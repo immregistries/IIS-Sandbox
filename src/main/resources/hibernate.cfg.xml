@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-configuration SYSTEM "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+  <session-factory>
+    <property name="hibernate.connection.driver_class">com.mysql.jdbc.Driver</property>
+
+    <property name="hibernate.connection.url">jdbc:mysql://localhost/iis</property>
+    <property name="hibernate.connection.username">iis_web</property>
+    <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
+    <property name="connection.password">SharkBaitHooHaHa</property>
+ 
+    <property name="show_sql">false</property>
+    <property name="hibernate.c3p0.acquire_increment">1</property>
+    <property name="hibernate.c3p0.idle_test_period">100</property><!--  seconds -->
+    <property name="hibernate.c3p0.timeout">100</property><!--  seconds -->
+    <property name="hibernate.c3p0.max_size">30</property>
+    <property name="hibernate.c3p0.min_size">5</property>
+    <property name="hibernate.c3p0.max_statements">10</property>
+    <mapping resource="org/immregistries/aart/model/Agreement.hbm.xml"/>
+
+  </session-factory>
+</hibernate-configuration>
