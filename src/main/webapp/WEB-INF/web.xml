@@ -5,12 +5,12 @@
   <display-name>IIS Kernal</display-name>
 
   <servlet>
-    <servlet-name></servlet-name>
-    <servlet-class></servlet-class>
+    <servlet-name>pop</servlet-name>
+    <servlet-class>org.immregistries.iis.kernal.servlet.PopServlet</servlet-class>
   </servlet>
   <servlet-mapping>
-    <servlet-name></servlet-name>
-    <url-pattern></url-pattern>
+    <servlet-name>pop</servlet-name>
+    <url-pattern>pop</url-pattern>
   </servlet-mapping>
 
 
