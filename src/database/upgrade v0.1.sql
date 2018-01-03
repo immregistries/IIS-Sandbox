@@ -12,7 +12,7 @@ CREATE TABLE Patient_Master      (patient_id               int            NOT NU
                                   patient_name_last        varchar(30)    NOT NULL,
                                   patient_name_first       varchar(30)    NOT NULL,
                                   patient_name_middle      varchar(30)            ,
-                                  patient_birth_date       varchar(30)    NOT NULL,
+                                  patient_birth_date       date           NOT NULL,
                                   patient_phone_frag       varchar(30)            ,
                                   patient_address_frag     varchar(30)            ,
                                   patient_soundex_last     varchar(30)    NOT NULL,
@@ -37,8 +37,8 @@ CREATE TABLE Patient_Match       (match_id                 int            NOT NU
  
 CREATE TABLE Vaccination_Master  (vaccination_id           int            NOT NULL       AUTO_Increment   PRIMARY KEY,
                                   patient_id               int            NOT NULL,
-                                  administered_date        int            NOT NULL,
-                                  vaccine_cvx_code         int            NOT NULL); 
+                                  administered_date        date           NOT NULL,
+                                  vaccine_cvx_code         varchar(80)    NOT NULL);
 
 CREATE TABLE Vaccination_Reported (reported_vaccination_id int            NOT NULL       AUTO_Increment   PRIMARY KEY, 
                                   reported_patient_id      int            NOT NULL,           

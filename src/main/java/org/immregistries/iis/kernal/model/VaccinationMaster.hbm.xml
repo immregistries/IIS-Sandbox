@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="org.immregistries.iis.kernal.model">
+  <class name="VaccinationMaster" table="vaccination_master">
+    <id name="vaccinationId" column="vaccination_id">
+      <generator class="native"/>
+    </id>
+    <property name="patientId" column="patient_id" type="integer"/>
+    <property name="administeredDate" column="administered_date" type="date"/>
+    <property name="vaccineCvxCode" column="vaccine_cvx_code" type="string"/>
+  </class>
+</hibernate-mapping>

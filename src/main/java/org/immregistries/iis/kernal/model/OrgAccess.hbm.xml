@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="org.immregistries.iis.kernal.model">
+  <class name="OrgAccess" table="org_access">
+    <id name="orgAccessId" column="org_access_id">
+      <generator class="native"/>
+    </id>
+    <property name="orgId" column="org_id" type="integer"/>
+    <property name="accessName" column="access_name" type="string"/>
+    <property name="accessKey" column="access_key" type="string"/>
+  </class>
+</hibernate-mapping>

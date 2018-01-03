@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="org.immregistries.iis.kernal.model">
+  <class name="PatientMatch" table="patient_match">
+    <id name="matchId" column="match_id">
+      <generator class="native"/>
+    </id>
+    <property name="reportedPatientAId" column="reported_patient_a_id" type="integer"/>
+    <property name="reportedPatientBId" column="reported_patient_b_id" type="integer"/>
+    <property name="matchStatus" column="match_status" type="character"/>
+  </class>
+</hibernate-mapping>

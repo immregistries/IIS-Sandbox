@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="org.immregistries.iis.kernal.model">
+  <class name="PatientMaster" table="patient_master">
+    <id name="patientId" column="patient_id">
+      <generator class="native"/>
+    </id>
+    <property name="patientRegistryId" column="patient_registry_id" type="integer"/>
+    <property name="patientNameLast" column="patient_name_last" type="string"/>
+    <property name="patientNameFirst" column="patient_name_first" type="string"/>
+    <property name="patientNameMiddle" column="patient_name_middle" type="string"/>
+    <property name="patientBirthDate" column="patient_birth_date" type="date"/>
+    <property name="patientPhoneFrag" column="patient_phone_frag" type="string"/>
+    <property name="patientAddressFrag" column="patient_address_frag" type="string"/>
+    <property name="patientSoundexLast" column="patient_soundex_last" type="string"/>
+    <property name="patientSoundexFirst" column="patient_soundex_first" type="string"/>
+  </class>
+</hibernate-mapping>

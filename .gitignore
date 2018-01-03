@@ -2,3 +2,7 @@
 .project
 .settings/org.eclipse.jdt.core.prefs
 target/
+
+.idea/
+
+iis-kernal-poc.iml
