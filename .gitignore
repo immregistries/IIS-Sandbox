@@ -6,3 +6,5 @@ target/
 .idea/
 
 iis-kernal-poc.iml
+
+bin/
