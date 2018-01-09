@@ -55,12 +55,12 @@ public class PopServlet extends HttpServlet {
       String message = EXAMPLE_HL7;
       String actionStatus = null;
       String userid = req.getParameter(PARAM_USERID);
-      if (userid == null) {
-        userid = "";
+      if (userid == null || userid.equals("")) {
+        userid = "Mercy";
       }
       String password = req.getParameter(PARAM_PASSWORD);
-      if (password == null) {
-        password = "";
+      if (password == null || password.equals("")) {
+        password = "password1234";
       }
       String facilityid = req.getParameter(PARAM_FACILITYID);
       if (facilityid == null) {
@@ -74,15 +74,18 @@ public class PopServlet extends HttpServlet {
           query.setParameter(0, userid);
           query.setParameter(1, password);
           List<OrgAccess> orgAccessList = query.list();
-          if (orgAccessList.size() > 0)
+          if (orgAccessList.size() == 0)
+          {
+            actionStatus = "Userid and/or password is not recognized";
+          }
+          else 
           {
             OrgAccess orgAccess = orgAccessList.get(0);
             message = req.getParameter(PARAM_MESSAGE);
-            IncomingMessageHandler handler = new IncomingMessageHandler();
-            handler.process(message);
+            IncomingMessageHandler handler = new IncomingMessageHandler(dataSession);
+            handler.process(message, orgAccess);
             actionStatus = "Message Processed";
             dataSession.close();
-            
           }
         }
       }
@@ -93,13 +96,13 @@ public class PopServlet extends HttpServlet {
       out.println("  <body>");
       out.println("    <h1>Pop Test Interface</h1>");
       if (actionStatus != null) {
-        out.println("    <p style=\"font-color: red;\">" + actionStatus + "</p>");
+        out.println("    <p style=\"color: red;\">" + actionStatus + "</p>");
       }
       out.println("    <form method=\"POST\" action=\"pop\">");
-      out.println("    User Id: <text type=\"text\" name=\"" + PARAM_USERID + "\" value=\"" + userid
+      out.println("    User Id: <input type=\"text\" name=\"" + PARAM_USERID + "\" value=\"" + userid
           + "\"/><br/>");
-      out.println("    Password: <text type=\"password\" name=\"" + PARAM_PASSWORD + "\"/><br/>");
-      out.println("    Facility Id: <text type=\"text\" name=\"" + PARAM_FACILITYID + "\" value=\""
+      out.println("    Password: <input type=\"password\" name=\"" + PARAM_PASSWORD + "\"/><br/>");
+      out.println("    Facility Id: <input type=\"text\" name=\"" + PARAM_FACILITYID + "\" value=\""
           + facilityid + "\"/><br/>");
       out.println("      <textarea name=\"" + PARAM_MESSAGE + "\" rows=\"15\" cols=\"160\">"
           + message + "</textarea><br/>");

@@ -1,9 +1,21 @@
 package org.immregistries.iis.kernal.logic;
 
+import org.hibernate.Query;
+import org.hibernate.Session;
 import org.immregistries.dqa.hl7util.parser.HL7Reader;
+import org.immregistries.iis.kernal.model.OrgAccess;
+import org.immregistries.iis.kernal.model.PatientReported;
 
 public class IncomingMessageHandler {
-  public String process(String message) {
+  
+  private Session dataSession = null;
+  
+  public IncomingMessageHandler(Session dataSession)
+  {
+    this.dataSession = dataSession;
+  }
+  
+  public String process(String message, OrgAccess orgAccess) {
     HL7Reader reader = new HL7Reader(message);
     String nameFirst = "";
     String nameLast = "";
@@ -31,6 +43,12 @@ public class IncomingMessageHandler {
     System.out.println("--> state = " + state);
     System.out.println("--> zip = " + zip);
     System.out.println("--> phone = " + phone);
+    
+    PatientReported patientReported;
+    
+    {
+      // Query query = dataSession.createQuery("from PatientReported where reportedOrg = ?");
+    }
     
     if (zip.length()>5)
     {

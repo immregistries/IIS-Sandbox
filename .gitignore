@@ -12,3 +12,4 @@ bin/
 .DS_Store
 
 .settings/org.eclipse.core.resources.prefs
+src/database/.~lock.ERD v0.1.odg#

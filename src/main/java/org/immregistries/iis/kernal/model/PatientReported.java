@@ -7,12 +7,20 @@ import java.util.Date;
  */
 public class PatientReported {
     private int reportedPatientId = 0;
-    private int reportedOrgId = 0;
+    private OrgMaster reportedOrg = null;
     private String reportedMrn = "";
     private int patientId = 0;
     private String patientData = "";
     private Date reportedDate = null;
     private Date updatedDate = null;
+
+    public OrgMaster getReportedOrg() {
+      return reportedOrg;
+    }
+
+    public void setReportedOrg(OrgMaster reportedOrg) {
+      this.reportedOrg = reportedOrg;
+    }
 
     public int getReportedPatientId() {
         return reportedPatientId;
@@ -20,14 +28,6 @@ public class PatientReported {
 
     public void setReportedPatientId(int reportedPatientId) {
         this.reportedPatientId = reportedPatientId;
-    }
-
-    public int getReportedOrgId() {
-        return reportedOrgId;
-    }
-
-    public void setReportedOrgId(int reportedOrgId) {
-        this.reportedOrgId = reportedOrgId;
     }
 
     public String getReportedMrn() {

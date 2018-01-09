@@ -5,7 +5,7 @@
     <id name="reportedPatientId" column="reported_patient_id">
       <generator class="native"/>
     </id>
-    <property name="reportedOrgId" column="reported_org_id" type="integer"/>
+    <many-to-one name="reportedOrg" column="reported_org_id" class="OrgMaster"/>
     <property name="reportedMrn" column="reported_mrn" type="string"/>
     <property name="patientId" column="patient_id" type="integer"/>
     <property name="patientData" column="patient_data" type="string"/>
