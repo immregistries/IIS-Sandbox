@@ -11,6 +11,7 @@ public class IncomingMessageHandler {
     String city = "";
     String state = "";
     String zip = "";
+    String phone = "";
     if (reader.advanceToSegment("PID"))
     {
       nameLast = reader.getValue(5, 1);
@@ -19,13 +20,41 @@ public class IncomingMessageHandler {
       city = reader.getValue(11, 3);
       state = reader.getValue(11, 4);
       zip = reader.getValue(11, 5);
+      phone = reader.getValue(13, 7);
     }
+    
+    if (zip.length()>5)
+    {
+    	 zip=zip.substring(0, 5);
+    }
+    
     System.out.println("--> nameFirst = " + nameFirst);
     System.out.println("--> nameLast = " + nameLast);
-    System.out.println("--> adress = " + address);
+    System.out.println("--> address = " + address);
     System.out.println("--> city = " + city);
     System.out.println("--> state = " + state);
     System.out.println("--> zip = " + zip);
+    System.out.println("--> phone = " + phone);
+    
+    String ndcCode = "";
+    String adminDate = "";
+    if (reader.advanceToSegment("RXA"))
+    {
+    		ndcCode = reader.getValue(5,1);
+    		adminDate = reader.getValue(3,1);
+    }
+    System.out.println("--> ndcCode = " + ndcCode);
+    System.out.println("--> adminDate = " + adminDate);
+    
+//    if (reader.advanceToSegment("OBX", "RXA"))
+//    {
+//    		if (reader.getValue(1, 1)=="1")
+//    		{
+//    			if (reader.advanceToSegment("OBX"))
+//    		}
+//    }
+    
+    
     
     // do stuff here to put it in the database
     return "MSH|^~\\&|DCS|MYIIS|MYIIS||20090604000020-0500||ACK^V04^ACK|1234567|P|2.5.1|||NE|NE|||||Z23^CDCPHINVS\r"

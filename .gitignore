@@ -8,3 +8,7 @@ target/
 iis-kernal-poc.iml
 
 bin/
+
+.DS_Store
+
+.settings/org.eclipse.core.resources.prefs
