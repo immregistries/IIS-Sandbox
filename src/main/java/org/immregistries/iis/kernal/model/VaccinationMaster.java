@@ -7,7 +7,7 @@ import java.util.Date;
  */
 public class VaccinationMaster {
     private int vaccinationId = 0;
-    private int patientId = 0;
+    private PatientMaster patient = null;
     private Date administeredDate = null;
     private String vaccineCvxCode = "";
 
@@ -19,15 +19,15 @@ public class VaccinationMaster {
         this.vaccinationId = vaccinationId;
     }
 
-    public int getPatientId() {
-        return patientId;
-    }
+    public PatientMaster getPatient() {
+		return patient;
+	}
 
-    public void setPatientId(int patientId) {
-        this.patientId = patientId;
-    }
+	public void setPatient(PatientMaster patient) {
+		this.patient = patient;
+	}
 
-    public Date getAdministeredDate() {
+	public Date getAdministeredDate() {
         return administeredDate;
     }
 

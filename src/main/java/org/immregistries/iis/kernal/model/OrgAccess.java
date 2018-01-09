@@ -5,7 +5,7 @@ package org.immregistries.iis.kernal.model;
  */
 public class OrgAccess {
     private int orgAccessId = 0;
-    private int orgId = 0;
+    private OrgMaster org = null;
     private String accessName = "";
     private String accessKey = "";
 
@@ -17,15 +17,15 @@ public class OrgAccess {
         this.orgAccessId = orgAccessId;
     }
 
-    public int getOrgId() {
-        return orgId;
-    }
+    public OrgMaster getOrg() {
+		return org;
+	}
 
-    public void setOrgId(int orgId) {
-        this.orgId = orgId;
-    }
+	public void setOrg(OrgMaster org) {
+		this.org = org;
+	}
 
-    public String getAccessName() {
+	public String getAccessName() {
         return accessName;
     }
 

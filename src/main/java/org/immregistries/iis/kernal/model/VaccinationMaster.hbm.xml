@@ -5,7 +5,7 @@
     <id name="vaccinationId" column="vaccination_id">
       <generator class="native"/>
     </id>
-    <property name="patientId" column="patient_id" type="integer"/>
+    <many-to-one name="patient" column="patient_id" class="PatientMaster"/>
     <property name="administeredDate" column="administered_date" type="date"/>
     <property name="vaccineCvxCode" column="vaccine_cvx_code" type="string"/>
   </class>

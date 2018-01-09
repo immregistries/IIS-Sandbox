@@ -7,7 +7,7 @@
     </id>
     <many-to-one name="reportedOrg" column="reported_org_id" class="OrgMaster"/>
     <property name="reportedMrn" column="reported_mrn" type="string"/>
-    <property name="patientId" column="patient_id" type="integer"/>
+    <many-to-one name="Patient" column="patient_id" class="PatientMaster"/>
     <property name="patientData" column="patient_data" type="string"/>
     <property name="reportedDate" column="reported_date" type="date"/>
     <property name="updatedDate" column="updated_date" type="date"/>

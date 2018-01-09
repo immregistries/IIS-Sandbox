@@ -5,9 +5,9 @@
     <id name="reportedVaccinationId" column="reported_vaccination_id">
       <generator class="native"/>
     </id>
-    <property name="reportedPatientId" column="reported_patient_id" type="integer"/>
+    <many-to-one name="reportedPatient" column="reported_patient_id" class="PatientReported"/>
     <property name="reportedOrderId" column="reported_order_id" type="integer"/>
-    <property name="vaccinationId" column="vaccination_id" type="integer"/>
+    <many-to-one name="vaccination" column="vaccination_id" class="VaccinationMaster"/>
     <property name="vaccinationData" column="vaccination_data" type="string"/>
     <property name="reportedDate" column="reported_date" type="date"/>
     <property name="updatedDate" column="updated_date" type="date"/>

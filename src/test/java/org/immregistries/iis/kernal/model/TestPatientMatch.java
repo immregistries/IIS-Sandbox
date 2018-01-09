@@ -17,7 +17,7 @@ public class TestPatientMatch extends TestCase {
     List<PatientMatch> patientMatchList = query.list();
     for (PatientMatch patientMatch : patientMatchList) {
       System.out
-          .println("--> patientMatch.getReportedPatientAId() = " + patientMatch.getReportedPatientAId());
+          .println("--> patientMatch.getReportedPatientAId() = " + patientMatch.getReportedPatientA());
     }
 
     dataSession.close();

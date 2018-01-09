@@ -5,8 +5,8 @@
     <id name="matchId" column="match_id">
       <generator class="native"/>
     </id>
-    <property name="reportedPatientAId" column="reported_patient_a_id" type="integer"/>
-    <property name="reportedPatientBId" column="reported_patient_b_id" type="integer"/>
+    <many-to-one name="reportedPatientA" column="reported_patient_a_id" class="PatientReported"/>
+    <many-to-one name="reportedPatientB" column="reported_patient_b_id" class="PatientReported"/>
     <property name="matchStatus" column="match_status" type="character"/>
   </class>
 </hibernate-mapping>

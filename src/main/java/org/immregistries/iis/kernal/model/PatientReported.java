@@ -9,7 +9,7 @@ public class PatientReported {
     private int reportedPatientId = 0;
     private OrgMaster reportedOrg = null;
     private String reportedMrn = "";
-    private int patientId = 0;
+    private PatientMaster patient = null;
     private String patientData = "";
     private Date reportedDate = null;
     private Date updatedDate = null;
@@ -38,15 +38,15 @@ public class PatientReported {
         this.reportedMrn = reportedMrn;
     }
 
-    public int getPatientId() {
-        return patientId;
-    }
+    public PatientMaster getPatient() {
+		return patient;
+	}
 
-    public void setPatientId(int patientId) {
-        this.patientId = patientId;
-    }
+	public void setPatient(PatientMaster patient) {
+		this.patient = patient;
+	}
 
-    public String getPatientData() {
+	public String getPatientData() {
         return patientData;
     }
 

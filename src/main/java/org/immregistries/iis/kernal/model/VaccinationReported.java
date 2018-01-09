@@ -7,9 +7,9 @@ import java.util.Date;
  */
 public class VaccinationReported {
     private int reportedVaccinationId = 0;
-    private int reportedPatientId = 0;
+    private PatientReported reportedPatient = null;
     private int reportedOrderId = 0;
-    private int vaccinationId = 0;
+    private VaccinationMaster vaccination = null;
     private String vaccinationData = "";
     private Date reportedDate = null;
     private Date updatedDate = null;
@@ -22,15 +22,15 @@ public class VaccinationReported {
         this.reportedVaccinationId = reportedVaccinationId;
     }
 
-    public int getReportedPatientId() {
-        return reportedPatientId;
-    }
+    public PatientReported getReportedPatient() {
+		return reportedPatient;
+	}
 
-    public void setReportedPatientId(int reportedPatientId) {
-        this.reportedPatientId = reportedPatientId;
-    }
+	public void setReportedPatient(PatientReported reportedPatient) {
+		this.reportedPatient = reportedPatient;
+	}
 
-    public int getReportedOrderId() {
+	public int getReportedOrderId() {
         return reportedOrderId;
     }
 
@@ -38,15 +38,15 @@ public class VaccinationReported {
         this.reportedOrderId = reportedOrderId;
     }
 
-    public int getVaccinationId() {
-        return vaccinationId;
-    }
+    public VaccinationMaster getVaccination() {
+		return vaccination;
+	}
 
-    public void setVaccinationId(int vaccinationId) {
-        this.vaccinationId = vaccinationId;
-    }
+	public void setVaccination(VaccinationMaster vaccination) {
+		this.vaccination = vaccination;
+	}
 
-    public String getVaccinationData() {
+	public String getVaccinationData() {
         return vaccinationData;
     }
 

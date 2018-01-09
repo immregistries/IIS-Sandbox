@@ -5,8 +5,8 @@ package org.immregistries.iis.kernal.model;
  */
 public class PatientMatch {
     private int matchId = 0;
-    private int reportedPatientAId = 0;
-    private int reportedPatientBId = 0;
+    private PatientReported reportedPatientA = null;
+    private PatientReported reportedPatientB = null;
     private MatchStatus matchStatus = null;
 
     public int getMatchId() {
@@ -17,23 +17,23 @@ public class PatientMatch {
         this.matchId = matchId;
     }
 
-    public int getReportedPatientAId() {
-        return reportedPatientAId;
-    }
+    public PatientReported getReportedPatientA() {
+		return reportedPatientA;
+	}
 
-    public void setReportedPatientAId(int reportedPatientAId) {
-        this.reportedPatientAId = reportedPatientAId;
-    }
+	public void setReportedPatientA(PatientReported reportedPatientA) {
+		this.reportedPatientA = reportedPatientA;
+	}
 
-    public int getReportedPatientBId() {
-        return reportedPatientBId;
-    }
+	public PatientReported getReportedPatientB() {
+		return reportedPatientB;
+	}
 
-    public void setReportedPatientBId(int reportedPatientBId) {
-        this.reportedPatientBId = reportedPatientBId;
-    }
+	public void setReportedPatientB(PatientReported reportedPatientB) {
+		this.reportedPatientB = reportedPatientB;
+	}
 
-    public MatchStatus getMatchStatus() { return matchStatus; }
+	public MatchStatus getMatchStatus() { return matchStatus; }
 
     public void setMatchStatus(MatchStatus matchStatus) { this.matchStatus = matchStatus; }
 }
