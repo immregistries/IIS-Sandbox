@@ -12,6 +12,7 @@ public class IncomingMessageHandler {
     String state = "";
     String zip = "";
     String phone = "";
+    String addressFrag = "";
     if (reader.advanceToSegment("PID"))
     {
       nameLast = reader.getValue(5, 1);
@@ -23,11 +24,6 @@ public class IncomingMessageHandler {
       phone = reader.getValue(13, 7);
     }
     
-    if (zip.length()>5)
-    {
-    	 zip=zip.substring(0, 5);
-    }
-    
     System.out.println("--> nameFirst = " + nameFirst);
     System.out.println("--> nameLast = " + nameLast);
     System.out.println("--> address = " + address);
@@ -35,6 +31,17 @@ public class IncomingMessageHandler {
     System.out.println("--> state = " + state);
     System.out.println("--> zip = " + zip);
     System.out.println("--> phone = " + phone);
+    
+    if (zip.length()>5)
+    {
+    	 zip = zip.substring(0, 5);
+    }
+    int spaceIndex = address.indexOf(" ");
+    address = address.substring(0, spaceIndex);
+    addressFrag = zip + ":" + address;
+    
+    System.out.println("--> addressFrag = " + addressFrag);
+    
     
     String ndcCode = "";
     String adminDate = "";
