@@ -2,19 +2,28 @@ package org.immregistries.iis.kernal.servlet;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.hibernate.Query;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.AnnotationConfiguration;
 import org.immregistries.iis.kernal.logic.IncomingMessageHandler;
+import org.immregistries.iis.kernal.model.OrgAccess;
 
 public class PopServlet extends HttpServlet {
 
-  private static final String PARAM_MESSAGE = "message";
-  private static final String PARAM_ACTION = "action";
-  private static final String ACTION_SUBMIT = "Submit";
+  public static final String PARAM_MESSAGE = "MESSAGEDATA";
+  public static final String PARAM_ACTION = "action";
+  public static final String PARAM_USERID = "USERID";
+  public static final String PARAM_PASSWORD = "PASSWORD";
+  public static final String PARAM_FACILITYID = "FACILITYID";
+  public static final String ACTION_SUBMIT = "Submit";
 
   private static final String EXAMPLE_HL7 =
       "MSH|^~\\&|Test EHR Application|X68||NIST Test Iz Reg|20120701082240-0500||VXU^V04^VXU_V04|NIST-IZ-001.00|P|2.5.1|||ER|AL|||||Z22^CDCPHINVS\n"
@@ -45,12 +54,36 @@ public class PopServlet extends HttpServlet {
       String action = req.getParameter(PARAM_ACTION);
       String message = EXAMPLE_HL7;
       String actionStatus = null;
+      String userid = req.getParameter(PARAM_USERID);
+      if (userid == null) {
+        userid = "";
+      }
+      String password = req.getParameter(PARAM_PASSWORD);
+      if (password == null) {
+        password = "";
+      }
+      String facilityid = req.getParameter(PARAM_FACILITYID);
+      if (facilityid == null) {
+        facilityid = "";
+      }
       if (action != null) {
         if (action.equals(ACTION_SUBMIT)) {
-          message = req.getParameter(PARAM_MESSAGE);
-          IncomingMessageHandler handler = new IncomingMessageHandler();
-          handler.process(message);
-          actionStatus = "Message Processed";
+          SessionFactory factory = new AnnotationConfiguration().configure().buildSessionFactory();
+          Session dataSession = factory.openSession();
+          Query query = dataSession.createQuery("from OrgAccess where accessName = ? and accessKey = ?");
+          query.setParameter(0, userid);
+          query.setParameter(1, password);
+          List<OrgAccess> orgAccessList = query.list();
+          if (orgAccessList.size() > 0)
+          {
+            OrgAccess orgAccess = orgAccessList.get(0);
+            message = req.getParameter(PARAM_MESSAGE);
+            IncomingMessageHandler handler = new IncomingMessageHandler();
+            handler.process(message);
+            actionStatus = "Message Processed";
+            dataSession.close();
+            
+          }
         }
       }
       out.println("<html>");
@@ -63,8 +96,13 @@ public class PopServlet extends HttpServlet {
         out.println("    <p style=\"font-color: red;\">" + actionStatus + "</p>");
       }
       out.println("    <form method=\"POST\" action=\"pop\">");
+      out.println("    User Id: <text type=\"text\" name=\"" + PARAM_USERID + "\" value=\"" + userid
+          + "\"/><br/>");
+      out.println("    Password: <text type=\"password\" name=\"" + PARAM_PASSWORD + "\"/><br/>");
+      out.println("    Facility Id: <text type=\"text\" name=\"" + PARAM_FACILITYID + "\" value=\""
+          + facilityid + "\"/><br/>");
       out.println("      <textarea name=\"" + PARAM_MESSAGE + "\" rows=\"15\" cols=\"160\">"
-          + message + "</textarea>");
+          + message + "</textarea><br/>");
       out.println("      <input type=\"submit\" name=\"" + PARAM_ACTION + "\" value=\""
           + ACTION_SUBMIT + "\"/>");
       out.println("    </form>");
