@@ -14,6 +14,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.AnnotationConfiguration;
 import org.immregistries.iis.kernal.logic.IncomingMessageHandler;
+import org.immregistries.iis.kernal.logic.ProcessingException;
 import org.immregistries.iis.kernal.model.OrgAccess;
 
 public class PopServlet extends HttpServlet {
@@ -70,21 +71,23 @@ public class PopServlet extends HttpServlet {
         if (action.equals(ACTION_SUBMIT)) {
           SessionFactory factory = new AnnotationConfiguration().configure().buildSessionFactory();
           Session dataSession = factory.openSession();
-          Query query = dataSession.createQuery("from OrgAccess where accessName = ? and accessKey = ?");
+          Query query =
+              dataSession.createQuery("from OrgAccess where accessName = ? and accessKey = ?");
           query.setParameter(0, userid);
           query.setParameter(1, password);
           List<OrgAccess> orgAccessList = query.list();
-          if (orgAccessList.size() == 0)
-          {
+          if (orgAccessList.size() == 0) {
             actionStatus = "Userid and/or password is not recognized";
-          }
-          else 
-          {
+          } else {
             OrgAccess orgAccess = orgAccessList.get(0);
             message = req.getParameter(PARAM_MESSAGE);
             IncomingMessageHandler handler = new IncomingMessageHandler(dataSession);
-            handler.process(message, orgAccess);
-            actionStatus = "Message Processed";
+            try {
+              handler.process(message, orgAccess);
+              actionStatus = "Message Processed";
+            } catch (ProcessingException pe) {
+              actionStatus = pe.getMessage();
+            }
             dataSession.close();
           }
         }
@@ -99,8 +102,8 @@ public class PopServlet extends HttpServlet {
         out.println("    <p style=\"color: red;\">" + actionStatus + "</p>");
       }
       out.println("    <form method=\"POST\" action=\"pop\">");
-      out.println("    User Id: <input type=\"text\" name=\"" + PARAM_USERID + "\" value=\"" + userid
-          + "\"/><br/>");
+      out.println("    User Id: <input type=\"text\" name=\"" + PARAM_USERID + "\" value=\""
+          + userid + "\"/><br/>");
       out.println("    Password: <input type=\"password\" name=\"" + PARAM_PASSWORD + "\"/><br/>");
       out.println("    Facility Id: <input type=\"text\" name=\"" + PARAM_FACILITYID + "\" value=\""
           + facilityid + "\"/><br/>");
