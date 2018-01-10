@@ -42,7 +42,7 @@ CREATE TABLE Vaccination_Master  (vaccination_id           int            NOT NU
 
 CREATE TABLE Vaccination_Reported (reported_vaccination_id int            NOT NULL       AUTO_Increment   PRIMARY KEY, 
                                   reported_patient_id      int            NOT NULL,           
-                                  reported_order_id        int            NOT NULL,           
+                                  reported_order_id        varchar(60)    NOT NULL,           
                                   vaccination_id           int            NOT NULL,
                                   vaccination_data         varchar(20000) NOT NULL,
                                   reported_date            datetime       NOT NULL,

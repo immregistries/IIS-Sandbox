@@ -1,5 +1,7 @@
 package org.immregistries.iis.kernal.logic;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
@@ -33,6 +35,7 @@ public class IncomingMessageHandler {
     String addressFrag = "";
     String reportedMrn = "";
     Date birthDate = null;
+    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
     if (reader.advanceToSegment("PID")) {
       reportedMrn = reader.getValueBySearchingRepeats(3, 1, "MR", 5);
       nameLast = reader.getValue(5, 1);
@@ -43,13 +46,19 @@ public class IncomingMessageHandler {
       state = reader.getValue(11, 4);
       zip = reader.getValue(11, 5);
       phone = reader.getValue(13, 7);
-      // birthDate = reader.getValue(arg0)
-    }
+      try {
+		birthDate = simpleDateFormat.parse(reader.getValue(7));
+	  } catch (ParseException e) {
+		  throw new ProcessingException("Could not read date of birth");
+	  }
+	}
 
     if (reportedMrn.equals("")) {
       throw new ProcessingException("MRN was not found, required for accepting vaccination report");
     }
-
+    
+    
+    
     System.out.println("--> nameFirst = " + nameFirst);
     System.out.println("--> nameLast = " + nameLast);
     System.out.println("--> address = " + address);
@@ -84,7 +93,9 @@ public class IncomingMessageHandler {
     patient.setPatientNameLast(nameLast);
     patient.setPatientNameFirst(nameFirst);
     patient.setPatientNameMiddle(nameMiddle);
-    patient.setPatientBirthDate(new Date());
+    patient.setPatientAddressFrag(addressFrag);
+    patient.setPatientPhoneFrag(phone);
+    patient.setPatientBirthDate(birthDate);
     patient.setPatientSoundexFirst("Blah");
     patient.setPatientSoundexLast("Blah");
     // finish this part
