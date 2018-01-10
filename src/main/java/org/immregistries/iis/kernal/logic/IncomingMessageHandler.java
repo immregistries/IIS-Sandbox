@@ -16,6 +16,10 @@ import org.immregistries.iis.kernal.model.PatientReported;
 import org.immregistries.iis.kernal.model.VaccinationReported;
 
 public class IncomingMessageHandler {
+  // TODO: 
+  //   Organize logic classes, need to have access classes for every object, maybe a new Access package? 
+  //   Look at names of database fields, make more consistent
+  //   Finish implementing the vaccination logic, use NDC instead of CVX, we'll translate to CVX later
 
   private Session dataSession = null;
 
