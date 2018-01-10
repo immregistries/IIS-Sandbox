@@ -6,7 +6,7 @@
       <generator class="native"/>
     </id>
     <many-to-one name="reportedPatient" column="reported_patient_id" class="PatientReported"/>
-    <property name="reportedOrderId" column="reported_order_id" type="integer"/>
+    <property name="reportedOrderId" column="reported_order_id" type="string"/>
     <many-to-one name="vaccination" column="vaccination_id" class="VaccinationMaster"/>
     <property name="vaccinationData" column="vaccination_data" type="string"/>
     <property name="reportedDate" column="reported_date" type="date"/>

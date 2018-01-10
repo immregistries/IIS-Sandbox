@@ -10,6 +10,15 @@ public class VaccinationMaster {
     private PatientMaster patient = null;
     private Date administeredDate = null;
     private String vaccineCvxCode = "";
+    private VaccinationReported vaccinationReported = null;
+
+    public VaccinationReported getVaccinationReported() {
+      return vaccinationReported;
+    }
+
+    public void setVaccinationReported(VaccinationReported vaccinationReported) {
+      this.vaccinationReported = vaccinationReported;
+    }
 
     public int getVaccinationId() {
         return vaccinationId;

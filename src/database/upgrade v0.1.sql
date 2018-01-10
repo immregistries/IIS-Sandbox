@@ -38,7 +38,8 @@ CREATE TABLE Patient_Match       (match_id                 int            NOT NU
 CREATE TABLE Vaccination_Master  (vaccination_id           int            NOT NULL       AUTO_Increment   PRIMARY KEY,
                                   patient_id               int            NOT NULL,
                                   administered_date        date           NOT NULL,
-                                  vaccine_cvx_code         varchar(80)    NOT NULL);
+                                  vaccine_cvx_code         varchar(80)    NOT NULL,
+                                  reported_vaccination_id  int            NOT NULL);
 
 CREATE TABLE Vaccination_Reported (reported_vaccination_id int            NOT NULL       AUTO_Increment   PRIMARY KEY, 
                                   reported_patient_id      int            NOT NULL,           
@@ -49,3 +50,5 @@ CREATE TABLE Vaccination_Reported (reported_vaccination_id int            NOT NU
                                   updated_date             datetime       NOT NULL,
                      FOREIGN KEY (reported_patient_id)     REFERENCES     Patient_Reported(reported_patient_id), 
                      FOREIGN KEY (vaccination_id)          REFERENCES     Vaccination_Master(vaccination_id) );
+
+ALTER TABLE Vaccination_Master ADD FOREIGN KEY (reported_vaccination_id)  REFERENCES Vaccination_Reported(reported_vaccination_id);

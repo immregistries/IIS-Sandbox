@@ -13,6 +13,7 @@ import org.immregistries.dqa.hl7util.parser.HL7Reader;
 import org.immregistries.iis.kernal.model.OrgAccess;
 import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.model.PatientReported;
+import org.immregistries.iis.kernal.model.VaccinationReported;
 
 public class IncomingMessageHandler {
 
@@ -47,18 +48,18 @@ public class IncomingMessageHandler {
       zip = reader.getValue(11, 5);
       phone = reader.getValue(13, 7);
       try {
-		birthDate = simpleDateFormat.parse(reader.getValue(7));
-	  } catch (ParseException e) {
-		  throw new ProcessingException("Could not read date of birth");
-	  }
-	}
+        birthDate = simpleDateFormat.parse(reader.getValue(7));
+      } catch (ParseException e) {
+        throw new ProcessingException("Could not read date of birth");
+      }
+    }
 
     if (reportedMrn.equals("")) {
       throw new ProcessingException("MRN was not found, required for accepting vaccination report");
     }
-    
-    
-    
+
+
+
     System.out.println("--> nameFirst = " + nameFirst);
     System.out.println("--> nameLast = " + nameLast);
     System.out.println("--> address = " + address);
@@ -96,15 +97,42 @@ public class IncomingMessageHandler {
     patient.setPatientAddressFrag(addressFrag);
     patient.setPatientPhoneFrag(phone);
     patient.setPatientBirthDate(birthDate);
-    patient.setPatientSoundexFirst("Blah");
-    patient.setPatientSoundexLast("Blah");
-    // finish this part
+    patient.setPatientSoundexFirst("Blah"); // TODO, later
+    patient.setPatientSoundexLast("Blah");  // TODO, later
     patientReported.setUpdatedDate(new Date());
+    patientReported.setPatientData(""); // TODO, this needs to be done sooner
+    {
+      Transaction transaction = dataSession.beginTransaction();
+      dataSession.saveOrUpdate(patient);
+      dataSession.saveOrUpdate(patientReported);
+      transaction.commit();
+    }
 
-    Transaction transaction = dataSession.beginTransaction();
-    dataSession.saveOrUpdate(patient);
-    dataSession.saveOrUpdate(patientReported);
-    transaction.commit();
+    while (reader.advanceToSegment("ORC")) {
+      String vaccinationOrderId = reader.getValue(3);
+      if (vaccinationOrderId.equals("")) {
+        throw new ProcessingException("Vaccination order id was not found, unable to process");
+      }
+      if (reader.advanceToSegment("RXA")) {
+        {
+          Query query = dataSession.createQuery(
+              "from VaccinationReported where reportedPatient = ? and reportedOrderId = ?");
+          query.setParameter(0, patientReported);
+          query.setParameter(1, vaccinationOrderId);
+          List<VaccinationReported> vaccinationReportedList = query.list();
+          if (vaccinationReportedList.size() > 0) {
+
+          }
+        }
+        // TODO need to find or create vaccination reported and master, then you can save them
+        {
+          Transaction transaction = dataSession.beginTransaction();
+          transaction.commit();
+        }
+        // do your stuff
+      }
+    }
+
 
 
     if (zip.length() > 5) {

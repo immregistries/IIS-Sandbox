@@ -8,7 +8,7 @@ import java.util.Date;
 public class VaccinationReported {
     private int reportedVaccinationId = 0;
     private PatientReported reportedPatient = null;
-    private int reportedOrderId = 0;
+    private String reportedOrderId = "";
     private VaccinationMaster vaccination = null;
     private String vaccinationData = "";
     private Date reportedDate = null;
@@ -30,11 +30,11 @@ public class VaccinationReported {
 		this.reportedPatient = reportedPatient;
 	}
 
-	public int getReportedOrderId() {
+	public String getReportedOrderId() {
         return reportedOrderId;
     }
 
-    public void setReportedOrderId(int reportedOrderId) {
+    public void setReportedOrderId(String reportedOrderId) {
         this.reportedOrderId = reportedOrderId;
     }
 
