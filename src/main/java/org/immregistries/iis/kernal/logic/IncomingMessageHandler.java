@@ -70,14 +70,6 @@ public class IncomingMessageHandler {
 
 
 
-    System.out.println("--> nameFirst = " + nameFirst);
-    System.out.println("--> nameLast = " + nameLast);
-    System.out.println("--> address = " + address);
-    System.out.println("--> city = " + city);
-    System.out.println("--> state = " + state);
-    System.out.println("--> zip = " + zip);
-    System.out.println("--> phone = " + phone);
-
     PatientReported patientReported = null;
     PatientMaster patient = null;
     {
@@ -141,8 +133,6 @@ public class IncomingMessageHandler {
           } catch (ParseException e) {
             throw new ProcessingException("Could not read administered date");
           }
-//        System.out.println("--> ndcCode = " + ndcCode);
-//        System.out.println("--> adminDate = " + adminDate);
         {
           Query query = dataSession.createQuery(
               "from VaccinationReported where patientReported = ? and vaccinationReportedExternalLink = ?");
@@ -184,26 +174,6 @@ public class IncomingMessageHandler {
         }
       }
     }
-
-
-
-    
-
-    System.out.println("--> addressFrag = " + addressFrag);
-
-
-//    String ndcCode = "";
-//    String adminDate = "";
-//    if (reader.advanceToSegment("RXA")) {
-//      ndcCode = reader.getValue(5, 1);
-//      adminDate = reader.getValue(3, 1);
-//    }
-//    System.out.println("--> ndcCode = " + ndcCode);
-//    System.out.println("--> adminDate = " + adminDate);
-
-    
-
-
 
     // do stuff here to put it in the database
     return "MSH|^~\\&|DCS|MYIIS|MYIIS||20090604000020-0500||ACK^V04^ACK|1234567|P|2.5.1|||NE|NE|||||Z23^CDCPHINVS\r"

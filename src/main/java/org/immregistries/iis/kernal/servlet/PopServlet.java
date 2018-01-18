@@ -25,6 +25,7 @@ public class PopServlet extends HttpServlet {
   public static final String PARAM_PASSWORD = "PASSWORD";
   public static final String PARAM_FACILITYID = "FACILITYID";
   public static final String ACTION_SUBMIT = "Submit";
+  public static final String PARAM_VIEW = "view";
 
   private static final String EXAMPLE_HL7 =
       "MSH|^~\\&|Test EHR Application|X68||NIST Test Iz Reg|20120701082240-0500||VXU^V04^VXU_V04|NIST-IZ-001.00|P|2.5.1|||ER|AL|||||Z22^CDCPHINVS\n"
@@ -67,8 +68,10 @@ public class PopServlet extends HttpServlet {
       if (facilityid == null) {
         facilityid = "";
       }
+      String ack = "";
       if (action != null) {
         if (action.equals(ACTION_SUBMIT)) {
+          message = req.getParameter(PARAM_MESSAGE);
           SessionFactory factory = new AnnotationConfiguration().configure().buildSessionFactory();
           Session dataSession = factory.openSession();
           Query query =
@@ -80,10 +83,9 @@ public class PopServlet extends HttpServlet {
             actionStatus = "Userid and/or password is not recognized";
           } else {
             OrgAccess orgAccess = orgAccessList.get(0);
-            message = req.getParameter(PARAM_MESSAGE);
             IncomingMessageHandler handler = new IncomingMessageHandler(dataSession);
             try {
-              handler.process(message, orgAccess);
+              ack = handler.process(message, orgAccess);
               actionStatus = "Message Processed";
             } catch (ProcessingException pe) {
               actionStatus = pe.getMessage();
@@ -92,28 +94,35 @@ public class PopServlet extends HttpServlet {
           }
         }
       }
-      out.println("<html>");
-      out.println("  <head>");
-      out.println("    <title>IIS Kernel Pop</title>");
-      out.println("  </head>");
-      out.println("  <body>");
-      out.println("    <h1>Pop Test Interface</h1>");
-      if (actionStatus != null) {
-        out.println("    <p style=\"color: red;\">" + actionStatus + "</p>");
+      if (req.getParameter(PARAM_VIEW) == null) {
+        resp.setContentType("text/plain");
+        out.print(ack);
+      } else {
+        out.println("<html>");
+        out.println("  <head>");
+        out.println("    <title>IIS Kernel Pop</title>");
+        out.println("  </head>");
+        out.println("  <body>");
+        out.println("    <h1>Pop Test Interface</h1>");
+        if (actionStatus != null) {
+          out.println("    <p style=\"color: red;\">" + actionStatus + "</p>");
+        }
+        out.println("    <form method=\"POST\" action=\"pop\">");
+        out.println("    User Id: <input type=\"text\" name=\"" + PARAM_USERID + "\" value=\""
+            + userid + "\"/><br/>");
+        out.println(
+            "    Password: <input type=\"password\" name=\"" + PARAM_PASSWORD + "\"/><br/>");
+        out.println("    Facility Id: <input type=\"text\" name=\"" + PARAM_FACILITYID
+            + "\" value=\"" + facilityid + "\"/><br/>");
+        out.println("      <textarea name=\"" + PARAM_MESSAGE + "\" rows=\"15\" cols=\"160\">"
+            + message + "</textarea><br/>");
+        out.println("      <input type=\"submit\" name=\"" + PARAM_ACTION + "\" value=\""
+            + ACTION_SUBMIT + "\"/>");
+        out.println("      <input type=\"hidden\" name=\"" + PARAM_VIEW + "\" value=\"user\"/>");
+        out.println("    </form>");
+        out.println("  </body>");
+        out.println("</html>");
       }
-      out.println("    <form method=\"POST\" action=\"pop\">");
-      out.println("    User Id: <input type=\"text\" name=\"" + PARAM_USERID + "\" value=\""
-          + userid + "\"/><br/>");
-      out.println("    Password: <input type=\"password\" name=\"" + PARAM_PASSWORD + "\"/><br/>");
-      out.println("    Facility Id: <input type=\"text\" name=\"" + PARAM_FACILITYID + "\" value=\""
-          + facilityid + "\"/><br/>");
-      out.println("      <textarea name=\"" + PARAM_MESSAGE + "\" rows=\"15\" cols=\"160\">"
-          + message + "</textarea><br/>");
-      out.println("      <input type=\"submit\" name=\"" + PARAM_ACTION + "\" value=\""
-          + ACTION_SUBMIT + "\"/>");
-      out.println("    </form>");
-      out.println("  </body>");
-      out.println("</html>");
     } catch (Exception e) {
       e.printStackTrace(System.err);
     }
