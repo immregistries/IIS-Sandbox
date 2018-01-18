@@ -13,13 +13,13 @@ import org.immregistries.dqa.hl7util.parser.HL7Reader;
 import org.immregistries.iis.kernal.model.OrgAccess;
 import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.model.PatientReported;
+import org.immregistries.iis.kernal.model.VaccinationMaster;
 import org.immregistries.iis.kernal.model.VaccinationReported;
 
 public class IncomingMessageHandler {
   // TODO: 
   //   Organize logic classes, need to have access classes for every object, maybe a new Access package? 
   //   Look at names of database fields, make more consistent
-  //   Finish implementing the vaccination logic, use NDC instead of CVX, we'll translate to CVX later
 
   private Session dataSession = null;
 
@@ -38,11 +38,11 @@ public class IncomingMessageHandler {
     String zip = "";
     String phone = "";
     String addressFrag = "";
-    String reportedMrn = "";
+    String patientReportedExternalLink = "";
     Date birthDate = null;
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
     if (reader.advanceToSegment("PID")) {
-      reportedMrn = reader.getValueBySearchingRepeats(3, 1, "MR", 5);
+    	  patientReportedExternalLink = reader.getValueBySearchingRepeats(3, 1, "MR", 5);
       nameLast = reader.getValue(5, 1);
       nameFirst = reader.getValue(5, 2);
       nameMiddle = reader.getValue(5, 3);
@@ -51,6 +51,12 @@ public class IncomingMessageHandler {
       state = reader.getValue(11, 4);
       zip = reader.getValue(11, 5);
       phone = reader.getValue(13, 7);
+      if (zip.length() > 5) {
+          zip = zip.substring(0, 5);
+        }
+        int spaceIndex = address.indexOf(" ");
+        address = address.substring(0, spaceIndex);
+        addressFrag = zip + ":" + address;
       try {
         birthDate = simpleDateFormat.parse(reader.getValue(7));
       } catch (ParseException e) {
@@ -58,7 +64,7 @@ public class IncomingMessageHandler {
       }
     }
 
-    if (reportedMrn.equals("")) {
+    if (patientReportedExternalLink.equals("")) {
       throw new ProcessingException("MRN was not found, required for accepting vaccination report");
     }
 
@@ -76,9 +82,9 @@ public class IncomingMessageHandler {
     PatientMaster patient = null;
     {
       Query query =
-          dataSession.createQuery("from PatientReported where reportedOrg = ? and reportedMrn = ?");
+          dataSession.createQuery("from PatientReported where orgReported = ? and patientReportedExternalLink = ?");
       query.setParameter(0, orgAccess.getOrg());
-      query.setParameter(1, reportedMrn);
+      query.setParameter(1, patientReportedExternalLink);
       List<PatientReported> patientReportedList = query.list();
       if (patientReportedList.size() > 0) {
         patientReported = patientReportedList.get(0);
@@ -88,10 +94,10 @@ public class IncomingMessageHandler {
 
     if (patientReported == null) {
       patient = new PatientMaster();
-      patient.setPatientRegistryId(generatePatientRegistryId());
+      patient.setPatientExternalLink(generatePatientExternalLink());
       patientReported = new PatientReported();
-      patientReported.setReportedOrg(orgAccess.getOrg());
-      patientReported.setReportedMrn(reportedMrn);
+      patientReported.setOrgReported(orgAccess.getOrg());
+      patientReported.setPatientReportedExternalLink(patientReportedExternalLink);
       patientReported.setPatient(patient);
       patientReported.setReportedDate(new Date());
     }
@@ -104,67 +110,98 @@ public class IncomingMessageHandler {
     patient.setPatientSoundexFirst("Blah"); // TODO, later
     patient.setPatientSoundexLast("Blah");  // TODO, later
     patientReported.setUpdatedDate(new Date());
-    patientReported.setPatientData(""); // TODO, this needs to be done sooner
+    String patientData = "";
+    reader.resetPostion();
+    while(!(reader.getSegmentName().equals("ORC"))) {
+    	  patientData += reader.getOriginalSegment() + "/r";
+    	  reader.advance();
+    }
+    patientReported.setPatientData(patientData);
     {
       Transaction transaction = dataSession.beginTransaction();
       dataSession.saveOrUpdate(patient);
       dataSession.saveOrUpdate(patientReported);
       transaction.commit();
     }
-
-    while (reader.advanceToSegment("ORC")) {
-      String vaccinationOrderId = reader.getValue(3);
-      if (vaccinationOrderId.equals("")) {
+    while (reader.getSegmentName().equals("ORC")) {
+    	  String vaccineData = "";
+    	  VaccinationReported vaccinationReported = null;
+      VaccinationMaster vaccination = null;
+    	  String ndcCode = "";
+      Date adminDate = null;
+      String vaccinationReportedExternalLink = reader.getValue(3);
+      if (vaccinationReportedExternalLink.equals("")) {
         throw new ProcessingException("Vaccination order id was not found, unable to process");
       }
+      vaccineData += reader.getOriginalSegment() + "/r";
       if (reader.advanceToSegment("RXA")) {
+    	  	ndcCode = reader.getValue(5, 1);
+        try {
+            adminDate = simpleDateFormat.parse(reader.getValue(3,1));
+          } catch (ParseException e) {
+            throw new ProcessingException("Could not read administered date");
+          }
+//        System.out.println("--> ndcCode = " + ndcCode);
+//        System.out.println("--> adminDate = " + adminDate);
         {
           Query query = dataSession.createQuery(
-              "from VaccinationReported where reportedPatient = ? and reportedOrderId = ?");
+              "from VaccinationReported where patientReported = ? and vaccinationReportedExternalLink = ?");
           query.setParameter(0, patientReported);
-          query.setParameter(1, vaccinationOrderId);
+          query.setParameter(1, vaccinationReportedExternalLink);
           List<VaccinationReported> vaccinationReportedList = query.list();
           if (vaccinationReportedList.size() > 0) {
-
+        	  	vaccinationReported = vaccinationReportedList.get(0);
+        	  	vaccination = vaccinationReported.getVaccination();
           }
         }
-        // TODO need to find or create vaccination reported and master, then you can save them
+        if (vaccinationReported == null) {
+        		vaccination = new VaccinationMaster();
+        		vaccinationReported = new VaccinationReported();
+        		vaccinationReported.setVaccination(vaccination);
+        		vaccination.setVaccinationReported(null);
+        		vaccinationReported.setReportedDate(new Date());
+        		vaccinationReported.setVaccinationReportedExternalLink(vaccinationReportedExternalLink);
+        }
+        vaccinationReported.setPatientReported(patientReported);
+        vaccination.setPatient(patient);
+        vaccination.setVaccineCvxCode(ndcCode); // TODO: need to change to cvx
+        vaccination.setAdministeredDate(adminDate);
+        vaccinationReported.setUpdatedDate(new Date());
+        while (!(reader.getSegmentName().equals("ORC")) ) {
+        	  vaccineData += reader.getOriginalSegment() + "/r";
+        	  if (!(reader.advance())) {
+        		  break;
+        	  }
+        }
+        vaccinationReported.setVaccinationData(vaccineData);
         {
           Transaction transaction = dataSession.beginTransaction();
+          dataSession.saveOrUpdate(vaccination);
+          dataSession.saveOrUpdate(vaccinationReported);
+          vaccination.setVaccinationReported(vaccinationReported);
+          dataSession.saveOrUpdate(vaccination);
           transaction.commit();
         }
-        // do your stuff
       }
     }
 
 
 
-    if (zip.length() > 5) {
-      zip = zip.substring(0, 5);
-    }
-    int spaceIndex = address.indexOf(" ");
-    address = address.substring(0, spaceIndex);
-    addressFrag = zip + ":" + address;
+    
 
     System.out.println("--> addressFrag = " + addressFrag);
 
 
-    String ndcCode = "";
-    String adminDate = "";
-    if (reader.advanceToSegment("RXA")) {
-      ndcCode = reader.getValue(5, 1);
-      adminDate = reader.getValue(3, 1);
-    }
-    System.out.println("--> ndcCode = " + ndcCode);
-    System.out.println("--> adminDate = " + adminDate);
+//    String ndcCode = "";
+//    String adminDate = "";
+//    if (reader.advanceToSegment("RXA")) {
+//      ndcCode = reader.getValue(5, 1);
+//      adminDate = reader.getValue(3, 1);
+//    }
+//    System.out.println("--> ndcCode = " + ndcCode);
+//    System.out.println("--> adminDate = " + adminDate);
 
-    // if (reader.advanceToSegment("OBX", "RXA"))
-    // {
-    // if (reader.getValue(1, 1)=="1")
-    // {
-    // if (reader.advanceToSegment("OBX"))
-    // }
-    // }
+    
 
 
 
@@ -178,7 +215,7 @@ public class IncomingMessageHandler {
       {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T',
           'U', 'V', 'W', 'X', 'Y', 'Z', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
 
-  public String generatePatientRegistryId() {
+  public String generatePatientExternalLink() {
     boolean keepLooking = true;
     int count = 0;
     while (keepLooking) {
@@ -186,11 +223,11 @@ public class IncomingMessageHandler {
       if (count > 1000) {
         throw new RuntimeException("Unable to get a new id, tried 1000 times!");
       }
-      String patientRegistryId = generateId();
-      Query query = dataSession.createQuery("from PatientMaster where patientRegistryId = ?");
-      query.setParameter(0, patientRegistryId);
+      String patientExternalLink = generateId();
+      Query query = dataSession.createQuery("from PatientMaster where patientExternalLink = ?");
+      query.setParameter(0, patientExternalLink);
       if (query.list().size() == 0) {
-        return patientRegistryId;
+        return patientExternalLink;
         // we found a unique id!
       }
     }

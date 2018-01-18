@@ -6,36 +6,36 @@ import java.util.Date;
  * Created by Eric on 12/20/17.
  */
 public class PatientReported {
-    private int reportedPatientId = 0;
-    private OrgMaster reportedOrg = null;
-    private String reportedMrn = "";
+    private int patientReportedId = 0;
+    private OrgMaster orgReported = null;
+    private String patientReportedExternalLink = "";
     private PatientMaster patient = null;
     private String patientData = "";
     private Date reportedDate = null;
     private Date updatedDate = null;
 
-    public OrgMaster getReportedOrg() {
-      return reportedOrg;
+    public OrgMaster getOrgReported() {
+      return orgReported;
     }
 
-    public void setReportedOrg(OrgMaster reportedOrg) {
-      this.reportedOrg = reportedOrg;
+    public void setOrgReported(OrgMaster reportedOrg) {
+      this.orgReported = reportedOrg;
     }
 
-    public int getReportedPatientId() {
-        return reportedPatientId;
+    public int getPatientReportedId() {
+        return patientReportedId;
     }
 
-    public void setReportedPatientId(int reportedPatientId) {
-        this.reportedPatientId = reportedPatientId;
+    public void setPatientReportedId(int reportedPatientId) {
+        this.patientReportedId = reportedPatientId;
     }
 
-    public String getReportedMrn() {
-        return reportedMrn;
+    public String getPatientReportedExternalLink() {
+        return patientReportedExternalLink;
     }
 
-    public void setReportedMrn(String reportedMrn) {
-        this.reportedMrn = reportedMrn;
+    public void setPatientReportedExternalLink(String reportedMrn) {
+        this.patientReportedExternalLink = reportedMrn;
     }
 
     public PatientMaster getPatient() {

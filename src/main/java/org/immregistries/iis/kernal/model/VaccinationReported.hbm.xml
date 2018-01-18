@@ -2,11 +2,11 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 <hibernate-mapping package="org.immregistries.iis.kernal.model">
   <class name="VaccinationReported" table="vaccination_reported">
-    <id name="reportedVaccinationId" column="reported_vaccination_id">
+    <id name="vaccinationReportedId" column="vaccination_reported_id">
       <generator class="native"/>
     </id>
-    <many-to-one name="reportedPatient" column="reported_patient_id" class="PatientReported"/>
-    <property name="reportedOrderId" column="reported_order_id" type="string"/>
+    <many-to-one name="patientReported" column="patient_reported_id" class="PatientReported"/>
+    <property name="vaccinationReportedExternalLink" column="vaccination_reported_external_link" type="string"/>
     <many-to-one name="vaccination" column="vaccination_id" class="VaccinationMaster"/>
     <property name="vaccinationData" column="vaccination_data" type="string"/>
     <property name="reportedDate" column="reported_date" type="date"/>

@@ -7,7 +7,7 @@ import java.util.Date;
  */
 public class PatientMaster {
     private int patientId = 0;
-    private String patientRegistryId = "";
+    private String patientExternalLink = "";
     private String patientNameLast = "";
     private String patientNameFirst = "";
     private String patientNameMiddle = "";
@@ -25,12 +25,12 @@ public class PatientMaster {
         this.patientId = patientId;
     }
 
-    public String getPatientRegistryId() {
-        return patientRegistryId;
+    public String getPatientExternalLink() {
+        return patientExternalLink;
     }
 
-    public void setPatientRegistryId(String patientRegistryId) {
-        this.patientRegistryId = patientRegistryId;
+    public void setPatientExternalLink(String patientRegistryId) {
+        this.patientExternalLink = patientRegistryId;
     }
 
     public String getPatientNameLast() {

@@ -5,7 +5,7 @@
     <id name="patientId" column="patient_id">
       <generator class="native"/>
     </id>
-    <property name="patientRegistryId" column="patient_registry_id" type="string"/>
+    <property name="patientExternalLink" column="patient_external_link" type="string"/>
     <property name="patientNameLast" column="patient_name_last" type="string"/>
     <property name="patientNameFirst" column="patient_name_first" type="string"/>
     <property name="patientNameMiddle" column="patient_name_middle" type="string"/>

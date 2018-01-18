@@ -17,7 +17,7 @@ public class TestPatientReported extends TestCase {
     List<PatientReported> patientReportedList = query.list();
     for (PatientReported patientReported : patientReportedList) {
       System.out
-          .println("--> patientReported.getReportedMrn() = " + patientReported.getReportedMrn());
+          .println("--> patientReported.getReportedMrn() = " + patientReported.getPatientReportedExternalLink());
     }
 
     dataSession.close();

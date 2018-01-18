@@ -6,36 +6,36 @@ import java.util.Date;
  * Created by Eric on 12/20/17.
  */
 public class VaccinationReported {
-    private int reportedVaccinationId = 0;
-    private PatientReported reportedPatient = null;
-    private String reportedOrderId = "";
+    private int vaccinationReportedId = 0;
+    private PatientReported patientReported = null;
+    private String vaccinationReportedExternalLink = "";
     private VaccinationMaster vaccination = null;
     private String vaccinationData = "";
     private Date reportedDate = null;
     private Date updatedDate = null;
 
-    public int getReportedVaccinationId() {
-        return reportedVaccinationId;
+    public int getVaccinationReportedId() {
+        return vaccinationReportedId;
     }
 
-    public void setReportedVaccinationId(int reportedVaccinationId) {
-        this.reportedVaccinationId = reportedVaccinationId;
+    public void setVaccinationReportedId(int reportedVaccinationId) {
+        this.vaccinationReportedId = reportedVaccinationId;
     }
 
-    public PatientReported getReportedPatient() {
-		return reportedPatient;
+    public PatientReported getPatientReported() {
+		return patientReported;
 	}
 
-	public void setReportedPatient(PatientReported reportedPatient) {
-		this.reportedPatient = reportedPatient;
+	public void setPatientReported(PatientReported reportedPatient) {
+		this.patientReported = reportedPatient;
 	}
 
-	public String getReportedOrderId() {
-        return reportedOrderId;
+	public String getVaccinationReportedExternalLink() {
+        return vaccinationReportedExternalLink;
     }
 
-    public void setReportedOrderId(String reportedOrderId) {
-        this.reportedOrderId = reportedOrderId;
+    public void setVaccinationReportedExternalLink(String reportedOrderId) {
+        this.vaccinationReportedExternalLink = reportedOrderId;
     }
 
     public VaccinationMaster getVaccination() {
