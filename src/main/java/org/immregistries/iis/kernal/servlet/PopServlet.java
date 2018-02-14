@@ -94,7 +94,7 @@ public class PopServlet extends HttpServlet {
           }
         }
       }
-      if (req.getParameter(PARAM_VIEW) == null) {
+      if (req.getParameter(PARAM_VIEW) == null && !ack.equals("")) {
         resp.setContentType("text/plain");
         out.print(ack);
       } else {
