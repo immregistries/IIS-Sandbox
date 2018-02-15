@@ -67,6 +67,13 @@
     </dependency>
 
     <dependency>
+      <groupId>org.immregistries.vaccination_deduplication</groupId>
+      <artifactId>api</artifactId>
+      <version>0.1</version>
+    </dependency>
+
+
+    <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-log4j12</artifactId>
       <version>${slf4j.version}</version>
