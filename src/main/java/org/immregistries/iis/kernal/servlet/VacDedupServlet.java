@@ -182,7 +182,7 @@ public class VacDedupServlet extends HttpServlet {
           for (LinkedImmunization li : immunizationListResults) {
             i++;
             out.println("    <h3>Immunization Set " + i + " " + li.getType() + "</h3>");
-            out.println("      <table border=\"0\" cellpadding=\"3\">");
+            out.println("      <table border=\"1\" cellpadding=\"3\" cellspacing=\"0\">");
             out.println("        <tr>");
             out.println("          <th>Date</th>");
             out.println("          <th>CVX</th>");
