@@ -12,20 +12,30 @@ import javax.servlet.http.HttpServletResponse;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.hibernate.cfg.AnnotationConfiguration;
 import org.immregistries.iis.kernal.logic.IncomingMessageHandler;
-import org.immregistries.iis.kernal.logic.ProcessingException;
 import org.immregistries.iis.kernal.model.OrgAccess;
+import org.immregistries.iis.kernal.model.OrgMaster;
 
+@SuppressWarnings("serial")
 public class PopServlet extends HttpServlet {
 
   public static final String PARAM_MESSAGE = "MESSAGEDATA";
-  public static final String PARAM_ACTION = "action";
   public static final String PARAM_USERID = "USERID";
   public static final String PARAM_PASSWORD = "PASSWORD";
   public static final String PARAM_FACILITYID = "FACILITYID";
-  public static final String ACTION_SUBMIT = "Submit";
-  public static final String PARAM_VIEW = "view";
+  
+  private static SessionFactory factory;
+  
+  public static Session getDataSession()
+  {
+    if (factory == null)
+    {
+      factory = new AnnotationConfiguration().configure().buildSessionFactory();
+    }
+    return factory.openSession();
+  }
 
   private static final String EXAMPLE_HL7 =
       "MSH|^~\\&|Test EHR Application|X68||NIST Test Iz Reg|20120701082240-0500||VXU^V04^VXU_V04|NIST-IZ-001.00|P|2.5.1|||ER|AL|||||Z22^CDCPHINVS\n"
@@ -43,7 +53,33 @@ public class PopServlet extends HttpServlet {
   @Override
   protected void doPost(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
-    doGet(req, resp);
+    resp.setContentType("text/html");
+    PrintWriter out = new PrintWriter(resp.getOutputStream());
+    try {
+      String message = req.getParameter(PARAM_MESSAGE);
+      String userId = req.getParameter(PARAM_USERID);
+      String password = req.getParameter(PARAM_PASSWORD);
+      String facilityId = req.getParameter(PARAM_FACILITYID);
+      String ack = "";
+      Session dataSession = getDataSession();
+      try {
+        OrgAccess orgAccess = authenticateOrgAccess(userId, password, facilityId, dataSession);
+        if (orgAccess == null) {
+          throw new ServletException("Facilityid, userid and/or password are not recognized");
+        } else {
+          IncomingMessageHandler handler = new IncomingMessageHandler(dataSession);
+          ack = handler.process(message, orgAccess);
+        }
+      } finally {
+        dataSession.close();
+      }
+      resp.setContentType("text/plain");
+      out.print(ack);
+    } catch (Exception e) {
+      e.printStackTrace(System.err);
+    }
+    out.flush();
+    out.close();
   }
 
   @Override
@@ -53,72 +89,39 @@ public class PopServlet extends HttpServlet {
     resp.setContentType("text/html");
     PrintWriter out = new PrintWriter(resp.getOutputStream());
     try {
-      String action = req.getParameter(PARAM_ACTION);
-      String message = EXAMPLE_HL7;
-      String actionStatus = null;
-      String userid = req.getParameter(PARAM_USERID);
-      if (userid == null || userid.equals("")) {
-        userid = "Mercy";
+      String message = req.getParameter(PARAM_MESSAGE);
+      if (message == null || message.equals("")) {
+        message = EXAMPLE_HL7;
+      }
+      String userId = req.getParameter(PARAM_USERID);
+      if (userId == null || userId.equals("")) {
+        userId = "Mercy";
       }
       String password = req.getParameter(PARAM_PASSWORD);
       if (password == null || password.equals("")) {
         password = "password1234";
       }
-      String facilityid = req.getParameter(PARAM_FACILITYID);
-      if (facilityid == null) {
-        facilityid = "";
+      String facilityId = req.getParameter(PARAM_FACILITYID);
+      if (facilityId == null || facilityId.equals("")) {
+        facilityId = "Mercy Healthcare";
       }
-      String ack = "";
-      if (action != null) {
-        if (action.equals(ACTION_SUBMIT)) {
-          message = req.getParameter(PARAM_MESSAGE);
-          SessionFactory factory = new AnnotationConfiguration().configure().buildSessionFactory();
-          Session dataSession = factory.openSession();
-          Query query =
-              dataSession.createQuery("from OrgAccess where accessName = ? and accessKey = ?");
-          query.setParameter(0, userid);
-          query.setParameter(1, password);
-          List<OrgAccess> orgAccessList = query.list();
-          if (orgAccessList.size() == 0) {
-            actionStatus = "Userid and/or password is not recognized";
-          } else {
-            OrgAccess orgAccess = orgAccessList.get(0);
-            IncomingMessageHandler handler = new IncomingMessageHandler(dataSession);
-            try {
-              ack = handler.process(message, orgAccess);
-              actionStatus = "Message Processed";
-            } catch (ProcessingException pe) {
-              actionStatus = pe.getMessage();
-            }
-            dataSession.close();
-          }
-        }
-      }
-      if (req.getParameter(PARAM_VIEW) == null && !ack.equals("")) {
-        resp.setContentType("text/plain");
-        out.print(ack);
-      } else {
+      {
         out.println("<html>");
         out.println("  <head>");
         out.println("    <title>IIS Kernel Pop</title>");
         out.println("  </head>");
         out.println("  <body>");
         out.println("    <h1>Pop Test Interface</h1>");
-        if (actionStatus != null) {
-          out.println("    <p style=\"color: red;\">" + actionStatus + "</p>");
-        }
         out.println("    <form method=\"POST\" action=\"pop\">");
         out.println("    User Id: <input type=\"text\" name=\"" + PARAM_USERID + "\" value=\""
-            + userid + "\"/><br/>");
+            + userId + "\"/><br/>");
         out.println(
             "    Password: <input type=\"password\" name=\"" + PARAM_PASSWORD + "\"/><br/>");
         out.println("    Facility Id: <input type=\"text\" name=\"" + PARAM_FACILITYID
-            + "\" value=\"" + facilityid + "\"/><br/>");
+            + "\" value=\"" + facilityId + "\"/><br/>");
         out.println("      <textarea name=\"" + PARAM_MESSAGE + "\" rows=\"15\" cols=\"160\">"
             + message + "</textarea><br/>");
-        out.println("      <input type=\"submit\" name=\"" + PARAM_ACTION + "\" value=\""
-            + ACTION_SUBMIT + "\"/>");
-        out.println("      <input type=\"hidden\" name=\"" + PARAM_VIEW + "\" value=\"user\"/>");
+        out.println("      <input type=\"submit\" name=\"sumbit\" value=\"Submit\"/>");
         out.println("    </form>");
         out.println("  </body>");
         out.println("</html>");
@@ -128,5 +131,44 @@ public class PopServlet extends HttpServlet {
     }
     out.flush();
     out.close();
+  }
+
+  @SuppressWarnings("unchecked")
+  public OrgAccess authenticateOrgAccess(String userId, String password, String facilityId,
+      Session dataSession) {
+    OrgMaster orgMaster = null;
+    OrgAccess orgAccess = null;
+    {
+      Query query = dataSession.createQuery("from OrgMaster where organizationName = ?");
+      query.setParameter(0, facilityId);
+      List<OrgMaster> orgMasterList = query.list();
+      if (orgMasterList.size() > 0) {
+        orgMaster = orgMasterList.get(0);
+      } else {
+        orgMaster = new OrgMaster();
+        orgMaster.setOrganizationName(facilityId);
+        orgAccess = new OrgAccess();
+        orgAccess.setOrg(orgMaster);
+        orgAccess.setAccessName(userId);
+        orgAccess.setAccessKey(password);
+        Transaction transaction = dataSession.beginTransaction();
+        dataSession.save(orgMaster);
+        dataSession.save(orgAccess);
+        transaction.commit();
+      }
+
+    }
+    if (orgAccess == null) {
+      Query query = dataSession
+          .createQuery("from OrgAccess where accessName = ? and accessKey = ? and org = ?");
+      query.setParameter(0, userId);
+      query.setParameter(1, password);
+      query.setParameter(2, orgMaster);
+      List<OrgAccess> orgAccessList = query.list();
+      if (orgAccessList.size() != 0) {
+        orgAccess = orgAccessList.get(0);
+      }
+    }
+    return orgAccess;
   }
 }

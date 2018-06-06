@@ -6,9 +6,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 import org.immregistries.vaccination_deduplication.Immunization;
-import org.immregistries.vaccination_deduplication.ImmunizationSource;
 import org.immregistries.vaccination_deduplication.LinkedImmunization;
 import org.immregistries.vaccination_deduplication.VaccinationDeduplication;
+import org.immregistries.vaccination_deduplication.reference.ImmunizationSource;
 
 import junit.framework.TestCase;
 
@@ -42,8 +42,7 @@ public class VaccinationDedup extends TestCase {
       patientRecords.add(immunization);
     }
 
-    VaccinationDeduplication vaccinationDeduplication = VaccinationDeduplication.getInstance();
-    vaccinationDeduplication.initialize();
+    VaccinationDeduplication vaccinationDeduplication = new VaccinationDeduplication();
 
     ArrayList<LinkedImmunization> result =
         vaccinationDeduplication.deduplicateDeterministic(patientRecords);

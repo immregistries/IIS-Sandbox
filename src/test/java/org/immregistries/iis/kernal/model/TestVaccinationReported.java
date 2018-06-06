@@ -16,8 +16,8 @@ public class TestVaccinationReported extends TestCase {
     Query query = dataSession.createQuery("from VaccinationReported");
     List<VaccinationReported> vaccinationReportedList = query.list();
     for (VaccinationReported vaccinationReported : vaccinationReportedList) {
-      System.out
-          .println("--> vaccinationReported.getVaccinationData() = " + vaccinationReported.getVaccinationData());
+      System.out.println("--> vaccinationReported.getVaccineCvxCode() = "
+          + vaccinationReported.getVaccineCvxCode());
     }
 
     dataSession.close();

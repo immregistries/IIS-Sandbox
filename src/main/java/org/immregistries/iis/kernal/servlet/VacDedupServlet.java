@@ -13,9 +13,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.immregistries.vaccination_deduplication.Immunization;
-import org.immregistries.vaccination_deduplication.ImmunizationSource;
 import org.immregistries.vaccination_deduplication.LinkedImmunization;
 import org.immregistries.vaccination_deduplication.VaccinationDeduplication;
+import org.immregistries.vaccination_deduplication.reference.ImmunizationSource;
 
 public class VacDedupServlet extends HttpServlet {
 
@@ -94,8 +94,7 @@ public class VacDedupServlet extends HttpServlet {
           }
           if (immunizationList.size() > 1) {
             VaccinationDeduplication vaccinationDeduplication =
-                VaccinationDeduplication.getInstance();
-            vaccinationDeduplication.initialize();
+                new VaccinationDeduplication();
 
             if (algorithm.equals(ALGORITHM_DETERMINISTIC)) {
               immunizationListResults =
@@ -164,7 +163,6 @@ public class VacDedupServlet extends HttpServlet {
           out.println("          <td>");
           printSource(out, i, source, ImmunizationSource.SOURCE);
           printSource(out, i, source, ImmunizationSource.HISTORICAL);
-          printSource(out, i, source, ImmunizationSource.ALTERNATE);
           out.println("          </td>");
           out.println("        </tr>");
         }

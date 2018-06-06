@@ -19,4 +19,19 @@ public class OrgMaster {
   public void setOrganizationName(String organizationName) {
     this.organizationName = organizationName;
   }
+
+  @Override
+  public int hashCode() {
+    return this.getOrgId();
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (obj instanceof OrgMaster) {
+      OrgMaster other = (OrgMaster) obj;
+      return other.getOrgId() == this.getOrgId();
+    }
+    // TODO Auto-generated method stub
+    return super.equals(obj);
+  }
 }

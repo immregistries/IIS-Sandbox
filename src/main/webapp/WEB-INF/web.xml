@@ -2,7 +2,7 @@
 <web-app xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd"
   version="2.4">
 
-  <display-name>IIS Kernal</display-name>
+  <display-name>IIS Kernel</display-name>
 
   <servlet>
     <servlet-name>pop</servlet-name>
@@ -14,11 +14,11 @@
   </servlet>
   <servlet-mapping>
     <servlet-name>pop</servlet-name>
-    <url-pattern>pop</url-pattern>
+    <url-pattern>/pop</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>vacDedup</servlet-name>
-    <url-pattern>vacDedup</url-pattern>
+    <url-pattern>/vacDedup</url-pattern>
   </servlet-mapping>
 
 

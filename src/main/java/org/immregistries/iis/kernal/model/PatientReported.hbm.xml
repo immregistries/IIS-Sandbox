@@ -8,8 +8,40 @@
     <many-to-one name="orgReported" column="org_reported_id" class="OrgMaster"/>
     <property name="patientReportedExternalLink" column="patient_reported_external_link" type="string"/>
     <many-to-one name="Patient" column="patient_id" class="PatientMaster"/>
-    <property name="patientData" column="patient_data" type="string"/>
     <property name="reportedDate" column="reported_date" type="date"/>
     <property name="updatedDate" column="updated_date" type="date"/>
+    <property name="patientReportedAuthority" column="patient_reported_authority" type="string"/>
+    <property name="patientReportedType" column="patient_reported_type" type="string"/>
+    <property name="patientNameLast" column="patient_name_last" type="string"/>
+    <property name="patientNameFirst" column="patient_name_first" type="string"/>
+    <property name="patientNameMiddle" column="patient_name_middle" type="string"/>
+    <property name="patientMotherMaiden" column="patient_mother_maiden" type="string"/>
+    <property name="patientBirthDate" column="patient_birth_date" type="date"/>
+    <property name="patientSex" column="patient_sex" type="string"/>
+    <property name="patientRace" column="patient_race" type="string"/>
+    <property name="patientAddressLine1" column="patient_address_line1" type="string"/>
+    <property name="patientAddressLine2" column="patient_address_line2" type="string"/>
+    <property name="patientAddressCity" column="patient_address_city" type="string"/>
+    <property name="patientAddressState" column="patient_address_state" type="string"/>
+    <property name="patientAddressZip" column="patient_address_zip" type="string"/>
+    <property name="patientAddressCountry" column="patient_address_country" type="string"/>
+    <property name="patientAddressCountyParish" column="patient_address_county_parish" type="string"/>
+    <property name="patientPhone" column="patient_phone" type="string"/>
+    <property name="patientEmail" column="patient_email" type="string"/>
+    <property name="patientEthnicity" column="patient_ethnicity" type="string"/>
+    <property name="patientBirthFlag" column="patient_birth_flag" type="string"/>
+    <property name="patientBirthOrder" column="patient_birth_order" type="string"/>
+    <property name="patientDeathFlag" column="patient_death_flag" type="string"/>
+    <property name="patientDeathDate" column="patient_death_date" type="date"/>
+    <property name="publicityIndicator" column="publicity_indicator" type="string"/>
+    <property name="publicityIndicatorDate" column="publicity_indicator_date" type="date"/>
+    <property name="protectionIndicator" column="protection_indicator" type="string"/>
+    <property name="protectionIndicatorDate" column="protection_indicator_date" type="date"/>
+    <property name="registryStatusIndicator" column="registry_status_indicator" type="string"/>
+    <property name="registryStatusIndicatorDate" column="registry_status_indicator_date" type="date"/>
+    <property name="guardianLast" column="guardian_last" type="string"/>
+    <property name="guardianFirst" column="guardian_first" type="string"/>
+    <property name="guardianMiddle" column="guardian_middle" type="string"/>
+    <property name="guardianRelationship" column="guardian_relationship" type="string"/>
   </class>
 </hibernate-mapping>

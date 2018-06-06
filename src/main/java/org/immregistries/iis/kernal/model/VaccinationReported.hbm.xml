@@ -8,8 +8,22 @@
     <many-to-one name="patientReported" column="patient_reported_id" class="PatientReported"/>
     <property name="vaccinationReportedExternalLink" column="vaccination_reported_external_link" type="string"/>
     <many-to-one name="vaccination" column="vaccination_id" class="VaccinationMaster"/>
-    <property name="vaccinationData" column="vaccination_data" type="string"/>
     <property name="reportedDate" column="reported_date" type="date"/>
     <property name="updatedDate" column="updated_date" type="date"/>
+    <property name="administeredDate" column="administered_date" type="date"/>
+    <property name="vaccineCvxCode" column="vaccine_cvx_code" type="string"/>
+    <property name="vaccineNdcCode" column="vaccine_ndc_code" type="string"/>
+    <property name="vaccineMvxCode" column="vaccine_mvx_code" type="string"/>
+    <property name="administeredAmount" column="administered_amount" type="string"/>
+    <property name="informationSource" column="information_source" type="string"/>
+    <property name="lotnumber" column="lot_number" type="string"/>
+    <property name="expirationDate" column="expiration_date" type="date"/>
+    <property name="completionStatus" column="completion_status" type="string"/>
+    <property name="actionCode" column="action_code" type="string"/>
+    <property name="refusalReasonCode" column="refusal_reason_code" type="string"/>
+    <property name="bodySite" column="body_site" type="string"/>
+    <property name="bodyRoute" column="body_route" type="string"/>
+    <property name="fundingSource" column="funding_source" type="string"/>
+    <property name="fundingEligibility" column="funding_eligibility" type="string"/>
   </class>
 </hibernate-mapping>
