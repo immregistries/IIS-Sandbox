@@ -9,12 +9,20 @@
     <servlet-class>org.immregistries.iis.kernal.servlet.PopServlet</servlet-class>
   </servlet>
   <servlet>
+    <servlet-name>soap</servlet-name>
+    <servlet-class>org.immregistries.iis.kernal.servlet.SoapServlet</servlet-class>
+  </servlet>
+  <servlet>
     <servlet-name>vacDedup</servlet-name>
     <servlet-class>org.immregistries.iis.kernal.servlet.VacDedupServlet</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>pop</servlet-name>
     <url-pattern>/pop</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>soap</servlet-name>
+    <url-pattern>/soap</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>vacDedup</servlet-name>

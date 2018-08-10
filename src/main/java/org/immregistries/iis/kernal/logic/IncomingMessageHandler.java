@@ -2,6 +2,7 @@ package org.immregistries.iis.kernal.logic;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
@@ -18,6 +19,16 @@ import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.model.PatientReported;
 import org.immregistries.iis.kernal.model.VaccinationMaster;
 import org.immregistries.iis.kernal.model.VaccinationReported;
+import org.tch.fc.model.EvaluationActual;
+import org.tch.fc.ConnectFactory;
+import org.tch.fc.ConnectorInterface;
+import org.tch.fc.model.ForecastActual;
+import org.tch.fc.model.Service;
+import org.tch.fc.model.Software;
+import org.tch.fc.model.SoftwareResult;
+import org.tch.fc.model.TestCase;
+import org.tch.fc.model.TestEvent;
+import org.tch.fc.model.VaccineGroup;
 
 public class IncomingMessageHandler {
   // TODO:
@@ -490,6 +501,10 @@ public class IncomingMessageHandler {
         query.setParameter(0, patient);
         vaccinationMasterList = query.list();
       }
+      List<ForecastActual> forecastActualList =
+          doForecast(patient, patientReported, codeMap, vaccinationMasterList);
+      int obxSetId = 0;
+      int obsSubId = 0;
       for (VaccinationMaster vaccination : vaccinationMasterList) {
         Code cvxCode = codeMap.getCodeForCodeset(CodesetType.VACCINATION_CVX_CODE,
             vaccination.getVaccineCvxCode());
@@ -502,19 +517,7 @@ public class IncomingMessageHandler {
         if ("D".equals(vaccinationReported.getActionCode())) {
           continue;
         }
-        sb.append("ORC");
-        // ORC-1
-        sb.append("|RE");
-        // ORC-2
-        sb.append("|");
-        if (originalReporter) {
-          sb.append(vaccinationReported.getVaccinationReportedExternalLink() + "^"
-              + orgAccess.getOrg().getOrganizationName());
-        }
-        // ORC-3
-        sb.append("|");
-        sb.append(vaccination.getVaccinationId() + "^IIS");
-        sb.append("\r");
+        printORC(orgAccess, sb, vaccination, vaccinationReported, originalReporter);
         sb.append("RXA");
         // RXA-1
         sb.append("|0");
@@ -615,11 +618,202 @@ public class IncomingMessageHandler {
           sb.append("|");
           sb.append(printCode(vaccinationReported.getBodySite(), CodesetType.BODY_SITE, "HL70163",
               codeMap));
+          sb.append("\r");
+        }
+        TestEvent testEvent = vaccinationReported.getTestEvent();
+        if (testEvent != null && testEvent.getEvaluationActualList() != null) {
+          for (EvaluationActual evaluationActual : testEvent.getEvaluationActualList()) {
+            obsSubId++;
+            {
+              obxSetId++;
+              String loinc = "30956-7";
+              String loincLabel = "Vaccine type";
+              String value = evaluationActual.getVaccineCvx();
+              String valueLabel = evaluationActual.getVaccineCvx();
+              String valueTable = "CVX";
+              printObx(sb, obxSetId, obsSubId, loinc, loincLabel, value, valueLabel, valueTable);
+            }
+            {
+              obxSetId++;
+              String loinc = "59781-5";
+              String loincLabel = "Dose validity";
+              String value = evaluationActual.getDoseValid();
+              String valueLabel = evaluationActual.getDoseValid();
+              String valueTable = "TCH";
+              printObx(sb, obxSetId, obsSubId, loinc, loincLabel, value, valueLabel, valueTable);
+            }
+          }
+        }
+      }
+      if (forecastActualList != null && forecastActualList.size() > 0) {
+        printORC(orgAccess, sb, null, null, false);
+        sb.append("RXA");
+        // RXA-1
+        sb.append("|0");
+        // RXA-2
+        sb.append("|1");
+        // RXA-3
+        sb.append("|" + sdf.format(new Date()));
+        // RXA-4
+        sb.append("|");
+        // RXA-5
+        sb.append("|998^No Vaccination Administered^CVX");
+        sb.append("\r");
+        for (ForecastActual forecastActual : forecastActualList) {
+          obsSubId++;
+          {
+            obxSetId++;
+            String loinc = "30956-7";
+            String loincLabel = "Vaccine type";
+            String value = forecastActual.getVaccineGroup().getVaccineCvx();
+            String valueLabel = forecastActual.getVaccineGroup().getLabel();
+            String valueTable = "CVX";
+            printObx(sb, obxSetId, obsSubId, loinc, loincLabel, value, valueLabel, valueTable);
+          }
+          {
+            obxSetId++;
+            String loinc = "59783-1";
+            String loincLabel = "Status in series";
+            String value = forecastActual.getAdminStatus();
+            String valueLabel = forecastActual.getAdminStatus();
+            String valueTable = "TCH";
+            printObx(sb, obxSetId, obsSubId, loinc, loincLabel, value, valueLabel, valueTable);
+          }
+          if (forecastActual.getDueDate() != null) {
+            obxSetId++;
+            String loinc = "30981-5";
+            String loincLabel = "Earliest date";
+            Date value = forecastActual.getValidDate();
+            printObx(sb, obxSetId, obsSubId, loinc, loincLabel, value);
+          }
+          if (forecastActual.getDueDate() != null) {
+            obxSetId++;
+            String loinc = "30980-7";
+            String loincLabel = "Recommended date";
+            Date value = forecastActual.getDueDate();
+            printObx(sb, obxSetId, obsSubId, loinc, loincLabel, value);
+          }
+          if (forecastActual.getDueDate() != null) {
+            obxSetId++;
+            String loinc = "59778-1";
+            String loincLabel = "Latest date";
+            Date value = forecastActual.getOverdueDate();
+            printObx(sb, obxSetId, obsSubId, loinc, loincLabel, value);
+          }
         }
       }
     }
 
     return sb.toString();
+  }
+
+  public void printORC(OrgAccess orgAccess, StringBuilder sb, VaccinationMaster vaccination,
+      VaccinationReported vaccinationReported, boolean originalReporter) {
+    sb.append("ORC");
+    // ORC-1
+    sb.append("|RE");
+    // ORC-2
+    sb.append("|");
+    if (originalReporter) {
+      sb.append(vaccinationReported.getVaccinationReportedExternalLink() + "^"
+          + orgAccess.getOrg().getOrganizationName());
+    }
+    // ORC-3
+    sb.append("|");
+    if (vaccination == null) {
+      sb.append("999");
+    } else {
+      sb.append(vaccination.getVaccinationId() + "^IIS");
+    }
+    sb.append("\r");
+  }
+
+  public List<ForecastActual> doForecast(PatientMaster patient, PatientReported patientReported,
+      CodeMap codeMap, List<VaccinationMaster> vaccinationMasterList) {
+    List<ForecastActual> forecastActualList = null;;
+    try {
+      TestCase testCase = new TestCase();
+      testCase.setEvalDate(new Date());
+      testCase.setPatientSex(patientReported == null ? "F" : patientReported.getPatientSex());
+      testCase.setPatientDob(patient.getPatientBirthDate());
+      List<TestEvent> testEventList = new ArrayList<>();
+      for (VaccinationMaster vaccination : vaccinationMasterList) {
+        Code cvxCode = codeMap.getCodeForCodeset(CodesetType.VACCINATION_CVX_CODE,
+            vaccination.getVaccineCvxCode());
+        if (cvxCode == null) {
+          continue;
+        }
+        VaccinationReported vaccinationReported = vaccination.getVaccinationReported();
+        if ("D".equals(vaccinationReported.getActionCode())) {
+          continue;
+        }
+        int cvx = 0;
+        try {
+          cvx = Integer.parseInt(vaccinationReported.getVaccineCvxCode());
+          TestEvent testEvent = new TestEvent(cvx, vaccinationReported.getAdministeredDate());
+          testEventList.add(testEvent);
+          vaccinationReported.setTestEvent(testEvent);
+        } catch (NumberFormatException nfe) {
+          continue;
+        }
+      }
+      testCase.setTestEventList(testEventList);
+      Software software = new Software();
+      software.setServiceUrl("http://tchforecasttester.org/fv/forecast");
+      software.setService(Service.TCH);
+
+      ConnectorInterface connector =
+          ConnectFactory.createConnecter(software, VaccineGroup.getForecastItemList());
+      connector.setLogText(false);
+      forecastActualList = connector.queryForForecast(testCase, new SoftwareResult());
+    } catch (Exception e) {
+      System.err.println("Unable to query for forecast");
+      e.printStackTrace(System.err);
+    }
+    return forecastActualList;
+  }
+
+  public void printObx(StringBuilder sb, int obxSetId, int obsSubId, String loinc,
+      String loincLabel, String value, String valueLabel, String valueTable) {
+    sb.append("OBX");
+    // OBX-1
+    sb.append("|");
+    sb.append(obxSetId);
+    // OBX-2
+    sb.append("|");
+    sb.append("CE");
+    // OBX-3
+    sb.append("|");
+    sb.append(loinc + "^" + loincLabel + "^LN");
+    // OBX-4
+    sb.append("|");
+    sb.append(obsSubId);
+    // OBX-5
+    sb.append("|");
+    sb.append(value + "^" + valueLabel + "^" + valueTable);
+    sb.append("\r");
+  }
+
+  public void printObx(StringBuilder sb, int obxSetId, int obsSubId, String loinc,
+      String loincLabel, Date value) {
+    sb.append("OBX");
+    // OBX-1
+    sb.append("|");
+    sb.append(obxSetId);
+    // OBX-2
+    sb.append("|");
+    sb.append("DT");
+    // OBX-3
+    sb.append("|");
+    sb.append(loinc + "^" + loincLabel + "^LN");
+    // OBX-4
+    sb.append("|");
+    sb.append(obsSubId);
+    // OBX-5
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+    sb.append("|");
+    sb.append(sdf.format(value));
+    sb.append("\r");
   }
 
   public String printCode(String value, CodesetType codesetType, String tableName,

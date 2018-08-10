@@ -2,6 +2,8 @@ package org.immregistries.iis.kernal.model;
 
 import java.util.Date;
 
+import org.tch.fc.model.TestEvent;
+
 /**
  * Created by Eric on 12/20/17.
  */
@@ -28,6 +30,15 @@ public class VaccinationReported {
     private String bodyRoute = "";
     private String fundingSource = "";
     private String fundingEligibility = "";
+    private TestEvent testEvent = null;
+
+    public TestEvent getTestEvent() {
+      return testEvent;
+    }
+
+    public void setTestEvent(TestEvent testEvent) {
+      this.testEvent = testEvent;
+    }
 
     public Date getAdministeredDate() {
       return administeredDate;
