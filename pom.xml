@@ -67,6 +67,12 @@
 			<version>2.1</version>
 		</dependency>
 
+    <dependency>
+      <groupId>org.immregistries</groupId>
+      <artifactId>mqe-validator</artifactId>
+      <version>${mqe.version}</version>
+    </dependency>
+
 		<dependency>
 			<groupId>org.immregistries</groupId>
 			<artifactId>smm-tester</artifactId>
