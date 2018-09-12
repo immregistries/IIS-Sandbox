@@ -4,7 +4,9 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import org.hibernate.Query;
@@ -36,6 +38,40 @@ public class IncomingMessageHandler {
   // package?
   // Look at names of database fields, make more consistent
 
+ 
+
+  private static Map<String, List<ReceivedResponse>> receivedResponseListMap = new HashMap<>();
+  private static final int MAX_LIST_SIZE = 40;
+
+  private static void registerReceived(String received, String response, OrgAccess orgAccess) {
+    synchronized (receivedResponseListMap) {
+      ReceivedResponse receivedResponse = new ReceivedResponse();
+      receivedResponse.setReceivedMessage(received);
+      receivedResponse.setResponseMessage(response);
+      List<ReceivedResponse> receivedResponseList =
+          receivedResponseListMap.get(orgAccess.getOrg().getOrganizationName());
+      if (receivedResponseList == null) {
+        receivedResponseList = new ArrayList<>();
+        receivedResponseListMap.put(orgAccess.getOrg().getOrganizationName(), receivedResponseList);
+      }
+      receivedResponseList.add(0, receivedResponse);
+      if (receivedResponseList.size() > MAX_LIST_SIZE) {
+        receivedResponseList.remove(MAX_LIST_SIZE);
+      }
+    }
+  }
+
+  public static List<ReceivedResponse> getReceivedResponseList(String organizationName) {
+    synchronized (receivedResponseListMap) {
+      List<ReceivedResponse> receivedResponseList = receivedResponseListMap.get(organizationName);
+      if (receivedResponseList == null) {
+        return new ArrayList<ReceivedResponse>();
+      }
+      return new ArrayList<ReceivedResponse>(receivedResponseList);
+    }
+  }
+
+
   private Session dataSession = null;
 
   public IncomingMessageHandler(Session dataSession) {
@@ -45,14 +81,17 @@ public class IncomingMessageHandler {
   public String process(String message, OrgAccess orgAccess) {
     HL7Reader reader = new HL7Reader(message);
     String messageType = reader.getValue(9);
+    String responseMessage;
     if (messageType.equals("VXU")) {
-      return processVXU(orgAccess, reader);
+      responseMessage = processVXU(orgAccess, reader);
     } else if (messageType.equals("QBP")) {
-      return processQBP(orgAccess, reader);
+      responseMessage = processQBP(orgAccess, reader);
     } else {
       ProcessingException e = new ProcessingException("Unsupported message", "", 0, 0);
-      return buildAck(reader, e);
+      responseMessage = buildAck(reader, e);
     }
+    registerReceived(message, responseMessage, orgAccess);
+    return responseMessage;
   }
 
   public String processQBP(OrgAccess orgAccess, HL7Reader reader) {

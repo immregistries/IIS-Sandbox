@@ -14,6 +14,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.AnnotationConfiguration;
+import org.immregistries.iis.kernal.SoftwareVersion;
 import org.immregistries.iis.kernal.logic.IncomingMessageHandler;
 import org.immregistries.iis.kernal.model.OrgAccess;
 import org.immregistries.iis.kernal.model.OrgMaster;
@@ -123,6 +124,7 @@ public class PopServlet extends HttpServlet {
             + message + "</textarea><br/>");
         out.println("      <input type=\"submit\" name=\"sumbit\" value=\"Submit\"/>");
         out.println("    </form>");
+        out.println("    <p>ISS Kernel Version: " + SoftwareVersion.VERSION + "</p>");
         out.println("  </body>");
         out.println("</html>");
       }

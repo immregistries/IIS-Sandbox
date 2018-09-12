@@ -9,6 +9,10 @@
     <servlet-class>org.immregistries.iis.kernal.servlet.PopServlet</servlet-class>
   </servlet>
   <servlet>
+    <servlet-name>status</servlet-name>
+    <servlet-class>org.immregistries.iis.kernal.servlet.StatusServlet</servlet-class>
+  </servlet>
+  <servlet>
     <servlet-name>soap</servlet-name>
     <servlet-class>org.immregistries.iis.kernal.servlet.SoapServlet</servlet-class>
   </servlet>
@@ -16,6 +20,10 @@
     <servlet-name>vacDedup</servlet-name>
     <servlet-class>org.immregistries.iis.kernal.servlet.VacDedupServlet</servlet-class>
   </servlet>
+  <servlet-mapping>
+    <servlet-name>status</servlet-name>
+    <url-pattern>/status</url-pattern>
+  </servlet-mapping>
   <servlet-mapping>
     <servlet-name>pop</servlet-name>
     <url-pattern>/pop</url-pattern>
