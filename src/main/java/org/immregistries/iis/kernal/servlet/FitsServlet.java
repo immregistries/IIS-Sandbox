@@ -6,16 +6,24 @@ import java.io.PrintWriter;
 import java.io.StringReader;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.immregistries.dqa.codebase.client.CodeMap;
+import org.immregistries.dqa.codebase.client.generated.Code;
+import org.immregistries.dqa.codebase.client.reference.CodesetType;
+import org.immregistries.iis.kernal.logic.CodeMapManager;
+import org.immregistries.iis.kernal.logic.FitsExamples;
 import org.tch.fc.IISConnector;
 import org.tch.fc.IISConnector.ParseDebugLine;
+import org.tch.fc.model.Admin;
 import org.tch.fc.model.EvaluationActual;
 import org.tch.fc.model.ForecastActual;
 import org.tch.fc.model.Software;
@@ -30,6 +38,7 @@ public class FitsServlet extends HttpServlet {
 
   public static final String RSP_MESSAGE = "rsp";
   public static final String MESSAGE_NAME = "messageName";
+  public static final String EXAMPLE_NAME = "exampleName";
 
 
   @Override
@@ -46,6 +55,11 @@ public class FitsServlet extends HttpServlet {
     if (req.getParameter(MESSAGE_NAME) != null) {
       messageName = req.getParameter(MESSAGE_NAME);
     }
+    if (req.getParameter(EXAMPLE_NAME) != null) {
+      messageName = req.getParameter(EXAMPLE_NAME);
+      rsp = FitsExamples.exampleMap.get(messageName);
+    }
+    messageName = messageName.replaceAll("\\s", "_");
     try {
       {
         out.println("<html>");
@@ -95,6 +109,10 @@ public class FitsServlet extends HttpServlet {
               case OK:
                 color = "#66ff66";
                 break;
+              case OK_FORECAST:
+              case OK_EVALUATION:
+                color = "#009933";
+                break;
               case PROBLEM:
                 color = "#ff6666";
                 break;
@@ -109,110 +127,185 @@ public class FitsServlet extends HttpServlet {
             out.println("</tr>");
           }
           out.println("</table>");
+          out.println("<br/>");
 
-          out.println("<h3>JUnit test for " + messageName + "</h3>");
-          out.println("<pre>");
-          out.println(
-              "  private static final String RSP_" + messageName.toUpperCase() + " = \"\" ");
-          BufferedReader in = new BufferedReader(new StringReader(rsp));
-          String line;
-          while ((line = in.readLine()) != null) {
-            out.print("    + \"");
-            int pos = line.indexOf('\\');
-            while (pos >= 0) {
-              out.print(line.substring(0, pos));
-              out.print("\\\\");
-              line = line.substring(pos + 1);
-              pos = line.indexOf('\\');
+          Map<String, List<VaccineGroup>> familyMapping = c.getFamilyMapping();
+          List<String> familyMappingNameList = new ArrayList<>(familyMapping.keySet());
+          Collections.sort(familyMappingNameList, new Comparator<String>() {
+            @Override
+            public int compare(String s1, String s2) {
+              int cvx1 = 0;
+              try {
+                cvx1 = Integer.parseInt(s1);
+              } catch (NumberFormatException nfe) {
+                // ignore
+              }
+              int cvx2 = 0;
+              try {
+                cvx2 = Integer.parseInt(s2);
+              } catch (NumberFormatException nfe) {
+                // ignore
+              }
+              if (cvx1 == 0) {
+                if (cvx2 == 0) {
+                  return s1.compareTo(s2);
+                }
+                return 1;
+              } else if (cvx2 == 0) {
+                return -1;
+              }
+              return (new Integer(cvx1)).compareTo(cvx2);
             }
-            out.println(line + "\\r\"");
-          }
-          out.println("  ;");
-          out.println("  @Test");
-          out.println("  public void testRSP_" + messageName + "() throws Exception {");
-          out.println(
-              "    List&lt;ForecastActual&gt; forecastActualList = new ArrayList&lt;ForecastActual&gt;();");
-          out.println("    TestCase testCase = run(forecastActualList, RSP_"
-              + messageName.toUpperCase() + ");");
-          SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
-          out.println("    SimpleDateFormat sdf = new SimpleDateFormat(\"MM/dd/yyyy\");");
-          out.println("    assertEquals(\"Not all test events read\", "
-              + testCase.getTestEventList().size() + ", testCase.getTestEventList().size()); ");
-          {
-            int posA = 0;
-            for (TestEvent testEvent : testCase.getTestEventList()) {
-              if (testEvent.getEvaluationActualList() != null
-                  && testEvent.getEvaluationActualList().size() > 0) {
-                out.println("    assertEquals(\"Wrong number of evaluations\", "
-                    + testEvent.getEvaluationActualList().size()
-                    + ", testCase.getTestEventList().get(" + posA
-                    + ").getEvaluationActualList().size()); ");
-                int posB = 0;
-                for (EvaluationActual evaluationActual : testEvent.getEvaluationActualList()) {
-                  if (evaluationActual.getVaccineCvx() != null) {
-                    out.println("    assertEquals(\"Wrong CVX found\", \""
-                        + evaluationActual.getVaccineCvx() + "\", testCase.getTestEventList().get("
-                        + posA + ").getEvaluationActualList().get(" + posB
-                        + ").getVaccineCvx()); ");
-                    out.println("    assertEquals(\"Wrong validity found\", \""
-                        + evaluationActual.getDoseValid() + "\", testCase.getTestEventList().get("
-                        + posA + ").getEvaluationActualList().get(" + posB + ").getDoseValid()); ");
-                  }
-                  posB++;
+          });
+
+          out.println("<table border=\"1\" cellpadding=\"3\" cellspacing=\"0\">");
+          out.println("<caption>Forecast Codes Map</caption>");
+          out.println("<tr>");
+          out.println("  <th>Value Received</th>");
+          out.println("  <th>CVX Label from CDC</th>");
+          out.println("  <th>Count</th>");
+          out.println("  <th>Vaccine Group</th>");
+          out.println("</tr>");
+          CodeMap codeMap = CodeMapManager.getCodeMap();
+          for (String familyMappingName : familyMappingNameList) {
+            if (familyMapping.get(familyMappingName).size() > 0) {
+              boolean first = true;
+              int count = 0;
+              for (ForecastActual forecastActual : forecastActualList) {
+                if (forecastActual.getVaccineCvx().equals(familyMappingName)) {
+                  count++;
                 }
               }
-              posA++;
+              for (VaccineGroup vaccineGroup : familyMapping.get(familyMappingName)) {
+                out.println("<tr>");
+                String color = "white";
+                if (count > 0) {
+                  color = "#66ff66";
+                }
+                if (first) {
+                  out.println("  <td style=\"background-color: " + color + ";\" rowspan=\""
+                      + familyMapping.get(familyMappingName).size() + "\">" + familyMappingName
+                      + "</td>");
+                  Code code = codeMap.getCodeForCodeset(CodesetType.VACCINATION_CVX_CODE,
+                      familyMappingName);
+                  if (code == null) {
+                    out.println("  <td style=\"background-color: " + color + ";\" rowspan=\""
+                        + familyMapping.get(familyMappingName).size() + "\">-</td>");
+                  } else {
+                    out.println("  <td style=\"background-color: " + color + ";\" rowspan=\""
+                        + familyMapping.get(familyMappingName).size() + "\">" + code.getLabel()
+                        + "</td>");
+                  }
+                  out.println("  <td style=\"background-color: " + color + ";\" rowspan=\""
+                      + familyMapping.get(familyMappingName).size() + "\">" + count + "</td>");
+                }
+                out.println("  <td style=\"background-color: " + color + ";\">"
+                    + vaccineGroup.getLabel() + "</td>");
+                out.println("</tr>");
+                first = false;
+              }
             }
           }
-          out.println("    assertEquals(\"Not all forecasts read\", " + forecastActualList.size()
-              + ",forecastActualList.size()); ");
+          out.println("</table>");
+          out.println("<br/>");
 
-          {
-            int posA = 0;
+          out.println("<table border=\"1\" cellpadding=\"3\" cellspacing=\"0\">");
+          out.println("<caption>Vaccine Groups Represented</caption>");
+          out.println("<tr>");
+          out.println("  <th>Vaccine Group</th>");
+          out.println("  <th>Count</th>");
+          out.println("</tr>");
+          List<VaccineGroup> vaccineGroupList = VaccineGroup.getForecastItemList();
+          Collections.sort(vaccineGroupList, new Comparator<VaccineGroup>() {
+            @Override
+            public int compare(VaccineGroup vg1, VaccineGroup vg2) {
+              return vg1.getLabel().compareTo(vg2.getLabel());
+            }
+          });
+          for (VaccineGroup vaccineGroup : vaccineGroupList) {
+            int count = 0;
             for (ForecastActual forecastActual : forecastActualList) {
-              out.println("    assertEquals(\"Forecast not found\", \""
-                  + forecastActual.getVaccineGroup().getLabel() + "\", forecastActualList.get("
-                  + posA + ").getVaccineGroup().getLabel()); ");
-              out.println(
-                  "    assertEquals(\"Wrong status found\", \"" + forecastActual.getAdminStatus()
-                      + "\", forecastActualList.get(" + posA + ").getAdminStatus()); ");
-              if (forecastActual.getValidDate() == null) {
-                out.println("    assertNull(\"Valid date should be null\", forecastActualList.get("
-                    + posA + ").getValidDate()); ");
-              } else {
-                out.println("    assertNotNull(\"Valid date should not be null\", forecastActualList.get("
-                    + posA + ").getValidDate()); ");
-                out.println(
-                    "    assertEquals(\"Wrong earliest date found\", \"" + sdf.format(forecastActual.getValidDate())
-                        + "\", sdf.format(forecastActualList.get(" + posA + ").getValidDate())); ");
+              if (forecastActual.getVaccineGroup().equals(vaccineGroup)) {
+                count++;
               }
-              if (forecastActual.getDueDate() == null) {
-                out.println("    assertNull(\"Due date should be null\", forecastActualList.get("
-                    + posA + ").getDueDate()); ");
-              } else {
-                out.println("    assertNotNull(\"Due date should not be null\", forecastActualList.get("
-                    + posA + ").getDueDate()); ");
+            }
+            String color = "white";
+            if (count > 0) {
+              color = "#66ff66";
+            }
+            out.println("<tr>");
+            out.println("  <td style=\"background-color: " + color + ";\">"
+                + vaccineGroup.getLabel() + "</td>");
+            out.println("  <td style=\"background-color: " + color + ";\">" + count + "</td>");
+            out.println("</tr>");
+          }
+          out.println("</table>");
+          out.println("<br/>");
+
+          Map<String, Admin> adminStatusMap = IISConnector.getAdminstatusmap();
+          Map<String, Admin> adminStatusLabelMap = IISConnector.getAdminstatuslabelmap();
+          out.println("<table border=\"1\" cellpadding=\"3\" cellspacing=\"0\">");
+          out.println("<caption>Evaluation Status Mapping</caption>");
+          out.println("<tr>");
+          out.println("  <th>Priority</th>");
+          out.println("  <th>Position</th>");
+          out.println("  <th>Case Sensitive</th>");
+          out.println("  <th>Receive</th>");
+          out.println("  <th>Evaluation Status</th>");
+          out.println("</tr>");
+          {
+            List<String> adminStatusList = new ArrayList<String>(adminStatusMap.keySet());
+            Collections.sort(adminStatusList);
+            for (String adminStatus : adminStatusList) {
+              Admin admin = adminStatusMap.get(adminStatus);
+              if (admin != null) {
+                String color = "white";
+                out.println("<tr>");
+                out.println("  <td style=\"background-color: " + color + ";\">1</td>");
+                out.println("  <td style=\"background-color: " + color + ";\">OBX-5.1</td>");
+                out.println("  <td style=\"background-color: " + color + ";\">Y</td>");
                 out.println(
-                    "    assertEquals(\"Wrong due date found\", \"" + sdf.format(forecastActual.getDueDate())
-                        + "\", sdf.format(forecastActualList.get(" + posA + ").getDueDate())); ");
+                    "  <td style=\"background-color: " + color + ";\">" + adminStatus + "</td>");
+                out.println("  <td style=\"background-color: " + color + ";\">" + admin.getLabel()
+                    + "</td>");
+                out.println("</tr>");
               }
-              if (forecastActual.getOverdueDate() == null) {
-                out.println("    assertNull(\"Overdue date should be null\", forecastActualList.get("
-                    + posA + ").getOverdueDate()); ");
-              } else {
-                out.println("    assertNotNull(\"Overdue date should not be null\", forecastActualList.get("
-                    + posA + ").getOverdueDate()); ");
-                out.println(
-                    "    assertEquals(\"Wrong overdue date found\", \"" + sdf.format(forecastActual.getOverdueDate())
-                        + "\", sdf.format(forecastActualList.get(" + posA + ").getOverdueDate())); ");
-              }
-              posA++;
             }
           }
-          out.println("  }");
-          in.close();
+          {
+            List<String> adminStatusLabelList = new ArrayList<String>(adminStatusLabelMap.keySet());
+            Collections.sort(adminStatusLabelList);
+            for (String adminStatusLabel : adminStatusLabelList) {
+              Admin admin = adminStatusLabelMap.get(adminStatusLabel);
+              if (admin != null) {
+                String color = "white";
+                out.println("<tr>");
+                out.println("  <td style=\"background-color: " + color + ";\">2</td>");
+                out.println("  <td style=\"background-color: " + color + ";\">OBX-5.2</td>");
+                out.println("  <td style=\"background-color: " + color + ";\">N</td>");
+                out.println("  <td style=\"background-color: " + color + ";\">" + adminStatusLabel
+                    + "</td>");
+                out.println("  <td style=\"background-color: " + color + ";\">" + admin.getLabel()
+                    + "</td>");
+                out.println("</tr>");
+              }
+            }
+          }
+          out.println("</table>");
+          out.println("<br/>");
+
+          printCode(out, rsp, messageName, forecastActualList, testCase);
         }
-        out.println("</pre>");
+        out.println("    <h2>Example RSPs</h2>");
+        List<String> exampleNameList = new ArrayList<String>(FitsExamples.exampleMap.keySet());
+        Collections.sort(exampleNameList);
+        out.println("<ul>");
+        for (String exampleName : exampleNameList) {
+          out.println("<li><a href=\"fits?" + EXAMPLE_NAME + "=" + exampleName + "\">" + exampleName
+              + "</a></li>");
+        }
+        out.println("<ul>");
+
         out.println("  </body>");
         out.println("</html>");
       }
@@ -223,38 +316,117 @@ public class FitsServlet extends HttpServlet {
     out.close();
   }
 
+  public void printCode(PrintWriter out, String rsp, String messageName,
+      List<ForecastActual> forecastActualList, TestCase testCase) throws IOException {
+    out.println("<h3>JUnit test for " + messageName + "</h3>");
+    out.println("<pre>");
+    out.println("exampleMap.put(\"" + messageName + "\", RSP_" + messageName.toUpperCase() + ");");
+    out.println("</pre>");
+    out.println("<pre>");
+    out.println("  private static final String RSP_" + messageName.toUpperCase() + " = \"\" ");
+    BufferedReader in = new BufferedReader(new StringReader(rsp));
+    String line;
+    while ((line = in.readLine()) != null) {
+      out.print("    + \"");
+      int pos = line.indexOf('\\');
+      while (pos >= 0) {
+        out.print(line.substring(0, pos));
+        out.print("\\\\");
+        line = line.substring(pos + 1);
+        pos = line.indexOf('\\');
+      }
+      out.println(line + "\\r\"");
+    }
+    out.println("  ;");
+    out.println("  @Test");
+    out.println("  public void testRSP_" + messageName + "() throws Exception {");
+    out.println(
+        "    List&lt;ForecastActual&gt; forecastActualList = new ArrayList&lt;ForecastActual&gt;();");
+    out.println(
+        "    TestCase testCase = run(forecastActualList, RSP_" + messageName.toUpperCase() + ");");
+    SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
+    out.println("    SimpleDateFormat sdf = new SimpleDateFormat(\"MM/dd/yyyy\");");
+    out.println("    assertEquals(\"Not all test events read\", "
+        + testCase.getTestEventList().size() + ", testCase.getTestEventList().size()); ");
+    {
+      int posA = 0;
+      for (TestEvent testEvent : testCase.getTestEventList()) {
+        if (testEvent.getEvaluationActualList() != null
+            && testEvent.getEvaluationActualList().size() > 0) {
+          out.println("    assertEquals(\"Wrong number of evaluations\", "
+              + testEvent.getEvaluationActualList().size() + ", testCase.getTestEventList().get("
+              + posA + ").getEvaluationActualList().size()); ");
+          int posB = 0;
+          for (EvaluationActual evaluationActual : testEvent.getEvaluationActualList()) {
+            if (evaluationActual.getVaccineCvx() != null) {
+              out.println("    assertEquals(\"Wrong CVX found\", \""
+                  + evaluationActual.getVaccineCvx() + "\", testCase.getTestEventList().get(" + posA
+                  + ").getEvaluationActualList().get(" + posB + ").getVaccineCvx()); ");
+              out.println("    assertEquals(\"Wrong validity found\", \""
+                  + evaluationActual.getDoseValid() + "\", testCase.getTestEventList().get(" + posA
+                  + ").getEvaluationActualList().get(" + posB + ").getDoseValid()); ");
+            }
+            posB++;
+          }
+        }
+        posA++;
+      }
+    }
+    out.println("    assertEquals(\"Not all forecasts read\", " + forecastActualList.size()
+        + ",forecastActualList.size()); ");
+
+    {
+      int posA = 0;
+      for (ForecastActual forecastActual : forecastActualList) {
+        out.println("    assertEquals(\"Forecast not found\", \""
+            + forecastActual.getVaccineGroup().getLabel() + "\", forecastActualList.get(" + posA
+            + ").getVaccineGroup().getLabel()); ");
+        out.println("    assertEquals(\"Wrong status found\", \"" + forecastActual.getAdminStatus()
+            + "\", forecastActualList.get(" + posA + ").getAdminStatus()); ");
+        if (forecastActual.getValidDate() == null) {
+          out.println("    assertNull(\"Valid date should be null\", forecastActualList.get(" + posA
+              + ").getValidDate()); ");
+        } else {
+          out.println("    assertNotNull(\"Valid date should not be null\", forecastActualList.get("
+              + posA + ").getValidDate()); ");
+          out.println("    assertEquals(\"Wrong earliest date found\", \""
+              + sdf.format(forecastActual.getValidDate()) + "\", sdf.format(forecastActualList.get("
+              + posA + ").getValidDate())); ");
+        }
+        if (forecastActual.getDueDate() == null) {
+          out.println("    assertNull(\"Due date should be null\", forecastActualList.get(" + posA
+              + ").getDueDate()); ");
+        } else {
+          out.println("    assertNotNull(\"Due date should not be null\", forecastActualList.get("
+              + posA + ").getDueDate()); ");
+          out.println("    assertEquals(\"Wrong due date found\", \""
+              + sdf.format(forecastActual.getDueDate()) + "\", sdf.format(forecastActualList.get("
+              + posA + ").getDueDate())); ");
+        }
+        if (forecastActual.getOverdueDate() == null) {
+          out.println("    assertNull(\"Overdue date should be null\", forecastActualList.get("
+              + posA + ").getOverdueDate()); ");
+        } else {
+          out.println(
+              "    assertNotNull(\"Overdue date should not be null\", forecastActualList.get("
+                  + posA + ").getOverdueDate()); ");
+          out.println("    assertEquals(\"Wrong overdue date found\", \""
+              + sdf.format(forecastActual.getOverdueDate())
+              + "\", sdf.format(forecastActualList.get(" + posA + ").getOverdueDate())); ");
+        }
+        posA++;
+      }
+    }
+    out.println("  }");
+    in.close();
+    out.println("</pre>");
+  }
+
   @Override
   protected void doPost(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
     doGet(req, resp);
   }
 
-  private static String pad(Object o, int len) {
-    if (o == null) {
-      return pad("", len);
-    }
-    return pad(o.toString(), len);
-  }
-
-  private static String pad(Date date, int len) {
-    if (date == null) {
-      return pad("", len);
-    }
-    SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
-    return pad(sdf.format(date), len);
-  }
-
-  private static String pad(String s, int len) {
-    if (s == null) {
-      s = "";
-    }
-    for (int i = s.length(); i < len; i++) {
-      s += " ";
-    }
-    if (s.length() > len) {
-      s = s.substring(0, len);
-    }
-    return s;
-  }
 
 }
