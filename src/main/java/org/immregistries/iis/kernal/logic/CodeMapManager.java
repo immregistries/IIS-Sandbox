@@ -2,8 +2,8 @@ package org.immregistries.iis.kernal.logic;
 
 import java.io.InputStream;
 
-import org.immregistries.dqa.codebase.client.CodeMap;
-import org.immregistries.dqa.codebase.client.CodeMapBuilder;
+import org.immregistries.codebase.client.CodeMap;
+import org.immregistries.codebase.client.CodeMapBuilder;
 
 public class CodeMapManager {
 

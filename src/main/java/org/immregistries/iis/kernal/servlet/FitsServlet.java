@@ -16,9 +16,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.immregistries.dqa.codebase.client.CodeMap;
-import org.immregistries.dqa.codebase.client.generated.Code;
-import org.immregistries.dqa.codebase.client.reference.CodesetType;
+import org.immregistries.codebase.client.CodeMap;
+import org.immregistries.codebase.client.generated.Code;
+import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.logic.CodeMapManager;
 import org.immregistries.iis.kernal.logic.FitsExamples;
 import org.tch.fc.IISConnector;
