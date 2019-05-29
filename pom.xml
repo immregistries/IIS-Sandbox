@@ -8,7 +8,7 @@
 	<packaging>war</packaging>
 
 	<name>Immunization Information System Kernel - Proof of Concept</name>
-	<url>http://imregistries.org</url>
+	<url>http://immregistries.org</url>
 
 	<licenses>
 		<license>
