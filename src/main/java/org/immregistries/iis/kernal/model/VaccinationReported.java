@@ -2,7 +2,7 @@ package org.immregistries.iis.kernal.model;
 
 import java.util.Date;
 
-import org.tch.fc.model.TestEvent;
+import org.immregistries.vfa.connect.model.TestEvent;
 
 /**
  * Created by Eric on 12/20/17.

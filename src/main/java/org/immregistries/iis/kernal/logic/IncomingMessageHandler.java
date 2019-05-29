@@ -5,32 +5,34 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-
+import java.util.Set;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
-import org.immregistries.mqe.hl7util.parser.HL7Reader;
 import org.immregistries.iis.kernal.model.OrgAccess;
 import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.model.PatientReported;
+import org.immregistries.iis.kernal.model.ProcessingFlavor;
 import org.immregistries.iis.kernal.model.VaccinationMaster;
 import org.immregistries.iis.kernal.model.VaccinationReported;
-import org.tch.fc.model.EvaluationActual;
-import org.tch.fc.ConnectFactory;
-import org.tch.fc.ConnectorInterface;
-import org.tch.fc.model.ForecastActual;
-import org.tch.fc.model.Service;
-import org.tch.fc.model.Software;
-import org.tch.fc.model.SoftwareResult;
-import org.tch.fc.model.TestCase;
-import org.tch.fc.model.TestEvent;
-import org.tch.fc.model.VaccineGroup;
+import org.immregistries.mqe.hl7util.parser.HL7Reader;
+import org.immregistries.vfa.connect.ConnectFactory;
+import org.immregistries.vfa.connect.ConnectorInterface;
+import org.immregistries.vfa.connect.model.EvaluationActual;
+import org.immregistries.vfa.connect.model.ForecastActual;
+import org.immregistries.vfa.connect.model.Service;
+import org.immregistries.vfa.connect.model.Software;
+import org.immregistries.vfa.connect.model.SoftwareResult;
+import org.immregistries.vfa.connect.model.TestCase;
+import org.immregistries.vfa.connect.model.TestEvent;
+import org.immregistries.vfa.connect.model.VaccineGroup;
 
 public class IncomingMessageHandler {
   // TODO:
@@ -38,7 +40,7 @@ public class IncomingMessageHandler {
   // package?
   // Look at names of database fields, make more consistent
 
- 
+
 
   private static Map<String, List<ReceivedResponse>> receivedResponseListMap = new HashMap<>();
   private static final int MAX_LIST_SIZE = 40;
@@ -420,22 +422,36 @@ public class IncomingMessageHandler {
     }
   }
 
+  @SuppressWarnings("unchecked")
   public String buildRSP(HL7Reader reader, PatientMaster patient, PatientReported patientReported,
       OrgAccess orgAccess) {
     reader.resetPostion();
 
+    Set<ProcessingFlavor> processingFlavorSet = orgAccess.getOrg().getProcessingFlavorSet();
     StringBuilder sb = new StringBuilder();
     String profileIdSubmitted = reader.getValue(21);
     CodeMap codeMap = CodeMapManager.getCodeMap();
+    String profileId = "Z32";
+    boolean sendBackForecast = true;
+    if (processingFlavorSet.contains(ProcessingFlavor.COCONUT)) {
+      sendBackForecast = false;
+    } else if (processingFlavorSet.contains(ProcessingFlavor.ORANGE)) {
+      sendBackForecast = false;
+    }
+
     {
       String messageType = "RSP^K11^RSP_K11";
-      String profileId = "Z32";
       if (patient == null) {
         profileId = "Z33";
       } else if (profileIdSubmitted.equals("Z34")) {
         profileId = "Z32";
       } else if (profileIdSubmitted.equals("Z44")) {
-        profileId = "Z42";
+        if (processingFlavorSet.contains(ProcessingFlavor.ORANGE)) {
+          profileId = "Z32";
+        } else {
+          sendBackForecast = true;
+          profileId = "Z42";
+        }
       }
       createMSH(messageType, profileId, reader, sb);
     }
@@ -465,8 +481,11 @@ public class IncomingMessageHandler {
       }
       sb.append("" + profileIdSubmitted + "^" + profileName + "^CDCPHINVS\r");
     }
+    reader.resetPostion();
     if (reader.advanceToSegment("QPD")) {
       sb.append(reader.getOriginalSegment() + "\r");
+    } else {
+      sb.append("QPD|");
     }
     if (patient != null) {
       SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
@@ -488,6 +507,7 @@ public class IncomingMessageHandler {
       // PID-5
       sb.append("|" + patient.getPatientNameLast() + "^" + patient.getPatientNameFirst() + "^"
           + patient.getPatientNameMiddle() + "^^^^L");
+
       // PID-6
       if (patientReported != null) {
         sb.append("|" + patientReported.getPatientMotherMaiden() + "^^^^^^M");
@@ -507,7 +527,10 @@ public class IncomingMessageHandler {
             + patientReported.getPatientAddressCity() + "^"
             + patientReported.getPatientAddressState() + "^"
             + patientReported.getPatientAddressZip() + "^"
-            + patientReported.getPatientAddressCountry());
+            + patientReported.getPatientAddressCountry() + "^");
+        if (!processingFlavorSet.contains(ProcessingFlavor.LIME)) {
+          sb.append("P");
+        }
         // PID-12
         sb.append("|");
         // PID-13
@@ -540,8 +563,19 @@ public class IncomingMessageHandler {
         query.setParameter(0, patient);
         vaccinationMasterList = query.list();
       }
-      List<ForecastActual> forecastActualList =
-          doForecast(patient, patientReported, codeMap, vaccinationMasterList);
+
+      if (processingFlavorSet.contains(ProcessingFlavor.LEMON)) {
+        for (Iterator<VaccinationMaster> it = vaccinationMasterList.iterator(); it.hasNext();) {
+          it.next();
+          if (random.nextInt(4) == 0) {
+            it.remove();
+          }
+        }
+      }
+      List<ForecastActual> forecastActualList = null;
+      if (sendBackForecast) {
+        forecastActualList = doForecast(patient, patientReported, codeMap, vaccinationMasterList);
+      }
       int obxSetId = 0;
       int obsSubId = 0;
       for (VaccinationMaster vaccination : vaccinationMasterList) {
@@ -606,7 +640,7 @@ public class IncomingMessageHandler {
                 vaccinationReported.getInformationSource());
           }
           if (informationCode != null) {
-            sb.append(informationCode.getValue() + "^" + informationCode.getLabel() + "^NIP0001");
+            sb.append(informationCode.getValue() + "^" + informationCode.getLabel() + "^NIP001");
           }
         }
         // RXA-10
@@ -641,8 +675,14 @@ public class IncomingMessageHandler {
         sb.append("|");
         // RXA-20
         sb.append("|");
-        sb.append(printCode(vaccinationReported.getCompletionStatus(),
-            CodesetType.VACCINATION_COMPLETION, null, codeMap));
+        if (!processingFlavorSet.contains(ProcessingFlavor.LIME)) {
+          String completionStatus = vaccinationReported.getCompletionStatus();
+          if (completionStatus == null || completionStatus.equals("")) {
+            completionStatus = "CP";
+          }
+          sb.append(printCode(completionStatus, CodesetType.VACCINATION_COMPLETION, null, codeMap));
+        }
+
         // RXA-21
         sb.append("|A");
         sb.append("\r");
@@ -677,8 +717,8 @@ public class IncomingMessageHandler {
               String loinc = "59781-5";
               String loincLabel = "Dose validity";
               String value = evaluationActual.getDoseValid();
-              String valueLabel = evaluationActual.getDoseValid();
-              String valueTable = "TCH";
+              String valueLabel = value;
+              String valueTable = "99107";
               printObx(sb, obxSetId, obsSubId, loinc, loincLabel, value, valueLabel, valueTable);
             }
           }
@@ -697,6 +737,36 @@ public class IncomingMessageHandler {
         sb.append("|");
         // RXA-5
         sb.append("|998^No Vaccination Administered^CVX");
+        // RXA-6
+        sb.append("|999");
+        // RXA-7
+        sb.append("|");
+        // RXA-8
+        sb.append("|");
+        // RXA-9
+        sb.append("|");
+        // RXA-10
+        sb.append("|");
+        // RXA-11
+        sb.append("|");
+        // RXA-12
+        sb.append("|");
+        // RXA-13
+        sb.append("|");
+        // RXA-14
+        sb.append("|");
+        // RXA-15
+        sb.append("|");
+        // RXA-16
+        sb.append("|");
+        // RXA-17
+        sb.append("|");
+        // RXA-18
+        sb.append("|");
+        // RXA-19
+        sb.append("|");
+        // RXA-20
+        sb.append("|NA");
         sb.append("\r");
         for (ForecastActual forecastActual : forecastActualList) {
           obsSubId++;
@@ -715,7 +785,7 @@ public class IncomingMessageHandler {
             String loincLabel = "Status in series";
             String value = forecastActual.getAdminStatus();
             String valueLabel = forecastActual.getAdminStatus();
-            String valueTable = "TCH";
+            String valueTable = "99106";
             printObx(sb, obxSetId, obsSubId, loinc, loincLabel, value, valueLabel, valueTable);
           }
           if (forecastActual.getDueDate() != null) {
@@ -748,6 +818,7 @@ public class IncomingMessageHandler {
 
   public void printORC(OrgAccess orgAccess, StringBuilder sb, VaccinationMaster vaccination,
       VaccinationReported vaccinationReported, boolean originalReporter) {
+    Set<ProcessingFlavor> processingFlavorSet = orgAccess.getOrg().getProcessingFlavorSet();
     sb.append("ORC");
     // ORC-1
     sb.append("|RE");
@@ -760,7 +831,11 @@ public class IncomingMessageHandler {
     // ORC-3
     sb.append("|");
     if (vaccination == null) {
-      sb.append("999");
+      if (processingFlavorSet.contains(ProcessingFlavor.LIME)) {
+        sb.append("999^IIS");
+      } else {
+        sb.append("9999^IIS");
+      }
     } else {
       sb.append(vaccination.getVaccinationId() + "^IIS");
     }
@@ -798,8 +873,8 @@ public class IncomingMessageHandler {
       }
       testCase.setTestEventList(testEventList);
       Software software = new Software();
-      software.setServiceUrl("http://tchforecasttester.org/fv/forecast");
-      software.setService(Service.TCH);
+      software.setServiceUrl("http://florence.immregistries.org/lonestar/forecast");
+      software.setService(Service.LSVF);
 
       ConnectorInterface connector =
           ConnectFactory.createConnecter(software, VaccineGroup.getForecastItemList());
@@ -810,6 +885,40 @@ public class IncomingMessageHandler {
       e.printStackTrace(System.err);
     }
     return forecastActualList;
+  }
+
+  public void printObx(StringBuilder sb, int obxSetId, int obsSubId, String loinc,
+      String loincLabel, String value) {
+    sb.append("OBX");
+    // OBX-1
+    sb.append("|");
+    sb.append(obxSetId);
+    // OBX-2
+    sb.append("|");
+    sb.append("CE");
+    // OBX-3
+    sb.append("|");
+    sb.append(loinc + "^" + loincLabel + "^LN");
+    // OBX-4
+    sb.append("|");
+    sb.append(obsSubId);
+    // OBX-5
+    sb.append("|");
+    sb.append(value);
+    // OBX-6
+    sb.append("|");
+    // OBX-7
+    sb.append("|");
+    // OBX-8
+    sb.append("|");
+    // OBX-9
+    sb.append("|");
+    // OBX-10
+    sb.append("|");
+    // OBX-11
+    sb.append("|");
+    sb.append("F");
+    sb.append("\r");
   }
 
   public void printObx(StringBuilder sb, int obxSetId, int obsSubId, String loinc,
@@ -830,6 +939,19 @@ public class IncomingMessageHandler {
     // OBX-5
     sb.append("|");
     sb.append(value + "^" + valueLabel + "^" + valueTable);
+    // OBX-6
+    sb.append("|");
+    // OBX-7
+    sb.append("|");
+    // OBX-8
+    sb.append("|");
+    // OBX-9
+    sb.append("|");
+    // OBX-10
+    sb.append("|");
+    // OBX-11
+    sb.append("|");
+    sb.append("F");
     sb.append("\r");
   }
 
@@ -852,6 +974,19 @@ public class IncomingMessageHandler {
     SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
     sb.append("|");
     sb.append(sdf.format(value));
+    // OBX-6
+    sb.append("|");
+    // OBX-7
+    sb.append("|");
+    // OBX-8
+    sb.append("|");
+    // OBX-9
+    sb.append("|");
+    // OBX-10
+    sb.append("|");
+    // OBX-11
+    sb.append("|");
+    sb.append("F");
     sb.append("\r");
   }
 

@@ -1,0 +1,63 @@
+-----------------------------------------
+Connection
+Label: IIS-Sandbox
+Type: POST
+URL: http://localhost//iis-sandbox/pop
+User Id: Mercy
+Password: PASSWORD_HIDDEN_BY_SMM|3poC1CxmnZhbuTdGr1Y5rQ==
+Facility Id: Mercy Healthcare
+Ack Type: DEFAULT
+Transfer Type: NEAR_REAL_TIME_LINK
+
+Lime: Missing non-critical required fields, such as RXA-20
+
+-----------------------------------------
+Connection
+Label: IIS-Sandbox Lime
+Type: POST
+URL: http://localhost//iis-sandbox/pop
+User Id: Mercy
+Password: PASSWORD_HIDDEN_BY_SMM|3poC1CxmnZhbuTdGr1Y5rQ==
+Facility Id: Lime Healthcare
+Ack Type: DEFAULT
+Transfer Type: NEAR_REAL_TIME_LINK
+
+
+
+Coconut: Forecast not returned, ever
+-----------------------------------------
+Connection
+Label: IIS-Sandbox Coconut
+Type: POST
+URL: http://localhost//iis-sandbox/pop
+User Id: Mercy
+Password: PASSWORD_HIDDEN_BY_SMM|3poC1CxmnZhbuTdGr1Y5rQ==
+Facility Id: Coconut Healthcare
+Ack Type: DEFAULT
+Transfer Type: NEAR_REAL_TIME_LINK
+
+Orange: Only Z32 is every returned
+-----------------------------------------
+Connection
+Label: IIS-Sandbox Orange
+Type: POST
+URL: http://localhost//iis-sandbox/pop
+User Id: Mercy
+Password: PASSWORD_HIDDEN_BY_SMM|3poC1CxmnZhbuTdGr1Y5rQ==
+Facility Id: Orange Healthcare
+Ack Type: DEFAULT
+Transfer Type: NEAR_REAL_TIME_LINK
+
+Lemon: Only some vaccinations returned, randomly
+-----------------------------------------
+Connection
+Label: IIS-Sandbox Lemon
+Type: POST
+URL: http://localhost//iis-sandbox/pop
+User Id: Mercy
+Password: PASSWORD_HIDDEN_BY_SMM|3poC1CxmnZhbuTdGr1Y5rQ==
+Facility Id: Lemon Healthcare
+Ack Type: DEFAULT
+Transfer Type: NEAR_REAL_TIME_LINK
+
+

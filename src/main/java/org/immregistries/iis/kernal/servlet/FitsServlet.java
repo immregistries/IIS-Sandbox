@@ -21,17 +21,17 @@ import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.logic.CodeMapManager;
 import org.immregistries.iis.kernal.logic.FitsExamples;
-import org.tch.fc.IISConnector;
-import org.tch.fc.IISConnector.ParseDebugLine;
-import org.tch.fc.model.Admin;
-import org.tch.fc.model.EvaluationActual;
-import org.tch.fc.model.ForecastActual;
-import org.tch.fc.model.Software;
-import org.tch.fc.model.SoftwareResult;
-import org.tch.fc.model.TestCase;
-import org.tch.fc.model.TestEvent;
-import org.tch.fc.model.VaccineGroup;
-import org.tch.fc.util.ForecastResultPrinter;
+import org.immregistries.vfa.connect.IISConnector;
+import org.immregistries.vfa.connect.IISConnector.ParseDebugLine;
+import org.immregistries.vfa.connect.model.Admin;
+import org.immregistries.vfa.connect.model.EvaluationActual;
+import org.immregistries.vfa.connect.model.ForecastActual;
+import org.immregistries.vfa.connect.model.Software;
+import org.immregistries.vfa.connect.model.SoftwareResult;
+import org.immregistries.vfa.connect.model.TestCase;
+import org.immregistries.vfa.connect.model.TestEvent;
+import org.immregistries.vfa.connect.model.VaccineGroup;
+import org.immregistries.vfa.connect.util.ForecastResultPrinter;
 
 @SuppressWarnings("serial")
 public class FitsServlet extends HttpServlet {
