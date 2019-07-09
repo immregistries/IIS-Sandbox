@@ -16,6 +16,7 @@ import org.hibernate.Transaction;
 import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
+import org.immregistries.iis.kernal.SoftwareVersion;
 import org.immregistries.iis.kernal.model.OrgAccess;
 import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.model.PatientReported;
@@ -453,7 +454,7 @@ public class IncomingMessageHandler {
           profileId = "Z42";
         }
       }
-      createMSH(messageType, profileId, reader, sb);
+      createMSH(messageType, profileId, reader, sb, processingFlavorSet);
     }
     {
       String sendersUniqueId = reader.getValue(10);
@@ -1009,7 +1010,7 @@ public class IncomingMessageHandler {
     {
       String messageType = "ACK^V04^ACK";
       String profileId = "Z23";
-      createMSH(messageType, profileId, reader, sb);
+      createMSH(messageType, profileId, reader, sb, null);
     }
 
     String sendersUniqueId = "";
@@ -1045,19 +1046,29 @@ public class IncomingMessageHandler {
     return sb.toString();
   }
 
-  public void createMSH(String messageType, String profileId, HL7Reader reader, StringBuilder sb) {
+  public void createMSH(String messageType, String profileId, HL7Reader reader, StringBuilder sb,
+      Set<ProcessingFlavor> processingFlavorSet) {
     String sendingApp = "";
     String sendingFac = "";
     String receivingApp = "";
-    String receivingFac = "";
+    String receivingFac = "IIS Sandbox";
+    if (processingFlavorSet != null) {
+      for (ProcessingFlavor processingFlavor : ProcessingFlavor.values()) {
+        if (processingFlavorSet.contains(processingFlavor)) {
+          receivingFac += " " + processingFlavor.getKey();
+        }
+      }
+    }
+    receivingFac += " v" + SoftwareVersion.VERSION;
 
     reader.resetPostion();
     if (reader.advanceToSegment("MSH")) {
       sendingApp = reader.getValue(3);
       sendingFac = reader.getValue(4);
       receivingApp = reader.getValue(5);
-      receivingFac = reader.getValue(6);
     }
+
+
     String sendingDateString;
     {
       SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddhhmmssZ");
