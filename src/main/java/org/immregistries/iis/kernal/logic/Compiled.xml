@@ -10090,7 +10090,7 @@
         <code>
             <value>90747</value>
             <label>Hep B, dialysis</label>
-            <description></description>
+            <description>Note that the NDCs for Engerix-B are mapped to CVX 43 which is not specific to dialysis use</description>
             <code-status>
                 <status>Valid</status>
             </code-status>
@@ -10320,6 +10320,17 @@
             </code-status>
             <reference>
                 <link-to codeset="VACCINATION_CVX_CODE">171</link-to>
+            </reference>
+        </code>
+        <code>
+            <value>90689</value>
+            <label>Influenza virus vaccine, quadrivalent (IIV4), inactivated, adjuvanted, preservative free, 0.25 mL dosage, for intramuscular use</label>
+            <description>This CPT represents the 0.25mL dose</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">150</link-to>
             </reference>
         </code>
         <code>
@@ -11570,6 +11581,19 @@
             <test-age>2 months</test-age>
         </code>
         <code>
+            <value>195</value>
+            <label>DT, IPV adsorbed</label>
+            <description>Diptheria, Tetanus, Poliomyelitis adsorbed Notes: This code should be used to document non-US vaccines for DT,IPV such as Revaxis</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINE_GROUP">Td</link-to>
+                <link-to codeset="VACCINE_GROUP">POLIO</link-to>
+            </reference>
+            <concept-type>foreign vaccine</concept-type>
+        </code>
+        <code>
             <value>20</value>
             <label>DTaP</label>
             <description>diphtheria, tetanus toxoids and acellular pertussis
@@ -11679,6 +11703,9 @@
                 <link-to codeset="VACCINE_GROUP">HIB</link-to>
                 <link-to codeset="VACCINE_GROUP">POLIO</link-to>
                 <link-to codeset="VACCINATION_CPT_CODE">90697</link-to>
+                <link-to codeset="VACCINATION_TRADE_NAME">VAXELIS</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">63361-0245-58</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">63361-0245-10</link-to>
             </reference>
             <use-date>
                 <not-before>20110831</not-before>
@@ -13126,6 +13153,7 @@
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">19515-0909-52</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">49281-0418-10</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">49281-0418-50</link-to>
+                <link-to codeset="VACCINATION_CPT_CODE">90689</link-to>
             </reference>
             <use-date>
                 <not-before>20130103</not-before>
@@ -13549,6 +13577,18 @@
             </use-age>
             <concept-type>vaccine</concept-type>
             <test-age>2 years</test-age>
+        </code>
+        <code>
+            <value>194</value>
+            <label>Influenza, Southern Hemisphere</label>
+            <description>Influenza, Southern Hemisphere, unspecified formulation Notes: This CVX code should only be used to record the current or historic administration of non-US influenza vaccines for the Southern Hemisphere seasonal influenza</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINE_GROUP">FLU</link-to>
+            </reference>
+            <concept-type>foreign vaccine</concept-type>
         </code>
         <code>
             <value>15</value>
@@ -15263,6 +15303,7 @@
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">21695-0413-01</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">00006-4133-41</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">14362-0111-04</link-to>
+                <link-to codeset="VACCINATION_TRADE_NAME">TDVAX</link-to>
             </reference>
             <use-date>
                 <not-before>20100820</not-before>
@@ -15289,6 +15330,7 @@
                 <link-to codeset="VACCINATION_CPT_CODE">90714</link-to>
             </reference>
             <use-date>
+                <not-before>20190515</not-before>
                 <not-expected-after>20100930</not-expected-after>
                 <not-after>20100930</not-after>
             </use-date>
@@ -17121,6 +17163,7 @@
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">14362-0111-03</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">21695-0413-01</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">14362-0111-04</link-to>
+                <link-to codeset="VACCINATION_TRADE_NAME">TDVAX</link-to>
             </reference>
             <use-date>
                 <not-before>20100528</not-before>
@@ -17842,6 +17885,12 @@
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">49281-0518-25</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">50090-1693-09</link-to>
                 <link-to codeset="VACCINATION_LOT_NUMBER_PATTERN">^[A-Z][0-9]{4,4}'-'[0-9]$</link-to>
+                <link-to codeset="VACCINATION_TRADE_NAME">VAXELIS</link-to>
+                <link-to codeset="VACCINATION_TRADE_NAME">Flublok quadrivalent</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">49281-0718-88</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">63361-0245-58</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">49281-0718-10</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">63361-0245-10</link-to>
             </reference>
             <use-date>
                 <not-before>20100528</not-before>
@@ -18117,6 +18166,8 @@
             </reference>
             <use-date>
                 <not-before>20160531</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -18202,6 +18253,8 @@
             </reference>
             <use-date>
                 <not-before>20050610</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -18244,6 +18297,8 @@
             </reference>
             <use-date>
                 <not-before>20131001</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -18286,6 +18341,8 @@
             </reference>
             <use-date>
                 <not-before>20050610</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -18328,6 +18385,8 @@
             </reference>
             <use-date>
                 <not-before>20050610</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -18371,6 +18430,8 @@
             </reference>
             <use-date>
                 <not-before>20110531</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -18927,6 +18988,8 @@
             </reference>
             <use-date>
                 <not-before>20180701</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -18969,6 +19032,8 @@
             </reference>
             <use-date>
                 <not-before>20180701</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -19096,6 +19161,8 @@
             </reference>
             <use-date>
                 <not-before>20180701</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -19138,6 +19205,8 @@
             </reference>
             <use-date>
                 <not-before>20180701</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -19265,6 +19334,8 @@
             </reference>
             <use-date>
                 <not-before>19890621</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -19307,6 +19378,8 @@
             </reference>
             <use-date>
                 <not-before>20161201</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -19349,6 +19422,8 @@
             </reference>
             <use-date>
                 <not-before>20161201</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -19477,6 +19552,8 @@
             </reference>
             <use-date>
                 <not-before>19701104</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -19519,6 +19596,8 @@
             </reference>
             <use-date>
                 <not-before>20090724</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -19604,6 +19683,8 @@
             </reference>
             <use-date>
                 <not-before>20090724</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -19646,6 +19727,8 @@
             </reference>
             <use-date>
                 <not-before>20090724</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -19817,6 +19900,8 @@
             </reference>
             <use-date>
                 <not-before>20020514</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -19859,6 +19944,8 @@
             </reference>
             <use-date>
                 <not-before>20020514</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -19901,6 +19988,8 @@
             </reference>
             <use-date>
                 <not-before>20020514</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -20072,6 +20161,8 @@
             </reference>
             <use-date>
                 <not-before>20100329</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -20114,6 +20205,8 @@
             </reference>
             <use-date>
                 <not-before>20070328</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -20156,6 +20249,8 @@
             </reference>
             <use-date>
                 <not-before>20070328</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -20198,6 +20293,8 @@
             </reference>
             <use-date>
                 <not-before>20070425</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -20240,6 +20337,8 @@
             </reference>
             <use-date>
                 <not-before>20070425</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -20282,6 +20381,8 @@
             </reference>
             <use-date>
                 <not-before>20070328</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -20495,6 +20596,8 @@
             </reference>
             <use-date>
                 <not-before>20180713</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -20923,6 +21026,8 @@
             </reference>
             <use-date>
                 <not-before>20180629</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -21220,6 +21325,7 @@
                 <link-to codeset="VACCINATION_CVX_CODE">185</link-to>
                 <link-to codeset="VACCINATION_MANUFACTURER_CODE">PSC</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">49281-0718-88</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">PMC</link-to>
             </reference>
             <use-date>
                 <not-before>20180629</not-before>
@@ -21524,6 +21630,8 @@
             </reference>
             <use-date>
                 <not-before>20180701</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -21566,6 +21674,8 @@
             </reference>
             <use-date>
                 <not-before>20180701</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -22378,6 +22488,8 @@
             </reference>
             <use-date>
                 <not-before>20180629</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -22420,6 +22532,8 @@
             </reference>
             <use-date>
                 <not-before>20180629</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -22891,6 +23005,8 @@
             </reference>
             <use-date>
                 <not-before>20180810</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -25122,6 +25238,8 @@
             </reference>
             <use-date>
                 <not-before>20180629</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -25807,6 +25925,8 @@
             </reference>
             <use-date>
                 <not-before>20180629</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -25849,6 +25969,8 @@
             </reference>
             <use-date>
                 <not-before>20180629</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -25891,6 +26013,8 @@
             </reference>
             <use-date>
                 <not-before>20180629</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -25933,6 +26057,8 @@
             </reference>
             <use-date>
                 <not-before>20180629</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -26230,6 +26356,8 @@
             </reference>
             <use-date>
                 <not-before>20060608</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -26272,6 +26400,8 @@
             </reference>
             <use-date>
                 <not-before>20060608</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -26314,6 +26444,8 @@
             </reference>
             <use-date>
                 <not-before>20060608</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -26356,6 +26488,8 @@
             </reference>
             <use-date>
                 <not-before>20060608</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -26398,6 +26532,8 @@
             </reference>
             <use-date>
                 <not-before>20141210</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -26440,6 +26576,8 @@
             </reference>
             <use-date>
                 <not-before>20141210</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -26482,6 +26620,8 @@
             </reference>
             <use-date>
                 <not-before>20141210</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -26525,6 +26665,8 @@
             </reference>
             <use-date>
                 <not-before>20070413</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -26568,6 +26710,8 @@
             </reference>
             <use-date>
                 <not-before>20070413</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -26610,6 +26754,8 @@
             </reference>
             <use-date>
                 <not-before>20070216</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -26652,6 +26798,8 @@
             </reference>
             <use-date>
                 <not-before>20070216</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -26695,6 +26843,8 @@
             </reference>
             <use-date>
                 <not-before>20070413</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -26736,6 +26886,8 @@
             </reference>
             <use-date>
                 <not-before>20070413</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -26778,6 +26930,8 @@
             </reference>
             <use-date>
                 <not-before>20180101</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -26820,6 +26974,8 @@
             </reference>
             <use-date>
                 <not-before>20180101</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -26862,6 +27018,8 @@
             </reference>
             <use-date>
                 <not-before>20180101</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -26904,6 +27062,8 @@
             </reference>
             <use-date>
                 <not-before>20151221</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -26946,6 +27106,8 @@
             </reference>
             <use-date>
                 <not-before>20151221</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -27031,6 +27193,8 @@
             </reference>
             <use-date>
                 <not-before>20130930</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -27073,6 +27237,8 @@
             </reference>
             <use-date>
                 <not-before>20090724</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -27115,6 +27281,8 @@
             </reference>
             <use-date>
                 <not-before>20090724</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -27157,6 +27325,8 @@
             </reference>
             <use-date>
                 <not-before>20180921</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -27198,6 +27368,10 @@
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">58160-0804-01</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">58160-0802-02</link-to>
             </reference>
+            <use-date>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
+            </use-date>
         </code>
         <code>
             <value>58160-808-15</value>
@@ -27368,6 +27542,8 @@
             </reference>
             <use-date>
                 <not-before>20090915</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -27410,6 +27586,8 @@
             </reference>
             <use-date>
                 <not-before>20090915</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -27452,6 +27630,8 @@
             </reference>
             <use-date>
                 <not-before>20090915</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -27494,6 +27674,8 @@
             </reference>
             <use-date>
                 <not-before>20090915</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -27536,6 +27718,8 @@
             </reference>
             <use-date>
                 <not-before>20090915</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -27578,6 +27762,8 @@
             </reference>
             <use-date>
                 <not-before>20090915</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -27663,6 +27849,8 @@
             </reference>
             <use-date>
                 <not-before>20090915</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -27792,6 +27980,8 @@
             </reference>
             <use-date>
                 <not-before>19901221</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -27834,6 +28024,8 @@
             </reference>
             <use-date>
                 <not-before>20180817</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -27876,6 +28068,8 @@
             </reference>
             <use-date>
                 <not-before>20090330</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -27920,6 +28114,8 @@
             </reference>
             <use-date>
                 <not-before>20090330</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -27962,6 +28158,8 @@
             </reference>
             <use-date>
                 <not-before>20090330</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -28004,6 +28202,8 @@
             </reference>
             <use-date>
                 <not-before>20090330</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -28046,6 +28246,8 @@
             </reference>
             <use-date>
                 <not-before>20080709</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -28088,6 +28290,8 @@
             </reference>
             <use-date>
                 <not-before>20080709</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -28173,6 +28377,8 @@
             </reference>
             <use-date>
                 <not-before>19710421</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -28344,6 +28550,8 @@
             </reference>
             <use-date>
                 <not-before>20050114</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -28515,6 +28723,8 @@
             </reference>
             <use-date>
                 <not-before>19811123</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -28602,6 +28812,8 @@
             </reference>
             <use-date>
                 <not-before>20170301</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -28644,6 +28856,8 @@
             </reference>
             <use-date>
                 <not-before>20090724</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -28729,6 +28943,8 @@
             </reference>
             <use-date>
                 <not-before>19891220</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -28772,6 +28988,8 @@
             </reference>
             <use-date>
                 <not-before>20080620</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -28857,6 +29075,8 @@
             </reference>
             <use-date>
                 <not-before>20140530</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -28899,6 +29119,8 @@
             </reference>
             <use-date>
                 <not-before>19830707</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -29027,6 +29249,8 @@
             </reference>
             <use-date>
                 <not-before>19830707</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -29069,6 +29293,8 @@
             </reference>
             <use-date>
                 <not-before>20140721</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -29154,6 +29380,8 @@
             </reference>
             <use-date>
                 <not-before>20100312</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -29196,6 +29424,8 @@
             </reference>
             <use-date>
                 <not-before>20100312</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -29238,6 +29468,8 @@
             </reference>
             <use-date>
                 <not-before>20100312</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -29280,6 +29512,8 @@
             </reference>
             <use-date>
                 <not-before>20150801</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -29365,6 +29599,8 @@
             </reference>
             <use-date>
                 <not-before>20150324</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -29408,6 +29644,8 @@
             </reference>
             <use-date>
                 <not-before>20161219</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -29450,6 +29688,8 @@
             </reference>
             <use-date>
                 <not-before>20140708</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -29535,6 +29775,8 @@
             </reference>
             <use-date>
                 <not-before>20180817</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -29577,6 +29819,8 @@
             </reference>
             <use-date>
                 <not-before>19860723</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -29619,6 +29863,8 @@
             </reference>
             <use-date>
                 <not-before>19860723</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -29661,6 +29907,8 @@
             </reference>
             <use-date>
                 <not-before>19860723</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -29746,6 +29994,8 @@
             </reference>
             <use-date>
                 <not-before>19860723</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -29788,6 +30038,8 @@
             </reference>
             <use-date>
                 <not-before>19860723</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -29830,6 +30082,8 @@
             </reference>
             <use-date>
                 <not-before>19860723</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -29870,6 +30124,10 @@
                 <link-to codeset="VACCINATION_MANUFACTURER_CODE">MSD</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">00006-4995-01</link-to>
             </reference>
+            <use-date>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
+            </use-date>
         </code>
         <code>
             <value>0006-4995-00</value>
@@ -29911,6 +30169,8 @@
             </reference>
             <use-date>
                 <not-before>19860723</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -30039,6 +30299,8 @@
             </reference>
             <use-date>
                 <not-before>20110113</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -30081,6 +30343,8 @@
             </reference>
             <use-date>
                 <not-before>20060203</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -30123,6 +30387,8 @@
             </reference>
             <use-date>
                 <not-before>20060203</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -30165,6 +30431,8 @@
             </reference>
             <use-date>
                 <not-before>20171020</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -30207,6 +30475,8 @@
             </reference>
             <use-date>
                 <not-before>20171020</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -30249,6 +30519,8 @@
             </reference>
             <use-date>
                 <not-before>20160927</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -30291,6 +30563,8 @@
             </reference>
             <use-date>
                 <not-before>20101208</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -30333,6 +30607,8 @@
             </reference>
             <use-date>
                 <not-before>20101208</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -30418,6 +30694,8 @@
             </reference>
             <use-date>
                 <not-before>20150701</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -30460,6 +30738,8 @@
             </reference>
             <use-date>
                 <not-before>19671013</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -30545,6 +30825,8 @@
             </reference>
             <use-date>
                 <not-before>19700727</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -30716,6 +30998,8 @@
             </reference>
             <use-date>
                 <not-before>20141105</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -30758,6 +31042,8 @@
             </reference>
             <use-date>
                 <not-before>20141105</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -30800,6 +31086,8 @@
             </reference>
             <use-date>
                 <not-before>20141105</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -30928,6 +31216,8 @@
             </reference>
             <use-date>
                 <not-before>20070607</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -31057,6 +31347,8 @@
             </reference>
             <use-date>
                 <not-before>19941128</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -31100,6 +31392,8 @@
             </reference>
             <use-date>
                 <not-before>19941128</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -31142,6 +31436,8 @@
             </reference>
             <use-date>
                 <not-before>19960329</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -31185,6 +31481,8 @@
             </reference>
             <use-date>
                 <not-before>19960329</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -31227,6 +31525,8 @@
             </reference>
             <use-date>
                 <not-before>19960329</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -31270,6 +31570,8 @@
             </reference>
             <use-date>
                 <not-before>19960329</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -31312,6 +31614,8 @@
             </reference>
             <use-date>
                 <not-before>19960329</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -31355,6 +31659,8 @@
             </reference>
             <use-date>
                 <not-before>19960329</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -31398,6 +31704,8 @@
             </reference>
             <use-date>
                 <not-before>19960329</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -31440,6 +31748,8 @@
             </reference>
             <use-date>
                 <not-before>19950317</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -31482,6 +31792,8 @@
             </reference>
             <use-date>
                 <not-before>19950317</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -31565,6 +31877,10 @@
                 <link-to codeset="VACCINATION_MANUFACTURER_CODE">PAX</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">70460-0002-02</link-to>
             </reference>
+            <use-date>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
+            </use-date>
         </code>
         <code>
             <value>70460-001-01</value>
@@ -31593,6 +31909,48 @@
             </code-status>
         </code>
         <code>
+            <value>63361-0245-10</value>
+            <label>VAXELIS</label>
+            <description>MCM Vaccine Co. - Diphtheria and Tetanus Toxoids and Acellular Pertu</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">146</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">PMC</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">63361-0245-58</link-to>
+            </reference>
+            <use-date>
+                <not-before>20181221</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>63361-245-10</value>
+            <label>VAXELIS</label>
+            <description>MCM Vaccine Co. - Diphtheria and Tetanus Toxoids and Acellular Pertu</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>63361-0245-10</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20190530</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>63361024510</value>
+            <label>VAXELIS</label>
+            <description>MCM Vaccine Co. - Diphtheria and Tetanus Toxoids and Acellular Pertu</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>63361-0245-10</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20190530</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
             <value>69401-0000-01</value>
             <label>Vivotif</label>
             <description>PaxVax Berna GmbH - SALMONELLA TYPHI TY21A</description>
@@ -31606,6 +31964,8 @@
             </reference>
             <use-date>
                 <not-before>19920316</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -31648,6 +32008,8 @@
             </reference>
             <use-date>
                 <not-before>19920316</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -31690,6 +32052,8 @@
             </reference>
             <use-date>
                 <not-before>19530522</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -31732,6 +32096,8 @@
             </reference>
             <use-date>
                 <not-before>19530522</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -31774,6 +32140,8 @@
             </reference>
             <use-date>
                 <not-before>20060525</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -31816,6 +32184,8 @@
             </reference>
             <use-date>
                 <not-before>20060525</not-before>
+                <not-expected-after>20191120</not-expected-after>
+                <not-after>20200520</not-after>
             </use-date>
         </code>
         <code>
@@ -34923,6 +35293,7 @@
                 <link-to codeset="VACCINATION_CVX_CODE">185</link-to>
                 <link-to codeset="VACCINATION_MANUFACTURER_CODE">PSC</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">49281-0718-10</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">PMC</link-to>
             </reference>
             <use-date>
                 <not-before>20180629</not-before>
@@ -36637,6 +37008,7 @@
             </reference>
             <use-date>
                 <not-before>20180810</not-before>
+                <not-after>20190430</not-after>
             </use-date>
         </code>
         <code>
@@ -42182,6 +42554,7 @@
             </reference>
             <use-date>
                 <not-before>19811123</not-before>
+                <not-after>20190430</not-after>
             </use-date>
         </code>
         <code>
@@ -42224,6 +42597,7 @@
             </reference>
             <use-date>
                 <not-before>19811123</not-before>
+                <not-after>20190430</not-after>
             </use-date>
         </code>
         <code>
@@ -42606,6 +42980,7 @@
             </reference>
             <use-date>
                 <not-before>19830707</not-before>
+                <not-after>20190430</not-after>
             </use-date>
         </code>
         <code>
@@ -44642,6 +45017,48 @@
             </code-status>
         </code>
         <code>
+            <value>63361-0245-58</value>
+            <label>VAXELIS</label>
+            <description>MCM Vaccine Co - Diphtheria and Tetanus Toxoids and Acellular Pertussis Adsorbed, Inactivated Poliovirus, Haemophilus b Conjugate (Meningococcal Protein Conjugate) and Hepatitis B (Recombinant) Vaccine (DTaP-IPV-Hib-HepB dose for 6 wks through 4th yr)</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">146</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">PMC</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">63361-0245-10</link-to>
+            </reference>
+            <use-date>
+                <not-before>20181221</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>63361-245-58</value>
+            <label>VAXELIS</label>
+            <description>MCM Vaccine Co - Diphtheria and Tetanus Toxoids and Acellular Pertussis Adsorbed, Inactivated Poliovirus, Haemophilus b Conjugate (Meningococcal Protein Conjugate) and Hepatitis B (Recombinant) Vaccine (DTaP-IPV-Hib-HepB dose for 6 wks through 4th yr)</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>63361-0245-58</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20190213</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>63361024558</value>
+            <label>VAXELIS</label>
+            <description>MCM Vaccine Co - Diphtheria and Tetanus Toxoids and Acellular Pertussis Adsorbed, Inactivated Poliovirus, Haemophilus b Conjugate (Meningococcal Protein Conjugate) and Hepatitis B (Recombinant) Vaccine (DTaP-IPV-Hib-HepB dose for 6 wks through 4th yr)</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>63361-0245-58</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20190213</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
             <value>69401-0000-01</value>
             <label>Vivotif</label>
             <description>PaxVax Berna GmbH - SALMONELLA TYPHI TY21A</description>
@@ -45131,6 +45548,20 @@
             </reference>
             <use-date>
                 <not-before>20100528</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>VAXELIS</value>
+            <label>DTaP,IPV,Hib,HepB</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">146</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">PMC</link-to>
+            </reference>
+            <use-date>
+                <not-before>20190213</not-before>
             </use-date>
         </code>
         <code>
@@ -45770,9 +46201,11 @@
             <reference>
                 <link-to codeset="VACCINATION_CVX_CODE">185</link-to>
                 <link-to codeset="VACCINATION_MANUFACTURER_CODE">PSC</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">PMC</link-to>
             </reference>
             <use-date>
                 <not-before>20170421</not-before>
+                <not-after>20190213</not-after>
             </use-date>
         </code>
         <code>
@@ -46388,6 +46821,20 @@
             </use-date>
         </code>
         <code>
+            <value>TDVAX</value>
+            <label>Td (adult), 2 Lf tetanus toxoid, preservative free, adsorbed</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">09</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">MBL</link-to>
+            </reference>
+            <use-date>
+                <not-before>20190521</not-before>
+            </use-date>
+        </code>
+        <code>
             <value>Td, adsorbed</value>
             <label>Td (adult), adsorbed</label>
             <code-status>
@@ -46400,6 +46847,7 @@
             </reference>
             <use-date>
                 <not-before>20170419</not-before>
+                <not-after>20190521</not-after>
             </use-date>
         </code>
         <code>
@@ -46955,6 +47403,8 @@
                 <link-to codeset="VACCINATION_VIS_VACCINES">106</link-to>
                 <link-to codeset="VACCINATION_VIS_VACCINES">20</link-to>
                 <link-to codeset="VACCINATION_VIS_VACCINES">110</link-to>
+                <link-to codeset="VACCINATION_VIS_VACCINES">146</link-to>
+                <link-to codeset="VACCINATION_VIS_VACCINES">28</link-to>
             </reference>
             <use-date>
                 <not-before>20180824</not-before>
@@ -47508,6 +47958,7 @@
                 <link-to codeset="VACCINATION_VIS_VACCINES">120</link-to>
                 <link-to codeset="VACCINATION_VIS_VACCINES">51</link-to>
                 <link-to codeset="VACCINATION_VIS_VACCINES">133</link-to>
+                <link-to codeset="VACCINATION_VIS_VACCINES">28</link-to>
             </reference>
             <use-date>
                 <not-before>20151105</not-before>
@@ -48000,6 +48451,20 @@
             </use-date>
         </code>
         <code>
+            <value>28</value>
+            <label>DTaP (Diphtheria, Tetanus, Pertussis) Vaccine VIS</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300003511180824</link-to>
+                <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300026411151105</link-to>
+            </reference>
+            <use-date>
+                <not-before>20180824</not-before>
+            </use-date>
+        </code>
+        <code>
             <value>106</value>
             <label>DTaP, 5 pertussis antigens</label>
             <description></description>
@@ -48037,6 +48502,7 @@
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300006611150402</link-to>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300006611981216</link-to>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300005911181012</link-to>
+                <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300003511180824</link-to>
             </reference>
             <use-date>
                 <not-before>20151105</not-before>
@@ -49319,6 +49785,7 @@
                 <link-to codeset="VACCINATION_CVX_CODE">15</link-to>
                 <link-to codeset="VACCINATION_CVX_CODE">168</link-to>
                 <link-to codeset="VACCINATION_CVX_CODE">16</link-to>
+                <link-to codeset="VACCINATION_CVX_CODE">194</link-to>
             </reference>
         </code>
         <code>
@@ -49473,6 +49940,7 @@
                 <link-to codeset="VACCINATION_CVX_CODE">170</link-to>
                 <link-to codeset="VACCINATION_CVX_CODE">10</link-to>
                 <link-to codeset="VACCINATION_CVX_CODE">02</link-to>
+                <link-to codeset="VACCINATION_CVX_CODE">195</link-to>
             </reference>
         </code>
         <code>
@@ -49530,6 +49998,7 @@
                 <link-to codeset="VACCINATION_CVX_CODE">113</link-to>
                 <link-to codeset="VACCINATION_CVX_CODE">09</link-to>
                 <link-to codeset="VACCINATION_CVX_CODE">115</link-to>
+                <link-to codeset="VACCINATION_CVX_CODE">195</link-to>
             </reference>
         </code>
         <code>
