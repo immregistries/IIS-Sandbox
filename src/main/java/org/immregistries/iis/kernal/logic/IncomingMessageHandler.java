@@ -427,6 +427,7 @@ public class IncomingMessageHandler {
   public String buildRSP(HL7Reader reader, PatientMaster patient, PatientReported patientReported,
       OrgAccess orgAccess) {
     reader.resetPostion();
+    reader.advanceToSegment("MSH");
 
     Set<ProcessingFlavor> processingFlavorSet = orgAccess.getOrg().getProcessingFlavorSet();
     StringBuilder sb = new StringBuilder();
