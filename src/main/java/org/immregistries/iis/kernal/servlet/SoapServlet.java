@@ -2,28 +2,22 @@ package org.immregistries.iis.kernal.servlet;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
-
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
+import javax.servlet.http.HttpSession;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.AnnotationConfiguration;
-import org.immregistries.mqe.hl7util.parser.HL7Reader;
 import org.immregistries.iis.kernal.logic.IncomingMessageHandler;
 import org.immregistries.iis.kernal.model.OrgAccess;
 import org.immregistries.iis.kernal.model.OrgMaster;
 import org.immregistries.smm.cdc.CDCWSDLServer;
 import org.immregistries.smm.cdc.Fault;
-import org.immregistries.smm.cdc.MessageTooLargeFault;
-import org.immregistries.smm.cdc.ProcessorFactory;
 import org.immregistries.smm.cdc.SecurityFault;
 import org.immregistries.smm.cdc.SubmitSingleMessage;
 import org.immregistries.smm.cdc.UnknownFault;
@@ -133,10 +127,11 @@ public class SoapServlet extends HttpServlet {
       out.close();
     } else {
       resp.setContentType("text/html;charset=UTF-8");
-
+      HttpSession session = req.getSession(true);
       PrintWriter out = resp.getWriter();
       try {
-        out.println("<h1>IIS Kernel - CDC SOAP Endpoint</h1>");
+        HomeServlet.doHeader(out, session);
+        out.println("<h2>CDC SOAP Endpoint</h2>");
         out.println("<p>");
         out.println("This demonstration system supports the use of the ");
         out.println(
@@ -151,6 +146,7 @@ public class SoapServlet extends HttpServlet {
       } finally {
         out.close();
       }
+      HomeServlet.doFooter(out, true);
     }
   }
 

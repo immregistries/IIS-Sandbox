@@ -3,10 +3,18 @@
   version="2.4">
 
   <display-name>IIS Kernel</display-name>
+  
+  <welcome-file-list>  
+  	<welcome-file>home</welcome-file>
+  </welcome-file-list>
 
   <servlet>
     <servlet-name>pop</servlet-name>
     <servlet-class>org.immregistries.iis.kernal.servlet.PopServlet</servlet-class>
+  </servlet>
+  <servlet>
+    <servlet-name>home</servlet-name>
+    <servlet-class>org.immregistries.iis.kernal.servlet.HomeServlet</servlet-class>
   </servlet>
   <servlet>
     <servlet-name>fits</servlet-name>
@@ -24,6 +32,10 @@
     <servlet-name>vacDedup</servlet-name>
     <servlet-class>org.immregistries.iis.kernal.servlet.VacDedupServlet</servlet-class>
   </servlet>
+  <servlet-mapping>
+    <servlet-name>home</servlet-name>
+    <url-pattern>/home</url-pattern>
+  </servlet-mapping>
   <servlet-mapping>
     <servlet-name>status</servlet-name>
     <url-pattern>/status</url-pattern>

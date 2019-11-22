@@ -70,7 +70,7 @@
 		<dependency>
 			<groupId>org.immregistries</groupId>
 			<artifactId>smm-tester</artifactId>
-			<version>2.0</version>
+			<version>2.13</version>
 			<classifier>client</classifier>
 		</dependency>
 

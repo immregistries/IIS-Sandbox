@@ -36,6 +36,7 @@ import org.immregistries.vfa.connect.model.TestEvent;
 import org.immregistries.vfa.connect.model.VaccineGroup;
 
 public class IncomingMessageHandler {
+  private static final String PATIENT_MIDDLE_NAME_MULTI = "Multi";
   // TODO:
   // Organize logic classes, need to have access classes for every object, maybe a new Access
   // package?
@@ -43,6 +44,10 @@ public class IncomingMessageHandler {
 
 
 
+  private static final String RSP_Z42_MATCH_WITH_FORECAST = "Z42";
+  private static final String RSP_Z32_MATCH = "Z32";
+  private static final String RSP_Z31_MULTIPLE_MATCH = "Z31";
+  private static final String RSP_Z33_NO_MATCH = "Z33";
   private static Map<String, List<ReceivedResponse>> receivedResponseListMap = new HashMap<>();
   private static final int MAX_LIST_SIZE = 40;
 
@@ -99,7 +104,7 @@ public class IncomingMessageHandler {
 
   public String processQBP(OrgAccess orgAccess, HL7Reader reader) {
     PatientReported patientReported = null;
-    PatientMaster patient = null;
+    List<PatientReported> patientReportedPossibleList = new ArrayList<>();
     if (reader.advanceToSegment("QPD")) {
       String mrn = "";
       {
@@ -116,7 +121,6 @@ public class IncomingMessageHandler {
         List<PatientReported> patientReportedList = query.list();
         if (patientReportedList.size() > 0) {
           patientReported = patientReportedList.get(0);
-          patient = patientReported.getPatient();
         }
       }
       String patientNameLast = reader.getValue(4, 1);
@@ -151,9 +155,25 @@ public class IncomingMessageHandler {
           patientReported = null;
         }
       }
+      if (patientReported == null) {
+        Query query = dataSession.createQuery(
+            "from PatientReported where orgReported = :orgReported and Patient.patientBirthDate = :patientBirthDate "
+                + "and (Patient.patientNameLast = :patientNameLast or Patient.patientNameFirst = :patientNameFirst) ");
+        query.setParameter("orgReported", orgAccess.getOrg());
+        query.setParameter("patientBirthDate", patientBirthDate);
+        query.setParameter("patientNameLast", patientNameLast);
+        query.setParameter("patientNameFirst", patientNameFirst);
+        patientReportedPossibleList = query.list();
+      }
+      if (patientReported != null
+          && patientNameMiddle.equalsIgnoreCase(PATIENT_MIDDLE_NAME_MULTI)) {
+        patientReportedPossibleList.add(patientReported);
+        patientReportedPossibleList.add(patientReported);
+        patientReported = null;
+      }
     }
 
-    return buildRSP(reader, patient, patientReported, orgAccess);
+    return buildRSP(reader, patientReported, orgAccess, patientReportedPossibleList);
   }
 
   public String processVXU(OrgAccess orgAccess, HL7Reader reader) {
@@ -424,8 +444,8 @@ public class IncomingMessageHandler {
   }
 
   @SuppressWarnings("unchecked")
-  public String buildRSP(HL7Reader reader, PatientMaster patient, PatientReported patientReported,
-      OrgAccess orgAccess) {
+  public String buildRSP(HL7Reader reader, PatientReported patientReported, OrgAccess orgAccess,
+      List<PatientReported> patientReportedPossibleList) {
     reader.resetPostion();
     reader.advanceToSegment("MSH");
 
@@ -433,7 +453,7 @@ public class IncomingMessageHandler {
     StringBuilder sb = new StringBuilder();
     String profileIdSubmitted = reader.getValue(21);
     CodeMap codeMap = CodeMapManager.getCodeMap();
-    String profileId = "Z32";
+    String profileId = RSP_Z33_NO_MATCH;
     boolean sendBackForecast = true;
     if (processingFlavorSet.contains(ProcessingFlavor.COCONUT)) {
       sendBackForecast = false;
@@ -443,16 +463,23 @@ public class IncomingMessageHandler {
 
     {
       String messageType = "RSP^K11^RSP_K11";
-      if (patient == null) {
-        profileId = "Z33";
+      if (patientReported == null) {
+        profileId = RSP_Z33_NO_MATCH;
+        if (patientReportedPossibleList.size() > 0) {
+          if (profileIdSubmitted.equals("Z34")) {
+            profileId = RSP_Z31_MULTIPLE_MATCH;
+          } else if (profileIdSubmitted.equals("Z44")) {
+            profileId = RSP_Z33_NO_MATCH;
+          }
+        }
       } else if (profileIdSubmitted.equals("Z34")) {
-        profileId = "Z32";
+        profileId = RSP_Z32_MATCH;
       } else if (profileIdSubmitted.equals("Z44")) {
         if (processingFlavorSet.contains(ProcessingFlavor.ORANGE)) {
-          profileId = "Z32";
+          profileId = RSP_Z32_MATCH;
         } else {
           sendBackForecast = true;
-          profileId = "Z42";
+          profileId = RSP_Z42_MATCH_WITH_FORECAST;
         }
       }
       createMSH(messageType, profileId, reader, sb, processingFlavorSet);
@@ -476,7 +503,7 @@ public class IncomingMessageHandler {
         queryId = reader.getValue(2);
       }
       sb.append("QAK|" + queryId + "|");
-      if (patient == null) {
+      if (patientReported == null) {
         sb.append("NF|");
       } else {
         sb.append("OK|");
@@ -489,76 +516,20 @@ public class IncomingMessageHandler {
     } else {
       sb.append("QPD|");
     }
-    if (patient != null) {
+    if (profileId.equals(RSP_Z31_MULTIPLE_MATCH)) {
       SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-      // PID
-      sb.append("PID");
-      // PID-1
-      sb.append("|1");
-      // PID-2
-      sb.append("|");
-      // PID-3
-      sb.append("|" + patient.getPatientExternalLink() + "^^^IIS^SR");
-      if (patientReported != null) {
-        sb.append("~" + patientReported.getPatientReportedExternalLink() + "^^^"
-            + patientReported.getPatientReportedAuthority() + "^"
-            + patientReported.getPatientReportedType());
+      int count = 0;
+      for (PatientReported pr : patientReportedPossibleList) {
+        count++;
+        PatientMaster patient = pr.getPatient();
+        printQueryPID(pr, processingFlavorSet, sb, patient, sdf, count);
       }
-      // PID-4
-      sb.append("|");
-      // PID-5
-      sb.append("|" + patient.getPatientNameLast() + "^" + patient.getPatientNameFirst() + "^"
-          + patient.getPatientNameMiddle() + "^^^^L");
-
-      // PID-6
-      if (patientReported != null) {
-        sb.append("|" + patientReported.getPatientMotherMaiden() + "^^^^^^M");
-      }
-      // PID-7
-      sb.append("|" + sdf.format(patient.getPatientBirthDate()));
-      if (patientReported != null) {
-        // PID-8
-        sb.append("|" + patientReported.getPatientSex());
-        // PID-9
-        sb.append("|");
-        // PID-10
-        sb.append("|");
-        // PID-11
-        sb.append("|" + patientReported.getPatientAddressLine1() + "^"
-            + patientReported.getPatientAddressLine2() + "^"
-            + patientReported.getPatientAddressCity() + "^"
-            + patientReported.getPatientAddressState() + "^"
-            + patientReported.getPatientAddressZip() + "^"
-            + patientReported.getPatientAddressCountry() + "^");
-        if (!processingFlavorSet.contains(ProcessingFlavor.LIME)) {
-          sb.append("P");
-        }
-        // PID-12
-        sb.append("|");
-        // PID-13
-        sb.append("|");
-        String phone = patientReported.getPatientPhone();
-        if (phone.length() == 10) {
-          sb.append("^PRN^PH^^^" + phone.substring(0, 3) + "^" + phone.substring(3, 10));
-        }
-      }
-      sb.append("\r");
-      if (patientReported != null) {
-        if (!patientReported.getGuardianRelationship().equals("")
-            && !patientReported.getGuardianLast().equals("")
-            && !patientReported.getGuardianFirst().equals("")) {
-          Code code = codeMap.getCodeForCodeset(CodesetType.PERSON_RELATIONSHIP,
-              patientReported.getGuardianRelationship());
-          if (code != null) {
-            sb.append("NK1");
-            sb.append("|1");
-            sb.append("|" + patientReported.getGuardianLast() + "^"
-                + patientReported.getGuardianFirst() + "^^^^^L");
-            sb.append("|" + code.getValue() + "^" + code.getLabel() + "^HL70063");
-            sb.append("\r");
-          }
-        }
-      }
+    }
+    else if (profileId.equals(RSP_Z32_MATCH) || profileId.equals(RSP_Z42_MATCH_WITH_FORECAST)) {
+      PatientMaster patient = patientReported.getPatient();
+      SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+      printQueryPID(patientReported, processingFlavorSet, sb, patient, sdf, 1);
+      printQueryNK1(patientReported, sb, codeMap);
       List<VaccinationMaster> vaccinationMasterList;
       {
         Query query = dataSession.createQuery("from VaccinationMaster where patient = ?");
@@ -726,7 +697,7 @@ public class IncomingMessageHandler {
           }
         }
       }
-      if (forecastActualList != null && forecastActualList.size() > 0) {
+      if (sendBackForecast && forecastActualList.size() > 0) {
         printORC(orgAccess, sb, null, null, false);
         sb.append("RXA");
         // RXA-1
@@ -816,6 +787,82 @@ public class IncomingMessageHandler {
     }
 
     return sb.toString();
+  }
+
+  public void printQueryNK1(PatientReported patientReported, StringBuilder sb, CodeMap codeMap) {
+    if (patientReported != null) {
+      if (!patientReported.getGuardianRelationship().equals("")
+          && !patientReported.getGuardianLast().equals("")
+          && !patientReported.getGuardianFirst().equals("")) {
+        Code code = codeMap.getCodeForCodeset(CodesetType.PERSON_RELATIONSHIP,
+            patientReported.getGuardianRelationship());
+        if (code != null) {
+          sb.append("NK1");
+          sb.append("|1");
+          sb.append("|" + patientReported.getGuardianLast() + "^"
+              + patientReported.getGuardianFirst() + "^^^^^L");
+          sb.append("|" + code.getValue() + "^" + code.getLabel() + "^HL70063");
+          sb.append("\r");
+        }
+      }
+    }
+  }
+
+  public void printQueryPID(PatientReported patientReported,
+      Set<ProcessingFlavor> processingFlavorSet, StringBuilder sb, PatientMaster patient,
+      SimpleDateFormat sdf, int pidCount) {
+    // PID
+    sb.append("PID");
+    // PID-1
+    sb.append("|" + pidCount);
+    // PID-2
+    sb.append("|");
+    // PID-3
+    sb.append("|" + patient.getPatientExternalLink() + "^^^IIS^SR");
+    if (patientReported != null) {
+      sb.append("~" + patientReported.getPatientReportedExternalLink() + "^^^"
+          + patientReported.getPatientReportedAuthority() + "^"
+          + patientReported.getPatientReportedType());
+    }
+    // PID-4
+    sb.append("|");
+    // PID-5
+    sb.append("|" + patient.getPatientNameLast() + "^" + patient.getPatientNameFirst() + "^"
+        + patient.getPatientNameMiddle() + "^^^^L");
+
+    // PID-6
+    sb.append("|");
+    if (patientReported != null) {
+      sb.append(patientReported.getPatientMotherMaiden() + "^^^^^^M");
+    }
+    // PID-7
+    sb.append("|" + sdf.format(patient.getPatientBirthDate()));
+    if (patientReported != null) {
+      // PID-8
+      sb.append("|" + patientReported.getPatientSex());
+      // PID-9
+      sb.append("|");
+      // PID-10
+      sb.append("|");
+      // PID-11
+      sb.append("|" + patientReported.getPatientAddressLine1() + "^"
+          + patientReported.getPatientAddressLine2() + "^" + patientReported.getPatientAddressCity()
+          + "^" + patientReported.getPatientAddressState() + "^"
+          + patientReported.getPatientAddressZip() + "^"
+          + patientReported.getPatientAddressCountry() + "^");
+      if (!processingFlavorSet.contains(ProcessingFlavor.LIME)) {
+        sb.append("P");
+      }
+      // PID-12
+      sb.append("|");
+      // PID-13
+      sb.append("|");
+      String phone = patientReported.getPatientPhone();
+      if (phone.length() == 10) {
+        sb.append("^PRN^PH^^^" + phone.substring(0, 3) + "^" + phone.substring(3, 10));
+      }
+    }
+    sb.append("\r");
   }
 
   public void printORC(OrgAccess orgAccess, StringBuilder sb, VaccinationMaster vaccination,

@@ -7,6 +7,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -57,10 +58,14 @@ public class PopServlet extends HttpServlet {
       String userId = req.getParameter(PARAM_USERID);
       String password = req.getParameter(PARAM_PASSWORD);
       String facilityId = req.getParameter(PARAM_FACILITYID);
+      HttpSession session = req.getSession(true);
+      OrgAccess orgAccess = (OrgAccess) session.getAttribute("orgAccess");
       String ack = "";
       Session dataSession = getDataSession();
       try {
-        OrgAccess orgAccess = authenticateOrgAccess(userId, password, facilityId, dataSession);
+        if (orgAccess == null) {
+          orgAccess = authenticateOrgAccess(userId, password, facilityId, dataSession);
+        }
         if (orgAccess == null) {
           resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
           out.println(
@@ -85,6 +90,7 @@ public class PopServlet extends HttpServlet {
   protected void doGet(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
 
+    HttpSession session = req.getSession(true);
     resp.setContentType("text/html");
     PrintWriter out = new PrintWriter(resp.getOutputStream());
     try {
@@ -105,26 +111,46 @@ public class PopServlet extends HttpServlet {
         facilityId = "Mercy Healthcare";
       }
       {
-        out.println("<html>");
-        out.println("  <head>");
-        out.println("    <title>IIS Kernel Pop</title>");
-        out.println("  </head>");
-        out.println("  <body>");
-        out.println("    <h1>Pop Test Interface</h1>");
-        out.println("    <form method=\"POST\" action=\"pop\">");
-        out.println("    User Id: <input type=\"text\" name=\"" + PARAM_USERID + "\" value=\""
-            + userId + "\"/><br/>");
-        out.println(
-            "    Password: <input type=\"password\" name=\"" + PARAM_PASSWORD + "\"/><br/>");
-        out.println("    Facility Id: <input type=\"text\" name=\"" + PARAM_FACILITYID
-            + "\" value=\"" + facilityId + "\"/><br/>");
-        out.println("      <textarea name=\"" + PARAM_MESSAGE + "\" rows=\"15\" cols=\"160\">"
-            + message + "</textarea><br/>");
-        out.println("      <input type=\"submit\" name=\"sumbit\" value=\"Submit\"/>");
+        HomeServlet.doHeader(out, session);
+        out.println("    <h2>Pop Test Interface</h2>");
+        out.println("    <form method=\"POST\" action=\"pop\" target=\"_blank\">");
+        out.println("      <table>");
+        OrgAccess orgAccess = (OrgAccess) session.getAttribute("orgAccess");
+        if (orgAccess == null) {
+          out.println("        <tr>");
+          out.println("          <th>User Id</th><td><input type=\"text\" name=\"" + PARAM_USERID
+              + "\" value=\"" + userId + "\"/></td>");
+          out.println("        </tr>");
+          out.println("        <tr>");
+          out.println("      <th>Password</th><td><input type=\"password\" name=\"" + PARAM_PASSWORD
+              + "\"/></td>");
+          out.println("        </tr>");
+          out.println("        <tr>");
+          out.println("      <th>Facility Id</th><td><input type=\"text\" name=\""
+              + PARAM_FACILITYID + "\" value=\"" + facilityId + "\"/></td>");
+          out.println("        </tr>");
+        } else {
+          out.println("        <tr>");
+          out.println("          <th>User Id</th><td>" + orgAccess.getAccessName() + "</td>");
+          out.println("        </tr>");
+          out.println("        <tr>");
+          out.println("          <th>Facility Id</th><td>"
+              + orgAccess.getOrg().getOrganizationName() + "</td>");
+          out.println("        </tr>");
+        }
+        out.println("        <tr>");
+        out.println("          <th>Message</th><td><textarea name=\"" + PARAM_MESSAGE
+            + "\" rows=\"15\" cols=\"160\">" + message + "</textarea></td>");
+        out.println("        </tr>");
+        out.println("        <tr>");
+        out.println("          <td colspan=\"2\" align=\"right\">");
+        out.println("            <input type=\"submit\" name=\"sumbit\" value=\"Submit\"/>");
+        out.println("          </td>");
+        out.println("        </tr>");
+        out.println("      </table>");
         out.println("    </form>");
         out.println("    <p>ISS Kernel Version: " + SoftwareVersion.VERSION + "</p>");
-        out.println("  </body>");
-        out.println("</html>");
+        HomeServlet.doFooter(out, false);
       }
     } catch (Exception e) {
       e.printStackTrace(System.err);
