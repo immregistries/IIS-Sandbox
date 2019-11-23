@@ -21,6 +21,7 @@
     <mapping resource="org/immregistries/iis/kernal/model/PatientMaster.hbm.xml"/>
     <mapping resource="org/immregistries/iis/kernal/model/PatientMatch.hbm.xml"/>
     <mapping resource="org/immregistries/iis/kernal/model/PatientReported.hbm.xml"/>
+    <mapping resource="org/immregistries/iis/kernal/model/MessageReceived.hbm.xml"/>
     <mapping resource="org/immregistries/iis/kernal/model/VaccinationMaster.hbm.xml"/>
     <mapping resource="org/immregistries/iis/kernal/model/VaccinationReported.hbm.xml"/>
   </session-factory>

@@ -146,7 +146,7 @@ public class SoapServlet extends HttpServlet {
       } finally {
         out.close();
       }
-      HomeServlet.doFooter(out, true);
+      HomeServlet.doFooter(out, session);
     }
   }
 

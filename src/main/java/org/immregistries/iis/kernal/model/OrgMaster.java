@@ -1,8 +1,9 @@
 package org.immregistries.iis.kernal.model;
 
+import java.io.Serializable;
 import java.util.Set;
 
-public class OrgMaster {
+public class OrgMaster implements Serializable {
   private int orgId = 0;
   private String organizationName = "";
   private Set<ProcessingFlavor> processingFlavorSet = null;
@@ -39,8 +40,7 @@ public class OrgMaster {
   }
 
   public Set<ProcessingFlavor> getProcessingFlavorSet() {
-    if (processingFlavorSet == null)
-    {
+    if (processingFlavorSet == null) {
       processingFlavorSet = ProcessingFlavor.getProcessingStyle(organizationName);
     }
     return processingFlavorSet;

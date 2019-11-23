@@ -8,8 +8,8 @@
     <many-to-one name="orgReported" column="org_reported_id" class="OrgMaster"/>
     <property name="patientReportedExternalLink" column="patient_reported_external_link" type="string"/>
     <many-to-one name="Patient" column="patient_id" class="PatientMaster"/>
-    <property name="reportedDate" column="reported_date" type="date"/>
-    <property name="updatedDate" column="updated_date" type="date"/>
+    <property name="reportedDate" column="reported_date" type="timestamp"/>
+    <property name="updatedDate" column="updated_date" type="timestamp"/>
     <property name="patientReportedAuthority" column="patient_reported_authority" type="string"/>
     <property name="patientReportedType" column="patient_reported_type" type="string"/>
     <property name="patientNameLast" column="patient_name_last" type="string"/>

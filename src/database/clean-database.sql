@@ -1,0 +1,10 @@
+SET FOREIGN_KEY_CHECKS=0;
+TRUNCATE TABLE org_access;
+TRUNCATE TABLE org_master;
+TRUNCATE TABLE patient_master;
+TRUNCATE TABLE patient_match;
+TRUNCATE TABLE patient_reported;
+TRUNCATE TABLE vaccination_master;
+TRUNCATE TABLE vaccination_reported;
+TRUNCATE TABLE message_received;
+SET FOREIGN_KEY_CHECKS=1;

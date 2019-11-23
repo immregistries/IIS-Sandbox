@@ -17,12 +17,16 @@
     <servlet-class>org.immregistries.iis.kernal.servlet.HomeServlet</servlet-class>
   </servlet>
   <servlet>
+    <servlet-name>patient</servlet-name>
+    <servlet-class>org.immregistries.iis.kernal.servlet.PatientServlet</servlet-class>
+  </servlet>
+  <servlet>
     <servlet-name>fits</servlet-name>
     <servlet-class>org.immregistries.iis.kernal.servlet.FitsServlet</servlet-class>
   </servlet>
   <servlet>
-    <servlet-name>status</servlet-name>
-    <servlet-class>org.immregistries.iis.kernal.servlet.StatusServlet</servlet-class>
+    <servlet-name>message</servlet-name>
+    <servlet-class>org.immregistries.iis.kernal.servlet.MessageServlet</servlet-class>
   </servlet>
   <servlet>
     <servlet-name>soap</servlet-name>
@@ -37,8 +41,8 @@
     <url-pattern>/home</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
-    <servlet-name>status</servlet-name>
-    <url-pattern>/status</url-pattern>
+    <servlet-name>message</servlet-name>
+    <url-pattern>/message</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>pop</servlet-name>
@@ -55,6 +59,10 @@
   <servlet-mapping>
     <servlet-name>vacDedup</servlet-name>
     <url-pattern>/vacDedup</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>patient</servlet-name>
+    <url-pattern>/patient</url-pattern>
   </servlet-mapping>
 
 

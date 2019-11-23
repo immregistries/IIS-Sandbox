@@ -17,6 +17,7 @@ import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.SoftwareVersion;
+import org.immregistries.iis.kernal.model.MessageReceived;
 import org.immregistries.iis.kernal.model.OrgAccess;
 import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.model.PatientReported;
@@ -48,37 +49,11 @@ public class IncomingMessageHandler {
   private static final String RSP_Z32_MATCH = "Z32";
   private static final String RSP_Z31_MULTIPLE_MATCH = "Z31";
   private static final String RSP_Z33_NO_MATCH = "Z33";
-  private static Map<String, List<ReceivedResponse>> receivedResponseListMap = new HashMap<>();
-  private static final int MAX_LIST_SIZE = 40;
-
-  private static void registerReceived(String received, String response, OrgAccess orgAccess) {
-    synchronized (receivedResponseListMap) {
-      ReceivedResponse receivedResponse = new ReceivedResponse();
-      receivedResponse.setReceivedMessage(received);
-      receivedResponse.setResponseMessage(response);
-      List<ReceivedResponse> receivedResponseList =
-          receivedResponseListMap.get(orgAccess.getOrg().getOrganizationName());
-      if (receivedResponseList == null) {
-        receivedResponseList = new ArrayList<>();
-        receivedResponseListMap.put(orgAccess.getOrg().getOrganizationName(), receivedResponseList);
-      }
-      receivedResponseList.add(0, receivedResponse);
-      if (receivedResponseList.size() > MAX_LIST_SIZE) {
-        receivedResponseList.remove(MAX_LIST_SIZE);
-      }
-    }
-  }
-
-  public static List<ReceivedResponse> getReceivedResponseList(String organizationName) {
-    synchronized (receivedResponseListMap) {
-      List<ReceivedResponse> receivedResponseList = receivedResponseListMap.get(organizationName);
-      if (receivedResponseList == null) {
-        return new ArrayList<ReceivedResponse>();
-      }
-      return new ArrayList<ReceivedResponse>(receivedResponseList);
-    }
-  }
-
+  private static final String QUERY_OK = "OK";
+  private static final String QUERY_NOT_FOUND = "NF";
+  private static final String QUERY_TOO_MANY = "TM";
+  //  private static final String QUERY_APPLICATION_ERROR = "AE";
+  //  private static final String QUERY_APPLICATION_REJECT = "AR";
 
   private Session dataSession = null;
 
@@ -91,18 +66,18 @@ public class IncomingMessageHandler {
     String messageType = reader.getValue(9);
     String responseMessage;
     if (messageType.equals("VXU")) {
-      responseMessage = processVXU(orgAccess, reader);
+      responseMessage = processVXU(orgAccess, reader, message);
     } else if (messageType.equals("QBP")) {
-      responseMessage = processQBP(orgAccess, reader);
+      responseMessage = processQBP(orgAccess, reader, message);
     } else {
       ProcessingException e = new ProcessingException("Unsupported message", "", 0, 0);
       responseMessage = buildAck(reader, e);
+      recordMessageReceived(message, null, responseMessage, "Unknown", "NAck");
     }
-    registerReceived(message, responseMessage, orgAccess);
     return responseMessage;
   }
 
-  public String processQBP(OrgAccess orgAccess, HL7Reader reader) {
+  public String processQBP(OrgAccess orgAccess, HL7Reader reader, String messageReceived) {
     PatientReported patientReported = null;
     List<PatientReported> patientReportedPossibleList = new ArrayList<>();
     if (reader.advanceToSegment("QPD")) {
@@ -128,6 +103,19 @@ public class IncomingMessageHandler {
       String patientNameMiddle = reader.getValue(4, 3);
       Date patientBirthDate = parseDate(reader.getValue(6));
       String patientSex = reader.getValue(7);
+      if (patientReported == null) {
+        Query query = dataSession.createQuery(
+            "from PatientReported where orgReported = :orgReported and Patient.patientBirthDate = :patientBirthDate "
+                + "and Patient.patientNameLast = :patientNameLast and Patient.patientNameFirst = :patientNameFirst ");
+        query.setParameter("orgReported", orgAccess.getOrg());
+        query.setParameter("patientBirthDate", patientBirthDate);
+        query.setParameter("patientNameLast", patientNameLast);
+        query.setParameter("patientNameFirst", patientNameFirst);
+        List<PatientReported> patientReportedList = query.list();
+        if (patientReportedList.size() > 0) {
+          patientReported = patientReportedList.get(0);
+        }
+      }
       if (patientReported != null) {
         int points = 0;
         if (!patientNameLast.equals("")
@@ -173,10 +161,10 @@ public class IncomingMessageHandler {
       }
     }
 
-    return buildRSP(reader, patientReported, orgAccess, patientReportedPossibleList);
+    return buildRSP(reader, messageReceived, patientReported, orgAccess, patientReportedPossibleList);
   }
 
-  public String processVXU(OrgAccess orgAccess, HL7Reader reader) {
+  public String processVXU(OrgAccess orgAccess, HL7Reader reader, String message) {
     try {
       String patientReportedExternalLink = "";
       String patientReportedAuthority = "";
@@ -220,6 +208,7 @@ public class IncomingMessageHandler {
       if (patientReported == null) {
         patient = new PatientMaster();
         patient.setPatientExternalLink(generatePatientExternalLink());
+        patient.setOrgMaster(orgAccess.getOrg());
         patientReported = new PatientReported();
         patientReported.setOrgReported(orgAccess.getOrg());
         patientReported.setPatientReportedExternalLink(patientReportedExternalLink);
@@ -304,6 +293,8 @@ public class IncomingMessageHandler {
         }
       }
       reader.resetPostion();
+
+
 
       patientReported.setUpdatedDate(new Date());
       {
@@ -437,14 +428,33 @@ public class IncomingMessageHandler {
           }
         }
       }
-      return buildAck(reader, null);
+      String ack = buildAck(reader, null);
+      recordMessageReceived(message, patientReported, ack, "Update", "Ack");
+      return ack;
     } catch (ProcessingException e) {
-      return buildAck(reader, e);
+      String ack = buildAck(reader, e);
+      recordMessageReceived(message, null, ack, "Update", "Exception");
+      return ack;
     }
   }
 
+  public void recordMessageReceived(String message, PatientReported patientReported,
+      String messageResponse, String categoryRequest, String categoryResponse) {
+    MessageReceived messageReceived = new MessageReceived();
+    messageReceived.setOrgMaster(patientReported.getOrgReported());
+    messageReceived.setMessageRequest(message);
+    messageReceived.setPatientReported(patientReported);
+    messageReceived.setMessageResponse(messageResponse);
+    messageReceived.setReportedDate(new Date());
+    messageReceived.setCategoryRequest(categoryRequest);
+    messageReceived.setCategoryResponse(categoryResponse);
+    Transaction transaction = dataSession.beginTransaction();
+    dataSession.save(messageReceived);
+    transaction.commit();
+  }
+
   @SuppressWarnings("unchecked")
-  public String buildRSP(HL7Reader reader, PatientReported patientReported, OrgAccess orgAccess,
+  public String buildRSP(HL7Reader reader, String messageRecieved, PatientReported patientReported, OrgAccess orgAccess,
       List<PatientReported> patientReportedPossibleList) {
     reader.resetPostion();
     reader.advanceToSegment("MSH");
@@ -453,6 +463,7 @@ public class IncomingMessageHandler {
     StringBuilder sb = new StringBuilder();
     String profileIdSubmitted = reader.getValue(21);
     CodeMap codeMap = CodeMapManager.getCodeMap();
+    String categoryResponse = "No Match";
     String profileId = RSP_Z33_NO_MATCH;
     boolean sendBackForecast = true;
     if (processingFlavorSet.contains(ProcessingFlavor.COCONUT)) {
@@ -461,25 +472,57 @@ public class IncomingMessageHandler {
       sendBackForecast = false;
     }
 
+    String queryId = "";
+    int maxCount = 20;
+    if (reader.advanceToSegment("QPD")) {
+      queryId = reader.getValue(2);
+      if (reader.advanceToSegment("RCP")) {
+        String s = reader.getValue(2);
+        try {
+          int i = Integer.parseInt(s);
+          if (i < maxCount) {
+            maxCount = i;
+          }
+        } catch (NumberFormatException nfe) {
+          // ignore
+        }
+      }
+    }
+    String queryResponse = QUERY_OK;
     {
       String messageType = "RSP^K11^RSP_K11";
       if (patientReported == null) {
+        queryResponse = QUERY_NOT_FOUND;
         profileId = RSP_Z33_NO_MATCH;
+        categoryResponse = "No Match";
         if (patientReportedPossibleList.size() > 0) {
           if (profileIdSubmitted.equals("Z34")) {
-            profileId = RSP_Z31_MULTIPLE_MATCH;
+            if (patientReportedPossibleList.size() > maxCount) {
+              queryResponse = QUERY_TOO_MANY;
+              profileId = RSP_Z33_NO_MATCH;
+              categoryResponse = "Too Many Matches";
+            } else {
+              queryResponse = QUERY_OK;
+              profileId = RSP_Z31_MULTIPLE_MATCH;
+              categoryResponse = "Possible Match";
+            }
           } else if (profileIdSubmitted.equals("Z44")) {
+            queryResponse = QUERY_NOT_FOUND;
             profileId = RSP_Z33_NO_MATCH;
+            categoryResponse = "No Match";
           }
         }
       } else if (profileIdSubmitted.equals("Z34")) {
         profileId = RSP_Z32_MATCH;
+        categoryResponse = "Match";
       } else if (profileIdSubmitted.equals("Z44")) {
         if (processingFlavorSet.contains(ProcessingFlavor.ORANGE)) {
           profileId = RSP_Z32_MATCH;
+          categoryResponse = "Match";
         } else {
           sendBackForecast = true;
           profileId = RSP_Z42_MATCH_WITH_FORECAST;
+          categoryResponse = "Match";
         }
       }
       createMSH(messageType, profileId, reader, sb, processingFlavorSet);
@@ -498,16 +541,10 @@ public class IncomingMessageHandler {
       profileName = "Request Evaluated Immunization History and Forecast Query";
     }
     {
-      String queryId = "";
-      if (reader.advanceToSegment("QPD")) {
-        queryId = reader.getValue(2);
-      }
-      sb.append("QAK|" + queryId + "|");
-      if (patientReported == null) {
-        sb.append("NF|");
-      } else {
-        sb.append("OK|");
-      }
+
+      sb.append("QAK|" + queryId);
+      sb.append("|" + queryResponse);
+      sb.append("|");
       sb.append("" + profileIdSubmitted + "^" + profileName + "^CDCPHINVS\r");
     }
     reader.resetPostion();
@@ -524,8 +561,7 @@ public class IncomingMessageHandler {
         PatientMaster patient = pr.getPatient();
         printQueryPID(pr, processingFlavorSet, sb, patient, sdf, count);
       }
-    }
-    else if (profileId.equals(RSP_Z32_MATCH) || profileId.equals(RSP_Z42_MATCH_WITH_FORECAST)) {
+    } else if (profileId.equals(RSP_Z32_MATCH) || profileId.equals(RSP_Z42_MATCH_WITH_FORECAST)) {
       PatientMaster patient = patientReported.getPatient();
       SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
       printQueryPID(patientReported, processingFlavorSet, sb, patient, sdf, 1);
@@ -786,7 +822,9 @@ public class IncomingMessageHandler {
       }
     }
 
-    return sb.toString();
+    String messageResponse = sb.toString();
+    recordMessageReceived(messageRecieved, patientReported, messageResponse, "Query", categoryResponse);
+    return messageResponse;
   }
 
   public void printQueryNK1(PatientReported patientReported, StringBuilder sb, CodeMap codeMap) {

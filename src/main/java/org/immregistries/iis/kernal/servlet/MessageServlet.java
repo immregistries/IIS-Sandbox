@@ -2,7 +2,6 @@ package org.immregistries.iis.kernal.servlet;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.text.SimpleDateFormat;
 import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -12,13 +11,12 @@ import javax.servlet.http.HttpSession;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.immregistries.iis.kernal.logic.IncomingMessageHandler;
-import org.immregistries.iis.kernal.logic.ReceivedResponse;
+import org.immregistries.iis.kernal.model.MessageReceived;
 import org.immregistries.iis.kernal.model.OrgAccess;
 import org.immregistries.iis.kernal.model.OrgMaster;
 
 @SuppressWarnings("serial")
-public class StatusServlet extends HttpServlet {
+public class MessageServlet extends HttpServlet {
 
   public static final String PARAM_ORG_ID = "orgId";
   public static final String PARAM_USERID = "USERID";
@@ -29,6 +27,9 @@ public class StatusServlet extends HttpServlet {
 
   public static final String ACTION_LOGIN = "Login";
   public static final String ACTION_LOGOUT = "Logout";
+  public static final String ACTION_SEARCH = "Search";
+
+  public static final String PARAM_SEARCH = "search";
 
   @Override
   protected void doPost(HttpServletRequest req, HttpServletResponse resp)
@@ -83,9 +84,10 @@ public class StatusServlet extends HttpServlet {
               Integer.parseInt(req.getParameter(PARAM_ORG_ID)));
           facilityId = orgMaster.getOrganizationName();
         }
+        out.println("    <div class=\"w3-container w3-card-4\">");
         out.println("    <h2>Login</h2>");
         out.println(
-            "    <form method=\"POST\" action=\"status\" class=\"w3-container w3-card-4\">");
+            "    <form method=\"POST\" action=\"message\" class=\"w3-container w3-card-4\">");
         out.println("      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_USERID
             + "\" value=\"" + userId + "\" required/>");
         out.println("          <label>User Id</label>");
@@ -99,30 +101,60 @@ public class StatusServlet extends HttpServlet {
             "          <input class=\"w3-button w3-section w3-teal w3-ripple\" type=\"submit\" name=\""
                 + PARAM_ACTION + "\" value=\"" + ACTION_LOGIN + "\"/>");
         out.println("    </form>");
+        out.println("    </div>");
       } else {
+        out.println("    <div class=\"w3-container w3-half w3-margin-top\">");
         out.println("    <h2>" + orgAccess.getOrg().getOrganizationName() + "</h2>");
         out.println("    <h3>Messages Recently Received</h3>");
-        List<ReceivedResponse> receivedResponseList = IncomingMessageHandler
-            .getReceivedResponseList(orgAccess.getOrg().getOrganizationName());
-        if (receivedResponseList.size() == 0) {
+        String search = req.getParameter(PARAM_SEARCH);
+        if (search == null) {
+          search = "";
+        }
+        out.println("    <form method=\"GET\" action=\"message\" class=\"w3-container w3-card-4\">");
+        out.println("      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_SEARCH
+            + "\" value=\"" + search + "\"/>");
+        out.println(
+            "          <input class=\"w3-button w3-section w3-teal w3-ripple\" type=\"submit\" name=\""
+                + PARAM_ACTION + "\" value=\"" + ACTION_SEARCH + "\"/>");
+        out.println("    </form>");
+        out.println("    </div>");
+
+        out.println("    <div class=\"w3-container\">");
+        List<MessageReceived> messageReceivedList;
+        {
+          Query query = dataSession.createQuery(
+              "from MessageReceived where orgMaster = :orgMaster order by reportedDate desc");
+          query.setParameter("orgMaster", orgAccess.getOrg());
+          messageReceivedList = query.list();
+        }
+
+        if (messageReceivedList.size() == 0) {
           out.println("     <em>None Received</em>");
         } else {
-          SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
-          for (ReceivedResponse receivedResponse : receivedResponseList) {
-            out.println("     <h3>" + sdf.format(receivedResponse.getReceivedDate()) + "</h3>");
-            out.println("     <pre>" + receivedResponse.getReceivedMessage() + "</pre>");
-            out.println("     <pre>" + receivedResponse.getResponseMessage() + "</pre>");
+          int count = 0;
+          for (MessageReceived messageReceived : messageReceivedList) {
+            if (search.length() > 0) {
+              if (!messageReceived.getMessageRequest().contains(search)
+                  && !messageReceived.getMessageResponse().contains(search)) {
+                continue;
+              }
+            }
+            count++;
+            if (count > 100) {
+              out.println("  <em>Only showing first 100 messages</em>");
+              break;
+            }
+            PatientServlet.printMessageReceived(out, messageReceived);
           }
         }
-        out.println(
-            "    <p><a href=\"status?" + PARAM_ACTION + "=" + ACTION_LOGOUT + "\">Logout</a></p>");
+        out.println("    </div>");
       }
     } catch (Exception e) {
       e.printStackTrace(System.err);
     } finally {
       dataSession.close();
     }
-    HomeServlet.doFooter(out, false);
+    HomeServlet.doFooter(out, session);
     out.flush();
     out.close();
   }

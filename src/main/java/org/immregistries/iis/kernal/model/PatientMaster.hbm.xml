@@ -5,6 +5,7 @@
     <id name="patientId" column="patient_id">
       <generator class="native"/>
     </id>
+    <many-to-one name="orgMaster" column="org_id" class="OrgMaster"/>
     <property name="patientExternalLink" column="patient_external_link" type="string"/>
     <property name="patientNameLast" column="patient_name_last" type="string"/>
     <property name="patientNameFirst" column="patient_name_first" type="string"/>

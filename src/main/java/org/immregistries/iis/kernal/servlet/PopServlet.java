@@ -17,6 +17,9 @@ import org.immregistries.iis.kernal.SoftwareVersion;
 import org.immregistries.iis.kernal.logic.IncomingMessageHandler;
 import org.immregistries.iis.kernal.model.OrgAccess;
 import org.immregistries.iis.kernal.model.OrgMaster;
+import org.immregistries.smm.transform.ScenarioManager;
+import org.immregistries.smm.transform.TestCaseMessage;
+import org.immregistries.smm.transform.Transformer;
 
 @SuppressWarnings("serial")
 public class PopServlet extends HttpServlet {
@@ -73,6 +76,7 @@ public class PopServlet extends HttpServlet {
         } else {
           IncomingMessageHandler handler = new IncomingMessageHandler(dataSession);
           ack = handler.process(message, orgAccess);
+          session.setAttribute("orgAccess", orgAccess);
         }
       } finally {
         dataSession.close();
@@ -96,7 +100,11 @@ public class PopServlet extends HttpServlet {
     try {
       String message = req.getParameter(PARAM_MESSAGE);
       if (message == null || message.equals("")) {
-        message = EXAMPLE_HL7;
+        TestCaseMessage testCaseMessage =
+            ScenarioManager.createTestCaseMessage(ScenarioManager.SCENARIO_1_R_ADMIN_CHILD);
+        Transformer transformer = new Transformer();
+        transformer.transform(testCaseMessage);
+        message = testCaseMessage.getMessageText();
       }
       String userId = req.getParameter(PARAM_USERID);
       if (userId == null || userId.equals("")) {
@@ -112,45 +120,44 @@ public class PopServlet extends HttpServlet {
       }
       {
         HomeServlet.doHeader(out, session);
-        out.println("    <h2>Pop Test Interface</h2>");
-        out.println("    <form method=\"POST\" action=\"pop\" target=\"_blank\">");
-        out.println("      <table>");
+        out.println("    <h2>Send Now</h2>");
+        out.println("    <form action=\"pop\" method=\"POST\" target=\"_blank\">");
+        out.println("      <h3>Message To Send</h3>");
+        out.println("      <textarea class=\"w3-input\" name=\"" + PARAM_MESSAGE
+            + "\" rows=\"15\" cols=\"160\">" + message + "</textarea></td>");
+        out.println("    <div class=\"w3-container w3-half w3-margin-top\">");
+
+        out.println("    <div class=\"w3-container w3-card-4\">");
+        out.println("      <h3>Authentication</h3>");
         OrgAccess orgAccess = (OrgAccess) session.getAttribute("orgAccess");
         if (orgAccess == null) {
-          out.println("        <tr>");
-          out.println("          <th>User Id</th><td><input type=\"text\" name=\"" + PARAM_USERID
-              + "\" value=\"" + userId + "\"/></td>");
-          out.println("        </tr>");
-          out.println("        <tr>");
-          out.println("      <th>Password</th><td><input type=\"password\" name=\"" + PARAM_PASSWORD
-              + "\"/></td>");
-          out.println("        </tr>");
-          out.println("        <tr>");
-          out.println("      <th>Facility Id</th><td><input type=\"text\" name=\""
-              + PARAM_FACILITYID + "\" value=\"" + facilityId + "\"/></td>");
-          out.println("        </tr>");
+          out.println("      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_USERID
+              + "\" value=\"" + userId + "\"/>");
+          out.println("      <label>User Id</label>");
+          out.println("      <input class=\"w3-input\" type=\"password\" name=\"" + PARAM_PASSWORD
+              + "\"/>");
+          out.println("      <label>Password</label>");
+          out.println("      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_FACILITYID
+              + "\" value=\"" + facilityId + "\"/>");
+          out.println("      <label>Facility Id</label>");
         } else {
-          out.println("        <tr>");
-          out.println("          <th>User Id</th><td>" + orgAccess.getAccessName() + "</td>");
-          out.println("        </tr>");
-          out.println("        <tr>");
-          out.println("          <th>Facility Id</th><td>"
-              + orgAccess.getOrg().getOrganizationName() + "</td>");
-          out.println("        </tr>");
+          out.println("      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_USERID
+              + "\" value=\"" + userId + "\"/ disabled>");
+          out.println("      <label>User Id</label>");
+          out.println("      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_FACILITYID
+              + "\" value=\"" + facilityId + "\" disabled/>");
+          out.println("      <label>Facility Id</label>");
         }
-        out.println("        <tr>");
-        out.println("          <th>Message</th><td><textarea name=\"" + PARAM_MESSAGE
-            + "\" rows=\"15\" cols=\"160\">" + message + "</textarea></td>");
-        out.println("        </tr>");
-        out.println("        <tr>");
-        out.println("          <td colspan=\"2\" align=\"right\">");
-        out.println("            <input type=\"submit\" name=\"sumbit\" value=\"Submit\"/>");
-        out.println("          </td>");
-        out.println("        </tr>");
-        out.println("      </table>");
+        out.println("      <br/>");
+        out.println(
+            "      <input class=\"w3-button w3-section w3-teal w3-ripple\" type=\"submit\" name=\"sumbit\" value=\"Submit\"/>");
+        out.println(
+            "    <span class=\"w3-yellow\">Test data only</span>");
+
+        out.println("    </div>");
+        out.println("    </div>");
         out.println("    </form>");
-        out.println("    <p>ISS Kernel Version: " + SoftwareVersion.VERSION + "</p>");
-        HomeServlet.doFooter(out, false);
+        HomeServlet.doFooter(out, session);
       }
     } catch (Exception e) {
       e.printStackTrace(System.err);

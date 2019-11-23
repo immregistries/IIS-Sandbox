@@ -1,212 +1,212 @@
 package org.immregistries.iis.kernal.model;
 
+import java.io.Serializable;
 import java.util.Date;
-
 import org.immregistries.vfa.connect.model.TestEvent;
 
 /**
  * Created by Eric on 12/20/17.
  */
-public class VaccinationReported {
-    private int vaccinationReportedId = 0;
-    private PatientReported patientReported = null;
-    private String vaccinationReportedExternalLink = "";
-    private VaccinationMaster vaccination = null;
-    private Date reportedDate = null;
-    private Date updatedDate = null;
-    
-    private Date administeredDate = null;
-    private String vaccineCvxCode = "";
-    private String vaccineNdcCode = "";
-    private String vaccineMvxCode = "";
-    private String administeredAmount = "";
-    private String informationSource = "";
-    private String lotnumber = "";
-    private Date expirationDate = null;
-    private String completionStatus = "";
-    private String actionCode = "";
-    private String refusalReasonCode = "";
-    private String bodySite = "";
-    private String bodyRoute = "";
-    private String fundingSource = "";
-    private String fundingEligibility = "";
-    private TestEvent testEvent = null;
+public class VaccinationReported implements Serializable {
+  private int vaccinationReportedId = 0;
+  private PatientReported patientReported = null;
+  private String vaccinationReportedExternalLink = "";
+  private VaccinationMaster vaccination = null;
+  private Date reportedDate = null;
+  private Date updatedDate = null;
 
-    public TestEvent getTestEvent() {
-      return testEvent;
-    }
+  private Date administeredDate = null;
+  private String vaccineCvxCode = "";
+  private String vaccineNdcCode = "";
+  private String vaccineMvxCode = "";
+  private String administeredAmount = "";
+  private String informationSource = "";
+  private String lotnumber = "";
+  private Date expirationDate = null;
+  private String completionStatus = "";
+  private String actionCode = "";
+  private String refusalReasonCode = "";
+  private String bodySite = "";
+  private String bodyRoute = "";
+  private String fundingSource = "";
+  private String fundingEligibility = "";
+  private TestEvent testEvent = null;
 
-    public void setTestEvent(TestEvent testEvent) {
-      this.testEvent = testEvent;
-    }
+  public TestEvent getTestEvent() {
+    return testEvent;
+  }
 
-    public Date getAdministeredDate() {
-      return administeredDate;
-    }
+  public void setTestEvent(TestEvent testEvent) {
+    this.testEvent = testEvent;
+  }
 
-    public void setAdministeredDate(Date administeredDate) {
-      this.administeredDate = administeredDate;
-    }
+  public Date getAdministeredDate() {
+    return administeredDate;
+  }
 
-    public String getVaccineCvxCode() {
-      return vaccineCvxCode;
-    }
+  public void setAdministeredDate(Date administeredDate) {
+    this.administeredDate = administeredDate;
+  }
 
-    public void setVaccineCvxCode(String vaccineCvxCode) {
-      this.vaccineCvxCode = vaccineCvxCode;
-    }
+  public String getVaccineCvxCode() {
+    return vaccineCvxCode;
+  }
 
-    public String getVaccineNdcCode() {
-      return vaccineNdcCode;
-    }
+  public void setVaccineCvxCode(String vaccineCvxCode) {
+    this.vaccineCvxCode = vaccineCvxCode;
+  }
 
-    public void setVaccineNdcCode(String vaccineNdcCode) {
-      this.vaccineNdcCode = vaccineNdcCode;
-    }
+  public String getVaccineNdcCode() {
+    return vaccineNdcCode;
+  }
 
-    public String getVaccineMvxCode() {
-      return vaccineMvxCode;
-    }
+  public void setVaccineNdcCode(String vaccineNdcCode) {
+    this.vaccineNdcCode = vaccineNdcCode;
+  }
 
-    public void setVaccineMvxCode(String vaccineMvxCode) {
-      this.vaccineMvxCode = vaccineMvxCode;
-    }
+  public String getVaccineMvxCode() {
+    return vaccineMvxCode;
+  }
 
-    public String getAdministeredAmount() {
-      return administeredAmount;
-    }
+  public void setVaccineMvxCode(String vaccineMvxCode) {
+    this.vaccineMvxCode = vaccineMvxCode;
+  }
 
-    public void setAdministeredAmount(String administeredAmount) {
-      this.administeredAmount = administeredAmount;
-    }
+  public String getAdministeredAmount() {
+    return administeredAmount;
+  }
 
-    public String getInformationSource() {
-      return informationSource;
-    }
+  public void setAdministeredAmount(String administeredAmount) {
+    this.administeredAmount = administeredAmount;
+  }
 
-    public void setInformationSource(String informationSource) {
-      this.informationSource = informationSource;
-    }
+  public String getInformationSource() {
+    return informationSource;
+  }
 
-    public String getLotnumber() {
-      return lotnumber;
-    }
+  public void setInformationSource(String informationSource) {
+    this.informationSource = informationSource;
+  }
 
-    public void setLotnumber(String lotnumber) {
-      this.lotnumber = lotnumber;
-    }
+  public String getLotnumber() {
+    return lotnumber;
+  }
 
-    public Date getExpirationDate() {
-      return expirationDate;
-    }
+  public void setLotnumber(String lotnumber) {
+    this.lotnumber = lotnumber;
+  }
 
-    public void setExpirationDate(Date expirationDate) {
-      this.expirationDate = expirationDate;
-    }
+  public Date getExpirationDate() {
+    return expirationDate;
+  }
 
-    public String getCompletionStatus() {
-      return completionStatus;
-    }
+  public void setExpirationDate(Date expirationDate) {
+    this.expirationDate = expirationDate;
+  }
 
-    public void setCompletionStatus(String completionStatus) {
-      this.completionStatus = completionStatus;
-    }
+  public String getCompletionStatus() {
+    return completionStatus;
+  }
 
-    public String getActionCode() {
-      return actionCode;
-    }
+  public void setCompletionStatus(String completionStatus) {
+    this.completionStatus = completionStatus;
+  }
 
-    public void setActionCode(String actionCode) {
-      this.actionCode = actionCode;
-    }
+  public String getActionCode() {
+    return actionCode;
+  }
 
-    public String getRefusalReasonCode() {
-      return refusalReasonCode;
-    }
+  public void setActionCode(String actionCode) {
+    this.actionCode = actionCode;
+  }
 
-    public void setRefusalReasonCode(String refusalReasonCode) {
-      this.refusalReasonCode = refusalReasonCode;
-    }
+  public String getRefusalReasonCode() {
+    return refusalReasonCode;
+  }
 
-    public String getBodySite() {
-      return bodySite;
-    }
+  public void setRefusalReasonCode(String refusalReasonCode) {
+    this.refusalReasonCode = refusalReasonCode;
+  }
 
-    public void setBodySite(String bodySite) {
-      this.bodySite = bodySite;
-    }
+  public String getBodySite() {
+    return bodySite;
+  }
 
-    public String getBodyRoute() {
-      return bodyRoute;
-    }
+  public void setBodySite(String bodySite) {
+    this.bodySite = bodySite;
+  }
 
-    public void setBodyRoute(String bodyRoute) {
-      this.bodyRoute = bodyRoute;
-    }
+  public String getBodyRoute() {
+    return bodyRoute;
+  }
 
-    public String getFundingSource() {
-      return fundingSource;
-    }
+  public void setBodyRoute(String bodyRoute) {
+    this.bodyRoute = bodyRoute;
+  }
 
-    public void setFundingSource(String fundingSource) {
-      this.fundingSource = fundingSource;
-    }
+  public String getFundingSource() {
+    return fundingSource;
+  }
 
-    public String getFundingEligibility() {
-      return fundingEligibility;
-    }
+  public void setFundingSource(String fundingSource) {
+    this.fundingSource = fundingSource;
+  }
 
-    public void setFundingEligibility(String fundingEligibility) {
-      this.fundingEligibility = fundingEligibility;
-    }
+  public String getFundingEligibility() {
+    return fundingEligibility;
+  }
 
-    public int getVaccinationReportedId() {
-        return vaccinationReportedId;
-    }
+  public void setFundingEligibility(String fundingEligibility) {
+    this.fundingEligibility = fundingEligibility;
+  }
 
-    public void setVaccinationReportedId(int reportedVaccinationId) {
-        this.vaccinationReportedId = reportedVaccinationId;
-    }
+  public int getVaccinationReportedId() {
+    return vaccinationReportedId;
+  }
 
-    public PatientReported getPatientReported() {
-		return patientReported;
-	}
+  public void setVaccinationReportedId(int reportedVaccinationId) {
+    this.vaccinationReportedId = reportedVaccinationId;
+  }
 
-	public void setPatientReported(PatientReported reportedPatient) {
-		this.patientReported = reportedPatient;
-	}
+  public PatientReported getPatientReported() {
+    return patientReported;
+  }
 
-	public String getVaccinationReportedExternalLink() {
-        return vaccinationReportedExternalLink;
-    }
+  public void setPatientReported(PatientReported reportedPatient) {
+    this.patientReported = reportedPatient;
+  }
 
-    public void setVaccinationReportedExternalLink(String reportedOrderId) {
-        this.vaccinationReportedExternalLink = reportedOrderId;
-    }
+  public String getVaccinationReportedExternalLink() {
+    return vaccinationReportedExternalLink;
+  }
 
-    public VaccinationMaster getVaccination() {
-		return vaccination;
-	}
+  public void setVaccinationReportedExternalLink(String reportedOrderId) {
+    this.vaccinationReportedExternalLink = reportedOrderId;
+  }
 
-	public void setVaccination(VaccinationMaster vaccination) {
-		this.vaccination = vaccination;
-	}
+  public VaccinationMaster getVaccination() {
+    return vaccination;
+  }
 
-    public Date getReportedDate() {
-        return reportedDate;
-    }
+  public void setVaccination(VaccinationMaster vaccination) {
+    this.vaccination = vaccination;
+  }
 
-    public void setReportedDate(Date reportedDate) {
-        this.reportedDate = reportedDate;
-    }
+  public Date getReportedDate() {
+    return reportedDate;
+  }
 
-    public Date getUpdatedDate() {
-        return updatedDate;
-    }
+  public void setReportedDate(Date reportedDate) {
+    this.reportedDate = reportedDate;
+  }
 
-    public void setUpdatedDate(Date updatedDate) {
-        this.updatedDate = updatedDate;
-    }
+  public Date getUpdatedDate() {
+    return updatedDate;
+  }
+
+  public void setUpdatedDate(Date updatedDate) {
+    this.updatedDate = updatedDate;
+  }
 
 
 }

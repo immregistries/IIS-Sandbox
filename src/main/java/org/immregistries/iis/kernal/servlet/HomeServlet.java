@@ -2,6 +2,7 @@ package org.immregistries.iis.kernal.servlet;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -38,20 +39,20 @@ public class HomeServlet extends HttpServlet {
     try {
       {
         doHeader(out, session);
+        out.println("    <div class=\"w3-container w3-half w3-margin-top\">");
         out.println(
-            "    <div class=\"w3-panel w3-yellow\"><p class=\"w3-left-align\">This is an IIS HL7 Interface demonstration system. Only for test data use. "
-                + " Do not put production data in here. Submitted data may be cleared from the database "
-                + " as often as every day. </p></div>");
+            "    <div class=\"w3-panel w3-yellow\"><p class=\"w3-left-align\">This system is for test purposes only. "
+                + "Do not submit production data. As a precaution all submitted data will be deleted once a day.  </p></div>");
         out.println("    <h2>Documentation</h2>");
-        out.println(
-            "    <p class=\"w3-left-align\">For help and detailed documentation on functions please see the project wiki: "
-                + "<a href=\"https://github.com/immregistries/IIS-Sandbox/wiki\">https://github.com/immregistries/IIS-Sandbox/wiki</a></p>");
+        out.println("    <p class=\"w3-left-align\">Please see the project wiki: "
+            + "<a href=\"https://github.com/immregistries/IIS-Sandbox/wiki\">https://github.com/immregistries/IIS-Sandbox/wiki</a></p>");
         out.println("    <h2>Functions Supported</h2>");
         out.println("    <ul class=\"w3-ul w3-hoverable\">");
+        out.println("      <li><a href=\"pop\">Send Now</a>: Send an HL7 message in now.</li>");
         out.println(
-            "      <li><a href=\"status\">Status</a>: Most recently submitted messages</li>");
+            "      <li><a href=\"message\">Messages</a>: Review recently submitted messages</li>");
         out.println(
-            "      <li><a href=\"pop\">Manual</a>: HL7 realtime interfacing using simple REST interface</li>");
+            "      <li><a href=\"patient\">Patients</a>: See data received by patient</li>");
         out.println(
             "      <li><a href=\"soap\">CDC WSDL</a>: HL7 realtime interfacing using CDC WSDL</li>");
         out.println("    </ul>");
@@ -68,7 +69,10 @@ public class HomeServlet extends HttpServlet {
         } finally {
           dataSession.close();
         }
-        doFooter(out, true);
+        out.println("  </div>");
+        out.println(
+            "  <img src=\"images/110720-F-DM566-001.JPG\" class=\"w3-round\" alt=\"Sandbox\">");
+        doFooter(out, session);
       }
     } catch (Exception e) {
       e.printStackTrace(System.err);
@@ -88,8 +92,9 @@ public class HomeServlet extends HttpServlet {
     out.println("      <div class=\"w3-bar w3-light-grey\">");
     out.println(
         "        <a href=\"home\" class=\"w3-bar-item w3-button w3-green\">IIS Sandbox</a>");
-    out.println("        <a href=\"status\" class=\"w3-bar-item w3-button\">Status</a>");
-    out.println("        <a href=\"pop\" class=\"w3-bar-item w3-button\">Manual</a>");
+    out.println("        <a href=\"pop\" class=\"w3-bar-item w3-button\">Send Now</a>");
+    out.println("        <a href=\"message\" class=\"w3-bar-item w3-button\">Messages</a>");
+    out.println("        <a href=\"patient\" class=\"w3-bar-item w3-button\">Patients</a>");
     out.println("        <a href=\"soap\" class=\"w3-bar-item w3-button\">CDC WSDL</a>");
     OrgAccess orgAccess = (OrgAccess) session.getAttribute("orgAccess");
     if (orgAccess != null) {
@@ -98,16 +103,25 @@ public class HomeServlet extends HttpServlet {
     }
     out.println("      </div>");
     out.println("    </header>");
-    out.println("    <div class=\"w3-container w3-half w3-margin-top\">");
+    out.println("    <div class=\"w3-container\">");
+
   }
 
-  public static void doFooter(PrintWriter out, boolean showPhoto) {
+  public static void doFooter(PrintWriter out, HttpSession session) {
     out.println("  </div>");
-    if (showPhoto) {
-      out.println(
-          "  <img src=\"images/110720-F-DM566-001.JPG\" class=\"w3-round\" alt=\"Sandbox\">");
+    SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+    OrgAccess orgAccess = (OrgAccess) session.getAttribute("orgAccess");
+    if (orgAccess != null) {
+      out.println("  <div class=\"w3-container\">");
+      out.println("    <p><a href=\"message?" + MessageServlet.PARAM_ACTION + "="
+          + MessageServlet.ACTION_LOGOUT + "\">Logout</a></p>");
+      out.println("  </div>");
     }
-    out.println("  <p>IIS Sandbox version " + SoftwareVersion.VERSION + "</p>");
+
+    out.println("  <div class=\"w3-container w3-green\">");
+    out.println("    <p>IIS Sandbox v" + SoftwareVersion.VERSION + " - Current Time "
+        + sdf.format(System.currentTimeMillis()) + "</p>");
+    out.println("  </div>");
     out.println("  </body>");
     out.println("</html>");
   }
