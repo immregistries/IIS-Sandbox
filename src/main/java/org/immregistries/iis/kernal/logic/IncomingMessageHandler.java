@@ -46,15 +46,17 @@ public class IncomingMessageHandler {
 
 
 
+  private static final String QBP_Z34 = "Z34";
+  private static final String QBP_Z44 = "Z44";
   private static final String RSP_Z42_MATCH_WITH_FORECAST = "Z42";
   private static final String RSP_Z32_MATCH = "Z32";
   private static final String RSP_Z31_MULTIPLE_MATCH = "Z31";
   private static final String RSP_Z33_NO_MATCH = "Z33";
+  private static final String Z23_ACKNOWLEDGEMENT = "Z23";
   private static final String QUERY_OK = "OK";
   private static final String QUERY_NOT_FOUND = "NF";
   private static final String QUERY_TOO_MANY = "TM";
-  //  private static final String QUERY_APPLICATION_ERROR = "AE";
-  //  private static final String QUERY_APPLICATION_REJECT = "AR";
+  private static final String QUERY_APPLICATION_ERROR = "AE";
 
   private Session dataSession = null;
 
@@ -81,6 +83,7 @@ public class IncomingMessageHandler {
   public String processQBP(OrgAccess orgAccess, HL7Reader reader, String messageReceived) {
     PatientReported patientReported = null;
     List<PatientReported> patientReportedPossibleList = new ArrayList<>();
+    ProcessingException processingException = null;
     if (reader.advanceToSegment("QPD")) {
       String mrn = "";
       {
@@ -104,66 +107,86 @@ public class IncomingMessageHandler {
       String patientNameMiddle = reader.getValue(4, 3);
       Date patientBirthDate = parseDate(reader.getValue(6));
       String patientSex = reader.getValue(7);
-      if (patientReported == null) {
-        Query query = dataSession.createQuery(
-            "from PatientReported where orgReported = :orgReported and Patient.patientBirthDate = :patientBirthDate "
-                + "and Patient.patientNameLast = :patientNameLast and Patient.patientNameFirst = :patientNameFirst ");
-        query.setParameter("orgReported", orgAccess.getOrg());
-        query.setParameter("patientBirthDate", patientBirthDate);
-        query.setParameter("patientNameLast", patientNameLast);
-        query.setParameter("patientNameFirst", patientNameFirst);
-        List<PatientReported> patientReportedList = query.list();
-        if (patientReportedList.size() > 0) {
-          patientReported = patientReportedList.get(0);
-        }
+      String problem = null;
+      int fieldPosition = 0;
+
+      if (patientNameLast.equals("")) {
+        problem = "Last name is missing";
+        fieldPosition = 4;
+      } else if (patientNameFirst.equals("")) {
+        problem = "First name is missing";
+        fieldPosition = 4;
+      } else if (patientBirthDate == null) {
+        problem = "Date of Birth is missing";
+        fieldPosition = 6;
       }
-      if (patientReported != null) {
-        int points = 0;
-        if (!patientNameLast.equals("")
-            && patientNameLast.equalsIgnoreCase(patientReported.getPatientNameLast())) {
-          points = points + 2;
+      if (problem != null) {
+        processingException = new ProcessingException(problem, "QPD", 1, fieldPosition);
+      } else {
+
+        if (patientReported == null) {
+          Query query = dataSession.createQuery(
+              "from PatientReported where orgReported = :orgReported and Patient.patientBirthDate = :patientBirthDate "
+                  + "and Patient.patientNameLast = :patientNameLast and Patient.patientNameFirst = :patientNameFirst ");
+          query.setParameter("orgReported", orgAccess.getOrg());
+          query.setParameter("patientBirthDate", patientBirthDate);
+          query.setParameter("patientNameLast", patientNameLast);
+          query.setParameter("patientNameFirst", patientNameFirst);
+          List<PatientReported> patientReportedList = query.list();
+          if (patientReportedList.size() > 0) {
+            patientReported = patientReportedList.get(0);
+          }
         }
-        if (!patientNameFirst.equals("")
-            && patientNameFirst.equalsIgnoreCase(patientReported.getPatientNameFirst())) {
-          points = points + 2;
+        if (patientReported != null) {
+          int points = 0;
+          if (!patientNameLast.equals("")
+              && patientNameLast.equalsIgnoreCase(patientReported.getPatientNameLast())) {
+            points = points + 2;
+          }
+          if (!patientNameFirst.equals("")
+              && patientNameFirst.equalsIgnoreCase(patientReported.getPatientNameFirst())) {
+            points = points + 2;
+          }
+          if (!patientNameMiddle.equals("")
+              && patientNameMiddle.equalsIgnoreCase(patientReported.getPatientNameFirst())) {
+            points = points + 2;
+          }
+          if (patientBirthDate != null
+              && patientBirthDate.equals(patientReported.getPatientBirthDate())) {
+            points = points + 2;
+          }
+          if (!patientSex.equals("")
+              && patientSex.equalsIgnoreCase(patientReported.getPatientSex())) {
+            points = points + 2;
+          }
+          if (points < 6) {
+            // not enough matching so don't indicate this as a match
+            patientReported = null;
+          }
         }
-        if (!patientNameMiddle.equals("")
-            && patientNameMiddle.equalsIgnoreCase(patientReported.getPatientNameFirst())) {
-          points = points + 2;
+        if (patientReported == null) {
+          Query query = dataSession.createQuery(
+              "from PatientReported where orgReported = :orgReported and Patient.patientBirthDate = :patientBirthDate "
+                  + "and (Patient.patientNameLast = :patientNameLast or Patient.patientNameFirst = :patientNameFirst) ");
+          query.setParameter("orgReported", orgAccess.getOrg());
+          query.setParameter("patientBirthDate", patientBirthDate);
+          query.setParameter("patientNameLast", patientNameLast);
+          query.setParameter("patientNameFirst", patientNameFirst);
+          patientReportedPossibleList = query.list();
         }
-        if (patientBirthDate != null
-            && patientBirthDate.equals(patientReported.getPatientBirthDate())) {
-          points = points + 2;
-        }
-        if (!patientSex.equals("")
-            && patientSex.equalsIgnoreCase(patientReported.getPatientSex())) {
-          points = points + 2;
-        }
-        if (points < 6) {
-          // not enough matching so don't indicate this as a match
+        if (patientReported != null
+            && patientNameMiddle.equalsIgnoreCase(PATIENT_MIDDLE_NAME_MULTI)) {
+          patientReportedPossibleList.add(patientReported);
+          patientReportedPossibleList.add(patientReported);
           patientReported = null;
         }
       }
-      if (patientReported == null) {
-        Query query = dataSession.createQuery(
-            "from PatientReported where orgReported = :orgReported and Patient.patientBirthDate = :patientBirthDate "
-                + "and (Patient.patientNameLast = :patientNameLast or Patient.patientNameFirst = :patientNameFirst) ");
-        query.setParameter("orgReported", orgAccess.getOrg());
-        query.setParameter("patientBirthDate", patientBirthDate);
-        query.setParameter("patientNameLast", patientNameLast);
-        query.setParameter("patientNameFirst", patientNameFirst);
-        patientReportedPossibleList = query.list();
-      }
-      if (patientReported != null
-          && patientNameMiddle.equalsIgnoreCase(PATIENT_MIDDLE_NAME_MULTI)) {
-        patientReportedPossibleList.add(patientReported);
-        patientReportedPossibleList.add(patientReported);
-        patientReported = null;
-      }
+    } else {
+      processingException = new ProcessingException("QPD segment not found", null, 0, 0);
     }
 
     return buildRSP(reader, messageReceived, patientReported, orgAccess,
-        patientReportedPossibleList);
+        patientReportedPossibleList, processingException);
   }
 
   public String processVXU(OrgAccess orgAccess, HL7Reader reader, String message) {
@@ -458,7 +481,8 @@ public class IncomingMessageHandler {
 
   @SuppressWarnings("unchecked")
   public String buildRSP(HL7Reader reader, String messageRecieved, PatientReported patientReported,
-      OrgAccess orgAccess, List<PatientReported> patientReportedPossibleList) {
+      OrgAccess orgAccess, List<PatientReported> patientReportedPossibleList,
+      ProcessingException processingException) {
     reader.resetPostion();
     reader.advanceToSegment("MSH");
 
@@ -499,7 +523,7 @@ public class IncomingMessageHandler {
         profileId = RSP_Z33_NO_MATCH;
         categoryResponse = "No Match";
         if (patientReportedPossibleList.size() > 0) {
-          if (profileIdSubmitted.equals("Z34")) {
+          if (profileIdSubmitted.equals(QBP_Z34)) {
             if (patientReportedPossibleList.size() > maxCount) {
               queryResponse = QUERY_TOO_MANY;
               profileId = RSP_Z33_NO_MATCH;
@@ -515,10 +539,14 @@ public class IncomingMessageHandler {
             categoryResponse = "No Match";
           }
         }
-      } else if (profileIdSubmitted.equals("Z34")) {
+        if (processingException != null)
+        {
+          queryResponse = QUERY_APPLICATION_ERROR;
+        }
+      } else if (profileIdSubmitted.equals(QBP_Z34)) {
         profileId = RSP_Z32_MATCH;
         categoryResponse = "Match";
-      } else if (profileIdSubmitted.equals("Z44")) {
+      } else if (profileIdSubmitted.equals(QBP_Z44)) {
         if (processingFlavorSet.contains(ProcessingFlavor.ORANGE)) {
           profileId = RSP_Z32_MATCH;
           categoryResponse = "Match";
@@ -532,7 +560,11 @@ public class IncomingMessageHandler {
     }
     {
       String sendersUniqueId = reader.getValue(10);
-      sb.append("MSA|AA|" + sendersUniqueId + "\r");
+      if (processingException == null) {
+        sb.append("MSA|AA|" + sendersUniqueId + "\r");
+      } else {
+        sb.append("MSA|AE|" + sendersUniqueId + "\r");
+      }
     }
     String profileName = "Request a Complete Immunization History";
     if (profileIdSubmitted.equals("")) {
@@ -824,6 +856,9 @@ public class IncomingMessageHandler {
         }
       }
     }
+    if (processingException != null) {
+      printERRSegment(processingException, sb);
+    }
 
     String messageResponse = sb.toString();
     recordMessageReceived(messageRecieved, patientReported, messageResponse, "Query",
@@ -1099,7 +1134,7 @@ public class IncomingMessageHandler {
     StringBuilder sb = new StringBuilder();
     {
       String messageType = "ACK^V04^ACK";
-      String profileId = "Z23";
+      String profileId = Z23_ACKNOWLEDGEMENT;
       createMSH(messageType, profileId, reader, sb, null);
     }
 
@@ -1117,23 +1152,27 @@ public class IncomingMessageHandler {
       sb.append("MSA|AA|" + sendersUniqueId + "\r");
     } else {
       sb.append("MSA|AE|" + sendersUniqueId + "\r");
-      sb.append("ERR|");
-      sb.append("|"); // 2
-      if (e.getSegmentId() != null && !e.getSegmentId().equals("")) {
-        sb.append(e.getSegmentId() + "^" + e.getSegmentRepeat());
-        if (e.getFieldPosition() > 0) {
-          sb.append("^" + e.getFieldPosition());
-        }
-      }
-      sb.append("|101^Required field missing^HL70357"); // 3
-      sb.append("|E"); // 4
-      sb.append("|"); // 5
-      sb.append("|"); // 6
-      sb.append("|"); // 7
-      sb.append("|" + e.getMessage()); // 8
-      sb.append("|\r");
+      printERRSegment(e, sb);
     }
     return sb.toString();
+  }
+
+  public void printERRSegment(ProcessingException e, StringBuilder sb) {
+    sb.append("ERR|");
+    sb.append("|"); // 2
+    if (e.getSegmentId() != null && !e.getSegmentId().equals("")) {
+      sb.append(e.getSegmentId() + "^" + e.getSegmentRepeat());
+      if (e.getFieldPosition() > 0) {
+        sb.append("^" + e.getFieldPosition());
+      }
+    }
+    sb.append("|101^Required field missing^HL70357"); // 3
+    sb.append("|E"); // 4
+    sb.append("|"); // 5
+    sb.append("|"); // 6
+    sb.append("|"); // 7
+    sb.append("|" + e.getMessage()); // 8
+    sb.append("|\r");
   }
 
   public void createMSH(String messageType, String profileId, HL7Reader reader, StringBuilder sb,

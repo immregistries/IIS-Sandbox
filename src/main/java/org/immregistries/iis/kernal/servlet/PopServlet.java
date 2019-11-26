@@ -151,8 +151,7 @@ public class PopServlet extends HttpServlet {
         out.println("      <br/>");
         out.println(
             "      <input class=\"w3-button w3-section w3-teal w3-ripple\" type=\"submit\" name=\"sumbit\" value=\"Submit\"/>");
-        out.println(
-            "    <span class=\"w3-yellow\">Test data only</span>");
+        out.println("    <span class=\"w3-yellow\">Test Data Only</span>");
 
         out.println("    </div>");
         out.println("    </div>");
