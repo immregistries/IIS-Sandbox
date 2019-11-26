@@ -68,10 +68,12 @@ public class PatientServlet extends HttpServlet {
           Query query = dataSession
               .createQuery("from PatientReported where patientNameLast like :patientNameLast "
                   + "and patientNameFirst like :patientNameFirst "
-                  + "and patientReportedExternalLink like :patientReportedExternalLink");
+                  + "and patientReportedExternalLink like :patientReportedExternalLink "
+                  + "and orgReported = :orgReported");
           query.setParameter("patientNameLast", patientNameLast + "%");
           query.setParameter("patientNameFirst", patientNameFirst + "%");
           query.setParameter("patientReportedExternalLink", patientReportedExternalLink + "%");
+          query.setParameter("orgReported", orgAccess.getOrg());
           patientReportedList = query.list();
         }
       }
@@ -122,7 +124,9 @@ public class PatientServlet extends HttpServlet {
         boolean showingRecent = false;
         if (patientReportedList == null) {
           showingRecent = true;
-          Query query = dataSession.createQuery("from PatientReported order by updatedDate desc ");
+          Query query = dataSession.createQuery("from PatientReported where orgReported = :orgReported "
+              + "order by updatedDate desc ");
+          query.setParameter("orgReported", orgAccess.getOrg());
           patientReportedList = query.list();
         }
 

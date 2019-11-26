@@ -19,6 +19,7 @@ import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.SoftwareVersion;
 import org.immregistries.iis.kernal.model.MessageReceived;
 import org.immregistries.iis.kernal.model.OrgAccess;
+import org.immregistries.iis.kernal.model.OrgMaster;
 import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.model.PatientReported;
 import org.immregistries.iis.kernal.model.ProcessingFlavor;
@@ -72,7 +73,7 @@ public class IncomingMessageHandler {
     } else {
       ProcessingException e = new ProcessingException("Unsupported message", "", 0, 0);
       responseMessage = buildAck(reader, e);
-      recordMessageReceived(message, null, responseMessage, "Unknown", "NAck");
+      recordMessageReceived(message, null, responseMessage, "Unknown", "NAck", orgAccess.getOrg());
     }
     return responseMessage;
   }
@@ -161,7 +162,8 @@ public class IncomingMessageHandler {
       }
     }
 
-    return buildRSP(reader, messageReceived, patientReported, orgAccess, patientReportedPossibleList);
+    return buildRSP(reader, messageReceived, patientReported, orgAccess,
+        patientReportedPossibleList);
   }
 
   public String processVXU(OrgAccess orgAccess, HL7Reader reader, String message) {
@@ -429,19 +431,20 @@ public class IncomingMessageHandler {
         }
       }
       String ack = buildAck(reader, null);
-      recordMessageReceived(message, patientReported, ack, "Update", "Ack");
+      recordMessageReceived(message, patientReported, ack, "Update", "Ack", orgAccess.getOrg());
       return ack;
     } catch (ProcessingException e) {
       String ack = buildAck(reader, e);
-      recordMessageReceived(message, null, ack, "Update", "Exception");
+      recordMessageReceived(message, null, ack, "Update", "Exception", orgAccess.getOrg());
       return ack;
     }
   }
 
   public void recordMessageReceived(String message, PatientReported patientReported,
-      String messageResponse, String categoryRequest, String categoryResponse) {
+      String messageResponse, String categoryRequest, String categoryResponse,
+      OrgMaster orgMaster) {
     MessageReceived messageReceived = new MessageReceived();
-    messageReceived.setOrgMaster(patientReported.getOrgReported());
+    messageReceived.setOrgMaster(orgMaster);
     messageReceived.setMessageRequest(message);
     messageReceived.setPatientReported(patientReported);
     messageReceived.setMessageResponse(messageResponse);
@@ -454,8 +457,8 @@ public class IncomingMessageHandler {
   }
 
   @SuppressWarnings("unchecked")
-  public String buildRSP(HL7Reader reader, String messageRecieved, PatientReported patientReported, OrgAccess orgAccess,
-      List<PatientReported> patientReportedPossibleList) {
+  public String buildRSP(HL7Reader reader, String messageRecieved, PatientReported patientReported,
+      OrgAccess orgAccess, List<PatientReported> patientReportedPossibleList) {
     reader.resetPostion();
     reader.advanceToSegment("MSH");
 
@@ -823,7 +826,8 @@ public class IncomingMessageHandler {
     }
 
     String messageResponse = sb.toString();
-    recordMessageReceived(messageRecieved, patientReported, messageResponse, "Query", categoryResponse);
+    recordMessageReceived(messageRecieved, patientReported, messageResponse, "Query",
+        categoryResponse, orgAccess.getOrg());
     return messageResponse;
   }
 
