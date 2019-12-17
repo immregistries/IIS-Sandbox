@@ -7,7 +7,8 @@ public enum ProcessingFlavor {
                               LIME("Lime", "Missing non-critical required fields"),
                               COCONUT("Coconut", "Forecast never returned"),
                               ORANGE("Orange", "Z32 is returned for query matches"),
-                              LEMON("Lemon", "Vaccinations are randomly not returned");
+                              LEMON("Lemon", "Vaccinations are randomly not returned"),
+                              GREEN("Green", "Typhoid vaccination is never returned");
 
   private String key = "";
   private String behaviorDescription = "";

@@ -615,7 +615,14 @@ public class IncomingMessageHandler {
             it.remove();
           }
         }
-      }
+      } if (processingFlavorSet.contains(ProcessingFlavor.GREEN)) {
+        for (Iterator<VaccinationMaster> it = vaccinationMasterList.iterator(); it.hasNext();) {
+          VaccinationMaster vaccinationMaster = it.next();
+          if (vaccinationMaster.getVaccineCvxCode().equals("91")) {
+            it.remove();
+          }
+        }
+      }  
       List<ForecastActual> forecastActualList = null;
       if (sendBackForecast) {
         forecastActualList = doForecast(patient, patientReported, codeMap, vaccinationMasterList);
