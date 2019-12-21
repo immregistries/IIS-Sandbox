@@ -3,11 +3,10 @@ package org.immregistries.iis.kernal.logic;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import org.hibernate.Query;
@@ -183,6 +182,39 @@ public class IncomingMessageHandler {
       }
     } else {
       processingException = new ProcessingException("QPD segment not found", null, 0, 0);
+    }
+
+    Set<ProcessingFlavor> processingFlavorSet = orgAccess.getOrg().getProcessingFlavorSet();
+    if (processingFlavorSet.contains(ProcessingFlavor.SNAIL)
+        || processingFlavorSet.contains(ProcessingFlavor.SNAIL30)
+        || processingFlavorSet.contains(ProcessingFlavor.SNAIL60)
+        || processingFlavorSet.contains(ProcessingFlavor.SNAIL90)) {
+      Calendar calendar = Calendar.getInstance();
+      int seconds = -30;
+      if (processingFlavorSet.contains(ProcessingFlavor.SNAIL30)) {
+        seconds = -30;
+      } else if (processingFlavorSet.contains(ProcessingFlavor.SNAIL60)) {
+        seconds = -60;
+      } else if (processingFlavorSet.contains(ProcessingFlavor.SNAIL90)) {
+        seconds = -90;
+      } else {
+        int delay = calendar.get(Calendar.MINUTE) % 4;
+        seconds = delay * -30;
+      }
+
+      calendar.add(Calendar.SECOND, seconds);
+      Date cutoff = calendar.getTime();
+      if (patientReported != null) {
+        if (cutoff.before(patientReported.getReportedDate())) {
+          patientReported = null;
+        }
+      }
+      for (Iterator<PatientReported> it = patientReportedPossibleList.iterator(); it.hasNext();) {
+        PatientReported pr = it.next();
+        if (cutoff.before(pr.getReportedDate())) {
+          it.remove();
+        }
+      }
     }
 
     return buildRSP(reader, messageReceived, patientReported, orgAccess,
@@ -539,8 +571,7 @@ public class IncomingMessageHandler {
             categoryResponse = "No Match";
           }
         }
-        if (processingException != null)
-        {
+        if (processingException != null) {
           queryResponse = QUERY_APPLICATION_ERROR;
         }
       } else if (profileIdSubmitted.equals(QBP_Z34)) {
@@ -615,14 +646,15 @@ public class IncomingMessageHandler {
             it.remove();
           }
         }
-      } if (processingFlavorSet.contains(ProcessingFlavor.GREEN)) {
+      }
+      if (processingFlavorSet.contains(ProcessingFlavor.GREEN)) {
         for (Iterator<VaccinationMaster> it = vaccinationMasterList.iterator(); it.hasNext();) {
           VaccinationMaster vaccinationMaster = it.next();
           if (vaccinationMaster.getVaccineCvxCode().equals("91")) {
             it.remove();
           }
         }
-      }  
+      }
       List<ForecastActual> forecastActualList = null;
       if (sendBackForecast) {
         forecastActualList = doForecast(patient, patientReported, codeMap, vaccinationMasterList);

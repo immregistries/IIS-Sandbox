@@ -8,7 +8,11 @@ public enum ProcessingFlavor {
                               COCONUT("Coconut", "Forecast never returned"),
                               ORANGE("Orange", "Z32 is returned for query matches"),
                               LEMON("Lemon", "Vaccinations are randomly not returned"),
-                              GREEN("Green", "Typhoid vaccination is never returned");
+                              GREEN("Green", "Typhoid vaccination is never returned"),
+                              SNAIL("Snail", "Patients are not returned until 0, 30, 60, or 90 seconds after they have been submitted"),
+                              SNAIL30("Snail30", "Patients are not returned until 30 seconds after they have been submitted"),
+                              SNAIL60("Snail60", "Patients are not returned until 60 seconds after they have been submitted"),
+                              SNAIL90("Snail90", "Patients are not returned until 90 seconds after they have been submitted");
 
   private String key = "";
   private String behaviorDescription = "";

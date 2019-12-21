@@ -16,6 +16,7 @@ import org.hibernate.Transaction;
 import org.immregistries.iis.kernal.SoftwareVersion;
 import org.immregistries.iis.kernal.model.OrgAccess;
 import org.immregistries.iis.kernal.model.OrgMaster;
+import org.immregistries.iis.kernal.model.ProcessingFlavor;
 
 @SuppressWarnings("serial")
 public class HomeServlet extends HttpServlet {
@@ -69,6 +70,16 @@ public class HomeServlet extends HttpServlet {
         } finally {
           dataSession.close();
         }
+        out.println("    <h2>Processing Flavors</h2>");
+        out.println("    <p>If any of the following words appear in the name of the facility then special processing rules will apply. "
+            + "These processing rules can be used to simulate specific IIS behavior. </p>");
+        out.println("    <ul class=\"w3-ul w3-hoverable\">");
+        for (ProcessingFlavor processingFlavor : ProcessingFlavor.values())
+        {
+          out.println("      <li>" + processingFlavor.getKey() + ": " + processingFlavor.getBehaviorDescription() + "</li>");
+        }
+        
+        out.println("    </ul>");
         out.println("  </div>");
         
         out.println(
