@@ -91,6 +91,8 @@ public class IncomingMessageHandler {
           mrn = reader.getValueBySearchingRepeats(3, 1, "PT", 5);
         }
       }
+      String problem = null;
+      int fieldPosition = 0;
       if (!mrn.equals("")) {
         Query query = dataSession.createQuery(
             "from PatientReported where orgReported = ? and patientReportedExternalLink = ?");
@@ -106,8 +108,6 @@ public class IncomingMessageHandler {
       String patientNameMiddle = reader.getValue(4, 3);
       Date patientBirthDate = parseDate(reader.getValue(6));
       String patientSex = reader.getValue(7);
-      String problem = null;
-      int fieldPosition = 0;
 
       if (patientNameLast.equals("")) {
         problem = "Last name is missing";
@@ -279,6 +279,17 @@ public class IncomingMessageHandler {
         String patientNameMiddle = reader.getValue(5, 3);
         String patientPhone = reader.getValue(13, 6) + reader.getValue(13, 7);
 
+        if (patientNameLast.equals("")) {
+          throw new ProcessingException(
+              "Patient last name was not found, required for accepting patient and vaccination history",
+              "PID", 1, 5);
+        }
+        if (patientNameFirst.equals("")) {
+          throw new ProcessingException(
+              "Patient first name was not found, required for accepting patient and vaccination history",
+              "PID", 1, 5);
+        }
+
 
         String zip = reader.getValue(11, 5);
         if (zip.length() > 5) {
@@ -296,6 +307,11 @@ public class IncomingMessageHandler {
         Date patientBirthDate;
         patientBirthDate =
             parseDate(reader.getValue(7), "Bad format for date of birth", "PID", 1, 7);
+        if (patientBirthDate.after(new Date())) {
+          throw new ProcessingException(
+              "Patient is indicated as being born in the future, unable to record patients who are not yet born",
+              "PID", 1, 7);
+        }
         patient.setPatientAddressFrag(addressFrag);
         patient.setPatientNameLast(patientNameLast);
         patient.setPatientNameFirst(patientNameFirst);
@@ -385,6 +401,11 @@ public class IncomingMessageHandler {
           }
           administrationDate = parseDate(reader.getValue(3, 1),
               "Could not read administered date in RXA-5", "RXA", rxaCount, 5);
+          if (administrationDate.after(new Date())) {
+            throw new ProcessingException(
+                "Vaccination is indicated as occuring in the future, unable to accept future vaccination events",
+                "RXA", rxaCount, 5);
+          }
           {
             Query query = dataSession.createQuery(
                 "from VaccinationReported where patientReported = ? and vaccinationReportedExternalLink = ?");
@@ -483,6 +504,9 @@ public class IncomingMessageHandler {
             dataSession.saveOrUpdate(vaccination);
             transaction.commit();
           }
+        } else {
+          throw new ProcessingException("RXA segment was not found after ORC segment", "ORC",
+              orcCount, 0);
         }
       }
       String ack = buildAck(reader, null);
