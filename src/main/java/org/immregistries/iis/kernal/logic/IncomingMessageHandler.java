@@ -223,6 +223,7 @@ public class IncomingMessageHandler {
 
   public String processVXU(OrgAccess orgAccess, HL7Reader reader, String message) {
     try {
+      Set<ProcessingFlavor> processingFlavorSet = orgAccess.getOrg().getProcessingFlavorSet();
       String patientReportedExternalLink = "";
       String patientReportedAuthority = "";
       String patientReportedType = "MR";
@@ -344,6 +345,17 @@ public class IncomingMessageHandler {
         patientReported.setPatientEmail(reader.getValueBySearchingRepeats(13, 4, "NET", 2));
         patientReported.setPatientPhone(patientPhone);
         patientReported.setPatientReportedAuthority(patientReportedAuthority);
+
+        if (processingFlavorSet.contains(ProcessingFlavor.BLACKBERRY)) {
+          if (patientReported.getPatientAddressLine1().equals("")
+              || patientReported.getPatientAddressCity().equals("")
+              || patientReported.getPatientAddressState().equals("")
+              || patientReported.getPatientAddressZip().equals("")) {
+            throw new ProcessingException("Patient address is required but it was not sent", "PID",
+                11, 0);
+          }
+        }
+
       }
       if (reader.advanceToSegment("PD1")) {
         patientReported.setPublicityIndicator(reader.getValue(11));
@@ -467,6 +479,14 @@ public class IncomingMessageHandler {
                 "Unrecognized vaccine " + vaccineCodeType + " code '" + vaccineCode + "'", "RXA",
                 rxaCount, 5);
           }
+          if (processingFlavorSet.contains(ProcessingFlavor.PEAR)) {
+            String administeredAtLocation = reader.getValue(11, 4);
+            if (!administeredAtLocation.equals("")) {
+              throw new ProcessingException(
+                  "Unrecognized administered at location, unable to accept immunization report",
+                  "RXA", rxaCount, 11);
+            }
+          }
           vaccination.setVaccineCvxCode(vaccineCvxCode);
           vaccination.setAdministeredDate(administrationDate);
           vaccinationReported.setUpdatedDate(new Date());
@@ -485,6 +505,11 @@ public class IncomingMessageHandler {
           if (reader.advanceToSegment("RXR", "ORC")) {
             vaccinationReported.setBodyRoute(reader.getValue(1));
             vaccinationReported.setBodySite(reader.getValue(2));
+          } else if (processingFlavorSet.contains(ProcessingFlavor.SPRUCE)) {
+            if (vaccinationReported.getInformationSource().equals("00")) {
+              throw new ProcessingException("RXR segment is required for administered vaccinations",
+                  "RXA", rxaCount, 0);
+            }
           }
           reader.gotoSegmentPosition(segmentPosition);
           while (reader.advanceToSegment("OBX", "ORC")) {
@@ -495,6 +520,9 @@ public class IncomingMessageHandler {
               vaccinationReported.setFundingSource(reader.getValue(5));
             }
           }
+
+
+
           reader.gotoSegmentPosition(segmentPosition);
           {
             Transaction transaction = dataSession.beginTransaction();
@@ -508,6 +536,11 @@ public class IncomingMessageHandler {
           throw new ProcessingException("RXA segment was not found after ORC segment", "ORC",
               orcCount, 0);
         }
+      }
+      if (processingFlavorSet.contains(ProcessingFlavor.CRANBERRY) && rxaCount == 0) {
+        throw new ProcessingException(
+            "Patient vacciantion history cannot be accepted without at least one vaccination specified",
+            "", 0, 0);
       }
       String ack = buildAck(reader, null);
       recordMessageReceived(message, patientReported, ack, "Update", "Ack", orgAccess.getOrg());
