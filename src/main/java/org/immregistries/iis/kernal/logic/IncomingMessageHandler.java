@@ -390,6 +390,7 @@ public class IncomingMessageHandler {
       }
       int orcCount = 0;
       int rxaCount = 0;
+      int vaccinationCount = 0;
       while (reader.advanceToSegment("ORC")) {
         orcCount++;
         VaccinationReported vaccinationReported = null;
@@ -511,6 +512,13 @@ public class IncomingMessageHandler {
                   "RXA", rxaCount, 0);
             }
           }
+          if (!vaccinationReported.getVaccineCvxCode().equals("998")
+              && !vaccinationReported.getVaccineCvxCode().equals("999")
+              && (vaccinationReported.getCompletionStatus().equals("CP")
+                  || vaccinationReported.getCompletionStatus().equals("PA"))) {
+            vaccinationCount++;
+          }
+
           reader.gotoSegmentPosition(segmentPosition);
           while (reader.advanceToSegment("OBX", "ORC")) {
             String indicator = reader.getValue(3);
@@ -537,9 +545,9 @@ public class IncomingMessageHandler {
               orcCount, 0);
         }
       }
-      if (processingFlavorSet.contains(ProcessingFlavor.CRANBERRY) && rxaCount == 0) {
+      if (processingFlavorSet.contains(ProcessingFlavor.CRANBERRY) && vaccinationCount == 0) {
         throw new ProcessingException(
-            "Patient vacciantion history cannot be accepted without at least one vaccination specified",
+            "Patient vaccination history cannot be accepted without at least one administered or historical vaccination specified",
             "", 0, 0);
       }
       String ack = buildAck(reader, null);
