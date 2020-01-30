@@ -1,5 +1,6 @@
 package org.immregistries.iis.kernal.logic;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -872,7 +873,7 @@ public class IncomingMessageHandler {
           }
         }
       }
-      if (sendBackForecast && forecastActualList.size() > 0) {
+      if (sendBackForecast && forecastActualList != null && forecastActualList.size() > 0) {
         printORC(orgAccess, sb, null, null, false);
         sb.append("RXA");
         // RXA-1
@@ -1109,7 +1110,12 @@ public class IncomingMessageHandler {
       ConnectorInterface connector =
           ConnectFactory.createConnecter(software, VaccineGroup.getForecastItemList());
       connector.setLogText(false);
-      forecastActualList = connector.queryForForecast(testCase, new SoftwareResult());
+      try {
+        forecastActualList = connector.queryForForecast(testCase, new SoftwareResult());
+      } catch (IOException ioe) {
+        System.err.println("Unable to query for forecast");
+        ioe.printStackTrace();
+      }
     } catch (Exception e) {
       System.err.println("Unable to query for forecast");
       e.printStackTrace(System.err);
