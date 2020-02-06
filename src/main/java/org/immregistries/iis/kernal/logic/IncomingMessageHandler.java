@@ -652,6 +652,9 @@ public class IncomingMessageHandler {
           profileId = RSP_Z42_MATCH_WITH_FORECAST;
           categoryResponse = "Match";
         }
+      } else {
+        processingException =  new ProcessingException("Unrecognized profile id '" + profileIdSubmitted + "'", "MSH",
+            1, 21);
       }
       createMSH(messageType, profileId, reader, sb, processingFlavorSet);
     }
@@ -661,6 +664,9 @@ public class IncomingMessageHandler {
         sb.append("MSA|AA|" + sendersUniqueId + "\r");
       } else {
         sb.append("MSA|AE|" + sendersUniqueId + "\r");
+      }
+      if (processingException != null) {
+        printERRSegment(processingException, sb);
       }
     }
     String profileName = "Request a Complete Immunization History";
@@ -673,7 +679,6 @@ public class IncomingMessageHandler {
       profileName = "Request Evaluated Immunization History and Forecast Query";
     }
     {
-
       sb.append("QAK|" + queryId);
       sb.append("|" + queryResponse);
       sb.append("|");
@@ -697,7 +702,9 @@ public class IncomingMessageHandler {
       PatientMaster patient = patientReported.getPatient();
       SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
       printQueryPID(patientReported, processingFlavorSet, sb, patient, sdf, 1);
-      printQueryNK1(patientReported, sb, codeMap);
+      if (profileId.equals(RSP_Z32_MATCH)) {
+        printQueryNK1(patientReported, sb, codeMap);
+      }
       List<VaccinationMaster> vaccinationMasterList;
       {
         Query query = dataSession.createQuery("from VaccinationMaster where patient = ?");
@@ -960,9 +967,6 @@ public class IncomingMessageHandler {
           }
         }
       }
-    }
-    if (processingException != null) {
-      printERRSegment(processingException, sb);
     }
 
     String messageResponse = sb.toString();
