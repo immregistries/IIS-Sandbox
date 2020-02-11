@@ -2,7 +2,9 @@ package org.immregistries.iis.kernal.servlet;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -28,6 +30,7 @@ public class MessageServlet extends HttpServlet {
   public static final String ACTION_LOGIN = "Login";
   public static final String ACTION_LOGOUT = "Logout";
   public static final String ACTION_SEARCH = "Search";
+  public static final String ACTION_SWITCH = "Switch";
 
   public static final String PARAM_SEARCH = "search";
 
@@ -48,27 +51,60 @@ public class MessageServlet extends HttpServlet {
     Session dataSession = PopServlet.getDataSession();
     try {
       String action = req.getParameter(PARAM_ACTION);
+      String messageError = null;
+      String messageConfirmation = null;
       if (action != null) {
         if (action.equals(ACTION_LOGOUT)) {
           session.removeAttribute("orgAccess");
-        }
-        HomeServlet.doHeader(out, session);
-        if (action.equals(ACTION_LOGIN)) {
+        } else if (action.equals(ACTION_LOGIN)) {
           String userId = req.getParameter(PARAM_USERID);
           String facilityId = req.getParameter(PARAM_FACILITYID);
           String password = req.getParameter(PARAM_PASSWORD);
           OrgAccess orgAccess = authenticateOrgAccess(userId, password, facilityId, dataSession);
           if (orgAccess == null) {
-            out.println("  <div class=\"w3-panel w3-red\">");
-            out.println("    <p>Unable to login, unrecognized credentials</p>");
-            out.println("  </div>");
+            messageError = "Unable to login, unrecognized credentials";
           } else {
             session.setAttribute("orgAccess", orgAccess);
+            Map<Integer, OrgAccess> orgAccessMap = new HashMap<Integer, OrgAccess>();
+            Query query = dataSession.createQuery("from OrgMaster order by organizationName");
+            List<OrgMaster> orgMasterList = query.list();
+            for (OrgMaster orgMaster : orgMasterList) {
+              OrgAccess oa =
+                  authenticateOrgAccessForFacility(userId, password, dataSession, orgMaster);
+              if (oa != null) {
+                orgAccessMap.put(orgMaster.getOrgId(), oa);
+              }
+            }
+            session.setAttribute("orgAccessMap", orgAccessMap);
+            messageConfirmation = "Logged in to " + orgAccess.getOrg().getOrganizationName();
+          }
+        } else if (action.equals(ACTION_SWITCH)) {
+          OrgMaster orgMaster = (OrgMaster) dataSession.get(OrgMaster.class,
+              Integer.parseInt(req.getParameter(PARAM_ORG_ID)));
+          @SuppressWarnings("unchecked")
+          Map<Integer, OrgAccess> orgAccessMap =
+              (Map<Integer, OrgAccess>) session.getAttribute("orgAccessMap");
+          if (orgAccessMap != null) {
+            OrgAccess orgAccess = orgAccessMap.get(orgMaster.getOrgId());
+            if (orgAccess != null) {
+              session.setAttribute("orgAccess", orgAccess);
+              messageConfirmation = "Switched to " + orgAccess.getOrg().getOrganizationName() + "";
+            }
           }
         }
-      } else {
-        HomeServlet.doHeader(out, session);
       }
+      HomeServlet.doHeader(out, session);
+      if (messageError != null) {
+        out.println("  <div class=\"w3-panel w3-red\">");
+        out.println("    <p>" + messageError + "</p>");
+        out.println("  </div>");
+      }
+      if (messageConfirmation != null) {
+        out.println("  <div class=\"w3-panel w3-green\">");
+        out.println("    <p>" + messageConfirmation + "</p>");
+        out.println("  </div>");
+      }
+
       OrgAccess orgAccess = (OrgAccess) session.getAttribute("orgAccess");
       if (orgAccess == null) {
         String userId = req.getParameter(PARAM_USERID);
@@ -110,7 +146,8 @@ public class MessageServlet extends HttpServlet {
         if (search == null) {
           search = "";
         }
-        out.println("    <form method=\"GET\" action=\"message\" class=\"w3-container w3-card-4\">");
+        out.println(
+            "    <form method=\"GET\" action=\"message\" class=\"w3-container w3-card-4\">");
         out.println("      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_SEARCH
             + "\" value=\"" + search + "\"/>");
         out.println(
@@ -150,6 +187,7 @@ public class MessageServlet extends HttpServlet {
         out.println("    </div>");
       }
     } catch (Exception e) {
+      System.err.println("Unable to render page: " + e.getMessage());
       e.printStackTrace(System.err);
     } finally {
       dataSession.close();
@@ -185,15 +223,22 @@ public class MessageServlet extends HttpServlet {
 
     }
     if (orgAccess == null) {
-      Query query = dataSession
-          .createQuery("from OrgAccess where accessName = ? and accessKey = ? and org = ?");
-      query.setParameter(0, userId);
-      query.setParameter(1, password);
-      query.setParameter(2, orgMaster);
-      List<OrgAccess> orgAccessList = query.list();
-      if (orgAccessList.size() != 0) {
-        orgAccess = orgAccessList.get(0);
-      }
+      orgAccess = authenticateOrgAccessForFacility(userId, password, dataSession, orgMaster);
+    }
+    return orgAccess;
+  }
+
+  public OrgAccess authenticateOrgAccessForFacility(String userId, String password,
+      Session dataSession, OrgMaster orgMaster) {
+    OrgAccess orgAccess = null;
+    Query query = dataSession
+        .createQuery("from OrgAccess where accessName = ? and accessKey = ? and org = ?");
+    query.setParameter(0, userId);
+    query.setParameter(1, password);
+    query.setParameter(2, orgMaster);
+    List<OrgAccess> orgAccessList = query.list();
+    if (orgAccessList.size() != 0) {
+      orgAccess = orgAccessList.get(0);
     }
     return orgAccess;
   }

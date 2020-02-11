@@ -4,6 +4,10 @@ import java.io.Serializable;
 import java.util.Set;
 
 public class OrgMaster implements Serializable {
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 1L;
   private int orgId = 0;
   private String organizationName = "";
   private Set<ProcessingFlavor> processingFlavorSet = null;
@@ -35,7 +39,6 @@ public class OrgMaster implements Serializable {
       OrgMaster other = (OrgMaster) obj;
       return other.getOrgId() == this.getOrgId();
     }
-    // TODO Auto-generated method stub
     return super.equals(obj);
   }
 
