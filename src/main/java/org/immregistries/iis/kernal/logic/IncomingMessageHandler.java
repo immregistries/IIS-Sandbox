@@ -1,13 +1,17 @@
 package org.immregistries.iis.kernal.logic;
 
 import java.io.IOException;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import org.hibernate.Query;
@@ -392,6 +396,7 @@ public class IncomingMessageHandler {
       int orcCount = 0;
       int rxaCount = 0;
       int vaccinationCount = 0;
+      int refusalCount = 0;
       while (reader.advanceToSegment("ORC")) {
         orcCount++;
         VaccinationReported vaccinationReported = null;
@@ -516,8 +521,13 @@ public class IncomingMessageHandler {
           if (!vaccinationReported.getVaccineCvxCode().equals("998")
               && !vaccinationReported.getVaccineCvxCode().equals("999")
               && (vaccinationReported.getCompletionStatus().equals("CP")
-                  || vaccinationReported.getCompletionStatus().equals("PA"))) {
+                  || vaccinationReported.getCompletionStatus().equals("PA")
+                  || vaccinationReported.getCompletionStatus().equals(""))) {
             vaccinationCount++;
+          }
+
+          if (vaccinationReported.getCompletionStatus().equals("RE")) {
+            refusalCount++;
           }
 
           reader.gotoSegmentPosition(segmentPosition);
@@ -549,6 +559,12 @@ public class IncomingMessageHandler {
       if (processingFlavorSet.contains(ProcessingFlavor.CRANBERRY) && vaccinationCount == 0) {
         throw new ProcessingException(
             "Patient vaccination history cannot be accepted without at least one administered or historical vaccination specified",
+            "", 0, 0);
+      }
+      if (processingFlavorSet.contains(ProcessingFlavor.BILBERRY)
+          && (vaccinationCount == 0 && refusalCount == 0)) {
+        throw new ProcessingException(
+            "Patient vaccination history cannot be accepted without at least one administered, historical, or refused vaccination specified",
             "", 0, 0);
       }
       String ack = buildAck(reader, null);
@@ -653,8 +669,8 @@ public class IncomingMessageHandler {
           categoryResponse = "Match";
         }
       } else {
-        processingException =  new ProcessingException("Unrecognized profile id '" + profileIdSubmitted + "'", "MSH",
-            1, 21);
+        processingException = new ProcessingException(
+            "Unrecognized profile id '" + profileIdSubmitted + "'", "MSH", 1, 21);
       }
       createMSH(messageType, profileId, reader, sb, processingFlavorSet);
     }
@@ -707,10 +723,31 @@ public class IncomingMessageHandler {
       }
       List<VaccinationMaster> vaccinationMasterList;
       {
-        Query query = dataSession.createQuery("from VaccinationMaster where patient = ?");
+        vaccinationMasterList = new ArrayList<>();
+        Query query = dataSession.createQuery(
+            "from VaccinationMaster where patient = ? order by vaccinationReported asc");
         query.setParameter(0, patient);
-        vaccinationMasterList = query.list();
+        List<VaccinationMaster> vmList = query.list();
+        Map<String, VaccinationMaster> map = new HashMap<>();
+        for (VaccinationMaster vaccinationMaster : vmList) {
+          if (vaccinationMaster.getAdministeredDate() != null) {
+            String key = sdf.format(vaccinationMaster.getAdministeredDate());
+            if (!vaccinationMaster.getVaccineCvxCode().equals("")) {
+              key += key + vaccinationMaster.getVaccineCvxCode();
+              map.put(key, vaccinationMaster);
+            }
+          }
+        }
+        List<String> keyList = new ArrayList<>(map.keySet());
+        Collections.sort(keyList);
+        for (String key : keyList) {
+          vaccinationMasterList.add(map.get(key));
+        }
+
       }
+
+      // remove obvious duplicates
+
 
       if (processingFlavorSet.contains(ProcessingFlavor.LEMON)) {
         for (Iterator<VaccinationMaster> it = vaccinationMasterList.iterator(); it.hasNext();) {

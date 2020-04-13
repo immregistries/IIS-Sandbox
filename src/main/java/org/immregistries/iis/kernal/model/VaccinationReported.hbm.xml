@@ -8,8 +8,8 @@
     <many-to-one name="patientReported" column="patient_reported_id" class="PatientReported"/>
     <property name="vaccinationReportedExternalLink" column="vaccination_reported_external_link" type="string"/>
     <many-to-one name="vaccination" column="vaccination_id" class="VaccinationMaster"/>
-    <property name="reportedDate" column="reported_date" type="date"/>
-    <property name="updatedDate" column="updated_date" type="date"/>
+    <property name="reportedDate" column="reported_date" type="timestamp"/>
+    <property name="updatedDate" column="updated_date" type="timestamp"/>
     <property name="administeredDate" column="administered_date" type="date"/>
     <property name="vaccineCvxCode" column="vaccine_cvx_code" type="string"/>
     <property name="vaccineNdcCode" column="vaccine_ndc_code" type="string"/>

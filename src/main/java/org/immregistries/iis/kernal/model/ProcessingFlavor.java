@@ -11,6 +11,8 @@ public enum ProcessingFlavor {
                               GREEN("Green", "Typhoid vaccination is never returned"),
                               CRANBERRY("Cranberry",
                                   "Vaccination update is not accepted without at least one vaccination reported"),
+                              BILBERRY("Bilberry",
+                                  "Vaccination update is not accepted without at least one vaccination or refusal reported"),
                               PEAR("Pear",
                                   "The administered-at-location will not be recognized if valued and the message rejected"),
                               BLACKBERRY("Blackberry", "The patient's address is required"),

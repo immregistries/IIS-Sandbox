@@ -32,15 +32,11 @@
 			<version>3.8.1</version>
 			<scope>test</scope>
 		</dependency>
-
-
 		<dependency>
 			<groupId>org.immregistries</groupId>
 			<artifactId>mqe-hl7-utility</artifactId>
-			<version>2018.12-BETA</version>
+			<version>2020.02-BETA</version>
 		</dependency>
-
-
 		<dependency>
 			<groupId>org.mortbay.jetty</groupId>
 			<artifactId>jetty</artifactId>

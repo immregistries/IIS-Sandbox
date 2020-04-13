@@ -131,14 +131,13 @@ public class HomeServlet extends HttpServlet {
     out.println("      <div class=\"w3-bar w3-light-grey\">");
     out.println(
         "        <a href=\"home\" class=\"w3-bar-item w3-button w3-green\">IIS Sandbox</a>");
-    out.println("        <a href=\"pop\" class=\"w3-bar-item w3-button\">Send Now</a>");
     OrgAccess orgAccess = (OrgAccess) session.getAttribute("orgAccess");
     if (orgAccess != null) {
       String link = "home?" + PARAM_SHOW + "=" + SHOW_FACILITIES;
       out.println(
           "        <a href=\"" + link + "\" class=\"w3-bar-item w3-button\">Facilities</a>");
     }
-
+    out.println("        <a href=\"pop\" class=\"w3-bar-item w3-button\">Send Now</a>");
     out.println("        <a href=\"message\" class=\"w3-bar-item w3-button\">Messages</a>");
     out.println("        <a href=\"patient\" class=\"w3-bar-item w3-button\">Patients</a>");
     out.println("        <a href=\"soap\" class=\"w3-bar-item w3-button\">CDC WSDL</a>");
