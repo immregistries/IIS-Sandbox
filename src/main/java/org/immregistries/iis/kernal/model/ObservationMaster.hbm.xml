@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="org.immregistries.iis.kernal.model">
+  <class name="ObservationMaster" table="observation_master">
+    <id name="observationId" column="observation_id">
+      <generator class="native"/>
+    </id>
+    <many-to-one name="patient" column="patient_id" class="PatientMaster"/>
+    <many-to-one name="vaccination" column="vaccination_id" class="VaccinationMaster"/>
+    <property name="identifierCode" column="identifier_code" type="string"/>
+    <property name="valueCode" column="value_code" type="string"/>
+    <many-to-one name="observationReported" column="observation_reported_id" class="ObservationReported"/>
+  </class>
+</hibernate-mapping>
+

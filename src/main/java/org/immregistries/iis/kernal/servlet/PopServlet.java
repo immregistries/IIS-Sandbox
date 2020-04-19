@@ -84,6 +84,8 @@ public class PopServlet extends HttpServlet {
       resp.setContentType("text/plain");
       out.print(ack);
     } catch (Exception e) {
+      resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+      e.printStackTrace(out);
       e.printStackTrace(System.err);
     }
     out.flush();

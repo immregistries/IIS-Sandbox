@@ -24,5 +24,7 @@
     <mapping resource="org/immregistries/iis/kernal/model/MessageReceived.hbm.xml"/>
     <mapping resource="org/immregistries/iis/kernal/model/VaccinationMaster.hbm.xml"/>
     <mapping resource="org/immregistries/iis/kernal/model/VaccinationReported.hbm.xml"/>
+    <mapping resource="org/immregistries/iis/kernal/model/ObservationMaster.hbm.xml"/>
+    <mapping resource="org/immregistries/iis/kernal/model/ObservationReported.hbm.xml"/>
   </session-factory>
 </hibernate-configuration>

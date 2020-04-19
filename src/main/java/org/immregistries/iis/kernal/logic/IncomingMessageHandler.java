@@ -22,6 +22,8 @@ import org.immregistries.codebase.client.reference.CodeStatusValue;
 import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.SoftwareVersion;
 import org.immregistries.iis.kernal.model.MessageReceived;
+import org.immregistries.iis.kernal.model.ObservationMaster;
+import org.immregistries.iis.kernal.model.ObservationReported;
 import org.immregistries.iis.kernal.model.OrgAccess;
 import org.immregistries.iis.kernal.model.OrgMaster;
 import org.immregistries.iis.kernal.model.PatientMaster;
@@ -72,16 +74,25 @@ public class IncomingMessageHandler {
     HL7Reader reader = new HL7Reader(message);
     String messageType = reader.getValue(9);
     String responseMessage;
-    if (messageType.equals("VXU")) {
-      responseMessage = processVXU(orgAccess, reader, message);
-    } else if (messageType.equals("QBP")) {
-      responseMessage = processQBP(orgAccess, reader, message);
-    } else {
-      ProcessingException pe = new ProcessingException("Unsupported message", "", 0, 0);
+    try {
+      if (messageType.equals("VXU")) {
+        responseMessage = processVXU(orgAccess, reader, message);
+      } else if (messageType.equals("QBP")) {
+        responseMessage = processQBP(orgAccess, reader, message);
+      } else {
+        ProcessingException pe = new ProcessingException("Unsupported message", "", 0, 0);
+        List<ProcessingException> processingExceptionList = new ArrayList<>();
+        processingExceptionList.add(pe);
+        responseMessage = buildAck(reader, processingExceptionList);
+        recordMessageReceived(message, null, responseMessage, "Unknown", "NAck",
+            orgAccess.getOrg());
+      }
+    } catch (Exception e) {
+      e.printStackTrace(System.err);
       List<ProcessingException> processingExceptionList = new ArrayList<>();
-      processingExceptionList.add(pe);
+      processingExceptionList.add(new ProcessingException(
+          "Internal error prevented processing: " + e.getMessage(), null, 0, 0));
       responseMessage = buildAck(reader, processingExceptionList);
-      recordMessageReceived(message, null, responseMessage, "Unknown", "NAck", orgAccess.getOrg());
     }
     return responseMessage;
   }
@@ -591,6 +602,8 @@ public class IncomingMessageHandler {
                 rxaCount, 5);
           }
           if (vaccineCode.equals("998")) {
+            obxCount = readAndCreateObservations(reader, processingExceptionList, patientReported,
+                patient, strictDate, obxCount, null, null);
             continue;
           }
           if (vaccinationReportedExternalLink.equals("")) {
@@ -782,9 +795,12 @@ public class IncomingMessageHandler {
             refusalCount++;
           }
 
+
+
           reader.gotoSegmentPosition(segmentPosition);
+          int tempObxCount = obxCount;
           while (reader.advanceToSegment("OBX", "ORC")) {
-            obxCount++;
+            tempObxCount++;
             String indicator = reader.getValue(3);
             if (indicator.equals("64994-7")) {
               String fundingEligibility = reader.getValue(5);
@@ -794,7 +810,7 @@ public class IncomingMessageHandler {
                 if (fundingEligibilityCode == null) {
                   ProcessingException pe = new ProcessingException(
                       "Funding eligibility '" + fundingEligibility + "' was not recognized", "OBX",
-                      obxCount, 5).setWarning();
+                      tempObxCount, 5).setWarning();
                   processingExceptionList.add(pe);
                 } else {
                   vaccinationReported.setFundingEligibility(fundingEligibilityCode.getValue());
@@ -807,8 +823,8 @@ public class IncomingMessageHandler {
                     .getCodeForCodeset(CodesetType.VACCINATION_FUNDING_SOURCE, fundingSource);
                 if (fundingSourceCode == null) {
                   ProcessingException pe = new ProcessingException(
-                      "Funding source '" + fundingSource + "' was not recognized", "OBX", obxCount,
-                      5).setWarning();
+                      "Funding source '" + fundingSource + "' was not recognized", "OBX",
+                      tempObxCount, 5).setWarning();
                   processingExceptionList.add(pe);
                 } else {
                   vaccinationReported.setFundingSource(fundingSourceCode.getValue());
@@ -827,6 +843,10 @@ public class IncomingMessageHandler {
             dataSession.saveOrUpdate(vaccination);
             transaction.commit();
           }
+
+          reader.gotoSegmentPosition(segmentPosition);
+          obxCount = readAndCreateObservations(reader, processingExceptionList, patientReported,
+              patient, strictDate, obxCount, vaccinationReported, vaccination);
         } else {
           throw new ProcessingException("RXA segment was not found after ORC segment", "ORC",
               orcCount, 0);
@@ -854,6 +874,89 @@ public class IncomingMessageHandler {
       recordMessageReceived(message, null, ack, "Update", "Exception", orgAccess.getOrg());
       return ack;
     }
+  }
+
+  public int readAndCreateObservations(HL7Reader reader,
+      List<ProcessingException> processingExceptionList, PatientReported patientReported,
+      PatientMaster patient, boolean strictDate, int obxCount,
+      VaccinationReported vaccinationReported, VaccinationMaster vaccination) {
+    while (reader.advanceToSegment("OBX", "ORC")) {
+      obxCount++;
+      String identifierCode = reader.getValue(3);
+      String valueCode = reader.getValue(5);
+      ObservationMaster observation =
+          readObservations(reader, processingExceptionList, patientReported, patient, strictDate,
+              obxCount, vaccinationReported, vaccination, identifierCode, valueCode);
+      {
+        ObservationReported observationReported = observation.getObservationReported();
+        observation.setObservationReported(null);
+        Transaction transaction = dataSession.beginTransaction();
+        dataSession.saveOrUpdate(observation);
+        dataSession.saveOrUpdate(observationReported);
+        observation.setObservationReported(observationReported);
+        dataSession.saveOrUpdate(observation);
+        transaction.commit();
+      }
+    }
+    return obxCount;
+  }
+
+  public ObservationMaster readObservations(HL7Reader reader,
+      List<ProcessingException> processingExceptionList, PatientReported patientReported,
+      PatientMaster patient, boolean strictDate, int obxCount,
+      VaccinationReported vaccinationReported, VaccinationMaster vaccination, String identifierCode,
+      String valueCode) {
+    ObservationMaster observation;
+    String q;
+    if (vaccination == null) {
+      q = "from ObservationMaster where " + "patient = :patient and vaccination is null "
+          + "and identifierCode = :identifierCode";
+    } else {
+      q = "from ObservationMaster where " + "patient = :patient and vaccination = :vaccination "
+          + "and identifierCode = :identifierCode";
+    }
+    Query query = dataSession.createQuery(q);
+    query.setParameter("patient", patient);
+    if (vaccination != null) {
+      query.setParameter("vaccination", vaccination);
+    }
+    query.setParameter("identifierCode", identifierCode);
+    List<ObservationMaster> l = query.list();
+    ObservationReported observationReported;
+    if (l.size() > 0) {
+      observation = l.get(0);
+      observationReported = observation.getObservationReported();
+    } else {
+      observation = new ObservationMaster();
+      observation.setPatient(patient);
+      observation.setVaccination(vaccination);
+      observation.setIdentifierCode(identifierCode);
+      observationReported = new ObservationReported();
+      observation.setObservationReported(observationReported);
+      observationReported.setReportedDate(new Date());
+    }
+    observation.setValueCode(valueCode);
+    observationReported.setPatientReported(patientReported);
+    observationReported.setVaccinationReported(vaccinationReported);
+    observationReported.setObservation(observation);
+    observationReported.setUpdatedDate(new Date());
+    observationReported.setIdentifierCode(identifierCode);
+    observationReported.setIdentifierLabel(reader.getValue(3, 2));
+    observationReported.setIdentifierTable(reader.getValue(3, 3));
+    observationReported.setValueCode(valueCode);
+    observationReported.setValueLabel(reader.getValue(5, 2));
+    observationReported.setValueTable(reader.getValue(5, 3));
+    observationReported.setUnitsCode(reader.getValue(6, 1));
+    observationReported.setUnitsLabel(reader.getValue(6, 2));
+    observationReported.setUnitsTable(reader.getValue(6, 3));
+    observationReported.setResultStatus(reader.getValue(11));
+    observationReported.setObservationDate(
+        parseDateWarn(reader.getValue(14), "Unparsable date/time of observation", "OBX", obxCount,
+            14, strictDate, processingExceptionList));
+    observationReported.setMethodCode(reader.getValue(17, 1));
+    observationReported.setMethodLabel(reader.getValue(17, 2));
+    observationReported.setMethodTable(reader.getValue(17, 3));
+    return observation;
   }
 
   public void verifyNoErrors(List<ProcessingException> processingExceptionList)
@@ -1213,7 +1316,36 @@ public class IncomingMessageHandler {
             }
           }
         }
+        {
+          Query query = dataSession.createQuery(
+              "from ObservationMaster where patient = :patient and vaccination = :vaccination");
+          query.setParameter("patient", patient);
+          query.setParameter("vaccination", vaccination);
+          List<ObservationMaster> observationList = query.list();
+          if (observationList.size() > 0) {
+            obsSubId++;
+            for (ObservationMaster observation : observationList) {
+              obxSetId++;
+              printObx(sb, obxSetId, obsSubId, observation);
+            }
+          }
+        }
       }
+      {
+        Query query = dataSession.createQuery(
+            "from ObservationMaster where patient = :patient and vaccination is null");
+        query.setParameter("patient", patient);
+        List<ObservationMaster> observationList = query.list();
+        if (observationList.size() > 0) {
+          printORC(orgAccess, sb, null, null, false);
+          obsSubId++;
+          for (ObservationMaster observation : observationList) {
+            obxSetId++;
+            printObx(sb, obxSetId, obsSubId, observation);
+          }
+        }
+      }
+      
       if (sendBackForecast && forecastActualList != null && forecastActualList.size() > 0) {
         printORC(orgAccess, sb, null, null, false);
         sb.append("RXA");
@@ -1568,6 +1700,72 @@ public class IncomingMessageHandler {
     sb.append("\r");
   }
 
+  public void printObx(StringBuilder sb, int obxSetId, int obsSubId,
+      ObservationMaster observation) {
+    ObservationReported ob = observation.getObservationReported();
+    sb.append("OBX");
+    // OBX-1
+    sb.append("|");
+    sb.append(obxSetId);
+    // OBX-2
+    sb.append("|");
+    sb.append(ob.getValueType());
+    // OBX-3
+    sb.append("|");
+    sb.append(
+        ob.getIdentifierCode() + "^" + ob.getIdentifierLabel() + "^" + ob.getIdentifierTable());
+    // OBX-4
+    sb.append("|");
+    sb.append(obsSubId);
+    // OBX-5
+    sb.append("|");
+    if (ob.getValueTable().equals("")) {
+      sb.append(ob.getValueCode());
+    } else {
+      sb.append(ob.getValueCode() + "^" + ob.getValueLabel() + "^" + ob.getValueTable());
+    }
+    // OBX-6
+    sb.append("|");
+    if (ob.getUnitsTable().equals("")) {
+      sb.append(ob.getUnitsCode());
+    } else {
+      sb.append(ob.getUnitsCode() + "^" + ob.getUnitsLabel() + "^" + ob.getUnitsTable());
+    }
+    // OBX-7
+    sb.append("|");
+    // OBX-8
+    sb.append("|");
+    // OBX-9
+    sb.append("|");
+    // OBX-10
+    sb.append("|");
+    // OBX-11
+    sb.append("|");
+    sb.append(ob.getResultStatus());
+    // OBX-12
+    sb.append("|");
+    // OBX-13
+    sb.append("|");
+    // OBX-14
+    sb.append("|");
+    if (ob.getObservationDate() != null) {
+      SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+      sb.append(sdf.format(ob.getObservationDate()));
+    }
+    // OBX-15
+    sb.append("|");
+    // OBX-16
+    sb.append("|");
+    // OBX-17
+    sb.append("|");
+    if (ob.getMethodTable().equals("")) {
+      sb.append(ob.getMethodCode());
+    } else {
+      sb.append(ob.getMethodCode() + "^" + ob.getMethodLabel() + "^" + ob.getMethodTable());
+    }
+    sb.append("\r");
+  }
+
   public void printObx(StringBuilder sb, int obxSetId, int obsSubId, String loinc,
       String loincLabel, String value, String valueLabel, String valueTable) {
     sb.append("OBX");
@@ -1601,6 +1799,7 @@ public class IncomingMessageHandler {
     sb.append("F");
     sb.append("\r");
   }
+
 
   public void printObx(StringBuilder sb, int obxSetId, int obsSubId, String loinc,
       String loincLabel, Date value) {
