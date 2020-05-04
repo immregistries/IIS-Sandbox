@@ -317,6 +317,35 @@ public class IncomingMessageHandler {
             }
             processingExceptionList.add(pe);
           }
+
+          {
+            int countNums = 0;
+            boolean invalidCharFound = false;
+            char invalidChar = ' ';
+            for (char c : patientPhone.toCharArray()) {
+              if (c >= '0' && c <= '9') {
+                countNums++;
+              } else if (c != '-' && c != '.' && c != ' ' && c != '(' && c != ')') {
+                if (!invalidCharFound) {
+                  invalidCharFound = true;
+                  invalidChar = c;
+                }
+              }
+            }
+            if (!invalidCharFound) {
+              ProcessingException pe = new ProcessingException(
+                  "Patient phone number has unexpected character: " + invalidChar, "PID", 1, 13);
+              pe.setWarning();
+              processingExceptionList.add(pe);
+            }
+            if (countNums != 10 || patientPhone.startsWith("555") || patientPhone.startsWith("0")
+                || patientPhone.startsWith("1")) {
+              ProcessingException pe = new ProcessingException(
+                  "Patient phone number does not appear to be valid", "PID", 1, 13);
+              pe.setWarning();
+              processingExceptionList.add(pe);
+            }
+          }
         }
         if (!telUseCode.equals("PRN")) {
           patientPhone = "";
@@ -766,6 +795,16 @@ public class IncomingMessageHandler {
           vaccinationReported.setVaccineMvxCode(reader.getValue(17));
           vaccinationReported.setRefusalReasonCode(reader.getValue(18));
           vaccinationReported.setCompletionStatus(reader.getValue(20));
+          if (!vaccinationReported.getRefusalReasonCode().equals("")) {
+            Code refusalCode = codeMap.getCodeForCodeset(CodesetType.VACCINATION_REFUSAL,
+                vaccinationReported.getRefusalReasonCode());
+            if (refusalCode == null) {
+              ProcessingException pe =
+                  new ProcessingException("Unrecognized refusal reason", "OBX", rxaCount, 18);
+              pe.setWarning();
+              processingExceptionList.add(pe);
+            }
+          }
           vaccinationReported.setActionCode(reader.getValue(21));
           int segmentPosition = reader.getSegmentPosition();
           if (reader.advanceToSegment("RXR", "ORC")) {
@@ -887,6 +926,35 @@ public class IncomingMessageHandler {
       ObservationMaster observation =
           readObservations(reader, processingExceptionList, patientReported, patient, strictDate,
               obxCount, vaccinationReported, vaccination, identifierCode, valueCode);
+      if (observation.getIdentifierCode().equals("30945-0")) // contraindication!
+      {
+        CodeMap codeMap = CodeMapManager.getCodeMap();
+        Code contraCode = codeMap.getCodeForCodeset(CodesetType.CONTRAINDICATION_OR_PRECAUTION,
+            observation.getValueCode());
+        if (contraCode == null) {
+          ProcessingException pe = new ProcessingException(
+              "Unrecognized contraindication or precaution", "OBX", obxCount, 5);
+          pe.setWarning();
+          processingExceptionList.add(pe);
+        }
+        if (observation.getObservationReported().getObservationDate() != null) {
+          Date today = new Date();
+          if (observation.getObservationReported().getObservationDate().after(today)) {
+            ProcessingException pe = new ProcessingException(
+                "Contraindication or precaution observed in the future", "OBX", obxCount, 5);
+            pe.setWarning();
+            processingExceptionList.add(pe);
+          }
+          if (patientReported.getPatientBirthDate() != null && observation.getObservationReported()
+              .getObservationDate().before(patientReported.getPatientBirthDate())) {
+            ProcessingException pe = new ProcessingException(
+                "Contraindication or precaution observed before patient was born", "OBX", obxCount,
+                5);
+            pe.setWarning();
+            processingExceptionList.add(pe);
+          }
+        }
+      }
       {
         ObservationReported observationReported = observation.getObservationReported();
         observation.setObservationReported(null);
