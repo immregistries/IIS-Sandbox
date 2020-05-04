@@ -1332,8 +1332,8 @@ public class IncomingMessageHandler {
         }
       }
       {
-        Query query = dataSession.createQuery(
-            "from ObservationMaster where patient = :patient and vaccination is null");
+        Query query = dataSession
+            .createQuery("from ObservationMaster where patient = :patient and vaccination is null");
         query.setParameter("patient", patient);
         List<ObservationMaster> observationList = query.list();
         if (observationList.size() > 0) {
@@ -1345,7 +1345,7 @@ public class IncomingMessageHandler {
           }
         }
       }
-      
+
       if (sendBackForecast && forecastActualList != null && forecastActualList.size() > 0) {
         printORC(orgAccess, sb, null, null, false);
         sb.append("RXA");
@@ -1598,9 +1598,8 @@ public class IncomingMessageHandler {
     sb.append("|RE");
     // ORC-2
     sb.append("|");
-    if (originalReporter) {
-      sb.append(vaccinationReported.getVaccinationReportedExternalLink() + "^"
-          + orgAccess.getOrg().getOrganizationName());
+    if (vaccination != null) {
+      sb.append(vaccination.getVaccinationId() + "^IIS");
     }
     // ORC-3
     sb.append("|");
@@ -1611,7 +1610,10 @@ public class IncomingMessageHandler {
         sb.append("9999^IIS");
       }
     } else {
-      sb.append(vaccination.getVaccinationId() + "^IIS");
+      if (originalReporter) {
+        sb.append(vaccinationReported.getVaccinationReportedExternalLink() + "^"
+            + orgAccess.getOrg().getOrganizationName());
+      }
     }
     sb.append("\r");
   }
