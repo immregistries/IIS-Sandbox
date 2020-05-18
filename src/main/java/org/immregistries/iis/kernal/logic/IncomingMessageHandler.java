@@ -75,6 +75,14 @@ public class IncomingMessageHandler {
     String messageType = reader.getValue(9);
     String responseMessage;
     try {
+      Set<ProcessingFlavor> processingFlavorSet = orgAccess.getOrg().getProcessingFlavorSet();
+      if (processingFlavorSet.contains(ProcessingFlavor.SOURSOP)) {
+        String facilityId = reader.getValue(4);
+        if (!facilityId.equals(orgAccess.getOrg().getOrganizationName())) {
+          throw new ProcessingException("Not allowed to submit for facility indicated in MSH-4",
+              "MSH", 1, 4);
+        }
+      }
       if (messageType.equals("VXU")) {
         responseMessage = processVXU(orgAccess, reader, message);
       } else if (messageType.equals("QBP")) {
