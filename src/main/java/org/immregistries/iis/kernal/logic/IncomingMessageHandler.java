@@ -800,7 +800,7 @@ public class IncomingMessageHandler {
                 vaccinationReported.getRefusalReasonCode());
             if (refusalCode == null) {
               ProcessingException pe =
-                  new ProcessingException("Unrecognized refusal reason", "OBX", rxaCount, 18);
+                  new ProcessingException("Unrecognized refusal reason", "RXA", rxaCount, 18);
               pe.setWarning();
               processingExceptionList.add(pe);
             }
@@ -949,7 +949,7 @@ public class IncomingMessageHandler {
               .getObservationDate().before(patientReported.getPatientBirthDate())) {
             ProcessingException pe = new ProcessingException(
                 "Contraindication or precaution observed before patient was born", "OBX", obxCount,
-                5);
+                14);
             pe.setWarning();
             processingExceptionList.add(pe);
           }
