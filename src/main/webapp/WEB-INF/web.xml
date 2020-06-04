@@ -25,6 +25,10 @@
     <servlet-class>org.immregistries.iis.kernal.servlet.FitsServlet</servlet-class>
   </servlet>
   <servlet>
+    <servlet-name>lab</servlet-name>
+    <servlet-class>org.immregistries.iis.kernal.servlet.LabServlet</servlet-class>
+  </servlet>
+  <servlet>
     <servlet-name>message</servlet-name>
     <servlet-class>org.immregistries.iis.kernal.servlet.MessageServlet</servlet-class>
   </servlet>
@@ -39,6 +43,10 @@
   <servlet-mapping>
     <servlet-name>home</servlet-name>
     <url-pattern>/home</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>lab</servlet-name>
+    <url-pattern>/lab</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>message</servlet-name>

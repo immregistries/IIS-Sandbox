@@ -1017,6 +1017,7 @@ public class IncomingMessageHandler {
     observationReported.setObservation(observation);
     observationReported.setUpdatedDate(new Date());
     observationReported.setIdentifierCode(identifierCode);
+    observationReported.setValueType(reader.getValue(2));
     observationReported.setIdentifierLabel(reader.getValue(3, 2));
     observationReported.setIdentifierTable(reader.getValue(3, 3));
     observationReported.setValueCode(valueCode);
