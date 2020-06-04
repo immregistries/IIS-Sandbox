@@ -85,6 +85,8 @@ public class IncomingMessageHandler {
       }
       if (messageType.equals("VXU")) {
         responseMessage = processVXU(orgAccess, reader, message);
+      } else if (messageType.equals("ORU")) {
+        responseMessage = processORU(orgAccess, reader, message);
       } else if (messageType.equals("QBP")) {
         responseMessage = processQBP(orgAccess, reader, message);
       } else {
@@ -254,55 +256,6 @@ public class IncomingMessageHandler {
     List<ProcessingException> processingExceptionList = new ArrayList<>();
     try {
       Set<ProcessingFlavor> processingFlavorSet = orgAccess.getOrg().getProcessingFlavorSet();
-      String patientReportedExternalLink = "";
-      String patientReportedAuthority = "";
-      String patientReportedType = "MR";
-      if (reader.advanceToSegment("PID")) {
-        patientReportedExternalLink =
-            reader.getValueBySearchingRepeats(3, 1, patientReportedType, 5);
-        patientReportedAuthority = reader.getValueBySearchingRepeats(3, 4, patientReportedType, 5);
-        if (patientReportedExternalLink.equals("")) {
-          patientReportedAuthority = "";
-          patientReportedType = "PT";
-          patientReportedExternalLink =
-              reader.getValueBySearchingRepeats(3, 1, patientReportedType, 5);
-          patientReportedAuthority =
-              reader.getValueBySearchingRepeats(3, 4, patientReportedType, 5);
-          if (patientReportedExternalLink.equals("")) {
-            throw new ProcessingException(
-                "MRN was not found, required for accepting vaccination report", "PID", 1, 3);
-          }
-        }
-      } else {
-        throw new ProcessingException(
-            "No PID segment found, required for accepting vaccination report", "", 0, 0);
-      }
-
-
-      PatientReported patientReported = null;
-      PatientMaster patient = null;
-      {
-        Query query = dataSession.createQuery(
-            "from PatientReported where orgReported = ? and patientReportedExternalLink = ?");
-        query.setParameter(0, orgAccess.getOrg());
-        query.setParameter(1, patientReportedExternalLink);
-        List<PatientReported> patientReportedList = query.list();
-        if (patientReportedList.size() > 0) {
-          patientReported = patientReportedList.get(0);
-          patient = patientReported.getPatient();
-        }
-      }
-
-      if (patientReported == null) {
-        patient = new PatientMaster();
-        patient.setPatientExternalLink(generatePatientExternalLink());
-        patient.setOrgMaster(orgAccess.getOrg());
-        patientReported = new PatientReported();
-        patientReported.setOrgReported(orgAccess.getOrg());
-        patientReported.setPatientReportedExternalLink(patientReportedExternalLink);
-        patientReported.setPatient(patient);
-        patientReported.setReportedDate(new Date());
-      }
 
       CodeMap codeMap = CodeMapManager.getCodeMap();
 
@@ -310,315 +263,13 @@ public class IncomingMessageHandler {
       if (processingFlavorSet.contains(ProcessingFlavor.CANTALOUPE)) {
         strictDate = false;
       }
-      {
-        String patientNameLast = reader.getValue(5, 1);
-        String patientNameFirst = reader.getValue(5, 2);
-        String patientNameMiddle = reader.getValue(5, 3);
-        String patientPhone = reader.getValue(13, 6) + reader.getValue(13, 7);
-        String telUseCode = reader.getValue(13, 2);
-        if (patientPhone.length() >= 0) {
-          if (!telUseCode.equals("PRN")) {
-            ProcessingException pe = new ProcessingException(
-                "Patient phone telecommunication type must be PRN ", "PID", 1, 13);
-            if (!processingFlavorSet.contains(ProcessingFlavor.QUINZE)) {
-              pe.setWarning();
-            }
-            processingExceptionList.add(pe);
-          }
+      PatientReported patientReported = null;
 
-          {
-            int countNums = 0;
-            boolean invalidCharFound = false;
-            char invalidChar = ' ';
-            for (char c : patientPhone.toCharArray()) {
-              if (c >= '0' && c <= '9') {
-                countNums++;
-              } else if (c != '-' && c != '.' && c != ' ' && c != '(' && c != ')') {
-                if (!invalidCharFound) {
-                  invalidCharFound = true;
-                  invalidChar = c;
-                }
-              }
-            }
-            if (!invalidCharFound) {
-              ProcessingException pe = new ProcessingException(
-                  "Patient phone number has unexpected character: " + invalidChar, "PID", 1, 13);
-              pe.setWarning();
-              processingExceptionList.add(pe);
-            }
-            if (countNums != 10 || patientPhone.startsWith("555") || patientPhone.startsWith("0")
-                || patientPhone.startsWith("1")) {
-              ProcessingException pe = new ProcessingException(
-                  "Patient phone number does not appear to be valid", "PID", 1, 13);
-              pe.setWarning();
-              processingExceptionList.add(pe);
-            }
-          }
-        }
-        if (!telUseCode.equals("PRN")) {
-          patientPhone = "";
-        }
-
-        if (patientNameLast.equals("")) {
-          throw new ProcessingException(
-              "Patient last name was not found, required for accepting patient and vaccination history",
-              "PID", 1, 5);
-        }
-        if (patientNameFirst.equals("")) {
-          throw new ProcessingException(
-              "Patient first name was not found, required for accepting patient and vaccination history",
-              "PID", 1, 5);
-        }
+      patientReported = processPatient(orgAccess, reader, processingExceptionList,
+          processingFlavorSet, codeMap, strictDate, patientReported);
 
 
-        String zip = reader.getValue(11, 5);
-        if (zip.length() > 5) {
-          zip = zip.substring(0, 5);
-        }
-        String addressFragPrep = reader.getValue(11, 1);
-        String addressFrag = "";
-        {
-          int spaceIndex = addressFragPrep.indexOf(" ");
-          if (spaceIndex > 0) {
-            addressFragPrep = addressFragPrep.substring(0, spaceIndex);
-          }
-          addressFrag = zip + ":" + addressFragPrep;
-        }
-        Date patientBirthDate;
-        patientBirthDate = parseDateError(reader.getValue(7), "Bad format for date of birth", "PID",
-            1, 7, strictDate);
-        if (patientBirthDate.after(new Date())) {
-          throw new ProcessingException(
-              "Patient is indicated as being born in the future, unable to record patients who are not yet born",
-              "PID", 1, 7);
-        }
-        patient.setPatientAddressFrag(addressFrag);
-        patient.setPatientNameLast(patientNameLast);
-        patient.setPatientNameFirst(patientNameFirst);
-        patient.setPatientNameMiddle(patientNameMiddle);
-        patient.setPatientPhoneFrag(patientPhone);
-        patient.setPatientBirthDate(patientBirthDate);
-        patient.setPatientSoundexFirst(""); // TODO, later
-        patient.setPatientSoundexLast(""); // TODO, later
-        patientReported.setPatientReportedExternalLink(patientReportedExternalLink);
-        patientReported.setPatientReportedType(patientReportedType);
-        patientReported.setPatientNameFirst(patientNameFirst);
-        patientReported.setPatientNameLast(patientNameLast);
-        patientReported.setPatientNameMiddle(patientNameMiddle);
-        patientReported.setPatientMotherMaiden(reader.getValue(6));
-        patientReported.setPatientBirthDate(patientBirthDate);
-        patientReported.setPatientSex(reader.getValue(8));
-        patientReported.setPatientRace(reader.getValue(10));
-        patientReported.setPatientAddressLine1(reader.getValue(11, 1));
-        patientReported.setPatientAddressLine2(reader.getValue(11, 2));
-        patientReported.setPatientAddressCity(reader.getValue(11, 3));
-        patientReported.setPatientAddressState(reader.getValue(11, 4));
-        patientReported.setPatientAddressZip(reader.getValue(11, 5));
-        patientReported.setPatientAddressCountry(reader.getValue(11, 6));
-        patientReported.setPatientAddressCountyParish(reader.getValue(11, 9));
-        patientReported.setPatientEthnicity(reader.getValue(22));
-        patientReported.setPatientBirthFlag(reader.getValue(24));
-        patientReported.setPatientBirthOrder(reader.getValue(25));
-        patientReported.setPatientDeathDate(parseDateWarn(reader.getValue(29),
-            "Invalid patient death date", "PID", 1, 29, strictDate, processingExceptionList));
-        patientReported.setPatientDeathFlag(reader.getValue(30));
-        patientReported.setPatientEmail(reader.getValueBySearchingRepeats(13, 4, "NET", 2));
-        patientReported.setPatientPhone(patientPhone);
-        patientReported.setPatientReportedAuthority(patientReportedAuthority);
 
-        {
-          String patientSex = patientReported.getPatientSex();
-          if (!ValidValues.verifyValidValue(patientSex, ValidValues.SEX)) {
-            ProcessingException pe =
-                new ProcessingException("Patient sex '" + patientSex + "' is not recognized", "PID",
-                    1, 8).setWarning();
-            if (processingFlavorSet.contains(ProcessingFlavor.ELDERBERRIES)) {
-              pe.setWarning();
-            }
-            processingExceptionList.add(pe);
-          }
-        }
-
-        String patientAddressCountry = patientReported.getPatientAddressCountry();
-        if (!patientAddressCountry.equals("")) {
-          if (!ValidValues.verifyValidValue(patientAddressCountry, ValidValues.COUNTRY_2DIGIT)
-              && !ValidValues.verifyValidValue(patientAddressCountry, ValidValues.COUNTRY_3DIGIT)) {
-            ProcessingException pe =
-                new ProcessingException("Patient address country '" + patientAddressCountry
-                    + "' is not recognized and cannot be accepted", "PID", 1, 11);
-            if (processingFlavorSet.contains(ProcessingFlavor.GUAVA)) {
-              pe.setWarning();
-            }
-            processingExceptionList.add(pe);
-          }
-        }
-        if (patientAddressCountry.equals("") || patientAddressCountry.equals("US")
-            || patientAddressCountry.equals("USA")) {
-          String patientAddressState = patientReported.getPatientAddressState();
-          if (!patientAddressState.equals("")) {
-            if (!ValidValues.verifyValidValue(patientAddressState, ValidValues.STATE)) {
-              ProcessingException pe =
-                  new ProcessingException("Patient address state '" + patientAddressState
-                      + "' is not recognized and cannot be accepted", "PID", 1, 11);
-              if (processingFlavorSet.contains(ProcessingFlavor.GUAVA)) {
-                pe.setWarning();
-              }
-              processingExceptionList.add(pe);
-            }
-          }
-        }
-
-
-        {
-          String race = patientReported.getPatientRace();
-          if (!race.equals("")) {
-            Code raceCode = codeMap.getCodeForCodeset(CodesetType.PATIENT_RACE, race);
-            if (raceCode == null
-                || CodeStatusValue.getBy(raceCode.getCodeStatus()) != CodeStatusValue.VALID) {
-              ProcessingException pe = new ProcessingException(
-                  "Invalid race '" + race + "', message cannot be accepted", "PID", 1, 10);
-              if (!processingFlavorSet.contains(ProcessingFlavor.FIG)) {
-                pe.setWarning();
-              }
-              processingExceptionList.add(pe);
-            }
-          }
-        }
-
-        {
-          String ethnicity = patientReported.getPatientEthnicity();
-          if (!ethnicity.equals("")) {
-            Code ethnicityCode =
-                codeMap.getCodeForCodeset(CodesetType.PATIENT_ETHNICITY, ethnicity);
-            if (ethnicityCode == null
-                || CodeStatusValue.getBy(ethnicityCode.getCodeStatus()) != CodeStatusValue.VALID) {
-              ProcessingException pe = new ProcessingException(
-                  "Invalid ethnicity '" + ethnicity + "', message cannot be accepted", "PID", 1,
-                  10);
-              if (!processingFlavorSet.contains(ProcessingFlavor.FIG)) {
-                pe.setWarning();
-              }
-              processingExceptionList.add(pe);
-            }
-          }
-        }
-
-        if (processingFlavorSet.contains(ProcessingFlavor.BLACKBERRY)) {
-          if (patientReported.getPatientAddressLine1().equals("")
-              || patientReported.getPatientAddressCity().equals("")
-              || patientReported.getPatientAddressState().equals("")
-              || patientReported.getPatientAddressZip().equals("")) {
-            throw new ProcessingException("Patient address is required but it was not sent", "PID",
-                1, 11);
-          }
-        }
-
-        {
-          String birthFlag = patientReported.getPatientBirthFlag();
-          String birthOrder = patientReported.getPatientBirthOrder();
-          if (!birthFlag.equals("") || !birthOrder.equals("")) {
-            if (birthFlag.equals("") || birthFlag.equals("N")) {
-              // The only acceptable value here is now blank or 1
-              if (!birthOrder.equals("1") && !birthOrder.equals("")) {
-                ProcessingException pe = new ProcessingException("Birth order was specified as "
-                    + birthOrder + " but not indicated as multiple birth", "PID", 1, 25);
-                if (processingFlavorSet.contains(ProcessingFlavor.PLANTAIN)) {
-                  pe.setWarning();
-                }
-                processingExceptionList.add(pe);
-              }
-            } else if (birthFlag.equals("Y")) {
-              if (birthOrder.equals("")) {
-                ProcessingException pe = new ProcessingException(
-                    "Multiple birth but birth order was not specified", "PID", 1, 24);
-                pe.setWarning();
-                processingExceptionList.add(pe);
-              } else if (!ValidValues.verifyValidValue(birthOrder, ValidValues.BIRTH_ORDER)) {
-                ProcessingException pe =
-                    new ProcessingException("Birth order was specified as " + birthOrder
-                        + " but not an expected value, must be between 1 and 9", "PID", 1, 25);
-                if (processingFlavorSet.contains(ProcessingFlavor.PLANTAIN)) {
-                  pe.setWarning();
-                }
-                processingExceptionList.add(pe);
-              }
-            } else {
-              ProcessingException pe = new ProcessingException(
-                  "Multiple birth indicator " + birthFlag + " is not recognized", "PID", 1, 24);
-              if (processingFlavorSet.contains(ProcessingFlavor.PLANTAIN)) {
-                pe.setWarning();
-              }
-              processingExceptionList.add(pe);
-            }
-          }
-        }
-
-      }
-      if (reader.advanceToSegment("PD1")) {
-        patientReported.setPublicityIndicator(reader.getValue(11));
-        patientReported.setProtectionIndicator(reader.getValue(12));
-        patientReported.setProtectionIndicatorDate(
-            parseDateWarn(reader.getValue(13), "Invalid protection indicator date", "PD1", 1, 13,
-                strictDate, processingExceptionList));
-        patientReported.setRegistryStatusIndicator(reader.getValue(16));
-        patientReported.setRegistryStatusIndicatorDate(
-            parseDateWarn(reader.getValue(17), "Invalid registry status indicator date", "PD1", 1,
-                17, strictDate, processingExceptionList));
-        patientReported.setPublicityIndicatorDate(parseDateWarn(reader.getValue(18),
-            "Invalid publicity indicator date", "PD1", 1, 18, strictDate, processingExceptionList));
-      }
-      reader.resetPostion();
-      {
-        int repeatCount = 0;
-        while (reader.advanceToSegment("NK1")) {
-          patientReported.setGuardianLast(reader.getValue(2, 1));
-          patientReported.setGuardianFirst(reader.getValue(2, 2));
-          patientReported.setGuardianMiddle(reader.getValue(2, 1));
-          String guardianRelationship = reader.getValue(3);
-          patientReported.setGuardianRelationship(guardianRelationship);
-          repeatCount++;
-          if (patientReported.getGuardianLast().equals("")) {
-            ProcessingException pe =
-                new ProcessingException("Next-of-kin last name is empty", "NK1", repeatCount, 2)
-                    .setWarning();
-            processingExceptionList.add(pe);
-          }
-          if (patientReported.getGuardianFirst().equals("")) {
-            ProcessingException pe =
-                new ProcessingException("Next-of-kin first name is empty", "NK1", repeatCount, 2)
-                    .setWarning();
-            processingExceptionList.add(pe);
-          }
-          if (guardianRelationship.equals("")) {
-            ProcessingException pe =
-                new ProcessingException("Next-of-kin relationship is empty", "NK1", repeatCount, 3)
-                    .setWarning();
-            processingExceptionList.add(pe);
-          }
-          if (guardianRelationship.equals("MTH") || guardianRelationship.equals("FTH")
-              || guardianRelationship.equals("GRD")) {
-            break;
-          } else {
-            ProcessingException pe = new ProcessingException((guardianRelationship.equals("")
-                ? "Next-of-kin relationship not specified so is not recognized as guardian and will be ignored"
-                : ("Next-of-kin relationship '" + guardianRelationship
-                    + "' is not a recognized guardian and will be ignored")),
-                "NK1", repeatCount, 3).setWarning();
-            processingExceptionList.add(pe);
-          }
-        }
-      }
-      reader.resetPostion();
-
-      verifyNoErrors(processingExceptionList);
-
-      patientReported.setUpdatedDate(new Date());
-      {
-        Transaction transaction = dataSession.beginTransaction();
-        dataSession.saveOrUpdate(patient);
-        dataSession.saveOrUpdate(patientReported);
-        transaction.commit();
-      }
       int orcCount = 0;
       int rxaCount = 0;
       int obxCount = 0;
@@ -640,7 +291,7 @@ public class IncomingMessageHandler {
           }
           if (vaccineCode.equals("998")) {
             obxCount = readAndCreateObservations(reader, processingExceptionList, patientReported,
-                patient, strictDate, obxCount, null, null);
+                strictDate, obxCount, null, null);
             continue;
           }
           if (vaccinationReportedExternalLink.equals("")) {
@@ -674,7 +325,7 @@ public class IncomingMessageHandler {
             vaccinationReported.setVaccinationReportedExternalLink(vaccinationReportedExternalLink);
           }
           vaccinationReported.setPatientReported(patientReported);
-          vaccination.setPatient(patient);
+          vaccination.setPatient(patientReported.getPatient());
 
           String vaccineCvxCode = "";
           String vaccineNdcCode = "";
@@ -824,7 +475,8 @@ public class IncomingMessageHandler {
                   "RXA", rxaCount, 0);
             }
           }
-          if (vaccinationReported.getAdministeredDate().before(patient.getPatientBirthDate())
+          if (vaccinationReported.getAdministeredDate()
+              .before(patientReported.getPatientBirthDate())
               && !processingFlavorSet.contains(ProcessingFlavor.CLEMENTINE)) {
             throw new ProcessingException(
                 "Vaccination is reported as having been administered before the patient was born",
@@ -893,7 +545,7 @@ public class IncomingMessageHandler {
 
           reader.gotoSegmentPosition(segmentPosition);
           obxCount = readAndCreateObservations(reader, processingExceptionList, patientReported,
-              patient, strictDate, obxCount, vaccinationReported, vaccination);
+              strictDate, obxCount, vaccinationReported, vaccination);
         } else {
           throw new ProcessingException("RXA segment was not found after ORC segment", "ORC",
               orcCount, 0);
@@ -923,17 +575,425 @@ public class IncomingMessageHandler {
     }
   }
 
+  public PatientReported processPatient(OrgAccess orgAccess, HL7Reader reader,
+      List<ProcessingException> processingExceptionList, Set<ProcessingFlavor> processingFlavorSet,
+      CodeMap codeMap, boolean strictDate, PatientReported patientReported)
+      throws ProcessingException {
+    PatientMaster patient = null;
+    String patientReportedExternalLink = "";
+    String patientReportedAuthority = "";
+    String patientReportedType = "MR";
+    if (reader.advanceToSegment("PID")) {
+      patientReportedExternalLink = reader.getValueBySearchingRepeats(3, 1, patientReportedType, 5);
+      patientReportedAuthority = reader.getValueBySearchingRepeats(3, 4, patientReportedType, 5);
+      if (patientReportedExternalLink.equals("")) {
+        patientReportedAuthority = "";
+        patientReportedType = "PT";
+        patientReportedExternalLink =
+            reader.getValueBySearchingRepeats(3, 1, patientReportedType, 5);
+        patientReportedAuthority = reader.getValueBySearchingRepeats(3, 4, patientReportedType, 5);
+        if (patientReportedExternalLink.equals("")) {
+          patientReportedAuthority = "";
+          patientReportedType = "PI";
+          patientReportedExternalLink =
+              reader.getValueBySearchingRepeats(3, 1, patientReportedType, 5);
+          patientReportedAuthority = reader.getValueBySearchingRepeats(3, 4, patientReportedType, 5);
+          if (patientReportedExternalLink.equals("")) {
+            throw new ProcessingException(
+                "MRN was not found, required for accepting vaccination report", "PID", 1, 3);
+          }
+        }
+      }
+    } else {
+      throw new ProcessingException(
+          "No PID segment found, required for accepting vaccination report", "", 0, 0);
+    }
+
+
+    {
+      Query query = dataSession.createQuery(
+          "from PatientReported where orgReported = ? and patientReportedExternalLink = ?");
+      query.setParameter(0, orgAccess.getOrg());
+      query.setParameter(1, patientReportedExternalLink);
+      List<PatientReported> patientReportedList = query.list();
+      if (patientReportedList.size() > 0) {
+        patientReported = patientReportedList.get(0);
+        patient = patientReported.getPatient();
+      }
+    }
+
+    if (patientReported == null) {
+      patient = new PatientMaster();
+      patient.setPatientExternalLink(generatePatientExternalLink());
+      patient.setOrgMaster(orgAccess.getOrg());
+      patientReported = new PatientReported();
+      patientReported.setOrgReported(orgAccess.getOrg());
+      patientReported.setPatientReportedExternalLink(patientReportedExternalLink);
+      patientReported.setPatient(patient);
+      patientReported.setReportedDate(new Date());
+    }
+
+    {
+      String patientNameLast = reader.getValue(5, 1);
+      String patientNameFirst = reader.getValue(5, 2);
+      String patientNameMiddle = reader.getValue(5, 3);
+      String patientPhone = reader.getValue(13, 6) + reader.getValue(13, 7);
+      String telUseCode = reader.getValue(13, 2);
+      if (patientPhone.length() >= 0) {
+        if (!telUseCode.equals("PRN")) {
+          ProcessingException pe = new ProcessingException(
+              "Patient phone telecommunication type must be PRN ", "PID", 1, 13);
+          if (!processingFlavorSet.contains(ProcessingFlavor.QUINZE)) {
+            pe.setWarning();
+          }
+          processingExceptionList.add(pe);
+        }
+
+        {
+          int countNums = 0;
+          boolean invalidCharFound = false;
+          char invalidChar = ' ';
+          for (char c : patientPhone.toCharArray()) {
+            if (c >= '0' && c <= '9') {
+              countNums++;
+            } else if (c != '-' && c != '.' && c != ' ' && c != '(' && c != ')') {
+              if (!invalidCharFound) {
+                invalidCharFound = true;
+                invalidChar = c;
+              }
+            }
+          }
+          if (!invalidCharFound) {
+            ProcessingException pe = new ProcessingException(
+                "Patient phone number has unexpected character: " + invalidChar, "PID", 1, 13);
+            pe.setWarning();
+            processingExceptionList.add(pe);
+          }
+          if (countNums != 10 || patientPhone.startsWith("555") || patientPhone.startsWith("0")
+              || patientPhone.startsWith("1")) {
+            ProcessingException pe = new ProcessingException(
+                "Patient phone number does not appear to be valid", "PID", 1, 13);
+            pe.setWarning();
+            processingExceptionList.add(pe);
+          }
+        }
+      }
+      if (!telUseCode.equals("PRN")) {
+        patientPhone = "";
+      }
+
+      if (patientNameLast.equals("")) {
+        throw new ProcessingException(
+            "Patient last name was not found, required for accepting patient and vaccination history",
+            "PID", 1, 5);
+      }
+      if (patientNameFirst.equals("")) {
+        throw new ProcessingException(
+            "Patient first name was not found, required for accepting patient and vaccination history",
+            "PID", 1, 5);
+      }
+
+
+      String zip = reader.getValue(11, 5);
+      if (zip.length() > 5) {
+        zip = zip.substring(0, 5);
+      }
+      String addressFragPrep = reader.getValue(11, 1);
+      String addressFrag = "";
+      {
+        int spaceIndex = addressFragPrep.indexOf(" ");
+        if (spaceIndex > 0) {
+          addressFragPrep = addressFragPrep.substring(0, spaceIndex);
+        }
+        addressFrag = zip + ":" + addressFragPrep;
+      }
+      Date patientBirthDate;
+      patientBirthDate = parseDateError(reader.getValue(7), "Bad format for date of birth", "PID",
+          1, 7, strictDate);
+      if (patientBirthDate.after(new Date())) {
+        throw new ProcessingException(
+            "Patient is indicated as being born in the future, unable to record patients who are not yet born",
+            "PID", 1, 7);
+      }
+      patient.setPatientAddressFrag(addressFrag);
+      patient.setPatientNameLast(patientNameLast);
+      patient.setPatientNameFirst(patientNameFirst);
+      patient.setPatientNameMiddle(patientNameMiddle);
+      patient.setPatientPhoneFrag(patientPhone);
+      patient.setPatientBirthDate(patientBirthDate);
+      patient.setPatientSoundexFirst(""); // TODO, later
+      patient.setPatientSoundexLast(""); // TODO, later
+      patientReported.setPatientReportedExternalLink(patientReportedExternalLink);
+      patientReported.setPatientReportedType(patientReportedType);
+      patientReported.setPatientNameFirst(patientNameFirst);
+      patientReported.setPatientNameLast(patientNameLast);
+      patientReported.setPatientNameMiddle(patientNameMiddle);
+      patientReported.setPatientMotherMaiden(reader.getValue(6));
+      patientReported.setPatientBirthDate(patientBirthDate);
+      patientReported.setPatientSex(reader.getValue(8));
+      patientReported.setPatientRace(reader.getValue(10));
+      patientReported.setPatientAddressLine1(reader.getValue(11, 1));
+      patientReported.setPatientAddressLine2(reader.getValue(11, 2));
+      patientReported.setPatientAddressCity(reader.getValue(11, 3));
+      patientReported.setPatientAddressState(reader.getValue(11, 4));
+      patientReported.setPatientAddressZip(reader.getValue(11, 5));
+      patientReported.setPatientAddressCountry(reader.getValue(11, 6));
+      patientReported.setPatientAddressCountyParish(reader.getValue(11, 9));
+      patientReported.setPatientEthnicity(reader.getValue(22));
+      patientReported.setPatientBirthFlag(reader.getValue(24));
+      patientReported.setPatientBirthOrder(reader.getValue(25));
+      patientReported.setPatientDeathDate(parseDateWarn(reader.getValue(29),
+          "Invalid patient death date", "PID", 1, 29, strictDate, processingExceptionList));
+      patientReported.setPatientDeathFlag(reader.getValue(30));
+      patientReported.setPatientEmail(reader.getValueBySearchingRepeats(13, 4, "NET", 2));
+      patientReported.setPatientPhone(patientPhone);
+      patientReported.setPatientReportedAuthority(patientReportedAuthority);
+
+      {
+        String patientSex = patientReported.getPatientSex();
+        if (!ValidValues.verifyValidValue(patientSex, ValidValues.SEX)) {
+          ProcessingException pe =
+              new ProcessingException("Patient sex '" + patientSex + "' is not recognized", "PID",
+                  1, 8).setWarning();
+          if (processingFlavorSet.contains(ProcessingFlavor.ELDERBERRIES)) {
+            pe.setWarning();
+          }
+          processingExceptionList.add(pe);
+        }
+      }
+
+      String patientAddressCountry = patientReported.getPatientAddressCountry();
+      if (!patientAddressCountry.equals("")) {
+        if (!ValidValues.verifyValidValue(patientAddressCountry, ValidValues.COUNTRY_2DIGIT)
+            && !ValidValues.verifyValidValue(patientAddressCountry, ValidValues.COUNTRY_3DIGIT)) {
+          ProcessingException pe = new ProcessingException("Patient address country '"
+              + patientAddressCountry + "' is not recognized and cannot be accepted", "PID", 1, 11);
+          if (processingFlavorSet.contains(ProcessingFlavor.GUAVA)) {
+            pe.setWarning();
+          }
+          processingExceptionList.add(pe);
+        }
+      }
+      if (patientAddressCountry.equals("") || patientAddressCountry.equals("US")
+          || patientAddressCountry.equals("USA")) {
+        String patientAddressState = patientReported.getPatientAddressState();
+        if (!patientAddressState.equals("")) {
+          if (!ValidValues.verifyValidValue(patientAddressState, ValidValues.STATE)) {
+            ProcessingException pe = new ProcessingException("Patient address state '"
+                + patientAddressState + "' is not recognized and cannot be accepted", "PID", 1, 11);
+            if (processingFlavorSet.contains(ProcessingFlavor.GUAVA)) {
+              pe.setWarning();
+            }
+            processingExceptionList.add(pe);
+          }
+        }
+      }
+
+
+      {
+        String race = patientReported.getPatientRace();
+        if (!race.equals("")) {
+          Code raceCode = codeMap.getCodeForCodeset(CodesetType.PATIENT_RACE, race);
+          if (raceCode == null
+              || CodeStatusValue.getBy(raceCode.getCodeStatus()) != CodeStatusValue.VALID) {
+            ProcessingException pe = new ProcessingException(
+                "Invalid race '" + race + "', message cannot be accepted", "PID", 1, 10);
+            if (!processingFlavorSet.contains(ProcessingFlavor.FIG)) {
+              pe.setWarning();
+            }
+            processingExceptionList.add(pe);
+          }
+        }
+      }
+
+      {
+        String ethnicity = patientReported.getPatientEthnicity();
+        if (!ethnicity.equals("")) {
+          Code ethnicityCode = codeMap.getCodeForCodeset(CodesetType.PATIENT_ETHNICITY, ethnicity);
+          if (ethnicityCode == null
+              || CodeStatusValue.getBy(ethnicityCode.getCodeStatus()) != CodeStatusValue.VALID) {
+            ProcessingException pe = new ProcessingException(
+                "Invalid ethnicity '" + ethnicity + "', message cannot be accepted", "PID", 1, 10);
+            if (!processingFlavorSet.contains(ProcessingFlavor.FIG)) {
+              pe.setWarning();
+            }
+            processingExceptionList.add(pe);
+          }
+        }
+      }
+
+      if (processingFlavorSet.contains(ProcessingFlavor.BLACKBERRY)) {
+        if (patientReported.getPatientAddressLine1().equals("")
+            || patientReported.getPatientAddressCity().equals("")
+            || patientReported.getPatientAddressState().equals("")
+            || patientReported.getPatientAddressZip().equals("")) {
+          throw new ProcessingException("Patient address is required but it was not sent", "PID", 1,
+              11);
+        }
+      }
+
+      {
+        String birthFlag = patientReported.getPatientBirthFlag();
+        String birthOrder = patientReported.getPatientBirthOrder();
+        if (!birthFlag.equals("") || !birthOrder.equals("")) {
+          if (birthFlag.equals("") || birthFlag.equals("N")) {
+            // The only acceptable value here is now blank or 1
+            if (!birthOrder.equals("1") && !birthOrder.equals("")) {
+              ProcessingException pe = new ProcessingException("Birth order was specified as "
+                  + birthOrder + " but not indicated as multiple birth", "PID", 1, 25);
+              if (processingFlavorSet.contains(ProcessingFlavor.PLANTAIN)) {
+                pe.setWarning();
+              }
+              processingExceptionList.add(pe);
+            }
+          } else if (birthFlag.equals("Y")) {
+            if (birthOrder.equals("")) {
+              ProcessingException pe = new ProcessingException(
+                  "Multiple birth but birth order was not specified", "PID", 1, 24);
+              pe.setWarning();
+              processingExceptionList.add(pe);
+            } else if (!ValidValues.verifyValidValue(birthOrder, ValidValues.BIRTH_ORDER)) {
+              ProcessingException pe =
+                  new ProcessingException("Birth order was specified as " + birthOrder
+                      + " but not an expected value, must be between 1 and 9", "PID", 1, 25);
+              if (processingFlavorSet.contains(ProcessingFlavor.PLANTAIN)) {
+                pe.setWarning();
+              }
+              processingExceptionList.add(pe);
+            }
+          } else {
+            ProcessingException pe = new ProcessingException(
+                "Multiple birth indicator " + birthFlag + " is not recognized", "PID", 1, 24);
+            if (processingFlavorSet.contains(ProcessingFlavor.PLANTAIN)) {
+              pe.setWarning();
+            }
+            processingExceptionList.add(pe);
+          }
+        }
+      }
+
+    }
+    if (reader.advanceToSegment("PD1")) {
+      patientReported.setPublicityIndicator(reader.getValue(11));
+      patientReported.setProtectionIndicator(reader.getValue(12));
+      patientReported.setProtectionIndicatorDate(parseDateWarn(reader.getValue(13),
+          "Invalid protection indicator date", "PD1", 1, 13, strictDate, processingExceptionList));
+      patientReported.setRegistryStatusIndicator(reader.getValue(16));
+      patientReported.setRegistryStatusIndicatorDate(
+          parseDateWarn(reader.getValue(17), "Invalid registry status indicator date", "PD1", 1, 17,
+              strictDate, processingExceptionList));
+      patientReported.setPublicityIndicatorDate(parseDateWarn(reader.getValue(18),
+          "Invalid publicity indicator date", "PD1", 1, 18, strictDate, processingExceptionList));
+    }
+    reader.resetPostion();
+    {
+      int repeatCount = 0;
+      while (reader.advanceToSegment("NK1")) {
+        patientReported.setGuardianLast(reader.getValue(2, 1));
+        patientReported.setGuardianFirst(reader.getValue(2, 2));
+        patientReported.setGuardianMiddle(reader.getValue(2, 1));
+        String guardianRelationship = reader.getValue(3);
+        patientReported.setGuardianRelationship(guardianRelationship);
+        repeatCount++;
+        if (patientReported.getGuardianLast().equals("")) {
+          ProcessingException pe =
+              new ProcessingException("Next-of-kin last name is empty", "NK1", repeatCount, 2)
+                  .setWarning();
+          processingExceptionList.add(pe);
+        }
+        if (patientReported.getGuardianFirst().equals("")) {
+          ProcessingException pe =
+              new ProcessingException("Next-of-kin first name is empty", "NK1", repeatCount, 2)
+                  .setWarning();
+          processingExceptionList.add(pe);
+        }
+        if (guardianRelationship.equals("")) {
+          ProcessingException pe =
+              new ProcessingException("Next-of-kin relationship is empty", "NK1", repeatCount, 3)
+                  .setWarning();
+          processingExceptionList.add(pe);
+        }
+        if (guardianRelationship.equals("MTH") || guardianRelationship.equals("FTH")
+            || guardianRelationship.equals("GRD")) {
+          break;
+        } else {
+          ProcessingException pe = new ProcessingException((guardianRelationship.equals("")
+              ? "Next-of-kin relationship not specified so is not recognized as guardian and will be ignored"
+              : ("Next-of-kin relationship '" + guardianRelationship
+                  + "' is not a recognized guardian and will be ignored")),
+              "NK1", repeatCount, 3).setWarning();
+          processingExceptionList.add(pe);
+        }
+      }
+    }
+    reader.resetPostion();
+
+    verifyNoErrors(processingExceptionList);
+
+    patientReported.setUpdatedDate(new Date());
+    {
+      Transaction transaction = dataSession.beginTransaction();
+      dataSession.saveOrUpdate(patient);
+      dataSession.saveOrUpdate(patientReported);
+      transaction.commit();
+    }
+    return patientReported;
+  }
+
+  public String processORU(OrgAccess orgAccess, HL7Reader reader, String message) {
+    List<ProcessingException> processingExceptionList = new ArrayList<>();
+    try {
+      Set<ProcessingFlavor> processingFlavorSet = orgAccess.getOrg().getProcessingFlavorSet();
+
+      CodeMap codeMap = CodeMapManager.getCodeMap();
+
+      boolean strictDate = true;
+      if (processingFlavorSet.contains(ProcessingFlavor.CANTALOUPE)) {
+        strictDate = false;
+      }
+      PatientReported patientReported = null;
+
+      patientReported = processPatient(orgAccess, reader, processingExceptionList,
+          processingFlavorSet, codeMap, strictDate, patientReported);
+
+      int orcCount = 0;
+      int obrCount = 0;
+      int obxCount = 0;
+      while (reader.advanceToSegment("ORC")) {
+        orcCount++;
+        if (reader.advanceToSegment("OBR", "ORC")) {
+          obrCount++;
+          obxCount = readAndCreateObservations(reader, processingExceptionList, patientReported,
+              strictDate, obxCount, null, null);
+        } else {
+          throw new ProcessingException("OBR segment was not found after ORC segment", "ORC",
+              orcCount, 0);
+        }
+      }
+      String ack = buildAck(reader, processingExceptionList);
+      recordMessageReceived(message, patientReported, ack, "Update", "Ack", orgAccess.getOrg());
+      return ack;
+    } catch (ProcessingException e) {
+      if (!processingExceptionList.contains(e)) {
+        processingExceptionList.add(e);
+      }
+      String ack = buildAck(reader, processingExceptionList);
+      recordMessageReceived(message, null, ack, "Update", "Exception", orgAccess.getOrg());
+      return ack;
+    }
+  }
+
   public int readAndCreateObservations(HL7Reader reader,
       List<ProcessingException> processingExceptionList, PatientReported patientReported,
-      PatientMaster patient, boolean strictDate, int obxCount,
-      VaccinationReported vaccinationReported, VaccinationMaster vaccination) {
+      boolean strictDate, int obxCount, VaccinationReported vaccinationReported,
+      VaccinationMaster vaccination) {
     while (reader.advanceToSegment("OBX", "ORC")) {
       obxCount++;
       String identifierCode = reader.getValue(3);
       String valueCode = reader.getValue(5);
       ObservationMaster observation =
-          readObservations(reader, processingExceptionList, patientReported, patient, strictDate,
-              obxCount, vaccinationReported, vaccination, identifierCode, valueCode);
+          readObservations(reader, processingExceptionList, patientReported, strictDate, obxCount,
+              vaccinationReported, vaccination, identifierCode, valueCode);
       if (observation.getIdentifierCode().equals("30945-0")) // contraindication!
       {
         CodeMap codeMap = CodeMapManager.getCodeMap();
@@ -979,9 +1039,8 @@ public class IncomingMessageHandler {
 
   public ObservationMaster readObservations(HL7Reader reader,
       List<ProcessingException> processingExceptionList, PatientReported patientReported,
-      PatientMaster patient, boolean strictDate, int obxCount,
-      VaccinationReported vaccinationReported, VaccinationMaster vaccination, String identifierCode,
-      String valueCode) {
+      boolean strictDate, int obxCount, VaccinationReported vaccinationReported,
+      VaccinationMaster vaccination, String identifierCode, String valueCode) {
     ObservationMaster observation;
     String q;
     if (vaccination == null) {
@@ -992,7 +1051,7 @@ public class IncomingMessageHandler {
           + "and identifierCode = :identifierCode";
     }
     Query query = dataSession.createQuery(q);
-    query.setParameter("patient", patient);
+    query.setParameter("patient", patientReported.getPatient());
     if (vaccination != null) {
       query.setParameter("vaccination", vaccination);
     }
@@ -1004,7 +1063,7 @@ public class IncomingMessageHandler {
       observationReported = observation.getObservationReported();
     } else {
       observation = new ObservationMaster();
-      observation.setPatient(patient);
+      observation.setPatient(patientReported.getPatient());
       observation.setVaccination(vaccination);
       observation.setIdentifierCode(identifierCode);
       observationReported = new ObservationReported();

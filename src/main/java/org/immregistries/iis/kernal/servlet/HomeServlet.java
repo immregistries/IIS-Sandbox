@@ -50,7 +50,7 @@ public class HomeServlet extends HttpServlet {
           out.println("    <h2>Documentation</h2>");
           out.println("    <p class=\"w3-left-align\">Please see the project wiki: "
               + "<a href=\"https://github.com/immregistries/IIS-Sandbox/wiki\">https://github.com/immregistries/IIS-Sandbox/wiki</a></p>");
-          out.println("    <h2>Functions Supported</h2>");
+          out.println("    <h2>Primary Functions Supported</h2>");
           out.println("    <ul class=\"w3-ul w3-hoverable\">");
           out.println("      <li><a href=\"pop\">Send Now</a>: Send an HL7 message in now.</li>");
           out.println(
@@ -59,6 +59,11 @@ public class HomeServlet extends HttpServlet {
               "      <li><a href=\"patient\">Patients</a>: See data received by patient</li>");
           out.println(
               "      <li><a href=\"soap\">CDC WSDL</a>: HL7 realtime interfacing using CDC WSDL</li>");
+          out.println("    </ul>");
+          out.println("    <h3>Secondary Functions Supported</h3>");
+          out.println("    <ul class=\"w3-ul w3-hoverable\">");
+          out.println(
+              "      <li><a href=\"lab\">Convert ORU to VXU</a>: Convert an ORU lab message to a VXU. </li>");
           out.println("    </ul>");
 
           out.println("    <h2>Processing Flavors</h2>");

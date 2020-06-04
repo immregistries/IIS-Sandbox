@@ -71,6 +71,7 @@ public enum SnomedValue {
   INCONCLUSIVE("419984006", "Inconclusive"),
   PRESUMPTIVE_POSITIVE("720735008", "Presumptive positive"),
   EQUIVOCAL("42425007", "Equivocal"),
+  HISTORY_OF_SARS_COV_2("292508471000119105", "History of SARS-CoV-2"),
 
   ;
   private String identifierCode;

@@ -379,6 +379,9 @@ public class PatientServlet extends HttpServlet {
               } else {
                 out.println("      " + sdfDate.format(valueDate));
               }
+            } else if (valueType.equals("SN")) {
+              out.println("      " + observationReported.getValueLabel() + " "
+                  + observationReported.getValueTable() + " " + observationReported.getValueCode());
             } else {
               String code = observationReported.getValueCode();
               if (observationReported.getValueLabel().equals("")) {
