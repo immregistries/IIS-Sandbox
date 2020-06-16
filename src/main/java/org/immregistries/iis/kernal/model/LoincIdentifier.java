@@ -121,6 +121,10 @@ public enum LoincIdentifier {
                                    SARS_REL_COV_PLUS_MERS_RNA_RESP_QL_NAA_PLUS_PROBE("94532-9", "SARS-rel CoV+MERS RNA Resp Ql NAA+probe"),
 
 
+                                   TPG_PAND("TPG_PAND", "Priority Group - Pandemic"),
+                                   TPG_POP_GRP("TPG_POP_GRP", "Priority Group - Population Group"),
+                                   TPG_TIER("TPG_TIER", "Priority Group - Tier"),
+
   ;
 
   private static Set<String> suppressIdentifierCodeSet = new HashSet<>();

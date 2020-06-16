@@ -31,7 +31,7 @@ import org.immregistries.iis.kernal.model.PatientReported;
 import org.immregistries.iis.kernal.model.ProcessingFlavor;
 import org.immregistries.iis.kernal.model.VaccinationMaster;
 import org.immregistries.iis.kernal.model.VaccinationReported;
-import org.immregistries.mqe.hl7util.parser.HL7Reader;
+import org.immregistries.smm.tester.manager.HL7Reader;
 import org.immregistries.vfa.connect.ConnectFactory;
 import org.immregistries.vfa.connect.ConnectorInterface;
 import org.immregistries.vfa.connect.model.EvaluationActual;
@@ -663,7 +663,7 @@ public class IncomingMessageHandler {
               }
             }
           }
-          if (!invalidCharFound) {
+          if (invalidCharFound) {
             ProcessingException pe = new ProcessingException(
                 "Patient phone number has unexpected character: " + invalidChar, "PID", 1, 13);
             pe.setWarning();

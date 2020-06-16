@@ -7,4 +7,6 @@ TRUNCATE TABLE patient_reported;
 TRUNCATE TABLE vaccination_master;
 TRUNCATE TABLE vaccination_reported;
 TRUNCATE TABLE message_received;
+TRUNCATE TABLE observation_master;
+TRUNCATE TABLE observation_reported;
 SET FOREIGN_KEY_CHECKS=1;
