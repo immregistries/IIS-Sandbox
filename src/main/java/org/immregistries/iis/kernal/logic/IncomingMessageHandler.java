@@ -1785,7 +1785,7 @@ public class IncomingMessageHandler {
       }
       testCase.setTestEventList(testEventList);
       Software software = new Software();
-      software.setServiceUrl("http://florence.immregistries.org/lonestar/forecast");
+      software.setServiceUrl("https://florence.immregistries.org/lonestar/forecast");
       software.setService(Service.LSVF);
 
       ConnectorInterface connector =
