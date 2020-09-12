@@ -1257,33 +1257,7 @@ public class IncomingMessageHandler {
       if (profileId.equals(RSP_Z32_MATCH)) {
         printQueryNK1(patientReported, sb, codeMap);
       }
-      List<VaccinationMaster> vaccinationMasterList;
-      {
-        vaccinationMasterList = new ArrayList<>();
-        Query query = dataSession.createQuery(
-            "from VaccinationMaster where patient = ? order by vaccinationReported asc");
-        query.setParameter(0, patient);
-        List<VaccinationMaster> vmList = query.list();
-        Map<String, VaccinationMaster> map = new HashMap<>();
-        for (VaccinationMaster vaccinationMaster : vmList) {
-          if (vaccinationMaster.getAdministeredDate() != null) {
-            String key = sdf.format(vaccinationMaster.getAdministeredDate());
-            if (!vaccinationMaster.getVaccineCvxCode().equals("")) {
-              key += key + vaccinationMaster.getVaccineCvxCode();
-              map.put(key, vaccinationMaster);
-            }
-          }
-        }
-        List<String> keyList = new ArrayList<>(map.keySet());
-        Collections.sort(keyList);
-        for (String key : keyList) {
-          vaccinationMasterList.add(map.get(key));
-        }
-
-      }
-
-      // remove obvious duplicates
-
+      List<VaccinationMaster> vaccinationMasterList = getVaccinationMasterList(patient, dataSession);
 
       if (processingFlavorSet.contains(ProcessingFlavor.LEMON)) {
         for (Iterator<VaccinationMaster> it = vaccinationMasterList.iterator(); it.hasNext();) {
@@ -1575,6 +1549,36 @@ public class IncomingMessageHandler {
     recordMessageReceived(messageRecieved, patientReported, messageResponse, "Query",
         categoryResponse, orgAccess.getOrg());
     return messageResponse;
+  }
+
+  public static List<VaccinationMaster> getVaccinationMasterList(PatientMaster patient,
+      Session dataSession) {
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+    List<VaccinationMaster> vaccinationMasterList;
+    {
+      vaccinationMasterList = new ArrayList<>();
+      Query query = dataSession.createQuery(
+          "from VaccinationMaster where patient = ? order by vaccinationReported asc");
+      query.setParameter(0, patient);
+      List<VaccinationMaster> vmList = query.list();
+      Map<String, VaccinationMaster> map = new HashMap<>();
+      for (VaccinationMaster vaccinationMaster : vmList) {
+        if (vaccinationMaster.getAdministeredDate() != null) {
+          String key = sdf.format(vaccinationMaster.getAdministeredDate());
+          if (!vaccinationMaster.getVaccineCvxCode().equals("")) {
+            key += key + vaccinationMaster.getVaccineCvxCode();
+            map.put(key, vaccinationMaster);
+          }
+        }
+      }
+      List<String> keyList = new ArrayList<>(map.keySet());
+      Collections.sort(keyList);
+      for (String key : keyList) {
+        vaccinationMasterList.add(map.get(key));
+      }
+
+    }
+    return vaccinationMasterList;
   }
 
   public void printQueryNK1(PatientReported patientReported, StringBuilder sb, CodeMap codeMap) {

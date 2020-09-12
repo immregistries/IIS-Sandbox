@@ -299,6 +299,13 @@ public class PatientServlet extends HttpServlet {
             printMessageReceived(out, messageReceived);
           }
         }
+
+        {
+          String link = "v2ToFhir?" + V2ToFhirServlet.PARAM_PATIENT_REPORTED_ID + "="
+              + patientReportedSelected.getPatientReportedId();;
+          out.println("<a href=\"" + link + "\">FHIR Bundle</a>");
+        }
+
         out.println("  </div>");
       }
     } catch (Exception e) {
