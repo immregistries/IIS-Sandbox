@@ -64,6 +64,8 @@ public class HomeServlet extends HttpServlet {
           out.println("    <ul class=\"w3-ul w3-hoverable\">");
           out.println(
               "      <li><a href=\"lab\">Convert ORU to VXU</a>: Convert an ORU lab message to a VXU. </li>");
+          out.println(
+              "      <li><a href=\"covid\">COVID-19 Reporting</a>: Export data to demonstrate COVID-19 reporting </li>");
           out.println("    </ul>");
 
           out.println("    <h2>Processing Flavors</h2>");
