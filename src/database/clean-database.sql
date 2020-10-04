@@ -9,4 +9,5 @@ TRUNCATE TABLE vaccination_reported;
 TRUNCATE TABLE message_received;
 TRUNCATE TABLE observation_master;
 TRUNCATE TABLE observation_reported;
+TRUNCATE TABLE org_location;
 SET FOREIGN_KEY_CHECKS=1;

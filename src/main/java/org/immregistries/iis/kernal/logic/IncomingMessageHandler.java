@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -25,6 +26,7 @@ import org.immregistries.iis.kernal.model.MessageReceived;
 import org.immregistries.iis.kernal.model.ObservationMaster;
 import org.immregistries.iis.kernal.model.ObservationReported;
 import org.immregistries.iis.kernal.model.OrgAccess;
+import org.immregistries.iis.kernal.model.OrgLocation;
 import org.immregistries.iis.kernal.model.OrgMaster;
 import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.model.PatientReported;
@@ -431,12 +433,41 @@ public class IncomingMessageHandler {
           }
 
 
-          if (processingFlavorSet.contains(ProcessingFlavor.PEAR)) {
+          {
             String administeredAtLocation = reader.getValue(11, 4);
-            if (!administeredAtLocation.equals("")) {
-              throw new ProcessingException(
-                  "Unrecognized administered at location, unable to accept immunization report",
-                  "RXA", rxaCount, 11);
+            if (StringUtils.isNotEmpty(administeredAtLocation)) {
+              Query query = dataSession.createQuery(
+                  "from OrgLocation where orgMaster = :orgMaster and orgFacilityCode = :orgFacilityCode");
+              query.setParameter("orgMaster", orgAccess.getOrg());
+              query.setParameter("orgFacilityCode", administeredAtLocation);
+              List<OrgLocation> orgMasterList = query.list();
+              OrgLocation orgLocation = null;
+              if (orgMasterList.size() > 0) {
+                orgLocation = orgMasterList.get(0);
+              }
+
+              if (orgLocation == null) {
+                if (processingFlavorSet.contains(ProcessingFlavor.PEAR)) {
+                  throw new ProcessingException(
+                      "Unrecognized administered at location, unable to accept immunization report",
+                      "RXA", rxaCount, 11);
+                }
+                orgLocation = new OrgLocation();
+                orgLocation.setOrgFacilityCode(administeredAtLocation);
+                orgLocation.setOrgMaster(orgAccess.getOrg());
+                orgLocation.setOrgFacilityName(administeredAtLocation);
+                orgLocation.setLocationType("");
+                orgLocation.setAddressLine1(reader.getValue(11, 9));
+                orgLocation.setAddressLine2(reader.getValue(11, 10));
+                orgLocation.setAddressCity(reader.getValue(11, 11));
+                orgLocation.setAddressState(reader.getValue(11, 12));
+                orgLocation.setAddressZip(reader.getValue(11, 13));
+                orgLocation.setAddressCountry(reader.getValue(11, 14));
+                Transaction transaction = dataSession.beginTransaction();
+                dataSession.save(orgLocation);
+                transaction.commit();
+              }
+              vaccinationReported.setOrgLocation(orgLocation);
             }
           }
           vaccination.setVaccineCvxCode(vaccineCvxCode);
@@ -597,7 +628,8 @@ public class IncomingMessageHandler {
           patientReportedType = "PI";
           patientReportedExternalLink =
               reader.getValueBySearchingRepeats(3, 1, patientReportedType, 5);
-          patientReportedAuthority = reader.getValueBySearchingRepeats(3, 4, patientReportedType, 5);
+          patientReportedAuthority =
+              reader.getValueBySearchingRepeats(3, 4, patientReportedType, 5);
           if (patientReportedExternalLink.equals("")) {
             throw new ProcessingException(
                 "MRN was not found, required for accepting vaccination report", "PID", 1, 3);
@@ -1257,7 +1289,8 @@ public class IncomingMessageHandler {
       if (profileId.equals(RSP_Z32_MATCH)) {
         printQueryNK1(patientReported, sb, codeMap);
       }
-      List<VaccinationMaster> vaccinationMasterList = getVaccinationMasterList(patient, dataSession);
+      List<VaccinationMaster> vaccinationMasterList =
+          getVaccinationMasterList(patient, dataSession);
 
       if (processingFlavorSet.contains(ProcessingFlavor.LEMON)) {
         for (Iterator<VaccinationMaster> it = vaccinationMasterList.iterator(); it.hasNext();) {
@@ -1557,8 +1590,8 @@ public class IncomingMessageHandler {
     List<VaccinationMaster> vaccinationMasterList;
     {
       vaccinationMasterList = new ArrayList<>();
-      Query query = dataSession.createQuery(
-          "from VaccinationMaster where patient = ? order by vaccinationReported asc");
+      Query query = dataSession
+          .createQuery("from VaccinationMaster where patient = ? order by vaccinationReported asc");
       query.setParameter(0, patient);
       List<VaccinationMaster> vmList = query.list();
       Map<String, VaccinationMaster> map = new HashMap<>();

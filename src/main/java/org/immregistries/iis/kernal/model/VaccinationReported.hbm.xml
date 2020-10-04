@@ -25,5 +25,6 @@
     <property name="bodyRoute" column="body_route" type="string"/>
     <property name="fundingSource" column="funding_source" type="string"/>
     <property name="fundingEligibility" column="funding_eligibility" type="string"/>
+    <many-to-one name="orgLocation" column="org_location_id" class="OrgLocation"/>
   </class>
 </hibernate-mapping>

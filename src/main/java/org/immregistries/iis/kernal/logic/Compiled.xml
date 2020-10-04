@@ -17558,6 +17558,21 @@
             </use-date>
         </code>
         <code>
+            <value>MOD</value>
+            <label>Moderna Therapeutics</label>
+            <description>New vaccine company, not yet added to CDC set</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">80777-9999-00</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">80777-9999-00</link-to>
+            </reference>
+            <use-date>
+                <not-before>20201001</not-before>
+            </use-date>
+        </code>
+        <code>
             <value>MSD</value>
             <label>Merck and Co., Inc.</label>
             <description></description>
@@ -34125,6 +34140,38 @@
                 </deprecated>
             </code-status>
         </code>
+        <code>
+            <value>80777-9999-00</value>
+            <label>COVID mRNA-1273</label>
+            <description>COVID-19 mRNA-1273 Vaccine by Moderna</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">900</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">MOD</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">80777-9999-00</link-to>
+            </reference>
+            <use-date>
+                <not-before>20201001</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>00025-9999-00</value>
+            <label>COVID BNT162b2</label>
+            <description>COVID-19 BNT162b2 Vaccine by Pfizer/BioNTech</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">901</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">PFR</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">00025-9999-00</link-to>
+            </reference>
+            <use-date>
+                <not-before>20201001</not-before>
+            </use-date>
+        </code>
     </codeset>
     <codeset>
         <label>Vaccination NDC for Unit-of-Use</label>
@@ -48959,6 +49006,38 @@
                     <effective-date>20141119</effective-date>
                 </deprecated>
             </code-status>
+        </code>
+        <code>
+            <value>80777-9999-00</value>
+            <label>mRNA-1273</label>
+            <description>COVID-19 mRNA-1273 Vaccine by Moderna</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">900</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">MOD</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">80777-9999-00</link-to>
+            </reference>
+            <use-date>
+                <not-before>20201001</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>00025-9999-00</value>
+            <label>COVID BNT162b2</label>
+            <description>COVID-19 BNT162b2 Vaccine by Pfizer/BioNTech</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">901</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">PFR</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">00025-9999-00</link-to>
+            </reference>
+            <use-date>
+                <not-before>20201001</not-before>
+            </use-date>
         </code>
     </codeset>
     <codeset>

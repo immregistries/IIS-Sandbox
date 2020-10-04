@@ -25,6 +25,10 @@
     <servlet-class>org.immregistries.iis.kernal.servlet.PatientServlet</servlet-class>
   </servlet>
   <servlet>
+    <servlet-name>location</servlet-name>
+    <servlet-class>org.immregistries.iis.kernal.servlet.LocationServlet</servlet-class>
+  </servlet>
+  <servlet>
     <servlet-name>vaccination</servlet-name>
     <servlet-class>org.immregistries.iis.kernal.servlet.VaccinationServlet</servlet-class>
   </servlet>
@@ -91,6 +95,10 @@
   <servlet-mapping>
     <servlet-name>patient</servlet-name>
     <url-pattern>/patient</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>location</servlet-name>
+    <url-pattern>/location</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>vaccination</servlet-name>

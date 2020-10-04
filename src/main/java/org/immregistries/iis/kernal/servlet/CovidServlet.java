@@ -20,6 +20,7 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.immregistries.iis.kernal.model.OrgAccess;
+import org.immregistries.iis.kernal.model.OrgLocation;
 import org.immregistries.iis.kernal.model.OrgMaster;
 import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.model.PatientReported;
@@ -99,7 +100,8 @@ public class CovidServlet extends HttpServlet {
       if (StringUtils.isEmpty(cvxCodes)) {
         cvxCodes = "900,901,902";
       }
-      boolean includePhi = req.getParameter(PARAM_INCLUDE_PHI) != null;
+      boolean includePhi =
+          req.getParameter(PARAM_CVX_CODES) == null || req.getParameter(PARAM_INCLUDE_PHI) != null;
 
       if (messageError != null) {
         out.println("  <div class=\"w3-panel w3-red\">");
@@ -138,17 +140,22 @@ public class CovidServlet extends HttpServlet {
               }
             }
           }
-          out.print("<textarea cols=\"80\" rows=\"30\">");
-          Query query = dataSession.createQuery(
-              "from VaccinationReported where reportedDate >= :dateStart and reportedDate <= :dateEnd "
-                  + "and patientReported.orgReported = :orgReported");
-          query.setParameter("dateStart", dateStart);
-          query.setParameter("dateEnd", dateEnd);
-          query.setParameter("orgReported", orgAccess.getOrg());
-          List<VaccinationReported> vaccinationReportedList = query.list();
+          List<VaccinationReported> vaccinationReportedList;
+          out.print(
+              "<textarea cols=\"80\" rows=\"30\" style=\"white-space: nowrap;  overflow: auto;\">");
+          {
+            Query query = dataSession.createQuery(
+                "from VaccinationReported where reportedDate >= :dateStart and reportedDate <= :dateEnd "
+                    + "and patientReported.orgReported = :orgReported");
+            query.setParameter("dateStart", dateStart);
+            query.setParameter("dateEnd", dateEnd);
+            query.setParameter("orgReported", orgAccess.getOrg());
+            vaccinationReportedList = query.list();
+          }
           for (VaccinationReported vaccinationReported : vaccinationReportedList) {
             if (cvxCodeSet.contains(vaccinationReported.getVaccineCvxCode())) {
-              printLine(out, vaccinationReported, includePhi);
+              int doseNumber = getDoseNumber(dataSession, vaccinationReported);
+              printLine(out, vaccinationReported, includePhi, doseNumber);
             }
           }
           out.println("</textarea>");
@@ -167,8 +174,22 @@ public class CovidServlet extends HttpServlet {
     out.close();
   }
 
+  private int getDoseNumber(Session dataSession, VaccinationReported vaccinationReported) {
+    int doseNumber = 0;
+    if (vaccinationReported.getCompletionStatus().equals("CP")) {
+      Query query = dataSession
+          .createQuery("from VaccinationReported where administeredDate < :administeredDate "
+              + "and patientReported = :patientReported and completionStatus = 'CP'");
+      query.setParameter("administeredDate", vaccinationReported.getAdministeredDate());
+      query.setParameter("patientReported", vaccinationReported.getPatientReported());
+      List<VaccinationReported> list = query.list();
+      doseNumber = list.size() + 1;
+    }
+    return doseNumber;
+  }
+
   private void printLine(PrintWriter out, VaccinationReported vaccinationReported,
-      boolean includePhi) {
+      boolean includePhi, int doseNumber) {
 
     PatientReported patientReported = vaccinationReported.getPatientReported();
     PatientMaster patient = patientReported.getPatient();
@@ -213,47 +234,131 @@ public class CovidServlet extends HttpServlet {
     printField(vaccinationReported.getVaccination().getVaccinationId(), out);
     //    20   Administration date
     printField(vaccinationReported.getAdministeredDate(), out);
-    //    21   CVX (product)
-    printField(vaccinationReported.getVaccineCvxCode(), out);
-    //    22   MVX
-    printField(vaccinationReported.getVaccineMvxCode(), out);
-    //    23   Lot number: unit of use
-    printField(vaccinationReported.getLotnumber(), out);
-    //    24   Vaccine expiration date
-    printField(vaccinationReported.getExpirationDate(), out);
-    //    25   Vaccine administering site
-    printField(vaccinationReported.getBodySite(), out);
-    //    26   Vaccine route of administration
-    printField(vaccinationReported.getBodyRoute(), out);
-    //    27   Dose number
+
+    boolean administeredVaccination = StringUtils.isEmpty(vaccinationReported.getCompletionStatus())
+        || vaccinationReported.getCompletionStatus().equals("CP");
+    if (administeredVaccination) {
+      //    21   CVX
+      printField(vaccinationReported.getVaccineCvxCode(), out);
+      //    22   NDC
+      printField(vaccinationReported.getVaccineNdcCode(), out);
+      //    23   MVX
+      printField(vaccinationReported.getVaccineMvxCode(), out);
+      //    24   Lot number
+      printField(vaccinationReported.getLotnumber(), out);
+      //    25   Vaccine expiration date
+      printField(vaccinationReported.getExpirationDate(), out);
+      //    26   Vaccine administering site
+      printField(vaccinationReported.getBodySite(), out);
+      //    27   Vaccine route of administration
+      printField(vaccinationReported.getBodyRoute(), out);
+      if (administeredVaccination && doseNumber > 0) {
+        //    28   Dose number
+        printField(doseNumber, out);
+        if (doseNumber >= 2) {
+          //    29   Vaccination series complete
+          printField("Yes", out);
+        } else {
+          printField("No", out);
+        }
+      } else {
+        //    28   Dose number
+        printField("", out);
+        //    28   Dose number
+        printField("", out);
+      }
+    } else {
+      //    21   CVX
+      printField("", out);
+      //    22   NDC
+      printField("", out);
+      //    23   MVX
+      printField("", out);
+      //    24   Lot number
+      printField("", out);
+      //    25   Vaccine expiration date
+      printField("", out);
+      //    26   Vaccine administering site
+      printField("", out);
+      //    27   Vaccine route of administration
+      printField("", out);
+      //    28   Dose number
+      printField("", out);
+      //    29   Vaccination series complete
+      printField("", out);
+    }
+
+    OrgLocation orgLocation = vaccinationReported.getOrgLocation();
+    if (orgLocation == null) {
+      //    30   Sending organization
+      printField("", out);
+      //    31   Administered at location
+      printField("", out);
+      //    32   Administered at location: type
+      printField("", out);
+      //    33   Administration address: street
+      printField("", out);
+      //    34   Administration address: city
+      printField("", out);
+      //    35   Administration address: county
+      printField("", out);
+      //    36   Administration address: state
+      printField("", out);
+      //    37   Administration address: zip code
+      printField("", out);
+    } else {
+      //    30   Sending organization
+      printField(orgLocation.getOrgFacilityCode(), out);
+      //    31   Administered at location
+      printField(orgLocation.getOrgFacilityName(), out);
+      //    32   Administered at location: type
+      printField(orgLocation.getLocationType(), out);
+      //    33   Administration address: street
+      printField(orgLocation.getAddressLine1(), out);
+      //    34   Administration address: city
+      printField(orgLocation.getAddressCity(), out);
+      //    35   Administration address: county
+      printField(orgLocation.getAddressCountyParish(), out);
+      //    36   Administration address: state
+      printField(orgLocation.getAddressState(), out);
+      //    37   Administration address: zip code
+      printField(orgLocation.getAddressZip(), out);
+    }
+    if (administeredVaccination) {
+      //    38   Vaccine administering provider suffix
+      printField("", out);
+    } else {
+      //    38   Vaccine administering provider suffix
+      printField("", out);
+    }
+    if (administeredVaccination) {
+      //    39   Vaccination refusal
+      printField("No", out);
+    } else {
+      if (vaccinationReported.getCompletionStatus().equals("RE")) {
+        //    39   Vaccination refusal
+        printField("Yes", out);
+      } else {
+        //    39   Vaccination refusal
+        printField("", out);
+      }
+    }
+    //    40   Comorbidity status
     printField("", out);
-    //    28   Vaccination series complete
-    printField("", out);
-    //    29   Sending organization
-    printField("", out);
-    //    30   Administered at location
-    printField("", out);
-    //    31   Administered at location: type
-    printField("", out);
-    //    32   Administration address: street
-    printField("", out);
-    //    33   Administration address: city
-    printField("", out);
-    //    34   Administration address: county
-    printField("", out);
-    //    35   Administration address: state
-    printField("", out);
-    //    36   Administration address: zip code
-    printField("", out);
-    //    37   Vaccine administering provider suffix
-    printField("", out);
-    //    38   Vaccination refusal
-    printField("", out);
-    //    39   Comorbidity status
-    printField("", out);
-    //    40   Recipient missed vaccination appointment
-    printField("No", out);
-    //    41   Serology results 
+    if (administeredVaccination) {
+      //    41  Recipient missed vaccination appointment
+      printField("No", out);
+    } else {
+      if (vaccinationReported.getCompletionStatus().equals("NA")) {
+        //    41  Recipient missed vaccination appointment
+        printField("Yes", out);
+      } else {
+        //    41  Recipient missed vaccination appointment
+        printField("No", out);
+      }
+    }
+
+    //    42   Serology results 
     printField("", out);
     out.println();
   }

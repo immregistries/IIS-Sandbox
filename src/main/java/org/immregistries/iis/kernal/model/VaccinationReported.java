@@ -31,6 +31,7 @@ public class VaccinationReported implements Serializable {
   private String fundingSource = "";
   private String fundingEligibility = "";
   private TestEvent testEvent = null;
+  private OrgLocation orgLocation = null;
 
   public TestEvent getTestEvent() {
     return testEvent;
@@ -206,6 +207,14 @@ public class VaccinationReported implements Serializable {
 
   public void setUpdatedDate(Date updatedDate) {
     this.updatedDate = updatedDate;
+  }
+
+  public OrgLocation getOrgLocation() {
+    return orgLocation;
+  }
+
+  public void setOrgLocation(OrgLocation orgLocation) {
+    this.orgLocation = orgLocation;
   }
 
 

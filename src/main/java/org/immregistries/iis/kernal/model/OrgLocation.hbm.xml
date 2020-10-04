@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="org.immregistries.iis.kernal.model">
+  <class name="OrgLocation" table="org_location">
+    <id name="orgLocationId" column="org_location_id">
+      <generator class="native"/>
+    </id>
+    <property name="orgFacilityCode" column="org_facility_code" type="string"/>
+    <many-to-one name="orgMaster" column="org_id" class="OrgMaster"/>
+    <property name="orgFacilityName" column="org_facility_name" type="string"/>
+    <property name="locationType" column="location_type" type="string"/>
+    <property name="addressLine1" column="address_line1" type="string"/>
+    <property name="addressLine2" column="address_line2" type="string"/>
+    <property name="addressCity" column="address_city" type="string"/>
+    <property name="addressState" column="address_state" type="string"/>
+    <property name="addressZip" column="address_zip" type="string"/>
+    <property name="addressCountry" column="address_country" type="string"/>
+    <property name="addressCountyParish" column="address_county_parish" type="string"/>
+  </class>
+</hibernate-mapping>

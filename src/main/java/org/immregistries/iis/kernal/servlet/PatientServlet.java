@@ -207,6 +207,7 @@ public class PatientServlet extends HttpServlet {
           out.println("    <th>Manufacturer</th>");
           out.println("    <th>Lot Number</th>");
           out.println("    <th>Information</th>");
+          out.println("    <th>Completion</th>");
           out.println("    <th>Action</th>");
           out.println("  </tr>");
           out.println("  <tbody>");
@@ -259,6 +260,15 @@ public class PatientServlet extends HttpServlet {
               }
             }
             out.println("    </td>");
+            out.println("    <td>");
+            if (!StringUtils.isEmpty(vaccinationReported.getCompletionStatus())) {
+              Code completionCode = codeMap.getCodeForCodeset(CodesetType.VACCINATION_COMPLETION,
+                  vaccinationReported.getCompletionStatus());
+              if (completionCode != null) {
+                out.print(completionCode.getLabel());
+                out.println(" (" + vaccinationReported.getCompletionStatus() + ")");
+              }
+            }
             out.println("    <td>");
             if (!StringUtils.isEmpty(vaccinationReported.getActionCode())) {
               Code actionCode = codeMap.getCodeForCodeset(CodesetType.VACCINATION_ACTION_CODE,
