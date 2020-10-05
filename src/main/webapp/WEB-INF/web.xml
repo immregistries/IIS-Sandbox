@@ -45,6 +45,10 @@
     <servlet-class>org.immregistries.iis.kernal.servlet.CovidServlet</servlet-class>
   </servlet>
   <servlet>
+    <servlet-name>covidGenerate</servlet-name>
+    <servlet-class>org.immregistries.iis.kernal.servlet.CovidGenerateServlet</servlet-class>
+  </servlet>
+  <servlet>
     <servlet-name>message</servlet-name>
     <servlet-class>org.immregistries.iis.kernal.servlet.MessageServlet</servlet-class>
   </servlet>
@@ -67,6 +71,10 @@
   <servlet-mapping>
     <servlet-name>covid</servlet-name>
     <url-pattern>/covid</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>covidGenerate</servlet-name>
+    <url-pattern>/covidGenerate</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>message</servlet-name>

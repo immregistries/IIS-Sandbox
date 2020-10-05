@@ -5,7 +5,7 @@
 
 	<groupId>org.immregistries</groupId>
 	<artifactId>iis-sandbox</artifactId>
-	<version>0.2</version>
+	<version>0.4</version>
 	<packaging>war</packaging>
 
 	<name>Immunization Information System Kernel - Proof of Concept</name>
@@ -68,7 +68,7 @@
 		<dependency>
 			<groupId>org.immregistries</groupId>
 			<artifactId>smm-tester</artifactId>
-			<version>2.23</version>
+			<version>2.28.0</version>
 			<classifier>client</classifier>
 		</dependency>
 

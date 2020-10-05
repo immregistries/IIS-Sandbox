@@ -30,6 +30,7 @@ import org.immregistries.iis.kernal.model.OrgLocation;
 import org.immregistries.iis.kernal.model.OrgMaster;
 import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.model.PatientReported;
+import org.immregistries.iis.kernal.model.Person;
 import org.immregistries.iis.kernal.model.ProcessingFlavor;
 import org.immregistries.iis.kernal.model.VaccinationMaster;
 import org.immregistries.iis.kernal.model.VaccinationReported;
@@ -470,6 +471,39 @@ public class IncomingMessageHandler {
               vaccinationReported.setOrgLocation(orgLocation);
             }
           }
+          {
+            String admininsteringProvider = reader.getValue(10);
+            if (StringUtils.isNotEmpty(admininsteringProvider)) {
+              Person person = null;
+              {
+                Query query = dataSession.createQuery(
+                    "from Person where orgMaster = :orgMaster and personExternalLink = :personExternalLink");
+                query.setParameter("orgMaster", orgAccess.getOrg());
+                query.setParameter("personExternalLink", admininsteringProvider);
+                List<Person> personList = query.list();
+                if (personList.size() > 0) {
+                  person = personList.get(0);
+                }
+              }
+              if (person == null) {
+                person = new Person();
+                person.setPersonExternalLink(admininsteringProvider);
+                person.setOrgMaster(orgAccess.getOrg());
+                person.setNameLast(reader.getValue(10, 2));
+                person.setNameFirst(reader.getValue(10, 3));
+                person.setNameMiddle(reader.getValue(10, 4));
+                person.setAssigningAuthority(reader.getValue(10, 9));
+                person.setNameTypeCode(reader.getValue(10, 10));
+                person.setIdentifierTypeCode(reader.getValue(10, 13));
+                person.setProfessionalSuffix(reader.getValue(10, 21));
+                Transaction transaction = dataSession.beginTransaction();
+                dataSession.save(person);
+                transaction.commit();
+              }
+              vaccinationReported.setAdministeringProvider(person);
+            }
+
+          }
           vaccination.setVaccineCvxCode(vaccineCvxCode);
           vaccination.setAdministeredDate(administrationDate);
           vaccinationReported.setUpdatedDate(new Date());
@@ -764,6 +798,11 @@ public class IncomingMessageHandler {
       patientReported.setPatientBirthDate(patientBirthDate);
       patientReported.setPatientSex(reader.getValue(8));
       patientReported.setPatientRace(reader.getValue(10));
+      patientReported.setPatientRace2(reader.getValueRepeat(10, 1, 2));
+      patientReported.setPatientRace3(reader.getValueRepeat(10, 1, 3));
+      patientReported.setPatientRace4(reader.getValueRepeat(10, 1, 4));
+      patientReported.setPatientRace5(reader.getValueRepeat(10, 1, 5));
+      patientReported.setPatientRace6(reader.getValueRepeat(10, 1, 6));
       patientReported.setPatientAddressLine1(reader.getValue(11, 1));
       patientReported.setPatientAddressLine2(reader.getValue(11, 2));
       patientReported.setPatientAddressCity(reader.getValue(11, 3));

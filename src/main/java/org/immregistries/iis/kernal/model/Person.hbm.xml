@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="org.immregistries.iis.kernal.model">
+  <class name="Person" table="person">
+    <id name="personId" column="person_id">
+      <generator class="native"/>
+    </id>
+    <property name="personExternalLink" column="person_external_link" type="string"/>
+    <many-to-one name="orgMaster" column="org_id" class="OrgMaster"/>
+    <property name="nameLast" column="name_last" type="string"/>
+    <property name="nameFirst" column="name_first" type="string"/>
+    <property name="nameMiddle" column="name_middle" type="string"/>
+    <property name="assigningAuthority" column="assigning_authority" type="string"/>
+    <property name="nameTypeCode" column="name_type_code" type="string"/>
+    <property name="identifierTypeCode" column="identifier_type_code" type="string"/>
+    <property name="professionalSuffix" column="professional_suffix" type="string"/>
+  </class>
+</hibernate-mapping>

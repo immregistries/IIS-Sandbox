@@ -32,6 +32,33 @@ public class VaccinationReported implements Serializable {
   private String fundingEligibility = "";
   private TestEvent testEvent = null;
   private OrgLocation orgLocation = null;
+  private Person enteredBy = null;
+  private Person orderingProvider = null;
+  private Person administeringProvider = null;
+
+  public Person getEnteredBy() {
+    return enteredBy;
+  }
+
+  public void setEnteredBy(Person enteredBy) {
+    this.enteredBy = enteredBy;
+  }
+
+  public Person getOrderingProvider() {
+    return orderingProvider;
+  }
+
+  public void setOrderingProvider(Person orderingProvider) {
+    this.orderingProvider = orderingProvider;
+  }
+
+  public Person getAdministeringProvider() {
+    return administeringProvider;
+  }
+
+  public void setAdministeringProvider(Person administeringProvider) {
+    this.administeringProvider = administeringProvider;
+  }
 
   public TestEvent getTestEvent() {
     return testEvent;

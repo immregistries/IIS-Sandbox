@@ -109,7 +109,7 @@ public class CovidServlet extends HttpServlet {
         out.println("  </div>");
       }
       out.println("    <div class=\"w3-container w3-card-4\">");
-      out.println("    <h2>Convert Lab Message (ORU^R01) with SARS-CoV-2 Results to VXU</h2>");
+      out.println("    <h2>Export COVID-19 Flat-File for CDC Reporting</h2>");
       out.println("    <form method=\"POST\" action=\"covid\" class=\"w3-container w3-card-4\">");
       out.println("          <label>Start Date</label>");
       out.println("          <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_DATE_START
@@ -219,15 +219,15 @@ public class CovidServlet extends HttpServlet {
     //    12   Recipient race 1
     printField(patientReported.getPatientRace(), includePhi, out);
     //    13   Recipient race 2
-    printField("", out);
+    printField(patientReported.getPatientRace2(), includePhi, out);
     //    14   Recipient race 3
-    printField("", out);
+    printField(patientReported.getPatientRace3(), includePhi, out);
     //    15   Recipient race 4
-    printField("", out);
+    printField(patientReported.getPatientRace4(), includePhi, out);
     //    16   Recipient race 5
-    printField("", out);
+    printField(patientReported.getPatientRace5(), includePhi, out);
     //    17   Recipient race 6
-    printField("", out);
+    printField(patientReported.getPatientRace6(), includePhi, out);
     //    18   Recipient ethnicity
     printField(patientReported.getPatientEthnicity(), includePhi, out);
     //    19   IIS vaccination event ID
@@ -325,8 +325,13 @@ public class CovidServlet extends HttpServlet {
       printField(orgLocation.getAddressZip(), out);
     }
     if (administeredVaccination) {
-      //    38   Vaccine administering provider suffix
-      printField("", out);
+      if (vaccinationReported.getAdministeringProvider() == null) {
+        //    38   Vaccine administering provider suffix
+        printField("", out);
+      } else {
+        //    38   Vaccine administering provider suffix
+        printField(vaccinationReported.getAdministeringProvider().getProfessionalSuffix(), out);
+      }
     } else {
       //    38   Vaccine administering provider suffix
       printField("", out);

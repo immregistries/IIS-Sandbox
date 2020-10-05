@@ -23,6 +23,11 @@ public class PatientReported implements Serializable {
   private Date patientBirthDate = null;
   private String patientSex = "";
   private String patientRace = "";
+  private String patientRace2 = "";
+  private String patientRace3 = "";
+  private String patientRace4 = "";
+  private String patientRace5 = "";
+  private String patientRace6 = "";
   private String patientAddressLine1 = "";
   private String patientAddressLine2 = "";
   private String patientAddressCity = "";
@@ -358,6 +363,46 @@ public class PatientReported implements Serializable {
 
   public void setUpdatedDate(Date updatedDate) {
     this.updatedDate = updatedDate;
+  }
+
+  public String getPatientRace2() {
+    return patientRace2;
+  }
+
+  public void setPatientRace2(String patientRace2) {
+    this.patientRace2 = patientRace2;
+  }
+
+  public String getPatientRace3() {
+    return patientRace3;
+  }
+
+  public void setPatientRace3(String patientRace3) {
+    this.patientRace3 = patientRace3;
+  }
+
+  public String getPatientRace4() {
+    return patientRace4;
+  }
+
+  public void setPatientRace4(String patientRace4) {
+    this.patientRace4 = patientRace4;
+  }
+
+  public String getPatientRace5() {
+    return patientRace5;
+  }
+
+  public void setPatientRace5(String patientRace5) {
+    this.patientRace5 = patientRace5;
+  }
+
+  public String getPatientRace6() {
+    return patientRace6;
+  }
+
+  public void setPatientRace6(String patientRace6) {
+    this.patientRace6 = patientRace6;
   }
 
 }

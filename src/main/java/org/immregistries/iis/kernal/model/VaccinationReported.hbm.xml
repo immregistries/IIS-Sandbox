@@ -26,5 +26,8 @@
     <property name="fundingSource" column="funding_source" type="string"/>
     <property name="fundingEligibility" column="funding_eligibility" type="string"/>
     <many-to-one name="orgLocation" column="org_location_id" class="OrgLocation"/>
+    <many-to-one name="enteredBy" column="entered_by" class="Person"/>
+    <many-to-one name="orderingProvider" column="ordering_provider" class="Person"/>
+    <many-to-one name="administeringProvider" column="administering_provider" class="Person"/>
   </class>
 </hibernate-mapping>

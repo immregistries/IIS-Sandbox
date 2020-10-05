@@ -19,6 +19,11 @@
     <property name="patientBirthDate" column="patient_birth_date" type="date"/>
     <property name="patientSex" column="patient_sex" type="string"/>
     <property name="patientRace" column="patient_race" type="string"/>
+    <property name="patientRace2" column="patient_race2" type="string"/>
+    <property name="patientRace3" column="patient_race3" type="string"/>
+    <property name="patientRace4" column="patient_race4" type="string"/>
+    <property name="patientRace5" column="patient_race5" type="string"/>
+    <property name="patientRace6" column="patient_race6" type="string"/>
     <property name="patientAddressLine1" column="patient_address_line1" type="string"/>
     <property name="patientAddressLine2" column="patient_address_line2" type="string"/>
     <property name="patientAddressCity" column="patient_address_city" type="string"/>
