@@ -16,5 +16,6 @@
     <property name="addressZip" column="address_zip" type="string"/>
     <property name="addressCountry" column="address_country" type="string"/>
     <property name="addressCountyParish" column="address_county_parish" type="string"/>
+    <property name="vfcProviderPin" column="vfc_provider_pin" type="string"/>
   </class>
 </hibernate-mapping>

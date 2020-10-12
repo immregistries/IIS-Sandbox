@@ -10,4 +10,5 @@ TRUNCATE TABLE message_received;
 TRUNCATE TABLE observation_master;
 TRUNCATE TABLE observation_reported;
 TRUNCATE TABLE org_location;
+TRUNCATE TABLE person;
 SET FOREIGN_KEY_CHECKS=1;

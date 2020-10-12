@@ -11,7 +11,8 @@ CREATE TABLE org_location
   address_state           VARCHAR(250),
   address_zip             VARCHAR(250),
   address_country         VARCHAR(250),
-  address_county_parish   VARCHAR(250)
+  address_county_parish   VARCHAR(250), 
+  vfc_provider_pin        VARCHAR(250)
 );
 
 ALTER TABLE vaccination_reported ADD COLUMN org_location_id INT;

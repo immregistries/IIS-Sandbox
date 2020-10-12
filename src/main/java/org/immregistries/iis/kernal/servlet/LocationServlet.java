@@ -45,6 +45,7 @@ public class LocationServlet extends HttpServlet {
   public static final String PARAM_ADDRESS_ZIP = "addressZip";
   public static final String PARAM_ADDRESS_COUNTRY = "addressCountry";
   public static final String PARAM_ADDRESS_COUNTY_PARISH = "addressCountyParish";
+  public static final String PARAM_VFC_PROVIDER_PIN = "vfcProviderPin";
 
 
 
@@ -102,6 +103,7 @@ public class LocationServlet extends HttpServlet {
           orgLocationSelected.setAddressZip(req.getParameter(PARAM_ADDRESS_ZIP));
           orgLocationSelected.setAddressCountry(req.getParameter(PARAM_ADDRESS_COUNTRY));
           orgLocationSelected.setAddressCountyParish(req.getParameter(PARAM_ADDRESS_COUNTY_PARISH));
+          orgLocationSelected.setVfcProviderPin(req.getParameter(PARAM_VFC_PROVIDER_PIN));
           Transaction transaction = dataSession.beginTransaction();
           dataSession.update(orgLocationSelected);
           transaction.commit();
@@ -206,6 +208,10 @@ public class LocationServlet extends HttpServlet {
         out.println(
             "      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_ADDRESS_COUNTY_PARISH
                 + "\" value=\"" + orgLocationSelected.getAddressCountyParish() + "\"/>");
+        out.println("      <label>VFC Provider PIN</label>");
+        out.println(
+            "      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_VFC_PROVIDER_PIN
+                + "\" value=\"" + orgLocationSelected.getVfcProviderPin() + "\"/>");
         out.println("          <input type=\"hidden\" name=\"" + PARAM_ORG_LOCATION_ID
             + "\" value=\"" + orgLocationSelected.getOrgLocationId() + "\"/>");
         out.println(

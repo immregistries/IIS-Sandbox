@@ -15,7 +15,14 @@ public class OrgLocation implements Serializable {
   private String addressZip = "";
   private String addressCountry = "";
   private String addressCountyParish = "";
+  private String vfcProviderPin = "";
   
+  public String getVfcProviderPin() {
+    return vfcProviderPin;
+  }
+  public void setVfcProviderPin(String vfcProviderPin) {
+    this.vfcProviderPin = vfcProviderPin;
+  }
   public int getOrgLocationId() {
     return orgLocationId;
   }

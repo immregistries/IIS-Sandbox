@@ -11232,8 +11232,8 @@
         <type>VACCINATION_CVX_CODE</type>
         <code>
             <value>900</value>
-            <label>mRNA-1273</label>
-            <description>Moderna COVID-19 Vaccine</description>
+            <label>COVID Vaccine A</label>
+            <description>For demonstration purpose only</description>
             <code-status>
                 <status>Valid</status>
             </code-status>
@@ -11253,8 +11253,8 @@
         </code>
         <code>
             <value>901</value>
-            <label>BNT162b2</label>
-            <description>Pfizer/BioNTech COVID-19 Vaccine</description>
+            <label>COVID Vaccine B</label>
+            <description>For demonstration purpose only</description>
             <code-status>
                 <status>Valid</status>
             </code-status>
@@ -16753,6 +16753,35 @@
         <label>Vaccination Manufacturer Code</label>
         <type>VACCINATION_MANUFACTURER_CODE</type>
         <code>
+            <value>AAA</value>
+            <label>COVID Manufacturer A</label>
+            <description>Example for COVID-19 preparation</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">99999-9999-00</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">99999-9999-00</link-to>
+            </reference>
+            <use-date>
+                <not-before>20201001</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>BBB</value>
+            <label>COVID Manufacturer B</label>
+            <description>Example for COVID-19 preparation</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">99999-9999-01</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">99999-9999-01</link-to>
+            </reference>
+            <use-date>
+                <not-before>20201001</not-before>
+            </use-date>
+        </code>    <code>
             <value>AB</value>
             <label>Abbott Laboratories</label>
             <description>includes Ross Products Division, Solvay</description>
@@ -17555,21 +17584,6 @@
             </reference>
             <use-date>
                 <not-before>20100528</not-before>
-            </use-date>
-        </code>
-        <code>
-            <value>MOD</value>
-            <label>Moderna Therapeutics</label>
-            <description>New vaccine company, not yet added to CDC set</description>
-            <code-status>
-                <status>Valid</status>
-            </code-status>
-            <reference>
-                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">80777-9999-00</link-to>
-                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">80777-9999-00</link-to>
-            </reference>
-            <use-date>
-                <not-before>20201001</not-before>
             </use-date>
         </code>
         <code>
@@ -34141,32 +34155,32 @@
             </code-status>
         </code>
         <code>
-            <value>80777-9999-00</value>
-            <label>COVID mRNA-1273</label>
-            <description>COVID-19 mRNA-1273 Vaccine by Moderna</description>
+            <value>99999-9999-00</value>
+            <label>COVID Vaccine A</label>
+            <description>COVID-19 Vaccine A - Placeholder for examples</description>
             <code-status>
                 <status>Valid</status>
             </code-status>
             <reference>
                 <link-to codeset="VACCINATION_CVX_CODE">900</link-to>
-                <link-to codeset="VACCINATION_MANUFACTURER_CODE">MOD</link-to>
-                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">80777-9999-00</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">AAA</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">99999-9999-00</link-to>
             </reference>
             <use-date>
                 <not-before>20201001</not-before>
             </use-date>
         </code>
         <code>
-            <value>00025-9999-00</value>
-            <label>COVID BNT162b2</label>
-            <description>COVID-19 BNT162b2 Vaccine by Pfizer/BioNTech</description>
+            <value>99999-9999-01</value>
+            <label>COVID Vaccine B</label>
+            <description>COVID-19 Vaccine B - Placeholder for examples</description>
             <code-status>
                 <status>Valid</status>
             </code-status>
             <reference>
                 <link-to codeset="VACCINATION_CVX_CODE">901</link-to>
-                <link-to codeset="VACCINATION_MANUFACTURER_CODE">PFR</link-to>
-                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">00025-9999-00</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">BBB</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">99999-9999-01</link-to>
             </reference>
             <use-date>
                 <not-before>20201001</not-before>
@@ -49008,32 +49022,32 @@
             </code-status>
         </code>
         <code>
-            <value>80777-9999-00</value>
-            <label>mRNA-1273</label>
-            <description>COVID-19 mRNA-1273 Vaccine by Moderna</description>
+            <value>99999-9999-00</value>
+            <label>COVID Vaccine A</label>
+            <description>COVID-19 Vaccine A - Placeholder for examples</description>
             <code-status>
                 <status>Valid</status>
             </code-status>
             <reference>
                 <link-to codeset="VACCINATION_CVX_CODE">900</link-to>
-                <link-to codeset="VACCINATION_MANUFACTURER_CODE">MOD</link-to>
-                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">80777-9999-00</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">AAA</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">99999-9999-00</link-to>
             </reference>
             <use-date>
                 <not-before>20201001</not-before>
             </use-date>
         </code>
         <code>
-            <value>00025-9999-00</value>
-            <label>COVID BNT162b2</label>
-            <description>COVID-19 BNT162b2 Vaccine by Pfizer/BioNTech</description>
+            <value>99999-9999-01</value>
+            <label>COVID Vaccine B</label>
+            <description>COVID-19 Vaccine B - Placeholder for examples</description>
             <code-status>
                 <status>Valid</status>
             </code-status>
             <reference>
                 <link-to codeset="VACCINATION_CVX_CODE">901</link-to>
-                <link-to codeset="VACCINATION_MANUFACTURER_CODE">PFR</link-to>
-                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">00025-9999-00</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">BBB</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">99999-9999-01</link-to>
             </reference>
             <use-date>
                 <not-before>20201001</not-before>
@@ -54068,7 +54082,7 @@
         <code>
             <value>COVID-19</value>
             <label>COVID-19</label>
-            <description></description>
+            <description>Temporary - for demonstration only</description>
             <code-status>
                 <status>Valid</status>
             </code-status>

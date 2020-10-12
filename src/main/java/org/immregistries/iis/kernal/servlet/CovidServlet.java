@@ -152,6 +152,8 @@ public class CovidServlet extends HttpServlet {
             query.setParameter("orgReported", orgAccess.getOrg());
             vaccinationReportedList = query.list();
           }
+
+          printHeaderLine(out);
           for (VaccinationReported vaccinationReported : vaccinationReportedList) {
             if (cvxCodeSet.contains(vaccinationReported.getVaccineCvxCode())) {
               int doseNumber = getDoseNumber(dataSession, vaccinationReported);
@@ -174,6 +176,57 @@ public class CovidServlet extends HttpServlet {
     out.close();
   }
 
+  private void printHeaderLine(PrintWriter out) {
+    printField("ext_type", out);
+    printField("pprl_id", out);
+    printField("recip_id", out);
+    printField("recip_first_name", out);
+    printField("recip_middle_name", out);
+    printField("recip_last_name", out);
+    printField("recip_dob", out);
+    printField("recip_sex", out);
+    printField("recip_address_street", out);
+    printField("recip_address_street_2", out);
+    printField("recip_address_city", out);
+    printField("recip_address_county", out);
+    printField("recip_address_state", out);
+    printField("recip_address_zip", out);
+    printField("recip_race_1", out);
+    printField("recip_race_2", out);
+    printField("recip_race_3", out);
+    printField("recip_race_4", out);
+    printField("recip_race_5", out);
+    printField("recip_race_6", out);
+    printField("recip_ethnicity", out);
+    printField("vax_event_id", out);
+    printField("admin_date", out);
+    printField("cvx", out);
+    printField("ndc", out);
+    printField("mvx", out);
+    printField("lot_number", out);
+    printField("vax_expiration", out);
+    printField("vax_admin_site", out);
+    printField("vax_route", out);
+    printField("dose_num", out);
+    printField("vax_series_complete", out);
+    printField("responsible_org", out);
+    printField("admin_name", out);
+    printField("vfc_prov_pin", out);
+    printField("admin_type", out);
+    printField("admin_address_street", out);
+    printField("admin_address_street_2", out);
+    printField("admin_address_city", out);
+    printField("admin_address_county", out);
+    printField("admin_address_state", out);
+    printField("admin_address_zip", out);
+    printField("vax_prov_suffix", out);
+    printField("vax_refusal", out);
+    printField("cmorbid_status", out);
+    printField("recip_missed_appt", out);
+    printField("serology", out);
+    out.println();
+  }
+
   private int getDoseNumber(Session dataSession, VaccinationReported vaccinationReported) {
     int doseNumber = 0;
     if (vaccinationReported.getCompletionStatus().equals("CP")) {
@@ -194,178 +247,235 @@ public class CovidServlet extends HttpServlet {
     PatientReported patientReported = vaccinationReported.getPatientReported();
     PatientMaster patient = patientReported.getPatient();
 
-    //    1    IIS recipient ID
+
+    //    1    Extract Type
+    if (includePhi) {
+      printField("I", out);
+    } else {
+      printField("D", out);
+    }
+    //    2    PPRL Generated ID
+    printField("", out);
+    //    3    Recipient ID
     printField(patient.getPatientId(), out);
-    //    2    Recipient name: first
+    //    4    Recipient name: first
     printField(patientReported.getPatientNameFirst(), includePhi, out);
-    //    3    Recipient name: middle
+    //    5    Recipient name: middle
     printField(patientReported.getPatientNameMiddle(), includePhi, out);
-    //    4    Recipient name: last
+    //    6    Recipient name: last
     printField(patientReported.getPatientNameLast(), includePhi, out);
-    //    5    Recipient date of birth
+    //    7    Recipient date of birth
     printField(patientReported.getPatientBirthDate(), out);
-    //    6    Recipient sex
+    //    8    Recipient sex
     printField(patientReported.getPatientSex(), out);
-    //    7    Recipient address: street
+    //    9    Recipient address: street
     printField(patientReported.getPatientAddressLine1(), includePhi, out);
-    //    8    Recipient address: city
+    //    10   Recipient address: street 2
+    printField(patientReported.getPatientAddressLine2(), includePhi, out);
+    //    11   Recipient address: city
     printField(patientReported.getPatientAddressCity(), includePhi, out);
-    //    9    Recipient address:  county
+    //    12   Recipient address: county
     printField(patientReported.getPatientAddressCountyParish(), out);
-    //    10   Recipient address: state
-    printField(patientReported.getPatientAddressState(), includePhi, out);
-    //    11   Recipient address: zip code
+    //    13   Recipient address: state
+    printField(patientReported.getPatientAddressState(), out);
+    //    14   Recipient address: zip code
     printField(patientReported.getPatientAddressZip(), out);
-    //    12   Recipient race 1
-    printField(patientReported.getPatientRace(), includePhi, out);
-    //    13   Recipient race 2
-    printField(patientReported.getPatientRace2(), includePhi, out);
-    //    14   Recipient race 3
-    printField(patientReported.getPatientRace3(), includePhi, out);
-    //    15   Recipient race 4
-    printField(patientReported.getPatientRace4(), includePhi, out);
-    //    16   Recipient race 5
-    printField(patientReported.getPatientRace5(), includePhi, out);
-    //    17   Recipient race 6
-    printField(patientReported.getPatientRace6(), includePhi, out);
-    //    18   Recipient ethnicity
-    printField(patientReported.getPatientEthnicity(), includePhi, out);
-    //    19   IIS vaccination event ID
+    if (StringUtils.isEmpty(patientReported.getPatientRace())) {
+      //    15   Recipient race 1
+      printField("UNK", out);
+    } else {
+      //    15   Recipient race 1
+      printField(patientReported.getPatientRace(), out);
+    }
+    //    16   Recipient race 2
+    printField(patientReported.getPatientRace2(), out);
+    //    17   Recipient race 3
+    printField(patientReported.getPatientRace3(), out);
+    //    18   Recipient race 4
+    printField(patientReported.getPatientRace4(), out);
+    //    19   Recipient race 5
+    printField(patientReported.getPatientRace5(), out);
+    //    20   Recipient race 6
+    printField(patientReported.getPatientRace6(), out);
+    //    21   Recipient ethnicity
+    printField(patientReported.getPatientEthnicity(), out);
+    //    22   Vaccination Event ID
     printField(vaccinationReported.getVaccination().getVaccinationId(), out);
-    //    20   Administration date
+    //    23   Administration date
     printField(vaccinationReported.getAdministeredDate(), out);
+
+
 
     boolean administeredVaccination = StringUtils.isEmpty(vaccinationReported.getCompletionStatus())
         || vaccinationReported.getCompletionStatus().equals("CP");
     if (administeredVaccination) {
-      //    21   CVX
+      //    24   CVX
       printField(vaccinationReported.getVaccineCvxCode(), out);
-      //    22   NDC
+      //    25   NDC
       printField(vaccinationReported.getVaccineNdcCode(), out);
-      //    23   MVX
+      //    26   MVX
       printField(vaccinationReported.getVaccineMvxCode(), out);
-      //    24   Lot number
+      //    27   Lot number
       printField(vaccinationReported.getLotnumber(), out);
-      //    25   Vaccine expiration date
+      //    28   Vaccine expiration date
       printField(vaccinationReported.getExpirationDate(), out);
-      //    26   Vaccine administering site
+      //    29   Vaccine administering site
       printField(vaccinationReported.getBodySite(), out);
-      //    27   Vaccine route of administration
+      //    30   Vaccine route of administration
       printField(vaccinationReported.getBodyRoute(), out);
-      if (administeredVaccination && doseNumber > 0) {
-        //    28   Dose number
-        printField(doseNumber, out);
-        if (doseNumber >= 2) {
-          //    29   Vaccination series complete
-          printField("Yes", out);
+      if (administeredVaccination) {
+        if (doseNumber > 0) {
+          //    31   Dose number
+          printField(doseNumber, out);
+          if (doseNumber >= 2) {
+            //    32   Vaccination series complete
+            printField("Yes", out);
+          } else {
+            //    29   Vaccination series complete
+            printField("No", out);
+          }
         } else {
-          printField("No", out);
+          //    31   Dose number
+          printField("UNK", out);
+          //    32   Vaccination series complete
+          printField("UNK", out);
         }
       } else {
-        //    28   Dose number
+        //    31   Dose number
         printField("", out);
-        //    28   Dose number
+        //    32   Vaccination series complete
         printField("", out);
       }
     } else {
-      //    21   CVX
+      //    24   CVX
       printField("", out);
-      //    22   NDC
+      //    25   NDC
       printField("", out);
-      //    23   MVX
+      //    26   MVX
       printField("", out);
-      //    24   Lot number
+      //    27   Lot number
       printField("", out);
-      //    25   Vaccine expiration date
+      //    28   Vaccine expiration date
       printField("", out);
-      //    26   Vaccine administering site
+      //    29   Vaccine administering site
       printField("", out);
-      //    27   Vaccine route of administration
+      //    30   Vaccine route of administration
       printField("", out);
-      //    28   Dose number
+      //    31   Dose number
       printField("", out);
-      //    29   Vaccination series complete
+      //    32   Vaccination series complete
       printField("", out);
     }
 
     OrgLocation orgLocation = vaccinationReported.getOrgLocation();
     if (orgLocation == null) {
-      //    30   Sending organization
+      //    33   Responsible organization
       printField("", out);
-      //    31   Administered at location
+      //    34   Administered at location
       printField("", out);
-      //    32   Administered at location: type
+      //    35   VFC Provider PIN
       printField("", out);
-      //    33   Administration address: street
+      //    36   Administered at location: type
       printField("", out);
-      //    34   Administration address: city
+      //    37   Administration address: street
       printField("", out);
-      //    35   Administration address: county
+      //    38   Administration address: street 2
       printField("", out);
-      //    36   Administration address: state
+      //    39   Administration address: city
       printField("", out);
-      //    37   Administration address: zip code
+      //    40   Administration address: county
+      printField("", out);
+      //    41   Administration address: state
+      printField("", out);
+      //    42   Administration address: zip code
       printField("", out);
     } else {
-      //    30   Sending organization
+      //    33   Responsible organization
       printField(orgLocation.getOrgFacilityCode(), out);
-      //    31   Administered at location
+      //    34   Administered at location
       printField(orgLocation.getOrgFacilityName(), out);
-      //    32   Administered at location: type
+      //    35   VFC Provider PIN
+      printField(orgLocation.getVfcProviderPin(), out);
+      //    36   Administered at location: type
       printField(orgLocation.getLocationType(), out);
-      //    33   Administration address: street
+      //    37   Administration address: street
       printField(orgLocation.getAddressLine1(), out);
-      //    34   Administration address: city
+      //    38   Administration address: street 2
+      printField(orgLocation.getAddressLine2(), out);
+      //    39   Administration address: city
       printField(orgLocation.getAddressCity(), out);
-      //    35   Administration address: county
+      //    40   Administration address: county
       printField(orgLocation.getAddressCountyParish(), out);
-      //    36   Administration address: state
+      //    41   Administration address: state
       printField(orgLocation.getAddressState(), out);
-      //    37   Administration address: zip code
+      //    42   Administration address: zip code
       printField(orgLocation.getAddressZip(), out);
     }
     if (administeredVaccination) {
       if (vaccinationReported.getAdministeringProvider() == null) {
-        //    38   Vaccine administering provider suffix
+        //    43   Vaccine administering provider suffix
         printField("", out);
       } else {
-        //    38   Vaccine administering provider suffix
-        printField(vaccinationReported.getAdministeringProvider().getProfessionalSuffix(), out);
+        String suffix = getSuffix(vaccinationReported);
+        //    43   Vaccine administering provider suffix
+        printField(suffix, out);
       }
     } else {
-      //    38   Vaccine administering provider suffix
+      //    43   Vaccine administering provider suffix
       printField("", out);
     }
     if (administeredVaccination) {
-      //    39   Vaccination refusal
+      //    44   Vaccination refusal
       printField("No", out);
     } else {
       if (vaccinationReported.getCompletionStatus().equals("RE")) {
-        //    39   Vaccination refusal
+        //    44   Vaccination refusal
         printField("Yes", out);
       } else {
-        //    39   Vaccination refusal
+        //    44   Vaccination refusal
         printField("", out);
       }
     }
-    //    40   Comorbidity status
-    printField("", out);
+    //    45   Comorbidity status
+    printField("UNK", out);
     if (administeredVaccination) {
-      //    41  Recipient missed vaccination appointment
+      //    46   Recipient missed vaccination appointment
       printField("No", out);
     } else {
       if (vaccinationReported.getCompletionStatus().equals("NA")) {
-        //    41  Recipient missed vaccination appointment
+        //    46   Recipient missed vaccination appointment
         printField("Yes", out);
       } else {
-        //    41  Recipient missed vaccination appointment
+        //    46   Recipient missed vaccination appointment
         printField("No", out);
       }
     }
 
-    //    42   Serology results 
-    printField("", out);
+    //    47   Serology results 
+    printField("UNK", out);
     out.println();
+  }
+
+  private static Set<String> suffixAllowedValueSet = new HashSet<>();
+  static {
+    suffixAllowedValueSet.add("RN");
+    suffixAllowedValueSet.add("MD");
+    suffixAllowedValueSet.add("NP");
+    suffixAllowedValueSet.add("PA");
+    suffixAllowedValueSet.add("LPN");
+  }
+
+
+  private String getSuffix(VaccinationReported vaccinationReported) {
+    String suffix = vaccinationReported.getAdministeringProvider().getProfessionalSuffix();
+    if (StringUtils.isEmpty(suffix)) {
+      suffix = "UNK";
+    } else {
+      if (!suffixAllowedValueSet.contains(suffix)) {
+        suffix = "OTH";
+      }
+    }
+    return suffix;
   }
 
   private void printField(String s, PrintWriter out) {
@@ -376,16 +486,12 @@ public class CovidServlet extends HttpServlet {
   }
 
   private void printField(String s, boolean includePhi, PrintWriter out) {
-    if (s != null && includePhi) {
-      out.print(s);
-    }
-    out.print("\t");
-  }
-
-  private void printField(Date d, boolean includePhi, PrintWriter out) {
-    if (d != null && includePhi) {
-      SimpleDateFormat sdf = new SimpleDateFormat(EXPORT_YYYY_MM_DD);
-      out.print(sdf.format(d));
+    if (includePhi) {
+      if (s != null) {
+        out.print(s);
+      }
+    } else {
+      out.print("Redacted");
     }
     out.print("\t");
   }
