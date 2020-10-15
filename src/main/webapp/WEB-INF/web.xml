@@ -17,6 +17,10 @@
     <servlet-class>org.immregistries.iis.kernal.servlet.PopServlet</servlet-class>
   </servlet>
   <servlet>
+    <servlet-name>event</servlet-name>
+    <servlet-class>org.immregistries.iis.kernal.servlet.EventServlet</servlet-class>
+  </servlet>
+  <servlet>
     <servlet-name>home</servlet-name>
     <servlet-class>org.immregistries.iis.kernal.servlet.HomeServlet</servlet-class>
   </servlet>
@@ -87,6 +91,10 @@
   <servlet-mapping>
     <servlet-name>pop</servlet-name>
     <url-pattern>/pop</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>event</servlet-name>
+    <url-pattern>/event</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>soap</servlet-name>
