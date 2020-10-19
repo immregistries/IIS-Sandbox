@@ -211,7 +211,7 @@ public class CovidServlet extends HttpServlet {
     printField("vax_series_complete", out);
     printField("responsible_org", out);
     printField("admin_name", out);
-    printField("vfc_prov_pin", out);
+    printField("vtrcks_prov_pin", out);
     printField("admin_type", out);
     printField("admin_address_street", out);
     printField("admin_address_street_2", out);
@@ -347,8 +347,13 @@ public class CovidServlet extends HttpServlet {
         printField("", out);
       }
     } else {
-      //    24   CVX
-      printField("", out);
+      if (vaccinationReported.getCompletionStatus().equals("RE")) {
+        //    24   CVX
+        printField(vaccinationReported.getVaccineCvxCode(), out);
+      } else {
+        //    24   CVX
+        printField("", out);
+      }
       //    25   NDC
       printField("", out);
       //    26   MVX
@@ -433,7 +438,7 @@ public class CovidServlet extends HttpServlet {
         printField("Yes", out);
       } else {
         //    44   Vaccination refusal
-        printField("", out);
+        printField("No", out);
       }
     }
     //    45   Comorbidity status
