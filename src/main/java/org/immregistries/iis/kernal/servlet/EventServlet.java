@@ -2,29 +2,15 @@ package org.immregistries.iis.kernal.servlet;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Date;
-import java.util.List;
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
 import org.hibernate.cfg.AnnotationConfiguration;
-import org.immregistries.iis.kernal.SoftwareVersion;
-import org.immregistries.iis.kernal.logic.IncomingMessageHandler;
+import org.immregistries.iis.kernal.logic.IncomingEventHandler;
 import org.immregistries.iis.kernal.model.OrgAccess;
-import org.immregistries.iis.kernal.model.OrgLocation;
-import org.immregistries.iis.kernal.model.OrgMaster;
-import org.immregistries.iis.kernal.model.Person;
-import org.immregistries.iis.kernal.model.VaccinationMaster;
-import org.immregistries.smm.transform.ScenarioManager;
-import org.immregistries.smm.transform.TestCaseMessage;
-import org.immregistries.smm.transform.Transformer;
-import org.immregistries.vfa.connect.model.TestEvent;
 
 @SuppressWarnings("serial")
 public class EventServlet extends PopServlet {
@@ -33,23 +19,7 @@ public class EventServlet extends PopServlet {
   public static final String PARAM_PASSWORD = "PASSWORD";
   public static final String PARAM_FACILITYID = "FACILITYID";
 
-  public static final String[] PARAMS_PATIENT =
-      new String[] {"patientReportedExternalLink", "patientReportedAuthority",
-          "patientReportedType", "patientNameLast", "patientNameFirst", "patientNameMiddle",
-          "patientMotherMaiden", "patientBirthDate", "patientSex", "patientRace", "patientRace2",
-          "patientRace3", "patientRace4", "patientRace5", "patientRace6", "patientAddressLine1",
-          "patientAddressLine2", "patientAddressCity", "patientAddressState", "patientAddressZip",
-          "patientAddressCountry", "patientAddressCountyParish", "patientPhone", "patientEmail",
-          "patientEthnicity", "patientBirthFlag", "patientBirthOrder", "patientDeathFlag",
-          "patientDeathDate", "publicityIndicator", "publicityIndicatorDate", "protectionIndicator",
-          "protectionIndicatorDate", "registryStatusIndicator", "registryStatusIndicatorDate",
-          "guardianLast", "guardianFirst", "guardianMiddle", "guardianRelationship"};
 
-  public static final String[] PARAMS_VACCINATION = new String[] {"vaccinationReportedExternalLink",
-      "administeredDate", "vaccineCvxCode", "vaccineNdcCode", "vaccineMvxCode = ",
-      "administeredAmount", "informationSource", "lotnumber", "expirationDate", "completionStatus",
-      "actionCode", "refusalReasonCode", "bodySite", "bodyRoute", "fundingSource",
-      "fundingEligibility", "orgLocationFacilityCode"};
 
   private static SessionFactory factory;
 
@@ -83,7 +53,8 @@ public class EventServlet extends PopServlet {
           out.println(
               "Access is not authorized. Facilityid, userid and/or password are not recognized. ");
         } else {
-
+          IncomingEventHandler incomingEventHandler = new IncomingEventHandler(dataSession);
+          ack = incomingEventHandler.process(req, orgAccess);
           session.setAttribute("orgAccess", orgAccess);
         }
       } finally {
@@ -124,7 +95,7 @@ public class EventServlet extends PopServlet {
       {
         HomeServlet.doHeader(out, session);
         out.println("    <h2>Send Now</h2>");
-        out.println("    <form action=\"pop\" method=\"POST\" target=\"_blank\">");
+        out.println("    <form action=\"event\" method=\"POST\" target=\"_blank\">");
         out.println("    <div class=\"w3-container w3-half w3-margin-top\">");
         out.println("    <div class=\"w3-container w3-card-4\">");
         out.println("      <h3>Authentication</h3>");
@@ -148,13 +119,13 @@ public class EventServlet extends PopServlet {
           out.println("      <label>Facility Id</label>");
         }
         out.println("      <h3>Patient</h3>");
-        for (String s : PARAMS_PATIENT) {
+        for (String s : IncomingEventHandler.PARAMS_PATIENT) {
           out.println("      <label>" + s + "</label>");
           out.println("      <input class=\"w3-input\" type=\"text\" name=\"" + s + "\"/>");
         }
         out.println("");
         out.println("      <h3>Vaccination</h3>");
-        for (String s : PARAMS_VACCINATION) {
+        for (String s : IncomingEventHandler.PARAMS_VACCINATION) {
           out.println("      <label>" + s + "</label>");
           out.println("      <input class=\"w3-input\" type=\"text\" name=\"" + s + "\"/>");
         }

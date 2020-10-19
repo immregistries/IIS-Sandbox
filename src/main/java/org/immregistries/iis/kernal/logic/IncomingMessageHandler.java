@@ -67,7 +67,7 @@ public class IncomingMessageHandler {
   private static final String QUERY_TOO_MANY = "TM";
   private static final String QUERY_APPLICATION_ERROR = "AE";
 
-  private Session dataSession = null;
+  protected Session dataSession = null;
 
   public IncomingMessageHandler(Session dataSession) {
     this.dataSession = dataSession;
