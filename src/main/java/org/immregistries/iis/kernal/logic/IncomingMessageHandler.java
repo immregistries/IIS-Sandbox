@@ -13,10 +13,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+
+import ca.uhn.fhir.context.FhirContext;
+import ca.uhn.fhir.parser.IParser;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hl7.fhir.r4.model.Immunization;
+import org.hl7.fhir.r4.model.Patient;
 import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodeStatusValue;
@@ -67,6 +72,8 @@ public class IncomingMessageHandler {
   private static final String QUERY_TOO_MANY = "TM";
   private static final String QUERY_APPLICATION_ERROR = "AE";
 
+  private FhirContext ctx  = Context.getCtx();
+
   protected Session dataSession = null;
 
   public IncomingMessageHandler(Session dataSession) {
@@ -74,6 +81,12 @@ public class IncomingMessageHandler {
   }
 
   public String process(String message, OrgAccess orgAccess) {
+    Immunization immunization = processImmunizationFHIR(message);
+    Patient patient = processPatientFHIR(message);
+
+    IParser parser = ctx.newJsonParser();
+    return parser.encodeResourceToString(patient) + "\n" + parser.encodeResourceToString(immunization);
+    /*
     HL7Reader reader = new HL7Reader(message);
     String messageType = reader.getValue(9);
     String responseMessage;
@@ -108,6 +121,19 @@ public class IncomingMessageHandler {
       responseMessage = buildAck(reader, processingExceptionList);
     }
     return responseMessage;
+    */
+  }
+
+  public Patient processPatientFHIR(String message){
+    IParser parser = Context.fhir_parser(message);
+    Patient patient = parser.parseResource(Patient.class,message);
+    return patient;
+  }
+
+  public Immunization processImmunizationFHIR(String message){
+    IParser parser = Context.fhir_parser(message);
+    Immunization immunization = parser.parseResource(Immunization.class,message);
+    return immunization;
   }
 
   public String processQBP(OrgAccess orgAccess, HL7Reader reader, String messageReceived) {
@@ -256,6 +282,7 @@ public class IncomingMessageHandler {
   }
 
   public String processVXU(OrgAccess orgAccess, HL7Reader reader, String message) {
+
     List<ProcessingException> processingExceptionList = new ArrayList<>();
     try {
       Set<ProcessingFlavor> processingFlavorSet = orgAccess.getOrg().getProcessingFlavorSet();
@@ -638,6 +665,7 @@ public class IncomingMessageHandler {
       recordMessageReceived(message, null, ack, "Update", "Exception", orgAccess.getOrg());
       return ack;
     }
+
   }
 
   public PatientReported processPatient(OrgAccess orgAccess, HL7Reader reader,
