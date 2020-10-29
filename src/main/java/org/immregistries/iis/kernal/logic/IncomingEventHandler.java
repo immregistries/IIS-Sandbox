@@ -396,13 +396,14 @@ public class IncomingEventHandler extends IncomingMessageHandler {
     name.setUse(HumanName.NameUse.OFFICIAL);
     name.setFamily(req.getParameter(PATIENT_NAME_LAST));
     name.addGiven(req.getParameter(PATIENT_NAME_FIRST));
+    //name.addGiven(req.getParameter(PATIENT_NAME_MIDDLE));
 
     patient.setBirthDate(parseDateInternal(req.getParameter(PATIENT_BIRTH_DATE),true));
     if(patient.getBirthDate().after(new Date())){
       throw new Exception(
               "Patient is indicated as being born in the future, unable to record patients who are not yet born");
     }
-    //name.addGiven();
+
 
 // We can now use a parser to encode this resource into a string.
     String encoded = Context.getCtx().newXmlParser().encodeResourceToString(patient);
