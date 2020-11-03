@@ -1,14 +1,14 @@
-package org.immregistries.iis.kernal.Fhir;
+package org.immregistries.iis.kernal.fhir;
 
 
 import ca.uhn.fhir.rest.server.IResourceProvider;
 import ca.uhn.fhir.rest.server.RestfulServer;
-import javax.servlet.annotation.WebServlet;
+//import javax.servlet.annotation.WebServlet;
 import javax.servlet.ServletException;
 import java.util.ArrayList;
 import java.util.List;
 
-@WebServlet(urlPatterns= {"/fhir/*"}, displayName="FHIR Server")
+/*WebServlet(urlPatterns= {"/fhir/*"}, displayName="FHIR Server")*/
 public class Server extends RestfulServer {
     private static final long serialVersionUID = 1L;
 

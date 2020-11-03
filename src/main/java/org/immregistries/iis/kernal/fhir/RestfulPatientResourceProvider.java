@@ -1,16 +1,12 @@
-package org.immregistries.iis.kernal.Fhir;
+package org.immregistries.iis.kernal.fhir;
 
 import ca.uhn.fhir.model.primitive.UriDt;
-import ca.uhn.fhir.rest.annotation.IdParam;
-import ca.uhn.fhir.rest.annotation.Read;
-import ca.uhn.fhir.rest.annotation.RequiredParam;
-import ca.uhn.fhir.rest.annotation.Search;
+import ca.uhn.fhir.rest.annotation.*;
+import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.param.StringParam;
 import ca.uhn.fhir.rest.server.IResourceProvider;
-import org.hl7.fhir.r4.model.Enumerations;
-import org.hl7.fhir.r4.model.IdType;
-import org.hl7.fhir.r4.model.Identifier;
-import org.hl7.fhir.r4.model.Patient;
+import ca.uhn.fhir.rest.server.exceptions.UnprocessableEntityException;
+import org.hl7.fhir.r4.model.*;
 
 import java.util.Collections;
 import java.util.List;
@@ -81,6 +77,41 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
         patient.getName().get(0).addGiven("PatientOne");
         patient.setGender(Enumerations.AdministrativeGender.MALE);
         return Collections.singletonList(patient);
+    }
+
+    @Create
+    public MethodOutcome createPatient(@ResourceParam Patient thePatient) {
+
+        /*
+         * First we might want to do business validation. The UnprocessableEntityException
+         * results in an HTTP 422, which is appropriate for business rule failure
+         */
+        if (thePatient.getIdentifierFirstRep().isEmpty()) {
+            /* It is also possible to pass an OperationOutcome resource
+             * to the UnprocessableEntityException if you want to return
+             * a custom populated OperationOutcome. Otherwise, a simple one
+             * is created using the string supplied below.
+             */
+            throw new UnprocessableEntityException("No identifier supplied");
+        }
+
+        // Save this patient to the database...
+
+        //savePatientToDatabase(thePatient);
+
+        // This method returns a MethodOutcome object which contains
+        // the ID (composed of the type Patient, the logical ID 3746, and the
+        // version ID 1)
+        MethodOutcome retVal = new MethodOutcome();
+        retVal.setId(new IdType("Patient", "3746", "1"));
+
+        // You can also add an OperationOutcome resource to return
+        // This part is optional though:
+        OperationOutcome outcome = new OperationOutcome();
+        outcome.addIssue().setDiagnostics("One minor issue detected");
+        retVal.setOperationOutcome(outcome);
+
+        return retVal;
     }
 
 }
