@@ -7,9 +7,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hl7.fhir.r4.model.HumanName;
-import org.hl7.fhir.r4.model.Identifier;
-import org.hl7.fhir.r4.model.Patient;
 import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
@@ -108,13 +105,8 @@ public class IncomingEventHandler extends IncomingMessageHandler {
       e.printStackTrace(System.err);
       return "Exception processing request" + e.getMessage();
     }
-    String test= null;
-    try {
-      test = patientProcessFhir(req);
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-    return "OK"+ test;
+
+    return "OK";
   }
 
 
@@ -383,32 +375,6 @@ public class IncomingEventHandler extends IncomingMessageHandler {
     return patientReported;
   }
 
-  public String patientProcessFhir(HttpServletRequest req) throws Exception{
-    Patient patient = new Patient();
-
-// Add an MRN (a patient identifier)
-    Identifier id = patient.addIdentifier();
-    //id.setSystem("http://example.com/fictitious-mrns");
-    //id.setValue("MRN001");
-    id.setValue(req.getParameter(PATIENT_REPORTED_EXTERNAL_LINK));
-// Add a name
-    HumanName name = patient.addName();
-    name.setUse(HumanName.NameUse.OFFICIAL);
-    name.setFamily(req.getParameter(PATIENT_NAME_LAST));
-    name.addGiven(req.getParameter(PATIENT_NAME_FIRST));
-    //name.addGiven(req.getParameter(PATIENT_NAME_MIDDLE));
-
-    patient.setBirthDate(parseDateInternal(req.getParameter(PATIENT_BIRTH_DATE),true));
-    if(patient.getBirthDate().after(new Date())){
-      throw new Exception(
-              "Patient is indicated as being born in the future, unable to record patients who are not yet born");
-    }
-
-
-// We can now use a parser to encode this resource into a string.
-    String encoded = Context.getCtx().newXmlParser().encodeResourceToString(patient);
-    return encoded;
-  }
 
 
 
