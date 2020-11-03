@@ -80,13 +80,28 @@ public class IncomingMessageHandler {
     this.dataSession = dataSession;
   }
 
-  public String process(String message, OrgAccess orgAccess) {
-    Immunization immunization = processImmunizationFHIR(message);
-    Patient patient = processPatientFHIR(message);
+  public String processFHIR(String patientMessage,String immunizationMessage, OrgAccess orgAccess) {
+    Immunization immunization = processImmunizationFHIR(patientMessage);
+    Patient patient = processPatientFHIR(immunizationMessage);
 
     IParser parser = ctx.newJsonParser();
     return parser.encodeResourceToString(patient) + "\n" + parser.encodeResourceToString(immunization);
-    /*
+  }
+
+  public Patient processPatientFHIR(String message){
+    IParser parser = Context.fhir_parser(message);
+    Patient patient = parser.parseResource(Patient.class,message);
+    return patient;
+  }
+
+  public Immunization processImmunizationFHIR(String message){
+    IParser parser = Context.fhir_parser(message);
+    Immunization immunization = parser.parseResource(Immunization.class,message);
+    return immunization;
+  }
+
+
+  public String process(String message, OrgAccess orgAccess) {
     HL7Reader reader = new HL7Reader(message);
     String messageType = reader.getValue(9);
     String responseMessage;
@@ -121,20 +136,9 @@ public class IncomingMessageHandler {
       responseMessage = buildAck(reader, processingExceptionList);
     }
     return responseMessage;
-    */
   }
 
-  public Patient processPatientFHIR(String message){
-    IParser parser = Context.fhir_parser(message);
-    Patient patient = parser.parseResource(Patient.class,message);
-    return patient;
-  }
 
-  public Immunization processImmunizationFHIR(String message){
-    IParser parser = Context.fhir_parser(message);
-    Immunization immunization = parser.parseResource(Immunization.class,message);
-    return immunization;
-  }
 
   public String processQBP(OrgAccess orgAccess, HL7Reader reader, String messageReceived) {
     PatientReported patientReported = null;
