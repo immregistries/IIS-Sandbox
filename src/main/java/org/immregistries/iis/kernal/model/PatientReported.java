@@ -1,5 +1,9 @@
 package org.immregistries.iis.kernal.model;
 
+import org.hl7.fhir.r4.model.ContactPoint;
+import org.hl7.fhir.r4.model.Immunization;
+import org.hl7.fhir.r4.model.Patient;
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -52,6 +56,49 @@ public class PatientReported implements Serializable {
   private String guardianFirst = "";
   private String guardianMiddle = "";
   private String guardianRelationship = "";
+
+  public void PatientReportedFromFHIR(Patient p, Immunization i) {
+    this.patientReportedId = patientReportedId;
+    this.patientReportedExternalLink = p.getId();
+    this.reportedDate = i.getRecorded();
+    this.updatedDate = i.getOccurrenceDateTimeType().getValue();
+    this.patientReportedAuthority = i.getIdentifierFirstRep().getValue();
+    this.patientReportedType = patientReportedType;
+    this.patientNameLast = p.getNameFirstRep().getFamily();
+    this.patientNameFirst = p.getNameFirstRep().getGiven().get(0).getValueNotNull();
+    if (p.getNameFirstRep().getGiven().size()>1){
+      this.patientNameMiddle = p.getNameFirstRep().getGiven().get(1).getValueNotNull();
+    }
+    this.patientBirthDate = p.getBirthDate(); //TODO format
+    this.patientSex = p.getGender().toString();
+    this.patientAddressLine1 = p.getAddress().get(0).getLine().get(0).getValueNotNull();
+    if (p.getAddress().get(0).getLine().size()>1){
+      this.patientAddressLine2 = p.getAddress().get(0).getLine().get(1).getValueNotNull();
+    }
+    this.patientAddressCity =  p.getAddress().get(0).getCity();
+    this.patientAddressState = p.getAddress().get(0).getState();
+    this.patientAddressZip = p.getAddress().get(0).getPostalCode();
+    this.patientAddressCountry = p.getAddress().get(0).getCountry();
+    this.patientAddressCountyParish = p.getAddress().get(0).getDistrict();
+    for (ContactPoint contact : p.getTelecom()){
+      if (contact.getSystem().name().equals("PHONE")){
+        this.patientPhone = p.getTelecomFirstRep().getValue();
+      }else if (contact.getSystem().name().equals("EMAIL")){
+        this.patientEmail = p.getTelecom().get(1).getValue();
+      }
+    }
+    this.patientBirthFlag = p.getBirthDate().toString(); //TODO CREATE FLAG;
+    this.patientBirthOrder = patientBirthOrder;
+    this.patientDeathFlag = p.getDeceasedBooleanType().toString(); //TODO format
+    this.patientDeathDate = p.getDeceasedDateTimeType().getValue(); //TODO format
+    //this.registryStatusIndicator = p.getActive();
+    this.guardianLast = p.getContactFirstRep().getName().getFamily();
+    this.guardianFirst = p.getContactFirstRep().getName().getGiven().get(0).getValueNotNull();
+    if (p.getContactFirstRep().getName().getGiven().size()>1){
+      this.guardianMiddle = p.getContactFirstRep().getName().getGiven().get(1).getValueNotNull();
+    }
+    this.guardianRelationship = p.getContactFirstRep().getRelationshipFirstRep().getText();
+  }
 
   public String getPatientReportedAuthority() {
     return patientReportedAuthority;
