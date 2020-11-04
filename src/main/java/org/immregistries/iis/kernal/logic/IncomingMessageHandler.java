@@ -81,11 +81,19 @@ public class IncomingMessageHandler {
   }
 
   public String processFHIR(String patientMessage,String immunizationMessage, OrgAccess orgAccess) {
-    Immunization immunization = processImmunizationFHIR(patientMessage);
-    Patient patient = processPatientFHIR(immunizationMessage);
-
+    //Immunization immunization = processImmunizationFHIR(immunizationMessage);
+    Patient patient = processPatientFHIR(patientMessage);
     IParser parser = ctx.newJsonParser();
-    return parser.encodeResourceToString(patient) + "\n" + parser.encodeResourceToString(immunization);
+    PatientReported patientReported = new PatientReported();
+    patientReported.patientReportedFromFHIR(patient);//,immunization);
+    patientReported.setPatientReportedId(10);
+    {
+      Transaction transaction = dataSession.beginTransaction();
+      dataSession.saveOrUpdate(patientReported);
+      transaction.commit();
+    }
+
+    return patientReported.toString() + "  \n\n\n       " + parser.encodeResourceToString(patient); //+ "\n" + parser.encodeResourceToString(immunization);
   }
 
   public Patient processPatientFHIR(String message){
