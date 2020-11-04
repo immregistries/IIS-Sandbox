@@ -57,20 +57,24 @@ public class PatientReported implements Serializable {
   private String guardianMiddle = "";
   private String guardianRelationship = "";
 
-  public void PatientReportedFromFHIR(Patient p, Immunization i) {
+  public void patientReportedFromFHIR(Patient p ){//}, Immunization i) {
     this.patientReportedId = patientReportedId;
-    this.patientReportedExternalLink = p.getId();
-    this.reportedDate = i.getRecorded();
+    this.patientReportedExternalLink = p.getId(); //TODO modify
+
+
+    /*this.reportedDate = i.getRecorded();
     this.updatedDate = i.getOccurrenceDateTimeType().getValue();
     this.patientReportedAuthority = i.getIdentifierFirstRep().getValue();
-    this.patientReportedType = patientReportedType;
+    this.patientReportedType = patientReportedType;*/
+
+
     this.patientNameLast = p.getNameFirstRep().getFamily();
     this.patientNameFirst = p.getNameFirstRep().getGiven().get(0).getValueNotNull();
     if (p.getNameFirstRep().getGiven().size()>1){
       this.patientNameMiddle = p.getNameFirstRep().getGiven().get(1).getValueNotNull();
     }
-    this.patientBirthDate = p.getBirthDate(); //TODO format
-    this.patientSex = p.getGender().toString();
+    this.patientBirthDate = p.getBirthDate();
+    this.patientSex = String.valueOf(p.getGender().toString().charAt(0)); // Get the first char of MALE or FEMALE
     this.patientAddressLine1 = p.getAddress().get(0).getLine().get(0).getValueNotNull();
     if (p.getAddress().get(0).getLine().size()>1){
       this.patientAddressLine2 = p.getAddress().get(0).getLine().get(1).getValueNotNull();
@@ -87,10 +91,12 @@ public class PatientReported implements Serializable {
         this.patientEmail = p.getTelecom().get(1).getValue();
       }
     }
-    this.patientBirthFlag = p.getBirthDate().toString(); //TODO CREATE FLAG;
+    this.patientBirthFlag = p.getBirthDate().toString(); //TODO look for flag format;
     this.patientBirthOrder = patientBirthOrder;
-    this.patientDeathFlag = p.getDeceasedBooleanType().toString(); //TODO format
-    this.patientDeathDate = p.getDeceasedDateTimeType().getValue(); //TODO format
+    //this.patientDeathFlag = p.getDeceasedBooleanType().toString();
+    if (p.getDeceasedBooleanType().booleanValue()){
+      this.patientDeathDate = p.getDeceasedDateTimeType().getValue();
+    }
     //this.registryStatusIndicator = p.getActive();
     this.guardianLast = p.getContactFirstRep().getName().getFamily();
     this.guardianFirst = p.getContactFirstRep().getName().getGiven().get(0).getValueNotNull();
@@ -452,4 +458,53 @@ public class PatientReported implements Serializable {
     this.patientRace6 = patientRace6;
   }
 
+  @Override
+  public String toString() {
+    return "PatientReported{" +
+            "patientReportedId=" + patientReportedId +
+            ", orgReported=" + orgReported +
+            ", patientReportedExternalLink='" + patientReportedExternalLink + '\'' +
+            ", patient=" + patient +
+            ", reportedDate=" + reportedDate +
+            ", updatedDate=" + updatedDate +
+            ", patientReportedAuthority='" + patientReportedAuthority + '\'' +
+            ", patientReportedType='" + patientReportedType + '\'' +
+            ", patientNameLast='" + patientNameLast + '\'' +
+            ", patientNameFirst='" + patientNameFirst + '\'' +
+            ", patientNameMiddle='" + patientNameMiddle + '\'' +
+            ", patientMotherMaiden='" + patientMotherMaiden + '\'' +
+            ", patientBirthDate=" + patientBirthDate +
+            ", patientSex='" + patientSex + '\'' +
+            ", patientRace='" + patientRace + '\'' +
+            ", patientRace2='" + patientRace2 + '\'' +
+            ", patientRace3='" + patientRace3 + '\'' +
+            ", patientRace4='" + patientRace4 + '\'' +
+            ", patientRace5='" + patientRace5 + '\'' +
+            ", patientRace6='" + patientRace6 + '\'' +
+            ", patientAddressLine1='" + patientAddressLine1 + '\'' +
+            ", patientAddressLine2='" + patientAddressLine2 + '\'' +
+            ", patientAddressCity='" + patientAddressCity + '\'' +
+            ", patientAddressState='" + patientAddressState + '\'' +
+            ", patientAddressZip='" + patientAddressZip + '\'' +
+            ", patientAddressCountry='" + patientAddressCountry + '\'' +
+            ", patientAddressCountyParish='" + patientAddressCountyParish + '\'' +
+            ", patientPhone='" + patientPhone + '\'' +
+            ", patientEmail='" + patientEmail + '\'' +
+            ", patientEthnicity='" + patientEthnicity + '\'' +
+            ", patientBirthFlag='" + patientBirthFlag + '\'' +
+            ", patientBirthOrder='" + patientBirthOrder + '\'' +
+            ", patientDeathFlag='" + patientDeathFlag + '\'' +
+            ", patientDeathDate=" + patientDeathDate +
+            ", publicityIndicator='" + publicityIndicator + '\'' +
+            ", publicityIndicatorDate=" + publicityIndicatorDate +
+            ", protectionIndicator='" + protectionIndicator + '\'' +
+            ", protectionIndicatorDate=" + protectionIndicatorDate +
+            ", registryStatusIndicator='" + registryStatusIndicator + '\'' +
+            ", registryStatusIndicatorDate=" + registryStatusIndicatorDate +
+            ", guardianLast='" + guardianLast + '\'' +
+            ", guardianFirst='" + guardianFirst + '\'' +
+            ", guardianMiddle='" + guardianMiddle + '\'' +
+            ", guardianRelationship='" + guardianRelationship + '\'' +
+            '}';
+  }
 }
