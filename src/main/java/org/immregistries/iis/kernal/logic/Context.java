@@ -13,7 +13,7 @@ public class Context {
     }
 
     public static IParser fhir_parser(String message){ //Returns appropriate parser
-        if (message.charAt(0) == '<'){ //If XML
+        if (message.equals("application/fhir+xml")){ //If XML
             return xml;
         }else{ //else should be json
             return json;
