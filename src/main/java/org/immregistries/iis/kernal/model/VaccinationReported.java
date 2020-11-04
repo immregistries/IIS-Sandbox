@@ -2,31 +2,34 @@ package org.immregistries.iis.kernal.model;
 
 import java.io.Serializable;
 import java.util.Date;
+import org.hl7.fhir.r4.model.HumanName;
+import org.hl7.fhir.r4.model.Immunization;
+import org.hl7.fhir.r4.model.Patient;
 import org.immregistries.vfa.connect.model.TestEvent;
 
 /**
  * Created by Eric on 12/20/17.
  */
 public class VaccinationReported implements Serializable {
-  private int vaccinationReportedId = 0;
-  private PatientReported patientReported = null;
-  private String vaccinationReportedExternalLink = "";
-  private VaccinationMaster vaccination = null;
-  private Date reportedDate = null;
-  private Date updatedDate = null;
+  private int vaccinationReportedId = 0;					
+  private PatientReported patientReported = null;			
+  private String vaccinationReportedExternalLink = "";		
+  private VaccinationMaster vaccination = null;				
+  private Date reportedDate = null;							
+  private Date updatedDate = null;							
 
-  private Date administeredDate = null;
+  private Date administeredDate = null;                     
   private String vaccineCvxCode = "";
   private String vaccineNdcCode = "";
   private String vaccineMvxCode = "";
-  private String administeredAmount = "";
+  private String administeredAmount = "";					
   private String informationSource = "";
-  private String lotnumber = "";
-  private Date expirationDate = null;
-  private String completionStatus = "";
+  private String lotnumber = "";							
+  private Date expirationDate = null;						
+  private String completionStatus = "";						
   private String actionCode = "";
   private String refusalReasonCode = "";
-  private String bodySite = "";
+  private String bodySite = "";                             
   private String bodyRoute = "";
   private String fundingSource = "";
   private String fundingEligibility = "";
@@ -36,6 +39,33 @@ public class VaccinationReported implements Serializable {
   private Person orderingProvider = null;
   private Person administeringProvider = null;
 
+  
+  public void vaccinationReportedFromFHIR(Patient p, Immunization i) {
+	this.vaccinationReportedId = 0;
+	this.vaccinationReportedExternalLink = i.getId();
+	PatientReported pr = new PatientReported();
+	pr.PatientReportedFromFHIR(p, i);
+	this.patientReported = pr;
+	this.reportedDate = i.getRecorded();
+	this.updatedDate = i.getOccurrenceDateTimeType().getValue();
+	
+	
+	this.lotnumber = i.getLotNumber();
+	this.administeredDate = i.getOccurrenceDateTimeType().getValue();
+	
+	this.administeredAmount = i.getDoseQuantity().getValue().toString();
+	this.expirationDate = i.getExpirationDate();
+	this.completionStatus = i.getStatus().toString();
+	
+	VaccinationMaster vm = new VaccinationMaster();
+	vm.setAdministeredDate(this.administeredDate);
+	vm.setPatient(pr.getPatient());
+	vm.setVaccinationId(this.vaccinationReportedId);
+	vm.setVaccinationReported(this);
+	vm.setVaccineCvxCode(this.vaccineCvxCode);
+  }
+  
+  
   public Person getEnteredBy() {
     return enteredBy;
   }
