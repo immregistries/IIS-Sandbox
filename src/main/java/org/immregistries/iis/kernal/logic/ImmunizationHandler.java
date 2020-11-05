@@ -36,7 +36,7 @@ public class ImmunizationHandler {
 
     public static void orgLocationFromFhirImmunization(OrgLocation orgLocation, Immunization i){
         Location l = i.getLocationTarget();
-        //orgLocation.setOrgLocationId(l.getId()); //TODO create an external identifier or change the type to string
+        orgLocation.setOrgFacilityCode(l.getId()); //TODO create an external identifier or change the usage of the name
         orgLocation.setOrgFacilityName(l.getName());
         //orgLocation.setLocationType(l.getTypeFirstRep());
         orgLocation.setAddressCity(l.getAddress().getLine().get(0).getValueNotNull());

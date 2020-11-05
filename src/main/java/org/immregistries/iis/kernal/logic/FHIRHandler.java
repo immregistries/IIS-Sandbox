@@ -44,6 +44,31 @@ public class FHIRHandler extends IncomingMessageHandler {
             vaccinationReported.setReportedDate(new Date());
             vaccinationReported.setVaccinationReportedExternalLink(vaccinationReportedExternalLink);
         }
+
+        {
+            String administeredAtLocation = immunization.getLocationTarget().getId();
+            if (StringUtils.isNotEmpty(administeredAtLocation)) {
+                Query query = dataSession.createQuery(
+                        "from OrgLocation where orgMaster = :orgMaster and orgFacilityCode = :orgFacilityCode");
+                query.setParameter("orgMaster", orgAccess.getOrg());
+                query.setParameter("orgFacilityCode", administeredAtLocation);
+                List<OrgLocation> orgMasterList = query.list();
+                OrgLocation orgLocation = null;
+                if (orgMasterList.size() > 0) {
+                    orgLocation = orgMasterList.get(0);
+                }
+
+                if (orgLocation == null) {
+                    orgLocation = new OrgLocation();
+                    ImmunizationHandler.orgLocationFromFhirImmunization(orgLocation, immunization);
+                    orgLocation.setOrgMaster(orgAccess.getOrg());
+                    Transaction transaction = dataSession.beginTransaction();
+                    dataSession.save(orgLocation);
+                    transaction.commit();
+                }
+                vaccinationReported.setOrgLocation(orgLocation);
+            }
+        }
     }
 
     public PatientReported FIHR_EventPatientReported(OrgAccess orgAccess, Patient patient, Immunization immunization) throws Exception {
