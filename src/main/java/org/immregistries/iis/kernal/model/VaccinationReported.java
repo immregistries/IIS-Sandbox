@@ -44,7 +44,7 @@ public class VaccinationReported implements Serializable {
 	this.vaccinationReportedId = 0;
 	this.vaccinationReportedExternalLink = i.getId();
 	PatientReported pr = new PatientReported();
-	pr.PatientReportedFromFHIR(p, i);
+	//pr.PatientReportedFromFHIR(p, i);
 	this.patientReported = pr;
 	this.reportedDate = i.getRecorded();
 	this.updatedDate = i.getOccurrenceDateTimeType().getValue();

@@ -1,36 +1,41 @@
 package org.immregistries.iis.kernal.fhir;
 
 import ca.uhn.fhir.model.primitive.UriDt;
+import ca.uhn.fhir.parser.DataFormatException;
 import ca.uhn.fhir.rest.annotation.*;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.param.StringParam;
 import ca.uhn.fhir.rest.server.IResourceProvider;
+import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
 import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
+import ca.uhn.fhir.rest.server.exceptions.ResourceVersionConflictException;
 import ca.uhn.fhir.rest.server.exceptions.UnprocessableEntityException;
 import org.hl7.fhir.r4.model.*;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * All resource providers must implement IResourceProvider
  */
 public class RestfulPatientResourceProvider implements IResourceProvider {
-    private Map<String,Patient> myPatients = new HashMap<String,Patient>();
+    private Map<Long,Patient> myPatients = new HashMap<Long,Patient>();
+    private long nextId=0;
 
 
 
     public RestfulPatientResourceProvider() {
+        /*long patientId= nextId++;
+
         Patient patient = new Patient();
+        patient.setId(Long.toString(patientId));
         patient.addIdentifier();
         patient.getIdentifier().get(0).setSystem(String.valueOf(new UriDt("urn:hapitest:mrns")));
         patient.getIdentifier().get(0).setValue("00002");
-        patient.addName().setFamily("Test");
-        patient.getName().get(0).addGiven("PatientOne");
+        patient.addName().setFamily("Achi");
+        patient.getName().get(0).addGiven("Flavie");
         patient.setGender(Enumerations.AdministrativeGender.FEMALE);
-        myPatients.put("1",patient);
+
+        myPatients.put(patientId,patient);*/
 
     }
 
@@ -58,46 +63,16 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
      */
     @Read()
     public Patient getResourceById(@IdParam IdType theId) {
-        Patient patient= myPatients.get(theId.getIdPart());
+        Patient patient= myPatients.get(theId.getIdPartAsLong());
         if(patient==null){
             throw new ResourceNotFoundException(theId);
         }
         return patient;
     }
 
-
-    /**
-     * The "@Search" annotation indicates that this method supports the
-     * search operation. You may have many different methods annotated with
-     * this annotation, to support many different search criteria. This
-     * example searches by family name.
-     *
-     * @param theFamilyName
-     *    This operation takes one parameter which is the search criteria. It is
-     *    annotated with the "@Required" annotation. This annotation takes one argument,
-     *    a string containing the name of the search criteria. The datatype here
-     *    is StringParam, but there are other possible parameter types depending on the
-     *    specific search criteria.
-     * @return
-     *    This method returns a list of Patients. This list may contain multiple
-     *    matching resources, or it may also be empty.
-     */
-    @Search()
-    public List<Patient> getPatient(@RequiredParam(name = Patient.SP_FAMILY) StringParam theFamilyName) {
-        Patient patient = new Patient();
-        patient.addIdentifier();
-        patient.getIdentifier().get(0).setUse(Identifier.IdentifierUse.OFFICIAL);
-        patient.getIdentifier().get(0).setSystem(String.valueOf(new UriDt("urn:hapitest:mrns")));
-        patient.getIdentifier().get(0).setValue("00001");
-        patient.addName();
-        patient.getName().get(0).setFamily(theFamilyName.getValue());
-        patient.getName().get(0).addGiven("PatientOne");
-        patient.setGender(Enumerations.AdministrativeGender.MALE);
-        return Collections.singletonList(patient);
-    }
-
     @Create
     public MethodOutcome createPatient(@ResourceParam Patient thePatient) {
+        //TODO must add validation method later
 
         /*
          * First we might want to do business validation. The UnprocessableEntityException
@@ -112,26 +87,66 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
             throw new UnprocessableEntityException("No identifier supplied");
         }
 
+        long id= nextId++;
+
         // Save this patient to the database...
+        myPatients.put(id,thePatient);
 
-        myPatients.put("2",thePatient);
+        return new MethodOutcome(new IdType(id));
+    }
 
-        //savePatientToDatabase(thePatient);
+    /**
+     * The "@Update" annotation indicates that this method supports replacing an existing
+     * resource (by ID) with a new instance of that resource.
+     *
+     * @param theId      This is the ID of the patient to update
+     * @param thePatient This is the actual resource to save
+     * @return This method returns a "MethodOutcome"
+     */
 
-        // This method returns a MethodOutcome object which contains
-        // the ID (composed of the type Patient, the logical ID 3746, and the
-        // version ID 1)
-        MethodOutcome retVal = new MethodOutcome();
-        retVal.setId(new IdType("Patient", "3746", "1"));
+    @Update
+    public MethodOutcome updatePatient(@IdParam IdType theId, @ResourceParam Patient thePatient) {
+        //TODO add validation method later
 
-        // You can also add an OperationOutcome resource to return
-        // This part is optional though:
-        OperationOutcome outcome = new OperationOutcome();
-        outcome.addIssue().setDiagnostics("One minor issue detected");
-        retVal.setOperationOutcome(outcome);
+        Long resourceId;
+        try {
+            resourceId = theId.getIdPartAsLong();
+
+        } catch (DataFormatException e) {
+            throw new InvalidRequestException("Invalid ID " + theId.getValue() + " - Must be numeric");
+        }
+
+        if (!myPatients.containsKey(resourceId)) {
+            throw new ResourceNotFoundException(theId);
+        }
 
 
-        return retVal;
+        // ... perform the update ...
+        myPatients.put(resourceId,thePatient);
+        return new MethodOutcome();
+
+    }
+
+
+    @Delete()
+    public MethodOutcome deletePatient(@IdParam IdType theId) {
+
+        Long resourceId;
+        try {
+            resourceId = theId.getIdPartAsLong();
+
+        } catch (DataFormatException e) {
+            throw new InvalidRequestException("Invalid ID " + theId.getValue() + " - Must be numeric");
+        }
+
+        if (!myPatients.containsKey(resourceId)) {
+            throw new ResourceNotFoundException(theId);
+        }
+
+        // .. Delete the patient ..
+        myPatients.remove(resourceId);
+
+        return new MethodOutcome();
     }
 
 }
