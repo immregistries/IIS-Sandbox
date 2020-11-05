@@ -40,9 +40,12 @@ public class FHIRHandler extends IncomingMessageHandler {
             vaccination = new VaccinationMaster();
             vaccinationReported = new VaccinationReported();
             vaccinationReported.setVaccination(vaccination);
-            vaccination.setVaccinationReported(null);
+            vaccination.setVaccinationReported(vaccinationReported);
             vaccinationReported.setReportedDate(new Date());
-            vaccinationReported.setVaccinationReportedExternalLink(vaccinationReportedExternalLink);
+        }
+        if (vaccinationReported.getAdministeredDate().before(patientReported.getPatientBirthDate())) {
+            throw new Exception(
+                    "Vaccination is reported as having been administered before the patient was born");
         }
 
         {
@@ -68,6 +71,15 @@ public class FHIRHandler extends IncomingMessageHandler {
                 }
                 vaccinationReported.setOrgLocation(orgLocation);
             }
+
+        }
+        {
+            Transaction transaction = dataSession.beginTransaction();
+            dataSession.saveOrUpdate(vaccination);
+            dataSession.saveOrUpdate(vaccinationReported);
+            vaccination.setVaccinationReported(vaccinationReported);
+            dataSession.saveOrUpdate(vaccination);
+            transaction.commit();
         }
     }
 
