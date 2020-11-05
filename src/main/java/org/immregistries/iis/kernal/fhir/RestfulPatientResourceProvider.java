@@ -5,16 +5,34 @@ import ca.uhn.fhir.rest.annotation.*;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.param.StringParam;
 import ca.uhn.fhir.rest.server.IResourceProvider;
+import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
 import ca.uhn.fhir.rest.server.exceptions.UnprocessableEntityException;
 import org.hl7.fhir.r4.model.*;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * All resource providers must implement IResourceProvider
  */
 public class RestfulPatientResourceProvider implements IResourceProvider {
+    private Map<String,Patient> myPatients = new HashMap<String,Patient>();
+
+
+
+    public RestfulPatientResourceProvider() {
+        Patient patient = new Patient();
+        patient.addIdentifier();
+        patient.getIdentifier().get(0).setSystem(String.valueOf(new UriDt("urn:hapitest:mrns")));
+        patient.getIdentifier().get(0).setValue("00002");
+        patient.addName().setFamily("Test");
+        patient.getName().get(0).addGiven("PatientOne");
+        patient.setGender(Enumerations.AdministrativeGender.FEMALE);
+        myPatients.put("1",patient);
+
+    }
 
     /**
      * The getResourceType method comes from IResourceProvider, and must
@@ -25,6 +43,19 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
     public Class<Patient> getResourceType() {
         return Patient.class;
     }
+
+
+    /*@Read()
+    public Patient getResourceById(@IdParam IdType theId) {
+        Patient patient = new Patient();
+        patient.addIdentifier();
+        patient.getIdentifier().get(0).setSystem(String.valueOf(new UriDt("urn:hapitest:mrns")));
+        patient.getIdentifier().get(0).setValue("00002");
+        patient.addName().setFamily("Test");
+        patient.getName().get(0).addGiven("PatientOne");
+        patient.setGender(Enumerations.AdministrativeGender.FEMALE);
+        return patient;
+    }*/
 
     /**
      * The "@Read" annotation indicates that this method supports the
@@ -39,15 +70,13 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
      */
     @Read()
     public Patient getResourceById(@IdParam IdType theId) {
-        Patient patient = new Patient();
-        patient.addIdentifier();
-        patient.getIdentifier().get(0).setSystem(String.valueOf(new UriDt("urn:hapitest:mrns")));
-        patient.getIdentifier().get(0).setValue("00002");
-        patient.addName().setFamily("Test");
-        patient.getName().get(0).addGiven("PatientOne");
-        patient.setGender(Enumerations.AdministrativeGender.FEMALE);
+        Patient patient= myPatients.get(theId.getIdPart());
+        if(patient==null){
+            throw new ResourceNotFoundException(theId);
+        }
         return patient;
     }
+
 
     /**
      * The "@Search" annotation indicates that this method supports the

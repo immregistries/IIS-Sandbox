@@ -1,12 +1,18 @@
 package org.immregistries.iis.kernal.fhir;
 
 
+import ca.uhn.fhir.context.FhirContext;
+import ca.uhn.fhir.narrative.DefaultThymeleafNarrativeGenerator;
+import ca.uhn.fhir.narrative.INarrativeGenerator;
+import ca.uhn.fhir.rest.api.EncodingEnum;
+import ca.uhn.fhir.rest.server.HardcodedServerAddressStrategy;
 import ca.uhn.fhir.rest.server.IResourceProvider;
 import ca.uhn.fhir.rest.server.RestfulServer;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.ServletException;
 import java.util.ArrayList;
 import java.util.List;
+import ca.uhn.fhir.rest.server.interceptor.ResponseHighlighterInterceptor;
 
 @WebServlet(urlPatterns= {"/fhir/*"}, displayName="FHIR Server")
 public class Server extends RestfulServer {
@@ -17,8 +23,24 @@ public class Server extends RestfulServer {
      * be used to configure the servlet to define resource providers, or set up
      * configuration, interceptors, etc.
      */
+
+    /*public Server() {
+
+
+
+        // ...add some resource providers, etc...
+        List<IResourceProvider> resourceProviders = new ArrayList<IResourceProvider>();
+
+        setResourceProviders(resourceProviders);
+    }*/
     @Override
     protected void initialize() throws ServletException {
+        //setFhirContext(FhirContext.forR4());
+
+        this.setDefaultResponseEncoding(EncodingEnum.JSON);
+
+        String serverBaseUrl = "http://localhost:8080/iis-sandbox/fhir";
+        setServerAddressStrategy(new HardcodedServerAddressStrategy(serverBaseUrl));
         /*
          * The servlet defines any number of resource providers, and
          * configures itself to use them by calling
@@ -26,6 +48,12 @@ public class Server extends RestfulServer {
          */
         List<IResourceProvider> resourceProviders = new ArrayList<IResourceProvider>();
         resourceProviders.add(new RestfulPatientResourceProvider());
+
         setResourceProviders(resourceProviders);
+
+        INarrativeGenerator narrativeGen = new DefaultThymeleafNarrativeGenerator();
+        getFhirContext().setNarrativeGenerator(narrativeGen);
+
+        //registerInterceptor(new ResponseHighlighterInterceptor());
     }
 }
