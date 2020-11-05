@@ -45,18 +45,6 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
     }
 
 
-    /*@Read()
-    public Patient getResourceById(@IdParam IdType theId) {
-        Patient patient = new Patient();
-        patient.addIdentifier();
-        patient.getIdentifier().get(0).setSystem(String.valueOf(new UriDt("urn:hapitest:mrns")));
-        patient.getIdentifier().get(0).setValue("00002");
-        patient.addName().setFamily("Test");
-        patient.getName().get(0).addGiven("PatientOne");
-        patient.setGender(Enumerations.AdministrativeGender.FEMALE);
-        return patient;
-    }*/
-
     /**
      * The "@Read" annotation indicates that this method supports the
      * read operation. Read operations should return a single resource
@@ -126,6 +114,8 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
 
         // Save this patient to the database...
 
+        myPatients.put("2",thePatient);
+
         //savePatientToDatabase(thePatient);
 
         // This method returns a MethodOutcome object which contains
@@ -139,6 +129,7 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
         OperationOutcome outcome = new OperationOutcome();
         outcome.addIssue().setDiagnostics("One minor issue detected");
         retVal.setOperationOutcome(outcome);
+
 
         return retVal;
     }
