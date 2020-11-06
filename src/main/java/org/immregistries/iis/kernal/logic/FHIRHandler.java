@@ -42,6 +42,7 @@ public class FHIRHandler extends IncomingMessageHandler {
             vaccinationReported.setVaccination(vaccination);
             vaccination.setVaccinationReported(vaccinationReported);
             vaccinationReported.setReportedDate(new Date());
+
         }
         if (vaccinationReported.getAdministeredDate().before(patientReported.getPatientBirthDate())) {
             throw new Exception(
@@ -64,6 +65,8 @@ public class FHIRHandler extends IncomingMessageHandler {
                 if (orgLocation == null) {
                     orgLocation = new OrgLocation();
                     ImmunizationHandler.orgLocationFromFhirImmunization(orgLocation, immunization);
+                    vaccination.setPatient(patientReported.getPatient());
+                    vaccinationReported.setPatientReported(patientReported);
                     orgLocation.setOrgMaster(orgAccess.getOrg());
                     Transaction transaction = dataSession.beginTransaction();
                     dataSession.save(orgLocation);

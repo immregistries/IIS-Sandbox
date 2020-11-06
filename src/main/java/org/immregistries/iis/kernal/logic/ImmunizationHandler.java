@@ -24,7 +24,16 @@ public class ImmunizationHandler {
         vaccinationReported.setAdministeredDate(i.getOccurrenceDateTimeType().getValue());
         vaccinationReported.setAdministeredAmount(i.getDoseQuantity().getValue().toString());
         vaccinationReported.setExpirationDate(i.getExpirationDate());
-        vaccinationReported.setCompletionStatus(i.getStatus().toString());
+        switch (i.getStatus().toCode()){
+            case "completed" : vaccinationReported.setCompletionStatus("CP");
+            case "entered-in-error" : vaccinationReported.setCompletionStatus("entered-in-error"); //TODO find accurate value
+            case "not-done" : vaccinationReported.setCompletionStatus("not-done");  //TODO find accurate value
+        }
+
+        //vaccinationReported.setActionCode();
+        vaccinationReported.setRefusalReasonCode(i.getReasonCodeFirstRep().getText());
+
+        vaccinationReported.setVaccineCvxCode(i.getVaccineCode().getCodingFirstRep().getCode());
 
         VaccinationMaster vaccinationMaster = vaccinationReported.getVaccination();
 
