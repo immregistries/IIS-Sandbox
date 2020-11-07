@@ -24,11 +24,11 @@ public class ImmunizationHandler {
         vaccinationReported.setAdministeredDate(i.getOccurrenceDateTimeType().getValue());
         vaccinationReported.setAdministeredAmount(i.getDoseQuantity().getValue().toString());
         vaccinationReported.setExpirationDate(i.getExpirationDate());
-        switch (i.getStatus().toCode()){
+        /*switch (i.getStatus().toCode()){
             case "completed" : vaccinationReported.setCompletionStatus("CP");
             case "entered-in-error" : vaccinationReported.setCompletionStatus("entered-in-error"); //TODO find accurate value
             case "not-done" : vaccinationReported.setCompletionStatus("not-done");  //TODO find accurate value
-        }
+        }*/
 
         //vaccinationReported.setActionCode();
         vaccinationReported.setRefusalReasonCode(i.getReasonCodeFirstRep().getText());
@@ -58,19 +58,36 @@ public class ImmunizationHandler {
         orgLocation.setAddressCountry(l.getAddress().getCountry());
     }
 
-    public static Immunization getImmunization(OrgLocation orgLocation, VaccinationReported vaccinationReported, PatientReported patientReported){
-        Immunization immunization = new Immunization();
-        immunization.setId(vaccinationReported.getVaccinationReportedExternalLink());
-        immunization.setRecorded(vaccinationReported.getReportedDate());
-        immunization.setLotNumber(vaccinationReported.getLotnumber());
+    public static Immunization getImmunization(OrgLocation ol, VaccinationReported vr, PatientReported pr){
+        Immunization i = new Immunization();
+        i.setId(vr.getVaccinationReportedExternalLink());
+        i.setRecorded(vr.getReportedDate());
+        i.setLotNumber(vr.getLotnumber());
         //TODO check if Occurence needs to be instanciated
-        immunization.setOccurrence(new InstantType());
-        immunization.getOccurrenceDateTimeType().setValue(vaccinationReported.getAdministeredDate());
-        immunization.setDoseQuantity(new Quantity());
-        immunization.getDoseQuantity().setValue(new BigDecimal(vaccinationReported.getAdministeredAmount()));
-        immunization.setExpirationDate(vaccinationReported.getExpirationDate());
+        //i.setOccurrence(new InstantType());
+        i.getOccurrenceDateTimeType().setValue(vr.getAdministeredDate());
+        i.setDoseQuantity(new Quantity());
+        i.getDoseQuantity().setValue(new BigDecimal(vr.getAdministeredAmount()));
+        i.setExpirationDate(vr.getExpirationDate());
+        i.setStatus(Immunization.ImmunizationStatus.valueOf(vr.getCompletionStatus()));
 
-        return immunization;
+        i.addReasonCode().addCoding().setCode(vr.getRefusalReasonCode());
+        i.getVaccineCode().addCoding().setCode(vr.getVaccineCvxCode());
+
+        Location location = i.getLocationTarget();
+        location.setId(ol.getOrgFacilityCode());
+        location.setName(ol.getOrgFacilityName());
+
+        Address address = location.getAddress();
+        address.addLine(ol.getAddressLine1());
+        address.addLine(ol.getAddressLine2());
+        address.setCity(ol.getAddressCity());
+        address.setState(ol.getAddressState());
+        address.setPostalCode(ol.getAddressZip());
+        address.setCountry(ol.getAddressCountry());
+
+
+        return i;
     }
 
 }
