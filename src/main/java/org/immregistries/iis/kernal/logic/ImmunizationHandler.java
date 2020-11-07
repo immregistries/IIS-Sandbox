@@ -58,7 +58,7 @@ public class ImmunizationHandler {
         orgLocation.setAddressCountry(l.getAddress().getCountry());
     }
 
-    public static Immunization getImmunization(OrgLocation orgLocation, VaccinationReported vr, PatientReported pr){
+    public static Immunization getImmunization(OrgLocation ol, VaccinationReported vr, PatientReported pr){
         Immunization i = new Immunization();
         i.setId(vr.getVaccinationReportedExternalLink());
         i.setRecorded(vr.getReportedDate());
@@ -70,6 +70,22 @@ public class ImmunizationHandler {
         i.getDoseQuantity().setValue(new BigDecimal(vr.getAdministeredAmount()));
         i.setExpirationDate(vr.getExpirationDate());
         i.setStatus(Immunization.ImmunizationStatus.valueOf(vr.getCompletionStatus()));
+
+        i.addReasonCode().addCoding().setCode(vr.getRefusalReasonCode());
+        i.getVaccineCode().addCoding().setCode(vr.getVaccineCvxCode());
+
+        Location location = i.getLocationTarget();
+        location.setId(ol.getOrgFacilityCode());
+        location.setName(ol.getOrgFacilityName());
+
+        Address address = location.getAddress();
+        address.addLine(ol.getAddressLine1());
+        address.addLine(ol.getAddressLine2());
+        address.setCity(ol.getAddressCity());
+        address.setState(ol.getAddressState());
+        address.setPostalCode(ol.getAddressZip());
+        address.setCountry(ol.getAddressCountry());
+
 
         return i;
     }
