@@ -85,7 +85,7 @@ public class IncomingMessageHandler {
     Patient patient = processPatientFHIR(patientMessage);
     IParser parser = ctx.newJsonParser();
     PatientReported patientReported = new PatientReported();
-    patientReported.patientReportedFromFHIR(patient);//,immunization);
+    //patientReported.patientReportedFromFHIR(patient);//,immunization);
     patientReported.setPatientReportedId(10);
     {
       Transaction transaction = dataSession.beginTransaction();

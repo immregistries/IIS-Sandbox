@@ -24,7 +24,7 @@ public class VaccinationReported implements Serializable {
   private String vaccineMvxCode = "";
   private String administeredAmount = "";					
   private String informationSource = "";
-  private String lotnumber = "";							
+  private String lotnumber = "";
   private Date expirationDate = null;						
   private String completionStatus = "";						
   private String actionCode = "";
@@ -38,32 +38,6 @@ public class VaccinationReported implements Serializable {
   private Person enteredBy = null;
   private Person orderingProvider = null;
   private Person administeringProvider = null;
-
-  
-  public void vaccinationReportedFromFHIR(Patient p, Immunization i) {
-	this.vaccinationReportedId = 0;
-	this.vaccinationReportedExternalLink = i.getId();
-	PatientReported pr = new PatientReported();
-	//pr.PatientReportedFromFHIR(p, i);
-	this.patientReported = pr;
-	this.reportedDate = i.getRecorded();
-	this.updatedDate = i.getOccurrenceDateTimeType().getValue();
-	
-	
-	this.lotnumber = i.getLotNumber();
-	this.administeredDate = i.getOccurrenceDateTimeType().getValue();
-	
-	this.administeredAmount = i.getDoseQuantity().getValue().toString();
-	this.expirationDate = i.getExpirationDate();
-	this.completionStatus = i.getStatus().toString();
-	
-	VaccinationMaster vm = new VaccinationMaster();
-	vm.setAdministeredDate(this.administeredDate);
-	vm.setPatient(pr.getPatient());
-	vm.setVaccinationId(this.vaccinationReportedId);
-	vm.setVaccinationReported(this);
-	vm.setVaccineCvxCode(this.vaccineCvxCode);
-  }
   
   
   public Person getEnteredBy() {
