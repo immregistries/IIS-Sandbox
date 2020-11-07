@@ -10,33 +10,44 @@ import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
 import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
 import ca.uhn.fhir.rest.server.exceptions.ResourceVersionConflictException;
 import ca.uhn.fhir.rest.server.exceptions.UnprocessableEntityException;
+import org.hibernate.Query;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
+import org.hibernate.cfg.AnnotationConfiguration;
 import org.hl7.fhir.r4.model.*;
+import org.immregistries.iis.kernal.logic.FHIRHandler;
+import org.immregistries.iis.kernal.logic.IncomingEventHandler;
+import org.immregistries.iis.kernal.logic.IncomingMessageHandler;
+import org.immregistries.iis.kernal.logic.PatientHandler;
+import org.immregistries.iis.kernal.model.OrgAccess;
+import org.immregistries.iis.kernal.model.OrgMaster;
+import org.immregistries.iis.kernal.model.PatientReported;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.*;
 
 /**
  * All resource providers must implement IResourceProvider
  */
 public class RestfulPatientResourceProvider implements IResourceProvider {
-    private Map<Long,Patient> myPatients = new HashMap<Long,Patient>();
-    private long nextId=0;
-
-
+    protected Session dataSession=null;
+    public static final String PARAM_USERID = "TELECOM NANCY";
+    public static final String PARAM_PASSWORD = "1234";
+    public static final String PARAM_FACILITYID = "TELECOMNANCY";
+    protected OrgAccess orgAccess= null;
+    protected OrgMaster orgMaster=null;
+    protected PatientReported patientReported=null;
+    private static SessionFactory factory;
 
     public RestfulPatientResourceProvider() {
-        /*long patientId= nextId++;
+    }
 
-        Patient patient = new Patient();
-        patient.setId(Long.toString(patientId));
-        patient.addIdentifier();
-        patient.getIdentifier().get(0).setSystem(String.valueOf(new UriDt("urn:hapitest:mrns")));
-        patient.getIdentifier().get(0).setValue("00002");
-        patient.addName().setFamily("Achi");
-        patient.getName().get(0).addGiven("Flavie");
-        patient.setGender(Enumerations.AdministrativeGender.FEMALE);
-
-        myPatients.put(patientId,patient);*/
-
+    public static Session getDataSession() {
+        if (factory == null) {
+            factory = new AnnotationConfiguration().configure().buildSessionFactory();
+        }
+        return factory.openSession();
     }
 
     /**
@@ -63,36 +74,36 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
      */
     @Read()
     public Patient getResourceById(@IdParam IdType theId) {
-        Patient patient= myPatients.get(theId.getIdPartAsLong());
+        /*Patient patient= myPatients.get(theId.getIdPartAsLong());
         if(patient==null){
             throw new ResourceNotFoundException(theId);
-        }
-        return patient;
+        }*/
+        return null;
     }
 
-    @Create
+   @Create
     public MethodOutcome createPatient(@ResourceParam Patient thePatient) {
         //TODO must add validation method later
-
-        /*
-         * First we might want to do business validation. The UnprocessableEntityException
-         * results in an HTTP 422, which is appropriate for business rule failure
-         */
         if (thePatient.getIdentifierFirstRep().isEmpty()) {
-            /* It is also possible to pass an OperationOutcome resource
-             * to the UnprocessableEntityException if you want to return
-             * a custom populated OperationOutcome. Otherwise, a simple one
-             * is created using the string supplied below.
-             */
             throw new UnprocessableEntityException("No identifier supplied");
         }
-
-        long id= nextId++;
-
         // Save this patient to the database...
-        myPatients.put(id,thePatient);
+       Session dataSession = getDataSession();
+       try {
+           if (orgAccess == null) {
+               authenticateOrgAccess(PARAM_USERID,PARAM_PASSWORD,PARAM_FACILITYID,dataSession);
+           }else{
+               FHIRHandler fhirHandler = new FHIRHandler(dataSession);
+               fhirHandler.FHIR_EventVaccinationReported(orgAccess,thePatient,null);
+           }
 
-        return new MethodOutcome(new IdType(id));
+       } catch (Exception e) {
+           e.printStackTrace();
+       } finally {
+           dataSession.close();
+       }
+        return new MethodOutcome(new IdType(thePatient.getId()));
+
     }
 
     /**
@@ -108,7 +119,7 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
     public MethodOutcome updatePatient(@IdParam IdType theId, @ResourceParam Patient thePatient) {
         //TODO add validation method later
 
-        Long resourceId;
+        /*Long resourceId;
         try {
             resourceId = theId.getIdPartAsLong();
 
@@ -122,7 +133,7 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
 
 
         // ... perform the update ...
-        myPatients.put(resourceId,thePatient);
+        myPatients.put(resourceId,thePatient);*/
         return new MethodOutcome();
 
     }
@@ -131,7 +142,7 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
     @Delete()
     public MethodOutcome deletePatient(@IdParam IdType theId) {
 
-        Long resourceId;
+        /*Long resourceId;
         try {
             resourceId = theId.getIdPartAsLong();
 
@@ -144,9 +155,48 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
         }
 
         // .. Delete the patient ..
-        myPatients.remove(resourceId);
+        //myPatients.remove(resourceId);*/
 
         return new MethodOutcome();
     }
+
+    public OrgAccess authenticateOrgAccess(String userId, String password, String facilityId,
+                                           Session dataSession) {
+        OrgMaster orgMaster = null;
+        OrgAccess orgAccess = null;
+        {
+            Query query = dataSession.createQuery("from OrgMaster where organizationName = ?");
+            query.setParameter(0, facilityId);
+            List<OrgMaster> orgMasterList = query.list();
+            if (orgMasterList.size() > 0) {
+                orgMaster = orgMasterList.get(0);
+            } else {
+                orgMaster = new OrgMaster();
+                orgMaster.setOrganizationName(facilityId);
+                orgAccess = new OrgAccess();
+                orgAccess.setOrg(orgMaster);
+                orgAccess.setAccessName(userId);
+                orgAccess.setAccessKey(password);
+                Transaction transaction = dataSession.beginTransaction();
+                dataSession.save(orgMaster);
+                dataSession.save(orgAccess);
+                transaction.commit();
+            }
+
+        }
+        if (orgAccess == null) {
+            Query query = dataSession
+                    .createQuery("from OrgAccess where accessName = ? and accessKey = ? and org = ?");
+            query.setParameter(0, userId);
+            query.setParameter(1, password);
+            query.setParameter(2, orgMaster);
+            List<OrgAccess> orgAccessList = query.list();
+            if (orgAccessList.size() != 0) {
+                orgAccess = orgAccessList.get(0);
+            }
+        }
+        return orgAccess;
+    }
+
 
 }
