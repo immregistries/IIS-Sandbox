@@ -1,10 +1,10 @@
 package org.immregistries.iis.kernal.logic;
 
-import org.hl7.fhir.r4.model.ContactPoint;
-import org.hl7.fhir.r4.model.Immunization;
-import org.hl7.fhir.r4.model.Location;
-import org.hl7.fhir.r4.model.Patient;
+import org.hl7.fhir.r4.model.*;
 import org.immregistries.iis.kernal.model.*;
+
+import java.math.BigDecimal;
+import java.util.Date;
 
 public class ImmunizationHandler {
 
@@ -19,7 +19,7 @@ public class ImmunizationHandler {
         //vaccinationReported.setVaccinationReportedId(0);
         vaccinationReported.setVaccinationReportedExternalLink(i.getId());
         vaccinationReported.setReportedDate(i.getRecorded());
-        vaccinationReported.setUpdatedDate(i.getOccurrenceDateTimeType().getValue());
+        vaccinationReported.setUpdatedDate(new Date());
         vaccinationReported.setLotnumber(i.getLotNumber());
         vaccinationReported.setAdministeredDate(i.getOccurrenceDateTimeType().getValue());
         vaccinationReported.setAdministeredAmount(i.getDoseQuantity().getValue().toString());
@@ -56,6 +56,21 @@ public class ImmunizationHandler {
         orgLocation.setAddressState(l.getAddress().getState());
         orgLocation.setAddressZip(l.getAddress().getPostalCode());
         orgLocation.setAddressCountry(l.getAddress().getCountry());
+    }
+
+    public static Immunization getImmunization(OrgLocation orgLocation, VaccinationReported vaccinationReported, PatientReported patientReported){
+        Immunization immunization = new Immunization();
+        immunization.setId(vaccinationReported.getVaccinationReportedExternalLink());
+        immunization.setRecorded(vaccinationReported.getReportedDate());
+        immunization.setLotNumber(vaccinationReported.getLotnumber());
+        //TODO check if Occurence needs to be instanciated
+        immunization.setOccurrence(new InstantType());
+        immunization.getOccurrenceDateTimeType().setValue(vaccinationReported.getAdministeredDate());
+        immunization.setDoseQuantity(new Quantity());
+        immunization.getDoseQuantity().setValue(new BigDecimal(vaccinationReported.getAdministeredAmount()));
+        immunization.setExpirationDate(vaccinationReported.getExpirationDate());
+
+        return immunization;
     }
 
 }
