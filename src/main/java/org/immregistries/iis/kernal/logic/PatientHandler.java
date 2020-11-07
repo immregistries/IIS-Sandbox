@@ -1,14 +1,11 @@
 package org.immregistries.iis.kernal.logic;
 
-import org.hl7.fhir.r4.model.ContactPoint;
-import org.hl7.fhir.r4.model.Immunization;
-import org.hl7.fhir.r4.model.Patient;
-import org.immregistries.iis.kernal.model.PatientMaster;
-import org.immregistries.iis.kernal.model.PatientReported;
-import org.immregistries.iis.kernal.model.VaccinationMaster;
-import org.immregistries.iis.kernal.model.VaccinationReported;
+import org.hl7.fhir.r4.model.*;
+import org.immregistries.iis.kernal.model.*;
 
-import java.util.Date;
+
+import java.math.BigDecimal;
+import java.util.*;
 
 public class PatientHandler {
     public static void patientReportedFromFhirPatient(PatientReported patientReported, Patient p) {
@@ -16,27 +13,33 @@ public class PatientHandler {
         //patientReported.setPatientReportedType(p.get);
         patientReported.setReportedDate(new Date());
         patientReported.setPatientReportedExternalLink(p.getId()); //TODO modify
-        patientReported.setPatientNameLast(p.getNameFirstRep().getFamily());
-        patientReported.setPatientNameFirst(p.getNameFirstRep().getGiven().get(0).getValueNotNull());
-        if (p.getNameFirstRep().getGiven().size() > 1) {
-            patientReported.setPatientNameMiddle(p.getNameFirstRep().getGiven().get(1).getValueNotNull());
+
+        HumanName name = p.getNameFirstRep();
+        patientReported.setPatientNameLast(name.getFamily());
+        patientReported.setPatientNameFirst(name.getGiven().get(0).getValueNotNull());
+        if (name.getGiven().size() > 1) {
+            patientReported.setPatientNameMiddle(name.getGiven().get(1).getValueNotNull());
         }
+
         patientReported.setPatientBirthDate(p.getBirthDate());
-        patientReported.setPatientSex(String.valueOf(p.getGender().toString().charAt(0))); // Get the first char of MALE or FEMALE
-        patientReported.setPatientAddressLine1(p.getAddress().get(0).getLine().get(0).getValueNotNull());
-        if (p.getAddress().get(0).getLine().size() > 1) {
-            patientReported.setPatientAddressLine2(p.getAddress().get(0).getLine().get(1).getValueNotNull());
+        patientReported.setPatientSex(String.valueOf(p.getGender().toString().charAt(0))); // Get the first char of MALE or FEMALE -> "M" or "F"
+
+        Address address = p.getAddressFirstRep();
+        patientReported.setPatientAddressLine1(address.getLine().get(0).getValueNotNull());
+        if (address.getLine().size() > 1) {
+            patientReported.setPatientAddressLine2(address.getLine().get(1).getValueNotNull());
         }
-        patientReported.setPatientAddressCity(p.getAddress().get(0).getCity());
-        patientReported.setPatientAddressState(p.getAddress().get(0).getState());
-        patientReported.setPatientAddressZip(p.getAddress().get(0).getPostalCode());
-        patientReported.setPatientAddressCountry(p.getAddress().get(0).getCountry());
-        patientReported.setPatientAddressCountyParish(p.getAddress().get(0).getDistrict());
+        patientReported.setPatientAddressCity(address.getCity());
+        patientReported.setPatientAddressState(address.getState());
+        patientReported.setPatientAddressZip(address.getPostalCode());
+        patientReported.setPatientAddressCountry(address.getCountry());
+        patientReported.setPatientAddressCountyParish(address.getDistrict());
+
         for (ContactPoint contact : p.getTelecom()) {
-            if (contact.getSystem().name().equals("PHONE")) {
-                patientReported.setPatientPhone(p.getTelecomFirstRep().getValue());
-            } else if (contact.getSystem().name().equals("EMAIL")) {
-                patientReported.setPatientEmail(p.getTelecom().get(1).getValue());
+            if (contact.getSystem().equals(ContactPoint.ContactPointSystem.PHONE)) {
+                patientReported.setPatientPhone(contact.getValue());
+            } else if (contact.getSystem().equals(ContactPoint.ContactPointSystem.EMAIL)) {
+                patientReported.setPatientEmail(contact.getValue());
             }
         }
         patientReported.setPatientBirthFlag(p.getBirthDate().toString()); //TODO look for flag format
@@ -46,12 +49,13 @@ public class PatientHandler {
             patientReported.setPatientDeathDate(p.getDeceasedDateTimeType().getValue());
         }
         //patientReported.setRegistryStatusIndicator(p.getActive());
-        patientReported.setGuardianLast(p.getContactFirstRep().getName().getFamily());
-        patientReported.setGuardianFirst(p.getContactFirstRep().getName().getGiven().get(0).getValueNotNull());
+        Patient.ContactComponent contact = p.getContactFirstRep();
+        patientReported.setGuardianLast(contact.getName().getFamily());
+        patientReported.setGuardianFirst(contact.getName().getGiven().get(0).getValueNotNull());
         if (p.getContactFirstRep().getName().getGiven().size() > 1) {
-            patientReported.setGuardianMiddle(p.getContactFirstRep().getName().getGiven().get(1).getValueNotNull());
+            patientReported.setGuardianMiddle(contact.getName().getGiven().get(1).getValueNotNull());
         }
-        patientReported.setGuardianRelationship(p.getContactFirstRep().getRelationshipFirstRep().getText());
+        patientReported.setGuardianRelationship(contact.getRelationshipFirstRep().getText());
 
         PatientMaster patientMaster = patientReported.getPatient();
         patientMaster.setPatientId(patientReported.getPatientReportedId());
@@ -63,5 +67,48 @@ public class PatientHandler {
         patientMaster.setPatientPhoneFrag(patientReported.getPatientPhone());
         patientMaster.setPatientAddressFrag(patientReported.getPatientAddressZip());
     }
+
+    public static Patient getPatient(OrgLocation orgLocation, VaccinationReported vaccinationReported, PatientReported pr){
+        Patient p = new Patient();
+        p.setId(pr.getPatientReportedExternalLink());
+
+        HumanName name = p.addName();
+        name.setFamily(pr.getPatientNameLast());
+        name.addGivenElement().setValue(pr.getPatientNameFirst());
+        name.addGivenElement().setValue(pr.getPatientNameMiddle());
+
+        p.addTelecom().setSystem(ContactPoint.ContactPointSystem.EMAIL).setValue(pr.getPatientEmail());
+        p.addTelecom().setSystem(ContactPoint.ContactPointSystem.PHONE).setValue(pr.getPatientPhone());
+        switch (pr.getPatientSex()){
+            case "M":p.setGender(Enumerations.AdministrativeGender.MALE);break;
+            case "F":p.setGender(Enumerations.AdministrativeGender.FEMALE);break;
+            default:p.setGender(Enumerations.AdministrativeGender.OTHER);
+        }
+        p.setBirthDate(pr.getPatientBirthDate());
+        if (null == pr.getPatientDeathDate()){
+            p.getDeceasedBooleanType().setValue(false);
+        }else {
+            p.getDeceasedBooleanType().setValue(true);
+            p.getDeceasedDateTimeType().setValue(pr.getPatientDeathDate());
+        }
+
+        Address address = p.addAddress();
+        address.addLine(pr.getPatientAddressLine1());
+        address.addLine(pr.getPatientAddressLine2());
+        address.setCity(pr.getPatientAddressCity());
+        address.setCountry(pr.getPatientAddressCountry());
+        address.setState(pr.getPatientAddressState());
+        address.setPostalCode(pr.getPatientAddressZip());
+
+        //TODO deal with contact (maybe create an id in the DB ?)
+        Patient.ContactComponent contact = p.addContact();
+        HumanName contactName = new HumanName();
+        contactName.setFamily(pr.getGuardianLast());
+        contactName.addGivenElement().setValue(pr.getGuardianFirst());
+        contactName.addGivenElement().setValue(pr.getGuardianMiddle());
+        contact.setName(contactName);
+        return p;
+    }
+
 
 }
