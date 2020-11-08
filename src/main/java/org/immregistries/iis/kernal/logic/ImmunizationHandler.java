@@ -9,10 +9,13 @@ import java.util.Date;
 public class ImmunizationHandler {
 
     public static void patientReportedFromFhirImmunization(PatientReported patientReported, Immunization i) {
-        patientReported.setReportedDate(i.getRecorded());
-        patientReported.setUpdatedDate(i.getOccurrenceDateTimeType().getValue());
-        patientReported.setPatientReportedAuthority(i.getIdentifierFirstRep().getValue());
-        //patientReported.setPatientReportedType(patientReportedType);
+        if(!i.equals(null)){
+            patientReported.setReportedDate(i.getRecorded());
+            patientReported.setUpdatedDate(i.getOccurrenceDateTimeType().getValue());
+            patientReported.setPatientReportedAuthority(i.getIdentifierFirstRep().getValue());
+            //patientReported.setPatientReportedType(patientReportedType);
+        }
+
     }
 
     public static void vaccinationReportedFromFhirImmunization(VaccinationReported vaccinationReported, Immunization i) {

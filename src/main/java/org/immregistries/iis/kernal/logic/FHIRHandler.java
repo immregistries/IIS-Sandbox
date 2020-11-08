@@ -1,6 +1,8 @@
 package org.immregistries.iis.kernal.logic;
 
+import ca.uhn.fhir.parser.IParser;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -12,6 +14,7 @@ import java.util.Date;
 import java.util.List;
 
 public class FHIRHandler extends IncomingMessageHandler {
+    //private static Logger logger = Logger.getLogger(FHIRHandler.class);
 
     public FHIRHandler(Session dataSession) {
         super(dataSession);
@@ -90,6 +93,14 @@ public class FHIRHandler extends IncomingMessageHandler {
         PatientMaster patientMaster = null;
         PatientReported patientReported = null;
 
+        IParser jsonParser = Context.getCtx().newJsonParser();
+        jsonParser.setPrettyPrint(true);
+        String encoded = jsonParser.encodeResourceToString(patient);
+        System.err.println(encoded);
+        System.err.println(patient.getId());
+
+
+
         //Initialising and linking the objects
         /*PatientMaster patientMaster = new PatientMaster();
         PatientReported patientReported = new PatientReported();
@@ -112,7 +123,11 @@ public class FHIRHandler extends IncomingMessageHandler {
         ImmunizationHandler.vaccinationReportedFromFhirImmunization(vaccinationReported,immunization);*/
 
         String patientReportedExternalLink = patient.getId();
-        String patientReportedAuthority = immunization.getIdentifierFirstRep().getValue();
+        System.err.println(immunization);
+        if(immunization != null){
+            String patientReportedAuthority = immunization.getIdentifierFirstRep().getValue();
+        }
+
         //String patientReportedType = patientReported.getPatientReportedType();
         if (StringUtils.isEmpty(patientReportedExternalLink)) {
             throw new Exception("Patient external link must be indicated");
@@ -135,6 +150,7 @@ public class FHIRHandler extends IncomingMessageHandler {
             PatientHandler.patientReportedFromFhirPatient(patientReported, patient);
             ImmunizationHandler.patientReportedFromFhirImmunization(patientReported,immunization);
         }
+        //logger.info(patientMaster);
 
         {
             Transaction transaction = dataSession.beginTransaction();
@@ -142,6 +158,7 @@ public class FHIRHandler extends IncomingMessageHandler {
             dataSession.saveOrUpdate(patientReported);
             transaction.commit();
         }
+        System.out.println(patientMaster);
         return patientReported;
     }
 

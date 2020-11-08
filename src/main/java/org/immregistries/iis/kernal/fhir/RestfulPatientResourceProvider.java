@@ -2,6 +2,7 @@ package org.immregistries.iis.kernal.fhir;
 
 import ca.uhn.fhir.model.primitive.UriDt;
 import ca.uhn.fhir.parser.DataFormatException;
+import ca.uhn.fhir.parser.IParser;
 import ca.uhn.fhir.rest.annotation.*;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.param.StringParam;
@@ -16,10 +17,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.AnnotationConfiguration;
 import org.hl7.fhir.r4.model.*;
-import org.immregistries.iis.kernal.logic.FHIRHandler;
-import org.immregistries.iis.kernal.logic.IncomingEventHandler;
-import org.immregistries.iis.kernal.logic.IncomingMessageHandler;
-import org.immregistries.iis.kernal.logic.PatientHandler;
+import org.immregistries.iis.kernal.logic.*;
 import org.immregistries.iis.kernal.model.OrgAccess;
 import org.immregistries.iis.kernal.model.OrgMaster;
 import org.immregistries.iis.kernal.model.PatientReported;
@@ -83,7 +81,8 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
 
    @Create
     public MethodOutcome createPatient(@ResourceParam Patient thePatient) {
-        //TODO must add validation method later
+        PatientReported patientReported = null;
+
         if (thePatient.getIdentifierFirstRep().isEmpty()) {
             throw new UnprocessableEntityException("No identifier supplied");
         }
@@ -92,10 +91,19 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
        try {
            if (orgAccess == null) {
                authenticateOrgAccess(PARAM_USERID,PARAM_PASSWORD,PARAM_FACILITYID,dataSession);
-           }else{
-               FHIRHandler fhirHandler = new FHIRHandler(dataSession);
-               fhirHandler.FHIR_EventVaccinationReported(orgAccess,thePatient,null);
            }
+
+
+           /*IParser jsonParser = Context.getCtx().newJsonParser();
+           jsonParser.setPrettyPrint(true);
+           String encoded = jsonParser.encodeResourceToString(thePatient);
+           System.err.println(encoded);*/
+
+
+           FHIRHandler fhirHandler = new FHIRHandler(dataSession);
+           fhirHandler.processFIHR_Event(orgAccess,thePatient,null);
+
+
 
        } catch (Exception e) {
            e.printStackTrace();
