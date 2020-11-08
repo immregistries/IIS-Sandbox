@@ -51,10 +51,17 @@ public class PatientHandler {
         //patientReported.setPatientDeathFlag(p.getDeceasedBooleanType().toString());
 
         if (null != p.getDeceased()) {
-            if (p.getDeceasedBooleanType().booleanValue()) {
+            if (p.getDeceasedBooleanType().isBooleanPrimitive()) {
+                patientReported.setPatientDeathFlag(p.getDeceasedBooleanType().toString());
+            }
+            //System.out.println(p.getDeceased().getId());
+            //System.out.println(p.getDeceasedDateTimeType().);
+            if (p.getDeceased().isDateTime()){
                 patientReported.setPatientDeathDate(p.getDeceasedDateTimeType().getValue());
+
             }
         }
+
         //patientReported.setRegistryStatusIndicator(p.getActive());
         { // Patient Contact / Guardian
             Patient.ContactComponent contact = p.getContactFirstRep();
