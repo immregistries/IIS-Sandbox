@@ -13,18 +13,21 @@ public class PatientHandler {
         //patientReported.setPatientReportedType(p.get);
         patientReported.setReportedDate(new Date());
         patientReported.setPatientReportedExternalLink(p.getIdentifier().get(0).getValue()); //TODO modify
-
-        HumanName name = p.getNameFirstRep();
-        patientReported.setPatientNameLast(name.getFamily());
-        patientReported.setPatientNameFirst(name.getGiven().get(0).getValueNotNull());
-        if (name.getGiven().size() > 1) {
-            patientReported.setPatientNameMiddle(name.getGiven().get(1).getValueNotNull());
+        { //Name
+            HumanName name = p.getNameFirstRep();
+            patientReported.setPatientNameLast(name.getFamily());
+            if (name.getGiven().size() > 0) {
+                patientReported.setPatientNameFirst(name.getGiven().get(0).getValueNotNull());
+            }
+            if (name.getGiven().size() > 1) {
+                patientReported.setPatientNameMiddle(name.getGiven().get(1).getValueNotNull());
+            }
         }
 
         patientReported.setPatientBirthDate(p.getBirthDate());
         patientReported.setPatientSex(String.valueOf(p.getGender().toString().charAt(0))); // Get the first char of MALE or FEMALE -> "M" or "F"
 
-        {
+        { // Address
             Address address = p.getAddressFirstRep();
             if (address.getLine().size() > 0) {
                 patientReported.setPatientAddressLine1(address.getLine().get(0).getValueNotNull());
