@@ -12,7 +12,7 @@ public class PatientHandler {
         //patientReported.setPatientReportedId(;
         //patientReported.setPatientReportedType(p.get);
         patientReported.setReportedDate(new Date());
-        patientReported.setPatientReportedExternalLink(p.getId()); //TODO modify
+        patientReported.setPatientReportedExternalLink(p.getIdentifier().get(0).getValue()); //TODO modify
 
         HumanName name = p.getNameFirstRep();
         patientReported.setPatientNameLast(name.getFamily());
@@ -35,14 +35,15 @@ public class PatientHandler {
         patientReported.setPatientAddressCountry(address.getCountry());
         patientReported.setPatientAddressCountyParish(address.getDistrict());
 
-        for (ContactPoint contact : p.getTelecom()) {
+        /*for (ContactPoint contact : p.getTelecom()) {
+            System.err.println(contact.getSystem());
             if (contact.getSystem().equals(ContactPoint.ContactPointSystem.PHONE)) {
                 patientReported.setPatientPhone(contact.getValue());
             } else if (contact.getSystem().equals(ContactPoint.ContactPointSystem.EMAIL)) {
                 patientReported.setPatientEmail(contact.getValue());
             }
-        }
-        patientReported.setPatientBirthFlag(p.getBirthDate().toString()); //TODO look for flag format
+        }*/
+        //patientReported.setPatientBirthFlag(p.getBirthDate().toString()); //TODO look for flag format
         //patientReported.setPatientBirthOrder(patientBirthOrder);
         //patientReported.setPatientDeathFlag(p.getDeceasedBooleanType().toString());
         if (p.getDeceasedBooleanType().booleanValue()) {

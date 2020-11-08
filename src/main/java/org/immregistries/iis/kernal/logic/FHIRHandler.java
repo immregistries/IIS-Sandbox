@@ -14,7 +14,7 @@ import java.util.Date;
 import java.util.List;
 
 public class FHIRHandler extends IncomingMessageHandler {
-    //private static Logger logger = Logger.getLogger(FHIRHandler.class);
+
 
     public FHIRHandler(Session dataSession) {
         super(dataSession);
@@ -93,11 +93,11 @@ public class FHIRHandler extends IncomingMessageHandler {
         PatientMaster patientMaster = null;
         PatientReported patientReported = null;
 
-        IParser jsonParser = Context.getCtx().newJsonParser();
+        /*IParser jsonParser = Context.getCtx().newJsonParser();
         jsonParser.setPrettyPrint(true);
         String encoded = jsonParser.encodeResourceToString(patient);
         System.err.println(encoded);
-        System.err.println(patient.getId());
+        System.err.println(patient.getIdentifier().get(0).getValue());*/
 
 
 
@@ -121,9 +121,9 @@ public class FHIRHandler extends IncomingMessageHandler {
         /*PatientHandler.patientReportedFromFhirPatient(patientReported, patient);
         ImmunizationHandler.patientReportedFromFhirImmunization(patientReported,immunization);
         ImmunizationHandler.vaccinationReportedFromFhirImmunization(vaccinationReported,immunization);*/
-
-        String patientReportedExternalLink = patient.getId();
-        System.err.println(immunization);
+        System.err.println(patient);
+        System.err.println(patient.getIdentifier().get(0).getValue());
+        String patientReportedExternalLink = patient.getIdentifier().get(0).getValue();
         if(immunization != null){
             String patientReportedAuthority = immunization.getIdentifierFirstRep().getValue();
         }
@@ -148,17 +148,24 @@ public class FHIRHandler extends IncomingMessageHandler {
             patientReported = new PatientReported();
             patientReported.setPatient(patientMaster);
             PatientHandler.patientReportedFromFhirPatient(patientReported, patient);
-            ImmunizationHandler.patientReportedFromFhirImmunization(patientReported,immunization);
+            //ImmunizationHandler.patientReportedFromFhirImmunization(patientReported,immunization);
         }
-        //logger.info(patientMaster);
+
+        patientMaster.setOrgMaster(orgAccess.getOrg());
+        patientReported.setOrgReported(orgAccess.getOrg());
+        patientReported.setUpdatedDate(new Date());
+
+
 
         {
             Transaction transaction = dataSession.beginTransaction();
+
+
             dataSession.saveOrUpdate(patientMaster);
             dataSession.saveOrUpdate(patientReported);
             transaction.commit();
         }
-        System.out.println(patientMaster);
+
         return patientReported;
     }
 

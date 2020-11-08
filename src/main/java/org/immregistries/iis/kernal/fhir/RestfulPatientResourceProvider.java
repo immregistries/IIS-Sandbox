@@ -94,14 +94,19 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
            }
 
 
-           /*IParser jsonParser = Context.getCtx().newJsonParser();
-           jsonParser.setPrettyPrint(true);
-           String encoded = jsonParser.encodeResourceToString(thePatient);
-           System.err.println(encoded);*/
+           //System.err.println(orgAccess.getAccessName());
+           //System.err.println(orgAccess.getAccessKey());
+           //System.err.println(orgAccess.getOrgAccessId());
+           //IParser jsonParser = Context.getCtx().newJsonParser();
+           //jsonParser.setPrettyPrint(true);
+          // String encoded = jsonParser.encodeResourceToString(thePatient);
+           //Patient patient = jsonParser.parseResource(Patient.class,encoded );
+           //System.err.println("the id of patient is : " + patient.getIdentifier().get(0).getValue());
 
 
            FHIRHandler fhirHandler = new FHIRHandler(dataSession);
-           fhirHandler.processFIHR_Event(orgAccess,thePatient,null);
+           patientReported = fhirHandler.FIHR_EventPatientReported(orgAccess,thePatient,null);
+           //fhirHandler.processFIHR_Event(orgAccess,thePatient,null);
 
 
 
@@ -170,8 +175,7 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
 
     public OrgAccess authenticateOrgAccess(String userId, String password, String facilityId,
                                            Session dataSession) {
-        OrgMaster orgMaster = null;
-        OrgAccess orgAccess = null;
+
         {
             Query query = dataSession.createQuery("from OrgMaster where organizationName = ?");
             query.setParameter(0, facilityId);
