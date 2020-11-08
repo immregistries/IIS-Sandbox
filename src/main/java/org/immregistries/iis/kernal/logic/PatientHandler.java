@@ -24,49 +24,60 @@ public class PatientHandler {
         patientReported.setPatientBirthDate(p.getBirthDate());
         patientReported.setPatientSex(String.valueOf(p.getGender().toString().charAt(0))); // Get the first char of MALE or FEMALE -> "M" or "F"
 
-        Address address = p.getAddressFirstRep();
-        patientReported.setPatientAddressLine1(address.getLine().get(0).getValueNotNull());
-        if (address.getLine().size() > 1) {
-            patientReported.setPatientAddressLine2(address.getLine().get(1).getValueNotNull());
+        {
+            Address address = p.getAddressFirstRep();
+            if (address.getLine().size() > 0) {
+                patientReported.setPatientAddressLine1(address.getLine().get(0).getValueNotNull());
+            }
+            if (address.getLine().size() > 1) {
+                patientReported.setPatientAddressLine2(address.getLine().get(1).getValueNotNull());
+            }
+            patientReported.setPatientAddressCity(address.getCity());
+            patientReported.setPatientAddressState(address.getState());
+            patientReported.setPatientAddressZip(address.getPostalCode());
+            patientReported.setPatientAddressCountry(address.getCountry());
+            patientReported.setPatientAddressCountyParish(address.getDistrict());
         }
-        patientReported.setPatientAddressCity(address.getCity());
-        patientReported.setPatientAddressState(address.getState());
-        patientReported.setPatientAddressZip(address.getPostalCode());
-        patientReported.setPatientAddressCountry(address.getCountry());
-        patientReported.setPatientAddressCountyParish(address.getDistrict());
-
-        /*for (ContactPoint contact : p.getTelecom()) {
+        for (ContactPoint contact : p.getTelecom()) {
             System.err.println(contact.getSystem());
             if (contact.getSystem().equals(ContactPoint.ContactPointSystem.PHONE)) {
                 patientReported.setPatientPhone(contact.getValue());
             } else if (contact.getSystem().equals(ContactPoint.ContactPointSystem.EMAIL)) {
                 patientReported.setPatientEmail(contact.getValue());
             }
-        }*/
+        }
         //patientReported.setPatientBirthFlag(p.getBirthDate().toString()); //TODO look for flag format
         //patientReported.setPatientBirthOrder(patientBirthOrder);
         //patientReported.setPatientDeathFlag(p.getDeceasedBooleanType().toString());
-        if (p.getDeceasedBooleanType().booleanValue()) {
-            patientReported.setPatientDeathDate(p.getDeceasedDateTimeType().getValue());
+
+        if (null != p.getDeceased()) {
+            if (p.getDeceasedBooleanType().booleanValue()) {
+                patientReported.setPatientDeathDate(p.getDeceasedDateTimeType().getValue());
+            }
         }
         //patientReported.setRegistryStatusIndicator(p.getActive());
-        Patient.ContactComponent contact = p.getContactFirstRep();
-        patientReported.setGuardianLast(contact.getName().getFamily());
-        patientReported.setGuardianFirst(contact.getName().getGiven().get(0).getValueNotNull());
-        if (p.getContactFirstRep().getName().getGiven().size() > 1) {
-            patientReported.setGuardianMiddle(contact.getName().getGiven().get(1).getValueNotNull());
+        { // Patient Contact / Guardian
+            Patient.ContactComponent contact = p.getContactFirstRep();
+            patientReported.setGuardianLast(contact.getName().getFamily());
+            if (p.getContactFirstRep().getName().getGiven().size() > 0) {
+                patientReported.setGuardianFirst(contact.getName().getGiven().get(0).getValueNotNull());
+            }
+            if (p.getContactFirstRep().getName().getGiven().size() > 1) {
+                patientReported.setGuardianMiddle(contact.getName().getGiven().get(1).getValueNotNull());
+            }
+            patientReported.setGuardianRelationship(contact.getRelationshipFirstRep().getText());
         }
-        patientReported.setGuardianRelationship(contact.getRelationshipFirstRep().getText());
-
-        PatientMaster patientMaster = patientReported.getPatient();
-        patientMaster.setPatientId(patientReported.getPatientReportedId());
-        patientMaster.setPatientExternalLink(patientReported.getPatientReportedExternalLink());
-        patientMaster.setPatientNameLast(patientReported.getPatientNameLast());
-        patientMaster.setPatientNameFirst(patientReported.getPatientNameFirst());
-        patientMaster.setPatientNameMiddle(patientReported.getPatientNameMiddle());
-        patientMaster.setPatientBirthDate(patientReported.getPatientBirthDate());
-        patientMaster.setPatientPhoneFrag(patientReported.getPatientPhone());
-        patientMaster.setPatientAddressFrag(patientReported.getPatientAddressZip());
+        { // PatientMaster Ressource
+            PatientMaster patientMaster = patientReported.getPatient();
+            patientMaster.setPatientId(patientReported.getPatientReportedId());
+            patientMaster.setPatientExternalLink(patientReported.getPatientReportedExternalLink());
+            patientMaster.setPatientNameLast(patientReported.getPatientNameLast());
+            patientMaster.setPatientNameFirst(patientReported.getPatientNameFirst());
+            patientMaster.setPatientNameMiddle(patientReported.getPatientNameMiddle());
+            patientMaster.setPatientBirthDate(patientReported.getPatientBirthDate());
+            patientMaster.setPatientPhoneFrag(patientReported.getPatientPhone());
+            patientMaster.setPatientAddressFrag(patientReported.getPatientAddressZip());
+        }
     }
 
     public static Patient getPatient(OrgLocation orgLocation, VaccinationReported vaccinationReported, PatientReported pr){
