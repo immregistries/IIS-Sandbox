@@ -168,8 +168,8 @@ public class FHIRHandler extends IncomingMessageHandler {
         return patientReported;
     }
 
-    public VaccinationReported FHIR_EventVaccinationReported(OrgAccess orgAccess, Patient patient, Immunization immunization) throws Exception {
+    /*public VaccinationReported FHIR_EventVaccinationReported(OrgAccess orgAccess, Patient patient, Immunization immunization) throws Exception {
         VaccinationReported vaccinationReported = null;
         return vaccinationReported;
-    }
+    }*/
 }

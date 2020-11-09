@@ -200,8 +200,6 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
             if (patientReportedList.size() > 0) {
                 patientReported = patientReportedList.get(0);
                 patient =PatientHandler.getPatient(null,null,patientReported);
-
-
             }
         }
         return patient;
