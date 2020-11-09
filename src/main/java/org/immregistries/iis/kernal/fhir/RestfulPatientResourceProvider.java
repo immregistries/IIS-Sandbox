@@ -1,15 +1,9 @@
 package org.immregistries.iis.kernal.fhir;
 
-import ca.uhn.fhir.model.primitive.UriDt;
-import ca.uhn.fhir.parser.DataFormatException;
-import ca.uhn.fhir.parser.IParser;
+
 import ca.uhn.fhir.rest.annotation.*;
 import ca.uhn.fhir.rest.api.MethodOutcome;
-import ca.uhn.fhir.rest.param.StringParam;
 import ca.uhn.fhir.rest.server.IResourceProvider;
-import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
-import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
-import ca.uhn.fhir.rest.server.exceptions.ResourceVersionConflictException;
 import ca.uhn.fhir.rest.server.exceptions.UnprocessableEntityException;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -21,8 +15,6 @@ import org.immregistries.iis.kernal.logic.*;
 import org.immregistries.iis.kernal.model.OrgAccess;
 import org.immregistries.iis.kernal.model.OrgMaster;
 import org.immregistries.iis.kernal.model.PatientReported;
-
-import javax.servlet.http.HttpServletResponse;
 import java.util.*;
 
 /**
@@ -73,30 +65,25 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
     @Read()
     public Patient getResourceById(@IdParam IdType theId) {
         Patient patient =null;
-
-
         // Retrieve this patient in the database...
         Session dataSession = getDataSession();
         try {
             if (orgAccess == null) {
                 authenticateOrgAccess(PARAM_USERID,PARAM_PASSWORD,PARAM_FACILITYID,dataSession);
             }
-
             patient = getPatientById(theId.getIdPart(),dataSession,orgAccess );
-
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
             dataSession.close();
-
         }
-
         return patient;
     }
 
    @Create
     public MethodOutcome createPatient(@ResourceParam Patient thePatient) {
         patientReported = null;
+        System.err.println("l id du patient est " +thePatient.getId());
         if (thePatient.getIdentifierFirstRep().isEmpty()) {
             throw new UnprocessableEntityException("No identifier supplied");
         }
@@ -137,16 +124,6 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
             if (orgAccess == null) {
                 authenticateOrgAccess(PARAM_USERID,PARAM_PASSWORD,PARAM_FACILITYID,dataSession);
             }
-
-
-            //System.err.println(orgAccess.getAccessName());
-            //System.err.println(orgAccess.getAccessKey());
-            //System.err.println(orgAccess.getOrgAccessId());
-            //IParser jsonParser = Context.getCtx().newJsonParser();
-            //jsonParser.setPrettyPrint(true);
-            // String encoded = jsonParser.encodeResourceToString(thePatient);
-            //Patient patient = jsonParser.parseResource(Patient.class,encoded );
-            //System.err.println("the id of patient is : " + patient.getIdentifier().get(0).getValue());
 
 
             FHIRHandler fhirHandler = new FHIRHandler(dataSession);

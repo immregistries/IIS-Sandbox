@@ -138,6 +138,8 @@ public class FHIRHandler extends IncomingMessageHandler {
             List<PatientReported> patientReportedList = query.list();
             if (patientReportedList.size() > 0) {
                 patientReported = patientReportedList.get(0);
+                //patientMaster = patientReported.getPatient();
+                PatientHandler.patientReportedFromFhirPatient(patientReported,patient);
                 patientMaster = patientReported.getPatient();
 
             }
@@ -148,15 +150,10 @@ public class FHIRHandler extends IncomingMessageHandler {
             patientReported.setPatient(patientMaster);
             PatientHandler.patientReportedFromFhirPatient(patientReported, patient);
             //ImmunizationHandler.patientReportedFromFhirImmunization(patientReported,immunization);
-        }else{
-            //patientReported.setPatient(patientMaster);
-            //PatientHandler.patientReportedFromFhirPatient(patientReported,patient);
         }
-
         patientMaster.setOrgMaster(orgAccess.getOrg());
         patientReported.setOrgReported(orgAccess.getOrg());
         patientReported.setUpdatedDate(new Date());
-
 
 
         {
