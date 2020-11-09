@@ -43,21 +43,25 @@ public class PatientHandler {
             patientReported.setPatientAddressCountry(address.getCountry());
             patientReported.setPatientAddressCountyParish(address.getDistrict());
         }
-        /*for (ContactPoint contact : p.getTelecom()) {
-            System.err.println(contact.getSystem());
-            if (contact.getSystem().equals(ContactPoint.ContactPointSystem.PHONE)) {
-                patientReported.setPatientPhone(contact.getValue());
-            } else if (contact.getSystem().equals(ContactPoint.ContactPointSystem.EMAIL)) {
-                patientReported.setPatientEmail(contact.getValue());
-            }
-        }*/
-        //patientReported.setPatientBirthFlag(p.getBirthDate().toString()); //TODO look for flag format
-        //patientReported.setPatientBirthOrder(patientBirthOrder);
-        //patientReported.setPatientDeathFlag(p.getDeceasedBooleanType().toString());
 
-        /*if (null != p.getDeceased()) {
+        for (ContactPoint telecom : p.getTelecom()) {
+            if (null != telecom.getSystem()){
+                if (telecom.getSystem().equals(ContactPoint.ContactPointSystem.PHONE)) {
+                    patientReported.setPatientPhone(telecom.getValue());
+                } else if (telecom.getSystem().equals(ContactPoint.ContactPointSystem.EMAIL)) {
+                    patientReported.setPatientEmail(telecom.getValue());
+                }
+            }
+        }
+
+        //patientReported.setPatientBirthFlag(p.getBirthDate().toString());
+        if (null != p.getMultipleBirth()){
+            patientReported.setPatientBirthOrder(String.valueOf(p.getMultipleBirthIntegerType()));
+        }
+
+        if (null != p.getDeceased()) {
             if (p.getDeceasedBooleanType().isBooleanPrimitive()) {
-                patientReported.setPatientDeathFlag(p.getDeceasedBooleanType().toString());
+                patientReported.setPatientDeathFlag(String.valueOf(p.getDeceasedBooleanType().toString().charAt(0))); // Y or N
             }
             //System.out.println(p.getDeceased().getId());
             //System.out.println(p.getDeceasedDateTimeType().);
@@ -65,7 +69,7 @@ public class PatientHandler {
                 patientReported.setPatientDeathDate(p.getDeceasedDateTimeType().getValue());
 
             }
-        }*/
+        }
 
         //patientReported.setRegistryStatusIndicator(p.getActive());
         { // Patient Contact / Guardian
