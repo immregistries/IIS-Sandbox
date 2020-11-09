@@ -93,11 +93,9 @@ public class FHIRHandler extends IncomingMessageHandler {
         PatientMaster patientMaster = null;
         PatientReported patientReported = null;
 
-        /*IParser jsonParser = Context.getCtx().newJsonParser();
-        jsonParser.setPrettyPrint(true);
-        String encoded = jsonParser.encodeResourceToString(patient);
-        System.err.println(encoded);
-        System.err.println(patient.getIdentifier().get(0).getValue());*/
+        System.err.println(patient.getId());
+
+
 
 
 
@@ -121,8 +119,8 @@ public class FHIRHandler extends IncomingMessageHandler {
         /*PatientHandler.patientReportedFromFhirPatient(patientReported, patient);
         ImmunizationHandler.patientReportedFromFhirImmunization(patientReported,immunization);
         ImmunizationHandler.vaccinationReportedFromFhirImmunization(vaccinationReported,immunization);*/
-        System.err.println(patient);
-        System.err.println(patient.getIdentifier().get(0).getValue());
+        //System.err.println(patient);
+        //System.err.println(patient.getIdentifier().get(0).getValue());
         String patientReportedExternalLink = patient.getIdentifier().get(0).getValue();
         if(immunization != null){
             String patientReportedAuthority = immunization.getIdentifierFirstRep().getValue();
@@ -141,6 +139,7 @@ public class FHIRHandler extends IncomingMessageHandler {
             if (patientReportedList.size() > 0) {
                 patientReported = patientReportedList.get(0);
                 patientMaster = patientReported.getPatient();
+
             }
         }
         if (patientReported == null) {
@@ -149,6 +148,9 @@ public class FHIRHandler extends IncomingMessageHandler {
             patientReported.setPatient(patientMaster);
             PatientHandler.patientReportedFromFhirPatient(patientReported, patient);
             //ImmunizationHandler.patientReportedFromFhirImmunization(patientReported,immunization);
+        }else{
+            //patientReported.setPatient(patientMaster);
+            //PatientHandler.patientReportedFromFhirPatient(patientReported,patient);
         }
 
         patientMaster.setOrgMaster(orgAccess.getOrg());

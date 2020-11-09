@@ -72,17 +72,31 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
      */
     @Read()
     public Patient getResourceById(@IdParam IdType theId) {
-        /*Patient patient= myPatients.get(theId.getIdPartAsLong());
-        if(patient==null){
-            throw new ResourceNotFoundException(theId);
-        }*/
-        return null;
+        Patient patient =null;
+
+
+        // Retrieve this patient in the database...
+        Session dataSession = getDataSession();
+        try {
+            if (orgAccess == null) {
+                authenticateOrgAccess(PARAM_USERID,PARAM_PASSWORD,PARAM_FACILITYID,dataSession);
+            }
+
+            patient = getPatientById(theId.getIdPart(),dataSession,orgAccess );
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            dataSession.close();
+
+        }
+
+        return patient;
     }
 
    @Create
     public MethodOutcome createPatient(@ResourceParam Patient thePatient) {
-        PatientReported patientReported = null;
-
+        patientReported = null;
         if (thePatient.getIdentifierFirstRep().isEmpty()) {
             throw new UnprocessableEntityException("No identifier supplied");
         }
@@ -92,30 +106,14 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
            if (orgAccess == null) {
                authenticateOrgAccess(PARAM_USERID,PARAM_PASSWORD,PARAM_FACILITYID,dataSession);
            }
-
-
-           //System.err.println(orgAccess.getAccessName());
-           //System.err.println(orgAccess.getAccessKey());
-           //System.err.println(orgAccess.getOrgAccessId());
-           //IParser jsonParser = Context.getCtx().newJsonParser();
-           //jsonParser.setPrettyPrint(true);
-          // String encoded = jsonParser.encodeResourceToString(thePatient);
-           //Patient patient = jsonParser.parseResource(Patient.class,encoded );
-           //System.err.println("the id of patient is : " + patient.getIdentifier().get(0).getValue());
-
-
            FHIRHandler fhirHandler = new FHIRHandler(dataSession);
            patientReported = fhirHandler.FIHR_EventPatientReported(orgAccess,thePatient,null);
-           //fhirHandler.processFIHR_Event(orgAccess,thePatient,null);
-
-
-
        } catch (Exception e) {
            e.printStackTrace();
        } finally {
            dataSession.close();
        }
-        return new MethodOutcome(new IdType(thePatient.getId()));
+        return new MethodOutcome(new IdType(thePatient.getIdentifier().get(0).getValue()));
 
     }
 
@@ -129,24 +127,41 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
      */
 
     @Update
-    public MethodOutcome updatePatient(@IdParam IdType theId, @ResourceParam Patient thePatient) {
+    public MethodOutcome updatePatient(@IdParam IdType theId , @ResourceParam Patient thePatient) {
         //TODO add validation method later
 
-        /*Long resourceId;
+        System.err.println(theId.getIdPart());
+
+        Session dataSession = getDataSession();
         try {
-            resourceId = theId.getIdPartAsLong();
+            if (orgAccess == null) {
+                authenticateOrgAccess(PARAM_USERID,PARAM_PASSWORD,PARAM_FACILITYID,dataSession);
+            }
 
-        } catch (DataFormatException e) {
-            throw new InvalidRequestException("Invalid ID " + theId.getValue() + " - Must be numeric");
+
+            //System.err.println(orgAccess.getAccessName());
+            //System.err.println(orgAccess.getAccessKey());
+            //System.err.println(orgAccess.getOrgAccessId());
+            //IParser jsonParser = Context.getCtx().newJsonParser();
+            //jsonParser.setPrettyPrint(true);
+            // String encoded = jsonParser.encodeResourceToString(thePatient);
+            //Patient patient = jsonParser.parseResource(Patient.class,encoded );
+            //System.err.println("the id of patient is : " + patient.getIdentifier().get(0).getValue());
+
+
+            FHIRHandler fhirHandler = new FHIRHandler(dataSession);
+            patientReported = fhirHandler.FIHR_EventPatientReported(orgAccess,thePatient,null);
+            //fhirHandler.processFIHR_Event(orgAccess,thePatient,null);
+
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            dataSession.close();
         }
 
-        if (!myPatients.containsKey(resourceId)) {
-            throw new ResourceNotFoundException(theId);
-        }
 
-
-        // ... perform the update ...
-        myPatients.put(resourceId,thePatient);*/
         return new MethodOutcome();
 
     }
@@ -155,20 +170,6 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
     @Delete()
     public MethodOutcome deletePatient(@IdParam IdType theId) {
 
-        /*Long resourceId;
-        try {
-            resourceId = theId.getIdPartAsLong();
-
-        } catch (DataFormatException e) {
-            throw new InvalidRequestException("Invalid ID " + theId.getValue() + " - Must be numeric");
-        }
-
-        if (!myPatients.containsKey(resourceId)) {
-            throw new ResourceNotFoundException(theId);
-        }
-
-        // .. Delete the patient ..
-        //myPatients.remove(resourceId);*/
 
         return new MethodOutcome();
     }
@@ -208,6 +209,25 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
             }
         }
         return orgAccess;
+    }
+
+    public static Patient getPatientById(String id, Session dataSession,OrgAccess orgAccess ){
+        Patient patient = null;
+        PatientReported patientReported =null;
+        {
+            Query query = dataSession.createQuery(
+                    "from PatientReported where orgReported = ? and patientReportedExternalLink = ?");
+            query.setParameter(0, orgAccess.getOrg());
+            query.setParameter(1, id);
+            List<PatientReported> patientReportedList = query.list();
+            if (patientReportedList.size() > 0) {
+                patientReported = patientReportedList.get(0);
+                patient =PatientHandler.getPatient(null,null,patientReported);
+
+
+            }
+        }
+        return patient;
     }
 
 

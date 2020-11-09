@@ -1,5 +1,6 @@
 package org.immregistries.iis.kernal.logic;
 
+import org.hibernate.Query;
 import org.hl7.fhir.r4.model.*;
 import org.immregistries.iis.kernal.model.*;
 
@@ -13,6 +14,7 @@ public class PatientHandler {
         //patientReported.setPatientReportedType(p.get);
         patientReported.setReportedDate(new Date());
         patientReported.setPatientReportedExternalLink(p.getIdentifier().get(0).getValue()); //TODO modify
+
         { //Name
             HumanName name = p.getNameFirstRep();
             patientReported.setPatientNameLast(name.getFamily());
@@ -41,19 +43,19 @@ public class PatientHandler {
             patientReported.setPatientAddressCountry(address.getCountry());
             patientReported.setPatientAddressCountyParish(address.getDistrict());
         }
-        for (ContactPoint contact : p.getTelecom()) {
+        /*for (ContactPoint contact : p.getTelecom()) {
             System.err.println(contact.getSystem());
             if (contact.getSystem().equals(ContactPoint.ContactPointSystem.PHONE)) {
                 patientReported.setPatientPhone(contact.getValue());
             } else if (contact.getSystem().equals(ContactPoint.ContactPointSystem.EMAIL)) {
                 patientReported.setPatientEmail(contact.getValue());
             }
-        }
+        }*/
         //patientReported.setPatientBirthFlag(p.getBirthDate().toString()); //TODO look for flag format
         //patientReported.setPatientBirthOrder(patientBirthOrder);
         //patientReported.setPatientDeathFlag(p.getDeceasedBooleanType().toString());
 
-        if (null != p.getDeceased()) {
+        /*if (null != p.getDeceased()) {
             if (p.getDeceasedBooleanType().isBooleanPrimitive()) {
                 patientReported.setPatientDeathFlag(p.getDeceasedBooleanType().toString());
             }
@@ -63,7 +65,7 @@ public class PatientHandler {
                 patientReported.setPatientDeathDate(p.getDeceasedDateTimeType().getValue());
 
             }
-        }
+        }*/
 
         //patientReported.setRegistryStatusIndicator(p.getActive());
         { // Patient Contact / Guardian
