@@ -21,7 +21,7 @@ import org.immregistries.iis.kernal.model.*;
 
 import java.util.List;
 
-public class RestfuImmunizationProvider implements IResourceProvider {
+public class RestfulImmunizationProvider implements IResourceProvider {
     protected Session dataSession=null;
     public static final String PARAM_USERID = "TELECOM NANCY";
     public static final String PARAM_PASSWORD = "1234";
