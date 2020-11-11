@@ -14,6 +14,7 @@ import org.hl7.fhir.r4.model.*;
 import org.immregistries.iis.kernal.logic.*;
 import org.immregistries.iis.kernal.model.OrgAccess;
 import org.immregistries.iis.kernal.model.OrgMaster;
+import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.model.PatientReported;
 import java.util.*;
 
@@ -27,11 +28,7 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
     public static final String PARAM_FACILITYID = "TELECOMNANCY";
     protected OrgAccess orgAccess= null;
     protected OrgMaster orgMaster=null;
-    protected PatientReported patientReported=null;
     private static SessionFactory factory;
-
-    public RestfulPatientResourceProvider() {
-    }
 
     public static Session getDataSession() {
         if (factory == null) {
@@ -82,13 +79,19 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
 
    @Create
     public MethodOutcome createPatient(@ResourceParam Patient thePatient) {
-        patientReported = null;
-        System.err.println("l id du patient est " +thePatient.getId());
+        PatientReported patientReported = null;
+       // System.err.println("l id du patient est " +thePatient.getId());
         if (thePatient.getIdentifierFirstRep().isEmpty()) {
             throw new UnprocessableEntityException("No identifier supplied");
         }
         // Save this patient to the database...
        Session dataSession = getDataSession();
+        //IdType idType = thePatient.getIdElement();
+        //System.err.println(idType);
+
+        //String id = idType.getIdPart();
+       //System.err.println(id);
+
        try {
            if (orgAccess == null) {
                authenticateOrgAccess(PARAM_USERID,PARAM_PASSWORD,PARAM_FACILITYID,dataSession);
@@ -116,21 +119,16 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
     @Update
     public MethodOutcome updatePatient(@IdParam IdType theId , @ResourceParam Patient thePatient) {
         //TODO add validation method later
-
-        System.err.println(theId.getIdPart());
+        PatientReported patientReported=null;
+        //System.err.println(theId.getIdPart());
 
         Session dataSession = getDataSession();
         try {
             if (orgAccess == null) {
                 authenticateOrgAccess(PARAM_USERID,PARAM_PASSWORD,PARAM_FACILITYID,dataSession);
             }
-
-
             FHIRHandler fhirHandler = new FHIRHandler(dataSession);
             patientReported = fhirHandler.FIHR_EventPatientReported(orgAccess,thePatient,null);
-            //fhirHandler.processFIHR_Event(orgAccess,thePatient,null);
-
-
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -146,6 +144,17 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
 
     @Delete()
     public MethodOutcome deletePatient(@IdParam IdType theId) {
+        Session dataSession = getDataSession();
+        try {
+            if (orgAccess == null) {
+                authenticateOrgAccess(PARAM_USERID,PARAM_PASSWORD,PARAM_FACILITYID,dataSession);
+            }
+            deletePatientById(theId.getIdPart(),dataSession,orgAccess );
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            dataSession.close();
+        }
 
 
         return new MethodOutcome();
@@ -204,6 +213,35 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
         }
         return patient;
     }
+  public void deletePatientById(String id,Session dataSession,OrgAccess orgAccess
+  ){
+        PatientReported patientReported=null;
+        PatientMaster patientMaster=null;
 
+      {
+          Query query = dataSession.createQuery(
+                  "from  PatientReported where orgReported = ? and patientReportedExternalLink = ?");
+          query.setParameter(0, orgAccess.getOrg());
+          query.setParameter(1, id);
+          List<PatientReported> patientReportedList = query.list();
+          if (patientReportedList.size() > 0) {
+              patientReported = patientReportedList.get(0);
+              patientMaster =patientReported.getPatient();
+          }
+      }
+
+
+      {
+          Transaction transaction = dataSession.beginTransaction();
+
+          dataSession.delete(patientReported);
+          dataSession.delete(patientMaster);
+
+          //dataSession.delete(patientReported);
+          transaction.commit();
+      }
+
+
+  }
 
 }

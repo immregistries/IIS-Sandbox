@@ -37,7 +37,7 @@ public class Server extends RestfulServer {
     protected void initialize() throws ServletException {
         //setFhirContext(FhirContext.forR4());
 
-        this.setDefaultResponseEncoding(EncodingEnum.JSON);
+        this.setDefaultResponseEncoding(EncodingEnum.XML);
 
         String serverBaseUrl = "http://localhost:8080/iis-sandbox/fhir";
         setServerAddressStrategy(new HardcodedServerAddressStrategy(serverBaseUrl));
@@ -48,7 +48,7 @@ public class Server extends RestfulServer {
          */
         List<IResourceProvider> resourceProviders = new ArrayList<IResourceProvider>();
         resourceProviders.add(new RestfulPatientResourceProvider());
-        resourceProviders.add(new RestfulImmunizationProvider());
+        resourceProviders.add(new RestfuImmunizationProvider());
 
         setResourceProviders(resourceProviders);
 

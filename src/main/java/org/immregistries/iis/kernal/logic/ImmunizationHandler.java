@@ -21,12 +21,17 @@ public class ImmunizationHandler {
     public static void vaccinationReportedFromFhirImmunization(VaccinationReported vaccinationReported, Immunization i) {
         //vaccinationReported.setVaccinationReportedId(0);
         vaccinationReported.setVaccinationReportedExternalLink(i.getId());
+        if(i.getRecorded()!=null) {
         vaccinationReported.setReportedDate(i.getRecorded());
+        }else {
+            vaccinationReported.setReportedDate(new Date());
+        }
         vaccinationReported.setUpdatedDate(new Date());
         vaccinationReported.setLotnumber(i.getLotNumber());
         vaccinationReported.setAdministeredDate(i.getOccurrenceDateTimeType().getValue());
         vaccinationReported.setAdministeredAmount(i.getDoseQuantity().getValue().toString());
         vaccinationReported.setExpirationDate(i.getExpirationDate());
+        vaccinationReported.setVaccinationReportedExternalLink(i.getIdentifier().get(0).getValue());
         /*switch (i.getStatus().toCode()){
             case "completed" : vaccinationReported.setCompletionStatus("CP");
             case "entered-in-error" : vaccinationReported.setCompletionStatus("entered-in-error"); //TODO find accurate value
@@ -61,36 +66,39 @@ public class ImmunizationHandler {
         orgLocation.setAddressCountry(l.getAddress().getCountry());
     }
 
-    public static Immunization getImmunization(OrgLocation ol, VaccinationReported vr, PatientReported pr){
-        Immunization i = new Immunization();
-        i.setId(vr.getVaccinationReportedExternalLink());
-        i.setRecorded(vr.getReportedDate());
-        i.setLotNumber(vr.getLotnumber());
-        //TODO check if Occurence needs to be instanciated
-        //i.setOccurrence(new InstantType());
-        i.getOccurrenceDateTimeType().setValue(vr.getAdministeredDate());
-        i.setDoseQuantity(new Quantity());
-        i.getDoseQuantity().setValue(new BigDecimal(vr.getAdministeredAmount()));
-        i.setExpirationDate(vr.getExpirationDate());
-        i.setStatus(Immunization.ImmunizationStatus.valueOf(vr.getCompletionStatus()));
+    public static Immunization getImmunization(OrgLocation ol, VaccinationReported vr, PatientReported pr) {
+	Immunization i = new Immunization();
+	i.setId(vr.getVaccinationReportedExternalLink());
+	i.setRecorded(vr.getReportedDate());
+	i.setLotNumber(vr.getLotnumber());
+	// TODO check if Occurence needs to be instanciated
+	// i.setOccurrence(new InstantType());
+	i.getOccurrenceDateTimeType().setValue(vr.getAdministeredDate());
+	i.setDoseQuantity(new Quantity());
+	i.getDoseQuantity().setValue(new BigDecimal(vr.getAdministeredAmount()));
+	i.setExpirationDate(vr.getExpirationDate());
+	if (!vr.getCompletionStatus().equals("")) {
+	    i.setStatus(Immunization.ImmunizationStatus.valueOf(vr.getCompletionStatus()));
+	}
 
-        i.addReasonCode().addCoding().setCode(vr.getRefusalReasonCode());
-        i.getVaccineCode().addCoding().setCode(vr.getVaccineCvxCode());
+	i.addReasonCode().addCoding().setCode(vr.getRefusalReasonCode());
+	i.getVaccineCode().addCoding().setCode(vr.getVaccineCvxCode());
 
-        Location location = i.getLocationTarget();
-        location.setId(ol.getOrgFacilityCode());
-        location.setName(ol.getOrgFacilityName());
+	Location location = i.getLocationTarget();
+	if (ol != null) {
+	    location.setId(ol.getOrgFacilityCode());
+	    location.setName(ol.getOrgFacilityName());
 
-        Address address = location.getAddress();
-        address.addLine(ol.getAddressLine1());
-        address.addLine(ol.getAddressLine2());
-        address.setCity(ol.getAddressCity());
-        address.setState(ol.getAddressState());
-        address.setPostalCode(ol.getAddressZip());
-        address.setCountry(ol.getAddressCountry());
+	    Address address = location.getAddress();
+	    address.addLine(ol.getAddressLine1());
+	    address.addLine(ol.getAddressLine2());
+	    address.setCity(ol.getAddressCity());
+	    address.setState(ol.getAddressState());
+	    address.setPostalCode(ol.getAddressZip());
+	    address.setCountry(ol.getAddressCountry());
+	}
 
-
-        return i;
+	return i;
     }
 
 }
