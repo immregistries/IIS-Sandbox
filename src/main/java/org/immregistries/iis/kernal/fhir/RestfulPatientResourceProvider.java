@@ -80,17 +80,17 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
    @Create
     public MethodOutcome createPatient(@ResourceParam Patient thePatient) {
         PatientReported patientReported = null;
-        System.err.println("l id du patient est " +thePatient.getId());
+       // System.err.println("l id du patient est " +thePatient.getId());
         if (thePatient.getIdentifierFirstRep().isEmpty()) {
             throw new UnprocessableEntityException("No identifier supplied");
         }
         // Save this patient to the database...
        Session dataSession = getDataSession();
-        IdType idType = thePatient.getIdElement();
-        System.err.println(idType);
+        //IdType idType = thePatient.getIdElement();
+        //System.err.println(idType);
 
-        String id = idType.getIdPart();
-       System.err.println(id);
+        //String id = idType.getIdPart();
+       //System.err.println(id);
 
        try {
            if (orgAccess == null) {
@@ -120,7 +120,7 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
     public MethodOutcome updatePatient(@IdParam IdType theId , @ResourceParam Patient thePatient) {
         //TODO add validation method later
         PatientReported patientReported=null;
-        System.err.println(theId.getIdPart());
+        //System.err.println(theId.getIdPart());
 
         Session dataSession = getDataSession();
         try {

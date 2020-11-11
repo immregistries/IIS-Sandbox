@@ -92,9 +92,9 @@ public class FHIRHandler extends IncomingMessageHandler {
     public PatientReported FIHR_EventPatientReported(OrgAccess orgAccess, Patient patient, Immunization immunization) throws Exception {
         PatientMaster patientMaster = null;
         PatientReported patientReported = null;
-        String patientReportedExternalLink=null;
 
-        System.err.println(patient.getId());
+
+        //System.err.println(patient.getId());
 
         //Initialising and linking the objects
         /*PatientMaster patientMaster = new PatientMaster();
@@ -118,14 +118,10 @@ public class FHIRHandler extends IncomingMessageHandler {
         ImmunizationHandler.vaccinationReportedFromFhirImmunization(vaccinationReported,immunization);*/
         //System.err.println(patient);
         //System.err.println(patient.getIdentifier().get(0).getValue());
-        if(patient.getIdentifier().get(0).getValue()!=null)
-        {
-            patientReportedExternalLink = patient.getIdentifier().get(0).getValue();
-        }
-        else{
-            patientReportedExternalLink = patient.getId();
 
-        }
+        String patientReportedExternalLink = patient.getIdentifier().get(0).getValue();
+
+
 
         if(immunization != null){
             String patientReportedAuthority = immunization.getIdentifierFirstRep().getValue();
