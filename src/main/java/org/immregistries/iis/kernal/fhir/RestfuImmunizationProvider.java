@@ -14,8 +14,8 @@ import org.hibernate.Transaction;
 import org.hibernate.cfg.AnnotationConfiguration;
 import org.hl7.fhir.r4.model.IdType;
 import org.hl7.fhir.r4.model.Immunization;
+import org.immregistries.iis.kernal.logic.*;
 import org.hl7.fhir.r4.model.Patient;
-import org.immregistries.iis.kernal.logic.FHIRHandler;
 import org.immregistries.iis.kernal.logic.ImmunizationHandler;
 import org.immregistries.iis.kernal.model.*;
 
