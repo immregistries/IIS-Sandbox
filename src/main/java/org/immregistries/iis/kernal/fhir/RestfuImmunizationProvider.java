@@ -87,8 +87,8 @@ public class RestfuImmunizationProvider implements IResourceProvider {
         return immunization;
     }
 
-    public static Immunization getImmunizationById(String id, Session dataSession,OrgAccess orgAccess ){
-        Immunization immunization = null;
+   public static Immunization getImmunizationById(String id, Session dataSession,OrgAccess orgAccess ){
+         Immunization immunization = null;
         VaccinationReported vaccinationReported = null;
         PatientReported patientReported = null;
         OrgLocation orgLocation = null;
@@ -104,7 +104,7 @@ public class RestfuImmunizationProvider implements IResourceProvider {
         }
         {
             Query query = dataSession.createQuery(
-                    "from VaccinationReported where orgReported = ? and vaccinationReportedExternalLink = ?");
+                    "from VaccinationReported where orgLocation = ? and vaccinationReportedExternalLink = ?");
             query.setParameter(0, orgAccess.getOrg());
             query.setParameter(1, id);
             List<VaccinationReported> vaccinationReportedList = query.list();
@@ -122,7 +122,7 @@ public class RestfuImmunizationProvider implements IResourceProvider {
                 patientReported = patientReportedList.get(0);
             }
         }*/
-        return immunization;
+        return null;
     }
 
     public OrgAccess authenticateOrgAccess(String userId, String password, String facilityId,
