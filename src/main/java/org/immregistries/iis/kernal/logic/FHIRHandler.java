@@ -22,71 +22,7 @@ public class FHIRHandler extends IncomingMessageHandler {
 
     public void processFIHR_Event(OrgAccess orgAccess, Patient patient, Immunization immunization) throws Exception {
         PatientReported patientReported = FIHR_EventPatientReported(orgAccess,patient,immunization);
-        //VaccinationReported vaccinationReported = FHIR_EventVaccinationReported(orgAccess,patient,immunization);
-        VaccinationReported vaccinationReported = null;
-        VaccinationMaster vaccination = null;
-        Date administrationDate = null;
-        String vaccinationReportedExternalLink = immunization.getId();
-
-        {
-            Query query = dataSession.createQuery(
-                    "from VaccinationReported where patientReported = ? and vaccinationReportedExternalLink = ?");
-            query.setParameter(0, patientReported);
-            query.setParameter(1, vaccinationReportedExternalLink);
-            List<VaccinationReported> vaccinationReportedList = query.list();
-            if (vaccinationReportedList.size() > 0) {
-                vaccinationReported = vaccinationReportedList.get(0);
-                vaccination = vaccinationReported.getVaccination();
-            }
-        }
-        if (vaccinationReported == null) {
-            vaccination = new VaccinationMaster();
-            vaccinationReported = new VaccinationReported();
-            vaccinationReported.setVaccination(vaccination);
-            vaccination.setVaccinationReported(vaccinationReported);
-            vaccinationReported.setReportedDate(new Date());
-
-        }
-        if (vaccinationReported.getAdministeredDate().before(patientReported.getPatientBirthDate())) {
-            throw new Exception(
-                    "Vaccination is reported as having been administered before the patient was born");
-        }
-
-        {
-            String administeredAtLocation = immunization.getLocationTarget().getId();
-            if (StringUtils.isNotEmpty(administeredAtLocation)) {
-                Query query = dataSession.createQuery(
-                        "from OrgLocation where orgMaster = :orgMaster and orgFacilityCode = :orgFacilityCode");
-                query.setParameter("orgMaster", orgAccess.getOrg());
-                query.setParameter("orgFacilityCode", administeredAtLocation);
-                List<OrgLocation> orgMasterList = query.list();
-                OrgLocation orgLocation = null;
-                if (orgMasterList.size() > 0) {
-                    orgLocation = orgMasterList.get(0);
-                }
-
-                if (orgLocation == null) {
-                    orgLocation = new OrgLocation();
-                    ImmunizationHandler.orgLocationFromFhirImmunization(orgLocation, immunization);
-                    vaccination.setPatient(patientReported.getPatient());
-                    vaccinationReported.setPatientReported(patientReported);
-                    orgLocation.setOrgMaster(orgAccess.getOrg());
-                    Transaction transaction = dataSession.beginTransaction();
-                    dataSession.save(orgLocation);
-                    transaction.commit();
-                }
-                vaccinationReported.setOrgLocation(orgLocation);
-            }
-
-        }
-        {
-            Transaction transaction = dataSession.beginTransaction();
-            dataSession.saveOrUpdate(vaccination);
-            dataSession.saveOrUpdate(vaccinationReported);
-            vaccination.setVaccinationReported(vaccinationReported);
-            dataSession.saveOrUpdate(vaccination);
-            transaction.commit();
-        }
+        VaccinationReported vaccinationReported = FHIR_EventVaccinationReported(orgAccess,patient,patientReported,immunization);
     }
 
     public PatientReported FIHR_EventPatientReported(OrgAccess orgAccess, Patient patient, Immunization immunization) throws Exception {
@@ -136,9 +72,8 @@ public class FHIRHandler extends IncomingMessageHandler {
             query.setParameter(0, orgAccess.getOrg());
             query.setParameter(1, patientReportedExternalLink);
             List<PatientReported> patientReportedList = query.list();
-            if (patientReportedList.size() > 0) {
+            if (patientReportedList.size() > 0) { 
                 patientReported = patientReportedList.get(0);
-                //patientMaster = patientReported.getPatient();
                 PatientHandler.patientReportedFromFhirPatient(patientReported,patient);
                 patientMaster = patientReported.getPatient();
 
@@ -168,8 +103,88 @@ public class FHIRHandler extends IncomingMessageHandler {
         return patientReported;
     }
 
-    /*public VaccinationReported FHIR_EventVaccinationReported(OrgAccess orgAccess, Patient patient, Immunization immunization) throws Exception {
-        VaccinationReported vaccinationReported = null;
-        return vaccinationReported;
-    }*/
+    public VaccinationReported FHIR_EventVaccinationReported(OrgAccess orgAccess, Patient patient,PatientReported patientReported, Immunization immunization) throws Exception {
+	VaccinationMaster vaccination = null;
+	VaccinationReported vaccinationReported = null;
+
+	Date administrationDate = null;
+	{
+	    Query query = dataSession.createQuery(
+		    "from VaccinationReported where patientReported = ? and vaccinationReportedExternalLink = ?");
+	    query.setParameter(0, patientReported);
+	    query.setParameter(1, immunization.getId());
+	    List<VaccinationReported> vaccinationReportedList = query.list();
+	    if (vaccinationReportedList.size() > 0) {
+		vaccinationReported = vaccinationReportedList.get(0);
+		vaccination = vaccinationReported.getVaccination();
+	    }
+	} 
+	if (vaccinationReported == null) {
+	    vaccination = new VaccinationMaster();
+	    vaccination.setPatient(patientReported.getPatient());
+	    vaccinationReported = new VaccinationReported();
+	    vaccinationReported.setVaccination(vaccination);
+	    vaccinationReported.setPatientReported(patientReported);
+	    vaccination.setVaccinationReported(vaccinationReported);
+	    vaccination.setPatient(patientReported.getPatient());
+
+	    ImmunizationHandler.vaccinationReportedFromFhirImmunization(vaccinationReported,immunization);
+	}
+	if (vaccinationReported.getUpdatedDate().before(patient.getBirthDate())) {
+	    throw new Exception("Vaccination is reported as having been administered before the patient was born");
+	}
+
+	String administeredAtLocation = immunization.getLocationTarget().getId();
+	if (StringUtils.isNotEmpty(administeredAtLocation)) {
+	    Query query = dataSession.createQuery(
+		    "from OrgLocation where orgMaster = :orgMaster and orgFacilityCode = :orgFacilityCode");
+	    query.setParameter("orgMaster", orgAccess.getOrg());
+	    query.setParameter("orgFacilityCode", administeredAtLocation);
+	    List<OrgLocation> orgMasterList = query.list();
+	    
+	    
+	    OrgLocation orgLocation = null;
+	    if (orgMasterList.size() > 0) {
+		orgLocation = orgMasterList.get(0);
+	    }
+
+	    if (orgLocation == null) {
+		orgLocation = new OrgLocation();
+		ImmunizationHandler.orgLocationFromFhirImmunization(orgLocation, immunization);
+		orgLocation.setOrgMaster(orgAccess.getOrg());
+		Transaction transaction = dataSession.beginTransaction();
+		dataSession.save(orgLocation);
+		transaction.commit();
+	    }
+	    vaccinationReported.setOrgLocation(orgLocation);
+	}
+
+	Transaction transaction = dataSession.beginTransaction();
+	dataSession.saveOrUpdate(vaccination);
+	dataSession.saveOrUpdate(vaccinationReported);
+	vaccination.setVaccinationReported(vaccinationReported);
+	dataSession.saveOrUpdate(vaccination);
+	transaction.commit();
+	return vaccinationReported;
+    }
+    
+    public void FHIR_EventVaccinationDeleted(OrgAccess orgAccess, String id) {
+	VaccinationReported vr = new VaccinationReported();
+	VaccinationMaster vm = new VaccinationMaster();
+
+        Query query = dataSession.createQuery(
+                "from  VaccinationReported where vaccinationReportedExternalLink = ?");
+        query.setParameter(0, id);
+        List<VaccinationReported> vaccinationReportedList = query.list();
+        if (vaccinationReportedList.size() > 0) {
+            vr = vaccinationReportedList.get(0);
+            vm =vr.getVaccination();
+        }
+        Transaction transaction = dataSession.beginTransaction();
+
+        dataSession.delete(vr);
+        dataSession.delete(vm);
+        transaction.commit();
+    }
+    
 }
