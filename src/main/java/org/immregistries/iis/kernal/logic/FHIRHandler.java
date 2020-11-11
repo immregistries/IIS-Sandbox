@@ -29,11 +29,8 @@ public class FHIRHandler extends IncomingMessageHandler {
         PatientMaster patientMaster = null;
         PatientReported patientReported = null;
 
-        System.err.println(patient.getId());
 
-
-
-
+        //System.err.println(patient.getId());
 
         //Initialising and linking the objects
         /*PatientMaster patientMaster = new PatientMaster();
@@ -57,7 +54,11 @@ public class FHIRHandler extends IncomingMessageHandler {
         ImmunizationHandler.vaccinationReportedFromFhirImmunization(vaccinationReported,immunization);*/
         //System.err.println(patient);
         //System.err.println(patient.getIdentifier().get(0).getValue());
+
         String patientReportedExternalLink = patient.getIdentifier().get(0).getValue();
+
+
+
         if(immunization != null){
             String patientReportedAuthority = immunization.getIdentifierFirstRep().getValue();
         }

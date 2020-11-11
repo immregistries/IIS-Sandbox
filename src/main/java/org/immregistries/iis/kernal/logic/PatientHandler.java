@@ -158,6 +158,8 @@ public class PatientHandler {
 
     public static Patient getPatient(OrgLocation orgLocation, VaccinationReported vaccinationReported, PatientReported pr){
         Patient p = new Patient();
+        Identifier id= p.addIdentifier();
+        id.setValue(pr.getPatientReportedExternalLink());
         p.setId(pr.getPatientReportedExternalLink());
 
         HumanName name = p.addName();
