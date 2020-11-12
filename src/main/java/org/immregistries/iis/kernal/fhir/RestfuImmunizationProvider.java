@@ -2,10 +2,10 @@ package org.immregistries.iis.kernal.fhir;
 
 import java.util.List;
 
+import ca.uhn.fhir.rest.api.server.RequestDetails;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
 import org.hibernate.cfg.AnnotationConfiguration;
 import org.hl7.fhir.r4.model.IdType;
 import org.hl7.fhir.r4.model.Immunization;
@@ -54,7 +54,7 @@ public class RestfuImmunizationProvider implements IResourceProvider {
     }
 
     @Create
-    public MethodOutcome createImmunization(@ResourceParam Immunization theImmunization) {
+    public MethodOutcome createImmunization(RequestDetails theRequestDetails, @ResourceParam Immunization theImmunization) {
         vaccinationReported = null;
         //System.err.println("l id du patient est " +theImmunization.getId());
         if (theImmunization.getIdentifierFirstRep().isEmpty()) {
@@ -62,14 +62,18 @@ public class RestfuImmunizationProvider implements IResourceProvider {
         }
         Session dataSession = getDataSession();
         try {
-            if (orgAccess == null) {
+            /*if (orgAccess == null) {
                 authenticateOrgAccess(PARAM_USERID,PARAM_PASSWORD,PARAM_FACILITYID,dataSession);
-            }
+            }*/
+            orgAccess = Authentication.authenticateOrgAccess(theRequestDetails,dataSession);
             FHIRHandler fhirHandler = new FHIRHandler(dataSession);
             PatientReported pr = PatientRepository.getPatientFromExternalId(orgAccess, dataSession, theImmunization.getPatient().getReference().substring(8)); // the id patient starts with Patient/ so we cut it
-            Patient patient = PatientHandler.patientReportedToFhirPatient(pr);
-            
-            fhirHandler.processFIHR_Event(orgAccess,patient,theImmunization);
+            if (null != pr){
+                Patient patient = PatientHandler.patientReportedToFhirPatient(pr);
+                fhirHandler.processFIHR_Event(orgAccess,patient,theImmunization);
+            }else {
+                throw new Exception("No patient Found with the identifier supplied");
+            }
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -79,14 +83,16 @@ public class RestfuImmunizationProvider implements IResourceProvider {
     }
 
     @Read()
-    public Immunization getResourceById(@IdParam IdType theId) {
+    public Immunization getResourceById(RequestDetails theRequestDetails, @IdParam IdType theId) {
 	Immunization immunization = null;
 	Session dataSession = getDataSession();
 	try {
-	    if (orgAccess == null) {
+	    /*if (orgAccess == null) {
 		authenticateOrgAccess(PARAM_USERID, PARAM_PASSWORD, PARAM_FACILITYID, dataSession);
-	    }
-	    immunization = getImmunizationById(theId.getIdPart(), dataSession, orgAccess);
+	    }*/
+        orgAccess = Authentication.authenticateOrgAccess(theRequestDetails,dataSession);
+
+        immunization = getImmunizationById(theId.getIdPart(), dataSession, orgAccess);
 	} catch (Exception e) {
 	    e.printStackTrace();
 	} finally {
@@ -96,16 +102,17 @@ public class RestfuImmunizationProvider implements IResourceProvider {
     }
     
     @Update()
-    public MethodOutcome updateImmunization(@IdParam IdType theId , @ResourceParam Immunization theImmunization) {
+    public MethodOutcome updateImmunization(RequestDetails theRequestDetails, @IdParam IdType theId , @ResourceParam Immunization theImmunization) {
         vaccinationReported = null;
         if (theImmunization.getIdentifierFirstRep().isEmpty()) {
             throw new UnprocessableEntityException("No identifier supplied");
         }
         Session dataSession = getDataSession();
         try {
-            if (orgAccess == null) {
+            /*if (orgAccess == null) {
                 authenticateOrgAccess(PARAM_USERID,PARAM_PASSWORD,PARAM_FACILITYID,dataSession);
-            }
+            }*/
+            orgAccess = Authentication.authenticateOrgAccess(theRequestDetails,dataSession);
             FHIRHandler fhirHandler = new FHIRHandler(dataSession);
             PatientReported pr = PatientRepository.getPatientFromExternalId(orgAccess, dataSession, theImmunization.getPatient().getReference().substring(8)); // the id patient starts with Patient/ so we cut it
             Patient patient = PatientHandler.patientReportedToFhirPatient(pr);
@@ -120,22 +127,20 @@ public class RestfuImmunizationProvider implements IResourceProvider {
     }
     
     @Delete()
-    public MethodOutcome deleteImmunization(@IdParam IdType theId) {
+    public MethodOutcome deleteImmunization(RequestDetails theRequestDetails, @IdParam IdType theId) {
         Session dataSession = getDataSession();
         try {
-            if (orgAccess == null) {
+            /*if (orgAccess == null) {
                 authenticateOrgAccess(PARAM_USERID,PARAM_PASSWORD,PARAM_FACILITYID,dataSession);
-            }
+            }*/
+            orgAccess = Authentication.authenticateOrgAccess(theRequestDetails,dataSession);
             FHIRHandler fhirHandler = new FHIRHandler(dataSession);
-
             fhirHandler.FHIR_EventVaccinationDeleted(orgAccess,theId.getIdPart());
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
             dataSession.close();
         }
-
-
         return new MethodOutcome();
     }
 
@@ -176,7 +181,7 @@ public class RestfuImmunizationProvider implements IResourceProvider {
 	return immunization;
     }
 
-    public OrgAccess authenticateOrgAccess(String userId, String password, String facilityId, Session dataSession) {
+    /*public OrgAccess authenticateOrgAccess(String userId, String password, String facilityId, Session dataSession) {
 	{
 	    Query query = dataSession.createQuery("from OrgMaster where organizationName = ?");
 	    query.setParameter(0, facilityId);
@@ -208,6 +213,6 @@ public class RestfuImmunizationProvider implements IResourceProvider {
 	    }
 	}
 	return orgAccess;
-    }
+    }*/
 
 }

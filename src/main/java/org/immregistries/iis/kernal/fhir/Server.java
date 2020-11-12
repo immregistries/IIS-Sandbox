@@ -13,6 +13,7 @@ import javax.servlet.ServletException;
 import java.util.ArrayList;
 import java.util.List;
 import ca.uhn.fhir.rest.server.interceptor.ResponseHighlighterInterceptor;
+import ca.uhn.fhir.rest.server.tenant.UrlBaseTenantIdentificationStrategy;
 
 @WebServlet(urlPatterns= {"/fhir/*"}, displayName="FHIR Server")
 public class Server extends RestfulServer {
@@ -40,6 +41,7 @@ public class Server extends RestfulServer {
         this.setDefaultResponseEncoding(EncodingEnum.XML);
 
         String serverBaseUrl = "http://localhost:8080/iis-sandbox/fhir";
+        setTenantIdentificationStrategy(new UrlBaseTenantIdentificationStrategy());
         setServerAddressStrategy(new HardcodedServerAddressStrategy(serverBaseUrl));
         /*
          * The servlet defines any number of resource providers, and

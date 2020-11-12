@@ -3,6 +3,7 @@ package org.immregistries.iis.kernal.fhir;
 
 import ca.uhn.fhir.rest.annotation.*;
 import ca.uhn.fhir.rest.api.MethodOutcome;
+import ca.uhn.fhir.rest.api.server.RequestDetails;
 import ca.uhn.fhir.rest.server.IResourceProvider;
 import ca.uhn.fhir.rest.server.exceptions.UnprocessableEntityException;
 import org.hibernate.Query;
@@ -16,6 +17,7 @@ import org.immregistries.iis.kernal.model.OrgAccess;
 import org.immregistries.iis.kernal.model.OrgMaster;
 import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.model.PatientReported;
+
 import java.util.*;
 
 /**
@@ -60,14 +62,15 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
      *    Returns a resource matching this identifier, or null if none exists.
      */
     @Read()
-    public Patient getResourceById(@IdParam IdType theId) {
+    public Patient getResourceById(RequestDetails theRequestDetails, @IdParam IdType theId) {
         Patient patient =null;
         // Retrieve this patient in the database...
         Session dataSession = getDataSession();
         try {
-            if (orgAccess == null) {
+            /*if (orgAccess == null) {
                 authenticateOrgAccess(PARAM_USERID,PARAM_PASSWORD,PARAM_FACILITYID,dataSession);
-            }
+            }*/
+            orgAccess = Authentication.authenticateOrgAccess(theRequestDetails,dataSession);
             patient = getPatientById(theId.getIdPart(),dataSession,orgAccess );
         } catch (Exception e) {
             e.printStackTrace();
@@ -78,7 +81,7 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
     }
 
    @Create
-    public MethodOutcome createPatient(@ResourceParam Patient thePatient) {
+    public MethodOutcome createPatient(RequestDetails theRequestDetails, @ResourceParam Patient thePatient) {
         PatientReported patientReported = null;
        // System.err.println("l id du patient est " +thePatient.getId());
         if (thePatient.getIdentifierFirstRep().isEmpty()) {
@@ -93,9 +96,10 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
        //System.err.println(id);
 
        try {
-           if (orgAccess == null) {
+           /*if (orgAccess == null) {
                authenticateOrgAccess(PARAM_USERID,PARAM_PASSWORD,PARAM_FACILITYID,dataSession);
-           }
+           }*/
+           orgAccess = Authentication.authenticateOrgAccess(theRequestDetails,dataSession);
            FHIRHandler fhirHandler = new FHIRHandler(dataSession);
            patientReported = fhirHandler.FIHR_EventPatientReported(orgAccess,thePatient,null);
        } catch (Exception e) {
@@ -117,16 +121,17 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
      */
 
     @Update
-    public MethodOutcome updatePatient(@IdParam IdType theId , @ResourceParam Patient thePatient) {
+    public MethodOutcome updatePatient(RequestDetails theRequestDetails, @IdParam IdType theId , @ResourceParam Patient thePatient) {
         //TODO add validation method later
         PatientReported patientReported=null;
         //System.err.println(theId.getIdPart());
 
         Session dataSession = getDataSession();
         try {
-            if (orgAccess == null) {
+            /*if (orgAccess == null) {
                 authenticateOrgAccess(PARAM_USERID,PARAM_PASSWORD,PARAM_FACILITYID,dataSession);
-            }
+            }*/
+            orgAccess = Authentication.authenticateOrgAccess(theRequestDetails,dataSession);
             FHIRHandler fhirHandler = new FHIRHandler(dataSession);
             patientReported = fhirHandler.FIHR_EventPatientReported(orgAccess,thePatient,null);
 
@@ -143,12 +148,13 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
 
 
     @Delete()
-    public MethodOutcome deletePatient(@IdParam IdType theId) {
+    public MethodOutcome deletePatient(RequestDetails theRequestDetails, @IdParam IdType theId) {
         Session dataSession = getDataSession();
         try {
-            if (orgAccess == null) {
+            /*if (orgAccess == null) {
                 authenticateOrgAccess(PARAM_USERID,PARAM_PASSWORD,PARAM_FACILITYID,dataSession);
-            }
+            }*/
+            orgAccess = Authentication.authenticateOrgAccess(theRequestDetails,dataSession);
             deletePatientById(theId.getIdPart(),dataSession,orgAccess );
         } catch (Exception e) {
             e.printStackTrace();
@@ -158,43 +164,6 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
 
 
         return new MethodOutcome();
-    }
-
-    public OrgAccess authenticateOrgAccess(String userId, String password, String facilityId,
-                                           Session dataSession) {
-
-        {
-            Query query = dataSession.createQuery("from OrgMaster where organizationName = ?");
-            query.setParameter(0, facilityId);
-            List<OrgMaster> orgMasterList = query.list();
-            if (orgMasterList.size() > 0) {
-                orgMaster = orgMasterList.get(0);
-            } else {
-                orgMaster = new OrgMaster();
-                orgMaster.setOrganizationName(facilityId);
-                orgAccess = new OrgAccess();
-                orgAccess.setOrg(orgMaster);
-                orgAccess.setAccessName(userId);
-                orgAccess.setAccessKey(password);
-                Transaction transaction = dataSession.beginTransaction();
-                dataSession.save(orgMaster);
-                dataSession.save(orgAccess);
-                transaction.commit();
-            }
-
-        }
-        if (orgAccess == null) {
-            Query query = dataSession
-                    .createQuery("from OrgAccess where accessName = ? and accessKey = ? and org = ?");
-            query.setParameter(0, userId);
-            query.setParameter(1, password);
-            query.setParameter(2, orgMaster);
-            List<OrgAccess> orgAccessList = query.list();
-            if (orgAccessList.size() != 0) {
-                orgAccess = orgAccessList.get(0);
-            }
-        }
-        return orgAccess;
     }
 
     public static Patient getPatientById(String id, Session dataSession,OrgAccess orgAccess ){
