@@ -167,8 +167,12 @@ public class PatientHandler {
         name.addGivenElement().setValue(pr.getPatientNameFirst());
         name.addGivenElement().setValue(pr.getPatientNameMiddle());
 
-        p.addTelecom().setSystem(ContactPoint.ContactPointSystem.EMAIL).setValue(pr.getPatientEmail());
-        p.addTelecom().setSystem(ContactPoint.ContactPointSystem.PHONE).setValue(pr.getPatientPhone());
+        if (null != pr.getPatientEmail()){
+			p.addTelecom().setSystem(ContactPoint.ContactPointSystem.EMAIL).setValue(pr.getPatientEmail());
+		}
+		if (null != pr.getPatientPhone()){
+			p.addTelecom().setSystem(ContactPoint.ContactPointSystem.PHONE).setValue(pr.getPatientPhone());
+		}
         switch (pr.getPatientSex()){
             case "M":p.setGender(Enumerations.AdministrativeGender.MALE);break;
             case "F":p.setGender(Enumerations.AdministrativeGender.FEMALE);break;
