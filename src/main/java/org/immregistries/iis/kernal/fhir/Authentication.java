@@ -73,6 +73,8 @@ public class Authentication {
                     List<OrgAccess> orgAccessList = query.list();
                     if (orgAccessList.size() != 0) {
                         orgAccess = orgAccessList.get(0);
+                    }else {
+                        throw new AuthenticationException("password for ID : " + facilityId);
                     }
                 }
             }
