@@ -32,9 +32,6 @@ import ca.uhn.fhir.rest.server.exceptions.UnprocessableEntityException;
 
 public class RestfuImmunizationProvider implements IResourceProvider {
     protected Session dataSession = null;
-    public static final String PARAM_USERID = "TELECOM NANCY";
-    public static final String PARAM_PASSWORD = "1234";
-    public static final String PARAM_FACILITYID = "TELECOMNANCY";
     protected OrgAccess orgAccess = null;
     protected OrgMaster orgMaster = null;
     protected PatientReported patientReported = null;
@@ -62,9 +59,6 @@ public class RestfuImmunizationProvider implements IResourceProvider {
         }
         Session dataSession = getDataSession();
         try {
-            /*if (orgAccess == null) {
-                authenticateOrgAccess(PARAM_USERID,PARAM_PASSWORD,PARAM_FACILITYID,dataSession);
-            }*/
             orgAccess = Authentication.authenticateOrgAccess(theRequestDetails,dataSession);
             FHIRHandler fhirHandler = new FHIRHandler(dataSession);
             PatientReported pr = PatientRepository.getPatientFromExternalId(orgAccess, dataSession, theImmunization.getPatient().getReference().substring(8)); // the id patient starts with Patient/ so we cut it
@@ -109,9 +103,6 @@ public class RestfuImmunizationProvider implements IResourceProvider {
         }
         Session dataSession = getDataSession();
         try {
-            /*if (orgAccess == null) {
-                authenticateOrgAccess(PARAM_USERID,PARAM_PASSWORD,PARAM_FACILITYID,dataSession);
-            }*/
             orgAccess = Authentication.authenticateOrgAccess(theRequestDetails,dataSession);
             FHIRHandler fhirHandler = new FHIRHandler(dataSession);
             PatientReported pr = PatientRepository.getPatientFromExternalId(orgAccess, dataSession, theImmunization.getPatient().getReference().substring(8)); // the id patient starts with Patient/ so we cut it
@@ -130,9 +121,6 @@ public class RestfuImmunizationProvider implements IResourceProvider {
     public MethodOutcome deleteImmunization(RequestDetails theRequestDetails, @IdParam IdType theId) {
         Session dataSession = getDataSession();
         try {
-            /*if (orgAccess == null) {
-                authenticateOrgAccess(PARAM_USERID,PARAM_PASSWORD,PARAM_FACILITYID,dataSession);
-            }*/
             orgAccess = Authentication.authenticateOrgAccess(theRequestDetails,dataSession);
             FHIRHandler fhirHandler = new FHIRHandler(dataSession);
             fhirHandler.FHIR_EventVaccinationDeleted(orgAccess,theId.getIdPart());
@@ -180,39 +168,4 @@ public class RestfuImmunizationProvider implements IResourceProvider {
 	 */
 	return immunization;
     }
-
-    /*public OrgAccess authenticateOrgAccess(String userId, String password, String facilityId, Session dataSession) {
-	{
-	    Query query = dataSession.createQuery("from OrgMaster where organizationName = ?");
-	    query.setParameter(0, facilityId);
-	    List<OrgMaster> orgMasterList = query.list();
-	    if (orgMasterList.size() > 0) {
-		orgMaster = orgMasterList.get(0);
-	    } else {
-		orgMaster = new OrgMaster();
-		orgMaster.setOrganizationName(facilityId);
-		orgAccess = new OrgAccess();
-		orgAccess.setOrg(orgMaster);
-		orgAccess.setAccessName(userId);
-		orgAccess.setAccessKey(password);
-		Transaction transaction = dataSession.beginTransaction();
-		dataSession.save(orgMaster);
-		dataSession.save(orgAccess);
-		transaction.commit();
-	    }
-
-	}
-	if (orgAccess == null) {
-	    Query query = dataSession.createQuery("from OrgAccess where accessName = ? and accessKey = ? and org = ?");
-	    query.setParameter(0, userId);
-	    query.setParameter(1, password);
-	    query.setParameter(2, orgMaster);
-	    List<OrgAccess> orgAccessList = query.list();
-	    if (orgAccessList.size() != 0) {
-		orgAccess = orgAccessList.get(0);
-	    }
-	}
-	return orgAccess;
-    }*/
-
 }

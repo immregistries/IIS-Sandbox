@@ -25,9 +25,6 @@ import java.util.*;
  */
 public class RestfulPatientResourceProvider implements IResourceProvider {
     protected Session dataSession=null;
-    public static final String PARAM_USERID = "TELECOM NANCY";
-    public static final String PARAM_PASSWORD = "1234";
-    public static final String PARAM_FACILITYID = "TELECOMNANCY";
     protected OrgAccess orgAccess= null;
     protected OrgMaster orgMaster=null;
     private static SessionFactory factory;
@@ -67,9 +64,6 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
         // Retrieve this patient in the database...
         Session dataSession = getDataSession();
         try {
-            /*if (orgAccess == null) {
-                authenticateOrgAccess(PARAM_USERID,PARAM_PASSWORD,PARAM_FACILITYID,dataSession);
-            }*/
             orgAccess = Authentication.authenticateOrgAccess(theRequestDetails,dataSession);
             patient = getPatientById(theId.getIdPart(),dataSession,orgAccess );
         } catch (Exception e) {
@@ -96,9 +90,6 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
        //System.err.println(id);
 
        try {
-           /*if (orgAccess == null) {
-               authenticateOrgAccess(PARAM_USERID,PARAM_PASSWORD,PARAM_FACILITYID,dataSession);
-           }*/
            orgAccess = Authentication.authenticateOrgAccess(theRequestDetails,dataSession);
            FHIRHandler fhirHandler = new FHIRHandler(dataSession);
            patientReported = fhirHandler.FIHR_EventPatientReported(orgAccess,thePatient,null);
@@ -128,9 +119,6 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
 
         Session dataSession = getDataSession();
         try {
-            /*if (orgAccess == null) {
-                authenticateOrgAccess(PARAM_USERID,PARAM_PASSWORD,PARAM_FACILITYID,dataSession);
-            }*/
             orgAccess = Authentication.authenticateOrgAccess(theRequestDetails,dataSession);
             FHIRHandler fhirHandler = new FHIRHandler(dataSession);
             patientReported = fhirHandler.FIHR_EventPatientReported(orgAccess,thePatient,null);
@@ -151,9 +139,6 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
     public MethodOutcome deletePatient(RequestDetails theRequestDetails, @IdParam IdType theId) {
         Session dataSession = getDataSession();
         try {
-            /*if (orgAccess == null) {
-                authenticateOrgAccess(PARAM_USERID,PARAM_PASSWORD,PARAM_FACILITYID,dataSession);
-            }*/
             orgAccess = Authentication.authenticateOrgAccess(theRequestDetails,dataSession);
             deletePatientById(theId.getIdPart(),dataSession,orgAccess );
         } catch (Exception e) {
@@ -182,8 +167,8 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
         }
         return patient;
     }
-  public void deletePatientById(String id,Session dataSession,OrgAccess orgAccess
-  ){
+
+    public void deletePatientById(String id,Session dataSession,OrgAccess orgAccess) {
         PatientReported patientReported=null;
         PatientMaster patientMaster=null;
 
@@ -198,8 +183,6 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
               patientMaster =patientReported.getPatient();
           }
       }
-
-
       {
           Transaction transaction = dataSession.beginTransaction();
 
