@@ -41,8 +41,8 @@ public class Authentication {
         String base64 = authHeader.substring("Basic ".length());
         String base64decoded = new String(Base64.decodeBase64(base64));
         String[] parts = base64decoded.split(":");
-        String facilityId = theRequestDetails.getTenantId();
 
+        String facilityId = theRequestDetails.getTenantId();
         //String facilityId = parts[0];
         String password = parts[1]; //TODO Maybe hash password
 

@@ -80,34 +80,6 @@ public class IncomingMessageHandler {
     this.dataSession = dataSession;
   }
 
-  public String processFHIR(String patientMessage,String immunizationMessage, OrgAccess orgAccess) {
-    //Immunization immunization = processImmunizationFHIR(immunizationMessage);
-    Patient patient = processPatientFHIR(patientMessage);
-    IParser parser = ctx.newJsonParser();
-    PatientReported patientReported = new PatientReported();
-    //patientReported.patientReportedFromFHIR(patient);//,immunization);
-    patientReported.setPatientReportedId(10);
-    {
-      Transaction transaction = dataSession.beginTransaction();
-      dataSession.saveOrUpdate(patientReported);
-      transaction.commit();
-    }
-
-    return patientReported.toString() + "  \n\n\n       " + parser.encodeResourceToString(patient); //+ "\n" + parser.encodeResourceToString(immunization);
-  }
-
-  public Patient processPatientFHIR(String message){
-    IParser parser = Context.fhir_parser(message);
-    Patient patient = parser.parseResource(Patient.class,message);
-    return patient;
-  }
-
-  public Immunization processImmunizationFHIR(String message){
-    IParser parser = Context.fhir_parser(message);
-    Immunization immunization = parser.parseResource(Immunization.class,message);
-    return immunization;
-  }
-
 
   public String process(String message, OrgAccess orgAccess) {
     HL7Reader reader = new HL7Reader(message);

@@ -53,7 +53,6 @@ public class RestfuImmunizationProvider implements IResourceProvider {
     @Create
     public MethodOutcome createImmunization(RequestDetails theRequestDetails, @ResourceParam Immunization theImmunization) {
         vaccinationReported = null;
-        //System.err.println("l id du patient est " +theImmunization.getId());
         if (theImmunization.getIdentifierFirstRep().isEmpty()) {
             throw new UnprocessableEntityException("No identifier supplied");
         }
