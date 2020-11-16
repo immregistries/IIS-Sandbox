@@ -73,8 +73,6 @@ public class PatientHandler {
 														      // or
 														      // N
 	    }
-	    // System.out.println(p.getDeceased().getId());
-	    // System.out.println(p.getDeceasedDateTimeType().);
 	    if (p.getDeceased().isDateTime()) {
 		patientReported.setPatientDeathDate(p.getDeceasedDateTimeType().getValue());
 

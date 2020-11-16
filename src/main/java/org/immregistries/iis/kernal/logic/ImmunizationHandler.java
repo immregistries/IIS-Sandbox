@@ -71,8 +71,6 @@ public class ImmunizationHandler {
 	i.setId(vr.getVaccinationReportedExternalLink());
 	i.setRecorded(vr.getReportedDate());
 	i.setLotNumber(vr.getLotnumber());
-	// TODO check if Occurence needs to be instanciated
-	// i.setOccurrence(new InstantType());
 	i.getOccurrenceDateTimeType().setValue(vr.getAdministeredDate());
 	i.setDoseQuantity(new Quantity());
 	i.getDoseQuantity().setValue(new BigDecimal(vr.getAdministeredAmount()));
