@@ -44,7 +44,7 @@ public class FHIRHandler extends IncomingMessageHandler {
             query.setParameter(0, orgAccess.getOrg());
             query.setParameter(1, patientReportedExternalLink);
             List<PatientReported> patientReportedList = query.list();
-            if (patientReportedList.size() > 0) { 
+            if (patientReportedList.size() > 0) {
                 patientReported = patientReportedList.get(0);
                 PatientHandler.patientReportedFromFhirPatient(patientReported,patient);
                 patientMaster = patientReported.getPatient();

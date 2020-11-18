@@ -1,6 +1,7 @@
 package org.immregistries.iis.kernal.fhir;
 
 
+import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.rest.annotation.*;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.api.server.RequestDetails;
@@ -17,7 +18,9 @@ import org.immregistries.iis.kernal.model.OrgAccess;
 import org.immregistries.iis.kernal.model.OrgMaster;
 import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.model.PatientReported;
+import org.springframework.web.bind.annotation.RequestParam;
 
+import javax.annotation.PostConstruct;
 import java.util.*;
 
 /**
@@ -74,9 +77,12 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
         return patient;
     }
 
+
+
    @Create
     public MethodOutcome createPatient(RequestDetails theRequestDetails, @ResourceParam Patient thePatient) {
         PatientReported patientReported = null;
+        List<Patient> matches= new ArrayList<Patient>();
        // System.err.println("l id du patient est " +thePatient.getId());
         if (thePatient.getIdentifierFirstRep().isEmpty()) {
             throw new UnprocessableEntityException("No identifier supplied");
@@ -92,7 +98,15 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
        try {
            orgAccess = Authentication.authenticateOrgAccess(theRequestDetails,dataSession);
            FHIRHandler fhirHandler = new FHIRHandler(dataSession);
+           matches= findMatch(dataSession,thePatient);
            patientReported = fhirHandler.FIHR_EventPatientReported(orgAccess,thePatient,null);
+
+           for(Patient match : matches)
+           {
+               String encoded = Context.getCtx().newJsonParser().setPrettyPrint(true).encodeResourceToString(match);
+               System.err.println(encoded);
+           }
+           System.err.println("found "+ matches.size() + " match(es)");
        } catch (Exception e) {
            e.printStackTrace();
        } finally {
@@ -195,5 +209,49 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
 
 
   }
+
+  public ArrayList<Patient> findMatch(Session dataSession, Patient patient){
+        ArrayList<Patient> matches = new ArrayList<Patient>();
+
+              Query query = dataSession.createQuery(
+                      "from PatientReported where patientNameLast = ? and patientNameFirst= ? ");
+              query.setParameter(0, patient.getNameFirstRep().getFamily());
+              query.setParameter(1,patient.getNameFirstRep().getGiven().get(0).toString());
+              //query.setParameter(2, patient.getBirthDate());
+              List<PatientReported> patientReportedList = query.list();
+
+
+              if (patientReportedList.size() > 0)
+              {
+
+                  for(PatientReported patientReported : patientReportedList)
+                  {
+                      patient=PatientHandler.getPatient(null,null,patientReported);
+                      matches.add(patient);
+                  }
+
+              }
+
+        return matches;
+  }
+  /*@Read()
+  public List<Patient> getMatches(RequestDetails theRequestDetails,  @ResourceParam Patient thePatient){
+      Session dataSession = getDataSession();
+      List<Patient> matches = new ArrayList<Patient>();
+      try {
+
+          orgAccess = Authentication.authenticateOrgAccess(theRequestDetails,dataSession);
+          matches = findMatch(dataSession,thePatient);
+
+      } catch (Exception e) {
+          e.printStackTrace();
+      } finally {
+          dataSession.close();
+      }
+
+
+        return matches;
+
+  }*/
 
 }
