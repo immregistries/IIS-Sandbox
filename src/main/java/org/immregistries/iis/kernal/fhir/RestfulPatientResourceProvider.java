@@ -98,15 +98,15 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
        try {
            orgAccess = Authentication.authenticateOrgAccess(theRequestDetails,dataSession);
            FHIRHandler fhirHandler = new FHIRHandler(dataSession);
-           matches= findMatch(dataSession,thePatient);
+           //matches= findMatch(dataSession,thePatient);
            patientReported = fhirHandler.FIHR_EventPatientReported(orgAccess,thePatient,null);
 
-           for(Patient match : matches)
+           /*for(Patient match : matches)
            {
                String encoded = Context.getCtx().newJsonParser().setPrettyPrint(true).encodeResourceToString(match);
                System.err.println(encoded);
            }
-           System.err.println("found "+ matches.size() + " match(es)");
+           System.err.println("found "+ matches.size() + " match(es)");*/
        } catch (Exception e) {
            e.printStackTrace();
        } finally {
@@ -210,7 +210,7 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
 
   }
 
-  public ArrayList<Patient> findMatch(Session dataSession, Patient patient){
+  /*public ArrayList<Patient> findMatch(Session dataSession, Patient patient){
         ArrayList<Patient> matches = new ArrayList<Patient>();
 
               Query query = dataSession.createQuery(
@@ -233,7 +233,7 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
               }
 
         return matches;
-  }
+  }*/
   /*@Read()
   public List<Patient> getMatches(RequestDetails theRequestDetails,  @ResourceParam Patient thePatient){
       Session dataSession = getDataSession();

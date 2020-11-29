@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.hibernate.Query;
+import org.hibernate.Session;
 import org.hl7.fhir.r4.model.Address;
 import org.hl7.fhir.r4.model.ContactPoint;
 import org.hl7.fhir.r4.model.ContactPoint.ContactPointSystem;
@@ -204,6 +206,18 @@ public class PatientHandler {
         contact.setName(contactName);
         return p;
     }
+
+	public static List<PatientMaster> findMatch(Session dataSession, Patient patient){
+		List<PatientMaster> matches;
+		Query query = dataSession.createQuery(
+				"from PatientMaster where patientNameLast = ? and patientNameFirst= ? ");
+		query.setParameter(0, patient.getNameFirstRep().getFamily());
+		query.setParameter(1,patient.getNameFirstRep().getGiven().get(0).toString());
+		//query.setParameter(2, patient.getBirthDate());
+		matches = query.list();
+
+		return matches;
+	}
 
 
 }

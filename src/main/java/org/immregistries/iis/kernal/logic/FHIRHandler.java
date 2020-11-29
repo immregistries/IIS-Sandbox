@@ -10,6 +10,7 @@ import org.hl7.fhir.r4.model.Immunization;
 import org.hl7.fhir.r4.model.Patient;
 import org.immregistries.iis.kernal.model.*;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -51,9 +52,14 @@ public class FHIRHandler extends IncomingMessageHandler {
                 //PatientHandler.patientReportedFromFhirPatient(patientReported,patient);
                 patientMaster = patientReportedList.get(0).getPatient();
 
-            } else {
-				patientMaster = new PatientMaster();
-				patientMaster.setOrgMaster(orgAccess.getOrg());
+            } else { //EMPI Search matches with name
+				List<PatientMaster> patientMasterList = PatientHandler.findMatch(dataSession,patient);
+				if(patientMasterList.size() > 0){
+					patientMaster = patientMasterList.get(0);
+				}else {
+					patientMaster = new PatientMaster();
+					patientMaster.setOrgMaster(orgAccess.getOrg());
+				}
 			}
         }
 		patientReported = new PatientReported();
