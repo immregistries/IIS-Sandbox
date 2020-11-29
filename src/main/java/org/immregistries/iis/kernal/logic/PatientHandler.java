@@ -93,15 +93,18 @@ public class PatientHandler {
 
 	// PatientMaster Ressource
 	PatientMaster patientMaster = patientReported.getPatient();
+	if (null == patientMaster.getPatientNameLast()){ //TODO improve this condition
 
-	patientMaster.setPatientId(patientReported.getPatientReportedId());
-	patientMaster.setPatientExternalLink(patientReported.getPatientReportedExternalLink());
-	patientMaster.setPatientNameLast(patientReported.getPatientNameLast());
-	patientMaster.setPatientNameFirst(patientReported.getPatientNameFirst());
-	patientMaster.setPatientNameMiddle(patientReported.getPatientNameMiddle());
-	patientMaster.setPatientBirthDate(patientReported.getPatientBirthDate());
-	patientMaster.setPatientPhoneFrag(patientReported.getPatientPhone());
-	patientMaster.setPatientAddressFrag(patientReported.getPatientAddressZip());
+		patientMaster.setPatientId(patientReported.getPatientReportedId());
+		patientMaster.setPatientExternalLink(patientReported.getPatientReportedExternalLink());
+		patientMaster.setPatientNameLast(patientReported.getPatientNameLast());
+		patientMaster.setPatientNameFirst(patientReported.getPatientNameFirst());
+		patientMaster.setPatientNameMiddle(patientReported.getPatientNameMiddle());
+		patientMaster.setPatientBirthDate(patientReported.getPatientBirthDate());
+		patientMaster.setPatientPhoneFrag(patientReported.getPatientPhone());
+		patientMaster.setPatientAddressFrag(patientReported.getPatientAddressZip());
+	}
+
 
     }
 

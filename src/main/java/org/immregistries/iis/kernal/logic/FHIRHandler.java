@@ -38,6 +38,8 @@ public class FHIRHandler extends IncomingMessageHandler {
         if (StringUtils.isEmpty(patientReportedExternalLink)) {
             throw new Exception("Patient external link must be indicated");
         }
+
+
         {
             Query query = dataSession.createQuery(
                     "from PatientReported where orgReported = ? and patientReportedExternalLink = ?");
@@ -45,23 +47,20 @@ public class FHIRHandler extends IncomingMessageHandler {
             query.setParameter(1, patientReportedExternalLink);
             List<PatientReported> patientReportedList = query.list();
             if (patientReportedList.size() > 0) {
-                patientReported = patientReportedList.get(0);
-                PatientHandler.patientReportedFromFhirPatient(patientReported,patient);
-                patientMaster = patientReported.getPatient();
+                //patientReported = patientReportedList.get(0);
+                //PatientHandler.patientReportedFromFhirPatient(patientReported,patient);
+                patientMaster = patientReportedList.get(0).getPatient();
 
-            }
+            } else {
+				patientMaster = new PatientMaster();
+				patientMaster.setOrgMaster(orgAccess.getOrg());
+			}
         }
-        if (patientReported == null) {
-            patientMaster = new PatientMaster();
-            patientReported = new PatientReported();
-            patientReported.setPatient(patientMaster);
-            PatientHandler.patientReportedFromFhirPatient(patientReported, patient);
-            //ImmunizationHandler.patientReportedFromFhirImmunization(patientReported,immunization);
-        }
-        patientMaster.setOrgMaster(orgAccess.getOrg());
+		patientReported = new PatientReported();
+		patientReported.setPatient(patientMaster);
+		PatientHandler.patientReportedFromFhirPatient(patientReported, patient);
         patientReported.setOrgReported(orgAccess.getOrg());
         patientReported.setUpdatedDate(new Date());
-
 
         {
             Transaction transaction = dataSession.beginTransaction();
