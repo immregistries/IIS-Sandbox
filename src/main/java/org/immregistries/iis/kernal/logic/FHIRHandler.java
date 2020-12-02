@@ -30,8 +30,9 @@ public class FHIRHandler extends IncomingMessageHandler {
         PatientMaster patientMaster = null;
         PatientReported patientReported = null;
         String patientReportedExternalLink = patient.getIdentifier().get(0).getValue();
+        System.err.println(patientReportedExternalLink);
         boolean patientAlreadyExists = false;
-        
+        int levelConfidence=0;
         if(immunization != null){
             String patientReportedAuthority = immunization.getIdentifierFirstRep().getValue();
         }
@@ -49,19 +50,31 @@ public class FHIRHandler extends IncomingMessageHandler {
             query.setParameter(1, patientReportedExternalLink);
             List<PatientReported> patientReportedList = query.list();
             if (patientReportedList.size() > 0) {
+            	System.err.println("Le patient existe déja");
             	//get patient master and reported
                 patientReported = patientReportedList.get(0);
                 PatientHandler.patientReportedFromFhirPatient(patientReported,patient);
                 patientMaster = patientReported.getPatient();
 
-            } else { //EMPI Search matches with name
+            } else { //EMPI Search matches with firstname, lastname and birthday
 				List<PatientMaster> patientMasterList = PatientHandler.findMatch(dataSession,patient);
 				if(patientMasterList.size() > 0){
+					System.err.println("Le patient a un  match ");
 					//Create new patient reported and get existing patient master
 					patientAlreadyExists = true;
 					patientMaster = patientMasterList.get(0);
+					levelConfidence=2;
+				}else if(PatientHandler.findPossibleMatch(dataSession,patient).size()>0){
+					// Found an existing patient with same firstname and lastname
+					patientAlreadyExists=true;
+					patientMasterList=PatientHandler.findPossibleMatch(dataSession,patient);
+					patientMaster=patientMasterList.get(0);
+					levelConfidence=1;
+					System.err.println("Le patient a un possible match ");
+
 				}else {
 					//Create new patient master and patient reported
+					System.err.println("Le patient n' a pas de match ");
 					patientMaster = new PatientMaster();
 					patientMaster.setOrgMaster(orgAccess.getOrg());
 				}
@@ -80,8 +93,9 @@ public class FHIRHandler extends IncomingMessageHandler {
             dataSession.saveOrUpdate(patientMaster);
             dataSession.saveOrUpdate(patientReported);
             if(patientAlreadyExists) {
+            	System.err.println("creation patientlink");
             	PatientLink pl = new PatientLink();
-            	pl.setLevelConfidence(0); //TODO : set level confidence
+            	pl.setLevelConfidence(levelConfidence);
             	pl.setPatientMaster(patientMaster);
             	pl.setPatientReported(patientReported);
             	dataSession.saveOrUpdate(pl);
