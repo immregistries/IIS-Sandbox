@@ -95,7 +95,7 @@ public class PatientHandler {
 
 	// PatientMaster Ressource
 	PatientMaster patientMaster = patientReported.getPatient();
-	if (null == patientMaster.getPatientNameLast()){ //TODO improve this condition
+	if (patientMaster.getPatientNameLast().equals("")){ //TODO improve this condition
 
 		patientMaster.setPatientId(patientReported.getPatientReportedId());
 		patientMaster.setPatientExternalLink(patientReported.getPatientReportedExternalLink());

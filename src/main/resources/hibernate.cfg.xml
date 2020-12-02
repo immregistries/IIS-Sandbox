@@ -28,5 +28,6 @@
     <mapping resource="org/immregistries/iis/kernal/model/VaccinationReported.hbm.xml"/>
     <mapping resource="org/immregistries/iis/kernal/model/ObservationMaster.hbm.xml"/>
     <mapping resource="org/immregistries/iis/kernal/model/ObservationReported.hbm.xml"/>
+    <mapping resource="org/immregistries/iis/kernal/model/PatientLink.hbm.xml"/>
   </session-factory>
 </hibernate-configuration>
