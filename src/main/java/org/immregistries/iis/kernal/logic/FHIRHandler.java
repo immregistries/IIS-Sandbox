@@ -30,7 +30,8 @@ public class FHIRHandler extends IncomingMessageHandler {
         PatientMaster patientMaster = null;
         PatientReported patientReported = null;
         String patientReportedExternalLink = patient.getIdentifier().get(0).getValue();
-
+        boolean patientAlreadyExists = false;
+        
         if(immunization != null){
             String patientReportedAuthority = immunization.getIdentifierFirstRep().getValue();
         }
@@ -48,25 +49,29 @@ public class FHIRHandler extends IncomingMessageHandler {
             query.setParameter(1, patientReportedExternalLink);
             List<PatientReported> patientReportedList = query.list();
             if (patientReportedList.size() > 0) {
-                //patientReported = patientReportedList.get(0);
-                //PatientHandler.patientReportedFromFhirPatient(patientReported,patient);
-                patientMaster = patientReportedList.get(0).getPatient();
+            	//get patient master and reported
+                patientReported = patientReportedList.get(0);
+                PatientHandler.patientReportedFromFhirPatient(patientReported,patient);
+                patientMaster = patientReported.getPatient();
 
             } else { //EMPI Search matches with name
 				List<PatientMaster> patientMasterList = PatientHandler.findMatch(dataSession,patient);
 				if(patientMasterList.size() > 0){
+					//Create new patient reported and get existing patient master
+					patientAlreadyExists = true;
 					patientMaster = patientMasterList.get(0);
 				}else {
+					//Create new patient master and patient reported
 					patientMaster = new PatientMaster();
 					patientMaster.setOrgMaster(orgAccess.getOrg());
 				}
+				patientReported = new PatientReported();
+				patientReported.setPatient(patientMaster);
+	            PatientHandler.patientReportedFromFhirPatient(patientReported, patient);
+	            patientReported.setOrgReported(orgAccess.getOrg());
+				patientReported.setUpdatedDate(new Date());
 			}
         }
-		patientReported = new PatientReported();
-		patientReported.setPatient(patientMaster);
-		PatientHandler.patientReportedFromFhirPatient(patientReported, patient);
-        patientReported.setOrgReported(orgAccess.getOrg());
-        patientReported.setUpdatedDate(new Date());
 
         {
             Transaction transaction = dataSession.beginTransaction();
@@ -74,6 +79,13 @@ public class FHIRHandler extends IncomingMessageHandler {
 
             dataSession.saveOrUpdate(patientMaster);
             dataSession.saveOrUpdate(patientReported);
+            if(patientAlreadyExists) {
+            	PatientLink pl = new PatientLink();
+            	pl.setLevelConfidence(0); //TODO : set level confidence
+            	pl.setPatientMaster(patientMaster);
+            	pl.setPatientReported(patientReported);
+            	dataSession.saveOrUpdate(pl);
+            }
             transaction.commit();
         }
 
