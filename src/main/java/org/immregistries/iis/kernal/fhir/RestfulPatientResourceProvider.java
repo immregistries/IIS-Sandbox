@@ -38,29 +38,11 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
         }
         return factory.openSession();
     }
-
-    /**
-     * The getResourceType method comes from IResourceProvider, and must
-     * be overridden to indicate what type of resource this provider
-     * supplies.
-     */
     @Override
     public Class<Patient> getResourceType() {
         return Patient.class;
     }
 
-
-    /**
-     * The "@Read" annotation indicates that this method supports the
-     * read operation. Read operations should return a single resource
-     * instance.
-     *
-     * @param theId
-     *    The read operation takes one parameter, which must be of type
-     *    IdType and must be annotated with the "@Read.IdParam" annotation.
-     * @return
-     *    Returns a resource matching this identifier, or null if none exists.
-     */
     @Read()
     public Patient getResourceById(RequestDetails theRequestDetails, @IdParam IdType theId) {
         Patient patient =null;
@@ -83,18 +65,11 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
     public MethodOutcome createPatient(RequestDetails theRequestDetails, @ResourceParam Patient thePatient) {
         PatientReported patientReported = null;
         List<Patient> matches= new ArrayList<Patient>();
-       // System.err.println("l id du patient est " +thePatient.getId());
         if (thePatient.getIdentifierFirstRep().isEmpty()) {
             throw new UnprocessableEntityException("No identifier supplied");
         }
         // Save this patient to the database...
        Session dataSession = getDataSession();
-        //IdType idType = thePatient.getIdElement();
-        //System.err.println(idType);
-
-        //String id = idType.getIdPart();
-       //System.err.println(id);
-
        try {
            orgAccess = Authentication.authenticateOrgAccess(theRequestDetails,dataSession);
            FHIRHandler fhirHandler = new FHIRHandler(dataSession);
@@ -127,27 +102,19 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
 
     @Update
     public MethodOutcome updatePatient(RequestDetails theRequestDetails, @IdParam IdType theId , @ResourceParam Patient thePatient) {
-        //TODO add validation method later
         PatientReported patientReported=null;
-        //System.err.println(theId.getIdPart());
-
         Session dataSession = getDataSession();
         try {
             orgAccess = Authentication.authenticateOrgAccess(theRequestDetails,dataSession);
             FHIRHandler fhirHandler = new FHIRHandler(dataSession);
             patientReported = fhirHandler.FIHR_EventPatientReported(orgAccess,thePatient,null);
-
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
             dataSession.close();
         }
-
-
         return new MethodOutcome();
-
     }
-
 
     @Delete()
     public MethodOutcome deletePatient(RequestDetails theRequestDetails, @IdParam IdType theId) {
@@ -160,8 +127,6 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
         } finally {
             dataSession.close();
         }
-
-
         return new MethodOutcome();
     }
 
@@ -199,15 +164,10 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
       }
       {
           Transaction transaction = dataSession.beginTransaction();
-
           dataSession.delete(patientReported);
           dataSession.delete(patientMaster);
-
-          //dataSession.delete(patientReported);
           transaction.commit();
       }
-
-
   }
 
   /*public ArrayList<Patient> findMatch(Session dataSession, Patient patient){
