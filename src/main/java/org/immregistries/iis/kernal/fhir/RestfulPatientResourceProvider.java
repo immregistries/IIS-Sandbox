@@ -141,7 +141,7 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
                 patientReported = patientReportedList.get(0);
                 patient =PatientHandler.getPatient(null,null,patientReported);
                 //TODO add patientLink
-               /* Query queryLink = dataSession.createQuery(
+               Query queryLink = dataSession.createQuery(
                         "from PatientLink where patientReported = ?");
                 queryLink.setParameter(0, patientReported.getPatientReportedId());
                 List<PatientLink> patientLinkList = queryLink.list();
@@ -156,14 +156,16 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
                         queryMaster.setParameter(0, link.getPatientMaster());
                         List<PatientMaster> patientMasterList = queryMaster.list();
                         System.err.println(patientMasterList.get(0).getPatientExternalLink());
+                        String ref = patientMasterList.get(0).getPatientExternalLink();
 
-                         Patient.PatientLinkComponent patientLinkComponent= link
-                         Patient.PatientLinkComponent patientLinkComponent =
-                        patient.addLink()
+                         Patient.PatientLinkComponent patientLinkComponent= new Patient.PatientLinkComponent();
+                         Reference reference = new Reference();
+                         reference.setReference("http://localhost:8080/iis-sandbox/fhir/Org1/Patient/"+ref);
+                         patient.addLink(patientLinkComponent.setOther(reference));
                     }
 
 
-                }*/
+                }
 
 
 
