@@ -163,7 +163,10 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
                             String ref = patientMasterList.get(0).getPatientExternalLink();
                             Patient.PatientLinkComponent patientLinkComponent= new Patient.PatientLinkComponent();
                             Reference reference = new Reference();
-                            reference.setReference("http://localhost:8080/iis-sandbox/fhir/Org1/Patient/"+ref);
+                            //reference.setReference("http://localhost:8080/iis-sandbox/fhir/Org1/Patient/"+ref);
+                            //reference.setReference(ref);
+                            reference.setReference("Patient/"+ref);
+
 
                             patient.addLink(patientLinkComponent.setOther(reference));
 
