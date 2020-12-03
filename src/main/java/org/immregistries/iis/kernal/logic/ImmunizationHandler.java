@@ -95,8 +95,16 @@ public class ImmunizationHandler {
 	    address.setPostalCode(ol.getAddressZip());
 	    address.setCountry(ol.getAddressCountry());
 	}
+    Extension links = new Extension("#links");
+	Extension link = new Extension();
+	link.setValue(new CodeType("level1")).setUrl("Immunization/"+vr.getVaccination().getVaccinationId())
+;	//link.setProperty("target",new StringType("Immunization/123"));
+	//link.setProperty("assurance",);
+    links.addExtension(link);
+    i.addExtension(links);
 
-	return i;
+
+        return i;
     }
 
 }
