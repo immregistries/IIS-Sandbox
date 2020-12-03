@@ -14,10 +14,7 @@ import org.hibernate.Transaction;
 import org.hibernate.cfg.AnnotationConfiguration;
 import org.hl7.fhir.r4.model.*;
 import org.immregistries.iis.kernal.logic.*;
-import org.immregistries.iis.kernal.model.OrgAccess;
-import org.immregistries.iis.kernal.model.OrgMaster;
-import org.immregistries.iis.kernal.model.PatientMaster;
-import org.immregistries.iis.kernal.model.PatientReported;
+import org.immregistries.iis.kernal.model.*;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.annotation.PostConstruct;
@@ -133,6 +130,7 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
     public static Patient getPatientById(String id, Session dataSession,OrgAccess orgAccess ){
         Patient patient = null;
         PatientReported patientReported =null;
+        System.err.println("the id is " + id);
         {
             Query query = dataSession.createQuery(
                     "from PatientReported where orgReported = ? and patientReportedExternalLink = ?");
@@ -142,6 +140,35 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
             if (patientReportedList.size() > 0) {
                 patientReported = patientReportedList.get(0);
                 patient =PatientHandler.getPatient(null,null,patientReported);
+                //TODO add patientLink
+               /* Query queryLink = dataSession.createQuery(
+                        "from PatientLink where patientReported = ?");
+                queryLink.setParameter(0, patientReported.getPatientReportedId());
+                List<PatientLink> patientLinkList = queryLink.list();
+
+                if(patientLinkList.size()>0){
+                    System.err.println(queryLink.list().size());
+
+                    for(PatientLink link : patientLinkList){
+                        System.err.println(link.getPatientMaster());
+                        Query queryMaster = dataSession.createQuery(
+                                "from PatientMaster where patientId = ?");
+                        queryMaster.setParameter(0, link.getPatientMaster());
+                        List<PatientMaster> patientMasterList = queryMaster.list();
+                        System.err.println(patientMasterList.get(0).getPatientExternalLink());
+
+                         Patient.PatientLinkComponent patientLinkComponent= link
+                         Patient.PatientLinkComponent patientLinkComponent =
+                        patient.addLink()
+                    }
+
+
+                }*/
+
+
+
+
+
             }
         }
         return patient;
