@@ -130,7 +130,7 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
     public static Patient getPatientById(String id, Session dataSession,OrgAccess orgAccess ){
         Patient patient = null;
         PatientReported patientReported =null;
-        System.err.println("the id is " + id);
+        //System.err.println("the id is " + id);
         {
             Query query = dataSession.createQuery(
                     "from PatientReported where orgReported = ? and patientReportedExternalLink = ?");
@@ -141,31 +141,40 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
                 patientReported = patientReportedList.get(0);
                 patient =PatientHandler.getPatient(null,null,patientReported);
                 //TODO add patientLink
+                System.err.println(patientReported.getPatientReportedId());
+                int linkId = patientReported.getPatientReportedId();
                Query queryLink = dataSession.createQuery(
-                        "from PatientLink where patientReported = ?");
-                queryLink.setParameter(0, patientReported.getPatientReportedId());
-                List<PatientLink> patientLinkList = queryLink.list();
+                        "from PatientLink where patientReported.id = ?");
+                queryLink.setParameter(0, linkId);
+               List<PatientLink> patientLinkList = queryLink.list();
+                System.err.println(queryLink.list().size());
 
                 if(patientLinkList.size()>0){
-                    System.err.println(queryLink.list().size());
+                    //System.err.println(queryLink.list().size());
 
                     for(PatientLink link : patientLinkList){
-                        System.err.println(link.getPatientMaster());
+                        //System.err.println(link.getPatientMaster());
                         Query queryMaster = dataSession.createQuery(
                                 "from PatientMaster where patientId = ?");
-                        queryMaster.setParameter(0, link.getPatientMaster());
+                        queryMaster.setParameter(0, link.getPatientMaster().getPatientId());
                         List<PatientMaster> patientMasterList = queryMaster.list();
-                        System.err.println(patientMasterList.get(0).getPatientExternalLink());
-                        String ref = patientMasterList.get(0).getPatientExternalLink();
+                        if(patientMasterList.size()>0){
+                            System.err.println(patientMasterList.get(0).getPatientExternalLink());
+                            String ref = patientMasterList.get(0).getPatientExternalLink();
+                            Patient.PatientLinkComponent patientLinkComponent= new Patient.PatientLinkComponent();
+                            Reference reference = new Reference();
+                            reference.setReference("http://localhost:8080/iis-sandbox/fhir/Org1/Patient/"+ref);
 
-                         Patient.PatientLinkComponent patientLinkComponent= new Patient.PatientLinkComponent();
-                         Reference reference = new Reference();
-                         reference.setReference("http://localhost:8080/iis-sandbox/fhir/Org1/Patient/"+ref);
-                         patient.addLink(patientLinkComponent.setOther(reference));
+                            patient.addLink(patientLinkComponent.setOther(reference));
+
+                        }
+
+
+
                     }
 
 
-                }
+               }
 
 
 

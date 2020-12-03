@@ -14,6 +14,9 @@ public class PatientLink implements Serializable {
 	private int id;
 	private PatientMaster patientMaster = null;
 	private PatientReported patientReported =null;
+	/*private int patientMasterId= 0;
+	private int patientReportedId=0;*/
+
 	private int levelConfidence;
 	
 	public int getId() {
@@ -40,5 +43,20 @@ public class PatientLink implements Serializable {
 	public void setLevelConfidence(int levelConfidence) {
 		this.levelConfidence = levelConfidence;
 	}
-	
+
+	/*public int getPatientMasterId() {
+		return patientMasterId;
+	}
+
+	public void setPatientMasterId(int patientMasterId) {
+		this.patientMasterId = patientMasterId;
+	}
+
+	public int getPatientReportedId() {
+		return patientReportedId;
+	}
+
+	public void setPatientReportedId(int patientReportedId) {
+		this.patientReportedId = patientReportedId;
+	}*/
 }
