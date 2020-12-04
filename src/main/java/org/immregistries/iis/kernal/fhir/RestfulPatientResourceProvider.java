@@ -130,7 +130,6 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
     public static Patient getPatientById(String id, Session dataSession,OrgAccess orgAccess ){
         Patient patient = null;
         PatientReported patientReported =null;
-        //System.err.println("the id is " + id);
         {
             Query query = dataSession.createQuery(
                     "from PatientReported where orgReported = ? and patientReportedExternalLink = ?");
@@ -140,49 +139,23 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
             if (patientReportedList.size() > 0) {
                 patientReported = patientReportedList.get(0);
                 patient =PatientHandler.getPatient(null,null,patientReported);
-                //TODO add patientLink
-                System.err.println(patientReported.getPatientReportedId());
+
                 int linkId = patientReported.getPatientReportedId();
                Query queryLink = dataSession.createQuery(
                         "from PatientLink where patientReported.id = ?");
                 queryLink.setParameter(0, linkId);
                List<PatientLink> patientLinkList = queryLink.list();
-                System.err.println(queryLink.list().size());
 
                 if(patientLinkList.size()>0){
-                    //System.err.println(queryLink.list().size());
-
                     for(PatientLink link : patientLinkList){
-                        //System.err.println(link.getPatientMaster());
-                        Query queryMaster = dataSession.createQuery(
-                                "from PatientMaster where patientId = ?");
-                        queryMaster.setParameter(0, link.getPatientMaster().getPatientId());
-                        List<PatientMaster> patientMasterList = queryMaster.list();
-                        if(patientMasterList.size()>0){
-                            System.err.println(patientMasterList.get(0).getPatientExternalLink());
-                            String ref = patientMasterList.get(0).getPatientExternalLink();
+                            String ref = link.getPatientMaster().getPatientExternalLink();
                             Patient.PatientLinkComponent patientLinkComponent= new Patient.PatientLinkComponent();
                             Reference reference = new Reference();
-                            //reference.setReference("http://localhost:8080/iis-sandbox/fhir/Org1/Patient/"+ref);
-                            //reference.setReference(ref);
-                            reference.setReference("Patient/"+ref);
-
-
+                            reference.setReference("Person/"+ref);
                             patient.addLink(patientLinkComponent.setOther(reference));
 
-                        }
-
-
-
                     }
-
-
                }
-
-
-
-
-
             }
         }
         return patient;
@@ -211,48 +184,6 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
       }
   }
 
-  /*public ArrayList<Patient> findMatch(Session dataSession, Patient patient){
-        ArrayList<Patient> matches = new ArrayList<Patient>();
 
-              Query query = dataSession.createQuery(
-                      "from PatientReported where patientNameLast = ? and patientNameFirst= ? ");
-              query.setParameter(0, patient.getNameFirstRep().getFamily());
-              query.setParameter(1,patient.getNameFirstRep().getGiven().get(0).toString());
-              //query.setParameter(2, patient.getBirthDate());
-              List<PatientReported> patientReportedList = query.list();
-
-
-              if (patientReportedList.size() > 0)
-              {
-
-                  for(PatientReported patientReported : patientReportedList)
-                  {
-                      patient=PatientHandler.getPatient(null,null,patientReported);
-                      matches.add(patient);
-                  }
-
-              }
-
-        return matches;
-  }*/
-  /*@Read()
-  public List<Patient> getMatches(RequestDetails theRequestDetails,  @ResourceParam Patient thePatient){
-      Session dataSession = getDataSession();
-      List<Patient> matches = new ArrayList<Patient>();
-      try {
-
-          orgAccess = Authentication.authenticateOrgAccess(theRequestDetails,dataSession);
-          matches = findMatch(dataSession,thePatient);
-
-      } catch (Exception e) {
-          e.printStackTrace();
-      } finally {
-          dataSession.close();
-      }
-
-
-        return matches;
-
-  }*/
 
 }
