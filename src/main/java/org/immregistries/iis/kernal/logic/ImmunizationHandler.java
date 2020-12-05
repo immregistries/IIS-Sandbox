@@ -81,6 +81,7 @@ public class ImmunizationHandler {
 
 	i.addReasonCode().addCoding().setCode(vr.getRefusalReasonCode());
 	i.getVaccineCode().addCoding().setCode(vr.getVaccineCvxCode());
+	i.setPatient(new Reference("Patient/"+pr.getPatientReportedId() ));
 
 	Location location = i.getLocationTarget();
 	if (ol != null) {

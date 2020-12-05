@@ -51,6 +51,7 @@ public class Server extends RestfulServer {
         List<IResourceProvider> resourceProviders = new ArrayList<IResourceProvider>();
         resourceProviders.add(new RestfulPatientResourceProvider());
         resourceProviders.add(new RestfuImmunizationProvider());
+        resourceProviders.add(new RestfulMedicationAdministrationProvider());
 
         setResourceProviders(resourceProviders);
 

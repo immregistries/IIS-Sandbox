@@ -8,9 +8,7 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.AnnotationConfiguration;
-import org.hl7.fhir.r4.model.IdType;
-import org.hl7.fhir.r4.model.Immunization;
-import org.hl7.fhir.r4.model.MedicationAdministration;
+import org.hl7.fhir.r4.model.*;
 import org.immregistries.iis.kernal.model.*;
 
 import java.util.List;
@@ -40,18 +38,18 @@ public class RestfulMedicationAdministrationProvider implements IResourceProvide
         MedicationAdministration medicationAdministration = null;
         Session dataSession = getDataSession();
         String id = theId.getIdPart();
+        System.err.println(id);
+        System.err.println(Integer.parseInt(id));
         try {
             orgAccess = Authentication.authenticateOrgAccess(theRequestDetails,dataSession);
             {
                 Query query = dataSession
-                        .createQuery("from VaccinationMaster where orgReported = ? and vaccinationId= ?");
-                query.setParameter(0, orgAccess.getOrg());
-                query.setParameter(1, id);
+                        .createQuery("from VaccinationMaster where vaccinationId= ?");
+                //query.setParameter(0, orgAccess.getOrg());
+                query.setParameter(0, Integer.parseInt(id));
                 List<VaccinationMaster> vaccinationMasterList = query.list();
                 if (vaccinationMasterList.size() > 0) {
                     vaccinationMaster = vaccinationMasterList.get(0);
-                    medicationAdministration =  new MedicationAdministration();
-                    medicationAdministration.setId(id);
                 }
             }
 
@@ -59,6 +57,19 @@ public class RestfulMedicationAdministrationProvider implements IResourceProvide
             e.printStackTrace();
         } finally {
             dataSession.close();
+        }
+
+        if (vaccinationMaster != null){
+            medicationAdministration =  new MedicationAdministration();
+            medicationAdministration.setId(id);
+            medicationAdministration.setEffective(new DateTimeType(vaccinationMaster.getAdministeredDate()));
+            medicationAdministration.setSubject( new Reference("Patient/" + vaccinationMaster.getPatient().getPatientId()));
+            //medicationAdministration.setMedication(new CodeType(vaccinationMaster.getVaccineCvxCode()));
+            Extension links = new Extension("#links");
+            Extension link = new Extension();
+            link.setValue(new CodeType("level1")).setUrl("Immunization/"+vaccinationMaster.getVaccinationId());
+            links.addExtension(link);
+            medicationAdministration.addExtension(links);
         }
         return medicationAdministration;
     }
