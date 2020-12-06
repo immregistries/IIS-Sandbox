@@ -38,8 +38,6 @@ public class RestfulMedicationAdministrationProvider implements IResourceProvide
         MedicationAdministration medicationAdministration = null;
         Session dataSession = getDataSession();
         String id = theId.getIdPart();
-        System.err.println(id);
-        System.err.println(Integer.parseInt(id));
         try {
             orgAccess = Authentication.authenticateOrgAccess(theRequestDetails,dataSession);
             {
@@ -52,6 +50,31 @@ public class RestfulMedicationAdministrationProvider implements IResourceProvide
                     vaccinationMaster = vaccinationMasterList.get(0);
                 }
             }
+            if (vaccinationMaster != null){
+                medicationAdministration =  new MedicationAdministration();
+                medicationAdministration.setId(id);
+                medicationAdministration.setEffective(new DateTimeType(vaccinationMaster.getAdministeredDate()));
+                medicationAdministration.setSubject( new Reference(theRequestDetails.getFhirServerBase()+"/Patient/" + vaccinationMaster.getPatient().getPatientId()));
+                //medicationAdministration.setMedication(new CodeType(vaccinationMaster.getVaccineCvxCode()));
+                {
+                    Query query = dataSession
+                            .createQuery("from VaccinationReported where vaccination= ?");
+                    //query.setParameter(0, orgAccess.getOrg());
+                    query.setParameter(0, vaccinationMaster);
+                    List<VaccinationReported> vaccinationReportedList = query.list();
+                    if (vaccinationReportedList.size() > 0) {
+                        Extension links = new Extension("#links");
+                        Extension link;
+                        for (VaccinationReported vl : vaccinationReportedList){
+                            link = new Extension();
+                            link.setValue(new StringType(theRequestDetails.getFhirServerBase()+"/Immunization/"+vl.getVaccinationReportedId()));
+                            links.addExtension(link);
+                        }
+                        medicationAdministration.addExtension(links);
+                    }
+                }
+
+            }
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -59,18 +82,7 @@ public class RestfulMedicationAdministrationProvider implements IResourceProvide
             dataSession.close();
         }
 
-        if (vaccinationMaster != null){
-            medicationAdministration =  new MedicationAdministration();
-            medicationAdministration.setId(id);
-            medicationAdministration.setEffective(new DateTimeType(vaccinationMaster.getAdministeredDate()));
-            medicationAdministration.setSubject( new Reference("Patient/" + vaccinationMaster.getPatient().getPatientId()));
-            //medicationAdministration.setMedication(new CodeType(vaccinationMaster.getVaccineCvxCode()));
-            Extension links = new Extension("#links");
-            Extension link = new Extension();
-            link.setValue(new CodeType("level1")).setUrl("Immunization/"+vaccinationMaster.getVaccinationId());
-            links.addExtension(link);
-            medicationAdministration.addExtension(links);
-        }
+
         return medicationAdministration;
     }
 }

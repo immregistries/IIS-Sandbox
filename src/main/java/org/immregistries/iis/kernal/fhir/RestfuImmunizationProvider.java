@@ -13,11 +13,7 @@ import org.immregistries.iis.kernal.logic.*;
 import org.hl7.fhir.r4.model.Patient;
 import org.immregistries.iis.kernal.logic.ImmunizationHandler;
 import org.immregistries.iis.kernal.logic.PatientHandler;
-import org.immregistries.iis.kernal.model.OrgAccess;
-import org.immregistries.iis.kernal.model.OrgLocation;
-import org.immregistries.iis.kernal.model.OrgMaster;
-import org.immregistries.iis.kernal.model.PatientReported;
-import org.immregistries.iis.kernal.model.VaccinationReported;
+import org.immregistries.iis.kernal.model.*;
 import org.immregistries.iis.kernal.repository.PatientRepository;
 
 import ca.uhn.fhir.rest.annotation.Create;
@@ -85,7 +81,7 @@ public class RestfuImmunizationProvider implements IResourceProvider {
 	    }*/
         orgAccess = Authentication.authenticateOrgAccess(theRequestDetails,dataSession);
 
-        immunization = getImmunizationById(theId.getIdPart(), dataSession, orgAccess);
+        immunization = getImmunizationById(theRequestDetails, theId.getIdPart(), dataSession, orgAccess);
 	} catch (Exception e) {
 	    e.printStackTrace();
 	} finally {
@@ -132,32 +128,23 @@ public class RestfuImmunizationProvider implements IResourceProvider {
     }
 
 
-    public static Immunization getImmunizationById(String id, Session dataSession, OrgAccess orgAccess) {
-	Immunization immunization = null;
-	VaccinationReported vaccinationReported = null;
-	PatientReported patientReported = null;
-	OrgLocation orgLocation = null;
-	{
-	    Query query = dataSession
-		    .createQuery("from PatientReported where orgReported = ? and patientReportedExternalLink = ?");
-	    query.setParameter(0, orgAccess.getOrg());
-	    query.setParameter(1, id);
-	    List<PatientReported> patientReportedList = query.list();
-	    if (patientReportedList.size() > 0) {
-		patientReported = patientReportedList.get(0);
+    public static Immunization getImmunizationById(RequestDetails theRequestDetails, String id, Session dataSession, OrgAccess orgAccess) {
+	    Immunization immunization = null;
+	    VaccinationReported vaccinationReported = null;
+	    PatientReported patientReported = null;
+	    OrgLocation orgLocation = null;
+
+	    {
+	        Query query = dataSession.createQuery(
+	    	    "from VaccinationReported where vaccinationReportedExternalLink = ?");
+	        query.setParameter(0, id);
+	        List<VaccinationReported> vaccinationReportedList = query.list();
+	        if (vaccinationReportedList.size() > 0) {
+	    	    vaccinationReported = vaccinationReportedList.get(0);
+                immunization = ImmunizationHandler.getImmunization(theRequestDetails, vaccinationReported);
+	        }
 	    }
-	}
-	{
-	    Query query = dataSession.createQuery(
-		    "from VaccinationReported where vaccinationReportedExternalLink = ?");
-	    query.setParameter(0, id);
-	    List<VaccinationReported> vaccinationReportedList = query.list();
-	    if (vaccinationReportedList.size() > 0) {
-		vaccinationReported = vaccinationReportedList.get(0);
-		immunization = ImmunizationHandler.getImmunization(vaccinationReported.getOrgLocation(),
-			vaccinationReported, patientReported);
-	    }
-	}
+
 	/*
 	 * { Query query = dataSession.createQuery(
 	 * "from OrgLocation where  org_facility_code = ?"); query.setParameter(0,
@@ -165,6 +152,6 @@ public class RestfuImmunizationProvider implements IResourceProvider {
 	 * patientReportedList = query.list(); if (patientReportedList.size() > 0) {
 	 * patientReported = patientReportedList.get(0); } }
 	 */
-	return immunization;
+	    return immunization;
     }
 }
