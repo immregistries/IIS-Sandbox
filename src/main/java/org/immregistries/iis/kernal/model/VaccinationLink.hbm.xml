@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="org.immregistries.iis.kernal.model">
+    <class name="VaccinationLink" table="vaccination_link">
+        <id name="id" column="id">
+            <generator class="native"/>
+        </id>
+        <many-to-one name="vaccinationMaster" column="vaccination_master_ID" class="VaccinationMaster"/>
+        <many-to-one name="vaccinationReported" column="vaccination_reported_ID" class="VaccinationReported"/>
+        <property name="levelConfidence" column="level_confidence" type="integer"/>
+    </class>
+</hibernate-mapping>
