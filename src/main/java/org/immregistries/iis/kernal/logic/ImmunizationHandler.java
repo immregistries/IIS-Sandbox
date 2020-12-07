@@ -81,7 +81,7 @@ public class ImmunizationHandler {
 	    i.addReasonCode().addCoding().setCode(vr.getRefusalReasonCode());
 	    i.getVaccineCode().addCoding().setCode(vr.getVaccineCvxCode());
 	    //if (pr != null){
-            i.setPatient(new Reference(theRequestDetails.getFhirServerBase()+"/Patient/"+vr.getPatientReported().getPatientReportedId() ));
+            i.setPatient(new Reference(theRequestDetails.getFhirServerBase()+"/Patient/"+vr.getPatientReported().getPatientReportedExternalLink()));
         //}
 
 	    Location location = i.getLocationTarget();
@@ -101,7 +101,7 @@ public class ImmunizationHandler {
         Extension links = new Extension("#links");
 	    Extension link;
 	    link = new Extension();
-	    link.setValue(new StringType(theRequestDetails.getFhirServerBase()+"/MedicationAdministration/"+vr.getVaccination().getVaccinationId()));
+	    link.setValue(new StringType(theRequestDetails.getFhirServerBase()+"/MedicationAdministration/"+vr.getVaccination().getVaccinationReported().getVaccinationReportedExternalLink()));
 	    links.addExtension(link);
         i.addExtension(links);
         return i;

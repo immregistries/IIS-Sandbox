@@ -130,12 +130,28 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
     public static Patient getPatientById(String id, Session dataSession,OrgAccess orgAccess ){
         Patient patient = null;
         PatientReported patientReported =null;
+        int idInt = 0;
+        boolean isExternalLink = false;
+        try {
+            idInt = Integer.parseInt(id);
+        } catch(NumberFormatException | NullPointerException e) {
+            isExternalLink = true;
+        }
         //System.err.println("the id is " + id);
         {
-            Query query = dataSession.createQuery(
-                    "from PatientReported where orgReported = ? and patientReportedExternalLink = ?");
-            query.setParameter(0, orgAccess.getOrg());
-            query.setParameter(1, id);
+            Query query;
+            if (isExternalLink){
+                query = dataSession.createQuery(
+                        "from PatientReported where orgReported = ? and patientReportedExternalLink = ?");
+                query.setParameter(0, orgAccess.getOrg());
+                query.setParameter(1, id);
+            }else {
+                query = dataSession.createQuery(
+                        "from PatientReported where orgReported = ? and patientReportedId = ?");
+                query.setParameter(0, orgAccess.getOrg());
+                query.setParameter(1, idInt);
+            }
+
             List<PatientReported> patientReportedList = query.list();
             if (patientReportedList.size() > 0) {
                 patientReported = patientReportedList.get(0);

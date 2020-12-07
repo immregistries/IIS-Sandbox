@@ -109,8 +109,6 @@ public class FHIRHandler extends IncomingMessageHandler {
     public VaccinationReported FHIR_EventVaccinationReported(OrgAccess orgAccess, Patient patient,PatientReported patientReported, Immunization immunization) throws Exception {
 		VaccinationMaster vaccinationMaster = null;
 		VaccinationReported vaccinationReported = null;
-		//VaccinationLink vaccinationLink = null;
-		int levelConfidence = 0;
 
 		vaccinationReported = new VaccinationReported();
 		vaccinationReported.setPatientReported(patientReported);
@@ -124,16 +122,14 @@ public class FHIRHandler extends IncomingMessageHandler {
 	    	if (vaccinationReportedList.size() > 0) { // if external link found
 				System.out.println("Immunization already exists");
 				vaccinationMaster = vaccinationReportedList.get(0).getVaccination();
-				levelConfidence = 1;
 	    	} else if (false){
 	    		//TODO Vacdedup find match
 			} else {
 				vaccinationMaster = new VaccinationMaster();
 				vaccinationMaster.setPatient(patientReported.getPatient());
-				//vaccinationMaster.setVaccinationReported(vaccinationReported);
+				vaccinationMaster.setVaccinationReported(vaccinationReported);
 				vaccinationMaster.setPatient(patientReported.getPatient());
 				ImmunizationHandler.vaccinationMasterFromFhirImmunization(vaccinationMaster,immunization);
-				levelConfidence = 1;
 			}
 		}
 		vaccinationReported.setVaccination(vaccinationMaster);
@@ -163,11 +159,6 @@ public class FHIRHandler extends IncomingMessageHandler {
 	    vaccinationReported.setOrgLocation(orgLocation);
 	}
 
-
-	/*vaccinationLink = new VaccinationLink();
-	vaccinationLink.setVaccinationReported(vaccinationReported);
-	vaccinationLink.setVaccinationMaster(vaccinationMaster);
-	vaccinationLink.setLevelConfidence(levelConfidence);*/
 
 	Transaction transaction = dataSession.beginTransaction();
 	dataSession.saveOrUpdate(vaccinationMaster);
