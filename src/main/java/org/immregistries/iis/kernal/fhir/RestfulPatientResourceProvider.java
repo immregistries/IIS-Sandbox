@@ -70,15 +70,9 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
        try {
            orgAccess = Authentication.authenticateOrgAccess(theRequestDetails,dataSession);
            FHIRHandler fhirHandler = new FHIRHandler(dataSession);
-           //matches= findMatch(dataSession,thePatient);
+
            patientReported = fhirHandler.FIHR_EventPatientReported(orgAccess,thePatient,null);
 
-           /*for(Patient match : matches)
-           {
-               String encoded = Context.getCtx().newJsonParser().setPrettyPrint(true).encodeResourceToString(match);
-               System.err.println(encoded);
-           }
-           System.err.println("found "+ matches.size() + " match(es)");*/
        } catch (Exception e) {
            e.printStackTrace();
        } finally {
@@ -160,7 +154,7 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
         }
         return patient;
     }
-
+    //We can delete only Patient with no link
     public void deletePatientById(String id,Session dataSession,OrgAccess orgAccess) {
         PatientReported patientReported=null;
         PatientMaster patientMaster=null;
@@ -173,13 +167,21 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
           List<PatientReported> patientReportedList = query.list();
           if (patientReportedList.size() > 0) {
               patientReported = patientReportedList.get(0);
+
               patientMaster =patientReported.getPatient();
+              System.err.println("Lid du patient Master est  " +patientMaster.getPatientExternalLink());
+
+
+
           }
       }
       {
           Transaction transaction = dataSession.beginTransaction();
           dataSession.delete(patientReported);
+
           dataSession.delete(patientMaster);
+
+
           transaction.commit();
       }
   }
