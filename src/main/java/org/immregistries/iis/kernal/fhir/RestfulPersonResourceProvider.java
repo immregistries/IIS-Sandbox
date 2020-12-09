@@ -175,7 +175,7 @@ public class RestfulPersonResourceProvider implements IResourceProvider {
 
         }
 
-        
+
         {
             Transaction transaction = dataSession.beginTransaction();
             dataSession.delete(patientReported);

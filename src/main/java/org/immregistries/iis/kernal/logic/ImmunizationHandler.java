@@ -1,10 +1,12 @@
 package org.immregistries.iis.kernal.logic;
 
+import ca.uhn.fhir.rest.api.server.RequestDetails;
 import org.hl7.fhir.r4.model.*;
 import org.immregistries.iis.kernal.model.*;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 public class ImmunizationHandler {
 
@@ -40,15 +42,12 @@ public class ImmunizationHandler {
 
         //vaccinationReported.setActionCode();
         vaccinationReported.setRefusalReasonCode(i.getReasonCodeFirstRep().getText());
-
         vaccinationReported.setVaccineCvxCode(i.getVaccineCode().getCodingFirstRep().getCode());
+    }
 
-        VaccinationMaster vaccinationMaster = vaccinationReported.getVaccination();
-
-        vaccinationMaster.setAdministeredDate(vaccinationReported.getAdministeredDate());
-        vaccinationMaster.setVaccinationId(vaccinationReported.getVaccinationReportedId());
-        vaccinationMaster.setVaccinationReported(vaccinationReported);
-        vaccinationMaster.setVaccineCvxCode(vaccinationReported.getVaccineCvxCode());
+    public static void vaccinationMasterFromFhirImmunization( VaccinationMaster vaccinationMaster, Immunization i){
+        vaccinationMaster.setAdministeredDate(i.getOccurrenceDateTimeType().getValue());
+        vaccinationMaster.setVaccineCvxCode(i.getVaccineCode().getCodingFirstRep().getCode());
     }
 
     public static void orgLocationFromFhirImmunization(OrgLocation orgLocation, Immunization i){
@@ -66,37 +65,46 @@ public class ImmunizationHandler {
         orgLocation.setAddressCountry(l.getAddress().getCountry());
     }
 
-    public static Immunization getImmunization(OrgLocation ol, VaccinationReported vr, PatientReported pr) {
-	Immunization i = new Immunization();
-	i.setId(vr.getVaccinationReportedExternalLink());
-	i.setRecorded(vr.getReportedDate());
-	i.setLotNumber(vr.getLotnumber());
-	i.getOccurrenceDateTimeType().setValue(vr.getAdministeredDate());
-	i.setDoseQuantity(new Quantity());
-	i.getDoseQuantity().setValue(new BigDecimal(vr.getAdministeredAmount()));
-	i.setExpirationDate(vr.getExpirationDate());
-	if (!vr.getCompletionStatus().equals("")) {
-	    i.setStatus(Immunization.ImmunizationStatus.valueOf(vr.getCompletionStatus()));
-	}
+    public static Immunization getImmunization(RequestDetails theRequestDetails, VaccinationReported vr) {
+	    Immunization i = new Immunization();
+	    i.setId(vr.getVaccinationReportedExternalLink());
+	    i.setRecorded(vr.getReportedDate());
+	    i.setLotNumber(vr.getLotnumber());
+	    i.getOccurrenceDateTimeType().setValue(vr.getAdministeredDate());
+	    i.setDoseQuantity(new Quantity());
+	    i.getDoseQuantity().setValue(new BigDecimal(vr.getAdministeredAmount()));
+	    i.setExpirationDate(vr.getExpirationDate());
+	    if (!vr.getCompletionStatus().equals("")) {
+	        i.setStatus(Immunization.ImmunizationStatus.valueOf(vr.getCompletionStatus()));
+	    }
 
-	i.addReasonCode().addCoding().setCode(vr.getRefusalReasonCode());
-	i.getVaccineCode().addCoding().setCode(vr.getVaccineCvxCode());
+	    i.addReasonCode().addCoding().setCode(vr.getRefusalReasonCode());
+	    i.getVaccineCode().addCoding().setCode(vr.getVaccineCvxCode());
+	    //if (pr != null){
+            i.setPatient(new Reference(theRequestDetails.getFhirServerBase()+"/Patient/"+vr.getPatientReported().getPatientReportedExternalLink()));
+        //}
 
-	Location location = i.getLocationTarget();
-	if (ol != null) {
-	    location.setId(ol.getOrgFacilityCode());
-	    location.setName(ol.getOrgFacilityName());
+	    Location location = i.getLocationTarget();
+	    OrgLocation ol = vr.getOrgLocation();
+	    if (ol != null) {
+	        location.setId(ol.getOrgFacilityCode());
+	        location.setName(ol.getOrgFacilityName());
 
-	    Address address = location.getAddress();
-	    address.addLine(ol.getAddressLine1());
-	    address.addLine(ol.getAddressLine2());
-	    address.setCity(ol.getAddressCity());
-	    address.setState(ol.getAddressState());
-	    address.setPostalCode(ol.getAddressZip());
-	    address.setCountry(ol.getAddressCountry());
-	}
-
-	return i;
+	        Address address = location.getAddress();
+	        address.addLine(ol.getAddressLine1());
+	        address.addLine(ol.getAddressLine2());
+	        address.setCity(ol.getAddressCity());
+	        address.setState(ol.getAddressState());
+	        address.setPostalCode(ol.getAddressZip());
+	        address.setCountry(ol.getAddressCountry());
+	    }
+        Extension links = new Extension("#links");
+	    Extension link;
+	    link = new Extension();
+	    link.setValue(new StringType(theRequestDetails.getFhirServerBase()+"/MedicationAdministration/"+vr.getVaccination().getVaccinationReported().getVaccinationReportedExternalLink()));
+	    links.addExtension(link);
+        i.addExtension(links);
+        return i;
     }
 
 }

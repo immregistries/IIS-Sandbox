@@ -52,12 +52,12 @@ public class Server extends RestfulServer {
         resourceProviders.add(new RestfulPatientResourceProvider());
         resourceProviders.add(new RestfuImmunizationProvider());
         resourceProviders.add(new RestfulPersonResourceProvider());
-
+        resourceProviders.add(new RestfulMedicationAdministrationProvider());
         setResourceProviders(resourceProviders);
 
         INarrativeGenerator narrativeGen = new DefaultThymeleafNarrativeGenerator();
         getFhirContext().setNarrativeGenerator(narrativeGen);
 
-        //registerInterceptor(new ResponseHighlighterInterceptor());
+
     }
 }

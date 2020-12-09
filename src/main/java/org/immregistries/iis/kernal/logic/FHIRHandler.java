@@ -30,7 +30,7 @@ public class FHIRHandler extends IncomingMessageHandler {
         PatientMaster patientMaster = null;
         PatientReported patientReported = null;
         String patientReportedExternalLink = patient.getIdentifier().get(0).getValue();
-        System.err.println(patientReportedExternalLink);
+
         boolean patientAlreadyExists = false;
         int levelConfidence=0;
         if(immunization != null){
@@ -50,7 +50,7 @@ public class FHIRHandler extends IncomingMessageHandler {
             query.setParameter(1, patientReportedExternalLink);
             List<PatientReported> patientReportedList = query.list();
             if (patientReportedList.size() > 0) {
-            	System.err.println("Le patient existe déja");
+            	System.err.println("patient already exists");
             	//get patient master and reported
                 patientReported = patientReportedList.get(0);
                 PatientHandler.patientReportedFromFhirPatient(patientReported,patient);
@@ -60,7 +60,7 @@ public class FHIRHandler extends IncomingMessageHandler {
             } else { //EMPI Search matches with firstname, lastname and birthday
 				List<PatientMaster> patientMasterList = PatientHandler.findMatch(dataSession,patient);
 				if(patientMasterList.size() > 0){
-					System.err.println("Le patient a un  match ");
+					System.err.println("patient has a match ");
 					//Create new patient reported and get existing patient master
 					patientAlreadyExists = true;
 					patientMaster = patientMasterList.get(0);
@@ -71,11 +71,11 @@ public class FHIRHandler extends IncomingMessageHandler {
 					patientMasterList=PatientHandler.findPossibleMatch(dataSession,patient);
 					patientMaster=patientMasterList.get(0);
 					levelConfidence=1;
-					System.err.println("Le patient a un possible match ");
+					System.err.println("patient has a possible match ");
 
 				}else {
 					//Create new patient master and patient reported
-					System.err.println("Le patient n' a pas de match ");
+					System.err.println("patient has no match ");
 					patientMaster = new PatientMaster();
 					patientMaster.setOrgMaster(orgAccess.getOrg());
 				}
@@ -108,36 +108,37 @@ public class FHIRHandler extends IncomingMessageHandler {
     }
 
     public VaccinationReported FHIR_EventVaccinationReported(OrgAccess orgAccess, Patient patient,PatientReported patientReported, Immunization immunization) throws Exception {
-	VaccinationMaster vaccination = null;
-	VaccinationReported vaccinationReported = null;
+		VaccinationMaster vaccinationMaster = null;
+		VaccinationReported vaccinationReported = null;
 
-	Date administrationDate = null;
-	{
-	    Query query = dataSession.createQuery(
+		vaccinationReported = new VaccinationReported();
+		vaccinationReported.setPatientReported(patientReported);
+		ImmunizationHandler.vaccinationReportedFromFhirImmunization(vaccinationReported,immunization);
+		{
+	    	Query query = dataSession.createQuery(
 		    "from VaccinationReported where patientReported = ? and vaccinationReportedExternalLink = ?");
-	    query.setParameter(0, patientReported);
-	    query.setParameter(1, immunization.getId());
-	    List<VaccinationReported> vaccinationReportedList = query.list();
-	    if (vaccinationReportedList.size() > 0) {
-		vaccinationReported = vaccinationReportedList.get(0);
-		vaccination = vaccinationReported.getVaccination();
-	    }
-	} 
-	if (vaccinationReported == null) {
-	    vaccination = new VaccinationMaster();
-	    vaccination.setPatient(patientReported.getPatient());
-	    vaccinationReported = new VaccinationReported();
-	    vaccinationReported.setVaccination(vaccination);
-	    vaccinationReported.setPatientReported(patientReported);
-	    vaccination.setVaccinationReported(vaccinationReported);
-	    vaccination.setPatient(patientReported.getPatient());
+	    	query.setParameter(0, patientReported);
+	   		query.setParameter(1, immunization.getId());
+	    	List<VaccinationReported> vaccinationReportedList = query.list();
+	    	if (vaccinationReportedList.size() > 0) { // if external link found
+				System.out.println("Immunization already exists");
+				vaccinationMaster = vaccinationReportedList.get(0).getVaccination();
+	    	} else if (false){
+	    		//TODO Vacdedup find match
+			} else {
+				vaccinationMaster = new VaccinationMaster();
+				vaccinationMaster.setPatient(patientReported.getPatient());
+				vaccinationMaster.setVaccinationReported(vaccinationReported);
+				vaccinationMaster.setPatient(patientReported.getPatient());
+				ImmunizationHandler.vaccinationMasterFromFhirImmunization(vaccinationMaster,immunization);
+			}
+		}
+		vaccinationReported.setVaccination(vaccinationMaster);
+		if (vaccinationReported.getUpdatedDate().before(patient.getBirthDate())) {
+	    	throw new Exception("Vaccination is reported as having been administered before the patient was born");
+		}
 
-	    ImmunizationHandler.vaccinationReportedFromFhirImmunization(vaccinationReported,immunization);
-	}
-	if (vaccinationReported.getUpdatedDate().before(patient.getBirthDate())) {
-	    throw new Exception("Vaccination is reported as having been administered before the patient was born");
-	}
-
+	// OrgLocation
 	String administeredAtLocation = immunization.getLocationTarget().getId();
 	if (StringUtils.isNotEmpty(administeredAtLocation)) {
 	    Query query = dataSession.createQuery(
@@ -145,29 +146,25 @@ public class FHIRHandler extends IncomingMessageHandler {
 	    query.setParameter("orgMaster", orgAccess.getOrg());
 	    query.setParameter("orgFacilityCode", administeredAtLocation);
 	    List<OrgLocation> orgMasterList = query.list();
-	    
-	    
 	    OrgLocation orgLocation = null;
 	    if (orgMasterList.size() > 0) {
-		orgLocation = orgMasterList.get(0);
-	    }
-
-	    if (orgLocation == null) {
-		orgLocation = new OrgLocation();
-		ImmunizationHandler.orgLocationFromFhirImmunization(orgLocation, immunization);
-		orgLocation.setOrgMaster(orgAccess.getOrg());
-		Transaction transaction = dataSession.beginTransaction();
-		dataSession.save(orgLocation);
-		transaction.commit();
+			orgLocation = orgMasterList.get(0);
+	    } else {
+			orgLocation = new OrgLocation();
+			ImmunizationHandler.orgLocationFromFhirImmunization(orgLocation, immunization);
+			orgLocation.setOrgMaster(orgAccess.getOrg());
+			Transaction transaction = dataSession.beginTransaction();
+			dataSession.save(orgLocation);
+			transaction.commit();
 	    }
 	    vaccinationReported.setOrgLocation(orgLocation);
 	}
 
+
 	Transaction transaction = dataSession.beginTransaction();
-	dataSession.saveOrUpdate(vaccination);
+	dataSession.saveOrUpdate(vaccinationMaster);
 	dataSession.saveOrUpdate(vaccinationReported);
-	vaccination.setVaccinationReported(vaccinationReported);
-	dataSession.saveOrUpdate(vaccination);
+	//dataSession.saveOrUpdate(vaccinationLink);
 	transaction.commit();
 	return vaccinationReported;
     }
