@@ -158,6 +158,7 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
     public void deletePatientById(String id,Session dataSession,OrgAccess orgAccess) {
         PatientReported patientReported=null;
         PatientMaster patientMaster=null;
+        PatientLink patientLink=null;
 
       {
           Query query = dataSession.createQuery(
@@ -171,15 +172,29 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
               patientMaster =patientReported.getPatient();
               System.err.println("Lid du patient Master est  " +patientMaster.getPatientExternalLink());
 
-
-
           }
+
+          //Deleting possible links
+
+          Query queryLink = dataSession.createQuery(
+                  "from  PatientLink where patientReported.patientReportedId=?");
+          queryLink.setParameter(0, patientReported.getPatientReportedId());
+          List<PatientLink> patientLinkList= queryLink.list();
+          if(patientLinkList.size()>0){
+              patientLink = patientLinkList.get(0);
+          }
+
+
+
       }
       {
           Transaction transaction = dataSession.beginTransaction();
           dataSession.delete(patientReported);
+          if(patientLink!=null){
+              dataSession.delete(patientLink);
+          }
 
-          dataSession.delete(patientMaster);
+          //dataSession.delete(patientMaster);
 
 
           transaction.commit();

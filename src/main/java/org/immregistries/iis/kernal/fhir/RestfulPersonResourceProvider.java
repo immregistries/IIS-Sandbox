@@ -67,7 +67,7 @@ public class RestfulPersonResourceProvider implements IResourceProvider {
             patientReported=patientReportedList.get(0);
             person= PersonHandler.getPerson(patientReported);
         }
-        //TODO add Link
+        //add Link
 
         int linkId = patientReported.getPatientReportedId();
         Query queryLink = dataSession.createQuery(
@@ -122,7 +122,7 @@ public class RestfulPersonResourceProvider implements IResourceProvider {
         return new MethodOutcome();
     }
 
-    private void deletePersonById(String idPart, Session dataSession, OrgAccess orgAccess) {
+    private void deletePersonById(String idPart, Session dataSession, OrgAccess orgAccess) throws Exception {
         PatientReported patientReported=null;
         PatientMaster patientMaster=null;
 
@@ -140,7 +140,42 @@ public class RestfulPersonResourceProvider implements IResourceProvider {
                 patientReported = patientReportedList.get(0);
                 patientMaster =patientReported.getPatient();
             }
+            //Verify all links are already deleted if not ask to delete the patients first
         }
+
+        {
+            Query query = dataSession.createQuery(
+                    "from  PatientReported where orgReported = ? and patientReportedExternalLink = ?");
+            query.setParameter(0, orgAccess.getOrg());
+            query.setParameter(1, idPart);
+            List<PatientReported> patientReportedList = query.list();
+            System.err.println(orgAccess.getOrg());
+            System.err.println(idPart);
+            System.err.println(patientReportedList.size());
+            if (patientReportedList.size() > 0) {
+
+                patientReported = patientReportedList.get(0);
+                patientMaster =patientReported.getPatient();
+            }
+
+        }
+        {
+            //Verify if all links are already deleted if not ask to delete
+            // the several PatientReported and PatientLink first
+            Query queryLink = dataSession.createQuery(
+                    "from  PatientLink where patientMaster.patientId = ?");
+            queryLink.setParameter(0, patientMaster.getPatientId());
+
+            List<PatientLink> patientLinkList = queryLink.list();
+
+            if (patientLinkList.size() > 0) {
+
+                throw new Exception("The patients linked  to Person/"+idPart+" must be deleted first");
+            }
+
+        }
+
+        
         {
             Transaction transaction = dataSession.beginTransaction();
             dataSession.delete(patientReported);
