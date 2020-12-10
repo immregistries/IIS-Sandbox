@@ -20,7 +20,7 @@ public class CodeMapManager {
   CodeMap codeMap = null;
 
   public CodeMapManager() {
-    InputStream is = this.getClass().getResourceAsStream("Compiled.xml");
+    InputStream is = this.getClass().getResourceAsStream("/Compiled.xml");
     if (is == null) {
       System.err.println("Unable to find Compiled.xml!");
     }
