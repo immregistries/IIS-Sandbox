@@ -93,8 +93,7 @@ public class VacDedupServlet extends HttpServlet {
             i++;
           }
           if (immunizationList.size() > 1) {
-            VaccinationDeduplication vaccinationDeduplication =
-                new VaccinationDeduplication();
+            VaccinationDeduplication vaccinationDeduplication = new VaccinationDeduplication();
 
             if (algorithm.equals(ALGORITHM_DETERMINISTIC)) {
               immunizationListResults =

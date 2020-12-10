@@ -8,7 +8,7 @@ public class ObservationMaster implements Serializable {
    * 
    */
   private static final long serialVersionUID = 1L;
-  
+
   private int observationId = 0;
   private PatientMaster patient = null;
   private VaccinationMaster vaccination = null;

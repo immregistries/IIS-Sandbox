@@ -24,199 +24,202 @@ import java.util.*;
  * All resource providers must implement IResourceProvider
  */
 public class RestfulPatientResourceProvider implements IResourceProvider {
-    protected Session dataSession=null;
-    protected OrgAccess orgAccess= null;
-    protected OrgMaster orgMaster=null;
-    private static SessionFactory factory;
+  protected Session dataSession = null;
+  protected OrgAccess orgAccess = null;
+  protected OrgMaster orgMaster = null;
+  private static SessionFactory factory;
 
-    public static Session getDataSession() {
-        if (factory == null) {
-            factory = new AnnotationConfiguration().configure().buildSessionFactory();
-        }
-        return factory.openSession();
+  public static Session getDataSession() {
+    if (factory == null) {
+      factory = new AnnotationConfiguration().configure().buildSessionFactory();
     }
-    @Override
-    public Class<Patient> getResourceType() {
-        return Patient.class;
+    return factory.openSession();
+  }
+
+  @Override
+  public Class<Patient> getResourceType() {
+    return Patient.class;
+  }
+
+  @Read()
+  public Patient getResourceById(RequestDetails theRequestDetails, @IdParam IdType theId) {
+    Patient patient = null;
+    // Retrieve this patient in the database...
+    Session dataSession = getDataSession();
+    try {
+      orgAccess = Authentication.authenticateOrgAccess(theRequestDetails, dataSession);
+      patient = getPatientById(theId.getIdPart(), dataSession, orgAccess);
+    } catch (Exception e) {
+      e.printStackTrace();
+    } finally {
+      dataSession.close();
+    }
+    return patient;
+  }
+
+
+
+  @Create
+  public MethodOutcome createPatient(RequestDetails theRequestDetails,
+      @ResourceParam Patient thePatient) {
+    PatientReported patientReported = null;
+    List<Patient> matches = new ArrayList<Patient>();
+    if (thePatient.getIdentifierFirstRep().isEmpty()) {
+      throw new UnprocessableEntityException("No identifier supplied");
+    }
+    // Save this patient to the database...
+    Session dataSession = getDataSession();
+    try {
+      orgAccess = Authentication.authenticateOrgAccess(theRequestDetails, dataSession);
+      FHIRHandler fhirHandler = new FHIRHandler(dataSession);
+
+      patientReported = fhirHandler.FIHR_EventPatientReported(orgAccess, thePatient, null);
+
+    } catch (Exception e) {
+      e.printStackTrace();
+    } finally {
+      dataSession.close();
+    }
+    return new MethodOutcome(new IdType(thePatient.getIdentifier().get(0).getValue()));
+
+  }
+
+  /**
+   * The "@Update" annotation indicates that this method supports replacing an existing
+   * resource (by ID) with a new instance of that resource.
+   *
+   * @param theId      This is the ID of the patient to update
+   * @param thePatient This is the actual resource to save
+   * @return This method returns a "MethodOutcome"
+   */
+
+  @Update
+  public MethodOutcome updatePatient(RequestDetails theRequestDetails, @IdParam IdType theId,
+      @ResourceParam Patient thePatient) {
+    PatientReported patientReported = null;
+    Session dataSession = getDataSession();
+    try {
+      orgAccess = Authentication.authenticateOrgAccess(theRequestDetails, dataSession);
+      FHIRHandler fhirHandler = new FHIRHandler(dataSession);
+      patientReported = fhirHandler.FIHR_EventPatientReported(orgAccess, thePatient, null);
+    } catch (Exception e) {
+      e.printStackTrace();
+    } finally {
+      dataSession.close();
+    }
+    return new MethodOutcome();
+  }
+
+  @Delete()
+  public MethodOutcome deletePatient(RequestDetails theRequestDetails, @IdParam IdType theId) {
+    Session dataSession = getDataSession();
+    try {
+      orgAccess = Authentication.authenticateOrgAccess(theRequestDetails, dataSession);
+      deletePatientById(theId.getIdPart(), dataSession, orgAccess);
+    } catch (Exception e) {
+      e.printStackTrace();
+    } finally {
+      dataSession.close();
+    }
+    return new MethodOutcome();
+  }
+
+  public static Patient getPatientById(String id, Session dataSession, OrgAccess orgAccess) {
+    Patient patient = null;
+    PatientReported patientReported = null;
+
+    int idInt = 0;
+    boolean isExternalLink = false;
+    try {
+      idInt = Integer.parseInt(id);
+    } catch (NumberFormatException | NullPointerException e) {
+      isExternalLink = true;
     }
 
-    @Read()
-    public Patient getResourceById(RequestDetails theRequestDetails, @IdParam IdType theId) {
-        Patient patient =null;
-        // Retrieve this patient in the database...
-        Session dataSession = getDataSession();
-        try {
-            orgAccess = Authentication.authenticateOrgAccess(theRequestDetails,dataSession);
-            patient = getPatientById(theId.getIdPart(),dataSession,orgAccess );
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            dataSession.close();
-        }
-        return patient;
-    }
+    {
+      Query query;
+      if (isExternalLink) {
+        query = dataSession.createQuery(
+            "from PatientReported where orgReported = ? and patientReportedExternalLink = ?");
+        query.setParameter(0, orgAccess.getOrg());
+        query.setParameter(1, id);
+      } else {
+        query = dataSession
+            .createQuery("from PatientReported where orgReported = ? and patientReportedId = ?");
+        query.setParameter(0, orgAccess.getOrg());
+        query.setParameter(1, idInt);
+      }
 
+      List<PatientReported> patientReportedList = query.list();
+      if (patientReportedList.size() > 0) {
+        patientReported = patientReportedList.get(0);
+        patient = PatientHandler.getPatient(null, null, patientReported);
 
+        int linkId = patientReported.getPatientReportedId();
+        Query queryLink = dataSession.createQuery("from PatientLink where patientReported.id = ?");
+        queryLink.setParameter(0, linkId);
+        List<PatientLink> patientLinkList = queryLink.list();
 
-   @Create
-    public MethodOutcome createPatient(RequestDetails theRequestDetails, @ResourceParam Patient thePatient) {
-        PatientReported patientReported = null;
-        List<Patient> matches= new ArrayList<Patient>();
-        if (thePatient.getIdentifierFirstRep().isEmpty()) {
-            throw new UnprocessableEntityException("No identifier supplied");
-        }
-        // Save this patient to the database...
-       Session dataSession = getDataSession();
-       try {
-           orgAccess = Authentication.authenticateOrgAccess(theRequestDetails,dataSession);
-           FHIRHandler fhirHandler = new FHIRHandler(dataSession);
-
-           patientReported = fhirHandler.FIHR_EventPatientReported(orgAccess,thePatient,null);
-
-       } catch (Exception e) {
-           e.printStackTrace();
-       } finally {
-           dataSession.close();
-       }
-        return new MethodOutcome(new IdType(thePatient.getIdentifier().get(0).getValue()));
-
-    }
-
-    /**
-     * The "@Update" annotation indicates that this method supports replacing an existing
-     * resource (by ID) with a new instance of that resource.
-     *
-     * @param theId      This is the ID of the patient to update
-     * @param thePatient This is the actual resource to save
-     * @return This method returns a "MethodOutcome"
-     */
-
-    @Update
-    public MethodOutcome updatePatient(RequestDetails theRequestDetails, @IdParam IdType theId , @ResourceParam Patient thePatient) {
-        PatientReported patientReported=null;
-        Session dataSession = getDataSession();
-        try {
-            orgAccess = Authentication.authenticateOrgAccess(theRequestDetails,dataSession);
-            FHIRHandler fhirHandler = new FHIRHandler(dataSession);
-            patientReported = fhirHandler.FIHR_EventPatientReported(orgAccess,thePatient,null);
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            dataSession.close();
-        }
-        return new MethodOutcome();
-    }
-
-    @Delete()
-    public MethodOutcome deletePatient(RequestDetails theRequestDetails, @IdParam IdType theId) {
-        Session dataSession = getDataSession();
-        try {
-            orgAccess = Authentication.authenticateOrgAccess(theRequestDetails,dataSession);
-            deletePatientById(theId.getIdPart(),dataSession,orgAccess );
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            dataSession.close();
-        }
-        return new MethodOutcome();
-    }
-
-    public static Patient getPatientById(String id, Session dataSession,OrgAccess orgAccess ){
-        Patient patient = null;
-        PatientReported patientReported =null;
-
-        int idInt = 0;
-        boolean isExternalLink = false;
-        try {
-            idInt = Integer.parseInt(id);
-        } catch(NumberFormatException | NullPointerException e) {
-            isExternalLink = true;
-        }
-
-        {
-            Query query;
-            if (isExternalLink){
-                query = dataSession.createQuery(
-                        "from PatientReported where orgReported = ? and patientReportedExternalLink = ?");
-                query.setParameter(0, orgAccess.getOrg());
-                query.setParameter(1, id);
-            }else {
-                query = dataSession.createQuery(
-                        "from PatientReported where orgReported = ? and patientReportedId = ?");
-                query.setParameter(0, orgAccess.getOrg());
-                query.setParameter(1, idInt);
-            }
-
-            List<PatientReported> patientReportedList = query.list();
-            if (patientReportedList.size() > 0) {
-                patientReported = patientReportedList.get(0);
-                patient =PatientHandler.getPatient(null,null,patientReported);
-
-                int linkId = patientReported.getPatientReportedId();
-               Query queryLink = dataSession.createQuery(
-                        "from PatientLink where patientReported.id = ?");
-                queryLink.setParameter(0, linkId);
-               List<PatientLink> patientLinkList = queryLink.list();
-
-                if(patientLinkList.size()>0){
-                    for(PatientLink link : patientLinkList){
-                            String ref = link.getPatientMaster().getPatientExternalLink();
-                            Patient.PatientLinkComponent patientLinkComponent= new Patient.PatientLinkComponent();
-                            Reference reference = new Reference();
-                            reference.setReference("Person/"+ref);
-                            patient.addLink(patientLinkComponent.setOther(reference));
-
-                    }
-               }
-            }
-        }
-        return patient;
-    }
-    //We can delete only Patient with no link
-    public void deletePatientById(String id,Session dataSession,OrgAccess orgAccess) {
-        PatientReported patientReported=null;
-        PatientMaster patientMaster=null;
-        PatientLink patientLink=null;
-
-      {
-          Query query = dataSession.createQuery(
-                  "from  PatientReported where orgReported = ? and patientReportedExternalLink = ?");
-          query.setParameter(0, orgAccess.getOrg());
-          query.setParameter(1, id);
-          List<PatientReported> patientReportedList = query.list();
-          if (patientReportedList.size() > 0) {
-              patientReported = patientReportedList.get(0);
-
-              patientMaster =patientReported.getPatient();
-              System.err.println("Lid du patient Master est  " +patientMaster.getPatientExternalLink());
+        if (patientLinkList.size() > 0) {
+          for (PatientLink link : patientLinkList) {
+            String ref = link.getPatientMaster().getPatientExternalLink();
+            Patient.PatientLinkComponent patientLinkComponent = new Patient.PatientLinkComponent();
+            Reference reference = new Reference();
+            reference.setReference("Person/" + ref);
+            patient.addLink(patientLinkComponent.setOther(reference));
 
           }
+        }
+      }
+    }
+    return patient;
+  }
 
-          //Deleting possible links
+  //We can delete only Patient with no link
+  public void deletePatientById(String id, Session dataSession, OrgAccess orgAccess) {
+    PatientReported patientReported = null;
+    PatientMaster patientMaster = null;
+    PatientLink patientLink = null;
 
-          Query queryLink = dataSession.createQuery(
-                  "from  PatientLink where patientReported.patientReportedId=?");
-          queryLink.setParameter(0, patientReported.getPatientReportedId());
-          List<PatientLink> patientLinkList= queryLink.list();
-          if(patientLinkList.size()>0){
-              patientLink = patientLinkList.get(0);
-          }
+    {
+      Query query = dataSession.createQuery(
+          "from  PatientReported where orgReported = ? and patientReportedExternalLink = ?");
+      query.setParameter(0, orgAccess.getOrg());
+      query.setParameter(1, id);
+      List<PatientReported> patientReportedList = query.list();
+      if (patientReportedList.size() > 0) {
+        patientReported = patientReportedList.get(0);
 
-
+        patientMaster = patientReported.getPatient();
+        System.err.println("Lid du patient Master est  " + patientMaster.getPatientExternalLink());
 
       }
-      {
-          Transaction transaction = dataSession.beginTransaction();
-          dataSession.delete(patientReported);
-          if(patientLink!=null){
-              dataSession.delete(patientLink);
-          }
 
-          //dataSession.delete(patientMaster);
+      //Deleting possible links
 
-
-          transaction.commit();
+      Query queryLink =
+          dataSession.createQuery("from  PatientLink where patientReported.patientReportedId=?");
+      queryLink.setParameter(0, patientReported.getPatientReportedId());
+      List<PatientLink> patientLinkList = queryLink.list();
+      if (patientLinkList.size() > 0) {
+        patientLink = patientLinkList.get(0);
       }
+
+
+
+    }
+    {
+      Transaction transaction = dataSession.beginTransaction();
+      dataSession.delete(patientReported);
+      if (patientLink != null) {
+        dataSession.delete(patientLink);
+      }
+
+      //dataSession.delete(patientMaster);
+
+
+      transaction.commit();
+    }
   }
 
 

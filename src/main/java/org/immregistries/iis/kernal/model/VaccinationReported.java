@@ -11,25 +11,25 @@ import org.immregistries.vfa.connect.model.TestEvent;
  * Created by Eric on 12/20/17.
  */
 public class VaccinationReported implements Serializable {
-  private int vaccinationReportedId = 0;					
-  private PatientReported patientReported = null;			
-  private String vaccinationReportedExternalLink = "";		
-  private VaccinationMaster vaccination = null;				
-  private Date reportedDate = null;							
-  private Date updatedDate = null;							
+  private int vaccinationReportedId = 0;
+  private PatientReported patientReported = null;
+  private String vaccinationReportedExternalLink = "";
+  private VaccinationMaster vaccination = null;
+  private Date reportedDate = null;
+  private Date updatedDate = null;
 
-  private Date administeredDate = null;                     
+  private Date administeredDate = null;
   private String vaccineCvxCode = "";
   private String vaccineNdcCode = "";
   private String vaccineMvxCode = "";
-  private String administeredAmount = "";					
+  private String administeredAmount = "";
   private String informationSource = "";
   private String lotnumber = "";
-  private Date expirationDate = null;						
-  private String completionStatus = "";						
+  private Date expirationDate = null;
+  private String completionStatus = "";
   private String actionCode = "";
   private String refusalReasonCode = "";
-  private String bodySite = "";                             
+  private String bodySite = "";
   private String bodyRoute = "";
   private String fundingSource = "";
   private String fundingEligibility = "";
@@ -38,8 +38,8 @@ public class VaccinationReported implements Serializable {
   private Person enteredBy = null;
   private Person orderingProvider = null;
   private Person administeringProvider = null;
-  
-  
+
+
   public Person getEnteredBy() {
     return enteredBy;
   }

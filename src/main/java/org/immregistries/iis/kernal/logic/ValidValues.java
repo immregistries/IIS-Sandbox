@@ -48,11 +48,11 @@ public class ValidValues {
       "SYR", "TWN", "TJK", "TZA", "THA", "TLS", "TGO", "TKL", "TON", "TTO", "TUN", "TUR", "TKM",
       "TCA", "TUV", "UGA", "UKR", "ARE", "GBR", "UMI", "USA", "URY", "UZB", "VUT", "VEN", "VNM",
       "VGB", "VIR", "WLF", "ESH", "YEM", "ZMB", "ZWE", "ALA"};
-  
+
   public static final String[] BIRTH_FLAG = {"Y", "N"};
-  
+
   public static final String[] BIRTH_ORDER = {"1", "2", "3", "4", "5", "6", "7", "8", "9"};
-  
+
   public static boolean verifyValidValue(String value, String[] valuesValid) {
     for (String vv : valuesValid) {
       if (vv.equals(value)) {

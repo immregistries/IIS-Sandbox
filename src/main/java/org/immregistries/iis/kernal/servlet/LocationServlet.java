@@ -79,11 +79,9 @@ public class LocationServlet extends HttpServlet {
 
       String action = req.getParameter(PARAM_ACTION);
       if (action != null) {
-        if (action.equals(ACTION_ADD))
-        {
+        if (action.equals(ACTION_ADD)) {
           String orgFacilityCode = req.getParameter(PARAM_ORG_FACILITY_CODE);
-          if (StringUtils.isNotEmpty(orgFacilityCode))
-          {
+          if (StringUtils.isNotEmpty(orgFacilityCode)) {
             orgLocationSelected = new OrgLocation();
             orgLocationSelected.setOrgFacilityCode(orgFacilityCode);
             orgLocationSelected.setOrgMaster(orgAccess.getOrg());
@@ -91,8 +89,7 @@ public class LocationServlet extends HttpServlet {
             dataSession.save(orgLocationSelected);
             transaction.commit();
           }
-        } else if (action.equals(ACTION_SAVE))
-        {
+        } else if (action.equals(ACTION_SAVE)) {
           orgLocationSelected.setOrgFacilityCode(req.getParameter(PARAM_ORG_FACILITY_CODE));
           orgLocationSelected.setOrgFacilityName(req.getParameter(PARAM_ORG_FACILITY_NAME));
           orgLocationSelected.setLocationType(req.getParameter(PARAM_LOCATION_TYPE));
@@ -107,7 +104,7 @@ public class LocationServlet extends HttpServlet {
           Transaction transaction = dataSession.beginTransaction();
           dataSession.update(orgLocationSelected);
           transaction.commit();
-        }  
+        }
       }
 
       List<OrgLocation> orgLocationList = null;
@@ -209,9 +206,8 @@ public class LocationServlet extends HttpServlet {
             "      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_ADDRESS_COUNTY_PARISH
                 + "\" value=\"" + orgLocationSelected.getAddressCountyParish() + "\"/>");
         out.println("      <label>VFC Provider PIN</label>");
-        out.println(
-            "      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_VFC_PROVIDER_PIN
-                + "\" value=\"" + orgLocationSelected.getVfcProviderPin() + "\"/>");
+        out.println("      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_VFC_PROVIDER_PIN
+            + "\" value=\"" + orgLocationSelected.getVfcProviderPin() + "\"/>");
         out.println("          <input type=\"hidden\" name=\"" + PARAM_ORG_LOCATION_ID
             + "\" value=\"" + orgLocationSelected.getOrgLocationId() + "\"/>");
         out.println(

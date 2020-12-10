@@ -72,7 +72,7 @@ public class IncomingMessageHandler {
   private static final String QUERY_TOO_MANY = "TM";
   private static final String QUERY_APPLICATION_ERROR = "AE";
 
-  private FhirContext ctx  = Context.getCtx();
+  private FhirContext ctx = Context.getCtx();
 
   protected Session dataSession = null;
 

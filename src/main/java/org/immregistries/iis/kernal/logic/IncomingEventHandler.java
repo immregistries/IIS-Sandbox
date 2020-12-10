@@ -36,7 +36,7 @@ public class IncomingEventHandler extends IncomingMessageHandler {
   private static final String VACCINE_CVX_CODE = "vaccineCvxCode";
   private static final String ADMINISTERED_DATE = "administeredDate";
   private static final String VACCINATION_REPORTED_EXTERNAL_LINK =
-          "vaccinationReportedExternalLink";
+      "vaccinationReportedExternalLink";
   private static final String GUARDIAN_RELATIONSHIP = "guardianRelationship";
   private static final String GUARDIAN_MIDDLE = "guardianMiddle";
   private static final String GUARDIAN_FIRST = "guardianFirst";
@@ -78,21 +78,21 @@ public class IncomingEventHandler extends IncomingMessageHandler {
   private static final String PATIENT_REPORTED_EXTERNAL_LINK = "patientReportedExternalLink";
 
   public static final String[] PARAMS_PATIENT = new String[] {PATIENT_REPORTED_EXTERNAL_LINK,
-          PATIENT_REPORTED_AUTHORITY, PATIENT_REPORTED_TYPE, PATIENT_NAME_LAST, PATIENT_NAME_FIRST,
-          PATIENT_NAME_MIDDLE, PATIENT_MOTHER_MAIDEN, PATIENT_BIRTH_DATE, PATIENT_SEX, PATIENT_RACE,
-          PATIENT_RACE2, PATIENT_RACE3, PATIENT_RACE4, PATIENT_RACE5, PATIENT_RACE6,
-          PATIENT_ADDRESS_LINE1, PATIENT_ADDRESS_LINE2, PATIENT_ADDRESS_CITY, PATIENT_ADDRESS_STATE,
-          PATIENT_ADDRESS_ZIP, PATIENT_ADDRESS_COUNTRY, PATIENT_ADDRESS_COUNTY_PARISH, PATIENT_PHONE,
-          PATIENT_EMAIL, PATIENT_ETHNICITY, PATIENT_BIRTH_FLAG, PATIENT_BIRTH_ORDER, PATIENT_DEATH_FLAG,
-          PATIENT_DEATH_DATE, PUBLICITY_INDICATOR, PUBLICITY_INDICATOR_DATE, PROTECTION_INDICATOR,
-          PROTECTION_INDICATOR_DATE, REGISTRY_STATUS_INDICATOR, REGISTRY_STATUS_INDICATOR_DATE,
-          GUARDIAN_LAST, GUARDIAN_FIRST, GUARDIAN_MIDDLE, GUARDIAN_RELATIONSHIP};
+      PATIENT_REPORTED_AUTHORITY, PATIENT_REPORTED_TYPE, PATIENT_NAME_LAST, PATIENT_NAME_FIRST,
+      PATIENT_NAME_MIDDLE, PATIENT_MOTHER_MAIDEN, PATIENT_BIRTH_DATE, PATIENT_SEX, PATIENT_RACE,
+      PATIENT_RACE2, PATIENT_RACE3, PATIENT_RACE4, PATIENT_RACE5, PATIENT_RACE6,
+      PATIENT_ADDRESS_LINE1, PATIENT_ADDRESS_LINE2, PATIENT_ADDRESS_CITY, PATIENT_ADDRESS_STATE,
+      PATIENT_ADDRESS_ZIP, PATIENT_ADDRESS_COUNTRY, PATIENT_ADDRESS_COUNTY_PARISH, PATIENT_PHONE,
+      PATIENT_EMAIL, PATIENT_ETHNICITY, PATIENT_BIRTH_FLAG, PATIENT_BIRTH_ORDER, PATIENT_DEATH_FLAG,
+      PATIENT_DEATH_DATE, PUBLICITY_INDICATOR, PUBLICITY_INDICATOR_DATE, PROTECTION_INDICATOR,
+      PROTECTION_INDICATOR_DATE, REGISTRY_STATUS_INDICATOR, REGISTRY_STATUS_INDICATOR_DATE,
+      GUARDIAN_LAST, GUARDIAN_FIRST, GUARDIAN_MIDDLE, GUARDIAN_RELATIONSHIP};
 
   public static final String[] PARAMS_VACCINATION =
-          new String[] {VACCINATION_REPORTED_EXTERNAL_LINK, ADMINISTERED_DATE, VACCINE_CVX_CODE,
-                  VACCINE_NDC_CODE, VACCINE_MVX_CODE, ADMINISTERED_AMOUNT, INFORMATION_SOURCE, LOTNUMBER,
-                  EXPIRATION_DATE, COMPLETION_STATUS, ACTION_CODE, REFUSAL_REASON_CODE, BODY_SITE,
-                  BODY_ROUTE, FUNDING_SOURCE, FUNDING_ELIGIBILITY, ORG_LOCATION_FACILITY_CODE};
+      new String[] {VACCINATION_REPORTED_EXTERNAL_LINK, ADMINISTERED_DATE, VACCINE_CVX_CODE,
+          VACCINE_NDC_CODE, VACCINE_MVX_CODE, ADMINISTERED_AMOUNT, INFORMATION_SOURCE, LOTNUMBER,
+          EXPIRATION_DATE, COMPLETION_STATUS, ACTION_CODE, REFUSAL_REASON_CODE, BODY_SITE,
+          BODY_ROUTE, FUNDING_SOURCE, FUNDING_ELIGIBILITY, ORG_LOCATION_FACILITY_CODE};
 
   public IncomingEventHandler(Session dataSession) {
     super(dataSession);
@@ -123,11 +123,11 @@ public class IncomingEventHandler extends IncomingMessageHandler {
     administrationDate = parseDateInternal(req.getParameter(ADMINISTERED_DATE), true);
     if (administrationDate.after(new Date())) {
       throw new Exception(
-              "Vaccination is indicated as occuring in the future, unable to accept future vaccination events");
+          "Vaccination is indicated as occuring in the future, unable to accept future vaccination events");
     }
     {
       Query query = dataSession.createQuery(
-              "from VaccinationReported where patientReported = ? and vaccinationReportedExternalLink = ?");
+          "from VaccinationReported where patientReported = ? and vaccinationReportedExternalLink = ?");
       query.setParameter(0, patientReported);
       query.setParameter(1, vaccinationReportedExternalLink);
       List<VaccinationReported> vaccinationReportedList = query.list();
@@ -154,8 +154,8 @@ public class IncomingEventHandler extends IncomingMessageHandler {
       Code ndcCode = codeMap.getCodeForCodeset(CodesetType.VACCINATION_NDC_CODE, vaccineNdcCode);
       if (ndcCode != null) {
         if (ndcCode.getCodeStatus() != null && ndcCode.getCodeStatus().getDeprecated() != null
-                && ndcCode.getCodeStatus().getDeprecated().getNewCodeValue() != null
-                && !ndcCode.getCodeStatus().getDeprecated().getNewCodeValue().equals("")) {
+            && ndcCode.getCodeStatus().getDeprecated().getNewCodeValue() != null
+            && !ndcCode.getCodeStatus().getDeprecated().getNewCodeValue().equals("")) {
           vaccineNdcCode = ndcCode.getCodeStatus().getDeprecated().getNewCodeValue();
         }
         Code cvxCode = codeMap.getRelatedCode(ndcCode, CodesetType.VACCINATION_CVX_CODE);
@@ -179,7 +179,7 @@ public class IncomingEventHandler extends IncomingMessageHandler {
       String administeredAtLocation = req.getParameter(ORG_LOCATION_FACILITY_CODE);
       if (StringUtils.isNotEmpty(administeredAtLocation)) {
         Query query = dataSession.createQuery(
-                "from OrgLocation where orgMaster = :orgMaster and orgFacilityCode = :orgFacilityCode");
+            "from OrgLocation where orgMaster = :orgMaster and orgFacilityCode = :orgFacilityCode");
         query.setParameter("orgMaster", orgAccess.getOrg());
         query.setParameter("orgFacilityCode", administeredAtLocation);
         List<OrgLocation> orgMasterList = query.list();
@@ -217,7 +217,7 @@ public class IncomingEventHandler extends IncomingMessageHandler {
     vaccinationReported.setInformationSource(req.getParameter(INFORMATION_SOURCE));
     vaccinationReported.setLotnumber(req.getParameter(LOTNUMBER));
     vaccinationReported
-            .setExpirationDate(parseDateInternal(req.getParameter(EXPIRATION_DATE), true));
+        .setExpirationDate(parseDateInternal(req.getParameter(EXPIRATION_DATE), true));
     vaccinationReported.setVaccineMvxCode(req.getParameter(VACCINE_MVX_CODE));
     vaccinationReported.setRefusalReasonCode(req.getParameter(REFUSAL_REASON_CODE));
     vaccinationReported.setCompletionStatus(req.getParameter(COMPLETION_STATUS));
@@ -226,7 +226,7 @@ public class IncomingEventHandler extends IncomingMessageHandler {
     vaccinationReported.setBodySite(req.getParameter(BODY_SITE));
     if (vaccinationReported.getAdministeredDate().before(patientReported.getPatientBirthDate())) {
       throw new Exception(
-              "Vaccination is reported as having been administered before the patient was born");
+          "Vaccination is reported as having been administered before the patient was born");
     }
 
     vaccinationReported.setFundingEligibility(req.getParameter(FUNDING_ELIGIBILITY));
@@ -245,7 +245,7 @@ public class IncomingEventHandler extends IncomingMessageHandler {
   }
 
   public PatientReported processPatient(OrgAccess orgAccess, HttpServletRequest req,
-                                        CodeMap codeMap) throws Exception {
+      CodeMap codeMap) throws Exception {
     PatientReported patientReported = null;
     PatientMaster patient = null;
 
@@ -258,7 +258,7 @@ public class IncomingEventHandler extends IncomingMessageHandler {
 
     {
       Query query = dataSession.createQuery(
-              "from PatientReported where orgReported = ? and patientReportedExternalLink = ?");
+          "from PatientReported where orgReported = ? and patientReportedExternalLink = ?");
       query.setParameter(0, orgAccess.getOrg());
       query.setParameter(1, patientReportedExternalLink);
       List<PatientReported> patientReportedList = query.list();
@@ -287,11 +287,11 @@ public class IncomingEventHandler extends IncomingMessageHandler {
 
     if (patientNameLast.equals("")) {
       throw new Exception(
-              "Patient last name was not found, required for accepting patient and vaccination history");
+          "Patient last name was not found, required for accepting patient and vaccination history");
     }
     if (patientNameFirst.equals("")) {
       throw new Exception(
-              "Patient first name was not found, required for accepting patient and vaccination history");
+          "Patient first name was not found, required for accepting patient and vaccination history");
     }
 
 
@@ -312,7 +312,7 @@ public class IncomingEventHandler extends IncomingMessageHandler {
 
     if (patientBirthDate.after(new Date())) {
       throw new Exception(
-              "Patient is indicated as being born in the future, unable to record patients who are not yet born");
+          "Patient is indicated as being born in the future, unable to record patients who are not yet born");
     }
     patient.setPatientAddressFrag(addressFrag);
     patient.setPatientNameLast(patientNameLast);
@@ -347,7 +347,7 @@ public class IncomingEventHandler extends IncomingMessageHandler {
     patientReported.setPatientBirthFlag(req.getParameter(PATIENT_BIRTH_FLAG));
     patientReported.setPatientBirthOrder(req.getParameter(PATIENT_BIRTH_ORDER));
     patientReported
-            .setPatientDeathDate(parseDateInternal(req.getParameter(PATIENT_DEATH_DATE), true));
+        .setPatientDeathDate(parseDateInternal(req.getParameter(PATIENT_DEATH_DATE), true));
     patientReported.setPatientDeathFlag(req.getParameter(PATIENT_DEATH_FLAG));
     patientReported.setPatientEmail(req.getParameter(PATIENT_EMAIL));
     patientReported.setPatientPhone(patientPhone);
@@ -355,12 +355,12 @@ public class IncomingEventHandler extends IncomingMessageHandler {
     patientReported.setPublicityIndicator(req.getParameter(PUBLICITY_INDICATOR));
     patientReported.setProtectionIndicator(req.getParameter(PROTECTION_INDICATOR));
     patientReported.setProtectionIndicatorDate(
-            parseDateInternal(req.getParameter(PROTECTION_INDICATOR_DATE), true));
+        parseDateInternal(req.getParameter(PROTECTION_INDICATOR_DATE), true));
     patientReported.setRegistryStatusIndicator(req.getParameter(REGISTRY_STATUS_INDICATOR));
     patientReported.setRegistryStatusIndicatorDate(
-            parseDateInternal(req.getParameter(PROTECTION_INDICATOR_DATE), true));
+        parseDateInternal(req.getParameter(PROTECTION_INDICATOR_DATE), true));
     patientReported.setPublicityIndicatorDate(
-            parseDateInternal(req.getParameter(PUBLICITY_INDICATOR_DATE), true));
+        parseDateInternal(req.getParameter(PUBLICITY_INDICATOR_DATE), true));
     patientReported.setGuardianLast(req.getParameter(GUARDIAN_LAST));
     patientReported.setGuardianFirst(req.getParameter(GUARDIAN_FIRST));
     patientReported.setGuardianMiddle(req.getParameter(GUARDIAN_MIDDLE));
@@ -374,7 +374,6 @@ public class IncomingEventHandler extends IncomingMessageHandler {
     }
     return patientReported;
   }
-
 
 
 
