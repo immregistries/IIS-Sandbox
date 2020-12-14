@@ -123,15 +123,16 @@ public class FHIRHandler extends IncomingMessageHandler {
 	    	if (vaccinationReportedList.size() > 0) { // if external link found
 				System.out.println("Immunization already exists");
 				vaccinationMaster = vaccinationReportedList.get(0).getVaccination();
-	    	} else if (false){
-	    		//TODO Vacdedup find match
-			} else {
-				vaccinationMaster = new VaccinationMaster();
-				vaccinationMaster.setPatient(patientReported.getPatient());
-				vaccinationMaster.setVaccinationReported(vaccinationReported);
-				vaccinationMaster.setPatient(patientReported.getPatient());
-				ImmunizationHandler.vaccinationMasterFromFhirImmunization(vaccinationMaster,immunization);
+	    	} else {
+	    		vaccinationMaster = ImmunizationHandler.findMatch(dataSession, patientReported, immunization);
 			}
+		}
+		if (vaccinationMaster == null){
+			vaccinationMaster = new VaccinationMaster();
+			vaccinationMaster.setPatient(patientReported.getPatient());
+			vaccinationMaster.setVaccinationReported(vaccinationReported);
+			vaccinationMaster.setPatient(patientReported.getPatient());
+			ImmunizationHandler.vaccinationMasterFromFhirImmunization(vaccinationMaster,immunization);
 		}
 		vaccinationReported.setVaccination(vaccinationMaster);
 		if (vaccinationReported.getUpdatedDate().before(patient.getBirthDate())) {
