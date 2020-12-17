@@ -1,0 +1,72 @@
+You can find examples of resources in the xml files provided in the same directory
+AUTHENTIFICATION
+
+You can use any  testing API platform such  as Postman, Insomnia
+You nead to authentificate with a username and  a password
+
+For example, in postman you have to fill the "AUTHORIZATION" section with type "BASIC AUTH"
+
+You can use examplePatient.xml if you don't have any other example
+CREATE A PATIENT
+POST http://localhost:8080/iis-sandbox/fhir/Org1/Patient/
+
+READ A PATIENT
+GET http://localhost:8080/iis-sandbox/fhir/Org1/Patient/example
+
+UPDATE A PATIENT
+PUT http://localhost:8080/iis-sandbox/fhir/Org1/Patient/example
+
+DELETE A PATIENT
+DELETE http://localhost:8080/iis-sandbox/fhir/Org1/Patient/example
+
+
+CREATE A PATIENT WITH LINKS
+use matchPatient.xml, match2Patient.xml, match1Patient.xml for example and do a POST for each
+
+POST http://localhost:8080/iis-sandbox/fhir/Org1/Patient/
+
+READ  A PERSON AND SEES ITS LINKS AND LEVELS OF ASSURANCE
+GET  http://localhost:8080/iis-sandbox/fhir/Org1/Person/patientWithLinks
+
+READ A LINKED PATIENT
+
+GET  http://localhost:8080/iis-sandbox/fhir/Org1/Patient/match1
+
+OR
+
+GET http://localhost:8080/iis-sandbox/fhir/Org1/Patient/match2
+
+
+Use testImunnization if you have no Immunization ressource example
+CREATE AN IMMUNIZATION
+POST http://localhost:8080/iis-sandbox/fhir/Org1/Immunization
+
+READ AN IMMUNIZATION
+GET http://localhost:8080/iis-sandbox/fhir/Org1/Immunization/test
+
+UPDATE AN IMMUNIZATION
+PUT http://localhost:8080/iis-sandbox/fhir/Org1/Immunization/test
+
+
+DELETE AN IMMUNIZATION
+DELETE http://localhost:8080/iis-sandbox/fhir/Org1/Immunization/test
+
+
+
+# TO REVIEW
+CREATE A DUPLICATED IMMUNIZATION
+use dedupImmunization.xml for exemple
+
+POST http://localhost:8080/iis-sandbox/fhir/Org1/Immunization
+
+change the dates and repost
+
+READ  A DUPLICATED IMUUNIZATION
+GET http://localhost:8080/iis-sandbox/fhir/Org1/MedicationAdministration/vaccineCODE
+
+
+
+
+
+
+

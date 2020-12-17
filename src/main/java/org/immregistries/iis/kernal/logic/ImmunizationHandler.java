@@ -131,7 +131,7 @@ public class ImmunizationHandler {
 
     i1 = new org.immregistries.vaccination_deduplication.Immunization();
     i1.setCVX(immunization.getVaccineCode().toString());
-    i1.setDate(String.valueOf(immunization.getOccurrenceDateTimeType()));
+    //i1.setDate(String.valueOf(immunization.getOccurrenceDateTimeType()));
     i1.setLotNumber(immunization.getLotNumber());
     if (immunization.getPrimarySource()){
       i1.setSource(ImmunizationSource.SOURCE);
