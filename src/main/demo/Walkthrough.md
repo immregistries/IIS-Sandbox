@@ -72,8 +72,8 @@ You can use examplePatient.xml if you don't have any other example :
     
 
 
-### Basic requests with Immunization ressources
-You can use testImmunization if you have no Immunization ressource example :
+### Basic requests with Immunization resources
+You can use testImmunization if you have no Immunization resource example :
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -196,13 +196,13 @@ You can use testImmunization if you have no Immunization ressource example :
 
 ## Linked Ressources and possible duplicates
 
-The system imitates the **EMPI** system from Hapi Fhir and links  Patient ressources with pre-existing ressources if there are suspicions that they are related or duplicates
+The system imitates the **EMPI** system from Hapi Fhir and links  Patient resources with pre-existing resources if there are suspicions that they are related or duplicates
 
- - Patients are linked with Person Ressources
- - Immunization are linked with MedicationAdministration Ressources, using FHIR Extensions
+ - Patients are linked with Person Resources
+ - Immunization are linked with MedicationAdministration Resources, using FHIR Extensions
 ### Creating a Patient with links :
 - Initiating an example of a situation of linking
-    - As an example you can make POST each of these ressources
+    - As an example you can make POST each of these resources
         - matchPatient.xml
         - match2Patient.xml
         - match1Patient.xml
@@ -323,7 +323,7 @@ you can use dedupImmunization.xml :
     - **POST** http://localhost:8080/iis-sandbox/fhir/tenantId/Immunization
     - Then change the dates and repost
 
-- Visualize the MedicationAdministration Ressource 
+- Visualize the MedicationAdministration Resource 
     - **GET** http://localhost:8080/iis-sandbox/fhir/tenantId/MedicationAdministration/vaccineCODE
 
 
