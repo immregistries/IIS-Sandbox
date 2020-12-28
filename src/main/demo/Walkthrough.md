@@ -19,9 +19,9 @@ As an example, if you are using __POSTMAN__, the "AUTHORIZATION" section with ty
 
 Introducing a new tenant id in a request, along with a http basic authentication header, will automatically create a new user in the system
 
-## REQUESTS
+## Requests
 
-### Basic requests with patient ressources
+### Basic requests with patient resources
 You can use examplePatient.xml if you don't have any other example :
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
