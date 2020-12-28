@@ -208,7 +208,7 @@ The system imitates the **EMPI** system from Hapi Fhir and links  Patient ressou
         - match1Patient.xml
     
 
-- Visualize the Person Ressource and the links its levels of assurance
+- Visualize the Person Ressource and each link with its levels of assurance
     - **GET**  http://localhost:8080/iis-sandbox/fhir/tenantId/Person/patientWithLinks
 
 ### Creating an Immunization with links :
