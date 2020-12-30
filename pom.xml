@@ -37,7 +37,7 @@
 		<dependency>
 			<groupId>org.immregistries</groupId>
 			<artifactId>mqe-hl7-utility</artifactId>
-			<version>2020.08-BETA</version>
+			<version>2020.04-BETA</version>
 		</dependency>
 		<dependency>
 			<groupId>org.mortbay.jetty</groupId>
@@ -176,6 +176,13 @@
 			<groupId>ca.uhn.hapi.fhir</groupId>
 			<artifactId>hapi-fhir-structures-r4</artifactId>
 			<version>${hapi.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>javax.servlet-api</artifactId>
+			<version>3.1.0</version>
+			<scope>provided</scope>
 		</dependency>
 
 	</dependencies>

@@ -13,10 +13,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+
+import ca.uhn.fhir.context.FhirContext;
+import ca.uhn.fhir.parser.IParser;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hl7.fhir.r4.model.Immunization;
+import org.hl7.fhir.r4.model.Patient;
 import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodeStatusValue;
@@ -67,11 +72,14 @@ public class IncomingMessageHandler {
   private static final String QUERY_TOO_MANY = "TM";
   private static final String QUERY_APPLICATION_ERROR = "AE";
 
+  private FhirContext ctx = Context.getCtx();
+
   protected Session dataSession = null;
 
   public IncomingMessageHandler(Session dataSession) {
     this.dataSession = dataSession;
   }
+
 
   public String process(String message, OrgAccess orgAccess) {
     HL7Reader reader = new HL7Reader(message);
@@ -109,6 +117,8 @@ public class IncomingMessageHandler {
     }
     return responseMessage;
   }
+
+
 
   public String processQBP(OrgAccess orgAccess, HL7Reader reader, String messageReceived) {
     PatientReported patientReported = null;
@@ -256,6 +266,7 @@ public class IncomingMessageHandler {
   }
 
   public String processVXU(OrgAccess orgAccess, HL7Reader reader, String message) {
+
     List<ProcessingException> processingExceptionList = new ArrayList<>();
     try {
       Set<ProcessingFlavor> processingFlavorSet = orgAccess.getOrg().getProcessingFlavorSet();
@@ -638,6 +649,7 @@ public class IncomingMessageHandler {
       recordMessageReceived(message, null, ack, "Update", "Exception", orgAccess.getOrg());
       return ack;
     }
+
   }
 
   public PatientReported processPatient(OrgAccess orgAccess, HL7Reader reader,

@@ -1,5 +1,9 @@
 package org.immregistries.iis.kernal.model;
 
+import org.hl7.fhir.r4.model.ContactPoint;
+import org.hl7.fhir.r4.model.Immunization;
+import org.hl7.fhir.r4.model.Patient;
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -52,6 +56,7 @@ public class PatientReported implements Serializable {
   private String guardianFirst = "";
   private String guardianMiddle = "";
   private String guardianRelationship = "";
+
 
   public String getPatientReportedAuthority() {
     return patientReportedAuthority;
@@ -405,4 +410,34 @@ public class PatientReported implements Serializable {
     this.patientRace6 = patientRace6;
   }
 
+  @Override
+  public String toString() {
+    return "PatientReported{" + "patientReportedId=" + patientReportedId + ", orgReported="
+        + orgReported + ", patientReportedExternalLink='" + patientReportedExternalLink + '\''
+        + ", patient=" + patient + ", reportedDate=" + reportedDate + ", updatedDate=" + updatedDate
+        + ", patientReportedAuthority='" + patientReportedAuthority + '\''
+        + ", patientReportedType='" + patientReportedType + '\'' + ", patientNameLast='"
+        + patientNameLast + '\'' + ", patientNameFirst='" + patientNameFirst + '\''
+        + ", patientNameMiddle='" + patientNameMiddle + '\'' + ", patientMotherMaiden='"
+        + patientMotherMaiden + '\'' + ", patientBirthDate=" + patientBirthDate + ", patientSex='"
+        + patientSex + '\'' + ", patientRace='" + patientRace + '\'' + ", patientRace2='"
+        + patientRace2 + '\'' + ", patientRace3='" + patientRace3 + '\'' + ", patientRace4='"
+        + patientRace4 + '\'' + ", patientRace5='" + patientRace5 + '\'' + ", patientRace6='"
+        + patientRace6 + '\'' + ", patientAddressLine1='" + patientAddressLine1 + '\''
+        + ", patientAddressLine2='" + patientAddressLine2 + '\'' + ", patientAddressCity='"
+        + patientAddressCity + '\'' + ", patientAddressState='" + patientAddressState + '\''
+        + ", patientAddressZip='" + patientAddressZip + '\'' + ", patientAddressCountry='"
+        + patientAddressCountry + '\'' + ", patientAddressCountyParish='"
+        + patientAddressCountyParish + '\'' + ", patientPhone='" + patientPhone + '\''
+        + ", patientEmail='" + patientEmail + '\'' + ", patientEthnicity='" + patientEthnicity
+        + '\'' + ", patientBirthFlag='" + patientBirthFlag + '\'' + ", patientBirthOrder='"
+        + patientBirthOrder + '\'' + ", patientDeathFlag='" + patientDeathFlag + '\''
+        + ", patientDeathDate=" + patientDeathDate + ", publicityIndicator='" + publicityIndicator
+        + '\'' + ", publicityIndicatorDate=" + publicityIndicatorDate + ", protectionIndicator='"
+        + protectionIndicator + '\'' + ", protectionIndicatorDate=" + protectionIndicatorDate
+        + ", registryStatusIndicator='" + registryStatusIndicator + '\''
+        + ", registryStatusIndicatorDate=" + registryStatusIndicatorDate + ", guardianLast='"
+        + guardianLast + '\'' + ", guardianFirst='" + guardianFirst + '\'' + ", guardianMiddle='"
+        + guardianMiddle + '\'' + ", guardianRelationship='" + guardianRelationship + '\'' + '}';
+  }
 }

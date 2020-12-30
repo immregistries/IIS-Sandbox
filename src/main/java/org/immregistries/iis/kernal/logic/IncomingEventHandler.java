@@ -105,6 +105,7 @@ public class IncomingEventHandler extends IncomingMessageHandler {
       e.printStackTrace(System.err);
       return "Exception processing request" + e.getMessage();
     }
+
     return "OK";
   }
 

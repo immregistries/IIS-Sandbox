@@ -11,4 +11,5 @@ TRUNCATE TABLE observation_master;
 TRUNCATE TABLE observation_reported;
 TRUNCATE TABLE org_location;
 TRUNCATE TABLE person;
+TRUNCATE TABLE patient_link;
 SET FOREIGN_KEY_CHECKS=1;
