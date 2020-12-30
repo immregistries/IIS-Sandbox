@@ -1,7 +1,6 @@
 package org.immregistries.iis.kernal.fhir;
 
 
-import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.rest.annotation.*;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.api.server.RequestDetails;
@@ -15,9 +14,6 @@ import org.hibernate.cfg.AnnotationConfiguration;
 import org.hl7.fhir.r4.model.*;
 import org.immregistries.iis.kernal.logic.*;
 import org.immregistries.iis.kernal.model.*;
-import org.springframework.web.bind.annotation.RequestParam;
-
-import javax.annotation.PostConstruct;
 import java.util.*;
 
 /**
@@ -35,12 +31,27 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
     }
     return factory.openSession();
   }
-
+  /**
+   * The getResourceType method comes from IResourceProvider, and must
+   * be overridden to indicate what type of resource this provider
+   * supplies.
+   */
   @Override
   public Class<Patient> getResourceType() {
     return Patient.class;
   }
 
+  /**
+   * The "@Read" annotation indicates that this method supports the
+   * read operation. Read operations should return a single resource
+   * instance.
+   *@param theRequestDetails authentification access information
+   *@param theId the id of the resource to be read
+   *    The read operation takes one parameter, which must be of type
+   *    IdType and must be annotated with the "@Read.IdParam" annotation.
+   * @return
+   *    Returns a resource matching this identifier, or null if none exists.
+   */
   @Read()
   public Patient getResourceById(RequestDetails theRequestDetails, @IdParam IdType theId) {
     Patient patient = null;
@@ -58,7 +69,14 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
   }
 
 
-
+  /**
+   *The "@Create" annotation indicates that this method supports the
+   * create operation.
+   * @param theRequestDetails authentification access information
+   * @param thePatient patient resource body
+   * @return This method returns a MethodOutcome object which contains
+   * the ID of the new patient
+   */
   @Create
   public MethodOutcome createPatient(RequestDetails theRequestDetails,
       @ResourceParam Patient thePatient) {
@@ -110,6 +128,13 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
     return new MethodOutcome();
   }
 
+  /**
+   * The "@Delete" annotation indicates that this method supports deleting an existing
+   * resource (by ID)
+   * @param theRequestDetails authentification access information
+   *  @param theId This is the ID of the patient to delete
+   * @return This method returns a "MethodOutcome"
+   */
   @Delete()
   public MethodOutcome deletePatient(RequestDetails theRequestDetails, @IdParam IdType theId) {
     Session dataSession = getDataSession();
@@ -124,6 +149,13 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
     return new MethodOutcome();
   }
 
+  /**
+   * This methods asks to find and rebuild the patient resource with the id provided
+   * @param id The id of the patient resource
+   * @param dataSession The session
+   * @param orgAccess the orgAccess
+   * @return the Patient, null is no patient was found in the database
+   */
   public static Patient getPatientById(String id, Session dataSession, OrgAccess orgAccess) {
     Patient patient = null;
     PatientReported patientReported = null;
@@ -175,6 +207,12 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
     return patient;
   }
 
+  /**
+   * This methods delete from the database the information about the patient with the provided id
+   * @param id The id of the resource to be deleted
+   * @param dataSession The session
+   * @param orgAccess The orgAccess
+   */
   //We can delete only Patient with no link
   public void deletePatientById(String id, Session dataSession, OrgAccess orgAccess) {
     PatientReported patientReported = null;
@@ -191,7 +229,7 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
         patientReported = patientReportedList.get(0);
 
         patientMaster = patientReported.getPatient();
-        System.err.println("Lid du patient Master est  " + patientMaster.getPatientExternalLink());
+        //System.err.println("Lid du patient Master est  " + patientMaster.getPatientExternalLink());
 
       }
 

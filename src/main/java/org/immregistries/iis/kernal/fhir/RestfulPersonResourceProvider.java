@@ -4,21 +4,16 @@ import ca.uhn.fhir.rest.annotation.*;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.api.server.RequestDetails;
 import ca.uhn.fhir.rest.server.IResourceProvider;
-import ca.uhn.fhir.rest.server.exceptions.UnprocessableEntityException;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.AnnotationConfiguration;
 import org.hl7.fhir.r4.model.IdType;
-import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.Person;
 import org.hl7.fhir.r4.model.Reference;
-import org.immregistries.iis.kernal.logic.FHIRHandler;
 import org.immregistries.iis.kernal.logic.PersonHandler;
 import org.immregistries.iis.kernal.model.*;
-
-import java.util.ArrayList;
 import java.util.List;
 
 public class RestfulPersonResourceProvider implements IResourceProvider {
@@ -34,6 +29,11 @@ public class RestfulPersonResourceProvider implements IResourceProvider {
     return factory.openSession();
   }
 
+  /**
+   * The getResourceType method comes from IResourceProvider, and must
+   * be overridden to indicate what type of resource this provider
+   * supplies.
+   */
   @Override
   public Class<Person> getResourceType() {
     return Person.class;
@@ -55,6 +55,13 @@ public class RestfulPersonResourceProvider implements IResourceProvider {
     return person;
   }
 
+  /**
+   * This methods asks to find and rebuild the person resource with the id provided
+   * @param idPart The id of the person resource
+   * @param dataSession The session
+   * @param orgAccess the orgAccess
+   * @return the Patient, null is no patient was found in the database
+   */
   private Person getPersonById(String idPart, Session dataSession, OrgAccess orgAccess) {
     Person person = null;
     PatientReported patientReported = null;
@@ -112,6 +119,13 @@ public class RestfulPersonResourceProvider implements IResourceProvider {
     return new MethodOutcome();
   }
 
+  /**
+   * The "@Delete" annotation indicates that this method supports deleting an existing
+   * resource (by ID)
+   * @param theRequestDetails authentification access information
+   *  @param theId This is the ID of the person to delete
+   * @return This method returns a "MethodOutcome"
+   */
   @Delete()
   public MethodOutcome deletePerson(RequestDetails theRequestDetails, @IdParam IdType theId) {
     Session dataSession = getDataSession();
@@ -125,7 +139,12 @@ public class RestfulPersonResourceProvider implements IResourceProvider {
     }
     return new MethodOutcome();
   }
-
+  /**
+   * This methods delete from the database the information about the person with the provided id
+   * @param idPart The id of the resource to be deleted
+   * @param dataSession The session
+   * @param orgAccess The orgAccess
+   */
   private void deletePersonById(String idPart, Session dataSession, OrgAccess orgAccess)
       throws Exception {
     PatientReported patientReported = null;

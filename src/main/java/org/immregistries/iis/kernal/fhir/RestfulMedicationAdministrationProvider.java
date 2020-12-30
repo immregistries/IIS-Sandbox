@@ -20,6 +20,11 @@ public class RestfulMedicationAdministrationProvider implements IResourceProvide
   protected VaccinationMaster vaccinationMaster = null;
   private static SessionFactory factory;
 
+  /**
+   * The getResourceType method comes from IResourceProvider, and must
+   * be overridden to indicate what type of resource this provider
+   * supplies.
+   */
   @Override
   public Class<MedicationAdministration> getResourceType() {
     return MedicationAdministration.class;

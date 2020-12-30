@@ -20,6 +20,12 @@ import org.immregistries.iis.kernal.model.PatientReported;
 import org.immregistries.iis.kernal.model.VaccinationReported;
 
 public class PatientHandler {
+
+  /**
+   * This method set the patientReported information based on the patient information
+   * @param patientReported the patientReported
+   * @param p the Patient resource
+   */
   public static void patientReportedFromFhirPatient(PatientReported patientReported, Patient p) {
     // patientReported.setPatientReportedId(;
     // patientReported.setPatientReportedType(p.get);
@@ -111,6 +117,11 @@ public class PatientHandler {
 
   }
 
+  /**
+   * This methods create the patient resource based on the patientReported information
+   * @param pr the patientReported
+   * @return the Patient resource
+   */
   public static Patient patientReportedToFhirPatient(PatientReported pr) {
     Patient ret = new Patient();
 
@@ -159,6 +170,7 @@ public class PatientHandler {
 
     return ret;
   }
+
 
   public static Patient getPatient(OrgLocation orgLocation, VaccinationReported vaccinationReported,
       PatientReported pr) {
@@ -217,7 +229,13 @@ public class PatientHandler {
 
     return p;
   }
-
+  /**
+   * This methods is looking for posssible matches based on the first name, last name between the provided patient
+   * and the existing patients in the database
+   * @param dataSession the Session
+   * @param patient the patient
+   * @return a list of PatientMaster who match the patient, null if none has been found
+   */
   public static List<PatientMaster> findPossibleMatch(Session dataSession, Patient patient) {
     List<PatientMaster> matches;
     Query query = dataSession
@@ -231,6 +249,13 @@ public class PatientHandler {
     return matches;
   }
 
+  /**
+   * This methods is looking for matches based on the first name, last name and birthday between the provided patient
+   * and the existing patients in the database
+   * @param dataSession the Session
+   * @param patient the patient
+   * @return a list of PatientMaster who match the patient, null if none has been found
+   */
   public static List<PatientMaster> findMatch(Session dataSession, Patient patient) {
     List<PatientMaster> matches;
     Query queryBigMatch = dataSession.createQuery(

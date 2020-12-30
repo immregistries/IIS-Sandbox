@@ -34,6 +34,11 @@ public class RestfuImmunizationProvider implements IResourceProvider {
   protected VaccinationReported vaccinationReported = null;
   private static SessionFactory factory;
 
+  /**
+   * The getResourceType method comes from IResourceProvider, and must
+   * be overridden to indicate what type of resource this provider
+   * supplies.
+   */
   @Override
   public Class<Immunization> getResourceType() {
     return Immunization.class;

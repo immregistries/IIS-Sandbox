@@ -25,15 +25,6 @@ public class Server extends RestfulServer {
    * configuration, interceptors, etc.
    */
 
-  /*public Server() {
-  
-  
-  
-      // ...add some resource providers, etc...
-      List<IResourceProvider> resourceProviders = new ArrayList<IResourceProvider>();
-  
-      setResourceProviders(resourceProviders);
-  }*/
   @Override
   protected void initialize() throws ServletException {
     //setFhirContext(FhirContext.forR4());

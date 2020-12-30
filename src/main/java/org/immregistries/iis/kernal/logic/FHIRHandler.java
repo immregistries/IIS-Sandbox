@@ -25,7 +25,15 @@ public class FHIRHandler extends IncomingMessageHandler {
         PatientReported patientReported = FIHR_EventPatientReported(orgAccess,patient,immunization);
         VaccinationReported vaccinationReported = FHIR_EventVaccinationReported(orgAccess,patient,patientReported,immunization);
     }
-
+    
+	/**
+	 * This methods is collecting the patient information to add or update a patient Reported
+	 * @param orgAccess the orgAccess
+	 * @param patient the patient resource
+	 * @param immunization the immunization resource
+	 * @return the patientReported added or updated
+	 * @throws Exception
+	 */
     public PatientReported FIHR_EventPatientReported(OrgAccess orgAccess, Patient patient, Immunization immunization) throws Exception {
         PatientMaster patientMaster = null;
         PatientReported patientReported = null;
@@ -107,6 +115,15 @@ public class FHIRHandler extends IncomingMessageHandler {
         return patientReported;
     }
 
+	/**
+	 * This methods is collecting the immunization information to add or update a vaccinationReported
+	 * @param orgAccess the orgAccess
+	 * @param patient the patient resource
+	 * @param patientReported the patientReported
+	 * @param immunization the immunization resource
+	 * @return the vaccinationReported added or updated
+	 * @throws Exception
+	 */
     public VaccinationReported FHIR_EventVaccinationReported(OrgAccess orgAccess, Patient patient,PatientReported patientReported, Immunization immunization) throws Exception {
 		VaccinationMaster vaccinationMaster = null;
 		VaccinationReported vaccinationReported = null;
@@ -169,7 +186,12 @@ public class FHIRHandler extends IncomingMessageHandler {
 	transaction.commit();
 	return vaccinationReported;
     }
-    
+
+	/**
+	 * This method deletes the vacinationReported from the database with the provided id
+	 * @param orgAccess the orgAcess of the organization
+	 * @param id the id of the vaccinationReported to be deleted
+	 */
     public void FHIR_EventVaccinationDeleted(OrgAccess orgAccess, String id) {
 	VaccinationReported vr = new VaccinationReported();
 	VaccinationMaster vm = new VaccinationMaster();
