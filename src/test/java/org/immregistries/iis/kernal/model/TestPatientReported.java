@@ -5,7 +5,6 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.AnnotationConfiguration;
-
 import java.util.List;
 
 public class TestPatientReported extends TestCase {
@@ -16,8 +15,8 @@ public class TestPatientReported extends TestCase {
     Query query = dataSession.createQuery("from PatientReported");
     List<PatientReported> patientReportedList = query.list();
     for (PatientReported patientReported : patientReportedList) {
-      System.out
-          .println("--> patientReported.getReportedMrn() = " + patientReported.getPatientReportedExternalLink());
+      System.out.println("--> patientReported.getReportedMrn() = "
+          + patientReported.getPatientReportedExternalLink());
     }
 
     dataSession.close();

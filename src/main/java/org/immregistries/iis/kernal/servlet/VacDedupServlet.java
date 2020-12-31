@@ -6,12 +6,10 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import org.immregistries.vaccination_deduplication.Immunization;
 import org.immregistries.vaccination_deduplication.LinkedImmunization;
 import org.immregistries.vaccination_deduplication.VaccinationDeduplication;

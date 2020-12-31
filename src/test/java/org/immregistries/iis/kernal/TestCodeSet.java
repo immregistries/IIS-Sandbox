@@ -6,10 +6,9 @@ import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.logic.CodeMapManager;
 import junit.framework.TestCase;
 
-public class TestCodeSet extends TestCase  {
+public class TestCodeSet extends TestCase {
 
-  public void testCodeMapManager()
-  {
+  public void testCodeMapManager() {
     CodeMap codeMap = CodeMapManager.getCodeMap();
     Code code = codeMap.getCodeForCodeset(CodesetType.VACCINATION_CVX_CODE, "03");
     assertNotNull(code);

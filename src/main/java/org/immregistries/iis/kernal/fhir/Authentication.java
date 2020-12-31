@@ -13,7 +13,6 @@ import org.hibernate.Transaction;
 import org.hibernate.cfg.AnnotationConfiguration;
 import org.immregistries.iis.kernal.model.OrgAccess;
 import org.immregistries.iis.kernal.model.OrgMaster;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;

@@ -1,7 +1,6 @@
 package org.immregistries.iis.kernal.fhir;
 
 import java.util.List;
-
 import ca.uhn.fhir.rest.api.server.RequestDetails;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -15,7 +14,6 @@ import org.immregistries.iis.kernal.logic.ImmunizationHandler;
 import org.immregistries.iis.kernal.logic.PatientHandler;
 import org.immregistries.iis.kernal.model.*;
 import org.immregistries.iis.kernal.repository.PatientRepository;
-
 import ca.uhn.fhir.rest.annotation.Create;
 import ca.uhn.fhir.rest.annotation.Delete;
 import ca.uhn.fhir.rest.annotation.IdParam;

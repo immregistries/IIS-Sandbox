@@ -17,7 +17,6 @@ import org.hl7.fhir.r4.model.Reference;
 import org.immregistries.iis.kernal.logic.FHIRHandler;
 import org.immregistries.iis.kernal.logic.PersonHandler;
 import org.immregistries.iis.kernal.model.*;
-
 import java.util.ArrayList;
 import java.util.List;
 

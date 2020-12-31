@@ -4,12 +4,10 @@ package org.immregistries.iis.kernal.dedup;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-
 import org.immregistries.vaccination_deduplication.Immunization;
 import org.immregistries.vaccination_deduplication.LinkedImmunization;
 import org.immregistries.vaccination_deduplication.VaccinationDeduplication;
 import org.immregistries.vaccination_deduplication.reference.ImmunizationSource;
-
 import junit.framework.TestCase;
 
 public class VaccinationDedup extends TestCase {
@@ -48,16 +46,14 @@ public class VaccinationDedup extends TestCase {
         vaccinationDeduplication.deduplicateDeterministic(patientRecords);
 
     int i = 0;
-    for (LinkedImmunization li : result) 
-    {
+    for (LinkedImmunization li : result) {
       i++;
       System.out.println("Immunization " + i + ": " + li.getType());
-      for (Immunization immunization: li)
-      {
+      for (Immunization immunization : li) {
         System.out.println("  + " + immunization);
       }
     }
-    
+
 
 
   }

@@ -10,7 +10,6 @@ import org.immregistries.vaccination_deduplication.computation_classes.Determini
 import org.immregistries.vaccination_deduplication.reference.ComparisonResult;
 import org.immregistries.vaccination_deduplication.reference.DeterministicResult;
 import org.immregistries.vaccination_deduplication.reference.ImmunizationSource;
-
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.Date;
@@ -122,7 +121,8 @@ public class ImmunizationHandler {
     return i;
   }
 
-  public static VaccinationMaster findMatch(Session dataSession, PatientReported patientReported, Immunization immunization) throws ParseException {
+  public static VaccinationMaster findMatch(Session dataSession, PatientReported patientReported,
+      Immunization immunization) throws ParseException {
     VaccinationMaster vm = null;
     Deterministic comparer = new Deterministic();
     ComparisonResult comparison;
@@ -133,29 +133,28 @@ public class ImmunizationHandler {
     i1.setCVX(immunization.getVaccineCode().toString());
     //i1.setDate(String.valueOf(immunization.getOccurrenceDateTimeType()));
     i1.setLotNumber(immunization.getLotNumber());
-    if (immunization.getPrimarySource()){
+    if (immunization.getPrimarySource()) {
       i1.setSource(ImmunizationSource.SOURCE);
-    }else {
+    } else {
       i1.setSource(ImmunizationSource.HISTORICAL);
     }
 
     {
-      Query query = dataSession.createQuery(
-              "from VaccinationReported where patientReported = ?");
+      Query query = dataSession.createQuery("from VaccinationReported where patientReported = ?");
       query.setParameter(0, patientReported);
       List<VaccinationReported> vaccinationReportedList = query.list();
 
-      for (VaccinationReported vaccinationReported : vaccinationReportedList){
+      for (VaccinationReported vaccinationReported : vaccinationReportedList) {
         i2 = new org.immregistries.vaccination_deduplication.Immunization();
         i2.setCVX(vaccinationReported.getVaccineCvxCode());
         i2.setDate(vaccinationReported.getAdministeredDate());
         i2.setLotNumber(vaccinationReported.getLotnumber());
-        if (immunization.getPrimarySource()){
+        if (immunization.getPrimarySource()) {
           i2.setSource(ImmunizationSource.SOURCE);
-        }else {
+        } else {
           i2.setSource(ImmunizationSource.HISTORICAL);
         }
-        comparison = comparer.compare(i1,i2);
+        comparison = comparer.compare(i1, i2);
         if (comparison.equals(ComparisonResult.EQUAL)) {
           return vaccinationReported.getVaccination();
         }

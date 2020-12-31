@@ -5,7 +5,6 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.AnnotationConfiguration;
-
 import java.util.List;
 
 public class TestVaccinationMaster extends TestCase {
@@ -16,8 +15,8 @@ public class TestVaccinationMaster extends TestCase {
     Query query = dataSession.createQuery("from VaccinationMaster");
     List<VaccinationMaster> vaccinationMasterList = query.list();
     for (VaccinationMaster vaccinationMaster : vaccinationMasterList) {
-      System.out
-          .println("--> vaccinationMaster.getVaccinationCvxCode() = " + vaccinationMaster.getVaccineCvxCode());
+      System.out.println("--> vaccinationMaster.getVaccinationCvxCode() = "
+          + vaccinationMaster.getVaccineCvxCode());
     }
 
     dataSession.close();

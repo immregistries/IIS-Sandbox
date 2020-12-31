@@ -37,7 +37,7 @@
 		<dependency>
 			<groupId>org.immregistries</groupId>
 			<artifactId>mqe-hl7-utility</artifactId>
-			<version>2020.04-BETA</version>
+			<version>2020.12-BETA</version>
 		</dependency>
 		<dependency>
 			<groupId>org.mortbay.jetty</groupId>

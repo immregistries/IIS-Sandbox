@@ -10,7 +10,6 @@ import org.hibernate.SessionFactory;
 import org.hibernate.cfg.AnnotationConfiguration;
 import org.hl7.fhir.r4.model.*;
 import org.immregistries.iis.kernal.model.*;
-
 import java.util.List;
 
 public class RestfulMedicationAdministrationProvider implements IResourceProvider {

@@ -16,7 +16,6 @@ import org.hl7.fhir.r4.model.*;
 import org.immregistries.iis.kernal.logic.*;
 import org.immregistries.iis.kernal.model.*;
 import org.springframework.web.bind.annotation.RequestParam;
-
 import javax.annotation.PostConstruct;
 import java.util.*;
 
