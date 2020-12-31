@@ -24,18 +24,6 @@ import ca.uhn.fhir.rest.api.server.RequestDetails;
 
 public class ImmunizationHandler {
 
-  // TODO: Never called
-  public static void patientReportedFromFhirImmunization(PatientReported patientReported,
-      Immunization i) {
-    if (!i.equals(null)) {
-      patientReported.setReportedDate(i.getRecorded());
-      patientReported.setUpdatedDate(i.getOccurrenceDateTimeType().getValue());
-      patientReported.setPatientReportedAuthority(i.getIdentifierFirstRep().getValue());
-      //patientReported.setPatientReportedType(patientReportedType);
-    }
-
-  }
-
   public static void vaccinationReportedFromFhirImmunization(
       VaccinationReported vaccinationReported, Immunization i) {
     //vaccinationReported.setVaccinationReportedId(0);
@@ -150,6 +138,7 @@ public class ImmunizationHandler {
     {
       Query query = dataSession.createQuery("from VaccinationReported where patientReported = ?");
       query.setParameter(0, patientReported);
+      @SuppressWarnings("unchecked")
       List<VaccinationReported> vaccinationReportedList = query.list();
 
       for (VaccinationReported vaccinationReported : vaccinationReportedList) {

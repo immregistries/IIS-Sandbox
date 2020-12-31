@@ -12,7 +12,6 @@ import org.immregistries.iis.kernal.logic.FHIRHandler;
 import org.immregistries.iis.kernal.logic.ImmunizationHandler;
 import org.immregistries.iis.kernal.logic.PatientHandler;
 import org.immregistries.iis.kernal.model.OrgAccess;
-import org.immregistries.iis.kernal.model.OrgLocation;
 import org.immregistries.iis.kernal.model.OrgMaster;
 import org.immregistries.iis.kernal.model.PatientReported;
 import org.immregistries.iis.kernal.model.VaccinationReported;
@@ -139,13 +138,11 @@ public class RestfulImmunizationProvider implements IResourceProvider {
       Session dataSession, OrgAccess orgAccess) {
     Immunization immunization = null;
     VaccinationReported vaccinationReported = null;
-    PatientReported patientReported = null;
-    OrgLocation orgLocation = null;
-
     {
       Query query = dataSession
           .createQuery("from VaccinationReported where vaccinationReportedExternalLink = ?");
       query.setParameter(0, id);
+      @SuppressWarnings("unchecked")
       List<VaccinationReported> vaccinationReportedList = query.list();
       if (vaccinationReportedList.size() > 0) {
         vaccinationReported = vaccinationReportedList.get(0);
