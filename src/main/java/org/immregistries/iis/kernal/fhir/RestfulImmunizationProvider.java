@@ -1,18 +1,21 @@
 package org.immregistries.iis.kernal.fhir;
 
 import java.util.List;
-import ca.uhn.fhir.rest.api.server.RequestDetails;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.AnnotationConfiguration;
 import org.hl7.fhir.r4.model.IdType;
 import org.hl7.fhir.r4.model.Immunization;
-import org.immregistries.iis.kernal.logic.*;
 import org.hl7.fhir.r4.model.Patient;
+import org.immregistries.iis.kernal.logic.FHIRHandler;
 import org.immregistries.iis.kernal.logic.ImmunizationHandler;
 import org.immregistries.iis.kernal.logic.PatientHandler;
-import org.immregistries.iis.kernal.model.*;
+import org.immregistries.iis.kernal.model.OrgAccess;
+import org.immregistries.iis.kernal.model.OrgLocation;
+import org.immregistries.iis.kernal.model.OrgMaster;
+import org.immregistries.iis.kernal.model.PatientReported;
+import org.immregistries.iis.kernal.model.VaccinationReported;
 import org.immregistries.iis.kernal.repository.PatientRepository;
 import ca.uhn.fhir.rest.annotation.Create;
 import ca.uhn.fhir.rest.annotation.Delete;
@@ -21,10 +24,11 @@ import ca.uhn.fhir.rest.annotation.Read;
 import ca.uhn.fhir.rest.annotation.ResourceParam;
 import ca.uhn.fhir.rest.annotation.Update;
 import ca.uhn.fhir.rest.api.MethodOutcome;
+import ca.uhn.fhir.rest.api.server.RequestDetails;
 import ca.uhn.fhir.rest.server.IResourceProvider;
 import ca.uhn.fhir.rest.server.exceptions.UnprocessableEntityException;
 
-public class RestfuImmunizationProvider implements IResourceProvider {
+public class RestfulImmunizationProvider implements IResourceProvider {
   protected Session dataSession = null;
   protected OrgAccess orgAccess = null;
   protected OrgMaster orgMaster = null;

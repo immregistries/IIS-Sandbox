@@ -13,14 +13,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
-import ca.uhn.fhir.context.FhirContext;
-import ca.uhn.fhir.parser.IParser;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hl7.fhir.r4.model.Immunization;
-import org.hl7.fhir.r4.model.Patient;
 import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodeStatusValue;
@@ -49,6 +45,7 @@ import org.immregistries.vfa.connect.model.SoftwareResult;
 import org.immregistries.vfa.connect.model.TestCase;
 import org.immregistries.vfa.connect.model.TestEvent;
 import org.immregistries.vfa.connect.model.VaccineGroup;
+import ca.uhn.fhir.context.FhirContext;
 
 public class IncomingMessageHandler {
   private static final String PATIENT_MIDDLE_NAME_MULTI = "Multi";

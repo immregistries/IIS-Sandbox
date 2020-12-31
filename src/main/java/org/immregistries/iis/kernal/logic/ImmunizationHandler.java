@@ -1,19 +1,26 @@
 package org.immregistries.iis.kernal.logic;
 
-import ca.uhn.fhir.rest.api.server.RequestDetails;
-import org.hibernate.Query;
-import org.hibernate.Session;
-import org.hl7.fhir.r4.model.*;
-import org.immregistries.iis.kernal.model.*;
-import org.immregistries.vaccination_deduplication.computation_classes.Comparer;
-import org.immregistries.vaccination_deduplication.computation_classes.Deterministic;
-import org.immregistries.vaccination_deduplication.reference.ComparisonResult;
-import org.immregistries.vaccination_deduplication.reference.DeterministicResult;
-import org.immregistries.vaccination_deduplication.reference.ImmunizationSource;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
+import org.hibernate.Query;
+import org.hibernate.Session;
+import org.hl7.fhir.r4.model.Address;
+import org.hl7.fhir.r4.model.Extension;
+import org.hl7.fhir.r4.model.Immunization;
+import org.hl7.fhir.r4.model.Location;
+import org.hl7.fhir.r4.model.Quantity;
+import org.hl7.fhir.r4.model.Reference;
+import org.hl7.fhir.r4.model.StringType;
+import org.immregistries.iis.kernal.model.OrgLocation;
+import org.immregistries.iis.kernal.model.PatientReported;
+import org.immregistries.iis.kernal.model.VaccinationMaster;
+import org.immregistries.iis.kernal.model.VaccinationReported;
+import org.immregistries.vaccination_deduplication.computation_classes.Deterministic;
+import org.immregistries.vaccination_deduplication.reference.ComparisonResult;
+import org.immregistries.vaccination_deduplication.reference.ImmunizationSource;
+import ca.uhn.fhir.rest.api.server.RequestDetails;
 
 public class ImmunizationHandler {
 

@@ -1,17 +1,20 @@
 package org.immregistries.iis.kernal.logic;
 
-import ca.uhn.fhir.parser.IParser;
+import java.util.Date;
+import java.util.List;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hl7.fhir.r4.model.Immunization;
 import org.hl7.fhir.r4.model.Patient;
-import org.immregistries.iis.kernal.model.*;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import org.immregistries.iis.kernal.model.OrgAccess;
+import org.immregistries.iis.kernal.model.OrgLocation;
+import org.immregistries.iis.kernal.model.PatientLink;
+import org.immregistries.iis.kernal.model.PatientMaster;
+import org.immregistries.iis.kernal.model.PatientReported;
+import org.immregistries.iis.kernal.model.VaccinationMaster;
+import org.immregistries.iis.kernal.model.VaccinationReported;
 
 public class FHIRHandler extends IncomingMessageHandler {
 
@@ -61,23 +64,19 @@ public class FHIRHandler extends IncomingMessageHandler {
 
       } else { //EMPI Search matches with firstname, lastname and birthday
         List<PatientMaster> patientMasterList = PatientHandler.findMatch(dataSession, patient);
+        List<PatientMaster> patientMasterPossibleList;
         if (patientMasterList.size() > 0) {
-          System.err.println("patient has a match ");
           //Create new patient reported and get existing patient master
           patientAlreadyExists = true;
           patientMaster = patientMasterList.get(0);
           levelConfidence = 2;
-        } else if (PatientHandler.findPossibleMatch(dataSession, patient).size() > 0) {
+        } else if ((patientMasterPossibleList = PatientHandler.findPossibleMatch(dataSession, patient)).size() > 0) {
           // Found an existing patient with same firstname and lastname
           patientAlreadyExists = true;
-          patientMasterList = PatientHandler.findPossibleMatch(dataSession, patient);
-          patientMaster = patientMasterList.get(0);
+          patientMaster = patientMasterPossibleList.get(0);
           levelConfidence = 1;
-          System.err.println("patient has a possible match ");
-
         } else {
           //Create new patient master and patient reported
-          System.err.println("patient has no match ");
           patientMaster = new PatientMaster();
           patientMaster.setOrgMaster(orgAccess.getOrg());
         }

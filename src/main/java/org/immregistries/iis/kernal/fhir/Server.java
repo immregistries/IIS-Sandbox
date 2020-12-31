@@ -1,18 +1,16 @@
 package org.immregistries.iis.kernal.fhir;
 
 
-import ca.uhn.fhir.context.FhirContext;
+import java.util.ArrayList;
+import java.util.List;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import ca.uhn.fhir.narrative.DefaultThymeleafNarrativeGenerator;
 import ca.uhn.fhir.narrative.INarrativeGenerator;
 import ca.uhn.fhir.rest.api.EncodingEnum;
 import ca.uhn.fhir.rest.server.HardcodedServerAddressStrategy;
 import ca.uhn.fhir.rest.server.IResourceProvider;
 import ca.uhn.fhir.rest.server.RestfulServer;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.ServletException;
-import java.util.ArrayList;
-import java.util.List;
-import ca.uhn.fhir.rest.server.interceptor.ResponseHighlighterInterceptor;
 import ca.uhn.fhir.rest.server.tenant.UrlBaseTenantIdentificationStrategy;
 
 @WebServlet(urlPatterns = {"/fhir/*"}, displayName = "FHIR Server")
@@ -50,7 +48,7 @@ public class Server extends RestfulServer {
      */
     List<IResourceProvider> resourceProviders = new ArrayList<IResourceProvider>();
     resourceProviders.add(new RestfulPatientResourceProvider());
-    resourceProviders.add(new RestfuImmunizationProvider());
+    resourceProviders.add(new RestfulImmunizationProvider());
     resourceProviders.add(new RestfulPersonResourceProvider());
     resourceProviders.add(new RestfulMedicationAdministrationProvider());
     setResourceProviders(resourceProviders);

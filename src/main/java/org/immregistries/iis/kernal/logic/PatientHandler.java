@@ -225,20 +225,17 @@ public class PatientHandler {
     query.setParameter(1, patient.getNameFirstRep().getGiven().get(0).toString());
     //query.setParameter(2, patient.getBirthDate());
     matches = query.list();
-
-
     return matches;
   }
 
   public static List<PatientMaster> findMatch(Session dataSession, Patient patient) {
     List<PatientMaster> matches;
     Query queryBigMatch = dataSession.createQuery(
-        "from PatientMaster where patientNameLast = ? and patientNameFirst= ? and patientBirthDate=?");
+        "from PatientMaster where patientNameLast = ? and patientNameFirst= ? and patientBirthDate = ?");
     queryBigMatch.setParameter(0, patient.getNameFirstRep().getFamily());
     queryBigMatch.setParameter(1, patient.getNameFirstRep().getGiven().get(0).toString());
     queryBigMatch.setParameter(2, patient.getBirthDate());
     matches = queryBigMatch.list();
-
     return matches;
   }
 

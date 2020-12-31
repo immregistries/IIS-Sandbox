@@ -1,10 +1,6 @@
 package org.immregistries.iis.kernal.model;
 
-import org.hl7.fhir.r4.model.ContactPoint;
-import org.hl7.fhir.r4.model.Immunization;
-import org.hl7.fhir.r4.model.Patient;
 import java.io.Serializable;
-import java.util.Date;
 
 /**
  * Created by Eric on 12/20/17.

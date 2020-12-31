@@ -2,9 +2,6 @@ package org.immregistries.iis.kernal.model;
 
 import java.io.Serializable;
 import java.util.Date;
-import org.hl7.fhir.r4.model.HumanName;
-import org.hl7.fhir.r4.model.Immunization;
-import org.hl7.fhir.r4.model.Patient;
 import org.immregistries.vfa.connect.model.TestEvent;
 
 /**
