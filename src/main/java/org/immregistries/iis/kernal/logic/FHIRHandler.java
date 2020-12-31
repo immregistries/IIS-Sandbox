@@ -23,14 +23,14 @@ public class FHIRHandler extends IncomingMessageHandler {
     super(dataSession);
   }
 
-  public void processFIHR_Event(OrgAccess orgAccess, Patient patient, Immunization immunization)
+  public void processFHIR_Event(OrgAccess orgAccess, Patient patient, Immunization immunization)
       throws Exception {
-    PatientReported patientReported = FIHR_EventPatientReported(orgAccess, patient, immunization);
+    PatientReported patientReported = FHIR_EventPatientReported(orgAccess, patient, immunization);
     VaccinationReported vaccinationReported =
         FHIR_EventVaccinationReported(orgAccess, patient, patientReported, immunization);
   }
 
-  public PatientReported FIHR_EventPatientReported(OrgAccess orgAccess, Patient patient,
+  public PatientReported FHIR_EventPatientReported(OrgAccess orgAccess, Patient patient,
       Immunization immunization) throws Exception {
     PatientMaster patientMaster = null;
     PatientReported patientReported = null;

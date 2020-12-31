@@ -24,6 +24,7 @@ import ca.uhn.fhir.rest.api.server.RequestDetails;
 
 public class ImmunizationHandler {
 
+  // TODO: Never called
   public static void patientReportedFromFhirImmunization(PatientReported patientReported,
       Immunization i) {
     if (!i.equals(null)) {

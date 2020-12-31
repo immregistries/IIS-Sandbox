@@ -63,7 +63,7 @@ public class RestfulImmunizationProvider implements IResourceProvider {
           theImmunization.getPatient().getReference().substring(8)); // the id patient starts with Patient/ so we cut it
       if (null != pr) {
         Patient patient = PatientHandler.patientReportedToFhirPatient(pr);
-        fhirHandler.processFIHR_Event(orgAccess, patient, theImmunization);
+        fhirHandler.processFHIR_Event(orgAccess, patient, theImmunization);
       } else {
         throw new Exception("No patient Found with the identifier supplied");
       }
@@ -110,7 +110,7 @@ public class RestfulImmunizationProvider implements IResourceProvider {
           theImmunization.getPatient().getReference().substring(8)); // the id patient starts with Patient/ so we cut it
       Patient patient = PatientHandler.patientReportedToFhirPatient(pr);
 
-      fhirHandler.processFIHR_Event(orgAccess, patient, theImmunization);
+      fhirHandler.processFHIR_Event(orgAccess, patient, theImmunization);
     } catch (Exception e) {
       e.printStackTrace();
     } finally {

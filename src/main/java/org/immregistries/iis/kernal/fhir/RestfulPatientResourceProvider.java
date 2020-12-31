@@ -82,7 +82,7 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
       orgAccess = Authentication.authenticateOrgAccess(theRequestDetails, dataSession);
       FHIRHandler fhirHandler = new FHIRHandler(dataSession);
 
-      patientReported = fhirHandler.FIHR_EventPatientReported(orgAccess, thePatient, null);
+      patientReported = fhirHandler.FHIR_EventPatientReported(orgAccess, thePatient, null);
 
     } catch (Exception e) {
       e.printStackTrace();
@@ -110,7 +110,7 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
     try {
       orgAccess = Authentication.authenticateOrgAccess(theRequestDetails, dataSession);
       FHIRHandler fhirHandler = new FHIRHandler(dataSession);
-      patientReported = fhirHandler.FIHR_EventPatientReported(orgAccess, thePatient, null);
+      patientReported = fhirHandler.FHIR_EventPatientReported(orgAccess, thePatient, null);
     } catch (Exception e) {
       e.printStackTrace();
     } finally {
