@@ -13,6 +13,8 @@ The server uses a tenant id specified in the Url as in
    
 along with a http basic authentication password
 
+![alt text](https://github.com/immregistries/IIS-Sandbox/blob/PI/src/main/demo/pictures/Authentification.jpg?raw=true)
+
 As an example, if you are using __POSTMAN__, the "AUTHORIZATION" section with type "BASIC AUTH" needs to be filled.
 
 ### Creating a new user
@@ -21,7 +23,12 @@ Introducing a new tenant id in a request, along with a http basic authentication
 
 ## Requests
 
+If you want to send xml or json data, you will need to add them in a Body tab. In Postman, it is presented as follow :
+
+![alt text](https://github.com/immregistries/IIS-Sandbox/blob/PI/src/main/demo/pictures/Body.jpg?raw=true)
+
 ### Basic requests with patient resources
+
 You can use examplePatient.xml if you don't have any other example :
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
