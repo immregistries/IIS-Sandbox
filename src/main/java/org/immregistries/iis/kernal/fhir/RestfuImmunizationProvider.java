@@ -51,6 +51,14 @@ public class RestfuImmunizationProvider implements IResourceProvider {
     return factory.openSession();
   }
 
+  /**
+   *The "@Create" annotation indicates that this method supports the
+   * create operation.
+   * @param theRequestDetails authentification access information
+   * @param theImmunization immunization resource body
+   * @return This method returns a MethodOutcome object which contains
+   * the ID of the new immunization
+   */
   @Create
   public MethodOutcome createImmunization(RequestDetails theRequestDetails,
       @ResourceParam Immunization theImmunization) {
@@ -77,7 +85,14 @@ public class RestfuImmunizationProvider implements IResourceProvider {
     }
     return new MethodOutcome(new IdType(theImmunization.getIdentifier().get(0).getValue()));
   }
-
+  /**
+   * This methods asks to find and rebuild the person resource with the id provided
+   * @param theRequestDetails authentification access information
+   * @param theId The id of the immunization resource
+   *
+   *
+   * @return the Immunization, null is none was found in the database
+   */
   @Read()
   public Immunization getResourceById(RequestDetails theRequestDetails, @IdParam IdType theId) {
     Immunization immunization = null;
@@ -98,6 +113,14 @@ public class RestfuImmunizationProvider implements IResourceProvider {
     return immunization;
   }
 
+  /**
+   * The "@Update" annotation indicates that this method supports replacing an existing
+   * resource (by ID) with a new instance of that resource.
+   *
+   * @param theId      This is the ID of the Immunization to update
+   * @param theImmunization This is the actual resource to update
+   * @return This method returns a "MethodOutcome"
+   */
   @Update()
   public MethodOutcome updateImmunization(RequestDetails theRequestDetails, @IdParam IdType theId,
       @ResourceParam Immunization theImmunization) {
@@ -121,7 +144,13 @@ public class RestfuImmunizationProvider implements IResourceProvider {
     }
     return new MethodOutcome(new IdType(theImmunization.getIdentifier().get(0).getValue()));
   }
-
+  /**
+   * The "@Delete" annotation indicates that this method supports deleting an existing
+   * resource (by ID)
+   * @param theRequestDetails authentification access information
+   *  @param theId This is the ID of the immunization to delete
+   * @return This method returns a "MethodOutcome"
+   */
   @Delete()
   public MethodOutcome deleteImmunization(RequestDetails theRequestDetails, @IdParam IdType theId) {
     Session dataSession = getDataSession();
@@ -137,7 +166,13 @@ public class RestfuImmunizationProvider implements IResourceProvider {
     return new MethodOutcome();
   }
 
-
+  /**
+   * This methods asks to find and rebuild the immunization resource with the id provided
+   * @param id The id of the patient resource
+   * @param dataSession The session
+   * @param orgAccess the orgAccess
+   * @return the Immunization, null is none was found in the database
+   */
   public static Immunization getImmunizationById(RequestDetails theRequestDetails, String id,
       Session dataSession, OrgAccess orgAccess) {
     Immunization immunization = null;

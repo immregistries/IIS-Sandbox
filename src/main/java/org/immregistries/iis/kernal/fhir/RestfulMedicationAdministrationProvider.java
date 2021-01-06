@@ -37,7 +37,14 @@ public class RestfulMedicationAdministrationProvider implements IResourceProvide
     return factory.openSession();
   }
 
-
+  /**
+   * This methods asks to find and rebuild the MedicationAdministration resource with the id provided
+   * @param theRequestDetails autenthification access information
+   * @param theId The id of the medicationAdministration resource
+   *
+   *
+   * @return the MedicationAdministration, null is none was found in the database
+   */
   @Read()
   public MedicationAdministration getResourceById(RequestDetails theRequestDetails,
       @IdParam IdType theId) {

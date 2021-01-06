@@ -107,7 +107,7 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
    * resource (by ID) with a new instance of that resource.
    *
    * @param theId      This is the ID of the patient to update
-   * @param thePatient This is the actual resource to save
+   * @param thePatient This is the actual resource to update
    * @return This method returns a "MethodOutcome"
    */
 
