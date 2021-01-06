@@ -1,8 +1,5 @@
 package org.immregistries.iis.kernal.model;
 
-import org.hl7.fhir.r4.model.ContactPoint;
-import org.hl7.fhir.r4.model.Patient;
-
 import java.io.Serializable;
 import java.util.Date;
 
@@ -10,6 +7,9 @@ import java.util.Date;
  * Created by Eric on 12/20/17.
  */
 public class PatientMaster implements Serializable {
+	
+  private static final long serialVersionUID = 1L;
+
   private int patientId = 0;
   private OrgMaster orgMaster = null;
   private String patientExternalLink = "";

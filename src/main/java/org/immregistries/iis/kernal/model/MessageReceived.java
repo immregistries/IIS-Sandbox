@@ -4,6 +4,9 @@ import java.io.Serializable;
 import java.util.Date;
 
 public class MessageReceived implements Serializable {
+
+  private static final long serialVersionUID = 1L;
+  
   private int messageReceivedId = 0;
   private OrgMaster orgMaster = null;
   private String messageRequest = "";

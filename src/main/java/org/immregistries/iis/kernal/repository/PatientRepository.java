@@ -17,7 +17,8 @@ public class PatientRepository {
         "from PatientReported where orgReported = ? and patientReportedExternalLink = ?");
     query.setParameter(0, orgAccess.getOrg());
     query.setParameter(1, patientReportedExternalLink);
-    List<PatientReported> patientReportedList = query.list();
+    @SuppressWarnings("unchecked")
+	List<PatientReported> patientReportedList = query.list();
     if (patientReportedList.size() > 0) {
       patientReported = patientReportedList.get(0);
     }

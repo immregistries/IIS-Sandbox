@@ -1,8 +1,6 @@
 package org.immregistries.iis.kernal.logic;
 
-import ca.uhn.fhir.parser.IParser;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -10,7 +8,6 @@ import org.hl7.fhir.r4.model.Immunization;
 import org.hl7.fhir.r4.model.Patient;
 import org.immregistries.iis.kernal.model.*;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -23,7 +20,7 @@ public class FHIRHandler extends IncomingMessageHandler {
 
     public void processFIHR_Event(OrgAccess orgAccess, Patient patient, Immunization immunization) throws Exception {
         PatientReported patientReported = FIHR_EventPatientReported(orgAccess,patient,immunization);
-        VaccinationReported vaccinationReported = FHIR_EventVaccinationReported(orgAccess,patient,patientReported,immunization);
+        FHIR_EventVaccinationReported(orgAccess,patient,patientReported,immunization);
     }
     
 	/**
@@ -41,11 +38,7 @@ public class FHIRHandler extends IncomingMessageHandler {
 
         boolean patientAlreadyExists = false;
         int levelConfidence=0;
-        if(immunization != null){
-            String patientReportedAuthority = immunization.getIdentifierFirstRep().getValue();
-        }
 
-        //String patientReportedType = patientReported.getPatientReportedType();
         if (StringUtils.isEmpty(patientReportedExternalLink)) {
             throw new Exception("Patient external link must be indicated");
         }
@@ -56,7 +49,8 @@ public class FHIRHandler extends IncomingMessageHandler {
                     "from PatientReported where orgReported = ? and patientReportedExternalLink = ?");
             query.setParameter(0, orgAccess.getOrg());
             query.setParameter(1, patientReportedExternalLink);
-            List<PatientReported> patientReportedList = query.list();
+            @SuppressWarnings("unchecked")
+			List<PatientReported> patientReportedList = query.list();
             if (patientReportedList.size() > 0) {
             	System.err.println("patient already exists");
             	//get patient master and reported
@@ -136,7 +130,8 @@ public class FHIRHandler extends IncomingMessageHandler {
 		    "from VaccinationReported where patientReported = ? and vaccinationReportedExternalLink = ?");
 	    	query.setParameter(0, patientReported);
 	   		query.setParameter(1, immunization.getId());
-	    	List<VaccinationReported> vaccinationReportedList = query.list();
+	    	@SuppressWarnings("unchecked")
+			List<VaccinationReported> vaccinationReportedList = query.list();
 	    	if (vaccinationReportedList.size() > 0) { // if external link found
 				System.out.println("Immunization already exists");
 				vaccinationMaster = vaccinationReportedList.get(0).getVaccination();
@@ -163,7 +158,8 @@ public class FHIRHandler extends IncomingMessageHandler {
 		    "from OrgLocation where orgMaster = :orgMaster and orgFacilityCode = :orgFacilityCode");
 	    query.setParameter("orgMaster", orgAccess.getOrg());
 	    query.setParameter("orgFacilityCode", administeredAtLocation);
-	    List<OrgLocation> orgMasterList = query.list();
+	    @SuppressWarnings("unchecked")
+		List<OrgLocation> orgMasterList = query.list();
 	    OrgLocation orgLocation = null;
 	    if (orgMasterList.size() > 0) {
 			orgLocation = orgMasterList.get(0);
@@ -199,7 +195,8 @@ public class FHIRHandler extends IncomingMessageHandler {
         Query query = dataSession.createQuery(
                 "from  VaccinationReported where vaccinationReportedExternalLink = ?");
         query.setParameter(0, id);
-        List<VaccinationReported> vaccinationReportedList = query.list();
+        @SuppressWarnings("unchecked")
+		List<VaccinationReported> vaccinationReportedList = query.list();
         if (vaccinationReportedList.size() > 0) {
             vr = vaccinationReportedList.get(0);
             vm =vr.getVaccination();

@@ -236,7 +236,8 @@ public class PatientHandler {
    * @param patient the patient
    * @return a list of PatientMaster who match the patient, null if none has been found
    */
-  public static List<PatientMaster> findPossibleMatch(Session dataSession, Patient patient) {
+  @SuppressWarnings("unchecked")
+public static List<PatientMaster> findPossibleMatch(Session dataSession, Patient patient) {
     List<PatientMaster> matches;
     Query query = dataSession
         .createQuery("from PatientMaster where patientNameLast = ? and patientNameFirst= ? ");
@@ -256,7 +257,8 @@ public class PatientHandler {
    * @param patient the patient
    * @return a list of PatientMaster who match the patient, null if none has been found
    */
-  public static List<PatientMaster> findMatch(Session dataSession, Patient patient) {
+  @SuppressWarnings("unchecked")
+public static List<PatientMaster> findMatch(Session dataSession, Patient patient) {
     List<PatientMaster> matches;
     Query queryBigMatch = dataSession.createQuery(
         "from PatientMaster where patientNameLast = ? and patientNameFirst= ? and patientBirthDate=?");

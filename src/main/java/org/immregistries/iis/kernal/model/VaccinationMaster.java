@@ -7,6 +7,8 @@ import java.util.Date;
  * Created by Eric on 12/20/17.
  */
 public class VaccinationMaster implements Serializable {
+  private static final long serialVersionUID = 1L;
+
   private int vaccinationId = 0;
   private PatientMaster patient = null;
   private Date administeredDate = null;

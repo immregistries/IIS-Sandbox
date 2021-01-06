@@ -58,7 +58,8 @@ public class RestfulMedicationAdministrationProvider implements IResourceProvide
             .createQuery("from VaccinationReported where vaccinationReportedExternalLink= ?");
         //query.setParameter(0, orgAccess.getOrg());
         query.setParameter(0, id);
-        List<VaccinationReported> vaccinationReportedList = query.list();
+        @SuppressWarnings("unchecked")
+		List<VaccinationReported> vaccinationReportedList = query.list();
         if (vaccinationReportedList.size() > 0) {
           vaccinationMaster = vaccinationReportedList.get(0).getVaccination();
         }
@@ -73,7 +74,8 @@ public class RestfulMedicationAdministrationProvider implements IResourceProvide
         {
           Query query = dataSession.createQuery("from VaccinationReported where vaccination= ?");
           query.setParameter(0, vaccinationMaster);
-          List<VaccinationReported> vaccinationReportedList = query.list();
+          @SuppressWarnings("unchecked")
+		List<VaccinationReported> vaccinationReportedList = query.list();
           if (vaccinationReportedList.size() > 0) {
             Extension links = new Extension("#links");
             Extension link;

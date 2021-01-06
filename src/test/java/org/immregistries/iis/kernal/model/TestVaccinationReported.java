@@ -14,7 +14,8 @@ public class TestVaccinationReported extends TestCase {
     Session dataSession = factory.openSession();
 
     Query query = dataSession.createQuery("from VaccinationReported");
-    List<VaccinationReported> vaccinationReportedList = query.list();
+    @SuppressWarnings("unchecked")
+	List<VaccinationReported> vaccinationReportedList = query.list();
     for (VaccinationReported vaccinationReported : vaccinationReportedList) {
       System.out.println("--> vaccinationReported.getVaccineCvxCode() = "
           + vaccinationReported.getVaccineCvxCode());
