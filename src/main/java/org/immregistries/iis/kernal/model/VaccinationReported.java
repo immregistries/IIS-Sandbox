@@ -2,15 +2,14 @@ package org.immregistries.iis.kernal.model;
 
 import java.io.Serializable;
 import java.util.Date;
-import org.hl7.fhir.r4.model.HumanName;
-import org.hl7.fhir.r4.model.Immunization;
-import org.hl7.fhir.r4.model.Patient;
 import org.immregistries.vfa.connect.model.TestEvent;
 
 /**
  * Created by Eric on 12/20/17.
  */
 public class VaccinationReported implements Serializable {
+  private static final long serialVersionUID = 1L;
+	
   private int vaccinationReportedId = 0;
   private PatientReported patientReported = null;
   private String vaccinationReportedExternalLink = "";

@@ -142,14 +142,13 @@ public class RestfuImmunizationProvider implements IResourceProvider {
       Session dataSession, OrgAccess orgAccess) {
     Immunization immunization = null;
     VaccinationReported vaccinationReported = null;
-    PatientReported patientReported = null;
-    OrgLocation orgLocation = null;
 
     {
       Query query = dataSession
           .createQuery("from VaccinationReported where vaccinationReportedExternalLink = ?");
       query.setParameter(0, id);
-      List<VaccinationReported> vaccinationReportedList = query.list();
+      @SuppressWarnings("unchecked")
+	List<VaccinationReported> vaccinationReportedList = query.list();
       if (vaccinationReportedList.size() > 0) {
         vaccinationReported = vaccinationReportedList.get(0);
         immunization = ImmunizationHandler.getImmunization(theRequestDetails, vaccinationReported);

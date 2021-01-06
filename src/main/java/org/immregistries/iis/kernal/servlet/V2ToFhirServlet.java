@@ -349,7 +349,8 @@ public class V2ToFhirServlet extends HttpServlet {
     query.setParameter(0, userId);
     query.setParameter(1, password);
     query.setParameter(2, orgMaster);
-    List<OrgAccess> orgAccessList = query.list();
+    @SuppressWarnings("unchecked")
+	List<OrgAccess> orgAccessList = query.list();
     if (orgAccessList.size() != 0) {
       orgAccess = orgAccessList.get(0);
     }

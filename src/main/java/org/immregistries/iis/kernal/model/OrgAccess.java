@@ -6,6 +6,9 @@ import java.io.Serializable;
  * Created by Eric on 12/20/17.
  */
 public class OrgAccess implements Serializable {
+
+  private static final long serialVersionUID = 1L;
+
   private int orgAccessId = 0;
   private OrgMaster org = null;
   private String accessName = "";

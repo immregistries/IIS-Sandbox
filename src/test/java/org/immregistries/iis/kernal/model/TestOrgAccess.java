@@ -18,7 +18,8 @@ public class TestOrgAccess extends TestCase {
         Session dataSession = factory.openSession();
 
         Query query = dataSession.createQuery("from OrgAccess");
-        List<OrgAccess> orgAccessList = query.list();
+        @SuppressWarnings("unchecked")
+		List<OrgAccess> orgAccessList = query.list();
         for (OrgAccess orgAccess : orgAccessList) {
             System.out
                     .println("--> orgAccess.getAccessName() = " + orgAccess.getAccessName());

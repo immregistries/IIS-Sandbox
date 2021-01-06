@@ -45,7 +45,8 @@ public class CovidServlet extends HttpServlet {
     doGet(req, resp);
   }
 
-  @Override
+  @SuppressWarnings("unchecked")
+@Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
 
@@ -65,7 +66,6 @@ public class CovidServlet extends HttpServlet {
       SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
       String action = req.getParameter(PARAM_ACTION);
       String messageError = null;
-      String messageConfirmation = null;
       String dateStartString = req.getParameter(PARAM_DATE_START);
       String dateEndString = req.getParameter(PARAM_DATE_END);
       HomeServlet.doHeader(out, session);
@@ -237,7 +237,8 @@ public class CovidServlet extends HttpServlet {
               + "and patientReported = :patientReported and completionStatus = 'CP'");
       query.setParameter("administeredDate", vaccinationReported.getAdministeredDate());
       query.setParameter("patientReported", vaccinationReported.getPatientReported());
-      List<VaccinationReported> list = query.list();
+      @SuppressWarnings("unchecked")
+	List<VaccinationReported> list = query.list();
       doseNumber = list.size() + 1;
     }
     return doseNumber;
@@ -528,7 +529,8 @@ public class CovidServlet extends HttpServlet {
     query.setParameter(0, userId);
     query.setParameter(1, password);
     query.setParameter(2, orgMaster);
-    List<OrgAccess> orgAccessList = query.list();
+    @SuppressWarnings("unchecked")
+	List<OrgAccess> orgAccessList = query.list();
     if (orgAccessList.size() != 0) {
       orgAccess = orgAccessList.get(0);
     }

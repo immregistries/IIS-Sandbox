@@ -6,6 +6,9 @@ import java.io.Serializable;
  * Created by Eric on 12/20/17.
  */
 public class PatientMatch implements Serializable {
+
+  private static final long serialVersionUID = 1L;
+  
   private int matchId = 0;
   private PatientReported reportedPatientA = null;
   private PatientReported reportedPatientB = null;

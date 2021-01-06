@@ -18,6 +18,7 @@ import org.immregistries.vaccination_deduplication.VaccinationDeduplication;
 import org.immregistries.vaccination_deduplication.reference.ImmunizationSource;
 
 public class VacDedupServlet extends HttpServlet {
+  private static final long serialVersionUID = 1L;
 
   public static final String PARAM_ACTION = "action";
   public static final String PARAM_CVX = "cvx";

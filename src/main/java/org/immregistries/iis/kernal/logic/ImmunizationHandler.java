@@ -5,10 +5,8 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hl7.fhir.r4.model.*;
 import org.immregistries.iis.kernal.model.*;
-import org.immregistries.vaccination_deduplication.computation_classes.Comparer;
 import org.immregistries.vaccination_deduplication.computation_classes.Deterministic;
 import org.immregistries.vaccination_deduplication.reference.ComparisonResult;
-import org.immregistries.vaccination_deduplication.reference.DeterministicResult;
 import org.immregistries.vaccination_deduplication.reference.ImmunizationSource;
 
 import java.math.BigDecimal;
@@ -143,7 +141,8 @@ public class ImmunizationHandler {
       Query query = dataSession.createQuery(
               "from VaccinationReported where patientReported = ?");
       query.setParameter(0, patientReported);
-      List<VaccinationReported> vaccinationReportedList = query.list();
+      @SuppressWarnings("unchecked")
+	List<VaccinationReported> vaccinationReportedList = query.list();
 
       for (VaccinationReported vaccinationReported : vaccinationReportedList){
         i2 = new org.immregistries.vaccination_deduplication.Immunization();

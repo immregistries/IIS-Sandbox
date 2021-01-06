@@ -69,7 +69,8 @@ public class RestfulPersonResourceProvider implements IResourceProvider {
     Query query =
         dataSession.createQuery("from PatientReported where patientReportedExternalLink = ?");
     query.setParameter(0, idPart);
-    List<PatientReported> patientReportedList = query.list();
+    @SuppressWarnings("unchecked")
+	List<PatientReported> patientReportedList = query.list();
 
     if (patientReportedList.size() > 0) {
       patientReported = patientReportedList.get(0);
@@ -80,7 +81,8 @@ public class RestfulPersonResourceProvider implements IResourceProvider {
     int linkId = patientReported.getPatientReportedId();
     Query queryLink = dataSession.createQuery("from PatientLink where patientMaster.id = ?");
     queryLink.setParameter(0, linkId);
-    List<PatientLink> patientLinkList = queryLink.list();
+    @SuppressWarnings("unchecked")
+	List<PatientLink> patientLinkList = queryLink.list();
 
     if (patientLinkList.size() > 0) {
       for (PatientLink link : patientLinkList) {
@@ -155,7 +157,8 @@ public class RestfulPersonResourceProvider implements IResourceProvider {
           "from  PatientReported where orgReported = ? and patientReportedExternalLink = ?");
       query.setParameter(0, orgAccess.getOrg());
       query.setParameter(1, idPart);
-      List<PatientReported> patientReportedList = query.list();
+      @SuppressWarnings("unchecked")
+	List<PatientReported> patientReportedList = query.list();
       System.err.println(orgAccess.getOrg());
       System.err.println(idPart);
       System.err.println(patientReportedList.size());
@@ -172,7 +175,8 @@ public class RestfulPersonResourceProvider implements IResourceProvider {
           "from  PatientReported where orgReported = ? and patientReportedExternalLink = ?");
       query.setParameter(0, orgAccess.getOrg());
       query.setParameter(1, idPart);
-      List<PatientReported> patientReportedList = query.list();
+      @SuppressWarnings("unchecked")
+	List<PatientReported> patientReportedList = query.list();
       System.err.println(orgAccess.getOrg());
       System.err.println(idPart);
       System.err.println(patientReportedList.size());
@@ -190,7 +194,8 @@ public class RestfulPersonResourceProvider implements IResourceProvider {
           dataSession.createQuery("from  PatientLink where patientMaster.patientId = ?");
       queryLink.setParameter(0, patientMaster.getPatientId());
 
-      List<PatientLink> patientLinkList = queryLink.list();
+      @SuppressWarnings("unchecked")
+	List<PatientLink> patientLinkList = queryLink.list();
 
       if (patientLinkList.size() > 0) {
 

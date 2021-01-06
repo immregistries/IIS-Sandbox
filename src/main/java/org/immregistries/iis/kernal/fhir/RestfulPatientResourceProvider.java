@@ -80,8 +80,6 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
   @Create
   public MethodOutcome createPatient(RequestDetails theRequestDetails,
       @ResourceParam Patient thePatient) {
-    PatientReported patientReported = null;
-    List<Patient> matches = new ArrayList<Patient>();
     if (thePatient.getIdentifierFirstRep().isEmpty()) {
       throw new UnprocessableEntityException("No identifier supplied");
     }
@@ -91,7 +89,7 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
       orgAccess = Authentication.authenticateOrgAccess(theRequestDetails, dataSession);
       FHIRHandler fhirHandler = new FHIRHandler(dataSession);
 
-      patientReported = fhirHandler.FIHR_EventPatientReported(orgAccess, thePatient, null);
+      fhirHandler.FIHR_EventPatientReported(orgAccess, thePatient, null);
 
     } catch (Exception e) {
       e.printStackTrace();
@@ -114,12 +112,11 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
   @Update
   public MethodOutcome updatePatient(RequestDetails theRequestDetails, @IdParam IdType theId,
       @ResourceParam Patient thePatient) {
-    PatientReported patientReported = null;
     Session dataSession = getDataSession();
     try {
       orgAccess = Authentication.authenticateOrgAccess(theRequestDetails, dataSession);
       FHIRHandler fhirHandler = new FHIRHandler(dataSession);
-      patientReported = fhirHandler.FIHR_EventPatientReported(orgAccess, thePatient, null);
+      fhirHandler.FIHR_EventPatientReported(orgAccess, thePatient, null);
     } catch (Exception e) {
       e.printStackTrace();
     } finally {
@@ -182,7 +179,8 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
         query.setParameter(1, idInt);
       }
 
-      List<PatientReported> patientReportedList = query.list();
+      @SuppressWarnings("unchecked")
+	List<PatientReported> patientReportedList = query.list();
       if (patientReportedList.size() > 0) {
         patientReported = patientReportedList.get(0);
         patient = PatientHandler.getPatient(null, null, patientReported);
@@ -190,7 +188,8 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
         int linkId = patientReported.getPatientReportedId();
         Query queryLink = dataSession.createQuery("from PatientLink where patientReported.id = ?");
         queryLink.setParameter(0, linkId);
-        List<PatientLink> patientLinkList = queryLink.list();
+        @SuppressWarnings("unchecked")
+		List<PatientLink> patientLinkList = queryLink.list();
 
         if (patientLinkList.size() > 0) {
           for (PatientLink link : patientLinkList) {
@@ -216,7 +215,6 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
   //We can delete only Patient with no link
   public void deletePatientById(String id, Session dataSession, OrgAccess orgAccess) {
     PatientReported patientReported = null;
-    PatientMaster patientMaster = null;
     PatientLink patientLink = null;
 
     {
@@ -224,12 +222,10 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
           "from  PatientReported where orgReported = ? and patientReportedExternalLink = ?");
       query.setParameter(0, orgAccess.getOrg());
       query.setParameter(1, id);
-      List<PatientReported> patientReportedList = query.list();
+      @SuppressWarnings("unchecked")
+	List<PatientReported> patientReportedList = query.list();
       if (patientReportedList.size() > 0) {
         patientReported = patientReportedList.get(0);
-
-        patientMaster = patientReported.getPatient();
-        //System.err.println("Lid du patient Master est  " + patientMaster.getPatientExternalLink());
 
       }
 
@@ -238,7 +234,8 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
       Query queryLink =
           dataSession.createQuery("from  PatientLink where patientReported.patientReportedId=?");
       queryLink.setParameter(0, patientReported.getPatientReportedId());
-      List<PatientLink> patientLinkList = queryLink.list();
+      @SuppressWarnings("unchecked")
+	List<PatientLink> patientLinkList = queryLink.list();
       if (patientLinkList.size() > 0) {
         patientLink = patientLinkList.get(0);
       }

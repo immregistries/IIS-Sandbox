@@ -3,6 +3,8 @@ package org.immregistries.iis.kernal.model;
 import java.io.Serializable;
 
 public class Person implements Serializable {
+  private static final long serialVersionUID = 1L;
+	
   private int personId = 0;
   private String personExternalLink = "";
   private OrgMaster orgMaster = null;

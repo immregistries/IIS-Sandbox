@@ -3,6 +3,9 @@ package org.immregistries.iis.kernal.model;
 import java.io.Serializable;
 
 public class OrgLocation implements Serializable {
+	
+  private static final long serialVersionUID = 1L;
+  
   private int orgLocationId = 0;
   private String orgFacilityCode = "";
   private OrgMaster orgMaster = null;

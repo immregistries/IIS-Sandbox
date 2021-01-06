@@ -14,7 +14,8 @@ public class TestPatientMaster extends TestCase {
     Session dataSession = factory.openSession();
 
     Query query = dataSession.createQuery("from PatientMaster");
-    List<PatientMaster> patientMasterList = query.list();
+    @SuppressWarnings("unchecked")
+	List<PatientMaster> patientMasterList = query.list();
     for (PatientMaster patientMaster : patientMasterList) {
       System.out
           .println("--> patientMaster.getPatientNameLast() = " + patientMaster.getPatientNameLast());
