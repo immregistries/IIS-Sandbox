@@ -2,6 +2,7 @@ package org.immregistries.iis.kernal.servlet;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.URLEncoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -56,8 +57,8 @@ public class FhirTestServlet extends HttpServlet {
   private static final String PARAM_FORMAT = "format";
   private static final String PARAM_NEW = "new";
 
-  private static final String FORMAT_JSON = "json";
-  private static final String FORMAT_XML = "xml";
+  private static final String FORMAT_JSON = "JSON";
+  private static final String FORMAT_XML = "XML";
 
   private static final String BASE_URL = "https://florence.immregistries.org/iis-sandbox/fhir";
 
@@ -79,8 +80,6 @@ public class FhirTestServlet extends HttpServlet {
     Session dataSession = PopServlet.getDataSession();
     HomeServlet.doHeader(out, session);
     try {
-
-
 
       try {
         CodeMap codeMap = CodeMapManager.getCodeMap();
@@ -116,7 +115,7 @@ public class FhirTestServlet extends HttpServlet {
             message = testCaseMessage.getMessageText();
           }
           HL7Reader reader = new HL7Reader(message);
-          if (reader.advanceToSegment("PID")) {
+          if (reader.advanceToSegment("PID", "ORC")) {
             pr.setPatientReportedExternalLink(reader.getValue(3, 1));
             pm.setPatientExternalLink(reader.getValue(3, 1));
             pr.setPatientNameLast(reader.getValue(5, 1));
@@ -141,10 +140,54 @@ public class FhirTestServlet extends HttpServlet {
           while (reader.advanceToSegment("ORC")) {
             String vaccinationId = reader.getValue(3);
             if (reader.advanceToSegment("RXA")) {
-              VaccinationReported vaccinationReported = new VaccinationReported();
-              vaccinationReportedList.add(vaccinationReported);
-              vaccinationReported.setVaccinationReportedExternalLink(vaccinationId);
-
+              VaccinationReported vr = new VaccinationReported();
+              vaccinationReportedList.add(vr);
+              vr.setVaccinationReportedExternalLink(vaccinationId);
+              vr.setAdministeredDate(getDateSafe(reader.getValue(3)));
+              {
+                String vaccineCode = reader.getValue(5, 1);
+                String vaccineCvxCode = "";
+                String vaccineNdcCode = "";
+                String vaccineCodeType = reader.getValue(5, 3);
+                if (vaccineCodeType.equals("NDC")) {
+                  vaccineNdcCode = vaccineCode;
+                } else if (vaccineCodeType.equals("CPT") || vaccineCodeType.equals("C4")
+                    || vaccineCodeType.equals("C5")) {
+                  // ignore
+                } else {
+                  vaccineCvxCode = vaccineCode;
+                }
+                {
+                  String altVaccineCode = reader.getValue(5, 4);
+                  String altVaccineCodeType = reader.getValue(5, 6);
+                  if (!altVaccineCode.equals("")) {
+                    if (altVaccineCodeType.equals("NDC")) {
+                      if (vaccineNdcCode.equals("")) {
+                        vaccineNdcCode = altVaccineCode;
+                      }
+                    } else if (altVaccineCodeType.equals("CPT") || altVaccineCodeType.equals("C4")
+                        || altVaccineCodeType.equals("C5")) {
+                      // ignore
+                    } else {
+                      if (vaccineCvxCode.equals("")) {
+                        vaccineCvxCode = altVaccineCode;
+                      }
+                    }
+                  }
+                }
+                vr.setVaccineCvxCode(vaccineCvxCode);
+                vr.setVaccineNdcCode(vaccineNdcCode);
+              }
+              {
+                String admininisteredAmount = reader.getValue(6);
+                if (!admininisteredAmount.equals("999")) {
+                  vr.setAdministeredAmount(admininisteredAmount);
+                }
+              }
+              vr.setInformationSource(reader.getValue(9));
+              vr.setLotnumber(reader.getValue(15));
+              vr.setVaccineMvxCode(reader.getValue(17));
+              vr.setCompletionStatus(reader.getValue(20));
             }
           }
         }
@@ -152,96 +195,139 @@ public class FhirTestServlet extends HttpServlet {
         Patient patient = new Patient();
         createPatientResource(pr, patient);
 
-
-
         String baseUrl = req.getParameter(BASE_URL);
         if (baseUrl == null) {
           String tenantId = "tenantId";
           if (orgAccess != null) {
             tenantId = orgAccess.getOrg().getOrganizationName();
           }
+          tenantId = URLEncoder.encode(tenantId, "UTF-8");
           baseUrl = BASE_URL + "/" + tenantId + "/";
         }
 
-        out.println("<h3>Multitenancy</h3>");
+        out.println("<h2>FHIR Test Endpoint</h2>");
+        out.println("<p>" + baseUrl + "</p>");
+        if (orgAccess == null) {
+          out.println(
+              "    <div class=\"w3-panel w3-yellow\"><p class=\"w3-left-align\">You will need to place the IIS Sandbox Facility Id where the tenantId is indicated. </p></div>");
+        }
         out.println(
             "<p>The IIS Sandbox supports multitenancy for FHIR. Which means that resources submitted to the sandbox will be placed in dedicated buckets of data that are separated from data by different tenants (facilities.) This is different than IIS which will merge data from all submitters. The IIS Sandbox keeps submitted data separate to support testing from multiple agencies. </p>");
-        out.println("<a href=\"" + baseUrl + "\">" + baseUrl + "</a>");
-        String patientUrl = baseUrl + "Patient/";
-        String patientUrlWithId = patientUrl + pr.getPatientReportedExternalLink();
-        out.println("<h3>Patient Resource</h3>");
-        out.println("<table>");
-        out.println("  <tr>");
-        out.println("    <th>Action</th>");
-        out.println("    <th>Method</th>");
-        out.println("    <th>URL</th>");
-        out.println("  </tr>");
-        out.println("  <tr>");
-        out.println("    <td>Create</td>");
-        out.println("    <td>POST</td>");
-        out.println("    <td><a href=\"" + patientUrl + "\">" + patientUrl + "</a></td>");
-        out.println("  </tr>");
-        out.println("  <tr>");
-        out.println("    <td>Read</td>");
-        out.println("    <td>GET</td>");
-        out.println(
-            "    <td><a href=\"" + patientUrlWithId + "\">" + patientUrlWithId + "</a></td>");
-        out.println("  </tr>");
-        out.println("  <tr>");
-        out.println("    <td>Update</td>");
-        out.println("    <td>PUT</td>");
-        out.println(
-            "    <td><a href=\"" + patientUrlWithId + "\">" + patientUrlWithId + "</a></td>");
-        out.println("  </tr>");
-        out.println("  <tr>");
-        out.println("    <td>Delete</td>");
-        out.println("    <td>DELETE</td>");
-        out.println(
-            "    <td><a href=\"" + patientUrlWithId + "\">" + patientUrlWithId + "</a></td>");
-        out.println("  </tr>");
-        out.println("</table>");
-        out.println("<textarea cols=\"80\" rows=\"30\">" + parser.encodeResourceToString(patient)
-            + "</textarea>");
+        {
+          String patientUrl = baseUrl + "Patient/";
+          String patientUrlWithId = patientUrl + pr.getPatientReportedExternalLink();
+          out.println("<h3>Patient Resource</h3>");
+          out.println(
+              "<table class=\"w3-table w3-bordered w3-striped w3-border test w3-hoverable\">");
+          out.println("  <tr class=\"w3-green\">");
+          out.println("    <th>Action</th>");
+          out.println("    <th>Method</th>");
+          out.println("    <th>URL</th>");
+          out.println("  </tr>");
+          out.println("  <tbody>");
+          out.println("  <tr>");
+          out.println("    <td>Create</td>");
+          out.println("    <td>POST</td>");
+          out.println("    <td><a href=\"" + patientUrl + "\">" + patientUrl + "</a></td>");
+          out.println("  </tr>");
+          out.println("  <tr>");
+          out.println("    <td>Read</td>");
+          out.println("    <td>GET</td>");
+          out.println(
+              "    <td><a href=\"" + patientUrlWithId + "\">" + patientUrlWithId + "</a></td>");
+          out.println("  </tr>");
+          out.println("  <tr>");
+          out.println("    <td>Update</td>");
+          out.println("    <td>PUT</td>");
+          out.println(
+              "    <td><a href=\"" + patientUrlWithId + "\">" + patientUrlWithId + "</a></td>");
+          out.println("  </tr>");
+          out.println("  <tr>");
+          out.println("    <td>Delete</td>");
+          out.println("    <td>DELETE</td>");
+          out.println(
+              "    <td><a href=\"" + patientUrlWithId + "\">" + patientUrlWithId + "</a></td>");
+          out.println("  </tr>");
+          out.println("  </tbody>");
+          out.println("</table>");
+          out.println("<h4>" + format + "</h4>");
+          out.println("<textarea cols=\"80\" rows=\"15\">" + parser.encodeResourceToString(patient)
+              + "</textarea>");
+        }
 
         int count = 0;
-        for (VaccinationReported vaccinationReported : vaccinationReportedList) {
-          count++;
+        for (VaccinationReported vr : vaccinationReportedList) {
           Immunization immunization = new Immunization();
-          Code cvxCode = codeMap.getCodeForCodeset(CodesetType.VACCINATION_CVX_CODE,
-              vaccinationReported.getVaccineCvxCode());
+          Code cvxCode =
+              codeMap.getCodeForCodeset(CodesetType.VACCINATION_CVX_CODE, vr.getVaccineCvxCode());
           if (cvxCode == null) {
             continue;
           }
 
-          if ("D".equals(vaccinationReported.getActionCode())) {
+          if ("D".equals(vr.getActionCode())) {
             continue;
           }
-          createImmunizationResource(vaccinationReported, immunization, cvxCode, codeMap);
+          count++;
+          createImmunizationResource(vr, immunization, cvxCode, codeMap);
+          String immUrl = baseUrl + "Immunization/";
+          String immUrlWithId = immUrl + vr.getVaccinationReportedExternalLink();
           out.println("<h3>Immunization #" + count + "</h3>");
-          out.println("<pre>" + parser.encodeResourceToString(immunization) + "</pre>");
+          out.println(
+              "<table class=\"w3-table w3-bordered w3-striped w3-border test w3-hoverable\">");
+          out.println("  <tr class=\"w3-green\">");
+          out.println("    <th>Action</th>");
+          out.println("    <th>Method</th>");
+          out.println("    <th>URL</th>");
+          out.println("  </tr>");
+          out.println("  <tbody>");
+          out.println("  <tr>");
+          out.println("    <td>Create</td>");
+          out.println("    <td>POST</td>");
+          out.println("    <td><a href=\"" + immUrl + "\">" + immUrl + "</a></td>");
+          out.println("  </tr>");
+          out.println("  <tr>");
+          out.println("    <td>Read</td>");
+          out.println("    <td>GET</td>");
+          out.println("    <td><a href=\"" + immUrlWithId + "\">" + immUrlWithId + "</a></td>");
+          out.println("  </tr>");
+          out.println("  <tr>");
+          out.println("    <td>Update</td>");
+          out.println("    <td>PUT</td>");
+          out.println("    <td><a href=\"" + immUrlWithId + "\">" + immUrlWithId + "</a></td>");
+          out.println("  </tr>");
+          out.println("  <tr>");
+          out.println("    <td>Delete</td>");
+          out.println("    <td>DELETE</td>");
+          out.println("    <td><a href=\"" + immUrlWithId + "\">" + immUrlWithId + "</a></td>");
+          out.println("  </tr>");
+          out.println("  </tbody>");
+          out.println("</table>");
+          out.println("<h4>" + format + "</h4>");
+          out.println("<textarea cols=\"80\" rows=\"15\">"
+              + parser.encodeResourceToString(immunization) + "</textarea>");
         }
 
-
-        out.println("<h1>Generate Examples</h1>");
-        out.println("<form action=\"fhirTest\" method=\"POST\" target=\"_blank\">");
+        out.println("<h2>Setup</h2>");
+        out.println("<form action=\"fhirTest\" method=\"POST\">");
         out.println("    <div class=\"w3-container w3-half w3-margin-top\">");
-        out.println("      <label>Message To Send</label>");
+        out.println("    <div class=\"w3-container w3-card-4\">");
+        out.println("      <label>VXU Message</label>");
         out.println("      <textarea class=\"w3-input\" name=\"" + PARAM_MESSAGE
             + "\" rows=\"15\" cols=\"160\">" + message + "</textarea></td>");
-        out.println("    <div class=\"w3-container w3-card-4\">");
+        out.println("      <label>Regenerate</label>");
+        out.println("      <input class=\"w3-input\" type=\"checkbox\" name=\"" + PARAM_NEW
+            + "\" value=\"True\"/>");
         out.println("      <label>Base URL</label>");
         out.println("      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_BASE_URL
             + "\" value=\"" + baseUrl + "\"/>");
-        out.println("      <label>Message Format</label>");
+        out.println("      <label>JSON</label>");
         out.println(
             "      <input class=\"w3-input\" type=\"radio\" name=\"" + PARAM_FORMAT + "\" value=\""
-                + FORMAT_JSON + "\"" + (format.equals(FORMAT_JSON) ? " selected" : "") + "/> JSON");
-        out.println("      XML <input class=\"w3-input\" type=\"radio\" name=\"" + PARAM_FORMAT
-            + "\" value=\"" + FORMAT_XML + "\"" + (format.equals(FORMAT_XML) ? " selected" : "")
-            + "/> XML");
-        out.println("      <label>Regenerate Example</label>");
-        out.println("      <input class=\"w3-input\" type=\"checkbox\" name=\"" + PARAM_NEW
-            + "\" value=\"True\"/>");
+                + FORMAT_JSON + "\"" + (format.equals(FORMAT_JSON) ? " checked" : "") + "/>");
+        out.println("      <label>XML</label>");
+        out.println(
+            "      <input class=\"w3-input\" type=\"radio\" name=\"" + PARAM_FORMAT + "\" value=\""
+                + FORMAT_XML + "\"" + (format.equals(FORMAT_XML) ? " checked" : "") + "/>");
         out.println("      <br/>");
         out.println(
             "      <input class=\"w3-button w3-section w3-teal w3-ripple\" type=\"submit\" name=\"sumbit\" value=\"Refresh\"/>");
@@ -254,8 +340,6 @@ public class FhirTestServlet extends HttpServlet {
         e.printStackTrace(out);
         out.println("</pre>");
       }
-
-
 
     } catch (Exception e) {
       System.err.println("Unable to render page: " + e.getMessage());
@@ -300,7 +384,6 @@ public class FhirTestServlet extends HttpServlet {
   private void createImmunizationResource(VaccinationReported vaccinationReported,
       Immunization immunization, Code cvxCode, CodeMap codeMap) {
 
-
     {
       DateTimeType occurance = new DateTimeType(vaccinationReported.getAdministeredDate());
       immunization.setOccurrence(occurance);
@@ -327,7 +410,7 @@ public class FhirTestServlet extends HttpServlet {
           doseQuantity.setValue(d);
           immunization.setDoseQuantity(doseQuantity);
         } catch (NumberFormatException nfe) {
-          //ignore
+          // ignore
         }
       }
     }
@@ -352,7 +435,6 @@ public class FhirTestServlet extends HttpServlet {
         immunization.setExpirationDate(expirationDate);
       }
     }
-
 
     {
       CodeableConcept mvxCoding = createCodeableConcept(vaccinationReported.getVaccineMvxCode(),
@@ -404,7 +486,8 @@ public class FhirTestServlet extends HttpServlet {
         p.setGender(administrativeGender);
       }
     }
-    // TODO Race - not supported by base specification, probably have to use extensions
+    // TODO Race - not supported by base specification, probably have to use
+    // extensions
     if (StringUtils.isNotEmpty(pr.getPatientAddressLine1())
         || StringUtils.isNotEmpty(pr.getPatientAddressZip())) {
       Address address = p.addAddress();
