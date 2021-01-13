@@ -23,11 +23,6 @@ public class PatientHandlerTest extends TestCase {
     p.addAddress().addLine("12 rue chicago");
     patientReported.setPatient(patientMaster);
 
-
-
-
-   
-
   }
 
   public void tearDown() throws Exception {
@@ -54,8 +49,10 @@ public class PatientHandlerTest extends TestCase {
   }
 
   public void testFindPossibleMatch() {
+    //need database
   }
 
   public void testFindMatch() {
+    // need database
   }
 }
