@@ -148,6 +148,19 @@
             </use-date>
         </code>
         <code>
+            <value>AstraZeneca COVID-19 Vaccine</value>
+            <label>COVID-19 vaccine, vector-nr, rS-ChAdOx1, PF, 0.5 mL</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">210</link-to>
+            </reference>
+            <use-date>
+                <not-before>20201209</not-before>
+            </use-date>
+        </code>
+        <code>
             <value>Moderna COVID-19 Vaccine</value>
             <label>COVID-19, mRNA, LNP-S, PF, 100 mcg/0.5 mL dose</label>
             <code-status>
@@ -8578,6 +8591,32 @@
             </use-date>
         </code>
         <code>
+            <value>207</value>
+            <label>COVID-19 Moderna Vaccine EUA Recipient-Caregiver Fact Sheet</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300034911201201</link-to>
+            </reference>
+            <use-date>
+                <not-before>20201201</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>208</value>
+            <label>COVID-19 Pfizer BioNTech Vaccine EUA Recipient-Caregiver Fact Sheet</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300033211201201</link-to>
+            </reference>
+            <use-date>
+                <not-before>20201201</not-before>
+            </use-date>
+        </code>
+        <code>
             <value>20</value>
             <label>Diphtheria/Tetanus/Pertussis (DTaP) VIS</label>
             <code-status>
@@ -11706,6 +11745,7 @@
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">42515-0002-01</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">62195-0051-10</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">42515-0002-01</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">62195-0051-01</link-to>
             </reference>
             <use-date>
                 <not-before>20160719</not-before>
@@ -14831,6 +14871,7 @@
                 <link-to codeset="VACCINATION_CVX_CODE">213</link-to>
                 <link-to codeset="VACCINATION_CVX_CODE">207</link-to>
                 <link-to codeset="VACCINATION_CVX_CODE">208</link-to>
+                <link-to codeset="VACCINATION_CVX_CODE">210</link-to>
             </reference>
         </code>
         <code>
@@ -16702,6 +16743,24 @@
             </use-age>
             <concept-type>non vaccine</concept-type>
             <test-age>2 months</test-age>
+        </code>
+        <code>
+            <value>210</value>
+            <label>COVID-19 vaccine, vector-nr, rS-ChAdOx1, PF, 0.5 mL</label>
+            <description>SARS-COV-2 (COVID-19) vaccine, vector non-replicating, recombinant spike protein-ChAdOx1, preservative free, 0.5 mL Notes: Potential EUA, 2-dose vaccine</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINE_GROUP">COVID-19</link-to>
+                <link-to codeset="VACCINATION_TRADE_NAME">AstraZeneca COVID-19 Vaccine</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">00310-1222-10</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">00310-1222-15</link-to>
+            </reference>
+            <use-date>
+                <not-before>20201222</not-before>
+            </use-date>
+            <concept-type>vaccine</concept-type>
         </code>
         <code>
             <value>207</value>
@@ -19151,6 +19210,7 @@
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">42515-0002-01</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">62195-0051-10</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">42515-0002-01</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">62195-0051-01</link-to>
             </reference>
             <use-date>
                 <not-before>20100528</not-before>
@@ -22221,6 +22281,32 @@
             </use-date>
         </code>
         <code>
+            <value>253088698300034911201201</value>
+            <label>COVID-19 Moderna Vaccine EUA Recipient-Caregiver Fact Sheet</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_VIS_VACCINES">207</link-to>
+            </reference>
+            <use-date>
+                <not-before>20201201</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>253088698300033211201201</value>
+            <label>COVID-19 Pfizer BioNTech Vaccine EUA Recipient-Caregiver Fact Sheet</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_VIS_VACCINES">208</link-to>
+            </reference>
+            <use-date>
+                <not-before>20201201</not-before>
+            </use-date>
+        </code>
+        <code>
             <value>253088698300003511070517</value>
             <label>Diphtheria/Tetanus/Pertussis (DTaP) VIS</label>
             <code-status>
@@ -25140,6 +25226,14 @@
             <use-date/>
         </code>
         <code>
+            <value>91302</value>
+            <label>Severe acute respiratory syndrome coronavirus 2 (SARS-CoV-2) (coronavirus disease [COVID-19]) vaccine, DNA, spike protein, chimpanzee adenovirus Oxford 1 (ChAdOx1) vector, preservative free, 5x1010 viral particles/0.5mL dosage, for intramuscular use</label>
+            <description>COVID-19 Vaccine - Potential EUA authorization</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+        </code>
+        <code>
             <value>91301</value>
             <label>Severe acute respiratory syndrome coronavirus 2 (SARS-CoV-2) (Coronavirus disease [COVID-19]) vaccine, mRNA-LNP, spike protein, preservative free, 100 mcg/0.5mL dosage, for intramuscular use</label>
             <description>COVID-19 Vaccine - Potential EUA authorization</description>
@@ -26813,6 +26907,47 @@
             </code-status>
         </code>
         <code>
+            <value>00310-1222-10</value>
+            <label>ASTRAZENECA COVID-19 VACCINE</label>
+            <description>AstraZeneca Pharmaceuticals LP - SARS-COV-2 (COVID-19) vaccine, vector non-replicating, recombinant spike protein-ChAdOx1, preservative free, 0.5 mL</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">210</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">00310-1222-15</link-to>
+            </reference>
+            <use-date>
+                <not-before>20201222</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>0310-1222-10</value>
+            <label>ASTRAZENECA COVID-19 VACCINE</label>
+            <description>AstraZeneca Pharmaceuticals LP - SARS-COV-2 (COVID-19) vaccine, vector non-replicating, recombinant spike protein-ChAdOx1, preservative free, 0.5 mL</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>00310-1222-10</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20210104</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>00310122210</value>
+            <label>ASTRAZENECA COVID-19 VACCINE</label>
+            <description>AstraZeneca Pharmaceuticals LP - SARS-COV-2 (COVID-19) vaccine, vector non-replicating, recombinant spike protein-ChAdOx1, preservative free, 0.5 mL</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>00310-1222-10</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20210104</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
             <value>00052-0603-01</value>
             <label>BCG VACCINE</label>
             <description>Organon Pharmaceuticals USA - BACILLUS CALMETTE-GUERIN SUBSTRAIN TICE LIVE ANTIGEN</description>
@@ -26869,6 +27004,7 @@
             </reference>
             <use-date>
                 <not-before>20161201</not-before>
+                <not-after>20201231</not-after>
             </use-date>
         </code>
         <code>
@@ -34792,6 +34928,7 @@
             </reference>
             <use-date>
                 <not-before>20190930</not-before>
+                <not-after>20201231</not-after>
             </use-date>
         </code>
         <code>
@@ -34834,6 +34971,7 @@
             </reference>
             <use-date>
                 <not-before>20190930</not-before>
+                <not-after>20201231</not-after>
             </use-date>
         </code>
         <code>
@@ -34876,6 +35014,7 @@
             </reference>
             <use-date>
                 <not-before>20190930</not-before>
+                <not-after>20201231</not-after>
             </use-date>
         </code>
         <code>
@@ -36751,6 +36890,7 @@
                 <link-to codeset="VACCINATION_CVX_CODE">134</link-to>
                 <link-to codeset="VACCINATION_MANUFACTURER_CODE">VAL</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">62195-0051-10</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">62195-0051-01</link-to>
             </reference>
             <use-date>
                 <not-before>20090330</not-before>
@@ -37517,7 +37657,7 @@
                 <link-to codeset="VACCINATION_MANUFACTURER_CODE">MOD</link-to>
             </reference>
             <use-date>
-                <not-before>20201016</not-before>
+                <not-before>20201218</not-before>
             </use-date>
         </code>
         <code>
@@ -37813,7 +37953,7 @@
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">59267-1000-03</link-to>
             </reference>
             <use-date>
-                <not-before>20201104</not-before>
+                <not-before>20201212</not-before>
             </use-date>
         </code>
         <code>
@@ -38883,6 +39023,9 @@
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">00006-4047-41</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">00006-4047-20</link-to>
             </reference>
+            <use-date>
+                <not-before>20201001</not-before>
+            </use-date>
         </code>
         <code>
             <value>0006-4047-02</value>
@@ -40162,6 +40305,9 @@
                 <link-to codeset="VACCINATION_MANUFACTURER_CODE">PMC</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">63361-0243-15</link-to>
             </reference>
+            <use-date>
+                <not-before>20201001</not-before>
+            </use-date>
         </code>
         <code>
             <value>63361-243-88</value>
@@ -41793,6 +41939,47 @@
             </code-status>
         </code>
         <code>
+            <value>00310-1222-15</value>
+            <label>ASTRAZENECA COVID-19 VACCINE</label>
+            <description>AstraZeneca Pharmaceuticals LP - SARS-COV-2 (COVID-19) vaccine, vector non-replicating, recombinant spike protein-ChAdOx1, preservative free, 0.5 mL</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">210</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">00310-1222-10</link-to>
+            </reference>
+            <use-date>
+                <not-before>20201222</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>0310-1222-15</value>
+            <label>ASTRAZENECA COVID-19 VACCINE</label>
+            <description>AstraZeneca Pharmaceuticals LP - SARS-COV-2 (COVID-19) vaccine, vector non-replicating, recombinant spike protein-ChAdOx1, preservative free, 0.5 mL</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>00310-1222-15</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20210106</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>00310122215</value>
+            <label>ASTRAZENECA COVID-19 VACCINE</label>
+            <description>AstraZeneca Pharmaceuticals LP - SARS-COV-2 (COVID-19) vaccine, vector non-replicating, recombinant spike protein-ChAdOx1, preservative free, 0.5 mL</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>00310-1222-15</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20210106</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
             <value>00052-0603-02</value>
             <label>BCG VACCINE</label>
             <description>Organon Pharmaceuticals USA - BACILLUS CALMETTE-GUERIN SUBSTRAIN TICE LIVE ANTIGEN</description>
@@ -41848,6 +42035,7 @@
             </reference>
             <use-date>
                 <not-before>20161201</not-before>
+                <not-after>20201231</not-after>
             </use-date>
         </code>
         <code>
@@ -41890,6 +42078,7 @@
             </reference>
             <use-date>
                 <not-before>20161201</not-before>
+                <not-after>20201231</not-after>
             </use-date>
         </code>
         <code>
@@ -42060,6 +42249,7 @@
             </reference>
             <use-date>
                 <not-before>20090724</not-before>
+                <not-after>20201026</not-after>
             </use-date>
         </code>
         <code>
@@ -49806,6 +49996,7 @@
             </reference>
             <use-date>
                 <not-before>20190930</not-before>
+                <not-after>20201231</not-after>
             </use-date>
         </code>
         <code>
@@ -49848,6 +50039,7 @@
             </reference>
             <use-date>
                 <not-before>20190930</not-before>
+                <not-after>20201231</not-after>
             </use-date>
         </code>
         <code>
@@ -49890,6 +50082,7 @@
             </reference>
             <use-date>
                 <not-before>20190930</not-before>
+                <not-after>20201231</not-after>
             </use-date>
         </code>
         <code>
@@ -51850,6 +52043,7 @@
             </reference>
             <use-date>
                 <not-before>20090330</not-before>
+                <not-after>20201123</not-after>
             </use-date>
         </code>
         <code>
@@ -51917,6 +52111,48 @@
                     <new-code-value>42515-0002-01</new-code-value>
                     <reason>Use 11-digit format with dashes</reason>
                     <effective-date>20180406</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>62195-0051-01</value>
+            <label>Ixiaro</label>
+            <description>Vetter Pharma Fertigung GmbH &amp; Co. KG - JAPANESE ENCEPHALITIS VACCINE, INACTIVATED, ADSORBED</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">134</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">VAL</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">62195-0051-01</link-to>
+            </reference>
+            <use-date>
+                <not-before>20201123</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>62195-051-01</value>
+            <label>Ixiaro</label>
+            <description>Vetter Pharma Fertigung GmbH &amp; Co. KG - JAPANESE ENCEPHALITIS VACCINE, INACTIVATED, ADSORBED</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>62195-0051-01</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20201229</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>62195005101</value>
+            <label>Ixiaro</label>
+            <description>Vetter Pharma Fertigung GmbH &amp; Co. KG - JAPANESE ENCEPHALITIS VACCINE, INACTIVATED, ADSORBED</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>62195-0051-01</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20201229</effective-date>
                 </deprecated>
             </code-status>
         </code>
@@ -52574,7 +52810,7 @@
                 <link-to codeset="VACCINATION_MANUFACTURER_CODE">MOD</link-to>
             </reference>
             <use-date>
-                <not-before>20201016</not-before>
+                <not-before>20201218</not-before>
             </use-date>
         </code>
         <code>
@@ -52830,7 +53066,7 @@
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">59267-1000-01</link-to>
             </reference>
             <use-date>
-                <not-before>20201104</not-before>
+                <not-before>20201212</not-before>
             </use-date>
         </code>
         <code>
@@ -52871,6 +53107,9 @@
                 <link-to codeset="VACCINATION_MANUFACTURER_CODE">PFR</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">59267-1000-01</link-to>
             </reference>
+            <use-date>
+                <not-before>20201212</not-before>
+            </use-date>
         </code>
         <code>
             <value>59267-1000-3</value>
@@ -53508,6 +53747,7 @@
             </reference>
             <use-date>
                 <not-before>20161219</not-before>
+                <not-after>20201231</not-after>
             </use-date>
         </code>
         <code>
@@ -54352,6 +54592,9 @@
                 <link-to codeset="VACCINATION_MANUFACTURER_CODE">SKB</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">58160-0828-01</link-to>
             </reference>
+            <use-date>
+                <not-before>20201001</not-before>
+            </use-date>
         </code>
         <code>
             <value>50090-5147-0</value>
@@ -55879,6 +56122,9 @@
                 <link-to codeset="VACCINATION_MANUFACTURER_CODE">PMC</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">63361-0243-88</link-to>
             </reference>
+            <use-date>
+                <not-before>20201001</not-before>
+            </use-date>
         </code>
         <code>
             <value>63361-243-15</value>
