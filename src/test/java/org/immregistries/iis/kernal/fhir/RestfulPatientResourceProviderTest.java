@@ -112,12 +112,19 @@ public class RestfulPatientResourceProviderTest extends TestCase {
     patientMaster=null;
     dataSession=null;
   }
-  public void testUpdatePatient() {
-  }
+  
 
   public void testGetPatientById() {
     assertEquals("Identifiant1",RestfulPatientResourceProvider.getPatientById("Identifiant1",dataSession,orgAccess).getIdentifier().get(0).getValue());
 
+  }
+
+  public void testUpdatePatient() throws Exception {
+    p.setGender(AdministrativeGender.FEMALE);
+    FHIRHandler fhirHandler = new FHIRHandler(dataSession);
+    patientReported = fhirHandler.FIHR_EventPatientReported(orgAccess,p,null);
+
+    assertEquals("F",patientReported.getPatientSex());
   }
 
   public void testDeletePatientById() {
