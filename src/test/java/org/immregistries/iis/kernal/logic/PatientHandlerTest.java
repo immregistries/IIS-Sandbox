@@ -50,11 +50,6 @@ public class PatientHandlerTest extends TestCase {
     
   }
 
-  public void testPatientReportedToFhirPatient() {
-  }
-
-  public void testGetPatient() {
-  }
 
   public void testFindPossibleMatch() {
     //need database

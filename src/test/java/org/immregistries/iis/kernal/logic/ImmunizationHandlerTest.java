@@ -70,10 +70,5 @@ public class ImmunizationHandlerTest extends TestCase {
   public void testOrgLocationFromFhirImmunization() {
   }
 
-  public void testGetImmunization() {
-  }
 
-  public void testFindMatch() {
-    //need database
-  }
 }
