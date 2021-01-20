@@ -103,6 +103,7 @@ public class FHIRHandler extends IncomingMessageHandler {
             	pl.setPatientReported(patientReported);
             	dataSession.saveOrUpdate(pl);
             }
+            System.err.println("le patient a pour id "+ patientReported.getPatientReportedExternalLink());
             transaction.commit();
         }
 

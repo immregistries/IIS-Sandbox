@@ -181,6 +181,7 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
 
       @SuppressWarnings("unchecked")
 	List<PatientReported> patientReportedList = query.list();
+      System.err.println("la taille est " + patientReportedList.size());
       if (patientReportedList.size() > 0) {
         patientReported = patientReportedList.get(0);
         patient = PatientHandler.getPatient(null, null, patientReported);
