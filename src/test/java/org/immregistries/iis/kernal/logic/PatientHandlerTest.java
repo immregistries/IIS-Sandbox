@@ -51,9 +51,7 @@ public class PatientHandlerTest extends TestCase {
   }
 
 
-  public void testFindPossibleMatch() {
-    //need database
-  }
+
 
   public void testFindMatch() {
     // need database

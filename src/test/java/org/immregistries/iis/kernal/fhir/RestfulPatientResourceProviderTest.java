@@ -127,6 +127,5 @@ public class RestfulPatientResourceProviderTest extends TestCase {
     assertEquals("F",patientReported.getPatientSex());
   }
 
-  public void testDeletePatientById() {
-  }
+
 }
