@@ -41,7 +41,7 @@ public class RestfulPatientResourceProviderTest extends TestCase {
     p.addIdentifier().setValue("Identifiant1");
     HumanName name = p.addName().setFamily("Doe").addGiven("John");
 
-    System.err.println((p.getNameFirstRep().getGiven().get(0)));
+
     Date date= new Date();
     p.setBirthDate(date);
 
@@ -92,14 +92,6 @@ public class RestfulPatientResourceProviderTest extends TestCase {
       dataSession.close();
     }
     dataSession= factory.openSession();
-
-    Query query = dataSession.createQuery(
-        "from PatientReported where patientNameFirst = ?");
-    query.setParameter(0,"John");
-    List<PatientReported> patientReportedList= query.list();
-    System.err.println(patientReportedList.get(0).getPatientNameFirst());
-
-
 
     FHIRHandler fhirHandler = new FHIRHandler(dataSession);
     patientReported = fhirHandler.FIHR_EventPatientReported(orgAccess,p,null);
