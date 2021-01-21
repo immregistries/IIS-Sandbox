@@ -39,7 +39,7 @@ public class PatientHandlerTest extends TestCase {
   SessionFactory factory;
 
 
-  @BeforeClass
+
   public void setUp() throws Exception {
     super.setUp();
     p.addIdentifier().setValue("Identifiant1");
@@ -91,18 +91,18 @@ public class PatientHandlerTest extends TestCase {
       }
     } catch (Exception e) {
       e.printStackTrace();
-    } finally {
-      dataSession.close();
     }
-    dataSession= factory.openSession();
+
 
 
   }
-  @AfterClass
+
   public void tearDown() throws Exception {
     patientReported =null;
     p = null;
     patientMaster=null;
+    dataSession.close();
+    dataSession=null;
   }
 
   public void testPatientReportedFromFhirPatient() {
@@ -114,13 +114,27 @@ public class PatientHandlerTest extends TestCase {
     assertEquals("12 rue chicago",patientReported.getPatientAddressLine1());
     assertEquals("John",patientReported.getPatientNameFirst());
 
+
+
     
   }
 
 
 
 
-  public void testFindMatch() {
+  public void testFindPossibleMatch() throws Exception {
+    //to be reviewed
+    FHIRHandler fhirHandler = new FHIRHandler(dataSession);
+    fhirHandler.FIHR_EventPatientReported(orgAccess,p,null);
+    /*List<PatientMaster> matches;
+    Query queryBigMatch = dataSession.createQuery(
+        "from PatientMaster where patientNameLast = ? and patientNameFirst= ? ");
+    queryBigMatch.setParameter(0, p.getNameFirstRep().getFamily());
+    queryBigMatch.setParameter(1, p.getNameFirstRep().getGiven().get(0).toString());
+
+    matches = queryBigMatch.list();
+    System.err.println(matches.size());*/
+
 
     Patient patient = new Patient();
     patient.addIdentifier().setValue("match");
@@ -133,14 +147,14 @@ public class PatientHandlerTest extends TestCase {
     patient.addAddress().addLine("12 avenue de Nancy");
     //System.err.println(patient.getNameFirstRep().getFamily());
     //System.err.println(patient.getNameFirstRep().getGiven().get(0).toString());
-    //assertEquals("1",PatientHandler.findMatch(dataSession,patient).size());
+    assertTrue(PatientHandler.findPossibleMatch(dataSession,patient).size()>0);
     //System.err.println(PatientHandler.findMatch(dataSession,patient).get(0).getPatientExternalLink());
-    System.err.println(patient.getNameFirstRep().getFamily());
+    /*System.err.println(patient.getNameFirstRep().getFamily());
     System.err.println(patient.getNameFirstRep().getGiven().get(0).toString());
      System.err.println(patient.getBirthDate());
     System.err.println(p.getNameFirstRep().getFamily());
     System.err.println(p.getNameFirstRep().getGiven().get(0).toString());
-    System.err.println(p.getBirthDate());
+    System.err.println(p.getBirthDate());*/
 
   }
 }

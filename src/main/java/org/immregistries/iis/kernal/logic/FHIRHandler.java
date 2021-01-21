@@ -95,6 +95,7 @@ public class FHIRHandler extends IncomingMessageHandler {
 
             dataSession.saveOrUpdate(patientMaster);
             dataSession.saveOrUpdate(patientReported);
+					  System.err.println("patient Created");
             if(patientAlreadyExists) {
             	System.err.println("creation patientlink");
             	PatientLink pl = new PatientLink();

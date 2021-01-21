@@ -96,6 +96,7 @@ public class RestfulPatientResourceProviderTest extends TestCase {
     FHIRHandler fhirHandler = new FHIRHandler(dataSession);
     patientReported = fhirHandler.FIHR_EventPatientReported(orgAccess,p,null);
 
+
   }
 
   public void tearDown() throws Exception {
