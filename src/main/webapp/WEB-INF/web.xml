@@ -21,6 +21,10 @@
     <servlet-class>org.immregistries.iis.kernal.servlet.PopServlet</servlet-class>
   </servlet>
   <servlet>
+    <servlet-name>queryConverter</servlet-name>
+    <servlet-class>org.immregistries.iis.kernal.servlet.QueryConverterServlet</servlet-class>
+  </servlet>
+  <servlet>
     <servlet-name>event</servlet-name>
     <servlet-class>org.immregistries.iis.kernal.servlet.EventServlet</servlet-class>
   </servlet>
@@ -99,6 +103,10 @@
   <servlet-mapping>
     <servlet-name>pop</servlet-name>
     <url-pattern>/pop</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>queryConverter</servlet-name>
+    <url-pattern>/queryConverter</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>event</servlet-name>

@@ -67,6 +67,8 @@ public class HomeServlet extends HttpServlet {
           out.println(
               "      <li><a href=\"lab\">Convert ORU to VXU</a>: Convert an ORU lab message to a VXU. </li>");
           out.println(
+              "      <li><a href=\"queryConverter\">Convert VXU to QBP</a>: Convert an VXU immunization message into an immunization query. </li>");
+          out.println(
               "      <li><a href=\"covid\">COVID-19 Reporting</a>: Export data to demonstrate COVID-19 reporting </li>");
           out.println(
               "      <li><a href=\"covidGenerate\">COVID-19 HL7 Generator</a>: Generate HL7 Messages</li>");
