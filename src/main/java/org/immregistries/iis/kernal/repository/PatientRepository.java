@@ -1,7 +1,6 @@
 package org.immregistries.iis.kernal.repository;
 
 import java.util.List;
-
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.immregistries.iis.kernal.model.OrgAccess;

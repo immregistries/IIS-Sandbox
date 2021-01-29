@@ -1,12 +1,10 @@
 package org.immregistries.iis.kernal.model;
 
 import java.util.List;
-
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.AnnotationConfiguration;
-
 import junit.framework.TestCase;
 
 public class TestOrgMaster extends TestCase {

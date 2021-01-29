@@ -13,8 +13,16 @@
     <servlet-class>org.immregistries.iis.kernal.servlet.V2ToFhirServlet</servlet-class>
   </servlet>
   <servlet>
+    <servlet-name>fhirTest</servlet-name>
+    <servlet-class>org.immregistries.iis.kernal.servlet.FhirTestServlet</servlet-class>
+  </servlet>
+  <servlet>
     <servlet-name>pop</servlet-name>
     <servlet-class>org.immregistries.iis.kernal.servlet.PopServlet</servlet-class>
+  </servlet>
+  <servlet>
+    <servlet-name>queryConverter</servlet-name>
+    <servlet-class>org.immregistries.iis.kernal.servlet.QueryConverterServlet</servlet-class>
   </servlet>
   <servlet>
     <servlet-name>event</servlet-name>
@@ -89,8 +97,16 @@
     <url-pattern>/v2ToFhir</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
+    <servlet-name>fhirTest</servlet-name>
+    <url-pattern>/fhirTest</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
     <servlet-name>pop</servlet-name>
     <url-pattern>/pop</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>queryConverter</servlet-name>
+    <url-pattern>/queryConverter</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>event</servlet-name>

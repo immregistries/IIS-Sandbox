@@ -1,5 +1,9 @@
+-- Brings up database to v.03
+
+
 CREATE DATABASE iis;
 
+USE iis;
 
 CREATE USER
   'iis_web'@'localhost' IDENTIFIED WITH mysql_native_password

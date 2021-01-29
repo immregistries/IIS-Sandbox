@@ -1,10 +1,6 @@
 package org.immregistries.iis.kernal.fhir;
 
-import ca.uhn.fhir.interceptor.api.Hook;
-import ca.uhn.fhir.interceptor.api.Interceptor;
-import ca.uhn.fhir.interceptor.api.Pointcut;
-import ca.uhn.fhir.rest.api.server.RequestDetails;
-import ca.uhn.fhir.rest.server.exceptions.AuthenticationException;
+import java.util.List;
 import org.apache.commons.codec.binary.Base64;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -12,7 +8,12 @@ import org.hibernate.Transaction;
 import org.immregistries.iis.kernal.model.OrgAccess;
 import org.immregistries.iis.kernal.model.OrgMaster;
 
-import java.util.List;
+import ca.uhn.fhir.interceptor.api.Hook;
+import ca.uhn.fhir.interceptor.api.Interceptor;
+import ca.uhn.fhir.interceptor.api.Pointcut;
+import ca.uhn.fhir.rest.api.server.RequestDetails;
+import ca.uhn.fhir.rest.server.exceptions.AuthenticationException;
+
 
 @Interceptor
 public class Authentication {

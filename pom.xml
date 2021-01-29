@@ -5,7 +5,7 @@
 
 	<groupId>org.immregistries</groupId>
 	<artifactId>iis-sandbox</artifactId>
-	<version>0.4</version>
+	<version>0.4.1</version>
 	<packaging>war</packaging>
 
 	<name>Immunization Information System Kernel - Proof of Concept</name>
@@ -37,7 +37,7 @@
 		<dependency>
 			<groupId>org.immregistries</groupId>
 			<artifactId>mqe-hl7-utility</artifactId>
-			<version>2020.04-BETA</version>
+			<version>2020.12-BETA</version>
 		</dependency>
 		<dependency>
 			<groupId>org.mortbay.jetty</groupId>
@@ -190,12 +190,6 @@
 			<version>1.4.200</version>
 			<scope>test</scope>
 		</dependency>
-    <dependency>
-      <groupId>org.junit.jupiter</groupId>
-      <artifactId>junit-jupiter</artifactId>
-      <version>RELEASE</version>
-      <scope>test</scope>
-    </dependency>
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter</artifactId>

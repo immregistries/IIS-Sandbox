@@ -26,7 +26,7 @@ import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.server.IResourceProvider;
 import ca.uhn.fhir.rest.server.exceptions.UnprocessableEntityException;
 
-public class RestfuImmunizationProvider implements IResourceProvider {
+public class RestfulImmunizationProvider implements IResourceProvider {
   protected Session dataSession = null;
   protected OrgAccess orgAccess = null;
   protected OrgMaster orgMaster = null;
@@ -183,7 +183,7 @@ public class RestfuImmunizationProvider implements IResourceProvider {
           .createQuery("from VaccinationReported where vaccinationReportedExternalLink = ?");
       query.setParameter(0, id);
       @SuppressWarnings("unchecked")
-	List<VaccinationReported> vaccinationReportedList = query.list();
+      List<VaccinationReported> vaccinationReportedList = query.list();
       if (vaccinationReportedList.size() > 0) {
         vaccinationReported = vaccinationReportedList.get(0);
         immunization = ImmunizationHandler.getImmunization(theRequestDetails, vaccinationReported);

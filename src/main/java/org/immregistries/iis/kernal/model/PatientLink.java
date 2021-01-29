@@ -7,14 +7,14 @@ import java.io.Serializable;
  * Created by Eric on 12/20/17.
  */
 public class PatientLink implements Serializable {
-	
+
 	private static final long serialVersionUID = 1L;
 	private int id;
 	private PatientMaster patientMaster = null;
 	private PatientReported patientReported =null;
 
 	private int levelConfidence;
-	
+
 	public int getId() {
 		return id;
 	}
@@ -43,15 +43,12 @@ public class PatientLink implements Serializable {
 	/*public int getPatientMasterId() {
 		return patientMasterId;
 	}
-
 	public void setPatientMasterId(int patientMasterId) {
 		this.patientMasterId = patientMasterId;
 	}
-
 	public int getPatientReportedId() {
 		return patientReportedId;
 	}
-
 	public void setPatientReportedId(int patientReportedId) {
 		this.patientReportedId = patientReportedId;
 	}*/

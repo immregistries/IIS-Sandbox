@@ -1,20 +1,36 @@
 package org.immregistries.iis.kernal.fhir;
 
 
-import ca.uhn.fhir.rest.annotation.*;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.api.server.RequestDetails;
 import ca.uhn.fhir.rest.server.IResourceProvider;
 import ca.uhn.fhir.rest.server.exceptions.UnprocessableEntityException;
+
+import java.util.List;
+
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.AnnotationConfiguration;
-import org.hl7.fhir.r4.model.*;
-import org.immregistries.iis.kernal.logic.*;
-import org.immregistries.iis.kernal.model.*;
-import java.util.*;
+
+import org.hl7.fhir.r4.model.IdType;
+import org.hl7.fhir.r4.model.Patient;
+import org.hl7.fhir.r4.model.Reference;
+import org.immregistries.iis.kernal.logic.FHIRHandler;
+import org.immregistries.iis.kernal.logic.PatientHandler;
+import org.immregistries.iis.kernal.model.OrgAccess;
+import org.immregistries.iis.kernal.model.OrgMaster;
+import org.immregistries.iis.kernal.model.PatientLink;
+
+import org.immregistries.iis.kernal.model.PatientReported;
+import ca.uhn.fhir.rest.annotation.Create;
+import ca.uhn.fhir.rest.annotation.Delete;
+import ca.uhn.fhir.rest.annotation.IdParam;
+import ca.uhn.fhir.rest.annotation.Read;
+import ca.uhn.fhir.rest.annotation.ResourceParam;
+import ca.uhn.fhir.rest.annotation.Update;
+
 
 /**
  * All resource providers must implement IResourceProvider
@@ -116,7 +132,9 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
     try {
       orgAccess = Authentication.authenticateOrgAccess(theRequestDetails, dataSession);
       FHIRHandler fhirHandler = new FHIRHandler(dataSession);
+
       fhirHandler.FIHR_EventPatientReported(orgAccess, thePatient, null);
+
     } catch (Exception e) {
       e.printStackTrace();
     } finally {
