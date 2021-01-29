@@ -130,8 +130,10 @@ public class IncomingEventHandler extends IncomingMessageHandler {
           "from VaccinationReported where patientReported = ? and vaccinationReportedExternalLink = ?");
       query.setParameter(0, patientReported);
       query.setParameter(1, vaccinationReportedExternalLink);
+
       @SuppressWarnings("unchecked")
       List<VaccinationReported> vaccinationReportedList = query.list();
+
       if (vaccinationReportedList.size() > 0) {
         vaccinationReported = vaccinationReportedList.get(0);
         vaccination = vaccinationReported.getVaccination();
@@ -183,8 +185,10 @@ public class IncomingEventHandler extends IncomingMessageHandler {
             "from OrgLocation where orgMaster = :orgMaster and orgFacilityCode = :orgFacilityCode");
         query.setParameter("orgMaster", orgAccess.getOrg());
         query.setParameter("orgFacilityCode", administeredAtLocation);
+
         @SuppressWarnings("unchecked")
         List<OrgLocation> orgMasterList = query.list();
+
         OrgLocation orgLocation = null;
         if (orgMasterList.size() > 0) {
           orgLocation = orgMasterList.get(0);
@@ -263,8 +267,10 @@ public class IncomingEventHandler extends IncomingMessageHandler {
           "from PatientReported where orgReported = ? and patientReportedExternalLink = ?");
       query.setParameter(0, orgAccess.getOrg());
       query.setParameter(1, patientReportedExternalLink);
+
       @SuppressWarnings("unchecked")
       List<PatientReported> patientReportedList = query.list();
+
       if (patientReportedList.size() > 0) {
         patientReported = patientReportedList.get(0);
         patient = patientReported.getPatient();

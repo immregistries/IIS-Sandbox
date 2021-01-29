@@ -13,7 +13,8 @@ public class TestPatientReported extends TestCase {
     Session dataSession = factory.openSession();
 
     Query query = dataSession.createQuery("from PatientReported");
-    List<PatientReported> patientReportedList = query.list();
+    @SuppressWarnings("unchecked")
+	List<PatientReported> patientReportedList = query.list();
     for (PatientReported patientReported : patientReportedList) {
       System.out.println("--> patientReported.getReportedMrn() = "
           + patientReported.getPatientReportedExternalLink());

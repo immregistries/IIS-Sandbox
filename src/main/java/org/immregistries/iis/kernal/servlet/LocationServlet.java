@@ -55,7 +55,8 @@ public class LocationServlet extends HttpServlet {
     doGet(req, resp);
   }
 
-  @Override
+  @SuppressWarnings("unchecked")
+@Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
 
@@ -396,7 +397,8 @@ public class LocationServlet extends HttpServlet {
     out.println("</div>");
   }
 
-  public List<ObservationReported> getObservationList(Session dataSession,
+  @SuppressWarnings("unchecked")
+public List<ObservationReported> getObservationList(Session dataSession,
       PatientReported patientReportedSelected) {
     List<ObservationReported> observationReportedList;
     {

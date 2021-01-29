@@ -7,6 +7,9 @@ import java.util.Date;
  * Created by Eric on 12/20/17.
  */
 public class PatientReported implements Serializable {
+
+  private static final long serialVersionUID = 1L;
+	
   private int patientReportedId = 0;
   private OrgMaster orgReported = null;
   private String patientReportedExternalLink = "";

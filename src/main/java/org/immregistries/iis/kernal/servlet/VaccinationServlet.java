@@ -167,7 +167,8 @@ public class VaccinationServlet extends PatientServlet {
     out.close();
   }
 
-  public List<ObservationReported> getObservationList(Session dataSession,
+  @SuppressWarnings("unchecked")
+public List<ObservationReported> getObservationList(Session dataSession,
       VaccinationReported vaccinationReported) {
     List<ObservationReported> observationReportedList;
     {

@@ -27,6 +27,11 @@ public class RestfulMedicationAdministrationProvider implements IResourceProvide
   protected VaccinationMaster vaccinationMaster = null;
   private static SessionFactory factory;
 
+  /**
+   * The getResourceType method comes from IResourceProvider, and must
+   * be overridden to indicate what type of resource this provider
+   * supplies.
+   */
   @Override
   public Class<MedicationAdministration> getResourceType() {
     return MedicationAdministration.class;
@@ -39,7 +44,14 @@ public class RestfulMedicationAdministrationProvider implements IResourceProvide
     return factory.openSession();
   }
 
-
+  /**
+   * This methods asks to find and rebuild the MedicationAdministration resource with the id provided
+   * @param theRequestDetails autenthification access information
+   * @param theId The id of the medicationAdministration resource
+   *
+   *
+   * @return the MedicationAdministration, null is none was found in the database
+   */
   @Read()
   public MedicationAdministration getResourceById(RequestDetails theRequestDetails,
       @IdParam IdType theId) {
@@ -53,7 +65,8 @@ public class RestfulMedicationAdministrationProvider implements IResourceProvide
             .createQuery("from VaccinationReported where vaccinationReportedExternalLink= ?");
         //query.setParameter(0, orgAccess.getOrg());
         query.setParameter(0, id);
-        List<VaccinationReported> vaccinationReportedList = query.list();
+        @SuppressWarnings("unchecked")
+		List<VaccinationReported> vaccinationReportedList = query.list();
         if (vaccinationReportedList.size() > 0) {
           vaccinationMaster = vaccinationReportedList.get(0).getVaccination();
         }
@@ -68,7 +81,8 @@ public class RestfulMedicationAdministrationProvider implements IResourceProvide
         {
           Query query = dataSession.createQuery("from VaccinationReported where vaccination= ?");
           query.setParameter(0, vaccinationMaster);
-          List<VaccinationReported> vaccinationReportedList = query.list();
+          @SuppressWarnings("unchecked")
+		List<VaccinationReported> vaccinationReportedList = query.list();
           if (vaccinationReportedList.size() > 0) {
             Extension links = new Extension("#links");
             Extension link;

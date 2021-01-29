@@ -13,7 +13,8 @@ public class TestVaccinationMaster extends TestCase {
     Session dataSession = factory.openSession();
 
     Query query = dataSession.createQuery("from VaccinationMaster");
-    List<VaccinationMaster> vaccinationMasterList = query.list();
+    @SuppressWarnings("unchecked")
+	List<VaccinationMaster> vaccinationMasterList = query.list();
     for (VaccinationMaster vaccinationMaster : vaccinationMasterList) {
       System.out.println("--> vaccinationMaster.getVaccinationCvxCode() = "
           + vaccinationMaster.getVaccineCvxCode());

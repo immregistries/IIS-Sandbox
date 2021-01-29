@@ -13,6 +13,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+
+
+import ca.uhn.fhir.context.FhirContext;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -45,7 +48,7 @@ import org.immregistries.vfa.connect.model.SoftwareResult;
 import org.immregistries.vfa.connect.model.TestCase;
 import org.immregistries.vfa.connect.model.TestEvent;
 import org.immregistries.vfa.connect.model.VaccineGroup;
-import ca.uhn.fhir.context.FhirContext;
+
 
 public class IncomingMessageHandler {
   private static final String PATIENT_MIDDLE_NAME_MULTI = "Multi";
@@ -116,7 +119,8 @@ public class IncomingMessageHandler {
 
 
 
-  public String processQBP(OrgAccess orgAccess, HL7Reader reader, String messageReceived) {
+  @SuppressWarnings("unchecked")
+public String processQBP(OrgAccess orgAccess, HL7Reader reader, String messageReceived) {
     PatientReported patientReported = null;
     List<PatientReported> patientReportedPossibleList = new ArrayList<>();
     List<ProcessingException> processingExceptionList = new ArrayList<>();
@@ -261,7 +265,8 @@ public class IncomingMessageHandler {
         patientReportedPossibleList, processingExceptionList);
   }
 
-  public String processVXU(OrgAccess orgAccess, HL7Reader reader, String message) {
+  @SuppressWarnings("unchecked")
+public String processVXU(OrgAccess orgAccess, HL7Reader reader, String message) {
 
     List<ProcessingException> processingExceptionList = new ArrayList<>();
     try {
@@ -648,7 +653,8 @@ public class IncomingMessageHandler {
 
   }
 
-  public PatientReported processPatient(OrgAccess orgAccess, HL7Reader reader,
+  @SuppressWarnings("unchecked")
+public PatientReported processPatient(OrgAccess orgAccess, HL7Reader reader,
       List<ProcessingException> processingExceptionList, Set<ProcessingFlavor> processingFlavorSet,
       CodeMap codeMap, boolean strictDate, PatientReported patientReported)
       throws ProcessingException {
@@ -1036,12 +1042,10 @@ public class IncomingMessageHandler {
           processingFlavorSet, codeMap, strictDate, patientReported);
 
       int orcCount = 0;
-      int obrCount = 0;
       int obxCount = 0;
       while (reader.advanceToSegment("ORC")) {
         orcCount++;
         if (reader.advanceToSegment("OBR", "ORC")) {
-          obrCount++;
           obxCount = readAndCreateObservations(reader, processingExceptionList, patientReported,
               strictDate, obxCount, null, null);
         } else {
@@ -1116,7 +1120,8 @@ public class IncomingMessageHandler {
     return obxCount;
   }
 
-  public ObservationMaster readObservations(HL7Reader reader,
+  @SuppressWarnings("unchecked")
+public ObservationMaster readObservations(HL7Reader reader,
       List<ProcessingException> processingExceptionList, PatientReported patientReported,
       boolean strictDate, int obxCount, VaccinationReported vaccinationReported,
       VaccinationMaster vaccination, String identifierCode, String valueCode) {
@@ -1640,7 +1645,8 @@ public class IncomingMessageHandler {
       Query query = dataSession
           .createQuery("from VaccinationMaster where patient = ? order by vaccinationReported asc");
       query.setParameter(0, patient);
-      List<VaccinationMaster> vmList = query.list();
+      @SuppressWarnings("unchecked")
+	List<VaccinationMaster> vmList = query.list();
       Map<String, VaccinationMaster> map = new HashMap<>();
       for (VaccinationMaster vaccinationMaster : vmList) {
         if (vaccinationMaster.getAdministeredDate() != null) {

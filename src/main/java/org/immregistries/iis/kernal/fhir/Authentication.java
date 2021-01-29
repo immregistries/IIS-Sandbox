@@ -7,11 +7,13 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.immregistries.iis.kernal.model.OrgAccess;
 import org.immregistries.iis.kernal.model.OrgMaster;
+
 import ca.uhn.fhir.interceptor.api.Hook;
 import ca.uhn.fhir.interceptor.api.Interceptor;
 import ca.uhn.fhir.interceptor.api.Pointcut;
 import ca.uhn.fhir.rest.api.server.RequestDetails;
 import ca.uhn.fhir.rest.server.exceptions.AuthenticationException;
+
 
 @Interceptor
 public class Authentication {
@@ -45,7 +47,8 @@ public class Authentication {
     {
       Query query = dataSession.createQuery("from OrgMaster where organizationName = ?");
       query.setParameter(0, facilityId);
-      List<OrgMaster> orgMasterList = query.list();
+      @SuppressWarnings("unchecked")
+	List<OrgMaster> orgMasterList = query.list();
       if (orgMasterList.size() == 0) {
         System.out.println("Creation of new access");
         orgMaster = new OrgMaster();
@@ -67,7 +70,8 @@ public class Authentication {
           query.setParameter(0, facilityId);
           query.setParameter(1, password);
           query.setParameter(2, orgMaster);
-          List<OrgAccess> orgAccessList = query.list();
+          @SuppressWarnings("unchecked")
+		List<OrgAccess> orgAccessList = query.list();
           if (orgAccessList.size() != 0) {
             orgAccess = orgAccessList.get(0);
           } else {

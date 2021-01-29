@@ -13,7 +13,8 @@ public class TestOrgMaster extends TestCase {
     Session dataSession = factory.openSession();
 
     Query query = dataSession.createQuery("from OrgMaster");
-    List<OrgMaster> orgMasterList = query.list();
+    @SuppressWarnings("unchecked")
+	List<OrgMaster> orgMasterList = query.list();
     for (OrgMaster orgMaster : orgMasterList) {
       System.out
           .println("--> orgMaster.getOrganizationName() = " + orgMaster.getOrganizationName());

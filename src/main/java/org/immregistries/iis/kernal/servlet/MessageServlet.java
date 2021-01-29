@@ -40,7 +40,8 @@ public class MessageServlet extends HttpServlet {
     doGet(req, resp);
   }
 
-  @Override
+  @SuppressWarnings("unchecked")
+@Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
 
@@ -81,7 +82,6 @@ public class MessageServlet extends HttpServlet {
         } else if (action.equals(ACTION_SWITCH)) {
           OrgMaster orgMaster = (OrgMaster) dataSession.get(OrgMaster.class,
               Integer.parseInt(req.getParameter(PARAM_ORG_ID)));
-          @SuppressWarnings("unchecked")
           Map<Integer, OrgAccess> orgAccessMap =
               (Map<Integer, OrgAccess>) session.getAttribute("orgAccessMap");
           if (orgAccessMap != null) {
@@ -236,7 +236,8 @@ public class MessageServlet extends HttpServlet {
     query.setParameter(0, userId);
     query.setParameter(1, password);
     query.setParameter(2, orgMaster);
-    List<OrgAccess> orgAccessList = query.list();
+    @SuppressWarnings("unchecked")
+	List<OrgAccess> orgAccessList = query.list();
     if (orgAccessList.size() != 0) {
       orgAccess = orgAccessList.get(0);
     }

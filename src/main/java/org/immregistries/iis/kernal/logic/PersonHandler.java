@@ -1,14 +1,23 @@
 package org.immregistries.iis.kernal.logic;
 
+
+
 import org.hl7.fhir.r4.model.Address;
 import org.hl7.fhir.r4.model.ContactPoint;
 import org.hl7.fhir.r4.model.Enumerations;
 import org.hl7.fhir.r4.model.HumanName;
 import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.Person;
+
 import org.immregistries.iis.kernal.model.PatientReported;
 
 public class PersonHandler {
+
+  /**
+   * This method recreate the Hapi Person resource from the database information
+   * @param pr the patientReported found in the database
+   * @return Fhir Person resource
+   */
   public static Person getPerson(PatientReported pr) {
 
     Person p = new Person();
