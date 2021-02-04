@@ -6,9 +6,6 @@ import java.util.List;
 import junit.framework.TestCase;
 import org.hibernate.Query;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
-import org.hibernate.cfg.AnnotationConfiguration;
 import org.hl7.fhir.r4.model.Enumerations.AdministrativeGender;
 import org.hl7.fhir.r4.model.HumanName;
 import org.hl7.fhir.r4.model.Immunization;
@@ -40,10 +37,7 @@ public class RestfuImmunizationProviderTest extends TestCase {
   PatientMaster patientMaster = new PatientMaster();
 
   Session dataSession=null;
-  String PARAM_USERID = "TELECOM NANCY";
-  String PARAM_PASSWORD = "1234";
-  String PARAM_FACILITYID = "TELECOMNANCY";
-  SessionFactory factory;
+
 
 
 
@@ -74,50 +68,8 @@ public class RestfuImmunizationProviderTest extends TestCase {
     immunization.getVaccineCode().addCoding().setCode("2V4");
 
 
-    if (factory == null) {
-      factory = new AnnotationConfiguration().configure().buildSessionFactory();
-    }
-    dataSession =factory.openSession();
+   OrgAccessGenerator.authentification(orgAccess,orgMaster,dataSession);
 
-
-    try {
-      if (orgAccess == null) {
-        Query query = dataSession.createQuery("from OrgMaster where organizationName = ?");
-        query.setParameter(0, PARAM_FACILITYID);
-        List<OrgMaster> orgMasterList = query.list();
-        if (orgMasterList.size() > 0) {
-          orgMaster = orgMasterList.get(0);
-        } else {
-          orgMaster = new OrgMaster();
-          orgMaster.setOrganizationName(PARAM_FACILITYID);
-          orgAccess = new OrgAccess();
-          orgAccess.setOrg(orgMaster);
-          orgAccess.setAccessName(PARAM_USERID);
-          orgAccess.setAccessKey(PARAM_PASSWORD);
-          Transaction transaction = dataSession.beginTransaction();
-          dataSession.save(orgMaster);
-          dataSession.save(orgAccess);
-          transaction.commit();
-        }
-      }
-
-      if (orgAccess == null) {
-        Query query = dataSession
-            .createQuery("from OrgAccess where accessName = ? and accessKey = ? and org = ?");
-        query.setParameter(0, PARAM_USERID);
-        query.setParameter(1, PARAM_PASSWORD);
-        query.setParameter(2, orgMaster);
-        List<OrgAccess> orgAccessList = query.list();
-        if (orgAccessList.size() != 0) {
-          orgAccess = orgAccessList.get(0);
-        }
-      }
-    } catch (Exception e) {
-      e.printStackTrace();
-    } finally {
-      dataSession.close();
-    }
-    dataSession= factory.openSession();
 
     FHIRHandler fhirHandler = new FHIRHandler(dataSession);
 
@@ -133,7 +85,7 @@ public class RestfuImmunizationProviderTest extends TestCase {
     vaccinationMaster=null;
     orgLocation=null;
     vaccinationReported=null;
-
+    dataSession.close();
     dataSession=null;
 
   }
