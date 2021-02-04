@@ -9,7 +9,6 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.AnnotationConfiguration;
-import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Enumerations.AdministrativeGender;
 import org.hl7.fhir.r4.model.HumanName;
 import org.hl7.fhir.r4.model.Immunization;
@@ -18,7 +17,6 @@ import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.Quantity;
 import org.hl7.fhir.r4.model.Reference;
 import org.immregistries.iis.kernal.logic.FHIRHandler;
-import org.immregistries.iis.kernal.logic.ImmunizationHandler;
 import org.immregistries.iis.kernal.model.OrgAccess;
 import org.immregistries.iis.kernal.model.OrgLocation;
 import org.immregistries.iis.kernal.model.OrgMaster;
@@ -26,11 +24,10 @@ import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.model.PatientReported;
 import org.immregistries.iis.kernal.model.VaccinationMaster;
 import org.immregistries.iis.kernal.model.VaccinationReported;
-import org.immregistries.iis.kernal.repository.PatientRepository;
 
 public class RestfuImmunizationProviderTest extends TestCase {
   PatientReported patientReported = new PatientReported();
-  Immunization i = new Immunization();
+  Immunization immunization = new Immunization();
   Location location = new Location();
   VaccinationMaster vaccinationMaster = new VaccinationMaster();
   OrgLocation orgLocation = new OrgLocation();
@@ -39,7 +36,7 @@ public class RestfuImmunizationProviderTest extends TestCase {
   OrgMaster orgMaster ;
 
 
-  Patient p= new Patient();
+  Patient patient = new Patient();
   PatientMaster patientMaster = new PatientMaster();
 
   Session dataSession=null;
@@ -53,28 +50,28 @@ public class RestfuImmunizationProviderTest extends TestCase {
   public void setUp() throws Exception {
     super.setUp();
 
-    p.addIdentifier().setValue("Identifiant1");
-    HumanName name = p.addName().setFamily("Doe").addGiven("John");
+    patient.addIdentifier().setValue("Identifiant1");
+    HumanName name = patient.addName().setFamily("Doe").addGiven("John");
 
-    System.err.println((p.getNameFirstRep().getGiven().get(0)));
+    System.err.println((patient.getNameFirstRep().getGiven().get(0)));
     Date date= new Date();
-    p.setBirthDate(date);
+    patient.setBirthDate(date);
 
-    p.setGender(AdministrativeGender.MALE);
-    p.addAddress().addLine("12 rue chicago");
+    patient.setGender(AdministrativeGender.MALE);
+    patient.addAddress().addLine("12 rue chicago");
     patientReported.setPatient(patientMaster);
-    i.setRecorded(new Date());
-    i.setId("idImmunization");
-    i.setLotNumber("LOT1");
-    i.getOccurrenceDateTimeType().setValue(new  Date());
-    i.setDoseQuantity(new Quantity().setValue(new BigDecimal(10)));
-    i.setExpirationDate(new Date());
-    i.addIdentifier().setValue("identifiant2");
-    String ref = p.getIdentifier().get(0).getValue();
+    immunization.setRecorded(new Date());
+    immunization.setId("idImmunization");
+    immunization.setLotNumber("LOT1");
+    immunization.getOccurrenceDateTimeType().setValue(new  Date());
+    immunization.setDoseQuantity(new Quantity().setValue(new BigDecimal(10)));
+    immunization.setExpirationDate(new Date());
+    immunization.addIdentifier().setValue("identifiant2");
+    String ref = patient.getIdentifier().get(0).getValue();
     Reference reference = new Reference("Patient/" + ref);
-    i.setPatient(reference);
-    i.addReasonCode().addCoding().setCode("2V4");
-    i.getVaccineCode().addCoding().setCode("2V4");
+    immunization.setPatient(reference);
+    immunization.addReasonCode().addCoding().setCode("2V4");
+    immunization.getVaccineCode().addCoding().setCode("2V4");
 
 
     if (factory == null) {
@@ -124,14 +121,14 @@ public class RestfuImmunizationProviderTest extends TestCase {
 
     FHIRHandler fhirHandler = new FHIRHandler(dataSession);
 
-    patientReported=fhirHandler.FIHR_EventPatientReported(orgAccess,p,i);
-    fhirHandler.FHIR_EventVaccinationReported(orgAccess,p,patientReported,i);
+    patientReported=fhirHandler.FIHR_EventPatientReported(orgAccess, patient, immunization);
+    fhirHandler.FHIR_EventVaccinationReported(orgAccess, patient,patientReported, immunization);
 
   }
 
   public void tearDown() {
     patientReported =null;
-    i =null;
+    immunization =null;
     location=null;
     vaccinationMaster=null;
     orgLocation=null;
@@ -162,12 +159,12 @@ public class RestfuImmunizationProviderTest extends TestCase {
   public void testUpdateImmunization() throws Exception {
 
 
-    i.setLotNumber("LOT2");
+    immunization.setLotNumber("LOT2");
 
     FHIRHandler fhirHandler = new FHIRHandler(dataSession);
 
-    patientReported=fhirHandler.FIHR_EventPatientReported(orgAccess,p,i);
-    fhirHandler.FHIR_EventVaccinationReported(orgAccess,p,patientReported,i);
+    patientReported=fhirHandler.FIHR_EventPatientReported(orgAccess, patient, immunization);
+    fhirHandler.FHIR_EventVaccinationReported(orgAccess, patient,patientReported, immunization);
 
 
     Query query = dataSession

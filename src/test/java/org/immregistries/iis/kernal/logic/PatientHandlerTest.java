@@ -1,8 +1,6 @@
 package org.immregistries.iis.kernal.logic;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
 import junit.framework.TestCase;
 import org.hibernate.Query;
@@ -17,15 +15,10 @@ import org.immregistries.iis.kernal.model.OrgAccess;
 import org.immregistries.iis.kernal.model.OrgMaster;
 import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.model.PatientReported;
-import org.joda.time.DateTime;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 
 public class PatientHandlerTest extends TestCase {
   PatientReported patientReported = new PatientReported();
-  Patient p= new Patient();
+  Patient patient = new Patient();
   PatientMaster patientMaster = new PatientMaster();
   Date date;
 
@@ -42,14 +35,14 @@ public class PatientHandlerTest extends TestCase {
 
   public void setUp() throws Exception {
     super.setUp();
-    p.addIdentifier().setValue("Identifiant1");
-    HumanName name = p.addName().setFamily("Doe").addGiven("John");
+    patient.addIdentifier().setValue("Identifiant1");
+    HumanName name = patient.addName().setFamily("Doe").addGiven("John");
     //System.err.println(p.getNameFirstRep().getGiven().get(0).toString());
     date= new Date();
-    p.setBirthDate(date);
+    patient.setBirthDate(date);
 
-    p.setGender(AdministrativeGender.MALE);
-    p.addAddress().addLine("12 rue chicago");
+    patient.setGender(AdministrativeGender.MALE);
+    patient.addAddress().addLine("12 rue chicago");
     patientReported.setPatient(patientMaster);
 
     if (factory == null) {
@@ -99,14 +92,14 @@ public class PatientHandlerTest extends TestCase {
 
   public void tearDown() throws Exception {
     patientReported =null;
-    p = null;
+    patient = null;
     patientMaster=null;
     dataSession.close();
     dataSession=null;
   }
 
   public void testPatientReportedFromFhirPatient() {
-    PatientHandler.patientReportedFromFhirPatient(patientReported,p);
+    PatientHandler.patientReportedFromFhirPatient(patientReported, patient);
     assertEquals("Identifiant1", patientReported.getPatientReportedExternalLink());
     assertEquals("Doe",patientReported.getPatientNameLast());
     assertFalse(patientReported.getPatientBirthDate()==null);
@@ -125,7 +118,7 @@ public class PatientHandlerTest extends TestCase {
   public void testFindPossibleMatch() throws Exception {
     //to be reviewed
     FHIRHandler fhirHandler = new FHIRHandler(dataSession);
-    fhirHandler.FIHR_EventPatientReported(orgAccess,p,null);
+    fhirHandler.FIHR_EventPatientReported(orgAccess, patient,null);
     /*List<PatientMaster> matches;
     Query queryBigMatch = dataSession.createQuery(
         "from PatientMaster where patientNameLast = ? and patientNameFirst= ? ");

@@ -17,11 +17,10 @@ import org.immregistries.iis.kernal.model.OrgMaster;
 
 import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.model.PatientReported;
-import ca.uhn.fhir.rest.api.server.RequestDetails;
 
 public class RestfulPatientResourceProviderTest extends TestCase {
   PatientReported patientReported = new PatientReported();
-  Patient p= new Patient();
+  Patient patient = new Patient();
   PatientMaster patientMaster = new PatientMaster();
   //SessionFactory factory = new AnnotationConfiguration().configure().buildSessionFactory();
   //Session dataSession = factory.openSession();
@@ -38,15 +37,15 @@ public class RestfulPatientResourceProviderTest extends TestCase {
 
   public void setUp() throws Exception {
     super.setUp();
-    p.addIdentifier().setValue("Identifiant1");
-    HumanName name = p.addName().setFamily("Doe").addGiven("John");
+    patient.addIdentifier().setValue("Identifiant1");
+    HumanName name = patient.addName().setFamily("Doe").addGiven("John");
 
 
     Date date= new Date();
-    p.setBirthDate(date);
+    patient.setBirthDate(date);
 
-    p.setGender(AdministrativeGender.MALE);
-    p.addAddress().addLine("12 rue chicago");
+    patient.setGender(AdministrativeGender.MALE);
+    patient.addAddress().addLine("12 rue chicago");
     patientReported.setPatient(patientMaster);
 
     if (factory == null) {
@@ -94,14 +93,14 @@ public class RestfulPatientResourceProviderTest extends TestCase {
     dataSession= factory.openSession();
 
     FHIRHandler fhirHandler = new FHIRHandler(dataSession);
-    patientReported = fhirHandler.FIHR_EventPatientReported(orgAccess,p,null);
+    patientReported = fhirHandler.FIHR_EventPatientReported(orgAccess, patient,null);
 
 
   }
 
   public void tearDown() throws Exception {
     patientReported =null;
-    p = null;
+    patient = null;
     patientMaster=null;
     dataSession=null;
   }
@@ -113,9 +112,9 @@ public class RestfulPatientResourceProviderTest extends TestCase {
   }
 
   public void testUpdatePatient() throws Exception {
-    p.setGender(AdministrativeGender.FEMALE);
+    patient.setGender(AdministrativeGender.FEMALE);
     FHIRHandler fhirHandler = new FHIRHandler(dataSession);
-    patientReported = fhirHandler.FIHR_EventPatientReported(orgAccess,p,null);
+    patientReported = fhirHandler.FIHR_EventPatientReported(orgAccess, patient,null);
 
     assertEquals("F",patientReported.getPatientSex());
   }
