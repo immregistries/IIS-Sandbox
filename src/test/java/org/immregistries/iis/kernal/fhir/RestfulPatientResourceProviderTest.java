@@ -19,15 +19,15 @@ import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.model.PatientReported;
 
 public class RestfulPatientResourceProviderTest extends TestCase {
-  PatientReported patientReported = new PatientReported();
-  Patient patient = new Patient();
-  PatientMaster patientMaster = new PatientMaster();
+  private PatientReported patientReported = new PatientReported();
+  private Patient patient = new Patient();
+  private PatientMaster patientMaster = new PatientMaster();
   //SessionFactory factory = new AnnotationConfiguration().configure().buildSessionFactory();
   //Session dataSession = factory.openSession();
-  OrgAccess orgAccess ;
-  OrgMaster orgMaster ;
+  private OrgAccess orgAccess ;
+  private OrgMaster orgMaster ;
 
-  Session dataSession=null;
+  private Session dataSession=null;
 
 
 
@@ -43,9 +43,11 @@ public class RestfulPatientResourceProviderTest extends TestCase {
     patient.setGender(AdministrativeGender.MALE);
     patient.addAddress().addLine("12 rue chicago");
     patientReported.setPatient(patientMaster);
-    OrgAccessGenerator.authentification(orgAccess,orgMaster,dataSession);
+    OrgAccessGenerator.authentification();
 
-
+    dataSession=OrgAccessGenerator.getDataSession();
+    orgAccess=OrgAccessGenerator.getOrgAccess();
+    orgMaster=OrgAccessGenerator.getOrgMaster();
     FHIRHandler fhirHandler = new FHIRHandler(dataSession);
     patientReported = fhirHandler.FIHR_EventPatientReported(orgAccess, patient,null);
 
@@ -56,7 +58,6 @@ public class RestfulPatientResourceProviderTest extends TestCase {
     patientReported =null;
     patient = null;
     patientMaster=null;
-    dataSession.close();
     dataSession=null;
 
   }

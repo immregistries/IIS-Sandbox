@@ -23,20 +23,20 @@ import org.immregistries.iis.kernal.model.VaccinationMaster;
 import org.immregistries.iis.kernal.model.VaccinationReported;
 
 public class RestfuImmunizationProviderTest extends TestCase {
-  PatientReported patientReported = new PatientReported();
-  Immunization immunization = new Immunization();
-  Location location = new Location();
-  VaccinationMaster vaccinationMaster = new VaccinationMaster();
-  OrgLocation orgLocation = new OrgLocation();
-  VaccinationReported vaccinationReported= new VaccinationReported();
-  OrgAccess orgAccess ;
-  OrgMaster orgMaster ;
+  private PatientReported patientReported = new PatientReported();
+  private Immunization immunization = new Immunization();
+  private Location location = new Location();
+  private VaccinationMaster vaccinationMaster = new VaccinationMaster();
+  private OrgLocation orgLocation = new OrgLocation();
+  private VaccinationReported vaccinationReported= new VaccinationReported();
+  private OrgAccess orgAccess ;
+  private OrgMaster orgMaster ;
 
 
-  Patient patient = new Patient();
-  PatientMaster patientMaster = new PatientMaster();
+  private Patient patient = new Patient();
+  private PatientMaster patientMaster = new PatientMaster();
 
-  Session dataSession=null;
+  private Session dataSession=null;
 
 
 
@@ -68,8 +68,10 @@ public class RestfuImmunizationProviderTest extends TestCase {
     immunization.getVaccineCode().addCoding().setCode("2V4");
 
 
-   OrgAccessGenerator.authentification(orgAccess,orgMaster,dataSession);
-
+    OrgAccessGenerator.authentification();
+    dataSession=OrgAccessGenerator.getDataSession();
+    orgAccess=OrgAccessGenerator.getOrgAccess();
+    orgMaster=OrgAccessGenerator.getOrgMaster();
 
     FHIRHandler fhirHandler = new FHIRHandler(dataSession);
 
@@ -85,7 +87,6 @@ public class RestfuImmunizationProviderTest extends TestCase {
     vaccinationMaster=null;
     orgLocation=null;
     vaccinationReported=null;
-    dataSession.close();
     dataSession=null;
 
   }

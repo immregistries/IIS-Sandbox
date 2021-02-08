@@ -18,15 +18,15 @@ import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.model.PatientReported;
 
 public class PatientHandlerTest extends TestCase {
-  PatientReported patientReported = new PatientReported();
-  Patient patient = new Patient();
-  PatientMaster patientMaster = new PatientMaster();
-  Date date;
+  private PatientReported patientReported = new PatientReported();
+  private Patient patient = new Patient();
+  private PatientMaster patientMaster = new PatientMaster();
+  private Date date;
 
-  OrgAccess orgAccess ;
-  OrgMaster orgMaster ;
+  private OrgAccess orgAccess ;
+  private OrgMaster orgMaster ;
 
-  Session dataSession=null;
+  private Session dataSession=null;
 
 
 
@@ -42,9 +42,11 @@ public class PatientHandlerTest extends TestCase {
     patient.addAddress().addLine("12 rue chicago");
     patientReported.setPatient(patientMaster);
 
-    OrgAccessGenerator.authentification(orgAccess,orgMaster,dataSession);
-
-
+    OrgAccessGenerator.authentification();
+    dataSession=OrgAccessGenerator.getDataSession();
+    orgAccess=OrgAccessGenerator.getOrgAccess();
+    orgMaster=OrgAccessGenerator.getOrgMaster();
+    //System.err.println("datasession patient handler test " + dataSession!=null);
 
   }
 
@@ -52,7 +54,6 @@ public class PatientHandlerTest extends TestCase {
     patientReported =null;
     patient = null;
     patientMaster=null;
-    dataSession.close();
     dataSession=null;
   }
 
@@ -76,6 +77,8 @@ public class PatientHandlerTest extends TestCase {
   public void testFindPossibleMatch() throws Exception {
     //to be reviewed
     FHIRHandler fhirHandler = new FHIRHandler(dataSession);
+//    System.err.println("datasession patient handler test " + dataSession!=null);
+
     fhirHandler.FIHR_EventPatientReported(orgAccess, patient,null);
     /*List<PatientMaster> matches;
     Query queryBigMatch = dataSession.createQuery(

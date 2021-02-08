@@ -17,12 +17,12 @@ import org.immregistries.iis.kernal.model.VaccinationMaster;
 import org.immregistries.iis.kernal.model.VaccinationReported;
 
 public class ImmunizationHandlerTest extends TestCase {
-  PatientReported patientReported = new PatientReported();
-  Immunization immunization = new Immunization();
-  Location location = new Location();
-  VaccinationMaster vaccinationMaster = new VaccinationMaster();
-  OrgLocation orgLocation = new OrgLocation();
-  VaccinationReported vaccinationReported= new VaccinationReported();
+  private PatientReported patientReported = new PatientReported();
+  private Immunization immunization = new Immunization();
+  private Location location = new Location();
+  private VaccinationMaster vaccinationMaster = new VaccinationMaster();
+  private OrgLocation orgLocation = new OrgLocation();
+  private VaccinationReported vaccinationReported= new VaccinationReported();
   public void setUp() throws Exception {
     super.setUp();
     immunization.setRecorded(new Date());

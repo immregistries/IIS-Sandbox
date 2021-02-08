@@ -15,9 +15,23 @@ public class OrgAccessGenerator {
   private static String PARAM_PASSWORD = "1234";
   private static String PARAM_FACILITYID = "TELECOMNANCY";
   private static SessionFactory factory;
+  private static OrgAccess orgAccess= null;
+  private static OrgMaster orgMaster = null;
+  private static Session dataSession = null;
 
+  public static OrgAccess getOrgAccess() {
+    return orgAccess;
+  }
 
-  public static void authentification(OrgAccess orgAccess,OrgMaster orgMaster,Session dataSession){
+  public static Session getDataSession() {
+    return dataSession;
+  }
+
+  public static OrgMaster getOrgMaster() {
+    return orgMaster;
+  }
+
+  public static void  authentification(){
     if (factory == null) {
     factory = new AnnotationConfiguration().configure().buildSessionFactory();
   }
@@ -57,12 +71,12 @@ public class OrgAccessGenerator {
   } catch (Exception e) {
     e.printStackTrace();
   } finally {
-    dataSession.close();
+    //dataSession.close();
   }
-  dataSession= factory.openSession();
+  //dataSession= factory.openSession();
+
 
 }
-
 
 
 }

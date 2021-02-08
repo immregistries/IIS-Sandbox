@@ -45,6 +45,7 @@ public class FHIRHandler extends IncomingMessageHandler {
 
 
     {
+//      System.err.println("datasession fhirhandler " + dataSession!=null);
       Query query = dataSession.createQuery(
           "from PatientReported where orgReported = ? and patientReportedExternalLink = ?");
       query.setParameter(0, orgAccess.getOrg());
