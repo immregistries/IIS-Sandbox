@@ -40,6 +40,7 @@ import org.immregistries.iis.kernal.model.VaccinationReported;
 import org.immregistries.smm.tester.manager.HL7Reader;
 import org.immregistries.vfa.connect.ConnectFactory;
 import org.immregistries.vfa.connect.ConnectorInterface;
+import org.immregistries.vfa.connect.model.Admin;
 import org.immregistries.vfa.connect.model.EvaluationActual;
 import org.immregistries.vfa.connect.model.ForecastActual;
 import org.immregistries.vfa.connect.model.Service;
@@ -1600,8 +1601,9 @@ public ObservationMaster readObservations(HL7Reader reader,
             obxSetId++;
             String loinc = "59783-1";
             String loincLabel = "Status in series";
-            String value = forecastActual.getAdminStatus();
-            String valueLabel = forecastActual.getAdminStatus();
+            Admin admin = forecastActual.getAdmin();
+            String value = admin.getAdminStatus();
+            String valueLabel = admin.getLabel();
             String valueTable = "99106";
             printObx(sb, obxSetId, obsSubId, loinc, loincLabel, value, valueLabel, valueTable);
           }
