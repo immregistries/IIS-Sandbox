@@ -139,6 +139,8 @@ public class FHIRHandler extends IncomingMessageHandler {
         vaccinationMaster = vaccinationReportedList.get(0).getVaccination();
       } else {
         vaccinationMaster = ImmunizationHandler.findMatch(dataSession, patientReported, immunization);
+
+
       }
     }
     if (vaccinationMaster == null){
