@@ -177,30 +177,27 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
 
     int idInt = 0;
     boolean isExternalLink = false;
-    try {
+    /*try {
       idInt = Integer.parseInt(id);
     } catch (NumberFormatException | NullPointerException e) {
       isExternalLink = true;
-    }
+    }*/
 
     {
       Query query;
-      if (isExternalLink) {
-        query = dataSession.createQuery(
-            "from PatientReported where orgReported = ? and patientReportedExternalLink = ?");
-        query.setParameter(0, orgAccess.getOrg());
-        query.setParameter(1, id);
-      } else {
-        query = dataSession
-            .createQuery("from PatientReported where orgReported = ? and patientReportedId = ?");
-        query.setParameter(0, orgAccess.getOrg());
-        query.setParameter(1, idInt);
-      }
+
+      query = dataSession.createQuery(
+          "from PatientReported where orgReported = ? and patientReportedExternalLink = ?");
+      query.setParameter(0, orgAccess.getOrg());
+      query.setParameter(1, id);
+      System.err.println("L id du patient reported est "+ id);
 
       @SuppressWarnings("unchecked")
-	List<PatientReported> patientReportedList = query.list();
-      System.err.println("la taille est " + patientReportedList.size());
+	    List<PatientReported> patientReportedList = query.list();
+
       if (patientReportedList.size() > 0) {
+
+        System.err.println("la taille est " + patientReportedList.size());
         patientReported = patientReportedList.get(0);
         patient = PatientHandler.getPatient(null, null, patientReported);
 
@@ -224,14 +221,14 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
     }
     return patient;
   }
-
+//We can delete only Patient with no link
   /**
    * This methods delete from the database the information about the patient with the provided id
    * @param id The id of the resource to be deleted
    * @param dataSession The session
    * @param orgAccess The orgAccess
    */
-  //We can delete only Patient with no link
+
   public void deletePatientById(String id, Session dataSession, OrgAccess orgAccess) {
     PatientReported patientReported = null;
     PatientLink patientLink = null;

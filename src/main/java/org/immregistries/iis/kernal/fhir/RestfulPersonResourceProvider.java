@@ -91,14 +91,17 @@ public class RestfulPersonResourceProvider implements IResourceProvider {
       person = PersonHandler.getPerson(patientReported);
     }
     //add Link
+    System.err.println("adding links");
 
-    int linkId = patientReported.getPatientReportedId();
+    int linkId = patientReported.getPatient().getPatientId();
     Query queryLink = dataSession.createQuery("from PatientLink where patientMaster.id = ?");
     queryLink.setParameter(0, linkId);
-    @SuppressWarnings("unchecked")
+    System.err.println("partienMasterId " + linkId);
+
 	List<PatientLink> patientLinkList = queryLink.list();
 
     if (patientLinkList.size() > 0) {
+      System.err.println("found links ");
       for (PatientLink link : patientLinkList) {
         String ref = link.getPatientReported().getPatientReportedExternalLink();
         int assuranceLevel = link.getLevelConfidence();
@@ -108,10 +111,12 @@ public class RestfulPersonResourceProvider implements IResourceProvider {
         if (assuranceLevel == 1) {
           person.addLink(personLinkComponent.setTarget(reference)
               .setAssurance(Person.IdentityAssuranceLevel.LEVEL2));
+          System.err.println("adding links level 1");
 
         } else {
           person.addLink(personLinkComponent.setTarget(reference)
               .setAssurance(Person.IdentityAssuranceLevel.LEVEL3));
+          System.err.println("adding links level 2");
         }
       }
 
