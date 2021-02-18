@@ -131,7 +131,8 @@ public class FHIRHandler extends IncomingMessageHandler {
       Query query = dataSession.createQuery(
           "from VaccinationReported where patientReported = ? and vaccinationReportedExternalLink = ?");
       query.setParameter(0, patientReported);
-      query.setParameter(1, immunization.getId());
+      query.setParameter(1, immunization.getIdentifier().get(0).getValue());
+      System.err.println("identifiant immunization " + immunization.getIdentifier().get(0).getValue());
       @SuppressWarnings("unchecked")
       List<VaccinationReported> vaccinationReportedList = query.list();
       if (vaccinationReportedList.size() > 0) { // if external link found

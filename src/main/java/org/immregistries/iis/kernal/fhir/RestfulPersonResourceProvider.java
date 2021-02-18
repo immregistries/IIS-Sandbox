@@ -31,6 +31,7 @@ import ca.uhn.fhir.rest.annotation.Update;
 
 
 public class RestfulPersonResourceProvider implements IResourceProvider {
+
   protected Session dataSession = null;
   protected OrgAccess orgAccess = null;
   protected OrgMaster orgMaster = null;
@@ -84,7 +85,7 @@ public class RestfulPersonResourceProvider implements IResourceProvider {
         dataSession.createQuery("from PatientReported where patientReportedExternalLink = ?");
     query.setParameter(0, idPart);
     @SuppressWarnings("unchecked")
-	List<PatientReported> patientReportedList = query.list();
+    List<PatientReported> patientReportedList = query.list();
 
     if (patientReportedList.size() > 0) {
       patientReported = patientReportedList.get(0);
@@ -98,7 +99,7 @@ public class RestfulPersonResourceProvider implements IResourceProvider {
     queryLink.setParameter(0, linkId);
     System.err.println("partienMasterId " + linkId);
 
-	List<PatientLink> patientLinkList = queryLink.list();
+    List<PatientLink> patientLinkList = queryLink.list();
 
     if (patientLinkList.size() > 0) {
       System.err.println("found links ");
@@ -160,75 +161,70 @@ public class RestfulPersonResourceProvider implements IResourceProvider {
     }
     return new MethodOutcome();
   }
+
   /**
    * This methods delete from the database the information about the person with the provided id
    * @param idPart The id of the resource to be deleted
    * @param dataSession The session
    * @param orgAccess The orgAccess
    */
-  private void deletePersonById(String idPart, Session dataSession, OrgAccess orgAccess)
-      throws Exception {
-    PatientReported patientReported = null;
-    PatientMaster patientMaster = null;
+  private void deletePersonById(String idPart, Session dataSession, OrgAccess orgAccess) throws Exception {
+      PatientMaster patientMaster = null;
 
-    {
-      Query query = dataSession.createQuery(
-          "from  PatientReported where orgReported = ? and patientReportedExternalLink = ?");
-      query.setParameter(0, orgAccess.getOrg());
-      query.setParameter(1, idPart);
-      @SuppressWarnings("unchecked")
-	List<PatientReported> patientReportedList = query.list();
-      System.err.println(orgAccess.getOrg());
-      System.err.println(idPart);
-      System.err.println(patientReportedList.size());
-      if (patientReportedList.size() > 0) {
+      {
+        Query query = dataSession.createQuery(
+            "from  PatientMaster where patientExternalLink = ?");
 
-        patientReported = patientReportedList.get(0);
-        patientMaster = patientReported.getPatient();
-      }
-      //Verify all links are already deleted if not ask to delete the patients first
-    }
+        query.setParameter(0, idPart);
+        @SuppressWarnings("unchecked")
+        List<PatientMaster> patientMasterList = query.list();
+        if (patientMasterList.size() > 0) {
 
-    {
-      Query query = dataSession.createQuery(
-          "from  PatientReported where orgReported = ? and patientReportedExternalLink = ?");
-      query.setParameter(0, orgAccess.getOrg());
-      query.setParameter(1, idPart);
-      @SuppressWarnings("unchecked")
-	List<PatientReported> patientReportedList = query.list();
-      System.err.println(orgAccess.getOrg());
-      System.err.println(idPart);
-      System.err.println(patientReportedList.size());
-      if (patientReportedList.size() > 0) {
-
-        patientReported = patientReportedList.get(0);
-        patientMaster = patientReported.getPatient();
+          patientMaster = patientMasterList.get(0);
+        }
       }
 
-    }
-    {
-      //Verify if all links are already deleted if not ask to delete
-      // the several PatientReported and PatientLink first
-      Query queryLink =
-          dataSession.createQuery("from  PatientLink where patientMaster.patientId = ?");
-      queryLink.setParameter(0, patientMaster.getPatientId());
+      {
+        //Verify if all links and patient reported are already deleted if not ask to delete
+        // the several PatientReported and PatientLink first
 
-      @SuppressWarnings("unchecked")
-	List<PatientLink> patientLinkList = queryLink.list();
+          Query query = dataSession.createQuery(
+              "from  PatientReported where orgReported = ? and patientReportedExternalLink = ?");
+          query.setParameter(0, orgAccess.getOrg());
+          query.setParameter(1, idPart);
+          @SuppressWarnings("unchecked")
+          List<PatientReported> patientReportedList = query.list();
 
-      if (patientLinkList.size() > 0) {
+          System.err.println(patientReportedList.size());
+          if (patientReportedList.size() > 0) {
 
-        throw new Exception("The patients linked  to Person/" + idPart + " must be deleted first");
-      }
+            throw new Exception(
+                "The patient  Patient/" + idPart + " must be deleted first");
+          }
+        }
 
-    }
+
+        Query queryLink =
+            dataSession.createQuery("from  PatientLink where patientMaster.patientId = ?");
+        queryLink.setParameter(0, patientMaster.getPatientId());
+
+        @SuppressWarnings("unchecked")
+        List<PatientLink> patientLinkList = queryLink.list();
+
+        if (patientLinkList.size() > 0) {
+
+          throw new Exception(
+              "The patients linked  to Person/" + idPart + " must be deleted first");
+        }
 
 
     {
       Transaction transaction = dataSession.beginTransaction();
-      dataSession.delete(patientReported);
+
       dataSession.delete(patientMaster);
       transaction.commit();
     }
   }
+
+
 }

@@ -70,6 +70,7 @@ public class RestfulImmunizationProvider implements IResourceProvider {
     try {
       orgAccess = Authentication.authenticateOrgAccess(theRequestDetails, dataSession);
       FHIRHandler fhirHandler = new FHIRHandler(dataSession);
+      System.err.println("patient de l immunization " +theImmunization.getPatient().getReference().substring(8));
       PatientReported pr = PatientRepository.getPatientFromExternalId(orgAccess, dataSession,
           theImmunization.getPatient().getReference().substring(8)); // the id patient starts with Patient/ so we cut it
       if (null != pr) {
