@@ -127,7 +127,7 @@ public class RestfuImmunizationProviderTest extends TestCase {
     List<VaccinationReported> vaccinationReportedList = query.list();
     if (vaccinationReportedList.size() > 0) {
       System.err.println(vaccinationReportedList.size());
-      vaccinationReported = vaccinationReportedList.get(2);
+      vaccinationReported = vaccinationReportedList.get(0);
       System.err.println(vaccinationReported.getLotnumber());
 
     }

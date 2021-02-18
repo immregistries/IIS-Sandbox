@@ -46,7 +46,7 @@ public class ImmunizationHandler {
    * @param vaccinationReported the vaccinationReported
    * @param i the Immunization resource
    */
-  public static void vaccinationReportedFromFhirImmunization(
+  public static VaccinationReported vaccinationReportedFromFhirImmunization(
       VaccinationReported vaccinationReported, Immunization i) {
     //vaccinationReported.setVaccinationReportedId(0);
     vaccinationReported.setVaccinationReportedExternalLink(i.getId());
@@ -57,7 +57,7 @@ public class ImmunizationHandler {
     }
     vaccinationReported.setUpdatedDate(new Date());
     vaccinationReported.setLotnumber(i.getLotNumber());
-    System.err.println("le lot number est" + i.getLotNumber());
+    //System.err.println("le lot number est" + i.getLotNumber());
     if(i.getOccurrenceDateTimeType().getValue()==null){
       vaccinationReported.setAdministeredDate(i.getOccurrenceStringType().dateTimeValue().getValue());
     }
@@ -83,7 +83,7 @@ public class ImmunizationHandler {
     }else{
       vaccinationReported.setInformationSource("00");
     }
-
+    return vaccinationReported;
   }
 
   /**

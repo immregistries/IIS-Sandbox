@@ -96,7 +96,7 @@ public class FHIRHandler extends IncomingMessageHandler {
 
       dataSession.saveOrUpdate(patientMaster);
       dataSession.saveOrUpdate(patientReported);
-      System.err.println("patient Created");
+      //System.err.println("patient Created");
       if(patientAlreadyExists) {
         System.err.println("creation patientlink");
         PatientLink pl = new PatientLink();
@@ -126,8 +126,8 @@ public class FHIRHandler extends IncomingMessageHandler {
     VaccinationReported vaccinationReported = null;
 
     vaccinationReported = new VaccinationReported();
-    vaccinationReported.setPatientReported(patientReported);
-    ImmunizationHandler.vaccinationReportedFromFhirImmunization(vaccinationReported,immunization);
+
+
     {
       Query query = dataSession.createQuery(
           "from VaccinationReported where patientReported = ? and vaccinationReportedExternalLink = ?");
@@ -139,6 +139,7 @@ public class FHIRHandler extends IncomingMessageHandler {
       if (vaccinationReportedList.size() > 0) { // if external link found
         System.err.println("Immunization already exists");
         vaccinationMaster = vaccinationReportedList.get(0).getVaccination();
+        vaccinationReported=vaccinationReportedList.get(0);
       } else {
         System.err.println("searching for duplication immunization ");
         vaccinationMaster = ImmunizationHandler.findMatch(dataSession, patientReported, immunization);
@@ -146,6 +147,9 @@ public class FHIRHandler extends IncomingMessageHandler {
 
       }
     }
+    vaccinationReported=ImmunizationHandler.vaccinationReportedFromFhirImmunization(vaccinationReported,immunization);
+    vaccinationReported.setPatientReported(patientReported);
+
     if (vaccinationMaster == null){
       System.err.println("creation of a new vaccination master");
       vaccinationMaster = new VaccinationMaster();
@@ -181,6 +185,7 @@ public class FHIRHandler extends IncomingMessageHandler {
       }
       vaccinationReported.setOrgLocation(orgLocation);
     }
+    System.err.println("final" +vaccinationReported.getLotnumber());
 
 
     Transaction transaction = dataSession.beginTransaction();
