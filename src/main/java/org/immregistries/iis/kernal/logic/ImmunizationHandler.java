@@ -57,6 +57,7 @@ public class ImmunizationHandler {
     }
     vaccinationReported.setUpdatedDate(new Date());
     vaccinationReported.setLotnumber(i.getLotNumber());
+    System.err.println("le lot number est" + i.getLotNumber());
     if(i.getOccurrenceDateTimeType().getValue()==null){
       vaccinationReported.setAdministeredDate(i.getOccurrenceStringType().dateTimeValue().getValue());
     }

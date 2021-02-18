@@ -32,7 +32,7 @@ public class PatientHandlerTest extends TestCase {
 
   public void setUp() throws Exception {
     super.setUp();
-    patient.addIdentifier().setValue("Identifiant1");
+    patient.addIdentifier().setValue("testPatient");
     HumanName name = patient.addName().setFamily("Doe").addGiven("John");
     //System.err.println(p.getNameFirstRep().getGiven().get(0).toString());
     date= new Date();
@@ -59,7 +59,7 @@ public class PatientHandlerTest extends TestCase {
 
   public void testPatientReportedFromFhirPatient() {
     PatientHandler.patientReportedFromFhirPatient(patientReported, patient);
-    assertEquals("Identifiant1", patientReported.getPatientReportedExternalLink());
+    assertEquals("testPatient", patientReported.getPatientReportedExternalLink());
     assertEquals("Doe",patientReported.getPatientNameLast());
     assertFalse(patientReported.getPatientBirthDate()==null);
     assertEquals("M", patientReported.getPatientSex());
@@ -90,16 +90,19 @@ public class PatientHandlerTest extends TestCase {
     System.err.println(matches.size());*/
 
 
-    Patient patient = new Patient();
-    patient.addIdentifier().setValue("match");
-    HumanName name = patient.addName().setFamily("Doe").addGiven("John");
+    Patient patientMatch = new Patient();
+    patientMatch.addIdentifier().setValue("Patientmatch");
+    HumanName name = patientMatch.addName().setFamily("Doe").addGiven("John");
 
 
-    patient.setBirthDate(date);
+    patientMatch.setBirthDate(date);
 
-    patient.setGender(AdministrativeGender.MALE);
-    patient.addAddress().addLine("12 avenue de Nancy");
+    patientMatch.setGender(AdministrativeGender.MALE);
+    patientMatch.addAddress().addLine("12 avenue de Nancy");
+
+    fhirHandler.FIHR_EventPatientReported(orgAccess,patientMatch,null);
     assertTrue(PatientHandler.findPossibleMatch(dataSession,patient).size()>0);
+
 
 
   }

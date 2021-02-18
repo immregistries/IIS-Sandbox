@@ -137,15 +137,17 @@ public class FHIRHandler extends IncomingMessageHandler {
       @SuppressWarnings("unchecked")
       List<VaccinationReported> vaccinationReportedList = query.list();
       if (vaccinationReportedList.size() > 0) { // if external link found
-        System.out.println("Immunization already exists");
+        System.err.println("Immunization already exists");
         vaccinationMaster = vaccinationReportedList.get(0).getVaccination();
       } else {
+        System.err.println("searching for duplication immunization ");
         vaccinationMaster = ImmunizationHandler.findMatch(dataSession, patientReported, immunization);
 
 
       }
     }
     if (vaccinationMaster == null){
+      System.err.println("creation of a new vaccination master");
       vaccinationMaster = new VaccinationMaster();
       vaccinationMaster.setPatient(patientReported.getPatient());
       vaccinationMaster.setVaccinationReported(vaccinationReported);

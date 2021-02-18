@@ -44,7 +44,7 @@ public class RestfuImmunizationProviderTest extends TestCase {
   public void setUp() throws Exception {
     super.setUp();
 
-    patient.addIdentifier().setValue("Identifiant1");
+    patient.addIdentifier().setValue("testPatientImmunization");
     HumanName name = patient.addName().setFamily("Doe").addGiven("John");
 
     System.err.println((patient.getNameFirstRep().getGiven().get(0)));
@@ -55,17 +55,17 @@ public class RestfuImmunizationProviderTest extends TestCase {
     patient.addAddress().addLine("12 rue chicago");
     patientReported.setPatient(patientMaster);
     immunization.setRecorded(new Date());
-    immunization.setId("idImmunization");
+    immunization.setId("testImmunizationProvider");
     immunization.setLotNumber("LOT1");
     immunization.getOccurrenceDateTimeType().setValue(new  Date());
     immunization.setDoseQuantity(new Quantity().setValue(new BigDecimal(10)));
     immunization.setExpirationDate(new Date());
-    immunization.addIdentifier().setValue("identifiant2");
+    immunization.addIdentifier().setValue("testImmunizationProvider");
     String ref = patient.getIdentifier().get(0).getValue();
     Reference reference = new Reference("Patient/" + ref);
     immunization.setPatient(reference);
-    immunization.addReasonCode().addCoding().setCode("2V4");
-    immunization.getVaccineCode().addCoding().setCode("2V4");
+    immunization.addReasonCode().addCoding().setCode("vaccineCode");
+    immunization.getVaccineCode().addCoding().setCode("vaccineCode");
 
 
     OrgAccessGenerator.authentification();
@@ -98,7 +98,7 @@ public class RestfuImmunizationProviderTest extends TestCase {
     {
       Query query = dataSession
           .createQuery("from VaccinationReported where vaccinationReportedExternalLink = ?");
-      query.setParameter(0, "identifiant2");
+      query.setParameter(0, "testImmunizationProvider");
       @SuppressWarnings("unchecked")
       List<VaccinationReported> vaccinationReportedList = query.list();
       if (vaccinationReportedList.size() > 0) {
@@ -106,7 +106,7 @@ public class RestfuImmunizationProviderTest extends TestCase {
 
       }
     }
-    assertEquals("identifiant2",vaccinationReported.getVaccinationReportedExternalLink());
+    assertEquals("testImmunizationProvider",vaccinationReported.getVaccinationReportedExternalLink());
   }
 
   public void testUpdateImmunization() throws Exception {
@@ -116,24 +116,24 @@ public class RestfuImmunizationProviderTest extends TestCase {
 
     FHIRHandler fhirHandler = new FHIRHandler(dataSession);
 
-    patientReported=fhirHandler.FIHR_EventPatientReported(orgAccess, patient, immunization);
+    //patientReported=fhirHandler.FIHR_EventPatientReported(orgAccess, patient, immunization);
     fhirHandler.FHIR_EventVaccinationReported(orgAccess, patient,patientReported, immunization);
 
 
     Query query = dataSession
         .createQuery("from VaccinationReported where vaccinationReportedExternalLink = ?");
-    query.setParameter(0, "identifiant2");
+    query.setParameter(0, "testImmunizationProvider");
 
     List<VaccinationReported> vaccinationReportedList = query.list();
     if (vaccinationReportedList.size() > 0) {
       System.err.println(vaccinationReportedList.size());
-      vaccinationReported = vaccinationReportedList.get(0);
+      vaccinationReported = vaccinationReportedList.get(2);
       System.err.println(vaccinationReported.getLotnumber());
 
     }
 
     //assertEquals("LOT2",vaccinationReported.getLotnumber()); problem
-    assertEquals("LOT1",vaccinationReported.getLotnumber());
+    assertEquals("LOT2",vaccinationReported.getLotnumber());
 
   }
 }

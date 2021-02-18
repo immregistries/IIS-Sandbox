@@ -31,7 +31,7 @@ public class ImmunizationHandlerTest extends TestCase {
     immunization.getOccurrenceDateTimeType().setValue(new  Date());
     immunization.setDoseQuantity(new Quantity().setValue(new BigDecimal(10)));
     immunization.setExpirationDate(new Date());
-    immunization.addIdentifier().setValue("identifiant1");
+    immunization.addIdentifier().setValue("testImmunization");
 
 
 
@@ -59,7 +59,7 @@ public class ImmunizationHandlerTest extends TestCase {
     assertEquals(vaccinationReported.getLotnumber(),"LOT1");
     assertTrue(vaccinationReported.getAdministeredDate()!=null);
     assertEquals(vaccinationReported.getAdministeredAmount(),new BigDecimal(10).toString());
-    assertEquals("identifiant1",vaccinationReported.getVaccinationReportedExternalLink());
+    assertEquals("testImmunization",vaccinationReported.getVaccinationReportedExternalLink());
 
 
   }
