@@ -4,7 +4,7 @@
   <session-factory>
     <property name="hibernate.connection.driver_class">com.mysql.jdbc.Driver</property>
 
-    <property name="hibernate.connection.url">jdbc:mysql://localhost/iis?serverTimezone=Europe/Paris&amp;useLegacyDatetimeCode=false</property>
+    <property name="hibernate.connection.url">jdbc:mysql://localhost/iis</property>
     <property name="hibernate.connection.username">iis_web</property>
     <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
     <property name="connection.password">SharkBaitHooHaHa</property>
