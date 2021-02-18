@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-configuration SYSTEM "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+  <session-factory>
+    <property name="hibernate.connection.driver_class">java.sql.Driver</property>
+
+    <property name="hibernate.connection.url">jdbc:h2:mem:test</property>
+    <property name="hibernate.connection.username">iis_web</property>
+    <property name="hibernate.dialect">org.hibernate.dialect.H2Dialect</property>
+    <property name="connection.password">SharkBaitHooHaHa</property>
+
+    <property name="hibernate.hbm2ddl.auto">create</property>
+
+    <property name="show_sql">false</property>
+    <property name="hibernate.c3p0.acquire_increment">1</property>
+    <property name="hibernate.c3p0.idle_test_period">100</property><!--  seconds -->
+    <property name="hibernate.c3p0.timeout">100</property><!--  seconds -->
+    <property name="hibernate.c3p0.max_size">30</property>
+    <property name="hibernate.c3p0.min_size">5</property>
+    <property name="hibernate.c3p0.max_statements">10</property>
+
+    <mapping resource="org/immregistries/iis/kernal/model/OrgMaster.hbm.xml"/>
+    <mapping resource="org/immregistries/iis/kernal/model/OrgAccess.hbm.xml"/>
+    <mapping resource="org/immregistries/iis/kernal/model/OrgLocation.hbm.xml"/>
+    <mapping resource="org/immregistries/iis/kernal/model/PatientMaster.hbm.xml"/>
+    <mapping resource="org/immregistries/iis/kernal/model/PatientMatch.hbm.xml"/>
+    <mapping resource="org/immregistries/iis/kernal/model/PatientReported.hbm.xml"/>
+    <mapping resource="org/immregistries/iis/kernal/model/Person.hbm.xml"/>
+    <mapping resource="org/immregistries/iis/kernal/model/MessageReceived.hbm.xml"/>
+    <mapping resource="org/immregistries/iis/kernal/model/VaccinationMaster.hbm.xml"/>
+    <mapping resource="org/immregistries/iis/kernal/model/VaccinationReported.hbm.xml"/>
+    <mapping resource="org/immregistries/iis/kernal/model/ObservationMaster.hbm.xml"/>
+    <mapping resource="org/immregistries/iis/kernal/model/ObservationReported.hbm.xml"/>
+    <mapping resource="org/immregistries/iis/kernal/model/PatientLink.hbm.xml"/>
+  </session-factory>
+</hibernate-configuration>

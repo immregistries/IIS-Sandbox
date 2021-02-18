@@ -33,7 +33,7 @@ public class OrgAccessGenerator {
 
   public static void  authentification(){
     if (factory == null) {
-    factory = new AnnotationConfiguration().configure().buildSessionFactory();
+    factory = new AnnotationConfiguration().configure("hibernate.h2.cfg.xml").buildSessionFactory();
   }
     dataSession =factory.openSession();
     try {
