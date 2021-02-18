@@ -148,6 +148,19 @@
             </use-date>
         </code>
         <code>
+            <value>Janssen (J&amp;J) COVID-19 Vaccine</value>
+            <label>COVID-19 vaccine, vector-nr, rS-Ad26, PF, 0.5 mL</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">212</link-to>
+            </reference>
+            <use-date>
+                <not-before>20210113</not-before>
+            </use-date>
+        </code>
+        <code>
             <value>AstraZeneca COVID-19 Vaccine</value>
             <label>COVID-19 vaccine, vector-nr, rS-ChAdOx1, PF, 0.5 mL</label>
             <code-status>
@@ -8591,6 +8604,32 @@
             </use-date>
         </code>
         <code>
+            <value>210</value>
+            <label>COVID-19 AstraZeneca Vaccine EUA Recipient-Caregiver Fact Sheet</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300035611210201</link-to>
+            </reference>
+            <use-date>
+                <not-before>20210201</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>212</value>
+            <label>COVID-19 Janssen Vaccine EUA Recipient-Caregiver Fact Sheet</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300036311210201</link-to>
+            </reference>
+            <use-date>
+                <not-before>20210201</not-before>
+            </use-date>
+        </code>
+        <code>
             <value>207</value>
             <label>COVID-19 Moderna Vaccine EUA Recipient-Caregiver Fact Sheet</label>
             <code-status>
@@ -14872,6 +14911,7 @@
                 <link-to codeset="VACCINATION_CVX_CODE">207</link-to>
                 <link-to codeset="VACCINATION_CVX_CODE">208</link-to>
                 <link-to codeset="VACCINATION_CVX_CODE">210</link-to>
+                <link-to codeset="VACCINATION_CVX_CODE">212</link-to>
             </reference>
         </code>
         <code>
@@ -16745,6 +16785,25 @@
             <test-age>2 months</test-age>
         </code>
         <code>
+            <value>212</value>
+            <label>COVID-19 vaccine, vector-nr, rS-Ad26, PF, 0.5 mL</label>
+            <description>SARS-COV-2 (COVID-19) vaccine, vector non-replicating, recombinant spike protein-Ad26, preservative free, 0.5 mL Notes: Potential EUA, 1-dose vaccine</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINE_GROUP">COVID-19</link-to>
+                <link-to codeset="VACCINATION_TRADE_NAME">Janssen (J&amp;J) COVID-19 Vaccine</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">59676-0580-05</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">59676-0580-15</link-to>
+                <link-to codeset="VACCINATION_CPT_CODE">91303</link-to>
+            </reference>
+            <use-date>
+                <not-before>20210126</not-before>
+            </use-date>
+            <concept-type>vaccine</concept-type>
+        </code>
+        <code>
             <value>210</value>
             <label>COVID-19 vaccine, vector-nr, rS-ChAdOx1, PF, 0.5 mL</label>
             <description>SARS-COV-2 (COVID-19) vaccine, vector non-replicating, recombinant spike protein-ChAdOx1, preservative free, 0.5 mL Notes: Potential EUA, 2-dose vaccine</description>
@@ -16756,6 +16815,7 @@
                 <link-to codeset="VACCINATION_TRADE_NAME">AstraZeneca COVID-19 Vaccine</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">00310-1222-10</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">00310-1222-15</link-to>
+                <link-to codeset="VACCINATION_CPT_CODE">91302</link-to>
             </reference>
             <use-date>
                 <not-before>20201222</not-before>
@@ -22281,6 +22341,32 @@
             </use-date>
         </code>
         <code>
+            <value>253088698300035611210201</value>
+            <label>COVID-19 AstraZeneca Vaccine EUA Recipient-Caregiver Fact Sheet</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_VIS_VACCINES">210</link-to>
+            </reference>
+            <use-date>
+                <not-before>20210201</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>253088698300036311210201</value>
+            <label>COVID-19 Janssen Vaccine EUA Recipient-Caregiver Fact Sheet</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_VIS_VACCINES">212</link-to>
+            </reference>
+            <use-date>
+                <not-before>20210201</not-before>
+            </use-date>
+        </code>
+        <code>
             <value>253088698300034911201201</value>
             <label>COVID-19 Moderna Vaccine EUA Recipient-Caregiver Fact Sheet</label>
             <code-status>
@@ -25226,12 +25312,26 @@
             <use-date/>
         </code>
         <code>
+            <value>91303</value>
+            <label>Severe acute respiratory syndrome coronavirus 2 (SARS-CoV-2) (coronavirus disease [COVID-19]) vaccine, DNA, spike protein, adenovirus type 26 (Ad26) vector, preservative free, 5x1010 viral particles/0.5mL dosage, for intramuscular use</label>
+            <description>COVID-19 Vaccine - Potential EUA authorization</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">212</link-to>
+            </reference>
+        </code>
+        <code>
             <value>91302</value>
             <label>Severe acute respiratory syndrome coronavirus 2 (SARS-CoV-2) (coronavirus disease [COVID-19]) vaccine, DNA, spike protein, chimpanzee adenovirus Oxford 1 (ChAdOx1) vector, preservative free, 5x1010 viral particles/0.5mL dosage, for intramuscular use</label>
             <description>COVID-19 Vaccine - Potential EUA authorization</description>
             <code-status>
                 <status>Valid</status>
             </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">210</link-to>
+            </reference>
         </code>
         <code>
             <value>91301</value>
@@ -25559,6 +25659,7 @@
             </reference>
             <use-date>
                 <not-before>20131001</not-before>
+                <not-after>20210120</not-after>
             </use-date>
         </code>
         <code>
@@ -36965,6 +37066,47 @@
             </code-status>
         </code>
         <code>
+            <value>59676-0580-05</value>
+            <label>Janssen COVID-19 Vaccine</label>
+            <description>Janssen Products, LP - SARS-COV-2 (COVID-19) vaccine, vector non-replicating, recombinant spike protein-Ad26, preservative free, 0.5 mLee, 0.5 mL</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">212</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">59676-0580-15</link-to>
+            </reference>
+            <use-date>
+                <not-before>20210201</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>59676-580-05</value>
+            <label>Janssen COVID-19 Vaccine</label>
+            <description>Janssen Products, LP - SARS-COV-2 (COVID-19) vaccine, vector non-replicating, recombinant spike protein-Ad26, preservative free, 0.5 mLee, 0.5 mL</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>59676-0580-05</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20210125</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>59676058005</value>
+            <label>Janssen COVID-19 Vaccine</label>
+            <description>Janssen Products, LP - SARS-COV-2 (COVID-19) vaccine, vector non-replicating, recombinant spike protein-Ad26, preservative free, 0.5 mLee, 0.5 mL</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>59676-0580-05</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20210125</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
             <value>58160-0812-43</value>
             <label>KINRIX</label>
             <description>GlaxoSmithKline Biologicals SA - DIPHTHERIA AND TETANUS TOXOIDS AND ACELLULAR PERTUSSIS ADSORBED AND INACTIVATED POLIOVIRUS VACCINE</description>
@@ -40672,6 +40814,7 @@
             </reference>
             <use-date>
                 <not-before>20131001</not-before>
+                <not-after>20210120</not-after>
             </use-date>
         </code>
         <code>
@@ -52153,6 +52296,47 @@
                     <new-code-value>62195-0051-01</new-code-value>
                     <reason>Use 11-digit format with dashes</reason>
                     <effective-date>20201229</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>59676-0580-15</value>
+            <label>Janssen COVID-19 Vaccine</label>
+            <description>Janssen Products, LP - SARS-COV-2 (COVID-19) vaccine, vector non-replicating, recombinant spike protein-Ad26, preservative free, 0.5 mL</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">212</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">59676-0580-05</link-to>
+            </reference>
+            <use-date>
+                <not-before>20210201</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>59676-580-15</value>
+            <label>Janssen COVID-19 Vaccine</label>
+            <description>Janssen Products, LP - SARS-COV-2 (COVID-19) vaccine, vector non-replicating, recombinant spike protein-Ad26, preservative free, 0.5 mL</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>59676-0580-15</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20210125</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>59676058015</value>
+            <label>Janssen COVID-19 Vaccine</label>
+            <description>Janssen Products, LP - SARS-COV-2 (COVID-19) vaccine, vector non-replicating, recombinant spike protein-Ad26, preservative free, 0.5 mL</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>59676-0580-15</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20210125</effective-date>
                 </deprecated>
             </code-status>
         </code>

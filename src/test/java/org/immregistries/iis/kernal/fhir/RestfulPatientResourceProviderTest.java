@@ -17,93 +17,49 @@ import org.immregistries.iis.kernal.model.OrgMaster;
 
 import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.model.PatientReported;
-import ca.uhn.fhir.rest.api.server.RequestDetails;
 
 public class RestfulPatientResourceProviderTest extends TestCase {
-  PatientReported patientReported = new PatientReported();
-  Patient p= new Patient();
-  PatientMaster patientMaster = new PatientMaster();
+  private PatientReported patientReported = new PatientReported();
+  private Patient patient = new Patient();
+  private PatientMaster patientMaster = new PatientMaster();
   //SessionFactory factory = new AnnotationConfiguration().configure().buildSessionFactory();
   //Session dataSession = factory.openSession();
-  OrgAccess orgAccess ;
-  OrgMaster orgMaster ;
+  private OrgAccess orgAccess ;
+  private OrgMaster orgMaster ;
 
-  Session dataSession=null;
-  String PARAM_USERID = "TELECOM NANCY";
-  String PARAM_PASSWORD = "1234";
-  String PARAM_FACILITYID = "TELECOMNANCY";
-  SessionFactory factory;
+  private Session dataSession=null;
 
 
 
   public void setUp() throws Exception {
     super.setUp();
-    p.addIdentifier().setValue("Identifiant1");
-    HumanName name = p.addName().setFamily("Doe").addGiven("John");
+    patient.addIdentifier().setValue("Identifiant1");
+    HumanName name = patient.addName().setFamily("Doe").addGiven("John");
 
 
     Date date= new Date();
-    p.setBirthDate(date);
+    patient.setBirthDate(date);
 
-    p.setGender(AdministrativeGender.MALE);
-    p.addAddress().addLine("12 rue chicago");
+    patient.setGender(AdministrativeGender.MALE);
+    patient.addAddress().addLine("12 rue chicago");
     patientReported.setPatient(patientMaster);
+    OrgAccessGenerator.authentification();
 
-    if (factory == null) {
-      factory = new AnnotationConfiguration().configure().buildSessionFactory();
-    }
-    dataSession =factory.openSession();
-
-    try {
-      if (orgAccess == null) {
-        Query query = dataSession.createQuery("from OrgMaster where organizationName = ?");
-        query.setParameter(0, PARAM_FACILITYID);
-        List<OrgMaster> orgMasterList = query.list();
-        if (orgMasterList.size() > 0) {
-          orgMaster = orgMasterList.get(0);
-        } else {
-          orgMaster = new OrgMaster();
-          orgMaster.setOrganizationName(PARAM_FACILITYID);
-          orgAccess = new OrgAccess();
-          orgAccess.setOrg(orgMaster);
-          orgAccess.setAccessName(PARAM_USERID);
-          orgAccess.setAccessKey(PARAM_PASSWORD);
-          Transaction transaction = dataSession.beginTransaction();
-          dataSession.save(orgMaster);
-          dataSession.save(orgAccess);
-          transaction.commit();
-        }
-      }
-
-    if (orgAccess == null) {
-      Query query = dataSession
-          .createQuery("from OrgAccess where accessName = ? and accessKey = ? and org = ?");
-      query.setParameter(0, PARAM_USERID);
-      query.setParameter(1, PARAM_PASSWORD);
-      query.setParameter(2, orgMaster);
-      List<OrgAccess> orgAccessList = query.list();
-      if (orgAccessList.size() != 0) {
-        orgAccess = orgAccessList.get(0);
-      }
-    }
-    } catch (Exception e) {
-      e.printStackTrace();
-    } finally {
-      dataSession.close();
-    }
-    dataSession= factory.openSession();
-
+    dataSession=OrgAccessGenerator.getDataSession();
+    orgAccess=OrgAccessGenerator.getOrgAccess();
+    orgMaster=OrgAccessGenerator.getOrgMaster();
     FHIRHandler fhirHandler = new FHIRHandler(dataSession);
-    patientReported = fhirHandler.FIHR_EventPatientReported(orgAccess,p,null);
+    patientReported = fhirHandler.FIHR_EventPatientReported(orgAccess, patient,null);
 
 
   }
 
   public void tearDown() throws Exception {
     patientReported =null;
-    p = null;
+    patient = null;
     patientMaster=null;
     dataSession=null;
+
   }
   
 
@@ -113,9 +69,9 @@ public class RestfulPatientResourceProviderTest extends TestCase {
   }
 
   public void testUpdatePatient() throws Exception {
-    p.setGender(AdministrativeGender.FEMALE);
+    patient.setGender(AdministrativeGender.FEMALE);
     FHIRHandler fhirHandler = new FHIRHandler(dataSession);
-    patientReported = fhirHandler.FIHR_EventPatientReported(orgAccess,p,null);
+    patientReported = fhirHandler.FIHR_EventPatientReported(orgAccess, patient,null);
 
     assertEquals("F",patientReported.getPatientSex());
   }

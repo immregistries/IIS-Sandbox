@@ -17,21 +17,21 @@ import org.immregistries.iis.kernal.model.VaccinationMaster;
 import org.immregistries.iis.kernal.model.VaccinationReported;
 
 public class ImmunizationHandlerTest extends TestCase {
-  PatientReported patientReported = new PatientReported();
-  Immunization i = new Immunization();
-  Location location = new Location();
-  VaccinationMaster vaccinationMaster = new VaccinationMaster();
-  OrgLocation orgLocation = new OrgLocation();
-  VaccinationReported vaccinationReported= new VaccinationReported();
+  private PatientReported patientReported = new PatientReported();
+  private Immunization immunization = new Immunization();
+  private Location location = new Location();
+  private VaccinationMaster vaccinationMaster = new VaccinationMaster();
+  private OrgLocation orgLocation = new OrgLocation();
+  private VaccinationReported vaccinationReported= new VaccinationReported();
   public void setUp() throws Exception {
     super.setUp();
-    i.setRecorded(new Date());
-    i.setId("idImmunization");
-    i.setLotNumber("LOT1");
-    i.getOccurrenceDateTimeType().setValue(new  Date());
-    i.setDoseQuantity(new Quantity().setValue(new BigDecimal(10)));
-    i.setExpirationDate(new Date());
-    i.addIdentifier().setValue("identifiant1");
+    immunization.setRecorded(new Date());
+    immunization.setId("idImmunization");
+    immunization.setLotNumber("LOT1");
+    immunization.getOccurrenceDateTimeType().setValue(new  Date());
+    immunization.setDoseQuantity(new Quantity().setValue(new BigDecimal(10)));
+    immunization.setExpirationDate(new Date());
+    immunization.addIdentifier().setValue("identifiant1");
 
 
 
@@ -39,7 +39,7 @@ public class ImmunizationHandlerTest extends TestCase {
 
   public void tearDown() throws Exception {
     patientReported =null;
-    i =null;
+    immunization =null;
     location=null;
     vaccinationMaster=null;
     orgLocation=null;
@@ -47,13 +47,13 @@ public class ImmunizationHandlerTest extends TestCase {
 
   }
   public void testPatientReportedFromFhirImmunization() {
-    ImmunizationHandler.patientReportedFromFhirImmunization(patientReported,i);
+    ImmunizationHandler.patientReportedFromFhirImmunization(patientReported,immunization);
     assertTrue(patientReported.getReportedDate()!=null);
 
   }
 
   public void testVaccinationReportedFromFhirImmunization() {
-    ImmunizationHandler.vaccinationReportedFromFhirImmunization(vaccinationReported,i);
+    ImmunizationHandler.vaccinationReportedFromFhirImmunization(vaccinationReported,immunization);
     assertTrue(vaccinationReported.getReportedDate()!=null);
     assertTrue(vaccinationReported.getUpdatedDate()!=null);
     assertEquals(vaccinationReported.getLotnumber(),"LOT1");
