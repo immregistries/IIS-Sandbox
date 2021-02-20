@@ -1363,7 +1363,7 @@ public ObservationMaster readObservations(HL7Reader reader,
       }
       List<ForecastActual> forecastActualList = null;
       if (sendBackForecast) {
-        forecastActualList = doForecast(patient, patientReported, codeMap, vaccinationMasterList);
+        forecastActualList = doForecast(patient, patientReported, codeMap, vaccinationMasterList, orgAccess);
       }
       int obxSetId = 0;
       int obsSubId = 0;
@@ -1847,8 +1847,9 @@ public ObservationMaster readObservations(HL7Reader reader,
   }
 
   public List<ForecastActual> doForecast(PatientMaster patient, PatientReported patientReported,
-      CodeMap codeMap, List<VaccinationMaster> vaccinationMasterList) {
-    List<ForecastActual> forecastActualList = null;;
+      CodeMap codeMap, List<VaccinationMaster> vaccinationMasterList, OrgAccess orgAccess) {
+    List<ForecastActual> forecastActualList = null;
+    Set<ProcessingFlavor> processingFlavorSet = orgAccess.getOrg().getProcessingFlavorSet();
     try {
       TestCase testCase = new TestCase();
       testCase.setEvalDate(new Date());
@@ -1879,6 +1880,10 @@ public ObservationMaster readObservations(HL7Reader reader,
       Software software = new Software();
       software.setServiceUrl("https://florence.immregistries.org/lonestar/forecast");
       software.setService(Service.LSVF);
+      if(processingFlavorSet.contains(ProcessingFlavor.ICE)) {
+        software.setServiceUrl("https://florence.immregistries.org/opencds-decision-support-service/evaluate");
+        software.setService(Service.ICE);
+      }
 
       ConnectorInterface connector =
           ConnectFactory.createConnecter(software, VaccineGroup.getForecastItemList());
@@ -2049,7 +2054,9 @@ public ObservationMaster readObservations(HL7Reader reader,
     // OBX-5
     SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
     sb.append("|");
-    sb.append(sdf.format(value));
+    if(value != null){
+      sb.append(sdf.format(value));
+    }
     // OBX-6
     sb.append("|");
     // OBX-7

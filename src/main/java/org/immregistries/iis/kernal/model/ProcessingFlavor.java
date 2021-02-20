@@ -37,6 +37,7 @@ public enum ProcessingFlavor {
                                   "Will not accept phone numbers unless they are of Telecommunication Use Code PRN"),
                               SOURSOP("Soursop",
                                   "The facility submitted in MSH-4 must match what is sent in the CDC SOAP WSDL request"),
+                              ICE("Ice", "Forecast generated with open-cds ICE"),
                               SNAIL("Snail",
                                   "Patients are not returned until 0, 30, 60, or 90 seconds after they have been submitted"),
                               SNAIL30("Snail30",
