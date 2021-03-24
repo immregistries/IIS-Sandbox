@@ -46,7 +46,7 @@ public class EventServlet extends PopServlet {
       Session dataSession = getDataSession();
       try {
         if (orgAccess == null) {
-          orgAccess = authenticateOrgAccess(userId, password, facilityId, dataSession);
+          orgAccess = ServletHelper.authenticateOrgAccess(userId, password, facilityId, dataSession);
         }
         if (orgAccess == null) {
           resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);

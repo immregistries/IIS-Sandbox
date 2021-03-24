@@ -98,9 +98,6 @@ public class RestfulImmunizationProvider implements IResourceProvider {
     Immunization immunization = null;
     Session dataSession = getDataSession();
     try {
-      /*if (orgAccess == null) {
-      authenticateOrgAccess(PARAM_USERID, PARAM_PASSWORD, PARAM_FACILITYID, dataSession);
-      }*/
       orgAccess = Authentication.authenticateOrgAccess(theRequestDetails, dataSession);
 
       immunization =
