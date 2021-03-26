@@ -61,7 +61,7 @@ public class MessageServlet extends HttpServlet {
           String userId = req.getParameter(PARAM_USERID);
           String facilityId = req.getParameter(PARAM_FACILITYID);
           String password = req.getParameter(PARAM_PASSWORD);
-          OrgAccess orgAccess = authenticateOrgAccess(userId, password, facilityId, dataSession);
+          OrgAccess orgAccess = ServletHelper.authenticateOrgAccess(userId, password, facilityId, dataSession);
           if (orgAccess == null) {
             messageError = "Unable to login, unrecognized credentials";
           } else {
@@ -70,8 +70,8 @@ public class MessageServlet extends HttpServlet {
             Query query = dataSession.createQuery("from OrgMaster order by organizationName");
             List<OrgMaster> orgMasterList = query.list();
             for (OrgMaster orgMaster : orgMasterList) {
-              OrgAccess oa =
-                  authenticateOrgAccessForFacility(userId, password, dataSession, orgMaster);
+              OrgAccess oa = ServletHelper.authenticateOrgAccessForFacility(
+                userId, password, dataSession, orgMaster);
               if (oa != null) {
                 orgAccessMap.put(orgMaster.getOrgId(), oa);
               }
@@ -197,50 +197,4 @@ public class MessageServlet extends HttpServlet {
     out.close();
   }
 
-  @SuppressWarnings("unchecked")
-  public OrgAccess authenticateOrgAccess(String userId, String password, String facilityId,
-      Session dataSession) {
-    OrgMaster orgMaster = null;
-    OrgAccess orgAccess = null;
-    {
-      Query query = dataSession.createQuery("from OrgMaster where organizationName = ?");
-      query.setParameter(0, facilityId);
-      List<OrgMaster> orgMasterList = query.list();
-      if (orgMasterList.size() > 0) {
-        orgMaster = orgMasterList.get(0);
-      } else {
-        orgMaster = new OrgMaster();
-        orgMaster.setOrganizationName(facilityId);
-        orgAccess = new OrgAccess();
-        orgAccess.setOrg(orgMaster);
-        orgAccess.setAccessName(userId);
-        orgAccess.setAccessKey(password);
-        Transaction transaction = dataSession.beginTransaction();
-        dataSession.save(orgMaster);
-        dataSession.save(orgAccess);
-        transaction.commit();
-      }
-
-    }
-    if (orgAccess == null) {
-      orgAccess = authenticateOrgAccessForFacility(userId, password, dataSession, orgMaster);
-    }
-    return orgAccess;
-  }
-
-  public OrgAccess authenticateOrgAccessForFacility(String userId, String password,
-      Session dataSession, OrgMaster orgMaster) {
-    OrgAccess orgAccess = null;
-    Query query = dataSession
-        .createQuery("from OrgAccess where accessName = ? and accessKey = ? and org = ?");
-    query.setParameter(0, userId);
-    query.setParameter(1, password);
-    query.setParameter(2, orgMaster);
-    @SuppressWarnings("unchecked")
-	List<OrgAccess> orgAccessList = query.list();
-    if (orgAccessList.size() != 0) {
-      orgAccess = orgAccessList.get(0);
-    }
-    return orgAccess;
-  }
 }

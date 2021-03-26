@@ -100,42 +100,4 @@ public class QueryConverterServlet extends HttpServlet {
     out.close();
   }
 
-  @SuppressWarnings("unchecked")
-  public OrgAccess authenticateOrgAccess(String userId, String password, String facilityId,
-      Session dataSession) {
-    OrgMaster orgMaster = null;
-    OrgAccess orgAccess = null;
-    {
-      Query query = dataSession.createQuery("from OrgMaster where organizationName = ?");
-      query.setParameter(0, facilityId);
-      List<OrgMaster> orgMasterList = query.list();
-      if (orgMasterList.size() > 0) {
-        orgMaster = orgMasterList.get(0);
-      } else {
-        orgMaster = new OrgMaster();
-        orgMaster.setOrganizationName(facilityId);
-        orgAccess = new OrgAccess();
-        orgAccess.setOrg(orgMaster);
-        orgAccess.setAccessName(userId);
-        orgAccess.setAccessKey(password);
-        Transaction transaction = dataSession.beginTransaction();
-        dataSession.save(orgMaster);
-        dataSession.save(orgAccess);
-        transaction.commit();
-      }
-
-    }
-    if (orgAccess == null) {
-      Query query = dataSession
-          .createQuery("from OrgAccess where accessName = ? and accessKey = ? and org = ?");
-      query.setParameter(0, userId);
-      query.setParameter(1, password);
-      query.setParameter(2, orgMaster);
-      List<OrgAccess> orgAccessList = query.list();
-      if (orgAccessList.size() != 0) {
-        orgAccess = orgAccessList.get(0);
-      }
-    }
-    return orgAccess;
-  }
 }
