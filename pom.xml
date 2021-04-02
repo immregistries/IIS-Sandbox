@@ -177,6 +177,11 @@
 			<artifactId>hapi-fhir-structures-r4</artifactId>
 			<version>${hapi.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>ca.uhn.hapi</groupId>
+			<artifactId>hapi-base</artifactId>
+			<version>2.3</version>
+		</dependency>
 
 		<dependency>
 			<groupId>javax.servlet</groupId>
@@ -196,6 +201,11 @@
 			<version>RELEASE</version>
 			<scope>test</scope>
 		</dependency>
+        <dependency>
+          <groupId>com.fasterxml.jackson.core</groupId>
+          <artifactId>jackson-databind</artifactId>
+          <version>2.10.0</version>
+        </dependency>
 
 	</dependencies>
 
