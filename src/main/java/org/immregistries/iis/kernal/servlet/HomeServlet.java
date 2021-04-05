@@ -76,6 +76,8 @@ public class HomeServlet extends HttpServlet {
               "      <li><a href=\"event\">Submit Event</a>: Submit a patient and vaccination event manually.</li>");
           out.println(
               "      <li><a href=\"fhirTest\">FHIR Test Endpoint</a>: Create FHIR resources to test with IIS Sandbox.</li>");
+          out.println(
+              "      <li><a href=\"vciDemo\">VCI Demonstration</a>: Demonstration of RSP conversion steps for the Vaccine Credential Initiative</li>");
           out.println("    </ul>");
 
           out.println("    <h2>Processing Flavors</h2>");
