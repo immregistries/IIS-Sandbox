@@ -148,6 +148,20 @@
             </use-date>
         </code>
         <code>
+            <value>Novavax COVID-19 Vaccine</value>
+            <label>COVID-19 vaccine, Subunit, rS-nanoparticle+Matrix-M1 Adjuvant, PF, 0.5 mL</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">211</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">NVX</link-to>
+            </reference>
+            <use-date>
+                <not-before>20210323</not-before>
+            </use-date>
+        </code>
+        <code>
             <value>Janssen (J&amp;J) COVID-19 Vaccine</value>
             <label>COVID-19 vaccine, vector-nr, rS-Ad26, PF, 0.5 mL</label>
             <code-status>
@@ -393,6 +407,20 @@
             </reference>
             <use-date>
                 <not-after>20100901</not-after>
+            </use-date>
+        </code>
+        <code>
+            <value>ERVEBO (Ebola Zaire Vaccine, Live)</value>
+            <label>Ebola Zaire vaccine, live, recombinant, 1mL dose</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">204</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">MSD</link-to>
+            </reference>
+            <use-date>
+                <not-before>20210323</not-before>
             </use-date>
         </code>
         <code>
@@ -8637,6 +8665,7 @@
             </code-status>
             <reference>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300034911201201</link-to>
+                <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300034911210401</link-to>
             </reference>
             <use-date>
                 <not-before>20201201</not-before>
@@ -10943,6 +10972,7 @@
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">54868-2219-00</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">00006-4133-41</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">00006-4047-02</link-to>
+                <link-to codeset="VACCINATION_TRADE_NAME">ERVEBO (Ebola Zaire Vaccine, Live)</link-to>
             </reference>
             <use-date>
                 <not-before>20121018</not-before>
@@ -10983,6 +11013,8 @@
                 <link-to codeset="VACCINATION_TRADE_NAME">Moderna COVID-19 Vaccine</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">80777-0273-10</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">80777-0273-99</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">80777-0273-15</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">49281-0182-25</link-to>
             </reference>
             <use-date>
                 <not-before>20201001</not-before>
@@ -11110,6 +11142,9 @@
             <code-status>
                 <status>Valid</status>
             </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_TRADE_NAME">Novavax COVID-19 Vaccine</link-to>
+            </reference>
             <use-date>
                 <not-before>20100528</not-before>
             </use-date>
@@ -11571,6 +11606,12 @@
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">49281-0590-05</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">63361-0243-88</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">63361-0243-15</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">49281-0337-78</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">49281-0182-00</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">49281-0321-88</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">49281-0337-15</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">49281-0182-25</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">49281-0321-50</link-to>
             </reference>
             <use-date>
                 <not-before>20100528</not-before>
@@ -14912,6 +14953,7 @@
                 <link-to codeset="VACCINATION_CVX_CODE">208</link-to>
                 <link-to codeset="VACCINATION_CVX_CODE">210</link-to>
                 <link-to codeset="VACCINATION_CVX_CODE">212</link-to>
+                <link-to codeset="VACCINATION_CVX_CODE">211</link-to>
             </reference>
         </code>
         <code>
@@ -14944,6 +14986,14 @@
                 <link-to codeset="VACCINATION_CVX_CODE">22</link-to>
                 <link-to codeset="VACCINATION_CVX_CODE">102</link-to>
                 <link-to codeset="VACCINATION_CVX_CODE">195</link-to>
+            </reference>
+        </code>
+        <code>
+            <value>Ebola</value>
+            <label>Ebola Zaire vaccine, live, recombinant, 1mL dose</label>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">214</link-to>
+                <link-to codeset="VACCINATION_CVX_CODE">204</link-to>
             </reference>
         </code>
         <code>
@@ -16785,6 +16835,22 @@
             <test-age>2 months</test-age>
         </code>
         <code>
+            <value>211</value>
+            <label>COVID-19 vaccine, Subunit, rS-nanoparticle+Matrix-M1 Adjuvant, PF, 0.5 mL</label>
+            <description>SARS-COV-2 (COVID-19) vaccine, Subunit, recombinant spike protein-nanoparticle+Matrix-M1 Adjuvant, preservative free, 0.5mL per dose Notes: Pending FDA EUA Authorization</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINE_GROUP">COVID-19</link-to>
+                <link-to codeset="VACCINATION_TRADE_NAME">Novavax COVID-19 Vaccine</link-to>
+            </reference>
+            <use-date>
+                <not-before>20210406</not-before>
+            </use-date>
+            <concept-type>vaccine</concept-type>
+        </code>
+        <code>
             <value>212</value>
             <label>COVID-19 vaccine, vector-nr, rS-Ad26, PF, 0.5 mL</label>
             <description>SARS-COV-2 (COVID-19) vaccine, vector non-replicating, recombinant spike protein-Ad26, preservative free, 0.5 mL Notes: Potential EUA, 1-dose vaccine</description>
@@ -16835,6 +16901,7 @@
                 <link-to codeset="VACCINATION_TRADE_NAME">Moderna COVID-19 Vaccine</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">80777-0273-10</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">80777-0273-99</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">80777-0273-15</link-to>
             </reference>
             <use-date>
                 <not-before>20201102</not-before>
@@ -17332,6 +17399,37 @@
             </use-age>
             <concept-type>vaccine</concept-type>
             <test-age>2 months</test-age>
+        </code>
+        <code>
+            <value>204</value>
+            <label>Ebola Zaire vaccine, live, recombinant, 1mL dose</label>
+            <description>Ebola Zaire vaccine, live, recombinant, 1mL dose Notes: FDA Approval Pending</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINE_GROUP">Ebola</link-to>
+                <link-to codeset="VACCINATION_TRADE_NAME">ERVEBO (Ebola Zaire Vaccine, Live)</link-to>
+            </reference>
+            <use-date>
+                <not-before>20210406</not-before>
+            </use-date>
+            <concept-type>vaccine</concept-type>
+        </code>
+        <code>
+            <value>214</value>
+            <label>Ebola, unspecified</label>
+            <description>Ebola, unspecified</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINE_GROUP">Ebola</link-to>
+            </reference>
+            <use-date>
+                <not-after>20210406</not-after>
+            </use-date>
+            <concept-type>vaccine</concept-type>
         </code>
         <code>
             <value>57</value>
@@ -19073,6 +19171,8 @@
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">49281-0181-00</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">49281-0181-25</link-to>
                 <link-to codeset="VACCINE_GROUP">FLU</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">49281-0182-00</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">49281-0182-25</link-to>
             </reference>
             <use-date>
                 <not-before>20200506</not-before>
@@ -19091,6 +19191,8 @@
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">49281-0320-88</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">49281-0320-50</link-to>
                 <link-to codeset="VACCINE_GROUP">FLU</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">49281-0321-88</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">49281-0321-50</link-to>
             </reference>
             <use-date>
                 <not-before>20200506</not-before>
@@ -19109,6 +19211,8 @@
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">49281-0336-78</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">49281-0336-15</link-to>
                 <link-to codeset="VACCINE_GROUP">FLU</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">49281-0337-78</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">49281-0337-15</link-to>
             </reference>
             <use-date>
                 <not-before>20200506</not-before>
@@ -22377,6 +22481,19 @@
             </reference>
             <use-date>
                 <not-before>20201201</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>253088698300034911210401</value>
+            <label>COVID-19 Moderna Vaccine EUA Recipient-Caregiver Fact Sheet</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_VIS_VACCINES">207</link-to>
+            </reference>
+            <use-date>
+                <not-before>20210326</not-before>
             </use-date>
         </code>
         <code>
@@ -31387,6 +31504,7 @@
             </reference>
             <use-date>
                 <not-before>20200810</not-before>
+                <not-after>20210401</not-after>
             </use-date>
         </code>
         <code>
@@ -35145,6 +35263,132 @@
             </code-status>
         </code>
         <code>
+            <value>49281-0337-78</value>
+            <label>FLUZONE QUADRIVALENT SOUTHERN HEMISPHERE</label>
+            <description>Sanofi Pasteur Inc. - Influenza, Southern Hemisphere, Multi-Dose 0.5 mL (2021 season southern hemisphere)</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">202</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">PMC</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">49281-0337-15</link-to>
+            </reference>
+            <use-date>
+                <not-before>20210204</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>49281-337-78</value>
+            <label>FLUZONE QUADRIVALENT SOUTHERN HEMISPHERE</label>
+            <description>Sanofi Pasteur Inc. - Influenza, Southern Hemisphere, Multi-Dose 0.5 mL (2021 season southern hemisphere)</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>49281-0337-78</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20210330</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>49281033778</value>
+            <label>FLUZONE QUADRIVALENT SOUTHERN HEMISPHERE</label>
+            <description>Sanofi Pasteur Inc. - Influenza, Southern Hemisphere, Multi-Dose 0.5 mL (2021 season southern hemisphere)</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>49281-0337-78</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20210330</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>49281-0182-00</value>
+            <label>FLUZONE QUADRIVALENT SOUTHERN HEMISPHERE</label>
+            <description>Sanofi Pasteur Inc. - Influenza, Southern Hemisphere, Single-Dose, Pediatric 0.25mL (2021 season southern hemisphere)</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">200</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">PMC</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">49281-0182-25</link-to>
+            </reference>
+            <use-date>
+                <not-before>20210204</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>49281-182-00</value>
+            <label>FLUZONE QUADRIVALENT SOUTHERN HEMISPHERE</label>
+            <description>Sanofi Pasteur Inc. - Influenza, Southern Hemisphere, Single-Dose, Pediatric 0.25mL (2021 season southern hemisphere)</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>49281-0182-00</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20210330</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>49281018200</value>
+            <label>FLUZONE QUADRIVALENT SOUTHERN HEMISPHERE</label>
+            <description>Sanofi Pasteur Inc. - Influenza, Southern Hemisphere, Single-Dose, Pediatric 0.25mL (2021 season southern hemisphere)</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>49281-0182-00</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20210330</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>49281-0321-88</value>
+            <label>FLUZONE QUADRIVALENT SOUTHERN HEMISPHERE</label>
+            <description>Sanofi Pasteur Inc. - Influenza, Southern Hemisphere, Single-Dose 0.5 mL (2021 season southern hemisphere)</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">201</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">PMC</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">49281-0321-50</link-to>
+            </reference>
+            <use-date>
+                <not-before>20210204</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>49281-321-88</value>
+            <label>FLUZONE QUADRIVALENT SOUTHERN HEMISPHERE</label>
+            <description>Sanofi Pasteur Inc. - Influenza, Southern Hemisphere, Single-Dose 0.5 mL (2021 season southern hemisphere)</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>49281-0321-88</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20210330</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>49281032188</value>
+            <label>FLUZONE QUADRIVALENT SOUTHERN HEMISPHERE</label>
+            <description>Sanofi Pasteur Inc. - Influenza, Southern Hemisphere, Single-Dose 0.5 mL (2021 season southern hemisphere)</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>49281-0321-88</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20210330</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
             <value>49281-0516-00</value>
             <label>Fluzone Quadrivalent, pediatric</label>
             <description>Sanofi - Influenza vaccine, quadrivalent</description>
@@ -35585,6 +35829,7 @@
             </reference>
             <use-date>
                 <not-before>20070216</not-before>
+                <not-after>20210301</not-after>
             </use-date>
         </code>
         <code>
@@ -35715,6 +35960,7 @@
             </reference>
             <use-date>
                 <not-before>20070413</not-before>
+                <not-after>20210301</not-after>
             </use-date>
         </code>
         <code>
@@ -37825,6 +38071,48 @@
                     <new-code-value>80777-0273-10</new-code-value>
                     <reason>Use 11-digit format with dashes</reason>
                     <effective-date>20201102</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>80777-0273-15</value>
+            <label>Moderna COVID-19 Vaccine</label>
+            <description>Moderna US, Inc. - SARS-COV-2 (COVID-19) vaccine, mRNA, spike protein, LNP, preservative free, 100 mcg/0.5mL dose</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">207</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">MOD</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">49281-0182-25</link-to>
+            </reference>
+            <use-date>
+                <not-before>20210401</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>80777-273-15</value>
+            <label>Moderna COVID-19 Vaccine</label>
+            <description>Moderna US, Inc. - SARS-COV-2 (COVID-19) vaccine, mRNA, spike protein, LNP, preservative free, 100 mcg/0.5mL dose</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>80777-0273-15</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20210407</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>80777027315</value>
+            <label>Moderna COVID-19 Vaccine</label>
+            <description>Moderna US, Inc. - SARS-COV-2 (COVID-19) vaccine, mRNA, spike protein, LNP, preservative free, 100 mcg/0.5mL dose</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>80777-0273-15</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20210407</effective-date>
                 </deprecated>
             </code-status>
         </code>
@@ -46497,6 +46785,7 @@
             </reference>
             <use-date>
                 <not-before>20200810</not-before>
+                <not-after>20210401</not-after>
             </use-date>
         </code>
         <code>
@@ -50255,6 +50544,134 @@
             </code-status>
         </code>
         <code>
+            <value>49281-0337-15</value>
+            <label>FLUZONE QUADRIVALENT SOUTHERN HEMISPHERE</label>
+            <description>Sanofi Pasteur Inc. - Influenza, Southern Hemisphere, Multi-Dose 0.5mL (2021 season southern hemisphere)</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">202</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">PMC</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">49281-0337-78</link-to>
+            </reference>
+            <use-date>
+                <not-before>20210204</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>49281-337-15</value>
+            <label>FLUZONE QUADRIVALENT SOUTHERN HEMISPHERE</label>
+            <description>Sanofi Pasteur Inc. - Influenza, Southern Hemisphere, Multi-Dose 0.5mL (2021 season southern hemisphere)</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>49281-0337-15</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20210401</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>49281033715</value>
+            <label>FLUZONE QUADRIVALENT SOUTHERN HEMISPHERE</label>
+            <description>Sanofi Pasteur Inc. - Influenza, Southern Hemisphere, Multi-Dose 0.5mL (2021 season southern hemisphere)</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>49281-0337-15</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20210401</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>49281-0182-25</value>
+            <label>FLUZONE QUADRIVALENT SOUTHERN HEMISPHERE</label>
+            <description>Sanofi Pasteur Inc. - Influenza, Southern Hemisphere, Single-Dose 0.25 mL (2021 season southern hemisphere)</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">200</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">PMC</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">49281-0182-00</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">MOD</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">80777-0273-15</link-to>
+            </reference>
+            <use-date>
+                <not-before>20210204</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>49281-182-25</value>
+            <label>FLUZONE QUADRIVALENT SOUTHERN HEMISPHERE</label>
+            <description>Sanofi Pasteur Inc. - Influenza, Southern Hemisphere, Single-Dose 0.25 mL (2021 season southern hemisphere)</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>49281-0182-25</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20210401</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>49281018225</value>
+            <label>FLUZONE QUADRIVALENT SOUTHERN HEMISPHERE</label>
+            <description>Sanofi Pasteur Inc. - Influenza, Southern Hemisphere, Single-Dose 0.25 mL (2021 season southern hemisphere)</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>49281-0182-25</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20210401</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>49281-0321-50</value>
+            <label>FLUZONE QUADRIVALENT SOUTHERN HEMISPHERE</label>
+            <description>Sanofi Pasteur Inc. - Influenza, Southern Hemisphere, Single-Dose 0.5 mL (2021 season southern hemisphere)</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">201</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">PMC</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">49281-0321-88</link-to>
+            </reference>
+            <use-date>
+                <not-before>20210204</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>49281-321-50</value>
+            <label>FLUZONE QUADRIVALENT SOUTHERN HEMISPHERE</label>
+            <description>Sanofi Pasteur Inc. - Influenza, Southern Hemisphere, Single-Dose 0.5 mL (2021 season southern hemisphere)</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>49281-0321-50</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20210401</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>49281032150</value>
+            <label>FLUZONE QUADRIVALENT SOUTHERN HEMISPHERE</label>
+            <description>Sanofi Pasteur Inc. - Influenza, Southern Hemisphere, Single-Dose 0.5 mL (2021 season southern hemisphere)</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>49281-0321-50</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20210401</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
             <value>49281-0516-25</value>
             <label>Fluzone Quadrivalent, pediatric</label>
             <description>Sanofi - Influenza vaccine, quadrivalent</description>
@@ -50778,6 +51195,7 @@
             </reference>
             <use-date>
                 <not-before>20070216</not-before>
+                <not-after>20210211</not-after>
             </use-date>
         </code>
         <code>
@@ -50863,6 +51281,7 @@
             </reference>
             <use-date>
                 <not-before>20070413</not-before>
+                <not-after>20210211</not-after>
             </use-date>
         </code>
         <code>
