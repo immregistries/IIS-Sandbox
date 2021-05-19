@@ -8679,6 +8679,7 @@
             </code-status>
             <reference>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300033211201201</link-to>
+                <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300033211210501</link-to>
             </reference>
             <use-date>
                 <not-before>20201201</not-before>
@@ -9428,6 +9429,19 @@
             </reference>
             <use-date>
                 <not-before>20140124</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>203</value>
+            <label>Meningococcal ACWY Vaccine VIS</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300014111190815</link-to>
+            </reference>
+            <use-date>
+                <not-before>20190815</not-before>
             </use-date>
         </code>
         <code>
@@ -11015,6 +11029,7 @@
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">80777-0273-99</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">80777-0273-15</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">49281-0182-25</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">80777-0273-98</link-to>
             </reference>
             <use-date>
                 <not-before>20201001</not-before>
@@ -11144,6 +11159,8 @@
             </code-status>
             <reference>
                 <link-to codeset="VACCINATION_TRADE_NAME">Novavax COVID-19 Vaccine</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">80631-0100-01</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">80631-0100-10</link-to>
             </reference>
             <use-date>
                 <not-before>20100528</not-before>
@@ -16845,6 +16862,8 @@
             <reference>
                 <link-to codeset="VACCINE_GROUP">COVID-19</link-to>
                 <link-to codeset="VACCINATION_TRADE_NAME">Novavax COVID-19 Vaccine</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">80631-0100-01</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">80631-0100-10</link-to>
             </reference>
             <use-date>
                 <not-before>20210406</not-before>
@@ -22499,6 +22518,19 @@
             </use-date>
         </code>
         <code>
+            <value>253088698300033211210501</value>
+            <label>COVID-19 Pfizer BioNTech EUA Recipient-Caregiver Fact Sheet</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_VIS_VACCINES">208</link-to>
+            </reference>
+            <use-date>
+                <not-before>20210510</not-before>
+            </use-date>
+        </code>
+        <code>
             <value>253088698300033211201201</value>
             <label>COVID-19 Pfizer BioNTech Vaccine EUA Recipient-Caregiver Fact Sheet</label>
             <code-status>
@@ -23181,6 +23213,7 @@
             <reference>
                 <link-to codeset="VACCINATION_VIS_VACCINES">136</link-to>
                 <link-to codeset="VACCINATION_VIS_VACCINES">114</link-to>
+                <link-to codeset="VACCINATION_VIS_VACCINES">203</link-to>
             </reference>
             <use-date>
                 <not-before>20190815</not-before>
@@ -25475,6 +25508,14 @@
             </reference>
         </code>
         <code>
+            <value>91304</value>
+            <label>Severe acute respiratory syndrome coronavirus 2 (SARSCoV-2) (coronavirus disease [COVID-19]) vaccine, recombinant spike protein nanoparticle, saponin-based adjuvant, preservative free, 5 mcg/0.5mL dosage, for intramuscular use</label>
+            <description>COVID-19 Vaccine - Potential EUA authorization</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+        </code>
+        <code>
             <value>90714</value>
             <label>Td (adult) preservative free</label>
             <description></description>
@@ -27634,6 +27675,48 @@
                     <new-code-value>00006-4898-01</new-code-value>
                     <reason>Use 11-digit format with dashes</reason>
                     <effective-date>20151030</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>80631-0100-01</value>
+            <label>COVID-19 Vaccine, Adjuvanted</label>
+            <description>Novavax Inc. - SARS-COV-2 (COVID-19) vaccine, Subunit, recombinant spike protein-nanoparticle+Matrix-M1 Adjuvant, preservative free, 0.5mL per dose</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">211</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">NVX</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">80631-0100-10</link-to>
+            </reference>
+            <use-date>
+                <not-before>20210601</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>80631-100-01</value>
+            <label>COVID-19 Vaccine, Adjuvanted</label>
+            <description>Novavax Inc. - SARS-COV-2 (COVID-19) vaccine, Subunit, recombinant spike protein-nanoparticle+Matrix-M1 Adjuvant, preservative free, 0.5mL per dose</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>80631-0100-01</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20210504</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>80631010001</value>
+            <label>COVID-19 Vaccine, Adjuvanted</label>
+            <description>Novavax Inc. - SARS-COV-2 (COVID-19) vaccine, Subunit, recombinant spike protein-nanoparticle+Matrix-M1 Adjuvant, preservative free, 0.5mL per dose</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>80631-0100-01</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20210504</effective-date>
                 </deprecated>
             </code-status>
         </code>
@@ -38088,6 +38171,7 @@
                 <link-to codeset="VACCINATION_CVX_CODE">207</link-to>
                 <link-to codeset="VACCINATION_MANUFACTURER_CODE">MOD</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">49281-0182-25</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">80777-0273-98</link-to>
             </reference>
             <use-date>
                 <not-before>20210401</not-before>
@@ -42965,6 +43049,48 @@
                     <new-code-value>00006-4898-00</new-code-value>
                     <reason>Use 11-digit format with dashes</reason>
                     <effective-date>20140127</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>80631-0100-10</value>
+            <label>COVID-19 Vaccine, Adjuvanted</label>
+            <description>Novavax Inc. - SARS-COV-2 (COVID-19) vaccine, Subunit, recombinant spike protein-nanoparticle+Matrix-M1 Adjuvant, preservative free, 0.5mL per dose</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">211</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">NVX</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">80631-0100-01</link-to>
+            </reference>
+            <use-date>
+                <not-before>20210601</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>80631-100-10</value>
+            <label>COVID-19 Vaccine, Adjuvanted</label>
+            <description>Novavax Inc. - SARS-COV-2 (COVID-19) vaccine, Subunit, recombinant spike protein-nanoparticle+Matrix-M1 Adjuvant, preservative free, 0.5mL per dose</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>80631-0100-10</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20210504</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>80631010010</value>
+            <label>COVID-19 Vaccine, Adjuvanted</label>
+            <description>Novavax Inc. - SARS-COV-2 (COVID-19) vaccine, Subunit, recombinant spike protein-nanoparticle+Matrix-M1 Adjuvant, preservative free, 0.5mL per dose</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>80631-0100-10</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20210504</effective-date>
                 </deprecated>
             </code-status>
         </code>
@@ -53456,6 +53582,8 @@
                 <link-to codeset="VACCINATION_CVX_CODE">207</link-to>
                 <link-to codeset="VACCINATION_MANUFACTURER_CODE">PMC</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">49281-0182-00</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">MOD</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">80777-0273-15</link-to>
             </reference>
             <use-date>
                 <not-before>20210401</not-before>
