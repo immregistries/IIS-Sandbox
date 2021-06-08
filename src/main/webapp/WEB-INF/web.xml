@@ -76,6 +76,14 @@
     <servlet-name>vacDedup</servlet-name>
     <servlet-class>org.immregistries.iis.kernal.servlet.VacDedupServlet</servlet-class>
   </servlet>
+  <servlet>
+    <servlet-name>VXUDownload</servlet-name>
+    <servlet-class>org.immregistries.iis.kernal.servlet.VXUDownloadServlet</servlet-class>
+  </servlet>
+  <servlet>
+    <servlet-name>VXUDownloadForm</servlet-name>
+    <servlet-class>org.immregistries.iis.kernal.servlet.VXUDownloadFormServlet</servlet-class>
+  </servlet>
   <servlet-mapping>
     <servlet-name>home</servlet-name>
     <url-pattern>/home</url-pattern>
@@ -144,6 +152,13 @@
     <servlet-name>vaccination</servlet-name>
     <url-pattern>/vaccination</url-pattern>
   </servlet-mapping>
-
+  <servlet-mapping>
+    <servlet-name>VXUDownload</servlet-name>
+    <url-pattern>/VXUDownload</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>VXUDownloadForm</servlet-name>
+    <url-pattern>/VXUDownloadForm</url-pattern>
+  </servlet-mapping>
 
 </web-app>

@@ -18,10 +18,8 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Query;
 import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.immregistries.iis.kernal.model.OrgAccess;
 import org.immregistries.iis.kernal.model.OrgLocation;
-import org.immregistries.iis.kernal.model.OrgMaster;
 import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.model.PatientReported;
 import org.immregistries.iis.kernal.model.VaccinationReported;
@@ -29,6 +27,8 @@ import org.immregistries.iis.kernal.model.VaccinationReported;
 @SuppressWarnings("serial")
 public class CovidServlet extends HttpServlet {
 
+
+  public static final String COVID_CVX_CODES = "208,207,210,212,211,213";
 
   private static final String EXPORT_YYYY_MM_DD = "yyyy-MM-dd";
 
@@ -98,7 +98,7 @@ public class CovidServlet extends HttpServlet {
       }
       String cvxCodes = req.getParameter(PARAM_CVX_CODES);
       if (StringUtils.isEmpty(cvxCodes)) {
-        cvxCodes = "900,901,902";
+        cvxCodes = COVID_CVX_CODES;
       }
       boolean includePhi =
           req.getParameter(PARAM_CVX_CODES) == null || req.getParameter(PARAM_INCLUDE_PHI) != null;

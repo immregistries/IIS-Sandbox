@@ -71,6 +71,8 @@ public class HomeServlet extends HttpServlet {
           out.println(
               "      <li><a href=\"covid\">COVID-19 Reporting</a>: Export data to demonstrate COVID-19 reporting </li>");
           out.println(
+              "      <li><a href=\"VXUDownloadForm\">COVID-19 Reporting (HL7)</a>: Download data in HL7 format demonstrate COVID-19 reporting </li>");
+          out.println(
               "      <li><a href=\"covidGenerate\">COVID-19 HL7 Generator</a>: Generate HL7 Messages</li>");
           out.println(
               "      <li><a href=\"event\">Submit Event</a>: Submit a patient and vaccination event manually.</li>");
