@@ -13,8 +13,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
-
-
 import ca.uhn.fhir.context.FhirContext;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Query;
@@ -1719,6 +1717,14 @@ public class IncomingMessageHandler {
         sb.append("|");
         // RXA-11
         sb.append("|");
+        sb.append("^^^");
+        if (vaccinationReported.getOrgLocation() == null
+            || vaccinationReported.getOrgLocation().getOrgFacilityCode() == null
+            || "".equals(vaccinationReported.getOrgLocation().getOrgFacilityCode())) {
+          sb.append("AIRA");
+        } else {
+          sb.append(vaccinationReported.getOrgLocation().getOrgFacilityCode());
+        }
         // RXA-12
         sb.append("|");
         // RXA-13
