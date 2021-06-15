@@ -170,7 +170,7 @@ public class VXUDownloadGenerator extends Thread {
 
     IncomingMessageHandler incomingMessageHandler = new IncomingMessageHandler(dataSession);
     Random random = new Random();
-    String filename = "VXUDownload-";
+    String filename = "temp/VXUDownload-";
     for (int i = 0; i < 40; i++) {
       filename += (char) ('A' + random.nextInt(26));
     }
