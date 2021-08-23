@@ -1383,8 +1383,12 @@ public class IncomingMessageHandler {
         sb.append("|0");
         // RXA-2
         sb.append("|1");
+        String adminDate = sdf.format(vaccination.getAdministeredDate());
+        if (obxSetId == 0 && processingFlavorSet.contains(ProcessingFlavor.CHERRY)) {
+            adminDate = "";
+        }
         // RXA-3
-        sb.append("|" + sdf.format(vaccination.getAdministeredDate()));
+        sb.append("|" + adminDate);
         // RXA-4
         sb.append("|");
         // RXA-5
