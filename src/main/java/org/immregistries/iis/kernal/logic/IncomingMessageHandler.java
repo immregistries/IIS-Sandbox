@@ -1383,8 +1383,12 @@ public class IncomingMessageHandler {
         sb.append("|0");
         // RXA-2
         sb.append("|1");
+        String adminDate = sdf.format(vaccination.getAdministeredDate());
+        if (obxSetId == 0 && processingFlavorSet.contains(ProcessingFlavor.CHERRY)) {
+            adminDate = "";
+        }
         // RXA-3
-        sb.append("|" + sdf.format(vaccination.getAdministeredDate()));
+        sb.append("|" + adminDate);
         // RXA-4
         sb.append("|");
         // RXA-5
@@ -1896,6 +1900,7 @@ public class IncomingMessageHandler {
     String firstName = patient.getPatientNameFirst();
     String middleName = patient.getPatientNameMiddle();
     String lastName = patient.getPatientNameLast();
+    String dateOfBirth = sdf.format(patient.getPatientBirthDate());
 
     // If "PHI" flavor, strip AIRA from names 10% of the time
     if (processingFlavorSet.contains(ProcessingFlavor.PHI)) {
@@ -1905,6 +1910,18 @@ public class IncomingMessageHandler {
         lastName = lastName.replace("AIRA", "");
       }
     }
+
+    if (processingFlavorSet.contains(ProcessingFlavor.CITRUS)) {
+      int omission = random.nextInt(3);
+      if (omission == 0) {
+        firstName = "";
+      } else if (omission == 1) {
+        lastName = "";
+      } else {
+        dateOfBirth = "";
+      }
+    }
+
     sb.append("|" + lastName + "^" + firstName + "^" + middleName + "^^^^L");
 
     // PID-6
@@ -1913,7 +1930,7 @@ public class IncomingMessageHandler {
       sb.append(patientReported.getPatientMotherMaiden() + "^^^^^^M");
     }
     // PID-7
-    sb.append("|" + sdf.format(patient.getPatientBirthDate()));
+    sb.append("|" + dateOfBirth);
     if (patientReported != null) {
       // PID-8
       {
