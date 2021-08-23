@@ -93,12 +93,15 @@ public class SoapServlet extends HttpServlet {
         }
 
         @Override
-        public void authorize(SubmitSingleMessage ssm) throws SecurityFault {
+        public void authorize(SubmitSingleMessage ssm) throws Fault {
           String userId = ssm.getUsername();
           String password = ssm.getPassword();
           String facilityId = ssm.getFacilityID();
           Session dataSession = getDataSession();
           try {
+            if("NPE".equals(userId) && "NPE".equals(password)) {
+                throw new UnknownFault("Unknown Fault");
+            }
             OrgAccess orgAccess = ServletHelper.authenticateOrgAccess(userId, password, facilityId, dataSession);
             if (orgAccess == null) {
               throw new SecurityFault("Username/password combination is unrecognized");
@@ -112,9 +115,6 @@ public class SoapServlet extends HttpServlet {
       server.process(req, resp);
     } finally {
     }
-
-
-
   }
 
   @Override
