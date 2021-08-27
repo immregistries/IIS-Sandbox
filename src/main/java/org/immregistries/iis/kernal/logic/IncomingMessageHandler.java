@@ -1438,6 +1438,13 @@ public class IncomingMessageHandler {
         sb.append("|");
         // RXA-11
         sb.append("|");
+        if (vaccinationReported.getOrgLocation() == null
+            || vaccinationReported.getOrgLocation().getOrgFacilityCode() == null
+            || "".equals(vaccinationReported.getOrgLocation().getOrgFacilityCode())) {
+        } else {
+          sb.append("^^^");
+          sb.append(vaccinationReported.getOrgLocation().getOrgFacilityCode());
+        }
         // RXA-12
         sb.append("|");
         // RXA-13
