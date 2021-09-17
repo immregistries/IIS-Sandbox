@@ -298,6 +298,23 @@
             </use-date>
         </code>
         <code>
+            <value>Pfizer-BioNTech COVID-19 Vaccine (EUA labeled) COMIRNATY (BLA labeled)</value>
+            <label>COVID-19, mRNA, LNP-S, PF, 30 mcg/0.3 mL dose, tris-sucrose</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">217</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">PFR</link-to>
+                <link-to codeset="VACCINATION_CVX_CODE">219</link-to>
+                <link-to codeset="VACCINATION_CVX_CODE">208</link-to>
+                <link-to codeset="VACCINATION_CVX_CODE">218</link-to>
+            </reference>
+            <use-date>
+                <not-before>20210910</not-before>
+            </use-date>
+        </code>
+        <code>
             <value>DENGVAXIA</value>
             <label>dengue fever</label>
             <code-status>
@@ -10778,6 +10795,8 @@
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">50632-0013-01</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">58160-0887-52</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">50632-0010-01</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">50090-1502-09</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">50090-1502-00</link-to>
             </reference>
             <use-date>
                 <not-before>20100528</not-before>
@@ -11439,6 +11458,17 @@
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">00005-2000-01</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">00005-2000-10</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">00005-2000-02</link-to>
+                <link-to codeset="VACCINATION_TRADE_NAME">Pfizer-BioNTech COVID-19 Vaccine (EUA labeled) COMIRNATY (BLA labeled)</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">59267-1025-01</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">59267-1055-01</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">59267-0078-01</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">59267-1025-02</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">59267-1055-04</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">59267-0078-04</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">59267-0078-02</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">59267-1025-03</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">59267-1025-04</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">59267-1055-02</link-to>
             </reference>
             <use-date>
                 <not-before>20100528</not-before>
@@ -15186,6 +15216,9 @@
                 <link-to codeset="VACCINATION_CVX_CODE">506</link-to>
                 <link-to codeset="VACCINATION_CVX_CODE">504</link-to>
                 <link-to codeset="VACCINATION_CVX_CODE">505</link-to>
+                <link-to codeset="VACCINATION_CVX_CODE">218</link-to>
+                <link-to codeset="VACCINATION_CVX_CODE">219</link-to>
+                <link-to codeset="VACCINATION_CVX_CODE">217</link-to>
             </reference>
         </code>
         <code>
@@ -17273,6 +17306,25 @@
             <concept-type>foreign vaccine</concept-type>
         </code>
         <code>
+            <value>218</value>
+            <label>COVID-19, mRNA, LNP-S, PF, 10 mcg/0.2 mL dose, tris-sucrose</label>
+            <description>SARS-COV-2 (COVID-19) vaccine, mRNA, spike protein, LNP, preservative free, 10 mcg/0.2mL dose, tris-sucrose formulation Notes: Potential FDA EUA, Pfizer tris-sucrose vaccine for 5 through 11 years of age</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINE_GROUP">COVID-19</link-to>
+                <link-to codeset="VACCINATION_TRADE_NAME">Pfizer-BioNTech COVID-19 Vaccine (EUA labeled) COMIRNATY (BLA labeled)</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">59267-1055-01</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">59267-1055-04</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">59267-1055-02</link-to>
+            </reference>
+            <use-date>
+                <not-before>20210913</not-before>
+            </use-date>
+            <concept-type>vaccine</concept-type>
+        </code>
+        <code>
             <value>207</value>
             <label>COVID-19, mRNA, LNP-S, PF, 100 mcg/0.5 mL dose</label>
             <description>SARS-COV-2 (COVID-19) vaccine, mRNA, spike protein, LNP, preservative free, 100 mcg/0.5mL dose Notes: Potential EUA, 2-dose vaccine</description>
@@ -17295,6 +17347,25 @@
             <concept-type>vaccine</concept-type>
         </code>
         <code>
+            <value>219</value>
+            <label>COVID-19, mRNA, LNP-S, PF, 3 mcg/0.2 mL dose, tris-sucrose</label>
+            <description>SARS-COV-2 (COVID-19) vaccine, mRNA, spike protein, LNP, preservative free, 3 mcg/0.2mL dose, tris-sucrose formulation Notes: Potential FDA EUA, Pfizer tris-sucrose vaccine for 2 through 4 years of age</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINE_GROUP">COVID-19</link-to>
+                <link-to codeset="VACCINATION_TRADE_NAME">Pfizer-BioNTech COVID-19 Vaccine (EUA labeled) COMIRNATY (BLA labeled)</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">59267-0078-01</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">59267-0078-04</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">59267-0078-02</link-to>
+            </reference>
+            <use-date>
+                <not-before>20210908</not-before>
+            </use-date>
+            <concept-type>vaccine</concept-type>
+        </code>
+        <code>
             <value>208</value>
             <label>COVID-19, mRNA, LNP-S, PF, 30 mcg/0.3 mL dose</label>
             <description>SARS-COV-2 (COVID-19) vaccine, mRNA, spike protein, LNP, preservative free, 30 mcg/0.3mL dose Notes: Potential EUA, 2-dose vaccine</description>
@@ -17310,9 +17381,30 @@
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">59267-1000-03</link-to>
                 <link-to codeset="VACCINATION_TRADE_NAME">Pfizer-BioNTech COVID-19 Vaccine (Non-US COMIRNATY)</link-to>
                 <link-to codeset="VACCINATION_TRADE_NAME">Pfizer-BioNTech COVID-19 Vaccine (COMIRNATY)</link-to>
+                <link-to codeset="VACCINATION_TRADE_NAME">Pfizer-BioNTech COVID-19 Vaccine (EUA labeled) COMIRNATY (BLA labeled)</link-to>
             </reference>
             <use-date>
                 <not-before>20201102</not-before>
+            </use-date>
+            <concept-type>vaccine</concept-type>
+        </code>
+        <code>
+            <value>217</value>
+            <label>COVID-19, mRNA, LNP-S, PF, 30 mcg/0.3 mL dose, tris-sucrose</label>
+            <description>SARS-COV-2 (COVID-19) vaccine, mRNA, spike protein, LNP, preservative free, 30 mcg/0.3mL dose, tris-sucrose formulation Notes: Potential FDA EUA, Pfizer tris-sucrose formuation vaccine for ages 12 and older</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINE_GROUP">COVID-19</link-to>
+                <link-to codeset="VACCINATION_TRADE_NAME">Pfizer-BioNTech COVID-19 Vaccine (EUA labeled) COMIRNATY (BLA labeled)</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">59267-1025-01</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">59267-1025-02</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">59267-1025-03</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">59267-1025-04</link-to>
+            </reference>
+            <use-date>
+                <not-before>20210913</not-before>
             </use-date>
             <concept-type>vaccine</concept-type>
         </code>
@@ -17880,6 +17972,8 @@
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">00006-4841-41</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">00006-4841-00</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">55045-3841-01</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">50090-1502-09</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">50090-1502-00</link-to>
             </reference>
             <use-date>
                 <not-before>19950101</not-before>
@@ -25980,6 +26074,22 @@
             <use-date/>
         </code>
         <code>
+            <value>90671</value>
+            <label>Pneumococcal conjugate vaccine, 15 valent (PCV15), for intramuscular use</label>
+            <description></description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+        </code>
+        <code>
+            <value>90677</value>
+            <label>Pneumococcal conjugate vaccine, 20 valent (PCV20), for intramuscular use</label>
+            <description></description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+        </code>
+        <code>
             <value>90732</value>
             <label>pneumococcal polysaccharide PPV23</label>
             <description></description>
@@ -26148,6 +26258,14 @@
             </reference>
         </code>
         <code>
+            <value>91305</value>
+            <label>Severe acute respiratory syndrome coronavirus 2 (SARS-CoV-2) (coronavirus disease [COVID-19]) vaccine, mRNA-LNP, spike protein, preservative free, 30 mcg/0.3 mL dosage, tris-sucrose formulation, for intramuscular use</label>
+            <description>COVID-19 Vaccine - Potential EUA authorization</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+        </code>
+        <code>
             <value>91300</value>
             <label>Severe acute respiratory syndrome coronavirus 2 (SARS-CoV-2) (Coronavirus disease [COVID-19]) vaccine, mRNA-LNP, spike protein, preservative free, 30 mcg/0.3mL dosage, diluent reconstituted, for intramuscular use</label>
             <description>COVID-19 Vaccine - Potential EUA authorization</description>
@@ -26157,6 +26275,14 @@
             <reference>
                 <link-to codeset="VACCINATION_CVX_CODE">208</link-to>
             </reference>
+        </code>
+        <code>
+            <value>91306</value>
+            <label>Severe acute respiratory syndrome coronavirus 2 (SARS-CoV-2) (coronavirus disease [COVID-19]) vaccine, mRNA-LNP, spike protein, preservative free, 50 mcg/0.25 mL dosage, for intramuscular use</label>
+            <description>COVID-19 Vaccine - Potential EUA authorization for booster dose</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
         </code>
         <code>
             <value>91304</value>
@@ -26348,6 +26474,14 @@
                 <link-to codeset="VACCINATION_CVX_CODE">37</link-to>
             </reference>
             <use-date/>
+        </code>
+        <code>
+            <value>90758</value>
+            <label>Zaire ebolavirus vaccine, live, for intramuscular use</label>
+            <description></description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
         </code>
         <code>
             <value>90736</value>
@@ -37378,6 +37512,48 @@
             </code-status>
         </code>
         <code>
+            <value>50090-1502-09</value>
+            <label>HAVRIX</label>
+            <description>A-S Medication Solutions - HEPATITIS A VACCINE Adult Dose</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">52</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">SKB</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">50090-1502-00</link-to>
+            </reference>
+            <use-date>
+                <not-before>20210801</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>50090-1502-9</value>
+            <label>HAVRIX</label>
+            <description>A-S Medication Solutions - HEPATITIS A VACCINE Adult Dose</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>50090-1502-09</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20210913</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>50090150209</value>
+            <label>HAVRIX</label>
+            <description>A-S Medication Solutions - HEPATITIS A VACCINE Adult Dose</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>50090-1502-09</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20210913</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
             <value>43528-0002-01</value>
             <label>HEPLISAV-B</label>
             <description>Dynavax Technologies Corporation - HEPATITIS B VACCINE (RECOMBINANT)</description>
@@ -39799,6 +39975,136 @@
                     <new-code-value>59267-1000-01</new-code-value>
                     <reason>Use 11-digit format with dashes</reason>
                     <effective-date>20201111</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>59267-1025-01</value>
+            <label>Pfizer-BioNTech Covid-19 Vaccine</label>
+            <description>Pfizer Manufacturing Belgium NV - COVID-19, mRNA, LNP-S, PF, 30 mcg/0.3 mL dose, tris-sucrose</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">217</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">PFR</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">59267-1025-02</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">59267-1025-03</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">59267-1025-04</link-to>
+            </reference>
+            <use-date>
+                <not-before>20211001</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>59267-1025-1</value>
+            <label>Pfizer-BioNTech Covid-19 Vaccine</label>
+            <description>Pfizer Manufacturing Belgium NV - COVID-19, mRNA, LNP-S, PF, 30 mcg/0.3 mL dose, tris-sucrose</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>59267-1025-01</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20210910</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>59267102501</value>
+            <label>Pfizer-BioNTech Covid-19 Vaccine</label>
+            <description>Pfizer Manufacturing Belgium NV - COVID-19, mRNA, LNP-S, PF, 30 mcg/0.3 mL dose, tris-sucrose</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>59267-1025-01</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20210910</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>59267-1055-01</value>
+            <label>Pfizer-BioNTech Covid-19 Vaccine</label>
+            <description>Pfizer Manufacturing Belgium NV - COVID-19, mRNA, LNP-S, PF, 10 mcg/0.2 mL dose, tris-sucrose</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">218</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">PFR</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">59267-1055-04</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">59267-1055-02</link-to>
+            </reference>
+            <use-date>
+                <not-before>20211001</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>59267-1055-1</value>
+            <label>Pfizer-BioNTech Covid-19 Vaccine</label>
+            <description>Pfizer Manufacturing Belgium NV - COVID-19, mRNA, LNP-S, PF, 10 mcg/0.2 mL dose, tris-sucrose</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>59267-1055-01</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20210910</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>59267105501</value>
+            <label>Pfizer-BioNTech Covid-19 Vaccine</label>
+            <description>Pfizer Manufacturing Belgium NV - COVID-19, mRNA, LNP-S, PF, 10 mcg/0.2 mL dose, tris-sucrose</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>59267-1055-01</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20210910</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>59267-0078-01</value>
+            <label>Pfizer-BioNTech Covid-19 Vaccine</label>
+            <description>Pfizer Manufacturing Belgium NV - COVID-19, mRNA, LNP-S, PF, 3 mcg/0.2 mL dose, tris-sucrose</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">219</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">PFR</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">59267-0078-04</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">59267-0078-02</link-to>
+            </reference>
+            <use-date>
+                <not-before>20211101</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>59267-0078-1</value>
+            <label>Pfizer-BioNTech Covid-19 Vaccine</label>
+            <description>Pfizer Manufacturing Belgium NV - COVID-19, mRNA, LNP-S, PF, 3 mcg/0.2 mL dose, tris-sucrose</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>59267-0078-01</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20210910</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>59267007801</value>
+            <label>Pfizer-BioNTech Covid-19 Vaccine</label>
+            <description>Pfizer Manufacturing Belgium NV - COVID-19, mRNA, LNP-S, PF, 3 mcg/0.2 mL dose, tris-sucrose</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>59267-0078-01</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20210910</effective-date>
                 </deprecated>
             </code-status>
         </code>
@@ -53562,6 +53868,48 @@
             </code-status>
         </code>
         <code>
+            <value>50090-1502-00</value>
+            <label>HAVRIX</label>
+            <description>A-S Medication Solutions - HEPATITIS A VACCINE - Adult Dose</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">52</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">SKB</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">50090-1502-09</link-to>
+            </reference>
+            <use-date>
+                <not-before>20210801</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>50090-1502-0</value>
+            <label>HAVRIX</label>
+            <description>A-S Medication Solutions - HEPATITIS A VACCINE - Adult Dose</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>50090-1502-00</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20210913</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>50090150200</value>
+            <label>HAVRIX</label>
+            <description>A-S Medication Solutions - HEPATITIS A VACCINE - Adult Dose</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>50090-1502-00</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20210913</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
             <value>43528-0002-05</value>
             <label>HEPLISAV-B</label>
             <description>Dynavax Technologies Corporation - HEPATITIS B VACCINE (RECOMBINANT)</description>
@@ -55990,6 +56338,300 @@
                     <new-code-value>59267-1000-03</new-code-value>
                     <reason>Use 11-digit format with dashes</reason>
                     <effective-date>20201111</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>59267-1025-02</value>
+            <label>Pfizer-BioNTech Covid-19 Vaccine</label>
+            <description>Pfizer Manufacturing Belgium NV - COVID-19, mRNA, LNP-S, PF, 30 mcg/0.3 mL dose, tris-sucrose</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">217</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">PFR</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">59267-1025-01</link-to>
+            </reference>
+            <use-date>
+                <not-before>20211001</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>59267-1025-2</value>
+            <label>Pfizer-BioNTech Covid-19 Vaccine</label>
+            <description>Pfizer Manufacturing Belgium NV - COVID-19, mRNA, LNP-S, PF, 30 mcg/0.3 mL dose, tris-sucrose</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>59267-1025-02</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20210910</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>59267102502</value>
+            <label>Pfizer-BioNTech Covid-19 Vaccine</label>
+            <description>Pfizer Manufacturing Belgium NV - COVID-19, mRNA, LNP-S, PF, 30 mcg/0.3 mL dose, tris-sucrose</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>59267-1025-02</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20210910</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>59267-1055-04</value>
+            <label>Pfizer-BioNTech Covid-19 Vaccine</label>
+            <description>Pfizer Manufacturing Belgium NV - COVID-19, mRNA, LNP-S, PF, 10 mcg/0.2 mL dose, tris-sucrose</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">218</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">PFR</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">59267-1055-01</link-to>
+            </reference>
+            <use-date>
+                <not-before>20211001</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>59267-1055-4</value>
+            <label>Pfizer-BioNTech Covid-19 Vaccine</label>
+            <description>Pfizer Manufacturing Belgium NV - COVID-19, mRNA, LNP-S, PF, 10 mcg/0.2 mL dose, tris-sucrose</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>59267-1055-04</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20210910</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>59267105504</value>
+            <label>Pfizer-BioNTech Covid-19 Vaccine</label>
+            <description>Pfizer Manufacturing Belgium NV - COVID-19, mRNA, LNP-S, PF, 10 mcg/0.2 mL dose, tris-sucrose</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>59267-1055-04</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20210910</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>59267-0078-04</value>
+            <label>Pfizer-BioNTech Covid-19 Vaccine</label>
+            <description>Pfizer Manufacturing Belgium NV - COVID-19, mRNA, LNP-S, PF, 3 mcg/0.2 mL dose, tris-sucrose</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">219</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">PFR</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">59267-0078-01</link-to>
+            </reference>
+            <use-date>
+                <not-before>20211101</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>59267-0078-4</value>
+            <label>Pfizer-BioNTech Covid-19 Vaccine</label>
+            <description>Pfizer Manufacturing Belgium NV - COVID-19, mRNA, LNP-S, PF, 3 mcg/0.2 mL dose, tris-sucrose</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>59267-0078-04</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20210910</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>59267007804</value>
+            <label>Pfizer-BioNTech Covid-19 Vaccine</label>
+            <description>Pfizer Manufacturing Belgium NV - COVID-19, mRNA, LNP-S, PF, 3 mcg/0.2 mL dose, tris-sucrose</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>59267-0078-04</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20210910</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>59267-0078-02</value>
+            <label>Pfizer-BioNTech Covid-19 Vaccine</label>
+            <description>Pfizer Manufacturing Belgium NV - COVID-19, mRNA, LNP-S, PF, 3 mcg/0.2 mL dose, tris-sucrose</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">219</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">PFR</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">59267-0078-01</link-to>
+            </reference>
+            <use-date>
+                <not-before>20211101</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>59267-0078-2</value>
+            <label>Pfizer-BioNTech Covid-19 Vaccine</label>
+            <description>Pfizer Manufacturing Belgium NV - COVID-19, mRNA, LNP-S, PF, 3 mcg/0.2 mL dose, tris-sucrose</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>59267-0078-02</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20210910</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>59267007802</value>
+            <label>Pfizer-BioNTech Covid-19 Vaccine</label>
+            <description>Pfizer Manufacturing Belgium NV - COVID-19, mRNA, LNP-S, PF, 3 mcg/0.2 mL dose, tris-sucrose</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>59267-0078-02</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20210910</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>59267-1025-03</value>
+            <label>Pfizer-BioNTech Covid-19 Vaccine</label>
+            <description>Pfizer Manufacturing Belgium NV - COVID-19, mRNA, LNP-S, PF, 30 mcg/0.3 mL dose, tris-sucrose</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">217</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">PFR</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">59267-1025-01</link-to>
+            </reference>
+            <use-date>
+                <not-before>20211001</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>59267-1025-3</value>
+            <label>Pfizer-BioNTech Covid-19 Vaccine</label>
+            <description>Pfizer Manufacturing Belgium NV - COVID-19, mRNA, LNP-S, PF, 30 mcg/0.3 mL dose, tris-sucrose</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>59267-1025-03</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20210910</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>59267102503</value>
+            <label>Pfizer-BioNTech Covid-19 Vaccine</label>
+            <description>Pfizer Manufacturing Belgium NV - COVID-19, mRNA, LNP-S, PF, 30 mcg/0.3 mL dose, tris-sucrose</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>59267-1025-03</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20210910</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>59267-1025-04</value>
+            <label>Pfizer-BioNTech Covid-19 Vaccine</label>
+            <description>Pfizer Manufacturing Belgium NV - COVID-19, mRNA, LNP-S, PF, 30 mcg/0.3 mL dose, tris-sucrose</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">217</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">PFR</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">59267-1025-01</link-to>
+            </reference>
+            <use-date>
+                <not-before>20211001</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>59267-1025-4</value>
+            <label>Pfizer-BioNTech Covid-19 Vaccine</label>
+            <description>Pfizer Manufacturing Belgium NV - COVID-19, mRNA, LNP-S, PF, 30 mcg/0.3 mL dose, tris-sucrose</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>59267-1025-04</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20210910</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>59267102504</value>
+            <label>Pfizer-BioNTech Covid-19 Vaccine</label>
+            <description>Pfizer Manufacturing Belgium NV - COVID-19, mRNA, LNP-S, PF, 30 mcg/0.3 mL dose, tris-sucrose</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>59267-1025-04</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20210910</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>59267-1055-02</value>
+            <label>Pfizer-BioNTech Covid-19 Vaccine</label>
+            <description>Pfizer Manufacturing Belgium NV - COVID-19, mRNA, LNP-S, PF, 10 mcg/0.2 mL dose, tris-sucrose</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">218</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">PFR</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">59267-1055-01</link-to>
+            </reference>
+            <use-date>
+                <not-before>20211001</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>59267-1055-2</value>
+            <label>Pfizer-BioNTech Covid-19 Vaccine</label>
+            <description>Pfizer Manufacturing Belgium NV - COVID-19, mRNA, LNP-S, PF, 10 mcg/0.2 mL dose, tris-sucrose</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>59267-1055-02</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20210910</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>59267105502</value>
+            <label>Pfizer-BioNTech Covid-19 Vaccine</label>
+            <description>Pfizer Manufacturing Belgium NV - COVID-19, mRNA, LNP-S, PF, 10 mcg/0.2 mL dose, tris-sucrose</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>59267-1055-02</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20210910</effective-date>
                 </deprecated>
             </code-status>
         </code>
