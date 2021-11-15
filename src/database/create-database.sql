@@ -6,10 +6,9 @@ CREATE DATABASE iis;
 USE iis;
 
 CREATE USER
-  'iis_web'@'localhost' IDENTIFIED WITH mysql_native_password
-                                   BY 'SharkBaitHooHaHa';
+  'iis_web'@'%' IDENTIFIED WITH mysql_native_password BY 'SharkBaitHooHaHa';
 								   
-GRANT ALL ON iis.* TO 'iis_web'@'localhost';
+GRANT ALL ON iis.* TO 'iis_web'@'%';
 
 
 -- MySQL dump 10.13  Distrib 8.0.13, for Win64 (x86_64)

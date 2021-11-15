@@ -138,9 +138,10 @@ public class FHIRHandler extends IncomingMessageHandler {
       if (vaccinationReportedList.size() > 0) { // if external link found
         System.out.println("Immunization already exists");
         vaccinationMaster = vaccinationReportedList.get(0).getVaccination();
-      } else {
-        vaccinationMaster = ImmunizationHandler.findMatch(dataSession, patientReported, immunization);
-      }
+      } 
+      //else {
+      //  vaccinationMaster = ImmunizationHandler.findMatch(dataSession, patientReported, immunization);
+      //}
     }
     if (vaccinationMaster == null){
       vaccinationMaster = new VaccinationMaster();

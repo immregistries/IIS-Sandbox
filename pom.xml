@@ -37,7 +37,7 @@
 		<dependency>
 			<groupId>org.immregistries</groupId>
 			<artifactId>mqe-hl7-utility</artifactId>
-			<version>2020.12-BETA</version>
+			<version>2021.7-BETA</version>
 		</dependency>
 		<dependency>
 			<groupId>org.mortbay.jetty</groupId>
@@ -76,12 +76,6 @@
 			<groupId>org.immregistries.vfa</groupId>
 			<artifactId>ForecastConnector</artifactId>
 			<version>3.19</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.immregistries.vaccination_deduplication</groupId>
-			<artifactId>vaccination-deduplication-api</artifactId>
-			<version>0.1-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>

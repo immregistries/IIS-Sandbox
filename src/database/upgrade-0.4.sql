@@ -1,5 +1,3 @@
-use iis;
-
 CREATE TABLE org_location
 (
   org_location_id         INT            NOT NULL AUTO_INCREMENT PRIMARY KEY,

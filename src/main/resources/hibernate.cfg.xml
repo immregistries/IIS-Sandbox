@@ -2,9 +2,9 @@
 <!DOCTYPE hibernate-configuration SYSTEM "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
 <hibernate-configuration>
   <session-factory>
-    <property name="hibernate.connection.driver_class">com.mysql.jdbc.Driver</property>
+    <property name="hibernate.connection.driver_class">com.mysql.cj.jdbc.Driver</property>
 
-    <property name="hibernate.connection.url">jdbc:mysql://localhost/iis</property>
+    <property name="hibernate.connection.url">jdbc:mysql://${MYSQL_HOST_PORT:localhost}/iis</property>
     <property name="hibernate.connection.username">iis_web</property>
     <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
     <property name="connection.password">SharkBaitHooHaHa</property>
