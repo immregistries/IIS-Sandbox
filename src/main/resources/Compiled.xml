@@ -175,6 +175,19 @@
             </use-date>
         </code>
         <code>
+            <value>COVAXIN (Bharat) COVID-19 Vaccine</value>
+            <label>COVID-19 IV Non-US Vaccine (COVAXIN)</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">502</link-to>
+            </reference>
+            <use-date>
+                <not-before>20211109</not-before>
+            </use-date>
+        </code>
+        <code>
             <value>Novavax COVID-19 Vaccine</value>
             <label>COVID-19 vaccine, Subunit, rS-nanoparticle+Matrix-M1 Adjuvant, PF, 0.5 mL</label>
             <code-status>
@@ -1891,6 +1904,20 @@
             </reference>
             <use-date>
                 <not-after>20100528</not-after>
+            </use-date>
+        </code>
+        <code>
+            <value>TICOVAC</value>
+            <label>tick-borne encephalitis</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">77</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">PFR</link-to>
+            </reference>
+            <use-date>
+                <not-before>20211104</not-before>
             </use-date>
         </code>
         <code>
@@ -8793,9 +8820,23 @@
             <reference>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300034911201201</link-to>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300034911210401</link-to>
+                <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300034911210601</link-to>
             </reference>
             <use-date>
                 <not-before>20201201</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>217</value>
+            <label>COVID-19 Pfizer BioNTech EUA Recipient-Caregiver Fact Sheet</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300033211210501</link-to>
+            </reference>
+            <use-date>
+                <not-before>20211119</not-before>
             </use-date>
         </code>
         <code>
@@ -9758,6 +9799,19 @@
             </reference>
             <use-date>
                 <not-before>20180212</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>218</value>
+            <label>Pfizer BioNTech EUA Recipient-Caregiver Fact Sheet-Pediatric</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300042411211001</link-to>
+            </reference>
+            <use-date>
+                <not-before>20211029</not-before>
             </use-date>
         </code>
         <code>
@@ -11493,6 +11547,10 @@
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">59267-1025-03</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">59267-1025-04</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">59267-1055-02</link-to>
+                <link-to codeset="VACCINATION_TRADE_NAME">TICOVAC</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">00069-0411-01</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">00069-0411-02</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">00069-0411-10</link-to>
             </reference>
             <use-date>
                 <not-before>20100528</not-before>
@@ -15690,6 +15748,13 @@
             </reference>
         </code>
         <code>
+            <value>Tick-borne encephalitis</value>
+            <label>tick-borne encephalitis</label>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">77</link-to>
+            </reference>
+        </code>
+        <code>
             <value>TYPHOID</value>
             <label>Typhoid</label>
             <description></description>
@@ -17160,6 +17225,7 @@
             </code-status>
             <reference>
                 <link-to codeset="VACCINE_GROUP">COVID-19</link-to>
+                <link-to codeset="VACCINATION_TRADE_NAME">COVAXIN (Bharat) COVID-19 Vaccine</link-to>
             </reference>
             <concept-type>foreign vaccine</concept-type>
         </code>
@@ -21748,7 +21814,15 @@
             <code-status>
                 <status>Valid</status>
             </code-status>
+            <reference>
+                <link-to codeset="VACCINE_GROUP">Tick-borne encephalitis</link-to>
+                <link-to codeset="VACCINATION_TRADE_NAME">TICOVAC</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">00069-0411-01</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">00069-0411-02</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">00069-0411-10</link-to>
+            </reference>
             <use-date>
+                <not-before>20211104</not-before>
                 <not-expected-after>20100528</not-expected-after>
                 <not-after>20100528</not-after>
             </use-date>
@@ -23076,6 +23150,19 @@
             </use-date>
         </code>
         <code>
+            <value>253088698300034911210601</value>
+            <label>COVID-19 Moderna Vaccine EUA Recipient-Caregiver Fact Sheet</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_VIS_VACCINES">207</link-to>
+            </reference>
+            <use-date>
+                <not-before>20211119</not-before>
+            </use-date>
+        </code>
+        <code>
             <value>253088698300033211210501</value>
             <label>COVID-19 Pfizer BioNTech EUA Recipient-Caregiver Fact Sheet</label>
             <code-status>
@@ -23083,6 +23170,7 @@
             </code-status>
             <reference>
                 <link-to codeset="VACCINATION_VIS_VACCINES">208</link-to>
+                <link-to codeset="VACCINATION_VIS_VACCINES">217</link-to>
             </reference>
             <use-date>
                 <not-before>20210510</not-before>
@@ -24202,6 +24290,19 @@
             </reference>
             <use-date>
                 <not-before>20191030</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>253088698300042411211001</value>
+            <label>Pfizer BioNTech EUA Recipient-Caregiver Fact Sheet-Pediatric</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_VIS_VACCINES">218</link-to>
+            </reference>
+            <use-date>
+                <not-before>20211029</not-before>
             </use-date>
         </code>
         <code>
@@ -26464,6 +26565,14 @@
                 <link-to codeset="VACCINATION_CVX_CODE">35</link-to>
             </reference>
             <use-date/>
+        </code>
+        <code>
+            <value>90627</value>
+            <label>Tick-borne encephalitis virus vaccine, inactivated; 0.5 mL dosage, for intramuscular use</label>
+            <description></description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
         </code>
         <code>
             <value>90389</value>
@@ -41891,6 +42000,49 @@
             </code-status>
         </code>
         <code>
+            <value>00069-0411-01</value>
+            <label>TicoVac</label>
+            <description>Pfizer Laboratories Div Pfizer Inc - tick-borne encephalitis vaccine, .5mL dose</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">77</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">PFR</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">00069-0411-02</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">00069-0411-10</link-to>
+            </reference>
+            <use-date>
+                <not-before>20211025</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>0069-0411-01</value>
+            <label>TicoVac</label>
+            <description>Pfizer Laboratories Div Pfizer Inc - tick-borne encephalitis vaccine, .5mL dose</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>00069-0411-01</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20211104</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>00069041101</value>
+            <label>TicoVac</label>
+            <description>Pfizer Laboratories Div Pfizer Inc - tick-borne encephalitis vaccine, .5mL dose</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>00069-0411-01</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20211104</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
             <value>49281-0298-10</value>
             <label>TRIPEDIA</label>
             <description>Sanofi Pasteur Inc. - CORYNEBACTERIUM DIPHTHERIAE TOXOID ANTIGEN (FORMALDEHYDE INACTIVATED), CLOSTRIDIUM TETANI TOXOID ANT</description>
@@ -42677,7 +42829,7 @@
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">00006-4329-03</link-to>
             </reference>
             <use-date>
-                <not-before>20201118</not-before>
+                <not-before>20210716</not-before>
             </use-date>
         </code>
         <code>
@@ -56471,6 +56623,7 @@
             </reference>
             <use-date>
                 <not-before>20211001</not-before>
+                <not-after>20211101</not-after>
             </use-date>
         </code>
         <code>
@@ -56723,6 +56876,7 @@
             </reference>
             <use-date>
                 <not-before>20211001</not-before>
+                <not-after>20211101</not-after>
             </use-date>
         </code>
         <code>
@@ -58788,6 +58942,90 @@
             </code-status>
         </code>
         <code>
+            <value>00069-0411-02</value>
+            <label>TicoVac</label>
+            <description>Pfizer Laboratories Div Pfizer Inc - tick-borne encephalitis vaccine, .5mL dose</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">77</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">PFR</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">00069-0411-01</link-to>
+            </reference>
+            <use-date>
+                <not-before>20211025</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>0069-0411-02</value>
+            <label>TicoVac</label>
+            <description>Pfizer Laboratories Div Pfizer Inc - tick-borne encephalitis vaccine, .5mL dose</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>00069-0411-02</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20211104</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>00069041102</value>
+            <label>TicoVac</label>
+            <description>Pfizer Laboratories Div Pfizer Inc - tick-borne encephalitis vaccine, .5mL dose</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>00069-0411-02</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20211104</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>00069-0411-10</value>
+            <label>TicoVac</label>
+            <description>Pfizer Laboratories Div Pfizer Inc - tick-borne encephalitis vaccine, .5mL dose</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">77</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">PFR</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">00069-0411-01</link-to>
+            </reference>
+            <use-date>
+                <not-before>20211025</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>0069-0411-10</value>
+            <label>TicoVac</label>
+            <description>Pfizer Laboratories Div Pfizer Inc - tick-borne encephalitis vaccine, .5mL dose</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>00069-0411-10</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20211104</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>00069041110</value>
+            <label>TicoVac</label>
+            <description>Pfizer Laboratories Div Pfizer Inc - tick-borne encephalitis vaccine, .5mL dose</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>00069-0411-10</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20211104</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
             <value>49281-0298-10</value>
             <label>TRIPEDIA</label>
             <description>Sanofi Pasteur Inc. - CORYNEBACTERIUM DIPHTHERIAE TOXOID ANTIGEN (FORMALDEHYDE INACTIVATED), CLOSTRIDIUM TETANI TOXOID ANT</description>
@@ -59908,7 +60146,7 @@
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">00006-4329-01</link-to>
             </reference>
             <use-date>
-                <not-before>20201118</not-before>
+                <not-before>20210716</not-before>
             </use-date>
         </code>
         <code>
@@ -59950,7 +60188,7 @@
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">00006-4329-01</link-to>
             </reference>
             <use-date>
-                <not-before>20201118</not-before>
+                <not-before>20210716</not-before>
             </use-date>
         </code>
         <code>
