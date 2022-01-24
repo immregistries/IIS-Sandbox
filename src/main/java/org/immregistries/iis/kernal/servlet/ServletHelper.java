@@ -6,6 +6,9 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.immregistries.iis.kernal.model.OrgAccess;
 import org.immregistries.iis.kernal.model.OrgMaster;
+import org.mindrot.jbcrypt.BCrypt;
+
+import ca.uhn.fhir.rest.server.exceptions.AuthenticationException;
 
 public class ServletHelper {
 
@@ -33,7 +36,7 @@ public class ServletHelper {
       orgAccess = new OrgAccess();
       orgAccess.setOrg(orgMaster);
       orgAccess.setAccessName(userId);
-      orgAccess.setAccessKey(password);
+      orgAccess.setAccessKey(BCrypt.hashpw(password, BCrypt.gensalt(5)));
       Transaction transaction = dataSession.beginTransaction();
       dataSession.save(orgMaster);
       dataSession.save(orgAccess);
@@ -49,17 +52,24 @@ public class ServletHelper {
   public static OrgAccess authenticateOrgAccessForFacility(
       String userId, String password, Session dataSession, OrgMaster orgMaster) {
     OrgAccess orgAccess = null;
-    String queryString = "from OrgAccess where accessName = ? and accessKey = ? and org = ?";
+    String facilityId = orgMaster.getOrganizationName();
+    String queryString = "from OrgAccess where accessName = ? and org = ?";
     Query query = dataSession.createQuery(queryString);
     query.setParameter(0, userId);
-    query.setParameter(1, password);
-    query.setParameter(2, orgMaster);
+    query.setParameter(1, orgMaster);
 
     @SuppressWarnings("unchecked")
     List<OrgAccess> orgAccessList = query.list();
     if (orgAccessList.size() != 0) {
-      orgAccess = orgAccessList.get(0);
+      if (BCrypt.checkpw(password, orgAccessList.get(0).getAccessKey())) {
+        orgAccess = orgAccessList.get(0);
+      } else {
+        throw new AuthenticationException("password for ID : " + facilityId);
+      }
+    } else {
+      throw new AuthenticationException("password for ID : " + facilityId);
     }
+    
     return orgAccess;
   }
 }
