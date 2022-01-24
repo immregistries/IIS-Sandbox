@@ -101,18 +101,21 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
     }
     // Save this patient to the database...
     Session dataSession = getDataSession();
+    PatientReported pr = new PatientReported();
     try {
       orgAccess = Authentication.authenticateOrgAccess(theRequestDetails, dataSession);
       FHIRHandler fhirHandler = new FHIRHandler(dataSession);
 
-      fhirHandler.FIHR_EventPatientReported(orgAccess, thePatient, null);
+      pr = fhirHandler.FIHR_EventPatientReported(orgAccess, thePatient, null);
 
     } catch (Exception e) {
       e.printStackTrace();
     } finally {
       dataSession.close();
     }
-    return new MethodOutcome(new IdType(thePatient.getIdentifier().get(0).getValue()));
+    MethodOutcome retVal = new MethodOutcome();
+    retVal.setId(new IdType("Patient", pr.getPatientReportedExternalLink(), "1"));
+    return retVal;
 
   }
 

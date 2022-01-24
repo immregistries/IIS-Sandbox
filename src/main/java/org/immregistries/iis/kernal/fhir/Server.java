@@ -30,7 +30,7 @@ public class Server extends RestfulServer {
   protected void initialize() throws ServletException {
     this.setDefaultResponseEncoding(EncodingEnum.XML);
 
-    String serverBaseUrl = "http://localhost:8080/iis-sandbox/fhir";
+    String serverBaseUrl = "florence.immregistries.org/iis-sandbox/fhir";
     setTenantIdentificationStrategy(new UrlBaseTenantIdentificationStrategy());
     setServerAddressStrategy(new HardcodedServerAddressStrategy(serverBaseUrl));
 
