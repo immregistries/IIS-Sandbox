@@ -83,7 +83,7 @@ public class RestfulImmunizationProvider implements IResourceProvider {
     } finally {
       dataSession.close();
     }
-    return new MethodOutcome(new IdType(theImmunization.getIdentifier().get(0).getValue()));
+    return new MethodOutcome(new IdType("Immunization",theImmunization.getIdentifier().get(0).getValue()));
   }
   /**
    * This methods asks to find and rebuild the person resource with the id provided

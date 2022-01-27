@@ -30,7 +30,6 @@ public class Authentication {
     OrgMaster orgMaster;
     OrgAccess orgAccess = null;
     String authHeader = theRequestDetails.getHeader("Authorization");
-    System.err.println();
 
     // The format of the header must be:
     // Authorization: Basic [base64 of username:password]

@@ -29,7 +29,7 @@ public class PatientHandler {
     // patientReported.setPatientReportedId(;
     // patientReported.setPatientReportedType(p.get);
     patientReported.setReportedDate(new Date());
-    patientReported.setPatientReportedExternalLink(p.getIdentifier().get(0).getValue()); // TODO modify
+    patientReported.setPatientReportedExternalLink(p.getIdentifier().get(0).getValue());
 
     // Name
     HumanName name = p.getNameFirstRep();

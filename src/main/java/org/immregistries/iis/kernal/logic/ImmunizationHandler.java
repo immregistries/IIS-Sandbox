@@ -126,7 +126,7 @@ public class ImmunizationHandler {
     i.addReasonCode().addCoding().setCode(vr.getRefusalReasonCode());
     i.getVaccineCode().addCoding().setCode(vr.getVaccineCvxCode());
     //if (pr != null){
-    i.setPatient(new Reference(theRequestDetails.getFhirServerBase() + "/Patient/"
+    i.setPatient(new Reference("Patient/"
         + vr.getPatientReported().getPatientReportedExternalLink()));
     //}
 

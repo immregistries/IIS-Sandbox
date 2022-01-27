@@ -58,7 +58,6 @@ public class FHIRHandler extends IncomingMessageHandler {
         patientReported = patientReportedList.get(0);
         PatientHandler.patientReportedFromFhirPatient(patientReported,patient);
         patientMaster = patientReported.getPatient();
-        //System.err.println("Lid du patientMaster est " + patientMaster.getPatientExternalLink());
 
       } else { //EMPI Search matches with firstname, lastname and birthday
         List<PatientMaster> patientMasterList = PatientHandler.findMatch(dataSession,patient);
