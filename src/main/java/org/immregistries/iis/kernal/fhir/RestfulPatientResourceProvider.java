@@ -132,18 +132,19 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
   public MethodOutcome updatePatient(RequestDetails theRequestDetails, @IdParam IdType theId,
       @ResourceParam Patient thePatient) {
     Session dataSession = getDataSession();
+    PatientReported pr = new PatientReported();
     try {
       orgAccess = Authentication.authenticateOrgAccess(theRequestDetails, dataSession);
       FHIRHandler fhirHandler = new FHIRHandler(dataSession);
 
-      fhirHandler.FIHR_EventPatientReported(orgAccess, thePatient, null);
+      pr = fhirHandler.FIHR_EventPatientReported(orgAccess, thePatient, null);
 
     } catch (Exception e) {
       e.printStackTrace();
     } finally {
       dataSession.close();
     }
-    return new MethodOutcome();
+    return new MethodOutcome(new IdType("Patient", pr.getPatientReportedExternalLink()));
   }
 
   /**
@@ -185,7 +186,8 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
     } catch (NumberFormatException | NullPointerException e) {
       isExternalLink = true;
     }
-
+    //TODO MODIFY METHOD, Next line is a temporary solution
+    isExternalLink=true;
     {
       Query query;
       if (isExternalLink) {
