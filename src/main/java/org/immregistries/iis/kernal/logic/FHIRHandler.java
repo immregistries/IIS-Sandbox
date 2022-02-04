@@ -48,7 +48,6 @@ public class FHIRHandler extends IncomingMessageHandler {
 
 
     {
-//      System.err.println("datasession fhirhandler " + dataSession!=null);
       Query query = dataSession.createQuery(
           "from PatientReported where orgReported = ? and patientReportedExternalLink = ?");
       query.setParameter(0, orgAccess.getOrg());
@@ -56,7 +55,7 @@ public class FHIRHandler extends IncomingMessageHandler {
       @SuppressWarnings("unchecked")
       List<PatientReported> patientReportedList = query.list();
       if (patientReportedList.size() > 0) {
-        System.err.println("patient already exists");
+        System.err.println("Patient already exists");
         //get patient master and reported
         patientReported = patientReportedList.get(0);
         PatientHandler.patientReportedFromFhirPatient(patientReported,patient);
@@ -65,7 +64,7 @@ public class FHIRHandler extends IncomingMessageHandler {
       } else { //EMPI Search matches with firstname, lastname and birthday
         List<PatientMaster> patientMasterList = PatientHandler.findMatch(dataSession,patient);
         if(patientMasterList.size() > 0){
-          System.err.println("patient has a match ");
+          System.err.println("patient has a match");
           //Create new patient reported and get existing patient master
           patientAlreadyExists = true;
           patientMaster = patientMasterList.get(0);
@@ -77,7 +76,6 @@ public class FHIRHandler extends IncomingMessageHandler {
           patientMaster=patientMasterList.get(0);
           levelConfidence=1;
           System.err.println("patient has a possible match ");
-
         }else {
           //Create new patient master and patient reported
           System.err.println("patient has no match ");
@@ -100,7 +98,7 @@ public class FHIRHandler extends IncomingMessageHandler {
       dataSession.saveOrUpdate(patientReported);
       System.err.println("patient Created");
       if(patientAlreadyExists) {
-        System.err.println("creation patientlink");
+        System.err.println("Creating patientlink");
         PatientLink pl = new PatientLink();
         pl.setLevelConfidence(levelConfidence);
         pl.setPatientMaster(patientMaster);

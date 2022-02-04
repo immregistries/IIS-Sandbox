@@ -200,8 +200,7 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
       }
 
       @SuppressWarnings("unchecked")
-	List<PatientReported> patientReportedList = query.list();
-      System.err.println("la taille est " + patientReportedList.size());
+	    List<PatientReported> patientReportedList = query.list();
       if (patientReportedList.size() > 0) {
         patientReported = patientReportedList.get(0);
         patient = PatientHandler.getPatient(null, null, patientReported);
@@ -244,7 +243,7 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
       query.setParameter(0, orgAccess.getOrg());
       query.setParameter(1, id);
       @SuppressWarnings("unchecked")
-	List<PatientReported> patientReportedList = query.list();
+	    List<PatientReported> patientReportedList = query.list();
       if (patientReportedList.size() > 0) {
         patientReported = patientReportedList.get(0);
 
@@ -256,7 +255,7 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
           dataSession.createQuery("from  PatientLink where patientReported.patientReportedId=?");
       queryLink.setParameter(0, patientReported.getPatientReportedId());
       @SuppressWarnings("unchecked")
-	List<PatientLink> patientLinkList = queryLink.list();
+	    List<PatientLink> patientLinkList = queryLink.list();
       if (patientLinkList.size() > 0) {
         patientLink = patientLinkList.get(0);
       }
