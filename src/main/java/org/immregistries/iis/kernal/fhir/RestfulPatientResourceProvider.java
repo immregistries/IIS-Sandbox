@@ -4,6 +4,7 @@ package org.immregistries.iis.kernal.fhir;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.api.server.RequestDetails;
 import ca.uhn.fhir.rest.server.IResourceProvider;
+import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
 import ca.uhn.fhir.rest.server.exceptions.UnprocessableEntityException;
 
 import java.util.List;
@@ -13,7 +14,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.AnnotationConfiguration;
-
+import org.hl7.fhir.r4.model.OperationOutcome;
 import org.hl7.fhir.r4.model.IdType;
 import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.Reference;
@@ -102,19 +103,15 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
     // Save this patient to the database...
     Session dataSession = getDataSession();
     PatientReported pr = new PatientReported();
-    try {
-      orgAccess = Authentication.authenticateOrgAccess(theRequestDetails, dataSession);
-      FHIRHandler fhirHandler = new FHIRHandler(dataSession);
+    orgAccess = Authentication.authenticateOrgAccess(theRequestDetails, dataSession);
+    FHIRHandler fhirHandler = new FHIRHandler(dataSession);
 
-      pr = fhirHandler.FIHR_EventPatientReported(orgAccess, thePatient, null);
+    pr = fhirHandler.FIHR_EventPatientReported(orgAccess, thePatient, null);
 
-    } catch (Exception e) {
-      e.printStackTrace();
-    } finally {
-      dataSession.close();
-    }
     MethodOutcome retVal = new MethodOutcome();
     retVal.setId(new IdType("Patient", pr.getPatientReportedExternalLink(), "1"));
+
+    dataSession.close();
     return retVal;
 
   }
@@ -133,18 +130,23 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
       @ResourceParam Patient thePatient) {
     Session dataSession = getDataSession();
     PatientReported pr = new PatientReported();
-    try {
-      orgAccess = Authentication.authenticateOrgAccess(theRequestDetails, dataSession);
-      FHIRHandler fhirHandler = new FHIRHandler(dataSession);
+    MethodOutcome retVal = new MethodOutcome();
 
-      pr = fhirHandler.FIHR_EventPatientReported(orgAccess, thePatient, null);
+    // FHIR Specification, need url id to be same as resource id
+    if (theId.getIdPart() != thePatient.getId()) {
+      throw new InvalidRequestException("Resource Id different from Request Id");
+    } 
 
-    } catch (Exception e) {
-      e.printStackTrace();
-    } finally {
-      dataSession.close();
-    }
-    return new MethodOutcome(new IdType("Patient", pr.getPatientReportedExternalLink()));
+    orgAccess = Authentication.authenticateOrgAccess(theRequestDetails, dataSession);
+    FHIRHandler fhirHandler = new FHIRHandler(dataSession);
+
+    pr = fhirHandler.FIHR_EventPatientReported(orgAccess, thePatient, null);
+    retVal.setResource(getPatientById(pr.getPatientReportedExternalLink(), dataSession, orgAccess));
+    retVal.setId(new IdType("Patient", pr.getPatientReportedExternalLink()));
+
+    dataSession.close();
+    
+    return retVal ;
   }
 
   /**
@@ -157,14 +159,9 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
   @Delete()
   public MethodOutcome deletePatient(RequestDetails theRequestDetails, @IdParam IdType theId) {
     Session dataSession = getDataSession();
-    try {
-      orgAccess = Authentication.authenticateOrgAccess(theRequestDetails, dataSession);
-      deletePatientById(theId.getIdPart(), dataSession, orgAccess);
-    } catch (Exception e) {
-      e.printStackTrace();
-    } finally {
-      dataSession.close();
-    }
+    orgAccess = Authentication.authenticateOrgAccess(theRequestDetails, dataSession);
+    deletePatientById(theId.getIdPart(), dataSession, orgAccess);
+    dataSession.close();
     return new MethodOutcome();
   }
 
@@ -213,7 +210,7 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
         Query queryLink = dataSession.createQuery("from PatientLink where patientReported.id = ?");
         queryLink.setParameter(0, linkId);
         @SuppressWarnings("unchecked")
-		List<PatientLink> patientLinkList = queryLink.list();
+		    List<PatientLink> patientLinkList = queryLink.list();
 
         if (patientLinkList.size() > 0) {
           for (PatientLink link : patientLinkList) {

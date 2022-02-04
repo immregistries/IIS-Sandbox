@@ -1,12 +1,15 @@
 package org.immregistries.iis.kernal.logic;
 
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hl7.fhir.r4.model.Immunization;
 import org.hl7.fhir.r4.model.Patient;
 import org.immregistries.iis.kernal.model.*;
+
+import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
 
 import java.util.Date;
 import java.util.List;
@@ -31,7 +34,7 @@ public class FHIRHandler extends IncomingMessageHandler {
    * @return the patientReported added or updated
    * @throws Exception
    */
-  public PatientReported FIHR_EventPatientReported(OrgAccess orgAccess, Patient patient, Immunization immunization) throws Exception {
+  public PatientReported FIHR_EventPatientReported(OrgAccess orgAccess, Patient patient, Immunization immunization) throws InvalidRequestException, HibernateException {
     PatientMaster patientMaster = null;
     PatientReported patientReported = null;
     String patientReportedExternalLink = patient.getIdentifier().get(0).getValue();
@@ -40,7 +43,7 @@ public class FHIRHandler extends IncomingMessageHandler {
     int levelConfidence=0;
 
     if (StringUtils.isEmpty(patientReportedExternalLink)) {
-      throw new Exception("Patient external link must be indicated");
+      throw new InvalidRequestException("Patient external link must be indicated");
     }
 
 
@@ -104,7 +107,6 @@ public class FHIRHandler extends IncomingMessageHandler {
         pl.setPatientReported(patientReported);
         dataSession.saveOrUpdate(pl);
       }
-      System.err.println("le patient a pour id "+ patientReported.getPatientReportedExternalLink());
       transaction.commit();
     }
 
