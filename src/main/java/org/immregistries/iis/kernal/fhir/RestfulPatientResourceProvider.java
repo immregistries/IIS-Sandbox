@@ -131,20 +131,27 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
     Session dataSession = getDataSession();
     PatientReported pr = new PatientReported();
     MethodOutcome retVal = new MethodOutcome();
+    try {
+      // FHIR Specification, need url id to be same as resource id
+      // if (!thePatient.getId().equals(theId.getIdPart().split("Patient/")[0])) {
+      //   System.err.println("-" + theId.getIdPart().split("Patient/")[0] + "-");
+      //   System.err.println("-" + thePatient.getId() + "-" + thePatient.getId().equals(theId.getIdPart().split("Patient/")[0]));
 
-    // FHIR Specification, need url id to be same as resource id
-    if (theId.getIdPart() != thePatient.getId()) {
-      throw new InvalidRequestException("Resource Id different from Request Id");
-    } 
+      //   throw new InvalidRequestException("Resource Id " + theId.getIdPart().split("Patient/")[0] + " different from Request Id " + theId.getIdPart() );
+      // } 
 
-    orgAccess = Authentication.authenticateOrgAccess(theRequestDetails, dataSession);
-    FHIRHandler fhirHandler = new FHIRHandler(dataSession);
+      orgAccess = Authentication.authenticateOrgAccess(theRequestDetails, dataSession);
+      FHIRHandler fhirHandler = new FHIRHandler(dataSession);
 
-    pr = fhirHandler.FIHR_EventPatientReported(orgAccess, thePatient, null);
-    retVal.setResource(getPatientById(pr.getPatientReportedExternalLink(), dataSession, orgAccess));
-    retVal.setId(new IdType("Patient", pr.getPatientReportedExternalLink()));
-
-    dataSession.close();
+      pr = fhirHandler.FIHR_EventPatientReported(orgAccess, thePatient, null);
+      retVal.setResource(getPatientById(pr.getPatientReportedExternalLink(), dataSession, orgAccess));
+      retVal.setId(new IdType("Patient", pr.getPatientReportedExternalLink()));
+      dataSession.close();
+    } catch (Exception e) {
+      e.printStackTrace();
+      dataSession.close();
+      throw e;
+    }
     
     return retVal ;
   }
