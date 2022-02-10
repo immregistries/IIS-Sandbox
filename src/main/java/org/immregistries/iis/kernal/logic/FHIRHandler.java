@@ -21,9 +21,9 @@ public class FHIRHandler extends IncomingMessageHandler {
     super(dataSession);
   }
 
-  public void processFIHR_Event(OrgAccess orgAccess, Patient patient, Immunization immunization) throws Exception {
-    PatientReported patientReported = FIHR_EventPatientReported(orgAccess,patient,immunization);
-    FHIR_EventVaccinationReported(orgAccess,patient,patientReported,immunization);
+  public void processFhirEvent(OrgAccess orgAccess, Patient patient, Immunization immunization) throws Exception {
+    PatientReported patientReported = fhirEventPatientReported(orgAccess,patient,immunization);
+    fhirEventVaccinationReported(orgAccess,patient,patientReported,immunization);
   }
 
   /**
@@ -34,7 +34,7 @@ public class FHIRHandler extends IncomingMessageHandler {
    * @return the patientReported added or updated
    * @throws Exception
    */
-  public PatientReported FIHR_EventPatientReported(OrgAccess orgAccess, Patient patient, Immunization immunization) throws InvalidRequestException, HibernateException {
+  public PatientReported fhirEventPatientReported(OrgAccess orgAccess, Patient patient, Immunization immunization) throws InvalidRequestException, HibernateException {
     PatientMaster patientMaster = null;
     PatientReported patientReported = null;
     String patientReportedExternalLink = patient.getIdentifier().get(0).getValue();
@@ -120,7 +120,7 @@ public class FHIRHandler extends IncomingMessageHandler {
    * @return the vaccinationReported added or updated
    * @throws Exception
    */
-  public VaccinationReported FHIR_EventVaccinationReported(OrgAccess orgAccess, Patient patient,PatientReported patientReported, Immunization immunization) throws Exception {
+  public VaccinationReported fhirEventVaccinationReported(OrgAccess orgAccess, Patient patient,PatientReported patientReported, Immunization immunization) throws Exception {
     VaccinationMaster vaccinationMaster = null;
     VaccinationReported vaccinationReported = null;
 
@@ -180,7 +180,6 @@ public class FHIRHandler extends IncomingMessageHandler {
     Transaction transaction = dataSession.beginTransaction();
     dataSession.saveOrUpdate(vaccinationMaster);
     dataSession.saveOrUpdate(vaccinationReported);
-    //dataSession.saveOrUpdate(vaccinationLink);
     transaction.commit();
     return vaccinationReported;
   }

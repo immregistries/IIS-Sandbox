@@ -79,7 +79,7 @@ public class PatientHandlerTest extends TestCase {
     FHIRHandler fhirHandler = new FHIRHandler(dataSession);
 //    System.err.println("datasession patient handler test " + dataSession!=null);
 
-    fhirHandler.FIHR_EventPatientReported(orgAccess, patient,null);
+    fhirHandler.fhirEventPatientReported(orgAccess, patient,null);
     /*List<PatientMaster> matches;
     Query queryBigMatch = dataSession.createQuery(
         "from PatientMaster where patientNameLast = ? and patientNameFirst= ? ");

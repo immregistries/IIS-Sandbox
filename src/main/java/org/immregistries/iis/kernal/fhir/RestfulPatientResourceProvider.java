@@ -4,7 +4,6 @@ package org.immregistries.iis.kernal.fhir;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.api.server.RequestDetails;
 import ca.uhn.fhir.rest.server.IResourceProvider;
-import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
 import ca.uhn.fhir.rest.server.exceptions.UnprocessableEntityException;
 
 import java.util.List;
@@ -14,7 +13,6 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.AnnotationConfiguration;
-import org.hl7.fhir.r4.model.OperationOutcome;
 import org.hl7.fhir.r4.model.IdType;
 import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.Reference;
@@ -73,7 +71,7 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
   public Patient getResourceById(RequestDetails theRequestDetails, @IdParam IdType theId) {
     Patient patient = null;
     // Retrieve this patient in the database...
-    Session dataSession = getDataSession();
+    dataSession = getDataSession();
     try {
       orgAccess = Authentication.authenticateOrgAccess(theRequestDetails, dataSession);
       patient = getPatientById(theId.getIdPart(), dataSession, orgAccess);
@@ -101,12 +99,12 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
       throw new UnprocessableEntityException("No identifier supplied");
     }
     // Save this patient to the database...
-    Session dataSession = getDataSession();
+    dataSession = getDataSession();
     PatientReported pr = new PatientReported();
     orgAccess = Authentication.authenticateOrgAccess(theRequestDetails, dataSession);
     FHIRHandler fhirHandler = new FHIRHandler(dataSession);
 
-    pr = fhirHandler.FIHR_EventPatientReported(orgAccess, thePatient, null);
+    pr = fhirHandler.fhirEventPatientReported(orgAccess, thePatient, null);
 
     MethodOutcome retVal = new MethodOutcome();
     retVal.setId(new IdType("Patient", pr.getPatientReportedExternalLink(), "1"));
@@ -128,22 +126,20 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
   @Update
   public MethodOutcome updatePatient(RequestDetails theRequestDetails, @IdParam IdType theId,
       @ResourceParam Patient thePatient) {
-    Session dataSession = getDataSession();
+    dataSession = getDataSession();
     PatientReported pr = new PatientReported();
     MethodOutcome retVal = new MethodOutcome();
     try {
       // FHIR Specification, need url id to be same as resource id
-      // if (!thePatient.getId().equals(theId.getIdPart().split("Patient/")[0])) {
-      //   System.err.println("-" + theId.getIdPart().split("Patient/")[0] + "-");
-      //   System.err.println("-" + thePatient.getId() + "-" + thePatient.getId().equals(theId.getIdPart().split("Patient/")[0]));
 
+      // if (!thePatient.getId().equals(theId.getIdPart().split("Patient/")[0])) {
       //   throw new InvalidRequestException("Resource Id " + theId.getIdPart().split("Patient/")[0] + " different from Request Id " + theId.getIdPart() );
       // } 
 
       orgAccess = Authentication.authenticateOrgAccess(theRequestDetails, dataSession);
       FHIRHandler fhirHandler = new FHIRHandler(dataSession);
 
-      pr = fhirHandler.FIHR_EventPatientReported(orgAccess, thePatient, null);
+      pr = fhirHandler.fhirEventPatientReported(orgAccess, thePatient, null);
       retVal.setResource(getPatientById(pr.getPatientReportedExternalLink(), dataSession, orgAccess));
       retVal.setId(new IdType("Patient", pr.getPatientReportedExternalLink()));
       dataSession.close();
@@ -165,7 +161,7 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
    */
   @Delete()
   public MethodOutcome deletePatient(RequestDetails theRequestDetails, @IdParam IdType theId) {
-    Session dataSession = getDataSession();
+    dataSession = getDataSession();
     orgAccess = Authentication.authenticateOrgAccess(theRequestDetails, dataSession);
     deletePatientById(theId.getIdPart(), dataSession, orgAccess);
     dataSession.close();
@@ -208,7 +204,7 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
 
       @SuppressWarnings("unchecked")
 	    List<PatientReported> patientReportedList = query.list();
-      if (patientReportedList.size() > 0) {
+      if (!patientReportedList.isEmpty()) {
         patientReported = patientReportedList.get(0);
         patient = PatientHandler.getPatient(null, null, patientReported);
 
@@ -218,7 +214,7 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
         @SuppressWarnings("unchecked")
 		    List<PatientLink> patientLinkList = queryLink.list();
 
-        if (patientLinkList.size() > 0) {
+        if (!patientLinkList.isEmpty()) {
           for (PatientLink link : patientLinkList) {
             String ref = link.getPatientMaster().getPatientExternalLink();
             Patient.PatientLinkComponent patientLinkComponent = new Patient.PatientLinkComponent();
@@ -251,7 +247,7 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
       query.setParameter(1, id);
       @SuppressWarnings("unchecked")
 	    List<PatientReported> patientReportedList = query.list();
-      if (patientReportedList.size() > 0) {
+      if (!patientReportedList.isEmpty()) {
         patientReported = patientReportedList.get(0);
 
       }

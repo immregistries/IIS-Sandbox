@@ -22,12 +22,9 @@ import org.immregistries.iis.kernal.model.OrgMaster;
 import org.immregistries.iis.kernal.model.PatientLink;
 import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.model.PatientReported;
-import ca.uhn.fhir.rest.annotation.Create;
 import ca.uhn.fhir.rest.annotation.Delete;
 import ca.uhn.fhir.rest.annotation.IdParam;
 import ca.uhn.fhir.rest.annotation.Read;
-import ca.uhn.fhir.rest.annotation.ResourceParam;
-import ca.uhn.fhir.rest.annotation.Update;
 
 
 public class RestfulPersonResourceProvider implements IResourceProvider {
@@ -57,7 +54,6 @@ public class RestfulPersonResourceProvider implements IResourceProvider {
   public Person getResourceById(RequestDetails theRequestDetails, @IdParam IdType theId) {
     Person person = null;
     // Retrieve this person in the database...
-    Session dataSession = getDataSession();
     try {
       orgAccess = Authentication.authenticateOrgAccess(theRequestDetails, dataSession);
       person = getPersonById(theId.getIdPart(), dataSession, orgAccess);
@@ -80,9 +76,10 @@ public class RestfulPersonResourceProvider implements IResourceProvider {
     Person person = null;
     PatientReported patientReported = null;
 
-    Query query =
-        dataSession.createQuery("from PatientReported where patientReportedExternalLink = ?");
-    query.setParameter(0, idPart);
+    Query query = dataSession.createQuery(
+          "from  PatientReported where orgReported = ? and patientReportedExternalLink = ?");
+      query.setParameter(0, orgAccess.getOrg());
+      query.setParameter(1, idPart);
     @SuppressWarnings("unchecked")
 	List<PatientReported> patientReportedList = query.list();
 
@@ -98,7 +95,7 @@ public class RestfulPersonResourceProvider implements IResourceProvider {
     @SuppressWarnings("unchecked")
 	List<PatientLink> patientLinkList = queryLink.list();
 
-    if (patientLinkList.size() > 0) {
+    if (!patientLinkList.isEmpty()) {
       for (PatientLink link : patientLinkList) {
         String ref = link.getPatientReported().getPatientReportedExternalLink();
         int assuranceLevel = link.getLevelConfidence();
@@ -119,22 +116,6 @@ public class RestfulPersonResourceProvider implements IResourceProvider {
     return person;
   }
 
-
-  // @Create
-  // public MethodOutcome createPatient(RequestDetails theRequestDetails,
-  //     @ResourceParam Person thePerson) {
-
-  //   return new MethodOutcome();
-
-  // }
-
-
-  // @Update
-  // public MethodOutcome updatePerson(RequestDetails theRequestDetails, @IdParam IdType theId,
-  //     @ResourceParam Person thePerson) {
-  //   return new MethodOutcome();
-  // }
-
   /**
    * The "@Delete" annotation indicates that this method supports deleting an existing
    * resource (by ID)
@@ -144,7 +125,6 @@ public class RestfulPersonResourceProvider implements IResourceProvider {
    */
   @Delete()
   public MethodOutcome deletePerson(RequestDetails theRequestDetails, @IdParam IdType theId) {
-    Session dataSession = getDataSession();
     try {
       orgAccess = Authentication.authenticateOrgAccess(theRequestDetails, dataSession);
       deletePersonById(theId.getIdPart(), dataSession, orgAccess);
