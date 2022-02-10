@@ -120,20 +120,20 @@ public class RestfulPersonResourceProvider implements IResourceProvider {
   }
 
 
-  @Create
-  public MethodOutcome createPatient(RequestDetails theRequestDetails,
-      @ResourceParam Person thePerson) {
+  // @Create
+  // public MethodOutcome createPatient(RequestDetails theRequestDetails,
+  //     @ResourceParam Person thePerson) {
 
-    return new MethodOutcome();
+  //   return new MethodOutcome();
 
-  }
+  // }
 
 
-  @Update
-  public MethodOutcome updatePerson(RequestDetails theRequestDetails, @IdParam IdType theId,
-      @ResourceParam Person thePerson) {
-    return new MethodOutcome();
-  }
+  // @Update
+  // public MethodOutcome updatePerson(RequestDetails theRequestDetails, @IdParam IdType theId,
+  //     @ResourceParam Person thePerson) {
+  //   return new MethodOutcome();
+  // }
 
   /**
    * The "@Delete" annotation indicates that this method supports deleting an existing
