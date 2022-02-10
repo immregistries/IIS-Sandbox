@@ -249,19 +249,19 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
 	    List<PatientReported> patientReportedList = query.list();
       if (!patientReportedList.isEmpty()) {
         patientReported = patientReportedList.get(0);
+        // Deleting possible links
+        Query queryLink = dataSession.createQuery(
+            "from  PatientLink where patientReported.patientReportedId=?");
+        queryLink.setParameter(0, patientReported.getPatientReportedId());
+        @SuppressWarnings("unchecked")
+        List<PatientLink> patientLinkList = queryLink.list();
+        if (!patientLinkList.isEmpty()) {
+          patientLink = patientLinkList.get(0);
+        }
 
       }
 
-      //Deleting possible links
-
-      Query queryLink =
-          dataSession.createQuery("from  PatientLink where patientReported.patientReportedId=?");
-      queryLink.setParameter(0, patientReported.getPatientReportedId());
-      @SuppressWarnings("unchecked")
-	    List<PatientLink> patientLinkList = queryLink.list();
-      if (patientLinkList.size() > 0) {
-        patientLink = patientLinkList.get(0);
-      }
+      
 
 
 

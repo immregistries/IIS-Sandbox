@@ -183,7 +183,9 @@ public class RestfulImmunizationProvider implements IResourceProvider {
       List<VaccinationReported> vaccinationReportedList = query.list();
       if (!vaccinationReportedList.isEmpty()) {
         vaccinationReported = vaccinationReportedList.get(0);
-        immunization = ImmunizationHandler.getImmunization(theRequestDetails, vaccinationReported);
+        if (vaccinationReported.getPatientReported().getOrgReported().getOrgId() != orgAccess.getOrgAccessId()){
+          immunization = ImmunizationHandler.getImmunization(theRequestDetails, vaccinationReported);
+        }
       }
     }
 
