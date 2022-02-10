@@ -24,6 +24,7 @@ import ca.uhn.fhir.rest.annotation.ResourceParam;
 import ca.uhn.fhir.rest.annotation.Update;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.server.IResourceProvider;
+import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
 import ca.uhn.fhir.rest.server.exceptions.UnprocessableEntityException;
 
 public class RestfulImmunizationProvider implements IResourceProvider {
@@ -76,7 +77,7 @@ public class RestfulImmunizationProvider implements IResourceProvider {
         Patient patient = PatientHandler.patientReportedToFhirPatient(pr);
         fhirHandler.processFhirEvent(orgAccess, patient, theImmunization);
       } else {
-        throw new Exception("No patient Found with the identifier supplied");
+        throw new InvalidRequestException("No patient Found with the identifier supplied");
       }
     } catch (Exception e) {
       e.printStackTrace();
