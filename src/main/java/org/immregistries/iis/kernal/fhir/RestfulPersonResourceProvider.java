@@ -83,36 +83,35 @@ public class RestfulPersonResourceProvider implements IResourceProvider {
     @SuppressWarnings("unchecked")
 	List<PatientReported> patientReportedList = query.list();
 
-    if (patientReportedList.size() > 0) {
+    if (!patientReportedList.isEmpty()) {
       patientReported = patientReportedList.get(0);
       person = PersonHandler.getPerson(patientReported);
-    }
-    //add Link
 
-    int linkId = patientReported.getPatientReportedId();
-    Query queryLink = dataSession.createQuery("from PatientLink where patientMaster.id = ?");
-    queryLink.setParameter(0, linkId);
-    @SuppressWarnings("unchecked")
-	List<PatientLink> patientLinkList = queryLink.list();
+      //add Link
+      int linkId = patientReported.getPatientReportedId();
+      Query queryLink = dataSession.createQuery("from PatientLink where patientMaster.id = ?");
+      queryLink.setParameter(0, linkId);
+      @SuppressWarnings("unchecked")
+      List<PatientLink> patientLinkList = queryLink.list();
 
-    if (!patientLinkList.isEmpty()) {
-      for (PatientLink link : patientLinkList) {
-        String ref = link.getPatientReported().getPatientReportedExternalLink();
-        int assuranceLevel = link.getLevelConfidence();
-        Person.PersonLinkComponent personLinkComponent = new Person.PersonLinkComponent();
-        Reference reference = new Reference();
-        reference.setReference("Patient/" + ref);
-        if (assuranceLevel == 1) {
-          person.addLink(personLinkComponent.setTarget(reference)
-              .setAssurance(Person.IdentityAssuranceLevel.LEVEL2));
-
-        } else {
-          person.addLink(personLinkComponent.setTarget(reference)
-              .setAssurance(Person.IdentityAssuranceLevel.LEVEL3));
+      if (!patientLinkList.isEmpty()) {
+        for (PatientLink link : patientLinkList) {
+          String ref = link.getPatientReported().getPatientReportedExternalLink();
+          int assuranceLevel = link.getLevelConfidence();
+          Person.PersonLinkComponent personLinkComponent = new Person.PersonLinkComponent();
+          Reference reference = new Reference();
+          reference.setReference("Patient/" + ref);
+          if (assuranceLevel == 1) {
+            person.addLink(personLinkComponent.setTarget(reference)
+                .setAssurance(Person.IdentityAssuranceLevel.LEVEL2));
+  
+          } else {
+            person.addLink(personLinkComponent.setTarget(reference)
+                .setAssurance(Person.IdentityAssuranceLevel.LEVEL3));
+          }
         }
       }
-
-    }
+    }    
     return person;
   }
 
@@ -153,10 +152,7 @@ public class RestfulPersonResourceProvider implements IResourceProvider {
       query.setParameter(1, idPart);
       @SuppressWarnings("unchecked")
 	List<PatientReported> patientReportedList = query.list();
-      System.err.println(orgAccess.getOrg());
-      System.err.println(idPart);
-      System.err.println(patientReportedList.size());
-      if (patientReportedList.size() > 0) {
+      if (!patientReportedList.isEmpty()) {
 
         patientReported = patientReportedList.get(0);
         patientMaster = patientReported.getPatient();
@@ -171,11 +167,7 @@ public class RestfulPersonResourceProvider implements IResourceProvider {
       query.setParameter(1, idPart);
       @SuppressWarnings("unchecked")
 	List<PatientReported> patientReportedList = query.list();
-      System.err.println(orgAccess.getOrg());
-      System.err.println(idPart);
-      System.err.println(patientReportedList.size());
-      if (patientReportedList.size() > 0) {
-
+      if (!patientReportedList.isEmpty()) {
         patientReported = patientReportedList.get(0);
         patientMaster = patientReported.getPatient();
       }
@@ -191,8 +183,7 @@ public class RestfulPersonResourceProvider implements IResourceProvider {
       @SuppressWarnings("unchecked")
 	List<PatientLink> patientLinkList = queryLink.list();
 
-      if (patientLinkList.size() > 0) {
-
+      if (!patientLinkList.isEmpty()) {
         throw new Exception("The patients linked  to Person/" + idPart + " must be deleted first");
       }
 

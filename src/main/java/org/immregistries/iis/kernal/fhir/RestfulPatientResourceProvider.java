@@ -258,13 +258,7 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
         if (!patientLinkList.isEmpty()) {
           patientLink = patientLinkList.get(0);
         }
-
       }
-
-      
-
-
-
     }
     {
       Transaction transaction = dataSession.beginTransaction();
@@ -272,10 +266,7 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
       if (patientLink != null) {
         dataSession.delete(patientLink);
       }
-
       //dataSession.delete(patientMaster);
-
-
       transaction.commit();
     }
   }

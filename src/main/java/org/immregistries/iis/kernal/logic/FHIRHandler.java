@@ -46,17 +46,16 @@ public class FHIRHandler extends IncomingMessageHandler {
       throw new InvalidRequestException("Patient external link must be indicated");
     }
 
-
-    {
+    { //EMPI SYSTEM LOGIC TO FIND DUPLICATES
       Query query = dataSession.createQuery(
           "from PatientReported where orgReported = ? and patientReportedExternalLink = ?");
       query.setParameter(0, orgAccess.getOrg());
       query.setParameter(1, patientReportedExternalLink);
       @SuppressWarnings("unchecked")
       List<PatientReported> patientReportedList = query.list();
-      if (patientReportedList.size() > 0) {
-        System.err.println("Patient already exists");
-        //get patient master and reported
+      if (!patientReportedList.isEmpty()) {
+        // System.err.println("Patient already exists");
+        // Get patient master and reported
         patientReported = patientReportedList.get(0);
         PatientHandler.patientReportedFromFhirPatient(patientReported,patient);
         patientMaster = patientReported.getPatient();
@@ -64,21 +63,21 @@ public class FHIRHandler extends IncomingMessageHandler {
       } else { //EMPI Search matches with firstname, lastname and birthday
         List<PatientMaster> patientMasterList = PatientHandler.findMatch(dataSession,patient);
         if(patientMasterList.size() > 0){
-          System.err.println("patient has a match");
-          //Create new patient reported and get existing patient master
+          // System.err.println("patient has a match");
+          // Create new patient reported and get existing patient master
           patientAlreadyExists = true;
           patientMaster = patientMasterList.get(0);
           levelConfidence=2;
-        }else if(PatientHandler.findPossibleMatch(dataSession,patient).size()>0){
+        } else if(!PatientHandler.findPossibleMatch(dataSession,patient).isEmpty()){
+          // System.err.println("patient has a possible match ");
           // Found an existing patient with same firstname and lastname
           patientAlreadyExists=true;
           patientMasterList=PatientHandler.findPossibleMatch(dataSession,patient);
           patientMaster=patientMasterList.get(0);
           levelConfidence=1;
-          System.err.println("patient has a possible match ");
-        }else {
-          //Create new patient master and patient reported
-          System.err.println("patient has no match ");
+        } else {
+          // Create new patient master and patient reported
+          // System.err.println("patient has no match ");
           patientMaster = new PatientMaster();
           patientMaster.setOrgMaster(orgAccess.getOrg());
         }
@@ -96,9 +95,9 @@ public class FHIRHandler extends IncomingMessageHandler {
 
       dataSession.saveOrUpdate(patientMaster);
       dataSession.saveOrUpdate(patientReported);
-      System.err.println("patient Created");
+      // System.err.println("patient Created");
       if(patientAlreadyExists) {
-        System.err.println("Creating patientlink");
+        // System.err.println("Creating patientlink");
         PatientLink pl = new PatientLink();
         pl.setLevelConfidence(levelConfidence);
         pl.setPatientMaster(patientMaster);
@@ -135,7 +134,7 @@ public class FHIRHandler extends IncomingMessageHandler {
       @SuppressWarnings("unchecked")
       List<VaccinationReported> vaccinationReportedList = query.list();
       if (vaccinationReportedList.size() > 0) { // if external link found
-        System.out.println("Immunization already exists");
+        // System.err.println("Immunization already exists");
         vaccinationMaster = vaccinationReportedList.get(0).getVaccination();
       } else {
         vaccinationMaster = ImmunizationHandler.findMatch(dataSession, patientReported, immunization);
