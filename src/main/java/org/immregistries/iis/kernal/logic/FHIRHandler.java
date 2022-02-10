@@ -14,6 +14,8 @@ import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
 import java.util.Date;
 import java.util.List;
 
+import com.google.protobuf.TextFormat.ParseException;
+
 public class FHIRHandler extends IncomingMessageHandler {
 
 
@@ -21,7 +23,7 @@ public class FHIRHandler extends IncomingMessageHandler {
     super(dataSession);
   }
 
-  public void processFhirEvent(OrgAccess orgAccess, Patient patient, Immunization immunization) throws Exception {
+  public void processFhirEvent(OrgAccess orgAccess, Patient patient, Immunization immunization) throws HibernateException, InvalidRequestException {
     PatientReported patientReported = fhirEventPatientReported(orgAccess,patient,immunization);
     fhirEventVaccinationReported(orgAccess,patient,patientReported,immunization);
   }
@@ -62,7 +64,7 @@ public class FHIRHandler extends IncomingMessageHandler {
 
       } else { //EMPI Search matches with firstname, lastname and birthday
         List<PatientMaster> patientMasterList = PatientHandler.findMatch(dataSession,patient);
-        if(patientMasterList.size() > 0){
+        if(!patientMasterList.isEmpty()){
           // System.err.println("patient has a match");
           // Create new patient reported and get existing patient master
           patientAlreadyExists = true;
@@ -119,7 +121,7 @@ public class FHIRHandler extends IncomingMessageHandler {
    * @return the vaccinationReported added or updated
    * @throws Exception
    */
-  public VaccinationReported fhirEventVaccinationReported(OrgAccess orgAccess, Patient patient,PatientReported patientReported, Immunization immunization) throws Exception {
+  public VaccinationReported fhirEventVaccinationReported(OrgAccess orgAccess, Patient patient,PatientReported patientReported, Immunization immunization) throws HibernateException {
     VaccinationMaster vaccinationMaster = null;
     VaccinationReported vaccinationReported = null;
 
@@ -133,7 +135,7 @@ public class FHIRHandler extends IncomingMessageHandler {
       query.setParameter(1, immunization.getId());
       @SuppressWarnings("unchecked")
       List<VaccinationReported> vaccinationReportedList = query.list();
-      if (vaccinationReportedList.size() > 0) { // if external link found
+      if (!vaccinationReportedList.isEmpty()) { // if external link found
         // System.err.println("Immunization already exists");
         vaccinationMaster = vaccinationReportedList.get(0).getVaccination();
       } else {
@@ -149,7 +151,7 @@ public class FHIRHandler extends IncomingMessageHandler {
     }
     vaccinationReported.setVaccination(vaccinationMaster);
     if (vaccinationReported.getUpdatedDate().before(patient.getBirthDate())) {
-      throw new Exception("Vaccination is reported as having been administered before the patient was born");
+      throw new InvalidRequestException("Vaccination is reported as having been administered before the patient was born");
     }
 
     // OrgLocation
@@ -162,7 +164,7 @@ public class FHIRHandler extends IncomingMessageHandler {
       @SuppressWarnings("unchecked")
       List<OrgLocation> orgMasterList = query.list();
       OrgLocation orgLocation = null;
-      if (orgMasterList.size() > 0) {
+      if (!orgMasterList.isEmpty()) {
         orgLocation = orgMasterList.get(0);
       } else {
         orgLocation = new OrgLocation();
@@ -197,7 +199,7 @@ public class FHIRHandler extends IncomingMessageHandler {
     query.setParameter(0, id);
     @SuppressWarnings("unchecked")
     List<VaccinationReported> vaccinationReportedList = query.list();
-    if (vaccinationReportedList.size() > 0) {
+    if (!vaccinationReportedList.isEmpty()) {
       vr = vaccinationReportedList.get(0);
       vm =vr.getVaccination();
     }

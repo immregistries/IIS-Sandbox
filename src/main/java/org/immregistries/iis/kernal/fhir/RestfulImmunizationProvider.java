@@ -79,8 +79,9 @@ public class RestfulImmunizationProvider implements IResourceProvider {
       } else {
         throw new InvalidRequestException("No patient Found with the identifier supplied");
       }
-    } catch (Exception e) {
+    } catch (InvalidRequestException e) {
       e.printStackTrace();
+      throw e;
     } finally {
       dataSession.close();
     }

@@ -1,7 +1,6 @@
 package org.immregistries.iis.kernal.logic;
 
 import java.math.BigDecimal;
-import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 import org.hibernate.Query;
@@ -125,10 +124,9 @@ public class ImmunizationHandler {
 
     i.addReasonCode().addCoding().setCode(vr.getRefusalReasonCode());
     i.getVaccineCode().addCoding().setCode(vr.getVaccineCvxCode());
-    //if (pr != null){
+
     i.setPatient(new Reference("Patient/"
         + vr.getPatientReported().getPatientReportedExternalLink()));
-    //}
 
     Location location = i.getLocationTarget();
     OrgLocation ol = vr.getOrgLocation();
@@ -163,7 +161,7 @@ public class ImmunizationHandler {
    * @return the vaccinationMaster found, null if none has been found
    */
 
-  public static VaccinationMaster findMatch(Session dataSession, PatientReported patientReported, Immunization immunization) throws ParseException {
+  public static VaccinationMaster findMatch(Session dataSession, PatientReported patientReported, Immunization immunization) {
     VaccinationMaster vm = null;
     Deterministic comparer = new Deterministic();
     ComparisonResult comparison;

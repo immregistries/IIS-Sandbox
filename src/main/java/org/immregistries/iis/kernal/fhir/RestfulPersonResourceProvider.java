@@ -4,6 +4,7 @@ package org.immregistries.iis.kernal.fhir;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.api.server.RequestDetails;
 import ca.uhn.fhir.rest.server.IResourceProvider;
+import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
 
 import java.util.List;
 
@@ -166,29 +167,25 @@ public class RestfulPersonResourceProvider implements IResourceProvider {
       query.setParameter(0, orgAccess.getOrg());
       query.setParameter(1, idPart);
       @SuppressWarnings("unchecked")
-	List<PatientReported> patientReportedList = query.list();
+	    List<PatientReported> patientReportedList = query.list();
       if (!patientReportedList.isEmpty()) {
         patientReported = patientReportedList.get(0);
         patientMaster = patientReported.getPatient();
-      }
 
-    }
-    {
       //Verify if all links are already deleted if not ask to delete
-      // the several PatientReported and PatientLink first
-      Query queryLink =
-          dataSession.createQuery("from  PatientLink where patientMaster.patientId = ?");
-      queryLink.setParameter(0, patientMaster.getPatientId());
+        // the several PatientReported and PatientLink first
+        Query queryLink = dataSession.createQuery(
+          "from  PatientLink where patientMaster.patientId = ?");
+        queryLink.setParameter(0, patientMaster.getPatientId());
 
-      @SuppressWarnings("unchecked")
-	List<PatientLink> patientLinkList = queryLink.list();
+        @SuppressWarnings("unchecked")
+        List<PatientLink> patientLinkList = queryLink.list();
 
-      if (!patientLinkList.isEmpty()) {
-        throw new Exception("The patients linked  to Person/" + idPart + " must be deleted first");
+        if (!patientLinkList.isEmpty()) {
+          throw new InvalidRequestException("The patients linked  to Person/" + idPart + " must be deleted first");
+        }
       }
-
     }
-
 
     {
       Transaction transaction = dataSession.beginTransaction();
