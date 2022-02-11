@@ -14,7 +14,6 @@ import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
 import java.util.Date;
 import java.util.List;
 
-import com.google.protobuf.TextFormat.ParseException;
 
 public class FHIRHandler extends IncomingMessageHandler {
 
@@ -190,7 +189,7 @@ public class FHIRHandler extends IncomingMessageHandler {
    * @param orgAccess the orgAcess of the organization
    * @param id the id of the vaccinationReported to be deleted
    */
-  public void FHIR_EventVaccinationDeleted(OrgAccess orgAccess, String id) {
+  public void fhirEventVaccinationDeleted(OrgAccess orgAccess, String id) {
     VaccinationReported vr = new VaccinationReported();
     VaccinationMaster vm = new VaccinationMaster();
 
@@ -201,7 +200,7 @@ public class FHIRHandler extends IncomingMessageHandler {
     List<VaccinationReported> vaccinationReportedList = query.list();
     if (!vaccinationReportedList.isEmpty()) {
       vr = vaccinationReportedList.get(0);
-      vm =vr.getVaccination();
+      vm = vr.getVaccination();
     }
     Transaction transaction = dataSession.beginTransaction();
 

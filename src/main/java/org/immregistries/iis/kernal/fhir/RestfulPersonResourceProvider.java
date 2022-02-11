@@ -142,7 +142,7 @@ public class RestfulPersonResourceProvider implements IResourceProvider {
    * @param orgAccess The orgAccess
    */
   private void deletePersonById(String idPart, Session dataSession, OrgAccess orgAccess)
-      throws Exception {
+      throws InvalidRequestException {
     PatientReported patientReported = null;
     PatientMaster patientMaster = null;
 

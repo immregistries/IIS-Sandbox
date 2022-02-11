@@ -25,6 +25,8 @@ import ca.uhn.fhir.rest.api.server.RequestDetails;
 
 public class ImmunizationHandler {
 
+  private ImmunizationHandler(){}
+
   /**
    * This method set the patientReported information based on the patient information
    * @param patientReported the patientReported
@@ -32,7 +34,7 @@ public class ImmunizationHandler {
    */
   public static void patientReportedFromFhirImmunization(PatientReported patientReported,
       Immunization i) {
-    if (!i.equals(null)) {
+    if (i != null) {
       patientReported.setReportedDate(i.getRecorded());
       patientReported.setUpdatedDate(i.getOccurrenceDateTimeType().getValue());
       patientReported.setPatientReportedAuthority(i.getIdentifierFirstRep().getValue());

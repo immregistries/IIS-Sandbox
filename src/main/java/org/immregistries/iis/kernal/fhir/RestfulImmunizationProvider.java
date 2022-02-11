@@ -156,7 +156,7 @@ public class RestfulImmunizationProvider implements IResourceProvider {
     try {
       orgAccess = Authentication.authenticateOrgAccess(theRequestDetails, dataSession);
       FHIRHandler fhirHandler = new FHIRHandler(dataSession);
-      fhirHandler.FHIR_EventVaccinationDeleted(orgAccess, theId.getIdPart());
+      fhirHandler.fhirEventVaccinationDeleted(orgAccess, theId.getIdPart());
     } catch (Exception e) {
       e.printStackTrace();
     } finally {
