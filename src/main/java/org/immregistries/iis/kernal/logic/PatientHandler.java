@@ -20,12 +20,14 @@ import org.immregistries.iis.kernal.model.VaccinationReported;
 
 public class PatientHandler {
 
+  private PatientHandler(){}
+
   /**
    * This method set the patientReported information based on the patient information
    * @param patientReported the patientReported
    * @param p the Patient resource
    */
-  public static void patientReportedFromFhirPatient(PatientReported patientReported, Patient p) {
+  public static void patientReportedFromFhir(PatientReported patientReported, Patient p) {
     // patientReported.setPatientReportedId(;
     // patientReported.setPatientReportedType(p.get);
     patientReported.setReportedDate(new Date());
@@ -121,57 +123,11 @@ public class PatientHandler {
    * @param pr the patientReported
    * @return the Patient resource
    */
-  public static Patient patientReportedToFhirPatient(PatientReported pr) {
-    Patient ret = new Patient();
-
-    Identifier identifier = new Identifier();
-    identifier.setValue(pr.getPatientReportedExternalLink());
-    List<Identifier> li = new ArrayList<>();
-    li.add(identifier);
-    ret.setIdentifier(li);
-
-    HumanName name = new HumanName();
-    name.addGiven(pr.getPatientNameFirst());
-    name.addGiven(pr.getPatientNameMiddle());
-    name.setFamily(pr.getPatientNameLast());
-    ret.addName(name);
-
-    Address address = new Address();
-    address.setCity(pr.getPatientAddressCity());
-    address.setCountry(pr.getPatientAddressCountry());
-    address.setState(pr.getPatientAddressState());
-    address.setPostalCode(pr.getPatientAddressZip());
-    ret.addAddress(address);
-
-    if (pr.getPatientPhone() != null) {
-      ContactPoint cp = new ContactPoint();
-      cp.setValue(pr.getPatientPhone());
-      cp.setSystem(ContactPointSystem.PHONE);
-      ret.addTelecom(cp);
-    }
-
-    if (pr.getPatientEmail() != null) {
-      ContactPoint cp = new ContactPoint();
-      cp.setValue(pr.getPatientEmail());
-      cp.setSystem(ContactPointSystem.EMAIL);
-      ret.addTelecom(cp);
-    }
-
-    ret.setBirthDate(pr.getPatientBirthDate());
-
-    if (pr.getPatientSex() != null) {
-      if (pr.getPatientSex().equals("M")) {
-        ret.setGender(AdministrativeGender.MALE);
-      } else if (pr.getPatientSex().equals("F")) {
-        ret.setGender(AdministrativeGender.FEMALE);
-      }
-    }
-
-    return ret;
+  public static Patient patientReportedToFhir(PatientReported pr) {
+    return getFhirPatient(null, null, pr);
   }
 
-
-  public static Patient getPatient(OrgLocation orgLocation, VaccinationReported vaccinationReported,
+  public static Patient getFhirPatient(OrgLocation orgLocation, VaccinationReported vaccinationReported,
       PatientReported pr) {
     Patient p = new Patient();
     Identifier id = p.addIdentifier();
@@ -184,22 +140,22 @@ public class PatientHandler {
     name.addGivenElement().setValue(pr.getPatientNameMiddle());
 
     if (null != pr.getPatientEmail()) {
-      p.addTelecom().setSystem(ContactPoint.ContactPointSystem.EMAIL)
+      p.addTelecom().setSystem(ContactPointSystem.EMAIL)
           .setValue(pr.getPatientEmail());
     }
     if (null != pr.getPatientPhone()) {
-      p.addTelecom().setSystem(ContactPoint.ContactPointSystem.PHONE)
+      p.addTelecom().setSystem(ContactPointSystem.PHONE)
           .setValue(pr.getPatientPhone());
     }
     switch (pr.getPatientSex()) {
       case "M":
-        p.setGender(Enumerations.AdministrativeGender.MALE);
+        p.setGender(AdministrativeGender.MALE);
         break;
       case "F":
-        p.setGender(Enumerations.AdministrativeGender.FEMALE);
+        p.setGender(AdministrativeGender.FEMALE);
         break;
       default:
-        p.setGender(Enumerations.AdministrativeGender.OTHER);
+        p.setGender(AdministrativeGender.OTHER);
     }
     p.setBirthDate(pr.getPatientBirthDate());
     if (null == pr.getPatientDeathDate()) {
@@ -225,9 +181,10 @@ public class PatientHandler {
     contactName.addGivenElement().setValue(pr.getGuardianMiddle());
     contact.setName(contactName);
 
-
     return p;
   }
+
+
   /**
    * This methods is looking for posssible matches based on the first name, last name between the provided patient
    * and the existing patients in the database

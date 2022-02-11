@@ -75,7 +75,7 @@ public class RestfulImmunizationProvider implements IResourceProvider {
       PatientReported pr = PatientRepository.getPatientFromExternalId(orgAccess, dataSession,
           theImmunization.getPatient().getReference().substring(8)); // the id patient starts with Patient/ so we cut it
       if (null != pr) {
-        Patient patient = PatientHandler.patientReportedToFhirPatient(pr);
+        Patient patient = PatientHandler.patientReportedToFhir(pr);
         fhirHandler.processFhirEvent(orgAccess, patient, theImmunization);
       } else {
         throw new InvalidRequestException("No patient Found with the identifier supplied");
@@ -134,7 +134,7 @@ public class RestfulImmunizationProvider implements IResourceProvider {
       FHIRHandler fhirHandler = new FHIRHandler(dataSession);
       PatientReported pr = PatientRepository.getPatientFromExternalId(orgAccess, dataSession,
           theImmunization.getPatient().getReference().substring(8)); // the id patient starts with Patient/ so we cut it
-      Patient patient = PatientHandler.patientReportedToFhirPatient(pr);
+      Patient patient = PatientHandler.patientReportedToFhir(pr);
 
       fhirHandler.processFhirEvent(orgAccess, patient, theImmunization);
     } catch (Exception e) {
@@ -156,7 +156,6 @@ public class RestfulImmunizationProvider implements IResourceProvider {
     dataSession = getDataSession();
     try {
       orgAccess = Authentication.authenticateOrgAccess(theRequestDetails, dataSession);
-      FHIRHandler fhirHandler = new FHIRHandler(dataSession);
       fhirEventVaccinationDeleted(orgAccess, theId.getIdPart());
     } catch (Exception e) {
       e.printStackTrace();

@@ -57,8 +57,8 @@ public class PatientHandlerTest extends TestCase {
     dataSession=null;
   }
 
-  public void testPatientReportedFromFhirPatient() {
-    PatientHandler.patientReportedFromFhirPatient(patientReported, patient);
+  public void testpatientReportedFromFhir() {
+    PatientHandler.patientReportedFromFhir(patientReported, patient);
     assertEquals("Identifiant1", patientReported.getPatientReportedExternalLink());
     assertEquals("Doe",patientReported.getPatientNameLast());
     assertFalse(patientReported.getPatientBirthDate()==null);

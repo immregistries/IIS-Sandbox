@@ -76,8 +76,8 @@ public class RestfulMedicationAdministrationProvider implements IResourceProvide
         medicationAdministration.setId(id);
         medicationAdministration
             .setEffective(new DateTimeType(vaccinationMaster.getAdministeredDate()));
-        medicationAdministration.setSubject(new Reference(theRequestDetails.getFhirServerBase()
-            + "/Patient/" + vaccinationMaster.getPatient().getPatientId()));
+        medicationAdministration.setSubject(new Reference("/Patient/" 
+            + vaccinationMaster.getPatient().getPatientId()));
         {
           Query query = dataSession.createQuery("from VaccinationReported where vaccination= ?");
           query.setParameter(0, vaccinationMaster);
@@ -88,7 +88,7 @@ public class RestfulMedicationAdministrationProvider implements IResourceProvide
             Extension link;
             for (VaccinationReported vl : vaccinationReportedList) {
               link = new Extension();
-              link.setValue(new StringType(theRequestDetails.getFhirServerBase() + "/Immunization/"
+              link.setValue(new StringType("/Immunization/"
                   + vl.getVaccinationReportedExternalLink()));
               links.addExtension(link);
             }

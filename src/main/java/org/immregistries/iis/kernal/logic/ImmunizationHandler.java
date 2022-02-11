@@ -148,7 +148,7 @@ public class ImmunizationHandler {
     Extension link;
     link = new Extension();
     link.setValue(
-        new StringType(theRequestDetails.getFhirServerBase() + "/MedicationAdministration/"
+        new StringType("/MedicationAdministration/"
             + vr.getVaccination().getVaccinationReported().getVaccinationReportedExternalLink()));
     links.addExtension(link);
     i.addExtension(links);
@@ -162,7 +162,6 @@ public class ImmunizationHandler {
    * @param immunization the immunization resource
    * @return the vaccinationMaster found, null if none has been found
    */
-
   public static VaccinationMaster findMatch(Session dataSession, PatientReported patientReported, Immunization immunization) {
     VaccinationMaster vm = null;
     Deterministic comparer = new Deterministic();

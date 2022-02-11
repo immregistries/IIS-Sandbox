@@ -58,7 +58,7 @@ public class FHIRHandler extends IncomingMessageHandler {
         // System.err.println("Patient already exists");
         // Get patient master and reported
         patientReported = patientReportedList.get(0);
-        PatientHandler.patientReportedFromFhirPatient(patientReported,patient);
+        PatientHandler.patientReportedFromFhir(patientReported,patient);
         patientMaster = patientReported.getPatient();
 
       } else { //EMPI Search matches with firstname, lastname and birthday
@@ -84,7 +84,7 @@ public class FHIRHandler extends IncomingMessageHandler {
         }
         patientReported = new PatientReported();
         patientReported.setPatient(patientMaster);
-        PatientHandler.patientReportedFromFhirPatient(patientReported, patient);
+        PatientHandler.patientReportedFromFhir(patientReported, patient);
         patientReported.setOrgReported(orgAccess.getOrg());
         patientReported.setUpdatedDate(new Date());
       }
