@@ -172,7 +172,7 @@ public class SoapServlet extends HttpServlet {
         out.println("<p>Additional end points are available, which provide different behaviors ");
         out.println("(some good and some bad). ");
         out.println("These can be used to demonstrate different or bad interactions. </p>");
-        ProcessorFactory.printExplanations(out, "soap");
+        ProcessorFactory.printExplanations(out);
       } finally {
         out.close();
       }
