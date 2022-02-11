@@ -138,7 +138,7 @@ public class IncomingMessageHandler {
         query.setParameter(0, orgAccess.getOrg());
         query.setParameter(1, mrn);
         List<PatientReported> patientReportedList = query.list();
-        if (patientReportedList.size() > 0) {
+        if (!patientReportedList.isEmpty()) {
           patientReported = patientReportedList.get(0);
         }
       }

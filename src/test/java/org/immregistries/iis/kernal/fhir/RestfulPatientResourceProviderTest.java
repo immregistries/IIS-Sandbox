@@ -49,7 +49,7 @@ public class RestfulPatientResourceProviderTest extends TestCase {
     orgAccess=OrgAccessGenerator.getOrgAccess();
     orgMaster=OrgAccessGenerator.getOrgMaster();
     FHIRHandler fhirHandler = new FHIRHandler(dataSession);
-    patientReported = fhirHandler.FIHR_EventPatientReported(orgAccess, patient,null);
+    patientReported = fhirHandler.fhirEventPatientReported(orgAccess, patient,null);
 
 
   }
@@ -71,7 +71,7 @@ public class RestfulPatientResourceProviderTest extends TestCase {
   public void testUpdatePatient() throws Exception {
     patient.setGender(AdministrativeGender.FEMALE);
     FHIRHandler fhirHandler = new FHIRHandler(dataSession);
-    patientReported = fhirHandler.FIHR_EventPatientReported(orgAccess, patient,null);
+    patientReported = fhirHandler.fhirEventPatientReported(orgAccess, patient,null);
 
     assertEquals("F",patientReported.getPatientSex());
   }

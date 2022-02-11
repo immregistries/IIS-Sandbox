@@ -57,8 +57,8 @@ public class PatientHandlerTest extends TestCase {
     dataSession=null;
   }
 
-  public void testPatientReportedFromFhirPatient() {
-    PatientHandler.patientReportedFromFhirPatient(patientReported, patient);
+  public void testpatientReportedFromFhir() {
+    PatientHandler.patientReportedFromFhir(patientReported, patient);
     assertEquals("Identifiant1", patientReported.getPatientReportedExternalLink());
     assertEquals("Doe",patientReported.getPatientNameLast());
     assertFalse(patientReported.getPatientBirthDate()==null);
@@ -79,7 +79,7 @@ public class PatientHandlerTest extends TestCase {
     FHIRHandler fhirHandler = new FHIRHandler(dataSession);
 //    System.err.println("datasession patient handler test " + dataSession!=null);
 
-    fhirHandler.FIHR_EventPatientReported(orgAccess, patient,null);
+    fhirHandler.fhirEventPatientReported(orgAccess, patient,null);
     /*List<PatientMaster> matches;
     Query queryBigMatch = dataSession.createQuery(
         "from PatientMaster where patientNameLast = ? and patientNameFirst= ? ");

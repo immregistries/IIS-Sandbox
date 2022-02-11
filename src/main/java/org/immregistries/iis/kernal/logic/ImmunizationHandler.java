@@ -1,7 +1,6 @@
 package org.immregistries.iis.kernal.logic;
 
 import java.math.BigDecimal;
-import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 import org.hibernate.Query;
@@ -26,6 +25,8 @@ import ca.uhn.fhir.rest.api.server.RequestDetails;
 
 public class ImmunizationHandler {
 
+  private ImmunizationHandler(){}
+
   /**
    * This method set the patientReported information based on the patient information
    * @param patientReported the patientReported
@@ -33,7 +34,7 @@ public class ImmunizationHandler {
    */
   public static void patientReportedFromFhirImmunization(PatientReported patientReported,
       Immunization i) {
-    if (!i.equals(null)) {
+    if (i != null) {
       patientReported.setReportedDate(i.getRecorded());
       patientReported.setUpdatedDate(i.getOccurrenceDateTimeType().getValue());
       patientReported.setPatientReportedAuthority(i.getIdentifierFirstRep().getValue());
@@ -125,10 +126,9 @@ public class ImmunizationHandler {
 
     i.addReasonCode().addCoding().setCode(vr.getRefusalReasonCode());
     i.getVaccineCode().addCoding().setCode(vr.getVaccineCvxCode());
-    //if (pr != null){
-    i.setPatient(new Reference(theRequestDetails.getFhirServerBase() + "/Patient/"
+
+    i.setPatient(new Reference("Patient/"
         + vr.getPatientReported().getPatientReportedExternalLink()));
-    //}
 
     Location location = i.getLocationTarget();
     OrgLocation ol = vr.getOrgLocation();
@@ -148,7 +148,7 @@ public class ImmunizationHandler {
     Extension link;
     link = new Extension();
     link.setValue(
-        new StringType(theRequestDetails.getFhirServerBase() + "/MedicationAdministration/"
+        new StringType("/MedicationAdministration/"
             + vr.getVaccination().getVaccinationReported().getVaccinationReportedExternalLink()));
     links.addExtension(link);
     i.addExtension(links);
@@ -162,8 +162,7 @@ public class ImmunizationHandler {
    * @param immunization the immunization resource
    * @return the vaccinationMaster found, null if none has been found
    */
-
-  public static VaccinationMaster findMatch(Session dataSession, PatientReported patientReported, Immunization immunization) throws ParseException {
+  public static VaccinationMaster findMatch(Session dataSession, PatientReported patientReported, Immunization immunization) {
     VaccinationMaster vm = null;
     Deterministic comparer = new Deterministic();
     ComparisonResult comparison;

@@ -13,7 +13,6 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.AnnotationConfiguration;
-
 import org.hl7.fhir.r4.model.IdType;
 import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.Reference;
@@ -72,7 +71,7 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
   public Patient getResourceById(RequestDetails theRequestDetails, @IdParam IdType theId) {
     Patient patient = null;
     // Retrieve this patient in the database...
-    Session dataSession = getDataSession();
+    dataSession = getDataSession();
     try {
       orgAccess = Authentication.authenticateOrgAccess(theRequestDetails, dataSession);
       patient = getPatientById(theId.getIdPart(), dataSession, orgAccess);
@@ -100,19 +99,18 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
       throw new UnprocessableEntityException("No identifier supplied");
     }
     // Save this patient to the database...
-    Session dataSession = getDataSession();
-    try {
-      orgAccess = Authentication.authenticateOrgAccess(theRequestDetails, dataSession);
-      FHIRHandler fhirHandler = new FHIRHandler(dataSession);
+    dataSession = getDataSession();
+    PatientReported pr = new PatientReported();
+    orgAccess = Authentication.authenticateOrgAccess(theRequestDetails, dataSession);
+    FHIRHandler fhirHandler = new FHIRHandler(dataSession);
 
-      fhirHandler.FIHR_EventPatientReported(orgAccess, thePatient, null);
+    pr = fhirHandler.fhirEventPatientReported(orgAccess, thePatient, null);
 
-    } catch (Exception e) {
-      e.printStackTrace();
-    } finally {
-      dataSession.close();
-    }
-    return new MethodOutcome(new IdType(thePatient.getIdentifier().get(0).getValue()));
+    MethodOutcome retVal = new MethodOutcome();
+    retVal.setId(new IdType("Patient", pr.getPatientReportedExternalLink(), "1"));
+
+    dataSession.close();
+    return retVal;
 
   }
 
@@ -128,19 +126,30 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
   @Update
   public MethodOutcome updatePatient(RequestDetails theRequestDetails, @IdParam IdType theId,
       @ResourceParam Patient thePatient) {
-    Session dataSession = getDataSession();
+    dataSession = getDataSession();
+    PatientReported pr = new PatientReported();
+    MethodOutcome retVal = new MethodOutcome();
     try {
+      // FHIR Specification, need url id to be same as resource id
+
+      // if (!thePatient.getId().equals(theId.getIdPart().split("Patient/")[0])) {
+      //   throw new InvalidRequestException("Resource Id " + theId.getIdPart().split("Patient/")[0] + " different from Request Id " + theId.getIdPart() );
+      // } 
+
       orgAccess = Authentication.authenticateOrgAccess(theRequestDetails, dataSession);
       FHIRHandler fhirHandler = new FHIRHandler(dataSession);
 
-      fhirHandler.FIHR_EventPatientReported(orgAccess, thePatient, null);
-
+      pr = fhirHandler.fhirEventPatientReported(orgAccess, thePatient, null);
+      retVal.setResource(getPatientById(pr.getPatientReportedExternalLink(), dataSession, orgAccess));
+      retVal.setId(new IdType("Patient", pr.getPatientReportedExternalLink()));
+      dataSession.close();
     } catch (Exception e) {
       e.printStackTrace();
-    } finally {
       dataSession.close();
+      throw e;
     }
-    return new MethodOutcome();
+    
+    return retVal ;
   }
 
   /**
@@ -152,15 +161,10 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
    */
   @Delete()
   public MethodOutcome deletePatient(RequestDetails theRequestDetails, @IdParam IdType theId) {
-    Session dataSession = getDataSession();
-    try {
-      orgAccess = Authentication.authenticateOrgAccess(theRequestDetails, dataSession);
-      deletePatientById(theId.getIdPart(), dataSession, orgAccess);
-    } catch (Exception e) {
-      e.printStackTrace();
-    } finally {
-      dataSession.close();
-    }
+    dataSession = getDataSession();
+    orgAccess = Authentication.authenticateOrgAccess(theRequestDetails, dataSession);
+    deletePatientById(theId.getIdPart(), dataSession, orgAccess);
+    dataSession.close();
     return new MethodOutcome();
   }
 
@@ -174,43 +178,26 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
   public static Patient getPatientById(String id, Session dataSession, OrgAccess orgAccess) {
     Patient patient = null;
     PatientReported patientReported = null;
-
-    int idInt = 0;
-    boolean isExternalLink = false;
-    try {
-      idInt = Integer.parseInt(id);
-    } catch (NumberFormatException | NullPointerException e) {
-      isExternalLink = true;
-    }
-
+    
     {
-      Query query;
-      if (isExternalLink) {
-        query = dataSession.createQuery(
-            "from PatientReported where orgReported = ? and patientReportedExternalLink = ?");
-        query.setParameter(0, orgAccess.getOrg());
-        query.setParameter(1, id);
-      } else {
-        query = dataSession
-            .createQuery("from PatientReported where orgReported = ? and patientReportedId = ?");
-        query.setParameter(0, orgAccess.getOrg());
-        query.setParameter(1, idInt);
-      }
+      Query query = dataSession.createQuery(
+          "from PatientReported where orgReported = ? and patientReportedExternalLink = ?");
+      query.setParameter(0, orgAccess.getOrg());
+      query.setParameter(1, id);
 
       @SuppressWarnings("unchecked")
-	List<PatientReported> patientReportedList = query.list();
-      System.err.println("la taille est " + patientReportedList.size());
-      if (patientReportedList.size() > 0) {
+	    List<PatientReported> patientReportedList = query.list();
+      if (!patientReportedList.isEmpty()) {
         patientReported = patientReportedList.get(0);
-        patient = PatientHandler.getPatient(null, null, patientReported);
+        patient = PatientHandler.getFhirPatient(null, null, patientReported);
 
         int linkId = patientReported.getPatientReportedId();
         Query queryLink = dataSession.createQuery("from PatientLink where patientReported.id = ?");
         queryLink.setParameter(0, linkId);
         @SuppressWarnings("unchecked")
-		List<PatientLink> patientLinkList = queryLink.list();
+		    List<PatientLink> patientLinkList = queryLink.list();
 
-        if (patientLinkList.size() > 0) {
+        if (!patientLinkList.isEmpty()) {
           for (PatientLink link : patientLinkList) {
             String ref = link.getPatientMaster().getPatientExternalLink();
             Patient.PatientLinkComponent patientLinkComponent = new Patient.PatientLinkComponent();
@@ -242,25 +229,19 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
       query.setParameter(0, orgAccess.getOrg());
       query.setParameter(1, id);
       @SuppressWarnings("unchecked")
-	List<PatientReported> patientReportedList = query.list();
-      if (patientReportedList.size() > 0) {
+	    List<PatientReported> patientReportedList = query.list();
+      if (!patientReportedList.isEmpty()) {
         patientReported = patientReportedList.get(0);
-
+        // Deleting possible links
+        Query queryLink = dataSession.createQuery(
+            "from  PatientLink where patientReported.patientReportedId=?");
+        queryLink.setParameter(0, patientReported.getPatientReportedId());
+        @SuppressWarnings("unchecked")
+        List<PatientLink> patientLinkList = queryLink.list();
+        if (!patientLinkList.isEmpty()) {
+          patientLink = patientLinkList.get(0);
+        }
       }
-
-      //Deleting possible links
-
-      Query queryLink =
-          dataSession.createQuery("from  PatientLink where patientReported.patientReportedId=?");
-      queryLink.setParameter(0, patientReported.getPatientReportedId());
-      @SuppressWarnings("unchecked")
-	List<PatientLink> patientLinkList = queryLink.list();
-      if (patientLinkList.size() > 0) {
-        patientLink = patientLinkList.get(0);
-      }
-
-
-
     }
     {
       Transaction transaction = dataSession.beginTransaction();
@@ -268,10 +249,7 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
       if (patientLink != null) {
         dataSession.delete(patientLink);
       }
-
       //dataSession.delete(patientMaster);
-
-
       transaction.commit();
     }
   }

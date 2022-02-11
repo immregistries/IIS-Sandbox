@@ -4,6 +4,7 @@ package org.immregistries.iis.kernal.fhir;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.api.server.RequestDetails;
 import ca.uhn.fhir.rest.server.IResourceProvider;
+import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
 
 import java.util.List;
 
@@ -22,12 +23,9 @@ import org.immregistries.iis.kernal.model.OrgMaster;
 import org.immregistries.iis.kernal.model.PatientLink;
 import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.model.PatientReported;
-import ca.uhn.fhir.rest.annotation.Create;
 import ca.uhn.fhir.rest.annotation.Delete;
 import ca.uhn.fhir.rest.annotation.IdParam;
 import ca.uhn.fhir.rest.annotation.Read;
-import ca.uhn.fhir.rest.annotation.ResourceParam;
-import ca.uhn.fhir.rest.annotation.Update;
 
 
 public class RestfulPersonResourceProvider implements IResourceProvider {
@@ -57,7 +55,6 @@ public class RestfulPersonResourceProvider implements IResourceProvider {
   public Person getResourceById(RequestDetails theRequestDetails, @IdParam IdType theId) {
     Person person = null;
     // Retrieve this person in the database...
-    Session dataSession = getDataSession();
     try {
       orgAccess = Authentication.authenticateOrgAccess(theRequestDetails, dataSession);
       person = getPersonById(theId.getIdPart(), dataSession, orgAccess);
@@ -80,59 +77,43 @@ public class RestfulPersonResourceProvider implements IResourceProvider {
     Person person = null;
     PatientReported patientReported = null;
 
-    Query query =
-        dataSession.createQuery("from PatientReported where patientReportedExternalLink = ?");
-    query.setParameter(0, idPart);
+    Query query = dataSession.createQuery(
+          "from  PatientReported where orgReported = ? and patientReportedExternalLink = ?");
+      query.setParameter(0, orgAccess.getOrg());
+      query.setParameter(1, idPart);
     @SuppressWarnings("unchecked")
 	List<PatientReported> patientReportedList = query.list();
 
-    if (patientReportedList.size() > 0) {
+    if (!patientReportedList.isEmpty()) {
       patientReported = patientReportedList.get(0);
       person = PersonHandler.getPerson(patientReported);
-    }
-    //add Link
 
-    int linkId = patientReported.getPatientReportedId();
-    Query queryLink = dataSession.createQuery("from PatientLink where patientMaster.id = ?");
-    queryLink.setParameter(0, linkId);
-    @SuppressWarnings("unchecked")
-	List<PatientLink> patientLinkList = queryLink.list();
+      //add Link
+      int linkId = patientReported.getPatientReportedId();
+      Query queryLink = dataSession.createQuery("from PatientLink where patientMaster.id = ?");
+      queryLink.setParameter(0, linkId);
+      @SuppressWarnings("unchecked")
+      List<PatientLink> patientLinkList = queryLink.list();
 
-    if (patientLinkList.size() > 0) {
-      for (PatientLink link : patientLinkList) {
-        String ref = link.getPatientReported().getPatientReportedExternalLink();
-        int assuranceLevel = link.getLevelConfidence();
-        Person.PersonLinkComponent personLinkComponent = new Person.PersonLinkComponent();
-        Reference reference = new Reference();
-        reference.setReference("Patient/" + ref);
-        if (assuranceLevel == 1) {
-          person.addLink(personLinkComponent.setTarget(reference)
-              .setAssurance(Person.IdentityAssuranceLevel.LEVEL2));
-
-        } else {
-          person.addLink(personLinkComponent.setTarget(reference)
-              .setAssurance(Person.IdentityAssuranceLevel.LEVEL3));
+      if (!patientLinkList.isEmpty()) {
+        for (PatientLink link : patientLinkList) {
+          String ref = link.getPatientReported().getPatientReportedExternalLink();
+          int assuranceLevel = link.getLevelConfidence();
+          Person.PersonLinkComponent personLinkComponent = new Person.PersonLinkComponent();
+          Reference reference = new Reference();
+          reference.setReference("Patient/" + ref);
+          if (assuranceLevel == 1) {
+            person.addLink(personLinkComponent.setTarget(reference)
+                .setAssurance(Person.IdentityAssuranceLevel.LEVEL2));
+  
+          } else {
+            person.addLink(personLinkComponent.setTarget(reference)
+                .setAssurance(Person.IdentityAssuranceLevel.LEVEL3));
+          }
         }
       }
-
-    }
+    }    
     return person;
-  }
-
-
-  @Create
-  public MethodOutcome createPatient(RequestDetails theRequestDetails,
-      @ResourceParam Person thePerson) {
-
-    return new MethodOutcome();
-
-  }
-
-
-  @Update
-  public MethodOutcome updatePerson(RequestDetails theRequestDetails, @IdParam IdType theId,
-      @ResourceParam Person thePerson) {
-    return new MethodOutcome();
   }
 
   /**
@@ -144,7 +125,6 @@ public class RestfulPersonResourceProvider implements IResourceProvider {
    */
   @Delete()
   public MethodOutcome deletePerson(RequestDetails theRequestDetails, @IdParam IdType theId) {
-    Session dataSession = getDataSession();
     try {
       orgAccess = Authentication.authenticateOrgAccess(theRequestDetails, dataSession);
       deletePersonById(theId.getIdPart(), dataSession, orgAccess);
@@ -162,7 +142,7 @@ public class RestfulPersonResourceProvider implements IResourceProvider {
    * @param orgAccess The orgAccess
    */
   private void deletePersonById(String idPart, Session dataSession, OrgAccess orgAccess)
-      throws Exception {
+      throws InvalidRequestException {
     PatientReported patientReported = null;
     PatientMaster patientMaster = null;
 
@@ -173,10 +153,7 @@ public class RestfulPersonResourceProvider implements IResourceProvider {
       query.setParameter(1, idPart);
       @SuppressWarnings("unchecked")
 	List<PatientReported> patientReportedList = query.list();
-      System.err.println(orgAccess.getOrg());
-      System.err.println(idPart);
-      System.err.println(patientReportedList.size());
-      if (patientReportedList.size() > 0) {
+      if (!patientReportedList.isEmpty()) {
 
         patientReported = patientReportedList.get(0);
         patientMaster = patientReported.getPatient();
@@ -190,34 +167,25 @@ public class RestfulPersonResourceProvider implements IResourceProvider {
       query.setParameter(0, orgAccess.getOrg());
       query.setParameter(1, idPart);
       @SuppressWarnings("unchecked")
-	List<PatientReported> patientReportedList = query.list();
-      System.err.println(orgAccess.getOrg());
-      System.err.println(idPart);
-      System.err.println(patientReportedList.size());
-      if (patientReportedList.size() > 0) {
-
+	    List<PatientReported> patientReportedList = query.list();
+      if (!patientReportedList.isEmpty()) {
         patientReported = patientReportedList.get(0);
         patientMaster = patientReported.getPatient();
-      }
 
-    }
-    {
       //Verify if all links are already deleted if not ask to delete
-      // the several PatientReported and PatientLink first
-      Query queryLink =
-          dataSession.createQuery("from  PatientLink where patientMaster.patientId = ?");
-      queryLink.setParameter(0, patientMaster.getPatientId());
+        // the several PatientReported and PatientLink first
+        Query queryLink = dataSession.createQuery(
+          "from  PatientLink where patientMaster.patientId = ?");
+        queryLink.setParameter(0, patientMaster.getPatientId());
 
-      @SuppressWarnings("unchecked")
-	List<PatientLink> patientLinkList = queryLink.list();
+        @SuppressWarnings("unchecked")
+        List<PatientLink> patientLinkList = queryLink.list();
 
-      if (patientLinkList.size() > 0) {
-
-        throw new Exception("The patients linked  to Person/" + idPart + " must be deleted first");
+        if (!patientLinkList.isEmpty()) {
+          throw new InvalidRequestException("The patients linked  to Person/" + idPart + " must be deleted first");
+        }
       }
-
     }
-
 
     {
       Transaction transaction = dataSession.beginTransaction();

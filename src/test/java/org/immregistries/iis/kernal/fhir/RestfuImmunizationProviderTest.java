@@ -75,8 +75,8 @@ public class RestfuImmunizationProviderTest extends TestCase {
 
     FHIRHandler fhirHandler = new FHIRHandler(dataSession);
 
-    patientReported=fhirHandler.FIHR_EventPatientReported(orgAccess, patient, immunization);
-    fhirHandler.FHIR_EventVaccinationReported(orgAccess, patient,patientReported, immunization);
+    patientReported=fhirHandler.fhirEventPatientReported(orgAccess, patient, immunization);
+    fhirHandler.fhirEventVaccinationReported(orgAccess, patient,patientReported, immunization);
 
   }
 
@@ -116,8 +116,8 @@ public class RestfuImmunizationProviderTest extends TestCase {
 
     FHIRHandler fhirHandler = new FHIRHandler(dataSession);
 
-    patientReported=fhirHandler.FIHR_EventPatientReported(orgAccess, patient, immunization);
-    fhirHandler.FHIR_EventVaccinationReported(orgAccess, patient,patientReported, immunization);
+    patientReported=fhirHandler.fhirEventPatientReported(orgAccess, patient, immunization);
+    fhirHandler.fhirEventVaccinationReported(orgAccess, patient,patientReported, immunization);
 
 
     Query query = dataSession

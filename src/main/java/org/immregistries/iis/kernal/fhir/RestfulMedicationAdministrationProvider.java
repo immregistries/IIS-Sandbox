@@ -56,7 +56,7 @@ public class RestfulMedicationAdministrationProvider implements IResourceProvide
   public MedicationAdministration getResourceById(RequestDetails theRequestDetails,
       @IdParam IdType theId) {
     MedicationAdministration medicationAdministration = null;
-    Session dataSession = getDataSession();
+    dataSession = getDataSession();
     String id = theId.getIdPart();
     try {
       orgAccess = Authentication.authenticateOrgAccess(theRequestDetails, dataSession);
@@ -66,8 +66,8 @@ public class RestfulMedicationAdministrationProvider implements IResourceProvide
         //query.setParameter(0, orgAccess.getOrg());
         query.setParameter(0, id);
         @SuppressWarnings("unchecked")
-		List<VaccinationReported> vaccinationReportedList = query.list();
-        if (vaccinationReportedList.size() > 0) {
+		    List<VaccinationReported> vaccinationReportedList = query.list();
+        if (!vaccinationReportedList.isEmpty()) {
           vaccinationMaster = vaccinationReportedList.get(0).getVaccination();
         }
       }
@@ -76,19 +76,19 @@ public class RestfulMedicationAdministrationProvider implements IResourceProvide
         medicationAdministration.setId(id);
         medicationAdministration
             .setEffective(new DateTimeType(vaccinationMaster.getAdministeredDate()));
-        medicationAdministration.setSubject(new Reference(theRequestDetails.getFhirServerBase()
-            + "/Patient/" + vaccinationMaster.getPatient().getPatientId()));
+        medicationAdministration.setSubject(new Reference("/Patient/" 
+            + vaccinationMaster.getPatient().getPatientId()));
         {
           Query query = dataSession.createQuery("from VaccinationReported where vaccination= ?");
           query.setParameter(0, vaccinationMaster);
           @SuppressWarnings("unchecked")
-		List<VaccinationReported> vaccinationReportedList = query.list();
-          if (vaccinationReportedList.size() > 0) {
+		      List<VaccinationReported> vaccinationReportedList = query.list();
+          if (!vaccinationReportedList.isEmpty()) {
             Extension links = new Extension("#links");
             Extension link;
             for (VaccinationReported vl : vaccinationReportedList) {
               link = new Extension();
-              link.setValue(new StringType(theRequestDetails.getFhirServerBase() + "/Immunization/"
+              link.setValue(new StringType("/Immunization/"
                   + vl.getVaccinationReportedExternalLink()));
               links.addExtension(link);
             }
