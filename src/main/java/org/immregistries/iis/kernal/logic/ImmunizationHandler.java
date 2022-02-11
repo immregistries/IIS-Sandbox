@@ -62,11 +62,13 @@ public class ImmunizationHandler {
     vaccinationReported.setAdministeredAmount(i.getDoseQuantity().getValue().toString());
     vaccinationReported.setExpirationDate(i.getExpirationDate());
     vaccinationReported.setVaccinationReportedExternalLink(i.getIdentifier().get(0).getValue());
-    /*switch (i.getStatus().toCode()){
-        case "completed" : vaccinationReported.setCompletionStatus("CP");
-        case "entered-in-error" : vaccinationReported.setCompletionStatus("entered-in-error"); //TODO find accurate value
-        case "not-done" : vaccinationReported.setCompletionStatus("not-done");  //TODO find accurate value
-    }*/
+    switch(i.getStatus()){
+        case COMPLETED : vaccinationReported.setCompletionStatus("CP"); break;
+        case ENTEREDINERROR : vaccinationReported.setActionCode("D"); break;
+        case NOTDONE : vaccinationReported.setCompletionStatus("RE"); break; //Could also be NA or PA
+      default:
+        break;
+    }
 
     //vaccinationReported.setActionCode();
     vaccinationReported.setRefusalReasonCode(i.getReasonCodeFirstRep().getText());
