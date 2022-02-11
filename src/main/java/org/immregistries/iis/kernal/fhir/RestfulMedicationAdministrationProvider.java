@@ -56,7 +56,7 @@ public class RestfulMedicationAdministrationProvider implements IResourceProvide
   public MedicationAdministration getResourceById(RequestDetails theRequestDetails,
       @IdParam IdType theId) {
     MedicationAdministration medicationAdministration = null;
-    Session dataSession = getDataSession();
+    dataSession = getDataSession();
     String id = theId.getIdPart();
     try {
       orgAccess = Authentication.authenticateOrgAccess(theRequestDetails, dataSession);
@@ -66,8 +66,8 @@ public class RestfulMedicationAdministrationProvider implements IResourceProvide
         //query.setParameter(0, orgAccess.getOrg());
         query.setParameter(0, id);
         @SuppressWarnings("unchecked")
-		List<VaccinationReported> vaccinationReportedList = query.list();
-        if (vaccinationReportedList.size() > 0) {
+		    List<VaccinationReported> vaccinationReportedList = query.list();
+        if (!vaccinationReportedList.isEmpty()) {
           vaccinationMaster = vaccinationReportedList.get(0).getVaccination();
         }
       }
@@ -82,8 +82,8 @@ public class RestfulMedicationAdministrationProvider implements IResourceProvide
           Query query = dataSession.createQuery("from VaccinationReported where vaccination= ?");
           query.setParameter(0, vaccinationMaster);
           @SuppressWarnings("unchecked")
-		List<VaccinationReported> vaccinationReportedList = query.list();
-          if (vaccinationReportedList.size() > 0) {
+		      List<VaccinationReported> vaccinationReportedList = query.list();
+          if (!vaccinationReportedList.isEmpty()) {
             Extension links = new Extension("#links");
             Extension link;
             for (VaccinationReported vl : vaccinationReportedList) {

@@ -189,7 +189,7 @@ public class RestfulPatientResourceProvider implements IResourceProvider {
 	    List<PatientReported> patientReportedList = query.list();
       if (!patientReportedList.isEmpty()) {
         patientReported = patientReportedList.get(0);
-        patient = PatientHandler.getPatient(null, null, patientReported);
+        patient = PatientHandler.getFhirPatient(null, null, patientReported);
 
         int linkId = patientReported.getPatientReportedId();
         Query queryLink = dataSession.createQuery("from PatientLink where patientReported.id = ?");
