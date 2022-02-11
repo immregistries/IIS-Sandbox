@@ -6,6 +6,7 @@ import ca.uhn.fhir.rest.api.server.RequestDetails;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.hibernate.cfg.AnnotationConfiguration;
 import org.hl7.fhir.r4.model.IdType;
 import org.hl7.fhir.r4.model.Immunization;
@@ -156,7 +157,7 @@ public class RestfulImmunizationProvider implements IResourceProvider {
     try {
       orgAccess = Authentication.authenticateOrgAccess(theRequestDetails, dataSession);
       FHIRHandler fhirHandler = new FHIRHandler(dataSession);
-      fhirHandler.fhirEventVaccinationDeleted(orgAccess, theId.getIdPart());
+      fhirEventVaccinationDeleted(orgAccess, theId.getIdPart());
     } catch (Exception e) {
       e.printStackTrace();
     } finally {
@@ -199,5 +200,30 @@ public class RestfulImmunizationProvider implements IResourceProvider {
      * patientReported = patientReportedList.get(0); } }
      */
     return immunization;
+  }
+
+  /**
+   * This method deletes the vacinationReported from the database with the provided id
+   * @param orgAccess the orgAcess of the organization
+   * @param id the id of the vaccinationReported to be deleted
+   */
+  public void fhirEventVaccinationDeleted(OrgAccess orgAccess, String id) {
+    VaccinationReported vr = new VaccinationReported();
+    VaccinationMaster vm = new VaccinationMaster();
+
+    Query query = dataSession.createQuery(
+        "from  VaccinationReported where vaccinationReportedExternalLink = ?");
+    query.setParameter(0, id);
+    @SuppressWarnings("unchecked")
+    List<VaccinationReported> vaccinationReportedList = query.list();
+    if (!vaccinationReportedList.isEmpty()) {
+      vr = vaccinationReportedList.get(0);
+      vm = vr.getVaccination();
+    }
+    Transaction transaction = dataSession.beginTransaction();
+
+    dataSession.delete(vr);
+    dataSession.delete(vm);
+    transaction.commit();
   }
 }

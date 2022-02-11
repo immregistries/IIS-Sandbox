@@ -184,29 +184,5 @@ public class FHIRHandler extends IncomingMessageHandler {
     return vaccinationReported;
   }
 
-  /**
-   * This method deletes the vacinationReported from the database with the provided id
-   * @param orgAccess the orgAcess of the organization
-   * @param id the id of the vaccinationReported to be deleted
-   */
-  public void fhirEventVaccinationDeleted(OrgAccess orgAccess, String id) {
-    VaccinationReported vr = new VaccinationReported();
-    VaccinationMaster vm = new VaccinationMaster();
-
-    Query query = dataSession.createQuery(
-        "from  VaccinationReported where vaccinationReportedExternalLink = ?");
-    query.setParameter(0, id);
-    @SuppressWarnings("unchecked")
-    List<VaccinationReported> vaccinationReportedList = query.list();
-    if (!vaccinationReportedList.isEmpty()) {
-      vr = vaccinationReportedList.get(0);
-      vm = vr.getVaccination();
-    }
-    Transaction transaction = dataSession.beginTransaction();
-
-    dataSession.delete(vr);
-    dataSession.delete(vm);
-    transaction.commit();
-  }
 
 }
