@@ -263,6 +263,7 @@
             <reference>
                 <link-to codeset="VACCINATION_CVX_CODE">207</link-to>
                 <link-to codeset="VACCINATION_MANUFACTURER_CODE">MOD</link-to>
+                <link-to codeset="VACCINATION_CVX_CODE">221</link-to>
             </reference>
             <use-date>
                 <not-before>20210713</not-before>
@@ -8840,6 +8841,19 @@
             </use-date>
         </code>
         <code>
+            <value>221</value>
+            <label>COVID-19 Moderna Vaccine EUA Recipient-Caregiver Fact Sheet</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300034911210601</link-to>
+            </reference>
+            <use-date>
+                <not-before>20220131</not-before>
+            </use-date>
+        </code>
+        <code>
             <value>217</value>
             <label>COVID-19 Pfizer BioNTech EUA Recipient-Caregiver Fact Sheet</label>
             <code-status>
@@ -8850,6 +8864,19 @@
             </reference>
             <use-date>
                 <not-before>20211119</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>219</value>
+            <label>COVID-19 Pfizer BioNTech EUA Recipient-Caregiver Fact Sheet- Pediatric &lt;5 yrs</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300048611220101</link-to>
+            </reference>
+            <use-date>
+                <not-before>20220301</not-before>
             </use-date>
         </code>
         <code>
@@ -9871,6 +9898,7 @@
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300026411200401</link-to>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300015811210806</link-to>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300026411211015</link-to>
+                <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300049311220204</link-to>
             </reference>
             <use-date>
                 <not-before>20151105</not-before>
@@ -9883,6 +9911,32 @@
             <code-status>
                 <status>Valid</status>
             </code-status>
+        </code>
+        <code>
+            <value>216</value>
+            <label>Pneumococcal Conjugate Vaccine (PCV13_PCV15_PCV20) VIS</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300049311220204</link-to>
+            </reference>
+            <use-date>
+                <not-before>20220204</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>215</value>
+            <label>Pneumococcal Conjugate Vaccine (PCV13_PCV15_PCV20) VIS</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300049311220204</link-to>
+            </reference>
+            <use-date>
+                <not-before>20220204</not-before>
+            </use-date>
         </code>
         <code>
             <value>33</value>
@@ -9949,6 +10003,7 @@
             <reference>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300032511180212</link-to>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300032511191030</link-to>
+                <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300032511220204</link-to>
             </reference>
             <use-date>
                 <not-before>20180212</not-before>
@@ -11338,6 +11393,8 @@
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">49281-0182-25</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">80777-0273-98</link-to>
                 <link-to codeset="VACCINATION_TRADE_NAME">Moderna COVID-19 Vaccine (non-US Spikevax)</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">80777-0275-05</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">80777-0275-99</link-to>
             </reference>
             <use-date>
                 <not-before>20201001</not-before>
@@ -11590,6 +11647,9 @@
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">00069-0411-01</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">00069-0411-02</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">00069-0411-10</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">00069-2025-01</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">00069-2025-10</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">00069-2025-25</link-to>
             </reference>
             <use-date>
                 <not-before>20100528</not-before>
@@ -11971,6 +12031,8 @@
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">49281-0421-10</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">49281-0421-50</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">49281-0521-25</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">49281-0564-88</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">49281-0564-15</link-to>
             </reference>
             <use-date>
                 <not-before>20100528</not-before>
@@ -15340,6 +15402,7 @@
                 <link-to codeset="VACCINATION_CVX_CODE">218</link-to>
                 <link-to codeset="VACCINATION_CVX_CODE">219</link-to>
                 <link-to codeset="VACCINATION_CVX_CODE">217</link-to>
+                <link-to codeset="VACCINATION_CVX_CODE">221</link-to>
             </reference>
         </code>
         <code>
@@ -15778,6 +15841,7 @@
                 <link-to codeset="VACCINATION_CVX_CODE">115</link-to>
                 <link-to codeset="VACCINATION_CVX_CODE">195</link-to>
                 <link-to codeset="VACCINATION_CVX_CODE">196</link-to>
+                <link-to codeset="VACCINATION_CVX_CODE">35</link-to>
             </reference>
         </code>
         <code>
@@ -17535,9 +17599,30 @@
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">59267-1025-03</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">59267-1025-04</link-to>
                 <link-to codeset="VACCINATION_CPT_CODE">91305</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">00069-2025-01</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">00069-2025-10</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">00069-2025-25</link-to>
             </reference>
             <use-date>
                 <not-before>20210913</not-before>
+            </use-date>
+            <concept-type>vaccine</concept-type>
+        </code>
+        <code>
+            <value>221</value>
+            <label>COVID-19, mRNA, LNP-S, PF, 50 mcg/0.5 mL dose</label>
+            <description>SARS-COV-2 (COVID-19) vaccine, mRNA, spike protein, LNP, preservative free, 50 mcg/0.5 mL dose Notes: Pre-EUA Authorization Use for Moderna booster dose 2.5mL vial presentation only</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINE_GROUP">COVID-19</link-to>
+                <link-to codeset="VACCINATION_TRADE_NAME">Moderna COVID-19 Vaccine (non-US Spikevax)</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">80777-0275-05</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">80777-0275-99</link-to>
+            </reference>
+            <use-date>
+                <not-before>20220214</not-before>
             </use-date>
             <concept-type>vaccine</concept-type>
         </code>
@@ -17872,6 +17957,8 @@
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">58160-0812-11</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">58160-0812-52</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">49281-0562-10</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">49281-0564-88</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">49281-0564-15</link-to>
             </reference>
             <use-date>
                 <not-before>20080101</not-before>
@@ -21819,6 +21906,7 @@
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">49281-0800-83</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">49281-0820-10</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">49281-0800-83</link-to>
+                <link-to codeset="VACCINE_GROUP">Td</link-to>
             </reference>
             <use-date>
                 <not-after>20150814</not-after>
@@ -23215,6 +23303,7 @@
             </code-status>
             <reference>
                 <link-to codeset="VACCINATION_VIS_VACCINES">207</link-to>
+                <link-to codeset="VACCINATION_VIS_VACCINES">221</link-to>
             </reference>
             <use-date>
                 <not-before>20211119</not-before>
@@ -23232,6 +23321,19 @@
             </reference>
             <use-date>
                 <not-before>20210510</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>253088698300048611220101</value>
+            <label>COVID-19 Pfizer BioNTech EUA Recipient-Caregiver Fact Sheet- Pediatric &lt;5 yrs</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_VIS_VACCINES">219</link-to>
+            </reference>
+            <use-date>
+                <not-before>20220301</not-before>
             </use-date>
         </code>
         <code>
@@ -24418,6 +24520,21 @@
             </use-date>
         </code>
         <code>
+            <value>253088698300049311220204</value>
+            <label>Pneumococcal Conjugate Vaccine (PCV13_PCV15_PCV20) VIS</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_VIS_VACCINES">216</link-to>
+                <link-to codeset="VACCINATION_VIS_VACCINES">215</link-to>
+                <link-to codeset="VACCINATION_VIS_VACCINES">133</link-to>
+            </reference>
+            <use-date>
+                <not-before>20220204</not-before>
+            </use-date>
+        </code>
+        <code>
             <value>253088698300016511091006</value>
             <label>Pneumococcal Polysaccharide VIS</label>
             <description></description>
@@ -24580,6 +24697,19 @@
             </reference>
             <use-date>
                 <not-before>20191030</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>253088698300032511220204</value>
+            <label>Recombinant Zoster Vaccine VIS</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_VIS_VACCINES">187</link-to>
+            </reference>
+            <use-date>
+                <not-before>20220204</not-before>
             </use-date>
         </code>
         <code>
@@ -26547,6 +26677,14 @@
             <reference>
                 <link-to codeset="VACCINATION_CVX_CODE">207</link-to>
             </reference>
+        </code>
+        <code>
+            <value>91308</value>
+            <label>Severe acute respiratory syndrome coronavirus 2 (SARS-CoV-2) (coronavirus disease [COVID-19]) vaccine, mRNA-LNP, spike protein, preservative free, 3 mcg/0.2 mL dosage, diluent reconstituted, tris-sucrose formulation, for intramuscular use</label>
+            <description>COVID-19 Vaccine - Potential EUA authorization for children under 5 yrs</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
         </code>
         <code>
             <value>91305</value>
@@ -28856,6 +28994,49 @@
                     <new-code-value>58160-0830-05</new-code-value>
                     <reason>Use 11-digit format with dashes</reason>
                     <effective-date>20141113</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>00069-2025-01</value>
+            <label>Comirnaty</label>
+            <description>Pfizer Laboratories Div Pfizer Inc - SARS-COV-2 (COVID-19) vaccine, mRNA, spike protein, LNP, preservative free, 30 mcg/0.3mL dose, tris-sucrose formulation</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">217</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">PFR</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">00069-2025-10</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">00069-2025-25</link-to>
+            </reference>
+            <use-date>
+                <not-before>20220301</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>0069-2025-01</value>
+            <label>Comirnaty</label>
+            <description>Pfizer Laboratories Div Pfizer Inc - SARS-COV-2 (COVID-19) vaccine, mRNA, spike protein, LNP, preservative free, 30 mcg/0.3mL dose, tris-sucrose formulation</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>00069-2025-01</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20220214</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>00069202501</value>
+            <label>Comirnaty</label>
+            <description>Pfizer Laboratories Div Pfizer Inc - SARS-COV-2 (COVID-19) vaccine, mRNA, spike protein, LNP, preservative free, 30 mcg/0.3mL dose, tris-sucrose formulation</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>00069-2025-01</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20220214</effective-date>
                 </deprecated>
             </code-status>
         </code>
@@ -39992,6 +40173,48 @@
             </code-status>
         </code>
         <code>
+            <value>80777-0275-05</value>
+            <label>Moderna COVID-19 Vaccine</label>
+            <description>Moderna US, Inc. - SARS-COV-2 (COVID-19) vaccine, mRNA, spike protein, LNP, preservative free, 50 mcg/0.5 mL dose</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">221</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">MOD</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">80777-0275-99</link-to>
+            </reference>
+            <use-date>
+                <not-before>20220103</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>80777-275-05</value>
+            <label>Moderna COVID-19 Vaccine</label>
+            <description>Moderna US, Inc. - SARS-COV-2 (COVID-19) vaccine, mRNA, spike protein, LNP, preservative free, 50 mcg/0.5 mL dose</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>80777-0275-05</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20220209</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>80777027505</value>
+            <label>Moderna COVID-19 Vaccine</label>
+            <description>Moderna US, Inc. - SARS-COV-2 (COVID-19) vaccine, mRNA, spike protein, LNP, preservative free, 50 mcg/0.5 mL dose</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>80777-0275-05</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20220209</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
             <value>58160-0811-43</value>
             <label>PEDIARIX</label>
             <description>GlaxoSmithKline Biologicals SA - DIPHTHERIA AND TETANUS TOXOIDS AND ACELLULAR PERTUSSIS ADSORBED, HEPATITIS B (RECOMBINANT) AND INACT</description>
@@ -40970,6 +41193,48 @@
                     <new-code-value>49281-0562-58</new-code-value>
                     <reason>Use 11-digit format with dashes</reason>
                     <effective-date>20151030</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>49281-0564-88</value>
+            <label>QUADRACEL</label>
+            <description>Sanofi Pasteur Inc. - DTAP adsorbed and inactivated poliovirus vaccine</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">130</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">PMC</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">49281-0564-15</link-to>
+            </reference>
+            <use-date>
+                <not-before>20220204</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>49281-564-88</value>
+            <label>QUADRACEL</label>
+            <description>Sanofi Pasteur Inc. - DTAP adsorbed and inactivated poliovirus vaccine</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>49281-0564-88</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20220210</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>49281056488</value>
+            <label>QUADRACEL</label>
+            <description>Sanofi Pasteur Inc. - DTAP adsorbed and inactivated poliovirus vaccine</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>49281-0564-88</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20220210</effective-date>
                 </deprecated>
             </code-status>
         </code>
@@ -45278,6 +45543,90 @@
                     <new-code-value>58160-0830-34</new-code-value>
                     <reason>Use 11-digit format with dashes</reason>
                     <effective-date>20140127</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>00069-2025-10</value>
+            <label>Comirnaty</label>
+            <description>Pfizer Laboratories Div Pfizer Inc - SARS-COV-2 (COVID-19) vaccine, mRNA, spike protein, LNP, preservative free, 30 mcg/0.3mL dose, tris-sucrose formulation</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">217</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">PFR</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">00069-2025-01</link-to>
+            </reference>
+            <use-date>
+                <not-before>20220301</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>0069-2025-10</value>
+            <label>Comirnaty</label>
+            <description>Pfizer Laboratories Div Pfizer Inc - SARS-COV-2 (COVID-19) vaccine, mRNA, spike protein, LNP, preservative free, 30 mcg/0.3mL dose, tris-sucrose formulation</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>00069-2025-10</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20220214</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>00069202510</value>
+            <label>Comirnaty</label>
+            <description>Pfizer Laboratories Div Pfizer Inc - SARS-COV-2 (COVID-19) vaccine, mRNA, spike protein, LNP, preservative free, 30 mcg/0.3mL dose, tris-sucrose formulation</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>00069-2025-10</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20220214</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>00069-2025-25</value>
+            <label>Comirnaty</label>
+            <description>Pfizer Laboratories Div Pfizer Inc - SARS-COV-2 (COVID-19) vaccine, mRNA, spike protein, LNP, preservative free, 30 mcg/0.3mL dose, tris-sucrose formulation</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">217</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">PFR</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">00069-2025-01</link-to>
+            </reference>
+            <use-date>
+                <not-before>20220301</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>0069-2025-25</value>
+            <label>Comirnaty</label>
+            <description>Pfizer Laboratories Div Pfizer Inc - SARS-COV-2 (COVID-19) vaccine, mRNA, spike protein, LNP, preservative free, 30 mcg/0.3mL dose, tris-sucrose formulation</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>00069-2025-25</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20220214</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>00069202525</value>
+            <label>Comirnaty</label>
+            <description>Pfizer Laboratories Div Pfizer Inc - SARS-COV-2 (COVID-19) vaccine, mRNA, spike protein, LNP, preservative free, 30 mcg/0.3mL dose, tris-sucrose formulation</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>00069-2025-25</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20220214</effective-date>
                 </deprecated>
             </code-status>
         </code>
@@ -56451,6 +56800,48 @@
             </code-status>
         </code>
         <code>
+            <value>80777-0275-99</value>
+            <label>Moderna COVID-19 Vaccine</label>
+            <description>Moderna US, Inc. - SARS-COV-2 (COVID-19) vaccine, mRNA, spike protein, LNP, preservative free, 50 mcg/0.5 mL dose</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">221</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">MOD</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">80777-0275-05</link-to>
+            </reference>
+            <use-date>
+                <not-before>20220103</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>80777-275-99</value>
+            <label>Moderna COVID-19 Vaccine</label>
+            <description>Moderna US, Inc. - SARS-COV-2 (COVID-19) vaccine, mRNA, spike protein, LNP, preservative free, 50 mcg/0.5 mL dose</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>80777-0275-99</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20220210</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>80777027599</value>
+            <label>Moderna COVID-19 Vaccine</label>
+            <description>Moderna US, Inc. - SARS-COV-2 (COVID-19) vaccine, mRNA, spike protein, LNP, preservative free, 50 mcg/0.5 mL dose</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>80777-0275-99</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20220210</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
             <value>58160-0811-52</value>
             <label>PEDIARIX</label>
             <description>GlaxoSmithKline Biologicals SA - DIPHTHERIA AND TETANUS TOXOIDS AND ACELLULAR PERTUSSIS ADSORBED, HEPATITIS B (RECOMBINANT) AND INACT</description>
@@ -57763,6 +58154,48 @@
                     <new-code-value>49281-0562-10</new-code-value>
                     <reason>Use 11-digit format with dashes</reason>
                     <effective-date>20150414</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>49281-0564-15</value>
+            <label>QUADRACEL</label>
+            <description>Sanofi Pasteur Inc. - DTAP adsorbed and inactivated poliovirus vaccine</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">130</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">PMC</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">49281-0564-88</link-to>
+            </reference>
+            <use-date>
+                <not-before>20220204</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>49281-564-15</value>
+            <label>QUADRACEL</label>
+            <description>Sanofi Pasteur Inc. - DTAP adsorbed and inactivated poliovirus vaccine</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>49281-0564-15</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20220209</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>49281056415</value>
+            <label>QUADRACEL</label>
+            <description>Sanofi Pasteur Inc. - DTAP adsorbed and inactivated poliovirus vaccine</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>49281-0564-15</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20220209</effective-date>
                 </deprecated>
             </code-status>
         </code>
