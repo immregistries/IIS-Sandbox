@@ -241,6 +241,21 @@
             </use-date>
         </code>
         <code>
+            <value>Sanofi COVID-19</value>
+            <label>COVID-19, D614, recomb, preS dTM, AS03 adjuvant add, PF, 5mcg/0.5mL</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">225</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">PMC</link-to>
+                <link-to codeset="VACCINATION_CVX_CODE">226</link-to>
+            </reference>
+            <use-date>
+                <not-before>20220310</not-before>
+            </use-date>
+        </code>
+        <code>
             <value>Moderna COVID-19 Vaccine</value>
             <label>COVID-19, mRNA, LNP-S, PF, 100 mcg/0.5 mL dose</label>
             <code-status>
@@ -1929,6 +1944,8 @@
             <reference>
                 <link-to codeset="VACCINATION_CVX_CODE">77</link-to>
                 <link-to codeset="VACCINATION_MANUFACTURER_CODE">PFR</link-to>
+                <link-to codeset="VACCINATION_CVX_CODE">224</link-to>
+                <link-to codeset="VACCINATION_CVX_CODE">223</link-to>
             </reference>
             <use-date>
                 <not-before>20211104</not-before>
@@ -12033,6 +12050,11 @@
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">49281-0521-25</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">49281-0564-88</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">49281-0564-15</link-to>
+                <link-to codeset="VACCINATION_TRADE_NAME">Sanofi COVID-19</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">49281-0339-78</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">49281-0322-88</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">49281-0322-50</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">49281-0339-15</link-to>
             </reference>
             <use-date>
                 <not-before>20100528</not-before>
@@ -15403,6 +15425,8 @@
                 <link-to codeset="VACCINATION_CVX_CODE">219</link-to>
                 <link-to codeset="VACCINATION_CVX_CODE">217</link-to>
                 <link-to codeset="VACCINATION_CVX_CODE">221</link-to>
+                <link-to codeset="VACCINATION_CVX_CODE">226</link-to>
+                <link-to codeset="VACCINATION_CVX_CODE">225</link-to>
             </reference>
         </code>
         <code>
@@ -15856,6 +15880,9 @@
             <label>tick-borne encephalitis</label>
             <reference>
                 <link-to codeset="VACCINATION_CVX_CODE">77</link-to>
+                <link-to codeset="VACCINATION_CVX_CODE">222</link-to>
+                <link-to codeset="VACCINATION_CVX_CODE">223</link-to>
+                <link-to codeset="VACCINATION_CVX_CODE">224</link-to>
             </reference>
         </code>
         <code>
@@ -17500,6 +17527,35 @@
             <concept-type>foreign vaccine</concept-type>
         </code>
         <code>
+            <value>226</value>
+            <label>COVID-19, D614, recomb, preS dTM, AS03 adjuvant add, PF, 10mcg/0.5mL</label>
+            <description>SARS-COV-2 (COVID-19) vaccine, D614, prefusion spike recombinant protein subunit (CoV2 preS dTM), AS03 adjuvant added, preservative free, 10mcg/0.5mL dose Notes: Pre-EUA Authorization, Sanofi Primary Series dose - requires addition of AS03 adjuvant</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINE_GROUP">COVID-19</link-to>
+                <link-to codeset="VACCINATION_TRADE_NAME">Sanofi COVID-19</link-to>
+            </reference>
+            <concept-type>pending</concept-type>
+        </code>
+        <code>
+            <value>225</value>
+            <label>COVID-19, D614, recomb, preS dTM, AS03 adjuvant add, PF, 5mcg/0.5mL</label>
+            <description>SARS-COV-2 (COVID-19) vaccine, D614, prefusion spike recombinant protein subunit (CoV2 preS dTM), AS03 adjuvant added, preservative free, 5mcg/0.5mL dose Notes: Pre-EUA Authorization, Sanofi Booster dose - requires addition of AS03 adjuvant</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINE_GROUP">COVID-19</link-to>
+                <link-to codeset="VACCINATION_TRADE_NAME">Sanofi COVID-19</link-to>
+            </reference>
+            <use-date>
+                <not-before>20220310</not-before>
+            </use-date>
+            <concept-type>vaccine</concept-type>
+        </code>
+        <code>
             <value>218</value>
             <label>COVID-19, mRNA, LNP-S, PF, 10 mcg/0.2 mL dose, tris-sucrose</label>
             <description>SARS-COV-2 (COVID-19) vaccine, mRNA, spike protein, LNP, preservative free, 10 mcg/0.2mL dose, tris-sucrose formulation Notes: Potential FDA EUA, Pfizer tris-sucrose vaccine for 5 through 11 years of age</description>
@@ -17555,6 +17611,7 @@
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">59267-0078-01</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">59267-0078-04</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">59267-0078-02</link-to>
+                <link-to codeset="VACCINATION_CPT_CODE">91308</link-to>
             </reference>
             <use-date>
                 <not-before>20210908</not-before>
@@ -19943,6 +20000,8 @@
                 <link-to codeset="VACCINE_GROUP">FLU</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">49281-0321-88</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">49281-0321-50</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">49281-0322-88</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">49281-0322-50</link-to>
             </reference>
             <use-date>
                 <not-before>20200506</not-before>
@@ -19963,6 +20022,8 @@
                 <link-to codeset="VACCINE_GROUP">FLU</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">49281-0337-78</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">49281-0337-15</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">49281-0339-78</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">49281-0339-15</link-to>
             </reference>
             <use-date>
                 <not-before>20200506</not-before>
@@ -21978,6 +22039,56 @@
             </use-age>
             <concept-type>vaccine</concept-type>
             <test-age>2 months</test-age>
+        </code>
+        <code>
+            <value>223</value>
+            <label>Tick-borne encephalitis, inactivated, PF, 0.25mL</label>
+            <description>Tick-borne encephalitis vaccine, inactivated, preservative free, 0.25mL dose Notes: Pediatric dose vaccine</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINE_GROUP">Tick-borne encephalitis</link-to>
+                <link-to codeset="VACCINATION_TRADE_NAME">TICOVAC</link-to>
+            </reference>
+            <use-date>
+                <not-before>20220303</not-before>
+            </use-date>
+            <concept-type>vaccine</concept-type>
+        </code>
+        <code>
+            <value>224</value>
+            <label>Tick-borne encephalitis, inactivated, PF, 0.5mL</label>
+            <description>Tick-borne encephalitis vaccine, inactivated, preservative free, 0.5mL dose Notes: Adult dose vaccine</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINE_GROUP">Tick-borne encephalitis</link-to>
+                <link-to codeset="VACCINATION_TRADE_NAME">TICOVAC</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">00069-0411-01</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">00069-0411-02</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">00069-0411-10</link-to>
+            </reference>
+            <use-date>
+                <not-before>20220304</not-before>
+            </use-date>
+            <concept-type>vaccine</concept-type>
+        </code>
+        <code>
+            <value>222</value>
+            <label>Tick-borne encephalitis, unspecified</label>
+            <description>Tick-borne encephalitis vaccine, unspecified Notes: Unspecified Code - should only be used when specific vaccine administered is unknown</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINE_GROUP">Tick-borne encephalitis</link-to>
+            </reference>
+            <use-date>
+                <not-after>20220303</not-after>
+            </use-date>
+            <concept-type>vaccine</concept-type>
         </code>
         <code>
             <value>13</value>
@@ -26685,6 +26796,9 @@
             <code-status>
                 <status>Valid</status>
             </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">219</link-to>
+            </reference>
         </code>
         <code>
             <value>91305</value>
@@ -26718,6 +26832,14 @@
             <reference>
                 <link-to codeset="VACCINATION_CVX_CODE">207</link-to>
             </reference>
+        </code>
+        <code>
+            <value>91309</value>
+            <label>Severe acute respiratory syndrome coronavirus 2 (SARS-CoV-2) (coronavirus disease [COVID-19]) vaccine, mRNA-LNP, spike protein, preservative free, 50 mcg/0.5 mL dosage, for intramuscular use</label>
+            <description>COVID-19 Vaccine - Potential EUA authorization booser dose</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
         </code>
         <code>
             <value>91304</value>
@@ -26783,6 +26905,14 @@
                 <link-to codeset="VACCINATION_CVX_CODE">35</link-to>
             </reference>
             <use-date/>
+        </code>
+        <code>
+            <value>90626</value>
+            <label>Tick-borne encephalitis virus vaccine, inactivated; 0.25 mL dosage, for intramuscular use</label>
+            <description></description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
         </code>
         <code>
             <value>90627</value>
@@ -37400,6 +37530,90 @@
             </code-status>
         </code>
         <code>
+            <value>49281-0339-78</value>
+            <label>FLUZONE QUADRIVALENT SOUTHERN HEMISPHERE</label>
+            <description>Sanofi Pasteur Inc. - Influenza, Southern Hemisphere, Single-Dose 0.5 mL (2022 season southern hemisphere)</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">202</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">PMC</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">49281-0339-15</link-to>
+            </reference>
+            <use-date>
+                <not-before>20220215</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>49281-339-78</value>
+            <label>FLUZONE QUADRIVALENT SOUTHERN HEMISPHERE</label>
+            <description>Sanofi Pasteur Inc. - Influenza, Southern Hemisphere, Single-Dose 0.5 mL (2022 season southern hemisphere)</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>49281-0339-78</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20220311</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>49281033978</value>
+            <label>FLUZONE QUADRIVALENT SOUTHERN HEMISPHERE</label>
+            <description>Sanofi Pasteur Inc. - Influenza, Southern Hemisphere, Single-Dose 0.5 mL (2022 season southern hemisphere)</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>49281-0339-78</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20220311</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>49281-0322-88</value>
+            <label>FLUZONE QUADRIVALENT SOUTHERN HEMISPHERE</label>
+            <description>Sanofi Pasteur Inc. - Influenza, Southern Hemisphere, Single-Dose 0.5 mL (2022 season southern hemisphere)</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">201</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">PMC</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">49281-0322-50</link-to>
+            </reference>
+            <use-date>
+                <not-before>20220215</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>49281-322-88</value>
+            <label>FLUZONE QUADRIVALENT SOUTHERN HEMISPHERE</label>
+            <description>Sanofi Pasteur Inc. - Influenza, Southern Hemisphere, Single-Dose 0.5 mL (2022 season southern hemisphere)</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>49281-0322-88</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20220311</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>49281032288</value>
+            <label>FLUZONE QUADRIVALENT SOUTHERN HEMISPHERE</label>
+            <description>Sanofi Pasteur Inc. - Influenza, Southern Hemisphere, Single-Dose 0.5 mL (2022 season southern hemisphere)</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>49281-0322-88</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20220311</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
             <value>49281-0516-00</value>
             <label>Fluzone Quadrivalent, pediatric</label>
             <description>Sanofi - Influenza vaccine, quadrivalent</description>
@@ -42407,6 +42621,7 @@
                 <link-to codeset="VACCINATION_MANUFACTURER_CODE">PFR</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">00069-0411-02</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">00069-0411-10</link-to>
+                <link-to codeset="VACCINATION_CVX_CODE">224</link-to>
             </reference>
             <use-date>
                 <not-before>20211025</not-before>
@@ -53942,6 +54157,90 @@
             </code-status>
         </code>
         <code>
+            <value>49281-0322-50</value>
+            <label>FLUZONE QUADRIVALENT SOUTHERN HEMISPHERE</label>
+            <description>Sanofi Pasteur Inc. - Influenza, Southern Hemisphere, Single-Dose 0.5 mL (2022 season southern hemisphere)</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">201</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">PMC</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">49281-0322-88</link-to>
+            </reference>
+            <use-date>
+                <not-before>20220215</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>49281-322-50</value>
+            <label>FLUZONE QUADRIVALENT SOUTHERN HEMISPHERE</label>
+            <description>Sanofi Pasteur Inc. - Influenza, Southern Hemisphere, Single-Dose 0.5 mL (2022 season southern hemisphere)</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>49281-0322-50</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20220304</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>49281032250</value>
+            <label>FLUZONE QUADRIVALENT SOUTHERN HEMISPHERE</label>
+            <description>Sanofi Pasteur Inc. - Influenza, Southern Hemisphere, Single-Dose 0.5 mL (2022 season southern hemisphere)</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>49281-0322-50</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20220304</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>49281-0339-15</value>
+            <label>FLUZONE QUADRIVALENT SOUTHERN HEMISPHERE</label>
+            <description>Sanofi Pasteur Inc. - Influenza, Southern Hemisphere, Multi-Dose 5 mL (2022 season southern hemisphere)</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">202</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">PMC</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">49281-0339-78</link-to>
+            </reference>
+            <use-date>
+                <not-before>20220215</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>49281-339-15</value>
+            <label>FLUZONE QUADRIVALENT SOUTHERN HEMISPHERE</label>
+            <description>Sanofi Pasteur Inc. - Influenza, Southern Hemisphere, Multi-Dose 5 mL (2022 season southern hemisphere)</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>49281-0339-15</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20220304</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>49281033915</value>
+            <label>FLUZONE QUADRIVALENT SOUTHERN HEMISPHERE</label>
+            <description>Sanofi Pasteur Inc. - Influenza, Southern Hemisphere, Multi-Dose 5 mL (2022 season southern hemisphere)</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>49281-0339-15</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20220304</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
             <value>49281-0516-25</value>
             <label>Fluzone Quadrivalent, pediatric</label>
             <description>Sanofi - Influenza vaccine, quadrivalent</description>
@@ -59576,6 +59875,7 @@
                 <link-to codeset="VACCINATION_CVX_CODE">77</link-to>
                 <link-to codeset="VACCINATION_MANUFACTURER_CODE">PFR</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">00069-0411-01</link-to>
+                <link-to codeset="VACCINATION_CVX_CODE">224</link-to>
             </reference>
             <use-date>
                 <not-before>20211025</not-before>
@@ -59618,6 +59918,7 @@
                 <link-to codeset="VACCINATION_CVX_CODE">77</link-to>
                 <link-to codeset="VACCINATION_MANUFACTURER_CODE">PFR</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">00069-0411-01</link-to>
+                <link-to codeset="VACCINATION_CVX_CODE">224</link-to>
             </reference>
             <use-date>
                 <not-before>20211025</not-before>
