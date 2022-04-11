@@ -1385,7 +1385,7 @@ public class IncomingMessageHandler {
         sb.append("|1");
         String adminDate = sdf.format(vaccination.getAdministeredDate());
         if (obxSetId == 0 && processingFlavorSet.contains(ProcessingFlavor.CHERRY)) {
-            adminDate = "";
+          adminDate = "";
         }
         // RXA-3
         sb.append("|" + adminDate);
@@ -2408,6 +2408,15 @@ public class IncomingMessageHandler {
     sb.append(sendingFac + "|");
     sb.append(sendingDateString + "|");
     sb.append("|");
+    if (processingFlavorSet.contains(ProcessingFlavor.MELON)) {
+      int pos = messageType.indexOf("^");
+      if (pos > 0) {
+        messageType = messageType.substring(0, pos);
+        if (System.currentTimeMillis() % 2 == 0) {
+          messageType += "^ZZZ";
+        }
+      }
+    }
     sb.append(messageType + "|");
     sb.append(uniqueId + "|");
     sb.append(production + "|");

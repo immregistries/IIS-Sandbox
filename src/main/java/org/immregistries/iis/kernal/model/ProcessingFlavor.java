@@ -5,6 +5,7 @@ import java.util.Set;
 
 public enum ProcessingFlavor {
   LIME("Lime", "Missing non-critical required fields"),
+  MELON("Melon", "Missing or incorrect important message headers"),
   COCONUT("Coconut", "Forecast never returned"),
   ORANGE("Orange", "Z32 is returned for query matches"),
   LEMON("Lemon", "Vaccinations are randomly not returned"),
