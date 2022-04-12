@@ -101,7 +101,7 @@ public class IncomingMessageHandler {
         ProcessingException pe = new ProcessingException("Unsupported message", "", 0, 0);
         List<ProcessingException> processingExceptionList = new ArrayList<>();
         processingExceptionList.add(pe);
-        responseMessage = buildAck(reader, processingExceptionList);
+        responseMessage = buildAck(reader, processingExceptionList, processingFlavorSet);
         recordMessageReceived(message, null, responseMessage, "Unknown", "NAck",
             orgAccess.getOrg());
       }
@@ -637,7 +637,7 @@ public class IncomingMessageHandler {
             "Patient vaccination history cannot be accepted without at least one administered, historical, or refused vaccination specified",
             "", 0, 0);
       }
-      String ack = buildAck(reader, processingExceptionList);
+      String ack = buildAck(reader, processingExceptionList, processingFlavorSet);
       recordMessageReceived(message, patientReported, ack, "Update", "Ack", orgAccess.getOrg());
       return ack;
     } catch (ProcessingException e) {
@@ -1051,7 +1051,7 @@ public class IncomingMessageHandler {
               orcCount, 0);
         }
       }
-      String ack = buildAck(reader, processingExceptionList);
+      String ack = buildAck(reader, processingExceptionList, processingFlavorSet);
       recordMessageReceived(message, patientReported, ack, "Update", "Ack", orgAccess.getOrg());
       return ack;
     } catch (ProcessingException e) {
@@ -2309,12 +2309,13 @@ public class IncomingMessageHandler {
     return "";
   }
 
-  public String buildAck(HL7Reader reader, List<ProcessingException> processingExceptionList) {
+  public String buildAck(HL7Reader reader, List<ProcessingException> processingExceptionList,
+      Set<ProcessingFlavor> processingFlavorSet) {
     StringBuilder sb = new StringBuilder();
     {
       String messageType = "ACK^V04^ACK";
       String profileId = Z23_ACKNOWLEDGEMENT;
-      createMSH(messageType, profileId, reader, sb, null);
+      createMSH(messageType, profileId, reader, sb, processingFlavorSet);
     }
 
     String sendersUniqueId = "";
@@ -2408,7 +2409,7 @@ public class IncomingMessageHandler {
     sb.append(sendingFac + "|");
     sb.append(sendingDateString + "|");
     sb.append("|");
-    if (processingFlavorSet.contains(ProcessingFlavor.MELON)) {
+    if (processingFlavorSet != null && processingFlavorSet.contains(ProcessingFlavor.MELON)) {
       int pos = messageType.indexOf("^");
       if (pos > 0) {
         messageType = messageType.substring(0, pos);
