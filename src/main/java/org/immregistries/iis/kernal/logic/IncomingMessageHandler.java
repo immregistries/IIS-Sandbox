@@ -1603,7 +1603,7 @@ public class IncomingMessageHandler {
             String loincLabel = "Vaccine type";
             String value = forecastActual.getVaccineGroup().getVaccineCvx();
             if (processingFlavorSet.contains(ProcessingFlavor.KUMQUAT)) {
-              if (System.currentTimeMillis() % 4 == 0) {
+              if (value.length() > 2) {
                 value = "BADCVX";
               }
             }
