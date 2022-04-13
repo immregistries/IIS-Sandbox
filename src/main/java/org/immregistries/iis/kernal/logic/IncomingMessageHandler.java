@@ -110,7 +110,7 @@ public class IncomingMessageHandler {
       List<ProcessingException> processingExceptionList = new ArrayList<>();
       processingExceptionList.add(new ProcessingException(
           "Internal error prevented processing: " + e.getMessage(), null, 0, 0));
-      responseMessage = buildAck(reader, processingExceptionList);
+      responseMessage = buildAck(reader, processingExceptionList, null);
     }
     return responseMessage;
   }
@@ -644,7 +644,7 @@ public class IncomingMessageHandler {
       if (!processingExceptionList.contains(e)) {
         processingExceptionList.add(e);
       }
-      String ack = buildAck(reader, processingExceptionList);
+      String ack = buildAck(reader, processingExceptionList, null);
       recordMessageReceived(message, null, ack, "Update", "Exception", orgAccess.getOrg());
       return ack;
     }
@@ -1058,7 +1058,7 @@ public class IncomingMessageHandler {
       if (!processingExceptionList.contains(e)) {
         processingExceptionList.add(e);
       }
-      String ack = buildAck(reader, processingExceptionList);
+      String ack = buildAck(reader, processingExceptionList, null);
       recordMessageReceived(message, null, ack, "Update", "Exception", orgAccess.getOrg());
       return ack;
     }
