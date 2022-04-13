@@ -1602,6 +1602,11 @@ public class IncomingMessageHandler {
             String loinc = "30956-7";
             String loincLabel = "Vaccine type";
             String value = forecastActual.getVaccineGroup().getVaccineCvx();
+            if (processingFlavorSet.contains(ProcessingFlavor.KUMQUAT)) {
+              if (System.currentTimeMillis() % 4 == 0) {
+                value = "BADCVX";
+              }
+            }
             String valueLabel = forecastActual.getVaccineGroup().getLabel();
             String valueTable = "CVX";
             printObx(sb, obxSetId, obsSubId, loinc, loincLabel, value, valueLabel, valueTable);

@@ -38,6 +38,7 @@ public enum ProcessingFlavor {
   PHI("PHI", "Trailing \"AIRA\" is removed from patient names 10% of the time on RSPs"),
   CITRUS("Citrus", "Randomly omit first name, last name or date of birth on RSPs"),
   CHERRY("Cherry", "Omit one vaccination admin date on RSPs"),
+  KUMQUAT("Kumquat", "Vaccination forecast sends back a bad CVX code"),
   SNAIL(
       "Snail",
       "Patients are not returned until 0, 30, 60, or 90 seconds after they have been submitted"),
