@@ -287,6 +287,20 @@
             </use-date>
         </code>
         <code>
+            <value>SPIKEVAX</value>
+            <label>COVID-19, mRNA, LNP-S, PF, 100 mcg/0.5mL dose or 50 mcg/0.25mL dose</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">207</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">MOD</link-to>
+            </reference>
+            <use-date>
+                <not-before>20220518</not-before>
+            </use-date>
+        </code>
+        <code>
             <value>Pfizer-BioNTech COVID-19 Vaccine</value>
             <label>COVID-19, mRNA, LNP-S, PF, 30 mcg/0.3 mL dose</label>
             <code-status>
@@ -343,6 +357,21 @@
             </reference>
             <use-date>
                 <not-before>20210910</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>COMIRNATY</value>
+            <label>COVID-19, mRNA, LNP-S, PF, 30 mcg/0.3 mL dose, tris-sucrose</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">217</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">PFR</link-to>
+                <link-to codeset="VACCINATION_CVX_CODE">208</link-to>
+            </reference>
+            <use-date>
+                <not-before>20220518</not-before>
             </use-date>
         </code>
         <code>
@@ -8858,6 +8887,32 @@
             </use-date>
         </code>
         <code>
+            <value>228</value>
+            <label>COVID-19 Moderna EUA Recipient-Caregiver Fact Sheet - Pediatric 6mo to &lt;6yrs</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300051611220501</link-to>
+            </reference>
+            <use-date>
+                <not-before>20220601</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>227</value>
+            <label>COVID-19 Moderna EUA Recipient-Caregiver Fact Sheet - Pediatric 6yrs to &lt;12yrs</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300050911220501</link-to>
+            </reference>
+            <use-date>
+                <not-before>20220601</not-before>
+            </use-date>
+        </code>
+        <code>
             <value>207</value>
             <label>COVID-19 Moderna Vaccine EUA Recipient-Caregiver Fact Sheet</label>
             <code-status>
@@ -8883,6 +8938,19 @@
             </reference>
             <use-date>
                 <not-before>20220131</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>211</value>
+            <label>COVID-19 Novavax EUA Recipient-Caregiver Fact Sheet</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300037011220101</link-to>
+            </reference>
+            <use-date>
+                <not-before>20220601</not-before>
             </use-date>
         </code>
         <code>
@@ -8923,6 +8991,19 @@
             </reference>
             <use-date>
                 <not-before>20201201</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>225</value>
+            <label>COVID-19 Sanofi-GSK EUA Recipient-Caregiver Fact Sheet - Booster</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300052311220401</link-to>
+            </reference>
+            <use-date>
+                <not-before>20220601</not-before>
             </use-date>
         </code>
         <code>
@@ -10007,6 +10088,7 @@
             <reference>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300018911091006</link-to>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300018911200108</link-to>
+                <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300018911220602</link-to>
             </reference>
             <use-date>
                 <not-before>20091006</not-before>
@@ -10021,6 +10103,7 @@
             <reference>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300018911091006</link-to>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300018911200108</link-to>
+                <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300018911220602</link-to>
             </reference>
             <use-date>
                 <not-before>20091006</not-before>
@@ -11427,6 +11510,13 @@
                 <link-to codeset="VACCINATION_TRADE_NAME">Moderna COVID-19 Vaccine (non-US Spikevax)</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">80777-0275-05</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">80777-0275-99</link-to>
+                <link-to codeset="VACCINATION_TRADE_NAME">SPIKEVAX</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">80777-0279-05</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">80777-0277-05</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">80777-0100-11</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">80777-0279-99</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">80777-0277-99</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">80777-0100-99</link-to>
             </reference>
             <use-date>
                 <not-before>20201001</not-before>
@@ -11682,6 +11772,7 @@
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">00069-2025-01</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">00069-2025-10</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">00069-2025-25</link-to>
+                <link-to codeset="VACCINATION_TRADE_NAME">COMIRNATY</link-to>
             </reference>
             <use-date>
                 <not-before>20100528</not-before>
@@ -17631,6 +17722,9 @@
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">80777-0273-98</link-to>
                 <link-to codeset="VACCINATION_TRADE_NAME">Moderna COVID-19 Vaccine (non-US Spikevax)</link-to>
                 <link-to codeset="VACCINATION_CPT_CODE">91306</link-to>
+                <link-to codeset="VACCINATION_TRADE_NAME">SPIKEVAX</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">80777-0100-11</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">80777-0100-99</link-to>
             </reference>
             <use-date>
                 <not-before>20201102</not-before>
@@ -17674,6 +17768,7 @@
                 <link-to codeset="VACCINATION_TRADE_NAME">Pfizer-BioNTech COVID-19 Vaccine (Non-US COMIRNATY)</link-to>
                 <link-to codeset="VACCINATION_TRADE_NAME">Pfizer-BioNTech COVID-19 Vaccine (COMIRNATY)</link-to>
                 <link-to codeset="VACCINATION_TRADE_NAME">Pfizer-BioNTech COVID-19 Vaccine (EUA labeled) COMIRNATY (BLA labeled)</link-to>
+                <link-to codeset="VACCINATION_TRADE_NAME">COMIRNATY</link-to>
             </reference>
             <use-date>
                 <not-before>20201102</not-before>
@@ -17698,6 +17793,7 @@
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">00069-2025-01</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">00069-2025-10</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">00069-2025-25</link-to>
+                <link-to codeset="VACCINATION_TRADE_NAME">COMIRNATY</link-to>
             </reference>
             <use-date>
                 <not-before>20210913</not-before>
@@ -17733,6 +17829,8 @@
             <reference>
                 <link-to codeset="VACCINE_GROUP">COVID-19</link-to>
                 <link-to codeset="VACCINATION_TRADE_NAME">Moderna COVID-19 Vaccine (non-US Spikevax)</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">80777-0279-05</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">80777-0279-99</link-to>
             </reference>
             <use-date>
                 <not-before>20220412</not-before>
@@ -17749,6 +17847,8 @@
             <reference>
                 <link-to codeset="VACCINE_GROUP">COVID-19</link-to>
                 <link-to codeset="VACCINATION_TRADE_NAME">Moderna COVID-19 Vaccine (non-US Spikevax)</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">80777-0277-05</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">80777-0277-99</link-to>
             </reference>
             <use-date>
                 <not-before>20220412</not-before>
@@ -21874,6 +21974,8 @@
             <reference>
                 <link-to codeset="VACCINE_GROUP">VACCINIA</link-to>
                 <link-to codeset="VACCINATION_TRADE_NAME">JYNNEOS</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">50632-0001-01</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">50632-0001-02</link-to>
             </reference>
             <use-date>
                 <not-before>20200720</not-before>
@@ -23515,6 +23617,32 @@
             </use-date>
         </code>
         <code>
+            <value>253088698300051611220501</value>
+            <label>COVID-19 Moderna EUA Recipient-Caregiver Fact Sheet - Pediatric 6mo to &lt;6yrs</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_VIS_VACCINES">228</link-to>
+            </reference>
+            <use-date>
+                <not-before>20220601</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>253088698300050911220501</value>
+            <label>COVID-19 Moderna EUA Recipient-Caregiver Fact Sheet - Pediatric 6yrs to &lt;12yrs</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_VIS_VACCINES">227</link-to>
+            </reference>
+            <use-date>
+                <not-before>20220601</not-before>
+            </use-date>
+        </code>
+        <code>
             <value>253088698300034911201201</value>
             <label>COVID-19 Moderna Vaccine EUA Recipient-Caregiver Fact Sheet</label>
             <code-status>
@@ -23555,6 +23683,19 @@
             </use-date>
         </code>
         <code>
+            <value>253088698300037011220101</value>
+            <label>COVID-19 Novavax EUA Recipient-Caregiver Fact Sheet</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_VIS_VACCINES">211</link-to>
+            </reference>
+            <use-date>
+                <not-before>20220601</not-before>
+            </use-date>
+        </code>
+        <code>
             <value>253088698300033211210501</value>
             <label>COVID-19 Pfizer BioNTech EUA Recipient-Caregiver Fact Sheet</label>
             <code-status>
@@ -23592,6 +23733,19 @@
             </reference>
             <use-date>
                 <not-before>20201201</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>253088698300052311220401</value>
+            <label>COVID-19 Sanofi-GSK EUA Recipient-Caregiver Fact Sheet - Booster</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_VIS_VACCINES">225</link-to>
+            </reference>
+            <use-date>
+                <not-before>20220601</not-before>
             </use-date>
         </code>
         <code>
@@ -24900,6 +25054,20 @@
             </reference>
             <use-date>
                 <not-before>20200108</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>253088698300018911220602</value>
+            <label>Rabies Vaccine VIS</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_VIS_VACCINES">175</link-to>
+                <link-to codeset="VACCINATION_VIS_VACCINES">176</link-to>
+            </reference>
+            <use-date>
+                <not-before>20220602</not-before>
             </use-date>
         </code>
         <code>
@@ -26903,6 +27071,14 @@
             </reference>
         </code>
         <code>
+            <value>91310</value>
+            <label>Severe acute respiratory syndrome coronavirus 2 (SARS-CoV-2) (coronavirus disease [COVID-19]) vaccine, monovalent, preservative free, 5 mcg/0.5 mL dosage, adjuvant AS03 emulsion, for intramuscular use</label>
+            <description>COVID-19 Vaccine - Potential EUA authorization booser dose</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+        </code>
+        <code>
             <value>91307</value>
             <label>Severe acute respiratory syndrome coronavirus 2 (SARS-CoV-2) (coronavirus disease [COVID-19]) vaccine, mRNA-LNP, spike protein, preservative free, 10 mcg/0.2 mL dosage, diluent reconstituted, tris-sucrose formulation, for intramuscular use</label>
             <description>COVID-19 Vaccine - Potential EUA authorization, Pediatric dose requires dilution</description>
@@ -26923,6 +27099,14 @@
             <reference>
                 <link-to codeset="VACCINATION_CVX_CODE">207</link-to>
             </reference>
+        </code>
+        <code>
+            <value>91311</value>
+            <label>Severe acute respiratory syndrome coronavirus 2 (SARS-CoV-2) (coronavirus disease [COVID-19]) vaccine, mRNA-LNP, spike protein, preservative free, 25 mcg/0.25 mL dosage, for intramuscular use</label>
+            <description>COVID-19 Vaccine - Potential EUA authorization Peds 6mo to &lt; 6yr</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
         </code>
         <code>
             <value>91308</value>
@@ -39803,6 +39987,47 @@
             </code-status>
         </code>
         <code>
+            <value>50632-0001-01</value>
+            <label>JYNNEOS</label>
+            <description>Bavarian Nordic A/S - Vaccinia, smallpox and monkeypox vaccine, live, non-replicating</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">206</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">50632-0001-02</link-to>
+            </reference>
+            <use-date>
+                <not-before>20210317</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>50632-001-01</value>
+            <label>JYNNEOS</label>
+            <description>Bavarian Nordic A/S - Vaccinia, smallpox and monkeypox vaccine, live, non-replicating</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>50632-0001-01</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20220520</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>50632000101</value>
+            <label>JYNNEOS</label>
+            <description>Bavarian Nordic A/S - Vaccinia, smallpox and monkeypox vaccine, live, non-replicating</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>50632-0001-01</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20220520</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
             <value>58160-0812-43</value>
             <label>KINRIX</label>
             <description>GlaxoSmithKline Biologicals SA - DIPHTHERIA AND TETANUS TOXOIDS AND ACELLULAR PERTUSSIS ADSORBED AND INACTIVATED POLIOVIRUS VACCINE</description>
@@ -40580,7 +40805,7 @@
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">80777-0275-99</link-to>
             </reference>
             <use-date>
-                <not-before>20220103</not-before>
+                <not-before>20220329</not-before>
             </use-date>
         </code>
         <code>
@@ -40606,6 +40831,90 @@
                     <new-code-value>80777-0275-05</new-code-value>
                     <reason>Use 11-digit format with dashes</reason>
                     <effective-date>20220209</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>80777-0279-05</value>
+            <label>Moderna COVID-19 Vaccine</label>
+            <description>Moderna US, Inc. - COVID-19, mRNA, LNP-S, PF, pediatric 25 mcg/0.25 mL dose, 6mo-&lt;6yr</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">228</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">MOD</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">80777-0279-99</link-to>
+            </reference>
+            <use-date>
+                <not-before>20220423</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>80777-279-05</value>
+            <label>Moderna COVID-19 Vaccine</label>
+            <description>Moderna US, Inc. - COVID-19, mRNA, LNP-S, PF, pediatric 25 mcg/0.25 mL dose, 6mo-&lt;6yr</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>80777-0279-05</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20220518</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>80777027905</value>
+            <label>Moderna COVID-19 Vaccine</label>
+            <description>Moderna US, Inc. - COVID-19, mRNA, LNP-S, PF, pediatric 25 mcg/0.25 mL dose, 6mo-&lt;6yr</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>80777-0279-05</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20220518</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>80777-0277-05</value>
+            <label>Moderna COVID-19 Vaccine</label>
+            <description>Moderna US, Inc. - COVID-19, mRNA, LNP-S, PF, pediatric 50 mcg/0.5 mL dose, 6yr-&lt;12yr</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">227</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">MOD</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">80777-0277-99</link-to>
+            </reference>
+            <use-date>
+                <not-before>20220412</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>80777-277-05</value>
+            <label>Moderna COVID-19 Vaccine</label>
+            <description>Moderna US, Inc. - COVID-19, mRNA, LNP-S, PF, pediatric 50 mcg/0.5 mL dose, 6yr-&lt;12yr</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>80777-0277-05</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20220518</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>80777027705</value>
+            <label>Moderna COVID-19 Vaccine</label>
+            <description>Moderna US, Inc. - COVID-19, mRNA, LNP-S, PF, pediatric 50 mcg/0.5 mL dose, 6yr-&lt;12yr</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>80777-0277-05</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20220518</effective-date>
                 </deprecated>
             </code-status>
         </code>
@@ -42362,6 +42671,48 @@
                     <new-code-value>58160-0828-03</new-code-value>
                     <reason>Use 11-digit format with dashes</reason>
                     <effective-date>20180615</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>80777-0100-11</value>
+            <label>Spikevax</label>
+            <description>Moderna US, Inc. - COVID-19, mRNA, LNP-S, PF, 100 mcg/0.5mL dose or 50 mcg/0.25mL dose</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">207</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">MOD</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">80777-0100-99</link-to>
+            </reference>
+            <use-date>
+                <not-before>20220401</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>80777-100-11</value>
+            <label>Spikevax</label>
+            <description>Moderna US, Inc. - COVID-19, mRNA, LNP-S, PF, 100 mcg/0.5mL dose or 50 mcg/0.25mL dose</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>80777-0100-11</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20220519</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>80777010011</value>
+            <label>Spikevax</label>
+            <description>Moderna US, Inc. - COVID-19, mRNA, LNP-S, PF, 100 mcg/0.5mL dose or 50 mcg/0.25mL dose</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>80777-0100-11</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20220519</effective-date>
                 </deprecated>
             </code-status>
         </code>
@@ -56596,6 +56947,47 @@
             </code-status>
         </code>
         <code>
+            <value>50632-0001-02</value>
+            <label>JYNNEOS</label>
+            <description>Bavarian Nordic A/S - Vaccinia, smallpox and monkeypox vaccine, live, non-replicating</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">206</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">50632-0001-01</link-to>
+            </reference>
+            <use-date>
+                <not-before>20210317</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>50632-001-02</value>
+            <label>JYNNEOS</label>
+            <description>Bavarian Nordic A/S - Vaccinia, smallpox and monkeypox vaccine, live, non-replicating</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>50632-0001-02</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20220520</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>50632000102</value>
+            <label>JYNNEOS</label>
+            <description>Bavarian Nordic A/S - Vaccinia, smallpox and monkeypox vaccine, live, non-replicating</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>50632-0001-02</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20220520</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
             <value>58160-0812-11</value>
             <label>KINRIX</label>
             <description>GlaxoSmithKline Biologicals SA - DIPHTHERIA AND TETANUS TOXOIDS AND ACELLULAR PERTUSSIS ADSORBED AND INACTIVATED POLIOVIRUS VACCINE</description>
@@ -57335,7 +57727,7 @@
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">80777-0275-05</link-to>
             </reference>
             <use-date>
-                <not-before>20220103</not-before>
+                <not-before>20220329</not-before>
             </use-date>
         </code>
         <code>
@@ -57361,6 +57753,90 @@
                     <new-code-value>80777-0275-99</new-code-value>
                     <reason>Use 11-digit format with dashes</reason>
                     <effective-date>20220210</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>80777-0279-99</value>
+            <label>Moderna COVID-19 Vaccine</label>
+            <description>Moderna US, Inc. - COVID-19, mRNA, LNP-S, PF, pediatric 25 mcg/0.25 mL dose, 6mo-&lt;6yr</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">228</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">MOD</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">80777-0279-05</link-to>
+            </reference>
+            <use-date>
+                <not-before>20220601</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>80777-279-99</value>
+            <label>Moderna COVID-19 Vaccine</label>
+            <description>Moderna US, Inc. - COVID-19, mRNA, LNP-S, PF, pediatric 25 mcg/0.25 mL dose, 6mo-&lt;6yr</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>80777-0279-99</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20220518</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>80777027999</value>
+            <label>Moderna COVID-19 Vaccine</label>
+            <description>Moderna US, Inc. - COVID-19, mRNA, LNP-S, PF, pediatric 25 mcg/0.25 mL dose, 6mo-&lt;6yr</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>80777-0279-99</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20220518</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>80777-0277-99</value>
+            <label>Moderna COVID-19 Vaccine</label>
+            <description>Moderna US, Inc. - COVID-19, mRNA, LNP-S, PF, pediatric 50 mcg/0.5 mL dose, 6yr-&lt;12yr</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">227</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">MOD</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">80777-0277-05</link-to>
+            </reference>
+            <use-date>
+                <not-before>20220601</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>80777-277-99</value>
+            <label>Moderna COVID-19 Vaccine</label>
+            <description>Moderna US, Inc. - COVID-19, mRNA, LNP-S, PF, pediatric 50 mcg/0.5 mL dose, 6yr-&lt;12yr</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>80777-0277-99</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20220518</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>80777027799</value>
+            <label>Moderna COVID-19 Vaccine</label>
+            <description>Moderna US, Inc. - COVID-19, mRNA, LNP-S, PF, pediatric 50 mcg/0.5 mL dose, 6yr-&lt;12yr</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>80777-0277-99</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20220518</effective-date>
                 </deprecated>
             </code-status>
         </code>
@@ -59660,6 +60136,48 @@
                     <new-code-value>50090-5147-00</new-code-value>
                     <reason>Use 11-digit format with dashes</reason>
                     <effective-date>20201030</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>80777-0100-99</value>
+            <label>Spikevax</label>
+            <description>Moderna US, Inc. - COVID-19, mRNA, LNP-S, PF, 100 mcg/0.5mL dose or 50 mcg/0.25mL dose</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">207</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">MOD</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">80777-0100-11</link-to>
+            </reference>
+            <use-date>
+                <not-before>20220601</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>80777-100-99</value>
+            <label>Spikevax</label>
+            <description>Moderna US, Inc. - COVID-19, mRNA, LNP-S, PF, 100 mcg/0.5mL dose or 50 mcg/0.25mL dose</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>80777-0100-99</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20220519</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>80777010099</value>
+            <label>Spikevax</label>
+            <description>Moderna US, Inc. - COVID-19, mRNA, LNP-S, PF, 100 mcg/0.5mL dose or 50 mcg/0.25mL dose</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>80777-0100-99</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20220519</effective-date>
                 </deprecated>
             </code-status>
         </code>
