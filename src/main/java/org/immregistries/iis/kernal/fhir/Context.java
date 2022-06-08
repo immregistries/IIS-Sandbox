@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal.logic;
+package org.immregistries.iis.kernal.fhir;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.parser.IParser;

@@ -76,7 +76,7 @@ public class ImmunizationHandler {
   }
 
   /**
-   * This method set the vaccinnationMaster information based on the immunization information
+   * This method set the vaccinationMaster information based on the immunization information
    * @param vaccinationMaster the vaccinationReported
    * @param i the Immunization resource
    */
@@ -122,8 +122,26 @@ public class ImmunizationHandler {
     i.setDoseQuantity(new Quantity());
     i.getDoseQuantity().setValue(new BigDecimal(vr.getAdministeredAmount()));
     i.setExpirationDate(vr.getExpirationDate());
-    if (!vr.getCompletionStatus().equals("")) {
-      i.setStatus(Immunization.ImmunizationStatus.valueOf(vr.getCompletionStatus()));
+    if (vr.getActionCode().equals("D")) {
+      i.setStatus(Immunization.ImmunizationStatus.ENTEREDINERROR);
+    } else {
+      switch(vr.getCompletionStatus()) {
+        case "CP" : {
+          i.setStatus(Immunization.ImmunizationStatus.COMPLETED);
+          break;
+        }
+        case "NA" :
+        case "PA" :
+        case "RE" : {
+          i.setStatus(Immunization.ImmunizationStatus.NOTDONE);
+          break;
+        }
+        case "" : {
+          i.setStatus(Immunization.ImmunizationStatus.NULL);
+          break;
+        }
+        default: break;
+      }
     }
 
     i.addReasonCode().addCoding().setCode(vr.getRefusalReasonCode());

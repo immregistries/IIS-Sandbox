@@ -23,6 +23,7 @@ import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodeStatusValue;
 import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.SoftwareVersion;
+import org.immregistries.iis.kernal.fhir.Context;
 import org.immregistries.iis.kernal.model.MessageReceived;
 import org.immregistries.iis.kernal.model.ObservationMaster;
 import org.immregistries.iis.kernal.model.ObservationReported;
