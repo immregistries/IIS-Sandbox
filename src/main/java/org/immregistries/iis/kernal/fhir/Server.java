@@ -9,12 +9,10 @@ import javax.servlet.annotation.WebServlet;
 import ca.uhn.fhir.narrative.DefaultThymeleafNarrativeGenerator;
 import ca.uhn.fhir.narrative.INarrativeGenerator;
 import ca.uhn.fhir.rest.api.EncodingEnum;
-import ca.uhn.fhir.rest.server.HardcodedServerAddressStrategy;
-import ca.uhn.fhir.rest.server.IResourceProvider;
-import ca.uhn.fhir.rest.server.IncomingRequestAddressStrategy;
-import ca.uhn.fhir.rest.server.RestfulServer;
+import ca.uhn.fhir.rest.server.*;
 
 
+import ca.uhn.fhir.rest.server.interceptor.LoggingInterceptor;
 import ca.uhn.fhir.rest.server.tenant.UrlBaseTenantIdentificationStrategy;
 import org.immregistries.iis.kernal.fhir.subscription.SubscriptionProvider;
 import org.immregistries.iis.kernal.fhir.subscription.SubscriptionTopicProvider;
@@ -32,11 +30,18 @@ public class Server extends RestfulServer {
   @Override
   protected void initialize() throws ServletException {
     this.setDefaultResponseEncoding(EncodingEnum.XML);
+    setFhirContext(Context.getCtx());
 
     String serverBaseUrl = "florence.immregistries.org/iis-sandbox/fhir";
-    setTenantIdentificationStrategy(new UrlBaseTenantIdentificationStrategy());
 //    setServerAddressStrategy(new HardcodedServerAddressStrategy(serverBaseUrl));
-    setServerAddressStrategy(new IncomingRequestAddressStrategy());
+    setServerAddressStrategy(new ApacheProxyAddressStrategy(true));
+//    setServerAddressStrategy(new IncomingRequestAddressStrategy());
+
+    LoggingInterceptor loggingInterceptor = new LoggingInterceptor();
+    loggingInterceptor.setLoggerName("FHIR IIS");
+    registerInterceptor(loggingInterceptor);
+
+    setTenantIdentificationStrategy(new UrlBaseTenantIdentificationStrategy());
 
     List<IResourceProvider> resourceProviders = new ArrayList<IResourceProvider>();
     resourceProviders.add(new RestfulPatientResourceProvider());
