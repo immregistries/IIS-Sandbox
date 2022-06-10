@@ -2,12 +2,12 @@ package org.immregistries.iis.kernal.logic;
 
 
 
-import org.hl7.fhir.r4.model.Address;
-import org.hl7.fhir.r4.model.ContactPoint;
-import org.hl7.fhir.r4.model.Enumerations;
-import org.hl7.fhir.r4.model.HumanName;
-import org.hl7.fhir.r4.model.Identifier;
-import org.hl7.fhir.r4.model.Person;
+import org.hl7.fhir.r5.model.Address;
+import org.hl7.fhir.r5.model.ContactPoint;
+import org.hl7.fhir.r5.model.Enumerations;
+import org.hl7.fhir.r5.model.HumanName;
+import org.hl7.fhir.r5.model.Identifier;
+import org.hl7.fhir.r5.model.Person;
 
 import org.immregistries.iis.kernal.model.PatientReported;
 

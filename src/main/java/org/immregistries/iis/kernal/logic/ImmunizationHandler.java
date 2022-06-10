@@ -6,13 +6,7 @@ import java.util.List;
 import org.hibernate.Query;
 import org.hibernate.Session;
 
-import org.hl7.fhir.r4.model.Address;
-import org.hl7.fhir.r4.model.Extension;
-import org.hl7.fhir.r4.model.Immunization;
-import org.hl7.fhir.r4.model.Location;
-import org.hl7.fhir.r4.model.Quantity;
-import org.hl7.fhir.r4.model.Reference;
-import org.hl7.fhir.r4.model.StringType;
+import org.hl7.fhir.r5.model.*;
 import org.immregistries.iis.kernal.model.OrgLocation;
 import org.immregistries.iis.kernal.model.PatientReported;
 import org.immregistries.iis.kernal.model.VaccinationMaster;
@@ -71,7 +65,7 @@ public class ImmunizationHandler {
     }
 
     //vaccinationReported.setActionCode();
-    vaccinationReported.setRefusalReasonCode(i.getReasonCodeFirstRep().getText());
+//    vaccinationReported.setRefusalReasonCode(i.getReasonCodeFirstRep().getText()); TODO R5
     vaccinationReported.setVaccineCvxCode(i.getVaccineCode().getCodingFirstRep().getCode());
   }
 
@@ -92,18 +86,18 @@ public class ImmunizationHandler {
    * @param i the Immunization resource
    */
   public static void orgLocationFromFhirImmunization(OrgLocation orgLocation, Immunization i) {
-    Location l = i.getLocationTarget();
-    orgLocation.setOrgFacilityCode(l.getId()); //TODO create an external identifier or change the usage of the name
-    orgLocation.setOrgFacilityName(l.getName());
-    //orgLocation.setLocationType(l.getTypeFirstRep());
-    orgLocation.setAddressCity(l.getAddress().getLine().get(0).getValueNotNull());
-    if (l.getAddress().getLine().size() > 1) {
-      orgLocation.setAddressLine2(l.getAddress().getLine().get(1).getValueNotNull());
-    }
-    orgLocation.setAddressCity(l.getAddress().getCity());
-    orgLocation.setAddressState(l.getAddress().getState());
-    orgLocation.setAddressZip(l.getAddress().getPostalCode());
-    orgLocation.setAddressCountry(l.getAddress().getCountry());
+//    Location l = i.getLocationTarget(); //todo r5
+//    orgLocation.setOrgFacilityCode(l.getId()); //TODO create an external identifier or change the usage of the name
+//    orgLocation.setOrgFacilityName(l.getName());
+//    //orgLocation.setLocationType(l.getTypeFirstRep());
+//    orgLocation.setAddressCity(l.getAddress().getLine().get(0).getValueNotNull());
+//    if (l.getAddress().getLine().size() > 1) {
+//      orgLocation.setAddressLine2(l.getAddress().getLine().get(1).getValueNotNull());
+//    }
+//    orgLocation.setAddressCity(l.getAddress().getCity());
+//    orgLocation.setAddressState(l.getAddress().getState());
+//    orgLocation.setAddressZip(l.getAddress().getPostalCode());
+//    orgLocation.setAddressCountry(l.getAddress().getCountry());
   }
 
   /**
@@ -123,47 +117,49 @@ public class ImmunizationHandler {
     i.getDoseQuantity().setValue(new BigDecimal(vr.getAdministeredAmount()));
     i.setExpirationDate(vr.getExpirationDate());
     if (vr.getActionCode().equals("D")) {
-      i.setStatus(Immunization.ImmunizationStatus.ENTEREDINERROR);
+      i.setStatus(Immunization.ImmunizationStatusCodes.ENTEREDINERROR);
     } else {
       switch(vr.getCompletionStatus()) {
         case "CP" : {
-          i.setStatus(Immunization.ImmunizationStatus.COMPLETED);
+          i.setStatus(Immunization.ImmunizationStatusCodes.COMPLETED);
           break;
         }
         case "NA" :
         case "PA" :
         case "RE" : {
-          i.setStatus(Immunization.ImmunizationStatus.NOTDONE);
+          i.setStatus(Immunization.ImmunizationStatusCodes.NOTDONE);
           break;
         }
         case "" : {
-          i.setStatus(Immunization.ImmunizationStatus.NULL);
+          i.setStatus(Immunization.ImmunizationStatusCodes.NULL);
           break;
         }
         default: break;
       }
     }
 
-    i.addReasonCode().addCoding().setCode(vr.getRefusalReasonCode());
+    i.addReason().setConcept(
+            new CodeableConcept(
+                    new Coding("VXU-iis-sandbox",vr.getRefusalReasonCode(),vr.getRefusalReasonCode())));
     i.getVaccineCode().addCoding().setCode(vr.getVaccineCvxCode());
 
     i.setPatient(new Reference("Patient/"
         + vr.getPatientReported().getPatientReportedExternalLink()));
 
-    Location location = i.getLocationTarget();
-    OrgLocation ol = vr.getOrgLocation();
-    if (ol != null) {
-      location.setId(ol.getOrgFacilityCode());
-      location.setName(ol.getOrgFacilityName());
-
-      Address address = location.getAddress();
-      address.addLine(ol.getAddressLine1());
-      address.addLine(ol.getAddressLine2());
-      address.setCity(ol.getAddressCity());
-      address.setState(ol.getAddressState());
-      address.setPostalCode(ol.getAddressZip());
-      address.setCountry(ol.getAddressCountry());
-    }
+//    Location location = i.getLocationTarget(); TODO R5
+//    OrgLocation ol = vr.getOrgLocation();
+//    if (ol != null) {
+//      location.setId(ol.getOrgFacilityCode());
+//      location.setName(ol.getOrgFacilityName());
+//
+//      Address address = location.getAddress();
+//      address.addLine(ol.getAddressLine1());
+//      address.addLine(ol.getAddressLine2());
+//      address.setCity(ol.getAddressCity());
+//      address.setState(ol.getAddressState());
+//      address.setPostalCode(ol.getAddressZip());
+//      address.setCountry(ol.getAddressCountry());
+//    }
     Extension links = new Extension("#links");
     Extension link;
     link = new Extension();

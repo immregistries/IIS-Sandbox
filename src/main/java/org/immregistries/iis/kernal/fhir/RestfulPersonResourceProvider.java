@@ -13,9 +13,9 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.AnnotationConfiguration;
-import org.hl7.fhir.r4.model.IdType;
-import org.hl7.fhir.r4.model.Person;
-import org.hl7.fhir.r4.model.Reference;
+import org.hl7.fhir.r5.model.IdType;
+import org.hl7.fhir.r5.model.Person;
+import org.hl7.fhir.r5.model.Reference;
 import org.immregistries.iis.kernal.logic.PersonHandler;
 
 import org.immregistries.iis.kernal.model.OrgAccess;

@@ -17,6 +17,7 @@ import ca.uhn.fhir.rest.server.RestfulServer;
 
 import ca.uhn.fhir.rest.server.tenant.UrlBaseTenantIdentificationStrategy;
 import org.immregistries.iis.kernal.fhir.subscription.SubscriptionProvider;
+import org.immregistries.iis.kernal.fhir.subscription.SubscriptionTopicProvider;
 
 @WebServlet(urlPatterns = {"/fhir/*"}, displayName = "FHIR Server")
 public class Server extends RestfulServer {
@@ -43,6 +44,8 @@ public class Server extends RestfulServer {
     resourceProviders.add(new RestfulPersonResourceProvider());
     resourceProviders.add(new RestfulMedicationAdministrationProvider());
     resourceProviders.add(new SubscriptionProvider());
+
+    resourceProviders.add(new SubscriptionTopicProvider());
     setResourceProviders(resourceProviders);
 
     INarrativeGenerator narrativeGen = new DefaultThymeleafNarrativeGenerator();

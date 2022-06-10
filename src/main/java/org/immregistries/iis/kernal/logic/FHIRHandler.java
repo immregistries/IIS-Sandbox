@@ -5,8 +5,8 @@ import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hl7.fhir.r4.model.Immunization;
-import org.hl7.fhir.r4.model.Patient;
+import org.hl7.fhir.r5.model.Immunization;
+import org.hl7.fhir.r5.model.Patient;
 import org.immregistries.iis.kernal.model.*;
 
 import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
@@ -153,28 +153,28 @@ public class FHIRHandler extends IncomingMessageHandler {
       throw new InvalidRequestException("Vaccination is reported as having been administered before the patient was born");
     }
 
-    // OrgLocation
-    String administeredAtLocation = immunization.getLocationTarget().getId();
-    if (StringUtils.isNotEmpty(administeredAtLocation)) {
-      Query query = dataSession.createQuery(
-          "from OrgLocation where orgMaster = :orgMaster and orgFacilityCode = :orgFacilityCode");
-      query.setParameter("orgMaster", orgAccess.getOrg());
-      query.setParameter("orgFacilityCode", administeredAtLocation);
-      @SuppressWarnings("unchecked")
-      List<OrgLocation> orgMasterList = query.list();
-      OrgLocation orgLocation = null;
-      if (!orgMasterList.isEmpty()) {
-        orgLocation = orgMasterList.get(0);
-      } else {
-        orgLocation = new OrgLocation();
-        ImmunizationHandler.orgLocationFromFhirImmunization(orgLocation, immunization);
-        orgLocation.setOrgMaster(orgAccess.getOrg());
-        Transaction transaction = dataSession.beginTransaction();
-        dataSession.save(orgLocation);
-        transaction.commit();
-      }
-      vaccinationReported.setOrgLocation(orgLocation);
-    }
+    // OrgLocation TODO Fix for R5
+//    String administeredAtLocation = immunization.getLocationTarget().getId();
+//    if (StringUtils.isNotEmpty(administeredAtLocation)) {
+//      Query query = dataSession.createQuery(
+//          "from OrgLocation where orgMaster = :orgMaster and orgFacilityCode = :orgFacilityCode");
+//      query.setParameter("orgMaster", orgAccess.getOrg());
+//      query.setParameter("orgFacilityCode", administeredAtLocation);
+//      @SuppressWarnings("unchecked")
+//      List<OrgLocation> orgMasterList = query.list();
+//      OrgLocation orgLocation = null;
+//      if (!orgMasterList.isEmpty()) {
+//        orgLocation = orgMasterList.get(0);
+//      } else {
+//        orgLocation = new OrgLocation();
+//        ImmunizationHandler.orgLocationFromFhirImmunization(orgLocation, immunization);
+//        orgLocation.setOrgMaster(orgAccess.getOrg());
+//        Transaction transaction = dataSession.beginTransaction();
+//        dataSession.save(orgLocation);
+//        transaction.commit();
+//      }
+//      vaccinationReported.setOrgLocation(orgLocation);
+//    }
 
 
     Transaction transaction = dataSession.beginTransaction();

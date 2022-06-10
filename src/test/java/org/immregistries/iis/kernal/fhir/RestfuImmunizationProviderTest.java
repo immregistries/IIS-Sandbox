@@ -6,13 +6,13 @@ import java.util.List;
 import junit.framework.TestCase;
 import org.hibernate.Query;
 import org.hibernate.Session;
-import org.hl7.fhir.r4.model.Enumerations.AdministrativeGender;
-import org.hl7.fhir.r4.model.HumanName;
-import org.hl7.fhir.r4.model.Immunization;
-import org.hl7.fhir.r4.model.Location;
-import org.hl7.fhir.r4.model.Patient;
-import org.hl7.fhir.r4.model.Quantity;
-import org.hl7.fhir.r4.model.Reference;
+import org.hl7.fhir.r5.model.Enumerations.AdministrativeGender;
+import org.hl7.fhir.r5.model.HumanName;
+import org.hl7.fhir.r5.model.Immunization;
+import org.hl7.fhir.r5.model.Location;
+import org.hl7.fhir.r5.model.Patient;
+import org.hl7.fhir.r5.model.Quantity;
+import org.hl7.fhir.r5.model.Reference;
 import org.immregistries.iis.kernal.logic.FHIRHandler;
 import org.immregistries.iis.kernal.model.OrgAccess;
 import org.immregistries.iis.kernal.model.OrgLocation;
@@ -64,7 +64,7 @@ public class RestfuImmunizationProviderTest extends TestCase {
     String ref = patient.getIdentifier().get(0).getValue();
     Reference reference = new Reference("Patient/" + ref);
     immunization.setPatient(reference);
-    immunization.addReasonCode().addCoding().setCode("2V4");
+//    immunization.addReasonCode().addCoding().setCode("2V4"); TODO R5
     immunization.getVaccineCode().addCoding().setCode("2V4");
 
 

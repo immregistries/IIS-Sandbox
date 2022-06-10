@@ -5,12 +5,12 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.AnnotationConfiguration;
-import org.hl7.fhir.r4.model.DateTimeType;
-import org.hl7.fhir.r4.model.Extension;
-import org.hl7.fhir.r4.model.IdType;
-import org.hl7.fhir.r4.model.MedicationAdministration;
-import org.hl7.fhir.r4.model.Reference;
-import org.hl7.fhir.r4.model.StringType;
+import org.hl7.fhir.r5.model.DateTimeType;
+import org.hl7.fhir.r5.model.Extension;
+import org.hl7.fhir.r5.model.IdType;
+import org.hl7.fhir.r5.model.MedicationAdministration;
+import org.hl7.fhir.r5.model.Reference;
+import org.hl7.fhir.r5.model.StringType;
 import org.immregistries.iis.kernal.model.OrgAccess;
 import org.immregistries.iis.kernal.model.OrgMaster;
 import org.immregistries.iis.kernal.model.VaccinationMaster;
@@ -74,8 +74,7 @@ public class RestfulMedicationAdministrationProvider implements IResourceProvide
       if (vaccinationMaster != null) {
         medicationAdministration = new MedicationAdministration();
         medicationAdministration.setId(id);
-        medicationAdministration
-            .setEffective(new DateTimeType(vaccinationMaster.getAdministeredDate()));
+//        medicationAdministration.setEffective(new DateTimeType(vaccinationMaster.getAdministeredDate()));
         medicationAdministration.setSubject(new Reference("/Patient/" 
             + vaccinationMaster.getPatient().getPatientId()));
         {

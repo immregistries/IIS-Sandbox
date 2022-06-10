@@ -13,7 +13,7 @@ import java.util.TimerTask;
 
 public class HeartbeatTask extends TimerTask {
 
-    private final Logger logger = LoggerFactory.getLogger(HeartbeatTask.class);
+//    private final Logger logger = LoggerFactory.getLogger(HeartbeatTask.class);
 
     private Subscription subscription;
     private IGenericClient client;
@@ -33,7 +33,9 @@ public class HeartbeatTask extends TimerTask {
 
     @Override
     public void run() {
-        logger.info(String.valueOf(LocalDateTime.ofInstant(Instant.ofEpochMilli(scheduledExecutionTime()),
+//        logger.info(String.valueOf(LocalDateTime.ofInstant(Instant.ofEpochMilli(scheduledExecutionTime()),
+//                ZoneId.systemDefault())));
+        System.out.println(String.valueOf(LocalDateTime.ofInstant(Instant.ofEpochMilli(scheduledExecutionTime()),
                 ZoneId.systemDefault())));
 //       this.client.create().resource(this.bundle).execute();
     }

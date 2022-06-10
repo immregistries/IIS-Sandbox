@@ -9,7 +9,7 @@ import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
 import ca.uhn.fhir.util.BundleBuilder;
 import org.hl7.fhir.instance.model.api.IBaseBundle;
 import org.hl7.fhir.r5.model.*;
-import org.hl7.fhir.r4.model.codesystems.SubscriptionChannelType;
+//import org.hl7.fhir.r5.model.codesystems.SubscriptionChannelType;
 import org.immregistries.iis.kernal.fhir.Context;
 import org.immregistries.iis.kernal.fhir.client.SubscriptionClientBuilder;
 import org.slf4j.Logger;
@@ -113,7 +113,7 @@ public class SubscriptionProvider implements IResourceProvider {
 //        sub.setChannel(channel);
         sub.setReason("testing purposes");
         sub.setTopic("localhost:9091/ehr-sandbox/subscriptionTopic");
-        sub.setChannelType(new Coding().setCode(SubscriptionChannelType.RESTHOOK.toCode()).setSystem("http://hl7.org/fhir/ValueSet/subscription-channel-type"));
+        sub.setChannelType(new Coding().setCode("RESTHOOK").setSystem("http://hl7.org/fhir/ValueSet/subscription-channel-type"));
 //        sub.setEndpoint(self.serverUrl)
 //        sub.setStatus(Subscription.SubscriptionStatus.ACTIVE);
         return sub;
