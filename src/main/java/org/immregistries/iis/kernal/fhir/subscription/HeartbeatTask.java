@@ -27,6 +27,7 @@ public class HeartbeatTask extends TimerTask {
         subscriptionStatus = new SubscriptionStatus()
                 .setStatus(Enumerations.SubscriptionState.ACTIVE)
                 .setType(SubscriptionStatus.SubscriptionNotificationType.HEARTBEAT)
+                .setEventsSinceSubscriptionStart(0)
                 .setTopic(subscription.getTopic());
         this.bundle = new Bundle(Bundle.BundleType.SUBSCRIPTIONNOTIFICATION);
         this.bundle.addEntry().setResource(subscriptionStatus);
@@ -39,6 +40,13 @@ public class HeartbeatTask extends TimerTask {
     public void run() {
         logger.info(" Heartbeat task ran at {}", LocalDateTime.ofInstant(Instant.ofEpochMilli(scheduledExecutionTime()),
                 ZoneId.systemDefault()));
+        this.subscriptionStatus.setEventsSinceSubscriptionStart(subscriptionStatus.getEventsSinceSubscriptionStart() + 1);
+        if (this.subscriptionStatus.getEventsSinceSubscriptionStart() > 3) {
+            cancel();
+        }
+        /**
+         * TODO fetch subscription in db, see if still active, if not cancel
+         */
 //       this.client.create().resource(this.bundle).execute();
     }
 

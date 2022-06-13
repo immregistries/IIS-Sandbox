@@ -64,14 +64,14 @@ public class SubscriptionProvider implements IResourceProvider {
         Timer heartbeatTimer = new Timer();
         heartbeatTimer.scheduleAtFixedRate(heartbeatTask,subscription.getHeartbeatPeriod()* 1000L,subscription.getHeartbeatPeriod()* 1000L);
 
-        for (int i = 0; i < 3; i++) {
-            try {
-                Thread.sleep(subscription.getHeartbeatPeriod()* 1000L + 1000L);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-        heartbeatTimer.cancel();
+//        for (int i = 0; i < 3; i++) {
+//            try {
+//                Thread.sleep(subscription.getHeartbeatPeriod()* 1000L + 1000L);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//        heartbeatTimer.cancel();
 
         MethodOutcome methodOutcome = new MethodOutcome().setResource(subscription);
         return methodOutcome;
