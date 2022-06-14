@@ -2,7 +2,6 @@ package org.immregistries.iis.kernal.fhir.subscription;
 
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import org.hl7.fhir.r5.model.*;
-import org.immregistries.iis.kernal.fhir.Context;
 import org.immregistries.iis.kernal.fhir.client.SubscriptionClientBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,8 +30,7 @@ public class HeartbeatTask extends TimerTask {
                 .setTopic(subscription.getTopic());
         this.bundle = new Bundle(Bundle.BundleType.SUBSCRIPTIONNOTIFICATION);
         this.bundle.addEntry().setResource(subscriptionStatus);
-        SubscriptionClientBuilder subscriptionClientBuilder = new SubscriptionClientBuilder(subscription);
-        this.client = subscriptionClientBuilder.getClient();
+        this.client = new SubscriptionClientBuilder(subscription).getClient();
 //        this.client = Context.getCtx().newRestfulGenericClient(subscription.getEndpoint());
     }
 

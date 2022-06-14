@@ -9,12 +9,16 @@ import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.server.IResourceProvider;
 import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
 import ca.uhn.fhir.util.BundleBuilder;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.AnnotationConfiguration;
 import org.hl7.fhir.instance.model.api.IBaseBundle;
 import org.hl7.fhir.r5.model.*;
 import org.hl7.fhir.r5.model.Subscription;
 //import org.hl7.fhir.r5.model.codesystems.SubscriptionChannelType;
 import org.immregistries.iis.kernal.fhir.Context;
 import org.immregistries.iis.kernal.fhir.client.SubscriptionClientBuilder;
+import org.immregistries.iis.kernal.model.SubscriptionStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,6 +26,15 @@ import java.util.Timer;
 
 
 public class SubscriptionProvider implements IResourceProvider {
+    private static SessionFactory factory;
+
+    public static Session getDataSession() {
+        if (factory == null) {
+            factory = new AnnotationConfiguration().configure().buildSessionFactory();
+        }
+        return factory.openSession();
+    }
+
 
     private final static int DEFAULT_HEARTBEAT_PERIOD = 60;
     private final static int MAX_HEARTBEAT_PERIOD = 3600;
@@ -41,6 +54,9 @@ public class SubscriptionProvider implements IResourceProvider {
 
     @Create()
     public MethodOutcome createSubscription(@ResourceParam Subscription subscription) {
+        Session session = getDataSession();
+//        logger.info(subscription.);
+        session.save(new SubscriptionStore(subscription));
         boolean isValid;
         if (subscription.getHeartbeatPeriod() > MAX_HEARTBEAT_PERIOD || subscription.getHeartbeatPeriod() < MIN_HEARTBEAT_PERIOD){
             subscription.setHeartbeatPeriod(DEFAULT_HEARTBEAT_PERIOD);

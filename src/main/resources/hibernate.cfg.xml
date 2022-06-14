@@ -29,5 +29,6 @@
     <mapping resource="org/immregistries/iis/kernal/model/ObservationMaster.hbm.xml"/>
     <mapping resource="org/immregistries/iis/kernal/model/ObservationReported.hbm.xml"/>
     <mapping resource="org/immregistries/iis/kernal/model/PatientLink.hbm.xml"/>
+    <mapping class="org.immregistries.iis.kernal.model.SubscriptionStore"/>
   </session-factory>
 </hibernate-configuration>
