@@ -17,7 +17,6 @@ import org.hl7.fhir.r5.model.*;
 import org.hl7.fhir.r5.model.Subscription;
 //import org.hl7.fhir.r5.model.codesystems.SubscriptionChannelType;
 import org.immregistries.iis.kernal.fhir.Context;
-import org.immregistries.iis.kernal.fhir.client.SubscriptionClientBuilder;
 import org.immregistries.iis.kernal.model.SubscriptionStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -103,7 +102,7 @@ public class SubscriptionProvider implements IResourceProvider {
                         .setEventsSinceSubscriptionStart(0)
                         .setTopic(subscription.getTopic())
         );
-        IGenericClient client = new SubscriptionClientBuilder(subscription).getClient();
+        IGenericClient client = new SubscriptionClientFactory(subscription).newGenericClient(subscription.getEndpoint());
         IBaseBundle outcome = client.transaction().withBundle(handshakeBundle).execute();
         logger.info(outcome.toString());
         return subscription;

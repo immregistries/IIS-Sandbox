@@ -1,6 +1,6 @@
-package org.immregistries.iis.kernal.fhir.client;
+package org.immregistries.iis.kernal.fhir.subscription;
 
-import ca.uhn.fhir.context.FhirContext;
+import ca.uhn.fhir.rest.client.apache.ApacheRestfulClientFactory;
 import ca.uhn.fhir.rest.client.api.IClientInterceptor;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.client.api.ServerValidationModeEnum;
@@ -13,26 +13,35 @@ import org.immregistries.iis.kernal.fhir.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SubscriptionClientBuilder {
+public class SubscriptionClientFactory extends ApacheRestfulClientFactory {
 
-    private final Logger logger = LoggerFactory.getLogger(SubscriptionClientBuilder.class);
+    private final Logger logger = LoggerFactory.getLogger(SubscriptionClientFactory.class);
+    private String secret;
+    private LoggingInterceptor loggingInterceptor;
+    private IClientInterceptor authInterceptor;
 
-    private final IGenericClient client;
+    @Override
+    public synchronized IGenericClient newGenericClient(String theServerBase) {
+        IGenericClient client = super.newGenericClient(theServerBase);
+        client.registerInterceptor(loggingInterceptor);
+        client.registerInterceptor(authInterceptor);
+        return client;
+    }
 
-    public SubscriptionClientBuilder(Subscription subscription){
+
+
+    public SubscriptionClientFactory(Subscription subscription){
         // Deactivate the request for server metadata
-        Context.getCtx().getRestfulClientFactory().setServerValidationMode(ServerValidationModeEnum.NEVER);
-        // Create a client
-        this.client = Context.getCtx().newRestfulGenericClient(subscription.getEndpoint());
-        LoggingInterceptor loggingInterceptor = new LoggingInterceptor();
+        setFhirContext(Context.getCtx());
+        setServerValidationMode(ServerValidationModeEnum.NEVER);
+
+        loggingInterceptor = new LoggingInterceptor();
         loggingInterceptor.setLoggerName("Subscription Client");
         loggingInterceptor.setLogger(logger);
-        this.client.registerInterceptor(loggingInterceptor);
-
         /**
          *  No tenancy interceptor : Already set in endpoint
          */
-        String secret = null;
+        secret = null;
         for (StringType header: subscription.getHeader()) {
             if (header.asStringValue().startsWith("Authorization: Bearer ")) {
                 secret = header.asStringValue().substring("Authorization: Bearer ".length());
@@ -43,15 +52,8 @@ public class SubscriptionClientBuilder {
             throw new InvalidRequestException("No secret specified in Subscription.header");
         } else {
             // Creating an auth interceptor to bear the secret
-            IClientInterceptor authInterceptor = new BearerTokenAuthInterceptor(secret);
-            this.client.registerInterceptor(authInterceptor);
+            authInterceptor = new BearerTokenAuthInterceptor(secret);
         }
-
     }
-
-    public IGenericClient getClient() {
-        return client;
-    }
-
 
 }
