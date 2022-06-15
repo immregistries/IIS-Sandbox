@@ -54,21 +54,14 @@ public class SubscriptionProvider implements IResourceProvider {
     @Create()
     public MethodOutcome createSubscription(@ResourceParam Subscription subscription) {
         Session session = getDataSession();
-//        logger.info(subscription.);
-        session.save(new SubscriptionStore(subscription));
         boolean isValid;
         if (subscription.getHeartbeatPeriod() > MAX_HEARTBEAT_PERIOD || subscription.getHeartbeatPeriod() < MIN_HEARTBEAT_PERIOD){
             subscription.setHeartbeatPeriod(DEFAULT_HEARTBEAT_PERIOD);
         }
-        /**
-         * TODO
-         * store/save active subscription
-         *
-         */
         if (subscription.getStatus().equals(Enumerations.SubscriptionState.REQUESTED)){
 //            subscription = handshake(subscription);
         } else if (subscription.getStatus().equals(Enumerations.SubscriptionState.ACTIVE)){
-            // TODO check if already exists
+            // TODO check if already exists and modify it ?
         } else if (subscription.getStatus().equals(Enumerations.SubscriptionState.ENTEREDINERROR)){
             // TODO cancel subscription
         } else {
@@ -89,6 +82,8 @@ public class SubscriptionProvider implements IResourceProvider {
 //        heartbeatTimer.cancel();
 
         MethodOutcome methodOutcome = new MethodOutcome().setResource(subscription);
+        session.save(new SubscriptionStore(subscription));
+
         return methodOutcome;
     }
 

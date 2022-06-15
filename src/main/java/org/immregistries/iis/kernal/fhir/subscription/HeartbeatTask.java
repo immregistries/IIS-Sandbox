@@ -1,6 +1,9 @@
 package org.immregistries.iis.kernal.fhir.subscription;
 
 import ca.uhn.fhir.rest.client.api.IGenericClient;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.AnnotationConfiguration;
 import org.hl7.fhir.r5.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,16 +14,15 @@ import java.time.ZoneId;
 import java.util.TimerTask;
 
 public class HeartbeatTask extends TimerTask {
+    private static SessionFactory factory;
+    public static Session getDataSession() {
+        if (factory == null) {
+            factory = new AnnotationConfiguration().configure().buildSessionFactory();
+        }
+        return factory.openSession();
+    }
 
     private final Logger logger = LoggerFactory.getLogger(HeartbeatTask.class);
-
-    public Subscription getSubscription() {
-        return subscription;
-    }
-
-    public void setSubscription(Subscription subscription) {
-        this.subscription = subscription;
-    }
 
     private Subscription subscription;
     private IGenericClient client;
@@ -43,10 +45,11 @@ public class HeartbeatTask extends TimerTask {
 
     @Override
     public void run() {
+        Session session = factory.openSession();
         logger.info(" Heartbeat task ran at {}", LocalDateTime.ofInstant(Instant.ofEpochMilli(scheduledExecutionTime()),
                 ZoneId.systemDefault()));
         this.subscriptionStatus.setEventsSinceSubscriptionStart(subscriptionStatus.getEventsSinceSubscriptionStart() + 1);
-        if (this.subscriptionStatus.getEventsSinceSubscriptionStart() > 3) {
+        if (this.subscriptionStatus.getEventsSinceSubscriptionStart() >= 3) {
             cancel();
         }
         /**
@@ -69,5 +72,13 @@ public class HeartbeatTask extends TimerTask {
 
     public void setSubscriptionStatus(SubscriptionStatus subscriptionStatus) {
         this.subscriptionStatus = subscriptionStatus;
+    }
+
+    public Subscription getSubscription() {
+        return subscription;
+    }
+
+    public void setSubscription(Subscription subscription) {
+        this.subscription = subscription;
     }
 }
