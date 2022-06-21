@@ -8,6 +8,7 @@ import ca.uhn.fhir.jpa.subscription.channel.config.SubscriptionChannelConfig;
 import ca.uhn.fhir.jpa.subscription.match.config.SubscriptionProcessorConfig;
 import ca.uhn.fhir.jpa.subscription.match.config.WebsocketDispatcherConfig;
 import ca.uhn.fhir.jpa.subscription.submit.config.SubscriptionSubmitterConfig;
+import org.immregistries.iis.kernal.servlet.HomeServlet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.boot.SpringApplication;
@@ -80,9 +81,18 @@ public class Application extends SpringBootServletInitializer {
 
     ServletRegistrationBean registrationBean = new ServletRegistrationBean();
     registrationBean.setServlet(dispatcherServlet);
-    registrationBean.addUrlMappings("/*");
+    registrationBean.addUrlMappings("/overlay/*");
     registrationBean.setLoadOnStartup(1);
     return registrationBean;
 
+  }
+
+  @Bean
+  public ServletRegistrationBean homeServletRegistrationBean() {
+	  ServletRegistrationBean registrationBean = new ServletRegistrationBean();
+	  registrationBean.setServlet(new HomeServlet());
+	  registrationBean.addUrlMappings( "/home");
+	  registrationBean.setLoadOnStartup(1);
+	  return registrationBean;
   }
 }
