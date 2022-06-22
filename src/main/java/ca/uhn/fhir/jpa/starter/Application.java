@@ -9,6 +9,8 @@ import ca.uhn.fhir.jpa.subscription.match.config.SubscriptionProcessorConfig;
 import ca.uhn.fhir.jpa.subscription.match.config.WebsocketDispatcherConfig;
 import ca.uhn.fhir.jpa.subscription.submit.config.SubscriptionSubmitterConfig;
 import org.immregistries.iis.kernal.servlet.HomeServlet;
+import org.immregistries.iis.kernal.servlet.MessageServlet;
+import org.immregistries.iis.kernal.servlet.PopServlet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.boot.SpringApplication;
@@ -95,4 +97,21 @@ public class Application extends SpringBootServletInitializer {
 	  registrationBean.setLoadOnStartup(1);
 	  return registrationBean;
   }
+
+	@Bean
+	public ServletRegistrationBean popServletRegistrationBean() {
+		ServletRegistrationBean registrationBean = new ServletRegistrationBean();
+		registrationBean.setServlet(new PopServlet());
+		registrationBean.addUrlMappings( "/pop");
+//		registrationBean.setLoadOnStartup(1);
+		return registrationBean;
+	}
+	@Bean
+	public ServletRegistrationBean messageServletRegistrationBean() {
+		ServletRegistrationBean registrationBean = new ServletRegistrationBean();
+		registrationBean.setServlet(new MessageServlet());
+		registrationBean.addUrlMappings( "/message");
+//		registrationBean.setLoadOnStartup(1);
+		return registrationBean;
+	}
 }
