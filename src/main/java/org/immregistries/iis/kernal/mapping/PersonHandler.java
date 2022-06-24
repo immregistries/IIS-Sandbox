@@ -1,7 +1,8 @@
-package org.immregistries.iis.kernal.logic;
+package org.immregistries.iis.kernal.mapping;
 
 
 import org.hl7.fhir.r5.model.*;
+import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.model.PatientReported;
 
 public class PersonHandler {
@@ -12,7 +13,6 @@ public class PersonHandler {
    * @return Fhir Person resource
    */
   public static Person getPerson(PatientReported pr) {
-
     Person p = new Person();
     Identifier id = p.addIdentifier();
     id.setValue(pr.getPatientReportedExternalLink());
@@ -53,5 +53,20 @@ public class PersonHandler {
     address.setPostalCode(pr.getPatientAddressZip());
 
     return p;
+  }
+
+  public static PatientMaster getPatientMasterFromFhir( PatientMaster patientMaster, Patient person) {
+	  if (patientMaster == null) {
+		  patientMaster = new PatientMaster();
+	  }
+	  patientMaster.setPatientId(Integer.parseInt(person.getId()));
+	  patientMaster.setPatientNameFirst(person.getNameFirstRep().getGiven().get(0).getValue());
+	  if (person.getNameFirstRep().getGiven().size() > 1) {
+		  patientMaster.setPatientNameMiddle(person.getNameFirstRep().getGiven().get(1).getValue());
+	  }
+	  patientMaster.setPatientNameLast(person.getNameFirstRep().getFamily());
+	  patientMaster.setPatientExternalLink(person.getIdentifierFirstRep().getId());
+//	  patientMaster.setPatientAddressFrag();
+	  return  patientMaster;
   }
 }

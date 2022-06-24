@@ -1,27 +1,47 @@
 package org.immregistries.iis.kernal.logic;
 
-import ca.uhn.fhir.context.FhirContext;
+import ca.uhn.fhir.jpa.rp.r5.PatientResourceProvider;
+import ca.uhn.fhir.rest.api.server.RequestDetails;
+import ca.uhn.fhir.rest.client.api.IGenericClient;
+import ca.uhn.fhir.rest.server.servlet.ServletRequestDetails;
 import org.apache.commons.lang3.StringUtils;
+import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hl7.fhir.r5.model.Bundle;
+import org.hl7.fhir.r5.model.IdType;
+import org.hl7.fhir.r5.model.Patient;
 import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodeStatusValue;
 import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.SoftwareVersion;
+import org.immregistries.iis.kernal.mapping.PatientHandler;
+import org.immregistries.iis.kernal.mapping.PersonHandler;
 import org.immregistries.iis.kernal.model.*;
+import org.immregistries.iis.kernal.repository.RepositoryClientFactory;
 import org.immregistries.smm.tester.manager.HL7Reader;
 import org.immregistries.vfa.connect.ConnectFactory;
 import org.immregistries.vfa.connect.ConnectorInterface;
 import org.immregistries.vfa.connect.model.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+//@Component
 public class IncomingMessageHandler {
+
+  private Logger logger = LoggerFactory.getLogger(IncomingMessageHandler.class);
+  @Autowired
+  private RepositoryClientFactory repositoryClientFactory;
+
   private static final String PATIENT_MIDDLE_NAME_MULTI = "Multi";
   // TODO:
   // Organize logic classes, need to have access classes for every object, maybe a new Access
@@ -45,9 +65,12 @@ public class IncomingMessageHandler {
 
   protected Session dataSession = null;
 
-  public IncomingMessageHandler(Session dataSession) {
-    this.dataSession = dataSession;
-  }
+	public IncomingMessageHandler() {
+	}
+
+//  public IncomingMessageHandler(Session dataSession) {
+//    this.dataSession = dataSession;
+//  }
 
 
   public String process(String message, OrgAccess orgAccess) {
@@ -138,17 +161,17 @@ public class IncomingMessageHandler {
       } else {
 
         if (patientReported == null) {
-          Query query = dataSession.createQuery(
-              "from PatientReported where orgReported = :orgReported and Patient.patientBirthDate = :patientBirthDate "
-                  + "and Patient.patientNameLast = :patientNameLast and Patient.patientNameFirst = :patientNameFirst ");
-          query.setParameter("orgReported", orgAccess.getOrg());
-          query.setParameter("patientBirthDate", patientBirthDate);
-          query.setParameter("patientNameLast", patientNameLast);
-          query.setParameter("patientNameFirst", patientNameFirst);
-          List<PatientReported> patientReportedList = query.list();
-          if (patientReportedList.size() > 0) {
-            patientReported = patientReportedList.get(0);
-          }
+//          Query query = dataSession.createQuery( TODO FIX
+//              "from PatientReported where orgReported = :orgReported and Patient.patientBirthDate = :patientBirthDate "
+//                  + "and Patient.patientNameLast = :patientNameLast and Patient.patientNameFirst = :patientNameFirst ");
+//          query.setParameter("orgReported", orgAccess.getOrg());
+//          query.setParameter("patientBirthDate", patientBirthDate);
+//          query.setParameter("patientNameLast", patientNameLast);
+//          query.setParameter("patientNameFirst", patientNameFirst);
+//          List<PatientReported> patientReportedList = query.list();
+//          if (patientReportedList.size() > 0) {
+//            patientReported = patientReportedList.get(0);
+//          }
         }
         if (patientReported != null) {
           int points = 0;
@@ -178,14 +201,14 @@ public class IncomingMessageHandler {
           }
         }
         if (patientReported == null) {
-          Query query = dataSession.createQuery(
-              "from PatientReported where orgReported = :orgReported and Patient.patientBirthDate = :patientBirthDate "
-                  + "and (Patient.patientNameLast = :patientNameLast or Patient.patientNameFirst = :patientNameFirst) ");
-          query.setParameter("orgReported", orgAccess.getOrg());
-          query.setParameter("patientBirthDate", patientBirthDate);
-          query.setParameter("patientNameLast", patientNameLast);
-          query.setParameter("patientNameFirst", patientNameFirst);
-          patientReportedPossibleList = query.list();
+//          Query query = dataSession.createQuery( TODO FIX
+//              "from PatientReported where orgReported = :orgReported and Patient.patientBirthDate = :patientBirthDate "
+//                  + "and (Patient.patientNameLast = :patientNameLast or Patient.patientNameFirst = :patientNameFirst) ");
+//          query.setParameter("orgReported", orgAccess.getOrg());
+//          query.setParameter("patientBirthDate", patientBirthDate);
+//          query.setParameter("patientNameLast", patientNameLast);
+//          query.setParameter("patientNameFirst", patientNameFirst);
+//          patientReportedPossibleList = query.list();
         }
         if (patientReported != null
             && patientNameMiddle.equalsIgnoreCase(PATIENT_MIDDLE_NAME_MULTI)) {
@@ -628,7 +651,14 @@ public class IncomingMessageHandler {
       List<ProcessingException> processingExceptionList, Set<ProcessingFlavor> processingFlavorSet,
       CodeMap codeMap, boolean strictDate, PatientReported patientReported)
       throws ProcessingException {
-    PatientMaster patient = null;
+
+
+	  RequestDetails requestDetails = new ServletRequestDetails();
+	  requestDetails.setTenantId(orgAccess.getAccessName());
+	  IGenericClient fhirClient = repositoryClientFactory.newGenericClient(requestDetails);
+	  Patient patient;
+
+    PatientMaster patientMaster = null;
     String patientReportedExternalLink = "";
     String patientReportedAuthority = "";
     String patientReportedType = "MR";
@@ -659,27 +689,28 @@ public class IncomingMessageHandler {
           "No PID segment found, required for accepting vaccination report", "", 0, 0);
     }
 
+		// Example of Jpa access
+	  try {
+		  Bundle bundle = fhirClient.search().forResource(Patient.class)
+			  .where(Patient.IDENTIFIER.exactly().identifier(patientReportedExternalLink)).returnBundle(Bundle.class).execute();
+		  logger.info(bundle.getEntryFirstRep().toString());
+		  patient = (Patient) bundle.getEntryFirstRep().getResource();
+		  logger.info("bundle has entry");
+		  patientReported = new PatientReported();
+		  PatientHandler.patientReportedFromFhir( patientReported, patient);
+		  patientMaster = patientReported.getPatient();
+	  } catch (ResourceNotFoundException e) {
 
-    {
-      Query query = dataSession.createQuery(
-          "from PatientReported where orgReported = ?0 and patientReportedExternalLink = ?1");
-      query.setParameter(0, orgAccess.getOrg());
-      query.setParameter(1, patientReportedExternalLink);
-      List<PatientReported> patientReportedList = query.list();
-      if (patientReportedList.size() > 0) {
-        patientReported = patientReportedList.get(0);
-        patient = patientReported.getPatient();
-      }
-    }
+	  }
 
     if (patientReported == null) {
-      patient = new PatientMaster();
-      patient.setPatientExternalLink(generatePatientExternalLink());
-      patient.setOrgMaster(orgAccess.getOrg());
+      patientMaster = new PatientMaster();
+//      patientMaster.setPatientExternalLink(generatePatientExternalLink());
+      patientMaster.setOrgMaster(orgAccess.getOrg());
       patientReported = new PatientReported();
       patientReported.setOrgReported(orgAccess.getOrg());
       patientReported.setPatientReportedExternalLink(patientReportedExternalLink);
-      patientReported.setPatient(patient);
+      patientReported.setPatient(patientMaster);
       patientReported.setReportedDate(new Date());
     }
 
@@ -689,7 +720,7 @@ public class IncomingMessageHandler {
       String patientNameMiddle = reader.getValue(5, 3);
       String patientPhone = reader.getValue(13, 6) + reader.getValue(13, 7);
       String telUseCode = reader.getValue(13, 2);
-      if (patientPhone.length() >= 0) {
+      if (patientPhone.length() > 0) {
         if (!telUseCode.equals("PRN")) {
           ProcessingException pe = new ProcessingException(
               "Patient phone telecommunication type must be PRN ", "PID", 1, 13);
@@ -765,14 +796,14 @@ public class IncomingMessageHandler {
             "Patient is indicated as being born in the future, unable to record patients who are not yet born",
             "PID", 1, 7);
       }
-      patient.setPatientAddressFrag(addressFrag);
-      patient.setPatientNameLast(patientNameLast);
-      patient.setPatientNameFirst(patientNameFirst);
-      patient.setPatientNameMiddle(patientNameMiddle);
-      patient.setPatientPhoneFrag(patientPhone);
-      patient.setPatientBirthDate(patientBirthDate);
-      patient.setPatientSoundexFirst(""); // TODO, later
-      patient.setPatientSoundexLast(""); // TODO, later
+      patientMaster.setPatientAddressFrag(addressFrag);
+      patientMaster.setPatientNameLast(patientNameLast);
+      patientMaster.setPatientNameFirst(patientNameFirst);
+      patientMaster.setPatientNameMiddle(patientNameMiddle);
+      patientMaster.setPatientPhoneFrag(patientPhone);
+      patientMaster.setPatientBirthDate(patientBirthDate);
+      patientMaster.setPatientSoundexFirst(""); // TODO, later
+      patientMaster.setPatientSoundexLast(""); // TODO, later
       patientReported.setPatientReportedExternalLink(patientReportedExternalLink);
       patientReported.setPatientReportedType(patientReportedType);
       patientReported.setPatientNameFirst(patientNameFirst);
@@ -987,10 +1018,10 @@ public class IncomingMessageHandler {
 
     patientReported.setUpdatedDate(new Date());
     {
-      Transaction transaction = dataSession.beginTransaction();
-      dataSession.saveOrUpdate(patient);
-      dataSession.saveOrUpdate(patientReported);
-      transaction.commit();
+		 org.hl7.fhir.r5.model.Person person = PersonHandler.getPerson(patientReported);
+		 Patient patient1 = PatientHandler.patientReportedToFhir(patientReported);
+		 fhirClient.update().resource(person).withId(person.getId());
+		 fhirClient.update().resource(patient1).withId(patient1.getId());
     }
     return patientReported;
   }

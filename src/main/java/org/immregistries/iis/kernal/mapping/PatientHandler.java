@@ -1,14 +1,12 @@
-package org.immregistries.iis.kernal.logic;
+package org.immregistries.iis.kernal.mapping;
 
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hl7.fhir.r5.model.*;
 import org.hl7.fhir.r5.model.ContactPoint.ContactPointSystem;
 import org.hl7.fhir.r5.model.Enumerations.AdministrativeGender;
-import org.immregistries.iis.kernal.model.OrgLocation;
 import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.model.PatientReported;
-import org.immregistries.iis.kernal.model.VaccinationReported;
 
 import java.util.Date;
 import java.util.List;
@@ -17,13 +15,15 @@ public class PatientHandler {
 
   private PatientHandler(){}
 
+
   /**
    * This method set the patientReported information based on the patient information
    * @param patientReported the patientReported
    * @param p the Patient resource
    */
   public static void patientReportedFromFhir(PatientReported patientReported, Patient p) {
-    // patientReported.setPatientReportedId(;
+     patientReported.setPatientReportedId(Integer.parseInt(p.getIdentifierFirstRep().getValue())); // TODO set patient Master
+//	  patientReported.setPatient();
     // patientReported.setPatientReportedType(p.get);
     patientReported.setReportedDate(new Date());
     patientReported.setPatientReportedExternalLink(p.getIdentifier().get(0).getValue());
@@ -41,6 +41,19 @@ public class PatientHandler {
     patientReported.setPatientBirthDate(p.getBirthDate());
     patientReported.setPatientSex(String.valueOf(p.getGender().toString().charAt(0))); // Get the first char of MALE
     // or FEMALE -> "M" or "F"
+
+	  switch (p.getGender()) {
+		  case MALE:
+			  patientReported.setPatientSex("M");
+			  break;
+		  case FEMALE:
+			  patientReported.setPatientSex("F");
+			  break;
+		  case OTHER:
+		  default:
+			  patientReported.setPatientSex("");
+			  break;
+	  }
 
     // Address
     Address address = p.getAddressFirstRep();
@@ -97,7 +110,11 @@ public class PatientHandler {
     patientReported.setGuardianRelationship(contact.getRelationshipFirstRep().getText());
 
     // PatientMaster Ressource
+
     PatientMaster patientMaster = patientReported.getPatient();
+	 if (patientMaster == null) {
+		 patientMaster = new PatientMaster();
+	 }
     if (patientMaster.getPatientNameLast().equals("")) { //TODO improve this condition
 
       patientMaster.setPatientId(patientReported.getPatientReportedId());
@@ -119,15 +136,14 @@ public class PatientHandler {
    * @return the Patient resource
    */
   public static Patient patientReportedToFhir(PatientReported pr) {
-    return getFhirPatient(null, null, pr);
+    return getFhirPatient(pr);
   }
 
-  public static Patient getFhirPatient(OrgLocation orgLocation, VaccinationReported vaccinationReported,
-      PatientReported pr) {
+  public static Patient getFhirPatient( PatientReported pr) {
     Patient p = new Patient();
     Identifier id = p.addIdentifier();
     id.setValue(pr.getPatientReportedExternalLink());
-    p.setId(pr.getPatientReportedExternalLink());
+//    p.setId(pr.getPatientReportedExternalLink());
 
     HumanName name = p.addName();
     name.setFamily(pr.getPatientNameLast());
@@ -168,7 +184,6 @@ public class PatientHandler {
     address.setState(pr.getPatientAddressState());
     address.setPostalCode(pr.getPatientAddressZip());
 
-    //TODO deal with contact (maybe create an id in the DB ?)
     Patient.ContactComponent contact = p.addContact();
     HumanName contactName = new HumanName();
     contactName.setFamily(pr.getGuardianLast());

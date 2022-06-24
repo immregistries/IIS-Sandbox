@@ -1,24 +1,32 @@
-package org.immregistries.iis.kernal.logic;
+package org.immregistries.iis.kernal.mapping;
 
 import ca.uhn.fhir.rest.api.server.RequestDetails;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hl7.fhir.r5.model.*;
-import org.immregistries.iis.kernal.model.OrgLocation;
 import org.immregistries.iis.kernal.model.PatientReported;
 import org.immregistries.iis.kernal.model.VaccinationMaster;
 import org.immregistries.iis.kernal.model.VaccinationReported;
+import org.immregistries.iis.kernal.repository.RepositoryClientFactory;
 import org.immregistries.vaccination_deduplication.computation_classes.Deterministic;
 import org.immregistries.vaccination_deduplication.reference.ComparisonResult;
 import org.immregistries.vaccination_deduplication.reference.ImmunizationSource;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
+@Component
 public class ImmunizationHandler {
 
-  private ImmunizationHandler(){}
+	private static RepositoryClientFactory repositoryClientFactory;
+
+	@Autowired
+	public void setRepositoryClientFactory(RepositoryClientFactory repositoryClientFactory){
+		ImmunizationHandler.repositoryClientFactory = repositoryClientFactory;
+	}
 
   /**
    * This method set the patientReported information based on the patient information
@@ -31,7 +39,6 @@ public class ImmunizationHandler {
       patientReported.setReportedDate(i.getRecorded());
       patientReported.setUpdatedDate(i.getOccurrenceDateTimeType().getValue());
       patientReported.setPatientReportedAuthority(i.getIdentifierFirstRep().getValue());
-      //patientReported.setPatientReportedType(patientReportedType);
     }
 
   }
@@ -41,7 +48,8 @@ public class ImmunizationHandler {
    * @param i the Immunization resource
    */
   public static void vaccinationReportedFromFhirImmunization(
-      VaccinationReported vaccinationReported, Immunization i) {
+      VaccinationReported vaccinationReported,
+		Immunization i) {
     //vaccinationReported.setVaccinationReportedId(0);
     vaccinationReported.setVaccinationReportedExternalLink(i.getId());
     if (i.getRecorded() != null) {
@@ -77,26 +85,6 @@ public class ImmunizationHandler {
       Immunization i) {
     vaccinationMaster.setAdministeredDate(i.getOccurrenceDateTimeType().getValue());
     vaccinationMaster.setVaccineCvxCode(i.getVaccineCode().getCodingFirstRep().getCode());
-  }
-
-  /**
-   * This method set the Location information based on the immunization information
-   * @param orgLocation the orgLocation
-   * @param i the Immunization resource
-   */
-  public static void orgLocationFromFhirImmunization(OrgLocation orgLocation, Immunization i) {
-//    Location l = i.getLocationTarget(); //todo r5
-//    orgLocation.setOrgFacilityCode(l.getId()); //TODO create an external identifier or change the usage of the name
-//    orgLocation.setOrgFacilityName(l.getName());
-//    //orgLocation.setLocationType(l.getTypeFirstRep());
-//    orgLocation.setAddressCity(l.getAddress().getLine().get(0).getValueNotNull());
-//    if (l.getAddress().getLine().size() > 1) {
-//      orgLocation.setAddressLine2(l.getAddress().getLine().get(1).getValueNotNull());
-//    }
-//    orgLocation.setAddressCity(l.getAddress().getCity());
-//    orgLocation.setAddressState(l.getAddress().getState());
-//    orgLocation.setAddressZip(l.getAddress().getPostalCode());
-//    orgLocation.setAddressCountry(l.getAddress().getCountry());
   }
 
   /**
@@ -145,20 +133,8 @@ public class ImmunizationHandler {
     i.setPatient(new Reference("Patient/"
         + vr.getPatientReported().getPatientReportedExternalLink()));
 
-//    Location location = i.getLocationTarget(); TODO R5
-//    OrgLocation ol = vr.getOrgLocation();
-//    if (ol != null) {
-//      location.setId(ol.getOrgFacilityCode());
-//      location.setName(ol.getOrgFacilityName());
-//
-//      Address address = location.getAddress();
-//      address.addLine(ol.getAddressLine1());
-//      address.addLine(ol.getAddressLine2());
-//      address.setCity(ol.getAddressCity());
-//      address.setState(ol.getAddressState());
-//      address.setPostalCode(ol.getAddressZip());
-//      address.setCountry(ol.getAddressCountry());
-//    }
+    Location location  = LocationMapper.fhirLocation(vr.getOrgLocation());
+	 i.setLocation(new Reference(location));
     Extension links = new Extension("#links");
     Extension link;
     link = new Extension();

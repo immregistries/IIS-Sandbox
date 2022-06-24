@@ -2,13 +2,13 @@ package org.immregistries.iis.kernal.servlet;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-//import org.hibernate.cfg.AnnotationConfiguration;
 import org.hibernate.cfg.Configuration;
 import org.immregistries.iis.kernal.logic.IncomingMessageHandler;
 import org.immregistries.iis.kernal.model.OrgAccess;
 import org.immregistries.smm.transform.ScenarioManager;
 import org.immregistries.smm.transform.TestCaseMessage;
 import org.immregistries.smm.transform.Transformer;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -18,10 +18,12 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-@SuppressWarnings("serial")
 public class PopServlet extends HttpServlet {
+	@Autowired
+	 private IncomingMessageHandler handler;
 
-  public static final String PARAM_MESSAGE = "MESSAGEDATA";
+
+	public static final String PARAM_MESSAGE = "MESSAGEDATA";
   public static final String PARAM_USERID = "USERID";
   public static final String PARAM_PASSWORD = "PASSWORD";
   public static final String PARAM_FACILITYID = "FACILITYID";
@@ -58,8 +60,9 @@ public class PopServlet extends HttpServlet {
           out.println(
               "Access is not authorized. Facilityid, userid and/or password are not recognized. ");
         } else {
-          IncomingMessageHandler handler = new IncomingMessageHandler(dataSession);
-          ack = handler.process(message, orgAccess);
+//			  IncomingMessageHandler handler = new IncomingMessageHandler(dataSession);
+
+			  ack = handler.process(message, orgAccess);
           session.setAttribute("orgAccess", orgAccess);
         }
       } finally {

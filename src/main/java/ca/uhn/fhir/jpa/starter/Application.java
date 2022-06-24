@@ -20,14 +20,22 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Import;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
+import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 import org.springframework.web.servlet.DispatcherServlet;
 
+import javax.servlet.http.HttpServlet;
+
 @ServletComponentScan(basePackageClasses = {
-  JpaRestfulServer.class})
+  JpaRestfulServer.class}, basePackages = {
+	"org.immregistries.iis.kernal.servlet"
+//	,"org.immregistries.iis.kernal.repository"
+})
 @SpringBootApplication(exclude = {ElasticsearchRestClientAutoConfiguration.class})
 @Import({
 	SubscriptionSubmitterConfig.class,
@@ -37,6 +45,10 @@ import org.springframework.web.servlet.DispatcherServlet;
 	MdmConfig.class,
 	JpaBatch2Config.class,
 	Batch2JobsConfig.class
+})
+@ComponentScan(basePackages = {
+	"ca.uhn.fhir.jpa.starter",
+	"org.immregistries.iis.kernal"
 })
 public class Application extends SpringBootServletInitializer {
 
@@ -92,24 +104,32 @@ public class Application extends SpringBootServletInitializer {
   @Bean
   public ServletRegistrationBean homeServletRegistrationBean() {
 	  ServletRegistrationBean registrationBean = new ServletRegistrationBean();
-	  registrationBean.setServlet(new HomeServlet());
+	  HomeServlet servlet = new HomeServlet();
+	  beanFactory.autowireBean(servlet);
+	  registrationBean.setServlet(servlet);
 	  registrationBean.addUrlMappings( "/home");
 	  registrationBean.setLoadOnStartup(1);
 	  return registrationBean;
   }
 
+
 	@Bean
 	public ServletRegistrationBean popServletRegistrationBean() {
 		ServletRegistrationBean registrationBean = new ServletRegistrationBean();
-		registrationBean.setServlet(new PopServlet());
+		HttpServlet servlet = new PopServlet();
+		beanFactory.autowireBean(servlet);
+		registrationBean.setServlet(servlet);
 		registrationBean.addUrlMappings( "/pop");
 //		registrationBean.setLoadOnStartup(1);
 		return registrationBean;
 	}
+
 	@Bean
 	public ServletRegistrationBean messageServletRegistrationBean() {
 		ServletRegistrationBean registrationBean = new ServletRegistrationBean();
-		registrationBean.setServlet(new MessageServlet());
+		HttpServlet servlet = new MessageServlet();
+		beanFactory.autowireBean(servlet);
+		registrationBean.setServlet(servlet);
 		registrationBean.addUrlMappings( "/message");
 //		registrationBean.setLoadOnStartup(1);
 		return registrationBean;

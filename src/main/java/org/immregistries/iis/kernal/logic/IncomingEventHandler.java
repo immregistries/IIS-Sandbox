@@ -1,19 +1,37 @@
 package org.immregistries.iis.kernal.logic;
 
+import ca.uhn.fhir.rest.api.server.RequestDetails;
+import ca.uhn.fhir.rest.client.api.IGenericClient;
+import ca.uhn.fhir.rest.server.servlet.ServletRequestDetails;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Query;
-import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hl7.fhir.r5.model.Bundle;
+import org.hl7.fhir.r5.model.Patient;
+import org.hl7.fhir.r5.model.Person;
 import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
+import org.immregistries.iis.kernal.mapping.PatientHandler;
+import org.immregistries.iis.kernal.mapping.PersonHandler;
 import org.immregistries.iis.kernal.model.*;
+import org.immregistries.iis.kernal.repository.RepositoryClientFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 import java.util.List;
 
+@Component
 public class IncomingEventHandler extends IncomingMessageHandler {
+
+	private Logger logger = LoggerFactory.getLogger(IncomingEventHandler.class);
+
+	@Autowired
+	private RepositoryClientFactory repositoryClientFactory;
 
   private static final String ORG_LOCATION_FACILITY_CODE = "orgLocationFacilityCode";
   private static final String FUNDING_ELIGIBILITY = "fundingEligibility";
@@ -90,9 +108,9 @@ public class IncomingEventHandler extends IncomingMessageHandler {
           EXPIRATION_DATE, COMPLETION_STATUS, ACTION_CODE, REFUSAL_REASON_CODE, BODY_SITE,
           BODY_ROUTE, FUNDING_SOURCE, FUNDING_ELIGIBILITY, ORG_LOCATION_FACILITY_CODE};
 
-  public IncomingEventHandler(Session dataSession) {
-    super(dataSession);
-  }
+//  public IncomingEventHandler(Session dataSession) {
+//    super(dataSession);
+//  }
 
   public String process(HttpServletRequest req, OrgAccess orgAccess) {
     try {
@@ -126,6 +144,7 @@ public class IncomingEventHandler extends IncomingMessageHandler {
           "from VaccinationReported where patientReported = ? and vaccinationReportedExternalLink = ?");
       query.setParameter(0, patientReported);
       query.setParameter(1, vaccinationReportedExternalLink);
+
 
       @SuppressWarnings("unchecked")
       List<VaccinationReported> vaccinationReportedList = query.list();
@@ -248,8 +267,13 @@ public class IncomingEventHandler extends IncomingMessageHandler {
 
   public PatientReported processPatient(OrgAccess orgAccess, HttpServletRequest req,
       CodeMap codeMap) throws Exception {
+	 RequestDetails requestDetails = new ServletRequestDetails();
+	 requestDetails.setTenantId(orgAccess.getAccessName());
+	 IGenericClient fhirClient = repositoryClientFactory.newGenericClient(requestDetails);
+	 Patient patient;
+
     PatientReported patientReported = null;
-    PatientMaster patient = null;
+    PatientMaster patientMaster = null;
 
     String patientReportedExternalLink = req.getParameter(PATIENT_REPORTED_EXTERNAL_LINK);
     String patientReportedAuthority = req.getParameter(PATIENT_REPORTED_AUTHORITY);
@@ -258,29 +282,31 @@ public class IncomingEventHandler extends IncomingMessageHandler {
       throw new Exception("Patient external link must be indicated");
     }
 
+
     {
-      Query query = dataSession.createQuery(
-          "from PatientReported where orgReported = ? and patientReportedExternalLink = ?");
-      query.setParameter(0, orgAccess.getOrg());
-      query.setParameter(1, patientReportedExternalLink);
+		 patient = fhirClient.read().resource(Patient.class).withId(patientReportedExternalLink).execute();
+		 logger.info(String.valueOf(patient));
 
-      @SuppressWarnings("unchecked")
-      List<PatientReported> patientReportedList = query.list();
-
-      if (patientReportedList.size() > 0) {
-        patientReported = patientReportedList.get(0);
-        patient = patientReported.getPatient();
-      }
+		 Bundle bundle = fhirClient.search().forResource(Patient.class)
+			 .where(Patient.IDENTIFIER.exactly().identifier(patientReportedExternalLink)).returnBundle(Bundle.class).execute();
+		 logger.info(bundle.getEntryFirstRep().toString());
+		 if (bundle.hasEntry()) {
+			 patient = (Patient) bundle.getEntryFirstRep().getResource();
+			 logger.info("bundle has entry");
+			 patientReported = new PatientReported();
+			 PatientHandler.patientReportedFromFhir( patientReported, patient);
+			 patientMaster = patientReported.getPatient();
+		 }
     }
 
     if (patientReported == null) {
-      patient = new PatientMaster();
-      patient.setPatientExternalLink(generatePatientExternalLink());
-      patient.setOrgMaster(orgAccess.getOrg());
+      patientMaster = new PatientMaster();
+      patientMaster.setPatientExternalLink(generatePatientExternalLink());
+      patientMaster.setOrgMaster(orgAccess.getOrg());
       patientReported = new PatientReported();
       patientReported.setOrgReported(orgAccess.getOrg());
       patientReported.setPatientReportedExternalLink(patientReportedExternalLink);
-      patientReported.setPatient(patient);
+      patientReported.setPatient(patientMaster);
       patientReported.setReportedDate(new Date());
     }
 
@@ -319,14 +345,14 @@ public class IncomingEventHandler extends IncomingMessageHandler {
       throw new Exception(
           "Patient is indicated as being born in the future, unable to record patients who are not yet born");
     }
-    patient.setPatientAddressFrag(addressFrag);
-    patient.setPatientNameLast(patientNameLast);
-    patient.setPatientNameFirst(patientNameFirst);
-    patient.setPatientNameMiddle(patientNameMiddle);
-    patient.setPatientPhoneFrag(patientPhone);
-    patient.setPatientBirthDate(patientBirthDate);
-    patient.setPatientSoundexFirst(""); // TODO, later
-    patient.setPatientSoundexLast(""); // TODO, later
+    patientMaster.setPatientAddressFrag(addressFrag);
+    patientMaster.setPatientNameLast(patientNameLast);
+    patientMaster.setPatientNameFirst(patientNameFirst);
+    patientMaster.setPatientNameMiddle(patientNameMiddle);
+    patientMaster.setPatientPhoneFrag(patientPhone);
+    patientMaster.setPatientBirthDate(patientBirthDate);
+    patientMaster.setPatientSoundexFirst(""); // TODO, later
+    patientMaster.setPatientSoundexLast(""); // TODO, later
     patientReported.setPatientReportedExternalLink(patientReportedExternalLink);
     patientReported.setPatientReportedType(patientReportedType);
     patientReported.setPatientNameFirst(patientNameFirst);
@@ -372,10 +398,10 @@ public class IncomingEventHandler extends IncomingMessageHandler {
     patientReported.setGuardianRelationship(req.getParameter(GUARDIAN_RELATIONSHIP));
     patientReported.setUpdatedDate(new Date());
     {
-      Transaction transaction = dataSession.beginTransaction();
-      dataSession.saveOrUpdate(patient);
-      dataSession.saveOrUpdate(patientReported);
-      transaction.commit();
+		 Person person = PersonHandler.getPerson(patientReported);
+		 Patient patient1 = PatientHandler.patientReportedToFhir(patientReported);
+		 fhirClient.update().resource(person).withId(person.getId());
+		 fhirClient.update().resource(patient1).withId(patient1.getId());
     }
     return patientReported;
   }

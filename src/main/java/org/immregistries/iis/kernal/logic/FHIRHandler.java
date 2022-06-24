@@ -4,10 +4,11 @@ import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
-import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hl7.fhir.r5.model.Immunization;
 import org.hl7.fhir.r5.model.Patient;
+import org.immregistries.iis.kernal.mapping.ImmunizationHandler;
+import org.immregistries.iis.kernal.mapping.PatientHandler;
 import org.immregistries.iis.kernal.model.*;
 
 import java.util.Date;
@@ -17,9 +18,9 @@ import java.util.List;
 public class FHIRHandler extends IncomingMessageHandler {
 
 
-  public FHIRHandler(Session dataSession) {
-    super(dataSession);
-  }
+//  public FHIRHandler(Session dataSession) {
+//    super(dataSession);
+//  }
 
   public void processFhirEvent(OrgAccess orgAccess, Patient patient, Immunization immunization) throws HibernateException, InvalidRequestException {
     PatientReported patientReported = fhirEventPatientReported(orgAccess,patient,immunization);
