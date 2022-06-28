@@ -5,7 +5,7 @@ import java.io.Serializable;
 public class Person implements Serializable {
   private static final long serialVersionUID = 1L;
 	
-  private int personId = 0;
+  private String personId = "";
   private String personExternalLink = "";
   private OrgMaster orgMaster = null;
   private String nameLast = "";
@@ -24,11 +24,11 @@ public class Person implements Serializable {
     this.professionalSuffix = professionalSuffix;
   }
 
-  public int getPersonId() {
+  public String getPersonId() {
     return personId;
   }
 
-  public void setPersonId(int personId) {
+  public void setPersonId(String personId) {
     this.personId = personId;
   }
 

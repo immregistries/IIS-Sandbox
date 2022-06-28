@@ -28,8 +28,14 @@ public class LocationMapper {
 		return  location;
 	}
 
+	public static OrgLocation orgLocationFromFhir(Location l) {
+		OrgLocation orgLocation = new OrgLocation();
+		orgLocation.setOrgLocationId(Integer.parseInt(l.getId()));
+		fillOrgLocationFromFhir(orgLocation,l);
+		return orgLocation;
+	}
 
-	public static void orgLocationFromFhir(OrgLocation orgLocation, Location l) {
+	public static void fillOrgLocationFromFhir(OrgLocation orgLocation, Location l) {
     orgLocation.setOrgFacilityCode(l.getId());
     orgLocation.setOrgFacilityName(l.getName());
     orgLocation.setLocationType(l.getTypeFirstRep().getText());

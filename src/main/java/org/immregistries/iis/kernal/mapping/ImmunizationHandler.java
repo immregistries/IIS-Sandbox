@@ -7,32 +7,29 @@ import org.hl7.fhir.r5.model.*;
 import org.immregistries.iis.kernal.model.PatientReported;
 import org.immregistries.iis.kernal.model.VaccinationMaster;
 import org.immregistries.iis.kernal.model.VaccinationReported;
-import org.immregistries.iis.kernal.repository.RepositoryClientFactory;
 import org.immregistries.vaccination_deduplication.computation_classes.Deterministic;
 import org.immregistries.vaccination_deduplication.reference.ComparisonResult;
 import org.immregistries.vaccination_deduplication.reference.ImmunizationSource;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
-@Component
+
 public class ImmunizationHandler {
 
-	private static RepositoryClientFactory repositoryClientFactory;
 
-	@Autowired
-	public void setRepositoryClientFactory(RepositoryClientFactory repositoryClientFactory){
-		ImmunizationHandler.repositoryClientFactory = repositoryClientFactory;
+	public static VaccinationReported vaccinationReportedFromFhir(Immunization i) {
+		VaccinationReported vaccinationReported = new VaccinationReported();
+		vaccinationReported.setVaccinationReportedId(i.getId());
+		fillVaccinationReportedFromFhirImmunization(vaccinationReported,i);
+		VaccinationMaster vaccinationMaster = new VaccinationMaster();
+		vaccinationMaster.setVaccinationId(vaccinationReported.getVaccinationReportedId());
+		vaccinationReported.setVaccination(vaccinationMaster);
+		vaccinationMasterFromFhirImmunization(vaccinationMaster, i);
+		return vaccinationReported;
 	}
 
-  /**
-   * This method set the patientReported information based on the patient information
-   * @param patientReported the patientReported
-   * @param i the Immunization resource
-   */
   public static void patientReportedFromFhirImmunization(PatientReported patientReported,
       Immunization i) {
     if (i != null) {
@@ -47,7 +44,7 @@ public class ImmunizationHandler {
    * @param vaccinationReported the vaccinationReported
    * @param i the Immunization resource
    */
-  public static void vaccinationReportedFromFhirImmunization(
+  public static void fillVaccinationReportedFromFhirImmunization(
       VaccinationReported vaccinationReported,
 		Immunization i) {
     //vaccinationReported.setVaccinationReportedId(0);
@@ -71,8 +68,8 @@ public class ImmunizationHandler {
         break;
     }
 
-    //vaccinationReported.setActionCode();
-//    vaccinationReported.setRefusalReasonCode(i.getReasonCodeFirstRep().getText()); TODO R5
+//    vaccinationReported.setActionCode(); TODO
+    vaccinationReported.setRefusalReasonCode(i.getReasonFirstRep().getConcept().getText());
     vaccinationReported.setVaccineCvxCode(i.getVaccineCode().getCodingFirstRep().getCode());
   }
 

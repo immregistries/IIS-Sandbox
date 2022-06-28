@@ -10,7 +10,7 @@ public class PatientReported implements Serializable {
 
   private static final long serialVersionUID = 1L;
 	
-  private int patientReportedId = 0;
+  private String patientReportedId = "";
   private OrgMaster orgReported = null;
   private String patientReportedExternalLink = "";
   private PatientMaster patient = null;
@@ -329,11 +329,11 @@ public class PatientReported implements Serializable {
     this.orgReported = reportedOrg;
   }
 
-  public int getPatientReportedId() {
+  public String getPatientReportedId() {
     return patientReportedId;
   }
 
-  public void setPatientReportedId(int reportedPatientId) {
+  public void setPatientReportedId(String reportedPatientId) {
     this.patientReportedId = reportedPatientId;
   }
 

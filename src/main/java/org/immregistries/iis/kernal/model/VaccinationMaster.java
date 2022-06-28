@@ -9,7 +9,7 @@ import java.util.Date;
 public class VaccinationMaster implements Serializable {
   private static final long serialVersionUID = 1L;
 
-  private int vaccinationId = 0;
+  private String vaccinationId = "";
   private PatientMaster patient = null;
   private Date administeredDate = null;
   private String vaccineCvxCode = "";
@@ -23,11 +23,11 @@ public class VaccinationMaster implements Serializable {
     this.vaccinationReported = vaccinationReported;
   }
 
-  public int getVaccinationId() {
+  public String getVaccinationId() {
     return vaccinationId;
   }
 
-  public void setVaccinationId(int vaccinationId) {
+  public void setVaccinationId(String vaccinationId) {
     this.vaccinationId = vaccinationId;
   }
 

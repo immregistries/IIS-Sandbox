@@ -11,7 +11,7 @@ import java.util.Date;
 public class VaccinationReported implements Serializable {
   private static final long serialVersionUID = 1L;
 	
-  private int vaccinationReportedId = 0;
+  private String vaccinationReportedId = "";
   private PatientReported patientReported = null;
   private String vaccinationReportedExternalLink = "";
   private VaccinationMaster vaccination = null;
@@ -192,11 +192,11 @@ public class VaccinationReported implements Serializable {
     this.fundingEligibility = fundingEligibility;
   }
 
-  public int getVaccinationReportedId() {
+  public String getVaccinationReportedId() {
     return vaccinationReportedId;
   }
 
-  public void setVaccinationReportedId(int reportedVaccinationId) {
+  public void setVaccinationReportedId(String reportedVaccinationId) {
     this.vaccinationReportedId = reportedVaccinationId;
   }
 

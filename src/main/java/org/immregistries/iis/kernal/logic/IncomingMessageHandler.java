@@ -1,25 +1,19 @@
 package org.immregistries.iis.kernal.logic;
 
-import ca.uhn.fhir.jpa.rp.r5.PatientResourceProvider;
-import ca.uhn.fhir.rest.api.server.RequestDetails;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
-import ca.uhn.fhir.rest.server.servlet.ServletRequestDetails;
 import org.apache.commons.lang3.StringUtils;
 import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
 import org.hibernate.Query;
-import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hl7.fhir.r5.model.Bundle;
-import org.hl7.fhir.r5.model.IdType;
-import org.hl7.fhir.r5.model.Patient;
+import org.hl7.fhir.r5.model.*;
 import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodeStatusValue;
 import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.SoftwareVersion;
-import org.immregistries.iis.kernal.mapping.PatientHandler;
-import org.immregistries.iis.kernal.mapping.PersonHandler;
+import org.immregistries.iis.kernal.mapping.*;
 import org.immregistries.iis.kernal.model.*;
+import org.immregistries.iis.kernal.model.Person;
 import org.immregistries.iis.kernal.repository.RepositoryClientFactory;
 import org.immregistries.smm.tester.manager.HL7Reader;
 import org.immregistries.vfa.connect.ConnectFactory;
@@ -28,7 +22,6 @@ import org.immregistries.vfa.connect.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -63,14 +56,11 @@ public class IncomingMessageHandler {
   private static final String QUERY_APPLICATION_ERROR = "AE";
 
 
-  protected Session dataSession = null;
+//  protected Session dataSession = null;
 
 	public IncomingMessageHandler() {
 	}
 
-//  public IncomingMessageHandler(Session dataSession) {
-//    this.dataSession = dataSession;
-//  }
 
 
   public String process(String message, OrgAccess orgAccess) {
@@ -114,6 +104,7 @@ public class IncomingMessageHandler {
 
   @SuppressWarnings("unchecked")
   public String processQBP(OrgAccess orgAccess, HL7Reader reader, String messageReceived) {
+	 IGenericClient fhirClient = repositoryClientFactory.newGenericClient(orgAccess);
     PatientReported patientReported = null;
     List<PatientReported> patientReportedPossibleList = new ArrayList<>();
     List<ProcessingException> processingExceptionList = new ArrayList<>();
@@ -128,14 +119,20 @@ public class IncomingMessageHandler {
       String problem = null;
       int fieldPosition = 0;
       if (!mrn.equals("")) {
-        Query query = dataSession.createQuery(
-            "from PatientReported where orgReported = ? and patientReportedExternalLink = ?");
-        query.setParameter(0, orgAccess.getOrg());
-        query.setParameter(1, mrn);
-        List<PatientReported> patientReportedList = query.list();
-        if (!patientReportedList.isEmpty()) {
-          patientReported = patientReportedList.get(0);
-        }
+			try {
+				Bundle bundle = fhirClient.search().forResource(Patient.class)
+					.where(Patient.IDENTIFIER.exactly().identifier(mrn)).returnBundle(Bundle.class).execute();
+				Patient patient = (Patient) bundle.getEntryFirstRep().getResource();
+				patientReported = PatientHandler.patientReportedFromFhir(patient);
+			} catch (ResourceNotFoundException e) {}
+//        Query query = dataSession.createQuery(
+//            "from PatientReported where orgReported = ? and patientReportedExternalLink = ?");
+//        query.setParameter(0, orgAccess.getOrg());
+//        query.setParameter(1, mrn);
+//        List<PatientReported> patientReportedList = query.list();
+//        if (!patientReportedList.isEmpty()) {
+//          patientReported = patientReportedList.get(0);
+//        }
       }
       String patientNameLast = reader.getValue(4, 1);
       String patientNameFirst = reader.getValue(4, 2);
@@ -161,17 +158,15 @@ public class IncomingMessageHandler {
       } else {
 
         if (patientReported == null) {
-//          Query query = dataSession.createQuery( TODO FIX
-//              "from PatientReported where orgReported = :orgReported and Patient.patientBirthDate = :patientBirthDate "
-//                  + "and Patient.patientNameLast = :patientNameLast and Patient.patientNameFirst = :patientNameFirst ");
-//          query.setParameter("orgReported", orgAccess.getOrg());
-//          query.setParameter("patientBirthDate", patientBirthDate);
-//          query.setParameter("patientNameLast", patientNameLast);
-//          query.setParameter("patientNameFirst", patientNameFirst);
-//          List<PatientReported> patientReportedList = query.list();
-//          if (patientReportedList.size() > 0) {
-//            patientReported = patientReportedList.get(0);
-//          }
+			  try {
+				  Bundle bundle = fhirClient.search().forResource(Patient.class)
+					  .where(Patient.NAME.matches().value(patientNameFirst))
+					  .and(Patient.FAMILY.matches().value(patientNameLast))
+					  .and(Patient.BIRTHDATE.exactly().day(patientBirthDate))
+					  .returnBundle(Bundle.class).execute();
+				  Patient patient = (Patient) bundle.getEntryFirstRep().getResource();
+				  patientReported = PatientHandler.patientReportedFromFhir(patient);
+			  } catch (ResourceNotFoundException e) {}
         }
         if (patientReported != null) {
           int points = 0;
@@ -201,14 +196,17 @@ public class IncomingMessageHandler {
           }
         }
         if (patientReported == null) {
-//          Query query = dataSession.createQuery( TODO FIX
-//              "from PatientReported where orgReported = :orgReported and Patient.patientBirthDate = :patientBirthDate "
-//                  + "and (Patient.patientNameLast = :patientNameLast or Patient.patientNameFirst = :patientNameFirst) ");
-//          query.setParameter("orgReported", orgAccess.getOrg());
-//          query.setParameter("patientBirthDate", patientBirthDate);
-//          query.setParameter("patientNameLast", patientNameLast);
-//          query.setParameter("patientNameFirst", patientNameFirst);
-//          patientReportedPossibleList = query.list();
+			  try {
+				  Bundle bundle = fhirClient.search().forResource(Patient.class)
+					  .where(Patient.NAME.matches().values(patientNameFirst,patientNameLast))
+					  .and(Patient.BIRTHDATE.exactly().day(patientBirthDate))
+					  .returnBundle(Bundle.class).execute();
+				  Patient patient = (Patient) bundle.getEntryFirstRep().getResource();
+				  patientReported = new PatientReported();
+				  for (Bundle.BundleEntryComponent entry: bundle.getEntry()) {
+					  patientReportedPossibleList.add(PatientHandler.patientReportedFromFhir((Patient) entry.getResource()));
+				  }
+			  } catch (ResourceNotFoundException e) {}
         }
         if (patientReported != null
             && patientNameMiddle.equalsIgnoreCase(PATIENT_MIDDLE_NAME_MULTI)) {
@@ -255,13 +253,13 @@ public class IncomingMessageHandler {
     }
 
     return buildRSP(reader, messageReceived, patientReported, orgAccess,
-        patientReportedPossibleList, processingExceptionList);
+        patientReportedPossibleList, processingExceptionList, fhirClient);
   }
 
   @SuppressWarnings("unchecked")
   public String processVXU(OrgAccess orgAccess, HL7Reader reader, String message) {
-
-    List<ProcessingException> processingExceptionList = new ArrayList<>();
+	  IGenericClient fhirClient = repositoryClientFactory.newGenericClient(orgAccess);
+	  List<ProcessingException> processingExceptionList = new ArrayList<>();
     try {
       Set<ProcessingFlavor> processingFlavorSet = orgAccess.getOrg().getProcessingFlavorSet();
 
@@ -286,7 +284,7 @@ public class IncomingMessageHandler {
       while (reader.advanceToSegment("ORC")) {
         orcCount++;
         VaccinationReported vaccinationReported = null;
-        VaccinationMaster vaccination = null;
+        VaccinationMaster vaccinationMaster = null;
         String vaccineCode = "";
         Date administrationDate = null;
         String vaccinationReportedExternalLink = reader.getValue(3);
@@ -299,7 +297,7 @@ public class IncomingMessageHandler {
           }
           if (vaccineCode.equals("998")) {
             obxCount = readAndCreateObservations(reader, processingExceptionList, patientReported,
-                strictDate, obxCount, null, null);
+                strictDate, obxCount, null, null, fhirClient);
             continue;
           }
           if (vaccinationReportedExternalLink.equals("")) {
@@ -313,27 +311,25 @@ public class IncomingMessageHandler {
                 "Vaccination is indicated as occuring in the future, unable to accept future vaccination events",
                 "RXA", rxaCount, 3);
           }
-          {
-            Query query = dataSession.createQuery(
-                "from VaccinationReported where patientReported = ? and vaccinationReportedExternalLink = ?");
-            query.setParameter(0, patientReported);
-            query.setParameter(1, vaccinationReportedExternalLink);
-            List<VaccinationReported> vaccinationReportedList = query.list();
-            if (vaccinationReportedList.size() > 0) {
-              vaccinationReported = vaccinationReportedList.get(0);
-              vaccination = vaccinationReported.getVaccination();
-            }
-          }
+
+			  try {
+				  Bundle bundle = fhirClient.search().forResource(Immunization.class)
+					  .where(Immunization.IDENTIFIER.exactly().identifier(vaccinationReportedExternalLink)).returnBundle(Bundle.class).execute();
+				  logger.info(bundle.getEntryFirstRep().toString());
+				  Immunization immunization = (Immunization) bundle.getEntryFirstRep().getResource();
+				  vaccinationReported = ImmunizationHandler.vaccinationReportedFromFhir(immunization);
+				  vaccinationMaster = vaccinationReported.getVaccination();
+			  } catch (ResourceNotFoundException e) {}
           if (vaccinationReported == null) {
-            vaccination = new VaccinationMaster();
+            vaccinationMaster = new VaccinationMaster();
             vaccinationReported = new VaccinationReported();
-            vaccinationReported.setVaccination(vaccination);
-            vaccination.setVaccinationReported(null);
+            vaccinationReported.setVaccination(vaccinationMaster);
+            vaccinationMaster.setVaccinationReported(null);
             vaccinationReported.setReportedDate(new Date());
             vaccinationReported.setVaccinationReportedExternalLink(vaccinationReportedExternalLink);
           }
           vaccinationReported.setPatientReported(patientReported);
-          vaccination.setPatient(patientReported.getPatient());
+          vaccinationMaster.setPatient(patientReported.getPatient());
 
           String vaccineCvxCode = "";
           String vaccineNdcCode = "";
@@ -442,15 +438,22 @@ public class IncomingMessageHandler {
           {
             String administeredAtLocation = reader.getValue(11, 4);
             if (StringUtils.isNotEmpty(administeredAtLocation)) {
-              Query query = dataSession.createQuery(
-                  "from OrgLocation where orgMaster = :orgMaster and orgFacilityCode = :orgFacilityCode");
-              query.setParameter("orgMaster", orgAccess.getOrg());
-              query.setParameter("orgFacilityCode", administeredAtLocation);
-              List<OrgLocation> orgMasterList = query.list();
-              OrgLocation orgLocation = null;
-              if (orgMasterList.size() > 0) {
-                orgLocation = orgMasterList.get(0);
-              }
+					OrgLocation orgLocation = null;
+					try {
+						Bundle bundle = fhirClient.search().forResource(Location.class)
+							.where(Location.IDENTIFIER.exactly().identifier(administeredAtLocation)).returnBundle(Bundle.class).execute();
+						Location location = (Location) bundle.getEntryFirstRep().getResource();
+						orgLocation = LocationMapper.orgLocationFromFhir(location);
+					} catch (ResourceNotFoundException e) {}
+//              Query query = dataSession.createQuery(
+//                  "from OrgLocation where orgMaster = :orgMaster and orgFacilityCode = :orgFacilityCode");
+//              query.setParameter("orgMaster", orgAccess.getOrg());
+//              query.setParameter("orgFacilityCode", administeredAtLocation);
+//              List<OrgLocation> orgMasterList = query.list();
+//              OrgLocation orgLocation = null;
+//              if (orgMasterList.size() > 0) {
+//                orgLocation = orgMasterList.get(0);
+//              }
 
               if (orgLocation == null) {
                 if (processingFlavorSet.contains(ProcessingFlavor.PEAR)) {
@@ -469,9 +472,11 @@ public class IncomingMessageHandler {
                 orgLocation.setAddressState(reader.getValue(11, 12));
                 orgLocation.setAddressZip(reader.getValue(11, 13));
                 orgLocation.setAddressCountry(reader.getValue(11, 14));
-                Transaction transaction = dataSession.beginTransaction();
-                dataSession.save(orgLocation);
-                transaction.commit();
+					 Location location = LocationMapper.fhirLocation(orgLocation);
+					 fhirClient.update().resource(location).withId(location.getId()).execute();
+//                Transaction transaction = dataSession.beginTransaction();
+//                dataSession.save(orgLocation);
+//                transaction.commit();
               }
               vaccinationReported.setOrgLocation(orgLocation);
             }
@@ -481,14 +486,21 @@ public class IncomingMessageHandler {
             if (StringUtils.isNotEmpty(admininsteringProvider)) {
               Person person = null;
               {
-                Query query = dataSession.createQuery(
-                    "from Person where orgMaster = :orgMaster and personExternalLink = :personExternalLink");
-                query.setParameter("orgMaster", orgAccess.getOrg());
-                query.setParameter("personExternalLink", admininsteringProvider);
-                List<Person> personList = query.list();
-                if (personList.size() > 0) {
-                  person = personList.get(0);
-                }
+					  try {
+						  Bundle bundle = fhirClient.search().forResource(org.hl7.fhir.r5.model.Person.class)
+							  .where(org.hl7.fhir.r5.model.Person.IDENTIFIER.exactly().identifier(admininsteringProvider))
+							  .returnBundle(Bundle.class).execute();
+						  org.hl7.fhir.r5.model.Person fhirPerson = (org.hl7.fhir.r5.model.Person) bundle.getEntryFirstRep().getResource();
+						  person = PersonHandler.getModelPerson(fhirPerson);
+					  } catch (ResourceNotFoundException e) {}
+//					  Query query = dataSession.createQuery(
+//                    "from Person where orgMaster = :orgMaster and personExternalLink = :personExternalLink");
+//                query.setParameter("orgMaster", orgAccess.getOrg());
+//                query.setParameter("personExternalLink", admininsteringProvider);
+//                List<Person> personList = query.list();
+//                if (personList.size() > 0) {
+//                  person = personList.get(0);
+//                }
               }
               if (person == null) {
                 person = new Person();
@@ -501,16 +513,18 @@ public class IncomingMessageHandler {
                 person.setNameTypeCode(reader.getValue(10, 10));
                 person.setIdentifierTypeCode(reader.getValue(10, 13));
                 person.setProfessionalSuffix(reader.getValue(10, 21));
-                Transaction transaction = dataSession.beginTransaction();
-                dataSession.save(person);
-                transaction.commit();
+					  org.hl7.fhir.r5.model.Person  p = PersonHandler.getPerson(person);
+					  fhirClient.create().resource(p).execute();
+//                Transaction transaction = dataSession.beginTransaction();
+//                dataSession.save(person);
+//                transaction.commit();
               }
               vaccinationReported.setAdministeringProvider(person);
             }
 
           }
-          vaccination.setVaccineCvxCode(vaccineCvxCode);
-          vaccination.setAdministeredDate(administrationDate);
+          vaccinationMaster.setVaccineCvxCode(vaccineCvxCode);
+          vaccinationMaster.setAdministeredDate(administrationDate);
           vaccinationReported.setUpdatedDate(new Date());
           vaccinationReported.setAdministeredDate(administrationDate);
           vaccinationReported.setVaccineCvxCode(vaccineCvxCode);
@@ -605,17 +619,19 @@ public class IncomingMessageHandler {
           verifyNoErrors(processingExceptionList);
           reader.gotoSegmentPosition(segmentPosition);
           {
-            Transaction transaction = dataSession.beginTransaction();
-            dataSession.saveOrUpdate(vaccination);
-            dataSession.saveOrUpdate(vaccinationReported);
-            vaccination.setVaccinationReported(vaccinationReported);
-            dataSession.saveOrUpdate(vaccination);
-            transaction.commit();
+				 fhirClient.update().resource(ImmunizationHandler.getImmunization(null,vaccinationReported)).execute();
+
+//            Transaction transaction = dataSession.beginTransaction();
+//            dataSession.saveOrUpdate(vaccinationMaster);
+//            dataSession.saveOrUpdate(vaccinationReported);
+//            vaccinationMaster.setVaccinationReported(vaccinationReported);
+//            dataSession.saveOrUpdate(vaccinationMaster);
+//            transaction.commit();
           }
 
           reader.gotoSegmentPosition(segmentPosition);
           obxCount = readAndCreateObservations(reader, processingExceptionList, patientReported,
-              strictDate, obxCount, vaccinationReported, vaccination);
+              strictDate, obxCount, vaccinationReported, vaccinationMaster, fhirClient);
         } else {
           throw new ProcessingException("RXA segment was not found after ORC segment", "ORC",
               orcCount, 0);
@@ -651,11 +667,7 @@ public class IncomingMessageHandler {
       List<ProcessingException> processingExceptionList, Set<ProcessingFlavor> processingFlavorSet,
       CodeMap codeMap, boolean strictDate, PatientReported patientReported)
       throws ProcessingException {
-
-
-	  RequestDetails requestDetails = new ServletRequestDetails();
-	  requestDetails.setTenantId(orgAccess.getAccessName());
-	  IGenericClient fhirClient = repositoryClientFactory.newGenericClient(requestDetails);
+	  IGenericClient fhirClient = repositoryClientFactory.newGenericClient(orgAccess);
 	  Patient patient;
 
     PatientMaster patientMaster = null;
@@ -689,7 +701,6 @@ public class IncomingMessageHandler {
           "No PID segment found, required for accepting vaccination report", "", 0, 0);
     }
 
-		// Example of Jpa access
 	  try {
 		  Bundle bundle = fhirClient.search().forResource(Patient.class)
 			  .where(Patient.IDENTIFIER.exactly().identifier(patientReportedExternalLink)).returnBundle(Bundle.class).execute();
@@ -697,11 +708,9 @@ public class IncomingMessageHandler {
 		  patient = (Patient) bundle.getEntryFirstRep().getResource();
 		  logger.info("bundle has entry");
 		  patientReported = new PatientReported();
-		  PatientHandler.patientReportedFromFhir( patientReported, patient);
+		  PatientHandler.fillPatientReportedFromFhir( patientReported, patient);
 		  patientMaster = patientReported.getPatient();
-	  } catch (ResourceNotFoundException e) {
-
-	  }
+	  } catch (ResourceNotFoundException e) {}
 
     if (patientReported == null) {
       patientMaster = new PatientMaster();
@@ -1018,7 +1027,7 @@ public class IncomingMessageHandler {
 
     patientReported.setUpdatedDate(new Date());
     {
-		 org.hl7.fhir.r5.model.Person person = PersonHandler.getPerson(patientReported);
+		 org.hl7.fhir.r5.model.Person person = PersonHandler.getFhirPerson(patientReported);
 		 Patient patient1 = PatientHandler.patientReportedToFhir(patientReported);
 		 fhirClient.update().resource(person).withId(person.getId());
 		 fhirClient.update().resource(patient1).withId(patient1.getId());
@@ -1027,6 +1036,7 @@ public class IncomingMessageHandler {
   }
 
   public String processORU(OrgAccess orgAccess, HL7Reader reader, String message) {
+		IGenericClient fhirClient = repositoryClientFactory.newGenericClient(orgAccess);
     List<ProcessingException> processingExceptionList = new ArrayList<>();
     try {
       Set<ProcessingFlavor> processingFlavorSet = orgAccess.getOrg().getProcessingFlavorSet();
@@ -1048,7 +1058,7 @@ public class IncomingMessageHandler {
         orcCount++;
         if (reader.advanceToSegment("OBR", "ORC")) {
           obxCount = readAndCreateObservations(reader, processingExceptionList, patientReported,
-              strictDate, obxCount, null, null);
+              strictDate, obxCount, null, null, fhirClient);
         } else {
           throw new ProcessingException("OBR segment was not found after ORC segment", "ORC",
               orcCount, 0);
@@ -1070,34 +1080,34 @@ public class IncomingMessageHandler {
   public int readAndCreateObservations(HL7Reader reader,
       List<ProcessingException> processingExceptionList, PatientReported patientReported,
       boolean strictDate, int obxCount, VaccinationReported vaccinationReported,
-      VaccinationMaster vaccination) {
+      VaccinationMaster vaccination, IGenericClient fhirClient) {
     while (reader.advanceToSegment("OBX", "ORC")) {
       obxCount++;
       String identifierCode = reader.getValue(3);
       String valueCode = reader.getValue(5);
-      ObservationMaster observation =
+      ObservationMaster observationMaster =
           readObservations(reader, processingExceptionList, patientReported, strictDate, obxCount,
-              vaccinationReported, vaccination, identifierCode, valueCode);
-      if (observation.getIdentifierCode().equals("30945-0")) // contraindication!
+              vaccinationReported, vaccination, identifierCode, valueCode, fhirClient);
+      if (observationMaster.getIdentifierCode().equals("30945-0")) // contraindication!
       {
         CodeMap codeMap = CodeMapManager.getCodeMap();
         Code contraCode = codeMap.getCodeForCodeset(CodesetType.CONTRAINDICATION_OR_PRECAUTION,
-            observation.getValueCode());
+            observationMaster.getValueCode());
         if (contraCode == null) {
           ProcessingException pe = new ProcessingException(
               "Unrecognized contraindication or precaution", "OBX", obxCount, 5);
           pe.setWarning();
           processingExceptionList.add(pe);
         }
-        if (observation.getObservationReported().getObservationDate() != null) {
+        if (observationMaster.getObservationReported().getObservationDate() != null) {
           Date today = new Date();
-          if (observation.getObservationReported().getObservationDate().after(today)) {
+          if (observationMaster.getObservationReported().getObservationDate().after(today)) {
             ProcessingException pe = new ProcessingException(
                 "Contraindication or precaution observed in the future", "OBX", obxCount, 5);
             pe.setWarning();
             processingExceptionList.add(pe);
           }
-          if (patientReported.getPatientBirthDate() != null && observation.getObservationReported()
+          if (patientReported.getPatientBirthDate() != null && observationMaster.getObservationReported()
               .getObservationDate().before(patientReported.getPatientBirthDate())) {
             ProcessingException pe = new ProcessingException(
                 "Contraindication or precaution observed before patient was born", "OBX", obxCount,
@@ -1108,14 +1118,16 @@ public class IncomingMessageHandler {
         }
       }
       {
-        ObservationReported observationReported = observation.getObservationReported();
-        observation.setObservationReported(null);
-        Transaction transaction = dataSession.beginTransaction();
-        dataSession.saveOrUpdate(observation);
-        dataSession.saveOrUpdate(observationReported);
-        observation.setObservationReported(observationReported);
-        dataSession.saveOrUpdate(observation);
-        transaction.commit();
+        ObservationReported observationReported = observationMaster.getObservationReported();
+        observationMaster.setObservationReported(null);
+		  Observation observation = ObservationMapper.getFhirObservation(observationMaster,observationReported);
+			fhirClient.update().resource(observation).execute();
+//			Transaction transaction = dataSession.beginTransaction();
+//        dataSession.saveOrUpdate(observationMaster);
+//        dataSession.saveOrUpdate(observationReported);
+//        observationMaster.setObservationReported(observationReported);
+//        dataSession.saveOrUpdate(observationMaster);
+//        transaction.commit();
       }
     }
     return obxCount;
@@ -1125,40 +1137,58 @@ public class IncomingMessageHandler {
   public ObservationMaster readObservations(HL7Reader reader,
       List<ProcessingException> processingExceptionList, PatientReported patientReported,
       boolean strictDate, int obxCount, VaccinationReported vaccinationReported,
-      VaccinationMaster vaccination, String identifierCode, String valueCode) {
-    ObservationMaster observation;
-    String q;
-    if (vaccination == null) {
-      q = "from ObservationMaster where " + "patient = :patient and vaccination is null "
-          + "and identifierCode = :identifierCode";
-    } else {
-      q = "from ObservationMaster where " + "patient = :patient and vaccination = :vaccination "
-          + "and identifierCode = :identifierCode";
-    }
-    Query query = dataSession.createQuery(q);
-    query.setParameter("patient", patientReported.getPatient());
-    if (vaccination != null) {
-      query.setParameter("vaccination", vaccination);
-    }
-    query.setParameter("identifierCode", identifierCode);
-    List<ObservationMaster> l = query.list();
-    ObservationReported observationReported;
-    if (l.size() > 0) {
-      observation = l.get(0);
-      observationReported = observation.getObservationReported();
-    } else {
-      observation = new ObservationMaster();
-      observation.setPatient(patientReported.getPatient());
-      observation.setVaccination(vaccination);
-      observation.setIdentifierCode(identifierCode);
+      VaccinationMaster vaccination, String identifierCode, String valueCode, IGenericClient fhirClient) {
+    ObservationMaster observationMaster = null;
+	 ObservationReported observationReported = null;
+
+	  try {
+		  Bundle bundle;
+		  if (vaccination == null) {
+			  bundle = fhirClient.search().forResource(Observation.class)
+//				  .where(!Observation.PART_OF.has)) TODO where null
+				  .returnBundle(Bundle.class).execute();
+		  } else {
+			  bundle = fhirClient.search().forResource(Observation.class)
+				  .where(Observation.PART_OF.hasId(vaccination.getVaccinationId()))
+				  .returnBundle(Bundle.class).execute();
+		  }
+		  Observation observation = (Observation) bundle.getEntryFirstRep().getResource();
+		  observationMaster = ObservationMapper.getObservationMaster(observation);
+		  observationReported = observationMaster.getObservationReported();
+	  } catch (ResourceNotFoundException e) {}
+
+//	  String q;
+//    if (vaccination == null) {
+//      q = "from ObservationMaster where " + "patient = :patient and vaccination is null "
+//          + "and identifierCode = :identifierCode";
+//    } else {
+//      q = "from ObservationMaster where " + "patient = :patient and vaccination = :vaccination "
+//          + "and identifierCode = :identifierCode";
+//    }
+//    Query query = dataSession.createQuery(q);
+//    query.setParameter("patient", patientReported.getPatient());
+//    if (vaccination != null) {
+//      query.setParameter("vaccination", vaccination);
+//    }
+//    query.setParameter("identifierCode", identifierCode);
+//    List<ObservationMaster> l = query.list();
+//    if (l.size() > 0) {
+//      observationMaster = l.get(0);
+//      observationReported = observationMaster.getObservationReported();
+//    } else
+    if (observationMaster == null) {
+      observationMaster = new ObservationMaster();
+      observationMaster.setPatient(patientReported.getPatient());
+      observationMaster.setVaccination(vaccination);
+      observationMaster.setIdentifierCode(identifierCode);
       observationReported = new ObservationReported();
-      observation.setObservationReported(observationReported);
+      observationMaster.setObservationReported(observationReported);
       observationReported.setReportedDate(new Date());
     }
-    observation.setValueCode(valueCode);
+    observationMaster.setValueCode(valueCode);
     observationReported.setPatientReported(patientReported);
     observationReported.setVaccinationReported(vaccinationReported);
-    observationReported.setObservation(observation);
+    observationReported.setObservation(observationMaster);
     observationReported.setUpdatedDate(new Date());
     observationReported.setIdentifierCode(identifierCode);
     observationReported.setValueType(reader.getValue(2));
@@ -1177,7 +1207,7 @@ public class IncomingMessageHandler {
     observationReported.setMethodCode(reader.getValue(17, 1));
     observationReported.setMethodLabel(reader.getValue(17, 2));
     observationReported.setMethodTable(reader.getValue(17, 3));
-    return observation;
+    return observationMaster;
   }
 
   public void verifyNoErrors(List<ProcessingException> processingExceptionList)
@@ -1209,15 +1239,16 @@ public class IncomingMessageHandler {
     messageReceived.setReportedDate(new Date());
     messageReceived.setCategoryRequest(categoryRequest);
     messageReceived.setCategoryResponse(categoryResponse);
-    Transaction transaction = dataSession.beginTransaction();
-    dataSession.save(messageReceived);
-    transaction.commit();
+	 // TODO interact with internal logs and metadata
+//    Transaction transaction = dataSession.beginTransaction();
+//    dataSession.save(messageReceived);
+//    transaction.commit();
   }
 
   @SuppressWarnings("unchecked")
   public String buildRSP(HL7Reader reader, String messageRecieved, PatientReported patientReported,
       OrgAccess orgAccess, List<PatientReported> patientReportedPossibleList,
-      List<ProcessingException> processingExceptionList) {
+      List<ProcessingException> processingExceptionList, IGenericClient fhirClient) {
     reader.resetPostion();
     reader.advanceToSegment("MSH");
 
@@ -1336,14 +1367,16 @@ public class IncomingMessageHandler {
         printQueryPID(pr, processingFlavorSet, sb, patient, sdf, count);
       }
     } else if (profileId.equals(RSP_Z32_MATCH) || profileId.equals(RSP_Z42_MATCH_WITH_FORECAST)) {
-      PatientMaster patient = patientReported.getPatient();
+      PatientMaster patientMaster = patientReported.getPatient();
       SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-      printQueryPID(patientReported, processingFlavorSet, sb, patient, sdf, 1);
+      printQueryPID(patientReported, processingFlavorSet, sb, patientMaster, sdf, 1);
       if (profileId.equals(RSP_Z32_MATCH)) {
         printQueryNK1(patientReported, sb, codeMap);
       }
-      List<VaccinationMaster> vaccinationMasterList =
-          getVaccinationMasterList(patient, dataSession);
+//      List<VaccinationMaster> vaccinationMasterList =
+//          getVaccinationMasterList(patient, dataSession);
+		List<VaccinationMaster> vaccinationMasterList =
+          getVaccinationMasterList(patientMaster, fhirClient);
 
       if (processingFlavorSet.contains(ProcessingFlavor.LEMON)) {
         for (Iterator<VaccinationMaster> it = vaccinationMasterList.iterator(); it.hasNext();) {
@@ -1354,17 +1387,12 @@ public class IncomingMessageHandler {
         }
       }
       if (processingFlavorSet.contains(ProcessingFlavor.GREEN)) {
-        for (Iterator<VaccinationMaster> it = vaccinationMasterList.iterator(); it.hasNext();) {
-          VaccinationMaster vaccinationMaster = it.next();
-          if (vaccinationMaster.getVaccineCvxCode().equals("91")) {
-            it.remove();
-          }
-        }
+			vaccinationMasterList.removeIf(vaccinationMaster -> vaccinationMaster.getVaccineCvxCode().equals("91"));
       }
       List<ForecastActual> forecastActualList = null;
       if (sendBackForecast) {
         forecastActualList =
-            doForecast(patient, patientReported, codeMap, vaccinationMasterList, orgAccess);
+            doForecast(patientMaster, patientReported, codeMap, vaccinationMasterList, orgAccess);
       }
       int obxSetId = 0;
       int obsSubId = 0;
@@ -1524,35 +1552,66 @@ public class IncomingMessageHandler {
             }
           }
         }
-        {
-          Query query = dataSession.createQuery(
-              "from ObservationMaster where patient = :patient and vaccination = :vaccination");
-          query.setParameter("patient", patient);
-          query.setParameter("vaccination", vaccination);
-          List<ObservationMaster> observationList = query.list();
-          if (observationList.size() > 0) {
-            obsSubId++;
-            for (ObservationMaster observation : observationList) {
-              obxSetId++;
-              printObx(sb, obxSetId, obsSubId, observation);
-            }
-          }
-        }
+			try {
+				Bundle bundle = fhirClient.search().forResource(Observation.class)
+					.where(Observation.PART_OF.hasId(patientMaster.getPatientId()))
+					.and(Observation.PART_OF.hasId(vaccination.getVaccinationId()))
+					.returnBundle(Bundle.class).execute();
+				if (bundle.hasEntry()) {
+					obsSubId++;
+					for (Bundle.BundleEntryComponent entry : bundle.getEntry()) {
+						ObservationMaster observationMaster =
+							ObservationMapper.getObservationMaster((Observation) entry.getResource());
+						obxSetId++;
+						printObx(sb, obxSetId, obsSubId, observationMaster);
+					}
+				}
+			} catch (ResourceNotFoundException e) {}
+//        {
+//          Query query = dataSession.createQuery(
+//              "from ObservationMaster where patient = :patient and vaccination = :vaccination");
+//          query.setParameter("patient", patientMaster);
+//          query.setParameter("vaccination", vaccination);
+//          List<ObservationMaster> observationList = query.list();
+//          if (observationList.size() > 0) {
+//            obsSubId++;
+//            for (ObservationMaster observation : observationList) {
+//              obxSetId++;
+//              printObx(sb, obxSetId, obsSubId, observation);
+//            }
+//          }
+//        }
       }
-      {
-        Query query = dataSession
-            .createQuery("from ObservationMaster where patient = :patient and vaccination is null");
-        query.setParameter("patient", patient);
-        List<ObservationMaster> observationList = query.list();
-        if (observationList.size() > 0) {
-          printORC(orgAccess, sb, null, null, false);
-          obsSubId++;
-          for (ObservationMaster observation : observationList) {
-            obxSetId++;
-            printObx(sb, obxSetId, obsSubId, observation);
-          }
-        }
-      }
+		 try {
+			 Bundle bundle = fhirClient.search().forResource(Observation.class)
+					 .where(Observation.PART_OF.hasId(patientMaster.getPatientId()))
+					 .returnBundle(Bundle.class).execute();
+
+			 if (bundle.hasEntry()) {
+				 printORC(orgAccess, sb, null, null, false);
+				 obsSubId++;
+				 for (Bundle.BundleEntryComponent entry : bundle.getEntry()) {
+					 obxSetId++;
+					 ObservationMaster observationMaster =
+						 ObservationMapper.getObservationMaster((Observation) entry.getResource());
+					 printObx(sb, obxSetId, obsSubId, observationMaster);
+				 }
+			 }
+		 } catch (ResourceNotFoundException e) {}
+//      {
+//        Query query = dataSession
+//            .createQuery("from ObservationMaster where patient = :patient and vaccination is null");
+//        query.setParameter("patient", patient);
+//        List<ObservationMaster> observationList = query.list();
+//        if (observationList.size() > 0) {
+//          printORC(orgAccess, sb, null, null, false);
+//          obsSubId++;
+//          for (ObservationMaster observation : observationList) {
+//            obxSetId++;
+//            printObx(sb, obxSetId, obsSubId, observation);
+//          }
+//        }
+//      }
 
       if (sendBackForecast && forecastActualList != null && forecastActualList.size() > 0) {
         printORC(orgAccess, sb, null, null, false);
@@ -1651,16 +1710,17 @@ public class IncomingMessageHandler {
   }
 
   public String buildVxu(VaccinationReported vaccinationReported, OrgAccess orgAccess) {
+		IGenericClient fhirClient = repositoryClientFactory.newGenericClient(orgAccess);
     StringBuilder sb = new StringBuilder();
     CodeMap codeMap = CodeMapManager.getCodeMap();
     Set<ProcessingFlavor> processingFlavorSet = orgAccess.getOrg().getProcessingFlavorSet();
     PatientReported patientReported = vaccinationReported.getPatientReported();
-    PatientMaster patient = patientReported.getPatient();
+    PatientMaster patientMaster = patientReported.getPatient();
     SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
     HL7Reader reader = new HL7Reader(
         "MSH|^~\\&|||AIRA|IIS Sandbox|20120701082240-0500||VXU^V04^VXU_V04|NIST-IZ-001.00|P|2.5.1|||ER|AL|||||Z22^CDCPHINVS\r");
     createMSH("VXU^V04^VXU_V04", "Z22", reader, sb, processingFlavorSet);
-    printQueryPID(patientReported, processingFlavorSet, sb, patient, sdf, 1);
+    printQueryPID(patientReported, processingFlavorSet, sb, patientMaster, sdf, 1);
     printQueryNK1(patientReported, sb, codeMap);
 
     int obxSetId = 0;
@@ -1819,46 +1879,83 @@ public class IncomingMessageHandler {
             }
           }
         }
-        {
-          Query query = dataSession.createQuery(
-              "from ObservationMaster where patient = :patient and vaccination = :vaccination");
-          query.setParameter("patient", patient);
-          query.setParameter("vaccination", vaccination);
-          List<ObservationMaster> observationList = query.list();
-          if (observationList.size() > 0) {
-            obsSubId++;
-            for (ObservationMaster observation : observationList) {
-              obxSetId++;
-              printObx(sb, obxSetId, obsSubId, observation);
-            }
-          }
-        }
+
+			try {
+				Bundle bundle = fhirClient.search().forResource(Observation.class)
+					.where(Observation.PART_OF.hasId(patientMaster.getPatientId()))
+					.and(Observation.PART_OF.hasId(vaccination.getVaccinationId()))
+					.returnBundle(Bundle.class).execute();
+				if (bundle.hasEntry()) {
+					obsSubId++;
+					for (Bundle.BundleEntryComponent entry : bundle.getEntry()) {
+						ObservationMaster observationMaster =
+							ObservationMapper.getObservationMaster((Observation) entry.getResource());
+						obxSetId++;
+						printObx(sb, obxSetId, obsSubId, observationMaster);
+					}
+				}
+			} catch (ResourceNotFoundException e) {}
+//			{
+//          Query query = dataSession.createQuery(
+//              "from ObservationMaster where patient = :patient and vaccination = :vaccination");
+//          query.setParameter("patient", patient);
+//          query.setParameter("vaccination", vaccination);
+//          List<ObservationMaster> observationList = query.list();
+//          if (observationList.size() > 0) {
+//            obsSubId++;
+//            for (ObservationMaster observation : observationList) {
+//              obxSetId++;
+//              printObx(sb, obxSetId, obsSubId, observation);
+//            }
+//          }
+//        }
       }
     }
     return sb.toString();
   }
 
   public static List<VaccinationMaster> getVaccinationMasterList(PatientMaster patient,
-      Session dataSession) {
-    SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+																					  IGenericClient fhirClient) {
+
+	  SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
     List<VaccinationMaster> vaccinationMasterList;
     {
-      vaccinationMasterList = new ArrayList<>();
-      Query query = dataSession
-          .createQuery("from VaccinationMaster where patient = ? order by vaccinationReported asc");
-      query.setParameter(0, patient);
-      @SuppressWarnings("unchecked")
-      List<VaccinationMaster> vmList = query.list();
-      Map<String, VaccinationMaster> map = new HashMap<>();
-      for (VaccinationMaster vaccinationMaster : vmList) {
-        if (vaccinationMaster.getAdministeredDate() != null) {
-          String key = sdf.format(vaccinationMaster.getAdministeredDate());
-          if (!vaccinationMaster.getVaccineCvxCode().equals("")) {
-            key += key + vaccinationMaster.getVaccineCvxCode();
-            map.put(key, vaccinationMaster);
-          }
-        }
-      }
+       vaccinationMasterList = new ArrayList<>();
+		 Map<String, VaccinationMaster> map = new HashMap<>();
+		 try {
+			 Bundle bundle = fhirClient.search().forResource(Immunization.class)
+				 .where(Immunization.PATIENT.hasId(patient.getPatientId()))
+				 .sort().ascending(Immunization.IDENTIFIER)
+				 .returnBundle(Bundle.class).execute();
+			 for (Bundle.BundleEntryComponent entry : bundle.getEntry()) {
+				 Immunization immunization = (Immunization) entry.getResource();
+				 if (immunization.getOccurrenceDateTimeType() != null) {
+					 String key = sdf.format(immunization.getOccurrenceDateTimeType());
+					 if (!immunization.getVaccineCode().getText().equals("")) {
+						 key += key + immunization.getVaccineCode().getText();
+						 VaccinationMaster vaccinationMaster = new VaccinationMaster();
+						 ImmunizationHandler.vaccinationMasterFromFhirImmunization(vaccinationMaster, immunization);
+						 map.put(key, vaccinationMaster);
+					 }
+				 }
+			 }
+		 } catch (ResourceNotFoundException e) {}
+
+//      Query query = dataSession
+//          .createQuery("from VaccinationMaster where patient = ? order by vaccinationReported asc");
+//      query.setParameter(0, patient);
+//      @SuppressWarnings("unchecked")
+//      List<VaccinationMaster> vmList = query.list();
+//      Map<String, VaccinationMaster> map = new HashMap<>();
+//      for (VaccinationMaster vaccinationMaster : vmList) {
+//        if (vaccinationMaster.getAdministeredDate() != null) {
+//          String key = sdf.format(vaccinationMaster.getAdministeredDate());
+//          if (!vaccinationMaster.getVaccineCvxCode().equals("")) {
+//            key += key + vaccinationMaster.getVaccineCvxCode();
+//            map.put(key, vaccinationMaster);
+//          }
+//        }
+//      }
       List<String> keyList = new ArrayList<>(map.keySet());
       Collections.sort(keyList);
       for (String key : keyList) {
@@ -2502,12 +2599,21 @@ public class IncomingMessageHandler {
         throw new RuntimeException("Unable to get a new id, tried 1000 times!");
       }
       String patientExternalLink = generateId();
-      Query query = dataSession.createQuery("from PatientMaster where patientExternalLink = ?");
-      query.setParameter(0, patientExternalLink);
-      if (query.list().size() == 0) {
-        return patientExternalLink;
-        // we found a unique id!
-      }
+		 try {
+			 Bundle bundle = fhirClient.search().forResource(Patient.class)
+				 .where(Patient.IDENTIFIER.exactly().identifier(patientExternalLink)).returnBundle(Bundle.class).execute();
+			 Patient patient = (Patient) bundle.getEntryFirstRep().getResource();
+		 } catch (ResourceNotFoundException e) {
+			 // TODO check if it works, if no resources found
+			 return patientExternalLink;
+			 // we found a unique id!
+		 }
+//      Query query = dataSession.createQuery("from PatientMaster where patientExternalLink = ?");
+//      query.setParameter(0, patientExternalLink);
+//      if (query.list().size() == 0) {
+//        return patientExternalLink;
+//        // we found a unique id!
+//      }
     }
     return null;
   }

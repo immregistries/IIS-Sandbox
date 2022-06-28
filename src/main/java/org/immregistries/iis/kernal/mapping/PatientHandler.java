@@ -15,16 +15,21 @@ public class PatientHandler {
 
   private PatientHandler(){}
 
+	public static PatientReported patientReportedFromFhir(Patient p) {
+	  PatientReported patientReported = new PatientReported();
+	  patientReported.setPatientReportedId(p.getId());
+	  fillPatientReportedFromFhir(patientReported,p);
+	  PersonHandler.getPatientMasterFromFhir(patientReported.getPatient(), p);
+	  return patientReported;
+	}
 
   /**
    * This method set the patientReported information based on the patient information
    * @param patientReported the patientReported
    * @param p the Patient resource
    */
-  public static void patientReportedFromFhir(PatientReported patientReported, Patient p) {
-     patientReported.setPatientReportedId(Integer.parseInt(p.getIdentifierFirstRep().getValue())); // TODO set patient Master
-//	  patientReported.setPatient();
-    // patientReported.setPatientReportedType(p.get);
+  public static void fillPatientReportedFromFhir(PatientReported patientReported, Patient p) {
+     patientReported.setPatientReportedId(p.getIdentifierFirstRep().getValue()); // TODO set patient Master
     patientReported.setReportedDate(new Date());
     patientReported.setPatientReportedExternalLink(p.getIdentifier().get(0).getValue());
 
@@ -39,8 +44,7 @@ public class PatientHandler {
     }
 
     patientReported.setPatientBirthDate(p.getBirthDate());
-    patientReported.setPatientSex(String.valueOf(p.getGender().toString().charAt(0))); // Get the first char of MALE
-    // or FEMALE -> "M" or "F"
+    patientReported.setPatientSex(String.valueOf(p.getGender().toString().charAt(0)));
 
 	  switch (p.getGender()) {
 		  case MALE:
@@ -79,10 +83,13 @@ public class PatientHandler {
       }
     }
 
-    // patientReported.setPatientBirthFlag(p.getBirthDate().toString());
+//     patientReported.setPatientBirthFlag(p.getBirthDate().toString());
     if (null != p.getMultipleBirth()) {
+		patientReported.setPatientBirthFlag("Y");
       patientReported.setPatientBirthOrder(String.valueOf(p.getMultipleBirthIntegerType()));
-    }
+    } else  {
+		 patientReported.setPatientBirthFlag("N");
+	 }
 
     if (null != p.getDeceased()) {
       if (p.getDeceasedBooleanType().isBooleanPrimitive()) {
@@ -141,6 +148,7 @@ public class PatientHandler {
 
   public static Patient getFhirPatient( PatientReported pr) {
     Patient p = new Patient();
+	 p.setId(pr.getPatientReportedExternalLink());
     Identifier id = p.addIdentifier();
     id.setValue(pr.getPatientReportedExternalLink());
 //    p.setId(pr.getPatientReportedExternalLink());

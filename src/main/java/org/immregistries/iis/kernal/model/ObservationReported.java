@@ -7,7 +7,7 @@ public class ObservationReported implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  private int observationReportedId = 0;
+  private String observationReportedId = "";
   private PatientReported patientReported = null;
   private VaccinationReported vaccinationReported = null;
   private ObservationMaster observation = null;
@@ -29,11 +29,11 @@ public class ObservationReported implements Serializable {
   private String methodLabel = "";
   private String methodTable = "";
 
-  public int getObservationReportedId() {
+  public String getObservationReportedId() {
     return observationReportedId;
   }
 
-  public void setObservationReportedId(int observationReportedId) {
+  public void setObservationReportedId(String observationReportedId) {
     this.observationReportedId = observationReportedId;
   }
 

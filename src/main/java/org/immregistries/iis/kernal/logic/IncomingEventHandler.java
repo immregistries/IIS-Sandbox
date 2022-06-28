@@ -294,7 +294,7 @@ public class IncomingEventHandler extends IncomingMessageHandler {
 			 patient = (Patient) bundle.getEntryFirstRep().getResource();
 			 logger.info("bundle has entry");
 			 patientReported = new PatientReported();
-			 PatientHandler.patientReportedFromFhir( patientReported, patient);
+			 PatientHandler.fillPatientReportedFromFhir( patientReported, patient);
 			 patientMaster = patientReported.getPatient();
 		 }
     }
@@ -398,7 +398,7 @@ public class IncomingEventHandler extends IncomingMessageHandler {
     patientReported.setGuardianRelationship(req.getParameter(GUARDIAN_RELATIONSHIP));
     patientReported.setUpdatedDate(new Date());
     {
-		 Person person = PersonHandler.getPerson(patientReported);
+		 Person person = PersonHandler.getFhirPerson(patientReported);
 		 Patient patient1 = PatientHandler.patientReportedToFhir(patientReported);
 		 fhirClient.update().resource(person).withId(person.getId());
 		 fhirClient.update().resource(patient1).withId(patient1.getId());

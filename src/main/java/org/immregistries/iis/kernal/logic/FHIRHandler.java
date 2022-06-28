@@ -58,7 +58,7 @@ public class FHIRHandler extends IncomingMessageHandler {
         // System.err.println("Patient already exists");
         // Get patient master and reported
         patientReported = patientReportedList.get(0);
-        PatientHandler.patientReportedFromFhir(patientReported,patient);
+        PatientHandler.fillPatientReportedFromFhir(patientReported,patient);
         patientMaster = patientReported.getPatient();
 
       } else { //EMPI Search matches with firstname, lastname and birthday
@@ -84,7 +84,7 @@ public class FHIRHandler extends IncomingMessageHandler {
         }
         patientReported = new PatientReported();
         patientReported.setPatient(patientMaster);
-        PatientHandler.patientReportedFromFhir(patientReported, patient);
+        PatientHandler.fillPatientReportedFromFhir(patientReported, patient);
         patientReported.setOrgReported(orgAccess.getOrg());
         patientReported.setUpdatedDate(new Date());
       }
@@ -126,7 +126,7 @@ public class FHIRHandler extends IncomingMessageHandler {
 
     vaccinationReported = new VaccinationReported();
     vaccinationReported.setPatientReported(patientReported);
-    ImmunizationHandler.vaccinationReportedFromFhirImmunization(vaccinationReported,immunization);
+    ImmunizationHandler.fillVaccinationReportedFromFhirImmunization(vaccinationReported,immunization);
     {
       Query query = dataSession.createQuery(
           "from VaccinationReported where patientReported = ? and vaccinationReportedExternalLink = ?");
