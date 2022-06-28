@@ -3,8 +3,6 @@ package org.immregistries.iis.kernal.logic;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import org.apache.commons.lang3.StringUtils;
 import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
-import org.hibernate.Query;
-import org.hibernate.Transaction;
 import org.hl7.fhir.r5.model.*;
 import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.generated.Code;
@@ -28,12 +26,11 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-//@Component
 public class IncomingMessageHandler {
 
   private Logger logger = LoggerFactory.getLogger(IncomingMessageHandler.class);
   @Autowired
-  private RepositoryClientFactory repositoryClientFactory;
+  protected RepositoryClientFactory repositoryClientFactory;
 
   private static final String PATIENT_MIDDLE_NAME_MULTI = "Multi";
   // TODO:
@@ -513,7 +510,7 @@ public class IncomingMessageHandler {
                 person.setNameTypeCode(reader.getValue(10, 10));
                 person.setIdentifierTypeCode(reader.getValue(10, 13));
                 person.setProfessionalSuffix(reader.getValue(10, 21));
-					  org.hl7.fhir.r5.model.Person  p = PersonHandler.getPerson(person);
+					  org.hl7.fhir.r5.model.Person  p = PersonHandler.getFhirPerson(person);
 					  fhirClient.create().resource(p).execute();
 //                Transaction transaction = dataSession.beginTransaction();
 //                dataSession.save(person);
@@ -619,7 +616,8 @@ public class IncomingMessageHandler {
           verifyNoErrors(processingExceptionList);
           reader.gotoSegmentPosition(segmentPosition);
           {
-				 fhirClient.update().resource(ImmunizationHandler.getImmunization(null,vaccinationReported)).execute();
+				 fhirClient.update().resource(ImmunizationHandler.getImmunization(vaccinationReported)).execute();
+				 // TODO include master info
 
 //            Transaction transaction = dataSession.beginTransaction();
 //            dataSession.saveOrUpdate(vaccinationMaster);
@@ -668,7 +666,6 @@ public class IncomingMessageHandler {
       CodeMap codeMap, boolean strictDate, PatientReported patientReported)
       throws ProcessingException {
 	  IGenericClient fhirClient = repositoryClientFactory.newGenericClient(orgAccess);
-	  Patient patient;
 
     PatientMaster patientMaster = null;
     String patientReportedExternalLink = "";
@@ -704,17 +701,13 @@ public class IncomingMessageHandler {
 	  try {
 		  Bundle bundle = fhirClient.search().forResource(Patient.class)
 			  .where(Patient.IDENTIFIER.exactly().identifier(patientReportedExternalLink)).returnBundle(Bundle.class).execute();
-		  logger.info(bundle.getEntryFirstRep().toString());
-		  patient = (Patient) bundle.getEntryFirstRep().getResource();
-		  logger.info("bundle has entry");
-		  patientReported = new PatientReported();
-		  PatientHandler.fillPatientReportedFromFhir( patientReported, patient);
+		  Patient patient = (Patient) bundle.getEntryFirstRep().getResource();
+		  patientReported = PatientHandler.patientReportedFromFhir(patient);
 		  patientMaster = patientReported.getPatient();
 	  } catch (ResourceNotFoundException e) {}
 
     if (patientReported == null) {
       patientMaster = new PatientMaster();
-//      patientMaster.setPatientExternalLink(generatePatientExternalLink());
       patientMaster.setOrgMaster(orgAccess.getOrg());
       patientReported = new PatientReported();
       patientReported.setOrgReported(orgAccess.getOrg());
@@ -1027,10 +1020,8 @@ public class IncomingMessageHandler {
 
     patientReported.setUpdatedDate(new Date());
     {
-		 org.hl7.fhir.r5.model.Person person = PersonHandler.getFhirPerson(patientReported);
-		 Patient patient1 = PatientHandler.patientReportedToFhir(patientReported);
-		 fhirClient.update().resource(person).withId(person.getId());
-		 fhirClient.update().resource(patient1).withId(patient1.getId());
+		 Patient patient = PatientHandler.patientReportedToFhir(patientReported);
+		 fhirClient.update().resource(patient).execute();
     }
     return patientReported;
   }
@@ -2590,7 +2581,7 @@ public class IncomingMessageHandler {
       {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T',
           'U', 'V', 'W', 'X', 'Y', 'Z', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
 
-  public String generatePatientExternalLink() {
+  public String generatePatientExternalLink(IGenericClient fhirClient) {
     boolean keepLooking = true;
     int count = 0;
     while (keepLooking) {

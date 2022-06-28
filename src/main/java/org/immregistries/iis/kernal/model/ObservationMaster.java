@@ -9,18 +9,18 @@ public class ObservationMaster implements Serializable {
    */
   private static final long serialVersionUID = 1L;
 
-  private int observationId = 0;
+  private String observationId = "";
   private PatientMaster patient = null;
   private VaccinationMaster vaccination = null;
   private String identifierCode = "";
   private String valueCode = "";
   private ObservationReported observationReported = null;
 
-  public int getObservationId() {
+  public String getObservationId() {
     return observationId;
   }
 
-  public void setObservationId(int observationId) {
+  public void setObservationId(String observationId) {
     this.observationId = observationId;
   }
 

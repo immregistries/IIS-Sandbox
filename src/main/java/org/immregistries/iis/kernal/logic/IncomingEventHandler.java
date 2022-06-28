@@ -2,16 +2,18 @@ package org.immregistries.iis.kernal.logic;
 
 import ca.uhn.fhir.rest.api.server.RequestDetails;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
+import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
 import ca.uhn.fhir.rest.server.servlet.ServletRequestDetails;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Query;
 import org.hibernate.Transaction;
-import org.hl7.fhir.r5.model.Bundle;
-import org.hl7.fhir.r5.model.Patient;
+import org.hl7.fhir.r5.model.*;
 import org.hl7.fhir.r5.model.Person;
 import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
+import org.immregistries.iis.kernal.mapping.ImmunizationHandler;
+import org.immregistries.iis.kernal.mapping.LocationMapper;
 import org.immregistries.iis.kernal.mapping.PatientHandler;
 import org.immregistries.iis.kernal.mapping.PersonHandler;
 import org.immregistries.iis.kernal.model.*;
@@ -30,8 +32,6 @@ public class IncomingEventHandler extends IncomingMessageHandler {
 
 	private Logger logger = LoggerFactory.getLogger(IncomingEventHandler.class);
 
-	@Autowired
-	private RepositoryClientFactory repositoryClientFactory;
 
   private static final String ORG_LOCATION_FACILITY_CODE = "orgLocationFacilityCode";
   private static final String FUNDING_ELIGIBILITY = "fundingEligibility";
@@ -125,10 +125,11 @@ public class IncomingEventHandler extends IncomingMessageHandler {
 
 
   public void processEvent(OrgAccess orgAccess, HttpServletRequest req) throws Exception {
+	  IGenericClient fhirClient = repositoryClientFactory.newGenericClient(orgAccess);
     CodeMap codeMap = CodeMapManager.getCodeMap();
     PatientReported patientReported = processPatient(orgAccess, req, codeMap);
     VaccinationReported vaccinationReported = null;
-    VaccinationMaster vaccination = null;
+    VaccinationMaster vaccinationMaster = null;
     Date administrationDate = null;
     String vaccinationReportedExternalLink = req.getParameter(VACCINATION_REPORTED_EXTERNAL_LINK);
     if (vaccinationReportedExternalLink.equals("")) {
@@ -139,31 +140,38 @@ public class IncomingEventHandler extends IncomingMessageHandler {
       throw new Exception(
           "Vaccination is indicated as occuring in the future, unable to accept future vaccination events");
     }
-    {
-      Query query = dataSession.createQuery(
-          "from VaccinationReported where patientReported = ? and vaccinationReportedExternalLink = ?");
-      query.setParameter(0, patientReported);
-      query.setParameter(1, vaccinationReportedExternalLink);
+	  try {
+		  Bundle bundle = fhirClient.search().forResource(Immunization.class)
+			  .where(Immunization.PATIENT.hasId(patientReported.getPatientReportedId()))
+			  .and(Immunization.IDENTIFIER.exactly().identifier(vaccinationReportedExternalLink))
+			  .returnBundle(Bundle.class).execute();
+		  Immunization immunization = (Immunization) bundle.getEntryFirstRep().getResource();
+		  vaccinationReported = ImmunizationHandler.vaccinationReportedFromFhir(immunization);
+		  vaccinationMaster = vaccinationReported.getVaccination();
 
-
-      @SuppressWarnings("unchecked")
-      List<VaccinationReported> vaccinationReportedList = query.list();
-
-      if (vaccinationReportedList.size() > 0) {
-        vaccinationReported = vaccinationReportedList.get(0);
-        vaccination = vaccinationReported.getVaccination();
-      }
-    }
+	  } catch (ResourceNotFoundException e) {}
+//    {
+//      Query query = dataSession.createQuery(
+//          "from VaccinationReported where patientReported = ? and vaccinationReportedExternalLink = ?");
+//      query.setParameter(0, patientReported);
+//      query.setParameter(1, vaccinationReportedExternalLink);
+//      @SuppressWarnings("unchecked")
+//      List<VaccinationReported> vaccinationReportedList = query.list();
+//      if (vaccinationReportedList.size() > 0) {
+//        vaccinationReported = vaccinationReportedList.get(0);
+//        vaccinationMaster = vaccinationReported.getVaccination();
+//      }
+//    }
     if (vaccinationReported == null) {
-      vaccination = new VaccinationMaster();
+      vaccinationMaster = new VaccinationMaster();
       vaccinationReported = new VaccinationReported();
-      vaccinationReported.setVaccination(vaccination);
-      vaccination.setVaccinationReported(null);
+      vaccinationReported.setVaccination(vaccinationMaster);
+      vaccinationMaster.setVaccinationReported(null);
       vaccinationReported.setReportedDate(new Date());
       vaccinationReported.setVaccinationReportedExternalLink(vaccinationReportedExternalLink);
     }
     vaccinationReported.setPatientReported(patientReported);
-    vaccination.setPatient(patientReported.getPatient());
+    vaccinationMaster.setPatient(patientReported.getPatient());
 
     String vaccineCvxCode = req.getParameter(VACCINE_CVX_CODE);
     String vaccineNdcCode = req.getParameter(VACCINE_NDC_CODE);
@@ -196,18 +204,23 @@ public class IncomingEventHandler extends IncomingMessageHandler {
     {
       String administeredAtLocation = req.getParameter(ORG_LOCATION_FACILITY_CODE);
       if (StringUtils.isNotEmpty(administeredAtLocation)) {
-        Query query = dataSession.createQuery(
-            "from OrgLocation where orgMaster = :orgMaster and orgFacilityCode = :orgFacilityCode");
-        query.setParameter("orgMaster", orgAccess.getOrg());
-        query.setParameter("orgFacilityCode", administeredAtLocation);
-
-        @SuppressWarnings("unchecked")
-        List<OrgLocation> orgMasterList = query.list();
-
-        OrgLocation orgLocation = null;
-        if (orgMasterList.size() > 0) {
-          orgLocation = orgMasterList.get(0);
-        }
+			OrgLocation orgLocation = null;
+			try {
+				Bundle bundle = fhirClient.search().forResource(Location.class)
+					.where(Location.IDENTIFIER.exactly().identifier(administeredAtLocation))
+					.where(Location.ORGANIZATION.hasAnyOfIds(administeredAtLocation)) //Todo verify condition
+					.returnBundle(Bundle.class).execute();
+				Location location = (Location) bundle.getEntryFirstRep().getResource();
+				orgLocation = LocationMapper.orgLocationFromFhir(location);
+			} catch (ResourceNotFoundException e) {}
+//        Query query = dataSession.createQuery(
+//            "from OrgLocation where orgMaster = :orgMaster and orgFacilityCode = :orgFacilityCode");
+//        query.setParameter("orgMaster", orgAccess.getOrg());
+//        query.setParameter("orgFacilityCode", administeredAtLocation);
+//        List<OrgLocation> orgMasterList = query.list();
+//        if (orgMasterList.size() > 0) {
+//          orgLocation = orgMasterList.get(0);
+//        }
 
         if (orgLocation == null) {
           orgLocation = new OrgLocation();
@@ -221,15 +234,17 @@ public class IncomingEventHandler extends IncomingMessageHandler {
           orgLocation.setAddressState("");
           orgLocation.setAddressZip("");
           orgLocation.setAddressCountry("");
-          Transaction transaction = dataSession.beginTransaction();
-          dataSession.save(orgLocation);
-          transaction.commit();
+			  Location location = LocationMapper.fhirLocation(orgLocation);
+			  fhirClient.update().resource(location).withId(location.getId()).execute();
+//          Transaction transaction = dataSession.beginTransaction();
+//          dataSession.save(orgLocation);
+//          transaction.commit();
         }
         vaccinationReported.setOrgLocation(orgLocation);
       }
     }
-    vaccination.setVaccineCvxCode(vaccineCvxCode);
-    vaccination.setAdministeredDate(administrationDate);
+    vaccinationMaster.setVaccineCvxCode(vaccineCvxCode);
+    vaccinationMaster.setAdministeredDate(administrationDate);
     vaccinationReported.setUpdatedDate(new Date());
     vaccinationReported.setAdministeredDate(administrationDate);
     vaccinationReported.setVaccineCvxCode(vaccineCvxCode);
@@ -255,12 +270,16 @@ public class IncomingEventHandler extends IncomingMessageHandler {
 
 
     {
-      Transaction transaction = dataSession.beginTransaction();
-      dataSession.saveOrUpdate(vaccination);
-      dataSession.saveOrUpdate(vaccinationReported);
-      vaccination.setVaccinationReported(vaccinationReported);
-      dataSession.saveOrUpdate(vaccination);
-      transaction.commit();
+		 Immunization immunization = ImmunizationHandler.getImmunization(vaccinationReported);
+		 // TODO include master info
+		 fhirClient.update().resource(immunization).execute();
+//      Transaction transaction = dataSession.beginTransaction();
+//      dataSession.saveOrUpdate(vaccinationMaster);
+//      dataSession.saveOrUpdate(vaccinationReported);
+//      vaccinationMaster.setVaccinationReported(vaccinationReported);
+//      dataSession.saveOrUpdate(vaccinationMaster);
+//      transaction.commit();
+
     }
 
   }
@@ -270,7 +289,6 @@ public class IncomingEventHandler extends IncomingMessageHandler {
 	 RequestDetails requestDetails = new ServletRequestDetails();
 	 requestDetails.setTenantId(orgAccess.getAccessName());
 	 IGenericClient fhirClient = repositoryClientFactory.newGenericClient(requestDetails);
-	 Patient patient;
 
     PatientReported patientReported = null;
     PatientMaster patientMaster = null;
@@ -284,7 +302,7 @@ public class IncomingEventHandler extends IncomingMessageHandler {
 
 
     {
-		 patient = fhirClient.read().resource(Patient.class).withId(patientReportedExternalLink).execute();
+		 Patient patient = fhirClient.read().resource(Patient.class).withId(patientReportedExternalLink).execute();
 		 logger.info(String.valueOf(patient));
 
 		 Bundle bundle = fhirClient.search().forResource(Patient.class)
@@ -301,7 +319,7 @@ public class IncomingEventHandler extends IncomingMessageHandler {
 
     if (patientReported == null) {
       patientMaster = new PatientMaster();
-      patientMaster.setPatientExternalLink(generatePatientExternalLink());
+      patientMaster.setPatientExternalLink(generatePatientExternalLink(fhirClient));
       patientMaster.setOrgMaster(orgAccess.getOrg());
       patientReported = new PatientReported();
       patientReported.setOrgReported(orgAccess.getOrg());
@@ -398,10 +416,8 @@ public class IncomingEventHandler extends IncomingMessageHandler {
     patientReported.setGuardianRelationship(req.getParameter(GUARDIAN_RELATIONSHIP));
     patientReported.setUpdatedDate(new Date());
     {
-		 Person person = PersonHandler.getFhirPerson(patientReported);
-		 Patient patient1 = PatientHandler.patientReportedToFhir(patientReported);
-		 fhirClient.update().resource(person).withId(person.getId());
-		 fhirClient.update().resource(patient1).withId(patient1.getId());
+		 Patient patient = PatientHandler.getFhirPatient(patientMaster, patientReported);
+		 fhirClient.update().resource(patient).execute();
     }
     return patientReported;
   }

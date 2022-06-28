@@ -6,7 +6,7 @@ public class OrgLocation implements Serializable {
 	
   private static final long serialVersionUID = 1L;
   
-  private int orgLocationId = 0;
+  private String orgLocationId = "";
   private String orgFacilityCode = "";
   private OrgMaster orgMaster = null;
   private String orgFacilityName = "";
@@ -28,11 +28,11 @@ public class OrgLocation implements Serializable {
     this.vfcProviderPin = vfcProviderPin;
   }
 
-  public int getOrgLocationId() {
+  public String getOrgLocationId() {
     return orgLocationId;
   }
 
-  public void setOrgLocationId(int orgLocationId) {
+  public void setOrgLocationId(String orgLocationId) {
     this.orgLocationId = orgLocationId;
   }
 

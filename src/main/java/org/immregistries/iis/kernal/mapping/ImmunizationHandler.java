@@ -26,6 +26,7 @@ public class ImmunizationHandler {
 		VaccinationMaster vaccinationMaster = new VaccinationMaster();
 		vaccinationMaster.setVaccinationId(vaccinationReported.getVaccinationReportedId());
 		vaccinationReported.setVaccination(vaccinationMaster);
+		vaccinationMaster.setVaccinationReported(vaccinationReported);
 		vaccinationMasterFromFhirImmunization(vaccinationMaster, i);
 		return vaccinationReported;
 	}
@@ -86,14 +87,13 @@ public class ImmunizationHandler {
 
   /**
    * This methods create the immunization resource based on the vaccinationReported information
-   *@param theRequestDetails authentification access information
    * @param vr the vaccinationReported
    * @return the Immunization resource
    */
-  public static Immunization getImmunization(RequestDetails theRequestDetails,
+  public static Immunization getImmunization(
       VaccinationReported vr) {
     Immunization i = new Immunization();
-    i.setId(vr.getVaccinationReportedExternalLink());
+    i.setId(vr.getVaccinationReportedId());
     i.setRecorded(vr.getReportedDate());
     i.setLotNumber(vr.getLotnumber());
     i.getOccurrenceDateTimeType().setValue(vr.getAdministeredDate());

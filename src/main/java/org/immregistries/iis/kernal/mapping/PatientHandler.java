@@ -19,7 +19,7 @@ public class PatientHandler {
 	  PatientReported patientReported = new PatientReported();
 	  patientReported.setPatientReportedId(p.getId());
 	  fillPatientReportedFromFhir(patientReported,p);
-	  PersonHandler.getPatientMasterFromFhir(patientReported.getPatient(), p);
+	  getPatientMasterFromFhir(patientReported.getPatient(), p);
 	  return patientReported;
 	}
 
@@ -137,68 +137,92 @@ public class PatientHandler {
 
   }
 
+	public static PatientMaster getPatientMasterFromFhir( PatientMaster patientMaster, Patient p) {
+		if (patientMaster == null) {
+			patientMaster = new PatientMaster();
+		}
+		patientMaster.setPatientId(p.getId());
+		patientMaster.setPatientNameFirst(p.getNameFirstRep().getGiven().get(0).getValue());
+		if (p.getNameFirstRep().getGiven().size() > 1) {
+			patientMaster.setPatientNameMiddle(p.getNameFirstRep().getGiven().get(1).getValue());
+		}
+		patientMaster.setPatientNameLast(p.getNameFirstRep().getFamily());
+		patientMaster.setPatientExternalLink(p.getIdentifierFirstRep().getId());
+//	  patientMaster.setPatientAddressFrag();
+		return  patientMaster;
+	}
+
   /**
    * This methods create the patient resource based on the patientReported information
    * @param pr the patientReported
    * @return the Patient resource
    */
   public static Patient patientReportedToFhir(PatientReported pr) {
-    return getFhirPatient(pr);
+    return getFhirPatient(null, pr);
   }
 
-  public static Patient getFhirPatient( PatientReported pr) {
-    Patient p = new Patient();
-	 p.setId(pr.getPatientReportedExternalLink());
-    Identifier id = p.addIdentifier();
-    id.setValue(pr.getPatientReportedExternalLink());
-//    p.setId(pr.getPatientReportedExternalLink());
+  public static Patient getFhirPatient(PatientMaster pm,PatientReported pr) {
+    Patient p = new Patient(); //TODO ID
+	 if (pm != null) {
+		 p.setId(pm.getPatientId());
+		 p.addIdentifier(MappingHelper.getFhirIdentifier("PatientMaster", pm.getPatientId()));
+		 HumanName name = p.addName();
+		 name.setFamily(pm.getPatientNameLast());
+		 name.addGivenElement().setValue(pm.getPatientNameFirst());
+		 name.addGivenElement().setValue(pm.getPatientNameMiddle());
+	 }
+	  if (pr != null) {
+		  p.setId(pr.getPatientReportedExternalLink());
+		  p.addIdentifier(MappingHelper.getFhirIdentifier("PatientReported", pr.getPatientReportedExternalLink()));
+		  if (p.getNameFirstRep() != null) {
+			  HumanName name = p.addName();
+			  name.setFamily(pr.getPatientNameLast());
+			  name.addGivenElement().setValue(pr.getPatientNameFirst());
+			  name.addGivenElement().setValue(pr.getPatientNameMiddle());
+		  }
 
-    HumanName name = p.addName();
-    name.setFamily(pr.getPatientNameLast());
-    name.addGivenElement().setValue(pr.getPatientNameFirst());
-    name.addGivenElement().setValue(pr.getPatientNameMiddle());
 
-    if (null != pr.getPatientEmail()) {
-      p.addTelecom().setSystem(ContactPointSystem.EMAIL)
-          .setValue(pr.getPatientEmail());
-    }
-    if (null != pr.getPatientPhone()) {
-      p.addTelecom().setSystem(ContactPointSystem.PHONE)
-          .setValue(pr.getPatientPhone());
-    }
-    switch (pr.getPatientSex()) {
-      case "M":
-        p.setGender(AdministrativeGender.MALE);
-        break;
-      case "F":
-        p.setGender(AdministrativeGender.FEMALE);
-        break;
-      default:
-        p.setGender(AdministrativeGender.OTHER);
-    }
-    p.setBirthDate(pr.getPatientBirthDate());
-    if (null == pr.getPatientDeathDate()) {
-      p.getDeceasedBooleanType().setValue(false);
-    } else {
-      p.getDeceasedBooleanType().setValue(true);
-      p.getDeceasedDateTimeType().setValue(pr.getPatientDeathDate());
-    }
+		  if (null != pr.getPatientEmail()) {
+			  p.addTelecom().setSystem(ContactPointSystem.EMAIL)
+				  .setValue(pr.getPatientEmail());
+		  }
+		  if (null != pr.getPatientPhone()) {
+			  p.addTelecom().setSystem(ContactPointSystem.PHONE)
+				  .setValue(pr.getPatientPhone());
+		  }
+		  switch (pr.getPatientSex()) {
+			  case "M":
+				  p.setGender(AdministrativeGender.MALE);
+				  break;
+			  case "F":
+				  p.setGender(AdministrativeGender.FEMALE);
+				  break;
+			  default:
+				  p.setGender(AdministrativeGender.OTHER);
+		  }
+		  p.setBirthDate(pr.getPatientBirthDate());
+		  if (null == pr.getPatientDeathDate()) {
+			  p.getDeceasedBooleanType().setValue(false);
+		  } else {
+			  p.getDeceasedBooleanType().setValue(true);
+			  p.getDeceasedDateTimeType().setValue(pr.getPatientDeathDate());
+		  }
 
-    Address address = p.addAddress();
-    address.addLine(pr.getPatientAddressLine1());
-    address.addLine(pr.getPatientAddressLine2());
-    address.setCity(pr.getPatientAddressCity());
-    address.setCountry(pr.getPatientAddressCountry());
-    address.setState(pr.getPatientAddressState());
-    address.setPostalCode(pr.getPatientAddressZip());
+		  Address address = p.addAddress();
+		  address.addLine(pr.getPatientAddressLine1());
+		  address.addLine(pr.getPatientAddressLine2());
+		  address.setCity(pr.getPatientAddressCity());
+		  address.setCountry(pr.getPatientAddressCountry());
+		  address.setState(pr.getPatientAddressState());
+		  address.setPostalCode(pr.getPatientAddressZip());
 
-    Patient.ContactComponent contact = p.addContact();
-    HumanName contactName = new HumanName();
-    contactName.setFamily(pr.getGuardianLast());
-    contactName.addGivenElement().setValue(pr.getGuardianFirst());
-    contactName.addGivenElement().setValue(pr.getGuardianMiddle());
-    contact.setName(contactName);
-
+		  Patient.ContactComponent contact = p.addContact();
+		  HumanName contactName = new HumanName();
+		  contactName.setFamily(pr.getGuardianLast());
+		  contactName.addGivenElement().setValue(pr.getGuardianFirst());
+		  contactName.addGivenElement().setValue(pr.getGuardianMiddle());
+		  contact.setName(contactName);
+	  }
     return p;
   }
 
