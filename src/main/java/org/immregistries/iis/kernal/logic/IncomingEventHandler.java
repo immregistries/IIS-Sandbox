@@ -5,27 +5,20 @@ import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
 import ca.uhn.fhir.rest.server.servlet.ServletRequestDetails;
 import org.apache.commons.lang3.StringUtils;
-import org.hibernate.Query;
-import org.hibernate.Transaction;
 import org.hl7.fhir.r5.model.*;
-import org.hl7.fhir.r5.model.Person;
 import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.mapping.ImmunizationHandler;
 import org.immregistries.iis.kernal.mapping.LocationMapper;
 import org.immregistries.iis.kernal.mapping.PatientHandler;
-import org.immregistries.iis.kernal.mapping.PersonHandler;
 import org.immregistries.iis.kernal.model.*;
-import org.immregistries.iis.kernal.repository.RepositoryClientFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
-import java.util.List;
 
 @Component
 public class IncomingEventHandler extends IncomingMessageHandler {
@@ -235,7 +228,9 @@ public class IncomingEventHandler extends IncomingMessageHandler {
           orgLocation.setAddressZip("");
           orgLocation.setAddressCountry("");
 			  Location location = LocationMapper.fhirLocation(orgLocation);
-			  fhirClient.update().resource(location).withId(location.getId()).execute();
+			  fhirClient.update().resource(location).conditional() //TODO test
+				  .where(Location.IDENTIFIER.exactly().systemAndIdentifier("OrgLocation", location.getId()))
+				  .execute();
 //          Transaction transaction = dataSession.beginTransaction();
 //          dataSession.save(orgLocation);
 //          transaction.commit();
@@ -272,7 +267,15 @@ public class IncomingEventHandler extends IncomingMessageHandler {
     {
 		 Immunization immunization = ImmunizationHandler.getImmunization(vaccinationReported);
 		 // TODO include master info
-		 fhirClient.update().resource(immunization).execute();
+		 fhirClient.update().resource(immunization).conditional()
+			 .where(Immunization.IDENTIFIER.exactly().systemAndIdentifier("VaccinationReported",vaccinationReported.getVaccinationReportedId()))
+//			 .or(Immunization.IDENTIFIER.exactly().systemAndIdentifier("VaccinationMaster",vaccinationMaster.getVaccinationId()))
+			 .execute();
+//		 Immunization immunizationMaster = ImmunizationHandler.getImmunization(vaccinationMaster);
+//		 fhirClient.update().resource(immunization).conditional().where(
+//				 Immunization.IDENTIFIER.exactly().systemAndIdentifier("VaccinationReported",vaccinationReported.getVaccinationReportedId()))
+//			 .execute();
+
 //      Transaction transaction = dataSession.beginTransaction();
 //      dataSession.saveOrUpdate(vaccinationMaster);
 //      dataSession.saveOrUpdate(vaccinationReported);
@@ -302,19 +305,20 @@ public class IncomingEventHandler extends IncomingMessageHandler {
 
 
     {
-		 Patient patient = fhirClient.read().resource(Patient.class).withId(patientReportedExternalLink).execute();
-		 logger.info(String.valueOf(patient));
+		 try {
+//			 Patient patient = fhirClient.read().resource(Patient.class).withId(patientReportedExternalLink).execute();
+//			 logger.info(String.valueOf(patient));
+			 Bundle bundle = fhirClient.search().forResource(Patient.class)
+				 .where(Patient.IDENTIFIER.exactly().identifier(patientReportedExternalLink))
+				 .returnBundle(Bundle.class).execute();
+			 logger.info(bundle.getEntryFirstRep().toString());
+			 if (bundle.hasEntry()) {
+				 Patient patient = (Patient) bundle.getEntryFirstRep().getResource();
+				 patientReported = PatientHandler.getPatientReportedFromFhir(patient);
+				 patientMaster = patientReported.getPatient();
+			 }
+		 } catch (ResourceNotFoundException e) {}
 
-		 Bundle bundle = fhirClient.search().forResource(Patient.class)
-			 .where(Patient.IDENTIFIER.exactly().identifier(patientReportedExternalLink)).returnBundle(Bundle.class).execute();
-		 logger.info(bundle.getEntryFirstRep().toString());
-		 if (bundle.hasEntry()) {
-			 patient = (Patient) bundle.getEntryFirstRep().getResource();
-			 logger.info("bundle has entry");
-			 patientReported = new PatientReported();
-			 PatientHandler.fillPatientReportedFromFhir( patientReported, patient);
-			 patientMaster = patientReported.getPatient();
-		 }
     }
 
     if (patientReported == null) {
@@ -417,7 +421,10 @@ public class IncomingEventHandler extends IncomingMessageHandler {
     patientReported.setUpdatedDate(new Date());
     {
 		 Patient patient = PatientHandler.getFhirPatient(patientMaster, patientReported);
-		 fhirClient.update().resource(patient).execute();
+		 fhirClient.update().resource(patient).conditional().where(Patient.IDENTIFIER.exactly()
+			 .systemAndIdentifier("PatientMaster",patientMaster.getPatientId())).execute();
+		 fhirClient.update().resource(patient).conditional().where(Patient.IDENTIFIER.exactly() //TODO choose to save or not the patientMaster
+			 .systemAndIdentifier("PatientReported",patientReported.getPatientReportedId())).execute();
     }
     return patientReported;
   }

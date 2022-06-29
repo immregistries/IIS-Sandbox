@@ -5,35 +5,52 @@ import org.immregistries.iis.kernal.model.ObservationMaster;
 import org.immregistries.iis.kernal.model.ObservationReported;
 
 public class ObservationMapper {
-	public static Observation getFhirObservation(ObservationMaster observationMaster, ObservationReported observationReported)  {
+	public static Observation getFhirObservation(ObservationMaster observationMaster, ObservationReported or)  {
 		Observation o = new Observation();
 		if (observationMaster != null) {
-			o.setId(observationMaster.getObservationId());
+//			o.setId(observationMaster.getObservationId());
 			o.addIdentifier(MappingHelper.getFhirIdentifier( "ObservationMaster",observationMaster.getObservationId()));
 			o.addPartOf(MappingHelper.getFhirReference("Immunization","VaccinationMaster", observationMaster.getVaccination().getVaccinationId()));
-			if (observationMaster.getObservationReported() != null && observationReported == null) {
+			if (observationMaster.getObservationReported() != null && or == null) {
 				o.addPartOf(MappingHelper.getFhirReference("Observation","ObservationReported",
 					observationMaster.getObservationReported().getObservationReportedId()));
 			}
+			o.addIdentifier(MappingHelper.getFhirIdentifier(
+				"identifierCode",observationMaster.getIdentifierCode()));
 			o.setSubject(MappingHelper.getFhirReference("Patient","PatientMaster",observationMaster.getPatient().getPatientId()));
 			o.setCode(new CodeableConcept().setText(observationMaster.getIdentifierCode()));
-			o.setValue(new CodeableConcept().setText(observationMaster.getValueCode()));
+			o.setValue(new Coding().setCode(observationMaster.getValueCode()));
 		}
 
-
-		if (observationReported != null) {
-			// Observation reported id takes over observation Master Id
-			o.setId(observationReported.getObservationReportedId());
-			o.addIdentifier(MappingHelper.getFhirIdentifier("ObservationReported",observationReported.getObservationReportedId()));
+		if (or != null) {
+//			o.setId(or.getObservationReportedId());
+			o.addIdentifier(MappingHelper.getFhirIdentifier("ObservationReported",or.getObservationReportedId()));
 			if (o.getPartOf().size() == 0) {
-				o.addPartOf(MappingHelper.getFhirReference("Immunization","VaccinationReported",observationReported.getVaccinationReported().getVaccinationReportedExternalLink()));
+				o.addPartOf(MappingHelper.getFhirReference("Immunization","VaccinationReported",or.getVaccinationReported().getVaccinationReportedExternalLink()));
 			}
-			if(observationReported.getPatientReported() != null) {
-				o.setSubject(MappingHelper.getFhirReference("Patient","PatientReported",observationReported.getPatientReported().getPatientReportedExternalLink()));
+			if(or.getPatientReported() != null) {
+				o.setSubject(MappingHelper.getFhirReference("Patient","PatientReported",or.getPatientReported().getPatientReportedExternalLink()));
 			}
-			if (observationReported.getObservation() != null && observationMaster == null) {
-				o.addPartOf(MappingHelper.getFhirReference("Observation","ObservationMaster", observationReported.getObservation().getObservationId()));
+			if (or.getObservation() != null && observationMaster == null) {
+				o.addPartOf(MappingHelper.getFhirReference("Observation","ObservationMaster", or.getObservation().getObservationId()));
 			}
+			o.setValue(new Coding()
+				.setCode(or.getValueCode())
+				.setSystem(or.getValueTable())
+				.setDisplay(or.getValueLabel()));
+			o.setMethod(new CodeableConcept()).getMethod().addCoding()
+				.setCode(or.getMethodCode())
+				.setSystem(or.getMethodTable())
+				.setDisplay(or.getMethodLabel());
+			o.addIdentifier(MappingHelper.getFhirIdentifier(
+				or.getIdentifierTable(),or.getIdentifierCode()));
+			o.addComponent().setValue(new DateTimeType(or.getObservationDate()))
+				.setCode(new CodeableConcept().setText("observationDate"));
+			o.addReferenceRange().setText(or.getUnitsLabel())
+				.addAppliesTo().setText(or.getUnitsTable())
+				.addCoding().setCode(or.getUnitsCode());
+			o.addInterpretation().setText("resultStatus")
+				.addCoding().setCode(or.getResultStatus());
 		}
 		return o;
 
