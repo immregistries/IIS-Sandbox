@@ -12,7 +12,7 @@ public class PatientMaster implements Serializable {
 
   private String patientId = "";
   private OrgMaster orgMaster = null;
-  private String patientExternalLink = "";
+//  private String patientExternalLink = "";
   private String patientNameLast = "";
   private String patientNameFirst = "";
   private String patientNameMiddle = "";
@@ -32,12 +32,18 @@ public class PatientMaster implements Serializable {
     this.patientId = patientId;
   }
 
+//  public String getPatientExternalLink() {
+//    return patientExternalLink;
+//  }
   public String getPatientExternalLink() {
-    return patientExternalLink;
+    return patientId;
   }
 
+//  public void setPatientExternalLink(String patientRegistryId) {
+//    this.patientExternalLink = patientRegistryId;
+//  }
   public void setPatientExternalLink(String patientRegistryId) {
-    this.patientExternalLink = patientRegistryId;
+    this.patientId = patientRegistryId;
   }
 
   public String getPatientNameLast() {

@@ -12,7 +12,7 @@ public class PatientReported implements Serializable {
 	
   private String patientReportedId = "";
   private OrgMaster orgReported = null;
-  private String patientReportedExternalLink = "";
+//  private String patientReportedExternalLink = "";
   private PatientMaster patient = null;
   private Date reportedDate = null;
   private Date updatedDate = null;
@@ -337,12 +337,18 @@ public class PatientReported implements Serializable {
     this.patientReportedId = reportedPatientId;
   }
 
+//  public String getPatientReportedExternalLink() {
+//    return patientReportedExternalLink;
+//  }
   public String getPatientReportedExternalLink() {
-    return patientReportedExternalLink;
+    return patientReportedId;
   }
 
+//  public void setPatientReportedExternalLink(String reportedMrn) {
+//    this.patientReportedExternalLink = reportedMrn;
+//  }
   public void setPatientReportedExternalLink(String reportedMrn) {
-    this.patientReportedExternalLink = reportedMrn;
+    this.patientReportedId = reportedMrn;
   }
 
   public PatientMaster getPatient() {
@@ -412,7 +418,8 @@ public class PatientReported implements Serializable {
   @Override
   public String toString() {
     return "PatientReported{" + "patientReportedId=" + patientReportedId + ", orgReported="
-        + orgReported + ", patientReportedExternalLink='" + patientReportedExternalLink + '\''
+        + orgReported
+//		 + ", patientReportedExternalLink='" + patientReportedExternalLink + '\''
         + ", patient=" + patient + ", reportedDate=" + reportedDate + ", updatedDate=" + updatedDate
         + ", patientReportedAuthority='" + patientReportedAuthority + '\''
         + ", patientReportedType='" + patientReportedType + '\'' + ", patientNameLast='"
