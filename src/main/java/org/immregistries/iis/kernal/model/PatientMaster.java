@@ -17,8 +17,8 @@ public class PatientMaster implements Serializable {
   private String patientNameFirst = "";
   private String patientNameMiddle = "";
   private Date patientBirthDate = null;
-  private String patientPhoneFrag = "";
-  private String patientAddressFrag = "";
+//  private String patientPhoneFrag = "";
+//  private String patientAddressFrag = "";
   private String patientSoundexLast = "";
   private String patientSoundexFirst = "";
 
@@ -78,21 +78,21 @@ public class PatientMaster implements Serializable {
     this.patientBirthDate = patientBirthDate;
   }
 
-  public String getPatientPhoneFrag() {
-    return patientPhoneFrag;
-  }
+//  public String getPatientPhoneFrag() {
+//    return patientPhoneFrag;
+//  }
+//
+//  public void setPatientPhoneFrag(String patientPhoneFrag) {
+//    this.patientPhoneFrag = patientPhoneFrag;
+//  }
 
-  public void setPatientPhoneFrag(String patientPhoneFrag) {
-    this.patientPhoneFrag = patientPhoneFrag;
-  }
-
-  public String getPatientAddressFrag() {
-    return patientAddressFrag;
-  }
-
-  public void setPatientAddressFrag(String patientAddressFrag) {
-    this.patientAddressFrag = patientAddressFrag;
-  }
+//  public String getPatientAddressFrag() {
+//    return patientAddressFrag;
+//  }
+//
+//  public void setPatientAddressFrag(String patientAddressFrag) {
+//    this.patientAddressFrag = patientAddressFrag;
+//  }
 
   public String getPatientSoundexLast() {
     return patientSoundexLast;
