@@ -19,8 +19,8 @@ public class PatientMaster implements Serializable {
   private Date patientBirthDate = null;
 //  private String patientPhoneFrag = "";
 //  private String patientAddressFrag = "";
-  private String patientSoundexLast = "";
-  private String patientSoundexFirst = "";
+//  private String patientSoundexLast = "";
+//  private String patientSoundexFirst = "";
 
 
 
@@ -94,21 +94,21 @@ public class PatientMaster implements Serializable {
 //    this.patientAddressFrag = patientAddressFrag;
 //  }
 
-  public String getPatientSoundexLast() {
-    return patientSoundexLast;
-  }
-
-  public void setPatientSoundexLast(String patientSoundexLast) {
-    this.patientSoundexLast = patientSoundexLast;
-  }
-
-  public String getPatientSoundexFirst() {
-    return patientSoundexFirst;
-  }
-
-  public void setPatientSoundexFirst(String patientSoundexFirst) {
-    this.patientSoundexFirst = patientSoundexFirst;
-  }
+//  public String getPatientSoundexLast() {
+//    return patientSoundexLast;
+//  }
+//
+//  public void setPatientSoundexLast(String patientSoundexLast) {
+//    this.patientSoundexLast = patientSoundexLast;
+//  }
+//
+//  public String getPatientSoundexFirst() {
+//    return patientSoundexFirst;
+//  }
+//
+//  public void setPatientSoundexFirst(String patientSoundexFirst) {
+//    this.patientSoundexFirst = patientSoundexFirst;
+//  }
 
   public OrgMaster getOrgMaster() {
     return orgMaster;

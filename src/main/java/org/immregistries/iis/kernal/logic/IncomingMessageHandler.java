@@ -802,14 +802,14 @@ public class IncomingMessageHandler {
             "Patient is indicated as being born in the future, unable to record patients who are not yet born",
             "PID", 1, 7);
       }
-      patientMaster.setPatientAddressFrag(addressFrag);
+//      patientMaster.setPatientAddressFrag(addressFrag);
       patientMaster.setPatientNameLast(patientNameLast);
       patientMaster.setPatientNameFirst(patientNameFirst);
       patientMaster.setPatientNameMiddle(patientNameMiddle);
-      patientMaster.setPatientPhoneFrag(patientPhone);
+//      patientMaster.setPatientPhoneFrag(patientPhone);
       patientMaster.setPatientBirthDate(patientBirthDate);
-      patientMaster.setPatientSoundexFirst(""); // TODO, later
-      patientMaster.setPatientSoundexLast(""); // TODO, later
+//      patientMaster.setPatientSoundexFirst(""); // TODO, later
+//      patientMaster.setPatientSoundexLast(""); // TODO, later
       patientReported.setPatientReportedExternalLink(patientReportedExternalLink);
       patientReported.setPatientReportedType(patientReportedType);
       patientReported.setPatientNameFirst(patientNameFirst);
