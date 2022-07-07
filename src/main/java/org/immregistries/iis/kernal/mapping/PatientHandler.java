@@ -1,8 +1,6 @@
 package org.immregistries.iis.kernal.mapping;
 
-import org.hibernate.Query;
-import org.hibernate.Session;
-import org.hl7.fhir.Code;
+
 import org.hl7.fhir.r5.model.*;
 import org.hl7.fhir.r5.model.ContactPoint.ContactPointSystem;
 import org.hl7.fhir.r5.model.Enumerations.AdministrativeGender;
@@ -10,8 +8,6 @@ import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.model.PatientReported;
 
 import java.util.Date;
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class PatientHandler {
 
@@ -175,6 +171,8 @@ public class PatientHandler {
 	}
 
 	public static PatientMaster getPatientMasterFromFhir(PatientMaster patientMaster, Patient p) {
+		patientMaster.setPatientId(MappingHelper.filterIdentifier(p.getIdentifier(),"PatientReported").getValue());
+
 		if (patientMaster == null) {
 			patientMaster = new PatientMaster();
 		}
@@ -189,8 +187,8 @@ public class PatientHandler {
 		return patientMaster;
 	}
 
-	public static Patient getFhirPatient(PatientMaster pm, PatientReported pr) {
-		Patient p = new Patient();
+	public static void getFhirPatient(Patient p, PatientMaster pm, PatientReported pr) {
+//		Patient p = new Patient().setBirthDate(new Date());
 		if (pm != null) {
 			p.addIdentifier(MappingHelper.getFhirIdentifier("PatientMaster", pm.getPatientId()));
 			HumanName name = p.addName();
@@ -201,7 +199,7 @@ public class PatientHandler {
 		}
 		if (pr != null) {
 			p.addIdentifier(MappingHelper.getFhirIdentifier("PatientReported", pr.getPatientReportedExternalLink()));
-			p.setManagingOrganization(MappingHelper.getFhirReference("","",pr.getPatientReportedAuthority()));
+//			p.setManagingOrganization(MappingHelper.getFhirReference("","PatientReportedAuthority",pr.getPatientReportedAuthority()));
 			p.setBirthDate(pr.getPatientBirthDate());
 			if (p.getNameFirstRep() != null) {
 				HumanName name = p.addName();
@@ -210,8 +208,7 @@ public class PatientHandler {
 				name.addGivenElement().setValue(pr.getPatientNameFirst());
 				name.addGivenElement().setValue(pr.getPatientNameMiddle());
 			}
-//			p.addName().setUse(HumanName.NameUse.MAIDEN).setFamily(pr.getPatientMotherMaiden());
-//			TODO
+//			p.addName().setUse(HumanName.NameUse.MAIDEN).setFamily(pr.getPatientMotherMaiden()); TODO
 			switch (pr.getPatientSex()) {
 				case "M":
 					p.setGender(AdministrativeGender.MALE);
@@ -276,7 +273,7 @@ public class PatientHandler {
 			address.setDistrict(pr.getPatientAddressCountyParish());
 			address.setPostalCode(pr.getPatientAddressZip());
 
-			if (pr.getPatientBirthOrder() != null) {
+			if (pr.getPatientBirthOrder() != null && !pr.getPatientBirthOrder().equals("")) {
 				p.setMultipleBirth(new IntegerType().setValue(Integer.parseInt(pr.getPatientBirthOrder())));
 			} else if (pr.getPatientBirthFlag().equals("Y")) {
 				p.setMultipleBirth(new BooleanType(true));
@@ -286,21 +283,27 @@ public class PatientHandler {
 			publicity.setUrl("publicity");
 			publicity.setValue(
 				new Coding().setSystem("publicityIndicator")
-					.setCode(pr.getPublicityIndicator())
-					.setVersion(pr.getPublicityIndicatorDate().toString()));
+					.setCode(pr.getPublicityIndicator()));
+			if (pr.getPublicityIndicatorDate() != null) {
+				publicity.getValueCoding().setVersion(pr.getPublicityIndicatorDate().toString());
+			}
 			Extension protection =  p.addExtension();
 			protection.setUrl("protection");
 			protection.setValue(
 				new Coding().setSystem("protectionIndicator")
-					.setCode(pr.getProtectionIndicator())
-					.setVersion(pr.getProtectionIndicatorDate().toString()));
+					.setCode(pr.getProtectionIndicator()));
+			if (pr.getProtectionIndicatorDate() != null) {
+				protection.getValueCoding().setVersion(pr.getProtectionIndicatorDate().toString());
+			}
+
 			Extension registryStatus =  p.addExtension();
 			registryStatus.setUrl("registryStatus");
 			registryStatus.setValue(
 				new Coding().setSystem("registryStatusIndicator")
-					.setCode(pr.getRegistryStatusIndicator())
-					.setVersion(pr.getRegistryStatusIndicatorDate().toString()));
-
+					.setCode(pr.getRegistryStatusIndicator()));
+			if (pr.getRegistryStatusIndicatorDate() != null) {
+				registryStatus.getValueCoding().setVersion(pr.getRegistryStatusIndicatorDate().toString());
+			}
 
 			Patient.ContactComponent contact = p.addContact();
 			HumanName contactName = new HumanName();
@@ -310,7 +313,7 @@ public class PatientHandler {
 			contactName.addGivenElement().setValue(pr.getGuardianFirst());
 			contactName.addGivenElement().setValue(pr.getGuardianMiddle());
 		}
-		return p;
+//		return p;
 	}
 
 }

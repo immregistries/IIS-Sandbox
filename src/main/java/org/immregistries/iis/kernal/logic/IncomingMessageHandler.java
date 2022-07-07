@@ -20,11 +20,13 @@ import org.immregistries.vfa.connect.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+
 
 public class IncomingMessageHandler {
 
@@ -119,8 +121,10 @@ public class IncomingMessageHandler {
 			try {
 				Bundle bundle = fhirClient.search().forResource(Patient.class)
 					.where(Patient.IDENTIFIER.exactly().identifier(mrn)).returnBundle(Bundle.class).execute();
-				Patient patient = (Patient) bundle.getEntryFirstRep().getResource();
-				patientReported = PatientHandler.getPatientReportedFromFhir(patient);
+				if (bundle.hasEntry()){
+					Patient patient = (Patient) bundle.getEntryFirstRep().getResource();
+					patientReported = PatientHandler.getPatientReportedFromFhir(patient);
+				}
 			} catch (ResourceNotFoundException e) {}
 //        Query query = dataSession.createQuery(
 //            "from PatientReported where orgReported = ? and patientReportedExternalLink = ?");
@@ -161,8 +165,10 @@ public class IncomingMessageHandler {
 					  .and(Patient.FAMILY.matches().value(patientNameLast))
 					  .and(Patient.BIRTHDATE.exactly().day(patientBirthDate))
 					  .returnBundle(Bundle.class).execute();
-				  Patient patient = (Patient) bundle.getEntryFirstRep().getResource();
-				  patientReported = PatientHandler.getPatientReportedFromFhir(patient);
+				  if (bundle.hasEntry()){
+					  Patient patient = (Patient) bundle.getEntryFirstRep().getResource();
+					  patientReported = PatientHandler.getPatientReportedFromFhir(patient);
+				  }
 			  } catch (ResourceNotFoundException e) {}
         }
         if (patientReported != null) {
@@ -198,8 +204,6 @@ public class IncomingMessageHandler {
 					  .where(Patient.NAME.matches().values(patientNameFirst,patientNameLast))
 					  .and(Patient.BIRTHDATE.exactly().day(patientBirthDate))
 					  .returnBundle(Bundle.class).execute();
-				  Patient patient = (Patient) bundle.getEntryFirstRep().getResource();
-				  patientReported = new PatientReported();
 				  for (Bundle.BundleEntryComponent entry: bundle.getEntry()) {
 					  patientReportedPossibleList.add(PatientHandler.getPatientReportedFromFhir((Patient) entry.getResource()));
 				  }
@@ -312,14 +316,16 @@ public class IncomingMessageHandler {
 			  try {
 				  Bundle bundle = fhirClient.search().forResource(Immunization.class)
 					  .where(Immunization.IDENTIFIER.exactly().identifier(vaccinationReportedExternalLink)).returnBundle(Bundle.class).execute();
-				  logger.info(bundle.getEntryFirstRep().toString());
-				  Immunization immunization = (Immunization) bundle.getEntryFirstRep().getResource();
-				  vaccinationReported = ImmunizationHandler.vaccinationReportedFromFhir(immunization);
-				  vaccinationMaster = vaccinationReported.getVaccination();
+				  if (bundle.hasEntry()) {
+					  Immunization immunization = (Immunization) bundle.getEntryFirstRep().getResource();
+					  vaccinationReported = ImmunizationHandler.vaccinationReportedFromFhir(immunization);
+					  vaccinationMaster = vaccinationReported.getVaccination();
+				  }
 			  } catch (ResourceNotFoundException e) {}
           if (vaccinationReported == null) {
             vaccinationMaster = new VaccinationMaster();
-            vaccinationReported = new VaccinationReported();
+				 vaccinationMaster.setVaccinationId(vaccinationReportedExternalLink); // TODO verify
+				 vaccinationReported = new VaccinationReported();
             vaccinationReported.setVaccination(vaccinationMaster);
             vaccinationMaster.setVaccinationReported(null);
             vaccinationReported.setReportedDate(new Date());
@@ -439,8 +445,10 @@ public class IncomingMessageHandler {
 					try {
 						Bundle bundle = fhirClient.search().forResource(Location.class)
 							.where(Location.IDENTIFIER.exactly().identifier(administeredAtLocation)).returnBundle(Bundle.class).execute();
-						Location location = (Location) bundle.getEntryFirstRep().getResource();
-						orgLocation = LocationMapper.orgLocationFromFhir(location);
+						if(bundle.hasEntry()){
+							Location location = (Location) bundle.getEntryFirstRep().getResource();
+							orgLocation = LocationMapper.orgLocationFromFhir(location);
+						}
 					} catch (ResourceNotFoundException e) {}
 //              Query query = dataSession.createQuery(
 //                  "from OrgLocation where orgMaster = :orgMaster and orgFacilityCode = :orgFacilityCode");
@@ -470,7 +478,7 @@ public class IncomingMessageHandler {
                 orgLocation.setAddressZip(reader.getValue(11, 13));
                 orgLocation.setAddressCountry(reader.getValue(11, 14));
 					 Location location = LocationMapper.fhirLocation(orgLocation);
-					 fhirClient.update().resource(location).withId(location.getId()).execute();
+					 fhirClient.update().resource(location).conditional().where(Location.IDENTIFIER.exactly().systemAndIdentifier("orgLocation",orgLocation.getOrgLocationId())).execute();
 //                Transaction transaction = dataSession.beginTransaction();
 //                dataSession.save(orgLocation);
 //                transaction.commit();
@@ -482,23 +490,15 @@ public class IncomingMessageHandler {
             String admininsteringProvider = reader.getValue(10);
             if (StringUtils.isNotEmpty(admininsteringProvider)) {
               Person person = null;
-              {
-					  try {
-						  Bundle bundle = fhirClient.search().forResource(org.hl7.fhir.r5.model.Person.class)
-							  .where(org.hl7.fhir.r5.model.Person.IDENTIFIER.exactly().identifier(admininsteringProvider))
-							  .returnBundle(Bundle.class).execute();
-						  org.hl7.fhir.r5.model.Person fhirPerson = (org.hl7.fhir.r5.model.Person) bundle.getEntryFirstRep().getResource();
-						  person = PersonHandler.getModelPerson(fhirPerson);
-					  } catch (ResourceNotFoundException e) {}
-//					  Query query = dataSession.createQuery(
-//                    "from Person where orgMaster = :orgMaster and personExternalLink = :personExternalLink");
-//                query.setParameter("orgMaster", orgAccess.getOrg());
-//                query.setParameter("personExternalLink", admininsteringProvider);
-//                List<Person> personList = query.list();
-//                if (personList.size() > 0) {
-//                  person = personList.get(0);
-//                }
-              }
+					try {
+						Bundle bundle = fhirClient.search().forResource(org.hl7.fhir.r5.model.Person.class)
+							.where(org.hl7.fhir.r5.model.Person.IDENTIFIER.exactly().identifier(admininsteringProvider))
+							.returnBundle(Bundle.class).execute();
+						if (bundle.hasEntry()) {
+							org.hl7.fhir.r5.model.Person fhirPerson = (org.hl7.fhir.r5.model.Person) bundle.getEntryFirstRep().getResource();
+							person = PersonHandler.getModelPerson(fhirPerson);
+						}
+					} catch (ResourceNotFoundException e) {}
               if (person == null) {
                 person = new Person();
                 person.setPersonExternalLink(admininsteringProvider);
@@ -616,10 +616,15 @@ public class IncomingMessageHandler {
           verifyNoErrors(processingExceptionList);
           reader.gotoSegmentPosition(segmentPosition);
           {
-				 Immunization immunization = ImmunizationHandler.getImmunization(vaccinationReported);
+				 Immunization immunization = ImmunizationHandler.getImmunization(null,vaccinationReported);
 				 fhirClient.update().resource(immunization).conditional().where(
 						 Immunization.IDENTIFIER.exactly()
 							 .systemAndIdentifier("VaccinationReported",vaccinationReported.getVaccinationReportedId()))
+					 .execute();
+				 immunization = ImmunizationHandler.getImmunization(vaccinationMaster,null);
+				 fhirClient.update().resource(immunization).conditional().where(
+						 Immunization.IDENTIFIER.exactly()
+							 .systemAndIdentifier("VaccinationMaster",vaccinationMaster.getVaccinationId()))
 					 .execute();
 				 // TODO include master info
 
@@ -705,9 +710,11 @@ public class IncomingMessageHandler {
 	  try {
 		  Bundle bundle = fhirClient.search().forResource(Patient.class)
 			  .where(Patient.IDENTIFIER.exactly().identifier(patientReportedExternalLink)).returnBundle(Bundle.class).execute();
-		  Patient patient = (Patient) bundle.getEntryFirstRep().getResource();
-		  patientReported = PatientHandler.getPatientReportedFromFhir(patient);
-		  patientMaster = patientReported.getPatient();
+		  if (bundle.hasEntry()) {
+			  Patient patient = (Patient) bundle.getEntryFirstRep().getResource();
+			  patientReported = PatientHandler.getPatientReportedFromFhir(patient);
+			  patientMaster = patientReported.getPatient();
+		  }
 	  } catch (ResourceNotFoundException e) {}
 
     if (patientReported == null) {
@@ -1024,10 +1031,18 @@ public class IncomingMessageHandler {
 
     patientReported.setUpdatedDate(new Date());
     {
-		 Patient patient = PatientHandler.getFhirPatient(null,patientReported);
-		 fhirClient.update().resource(patient).conditional().where(
-			 Patient.IDENTIFIER.exactly().systemAndIdentifier("PatientReported",patientReported.getPatientReportedId()))
-			 .execute();
+		 Patient patient = new Patient();
+		 PatientHandler.getFhirPatient(patient, null,patientReported);
+		 try {
+			 fhirClient.update().resource(patient).conditional().where(
+					 Patient.IDENTIFIER.exactly().systemAndIdentifier("PatientReported",patientReported.getPatientReportedId()))
+				 .execute();
+		 } catch (ResourceNotFoundException e){
+			 fhirClient.create().resource(patient)
+				 .execute();
+		 }
+
+
     }
     return patientReported;
   }
@@ -1116,15 +1131,18 @@ public class IncomingMessageHandler {
       }
       {
         ObservationReported observationReported = observationMaster.getObservationReported();
-        observationMaster.setObservationReported(null);
+        observationMaster.setObservationReported(null); //TODO change or create master
+
 		  Observation observation = ObservationMapper.getFhirObservation(observationMaster,observationReported);
-			fhirClient.update().resource(observation).execute();
-//			Transaction transaction = dataSession.beginTransaction();
-//        dataSession.saveOrUpdate(observationMaster);
-//        dataSession.saveOrUpdate(observationReported);
-//        observationMaster.setObservationReported(observationReported);
-//        dataSession.saveOrUpdate(observationMaster);
-//        transaction.commit();
+			try {
+				fhirClient.update().resource(observation)
+					.conditionalByUrl("Observation?identifier=ObservationReported|"
+						+ observationReported.getObservationReportedId())
+					.execute(); // TODO verify injection
+			} catch (ResourceNotFoundException e){
+				fhirClient.create().resource(observation)
+					.execute();
+			}
       }
     }
     return obxCount;
@@ -1142,16 +1160,20 @@ public class IncomingMessageHandler {
 		  Bundle bundle;
 		  if (vaccination == null) {
 			  bundle = fhirClient.search().forResource(Observation.class)
-//				  .where(!Observation.PART_OF.has)) TODO where null
+				  .where(Observation.PART_OF.isMissing(true))
+				  .and(Observation.SUBJECT.hasId(patientReported.getPatientReportedId()))
 				  .returnBundle(Bundle.class).execute();
 		  } else {
 			  bundle = fhirClient.search().forResource(Observation.class)
 				  .where(Observation.PART_OF.hasId(vaccination.getVaccinationId()))
+				  .and(Observation.SUBJECT.hasId(patientReported.getPatientReportedId()))
 				  .returnBundle(Bundle.class).execute();
 		  }
-		  Observation observation = (Observation) bundle.getEntryFirstRep().getResource();
-		  observationMaster = ObservationMapper.getObservationMaster(observation);
-		  observationReported = observationMaster.getObservationReported();
+		  if (bundle.hasEntry()){
+			  Observation observation = (Observation) bundle.getEntryFirstRep().getResource();
+			  observationMaster = ObservationMapper.getObservationMaster(observation);
+			  observationReported = observationMaster.getObservationReported();
+		  }
 	  } catch (ResourceNotFoundException e) {}
 
 //	  String q;
@@ -1930,8 +1952,7 @@ public class IncomingMessageHandler {
 					 String key = sdf.format(immunization.getOccurrenceDateTimeType());
 					 if (!immunization.getVaccineCode().getText().equals("")) {
 						 key += key + immunization.getVaccineCode().getText();
-						 VaccinationMaster vaccinationMaster = new VaccinationMaster();
-						 ImmunizationHandler.vaccinationMasterFromFhirImmunization(vaccinationMaster, immunization);
+						 VaccinationMaster vaccinationMaster = ImmunizationHandler.getVaccinationMaster(null, immunization);
 						 map.put(key, vaccinationMaster);
 					 }
 				 }
@@ -2599,7 +2620,9 @@ public class IncomingMessageHandler {
 		 try {
 			 Bundle bundle = fhirClient.search().forResource(Patient.class)
 				 .where(Patient.IDENTIFIER.exactly().identifier(patientExternalLink)).returnBundle(Bundle.class).execute();
-			 Patient patient = (Patient) bundle.getEntryFirstRep().getResource();
+			 if (!bundle.hasEntry()) {
+				 return patientExternalLink;
+			 }
 		 } catch (ResourceNotFoundException e) {
 			 // TODO check if it works, if no resources found
 			 return patientExternalLink;

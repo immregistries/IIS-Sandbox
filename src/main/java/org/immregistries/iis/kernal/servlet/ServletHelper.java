@@ -6,11 +6,16 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.immregistries.iis.kernal.model.OrgAccess;
 import org.immregistries.iis.kernal.model.OrgMaster;
+import org.immregistries.iis.kernal.repository.RepositoryClientFactory;
 import org.mindrot.jbcrypt.BCrypt;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
 public class ServletHelper {
+
+	@Autowired
+	RepositoryClientFactory repositoryClientFactory;
 
   private static String BAD_PASSWORD = "badpassword";
 
@@ -41,6 +46,8 @@ public class ServletHelper {
       dataSession.save(orgMaster);
       dataSession.save(orgAccess);
       transaction.commit();
+
+//		 repositoryClientFactory.newGenericClient("")
     }
 
     if (orgAccess == null) {

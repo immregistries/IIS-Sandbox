@@ -1,19 +1,12 @@
 package org.immregistries.iis.kernal.mapping;
 
-import ca.uhn.fhir.rest.api.server.RequestDetails;
-import org.hibernate.Query;
-import org.hibernate.Session;
 import org.hl7.fhir.r5.model.*;
 import org.immregistries.iis.kernal.model.PatientReported;
 import org.immregistries.iis.kernal.model.VaccinationMaster;
 import org.immregistries.iis.kernal.model.VaccinationReported;
-import org.immregistries.vaccination_deduplication.computation_classes.Deterministic;
-import org.immregistries.vaccination_deduplication.reference.ComparisonResult;
-import org.immregistries.vaccination_deduplication.reference.ImmunizationSource;
 
 import java.math.BigDecimal;
 import java.util.Date;
-import java.util.List;
 
 
 public class ImmunizationHandler {
@@ -22,175 +15,166 @@ public class ImmunizationHandler {
 	public static VaccinationReported vaccinationReportedFromFhir(Immunization i) {
 		VaccinationReported vaccinationReported = new VaccinationReported();
 		vaccinationReported.setVaccinationReportedId(i.getId());
-		fillVaccinationReportedFromFhirImmunization(vaccinationReported,i);
-		VaccinationMaster vaccinationMaster = new VaccinationMaster();
-		vaccinationMaster.setVaccinationId(vaccinationReported.getVaccinationReportedId());
+		fillVaccinationReported(vaccinationReported,i);
+		VaccinationMaster vaccinationMaster = getVaccinationMaster(null,i);
 		vaccinationReported.setVaccination(vaccinationMaster);
 		vaccinationMaster.setVaccinationReported(vaccinationReported);
-		vaccinationMasterFromFhirImmunization(vaccinationMaster, i);
 		return vaccinationReported;
 	}
 
-  public static void patientReportedFromFhirImmunization(PatientReported patientReported,
-      Immunization i) {
-    if (i != null) {
-      patientReported.setReportedDate(i.getRecorded());
-      patientReported.setUpdatedDate(i.getOccurrenceDateTimeType().getValue());
-      patientReported.setPatientReportedAuthority(i.getIdentifierFirstRep().getValue());
-    }
-
-  }
+//  public static void patientReportedFromFhirImmunization(PatientReported patientReported,
+//      Immunization i) {
+//    if (i != null) {
+//      patientReported.setReportedDate(i.getRecorded());
+//      patientReported.setUpdatedDate(i.getOccurrenceDateTimeType().getValue());
+//      patientReported.setPatientReportedAuthority(i.getIdentifierFirstRep().getValue());
+//    }
+//  }
   /**
-   * This method set the vaccinnationReported information based on the immunization information
-   * @param vaccinationReported the vaccinationReported
+   * This method fills a vaccinationReported object with mapped fhir immunization information
+   * @param vr the vaccinationReported
    * @param i the Immunization resource
    */
-  public static void fillVaccinationReportedFromFhirImmunization(
-      VaccinationReported vaccinationReported,
-		Immunization i) {
-    //vaccinationReported.setVaccinationReportedId(0);
-    vaccinationReported.setVaccinationReportedExternalLink(i.getId());
-    if (i.getRecorded() != null) {
-      vaccinationReported.setReportedDate(i.getRecorded());
-    } else {
-      vaccinationReported.setReportedDate(new Date());
-    }
-    vaccinationReported.setUpdatedDate(new Date());
-    vaccinationReported.setLotnumber(i.getLotNumber());
-    vaccinationReported.setAdministeredDate(i.getOccurrenceDateTimeType().getValue());
-    vaccinationReported.setAdministeredAmount(i.getDoseQuantity().getValue().toString());
-    vaccinationReported.setExpirationDate(i.getExpirationDate());
-    vaccinationReported.setVaccinationReportedExternalLink(i.getIdentifier().get(0).getValue());
+  public static void fillVaccinationReported(VaccinationReported vr, Immunization i) {
+     vr.setVaccinationReportedId(MappingHelper.filterIdentifier(i.getIdentifier(),"PatientReported").getValue());
+
+	  vr.setReportedDate(i.getRecorded());
+	  vr.setAdministeredDate(i.getOccurrenceDateTimeType().getValue());
+
+	  vr.setVaccineCvxCode(i.getVaccineCode().getCode("CVX"));
+	  vr.setVaccineNdcCode(i.getVaccineCode().getCode("NDC"));
+	  vr.setVaccineMvxCode(i.getVaccineCode().getCode("MVX"));
+
+	 vr.setAdministeredAmount(i.getDoseQuantity().getValue().toString());
+	 vr.setInformationSource(i.getInformationSourceCodeableConcept().getCode("informationSource"));
+    vr.setUpdatedDate(new Date());
+
+    vr.setLotnumber(i.getLotNumber());
+    vr.setExpirationDate(i.getExpirationDate());
     switch(i.getStatus()){
-        case COMPLETED : vaccinationReported.setCompletionStatus("CP"); break;
-        case ENTEREDINERROR : vaccinationReported.setActionCode("D"); break;
-        case NOTDONE : vaccinationReported.setCompletionStatus("RE"); break; //Could also be NA or PA
+        case COMPLETED : vr.setCompletionStatus("CP"); break;
+        case ENTEREDINERROR : vr.setActionCode("D"); break;
+        case NOTDONE : vr.setCompletionStatus("RE"); break; //Could also be NA or PA
       default:
         break;
     }
 
-//    vaccinationReported.setActionCode(); TODO
-    vaccinationReported.setRefusalReasonCode(i.getReasonFirstRep().getConcept().getText());
-    vaccinationReported.setVaccineCvxCode(i.getVaccineCode().getCodingFirstRep().getCode());
+    vr.setRefusalReasonCode(i.getReasonFirstRep().getConcept().getCodingFirstRep().getCode());
+	 vr.setBodySite(i.getSite().getCodingFirstRep().getCode());
+	 vr.setBodyRoute(i.getRoute().getCodingFirstRep().getCode());
+	 vr.setFundingSource(i.getFundingSource().getCodingFirstRep().getCode());
+	 vr.setFundingEligibility(i.getProgramEligibilityFirstRep().getCodingFirstRep().getCode());
+
+//	 vr.setOrgLocation(LocationMapper.orgLocationFromFhir(i.getLocation()));
+//	  vr.setEnteredBy();
+//	  vr.setAdministeringProvider();
+//	  vr.getOrderingProvider()
+  }
+
+
+  public static VaccinationMaster getVaccinationMaster(VaccinationMaster vm, Immunization i){
+	  if (vm == null){
+		  vm = new VaccinationMaster();
+	  }
+	  vm.setVaccinationId(MappingHelper.filterIdentifier(i.getIdentifier(), "VaccinationMaster").getValue());
+	  vm.setAdministeredDate(i.getOccurrenceDateTimeType().getValue());
+	  vm.setVaccineCvxCode(i.getVaccineCode().getCode("CVX"));
+//	  vm.setPatient();
+//	  vm.setVaccinationReported();
+	  return vm;
   }
 
   /**
-   * This method set the vaccinationMaster information based on the immunization information
-   * @param vaccinationMaster the vaccinationReported
-   * @param i the Immunization resource
-   */
-  public static void vaccinationMasterFromFhirImmunization(VaccinationMaster vaccinationMaster,
-      Immunization i) {
-    vaccinationMaster.setAdministeredDate(i.getOccurrenceDateTimeType().getValue());
-    vaccinationMaster.setVaccineCvxCode(i.getVaccineCode().getCodingFirstRep().getCode());
-  }
-
-  /**
-   * This methods create the immunization resource based on the vaccinationReported information
-   * @param vr the vaccinationReported
+   * This method create the immunization resource based on the vaccinationReported information
+   * @param vaccinationReported the vaccinationReported
    * @return the Immunization resource
    */
-  public static Immunization getImmunization(
-      VaccinationReported vr) {
+  public static Immunization getImmunization(VaccinationMaster vaccinationMaster, VaccinationReported vaccinationReported) {
     Immunization i = new Immunization();
-    i.setId(vr.getVaccinationReportedId());
-    i.setRecorded(vr.getReportedDate());
-    i.setLotNumber(vr.getLotnumber());
-    i.getOccurrenceDateTimeType().setValue(vr.getAdministeredDate());
-    i.setDoseQuantity(new Quantity());
-    i.getDoseQuantity().setValue(new BigDecimal(vr.getAdministeredAmount()));
-    i.setExpirationDate(vr.getExpirationDate());
-    if (vr.getActionCode().equals("D")) {
-      i.setStatus(Immunization.ImmunizationStatusCodes.ENTEREDINERROR);
-    } else {
-      switch(vr.getCompletionStatus()) {
-        case "CP" : {
-          i.setStatus(Immunization.ImmunizationStatusCodes.COMPLETED);
-          break;
-        }
-        case "NA" :
-        case "PA" :
-        case "RE" : {
-          i.setStatus(Immunization.ImmunizationStatusCodes.NOTDONE);
-          break;
-        }
-        case "" : {
-          i.setStatus(Immunization.ImmunizationStatusCodes.NULL);
-          break;
-        }
-        default: break;
-      }
-    }
+	 if (vaccinationMaster != null ){
+		i.addIdentifier(MappingHelper.getFhirIdentifier("VaccinationMaster",vaccinationMaster.getVaccinationId()));
+		i.setOccurrence(new DateTimeType(vaccinationMaster.getAdministeredDate()));
+		i.getVaccineCode().addCoding().setSystem("CVX").setCode(vaccinationMaster.getVaccineCvxCode());
+//		i.setPatient()
+		 i.setPatient(MappingHelper.getFhirReference("Patient","PatientReported", vaccinationMaster.getPatient().getPatientId()));
 
-    i.addReason().setConcept(
-            new CodeableConcept(
-                    new Coding("VXU-iis-sandbox",vr.getRefusalReasonCode(),vr.getRefusalReasonCode())));
-    i.getVaccineCode().addCoding().setCode(vr.getVaccineCvxCode());
-
-    i.setPatient(new Reference("Patient/"
-        + vr.getPatientReported().getPatientReportedExternalLink()));
-
-    Location location  = LocationMapper.fhirLocation(vr.getOrgLocation());
-	 i.setLocation(new Reference(location));
-    Extension links = new Extension("#links");
-    Extension link;
-    link = new Extension();
-    link.setValue(
-        new StringType("/MedicationAdministration/"
-            + vr.getVaccination().getVaccinationReported().getVaccinationReportedExternalLink()));
-    links.addExtension(link);
-    i.addExtension(links);
+	 }
+	 if (vaccinationReported != null) {
+		 fillImmunization(i, vaccinationReported);
+	 }
     return i;
   }
 
-  /**
-   * This methods is looking for matches based on the algorithm used in deduplication servlet
-   * @param dataSession the Session
-   * @param patientReported the patient
-   * @param immunization the immunization resource
-   * @return the vaccinationMaster found, null if none has been found
-   */
-  public static VaccinationMaster findMatch(Session dataSession, PatientReported patientReported, Immunization immunization) {
-    VaccinationMaster vm = null;
-    Deterministic comparer = new Deterministic();
-    ComparisonResult comparison;
-    org.immregistries.vaccination_deduplication.Immunization i1;
-    org.immregistries.vaccination_deduplication.Immunization i2;
+	/**
+	 * This method fills the immunization resource with the mapped information of a vaccinationReported object
+	 * @param i
+	 * @param vr
+	 */
+  public static void fillImmunization(Immunization i, VaccinationReported vr) {
 
-    i1 = new org.immregistries.vaccination_deduplication.Immunization();
-    i1.setCVX(immunization.getVaccineCode().toString());
-    //i1.setDate(String.valueOf(immunization.getOccurrenceDateTimeType()));
-    i1.setLotNumber(immunization.getLotNumber());
-    if (immunization.getPrimarySource()){
-      i1.setSource(ImmunizationSource.SOURCE);
-    }else {
-      i1.setSource(ImmunizationSource.HISTORICAL);
-    }
+//    i.setId(vr.getVaccinationReportedId());
+	  i.addIdentifier(MappingHelper.getFhirIdentifier("vaccinationReported", vr.getVaccinationReportedId()));
+	  i.setPatient(MappingHelper.getFhirReference("Patient","PatientReported", vr.getPatientReported().getPatientReportedId()));
+	  i.setRecorded(vr.getReportedDate());
+	  i.getOccurrenceDateTimeType().setValue(vr.getAdministeredDate());
 
-    {
-      Query query = dataSession.createQuery(
-          "from VaccinationReported where patientReported = ?");
-      query.setParameter(0, patientReported);
-      @SuppressWarnings("unchecked")
-      List<VaccinationReported> vaccinationReportedList = query.list();
+	  i.getVaccineCode().addCoding().setCode(vr.getVaccineCvxCode()).setSystem("CVX");
+	  i.getVaccineCode().addCoding().setCode(vr.getVaccineNdcCode()).setSystem("NDC");
+	  i.getVaccineCode().addCoding().setCode(vr.getVaccineMvxCode()).setSystem("Mvx");
 
-      for (VaccinationReported vaccinationReported : vaccinationReportedList){
-        i2 = new org.immregistries.vaccination_deduplication.Immunization();
-        i2.setCVX(vaccinationReported.getVaccineCvxCode());
-        i2.setDate(vaccinationReported.getAdministeredDate());
-        i2.setLotNumber(vaccinationReported.getLotnumber());
-        if (immunization.getPrimarySource()){
-          i2.setSource(ImmunizationSource.SOURCE);
-        }else {
-          i2.setSource(ImmunizationSource.HISTORICAL);
-        }
-        comparison = comparer.compare(i1,i2);
-        if (comparison.equals(ComparisonResult.EQUAL)) {
-          return vaccinationReported.getVaccination();
-        }
-      }
-    }
-    return vm;
+	  i.setDoseQuantity(new Quantity().setValue(new BigDecimal(vr.getAdministeredAmount())));
+	  i.setInformationSource(new CodeableConcept(new Coding().setSystem("informationSource").setCode(vr.getInformationSource()))); // TODO change system name
+	  i.setLotNumber(vr.getLotnumber());
+	  i.setExpirationDate(vr.getExpirationDate());
+
+	  if (vr.getActionCode().equals("D")) {
+		  i.setStatus(Immunization.ImmunizationStatusCodes.ENTEREDINERROR);
+	  } else {
+		  switch(vr.getCompletionStatus()) {
+			  case "CP" : {
+				  i.setStatus(Immunization.ImmunizationStatusCodes.COMPLETED);
+				  break;
+			  }
+			  case "NA" :
+			  case "PA" :
+			  case "RE" : {
+				  i.setStatus(Immunization.ImmunizationStatusCodes.NOTDONE);
+				  break;
+			  }
+			  case "" : {
+				  i.setStatus(Immunization.ImmunizationStatusCodes.NULL);
+				  break;
+			  }
+			  default: break;
+		  }
+	  }
+	  i.addReason().setConcept(new CodeableConcept(new Coding("refusalReasonCode",vr.getRefusalReasonCode(),vr.getRefusalReasonCode())));
+	  i.getSite().addCoding().setSystem("bodyPart").setCode(vr.getBodySite());
+	  i.getRoute().addCoding().setSystem("bodyRoute").setCode(vr.getBodyRoute());
+	  i.getFundingSource().addCoding().setSystem("fundingSource").setCode(vr.getFundingSource());
+	  i.addProgramEligibility().addCoding().setSystem("fundingEligibility").setCode(vr.getFundingEligibility());
+
+
+	  Location location  = LocationMapper.fhirLocation(vr.getOrgLocation()); // TODO save it ?
+	  i.setLocation(new Reference(location));
+
+	  if (vr.getEnteredBy() != null) {
+		  i.addPerformer()
+			  .setFunction(new CodeableConcept().addCoding(new Coding().setSystem("iis-sandbox-function").setCode("entering")))
+			  .setActor(MappingHelper.getFhirReference("Person","Person", vr.getEnteredBy().getPersonId()));
+	  }
+	  if (vr.getOrderingProvider() != null) {
+		  i.addPerformer()
+			  .setFunction(new CodeableConcept().addCoding(new Coding().setSystem("iis-sandbox-function").setCode("ordering")))
+			  .setActor(MappingHelper.getFhirReference("Person", "Person", vr.getOrderingProvider().getPersonId()));
+	  }
+	  if (vr.getAdministeringProvider() != null) {
+		  i.addPerformer()
+			  .setFunction(new CodeableConcept().addCoding(new Coding().setSystem("iis-sandbox-function").setCode("administering")))
+			  .setActor(MappingHelper.getFhirReference("Person", "Person", vr.getAdministeringProvider().getPersonId()));
+	  }
+
   }
+
 
 }

@@ -157,6 +157,7 @@ public class IncomingEventHandler extends IncomingMessageHandler {
 //    }
     if (vaccinationReported == null) {
       vaccinationMaster = new VaccinationMaster();
+		vaccinationMaster.setVaccinationId(vaccinationReportedExternalLink); // TODO  verify
       vaccinationReported = new VaccinationReported();
       vaccinationReported.setVaccination(vaccinationMaster);
       vaccinationMaster.setVaccinationReported(null);
@@ -265,23 +266,16 @@ public class IncomingEventHandler extends IncomingMessageHandler {
 
 
     {
-		 Immunization immunization = ImmunizationHandler.getImmunization(vaccinationReported);
+		 Immunization immunization = ImmunizationHandler.getImmunization(vaccinationMaster,vaccinationReported);
 		 // TODO include master info
 		 fhirClient.update().resource(immunization).conditional()
 			 .where(Immunization.IDENTIFIER.exactly().systemAndIdentifier("VaccinationReported",vaccinationReported.getVaccinationReportedId()))
-//			 .or(Immunization.IDENTIFIER.exactly().systemAndIdentifier("VaccinationMaster",vaccinationMaster.getVaccinationId()))
+//			 .or(Immunization.IDENTIFIER.exactly().systemAndIdentifier("VaccinationMaster",vaccinationMaster.getVaccinationId())) TODO
 			 .execute();
 //		 Immunization immunizationMaster = ImmunizationHandler.getImmunization(vaccinationMaster);
 //		 fhirClient.update().resource(immunization).conditional().where(
 //				 Immunization.IDENTIFIER.exactly().systemAndIdentifier("VaccinationReported",vaccinationReported.getVaccinationReportedId()))
 //			 .execute();
-
-//      Transaction transaction = dataSession.beginTransaction();
-//      dataSession.saveOrUpdate(vaccinationMaster);
-//      dataSession.saveOrUpdate(vaccinationReported);
-//      vaccinationMaster.setVaccinationReported(vaccinationReported);
-//      dataSession.saveOrUpdate(vaccinationMaster);
-//      transaction.commit();
 
     }
 
@@ -420,7 +414,8 @@ public class IncomingEventHandler extends IncomingMessageHandler {
     patientReported.setGuardianRelationship(req.getParameter(GUARDIAN_RELATIONSHIP));
     patientReported.setUpdatedDate(new Date());
     {
-		 Patient patient = PatientHandler.getFhirPatient(patientMaster, patientReported);
+		 Patient patient = new Patient();
+		 PatientHandler.getFhirPatient(patient, patientMaster, patientReported);
 		 fhirClient.update().resource(patient).conditional().where(Patient.IDENTIFIER.exactly()
 			 .systemAndIdentifier("PatientMaster",patientMaster.getPatientId())).execute();
 		 fhirClient.update().resource(patient).conditional().where(Patient.IDENTIFIER.exactly() //TODO choose to save or not the patientMaster

@@ -1,10 +1,14 @@
 package org.immregistries.iis.kernal.servlet;
 
+import ca.uhn.fhir.rest.client.api.IGenericClient;
 import org.hibernate.Query;
 import org.hibernate.Session;
+import org.immregistries.iis.kernal.logic.IncomingMessageHandler;
 import org.immregistries.iis.kernal.model.MessageReceived;
 import org.immregistries.iis.kernal.model.OrgAccess;
 import org.immregistries.iis.kernal.model.OrgMaster;
+import org.immregistries.iis.kernal.repository.RepositoryClientFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -20,6 +24,8 @@ import java.util.Map;
 
 @SuppressWarnings("serial")
 public class MessageServlet extends HttpServlet {
+	@Autowired
+	private RepositoryClientFactory repositoryClientFactory;
 
   public static final String PARAM_ORG_ID = "orgId";
   public static final String PARAM_USERID = "USERID";
@@ -47,6 +53,7 @@ public class MessageServlet extends HttpServlet {
       throws ServletException, IOException {
 
     HttpSession session = req.getSession(true);
+	  IGenericClient fhirClient;
 
     resp.setContentType("text/html");
     PrintWriter out = new PrintWriter(resp.getOutputStream());

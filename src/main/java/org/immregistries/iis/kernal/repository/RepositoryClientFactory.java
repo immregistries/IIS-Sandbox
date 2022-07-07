@@ -20,7 +20,7 @@ public class RepositoryClientFactory extends ApacheRestfulClientFactory {
 	 private IFhirSystemDao fhirSystemDao;
     private final Logger logger = LoggerFactory.getLogger(RepositoryClientFactory.class);
     private IClientInterceptor authInterceptor;
-	 private static String serverBase = "http://localhost:8080";
+	 private static String serverBase = "http://localhost:8080/fhir";
 
 	@Autowired
 	public RepositoryClientFactory(){
