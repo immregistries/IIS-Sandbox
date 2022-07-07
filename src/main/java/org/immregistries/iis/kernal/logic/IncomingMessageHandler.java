@@ -478,10 +478,13 @@ public class IncomingMessageHandler {
                 orgLocation.setAddressZip(reader.getValue(11, 13));
                 orgLocation.setAddressCountry(reader.getValue(11, 14));
 					 Location location = LocationMapper.fhirLocation(orgLocation);
-					 fhirClient.update().resource(location).conditional().where(Location.IDENTIFIER.exactly().systemAndIdentifier("orgLocation",orgLocation.getOrgLocationId())).execute();
-//                Transaction transaction = dataSession.beginTransaction();
-//                dataSession.save(orgLocation);
-//                transaction.commit();
+					  try {
+						  fhirClient.update().resource(location).conditional()
+							  .where(Location.IDENTIFIER.exactly().systemAndIdentifier("OrgLocation", location.getId()))
+							  .execute();
+					  } catch (ResourceNotFoundException e) {
+						  fhirClient.create().resource(location).execute();
+					  }
               }
               vaccinationReported.setOrgLocation(orgLocation);
             }
@@ -616,24 +619,16 @@ public class IncomingMessageHandler {
           verifyNoErrors(processingExceptionList);
           reader.gotoSegmentPosition(segmentPosition);
           {
-				 Immunization immunization = ImmunizationHandler.getImmunization(null,vaccinationReported);
-				 fhirClient.update().resource(immunization).conditional().where(
-						 Immunization.IDENTIFIER.exactly()
-							 .systemAndIdentifier("VaccinationReported",vaccinationReported.getVaccinationReportedId()))
-					 .execute();
-				 immunization = ImmunizationHandler.getImmunization(vaccinationMaster,null);
-				 fhirClient.update().resource(immunization).conditional().where(
-						 Immunization.IDENTIFIER.exactly()
-							 .systemAndIdentifier("VaccinationMaster",vaccinationMaster.getVaccinationId()))
-					 .execute();
-				 // TODO include master info
-
-//            Transaction transaction = dataSession.beginTransaction();
-//            dataSession.saveOrUpdate(vaccinationMaster);
-//            dataSession.saveOrUpdate(vaccinationReported);
-//            vaccinationMaster.setVaccinationReported(vaccinationReported);
-//            dataSession.saveOrUpdate(vaccinationMaster);
-//            transaction.commit();
+				 Immunization immunization = ImmunizationHandler.getImmunization(vaccinationMaster,vaccinationReported);
+//				 fhirClient.patch();TODO Convert resources to Fhirpatch and replace simple updates with patch
+				 try {
+					 fhirClient.update().resource(immunization).conditional().where(
+							 Immunization.IDENTIFIER.exactly()
+								 .systemAndIdentifier("VaccinationReported",vaccinationReported.getVaccinationReportedId()))
+						 .execute();
+				 } catch (ResourceNotFoundException e ){
+					 fhirClient.create().resource(immunization).execute();
+				 }
           }
 
           reader.gotoSegmentPosition(segmentPosition);

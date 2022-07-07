@@ -229,9 +229,14 @@ public class IncomingEventHandler extends IncomingMessageHandler {
           orgLocation.setAddressZip("");
           orgLocation.setAddressCountry("");
 			  Location location = LocationMapper.fhirLocation(orgLocation);
-			  fhirClient.update().resource(location).conditional() //TODO test
-				  .where(Location.IDENTIFIER.exactly().systemAndIdentifier("OrgLocation", location.getId()))
-				  .execute();
+			  try {
+				  fhirClient.update().resource(location).conditional() //TODO test
+					  .where(Location.IDENTIFIER.exactly().systemAndIdentifier("OrgLocation", location.getId()))
+					  .execute();
+			  } catch (ResourceNotFoundException e) {
+				  fhirClient.create().resource(location).execute();
+			  }
+
 //          Transaction transaction = dataSession.beginTransaction();
 //          dataSession.save(orgLocation);
 //          transaction.commit();
@@ -268,15 +273,14 @@ public class IncomingEventHandler extends IncomingMessageHandler {
     {
 		 Immunization immunization = ImmunizationHandler.getImmunization(vaccinationMaster,vaccinationReported);
 		 // TODO include master info
-		 fhirClient.update().resource(immunization).conditional()
-			 .where(Immunization.IDENTIFIER.exactly().systemAndIdentifier("VaccinationReported",vaccinationReported.getVaccinationReportedId()))
+		 try {
+			 fhirClient.update().resource(immunization).conditional()
+				 .where(Immunization.IDENTIFIER.exactly().systemAndIdentifier("VaccinationReported",vaccinationReported.getVaccinationReportedId()))
 //			 .or(Immunization.IDENTIFIER.exactly().systemAndIdentifier("VaccinationMaster",vaccinationMaster.getVaccinationId())) TODO
-			 .execute();
-//		 Immunization immunizationMaster = ImmunizationHandler.getImmunization(vaccinationMaster);
-//		 fhirClient.update().resource(immunization).conditional().where(
-//				 Immunization.IDENTIFIER.exactly().systemAndIdentifier("VaccinationReported",vaccinationReported.getVaccinationReportedId()))
-//			 .execute();
-
+				 .execute();
+		 } catch (ResourceNotFoundException e){
+			 fhirClient.create().resource(immunization).execute();
+		 }
     }
 
   }
@@ -416,10 +420,14 @@ public class IncomingEventHandler extends IncomingMessageHandler {
     {
 		 Patient patient = new Patient();
 		 PatientHandler.getFhirPatient(patient, patientMaster, patientReported);
-		 fhirClient.update().resource(patient).conditional().where(Patient.IDENTIFIER.exactly()
-			 .systemAndIdentifier("PatientMaster",patientMaster.getPatientId())).execute();
-		 fhirClient.update().resource(patient).conditional().where(Patient.IDENTIFIER.exactly() //TODO choose to save or not the patientMaster
-			 .systemAndIdentifier("PatientReported",patientReported.getPatientReportedId())).execute();
+		 // TODO Patch instead of PUT
+		 try {
+			 fhirClient.update().resource(patient).conditional().where(Patient.IDENTIFIER.exactly() //TODO choose to save or not the patientMaster
+				 .systemAndIdentifier("PatientReported",patientReported.getPatientReportedId())).execute();
+		 } catch (ResourceNotFoundException e ){
+			 fhirClient.create().resource(patient).execute();
+		 }
+
     }
     return patientReported;
   }

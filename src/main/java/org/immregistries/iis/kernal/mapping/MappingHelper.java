@@ -1,7 +1,10 @@
 package org.immregistries.iis.kernal.mapping;
 
+import ca.uhn.fhir.jpa.patch.FhirPatch;
+import ca.uhn.fhir.model.api.IResource;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
+import org.hl7.fhir.instance.model.api.IBaseParameters;
 import org.hl7.fhir.r5.model.*;
 import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.model.PatientReported;
@@ -56,6 +59,21 @@ public class MappingHelper {
 //				.execute();
 //		}
 //	}
+
+	public static IBaseParameters resourceToPatch(Resource resource) {
+		Parameters patch = new Parameters();
+//		Parameters.ParametersParameterComponent operation = patch.addParameter();
+//		operation.setName("operation");
+//		operation
+//			.addPart()
+//			.setName("type")
+//			.setValue(new CodeType("delete"));
+//		operation
+//			.addPart()
+//			.setName("path")
+//			.setValue(new StringType("Patient.identifier[0]"));
+		return patch;
+	}
 
 
 }
