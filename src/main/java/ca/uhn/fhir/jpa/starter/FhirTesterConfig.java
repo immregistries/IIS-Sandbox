@@ -41,7 +41,7 @@ public class FhirTesterConfig {
         .addServer()
         .withId(t.getKey())
         .withFhirVersion(t.getValue().getFhir_version())
-        .withBaseUrl(t.getValue().getServer_address())
+        .withBaseUrl(t.getValue().getServer_address())//TODO Add user id here for multitenancy or allow metadata without partitioning
         .withName(t.getValue().getName());
       retVal.setRefuseToFetchThirdPartyUrls(
         t.getValue().getRefuse_to_fetch_third_party_urls());

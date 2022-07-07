@@ -95,9 +95,7 @@ public class ImmunizationHandler {
 		i.addIdentifier(MappingHelper.getFhirIdentifier("VaccinationMaster",vaccinationMaster.getVaccinationId()));
 		i.setOccurrence(new DateTimeType(vaccinationMaster.getAdministeredDate()));
 		i.getVaccineCode().addCoding().setSystem("CVX").setCode(vaccinationMaster.getVaccineCvxCode());
-//		i.setPatient()
-		 i.setPatient(MappingHelper.getFhirReference("Patient","PatientReported", vaccinationMaster.getPatient().getPatientId()));
-
+		i.setPatient(MappingHelper.getFhirReference("Patient","PatientReported", vaccinationMaster.getPatient().getPatientId()));
 	 }
 	 if (vaccinationReported != null) {
 		 fillImmunization(i, vaccinationReported);
@@ -111,8 +109,6 @@ public class ImmunizationHandler {
 	 * @param vr
 	 */
   public static void fillImmunization(Immunization i, VaccinationReported vr) {
-
-//    i.setId(vr.getVaccinationReportedId());
 	  i.addIdentifier(MappingHelper.getFhirIdentifier("vaccinationReported", vr.getVaccinationReportedId()));
 	  i.setPatient(MappingHelper.getFhirReference("Patient","PatientReported", vr.getPatientReported().getPatientReportedId()));
 	  i.setRecorded(vr.getReportedDate());
