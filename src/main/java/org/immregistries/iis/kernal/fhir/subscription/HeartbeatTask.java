@@ -45,7 +45,7 @@ public class HeartbeatTask extends TimerTask {
 
     @Override
     public void run() {
-        Session session = factory.openSession();
+        Session session = getDataSession();
         logger.info(" Heartbeat task ran at {}", LocalDateTime.ofInstant(Instant.ofEpochMilli(scheduledExecutionTime()),
                 ZoneId.systemDefault()));
         this.subscriptionStatus.setEventsSinceSubscriptionStart(subscriptionStatus.getEventsSinceSubscriptionStart() + 1);
@@ -55,7 +55,7 @@ public class HeartbeatTask extends TimerTask {
         /**
          * TODO fetch subscription in db, see if still active, if not cancel
          */
-//       this.client.create().resource(this.bundle).execute();
+       this.client.create().resource(this.subscriptionStatus).execute();
     }
 
     public Bundle getBundle() {

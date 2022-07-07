@@ -34,17 +34,7 @@
 			<version>4.13.1</version>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.immregistries</groupId>
-			<artifactId>mqe-hl7-utility</artifactId>
-			<version>2021.7-BETA</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.apache.commons</groupId>
-					<artifactId>commons-lang3</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
+
 		<dependency>
 			<groupId>org.mortbay.jetty</groupId>
 			<artifactId>jetty</artifactId>
@@ -100,6 +90,18 @@
 			<groupId>org.immregistries.vaccination_deduplication</groupId>
 			<artifactId>vaccination-deduplication-api</artifactId>
 			<version>0.1-SNAPSHOT</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.immregistries</groupId>
+			<artifactId>mqe-hl7-utility</artifactId>
+			<version>2021.7-BETA</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.apache.commons</groupId>
+					<artifactId>commons-lang3</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<dependency>
