@@ -1,10 +1,17 @@
 package ca.uhn.fhir.jpa.starter;
 
+import ca.uhn.fhir.context.FhirContext;
+import ca.uhn.fhir.rest.client.api.IGenericClient;
+import ca.uhn.fhir.rest.server.util.ITestingUiClientFactory;
 import ca.uhn.fhir.to.FhirTesterMvcConfig;
 import ca.uhn.fhir.to.TesterConfig;
+import org.immregistries.iis.kernal.repository.RepositoryClientFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+
+import javax.servlet.http.HttpServletRequest;
 
 //@formatter:off
 /**
@@ -18,6 +25,9 @@ import org.springframework.context.annotation.Import;
 @Configuration
 @Import(FhirTesterMvcConfig.class)
 public class FhirTesterConfig {
+
+	@Autowired
+	RepositoryClientFactory repositoryClientFactory;
 
 	/**
 	 * This bean tells the testing webpage which servers it should configure itself
@@ -47,6 +57,8 @@ public class FhirTesterConfig {
         t.getValue().getRefuse_to_fetch_third_party_urls());
 
     });
+
+//	  retVal.setClientFactory(repositoryClientFactory); //TODO
     return retVal;
   }
 

@@ -450,15 +450,6 @@ public class IncomingMessageHandler {
 							orgLocation = LocationMapper.orgLocationFromFhir(location);
 						}
 					} catch (ResourceNotFoundException e) {}
-//              Query query = dataSession.createQuery(
-//                  "from OrgLocation where orgMaster = :orgMaster and orgFacilityCode = :orgFacilityCode");
-//              query.setParameter("orgMaster", orgAccess.getOrg());
-//              query.setParameter("orgFacilityCode", administeredAtLocation);
-//              List<OrgLocation> orgMasterList = query.list();
-//              OrgLocation orgLocation = null;
-//              if (orgMasterList.size() > 0) {
-//                orgLocation = orgMasterList.get(0);
-//              }
 
               if (orgLocation == null) {
                 if (processingFlavorSet.contains(ProcessingFlavor.PEAR)) {

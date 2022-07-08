@@ -20,6 +20,7 @@ import ca.uhn.fhir.jpa.partition.PartitionManagementProvider;
 import ca.uhn.fhir.jpa.provider.*;
 import ca.uhn.fhir.jpa.provider.dstu3.JpaConformanceProviderDstu3;
 import ca.uhn.fhir.jpa.search.DatabaseBackedPagingProvider;
+import ca.uhn.fhir.jpa.starter.interceptors.PartitionCreationInterceptor;
 import ca.uhn.fhir.jpa.subscription.util.SubscriptionDebugLogInterceptor;
 import ca.uhn.fhir.mdm.provider.MdmProviderLoader;
 import ca.uhn.fhir.narrative.DefaultThymeleafNarrativeGenerator;
@@ -98,6 +99,9 @@ public class BaseJpaRestfulServer extends RestfulServer {
   Optional<CqlProviderLoader> cqlProviderLoader;
   @Autowired
   Optional<MdmProviderLoader> mdmProviderProvider;
+
+  @Autowired
+	PartitionCreationInterceptor partitionCreationInterceptor;
 
   @Autowired
   private IValidationSupport myValidationSupport;
@@ -368,7 +372,8 @@ public class BaseJpaRestfulServer extends RestfulServer {
 
     // Partitioning
     if (appProperties.getPartitioning() != null) {
-      registerInterceptor(new RequestTenantPartitionInterceptor());
+		 registerInterceptor(partitionCreationInterceptor);
+//      registerInterceptor(new RequestTenantPartitionInterceptor());
       setTenantIdentificationStrategy(new UrlBaseTenantIdentificationStrategy());
       registerProviders(partitionManagementProvider);
     }
