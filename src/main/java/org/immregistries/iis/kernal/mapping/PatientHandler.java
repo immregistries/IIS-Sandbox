@@ -133,7 +133,9 @@ public class PatientHandler {
 		patientReported.setPublicityIndicatorDate(new Date(p.getExtensionByUrl("publicity").getValueCoding().getVersion()));
 
 		patientReported.setProtectionIndicator(p.getExtensionByUrl("protection").getValueCoding().getCode());
-		patientReported.setProtectionIndicatorDate(new Date(p.getExtensionByUrl("protection").getValueCoding().getVersion()));
+		if (p.getExtensionByUrl("protection").getValueCoding().getVersion() != null) {
+			patientReported.setProtectionIndicatorDate(new Date());
+		}
 
 		patientReported.setRegistryStatusIndicator(p.getExtensionByUrl("registryStatus").getValueCoding().getCode());
 		patientReported.setRegistryStatusIndicatorDate(new Date(p.getExtensionByUrl("registryStatus").getValueCoding().getVersion()));
