@@ -36,7 +36,20 @@ public class PartitionCreationInterceptor extends RequestTenantPartitionIntercep
 	@Override
 	@Hook(Pointcut.STORAGE_PARTITION_IDENTIFY_CREATE)
 	public RequestPartitionId PartitionIdentifyCreate(RequestDetails theRequestDetails) {
-		ourLog.info("STORAGE_PARTITION_IDENTIFY_CREATE {}", theRequestDetails.getTenantId());
+		ourLog.info("STORAGE_PARTITION_IDENTIFY_CREATE {} {}",theRequestDetails.getRequestType(), theRequestDetails.getCompleteUrl());
+		createPartition(theRequestDetails);
+		return this.extractPartitionIdFromRequest(theRequestDetails);
+	}
+
+	@Override
+	@Hook(Pointcut.STORAGE_PARTITION_IDENTIFY_READ)
+	public RequestPartitionId PartitionIdentifyRead(RequestDetails theRequestDetails) {
+		ourLog.info("STORAGE_PARTITION_IDENTIFY_READ {} {}",theRequestDetails.getRequestType(), theRequestDetails.getCompleteUrl());
+		createPartition(theRequestDetails);
+		return super.PartitionIdentifyRead(theRequestDetails);
+	}
+
+	private void createPartition(RequestDetails theRequestDetails) {
 		try {
 			partitionLookupSvc.getPartitionByName(theRequestDetails.getTenantId());
 		} catch (ResourceNotFoundException e) {
@@ -59,17 +72,6 @@ public class PartitionCreationInterceptor extends RequestTenantPartitionIntercep
 			inParams.addParameter().setName("description").setValue(tenantId);
 			partitionManagementProvider.addPartition(inParams,new IntegerType(id),tenantId,tenantId);
 		}
-		for (PartitionEntity partition: partitionLookupSvc.listPartitions()) {
-			ourLog.info("PARTITION LIST {} {}",partition.getName(), partition.getId());
-		}
-		return this.extractPartitionIdFromRequest(theRequestDetails);
-	}
-
-	@Override
-	@Hook(Pointcut.STORAGE_PARTITION_IDENTIFY_READ)
-	public RequestPartitionId PartitionIdentifyRead(RequestDetails theRequestDetails) {
-		ourLog.info("STORAGE_PARTITION_IDENTIFY_READ {}", theRequestDetails.getCompleteUrl());
-		return this.extractPartitionIdFromRequest(theRequestDetails);
 	}
 
 }
