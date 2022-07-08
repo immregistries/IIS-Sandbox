@@ -8,6 +8,7 @@ import ca.uhn.fhir.rest.client.api.IClientInterceptor;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.client.api.ServerValidationModeEnum;
 import ca.uhn.fhir.rest.client.interceptor.BearerTokenAuthInterceptor;
+import ca.uhn.fhir.rest.server.interceptor.LoggingInterceptor;
 import ca.uhn.fhir.rest.server.util.ITestingUiClientFactory;
 import org.immregistries.iis.kernal.model.OrgAccess;
 import org.slf4j.Logger;
@@ -24,6 +25,7 @@ public class RepositoryClientFactory extends ApacheRestfulClientFactory implemen
 	 private IFhirSystemDao fhirSystemDao;
     private final Logger logger = LoggerFactory.getLogger(RepositoryClientFactory.class);
     private IClientInterceptor authInterceptor;
+    private LoggingInterceptor loggingInterceptor;
 	 private static String serverBase = "http://localhost:8080/fhir";
 
 	@Autowired
@@ -35,6 +37,8 @@ public class RepositoryClientFactory extends ApacheRestfulClientFactory implemen
 	private void asynchInit() {
 		if (this.getFhirContext() == null ){
 			setFhirContext(fhirSystemDao.getContext());
+			loggingInterceptor = new LoggingInterceptor();
+			loggingInterceptor.setLogger(logger);
 		}
 		if (serverBase.equals("")) {
 			serverBase = ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString() + "/fhir";
@@ -65,6 +69,7 @@ public class RepositoryClientFactory extends ApacheRestfulClientFactory implemen
 		  asynchInit();
         IGenericClient client = super.newGenericClient(theServerBase);
 		  authInterceptor = new BearerTokenAuthInterceptor();
+		  client.registerInterceptor(loggingInterceptor);
 		  client.registerInterceptor(authInterceptor);
         return client;
     }

@@ -470,14 +470,10 @@ public class IncomingMessageHandler {
                 orgLocation.setAddressZip(reader.getValue(11, 13));
                 orgLocation.setAddressCountry(reader.getValue(11, 14));
 					 Location location = LocationMapper.fhirLocation(orgLocation);
-					  try {
-						  MethodOutcome outcome = fhirClient.update().resource(location).conditional()
-							  .where(Location.IDENTIFIER.exactly().systemAndIdentifier("OrgLocation", location.getId()))
-							  .execute();
-					  } catch (ResourceNotFoundException e) {
-						  MethodOutcome outcome = fhirClient.create().resource(location).execute();
-					  }
-              }
+					  MethodOutcome outcome;
+					  outcome = fhirClient.create().resource(location).execute();
+					  orgLocation = LocationMapper.orgLocationFromFhir(location);
+				  }
               vaccinationReported.setOrgLocation(orgLocation);
             }
           }

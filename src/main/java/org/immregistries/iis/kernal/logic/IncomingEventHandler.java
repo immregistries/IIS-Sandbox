@@ -204,7 +204,7 @@ public class IncomingEventHandler extends IncomingMessageHandler {
 			try {
 				Bundle bundle = fhirClient.search().forResource(Location.class)
 					.where(Location.IDENTIFIER.exactly().identifier(administeredAtLocation))
-					.where(Location.ORGANIZATION.hasAnyOfIds(administeredAtLocation)) //Todo verify condition
+//					.where(Location.ORGANIZATION.hasAnyOfIds(administeredAtLocation)) //Todo verify condition
 					.returnBundle(Bundle.class).execute();
 				Location location = (Location) bundle.getEntryFirstRep().getResource();
 				orgLocation = LocationMapper.orgLocationFromFhir(location);
@@ -231,13 +231,7 @@ public class IncomingEventHandler extends IncomingMessageHandler {
           orgLocation.setAddressZip("");
           orgLocation.setAddressCountry("");
 			  Location location = LocationMapper.fhirLocation(orgLocation);
-			  try {
-				  MethodOutcome outcome = fhirClient.update().resource(location).conditional() //TODO test
-					  .where(Location.IDENTIFIER.exactly().systemAndIdentifier("OrgLocation", location.getId()))
-					  .execute();
-			  } catch (ResourceNotFoundException e) {
-				  MethodOutcome outcome = fhirClient.create().resource(location).execute();
-			  }
+			  MethodOutcome outcome = fhirClient.create().resource(location).execute();
 
 //          Transaction transaction = dataSession.beginTransaction();
 //          dataSession.save(orgLocation);
