@@ -38,30 +38,34 @@ public class PartitionCreationInterceptor extends RequestTenantPartitionIntercep
 	@Autowired
 	private IPartitionLookupSvc partitionLookupSvc;
 	@Autowired
-	PartitionManagementProvider partitionManagementProvider;
+	private PartitionManagementProvider partitionManagementProvider;
 	private final Logger ourLog = LoggerFactory.getLogger(PartitionCreationInterceptor.class);
 
 	@Override
 	@Hook(Pointcut.STORAGE_PARTITION_IDENTIFY_CREATE)
 	public RequestPartitionId PartitionIdentifyCreate(RequestDetails theRequestDetails) {
-		ourLog.info("STORAGE_PARTITION_IDENTIFY_CREATE");
-		StringType tenantId = new StringType(this.extractPartitionIdFromRequest(theRequestDetails).getPartitionNames().get(0));
-		Random random = new Random();
-		int id = random.nextInt(10000);
-		int number_of_attempts = 0;
-		while (number_of_attempts < 100){
-			try {
-				partitionLookupSvc.getPartitionById(id);
-			} catch (ResourceNotFoundException e) {
-				id = random.nextInt(10000);
+		try {
+			partitionLookupSvc.getPartitionByName(theRequestDetails.getTenantId());
+		} catch (ResourceNotFoundException e) {
+			ourLog.info("STORAGE_PARTITION_IDENTIFY_CREATE {}", theRequestDetails.getTenantId());
+			StringType tenantId = new StringType(theRequestDetails.getTenantId());
+			Random random = new Random();
+			int id = random.nextInt(10000);
+			int number_of_attempts = 0;
+			while (number_of_attempts < 100){
+				try {
+					partitionLookupSvc.getPartitionById(id);
+				} catch (ResourceNotFoundException ee) {
+					id = random.nextInt(10000);
+				}
+				number_of_attempts++;
 			}
-			number_of_attempts++;
+			Parameters inParams = new Parameters();
+			inParams.addParameter().setName("id").setValue(new IntegerType(id));
+			inParams.addParameter().setName("name").setValue(tenantId);
+			inParams.addParameter().setName("description").setValue(tenantId);
+			partitionManagementProvider.addPartition(inParams,new IntegerType(id),tenantId,tenantId);
 		}
-		Parameters inParams = new Parameters();
-		inParams.addParameter().setName("id").setValue(new IntegerType(id));
-		inParams.addParameter().setName("name").setValue(tenantId);
-		inParams.addParameter().setName("description").setValue(tenantId);
-		partitionManagementProvider.addPartitions(inParams);
 		return this.extractPartitionIdFromRequest(theRequestDetails);
 	}
 

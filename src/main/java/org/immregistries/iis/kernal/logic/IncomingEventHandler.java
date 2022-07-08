@@ -1,5 +1,7 @@
 package org.immregistries.iis.kernal.logic;
 
+import ca.uhn.fhir.model.api.IResource;
+import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.api.server.RequestDetails;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
@@ -230,11 +232,11 @@ public class IncomingEventHandler extends IncomingMessageHandler {
           orgLocation.setAddressCountry("");
 			  Location location = LocationMapper.fhirLocation(orgLocation);
 			  try {
-				  fhirClient.update().resource(location).conditional() //TODO test
+				  MethodOutcome outcome = fhirClient.update().resource(location).conditional() //TODO test
 					  .where(Location.IDENTIFIER.exactly().systemAndIdentifier("OrgLocation", location.getId()))
 					  .execute();
 			  } catch (ResourceNotFoundException e) {
-				  fhirClient.create().resource(location).execute();
+				  MethodOutcome outcome = fhirClient.create().resource(location).execute();
 			  }
 
 //          Transaction transaction = dataSession.beginTransaction();
@@ -274,12 +276,12 @@ public class IncomingEventHandler extends IncomingMessageHandler {
 		 Immunization immunization = ImmunizationHandler.getImmunization(vaccinationMaster,vaccinationReported);
 		 // TODO include master info
 		 try {
-			 fhirClient.update().resource(immunization).conditional()
+			 MethodOutcome outcome = fhirClient.update().resource(immunization).conditional()
 				 .where(Immunization.IDENTIFIER.exactly().systemAndIdentifier("VaccinationReported",vaccinationReported.getVaccinationReportedId()))
 //			 .or(Immunization.IDENTIFIER.exactly().systemAndIdentifier("VaccinationMaster",vaccinationMaster.getVaccinationId())) TODO
 				 .execute();
 		 } catch (ResourceNotFoundException e){
-			 fhirClient.create().resource(immunization).execute();
+			 MethodOutcome outcome = fhirClient.create().resource(immunization).execute();
 		 }
     }
 
@@ -422,10 +424,10 @@ public class IncomingEventHandler extends IncomingMessageHandler {
 		 PatientHandler.getFhirPatient(patient, patientMaster, patientReported);
 		 // TODO Patch instead of PUT
 		 try {
-			 fhirClient.update().resource(patient).conditional().where(Patient.IDENTIFIER.exactly() //TODO choose to save or not the patientMaster
+			 MethodOutcome outcome = fhirClient.update().resource(patient).conditional().where(Patient.IDENTIFIER.exactly() //TODO choose to save or not the patientMaster
 				 .systemAndIdentifier("PatientReported",patientReported.getPatientReportedId())).execute();
 		 } catch (ResourceNotFoundException e ){
-			 fhirClient.create().resource(patient).execute();
+			 MethodOutcome outcome = fhirClient.create().resource(patient).execute();
 		 }
 
     }

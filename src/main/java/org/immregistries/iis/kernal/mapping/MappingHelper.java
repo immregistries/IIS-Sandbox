@@ -40,22 +40,22 @@ public class MappingHelper {
 //	public  static void savePatientReported(IGenericClient fhirClient, PatientMaster pm, PatientReported pr) {
 //		Patient patient = PatientHandler.getFhirPatient(pm,pr);
 //		try {
-//			fhirClient.update().resource(patient).conditional().where(
+//			IResource resource = fhirClient.update().resource(patient).conditional().where(
 //					Patient.IDENTIFIER.exactly().systemAndIdentifier("PatientReported",pr.getPatientReportedId()))
 //				.execute();
 //		} catch (ResourceNotFoundException e){
-//			fhirClient.create().resource(patient)
+//			MethodOutcome outcome = fhirClient.create().resource(patient)
 //				.execute();
 //		}
 //	}
 //	public  static void savePatientMaster(IGenericClient fhirClient, PatientMaster pm) {
 //		Patient patient = PatientHandler.getFhirPatient(pm,null);
 //		try {
-//			fhirClient.update().resource(patient).conditional().where(
+//			IResource resource = fhirClient.update().resource(patient).conditional().where(
 //					Patient.IDENTIFIER.exactly().systemAndIdentifier("PatientMaster",pm.getPatientId()))
 //				.execute();
 //		} catch (ResourceNotFoundException e){
-//			fhirClient.create().resource(patient)
+//			MethodOutcome outcome = fhirClient.create().resource(patient)
 //				.execute();
 //		}
 //	}

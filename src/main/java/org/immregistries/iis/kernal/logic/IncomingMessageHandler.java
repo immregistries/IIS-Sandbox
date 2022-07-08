@@ -1,5 +1,6 @@
 package org.immregistries.iis.kernal.logic;
 
+import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import org.apache.commons.lang3.StringUtils;
 import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
@@ -470,11 +471,11 @@ public class IncomingMessageHandler {
                 orgLocation.setAddressCountry(reader.getValue(11, 14));
 					 Location location = LocationMapper.fhirLocation(orgLocation);
 					  try {
-						  fhirClient.update().resource(location).conditional()
+						  MethodOutcome outcome = fhirClient.update().resource(location).conditional()
 							  .where(Location.IDENTIFIER.exactly().systemAndIdentifier("OrgLocation", location.getId()))
 							  .execute();
 					  } catch (ResourceNotFoundException e) {
-						  fhirClient.create().resource(location).execute();
+						  MethodOutcome outcome = fhirClient.create().resource(location).execute();
 					  }
               }
               vaccinationReported.setOrgLocation(orgLocation);
@@ -505,7 +506,7 @@ public class IncomingMessageHandler {
                 person.setIdentifierTypeCode(reader.getValue(10, 13));
                 person.setProfessionalSuffix(reader.getValue(10, 21));
 					  org.hl7.fhir.r5.model.Person  p = PersonHandler.getFhirPerson(person);
-					  fhirClient.create().resource(p).execute();
+					  MethodOutcome outcome = fhirClient.create().resource(p).execute();
 //                Transaction transaction = dataSession.beginTransaction();
 //                dataSession.save(person);
 //                transaction.commit();
@@ -613,12 +614,12 @@ public class IncomingMessageHandler {
 				 Immunization immunization = ImmunizationHandler.getImmunization(vaccinationMaster,vaccinationReported);
 //				 fhirClient.patch();TODO Convert resources to Fhirpatch and replace simple updates with patch
 				 try {
-					 fhirClient.update().resource(immunization).conditional().where(
+					 MethodOutcome outcome = fhirClient.update().resource(immunization).conditional().where(
 							 Immunization.IDENTIFIER.exactly()
 								 .systemAndIdentifier("VaccinationReported",vaccinationReported.getVaccinationReportedId()))
 						 .execute();
 				 } catch (ResourceNotFoundException e ){
-					 fhirClient.create().resource(immunization).execute();
+					 MethodOutcome outcome = fhirClient.create().resource(immunization).execute();
 				 }
           }
 
@@ -1020,11 +1021,11 @@ public class IncomingMessageHandler {
 		 Patient patient = new Patient();
 		 PatientHandler.getFhirPatient(patient, null,patientReported);
 		 try {
-			 fhirClient.update().resource(patient).conditional().where(
+			 MethodOutcome outcome = fhirClient.update().resource(patient).conditional().where(
 					 Patient.IDENTIFIER.exactly().systemAndIdentifier("PatientReported",patientReported.getPatientReportedId()))
 				 .execute();
 		 } catch (ResourceNotFoundException e){
-			 fhirClient.create().resource(patient)
+			 MethodOutcome outcome = fhirClient.create().resource(patient)
 				 .execute();
 		 }
 
@@ -1121,12 +1122,12 @@ public class IncomingMessageHandler {
 
 		  Observation observation = ObservationMapper.getFhirObservation(observationMaster,observationReported);
 			try {
-				fhirClient.update().resource(observation)
+				MethodOutcome outcome = fhirClient.update().resource(observation)
 					.conditionalByUrl("Observation?identifier=ObservationReported|"
 						+ observationReported.getObservationReportedId())
 					.execute(); // TODO verify injection
 			} catch (ResourceNotFoundException e){
-				fhirClient.create().resource(observation)
+				MethodOutcome outcome = fhirClient.create().resource(observation)
 					.execute();
 			}
       }
