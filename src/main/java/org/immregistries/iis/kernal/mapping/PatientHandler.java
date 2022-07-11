@@ -14,6 +14,17 @@ public class PatientHandler {
 	private PatientHandler() {
 	}
 
+	private static final String REGISTRY_STATUS_EXTENSION = "registryStatus";
+	private static final String REGISTRY_STATUS_INDICATOR = "registryStatusIndicator";
+	private static final String ETHNICITY = "ethnicity";
+	private static final String ETHNICITY_SYSTEM = "ethnicity";
+	private static final String RACE = "race";
+	private static final String RACE_SYSTEM = "race";
+	private static final String PUBLICITY_EXTENSION = "publicity";
+	private static final String PUBLICITY_SYSTEM = "publicityIndicator";
+	private static final String PROTECTION_EXTENSION = "protection";
+	private static final String PROTECTION_SYSTEM = "protectsionIndicator";
+
 	public static PatientReported getPatientReportedFromFhir(Patient p) {
 		PatientReported patientReported = new PatientReported();
 		patientReported.setPatientReportedId(p.getId());
@@ -56,7 +67,7 @@ public class PatientHandler {
 				break;
 		}
 		int raceNumber = 0;
-		for (Coding coding: p.getExtensionByUrl("race").getValueCodeableConcept().getCoding()) {
+		for (Coding coding: p.getExtensionByUrl(RACE).getValueCodeableConcept().getCoding()) {
 			raceNumber++;
 			switch (raceNumber) {
 				case 1:{
@@ -79,7 +90,9 @@ public class PatientHandler {
 				}
 			}
 		}
-		patientReported.setPatientEthnicity(p.getExtensionByUrl("ethnicity").getValueCodeType().getValue());
+		if (p.getExtensionByUrl(ETHNICITY) != null) {
+			patientReported.setPatientEthnicity(p.getExtensionByUrl(ETHNICITY).getValueCodeType().getValue());
+		}
 
 		for (ContactPoint telecom : p.getTelecom()) {
 			if (null != telecom.getSystem()) {
@@ -129,16 +142,24 @@ public class PatientHandler {
 			patientReported.setPatientBirthOrder(String.valueOf(p.getMultipleBirthIntegerType()));
 		}
 
-		patientReported.setPublicityIndicator(p.getExtensionByUrl("publicity").getValueCoding().getCode());
-		patientReported.setPublicityIndicatorDate(new Date(p.getExtensionByUrl("publicity").getValueCoding().getVersion()));
-
-		patientReported.setProtectionIndicator(p.getExtensionByUrl("protection").getValueCoding().getCode());
-		if (p.getExtensionByUrl("protection").getValueCoding().getVersion() != null) {
-			patientReported.setProtectionIndicatorDate(new Date());
+		if (p.getExtensionByUrl(PUBLICITY_EXTENSION) != null) {
+			patientReported.setPublicityIndicator(p.getExtensionByUrl(PUBLICITY_EXTENSION).getValueCoding().getCode());
+			patientReported.setPublicityIndicatorDate(new Date(p.getExtensionByUrl(PUBLICITY_EXTENSION).getValueCoding().getVersion()));
 		}
 
-		patientReported.setRegistryStatusIndicator(p.getExtensionByUrl("registryStatus").getValueCoding().getCode());
-		patientReported.setRegistryStatusIndicatorDate(new Date(p.getExtensionByUrl("registryStatus").getValueCoding().getVersion()));
+		if (p.getExtensionByUrl(PROTECTION_EXTENSION) != null) {
+			patientReported.setProtectionIndicator(p.getExtensionByUrl(PROTECTION_EXTENSION).getValueCoding().getCode());
+			if (p.getExtensionByUrl(PROTECTION_EXTENSION).getValueCoding().getVersion() != null) {
+				patientReported.setProtectionIndicatorDate(new Date());
+			}
+		}
+
+		if (p.getExtensionByUrl(REGISTRY_STATUS_EXTENSION) != null) {
+			patientReported.setRegistryStatusIndicator(p.getExtensionByUrl(REGISTRY_STATUS_EXTENSION).getValueCoding().getCode());
+			patientReported.setRegistryStatusIndicatorDate(new Date(p.getExtensionByUrl(REGISTRY_STATUS_EXTENSION).getValueCoding().getVersion()));
+
+		}
+
 
 		// patientReported.setRegistryStatusIndicator(p.getActive());
 		// Patient Contact / Guardian
@@ -225,8 +246,8 @@ public class PatientHandler {
 
 			//Race and ethnicity
 			Extension raceExtension =  p.addExtension();
-			raceExtension.setUrl("race");
-			CodeableConcept race = new CodeableConcept().setText("race");
+			raceExtension.setUrl(RACE);
+			CodeableConcept race = new CodeableConcept().setText(RACE_SYSTEM);
 			raceExtension.setValue(race);
 			if (pr.getPatientRace() != null && !pr.getPatientRace().equals("")) {
 				race.addCoding().setCode(pr.getPatientRace());
@@ -246,7 +267,7 @@ public class PatientHandler {
 			if (pr.getPatientRace6() != null && !pr.getPatientRace6().equals("")) {
 				race.addCoding().setCode(pr.getPatientRace6());
 			}
-			p.addExtension("ethnicity",new CodeType().setSystem("ethnicity").setValue(pr.getPatientEthnicity()));
+			p.addExtension(ETHNICITY,new CodeType().setSystem(ETHNICITY_SYSTEM).setValue(pr.getPatientEthnicity()));
 			// telecom
 			if (null != pr.getPatientPhone()) {
 				p.addTelecom().setSystem(ContactPointSystem.PHONE)
@@ -282,26 +303,26 @@ public class PatientHandler {
 			}
 
 			Extension publicity =  p.addExtension();
-			publicity.setUrl("publicity");
+			publicity.setUrl(PUBLICITY_EXTENSION);
 			publicity.setValue(
-				new Coding().setSystem("publicityIndicator")
+				new Coding().setSystem(PUBLICITY_SYSTEM)
 					.setCode(pr.getPublicityIndicator()));
 			if (pr.getPublicityIndicatorDate() != null) {
 				publicity.getValueCoding().setVersion(pr.getPublicityIndicatorDate().toString());
 			}
 			Extension protection =  p.addExtension();
-			protection.setUrl("protection");
+			protection.setUrl(PROTECTION_EXTENSION);
 			protection.setValue(
-				new Coding().setSystem("protectionIndicator")
+				new Coding().setSystem(PROTECTION_SYSTEM)
 					.setCode(pr.getProtectionIndicator()));
 			if (pr.getProtectionIndicatorDate() != null) {
 				protection.getValueCoding().setVersion(pr.getProtectionIndicatorDate().toString());
 			}
 
 			Extension registryStatus =  p.addExtension();
-			registryStatus.setUrl("registryStatus");
+			registryStatus.setUrl(REGISTRY_STATUS_EXTENSION);
 			registryStatus.setValue(
-				new Coding().setSystem("registryStatusIndicator")
+				new Coding().setSystem(REGISTRY_STATUS_INDICATOR)
 					.setCode(pr.getRegistryStatusIndicator()));
 			if (pr.getRegistryStatusIndicatorDate() != null) {
 				registryStatus.getValueCoding().setVersion(pr.getRegistryStatusIndicatorDate().toString());

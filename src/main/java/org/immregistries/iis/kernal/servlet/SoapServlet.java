@@ -6,6 +6,7 @@ import org.hibernate.cfg.Configuration;
 import org.immregistries.iis.kernal.logic.IncomingMessageHandler;
 import org.immregistries.iis.kernal.model.OrgAccess;
 import org.immregistries.smm.cdc.*;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -23,7 +24,10 @@ public class SoapServlet extends HttpServlet {
   public static final String PARAM_PASSWORD = "PASSWORD";
   public static final String PARAM_FACILITYID = "FACILITYID";
 
-  private static SessionFactory factory;
+   @Autowired
+   IncomingMessageHandler handler;
+
+	private static SessionFactory factory;
 
 	public static Session getDataSession() {
 		if (factory == null) {
@@ -68,7 +72,6 @@ public class SoapServlet extends HttpServlet {
             if (orgAccess == null) {
               throw new SecurityException("Username/password combination is unrecognized");
             } else {
-              IncomingMessageHandler handler = new IncomingMessageHandler();
               ack = handler.process(message, orgAccess);
             }
           } catch (Exception e) {
