@@ -11,6 +11,7 @@ import ca.uhn.fhir.jpa.subscription.submit.config.SubscriptionSubmitterConfig;
 import org.immregistries.iis.kernal.servlet.HomeServlet;
 import org.immregistries.iis.kernal.servlet.MessageServlet;
 import org.immregistries.iis.kernal.servlet.PopServlet;
+import org.immregistries.iis.kernal.servlet.SoapServlet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.boot.SpringApplication;
@@ -131,6 +132,17 @@ public class Application extends SpringBootServletInitializer {
 		beanFactory.autowireBean(servlet);
 		registrationBean.setServlet(servlet);
 		registrationBean.addUrlMappings( "/message");
+//		registrationBean.setLoadOnStartup(1);
+		return registrationBean;
+	}
+
+	@Bean
+	public ServletRegistrationBean soapServletRegistrationBean() {
+		ServletRegistrationBean registrationBean = new ServletRegistrationBean();
+		HttpServlet servlet = new SoapServlet();
+		beanFactory.autowireBean(servlet);
+		registrationBean.setServlet(servlet);
+		registrationBean.addUrlMappings( "/soap");
 //		registrationBean.setLoadOnStartup(1);
 		return registrationBean;
 	}

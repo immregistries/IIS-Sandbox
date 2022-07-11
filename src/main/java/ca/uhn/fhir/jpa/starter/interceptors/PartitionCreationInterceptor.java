@@ -22,6 +22,7 @@ import java.util.Random;
 
 /**
  * Intercepts requests, checks if partition aimed at exists, otherwise creates new partition
+ * registered in BaseJpaRestfulServer
  */
 @Component
 @Interceptor
@@ -36,7 +37,6 @@ public class PartitionCreationInterceptor extends RequestTenantPartitionIntercep
 	@Override
 	@Hook(Pointcut.STORAGE_PARTITION_IDENTIFY_CREATE)
 	public RequestPartitionId PartitionIdentifyCreate(RequestDetails theRequestDetails) {
-//		ourLog.info("STORAGE_PARTITION_IDENTIFY_CREATE {} {}",theRequestDetails.getRequestType(), theRequestDetails.getCompleteUrl());
 		createPartition(theRequestDetails);
 		return this.extractPartitionIdFromRequest(theRequestDetails);
 	}
@@ -44,7 +44,6 @@ public class PartitionCreationInterceptor extends RequestTenantPartitionIntercep
 	@Override
 	@Hook(Pointcut.STORAGE_PARTITION_IDENTIFY_READ)
 	public RequestPartitionId PartitionIdentifyRead(RequestDetails theRequestDetails) {
-//		ourLog.info("STORAGE_PARTITION_IDENTIFY_READ {} {}",theRequestDetails.getRequestType(), theRequestDetails.getCompleteUrl());
 		createPartition(theRequestDetails);
 		return super.PartitionIdentifyRead(theRequestDetails);
 	}
