@@ -3,18 +3,14 @@ package org.immregistries.iis.kernal.mapping;
 import org.hl7.fhir.r5.model.Address;
 import org.hl7.fhir.r5.model.Location;
 import org.immregistries.iis.kernal.model.OrgLocation;
-import org.springframework.beans.factory.annotation.Autowired;
 
 public class LocationMapper {
-
-	@Autowired
-
 
 	public static Location fhirLocation(OrgLocation ol) {
 		Location location = new Location();
 		if (ol != null) {
 			location.setId(ol.getOrgFacilityCode());
-			location.addIdentifier(MappingHelper.getFhirIdentifier("OrgLocation", ol.getOrgLocationId()));
+			location.addIdentifier(MappingHelper.getFhirIdentifier(MappingHelper.ORG_LOCATION, ol.getOrgLocationId()));
 			location.setName(ol.getOrgFacilityName());
 
 			Address address = location.getAddress();

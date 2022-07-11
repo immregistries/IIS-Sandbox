@@ -612,7 +612,7 @@ public class IncomingMessageHandler {
 				 try {
 					 MethodOutcome outcome = fhirClient.update().resource(immunization).conditional().where(
 							 Immunization.IDENTIFIER.exactly()
-								 .systemAndIdentifier("VaccinationReported",vaccinationReported.getVaccinationReportedId()))
+								 .systemAndIdentifier(MappingHelper.VACCINATION_REPORTED,vaccinationReported.getVaccinationReportedId()))
 						 .execute();
 				 } catch (ResourceNotFoundException e ){
 					 MethodOutcome outcome = fhirClient.create().resource(immunization).execute();
@@ -1018,7 +1018,7 @@ public class IncomingMessageHandler {
 		 PatientHandler.getFhirPatient(patient, null,patientReported);
 		 try {
 			 MethodOutcome outcome = fhirClient.update().resource(patient).conditional().where(
-					 Patient.IDENTIFIER.exactly().systemAndIdentifier("PatientReported",patientReported.getPatientReportedId()))
+					 Patient.IDENTIFIER.exactly().systemAndIdentifier(MappingHelper.PATIENT_REPORTED,patientReported.getPatientReportedId()))
 				 .execute();
 		 } catch (ResourceNotFoundException e){
 			 MethodOutcome outcome = fhirClient.create().resource(patient)

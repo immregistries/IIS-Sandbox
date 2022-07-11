@@ -5,6 +5,7 @@ import org.hl7.fhir.r5.model.*;
 
 public class PersonHandler {
 
+	public static final String ORGANISATION_ASSIGNING_AUTHORITY = "AssigningAuthority";
 
 
   public static org.immregistries.iis.kernal.model.Person getModelPerson(Person p) {
@@ -27,7 +28,7 @@ public class PersonHandler {
 	public static Person getFhirPerson(org.immregistries.iis.kernal.model.Person dbPerson) {
 	   Person p = new Person();
 	   p.setId(dbPerson.getPersonId());
-	   p.addIdentifier(MappingHelper.getFhirIdentifier("Person",dbPerson.getPersonExternalLink()));
+	   p.addIdentifier(MappingHelper.getFhirIdentifier(MappingHelper.PERSON,dbPerson.getPersonExternalLink()));
 		HumanName name = p.addName();
 		name.setFamily(dbPerson.getNameLast());
 		name.addGiven(dbPerson.getNameFirst());
@@ -35,7 +36,7 @@ public class PersonHandler {
 		if ( dbPerson.getProfessionalSuffix() != null) {
 			name.addSuffix(dbPerson.getProfessionalSuffix());
 		}
-		p.setManagingOrganization(MappingHelper.getFhirReference("Organisation","AssigningAuthority", dbPerson.getAssigningAuthority()));
+		p.setManagingOrganization(MappingHelper.getFhirReference(MappingHelper.ORGANISATION,ORGANISATION_ASSIGNING_AUTHORITY, dbPerson.getAssigningAuthority()));
 		return p;
 	}
 
@@ -48,7 +49,7 @@ public class PersonHandler {
 //  public static Person getFhirPerson(PatientReported pr) {
 //    Person p = new Person();
 //	  p.setId(pr.getPatientReportedExternalLink());
-//	  p.addIdentifier(MappingHelper.getFhirIdentifier("PatientReported",pr.getPatientReportedExternalLink()));
+//	  p.addIdentifier(MappingHelper.getFhirIdentifier(MappingHelper.PATIENT_REPORTED,pr.getPatientReportedExternalLink()));
 //
 //    HumanName name = p.addName();
 //    name.setFamily(pr.getPatientNameLast());

@@ -13,6 +13,7 @@ import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.mapping.ImmunizationHandler;
 import org.immregistries.iis.kernal.mapping.LocationMapper;
+import org.immregistries.iis.kernal.mapping.MappingHelper;
 import org.immregistries.iis.kernal.mapping.PatientHandler;
 import org.immregistries.iis.kernal.model.*;
 import org.slf4j.Logger;
@@ -271,8 +272,8 @@ public class IncomingEventHandler extends IncomingMessageHandler {
 		 // TODO include master info
 		 try {
 			 MethodOutcome outcome = fhirClient.update().resource(immunization).conditional()
-				 .where(Immunization.IDENTIFIER.exactly().systemAndIdentifier("VaccinationReported",vaccinationReported.getVaccinationReportedId()))
-//			 .or(Immunization.IDENTIFIER.exactly().systemAndIdentifier("VaccinationMaster",vaccinationMaster.getVaccinationId())) TODO
+				 .where(Immunization.IDENTIFIER.exactly().systemAndIdentifier(MappingHelper.VACCINATION_REPORTED,vaccinationReported.getVaccinationReportedId()))
+//			 .or(Immunization.IDENTIFIER.exactly().systemAndIdentifier(MappingHelper.VACCINATION_MASTER,vaccinationMaster.getVaccinationId())) TODO
 				 .execute();
 		 } catch (ResourceNotFoundException e){
 			 MethodOutcome outcome = fhirClient.create().resource(immunization).execute();
@@ -419,7 +420,7 @@ public class IncomingEventHandler extends IncomingMessageHandler {
 		 // TODO Patch instead of PUT
 		 try {
 			 MethodOutcome outcome = fhirClient.update().resource(patient).conditional().where(Patient.IDENTIFIER.exactly() //TODO choose to save or not the patientMaster
-				 .systemAndIdentifier("PatientReported",patientReported.getPatientReportedId())).execute();
+				 .systemAndIdentifier(MappingHelper.PATIENT_REPORTED,patientReported.getPatientReportedId())).execute();
 		 } catch (ResourceNotFoundException e ){
 			 MethodOutcome outcome = fhirClient.create().resource(patient).execute();
 		 }

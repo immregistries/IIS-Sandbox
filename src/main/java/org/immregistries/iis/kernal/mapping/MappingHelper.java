@@ -1,17 +1,28 @@
 package org.immregistries.iis.kernal.mapping;
 
-import ca.uhn.fhir.jpa.patch.FhirPatch;
-import ca.uhn.fhir.model.api.IResource;
-import ca.uhn.fhir.rest.client.api.IGenericClient;
-import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
+
 import org.hl7.fhir.instance.model.api.IBaseParameters;
 import org.hl7.fhir.r5.model.*;
-import org.immregistries.iis.kernal.model.PatientMaster;
-import org.immregistries.iis.kernal.model.PatientReported;
 
 import java.util.List;
 
 public class MappingHelper {
+
+	public static final String PATIENT = "Patient";
+	public static final String IMMUNIZATION = "Immunization";
+	public static final String OBSERVATION = "Observation";
+	public static final String ORGANISATION = "Organisation";
+	public static final String LOCATION = "Location";
+	public static final String PERSON = "Person";
+
+	public static final String PERSON_MODEL = "Person";
+	public static final String PATIENT_REPORTED = "PatientReported";
+	public static final String PATIENT_MASTER = "PatientMaster";
+	public static final String VACCINATION_MASTER = "VaccinationMaster";
+	public static final String VACCINATION_REPORTED = "VaccinationReported";
+	public static final String OBSERVATION_MASTER = "ObservationMaster";
+	public static final String OBSERVATION_REPORTED = "ObservationReported";
+	public static final String ORG_LOCATION = "OrgLocation";
 
 	public  static Reference getFhirReference(String fhirType, String dbType, String identifier) {
 		return new Reference(
@@ -41,7 +52,7 @@ public class MappingHelper {
 //		Patient patient = PatientHandler.getFhirPatient(pm,pr);
 //		try {
 //			IResource resource = fhirClient.update().resource(patient).conditional().where(
-//					Patient.IDENTIFIER.exactly().systemAndIdentifier("PatientReported",pr.getPatientReportedId()))
+//					Patient.IDENTIFIER.exactly().systemAndIdentifier(MappingHelper.PATIENT_REPORTED,pr.getPatientReportedId()))
 //				.execute();
 //		} catch (ResourceNotFoundException e){
 //			MethodOutcome outcome = fhirClient.create().resource(patient)
@@ -52,7 +63,7 @@ public class MappingHelper {
 //		Patient patient = PatientHandler.getFhirPatient(pm,null);
 //		try {
 //			IResource resource = fhirClient.update().resource(patient).conditional().where(
-//					Patient.IDENTIFIER.exactly().systemAndIdentifier("PatientMaster",pm.getPatientId()))
+//					Patient.IDENTIFIER.exactly().systemAndIdentifier(MappingHelper.PATIENT_MASTER,pm.getPatientId()))
 //				.execute();
 //		} catch (ResourceNotFoundException e){
 //			MethodOutcome outcome = fhirClient.create().resource(patient)

@@ -7,7 +7,7 @@ import org.immregistries.iis.kernal.model.PatientReported;
 public class CoverageMapper {
 	public Coverage getPatientCoverage(PatientReported patientReported) {
 		Coverage coverage = new Coverage();
-		coverage.setBeneficiary(MappingHelper.getFhirReference("Patient","PatientReported",patientReported.getPatientReportedId()));
+		coverage.setBeneficiary(MappingHelper.getFhirReference(MappingHelper.PATIENT,MappingHelper.PATIENT_REPORTED,patientReported.getPatientReportedId()));
 		coverage.setPeriod(new Period().setEnd(patientReported.getProtectionIndicatorDate()));
 		return coverage;
 	}

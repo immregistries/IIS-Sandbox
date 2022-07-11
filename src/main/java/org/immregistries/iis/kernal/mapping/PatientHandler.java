@@ -24,6 +24,8 @@ public class PatientHandler {
 	private static final String PUBLICITY_SYSTEM = "publicityIndicator";
 	private static final String PROTECTION_EXTENSION = "protection";
 	private static final String PROTECTION_SYSTEM = "protectsionIndicator";
+	private static final String YES = "Y";
+	private static final String NO = "N";
 
 	public static PatientReported getPatientReportedFromFhir(Patient p) {
 		PatientReported patientReported = new PatientReported();
@@ -40,7 +42,7 @@ public class PatientHandler {
 	 * @param p               the Patient resource
 	 */
 	private static void fillPatientReportedFromFhir(PatientReported patientReported, Patient p) {
-		patientReported.setPatientReportedId(MappingHelper.filterIdentifier(p.getIdentifier(),"PatientReported").getValue());
+		patientReported.setPatientReportedId(MappingHelper.filterIdentifier(p.getIdentifier(),MappingHelper.PATIENT_REPORTED).getValue());
 		patientReported.setPatientReportedAuthority(p.getManagingOrganization().getIdentifier().getValue());
 		patientReported.setPatientBirthDate(p.getBirthDate());
 		// Name
@@ -107,9 +109,9 @@ public class PatientHandler {
 		if (null != p.getDeceased()) {
 			if (p.getDeceased().isBooleanPrimitive()) {
 				if (p.getDeceasedBooleanType().booleanValue()) {
-					patientReported.setPatientDeathFlag("Y");
+					patientReported.setPatientDeathFlag(YES);
 				} else {
-					patientReported.setPatientDeathFlag("N");
+					patientReported.setPatientDeathFlag(NO);
 				}
 			}
 			if (p.getDeceased().isDateTime()) {
@@ -133,9 +135,9 @@ public class PatientHandler {
 		if (null != p.getMultipleBirth()) {
 			if (p.getMultipleBirth().isBooleanPrimitive()) {
 				if (p.getMultipleBirthBooleanType().booleanValue()) {
-					patientReported.setPatientBirthFlag("Y");
+					patientReported.setPatientBirthFlag(YES);
 				} else {
-					patientReported.setPatientBirthFlag("N");
+					patientReported.setPatientBirthFlag(NO);
 				}
 			}
 		} else {
@@ -194,7 +196,7 @@ public class PatientHandler {
 	}
 
 	public static PatientMaster getPatientMasterFromFhir(PatientMaster patientMaster, Patient p) {
-		patientMaster.setPatientId(MappingHelper.filterIdentifier(p.getIdentifier(),"PatientReported").getValue());
+		patientMaster.setPatientId(MappingHelper.filterIdentifier(p.getIdentifier(),MappingHelper.PATIENT_REPORTED).getValue());
 
 		if (patientMaster == null) {
 			patientMaster = new PatientMaster();
@@ -213,7 +215,7 @@ public class PatientHandler {
 	public static void getFhirPatient(Patient p, PatientMaster pm, PatientReported pr) {
 //		Patient p = new Patient().setBirthDate(new Date());
 		if (pm != null) {
-			p.addIdentifier(MappingHelper.getFhirIdentifier("PatientMaster", pm.getPatientId()));
+			p.addIdentifier(MappingHelper.getFhirIdentifier(MappingHelper.PATIENT_MASTER, pm.getPatientId()));
 			HumanName name = p.addName();
 			name.setFamily(pm.getPatientNameLast());
 			name.addGivenElement().setValue(pm.getPatientNameFirst());
@@ -221,7 +223,7 @@ public class PatientHandler {
 			p.setBirthDate(pm.getPatientBirthDate());
 		}
 		if (pr != null) {
-			p.addIdentifier(MappingHelper.getFhirIdentifier("PatientReported", pr.getPatientReportedExternalLink()));
+			p.addIdentifier(MappingHelper.getFhirIdentifier(MappingHelper.PATIENT_REPORTED, pr.getPatientReportedExternalLink()));
 //			p.setManagingOrganization(MappingHelper.getFhirReference("","PatientReportedAuthority",pr.getPatientReportedAuthority()));
 			p.setBirthDate(pr.getPatientBirthDate());
 			if (p.getNameFirstRep() != null) {
@@ -281,9 +283,9 @@ public class PatientHandler {
 
 			if (pr.getPatientDeathDate() != null) {
 				p.setDeceased(new DateType(pr.getPatientDeathDate()));
-			} else if (pr.getPatientDeathFlag().equals("Y")) {
+			} else if (pr.getPatientDeathFlag().equals(YES)) {
 				p.setDeceased(new BooleanType(true));
-			} else if (pr.getPatientDeathFlag().equals("N")) {
+			} else if (pr.getPatientDeathFlag().equals(NO)) {
 				p.setDeceased(new BooleanType(false));
 			}
 
@@ -298,7 +300,7 @@ public class PatientHandler {
 
 			if (pr.getPatientBirthOrder() != null && !pr.getPatientBirthOrder().equals("")) {
 				p.setMultipleBirth(new IntegerType().setValue(Integer.parseInt(pr.getPatientBirthOrder())));
-			} else if (pr.getPatientBirthFlag().equals("Y")) {
+			} else if (pr.getPatientBirthFlag().equals(YES)) {
 				p.setMultipleBirth(new BooleanType(true));
 			}
 
