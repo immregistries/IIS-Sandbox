@@ -23,7 +23,7 @@ public class PatientHandler {
 	private static final String PUBLICITY_EXTENSION = "publicity";
 	private static final String PUBLICITY_SYSTEM = "publicityIndicator";
 	private static final String PROTECTION_EXTENSION = "protection";
-	private static final String PROTECTION_SYSTEM = "protectsionIndicator";
+	private static final String PROTECTION_SYSTEM = "protectionIndicator";
 	private static final String YES = "Y";
 	private static final String NO = "N";
 

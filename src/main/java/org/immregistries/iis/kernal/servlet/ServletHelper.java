@@ -46,8 +46,6 @@ public class ServletHelper {
       dataSession.save(orgMaster);
       dataSession.save(orgAccess);
       transaction.commit();
-
-//		 repositoryClientFactory.newGenericClient("")
     }
 
     if (orgAccess == null) {
