@@ -448,30 +448,32 @@ public class IncomingMessageHandler {
 						if(bundle.hasEntry()){
 							Location location = (Location) bundle.getEntryFirstRep().getResource();
 							orgLocation = LocationMapper.orgLocationFromFhir(location);
+						} else {
+							if (processingFlavorSet.contains(ProcessingFlavor.PEAR)) {
+								throw new ProcessingException(
+									"Unrecognized administered at location, unable to accept immunization report",
+									"RXA", rxaCount, 11);
+							}
+							orgLocation = new OrgLocation();
+							orgLocation.setOrgFacilityCode(administeredAtLocation);
+							orgLocation.setOrgMaster(orgAccess.getOrg());
+							orgLocation.setOrgFacilityName(administeredAtLocation);
+							orgLocation.setLocationType("");
+							orgLocation.setAddressLine1(reader.getValue(11, 9));
+							orgLocation.setAddressLine2(reader.getValue(11, 10));
+							orgLocation.setAddressCity(reader.getValue(11, 11));
+							orgLocation.setAddressState(reader.getValue(11, 12));
+							orgLocation.setAddressZip(reader.getValue(11, 13));
+							orgLocation.setAddressCountry(reader.getValue(11, 14));
+							Location location = LocationMapper.fhirLocation(orgLocation);
+							MethodOutcome outcome;
+							outcome = fhirClient.create().resource(location).execute();
+							orgLocation = LocationMapper.orgLocationFromFhir(location);
 						}
 					} catch (ResourceNotFoundException e) {}
 
               if (orgLocation == null) {
-                if (processingFlavorSet.contains(ProcessingFlavor.PEAR)) {
-                  throw new ProcessingException(
-                      "Unrecognized administered at location, unable to accept immunization report",
-                      "RXA", rxaCount, 11);
-                }
-                orgLocation = new OrgLocation();
-                orgLocation.setOrgFacilityCode(administeredAtLocation);
-                orgLocation.setOrgMaster(orgAccess.getOrg());
-                orgLocation.setOrgFacilityName(administeredAtLocation);
-                orgLocation.setLocationType("");
-                orgLocation.setAddressLine1(reader.getValue(11, 9));
-                orgLocation.setAddressLine2(reader.getValue(11, 10));
-                orgLocation.setAddressCity(reader.getValue(11, 11));
-                orgLocation.setAddressState(reader.getValue(11, 12));
-                orgLocation.setAddressZip(reader.getValue(11, 13));
-                orgLocation.setAddressCountry(reader.getValue(11, 14));
-					 Location location = LocationMapper.fhirLocation(orgLocation);
-					  MethodOutcome outcome;
-					  outcome = fhirClient.create().resource(location).execute();
-					  orgLocation = LocationMapper.orgLocationFromFhir(location);
+
 				  }
               vaccinationReported.setOrgLocation(orgLocation);
             }
