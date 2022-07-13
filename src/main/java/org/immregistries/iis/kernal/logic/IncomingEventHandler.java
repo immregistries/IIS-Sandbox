@@ -206,37 +206,25 @@ public class IncomingEventHandler extends IncomingMessageHandler {
 					.where(Location.IDENTIFIER.exactly().identifier(administeredAtLocation))
 //					.where(Location.ORGANIZATION.hasAnyOfIds(administeredAtLocation)) //Todo verify condition
 					.returnBundle(Bundle.class).execute();
-				Location location = (Location) bundle.getEntryFirstRep().getResource();
-				orgLocation = LocationMapper.orgLocationFromFhir(location);
+				if (bundle.hasEntry()) {
+					Location location = (Location) bundle.getEntryFirstRep().getResource();
+					orgLocation = LocationMapper.orgLocationFromFhir(location);
+				}else {
+					orgLocation = new OrgLocation();
+					orgLocation.setOrgFacilityCode(administeredAtLocation);
+					orgLocation.setOrgMaster(orgAccess.getOrg());
+					orgLocation.setOrgFacilityName(administeredAtLocation);
+					orgLocation.setLocationType("");
+					orgLocation.setAddressLine1("");
+					orgLocation.setAddressLine2("");
+					orgLocation.setAddressCity("");
+					orgLocation.setAddressState("");
+					orgLocation.setAddressZip("");
+					orgLocation.setAddressCountry("");
+					Location location = LocationMapper.fhirLocation(orgLocation);
+					MethodOutcome outcome = fhirClient.create().resource(location).execute();
+				}
 			} catch (ResourceNotFoundException e) {}
-//        Query query = dataSession.createQuery(
-//            "from OrgLocation where orgMaster = :orgMaster and orgFacilityCode = :orgFacilityCode");
-//        query.setParameter("orgMaster", orgAccess.getOrg());
-//        query.setParameter("orgFacilityCode", administeredAtLocation);
-//        List<OrgLocation> orgMasterList = query.list();
-//        if (orgMasterList.size() > 0) {
-//          orgLocation = orgMasterList.get(0);
-//        }
-
-        if (orgLocation == null) {
-          orgLocation = new OrgLocation();
-          orgLocation.setOrgFacilityCode(administeredAtLocation);
-          orgLocation.setOrgMaster(orgAccess.getOrg());
-          orgLocation.setOrgFacilityName(administeredAtLocation);
-          orgLocation.setLocationType("");
-          orgLocation.setAddressLine1("");
-          orgLocation.setAddressLine2("");
-          orgLocation.setAddressCity("");
-          orgLocation.setAddressState("");
-          orgLocation.setAddressZip("");
-          orgLocation.setAddressCountry("");
-			  Location location = LocationMapper.fhirLocation(orgLocation);
-			  MethodOutcome outcome = fhirClient.create().resource(location).execute();
-
-//          Transaction transaction = dataSession.beginTransaction();
-//          dataSession.save(orgLocation);
-//          transaction.commit();
-        }
         vaccinationReported.setOrgLocation(orgLocation);
       }
     }
