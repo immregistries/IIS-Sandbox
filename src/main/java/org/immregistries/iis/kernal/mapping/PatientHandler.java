@@ -16,7 +16,7 @@ public class PatientHandler {
 
 	private static final String REGISTRY_STATUS_EXTENSION = "registryStatus";
 	private static final String REGISTRY_STATUS_INDICATOR = "registryStatusIndicator";
-	private static final String ETHNICITY = "ethnicity";
+	private static final String ETHNICITY_EXTENSION = "ethnicity";
 	private static final String ETHNICITY_SYSTEM = "ethnicity";
 	private static final String RACE = "race";
 	private static final String RACE_SYSTEM = "race";
@@ -27,7 +27,7 @@ public class PatientHandler {
 	private static final String YES = "Y";
 	private static final String NO = "N";
 
-	public static PatientReported getPatientReportedFromFhir(Patient p) {
+	public static PatientReported getReported(Patient p) {
 		PatientReported patientReported = new PatientReported();
 		patientReported.setPatientReportedId(p.getId());
 		fillPatientReportedFromFhir(patientReported, p);
@@ -92,8 +92,8 @@ public class PatientHandler {
 				}
 			}
 		}
-		if (p.getExtensionByUrl(ETHNICITY) != null) {
-			patientReported.setPatientEthnicity(p.getExtensionByUrl(ETHNICITY).getValueCodeType().getValue());
+		if (p.getExtensionByUrl(ETHNICITY_EXTENSION) != null) {
+			patientReported.setPatientEthnicity(p.getExtensionByUrl(ETHNICITY_EXTENSION).getValueCodeType().getValue());
 		}
 
 		for (ContactPoint telecom : p.getTelecom()) {
@@ -269,7 +269,7 @@ public class PatientHandler {
 			if (pr.getPatientRace6() != null && !pr.getPatientRace6().equals("")) {
 				race.addCoding().setCode(pr.getPatientRace6());
 			}
-			p.addExtension(ETHNICITY,new CodeType().setSystem(ETHNICITY_SYSTEM).setValue(pr.getPatientEthnicity()));
+			p.addExtension(ETHNICITY_EXTENSION,new CodeType().setSystem(ETHNICITY_SYSTEM).setValue(pr.getPatientEthnicity()));
 			// telecom
 			if (null != pr.getPatientPhone()) {
 				p.addTelecom().setSystem(ContactPointSystem.PHONE)

@@ -1,6 +1,5 @@
 package org.immregistries.iis.kernal.logic;
 
-import ca.uhn.fhir.model.api.IResource;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.api.server.RequestDetails;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
@@ -309,7 +308,7 @@ public class IncomingEventHandler extends IncomingMessageHandler {
 			 logger.info(bundle.getEntryFirstRep().toString());
 			 if (bundle.hasEntry()) {
 				 Patient patient = (Patient) bundle.getEntryFirstRep().getResource();
-				 patientReported = PatientHandler.getPatientReportedFromFhir(patient);
+				 patientReported = PatientHandler.getReported(patient);
 				 patientMaster = patientReported.getPatient();
 			 }
 		 } catch (ResourceNotFoundException e) {}

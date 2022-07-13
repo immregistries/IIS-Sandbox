@@ -21,7 +21,6 @@ import org.immregistries.vfa.connect.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -124,7 +123,7 @@ public class IncomingMessageHandler {
 					.where(Patient.IDENTIFIER.exactly().identifier(mrn)).returnBundle(Bundle.class).execute();
 				if (bundle.hasEntry()){
 					Patient patient = (Patient) bundle.getEntryFirstRep().getResource();
-					patientReported = PatientHandler.getPatientReportedFromFhir(patient);
+					patientReported = PatientHandler.getReported(patient);
 				}
 			} catch (ResourceNotFoundException e) {}
 //        Query query = dataSession.createQuery(
@@ -168,7 +167,7 @@ public class IncomingMessageHandler {
 					  .returnBundle(Bundle.class).execute();
 				  if (bundle.hasEntry()){
 					  Patient patient = (Patient) bundle.getEntryFirstRep().getResource();
-					  patientReported = PatientHandler.getPatientReportedFromFhir(patient);
+					  patientReported = PatientHandler.getReported(patient);
 				  }
 			  } catch (ResourceNotFoundException e) {}
         }
@@ -206,7 +205,7 @@ public class IncomingMessageHandler {
 					  .and(Patient.BIRTHDATE.exactly().day(patientBirthDate))
 					  .returnBundle(Bundle.class).execute();
 				  for (Bundle.BundleEntryComponent entry: bundle.getEntry()) {
-					  patientReportedPossibleList.add(PatientHandler.getPatientReportedFromFhir((Patient) entry.getResource()));
+					  patientReportedPossibleList.add(PatientHandler.getReported((Patient) entry.getResource()));
 				  }
 			  } catch (ResourceNotFoundException e) {}
         }
@@ -695,7 +694,7 @@ public class IncomingMessageHandler {
 			  .where(Patient.IDENTIFIER.exactly().identifier(patientReportedExternalLink)).returnBundle(Bundle.class).execute();
 		  if (bundle.hasEntry()) {
 			  Patient patient = (Patient) bundle.getEntryFirstRep().getResource();
-			  patientReported = PatientHandler.getPatientReportedFromFhir(patient);
+			  patientReported = PatientHandler.getReported(patient);
 			  patientMaster = patientReported.getPatient();
 		  }
 	  } catch (ResourceNotFoundException e) {}
