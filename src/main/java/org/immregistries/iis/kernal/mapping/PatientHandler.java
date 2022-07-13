@@ -31,7 +31,7 @@ public class PatientHandler {
 		PatientReported patientReported = new PatientReported();
 		patientReported.setPatientReportedId(p.getId());
 		fillPatientReportedFromFhir(patientReported, p);
-		getPatientMasterFromFhir(patientReported.getPatient(), p);
+		getMaster(patientReported.getPatient(), p);
 		return patientReported;
 	}
 
@@ -195,7 +195,7 @@ public class PatientHandler {
 
 	}
 
-	public static PatientMaster getPatientMasterFromFhir(PatientMaster patientMaster, Patient p) {
+	public static PatientMaster getMaster(PatientMaster patientMaster, Patient p) {
 		patientMaster.setPatientId(MappingHelper.filterIdentifier(p.getIdentifier(),MappingHelper.PATIENT_REPORTED).getValue());
 
 		if (patientMaster == null) {
@@ -212,7 +212,13 @@ public class PatientHandler {
 		return patientMaster;
 	}
 
-	public static void getFhirPatient(Patient p, PatientMaster pm, PatientReported pr) {
+	public static Patient getFhirResource(PatientMaster pm, PatientReported pr) {
+		Patient p = new Patient().setBirthDate(new Date());
+		fillFhirResource(p,pm,pr);
+		return p;
+	}
+
+	public static void fillFhirResource(Patient p, PatientMaster pm, PatientReported pr) {
 //		Patient p = new Patient().setBirthDate(new Date());
 		if (pm != null) {
 			p.addIdentifier(MappingHelper.getFhirIdentifier(MappingHelper.PATIENT_MASTER, pm.getPatientId()));

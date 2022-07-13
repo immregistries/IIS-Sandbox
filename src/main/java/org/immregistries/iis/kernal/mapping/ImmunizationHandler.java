@@ -24,11 +24,11 @@ public class ImmunizationHandler {
 	public static final String FUNDING_SOURCE = "fundingSource";
 	public static final String FUNDING_ELIGIBILITY = "fundingEligibility";
 
-	public static VaccinationReported vaccinationReportedFromFhir(Immunization i) {
+	public static VaccinationReported getReported(Immunization i) {
 		VaccinationReported vaccinationReported = new VaccinationReported();
 		vaccinationReported.setVaccinationReportedId(i.getId());
 		fillVaccinationReported(vaccinationReported,i);
-		VaccinationMaster vaccinationMaster = getVaccinationMaster(null,i);
+		VaccinationMaster vaccinationMaster = getMaster(null,i);
 		vaccinationReported.setVaccination(vaccinationMaster);
 		vaccinationMaster.setVaccinationReported(vaccinationReported);
 		return vaccinationReported;
@@ -84,7 +84,7 @@ public class ImmunizationHandler {
   }
 
 
-  public static VaccinationMaster getVaccinationMaster(VaccinationMaster vm, Immunization i){
+  public static VaccinationMaster getMaster(VaccinationMaster vm, Immunization i){
 	  if (vm == null){
 		  vm = new VaccinationMaster();
 	  }
@@ -101,7 +101,7 @@ public class ImmunizationHandler {
    * @param vaccinationReported the vaccinationReported
    * @return the Immunization resource
    */
-  public static Immunization getImmunization(VaccinationMaster vaccinationMaster, VaccinationReported vaccinationReported) {
+  public static Immunization getFhirResource(VaccinationMaster vaccinationMaster, VaccinationReported vaccinationReported) {
     Immunization i = new Immunization();
 	 if (vaccinationMaster != null ){
 		i.addIdentifier(MappingHelper.getFhirIdentifier(MappingHelper.VACCINATION_MASTER,vaccinationMaster.getVaccinationId()));

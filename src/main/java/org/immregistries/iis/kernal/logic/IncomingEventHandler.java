@@ -141,7 +141,7 @@ public class IncomingEventHandler extends IncomingMessageHandler {
 			  .and(Immunization.IDENTIFIER.exactly().identifier(vaccinationReportedExternalLink))
 			  .returnBundle(Bundle.class).execute();
 		  Immunization immunization = (Immunization) bundle.getEntryFirstRep().getResource();
-		  vaccinationReported = ImmunizationHandler.vaccinationReportedFromFhir(immunization);
+		  vaccinationReported = ImmunizationHandler.getReported(immunization);
 		  vaccinationMaster = vaccinationReported.getVaccination();
 
 	  } catch (ResourceNotFoundException e) {}
@@ -267,7 +267,7 @@ public class IncomingEventHandler extends IncomingMessageHandler {
 
 
     {
-		 Immunization immunization = ImmunizationHandler.getImmunization(vaccinationMaster,vaccinationReported);
+		 Immunization immunization = ImmunizationHandler.getFhirResource(vaccinationMaster,vaccinationReported);
 		 // TODO include master info
 		 try {
 			 MethodOutcome outcome = fhirClient.update().resource(immunization).conditional()
@@ -415,7 +415,7 @@ public class IncomingEventHandler extends IncomingMessageHandler {
     patientReported.setUpdatedDate(new Date());
     {
 		 Patient patient = new Patient();
-		 PatientHandler.getFhirPatient(patient, patientMaster, patientReported);
+		 PatientHandler.fillFhirResource(patient, patientMaster, patientReported);
 		 // TODO Patch instead of PUT
 		 try {
 			 MethodOutcome outcome = fhirClient.update().resource(patient).conditional().where(Patient.IDENTIFIER.exactly() //TODO choose to save or not the patientMaster

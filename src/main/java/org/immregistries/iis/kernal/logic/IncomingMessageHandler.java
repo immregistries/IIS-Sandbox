@@ -318,7 +318,7 @@ public class IncomingMessageHandler {
 					  .where(Immunization.IDENTIFIER.exactly().identifier(vaccinationReportedExternalLink)).returnBundle(Bundle.class).execute();
 				  if (bundle.hasEntry()) {
 					  Immunization immunization = (Immunization) bundle.getEntryFirstRep().getResource();
-					  vaccinationReported = ImmunizationHandler.vaccinationReportedFromFhir(immunization);
+					  vaccinationReported = ImmunizationHandler.getReported(immunization);
 					  vaccinationMaster = vaccinationReported.getVaccination();
 				  }
 			  } catch (ResourceNotFoundException e) {}
@@ -606,7 +606,7 @@ public class IncomingMessageHandler {
           verifyNoErrors(processingExceptionList);
           reader.gotoSegmentPosition(segmentPosition);
           {
-				 Immunization immunization = ImmunizationHandler.getImmunization(vaccinationMaster,vaccinationReported);
+				 Immunization immunization = ImmunizationHandler.getFhirResource(vaccinationMaster,vaccinationReported);
 //				 fhirClient.patch();TODO Convert resources to Fhirpatch and replace simple updates with patch
 				 try {
 					 MethodOutcome outcome = fhirClient.update().resource(immunization).conditional().where(
@@ -1014,7 +1014,7 @@ public class IncomingMessageHandler {
     patientReported.setUpdatedDate(new Date());
     {
 		 Patient patient = new Patient();
-		 PatientHandler.getFhirPatient(patient, null,patientReported);
+		 PatientHandler.fillFhirResource(patient, null,patientReported);
 		 try {
 			 MethodOutcome outcome = fhirClient.update().resource(patient).conditional().where(
 					 Patient.IDENTIFIER.exactly().systemAndIdentifier(MappingHelper.PATIENT_REPORTED,patientReported.getPatientReportedId()))
@@ -1115,7 +1115,7 @@ public class IncomingMessageHandler {
         ObservationReported observationReported = observationMaster.getObservationReported();
         observationMaster.setObservationReported(null); //TODO change or create master
 
-		  Observation observation = ObservationMapper.getFhirObservation(observationMaster,observationReported);
+		  Observation observation = ObservationMapper.getFhirResource(observationMaster,observationReported);
 			try {
 				MethodOutcome outcome = fhirClient.update().resource(observation)
 					.conditionalByUrl("Observation?identifier=ObservationReported|"
@@ -1153,7 +1153,7 @@ public class IncomingMessageHandler {
 		  }
 		  if (bundle.hasEntry()){
 			  Observation observation = (Observation) bundle.getEntryFirstRep().getResource();
-			  observationMaster = ObservationMapper.getObservationMaster(observation);
+			  observationMaster = ObservationMapper.getMaster(observation);
 			  observationReported = observationMaster.getObservationReported();
 		  }
 	  } catch (ResourceNotFoundException e) {}
@@ -1562,7 +1562,7 @@ public class IncomingMessageHandler {
 					obsSubId++;
 					for (Bundle.BundleEntryComponent entry : bundle.getEntry()) {
 						ObservationMaster observationMaster =
-							ObservationMapper.getObservationMaster((Observation) entry.getResource());
+							ObservationMapper.getMaster((Observation) entry.getResource());
 						obxSetId++;
 						printObx(sb, obxSetId, obsSubId, observationMaster);
 					}
@@ -1594,7 +1594,7 @@ public class IncomingMessageHandler {
 				 for (Bundle.BundleEntryComponent entry : bundle.getEntry()) {
 					 obxSetId++;
 					 ObservationMaster observationMaster =
-						 ObservationMapper.getObservationMaster((Observation) entry.getResource());
+						 ObservationMapper.getMaster((Observation) entry.getResource());
 					 printObx(sb, obxSetId, obsSubId, observationMaster);
 				 }
 			 }
@@ -1890,7 +1890,7 @@ public class IncomingMessageHandler {
 					obsSubId++;
 					for (Bundle.BundleEntryComponent entry : bundle.getEntry()) {
 						ObservationMaster observationMaster =
-							ObservationMapper.getObservationMaster((Observation) entry.getResource());
+							ObservationMapper.getMaster((Observation) entry.getResource());
 						obxSetId++;
 						printObx(sb, obxSetId, obsSubId, observationMaster);
 					}
@@ -1934,7 +1934,7 @@ public class IncomingMessageHandler {
 					 String key = sdf.format(immunization.getOccurrenceDateTimeType());
 					 if (!immunization.getVaccineCode().getText().equals("")) {
 						 key += key + immunization.getVaccineCode().getText();
-						 VaccinationMaster vaccinationMaster = ImmunizationHandler.getVaccinationMaster(null, immunization);
+						 VaccinationMaster vaccinationMaster = ImmunizationHandler.getMaster(null, immunization);
 						 map.put(key, vaccinationMaster);
 					 }
 				 }

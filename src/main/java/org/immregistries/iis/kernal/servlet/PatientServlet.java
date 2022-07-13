@@ -223,7 +223,7 @@ public class PatientServlet extends HttpServlet {
 				  .where(Immunization.PATIENT.hasId(patientReportedSelected.getPatientReportedId()))
 				  .returnBundle(Bundle.class).execute();
 			  for (Bundle.BundleEntryComponent entry: bundle.getEntry()) {
-				  vaccinationReportedList.add(ImmunizationHandler.vaccinationReportedFromFhir((Immunization) entry.getResource()));
+				  vaccinationReportedList.add(ImmunizationHandler.getReported((Immunization) entry.getResource()));
 			  }
 //          Query query = dataSession
 //              .createQuery("from VaccinationReported where patientReported = :patientReported");
@@ -543,7 +543,7 @@ public List<ObservationReported> getObservationList(IGenericClient fhirClient,
 			 .returnBundle(Bundle.class)
 			 .execute();
 		 for (Bundle.BundleEntryComponent entry: bundle.getEntry()) {
-			 observationReportedList.add(ObservationMapper.getObservationReported((Observation) entry.getResource()));
+			 observationReportedList.add(ObservationMapper.getReported((Observation) entry.getResource()));
 		 }
 //      Query query = dataSession.createQuery(
 //          "from ObservationReported where patientReported = :patientReported and vaccinationReported is null");
