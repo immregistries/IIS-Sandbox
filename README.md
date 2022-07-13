@@ -1,3 +1,9 @@
+# IIS Sandbox with Hapi Fhir Jpa Database
+JDK  17  needed.
+Command to compile and run :
+```
+mvn clean package spring-boot:repackage -Pboot && java -jar --add-opens java.base/java.lang=ALL-UNNAMED target/ROOT.war
+```
 # HAPI-FHIR Starter Project
 
 This project is a complete starter project you can use to deploy a FHIR server using HAPI FHIR JPA.
