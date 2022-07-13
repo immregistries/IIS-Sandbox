@@ -146,7 +146,9 @@ public class PatientHandler {
 
 		if (p.getExtensionByUrl(PUBLICITY_EXTENSION) != null) {
 			patientReported.setPublicityIndicator(p.getExtensionByUrl(PUBLICITY_EXTENSION).getValueCoding().getCode());
-			patientReported.setPublicityIndicatorDate(new Date(p.getExtensionByUrl(PUBLICITY_EXTENSION).getValueCoding().getVersion()));
+			if (p.getExtensionByUrl(PUBLICITY_EXTENSION).getValueCoding().getVersion() != null) {
+				patientReported.setPublicityIndicatorDate(new Date(p.getExtensionByUrl(PUBLICITY_EXTENSION).getValueCoding().getVersion()));
+			}
 		}
 
 		if (p.getExtensionByUrl(PROTECTION_EXTENSION) != null) {

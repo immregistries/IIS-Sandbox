@@ -159,7 +159,7 @@ public class IncomingEventHandler extends IncomingMessageHandler {
 //    }
     if (vaccinationReported == null) {
       vaccinationMaster = new VaccinationMaster();
-		vaccinationMaster.setVaccinationId(vaccinationReportedExternalLink); // TODO  verify
+		vaccinationMaster.setVaccinationId(vaccinationReportedExternalLink); // TODO  verify IMPORTANT
       vaccinationReported = new VaccinationReported();
       vaccinationReported.setVaccination(vaccinationMaster);
       vaccinationMaster.setVaccinationReported(null);
