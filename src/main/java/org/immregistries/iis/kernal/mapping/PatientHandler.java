@@ -42,6 +42,7 @@ public class PatientHandler {
 	 * @param p               the Patient resource
 	 */
 	private static void fillPatientReportedFromFhir(PatientReported patientReported, Patient p) {
+		patientReported.setUpdatedDate(p.getMeta().getLastUpdated());
 		patientReported.setPatientReportedId(MappingHelper.filterIdentifier(p.getIdentifier(),MappingHelper.PATIENT_REPORTED).getValue());
 		patientReported.setPatientReportedAuthority(p.getManagingOrganization().getIdentifier().getValue());
 		patientReported.setPatientBirthDate(p.getBirthDate());

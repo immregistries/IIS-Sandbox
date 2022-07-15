@@ -34,20 +34,13 @@ public class ImmunizationHandler {
 		return vaccinationReported;
 	}
 
-//  public static void patientReportedFromFhirImmunization(PatientReported patientReported,
-//      Immunization i) {
-//    if (i != null) {
-//      patientReported.setReportedDate(i.getRecorded());
-//      patientReported.setUpdatedDate(i.getOccurrenceDateTimeType().getValue());
-//      patientReported.setPatientReportedAuthority(i.getIdentifierFirstRep().getValue());
-//    }
-//  }
   /**
    * This method fills a vaccinationReported object with mapped fhir immunization information
    * @param vr the vaccinationReported
    * @param i the Immunization resource
    */
   public static void fillVaccinationReported(VaccinationReported vr, Immunization i) {
+	  vr.setUpdatedDate(i.getMeta().getLastUpdated());
      vr.setVaccinationReportedId(MappingHelper.filterIdentifier(i.getIdentifier(),MappingHelper.PATIENT_REPORTED).getValue());
 
 	  vr.setReportedDate(i.getRecorded());
@@ -79,7 +72,7 @@ public class ImmunizationHandler {
 
 //	 vr.setOrgLocation(LocationMapper.orgLocationFromFhir(i.getLocation()));
 //	  vr.setEnteredBy();
-//	  vr.setAdministeringProvider();
+//	  vr.setAdministeringProvider(); TODO but not urgent
 //	  vr.getOrderingProvider()
   }
 

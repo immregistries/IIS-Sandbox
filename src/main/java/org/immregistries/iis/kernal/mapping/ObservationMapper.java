@@ -61,6 +61,7 @@ public class ObservationMapper {
 
 	public static ObservationReported getReported(Observation o){
 		ObservationReported observationReported = new ObservationReported();
+		observationReported.setUpdatedDate(o.getMeta().getLastUpdated());
 		observationReported.setObservationReportedId(o.getCode().getCode(MappingHelper.OBSERVATION_REPORTED));
 //		observationReported.setVaccinationReported();
 //		observationReported.setObservation();

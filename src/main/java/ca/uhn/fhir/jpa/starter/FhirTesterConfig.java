@@ -1,6 +1,10 @@
 package ca.uhn.fhir.jpa.starter;
 
 import ca.uhn.fhir.context.FhirContext;
+import ca.uhn.fhir.context.FhirVersionEnum;
+import ca.uhn.fhir.jpa.entity.PartitionEntity;
+import ca.uhn.fhir.jpa.partition.IPartitionLookupSvc;
+import ca.uhn.fhir.jpa.partition.PartitionManagementProvider;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.server.util.ITestingUiClientFactory;
 import ca.uhn.fhir.to.FhirTesterMvcConfig;
@@ -28,6 +32,10 @@ public class FhirTesterConfig {
 
 	@Autowired
 	RepositoryClientFactory repositoryClientFactory;
+	@Autowired
+	IPartitionLookupSvc partitionLookupSvc;
+	@Autowired
+	PartitionManagementProvider partitionManagementProvider;
 
 	/**
 	 * This bean tells the testing webpage which servers it should configure itself
@@ -57,6 +65,13 @@ public class FhirTesterConfig {
         t.getValue().getRefuse_to_fetch_third_party_urls());
 
     });
+//	  for (PartitionEntity partitionEntity: partitionLookupSvc.listPartitions()) {
+//		  retVal.addServer()
+//			  .withId(String.valueOf(partitionEntity.getId()))
+//			  .withFhirVersion(appProperties.getFhir_version())
+//			  .withBaseUrl(appProperties.getServer_address() + "" + partitionEntity.getName())
+//			  .withName(partitionEntity.getName());
+//	  }
 
 //	  retVal.setClientFactory(repositoryClientFactory); //TODO
     return retVal;
