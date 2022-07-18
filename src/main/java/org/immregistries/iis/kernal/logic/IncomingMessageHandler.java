@@ -201,15 +201,9 @@ public class IncomingMessageHandler {
           }
         }
         if (patientReported == null) {
-			  try {
-				  Bundle bundle = fhirClient.search().forResource(Patient.class)
-					  .where(Patient.NAME.matches().values(patientNameFirst,patientNameLast))
-					  .and(Patient.BIRTHDATE.exactly().day(patientBirthDate))
-					  .returnBundle(Bundle.class).execute();
-				  for (Bundle.BundleEntryComponent entry: bundle.getEntry()) {
-					  patientReportedPossibleList.add(PatientHandler.getReported((Patient) entry.getResource()));
-				  }
-			  } catch (ResourceNotFoundException e) {}
+			  patientReportedPossibleList = fhirRequests.searchPatientReportedList(fhirClient,
+				  Patient.NAME.matches().values(patientNameFirst,patientNameLast),
+				  Patient.BIRTHDATE.exactly().day(patientBirthDate));
         }
         if (patientReported != null
             && patientNameMiddle.equalsIgnoreCase(PATIENT_MIDDLE_NAME_MULTI)) {
@@ -315,15 +309,9 @@ public class IncomingMessageHandler {
                 "RXA", rxaCount, 3);
           }
 
-			  try {
-				  Bundle bundle = fhirClient.search().forResource(Immunization.class)
-					  .where(Immunization.IDENTIFIER.exactly().identifier(vaccinationReportedExternalLink)).returnBundle(Bundle.class).execute();
-				  if (bundle.hasEntry()) {
-					  Immunization immunization = (Immunization) bundle.getEntryFirstRep().getResource();
-					  vaccinationReported = ImmunizationHandler.getReported(immunization);
-					  vaccinationMaster = vaccinationReported.getVaccination();
-				  }
-			  } catch (ResourceNotFoundException e) {}
+			 vaccinationReported = fhirRequests.searchVaccinationReported(fhirClient,Immunization.IDENTIFIER.exactly().identifier(vaccinationReportedExternalLink));
+			 vaccinationMaster = vaccinationReported.getVaccination();
+
           if (vaccinationReported == null) {
             vaccinationMaster = new VaccinationMaster();
 				 vaccinationMaster.setVaccinationId(vaccinationReportedExternalLink); // TODO verify
@@ -444,39 +432,29 @@ public class IncomingMessageHandler {
             String administeredAtLocation = reader.getValue(11, 4);
             if (StringUtils.isNotEmpty(administeredAtLocation)) {
 					OrgLocation orgLocation = null;
-					try {
-						Bundle bundle = fhirClient.search().forResource(Location.class)
-							.where(Location.IDENTIFIER.exactly().identifier(administeredAtLocation)).returnBundle(Bundle.class).execute();
-						if(bundle.hasEntry()){
-							Location location = (Location) bundle.getEntryFirstRep().getResource();
-							orgLocation = LocationMapper.orgLocationFromFhir(location);
-						} else {
-							if (processingFlavorSet.contains(ProcessingFlavor.PEAR)) {
-								throw new ProcessingException(
-									"Unrecognized administered at location, unable to accept immunization report",
-									"RXA", rxaCount, 11);
-							}
-							orgLocation = new OrgLocation();
-							orgLocation.setOrgFacilityCode(administeredAtLocation);
-							orgLocation.setOrgMaster(orgAccess.getOrg());
-							orgLocation.setOrgFacilityName(administeredAtLocation);
-							orgLocation.setLocationType("");
-							orgLocation.setAddressLine1(reader.getValue(11, 9));
-							orgLocation.setAddressLine2(reader.getValue(11, 10));
-							orgLocation.setAddressCity(reader.getValue(11, 11));
-							orgLocation.setAddressState(reader.getValue(11, 12));
-							orgLocation.setAddressZip(reader.getValue(11, 13));
-							orgLocation.setAddressCountry(reader.getValue(11, 14));
-							Location location = LocationMapper.fhirLocation(orgLocation);
-							MethodOutcome outcome;
-							outcome = fhirClient.create().resource(location).execute();
-							orgLocation = LocationMapper.orgLocationFromFhir(location);
+					orgLocation = fhirRequests.searchOrgLocation(fhirClient,Location.IDENTIFIER.exactly().identifier(administeredAtLocation));
+					if (orgLocation == null) {
+						if (processingFlavorSet.contains(ProcessingFlavor.PEAR)) {
+							throw new ProcessingException(
+								"Unrecognized administered at location, unable to accept immunization report",
+								"RXA", rxaCount, 11);
 						}
-					} catch (ResourceNotFoundException e) {}
-
-              if (orgLocation == null) {
-
-				  }
+						orgLocation = new OrgLocation();
+						orgLocation.setOrgFacilityCode(administeredAtLocation);
+						orgLocation.setOrgMaster(orgAccess.getOrg());
+						orgLocation.setOrgFacilityName(administeredAtLocation);
+						orgLocation.setLocationType("");
+						orgLocation.setAddressLine1(reader.getValue(11, 9));
+						orgLocation.setAddressLine2(reader.getValue(11, 10));
+						orgLocation.setAddressCity(reader.getValue(11, 11));
+						orgLocation.setAddressState(reader.getValue(11, 12));
+						orgLocation.setAddressZip(reader.getValue(11, 13));
+						orgLocation.setAddressCountry(reader.getValue(11, 14));
+						Location location = LocationMapper.fhirLocation(orgLocation);
+						MethodOutcome outcome;
+						outcome = fhirClient.create().resource(location).execute();
+						orgLocation = LocationMapper.orgLocationFromFhir(location);
+					}
               vaccinationReported.setOrgLocation(orgLocation);
             }
           }
@@ -1134,27 +1112,18 @@ public class IncomingMessageHandler {
       VaccinationMaster vaccination, String identifierCode, String valueCode, IGenericClient fhirClient) {
     ObservationMaster observationMaster = null;
 	 ObservationReported observationReported = null;
-
-	  try {
-		  Bundle bundle;
-		  if (vaccination == null) {
-			  bundle = fhirClient.search().forResource(Observation.class)
-				  .where(Observation.PART_OF.isMissing(true))
-				  .and(Observation.SUBJECT.hasId(patientReported.getPatientReportedId()))
-				  .returnBundle(Bundle.class).execute();
-		  } else {
-			  bundle = fhirClient.search().forResource(Observation.class)
-				  .where(Observation.PART_OF.hasId(vaccination.getVaccinationId()))
-				  .and(Observation.SUBJECT.hasId(patientReported.getPatientReportedId()))
-				  .returnBundle(Bundle.class).execute();
-		  }
-		  if (bundle.hasEntry()){
-			  Observation observation = (Observation) bundle.getEntryFirstRep().getResource();
-			  observationMaster = ObservationMapper.getMaster(observation);
-			  observationReported = observationMaster.getObservationReported();
-		  }
-	  } catch (ResourceNotFoundException e) {}
-
+	  if (vaccination == null) {
+		  observationReported = fhirRequests.searchObservationReported(fhirClient,
+			  Observation.PART_OF.isMissing(true),
+			  Observation.SUBJECT.hasId(patientReported.getPatientReportedId()));
+	  } else {
+		  observationReported = fhirRequests.searchObservationReported(fhirClient,
+			  Observation.PART_OF.hasId(vaccination.getVaccinationId()),
+			  Observation.SUBJECT.hasId(patientReported.getPatientReportedId()));
+	  }
+	  if (observationReported != null) {
+		  observationMaster = observationReported.getObservation();
+	  }
 //	  String q;
 //    if (vaccination == null) {
 //      q = "from ObservationMaster where " + "patient = :patient and vaccination is null "
@@ -1584,7 +1553,6 @@ public class IncomingMessageHandler {
 			 Bundle bundle = fhirClient.search().forResource(Observation.class)
 					 .where(Observation.PART_OF.hasId(patientMaster.getPatientId()))
 					 .returnBundle(Bundle.class).execute();
-
 			 if (bundle.hasEntry()) {
 				 printORC(orgAccess, sb, null, null, false);
 				 obsSubId++;

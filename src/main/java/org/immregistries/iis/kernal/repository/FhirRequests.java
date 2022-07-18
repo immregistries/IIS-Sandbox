@@ -5,20 +5,20 @@ import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.gclient.ICriterion;
 import ca.uhn.fhir.rest.gclient.IQuery;
 import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
-import org.hl7.fhir.r5.model.Bundle;
-import org.hl7.fhir.r5.model.Immunization;
-import org.hl7.fhir.r5.model.Observation;
-import org.hl7.fhir.r5.model.Patient;
-import org.immregistries.iis.kernal.mapping.ImmunizationHandler;
-import org.immregistries.iis.kernal.mapping.ObservationMapper;
-import org.immregistries.iis.kernal.mapping.PatientHandler;
+import org.hl7.fhir.r5.model.*;
+import org.immregistries.iis.kernal.mapping.*;
 import org.immregistries.iis.kernal.model.ObservationReported;
+import org.immregistries.iis.kernal.model.OrgLocation;
 import org.immregistries.iis.kernal.model.PatientReported;
+import org.immregistries.iis.kernal.model.Person;
 import org.immregistries.iis.kernal.model.VaccinationReported;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 public class FhirRequests {
@@ -38,6 +38,15 @@ public class FhirRequests {
 		}
 		return patientReported;
 	}
+
+	public List<PatientReported> searchPatientReportedList(IGenericClient fhirClient, ICriterion... where) {
+		List<PatientReported> patientReportedList = new ArrayList<>();
+		Bundle bundle = search(Patient.class,fhirClient, where);
+		for (Bundle.BundleEntryComponent entry: bundle.getEntry()) {
+			patientReportedList.add(PatientHandler.getReported((Patient) entry.getResource()));
+		}
+		return patientReportedList;
+	}
 	public VaccinationReported searchVaccinationReported(IGenericClient fhirClient, ICriterion... where) {
 		VaccinationReported vaccinationReported = null;
 		Bundle bundle = search(Immunization.class,fhirClient, where);
@@ -54,6 +63,24 @@ public class FhirRequests {
 		}
 		return observationReported;
 	}
+	public OrgLocation searchOrgLocation(IGenericClient fhirClient, ICriterion... where) {
+		OrgLocation orgLocation = null;
+		Bundle bundle = search(Observation.class,fhirClient, where);
+		if (bundle.hasEntry()) {
+			orgLocation = LocationMapper.orgLocationFromFhir((Location) bundle.getEntryFirstRep().getResource());
+		}
+		return orgLocation;
+	}
+
+	public Person searchPerson(IGenericClient fhirClient, ICriterion... where) {
+		Person person = null;
+		Bundle bundle = search(org.hl7.fhir.r5.model.Person.class,fhirClient, where);
+		if (bundle.hasEntry()) {
+			person = PersonHandler.getModelPerson((org.hl7.fhir.r5.model.Person) bundle.getEntryFirstRep().getResource());
+		}
+		return person;
+	}
+
 
 	private Bundle search(
 		Class<? extends org.hl7.fhir.instance.model.api.IBaseResource> aClass,

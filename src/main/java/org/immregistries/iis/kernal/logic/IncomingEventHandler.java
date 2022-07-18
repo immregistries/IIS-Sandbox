@@ -135,16 +135,11 @@ public class IncomingEventHandler extends IncomingMessageHandler {
       throw new Exception(
           "Vaccination is indicated as occuring in the future, unable to accept future vaccination events");
     }
-	  try {
-		  Bundle bundle = fhirClient.search().forResource(Immunization.class)
-			  .where(Immunization.PATIENT.hasId(patientReported.getPatientReportedId()))
-			  .and(Immunization.IDENTIFIER.exactly().identifier(vaccinationReportedExternalLink))
-			  .returnBundle(Bundle.class).execute();
-		  Immunization immunization = (Immunization) bundle.getEntryFirstRep().getResource();
-		  vaccinationReported = ImmunizationHandler.getReported(immunization);
-		  vaccinationMaster = vaccinationReported.getVaccination();
-
-	  } catch (ResourceNotFoundException e) {}
+	  vaccinationReported = fhirRequests.searchVaccinationReported(fhirClient,
+		 Immunization.PATIENT.hasId(patientReported.getPatientReportedId()),
+		 Immunization.IDENTIFIER.exactly().identifier(vaccinationReportedExternalLink)
+		 );
+	  vaccinationMaster = vaccinationReported.getVaccination();
 //    {
 //      Query query = dataSession.createQuery(
 //          "from VaccinationReported where patientReported = ? and vaccinationReportedExternalLink = ?");
@@ -201,30 +196,25 @@ public class IncomingEventHandler extends IncomingMessageHandler {
       String administeredAtLocation = req.getParameter(ORG_LOCATION_FACILITY_CODE);
       if (StringUtils.isNotEmpty(administeredAtLocation)) {
 			OrgLocation orgLocation = null;
-			try {
-				Bundle bundle = fhirClient.search().forResource(Location.class)
-					.where(Location.IDENTIFIER.exactly().identifier(administeredAtLocation))
-//					.where(Location.ORGANIZATION.hasAnyOfIds(administeredAtLocation)) //Todo verify condition
-					.returnBundle(Bundle.class).execute();
-				if (bundle.hasEntry()) {
-					Location location = (Location) bundle.getEntryFirstRep().getResource();
-					orgLocation = LocationMapper.orgLocationFromFhir(location);
-				}else {
-					orgLocation = new OrgLocation();
-					orgLocation.setOrgFacilityCode(administeredAtLocation);
-					orgLocation.setOrgMaster(orgAccess.getOrg());
-					orgLocation.setOrgFacilityName(administeredAtLocation);
-					orgLocation.setLocationType("");
-					orgLocation.setAddressLine1("");
-					orgLocation.setAddressLine2("");
-					orgLocation.setAddressCity("");
-					orgLocation.setAddressState("");
-					orgLocation.setAddressZip("");
-					orgLocation.setAddressCountry("");
-					Location location = LocationMapper.fhirLocation(orgLocation);
-					MethodOutcome outcome = fhirClient.create().resource(location).execute();
-				}
-			} catch (ResourceNotFoundException e) {}
+			orgLocation = fhirRequests.searchOrgLocation(fhirClient,
+				Location.IDENTIFIER.exactly().identifier(administeredAtLocation)
+				// Location.ORGANIZATION.hasAnyOfIds(administeredAtLocation) //Todo verify condition
+			);
+			if (orgLocation == null){
+				orgLocation = new OrgLocation();
+				orgLocation.setOrgFacilityCode(administeredAtLocation);
+				orgLocation.setOrgMaster(orgAccess.getOrg());
+				orgLocation.setOrgFacilityName(administeredAtLocation);
+				orgLocation.setLocationType("");
+				orgLocation.setAddressLine1("");
+				orgLocation.setAddressLine2("");
+				orgLocation.setAddressCity("");
+				orgLocation.setAddressState("");
+				orgLocation.setAddressZip("");
+				orgLocation.setAddressCountry("");
+				Location location = LocationMapper.fhirLocation(orgLocation);
+				MethodOutcome outcome = fhirClient.create().resource(location).execute();
+			}
         vaccinationReported.setOrgLocation(orgLocation);
       }
     }
@@ -287,19 +277,6 @@ public class IncomingEventHandler extends IncomingMessageHandler {
 
 
     {
-//		 try {
-////			 Patient patient = fhirClient.read().resource(Patient.class).withId(patientReportedExternalLink).execute();
-////			 logger.info(String.valueOf(patient));
-//			 Bundle bundle = fhirClient.search().forResource(Patient.class)
-//				 .where(Patient.IDENTIFIER.exactly().identifier(patientReportedExternalLink))
-//				 .returnBundle(Bundle.class).execute();
-//			 logger.info(bundle.getEntryFirstRep().toString());
-//			 if (bundle.hasEntry()) {
-//				 Patient patient = (Patient) bundle.getEntryFirstRep().getResource();
-//				 patientReported = PatientHandler.getReported(patient);
-//				 patientMaster = patientReported.getPatient();
-//			 }
-//		 } catch (ResourceNotFoundException e) {}
 		 patientReported = fhirRequests.searchPatientReported(getFhirClient(orgAccess),
 			 Patient.IDENTIFIER.exactly().identifier(patientReportedExternalLink)
 		 );
