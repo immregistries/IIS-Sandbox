@@ -12,6 +12,7 @@ import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.logic.CodeMapManager;
 import org.immregistries.iis.kernal.mapping.ImmunizationHandler;
 import org.immregistries.iis.kernal.model.*;
+import org.immregistries.iis.kernal.repository.FhirRequests;
 import org.immregistries.iis.kernal.repository.RepositoryClientFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -31,6 +32,8 @@ import java.util.Set;
 public class VaccinationServlet extends PatientServlet {
 	@Autowired
 	RepositoryClientFactory repositoryClientFactory;
+	@Autowired
+	FhirRequests fhirRequests;
 
   public static final String PARAM_ACTION = "action";
 
@@ -60,13 +63,9 @@ public class VaccinationServlet extends PatientServlet {
     Session dataSession = PopServlet.getDataSession(); //TODO
 	  IGenericClient fhirClient = repositoryClientFactory.newGenericClient(orgAccess);
     try {
-		 Bundle bundle = fhirClient.search().forResource(Immunization.class)
-			 .where(Immunization.IDENTIFIER.exactly().identifier(req.getParameter(PARAM_VACCINATION_REPORTED_ID)))
-			 .returnBundle(Bundle.class).execute();
-		 VaccinationReported vaccinationReported;
-//		 if (bundle.hasEntry()){
-			 vaccinationReported = ImmunizationHandler.getReported((Immunization) bundle.getEntryFirstRep().getResource());
-//		 }
+		 VaccinationReported vaccinationReported = fhirRequests.searchVaccinationReported(fhirClient,
+			 Immunization.IDENTIFIER.exactly().identifier(req.getParameter(PARAM_VACCINATION_REPORTED_ID)));
+
 //      VaccinationReported vaccinationReported =
 //          (VaccinationReported) dataSession.get(VaccinationReported.class,
 //              Integer.parseInt(req.getParameter(PARAM_VACCINATION_REPORTED_ID)));

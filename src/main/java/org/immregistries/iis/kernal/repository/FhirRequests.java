@@ -55,6 +55,14 @@ public class FhirRequests {
 		}
 		return vaccinationReported;
 	}
+	public List<VaccinationReported> searchVaccinationReportedList(IGenericClient fhirClient, ICriterion... where) {
+		List<VaccinationReported> vaccinationReportedList = new ArrayList<>();
+		Bundle bundle = search(Immunization.class,fhirClient, where);
+		for (Bundle.BundleEntryComponent entry: bundle.getEntry()) {
+			vaccinationReportedList.add(ImmunizationHandler.getReported((Immunization) entry.getResource()));
+		}
+		return vaccinationReportedList;
+	}
 	public ObservationReported searchObservationReported(IGenericClient fhirClient, ICriterion... where) {
 		ObservationReported observationReported = null;
 		Bundle bundle = search(Observation.class,fhirClient, where);
@@ -62,6 +70,14 @@ public class FhirRequests {
 			observationReported = ObservationMapper.getReported((Observation) bundle.getEntryFirstRep().getResource());
 		}
 		return observationReported;
+	}
+	public List<ObservationReported> searchObservationReportedList(IGenericClient fhirClient, ICriterion... where) {
+		List<ObservationReported> observationReportedList = new ArrayList<>();
+		Bundle bundle = search(Observation.class,fhirClient, where);
+		for (Bundle.BundleEntryComponent entry: bundle.getEntry()) {
+			observationReportedList.add(ObservationMapper.getReported((Observation) entry.getResource()));
+		}
+		return observationReportedList;
 	}
 	public OrgLocation searchOrgLocation(IGenericClient fhirClient, ICriterion... where) {
 		OrgLocation orgLocation = null;

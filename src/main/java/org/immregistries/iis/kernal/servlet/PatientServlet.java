@@ -14,6 +14,7 @@ import org.immregistries.iis.kernal.mapping.ImmunizationHandler;
 import org.immregistries.iis.kernal.mapping.ObservationMapper;
 import org.immregistries.iis.kernal.mapping.PatientHandler;
 import org.immregistries.iis.kernal.model.*;
+import org.immregistries.iis.kernal.repository.FhirRequests;
 import org.immregistries.iis.kernal.repository.RepositoryClientFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -33,6 +34,9 @@ import java.util.*;
 public class PatientServlet extends HttpServlet {
 	@Autowired
 	private RepositoryClientFactory repositoryClientFactory;
+
+	@Autowired
+	FhirRequests fhirRequests;
 
   public static final String PARAM_ACTION = "action";
   public static final String ACTION_SEARCH = "search";
@@ -217,14 +221,9 @@ public class PatientServlet extends HttpServlet {
         out.println("<h4>Vaccinations</h4>");
         List<VaccinationReported> vaccinationReportedList = new ArrayList<>();
         {
-			  Bundle bundle = fhirClient
-				  .search()
-				  .forResource(Immunization.class)
-				  .where(Immunization.PATIENT.hasId(patientReportedSelected.getPatientReportedId()))
-				  .returnBundle(Bundle.class).execute();
-			  for (Bundle.BundleEntryComponent entry: bundle.getEntry()) {
-				  vaccinationReportedList.add(ImmunizationHandler.getReported((Immunization) entry.getResource()));
-			  }
+			  vaccinationReportedList = fhirRequests.searchVaccinationReportedList(fhirClient,
+				  Immunization.PATIENT.hasId(patientReportedSelected.getPatientReportedId()));
+
 //          Query query = dataSession
 //              .createQuery("from VaccinationReported where patientReported = :patientReported");
 //          query.setParameter("patientReported", patientReportedSelected);
@@ -537,18 +536,10 @@ public List<ObservationReported> getObservationList(IGenericClient fhirClient,
       PatientReported patientReportedSelected) {
     List<ObservationReported> observationReportedList = new ArrayList<>();
     {
-		 Bundle bundle = fhirClient.search()
-			 .forResource(Observation.class)
-			 .where(Observation.PATIENT.hasId(patientReportedSelected.getPatientReportedId()))
-			 .returnBundle(Bundle.class)
-			 .execute();
-		 for (Bundle.BundleEntryComponent entry: bundle.getEntry()) {
-			 observationReportedList.add(ObservationMapper.getReported((Observation) entry.getResource()));
-		 }
-//      Query query = dataSession.createQuery(
-//          "from ObservationReported where patientReported = :patientReported and vaccinationReported is null");
-//      query.setParameter("patientReported", patientReportedSelected);
-//      observationReportedList = query.list();
+		 observationReportedList = fhirRequests.searchObservationReportedList(fhirClient,
+			 Observation.PATIENT.hasId(patientReportedSelected.getPatientReportedId())
+//			 ,Observation.PART_OF.hasChainedProperty(Immunization.IDENTIFIER.exactly().code("")) TODO Find formulato say is null or has no
+		 );
 
       Set<String> suppressSet = LoincIdentifier.getSuppressIdentifierCodeSet();
       for (Iterator<ObservationReported> it = observationReportedList.iterator(); it.hasNext();) {
