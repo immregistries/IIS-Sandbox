@@ -6,6 +6,7 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hl7.fhir.r5.model.Bundle;
 import org.hl7.fhir.r5.model.Immunization;
+import org.hl7.fhir.r5.model.Observation;
 import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
@@ -60,15 +61,10 @@ public class VaccinationServlet extends PatientServlet {
 
     resp.setContentType("text/html");
     PrintWriter out = new PrintWriter(resp.getOutputStream());
-    Session dataSession = PopServlet.getDataSession(); //TODO
 	  IGenericClient fhirClient = repositoryClientFactory.newGenericClient(orgAccess);
     try {
 		 VaccinationReported vaccinationReported = fhirRequests.searchVaccinationReported(fhirClient,
 			 Immunization.IDENTIFIER.exactly().identifier(req.getParameter(PARAM_VACCINATION_REPORTED_ID)));
-
-//      VaccinationReported vaccinationReported =
-//          (VaccinationReported) dataSession.get(VaccinationReported.class,
-//              Integer.parseInt(req.getParameter(PARAM_VACCINATION_REPORTED_ID)));
 
       String action = req.getParameter(PARAM_ACTION);
       if (action != null) {
@@ -159,7 +155,7 @@ public class VaccinationServlet extends PatientServlet {
         }
 
         List<ObservationReported> observationReportedList =
-            getObservationList(dataSession, vaccinationReported);
+            getObservationList(fhirClient, vaccinationReported);
 
         if (observationReportedList.size() != 0) {
           out.println("<h4>Observations</h4>");
@@ -170,8 +166,6 @@ public class VaccinationServlet extends PatientServlet {
       }
     } catch (Exception e) {
       e.printStackTrace(System.err);
-    } finally {
-      dataSession.close();
     }
     HomeServlet.doFooter(out, session);
     out.flush();
@@ -179,14 +173,13 @@ public class VaccinationServlet extends PatientServlet {
   }
 
   @SuppressWarnings("unchecked")
-public List<ObservationReported> getObservationList(Session dataSession,
+public List<ObservationReported> getObservationList(IGenericClient fhirClient,
       VaccinationReported vaccinationReported) {
     List<ObservationReported> observationReportedList;
     {
-      Query query = dataSession
-          .createQuery("from ObservationReported where vaccinationReported = :vaccinationReported");
-      query.setParameter("vaccinationReported", vaccinationReported);
-      observationReportedList = query.list();
+		 observationReportedList = fhirRequests.searchObservationReportedList(fhirClient,
+			 Observation.PATIENT.hasId(vaccinationReported.getVaccinationReportedId())
+		 );
       Set<String> suppressSet = LoincIdentifier.getSuppressIdentifierCodeSet();
       for (Iterator<ObservationReported> it = observationReportedList.iterator(); it.hasNext();) {
         ObservationReported observationReported = it.next();
