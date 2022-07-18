@@ -13,6 +13,7 @@ import org.immregistries.iis.kernal.SoftwareVersion;
 import org.immregistries.iis.kernal.mapping.*;
 import org.immregistries.iis.kernal.model.*;
 import org.immregistries.iis.kernal.model.Person;
+import org.immregistries.iis.kernal.repository.FhirRequests;
 import org.immregistries.iis.kernal.repository.RepositoryClientFactory;
 import org.immregistries.smm.tester.manager.HL7Reader;
 import org.immregistries.vfa.connect.ConnectFactory;
@@ -33,6 +34,18 @@ public class IncomingMessageHandler {
   private Logger logger = LoggerFactory.getLogger(IncomingMessageHandler.class);
   @Autowired
   protected RepositoryClientFactory repositoryClientFactory;
+
+  @Autowired
+  protected FhirRequests fhirRequests;
+
+  protected IGenericClient fhirClient;
+
+  protected IGenericClient getFhirClient(OrgAccess orgAccess) {
+	  if (fhirClient == null) {
+		  fhirClient = repositoryClientFactory.newGenericClient(orgAccess);
+	  }
+	  return fhirClient;
+  }
 
   private static final String PATIENT_MIDDLE_NAME_MULTI = "Multi";
   // TODO:
@@ -118,14 +131,9 @@ public class IncomingMessageHandler {
       String problem = null;
       int fieldPosition = 0;
       if (!mrn.equals("")) {
-			try {
-				Bundle bundle = fhirClient.search().forResource(Patient.class)
-					.where(Patient.IDENTIFIER.exactly().identifier(mrn)).returnBundle(Bundle.class).execute();
-				if (bundle.hasEntry()){
-					Patient patient = (Patient) bundle.getEntryFirstRep().getResource();
-					patientReported = PatientHandler.getReported(patient);
-				}
-			} catch (ResourceNotFoundException e) {}
+			patientReported = fhirRequests.searchPatientReported(getFhirClient(orgAccess),
+				Patient.IDENTIFIER.exactly().identifier(mrn)
+			);
 //        Query query = dataSession.createQuery(
 //            "from PatientReported where orgReported = ? and patientReportedExternalLink = ?");
 //        query.setParameter(0, orgAccess.getOrg());
@@ -159,17 +167,11 @@ public class IncomingMessageHandler {
       } else {
 
         if (patientReported == null) {
-			  try {
-				  Bundle bundle = fhirClient.search().forResource(Patient.class)
-					  .where(Patient.NAME.matches().value(patientNameFirst))
-					  .and(Patient.FAMILY.matches().value(patientNameLast))
-					  .and(Patient.BIRTHDATE.exactly().day(patientBirthDate))
-					  .returnBundle(Bundle.class).execute();
-				  if (bundle.hasEntry()){
-					  Patient patient = (Patient) bundle.getEntryFirstRep().getResource();
-					  patientReported = PatientHandler.getReported(patient);
-				  }
-			  } catch (ResourceNotFoundException e) {}
+			  patientReported = fhirRequests.searchPatientReported(getFhirClient(orgAccess),
+				  Patient.NAME.matches().value(patientNameFirst),
+				  Patient.FAMILY.matches().value(patientNameLast),
+				  Patient.BIRTHDATE.exactly().day(patientBirthDate)
+			  );
         }
         if (patientReported != null) {
           int points = 0;
@@ -690,16 +692,9 @@ public class IncomingMessageHandler {
       throw new ProcessingException(
           "No PID segment found, required for accepting vaccination report", "", 0, 0);
     }
-
-	  try {
-		  Bundle bundle = fhirClient.search().forResource(Patient.class)
-			  .where(Patient.IDENTIFIER.exactly().identifier(patientReportedExternalLink)).returnBundle(Bundle.class).execute();
-		  if (bundle.hasEntry()) {
-			  Patient patient = (Patient) bundle.getEntryFirstRep().getResource();
-			  patientReported = PatientHandler.getReported(patient);
-			  patientMaster = patientReported.getPatient();
-		  }
-	  } catch (ResourceNotFoundException e) {}
+	  patientReported = fhirRequests.searchPatientReported(getFhirClient(orgAccess),
+		  Patient.IDENTIFIER.exactly().identifier(patientReportedExternalLink)
+	  );
 
     if (patientReported == null) {
       patientMaster = new PatientMaster();

@@ -8,6 +8,7 @@ import ca.uhn.fhir.rest.client.api.IClientInterceptor;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.client.api.ServerValidationModeEnum;
 import ca.uhn.fhir.rest.client.interceptor.BearerTokenAuthInterceptor;
+import ca.uhn.fhir.rest.client.interceptor.UrlTenantSelectionInterceptor;
 import ca.uhn.fhir.rest.server.interceptor.LoggingInterceptor;
 import ca.uhn.fhir.rest.server.util.ITestingUiClientFactory;
 import org.immregistries.iis.kernal.model.OrgAccess;
@@ -26,6 +27,7 @@ public class RepositoryClientFactory extends ApacheRestfulClientFactory implemen
     private final Logger logger = LoggerFactory.getLogger(RepositoryClientFactory.class);
     private IClientInterceptor authInterceptor;
     private LoggingInterceptor loggingInterceptor;
+    private UrlTenantSelectionInterceptor urlTenantSelectionInterceptor;
 	 private static String serverBase = "http://localhost:8080/fhir";
 
 	@Autowired
@@ -47,17 +49,12 @@ public class RepositoryClientFactory extends ApacheRestfulClientFactory implemen
 
 	public synchronized IGenericClient newGenericClient(OrgAccess orgAccess) {
 		asynchInit();
-		return newGenericClient(serverBase + "/" + orgAccess.getAccessName());
+		IGenericClient client = newGenericClient(serverBase);
+		urlTenantSelectionInterceptor = new UrlTenantSelectionInterceptor(orgAccess.getAccessName());
+		client.registerInterceptor(urlTenantSelectionInterceptor);
+		return client;
 	}
 
-	public synchronized IGenericClient newGenericClient(RequestDetails theRequestDetails) {
-		asynchInit();
-		if (theRequestDetails.getTenantId() != null) {
-			return newGenericClient(serverBase + "/" + theRequestDetails.getTenantId());
-		} else {
-			return newGenericClient(serverBase);
-		}
-	}
 
 	public synchronized IGenericClient newGenericClient() {
 		asynchInit();

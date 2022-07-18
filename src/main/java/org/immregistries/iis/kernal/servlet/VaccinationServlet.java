@@ -1,13 +1,19 @@
 package org.immregistries.iis.kernal.servlet;
 
+import ca.uhn.fhir.rest.client.api.IGenericClient;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Query;
 import org.hibernate.Session;
+import org.hl7.fhir.r5.model.Bundle;
+import org.hl7.fhir.r5.model.Immunization;
 import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.logic.CodeMapManager;
+import org.immregistries.iis.kernal.mapping.ImmunizationHandler;
 import org.immregistries.iis.kernal.model.*;
+import org.immregistries.iis.kernal.repository.RepositoryClientFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -23,6 +29,8 @@ import java.util.Set;
 
 @SuppressWarnings("serial")
 public class VaccinationServlet extends PatientServlet {
+	@Autowired
+	RepositoryClientFactory repositoryClientFactory;
 
   public static final String PARAM_ACTION = "action";
 
@@ -49,11 +57,19 @@ public class VaccinationServlet extends PatientServlet {
 
     resp.setContentType("text/html");
     PrintWriter out = new PrintWriter(resp.getOutputStream());
-    Session dataSession = PopServlet.getDataSession();
+    Session dataSession = PopServlet.getDataSession(); //TODO
+	  IGenericClient fhirClient = repositoryClientFactory.newGenericClient(orgAccess);
     try {
-      VaccinationReported vaccinationReported =
-          (VaccinationReported) dataSession.get(VaccinationReported.class,
-              Integer.parseInt(req.getParameter(PARAM_VACCINATION_REPORTED_ID)));
+		 Bundle bundle = fhirClient.search().forResource(Immunization.class)
+			 .where(Immunization.IDENTIFIER.exactly().identifier(req.getParameter(PARAM_VACCINATION_REPORTED_ID)))
+			 .returnBundle(Bundle.class).execute();
+		 VaccinationReported vaccinationReported;
+//		 if (bundle.hasEntry()){
+			 vaccinationReported = ImmunizationHandler.getReported((Immunization) bundle.getEntryFirstRep().getResource());
+//		 }
+//      VaccinationReported vaccinationReported =
+//          (VaccinationReported) dataSession.get(VaccinationReported.class,
+//              Integer.parseInt(req.getParameter(PARAM_VACCINATION_REPORTED_ID)));
 
       String action = req.getParameter(PARAM_ACTION);
       if (action != null) {

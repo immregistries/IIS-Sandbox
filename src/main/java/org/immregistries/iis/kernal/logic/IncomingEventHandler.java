@@ -273,7 +273,7 @@ public class IncomingEventHandler extends IncomingMessageHandler {
       CodeMap codeMap) throws Exception {
 	 RequestDetails requestDetails = new ServletRequestDetails();
 	 requestDetails.setTenantId(orgAccess.getAccessName());
-	 IGenericClient fhirClient = repositoryClientFactory.newGenericClient(requestDetails);
+	 IGenericClient fhirClient = repositoryClientFactory.newGenericClient(orgAccess);
 
     PatientReported patientReported = null;
     PatientMaster patientMaster = null;
@@ -287,20 +287,23 @@ public class IncomingEventHandler extends IncomingMessageHandler {
 
 
     {
-		 try {
-//			 Patient patient = fhirClient.read().resource(Patient.class).withId(patientReportedExternalLink).execute();
-//			 logger.info(String.valueOf(patient));
-			 Bundle bundle = fhirClient.search().forResource(Patient.class)
-				 .where(Patient.IDENTIFIER.exactly().identifier(patientReportedExternalLink))
-				 .returnBundle(Bundle.class).execute();
-			 logger.info(bundle.getEntryFirstRep().toString());
-			 if (bundle.hasEntry()) {
-				 Patient patient = (Patient) bundle.getEntryFirstRep().getResource();
-				 patientReported = PatientHandler.getReported(patient);
-				 patientMaster = patientReported.getPatient();
-			 }
-		 } catch (ResourceNotFoundException e) {}
-
+//		 try {
+////			 Patient patient = fhirClient.read().resource(Patient.class).withId(patientReportedExternalLink).execute();
+////			 logger.info(String.valueOf(patient));
+//			 Bundle bundle = fhirClient.search().forResource(Patient.class)
+//				 .where(Patient.IDENTIFIER.exactly().identifier(patientReportedExternalLink))
+//				 .returnBundle(Bundle.class).execute();
+//			 logger.info(bundle.getEntryFirstRep().toString());
+//			 if (bundle.hasEntry()) {
+//				 Patient patient = (Patient) bundle.getEntryFirstRep().getResource();
+//				 patientReported = PatientHandler.getReported(patient);
+//				 patientMaster = patientReported.getPatient();
+//			 }
+//		 } catch (ResourceNotFoundException e) {}
+		 patientReported = fhirRequests.searchPatientReported(getFhirClient(orgAccess),
+			 Patient.IDENTIFIER.exactly().identifier(patientReportedExternalLink)
+		 );
+		 patientMaster = patientReported.getPatient();
     }
 
     if (patientReported == null) {
