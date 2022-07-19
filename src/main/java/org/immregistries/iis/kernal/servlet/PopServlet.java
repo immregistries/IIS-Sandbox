@@ -97,15 +97,15 @@ public class PopServlet extends HttpServlet {
       }
       String userId = req.getParameter(PARAM_USERID);
       if (userId == null || userId.equals("")) {
-        userId = "Mercy";
+        userId = "DEFAULT";
       }
       String password = req.getParameter(PARAM_PASSWORD);
       if (password == null || password.equals("")) {
-        password = "password1234";
+        password = "DEFAULT";
       }
       String facilityId = req.getParameter(PARAM_FACILITYID);
       if (facilityId == null || facilityId.equals("")) {
-        facilityId = "Mercy Healthcare";
+        facilityId = "DEFAULT";
       }
       {
         HomeServlet.doHeader(out, session);

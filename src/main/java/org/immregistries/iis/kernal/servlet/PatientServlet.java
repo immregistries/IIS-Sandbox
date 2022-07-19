@@ -87,16 +87,7 @@ public class PatientServlet extends HttpServlet {
 			  for (Bundle.BundleEntryComponent entry: bundle.getEntry()) {
 				  patientReportedList.add(PatientHandler.getReported((Patient) entry.getResource()));
 			  }
-//          Query query = dataSession
-//              .createQuery("from PatientReported where patientNameLast like :patientNameLast "
-//                  + "and patientNameFirst like :patientNameFirst "
-//                  + "and patientReportedExternalLink like :patientReportedExternalLink "
-//                  + "and orgReported = :orgReported");
-//          query.setParameter("patientNameLast", patientNameLast + "%");
-//          query.setParameter("patientNameFirst", patientNameFirst + "%");
-//          query.setParameter("patientReportedExternalLink", patientReportedExternalLink + "%");
-//          query.setParameter("orgReported", orgAccess.getOrg());
-//          patientReportedList = query.list();
+
         }
       }
 
