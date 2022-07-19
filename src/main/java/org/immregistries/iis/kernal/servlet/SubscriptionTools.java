@@ -1,8 +1,7 @@
 package org.immregistries.iis.kernal.servlet;
 
 import ca.uhn.fhir.rest.client.api.IGenericClient;
-import org.hl7.fhir.r5.model.Bundle;
-import org.hl7.fhir.r5.model.Subscription;
+import org.hl7.fhir.r5.model.*;
 import org.immregistries.iis.kernal.model.OrgAccess;
 import org.immregistries.iis.kernal.repository.RepositoryClientFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +23,31 @@ public class SubscriptionTools extends HttpServlet {
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
 		throws ServletException, IOException {
-		// TODO action as maual trigger with content
+		// TODO action as manual trigger with content
+		SubscriptionTopic.SubscriptionTopicResourceTriggerComponent patientTrigger = new SubscriptionTopic.SubscriptionTopicResourceTriggerComponent()
+			.setResource("Patient");
+		SubscriptionTopic.SubscriptionTopicResourceTriggerComponent operationOutcomeTrigger = new SubscriptionTopic.SubscriptionTopicResourceTriggerComponent()
+			.setResource("OperationOutcome");
+		SubscriptionTopic.SubscriptionTopicEventTriggerComponent eventTrigger =
+			new SubscriptionTopic.SubscriptionTopicEventTriggerComponent().setEvent( new CodeableConcept()
+				// https://terminology.hl7.org/3.1.0/ValueSet-v2-0003.html
+				.addCoding(new Coding().setSystem("http://terminology.hl7.org/ValueSet/v2-0003").setCode("A04"))
+				.addCoding(new Coding().setSystem("http://terminology.hl7.org/ValueSet/v2-0003").setCode("A28"))
+				.addCoding(new Coding().setSystem("http://terminology.hl7.org/ValueSet/v2-0003").setCode("A31"))
+			).setResource("Patient");
+
+		SubscriptionTopic topic  = new SubscriptionTopic()
+			.setDescription("Testing communication between EHR and IIS and operation outcome")
+			.setUrl("https://florence.immregistries.org/iis-sandbox/fhir/SubscriptionTopic")
+			.setStatus(Enumerations.PublicationStatus.DRAFT)
+			.setExperimental(true).setPublisher("Aira/Nist").setTitle("Health equity data quality requests within Immunization systems");
+
+		topic.addResourceTrigger(patientTrigger);
+		topic.addResourceTrigger(operationOutcomeTrigger);
+		topic.addEventTrigger(eventTrigger);
+		topic.addNotificationShape().setResource("OperationOutcome");
+		// TODO include topic in provider
+
 		doGet(req, resp);
 	}
 
