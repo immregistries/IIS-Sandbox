@@ -109,8 +109,9 @@ public class FhirRequests {
 				query = query.where(where[0]);
 			}
 			int i = 1;
-			while (i++ < size) {
+			while (i < size) {
 				query = query.and(where[i]);
+				i++;
 			}
 			return  query.execute();
 		} catch (ResourceNotFoundException e) {

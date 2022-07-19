@@ -310,7 +310,9 @@ public class IncomingMessageHandler {
           }
 
 			 vaccinationReported = fhirRequests.searchVaccinationReported(fhirClient,Immunization.IDENTIFIER.exactly().identifier(vaccinationReportedExternalLink));
-			 vaccinationMaster = vaccinationReported.getVaccination();
+			 if (vaccinationReported != null) {
+				 vaccinationMaster = vaccinationReported.getVaccination();
+			 }
 
           if (vaccinationReported == null) {
             vaccinationMaster = new VaccinationMaster();

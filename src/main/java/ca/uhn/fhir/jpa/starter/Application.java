@@ -163,4 +163,14 @@ public class Application extends SpringBootServletInitializer {
 //		registrationBean.setLoadOnStartup(1);
 		return registrationBean;
 	}
+	@Bean
+	public ServletRegistrationBean subscriptionServletRegistrationBean() {
+		ServletRegistrationBean registrationBean = new ServletRegistrationBean();
+		HttpServlet servlet = new SubscriptionServlet();
+		beanFactory.autowireBean(servlet);
+		registrationBean.setServlet(servlet);
+		registrationBean.addUrlMappings( "/subscription");
+//		registrationBean.setLoadOnStartup(1);
+		return registrationBean;
+	}
 }

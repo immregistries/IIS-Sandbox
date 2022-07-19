@@ -63,6 +63,8 @@ public class HomeServlet extends HttpServlet {
 					out.println(
 						"      <li><a href=\"location\">Patients</a>: See administered-at-locations</li>");
 					out.println(
+						"      <li><a href=\"subscription\">Subscriptions</a>: See fhir subscriptions</li>");
+					out.println(
 						"      <li><a href=\"soap\">CDC WSDL</a>: HL7 realtime interfacing using CDC WSDL</li>");
 					out.println("    </ul>");
 					out.println("    <h3>Secondary Functions Supported</h3>");
@@ -165,6 +167,7 @@ public class HomeServlet extends HttpServlet {
 		out.println("        <a href=\"message\" class=\"w3-bar-item w3-button\">Messages</a>");
 		out.println("        <a href=\"patient\" class=\"w3-bar-item w3-button\">Patients</a>");
 		out.println("        <a href=\"location\" class=\"w3-bar-item w3-button\">Locations</a>");
+		out.println("        <a href=\"subscription\" class=\"w3-bar-item w3-button\">Subscriptions</a>");
 		out.println("        <a href=\"soap\" class=\"w3-bar-item w3-button\">CDC WSDL</a>");
 		out.println("      </div>");
 		out.println("    </header>");

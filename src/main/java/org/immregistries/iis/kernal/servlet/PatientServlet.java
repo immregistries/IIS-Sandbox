@@ -2,10 +2,7 @@ package org.immregistries.iis.kernal.servlet;
 
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import org.apache.commons.lang3.StringUtils;
-import org.hl7.fhir.r5.model.Bundle;
-import org.hl7.fhir.r5.model.Immunization;
-import org.hl7.fhir.r5.model.Observation;
-import org.hl7.fhir.r5.model.Patient;
+import org.hl7.fhir.r5.model.*;
 import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
@@ -157,7 +154,10 @@ public class PatientServlet extends HttpServlet {
         boolean showingRecent = false;
         if (patientReportedList == null) {
           showingRecent = true;
-			  Bundle bundle = fhirClient.search().forResource(Patient.class).returnBundle(Bundle.class).execute();
+			  Bundle bundle = fhirClient.search().forResource(Patient.class)
+				  .returnBundle(Bundle.class)
+//				  .sort().descending() TODO sort by last updated date
+				  .execute();
 			  for (Bundle.BundleEntryComponent entry: bundle.getEntry()) {
 				  patientReportedList.add(PatientHandler.getReported((Patient) entry.getResource()));
 			  }
