@@ -6,6 +6,7 @@ import ca.uhn.fhir.interceptor.model.RequestPartitionId;
 import ca.uhn.fhir.jpa.entity.PartitionEntity;
 import ca.uhn.fhir.jpa.partition.IPartitionLookupSvc;
 import ca.uhn.fhir.jpa.partition.PartitionManagementProvider;
+import ca.uhn.fhir.jpa.rp.r5.SubscriptionTopicResourceProvider;
 import ca.uhn.fhir.rest.api.server.RequestDetails;
 import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
 import ca.uhn.fhir.rest.server.interceptor.partition.RequestTenantPartitionInterceptor;
@@ -27,6 +28,9 @@ import java.util.Random;
 @Component
 @Interceptor
 public class PartitionCreationInterceptor extends RequestTenantPartitionInterceptor {
+
+	@Autowired
+	SubscriptionTopicResourceProvider subscriptionTopicResourceProvider;
 
 	@Autowired
 	private IPartitionLookupSvc partitionLookupSvc;

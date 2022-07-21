@@ -24,29 +24,7 @@ public class SubscriptionTools extends HttpServlet {
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
 		throws ServletException, IOException {
 		// TODO action as manual trigger with content
-		SubscriptionTopic.SubscriptionTopicResourceTriggerComponent patientTrigger = new SubscriptionTopic.SubscriptionTopicResourceTriggerComponent()
-			.setResource("Patient");
-		SubscriptionTopic.SubscriptionTopicResourceTriggerComponent operationOutcomeTrigger = new SubscriptionTopic.SubscriptionTopicResourceTriggerComponent()
-			.setResource("OperationOutcome");
-		SubscriptionTopic.SubscriptionTopicEventTriggerComponent eventTrigger =
-			new SubscriptionTopic.SubscriptionTopicEventTriggerComponent().setEvent( new CodeableConcept()
-				// https://terminology.hl7.org/3.1.0/ValueSet-v2-0003.html
-				.addCoding(new Coding().setSystem("http://terminology.hl7.org/ValueSet/v2-0003").setCode("A04"))
-				.addCoding(new Coding().setSystem("http://terminology.hl7.org/ValueSet/v2-0003").setCode("A28"))
-				.addCoding(new Coding().setSystem("http://terminology.hl7.org/ValueSet/v2-0003").setCode("A31"))
-			).setResource("Patient");
 
-		SubscriptionTopic topic  = new SubscriptionTopic()
-			.setDescription("Testing communication between EHR and IIS and operation outcome")
-			.setUrl("https://florence.immregistries.org/iis-sandbox/fhir/SubscriptionTopic")
-			.setStatus(Enumerations.PublicationStatus.DRAFT)
-			.setExperimental(true).setPublisher("Aira/Nist").setTitle("Health equity data quality requests within Immunization systems");
-
-		topic.addResourceTrigger(patientTrigger);
-		topic.addResourceTrigger(operationOutcomeTrigger);
-		topic.addEventTrigger(eventTrigger);
-		topic.addNotificationShape().setResource("OperationOutcome");
-		// TODO include topic in provider
 
 		doGet(req, resp);
 	}
@@ -54,7 +32,7 @@ public class SubscriptionTools extends HttpServlet {
 	public static final String PARAM_ACTION = "action";
 	public static final String ACTION_SEARCH = "search";
 	public static final String PARAM_SUBSCRIPTION_ENDPOINT = "endpoint";
-	public static final String PARAM_SUBSCRIPTION_ID = "identifier";
+	public static final String PARAM_SUBSCRIPTION_ID = "subscriptionId";
 
 
 	@Override
@@ -89,13 +67,17 @@ public class SubscriptionTools extends HttpServlet {
 		try {
 			HomeServlet.doHeader(out, session);
 
-			Bundle bundle = fhirClient.search().forResource(Subscription.class)
-				.where(Subscription.IDENTIFIER.exactly().identifier(subscriptionId)).returnBundle(Bundle.class).execute();
-			if (bundle.hasEntry()) {
-				Subscription subscription = (Subscription) bundle.getEntryFirstRep().getResource();
-				out.println("<div class=\"w3-panel\"><p>"+ subscription.getStatus()+"/p></div>");
+			Subscription subscription = fhirClient.read().resource(Subscription.class).withId(subscriptionId).execute();
+//			Bundle bundle = fhirClient.search().forResource(Subscription.class)
+//				.where(Subscription.IDENTIFIER.exactly().identifier(subscriptionId)).returnBundle(Bundle.class).execute();
+			if (subscription != null) {
+//				subscription = (Subscription) bundle.getEntryFirstRep().getResource();
+				out.println("<div class=\"w3-panel\"><p>"
+					+ subscription.getStatus() + " "
+					+ subscription.getEndpoint()
+					+ "/p></div>");
 			} else {
-				out.println("<div class=\"w3-panel w3-yellow\"><p>No Record Found</p></div>");
+				out.println("<div class=\"w3-panel w3-yellow\"><p>Not Found</p></div>");
 			}
 			HomeServlet.doFooter(out,session);
 
