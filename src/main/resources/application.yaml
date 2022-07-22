@@ -162,7 +162,7 @@ hapi:
 #    bulk_export_enabled: true
     subscription:
       resthook_enabled: true
-      websocket_enabled: false
+#      websocket_enabled: false
 #      email:
 #        from: some@test.com
 #        host: google.com

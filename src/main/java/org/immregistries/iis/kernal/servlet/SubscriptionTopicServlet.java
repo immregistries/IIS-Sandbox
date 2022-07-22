@@ -36,11 +36,13 @@ public class SubscriptionTopicServlet extends HttpServlet {
 
 		SubscriptionTopic topic  = new SubscriptionTopic()
 			.setDescription("Testing communication between EHR and IIS and operation outcome")
-			.setUrl("https://florence.immregistries.org/iis-sandbox/fhir/SubscriptionTopic")
+//			.setUrl("https://florence.immregistries.org/iis-sandbox/fhir/SubscriptionTopic")
 			.setUrl("http://localhost:8080/SubscriptionTopic")
 			.setStatus(Enumerations.PublicationStatus.DRAFT)
-			.setExperimental(true).setPublisher("Aira/Nist").setTitle("Health equity data quality requests within Immunization systems");
+			.setExperimental(true).setPublisher("Aira/Nist")
+			.setTitle("Health equity data quality requests within Immunization systems");
 
+		topic.setId(topic.getUrl());
 		topic.addResourceTrigger(patientTrigger);
 		topic.addResourceTrigger(operationOutcomeTrigger);
 		topic.addEventTrigger(eventTrigger);
