@@ -49,9 +49,9 @@ public class RepositoryClientFactory extends ApacheRestfulClientFactory implemen
 
 	public synchronized IGenericClient newGenericClient(OrgAccess orgAccess) {
 		asynchInit();
-		IGenericClient client = newGenericClient(serverBase);
-		urlTenantSelectionInterceptor = new UrlTenantSelectionInterceptor(orgAccess.getAccessName());
-		client.registerInterceptor(urlTenantSelectionInterceptor);
+		IGenericClient client = newGenericClient(serverBase + "/" + orgAccess.getAccessName());
+//		urlTenantSelectionInterceptor = new UrlTenantSelectionInterceptor(orgAccess.getAccessName());
+//		client.registerInterceptor(urlTenantSelectionInterceptor);
 		return client;
 	}
 

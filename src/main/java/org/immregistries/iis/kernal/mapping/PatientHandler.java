@@ -147,7 +147,7 @@ public class PatientHandler {
 
 		if (p.getExtensionByUrl(PUBLICITY_EXTENSION) != null) {
 			patientReported.setPublicityIndicator(p.getExtensionByUrl(PUBLICITY_EXTENSION).getValueCoding().getCode());
-			if (p.getExtensionByUrl(PUBLICITY_EXTENSION).getValueCoding().getVersion() != null) {
+			if (p.getExtensionByUrl(PUBLICITY_EXTENSION).getValueCoding().getVersion() != null && !p.getExtensionByUrl(PUBLICITY_EXTENSION).getValueCoding().getVersion().equals("") ) {
 				patientReported.setPublicityIndicatorDate(new Date(p.getExtensionByUrl(PUBLICITY_EXTENSION).getValueCoding().getVersion()));
 			}
 		}
@@ -155,7 +155,7 @@ public class PatientHandler {
 		if (p.getExtensionByUrl(PROTECTION_EXTENSION) != null) {
 			patientReported.setProtectionIndicator(p.getExtensionByUrl(PROTECTION_EXTENSION).getValueCoding().getCode());
 			if (p.getExtensionByUrl(PROTECTION_EXTENSION).getValueCoding().getVersion() != null) {
-				patientReported.setProtectionIndicatorDate(new Date());
+				patientReported.setProtectionIndicatorDate(new Date(p.getExtensionByUrl(PROTECTION_EXTENSION).getValueCoding().getVersion()));
 			}
 		}
 
