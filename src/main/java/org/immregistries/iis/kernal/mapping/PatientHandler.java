@@ -7,6 +7,7 @@ import org.hl7.fhir.r5.model.Enumerations.AdministrativeGender;
 import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.model.PatientReported;
 
+import java.text.ParseException;
 import java.util.Date;
 
 public class PatientHandler {
@@ -148,20 +149,33 @@ public class PatientHandler {
 		if (p.getExtensionByUrl(PUBLICITY_EXTENSION) != null) {
 			patientReported.setPublicityIndicator(p.getExtensionByUrl(PUBLICITY_EXTENSION).getValueCoding().getCode());
 			if (p.getExtensionByUrl(PUBLICITY_EXTENSION).getValueCoding().getVersion() != null && !p.getExtensionByUrl(PUBLICITY_EXTENSION).getValueCoding().getVersion().equals("") ) {
-				patientReported.setPublicityIndicatorDate(new Date(p.getExtensionByUrl(PUBLICITY_EXTENSION).getValueCoding().getVersion()));
+				System.out.println(p.getExtensionByUrl(PUBLICITY_EXTENSION).getValueCoding().getVersion());
+				try {
+					patientReported.setPublicityIndicatorDate(MappingHelper.sdf.parse(p.getExtensionByUrl(PUBLICITY_EXTENSION).getValueCoding().getVersion()));
+				} catch (ParseException e) {
+//					throw new RuntimeException(e);
+				}
 			}
 		}
 
 		if (p.getExtensionByUrl(PROTECTION_EXTENSION) != null) {
 			patientReported.setProtectionIndicator(p.getExtensionByUrl(PROTECTION_EXTENSION).getValueCoding().getCode());
 			if (p.getExtensionByUrl(PROTECTION_EXTENSION).getValueCoding().getVersion() != null) {
-				patientReported.setProtectionIndicatorDate(new Date(p.getExtensionByUrl(PROTECTION_EXTENSION).getValueCoding().getVersion()));
+				try {
+					patientReported.setProtectionIndicatorDate(MappingHelper.sdf.parse(p.getExtensionByUrl(PROTECTION_EXTENSION).getValueCoding().getVersion()));
+				} catch (ParseException e) {
+//					throw new RuntimeException(e);
+				}
 			}
 		}
 
 		if (p.getExtensionByUrl(REGISTRY_STATUS_EXTENSION) != null) {
 			patientReported.setRegistryStatusIndicator(p.getExtensionByUrl(REGISTRY_STATUS_EXTENSION).getValueCoding().getCode());
-			patientReported.setRegistryStatusIndicatorDate(new Date(p.getExtensionByUrl(REGISTRY_STATUS_EXTENSION).getValueCoding().getVersion()));
+			try {
+				patientReported.setRegistryStatusIndicatorDate(MappingHelper.sdf.parse(p.getExtensionByUrl(REGISTRY_STATUS_EXTENSION).getValueCoding().getVersion()));
+			} catch (ParseException e) {
+//				throw new RuntimeException(e);
+			}
 
 		}
 
@@ -199,11 +213,10 @@ public class PatientHandler {
 	}
 
 	public static PatientMaster getMaster(PatientMaster patientMaster, Patient p) {
-		patientMaster.setPatientId(MappingHelper.filterIdentifier(p.getIdentifier(),MappingHelper.PATIENT_REPORTED).getValue());
-
 		if (patientMaster == null) {
 			patientMaster = new PatientMaster();
 		}
+		patientMaster.setPatientId(MappingHelper.filterIdentifier(p.getIdentifier(),MappingHelper.PATIENT_REPORTED).getValue());
 		patientMaster.setPatientId(p.getId());
 		patientMaster.setPatientNameFirst(p.getNameFirstRep().getGiven().get(0).getValue());
 		if (p.getNameFirstRep().getGiven().size() > 1) {

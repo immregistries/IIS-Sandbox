@@ -112,8 +112,73 @@
 		</li>
 	</ul>
 
-	<h4>Resources</h4>
+	<h4>Common Resources</h4>
 	
+	<ul class="nav nav-sidebar" >
+			<li th:class="${resourceName} == 'Patient' ? 'active' : ''">
+				<a
+               th:id="'leftResource' + 'Patient'"
+               href="#"
+               th:data1="'Patient'"
+               onclick="doAction(this, 'resource', this.getAttribute('data1'));">
+					<th:block th:text="'Patient'" >Patient</th:block>
+					<span class="badge badge-secondary" th:if="${resourceCounts['Patient']} != null" th:text="${resourceCounts['Patient']}"/>
+				</a>
+			</li>
+			<li th:class="${resourceName} == 'Immunization' ? 'active' : ''">
+				<a
+               th:id="'leftResource' + 'Immunization'"
+               href="#"
+               th:data1="'Immunization'"
+               onclick="doAction(this, 'resource', this.getAttribute('data1'));">
+					<th:block th:text="'Immunization'" >Patient</th:block>
+					<span class="badge badge-secondary" th:if="${resourceCounts['Immunization']} != null" th:text="${resourceCounts['Immunization']}"/>
+				</a>
+			</li>
+			<li th:class="${resourceName} == 'Location' ? 'active' : ''">
+				<a
+               th:id="'leftResource' + 'Location'"
+               href="#"
+               th:data1="'Location'"
+               onclick="doAction(this, 'resource', this.getAttribute('data1'));">
+					<th:block th:text="'Location'" >Patient</th:block>
+					<span class="badge badge-secondary" th:if="${resourceCounts['Location']} != null" th:text="${resourceCounts['Location']}"/>
+				</a>
+			</li>
+			<li th:class="${resourceName} == 'Observation' ? 'active' : ''">
+				<a
+               th:id="'leftResource' + 'Observation'"
+               href="#"
+               th:data1="'Observation'"
+               onclick="doAction(this, 'resource', this.getAttribute('data1'));">
+					<th:block th:text="'Observation'" >Patient</th:block>
+					<span class="badge badge-secondary" th:if="${resourceCounts['Observation']} != null" th:text="${resourceCounts['Observation']}"/>
+				</a>
+			</li>
+			<li th:class="${resourceName} == 'Subscription' ? 'active' : ''">
+				<a
+               th:id="'leftResource' + 'Subscription'"
+               href="#"
+               th:data1="'Subscription'"
+               onclick="doAction(this, 'resource', this.getAttribute('data1'));">
+					<th:block th:text="'Subscription'" >Patient</th:block>
+					<span class="badge badge-secondary" th:if="${resourceCounts['Subscription']} != null" th:text="${resourceCounts['Subscription']}"/>
+				</a>
+			</li>
+			<li th:class="${resourceName} == 'OperationOutcome' ? 'active' : ''">
+				<a
+               th:id="'leftResource' + 'OperationOutcome'"
+               href="#"
+               th:data1="'OperationOutcome'"
+               onclick="doAction(this, 'resource', this.getAttribute('data1'));">
+					<th:block th:text="'OperationOutcome'" >Patient</th:block>
+					<span class="badge badge-secondary" th:if="${resourceCounts['OperationOutcome']} != null" th:text="${resourceCounts['OperationOutcome']}"/>
+				</a>
+			</li>
+	</ul>
+
+	<h4>All Fhir Resources</h4>
+
 	<ul class="nav nav-sidebar" th:unless="${conf.rest.empty}">
 		<th:block th:each="resource, resIterStat : ${conf.rest[0].resource}">
 			<li th:class="${resourceName} == ${resource.typeElement.valueAsString} ? 'active' : ''">

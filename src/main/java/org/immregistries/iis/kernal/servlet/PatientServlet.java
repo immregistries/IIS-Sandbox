@@ -7,8 +7,6 @@ import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.logic.CodeMapManager;
-import org.immregistries.iis.kernal.mapping.ImmunizationHandler;
-import org.immregistries.iis.kernal.mapping.ObservationMapper;
 import org.immregistries.iis.kernal.mapping.PatientHandler;
 import org.immregistries.iis.kernal.model.*;
 import org.immregistries.iis.kernal.repository.FhirRequests;
@@ -73,21 +71,25 @@ public class PatientServlet extends HttpServlet {
       String patientNameFirst = req.getParameter(PARAM_PATIENT_NAME_FIRST);
       String patientReportedExternalLink = req.getParameter(PARAM_PATIENT_REPORTED_EXTERNAL_LINK);
 
-      List<PatientReported> patientReportedList = new ArrayList<>();
+      List<PatientReported> patientReportedList = null;
       String action = req.getParameter(PARAM_ACTION);
       if (action != null) {
         if (action.equals(ACTION_SEARCH)) {
-			  Bundle bundle = fhirClient
-				  .search()
-				  .forResource(Patient.class)
-				  .where(Patient.FAMILY.matches().value(patientNameLast))
-				  .and(Patient.NAME.matches().value(patientNameFirst))
-				  .and(Patient.IDENTIFIER.exactly().identifier(patientReportedExternalLink))
-				  .returnBundle(Bundle.class).execute();
-			  for (Bundle.BundleEntryComponent entry: bundle.getEntry()) {
-				  patientReportedList.add(PatientHandler.getReported((Patient) entry.getResource()));
-			  }
-
+			  patientReportedList = fhirRequests.searchPatientReportedList(fhirClient,
+				  Patient.FAMILY.matches().value(patientNameLast),
+				  Patient.NAME.matches().value(patientNameFirst),
+				  Patient.IDENTIFIER.exactly().code(patientReportedExternalLink)
+				  );
+//			  Bundle bundle = fhirClient
+//				  .search()
+//				  .forResource(Patient.class)
+//				  .where(Patient.FAMILY.matches().value(patientNameLast))
+//				  .and(Patient.NAME.matches().value(patientNameFirst))
+//				  .and(Patient.IDENTIFIER.exactly().code(patientReportedExternalLink))
+//				  .returnBundle(Bundle.class).execute();
+//			  for (Bundle.BundleEntryComponent entry: bundle.getEntry()) {
+//				  patientReportedList.add(PatientHandler.getReported((Patient) entry.getResource()));
+//			  }
         }
       }
 
@@ -106,16 +108,9 @@ public class PatientServlet extends HttpServlet {
       out.println("    <h2>" + orgAccess.getOrg().getOrganizationName() + "</h2>");
       PatientReported patientReportedSelected = null;
       if (req.getParameter(PARAM_PATIENT_REPORTED_ID) != null) {
-			Bundle bundle = fhirClient
-				.search()
-				.forResource(Patient.class)
-				.where(Patient.IDENTIFIER.exactly().identifier(req.getParameter(PARAM_PATIENT_REPORTED_ID)))
-				.returnBundle(Bundle.class).execute();
-			if (bundle.hasEntry()){
-				patientReportedSelected = PatientHandler.getReported((Patient) bundle.getEntryFirstRep().getResource());
-			}
-//        patientReportedSelected = (PatientReported) dataSession.get(PatientReported.class,
-//            Integer.parseInt(req.getParameter(PARAM_PATIENT_REPORTED_ID)));
+			patientReportedSelected = fhirRequests.searchPatientReported(fhirClient,
+				Patient.IDENTIFIER.exactly().identifier(req.getParameter(PARAM_PATIENT_REPORTED_ID))
+			);
       }
 
       if (patientReportedSelected == null) {
@@ -144,20 +139,9 @@ public class PatientServlet extends HttpServlet {
 
         boolean showingRecent = false;
         if (patientReportedList == null) {
-          showingRecent = true;
-			  Bundle bundle = fhirClient.search().forResource(Patient.class)
-				  .returnBundle(Bundle.class)
-//				  .sort().descending() TODO sort by last updated date
-				  .execute();
-			  for (Bundle.BundleEntryComponent entry: bundle.getEntry()) {
-				  patientReportedList.add(PatientHandler.getReported((Patient) entry.getResource()));
-			  }
-			  // TODO sort by date
-//          Query query =
-//              dataSession.createQuery("from PatientReported where orgReported = :orgReported "
-//                  + "order by updatedDate desc ");
-//          query.setParameter("orgReported", orgAccess.getOrg());
-//          patientReportedList = query.list();
+			  showingRecent = true;
+			  patientReportedList = fhirRequests.searchPatientReportedList(fhirClient);
+//			  TODO sort by last updated date
         }
 
         if (patientReportedList != null) {
