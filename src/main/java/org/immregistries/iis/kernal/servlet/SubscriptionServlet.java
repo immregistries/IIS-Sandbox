@@ -51,7 +51,7 @@ public class SubscriptionServlet extends HttpServlet {
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		try {
 			Bundle searchBundle = localClient.search().forResource(Subscription.class)
-				.where(Subscription.IDENTIFIER.exactly().identifier(subscriptionId)).returnBundle(Bundle.class).execute();
+				.where(Subscription.IDENTIFIER.exactly().code(subscriptionId)).returnBundle(Bundle.class).execute();
 			if (searchBundle.hasEntry()) {
 				Subscription subscription = (Subscription) searchBundle.getEntryFirstRep().getResource();
 				String message = req.getParameter(PARAM_MESSAGE);
@@ -118,13 +118,13 @@ public class SubscriptionServlet extends HttpServlet {
 
 			Subscription subscription;
 			Bundle bundle = fhirClient.search().forResource(Subscription.class)
-				.where(Subscription.IDENTIFIER.exactly().identifier(subscriptionId)).returnBundle(Bundle.class).execute();
+				.where(Subscription.IDENTIFIER.exactly().code(subscriptionId)).returnBundle(Bundle.class).execute();
 			if (bundle.hasEntry()) {
 				subscription = (Subscription) bundle.getEntryFirstRep().getResource();
 				printSubscription(out,subscription);
-				out.println("<label>Send Operation Outcome through subscription</label>");
 				out.println("<textarea class=\"w3-input w3-border\" name=\"" + PARAM_MESSAGE
 					+ "\"rows=\"15\" cols=\"160\">" + message + "</textarea></td>");
+				out.println("<h4>Send OperationOutcome  resource to subscriber</h4>");
 				out.println("<input class=\"w3-button w3-section w3-teal w3-ripple\" type=\"submit\" name=\"submit\" value=\"Submit\"/>");
 
 
@@ -224,11 +224,11 @@ public class SubscriptionServlet extends HttpServlet {
 		out.println("  <tbody>");
 		out.println("  <tr>");
 		out.println("    <th class=\"w3-green\">Identifier</th>");
-		out.println("    <td>" + subscription.getIdentifierFirstRep() + "</td>");
+		out.println("    <td>" + subscription.getIdentifierFirstRep().getValue() + "</td>");
 		out.println("  </tr>");
 		out.println("  <tr>");
 		out.println("    <th class=\"w3-green\">Topic</th>");
-		out.println("    <td>" + subscription.getTopic() + "</td>");
+		out.println("    <td>" + subscription.getTopicElement().getValue() + "</td>");
 		out.println("  </tr>");
 		out.println("  <tr>");
 		out.println("    <th class=\"w3-green\">Endpoint</th>");

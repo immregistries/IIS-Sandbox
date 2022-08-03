@@ -30,9 +30,8 @@ public class PatientHandler {
 
 	public static PatientReported getReported(Patient p) {
 		PatientReported patientReported = new PatientReported();
-		patientReported.setPatientReportedId(p.getId());
 		fillPatientReportedFromFhir(patientReported, p);
-		getMaster(patientReported.getPatient(), p);
+		patientReported.setPatient(getMaster(patientReported.getPatient(), p));
 		return patientReported;
 	}
 
@@ -43,8 +42,10 @@ public class PatientHandler {
 	 * @param p               the Patient resource
 	 */
 	private static void fillPatientReportedFromFhir(PatientReported patientReported, Patient p) {
+		patientReported.setPatientReportedId(new IdType(p.getId()).getIdPart());
+		patientReported.setPatientReportedExternalLink(MappingHelper.filterIdentifier(p.getIdentifier(),MappingHelper.PATIENT_REPORTED).getValue());
 		patientReported.setUpdatedDate(p.getMeta().getLastUpdated());
-		patientReported.setPatientReportedId(MappingHelper.filterIdentifier(p.getIdentifier(),MappingHelper.PATIENT_REPORTED).getValue());
+
 		patientReported.setPatientReportedAuthority(p.getManagingOrganization().getIdentifier().getValue());
 		patientReported.setPatientBirthDate(p.getBirthDate());
 		// Name
@@ -149,7 +150,6 @@ public class PatientHandler {
 		if (p.getExtensionByUrl(PUBLICITY_EXTENSION) != null) {
 			patientReported.setPublicityIndicator(p.getExtensionByUrl(PUBLICITY_EXTENSION).getValueCoding().getCode());
 			if (p.getExtensionByUrl(PUBLICITY_EXTENSION).getValueCoding().getVersion() != null && !p.getExtensionByUrl(PUBLICITY_EXTENSION).getValueCoding().getVersion().equals("") ) {
-				System.out.println(p.getExtensionByUrl(PUBLICITY_EXTENSION).getValueCoding().getVersion());
 				try {
 					patientReported.setPublicityIndicatorDate(MappingHelper.sdf.parse(p.getExtensionByUrl(PUBLICITY_EXTENSION).getValueCoding().getVersion()));
 				} catch (ParseException e) {
@@ -191,39 +191,20 @@ public class PatientHandler {
 			patientReported.setGuardianMiddle(contact.getName().getGiven().get(1).getValueNotNull());
 		}
 		patientReported.setGuardianRelationship(contact.getRelationshipFirstRep().getText());
-
-
-//		PatientMaster patientMaster = patientReported.getPatient();
-//		if (patientMaster == null) {
-//			patientMaster = new PatientMaster();
-//		}
-//		if (patientMaster.getPatientNameLast().equals("")) { //TODO improve this condition
-//
-//			patientMaster.setPatientId(patientReported.getPatientReportedId());
-//			patientMaster.setPatientExternalLink(patientReported.getPatientReportedExternalLink());
-//			patientMaster.setPatientNameLast(patientReported.getPatientNameLast());
-//			patientMaster.setPatientNameFirst(patientReported.getPatientNameFirst());
-//			patientMaster.setPatientNameMiddle(patientReported.getPatientNameMiddle());
-//			patientMaster.setPatientBirthDate(patientReported.getPatientBirthDate());
-//      patientMaster.setPatientPhoneFrag(patientReported.getPatientPhone());
-//      patientMaster.setPatientAddressFrag(patientReported.getPatientAddressZip());
-//		}
-
-
 	}
 
 	public static PatientMaster getMaster(PatientMaster patientMaster, Patient p) {
 		if (patientMaster == null) {
 			patientMaster = new PatientMaster();
 		}
-		patientMaster.setPatientId(MappingHelper.filterIdentifier(p.getIdentifier(),MappingHelper.PATIENT_REPORTED).getValue());
 		patientMaster.setPatientId(p.getId());
+		patientMaster.setPatientExternalLink(MappingHelper.filterIdentifier(p.getIdentifier(),MappingHelper.PATIENT_REPORTED).getValue());
 		patientMaster.setPatientNameFirst(p.getNameFirstRep().getGiven().get(0).getValue());
 		if (p.getNameFirstRep().getGiven().size() > 1) {
 			patientMaster.setPatientNameMiddle(p.getNameFirstRep().getGiven().get(1).getValue());
 		}
 		patientMaster.setPatientNameLast(p.getNameFirstRep().getFamily());
-		patientMaster.setPatientExternalLink(p.getIdentifierFirstRep().getId());
+		patientMaster.setPatientExternalLink(p.getIdentifierFirstRep().getValue());
 //	  patientMaster.setPatientAddressFrag();
 		return patientMaster;
 	}
@@ -237,7 +218,7 @@ public class PatientHandler {
 	public static void fillFhirResource(Patient p, PatientMaster pm, PatientReported pr) {
 //		Patient p = new Patient().setBirthDate(new Date());
 		if (pm != null) {
-			p.addIdentifier(MappingHelper.getFhirIdentifier(MappingHelper.PATIENT_MASTER, pm.getPatientId()));
+			p.addIdentifier(MappingHelper.getFhirIdentifier(MappingHelper.PATIENT_MASTER, pm.getPatientExternalLink()));
 			HumanName name = p.addName();
 			name.setFamily(pm.getPatientNameLast());
 			name.addGivenElement().setValue(pm.getPatientNameFirst());

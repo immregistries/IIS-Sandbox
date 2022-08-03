@@ -1,12 +1,14 @@
 package org.immregistries.iis.kernal.servlet;
 
 import ca.uhn.fhir.rest.client.api.IGenericClient;
+import ca.uhn.fhir.rest.gclient.ReferenceClientParam;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.r5.model.*;
 import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.logic.CodeMapManager;
+import org.immregistries.iis.kernal.mapping.MappingHelper;
 import org.immregistries.iis.kernal.mapping.PatientHandler;
 import org.immregistries.iis.kernal.model.*;
 import org.immregistries.iis.kernal.repository.FhirRequests;
@@ -107,10 +109,18 @@ public class PatientServlet extends HttpServlet {
 
       out.println("    <h2>" + orgAccess.getOrg().getOrganizationName() + "</h2>");
       PatientReported patientReportedSelected = null;
+      Patient patientSelected = null;
       if (req.getParameter(PARAM_PATIENT_REPORTED_ID) != null) {
-			patientReportedSelected = fhirRequests.searchPatientReported(fhirClient,
+			Bundle bundle =  fhirClient.search().forResource(Patient.class).where(
 				Patient.IDENTIFIER.exactly().identifier(req.getParameter(PARAM_PATIENT_REPORTED_ID))
-			);
+			).returnBundle(Bundle.class).execute();
+			if  (bundle.hasEntry()){
+				patientSelected = (Patient) bundle.getEntryFirstRep().getResource();
+				patientReportedSelected = PatientHandler.getReported(patientSelected);
+			}
+//			patientReportedSelected = fhirRequests.searchPatientReported(fhirClient,
+//				Patient.IDENTIFIER.exactly().identifier(req.getParameter(PARAM_PATIENT_REPORTED_ID))
+//			);
       }
 
       if (patientReportedSelected == null) {
@@ -168,7 +178,7 @@ public class PatientServlet extends HttpServlet {
                 break;
               }
               String link = "patient?" + PARAM_PATIENT_REPORTED_ID + "="
-                  + patientReported.getPatientReportedId();
+                  + patientReported.getPatientReportedExternalLink();
               out.println("  <tr>");
               out.println("    <td><a href=\"" + link + "\">"
                   + patientReported.getPatientReportedExternalLink() + "</a></td>");
@@ -194,16 +204,17 @@ public class PatientServlet extends HttpServlet {
         printPatient(out, patientReportedSelected);
         out.println("  <div class=\"w3-container\">");
         out.println("<h4>Vaccinations</h4>");
-        List<VaccinationReported> vaccinationReportedList = new ArrayList<>();
+        List<VaccinationReported> vaccinationReportedList = null;
         {
-			  vaccinationReportedList = fhirRequests.searchVaccinationReportedList(fhirClient,
-				  Immunization.PATIENT.hasId(patientReportedSelected.getPatientReportedId()));
+			  out.println("<h3>" + req.getParameter(PARAM_PATIENT_REPORTED_ID) + "</h3>");
+			  vaccinationReportedList = fhirRequests.searchVaccinationReportedList(fhirClient
+				  , Immunization.PATIENT.hasId(patientReportedSelected.getPatientReportedId())
+//					  .hasChainedProperty(
+//					  Patient.IDENTIFIER.exactly().systemAndIdentifier(MappingHelper.PATIENT_REPORTED,req.getParameter(PARAM_PATIENT_REPORTED_ID)))
+			  );
+			  out.println("<h3>" + vaccinationReportedList.toString() + "</h3>");
 
-//          Query query = dataSession
-//              .createQuery("from VaccinationReported where patientReported = :patientReported");
-//          query.setParameter("patientReported", patientReportedSelected);
-//          vaccinationReportedList = query.list();
-        }
+		  }
         if (vaccinationReportedList.size() == 0) {
           out.println("<div class=\"w3-panel w3-yellow\"><p>No Vaccinations</p></div>");
         } else {
@@ -512,9 +523,8 @@ public List<ObservationReported> getObservationList(IGenericClient fhirClient,
     List<ObservationReported> observationReportedList = new ArrayList<>();
     {
 		 observationReportedList = fhirRequests.searchObservationReportedList(fhirClient,
-			 Observation.PATIENT.hasId(patientReportedSelected.getPatientReportedId())
+			 Observation.PATIENT.hasId("Patient/" + patientReportedSelected.getPatientReportedId()));
 //			 ,Observation.PART_OF.hasChainedProperty(Immunization.IDENTIFIER.exactly().code("")) TODO Find formulato say is null or has no
-		 );
 
       Set<String> suppressSet = LoincIdentifier.getSuppressIdentifierCodeSet();
       for (Iterator<ObservationReported> it = observationReportedList.iterator(); it.hasNext();) {

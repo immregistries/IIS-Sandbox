@@ -14,13 +14,13 @@ public class ObservationMapper {
 		if (observationMaster != null) {
 			o.addIdentifier(MappingHelper.getFhirIdentifier( MappingHelper.OBSERVATION_MASTER,observationMaster.getObservationId()));
 			o.addPartOf(MappingHelper.getFhirReference(MappingHelper.IMMUNIZATION,MappingHelper.VACCINATION_MASTER, observationMaster.getVaccination().getVaccinationId()));
+			o.addPartOf(new Reference(MappingHelper.IMMUNIZATION + "/" + observationMaster.getVaccination().getVaccinationId()));
 //			if (observationMaster.getObservationReported() != null && observationReported == null) {
 //				o.addPartOf(MappingHelper.getFhirReference(MappingHelper.OBSERVATION,MappingHelper.OBSERVATION_REPORTED,
 //					observationMaster.getObservationReported().getObservationReportedId()));
 //			}
 			o.addIdentifier(MappingHelper.getFhirIdentifier(
 				IDENTIFIER_CODE,observationMaster.getIdentifierCode()));
-			o.setSubject(MappingHelper.getFhirReference(MappingHelper.PATIENT,MappingHelper.PATIENT_MASTER,observationMaster.getPatient().getPatientId()));
 			o.setCode(new CodeableConcept().setText(observationMaster.getIdentifierCode()));
 			o.setValue(new CodeableConcept(new Coding().setCode(observationMaster.getValueCode())));
 		}
@@ -28,10 +28,12 @@ public class ObservationMapper {
 		if (observationReported != null) {
 			o.addIdentifier(MappingHelper.getFhirIdentifier(MappingHelper.OBSERVATION_REPORTED,observationReported.getObservationReportedId()));
 			if (o.getPartOf().size() == 0) {
-				o.addPartOf(MappingHelper.getFhirReference(MappingHelper.IMMUNIZATION,MappingHelper.VACCINATION_REPORTED,observationReported.getVaccinationReported().getVaccinationReportedExternalLink()));
+				o.addPartOf(new Reference(MappingHelper.IMMUNIZATION + "/" + observationReported.getVaccinationReported().getVaccinationReportedExternalLink()));
 			}
 			if(observationReported.getPatientReported() != null) {
-				o.setSubject(MappingHelper.getFhirReference(MappingHelper.PATIENT,MappingHelper.PATIENT_REPORTED,observationReported.getPatientReported().getPatientReportedExternalLink()));
+				o.setSubject(new Reference().setReference("Patient/"+observationReported.getPatientReported().getPatientReportedId())); // TODO reactivate
+
+//				o.setSubject(MappingHelper.getFhirReference(MappingHelper.PATIENT,MappingHelper.PATIENT_REPORTED,observationReported.getPatientReported().getPatientReportedExternalLink()));
 			}
 			if (observationReported.getObservation() != null && observationMaster == null) {
 				o.addPartOf(MappingHelper.getFhirReference(MappingHelper.OBSERVATION,MappingHelper.OBSERVATION_MASTER, observationReported.getObservation().getObservationId()));

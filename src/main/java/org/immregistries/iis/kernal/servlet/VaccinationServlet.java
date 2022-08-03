@@ -7,11 +7,13 @@ import org.hibernate.Session;
 import org.hl7.fhir.r5.model.Bundle;
 import org.hl7.fhir.r5.model.Immunization;
 import org.hl7.fhir.r5.model.Observation;
+import org.hl7.fhir.r5.model.Patient;
 import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.logic.CodeMapManager;
 import org.immregistries.iis.kernal.mapping.ImmunizationHandler;
+import org.immregistries.iis.kernal.mapping.PatientHandler;
 import org.immregistries.iis.kernal.model.*;
 import org.immregistries.iis.kernal.repository.FhirRequests;
 import org.immregistries.iis.kernal.repository.RepositoryClientFactory;
@@ -63,8 +65,12 @@ public class VaccinationServlet extends PatientServlet {
     PrintWriter out = new PrintWriter(resp.getOutputStream());
 	  IGenericClient fhirClient = repositoryClientFactory.newGenericClient(orgAccess);
     try {
-		 VaccinationReported vaccinationReported = fhirRequests.searchVaccinationReported(fhirClient,
-			 Immunization.IDENTIFIER.exactly().identifier(req.getParameter(PARAM_VACCINATION_REPORTED_ID)));
+		 VaccinationReported vaccinationReported =
+			 ImmunizationHandler.getReported(fhirClient.read().resource(Immunization.class)
+				 .withId(req.getParameter(PARAM_VACCINATION_REPORTED_ID)).execute()); // TODO maybe switch with identifier
+
+//			 fhirRequests.searchVaccinationReported(fhirClient,
+//			 Immunization.IDENTIFIER.exactly().code(req.getParameter(PARAM_VACCINATION_REPORTED_ID)));
 
       String action = req.getParameter(PARAM_ACTION);
       if (action != null) {
@@ -73,7 +79,7 @@ public class VaccinationServlet extends PatientServlet {
       HomeServlet.doHeader(out, session);
 
       out.println("    <h2>" + orgAccess.getOrg().getOrganizationName() + "</h2>");
-      PatientReported patientReportedSelected = vaccinationReported.getPatientReported();
+      PatientReported patientReportedSelected = PatientHandler.getReported(fhirClient.read().resource(Patient.class).withId(vaccinationReported.getPatientReportedId()).execute());
 
       {
         printPatient(out, patientReportedSelected);

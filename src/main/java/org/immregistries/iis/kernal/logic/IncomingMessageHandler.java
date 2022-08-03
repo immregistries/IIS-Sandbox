@@ -132,7 +132,7 @@ public class IncomingMessageHandler {
       int fieldPosition = 0;
       if (!mrn.equals("")) {
 			patientReported = fhirRequests.searchPatientReported(getFhirClient(orgAccess),
-				Patient.IDENTIFIER.exactly().identifier(mrn)
+				Patient.IDENTIFIER.exactly().code(mrn)
 			);
 //        Query query = dataSession.createQuery(
 //            "from PatientReported where orgReported = ? and patientReportedExternalLink = ?");
@@ -309,7 +309,7 @@ public class IncomingMessageHandler {
                 "RXA", rxaCount, 3);
           }
 
-			 vaccinationReported = fhirRequests.searchVaccinationReported(fhirClient,Immunization.IDENTIFIER.exactly().identifier(vaccinationReportedExternalLink));
+			 vaccinationReported = fhirRequests.searchVaccinationReported(fhirClient,Immunization.IDENTIFIER.exactly().code(vaccinationReportedExternalLink));
 			 if (vaccinationReported != null) {
 				 vaccinationMaster = vaccinationReported.getVaccination();
 			 }
@@ -319,10 +319,11 @@ public class IncomingMessageHandler {
 				 vaccinationMaster.setVaccinationId(vaccinationReportedExternalLink); // TODO verify
 				 vaccinationReported = new VaccinationReported();
             vaccinationReported.setVaccination(vaccinationMaster);
-            vaccinationMaster.setVaccinationReported(null);
+            vaccinationMaster.setVaccinationReported(vaccinationReported);
             vaccinationReported.setReportedDate(new Date());
             vaccinationReported.setVaccinationReportedExternalLink(vaccinationReportedExternalLink);
           }
+          vaccinationReported.setPatientReportedId(patientReported.getPatientReportedId());
           vaccinationReported.setPatientReported(patientReported);
           vaccinationMaster.setPatient(patientReported.getPatient());
 
@@ -434,7 +435,8 @@ public class IncomingMessageHandler {
             String administeredAtLocation = reader.getValue(11, 4);
             if (StringUtils.isNotEmpty(administeredAtLocation)) {
 					OrgLocation orgLocation = null;
-					orgLocation = fhirRequests.searchOrgLocation(fhirClient,Location.IDENTIFIER.exactly().identifier(administeredAtLocation));
+					orgLocation = fhirRequests.searchOrgLocation(fhirClient,Location.IDENTIFIER.exactly().code(administeredAtLocation));
+
 					if (orgLocation == null) {
 						if (processingFlavorSet.contains(ProcessingFlavor.PEAR)) {
 							throw new ProcessingException(
@@ -454,8 +456,14 @@ public class IncomingMessageHandler {
 						orgLocation.setAddressCountry(reader.getValue(11, 14));
 						Location location = LocationMapper.fhirLocation(orgLocation);
 						MethodOutcome outcome;
-						outcome = fhirClient.create().resource(location).execute();
-						orgLocation = LocationMapper.orgLocationFromFhir(location);
+						try {
+							outcome = fhirClient.update().resource(location).conditional()
+								.where(Location.IDENTIFIER.exactly().identifier(location.getIdentifierFirstRep().getValue()))
+								.execute();
+						} catch (ResourceNotFoundException e ){
+							outcome = fhirClient.create().resource(location).execute();
+						}
+						orgLocation = LocationMapper.orgLocationFromFhir((Location) outcome.getResource());
 					}
               vaccinationReported.setOrgLocation(orgLocation);
             }
@@ -466,7 +474,7 @@ public class IncomingMessageHandler {
               Person person = null;
 					try {
 						Bundle bundle = fhirClient.search().forResource(org.hl7.fhir.r5.model.Person.class)
-							.where(org.hl7.fhir.r5.model.Person.IDENTIFIER.exactly().identifier(admininsteringProvider))
+							.where(org.hl7.fhir.r5.model.Person.IDENTIFIER.exactly().code(admininsteringProvider))
 							.returnBundle(Bundle.class).execute();
 						if (bundle.hasEntry()) {
 							org.hl7.fhir.r5.model.Person fhirPerson = (org.hl7.fhir.r5.model.Person) bundle.getEntryFirstRep().getResource();
@@ -485,11 +493,18 @@ public class IncomingMessageHandler {
                 person.setIdentifierTypeCode(reader.getValue(10, 13));
                 person.setProfessionalSuffix(reader.getValue(10, 21));
 					  org.hl7.fhir.r5.model.Person  p = PersonHandler.getFhirPerson(person);
-					  MethodOutcome outcome = fhirClient.create().resource(p).execute();
-//                Transaction transaction = dataSession.beginTransaction();
-//                dataSession.save(person);
-//                transaction.commit();
-              }
+					  MethodOutcome outcome;
+					  try {
+						  outcome = fhirClient.update().resource(p).conditional()
+							  .where(org.hl7.fhir.r5.model.Person.IDENTIFIER.exactly().identifier(p.getIdentifierFirstRep().getValue()))
+							  .execute();
+						  patientReported.setPatientReportedId(outcome.getId().getIdPart());
+					  } catch (ResourceNotFoundException e ){
+						  outcome = fhirClient.create().resource(p).execute();
+						  patientReported.setPatientReportedId(outcome.getId().getIdPart());
+					  }
+					  patientReported.setPatientReportedId(outcome.getId().getIdPart());
+				  }
               vaccinationReported.setAdministeringProvider(person);
             }
 
@@ -589,18 +604,20 @@ public class IncomingMessageHandler {
 
           verifyNoErrors(processingExceptionList);
           reader.gotoSegmentPosition(segmentPosition);
-          {
-				 Immunization immunization = ImmunizationHandler.getFhirResource(vaccinationMaster,vaccinationReported);
-//				 fhirClient.patch();TODO Convert resources to Fhirpatch and replace simple updates with patch
-				 try {
-					 MethodOutcome outcome = fhirClient.update().resource(immunization).conditional().where(
-							 Immunization.IDENTIFIER.exactly()
-								 .systemAndIdentifier(MappingHelper.VACCINATION_REPORTED,vaccinationReported.getVaccinationReportedId()))
-						 .execute();
-				 } catch (ResourceNotFoundException e ){
-					 MethodOutcome outcome = fhirClient.create().resource(immunization).execute();
-				 }
-          }
+			 vaccinationReported = fhirRequests.saveVaccinationReported(fhirClient, vaccinationMaster,vaccinationReported);
+			 vaccinationMaster.setVaccinationId(vaccinationReported.getVaccinationReportedId());
+//          {
+//				 Immunization immunization = ImmunizationHandler.getFhirResource(vaccinationMaster,vaccinationReported);
+////				 fhirClient.patch();TODO Convert resources to Fhirpatch and replace simple updates with patch
+//				 try {
+//					 MethodOutcome outcome = fhirClient.update().resource(immunization).conditional().where(
+//							 Immunization.IDENTIFIER.exactly()
+//								 .systemAndIdentifier(MappingHelper.VACCINATION_REPORTED,vaccinationReported.getVaccinationReportedId()))
+//						 .execute();
+//				 } catch (ResourceNotFoundException e ){
+//					 MethodOutcome outcome = fhirClient.create().resource(immunization).execute();
+//				 }
+//          }
 
           reader.gotoSegmentPosition(segmentPosition);
           obxCount = readAndCreateObservations(reader, processingExceptionList, patientReported,
@@ -679,12 +696,14 @@ public class IncomingMessageHandler {
     if (patientReported == null) {
       patientMaster = new PatientMaster();
       patientMaster.setOrgMaster(orgAccess.getOrg());
-      patientReported = new PatientReported();
+		 patientReported = new PatientReported();
       patientReported.setOrgReported(orgAccess.getOrg());
       patientReported.setPatientReportedExternalLink(patientReportedExternalLink);
       patientReported.setPatient(patientMaster);
       patientReported.setReportedDate(new Date());
-    }
+    } else {
+		 patientMaster = patientReported.getPatient();
+	 }
 
     {
       String patientNameLast = reader.getValue(5, 1);
@@ -989,20 +1008,7 @@ public class IncomingMessageHandler {
     verifyNoErrors(processingExceptionList);
 
     patientReported.setUpdatedDate(new Date());
-    {
-		 Patient patient = new Patient();
-		 PatientHandler.fillFhirResource(patient, null,patientReported);
-		 try {
-			 MethodOutcome outcome = fhirClient.update().resource(patient).conditional().where(
-					 Patient.IDENTIFIER.exactly().systemAndIdentifier(MappingHelper.PATIENT_REPORTED,patientReported.getPatientReportedId()))
-				 .execute();
-		 } catch (ResourceNotFoundException e){
-			 MethodOutcome outcome = fhirClient.create().resource(patient)
-				 .execute();
-		 }
-
-
-    }
+    patientReported = fhirRequests.savePatientReported(fhirClient,patientReported);
     return patientReported;
   }
 
@@ -1090,7 +1096,9 @@ public class IncomingMessageHandler {
       }
       {
         ObservationReported observationReported = observationMaster.getObservationReported();
-        observationMaster.setObservationReported(null); //TODO change or create master
+		  observationMaster.setPatient(patientReported.getPatient());
+
+//        observationMaster.setObservationReported(null); //TODO change or create master
 
 		  Observation observation = ObservationMapper.getFhirResource(observationMaster,observationReported);
 			try {
@@ -1117,7 +1125,7 @@ public class IncomingMessageHandler {
 	  if (vaccination == null) {
 		  observationReported = fhirRequests.searchObservationReported(fhirClient,
 			  Observation.PART_OF.isMissing(true),
-			  Observation.SUBJECT.hasId(patientReported.getPatientReportedId()));
+			  Observation.SUBJECT.hasId(patientReported.getPatientReportedId())); //TODO chqnge has linked property
 	  } else {
 		  observationReported = fhirRequests.searchObservationReported(fhirClient,
 			  Observation.PART_OF.hasId(vaccination.getVaccinationId()),
@@ -2568,7 +2576,7 @@ public class IncomingMessageHandler {
       String patientExternalLink = generateId();
 		 try {
 			 Bundle bundle = fhirClient.search().forResource(Patient.class)
-				 .where(Patient.IDENTIFIER.exactly().identifier(patientExternalLink)).returnBundle(Bundle.class).execute();
+				 .where(Patient.IDENTIFIER.exactly().code(patientExternalLink)).returnBundle(Bundle.class).execute();
 			 if (!bundle.hasEntry()) {
 				 return patientExternalLink;
 			 }

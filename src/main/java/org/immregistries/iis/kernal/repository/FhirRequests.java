@@ -1,17 +1,18 @@
 package org.immregistries.iis.kernal.repository;
 
 import ca.uhn.fhir.jpa.api.dao.IFhirResourceDao;
+import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.gclient.ICriterion;
 import ca.uhn.fhir.rest.gclient.IQuery;
+import ca.uhn.fhir.rest.gclient.IUpdateTyped;
+import ca.uhn.fhir.rest.gclient.IUpdateWithQuery;
 import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
+import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r5.model.*;
 import org.immregistries.iis.kernal.mapping.*;
-import org.immregistries.iis.kernal.model.ObservationReported;
-import org.immregistries.iis.kernal.model.OrgLocation;
-import org.immregistries.iis.kernal.model.PatientReported;
+import org.immregistries.iis.kernal.model.*;
 import org.immregistries.iis.kernal.model.Person;
-import org.immregistries.iis.kernal.model.VaccinationReported;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -87,6 +88,15 @@ public class FhirRequests {
 		}
 		return orgLocation;
 	}
+	public List<OrgLocation> searchOrgLocationList(IGenericClient fhirClient, ICriterion... where) {
+		List<OrgLocation> locationList = new ArrayList<>();
+		Bundle bundle = search(Location.class,fhirClient, where);
+		for (Bundle.BundleEntryComponent entry: bundle.getEntry()) {
+			locationList.add(LocationMapper.orgLocationFromFhir((Location) entry.getResource()));
+		}
+		return locationList;
+	}
+
 
 	public Person searchPerson(IGenericClient fhirClient, ICriterion... where) {
 		Person person = null;
@@ -117,6 +127,68 @@ public class FhirRequests {
 		} catch (ResourceNotFoundException e) {
 			return  new Bundle();
 		}
+	}
+
+	public PatientReported savePatientReported(IGenericClient fhirClient, PatientReported patientReported) {
+		Patient patient =  PatientHandler.getFhirResource( null,patientReported);
+//		Patient patient = new Patient();
+//		PatientHandler.fillFhirResource(patient, null,patientReported);
+		MethodOutcome outcome = save(fhirClient,patient,
+			Patient.IDENTIFIER.exactly().systemAndIdentifier(MappingHelper.PATIENT_REPORTED,patientReported.getPatientReportedExternalLink()));
+		if (outcome.getCreated() != null && outcome.getCreated()) {
+			patientReported.setPatientReportedId(outcome.getId().getIdPart());
+		} else if (!outcome.getResource().isEmpty()) {
+			patientReported.setPatientReportedId(outcome.getResource().getIdElement().getIdPart());
+		}
+		return patientReported;
+	}
+
+	public VaccinationReported saveVaccinationReported(IGenericClient fhirClient, VaccinationReported vaccinationReported) {
+		Immunization immunization = ImmunizationHandler.getFhirResource( null, vaccinationReported);
+		MethodOutcome outcome = save(fhirClient,immunization,
+			Immunization.IDENTIFIER.exactly()
+				.systemAndIdentifier(MappingHelper.VACCINATION_REPORTED, vaccinationReported.getVaccinationReportedExternalLink())
+		);
+		if (outcome.getCreated()){
+			vaccinationReported.setVaccinationReportedId(outcome.getId().getIdPart());
+		} else if (!outcome.getResource().isEmpty()) {
+			vaccinationReported.setVaccinationReportedId(outcome.getResource().getIdElement().getIdPart());
+		}
+		return vaccinationReported;
+	}
+	public VaccinationReported saveVaccinationReported(IGenericClient fhirClient, VaccinationMaster vaccinationMaster, VaccinationReported vaccinationReported) {
+		Immunization immunization = ImmunizationHandler.getFhirResource( vaccinationMaster, vaccinationReported);
+		MethodOutcome outcome = save(fhirClient,immunization,
+			Immunization.IDENTIFIER.exactly()
+				.systemAndIdentifier(MappingHelper.VACCINATION_REPORTED, vaccinationReported.getVaccinationReportedExternalLink())
+			);
+		if (outcome.getCreated() != null && outcome.getCreated()){
+			vaccinationReported.setVaccinationReportedId(outcome.getId().getIdPart());
+		} else if (!outcome.getResource().isEmpty()) {
+			vaccinationReported.setVaccinationReportedId(outcome.getResource().getIdElement().getIdPart());
+		}
+		return vaccinationReported;
+	}
+
+	private MethodOutcome save(IGenericClient fhirClient, IBaseResource resource, ICriterion... where) {
+		MethodOutcome outcome;
+		try {
+			IUpdateTyped query = fhirClient.update().resource(resource);
+			int size = where.length;
+			if (size > 0) {
+				query = query.conditional().where(where[0]);
+			}
+			int i = 1;
+			while (i < size) {
+				query = ((IUpdateWithQuery) query).and(where[i]);
+				i++;
+			}
+			outcome = query.execute();
+		} catch (ResourceNotFoundException e){
+			outcome = fhirClient.create().resource(resource)
+				.execute();
+		}
+		return outcome;
 	}
 
 }

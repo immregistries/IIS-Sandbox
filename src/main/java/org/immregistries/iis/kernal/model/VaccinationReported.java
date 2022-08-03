@@ -13,7 +13,8 @@ public class VaccinationReported implements Serializable {
 	
   private String vaccinationReportedId = "";
   private PatientReported patientReported = null;
-//  private String vaccinationReportedExternalLink = "";
+  private String patientReportedId = "";
+  private String vaccinationReportedExternalLink = "";
   private VaccinationMaster vaccination = null;
   private Date reportedDate = null;
   private Date updatedDate = null;
@@ -201,6 +202,9 @@ public class VaccinationReported implements Serializable {
   }
 
   public PatientReported getPatientReported() {
+	  if (patientReported == null && patientReportedId != null && !patientReportedId.equals("")) {
+		  //
+	  }
     return patientReported;
   }
 
@@ -209,13 +213,13 @@ public class VaccinationReported implements Serializable {
   }
 
   public String getVaccinationReportedExternalLink() {
-	  return vaccinationReportedId;
-//	  return vaccinationReportedExternalLink;
+//	  return vaccinationReportedId;
+	  return vaccinationReportedExternalLink;
   }
 
   public void setVaccinationReportedExternalLink(String reportedOrderId) {
-    this.vaccinationReportedId = reportedOrderId;
-//    this.vaccinationReportedExternalLink = reportedOrderId;
+//    this.vaccinationReportedId = reportedOrderId;
+    this.vaccinationReportedExternalLink = reportedOrderId;
   }
 
   public VaccinationMaster getVaccination() {
@@ -251,4 +255,11 @@ public class VaccinationReported implements Serializable {
   }
 
 
+	public String getPatientReportedId() {
+		return patientReportedId;
+	}
+
+	public void setPatientReportedId(String patientReportedId) {
+		this.patientReportedId = patientReportedId;
+	}
 }

@@ -35,47 +35,43 @@ public class SubscriptionTopicServlet extends HttpServlet {
 				.setResultForDelete(SubscriptionTopic.CriteriaNotExistsBehavior.TESTPASSES)
 				.setCurrent("Patient?_id=1")
 			).setFhirPathCriteria("Patient?_id=1");
-//		SubscriptionTopic.SubscriptionTopicResourceTriggerComponent operationOutcomeTrigger =
-//			new SubscriptionTopic.SubscriptionTopicResourceTriggerComponent()
-//				.setResource("OperationOutcome")
-//				.addSupportedInteraction(SubscriptionTopic.InteractionTrigger.CREATE)
-//				.addSupportedInteraction(SubscriptionTopic.InteractionTrigger.DELETE)
-//
-//				.setQueryCriteria(new SubscriptionTopic.SubscriptionTopicResourceTriggerQueryCriteriaComponent()
-//					.setResultForCreate(SubscriptionTopic.CriteriaNotExistsBehavior.TESTPASSES)
-//					.setResultForDelete(SubscriptionTopic.CriteriaNotExistsBehavior.TESTPASSES)
-//					.setCurrent("Operation?issue.severity=error")
-//				);
-//		SubscriptionTopic.SubscriptionTopicEventTriggerComponent eventTrigger =
-//			new SubscriptionTopic.SubscriptionTopicEventTriggerComponent().setEvent( new CodeableConcept()
-//				// https://terminology.hl7.org/3.1.0/ValueSet-v2-0003.html
-//				.addCoding(new Coding().setSystem("http://terminology.hl7.org/ValueSet/v2-0003").setCode("A04"))
-//				.addCoding(new Coding().setSystem("http://terminology.hl7.org/ValueSet/v2-0003").setCode("A28"))
-//				.addCoding(new Coding().setSystem("http://terminology.hl7.org/ValueSet/v2-0003").setCode("A31"))
-//			).setResource("Patient");
+		SubscriptionTopic.SubscriptionTopicResourceTriggerComponent operationOutcomeTrigger =
+			new SubscriptionTopic.SubscriptionTopicResourceTriggerComponent()
+				.setResource("OperationOutcome")
+				.addSupportedInteraction(SubscriptionTopic.InteractionTrigger.CREATE)
+				.addSupportedInteraction(SubscriptionTopic.InteractionTrigger.DELETE)
+
+				.setQueryCriteria(new SubscriptionTopic.SubscriptionTopicResourceTriggerQueryCriteriaComponent()
+					.setResultForCreate(SubscriptionTopic.CriteriaNotExistsBehavior.TESTPASSES)
+					.setResultForDelete(SubscriptionTopic.CriteriaNotExistsBehavior.TESTPASSES)
+					.setCurrent("Operation?issue.severity=error")
+				);
+		SubscriptionTopic.SubscriptionTopicEventTriggerComponent eventTrigger =
+			new SubscriptionTopic.SubscriptionTopicEventTriggerComponent().setEvent( new CodeableConcept()
+				// https://terminology.hl7.org/3.1.0/ValueSet-v2-0003.html
+				// Codes for CRUD on patients with HL7v2
+				.addCoding(new Coding().setSystem("http://terminology.hl7.org/ValueSet/v2-0003").setCode("A04"))
+				.addCoding(new Coding().setSystem("http://terminology.hl7.org/ValueSet/v2-0003").setCode("A28"))
+				.addCoding(new Coding().setSystem("http://terminology.hl7.org/ValueSet/v2-0003").setCode("A31"))
+				.addCoding(new Coding().setSystem("IIS-Sandbox").setCode("Manual Trigger"))
+				// TODO add MQE codes ?
+			).setResource("Patient");
 
 		SubscriptionTopic topic  = new SubscriptionTopic()
 			.setDescription("Testing communication between EHR and IIS and operation outcome")
 //			.setUrl("https://florence.immregistries.org/iis-sandbox/fhir/SubscriptionTopic")
-			.setUrl("http://localhost:8080/SubscriptionTopic")
+//			.setUrl("http://localhost:8080/SubscriptionTopic")
+			.setUrl(req.getRequestURI())
 			.setStatus(Enumerations.PublicationStatus.DRAFT)
 			.setExperimental(true).setPublisher("Aira/Nist")
 			.setTitle("Health equity data quality requests within Immunization systems");
 
 		topic.setId("sandbox");
 		topic.addResourceTrigger(patientTrigger);
-//		topic.addResourceTrigger(operationOutcomeTrigger);
+		topic.addResourceTrigger(operationOutcomeTrigger);
 //		topic.addEventTrigger(eventTrigger);
 		topic.addNotificationShape().setResource("OperationOutcome");
-//		topic.addCanFilterBy()
-//			.setDescription("test empty filter")
-//			.setResource("Immunization")
-//			.setFilterParameter()
-//		SubscriptionCanonicalizer
-//		logger.info(parser.encodeResourceToString(topic));
-//		logger.info(topic.getUrl());
-//		logger.info(topic.getId());
-		// TODO include topic in a provider
+		// TODO include topic in a provider or in fhir server
 		resp.getOutputStream().print(parser.encodeResourceToString(topic));
 	}
 }

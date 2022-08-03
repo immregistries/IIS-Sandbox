@@ -6,6 +6,9 @@ management:
       exposure:
         include: "health,prometheus"
 spring:
+#  output:
+#    ansi:
+#      enabled: ALWAYS
   main:
     allow-circular-references: true
     #allow-bean-definition-overriding: true
