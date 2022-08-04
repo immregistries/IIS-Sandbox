@@ -9,6 +9,7 @@ public class ObservationReported implements Serializable {
 
   private String observationReportedId = "";
   private PatientReported patientReported = null;
+  private String patientReportedId = null;
   private VaccinationReported vaccinationReported = null;
   private ObservationMaster observation = null;
   private Date reportedDate = null;
@@ -41,9 +42,12 @@ public class ObservationReported implements Serializable {
     return patientReported;
   }
 
-  public void setPatientReported(PatientReported patientReported) {
-    this.patientReported = patientReported;
-  }
+	public void setPatientReported(PatientReported reportedPatient) {
+		if (reportedPatient != null && reportedPatient.getPatientReportedId() != null) {
+			setPatientReportedId(reportedPatient.getPatientReportedId());
+		}
+		this.patientReported = reportedPatient;
+	}
 
   public VaccinationReported getVaccinationReported() {
     return vaccinationReported;
@@ -198,4 +202,11 @@ public class ObservationReported implements Serializable {
   }
 
 
+	public String getPatientReportedId() {
+		return patientReportedId;
+	}
+
+	public void setPatientReportedId(String patientReportedId) {
+		this.patientReportedId = patientReportedId;
+	}
 }

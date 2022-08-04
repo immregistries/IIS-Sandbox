@@ -42,7 +42,7 @@ public class ImmunizationHandler {
 	  vr.setVaccinationReportedId(new  IdType(i.getId()).getIdPart());
 	  vr.setUpdatedDate(i.getMeta().getLastUpdated());
      vr.setVaccinationReportedExternalLink(MappingHelper.filterIdentifier(i.getIdentifier(),MappingHelper.VACCINATION_REPORTED).getValue());
-	  vr.setPatientReportedId(new IdType(i.getPatient().getId()).getIdPart());
+	  vr.setPatientReportedId(i.getPatient().getReference());
 
 	  vr.setReportedDate(i.getRecorded());
 	  vr.setAdministeredDate(i.getOccurrenceDateTimeType().getValue());
@@ -50,6 +50,7 @@ public class ImmunizationHandler {
 	  vr.setVaccineCvxCode(i.getVaccineCode().getCode(CVX));
 	  vr.setVaccineNdcCode(i.getVaccineCode().getCode(NDC));
 	  vr.setVaccineMvxCode(i.getVaccineCode().getCode(MVX));
+
 
 	 vr.setAdministeredAmount(i.getDoseQuantity().getValue().toString());
 	 vr.setInformationSource(i.getInformationSourceCodeableConcept().getCode(INFORMATION_SOURCE));

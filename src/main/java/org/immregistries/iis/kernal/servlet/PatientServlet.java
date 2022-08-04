@@ -206,14 +206,9 @@ public class PatientServlet extends HttpServlet {
         out.println("<h4>Vaccinations</h4>");
         List<VaccinationReported> vaccinationReportedList = null;
         {
-			  out.println("<h3>" + req.getParameter(PARAM_PATIENT_REPORTED_ID) + "</h3>");
 			  vaccinationReportedList = fhirRequests.searchVaccinationReportedList(fhirClient
 				  , Immunization.PATIENT.hasId(patientReportedSelected.getPatientReportedId())
-//					  .hasChainedProperty(
-//					  Patient.IDENTIFIER.exactly().systemAndIdentifier(MappingHelper.PATIENT_REPORTED,req.getParameter(PARAM_PATIENT_REPORTED_ID)))
 			  );
-			  out.println("<h3>" + vaccinationReportedList.toString() + "</h3>");
-
 		  }
         if (vaccinationReportedList.size() == 0) {
           out.println("<div class=\"w3-panel w3-yellow\"><p>No Vaccinations</p></div>");

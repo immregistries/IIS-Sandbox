@@ -209,7 +209,10 @@ public class VaccinationReported implements Serializable {
   }
 
   public void setPatientReported(PatientReported reportedPatient) {
-    this.patientReported = reportedPatient;
+	  if (reportedPatient != null && reportedPatient.getPatientReportedId() != null) {
+		  setPatientReportedId(reportedPatient.getPatientReportedId());
+	  }
+	  this.patientReported = reportedPatient;
   }
 
   public String getVaccinationReportedExternalLink() {

@@ -1,10 +1,14 @@
 {
   "version": "1",
-  "mdmTypes": ["Patient", "Practitioner"],
+  "mdmTypes": ["Patient", "Observation","Immunization"],
   "candidateSearchParams": [
     {
       "resourceType": "Patient",
       "searchParams": ["birthdate"]
+    },
+    {
+      "resourceType": "Immunization",
+      "searchParams": ["vaccine-code"]
     },
     {
       "resourceType": "*",
