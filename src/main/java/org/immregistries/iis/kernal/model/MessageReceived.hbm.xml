@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="org.immregistries.iis.kernal.model">
+  <class name="MessageReceived" table="message_received">
+    <id name="messageReceivedId" column="message_received_id">
+      <generator class="native"/>
+    </id>
+    <many-to-one name="orgMaster" column="org_id" class="OrgMaster"/>
+    <property name="messageRequest" column="message_request" type="string"/>
+    <property name="messageResponse" column="message_response" type="string"/>
+    <property name="patientReportedId" column="patient_reported_id" type="string"/>
+    <property name="reportedDate" column="reported_date" type="timestamp"/>
+    <property name="categoryRequest" column="category_request" type="string"/>
+    <property name="categoryResponse" column="category_response" type="string"/>
+  </class>
+</hibernate-mapping>

@@ -3,6 +3,8 @@ package org.immregistries.iis.kernal.servlet;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.gclient.ReferenceClientParam;
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.Session;
+import org.hibernate.query.Query;
 import org.hl7.fhir.r5.model.*;
 import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.generated.Code;
@@ -26,6 +28,7 @@ import java.io.PrintWriter;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @SuppressWarnings("serial")
 public class PatientServlet extends HttpServlet {
@@ -66,7 +69,7 @@ public class PatientServlet extends HttpServlet {
 
     resp.setContentType("text/html");
     PrintWriter out = new PrintWriter(resp.getOutputStream());
-//    Session dataSession = PopServlet.getDataSession();
+    Session dataSession = PopServlet.getDataSession();
 	  IGenericClient fhirClient = repositoryClientFactory.newGenericClient(orgAccess);
     try {
       String patientNameLast = req.getParameter(PARAM_PATIENT_NAME_LAST);
@@ -313,11 +316,11 @@ public class PatientServlet extends HttpServlet {
         out.println("  <div class=\"w3-container\">");
 
         out.println("<h3>Messages Received</h3>");
-//        Query query = dataSession.createQuery( TODO Support MessageReceived mapping through logger or metadata
-//            "from MessageReceived where patientReported = :patientReported order by reportedDate asc");
-//        query.setParameter("patientReported", patientReportedSelected);
+        Query query = dataSession.createQuery( //TODO Support MessageReceived mapping through logger or metadata
+            "from MessageReceived where patientReportedId = :patientReportedId order by reportedDate asc");
+        query.setParameter("patientReportedId", patientReportedSelected.getPatientReportedId());
         List<MessageReceived> messageReceivedList = new ArrayList<>();
-//         messageReceivedList = query.list();
+         messageReceivedList = query.list();
         if (messageReceivedList.size() == 0) {
           out.println("<div class=\"w3-panel w3-yellow\"><p>No Messages Received</p></div>");
         } else {
@@ -326,18 +329,18 @@ public class PatientServlet extends HttpServlet {
           }
         }
 
-//        { TODO
-//          String link = "v2ToFhir?" + V2ToFhirServlet.PARAM_PATIENT_REPORTED_ID + "="
-//              + patientReportedSelected.getPatientReportedId();;
-//          out.println("<a href=\"" + link + "\">FHIR Bundle</a>");
-//        }
+        {
+          String link = req.getServletPath() + V2ToFhirServlet.PARAM_PATIENT_REPORTED_ID + "="
+              + patientReportedSelected.getPatientReportedId();;
+          out.println("<a href=\"" + link + "\">FHIR Bundle</a>");
+        }
 
         out.println("  </div>");
       }
     } catch (Exception e) {
       e.printStackTrace(System.err);
     } finally {
-//      dataSession.close();
+      dataSession.close();
     }
     HomeServlet.doFooter(out, session);
     out.flush();
@@ -518,9 +521,8 @@ public List<ObservationReported> getObservationList(IGenericClient fhirClient,
     List<ObservationReported> observationReportedList = new ArrayList<>();
     {
 		 observationReportedList = fhirRequests.searchObservationReportedList(fhirClient,
-			 Observation.PATIENT.hasId("Patient/" + patientReportedSelected.getPatientReportedId()));
-//			 ,Observation.PART_OF.hasChainedProperty(Immunization.IDENTIFIER.exactly().code("")) TODO Find formulato say is null or has no
-
+			 Observation.SUBJECT.hasId(patientReportedSelected.getPatientReportedId()));
+//		 observationReportedList = observationReportedList.stream().filter(observationReported -> observationReported.getVaccinationReported() == null).collect(Collectors.toList());
       Set<String> suppressSet = LoincIdentifier.getSuppressIdentifierCodeSet();
       for (Iterator<ObservationReported> it = observationReportedList.iterator(); it.hasNext();) {
         ObservationReported observationReported = it.next();

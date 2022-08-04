@@ -4,6 +4,8 @@ import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import org.apache.commons.lang3.StringUtils;
 import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.hl7.fhir.r5.model.*;
 import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.generated.Code;
@@ -15,6 +17,7 @@ import org.immregistries.iis.kernal.model.*;
 import org.immregistries.iis.kernal.model.Person;
 import org.immregistries.iis.kernal.repository.FhirRequests;
 import org.immregistries.iis.kernal.repository.RepositoryClientFactory;
+import org.immregistries.iis.kernal.servlet.PopServlet;
 import org.immregistries.smm.tester.manager.HL7Reader;
 import org.immregistries.vfa.connect.ConnectFactory;
 import org.immregistries.vfa.connect.ConnectorInterface;
@@ -31,14 +34,12 @@ import java.util.*;
 
 public class IncomingMessageHandler {
 
-  private Logger logger = LoggerFactory.getLogger(IncomingMessageHandler.class);
-  @Autowired
-  protected RepositoryClientFactory repositoryClientFactory;
-
-  @Autowired
-  protected FhirRequests fhirRequests;
-
-  protected IGenericClient fhirClient;
+  	private Logger logger = LoggerFactory.getLogger(IncomingMessageHandler.class);
+  	@Autowired
+  	protected RepositoryClientFactory repositoryClientFactory;
+  	@Autowired
+  	protected FhirRequests fhirRequests;
+	protected IGenericClient fhirClient;
 
   protected IGenericClient getFhirClient(OrgAccess orgAccess) {
 	  if (fhirClient == null) {
@@ -53,8 +54,6 @@ public class IncomingMessageHandler {
   // package?
   // Look at names of database fields, make more consistent
 
-
-
   private static final String QBP_Z34 = "Z34";
   private static final String QBP_Z44 = "Z44";
   private static final String RSP_Z42_MATCH_WITH_FORECAST = "Z42";
@@ -67,13 +66,11 @@ public class IncomingMessageHandler {
   private static final String QUERY_TOO_MANY = "TM";
   private static final String QUERY_APPLICATION_ERROR = "AE";
 
-
-//  protected Session dataSession = null;
+	protected Session dataSession = null;
 
 	public IncomingMessageHandler() {
+		dataSession = PopServlet.getDataSession();
 	}
-
-
 
   public String process(String message, OrgAccess orgAccess) {
     HL7Reader reader = new HL7Reader(message);
@@ -134,14 +131,6 @@ public class IncomingMessageHandler {
 			patientReported = fhirRequests.searchPatientReported(getFhirClient(orgAccess),
 				Patient.IDENTIFIER.exactly().code(mrn)
 			);
-//        Query query = dataSession.createQuery(
-//            "from PatientReported where orgReported = ? and patientReportedExternalLink = ?");
-//        query.setParameter(0, orgAccess.getOrg());
-//        query.setParameter(1, mrn);
-//        List<PatientReported> patientReportedList = query.list();
-//        if (!patientReportedList.isEmpty()) {
-//          patientReported = patientReportedList.get(0);
-//        }
       }
       String patientNameLast = reader.getValue(4, 1);
       String patientNameFirst = reader.getValue(4, 2);
@@ -1211,15 +1200,15 @@ public class IncomingMessageHandler {
     MessageReceived messageReceived = new MessageReceived();
     messageReceived.setOrgMaster(orgMaster);
     messageReceived.setMessageRequest(message);
-    messageReceived.setPatientReported(patientReported);
+    messageReceived.setPatientReportedId(patientReported.getPatientReportedId());
     messageReceived.setMessageResponse(messageResponse);
     messageReceived.setReportedDate(new Date());
     messageReceived.setCategoryRequest(categoryRequest);
     messageReceived.setCategoryResponse(categoryResponse);
 	 // TODO interact with internal logs and metadata
-//    Transaction transaction = dataSession.beginTransaction();
-//    dataSession.save(messageReceived);
-//    transaction.commit();
+    Transaction transaction = dataSession.beginTransaction();
+    dataSession.save(messageReceived);
+    transaction.commit();
   }
 
   @SuppressWarnings("unchecked")
@@ -1350,8 +1339,6 @@ public class IncomingMessageHandler {
       if (profileId.equals(RSP_Z32_MATCH)) {
         printQueryNK1(patientReported, sb, codeMap);
       }
-//      List<VaccinationMaster> vaccinationMasterList =
-//          getVaccinationMasterList(patient, dataSession);
 		List<VaccinationMaster> vaccinationMasterList =
           getVaccinationMasterList(patientMaster, fhirClient);
 
@@ -1544,20 +1531,6 @@ public class IncomingMessageHandler {
 					}
 				}
 			} catch (ResourceNotFoundException e) {}
-//        {
-//          Query query = dataSession.createQuery(
-//              "from ObservationMaster where patient = :patient and vaccination = :vaccination");
-//          query.setParameter("patient", patientMaster);
-//          query.setParameter("vaccination", vaccination);
-//          List<ObservationMaster> observationList = query.list();
-//          if (observationList.size() > 0) {
-//            obsSubId++;
-//            for (ObservationMaster observation : observationList) {
-//              obxSetId++;
-//              printObx(sb, obxSetId, obsSubId, observation);
-//            }
-//          }
-//        }
       }
 		 try {
 			 Bundle bundle = fhirClient.search().forResource(Observation.class)
@@ -1574,20 +1547,6 @@ public class IncomingMessageHandler {
 				 }
 			 }
 		 } catch (ResourceNotFoundException e) {}
-//      {
-//        Query query = dataSession
-//            .createQuery("from ObservationMaster where patient = :patient and vaccination is null");
-//        query.setParameter("patient", patient);
-//        List<ObservationMaster> observationList = query.list();
-//        if (observationList.size() > 0) {
-//          printORC(orgAccess, sb, null, null, false);
-//          obsSubId++;
-//          for (ObservationMaster observation : observationList) {
-//            obxSetId++;
-//            printObx(sb, obxSetId, obsSubId, observation);
-//          }
-//        }
-//      }
 
       if (sendBackForecast && forecastActualList != null && forecastActualList.size() > 0) {
         printORC(orgAccess, sb, null, null, false);
@@ -1871,20 +1830,6 @@ public class IncomingMessageHandler {
 					}
 				}
 			} catch (ResourceNotFoundException e) {}
-//			{
-//          Query query = dataSession.createQuery(
-//              "from ObservationMaster where patient = :patient and vaccination = :vaccination");
-//          query.setParameter("patient", patient);
-//          query.setParameter("vaccination", vaccination);
-//          List<ObservationMaster> observationList = query.list();
-//          if (observationList.size() > 0) {
-//            obsSubId++;
-//            for (ObservationMaster observation : observationList) {
-//              obxSetId++;
-//              printObx(sb, obxSetId, obsSubId, observation);
-//            }
-//          }
-//        }
       }
     }
     return sb.toString();
@@ -1916,21 +1861,6 @@ public class IncomingMessageHandler {
 			 }
 		 } catch (ResourceNotFoundException e) {}
 
-//      Query query = dataSession
-//          .createQuery("from VaccinationMaster where patient = ? order by vaccinationReported asc");
-//      query.setParameter(0, patient);
-//      @SuppressWarnings("unchecked")
-//      List<VaccinationMaster> vmList = query.list();
-//      Map<String, VaccinationMaster> map = new HashMap<>();
-//      for (VaccinationMaster vaccinationMaster : vmList) {
-//        if (vaccinationMaster.getAdministeredDate() != null) {
-//          String key = sdf.format(vaccinationMaster.getAdministeredDate());
-//          if (!vaccinationMaster.getVaccineCvxCode().equals("")) {
-//            key += key + vaccinationMaster.getVaccineCvxCode();
-//            map.put(key, vaccinationMaster);
-//          }
-//        }
-//      }
       List<String> keyList = new ArrayList<>(map.keySet());
       Collections.sort(keyList);
       for (String key : keyList) {
@@ -2585,12 +2515,6 @@ public class IncomingMessageHandler {
 			 return patientExternalLink;
 			 // we found a unique id!
 		 }
-//      Query query = dataSession.createQuery("from PatientMaster where patientExternalLink = ?");
-//      query.setParameter(0, patientExternalLink);
-//      if (query.list().size() == 0) {
-//        return patientExternalLink;
-//        // we found a unique id!
-//      }
     }
     return null;
   }
