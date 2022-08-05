@@ -8,15 +8,11 @@
     },
     {
       "resourceType": "Immunization",
-      "searchParams": ["vaccine-code"]
+      "searchParams": ["vaccine-code","patient","date","lot-number"]
     },
     {
       "resourceType": "*",
       "searchParams": ["identifier"]
-    },
-    {
-      "resourceType": "Patient",
-      "searchParams": ["general-practitioner"]
     }
   ],
   "candidateFilterSearchParams": [
@@ -29,7 +25,7 @@
   "matchFields": [
     {
       "name": "cosine-given-name",
-      "resourceType": "*",
+      "resourceType": "Patient",
       "resourcePath": "name.given",
       "matcher": {
         "algorithm": "COLOGNE"
@@ -37,7 +33,7 @@
     },
     {
       "name": "jaro-last-name",
-      "resourceType": "*",
+      "resourceType": "Patient",
       "resourcePath": "name.family",
       "matcher": {
         "algorithm": "SOUNDEX"

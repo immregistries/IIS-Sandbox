@@ -193,4 +193,125 @@ public class Application extends SpringBootServletInitializer {
 //		registrationBean.setLoadOnStartup(1);
 		return registrationBean;
 	}
+
+	@Bean
+	public ServletRegistrationBean covidServletRegistrationBean() {
+		ServletRegistrationBean registrationBean = new ServletRegistrationBean();
+		HttpServlet servlet = new CovidServlet();
+		beanFactory.autowireBean(servlet);
+		registrationBean.setServlet(servlet);
+		registrationBean.addUrlMappings( "/covid");
+//		registrationBean.setLoadOnStartup(1);
+		return registrationBean;
+	}
+	@Bean
+	public ServletRegistrationBean fitsServletRegistrationBean() {
+		ServletRegistrationBean registrationBean = new ServletRegistrationBean();
+		HttpServlet servlet = new FitsServlet();
+		beanFactory.autowireBean(servlet);
+		registrationBean.setServlet(servlet);
+		registrationBean.addUrlMappings( "/fits");
+//		registrationBean.setLoadOnStartup(1);
+		return registrationBean;
+	}
+	@Bean
+	public ServletRegistrationBean fhirTestServletRegistrationBean() {
+		ServletRegistrationBean registrationBean = new ServletRegistrationBean();
+		HttpServlet servlet = new FhirTestServlet();
+		beanFactory.autowireBean(servlet);
+		registrationBean.setServlet(servlet);
+		registrationBean.addUrlMappings( "/fhirTest");
+//		registrationBean.setLoadOnStartup(1);
+		return registrationBean;
+	}
+	@Bean
+	public ServletRegistrationBean labServletRegistrationBean() {
+		ServletRegistrationBean registrationBean = new ServletRegistrationBean();
+		HttpServlet servlet = new LabServlet();
+		beanFactory.autowireBean(servlet);
+		registrationBean.setServlet(servlet);
+		registrationBean.addUrlMappings( "/lab");
+//		registrationBean.setLoadOnStartup(1);
+		return registrationBean;
+	}
+	@Bean
+	public ServletRegistrationBean eventServletRegistrationBean() {
+		ServletRegistrationBean registrationBean = new ServletRegistrationBean();
+		HttpServlet servlet = new EventServlet();
+		beanFactory.autowireBean(servlet);
+		registrationBean.setServlet(servlet);
+		registrationBean.addUrlMappings( "/event");
+//		registrationBean.setLoadOnStartup(1);
+		return registrationBean;
+	}
+	@Bean
+	public ServletRegistrationBean queryConverterServletRegistrationBean() {
+		ServletRegistrationBean registrationBean = new ServletRegistrationBean();
+		HttpServlet servlet = new QueryConverterServlet();
+		beanFactory.autowireBean(servlet);
+		registrationBean.setServlet(servlet);
+		registrationBean.addUrlMappings( "/queryConverter");
+//		registrationBean.setLoadOnStartup(1);
+		return registrationBean;
+	}
+	@Bean
+	public ServletRegistrationBean v2ToFhirServletRegistrationBean() {
+		ServletRegistrationBean registrationBean = new ServletRegistrationBean();
+		HttpServlet servlet = new V2ToFhirServlet();
+		beanFactory.autowireBean(servlet);
+		registrationBean.setServlet(servlet);
+		registrationBean.addUrlMappings( "/v2ToFhir");
+//		registrationBean.setLoadOnStartup(1);
+		return registrationBean;
+	}
+	@Bean
+	public ServletRegistrationBean vacDedupServletRegistrationBean() {
+		ServletRegistrationBean registrationBean = new ServletRegistrationBean();
+		HttpServlet servlet = new VacDedupServlet();
+		beanFactory.autowireBean(servlet);
+		registrationBean.setServlet(servlet);
+		registrationBean.addUrlMappings( "/vacDedup");
+//		registrationBean.setLoadOnStartup(1);
+		return registrationBean;
+	}
+	@Bean
+	public ServletRegistrationBean vciServletRegistrationBean() {
+		ServletRegistrationBean registrationBean = new ServletRegistrationBean();
+		HttpServlet servlet = new VciServlet();
+		beanFactory.autowireBean(servlet);
+		registrationBean.setServlet(servlet);
+		registrationBean.addUrlMappings( "/vciDemo");
+//		registrationBean.setLoadOnStartup(1);
+		return registrationBean;
+	}
+	@Bean
+	public ServletRegistrationBean vXUDownloadServletRegistrationBean() {
+		ServletRegistrationBean registrationBean = new ServletRegistrationBean();
+		HttpServlet servlet = new VXUDownloadServlet();
+		beanFactory.autowireBean(servlet);
+		registrationBean.setServlet(servlet);
+		registrationBean.addUrlMappings( "/VXUDownload");
+//		registrationBean.setLoadOnStartup(1);
+		return registrationBean;
+	}
+	@Bean
+	public ServletRegistrationBean vXUDownloadFormServletRegistrationBean() {
+		ServletRegistrationBean registrationBean = new ServletRegistrationBean();
+		HttpServlet servlet = new VXUDownloadFormServlet();
+		beanFactory.autowireBean(servlet);
+		registrationBean.setServlet(servlet);
+		registrationBean.addUrlMappings( "/VXUDownloadForm");
+//		registrationBean.setLoadOnStartup(1);
+		return registrationBean;
+	}
+	@Bean
+	public ServletRegistrationBean covidGenerateServletRegistrationBean() {
+		ServletRegistrationBean registrationBean = new ServletRegistrationBean();
+		HttpServlet servlet = new CovidGenerateServlet();
+		beanFactory.autowireBean(servlet);
+		registrationBean.setServlet(servlet);
+		registrationBean.addUrlMappings( "/covidGenerate");
+//		registrationBean.setLoadOnStartup(1);
+		return registrationBean;
+	}
 }

@@ -67,7 +67,7 @@ public class V2ToFhirServlet extends HttpServlet {
 
       try {
         CodeMap codeMap = CodeMapManager.getCodeMap();
-        FhirContext ctx = FhirContext.forR4();
+        FhirContext ctx = repositoryClientFactory.getFhirContext();
         IParser parser = ctx.newJsonParser();
         parser.setPrettyPrint(true);
 
