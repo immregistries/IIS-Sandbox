@@ -281,7 +281,6 @@ public class IncomingEventHandler extends IncomingMessageHandler {
 		 patientReported = fhirRequests.searchPatientReported(getFhirClient(orgAccess),
 			 Patient.IDENTIFIER.exactly().code(patientReportedExternalLink)
 		 );
-		 patientMaster = patientReported.getPatient();
     }
 
     if (patientReported == null) {
@@ -293,10 +292,13 @@ public class IncomingEventHandler extends IncomingMessageHandler {
       patientReported.setPatientReportedExternalLink(patientReportedExternalLink);
       patientReported.setPatient(patientMaster);
       patientReported.setReportedDate(new Date());
-    }
+    }else {
+		 patientMaster = patientReported.getPatient();
+	 }
 
 
-    String patientNameLast = req.getParameter(PATIENT_NAME_LAST);
+
+		 String patientNameLast = req.getParameter(PATIENT_NAME_LAST);
     String patientNameFirst = req.getParameter(PATIENT_NAME_FIRST);
     String patientNameMiddle = req.getParameter(PATIENT_NAME_MIDDLE);
     String patientPhone = req.getParameter(PATIENT_PHONE);

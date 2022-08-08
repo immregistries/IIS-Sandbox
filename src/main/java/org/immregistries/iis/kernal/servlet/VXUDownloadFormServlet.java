@@ -2,6 +2,8 @@ package org.immregistries.iis.kernal.servlet;
 
 import org.hibernate.Session;
 import org.immregistries.iis.kernal.model.OrgAccess;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -16,6 +18,8 @@ import java.text.SimpleDateFormat;
 @SuppressWarnings("serial")
 public class VXUDownloadFormServlet extends HttpServlet {
 
+	@Autowired
+	AutowireCapableBeanFactory beanFactory;
 
   protected static final String CACHED_GENERATOR = "generator";
   protected static final String EXPORT_YYYY_MM_DD = "yyyy-MM-dd";
@@ -57,6 +61,7 @@ public class VXUDownloadFormServlet extends HttpServlet {
           (VXUDownloadGenerator) session.getAttribute(CACHED_GENERATOR);
       if (generator == null || action == null || action.equals(ACTION_GENERATE)) {
         generator = new VXUDownloadGenerator(req, orgAccess.getOrgAccessId());
+		  beanFactory.autowireBean(generator);
         session.setAttribute(CACHED_GENERATOR, generator);
       }
       HomeServlet.doHeader(out, session);

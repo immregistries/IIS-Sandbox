@@ -51,6 +51,8 @@ public class ImmunizationHandler {
 	  vr.setVaccineNdcCode(i.getVaccineCode().getCode(NDC));
 	  vr.setVaccineMvxCode(i.getVaccineCode().getCode(MVX));
 
+	  vr.setVaccineMvxCode(i.getManufacturer().getIdentifier().getValue());
+
 
 	 vr.setAdministeredAmount(i.getDoseQuantity().getValue().toString());
 	 vr.setInformationSource(i.getInformationSourceCodeableConcept().getCode(INFORMATION_SOURCE));
@@ -118,7 +120,8 @@ public class ImmunizationHandler {
 
 		 }
 		 i.getVaccineCode().addCoding().setCode(vr.getVaccineNdcCode()).setSystem(NDC);
-		 i.getVaccineCode().addCoding().setCode(vr.getVaccineMvxCode()).setSystem(MVX);
+//		 i.getVaccineCode().addCoding().setCode(vr.getVaccineMvxCode()).setSystem(MVX);
+		 i.setManufacturer(MappingHelper.getFhirReference(MappingHelper.ORGANISATION,MVX,vr.getVaccineMvxCode()));
 
 		 i.setDoseQuantity(new Quantity().setValue(new BigDecimal(vr.getAdministeredAmount())));
 		 i.setInformationSource(new CodeableConcept(new Coding().setSystem(INFORMATION_SOURCE).setCode(vr.getInformationSource()))); // TODO change system name
