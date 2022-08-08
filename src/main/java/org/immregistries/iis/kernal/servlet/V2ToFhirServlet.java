@@ -49,6 +49,7 @@ public class V2ToFhirServlet extends HttpServlet {
 
     HttpSession session = req.getSession(true);
     OrgAccess orgAccess = (OrgAccess) session.getAttribute("orgAccess");
+	  IGenericClient fhirClient = (IGenericClient) session.getAttribute("fhirClient");
     if (orgAccess == null) {
       RequestDispatcher dispatcher = req.getRequestDispatcher("home");
       dispatcher.forward(req, resp);
@@ -59,7 +60,6 @@ public class V2ToFhirServlet extends HttpServlet {
     PrintWriter out = new PrintWriter(resp.getOutputStream());
     Session dataSession = PopServlet.getDataSession();
     HomeServlet.doHeader(out, session);
-	  IGenericClient fhirClient = repositoryClientFactory.newGenericClient(orgAccess);
     try {
       PatientReported pr = (PatientReported) dataSession.get(PatientReported.class,
           Integer.parseInt(req.getParameter(PARAM_PATIENT_REPORTED_ID)));

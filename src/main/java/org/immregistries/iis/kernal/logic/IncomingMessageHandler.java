@@ -42,7 +42,7 @@ public class IncomingMessageHandler {
 	protected IGenericClient fhirClient;
 
   protected IGenericClient getFhirClient(OrgAccess orgAccess) {
-	  if (fhirClient == null) {
+	  if (fhirClient == null || !fhirClient.getServerBase().equals(orgAccess.getAccessName())) {
 		  fhirClient = repositoryClientFactory.newGenericClient(orgAccess);
 	  }
 	  return fhirClient;
@@ -113,7 +113,7 @@ public class IncomingMessageHandler {
 
   @SuppressWarnings("unchecked")
   public String processQBP(OrgAccess orgAccess, HL7Reader reader, String messageReceived) {
-	 IGenericClient fhirClient = repositoryClientFactory.newGenericClient(orgAccess);
+	 IGenericClient fhirClient = getFhirClient(orgAccess);
     PatientReported patientReported = null;
     List<PatientReported> patientReportedPossibleList = new ArrayList<>();
     List<ProcessingException> processingExceptionList = new ArrayList<>();
@@ -244,7 +244,7 @@ public class IncomingMessageHandler {
 
   @SuppressWarnings("unchecked")
   public String processVXU(OrgAccess orgAccess, HL7Reader reader, String message) {
-	  IGenericClient fhirClient = repositoryClientFactory.newGenericClient(orgAccess);
+	  IGenericClient fhirClient = getFhirClient(orgAccess);
 	  List<ProcessingException> processingExceptionList = new ArrayList<>();
     try {
       Set<ProcessingFlavor> processingFlavorSet = orgAccess.getOrg().getProcessingFlavorSet();
@@ -646,7 +646,7 @@ public class IncomingMessageHandler {
       List<ProcessingException> processingExceptionList, Set<ProcessingFlavor> processingFlavorSet,
       CodeMap codeMap, boolean strictDate, PatientReported patientReported)
       throws ProcessingException {
-	  IGenericClient fhirClient = repositoryClientFactory.newGenericClient(orgAccess);
+	  IGenericClient fhirClient = getFhirClient(orgAccess);
 
     PatientMaster patientMaster = null;
     String patientReportedExternalLink = "";
@@ -1002,7 +1002,7 @@ public class IncomingMessageHandler {
   }
 
   public String processORU(OrgAccess orgAccess, HL7Reader reader, String message) {
-		IGenericClient fhirClient = repositoryClientFactory.newGenericClient(orgAccess);
+		IGenericClient fhirClient = getFhirClient(orgAccess);
     List<ProcessingException> processingExceptionList = new ArrayList<>();
     try {
       Set<ProcessingFlavor> processingFlavorSet = orgAccess.getOrg().getProcessingFlavorSet();
@@ -1645,7 +1645,7 @@ public class IncomingMessageHandler {
   }
 
   public String buildVxu(VaccinationReported vaccinationReported, OrgAccess orgAccess) {
-		IGenericClient fhirClient = repositoryClientFactory.newGenericClient(orgAccess);
+		IGenericClient fhirClient = getFhirClient(orgAccess);
     StringBuilder sb = new StringBuilder();
     CodeMap codeMap = CodeMapManager.getCodeMap();
     Set<ProcessingFlavor> processingFlavorSet = orgAccess.getOrg().getProcessingFlavorSet();

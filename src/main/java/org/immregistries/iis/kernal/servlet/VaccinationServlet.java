@@ -55,7 +55,9 @@ public class VaccinationServlet extends PatientServlet {
 
     HttpSession session = req.getSession(true);
     OrgAccess orgAccess = (OrgAccess) session.getAttribute("orgAccess");
-    if (orgAccess == null) {
+	  IGenericClient fhirClient = (IGenericClient) session.getAttribute("fhirClient");
+
+	  if (orgAccess == null) {
       RequestDispatcher dispatcher = req.getRequestDispatcher("home");
       dispatcher.forward(req, resp);
       return;
@@ -63,7 +65,6 @@ public class VaccinationServlet extends PatientServlet {
 
     resp.setContentType("text/html");
     PrintWriter out = new PrintWriter(resp.getOutputStream());
-	  IGenericClient fhirClient = repositoryClientFactory.newGenericClient(orgAccess);
     try {
 		 VaccinationReported vaccinationReported =
 			 ImmunizationHandler.getReported(fhirClient.read().resource(Immunization.class)

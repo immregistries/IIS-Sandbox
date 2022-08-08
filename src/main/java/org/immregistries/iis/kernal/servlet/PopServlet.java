@@ -1,10 +1,12 @@
 package org.immregistries.iis.kernal.servlet;
 
+import ca.uhn.fhir.rest.client.api.IGenericClient;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.immregistries.iis.kernal.logic.IncomingMessageHandler;
 import org.immregistries.iis.kernal.model.OrgAccess;
+import org.immregistries.iis.kernal.repository.RepositoryClientFactory;
 import org.immregistries.smm.transform.ScenarioManager;
 import org.immregistries.smm.transform.TestCaseMessage;
 import org.immregistries.smm.transform.Transformer;
@@ -21,6 +23,8 @@ import java.io.PrintWriter;
 public class PopServlet extends HttpServlet {
 	@Autowired
 	 private IncomingMessageHandler handler;
+	@Autowired
+	RepositoryClientFactory repositoryClientFactory;
 
 
 	public static final String PARAM_MESSAGE = "MESSAGEDATA";
@@ -64,6 +68,8 @@ public class PopServlet extends HttpServlet {
 
 			  ack = handler.process(message, orgAccess);
           session.setAttribute("orgAccess", orgAccess);
+			  IGenericClient fhirClient = repositoryClientFactory.newGenericClient(orgAccess);
+          session.setAttribute("fhirClient", fhirClient);
         }
       } finally {
         dataSession.close();
