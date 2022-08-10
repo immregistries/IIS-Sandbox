@@ -20,6 +20,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class FhirRequests {
@@ -34,8 +35,13 @@ public class FhirRequests {
 		PatientReported patientReported = null;
 		Bundle bundle = search(Patient.class,fhirClient, where);
 		if (bundle.hasEntry()) {
-			Patient patient = (Patient) bundle.getEntryFirstRep().getResource();
-			patientReported = PatientMapper.getReported(patient);
+			List<Bundle.BundleEntryComponent> list = bundle.getEntry().stream()
+				// filter out the golden records
+				.filter(entry -> entry.getResource().getMeta().getTag().stream().noneMatch(coding -> coding.getCode().equals("GOLDEN_RECORD")))
+				.collect(Collectors.toList());
+			if (list.size() > 0) {
+				patientReported = PatientMapper.getReported((Patient) list.get(0).getResource());
+			}
 		}
 		return patientReported;
 	}
@@ -141,6 +147,18 @@ public class FhirRequests {
 			patientReported.setPatientReportedId(outcome.getResource().getIdElement().getIdPart());
 		}
 		return patientReported;
+	}
+
+	public ObservationReported saveObservationReported(IGenericClient fhirClient, ObservationReported observationReported) {
+		Observation observation = ObservationMapper.getFhirResource(null,observationReported);
+		MethodOutcome outcome = save(fhirClient,observation,
+			Observation.IDENTIFIER.exactly().systemAndIdentifier(MappingHelper.OBSERVATION_REPORTED,observationReported.getObservationReportedId()));
+		if (outcome.getCreated() != null && outcome.getCreated()) {
+			observationReported.setPatientReportedId(outcome.getId().getIdPart());
+		} else if (!outcome.getResource().isEmpty()) {
+			observationReported.setPatientReportedId(outcome.getResource().getIdElement().getIdPart());
+		}
+		return observationReported;
 	}
 
 	public VaccinationReported saveVaccinationReported(IGenericClient fhirClient, VaccinationReported vaccinationReported) {
