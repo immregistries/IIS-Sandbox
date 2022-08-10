@@ -10,9 +10,9 @@ import org.immregistries.iis.kernal.model.PatientReported;
 import java.text.ParseException;
 import java.util.Date;
 
-public class PatientHandler {
+public class PatientMapper {
 
-	private PatientHandler() {
+	private PatientMapper() {
 	}
 
 	private static final String REGISTRY_STATUS_EXTENSION = "registryStatus";
@@ -218,7 +218,7 @@ public class PatientHandler {
 	public static void fillFhirResource(Patient p, PatientMaster pm, PatientReported pr) {
 //		Patient p = new Patient().setBirthDate(new Date());
 		if (pm != null) {
-			p.addIdentifier(MappingHelper.getFhirIdentifier(MappingHelper.PATIENT_MASTER, pm.getPatientExternalLink()));
+//			p.addIdentifier(MappingHelper.getFhirIdentifier(MappingHelper.PATIENT_MASTER, pm.getPatientExternalLink()));
 			HumanName name = p.addName();
 			name.setFamily(pm.getPatientNameLast());
 			name.addGivenElement().setValue(pm.getPatientNameFirst());

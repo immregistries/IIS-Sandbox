@@ -1,7 +1,6 @@
 package org.immregistries.iis.kernal.servlet;
 
 import ca.uhn.fhir.rest.client.api.IGenericClient;
-import ca.uhn.fhir.rest.gclient.ReferenceClientParam;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
@@ -10,8 +9,7 @@ import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.logic.CodeMapManager;
-import org.immregistries.iis.kernal.mapping.MappingHelper;
-import org.immregistries.iis.kernal.mapping.PatientHandler;
+import org.immregistries.iis.kernal.mapping.PatientMapper;
 import org.immregistries.iis.kernal.model.*;
 import org.immregistries.iis.kernal.repository.FhirRequests;
 import org.immregistries.iis.kernal.repository.RepositoryClientFactory;
@@ -28,7 +26,6 @@ import java.io.PrintWriter;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @SuppressWarnings("serial")
 public class PatientServlet extends HttpServlet {
@@ -119,7 +116,7 @@ public class PatientServlet extends HttpServlet {
 			).returnBundle(Bundle.class).execute();
 			if  (bundle.hasEntry()){
 				patientSelected = (Patient) bundle.getEntryFirstRep().getResource();
-				patientReportedSelected = PatientHandler.getReported(patientSelected);
+				patientReportedSelected = PatientMapper.getReported(patientSelected);
 			}
 //			patientReportedSelected = fhirRequests.searchPatientReported(fhirClient,
 //				Patient.IDENTIFIER.exactly().identifier(req.getParameter(PARAM_PATIENT_REPORTED_ID))

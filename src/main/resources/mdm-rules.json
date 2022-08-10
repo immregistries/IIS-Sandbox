@@ -44,5 +44,5 @@
     "cosine-given-name" : "POSSIBLE_MATCH",
     "cosine-given-name,jaro-last-name" : "MATCH"
   },
-  "eidSystem": "http://company.io/fhir/NamingSystem/custom-eid-system"
+  "eidSystem": "urn:mrns"
 }

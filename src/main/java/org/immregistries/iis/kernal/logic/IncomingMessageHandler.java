@@ -14,7 +14,7 @@ import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.SoftwareVersion;
 import org.immregistries.iis.kernal.mapping.*;
 import org.immregistries.iis.kernal.model.*;
-import org.immregistries.iis.kernal.model.Person;
+import org.immregistries.iis.kernal.model.ModelPerson;
 import org.immregistries.iis.kernal.repository.FhirRequests;
 import org.immregistries.iis.kernal.repository.RepositoryClientFactory;
 import org.immregistries.iis.kernal.servlet.PopServlet;
@@ -460,28 +460,28 @@ public class IncomingMessageHandler {
           {
             String admininsteringProvider = reader.getValue(10);
             if (StringUtils.isNotEmpty(admininsteringProvider)) {
-              Person person = null;
+              ModelPerson modelPerson = null;
 					try {
 						Bundle bundle = fhirClient.search().forResource(org.hl7.fhir.r5.model.Person.class)
 							.where(org.hl7.fhir.r5.model.Person.IDENTIFIER.exactly().code(admininsteringProvider))
 							.returnBundle(Bundle.class).execute();
 						if (bundle.hasEntry()) {
 							org.hl7.fhir.r5.model.Person fhirPerson = (org.hl7.fhir.r5.model.Person) bundle.getEntryFirstRep().getResource();
-							person = PersonHandler.getModelPerson(fhirPerson);
+							modelPerson = PersonMapper.getModelPerson(fhirPerson);
 						}
 					} catch (ResourceNotFoundException e) {}
-              if (person == null) {
-                person = new Person();
-                person.setPersonExternalLink(admininsteringProvider);
-                person.setOrgMaster(orgAccess.getOrg());
-                person.setNameLast(reader.getValue(10, 2));
-                person.setNameFirst(reader.getValue(10, 3));
-                person.setNameMiddle(reader.getValue(10, 4));
-                person.setAssigningAuthority(reader.getValue(10, 9));
-                person.setNameTypeCode(reader.getValue(10, 10));
-                person.setIdentifierTypeCode(reader.getValue(10, 13));
-                person.setProfessionalSuffix(reader.getValue(10, 21));
-					  org.hl7.fhir.r5.model.Person  p = PersonHandler.getFhirPerson(person);
+              if (modelPerson == null) {
+                modelPerson = new ModelPerson();
+                modelPerson.setPersonExternalLink(admininsteringProvider);
+                modelPerson.setOrgMaster(orgAccess.getOrg());
+                modelPerson.setNameLast(reader.getValue(10, 2));
+                modelPerson.setNameFirst(reader.getValue(10, 3));
+                modelPerson.setNameMiddle(reader.getValue(10, 4));
+                modelPerson.setAssigningAuthority(reader.getValue(10, 9));
+                modelPerson.setNameTypeCode(reader.getValue(10, 10));
+                modelPerson.setIdentifierTypeCode(reader.getValue(10, 13));
+                modelPerson.setProfessionalSuffix(reader.getValue(10, 21));
+					  org.hl7.fhir.r5.model.Person  p = PersonMapper.getFhirPerson(modelPerson);
 					  MethodOutcome outcome;
 					  try {
 						  outcome = fhirClient.update().resource(p).conditional()
@@ -494,7 +494,7 @@ public class IncomingMessageHandler {
 					  }
 					  patientReported.setPatientReportedId(outcome.getId().getIdPart());
 				  }
-              vaccinationReported.setAdministeringProvider(person);
+              vaccinationReported.setAdministeringProvider(modelPerson);
             }
 
           }
@@ -1854,7 +1854,7 @@ public class IncomingMessageHandler {
 					 String key = sdf.format(immunization.getOccurrenceDateTimeType());
 					 if (!immunization.getVaccineCode().getText().equals("")) {
 						 key += key + immunization.getVaccineCode().getText();
-						 VaccinationMaster vaccinationMaster = ImmunizationHandler.getMaster(null, immunization);
+						 VaccinationMaster vaccinationMaster = ImmunizationMapper.getMaster(null, immunization);
 						 map.put(key, vaccinationMaster);
 					 }
 				 }

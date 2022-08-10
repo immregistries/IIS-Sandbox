@@ -12,7 +12,7 @@ import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r5.model.*;
 import org.immregistries.iis.kernal.mapping.*;
 import org.immregistries.iis.kernal.model.*;
-import org.immregistries.iis.kernal.model.Person;
+import org.immregistries.iis.kernal.model.ModelPerson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +35,7 @@ public class FhirRequests {
 		Bundle bundle = search(Patient.class,fhirClient, where);
 		if (bundle.hasEntry()) {
 			Patient patient = (Patient) bundle.getEntryFirstRep().getResource();
-			patientReported = PatientHandler.getReported(patient);
+			patientReported = PatientMapper.getReported(patient);
 		}
 		return patientReported;
 	}
@@ -44,7 +44,7 @@ public class FhirRequests {
 		List<PatientReported> patientReportedList = new ArrayList<>();
 		Bundle bundle = search(Patient.class,fhirClient, where);
 		for (Bundle.BundleEntryComponent entry: bundle.getEntry()) {
-			patientReportedList.add(PatientHandler.getReported((Patient) entry.getResource()));
+			patientReportedList.add(PatientMapper.getReported((Patient) entry.getResource()));
 		}
 		return patientReportedList;
 	}
@@ -52,7 +52,7 @@ public class FhirRequests {
 		VaccinationReported vaccinationReported = null;
 		Bundle bundle = search(Immunization.class,fhirClient, where);
 		if (bundle.hasEntry()) {
-			vaccinationReported = ImmunizationHandler.getReported((Immunization) bundle.getEntryFirstRep().getResource());
+			vaccinationReported = ImmunizationMapper.getReported((Immunization) bundle.getEntryFirstRep().getResource());
 		}
 		return vaccinationReported;
 	}
@@ -60,7 +60,7 @@ public class FhirRequests {
 		List<VaccinationReported> vaccinationReportedList = new ArrayList<>();
 		Bundle bundle = search(Immunization.class,fhirClient, where);
 		for (Bundle.BundleEntryComponent entry: bundle.getEntry()) {
-			vaccinationReportedList.add(ImmunizationHandler.getReported((Immunization) entry.getResource()));
+			vaccinationReportedList.add(ImmunizationMapper.getReported((Immunization) entry.getResource()));
 		}
 		return vaccinationReportedList;
 	}
@@ -98,13 +98,13 @@ public class FhirRequests {
 	}
 
 
-	public Person searchPerson(IGenericClient fhirClient, ICriterion... where) {
-		Person person = null;
+	public ModelPerson searchPerson(IGenericClient fhirClient, ICriterion... where) {
+		ModelPerson modelPerson = null;
 		Bundle bundle = search(org.hl7.fhir.r5.model.Person.class,fhirClient, where);
 		if (bundle.hasEntry()) {
-			person = PersonHandler.getModelPerson((org.hl7.fhir.r5.model.Person) bundle.getEntryFirstRep().getResource());
+			modelPerson = PersonMapper.getModelPerson((org.hl7.fhir.r5.model.Person) bundle.getEntryFirstRep().getResource());
 		}
-		return person;
+		return modelPerson;
 	}
 
 
@@ -130,7 +130,7 @@ public class FhirRequests {
 	}
 
 	public PatientReported savePatientReported(IGenericClient fhirClient, PatientReported patientReported) {
-		Patient patient =  PatientHandler.getFhirResource( null,patientReported);
+		Patient patient =  PatientMapper.getFhirResource( null,patientReported);
 //		Patient patient = new Patient();
 //		PatientHandler.fillFhirResource(patient, null,patientReported);
 		MethodOutcome outcome = save(fhirClient,patient,
@@ -144,7 +144,7 @@ public class FhirRequests {
 	}
 
 	public VaccinationReported saveVaccinationReported(IGenericClient fhirClient, VaccinationReported vaccinationReported) {
-		Immunization immunization = ImmunizationHandler.getFhirResource( null, vaccinationReported);
+		Immunization immunization = ImmunizationMapper.getFhirResource( null, vaccinationReported);
 		MethodOutcome outcome = save(fhirClient,immunization,
 			Immunization.IDENTIFIER.exactly()
 				.systemAndIdentifier(MappingHelper.VACCINATION_REPORTED, vaccinationReported.getVaccinationReportedExternalLink())
@@ -157,7 +157,7 @@ public class FhirRequests {
 		return vaccinationReported;
 	}
 	public VaccinationReported saveVaccinationReported(IGenericClient fhirClient, VaccinationMaster vaccinationMaster, VaccinationReported vaccinationReported) {
-		Immunization immunization = ImmunizationHandler.getFhirResource( vaccinationMaster, vaccinationReported);
+		Immunization immunization = ImmunizationMapper.getFhirResource( vaccinationMaster, vaccinationReported);
 		MethodOutcome outcome = save(fhirClient,immunization,
 			Immunization.IDENTIFIER.exactly()
 				.systemAndIdentifier(MappingHelper.VACCINATION_REPORTED, vaccinationReported.getVaccinationReportedExternalLink())

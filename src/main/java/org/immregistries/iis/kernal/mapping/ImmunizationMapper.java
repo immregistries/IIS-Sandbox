@@ -1,6 +1,5 @@
 package org.immregistries.iis.kernal.mapping;
 
-import org.hl7.fhir.instance.model.api.IIdType;
 import org.hl7.fhir.r5.model.*;
 import org.immregistries.iis.kernal.model.VaccinationMaster;
 import org.immregistries.iis.kernal.model.VaccinationReported;
@@ -9,7 +8,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 
-public class ImmunizationHandler {
+public class ImmunizationMapper {
 	public static final String CVX = "CVX";
 	public static final String MVX = "MVX";
 	public static final String NDC = "NDC";

@@ -2,41 +2,42 @@ package org.immregistries.iis.kernal.mapping;
 
 
 import org.hl7.fhir.r5.model.*;
+import org.immregistries.iis.kernal.model.ModelPerson;
 
-public class PersonHandler {
+public class PersonMapper {
 
 	public static final String ORGANISATION_ASSIGNING_AUTHORITY = "AssigningAuthority";
 
 
-  public static org.immregistries.iis.kernal.model.Person getModelPerson(Person p) {
-	  org.immregistries.iis.kernal.model.Person person = new org.immregistries.iis.kernal.model.Person();
-	  person.setPersonId(p.getId());
-	  person.setPersonExternalLink(p.getIdentifier().get(0).getValue());
+  public static ModelPerson getModelPerson(Person p) {
+	  ModelPerson modelPerson = new ModelPerson();
+	  modelPerson.setPersonId(p.getId());
+	  modelPerson.setPersonExternalLink(p.getIdentifier().get(0).getValue());
 		if (p.getNameFirstRep().getGiven().size() > 0) {
-			person.setNameFirst(p.getNameFirstRep().getGiven().get(0).getValue());
+			modelPerson.setNameFirst(p.getNameFirstRep().getGiven().get(0).getValue());
 		}
 		if (p.getNameFirstRep().getGiven().size() > 1) {
-			person.setNameMiddle(p.getNameFirstRep().getGiven().get(1).getValue());
+			modelPerson.setNameMiddle(p.getNameFirstRep().getGiven().get(1).getValue());
 		}
-		person.setNameLast(p.getNameFirstRep().getFamily());
-		person.setProfessionalSuffix(p.getNameFirstRep().getSuffixAsSingleString());
-		person.setAssigningAuthority(p.getManagingOrganization().getIdentifier().getValue());
+		modelPerson.setNameLast(p.getNameFirstRep().getFamily());
+		modelPerson.setProfessionalSuffix(p.getNameFirstRep().getSuffixAsSingleString());
+		modelPerson.setAssigningAuthority(p.getManagingOrganization().getIdentifier().getValue());
 
-	  return person;
+	  return modelPerson;
   }
 
-	public static Person getFhirPerson(org.immregistries.iis.kernal.model.Person dbPerson) {
+	public static Person getFhirPerson(ModelPerson modelPerson) {
 	   Person p = new Person();
-	   p.setId(dbPerson.getPersonId());
-	   p.addIdentifier(MappingHelper.getFhirIdentifier(MappingHelper.PERSON,dbPerson.getPersonExternalLink()));
+	   p.setId(modelPerson.getPersonId());
+	   p.addIdentifier(MappingHelper.getFhirIdentifier(MappingHelper.PERSON, modelPerson.getPersonExternalLink()));
 		HumanName name = p.addName();
-		name.setFamily(dbPerson.getNameLast());
-		name.addGiven(dbPerson.getNameFirst());
-		name.addGiven(dbPerson.getNameMiddle());
-		if ( dbPerson.getProfessionalSuffix() != null) {
-			name.addSuffix(dbPerson.getProfessionalSuffix());
+		name.setFamily(modelPerson.getNameLast());
+		name.addGiven(modelPerson.getNameFirst());
+		name.addGiven(modelPerson.getNameMiddle());
+		if ( modelPerson.getProfessionalSuffix() != null) {
+			name.addSuffix(modelPerson.getProfessionalSuffix());
 		}
-		p.setManagingOrganization(MappingHelper.getFhirReference(MappingHelper.ORGANISATION,ORGANISATION_ASSIGNING_AUTHORITY, dbPerson.getAssigningAuthority()));
+		p.setManagingOrganization(MappingHelper.getFhirReference(MappingHelper.ORGANISATION,ORGANISATION_ASSIGNING_AUTHORITY, modelPerson.getAssigningAuthority()));
 		return p;
 	}
 
