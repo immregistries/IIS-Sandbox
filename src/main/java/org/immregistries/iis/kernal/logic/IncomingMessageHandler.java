@@ -34,7 +34,7 @@ import java.util.*;
 
 public class IncomingMessageHandler {
 
-  	private Logger logger = LoggerFactory.getLogger(IncomingMessageHandler.class);
+  	private final Logger logger = LoggerFactory.getLogger(IncomingMessageHandler.class);
   	@Autowired
   	protected RepositoryClientFactory repositoryClientFactory;
   	@Autowired
@@ -66,7 +66,7 @@ public class IncomingMessageHandler {
   private static final String QUERY_TOO_MANY = "TM";
   private static final String QUERY_APPLICATION_ERROR = "AE";
 
-	protected Session dataSession = null;
+	protected Session dataSession;
 
 	public IncomingMessageHandler() {
 		dataSession = PopServlet.getDataSession();
@@ -85,20 +85,25 @@ public class IncomingMessageHandler {
               "MSH", 1, 4);
         }
       }
-      if (messageType.equals("VXU")) {
-        responseMessage = processVXU(orgAccess, reader, message);
-      } else if (messageType.equals("ORU")) {
-        responseMessage = processORU(orgAccess, reader, message);
-      } else if (messageType.equals("QBP")) {
-        responseMessage = processQBP(orgAccess, reader, message);
-      } else {
-        ProcessingException pe = new ProcessingException("Unsupported message", "", 0, 0);
-        List<ProcessingException> processingExceptionList = new ArrayList<>();
-        processingExceptionList.add(pe);
-        responseMessage = buildAck(reader, processingExceptionList);
-        recordMessageReceived(message, null, responseMessage, "Unknown", "NAck",
-            orgAccess.getOrg());
-      }
+		 switch (messageType) {
+			 case "VXU":
+				 responseMessage = processVXU(orgAccess, reader, message);
+				 break;
+			 case "ORU":
+				 responseMessage = processORU(orgAccess, reader, message);
+				 break;
+			 case "QBP":
+				 responseMessage = processQBP(orgAccess, reader, message);
+				 break;
+			 default:
+				 ProcessingException pe = new ProcessingException("Unsupported message", "", 0, 0);
+				 List<ProcessingException> processingExceptionList = new ArrayList<>();
+				 processingExceptionList.add(pe);
+				 responseMessage = buildAck(reader, processingExceptionList);
+				 recordMessageReceived(message, null, responseMessage, "Unknown", "NAck",
+					 orgAccess.getOrg());
+				 break;
+		 }
     } catch (Exception e) {
       e.printStackTrace(System.err);
       List<ProcessingException> processingExceptionList = new ArrayList<>();
@@ -460,16 +465,7 @@ public class IncomingMessageHandler {
           {
             String admininsteringProvider = reader.getValue(10);
             if (StringUtils.isNotEmpty(admininsteringProvider)) {
-              ModelPerson modelPerson = null;
-					try {
-						Bundle bundle = fhirClient.search().forResource(org.hl7.fhir.r5.model.Person.class)
-							.where(org.hl7.fhir.r5.model.Person.IDENTIFIER.exactly().code(admininsteringProvider))
-							.returnBundle(Bundle.class).execute();
-						if (bundle.hasEntry()) {
-							org.hl7.fhir.r5.model.Person fhirPerson = (org.hl7.fhir.r5.model.Person) bundle.getEntryFirstRep().getResource();
-							modelPerson = PersonMapper.getModelPerson(fhirPerson);
-						}
-					} catch (ResourceNotFoundException e) {}
+              ModelPerson modelPerson = fhirRequests.searchPerson(fhirClient,Person.IDENTIFIER.exactly().code(admininsteringProvider));
               if (modelPerson == null) {
                 modelPerson = new ModelPerson();
                 modelPerson.setPersonExternalLink(admininsteringProvider);
@@ -648,7 +644,7 @@ public class IncomingMessageHandler {
       throws ProcessingException {
 	  IGenericClient fhirClient = getFhirClient(orgAccess);
 
-    PatientMaster patientMaster = null;
+//    PatientMaster patientMaster = null;
     String patientReportedExternalLink = "";
     String patientReportedAuthority = "";
     String patientReportedType = "MR";
@@ -683,16 +679,17 @@ public class IncomingMessageHandler {
 	  );
 
     if (patientReported == null) {
-      patientMaster = new PatientMaster();
-      patientMaster.setOrgMaster(orgAccess.getOrg());
+//      patientMaster = new PatientMaster();
+//      patientMaster.setOrgMaster(orgAccess.getOrg());
 		 patientReported = new PatientReported();
       patientReported.setOrgReported(orgAccess.getOrg());
       patientReported.setPatientReportedExternalLink(patientReportedExternalLink);
-      patientReported.setPatient(patientMaster);
+//      patientReported.setPatient(patientMaster);
       patientReported.setReportedDate(new Date());
-    } else {
-		 patientMaster = patientReported.getPatient();
-	 }
+    }
+//	 else {
+//		 patientMaster = patientReported.getPatient();
+//	 }
 
     {
       String patientNameLast = reader.getValue(5, 1);
@@ -777,13 +774,13 @@ public class IncomingMessageHandler {
             "PID", 1, 7);
       }
 //      patientMaster.setPatientAddressFrag(addressFrag);
-      patientMaster.setPatientNameLast(patientNameLast);
-      patientMaster.setPatientNameFirst(patientNameFirst);
-      patientMaster.setPatientNameMiddle(patientNameMiddle);
-//      patientMaster.setPatientPhoneFrag(patientPhone);
-      patientMaster.setPatientBirthDate(patientBirthDate);
-//      patientMaster.setPatientSoundexFirst(""); // TODO, later
-//      patientMaster.setPatientSoundexLast(""); // TODO, later
+//      patientMaster.setPatientNameLast(patientNameLast);
+//      patientMaster.setPatientNameFirst(patientNameFirst);
+//      patientMaster.setPatientNameMiddle(patientNameMiddle);
+////      patientMaster.setPatientPhoneFrag(patientPhone);
+//      patientMaster.setPatientBirthDate(patientBirthDate);
+////      patientMaster.setPatientSoundexFirst(""); // TODO, later
+////      patientMaster.setPatientSoundexLast(""); // TODO, later
       patientReported.setPatientReportedExternalLink(patientReportedExternalLink);
       patientReported.setPatientReportedType(patientReportedType);
       patientReported.setPatientNameFirst(patientNameFirst);
@@ -1009,11 +1006,8 @@ public class IncomingMessageHandler {
 
       CodeMap codeMap = CodeMapManager.getCodeMap();
 
-      boolean strictDate = true;
-      if (processingFlavorSet.contains(ProcessingFlavor.CANTALOUPE)) {
-        strictDate = false;
-      }
-      PatientReported patientReported = null;
+      boolean strictDate = !processingFlavorSet.contains(ProcessingFlavor.CANTALOUPE);
+		 PatientReported patientReported = null;
 
       patientReported = processPatient(orgAccess, reader, processingExceptionList,
           processingFlavorSet, codeMap, strictDate, patientReported);
@@ -1087,18 +1081,9 @@ public class IncomingMessageHandler {
         ObservationReported observationReported = observationMaster.getObservationReported();
 		  observationMaster.setPatient(patientReported.getPatient());
 
-//        observationMaster.setObservationReported(null); //TODO change or create master
+//		  Observation observation = ObservationMapper.getFhirResource(observationMaster,observationReported);
+		  observationReported = fhirRequests.saveObservationReported(fhirClient,observationReported);
 
-		  Observation observation = ObservationMapper.getFhirResource(observationMaster,observationReported);
-			try {
-				MethodOutcome outcome = fhirClient.update().resource(observation)
-					.conditionalByUrl("Observation?identifier=ObservationReported|"
-						+ observationReported.getObservationReportedId())
-					.execute(); // TODO verify injection
-			} catch (ResourceNotFoundException e){
-				MethodOutcome outcome = fhirClient.create().resource(observation)
-					.execute();
-			}
       }
     }
     return obxCount;
@@ -1295,9 +1280,9 @@ public class IncomingMessageHandler {
     {
       String sendersUniqueId = reader.getValue(10);
       if (hasErrors(processingExceptionList)) {
-        sb.append("MSA|AE|" + sendersUniqueId + "\r");
+        sb.append("MSA|AE|").append(sendersUniqueId).append("\r");
       } else {
-        sb.append("MSA|AA|" + sendersUniqueId + "\r");
+        sb.append("MSA|AA|").append(sendersUniqueId).append("\r");
       }
       if (processingExceptionList.size() > 0) {
         printERRSegment(processingExceptionList.get(processingExceptionList.size() - 1), sb);
@@ -1313,14 +1298,14 @@ public class IncomingMessageHandler {
       profileName = "Request Evaluated Immunization History and Forecast Query";
     }
     {
-      sb.append("QAK|" + queryId);
-      sb.append("|" + queryResponse);
+      sb.append("QAK|").append(queryId);
+      sb.append("|").append(queryResponse);
       sb.append("|");
-      sb.append("" + profileIdSubmitted + "^" + profileName + "^CDCPHINVS\r");
+      sb.append(profileIdSubmitted).append("^").append(profileName).append("^CDCPHINVS\r");
     }
     reader.resetPostion();
     if (reader.advanceToSegment("QPD")) {
-      sb.append(reader.getOriginalSegment() + "\r");
+      sb.append(reader.getOriginalSegment()).append("\r");
     } else {
       sb.append("QPD|");
     }
@@ -1383,16 +1368,16 @@ public class IncomingMessageHandler {
             adminDate = "";
         }
         // RXA-3
-        sb.append("|" + adminDate);
+        sb.append("|").append(adminDate);
         // RXA-4
         sb.append("|");
         // RXA-5
-        sb.append("|" + cvxCode.getValue() + "^" + cvxCode.getLabel() + "^CVX");
+        sb.append("|").append(cvxCode.getValue()).append("^").append(cvxCode.getLabel()).append("^CVX");
         if (!vaccinationReported.getVaccineNdcCode().equals("")) {
           Code ndcCode = codeMap.getCodeForCodeset(CodesetType.VACCINATION_NDC_CODE,
               vaccinationReported.getVaccineNdcCode());
           if (ndcCode != null) {
-            sb.append("~" + ndcCode.getValue() + "^" + ndcCode.getLabel() + "^NDC");
+            sb.append("~").append(ndcCode.getValue()).append("^").append(ndcCode.getLabel()).append("^NDC");
           }
         }
         {
@@ -1426,7 +1411,7 @@ public class IncomingMessageHandler {
                 vaccinationReported.getInformationSource());
           }
           if (informationCode != null) {
-            sb.append(informationCode.getValue() + "^" + informationCode.getLabel() + "^NIP001");
+            sb.append(informationCode.getValue()).append("^").append(informationCode.getLabel()).append("^NIP001");
           }
         }
         // RXA-10
@@ -1675,16 +1660,16 @@ public class IncomingMessageHandler {
         // RXA-2
         sb.append("|1");
         // RXA-3
-        sb.append("|" + sdf.format(vaccination.getAdministeredDate()));
+        sb.append("|").append(sdf.format(vaccination.getAdministeredDate()));
         // RXA-4
         sb.append("|");
         // RXA-5
-        sb.append("|" + cvxCode.getValue() + "^" + cvxCode.getLabel() + "^CVX");
+        sb.append("|").append(cvxCode.getValue()).append("^").append(cvxCode.getLabel()).append("^CVX");
         if (!vaccinationReported.getVaccineNdcCode().equals("")) {
           Code ndcCode = codeMap.getCodeForCodeset(CodesetType.VACCINATION_NDC_CODE,
               vaccinationReported.getVaccineNdcCode());
           if (ndcCode != null) {
-            sb.append("~" + ndcCode.getValue() + "^" + ndcCode.getLabel() + "^NDC");
+            sb.append("~").append(ndcCode.getValue()).append("^").append(ndcCode.getLabel()).append("^NDC");
           }
         }
         {
@@ -1718,7 +1703,7 @@ public class IncomingMessageHandler {
                 vaccinationReported.getInformationSource());
           }
           if (informationCode != null) {
-            sb.append(informationCode.getValue() + "^" + informationCode.getLabel() + "^NIP001");
+            sb.append(informationCode.getValue()).append("^").append(informationCode.getLabel()).append("^NIP001");
           }
         }
         // RXA-10
@@ -1775,7 +1760,7 @@ public class IncomingMessageHandler {
             || (!actionCode.equals("A") && !actionCode.equals("D"))) {
           actionCode = "A";
         }
-        sb.append("|" + vaccinationReported.getActionCode());
+        sb.append("|").append(vaccinationReported.getActionCode());
         sb.append("\r");
         if (vaccinationReported.getBodyRoute() != null
             && !vaccinationReported.getBodyRoute().equals("")) {
@@ -1881,9 +1866,8 @@ public class IncomingMessageHandler {
         if (code != null) {
           sb.append("NK1");
           sb.append("|1");
-          sb.append("|" + patientReported.getGuardianLast() + "^"
-              + patientReported.getGuardianFirst() + "^^^^^L");
-          sb.append("|" + code.getValue() + "^" + code.getLabel() + "^HL70063");
+          sb.append("|").append(patientReported.getGuardianLast()).append("^").append(patientReported.getGuardianFirst()).append("^^^^^L");
+          sb.append("|").append(code.getValue()).append("^").append(code.getLabel()).append("^HL70063");
           sb.append("\r");
         }
       }
@@ -1896,15 +1880,13 @@ public class IncomingMessageHandler {
     // PID
     sb.append("PID");
     // PID-1
-    sb.append("|" + pidCount);
+    sb.append("|").append(pidCount);
     // PID-2
     sb.append("|");
     // PID-3
-    sb.append("|" + patient.getPatientExternalLink() + "^^^IIS^SR");
+    sb.append("|").append(patient.getPatientExternalLink()).append("^^^IIS^SR");
     if (patientReported != null) {
-      sb.append("~" + patientReported.getPatientReportedExternalLink() + "^^^"
-          + patientReported.getPatientReportedAuthority() + "^"
-          + patientReported.getPatientReportedType());
+      sb.append("~").append(patientReported.getPatientReportedExternalLink()).append("^^^").append(patientReported.getPatientReportedAuthority()).append("^").append(patientReported.getPatientReportedType());
     }
     // PID-4
     sb.append("|");
@@ -1934,15 +1916,15 @@ public class IncomingMessageHandler {
       }
     }
 
-    sb.append("|" + lastName + "^" + firstName + "^" + middleName + "^^^^L");
+    sb.append("|").append(lastName).append("^").append(firstName).append("^").append(middleName).append("^^^^L");
 
     // PID-6
     sb.append("|");
     if (patientReported != null) {
-      sb.append(patientReported.getPatientMotherMaiden() + "^^^^^^M");
+      sb.append(patientReported.getPatientMotherMaiden()).append("^^^^^^M");
     }
     // PID-7
-    sb.append("|" + dateOfBirth);
+    sb.append("|").append(dateOfBirth);
     if (patientReported != null) {
       // PID-8
       {
@@ -1950,7 +1932,7 @@ public class IncomingMessageHandler {
         if (!sex.equals("F") && !sex.equals("M") && !sex.equals("X")) {
           sex = "U";
         }
-        sb.append("|" + sex);
+        sb.append("|").append(sex);
       }
       // PID-9
       sb.append("|");
@@ -1977,11 +1959,7 @@ public class IncomingMessageHandler {
         }
       }
       // PID-11
-      sb.append("|" + patientReported.getPatientAddressLine1() + "^"
-          + patientReported.getPatientAddressLine2() + "^" + patientReported.getPatientAddressCity()
-          + "^" + patientReported.getPatientAddressState() + "^"
-          + patientReported.getPatientAddressZip() + "^"
-          + patientReported.getPatientAddressCountry() + "^");
+      sb.append("|").append(patientReported.getPatientAddressLine1()).append("^").append(patientReported.getPatientAddressLine2()).append("^").append(patientReported.getPatientAddressCity()).append("^").append(patientReported.getPatientAddressState()).append("^").append(patientReported.getPatientAddressZip()).append("^").append(patientReported.getPatientAddressCountry()).append("^");
       if (!processingFlavorSet.contains(ProcessingFlavor.LIME)) {
         sb.append("P");
       }
@@ -1991,7 +1969,7 @@ public class IncomingMessageHandler {
       sb.append("|");
       String phone = patientReported.getPatientPhone();
       if (phone.length() == 10) {
-        sb.append("^PRN^PH^^^" + phone.substring(0, 3) + "^" + phone.substring(3, 10));
+        sb.append("^PRN^PH^^^").append(phone.substring(0, 3)).append("^").append(phone.substring(3, 10));
       }
       // PID-14
       sb.append("|");
@@ -2053,7 +2031,7 @@ public class IncomingMessageHandler {
     // ORC-2
     sb.append("|");
     if (vaccination != null) {
-      sb.append(vaccination.getVaccinationId() + "^IIS");
+      sb.append(vaccination.getVaccinationId()).append("^IIS");
     }
     // ORC-3
     sb.append("|");
@@ -2065,8 +2043,7 @@ public class IncomingMessageHandler {
       }
     } else {
       if (originalReporter) {
-        sb.append(vaccinationReported.getVaccinationReportedExternalLink() + "^"
-            + orgAccess.getOrg().getOrganizationName());
+        sb.append(vaccinationReported.getVaccinationReportedExternalLink()).append("^").append(orgAccess.getOrg().getOrganizationName());
       }
     }
     sb.append("\r");
@@ -2139,7 +2116,7 @@ public class IncomingMessageHandler {
     sb.append("CE");
     // OBX-3
     sb.append("|");
-    sb.append(loinc + "^" + loincLabel + "^LN");
+    sb.append(loinc).append("^").append(loincLabel).append("^LN");
     // OBX-4
     sb.append("|");
     sb.append(obsSubId);
@@ -2174,8 +2151,7 @@ public class IncomingMessageHandler {
     sb.append(ob.getValueType());
     // OBX-3
     sb.append("|");
-    sb.append(
-        ob.getIdentifierCode() + "^" + ob.getIdentifierLabel() + "^" + ob.getIdentifierTable());
+    sb.append(ob.getIdentifierCode()).append("^").append(ob.getIdentifierLabel()).append("^").append(ob.getIdentifierTable());
     // OBX-4
     sb.append("|");
     sb.append(obsSubId);
@@ -2184,14 +2160,14 @@ public class IncomingMessageHandler {
     if (ob.getValueTable().equals("")) {
       sb.append(ob.getValueCode());
     } else {
-      sb.append(ob.getValueCode() + "^" + ob.getValueLabel() + "^" + ob.getValueTable());
+      sb.append(ob.getValueCode()).append("^").append(ob.getValueLabel()).append("^").append(ob.getValueTable());
     }
     // OBX-6
     sb.append("|");
     if (ob.getUnitsTable().equals("")) {
       sb.append(ob.getUnitsCode());
     } else {
-      sb.append(ob.getUnitsCode() + "^" + ob.getUnitsLabel() + "^" + ob.getUnitsTable());
+      sb.append(ob.getUnitsCode()).append("^").append(ob.getUnitsLabel()).append("^").append(ob.getUnitsTable());
     }
     // OBX-7
     sb.append("|");
@@ -2223,7 +2199,7 @@ public class IncomingMessageHandler {
     if (ob.getMethodTable().equals("")) {
       sb.append(ob.getMethodCode());
     } else {
-      sb.append(ob.getMethodCode() + "^" + ob.getMethodLabel() + "^" + ob.getMethodTable());
+      sb.append(ob.getMethodCode()).append("^").append(ob.getMethodLabel()).append("^").append(ob.getMethodTable());
     }
     sb.append("\r");
   }
@@ -2239,13 +2215,13 @@ public class IncomingMessageHandler {
     sb.append("CE");
     // OBX-3
     sb.append("|");
-    sb.append(loinc + "^" + loincLabel + "^LN");
+    sb.append(loinc).append("^").append(loincLabel).append("^LN");
     // OBX-4
     sb.append("|");
     sb.append(obsSubId);
     // OBX-5
     sb.append("|");
-    sb.append(value + "^" + valueLabel + "^" + valueTable);
+    sb.append(value).append("^").append(valueLabel).append("^").append(valueTable);
     // OBX-6
     sb.append("|");
     // OBX-7
@@ -2274,7 +2250,7 @@ public class IncomingMessageHandler {
     sb.append("DT");
     // OBX-3
     sb.append("|");
-    sb.append(loinc + "^" + loincLabel + "^LN");
+    sb.append(loinc).append("^").append(loincLabel).append("^LN");
     // OBX-4
     sb.append("|");
     sb.append(obsSubId);
@@ -2340,7 +2316,7 @@ public class IncomingMessageHandler {
       }
     }
 
-    sb.append("MSA|" + overallStatus + "|" + sendersUniqueId + "\r");
+    sb.append("MSA|").append(overallStatus).append("|").append(sendersUniqueId).append("\r");
     for (ProcessingException pe : processingExceptionList) {
       printERRSegment(pe, sb);
     }
@@ -2351,9 +2327,9 @@ public class IncomingMessageHandler {
     sb.append("ERR|");
     sb.append("|"); // 2
     if (e.getSegmentId() != null && !e.getSegmentId().equals("")) {
-      sb.append(e.getSegmentId() + "^" + e.getSegmentRepeat());
+      sb.append(e.getSegmentId()).append("^").append(e.getSegmentRepeat());
       if (e.getFieldPosition() > 0) {
-        sb.append("^" + e.getFieldPosition());
+        sb.append("^").append(e.getFieldPosition());
       }
     }
     sb.append("|101^Required field missing^HL70357"); // 3
@@ -2368,7 +2344,7 @@ public class IncomingMessageHandler {
     sb.append("|"); // 5
     sb.append("|"); // 6
     sb.append("|"); // 7
-    sb.append("|" + e.getMessage()); // 8
+    sb.append("|").append(e.getMessage()); // 8
     sb.append("|\r");
   }
 
@@ -2377,15 +2353,15 @@ public class IncomingMessageHandler {
     String sendingApp = "";
     String sendingFac = "";
     String receivingApp = "";
-    String receivingFac = "IIS Sandbox";
+    StringBuilder receivingFac = new StringBuilder("IIS Sandbox");
     if (processingFlavorSet != null) {
       for (ProcessingFlavor processingFlavor : ProcessingFlavor.values()) {
         if (processingFlavorSet.contains(processingFlavor)) {
-          receivingFac += " " + processingFlavor.getKey();
+          receivingFac.append(" ").append(processingFlavor.getKey());
         }
       }
     }
-    receivingFac += " v" + SoftwareVersion.VERSION;
+    receivingFac.append(" v" + SoftwareVersion.VERSION);
 
     reader.resetPostion();
     if (reader.advanceToSegment("MSH")) {
@@ -2407,15 +2383,15 @@ public class IncomingMessageHandler {
     String production = reader.getValue(11);
     // build MSH
     sb.append("MSH|^~\\&|");
-    sb.append(receivingApp + "|");
-    sb.append(receivingFac + "|");
-    sb.append(sendingApp + "|");
-    sb.append(sendingFac + "|");
-    sb.append(sendingDateString + "|");
+    sb.append(receivingApp).append("|");
+    sb.append(receivingFac).append("|");
+    sb.append(sendingApp).append("|");
+    sb.append(sendingFac).append("|");
+    sb.append(sendingDateString).append("|");
     sb.append("|");
-    sb.append(messageType + "|");
-    sb.append(uniqueId + "|");
-    sb.append(production + "|");
+    sb.append(messageType).append("|");
+    sb.append(uniqueId).append("|");
+    sb.append(production).append("|");
     sb.append("2.5.1|");
     sb.append("|");
     sb.append("|");
@@ -2425,7 +2401,7 @@ public class IncomingMessageHandler {
     sb.append("|");
     sb.append("|");
     sb.append("|");
-    sb.append(profileId + "^CDCPHINVS\r");
+    sb.append(profileId).append("^CDCPHINVS\r");
   }
 
   private static Integer increment = 1;
@@ -2520,10 +2496,10 @@ public class IncomingMessageHandler {
   }
 
   public String generateId() {
-    String patientRegistryId = "";
+    StringBuilder patientRegistryId = new StringBuilder();
     for (int i = 0; i < 12; i++) {
-      patientRegistryId += ID_CHARS[random.nextInt(ID_CHARS.length)];
+      patientRegistryId.append(ID_CHARS[random.nextInt(ID_CHARS.length)]);
     }
-    return patientRegistryId;
+    return patientRegistryId.toString();
   }
 }
