@@ -35,6 +35,11 @@ public class MappingHelper {
 			.setType(fhirType)
 			.setIdentifier(getFhirIdentifier(dbType,identifier));
 	}
+	public  static Reference getFhirReference(String fhirType, String dbType, String identifier, String fhirId) {
+		return new Reference(fhirType + "/" + fhirId)
+			.setType(fhirType)
+			.setIdentifier(getFhirIdentifier(dbType,identifier));
+	}
 
 	public  static Identifier getFhirIdentifier(String dbType, String identifier) {
 		return new Identifier()

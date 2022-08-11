@@ -327,9 +327,14 @@ public class PatientServlet extends HttpServlet {
         }
 
         {
-          String link = req.getServletPath().split("/patient")[0] = "/fhir/" + orgAccess.getAccessName() + "/Patient/"
-              + patientReportedSelected.getPatientReportedId();;
-          out.println("<a href=\"" + link + "\">FHIR Bundle</a>");
+          String link = req.getContextPath().split("/patient")[0] = "/fhir/" + orgAccess.getAccessName() + "/Patient/"
+	              + patientReportedSelected.getPatientReportedId();;
+          out.println("<a href=\"" + link + "\">FHIR Resource</a>");
+        }
+		  {
+          String link = req.getContextPath().split("/patient")[0] = "/fhir/" + orgAccess.getAccessName() + "/Patient?identifier="
+	              + patientReportedSelected.getPatientReportedExternalLink();
+          out.println("<a href=\"" + link + "\">all FHIR Resources</a>");
         }
 
         out.println("  </div>");

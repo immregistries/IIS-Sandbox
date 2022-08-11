@@ -1,6 +1,7 @@
 package org.immregistries.iis.kernal.repository;
 
 import ca.uhn.fhir.jpa.api.dao.IFhirResourceDao;
+import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.gclient.ICriterion;
@@ -22,6 +23,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static org.immregistries.iis.kernal.mapping.MappingHelper.OBSERVATION_REPORTED;
+import static org.immregistries.iis.kernal.mapping.MappingHelper.PATIENT_REPORTED;
+
 @Component
 public class FhirRequests {
 	@Autowired
@@ -31,24 +35,26 @@ public class FhirRequests {
 
 	Logger logger = LoggerFactory.getLogger(FhirRequests.class);
 
+	public PatientMaster searchPatientMaster(IGenericClient fhirClient, ICriterion... where) {
+		PatientMaster patientMaster = null;
+		Bundle bundle = searchGoldenRecord(Patient.class,fhirClient, where);
+		if (bundle.hasEntry()) {
+			patientMaster = PatientMapper.getMaster(new PatientMaster(),(Patient) bundle.getEntryFirstRep().getResource());
+		}
+		return patientMaster;
+	}
 	public PatientReported searchPatientReported(IGenericClient fhirClient, ICriterion... where) {
 		PatientReported patientReported = null;
-		Bundle bundle = search(Patient.class,fhirClient, where);
+		Bundle bundle = searchRegularRecord(Patient.class,fhirClient, where);
 		if (bundle.hasEntry()) {
-			List<Bundle.BundleEntryComponent> list = bundle.getEntry().stream()
-				// filter out the golden records
-				.filter(entry -> entry.getResource().getMeta().getTag().stream().noneMatch(coding -> coding.getCode().equals("GOLDEN_RECORD")))
-				.collect(Collectors.toList());
-			if (list.size() > 0) {
-				patientReported = PatientMapper.getReported((Patient) list.get(0).getResource());
-			}
+			patientReported = PatientMapper.getReported((Patient) bundle.getEntryFirstRep().getResource());
 		}
 		return patientReported;
 	}
 
 	public List<PatientReported> searchPatientReportedList(IGenericClient fhirClient, ICriterion... where) {
 		List<PatientReported> patientReportedList = new ArrayList<>();
-		Bundle bundle = search(Patient.class,fhirClient, where);
+		Bundle bundle = searchRegularRecord(Patient.class,fhirClient, where);
 		for (Bundle.BundleEntryComponent entry: bundle.getEntry()) {
 			patientReportedList.add(PatientMapper.getReported((Patient) entry.getResource()));
 		}
@@ -114,6 +120,33 @@ public class FhirRequests {
 	}
 
 
+	private Bundle searchGoldenRecord(Class<? extends org.hl7.fhir.instance.model.api.IBaseResource> aClass,
+												 IGenericClient fhirClient,
+												 ICriterion... where) {
+		Bundle bundle =search(aClass,fhirClient,where);
+		if (bundle.hasEntry()) {
+			List<Bundle.BundleEntryComponent> list = bundle.getEntry().stream()
+				// filter the golden records
+				.filter(entry -> entry.getResource().getMeta().getTag().stream().anyMatch(coding -> coding.getCode().equals("GOLDEN_RECORD")))
+				.collect(Collectors.toList());
+			bundle.setEntry(list);
+		}
+		return bundle;
+	}
+
+	private Bundle searchRegularRecord(Class<? extends org.hl7.fhir.instance.model.api.IBaseResource> aClass,
+												 IGenericClient fhirClient,
+												 ICriterion... where) {
+		Bundle bundle =search(aClass,fhirClient,where);
+		if (bundle.hasEntry()) {
+			List<Bundle.BundleEntryComponent> list = bundle.getEntry().stream()
+				// filter out the golden records
+				.filter(entry -> entry.getResource().getMeta().getTag().stream().noneMatch(coding -> coding.getCode().equals("GOLDEN_RECORD")))
+				.collect(Collectors.toList());
+			bundle.setEntry(list);
+		}
+		return bundle;
+	}
 	private Bundle search(
 		Class<? extends org.hl7.fhir.instance.model.api.IBaseResource> aClass,
 		IGenericClient fhirClient,
@@ -140,7 +173,7 @@ public class FhirRequests {
 //		Patient patient = new Patient();
 //		PatientHandler.fillFhirResource(patient, null,patientReported);
 		MethodOutcome outcome = save(fhirClient,patient,
-			Patient.IDENTIFIER.exactly().systemAndIdentifier(MappingHelper.PATIENT_REPORTED,patientReported.getPatientReportedExternalLink()));
+			Patient.IDENTIFIER.exactly().systemAndIdentifier(PATIENT_REPORTED,patientReported.getPatientReportedExternalLink()));
 		if (outcome.getCreated() != null && outcome.getCreated()) {
 			patientReported.setPatientReportedId(outcome.getId().getIdPart());
 		} else if (!outcome.getResource().isEmpty()) {
@@ -152,7 +185,7 @@ public class FhirRequests {
 	public ObservationReported saveObservationReported(IGenericClient fhirClient, ObservationReported observationReported) {
 		Observation observation = ObservationMapper.getFhirResource(null,observationReported);
 		MethodOutcome outcome = save(fhirClient,observation,
-			Observation.IDENTIFIER.exactly().systemAndIdentifier(MappingHelper.OBSERVATION_REPORTED,observationReported.getObservationReportedId()));
+			Observation.IDENTIFIER.exactly().systemAndIdentifier(OBSERVATION_REPORTED,observationReported.getObservationReportedId()));
 		if (outcome.getCreated() != null && outcome.getCreated()) {
 			observationReported.setPatientReportedId(outcome.getId().getIdPart());
 		} else if (!outcome.getResource().isEmpty()) {

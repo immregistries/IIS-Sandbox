@@ -1,6 +1,6 @@
 {
   "version": "1",
-  "mdmTypes": ["Patient", "Observation","Immunization"],
+  "mdmTypes": ["Patient", "Practitioner", "Immunization"],
   "candidateSearchParams": [
     {
       "resourceType": "Patient",
@@ -8,11 +8,15 @@
     },
     {
       "resourceType": "Immunization",
-      "searchParams": ["vaccine-code","patient","date","lot-number"]
+      "searchParams": ["vaccine-code","date","lot-number","patient"]
     },
     {
       "resourceType": "*",
       "searchParams": ["identifier"]
+    },
+    {
+      "resourceType": "Patient",
+      "searchParams": ["general-practitioner"]
     }
   ],
   "candidateFilterSearchParams": [
@@ -38,11 +42,31 @@
       "matcher": {
         "algorithm": "SOUNDEX"
       }
+    },
+    {
+      "name": "practitioner-given-name",
+      "resourceType": "Practitioner",
+      "resourcePath": "name.given",
+      "matcher": {
+        "algorithm": "COLOGNE"
+      }
+    },
+    {
+      "name": "practitioner-last-name",
+      "resourceType": "Practitioner",
+      "resourcePath": "name.family",
+      "matcher": {
+        "algorithm": "SOUNDEX"
+      }
     }
   ],
   "matchResultMap": {
     "cosine-given-name" : "POSSIBLE_MATCH",
     "cosine-given-name,jaro-last-name" : "MATCH"
   },
-  "eidSystem": "urn:mrns"
+  "eidSystems": {
+    "Patient": "urn:mrns",
+    "Immunization": "urn:mrns",
+    "Practitioner": "urn:mrns"
+  }
 }

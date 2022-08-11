@@ -10,6 +10,8 @@ import org.immregistries.iis.kernal.model.PatientReported;
 import java.text.ParseException;
 import java.util.Date;
 
+import static org.immregistries.iis.kernal.mapping.MappingHelper.PATIENT_REPORTED;
+
 public class PatientMapper {
 
 	private PatientMapper() {
@@ -31,7 +33,7 @@ public class PatientMapper {
 	public static PatientReported getReported(Patient p) {
 		PatientReported patientReported = new PatientReported();
 		fillPatientReportedFromFhir(patientReported, p);
-		patientReported.setPatient(getMaster(patientReported.getPatient(), p));
+//		patientReported.setPatient(getMaster(patientReported.getPatient(), p));
 		return patientReported;
 	}
 
@@ -43,7 +45,7 @@ public class PatientMapper {
 	 */
 	private static void fillPatientReportedFromFhir(PatientReported patientReported, Patient p) {
 		patientReported.setPatientReportedId(new IdType(p.getId()).getIdPart());
-		patientReported.setPatientReportedExternalLink(MappingHelper.filterIdentifier(p.getIdentifier(),MappingHelper.PATIENT_REPORTED).getValue());
+		patientReported.setPatientReportedExternalLink(MappingHelper.filterIdentifier(p.getIdentifier(),PATIENT_REPORTED).getValue());
 		patientReported.setUpdatedDate(p.getMeta().getLastUpdated());
 
 		patientReported.setPatientReportedAuthority(p.getManagingOrganization().getIdentifier().getValue());
@@ -198,7 +200,7 @@ public class PatientMapper {
 			patientMaster = new PatientMaster();
 		}
 		patientMaster.setPatientId(p.getId());
-		patientMaster.setPatientExternalLink(MappingHelper.filterIdentifier(p.getIdentifier(),MappingHelper.PATIENT_REPORTED).getValue());
+		patientMaster.setPatientExternalLink(MappingHelper.filterIdentifier(p.getIdentifier(), PATIENT_REPORTED).getValue());
 		patientMaster.setPatientNameFirst(p.getNameFirstRep().getGiven().get(0).getValue());
 		if (p.getNameFirstRep().getGiven().size() > 1) {
 			patientMaster.setPatientNameMiddle(p.getNameFirstRep().getGiven().get(1).getValue());
@@ -226,7 +228,7 @@ public class PatientMapper {
 			p.setBirthDate(pm.getPatientBirthDate());
 		}
 		if (pr != null) {
-			p.addIdentifier(MappingHelper.getFhirIdentifier(MappingHelper.PATIENT_REPORTED, pr.getPatientReportedExternalLink()));
+			p.addIdentifier(MappingHelper.getFhirIdentifier(PATIENT_REPORTED, pr.getPatientReportedExternalLink()));
 //			p.setManagingOrganization(MappingHelper.getFhirReference("","PatientReportedAuthority",pr.getPatientReportedAuthority()));
 			p.setBirthDate(pr.getPatientBirthDate());
 			if (p.getNameFirstRep() != null) {
