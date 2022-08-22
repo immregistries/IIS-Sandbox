@@ -44,7 +44,7 @@ public class SubscriptionTopicServlet extends HttpServlet {
 				.setQueryCriteria(new SubscriptionTopic.SubscriptionTopicResourceTriggerQueryCriteriaComponent()
 					.setResultForCreate(SubscriptionTopic.CriteriaNotExistsBehavior.TESTPASSES)
 					.setResultForDelete(SubscriptionTopic.CriteriaNotExistsBehavior.TESTPASSES)
-					.setCurrent("Operation?issue.severity=error")
+					.setCurrent("OperationOutcome?issue.severity=error")
 				);
 		SubscriptionTopic.SubscriptionTopicEventTriggerComponent eventTrigger =
 			new SubscriptionTopic.SubscriptionTopicEventTriggerComponent().setEvent( new CodeableConcept()

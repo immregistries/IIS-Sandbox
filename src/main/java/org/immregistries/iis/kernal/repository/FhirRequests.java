@@ -3,11 +3,12 @@ package org.immregistries.iis.kernal.repository;
 import ca.uhn.fhir.jpa.api.dao.IFhirResourceDao;
 import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
 import ca.uhn.fhir.rest.api.MethodOutcome;
+import ca.uhn.fhir.rest.api.server.IBundleProvider;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
-import ca.uhn.fhir.rest.gclient.ICriterion;
-import ca.uhn.fhir.rest.gclient.IQuery;
-import ca.uhn.fhir.rest.gclient.IUpdateTyped;
-import ca.uhn.fhir.rest.gclient.IUpdateWithQuery;
+import ca.uhn.fhir.rest.gclient.*;
+import ca.uhn.fhir.rest.param.StringParam;
+import ca.uhn.fhir.rest.param.TokenParam;
+import ca.uhn.fhir.rest.param.TokenParamModifier;
 import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r5.model.*;
@@ -33,7 +34,15 @@ public class FhirRequests {
 	@Autowired
 	RepositoryClientFactory repositoryClientFactory;
 
+	@Autowired
+	protected IFhirResourceDao<org.hl7.fhir.r5.model.Patient> myPatientDao;
+
 	Logger logger = LoggerFactory.getLogger(FhirRequests.class);
+
+
+	private static final String GOLDEN_SYSTEM = "http://hapifhir.io/fhir/NamingSystem/mdm-golden-resource-enterprise-id";
+	private static final String GOLDEN_RECORD = "GOLDEN_RECORD";
+	private static final String GOLDEN_TAG = GOLDEN_SYSTEM +"|" + GOLDEN_RECORD;
 
 	public PatientMaster searchPatientMaster(IGenericClient fhirClient, ICriterion... where) {
 		PatientMaster patientMaster = null;
@@ -46,6 +55,12 @@ public class FhirRequests {
 	public PatientReported searchPatientReported(IGenericClient fhirClient, ICriterion... where) {
 		PatientReported patientReported = null;
 		Bundle bundle = searchRegularRecord(Patient.class,fhirClient, where);
+//		SearchParameterMap map = new SearchParameterMap().add("_tag",new TokenParam().setSystem(GOLDEN_SYSTEM).setValue(GOLDEN_RECORD).setModifier(TokenParamModifier.NOT));
+//		IBundleProvider bundle1 = myPatientDao.search(map);
+//		if (!bundle1.isEmpty()) {
+//			patientReported = PatientMapper.getReported((Patient) bundle.getEntryFirstRep().getResource());
+//		}
+
 		if (bundle.hasEntry()) {
 			patientReported = PatientMapper.getReported((Patient) bundle.getEntryFirstRep().getResource());
 		}
@@ -54,6 +69,11 @@ public class FhirRequests {
 
 	public List<PatientReported> searchPatientReportedList(IGenericClient fhirClient, ICriterion... where) {
 		List<PatientReported> patientReportedList = new ArrayList<>();
+//		SearchParameterMap map = new SearchParameterMap().add("_tag",new TokenParam().setSystem(GOLDEN_SYSTEM).setValue(GOLDEN_RECORD).setModifier(TokenParamModifier.NOT));
+//		IBundleProvider bundle1 = myPatientDao.search(map, th);
+//		for (IBaseResource entry: bundle1.getAllResources()) {
+//			patientReportedList.add(PatientMapper.getReported((Patient) entry));
+//		}
 		Bundle bundle = searchRegularRecord(Patient.class,fhirClient, where);
 		for (Bundle.BundleEntryComponent entry: bundle.getEntry()) {
 			patientReportedList.add(PatientMapper.getReported((Patient) entry.getResource()));
@@ -62,7 +82,7 @@ public class FhirRequests {
 	}
 	public VaccinationReported searchVaccinationReported(IGenericClient fhirClient, ICriterion... where) {
 		VaccinationReported vaccinationReported = null;
-		Bundle bundle = search(Immunization.class,fhirClient, where);
+		Bundle bundle = searchRegularRecord(Immunization.class,fhirClient, where);
 		if (bundle.hasEntry()) {
 			vaccinationReported = ImmunizationMapper.getReported((Immunization) bundle.getEntryFirstRep().getResource());
 		}
@@ -70,7 +90,7 @@ public class FhirRequests {
 	}
 	public List<VaccinationReported> searchVaccinationReportedList(IGenericClient fhirClient, ICriterion... where) {
 		List<VaccinationReported> vaccinationReportedList = new ArrayList<>();
-		Bundle bundle = search(Immunization.class,fhirClient, where);
+		Bundle bundle = searchRegularRecord(Immunization.class,fhirClient, where);
 		for (Bundle.BundleEntryComponent entry: bundle.getEntry()) {
 			vaccinationReportedList.add(ImmunizationMapper.getReported((Immunization) entry.getResource()));
 		}
@@ -123,29 +143,41 @@ public class FhirRequests {
 	private Bundle searchGoldenRecord(Class<? extends org.hl7.fhir.instance.model.api.IBaseResource> aClass,
 												 IGenericClient fhirClient,
 												 ICriterion... where) {
-		Bundle bundle =search(aClass,fhirClient,where);
-		if (bundle.hasEntry()) {
-			List<Bundle.BundleEntryComponent> list = bundle.getEntry().stream()
-				// filter the golden records
-				.filter(entry -> entry.getResource().getMeta().getTag().stream().anyMatch(coding -> coding.getCode().equals("GOLDEN_RECORD")))
-				.collect(Collectors.toList());
-			bundle.setEntry(list);
+		try {
+			IQuery<Bundle> query = fhirClient.search().forResource(aClass).returnBundle(Bundle.class);
+			int size = where.length;
+			if (size > 0) {
+				query = query.where(where[0]).withTag(GOLDEN_SYSTEM, GOLDEN_RECORD);
+			}
+			int i = 1;
+			while (i < size) {
+				query = query.and(where[i]);
+				i++;
+			}
+			return  query.execute();
+		} catch (ResourceNotFoundException e) {
+			return  new Bundle();
 		}
-		return bundle;
 	}
 
 	private Bundle searchRegularRecord(Class<? extends org.hl7.fhir.instance.model.api.IBaseResource> aClass,
 												 IGenericClient fhirClient,
 												 ICriterion... where) {
-		Bundle bundle =search(aClass,fhirClient,where);
-		if (bundle.hasEntry()) {
-			List<Bundle.BundleEntryComponent> list = bundle.getEntry().stream()
-				// filter out the golden records
-				.filter(entry -> entry.getResource().getMeta().getTag().stream().noneMatch(coding -> coding.getCode().equals("GOLDEN_RECORD")))
-				.collect(Collectors.toList());
-			bundle.setEntry(list);
+		try {
+			IQuery<Bundle> query = fhirClient.search().forResource(aClass).returnBundle(Bundle.class);
+			int size = where.length;
+			if (size > 0) {
+				query = query.where(where[0]).withTag(":not"+GOLDEN_SYSTEM, GOLDEN_RECORD);
+			}
+			int i = 1;
+			while (i < size) {
+				query = query.and(where[i]);
+				i++;
+			}
+			return  query.execute();
+		} catch (ResourceNotFoundException e) {
+			return  new Bundle();
 		}
-		return bundle;
 	}
 	private Bundle search(
 		Class<? extends org.hl7.fhir.instance.model.api.IBaseResource> aClass,
@@ -172,7 +204,7 @@ public class FhirRequests {
 		Patient patient =  PatientMapper.getFhirResource( null,patientReported);
 //		Patient patient = new Patient();
 //		PatientHandler.fillFhirResource(patient, null,patientReported);
-		MethodOutcome outcome = save(fhirClient,patient,
+		MethodOutcome outcome = saveRegular(fhirClient,patient,
 			Patient.IDENTIFIER.exactly().systemAndIdentifier(PATIENT_REPORTED,patientReported.getPatientReportedExternalLink()));
 		if (outcome.getCreated() != null && outcome.getCreated()) {
 			patientReported.setPatientReportedId(outcome.getId().getIdPart());
@@ -184,7 +216,7 @@ public class FhirRequests {
 
 	public ObservationReported saveObservationReported(IGenericClient fhirClient, ObservationReported observationReported) {
 		Observation observation = ObservationMapper.getFhirResource(null,observationReported);
-		MethodOutcome outcome = save(fhirClient,observation,
+		MethodOutcome outcome = saveRegular(fhirClient,observation,
 			Observation.IDENTIFIER.exactly().systemAndIdentifier(OBSERVATION_REPORTED,observationReported.getObservationReportedId()));
 		if (outcome.getCreated() != null && outcome.getCreated()) {
 			observationReported.setPatientReportedId(outcome.getId().getIdPart());
@@ -196,7 +228,7 @@ public class FhirRequests {
 
 	public VaccinationReported saveVaccinationReported(IGenericClient fhirClient, VaccinationReported vaccinationReported) {
 		Immunization immunization = ImmunizationMapper.getFhirResource( null, vaccinationReported);
-		MethodOutcome outcome = save(fhirClient,immunization,
+		MethodOutcome outcome = saveRegular(fhirClient,immunization,
 			Immunization.IDENTIFIER.exactly()
 				.systemAndIdentifier(MappingHelper.VACCINATION_REPORTED, vaccinationReported.getVaccinationReportedExternalLink())
 		);
@@ -209,7 +241,7 @@ public class FhirRequests {
 	}
 	public VaccinationReported saveVaccinationReported(IGenericClient fhirClient, VaccinationMaster vaccinationMaster, VaccinationReported vaccinationReported) {
 		Immunization immunization = ImmunizationMapper.getFhirResource( vaccinationMaster, vaccinationReported);
-		MethodOutcome outcome = save(fhirClient,immunization,
+		MethodOutcome outcome = saveRegular(fhirClient,immunization,
 			Immunization.IDENTIFIER.exactly()
 				.systemAndIdentifier(MappingHelper.VACCINATION_REPORTED, vaccinationReported.getVaccinationReportedExternalLink())
 			);
@@ -221,6 +253,29 @@ public class FhirRequests {
 		return vaccinationReported;
 	}
 
+	private MethodOutcome saveRegular(IGenericClient fhirClient, IBaseResource resource, ICriterion... where) {
+		MethodOutcome outcome;
+		try {
+
+			IUpdateTyped query = fhirClient.update().resource(resource);
+			int size = where.length;
+			if (size > 0) {
+				query = query.conditional().where(where[0]);
+			}
+			int i = 1;
+			while (i < size) {
+				query = ((IUpdateWithQuery) query).and(where[i]);
+				i++;
+			}
+			outcome = query
+//				.conditionalByUrl(resource.fhirType() + "?_tag=:not=" + GOLDEN_TAG)
+				.execute();
+		} catch (ResourceNotFoundException e){
+			outcome = fhirClient.create().resource(resource)
+				.execute();
+		}
+		return outcome;
+	}
 	private MethodOutcome save(IGenericClient fhirClient, IBaseResource resource, ICriterion... where) {
 		MethodOutcome outcome;
 		try {

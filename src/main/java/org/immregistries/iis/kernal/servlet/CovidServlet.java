@@ -153,8 +153,8 @@ public class CovidServlet extends HttpServlet {
               "<textarea cols=\"80\" rows=\"30\" style=\"white-space: nowrap;  overflow: auto;\">");
           {
 				 vaccinationReportedList = fhirRequests.searchVaccinationReportedList(fhirClient,
-						Immunization.DATE.after().day(dateStart),
-					 Immunization.DATE.before().day(dateEnd),
+//						Immunization.DATE.after().day(dateStart),
+//					 Immunization.DATE.before().day(dateEnd),
 					 Immunization.PATIENT.hasChainedProperty(Patient.ORGANIZATION.hasId(String.valueOf(orgAccess.getOrg().getOrgId())))); // TODO test
 				 Date finalDateStart = dateStart;
 				 Date finalDateEnd = dateEnd;

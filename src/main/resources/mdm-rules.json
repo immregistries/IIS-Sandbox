@@ -21,7 +21,12 @@
   ],
   "candidateFilterSearchParams": [
     {
-      "resourceType": "*",
+      "resourceType": "Practitioner",
+      "searchParam": "active",
+      "fixedValue": "true"
+    },
+    {
+      "resourceType": "Patient",
       "searchParam": "active",
       "fixedValue": "true"
     }

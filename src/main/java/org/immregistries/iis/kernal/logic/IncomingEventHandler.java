@@ -279,6 +279,7 @@ public class IncomingEventHandler extends IncomingMessageHandler {
 
     {
 		 patientReported = fhirRequests.searchPatientReported(getFhirClient(orgAccess),
+//			 "identifier="+patientReportedExternalLink
 			 Patient.IDENTIFIER.exactly().code(patientReportedExternalLink)
 		 );
     }
