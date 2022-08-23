@@ -121,6 +121,14 @@ public class FhirRequests {
 		}
 		return modelPerson;
 	}
+	public ModelPerson searchPractitioner(IGenericClient fhirClient, ICriterion... where) {
+		ModelPerson modelPerson = null;
+		Bundle bundle = search(org.hl7.fhir.r5.model.Practitioner.class,fhirClient, where);
+		if (bundle.hasEntry()) {
+			modelPerson = PersonMapper.getModelPerson((org.hl7.fhir.r5.model.Practitioner) bundle.getEntryFirstRep().getResource());
+		}
+		return modelPerson;
+	}
 
 
 	private Bundle searchGoldenRecord(Class<? extends org.hl7.fhir.instance.model.api.IBaseResource> aClass,
@@ -191,6 +199,17 @@ public class FhirRequests {
 			patientReported.setPatientReportedId(outcome.getResource().getIdElement().getIdPart());
 		}
 		return patientReported;
+	}
+	public ModelPerson savePractitioner(IGenericClient fhirClient, ModelPerson modelPerson) {
+		Practitioner practitioner = PersonMapper.getFhirPractitioner(modelPerson);
+		MethodOutcome outcome = saveRegular(fhirClient,practitioner,
+			Patient.IDENTIFIER.exactly().identifier(modelPerson.getPersonExternalLink()));
+		if (outcome.getCreated() != null && outcome.getCreated()) {
+			modelPerson.setPersonId(outcome.getId().getIdPart());
+		} else if (!outcome.getResource().isEmpty()) {
+			modelPerson.setPersonId(outcome.getResource().getIdElement().getIdPart());
+		}
+		return modelPerson;
 	}
 
 	public ObservationReported saveObservationReported(IGenericClient fhirClient, ObservationReported observationReported) {

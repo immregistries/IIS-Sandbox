@@ -463,12 +463,12 @@ public class IncomingMessageHandler {
             }
           }
           {
-            String admininsteringProvider = reader.getValue(10);
-            if (StringUtils.isNotEmpty(admininsteringProvider)) {
-              ModelPerson modelPerson = fhirRequests.searchPerson(fhirClient,Person.IDENTIFIER.exactly().code(admininsteringProvider));
+            String administeringProvider = reader.getValue(10);
+            if (StringUtils.isNotEmpty(administeringProvider)) {
+              ModelPerson modelPerson = fhirRequests.searchPerson(fhirClient,Person.IDENTIFIER.exactly().code(administeringProvider));
               if (modelPerson == null) {
                 modelPerson = new ModelPerson();
-                modelPerson.setPersonExternalLink(admininsteringProvider);
+                modelPerson.setPersonExternalLink(administeringProvider);
                 modelPerson.setOrgMaster(orgAccess.getOrg());
                 modelPerson.setNameLast(reader.getValue(10, 2));
                 modelPerson.setNameFirst(reader.getValue(10, 3));
@@ -477,18 +477,19 @@ public class IncomingMessageHandler {
                 modelPerson.setNameTypeCode(reader.getValue(10, 10));
                 modelPerson.setIdentifierTypeCode(reader.getValue(10, 13));
                 modelPerson.setProfessionalSuffix(reader.getValue(10, 21));
-					  org.hl7.fhir.r5.model.Person  p = PersonMapper.getFhirPerson(modelPerson);
-					  MethodOutcome outcome;
-					  try {
-						  outcome = fhirClient.update().resource(p).conditional()
-							  .where(org.hl7.fhir.r5.model.Person.IDENTIFIER.exactly().identifier(p.getIdentifierFirstRep().getValue()))
-							  .execute();
-						  patientReported.setPatientReportedId(outcome.getId().getIdPart());
-					  } catch (ResourceNotFoundException e ){
-						  outcome = fhirClient.create().resource(p).execute();
-						  patientReported.setPatientReportedId(outcome.getId().getIdPart());
-					  }
-					  patientReported.setPatientReportedId(outcome.getId().getIdPart());
+//					  Person  p = PersonMapper.getFhirPerson(modelPerson);
+					  modelPerson = fhirRequests.savePractitioner(fhirClient,modelPerson);
+//					  modelPerson = fhirRequests.save(fhirClient,modelPerson);
+//					  MethodOutcome outcome;
+//					  try {
+//						  outcome = fhirClient.update().resource(p).conditional()
+//							  .where(org.hl7.fhir.r5.model.Person.IDENTIFIER.exactly().identifier(p.getIdentifierFirstRep().getValue()))
+//							  .execute();
+//						  modelPerson.setPersonId(outcome.getId().getIdPart());
+//					  } catch (ResourceNotFoundException e ){
+//						  outcome = fhirClient.create().resource(p).execute();
+//						  modelPerson.setPersonId(outcome.getId().getIdPart());
+//					  }
 				  }
               vaccinationReported.setAdministeringProvider(modelPerson);
             }
