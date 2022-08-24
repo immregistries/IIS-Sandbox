@@ -428,8 +428,7 @@ public class IncomingMessageHandler {
           {
             String administeredAtLocation = reader.getValue(11, 4);
             if (StringUtils.isNotEmpty(administeredAtLocation)) {
-					OrgLocation orgLocation = null;
-					orgLocation = fhirRequests.searchOrgLocation(fhirClient,Location.IDENTIFIER.exactly().code(administeredAtLocation));
+					OrgLocation orgLocation = fhirRequests.searchOrgLocation(fhirClient,Location.IDENTIFIER.exactly().code(administeredAtLocation));
 
 					if (orgLocation == null) {
 						if (processingFlavorSet.contains(ProcessingFlavor.PEAR)) {
@@ -448,16 +447,7 @@ public class IncomingMessageHandler {
 						orgLocation.setAddressState(reader.getValue(11, 12));
 						orgLocation.setAddressZip(reader.getValue(11, 13));
 						orgLocation.setAddressCountry(reader.getValue(11, 14));
-						Location location = LocationMapper.fhirLocation(orgLocation);
-						MethodOutcome outcome;
-						try {
-							outcome = fhirClient.update().resource(location).conditional()
-								.where(Location.IDENTIFIER.exactly().identifier(location.getIdentifierFirstRep().getValue()))
-								.execute();
-						} catch (ResourceNotFoundException e ){
-							outcome = fhirClient.create().resource(location).execute();
-						}
-						orgLocation = LocationMapper.orgLocationFromFhir((Location) outcome.getResource());
+						orgLocation = fhirRequests.saveOrgLocation(fhirClient,orgLocation);
 					}
               vaccinationReported.setOrgLocation(orgLocation);
             }

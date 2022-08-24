@@ -6,13 +6,14 @@ import java.util.Date;
 /**
  * Created by Eric on 12/20/17.
  */
+
 public class PatientMaster implements Serializable {
 	
   private static final long serialVersionUID = 1L;
 
   private String patientId = "";
   private OrgMaster orgMaster = null;
-//  private String patientExternalLink = "";
+  private String patientExternalLink = "";
   private String patientNameLast = "";
   private String patientNameFirst = "";
   private String patientNameMiddle = "";
@@ -32,18 +33,12 @@ public class PatientMaster implements Serializable {
     this.patientId = patientId;
   }
 
-//  public String getPatientExternalLink() {
-//    return patientExternalLink;
-//  }
   public String getPatientExternalLink() {
-    return patientId;
+    return patientExternalLink;
   }
 
-//  public void setPatientExternalLink(String patientRegistryId) {
-//    this.patientExternalLink = patientRegistryId;
-//  }
   public void setPatientExternalLink(String patientRegistryId) {
-    this.patientId = patientRegistryId;
+    this.patientExternalLink = patientRegistryId;
   }
 
   public String getPatientNameLast() {

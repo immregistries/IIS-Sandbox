@@ -17,7 +17,7 @@ public class MappingHelper {
 	public static final String PERSON = "Person";
 
 	public static final String PERSON_MODEL = "Person";
-	public static final String PATIENT_REPORTED = "urn:mrns";
+	public static final String MRN_SYSTEM = "urn:mrns";
 	public static final String PATIENT_MASTER = "PatientMaster";
 	public static final String VACCINATION_MASTER = "VaccinationMaster";
 	public static final String VACCINATION_REPORTED = "VaccinationReported";

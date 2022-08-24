@@ -9,8 +9,8 @@ public class LocationMapper {
 	public static Location fhirLocation(OrgLocation ol) {
 		Location location = new Location();
 		if (ol != null) {
-			location.setId(ol.getOrgFacilityCode());
-			location.addIdentifier(MappingHelper.getFhirIdentifier(MappingHelper.ORG_LOCATION, ol.getOrgLocationId()));
+			location.setId(ol.getOrgLocationId());
+			location.addIdentifier(MappingHelper.getFhirIdentifier(MappingHelper.ORG_LOCATION, ol.getOrgFacilityCode()));
 			location.setName(ol.getOrgFacilityName());
 
 			Address address = location.getAddress();
@@ -27,7 +27,7 @@ public class LocationMapper {
 	public static OrgLocation orgLocationFromFhir(Location l) {
 		OrgLocation orgLocation = new OrgLocation();
 		orgLocation.setOrgLocationId(l.getId());
-		orgLocation.setOrgFacilityCode(l.getId());
+		orgLocation.setOrgFacilityCode(l.getIdentifierFirstRep().getValue());
 		orgLocation.setOrgFacilityName(l.getName());
 		orgLocation.setLocationType(l.getTypeFirstRep().getText());
 		orgLocation.setAddressCity(l.getAddress().getLine().get(0).getValueNotNull());

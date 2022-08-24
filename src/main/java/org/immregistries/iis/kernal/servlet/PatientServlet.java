@@ -109,18 +109,10 @@ public class PatientServlet extends HttpServlet {
 
       out.println("    <h2>" + orgAccess.getOrg().getOrganizationName() + "</h2>");
       PatientReported patientReportedSelected = null;
-      Patient patientSelected = null;
       if (req.getParameter(PARAM_PATIENT_REPORTED_ID) != null) {
-			Bundle bundle =  fhirClient.search().forResource(Patient.class).where(
+			patientReportedSelected = fhirRequests.searchPatientReported(fhirClient,
 				Patient.IDENTIFIER.exactly().identifier(req.getParameter(PARAM_PATIENT_REPORTED_ID))
-			).returnBundle(Bundle.class).execute();
-			if  (bundle.hasEntry()){
-				patientSelected = (Patient) bundle.getEntryFirstRep().getResource();
-				patientReportedSelected = PatientMapper.getReported(patientSelected);
-			}
-//			patientReportedSelected = fhirRequests.searchPatientReported(fhirClient,
-//				Patient.IDENTIFIER.exactly().identifier(req.getParameter(PARAM_PATIENT_REPORTED_ID))
-//			);
+			);
       }
 
       if (patientReportedSelected == null) {

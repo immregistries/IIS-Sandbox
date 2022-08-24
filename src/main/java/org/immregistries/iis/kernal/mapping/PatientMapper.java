@@ -1,16 +1,18 @@
 package org.immregistries.iis.kernal.mapping;
 
 
+import ca.uhn.fhir.rest.client.api.IGenericClient;
 import org.hl7.fhir.r5.model.*;
 import org.hl7.fhir.r5.model.ContactPoint.ContactPointSystem;
 import org.hl7.fhir.r5.model.Enumerations.AdministrativeGender;
 import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.model.PatientReported;
+import org.immregistries.iis.kernal.repository.FhirRequests;
 
 import java.text.ParseException;
 import java.util.Date;
 
-import static org.immregistries.iis.kernal.mapping.MappingHelper.PATIENT_REPORTED;
+import static org.immregistries.iis.kernal.mapping.MappingHelper.MRN_SYSTEM;
 
 public class PatientMapper {
 
@@ -30,22 +32,19 @@ public class PatientMapper {
 	private static final String YES = "Y";
 	private static final String NO = "N";
 
-	public static PatientReported getReported(Patient p) {
-		PatientReported patientReported = new PatientReported();
-		fillPatientReportedFromFhir(patientReported, p);
-//		patientReported.setPatient(getMaster(patientReported.getPatient(), p));
+	public static PatientReported getReportedWithMaster(Patient p, FhirRequests fhirRequests, IGenericClient fhirClient) {
+		PatientReported patientReported = getReported(p);
+		patientReported.setPatient(
+			fhirRequests.searchPatientMaster(
+				fhirClient,
+				Patient.IDENTIFIER.exactly().systemAndIdentifier(MRN_SYSTEM,patientReported.getPatientReportedExternalLink())
+			));
 		return patientReported;
 	}
-
-	/**
-	 * This method set the patientReported information based on the patient information
-	 *
-	 * @param patientReported the patientReported
-	 * @param p               the Patient resource
-	 */
-	private static void fillPatientReportedFromFhir(PatientReported patientReported, Patient p) {
+	public static PatientReported getReported(Patient p) {
+		PatientReported patientReported = new PatientReported();
 		patientReported.setPatientReportedId(new IdType(p.getId()).getIdPart());
-		patientReported.setPatientReportedExternalLink(MappingHelper.filterIdentifier(p.getIdentifier(),PATIENT_REPORTED).getValue());
+		patientReported.setPatientReportedExternalLink(MappingHelper.filterIdentifier(p.getIdentifier(), MRN_SYSTEM).getValue());
 		patientReported.setUpdatedDate(p.getMeta().getLastUpdated());
 
 		patientReported.setPatientReportedAuthority(p.getManagingOrganization().getIdentifier().getValue());
@@ -193,14 +192,12 @@ public class PatientMapper {
 			patientReported.setGuardianMiddle(contact.getName().getGiven().get(1).getValueNotNull());
 		}
 		patientReported.setGuardianRelationship(contact.getRelationshipFirstRep().getText());
+		return patientReported;
 	}
 
-	public static PatientMaster getMaster(PatientMaster patientMaster, Patient p) {
-		if (patientMaster == null) {
-			patientMaster = new PatientMaster();
-		}
-		patientMaster.setPatientId(p.getId());
-		patientMaster.setPatientExternalLink(MappingHelper.filterIdentifier(p.getIdentifier(), PATIENT_REPORTED).getValue());
+	public static PatientMaster getMaster(Patient p) {
+		PatientMaster patientMaster = new PatientMaster();
+		patientMaster.setPatientExternalLink(MappingHelper.filterIdentifier(p.getIdentifier(), MRN_SYSTEM).getValue());
 		patientMaster.setPatientNameFirst(p.getNameFirstRep().getGiven().get(0).getValue());
 		if (p.getNameFirstRep().getGiven().size() > 1) {
 			patientMaster.setPatientNameMiddle(p.getNameFirstRep().getGiven().get(1).getValue());
@@ -212,13 +209,7 @@ public class PatientMapper {
 	}
 
 	public static Patient getFhirResource(PatientMaster pm, PatientReported pr) {
-		Patient p = new Patient().setBirthDate(new Date());
-		fillFhirResource(p,pm,pr);
-		return p;
-	}
-
-	public static void fillFhirResource(Patient p, PatientMaster pm, PatientReported pr) {
-//		Patient p = new Patient().setBirthDate(new Date());
+		Patient p = new Patient();
 		if (pm != null) {
 //			p.addIdentifier(MappingHelper.getFhirIdentifier(MappingHelper.PATIENT_MASTER, pm.getPatientExternalLink()));
 			HumanName name = p.addName();
@@ -228,7 +219,7 @@ public class PatientMapper {
 			p.setBirthDate(pm.getPatientBirthDate());
 		}
 		if (pr != null) {
-			p.addIdentifier(MappingHelper.getFhirIdentifier(PATIENT_REPORTED, pr.getPatientReportedExternalLink()));
+			p.addIdentifier(MappingHelper.getFhirIdentifier(MRN_SYSTEM, pr.getPatientReportedExternalLink()));
 //			p.setManagingOrganization(MappingHelper.getFhirReference("","PatientReportedAuthority",pr.getPatientReportedAuthority()));
 			p.setBirthDate(pr.getPatientBirthDate());
 			if (p.getNameFirstRep() != null) {
@@ -343,7 +334,7 @@ public class PatientMapper {
 			contactName.addGivenElement().setValue(pr.getGuardianFirst());
 			contactName.addGivenElement().setValue(pr.getGuardianMiddle());
 		}
-//		return p;
+		return p;
 	}
 
 }

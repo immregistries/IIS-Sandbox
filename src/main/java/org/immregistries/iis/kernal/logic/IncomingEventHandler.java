@@ -20,6 +20,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.Date;
 
+import static org.immregistries.iis.kernal.mapping.MappingHelper.MRN_SYSTEM;
+
 @Component
 public class IncomingEventHandler extends IncomingMessageHandler {
 
@@ -267,7 +269,7 @@ public class IncomingEventHandler extends IncomingMessageHandler {
 	  IGenericClient fhirClient = (IGenericClient) session.getAttribute("fhirClient");
 
     PatientReported patientReported = null;
-    PatientMaster patientMaster = null;
+//    PatientMaster patientMaster = null;
 
     String patientReportedExternalLink = req.getParameter(PATIENT_REPORTED_EXTERNAL_LINK);
     String patientReportedAuthority = req.getParameter(PATIENT_REPORTED_AUTHORITY);
@@ -285,16 +287,16 @@ public class IncomingEventHandler extends IncomingMessageHandler {
     }
 
     if (patientReported == null) {
-      patientMaster = new PatientMaster();
-      patientMaster.setPatientExternalLink(generatePatientExternalLink(fhirClient));
-      patientMaster.setOrgMaster(orgAccess.getOrg());
+//      patientMaster = new PatientMaster();
+//      patientMaster.setPatientExternalLink(generatePatientExternalLink(fhirClient));
+//      patientMaster.setOrgMaster(orgAccess.getOrg());
       patientReported = new PatientReported();
       patientReported.setOrgReported(orgAccess.getOrg());
       patientReported.setPatientReportedExternalLink(patientReportedExternalLink);
-      patientReported.setPatient(patientMaster);
+//      patientReported.setPatient(patientMaster);
       patientReported.setReportedDate(new Date());
     }else {
-		 patientMaster = patientReported.getPatient();
+//		 patientMaster = patientReported.getPatient();
 	 }
 
 
@@ -334,11 +336,11 @@ public class IncomingEventHandler extends IncomingMessageHandler {
           "Patient is indicated as being born in the future, unable to record patients who are not yet born");
     }
 //    patientMaster.setPatientAddressFrag(addressFrag);
-    patientMaster.setPatientNameLast(patientNameLast);
-    patientMaster.setPatientNameFirst(patientNameFirst);
-    patientMaster.setPatientNameMiddle(patientNameMiddle);
+//    patientMaster.setPatientNameLast(patientNameLast);
+//    patientMaster.setPatientNameFirst(patientNameFirst);
+//    patientMaster.setPatientNameMiddle(patientNameMiddle);
 //    patientMaster.setPatientPhoneFrag(patientPhone);
-    patientMaster.setPatientBirthDate(patientBirthDate);
+//    patientMaster.setPatientBirthDate(patientBirthDate);
 //    patientMaster.setPatientSoundexFirst(""); // TODO, later
 //    patientMaster.setPatientSoundexLast(""); // TODO, later
     patientReported.setPatientReportedExternalLink(patientReportedExternalLink);
@@ -386,6 +388,9 @@ public class IncomingEventHandler extends IncomingMessageHandler {
     patientReported.setGuardianRelationship(req.getParameter(GUARDIAN_RELATIONSHIP));
     patientReported.setUpdatedDate(new Date());
     patientReported = fhirRequests.savePatientReported(fhirClient,patientReported);
+	 patientReported.setPatient(fhirRequests.searchPatientMaster(fhirClient,
+		 Patient.IDENTIFIER.exactly().systemAndIdentifier(MRN_SYSTEM,patientReported.getPatientReportedExternalLink())
+	 ));
     return patientReported;
   }
 

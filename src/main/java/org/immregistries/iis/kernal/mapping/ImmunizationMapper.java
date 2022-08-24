@@ -109,7 +109,7 @@ public class ImmunizationMapper {
 	 if (vr != null) {
 		 i.addIdentifier(MappingHelper.getFhirIdentifier(MappingHelper.VACCINATION_REPORTED, vr.getVaccinationReportedExternalLink()));
 
-		 i.setPatient(MappingHelper.getFhirReference(MappingHelper.PATIENT,MappingHelper.PATIENT_REPORTED, vr.getPatientReported().getPatientReportedExternalLink(), vr.getPatientReported().getPatientReportedId()));
+		 i.setPatient(MappingHelper.getFhirReference(MappingHelper.PATIENT,MappingHelper.MRN_SYSTEM, vr.getPatientReported().getPatientReportedExternalLink(), vr.getPatientReported().getPatientReportedId()));
 //		 i.setPatient(new Reference().setReference("Patient/"+ vr.getPatientReported().getPatientReportedId()));
 		 i.setRecorded(vr.getReportedDate());
 		 i.getOccurrenceDateTimeType().setValue(vr.getAdministeredDate());
