@@ -275,7 +275,7 @@ public class IncomingMessageHandler {
       while (reader.advanceToSegment("ORC")) {
         orcCount++;
         VaccinationReported vaccinationReported = null;
-        VaccinationMaster vaccinationMaster = null;
+//        VaccinationMaster vaccinationMaster = null;
         String vaccineCode = "";
         Date administrationDate = null;
         String vaccinationReportedExternalLink = reader.getValue(3);
@@ -305,21 +305,21 @@ public class IncomingMessageHandler {
 
 			 vaccinationReported = fhirRequests.searchVaccinationReported(fhirClient,Immunization.IDENTIFIER.exactly().code(vaccinationReportedExternalLink));
 			 if (vaccinationReported != null) {
-				 vaccinationMaster = vaccinationReported.getVaccination();
+//				 vaccinationMaster = vaccinationReported.getVaccination();
 			 }
 
           if (vaccinationReported == null) {
-            vaccinationMaster = new VaccinationMaster();
-				 vaccinationMaster.setVaccinationId(vaccinationReportedExternalLink); // TODO verify
+//            vaccinationMaster = new VaccinationMaster();
+//				 vaccinationMaster.setVaccinationId(vaccinationReportedExternalLink); // TODO verify
 				 vaccinationReported = new VaccinationReported();
-            vaccinationReported.setVaccination(vaccinationMaster);
-            vaccinationMaster.setVaccinationReported(vaccinationReported);
+//            vaccinationReported.setVaccination(vaccinationMaster);
+//            vaccinationMaster.setVaccinationReported(vaccinationReported);
             vaccinationReported.setReportedDate(new Date());
             vaccinationReported.setVaccinationReportedExternalLink(vaccinationReportedExternalLink);
           }
           vaccinationReported.setPatientReportedId(patientReported.getPatientReportedId());
           vaccinationReported.setPatientReported(patientReported);
-          vaccinationMaster.setPatient(patientReported.getPatient());
+//          vaccinationMaster.setPatient(patientReported.getPatient());
 
           String vaccineCvxCode = "";
           String vaccineNdcCode = "";
@@ -485,8 +485,8 @@ public class IncomingMessageHandler {
             }
 
           }
-          vaccinationMaster.setVaccineCvxCode(vaccineCvxCode);
-          vaccinationMaster.setAdministeredDate(administrationDate);
+//          vaccinationMaster.setVaccineCvxCode(vaccineCvxCode);
+//          vaccinationMaster.setAdministeredDate(administrationDate);
           vaccinationReported.setUpdatedDate(new Date());
           vaccinationReported.setAdministeredDate(administrationDate);
           vaccinationReported.setVaccineCvxCode(vaccineCvxCode);
@@ -580,11 +580,11 @@ public class IncomingMessageHandler {
 
           verifyNoErrors(processingExceptionList);
           reader.gotoSegmentPosition(segmentPosition);
-			 vaccinationReported = fhirRequests.saveVaccinationReported(fhirClient, vaccinationMaster,vaccinationReported);
-			 vaccinationMaster.setVaccinationId(vaccinationReported.getVaccinationReportedId());
+			 vaccinationReported = fhirRequests.saveVaccinationReported(fhirClient, null,vaccinationReported);
+//			 vaccinationMaster.setVaccinationId(vaccinationReported.getVaccinationReportedId());
 //          {
 //				 Immunization immunization = ImmunizationHandler.getFhirResource(vaccinationMaster,vaccinationReported);
-////				 fhirClient.patch();TODO Convert resources to Fhirpatch and replace simple updates with patch
+////				 fhirClient.patch();TODO Convert resources to Fhirpatch and replace simple updates with patch or MDM might fix this issue
 //				 try {
 //					 MethodOutcome outcome = fhirClient.update().resource(immunization).conditional().where(
 //							 Immunization.IDENTIFIER.exactly()
@@ -597,7 +597,7 @@ public class IncomingMessageHandler {
 
           reader.gotoSegmentPosition(segmentPosition);
           obxCount = readAndCreateObservations(reader, processingExceptionList, patientReported,
-              strictDate, obxCount, vaccinationReported, vaccinationMaster, fhirClient);
+              strictDate, obxCount, vaccinationReported, null, fhirClient);
         } else {
           throw new ProcessingException("RXA segment was not found after ORC segment", "ORC",
               orcCount, 0);
@@ -1822,6 +1822,7 @@ public class IncomingMessageHandler {
 		 try {
 			 Bundle bundle = fhirClient.search().forResource(Immunization.class)
 				 .where(Immunization.PATIENT.hasId(patient.getPatientId()))
+				 .withTag(FhirRequests.GOLDEN_SYSTEM_TAG,FhirRequests.GOLDEN_RECORD)
 				 .sort().ascending(Immunization.IDENTIFIER)
 				 .returnBundle(Bundle.class).execute();
 			 for (Bundle.BundleEntryComponent entry : bundle.getEntry()) {
@@ -1830,7 +1831,7 @@ public class IncomingMessageHandler {
 					 String key = sdf.format(immunization.getOccurrenceDateTimeType());
 					 if (!immunization.getVaccineCode().getText().equals("")) {
 						 key += key + immunization.getVaccineCode().getText();
-						 VaccinationMaster vaccinationMaster = ImmunizationMapper.getMaster(null, immunization);
+						 VaccinationMaster vaccinationMaster = ImmunizationMapper.getMaster(immunization);
 						 map.put(key, vaccinationMaster);
 					 }
 				 }

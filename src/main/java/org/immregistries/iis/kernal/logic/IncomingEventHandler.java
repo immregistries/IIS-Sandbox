@@ -125,7 +125,7 @@ public class IncomingEventHandler extends IncomingMessageHandler {
     CodeMap codeMap = CodeMapManager.getCodeMap();
     PatientReported patientReported = processPatient(orgAccess, req, codeMap);
     VaccinationReported vaccinationReported = null;
-    VaccinationMaster vaccinationMaster = null;
+//    VaccinationMaster vaccinationMaster = null;
     Date administrationDate = null;
     String vaccinationReportedExternalLink = req.getParameter(VACCINATION_REPORTED_EXTERNAL_LINK);
     if (vaccinationReportedExternalLink.equals("")) {
@@ -140,7 +140,7 @@ public class IncomingEventHandler extends IncomingMessageHandler {
 		 Immunization.PATIENT.hasId(patientReported.getPatientReportedId()),
 		 Immunization.IDENTIFIER.exactly().code(vaccinationReportedExternalLink)
 		 );
-	  vaccinationMaster = vaccinationReported.getVaccination();
+//	  vaccinationMaster = vaccinationReported.getVaccination();
 //    {
 //      Query query = dataSession.createQuery(
 //          "from VaccinationReported where patientReported = ? and vaccinationReportedExternalLink = ?");
@@ -154,17 +154,17 @@ public class IncomingEventHandler extends IncomingMessageHandler {
 //      }
 //    }
     if (vaccinationReported == null) {
-      vaccinationMaster = new VaccinationMaster();
-		vaccinationMaster.setVaccinationId(vaccinationReportedExternalLink); // TODO  verify IMPORTANT
+//      vaccinationMaster = new VaccinationMaster();
+//		vaccinationMaster.setVaccinationId(vaccinationReportedExternalLink); TODO verify
       vaccinationReported = new VaccinationReported();
-      vaccinationReported.setVaccination(vaccinationMaster);
-      vaccinationMaster.setVaccinationReported(null);
+//      vaccinationReported.setVaccination(vaccinationMaster);
+//      vaccinationMaster.setVaccinationReported(null);
       vaccinationReported.setReportedDate(new Date());
       vaccinationReported.setVaccinationReportedExternalLink(vaccinationReportedExternalLink);
     }
 	  vaccinationReported.setPatientReportedId(patientReported.getPatientReportedId());
 	  vaccinationReported.setPatientReported(patientReported);
-    vaccinationMaster.setPatient(patientReported.getPatient());
+//    vaccinationMaster.setPatient(patientReported.getPatient());
 
     String vaccineCvxCode = req.getParameter(VACCINE_CVX_CODE);
     String vaccineNdcCode = req.getParameter(VACCINE_NDC_CODE);
@@ -228,8 +228,8 @@ public class IncomingEventHandler extends IncomingMessageHandler {
         vaccinationReported.setOrgLocation(orgLocation);
       }
     }
-    vaccinationMaster.setVaccineCvxCode(vaccineCvxCode);
-    vaccinationMaster.setAdministeredDate(administrationDate);
+//    vaccinationMaster.setVaccineCvxCode(vaccineCvxCode);
+//    vaccinationMaster.setAdministeredDate(administrationDate);
     vaccinationReported.setUpdatedDate(new Date());
     vaccinationReported.setAdministeredDate(administrationDate);
     vaccinationReported.setVaccineCvxCode(vaccineCvxCode);
@@ -255,8 +255,8 @@ public class IncomingEventHandler extends IncomingMessageHandler {
 
 
     {
-		 vaccinationReported = fhirRequests.saveVaccinationReported(fhirClient, vaccinationMaster,vaccinationReported);
-		 vaccinationMaster.setVaccinationId(vaccinationReported.getVaccinationReportedId());
+		 vaccinationReported = fhirRequests.saveVaccinationReported(fhirClient, null,vaccinationReported);
+//		 vaccinationMaster.setVaccinationId(vaccinationReported.getVaccinationReportedId());
     }
 
   }

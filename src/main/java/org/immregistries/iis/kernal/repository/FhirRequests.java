@@ -28,8 +28,8 @@ public class FhirRequests {
 	@Autowired
 	RepositoryClientFactory repositoryClientFactory;
 	Logger logger = LoggerFactory.getLogger(FhirRequests.class);
-	private static final String GOLDEN_SYSTEM_TAG = "http://hapifhir.io/fhir/NamingSystem/mdm-record-status";
-	private static final String GOLDEN_RECORD = "GOLDEN_RECORD";
+	public static final String GOLDEN_SYSTEM_TAG = "http://hapifhir.io/fhir/NamingSystem/mdm-record-status";
+	public static final String GOLDEN_RECORD = "GOLDEN_RECORD";
 	private static final TokenCriterion NOT_GOLDEN_CRITERION= new TokenCriterion("_tag:not",GOLDEN_SYSTEM_TAG,GOLDEN_RECORD);
 
 
@@ -57,6 +57,14 @@ public class FhirRequests {
 			patientReportedList.add(PatientMapper.getReportedWithMaster((Patient) entry.getResource(),this,fhirClient));
 		}
 		return patientReportedList;
+	}
+	public VaccinationMaster searchVaccinationMaster(IGenericClient fhirClient, ICriterion... where) {
+		VaccinationMaster vaccinationMaster = null;
+		Bundle bundle = searchGoldenRecord(Immunization.class,fhirClient, where);
+		if (bundle.hasEntry()) {
+			vaccinationMaster = ImmunizationMapper.getMaster((Immunization) bundle.getEntryFirstRep().getResource());
+		}
+		return vaccinationMaster;
 	}
 	public VaccinationReported searchVaccinationReported(IGenericClient fhirClient, ICriterion... where) {
 		VaccinationReported vaccinationReported = null;
