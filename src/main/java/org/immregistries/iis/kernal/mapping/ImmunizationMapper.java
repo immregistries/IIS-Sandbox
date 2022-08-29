@@ -81,7 +81,8 @@ public class ImmunizationMapper {
 
   public static VaccinationMaster getMaster( Immunization i){
 	  VaccinationMaster vaccinationMaster = new VaccinationMaster();
-	  vaccinationMaster.setVaccinationId(MappingHelper.filterIdentifier(i.getIdentifier(), MappingHelper.VACCINATION_MASTER).getValue());
+	  vaccinationMaster.setVaccinationId(i.getId());
+	  vaccinationMaster.setExternalLink(MappingHelper.filterIdentifier(i.getIdentifier(), MappingHelper.VACCINATION_MASTER).getValue());
 //	  vaccinationMaster.set(MappingHelper.filterIdentifier(i.getIdentifier(), MappingHelper.VACCINATION_MASTER).getValue());
 	  vaccinationMaster.setAdministeredDate(i.getOccurrenceDateTimeType().getValue());
 	  vaccinationMaster.setVaccineCvxCode(i.getVaccineCode().getCode(CVX));

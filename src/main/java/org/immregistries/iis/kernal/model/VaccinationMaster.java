@@ -15,6 +15,8 @@ public class VaccinationMaster implements Serializable {
   private String vaccineCvxCode = "";
   private VaccinationReported vaccinationReported = null;
 
+	private String externalLink = "";
+
   public VaccinationReported getVaccinationReported() {
     return vaccinationReported;
   }
@@ -55,5 +57,11 @@ public class VaccinationMaster implements Serializable {
     this.vaccineCvxCode = vaccineCvxCode;
   }
 
+	public String getExternalLink() {
+		return externalLink;
+	}
 
+	public void setExternalLink(String externalLink) {
+		this.externalLink = externalLink;
+	}
 }

@@ -470,16 +470,6 @@ public class IncomingMessageHandler {
 //					  Person  p = PersonMapper.getFhirPerson(modelPerson);
 					  modelPerson = fhirRequests.savePractitioner(fhirClient,modelPerson);
 //					  modelPerson = fhirRequests.save(fhirClient,modelPerson);
-//					  MethodOutcome outcome;
-//					  try {
-//						  outcome = fhirClient.update().resource(p).conditional()
-//							  .where(org.hl7.fhir.r5.model.Person.IDENTIFIER.exactly().identifier(p.getIdentifierFirstRep().getValue()))
-//							  .execute();
-//						  modelPerson.setPersonId(outcome.getId().getIdPart());
-//					  } catch (ResourceNotFoundException e ){
-//						  outcome = fhirClient.create().resource(p).execute();
-//						  modelPerson.setPersonId(outcome.getId().getIdPart());
-//					  }
 				  }
               vaccinationReported.setAdministeringProvider(modelPerson);
             }
