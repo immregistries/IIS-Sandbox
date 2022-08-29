@@ -1,8 +1,10 @@
 package org.immregistries.iis.kernal.mapping;
 
+import ca.uhn.fhir.rest.client.api.IGenericClient;
 import org.hl7.fhir.r5.model.*;
 import org.immregistries.iis.kernal.model.ObservationMaster;
 import org.immregistries.iis.kernal.model.ObservationReported;
+import org.immregistries.iis.kernal.repository.FhirRequests;
 
 import static org.immregistries.iis.kernal.mapping.MappingHelper.*;
 
@@ -11,34 +13,30 @@ public class ObservationMapper {
 	public static final String OBSERVATION_DATE = "observationDate";
 	public static final String RESULT_STATUS = "resultStatus";
 
-	public static Observation getFhirResource(ObservationMaster observationMaster, ObservationReported observationReported)  {
+	public static Observation getFhirResource(ObservationReported observationReported)  {
 		Observation o = new Observation();
-		if (observationMaster != null) {
-			o.addIdentifier(MappingHelper.getFhirIdentifier( OBSERVATION_MASTER,observationMaster.getObservationId()));
-			o.addPartOf(MappingHelper.getFhirReference(IMMUNIZATION,VACCINATION_MASTER, observationMaster.getVaccination().getVaccinationId()));
-			o.addPartOf(new Reference(IMMUNIZATION + "/" + observationMaster.getVaccination().getVaccinationId()));
-//			if (observationMaster.getObservationReported() != null && observationReported == null) {
-//				o.addPartOf(MappingHelper.getFhirReference(OBSERVATION,OBSERVATION_REPORTED,
-//					observationMaster.getObservationReported().getObservationReportedId()));
-//			}
-			o.addIdentifier(MappingHelper.getFhirIdentifier(
-				IDENTIFIER_CODE,observationMaster.getIdentifierCode()));
-			o.setCode(new CodeableConcept().setText(observationMaster.getIdentifierCode()));
-			o.setValue(new CodeableConcept(new Coding().setCode(observationMaster.getValueCode())));
-		}
+//		if (observationMaster != null) {
+//			o.addIdentifier(MappingHelper.getFhirIdentifier( OBSERVATION_MASTER,observationMaster.getObservationId()));
+//			o.addPartOf(MappingHelper.getFhirReference(IMMUNIZATION,VACCINATION_MASTER, observationMaster.getVaccination().getVaccinationId()));
+//			o.addPartOf(new Reference(IMMUNIZATION + "/" + observationMaster.getVaccination().getVaccinationId()));
+////			if (observationMaster.getObservationReported() != null && observationReported == null) {
+////				o.addPartOf(MappingHelper.getFhirReference(OBSERVATION,OBSERVATION_REPORTED,
+////					observationMaster.getObservationReported().getObservationReportedId()));
+////			}
+//			o.addIdentifier(MappingHelper.getFhirIdentifier(
+//				IDENTIFIER_CODE,observationMaster.getIdentifierCode()));
+//			o.setCode(new CodeableConcept().setText(observationMaster.getIdentifierCode()));
+//			o.setValue(new CodeableConcept(new Coding().setCode(observationMaster.getValueCode())));
+//		}
 
 		if (observationReported != null) {
 			o.addIdentifier(MappingHelper.getFhirIdentifier(OBSERVATION_REPORTED,observationReported.getObservationReportedId()));
 			if (o.getPartOf().size() == 0) {
-				o.addPartOf(new Reference().setReference(IMMUNIZATION + "/" + observationReported.getVaccinationReported().getVaccinationReportedId()));
+				o.addPartOf(new Reference().setReference(IMMUNIZATION + "/" + observationReported.getVaccinationReportedId()));
 			}
-			if(observationReported.getPatientReported() != null) {
-				o.setSubject(new Reference().setReference(PATIENT + "/"+observationReported.getPatientReported().getPatientReportedId()));
-
+			if(observationReported.getPatientReportedId() != null) {
+				o.setSubject(new Reference().setReference(PATIENT + "/"+observationReported.getPatientReportedId()));
 //				o.setSubject(MappingHelper.getFhirReference(PATIENT,PATIENT_REPORTED,observationReported.getPatientReported().getPatientReportedExternalLink()));
-			}
-			if (observationReported.getObservation() != null && observationMaster == null) {
-				o.addPartOf(MappingHelper.getFhirReference(OBSERVATION,OBSERVATION_MASTER, observationReported.getObservation().getObservationId()));
 			}
 			o.setValue(new CodeableConcept(new Coding()
 				.setCode(observationReported.getValueCode())
@@ -60,6 +58,16 @@ public class ObservationMapper {
 		}
 		return o;
 
+	}
+
+	public static ObservationReported getReportedWithMaster(Observation observation, FhirRequests fhirRequests, IGenericClient fhirClient){
+		ObservationReported observationReported = getReported(observation);
+		observationReported.setObservation(
+			fhirRequests.searchObservationMaster(
+				fhirClient,
+				Observation.IDENTIFIER.exactly().systemAndIdentifier(observationReported.getIdentifierTable(),observationReported.getIdentifierCode())
+			));
+		return observationReported;
 	}
 
 
@@ -109,7 +117,7 @@ public class ObservationMapper {
 		ObservationMaster observationMaster = new ObservationMaster();
 		observationMaster.setObservationId(o.getCode().getCode(OBSERVATION_MASTER));
 		observationMaster.setIdentifierCode(o.getCode().getCode(IDENTIFIER_CODE));
-//		observationMaster.setPatient();
+//		observationMaster.setPatient(); TODO
 //		observationMaster.setVaccination();
 //		observationMaster.setObservationReported();
 		observationMaster.setValueCode(o.getValueCodeableConcept().getCodingFirstRep().getCode());

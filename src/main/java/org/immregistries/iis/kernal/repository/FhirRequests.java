@@ -70,7 +70,7 @@ public class FhirRequests {
 		VaccinationReported vaccinationReported = null;
 		Bundle bundle = searchRegularRecord(Immunization.class,fhirClient, where);
 		if (bundle.hasEntry()) {
-			vaccinationReported = ImmunizationMapper.getReported((Immunization) bundle.getEntryFirstRep().getResource());
+			vaccinationReported = ImmunizationMapper.getReportedWithMaster((Immunization) bundle.getEntryFirstRep().getResource(),this,fhirClient);
 		}
 		return vaccinationReported;
 	}
@@ -78,23 +78,31 @@ public class FhirRequests {
 		List<VaccinationReported> vaccinationReportedList = new ArrayList<>();
 		Bundle bundle = searchRegularRecord(Immunization.class,fhirClient, where);
 		for (Bundle.BundleEntryComponent entry: bundle.getEntry()) {
-			vaccinationReportedList.add(ImmunizationMapper.getReported((Immunization) entry.getResource()));
+			vaccinationReportedList.add(ImmunizationMapper.getReportedWithMaster((Immunization) entry.getResource(),this,fhirClient));
 		}
 		return vaccinationReportedList;
 	}
 	public ObservationReported searchObservationReported(IGenericClient fhirClient, ICriterion... where) {
 		ObservationReported observationReported = null;
-		Bundle bundle = search(Observation.class,fhirClient, where);
+		Bundle bundle = searchRegularRecord(Observation.class,fhirClient, where);
 		if (bundle.hasEntry()) {
-			observationReported = ObservationMapper.getReported((Observation) bundle.getEntryFirstRep().getResource());
+			observationReported = ObservationMapper.getReportedWithMaster((Observation) bundle.getEntryFirstRep().getResource(),this,fhirClient);
 		}
 		return observationReported;
+	}
+	public ObservationMaster searchObservationMaster(IGenericClient fhirClient, ICriterion... where) {
+		ObservationMaster observationMaster = null;
+		Bundle bundle = searchGoldenRecord(Observation.class,fhirClient, where);
+		if (bundle.hasEntry()) {
+			observationMaster = ObservationMapper.getMaster((Observation) bundle.getEntryFirstRep().getResource());
+		}
+		return observationMaster;
 	}
 	public List<ObservationReported> searchObservationReportedList(IGenericClient fhirClient, ICriterion... where) {
 		List<ObservationReported> observationReportedList = new ArrayList<>();
 		Bundle bundle = search(Observation.class,fhirClient, where);
 		for (Bundle.BundleEntryComponent entry: bundle.getEntry()) {
-			observationReportedList.add(ObservationMapper.getReported((Observation) entry.getResource()));
+			observationReportedList.add(ObservationMapper.getReportedWithMaster((Observation) entry.getResource(),this,fhirClient));
 		}
 		return observationReportedList;
 	}
@@ -196,12 +204,14 @@ public class FhirRequests {
 		Patient patient =  PatientMapper.getFhirResource( null,patientReported);
 		MethodOutcome outcome = saveRegular(fhirClient,patient,
 			Patient.IDENTIFIER.exactly().systemAndIdentifier(MRN_SYSTEM,patientReported.getPatientReportedExternalLink()));
-		if (outcome.getCreated() != null && outcome.getCreated()) {
-			patientReported.setPatientReportedId(outcome.getId().getIdPart());
-		} else if (!outcome.getResource().isEmpty()) {
+		if (!outcome.getResource().isEmpty()) {
 			patientReported.setPatientReportedId(outcome.getResource().getIdElement().getIdPart());
+			return PatientMapper.getReportedWithMaster((Patient) outcome.getResource(),this,fhirClient);
+		} else if (outcome.getCreated() != null && outcome.getCreated()) {
+			patientReported.setPatientReportedId(outcome.getId().getIdPart());
 		}
-		return patientReported;
+//		return patientReported;
+		return searchPatientReported(fhirClient,Patient.IDENTIFIER.exactly().systemAndIdentifier(MRN_SYSTEM,patientReported.getPatientReportedExternalLink()));
 	}
 	public ModelPerson savePractitioner(IGenericClient fhirClient, ModelPerson modelPerson) {
 		Practitioner practitioner = PersonMapper.getFhirPractitioner(modelPerson);
@@ -216,7 +226,7 @@ public class FhirRequests {
 	}
 
 	public ObservationReported saveObservationReported(IGenericClient fhirClient, ObservationReported observationReported) {
-		Observation observation = ObservationMapper.getFhirResource(null,observationReported);
+		Observation observation = ObservationMapper.getFhirResource(observationReported);
 		MethodOutcome outcome = saveRegular(fhirClient,observation,
 			Observation.IDENTIFIER.exactly().systemAndIdentifier(OBSERVATION_REPORTED,observationReported.getObservationReportedId()));
 		if (outcome.getCreated() != null && outcome.getCreated()) {
@@ -228,7 +238,7 @@ public class FhirRequests {
 	}
 
 	public VaccinationReported saveVaccinationReported(IGenericClient fhirClient, VaccinationReported vaccinationReported) {
-		Immunization immunization = ImmunizationMapper.getFhirResource( null, vaccinationReported);
+		Immunization immunization = ImmunizationMapper.getFhirResource(vaccinationReported);
 		MethodOutcome outcome = saveRegular(fhirClient,immunization,
 			Immunization.IDENTIFIER.exactly()
 				.systemAndIdentifier(MappingHelper.VACCINATION_REPORTED, vaccinationReported.getVaccinationReportedExternalLink())
@@ -240,19 +250,19 @@ public class FhirRequests {
 		}
 		return vaccinationReported;
 	}
-	public VaccinationReported saveVaccinationReported(IGenericClient fhirClient, VaccinationMaster vaccinationMaster, VaccinationReported vaccinationReported) {
-		Immunization immunization = ImmunizationMapper.getFhirResource( vaccinationMaster, vaccinationReported);
-		MethodOutcome outcome = saveRegular(fhirClient,immunization,
-			Immunization.IDENTIFIER.exactly()
-				.systemAndIdentifier(MappingHelper.VACCINATION_REPORTED, vaccinationReported.getVaccinationReportedExternalLink())
-			);
-		if (outcome.getCreated() != null && outcome.getCreated()){
-			vaccinationReported.setVaccinationReportedId(outcome.getId().getIdPart());
-		} else if (!outcome.getResource().isEmpty()) {
-			vaccinationReported.setVaccinationReportedId(outcome.getResource().getIdElement().getIdPart());
-		}
-		return vaccinationReported;
-	}
+//	public VaccinationReported saveVaccinationReported(IGenericClient fhirClient, VaccinationReported vaccinationReported) {
+//		Immunization immunization = ImmunizationMapper.getFhirResource(vaccinationReported);
+//		MethodOutcome outcome = saveRegular(fhirClient,immunization,
+//			Immunization.IDENTIFIER.exactly()
+//				.systemAndIdentifier(MappingHelper.VACCINATION_REPORTED, vaccinationReported.getVaccinationReportedExternalLink())
+//			);
+//		if (outcome.getCreated() != null && outcome.getCreated()){
+//			vaccinationReported.setVaccinationReportedId(outcome.getId().getIdPart());
+//		} else if (!outcome.getResource().isEmpty()) {
+//			vaccinationReported.setVaccinationReportedId(outcome.getResource().getIdElement().getIdPart());
+//		}
+//		return vaccinationReported;
+//	}
 	public OrgLocation saveOrgLocation(IGenericClient fhirClient, OrgLocation orgLocation) {
 		Location location = LocationMapper.fhirLocation(orgLocation);
 		MethodOutcome outcome = saveRegular(fhirClient,location,

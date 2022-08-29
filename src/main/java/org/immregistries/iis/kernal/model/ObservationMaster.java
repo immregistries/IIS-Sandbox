@@ -12,6 +12,8 @@ public class ObservationMaster implements Serializable {
   private String observationId = "";
   private PatientMaster patient = null;
   private VaccinationMaster vaccination = null;
+  private String patientId = "";
+  private String vaccinationId = "";
   private String identifierCode = "";
   private String valueCode = "";
   private ObservationReported observationReported = null;
@@ -24,19 +26,25 @@ public class ObservationMaster implements Serializable {
     this.observationId = observationId;
   }
 
-  public PatientMaster getPatient() {
-    return patient;
-  }
+//  public PatientMaster getPatient() {
+//    return patient;
+//  }
 
   public void setPatient(PatientMaster patient) {
+	  if (patient != null) {
+		  setPatientId(patient.getPatientId());
+	  }
     this.patient = patient;
   }
 
-  public VaccinationMaster getVaccination() {
-    return vaccination;
-  }
+//  public VaccinationMaster getVaccination() {
+//    return vaccination;
+//  }
 
   public void setVaccination(VaccinationMaster vaccination) {
+	  if (vaccination != null) {
+		  setVaccinationId(vaccination.getVaccinationId());
+	  }
     this.vaccination = vaccination;
   }
 
@@ -64,4 +72,19 @@ public class ObservationMaster implements Serializable {
     this.observationReported = observationReported;
   }
 
+	public String getPatientId() {
+		return patientId;
+	}
+
+	public void setPatientId(String patientId) {
+		this.patientId = patientId;
+	}
+
+	public String getVaccinationId() {
+		return vaccinationId;
+	}
+
+	public void setVaccinationId(String vaccinationId) {
+		this.vaccinationId = vaccinationId;
+	}
 }

@@ -352,12 +352,12 @@ public class PatientServlet extends HttpServlet {
     out.println("  </tr>");
     out.println("  <tbody>");
     for (ObservationReported observationReported : observationReportedList) {
-      out.println("  <tr>");
+      out.println("<tr>");
       String valueType = observationReported.getValueType();
       if (valueType == null) {
         valueType = "CE";
       }
-      out.println("    <td>");
+      out.println("<td>");
       {
         String code = observationReported.getIdentifierCode();
         if (observationReported.getIdentifierLabel().equals("")) {
@@ -398,10 +398,8 @@ public class PatientServlet extends HttpServlet {
           }
         }
       }
-      out.println("    </td>");
-
-
-      out.println("    <td>");
+      out.println("</td>");
+      out.println("<td>");
       if (valueType.equals("DT")) {
         String value = observationReported.getValueCode();
         Date valueDate = null;
@@ -429,7 +427,7 @@ public class PatientServlet extends HttpServlet {
             + observationReported.getValueTable() + " " + observationReported.getValueCode());
       } else {
         String code = observationReported.getValueCode();
-        if (observationReported.getValueLabel().equals("")) {
+        if (observationReported.getValueLabel() == null || observationReported.getValueLabel().equals("")) {
           out.println("      " + code);
         } else {
           String table = observationReported.getValueTable();
@@ -471,7 +469,7 @@ public class PatientServlet extends HttpServlet {
       out.println("    </td>");
 
       if (observationReported.getObservationDate() == null) {
-        out.println("    <td></td>");
+        out.println("<td></td>");
       } else {
         out.println(
             "    <td>" + sdfDate.format(observationReported.getObservationDate()) + "</td>");

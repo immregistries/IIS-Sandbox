@@ -255,8 +255,7 @@ public class IncomingEventHandler extends IncomingMessageHandler {
 
 
     {
-		 vaccinationReported = fhirRequests.saveVaccinationReported(fhirClient, null,vaccinationReported);
-//		 vaccinationMaster.setVaccinationId(vaccinationReported.getVaccinationReportedId());
+		 vaccinationReported = fhirRequests.saveVaccinationReported(fhirClient, vaccinationReported);
     }
 
   }
@@ -281,7 +280,6 @@ public class IncomingEventHandler extends IncomingMessageHandler {
 
     {
 		 patientReported = fhirRequests.searchPatientReported(getFhirClient(orgAccess),
-//			 "identifier="+patientReportedExternalLink
 			 Patient.IDENTIFIER.exactly().code(patientReportedExternalLink)
 		 );
     }

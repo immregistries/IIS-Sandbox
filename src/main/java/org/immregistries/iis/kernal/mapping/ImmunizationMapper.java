@@ -31,8 +31,10 @@ public class ImmunizationMapper {
 			Immunization.IDENTIFIER.exactly().systemAndIdentifier(
 				MappingHelper.VACCINATION_REPORTED,
 				vaccinationReported.getVaccinationReportedExternalLink()));
-		vaccinationReported.setVaccination(vaccinationMaster);
-		vaccinationMaster.setVaccinationReported(vaccinationReported);
+		if (vaccinationMaster!= null) {
+			vaccinationReported.setVaccination(vaccinationMaster);
+			vaccinationMaster.setVaccinationReported(vaccinationReported);
+		}
 		return vaccinationReported;
 	}
 	public static VaccinationReported getReported(Immunization i) {
@@ -93,18 +95,17 @@ public class ImmunizationMapper {
 
   /**
    * This method create the immunization resource based on the vaccinationReported information
-   * @param vaccinationMaster the vaccinationMaster
    * @param vr the vaccinationReported
    * @return the Immunization resource
    */
-  public static Immunization getFhirResource(VaccinationMaster vaccinationMaster, VaccinationReported vr) {
+  public static Immunization getFhirResource(VaccinationReported vr) {
     Immunization i = new Immunization();
-	 if (vaccinationMaster != null ){
-		i.addIdentifier(MappingHelper.getFhirIdentifier(MappingHelper.VACCINATION_MASTER,vaccinationMaster.getVaccinationReported().getVaccinationReportedExternalLink()));
-		i.setOccurrence(new DateTimeType(vaccinationMaster.getAdministeredDate()));
-		i.getVaccineCode().addCoding().setSystem(CVX).setCode(vaccinationMaster.getVaccineCvxCode());
-//		i.setPatient(MappingHelper.getFhirReference(MappingHelper.PATIENT,MappingHelper.PATIENT_MASTER, vaccinationMaster.getPatient().getPatientExternalLink()));
-	 }
+//	 if (vaccinationMaster != null ){
+//		i.addIdentifier(MappingHelper.getFhirIdentifier(MappingHelper.VACCINATION_MASTER,vaccinationMaster.getVaccinationReported().getVaccinationReportedExternalLink()));
+//		i.setOccurrence(new DateTimeType(vaccinationMaster.getAdministeredDate()));
+//		i.getVaccineCode().addCoding().setSystem(CVX).setCode(vaccinationMaster.getVaccineCvxCode());
+////		i.setPatient(MappingHelper.getFhirReference(MappingHelper.PATIENT,MappingHelper.PATIENT_MASTER, vaccinationMaster.getPatient().getPatientExternalLink()));
+//	 }
 	 if (vr != null) {
 		 i.addIdentifier(MappingHelper.getFhirIdentifier(MappingHelper.VACCINATION_REPORTED, vr.getVaccinationReportedExternalLink()));
 

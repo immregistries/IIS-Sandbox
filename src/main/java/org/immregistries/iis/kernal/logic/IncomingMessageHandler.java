@@ -260,10 +260,8 @@ public class IncomingMessageHandler {
       if (processingFlavorSet.contains(ProcessingFlavor.CANTALOUPE)) {
         strictDate = false;
       }
-      PatientReported patientReported = null;
-
-      patientReported = processPatient(orgAccess, reader, processingExceptionList,
-          processingFlavorSet, codeMap, strictDate, patientReported);
+      PatientReported patientReported = processPatient(orgAccess, reader, processingExceptionList,
+          processingFlavorSet, codeMap, strictDate,null);
 
 
 
@@ -570,11 +568,11 @@ public class IncomingMessageHandler {
 
           verifyNoErrors(processingExceptionList);
           reader.gotoSegmentPosition(segmentPosition);
-			 vaccinationReported = fhirRequests.saveVaccinationReported(fhirClient, null,vaccinationReported);
+			 vaccinationReported = fhirRequests.saveVaccinationReported(fhirClient, vaccinationReported);
 //			 vaccinationMaster.setVaccinationId(vaccinationReported.getVaccinationReportedId());
 //          {
 //				 Immunization immunization = ImmunizationHandler.getFhirResource(vaccinationMaster,vaccinationReported);
-////				 fhirClient.patch();TODO Convert resources to Fhirpatch and replace simple updates with patch or MDM might fix this issue
+////				 fhirClient.patch();TODO Maybe Convert resources to Fhirpatch and replace simple updates with patch or MDM might fix this issue
 //				 try {
 //					 MethodOutcome outcome = fhirClient.update().resource(immunization).conditional().where(
 //							 Immunization.IDENTIFIER.exactly()
@@ -662,11 +660,11 @@ public class IncomingMessageHandler {
     if (patientReported == null) {
 //      patientMaster = new PatientMaster();
 //      patientMaster.setOrgMaster(orgAccess.getOrg());
-		 patientReported = new PatientReported();
-      patientReported.setOrgReported(orgAccess.getOrg());
-      patientReported.setPatientReportedExternalLink(patientReportedExternalLink);
+		  patientReported = new PatientReported();
+        patientReported.setOrgReported(orgAccess.getOrg());
+        patientReported.setPatientReportedExternalLink(patientReportedExternalLink);
 //      patientReported.setPatient(patientMaster);
-      patientReported.setReportedDate(new Date());
+        patientReported.setReportedDate(new Date());
     }
 //	 else {
 //		 patientMaster = patientReported.getPatient();
@@ -988,10 +986,8 @@ public class IncomingMessageHandler {
       CodeMap codeMap = CodeMapManager.getCodeMap();
 
       boolean strictDate = !processingFlavorSet.contains(ProcessingFlavor.CANTALOUPE);
-		 PatientReported patientReported = null;
-
-      patientReported = processPatient(orgAccess, reader, processingExceptionList,
-          processingFlavorSet, codeMap, strictDate, patientReported);
+		 PatientReported patientReported = processPatient(orgAccess, reader, processingExceptionList,
+          processingFlavorSet, codeMap, strictDate, null);
 
       int orcCount = 0;
       int obxCount = 0;
@@ -1026,29 +1022,29 @@ public class IncomingMessageHandler {
       obxCount++;
       String identifierCode = reader.getValue(3);
       String valueCode = reader.getValue(5);
-      ObservationMaster observationMaster =
+      ObservationReported observationReported =
           readObservations(reader, processingExceptionList, patientReported, strictDate, obxCount,
               vaccinationReported, vaccination, identifierCode, valueCode, fhirClient);
-      if (observationMaster.getIdentifierCode().equals("30945-0")) // contraindication!
+      if (observationReported.getIdentifierCode().equals("30945-0")) // contraindication!
       {
         CodeMap codeMap = CodeMapManager.getCodeMap();
         Code contraCode = codeMap.getCodeForCodeset(CodesetType.CONTRAINDICATION_OR_PRECAUTION,
-            observationMaster.getValueCode());
+            observationReported.getValueCode());
         if (contraCode == null) {
           ProcessingException pe = new ProcessingException(
               "Unrecognized contraindication or precaution", "OBX", obxCount, 5);
           pe.setWarning();
           processingExceptionList.add(pe);
         }
-        if (observationMaster.getObservationReported().getObservationDate() != null) {
+        if (observationReported.getObservationDate() != null) {
           Date today = new Date();
-          if (observationMaster.getObservationReported().getObservationDate().after(today)) {
+          if (observationReported.getObservationDate().after(today)) {
             ProcessingException pe = new ProcessingException(
                 "Contraindication or precaution observed in the future", "OBX", obxCount, 5);
             pe.setWarning();
             processingExceptionList.add(pe);
           }
-          if (patientReported.getPatientBirthDate() != null && observationMaster.getObservationReported()
+          if (patientReported.getPatientBirthDate() != null && observationReported
               .getObservationDate().before(patientReported.getPatientBirthDate())) {
             ProcessingException pe = new ProcessingException(
                 "Contraindication or precaution observed before patient was born", "OBX", obxCount,
@@ -1059,8 +1055,7 @@ public class IncomingMessageHandler {
         }
       }
       {
-        ObservationReported observationReported = observationMaster.getObservationReported();
-		  observationMaster.setPatient(patientReported.getPatient());
+		  observationReported.setPatientReportedId(patientReported.getPatientReportedId());
 
 //		  Observation observation = ObservationMapper.getFhirResource(observationMaster,observationReported);
 		  observationReported = fhirRequests.saveObservationReported(fhirClient,observationReported);
@@ -1071,56 +1066,34 @@ public class IncomingMessageHandler {
   }
 
   @SuppressWarnings("unchecked")
-  public ObservationMaster readObservations(HL7Reader reader,
+  public ObservationReported readObservations(HL7Reader reader,
       List<ProcessingException> processingExceptionList, PatientReported patientReported,
       boolean strictDate, int obxCount, VaccinationReported vaccinationReported,
       VaccinationMaster vaccination, String identifierCode, String valueCode, IGenericClient fhirClient) {
-    ObservationMaster observationMaster = null;
+//    ObservationMaster observationMaster = null;
 	 ObservationReported observationReported = null;
 	  if (vaccination == null) {
 		  observationReported = fhirRequests.searchObservationReported(fhirClient,
 			  Observation.PART_OF.isMissing(true),
-			  Observation.SUBJECT.hasId(patientReported.getPatientReportedId())); //TODO chqnge has linked property
+			  Observation.SUBJECT.hasId(patientReported.getPatientReportedId())); //TODO change has linked property
 	  } else {
 		  observationReported = fhirRequests.searchObservationReported(fhirClient,
 			  Observation.PART_OF.hasId(vaccination.getVaccinationId()),
 			  Observation.SUBJECT.hasId(patientReported.getPatientReportedId()));
 	  }
-	  if (observationReported != null) {
-		  observationMaster = observationReported.getObservation();
-	  }
-//	  String q;
-//    if (vaccination == null) {
-//      q = "from ObservationMaster where " + "patient = :patient and vaccination is null "
-//          + "and identifierCode = :identifierCode";
-//    } else {
-//      q = "from ObservationMaster where " + "patient = :patient and vaccination = :vaccination "
-//          + "and identifierCode = :identifierCode";
-//    }
-//    Query query = dataSession.createQuery(q);
-//    query.setParameter("patient", patientReported.getPatient());
-//    if (vaccination != null) {
-//      query.setParameter("vaccination", vaccination);
-//    }
-//    query.setParameter("identifierCode", identifierCode);
-//    List<ObservationMaster> l = query.list();
-//    if (l.size() > 0) {
-//      observationMaster = l.get(0);
-//      observationReported = observationMaster.getObservationReported();
-//    } else
-    if (observationMaster == null) {
-      observationMaster = new ObservationMaster();
-      observationMaster.setPatient(patientReported.getPatient());
-      observationMaster.setVaccination(vaccination);
-      observationMaster.setIdentifierCode(identifierCode);
+    if (observationReported == null) {
+//      observationMaster = new ObservationMaster();
+//      observationMaster.setPatientId(patientReported.getPatient().getPatientId());
+//      observationMaster.setVaccination(vaccination);
+//      observationMaster.setIdentifierCode(identifierCode);
       observationReported = new ObservationReported();
-      observationMaster.setObservationReported(observationReported);
+//      observationMaster.setObservationReported(observationReported);
       observationReported.setReportedDate(new Date());
     }
-    observationMaster.setValueCode(valueCode);
-    observationReported.setPatientReported(patientReported);
-    observationReported.setVaccinationReported(vaccinationReported);
-    observationReported.setObservation(observationMaster);
+//    observationMaster.setValueCode(valueCode);
+    observationReported.setPatientReportedId(patientReported.getPatientReportedId());
+    observationReported.setVaccinationReportedId(vaccinationReported.getVaccinationReportedId());
+//    observationReported.setObservation(observationMaster);
     observationReported.setUpdatedDate(new Date());
     observationReported.setIdentifierCode(identifierCode);
     observationReported.setValueType(reader.getValue(2));
@@ -1139,7 +1112,7 @@ public class IncomingMessageHandler {
     observationReported.setMethodCode(reader.getValue(17, 1));
     observationReported.setMethodLabel(reader.getValue(17, 2));
     observationReported.setMethodTable(reader.getValue(17, 3));
-    return observationMaster;
+    return observationReported;
   }
 
   public void verifyNoErrors(List<ProcessingException> processingExceptionList)
@@ -1490,10 +1463,12 @@ public class IncomingMessageHandler {
 				if (bundle.hasEntry()) {
 					obsSubId++;
 					for (Bundle.BundleEntryComponent entry : bundle.getEntry()) {
-						ObservationMaster observationMaster =
-							ObservationMapper.getMaster((Observation) entry.getResource());
+//						ObservationMaster observationMaster =
+//							ObservationMapper.getMaster((Observation) entry.getResource());
+						ObservationReported observationReported =
+							ObservationMapper.getReported((Observation) entry.getResource());
 						obxSetId++;
-						printObx(sb, obxSetId, obsSubId, observationMaster);
+						printObx(sb, obxSetId, obsSubId, observationReported);
 					}
 				}
 			} catch (ResourceNotFoundException e) {}
@@ -1507,9 +1482,9 @@ public class IncomingMessageHandler {
 				 obsSubId++;
 				 for (Bundle.BundleEntryComponent entry : bundle.getEntry()) {
 					 obxSetId++;
-					 ObservationMaster observationMaster =
-						 ObservationMapper.getMaster((Observation) entry.getResource());
-					 printObx(sb, obxSetId, obsSubId, observationMaster);
+					 ObservationReported observationReported =
+						 ObservationMapper.getReported((Observation) entry.getResource());
+					 printObx(sb, obxSetId, obsSubId, observationReported);
 				 }
 			 }
 		 } catch (ResourceNotFoundException e) {}
@@ -1789,10 +1764,10 @@ public class IncomingMessageHandler {
 				if (bundle.hasEntry()) {
 					obsSubId++;
 					for (Bundle.BundleEntryComponent entry : bundle.getEntry()) {
-						ObservationMaster observationMaster =
-							ObservationMapper.getMaster((Observation) entry.getResource());
+						ObservationReported observationReported =
+							ObservationMapper.getReported((Observation) entry.getResource());
 						obxSetId++;
-						printObx(sb, obxSetId, obsSubId, observationMaster);
+						printObx(sb, obxSetId, obsSubId, observationReported);
 					}
 				}
 			} catch (ResourceNotFoundException e) {}
@@ -2122,8 +2097,8 @@ public class IncomingMessageHandler {
   }
 
   public void printObx(StringBuilder sb, int obxSetId, int obsSubId,
-      ObservationMaster observation) {
-    ObservationReported ob = observation.getObservationReported();
+      ObservationReported ob) {
+//    ObservationReported ob = observation.getObservationReported();
     sb.append("OBX");
     // OBX-1
     sb.append("|");

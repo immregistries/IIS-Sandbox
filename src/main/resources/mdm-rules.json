@@ -1,6 +1,6 @@
 {
   "version": "1",
-  "mdmTypes": ["Patient", "Practitioner", "Immunization"],
+  "mdmTypes": ["Patient", "Practitioner","Observation", "Immunization"],
   "candidateSearchParams": [
     {
       "resourceType": "Patient",

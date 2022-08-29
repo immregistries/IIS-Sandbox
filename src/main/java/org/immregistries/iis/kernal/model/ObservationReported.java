@@ -8,9 +8,10 @@ public class ObservationReported implements Serializable {
   private static final long serialVersionUID = 1L;
 
   private String observationReportedId = "";
-  private PatientReported patientReported = null;
-  private String patientReportedId = null;
-  private VaccinationReported vaccinationReported = null;
+//  private PatientReported patientReported = null;
+//  private VaccinationReported vaccinationReported = null;
+  private String patientReportedId = "";
+  private String vaccinationReportedId = "";
   private ObservationMaster observation = null;
   private Date reportedDate = null;
   private Date updatedDate = null;
@@ -38,24 +39,24 @@ public class ObservationReported implements Serializable {
     this.observationReportedId = observationReportedId;
   }
 
-  public PatientReported getPatientReported() {
-    return patientReported;
-  }
-
-	public void setPatientReported(PatientReported reportedPatient) {
-		if (reportedPatient != null && reportedPatient.getPatientReportedId() != null) {
-			setPatientReportedId(reportedPatient.getPatientReportedId());
-		}
-		this.patientReported = reportedPatient;
-	}
-
-  public VaccinationReported getVaccinationReported() {
-    return vaccinationReported;
-  }
-
-  public void setVaccinationReported(VaccinationReported vaccinationReported) {
-    this.vaccinationReported = vaccinationReported;
-  }
+//  public PatientReported getPatientReported() {
+//    return patientReported;
+//  }
+//
+//	public void setPatientReported(PatientReported reportedPatient) {
+//		if (reportedPatient != null && reportedPatient.getPatientReportedId() != null) {
+//			setPatientReportedId(reportedPatient.getPatientReportedId());
+//		}
+//		this.patientReported = reportedPatient;
+//	}
+//
+//  public VaccinationReported getVaccinationReported() {
+//    return vaccinationReported;
+//  }
+//
+//  public void setVaccinationReported(VaccinationReported vaccinationReported) {
+//    this.vaccinationReported = vaccinationReported;
+//  }
 
   public ObservationMaster getObservation() {
     return observation;
@@ -208,5 +209,13 @@ public class ObservationReported implements Serializable {
 
 	public void setPatientReportedId(String patientReportedId) {
 		this.patientReportedId = patientReportedId;
+	}
+
+	public String getVaccinationReportedId() {
+		return vaccinationReportedId;
+	}
+
+	public void setVaccinationReportedId(String vaccinationReportedId) {
+		this.vaccinationReportedId = vaccinationReportedId;
 	}
 }
