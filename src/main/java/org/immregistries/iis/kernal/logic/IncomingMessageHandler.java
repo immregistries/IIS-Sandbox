@@ -659,16 +659,11 @@ public class IncomingMessageHandler {
 
     if (patientReported == null) {
 //      patientMaster = new PatientMaster();
-//      patientMaster.setOrgMaster(orgAccess.getOrg());
 		  patientReported = new PatientReported();
         patientReported.setOrgReported(orgAccess.getOrg());
         patientReported.setPatientReportedExternalLink(patientReportedExternalLink);
-//      patientReported.setPatient(patientMaster);
         patientReported.setReportedDate(new Date());
     }
-//	 else {
-//		 patientMaster = patientReported.getPatient();
-//	 }
 
     {
       String patientNameLast = reader.getValue(5, 1);
@@ -758,8 +753,8 @@ public class IncomingMessageHandler {
 //      patientMaster.setPatientNameMiddle(patientNameMiddle);
 ////      patientMaster.setPatientPhoneFrag(patientPhone);
 //      patientMaster.setPatientBirthDate(patientBirthDate);
-////      patientMaster.setPatientSoundexFirst(""); // TODO, later
-////      patientMaster.setPatientSoundexLast(""); // TODO, later
+////      patientMaster.setPatientSoundexFirst("");
+////      patientMaster.setPatientSoundexLast("");
       patientReported.setPatientReportedExternalLink(patientReportedExternalLink);
       patientReported.setPatientReportedType(patientReportedType);
       patientReported.setPatientNameFirst(patientNameFirst);

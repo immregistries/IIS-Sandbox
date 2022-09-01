@@ -28,12 +28,13 @@ public class MappingHelper {
 
 	//TODO choose system id or not
 	public  static Reference getFhirReference(String fhirType, String dbType, String identifier) {
-//		if (identifier == null || identifier.equals("") ) {
-//			throw new RuntimeException();
-//		}
-		return new Reference()
-			.setType(fhirType)
-			.setIdentifier(getFhirIdentifier(dbType,identifier));
+		if (identifier == null || identifier.isBlank()) {
+			return null;
+		} else {
+			return new Reference()
+				.setType(fhirType)
+				.setIdentifier(getFhirIdentifier(dbType,identifier));
+		}
 	}
 	public  static Reference getFhirReference(String fhirType, String dbType, String identifier, String fhirId) {
 		return new Reference(fhirType + "/" + fhirId)
@@ -48,7 +49,7 @@ public class MappingHelper {
 	}
 
 	public  static Identifier filterIdentifier(List<Identifier> identifiers, String system) {
-		return identifiers.stream().filter(identifier -> identifier.getSystem().equals(system)).findFirst().get();
+		return identifiers.stream().filter(identifier -> identifier.getSystem() != null && identifier.getSystem().equals(system)).findFirst().get();
 	}
 
 	public  static Coding filterCodeableConcept(CodeableConcept concept, String system) {

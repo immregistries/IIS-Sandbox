@@ -1,6 +1,6 @@
 {
   "version": "1",
-  "mdmTypes": ["Patient", "Practitioner","Observation", "Immunization"],
+  "mdmTypes": ["Patient", "Observation", "Immunization"],
   "candidateSearchParams": [
     {
       "resourceType": "Patient",
@@ -13,18 +13,9 @@
     {
       "resourceType": "*",
       "searchParams": ["identifier"]
-    },
-    {
-      "resourceType": "Patient",
-      "searchParams": ["general-practitioner"]
     }
   ],
   "candidateFilterSearchParams": [
-    {
-      "resourceType": "Practitioner",
-      "searchParam": "active",
-      "fixedValue": "true"
-    },
     {
       "resourceType": "Patient",
       "searchParam": "active",
@@ -47,22 +38,6 @@
       "matcher": {
         "algorithm": "SOUNDEX"
       }
-    },
-    {
-      "name": "practitioner-given-name",
-      "resourceType": "Practitioner",
-      "resourcePath": "name.given",
-      "matcher": {
-        "algorithm": "COLOGNE"
-      }
-    },
-    {
-      "name": "practitioner-last-name",
-      "resourceType": "Practitioner",
-      "resourcePath": "name.family",
-      "matcher": {
-        "algorithm": "SOUNDEX"
-      }
     }
   ],
   "matchResultMap": {
@@ -71,7 +46,6 @@
   },
   "eidSystems": {
     "Patient": "urn:mrns",
-    "Immunization": "urn:mrns",
-    "Practitioner": "urn:mrns"
+    "Immunization": "urn:mrns"
   }
 }

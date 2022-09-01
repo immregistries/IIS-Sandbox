@@ -44,7 +44,8 @@ public class PatientMapper {
 	public static PatientReported getReported(Patient p) {
 		PatientReported patientReported = new PatientReported();
 		patientReported.setPatientReportedId(new IdType(p.getId()).getIdPart());
-		patientReported.setPatientReportedExternalLink(MappingHelper.filterIdentifier(p.getIdentifier(), MRN_SYSTEM).getValue());
+//		patientReported.setPatientReportedExternalLink(MappingHelper.filterIdentifier(p.getIdentifier(), MRN_SYSTEM).getValue()); TODO see if only use MRN
+		patientReported.setPatientReportedExternalLink(p.getIdentifierFirstRep().getValue());
 		patientReported.setUpdatedDate(p.getMeta().getLastUpdated());
 
 		patientReported.setPatientReportedAuthority(p.getManagingOrganization().getIdentifier().getValue());

@@ -243,7 +243,7 @@ public class FhirRequests {
 			Immunization.IDENTIFIER.exactly()
 				.systemAndIdentifier(MappingHelper.VACCINATION_REPORTED, vaccinationReported.getVaccinationReportedExternalLink())
 		);
-		if (outcome.getCreated()){
+		if (outcome.getCreated() != null && outcome.getCreated()){
 			vaccinationReported.setVaccinationReportedId(outcome.getId().getIdPart());
 		} else if (!outcome.getResource().isEmpty()) {
 			vaccinationReported.setVaccinationReportedId(outcome.getResource().getIdElement().getIdPart());
