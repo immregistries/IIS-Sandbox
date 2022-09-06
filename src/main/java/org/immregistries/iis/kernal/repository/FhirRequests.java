@@ -201,7 +201,7 @@ public class FhirRequests {
 	}
 
 	public PatientReported savePatientReported(IGenericClient fhirClient, PatientReported patientReported) {
-		Patient patient =  PatientMapper.getFhirResource( null,patientReported);
+		Patient patient =  PatientMapper.getFhirResource(patientReported);
 		MethodOutcome outcome = saveRegular(fhirClient,patient,
 			Patient.IDENTIFIER.exactly().systemAndIdentifier(MRN_SYSTEM,patientReported.getPatientReportedExternalLink()));
 		if (!outcome.getResource().isEmpty()) {

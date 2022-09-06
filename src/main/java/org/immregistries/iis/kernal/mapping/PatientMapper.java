@@ -151,7 +151,7 @@ public class PatientMapper {
 
 		if (p.getExtensionByUrl(PUBLICITY_EXTENSION) != null) {
 			patientReported.setPublicityIndicator(p.getExtensionByUrl(PUBLICITY_EXTENSION).getValueCoding().getCode());
-			if (p.getExtensionByUrl(PUBLICITY_EXTENSION).getValueCoding().getVersion() != null && !p.getExtensionByUrl(PUBLICITY_EXTENSION).getValueCoding().getVersion().equals("") ) {
+			if (p.getExtensionByUrl(PUBLICITY_EXTENSION).getValueCoding().getVersion() != null && !p.getExtensionByUrl(PUBLICITY_EXTENSION).getValueCoding().getVersion().isBlank() ) {
 				try {
 					patientReported.setPublicityIndicatorDate(MappingHelper.sdf.parse(p.getExtensionByUrl(PUBLICITY_EXTENSION).getValueCoding().getVersion()));
 				} catch (ParseException e) {
@@ -209,132 +209,122 @@ public class PatientMapper {
 		return patientMaster;
 	}
 
-	public static Patient getFhirResource(PatientMaster pm, PatientReported pr) {
+	public static Patient getFhirResource(PatientReported pr) {
 		Patient p = new Patient();
-		if (pm != null) {
-//			p.addIdentifier(MappingHelper.getFhirIdentifier(MappingHelper.PATIENT_MASTER, pm.getPatientExternalLink()));
-			HumanName name = p.addName();
-			name.setFamily(pm.getPatientNameLast());
-			name.addGivenElement().setValue(pm.getPatientNameFirst());
-			name.addGivenElement().setValue(pm.getPatientNameMiddle());
-			p.setBirthDate(pm.getPatientBirthDate());
-		}
-		if (pr != null) {
-			p.addIdentifier(MappingHelper.getFhirIdentifier(MRN_SYSTEM, pr.getPatientReportedExternalLink()));
+		p.addIdentifier(MappingHelper.getFhirIdentifier(MRN_SYSTEM, pr.getPatientReportedExternalLink()));
 //			p.setManagingOrganization(MappingHelper.getFhirReference("","PatientReportedAuthority",pr.getPatientReportedAuthority()));
-			p.setBirthDate(pr.getPatientBirthDate());
-			if (p.getNameFirstRep() != null) {
-				HumanName name = p.addName();
-//				name.setUse(HumanName.NameUse.USUAL);
-				name.setFamily(pr.getPatientNameLast());
-				name.addGivenElement().setValue(pr.getPatientNameFirst());
-				name.addGivenElement().setValue(pr.getPatientNameMiddle());
-			}
-//			p.addName().setUse(HumanName.NameUse.MAIDEN).setFamily(pr.getPatientMotherMaiden()); TODO
-			switch (pr.getPatientSex()) {
-				case "M":
-					p.setGender(AdministrativeGender.MALE);
-					break;
-				case "F":
-					p.setGender(AdministrativeGender.FEMALE);
-					break;
-				default:
-					p.setGender(AdministrativeGender.OTHER);
-					break;
-			}
-
-			//Race and ethnicity
-			Extension raceExtension =  p.addExtension();
-			raceExtension.setUrl(RACE);
-			CodeableConcept race = new CodeableConcept().setText(RACE_SYSTEM);
-			raceExtension.setValue(race);
-			if (pr.getPatientRace() != null && !pr.getPatientRace().equals("")) {
-				race.addCoding().setCode(pr.getPatientRace());
-			}
-			if (pr.getPatientRace2() != null && !pr.getPatientRace2().equals("")) {
-				race.addCoding().setCode(pr.getPatientRace2());
-			}
-			if (pr.getPatientRace3() != null && !pr.getPatientRace3().equals("")) {
-				race.addCoding().setCode(pr.getPatientRace3());
-			}
-			if (pr.getPatientRace4() != null && !pr.getPatientRace4().equals("")) {
-				race.addCoding().setCode(pr.getPatientRace4());
-			}
-			if (pr.getPatientRace5() != null && !pr.getPatientRace5().equals("")) {
-				race.addCoding().setCode(pr.getPatientRace5());
-			}
-			if (pr.getPatientRace6() != null && !pr.getPatientRace6().equals("")) {
-				race.addCoding().setCode(pr.getPatientRace6());
-			}
-			p.addExtension(ETHNICITY_EXTENSION,new CodeType().setSystem(ETHNICITY_SYSTEM).setValue(pr.getPatientEthnicity()));
-			// telecom
-			if (null != pr.getPatientPhone()) {
-				p.addTelecom().setSystem(ContactPointSystem.PHONE)
-					.setValue(pr.getPatientPhone());
-			}
-			if (null != pr.getPatientEmail()) {
-				p.addTelecom().setSystem(ContactPointSystem.EMAIL)
-					.setValue(pr.getPatientEmail());
-			}
-
-
-			if (pr.getPatientDeathDate() != null) {
-				p.setDeceased(new DateType(pr.getPatientDeathDate()));
-			} else if (pr.getPatientDeathFlag().equals(YES)) {
-				p.setDeceased(new BooleanType(true));
-			} else if (pr.getPatientDeathFlag().equals(NO)) {
-				p.setDeceased(new BooleanType(false));
-			}
-
-			Address address = p.addAddress();
-			address.addLine(pr.getPatientAddressLine1());
-			address.addLine(pr.getPatientAddressLine2());
-			address.setCity(pr.getPatientAddressCity());
-			address.setCountry(pr.getPatientAddressCountry());
-			address.setState(pr.getPatientAddressState());
-			address.setDistrict(pr.getPatientAddressCountyParish());
-			address.setPostalCode(pr.getPatientAddressZip());
-
-			if (pr.getPatientBirthOrder() != null && !pr.getPatientBirthOrder().equals("")) {
-				p.setMultipleBirth(new IntegerType().setValue(Integer.parseInt(pr.getPatientBirthOrder())));
-			} else if (pr.getPatientBirthFlag().equals(YES)) {
-				p.setMultipleBirth(new BooleanType(true));
-			}
-
-			Extension publicity =  p.addExtension();
-			publicity.setUrl(PUBLICITY_EXTENSION);
-			publicity.setValue(
-				new Coding().setSystem(PUBLICITY_SYSTEM)
-					.setCode(pr.getPublicityIndicator()));
-			if (pr.getPublicityIndicatorDate() != null) {
-				publicity.getValueCoding().setVersion(pr.getPublicityIndicatorDate().toString());
-			}
-			Extension protection =  p.addExtension();
-			protection.setUrl(PROTECTION_EXTENSION);
-			protection.setValue(
-				new Coding().setSystem(PROTECTION_SYSTEM)
-					.setCode(pr.getProtectionIndicator()));
-			if (pr.getProtectionIndicatorDate() != null) {
-				protection.getValueCoding().setVersion(pr.getProtectionIndicatorDate().toString());
-			}
-
-			Extension registryStatus =  p.addExtension();
-			registryStatus.setUrl(REGISTRY_STATUS_EXTENSION);
-			registryStatus.setValue(
-				new Coding().setSystem(REGISTRY_STATUS_INDICATOR)
-					.setCode(pr.getRegistryStatusIndicator()));
-			if (pr.getRegistryStatusIndicatorDate() != null) {
-				registryStatus.getValueCoding().setVersion(pr.getRegistryStatusIndicatorDate().toString());
-			}
-
-			Patient.ContactComponent contact = p.addContact();
-			HumanName contactName = new HumanName();
-			contact.setName(contactName);
-			contact.addRelationship().setText(pr.getGuardianRelationship());
-			contactName.setFamily(pr.getGuardianLast());
-			contactName.addGivenElement().setValue(pr.getGuardianFirst());
-			contactName.addGivenElement().setValue(pr.getGuardianMiddle());
+		p.setBirthDate(pr.getPatientBirthDate());
+		if (p.getNameFirstRep() != null) {
+			HumanName name = p.addName()
+				.setFamily(pr.getPatientNameLast())
+				.addGiven(pr.getPatientNameFirst())
+				.addGiven(pr.getPatientNameMiddle());
+//			   .setUse(HumanName.NameUse.USUAL);
 		}
+
+//			p.addName().setUse(HumanName.NameUse.MAIDEN).setFamily(pr.getPatientMotherMaiden()); TODO
+		switch (pr.getPatientSex()) {
+			case "M":
+				p.setGender(AdministrativeGender.MALE);
+				break;
+			case "F":
+				p.setGender(AdministrativeGender.FEMALE);
+				break;
+			default:
+				p.setGender(AdministrativeGender.OTHER);
+				break;
+		}
+
+		//Race and ethnicity
+		Extension raceExtension =  p.addExtension();
+		raceExtension.setUrl(RACE);
+		CodeableConcept race = new CodeableConcept().setText(RACE_SYSTEM);
+		raceExtension.setValue(race);
+		if (pr.getPatientRace() != null && !pr.getPatientRace().isBlank()) {
+			race.addCoding().setCode(pr.getPatientRace());
+		}
+		if (pr.getPatientRace2() != null && !pr.getPatientRace2().isBlank()) {
+			race.addCoding().setCode(pr.getPatientRace2());
+		}
+		if (pr.getPatientRace3() != null && !pr.getPatientRace3().isBlank()) {
+			race.addCoding().setCode(pr.getPatientRace3());
+		}
+		if (pr.getPatientRace4() != null && !pr.getPatientRace4().isBlank()) {
+			race.addCoding().setCode(pr.getPatientRace4());
+		}
+		if (pr.getPatientRace5() != null && !pr.getPatientRace5().isBlank()) {
+			race.addCoding().setCode(pr.getPatientRace5());
+		}
+		if (pr.getPatientRace6() != null && !pr.getPatientRace6().isBlank()) {
+			race.addCoding().setCode(pr.getPatientRace6());
+		}
+		p.addExtension(ETHNICITY_EXTENSION,new CodeType().setSystem(ETHNICITY_SYSTEM).setValue(pr.getPatientEthnicity()));
+		// telecom
+		if (null != pr.getPatientPhone()) {
+			p.addTelecom().setSystem(ContactPointSystem.PHONE)
+				.setValue(pr.getPatientPhone());
+		}
+		if (null != pr.getPatientEmail()) {
+			p.addTelecom().setSystem(ContactPointSystem.EMAIL)
+				.setValue(pr.getPatientEmail());
+		}
+
+
+		if (pr.getPatientDeathDate() != null) {
+			p.setDeceased(new DateType(pr.getPatientDeathDate()));
+		} else if (pr.getPatientDeathFlag().equals(YES)) {
+			p.setDeceased(new BooleanType(true));
+		} else if (pr.getPatientDeathFlag().equals(NO)) {
+			p.setDeceased(new BooleanType(false));
+		}
+
+		p.addAddress().addLine(pr.getPatientAddressLine1())
+			.addLine(pr.getPatientAddressLine2())
+			.setCity(pr.getPatientAddressCity())
+			.setCountry(pr.getPatientAddressCountry())
+			.setState(pr.getPatientAddressState())
+			.setDistrict(pr.getPatientAddressCountyParish())
+			.setPostalCode(pr.getPatientAddressZip());
+
+		if (pr.getPatientBirthOrder() != null && !pr.getPatientBirthOrder().isBlank()) {
+			p.setMultipleBirth(new IntegerType().setValue(Integer.parseInt(pr.getPatientBirthOrder())));
+		} else if (pr.getPatientBirthFlag().equals(YES)) {
+			p.setMultipleBirth(new BooleanType(true));
+		}
+
+		Extension publicity =  p.addExtension();
+		publicity.setUrl(PUBLICITY_EXTENSION);
+		publicity.setValue(
+			new Coding().setSystem(PUBLICITY_SYSTEM)
+				.setCode(pr.getPublicityIndicator()));
+		if (pr.getPublicityIndicatorDate() != null) {
+			publicity.getValueCoding().setVersion(pr.getPublicityIndicatorDate().toString());
+		}
+		Extension protection =  p.addExtension();
+		protection.setUrl(PROTECTION_EXTENSION);
+		protection.setValue(
+			new Coding().setSystem(PROTECTION_SYSTEM)
+				.setCode(pr.getProtectionIndicator()));
+		if (pr.getProtectionIndicatorDate() != null) {
+			protection.getValueCoding().setVersion(pr.getProtectionIndicatorDate().toString());
+		}
+
+		Extension registryStatus =  p.addExtension();
+		registryStatus.setUrl(REGISTRY_STATUS_EXTENSION);
+		registryStatus.setValue(
+			new Coding().setSystem(REGISTRY_STATUS_INDICATOR)
+				.setCode(pr.getRegistryStatusIndicator()));
+		if (pr.getRegistryStatusIndicatorDate() != null) {
+			registryStatus.getValueCoding().setVersion(pr.getRegistryStatusIndicatorDate().toString());
+		}
+
+		Patient.ContactComponent contact = p.addContact();
+		HumanName contactName = new HumanName();
+		contact.setName(contactName);
+		contact.addRelationship().setText(pr.getGuardianRelationship());
+		contactName.setFamily(pr.getGuardianLast());
+		contactName.addGivenElement().setValue(pr.getGuardianFirst());
+		contactName.addGivenElement().setValue(pr.getGuardianMiddle());
 		return p;
 	}
 
