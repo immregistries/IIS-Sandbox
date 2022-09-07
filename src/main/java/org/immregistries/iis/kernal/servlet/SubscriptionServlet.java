@@ -1,12 +1,14 @@
 package org.immregistries.iis.kernal.servlet;
 
+import ca.uhn.fhir.interceptor.model.RequestPartitionId;
+import ca.uhn.fhir.jpa.partition.SystemRequestDetails;
+import ca.uhn.fhir.jpa.subscription.submit.interceptor.SubscriptionMatcherInterceptor;
 import ca.uhn.fhir.parser.IParser;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
-import org.hibernate.Session;
+import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r5.model.*;
 import org.immregistries.iis.kernal.model.OrgAccess;
-import org.immregistries.iis.kernal.model.PatientReported;
 import org.immregistries.iis.kernal.repository.RepositoryClientFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -19,11 +21,12 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
-import java.util.List;
 
 public class SubscriptionServlet extends HttpServlet {
 	@Autowired
 	RepositoryClientFactory repositoryClientFactory;
+	@Autowired
+	SubscriptionMatcherInterceptor subscriptionMatcherInterceptor;
 
 	public static final String PARAM_ACTION = "action";
 	public static final String PARAM_MESSAGE = "message";
@@ -51,10 +54,15 @@ public class SubscriptionServlet extends HttpServlet {
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		try {
 			Bundle searchBundle = localClient.search().forResource(Subscription.class)
-				.where(Subscription.IDENTIFIER.exactly().code(subscriptionId)).returnBundle(Bundle.class).execute();
+				.where(Subscription.IDENTIFIER.exactly().identifier(subscriptionId)).returnBundle(Bundle.class).execute();
+//			Subscription subscription = localClient.read().resource(Subscription.class).withId(subscriptionId).execute();
 			if (searchBundle.hasEntry()) {
 				Subscription subscription = (Subscription) searchBundle.getEntryFirstRep().getResource();
+
 				String message = req.getParameter(PARAM_MESSAGE);
+				IBaseResource parsedResource = parser.parseResource(message);
+//				subscriptionMatcherInterceptor.resourceCreated(parsedResource, new SystemRequestDetails().setRequestPartitionId(RequestPartitionId.fromPartitionName(""+orgAccess.getAccessName())));
+
 				IGenericClient endpointClient = repositoryClientFactory.newGenericClient(subscription.getEndpoint());
 				Bundle notificationBundle = new Bundle(Bundle.BundleType.SUBSCRIPTIONNOTIFICATION);
 				SubscriptionStatus status = new SubscriptionStatus()
@@ -63,12 +71,20 @@ public class SubscriptionServlet extends HttpServlet {
 					.setSubscription(subscription.getIdentifierFirstRep().getAssigner())
 					.setTopic(subscription.getTopic());
 				notificationBundle.addEntry().setResource(status);
-				notificationBundle.addEntry().setResource(parser.parseResource(OperationOutcome.class,message)); // TODO improve support
-
+				notificationBundle.addEntry().setResource((Resource) parsedResource);
 
 				MethodOutcome outcome = endpointClient.create().resource(notificationBundle).execute();
-				out.println(parser.encodeResourceToString(outcome.getResource()));
-				out.println(parser.encodeResourceToString(outcome.getOperationOutcome()));
+				if (outcome.getResource() != null) {
+					out.println(parser.encodeResourceToString(outcome.getResource()));
+				}
+				if (outcome.getOperationOutcome() != null) {
+					out.println(parser.encodeResourceToString(outcome.getOperationOutcome()));
+				}
+				if (outcome.getId() != null){
+					out.println(outcome.getId());
+				}
+			} else {
+				out.println("NO SUBSCRIPTION FOUND FOR THIS IDENTIFIER");
 			}
 		} catch (Exception e) {
 			resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -77,7 +93,7 @@ public class SubscriptionServlet extends HttpServlet {
 		}
 		out.flush();
 		out.close();
-		doGet(req, resp);
+//		doGet(req, resp);
 	}
 
 
@@ -122,10 +138,12 @@ public class SubscriptionServlet extends HttpServlet {
 			if (bundle.hasEntry()) {
 				subscription = (Subscription) bundle.getEntryFirstRep().getResource();
 				printSubscription(out,subscription);
+				out.println("<form action=\"subscription?identifier=" + subscription.getIdentifierFirstRep().getValue() + "\" method=\"POST\" target=\"_blank\">");
 				out.println("<textarea class=\"w3-input w3-border\" name=\"" + PARAM_MESSAGE
 					+ "\"rows=\"15\" cols=\"160\">" + message + "</textarea></td>");
 				out.println("<h4>Send OperationOutcome  resource to subscriber</h4>");
 				out.println("<input class=\"w3-button w3-section w3-teal w3-ripple\" type=\"submit\" name=\"submit\" value=\"Submit\"/>");
+				out.println("</form>");
 
 
 			} else {

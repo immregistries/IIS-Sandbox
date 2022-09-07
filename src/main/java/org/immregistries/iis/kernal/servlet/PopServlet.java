@@ -92,6 +92,10 @@ public class PopServlet extends HttpServlet {
     HttpSession session = req.getSession(true);
     resp.setContentType("text/html");
     PrintWriter out = new PrintWriter(resp.getOutputStream());
+	 OrgAccess orgAccess = (OrgAccess) session.getAttribute("orgAccess");
+	 String userId = null;
+	 String password = null;
+	 String facilityId = null;
     try {
       String message = req.getParameter(PARAM_MESSAGE);
       if (message == null || message.equals("")) {
@@ -101,18 +105,25 @@ public class PopServlet extends HttpServlet {
         transformer.transform(testCaseMessage);
         message = testCaseMessage.getMessageText();
       }
-      String userId = req.getParameter(PARAM_USERID);
-      if (userId == null || userId.equals("")) {
-        userId = "DEFAULT";
-      }
-      String password = req.getParameter(PARAM_PASSWORD);
-      if (password == null || password.equals("")) {
-        password = "DEFAULT";
-      }
-      String facilityId = req.getParameter(PARAM_FACILITYID);
-      if (facilityId == null || facilityId.equals("")) {
-        facilityId = "DEFAULT";
-      }
+		if (req.getParameter(PARAM_USERID) != null && !req.getParameter(PARAM_USERID).isBlank() ) {
+			userId = req.getParameter(PARAM_USERID);
+		}
+		if (userId == null || userId.isBlank()) {
+			userId = "DEFAULT";
+		}
+		if (req.getParameter(PARAM_PASSWORD) != null && !req.getParameter(PARAM_PASSWORD).isBlank() ) {
+			password = req.getParameter(PARAM_PASSWORD);
+		}
+		if (password == null || password.isBlank()) {
+			password = "DEFAULT";
+		}
+		 if (req.getParameter(PARAM_FACILITYID) == null || req.getParameter(PARAM_FACILITYID).isBlank() ) {
+			 facilityId = req.getParameter(PARAM_FACILITYID);
+			 if (facilityId == null || facilityId.isBlank()) {
+				 facilityId = "DEFAULT";
+			 }
+		 }
+
       {
         HomeServlet.doHeader(out, session);
         out.println("    <h2>Send Now</h2>");
@@ -124,7 +135,6 @@ public class PopServlet extends HttpServlet {
 
         out.println("    <div class=\"w3-container w3-card-4\">");
         out.println("      <h3>Authentication</h3>");
-        OrgAccess orgAccess = (OrgAccess) session.getAttribute("orgAccess");
         if (orgAccess == null) {
           out.println("      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_USERID
               + "\" value=\"" + userId + "\"/>");
@@ -137,10 +147,10 @@ public class PopServlet extends HttpServlet {
           out.println("      <label>Facility Id</label>");
         } else {
           out.println("      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_USERID
-              + "\" value=\"" + userId + "\"/ disabled>");
+              + "\" value=\"" + orgAccess.getAccessName() + "\"/ disabled>");
           out.println("      <label>User Id</label>");
           out.println("      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_FACILITYID
-              + "\" value=\"" + facilityId + "\" disabled/>");
+              + "\" value=\"" + orgAccess.getOrg().getOrganizationName() + "\" disabled/>");
           out.println("      <label>Facility Id</label>");
         }
         out.println("      <br/>");
