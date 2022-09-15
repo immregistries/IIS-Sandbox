@@ -469,6 +469,7 @@
             <reference>
                 <link-to codeset="VACCINATION_VIS_VACCINES">207</link-to>
                 <link-to codeset="VACCINATION_VIS_VACCINES">221</link-to>
+                <link-to codeset="VACCINATION_VIS_VACCINES">229</link-to>
             </reference>
             <use-date>
                 <not-before>20211119</not-before>
@@ -496,6 +497,7 @@
             <reference>
                 <link-to codeset="VACCINATION_VIS_VACCINES">208</link-to>
                 <link-to codeset="VACCINATION_VIS_VACCINES">217</link-to>
+                <link-to codeset="VACCINATION_VIS_VACCINES">300</link-to>
             </reference>
             <use-date>
                 <not-before>20210510</not-before>
@@ -4750,6 +4752,38 @@
             </reference>
         </code>
         <code>
+            <value>91315</value>
+            <label>Severe acute respiratory syndrome coronavirus 2 (SARS-CoV-2) (coronavirus disease [COVID-19]) vaccine, mRNA-LNP, bivalent spike protein, preservative free, 10 mcg/0.2 mL dosage, diluent reconstituted, tris-sucrose formulation, for intramuscular use</label>
+            <description>COVID-19 Vaccine - Potential EUA authorization bivalent booster for ages 5 yrs through 11 yrs</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+        </code>
+        <code>
+            <value>91312</value>
+            <label>Severe acute respiratory syndrome coronavirus 2 (SARS-CoV-2) (coronavirus disease [COVID-19]) vaccine, mRNA-LNP, bivalent spike protein, preservative free, 30 mcg/0.3 mL dosage, tris-sucrose formulation, for intramuscular use</label>
+            <description>COVID-19 Vaccine - EUA authorized 8/31/2022 bivalent booster ages 12+ yrs</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+        </code>
+        <code>
+            <value>91314</value>
+            <label>Severe acute respiratory syndrome coronavirus 2 (SARS-CoV-2) (coronavirus disease [COVID-19]) vaccine, mRNA-LNP, spike protein, bivalent, preservative free, 25 mcg/0.25 mL dosage, for intramuscular use</label>
+            <description>COVID-19 Vaccine - Potential EUA authorization bivalent booster for ages 6 yrs through 11 yrs</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+        </code>
+        <code>
+            <value>91313</value>
+            <label>Severe acute respiratory syndrome coronavirus 2 (SARS-CoV-2) (coronavirus disease [COVID-19]) vaccine, mRNA-LNP, spike protein, bivalent, preservative free, 50 mcg/0.5 mL dosage, for intramuscular use</label>
+            <description>COVID-19 Vaccine - EUA authorized 8/31/2022 bivalent booster for ages 18+ yrs, potential EUA ages 6 yrs through 17 yrs</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+        </code>
+        <code>
             <value>91307</value>
             <label>Severe acute respiratory syndrome coronavirus 2 (SARS-CoV-2) (coronavirus disease [COVID-19]) vaccine, mRNA-LNP, spike protein, preservative free, 10 mcg/0.2 mL dosage, diluent reconstituted, tris-sucrose formulation, for intramuscular use</label>
             <description>COVID-19 Vaccine - Potential EUA authorization, Pediatric dose requires dilution</description>
@@ -4855,6 +4889,9 @@
             <code-status>
                 <status>Valid</status>
             </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">206</link-to>
+            </reference>
         </code>
         <code>
             <value>90714</value>
@@ -5011,6 +5048,9 @@
             <code-status>
                 <status>Valid</status>
             </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">75</link-to>
+            </reference>
         </code>
         <code>
             <value>90393</value>
@@ -28237,6 +28277,7 @@
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">50632-0001-01</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">50632-0001-02</link-to>
                 <link-to codeset="VACCINE_GROUP">Orthopoxvirus</link-to>
+                <link-to codeset="VACCINATION_CPT_CODE">90611</link-to>
             </reference>
             <use-date>
                 <not-before>20200720</not-before>
@@ -28886,6 +28927,7 @@
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">71665-0330-01</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">71665-0330-02</link-to>
                 <link-to codeset="VACCINE_GROUP">Orthopoxvirus</link-to>
+                <link-to codeset="VACCINATION_CPT_CODE">90622</link-to>
             </reference>
             <use-date>
                 <not-before>20100528</not-before>
@@ -42867,6 +42909,19 @@
             </use-date>
         </code>
         <code>
+            <value>229</value>
+            <label>COVID-19 Moderna Vaccine EUA Recipient-Caregiver Adult Fact Sheet</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300034911210601</link-to>
+            </reference>
+            <use-date>
+                <not-before>20220831</not-before>
+            </use-date>
+        </code>
+        <code>
             <value>207</value>
             <label>COVID-19 Moderna Vaccine EUA Recipient-Caregiver Fact Sheet</label>
             <code-status>
@@ -42932,6 +42987,19 @@
             </reference>
             <use-date>
                 <not-before>20220301</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>300</value>
+            <label>COVID-19 Pfizer BioNTech EUA Recipient-Caregiver Fact Sheet-12 years and older</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300033211210501</link-to>
+            </reference>
+            <use-date>
+                <not-before>20220831</not-before>
             </use-date>
         </code>
         <code>
