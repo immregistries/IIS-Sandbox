@@ -62,19 +62,24 @@ public class PersonMapper {
 
 	public static Practitioner getFhirPractitioner(ModelPerson modelPerson) {
 		Practitioner practitioner = new Practitioner();
-		switch (new Reference(modelPerson.getIdentifierTypeCode()).getType()) {
-			case "Organization": {
-				practitioner.addIdentifier(MappingHelper.getFhirIdentifier(PRACTITIONER,modelPerson.getPersonExternalLink()).setAssigner(new Reference(modelPerson.getAssigningAuthority())));
-				break;
+		try {
+			switch (new Reference(modelPerson.getIdentifierTypeCode()).getType()) {
+				case "Organization": {
+					practitioner.addIdentifier(MappingHelper.getFhirIdentifier(PRACTITIONER,modelPerson.getPersonExternalLink()).setAssigner(new Reference(modelPerson.getAssigningAuthority())));
+					break;
+				}
+				case "System" : {
+					practitioner.addIdentifier(MappingHelper.getFhirIdentifier(modelPerson.getIdentifierTypeCode(),modelPerson.getPersonExternalLink()));
+					break;
+				} default: {
+					practitioner.addIdentifier(MappingHelper.getFhirIdentifier(PRACTITIONER,modelPerson.getPersonExternalLink()));
+					break;
+				}
 			}
-			case "System" : {
-				practitioner.addIdentifier(MappingHelper.getFhirIdentifier(modelPerson.getIdentifierTypeCode(),modelPerson.getPersonExternalLink()));
-				break;
-			} default: {
-				practitioner.addIdentifier(MappingHelper.getFhirIdentifier(PRACTITIONER,modelPerson.getPersonExternalLink()));
-				break;
-			}
+		} catch (NullPointerException e) { // If typecode is not reference
+			practitioner.addIdentifier(MappingHelper.getFhirIdentifier(modelPerson.getIdentifierTypeCode(),modelPerson.getPersonExternalLink()));
 		}
+
 
 		HumanName name = practitioner.addName();
 		name.setFamily(modelPerson.getNameLast());

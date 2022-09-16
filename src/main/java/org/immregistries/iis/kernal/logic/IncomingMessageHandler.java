@@ -1086,8 +1086,11 @@ public class IncomingMessageHandler {
       observationReported.setReportedDate(new Date());
     }
 //    observationMaster.setValueCode(valueCode);
+
     observationReported.setPatientReportedId(patientReported.getPatientReportedId());
-    observationReported.setVaccinationReportedId(vaccinationReported.getVaccinationReportedId());
+	 if(vaccinationReported != null) {
+		 observationReported.setVaccinationReportedId(vaccinationReported.getVaccinationReportedId());
+	 }
 //    observationReported.setObservation(observationMaster);
     observationReported.setUpdatedDate(new Date());
     observationReported.setIdentifierCode(identifierCode);
@@ -1134,7 +1137,9 @@ public class IncomingMessageHandler {
     MessageReceived messageReceived = new MessageReceived();
     messageReceived.setOrgMaster(orgMaster);
     messageReceived.setMessageRequest(message);
-    messageReceived.setPatientReportedId(patientReported.getPatientReportedId());
+	 if (patientReported != null) {
+		 messageReceived.setPatientReportedId(patientReported.getPatientReportedId());
+	 }
     messageReceived.setMessageResponse(messageResponse);
     messageReceived.setReportedDate(new Date());
     messageReceived.setCategoryRequest(categoryRequest);

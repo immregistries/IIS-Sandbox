@@ -445,9 +445,9 @@ public class PatientServlet extends HttpServlet {
                 "      " + observationReported.getValueLabel() + " (" + table + " " + code + ")");
           }
         }
-        if (observationReported.getValueTable().equals("SCT")
+        if (observationReported.getValueTable() != null && (observationReported.getValueTable().equals("SCT")
             || observationReported.getValueTable().equals("CDCPHINVS")
-            || observationReported.getValueTable().equals("99TPG")) {
+            || observationReported.getValueTable().equals("99TPG"))) {
           SnomedValue snomedValue = null;
           for (SnomedValue sv : SnomedValue.values()) {
             if (sv.getIdentifierCode().equalsIgnoreCase(code)) {

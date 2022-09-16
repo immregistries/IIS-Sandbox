@@ -60,14 +60,26 @@ public class ImmunizationMapper {
 
 		vr.setLotnumber(i.getLotNumber());
 		vr.setExpirationDate(i.getExpirationDate());
-		switch(i.getStatus()){
-			case COMPLETED : vr.setCompletionStatus("CP"); break;
-			case ENTEREDINERROR : vr.setActionCode("D"); break;
-			case NOTDONE : vr.setCompletionStatus("RE"); break; //Could also be NA or PA
-			default:
-				break;
+		if (i.getStatus() != null) {
+			switch(i.getStatus()){
+				case COMPLETED : {
+					vr.setCompletionStatus("CP");
+					break;
+				}
+				case ENTEREDINERROR : {
+					vr.setActionCode("D");
+					break;
+				}
+				case NOTDONE : {
+					vr.setCompletionStatus("RE");
+					break;
+				} //Could also be NA or PA
+				case NULL:
+				default:
+					vr.setCompletionStatus("");
+					break;
+			}
 		}
-
 		vr.setRefusalReasonCode(i.getReasonFirstRep().getConcept().getCodingFirstRep().getCode());
 		vr.setBodySite(i.getSite().getCodingFirstRep().getCode());
 		vr.setBodyRoute(i.getRoute().getCodingFirstRep().getCode());
@@ -141,11 +153,11 @@ public class ImmunizationMapper {
 					 i.setStatus(Immunization.ImmunizationStatusCodes.NOTDONE);
 					 break;
 				 }
-				 case "" : {
-					 i.setStatus(Immunization.ImmunizationStatusCodes.NULL);
+				 case "" :
+				 default: {
+//					 i.setStatus(Immunization.ImmunizationStatusCodes..NULL);
 					 break;
 				 }
-				 default: break;
 			 }
 		 }
 		 i.addReason().setConcept(new CodeableConcept(new Coding(REFUSAL_REASON_CODE,vr.getRefusalReasonCode(),vr.getRefusalReasonCode())));

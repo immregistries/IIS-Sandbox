@@ -82,8 +82,9 @@ public class LocationServlet extends HttpServlet {
     try {
 		 OrgLocation orgLocationSelected = null;
 		 if (req.getParameter(PARAM_ORG_LOCATION_ID) != null) {
-			orgLocationSelected = fhirRequests.searchOrgLocation(fhirClient,
-				Location.IDENTIFIER.exactly().identifier(req.getParameter(PARAM_ORG_LOCATION_ID)));
+//			orgLocationSelected = fhirRequests.searchOrgLocation(fhirClient,
+//				Location.IDENTIFIER.exactly().identifier(req.getParameter(PARAM_ORG_LOCATION_ID)));
+			orgLocationSelected = LocationMapper.orgLocationFromFhir(fhirClient.read().resource(Location.class).withId(req.getParameter(PARAM_ORG_LOCATION_ID)).execute());
 		 }
 
       String action = req.getParameter(PARAM_ACTION);

@@ -15,47 +15,31 @@ public class ObservationMapper {
 
 	public static Observation getFhirResource(ObservationReported observationReported)  {
 		Observation o = new Observation();
-//		if (observationMaster != null) {
-//			o.addIdentifier(MappingHelper.getFhirIdentifier( OBSERVATION_MASTER,observationMaster.getObservationId()));
-//			o.addPartOf(MappingHelper.getFhirReference(IMMUNIZATION,VACCINATION_MASTER, observationMaster.getVaccination().getVaccinationId()));
-//			o.addPartOf(new Reference(IMMUNIZATION + "/" + observationMaster.getVaccination().getVaccinationId()));
-////			if (observationMaster.getObservationReported() != null && observationReported == null) {
-////				o.addPartOf(MappingHelper.getFhirReference(OBSERVATION,OBSERVATION_REPORTED,
-////					observationMaster.getObservationReported().getObservationReportedId()));
-////			}
-//			o.addIdentifier(MappingHelper.getFhirIdentifier(
-//				IDENTIFIER_CODE,observationMaster.getIdentifierCode()));
-//			o.setCode(new CodeableConcept().setText(observationMaster.getIdentifierCode()));
-//			o.setValue(new CodeableConcept(new Coding().setCode(observationMaster.getValueCode())));
-//		}
-
-		if (observationReported != null) {
-			o.addIdentifier(MappingHelper.getFhirIdentifier(OBSERVATION_REPORTED,observationReported.getObservationReportedId()));
-			if (o.getPartOf().size() == 0) {
-				o.addPartOf(new Reference().setReference(IMMUNIZATION + "/" + observationReported.getVaccinationReportedId()));
-			}
-			if(observationReported.getPatientReportedId() != null) {
-				o.setSubject(new Reference().setReference(PATIENT + "/"+observationReported.getPatientReportedId()));
-//				o.setSubject(MappingHelper.getFhirReference(PATIENT,PATIENT_REPORTED,observationReported.getPatientReported().getPatientReportedExternalLink()));
-			}
-			o.setValue(new CodeableConcept(new Coding()
-				.setCode(observationReported.getValueCode())
-				.setSystem(observationReported.getValueTable())
-				.setDisplay(observationReported.getValueLabel())));
-			o.setMethod(new CodeableConcept()).getMethod().addCoding()
-				.setCode(observationReported.getMethodCode())
-				.setSystem(observationReported.getMethodTable())
-				.setDisplay(observationReported.getMethodLabel());
-			o.addIdentifier(MappingHelper.getFhirIdentifier(
-				observationReported.getIdentifierTable(),observationReported.getIdentifierCode())); //TODO label
-			o.addComponent().setValue(new DateTimeType(observationReported.getObservationDate()))
-				.setCode(new CodeableConcept().setText(OBSERVATION_DATE));
-			o.addReferenceRange().setText(observationReported.getUnitsLabel())
-				.addAppliesTo().setText(observationReported.getUnitsTable())
-				.addCoding().setCode(observationReported.getUnitsCode());
-			o.addInterpretation().setText(RESULT_STATUS)
-				.addCoding().setCode(observationReported.getResultStatus());
+		o.addIdentifier(MappingHelper.getFhirIdentifier(OBSERVATION_REPORTED,observationReported.getObservationReportedId()));
+		if (!observationReported.getVaccinationReportedId().isBlank()) {
+			o.addPartOf(new Reference().setReference(IMMUNIZATION + "/" + observationReported.getVaccinationReportedId()));
 		}
+		if(observationReported.getPatientReportedId() != null) {
+			o.setSubject(new Reference().setReference(PATIENT + "/"+observationReported.getPatientReportedId()));
+//				o.setSubject(MappingHelper.getFhirReference(PATIENT,PATIENT_REPORTED,observationReported.getPatientReported().getPatientReportedExternalLink()));
+		}
+		o.setValue(new CodeableConcept(new Coding()
+			.setCode(observationReported.getValueCode())
+			.setSystem(observationReported.getValueTable())
+			.setDisplay(observationReported.getValueLabel())));
+		o.setMethod(new CodeableConcept()).getMethod().addCoding()
+			.setCode(observationReported.getMethodCode())
+			.setSystem(observationReported.getMethodTable())
+			.setDisplay(observationReported.getMethodLabel());
+		o.addIdentifier(MappingHelper.getFhirIdentifier(
+			observationReported.getIdentifierTable(),observationReported.getIdentifierCode())); //TODO label
+		o.addComponent().setValue(new DateTimeType(observationReported.getObservationDate()))
+			.setCode(new CodeableConcept().setText(OBSERVATION_DATE));
+		o.addReferenceRange().setText(observationReported.getUnitsLabel())
+			.addAppliesTo().setText(observationReported.getUnitsTable())
+			.addCoding().setCode(observationReported.getUnitsCode());
+		o.addInterpretation().setText(RESULT_STATUS)
+			.addCoding().setCode(observationReported.getResultStatus());
 		return o;
 
 	}

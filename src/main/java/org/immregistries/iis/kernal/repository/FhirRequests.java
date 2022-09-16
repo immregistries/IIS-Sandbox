@@ -214,6 +214,7 @@ public class FhirRequests {
 		return searchPatientReported(fhirClient,Patient.IDENTIFIER.exactly().systemAndIdentifier(MRN_SYSTEM,patientReported.getPatientReportedExternalLink()));
 	}
 	public ModelPerson savePractitioner(IGenericClient fhirClient, ModelPerson modelPerson) {
+		logger.info(modelPerson.getIdentifierTypeCode());
 		Practitioner practitioner = PersonMapper.getFhirPractitioner(modelPerson);
 		MethodOutcome outcome = saveRegular(fhirClient,practitioner,
 			Patient.IDENTIFIER.exactly().identifier(modelPerson.getPersonExternalLink()));
