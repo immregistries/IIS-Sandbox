@@ -4758,6 +4758,9 @@
             <code-status>
                 <status>Valid</status>
             </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">301</link-to>
+            </reference>
         </code>
         <code>
             <value>91312</value>
@@ -4766,6 +4769,9 @@
             <code-status>
                 <status>Valid</status>
             </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">300</link-to>
+            </reference>
         </code>
         <code>
             <value>91314</value>
@@ -4774,6 +4780,9 @@
             <code-status>
                 <status>Valid</status>
             </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">229</link-to>
+            </reference>
         </code>
         <code>
             <value>91313</value>
@@ -4782,6 +4791,9 @@
             <code-status>
                 <status>Valid</status>
             </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">229</link-to>
+            </reference>
         </code>
         <code>
             <value>91307</value>
@@ -23910,6 +23922,7 @@
                 <link-to codeset="VACCINATION_TRADE_NAME">Pfizer-BioNTech COVID-19 Vaccine (EUA labeled) COMIRNATY (BLA labeled)</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">59267-0565-01</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">59267-0565-02</link-to>
+                <link-to codeset="VACCINATION_CPT_CODE">91315</link-to>
             </reference>
             <use-date>
                 <not-before>20220817</not-before>
@@ -23930,6 +23943,7 @@
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">59267-1404-01</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">59267-0304-02</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">59267-1404-02</link-to>
+                <link-to codeset="VACCINATION_CPT_CODE">91312</link-to>
             </reference>
             <use-date>
                 <not-before>20220817</not-before>
@@ -23948,6 +23962,8 @@
                 <link-to codeset="VACCINATION_TRADE_NAME">Moderna COVID-19 Vaccine (non-US Spikevax)</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">80777-0282-05</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">80777-0282-99</link-to>
+                <link-to codeset="VACCINATION_CPT_CODE">91314</link-to>
+                <link-to codeset="VACCINATION_CPT_CODE">91313</link-to>
             </reference>
             <use-date>
                 <not-before>20220615</not-before>
