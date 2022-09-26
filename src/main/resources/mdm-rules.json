@@ -38,14 +38,28 @@
       "matcher": {
         "algorithm": "SOUNDEX"
       }
+    },
+    {
+      "name": "identifier",
+      "resourceType": "*",
+      "resourcePath": "identifier",
+      "matcher": {
+        "algorithm": "IDENTIFIER"
+      }
+    },
+    {
+      "name": "birthDate",
+      "resourceType": "Patient",
+      "resourcePath": "birthDate",
+      "matcher": {
+        "algorithm": "DATE"
+      }
     }
+
   ],
   "matchResultMap": {
     "cosine-given-name" : "POSSIBLE_MATCH",
-    "cosine-given-name,jaro-last-name" : "MATCH"
-  },
-  "eidSystems": {
-    "Patient": "urn:mrns",
-    "Immunization": "urn:mrns"
+    "cosine-given-name,jaro-last-name,birthDate" : "MATCH",
+    "identifier,birthDate" : "MATCH"
   }
 }

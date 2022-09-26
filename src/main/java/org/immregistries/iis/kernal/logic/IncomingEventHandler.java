@@ -12,6 +12,7 @@ import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.mapping.LocationMapper;
 import org.immregistries.iis.kernal.model.*;
+import org.immregistries.iis.kernal.servlet.ServletHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -121,7 +122,7 @@ public class IncomingEventHandler extends IncomingMessageHandler {
 
   public void processEvent(OrgAccess orgAccess, HttpServletRequest req) throws Exception {
 	  HttpSession session = req.getSession(true);
-	  IGenericClient fhirClient = (IGenericClient) session.getAttribute("fhirClient");
+	  IGenericClient fhirClient = ServletHelper.getFhirClient(session,repositoryClientFactory);
     CodeMap codeMap = CodeMapManager.getCodeMap();
     PatientReported patientReported = processPatient(orgAccess, req, codeMap);
     VaccinationReported vaccinationReported = null;
@@ -264,9 +265,8 @@ public class IncomingEventHandler extends IncomingMessageHandler {
       CodeMap codeMap) throws Exception {
 	 RequestDetails requestDetails = new ServletRequestDetails();
 	 requestDetails.setTenantId(orgAccess.getAccessName());
-	  HttpSession session = req.getSession(true);
-	  IGenericClient fhirClient = (IGenericClient) session.getAttribute("fhirClient");
-
+	 HttpSession session = req.getSession(true);
+	 IGenericClient fhirClient = ServletHelper.getFhirClient(session,repositoryClientFactory);
     PatientReported patientReported = null;
 //    PatientMaster patientMaster = null;
 

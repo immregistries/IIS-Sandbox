@@ -68,8 +68,7 @@ public class PopServlet extends HttpServlet {
 
 			  ack = handler.process(message, orgAccess);
           session.setAttribute("orgAccess", orgAccess);
-			  IGenericClient fhirClient = repositoryClientFactory.newGenericClient(orgAccess);
-          session.setAttribute("fhirClient", fhirClient);
+			  IGenericClient fhirClient = ServletHelper.getFhirClient(session,repositoryClientFactory);
         }
       } finally {
         dataSession.close();

@@ -1,5 +1,7 @@
 package org.immregistries.iis.kernal.servlet;
 
+import ca.uhn.fhir.rest.client.api.IGenericClient;
+import ca.uhn.fhir.rest.client.impl.RestfulClientFactory;
 import ca.uhn.fhir.rest.server.exceptions.AuthenticationException;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -10,13 +12,10 @@ import org.immregistries.iis.kernal.repository.RepositoryClientFactory;
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.servlet.http.HttpSession;
 import java.util.List;
 
 public class ServletHelper {
-
-	@Autowired
-	RepositoryClientFactory repositoryClientFactory;
-
   private static String BAD_PASSWORD = "badpassword";
 
   public static OrgAccess authenticateOrgAccess(
@@ -76,5 +75,14 @@ public class ServletHelper {
     }
     
     return orgAccess;
+  }
+
+  public static IGenericClient getFhirClient(HttpSession session, RepositoryClientFactory repositoryClientFactory) {
+	  if (session.getAttribute("fhirClient") == null) {
+		  OrgAccess orgAccess = (OrgAccess) session.getAttribute("orgAccess");
+		  session.setAttribute("fhirClient", repositoryClientFactory.newGenericClient(orgAccess));
+	  }
+	  return (IGenericClient) session.getAttribute("fhirClient");
+
   }
 }

@@ -67,7 +67,7 @@ public class CovidServlet extends HttpServlet {
       dispatcher.forward(req, resp);
       return;
     }
-	  IGenericClient fhirClient = (IGenericClient) session.getAttribute("fhirClient");
+	  IGenericClient fhirClient = ServletHelper.getFhirClient(session,repositoryClientFactory);
 
 
 	  try {

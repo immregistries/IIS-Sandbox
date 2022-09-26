@@ -67,7 +67,7 @@ public class PatientServlet extends HttpServlet {
     resp.setContentType("text/html");
     PrintWriter out = new PrintWriter(resp.getOutputStream());
     Session dataSession = PopServlet.getDataSession();
-	  IGenericClient fhirClient = repositoryClientFactory.newGenericClient(orgAccess);
+	  IGenericClient fhirClient = ServletHelper.getFhirClient(session,repositoryClientFactory);
     try {
       String patientNameLast = req.getParameter(PARAM_PATIENT_NAME_LAST);
       String patientNameFirst = req.getParameter(PARAM_PATIENT_NAME_FIRST);
