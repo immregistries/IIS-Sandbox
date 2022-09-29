@@ -33,8 +33,8 @@ public class SubscriptionTopicServlet extends HttpServlet {
 			.setQueryCriteria(new SubscriptionTopic.SubscriptionTopicResourceTriggerQueryCriteriaComponent()
 				.setResultForCreate(SubscriptionTopic.CriteriaNotExistsBehavior.TESTPASSES)
 				.setResultForDelete(SubscriptionTopic.CriteriaNotExistsBehavior.TESTPASSES)
-				.setCurrent("Patient?_id=1")
-			).setFhirPathCriteria("Patient?_id=1");
+				.setCurrent("Patient?name=trigger")
+			).setFhirPathCriteria("Patient?name=trigger"); // TODO for tests remove or change
 		SubscriptionTopic.SubscriptionTopicResourceTriggerComponent operationOutcomeTrigger =
 			new SubscriptionTopic.SubscriptionTopicResourceTriggerComponent()
 				.setResource("OperationOutcome")

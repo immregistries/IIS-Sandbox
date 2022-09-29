@@ -1,11 +1,18 @@
 package org.immregistries.iis.kernal.servlet;
 
+import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.interceptor.model.RequestPartitionId;
 import ca.uhn.fhir.jpa.partition.SystemRequestDetails;
+import ca.uhn.fhir.jpa.subscription.match.deliver.resthook.SubscriptionDeliveringRestHookSubscriber;
+import ca.uhn.fhir.jpa.subscription.match.registry.SubscriptionCanonicalizer;
+import ca.uhn.fhir.jpa.subscription.model.CanonicalSubscription;
+import ca.uhn.fhir.jpa.subscription.model.ResourceDeliveryMessage;
 import ca.uhn.fhir.jpa.subscription.submit.interceptor.SubscriptionMatcherInterceptor;
 import ca.uhn.fhir.parser.IParser;
+import ca.uhn.fhir.rest.api.EncodingEnum;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
+import ca.uhn.fhir.rest.server.messaging.BaseResourceMessage;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r5.model.*;
 import org.immregistries.iis.kernal.model.OrgAccess;
@@ -24,9 +31,13 @@ import java.text.SimpleDateFormat;
 
 public class SubscriptionServlet extends HttpServlet {
 	@Autowired
+	FhirContext fhirContext;
+	@Autowired
 	RepositoryClientFactory repositoryClientFactory;
 	@Autowired
-	SubscriptionMatcherInterceptor subscriptionMatcherInterceptor;
+	SubscriptionDeliveringRestHookSubscriber subscriptionDeliveringRestHookSubscriber;
+	@Autowired
+	SubscriptionCanonicalizer subscriptionCanonicalizer;
 
 	public static final String PARAM_ACTION = "action";
 	public static final String PARAM_MESSAGE = "message";
@@ -70,7 +81,7 @@ public class SubscriptionServlet extends HttpServlet {
 				.where(Subscription.IDENTIFIER.exactly().identifier(subscriptionId)).returnBundle(Bundle.class).execute();
 //			Subscription subscription = localClient.read().resource(Subscription.class).withId(subscriptionId).execute();
 			if (searchBundle.hasEntry()) {
-				Subscription subscription = (Subscription) searchBundle.getEntryFirstRep().getResource();
+
 
 				String message = req.getParameter(PARAM_MESSAGE);
 				IParser parser;
@@ -80,28 +91,35 @@ public class SubscriptionServlet extends HttpServlet {
 					parser = repositoryClientFactory.getFhirContext().newJsonParser();
 				}
 				IBaseResource parsedResource = parser.parseResource(message);
-//				subscriptionMatcherInterceptor.resourceCreated(parsedResource, new SystemRequestDetails().setRequestPartitionId(RequestPartitionId.fromPartitionName(""+orgAccess.getAccessName())));
-
-				IGenericClient endpointClient = ServletHelper.getFhirClient(session,repositoryClientFactory);
-				Bundle notificationBundle = new Bundle(Bundle.BundleType.SUBSCRIPTIONNOTIFICATION);
-				SubscriptionStatus status = new SubscriptionStatus()
-					.setType(SubscriptionStatus.SubscriptionNotificationType.EVENTNOTIFICATION)
-					.setStatus(subscription.getStatus())
-					.setSubscription(subscription.getIdentifierFirstRep().getAssigner())
-					.setTopic(subscription.getTopic());
-				notificationBundle.addEntry().setResource(status);
-				notificationBundle.addEntry().setResource((Resource) parsedResource);
-
-				MethodOutcome outcome = endpointClient.create().resource(notificationBundle).execute();
-				if (outcome.getResource() != null) {
-					out.println(parser.encodeResourceToString(outcome.getResource()));
-				}
-				if (outcome.getOperationOutcome() != null) {
-					out.println(parser.encodeResourceToString(outcome.getOperationOutcome()));
-				}
-				if (outcome.getId() != null){
-					out.println(outcome.getId());
-				}
+				Subscription subscription = (Subscription) searchBundle.getEntryFirstRep().getResource();
+				ResourceDeliveryMessage resourceDeliveryMessage = new ResourceDeliveryMessage();
+				resourceDeliveryMessage.setSubscription(subscriptionCanonicalizer.canonicalize(subscription));
+				resourceDeliveryMessage.setPartitionId(RequestPartitionId.fromPartitionName(""+orgAccess.getAccessName()));
+				resourceDeliveryMessage.setOperationType(BaseResourceMessage.OperationTypeEnum.UPDATE);
+				resourceDeliveryMessage.setPayload(fhirContext,parsedResource, EncodingEnum.JSON);
+				subscriptionDeliveringRestHookSubscriber.handleMessage(resourceDeliveryMessage);
+//				IGenericClient endpointClient = repositoryClientFactory.newGenericClient(subscription.getEndpoint());
+//				Bundle notificationBundle = new Bundle(Bundle.BundleType.SUBSCRIPTIONNOTIFICATION);
+//				SubscriptionStatus status = new SubscriptionStatus()
+//					.setType(SubscriptionStatus.SubscriptionNotificationType.EVENTNOTIFICATION)
+//					.setStatus(subscription.getStatus())
+//					.setSubscription(subscription.getIdentifierFirstRep().getAssigner())
+//					.setEventsInNotification(1)
+//					.setEventsSinceSubscriptionStart(1)
+//					.setTopic(subscription.getTopic());
+//				notificationBundle.addEntry().setResource(status);
+//				notificationBundle.addEntry().setResource((Resource) parsedResource);
+//				MethodOutcome outcome = endpointClient.create().resource(notificationBundle).execute();
+//				if (outcome.getResource() != null) {
+//					out.println(parser.encodeResourceToString(outcome.getResource()));
+//				}
+//				if (outcome.getOperationOutcome() != null) {
+//					out.println(parser.encodeResourceToString(outcome.getOperationOutcome()));
+//				}
+//				if (outcome.getId() != null){
+//					out.println(outcome.getId());
+//				}
+				out.println(message);
 			} else {
 				out.println("NO SUBSCRIPTION FOUND FOR THIS IDENTIFIER");
 			}

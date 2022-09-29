@@ -108,18 +108,18 @@ public class PopServlet extends HttpServlet {
 			userId = req.getParameter(PARAM_USERID);
 		}
 		if (userId == null || userId.isBlank()) {
-			userId = "DEFAULT";
+			userId = "1";
 		}
 		if (req.getParameter(PARAM_PASSWORD) != null && !req.getParameter(PARAM_PASSWORD).isBlank() ) {
 			password = req.getParameter(PARAM_PASSWORD);
 		}
 		if (password == null || password.isBlank()) {
-			password = "DEFAULT";
+			password = "1";
 		}
 		 if (req.getParameter(PARAM_FACILITYID) == null || req.getParameter(PARAM_FACILITYID).isBlank() ) {
 			 facilityId = req.getParameter(PARAM_FACILITYID);
 			 if (facilityId == null || facilityId.isBlank()) {
-				 facilityId = "DEFAULT";
+				 facilityId = "1";
 			 }
 		 }
 
@@ -139,7 +139,7 @@ public class PopServlet extends HttpServlet {
               + "\" value=\"" + userId + "\"/>");
           out.println("      <label>User Id</label>");
           out.println("      <input class=\"w3-input\" type=\"password\" name=\"" + PARAM_PASSWORD
-              + "\"/>");
+				 + "\" value=\"1\"/>"); //TODO remove
           out.println("      <label>Password</label>");
           out.println("      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_FACILITYID
               + "\" value=\"" + facilityId + "\"/>");

@@ -21,6 +21,7 @@ import ca.uhn.fhir.jpa.provider.*;
 import ca.uhn.fhir.jpa.provider.dstu3.JpaConformanceProviderDstu3;
 import ca.uhn.fhir.jpa.search.DatabaseBackedPagingProvider;
 import ca.uhn.fhir.jpa.starter.interceptors.PartitionCreationInterceptor;
+import ca.uhn.fhir.jpa.starter.interceptors.SessionAuthorizationInterceptor;
 import ca.uhn.fhir.jpa.subscription.util.SubscriptionDebugLogInterceptor;
 import ca.uhn.fhir.mdm.provider.MdmProviderLoader;
 import ca.uhn.fhir.narrative.DefaultThymeleafNarrativeGenerator;
@@ -215,6 +216,11 @@ public class BaseJpaRestfulServer extends RestfulServer {
      */
 
     setPagingProvider(databaseBackedPagingProvider);
+
+	  /**
+		* Custom Authorization interceptor
+		*/
+	 this.registerInterceptor(new SessionAuthorizationInterceptor());
 
     /*
      * This interceptor formats the output using nice colourful
