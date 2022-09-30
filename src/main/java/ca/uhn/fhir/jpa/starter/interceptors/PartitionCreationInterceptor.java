@@ -66,19 +66,21 @@ public class PartitionCreationInterceptor extends RequestTenantPartitionIntercep
 		Random random = new Random();
 		int id = random.nextInt(10000);
 		int number_of_attempts = 0;
-		while (number_of_attempts < 100){
-			try {
+		try {
+			while (number_of_attempts < 1000){
 				partitionLookupSvc.getPartitionById(id);
-			} catch (ResourceNotFoundException ee) {
 				id = random.nextInt(10000);
+				number_of_attempts++;
 			}
-			number_of_attempts++;
+		} catch (ResourceNotFoundException e) {
+			// unused id found
+			Parameters inParams = new Parameters();
+			inParams.addParameter().setName("id").setValue(new IntegerType(id));
+			inParams.addParameter().setName("name").setValue(tenantId);
+			inParams.addParameter().setName("description").setValue(tenantId);
+			partitionManagementProvider.addPartition(inParams,new IntegerType(id),tenantId,tenantId);
 		}
-		Parameters inParams = new Parameters();
-		inParams.addParameter().setName("id").setValue(new IntegerType(id));
-		inParams.addParameter().setName("name").setValue(tenantId);
-		inParams.addParameter().setName("description").setValue(tenantId);
-		partitionManagementProvider.addPartition(inParams,new IntegerType(id),tenantId,tenantId);
+
 	}
 
 }
