@@ -23,6 +23,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Import;
+import org.springframework.web.context.request.RequestContextListener;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 import org.springframework.web.servlet.DispatcherServlet;
@@ -99,7 +100,11 @@ public class Application extends SpringBootServletInitializer {
 
   }
 
-  @Bean
+	@Bean public RequestContextListener requestContextListener(){
+		return new RequestContextListener();
+	}
+
+	@Bean
   public ServletRegistrationBean homeServletRegistrationBean() {
 	  ServletRegistrationBean registrationBean = new ServletRegistrationBean();
 	  HomeServlet servlet = new HomeServlet();

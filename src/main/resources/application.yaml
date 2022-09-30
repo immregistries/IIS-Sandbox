@@ -6,9 +6,16 @@ management:
       exposure:
         include: "health,prometheus"
 spring:
-#  output:
-#    ansi:
-#      enabled: ALWAYS
+  session:
+    store-type:  # Session store type.
+      redis:
+        flush-mode: on-save
+        namespace: spring:session
+  redis:
+    host: localhost
+    password:
+    port: 6379
+
   main:
     allow-circular-references: true
     #allow-bean-definition-overriding: true
