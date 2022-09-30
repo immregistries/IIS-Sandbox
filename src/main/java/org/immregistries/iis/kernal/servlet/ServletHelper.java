@@ -27,11 +27,10 @@ public class ServletHelper {
     OrgMaster orgMaster = null;
     OrgAccess orgAccess = null;
 
-     Query query = dataSession.createQuery("from OrgMaster where organizationName = ?1");
-	  query.setParameter(1, facilityId);
+	 Query query = dataSession.createQuery("from OrgMaster where organizationName = ?1");
+	 query.setParameter(1, facilityId);
 
-
-	  List<OrgMaster> orgMasterList = query.list();
+	 List<OrgMaster> orgMasterList = query.list();
     if (orgMasterList.size() > 0) {
       orgMaster = orgMasterList.get(0);
     } else {
@@ -40,7 +39,8 @@ public class ServletHelper {
       orgAccess = new OrgAccess();
       orgAccess.setOrg(orgMaster);
       orgAccess.setAccessName(userId);
-      orgAccess.setAccessKey(BCrypt.hashpw(password, BCrypt.gensalt(5)));
+//      orgAccess.setAccessKey(BCrypt.hashpw(password, BCrypt.gensalt(5))); TODO after auth checks fix in fhir
+      orgAccess.setAccessKey(password);
       Transaction transaction = dataSession.beginTransaction();
       dataSession.save(orgMaster);
       dataSession.save(orgAccess);
@@ -65,7 +65,8 @@ public class ServletHelper {
     @SuppressWarnings("unchecked")
     List<OrgAccess> orgAccessList = query.list();
     if (orgAccessList.size() != 0) {
-      if (BCrypt.checkpw(password, orgAccessList.get(0).getAccessKey())) {
+//      if (BCrypt.checkpw(password, orgAccessList.get(0).getAccessKey())) { TODO after auth checks fix in fhir
+      if (password.equals(orgAccessList.get(0).getAccessKey())) {
         orgAccess = orgAccessList.get(0);
       } else {
         throw new AuthenticationException("password for ID : " + facilityId);

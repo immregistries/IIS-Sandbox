@@ -39,16 +39,10 @@ public class SessionAuthorizationInterceptor extends AuthorizationInterceptor {
 
 	@Override
 	public List<IAuthRule> buildRuleList(RequestDetails theRequestDetails) {
-		HttpSession session = null;
-		try {
-			ServletRequestAttributes attr = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
-			session = attr.getRequest().getSession(false); // true == allow create
-			log.info("{}", session);
-		} catch (NoClassDefFoundError | ExceptionInInitializerError error) {
-			error.printStackTrace();
-			session = null;
-		}
+		ServletRequestAttributes attr = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
+		HttpSession session = attr.getRequest().getSession(false); // true == allow create
 		Session dataSession = PopServlet.getDataSession();
+		// TODO add secure verification to see if request originates from HL7v2 IIS sandbox functionalities
 
 		String authHeader = theRequestDetails.getHeader("Authorization");
 		OrgAccess orgAccess;

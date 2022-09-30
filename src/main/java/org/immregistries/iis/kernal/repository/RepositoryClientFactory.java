@@ -7,6 +7,8 @@ import ca.uhn.fhir.rest.client.apache.ApacheRestfulClientFactory;
 import ca.uhn.fhir.rest.client.api.IClientInterceptor;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.client.api.ServerValidationModeEnum;
+import ca.uhn.fhir.rest.client.impl.HttpBasicAuthInterceptor;
+import ca.uhn.fhir.rest.client.interceptor.BasicAuthInterceptor;
 import ca.uhn.fhir.rest.client.interceptor.BearerTokenAuthInterceptor;
 import ca.uhn.fhir.rest.client.interceptor.UrlTenantSelectionInterceptor;
 import ca.uhn.fhir.rest.server.interceptor.LoggingInterceptor;
@@ -25,9 +27,7 @@ public class RepositoryClientFactory extends ApacheRestfulClientFactory implemen
 	 @Autowired
 	 private IFhirSystemDao fhirSystemDao;
     private final Logger logger = LoggerFactory.getLogger(RepositoryClientFactory.class);
-    private IClientInterceptor authInterceptor;
     private LoggingInterceptor loggingInterceptor;
-    private UrlTenantSelectionInterceptor urlTenantSelectionInterceptor;
 	 private static String serverBase = "http://localhost:8080/fhir";
 
 	@Autowired
@@ -49,29 +49,21 @@ public class RepositoryClientFactory extends ApacheRestfulClientFactory implemen
 
 	public synchronized IGenericClient newGenericClient(OrgAccess orgAccess) {
 		asynchInit();
-		IGenericClient client = newGenericClient(serverBase + "/" + orgAccess.getAccessName());
-//		urlTenantSelectionInterceptor = new UrlTenantSelectionInterceptor(orgAccess.getAccessName());
-//		client.registerInterceptor(urlTenantSelectionInterceptor);
+		IGenericClient client = newGenericClient(serverBase);
+		UrlTenantSelectionInterceptor urlTenantSelectionInterceptor = new UrlTenantSelectionInterceptor(orgAccess.getAccessName());
+		client.registerInterceptor(urlTenantSelectionInterceptor);
+		IClientInterceptor authInterceptor = new BasicAuthInterceptor(orgAccess.getAccessName(),orgAccess.getAccessKey());
+		client.registerInterceptor(authInterceptor);
 		return client;
-	}
-
-
-	public synchronized IGenericClient newGenericClient() {
-		asynchInit();
-		return newGenericClient(serverBase);
 	}
 
 	 @Override
     public synchronized IGenericClient newGenericClient(String theServerBase) {
 		  asynchInit();
         IGenericClient client = super.newGenericClient(theServerBase);
-		  authInterceptor = new BearerTokenAuthInterceptor();
 		  client.registerInterceptor(loggingInterceptor);
-		  client.registerInterceptor(authInterceptor);
         return client;
     }
-
-
 
 	@Override
 	public IGenericClient newClient(FhirContext fhirContext, HttpServletRequest httpServletRequest, String s) {
