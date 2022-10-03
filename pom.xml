@@ -450,8 +450,8 @@
             </plugins>
         </pluginManagement>
 
-        <!-- Tells Maven to name the generated WAR file as ROOT.war -->
-        <finalName>ROOT</finalName>
+        <!-- Tells Maven to name the generated WAR file as iis-jpa.war -->
+        <finalName>iis-jpa</finalName>
 
         <plugins>
             <plugin>
