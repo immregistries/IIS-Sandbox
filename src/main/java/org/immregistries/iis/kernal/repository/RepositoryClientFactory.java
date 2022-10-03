@@ -8,6 +8,7 @@ import ca.uhn.fhir.rest.client.api.IClientInterceptor;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.client.api.ServerValidationModeEnum;
 import ca.uhn.fhir.rest.client.impl.HttpBasicAuthInterceptor;
+import ca.uhn.fhir.rest.client.interceptor.AdditionalRequestHeadersInterceptor;
 import ca.uhn.fhir.rest.client.interceptor.BasicAuthInterceptor;
 import ca.uhn.fhir.rest.client.interceptor.BearerTokenAuthInterceptor;
 import ca.uhn.fhir.rest.client.interceptor.UrlTenantSelectionInterceptor;
@@ -28,7 +29,7 @@ public class RepositoryClientFactory extends ApacheRestfulClientFactory implemen
 	 private IFhirSystemDao fhirSystemDao;
     private final Logger logger = LoggerFactory.getLogger(RepositoryClientFactory.class);
     private LoggingInterceptor loggingInterceptor;
-	 private static String serverBase = "http://localhost:8080/fhir";
+	 private static String serverBase = "";
 
 	@Autowired
 	public RepositoryClientFactory(){
@@ -62,6 +63,9 @@ public class RepositoryClientFactory extends ApacheRestfulClientFactory implemen
 		  asynchInit();
         IGenericClient client = super.newGenericClient(theServerBase);
 		  client.registerInterceptor(loggingInterceptor);
+		  AdditionalRequestHeadersInterceptor interceptor = new AdditionalRequestHeadersInterceptor();
+		  interceptor.addHeaderValue("Cache-Control", "no-cache");
+		  client.registerInterceptor(interceptor);
         return client;
     }
 
