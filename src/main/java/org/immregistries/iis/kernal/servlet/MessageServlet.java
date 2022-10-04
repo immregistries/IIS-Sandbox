@@ -88,7 +88,7 @@ public class MessageServlet extends HttpServlet {
             messageConfirmation = "Logged in to " + orgAccess.getOrg().getOrganizationName();
           }
         } else if (action.equals(ACTION_SWITCH)) {
-          OrgMaster orgMaster = (OrgMaster) dataSession.get(OrgMaster.class,
+          OrgMaster orgMaster = dataSession.get(OrgMaster.class,
               Integer.parseInt(req.getParameter(PARAM_ORG_ID)));
           Map<Integer, OrgAccess> orgAccessMap =
               (Map<Integer, OrgAccess>) session.getAttribute("orgAccessMap");
@@ -124,7 +124,7 @@ public class MessageServlet extends HttpServlet {
           facilityId = "";
         }
         if (req.getParameter(PARAM_ORG_ID) != null) {
-          OrgMaster orgMaster = (OrgMaster) dataSession.get(OrgMaster.class,
+          OrgMaster orgMaster = dataSession.get(OrgMaster.class,
               Integer.parseInt(req.getParameter(PARAM_ORG_ID)));
           facilityId = orgMaster.getOrganizationName();
         }

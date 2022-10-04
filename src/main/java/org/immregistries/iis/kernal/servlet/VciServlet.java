@@ -54,8 +54,8 @@ public class VciServlet extends HttpServlet {
           + "OBX|10|TS|29769-7^Date vaccine information statement presented^LN|4|20210327||||||F||||||\r\n"
           + "ORC|RE||9999^IIS\r\n";
 
-  private Map<String, Object> fhirImm = new HashMap<>();
-  private Map<String, Object> fhirPatient = new HashMap<>();
+  private final Map<String, Object> fhirImm = new HashMap<>();
+  private final Map<String, Object> fhirPatient = new HashMap<>();
   private static SessionFactory factory;
 
 

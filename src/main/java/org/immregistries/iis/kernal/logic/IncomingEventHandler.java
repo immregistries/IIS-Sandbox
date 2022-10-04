@@ -26,7 +26,7 @@ import static org.immregistries.iis.kernal.mapping.MappingHelper.MRN_SYSTEM;
 @Component
 public class IncomingEventHandler extends IncomingMessageHandler {
 
-	private Logger logger = LoggerFactory.getLogger(IncomingEventHandler.class);
+	private final Logger logger = LoggerFactory.getLogger(IncomingEventHandler.class);
 
 
   private static final String ORG_LOCATION_FACILITY_CODE = "orgLocationFacilityCode";

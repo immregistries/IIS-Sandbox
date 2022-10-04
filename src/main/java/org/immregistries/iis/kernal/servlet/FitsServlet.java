@@ -142,7 +142,7 @@ public class FitsServlet extends HttpServlet {
               } else if (cvx2 == 0) {
                 return -1;
               }
-              return (new Integer(cvx1)).compareTo(cvx2);
+              return (Integer.valueOf(cvx1)).compareTo(cvx2);
             }
           });
 

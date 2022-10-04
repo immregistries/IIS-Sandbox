@@ -110,7 +110,7 @@ public class Application extends SpringBootServletInitializer {
 	  HomeServlet servlet = new HomeServlet();
 	  beanFactory.autowireBean(servlet);
 	  registrationBean.setServlet(servlet);
-	  registrationBean.addUrlMappings( "/home");
+	  registrationBean.addUrlMappings("/home");
 	  registrationBean.setLoadOnStartup(1);
 	  return registrationBean;
   }

@@ -141,7 +141,7 @@ public class CovidServlet extends HttpServlet {
 
           Set<String> cvxCodeSet = new HashSet<>();
           {
-            String codes[] = cvxCodes.split("\\,");
+            String[] codes = cvxCodes.split("\\,");
             for (String c : codes) {
               if (StringUtils.isNotEmpty(c)) {
                 cvxCodeSet.add(c);

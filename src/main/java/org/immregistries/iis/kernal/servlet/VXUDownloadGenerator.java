@@ -102,7 +102,7 @@ public class VXUDownloadGenerator extends Thread {
   public VXUDownloadGenerator(HttpServletRequest req, int orgAccessId) {
     runningMessage = "Initializing";
     this.dataSession = PopServlet.getDataSession();
-    this.orgAccess = (OrgAccess) dataSession.get(OrgAccess.class, orgAccessId);
+    this.orgAccess = dataSession.get(OrgAccess.class, orgAccessId);
     sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
     messageError = null;
     dateStartString = req.getParameter(PARAM_DATE_START);
@@ -157,7 +157,7 @@ public class VXUDownloadGenerator extends Thread {
     boolean allVaccines = false;
     Set<String> cvxCodeSet = new HashSet<>();
     {
-      String codes[] = cvxCodes.split("\\,");
+      String[] codes = cvxCodes.split("\\,");
       for (String c : codes) {
         c = c.trim();
         if (StringUtils.isNotEmpty(c)) {

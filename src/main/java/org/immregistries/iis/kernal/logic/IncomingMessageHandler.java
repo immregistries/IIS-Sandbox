@@ -256,11 +256,8 @@ public class IncomingMessageHandler {
 
       CodeMap codeMap = CodeMapManager.getCodeMap();
 
-      boolean strictDate = true;
-      if (processingFlavorSet.contains(ProcessingFlavor.CANTALOUPE)) {
-        strictDate = false;
-      }
-      PatientReported patientReported = processPatient(orgAccess, reader, processingExceptionList,
+      boolean strictDate = !processingFlavorSet.contains(ProcessingFlavor.CANTALOUPE);
+		PatientReported patientReported = processPatient(orgAccess, reader, processingExceptionList,
           processingFlavorSet, codeMap, strictDate,null);
 
 
@@ -1926,7 +1923,7 @@ public class IncomingMessageHandler {
       sb.append("|");
       String phone = patientReported.getPatientPhone();
       if (phone.length() == 10) {
-        sb.append("^PRN^PH^^^").append(phone.substring(0, 3)).append("^").append(phone.substring(3, 10));
+        sb.append("^PRN^PH^^^").append(phone, 0, 3).append("^").append(phone, 3, 10);
       }
       // PID-14
       sb.append("|");

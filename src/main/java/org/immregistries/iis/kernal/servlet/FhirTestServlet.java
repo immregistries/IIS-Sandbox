@@ -29,6 +29,7 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -189,7 +190,7 @@ public class FhirTestServlet extends HttpServlet {
           if (orgAccess != null) {
             tenantId = orgAccess.getOrg().getOrganizationName();
           }
-          tenantId = URLEncoder.encode(tenantId, "UTF-8");
+          tenantId = URLEncoder.encode(tenantId, StandardCharsets.UTF_8);
           baseUrl = BASE_URL + "/" + tenantId + "/";
         }
 
