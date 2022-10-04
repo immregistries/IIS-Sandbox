@@ -11,6 +11,8 @@ import org.immregistries.iis.kernal.model.OrgMaster;
 import org.immregistries.iis.kernal.repository.RepositoryClientFactory;
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpSession;
 import java.util.List;
@@ -78,6 +80,12 @@ public class ServletHelper {
     return orgAccess;
   }
 
+
+
+  public static IGenericClient getFhirClient( RepositoryClientFactory repositoryClientFactory) {
+	  HttpSession session = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest().getSession(false);
+	  return  getFhirClient(session,repositoryClientFactory);
+  }
   public static IGenericClient getFhirClient(HttpSession session, RepositoryClientFactory repositoryClientFactory) {
 	  if (session.getAttribute("fhirClient") == null) {
 		  OrgAccess orgAccess = (OrgAccess) session.getAttribute("orgAccess");

@@ -86,7 +86,7 @@ public class ImmunizationMapper {
 		vr.setFundingSource(i.getFundingSource().getCodingFirstRep().getCode());
 		vr.setFundingEligibility(i.getProgramEligibilityFirstRep().getCodingFirstRep().getCode());
 
-//	 vr.setOrgLocation(LocationMapper.orgLocationFromFhir(i.getLocation()));
+//	 vr.setOrgLocation(LocationMapper.orgLocationFromFhir(i.getLocation())); // Dealt with in servlet
 //	  vr.setEnteredBy();
 //	  vr.setAdministeringProvider(); TODO but not urgent
 //	  vr.getOrderingProvider()
@@ -167,7 +167,7 @@ public class ImmunizationMapper {
 		 i.addProgramEligibility().addCoding().setSystem(FUNDING_ELIGIBILITY).setCode(vr.getFundingEligibility());
 
 
-		 Location location  = LocationMapper.fhirLocation(vr.getOrgLocation()); // TODO save it here ?
+		 Location location  = LocationMapper.fhirLocation(vr.getOrgLocation()); // Should have been saved in Event/MessageHandler
 		 i.setLocation(new Reference(location));
 
 		 if (vr.getEnteredBy() != null) { //TODO change to Practitioner and Test with Practitioner segments

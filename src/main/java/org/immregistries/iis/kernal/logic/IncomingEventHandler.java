@@ -141,22 +141,9 @@ public class IncomingEventHandler extends IncomingMessageHandler {
 		 Immunization.PATIENT.hasId(patientReported.getPatientReportedId()),
 		 Immunization.IDENTIFIER.exactly().code(vaccinationReportedExternalLink)
 		 );
-//	  vaccinationMaster = vaccinationReported.getVaccination();
-//    {
-//      Query query = dataSession.createQuery(
-//          "from VaccinationReported where patientReported = ? and vaccinationReportedExternalLink = ?");
-//      query.setParameter(0, patientReported);
-//      query.setParameter(1, vaccinationReportedExternalLink);
-//      @SuppressWarnings("unchecked")
-//      List<VaccinationReported> vaccinationReportedList = query.list();
-//      if (vaccinationReportedList.size() > 0) {
-//        vaccinationReported = vaccinationReportedList.get(0);
-//        vaccinationMaster = vaccinationReported.getVaccination();
-//      }
-//    }
     if (vaccinationReported == null) {
 //      vaccinationMaster = new VaccinationMaster();
-//		vaccinationMaster.setVaccinationId(vaccinationReportedExternalLink); TODO verify
+//		vaccinationMaster.setVaccinationId(vaccinationReportedExternalLink);
       vaccinationReported = new VaccinationReported();
 //      vaccinationReported.setVaccination(vaccinationMaster);
 //      vaccinationMaster.setVaccinationReported(null);

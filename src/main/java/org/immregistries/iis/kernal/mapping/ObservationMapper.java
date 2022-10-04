@@ -101,7 +101,7 @@ public class ObservationMapper {
 		ObservationMaster observationMaster = new ObservationMaster();
 		observationMaster.setObservationId(o.getCode().getCode(OBSERVATION_MASTER));
 		observationMaster.setIdentifierCode(o.getCode().getCode(IDENTIFIER_CODE));
-//		observationMaster.setPatient(); TODO
+//		observationMaster.setPatient(); TODO?
 //		observationMaster.setVaccination();
 //		observationMaster.setObservationReported();
 		observationMaster.setValueCode(o.getValueCodeableConcept().getCodingFirstRep().getCode());

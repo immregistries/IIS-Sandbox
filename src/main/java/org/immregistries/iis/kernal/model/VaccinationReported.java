@@ -35,6 +35,9 @@ public class VaccinationReported implements Serializable {
   private String fundingSource = "";
   private String fundingEligibility = "";
   private TestEvent testEvent = null;
+
+
+	private String orgLocationId = "";
   private OrgLocation orgLocation = null;
   private ModelPerson enteredBy = null;
   private ModelPerson orderingProvider = null;
@@ -255,8 +258,10 @@ public class VaccinationReported implements Serializable {
 
   public void setOrgLocation(OrgLocation orgLocation) {
     this.orgLocation = orgLocation;
+	 if (orgLocation != null) {
+		 this.orgLocationId = orgLocation.getOrgLocationId();
+	 }
   }
-
 
 	public String getPatientReportedId() {
 		return patientReportedId;
@@ -265,4 +270,13 @@ public class VaccinationReported implements Serializable {
 	public void setPatientReportedId(String patientReportedId) {
 		this.patientReportedId = patientReportedId;
 	}
+
+	public String getOrgLocationId() {
+		return orgLocationId;
+	}
+
+	public void setOrgLocationId(String orgLocationId) {
+		this.orgLocationId = orgLocationId;
+	}
+
 }

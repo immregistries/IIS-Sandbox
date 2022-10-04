@@ -2,11 +2,14 @@ package org.immregistries.iis.kernal.servlet;
 
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.gclient.DateClientParam;
+import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hl7.fhir.r5.model.Immunization;
+import org.hl7.fhir.r5.model.Location;
 import org.hl7.fhir.r5.model.Patient;
+import org.immregistries.iis.kernal.mapping.LocationMapper;
 import org.immregistries.iis.kernal.model.*;
 import org.immregistries.iis.kernal.repository.FhirRequests;
 import org.immregistries.iis.kernal.repository.RepositoryClientFactory;
@@ -159,13 +162,10 @@ public class CovidServlet extends HttpServlet {
 				 Date finalDateStart = dateStart;
 				 Date finalDateEnd = dateEnd;
 				 vaccinationReportedList = vaccinationReportedList.stream().filter(vaccinationReported -> vaccinationReported.getReportedDate().after(finalDateStart) && vaccinationReported.getReportedDate().before(finalDateEnd)).collect(Collectors.toList());
+//            TODO verify claim for reportedDate search criteria
 //            Query query = dataSession.createQuery(
 //                "from VaccinationReported where reportedDate >= :dateStart and reportedDate <= :dateEnd "
 //                    + "and patientReported.orgReported = :orgReported");
-//            query.setParameter("dateStart", dateStart);
-//            query.setParameter("dateEnd", dateEnd);
-//            query.setParameter("orgReported", orgAccess.getOrg());
-//            vaccinationReportedList = query.list();
           }
 
           printHeaderLine(out);
@@ -251,7 +251,7 @@ public class CovidServlet extends HttpServlet {
 //      query.setParameter("administeredDate", vaccinationReported.getAdministeredDate());
 //      query.setParameter("patientReported", vaccinationReported.getPatientReported());
 		List<VaccinationReported> list = fhirRequests.searchVaccinationReportedList(fhirClient,
-			 new DateClientParam("occurrence").before().day(vaccinationReported.getAdministeredDate()),
+			Immunization.DATE.before().day(vaccinationReported.getAdministeredDate()),
 			Immunization.PATIENT.hasId(vaccinationReported.getPatientReportedId()),
 			Immunization.STATUS.exactly().identifier(Immunization.ImmunizationStatusCodes.COMPLETED.toCode())
 		);
@@ -390,6 +390,15 @@ public class CovidServlet extends HttpServlet {
     }
 
     OrgLocation orgLocation = vaccinationReported.getOrgLocation();
+	 if (orgLocation == null) {
+		 try {
+			 orgLocation = LocationMapper.orgLocationFromFhir(
+				 ServletHelper.getFhirClient(repositoryClientFactory)
+					 .read().resource(Location.class)
+					 .withId(vaccinationReported.getOrgLocationId()).execute()
+			 );
+		 } catch (ResourceNotFoundException e) {}
+	 }
     if (orgLocation == null) {
       // 33: Responsible organization
       printField("", out);

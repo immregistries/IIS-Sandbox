@@ -566,20 +566,6 @@ public class IncomingMessageHandler {
           verifyNoErrors(processingExceptionList);
           reader.gotoSegmentPosition(segmentPosition);
 			 vaccinationReported = fhirRequests.saveVaccinationReported(fhirClient, vaccinationReported);
-//			 vaccinationMaster.setVaccinationId(vaccinationReported.getVaccinationReportedId());
-//          {
-//				 Immunization immunization = ImmunizationHandler.getFhirResource(vaccinationMaster,vaccinationReported);
-////				 fhirClient.patch();TODO Maybe Convert resources to Fhirpatch and replace simple updates with patch or MDM might fix this issue
-//				 try {
-//					 MethodOutcome outcome = fhirClient.update().resource(immunization).conditional().where(
-//							 Immunization.IDENTIFIER.exactly()
-//								 .systemAndIdentifier(MappingHelper.VACCINATION_REPORTED,vaccinationReported.getVaccinationReportedId()))
-//						 .execute();
-//				 } catch (ResourceNotFoundException e ){
-//					 MethodOutcome outcome = fhirClient.create().resource(immunization).execute();
-//				 }
-//          }
-
           reader.gotoSegmentPosition(segmentPosition);
           obxCount = readAndCreateObservations(reader, processingExceptionList, patientReported,
               strictDate, obxCount, vaccinationReported, null, fhirClient);
@@ -1067,7 +1053,7 @@ public class IncomingMessageHandler {
 	  if (vaccination == null) {
 		  observationReported = fhirRequests.searchObservationReported(fhirClient,
 			  Observation.PART_OF.isMissing(true),
-			  Observation.SUBJECT.hasId(patientReported.getPatientReportedId())); //TODO change has linked property
+			  Observation.SUBJECT.hasId(patientReported.getPatientReportedId()));
 	  } else {
 		  observationReported = fhirRequests.searchObservationReported(fhirClient,
 			  Observation.PART_OF.hasId(vaccination.getVaccinationId()),
@@ -2441,7 +2427,6 @@ public class IncomingMessageHandler {
 				 return patientExternalLink;
 			 }
 		 } catch (ResourceNotFoundException e) {
-			 // TODO check if it works, if no resources found
 			 return patientExternalLink;
 			 // we found a unique id!
 		 }

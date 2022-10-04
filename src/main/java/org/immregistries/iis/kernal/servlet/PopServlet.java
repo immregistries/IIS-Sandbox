@@ -139,7 +139,7 @@ public class PopServlet extends HttpServlet {
               + "\" value=\"" + userId + "\"/>");
           out.println("      <label>User Id</label>");
           out.println("      <input class=\"w3-input\" type=\"password\" name=\"" + PARAM_PASSWORD
-				 + "\" value=\"1\"/>"); //TODO remove
+				 + "\"/>");
           out.println("      <label>Password</label>");
           out.println("      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_FACILITYID
               + "\" value=\"" + facilityId + "\"/>");

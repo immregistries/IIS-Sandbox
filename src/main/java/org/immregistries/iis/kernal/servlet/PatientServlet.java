@@ -305,7 +305,7 @@ public class PatientServlet extends HttpServlet {
         out.println("  <div class=\"w3-container\">");
 
         out.println("<h3>Messages Received</h3>");
-        Query query = dataSession.createQuery( //TODO Support MessageReceived mapping through logger or metadata
+        Query query = dataSession.createQuery( // TODO Support MessageReceived mapping through logger or metadata
             "from MessageReceived where patientReportedId = :patientReportedId order by reportedDate asc");
         query.setParameter("patientReportedId", patientReportedSelected.getPatientReportedId());
         List<MessageReceived> messageReceivedList = new ArrayList<>();

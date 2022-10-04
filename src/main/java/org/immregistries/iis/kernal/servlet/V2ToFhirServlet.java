@@ -14,6 +14,7 @@ import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.logic.CodeMapManager;
 import org.immregistries.iis.kernal.logic.IncomingMessageHandler;
+import org.immregistries.iis.kernal.mapping.ImmunizationMapper;
 import org.immregistries.iis.kernal.model.*;
 import org.immregistries.iis.kernal.repository.RepositoryClientFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -141,6 +142,7 @@ public class V2ToFhirServlet extends HttpServlet {
   private void createImmunizationResource(VaccinationMaster vaccination, Immunization immunization,
       Code cvxCode, CodeMap codeMap) {
     VaccinationReported vaccinationReported = vaccination.getVaccinationReported();
+	 immunization = ImmunizationMapper.getFhirResource(vaccinationReported); // TODO Maybe remove this or remove the rest
 
     {
       DateTimeType occurance = new DateTimeType(vaccinationReported.getAdministeredDate());
@@ -156,7 +158,7 @@ public class V2ToFhirServlet extends HttpServlet {
     }
     if (StringUtils.isNotEmpty(vaccinationReported.getVaccineNdcCode())) {
       CodeableConcept ndcCoding = createCodeableConcept(vaccinationReported.getVaccineNdcCode(),
-          CodesetType.VACCINATION_NDC_CODE, "NDC", codeMap);
+          CodesetType.VACCINATION_NDC_CODE, "NDC", codeMap); //TODO use CodeSet type in mapping ?
       immunization.setVaccineCode(ndcCoding);
     }
     {

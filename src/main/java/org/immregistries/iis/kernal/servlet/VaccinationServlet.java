@@ -65,7 +65,7 @@ public class VaccinationServlet extends PatientServlet {
     try {
 		 VaccinationReported vaccinationReported =
 			 ImmunizationMapper.getReported(fhirClient.read().resource(Immunization.class)
-				 .withId(req.getParameter(PARAM_VACCINATION_REPORTED_ID)).execute()); // TODO maybe switch with identifier
+				 .withId(req.getParameter(PARAM_VACCINATION_REPORTED_ID)).execute());
 
 //			 fhirRequests.searchVaccinationReported(fhirClient,
 //			 Immunization.IDENTIFIER.exactly().code(req.getParameter(PARAM_VACCINATION_REPORTED_ID)));

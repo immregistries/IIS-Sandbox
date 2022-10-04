@@ -54,17 +54,17 @@ public class FhirTesterConfig {
   @Bean
   public TesterConfig testerConfig(AppProperties appProperties) {
     TesterConfig retVal = new TesterConfig();
-    appProperties.getTester().entrySet().stream().forEach(t -> {
-      retVal
-        .addServer()
-        .withId(t.getKey())
-        .withFhirVersion(t.getValue().getFhir_version())
-        .withBaseUrl(t.getValue().getServer_address())//TODO Add user id here for multitenancy or allow metadata without partitioning
-        .withName(t.getValue().getName());
-      retVal.setRefuseToFetchThirdPartyUrls(
-        t.getValue().getRefuse_to_fetch_third_party_urls());
-
-    });
+//    appProperties.getTester().entrySet().stream().forEach(t -> {
+//      retVal
+//        .addServer()
+//        .withId(t.getKey())
+//        .withFhirVersion(t.getValue().getFhir_version())
+//        .withBaseUrl(t.getValue().getServer_address())
+//        .withName(t.getValue().getName());
+//      retVal.setRefuseToFetchThirdPartyUrls(
+//        t.getValue().getRefuse_to_fetch_third_party_urls());
+//
+//    });
 //	  for (PartitionEntity partitionEntity: partitionLookupSvc.listPartitions()) {
 //		  retVal.addServer()
 //			  .withId(String.valueOf(partitionEntity.getId()))
@@ -73,7 +73,7 @@ public class FhirTesterConfig {
 //			  .withName(partitionEntity.getName());
 //	  }
 
-//	  retVal.setClientFactory(repositoryClientFactory); //TODO
+//	  retVal.setClientFactory(repositoryClientFactory);
     return retVal;
   }
 
