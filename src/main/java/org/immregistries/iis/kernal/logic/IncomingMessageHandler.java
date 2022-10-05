@@ -450,7 +450,7 @@ public class IncomingMessageHandler {
           {
             String administeringProvider = reader.getValue(10);
             if (StringUtils.isNotEmpty(administeringProvider)) {
-              ModelPerson modelPerson = fhirRequests.searchPerson(fhirClient,Person.IDENTIFIER.exactly().code(administeringProvider));
+              ModelPerson modelPerson = fhirRequests.searchPractitioner(fhirClient,Practitioner.IDENTIFIER.exactly().code(administeringProvider));
               if (modelPerson == null) {
                 modelPerson = new ModelPerson();
                 modelPerson.setPersonExternalLink(administeringProvider);
@@ -529,7 +529,7 @@ public class IncomingMessageHandler {
 
           reader.gotoSegmentPosition(segmentPosition);
           int tempObxCount = obxCount;
-          while (reader.advanceToSegment("OBX", "ORC")) {
+          while (reader.advanceToSegment("OBX", "ORC")) { //TODO store entering and ordering practitioners
             tempObxCount++;
             String indicator = reader.getValue(3);
             if (indicator.equals("64994-7")) {

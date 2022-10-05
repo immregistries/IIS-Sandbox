@@ -2,6 +2,7 @@ package org.immregistries.iis.kernal.mapping;
 
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import org.hl7.fhir.r5.model.*;
+import org.immregistries.iis.kernal.model.ModelPerson;
 import org.immregistries.iis.kernal.model.VaccinationMaster;
 import org.immregistries.iis.kernal.model.VaccinationReported;
 import org.immregistries.iis.kernal.repository.FhirRequests;
@@ -15,10 +16,13 @@ public class ImmunizationMapper {
 	public static final String MVX = "http://terminology.hl7.org/CodeSystem/MVX";
 	public static final String NDC = "NDC";
 	public static final String INFORMATION_SOURCE = "informationSource";
-	public static final String FUNCTION = "iis-sandbox-function";
-	public static final String ORDERING = "ordering";
+	public static final String FUNCTION = "http://hl7.org/fhir/ValueSet/immunization-function";
+	public static final String ORDERING = "OP";
+	public static final String ORDERING_DISPLAY = "Ordering Provider";
 	public static final String ENTERING = "entering";
-	public static final String ADMINISTERING = "administering";
+	public static final String ENTERING_DISPLAY = "Entering Provider";
+	public static final String ADMINISTERING = "AP";
+	public static final String ADMINISTERING_DISPLAY = "Administering Provider";
 	public static final String REFUSAL_REASON_CODE = "refusalReasonCode";
 	public static final String BODY_PART = "bodyPart";
 	public static final String BODY_ROUTE = "bodyRoute";
@@ -55,6 +59,7 @@ public class ImmunizationMapper {
 
 
 		vr.setAdministeredAmount(i.getDoseQuantity().getValue().toString());
+
 		vr.setInformationSource(i.getInformationSourceCodeableConcept().getCode(INFORMATION_SOURCE));
 		vr.setUpdatedDate(new Date());
 
@@ -86,10 +91,22 @@ public class ImmunizationMapper {
 		vr.setFundingSource(i.getFundingSource().getCodingFirstRep().getCode());
 		vr.setFundingEligibility(i.getProgramEligibilityFirstRep().getCodingFirstRep().getCode());
 
-//	 vr.setOrgLocation(LocationMapper.orgLocationFromFhir(i.getLocation())); // Dealt with in servlet
-//	  vr.setEnteredBy();
-//	  vr.setAdministeringProvider(); TODO but not urgent
-//	  vr.getOrderingProvider()
+	  vr.setOrgLocationId(i.getLocation().getId()); // Dealt with in servlet
+		if (i.getInformationSource().isResource()) {
+			vr.setEnteredById(i.getInformationSourceReference().getId());
+		}
+		for (Immunization.ImmunizationPerformerComponent performer: i.getPerformer()) {
+			switch (performer.getFunction().getCode(FUNCTION)){
+				case ADMINISTERING: {
+					vr.setAdministeringProviderId(performer.getActor().getId());
+					break;
+				}
+				case ORDERING: {
+					vr.setOrderingProviderId(performer.getActor().getId());
+					break;
+				}
+			}
+		}
 		return vr;
 	}
 
@@ -170,23 +187,42 @@ public class ImmunizationMapper {
 		 Location location  = LocationMapper.fhirLocation(vr.getOrgLocation()); // Should have been saved in Event/MessageHandler
 		 i.setLocation(new Reference(location));
 
-		 if (vr.getEnteredBy() != null) { //TODO change to Practitioner and Test with Practitioner segments
-			 i.addPerformer()
-				 .setFunction(new CodeableConcept().addCoding(new Coding().setSystem(FUNCTION).setCode(ENTERING)))
-				 .setActor(MappingHelper.getFhirReference(MappingHelper.PERSON,MappingHelper.PERSON_MODEL, vr.getEnteredBy().getPersonId()));
+		 if (vr.getEnteredBy() != null) {
+			 i.setInformationSource(new Reference(MappingHelper.PRACTITIONER+"/"+vr.getEnteredBy().getPersonId()));
 		 }
 		 if (vr.getOrderingProvider() != null) {
-			 i.addPerformer()
-				 .setFunction(new CodeableConcept().addCoding(new Coding().setSystem(FUNCTION).setCode(ORDERING)))
-				 .setActor(MappingHelper.getFhirReference(MappingHelper.PERSON, MappingHelper.PERSON_MODEL, vr.getOrderingProvider().getPersonId()));
+			 i.addPerformer(performer(vr.getOrderingProvider(),ORDERING, ORDERING_DISPLAY));
 		 }
 		 if (vr.getAdministeringProvider() != null) {
-			 i.addPerformer()
-				 .setFunction(new CodeableConcept().addCoding(new Coding().setSystem(FUNCTION).setCode(ADMINISTERING)))
-				 .setActor(MappingHelper.getFhirReference(MappingHelper.PERSON, MappingHelper.PERSON_MODEL, vr.getAdministeringProvider().getPersonId()));
+			 i.addPerformer(performer(vr.getAdministeringProvider(),ADMINISTERING, ADMINISTERING_DISPLAY));
 		 }
 	 }
     return i;
+  }
+
+  private static Immunization.ImmunizationPerformerComponent performer(ModelPerson person, String functionCode, String functionDisplay ) {
+	  Immunization.ImmunizationPerformerComponent performer = new Immunization.ImmunizationPerformerComponent();
+	  performer.setFunction(new CodeableConcept().addCoding(new Coding().setSystem(FUNCTION).setCode(functionCode).setDisplay(functionDisplay)));
+	  Reference actor;
+	  switch (person.getIdentifierTypeCode()) {
+		  case MappingHelper.PRACTITIONER: {
+			  actor = new Reference(MappingHelper.PRACTITIONER+"/"+person.getPersonId());
+			  break;
+		  }
+		  case MappingHelper.PERSON: {
+			  actor = MappingHelper.getFhirReference(
+				  MappingHelper.PERSON,
+				  MappingHelper.PERSON_MODEL,
+				  person.getPersonId(),
+				  person.getPersonId());
+			  break;
+		  }
+		  default:{
+			  actor = MappingHelper.getFhirReference(MappingHelper.PRACTITIONER, person.getIdentifierTypeCode(), person.getPersonExternalLink(), person.getPersonId());
+		  }
+	  }
+	  performer.setActor(actor);
+	  return performer;
   }
 
 

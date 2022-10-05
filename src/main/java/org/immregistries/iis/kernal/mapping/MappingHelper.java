@@ -15,6 +15,7 @@ public class MappingHelper {
 	public static final String ORGANISATION = "Organisation";
 	public static final String LOCATION = "Location";
 	public static final String PERSON = "Person";
+	public static final String PRACTITIONER = "Practitioner";
 
 	public static final String PERSON_MODEL = "Person";
 	public static final String MRN_SYSTEM = "urn:mrns";

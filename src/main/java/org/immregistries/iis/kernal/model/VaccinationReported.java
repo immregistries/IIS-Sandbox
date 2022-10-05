@@ -1,15 +1,21 @@
 package org.immregistries.iis.kernal.model;
 
+import org.immregistries.iis.kernal.repository.FhirRequests;
+import org.immregistries.iis.kernal.repository.RepositoryClientFactory;
 import org.immregistries.vfa.connect.model.TestEvent;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Objects;
 
 /**
  * Created by Eric on 12/20/17.
  */
 public class VaccinationReported implements Serializable {
   private static final long serialVersionUID = 1L;
+  @Autowired
+  private FhirRequests fhirRequests;
 	
   private String vaccinationReportedId = "";
   private PatientReported patientReported = null;
@@ -40,8 +46,12 @@ public class VaccinationReported implements Serializable {
 	private String orgLocationId = "";
   private OrgLocation orgLocation = null;
   private ModelPerson enteredBy = null;
+  private String enteredById = "";
   private ModelPerson orderingProvider = null;
-  private ModelPerson administeringProvider = null;
+	private String orderingProviderId = "";
+
+	private ModelPerson administeringProvider = null;
+  private String administeringProviderId = "";
 
 
   public ModelPerson getEnteredBy() {
@@ -49,6 +59,11 @@ public class VaccinationReported implements Serializable {
   }
 
   public void setEnteredBy(ModelPerson enteredBy) {
+	  if (enteredBy != null) {
+		  enteredById = enteredBy.getPersonId();
+	  } else {
+		  enteredById = "";
+	  }
     this.enteredBy = enteredBy;
   }
 
@@ -57,6 +72,11 @@ public class VaccinationReported implements Serializable {
   }
 
   public void setOrderingProvider(ModelPerson orderingProvider) {
+	  if (orderingProvider != null) {
+		  orderingProviderId = orderingProvider.getPersonId();
+	  } else {
+		  orderingProviderId = "";
+	  }
     this.orderingProvider = orderingProvider;
   }
 
@@ -65,6 +85,11 @@ public class VaccinationReported implements Serializable {
   }
 
   public void setAdministeringProvider(ModelPerson administeringProvider) {
+	  if (administeringProvider != null) {
+		  administeringProviderId = administeringProvider.getPersonId();
+	  } else {
+		  administeringProviderId = "";
+	  }
     this.administeringProvider = administeringProvider;
   }
 
@@ -205,26 +230,23 @@ public class VaccinationReported implements Serializable {
   }
 
   public PatientReported getPatientReported() {
-	  if (patientReported == null && patientReportedId != null && !patientReportedId.equals("")) {
-		  //
-	  }
     return patientReported;
   }
 
   public void setPatientReported(PatientReported reportedPatient) {
-	  if (reportedPatient != null && reportedPatient.getPatientReportedId() != null) {
-		  setPatientReportedId(reportedPatient.getPatientReportedId());
+	  if (reportedPatient != null) {
+		  patientReportedId = reportedPatient.getPatientReportedId();
+	  } else  {
+		  patientReportedId = "";
 	  }
 	  this.patientReported = reportedPatient;
   }
 
   public String getVaccinationReportedExternalLink() {
-//	  return vaccinationReportedId;
 	  return vaccinationReportedExternalLink;
   }
 
   public void setVaccinationReportedExternalLink(String reportedOrderId) {
-//    this.vaccinationReportedId = reportedOrderId;
     this.vaccinationReportedExternalLink = reportedOrderId;
   }
 
@@ -257,10 +279,13 @@ public class VaccinationReported implements Serializable {
   }
 
   public void setOrgLocation(OrgLocation orgLocation) {
+	  if (orgLocation != null) {
+		  orgLocationId = orgLocation.getOrgLocationId();
+	  } else {
+		  orgLocationId = "";
+	  }
     this.orgLocation = orgLocation;
-	 if (orgLocation != null) {
-		 this.orgLocationId = orgLocation.getOrgLocationId();
-	 }
+
   }
 
 	public String getPatientReportedId() {
@@ -268,6 +293,9 @@ public class VaccinationReported implements Serializable {
 	}
 
 	public void setPatientReportedId(String patientReportedId) {
+		if (patientReported != null && !Objects.equals(patientReportedId, patientReported.getPatientReportedId())) {
+			patientReported = null;
+		}
 		this.patientReportedId = patientReportedId;
 	}
 
@@ -276,7 +304,42 @@ public class VaccinationReported implements Serializable {
 	}
 
 	public void setOrgLocationId(String orgLocationId) {
+		if (orgLocation != null && !Objects.equals(orgLocationId, orgLocation.getOrgLocationId())) {
+			orgLocation = null;
+		}
 		this.orgLocationId = orgLocationId;
 	}
 
+	public String getEnteredById() {
+		return enteredById;
+	}
+
+	public void setEnteredById(String enteredById) {
+		if (enteredBy != null && !Objects.equals(enteredById, enteredBy.getPersonId())) {
+			enteredBy = null;
+		}
+		this.enteredById = enteredById;
+	}
+
+	public String getOrderingProviderId() {
+		return orderingProviderId;
+	}
+
+	public void setOrderingProviderId(String orderingProviderId) {
+		if (orderingProvider != null && !Objects.equals(orderingProviderId, orderingProvider.getPersonId())) {
+			orderingProvider = null;
+		}
+		this.orderingProviderId = orderingProviderId;
+	}
+
+	public String getAdministeringProviderId() {
+		return administeringProviderId;
+	}
+
+	public void setAdministeringProviderId(String administeringProviderId) {
+		if (administeringProvider != null && !Objects.equals(administeringProviderId, administeringProvider.getPersonId())) {
+			administeringProvider = null;
+		}
+		this.administeringProviderId = administeringProviderId;
+	}
 }
