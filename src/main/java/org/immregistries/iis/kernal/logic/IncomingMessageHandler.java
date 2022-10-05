@@ -1,6 +1,5 @@
 package org.immregistries.iis.kernal.logic;
 
-import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import org.apache.commons.lang3.StringUtils;
 import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
@@ -18,6 +17,7 @@ import org.immregistries.iis.kernal.model.ModelPerson;
 import org.immregistries.iis.kernal.repository.FhirRequests;
 import org.immregistries.iis.kernal.repository.RepositoryClientFactory;
 import org.immregistries.iis.kernal.servlet.PopServlet;
+import org.immregistries.iis.kernal.servlet.ServletHelper;
 import org.immregistries.smm.tester.manager.HL7Reader;
 import org.immregistries.vfa.connect.ConnectFactory;
 import org.immregistries.vfa.connect.ConnectorInterface;
@@ -39,13 +39,9 @@ public class IncomingMessageHandler {
   	protected RepositoryClientFactory repositoryClientFactory;
   	@Autowired
   	protected FhirRequests fhirRequests;
-	protected IGenericClient fhirClient;
 
-  protected IGenericClient getFhirClient(OrgAccess orgAccess) {
-	  if (fhirClient == null || !fhirClient.getServerBase().equals(orgAccess.getAccessName())) {
-		  fhirClient = repositoryClientFactory.newGenericClient(orgAccess);
-	  }
-	  return fhirClient;
+  protected IGenericClient getFhirClient() {
+	  return ServletHelper.getFhirClient(repositoryClientFactory);
   }
 
   private static final String PATIENT_MIDDLE_NAME_MULTI = "Multi";
@@ -116,9 +112,7 @@ public class IncomingMessageHandler {
 
 
 
-  @SuppressWarnings("unchecked")
   public String processQBP(OrgAccess orgAccess, HL7Reader reader, String messageReceived) {
-	 IGenericClient fhirClient = getFhirClient(orgAccess);
     PatientReported patientReported = null;
     List<PatientReported> patientReportedPossibleList = new ArrayList<>();
     List<ProcessingException> processingExceptionList = new ArrayList<>();
@@ -133,7 +127,7 @@ public class IncomingMessageHandler {
       String problem = null;
       int fieldPosition = 0;
       if (!mrn.equals("")) {
-			patientReported = fhirRequests.searchPatientReported(getFhirClient(orgAccess),
+			patientReported = fhirRequests.searchPatientReported(
 				Patient.IDENTIFIER.exactly().code(mrn)
 			);
       }
@@ -161,7 +155,7 @@ public class IncomingMessageHandler {
       } else {
 
         if (patientReported == null) {
-			  patientReported = fhirRequests.searchPatientReported(getFhirClient(orgAccess),
+			  patientReported = fhirRequests.searchPatientReported(
 				  Patient.NAME.matches().value(patientNameFirst),
 				  Patient.FAMILY.matches().value(patientNameLast),
 				  Patient.BIRTHDATE.exactly().day(patientBirthDate)
@@ -195,7 +189,7 @@ public class IncomingMessageHandler {
           }
         }
         if (patientReported == null) {
-			  patientReportedPossibleList = fhirRequests.searchPatientReportedList(fhirClient,
+			  patientReportedPossibleList = fhirRequests.searchPatientReportedList(
 				  Patient.NAME.matches().values(patientNameFirst,patientNameLast),
 				  Patient.BIRTHDATE.exactly().day(patientBirthDate));
         }
@@ -244,12 +238,12 @@ public class IncomingMessageHandler {
     }
 
     return buildRSP(reader, messageReceived, patientReported, orgAccess,
-        patientReportedPossibleList, processingExceptionList, fhirClient);
+        patientReportedPossibleList, processingExceptionList);
   }
 
   @SuppressWarnings("unchecked")
   public String processVXU(OrgAccess orgAccess, HL7Reader reader, String message) {
-	  IGenericClient fhirClient = getFhirClient(orgAccess);
+	  IGenericClient fhirClient = getFhirClient();
 	  List<ProcessingException> processingExceptionList = new ArrayList<>();
     try {
       Set<ProcessingFlavor> processingFlavorSet = orgAccess.getOrg().getProcessingFlavorSet();
@@ -283,7 +277,7 @@ public class IncomingMessageHandler {
           }
           if (vaccineCode.equals("998")) {
             obxCount = readAndCreateObservations(reader, processingExceptionList, patientReported,
-                strictDate, obxCount, null, null, fhirClient);
+                strictDate, obxCount, null, null);
             continue;
           }
           if (vaccinationReportedExternalLink.equals("")) {
@@ -298,7 +292,7 @@ public class IncomingMessageHandler {
                 "RXA", rxaCount, 3);
           }
 
-			 vaccinationReported = fhirRequests.searchVaccinationReported(fhirClient,Immunization.IDENTIFIER.exactly().code(vaccinationReportedExternalLink));
+			 vaccinationReported = fhirRequests.searchVaccinationReported(Immunization.IDENTIFIER.exactly().code(vaccinationReportedExternalLink));
 			 if (vaccinationReported != null) {
 //				 vaccinationMaster = vaccinationReported.getVaccination();
 			 }
@@ -423,7 +417,7 @@ public class IncomingMessageHandler {
           {
             String administeredAtLocation = reader.getValue(11, 4);
             if (StringUtils.isNotEmpty(administeredAtLocation)) {
-					OrgLocation orgLocation = fhirRequests.searchOrgLocation(fhirClient,Location.IDENTIFIER.exactly().code(administeredAtLocation));
+					OrgLocation orgLocation = fhirRequests.searchOrgLocation(Location.IDENTIFIER.exactly().code(administeredAtLocation));
 
 					if (orgLocation == null) {
 						if (processingFlavorSet.contains(ProcessingFlavor.PEAR)) {
@@ -442,7 +436,7 @@ public class IncomingMessageHandler {
 						orgLocation.setAddressState(reader.getValue(11, 12));
 						orgLocation.setAddressZip(reader.getValue(11, 13));
 						orgLocation.setAddressCountry(reader.getValue(11, 14));
-						orgLocation = fhirRequests.saveOrgLocation(fhirClient,orgLocation);
+						orgLocation = fhirRequests.saveOrgLocation(orgLocation);
 					}
               vaccinationReported.setOrgLocation(orgLocation);
             }
@@ -450,7 +444,7 @@ public class IncomingMessageHandler {
           {
             String administeringProvider = reader.getValue(10);
             if (StringUtils.isNotEmpty(administeringProvider)) {
-              ModelPerson modelPerson = fhirRequests.searchPractitioner(fhirClient,Practitioner.IDENTIFIER.exactly().code(administeringProvider));
+              ModelPerson modelPerson = fhirRequests.searchPractitioner(Practitioner.IDENTIFIER.exactly().code(administeringProvider));
               if (modelPerson == null) {
                 modelPerson = new ModelPerson();
                 modelPerson.setPersonExternalLink(administeringProvider);
@@ -463,7 +457,7 @@ public class IncomingMessageHandler {
                 modelPerson.setIdentifierTypeCode(reader.getValue(10, 13));
                 modelPerson.setProfessionalSuffix(reader.getValue(10, 21));
 //					  Person  p = PersonMapper.getFhirPerson(modelPerson);
-					  modelPerson = fhirRequests.savePractitioner(fhirClient,modelPerson);
+					  modelPerson = fhirRequests.savePractitioner(modelPerson);
 //					  modelPerson = fhirRequests.save(fhirClient,modelPerson);
 				  }
               vaccinationReported.setAdministeringProvider(modelPerson);
@@ -565,10 +559,10 @@ public class IncomingMessageHandler {
 
           verifyNoErrors(processingExceptionList);
           reader.gotoSegmentPosition(segmentPosition);
-			 vaccinationReported = fhirRequests.saveVaccinationReported(fhirClient, vaccinationReported);
+			 vaccinationReported = fhirRequests.saveVaccinationReported(vaccinationReported);
           reader.gotoSegmentPosition(segmentPosition);
           obxCount = readAndCreateObservations(reader, processingExceptionList, patientReported,
-              strictDate, obxCount, vaccinationReported, null, fhirClient);
+              strictDate, obxCount, vaccinationReported, null);
         } else {
           throw new ProcessingException("RXA segment was not found after ORC segment", "ORC",
               orcCount, 0);
@@ -604,7 +598,7 @@ public class IncomingMessageHandler {
       List<ProcessingException> processingExceptionList, Set<ProcessingFlavor> processingFlavorSet,
       CodeMap codeMap, boolean strictDate, PatientReported patientReported)
       throws ProcessingException {
-	  IGenericClient fhirClient = getFhirClient(orgAccess);
+	  IGenericClient fhirClient = getFhirClient();
 
 //    PatientMaster patientMaster = null;
     String patientReportedExternalLink = "";
@@ -636,7 +630,7 @@ public class IncomingMessageHandler {
       throw new ProcessingException(
           "No PID segment found, required for accepting vaccination report", "", 0, 0);
     }
-	  patientReported = fhirRequests.searchPatientReported(getFhirClient(orgAccess),
+	  patientReported = fhirRequests.searchPatientReported(
 		  Patient.IDENTIFIER.exactly().identifier(patientReportedExternalLink)
 	  );
 
@@ -951,12 +945,12 @@ public class IncomingMessageHandler {
     verifyNoErrors(processingExceptionList);
 
     patientReported.setUpdatedDate(new Date());
-    patientReported = fhirRequests.savePatientReported(fhirClient,patientReported);
+    patientReported = fhirRequests.savePatientReported(patientReported);
     return patientReported;
   }
 
   public String processORU(OrgAccess orgAccess, HL7Reader reader, String message) {
-		IGenericClient fhirClient = getFhirClient(orgAccess);
+		IGenericClient fhirClient = getFhirClient();
     List<ProcessingException> processingExceptionList = new ArrayList<>();
     try {
       Set<ProcessingFlavor> processingFlavorSet = orgAccess.getOrg().getProcessingFlavorSet();
@@ -973,7 +967,7 @@ public class IncomingMessageHandler {
         orcCount++;
         if (reader.advanceToSegment("OBR", "ORC")) {
           obxCount = readAndCreateObservations(reader, processingExceptionList, patientReported,
-              strictDate, obxCount, null, null, fhirClient);
+              strictDate, obxCount, null, null);
         } else {
           throw new ProcessingException("OBR segment was not found after ORC segment", "ORC",
               orcCount, 0);
@@ -995,14 +989,14 @@ public class IncomingMessageHandler {
   public int readAndCreateObservations(HL7Reader reader,
       List<ProcessingException> processingExceptionList, PatientReported patientReported,
       boolean strictDate, int obxCount, VaccinationReported vaccinationReported,
-      VaccinationMaster vaccination, IGenericClient fhirClient) {
+      VaccinationMaster vaccination) {
     while (reader.advanceToSegment("OBX", "ORC")) {
       obxCount++;
       String identifierCode = reader.getValue(3);
       String valueCode = reader.getValue(5);
       ObservationReported observationReported =
           readObservations(reader, processingExceptionList, patientReported, strictDate, obxCount,
-              vaccinationReported, vaccination, identifierCode, valueCode, fhirClient);
+              vaccinationReported, vaccination, identifierCode, valueCode);
       if (observationReported.getIdentifierCode().equals("30945-0")) // contraindication!
       {
         CodeMap codeMap = CodeMapManager.getCodeMap();
@@ -1036,7 +1030,7 @@ public class IncomingMessageHandler {
 		  observationReported.setPatientReportedId(patientReported.getPatientReportedId());
 
 //		  Observation observation = ObservationMapper.getFhirResource(observationMaster,observationReported);
-		  observationReported = fhirRequests.saveObservationReported(fhirClient,observationReported);
+		  observationReported = fhirRequests.saveObservationReported(observationReported);
 
       }
     }
@@ -1047,15 +1041,15 @@ public class IncomingMessageHandler {
   public ObservationReported readObservations(HL7Reader reader,
       List<ProcessingException> processingExceptionList, PatientReported patientReported,
       boolean strictDate, int obxCount, VaccinationReported vaccinationReported,
-      VaccinationMaster vaccination, String identifierCode, String valueCode, IGenericClient fhirClient) {
+      VaccinationMaster vaccination, String identifierCode, String valueCode) {
 //    ObservationMaster observationMaster = null;
 	 ObservationReported observationReported = null;
 	  if (vaccination == null) {
-		  observationReported = fhirRequests.searchObservationReported(fhirClient,
+		  observationReported = fhirRequests.searchObservationReported(
 			  Observation.PART_OF.isMissing(true),
 			  Observation.SUBJECT.hasId(patientReported.getPatientReportedId()));
 	  } else {
-		  observationReported = fhirRequests.searchObservationReported(fhirClient,
+		  observationReported = fhirRequests.searchObservationReported(
 			  Observation.PART_OF.hasId(vaccination.getVaccinationId()),
 			  Observation.SUBJECT.hasId(patientReported.getPatientReportedId()));
 	  }
@@ -1136,7 +1130,8 @@ public class IncomingMessageHandler {
   @SuppressWarnings("unchecked")
   public String buildRSP(HL7Reader reader, String messageRecieved, PatientReported patientReported,
       OrgAccess orgAccess, List<PatientReported> patientReportedPossibleList,
-      List<ProcessingException> processingExceptionList, IGenericClient fhirClient) {
+      List<ProcessingException> processingExceptionList) {
+	  IGenericClient fhirClient = getFhirClient();
     reader.resetPostion();
     reader.advanceToSegment("MSH");
 
@@ -1569,7 +1564,7 @@ public class IncomingMessageHandler {
   }
 
   public String buildVxu(VaccinationReported vaccinationReported, OrgAccess orgAccess) {
-		IGenericClient fhirClient = getFhirClient(orgAccess);
+		IGenericClient fhirClient = getFhirClient();
     StringBuilder sb = new StringBuilder();
     CodeMap codeMap = CodeMapManager.getCodeMap();
     Set<ProcessingFlavor> processingFlavorSet = orgAccess.getOrg().getProcessingFlavorSet();
@@ -2411,7 +2406,8 @@ public class IncomingMessageHandler {
       {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T',
           'U', 'V', 'W', 'X', 'Y', 'Z', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
 
-  public String generatePatientExternalLink(IGenericClient fhirClient) {
+  public String generatePatientExternalLink() {
+	 IGenericClient fhirClient = getFhirClient();
     boolean keepLooking = true;
     int count = 0;
     while (keepLooking) {

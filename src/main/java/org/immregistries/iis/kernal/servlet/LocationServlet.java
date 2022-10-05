@@ -6,7 +6,6 @@ import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Query;
 import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.hl7.fhir.r5.model.Location;
 import org.immregistries.iis.kernal.mapping.LocationMapper;
 import org.immregistries.iis.kernal.model.*;
@@ -128,7 +127,7 @@ public class LocationServlet extends HttpServlet {
       }
 
       List<OrgLocation> orgLocationList = null;
-      orgLocationList = fhirRequests.searchOrgLocationList(fhirClient);
+      orgLocationList = fhirRequests.searchOrgLocationList();
 
       HomeServlet.doHeader(out, session);
 

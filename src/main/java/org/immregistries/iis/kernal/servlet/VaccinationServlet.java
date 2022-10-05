@@ -181,8 +181,8 @@ public List<ObservationReported> getObservationList(IGenericClient fhirClient,
       VaccinationReported vaccinationReported) {
     List<ObservationReported> observationReportedList;
     {
-		 observationReportedList = fhirRequests.searchObservationReportedList(fhirClient,
-			 Observation.PATIENT.hasId(vaccinationReported.getVaccinationReportedId())
+		 observationReportedList = fhirRequests.searchObservationReportedList(
+                 Observation.PATIENT.hasId(vaccinationReported.getVaccinationReportedId())
 		 );
       Set<String> suppressSet = LoincIdentifier.getSuppressIdentifierCodeSet();
       for (Iterator<ObservationReported> it = observationReportedList.iterator(); it.hasNext();) {

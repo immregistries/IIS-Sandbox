@@ -1,7 +1,6 @@
 package org.immregistries.iis.kernal.mapping;
 
 
-import ca.uhn.fhir.rest.client.api.IGenericClient;
 import org.hl7.fhir.r5.model.*;
 import org.hl7.fhir.r5.model.ContactPoint.ContactPointSystem;
 import org.hl7.fhir.r5.model.Enumerations.AdministrativeGender;
@@ -10,7 +9,6 @@ import org.immregistries.iis.kernal.model.PatientReported;
 import org.immregistries.iis.kernal.repository.FhirRequests;
 
 import java.text.ParseException;
-import java.util.Date;
 
 import static org.immregistries.iis.kernal.mapping.MappingHelper.MRN_SYSTEM;
 
@@ -32,11 +30,10 @@ public class PatientMapper {
 	private static final String YES = "Y";
 	private static final String NO = "N";
 
-	public static PatientReported getReportedWithMaster(Patient p, FhirRequests fhirRequests, IGenericClient fhirClient) {
+	public static PatientReported getReportedWithMaster(Patient p, FhirRequests fhirRequests) {
 		PatientReported patientReported = getReported(p);
 		patientReported.setPatient(
 			fhirRequests.searchPatientMaster(
-				fhirClient,
 				Patient.IDENTIFIER.exactly().systemAndIdentifier(MRN_SYSTEM,patientReported.getPatientReportedExternalLink())
 			));
 		return patientReported;

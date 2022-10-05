@@ -1,11 +1,8 @@
 package org.immregistries.iis.kernal.servlet;
 
 import ca.uhn.fhir.rest.client.api.IGenericClient;
-import ca.uhn.fhir.rest.gclient.DateClientParam;
 import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
 import org.apache.commons.lang3.StringUtils;
-import org.hibernate.Query;
-import org.hibernate.Session;
 import org.hl7.fhir.r5.model.Immunization;
 import org.hl7.fhir.r5.model.Location;
 import org.hl7.fhir.r5.model.Patient;
@@ -155,7 +152,7 @@ public class CovidServlet extends HttpServlet {
           out.print(
               "<textarea cols=\"80\" rows=\"30\" style=\"white-space: nowrap;  overflow: auto;\">");
           {
-				 vaccinationReportedList = fhirRequests.searchVaccinationReportedList(fhirClient,
+				 vaccinationReportedList = fhirRequests.searchVaccinationReportedList(
 //						Immunization.DATE.after().day(dateStart),
 //					 Immunization.DATE.before().day(dateEnd),
 					 Immunization.PATIENT.hasChainedProperty(Patient.ORGANIZATION.hasId(String.valueOf(orgAccess.getOrg().getOrgId())))); // TODO test
@@ -250,7 +247,7 @@ public class CovidServlet extends HttpServlet {
 //              + "and patientReported = :patientReported and completionStatus = 'CP'");
 //      query.setParameter("administeredDate", vaccinationReported.getAdministeredDate());
 //      query.setParameter("patientReported", vaccinationReported.getPatientReported());
-		List<VaccinationReported> list = fhirRequests.searchVaccinationReportedList(fhirClient,
+		List<VaccinationReported> list = fhirRequests.searchVaccinationReportedList(
 			Immunization.DATE.before().day(vaccinationReported.getAdministeredDate()),
 			Immunization.PATIENT.hasId(vaccinationReported.getPatientReportedId()),
 			Immunization.STATUS.exactly().identifier(Immunization.ImmunizationStatusCodes.COMPLETED.toCode())

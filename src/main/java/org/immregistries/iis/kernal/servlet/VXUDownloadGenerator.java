@@ -1,10 +1,7 @@
 package org.immregistries.iis.kernal.servlet;
 
 import ca.uhn.fhir.rest.client.api.IGenericClient;
-import ca.uhn.fhir.rest.gclient.DateClientParam;
-import jdk.javadoc.doclet.Reporter;
 import org.apache.commons.lang3.StringUtils;
-import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hl7.fhir.r5.model.Immunization;
 import org.hl7.fhir.r5.model.Patient;
@@ -171,8 +168,8 @@ public class VXUDownloadGenerator extends Thread {
     runningMessage = "Looking for vaccinations";
 	  IGenericClient fhirClient = repositoryClientFactory.newGenericClient(orgAccess);
 
-	  List<VaccinationReported> vaccinationReportedList = fhirRequests.searchVaccinationReportedList(fhirClient,
-		  Immunization.DATE.after().day(dateStart),
+	  List<VaccinationReported> vaccinationReportedList = fhirRequests.searchVaccinationReportedList(
+              Immunization.DATE.after().day(dateStart),
 		  Immunization.DATE.before().day(dateEnd),
 		  Immunization.PATIENT.hasChainedProperty(Patient.ORGANIZATION.hasId(String.valueOf(orgAccess.getOrg().getOrgId())))); // TODO test
 	  Date finalDateStart = dateStart;

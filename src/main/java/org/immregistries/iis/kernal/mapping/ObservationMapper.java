@@ -48,8 +48,7 @@ public class ObservationMapper {
 		ObservationReported observationReported = getReported(observation);
 		observationReported.setObservation(
 			fhirRequests.searchObservationMaster(
-				fhirClient,
-				Observation.IDENTIFIER.exactly().systemAndIdentifier(observationReported.getIdentifierTable(),observationReported.getIdentifierCode())
+                    Observation.IDENTIFIER.exactly().systemAndIdentifier(observationReported.getIdentifierTable(),observationReported.getIdentifierCode())
 			));
 		return observationReported;
 	}

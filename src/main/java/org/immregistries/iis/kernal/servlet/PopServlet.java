@@ -21,18 +21,14 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 public class PopServlet extends HttpServlet {
-	@Autowired
-	 private IncomingMessageHandler handler;
-	@Autowired
-	RepositoryClientFactory repositoryClientFactory;
-
-
 	public static final String PARAM_MESSAGE = "MESSAGEDATA";
   public static final String PARAM_USERID = "USERID";
   public static final String PARAM_PASSWORD = "PASSWORD";
   public static final String PARAM_FACILITYID = "FACILITYID";
 
-  private static SessionFactory factory;
+	@Autowired
+	private IncomingMessageHandler handler;
+	private static SessionFactory factory;
 
   public static Session getDataSession() {
     if (factory == null) {
@@ -65,10 +61,8 @@ public class PopServlet extends HttpServlet {
               "Access is not authorized. Facilityid, userid and/or password are not recognized. ");
         } else {
 //			  IncomingMessageHandler handler = new IncomingMessageHandler(dataSession);
-
+			  session.setAttribute("orgAccess", orgAccess);
 			  ack = handler.process(message, orgAccess);
-          session.setAttribute("orgAccess", orgAccess);
-			  IGenericClient fhirClient = ServletHelper.getFhirClient(session,repositoryClientFactory);
         }
       } finally {
         dataSession.close();

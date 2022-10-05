@@ -137,8 +137,8 @@ public class IncomingEventHandler extends IncomingMessageHandler {
       throw new Exception(
           "Vaccination is indicated as occuring in the future, unable to accept future vaccination events");
     }
-	  vaccinationReported = fhirRequests.searchVaccinationReported(fhirClient,
-		 Immunization.PATIENT.hasId(patientReported.getPatientReportedId()),
+	  vaccinationReported = fhirRequests.searchVaccinationReported(
+		  Immunization.PATIENT.hasId(patientReported.getPatientReportedId()),
 		 Immunization.IDENTIFIER.exactly().code(vaccinationReportedExternalLink)
 		 );
     if (vaccinationReported == null) {
@@ -186,7 +186,7 @@ public class IncomingEventHandler extends IncomingMessageHandler {
       String administeredAtLocation = req.getParameter(ORG_LOCATION_FACILITY_CODE);
       if (StringUtils.isNotEmpty(administeredAtLocation)) {
 			OrgLocation orgLocation = null;
-			orgLocation = fhirRequests.searchOrgLocation(fhirClient,
+			orgLocation = fhirRequests.searchOrgLocation(
 				Location.IDENTIFIER.exactly().code(administeredAtLocation)
 				// Location.ORGANIZATION.hasAnyOfIds(administeredAtLocation) //Todo verify condition
 			);
@@ -243,7 +243,7 @@ public class IncomingEventHandler extends IncomingMessageHandler {
 
 
     {
-		 vaccinationReported = fhirRequests.saveVaccinationReported(fhirClient, vaccinationReported);
+		 vaccinationReported = fhirRequests.saveVaccinationReported(vaccinationReported);
     }
 
   }
@@ -266,7 +266,7 @@ public class IncomingEventHandler extends IncomingMessageHandler {
 
 
     {
-		 patientReported = fhirRequests.searchPatientReported(getFhirClient(orgAccess),
+		 patientReported = fhirRequests.searchPatientReported(
 			 Patient.IDENTIFIER.exactly().code(patientReportedExternalLink)
 		 );
     }
@@ -372,8 +372,8 @@ public class IncomingEventHandler extends IncomingMessageHandler {
     patientReported.setGuardianMiddle(req.getParameter(GUARDIAN_MIDDLE));
     patientReported.setGuardianRelationship(req.getParameter(GUARDIAN_RELATIONSHIP));
     patientReported.setUpdatedDate(new Date());
-    patientReported = fhirRequests.savePatientReported(fhirClient,patientReported);
-	 patientReported.setPatient(fhirRequests.searchPatientMaster(fhirClient,
+    patientReported = fhirRequests.savePatientReported(patientReported);
+	 patientReported.setPatient(fhirRequests.searchPatientMaster(
 		 Patient.IDENTIFIER.exactly().systemAndIdentifier(MRN_SYSTEM,patientReported.getPatientReportedExternalLink())
 	 ));
     return patientReported;

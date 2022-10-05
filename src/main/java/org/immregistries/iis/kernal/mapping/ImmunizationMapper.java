@@ -1,6 +1,5 @@
 package org.immregistries.iis.kernal.mapping;
 
-import ca.uhn.fhir.rest.client.api.IGenericClient;
 import org.hl7.fhir.r5.model.*;
 import org.immregistries.iis.kernal.model.ModelPerson;
 import org.immregistries.iis.kernal.model.VaccinationMaster;
@@ -29,9 +28,9 @@ public class ImmunizationMapper {
 	public static final String FUNDING_SOURCE = "fundingSource";
 	public static final String FUNDING_ELIGIBILITY = "fundingEligibility";
 
-	public static VaccinationReported getReportedWithMaster(Immunization i, FhirRequests fhirRequests, IGenericClient fhirClient) {
+	public static VaccinationReported getReportedWithMaster(Immunization i, FhirRequests fhirRequests) {
 		VaccinationReported vaccinationReported = getReported(i);
-		VaccinationMaster vaccinationMaster = fhirRequests.searchVaccinationMaster(fhirClient,
+		VaccinationMaster vaccinationMaster = fhirRequests.searchVaccinationMaster(
 			Immunization.IDENTIFIER.exactly().systemAndIdentifier(
 				MappingHelper.VACCINATION_REPORTED,
 				vaccinationReported.getVaccinationReportedExternalLink()));

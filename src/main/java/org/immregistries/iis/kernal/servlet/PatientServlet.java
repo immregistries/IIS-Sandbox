@@ -9,7 +9,6 @@ import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.logic.CodeMapManager;
-import org.immregistries.iis.kernal.mapping.PatientMapper;
 import org.immregistries.iis.kernal.model.*;
 import org.immregistries.iis.kernal.repository.FhirRequests;
 import org.immregistries.iis.kernal.repository.RepositoryClientFactory;
@@ -77,7 +76,7 @@ public class PatientServlet extends HttpServlet {
       String action = req.getParameter(PARAM_ACTION);
       if (action != null) {
         if (action.equals(ACTION_SEARCH)) {
-			  patientReportedList = fhirRequests.searchPatientReportedList(fhirClient,
+			  patientReportedList = fhirRequests.searchPatientReportedList(
 				  Patient.FAMILY.matches().value(patientNameLast),
 				  Patient.NAME.matches().value(patientNameFirst),
 				  Patient.IDENTIFIER.exactly().code(patientReportedExternalLink)
@@ -110,7 +109,7 @@ public class PatientServlet extends HttpServlet {
       out.println("    <h2>" + orgAccess.getOrg().getOrganizationName() + "</h2>");
       PatientReported patientReportedSelected = null;
       if (req.getParameter(PARAM_PATIENT_REPORTED_ID) != null) {
-			patientReportedSelected = fhirRequests.searchPatientReported(fhirClient,
+			patientReportedSelected = fhirRequests.searchPatientReported(
 				Patient.IDENTIFIER.exactly().identifier(req.getParameter(PARAM_PATIENT_REPORTED_ID))
 			);
       }
@@ -142,7 +141,7 @@ public class PatientServlet extends HttpServlet {
         boolean showingRecent = false;
         if (patientReportedList == null) {
 			  showingRecent = true;
-			  patientReportedList = fhirRequests.searchPatientReportedList(fhirClient);
+			  patientReportedList = fhirRequests.searchPatientReportedList();
 //			  TODO sort by last updated date
         }
 
@@ -198,8 +197,8 @@ public class PatientServlet extends HttpServlet {
         out.println("<h4>Vaccinations</h4>");
         List<VaccinationReported> vaccinationReportedList = null;
         {
-			  vaccinationReportedList = fhirRequests.searchVaccinationReportedList(fhirClient
-				  , Immunization.PATIENT.hasId(patientReportedSelected.getPatientReportedId())
+			  vaccinationReportedList = fhirRequests.searchVaccinationReportedList(
+				  Immunization.PATIENT.hasId(patientReportedSelected.getPatientReportedId())
 			  );
 		  }
         if (vaccinationReportedList.size() == 0) {
@@ -512,8 +511,8 @@ public List<ObservationReported> getObservationList(IGenericClient fhirClient,
       PatientReported patientReportedSelected) {
     List<ObservationReported> observationReportedList = new ArrayList<>();
     {
-		 observationReportedList = fhirRequests.searchObservationReportedList(fhirClient,
-			 Observation.SUBJECT.hasId(patientReportedSelected.getPatientReportedId()));
+		 observationReportedList = fhirRequests.searchObservationReportedList(
+                 Observation.SUBJECT.hasId(patientReportedSelected.getPatientReportedId()));
 //		 observationReportedList = observationReportedList.stream().filter(observationReported -> observationReported.getVaccinationReported() == null).collect(Collectors.toList());
       Set<String> suppressSet = LoincIdentifier.getSuppressIdentifierCodeSet();
       for (Iterator<ObservationReported> it = observationReportedList.iterator(); it.hasNext();) {
