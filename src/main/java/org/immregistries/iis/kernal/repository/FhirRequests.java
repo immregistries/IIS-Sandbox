@@ -1,6 +1,5 @@
 package org.immregistries.iis.kernal.repository;
 
-import ca.uhn.fhir.jpa.api.dao.IFhirResourceDao;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.gclient.*;
@@ -83,7 +82,7 @@ public class FhirRequests {
 		VaccinationReported vaccinationReported = null;
 		Bundle bundle = searchRegularRecord(Immunization.class, where);
 		if (bundle.hasEntry()) {
-			vaccinationReported = immunizationMapper.getReportedWithMaster((Immunization) bundle.getEntryFirstRep().getResource(),this);
+			vaccinationReported = immunizationMapper.getReportedWithMaster((Immunization) bundle.getEntryFirstRep().getResource());
 		}
 		return vaccinationReported;
 	}
@@ -91,7 +90,7 @@ public class FhirRequests {
 		List<VaccinationReported> vaccinationReportedList = new ArrayList<>();
 		Bundle bundle = searchRegularRecord(Immunization.class, where);
 		for (Bundle.BundleEntryComponent entry: bundle.getEntry()) {
-			vaccinationReportedList.add(immunizationMapper.getReportedWithMaster((Immunization) entry.getResource(),this));
+			vaccinationReportedList.add(immunizationMapper.getReportedWithMaster((Immunization) entry.getResource()));
 		}
 		return vaccinationReportedList;
 	}
@@ -333,6 +332,25 @@ public class FhirRequests {
 				.execute();
 		}
 		return outcome;
+	}
+
+	public PatientReported readPatientReported(String id) {
+		return patientMapper.getReported((Patient) read(Patient.class,id));
+	}
+	public ModelPerson readPractitionerPerson(String id) {
+		return personMapper.getModelPerson((Practitioner) read(Practitioner.class,id));
+	}
+	public OrgLocation readOrgLocation(String id) {
+		return locationMapper.orgLocationFromFhir((Location) read(Location.class,id));
+	}
+
+	public IBaseResource read(Class<? extends IBaseResource> aClass,String id) {
+		IGenericClient fhirClient = ServletHelper.getFhirClient(repositoryClientFactory);
+		try {
+			return fhirClient.read().resource(aClass).withId(id).execute();
+		} catch (ResourceNotFoundException e){
+			return null;
+		}
 	}
 
 }

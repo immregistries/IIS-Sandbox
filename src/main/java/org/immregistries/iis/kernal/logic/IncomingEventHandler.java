@@ -151,7 +151,6 @@ public class IncomingEventHandler extends IncomingMessageHandler {
       vaccinationReported.setReportedDate(new Date());
       vaccinationReported.setVaccinationReportedExternalLink(vaccinationReportedExternalLink);
     }
-	  vaccinationReported.setPatientReportedId(patientReported.getPatientReportedId());
 	  vaccinationReported.setPatientReported(patientReported);
 //    vaccinationMaster.setPatient(patientReported.getPatient());
 

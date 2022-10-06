@@ -15,6 +15,9 @@ import java.util.Date;
 public class ImmunizationMapper {
 	@Autowired
 	LocationMapper locationMapper;
+	@Autowired
+	FhirRequests fhirRequests;
+
 	public static final String CVX = "http://hl7.org/fhir/sid/cvx";
 	public static final String MVX = "http://terminology.hl7.org/CodeSystem/MVX";
 	public static final String NDC = "NDC";
@@ -32,7 +35,7 @@ public class ImmunizationMapper {
 	public static final String FUNDING_SOURCE = "fundingSource";
 	public static final String FUNDING_ELIGIBILITY = "fundingEligibility";
 
-	public VaccinationReported getReportedWithMaster(Immunization i, FhirRequests fhirRequests) {
+	public VaccinationReported getReportedWithMaster(Immunization i) {
 		VaccinationReported vaccinationReported = getReported(i);
 		VaccinationMaster vaccinationMaster = fhirRequests.searchVaccinationMaster(
 			Immunization.IDENTIFIER.exactly().systemAndIdentifier(
@@ -50,7 +53,10 @@ public class ImmunizationMapper {
 		vr.setVaccinationReportedId(new IdType(i.getId()).getIdPart());
 		vr.setUpdatedDate(i.getMeta().getLastUpdated());
 		vr.setVaccinationReportedExternalLink(MappingHelper.filterIdentifier(i.getIdentifier(),MappingHelper.VACCINATION_REPORTED).getValue());
-		vr.setPatientReportedId(i.getPatient().getReference());
+		if (i.getPatient() != null) {
+//			vr.setPatientReportedId(i.getPatient().getReference());
+			vr.setPatientReported(fhirRequests.readPatientReported(i.getPatient().getId()));
+		}
 
 		vr.setReportedDate(i.getRecorded());
 		vr.setAdministeredDate(i.getOccurrenceDateTimeType().getValue());
@@ -94,18 +100,24 @@ public class ImmunizationMapper {
 		vr.setFundingSource(i.getFundingSource().getCodingFirstRep().getCode());
 		vr.setFundingEligibility(i.getProgramEligibilityFirstRep().getCodingFirstRep().getCode());
 
-	   vr.setOrgLocationId(i.getLocation().getId()); // Dealt with in servlet
+		if (i.getLocation() != null){
+//			vr.setOrgLocationId(i.getLocation().getId());
+			vr.setOrgLocation(fhirRequests.readOrgLocation(i.getLocation().getId()));
+		}
 		if (i.getInformationSource().isResource()) {
-			vr.setEnteredById(i.getInformationSourceReference().getId());
+//			vr.setEnteredById(i.getInformationSourceReference().getId());
+			vr.setEnteredBy(fhirRequests.readPractitionerPerson(i.getInformationSourceReference().getId()));
 		}
 		for (Immunization.ImmunizationPerformerComponent performer: i.getPerformer()) {
 			switch (performer.getFunction().getCode(FUNCTION)){
 				case ADMINISTERING: {
-					vr.setAdministeringProviderId(performer.getActor().getId());
+//					vr.setAdministeringProviderId(performer.getActor().getId());
+					vr.setAdministeringProvider(fhirRequests.readPractitionerPerson(performer.getActor().getId()));
 					break;
 				}
 				case ORDERING: {
-					vr.setOrderingProviderId(performer.getActor().getId());
+//					vr.setOrderingProviderId(performer.getActor().getId());
+					vr.setOrderingProvider(fhirRequests.readPractitionerPerson(performer.getActor().getId()));
 					break;
 				}
 			}

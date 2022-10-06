@@ -5,12 +5,15 @@ import org.hl7.fhir.r5.model.*;
 import org.immregistries.iis.kernal.model.ObservationMaster;
 import org.immregistries.iis.kernal.model.ObservationReported;
 import org.immregistries.iis.kernal.repository.FhirRequests;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static org.immregistries.iis.kernal.mapping.MappingHelper.*;
 
 @Service
 public class ObservationMapper {
+	@Autowired
+	FhirRequests fhirRequests;
 	public static final String IDENTIFIER_CODE = "identifierCode";
 	public static final String OBSERVATION_DATE = "observationDate";
 	public static final String RESULT_STATUS = "resultStatus";
@@ -61,7 +64,7 @@ public class ObservationMapper {
 		observationReported.setUpdatedDate(o.getMeta().getLastUpdated());
 		observationReported.setObservationReportedId(o.getCode().getCode(OBSERVATION_REPORTED));
 //		observationReported.setVaccinationReported();
-//		observationReported.setObservation();
+//		observationReported.setVaccinationReported();
 //		observationReported.setPatientReported();
 		observationReported.setValueCode(o.getValueCodeableConcept().getCodingFirstRep().getCode());
 		observationReported.setValueTable(o.getValueCodeableConcept().getCodingFirstRep().getSystem());
@@ -102,7 +105,7 @@ public class ObservationMapper {
 		ObservationMaster observationMaster = new ObservationMaster();
 		observationMaster.setObservationId(o.getCode().getCode(OBSERVATION_MASTER));
 		observationMaster.setIdentifierCode(o.getCode().getCode(IDENTIFIER_CODE));
-//		observationMaster.setPatient(); TODO?
+//		observationMaster.setPatient(fhirRequests.searchPatientMaster(Patient.IDENTIFIER.exactly().code()));
 //		observationMaster.setVaccination();
 //		observationMaster.setObservationReported();
 		observationMaster.setValueCode(o.getValueCodeableConcept().getCodingFirstRep().getCode());
