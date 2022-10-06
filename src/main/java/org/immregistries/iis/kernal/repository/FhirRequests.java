@@ -10,8 +10,6 @@ import org.immregistries.iis.kernal.mapping.*;
 import org.immregistries.iis.kernal.model.*;
 import org.immregistries.iis.kernal.model.ModelPerson;
 import org.immregistries.iis.kernal.servlet.ServletHelper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -42,7 +40,7 @@ public class FhirRequests {
 	public static final String GOLDEN_RECORD = "GOLDEN_RECORD";
 	private static final TokenCriterion NOT_GOLDEN_CRITERION= new TokenCriterion("_tag:not",GOLDEN_SYSTEM_TAG,GOLDEN_RECORD);
 
-	private MethodOutcome saveRegular(IBaseResource resource, ICriterion... where) {
+	private MethodOutcome save(IBaseResource resource, ICriterion... where) {
 		IGenericClient fhirClient = ServletHelper.getFhirClient(repositoryClientFactory);
 		MethodOutcome outcome;
 		try {
@@ -242,7 +240,7 @@ public class FhirRequests {
 
 	public PatientReported savePatientReported(PatientReported patientReported) {
 		Patient patient =  patientMapper.getFhirResource(patientReported);
-		MethodOutcome outcome = saveRegular(patient,
+		MethodOutcome outcome = save(patient,
 			Patient.IDENTIFIER.exactly().systemAndIdentifier(MRN_SYSTEM,patientReported.getPatientReportedExternalLink()));
 		if (!outcome.getResource().isEmpty()) {
 			patientReported.setPatientReportedId(outcome.getResource().getIdElement().getIdPart());
@@ -255,7 +253,7 @@ public class FhirRequests {
 	}
 	public ModelPerson savePractitioner(ModelPerson modelPerson) {
 		Practitioner practitioner = personMapper.getFhirPractitioner(modelPerson);
-		MethodOutcome outcome = saveRegular(practitioner,
+		MethodOutcome outcome = save(practitioner,
 			Patient.IDENTIFIER.exactly().identifier(modelPerson.getPersonExternalLink()));
 		if (outcome.getCreated() != null && outcome.getCreated()) {
 			modelPerson.setPersonId(outcome.getId().getIdPart());
@@ -267,7 +265,7 @@ public class FhirRequests {
 
 	public ObservationReported saveObservationReported(ObservationReported observationReported) {
 		Observation observation = observationMapper.getFhirResource(observationReported);
-		MethodOutcome outcome = saveRegular(observation,
+		MethodOutcome outcome = save(observation,
 			Observation.IDENTIFIER.exactly().systemAndIdentifier(OBSERVATION_REPORTED,observationReported.getObservationReportedId()));
 		if (outcome.getCreated() != null && outcome.getCreated()) {
 			observationReported.setPatientReportedId(outcome.getId().getIdPart());
@@ -279,7 +277,7 @@ public class FhirRequests {
 
 	public VaccinationReported saveVaccinationReported(VaccinationReported vaccinationReported) {
 		Immunization immunization = immunizationMapper.getFhirResource(vaccinationReported);
-		MethodOutcome outcome = saveRegular(immunization,
+		MethodOutcome outcome = save(immunization,
 			Immunization.IDENTIFIER.exactly()
 				.systemAndIdentifier(MappingHelper.VACCINATION_REPORTED, vaccinationReported.getVaccinationReportedExternalLink())
 		);
@@ -293,7 +291,7 @@ public class FhirRequests {
 
 	public OrgLocation saveOrgLocation(OrgLocation orgLocation) {
 		Location location = locationMapper.fhirLocation(orgLocation);
-		MethodOutcome outcome = saveRegular(location,
+		MethodOutcome outcome = save(location,
 			Location.IDENTIFIER.exactly().identifier(location.getIdentifierFirstRep().getValue())
 			);
 		if (outcome.getCreated() != null && outcome.getCreated()){
