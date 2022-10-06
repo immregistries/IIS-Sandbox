@@ -39,6 +39,14 @@ public class IncomingMessageHandler {
   	protected RepositoryClientFactory repositoryClientFactory;
   	@Autowired
   	protected FhirRequests fhirRequests;
+	@Autowired
+	PatientMapper patientMapper;
+	@Autowired
+	ImmunizationMapper immunizationMapper;
+	@Autowired
+	ObservationMapper observationMapper;
+	@Autowired
+	LocationMapper locationMapper;
 
   protected IGenericClient getFhirClient() {
 	  return ServletHelper.getFhirClient(repositoryClientFactory);
@@ -1444,7 +1452,7 @@ public class IncomingMessageHandler {
 //						ObservationMaster observationMaster =
 //							ObservationMapper.getMaster((Observation) entry.getResource());
 						ObservationReported observationReported =
-							ObservationMapper.getReported((Observation) entry.getResource());
+							observationMapper.getReported((Observation) entry.getResource());
 						obxSetId++;
 						printObx(sb, obxSetId, obsSubId, observationReported);
 					}
@@ -1461,7 +1469,7 @@ public class IncomingMessageHandler {
 				 for (Bundle.BundleEntryComponent entry : bundle.getEntry()) {
 					 obxSetId++;
 					 ObservationReported observationReported =
-						 ObservationMapper.getReported((Observation) entry.getResource());
+						 observationMapper.getReported((Observation) entry.getResource());
 					 printObx(sb, obxSetId, obsSubId, observationReported);
 				 }
 			 }
@@ -1743,7 +1751,7 @@ public class IncomingMessageHandler {
 					obsSubId++;
 					for (Bundle.BundleEntryComponent entry : bundle.getEntry()) {
 						ObservationReported observationReported =
-							ObservationMapper.getReported((Observation) entry.getResource());
+							observationMapper.getReported((Observation) entry.getResource());
 						obxSetId++;
 						printObx(sb, obxSetId, obsSubId, observationReported);
 					}
@@ -1754,7 +1762,7 @@ public class IncomingMessageHandler {
     return sb.toString();
   }
 
-  public static List<VaccinationMaster> getVaccinationMasterList(PatientMaster patient,
+  public List<VaccinationMaster> getVaccinationMasterList(PatientMaster patient,
 																					  IGenericClient fhirClient) {
 
 	  SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
@@ -1774,7 +1782,7 @@ public class IncomingMessageHandler {
 					 String key = sdf.format(immunization.getOccurrenceDateTimeType());
 					 if (!immunization.getVaccineCode().getText().equals("")) {
 						 key += key + immunization.getVaccineCode().getText();
-						 VaccinationMaster vaccinationMaster = ImmunizationMapper.getMaster(immunization);
+						 VaccinationMaster vaccinationMaster = immunizationMapper.getMaster(immunization);
 						 map.put(key, vaccinationMaster);
 					 }
 				 }

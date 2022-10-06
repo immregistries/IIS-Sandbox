@@ -4,10 +4,12 @@ import org.hl7.fhir.r5.model.Address;
 import org.hl7.fhir.r5.model.IdType;
 import org.hl7.fhir.r5.model.Location;
 import org.immregistries.iis.kernal.model.OrgLocation;
+import org.springframework.stereotype.Service;
 
+@Service
 public class LocationMapper {
 
-	public static Location fhirLocation(OrgLocation ol) {
+	public Location fhirLocation(OrgLocation ol) {
 		Location location = new Location();
 		if (ol != null) {
 			location.setId(ol.getOrgLocationId());
@@ -29,7 +31,7 @@ public class LocationMapper {
 		return  location;
 	}
 
-	public static OrgLocation orgLocationFromFhir(Location l) {
+	public OrgLocation orgLocationFromFhir(Location l) {
 		OrgLocation orgLocation = new OrgLocation();
 		orgLocation.setOrgLocationId(new IdType(l.getId()).getIdPart());
 		orgLocation.setOrgFacilityCode(l.getIdentifierFirstRep().getValue());

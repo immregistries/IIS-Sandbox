@@ -34,6 +34,10 @@ public class VaccinationServlet extends PatientServlet {
 	RepositoryClientFactory repositoryClientFactory;
 	@Autowired
 	FhirRequests fhirRequests;
+	@Autowired
+	PatientMapper patientMapper;
+	@Autowired
+	ImmunizationMapper immunizationMapper;
 
   public static final String PARAM_ACTION = "action";
 
@@ -64,7 +68,7 @@ public class VaccinationServlet extends PatientServlet {
     PrintWriter out = new PrintWriter(resp.getOutputStream());
     try {
 		 VaccinationReported vaccinationReported =
-			 ImmunizationMapper.getReported(fhirClient.read().resource(Immunization.class)
+			 immunizationMapper.getReported(fhirClient.read().resource(Immunization.class)
 				 .withId(req.getParameter(PARAM_VACCINATION_REPORTED_ID)).execute());
 
 //			 fhirRequests.searchVaccinationReported(fhirClient,
@@ -77,7 +81,7 @@ public class VaccinationServlet extends PatientServlet {
       HomeServlet.doHeader(out, session);
 
       out.println("    <h2>" + orgAccess.getOrg().getOrganizationName() + "</h2>");
-      PatientReported patientReportedSelected = PatientMapper.getReported(fhirClient.read().resource(Patient.class).withId(vaccinationReported.getPatientReportedId()).execute());
+      PatientReported patientReportedSelected = patientMapper.getReported(fhirClient.read().resource(Patient.class).withId(vaccinationReported.getPatientReportedId()).execute());
 
       {
         printPatient(out, patientReportedSelected);

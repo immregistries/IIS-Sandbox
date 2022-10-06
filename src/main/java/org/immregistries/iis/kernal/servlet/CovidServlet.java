@@ -32,6 +32,8 @@ public class CovidServlet extends HttpServlet {
 	RepositoryClientFactory repositoryClientFactory;
 	@Autowired
 	FhirRequests fhirRequests;
+	@Autowired
+	LocationMapper locationMapper;
 
 
   public static final String COVID_CVX_CODES = "208,207,210,212,211,213";
@@ -389,7 +391,7 @@ public class CovidServlet extends HttpServlet {
     OrgLocation orgLocation = vaccinationReported.getOrgLocation();
 	 if (orgLocation == null) {
 		 try {
-			 orgLocation = LocationMapper.orgLocationFromFhir(
+			 orgLocation = locationMapper.orgLocationFromFhir(
 				 ServletHelper.getFhirClient(repositoryClientFactory)
 					 .read().resource(Location.class)
 					 .withId(vaccinationReported.getOrgLocationId()).execute()

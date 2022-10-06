@@ -5,15 +5,17 @@ import org.hl7.fhir.r5.model.*;
 import org.immregistries.iis.kernal.model.ObservationMaster;
 import org.immregistries.iis.kernal.model.ObservationReported;
 import org.immregistries.iis.kernal.repository.FhirRequests;
+import org.springframework.stereotype.Service;
 
 import static org.immregistries.iis.kernal.mapping.MappingHelper.*;
 
+@Service
 public class ObservationMapper {
 	public static final String IDENTIFIER_CODE = "identifierCode";
 	public static final String OBSERVATION_DATE = "observationDate";
 	public static final String RESULT_STATUS = "resultStatus";
 
-	public static Observation getFhirResource(ObservationReported observationReported)  {
+	public Observation getFhirResource(ObservationReported observationReported)  {
 		Observation o = new Observation();
 		o.addIdentifier(MappingHelper.getFhirIdentifier(OBSERVATION_REPORTED,observationReported.getObservationReportedId()));
 		if (!observationReported.getVaccinationReportedId().isBlank()) {
@@ -44,7 +46,7 @@ public class ObservationMapper {
 
 	}
 
-	public static ObservationReported getReportedWithMaster(Observation observation, FhirRequests fhirRequests, IGenericClient fhirClient){
+	public ObservationReported getReportedWithMaster(Observation observation, FhirRequests fhirRequests, IGenericClient fhirClient){
 		ObservationReported observationReported = getReported(observation);
 		observationReported.setObservation(
 			fhirRequests.searchObservationMaster(
@@ -54,7 +56,7 @@ public class ObservationMapper {
 	}
 
 
-	public static ObservationReported getReported(Observation o){
+	public ObservationReported getReported(Observation o){
 		ObservationReported observationReported = new ObservationReported();
 		observationReported.setUpdatedDate(o.getMeta().getLastUpdated());
 		observationReported.setObservationReportedId(o.getCode().getCode(OBSERVATION_REPORTED));
@@ -96,7 +98,7 @@ public class ObservationMapper {
 		return  observationReported;
 	}
 
-	public static ObservationMaster getMaster(Observation o){
+	public ObservationMaster getMaster(Observation o){
 		ObservationMaster observationMaster = new ObservationMaster();
 		observationMaster.setObservationId(o.getCode().getCode(OBSERVATION_MASTER));
 		observationMaster.setIdentifierCode(o.getCode().getCode(IDENTIFIER_CODE));

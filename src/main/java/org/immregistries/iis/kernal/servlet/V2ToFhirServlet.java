@@ -34,6 +34,10 @@ import java.util.List;
 public class V2ToFhirServlet extends HttpServlet {
 	@Autowired
 	RepositoryClientFactory repositoryClientFactory;
+	@Autowired
+	ImmunizationMapper immunizationMapper;
+	@Autowired
+	IncomingMessageHandler incomingMessageHandler;
 
   public static final String PARAM_PATIENT_REPORTED_ID = "patientReportedId";
 
@@ -78,7 +82,7 @@ public class V2ToFhirServlet extends HttpServlet {
         createPatientResource(pr, p);
         bundle.addEntry().setResource(p);
         List<VaccinationMaster> vaccinationMasterList =
-            IncomingMessageHandler.getVaccinationMasterList(pr.getPatient(),fhirClient);
+            incomingMessageHandler.getVaccinationMasterList(pr.getPatient(),fhirClient);
 
         for (VaccinationMaster vaccination : vaccinationMasterList) {
           Immunization immunization = new Immunization();
@@ -142,7 +146,7 @@ public class V2ToFhirServlet extends HttpServlet {
   private void createImmunizationResource(VaccinationMaster vaccination, Immunization immunization,
       Code cvxCode, CodeMap codeMap) {
     VaccinationReported vaccinationReported = vaccination.getVaccinationReported();
-	 immunization = ImmunizationMapper.getFhirResource(vaccinationReported); // TODO Maybe remove this or remove the rest
+	 immunization = immunizationMapper.getFhirResource(vaccinationReported); // TODO Maybe remove this or remove the rest
 
     {
       DateTimeType occurance = new DateTimeType(vaccinationReported.getAdministeredDate());

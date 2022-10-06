@@ -7,12 +7,13 @@ import org.hl7.fhir.r5.model.Enumerations.AdministrativeGender;
 import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.model.PatientReported;
 import org.immregistries.iis.kernal.repository.FhirRequests;
+import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
 
 import static org.immregistries.iis.kernal.mapping.MappingHelper.MRN_SYSTEM;
 
-//@Service
+@Service
 public class PatientMapper {
 
 	private PatientMapper() {
@@ -31,7 +32,7 @@ public class PatientMapper {
 	private static final String YES = "Y";
 	private static final String NO = "N";
 
-	public static PatientReported getReportedWithMaster(Patient p, FhirRequests fhirRequests) {
+	public PatientReported getReportedWithMaster(Patient p, FhirRequests fhirRequests) {
 		PatientReported patientReported = getReported(p);
 		patientReported.setPatient(
 			fhirRequests.searchPatientMaster(
@@ -39,7 +40,7 @@ public class PatientMapper {
 			));
 		return patientReported;
 	}
-	public static PatientReported getReported(Patient p) {
+	public PatientReported getReported(Patient p) {
 		PatientReported patientReported = new PatientReported();
 		patientReported.setPatientReportedId(new IdType(p.getId()).getIdPart());
 //		patientReported.setPatientReportedExternalLink(MappingHelper.filterIdentifier(p.getIdentifier(), MRN_SYSTEM).getValue()); TODO see if only use MRN
@@ -193,7 +194,7 @@ public class PatientMapper {
 		return patientReported;
 	}
 
-	public static PatientMaster getMaster(Patient p) {
+	public PatientMaster getMaster(Patient p) {
 		PatientMaster patientMaster = new PatientMaster();
 		patientMaster.setPatientExternalLink(MappingHelper.filterIdentifier(p.getIdentifier(), MRN_SYSTEM).getValue());
 		patientMaster.setPatientNameFirst(p.getNameFirstRep().getGiven().get(0).getValue());
@@ -206,7 +207,7 @@ public class PatientMapper {
 		return patientMaster;
 	}
 
-	public static Patient getFhirResource(PatientReported pr) {
+	public Patient getFhirResource(PatientReported pr) {
 		Patient p = new Patient();
 		p.addIdentifier(MappingHelper.getFhirIdentifier(MRN_SYSTEM, pr.getPatientReportedExternalLink()));
 //			p.setManagingOrganization(MappingHelper.getFhirReference("","PatientReportedAuthority",pr.getPatientReportedAuthority()));

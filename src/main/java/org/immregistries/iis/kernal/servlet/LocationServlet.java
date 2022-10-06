@@ -34,6 +34,8 @@ public class LocationServlet extends HttpServlet {
 	RepositoryClientFactory repositoryClientFactory;
 	@Autowired
 	FhirRequests fhirRequests;
+	@Autowired
+	LocationMapper locationMapper;
 
   public static final String PARAM_ACTION = "action";
   public static final String ACTION_ADD = "Add";
@@ -82,7 +84,7 @@ public class LocationServlet extends HttpServlet {
 		 if (req.getParameter(PARAM_ORG_LOCATION_ID) != null) {
 //			orgLocationSelected = fhirRequests.searchOrgLocation(fhirClient,
 //				Location.IDENTIFIER.exactly().identifier(req.getParameter(PARAM_ORG_LOCATION_ID)));
-			orgLocationSelected = LocationMapper.orgLocationFromFhir(fhirClient.read().resource(Location.class).withId(req.getParameter(PARAM_ORG_LOCATION_ID)).execute());
+			orgLocationSelected = locationMapper.orgLocationFromFhir(fhirClient.read().resource(Location.class).withId(req.getParameter(PARAM_ORG_LOCATION_ID)).execute());
 		 }
 
       String action = req.getParameter(PARAM_ACTION);

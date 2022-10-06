@@ -5,12 +5,16 @@ import org.immregistries.iis.kernal.model.ModelPerson;
 import org.immregistries.iis.kernal.model.VaccinationMaster;
 import org.immregistries.iis.kernal.model.VaccinationReported;
 import org.immregistries.iis.kernal.repository.FhirRequests;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.Date;
 
-
+@Service
 public class ImmunizationMapper {
+	@Autowired
+	LocationMapper locationMapper;
 	public static final String CVX = "http://hl7.org/fhir/sid/cvx";
 	public static final String MVX = "http://terminology.hl7.org/CodeSystem/MVX";
 	public static final String NDC = "NDC";
@@ -28,7 +32,7 @@ public class ImmunizationMapper {
 	public static final String FUNDING_SOURCE = "fundingSource";
 	public static final String FUNDING_ELIGIBILITY = "fundingEligibility";
 
-	public static VaccinationReported getReportedWithMaster(Immunization i, FhirRequests fhirRequests) {
+	public VaccinationReported getReportedWithMaster(Immunization i, FhirRequests fhirRequests) {
 		VaccinationReported vaccinationReported = getReported(i);
 		VaccinationMaster vaccinationMaster = fhirRequests.searchVaccinationMaster(
 			Immunization.IDENTIFIER.exactly().systemAndIdentifier(
@@ -41,7 +45,7 @@ public class ImmunizationMapper {
 		return vaccinationReported;
 	}
 
-	public static VaccinationReported getReported(Immunization i) {
+	public VaccinationReported getReported(Immunization i) {
 		VaccinationReported vr = new VaccinationReported();
 		vr.setVaccinationReportedId(new IdType(i.getId()).getIdPart());
 		vr.setUpdatedDate(i.getMeta().getLastUpdated());
@@ -109,7 +113,7 @@ public class ImmunizationMapper {
 		return vr;
 	}
 
-  public static VaccinationMaster getMaster(Immunization i){
+  public VaccinationMaster getMaster(Immunization i){
 	  VaccinationMaster vaccinationMaster = new VaccinationMaster();
 	  vaccinationMaster.setVaccinationId(i.getId());
 	  vaccinationMaster.setExternalLink(MappingHelper.filterIdentifier(i.getIdentifier(), MappingHelper.VACCINATION_MASTER).getValue());
@@ -126,7 +130,7 @@ public class ImmunizationMapper {
    * @param vr the vaccinationReported
    * @return the Immunization resource
    */
-  public static Immunization getFhirResource(VaccinationReported vr) {
+  public Immunization getFhirResource(VaccinationReported vr) {
      Immunization i = new Immunization();
 	  i.addIdentifier(MappingHelper.getFhirIdentifier(MappingHelper.VACCINATION_REPORTED, vr.getVaccinationReportedExternalLink()));
 	  i.setPatient(new Reference().setReference("Patient/"+ vr.getPatientReported().getPatientReportedId()));
@@ -174,7 +178,7 @@ public class ImmunizationMapper {
 	  i.addProgramEligibility().addCoding().setSystem(FUNDING_ELIGIBILITY).setCode(vr.getFundingEligibility());
 
 
-	  Location location  = LocationMapper.fhirLocation(vr.getOrgLocation()); // Should have been saved in Event/MessageHandler
+	  Location location  = locationMapper.fhirLocation(vr.getOrgLocation()); // Should have been saved in Event/MessageHandler
 	  i.setLocation(new Reference(location));
 
 	  if (vr.getEnteredBy() != null) {
@@ -189,7 +193,7 @@ public class ImmunizationMapper {
      return i;
   }
 
-  private static Immunization.ImmunizationPerformerComponent performer(ModelPerson person, String functionCode, String functionDisplay ) {
+  private Immunization.ImmunizationPerformerComponent performer(ModelPerson person, String functionCode, String functionDisplay ) {
 	  Immunization.ImmunizationPerformerComponent performer = new Immunization.ImmunizationPerformerComponent();
 	  performer.setFunction(new CodeableConcept().addCoding(new Coding().setSystem(FUNCTION).setCode(functionCode).setDisplay(functionDisplay)));
 	  Reference actor;

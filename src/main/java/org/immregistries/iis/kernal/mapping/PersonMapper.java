@@ -3,14 +3,16 @@ package org.immregistries.iis.kernal.mapping;
 
 import org.hl7.fhir.r5.model.*;
 import org.immregistries.iis.kernal.model.ModelPerson;
+import org.springframework.stereotype.Service;
 
+@Service
 public class PersonMapper {
 
 	public static final String ORGANISATION_ASSIGNING_AUTHORITY = "AssigningAuthority";
 	public static final String PRACTITIONER = "Practitioner";
 
 
-  public static ModelPerson getModelPerson(Person p) {
+  public ModelPerson getModelPerson(Person p) {
 	  ModelPerson modelPerson = new ModelPerson();
 	  modelPerson.setPersonId(p.getId());
 	  modelPerson.setPersonExternalLink(p.getIdentifier().get(0).getValue());
@@ -26,7 +28,7 @@ public class PersonMapper {
 
 	  return modelPerson;
   }
-  public static ModelPerson getModelPerson(Practitioner practitioner) {
+  public ModelPerson getModelPerson(Practitioner practitioner) {
 	  ModelPerson modelPerson = new ModelPerson();
 	  modelPerson.setPersonId(practitioner.getId());
 	  modelPerson.setPersonExternalLink(practitioner.getIdentifierFirstRep().getValue());
@@ -45,7 +47,7 @@ public class PersonMapper {
 	  return modelPerson;
   }
 
-	public static Person getFhirPerson(ModelPerson modelPerson) {
+	public Person getFhirPerson(ModelPerson modelPerson) {
 	   Person p = new Person();
 	   p.setId(modelPerson.getPersonId());
 	   p.addIdentifier(MappingHelper.getFhirIdentifier(MappingHelper.PERSON, modelPerson.getPersonExternalLink()));
@@ -60,7 +62,7 @@ public class PersonMapper {
 		return p;
 	}
 
-	public static Practitioner getFhirPractitioner(ModelPerson modelPerson) {
+	public Practitioner getFhirPractitioner(ModelPerson modelPerson) {
 		Practitioner practitioner = new Practitioner();
 		try {
 			switch (new Reference(modelPerson.getIdentifierTypeCode()).getType()) {

@@ -29,6 +29,7 @@ public class IncomingEventHandler extends IncomingMessageHandler {
 	private final Logger logger = LoggerFactory.getLogger(IncomingEventHandler.class);
 
 
+
   private static final String ORG_LOCATION_FACILITY_CODE = "orgLocationFacilityCode";
   private static final String FUNDING_ELIGIBILITY = "fundingEligibility";
   private static final String FUNDING_SOURCE = "fundingSource";
@@ -202,7 +203,7 @@ public class IncomingEventHandler extends IncomingMessageHandler {
 				orgLocation.setAddressState("");
 				orgLocation.setAddressZip("");
 				orgLocation.setAddressCountry("");
-				Location location = LocationMapper.fhirLocation(orgLocation);
+				Location location = locationMapper.fhirLocation(orgLocation);
 				MethodOutcome outcome;
 				try {
 					outcome = fhirClient.update().resource(location).conditional()
@@ -211,7 +212,7 @@ public class IncomingEventHandler extends IncomingMessageHandler {
 				} catch (ResourceNotFoundException e ){
 					outcome = fhirClient.create().resource(location).execute();
 				}
-				orgLocation = LocationMapper.orgLocationFromFhir((Location) outcome.getResource());
+				orgLocation = locationMapper.orgLocationFromFhir((Location) outcome.getResource());
 			}
         vaccinationReported.setOrgLocation(orgLocation);
       }
