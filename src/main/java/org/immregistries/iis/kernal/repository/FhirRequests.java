@@ -38,10 +38,95 @@ public class FhirRequests {
 	@Autowired
 	PersonMapper personMapper;
 
-	Logger logger = LoggerFactory.getLogger(FhirRequests.class);
 	public static final String GOLDEN_SYSTEM_TAG = "http://hapifhir.io/fhir/NamingSystem/mdm-record-status";
 	public static final String GOLDEN_RECORD = "GOLDEN_RECORD";
 	private static final TokenCriterion NOT_GOLDEN_CRITERION= new TokenCriterion("_tag:not",GOLDEN_SYSTEM_TAG,GOLDEN_RECORD);
+
+	private MethodOutcome saveRegular(IBaseResource resource, ICriterion... where) {
+		IGenericClient fhirClient = ServletHelper.getFhirClient(repositoryClientFactory);
+		MethodOutcome outcome;
+		try {
+			IUpdateTyped query = fhirClient.update().resource(resource);
+			int size = where.length;
+			query = query.conditional().where(NOT_GOLDEN_CRITERION);
+			int i = 0;
+			while (i < size) {
+				query = ((IUpdateWithQuery) query).and(where[i]);
+				i++;
+			}
+			outcome = query
+				.execute();
+		} catch (ResourceNotFoundException e){
+			outcome = fhirClient.create().resource(resource)
+				.execute();
+		}
+		return outcome;
+	}
+	public IBaseResource read(Class<? extends IBaseResource> aClass,String id) {
+		IGenericClient fhirClient = ServletHelper.getFhirClient(repositoryClientFactory);
+		try {
+			return fhirClient.read().resource(aClass).withId(id).execute();
+		} catch (ResourceNotFoundException e){
+			return null;
+		}
+	}
+	private Bundle searchGoldenRecord(Class<? extends IBaseResource> aClass,
+												 ICriterion... where) {
+		IGenericClient fhirClient = ServletHelper.getFhirClient(repositoryClientFactory);
+		try {
+			IQuery<Bundle> query = fhirClient.search().forResource(aClass).returnBundle(Bundle.class);
+			int size = where.length;
+			if (size > 0) {
+				query = query.where(where[0]).withTag(GOLDEN_SYSTEM_TAG, GOLDEN_RECORD);
+			}
+			int i = 1;
+			while (i < size) {
+				query = query.and(where[i]);
+				i++;
+			}
+			return  query.execute();
+		} catch (ResourceNotFoundException e) {
+			return  new Bundle();
+		}
+	}
+	private Bundle searchRegularRecord(Class<? extends IBaseResource> aClass,
+												  ICriterion... where) {
+		IGenericClient fhirClient = ServletHelper.getFhirClient(repositoryClientFactory);
+		try {
+			IQuery<Bundle> query = fhirClient.search().forResource(aClass).returnBundle(Bundle.class);
+			int size = where.length;
+			query = query.where(NOT_GOLDEN_CRITERION);
+			int i = 0;
+			while (i < size) {
+				query = query.and(where[i]);
+				i++;
+			}
+			return  query.execute();
+		} catch (ResourceNotFoundException e) {
+			return  new Bundle();
+		}
+	}
+	private Bundle search(
+		Class<? extends IBaseResource> aClass,
+		ICriterion... where) {
+		IGenericClient fhirClient = ServletHelper.getFhirClient(repositoryClientFactory);
+		try {
+			IQuery<Bundle> query = fhirClient.search().forResource(aClass).returnBundle(Bundle.class);
+			int size = where.length;
+			if (size > 0) {
+				query = query.where(where[0]);
+			}
+			int i = 1;
+			while (i < size) {
+				query = query.and(where[i]);
+				i++;
+			}
+			return  query.execute();
+		} catch (ResourceNotFoundException e) {
+			return  new Bundle();
+		}
+	}
+
 
 
 	public PatientMaster searchPatientMaster(ICriterion... where) {
@@ -155,65 +240,6 @@ public class FhirRequests {
 		return modelPerson;
 	}
 
-
-	private Bundle searchGoldenRecord(Class<? extends IBaseResource> aClass,
-												 ICriterion... where) {
-		IGenericClient fhirClient = ServletHelper.getFhirClient(repositoryClientFactory);
-		try {
-			IQuery<Bundle> query = fhirClient.search().forResource(aClass).returnBundle(Bundle.class);
-			int size = where.length;
-			if (size > 0) {
-				query = query.where(where[0]).withTag(GOLDEN_SYSTEM_TAG, GOLDEN_RECORD);
-			}
-			int i = 1;
-			while (i < size) {
-				query = query.and(where[i]);
-				i++;
-			}
-			return  query.execute();
-		} catch (ResourceNotFoundException e) {
-			return  new Bundle();
-		}
-	}
-
-	private Bundle searchRegularRecord(Class<? extends IBaseResource> aClass,
-												  ICriterion... where) {
-		IGenericClient fhirClient = ServletHelper.getFhirClient(repositoryClientFactory);
-		try {
-			IQuery<Bundle> query = fhirClient.search().forResource(aClass).returnBundle(Bundle.class);
-			int size = where.length;
-			query = query.where(NOT_GOLDEN_CRITERION);
-			int i = 0;
-			while (i < size) {
-				query = query.and(where[i]);
-				i++;
-			}
-			return  query.execute();
-		} catch (ResourceNotFoundException e) {
-			return  new Bundle();
-		}
-	}
-	private Bundle search(
-		Class<? extends IBaseResource> aClass,
-		ICriterion... where) {
-		IGenericClient fhirClient = ServletHelper.getFhirClient(repositoryClientFactory);
-		try {
-			IQuery<Bundle> query = fhirClient.search().forResource(aClass).returnBundle(Bundle.class);
-			int size = where.length;
-			if (size > 0) {
-				query = query.where(where[0]);
-			}
-			int i = 1;
-			while (i < size) {
-				query = query.and(where[i]);
-				i++;
-			}
-			return  query.execute();
-		} catch (ResourceNotFoundException e) {
-			return  new Bundle();
-		}
-	}
-
 	public PatientReported savePatientReported(PatientReported patientReported) {
 		Patient patient =  patientMapper.getFhirResource(patientReported);
 		MethodOutcome outcome = saveRegular(patient,
@@ -228,7 +254,6 @@ public class FhirRequests {
 		return searchPatientReported(Patient.IDENTIFIER.exactly().systemAndIdentifier(MRN_SYSTEM,patientReported.getPatientReportedExternalLink()));
 	}
 	public ModelPerson savePractitioner(ModelPerson modelPerson) {
-		logger.info(modelPerson.getIdentifierTypeCode());
 		Practitioner practitioner = personMapper.getFhirPractitioner(modelPerson);
 		MethodOutcome outcome = saveRegular(practitioner,
 			Patient.IDENTIFIER.exactly().identifier(modelPerson.getPersonExternalLink()));
@@ -265,19 +290,6 @@ public class FhirRequests {
 		}
 		return vaccinationReported;
 	}
-//	public VaccinationReported saveVaccinationReported(IGenericClient fhirClient, VaccinationReported vaccinationReported) {
-//		Immunization immunization = immunizationMapper.getFhirResource(vaccinationReported);
-//		MethodOutcome outcome = saveRegular(fhirClient,immunization,
-//			Immunization.IDENTIFIER.exactly()
-//				.systemAndIdentifier(MappingHelper.VACCINATION_REPORTED, vaccinationReported.getVaccinationReportedExternalLink())
-//			);
-//		if (outcome.getCreated() != null && outcome.getCreated()){
-//			vaccinationReported.setVaccinationReportedId(outcome.getId().getIdPart());
-//		} else if (!outcome.getResource().isEmpty()) {
-//			vaccinationReported.setVaccinationReportedId(outcome.getResource().getIdElement().getIdPart());
-//		}
-//		return vaccinationReported;
-//	}
 
 	public OrgLocation saveOrgLocation(OrgLocation orgLocation) {
 		Location location = locationMapper.fhirLocation(orgLocation);
@@ -292,48 +304,6 @@ public class FhirRequests {
 		return orgLocation;
 	}
 
-	private MethodOutcome saveRegular(IBaseResource resource, ICriterion... where) {
-		IGenericClient fhirClient = ServletHelper.getFhirClient(repositoryClientFactory);
-		MethodOutcome outcome;
-		try {
-			IUpdateTyped query = fhirClient.update().resource(resource);
-			int size = where.length;
-			query = query.conditional().where(NOT_GOLDEN_CRITERION);
-			int i = 0;
-			while (i < size) {
-				query = ((IUpdateWithQuery) query).and(where[i]);
-				i++;
-			}
-			outcome = query
-				.execute();
-		} catch (ResourceNotFoundException e){
-			outcome = fhirClient.create().resource(resource)
-				.execute();
-		}
-		return outcome;
-	}
-	private MethodOutcome save(IBaseResource resource, ICriterion... where) {
-		IGenericClient fhirClient = ServletHelper.getFhirClient(repositoryClientFactory);
-		MethodOutcome outcome;
-		try {
-			IUpdateTyped query = fhirClient.update().resource(resource);
-			int size = where.length;
-			if (size > 0) {
-				query = query.conditional().where(where[0]);
-			}
-			int i = 1;
-			while (i < size) {
-				query = ((IUpdateWithQuery) query).and(where[i]);
-				i++;
-			}
-			outcome = query.execute();
-		} catch (ResourceNotFoundException e){
-			outcome = fhirClient.create().resource(resource)
-				.execute();
-		}
-		return outcome;
-	}
-
 	public PatientReported readPatientReported(String id) {
 		return patientMapper.getReported((Patient) read(Patient.class,id));
 	}
@@ -343,14 +313,4 @@ public class FhirRequests {
 	public OrgLocation readOrgLocation(String id) {
 		return locationMapper.orgLocationFromFhir((Location) read(Location.class,id));
 	}
-
-	public IBaseResource read(Class<? extends IBaseResource> aClass,String id) {
-		IGenericClient fhirClient = ServletHelper.getFhirClient(repositoryClientFactory);
-		try {
-			return fhirClient.read().resource(aClass).withId(id).execute();
-		} catch (ResourceNotFoundException e){
-			return null;
-		}
-	}
-
 }
