@@ -26,7 +26,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-@SuppressWarnings("serial")
 public class PatientServlet extends HttpServlet {
 	@Autowired
 	private RepositoryClientFactory repositoryClientFactory;
@@ -142,7 +141,6 @@ public class PatientServlet extends HttpServlet {
         if (patientReportedList == null) {
 			  showingRecent = true;
 			  patientReportedList = fhirRequests.searchPatientReportedList();
-//			  TODO sort by last updated date
         }
 
         if (patientReportedList != null) {
@@ -506,7 +504,6 @@ public class PatientServlet extends HttpServlet {
     out.println("</div>");
   }
 
-  @SuppressWarnings("unchecked")
 public List<ObservationReported> getObservationList(IGenericClient fhirClient,
       PatientReported patientReportedSelected) {
     List<ObservationReported> observationReportedList = new ArrayList<>();
