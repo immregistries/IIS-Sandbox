@@ -12,6 +12,7 @@ import java.text.ParseException;
 
 import static org.immregistries.iis.kernal.mapping.MappingHelper.MRN_SYSTEM;
 
+//@Service
 public class PatientMapper {
 
 	private PatientMapper() {
@@ -175,7 +176,6 @@ public class PatientMapper {
 			} catch (ParseException e) {
 //				throw new RuntimeException(e);
 			}
-
 		}
 
 

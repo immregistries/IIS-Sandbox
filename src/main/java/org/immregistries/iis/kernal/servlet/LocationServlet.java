@@ -40,7 +40,6 @@ public class LocationServlet extends HttpServlet {
   public static final String ACTION_SAVE = "Save";
 
   public static final String PARAM_ORG_LOCATION_ID = "orgLocationId";
-
   public static final String PARAM_ORG_FACILITY_CODE = "orgFacilityCode";
   public static final String PARAM_ORG_FACILITY_NAME = "orgFacilityName";
   public static final String PARAM_LOCATION_TYPE = "locationType";
@@ -94,14 +93,15 @@ public class LocationServlet extends HttpServlet {
             orgLocationSelected = new OrgLocation();
             orgLocationSelected.setOrgFacilityCode(orgFacilityCode);
             orgLocationSelected.setOrgMaster(orgAccess.getOrg());
-				Location location = LocationMapper.fhirLocation(orgLocationSelected);
-				 try {
-					 MethodOutcome outcome = fhirClient.update().resource(location).conditional()
-						 .where(Location.IDENTIFIER.exactly().identifier(location.getIdentifierFirstRep().getValue()))
-						 .execute();
-				 } catch (ResourceNotFoundException e ){
-					 MethodOutcome outcome = fhirClient.create().resource(location).execute();
-				 }
+				orgLocationSelected = fhirRequests.saveOrgLocation(orgLocationSelected);
+//				Location location = LocationMapper.fhirLocation(orgLocationSelected);
+//				 try {
+//					 MethodOutcome outcome = fhirClient.update().resource(location).conditional()
+//						 .where(Location.IDENTIFIER.exactly().identifier(location.getIdentifierFirstRep().getValue()))
+//						 .execute();
+//				 } catch (ResourceNotFoundException e ){
+//					 MethodOutcome outcome = fhirClient.create().resource(location).execute();
+//				 }
           }
         } else if (action.equals(ACTION_SAVE)) {
           orgLocationSelected.setOrgFacilityCode(req.getParameter(PARAM_ORG_FACILITY_CODE));
@@ -115,14 +115,16 @@ public class LocationServlet extends HttpServlet {
           orgLocationSelected.setAddressCountry(req.getParameter(PARAM_ADDRESS_COUNTRY));
           orgLocationSelected.setAddressCountyParish(req.getParameter(PARAM_ADDRESS_COUNTY_PARISH));
           orgLocationSelected.setVfcProviderPin(req.getParameter(PARAM_VFC_PROVIDER_PIN));
-			  Location location = LocationMapper.fhirLocation(orgLocationSelected);
-			  try {
-				  MethodOutcome outcome = fhirClient.update().resource(location).conditional()
-					  .where(Location.IDENTIFIER.exactly().identifier(location.getIdentifierFirstRep().getValue()))
-					  .execute();
-			  } catch (ResourceNotFoundException e ){
-				  MethodOutcome outcome = fhirClient.create().resource(location).execute();
-			  }
+			  orgLocationSelected = fhirRequests.saveOrgLocation(orgLocationSelected);
+
+//			  Location location = LocationMapper.fhirLocation(orgLocationSelected);
+//			  try {
+//				  MethodOutcome outcome = fhirClient.update().resource(location).conditional()
+//					  .where(Location.IDENTIFIER.exactly().identifier(location.getIdentifierFirstRep().getValue()))
+//					  .execute();
+//			  } catch (ResourceNotFoundException e ){
+//				  MethodOutcome outcome = fhirClient.create().resource(location).execute();
+//			  }
         }
       }
 

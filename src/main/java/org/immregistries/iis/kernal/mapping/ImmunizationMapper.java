@@ -40,9 +40,10 @@ public class ImmunizationMapper {
 		}
 		return vaccinationReported;
 	}
+
 	public static VaccinationReported getReported(Immunization i) {
 		VaccinationReported vr = new VaccinationReported();
-		vr.setVaccinationReportedId(new  IdType(i.getId()).getIdPart());
+		vr.setVaccinationReportedId(new IdType(i.getId()).getIdPart());
 		vr.setUpdatedDate(i.getMeta().getLastUpdated());
 		vr.setVaccinationReportedExternalLink(MappingHelper.filterIdentifier(i.getIdentifier(),MappingHelper.VACCINATION_REPORTED).getValue());
 		vr.setPatientReportedId(i.getPatient().getReference());
@@ -55,7 +56,6 @@ public class ImmunizationMapper {
 		vr.setVaccineMvxCode(i.getVaccineCode().getCode(MVX));
 
 		vr.setVaccineMvxCode(i.getManufacturer().getIdentifier().getValue());
-
 
 		vr.setAdministeredAmount(i.getDoseQuantity().getValue().toString());
 
@@ -90,7 +90,7 @@ public class ImmunizationMapper {
 		vr.setFundingSource(i.getFundingSource().getCodingFirstRep().getCode());
 		vr.setFundingEligibility(i.getProgramEligibilityFirstRep().getCodingFirstRep().getCode());
 
-	  vr.setOrgLocationId(i.getLocation().getId()); // Dealt with in servlet
+	   vr.setOrgLocationId(i.getLocation().getId()); // Dealt with in servlet
 		if (i.getInformationSource().isResource()) {
 			vr.setEnteredById(i.getInformationSourceReference().getId());
 		}
@@ -109,7 +109,7 @@ public class ImmunizationMapper {
 		return vr;
 	}
 
-  public static VaccinationMaster getMaster( Immunization i){
+  public static VaccinationMaster getMaster(Immunization i){
 	  VaccinationMaster vaccinationMaster = new VaccinationMaster();
 	  vaccinationMaster.setVaccinationId(i.getId());
 	  vaccinationMaster.setExternalLink(MappingHelper.filterIdentifier(i.getIdentifier(), MappingHelper.VACCINATION_MASTER).getValue());
@@ -127,76 +127,66 @@ public class ImmunizationMapper {
    * @return the Immunization resource
    */
   public static Immunization getFhirResource(VaccinationReported vr) {
-    Immunization i = new Immunization();
-//	 if (vaccinationMaster != null ){
-//		i.addIdentifier(MappingHelper.getFhirIdentifier(MappingHelper.VACCINATION_MASTER,vaccinationMaster.getVaccinationReported().getVaccinationReportedExternalLink()));
-//		i.setOccurrence(new DateTimeType(vaccinationMaster.getAdministeredDate()));
-//		i.getVaccineCode().addCoding().setSystem(CVX).setCode(vaccinationMaster.getVaccineCvxCode());
-////		i.setPatient(MappingHelper.getFhirReference(MappingHelper.PATIENT,MappingHelper.PATIENT_MASTER, vaccinationMaster.getPatient().getPatientExternalLink()));
-//	 }
-	 if (vr != null) {
-		 i.addIdentifier(MappingHelper.getFhirIdentifier(MappingHelper.VACCINATION_REPORTED, vr.getVaccinationReportedExternalLink()));
+     Immunization i = new Immunization();
+	  i.addIdentifier(MappingHelper.getFhirIdentifier(MappingHelper.VACCINATION_REPORTED, vr.getVaccinationReportedExternalLink()));
+	  i.setPatient(new Reference().setReference("Patient/"+ vr.getPatientReported().getPatientReportedId()));
+	  i.setRecorded(vr.getReportedDate());
+	  i.getOccurrenceDateTimeType().setValue(vr.getAdministeredDate());
 
-//		 i.setPatient(MappingHelper.getFhirReference(MappingHelper.PATIENT,MappingHelper.MRN_SYSTEM, vr.getPatientReported().getPatientReportedExternalLink(), vr.getPatientReported().getPatientReportedId()));
-		 i.setPatient(new Reference().setReference("Patient/"+ vr.getPatientReported().getPatientReportedId()));
-		 i.setRecorded(vr.getReportedDate());
-		 i.getOccurrenceDateTimeType().setValue(vr.getAdministeredDate());
+	  if(!vr.getVaccineCvxCode().isBlank()){
+		  i.getVaccineCode().addCoding().setCode(vr.getVaccineCvxCode()).setSystem(CVX);
+	  }
+	  if(!vr.getVaccineNdcCode().isBlank()){
+		  i.getVaccineCode().addCoding().setCode(vr.getVaccineNdcCode()).setSystem(NDC);
+	  }
+	  i.setManufacturer(MappingHelper.getFhirReference(MappingHelper.ORGANISATION,MVX,vr.getVaccineMvxCode()));
 
-		 if(!vr.getVaccineCvxCode().isBlank()){
-			 i.getVaccineCode().addCoding().setCode(vr.getVaccineCvxCode()).setSystem(CVX);
-		 }
-		 if(!vr.getVaccineNdcCode().isBlank()){
-			 i.getVaccineCode().addCoding().setCode(vr.getVaccineNdcCode()).setSystem(NDC);
-		 }
-		 i.setManufacturer(MappingHelper.getFhirReference(MappingHelper.ORGANISATION,MVX,vr.getVaccineMvxCode()));
+	  i.setDoseQuantity(new Quantity().setValue(new BigDecimal(vr.getAdministeredAmount())));
+	  i.setInformationSource(new CodeableConcept(new Coding().setSystem(INFORMATION_SOURCE).setCode(vr.getInformationSource()))); // TODO change system name
+	  i.setLotNumber(vr.getLotnumber());
+	  i.setExpirationDate(vr.getExpirationDate());
 
-		 i.setDoseQuantity(new Quantity().setValue(new BigDecimal(vr.getAdministeredAmount())));
-		 i.setInformationSource(new CodeableConcept(new Coding().setSystem(INFORMATION_SOURCE).setCode(vr.getInformationSource()))); // TODO change system name
-		 i.setLotNumber(vr.getLotnumber());
-		 i.setExpirationDate(vr.getExpirationDate());
-
-		 if (vr.getActionCode().equals("D")) {
-			 i.setStatus(Immunization.ImmunizationStatusCodes.ENTEREDINERROR);
-		 } else {
-			 switch(vr.getCompletionStatus()) {
-				 case "CP" : {
-					 i.setStatus(Immunization.ImmunizationStatusCodes.COMPLETED);
-					 break;
-				 }
-				 case "NA" :
-				 case "PA" :
-				 case "RE" : {
-					 i.setStatus(Immunization.ImmunizationStatusCodes.NOTDONE);
-					 break;
-				 }
-				 case "" :
-				 default: {
+	  if (vr.getActionCode().equals("D")) {
+		  i.setStatus(Immunization.ImmunizationStatusCodes.ENTEREDINERROR);
+	  } else {
+		  switch(vr.getCompletionStatus()) {
+			  case "CP" : {
+				  i.setStatus(Immunization.ImmunizationStatusCodes.COMPLETED);
+				  break;
+			  }
+			  case "NA" :
+			  case "PA" :
+			  case "RE" : {
+				  i.setStatus(Immunization.ImmunizationStatusCodes.NOTDONE);
+				  break;
+			  }
+			  case "" :
+			  default: {
 //					 i.setStatus(Immunization.ImmunizationStatusCodes..NULL);
-					 break;
-				 }
-			 }
-		 }
-		 i.addReason().setConcept(new CodeableConcept(new Coding(REFUSAL_REASON_CODE,vr.getRefusalReasonCode(),vr.getRefusalReasonCode())));
-		 i.getSite().addCoding().setSystem(BODY_PART).setCode(vr.getBodySite());
-		 i.getRoute().addCoding().setSystem(BODY_ROUTE).setCode(vr.getBodyRoute());
-		 i.getFundingSource().addCoding().setSystem(FUNDING_SOURCE).setCode(vr.getFundingSource());
-		 i.addProgramEligibility().addCoding().setSystem(FUNDING_ELIGIBILITY).setCode(vr.getFundingEligibility());
+				  break;
+			  }
+		  }
+	  }
+	  i.addReason().setConcept(new CodeableConcept(new Coding(REFUSAL_REASON_CODE,vr.getRefusalReasonCode(),vr.getRefusalReasonCode())));
+	  i.getSite().addCoding().setSystem(BODY_PART).setCode(vr.getBodySite());
+	  i.getRoute().addCoding().setSystem(BODY_ROUTE).setCode(vr.getBodyRoute());
+	  i.getFundingSource().addCoding().setSystem(FUNDING_SOURCE).setCode(vr.getFundingSource());
+	  i.addProgramEligibility().addCoding().setSystem(FUNDING_ELIGIBILITY).setCode(vr.getFundingEligibility());
 
 
-		 Location location  = LocationMapper.fhirLocation(vr.getOrgLocation()); // Should have been saved in Event/MessageHandler
-		 i.setLocation(new Reference(location));
+	  Location location  = LocationMapper.fhirLocation(vr.getOrgLocation()); // Should have been saved in Event/MessageHandler
+	  i.setLocation(new Reference(location));
 
-		 if (vr.getEnteredBy() != null) {
-			 i.setInformationSource(new Reference(MappingHelper.PRACTITIONER+"/"+vr.getEnteredBy().getPersonId()));
-		 }
-		 if (vr.getOrderingProvider() != null) {
-			 i.addPerformer(performer(vr.getOrderingProvider(),ORDERING, ORDERING_DISPLAY));
-		 }
-		 if (vr.getAdministeringProvider() != null) {
-			 i.addPerformer(performer(vr.getAdministeringProvider(),ADMINISTERING, ADMINISTERING_DISPLAY));
-		 }
-	 }
-    return i;
+	  if (vr.getEnteredBy() != null) {
+		  i.setInformationSource(new Reference(MappingHelper.PRACTITIONER+"/"+vr.getEnteredBy().getPersonId()));
+	  }
+	  if (vr.getOrderingProvider() != null) {
+		  i.addPerformer(performer(vr.getOrderingProvider(),ORDERING, ORDERING_DISPLAY));
+	  }
+	  if (vr.getAdministeringProvider() != null) {
+		  i.addPerformer(performer(vr.getAdministeringProvider(),ADMINISTERING, ADMINISTERING_DISPLAY));
+	  }
+     return i;
   }
 
   private static Immunization.ImmunizationPerformerComponent performer(ModelPerson person, String functionCode, String functionDisplay ) {
