@@ -302,6 +302,9 @@ public class FhirRequests {
 		return orgLocation;
 	}
 
+	public PatientMaster readPatientMaster(String id) {
+		return patientMapper.getMaster((Patient) read(Patient.class,id));
+	}
 	public PatientReported readPatientReported(String id) {
 		return patientMapper.getReported((Patient) read(Patient.class,id));
 	}

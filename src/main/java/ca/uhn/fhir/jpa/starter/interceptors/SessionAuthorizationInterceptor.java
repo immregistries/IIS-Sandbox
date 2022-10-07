@@ -60,6 +60,7 @@ public class SessionAuthorizationInterceptor extends AuthorizationInterceptor {
 		}
 		if (orgAccess.getOrg().getOrganizationName() != null) {
 			return new RuleBuilder()
+				.allow().read().resourcesOfType("Subscription").withAnyId().forTenantIds("DEFAULT").andThen()
 				.allowAll("Logged in as " + orgAccess.getOrg().getOrganizationName()).forTenantIds(orgAccess.getOrg().getOrganizationName())
 				.build();
 		}

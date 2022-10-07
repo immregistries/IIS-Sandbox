@@ -68,17 +68,17 @@ public class MessageServlet extends HttpServlet {
             messageError = "Unable to login, unrecognized credentials";
           } else {
             session.setAttribute("orgAccess", orgAccess);
-            Map<Integer, OrgAccess> orgAccessMap = new HashMap<Integer, OrgAccess>();
-            Query query = dataSession.createQuery("from OrgMaster order by organizationName");
-            List<OrgMaster> orgMasterList = query.list();
-            for (OrgMaster orgMaster : orgMasterList) {
-              OrgAccess oa = ServletHelper.authenticateOrgAccessForFacility(
-                userId, password, dataSession, orgMaster);
-              if (oa != null) {
-                orgAccessMap.put(orgMaster.getOrgId(), oa);
-              }
-            }
-            session.setAttribute("orgAccessMap", orgAccessMap);
+//            Map<Integer, OrgAccess> orgAccessMap = new HashMap<Integer, OrgAccess>();
+//            Query query = dataSession.createQuery("from OrgMaster order by organizationName");
+//            List<OrgMaster> orgMasterList = query.list();
+//            for (OrgMaster orgMaster : orgMasterList) {
+//              OrgAccess oa = ServletHelper.authenticateOrgAccessForFacility(
+//                userId, password, dataSession, orgMaster);
+//              if (oa != null) {
+//                orgAccessMap.put(orgMaster.getOrgId(), oa);
+//              }
+//            }
+//            session.setAttribute("orgAccessMap", orgAccessMap);
             messageConfirmation = "Logged in to " + orgAccess.getOrg().getOrganizationName();
           }
         } else if (action.equals(ACTION_SWITCH)) {

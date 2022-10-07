@@ -53,7 +53,7 @@ public class ImmunizationMapper {
 		vr.setVaccinationReportedId(new IdType(i.getId()).getIdPart());
 		vr.setUpdatedDate(i.getMeta().getLastUpdated());
 		vr.setVaccinationReportedExternalLink(MappingHelper.filterIdentifier(i.getIdentifier(),MappingHelper.VACCINATION_REPORTED).getValue());
-		if (i.getPatient() != null) {
+		if (i.getPatient() != null && !i.getPatient().getId().isBlank()) {
 //			vr.setPatientReportedId(i.getPatient().getReference());
 			vr.setPatientReported(fhirRequests.readPatientReported(i.getPatient().getId()));
 		}
@@ -100,39 +100,43 @@ public class ImmunizationMapper {
 		vr.setFundingSource(i.getFundingSource().getCodingFirstRep().getCode());
 		vr.setFundingEligibility(i.getProgramEligibilityFirstRep().getCodingFirstRep().getCode());
 
-		if (i.getLocation() != null){
-//			vr.setOrgLocationId(i.getLocation().getId());
+		if (i.getLocation() != null && !i.getLocation().getId().isBlank()){
 			vr.setOrgLocation(fhirRequests.readOrgLocation(i.getLocation().getId()));
 		}
-		if (i.getInformationSource().isResource()) {
-//			vr.setEnteredById(i.getInformationSourceReference().getId());
+		if (i.getInformationSource().isResource() && !i.getInformationSource().getId().isBlank()) {
 			vr.setEnteredBy(fhirRequests.readPractitionerPerson(i.getInformationSourceReference().getId()));
 		}
 		for (Immunization.ImmunizationPerformerComponent performer: i.getPerformer()) {
-			switch (performer.getFunction().getCode(FUNCTION)){
-				case ADMINISTERING: {
-//					vr.setAdministeringProviderId(performer.getActor().getId());
-					vr.setAdministeringProvider(fhirRequests.readPractitionerPerson(performer.getActor().getId()));
-					break;
-				}
-				case ORDERING: {
-//					vr.setOrderingProviderId(performer.getActor().getId());
-					vr.setOrderingProvider(fhirRequests.readPractitionerPerson(performer.getActor().getId()));
-					break;
+			if (performer.getActor() !=null && !performer.getActor().getId().isBlank()){
+				switch (performer.getFunction().getCode(FUNCTION)){
+					case ADMINISTERING: {
+						vr.setAdministeringProvider(fhirRequests.readPractitionerPerson(performer.getActor().getId()));
+						break;
+					}
+					case ORDERING: {
+						vr.setOrderingProvider(fhirRequests.readPractitionerPerson(performer.getActor().getId()));
+						break;
+					}
 				}
 			}
 		}
 		return vr;
 	}
 
+	/**
+	 * Converts golden resource to VaccinationMaster
+	 * @param i
+	 * @return
+	 */
   public VaccinationMaster getMaster(Immunization i){
 	  VaccinationMaster vaccinationMaster = new VaccinationMaster();
 	  vaccinationMaster.setVaccinationId(i.getId());
 	  vaccinationMaster.setExternalLink(MappingHelper.filterIdentifier(i.getIdentifier(), MappingHelper.VACCINATION_MASTER).getValue());
-//	  vaccinationMaster.set(MappingHelper.filterIdentifier(i.getIdentifier(), MappingHelper.VACCINATION_MASTER).getValue());
 	  vaccinationMaster.setAdministeredDate(i.getOccurrenceDateTimeType().getValue());
 	  vaccinationMaster.setVaccineCvxCode(i.getVaccineCode().getCode(CVX));
-//	  vaccinationMaster.setPatient();
+	  if (i.getPatient() != null && !i.getPatient().getId().isBlank()) {
+		  vaccinationMaster.setPatient(fhirRequests.readPatientMaster(i.getPatient().getId()));
+	  }
 //	  vaccinationMaster.setVaccinationReported();
 	  return vaccinationMaster;
   }

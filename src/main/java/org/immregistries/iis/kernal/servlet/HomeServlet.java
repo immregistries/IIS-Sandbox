@@ -160,8 +160,7 @@ public class HomeServlet extends HttpServlet {
 		OrgAccess orgAccess = (OrgAccess) session.getAttribute("orgAccess");
 		if (orgAccess != null) {
 			String link = "home?" + PARAM_SHOW + "=" + SHOW_FACILITIES;
-			out.println(
-				"        <a href=\"" + link + "\" class=\"w3-bar-item w3-button\">Facilities</a>");
+			out.println("<a href=\"" + link + "\" class=\"w3-bar-item w3-button\">Facilities</a>");
 		}
 		out.println("        <a href=\"pop\" class=\"w3-bar-item w3-button\">Send Now</a>");
 		out.println("        <a href=\"message\" class=\"w3-bar-item w3-button\">Messages</a>");
@@ -169,6 +168,10 @@ public class HomeServlet extends HttpServlet {
 		out.println("        <a href=\"location\" class=\"w3-bar-item w3-button\">Locations</a>");
 		out.println("        <a href=\"subscription\" class=\"w3-bar-item w3-button\">Subscriptions</a>");
 		out.println("        <a href=\"soap\" class=\"w3-bar-item w3-button\">CDC WSDL</a>");
+		if (orgAccess != null) {
+			out.println("<a class='w3-bar-item w3-button w3-right' href=\"message?" + MessageServlet.PARAM_ACTION + "="
+				+ MessageServlet.ACTION_LOGOUT + "\">Logout</a>");
+		}
 		out.println("      </div>");
 		out.println("    </header>");
 		out.println("    <div class=\"w3-container\">");

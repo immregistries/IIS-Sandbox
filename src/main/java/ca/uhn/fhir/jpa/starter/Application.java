@@ -8,6 +8,7 @@ import ca.uhn.fhir.jpa.subscription.channel.config.SubscriptionChannelConfig;
 import ca.uhn.fhir.jpa.subscription.match.config.SubscriptionProcessorConfig;
 import ca.uhn.fhir.jpa.subscription.match.config.WebsocketDispatcherConfig;
 import ca.uhn.fhir.jpa.subscription.submit.config.SubscriptionSubmitterConfig;
+import org.immregistries.iis.kernal.logic.CodeMapManager;
 import org.immregistries.iis.kernal.servlet.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
@@ -52,7 +53,7 @@ import javax.servlet.http.HttpServlet;
 public class Application extends SpringBootServletInitializer {
 
   public static void main(String[] args) {
-
+	  CodeMapManager.getCodeMap(); // Initializes codemaps
     SpringApplication.run(Application.class, args);
 
     //Server is now accessible at eg. http://localhost:8080/fhir/metadata

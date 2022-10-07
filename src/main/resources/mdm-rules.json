@@ -4,6 +4,10 @@
   "candidateSearchParams": [
     {
       "resourceType": "Patient",
+      "searchParams": ["identifier"]
+    },
+    {
+      "resourceType": "Patient",
       "searchParams": ["birthdate"]
     },
     {
@@ -60,6 +64,6 @@
   "matchResultMap": {
     "cosine-given-name" : "POSSIBLE_MATCH",
     "cosine-given-name,jaro-last-name,birthDate" : "MATCH",
-    "identifier,birthDate" : "MATCH"
+    "identifier" : "MATCH"
   }
 }
