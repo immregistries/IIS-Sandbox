@@ -58,7 +58,7 @@ public class MessageServlet extends HttpServlet {
       String messageConfirmation = null;
       if (action != null) {
         if (action.equals(ACTION_LOGOUT)) {
-          session.removeAttribute("orgAccess");
+          ServletHelper.logout(session);
         } else if (action.equals(ACTION_LOGIN)) {
           String userId = req.getParameter(PARAM_USERID);
           String facilityId = req.getParameter(PARAM_FACILITYID);

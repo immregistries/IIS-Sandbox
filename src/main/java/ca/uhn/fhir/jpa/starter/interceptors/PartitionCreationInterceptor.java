@@ -4,8 +4,10 @@ import ca.uhn.fhir.i18n.Msg;
 import ca.uhn.fhir.interceptor.api.Hook;
 import ca.uhn.fhir.interceptor.api.Pointcut;
 import ca.uhn.fhir.interceptor.model.RequestPartitionId;
+import ca.uhn.fhir.jpa.dao.data.IPartitionDao;
 import ca.uhn.fhir.jpa.entity.PartitionEntity;
 import ca.uhn.fhir.jpa.partition.IPartitionLookupSvc;
+import ca.uhn.fhir.jpa.partition.PartitionLookupSvcImpl;
 import ca.uhn.fhir.jpa.partition.PartitionManagementProvider;
 import ca.uhn.fhir.jpa.rp.r5.SubscriptionTopicResourceProvider;
 import ca.uhn.fhir.rest.api.server.RequestDetails;
@@ -35,7 +37,7 @@ public class PartitionCreationInterceptor extends RequestTenantPartitionIntercep
 	@Autowired
 	SubscriptionTopicResourceProvider subscriptionTopicResourceProvider;
 	@Autowired
-	private IPartitionLookupSvc partitionLookupSvc;
+	private IPartitionDao myPartitionDao;
 	@Autowired
 	private PartitionManagementProvider partitionManagementProvider;
 	private final Logger ourLog = LoggerFactory.getLogger(PartitionCreationInterceptor.class);
@@ -47,40 +49,33 @@ public class PartitionCreationInterceptor extends RequestTenantPartitionIntercep
 		if (StringUtils.isBlank(tenantId)) {
 			throw new InternalErrorException(Msg.code(343) + "No tenant ID has been specified");
 		} else {
-//			if(tenantId.equals("DEFAULT")){
-//				return RequestPartitionId.defaultPartition();
-//			}
-			RequestPartitionId requestPartitionId = null;
-			try {
-				partitionLookupSvc.getPartitionByName(theRequestDetails.getTenantId());
-			} catch (ResourceNotFoundException e) {
-				createPartition(theRequestDetails);
+			if (myPartitionDao.findForName(theRequestDetails.getTenantId()).isPresent()) {
+				return RequestPartitionId.fromPartitionName(tenantId);
+			} else {
+				return createPartition(theRequestDetails);
 			}
-			requestPartitionId = RequestPartitionId.fromPartitionName(tenantId);
-			return requestPartitionId;
 		}
 	}
 
-	private void createPartition(RequestDetails theRequestDetails) {
-		StringType tenantId = new StringType(theRequestDetails.getTenantId());
+	private RequestPartitionId createPartition(RequestDetails theRequestDetails) {
+		// Reminder tenantId = partitionName != partitionId
+		StringType partitionName = new StringType(theRequestDetails.getTenantId());
 		Random random = new Random();
-		int id = random.nextInt(10000);
+		int idAttempt = random.nextInt(10000);
 		int number_of_attempts = 0;
-		try {
-			while (number_of_attempts < 1000){
-				partitionLookupSvc.getPartitionById(id);
-				id = random.nextInt(10000);
-				number_of_attempts++;
-			}
-		} catch (ResourceNotFoundException e) {
-			// unused id found
-			Parameters inParams = new Parameters();
-			inParams.addParameter().setName("id").setValue(new IntegerType(id));
-			inParams.addParameter().setName("name").setValue(tenantId);
-			inParams.addParameter().setName("description").setValue(tenantId);
-			partitionManagementProvider.addPartition(inParams,new IntegerType(id),tenantId,tenantId);
+		while (number_of_attempts < 1000 && myPartitionDao.existsById(idAttempt)){
+			idAttempt = random.nextInt(10000);
+			number_of_attempts++;
 		}
-
+		if (number_of_attempts == 1000){
+//			throw new Exception("Impossible to generate new partition id after 1000 attempts");
+		}
+		Parameters inParams = new Parameters();
+		inParams.addParameter().setName("id").setValue(new IntegerType(idAttempt));
+		inParams.addParameter().setName("name").setValue(partitionName);
+		inParams.addParameter().setName("description").setValue(partitionName);
+		partitionManagementProvider.addPartition(inParams,new IntegerType(idAttempt),partitionName,partitionName);
+		return RequestPartitionId.fromPartitionId(idAttempt);
 	}
 
 }

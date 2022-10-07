@@ -92,6 +92,16 @@ public class ServletHelper {
 		  session.setAttribute("fhirClient", repositoryClientFactory.newGenericClient(orgAccess));
 	  }
 	  return (IGenericClient) session.getAttribute("fhirClient");
-
   }
+
+	public static void logout(){
+		HttpSession session = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest().getSession(false);
+		logout(session);
+	}
+  public static void logout(HttpSession session){
+	  session.removeAttribute("orgAccess");
+	  session.removeAttribute("fhirClient");
+  }
+
+
 }

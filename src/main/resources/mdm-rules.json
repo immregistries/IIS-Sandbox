@@ -65,5 +65,8 @@
     "cosine-given-name" : "POSSIBLE_MATCH",
     "cosine-given-name,jaro-last-name,birthDate" : "MATCH",
     "identifier" : "MATCH"
+  },
+  "eidSystems": {
+    "Patient": "urn"
   }
 }
