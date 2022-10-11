@@ -7,6 +7,7 @@ import org.hl7.fhir.r5.model.Enumerations.AdministrativeGender;
 import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.model.PatientReported;
 import org.immregistries.iis.kernal.repository.FhirRequests;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
@@ -16,9 +17,8 @@ import static org.immregistries.iis.kernal.mapping.MappingHelper.MRN_SYSTEM;
 @Service
 public class PatientMapper {
 
-	private PatientMapper() {
-	}
-
+	@Autowired
+	FhirRequests fhirRequests;
 	private static final String REGISTRY_STATUS_EXTENSION = "registryStatus";
 	private static final String REGISTRY_STATUS_INDICATOR = "registryStatusIndicator";
 	private static final String ETHNICITY_EXTENSION = "ethnicity";
@@ -32,7 +32,7 @@ public class PatientMapper {
 	private static final String YES = "Y";
 	private static final String NO = "N";
 
-	public PatientReported getReportedWithMaster(Patient p, FhirRequests fhirRequests) {
+	public PatientReported getReportedWithMaster(Patient p) {
 		PatientReported patientReported = getReported(p);
 		patientReported.setPatient(
 			fhirRequests.searchPatientMaster(

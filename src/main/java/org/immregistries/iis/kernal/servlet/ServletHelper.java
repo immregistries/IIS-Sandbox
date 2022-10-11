@@ -1,5 +1,7 @@
 package org.immregistries.iis.kernal.servlet;
 
+import ca.uhn.fhir.jpa.partition.SystemRequestDetails;
+import ca.uhn.fhir.rest.api.server.RequestDetails;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.client.impl.RestfulClientFactory;
 import ca.uhn.fhir.rest.server.exceptions.AuthenticationException;
@@ -85,6 +87,16 @@ public class ServletHelper {
   public static IGenericClient getFhirClient( RepositoryClientFactory repositoryClientFactory) {
 	  HttpSession session = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest().getSession(false);
 	  return  getFhirClient(session,repositoryClientFactory);
+  }
+
+  private static OrgAccess getOrgAccess() {
+	  return (OrgAccess) ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest().getSession(false).getAttribute("orgAccess");
+  }
+
+  public static RequestDetails requestDetailsWithPartitionName() {
+	  RequestDetails requestDetails =  new SystemRequestDetails();
+	  requestDetails.setTenantId(ServletHelper.getOrgAccess().getAccessName());
+	  return requestDetails;
   }
   public static IGenericClient getFhirClient(HttpSession session, RepositoryClientFactory repositoryClientFactory) {
 	  if (session.getAttribute("fhirClient") == null) {

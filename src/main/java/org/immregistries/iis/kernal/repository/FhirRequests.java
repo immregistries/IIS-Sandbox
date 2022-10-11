@@ -1,8 +1,16 @@
 package org.immregistries.iis.kernal.repository;
 
+import ca.uhn.fhir.jpa.api.dao.IFhirResourceDao;
+import ca.uhn.fhir.jpa.partition.SystemRequestDetails;
+import ca.uhn.fhir.jpa.search.PersistedJpaBundleProvider;
+import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
+import ca.uhn.fhir.model.api.IQueryParameterType;
 import ca.uhn.fhir.rest.api.MethodOutcome;
+import ca.uhn.fhir.rest.api.server.IBundleProvider;
+import ca.uhn.fhir.rest.api.server.RequestDetails;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.gclient.*;
+import ca.uhn.fhir.rest.param.*;
 import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r5.model.*;
@@ -12,7 +20,10 @@ import org.immregistries.iis.kernal.model.ModelPerson;
 import org.immregistries.iis.kernal.servlet.ServletHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
+import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,8 +32,8 @@ import static org.immregistries.iis.kernal.mapping.MappingHelper.MRN_SYSTEM;
 
 @Component
 public class FhirRequests {
-//	@Autowired
-//	IFhirResourceDao<Patient> patientDao;
+	@Autowired
+	IFhirResourceDao<Patient> patientDao;
 	@Autowired
 	RepositoryClientFactory repositoryClientFactory;
 	@Autowired
@@ -87,6 +98,25 @@ public class FhirRequests {
 			return  new Bundle();
 		}
 	}
+
+	private IBundleProvider searchGoldenRecord(IFhirResourceDao dao,
+															 IQueryParameterType... where) {
+		SearchParameterMap searchParameterMap = new SearchParameterMap();
+		searchParameterMap.add("_tag", new TokenParam(GOLDEN_SYSTEM_TAG,GOLDEN_RECORD));
+		try {
+			int size = where.length;
+			int i = 0;
+			while (i < size) {
+				searchParameterMap.add(where[i].getQueryParameterQualifier(),where[i])	;
+				i++;
+			}
+			return dao.search(searchParameterMap, ServletHelper.requestDetailsWithPartitionName());
+
+		} catch (ResourceNotFoundException e) {
+			return null;
+		}
+
+	}
 	private Bundle searchRegularRecord(Class<? extends IBaseResource> aClass,
 												  ICriterion... where) {
 		IGenericClient fhirClient = ServletHelper.getFhirClient(repositoryClientFactory);
@@ -139,8 +169,9 @@ public class FhirRequests {
 	public PatientReported searchPatientReported(ICriterion... where) {
 		PatientReported patientReported = null;
 		Bundle bundle = searchRegularRecord(Patient.class, where);
+
 		if (bundle.hasEntry()) {
-			patientReported = patientMapper.getReportedWithMaster((Patient) bundle.getEntryFirstRep().getResource(),this);
+			patientReported = patientMapper.getReportedWithMaster((Patient) bundle.getEntryFirstRep().getResource());
 		}
 		return patientReported;
 	}
@@ -149,8 +180,12 @@ public class FhirRequests {
 		List<PatientReported> patientReportedList = new ArrayList<>();
 		Bundle bundle = searchRegularRecord(Patient.class, where);
 		for (Bundle.BundleEntryComponent entry: bundle.getEntry()) {
-			patientReportedList.add(patientMapper.getReportedWithMaster((Patient) entry.getResource(),this));
+			patientReportedList.add(patientMapper.getReportedWithMaster((Patient) entry.getResource()));
 		}
+//		IBundleProvider bundleProvider = searchGoldenRecord(patientDao,where);
+//		for (IBaseResource resource: bundleProvider.getAllResources()) {
+//			patientReportedList.add(patientMapper.getReportedWithMaster((Patient) resource));
+//		}
 		return patientReportedList;
 	}
 	public VaccinationMaster searchVaccinationMaster(ICriterion... where) {
@@ -244,7 +279,7 @@ public class FhirRequests {
 			Patient.IDENTIFIER.exactly().systemAndIdentifier(MRN_SYSTEM,patientReported.getPatientReportedExternalLink()));
 		if (!outcome.getResource().isEmpty()) {
 			patientReported.setPatientReportedId(outcome.getResource().getIdElement().getIdPart());
-			return patientMapper.getReportedWithMaster((Patient) outcome.getResource(),this);
+			return patientMapper.getReportedWithMaster((Patient) outcome.getResource());
 		} else if (outcome.getCreated() != null && outcome.getCreated()) {
 			patientReported.setPatientReportedId(outcome.getId().getIdPart());
 		}
