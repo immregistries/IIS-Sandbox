@@ -15,6 +15,7 @@ import ca.uhn.fhir.rest.api.server.RequestDetails;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.param.TokenParam;
 import org.hibernate.Query;
+import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r5.model.HumanName;
 import org.hl7.fhir.r5.model.Immunization;
@@ -52,7 +53,7 @@ public class MdmCustomInterceptor {
 //	@Autowired
 //	RepositoryClientFactory repositoryClientFactory;
 
-//	@Hook(Pointcut.MDM_BEFORE_PERSISTED_RESOURCE_CHECKED)
+	@Hook(Pointcut.MDM_BEFORE_PERSISTED_RESOURCE_CHECKED)
 	public void before(IBaseResource theResource, RequestDetails theRequestDetails) {
 
 //		switch (theResource)
@@ -71,7 +72,7 @@ public class MdmCustomInterceptor {
 //			IBundleProvider bundleProvider = immunizationDao.search(searchParameterMap, requestDetails);
 			List<Immunization> goldenList = null;
 
-			for (IBaseResource golden: goldenList){
+			for (IAnyResource golden: goldenList){
 				i2 = toVaccDedupImmunization((Immunization) golden);
 				comparison = comparer.compare(i1,i2);
 				if (comparison.equals(ComparisonResult.EQUAL)) {

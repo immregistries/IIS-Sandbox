@@ -15,7 +15,9 @@
         <groupId>ca.uhn.hapi.fhir</groupId>
         <artifactId>hapi-fhir</artifactId>
 <!--        <version>6.0.1</version>-->
-        <version>6.0.1-SUB</version>
+<!--        <version>6.0.1-SUB</version>-->
+<!--        <version>6.1.2</version>-->
+        <version>6.1.2-SUB</version>
     </parent>
 
     <artifactId>iis-sandbox</artifactId>
@@ -188,10 +190,10 @@
             <artifactId>hapi-fhir-jpaserver-base</artifactId>
             <version>${project.version}</version>
             <exclusions>
-                <exclusion>
-                    <groupId>org.springframework</groupId>
-                    <artifactId>spring-jcl</artifactId>
-                </exclusion>
+<!--                <exclusion>-->
+<!--                    <groupId>org.springframework</groupId>-->
+<!--                    <artifactId>spring-jcl</artifactId>-->
+<!--                </exclusion>-->
                 <exclusion>
                     <groupId>commons-logging</groupId>
                     <artifactId>commons-logging</artifactId>
