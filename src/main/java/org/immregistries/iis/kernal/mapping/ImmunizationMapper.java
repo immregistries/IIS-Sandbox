@@ -76,15 +76,15 @@ public class ImmunizationMapper {
 		vr.setExpirationDate(i.getExpirationDate());
 		if (i.getStatus() != null) {
 			switch(i.getStatus()){
-				case COMPLETED : {
+				case COMPLETED: {
 					vr.setCompletionStatus("CP");
 					break;
 				}
-				case ENTEREDINERROR : {
+				case ENTEREDINERROR: {
 					vr.setActionCode("D");
 					break;
 				}
-				case NOTDONE : {
+				case NOTDONE: {
 					vr.setCompletionStatus("RE");
 					break;
 				} //Could also be NA or PA
@@ -100,10 +100,10 @@ public class ImmunizationMapper {
 		vr.setFundingSource(i.getFundingSource().getCodingFirstRep().getCode());
 		vr.setFundingEligibility(i.getProgramEligibilityFirstRep().getCodingFirstRep().getCode());
 
-		if (i.getLocation() != null && !i.getLocation().getId().isBlank()){
+		if (i.getLocation() != null && i.getLocation().getId() != null && !i.getLocation().getId().isBlank()){
 			vr.setOrgLocation(fhirRequests.readOrgLocation(i.getLocation().getId()));
 		}
-		if (i.getInformationSource().isResource() && !i.getInformationSource().getId().isBlank()) {
+		if (i.getInformationSource().isResource() && i.getInformationSource().getId() != null && !i.getInformationSource().getId().isBlank()) {
 			vr.setEnteredBy(fhirRequests.readPractitionerPerson(i.getInformationSourceReference().getId()));
 		}
 		for (Immunization.ImmunizationPerformerComponent performer: i.getPerformer()) {

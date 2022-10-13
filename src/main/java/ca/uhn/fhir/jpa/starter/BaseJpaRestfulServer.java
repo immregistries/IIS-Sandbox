@@ -20,6 +20,7 @@ import ca.uhn.fhir.jpa.partition.PartitionManagementProvider;
 import ca.uhn.fhir.jpa.provider.*;
 import ca.uhn.fhir.jpa.provider.dstu3.JpaConformanceProviderDstu3;
 import ca.uhn.fhir.jpa.search.DatabaseBackedPagingProvider;
+import ca.uhn.fhir.jpa.starter.interceptors.MdmCustomInterceptor;
 import ca.uhn.fhir.jpa.starter.interceptors.PartitionCreationInterceptor;
 import ca.uhn.fhir.jpa.starter.interceptors.SessionAuthorizationInterceptor;
 import ca.uhn.fhir.jpa.subscription.util.SubscriptionDebugLogInterceptor;
@@ -40,6 +41,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import org.hl7.fhir.r4.model.Bundle.BundleType;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.cors.CorsConfiguration;
@@ -100,6 +102,8 @@ public class BaseJpaRestfulServer extends RestfulServer {
   Optional<CqlProviderLoader> cqlProviderLoader;
   @Autowired
   Optional<MdmProviderLoader> mdmProviderProvider;
+	@Autowired
+	AutowireCapableBeanFactory beanFactory;
 
   @Autowired
 	PartitionCreationInterceptor partitionCreationInterceptor;
@@ -221,6 +225,13 @@ public class BaseJpaRestfulServer extends RestfulServer {
 		* Custom Authorization interceptor
 		*/
 	 this.registerInterceptor(new SessionAuthorizationInterceptor());
+	 /**
+		* Mdm customization
+		*/
+	  MdmCustomInterceptor mdmCustomInterceptor = new MdmCustomInterceptor();
+	  beanFactory.autowireBean(mdmCustomInterceptor);
+
+	  this.registerInterceptor(mdmCustomInterceptor);
 
     /*
      * This interceptor formats the output using nice colourful

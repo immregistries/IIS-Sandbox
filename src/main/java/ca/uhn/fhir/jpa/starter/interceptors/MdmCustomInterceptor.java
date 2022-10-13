@@ -1,5 +1,6 @@
 package ca.uhn.fhir.jpa.starter.interceptors;
 
+import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.interceptor.api.Hook;
 import ca.uhn.fhir.interceptor.api.Pointcut;
 import ca.uhn.fhir.jpa.api.dao.IFhirResourceDao;
@@ -7,14 +8,18 @@ import ca.uhn.fhir.jpa.mdm.dao.MdmLinkDaoSvc;
 import ca.uhn.fhir.jpa.mdm.svc.MdmResourceDaoSvc;
 import ca.uhn.fhir.jpa.partition.SystemRequestDetails;
 import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
-import ca.uhn.fhir.mdm.api.MdmLinkSourceEnum;
-import ca.uhn.fhir.mdm.api.MdmMatchOutcome;
+import ca.uhn.fhir.mdm.api.*;
 import ca.uhn.fhir.mdm.provider.BaseMdmProvider;
+import ca.uhn.fhir.mdm.provider.MdmControllerHelper;
 import ca.uhn.fhir.mdm.provider.MdmProviderDstu3Plus;
+import ca.uhn.fhir.mdm.provider.MdmProviderLoader;
 import ca.uhn.fhir.rest.api.server.IBundleProvider;
 import ca.uhn.fhir.rest.api.server.RequestDetails;
 import ca.uhn.fhir.rest.param.StringParam;
+import ca.uhn.fhir.rest.param.TokenAndListParam;
 import ca.uhn.fhir.rest.param.TokenParam;
+import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
+import ca.uhn.fhir.rest.server.provider.ResourceProviderFactory;
 import ca.uhn.fhir.rest.server.servlet.ServletRequestDetails;
 import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.hl7.fhir.instance.model.api.IBaseResource;
@@ -25,6 +30,8 @@ import org.immregistries.iis.kernal.model.OrgAccess;
 import org.immregistries.vaccination_deduplication.computation_classes.Deterministic;
 import org.immregistries.vaccination_deduplication.reference.ComparisonResult;
 import org.immregistries.vaccination_deduplication.reference.ImmunizationSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -39,26 +46,38 @@ import static org.immregistries.iis.kernal.repository.FhirRequests.GOLDEN_SYSTEM
 
 @Service
 public class MdmCustomInterceptor {
-	List<String> myNamesToIgnore = asList("John Doe", "Jane Doe");
-	@Autowired
-	MdmResourceDaoSvc mdmResourceDaoSvc;
+	Logger log = LoggerFactory.getLogger(MdmCustomInterceptor.class);
 	@Autowired
 	IFhirResourceDao<Immunization> immunizationDao;
 	@Autowired
 	MdmLinkDaoSvc mdmLinkDaoSvc;
-//	@Autowired
-//	MdmProviderDstu3Plus mdmProvider;
+	MdmProviderDstu3Plus mdmProvider;
 
+	@Autowired
+	private FhirContext myFhirContext;
+	@Autowired
+	private ResourceProviderFactory myResourceProviderFactory;
+	@Autowired
+	private MdmControllerHelper myMdmControllerHelper;
+	@Autowired
+	private IMdmControllerSvc myMdmControllerSvc;
+	@Autowired
+	private IMdmSubmitSvc myMdmSubmitSvc;
+	@Autowired
+	private IMdmSettings myMdmSettings;
 //	@Autowired
 //	RepositoryClientFactory repositoryClientFactory;
 
 	@Hook(Pointcut.MDM_BEFORE_PERSISTED_RESOURCE_CHECKED)
 	public void before(IBaseResource theResource, RequestDetails theRequestDetails) {
-
-//		switch (theResource)
+		log.info("MDM_BEFORE_PERSISTED_RESOURCE_CHECKED");
+		mdmProvider = new MdmProviderDstu3Plus(this.myFhirContext, this.myMdmControllerSvc, this.myMdmControllerHelper, this.myMdmSubmitSvc, this.myMdmSettings);
 		//TODO find a better way to figure type out
 		try {
 			Immunization immunization = (Immunization) theResource;
+			if (immunization.getPatient()==null){
+				throw new InvalidRequestException("No patient specified");
+			}
 			Deterministic comparer = new Deterministic();
 			ComparisonResult comparison;
 			org.immregistries.vaccination_deduplication.Immunization i1 = toVaccDedupImmunization(immunization);
@@ -66,11 +85,15 @@ public class MdmCustomInterceptor {
 
 			OrgAccess orgAccess = (OrgAccess) ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest().getSession(false).getAttribute("orgAccess");
 			ServletRequestDetails servletRequestDetails = new ServletRequestDetails();
-//			SystemRequestDetails systemRequestDetails =  new SystemRequestDetails();
 			servletRequestDetails.setTenantId(orgAccess.getAccessName());
 			SearchParameterMap searchParameterMap = new SearchParameterMap()
-				.add("_tag", new TokenParam(GOLDEN_SYSTEM_TAG,GOLDEN_RECORD))
-				.add("patient", new StringParam(immunization.getPatient().getId()));
+				.add("_tag", new TokenParam(GOLDEN_SYSTEM_TAG,GOLDEN_RECORD));
+			if (immunization.getPatient().getId() != null) {
+				searchParameterMap.add("patient:mdm", new StringParam(immunization.getPatient().getId()));
+			} else if (immunization.getPatient().getIdentifier() != null){
+				searchParameterMap.add("patient.identifier", new TokenParam(immunization.getPatient().getIdentifier().getSystem(),immunization.getPatient().getIdentifier().getValue()));
+			}
+
 			IBundleProvider bundleProvider = immunizationDao.search(searchParameterMap, servletRequestDetails);
 
 			for (IBaseResource golden: bundleProvider.getAllResources()){
@@ -78,7 +101,9 @@ public class MdmCustomInterceptor {
 				i2 = toVaccDedupImmunization(golden_i);
 				comparison = comparer.compare(i1,i2);
 				if (comparison.equals(ComparisonResult.EQUAL)) {
-//					mdmProvider.createLink(new StringType(golden_i.getId()), new StringType(immunization.getId()),new StringType("MATCH"),servletRequestDetails);
+					log.info("MATCH");
+
+					mdmProvider.createLink(new StringType(golden_i.getId()), new StringType(immunization.getId()),new StringType("MATCH"),servletRequestDetails);
 //					mdmLinkDaoSvc.createOrUpdateLinkEntity(golden_i,immunization, MdmMatchOutcome.POSSIBLE_MATCH, MdmLinkSourceEnum.MANUAL,null);
 				}
 			}
