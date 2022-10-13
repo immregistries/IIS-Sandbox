@@ -53,7 +53,7 @@ public class ImmunizationMapper {
 		vr.setVaccinationReportedId(new IdType(i.getId()).getIdPart());
 		vr.setUpdatedDate(i.getMeta().getLastUpdated());
 		vr.setVaccinationReportedExternalLink(MappingHelper.filterIdentifier(i.getIdentifier(),MappingHelper.VACCINATION_REPORTED).getValue());
-		if (i.getPatient() != null && !i.getPatient().getId().isBlank()) {
+		if (i.getPatient() != null && i.getPatient().getId() != null && !i.getPatient().getId().isBlank()) {
 //			vr.setPatientReportedId(i.getPatient().getReference());
 			vr.setPatientReported(fhirRequests.readPatientReported(i.getPatient().getId()));
 		}
