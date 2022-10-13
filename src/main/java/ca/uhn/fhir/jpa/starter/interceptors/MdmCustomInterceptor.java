@@ -9,21 +9,19 @@ import ca.uhn.fhir.jpa.partition.SystemRequestDetails;
 import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
 import ca.uhn.fhir.mdm.api.MdmLinkSourceEnum;
 import ca.uhn.fhir.mdm.api.MdmMatchOutcome;
-import ca.uhn.fhir.model.api.IQueryParameterType;
+import ca.uhn.fhir.mdm.provider.BaseMdmProvider;
+import ca.uhn.fhir.mdm.provider.MdmProviderDstu3Plus;
 import ca.uhn.fhir.rest.api.server.IBundleProvider;
 import ca.uhn.fhir.rest.api.server.RequestDetails;
-import ca.uhn.fhir.rest.client.api.IGenericClient;
+import ca.uhn.fhir.rest.param.StringParam;
 import ca.uhn.fhir.rest.param.TokenParam;
-import org.hibernate.Query;
+import ca.uhn.fhir.rest.server.servlet.ServletRequestDetails;
 import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.hl7.fhir.instance.model.api.IBaseResource;
-import org.hl7.fhir.r5.model.HumanName;
 import org.hl7.fhir.r5.model.Immunization;
 import org.hl7.fhir.r5.model.Patient;
+import org.hl7.fhir.r5.model.StringType;
 import org.immregistries.iis.kernal.model.OrgAccess;
-import org.immregistries.iis.kernal.model.VaccinationReported;
-import org.immregistries.iis.kernal.repository.RepositoryClientFactory;
-import org.immregistries.iis.kernal.servlet.ServletHelper;
 import org.immregistries.vaccination_deduplication.computation_classes.Deterministic;
 import org.immregistries.vaccination_deduplication.reference.ComparisonResult;
 import org.immregistries.vaccination_deduplication.reference.ImmunizationSource;
@@ -34,7 +32,6 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.text.ParseException;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static java.util.Arrays.asList;
 import static org.immregistries.iis.kernal.repository.FhirRequests.GOLDEN_RECORD;
@@ -49,6 +46,8 @@ public class MdmCustomInterceptor {
 	IFhirResourceDao<Immunization> immunizationDao;
 	@Autowired
 	MdmLinkDaoSvc mdmLinkDaoSvc;
+//	@Autowired
+//	MdmProviderDstu3Plus mdmProvider;
 
 //	@Autowired
 //	RepositoryClientFactory repositoryClientFactory;
@@ -66,17 +65,21 @@ public class MdmCustomInterceptor {
 			org.immregistries.vaccination_deduplication.Immunization i2;
 
 			OrgAccess orgAccess = (OrgAccess) ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest().getSession(false).getAttribute("orgAccess");
-			RequestDetails requestDetails =  new SystemRequestDetails();
-			requestDetails.setTenantId(orgAccess.getAccessName());
-//			SearchParameterMap searchParameterMap = new SearchParameterMap().add("_tag:not", new TokenParam(GOLDEN_SYSTEM_TAG,GOLDEN_RECORD));
-//			IBundleProvider bundleProvider = immunizationDao.search(searchParameterMap, requestDetails);
-			List<Immunization> goldenList = null;
+			ServletRequestDetails servletRequestDetails = new ServletRequestDetails();
+//			SystemRequestDetails systemRequestDetails =  new SystemRequestDetails();
+			servletRequestDetails.setTenantId(orgAccess.getAccessName());
+			SearchParameterMap searchParameterMap = new SearchParameterMap()
+				.add("_tag", new TokenParam(GOLDEN_SYSTEM_TAG,GOLDEN_RECORD))
+				.add("patient", new StringParam(immunization.getPatient().getId()));
+			IBundleProvider bundleProvider = immunizationDao.search(searchParameterMap, servletRequestDetails);
 
-			for (IAnyResource golden: goldenList){
-				i2 = toVaccDedupImmunization((Immunization) golden);
+			for (IBaseResource golden: bundleProvider.getAllResources()){
+				Immunization golden_i = (Immunization) golden;
+				i2 = toVaccDedupImmunization(golden_i);
 				comparison = comparer.compare(i1,i2);
 				if (comparison.equals(ComparisonResult.EQUAL)) {
-					mdmLinkDaoSvc.createOrUpdateLinkEntity(golden,immunization, MdmMatchOutcome.POSSIBLE_MATCH, MdmLinkSourceEnum.MANUAL,null);
+//					mdmProvider.createLink(new StringType(golden_i.getId()), new StringType(immunization.getId()),new StringType("MATCH"),servletRequestDetails);
+//					mdmLinkDaoSvc.createOrUpdateLinkEntity(golden_i,immunization, MdmMatchOutcome.POSSIBLE_MATCH, MdmLinkSourceEnum.MANUAL,null);
 				}
 			}
 		} catch (ClassCastException c) {

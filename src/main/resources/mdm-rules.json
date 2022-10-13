@@ -19,14 +19,40 @@
       "searchParams": ["identifier"]
     }
   ],
-  "candidateFilterSearchParams": [
-    {
-      "resourceType": "Patient",
-      "searchParam": "active",
-      "fixedValue": "true"
-    }
-  ],
+  "candidateFilterSearchParams": [],
   "matchFields": [
+    {
+      "name": "occurrence-date",
+      "resourceType": "Immunization",
+      "resourcePath": "occurrence[x]",
+      "matcher": {
+        "algorithm": "DATE"
+      }
+    },
+    {
+      "name": "primary-source",
+      "resourceType": "Immunization",
+      "resourcePath": "primarySource",
+      "matcher": {
+        "algorithm": "STRING"
+      }
+    },
+    {
+      "name": "lot-number",
+      "resourceType": "Immunization",
+      "resourcePath": "lotNumber",
+      "matcher": {
+        "algorithm": "STRING"
+      }
+    },
+    {
+      "name": "vaccine-code",
+      "resourceType": "Immunization",
+      "resourcePath": "vaccineCode",
+      "matcher": {
+        "algorithm": "STRING"
+      }
+    },
     {
       "name": "cosine-given-name",
       "resourceType": "Patient",
@@ -44,29 +70,29 @@
       }
     },
     {
-      "name": "identifier",
-      "resourceType": "*",
-      "resourcePath": "identifier",
-      "matcher": {
-        "algorithm": "IDENTIFIER"
-      }
-    },
-    {
       "name": "birthDate",
       "resourceType": "Patient",
       "resourcePath": "birthDate",
       "matcher": {
         "algorithm": "DATE"
       }
+    },
+    {
+      "name": "identifier",
+      "resourceType": "Patient",
+      "resourcePath": "identifier",
+      "matcher": {
+        "algorithm": "IDENTIFIER"
+      }
     }
-
   ],
   "matchResultMap": {
     "cosine-given-name" : "POSSIBLE_MATCH",
     "cosine-given-name,jaro-last-name,birthDate" : "MATCH",
-    "identifier" : "MATCH"
+    "identifier" : "POSSIBLE_MATCH",
+    "occurrence-date,vaccine-code,lot-number" : "MATCH"
   },
   "eidSystems": {
-    "Patient": "urn"
+    "Patient": "urn:mrns"
   }
 }
