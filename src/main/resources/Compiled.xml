@@ -476,6 +476,21 @@
             </use-date>
         </code>
         <code>
+            <value>253088698300034911220901</value>
+            <label>COVID-19 Moderna Vaccine EUA Recipient-Caregiver Fact Sheet - 6 yrs and older</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_VIS_VACCINES">221</link-to>
+                <link-to codeset="VACCINATION_VIS_VACCINES">207</link-to>
+                <link-to codeset="VACCINATION_VIS_VACCINES">229</link-to>
+            </reference>
+            <use-date>
+                <not-before>20221012</not-before>
+            </use-date>
+        </code>
+        <code>
             <value>253088698300037011220101</value>
             <label>COVID-19 Novavax EUA Recipient-Caregiver Fact Sheet</label>
             <code-status>
@@ -43168,6 +43183,7 @@
             </code-status>
             <reference>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300034911210601</link-to>
+                <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300034911220901</link-to>
             </reference>
             <use-date>
                 <not-before>20220831</not-before>
@@ -43183,6 +43199,7 @@
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300034911201201</link-to>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300034911210401</link-to>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300034911210601</link-to>
+                <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300034911220901</link-to>
             </reference>
             <use-date>
                 <not-before>20201201</not-before>
@@ -43197,6 +43214,7 @@
             <reference>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300034911210601</link-to>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300050911220501</link-to>
+                <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300034911220901</link-to>
             </reference>
             <use-date>
                 <not-before>20220131</not-before>
