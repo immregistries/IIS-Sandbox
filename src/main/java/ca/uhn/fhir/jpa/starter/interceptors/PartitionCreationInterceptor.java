@@ -49,9 +49,6 @@ public class PartitionCreationInterceptor extends RequestTenantPartitionIntercep
 		if (StringUtils.isBlank(tenantId)) {
 			throw new InternalErrorException(Msg.code(343) + "No tenant ID has been specified");
 		} else {
-			if (tenantId.equals("DEFAULT")) {
-				return RequestPartitionId.defaultPartition();
-			}
 			if (myPartitionDao.findForName(theRequestDetails.getTenantId()).isPresent()) {
 				return RequestPartitionId.fromPartitionName(tenantId);
 			} else {

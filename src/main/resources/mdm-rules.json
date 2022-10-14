@@ -22,6 +22,14 @@
   "candidateFilterSearchParams": [],
   "matchFields": [
     {
+      "name": "immunization-patient",
+      "resourceType": "Immunization",
+      "resourcePath": "patient",
+      "matcher": {
+        "algorithm": "STRING"
+      }
+    },
+    {
       "name": "occurrence-date",
       "resourceType": "Immunization",
       "resourcePath": "occurrence[x]",
@@ -89,7 +97,8 @@
   "matchResultMap": {
     "cosine-given-name" : "POSSIBLE_MATCH",
     "cosine-given-name,jaro-last-name,birthDate" : "MATCH",
-    "identifier" : "POSSIBLE_MATCH"
+    "identifier" : "POSSIBLE_MATCH",
+    "occurrence-date,vaccine-code,lot-number,immunization-patient" : "MATCH"
   },
   "eidSystems": {
     "Patient": "urn:mrns"
