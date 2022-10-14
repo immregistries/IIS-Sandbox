@@ -107,6 +107,8 @@ public class BaseJpaRestfulServer extends RestfulServer {
 
   @Autowired
 	PartitionCreationInterceptor partitionCreationInterceptor;
+  @Autowired
+	MdmCustomInterceptor mdmCustomInterceptor;
 
   @Autowired
   private IValidationSupport myValidationSupport;
@@ -228,9 +230,6 @@ public class BaseJpaRestfulServer extends RestfulServer {
 	 /**
 		* Mdm customization
 		*/
-	  MdmCustomInterceptor mdmCustomInterceptor = new MdmCustomInterceptor();
-	  beanFactory.autowireBean(mdmCustomInterceptor);
-
 	  this.registerInterceptor(mdmCustomInterceptor);
 
     /*

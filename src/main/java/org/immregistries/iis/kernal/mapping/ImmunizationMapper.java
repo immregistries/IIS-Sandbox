@@ -52,10 +52,11 @@ public class ImmunizationMapper {
 		VaccinationReported vr = new VaccinationReported();
 		vr.setVaccinationReportedId(new IdType(i.getId()).getIdPart());
 		vr.setUpdatedDate(i.getMeta().getLastUpdated());
-		vr.setVaccinationReportedExternalLink(MappingHelper.filterIdentifier(i.getIdentifier(),MappingHelper.VACCINATION_REPORTED).getValue());
-		if (i.getPatient() != null && i.getPatient().getId() != null && !i.getPatient().getId().isBlank()) {
-//			vr.setPatientReportedId(i.getPatient().getReference());
-			vr.setPatientReported(fhirRequests.readPatientReported(i.getPatient().getId()));
+//		vr.setVaccinationReportedExternalLink(MappingHelper.filterIdentifier(i.getIdentifier(),MappingHelper.VACCINATION_REPORTED).getValue());
+		vr.setVaccinationReportedExternalLink(MappingHelper.identifierToString(i.getIdentifier()));
+		if (i.getPatient() != null && i.getPatient().getReference() != null && !i.getPatient().getReference().isBlank()) {
+			vr.setPatientReported(fhirRequests.readPatientReported(i.getPatient().getReference()));
+//			vr.setPatientReported(fhirRequests.readPatientReported(i.getPatient().getReference().split("Patient/")[0]));
 		}
 
 		vr.setReportedDate(i.getRecorded());
@@ -100,21 +101,21 @@ public class ImmunizationMapper {
 		vr.setFundingSource(i.getFundingSource().getCodingFirstRep().getCode());
 		vr.setFundingEligibility(i.getProgramEligibilityFirstRep().getCodingFirstRep().getCode());
 
-		if (i.getLocation() != null && i.getLocation().getId() != null && !i.getLocation().getId().isBlank()){
-			vr.setOrgLocation(fhirRequests.readOrgLocation(i.getLocation().getId()));
+		if (i.getLocation() != null && i.getLocation().getReference() != null && !i.getLocation().getReference().isBlank()){
+			vr.setOrgLocation(fhirRequests.readOrgLocation(i.getLocation().getReference()));
 		}
 		if (i.getInformationSource().isResource() && i.getInformationSource().getId() != null && !i.getInformationSource().getId().isBlank()) {
 			vr.setEnteredBy(fhirRequests.readPractitionerPerson(i.getInformationSourceReference().getId()));
 		}
 		for (Immunization.ImmunizationPerformerComponent performer: i.getPerformer()) {
-			if (performer.getActor() !=null && !performer.getActor().getId().isBlank()){
+			if (performer.getActor() != null && performer.getActor().getReference() != null && !performer.getActor().getReference().isBlank()){
 				switch (performer.getFunction().getCode(FUNCTION)){
 					case ADMINISTERING: {
-						vr.setAdministeringProvider(fhirRequests.readPractitionerPerson(performer.getActor().getId()));
+						vr.setAdministeringProvider(fhirRequests.readPractitionerPerson(performer.getActor().getReference()));
 						break;
 					}
 					case ORDERING: {
-						vr.setOrderingProvider(fhirRequests.readPractitionerPerson(performer.getActor().getId()));
+						vr.setOrderingProvider(fhirRequests.readPractitionerPerson(performer.getActor().getReference()));
 						break;
 					}
 				}
@@ -195,10 +196,12 @@ public class ImmunizationMapper {
 
 
 	  Location location  = locationMapper.fhirLocation(vr.getOrgLocation()); // Should have been saved in Event/MessageHandler
-	  i.setLocation(new Reference(location));
+	  if (location != null) {
+		  i.setLocation(new Reference(MappingHelper.LOCATION + "/" + location.getId()));
+	  }
 
 	  if (vr.getEnteredBy() != null) {
-		  i.setInformationSource(new Reference(MappingHelper.PRACTITIONER+"/"+vr.getEnteredBy().getPersonId()));
+		  i.setInformationSource(new Reference(MappingHelper.PRACTITIONER+"/" + vr.getEnteredBy().getPersonId()));
 	  }
 	  if (vr.getOrderingProvider() != null) {
 		  i.addPerformer(performer(vr.getOrderingProvider(),ORDERING, ORDERING_DISPLAY));

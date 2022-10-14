@@ -49,8 +49,16 @@ public class MappingHelper {
 				.setValue(identifier);
 	}
 
+	public  static String identifierToString(List<Identifier> identifiers) {
+		if (identifiers.size() > 0) {
+			return identifiers.get(0).getSystem() + "|" + identifiers.get(0).getValue();
+		} else {
+			return "";
+		}
+	}
+
 	public  static Identifier filterIdentifier(List<Identifier> identifiers, String system) {
-		return identifiers.stream().filter(identifier -> identifier.getSystem() != null && identifier.getSystem().equals(system)).findFirst().get();
+		return identifiers.stream().filter(identifier -> identifier.getSystem() != null && identifier.getSystem().equals(system)).findFirst().orElse(identifiers.get(0));
 	}
 
 	public  static Coding filterCodeableConcept(CodeableConcept concept, String system) {

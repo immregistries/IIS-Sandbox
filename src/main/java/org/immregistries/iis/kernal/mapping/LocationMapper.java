@@ -10,8 +10,9 @@ import org.springframework.stereotype.Service;
 public class LocationMapper {
 
 	public Location fhirLocation(OrgLocation ol) {
-		Location location = new Location();
+
 		if (ol != null) {
+			Location location = new Location();
 			location.setId(ol.getOrgLocationId());
 			location.addIdentifier(MappingHelper.getFhirIdentifier(MappingHelper.ORG_LOCATION, ol.getOrgFacilityCode()));
 			location.setName(ol.getOrgFacilityName());
@@ -27,8 +28,9 @@ public class LocationMapper {
 			address.setState(ol.getAddressState());
 			address.setPostalCode(ol.getAddressZip());
 			address.setCountry(ol.getAddressCountry());
+			return  location;
 		}
-		return  location;
+		return null;
 	}
 
 	public OrgLocation orgLocationFromFhir(Location l) {

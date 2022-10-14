@@ -38,9 +38,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.text.ParseException;
-import java.util.List;
 
-import static java.util.Arrays.asList;
 import static org.immregistries.iis.kernal.repository.FhirRequests.GOLDEN_RECORD;
 import static org.immregistries.iis.kernal.repository.FhirRequests.GOLDEN_SYSTEM_TAG;
 
@@ -69,7 +67,7 @@ public class MdmCustomInterceptor {
 //	RepositoryClientFactory repositoryClientFactory;
 
 	@Hook(Pointcut.MDM_BEFORE_PERSISTED_RESOURCE_CHECKED)
-	public void before(IBaseResource theResource, RequestDetails theRequestDetails) {
+	public void invoke(IBaseResource theResource) {
 		log.info("MDM_BEFORE_PERSISTED_RESOURCE_CHECKED");
 		mdmProvider = new MdmProviderDstu3Plus(this.myFhirContext, this.myMdmControllerSvc, this.myMdmControllerHelper, this.myMdmSubmitSvc, this.myMdmSettings);
 		//TODO find a better way to figure type out
