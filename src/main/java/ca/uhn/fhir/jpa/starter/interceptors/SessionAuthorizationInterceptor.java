@@ -35,6 +35,11 @@ public class SessionAuthorizationInterceptor extends AuthorizationInterceptor {
 		String authHeader = theRequestDetails.getHeader("Authorization");
 		OrgAccess orgAccess;
 		try {
+			if(authHeader != null && authHeader.startsWith("Bearer " + "Inside-job abcdef")) { // TODO set random hidden key generation
+				return new RuleBuilder()
+					.allowAll("Self made request") // TODO use tenant id in header
+					.build();
+			}
 			if(authHeader != null && authHeader.startsWith("Basic ")) {
 				String base64 = authHeader.substring("Basic ".length());
 				String base64decoded = new String(Base64.decodeBase64(base64));

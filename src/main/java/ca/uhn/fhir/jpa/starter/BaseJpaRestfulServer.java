@@ -107,8 +107,6 @@ public class BaseJpaRestfulServer extends RestfulServer {
 
   @Autowired
 	PartitionCreationInterceptor partitionCreationInterceptor;
-  @Autowired
-	MdmCustomInterceptor mdmCustomInterceptor;
 
   @Autowired
   private IValidationSupport myValidationSupport;
@@ -141,10 +139,20 @@ public class BaseJpaRestfulServer extends RestfulServer {
      * Order matters - the MDM provider registers itself on the resourceProviderFactory - hence the loading must be done
      * ahead of provider registration
      */
-    if(appProperties.getMdm_enabled())
-    	mdmProviderProvider.get().loadProvider();
+    if(appProperties.getMdm_enabled()){
+		 mdmProviderProvider.get().loadProvider();
+		 /**
+		  * Mdm customization
+		  */
+		 MdmCustomInterceptor mdmCustomInterceptor = new MdmCustomInterceptor();
+//		 mdmCustomInterceptor.setMdmProvider(mdmProviderProvider.get());
+		 beanFactory.autowireBean(mdmCustomInterceptor);
+		 this.registerInterceptor( mdmCustomInterceptor);
+	 }
 
-    registerProviders(resourceProviderFactory.createProviders());
+
+
+	  registerProviders(resourceProviderFactory.createProviders());
     registerProvider(jpaSystemProvider);
     /*
      * The conformance provider exports the supported resources, search parameters, etc for
@@ -227,10 +235,6 @@ public class BaseJpaRestfulServer extends RestfulServer {
 		* Custom Authorization interceptor
 		*/
 	 this.registerInterceptor(new SessionAuthorizationInterceptor());
-	 /**
-		* Mdm customization
-		*/
-	  this.registerInterceptor(mdmCustomInterceptor);
 
     /*
      * This interceptor formats the output using nice colourful

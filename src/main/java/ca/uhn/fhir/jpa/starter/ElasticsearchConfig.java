@@ -1,7 +1,5 @@
 package ca.uhn.fhir.jpa.starter;
 
-import ca.uhn.fhir.jpa.dao.search.HSearchSortHelperImpl;
-import ca.uhn.fhir.jpa.dao.search.IHSearchSortHelper;
 import ca.uhn.fhir.jpa.search.lastn.ElasticsearchSvcImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;

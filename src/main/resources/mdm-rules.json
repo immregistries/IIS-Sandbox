@@ -87,7 +87,7 @@
     },
     {
       "name": "identifier",
-      "resourceType": "Patient",
+      "resourceType": "Immunization",
       "resourcePath": "identifier",
       "matcher": {
         "algorithm": "IDENTIFIER"
@@ -96,9 +96,7 @@
   ],
   "matchResultMap": {
     "cosine-given-name" : "POSSIBLE_MATCH",
-    "cosine-given-name,jaro-last-name,birthDate" : "MATCH",
-    "identifier" : "POSSIBLE_MATCH",
-    "occurrence-date,vaccine-code,lot-number,immunization-patient" : "MATCH"
+    "cosine-given-name,jaro-last-name,birthDate" : "MATCH"
   },
   "eidSystems": {
     "Patient": "urn:mrns"

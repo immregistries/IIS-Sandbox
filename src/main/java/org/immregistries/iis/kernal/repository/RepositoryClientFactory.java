@@ -49,12 +49,14 @@ public class RepositoryClientFactory extends ApacheRestfulClientFactory implemen
 	}
 
 	public synchronized IGenericClient newGenericClient(OrgAccess orgAccess) {
+		return newGenericClientForPartition(orgAccess.getAccessName());
+	}
+	public synchronized IGenericClient newGenericClientForPartition(String partitionName) {
 		asynchInit();
-		IGenericClient client = newGenericClient(serverBase);
-		UrlTenantSelectionInterceptor urlTenantSelectionInterceptor = new UrlTenantSelectionInterceptor(orgAccess.getAccessName());
-		client.registerInterceptor(urlTenantSelectionInterceptor);
-		IClientInterceptor authInterceptor = new BasicAuthInterceptor(orgAccess.getAccessName(),orgAccess.getAccessKey());
-		client.registerInterceptor(authInterceptor);
+		IGenericClient client = newGenericClient(serverBase + "/" + partitionName);
+//		UrlTenantSelectionInterceptor urlTenantSelectionInterceptor = new UrlTenantSelectionInterceptor(partitionName);
+//		client.registerInterceptor(urlTenantSelectionInterceptor);
+//		IClientInterceptor authInterceptor = new BasicAuthInterceptor(orgAccess.getAccessName(),orgAccess.getAccessKey());
 		return client;
 	}
 
@@ -63,6 +65,8 @@ public class RepositoryClientFactory extends ApacheRestfulClientFactory implemen
 		  asynchInit();
         IGenericClient client = super.newGenericClient(theServerBase);
 		  client.registerInterceptor(loggingInterceptor);
+		  IClientInterceptor authInterceptor = new BearerTokenAuthInterceptor("Inside-job abcdef"); // TODO
+		  client.registerInterceptor(authInterceptor);
 		  AdditionalRequestHeadersInterceptor interceptor = new AdditionalRequestHeadersInterceptor();
 		  interceptor.addHeaderValue("Cache-Control", "no-cache");
 		  client.registerInterceptor(interceptor);
