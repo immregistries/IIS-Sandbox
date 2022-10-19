@@ -6,7 +6,7 @@ JDK  17  needed.
 Currently working with a customized version of Hapi fhir hosted here :
 https://github.com/cerbeor/hapi-fhir-Subscription-custom/tree/6.1.2-sub-sandbox
 
-For the current authentication and message log system, a Mysql Database needs to be running.
+For the current authentication and message log system, a Mysql Database is required, creation script : ``/src/main/database/create-database.sql``.
 
 The HAPI fhir Server uses H2 database.
 
