@@ -1,7 +1,14 @@
 # IIS Sandbox with Hapi Fhir Jpa Database
-Based on Hapi fhir Jpa starter and IIS Sandbox
+Based on Hapi fhir Jpa starter and IIS Sandbox.
+
 JDK  17  needed.
-Currently, working with a customized version of Hapi fhir\
+
+Currently working with a customized version of Hapi fhir hosted here :
+https://github.com/cerbeor/hapi-fhir-Subscription-custom/tree/6.1.2-sub-sandbox
+
+For the current authentication and message log system, a Mysql Database needs to be running.
+
+The HAPI fhir Server uses H2 database.
 
 Compile and run :
 ```

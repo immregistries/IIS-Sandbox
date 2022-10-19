@@ -1,6 +1,6 @@
 {
   "version": "1",
-  "mdmTypes": ["Patient", "Observation", "Immunization"],
+  "mdmTypes": ["Patient", "Observation","Immunization"],
   "candidateSearchParams": [
     {
       "resourceType": "Patient",
@@ -9,10 +9,6 @@
     {
       "resourceType": "Patient",
       "searchParams": ["birthdate"]
-    },
-    {
-      "resourceType": "Immunization",
-      "searchParams": ["vaccine-code","date","lot-number","patient"]
     },
     {
       "resourceType": "*",
@@ -62,6 +58,14 @@
       }
     },
     {
+      "name": "immunization-identifier",
+      "resourceType": "Immunization",
+      "resourcePath": "identifier",
+      "matcher": {
+        "algorithm": "IDENTIFIER"
+      }
+    },
+    {
       "name": "cosine-given-name",
       "resourceType": "Patient",
       "resourcePath": "name.given",
@@ -86,8 +90,8 @@
       }
     },
     {
-      "name": "identifier",
-      "resourceType": "Immunization",
+      "name": "patient-identifier",
+      "resourceType": "Patient",
       "resourcePath": "identifier",
       "matcher": {
         "algorithm": "IDENTIFIER"
@@ -96,7 +100,8 @@
   ],
   "matchResultMap": {
     "cosine-given-name" : "POSSIBLE_MATCH",
-    "cosine-given-name,jaro-last-name,birthDate" : "MATCH"
+    "cosine-given-name,jaro-last-name,birthDate" : "MATCH",
+    "patient-identifier" : "MATCH"
   },
   "eidSystems": {
     "Patient": "urn:mrns"

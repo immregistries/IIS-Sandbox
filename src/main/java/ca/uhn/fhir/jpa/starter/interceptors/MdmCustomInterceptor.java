@@ -6,25 +6,26 @@ import ca.uhn.fhir.interceptor.api.Pointcut;
 import ca.uhn.fhir.interceptor.model.RequestPartitionId;
 import ca.uhn.fhir.jpa.api.dao.IFhirResourceDao;
 import ca.uhn.fhir.jpa.mdm.dao.MdmLinkDaoSvc;
+import ca.uhn.fhir.jpa.mdm.svc.MdmLinkSvcImpl;
+import ca.uhn.fhir.jpa.mdm.svc.MdmResourceDaoSvc;
 import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
-import ca.uhn.fhir.mdm.api.IMdmControllerSvc;
-import ca.uhn.fhir.mdm.api.IMdmSettings;
-import ca.uhn.fhir.mdm.api.IMdmSubmitSvc;
+import ca.uhn.fhir.mdm.api.*;
+import ca.uhn.fhir.mdm.model.MdmTransactionContext;
 import ca.uhn.fhir.mdm.provider.MdmControllerHelper;
 import ca.uhn.fhir.mdm.provider.MdmProviderDstu3Plus;
-import ca.uhn.fhir.rest.api.server.IBundleProvider;
+import ca.uhn.fhir.mdm.util.GoldenResourceHelper;
+import ca.uhn.fhir.rest.api.Constants;
 import ca.uhn.fhir.rest.api.server.RequestDetails;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.param.StringParam;
 import ca.uhn.fhir.rest.param.TokenParam;
-import ca.uhn.fhir.rest.server.RestfulServer;
 import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
 import ca.uhn.fhir.rest.server.provider.ResourceProviderFactory;
 import ca.uhn.fhir.rest.server.servlet.ServletRequestDetails;
-import org.hl7.fhir.instance.model.api.IBaseBundle;
+import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.hl7.fhir.instance.model.api.IBaseResource;
-import org.hl7.fhir.instance.model.api.IPrimitiveType;
 import org.hl7.fhir.r5.model.*;
+import org.immregistries.iis.kernal.mapping.ImmunizationMapper;
 import org.immregistries.iis.kernal.repository.RepositoryClientFactory;
 import org.immregistries.vaccination_deduplication.computation_classes.Deterministic;
 import org.immregistries.vaccination_deduplication.reference.ComparisonResult;
@@ -46,12 +47,17 @@ import static org.immregistries.iis.kernal.repository.FhirRequests.GOLDEN_SYSTEM
 @Component
 @Interceptor
 public class MdmCustomInterceptor {
-	Logger log = LoggerFactory.getLogger(MdmCustomInterceptor.class);
+	Logger logger = LoggerFactory.getLogger(MdmCustomInterceptor.class);
 	@Autowired
 	IFhirResourceDao<Immunization> immunizationDao;
 	@Autowired
 	MdmLinkDaoSvc mdmLinkDaoSvc;
 
+	@Autowired
+	MdmResourceDaoSvc mdmResourceDaoSvc;
+	@Autowired
+	MdmLinkSvcImpl mdmLinkSvc;
+//	MdmLinkDaoSvc mdmLinkDaoSvc;
 	@Autowired
 	private FhirContext myFhirContext;
 	@Autowired
@@ -64,9 +70,9 @@ public class MdmCustomInterceptor {
 	private IMdmSubmitSvc myMdmSubmitSvc;
 	@Autowired
 	private IMdmSettings myMdmSettings;
-
+	@Autowired
+	private GoldenResourceHelper myGoldenResourceHelper;
 	MdmProviderDstu3Plus mdmProvider;
-
 	@Autowired
 	RepositoryClientFactory repositoryClientFactory;
 
@@ -74,87 +80,89 @@ public class MdmCustomInterceptor {
 		mdmProvider = new MdmProviderDstu3Plus(this.myFhirContext, this.myMdmControllerSvc, this.myMdmControllerHelper, this.myMdmSubmitSvc, this.myMdmSettings);
 	}
 
-
-	@Hook(Pointcut.STORAGE_PRESTORAGE_RESOURCE_CREATED)
+	@Hook(Pointcut.STORAGE_PRECOMMIT_RESOURCE_CREATED)
 	public void invoke(IBaseResource theResource, RequestDetails theRequestDetails) {
 		initialize();
 //		mdmProvider = new MdmProviderDstu3Plus(this.myFhirContext, this.myMdmControllerSvc, this.myMdmControllerHelper, this.myMdmSubmitSvc, this.myMdmSettings);
 		//TODO find a better way to figure type out
 		try {
 			Immunization immunization = (Immunization) theResource;
+//			if(immunization.hasMeta() && immunization.getMeta().getTag(GOLDEN_SYSTEM_TAG,GOLDEN_RECORD) != null) { // if is golden record
+//				return;
+//			}
 			if (immunization.getPatient() == null){
 				throw new InvalidRequestException("No patient specified");
 			}
 			Deterministic comparer = new Deterministic();
 			ComparisonResult comparison;
-			org.immregistries.vaccination_deduplication.Immunization i1 = toVaccDedupImmunization(immunization);
+			org.immregistries.vaccination_deduplication.Immunization i1 = toVaccDedupImmunization(immunization, theRequestDetails);
 			org.immregistries.vaccination_deduplication.Immunization i2;
 
 			HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
 			ServletRequestDetails servletRequestDetails = new ServletRequestDetails();
 //			servletRequestDetails.setServer((RestfulServer) theRequestDetails.getServer());
-//			servletRequestDetails.setServletRequest(request);
+			servletRequestDetails.setServletRequest(request);
 			servletRequestDetails.setTenantId(theRequestDetails.getTenantId());
-
-			SearchParameterMap searchParameterMap = new SearchParameterMap()
-				.add("_tag", new TokenParam(GOLDEN_SYSTEM_TAG,GOLDEN_RECORD));
+			MdmTransactionContext mdmTransactionContext = new MdmTransactionContext(MdmTransactionContext.OperationType.CREATE_RESOURCE);
+			mdmTransactionContext.setResourceType("Immunization");
 			Bundle bundle;
 			IGenericClient client = repositoryClientFactory.newGenericClientForPartition(theRequestDetails.getTenantId());
 
 			if (immunization.getPatient().getReference() != null) {
-				StringParam param =  new StringParam();
-				param.setValueAsQueryToken(myFhirContext,"patient","mdm",immunization.getPatient().getReference());
-				searchParameterMap.add("patient:mdm", param);
 				bundle = (Bundle) client.search().byUrl("Immunization?_tag="+ GOLDEN_SYSTEM_TAG + "|"+ GOLDEN_RECORD +"&patient:mdm=" + immunization.getPatient().getReference()).execute();
-//				mdmProvider.queryLinks(
-//					new StringType(immunization.getPatient().getReference()),
-//					new StringType(immunization.getPatient().getReference()),
-//					new StringType("MATCH"),
-//					new StringType(""),
-//					new UnsignedIntType(0),
-//					new UnsignedIntType(100),
-//					servletRequestDetails);
-			} else if (immunization.getPatient().getIdentifier() != null){
-//				searchParameterMap.add("patient.identifier", new TokenParam(immunization.getPatient().getIdentifier().getSystem(),immunization.getPatient().getIdentifier().getValue()));
+			}
+			else if (immunization.getPatient().getIdentifier() != null) {
 				bundle = (Bundle) client.search().byUrl(
-					"Immunization?_tag="+ GOLDEN_SYSTEM_TAG + "|"+ GOLDEN_RECORD
+					"1/Immunization?_tag="+ GOLDEN_SYSTEM_TAG + "|"+ GOLDEN_RECORD
 					+ "&patient.identifier=" + immunization.getPatient().getIdentifier().getSystem()
 						+ "|" + immunization.getPatient().getIdentifier().getValue()
 				);
 			} else {
 				throw new InvalidRequestException("No patient specified");
 			}
-//			for (IBaseResource golden: bun){
+			boolean hasMatch = false;
 			for (Bundle.BundleEntryComponent entry: bundle.getEntry()){
-
 				Immunization golden_i = (Immunization) entry.getResource();
-				log.info("{}", golden_i.getIdentifierFirstRep().getValue());
-
-				i2 = toVaccDedupImmunization(golden_i);
+				i2 = toVaccDedupImmunization(golden_i, theRequestDetails);
 				comparison = comparer.compare(i1,i2);
-				if (comparison.equals(ComparisonResult.EQUAL)) {
-					log.info("MATCH");
-					mdmProvider.createLink(new StringType(golden_i.getId()), new StringType(immunization.getId()),new StringType("MATCH"),servletRequestDetails);
-//					mdmLinkDaoSvc.createOrUpdateLinkEntity(golden_i,immunization, MdmMatchOutcome.POSSIBLE_MATCH, MdmLinkSourceEnum.MANUAL,null);
+				logger.info("{} {}", comparison, i2);
+//				mdmLinkDaoSvc.createOrUpdateLinkEntity(golden_i,immunization, MdmMatchOutcome.POSSIBLE_MATCH, MdmLinkSourceEnum.MANUAL,mdmTransactionContext);
+				if (comparison.equals(ComparisonResult.UNSURE)) {
+					mdmProvider.createLink(
+						new StringType("Immunization/" + golden_i.getId().split("Immunization/")[1]),
+						new StringType("Immunization/" + immunization.getId().split("Immunization/")[1]),
+						new StringType("POSSIBLE_MATCH"),
+						servletRequestDetails
+					);
+					hasMatch = true;
+					break;
+				} else if (comparison.equals(ComparisonResult.EQUAL)) {
+					mdmProvider.createLink(
+						new StringType("Immunization/" + golden_i.getId().split("Immunization/")[1]),
+						new StringType("Immunization/" + immunization.getId().split("Immunization/")[1]),
+						new StringType("MATCH"),
+						servletRequestDetails
+					);
+					hasMatch = true;
+					break;
 				}
+			}
+			if (!hasMatch){
+//				Create golden resource, currently made by mdm itself
+//				IAnyResource golden = myGoldenResourceHelper.createGoldenResourceFromMdmSourceResource(immunization,mdmTransactionContext);
+//				golden.setUserData(Constants.RESOURCE_PARTITION_ID, RequestPartitionId.fromPartitionName(theRequestDetails.getTenantId()));
+//				mdmLinkSvc.updateLink(golden,immunization,MdmMatchOutcome.NEW_GOLDEN_RESOURCE_MATCH,MdmLinkSourceEnum.MANUAL,mdmTransactionContext);
 			}
 		} catch (ClassCastException c) {
 		}
-		try {
-			Patient patient = (Patient) theResource;
-		} catch (ClassCastException c) {
-		}
 	}
 
-	@Hook(Pointcut.MDM_AFTER_PERSISTED_RESOURCE_CHECKED)
-	public void after() {
-		initialize();
-		log.info("MDM_AFTER_PERSISTED_RESOURCE_CHECKED");
-	}
-
-	private org.immregistries.vaccination_deduplication.Immunization toVaccDedupImmunization(Immunization immunization){
+	private org.immregistries.vaccination_deduplication.Immunization toVaccDedupImmunization(Immunization immunization, RequestDetails theRequestDetails){
 		org.immregistries.vaccination_deduplication.Immunization i1 = new org.immregistries.vaccination_deduplication.Immunization();
-		i1.setCVX(immunization.getVaccineCode().toString());
+		i1.setCVX(immunization.getVaccineCode().getCode(ImmunizationMapper.CVX));
+		if(immunization.hasManufacturer()){
+			i1.setMVX(immunization.getManufacturer().getIdentifier().getValue());
+		}
 		try {
 			i1.setDate(String.valueOf(immunization.getOccurrenceDateTimeType()));
 		} catch (ParseException e) {
@@ -163,13 +171,35 @@ public class MdmCustomInterceptor {
 		i1.setLotNumber(immunization.getLotNumber());
 		if (immunization.getPrimarySource()){
 			i1.setSource(ImmunizationSource.SOURCE);
-		}else {
-			i1.setSource(ImmunizationSource.HISTORICAL);
+		} else {
+			if (immunization.hasInformationSource()) {
+				if (immunization.hasInformationSourceCodeableConcept()){
+					if(immunization.getInformationSourceCodeableConcept().getCode(ImmunizationMapper.INFORMATION_SOURCE).equals("00")){
+						i1.setSource(ImmunizationSource.SOURCE);
+					} else {
+						i1.setSource(ImmunizationSource.HISTORICAL);
+					}
+				}
+			}
 		}
+
+		if (immunization.hasInformationSource()){ // TODO improve organisation naming and designation among tenancy or in resource info
+			if (immunization.hasInformationSourceReference()) {
+				if(immunization.getInformationSourceReference().getIdentifier() != null){
+					logger.info("Organisation id 111");
+					i1.setOrganisationID(immunization.getInformationSourceReference().getIdentifier().getValue());
+				} else if (immunization.getInformationSourceReference().getReference() != null
+					&& immunization.getInformationSourceReference().getReference().startsWith("Organisation/")) {
+					logger.info("Organisation id 112");
+					i1.setOrganisationID(immunization.getInformationSourceReference().getReference()); // TODO get organisation name from db
+				}
+			}
+		}
+		if ( i1.getOrganisationID().isBlank() && theRequestDetails != null){
+			i1.setOrganisationID(theRequestDetails.getTenantId());
+		}
+		logger.info("Organisation id {}", i1);
 		return i1;
 	}
 
-	public void setMdmProvider(MdmProviderDstu3Plus mdmProvider) {
-		this.mdmProvider = mdmProvider;
-	}
 }

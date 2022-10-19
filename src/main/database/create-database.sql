@@ -38,3 +38,9 @@ CREATE TABLE `org_access` (
   KEY `org_id` (`org_id`),
   CONSTRAINT `org_access_ibfk_1` FOREIGN KEY (`org_id`) REFERENCES `Org_Master` (`org_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+insert into org_master (org_id, organization_name) values (1, 'Mercy Healthcare');
+insert into org_master (org_id, organization_name) values (2, 'Family Physician');
+
+insert into org_access (org_id, access_name, access_key) values (1, 'Mercy', 'password1234');
+insert into org_access (org_id, access_name, access_key) values (2, 'Bob', '1234password1234');

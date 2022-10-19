@@ -21,7 +21,7 @@ public class ImmunizationMapper {
 	public static final String CVX = "http://hl7.org/fhir/sid/cvx";
 	public static final String MVX = "http://terminology.hl7.org/CodeSystem/MVX";
 	public static final String NDC = "NDC";
-	public static final String INFORMATION_SOURCE = "informationSource";
+	public static final String INFORMATION_SOURCE = "NIP001"; //TODO get system from actual message
 	public static final String FUNCTION = "http://hl7.org/fhir/ValueSet/immunization-function";
 	public static final String ORDERING = "OP";
 	public static final String ORDERING_DISPLAY = "Ordering Provider";
@@ -53,7 +53,7 @@ public class ImmunizationMapper {
 		vr.setVaccinationReportedId(new IdType(i.getId()).getIdPart());
 		vr.setUpdatedDate(i.getMeta().getLastUpdated());
 //		vr.setVaccinationReportedExternalLink(MappingHelper.filterIdentifier(i.getIdentifier(),MappingHelper.VACCINATION_REPORTED).getValue());
-		vr.setVaccinationReportedExternalLink(MappingHelper.identifierToString(i.getIdentifier()));
+		vr.setVaccinationReportedExternalLink(i.getIdentifierFirstRep().getValue());
 		if (i.getPatient() != null && i.getPatient().getReference() != null && !i.getPatient().getReference().isBlank()) {
 			vr.setPatientReported(fhirRequests.readPatientReported(i.getPatient().getReference()));
 //			vr.setPatientReported(fhirRequests.readPatientReported(i.getPatient().getReference().split("Patient/")[0]));
@@ -104,8 +104,10 @@ public class ImmunizationMapper {
 		if (i.getLocation() != null && i.getLocation().getReference() != null && !i.getLocation().getReference().isBlank()){
 			vr.setOrgLocation(fhirRequests.readOrgLocation(i.getLocation().getReference()));
 		}
-		if (i.getInformationSource().isResource() && i.getInformationSource().getId() != null && !i.getInformationSource().getId().isBlank()) {
-			vr.setEnteredBy(fhirRequests.readPractitionerPerson(i.getInformationSourceReference().getId()));
+		if (i.hasInformationSourceReference() && i.getInformationSourceReference().getReference() != null && !i.getInformationSourceReference().getReference().isBlank()) {
+			vr.setEnteredBy(fhirRequests.readPractitionerPerson(i.getInformationSourceReference().getReference()));
+		} else {
+//			vr.set
 		}
 		for (Immunization.ImmunizationPerformerComponent performer: i.getPerformer()) {
 			if (performer.getActor() != null && performer.getActor().getReference() != null && !performer.getActor().getReference().isBlank()){
@@ -163,6 +165,7 @@ public class ImmunizationMapper {
 	  i.setManufacturer(MappingHelper.getFhirReference(MappingHelper.ORGANISATION,MVX,vr.getVaccineMvxCode()));
 
 	  i.setDoseQuantity(new Quantity().setValue(new BigDecimal(vr.getAdministeredAmount())));
+
 	  i.setInformationSource(new CodeableConcept(new Coding().setSystem(INFORMATION_SOURCE).setCode(vr.getInformationSource()))); // TODO change system name
 	  i.setLotNumber(vr.getLotnumber());
 	  i.setExpirationDate(vr.getExpirationDate());
