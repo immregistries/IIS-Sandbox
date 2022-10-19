@@ -21,13 +21,6 @@ CREATE TABLE `message_received` (
   PRIMARY KEY (`message_received_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-DROP TABLE IF EXISTS `org_master`;
-CREATE TABLE `org_master` (
-  `org_id` int NOT NULL AUTO_INCREMENT,
-  `organization_name` varchar(255) NOT NULL,
-  PRIMARY KEY (`org_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
 DROP TABLE IF EXISTS `org_access`;
 CREATE TABLE `org_access` (
   `org_access_id` int NOT NULL AUTO_INCREMENT,
@@ -39,8 +32,18 @@ CREATE TABLE `org_access` (
   CONSTRAINT `org_access_ibfk_1` FOREIGN KEY (`org_id`) REFERENCES `Org_Master` (`org_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-insert into org_master (org_id, organization_name) values (1, 'Mercy Healthcare');
-insert into org_master (org_id, organization_name) values (2, 'Family Physician');
+DROP TABLE IF EXISTS `org_master`;
+CREATE TABLE `org_master` (
+  `org_id` int NOT NULL AUTO_INCREMENT,
+  `organization_name` varchar(255) NOT NULL,
+  PRIMARY KEY (`org_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+insert into org_master (org_id, organization_name) values (1, 'Mercy-Healthcare');
+insert into org_master (org_id, organization_name) values (2, 'Family-Physician');
+insert into org_master (org_id, organization_name) values (3, 'DEFAULT');
 
 insert into org_access (org_id, access_name, access_key) values (1, 'Mercy', 'password1234');
 insert into org_access (org_id, access_name, access_key) values (2, 'Bob', '1234password1234');
+insert into org_access (org_id, access_name, access_key) values (3, 'DEFAULT', 'BabySharkJaws');

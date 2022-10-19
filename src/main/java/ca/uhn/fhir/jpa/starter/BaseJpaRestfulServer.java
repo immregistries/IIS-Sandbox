@@ -20,6 +20,7 @@ import ca.uhn.fhir.jpa.partition.PartitionManagementProvider;
 import ca.uhn.fhir.jpa.provider.*;
 import ca.uhn.fhir.jpa.provider.dstu3.JpaConformanceProviderDstu3;
 import ca.uhn.fhir.jpa.search.DatabaseBackedPagingProvider;
+import ca.uhn.fhir.jpa.starter.interceptors.ExceptionFilteringInterceptor;
 import ca.uhn.fhir.jpa.starter.interceptors.MdmCustomInterceptor;
 import ca.uhn.fhir.jpa.starter.interceptors.PartitionCreationInterceptor;
 import ca.uhn.fhir.jpa.starter.interceptors.SessionAuthorizationInterceptor;
@@ -235,6 +236,7 @@ public class BaseJpaRestfulServer extends RestfulServer {
 		* Custom Authorization interceptor
 		*/
 	 this.registerInterceptor(new SessionAuthorizationInterceptor());
+	 this.registerInterceptor(new ExceptionFilteringInterceptor());
 
     /*
      * This interceptor formats the output using nice colourful

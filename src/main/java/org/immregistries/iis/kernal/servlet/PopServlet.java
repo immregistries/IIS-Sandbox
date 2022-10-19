@@ -102,18 +102,18 @@ public class PopServlet extends HttpServlet {
 			userId = req.getParameter(PARAM_USERID);
 		}
 		if (userId == null || userId.isBlank()) {
-			userId = "1";
+			userId = "Mercy";
 		}
 		if (req.getParameter(PARAM_PASSWORD) != null && !req.getParameter(PARAM_PASSWORD).isBlank() ) {
 			password = req.getParameter(PARAM_PASSWORD);
 		}
 		if (password == null || password.isBlank()) {
-			password = "1";
+			password = "password1234";
 		}
 		 if (req.getParameter(PARAM_FACILITYID) == null || req.getParameter(PARAM_FACILITYID).isBlank() ) {
 			 facilityId = req.getParameter(PARAM_FACILITYID);
 			 if (facilityId == null || facilityId.isBlank()) {
-				 facilityId = "1";
+				 facilityId = "Mercy-Healthcare";
 			 }
 		 }
 

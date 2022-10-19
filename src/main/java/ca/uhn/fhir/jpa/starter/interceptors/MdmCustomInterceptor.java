@@ -125,18 +125,18 @@ public class MdmCustomInterceptor {
 				Immunization golden_i = (Immunization) entry.getResource();
 				i2 = toVaccDedupImmunization(golden_i, theRequestDetails);
 				comparison = comparer.compare(i1,i2);
-				logger.info("{} {}", comparison, i2);
 //				mdmLinkDaoSvc.createOrUpdateLinkEntity(golden_i,immunization, MdmMatchOutcome.POSSIBLE_MATCH, MdmLinkSourceEnum.MANUAL,mdmTransactionContext);
-				if (comparison.equals(ComparisonResult.UNSURE)) {
-					mdmProvider.createLink(
-						new StringType("Immunization/" + golden_i.getId().split("Immunization/")[1]),
-						new StringType("Immunization/" + immunization.getId().split("Immunization/")[1]),
-						new StringType("POSSIBLE_MATCH"),
-						servletRequestDetails
-					);
-					hasMatch = true;
-					break;
-				} else if (comparison.equals(ComparisonResult.EQUAL)) {
+//				if (comparison.equals(ComparisonResult.UNSURE)) {
+//					mdmProvider.createLink(
+//						new StringType("Immunization/" + golden_i.getId().split("Immunization/")[1]),
+//						new StringType("Immunization/" + immunization.getId().split("Immunization/")[1]),
+//						new StringType("POSSIBLE_MATCH"),
+//						servletRequestDetails
+//					);
+//					hasMatch = true;
+//					break;
+//				}
+				if (comparison.equals(ComparisonResult.EQUAL)) {
 					mdmProvider.createLink(
 						new StringType("Immunization/" + golden_i.getId().split("Immunization/")[1]),
 						new StringType("Immunization/" + immunization.getId().split("Immunization/")[1]),
@@ -164,10 +164,17 @@ public class MdmCustomInterceptor {
 			i1.setMVX(immunization.getManufacturer().getIdentifier().getValue());
 		}
 		try {
-			i1.setDate(String.valueOf(immunization.getOccurrenceDateTimeType()));
+			if (immunization.hasOccurrenceStringType()){
+				i1.setDate(immunization.getOccurrenceStringType().getValue()); // TODO parse correctly
+			} else if (immunization.hasOccurrenceDateTimeType()) {
+				i1.setDate(immunization.getOccurrenceDateTimeType().getValue());
+			}
 		} catch (ParseException e) {
 //				throw new RuntimeException(e);
+
 		}
+
+
 		i1.setLotNumber(immunization.getLotNumber());
 		if (immunization.getPrimarySource()){
 			i1.setSource(ImmunizationSource.SOURCE);
@@ -186,11 +193,9 @@ public class MdmCustomInterceptor {
 		if (immunization.hasInformationSource()){ // TODO improve organisation naming and designation among tenancy or in resource info
 			if (immunization.hasInformationSourceReference()) {
 				if(immunization.getInformationSourceReference().getIdentifier() != null){
-					logger.info("Organisation id 111");
 					i1.setOrganisationID(immunization.getInformationSourceReference().getIdentifier().getValue());
 				} else if (immunization.getInformationSourceReference().getReference() != null
 					&& immunization.getInformationSourceReference().getReference().startsWith("Organisation/")) {
-					logger.info("Organisation id 112");
 					i1.setOrganisationID(immunization.getInformationSourceReference().getReference()); // TODO get organisation name from db
 				}
 			}
