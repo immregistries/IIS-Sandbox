@@ -30,6 +30,7 @@ public class RepositoryClientFactory extends ApacheRestfulClientFactory implemen
     private final Logger logger = LoggerFactory.getLogger(RepositoryClientFactory.class);
     private LoggingInterceptor loggingInterceptor;
 	 private static String serverBase = "";
+	 private static final String key = "wertyuhkjbasv!#$GFRqer678GaefgAgdf:[rW4r5ty1gv2y1532efu1yeb1 k!@$534t"; // TODO automatic generation at start and chang regularly
 
 	@Autowired
 	public RepositoryClientFactory(){
@@ -65,7 +66,7 @@ public class RepositoryClientFactory extends ApacheRestfulClientFactory implemen
 		  asynchInit();
         IGenericClient client = super.newGenericClient(theServerBase);
 		  client.registerInterceptor(loggingInterceptor);
-		  IClientInterceptor authInterceptor = new BearerTokenAuthInterceptor("Inside-job abcdef"); // TODO
+		  IClientInterceptor authInterceptor = new BearerTokenAuthInterceptor("Inside-job " + key ); // TODO
 		  client.registerInterceptor(authInterceptor);
 		  AdditionalRequestHeadersInterceptor interceptor = new AdditionalRequestHeadersInterceptor();
 		  interceptor.addHeaderValue("Cache-Control", "no-cache");

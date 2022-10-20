@@ -25,17 +25,18 @@ import java.util.List;
 @Interceptor
 public class SessionAuthorizationInterceptor extends AuthorizationInterceptor {
 	private static final Logger log = LoggerFactory.getLogger(SessionAuthorizationInterceptor.class);
+	private static final String key = "wertyuhkjbasv!#$GFRqer678GaefgAgdf:[rW4r5ty1gv2y1532efu1yeb1 k!@$534t"; // TODO automatic generation at start and chang regularly
+
 
 	@Override
 	public List<IAuthRule> buildRuleList(RequestDetails theRequestDetails) {
 		HttpSession session = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest().getSession(false);
 		Session dataSession = PopServlet.getDataSession();
-		// TODO add secure verification to see if request originates from HL7v2 IIS sandbox functionalities
 
 		String authHeader = theRequestDetails.getHeader("Authorization");
 		OrgAccess orgAccess;
 		try {
-			if(authHeader != null && authHeader.startsWith("Bearer " + "Inside-job abcdef")) { // TODO set random hidden key generation
+			if(authHeader != null && authHeader.startsWith("Bearer " + "Inside-job " + key)) { // TODO set random hidden key generation
 				return new RuleBuilder()
 					.allowAll("Self made request") // TODO use tenant id in header
 					.build();
