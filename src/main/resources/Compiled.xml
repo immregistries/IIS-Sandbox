@@ -20025,6 +20025,48 @@
             </code-status>
         </code>
         <code>
+            <value>80777-0283-02</value>
+            <label>Moderna COVID-19 Vaccine, Bivalent</label>
+            <description>Moderna US, Inc. - COVID-19, mRNA, LNP-S, bivalent booster, PF, 10 mcg/0.2 mLdose</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">230</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">MOD</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">80777-0283-99</link-to>
+            </reference>
+            <use-date>
+                <not-before>20220923</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>80777-283-02</value>
+            <label>Moderna COVID-19 Vaccine, Bivalent</label>
+            <description>Moderna US, Inc. - COVID-19, mRNA, LNP-S, bivalent booster, PF, 10 mcg/0.2 mLdose</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>80777-0283-02</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20221017</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>80777028302</value>
+            <label>Moderna COVID-19 Vaccine, Bivalent</label>
+            <description>Moderna US, Inc. - COVID-19, mRNA, LNP-S, bivalent booster, PF, 10 mcg/0.2 mLdose</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>80777-0283-02</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20221017</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
             <value>58160-0811-43</value>
             <label>PEDIARIX</label>
             <description>GlaxoSmithKline Biologicals SA - DIPHTHERIA AND TETANUS TOXOIDS AND ACELLULAR PERTUSSIS ADSORBED, HEPATITIS B (RECOMBINANT) AND INACT</description>
@@ -20600,6 +20642,48 @@
             </code-status>
         </code>
         <code>
+            <value>59267-0609-01</value>
+            <label>Pfizer-BioNTech Covid-19 Vaccine, Bivalent</label>
+            <description>Pfizer Manufacturing Belgium NV - COVID-19, mRNA, LNP-S, bivalent booster, PF, 3 mcg/0.2 mL dose</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">302</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">PFR</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">59267-0609-02</link-to>
+            </reference>
+            <use-date>
+                <not-before>20220815</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>59267-0609-1</value>
+            <label>Pfizer-BioNTech Covid-19 Vaccine, Bivalent</label>
+            <description>Pfizer Manufacturing Belgium NV - COVID-19, mRNA, LNP-S, bivalent booster, PF, 3 mcg/0.2 mL dose</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>59267-0609-01</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20221017</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>59267060901</value>
+            <label>Pfizer-BioNTech Covid-19 Vaccine, Bivalent</label>
+            <description>Pfizer Manufacturing Belgium NV - COVID-19, mRNA, LNP-S, bivalent booster, PF, 3 mcg/0.2 mL dose</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>59267-0609-01</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20221017</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
             <value>76420-0470-10</value>
             <label>Physicians EZ Use Flu Kit</label>
             <description>MedChem Manufacturing Inc. dba Enovachem - INFLUENZA A VIRUS A/CHRISTCHURCH/16/2010 NIB-74 (H1N1) ANTIGEN (PROPIOLACTONE INACTIVATED), INFLUENZ</description>
@@ -21034,6 +21118,48 @@
                     <new-code-value>00005-2000-01</new-code-value>
                     <reason>Use 11-digit format with dashes</reason>
                     <effective-date>20210823</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>50090-6026-01</value>
+            <label>PREVNAR 20</label>
+            <description>A-S Medication Solutions - Pneumococcal 20-valent Conjugate Vaccine (PCV20)</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">216</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">PFR</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">50090-6026-00</link-to>
+            </reference>
+            <use-date>
+                <not-before>20210810</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>50090-6026-1</value>
+            <label>PREVNAR 20</label>
+            <description>A-S Medication Solutions - Pneumococcal 20-valent Conjugate Vaccine (PCV20)</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>50090-6026-01</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20221017</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>50090602601</value>
+            <label>PREVNAR 20</label>
+            <description>A-S Medication Solutions - Pneumococcal 20-valent Conjugate Vaccine (PCV20)</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>50090-6026-01</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20221017</effective-date>
                 </deprecated>
             </code-status>
         </code>
@@ -24162,6 +24288,24 @@
             <concept-type>vaccine</concept-type>
         </code>
         <code>
+            <value>230</value>
+            <label>COVID-19, mRNA, LNP-S, bivalent booster, PF, 10 mcg/0.2 mL</label>
+            <description>SARS-COV-2 (COVID-19) vaccine, mRNA, spike protein, LNP, bivalent booster, preservative free, 10 mcg/0.2 mL dose Notes: Pre-EUA Moderna bivalent booster (ages 6 mo through 5 yrs), original strain + omicron BA.4/BA.5</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINE_GROUP">COVID-19</link-to>
+                <link-to codeset="VACCINATION_TRADE_NAME">Moderna COVID-19 Vaccine (non-US Spikevax)</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">80777-0283-02</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">80777-0283-99</link-to>
+            </reference>
+            <use-date>
+                <not-before>20221014</not-before>
+            </use-date>
+            <concept-type>vaccine</concept-type>
+        </code>
+        <code>
             <value>301</value>
             <label>COVID-19, mRNA, LNP-S, bivalent booster, PF, 10 mcg/0.2 mL dose</label>
             <description>SARS-COV-2 (COVID-19) vaccine, mRNA, spike protein, LNP, bivalent booster, preservative free, 10 mcg/0.2 mL dose, tris-sucrose formulation Notes: Pre-EUA Pfizer bivalent booster, ages 5-11 yrs, original strain + omicron BA.4/BA.5</description>
@@ -24198,6 +24342,24 @@
             </reference>
             <use-date>
                 <not-before>20220817</not-before>
+            </use-date>
+            <concept-type>vaccine</concept-type>
+        </code>
+        <code>
+            <value>302</value>
+            <label>COVID-19, mRNA, LNP-S, bivalent, PF, 3 mcg/0.2 mL dose</label>
+            <description>SARS-COV-2 (COVID-19) vaccine, mRNA, spike protein, LNP, bivalent, preservative free, 3 mcg/0.2 mL dose, tris-sucrose formulation Notes: Pre-EUA Pfizer bivalent (ages 6 mo through 4 yrs), original strain + omicron BA.4/BA.5</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINE_GROUP">COVID-19</link-to>
+                <link-to codeset="VACCINATION_TRADE_NAME">Pfizer-BioNTech COVID-19 Vaccine (EUA labeled) COMIRNATY (BLA labeled)</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">59267-0609-01</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">59267-0609-02</link-to>
+            </reference>
+            <use-date>
+                <not-before>20221019</not-before>
             </use-date>
             <concept-type>vaccine</concept-type>
         </code>
@@ -27875,6 +28037,8 @@
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">00005-2000-01</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">00005-2000-10</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">00005-2000-02</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">50090-6026-01</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">50090-6026-00</link-to>
             </reference>
             <use-date>
                 <not-before>20210818</not-before>
@@ -30505,6 +30669,8 @@
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">80777-0100-99</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">80777-0282-05</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">80777-0282-99</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">80777-0283-02</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">80777-0283-99</link-to>
             </reference>
             <use-date>
                 <not-before>20201001</not-before>
@@ -30770,6 +30936,10 @@
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">59267-0304-02</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">59267-0565-02</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">59267-1404-02</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">59267-0609-01</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">50090-6026-01</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">59267-0609-02</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">50090-6026-00</link-to>
             </reference>
             <use-date>
                 <not-before>20100528</not-before>
@@ -31674,6 +31844,8 @@
                 <link-to codeset="VACCINATION_CVX_CODE">229</link-to>
                 <link-to codeset="VACCINATION_CVX_CODE">301</link-to>
                 <link-to codeset="VACCINATION_CVX_CODE">300</link-to>
+                <link-to codeset="VACCINATION_CVX_CODE">230</link-to>
+                <link-to codeset="VACCINATION_CVX_CODE">302</link-to>
             </reference>
         </code>
         <code>
@@ -32535,6 +32707,7 @@
                 <link-to codeset="VACCINATION_CVX_CODE">227</link-to>
                 <link-to codeset="VACCINATION_CVX_CODE">228</link-to>
                 <link-to codeset="VACCINATION_CVX_CODE">229</link-to>
+                <link-to codeset="VACCINATION_CVX_CODE">230</link-to>
             </reference>
             <use-date>
                 <not-before>20210713</not-before>
@@ -32610,6 +32783,7 @@
                 <link-to codeset="VACCINATION_CVX_CODE">218</link-to>
                 <link-to codeset="VACCINATION_CVX_CODE">301</link-to>
                 <link-to codeset="VACCINATION_CVX_CODE">300</link-to>
+                <link-to codeset="VACCINATION_CVX_CODE">302</link-to>
             </reference>
             <use-date>
                 <not-before>20210910</not-before>
@@ -60106,6 +60280,48 @@
             </code-status>
         </code>
         <code>
+            <value>80777-0283-99</value>
+            <label>Moderna COVID-19 Vaccine, Bivalent</label>
+            <description>Moderna US, Inc. - COVID-19, mRNA, LNP-S, bivalent booster, PF, 10 mcg/0.2 mL dose</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">230</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">MOD</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">80777-0283-02</link-to>
+            </reference>
+            <use-date>
+                <not-before>20220923</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>80777-283-99</value>
+            <label>Moderna COVID-19 Vaccine, Bivalent</label>
+            <description>Moderna US, Inc. - COVID-19, mRNA, LNP-S, bivalent booster, PF, 10 mcg/0.2 mL dose</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>80777-0283-99</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20221017</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>80777028399</value>
+            <label>Moderna COVID-19 Vaccine, Bivalent</label>
+            <description>Moderna US, Inc. - COVID-19, mRNA, LNP-S, bivalent booster, PF, 10 mcg/0.2 mL dose</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>80777-0283-99</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20221017</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
             <value>58160-0811-52</value>
             <label>PEDIARIX</label>
             <description>GlaxoSmithKline Biologicals SA - DIPHTHERIA AND TETANUS TOXOIDS AND ACELLULAR PERTUSSIS ADSORBED, HEPATITIS B (RECOMBINANT) AND INACT</description>
@@ -60852,6 +61068,48 @@
             </code-status>
         </code>
         <code>
+            <value>59267-0609-02</value>
+            <label>Pfizer-BioNTech Covid-19 Vaccine, Bivalent</label>
+            <description>Pfizer Manufacturing Belgium NV - COVID-19, mRNA, LNP-S, bivalent booster, PF, 3 mcg/0.2 mL dose</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">302</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">PFR</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">59267-0609-01</link-to>
+            </reference>
+            <use-date>
+                <not-before>20220815</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>59267-0609-2</value>
+            <label>Pfizer-BioNTech Covid-19 Vaccine, Bivalent</label>
+            <description>Pfizer Manufacturing Belgium NV - COVID-19, mRNA, LNP-S, bivalent booster, PF, 3 mcg/0.2 mL dose</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>59267-0609-02</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20221017</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>59267060902</value>
+            <label>Pfizer-BioNTech Covid-19 Vaccine, Bivalent</label>
+            <description>Pfizer Manufacturing Belgium NV - COVID-19, mRNA, LNP-S, bivalent booster, PF, 3 mcg/0.2 mL dose</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>59267-0609-02</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20221017</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
             <value>76420-0470-10</value>
             <label>Physicians EZ Use Flu Kit</label>
             <description>MedChem Manufacturing Inc. dba Enovachem - INFLUENZA A VIRUS A/CHRISTCHURCH/16/2010 NIB-74 (H1N1) ANTIGEN (PROPIOLACTONE INACTIVATED), INFLUENZ</description>
@@ -61457,6 +61715,48 @@
                     <new-code-value>00005-2000-02</new-code-value>
                     <reason>Use 11-digit format with dashes</reason>
                     <effective-date>20210823</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>50090-6026-00</value>
+            <label>PREVNAR 20</label>
+            <description>A-S Medication Solutions - Pneumococcal 20-valent Conjugate Vaccine (PCV20)</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">216</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">PFR</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">50090-6026-01</link-to>
+            </reference>
+            <use-date>
+                <not-before>20210810</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>50090-6026-0</value>
+            <label>PREVNAR 20</label>
+            <description>A-S Medication Solutions - Pneumococcal 20-valent Conjugate Vaccine (PCV20)</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>50090-6026-00</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20221017</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>50090602600</value>
+            <label>PREVNAR 20</label>
+            <description>A-S Medication Solutions - Pneumococcal 20-valent Conjugate Vaccine (PCV20)</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>50090-6026-00</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20221017</effective-date>
                 </deprecated>
             </code-status>
         </code>
