@@ -1695,6 +1695,7 @@
             </code-status>
             <reference>
                 <link-to codeset="VACCINATION_VIS_VACCINES">218</link-to>
+                <link-to codeset="VACCINATION_VIS_VACCINES">301</link-to>
             </reference>
             <use-date>
                 <not-before>20211029</not-before>
@@ -20038,6 +20039,8 @@
             </reference>
             <use-date>
                 <not-before>20220923</not-before>
+                <not-expected-after>20230421</not-expected-after>
+                <not-after>20231021</not-after>
             </use-date>
         </code>
         <code>
@@ -20655,6 +20658,8 @@
             </reference>
             <use-date>
                 <not-before>20220815</not-before>
+                <not-expected-after>20230421</not-expected-after>
+                <not-after>20231021</not-after>
             </use-date>
         </code>
         <code>
@@ -21135,6 +21140,8 @@
             </reference>
             <use-date>
                 <not-before>20210810</not-before>
+                <not-expected-after>20230421</not-expected-after>
+                <not-after>20231021</not-after>
             </use-date>
         </code>
         <code>
@@ -43421,6 +43428,19 @@
             </use-date>
         </code>
         <code>
+            <value>301</value>
+            <label>COVID-19 Pfizer BioNTech EUA Recipient-Caregiver Fact Sheet- Pediatric 5yrs to &lt;12 yrs</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300042411211001</link-to>
+            </reference>
+            <use-date>
+                <not-before>20221012</not-before>
+            </use-date>
+        </code>
+        <code>
             <value>219</value>
             <label>COVID-19 Pfizer BioNTech EUA Recipient-Caregiver Fact Sheet- Pediatric &lt;5 yrs</label>
             <code-status>
@@ -60293,6 +60313,8 @@
             </reference>
             <use-date>
                 <not-before>20220923</not-before>
+                <not-expected-after>20230421</not-expected-after>
+                <not-after>20231021</not-after>
             </use-date>
         </code>
         <code>
@@ -61081,6 +61103,8 @@
             </reference>
             <use-date>
                 <not-before>20220815</not-before>
+                <not-expected-after>20230421</not-expected-after>
+                <not-after>20231021</not-after>
             </use-date>
         </code>
         <code>
@@ -61732,6 +61756,8 @@
             </reference>
             <use-date>
                 <not-before>20210810</not-before>
+                <not-expected-after>20230421</not-expected-after>
+                <not-after>20231021</not-after>
             </use-date>
         </code>
         <code>
