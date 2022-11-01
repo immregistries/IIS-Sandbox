@@ -44,8 +44,28 @@
         </repository>
     </repositories>
 
+<!--    <dependencyManagement>-->
+<!--        <dependencies>-->
+<!--            <dependency>-->
+<!--                <groupId>org.springframework.session</groupId>-->
+<!--                <artifactId>spring-session-bom</artifactId>-->
+<!--                <version>2021.2.0</version>-->
+<!--                <type>pom</type>-->
+<!--                <scope>import</scope>-->
+<!--            </dependency>-->
+<!--        </dependencies>-->
+<!--    </dependencyManagement>-->
 
     <dependencies>
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.session</groupId>-->
+<!--            <artifactId>spring-session-data-redis</artifactId>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>io.lettuce</groupId>-->
+<!--            <artifactId>lettuce-core</artifactId>-->
+<!--            <version>6.1.8.RELEASE</version>-->
+<!--        </dependency>-->
     <!-- IIS Sandbox dependencies -->
         <dependency>
             <groupId>org.mindrot</groupId>
@@ -452,8 +472,8 @@
             </plugins>
         </pluginManagement>
 
-        <!-- Tells Maven to name the generated WAR file as iis-jpa.war -->
-        <finalName>iis-jpa</finalName>
+        <!-- Tells Maven to name the generated WAR file as iis-sandbox-jpa.war -->
+        <finalName>iis-sandbox-jpa</finalName>
 
         <plugins>
             <plugin>
@@ -622,7 +642,7 @@
                     <ignoredResourcePatterns>
                         <ignoredResourcePattern>.*\.txt$</ignoredResourcePattern>
                         <ignoredResourcePattern>.*\.html$</ignoredResourcePattern>
-                        <ignoredResourcePattern>config/favicon.ico</ignoredResourcePattern>
+                        <ignoredResourcePattern>config/img/favicon.ico</ignoredResourcePattern>
                     </ignoredResourcePatterns>
                 </configuration>
             </plugin>

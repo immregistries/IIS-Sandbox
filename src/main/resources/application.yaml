@@ -7,7 +7,7 @@ management:
         include: "health,prometheus"
 server:
   servlet:
-    contextPath: "/iis-jpa"
+    contextPath: "/iis-sandbox-jpa"
 spring:
 #  session:
 #    store-type:  # Session store type.
@@ -160,7 +160,7 @@ hapi:
 #      home:
 ##        id: home
 #        name: Local Tester
-#        server_address: 'http://localhost:8080/iis-jpa/fhir/overlay-test'
+#        server_address: 'http://localhost:8080/iis-sandbox-jpa/fhir/overlay-test'
 #        refuse_to_fetch_third_party_urls: false
 #        fhir_version: R5
 #      global:

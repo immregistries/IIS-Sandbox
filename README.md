@@ -12,7 +12,7 @@ The HAPI fhir Server uses H2 database.
 
 Compile and run :
 ```
-mvn clean package -Pboot && java -jar --add-opens java.base/java.lang=ALL-UNNAMED target/iis-jpa.war
+mvn clean package -Pboot && java -jar --add-opens java.base/java.lang=ALL-UNNAMED target/iis-sandbox-jpa.war
 ```
 Compile only:
 ```

@@ -316,12 +316,12 @@ public class PatientServlet extends HttpServlet {
         }
 
         {
-          String link = req.getContextPath().split("/patient")[0] = "/iis-jpa/fhir/" + orgAccess.getAccessName() + "/Patient/"
+          String link = req.getContextPath().split("/patient")[0] = "/iis-sandbox-jpa/fhir/" + orgAccess.getAccessName() + "/Patient/"
 	              + patientReportedSelected.getPatientReportedId();
 			  out.println("<a href=\"" + link + "\">FHIR Resource</a>");
         }
 		  {
-          String link = req.getContextPath().split("/patient")[0] = "/iis-jpa/fhir/" + orgAccess.getAccessName() + "/Patient?identifier="
+          String link = req.getContextPath().split("/patient")[0] = "/iis-sandbox-jpa/fhir/" + orgAccess.getAccessName() + "/Patient?identifier="
 	              + patientReportedSelected.getPatientReportedExternalLink();
           out.println("<a href=\"" + link + "\">all FHIR Resources</a>");
         }
