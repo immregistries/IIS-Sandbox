@@ -9,15 +9,15 @@ server:
   servlet:
     contextPath: "/iis-sandbox-jpa"
 spring:
-#  session:
-#    store-type:  # Session store type.
-#      redis:
-#        flush-mode: on-save
-#        namespace: spring:session
-#  redis:
-#    host: localhost
-#    password:
-#    port: 6379
+  session:
+    redis:
+      flush-mode: on_save
+      namespace: spring:session
+#    store-type: 'redis' # Session store type.
+  redis:
+    host: localhost
+    password:
+    port: 6379
 
   main:
     allow-circular-references: true
@@ -27,11 +27,15 @@ spring:
     check-location: false
     baselineOnMigrate: true
   datasource:
-    url: 'jdbc:h2:file:./target/database/h2'
-    #url: jdbc:h2:mem:test_mem
-    username: sa
-    password: null
-    driverClassName: org.h2.Driver
+    url: 'jdbc:postgresql://localhost:5432/hapi_fhir_iis'
+    username: hapi_iis_web
+    password: SicMundusCreatusEst
+    driver-class-name: org.postgresql.Driver
+#    url: 'jdbc:h2:~/data/h2/test'
+#    url: 'jdbc:h2:file:./target/database/h2'
+#    driverClassName: org.h2.Driver
+#    url: jdbc:h2:mem:test_mem
+
     max-active: 15
 
     # database connection pool size
@@ -45,7 +49,8 @@ spring:
       #If using H2, then supply the value of ca.uhn.fhir.jpa.model.dialect.HapiFhirH2Dialect
       #If using postgres, then supply the value of ca.uhn.fhir.jpa.model.dialect.HapiFhirPostgres94Dialect
 
-      hibernate.dialect: ca.uhn.fhir.jpa.model.dialect.HapiFhirH2Dialect
+#      hibernate.dialect: ca.uhn.fhir.jpa.model.dialect.HapiFhirH2Dialect
+      hibernate.dialect: ca.uhn.fhir.jpa.model.dialect.HapiFhirPostgres94Dialect
   #      hibernate.hbm2ddl.auto: update
   #      hibernate.jdbc.batch_size: 20
   #      hibernate.cache.use_query_cache: false
