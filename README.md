@@ -6,6 +6,12 @@ JDK  17  needed.
 Currently working with a customized version of Hapi fhir hosted here :
 https://github.com/cerbeor/hapi-fhir-Subscription-custom/tree/6.1.2-sub-sandbox
 
+Hapi fhir requires a postgresql database 
+ - on address ``postgresql://localhost:5432/hapi_fhir_iis`` (this can be changed in application.yaml).
+
+ - Generation script: ``/src/main/database/create-postgresql-for-hapi-fhir.sql``
+
+
 For the current authentication and message log system, a Mysql Database is required, creation script : ``/src/main/database/create-database.sql``.
 
 The HAPI fhir Server uses H2 database.
