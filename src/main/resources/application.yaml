@@ -9,16 +9,6 @@ server:
   servlet:
     contextPath: "/iis-sandbox-jpa"
 spring:
-  session:
-    redis:
-      flush-mode: on_save
-      namespace: spring:session
-#    store-type: 'redis' # Session store type.
-  redis:
-    host: localhost
-    password:
-    port: 6379
-
   main:
     allow-circular-references: true
     #allow-bean-definition-overriding: true

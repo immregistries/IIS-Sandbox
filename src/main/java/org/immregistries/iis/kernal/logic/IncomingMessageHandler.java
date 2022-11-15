@@ -251,7 +251,6 @@ public class IncomingMessageHandler {
 
   @SuppressWarnings("unchecked")
   public String processVXU(OrgAccess orgAccess, HL7Reader reader, String message) {
-	  IGenericClient fhirClient = getFhirClient();
 	  List<ProcessingException> processingExceptionList = new ArrayList<>();
     try {
       Set<ProcessingFlavor> processingFlavorSet = orgAccess.getOrg().getProcessingFlavorSet();
@@ -466,7 +465,6 @@ public class IncomingMessageHandler {
                 modelPerson.setProfessionalSuffix(reader.getValue(10, 21));
 //					  Person  p = PersonMapper.getFhirPerson(modelPerson);
 					  modelPerson = fhirRequests.savePractitioner(modelPerson);
-//					  modelPerson = fhirRequests.save(fhirClient,modelPerson);
 				  }
               vaccinationReported.setAdministeringProvider(modelPerson);
             }
@@ -606,7 +604,6 @@ public class IncomingMessageHandler {
       List<ProcessingException> processingExceptionList, Set<ProcessingFlavor> processingFlavorSet,
       CodeMap codeMap, boolean strictDate, PatientReported patientReported)
       throws ProcessingException {
-	  IGenericClient fhirClient = getFhirClient();
 
 //    PatientMaster patientMaster = null;
     String patientReportedExternalLink = "";
@@ -958,7 +955,6 @@ public class IncomingMessageHandler {
   }
 
   public String processORU(OrgAccess orgAccess, HL7Reader reader, String message) {
-		IGenericClient fhirClient = getFhirClient();
     List<ProcessingException> processingExceptionList = new ArrayList<>();
     try {
       Set<ProcessingFlavor> processingFlavorSet = orgAccess.getOrg().getProcessingFlavorSet();
@@ -1265,7 +1261,7 @@ public class IncomingMessageHandler {
         printQueryNK1(patientReported, sb, codeMap);
       }
 		List<VaccinationMaster> vaccinationMasterList =
-          getVaccinationMasterList(patientMaster, fhirClient);
+          getVaccinationMasterList(patientMaster);
 
       if (processingFlavorSet.contains(ProcessingFlavor.LEMON)) {
         for (Iterator<VaccinationMaster> it = vaccinationMasterList.iterator(); it.hasNext();) {
@@ -1762,9 +1758,8 @@ public class IncomingMessageHandler {
     return sb.toString();
   }
 
-  public List<VaccinationMaster> getVaccinationMasterList(PatientMaster patient,
-																					  IGenericClient fhirClient) {
-
+  public List<VaccinationMaster> getVaccinationMasterList(PatientMaster patient) {
+	  IGenericClient fhirClient = getFhirClient();
 	  SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
     List<VaccinationMaster> vaccinationMasterList;
     {

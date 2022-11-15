@@ -34,38 +34,8 @@
 
     <name>HAPI FHIR JPA IIS Sandbox</name>
 
-    <repositories>
-        <repository>
-            <id>oss-snapshots</id>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-            <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
-        </repository>
-    </repositories>
-
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.springframework.session</groupId>
-                <artifactId>spring-session-bom</artifactId>
-                <version>2021.1.1</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
 
     <dependencies>
-<!--        <dependency>-->
-<!--            <groupId>org.springframework.session</groupId>-->
-<!--            <artifactId>spring-session-data-redis</artifactId>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>io.lettuce</groupId>-->
-<!--            <artifactId>lettuce-core</artifactId>-->
-<!--            <version>6.1.8.RELEASE</version>-->
-<!--        </dependency>-->
     <!-- IIS Sandbox dependencies -->
         <dependency>
             <groupId>org.mindrot</groupId>
@@ -141,12 +111,12 @@
         <dependency>
             <groupId>com.sun.faces</groupId>
             <artifactId>jsf-api</artifactId>
-            <version>2.1.7</version>
+            <version>2.2.20</version>
         </dependency>
         <dependency>
             <groupId>com.sun.faces</groupId>
             <artifactId>jsf-impl</artifactId>
-            <version>2.1.7</version>
+            <version>2.2.20</version>
         </dependency>
 
         <!--HAPI FHIR JPA Dependency-->

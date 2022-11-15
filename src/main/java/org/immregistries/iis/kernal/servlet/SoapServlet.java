@@ -72,7 +72,9 @@ public class SoapServlet extends HttpServlet {
             if (orgAccess == null) {
               throw new SecurityException("Username/password combination is unrecognized");
             } else {
-              ack = handler.process(message, orgAccess);
+					HttpSession session = req.getSession(true);
+					session.setAttribute("orgAccess",orgAccess);
+					ack = handler.process(message, orgAccess);
             }
           } catch (Exception e) {
             throw new UnknownFault("Unable to process request: " + e.getMessage(), e);
