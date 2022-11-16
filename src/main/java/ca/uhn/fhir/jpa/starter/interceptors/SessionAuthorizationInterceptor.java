@@ -51,7 +51,9 @@ public class SessionAuthorizationInterceptor extends AuthorizationInterceptor {
 				String base64decoded = new String(Base64.decodeBase64(base64));
 				String[] parts = base64decoded.split(":");
 				orgAccess = ServletHelper.authenticateOrgAccess( parts[0], parts[1], theRequestDetails.getTenantId(), dataSession);
-				session.setAttribute("orgAccess",orgAccess);
+				if (session != null){
+					session.setAttribute("orgAccess",orgAccess);
+				}
 			} else if (session != null && session.getAttribute("orgAccess") != null) {
 				orgAccess = (OrgAccess) session.getAttribute("orgAccess");
 			}
