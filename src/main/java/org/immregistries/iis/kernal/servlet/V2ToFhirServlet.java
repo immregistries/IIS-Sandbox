@@ -82,7 +82,7 @@ public class V2ToFhirServlet extends HttpServlet {
         createPatientResource(pr, p);
         bundle.addEntry().setResource(p);
         List<VaccinationMaster> vaccinationMasterList =
-            incomingMessageHandler.getVaccinationMasterList(pr.getPatient(),fhirClient);
+            incomingMessageHandler.getVaccinationMasterList(pr.getPatient());
 
         for (VaccinationMaster vaccination : vaccinationMasterList) {
           Immunization immunization = new Immunization();
