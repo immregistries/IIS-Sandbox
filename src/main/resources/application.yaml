@@ -1,5 +1,8 @@
 #Adds the option to go to eg. http://localhost:8080/actuator/health for seeing the running configuration
 #see https://docs.spring.io/spring-boot/docs/current/reference/html/actuator.html#actuator.endpoints
+
+#Used for all profiles
+
 management:
   endpoints:
     web:
@@ -199,3 +202,26 @@ hapi:
 #  protocol: 'http'
 #  schema_management_strategy: CREATE
 #  username: SomeUsername
+#
+## Prod profile only properties to set up with postgresql
+---
+spring:
+  config.activate.on-profile: prod
+  datasource:
+    url: 'jdbc:postgresql://localhost:5432/hapi_fhir_iis'
+    username: hapi_iis_web
+    password: SicMundusCreatusEst
+    driver-class-name: org.postgresql.Driver
+jpa.properties.hibernate.dialect: ca.uhn.fhir.jpa.model.dialect.HapiFhirPostgres94Dialect
+#
+## Dev profile only properties to set up with H2
+---
+spring:
+  config.activate.on-profile: dev
+  datasource:
+    url: 'jdbc:h2:file:./target/database/h2'
+    username: sa
+    password: null
+    driverClassName: org.h2.Driver
+jpa.properties.hibernate.dialect: ca.uhn.fhir.jpa.model.dialect.HapiFhirH2Dialect
+

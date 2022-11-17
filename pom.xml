@@ -636,6 +636,37 @@
     </build>
 
     <profiles>
+        <profile>
+            <id>prod</id>
+            <properties>
+                <activatedProperties>prod</activatedProperties>
+                <maven.test.skip>true</maven.test.skip>
+            </properties>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-web</artifactId>
+                    <version>${spring_boot_version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>dev</id>
+            <properties>
+                <activatedProperties>dev</activatedProperties>
+                <maven.test.skip>true</maven.test.skip>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-web</artifactId>
+                    <version>${spring_boot_version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
         <!-- Package the war for your preference. Use the boot profile if you prefer a single jar/war
         that can be started with and embedded application server. Default is jetty as it is assumed
         that the main users of this project already have an app server.
@@ -651,6 +682,9 @@
         <!-- Use the boot profile for development and debugging options when using your IDE -->
         <profile>
             <id>boot</id>
+            <properties>
+                <activatedProperties>prod</activatedProperties>
+            </properties>
             <dependencies>
                 <dependency>
                     <groupId>org.springframework.boot</groupId>
@@ -664,6 +698,10 @@
         <!-- java -jar -Dspring.batch.job.enabled=false jetty-runner.jar target/hapi-fhir-jpaserver.war -->
         <profile>
             <id>jetty</id>
+            <properties>
+                <activatedProperties>prod</activatedProperties>
+                <maven.test.skip>true</maven.test.skip>
+            </properties>
             <dependencies>
                 <dependency>
                     <groupId>org.springframework.boot</groupId>
