@@ -1,18 +1,11 @@
 package ca.uhn.fhir.jpa.starter.interceptors;
 
 import ca.uhn.fhir.i18n.Msg;
-import ca.uhn.fhir.interceptor.api.Hook;
-import ca.uhn.fhir.interceptor.api.Pointcut;
 import ca.uhn.fhir.interceptor.model.RequestPartitionId;
 import ca.uhn.fhir.jpa.dao.data.IPartitionDao;
-import ca.uhn.fhir.jpa.entity.PartitionEntity;
-import ca.uhn.fhir.jpa.partition.IPartitionLookupSvc;
-import ca.uhn.fhir.jpa.partition.PartitionLookupSvcImpl;
 import ca.uhn.fhir.jpa.partition.PartitionManagementProvider;
-import ca.uhn.fhir.jpa.rp.r5.SubscriptionTopicResourceProvider;
 import ca.uhn.fhir.rest.api.server.RequestDetails;
 import ca.uhn.fhir.rest.server.exceptions.InternalErrorException;
-import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
 import ca.uhn.fhir.rest.server.interceptor.partition.RequestTenantPartitionInterceptor;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.r5.model.IntegerType;
@@ -34,8 +27,6 @@ import java.util.Random;
 @Component
 @Interceptor
 public class PartitionCreationInterceptor extends RequestTenantPartitionInterceptor {
-	@Autowired
-	SubscriptionTopicResourceProvider subscriptionTopicResourceProvider;
 	@Autowired
 	private IPartitionDao myPartitionDao;
 	@Autowired

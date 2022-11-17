@@ -28,7 +28,7 @@ import java.util.List;
 @Component
 @Interceptor
 public class SessionAuthorizationInterceptor extends AuthorizationInterceptor {
-	private static final Logger log = LoggerFactory.getLogger(SessionAuthorizationInterceptor.class);
+	private static final Logger logger = LoggerFactory.getLogger(SessionAuthorizationInterceptor.class);
 	private static final String key = "wertyuhkjbasv!#$GFRqer678GaefgAgdf:[rW4r5ty1gv2y1532efu1yeb1 k!@$534t"; // TODO automatic generation at start and chang regularly
 
 
@@ -72,9 +72,10 @@ public class SessionAuthorizationInterceptor extends AuthorizationInterceptor {
 
 		if (orgAccess.getOrg().getOrganizationName() != null) {
 			return new RuleBuilder()
-				.allow()
-				.read()
-				.resourcesOfType("Subscription").withAnyId().forTenantIds("DEFAULT")
+				.allow() .read()
+				.resourcesOfType("Subscriptions").withAnyId().forTenantIds("DEFAULT")
+				.andThen().allow().read()
+				.resourcesOfType("SubscriptionTopic").withAnyId().forTenantIds("DEFAULT")
 				.andThen()
 				.allowAll("Logged in as " + orgAccess.getOrg().getOrganizationName())
 				.forTenantIds(orgAccess.getOrg().getOrganizationName())
