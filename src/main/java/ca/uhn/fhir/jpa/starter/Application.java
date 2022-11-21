@@ -101,17 +101,17 @@ public class Application extends SpringBootServletInitializer {
 
   }
 
-	@Bean public RequestContextListener requestContextListener(){
-		return new RequestContextListener();
-	}
+  @Bean public RequestContextListener requestContextListener(){
+	  return new RequestContextListener();
+  }
 
-	@Bean
+  @Bean
   public ServletRegistrationBean homeServletRegistrationBean() {
 	  ServletRegistrationBean registrationBean = new ServletRegistrationBean();
 	  HomeServlet servlet = new HomeServlet();
 	  beanFactory.autowireBean(servlet);
 	  registrationBean.setServlet(servlet);
-	  registrationBean.addUrlMappings("/home");
+	  registrationBean.addUrlMappings("/","/home");
 	  registrationBean.setLoadOnStartup(1);
 	  return registrationBean;
   }
