@@ -82,8 +82,51 @@ public class IncomingMessageHandler {
     String responseMessage;
     try {
       Set<ProcessingFlavor> processingFlavorSet = orgAccess.getOrg().getProcessingFlavorSet();
+		String facilityId = reader.getValue(4);
+
+		Organization sendingOrganization;
+		Bundle bundle = getFhirClient().search()
+			.forResource(Organization.class).returnBundle(Bundle.class)
+			.where(Organization.IDENTIFIER.exactly()
+				.systemAndIdentifier(reader.getValue(4,1),reader.getValue(4,2)))
+			.execute();
+		if (bundle.hasEntry()) {
+			sendingOrganization = (Organization) bundle.getEntryFirstRep().getResource();
+		} else {
+			sendingOrganization = new Organization()
+				.setName(reader.getValue(4,1))
+				.addIdentifier(new Identifier()
+					.setSystem(reader.getValue(4,2))
+					.setValue(reader.getValue(4,10)));
+		}
+		Organization managingOrganization = null;
+		String managingIdentifier = null;
+		if (reader.getValue(22,11) != null) {
+			managingIdentifier = reader.getValue(22,11);
+		} else if (reader.getValue(22,3) != null){
+			managingIdentifier = reader.getValue(22,3);
+		}
+		if (managingIdentifier != null) {
+			Bundle managingBundle = getFhirClient().search()
+				.forResource(Organization.class).returnBundle(Bundle.class)
+				.where(Organization.IDENTIFIER.exactly()
+					.systemAndIdentifier(reader.getValue(22,7), managingIdentifier))
+				.execute();
+			if (managingBundle.hasEntry()) {
+				managingOrganization = (Organization) managingBundle.getEntryFirstRep().getResource();
+			} else {
+				managingOrganization = new Organization();
+				managingOrganization.setName(reader.getValue(22,1));
+				managingOrganization.addIdentifier()
+					.setValue(managingIdentifier)
+					.setSystem(reader.getValue(22,7));
+			}
+		}
+		fhirRequests.saveOrganization(sendingOrganization);
+		if (managingOrganization != null){
+			fhirRequests.saveOrganization(managingOrganization);
+		}
       if (processingFlavorSet.contains(ProcessingFlavor.SOURSOP)) {
-        String facilityId = reader.getValue(4);
         if (!facilityId.equals(orgAccess.getOrg().getOrganizationName())) {
           throw new ProcessingException("Not allowed to submit for facility indicated in MSH-4",
               "MSH", 1, 4);
@@ -91,10 +134,10 @@ public class IncomingMessageHandler {
       }
 		 switch (messageType) {
 			 case "VXU":
-				 responseMessage = processVXU(orgAccess, reader, message);
+				 responseMessage = processVXU(orgAccess, reader, message, managingOrganization);
 				 break;
 			 case "ORU":
-				 responseMessage = processORU(orgAccess, reader, message);
+				 responseMessage = processORU(orgAccess, reader, message, managingOrganization);
 				 break;
 			 case "QBP":
 				 responseMessage = processQBP(orgAccess, reader, message);
@@ -108,6 +151,7 @@ public class IncomingMessageHandler {
 					 orgAccess.getOrg());
 				 break;
 		 }
+
     } catch (Exception e) {
       e.printStackTrace(System.err);
       List<ProcessingException> processingExceptionList = new ArrayList<>();
@@ -250,7 +294,7 @@ public class IncomingMessageHandler {
   }
 
   @SuppressWarnings("unchecked")
-  public String processVXU(OrgAccess orgAccess, HL7Reader reader, String message) {
+  public String processVXU(OrgAccess orgAccess, HL7Reader reader, String message, Organization managingOrganization) {
 	  List<ProcessingException> processingExceptionList = new ArrayList<>();
     try {
       Set<ProcessingFlavor> processingFlavorSet = orgAccess.getOrg().getProcessingFlavorSet();
@@ -259,7 +303,7 @@ public class IncomingMessageHandler {
 
       boolean strictDate = !processingFlavorSet.contains(ProcessingFlavor.CANTALOUPE);
 		PatientReported patientReported = processPatient(orgAccess, reader, processingExceptionList,
-          processingFlavorSet, codeMap, strictDate,null);
+          processingFlavorSet, codeMap, strictDate,null, managingOrganization);
 
 
 
@@ -601,8 +645,8 @@ public class IncomingMessageHandler {
 
   @SuppressWarnings("unchecked")
   public PatientReported processPatient(OrgAccess orgAccess, HL7Reader reader,
-      List<ProcessingException> processingExceptionList, Set<ProcessingFlavor> processingFlavorSet,
-      CodeMap codeMap, boolean strictDate, PatientReported patientReported)
+													 List<ProcessingException> processingExceptionList, Set<ProcessingFlavor> processingFlavorSet,
+													 CodeMap codeMap, boolean strictDate, PatientReported patientReported, Organization managingOrganization)
       throws ProcessingException {
 
 //    PatientMaster patientMaster = null;
@@ -645,6 +689,7 @@ public class IncomingMessageHandler {
         patientReported.setOrgReported(orgAccess.getOrg());
         patientReported.setPatientReportedExternalLink(patientReportedExternalLink);
         patientReported.setReportedDate(new Date());
+		  patientReported.setPatientReportedAuthority( "Organization/"+ managingOrganization.getId());
     }
 
     {
@@ -729,14 +774,6 @@ public class IncomingMessageHandler {
             "Patient is indicated as being born in the future, unable to record patients who are not yet born",
             "PID", 1, 7);
       }
-//      patientMaster.setPatientAddressFrag(addressFrag);
-//      patientMaster.setPatientNameLast(patientNameLast);
-//      patientMaster.setPatientNameFirst(patientNameFirst);
-//      patientMaster.setPatientNameMiddle(patientNameMiddle);
-////      patientMaster.setPatientPhoneFrag(patientPhone);
-//      patientMaster.setPatientBirthDate(patientBirthDate);
-////      patientMaster.setPatientSoundexFirst("");
-////      patientMaster.setPatientSoundexLast("");
       patientReported.setPatientReportedExternalLink(patientReportedExternalLink);
       patientReported.setPatientReportedType(patientReportedType);
       patientReported.setPatientNameFirst(patientNameFirst);
@@ -954,7 +991,7 @@ public class IncomingMessageHandler {
     return patientReported;
   }
 
-  public String processORU(OrgAccess orgAccess, HL7Reader reader, String message) {
+  public String processORU(OrgAccess orgAccess, HL7Reader reader, String message, Organization managingOrganization) {
     List<ProcessingException> processingExceptionList = new ArrayList<>();
     try {
       Set<ProcessingFlavor> processingFlavorSet = orgAccess.getOrg().getProcessingFlavorSet();
@@ -963,7 +1000,7 @@ public class IncomingMessageHandler {
 
       boolean strictDate = !processingFlavorSet.contains(ProcessingFlavor.CANTALOUPE);
 		 PatientReported patientReported = processPatient(orgAccess, reader, processingExceptionList,
-          processingFlavorSet, codeMap, strictDate, null);
+          processingFlavorSet, codeMap, strictDate, null, managingOrganization);
 
       int orcCount = 0;
       int obxCount = 0;

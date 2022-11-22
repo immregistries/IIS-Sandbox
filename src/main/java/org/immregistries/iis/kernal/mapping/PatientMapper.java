@@ -210,7 +210,7 @@ public class PatientMapper {
 	public Patient getFhirResource(PatientReported pr) {
 		Patient p = new Patient();
 		p.addIdentifier(MappingHelper.getFhirIdentifier(MRN_SYSTEM, pr.getPatientReportedExternalLink()));
-//			p.setManagingOrganization(MappingHelper.getFhirReference("","PatientReportedAuthority",pr.getPatientReportedAuthority()));
+		p.setManagingOrganization(new Reference("Organization/" + pr.getPatientReportedAuthority()));
 		p.setBirthDate(pr.getPatientBirthDate());
 		if (p.getNameFirstRep() != null) {
 			HumanName name = p.addName()

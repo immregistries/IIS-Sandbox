@@ -204,6 +204,14 @@ public class FhirRequests {
 		}
 		return vaccinationReported;
 	}
+	public Organization searchOrganization(ICriterion... where) {
+		Organization organization = null;
+		Bundle bundle = search(Organization.class, where);
+		if (bundle.hasEntry()) {
+			organization = (Organization) bundle.getEntryFirstRep().getResource();
+		}
+		return organization;
+	}
 	public List<VaccinationReported> searchVaccinationReportedList(ICriterion... where) {
 		List<VaccinationReported> vaccinationReportedList = new ArrayList<>();
 		Bundle bundle = searchRegularRecord(Immunization.class, where);
@@ -335,6 +343,19 @@ public class FhirRequests {
 			orgLocation.setOrgLocationId(outcome.getResource().getIdElement().getIdPart());
 		}
 		return orgLocation;
+	}
+	public Organization saveOrganization(Organization organization) {
+		MethodOutcome outcome = save(organization,
+			Organization.IDENTIFIER.exactly().identifier(organization.getIdentifierFirstRep().getValue())
+			);
+		if (!outcome.getResource().isEmpty()) {
+			return (Organization) outcome.getResource();
+		} else if (outcome.getCreated() != null && outcome.getCreated()){
+			organization.setId(outcome.getId().getIdPart());
+			return organization;
+		} else {
+			return null;
+		}
 	}
 
 	public PatientMaster readPatientMaster(String id) {

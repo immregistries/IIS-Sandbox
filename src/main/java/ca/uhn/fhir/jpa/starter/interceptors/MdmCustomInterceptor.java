@@ -125,22 +125,13 @@ public class MdmCustomInterceptor {
 				Immunization golden_i = (Immunization) entry.getResource();
 				i2 = toVaccDedupImmunization(golden_i, theRequestDetails);
 				comparison = comparer.compare(i1,i2);
-//				mdmLinkDaoSvc.createOrUpdateLinkEntity(golden_i,immunization, MdmMatchOutcome.POSSIBLE_MATCH, MdmLinkSourceEnum.MANUAL,mdmTransactionContext);
-//				if (comparison.equals(ComparisonResult.UNSURE)) {
-//					mdmProvider.createLink(
-//						new StringType("Immunization/" + golden_i.getId().split("Immunization/")[1]),
-//						new StringType("Immunization/" + immunization.getId().split("Immunization/")[1]),
-//						new StringType("POSSIBLE_MATCH"),
-//						servletRequestDetails
-//					);
-//					hasMatch = true;
-//					break;
-//				}
+				String matching_level = (golden_i.getPatient().equals(immunization.getPatient()))? "MATCH" : "POSSIBLE_MATCH";
+				// TODO scan mdm links to check match level
 				if (comparison.equals(ComparisonResult.EQUAL)) {
 					mdmProvider.createLink(
 						new StringType("Immunization/" + golden_i.getId().split("Immunization/")[1]),
 						new StringType("Immunization/" + immunization.getId().split("Immunization/")[1]),
-						new StringType("MATCH"),
+						new StringType(matching_level),
 						servletRequestDetails
 					);
 					hasMatch = true;
