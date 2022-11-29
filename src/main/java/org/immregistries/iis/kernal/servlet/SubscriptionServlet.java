@@ -106,7 +106,7 @@ public class SubscriptionServlet extends HttpServlet {
 				IBaseResource parsedResource = parser.parseResource(message);
 				Subscription subscription = (Subscription) searchBundle.getEntryFirstRep().getResource();
 
-				MethodOutcome methodOutcome = localClient.create().resource(parsedResource).execute();
+//				MethodOutcome methodOutcome = localClient.create().resource(parsedResource).execute();
 //				List<IPrimitiveType<String>> ids = new ArrayList<>();
 //				ids.add(methodOutcome.getId());
 //				List<IPrimitiveType<String>> urls = new ArrayList<>();
@@ -114,12 +114,12 @@ public class SubscriptionServlet extends HttpServlet {
 //				subscriptionTriggeringProvider.triggerSubscription(new IdType(subscription.getId()),ids,urls);
 
 
-//				ResourceDeliveryMessage resourceDeliveryMessage = new ResourceDeliveryMessage();
-//				resourceDeliveryMessage.setSubscription(subscriptionCanonicalizer.canonicalize(subscription));
-//				resourceDeliveryMessage.setPartitionId(RequestPartitionId.fromPartitionName(""+orgAccess.getAccessName()));
-//				resourceDeliveryMessage.setOperationType(BaseResourceMessage.OperationTypeEnum.UPDATE);
-//				resourceDeliveryMessage.setPayload(fhirContext,parsedResource, EncodingEnum.JSON);
-//				subscriptionDeliveringRestHookSubscriber.handleMessage(resourceDeliveryMessage);
+				ResourceDeliveryMessage resourceDeliveryMessage = new ResourceDeliveryMessage();
+				resourceDeliveryMessage.setSubscription(subscriptionCanonicalizer.canonicalize(subscription));
+				resourceDeliveryMessage.setPartitionId(RequestPartitionId.fromPartitionName(""+orgAccess.getAccessName()));
+				resourceDeliveryMessage.setOperationType(BaseResourceMessage.OperationTypeEnum.UPDATE);
+				resourceDeliveryMessage.setPayload(fhirContext,parsedResource, EncodingEnum.JSON);
+				subscriptionDeliveringRestHookSubscriber.handleMessage(resourceDeliveryMessage);
 
 
 //				IGenericClient endpointClient = repositoryClientFactory.newGenericClient(subscription.getEndpoint());
@@ -151,6 +151,7 @@ public class SubscriptionServlet extends HttpServlet {
 			resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 			e.printStackTrace(out);
 			e.printStackTrace(System.err);
+			// TODO add exception handling interceptor
 		}
 		out.flush();
 		out.close();

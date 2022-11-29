@@ -124,7 +124,7 @@ public class IncomingMessageHandler {
 		}
 		fhirRequests.saveOrganization(sendingOrganization);
 		if (managingOrganization != null){
-			fhirRequests.saveOrganization(managingOrganization);
+			managingOrganization = fhirRequests.saveOrganization(managingOrganization);
 		}
       if (processingFlavorSet.contains(ProcessingFlavor.SOURSOP)) {
         if (!facilityId.equals(orgAccess.getOrg().getOrganizationName())) {
@@ -689,7 +689,7 @@ public class IncomingMessageHandler {
         patientReported.setOrgReported(orgAccess.getOrg());
         patientReported.setPatientReportedExternalLink(patientReportedExternalLink);
         patientReported.setReportedDate(new Date());
-		  patientReported.setPatientReportedAuthority( "Organization/"+ managingOrganization.getId());
+		  patientReported.setManagingOrganizationId(managingOrganization.getId());
     }
 
     {

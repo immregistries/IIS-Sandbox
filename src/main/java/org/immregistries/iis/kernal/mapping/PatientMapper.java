@@ -47,8 +47,9 @@ public class PatientMapper {
 		patientReported.setPatientReportedExternalLink(p.getIdentifierFirstRep().getValue());
 		patientReported.setUpdatedDate(p.getMeta().getLastUpdated());
 
-		patientReported.setPatientReportedAuthority(p.getManagingOrganization().getIdentifier().getValue());
+		patientReported.setPatientReportedAuthority(p.getIdentifierFirstRep().getSystem());
 		patientReported.setPatientBirthDate(p.getBirthDate());
+		patientReported.setManagingOrganizationId(p.getManagingOrganization().getId());
 		// Name
 		HumanName name = p.getNameFirstRep();
 		patientReported.setPatientNameLast(name.getFamily());
@@ -209,8 +210,11 @@ public class PatientMapper {
 
 	public Patient getFhirResource(PatientReported pr) {
 		Patient p = new Patient();
-		p.addIdentifier(MappingHelper.getFhirIdentifier(MRN_SYSTEM, pr.getPatientReportedExternalLink()));
-		p.setManagingOrganization(new Reference("Organization/" + pr.getPatientReportedAuthority()));
+
+		p.addIdentifier(MappingHelper.getFhirIdentifier(
+			pr.getPatientReportedAuthority(),
+			pr.getPatientReportedExternalLink()));
+		p.setManagingOrganization(new Reference(pr.getManagingOrganizationId()));
 		p.setBirthDate(pr.getPatientBirthDate());
 		if (p.getNameFirstRep() != null) {
 			HumanName name = p.addName()

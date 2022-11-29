@@ -57,7 +57,17 @@ public class PatientReported implements Serializable {
   private String guardianRelationship = "";
 
 
-  public String getPatientReportedAuthority() {
+	private String managingOrganizationId;
+
+	public String getManagingOrganizationId() {
+		return managingOrganizationId;
+	}
+
+	public void setManagingOrganizationId(String managingOrganizationId) {
+		this.managingOrganizationId = managingOrganizationId;
+	}
+
+	public String getPatientReportedAuthority() {
     return patientReportedAuthority;
   }
 
