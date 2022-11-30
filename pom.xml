@@ -14,9 +14,6 @@
     <parent>
         <groupId>ca.uhn.hapi.fhir</groupId>
         <artifactId>hapi-fhir</artifactId>
-<!--        <version>6.0.1</version>-->
-<!--        <version>6.0.1-SUB</version>-->
-<!--        <version>6.1.2</version>-->
         <version>6.1.2-SUB</version>
     </parent>
 
@@ -619,7 +616,7 @@
         </plugins>
         <resources>
             <resource>
-                <filtering>false</filtering>
+                <filtering>true</filtering>
                 <directory>src/main/resources</directory>
             </resource>
             <resource>
@@ -639,7 +636,8 @@
         <profile>
             <id>prod</id>
             <properties>
-                <activatedProperties>prod</activatedProperties>
+                <spring.profiles.active>prod</spring.profiles.active>
+                <jpa.properties.hibernate.dialect>ca.uhn.fhir.jpa.model.dialect.HapiFhirPostgres94Dialect</jpa.properties.hibernate.dialect>
                 <maven.test.skip>true</maven.test.skip>
             </properties>
             <activation>
@@ -656,7 +654,8 @@
         <profile>
             <id>dev</id>
             <properties>
-                <activatedProperties>dev</activatedProperties>
+                <spring.profiles.active>dev</spring.profiles.active>
+                <jpa.properties.hibernate.dialect>ca.uhn.fhir.jpa.model.dialect.HapiFhirH2Dialect</jpa.properties.hibernate.dialect>
                 <maven.test.skip>true</maven.test.skip>
             </properties>
             <dependencies>
@@ -683,7 +682,9 @@
         <profile>
             <id>boot</id>
             <properties>
-                <activatedProperties>prod</activatedProperties>
+                <spring.profiles.active>prod</spring.profiles.active>
+                <jpa.properties.hibernate.dialect>ca.uhn.fhir.jpa.model.dialect.HapiFhirPostgres94Dialect</jpa.properties.hibernate.dialect>
+                <maven.test.skip>true</maven.test.skip>
             </properties>
             <dependencies>
                 <dependency>
@@ -699,7 +700,8 @@
         <profile>
             <id>jetty</id>
             <properties>
-                <activatedProperties>prod</activatedProperties>
+                <spring.profiles.active>prod</spring.profiles.active>
+                <jpa.properties.hibernate.dialect>ca.uhn.fhir.jpa.model.dialect.HapiFhirPostgres94Dialect</jpa.properties.hibernate.dialect>
                 <maven.test.skip>true</maven.test.skip>
             </properties>
             <dependencies>

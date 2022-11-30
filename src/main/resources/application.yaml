@@ -12,6 +12,8 @@ server:
   servlet:
     contextPath: "/iis-sandbox-jpa"
 spring:
+  profiles:
+    active: '@spring.profiles.active@'
   main:
     allow-circular-references: true
     #allow-bean-definition-overriding: true
@@ -20,14 +22,7 @@ spring:
     check-location: false
     baselineOnMigrate: true
   datasource:
-    url: 'jdbc:postgresql://localhost:5432/hapi_fhir_iis'
-    username: hapi_iis_web
-    password: SicMundusCreatusEst
-    driver-class-name: org.postgresql.Driver
-#    url: 'jdbc:h2:~/data/h2/test'
-#    url: 'jdbc:h2:file:./target/database/h2'
-#    driverClassName: org.h2.Driver
-#    url: jdbc:h2:mem:test_mem
+    # Handled in spring profiles
 
     max-active: 15
 
@@ -42,8 +37,9 @@ spring:
       #If using H2, then supply the value of ca.uhn.fhir.jpa.model.dialect.HapiFhirH2Dialect
       #If using postgres, then supply the value of ca.uhn.fhir.jpa.model.dialect.HapiFhirPostgres94Dialect
 
+      hibernate.dialect: '@jpa.properties.hibernate.dialect@'
 #      hibernate.dialect: ca.uhn.fhir.jpa.model.dialect.HapiFhirH2Dialect
-      hibernate.dialect: ca.uhn.fhir.jpa.model.dialect.HapiFhirPostgres94Dialect
+#      hibernate.dialect: ca.uhn.fhir.jpa.model.dialect.HapiFhirPostgres94Dialect
   #      hibernate.hbm2ddl.auto: update
   #      hibernate.jdbc.batch_size: 20
   #      hibernate.cache.use_query_cache: false
@@ -202,7 +198,7 @@ hapi:
 #  protocol: 'http'
 #  schema_management_strategy: CREATE
 #  username: SomeUsername
-#
+
 ## Prod profile only properties to set up with postgresql
 ---
 spring:
@@ -212,7 +208,7 @@ spring:
     username: hapi_iis_web
     password: SicMundusCreatusEst
     driver-class-name: org.postgresql.Driver
-jpa.properties.hibernate.dialect: ca.uhn.fhir.jpa.model.dialect.HapiFhirPostgres94Dialect
+#jpa.properties.hibernate.dialect: ca.uhn.fhir.jpa.model.dialect.HapiFhirPostgres94Dialect set in pom.xml
 #
 ## Dev profile only properties to set up with H2
 ---
@@ -223,5 +219,4 @@ spring:
     username: sa
     password: null
     driverClassName: org.h2.Driver
-jpa.properties.hibernate.dialect: ca.uhn.fhir.jpa.model.dialect.HapiFhirH2Dialect
-
+#jpa.properties.hibernate.dialect: ca.uhn.fhir.jpa.model.dialect.HapiFhirH2Dialect set in pom.xml
