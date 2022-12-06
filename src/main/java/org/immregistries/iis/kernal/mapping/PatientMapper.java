@@ -144,9 +144,9 @@ public class PatientMapper {
 				} else {
 					patientReported.setPatientBirthFlag(NO);
 				}
+			} else {
+				patientReported.setPatientBirthOrder(String.valueOf(p.getMultipleBirthIntegerType()));
 			}
-		} else {
-			patientReported.setPatientBirthOrder(String.valueOf(p.getMultipleBirthIntegerType()));
 		}
 
 		if (p.getExtensionByUrl(PUBLICITY_EXTENSION) != null) {

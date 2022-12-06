@@ -23,9 +23,7 @@ spring:
     baselineOnMigrate: true
   datasource:
     # Handled in spring profiles
-
     max-active: 15
-
     # database connection pool size
     hikari:
       maximum-pool-size: 10
