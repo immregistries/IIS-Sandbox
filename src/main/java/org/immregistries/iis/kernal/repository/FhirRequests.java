@@ -1,5 +1,6 @@
 package org.immregistries.iis.kernal.repository;
 
+import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.jpa.api.dao.IFhirResourceDao;
 import ca.uhn.fhir.jpa.partition.SystemRequestDetails;
 import ca.uhn.fhir.jpa.search.PersistedJpaBundleProvider;
@@ -18,6 +19,8 @@ import org.immregistries.iis.kernal.mapping.*;
 import org.immregistries.iis.kernal.model.*;
 import org.immregistries.iis.kernal.model.ModelPerson;
 import org.immregistries.iis.kernal.servlet.ServletHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -32,8 +35,11 @@ import static org.immregistries.iis.kernal.mapping.MappingHelper.MRN_SYSTEM;
 
 @Component
 public class FhirRequests {
+	Logger logger = LoggerFactory.getLogger(FhirRequests.class);
 	@Autowired
 	IFhirResourceDao<Patient> patientDao;
+	@Autowired
+	FhirContext fhirContext;
 	@Autowired
 	RepositoryClientFactory repositoryClientFactory;
 	@Autowired

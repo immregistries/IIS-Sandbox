@@ -9,6 +9,7 @@ import ca.uhn.fhir.interceptor.api.IInterceptorBroadcaster;
 import ca.uhn.fhir.interceptor.api.IInterceptorService;
 import ca.uhn.fhir.jpa.api.config.DaoConfig;
 import ca.uhn.fhir.jpa.api.dao.DaoRegistry;
+import ca.uhn.fhir.jpa.api.dao.IFhirResourceDao;
 import ca.uhn.fhir.jpa.api.dao.IFhirSystemDao;
 import ca.uhn.fhir.jpa.binary.interceptor.BinaryStorageInterceptor;
 import ca.uhn.fhir.jpa.bulk.export.provider.BulkDataExportProvider;
@@ -19,6 +20,7 @@ import ca.uhn.fhir.jpa.packages.PackageInstallationSpec;
 import ca.uhn.fhir.jpa.partition.PartitionManagementProvider;
 import ca.uhn.fhir.jpa.provider.*;
 import ca.uhn.fhir.jpa.provider.dstu3.JpaConformanceProviderDstu3;
+import ca.uhn.fhir.jpa.rp.r5.GroupResourceProvider;
 import ca.uhn.fhir.jpa.search.DatabaseBackedPagingProvider;
 import ca.uhn.fhir.jpa.starter.interceptors.ExceptionFilteringInterceptor;
 import ca.uhn.fhir.jpa.starter.interceptors.MdmCustomInterceptor;
@@ -41,6 +43,7 @@ import ca.uhn.fhir.validation.ResultSeverityEnum;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import org.hl7.fhir.r4.model.Bundle.BundleType;
+import org.hl7.fhir.r5.model.Group;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.context.ApplicationContext;
@@ -84,6 +87,11 @@ public class BaseJpaRestfulServer extends RestfulServer {
   @Autowired
   PartitionManagementProvider partitionManagementProvider;
 
+	@Autowired
+	private ApplicationContext context;
+	@Autowired
+	BulkQueryProvider bulkQueryProvider;
+
   @Autowired
   ValueSetOperationProvider valueSetOperationProvider;
   @Autowired
@@ -111,6 +119,9 @@ public class BaseJpaRestfulServer extends RestfulServer {
 
   @Autowired
   private IValidationSupport myValidationSupport;
+
+  @Autowired
+	IFhirResourceDao<Group> fhirResourceGroupDao;
 
   public BaseJpaRestfulServer() {
   }
@@ -153,6 +164,10 @@ public class BaseJpaRestfulServer extends RestfulServer {
 
 
 
+	 // Bulk Query
+	  bulkQueryProvider.setContext(fhirSystemDao.getContext());
+	  bulkQueryProvider.setDao(fhirResourceGroupDao);
+	 resourceProviderFactory.addSupplier(() -> bulkQueryProvider);
 	  registerProviders(resourceProviderFactory.createProviders());
     registerProvider(jpaSystemProvider);
     /*
