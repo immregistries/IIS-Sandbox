@@ -46,6 +46,12 @@
         </dependency>
 
         <dependency>
+            <groupId>ca.uhn.hapi.fhir</groupId>
+            <artifactId>hapi-fhir-converter</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.immregistries</groupId>
             <artifactId>smm-tester</artifactId>
             <version>2.31.0</version>

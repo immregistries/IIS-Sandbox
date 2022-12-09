@@ -10,7 +10,6 @@ import org.hl7.fhir.r5.model.*;
 import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
-import org.immregistries.iis.kernal.mapping.LocationMapper;
 import org.immregistries.iis.kernal.model.*;
 import org.immregistries.iis.kernal.servlet.ServletHelper;
 import org.slf4j.Logger;

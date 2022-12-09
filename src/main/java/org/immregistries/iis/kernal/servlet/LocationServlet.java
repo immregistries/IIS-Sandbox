@@ -1,13 +1,11 @@
 package org.immregistries.iis.kernal.servlet;
 
-import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
-import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hl7.fhir.r5.model.Location;
-import org.immregistries.iis.kernal.mapping.LocationMapper;
+import org.immregistries.iis.kernal.mapping.forR5.LocationMapper;
 import org.immregistries.iis.kernal.model.*;
 import org.immregistries.iis.kernal.repository.FhirRequests;
 import org.immregistries.iis.kernal.repository.RepositoryClientFactory;

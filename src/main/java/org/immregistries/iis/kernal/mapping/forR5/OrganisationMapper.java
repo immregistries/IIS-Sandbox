@@ -1,10 +1,8 @@
-package org.immregistries.iis.kernal.mapping;
+package org.immregistries.iis.kernal.mapping.forR5;
 
-import org.hl7.fhir.r5.model.Identifier;
 import org.hl7.fhir.r5.model.Organization;
+import org.immregistries.iis.kernal.mapping.MappingHelper;
 import org.immregistries.iis.kernal.model.OrgMaster;
-import org.immregistries.smm.tester.manager.HL7Reader;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service

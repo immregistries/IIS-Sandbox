@@ -1,9 +1,10 @@
-package org.immregistries.iis.kernal.mapping;
+package org.immregistries.iis.kernal.mapping.forR5;
 
 
 import org.hl7.fhir.r5.model.*;
 import org.hl7.fhir.r5.model.ContactPoint.ContactPointSystem;
 import org.hl7.fhir.r5.model.Enumerations.AdministrativeGender;
+import org.immregistries.iis.kernal.mapping.MappingHelper;
 import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.model.PatientReported;
 import org.immregistries.iis.kernal.repository.FhirRequests;

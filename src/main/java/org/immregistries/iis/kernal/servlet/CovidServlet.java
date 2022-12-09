@@ -6,7 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.r5.model.Immunization;
 import org.hl7.fhir.r5.model.Location;
 import org.hl7.fhir.r5.model.Patient;
-import org.immregistries.iis.kernal.mapping.LocationMapper;
+import org.immregistries.iis.kernal.mapping.forR5.LocationMapper;
 import org.immregistries.iis.kernal.model.*;
 import org.immregistries.iis.kernal.repository.FhirRequests;
 import org.immregistries.iis.kernal.repository.RepositoryClientFactory;

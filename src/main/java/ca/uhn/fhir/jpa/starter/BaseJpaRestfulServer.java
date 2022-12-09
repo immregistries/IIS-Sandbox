@@ -20,7 +20,6 @@ import ca.uhn.fhir.jpa.packages.PackageInstallationSpec;
 import ca.uhn.fhir.jpa.partition.PartitionManagementProvider;
 import ca.uhn.fhir.jpa.provider.*;
 import ca.uhn.fhir.jpa.provider.dstu3.JpaConformanceProviderDstu3;
-import ca.uhn.fhir.jpa.rp.r5.GroupResourceProvider;
 import ca.uhn.fhir.jpa.search.DatabaseBackedPagingProvider;
 import ca.uhn.fhir.jpa.starter.interceptors.ExceptionFilteringInterceptor;
 import ca.uhn.fhir.jpa.starter.interceptors.MdmCustomInterceptor;

@@ -1,8 +1,8 @@
 package ca.uhn.fhir.jpa.starter;
 
 import ca.uhn.fhir.context.FhirContext;
-import ca.uhn.fhir.jpa.api.dao.IFhirResourceDao;
-import ca.uhn.fhir.jpa.api.dao.IFhirResourceDaoPatient;
+import ca.uhn.fhir.context.FhirVersionEnum;
+import ca.uhn.fhir.jpa.api.dao.IFhirSystemDao;
 import ca.uhn.fhir.jpa.model.util.JpaConstants;
 import ca.uhn.fhir.jpa.provider.BaseJpaResourceProvider;
 import ca.uhn.fhir.jpa.provider.r5.BaseJpaResourceProviderPatientR5;
@@ -15,13 +15,11 @@ import ca.uhn.fhir.rest.api.Constants;
 import ca.uhn.fhir.rest.api.SortSpec;
 import ca.uhn.fhir.rest.api.server.IBundleProvider;
 import ca.uhn.fhir.rest.api.server.RequestDetails;
-import ca.uhn.fhir.rest.api.server.bulk.BulkDataExportOptions;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.param.*;
 import ca.uhn.fhir.rest.server.BundleProviders;
-import ca.uhn.fhir.rest.server.servlet.ServletRequestDetails;
+import org.hl7.fhir.convertors.factory.VersionConvertorFactory_40_50;
 import org.hl7.fhir.instance.model.api.IBaseResource;
-import org.hl7.fhir.instance.model.api.IPrimitiveType;
 import org.hl7.fhir.r5.model.*;
 import org.immregistries.iis.kernal.repository.RepositoryClientFactory;
 import org.slf4j.Logger;
@@ -29,12 +27,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 @Controller
 public class BulkQueryProvider extends GroupResourceProvider {
@@ -44,10 +38,13 @@ public class BulkQueryProvider extends GroupResourceProvider {
 	FhirContext fhirContext;
 	@Autowired
 	RepositoryClientFactory repositoryClientFactory;
-//	@Autowired
-//	IFhirResourceDao<Patient> myPatientDao;
 	@Autowired
 	BaseJpaResourceProvider<Patient> patientProvider;
+
+//	@Autowired
+//	BaseJpaResourceProvider<org.hl7.fhir.r4.model.Patient> patientR4Provider;
+	@Autowired
+	IFhirSystemDao fhirSystemDao;
 
 	/**
 	 * Group/123/$everything
@@ -95,6 +92,7 @@ public class BulkQueryProvider extends GroupResourceProvider {
 	) {
 		IGenericClient client = repositoryClientFactory.newGenericClientForPartition(theRequestDetails.getTenantId());
 		Bundle bundle = new Bundle().setIdentifier(new Identifier().setValue("test-bulk"));
+		FhirVersionEnum fhirVersion = fhirSystemDao.getContext().getVersion().getVersion();
 
 //		Parameters inParams = new Parameters();
 //		for (Map.Entry<String,String[]> entry : theRequestDetails.getParameters().entrySet()) {
@@ -110,10 +108,10 @@ public class BulkQueryProvider extends GroupResourceProvider {
 				for (IBaseResource resource: bundleProvider.getAllResources()) {
 					patientBundle.addEntry().setResource( (Resource) resource);
 				}
+//				VersionConvertorFactory_40_50.convertResource(patientBundle);
 				bundle.addEntry().setResource(patientBundle);
 			}
 		}
-//		logger.info("ND {}", fhirContext.newNDJsonParser().encodeResourceToString(bundle));
 		return bundle;
 	}
 }

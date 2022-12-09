@@ -11,7 +11,10 @@ import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodeStatusValue;
 import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.SoftwareVersion;
-import org.immregistries.iis.kernal.mapping.*;
+import org.immregistries.iis.kernal.mapping.forR5.ImmunizationMapper;
+import org.immregistries.iis.kernal.mapping.forR5.LocationMapper;
+import org.immregistries.iis.kernal.mapping.forR5.ObservationMapper;
+import org.immregistries.iis.kernal.mapping.forR5.PatientMapper;
 import org.immregistries.iis.kernal.model.*;
 import org.immregistries.iis.kernal.model.ModelPerson;
 import org.immregistries.iis.kernal.repository.FhirRequests;
@@ -40,13 +43,13 @@ public class IncomingMessageHandler {
   	@Autowired
   	protected FhirRequests fhirRequests;
 	@Autowired
-	PatientMapper patientMapper;
+    PatientMapper patientMapper;
 	@Autowired
-	ImmunizationMapper immunizationMapper;
+    ImmunizationMapper immunizationMapper;
 	@Autowired
-	ObservationMapper observationMapper;
+    ObservationMapper observationMapper;
 	@Autowired
-	LocationMapper locationMapper;
+    LocationMapper locationMapper;
 
   protected IGenericClient getFhirClient() {
 	  return ServletHelper.getFhirClient(repositoryClientFactory);

@@ -1,6 +1,7 @@
-package org.immregistries.iis.kernal.mapping;
+package org.immregistries.iis.kernal.mapping.forR5;
 
 import org.hl7.fhir.r5.model.*;
+import org.immregistries.iis.kernal.mapping.MappingHelper;
 import org.immregistries.iis.kernal.model.ModelPerson;
 import org.immregistries.iis.kernal.model.VaccinationMaster;
 import org.immregistries.iis.kernal.model.VaccinationReported;
@@ -95,7 +96,7 @@ public class ImmunizationMapper {
 					break;
 			}
 		}
-		vr.setRefusalReasonCode(i.getReasonFirstRep().getConcept().getCodingFirstRep().getCode());
+		vr.setRefusalReasonCode(i.getStatusReason().getCodingFirstRep().getCode());
 		vr.setBodySite(i.getSite().getCodingFirstRep().getCode());
 		vr.setBodyRoute(i.getRoute().getCodingFirstRep().getCode());
 		vr.setFundingSource(i.getFundingSource().getCodingFirstRep().getCode());
@@ -151,7 +152,7 @@ public class ImmunizationMapper {
    */
   public Immunization getFhirResource(VaccinationReported vr) {
      Immunization i = new Immunization();
-	  i.addIdentifier(MappingHelper.getFhirIdentifier(MappingHelper.VACCINATION_REPORTED, vr.getVaccinationReportedExternalLink()));
+	  i.addIdentifier(MappingHelper.getFhirIdentifier(MappingHelper.VACCINATION_REPORTED, vr.getVaccinationReportedExternalLink())); // TODO reported authority ?
 	  i.setPatient(new Reference().setReference("Patient/"+ vr.getPatientReported().getPatientReportedId()));
 	  i.setRecorded(vr.getReportedDate());
 	  i.getOccurrenceDateTimeType().setValue(vr.getAdministeredDate());
@@ -191,7 +192,8 @@ public class ImmunizationMapper {
 			  }
 		  }
 	  }
-	  i.addReason().setConcept(new CodeableConcept(new Coding(REFUSAL_REASON_CODE,vr.getRefusalReasonCode(),vr.getRefusalReasonCode())));
+	  i.setStatusReason(new CodeableConcept(new Coding(REFUSAL_REASON_CODE,vr.getRefusalReasonCode(),vr.getRefusalReasonCode())));
+//	  i.addReason().setConcept());
 	  i.getSite().addCoding().setSystem(BODY_PART).setCode(vr.getBodySite());
 	  i.getRoute().addCoding().setSystem(BODY_ROUTE).setCode(vr.getBodyRoute());
 	  i.getFundingSource().addCoding().setSystem(FUNDING_SOURCE).setCode(vr.getFundingSource());
