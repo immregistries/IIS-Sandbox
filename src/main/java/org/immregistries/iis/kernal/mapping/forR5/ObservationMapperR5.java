@@ -2,6 +2,7 @@ package org.immregistries.iis.kernal.mapping.forR5;
 
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import org.hl7.fhir.r5.model.*;
+import org.immregistries.iis.kernal.mapping.Interfaces.ObservationMapper;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
 import org.immregistries.iis.kernal.model.ObservationMaster;
 import org.immregistries.iis.kernal.model.ObservationReported;
@@ -11,8 +12,8 @@ import org.springframework.stereotype.Service;
 
 import static org.immregistries.iis.kernal.mapping.MappingHelper.*;
 
-@Service
-public class ObservationMapper {
+@Service("ObservationMapperR5")
+public class ObservationMapperR5 implements ObservationMapper<Observation> {
 	@Autowired
 	FhirRequests fhirRequests;
 	public static final String IDENTIFIER_CODE = "identifierCode";

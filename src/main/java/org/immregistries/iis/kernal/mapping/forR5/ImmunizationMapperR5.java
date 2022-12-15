@@ -1,6 +1,7 @@
 package org.immregistries.iis.kernal.mapping.forR5;
 
 import org.hl7.fhir.r5.model.*;
+import org.immregistries.iis.kernal.mapping.Interfaces.ImmunizationMapper;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
 import org.immregistries.iis.kernal.model.ModelPerson;
 import org.immregistries.iis.kernal.model.VaccinationMaster;
@@ -12,10 +13,10 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.Date;
 
-@Service
-public class ImmunizationMapper {
+@Service("ImmunizationMapperR5")
+public class ImmunizationMapperR5 implements ImmunizationMapper<Immunization> {
 	@Autowired
-	LocationMapper locationMapper;
+    LocationMapperR5 locationMapper;
 	@Autowired
 	FhirRequests fhirRequests;
 
@@ -200,7 +201,7 @@ public class ImmunizationMapper {
 	  i.addProgramEligibility().addCoding().setSystem(FUNDING_ELIGIBILITY).setCode(vr.getFundingEligibility());
 
 
-	  Location location  = locationMapper.fhirLocation(vr.getOrgLocation()); // Should have been saved in Event/MessageHandler
+	  Location location  = locationMapper.getFhirResource(vr.getOrgLocation()); // Should have been saved in Event/MessageHandler
 	  if (location != null) {
 		  i.setLocation(new Reference(MappingHelper.LOCATION + "/" + location.getId()));
 	  }

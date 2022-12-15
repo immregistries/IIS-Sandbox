@@ -11,12 +11,13 @@ import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodeStatusValue;
 import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.SoftwareVersion;
-import org.immregistries.iis.kernal.mapping.forR5.ImmunizationMapper;
-import org.immregistries.iis.kernal.mapping.forR5.LocationMapper;
-import org.immregistries.iis.kernal.mapping.forR5.ObservationMapper;
-import org.immregistries.iis.kernal.mapping.forR5.PatientMapper;
+import org.immregistries.iis.kernal.mapping.forR5.ImmunizationMapperR5;
+import org.immregistries.iis.kernal.mapping.forR5.LocationMapperR5;
+import org.immregistries.iis.kernal.mapping.forR5.ObservationMapperR5;
+import org.immregistries.iis.kernal.mapping.forR5.PatientMapperR5;
 import org.immregistries.iis.kernal.model.*;
 import org.immregistries.iis.kernal.model.ModelPerson;
+import org.immregistries.iis.kernal.repository.FhirRequestBase;
 import org.immregistries.iis.kernal.repository.FhirRequests;
 import org.immregistries.iis.kernal.repository.RepositoryClientFactory;
 import org.immregistries.iis.kernal.servlet.PopServlet;
@@ -43,13 +44,13 @@ public class IncomingMessageHandler {
   	@Autowired
   	protected FhirRequests fhirRequests;
 	@Autowired
-    PatientMapper patientMapper;
+    PatientMapperR5 patientMapper;
 	@Autowired
-    ImmunizationMapper immunizationMapper;
+	ImmunizationMapperR5 immunizationMapper;
 	@Autowired
-    ObservationMapper observationMapper;
+	ObservationMapperR5 observationMapper;
 	@Autowired
-    LocationMapper locationMapper;
+	LocationMapperR5 locationMapper;
 
   protected IGenericClient getFhirClient() {
 	  return ServletHelper.getFhirClient(repositoryClientFactory);
@@ -1808,7 +1809,7 @@ public class IncomingMessageHandler {
 		 try {
 			 Bundle bundle = fhirClient.search().forResource(Immunization.class)
 				 .where(Immunization.PATIENT.hasId(patient.getPatientId()))
-				 .withTag(FhirRequests.GOLDEN_SYSTEM_TAG,FhirRequests.GOLDEN_RECORD)
+				 .withTag(FhirRequestBase.GOLDEN_SYSTEM_TAG,FhirRequestBase.GOLDEN_RECORD)
 				 .sort().ascending(Immunization.IDENTIFIER)
 				 .returnBundle(Bundle.class).execute();
 			 for (Bundle.BundleEntryComponent entry : bundle.getEntry()) {

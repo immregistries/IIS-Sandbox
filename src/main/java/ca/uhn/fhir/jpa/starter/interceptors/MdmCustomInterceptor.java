@@ -19,7 +19,7 @@ import ca.uhn.fhir.rest.server.provider.ResourceProviderFactory;
 import ca.uhn.fhir.rest.server.servlet.ServletRequestDetails;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r5.model.*;
-import org.immregistries.iis.kernal.mapping.forR5.ImmunizationMapper;
+import org.immregistries.iis.kernal.mapping.forR5.ImmunizationMapperR5;
 import org.immregistries.iis.kernal.repository.RepositoryClientFactory;
 import org.immregistries.vaccination_deduplication.computation_classes.Deterministic;
 import org.immregistries.vaccination_deduplication.reference.ComparisonResult;
@@ -35,8 +35,8 @@ import javax.interceptor.Interceptor;
 import javax.servlet.http.HttpServletRequest;
 import java.text.ParseException;
 
-import static org.immregistries.iis.kernal.repository.FhirRequests.GOLDEN_RECORD;
-import static org.immregistries.iis.kernal.repository.FhirRequests.GOLDEN_SYSTEM_TAG;
+import static org.immregistries.iis.kernal.repository.FhirRequestBase.GOLDEN_RECORD;
+import static org.immregistries.iis.kernal.repository.FhirRequestBase.GOLDEN_SYSTEM_TAG;
 
 @Component
 @Interceptor
@@ -144,7 +144,7 @@ public class MdmCustomInterceptor {
 
 	private org.immregistries.vaccination_deduplication.Immunization toVaccDedupImmunization(Immunization immunization, RequestDetails theRequestDetails){
 		org.immregistries.vaccination_deduplication.Immunization i1 = new org.immregistries.vaccination_deduplication.Immunization();
-		i1.setCVX(immunization.getVaccineCode().getCode(ImmunizationMapper.CVX));
+		i1.setCVX(immunization.getVaccineCode().getCode(ImmunizationMapperR5.CVX));
 		if(immunization.hasManufacturer()){
 			i1.setMVX(immunization.getManufacturer().getIdentifier().getValue());
 		}
@@ -166,7 +166,7 @@ public class MdmCustomInterceptor {
 		} else {
 			if (immunization.hasInformationSource()) {
 				if (immunization.hasInformationSourceCodeableConcept()){
-					if(immunization.getInformationSourceCodeableConcept().getCode(ImmunizationMapper.INFORMATION_SOURCE).equals("00")){
+					if(immunization.getInformationSourceCodeableConcept().getCode(ImmunizationMapperR5.INFORMATION_SOURCE).equals("00")){
 						i1.setSource(ImmunizationSource.SOURCE);
 					} else {
 						i1.setSource(ImmunizationSource.HISTORICAL);

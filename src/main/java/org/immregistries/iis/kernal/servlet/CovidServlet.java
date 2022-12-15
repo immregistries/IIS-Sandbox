@@ -6,7 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.r5.model.Immunization;
 import org.hl7.fhir.r5.model.Location;
 import org.hl7.fhir.r5.model.Patient;
-import org.immregistries.iis.kernal.mapping.forR5.LocationMapper;
+import org.immregistries.iis.kernal.mapping.forR5.LocationMapperR5;
 import org.immregistries.iis.kernal.model.*;
 import org.immregistries.iis.kernal.repository.FhirRequests;
 import org.immregistries.iis.kernal.repository.RepositoryClientFactory;
@@ -33,7 +33,7 @@ public class CovidServlet extends HttpServlet {
 	@Autowired
 	FhirRequests fhirRequests;
 	@Autowired
-	LocationMapper locationMapper;
+    LocationMapperR5 locationMapper;
 
 
   public static final String COVID_CVX_CODES = "208,207,210,212,211,213";

@@ -201,7 +201,7 @@ public class IncomingEventHandler extends IncomingMessageHandler {
 				orgLocation.setAddressState("");
 				orgLocation.setAddressZip("");
 				orgLocation.setAddressCountry("");
-				Location location = locationMapper.fhirLocation(orgLocation);
+				Location location = locationMapper.getFhirResource(orgLocation);
 				MethodOutcome outcome;
 				try {
 					outcome = fhirClient.update().resource(location).conditional()

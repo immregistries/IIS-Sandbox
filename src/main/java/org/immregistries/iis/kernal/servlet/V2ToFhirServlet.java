@@ -14,7 +14,7 @@ import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.logic.CodeMapManager;
 import org.immregistries.iis.kernal.logic.IncomingMessageHandler;
-import org.immregistries.iis.kernal.mapping.forR5.ImmunizationMapper;
+import org.immregistries.iis.kernal.mapping.forR5.ImmunizationMapperR5;
 import org.immregistries.iis.kernal.model.*;
 import org.immregistries.iis.kernal.repository.RepositoryClientFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +35,7 @@ public class V2ToFhirServlet extends HttpServlet {
 	@Autowired
 	RepositoryClientFactory repositoryClientFactory;
 	@Autowired
-	ImmunizationMapper immunizationMapper;
+	ImmunizationMapperR5 immunizationMapper;
 	@Autowired
 	IncomingMessageHandler incomingMessageHandler;
 

@@ -3,14 +3,15 @@ package org.immregistries.iis.kernal.mapping.forR5;
 import org.hl7.fhir.r5.model.Address;
 import org.hl7.fhir.r5.model.IdType;
 import org.hl7.fhir.r5.model.Location;
+import org.immregistries.iis.kernal.mapping.Interfaces.LocationMapper;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
 import org.immregistries.iis.kernal.model.OrgLocation;
 import org.springframework.stereotype.Service;
 
 @Service
-public class LocationMapper {
+public class LocationMapperR5 implements LocationMapper<Location> {
 
-	public Location fhirLocation(OrgLocation ol) {
+	public Location getFhirResource(OrgLocation ol) {
 
 		if (ol != null) {
 			Location location = new Location();

@@ -4,6 +4,7 @@ package org.immregistries.iis.kernal.mapping.forR5;
 import org.hl7.fhir.r5.model.*;
 import org.hl7.fhir.r5.model.ContactPoint.ContactPointSystem;
 import org.hl7.fhir.r5.model.Enumerations.AdministrativeGender;
+import org.immregistries.iis.kernal.mapping.Interfaces.PatientMapper;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
 import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.model.PatientReported;
@@ -15,8 +16,8 @@ import java.text.ParseException;
 
 import static org.immregistries.iis.kernal.mapping.MappingHelper.MRN_SYSTEM;
 
-@Service
-public class PatientMapper {
+@Service("PatientMapperR5")
+public class PatientMapperR5 implements PatientMapper<Patient> {
 
 	@Autowired
 	FhirRequests fhirRequests;
