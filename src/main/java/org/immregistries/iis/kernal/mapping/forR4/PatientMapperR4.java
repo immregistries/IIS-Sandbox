@@ -18,7 +18,7 @@ import java.text.ParseException;
 
 import static org.immregistries.iis.kernal.mapping.MappingHelper.MRN_SYSTEM;
 
-@Service("PatientMapperR4")
+@Service
 @Conditional(OnR4Condition.class)
 public class PatientMapperR4 implements PatientMapper<Patient> {
 

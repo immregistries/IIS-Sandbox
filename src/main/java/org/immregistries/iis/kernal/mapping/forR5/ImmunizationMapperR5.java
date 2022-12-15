@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.Date;
 
-@Service("ImmunizationMapperR5")
+@Service
 @Conditional(OnR5Condition.class)
 public class ImmunizationMapperR5 implements ImmunizationMapper<Immunization> {
 	@Autowired
