@@ -8,7 +8,7 @@ import org.hl7.fhir.r5.model.Patient;
 import org.immregistries.iis.kernal.logic.IncomingMessageHandler;
 import org.immregistries.iis.kernal.model.OrgAccess;
 import org.immregistries.iis.kernal.model.VaccinationReported;
-import org.immregistries.iis.kernal.repository.FhirRequests;
+import org.immregistries.iis.kernal.repository.FhirRequesterR5;
 import org.immregistries.iis.kernal.repository.RepositoryClientFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 public class VXUDownloadGenerator extends Thread {
 
 	@Autowired
-	FhirRequests fhirRequests;
+    FhirRequesterR5 fhirRequests;
 	@Autowired
 	IncomingMessageHandler incomingMessageHandler;
 	@Autowired

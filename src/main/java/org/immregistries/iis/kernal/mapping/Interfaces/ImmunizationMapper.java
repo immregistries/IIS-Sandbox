@@ -1,6 +1,5 @@
 package org.immregistries.iis.kernal.mapping.Interfaces;
 
-import org.hl7.fhir.r4.model.Immunization;
 import org.immregistries.iis.kernal.model.VaccinationMaster;
 import org.immregistries.iis.kernal.model.VaccinationReported;
 

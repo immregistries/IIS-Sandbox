@@ -9,15 +9,57 @@ import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.gclient.*;
 import ca.uhn.fhir.rest.param.TokenParam;
 import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
+import org.hl7.fhir.instance.model.api.IBaseBundle;
 import org.hl7.fhir.instance.model.api.IBaseResource;
-import org.hl7.fhir.r5.model.Bundle;
+import org.immregistries.iis.kernal.mapping.Interfaces.*;
 import org.immregistries.iis.kernal.servlet.ServletHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public abstract class FhirRequestBase {
+public abstract class FhirRequester<
+	Patient extends IBaseResource,
+	Immunization extends IBaseResource,
+	Location extends IBaseResource,
+	Practitioner extends IBaseResource,
+	Observation extends IBaseResource,
+	Person extends IBaseResource,
+	Organization extends IBaseResource> implements IFhirRequester<Patient,Immunization,Location,Practitioner,Observation,Person,Organization> {
+
+	@Autowired
+	PatientMapper<Patient> patientMapper;
+	@Autowired
+	ImmunizationMapper<Immunization> immunizationMapper;
+	@Autowired
+	LocationMapper<Location> locationMapper;
+	@Autowired
+	PractitionerMapper<Practitioner> practitionerMapper;
+	@Autowired
+	ObservationMapper<Observation> observationMapper;
+	@Autowired
+	PersonMapper<Person> personMapper;
 
 	@Autowired
 	RepositoryClientFactory repositoryClientFactory;
+
+//	private final Class<Patient> patientClass;
+//	private final Class<Immunization> immunizationClass;
+//	private final Class<Location> locationClass;
+//	private final Class<Practitioner> practitionerClass;
+//	private final Class<Observation> observationClass;
+//	private final Class<Person> personClass;
+//	private final Class<Organization> organizationClass;
+//
+//	@SuppressWarnings("unchecked")
+//	public FhirRequester() {
+//		Class[] classes = GenericTypeResolver.resolveTypeArguments(getClass(), FhirRequester.class);
+//		assert classes != null;
+//		this.patientClass = (Class<Patient>) classes[0] ;
+//		this.immunizationClass = (Class<Immunization>) classes[1];
+//		this.locationClass = (Class<Location>) classes[2];
+//		this.practitionerClass = (Class<Practitioner>) classes[3];
+//		this.observationClass = (Class<Observation>) classes[4];
+//		this.personClass = (Class<Person>) classes[5];
+//		this.organizationClass = (Class<Organization>) classes[6];
+//	}
 
 	public static final String GOLDEN_SYSTEM_TAG = "http://hapifhir.io/fhir/NamingSystem/mdm-record-status";
 	public static final String GOLDEN_RECORD = "GOLDEN_RECORD";
@@ -44,6 +86,7 @@ public abstract class FhirRequestBase {
 		}
 		return outcome;
 	}
+
 	public IBaseResource read(Class<? extends IBaseResource> aClass,String id) {
 		IGenericClient fhirClient = ServletHelper.getFhirClient(repositoryClientFactory);
 		try {
@@ -52,11 +95,11 @@ public abstract class FhirRequestBase {
 			return null;
 		}
 	}
-	Bundle searchGoldenRecord(Class<? extends IBaseResource> aClass,
-									  ICriterion... where) {
+
+	IBaseBundle searchGoldenRecord(Class<? extends IBaseResource> aClass, ICriterion... where) {
 		IGenericClient fhirClient = ServletHelper.getFhirClient(repositoryClientFactory);
 		try {
-			IQuery<Bundle> query = fhirClient.search().forResource(aClass).returnBundle(Bundle.class);
+			IQuery<IBaseBundle> query = fhirClient.search().forResource(aClass);
 			int size = where.length;
 			if (size > 0) {
 				query = query.where(where[0]).withTag(GOLDEN_SYSTEM_TAG, GOLDEN_RECORD);
@@ -68,12 +111,11 @@ public abstract class FhirRequestBase {
 			}
 			return  query.execute();
 		} catch (ResourceNotFoundException e) {
-			return  new Bundle();
+			return  null;
 		}
 	}
 
-	IBundleProvider searchGoldenRecord(IFhirResourceDao dao,
-															 IQueryParameterType... where) {
+	IBundleProvider searchGoldenRecord(IFhirResourceDao dao,  IQueryParameterType... where) {
 		SearchParameterMap searchParameterMap = new SearchParameterMap();
 		searchParameterMap.add("_tag", new TokenParam(GOLDEN_SYSTEM_TAG,GOLDEN_RECORD));
 		try {
@@ -88,13 +130,12 @@ public abstract class FhirRequestBase {
 		} catch (ResourceNotFoundException e) {
 			return null;
 		}
-
 	}
-	Bundle searchRegularRecord(Class<? extends IBaseResource> aClass,
-										ICriterion... where) {
+
+	IBaseBundle searchRegularRecord(Class<? extends IBaseResource> aClass, ICriterion... where) {
 		IGenericClient fhirClient = ServletHelper.getFhirClient(repositoryClientFactory);
 		try {
-			IQuery<Bundle> query = fhirClient.search().forResource(aClass).returnBundle(Bundle.class);
+			IQuery<IBaseBundle> query = fhirClient.search().forResource(aClass);
 			int size = where.length;
 			query = query.where(NOT_GOLDEN_CRITERION);
 			int i = 0;
@@ -102,17 +143,18 @@ public abstract class FhirRequestBase {
 				query = query.and(where[i]);
 				i++;
 			}
-			return  query.execute();
+			return query.execute();
 		} catch (ResourceNotFoundException e) {
-			return  new Bundle();
+			return null;
 		}
 	}
-	Bundle search(
+
+	IBaseBundle search(
 		Class<? extends IBaseResource> aClass,
 		ICriterion... where) {
 		IGenericClient fhirClient = ServletHelper.getFhirClient(repositoryClientFactory);
 		try {
-			IQuery<Bundle> query = fhirClient.search().forResource(aClass).returnBundle(Bundle.class);
+			IQuery<IBaseBundle> query = fhirClient.search().forResource(aClass);
 			int size = where.length;
 			if (size > 0) {
 				query = query.where(where[0]);
@@ -124,7 +166,7 @@ public abstract class FhirRequestBase {
 			}
 			return  query.execute();
 		} catch (ResourceNotFoundException e) {
-			return  new Bundle();
+			return null;
 		}
 	}
 }

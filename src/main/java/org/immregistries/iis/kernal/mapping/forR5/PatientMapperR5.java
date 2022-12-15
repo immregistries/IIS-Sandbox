@@ -1,6 +1,7 @@
 package org.immregistries.iis.kernal.mapping.forR5;
 
 
+import ca.uhn.fhir.jpa.starter.annotations.OnR5Condition;
 import org.hl7.fhir.r5.model.*;
 import org.hl7.fhir.r5.model.ContactPoint.ContactPointSystem;
 import org.hl7.fhir.r5.model.Enumerations.AdministrativeGender;
@@ -8,8 +9,9 @@ import org.immregistries.iis.kernal.mapping.Interfaces.PatientMapper;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
 import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.model.PatientReported;
-import org.immregistries.iis.kernal.repository.FhirRequests;
+import org.immregistries.iis.kernal.repository.FhirRequesterR5;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
@@ -17,10 +19,11 @@ import java.text.ParseException;
 import static org.immregistries.iis.kernal.mapping.MappingHelper.MRN_SYSTEM;
 
 @Service("PatientMapperR5")
+@Conditional(OnR5Condition.class)
 public class PatientMapperR5 implements PatientMapper<Patient> {
 
 	@Autowired
-	FhirRequests fhirRequests;
+	FhirRequesterR5 fhirRequests;
 	private static final String REGISTRY_STATUS_EXTENSION = "registryStatus";
 	private static final String REGISTRY_STATUS_INDICATOR = "registryStatusIndicator";
 	private static final String ETHNICITY_EXTENSION = "ethnicity";

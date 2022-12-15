@@ -1,12 +1,15 @@
 package org.immregistries.iis.kernal.mapping.forR5;
 
+import ca.uhn.fhir.jpa.starter.annotations.OnR5Condition;
 import org.hl7.fhir.r5.model.Organization;
 import org.immregistries.iis.kernal.mapping.Interfaces.OrganizationMapper;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
 import org.immregistries.iis.kernal.model.OrgMaster;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Service;
 
 @Service
+@Conditional(OnR5Condition.class)
 public class OrganisationMapperR5 implements OrganizationMapper<Organization> {
 //	TODO
 

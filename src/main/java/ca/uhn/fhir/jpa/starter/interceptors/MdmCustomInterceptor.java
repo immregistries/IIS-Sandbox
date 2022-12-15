@@ -35,8 +35,8 @@ import javax.interceptor.Interceptor;
 import javax.servlet.http.HttpServletRequest;
 import java.text.ParseException;
 
-import static org.immregistries.iis.kernal.repository.FhirRequestBase.GOLDEN_RECORD;
-import static org.immregistries.iis.kernal.repository.FhirRequestBase.GOLDEN_SYSTEM_TAG;
+import static org.immregistries.iis.kernal.repository.FhirRequester.GOLDEN_RECORD;
+import static org.immregistries.iis.kernal.repository.FhirRequester.GOLDEN_SYSTEM_TAG;
 
 @Component
 @Interceptor

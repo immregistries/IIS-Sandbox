@@ -1,0 +1,46 @@
+package org.immregistries.iis.kernal.repository;
+
+import ca.uhn.fhir.rest.gclient.ICriterion;
+import org.hl7.fhir.instance.model.api.IBaseResource;
+import org.immregistries.iis.kernal.model.*;
+
+import java.util.List;
+
+
+public interface IFhirRequester<
+	Patient extends IBaseResource,
+	Immunization extends IBaseResource,
+	Location extends IBaseResource,
+	Practitioner extends IBaseResource,
+	Observation extends IBaseResource,
+	Person extends IBaseResource,
+	Organization extends IBaseResource> {
+
+	public PatientMaster searchPatientMaster(ICriterion... where);
+	public PatientReported searchPatientReported(ICriterion... where);
+	public List<PatientReported> searchPatientReportedList(ICriterion... where);
+	public VaccinationMaster searchVaccinationMaster(ICriterion... where);
+	public VaccinationReported searchVaccinationReported(ICriterion... where);
+	public List<VaccinationReported> searchVaccinationReportedList(ICriterion... where);
+	public ObservationReported searchObservationReported(ICriterion... where);
+	public Organization searchOrganization(ICriterion... where);
+
+	public ObservationMaster searchObservationMaster(ICriterion... where);
+	public List<ObservationReported> searchObservationReportedList(ICriterion... where);
+	public OrgLocation searchOrgLocation(ICriterion... where);
+	public List<OrgLocation> searchOrgLocationList(ICriterion... where);
+	public ModelPerson searchPerson(ICriterion... where);
+	public ModelPerson searchPractitioner(ICriterion... where);
+
+	public PatientReported savePatientReported(PatientReported patientReported);
+	public ModelPerson savePractitioner(ModelPerson modelPerson);
+	public ObservationReported saveObservationReported(ObservationReported observationReported);
+	public VaccinationReported saveVaccinationReported(VaccinationReported vaccinationReported);
+	public OrgLocation saveOrgLocation(OrgLocation orgLocation);
+	public Organization saveOrganization(Organization organization);
+
+	public PatientMaster readPatientMaster(String id);
+	public PatientReported readPatientReported(String id);
+	public ModelPerson readPractitionerPerson(String id);
+	public OrgLocation readOrgLocation(String id);
+}

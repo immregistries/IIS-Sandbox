@@ -1,9 +1,10 @@
-package org.immregistries.iis.kernal.mapping.forR5;
+package org.immregistries.iis.kernal.mapping.forR4;
 
-import ca.uhn.fhir.jpa.starter.annotations.OnR5Condition;
-import org.hl7.fhir.r5.model.Address;
-import org.hl7.fhir.r5.model.IdType;
-import org.hl7.fhir.r5.model.Location;
+import ca.uhn.fhir.jpa.starter.annotations.OnR4Condition;
+import org.hl7.fhir.r4.model.Address;
+import org.hl7.fhir.r4.model.IdType;
+import org.hl7.fhir.r4.model.Identifier;
+import org.hl7.fhir.r4.model.Location;
 import org.immregistries.iis.kernal.mapping.Interfaces.LocationMapper;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
 import org.immregistries.iis.kernal.model.OrgLocation;
@@ -11,15 +12,15 @@ import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Service;
 
 @Service
-@Conditional(OnR5Condition.class)
-public class LocationMapperR5 implements LocationMapper<Location> {
+@Conditional(OnR4Condition.class)
+public class LocationMapperR4 implements LocationMapper<Location> {
 
 	public Location getFhirResource(OrgLocation ol) {
 
 		if (ol != null) {
 			Location location = new Location();
 			location.setId(ol.getOrgLocationId());
-			location.addIdentifier(MappingHelper.getFhirIdentifier(MappingHelper.ORG_LOCATION, ol.getOrgFacilityCode()));
+			location.addIdentifier(new Identifier().setSystem(MappingHelper.ORG_LOCATION).setValue(ol.getOrgFacilityCode()));
 			location.setName(ol.getOrgFacilityName());
 
 			Address address = location.getAddress();

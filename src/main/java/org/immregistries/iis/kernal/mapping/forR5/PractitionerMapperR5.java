@@ -1,13 +1,16 @@
 package org.immregistries.iis.kernal.mapping.forR5;
 
 
+import ca.uhn.fhir.jpa.starter.annotations.OnR5Condition;
 import org.hl7.fhir.r5.model.*;
 import org.immregistries.iis.kernal.mapping.Interfaces.PractitionerMapper;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
 import org.immregistries.iis.kernal.model.ModelPerson;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Service;
 
 @Service
+@Conditional(OnR5Condition.class)
 public class PractitionerMapperR5 implements PractitionerMapper<Practitioner> {
 
 	public static final String PRACTITIONER = "Practitioner";

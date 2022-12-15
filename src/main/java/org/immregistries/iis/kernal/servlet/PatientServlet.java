@@ -10,7 +10,7 @@ import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.logic.CodeMapManager;
 import org.immregistries.iis.kernal.model.*;
-import org.immregistries.iis.kernal.repository.FhirRequests;
+import org.immregistries.iis.kernal.repository.FhirRequesterR5;
 import org.immregistries.iis.kernal.repository.RepositoryClientFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -31,7 +31,7 @@ public class PatientServlet extends HttpServlet {
 	private RepositoryClientFactory repositoryClientFactory;
 
 	@Autowired
-	FhirRequests fhirRequests;
+    FhirRequesterR5 fhirRequests;
 
   public static final String PARAM_ACTION = "action";
   public static final String ACTION_SEARCH = "search";

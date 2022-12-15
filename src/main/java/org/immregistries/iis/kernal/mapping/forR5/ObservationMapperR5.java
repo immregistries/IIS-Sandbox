@@ -1,21 +1,25 @@
 package org.immregistries.iis.kernal.mapping.forR5;
 
+import ca.uhn.fhir.jpa.starter.annotations.OnR5Condition;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import org.hl7.fhir.r5.model.*;
 import org.immregistries.iis.kernal.mapping.Interfaces.ObservationMapper;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
 import org.immregistries.iis.kernal.model.ObservationMaster;
 import org.immregistries.iis.kernal.model.ObservationReported;
-import org.immregistries.iis.kernal.repository.FhirRequests;
+import org.immregistries.iis.kernal.repository.FhirRequester;
+import org.immregistries.iis.kernal.repository.FhirRequesterR5;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Service;
 
 import static org.immregistries.iis.kernal.mapping.MappingHelper.*;
 
 @Service("ObservationMapperR5")
+@Conditional(OnR5Condition.class)
 public class ObservationMapperR5 implements ObservationMapper<Observation> {
 	@Autowired
-	FhirRequests fhirRequests;
+	FhirRequester fhirRequests;
 	public static final String IDENTIFIER_CODE = "identifierCode";
 	public static final String OBSERVATION_DATE = "observationDate";
 	public static final String RESULT_STATUS = "resultStatus";
@@ -51,7 +55,7 @@ public class ObservationMapperR5 implements ObservationMapper<Observation> {
 
 	}
 
-	public ObservationReported getReportedWithMaster(Observation observation, FhirRequests fhirRequests, IGenericClient fhirClient){
+	public ObservationReported getReportedWithMaster(Observation observation, FhirRequester fhirRequests, IGenericClient fhirClient){
 		ObservationReported observationReported = getReported(observation);
 		observationReported.setObservation(
 			fhirRequests.searchObservationMaster(

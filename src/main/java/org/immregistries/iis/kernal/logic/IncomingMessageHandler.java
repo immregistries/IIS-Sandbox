@@ -17,8 +17,8 @@ import org.immregistries.iis.kernal.mapping.forR5.ObservationMapperR5;
 import org.immregistries.iis.kernal.mapping.forR5.PatientMapperR5;
 import org.immregistries.iis.kernal.model.*;
 import org.immregistries.iis.kernal.model.ModelPerson;
-import org.immregistries.iis.kernal.repository.FhirRequestBase;
-import org.immregistries.iis.kernal.repository.FhirRequests;
+import org.immregistries.iis.kernal.repository.FhirRequester;
+import org.immregistries.iis.kernal.repository.FhirRequesterR5;
 import org.immregistries.iis.kernal.repository.RepositoryClientFactory;
 import org.immregistries.iis.kernal.servlet.PopServlet;
 import org.immregistries.iis.kernal.servlet.ServletHelper;
@@ -42,7 +42,7 @@ public class IncomingMessageHandler {
   	@Autowired
   	protected RepositoryClientFactory repositoryClientFactory;
   	@Autowired
-  	protected FhirRequests fhirRequests;
+  	protected FhirRequesterR5 fhirRequests;
 	@Autowired
     PatientMapperR5 patientMapper;
 	@Autowired
@@ -1809,7 +1809,7 @@ public class IncomingMessageHandler {
 		 try {
 			 Bundle bundle = fhirClient.search().forResource(Immunization.class)
 				 .where(Immunization.PATIENT.hasId(patient.getPatientId()))
-				 .withTag(FhirRequestBase.GOLDEN_SYSTEM_TAG,FhirRequestBase.GOLDEN_RECORD)
+				 .withTag(FhirRequester.GOLDEN_SYSTEM_TAG, FhirRequester.GOLDEN_RECORD)
 				 .sort().ascending(Immunization.IDENTIFIER)
 				 .returnBundle(Bundle.class).execute();
 			 for (Bundle.BundleEntryComponent entry : bundle.getEntry()) {

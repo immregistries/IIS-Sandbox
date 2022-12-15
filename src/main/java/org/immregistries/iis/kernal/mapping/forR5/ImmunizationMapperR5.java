@@ -1,24 +1,27 @@
 package org.immregistries.iis.kernal.mapping.forR5;
 
+import ca.uhn.fhir.jpa.starter.annotations.OnR5Condition;
 import org.hl7.fhir.r5.model.*;
 import org.immregistries.iis.kernal.mapping.Interfaces.ImmunizationMapper;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
 import org.immregistries.iis.kernal.model.ModelPerson;
 import org.immregistries.iis.kernal.model.VaccinationMaster;
 import org.immregistries.iis.kernal.model.VaccinationReported;
-import org.immregistries.iis.kernal.repository.FhirRequests;
+import org.immregistries.iis.kernal.repository.FhirRequesterR5;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.Date;
 
 @Service("ImmunizationMapperR5")
+@Conditional(OnR5Condition.class)
 public class ImmunizationMapperR5 implements ImmunizationMapper<Immunization> {
 	@Autowired
     LocationMapperR5 locationMapper;
 	@Autowired
-	FhirRequests fhirRequests;
+	FhirRequesterR5 fhirRequests;
 
 	public static final String CVX = "http://hl7.org/fhir/sid/cvx";
 	public static final String MVX = "http://terminology.hl7.org/CodeSystem/MVX";
