@@ -7,6 +7,7 @@ import org.immregistries.iis.kernal.mapping.MappingHelper;
 import org.immregistries.iis.kernal.model.ModelPerson;
 import org.immregistries.iis.kernal.model.VaccinationMaster;
 import org.immregistries.iis.kernal.model.VaccinationReported;
+import org.immregistries.iis.kernal.repository.FhirRequesterR4;
 import org.immregistries.iis.kernal.repository.FhirRequesterR5;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
@@ -19,7 +20,7 @@ import java.util.Date;
 @Conditional(OnR4Condition.class)
 public class ImmunizationMapperR4 implements ImmunizationMapper<Immunization> {
 	@Autowired
-    FhirRequesterR5 fhirRequests;
+	FhirRequesterR4 fhirRequests;
 
 	public static final String CVX = "http://hl7.org/fhir/sid/cvx";
 	public static final String MVX = "http://terminology.hl7.org/CodeSystem/MVX";

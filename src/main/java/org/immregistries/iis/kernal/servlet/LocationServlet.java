@@ -4,10 +4,10 @@ import ca.uhn.fhir.rest.client.api.IGenericClient;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Query;
 import org.hibernate.Session;
-import org.hl7.fhir.r5.model.Location;
+import org.immregistries.iis.kernal.mapping.Interfaces.LocationMapper;
 import org.immregistries.iis.kernal.mapping.forR5.LocationMapperR5;
 import org.immregistries.iis.kernal.model.*;
-import org.immregistries.iis.kernal.repository.FhirRequesterR5;
+import org.immregistries.iis.kernal.repository.FhirRequester;
 import org.immregistries.iis.kernal.repository.RepositoryClientFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -31,9 +31,9 @@ public class LocationServlet extends HttpServlet {
 	@Autowired
 	RepositoryClientFactory repositoryClientFactory;
 	@Autowired
-    FhirRequesterR5 fhirRequests;
+	FhirRequester fhirRequests;
 	@Autowired
-    LocationMapperR5 locationMapper;
+	LocationMapper locationMapper;
 
   public static final String PARAM_ACTION = "action";
   public static final String ACTION_ADD = "Add";
@@ -82,7 +82,7 @@ public class LocationServlet extends HttpServlet {
 		 if (req.getParameter(PARAM_ORG_LOCATION_ID) != null) {
 //			orgLocationSelected = fhirRequests.searchOrgLocation(fhirClient,
 //				Location.IDENTIFIER.exactly().identifier(req.getParameter(PARAM_ORG_LOCATION_ID)));
-			orgLocationSelected = locationMapper.orgLocationFromFhir(fhirClient.read().resource(Location.class).withId(req.getParameter(PARAM_ORG_LOCATION_ID)).execute());
+			orgLocationSelected = fhirRequests.readOrgLocation(req.getParameter(PARAM_ORG_LOCATION_ID));
 		 }
 
       String action = req.getParameter(PARAM_ACTION);

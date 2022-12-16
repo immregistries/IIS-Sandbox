@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 public class VXUDownloadGenerator extends Thread {
 
 	@Autowired
-    FhirRequesterR5 fhirRequests;
+	FhirRequesterR5 fhirRequests;
 	@Autowired
 	IncomingMessageHandler incomingMessageHandler;
 	@Autowired

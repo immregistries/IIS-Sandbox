@@ -20,7 +20,11 @@ import static org.immregistries.iis.kernal.mapping.MappingHelper.MRN_SYSTEM;
 import static org.immregistries.iis.kernal.mapping.MappingHelper.OBSERVATION_REPORTED;
 
 /**
- * Litteral copy of FhirRequesterR5 except for r5 and r4 import
+ * DO NOT EDIT THE CONTENT OF THIS FILE
+ *
+ * This is a literal copy of FhirRequesterR5 except for the name and imported FHIR Model package
+ *
+ * Please paste any new content from R5 version here to preserve similarity in behavior.
  */
 @Component
 @Conditional(OnR4Condition.class)
@@ -250,5 +254,9 @@ public class FhirRequesterR4 extends FhirRequester<Patient,Immunization,Location
 
 	public OrgLocation readOrgLocation(String id) {
 		return locationMapper.orgLocationFromFhir((Location) read(Location.class,id));
+	}
+
+	public VaccinationReported readVaccinationReported(String id) {
+		return immunizationMapper.getReported((Immunization) read(Immunization.class,id));
 	}
 }

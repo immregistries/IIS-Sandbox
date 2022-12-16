@@ -1,9 +1,7 @@
 package org.immregistries.iis.kernal.logic;
 
-import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.api.server.RequestDetails;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
-import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
 import ca.uhn.fhir.rest.server.servlet.ServletRequestDetails;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.r5.model.*;
@@ -11,10 +9,12 @@ import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.model.*;
+import org.immregistries.iis.kernal.repository.FhirRequester;
 import org.immregistries.iis.kernal.servlet.ServletHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -22,12 +22,14 @@ import java.util.Date;
 
 import static org.immregistries.iis.kernal.mapping.MappingHelper.MRN_SYSTEM;
 
-@Component
-public class IncomingEventHandler extends IncomingMessageHandler {
+@Service("IncomingEventHandler")
+public class IncomingEventHandler {
+	@Autowired
+	protected FhirRequester fhirRequester;
+	@Autowired
+	protected IncomingMessageHandler incomingMessageHandler;
 
 	private final Logger logger = LoggerFactory.getLogger(IncomingEventHandler.class);
-
-
 
   private static final String ORG_LOCATION_FACILITY_CODE = "orgLocationFacilityCode";
   private static final String FUNDING_ELIGIBILITY = "fundingEligibility";
@@ -104,9 +106,6 @@ public class IncomingEventHandler extends IncomingMessageHandler {
           EXPIRATION_DATE, COMPLETION_STATUS, ACTION_CODE, REFUSAL_REASON_CODE, BODY_SITE,
           BODY_ROUTE, FUNDING_SOURCE, FUNDING_ELIGIBILITY, ORG_LOCATION_FACILITY_CODE};
 
-//  public IncomingEventHandler(Session dataSession) {
-//    super(dataSession);
-//  }
 
   public String process(HttpServletRequest req, OrgAccess orgAccess) {
     try {
@@ -122,7 +121,6 @@ public class IncomingEventHandler extends IncomingMessageHandler {
 
   public void processEvent(OrgAccess orgAccess, HttpServletRequest req) throws Exception {
 	  HttpSession session = req.getSession(true);
-	  IGenericClient fhirClient = ServletHelper.getFhirClient(session,repositoryClientFactory);
     CodeMap codeMap = CodeMapManager.getCodeMap();
     PatientReported patientReported = processPatient(orgAccess, req, codeMap);
     VaccinationReported vaccinationReported = null;
@@ -132,12 +130,12 @@ public class IncomingEventHandler extends IncomingMessageHandler {
     if (vaccinationReportedExternalLink.equals("")) {
       throw new Exception("Vaccination order id was not found, unable to process");
     }
-    administrationDate = parseDateInternal(req.getParameter(ADMINISTERED_DATE), true);
+    administrationDate = incomingMessageHandler.parseDateInternal(req.getParameter(ADMINISTERED_DATE), true);
     if (administrationDate.after(new Date())) {
       throw new Exception(
           "Vaccination is indicated as occuring in the future, unable to accept future vaccination events");
     }
-	  vaccinationReported = fhirRequests.searchVaccinationReported(
+	  vaccinationReported = fhirRequester.searchVaccinationReported(
 		  Immunization.PATIENT.hasId(patientReported.getPatientReportedId()),
 		 Immunization.IDENTIFIER.exactly().code(vaccinationReportedExternalLink)
 		 );
@@ -185,7 +183,7 @@ public class IncomingEventHandler extends IncomingMessageHandler {
       String administeredAtLocation = req.getParameter(ORG_LOCATION_FACILITY_CODE);
       if (StringUtils.isNotEmpty(administeredAtLocation)) {
 			OrgLocation orgLocation = null;
-			orgLocation = fhirRequests.searchOrgLocation(
+			orgLocation = fhirRequester.searchOrgLocation(
 				Location.IDENTIFIER.exactly().code(administeredAtLocation)
 				// Location.ORGANIZATION.hasAnyOfIds(administeredAtLocation) //Todo verify condition
 			);
@@ -201,16 +199,7 @@ public class IncomingEventHandler extends IncomingMessageHandler {
 				orgLocation.setAddressState("");
 				orgLocation.setAddressZip("");
 				orgLocation.setAddressCountry("");
-				Location location = locationMapper.getFhirResource(orgLocation);
-				MethodOutcome outcome;
-				try {
-					outcome = fhirClient.update().resource(location).conditional()
-						.where(Location.IDENTIFIER.exactly().identifier(location.getIdentifierFirstRep().getValue()))
-						.execute();
-				} catch (ResourceNotFoundException e ){
-					outcome = fhirClient.create().resource(location).execute();
-				}
-				orgLocation = locationMapper.orgLocationFromFhir((Location) outcome.getResource());
+				orgLocation = fhirRequester.saveOrgLocation(orgLocation);
 			}
         vaccinationReported.setOrgLocation(orgLocation);
       }
@@ -225,7 +214,7 @@ public class IncomingEventHandler extends IncomingMessageHandler {
     vaccinationReported.setInformationSource(req.getParameter(INFORMATION_SOURCE));
     vaccinationReported.setLotnumber(req.getParameter(LOTNUMBER));
     vaccinationReported
-        .setExpirationDate(parseDateInternal(req.getParameter(EXPIRATION_DATE), true));
+        .setExpirationDate(incomingMessageHandler.parseDateInternal(req.getParameter(EXPIRATION_DATE), true));
     vaccinationReported.setVaccineMvxCode(req.getParameter(VACCINE_MVX_CODE));
     vaccinationReported.setRefusalReasonCode(req.getParameter(REFUSAL_REASON_CODE));
     vaccinationReported.setCompletionStatus(req.getParameter(COMPLETION_STATUS));
@@ -242,7 +231,7 @@ public class IncomingEventHandler extends IncomingMessageHandler {
 
 
     {
-		 vaccinationReported = fhirRequests.saveVaccinationReported(vaccinationReported);
+		 vaccinationReported = fhirRequester.saveVaccinationReported(vaccinationReported);
     }
 
   }
@@ -252,7 +241,6 @@ public class IncomingEventHandler extends IncomingMessageHandler {
 	 RequestDetails requestDetails = new ServletRequestDetails();
 	 requestDetails.setTenantId(orgAccess.getAccessName());
 	 HttpSession session = req.getSession(true);
-	 IGenericClient fhirClient = ServletHelper.getFhirClient(session,repositoryClientFactory);
     PatientReported patientReported = null;
 //    PatientMaster patientMaster = null;
 
@@ -265,7 +253,7 @@ public class IncomingEventHandler extends IncomingMessageHandler {
 
 
     {
-		 patientReported = fhirRequests.searchPatientReported(
+		 patientReported = fhirRequester.searchPatientReported(
 			 Patient.IDENTIFIER.exactly().code(patientReportedExternalLink)
 		 );
     }
@@ -313,7 +301,7 @@ public class IncomingEventHandler extends IncomingMessageHandler {
       }
       addressFrag = zip + ":" + addressFragPrep;
     }
-    Date patientBirthDate = parseDateInternal(req.getParameter(PATIENT_BIRTH_DATE), true);
+    Date patientBirthDate = incomingMessageHandler.parseDateInternal(req.getParameter(PATIENT_BIRTH_DATE), true);
 
     if (patientBirthDate.after(new Date())) {
       throw new Exception(
@@ -352,7 +340,7 @@ public class IncomingEventHandler extends IncomingMessageHandler {
     patientReported.setPatientBirthFlag(req.getParameter(PATIENT_BIRTH_FLAG));
     patientReported.setPatientBirthOrder(req.getParameter(PATIENT_BIRTH_ORDER));
     patientReported
-        .setPatientDeathDate(parseDateInternal(req.getParameter(PATIENT_DEATH_DATE), true));
+        .setPatientDeathDate(incomingMessageHandler.parseDateInternal(req.getParameter(PATIENT_DEATH_DATE), true));
     patientReported.setPatientDeathFlag(req.getParameter(PATIENT_DEATH_FLAG));
     patientReported.setPatientEmail(req.getParameter(PATIENT_EMAIL));
     patientReported.setPatientPhone(patientPhone);
@@ -360,19 +348,19 @@ public class IncomingEventHandler extends IncomingMessageHandler {
     patientReported.setPublicityIndicator(req.getParameter(PUBLICITY_INDICATOR));
     patientReported.setProtectionIndicator(req.getParameter(PROTECTION_INDICATOR));
     patientReported.setProtectionIndicatorDate(
-        parseDateInternal(req.getParameter(PROTECTION_INDICATOR_DATE), true));
+		 incomingMessageHandler.parseDateInternal(req.getParameter(PROTECTION_INDICATOR_DATE), true));
     patientReported.setRegistryStatusIndicator(req.getParameter(REGISTRY_STATUS_INDICATOR));
     patientReported.setRegistryStatusIndicatorDate(
-        parseDateInternal(req.getParameter(PROTECTION_INDICATOR_DATE), true));
+		 incomingMessageHandler.parseDateInternal(req.getParameter(PROTECTION_INDICATOR_DATE), true));
     patientReported.setPublicityIndicatorDate(
-        parseDateInternal(req.getParameter(PUBLICITY_INDICATOR_DATE), true));
+		 incomingMessageHandler.parseDateInternal(req.getParameter(PUBLICITY_INDICATOR_DATE), true));
     patientReported.setGuardianLast(req.getParameter(GUARDIAN_LAST));
     patientReported.setGuardianFirst(req.getParameter(GUARDIAN_FIRST));
     patientReported.setGuardianMiddle(req.getParameter(GUARDIAN_MIDDLE));
     patientReported.setGuardianRelationship(req.getParameter(GUARDIAN_RELATIONSHIP));
     patientReported.setUpdatedDate(new Date());
-    patientReported = fhirRequests.savePatientReported(patientReported);
-	 patientReported.setPatient(fhirRequests.searchPatientMaster(
+    patientReported = fhirRequester.savePatientReported(patientReported);
+	 patientReported.setPatient(fhirRequester.searchPatientMaster(
 		 Patient.IDENTIFIER.exactly().systemAndIdentifier(MRN_SYSTEM,patientReported.getPatientReportedExternalLink())
 	 ));
     return patientReported;

@@ -9,6 +9,7 @@ import org.immregistries.iis.kernal.mapping.Interfaces.PatientMapper;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
 import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.model.PatientReported;
+import org.immregistries.iis.kernal.repository.FhirRequesterR4;
 import org.immregistries.iis.kernal.repository.FhirRequesterR5;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
@@ -23,7 +24,7 @@ import static org.immregistries.iis.kernal.mapping.MappingHelper.MRN_SYSTEM;
 public class PatientMapperR4 implements PatientMapper<Patient> {
 
 	@Autowired
-    FhirRequesterR5 fhirRequests;
+	FhirRequesterR4 fhirRequests;
 	private static final String REGISTRY_STATUS_EXTENSION = "registryStatus";
 	private static final String REGISTRY_STATUS_INDICATOR = "registryStatusIndicator";
 	private static final String ETHNICITY_EXTENSION = "ethnicity";

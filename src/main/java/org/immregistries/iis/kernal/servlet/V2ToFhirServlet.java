@@ -30,6 +30,9 @@ import java.io.PrintWriter;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * Deprecated
+ */
 @SuppressWarnings("serial")
 public class V2ToFhirServlet extends HttpServlet {
 	@Autowired

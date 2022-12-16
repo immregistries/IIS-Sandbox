@@ -3,7 +3,6 @@ package org.immregistries.iis.kernal.servlet;
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.parser.IParser;
 import org.apache.commons.lang3.StringUtils;
-import org.hibernate.Session;
 import org.hl7.fhir.r5.model.*;
 import org.hl7.fhir.r5.model.ContactPoint.ContactPointSystem;
 import org.hl7.fhir.r5.model.Enumerations.AdministrativeGender;
@@ -36,6 +35,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * Deprecated, and only working with R5
+ */
 @SuppressWarnings("serial")
 public class FhirTestServlet extends HttpServlet {
 

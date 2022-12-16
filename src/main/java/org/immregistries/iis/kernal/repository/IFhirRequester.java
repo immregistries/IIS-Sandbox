@@ -2,6 +2,7 @@ package org.immregistries.iis.kernal.repository;
 
 import ca.uhn.fhir.rest.gclient.ICriterion;
 import org.hl7.fhir.instance.model.api.IBaseResource;
+import org.hl7.fhir.r5.model.Immunization;
 import org.immregistries.iis.kernal.model.*;
 
 import java.util.List;
@@ -43,4 +44,5 @@ public interface IFhirRequester<
 	public PatientReported readPatientReported(String id);
 	public ModelPerson readPractitionerPerson(String id);
 	public OrgLocation readOrgLocation(String id);
+	public VaccinationReported readVaccinationReported(String id);
 }

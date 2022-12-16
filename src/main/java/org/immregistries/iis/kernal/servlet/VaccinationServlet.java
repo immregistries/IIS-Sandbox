@@ -2,17 +2,15 @@ package org.immregistries.iis.kernal.servlet;
 
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import org.apache.commons.lang3.StringUtils;
-import org.hl7.fhir.r5.model.Immunization;
 import org.hl7.fhir.r5.model.Observation;
-import org.hl7.fhir.r5.model.Patient;
 import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.logic.CodeMapManager;
-import org.immregistries.iis.kernal.mapping.forR5.ImmunizationMapperR5;
-import org.immregistries.iis.kernal.mapping.forR5.PatientMapperR5;
+import org.immregistries.iis.kernal.mapping.Interfaces.ImmunizationMapper;
+import org.immregistries.iis.kernal.mapping.Interfaces.PatientMapper;
 import org.immregistries.iis.kernal.model.*;
-import org.immregistries.iis.kernal.repository.FhirRequesterR5;
+import org.immregistries.iis.kernal.repository.FhirRequester;
 import org.immregistries.iis.kernal.repository.RepositoryClientFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -33,11 +31,11 @@ public class VaccinationServlet extends PatientServlet {
 	@Autowired
 	RepositoryClientFactory repositoryClientFactory;
 	@Autowired
-    FhirRequesterR5 fhirRequests;
+	FhirRequester fhirRequester;
 	@Autowired
-	PatientMapperR5 patientMapper;
+	PatientMapper patientMapper;
 	@Autowired
-	ImmunizationMapperR5 immunizationMapper;
+	ImmunizationMapper immunizationMapper;
 
   public static final String PARAM_ACTION = "action";
 
@@ -67,10 +65,7 @@ public class VaccinationServlet extends PatientServlet {
     resp.setContentType("text/html");
     PrintWriter out = new PrintWriter(resp.getOutputStream());
     try {
-		 VaccinationReported vaccinationReported =
-			 immunizationMapper.getReported(fhirClient.read().resource(Immunization.class)
-				 .withId(req.getParameter(PARAM_VACCINATION_REPORTED_ID)).execute());
-
+		 VaccinationReported vaccinationReported = fhirRequester.readVaccinationReported(req.getParameter(PARAM_VACCINATION_REPORTED_ID));
 //			 fhirRequests.searchVaccinationReported(fhirClient,
 //			 Immunization.IDENTIFIER.exactly().code(req.getParameter(PARAM_VACCINATION_REPORTED_ID)));
 
@@ -81,8 +76,7 @@ public class VaccinationServlet extends PatientServlet {
       HomeServlet.doHeader(out, session);
 
       out.println("    <h2>" + orgAccess.getOrg().getOrganizationName() + "</h2>");
-      PatientReported patientReportedSelected = patientMapper.getReported(fhirClient.read().resource(Patient.class).withId(vaccinationReported.getPatientReportedId()).execute());
-
+      PatientReported patientReportedSelected = fhirRequester.readPatientReported(vaccinationReported.getPatientReportedId());
       {
         printPatient(out, patientReportedSelected);
         SimpleDateFormat sdfDate = new SimpleDateFormat("MM/dd/yyyy");
@@ -185,7 +179,7 @@ public List<ObservationReported> getObservationList(IGenericClient fhirClient,
       VaccinationReported vaccinationReported) {
     List<ObservationReported> observationReportedList;
     {
-		 observationReportedList = fhirRequests.searchObservationReportedList(
+		 observationReportedList = fhirRequester.searchObservationReportedList(
                  Observation.PATIENT.hasId(vaccinationReported.getVaccinationReportedId())
 		 );
       Set<String> suppressSet = LoincIdentifier.getSuppressIdentifierCodeSet();

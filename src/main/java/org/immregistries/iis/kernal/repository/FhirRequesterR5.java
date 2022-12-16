@@ -249,4 +249,8 @@ public class FhirRequesterR5 extends FhirRequester<Patient,Immunization,Location
 	public OrgLocation readOrgLocation(String id) {
 		return locationMapper.orgLocationFromFhir((Location) read(Location.class,id));
 	}
+
+	public VaccinationReported readVaccinationReported(String id) {
+		return immunizationMapper.getReported((Immunization) read(Immunization.class,id));
+	}
 }

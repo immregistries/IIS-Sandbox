@@ -1,10 +1,8 @@
 package org.immregistries.iis.kernal.servlet;
 
 import ca.uhn.fhir.rest.client.api.IGenericClient;
-import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.r5.model.Immunization;
-import org.hl7.fhir.r5.model.Location;
 import org.hl7.fhir.r5.model.Patient;
 import org.immregistries.iis.kernal.mapping.forR5.LocationMapperR5;
 import org.immregistries.iis.kernal.model.*;
@@ -31,7 +29,7 @@ public class CovidServlet extends HttpServlet {
 	@Autowired
 	RepositoryClientFactory repositoryClientFactory;
 	@Autowired
-	FhirRequesterR5 fhirRequests;
+	FhirRequesterR5 fhirRequester;
 	@Autowired
     LocationMapperR5 locationMapper;
 
@@ -154,7 +152,7 @@ public class CovidServlet extends HttpServlet {
           out.print(
               "<textarea cols=\"80\" rows=\"30\" style=\"white-space: nowrap;  overflow: auto;\">");
           {
-				 vaccinationReportedList = fhirRequests.searchVaccinationReportedList(
+				 vaccinationReportedList = fhirRequester.searchVaccinationReportedList(
 //						Immunization.DATE.after().day(dateStart),
 //					 Immunization.DATE.before().day(dateEnd),
 					 Immunization.PATIENT.hasChainedProperty(Patient.ORGANIZATION.hasId(String.valueOf(orgAccess.getOrg().getOrgId())))); // TODO test
@@ -249,7 +247,7 @@ public class CovidServlet extends HttpServlet {
 //              + "and patientReported = :patientReported and completionStatus = 'CP'");
 //      query.setParameter("administeredDate", vaccinationReported.getAdministeredDate());
 //      query.setParameter("patientReported", vaccinationReported.getPatientReported());
-		List<VaccinationReported> list = fhirRequests.searchVaccinationReportedList(
+		List<VaccinationReported> list = fhirRequester.searchVaccinationReportedList(
 			Immunization.DATE.before().day(vaccinationReported.getAdministeredDate()),
 			Immunization.PATIENT.hasId(vaccinationReported.getPatientReportedId()),
 			Immunization.STATUS.exactly().identifier(Immunization.ImmunizationStatusCodes.COMPLETED.toCode())
@@ -390,13 +388,7 @@ public class CovidServlet extends HttpServlet {
 
     OrgLocation orgLocation = vaccinationReported.getOrgLocation();
 	 if (orgLocation == null) {
-		 try {
-			 orgLocation = locationMapper.orgLocationFromFhir(
-				 ServletHelper.getFhirClient(repositoryClientFactory)
-					 .read().resource(Location.class)
-					 .withId(vaccinationReported.getOrgLocationId()).execute()
-			 );
-		 } catch (ResourceNotFoundException e) {}
+		 orgLocation = fhirRequester.readOrgLocation(vaccinationReported.getOrgLocationId());
 	 }
     if (orgLocation == null) {
       // 33: Responsible organization

@@ -1,8 +1,6 @@
 package org.immregistries.iis.kernal.model;
 
-import org.immregistries.iis.kernal.repository.FhirRequesterR5;
 import org.immregistries.vfa.connect.model.TestEvent;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -13,8 +11,6 @@ import java.util.Objects;
  */
 public class VaccinationReported implements Serializable {
   private static final long serialVersionUID = 1L;
-  @Autowired
-  private FhirRequesterR5 fhirRequests;
 	
   private String vaccinationReportedId = "";
   private PatientReported patientReported = null;
