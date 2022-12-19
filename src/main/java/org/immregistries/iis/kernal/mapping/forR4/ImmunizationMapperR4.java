@@ -216,7 +216,7 @@ public class ImmunizationMapperR4 implements ImmunizationMapper<Immunization> {
 	  i.addProgramEligibility().addCoding().setSystem(FUNDING_ELIGIBILITY).setCode(vr.getFundingEligibility());
 
 
-	  if (vr.getOrgLocationId().isBlank()) {
+	  if (!vr.getOrgLocationId().isBlank()) {
 		  i.setLocation(new Reference(MappingHelper.LOCATION + "/" + vr.getOrgLocationId()));
 	  }
 

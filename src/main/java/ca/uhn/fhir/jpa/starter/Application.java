@@ -1,8 +1,11 @@
 package ca.uhn.fhir.jpa.starter;
 
 import ca.uhn.fhir.batch2.jobs.config.Batch2JobsConfig;
+import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.jpa.batch2.JpaBatch2Config;
 import ca.uhn.fhir.jpa.starter.annotations.OnEitherVersion;
+import ca.uhn.fhir.jpa.starter.annotations.OnR4Condition;
+import ca.uhn.fhir.jpa.starter.annotations.OnR5Condition;
 import ca.uhn.fhir.jpa.starter.mdm.MdmConfig;
 import ca.uhn.fhir.jpa.subscription.channel.config.SubscriptionChannelConfig;
 import ca.uhn.fhir.jpa.subscription.match.config.SubscriptionProcessorConfig;
@@ -170,6 +173,7 @@ public class Application extends SpringBootServletInitializer {
 		return registrationBean;
 	}
 	@Bean
+	@Conditional(OnR5Condition.class)
 	public ServletRegistrationBean subscriptionServletRegistrationBean() {
 		ServletRegistrationBean registrationBean = new ServletRegistrationBean();
 		HttpServlet servlet = new SubscriptionServlet();
@@ -201,6 +205,7 @@ public class Application extends SpringBootServletInitializer {
 	}
 
 	@Bean
+	@Conditional(OnR5Condition.class)
 	public ServletRegistrationBean covidServletRegistrationBean() {
 		ServletRegistrationBean registrationBean = new ServletRegistrationBean();
 		HttpServlet servlet = new CovidServlet();

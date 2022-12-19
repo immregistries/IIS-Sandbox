@@ -1,14 +1,11 @@
 package ca.uhn.fhir.jpa.starter.interceptors;
 
 import ca.uhn.fhir.i18n.Msg;
-import ca.uhn.fhir.interceptor.api.Hook;
-import ca.uhn.fhir.interceptor.api.Pointcut;
 import ca.uhn.fhir.rest.api.server.RequestDetails;
 import ca.uhn.fhir.rest.server.interceptor.auth.AuthorizationInterceptor;
 import ca.uhn.fhir.rest.server.interceptor.auth.IAuthRule;
 import ca.uhn.fhir.rest.server.interceptor.auth.RuleBuilder;
 import org.apache.commons.codec.binary.Base64;
-import org.apache.http.HttpRequest;
 import org.apache.http.auth.AuthenticationException;
 import org.hibernate.Session;
 import org.immregistries.iis.kernal.model.OrgAccess;

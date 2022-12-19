@@ -21,10 +21,7 @@ import ca.uhn.fhir.jpa.partition.PartitionManagementProvider;
 import ca.uhn.fhir.jpa.provider.*;
 import ca.uhn.fhir.jpa.provider.dstu3.JpaConformanceProviderDstu3;
 import ca.uhn.fhir.jpa.search.DatabaseBackedPagingProvider;
-import ca.uhn.fhir.jpa.starter.interceptors.ExceptionFilteringInterceptor;
-import ca.uhn.fhir.jpa.starter.interceptors.MdmCustomInterceptor;
-import ca.uhn.fhir.jpa.starter.interceptors.PartitionCreationInterceptor;
-import ca.uhn.fhir.jpa.starter.interceptors.SessionAuthorizationInterceptor;
+import ca.uhn.fhir.jpa.starter.interceptors.*;
 import ca.uhn.fhir.jpa.subscription.util.SubscriptionDebugLogInterceptor;
 import ca.uhn.fhir.mdm.provider.MdmProviderLoader;
 import ca.uhn.fhir.narrative.DefaultThymeleafNarrativeGenerator;
@@ -33,7 +30,6 @@ import ca.uhn.fhir.narrative2.NullNarrativeGenerator;
 import ca.uhn.fhir.rest.openapi.OpenApiInterceptor;
 import ca.uhn.fhir.rest.server.*;
 import ca.uhn.fhir.rest.server.interceptor.*;
-import ca.uhn.fhir.rest.server.interceptor.partition.RequestTenantPartitionInterceptor;
 import ca.uhn.fhir.rest.server.provider.ResourceProviderFactory;
 import ca.uhn.fhir.rest.server.tenant.UrlBaseTenantIdentificationStrategy;
 import ca.uhn.fhir.rest.server.util.ISearchParamRegistry;
@@ -88,8 +84,6 @@ public class BaseJpaRestfulServer extends RestfulServer {
 
 	@Autowired
 	private ApplicationContext context;
-	@Autowired
-	BulkQueryProvider bulkQueryProvider;
 
   @Autowired
   ValueSetOperationProvider valueSetOperationProvider;
@@ -119,8 +113,6 @@ public class BaseJpaRestfulServer extends RestfulServer {
   @Autowired
   private IValidationSupport myValidationSupport;
 
-  @Autowired
-	IFhirResourceDao<Group> fhirResourceGroupDao;
 
   public BaseJpaRestfulServer() {
   }
@@ -144,6 +136,7 @@ public class BaseJpaRestfulServer extends RestfulServer {
       daoRegistry.setSupportedResourceTypes(supportedResourceTypes);
     }
 
+	  System.out.println(fhirSystemDao.getContext().getVersion().getVersion());
     setFhirContext(fhirSystemDao.getContext());
 
     /*
@@ -152,22 +145,30 @@ public class BaseJpaRestfulServer extends RestfulServer {
      */
     if(appProperties.getMdm_enabled()){
 		 mdmProviderProvider.get().loadProvider();
-		 /**
-		  * Mdm customization
-		  */
-		 MdmCustomInterceptor mdmCustomInterceptor = new MdmCustomInterceptor();
-//		 mdmCustomInterceptor.setMdmProvider(mdmProviderProvider.get());
-		 beanFactory.autowireBean(mdmCustomInterceptor);
-		 this.registerInterceptor( mdmCustomInterceptor);
 	 }
 
 
 
 	 // Bulk Query
-	  bulkQueryProvider.setContext(fhirSystemDao.getContext());
-	  bulkQueryProvider.setDao(fhirResourceGroupDao);
-	 resourceProviderFactory.addSupplier(() -> bulkQueryProvider);
-	  registerProviders(resourceProviderFactory.createProviders());
+	  FhirVersionEnum fhirVersion = fhirSystemDao.getContext().getVersion().getVersion();
+
+	  if (fhirVersion == FhirVersionEnum.R5) {
+		  /**
+			* Bulk FHIR Query provider
+			*/
+		  BulkQueryProvider bulkQueryProvider = new BulkQueryProvider();
+		  beanFactory.autowireBean(bulkQueryProvider);
+		  bulkQueryProvider.setContext(fhirSystemDao.getContext());
+		  resourceProviderFactory.addSupplier(() -> bulkQueryProvider);
+		  /**
+			* Mdm customization
+			*/
+		  MdmCustomInterceptor mdmCustomInterceptor = new MdmCustomInterceptor();
+//		  mdmCustomInterceptor.setMdmProvider(mdmProviderProvider.get());
+		  beanFactory.autowireBean(mdmCustomInterceptor);
+		  this.registerInterceptor( mdmCustomInterceptor);
+	  }
+	 registerProviders(resourceProviderFactory.createProviders());
     registerProvider(jpaSystemProvider);
     /*
      * The conformance provider exports the supported resources, search parameters, etc for
@@ -178,7 +179,6 @@ public class BaseJpaRestfulServer extends RestfulServer {
      * provide further customization of your server's CapabilityStatement
      */
 
-    FhirVersionEnum fhirVersion = fhirSystemDao.getContext().getVersion().getVersion();
     if (fhirVersion == FhirVersionEnum.DSTU2) {
 
       JpaConformanceProviderDstu2 confProvider = new JpaConformanceProviderDstu2(this, fhirSystemDao,

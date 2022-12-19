@@ -37,6 +37,17 @@ public class MappingHelper {
 				.setIdentifier(getFhirIdentifier(dbType,identifier));
 		}
 	}
+	public  static org.hl7.fhir.r4.model.Reference getFhirR4Reference(String fhirType, String dbType, String identifier) {
+		if (identifier == null || identifier.isBlank()) {
+			return null;
+		} else {
+			return new org.hl7.fhir.r4.model.Reference()
+				.setType(fhirType)
+				.setIdentifier(new org.hl7.fhir.r4.model.Identifier()
+					.setSystem(dbType)
+					.setValue(identifier));
+		}
+	}
 	public  static Reference getFhirReference(String fhirType, String dbType, String identifier, String fhirId) {
 		return new Reference(fhirType + "/" + fhirId)
 			.setType(fhirType)
@@ -45,6 +56,12 @@ public class MappingHelper {
 
 	public  static Identifier getFhirIdentifier(String dbType, String identifier) {
 		return new Identifier()
+				.setSystem(dbType)
+				.setValue(identifier);
+	}
+
+	public  static org.hl7.fhir.r4.model.Identifier getFhirR4Identifier(String dbType, String identifier) {
+		return new org.hl7.fhir.r4.model.Identifier()
 				.setSystem(dbType)
 				.setValue(identifier);
 	}
@@ -58,6 +75,9 @@ public class MappingHelper {
 	}
 
 	public  static Identifier filterIdentifier(List<Identifier> identifiers, String system) {
+		return identifiers.stream().filter(identifier -> identifier.getSystem() != null && identifier.getSystem().equals(system)).findFirst().orElse(identifiers.get(0));
+	}
+	public  static org.hl7.fhir.r4.model.Identifier filterR4Identifier(List<org.hl7.fhir.r4.model.Identifier> identifiers, String system) {
 		return identifiers.stream().filter(identifier -> identifier.getSystem() != null && identifier.getSystem().equals(system)).findFirst().orElse(identifiers.get(0));
 	}
 

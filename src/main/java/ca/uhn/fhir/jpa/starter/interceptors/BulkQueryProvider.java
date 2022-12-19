@@ -1,13 +1,14 @@
-package ca.uhn.fhir.jpa.starter;
+package ca.uhn.fhir.jpa.starter.interceptors;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.context.FhirVersionEnum;
+import ca.uhn.fhir.jpa.api.dao.IFhirResourceDao;
 import ca.uhn.fhir.jpa.api.dao.IFhirSystemDao;
 import ca.uhn.fhir.jpa.model.util.JpaConstants;
 import ca.uhn.fhir.jpa.provider.BaseJpaResourceProvider;
 import ca.uhn.fhir.jpa.provider.r5.BaseJpaResourceProviderPatientR5;
-import ca.uhn.fhir.jpa.provider.r5.JpaResourceProviderR5;
 import ca.uhn.fhir.jpa.rp.r5.GroupResourceProvider;
+import ca.uhn.fhir.jpa.starter.annotations.OnR5Condition;
 import ca.uhn.fhir.model.api.annotation.Description;
 import ca.uhn.fhir.model.valueset.BundleTypeEnum;
 import ca.uhn.fhir.rest.annotation.*;
@@ -17,20 +18,20 @@ import ca.uhn.fhir.rest.api.server.IBundleProvider;
 import ca.uhn.fhir.rest.api.server.RequestDetails;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.param.*;
-import ca.uhn.fhir.rest.server.BundleProviders;
-import org.hl7.fhir.convertors.factory.VersionConvertorFactory_40_50;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r5.model.*;
 import org.immregistries.iis.kernal.repository.RepositoryClientFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Controller;
 
 import java.util.List;
 
 
 @Controller
+@Conditional(OnR5Condition.class)
 public class BulkQueryProvider extends GroupResourceProvider {
 	Logger logger = LoggerFactory.getLogger(BulkQueryProvider.class);
 
@@ -45,6 +46,13 @@ public class BulkQueryProvider extends GroupResourceProvider {
 //	BaseJpaResourceProvider<org.hl7.fhir.r4.model.Patient> patientR4Provider;
 	@Autowired
 	IFhirSystemDao fhirSystemDao;
+	@Autowired
+	IFhirResourceDao<Group> fhirResourceGroupDao;
+
+	public BulkQueryProvider() {
+		super();
+		setDao(fhirResourceGroupDao);
+	}
 
 	/**
 	 * Group/123/$everything

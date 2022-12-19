@@ -2,6 +2,7 @@ package org.immregistries.iis.kernal.servlet;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.interceptor.model.RequestPartitionId;
+import ca.uhn.fhir.jpa.api.dao.IFhirSystemDao;
 import ca.uhn.fhir.jpa.provider.SubscriptionTriggeringProvider;
 import ca.uhn.fhir.jpa.rp.r5.OperationOutcomeResourceProvider;
 import ca.uhn.fhir.jpa.subscription.match.deliver.resthook.SubscriptionDeliveringRestHookSubscriber;
@@ -32,7 +33,7 @@ import java.text.SimpleDateFormat;
  */
 public class SubscriptionServlet extends HttpServlet {
 	@Autowired
-	FhirContext fhirContext;
+	IFhirSystemDao fhirSystemDao;
 	@Autowired
 	RepositoryClientFactory repositoryClientFactory;
 	@Autowired
@@ -112,7 +113,7 @@ public class SubscriptionServlet extends HttpServlet {
 				resourceDeliveryMessage.setSubscription(subscriptionCanonicalizer.canonicalize(subscription));
 				resourceDeliveryMessage.setPartitionId(RequestPartitionId.fromPartitionName(""+orgAccess.getAccessName()));
 				resourceDeliveryMessage.setOperationType(BaseResourceMessage.OperationTypeEnum.UPDATE);
-				resourceDeliveryMessage.setPayload(fhirContext,parsedResource, EncodingEnum.JSON);
+				resourceDeliveryMessage.setPayload(fhirSystemDao.getContext(),parsedResource, EncodingEnum.JSON);
 				subscriptionDeliveringRestHookSubscriber.handleMessage(resourceDeliveryMessage);
 
 

@@ -20,13 +20,13 @@ import java.io.IOException;
 @Component
 public class SubscriptionTopicServlet extends HttpServlet {
 	@Autowired
-	FhirContext fhirContext;
+	IFhirSystemDao fhirSystemDao;
 
 	Logger logger = LoggerFactory.getLogger(SubscriptionTopicServlet.class);
 
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		IParser parser = fhirContext.newJsonParser().setPrettyPrint(true);
+		IParser parser = fhirSystemDao.getContext().newJsonParser().setPrettyPrint(true);
 		SubscriptionTopic topic = getSubscriptionTopic();
 		resp.getOutputStream().print(parser.encodeResourceToString(topic));
 	}

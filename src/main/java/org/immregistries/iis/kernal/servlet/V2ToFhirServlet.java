@@ -14,7 +14,7 @@ import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.logic.CodeMapManager;
 import org.immregistries.iis.kernal.logic.IncomingMessageHandler;
-import org.immregistries.iis.kernal.mapping.forR5.ImmunizationMapperR5;
+import org.immregistries.iis.kernal.mapping.Interfaces.ImmunizationMapper;
 import org.immregistries.iis.kernal.model.*;
 import org.immregistries.iis.kernal.repository.RepositoryClientFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +38,7 @@ public class V2ToFhirServlet extends HttpServlet {
 	@Autowired
 	RepositoryClientFactory repositoryClientFactory;
 	@Autowired
-	ImmunizationMapperR5 immunizationMapper;
+	ImmunizationMapper immunizationMapper;
 	@Autowired
 	IncomingMessageHandler incomingMessageHandler;
 
@@ -149,7 +149,7 @@ public class V2ToFhirServlet extends HttpServlet {
   private void createImmunizationResource(VaccinationMaster vaccination, Immunization immunization,
       Code cvxCode, CodeMap codeMap) {
     VaccinationReported vaccinationReported = vaccination.getVaccinationReported();
-	 immunization = immunizationMapper.getFhirResource(vaccinationReported); // TODO Maybe remove this or remove the rest
+	 immunization = (Immunization) immunizationMapper.getFhirResource(vaccinationReported); // TODO Maybe remove this or remove the rest
 
     {
       DateTimeType occurance = new DateTimeType(vaccinationReported.getAdministeredDate());

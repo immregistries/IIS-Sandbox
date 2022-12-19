@@ -3,7 +3,7 @@ package ca.uhn.fhir.jpa.starter.interceptors;
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.interceptor.api.Hook;
 import ca.uhn.fhir.interceptor.api.Pointcut;
-import ca.uhn.fhir.jpa.api.dao.IFhirResourceDao;
+import ca.uhn.fhir.jpa.api.dao.IFhirSystemDao;
 import ca.uhn.fhir.jpa.mdm.dao.MdmLinkDaoSvc;
 import ca.uhn.fhir.jpa.mdm.svc.MdmLinkSvcImpl;
 import ca.uhn.fhir.jpa.mdm.svc.MdmResourceDaoSvc;
@@ -43,7 +43,7 @@ import static org.immregistries.iis.kernal.repository.FhirRequester.GOLDEN_SYSTE
 public class MdmCustomInterceptor {
 	Logger logger = LoggerFactory.getLogger(MdmCustomInterceptor.class);
 	@Autowired
-	IFhirResourceDao<Immunization> immunizationDao;
+	IFhirSystemDao fhirSystemDao;
 	@Autowired
 	MdmLinkDaoSvc mdmLinkDaoSvc;
 
@@ -52,8 +52,6 @@ public class MdmCustomInterceptor {
 	@Autowired
 	MdmLinkSvcImpl mdmLinkSvc;
 //	MdmLinkDaoSvc mdmLinkDaoSvc;
-	@Autowired
-	private FhirContext myFhirContext;
 	@Autowired
 	private ResourceProviderFactory myResourceProviderFactory;
 	@Autowired
@@ -71,7 +69,7 @@ public class MdmCustomInterceptor {
 	RepositoryClientFactory repositoryClientFactory;
 
 	private void initialize() {
-		mdmProvider = new MdmProviderDstu3Plus(this.myFhirContext, this.myMdmControllerSvc, this.myMdmControllerHelper, this.myMdmSubmitSvc, this.myMdmSettings);
+		mdmProvider = new MdmProviderDstu3Plus(fhirSystemDao.getContext(), this.myMdmControllerSvc, this.myMdmControllerHelper, this.myMdmSubmitSvc, this.myMdmSettings);
 	}
 
 	@Hook(Pointcut.STORAGE_PRECOMMIT_RESOURCE_CREATED)

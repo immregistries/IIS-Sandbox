@@ -1,6 +1,7 @@
 package org.immregistries.iis.kernal.servlet;
 
 import ca.uhn.fhir.context.FhirContext;
+import ca.uhn.fhir.jpa.api.dao.IFhirSystemDao;
 import ca.uhn.fhir.parser.IParser;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.r5.model.*;
@@ -19,6 +20,7 @@ import org.immregistries.mqe.hl7util.parser.HL7Reader;
 import org.immregistries.smm.transform.ScenarioManager;
 import org.immregistries.smm.transform.TestCaseMessage;
 import org.immregistries.smm.transform.Transformer;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -50,6 +52,8 @@ public class FhirTestServlet extends HttpServlet {
   private static final String FORMAT_XML = "XML";
 
   private static final String BASE_URL = "https://florence.immregistries.org/iis-sandbox/fhir";
+	@Autowired
+	IFhirSystemDao fhirSystemDao;
 
   @Override
   protected void doPost(HttpServletRequest req, HttpServletResponse resp)
@@ -72,7 +76,7 @@ public class FhirTestServlet extends HttpServlet {
 
       try {
         CodeMap codeMap = CodeMapManager.getCodeMap();
-        FhirContext ctx = FhirContext.forR4();
+        FhirContext ctx = fhirSystemDao.getContext();
         String format = req.getParameter(PARAM_FORMAT);
         if (format == null) {
           format = FORMAT_XML;
