@@ -38,7 +38,6 @@ import ca.uhn.fhir.validation.ResultSeverityEnum;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import org.hl7.fhir.r4.model.Bundle.BundleType;
-import org.hl7.fhir.r5.model.Group;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.context.ApplicationContext;
@@ -114,6 +113,12 @@ public class BaseJpaRestfulServer extends RestfulServer {
   private IValidationSupport myValidationSupport;
 
 
+  @Autowired(required=false)
+  IFhirResourceDao<org.hl7.fhir.r4.model.Group> fhirResourceGroupR4Dao;
+  @Autowired(required=false)
+  IFhirResourceDao<org.hl7.fhir.r5.model.Group> fhirResourceGroupR5Dao;
+
+
   public BaseJpaRestfulServer() {
   }
 
@@ -159,14 +164,23 @@ public class BaseJpaRestfulServer extends RestfulServer {
 		  BulkQueryProvider bulkQueryProvider = new BulkQueryProvider();
 		  beanFactory.autowireBean(bulkQueryProvider);
 		  bulkQueryProvider.setContext(fhirSystemDao.getContext());
+		  bulkQueryProvider.setDao(fhirResourceGroupR5Dao);
 		  resourceProviderFactory.addSupplier(() -> bulkQueryProvider);
-		  /**
-			* Mdm customization
-			*/
-		  MdmCustomInterceptor mdmCustomInterceptor = new MdmCustomInterceptor();
+		  if (appProperties.getMdm_enabled()) {
+			  /**
+				* Mdm customization
+				*/
+			  MdmCustomInterceptor mdmCustomInterceptor = new MdmCustomInterceptor();
 //		  mdmCustomInterceptor.setMdmProvider(mdmProviderProvider.get());
-		  beanFactory.autowireBean(mdmCustomInterceptor);
-		  this.registerInterceptor( mdmCustomInterceptor);
+			  beanFactory.autowireBean(mdmCustomInterceptor);
+			  this.registerInterceptor( mdmCustomInterceptor);
+		  }
+	  } else if (fhirVersion == FhirVersionEnum.R4) {
+		  BulkQueryProviderR4 bulkQueryProviderR4 = new BulkQueryProviderR4();
+		  beanFactory.autowireBean(bulkQueryProviderR4);
+		  bulkQueryProviderR4.setContext(fhirSystemDao.getContext());
+		  bulkQueryProviderR4.setDao(fhirResourceGroupR4Dao);
+		  resourceProviderFactory.addSupplier(() -> bulkQueryProviderR4);
 	  }
 	 registerProviders(resourceProviderFactory.createProviders());
     registerProvider(jpaSystemProvider);

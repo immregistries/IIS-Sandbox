@@ -7,6 +7,7 @@ import ca.uhn.fhir.jpa.api.dao.IFhirSystemDao;
 import ca.uhn.fhir.jpa.mdm.dao.MdmLinkDaoSvc;
 import ca.uhn.fhir.jpa.mdm.svc.MdmLinkSvcImpl;
 import ca.uhn.fhir.jpa.mdm.svc.MdmResourceDaoSvc;
+import ca.uhn.fhir.jpa.starter.mdm.MdmConfigCondition;
 import ca.uhn.fhir.mdm.api.*;
 import ca.uhn.fhir.mdm.model.MdmTransactionContext;
 import ca.uhn.fhir.mdm.provider.MdmControllerHelper;
@@ -27,6 +28,7 @@ import org.immregistries.vaccination_deduplication.reference.ImmunizationSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -40,6 +42,7 @@ import static org.immregistries.iis.kernal.repository.FhirRequester.GOLDEN_SYSTE
 
 @Component
 @Interceptor
+@Conditional(MdmConfigCondition.class)
 public class MdmCustomInterceptor {
 	Logger logger = LoggerFactory.getLogger(MdmCustomInterceptor.class);
 	@Autowired

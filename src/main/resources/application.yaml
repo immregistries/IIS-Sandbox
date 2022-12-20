@@ -114,7 +114,6 @@ hapi:
     #    filter_search_enabled: true
     #    graphql_enabled: true
     #    narrative_enabled: true
-    #    mdm_enabled: true
 #    local_base_urls:
 #      - https://hapi.fhir.org/baseR4
     mdm_enabled: true

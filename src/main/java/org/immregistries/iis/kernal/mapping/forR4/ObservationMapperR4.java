@@ -4,7 +4,6 @@ import ca.uhn.fhir.jpa.starter.annotations.OnR4Condition;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import org.hl7.fhir.r4.model.*;
 import org.immregistries.iis.kernal.mapping.Interfaces.ObservationMapper;
-import org.immregistries.iis.kernal.mapping.MappingHelper;
 import org.immregistries.iis.kernal.model.ObservationMaster;
 import org.immregistries.iis.kernal.model.ObservationReported;
 import org.immregistries.iis.kernal.repository.FhirRequester;
