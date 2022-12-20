@@ -19,6 +19,9 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
 
 public class PopServlet extends HttpServlet {
 	public static final String PARAM_MESSAGE = "MESSAGEDATA";
@@ -50,7 +53,9 @@ public class PopServlet extends HttpServlet {
       HttpSession session = req.getSession(true);
       OrgAccess orgAccess = (OrgAccess) session.getAttribute("orgAccess");
       String ack = "";
-      Session dataSession = getDataSession();
+		String[] messages;
+		StringBuilder ackBuilder = new StringBuilder();
+		Session dataSession = getDataSession();
       try {
         if (orgAccess == null) {
           orgAccess = ServletHelper.authenticateOrgAccess(userId, password, facilityId, dataSession);
@@ -60,9 +65,15 @@ public class PopServlet extends HttpServlet {
           out.println(
               "Access is not authorized. Facilityid, userid and/or password are not recognized. ");
         } else {
-//			  IncomingMessageHandler handler = new IncomingMessageHandler(dataSession);
 			  session.setAttribute("orgAccess", orgAccess);
-			  ack = handler.process(message, orgAccess);
+			  messages = message.split( "MSH\\|\\^~\\\\&\\|");
+			  for (String msh: messages) {
+				  if(!msh.isBlank()){
+					  ackBuilder.append(handler.process("MSH|^~\\&|" + msh, orgAccess));
+					  ackBuilder.append("\r\n");
+				  }
+			  }
+			  ack = ackBuilder.toString();
         }
       } finally {
         dataSession.close();

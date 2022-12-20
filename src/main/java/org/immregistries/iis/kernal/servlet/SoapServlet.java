@@ -67,6 +67,8 @@ public class SoapServlet extends HttpServlet {
           String facilityId = ssm.getFacilityID();
           String ack = "";
           Session dataSession = getDataSession();
+			 String[] messages;
+			 StringBuilder ackBuilder = new StringBuilder();
           try {
             OrgAccess orgAccess = ServletHelper.authenticateOrgAccess(userId, password, facilityId, dataSession);
             if (orgAccess == null) {
@@ -74,7 +76,14 @@ public class SoapServlet extends HttpServlet {
             } else {
 					HttpSession session = req.getSession(true);
 					session.setAttribute("orgAccess",orgAccess);
-					ack = handler.process(message, orgAccess);
+					messages = message.split( "MSH\\|\\^~\\\\&\\|");
+					for (String msh: messages) {
+						if(!msh.isBlank()){
+							ackBuilder.append(handler.process("MSH|^~\\&|" + msh, orgAccess));
+							ackBuilder.append("\r\n");
+						}
+					}
+					ack = ackBuilder.toString();
             }
           } catch (Exception e) {
             throw new UnknownFault("Unable to process request: " + e.getMessage(), e);
