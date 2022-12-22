@@ -17,8 +17,6 @@ public class MappingHelper {
 	public static final String PERSON = "Person";
 	public static final String PRACTITIONER = "Practitioner";
 
-	public static final String PERSON_MODEL = "Person";
-//	public static final String MRN_SYSTEM = "urn:mrns";
 	public static final SimpleDateFormat sdf = new SimpleDateFormat("E MMM dd HH:mm:ss yyyy");
 
 	//TODO choose system id or not
