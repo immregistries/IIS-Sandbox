@@ -22,7 +22,7 @@ import static org.immregistries.iis.kernal.mapping.MappingHelper.MRN_SYSTEM;
 
 @Component
 @Conditional(OnR5Condition.class)
-public class FhirRequesterR5 extends FhirRequester<Patient,Immunization,Location,Practitioner,Observation,Person, Organization> {
+public class FhirRequesterR5 extends FhirRequester<Patient,Immunization,Location,Practitioner,Observation,Person, Organization, RelatedPerson> {
 	Logger logger = LoggerFactory.getLogger(FhirRequesterR5.class);
 
 	public PatientMaster searchPatientMaster(ICriterion... where) {
@@ -155,6 +155,15 @@ public class FhirRequesterR5 extends FhirRequester<Patient,Immunization,Location
 		return modelPerson;
 	}
 
+	public RelatedPerson searchRelatedPerson(ICriterion... where) {
+		RelatedPerson relatedPerson = null;
+		Bundle bundle = (Bundle) search(RelatedPerson.class, where);
+		if (bundle != null && bundle.hasEntry()) {
+			relatedPerson = (RelatedPerson) bundle.getEntryFirstRep().getResource();
+		}
+		return relatedPerson;
+	}
+
 	public PatientReported savePatientReported(PatientReported patientReported) {
 		Patient patient = (Patient) patientMapper.getFhirResource(patientReported);
 		MethodOutcome outcome = save(patient,
@@ -179,6 +188,16 @@ public class FhirRequesterR5 extends FhirRequester<Patient,Immunization,Location
 			modelPerson.setPersonId(outcome.getResource().getIdElement().getIdPart());
 		}
 		return modelPerson;
+	}
+
+	public PatientReported saveRelatedPerson(PatientReported patientReported) {
+		RelatedPerson relatedPerson = (RelatedPerson) relatedPersonMapper.getFhirRelatedPersonFromPatient(patientReported);
+		MethodOutcome outcome = save(relatedPerson,
+			RelatedPerson.PATIENT.hasId(patientReported.getPatientReportedId()));
+		if (outcome.getResource() != null)  {
+			patientReported = relatedPersonMapper.fillGuardianInformation(patientReported, (RelatedPerson) outcome.getResource());
+		}
+		return patientReported;
 	}
 
 	public ObservationReported saveObservationReported(ObservationReported observationReported) {

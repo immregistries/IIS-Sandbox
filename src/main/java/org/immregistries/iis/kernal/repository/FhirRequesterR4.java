@@ -28,33 +28,33 @@ import static org.immregistries.iis.kernal.mapping.MappingHelper.OBSERVATION_REP
  */
 @Component
 @Conditional(OnR4Condition.class)
-public class FhirRequesterR4 extends FhirRequester<Patient,Immunization,Location,Practitioner,Observation,Person,Organization> {
+public class FhirRequesterR4 extends FhirRequester<Patient,Immunization,Location,Practitioner,Observation,Person,Organization,RelatedPerson> {
 	Logger logger = LoggerFactory.getLogger(FhirRequesterR4.class);
 
 	public PatientMaster searchPatientMaster(ICriterion... where) {
 		PatientMaster patientMaster = null;
-		Bundle bundle = (Bundle) searchGoldenRecord(Patient.class, where);
+		org.hl7.fhir.r4.model.Bundle bundle = (org.hl7.fhir.r4.model.Bundle) searchGoldenRecord(org.hl7.fhir.r4.model.Patient.class, where);
 		if (bundle != null && bundle.hasEntry()) {
-			patientMaster = patientMapper.getMaster((Patient) bundle.getEntryFirstRep().getResource());
+			patientMaster = patientMapper.getMaster((org.hl7.fhir.r4.model.Patient) bundle.getEntryFirstRep().getResource());
 		}
 		return patientMaster;
 	}
 
 	public PatientReported searchPatientReported(ICriterion... where) {
 		PatientReported patientReported = null;
-		Bundle bundle = (Bundle) searchRegularRecord(Patient.class, where);
+		org.hl7.fhir.r4.model.Bundle bundle = (org.hl7.fhir.r4.model.Bundle) searchRegularRecord(org.hl7.fhir.r4.model.Patient.class, where);
 		if (bundle != null && bundle.hasEntry()) {
-			patientReported = patientMapper.getReportedWithMaster((Patient) bundle.getEntryFirstRep().getResource());
+			patientReported = patientMapper.getReportedWithMaster((org.hl7.fhir.r4.model.Patient) bundle.getEntryFirstRep().getResource());
 		}
 		return patientReported;
 	}
 
 	public List<PatientReported> searchPatientReportedList(ICriterion... where) {
 		List<PatientReported> patientReportedList = new ArrayList<>();
-		Bundle bundle = (Bundle) searchRegularRecord(Patient.class, where);
+		org.hl7.fhir.r4.model.Bundle bundle = (org.hl7.fhir.r4.model.Bundle) searchRegularRecord(org.hl7.fhir.r4.model.Patient.class, where);
 		if (bundle != null) {
-			for (Bundle.BundleEntryComponent entry: bundle.getEntry()) {
-				patientReportedList.add(patientMapper.getReportedWithMaster((Patient) entry.getResource()));
+			for (org.hl7.fhir.r4.model.Bundle.BundleEntryComponent entry: bundle.getEntry()) {
+				patientReportedList.add(patientMapper.getReportedWithMaster((org.hl7.fhir.r4.model.Patient) entry.getResource()));
 			}
 		}
 		return patientReportedList;
@@ -62,36 +62,36 @@ public class FhirRequesterR4 extends FhirRequester<Patient,Immunization,Location
 
 	public VaccinationMaster searchVaccinationMaster(ICriterion... where) {
 		VaccinationMaster vaccinationMaster = null;
-		Bundle bundle = (Bundle) searchGoldenRecord(Immunization.class, where);
+		org.hl7.fhir.r4.model.Bundle bundle = (org.hl7.fhir.r4.model.Bundle) searchGoldenRecord(org.hl7.fhir.r4.model.Immunization.class, where);
 		if (bundle != null && bundle.hasEntry()) {
-			vaccinationMaster = immunizationMapper.getMaster((Immunization) bundle.getEntryFirstRep().getResource());
+			vaccinationMaster = immunizationMapper.getMaster((org.hl7.fhir.r4.model.Immunization) bundle.getEntryFirstRep().getResource());
 		}
 		return vaccinationMaster;
 	}
 
 	public VaccinationReported searchVaccinationReported(ICriterion... where) {
 		VaccinationReported vaccinationReported = null;
-		Bundle bundle = (Bundle) searchRegularRecord(Immunization.class, where);
+		org.hl7.fhir.r4.model.Bundle bundle = (org.hl7.fhir.r4.model.Bundle) searchRegularRecord(org.hl7.fhir.r4.model.Immunization.class, where);
 		if (bundle != null && bundle.hasEntry()) {
-			vaccinationReported = immunizationMapper.getReportedWithMaster((Immunization) bundle.getEntryFirstRep().getResource());
+			vaccinationReported = immunizationMapper.getReportedWithMaster((org.hl7.fhir.r4.model.Immunization) bundle.getEntryFirstRep().getResource());
 		}
 		return vaccinationReported;
 	}
 
-	public Organization searchOrganization(ICriterion... where) {
-		Organization organization = null;
-		Bundle bundle = (Bundle) search(Organization.class, where);
+	public org.hl7.fhir.r4.model.Organization searchOrganization(ICriterion... where) {
+		org.hl7.fhir.r4.model.Organization organization = null;
+		org.hl7.fhir.r4.model.Bundle bundle = (org.hl7.fhir.r4.model.Bundle) search(org.hl7.fhir.r4.model.Organization.class, where);
 		if (bundle != null && bundle.hasEntry()) {
-			organization = (Organization) bundle.getEntryFirstRep().getResource();
+			organization = (org.hl7.fhir.r4.model.Organization) bundle.getEntryFirstRep().getResource();
 		}
 		return organization;
 	}
 
 	public List<VaccinationReported> searchVaccinationReportedList(ICriterion... where) {
 		List<VaccinationReported> vaccinationReportedList = new ArrayList<>();
-		Bundle bundle = (Bundle) searchRegularRecord(Immunization.class, where);
-		for (Bundle.BundleEntryComponent entry: bundle.getEntry()) {
-			vaccinationReportedList.add(immunizationMapper.getReportedWithMaster((Immunization) entry.getResource()));
+		org.hl7.fhir.r4.model.Bundle bundle = (org.hl7.fhir.r4.model.Bundle) searchRegularRecord(org.hl7.fhir.r4.model.Immunization.class, where);
+		for (org.hl7.fhir.r4.model.Bundle.BundleEntryComponent entry: bundle.getEntry()) {
+			vaccinationReportedList.add(immunizationMapper.getReportedWithMaster((org.hl7.fhir.r4.model.Immunization) entry.getResource()));
 		}
 		return vaccinationReportedList;
 	}
@@ -99,18 +99,18 @@ public class FhirRequesterR4 extends FhirRequester<Patient,Immunization,Location
 	public ObservationReported searchObservationReported(ICriterion... where) {
 		IGenericClient fhirClient = ServletHelper.getFhirClient(repositoryClientFactory);
 		ObservationReported observationReported = null;
-		Bundle bundle = (Bundle) searchRegularRecord(Observation.class, where);
+		org.hl7.fhir.r4.model.Bundle bundle = (org.hl7.fhir.r4.model.Bundle) searchRegularRecord(org.hl7.fhir.r4.model.Observation.class, where);
 		if (bundle != null && bundle.hasEntry()) {
-			observationReported = observationMapper.getReportedWithMaster((Observation) bundle.getEntryFirstRep().getResource(),this,fhirClient);
+			observationReported = observationMapper.getReportedWithMaster((org.hl7.fhir.r4.model.Observation) bundle.getEntryFirstRep().getResource(),this,fhirClient);
 		}
 		return observationReported;
 	}
 
 	public ObservationMaster searchObservationMaster(ICriterion... where) {
 		ObservationMaster observationMaster = null;
-		Bundle bundle = (Bundle) searchGoldenRecord(Observation.class, where);
+		org.hl7.fhir.r4.model.Bundle bundle = (org.hl7.fhir.r4.model.Bundle) searchGoldenRecord(org.hl7.fhir.r4.model.Observation.class, where);
 		if (bundle != null && bundle.hasEntry()) {
-			observationMaster = observationMapper.getMaster((Observation) bundle.getEntryFirstRep().getResource());
+			observationMaster = observationMapper.getMaster((org.hl7.fhir.r4.model.Observation) bundle.getEntryFirstRep().getResource());
 		}
 		return observationMaster;
 	}
@@ -118,67 +118,76 @@ public class FhirRequesterR4 extends FhirRequester<Patient,Immunization,Location
 	public List<ObservationReported> searchObservationReportedList(ICriterion... where) {
 		IGenericClient fhirClient = ServletHelper.getFhirClient(repositoryClientFactory);
 		List<ObservationReported> observationReportedList = new ArrayList<>();
-		Bundle bundle = (Bundle) search(Observation.class, where);
-		for (Bundle.BundleEntryComponent entry: bundle.getEntry()) {
-			observationReportedList.add(observationMapper.getReportedWithMaster((Observation) entry.getResource(),this,fhirClient));
+		org.hl7.fhir.r4.model.Bundle bundle = (org.hl7.fhir.r4.model.Bundle) search(org.hl7.fhir.r4.model.Observation.class, where);
+		for (org.hl7.fhir.r4.model.Bundle.BundleEntryComponent entry: bundle.getEntry()) {
+			observationReportedList.add(observationMapper.getReportedWithMaster((org.hl7.fhir.r4.model.Observation) entry.getResource(),this,fhirClient));
 		}
 		return observationReportedList;
 	}
 
 	public OrgLocation searchOrgLocation(ICriterion... where) {
 		OrgLocation orgLocation = null;
-		Bundle bundle = (Bundle) search(Observation.class, where);
+		org.hl7.fhir.r4.model.Bundle bundle = (org.hl7.fhir.r4.model.Bundle) search(org.hl7.fhir.r4.model.Observation.class, where);
 		if (bundle != null && bundle.hasEntry()) {
-			orgLocation = locationMapper.orgLocationFromFhir((Location) bundle.getEntryFirstRep().getResource());
+			orgLocation = locationMapper.orgLocationFromFhir((org.hl7.fhir.r4.model.Location) bundle.getEntryFirstRep().getResource());
 		}
 		return orgLocation;
 	}
 
 	public List<OrgLocation> searchOrgLocationList(ICriterion... where) {
 		List<OrgLocation> locationList = new ArrayList<>();
-		Bundle bundle = (Bundle) search(Location.class, where);
-		for (Bundle.BundleEntryComponent entry: bundle.getEntry()) {
-			locationList.add(locationMapper.orgLocationFromFhir((Location) entry.getResource()));
+		org.hl7.fhir.r4.model.Bundle bundle = (org.hl7.fhir.r4.model.Bundle) search(org.hl7.fhir.r4.model.Location.class, where);
+		for (org.hl7.fhir.r4.model.Bundle.BundleEntryComponent entry: bundle.getEntry()) {
+			locationList.add(locationMapper.orgLocationFromFhir((org.hl7.fhir.r4.model.Location) entry.getResource()));
 		}
 		return locationList;
 	}
 
 	public ModelPerson searchPerson(ICriterion... where) {
 		ModelPerson modelPerson = null;
-		Bundle bundle = (Bundle) search(Person.class, where);
+		org.hl7.fhir.r4.model.Bundle bundle = (org.hl7.fhir.r4.model.Bundle) search(org.hl7.fhir.r4.model.Person.class, where);
 		if (bundle != null && bundle.hasEntry()) {
-			modelPerson = personMapper.getModelPerson((Person) bundle.getEntryFirstRep().getResource());
+			modelPerson = personMapper.getModelPerson((org.hl7.fhir.r4.model.Person) bundle.getEntryFirstRep().getResource());
 		}
 		return modelPerson;
 	}
 
 	public ModelPerson searchPractitioner(ICriterion... where) {
 		ModelPerson modelPerson = null;
-		Bundle bundle = (Bundle) search(Practitioner.class, where);
+		org.hl7.fhir.r4.model.Bundle bundle = (org.hl7.fhir.r4.model.Bundle) search(org.hl7.fhir.r4.model.Practitioner.class, where);
 		if (bundle != null && bundle.hasEntry()) {
-			modelPerson = practitionerMapper.getModelPerson((Practitioner) bundle.getEntryFirstRep().getResource());
+			modelPerson = practitionerMapper.getModelPerson((org.hl7.fhir.r4.model.Practitioner) bundle.getEntryFirstRep().getResource());
 		}
 		return modelPerson;
 	}
 
+	public org.hl7.fhir.r4.model.RelatedPerson searchRelatedPerson(ICriterion... where) {
+		org.hl7.fhir.r4.model.RelatedPerson relatedPerson = null;
+		org.hl7.fhir.r4.model.Bundle bundle = (org.hl7.fhir.r4.model.Bundle) search(org.hl7.fhir.r4.model.RelatedPerson.class, where);
+		if (bundle != null && bundle.hasEntry()) {
+			relatedPerson = (org.hl7.fhir.r4.model.RelatedPerson) bundle.getEntryFirstRep().getResource();
+		}
+		return relatedPerson;
+	}
+
 	public PatientReported savePatientReported(PatientReported patientReported) {
-		Patient patient = (Patient) patientMapper.getFhirResource(patientReported);
+		org.hl7.fhir.r4.model.Patient patient = (org.hl7.fhir.r4.model.Patient) patientMapper.getFhirResource(patientReported);
 		MethodOutcome outcome = save(patient,
-			Patient.IDENTIFIER.exactly().systemAndIdentifier(MRN_SYSTEM,patientReported.getPatientReportedExternalLink()));
+			org.hl7.fhir.r4.model.Patient.IDENTIFIER.exactly().systemAndIdentifier(MRN_SYSTEM,patientReported.getPatientReportedExternalLink()));
 		if (!outcome.getResource().isEmpty()) {
 			patientReported.setPatientReportedId(outcome.getResource().getIdElement().getIdPart());
-			return patientMapper.getReportedWithMaster((Patient) outcome.getResource());
+			return patientMapper.getReportedWithMaster((org.hl7.fhir.r4.model.Patient) outcome.getResource());
 		} else if (outcome.getCreated() != null && outcome.getCreated()) {
 			patientReported.setPatientReportedId(outcome.getId().getIdPart());
 		}
 //		return patientReported;
-		return searchPatientReported(Patient.IDENTIFIER.exactly().systemAndIdentifier(MRN_SYSTEM,patientReported.getPatientReportedExternalLink()));
+		return searchPatientReported(org.hl7.fhir.r4.model.Patient.IDENTIFIER.exactly().systemAndIdentifier(MRN_SYSTEM,patientReported.getPatientReportedExternalLink()));
 	}
 
 	public ModelPerson savePractitioner(ModelPerson modelPerson) {
-		Practitioner practitioner = practitionerMapper.getFhirResource(modelPerson);
+		org.hl7.fhir.r4.model.Practitioner practitioner = practitionerMapper.getFhirResource(modelPerson);
 		MethodOutcome outcome = save(practitioner,
-			Patient.IDENTIFIER.exactly().identifier(modelPerson.getPersonExternalLink()));
+			org.hl7.fhir.r4.model.Patient.IDENTIFIER.exactly().identifier(modelPerson.getPersonExternalLink()));
 		if (outcome.getCreated() != null && outcome.getCreated()) {
 			modelPerson.setPersonId(outcome.getId().getIdPart());
 		} else if (!outcome.getResource().isEmpty()) {
@@ -187,10 +196,20 @@ public class FhirRequesterR4 extends FhirRequester<Patient,Immunization,Location
 		return modelPerson;
 	}
 
+	public PatientReported saveRelatedPerson(PatientReported patientReported) {
+		org.hl7.fhir.r4.model.RelatedPerson relatedPerson = (org.hl7.fhir.r4.model.RelatedPerson) relatedPersonMapper.getFhirRelatedPersonFromPatient(patientReported);
+		MethodOutcome outcome = save(relatedPerson,
+			org.hl7.fhir.r4.model.RelatedPerson.PATIENT.hasId(patientReported.getPatientReportedId()));
+		if (outcome.getResource() != null)  {
+			patientReported = relatedPersonMapper.fillGuardianInformation(patientReported, (org.hl7.fhir.r4.model.RelatedPerson) outcome.getResource());
+		}
+		return patientReported;
+	}
+
 	public ObservationReported saveObservationReported(ObservationReported observationReported) {
-		Observation observation = observationMapper.getFhirResource(observationReported);
+		org.hl7.fhir.r4.model.Observation observation = observationMapper.getFhirResource(observationReported);
 		MethodOutcome outcome = save(observation,
-			Observation.IDENTIFIER.exactly().systemAndIdentifier(OBSERVATION_REPORTED,observationReported.getObservationReportedId()));
+			org.hl7.fhir.r4.model.Observation.IDENTIFIER.exactly().systemAndIdentifier(OBSERVATION_REPORTED,observationReported.getObservationReportedId()));
 		if (outcome.getCreated() != null && outcome.getCreated()) {
 			observationReported.setPatientReportedId(outcome.getId().getIdPart());
 		} else if (!outcome.getResource().isEmpty()) {
@@ -200,9 +219,9 @@ public class FhirRequesterR4 extends FhirRequester<Patient,Immunization,Location
 	}
 
 	public VaccinationReported saveVaccinationReported(VaccinationReported vaccinationReported) {
-		Immunization immunization =  (Immunization) immunizationMapper.getFhirResource(vaccinationReported);
+		org.hl7.fhir.r4.model.Immunization immunization =  (org.hl7.fhir.r4.model.Immunization) immunizationMapper.getFhirResource(vaccinationReported);
 		MethodOutcome outcome = save(immunization,
-			Immunization.IDENTIFIER.exactly()
+			org.hl7.fhir.r4.model.Immunization.IDENTIFIER.exactly()
 				.systemAndIdentifier(MappingHelper.VACCINATION_REPORTED, vaccinationReported.getVaccinationReportedExternalLink())
 		);
 		if (outcome.getCreated() != null && outcome.getCreated()){
@@ -214,10 +233,10 @@ public class FhirRequesterR4 extends FhirRequester<Patient,Immunization,Location
 	}
 
 	public OrgLocation saveOrgLocation(OrgLocation orgLocation) {
-		Location location = locationMapper.getFhirResource(orgLocation);
+		org.hl7.fhir.r4.model.Location location = locationMapper.getFhirResource(orgLocation);
 		MethodOutcome outcome = save(location,
-			Location.IDENTIFIER.exactly().identifier(location.getIdentifierFirstRep().getValue())
-			);
+			org.hl7.fhir.r4.model.Location.IDENTIFIER.exactly().identifier(location.getIdentifierFirstRep().getValue())
+		);
 		if (outcome.getCreated() != null && outcome.getCreated()){
 			orgLocation.setOrgLocationId(outcome.getId().getIdPart());
 		} else if (!outcome.getResource().isEmpty()) {
@@ -226,12 +245,12 @@ public class FhirRequesterR4 extends FhirRequester<Patient,Immunization,Location
 		return orgLocation;
 	}
 
-	public Organization saveOrganization(Organization organization) {
+	public org.hl7.fhir.r4.model.Organization saveOrganization(org.hl7.fhir.r4.model.Organization organization) {
 		MethodOutcome outcome = save(organization,
-			Organization.IDENTIFIER.exactly().identifier(organization.getIdentifierFirstRep().getValue())
-			);
+			org.hl7.fhir.r4.model.Organization.IDENTIFIER.exactly().identifier(organization.getIdentifierFirstRep().getValue())
+		);
 		if (!outcome.getResource().isEmpty()) {
-			return (Organization) outcome.getResource();
+			return (org.hl7.fhir.r4.model.Organization) outcome.getResource();
 		} else if (outcome.getCreated() != null && outcome.getCreated()){
 			organization.setId(outcome.getId().getIdPart());
 			return organization;
@@ -241,22 +260,22 @@ public class FhirRequesterR4 extends FhirRequester<Patient,Immunization,Location
 	}
 
 	public PatientMaster readPatientMaster(String id) {
-		return patientMapper.getMaster((Patient) read(Patient.class,id));
+		return patientMapper.getMaster((org.hl7.fhir.r4.model.Patient) read(org.hl7.fhir.r4.model.Patient.class,id));
 	}
 
 	public PatientReported readPatientReported(String id) {
-		return patientMapper.getReported((Patient) read(Patient.class,id));
+		return patientMapper.getReported((org.hl7.fhir.r4.model.Patient) read(org.hl7.fhir.r4.model.Patient.class,id));
 	}
 
 	public ModelPerson readPractitionerPerson(String id) {
-		return practitionerMapper.getModelPerson((Practitioner) read(Practitioner.class,id));
+		return practitionerMapper.getModelPerson((org.hl7.fhir.r4.model.Practitioner) read(org.hl7.fhir.r4.model.Practitioner.class,id));
 	}
 
 	public OrgLocation readOrgLocation(String id) {
-		return locationMapper.orgLocationFromFhir((Location) read(Location.class,id));
+		return locationMapper.orgLocationFromFhir((org.hl7.fhir.r4.model.Location) read(org.hl7.fhir.r4.model.Location.class,id));
 	}
 
 	public VaccinationReported readVaccinationReported(String id) {
-		return immunizationMapper.getReported((Immunization) read(Immunization.class,id));
+		return immunizationMapper.getReported((org.hl7.fhir.r4.model.Immunization) read(org.hl7.fhir.r4.model.Immunization.class,id));
 	}
 }

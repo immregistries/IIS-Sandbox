@@ -3,6 +3,7 @@ package org.immregistries.iis.kernal.repository;
 import ca.uhn.fhir.rest.gclient.ICriterion;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r5.model.Immunization;
+import org.hl7.fhir.r5.model.RelatedPerson;
 import org.immregistries.iis.kernal.model.*;
 
 import java.util.List;
@@ -15,7 +16,8 @@ public interface IFhirRequester<
 	Practitioner extends IBaseResource,
 	Observation extends IBaseResource,
 	Person extends IBaseResource,
-	Organization extends IBaseResource> {
+	Organization extends IBaseResource,
+	RelatedPerson extends IBaseResource> {
 
 	public PatientMaster searchPatientMaster(ICriterion... where);
 	public PatientReported searchPatientReported(ICriterion... where);
@@ -25,6 +27,8 @@ public interface IFhirRequester<
 	public List<VaccinationReported> searchVaccinationReportedList(ICriterion... where);
 	public ObservationReported searchObservationReported(ICriterion... where);
 	public Organization searchOrganization(ICriterion... where);
+	public RelatedPerson searchRelatedPerson(ICriterion... where);
+
 
 	public ObservationMaster searchObservationMaster(ICriterion... where);
 	public List<ObservationReported> searchObservationReportedList(ICriterion... where);
@@ -39,6 +43,7 @@ public interface IFhirRequester<
 	public VaccinationReported saveVaccinationReported(VaccinationReported vaccinationReported);
 	public OrgLocation saveOrgLocation(OrgLocation orgLocation);
 	public Organization saveOrganization(Organization organization);
+	public PatientReported saveRelatedPerson(PatientReported patientReported);
 
 	public PatientMaster readPatientMaster(String id);
 	public PatientReported readPatientReported(String id);

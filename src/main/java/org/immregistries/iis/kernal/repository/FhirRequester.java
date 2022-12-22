@@ -22,7 +22,9 @@ public abstract class FhirRequester<
 	Practitioner extends IBaseResource,
 	Observation extends IBaseResource,
 	Person extends IBaseResource,
-	Organization extends IBaseResource> implements IFhirRequester<Patient,Immunization,Location,Practitioner,Observation,Person,Organization> {
+	Organization extends IBaseResource,
+	RelatedPerson extends IBaseResource >
+	implements IFhirRequester<Patient,Immunization,Location,Practitioner,Observation,Person,Organization, RelatedPerson> {
 
 	@Autowired
 	PatientMapper<Patient> patientMapper;
@@ -36,6 +38,8 @@ public abstract class FhirRequester<
 	ObservationMapper<Observation> observationMapper;
 	@Autowired
 	PersonMapper<Person> personMapper;
+	@Autowired
+	RelatedPersonMapper<RelatedPerson> relatedPersonMapper;
 
 	@Autowired
 	RepositoryClientFactory repositoryClientFactory;

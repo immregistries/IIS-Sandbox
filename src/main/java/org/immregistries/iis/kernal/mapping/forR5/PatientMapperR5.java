@@ -24,6 +24,8 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 
 	@Autowired
 	FhirRequesterR5 fhirRequests;
+	@Autowired
+	RelatedPersonMapperR5 relatedPersonMapperR5;
 	private static final String REGISTRY_STATUS_EXTENSION = "registryStatus";
 	private static final String REGISTRY_STATUS_INDICATOR = "registryStatusIndicator";
 	private static final String ETHNICITY_EXTENSION = "ethnicity";
@@ -188,15 +190,17 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 
 		// patientReported.setRegistryStatusIndicator(p.getActive());
 		// Patient Contact / Guardian
-		Patient.ContactComponent contact = p.getContactFirstRep();
-		patientReported.setGuardianLast(contact.getName().getFamily());
-		if (p.getContactFirstRep().getName().getGiven().size() > 0) {
-			patientReported.setGuardianFirst(contact.getName().getGiven().get(0).getValueNotNull());
-		}
-		if (p.getContactFirstRep().getName().getGiven().size() > 1) {
-			patientReported.setGuardianMiddle(contact.getName().getGiven().get(1).getValueNotNull());
-		}
-		patientReported.setGuardianRelationship(contact.getRelationshipFirstRep().getText());
+
+//		Patient.ContactComponent contact = p.getContactFirstRep();
+//		patientReported.setGuardianLast(contact.getName().getFamily());
+//		if (p.getContactFirstRep().getName().getGiven().size() > 0) {
+//			patientReported.setGuardianFirst(contact.getName().getGiven().get(0).getValueNotNull());
+//		}
+//		if (p.getContactFirstRep().getName().getGiven().size() > 1) {
+//			patientReported.setGuardianMiddle(contact.getName().getGiven().get(1).getValueNotNull());
+//		}
+//		patientReported.setGuardianRelationship(contact.getRelationshipFirstRep().getText());
+		relatedPersonMapperR5.fillGuardianInformation(patientReported,fhirRequests.searchRelatedPerson(RelatedPerson.PATIENT.hasAnyOfIds(patientReported.getPatientReportedId(),patientReported.getPatientReportedExternalLink())));
 		return patientReported;
 	}
 

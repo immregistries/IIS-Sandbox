@@ -23,7 +23,7 @@ import java.util.*;
 @org.springframework.stereotype.Service()
 @Conditional(OnR5Condition.class)
 public class IncomingMessageHandlerR5 extends IncomingMessageHandler<Organization>{
-	private final Logger logger = LoggerFactory.getLogger(IncomingMessageHandlerR5.class);
+  private final Logger logger = LoggerFactory.getLogger(IncomingMessageHandlerR5.class);
 
   public String process(String message, OrgAccess orgAccess) {
     HL7Reader reader = new HL7Reader(message);
@@ -895,6 +895,7 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler<Organizatio
 
     patientReported.setUpdatedDate(new Date());
     patientReported = fhirRequester.savePatientReported(patientReported);
+	 patientReported = fhirRequester.saveRelatedPerson(patientReported);
     return patientReported;
   }
 
