@@ -230,11 +230,8 @@ public class ImmunizationMapperR5 implements ImmunizationMapper<Immunization> {
 			  break;
 		  }
 		  case MappingHelper.PERSON: {
-			  actor = MappingHelper.getFhirReference(
-				  MappingHelper.PERSON,
-				  MappingHelper.PERSON_MODEL,
-				  person.getPersonId(),
-				  person.getPersonId());
+			  actor = new Reference(MappingHelper.PERSON + "/" + person.getPersonId());
+			  ;
 			  break;
 		  }
 		  default:{
