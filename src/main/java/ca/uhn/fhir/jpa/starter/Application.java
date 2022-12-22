@@ -325,4 +325,15 @@ public class Application extends SpringBootServletInitializer {
 //		registrationBean.setLoadOnStartup(1);
 		return registrationBean;
 	}
+
+	@Bean
+	public ServletRegistrationBean testMappingRegistrationBean() {
+		ServletRegistrationBean registrationBean = new ServletRegistrationBean();
+		HttpServlet servlet = new TestMapping();
+		beanFactory.autowireBean(servlet);
+		registrationBean.setServlet(servlet);
+		registrationBean.addUrlMappings( "/utest");
+//		registrationBean.setLoadOnStartup(1);
+		return registrationBean;
+	}
 }

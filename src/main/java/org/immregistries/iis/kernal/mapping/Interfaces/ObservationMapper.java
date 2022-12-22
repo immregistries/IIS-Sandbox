@@ -6,6 +6,9 @@ import org.immregistries.iis.kernal.model.ObservationReported;
 import org.immregistries.iis.kernal.repository.FhirRequester;
 
 public interface ObservationMapper<Observation> {
+	public static final String IDENTIFIER_CODE = "identifierCode";
+	public static final String OBSERVATION_DATE = "observationDate";
+	public static final String RESULT_STATUS = "resultStatus";
 	public ObservationReported getReported(Observation i);
 	public ObservationMaster getMaster(Observation i);
 	public Observation getFhirResource(ObservationReported vr);

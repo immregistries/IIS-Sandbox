@@ -20,13 +20,10 @@ import static org.immregistries.iis.kernal.mapping.MappingHelper.*;
 public class ObservationMapperR5 implements ObservationMapper<Observation> {
 	@Autowired
 	FhirRequester fhirRequests;
-	public static final String IDENTIFIER_CODE = "identifierCode";
-	public static final String OBSERVATION_DATE = "observationDate";
-	public static final String RESULT_STATUS = "resultStatus";
 
 	public Observation getFhirResource(ObservationReported observationReported)  {
 		Observation o = new Observation();
-		o.addIdentifier(MappingHelper.getFhirIdentifier(OBSERVATION_REPORTED,observationReported.getObservationReportedId()));
+		o.setId(observationReported.getObservationReportedId());
 		if (!observationReported.getVaccinationReportedId().isBlank()) {
 			o.addPartOf(new Reference().setReference(IMMUNIZATION + "/" + observationReported.getVaccinationReportedId()));
 		}
@@ -68,32 +65,20 @@ public class ObservationMapperR5 implements ObservationMapper<Observation> {
 	public ObservationReported getReported(Observation o){
 		ObservationReported observationReported = new ObservationReported();
 		observationReported.setUpdatedDate(o.getMeta().getLastUpdated());
-		observationReported.setObservationReportedId(o.getCode().getCode(OBSERVATION_REPORTED));
-//		observationReported.setVaccinationReported();
-//		observationReported.setVaccinationReported();
-//		observationReported.setPatientReported();
+		observationReported.setObservationReportedId(o.getId());
+		observationReported.setVaccinationReportedId(o.getPartOfFirstRep().getId());
+		observationReported.setPatientReportedId(o.getSubject().getId());
 		observationReported.setValueCode(o.getValueCodeableConcept().getCodingFirstRep().getCode());
 		observationReported.setValueTable(o.getValueCodeableConcept().getCodingFirstRep().getSystem());
 		observationReported.setValueLabel(o.getValueCodeableConcept().getCodingFirstRep().getDisplay());
 		observationReported.setMethodCode(o.getMethod().getCodingFirstRep().getCode());
 		observationReported.setMethodTable(o.getMethod().getCodingFirstRep().getSystem());
 		observationReported.setMethodLabel(o.getMethod().getCodingFirstRep().getDisplay());
-		for (Identifier identifier: o.getIdentifier()) {
-			switch (identifier.getSystem()) {
-				case OBSERVATION: {
-					break;
-				}
-				case OBSERVATION_MASTER: {
-					break;
-				}
-				case OBSERVATION_REPORTED: {
-					break;
-				} default: {
-					observationReported.setIdentifierCode(identifier.getValue());
-					observationReported.setIdentifierTable(identifier.getSystem());
-				}
-			}
-		}
+
+		Identifier identifier = o.getIdentifierFirstRep();
+		observationReported.setIdentifierCode(identifier.getValue());
+		observationReported.setIdentifierTable(identifier.getSystem());
+
 		for (Observation.ObservationComponentComponent component: o.getComponent()) {
 			if (component.getCode().getText().equals(OBSERVATION_DATE)) {
 				observationReported.setObservationDate(component.getValueDateTimeType().getValue());
@@ -109,10 +94,10 @@ public class ObservationMapperR5 implements ObservationMapper<Observation> {
 
 	public ObservationMaster getMaster(Observation o){
 		ObservationMaster observationMaster = new ObservationMaster();
-		observationMaster.setObservationId(o.getCode().getCode(OBSERVATION_MASTER));
+		observationMaster.setObservationId(o.getId());
 		observationMaster.setIdentifierCode(o.getCode().getCode(IDENTIFIER_CODE));
-//		observationMaster.setPatient(fhirRequests.searchPatientMaster(Patient.IDENTIFIER.exactly().code()));
-//		observationMaster.setVaccination();
+		observationMaster.setPatientId(o.getSubject().getId());
+		observationMaster.setVaccinationId(o.getPartOf().stream().filter(ref -> ref.getReference().startsWith("Immunization/")).findFirst().orElse(new Reference("")).getId());
 //		observationMaster.setObservationReported();
 		observationMaster.setValueCode(o.getValueCodeableConcept().getCodingFirstRep().getCode());
 		return  observationMaster;

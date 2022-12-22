@@ -5,7 +5,6 @@ import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.gclient.ICriterion;
 import org.hl7.fhir.r4.model.*;
-import org.immregistries.iis.kernal.mapping.MappingHelper;
 import org.immregistries.iis.kernal.model.*;
 import org.immregistries.iis.kernal.servlet.ServletHelper;
 import org.slf4j.Logger;
@@ -16,15 +15,13 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.immregistries.iis.kernal.mapping.MappingHelper.MRN_SYSTEM;
-import static org.immregistries.iis.kernal.mapping.MappingHelper.OBSERVATION_REPORTED;
 
 /**
  * DO NOT EDIT THE CONTENT OF THIS FILE
  *
- * This is a literal copy of FhirRequesterR5 except for the name and imported FHIR Model package
+ * This is a literal copy of FhirRequesterR4 except for the name and imported FHIR Model package
  *
- * Please paste any new content from R5 version here to preserve similarity in behavior.
+ * Please paste any new content from R4 version here to preserve similarity in behavior.
  */
 @Component
 @Conditional(OnR4Condition.class)
@@ -173,7 +170,7 @@ public class FhirRequesterR4 extends FhirRequester<Patient,Immunization,Location
 	public PatientReported savePatientReported(PatientReported patientReported) {
 		org.hl7.fhir.r4.model.Patient patient = (org.hl7.fhir.r4.model.Patient) patientMapper.getFhirResource(patientReported);
 		MethodOutcome outcome = save(patient,
-			org.hl7.fhir.r4.model.Patient.IDENTIFIER.exactly().systemAndIdentifier(MRN_SYSTEM,patientReported.getPatientReportedExternalLink()));
+			org.hl7.fhir.r4.model.Patient.IDENTIFIER.exactly().systemAndIdentifier(patientReported.getPatientReportedAuthority(),patientReported.getPatientReportedExternalLink()));
 		if (!outcome.getResource().isEmpty()) {
 			patientReported.setPatientReportedId(outcome.getResource().getIdElement().getIdPart());
 			return patientMapper.getReportedWithMaster((org.hl7.fhir.r4.model.Patient) outcome.getResource());
@@ -181,7 +178,7 @@ public class FhirRequesterR4 extends FhirRequester<Patient,Immunization,Location
 			patientReported.setPatientReportedId(outcome.getId().getIdPart());
 		}
 //		return patientReported;
-		return searchPatientReported(org.hl7.fhir.r4.model.Patient.IDENTIFIER.exactly().systemAndIdentifier(MRN_SYSTEM,patientReported.getPatientReportedExternalLink()));
+		return searchPatientReported(org.hl7.fhir.r4.model.Patient.IDENTIFIER.exactly().systemAndIdentifier(patientReported.getPatientReportedAuthority(),patientReported.getPatientReportedExternalLink()));
 	}
 
 	public ModelPerson savePractitioner(ModelPerson modelPerson) {
@@ -208,8 +205,7 @@ public class FhirRequesterR4 extends FhirRequester<Patient,Immunization,Location
 
 	public ObservationReported saveObservationReported(ObservationReported observationReported) {
 		org.hl7.fhir.r4.model.Observation observation = observationMapper.getFhirResource(observationReported);
-		MethodOutcome outcome = save(observation,
-			org.hl7.fhir.r4.model.Observation.IDENTIFIER.exactly().systemAndIdentifier(OBSERVATION_REPORTED,observationReported.getObservationReportedId()));
+		MethodOutcome outcome = save(observation);
 		if (outcome.getCreated() != null && outcome.getCreated()) {
 			observationReported.setPatientReportedId(outcome.getId().getIdPart());
 		} else if (!outcome.getResource().isEmpty()) {
@@ -222,7 +218,7 @@ public class FhirRequesterR4 extends FhirRequester<Patient,Immunization,Location
 		org.hl7.fhir.r4.model.Immunization immunization =  (org.hl7.fhir.r4.model.Immunization) immunizationMapper.getFhirResource(vaccinationReported);
 		MethodOutcome outcome = save(immunization,
 			org.hl7.fhir.r4.model.Immunization.IDENTIFIER.exactly()
-				.systemAndIdentifier(MappingHelper.VACCINATION_REPORTED, vaccinationReported.getVaccinationReportedExternalLink())
+				.identifier(vaccinationReported.getVaccinationReportedExternalLink())
 		);
 		if (outcome.getCreated() != null && outcome.getCreated()){
 			vaccinationReported.setVaccinationReportedId(outcome.getId().getIdPart());

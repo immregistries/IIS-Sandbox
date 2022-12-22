@@ -17,7 +17,8 @@ import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
 
-import static org.immregistries.iis.kernal.mapping.MappingHelper.MRN_SYSTEM;
+import static org.immregistries.iis.kernal.repository.FhirRequester.GOLDEN_SYSTEM_IDENTIFIER;
+
 
 @Service
 @Conditional(OnR4Condition.class)
@@ -42,7 +43,7 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 		PatientReported patientReported = getReported(p);
 		patientReported.setPatient(
 			fhirRequests.searchPatientMaster(
-				Patient.IDENTIFIER.exactly().systemAndIdentifier(MRN_SYSTEM,patientReported.getPatientReportedExternalLink())
+				Patient.IDENTIFIER.exactly().systemAndIdentifier(patientReported.getPatientReportedAuthority(),patientReported.getPatientReportedExternalLink())
 			));
 		return patientReported;
 	}
@@ -206,11 +207,7 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 
 	public PatientMaster getMaster(Patient p) {
 		PatientMaster patientMaster = new PatientMaster();
-		patientMaster.setPatientExternalLink(
-			p.getIdentifier().stream()
-				.filter(identifier -> identifier.getSystem() != null && identifier.getSystem().equals(FhirRequesterR5.GOLDEN_RECORD))
-			.findFirst().orElse(p.getIdentifier().get(0)).getValue());
-
+		patientMaster.setPatientExternalLink(p.getIdentifier().stream().filter(identifier -> !identifier.getSystem().equals(GOLDEN_SYSTEM_IDENTIFIER)).findFirst().orElse(new Identifier()).getValue());
 		patientMaster.setPatientNameFirst(p.getNameFirstRep().getGiven().get(0).getValue());
 		if (p.getNameFirstRep().getGiven().size() > 1) {
 			patientMaster.setPatientNameMiddle(p.getNameFirstRep().getGiven().get(1).getValue());

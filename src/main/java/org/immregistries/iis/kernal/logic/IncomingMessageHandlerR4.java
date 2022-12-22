@@ -1748,7 +1748,7 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler<Organizatio
 	  return sendingOrganization;
   }
 
-  private Organization processManagingOrganization(HL7Reader reader) {
+  public Organization processManagingOrganization(HL7Reader reader) {
 	  Organization managingOrganization = null;
 	  String managingIdentifier = null;
 	  if (reader.getValue(22,11) != null) {

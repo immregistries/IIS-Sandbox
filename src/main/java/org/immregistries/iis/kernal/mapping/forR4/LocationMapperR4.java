@@ -1,10 +1,10 @@
 package org.immregistries.iis.kernal.mapping.forR4;
 
 import ca.uhn.fhir.jpa.starter.annotations.OnR4Condition;
-import org.hl7.fhir.r4.model.Address;
-import org.hl7.fhir.r4.model.IdType;
-import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.Location;
+import org.hl7.fhir.r4.model.Address;
+import org.hl7.fhir.r4.model.Extension;
+import org.hl7.fhir.r4.model.StringType;
 import org.immregistries.iis.kernal.mapping.Interfaces.LocationMapper;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
 import org.immregistries.iis.kernal.model.OrgLocation;
@@ -15,13 +15,16 @@ import org.springframework.stereotype.Service;
 @Conditional(OnR4Condition.class)
 public class LocationMapperR4 implements LocationMapper<Location> {
 
-	public Location getFhirResource(OrgLocation ol) {
+	public org.hl7.fhir.r4.model.Location getFhirResource(OrgLocation ol) {
 
 		if (ol != null) {
-			Location location = new Location();
+			org.hl7.fhir.r4.model.Location location = new org.hl7.fhir.r4.model.Location();
 			location.setId(ol.getOrgLocationId());
-			location.addIdentifier(new Identifier().setSystem(MappingHelper.ORG_LOCATION).setValue(ol.getOrgFacilityCode()));
+			location.addIdentifier(MappingHelper.getFhirR4Identifier("", ol.getOrgFacilityCode()));
 			location.setName(ol.getOrgFacilityName());
+			if (!ol.getVfcProviderPin().isBlank()) {
+				location.addExtension().setUrl(VFC_PROVIDER_PIN).setValue(new StringType(ol.getVfcProviderPin()));
+			}
 
 			Address address = location.getAddress();
 			if (!ol.getAddressLine1().isBlank()) {
@@ -39,14 +42,20 @@ public class LocationMapperR4 implements LocationMapper<Location> {
 		return null;
 	}
 
-	public OrgLocation orgLocationFromFhir(Location l) {
+	public OrgLocation orgLocationFromFhir(org.hl7.fhir.r4.model.Location l) {
 		OrgLocation orgLocation = new OrgLocation();
-		orgLocation.setOrgLocationId(new IdType(l.getId()).getIdPart());
+		orgLocation.setOrgLocationId(l.getId());
 		orgLocation.setOrgFacilityCode(l.getIdentifierFirstRep().getValue());
 		orgLocation.setOrgFacilityName(l.getName());
-		if (l.getTypeFirstRep().getText() != null) {
-			orgLocation.setLocationType(l.getTypeFirstRep().getText());
+		if (l.getTypeFirstRep().getCodingFirstRep().getCode() != null) {
+			orgLocation.setLocationType(l.getTypeFirstRep().getCodingFirstRep().getCode());
 		}
+
+		Extension vfc = l.getExtensionByUrl(VFC_PROVIDER_PIN);
+		if (vfc != null) {
+			orgLocation.setVfcProviderPin(String.valueOf(vfc.getValue()));
+		}
+
 		if (l.getAddress() != null) {
 			if (l.getAddress().getLine().size() >= 1) {
 				orgLocation.setAddressLine1(l.getAddress().getLine().get(0).getValueNotNull());

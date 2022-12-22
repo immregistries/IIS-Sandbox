@@ -43,8 +43,7 @@ public class ImmunizationMapperR5 implements ImmunizationMapper<Immunization> {
 	public VaccinationReported getReportedWithMaster(Immunization i) {
 		VaccinationReported vaccinationReported = getReported(i);
 		VaccinationMaster vaccinationMaster = fhirRequests.searchVaccinationMaster(
-			Immunization.IDENTIFIER.exactly().systemAndIdentifier(
-				MappingHelper.VACCINATION_REPORTED,
+			Immunization.IDENTIFIER.exactly().identifier(
 				vaccinationReported.getVaccinationReportedExternalLink()));
 		if (vaccinationMaster!= null) {
 			vaccinationReported.setVaccination(vaccinationMaster);
@@ -57,8 +56,8 @@ public class ImmunizationMapperR5 implements ImmunizationMapper<Immunization> {
 		VaccinationReported vr = new VaccinationReported();
 		vr.setVaccinationReportedId(new IdType(i.getId()).getIdPart());
 		vr.setUpdatedDate(i.getMeta().getLastUpdated());
-//		vr.setVaccinationReportedExternalLink(MappingHelper.filterIdentifier(i.getIdentifier(),MappingHelper.VACCINATION_REPORTED).getValue());
 		vr.setVaccinationReportedExternalLink(i.getIdentifierFirstRep().getValue());
+		vr.setVaccinationReportedExternalLinkSystem(i.getIdentifierFirstRep().getSystem());
 		if (i.getPatient() != null && i.getPatient().getReference() != null && !i.getPatient().getReference().isBlank()) {
 			vr.setPatientReported(fhirRequests.readPatientReported(i.getPatient().getReference()));
 //			vr.setPatientReported(fhirRequests.readPatientReported(i.getPatient().getReference().split("Patient/")[0]));
@@ -139,7 +138,7 @@ public class ImmunizationMapperR5 implements ImmunizationMapper<Immunization> {
   public VaccinationMaster getMaster(Immunization i){
 	  VaccinationMaster vaccinationMaster = new VaccinationMaster();
 	  vaccinationMaster.setVaccinationId(i.getId());
-	  vaccinationMaster.setExternalLink(MappingHelper.filterIdentifier(i.getIdentifier(), MappingHelper.VACCINATION_MASTER).getValue());
+	  vaccinationMaster.setExternalLink(i.getIdentifierFirstRep().getValue());
 	  vaccinationMaster.setAdministeredDate(i.getOccurrenceDateTimeType().getValue());
 	  vaccinationMaster.setVaccineCvxCode(i.getVaccineCode().getCode(CVX));
 	  if (i.getPatient() != null && !i.getPatient().getId().isBlank()) {
@@ -156,7 +155,7 @@ public class ImmunizationMapperR5 implements ImmunizationMapper<Immunization> {
    */
   public Immunization getFhirResource(VaccinationReported vr) {
      Immunization i = new Immunization();
-	  i.addIdentifier(MappingHelper.getFhirIdentifier(MappingHelper.VACCINATION_REPORTED, vr.getVaccinationReportedExternalLink())); // TODO reported authority ?
+	  i.addIdentifier(MappingHelper.getFhirIdentifier(vr.getVaccinationReportedExternalLinkSystem(), vr.getVaccinationReportedExternalLink())); // TODO if system empty ?
 	  i.setPatient(new Reference().setReference("Patient/"+ vr.getPatientReported().getPatientReportedId()));
 	  i.setRecorded(vr.getReportedDate());
 	  i.getOccurrenceDateTimeType().setValue(vr.getAdministeredDate());

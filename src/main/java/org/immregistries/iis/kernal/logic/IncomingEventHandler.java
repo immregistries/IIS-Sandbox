@@ -20,7 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.Date;
 
-import static org.immregistries.iis.kernal.mapping.MappingHelper.MRN_SYSTEM;
+
 
 @Service("IncomingEventHandler")
 public class IncomingEventHandler {
@@ -361,7 +361,7 @@ public class IncomingEventHandler {
     patientReported.setUpdatedDate(new Date());
     patientReported = fhirRequester.savePatientReported(patientReported);
 	 patientReported.setPatient(fhirRequester.searchPatientMaster(
-		 Patient.IDENTIFIER.exactly().systemAndIdentifier(MRN_SYSTEM,patientReported.getPatientReportedExternalLink())
+		 Patient.IDENTIFIER.exactly().systemAndIdentifier(patientReported.getPatientReportedAuthority(),patientReported.getPatientReportedExternalLink())
 	 ));
     return patientReported;
   }

@@ -31,7 +31,7 @@ public class ObservationMaster implements Serializable {
 //  }
 
   public void setPatient(PatientMaster patient) {
-	  if (patient != null) {
+	  if (patientId != null) {
 		  setPatientId(patient.getPatientId());
 	  }
     this.patient = patient;
@@ -42,7 +42,7 @@ public class ObservationMaster implements Serializable {
 //  }
 
   public void setVaccination(VaccinationMaster vaccination) {
-	  if (vaccination != null) {
+	  if (vaccinationId != null) {
 		  setVaccinationId(vaccination.getVaccinationId());
 	  }
     this.vaccination = vaccination;

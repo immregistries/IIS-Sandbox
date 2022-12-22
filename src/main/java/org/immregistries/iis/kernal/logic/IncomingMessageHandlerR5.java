@@ -33,14 +33,14 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler<Organizatio
       Set<ProcessingFlavor> processingFlavorSet = orgAccess.getOrg().getProcessingFlavorSet();
 		String facilityId = reader.getValue(4);
 
-		Organization sendingOrganization = processSendingOrganization(reader);
-		Organization managingOrganization = processManagingOrganization(reader);
       if (processingFlavorSet.contains(ProcessingFlavor.SOURSOP)) {
         if (!facilityId.equals(orgAccess.getOrg().getOrganizationName())) {
           throw new ProcessingException("Not allowed to submit for facility indicated in MSH-4",
               "MSH", 1, 4);
         }
       }
+		 Organization sendingOrganization = processSendingOrganization(reader);
+		 Organization managingOrganization = processManagingOrganization(reader);
 		 switch (messageType) {
 			 case "VXU":
 				 responseMessage = processVXU(orgAccess, reader, message, managingOrganization);
@@ -205,7 +205,6 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler<Organizatio
 	  List<ProcessingException> processingExceptionList = new ArrayList<>();
     try {
       Set<ProcessingFlavor> processingFlavorSet = orgAccess.getOrg().getProcessingFlavorSet();
-
       CodeMap codeMap = CodeMapManager.getCodeMap();
 
       boolean strictDate = !processingFlavorSet.contains(ProcessingFlavor.CANTALOUPE);
@@ -226,6 +225,7 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler<Organizatio
         String vaccineCode = "";
         Date administrationDate = null;
         String vaccinationReportedExternalLink = reader.getValue(3);
+        String vaccinationReportedExternalLinkSystem = reader.getValue(3,2);
         if (reader.advanceToSegment("RXA", "ORC")) {
           rxaCount++;
           vaccineCode = reader.getValue(5, 1);
@@ -256,17 +256,13 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler<Organizatio
 			 }
 
           if (vaccinationReported == null) {
-//            vaccinationMaster = new VaccinationMaster();
-//				 vaccinationMaster.setVaccinationId(vaccinationReportedExternalLink); // TODO verify
 				 vaccinationReported = new VaccinationReported();
-//            vaccinationReported.setVaccination(vaccinationMaster);
-//            vaccinationMaster.setVaccinationReported(vaccinationReported);
             vaccinationReported.setReportedDate(new Date());
             vaccinationReported.setVaccinationReportedExternalLink(vaccinationReportedExternalLink);
+				vaccinationReported.setVaccinationReportedExternalLinkSystem(vaccinationReportedExternalLinkSystem);
           }
           vaccinationReported.setPatientReportedId(patientReported.getPatientReportedId());
           vaccinationReported.setPatientReported(patientReported);
-//          vaccinationMaster.setPatient(patientReported.getPatient());
 
           String vaccineCvxCode = "";
           String vaccineNdcCode = "";
@@ -1740,7 +1736,7 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler<Organizatio
 	  return sendingOrganization;
   }
 
-  private Organization processManagingOrganization(HL7Reader reader) {
+  public Organization processManagingOrganization(HL7Reader reader) {
 	  Organization managingOrganization = null;
 	  String managingIdentifier = null;
 	  if (reader.getValue(22,11) != null) {

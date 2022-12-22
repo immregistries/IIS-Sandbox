@@ -5,7 +5,6 @@ import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.gclient.*;
 import org.hl7.fhir.r5.model.*;
-import org.immregistries.iis.kernal.mapping.MappingHelper;
 import org.immregistries.iis.kernal.model.*;
 import org.immregistries.iis.kernal.model.ModelPerson;
 import org.immregistries.iis.kernal.servlet.ServletHelper;
@@ -16,9 +15,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.immregistries.iis.kernal.mapping.MappingHelper.OBSERVATION_REPORTED;
-import static org.immregistries.iis.kernal.mapping.MappingHelper.MRN_SYSTEM;
 
 @Component
 @Conditional(OnR5Condition.class)
@@ -167,7 +163,7 @@ public class FhirRequesterR5 extends FhirRequester<Patient,Immunization,Location
 	public PatientReported savePatientReported(PatientReported patientReported) {
 		Patient patient = (Patient) patientMapper.getFhirResource(patientReported);
 		MethodOutcome outcome = save(patient,
-			Patient.IDENTIFIER.exactly().systemAndIdentifier(MRN_SYSTEM,patientReported.getPatientReportedExternalLink()));
+			Patient.IDENTIFIER.exactly().systemAndIdentifier(patientReported.getPatientReportedAuthority(),patientReported.getPatientReportedExternalLink()));
 		if (!outcome.getResource().isEmpty()) {
 			patientReported.setPatientReportedId(outcome.getResource().getIdElement().getIdPart());
 			return patientMapper.getReportedWithMaster((Patient) outcome.getResource());
@@ -175,7 +171,7 @@ public class FhirRequesterR5 extends FhirRequester<Patient,Immunization,Location
 			patientReported.setPatientReportedId(outcome.getId().getIdPart());
 		}
 //		return patientReported;
-		return searchPatientReported(Patient.IDENTIFIER.exactly().systemAndIdentifier(MRN_SYSTEM,patientReported.getPatientReportedExternalLink()));
+		return searchPatientReported(Patient.IDENTIFIER.exactly().systemAndIdentifier(patientReported.getPatientReportedAuthority(),patientReported.getPatientReportedExternalLink()));
 	}
 
 	public ModelPerson savePractitioner(ModelPerson modelPerson) {
@@ -202,8 +198,7 @@ public class FhirRequesterR5 extends FhirRequester<Patient,Immunization,Location
 
 	public ObservationReported saveObservationReported(ObservationReported observationReported) {
 		Observation observation = observationMapper.getFhirResource(observationReported);
-		MethodOutcome outcome = save(observation,
-			Observation.IDENTIFIER.exactly().systemAndIdentifier(OBSERVATION_REPORTED,observationReported.getObservationReportedId()));
+		MethodOutcome outcome = save(observation);
 		if (outcome.getCreated() != null && outcome.getCreated()) {
 			observationReported.setPatientReportedId(outcome.getId().getIdPart());
 		} else if (!outcome.getResource().isEmpty()) {
@@ -216,7 +211,7 @@ public class FhirRequesterR5 extends FhirRequester<Patient,Immunization,Location
 		Immunization immunization =  (Immunization) immunizationMapper.getFhirResource(vaccinationReported);
 		MethodOutcome outcome = save(immunization,
 			Immunization.IDENTIFIER.exactly()
-				.systemAndIdentifier(MappingHelper.VACCINATION_REPORTED, vaccinationReported.getVaccinationReportedExternalLink())
+				.identifier(vaccinationReported.getVaccinationReportedExternalLink())
 		);
 		if (outcome.getCreated() != null && outcome.getCreated()){
 			vaccinationReported.setVaccinationReportedId(outcome.getId().getIdPart());

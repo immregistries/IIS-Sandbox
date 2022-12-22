@@ -1,9 +1,7 @@
 package org.immregistries.iis.kernal.mapping.forR5;
 
 import ca.uhn.fhir.jpa.starter.annotations.OnR5Condition;
-import org.hl7.fhir.r5.model.Address;
-import org.hl7.fhir.r5.model.IdType;
-import org.hl7.fhir.r5.model.Location;
+import org.hl7.fhir.r5.model.*;
 import org.immregistries.iis.kernal.mapping.Interfaces.LocationMapper;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
 import org.immregistries.iis.kernal.model.OrgLocation;
@@ -19,8 +17,11 @@ public class LocationMapperR5 implements LocationMapper<Location> {
 		if (ol != null) {
 			Location location = new Location();
 			location.setId(ol.getOrgLocationId());
-			location.addIdentifier(MappingHelper.getFhirIdentifier(MappingHelper.ORG_LOCATION, ol.getOrgFacilityCode()));
+			location.addIdentifier(new Identifier().setValue(ol.getOrgFacilityCode()));
 			location.setName(ol.getOrgFacilityName());
+			if (!ol.getVfcProviderPin().isBlank()) {
+				location.addExtension().setUrl(VFC_PROVIDER_PIN).setValue(new StringType(ol.getVfcProviderPin()));
+			}
 
 			Address address = location.getAddress();
 			if (!ol.getAddressLine1().isBlank()) {
@@ -40,12 +41,18 @@ public class LocationMapperR5 implements LocationMapper<Location> {
 
 	public OrgLocation orgLocationFromFhir(Location l) {
 		OrgLocation orgLocation = new OrgLocation();
-		orgLocation.setOrgLocationId(new IdType(l.getId()).getIdPart());
+		orgLocation.setOrgLocationId(l.getId());
 		orgLocation.setOrgFacilityCode(l.getIdentifierFirstRep().getValue());
 		orgLocation.setOrgFacilityName(l.getName());
-		if (l.getTypeFirstRep().getText() != null) {
-			orgLocation.setLocationType(l.getTypeFirstRep().getText());
+		if (l.getTypeFirstRep().getCodingFirstRep().getCode() != null) {
+			orgLocation.setLocationType(l.getTypeFirstRep().getCodingFirstRep().getCode());
 		}
+
+		Extension vfc = l.getExtensionByUrl(VFC_PROVIDER_PIN);
+		if (vfc != null) {
+			orgLocation.setVfcProviderPin(vfc.getValueStringType().getValue());
+		}
+
 		if (l.getAddress() != null) {
 			if (l.getAddress().getLine().size() >= 1) {
 				orgLocation.setAddressLine1(l.getAddress().getLine().get(0).getValueNotNull());

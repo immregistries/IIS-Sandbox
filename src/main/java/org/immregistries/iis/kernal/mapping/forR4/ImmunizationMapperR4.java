@@ -43,7 +43,7 @@ public class ImmunizationMapperR4 implements ImmunizationMapper<Immunization> {
 		VaccinationReported vaccinationReported = getReported(i);
 		VaccinationMaster vaccinationMaster = fhirRequests.searchVaccinationMaster(
 			Immunization.IDENTIFIER.exactly().systemAndIdentifier(
-				MappingHelper.VACCINATION_REPORTED,
+				vaccinationReported.getVaccinationReportedExternalLinkSystem(),
 				vaccinationReported.getVaccinationReportedExternalLink()));
 		if (vaccinationMaster!= null) {
 			vaccinationReported.setVaccination(vaccinationMaster);

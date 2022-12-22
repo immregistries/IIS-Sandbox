@@ -18,13 +18,7 @@ public class MappingHelper {
 	public static final String PRACTITIONER = "Practitioner";
 
 	public static final String PERSON_MODEL = "Person";
-	public static final String MRN_SYSTEM = "urn:mrns";
-	public static final String PATIENT_MASTER = "PatientMaster";
-	public static final String VACCINATION_MASTER = "VaccinationMaster";
-	public static final String VACCINATION_REPORTED = "VaccinationReported";
-	public static final String OBSERVATION_MASTER = "ObservationMaster";
-	public static final String OBSERVATION_REPORTED = "ObservationReported";
-	public static final String ORG_LOCATION = "OrgLocation";
+//	public static final String MRN_SYSTEM = "urn:mrns";
 	public static final SimpleDateFormat sdf = new SimpleDateFormat("E MMM dd HH:mm:ss yyyy");
 
 	//TODO choose system id or not

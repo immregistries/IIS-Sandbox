@@ -16,6 +16,7 @@ public class VaccinationReported implements Serializable {
   private PatientReported patientReported = null;
   private String patientReportedId = "";
   private String vaccinationReportedExternalLink = "";
+  private String vaccinationReportedExternalLinkSystem = "";
   private VaccinationMaster vaccination = null;
   private Date reportedDate = null;
   private Date updatedDate = null;
@@ -336,5 +337,13 @@ public class VaccinationReported implements Serializable {
 			administeringProvider = null;
 		}
 		this.administeringProviderId = administeringProviderId;
+	}
+
+	public String getVaccinationReportedExternalLinkSystem() {
+		return vaccinationReportedExternalLinkSystem;
+	}
+
+	public void setVaccinationReportedExternalLinkSystem(String vaccinationReportedExternalLinkSystem) {
+		this.vaccinationReportedExternalLinkSystem = vaccinationReportedExternalLinkSystem;
 	}
 }
