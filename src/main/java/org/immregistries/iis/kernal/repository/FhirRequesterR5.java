@@ -169,9 +169,11 @@ public class FhirRequesterR5 extends FhirRequester<Patient,Immunization,Location
 			return patientMapper.getReportedWithMaster((Patient) outcome.getResource());
 		} else if (outcome.getCreated() != null && outcome.getCreated()) {
 			patientReported.setPatientReportedId(outcome.getId().getIdPart());
+			return readPatientReported(outcome.getId().getIdPart());
+		} else {
+			return patientReported;
+//			return searchPatientReported(Patient.IDENTIFIER.exactly().systemAndIdentifier(patientReported.getPatientReportedAuthority(),patientReported.getPatientReportedExternalLink()));
 		}
-//		return patientReported;
-		return searchPatientReported(Patient.IDENTIFIER.exactly().systemAndIdentifier(patientReported.getPatientReportedAuthority(),patientReported.getPatientReportedExternalLink()));
 	}
 
 	public ModelPerson savePractitioner(ModelPerson modelPerson) {
@@ -253,7 +255,7 @@ public class FhirRequesterR5 extends FhirRequester<Patient,Immunization,Location
 	}
 
 	public PatientReported readPatientReported(String id) {
-		return patientMapper.getReported((Patient) read(Patient.class,id));
+		return patientMapper.getReportedWithMaster((Patient) read(Patient.class, id));
 	}
 
 	public ModelPerson readPractitionerPerson(String id) {
@@ -265,6 +267,6 @@ public class FhirRequesterR5 extends FhirRequester<Patient,Immunization,Location
 	}
 
 	public VaccinationReported readVaccinationReported(String id) {
-		return immunizationMapper.getReported((Immunization) read(Immunization.class,id));
+		return immunizationMapper.getReportedWithMaster((Immunization) read(Immunization.class, id));
 	}
 }

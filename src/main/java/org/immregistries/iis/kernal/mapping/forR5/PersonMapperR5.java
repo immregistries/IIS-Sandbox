@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 @Service
 @Conditional(OnR5Condition.class)
 public class PersonMapperR5 implements PersonMapper<Person> {
-	public static final String ORGANISATION_ASSIGNING_AUTHORITY = "AssigningAuthority";
 
 	public ModelPerson getModelPerson(org.hl7.fhir.r5.model.Person p) {
 		ModelPerson modelPerson = new ModelPerson();

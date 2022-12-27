@@ -44,14 +44,13 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 		PatientReported patientReported = getReported(p);
 		patientReported.setPatient(
 			fhirRequests.searchPatientMaster(
-				Patient.IDENTIFIER.exactly().systemAndIdentifier(patientReported.getPatientReportedAuthority(),patientReported.getPatientReportedExternalLink())
+				Patient.IDENTIFIER.exactly().systemAndIdentifier(patientReported.getPatientReportedAuthority(), patientReported.getPatientReportedExternalLink()) // TODO change to get from mdm
 			));
 		return patientReported;
 	}
 	public PatientReported getReported(Patient p) {
 		PatientReported patientReported = new PatientReported();
 		patientReported.setPatientReportedId(new IdType(p.getId()).getIdPart());
-//		patientReported.setPatientReportedExternalLink(MappingHelper.filterIdentifier(p.getIdentifier(), MRN_SYSTEM).getValue()); TODO see if only use MRN
 		patientReported.setPatientReportedExternalLink(p.getIdentifierFirstRep().getValue());
 		patientReported.setUpdatedDate(p.getMeta().getLastUpdated());
 
@@ -216,9 +215,13 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 	public Patient getFhirResource(PatientReported pr) {
 		Patient p = new Patient();
 
-		p.addIdentifier(MappingHelper.getFhirIdentifier(
-			pr.getPatientReportedAuthority(),
-			pr.getPatientReportedExternalLink()));
+		p.addIdentifier(new Identifier()
+			.setSystem(pr.getPatientReportedAuthority())
+			.setValue(pr.getPatientReportedExternalLink())
+			.setType(
+				new CodeableConcept(new Coding()
+					.setSystem("http://terminology.hl7.org/CodeSystem/v2-0203")
+					.setCode(pr.getPatientReportedType()))));
 		p.setManagingOrganization(new Reference(pr.getManagingOrganizationId()));
 		p.setBirthDate(pr.getPatientBirthDate());
 		if (p.getNameFirstRep() != null) {

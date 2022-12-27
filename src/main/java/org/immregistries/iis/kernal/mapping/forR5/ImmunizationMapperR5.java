@@ -23,22 +23,6 @@ public class ImmunizationMapperR5 implements ImmunizationMapper<Immunization> {
 	@Autowired
 	FhirRequesterR5 fhirRequests;
 
-	public static final String CVX = "http://hl7.org/fhir/sid/cvx";
-	public static final String MVX = "http://terminology.hl7.org/CodeSystem/MVX";
-	public static final String NDC = "NDC";
-	public static final String INFORMATION_SOURCE = "NIP001"; //TODO get system from actual message
-	public static final String FUNCTION = "http://hl7.org/fhir/ValueSet/immunization-function";
-	public static final String ORDERING = "OP";
-	public static final String ORDERING_DISPLAY = "Ordering Provider";
-	public static final String ENTERING = "entering";
-	public static final String ENTERING_DISPLAY = "Entering Provider";
-	public static final String ADMINISTERING = "AP";
-	public static final String ADMINISTERING_DISPLAY = "Administering Provider";
-	public static final String REFUSAL_REASON_CODE = "refusalReasonCode";
-	public static final String BODY_PART = "bodyPart";
-	public static final String BODY_ROUTE = "bodyRoute";
-	public static final String FUNDING_SOURCE = "fundingSource";
-	public static final String FUNDING_ELIGIBILITY = "fundingEligibility";
 
 	public VaccinationReported getReportedWithMaster(Immunization i) {
 		VaccinationReported vaccinationReported = getReported(i);

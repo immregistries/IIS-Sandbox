@@ -15,8 +15,6 @@ import org.springframework.stereotype.Service;
 @Conditional(OnR4Condition.class)
 public class PractitionerMapperR4 implements PractitionerMapper<Practitioner> {
 
-	public static final String PRACTITIONER = "Practitioner";
-
 
   public ModelPerson getModelPerson(Practitioner practitioner) {
 	  ModelPerson modelPerson = new ModelPerson();

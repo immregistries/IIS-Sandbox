@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 @Conditional(OnR5Condition.class)
 public class PractitionerMapperR5 implements PractitionerMapper<Practitioner> {
 
-	public static final String PRACTITIONER = "Practitioner";
 
 
   public ModelPerson getModelPerson(Practitioner practitioner) {
