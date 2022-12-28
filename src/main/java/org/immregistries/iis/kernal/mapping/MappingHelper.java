@@ -69,15 +69,33 @@ public class MappingHelper {
 	public  static Identifier filterIdentifier(List<Identifier> identifiers, String system) {
 		return identifiers.stream().filter(identifier -> identifier.getSystem() != null && identifier.getSystem().equals(system)).findFirst().orElse(identifiers.get(0));
 	}
-	public  static org.hl7.fhir.r4.model.Identifier filterR4Identifier(List<org.hl7.fhir.r4.model.Identifier> identifiers, String system) {
+
+	public static org.hl7.fhir.r4.model.Identifier filterR4Identifier(List<org.hl7.fhir.r4.model.Identifier> identifiers, String system) {
 		return identifiers.stream().filter(identifier -> identifier.getSystem() != null && identifier.getSystem().equals(system)).findFirst().orElse(identifiers.get(0));
 	}
 
-	public  static Coding filterCodeableConcept(CodeableConcept concept, String system) {
+	public static Coding filterCodeableConcept(CodeableConcept concept, String system) {
 		return filterCodingList(concept.getCoding(), system);
 	}
-	public  static Coding filterCodingList(List<Coding> codings, String system) {
+
+	public static Coding filterCodingList(List<Coding> codings, String system) {
 		return codings.stream().filter(coding -> coding.getSystem().equals(system)).findFirst().get();
+	}
+
+	public static CodeableConcept extensionGetCodeableConcept(Extension extension) {
+		return extension.getValueCodeableConcept();
+	}
+
+	public static org.hl7.fhir.r4.model.CodeableConcept extensionGetCodeableConcept(org.hl7.fhir.r4.model.Extension extension) {
+		return extension.castToCodeableConcept(extension.getValue());
+	}
+
+	public static Coding extensionGetCoding(Extension extension) {
+		return extension.getValueCoding();
+	}
+
+	public static org.hl7.fhir.r4.model.Coding extensionGetCoding(org.hl7.fhir.r4.model.Extension extension) {
+		return extension.castToCoding(extension.getValue());
 	}
 
 	public static IBaseParameters resourceToPatch(Resource resource) {

@@ -3,14 +3,11 @@ package org.immregistries.iis.kernal.mapping.forR4;
 
 import ca.uhn.fhir.jpa.starter.annotations.OnR4Condition;
 import org.hl7.fhir.r4.model.*;
-import org.hl7.fhir.r4.model.ContactPoint.ContactPointSystem;
-import org.hl7.fhir.r4.model.Enumerations.AdministrativeGender;
 import org.immregistries.iis.kernal.mapping.Interfaces.PatientMapper;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
 import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.model.PatientReported;
 import org.immregistries.iis.kernal.repository.FhirRequesterR4;
-import org.immregistries.iis.kernal.repository.FhirRequesterR5;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Service;
@@ -26,31 +23,21 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 
 	@Autowired
 	FhirRequesterR4 fhirRequests;
-	private static final String REGISTRY_STATUS_EXTENSION = "registryStatus";
-	private static final String REGISTRY_STATUS_INDICATOR = "registryStatusIndicator";
-	private static final String ETHNICITY_EXTENSION = "ethnicity";
-	private static final String ETHNICITY_SYSTEM = "ethnicity";
-	private static final String RACE = "race";
-	private static final String RACE_SYSTEM = "race";
-	private static final String PUBLICITY_EXTENSION = "publicity";
-	private static final String PUBLICITY_SYSTEM = "publicityIndicator";
-	private static final String PROTECTION_EXTENSION = "protection";
-	private static final String PROTECTION_SYSTEM = "protectionIndicator";
-	private static final String YES = "Y";
-	private static final String NO = "N";
+	@Autowired
+	RelatedPersonMapperR4 relatedPersonMapperR4;
 
 	public PatientReported getReportedWithMaster(Patient p) {
 		PatientReported patientReported = getReported(p);
 		patientReported.setPatient(
 			fhirRequests.searchPatientMaster(
-				Patient.IDENTIFIER.exactly().systemAndIdentifier(patientReported.getPatientReportedAuthority(),patientReported.getPatientReportedExternalLink())
+				Patient.IDENTIFIER.exactly().systemAndIdentifier(patientReported.getPatientReportedAuthority(), patientReported.getPatientReportedExternalLink()) // TODO change to get from mdm
 			));
 		return patientReported;
 	}
+
 	public PatientReported getReported(Patient p) {
 		PatientReported patientReported = new PatientReported();
 		patientReported.setPatientReportedId(new IdType(p.getId()).getIdPart());
-//		patientReported.setPatientReportedExternalLink(MappingHelper.filterIdentifier(p.getIdentifier(), MRN_SYSTEM).getValue()); TODO see if only use MRN
 		patientReported.setPatientReportedExternalLink(p.getIdentifierFirstRep().getValue());
 		patientReported.setUpdatedDate(p.getMeta().getLastUpdated());
 
@@ -67,13 +54,16 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 			patientReported.setPatientNameMiddle(name.getGiven().get(1).getValueNotNull());
 		}
 
-//		patientReported.setPatientMotherMaiden(); TODO
+		Extension motherMaiden = p.getExtensionByUrl(MOTHER_MAIDEN_NAME);
+		if (motherMaiden != null) {
+			patientReported.setPatientMotherMaiden(motherMaiden.getValue().toString());
+		}
 		switch (p.getGender()) {
 			case MALE:
-				patientReported.setPatientSex("M");
+				patientReported.setPatientSex(MALE_SEX);
 				break;
 			case FEMALE:
-				patientReported.setPatientSex("F");
+				patientReported.setPatientSex(FEMALE_SEX);
 				break;
 			case OTHER:
 			default:
@@ -81,16 +71,17 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 				break;
 		}
 		int raceNumber = 0;
-		for (Coding coding: p.castToCodeableConcept(p.getExtensionByUrl(RACE).getValue()).getCoding()) {
+		CodeableConcept races = MappingHelper.extensionGetCodeableConcept(p.getExtensionByUrl(RACE));
+		for (Coding coding : races.getCoding()) {
 			raceNumber++;
 			switch (raceNumber) {
-				case 1:{
+				case 1: {
 					patientReported.setPatientRace(coding.getCode());
 				}
-				case 2:{
+				case 2: {
 					patientReported.setPatientRace2(coding.getCode());
 				}
-				case 3:{
+				case 3: {
 					patientReported.setPatientRace3(coding.getCode());
 				}
 				case 4:{
@@ -105,14 +96,15 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 			}
 		}
 		if (p.getExtensionByUrl(ETHNICITY_EXTENSION) != null) {
-			patientReported.setPatientEthnicity(p.getExtensionByUrl(ETHNICITY_EXTENSION).getValue().toString());
+			Coding ethnicity = MappingHelper.extensionGetCoding(p.getExtensionByUrl(ETHNICITY_EXTENSION));
+			patientReported.setPatientEthnicity(ethnicity.getCode());
 		}
 
 		for (ContactPoint telecom : p.getTelecom()) {
 			if (null != telecom.getSystem()) {
-				if (telecom.getSystem().equals(ContactPointSystem.PHONE)) {
+				if (telecom.getSystem().equals(ContactPoint.ContactPointSystem.PHONE)) {
 					patientReported.setPatientPhone(telecom.getValue());
-				} else if (telecom.getSystem().equals(ContactPointSystem.EMAIL)) {
+				} else if (telecom.getSystem().equals(ContactPoint.ContactPointSystem.EMAIL)) {
 					patientReported.setPatientEmail(telecom.getValue());
 				}
 			}
@@ -156,58 +148,55 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 			}
 		}
 
-		if (p.getExtensionByUrl(PUBLICITY_EXTENSION) != null) {
-			Coding publicityCoding = p.castToCoding(p.getExtensionByUrl(PUBLICITY_EXTENSION).getValue());
-			patientReported.setPublicityIndicator(publicityCoding.getCode());
-			if (publicityCoding.getVersion() != null && !publicityCoding.getVersion().isBlank() ) {
+		Extension publicity = p.getExtensionByUrl(PUBLICITY_EXTENSION);
+		if (publicity != null) {
+			Coding value = MappingHelper.extensionGetCoding(publicity);
+			patientReported.setPublicityIndicator(value.getCode());
+			if (value.getVersion() != null && !value.getVersion().isBlank()) {
 				try {
-					patientReported.setPublicityIndicatorDate(MappingHelper.sdf.parse(publicityCoding.getVersion()));
+					patientReported.setPublicityIndicatorDate(MappingHelper.sdf.parse(value.getVersion()));
 				} catch (ParseException e) {
 //					throw new RuntimeException(e);
 				}
 			}
 		}
-
-		if (p.getExtensionByUrl(PROTECTION_EXTENSION) != null) {
-			Coding protectionCoding = p.castToCoding(p.getExtensionByUrl(PROTECTION_EXTENSION).getValue());
-			patientReported.setProtectionIndicator(protectionCoding.getCode());
-			if (protectionCoding.getVersion() != null) {
+		Extension protection = p.getExtensionByUrl(PROTECTION_EXTENSION);
+		if (protection != null) {
+			Coding value = MappingHelper.extensionGetCoding(protection);
+			patientReported.setProtectionIndicator(value.getCode());
+			if (value.getVersion() != null && !value.getVersion().isBlank()) {
 				try {
-					patientReported.setProtectionIndicatorDate(MappingHelper.sdf.parse(protectionCoding.getVersion()));
+					patientReported.setProtectionIndicatorDate(MappingHelper.sdf.parse(value.getVersion()));
 				} catch (ParseException e) {
 //					throw new RuntimeException(e);
 				}
 			}
 		}
-
-		if (p.getExtensionByUrl(REGISTRY_STATUS_EXTENSION) != null) {
-			Coding statusCoding = p.castToCoding(p.getExtensionByUrl(REGISTRY_STATUS_EXTENSION).getValue());
-			patientReported.setRegistryStatusIndicator(statusCoding.getCode());
-			try {
-				patientReported.setRegistryStatusIndicatorDate(MappingHelper.sdf.parse(statusCoding.getVersion()));
-			} catch (ParseException e) {
+		Extension registry = p.getExtensionByUrl(REGISTRY_STATUS_EXTENSION);
+		if (registry != null) {
+			Coding value = MappingHelper.extensionGetCoding(registry);
+			patientReported.setRegistryStatusIndicator(value.getCode());
+			if (value.getVersion() != null && !value.getVersion().isBlank()) {
+				try {
+					patientReported.setRegistryStatusIndicatorDate(MappingHelper.sdf.parse(value.getVersion()));
+				} catch (ParseException e) {
 //				throw new RuntimeException(e);
+				}
 			}
 		}
-
 
 		// patientReported.setRegistryStatusIndicator(p.getActive());
 		// Patient Contact / Guardian
-		Patient.ContactComponent contact = p.getContactFirstRep();
-		patientReported.setGuardianLast(contact.getName().getFamily());
-		if (p.getContactFirstRep().getName().getGiven().size() > 0) {
-			patientReported.setGuardianFirst(contact.getName().getGiven().get(0).getValueNotNull());
+		RelatedPerson relatedPerson = fhirRequests.searchRelatedPerson(RelatedPerson.PATIENT.hasAnyOfIds(patientReported.getPatientReportedId(), patientReported.getPatientReportedExternalLink()));
+		if (relatedPerson != null) {
+			relatedPersonMapperR4.fillGuardianInformation(patientReported, relatedPerson);
 		}
-		if (p.getContactFirstRep().getName().getGiven().size() > 1) {
-			patientReported.setGuardianMiddle(contact.getName().getGiven().get(1).getValueNotNull());
-		}
-		patientReported.setGuardianRelationship(contact.getRelationshipFirstRep().getText());
 		return patientReported;
 	}
 
 	public PatientMaster getMaster(Patient p) {
 		PatientMaster patientMaster = new PatientMaster();
-		patientMaster.setPatientExternalLink(p.getIdentifier().stream().filter(identifier -> !identifier.getSystem().equals(GOLDEN_SYSTEM_IDENTIFIER)).findFirst().orElse(new Identifier()).getValue());
+		patientMaster.setPatientExternalLink(p.getIdentifier().stream().filter(identifier -> !identifier.getSystem().equals(GOLDEN_SYSTEM_IDENTIFIER)).findFirst().orElse(new Identifier()).getValue()); //TODO deal with MDM Identifiers
 		patientMaster.setPatientNameFirst(p.getNameFirstRep().getGiven().get(0).getValue());
 		if (p.getNameFirstRep().getGiven().size() > 1) {
 			patientMaster.setPatientNameMiddle(p.getNameFirstRep().getGiven().get(1).getValue());
@@ -222,9 +211,12 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 		Patient p = new Patient();
 
 		p.addIdentifier(new Identifier()
-				.setSystem(pr.getPatientReportedAuthority())
-				.setValue(pr.getPatientReportedExternalLink()));
-
+			.setSystem(pr.getPatientReportedAuthority())
+			.setValue(pr.getPatientReportedExternalLink())
+			.setType(
+				new CodeableConcept(new Coding()
+					.setSystem("http://terminology.hl7.org/CodeSystem/v2-0203")
+					.setCode(pr.getPatientReportedType()))));
 		p.setManagingOrganization(new Reference(pr.getManagingOrganizationId()));
 		p.setBirthDate(pr.getPatientBirthDate());
 		if (p.getNameFirstRep() != null) {
@@ -235,16 +227,19 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 //			   .setUse(HumanName.NameUse.USUAL);
 		}
 
-//			p.addName().setUse(HumanName.NameUse.MAIDEN).setFamily(pr.getPatientMotherMaiden()); TODO
+		Extension motherMaidenName = p.addExtension()
+			.setUrl(MOTHER_MAIDEN_NAME)
+			.setValue(new StringType(pr.getPatientMotherMaiden()));
+
 		switch (pr.getPatientSex()) {
-			case "M":
-				p.setGender(AdministrativeGender.MALE);
+			case MALE_SEX:
+				p.setGender(Enumerations.AdministrativeGender.MALE);
 				break;
-			case "F":
-				p.setGender(AdministrativeGender.FEMALE);
+			case FEMALE_SEX:
+				p.setGender(Enumerations.AdministrativeGender.FEMALE);
 				break;
 			default:
-				p.setGender(AdministrativeGender.OTHER);
+				p.setGender(Enumerations.AdministrativeGender.OTHER);
 				break;
 		}
 
@@ -271,14 +266,14 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 		if (pr.getPatientRace6() != null && !pr.getPatientRace6().isBlank()) {
 			race.addCoding().setCode(pr.getPatientRace6());
 		}
-		p.addExtension(ETHNICITY_EXTENSION,new CodeType().setSystem(ETHNICITY_SYSTEM).setValue(pr.getPatientEthnicity()));
+		p.addExtension(ETHNICITY_EXTENSION, new Coding().setSystem(ETHNICITY_SYSTEM).setCode(pr.getPatientEthnicity()));
 		// telecom
 		if (null != pr.getPatientPhone()) {
-			p.addTelecom().setSystem(ContactPointSystem.PHONE)
+			p.addTelecom().setSystem(ContactPoint.ContactPointSystem.PHONE)
 				.setValue(pr.getPatientPhone());
 		}
 		if (null != pr.getPatientEmail()) {
-			p.addTelecom().setSystem(ContactPointSystem.EMAIL)
+			p.addTelecom().setSystem(ContactPoint.ContactPointSystem.EMAIL)
 				.setValue(pr.getPatientEmail());
 		}
 
@@ -305,34 +300,34 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 			p.setMultipleBirth(new BooleanType(true));
 		}
 
-		Extension publicity =  p.addExtension();
+		Extension publicity = p.addExtension();
 		publicity.setUrl(PUBLICITY_EXTENSION);
-		Coding publicityCoding = new Coding()
+		Coding publicityValue = new Coding()
 			.setSystem(PUBLICITY_SYSTEM)
 			.setCode(pr.getPublicityIndicator());
-		publicity.setValue(publicityCoding);
+		publicity.setValue(publicityValue);
 		if (pr.getPublicityIndicatorDate() != null) {
-			publicityCoding.setVersion(pr.getPublicityIndicatorDate().toString());
+			publicityValue.setVersion(pr.getPublicityIndicatorDate().toString());
 		}
 
-		Extension protection =  p.addExtension();
+		Extension protection = p.addExtension();
 		protection.setUrl(PROTECTION_EXTENSION);
-		Coding protectionCoding = new Coding()
+		Coding protectionValue = new Coding()
 			.setSystem(PROTECTION_SYSTEM)
 			.setCode(pr.getProtectionIndicator());
-		protection.setValue(protectionCoding);
+		protection.setValue(protectionValue);
 		if (pr.getProtectionIndicatorDate() != null) {
-			protectionCoding.setVersion(pr.getProtectionIndicatorDate().toString());
+			protectionValue.setVersion(pr.getProtectionIndicatorDate().toString());
 		}
 
-		Extension registryStatus =  p.addExtension();
+		Extension registryStatus = p.addExtension();
 		registryStatus.setUrl(REGISTRY_STATUS_EXTENSION);
-		Coding statusCoding = new Coding()
+		Coding registryValue = new Coding()
 			.setSystem(REGISTRY_STATUS_INDICATOR)
 			.setCode(pr.getRegistryStatusIndicator());
-		registryStatus.setValue(statusCoding);
+		registryStatus.setValue(registryValue);
 		if (pr.getRegistryStatusIndicatorDate() != null) {
-			statusCoding.setVersion(pr.getRegistryStatusIndicatorDate().toString());
+			registryValue.setVersion(pr.getRegistryStatusIndicatorDate().toString());
 		}
 
 		Patient.ContactComponent contact = p.addContact();
