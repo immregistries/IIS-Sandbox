@@ -16,14 +16,18 @@ import org.immregistries.vfa.connect.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Conditional;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
+import javax.servlet.http.HttpServletRequest;
+import java.net.http.HttpRequest;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
 @org.springframework.stereotype.Service()
 @Conditional(OnR5Condition.class)
 public class IncomingMessageHandlerR5 extends IncomingMessageHandler<Organization>{
-  private final Logger logger = LoggerFactory.getLogger(IncomingMessageHandlerR5.class);
+	private final Logger logger = LoggerFactory.getLogger(IncomingMessageHandler.class);
 
   public String process(String message, OrgAccess orgAccess) {
     HL7Reader reader = new HL7Reader(message);
@@ -872,27 +876,38 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler<Organizatio
                   .setWarning();
           processingExceptionList.add(pe);
         }
-        if (guardianRelationship.equals("MTH") || guardianRelationship.equals("FTH")
-            || guardianRelationship.equals("GRD")) {
-          break;
-        } else {
-          ProcessingException pe = new ProcessingException((guardianRelationship.equals("")
-              ? "Next-of-kin relationship not specified so is not recognized as guardian and will be ignored"
-              : ("Next-of-kin relationship '" + guardianRelationship
-                  + "' is not a recognized guardian and will be ignored")),
-              "NK1", repeatCount, 3).setWarning();
-          processingExceptionList.add(pe);
-        }
-      }
-    }
-    reader.resetPostion();
+			if (guardianRelationship.equals("MTH") || guardianRelationship.equals("FTH")
+				|| guardianRelationship.equals("GRD")) {
+				break;
+			} else {
+				ProcessingException pe = new ProcessingException((guardianRelationship.equals("")
+					? "Next-of-kin relationship not specified so is not recognized as guardian and will be ignored"
+					: ("Next-of-kin relationship '" + guardianRelationship
+					+ "' is not a recognized guardian and will be ignored")),
+					"NK1", repeatCount, 3).setWarning();
+				processingExceptionList.add(pe);
+			}
+		}
+	 }
+	  reader.resetPostion();
 
-    verifyNoErrors(processingExceptionList);
+	  verifyNoErrors(processingExceptionList);
 
-    patientReported.setUpdatedDate(new Date());
-    patientReported = fhirRequester.savePatientReported(patientReported);
-	 patientReported = fhirRequester.saveRelatedPerson(patientReported);
-    return patientReported;
+	  patientReported.setUpdatedDate(new Date());
+	  patientReported = fhirRequester.savePatientReported(patientReported);
+	  patientReported = fhirRequester.saveRelatedPerson(patientReported);
+	  // TODO for group generation with message assert option activated, switch to arraylist ?
+	  HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+	  ArrayList<String> groupPatientIds = (ArrayList<String>) request.getAttribute("groupPatientIds");
+	  if (groupPatientIds != null) { // If there are numerous patients added and option was activated
+		  groupPatientIds.add(patientReported.getPatientReportedId());
+
+//		  groupPatientIds = new String[]{patientReported.getPatientReportedId()};
+	  }
+	  request.setAttribute("groupPatientIds", groupPatientIds);
+
+
+	  return patientReported;
   }
 
   public String processORU(OrgAccess orgAccess, HL7Reader reader, String message, Organization managingOrganization) {

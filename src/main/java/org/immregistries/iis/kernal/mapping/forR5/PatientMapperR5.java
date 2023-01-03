@@ -32,7 +32,7 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 		PatientReported patientReported = getReported(p);
 		patientReported.setPatient(
 			fhirRequests.searchPatientMaster(
-				Patient.IDENTIFIER.exactly().systemAndIdentifier(patientReported.getPatientReportedAuthority(), patientReported.getPatientReportedExternalLink()) // TODO change to get from mdm
+				Patient.IDENTIFIER.exactly().systemAndIdentifier(patientReported.getPatientReportedAuthority(), patientReported.getPatientReportedExternalLink())
 			));
 		return patientReported;
 	}

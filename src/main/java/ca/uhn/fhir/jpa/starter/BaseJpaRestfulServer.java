@@ -157,6 +157,7 @@ public class BaseJpaRestfulServer extends RestfulServer {
 	 // Bulk Query
 	  FhirVersionEnum fhirVersion = fhirSystemDao.getContext().getVersion().getVersion();
 
+	 // R5 CONFIGURATION
 	  if (fhirVersion == FhirVersionEnum.R5) {
 		  /**
 			* Bulk FHIR Query provider
@@ -173,9 +174,9 @@ public class BaseJpaRestfulServer extends RestfulServer {
 			  MdmCustomInterceptor mdmCustomInterceptor = new MdmCustomInterceptor();
 //		  mdmCustomInterceptor.setMdmProvider(mdmProviderProvider.get());
 			  beanFactory.autowireBean(mdmCustomInterceptor);
-			  this.registerInterceptor( mdmCustomInterceptor);
+			  this.registerInterceptor(mdmCustomInterceptor);
 		  }
-	  } else if (fhirVersion == FhirVersionEnum.R4) {
+	  } else if (fhirVersion == FhirVersionEnum.R4) { // R4 CONFIGURATION
 		  BulkQueryProviderR4 bulkQueryProviderR4 = new BulkQueryProviderR4();
 		  beanFactory.autowireBean(bulkQueryProviderR4);
 		  bulkQueryProviderR4.setContext(fhirSystemDao.getContext());

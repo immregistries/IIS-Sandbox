@@ -327,6 +327,7 @@ public class Application extends SpringBootServletInitializer {
 	}
 
 	@Bean
+	@Conditional(OnR5Condition.class)
 	public ServletRegistrationBean testMappingRegistrationBean() {
 		ServletRegistrationBean registrationBean = new ServletRegistrationBean();
 		HttpServlet servlet = new TestMapping();

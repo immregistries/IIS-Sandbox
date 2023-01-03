@@ -4,6 +4,8 @@ import ca.uhn.fhir.rest.client.api.IGenericClient;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
+import org.hl7.fhir.r4.model.Group;
+import org.hl7.fhir.r4.model.Reference;
 import org.immregistries.iis.kernal.logic.IncomingMessageHandler;
 import org.immregistries.iis.kernal.model.OrgAccess;
 import org.immregistries.iis.kernal.repository.RepositoryClientFactory;
@@ -25,30 +27,32 @@ import java.util.Scanner;
 
 public class PopServlet extends HttpServlet {
 	public static final String PARAM_MESSAGE = "MESSAGEDATA";
-  public static final String PARAM_USERID = "USERID";
-  public static final String PARAM_PASSWORD = "PASSWORD";
-  public static final String PARAM_FACILITYID = "FACILITYID";
+	public static final String PARAM_USERID = "USERID";
+	public static final String PARAM_PASSWORD = "PASSWORD";
+	public static final String PARAM_FACILITYID = "FACILITYID";
 
 	@Autowired
 	private IncomingMessageHandler handler;
+	@Autowired
+	RepositoryClientFactory repositoryClientFactory;
 	private static SessionFactory factory;
 
-  public static Session getDataSession() {
-    if (factory == null) {
-      factory = new Configuration().configure().buildSessionFactory();
-    }
-    return factory.openSession();
-  }
+	public static Session getDataSession() {
+		if (factory == null) {
+			factory = new Configuration().configure().buildSessionFactory();
+		}
+		return factory.openSession();
+	}
 
-  @Override
-  protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-      throws ServletException, IOException {
-    resp.setContentType("text/html");
-    PrintWriter out = new PrintWriter(resp.getOutputStream());
-    try {
-      String message = req.getParameter(PARAM_MESSAGE);
-      String userId = req.getParameter(PARAM_USERID);
-      String password = req.getParameter(PARAM_PASSWORD);
+	@Override
+	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+		throws ServletException, IOException {
+		resp.setContentType("text/html");
+		PrintWriter out = new PrintWriter(resp.getOutputStream());
+		try {
+			String message = req.getParameter(PARAM_MESSAGE);
+			String userId = req.getParameter(PARAM_USERID);
+			String password = req.getParameter(PARAM_PASSWORD);
       String facilityId = req.getParameter(PARAM_FACILITYID);
       HttpSession session = req.getSession(true);
       OrgAccess orgAccess = (OrgAccess) session.getAttribute("orgAccess");
@@ -66,15 +70,27 @@ public class PopServlet extends HttpServlet {
               "Access is not authorized. Facilityid, userid and/or password are not recognized. ");
         } else {
 			  session.setAttribute("orgAccess", orgAccess);
-			  messages = message.split( "MSH\\|\\^~\\\\&\\|");
-			  for (String msh: messages) {
-				  if(!msh.isBlank()){
+			  messages = message.split("MSH\\|\\^~\\\\&\\|");
+			  if (messages.length > 1) {
+				  req.setAttribute("groupPatientIds", new ArrayList<String>());
+			  }
+			  for (String msh : messages) {
+				  if (!msh.isBlank()) {
 					  ackBuilder.append(handler.process("MSH|^~\\&|" + msh, orgAccess));
 					  ackBuilder.append("\r\n");
 				  }
 			  }
 			  ack = ackBuilder.toString();
-        }
+			  ArrayList<String> groupPatientIds = (ArrayList<String>) req.getAttribute("groupPatientIds");
+			  if (groupPatientIds != null) {
+				  Group group = new Group();
+				  for (String id :
+					  groupPatientIds) {
+					  group.addMember().setEntity(new Reference().setReference("Patient/" + id));
+				  }
+				  ServletHelper.getFhirClient(repositoryClientFactory).create().resource(group).execute();
+			  }
+		  }
       } finally {
         dataSession.close();
       }

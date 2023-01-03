@@ -4,11 +4,15 @@ import ca.uhn.fhir.rest.client.api.IGenericClient;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
-import org.hl7.fhir.r5.model.*;
+import org.hl7.fhir.r4.model.Bundle;
+import org.hl7.fhir.r4.model.Patient;
+import org.hl7.fhir.r4.model.Immunization;
+import org.hl7.fhir.r4.model.Observation;
 import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.logic.CodeMapManager;
+import org.immregistries.iis.kernal.mapping.Interfaces.PatientMapper;
 import org.immregistries.iis.kernal.model.*;
 import org.immregistries.iis.kernal.repository.FhirRequester;
 import org.immregistries.iis.kernal.repository.RepositoryClientFactory;
@@ -33,21 +37,24 @@ public class PatientServlet extends HttpServlet {
 	@Autowired
 	FhirRequester fhirRequests;
 
-  public static final String PARAM_ACTION = "action";
-  public static final String ACTION_SEARCH = "search";
+	@Autowired
+	PatientMapper patientMapper;
 
-  public static final String PARAM_PATIENT_NAME_LAST = "patientNameLast";
-  public static final String PARAM_PATIENT_NAME_FIRST = "patientNameFirst";
-  public static final String PARAM_PATIENT_REPORTED_EXTERNAL_LINK = "patientReportedExternalLink";
+	public static final String PARAM_ACTION = "action";
+	public static final String ACTION_SEARCH = "search";
 
-  public static final String PARAM_PATIENT_REPORTED_ID = "patientReportedId";
+	public static final String PARAM_PATIENT_NAME_LAST = "patientNameLast";
+	public static final String PARAM_PATIENT_NAME_FIRST = "patientNameFirst";
+	public static final String PARAM_PATIENT_REPORTED_EXTERNAL_LINK = "patientReportedExternalLink";
+
+	public static final String PARAM_PATIENT_REPORTED_ID = "patientReportedId";
 
 
-  @Override
-  protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-      throws ServletException, IOException {
-    doGet(req, resp);
-  }
+	@Override
+	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+		throws ServletException, IOException {
+		doGet(req, resp);
+	}
 
   @SuppressWarnings("unchecked")
 @Override
@@ -140,8 +147,15 @@ public class PatientServlet extends HttpServlet {
         boolean showingRecent = false;
         if (patientReportedList == null) {
 			  showingRecent = true;
-			  patientReportedList = fhirRequests.searchPatientReportedList();
-        }
+			  patientReportedList = fhirRequests.searchPatientReportedList(); // TODO Paging
+//			  Bundle bundle = fhirClient
+//				  .search()
+//				  .forResource(Patient.class)
+//				  .returnBundle(Bundle.class).execute();
+//			  for (Bundle.BundleEntryComponent entry: bundle.getEntry()) {
+//				  patientReportedList.add(patientMapper.getReported(entry.getResource()));
+//			  }
+		  }
 
         if (patientReportedList != null) {
           if (patientReportedList.size() == 0) {
