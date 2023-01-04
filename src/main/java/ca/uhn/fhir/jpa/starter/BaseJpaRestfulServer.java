@@ -21,6 +21,8 @@ import ca.uhn.fhir.jpa.partition.PartitionManagementProvider;
 import ca.uhn.fhir.jpa.provider.*;
 import ca.uhn.fhir.jpa.provider.dstu3.JpaConformanceProviderDstu3;
 import ca.uhn.fhir.jpa.search.DatabaseBackedPagingProvider;
+import ca.uhn.fhir.jpa.starter.BulkQuery.BulkQueryGroupProvider;
+import ca.uhn.fhir.jpa.starter.BulkQuery.BulkQueryGroupProviderR4;
 import ca.uhn.fhir.jpa.starter.interceptors.*;
 import ca.uhn.fhir.jpa.subscription.util.SubscriptionDebugLogInterceptor;
 import ca.uhn.fhir.mdm.provider.MdmProviderLoader;
@@ -162,7 +164,7 @@ public class BaseJpaRestfulServer extends RestfulServer {
 		  /**
 			* Bulk FHIR Query provider
 			*/
-		  BulkQueryProvider bulkQueryProvider = new BulkQueryProvider();
+		  BulkQueryGroupProvider bulkQueryProvider = new BulkQueryGroupProvider();
 		  beanFactory.autowireBean(bulkQueryProvider);
 		  bulkQueryProvider.setContext(fhirSystemDao.getContext());
 		  bulkQueryProvider.setDao(fhirResourceGroupR5Dao);
@@ -177,7 +179,7 @@ public class BaseJpaRestfulServer extends RestfulServer {
 			  this.registerInterceptor(mdmCustomInterceptor);
 		  }
 	  } else if (fhirVersion == FhirVersionEnum.R4) { // R4 CONFIGURATION
-		  BulkQueryProviderR4 bulkQueryProviderR4 = new BulkQueryProviderR4();
+		  BulkQueryGroupProviderR4 bulkQueryProviderR4 = new BulkQueryGroupProviderR4();
 		  beanFactory.autowireBean(bulkQueryProviderR4);
 		  bulkQueryProviderR4.setContext(fhirSystemDao.getContext());
 		  bulkQueryProviderR4.setDao(fhirResourceGroupR4Dao);

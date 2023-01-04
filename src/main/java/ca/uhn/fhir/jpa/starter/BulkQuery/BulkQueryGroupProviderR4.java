@@ -1,4 +1,4 @@
-package ca.uhn.fhir.jpa.starter.interceptors;
+package ca.uhn.fhir.jpa.starter.BulkQuery;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.context.FhirVersionEnum;
@@ -19,11 +19,9 @@ import ca.uhn.fhir.rest.api.Constants;
 import ca.uhn.fhir.rest.api.SortSpec;
 import ca.uhn.fhir.rest.api.server.IBundleProvider;
 import ca.uhn.fhir.rest.api.server.RequestDetails;
-import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.param.DateRangeParam;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.*;
-import org.immregistries.iis.kernal.repository.RepositoryClientFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,24 +33,20 @@ import java.util.List;
 
 @Controller
 @Conditional(OnR4Condition.class)
-public class BulkQueryProviderR4 extends GroupResourceProvider {
-	Logger logger = LoggerFactory.getLogger(BulkQueryProviderR4.class);
+public class BulkQueryGroupProviderR4 extends GroupResourceProvider {
+	Logger logger = LoggerFactory.getLogger(BulkQueryGroupProviderR4.class);
 
 	@Autowired
 	FhirContext fhirContext;
 	@Autowired
-	RepositoryClientFactory repositoryClientFactory;
-	@Autowired
 	BaseJpaResourceProvider<Patient> patientProvider;
 
-//	@Autowired
-//	BaseJpaResourceProvider<org.hl7.fhir.r4.model.Patient> patientR4Provider;
 	@Autowired
 	IFhirSystemDao fhirSystemDao;
 	@Autowired
 	IFhirResourceDao<Group> fhirResourceGroupDao;
 
-	public BulkQueryProviderR4() {
+	public BulkQueryGroupProviderR4() {
 		super();
 		setDao(fhirResourceGroupDao);
 	}
@@ -101,27 +95,21 @@ public class BulkQueryProviderR4 extends GroupResourceProvider {
 
 		RequestDetails theRequestDetails
 	) {
-		IGenericClient client = repositoryClientFactory.newGenericClientForPartition(theRequestDetails.getTenantId());
 		Bundle bundle = new Bundle().setIdentifier(new Identifier().setValue("test-bulk"));
 		FhirVersionEnum fhirVersion = fhirSystemDao.getContext().getVersion().getVersion();
-
-//		Parameters inParams = new Parameters();
-//		for (Map.Entry<String,String[]> entry : theRequestDetails.getParameters().entrySet()) {
-//			inParams.addParameter(entry.getKey(),entry.getValue()[0]);
-//		}
-
-		Group group = client.read().resource(Group.class).withId(theId).execute();
-		for (Group.GroupMemberComponent member: group.getMember()) {
+		Group group = read(theServletRequest, theId, theRequestDetails);
+		for (Group.GroupMemberComponent member : group.getMember()) {
 			if (member.getEntity().getReference().split("/")[0].equals("Patient")) {
 				Bundle patientBundle = new Bundle();
-//				patientBundle = client.operation().onInstance(member.getEntity().getReference()).named("$everything").withParameters(inParams).returnResourceType(Bundle.class).execute();
-				IBundleProvider bundleProvider = ((BaseJpaResourceProviderPatientR4) patientProvider).patientInstanceEverything(theServletRequest, new IdType( member.getEntity().getReference()), theCount, theOffset, theLastUpdated, theContent, theNarrative, theFilter, theTypes, theSortSpec, theRequestDetails);
-				for (IBaseResource resource: bundleProvider.getAllResources()) {
-					patientBundle.addEntry().setResource( (Resource) resource);
+				IBundleProvider bundleProvider = ((BaseJpaResourceProviderPatientR4) patientProvider).patientInstanceEverything(theServletRequest, new IdType(member.getEntity().getReference()), theCount, theOffset, theLastUpdated, theContent, theNarrative, theFilter, theTypes, theSortSpec, theRequestDetails);
+				for (IBaseResource resource : bundleProvider.getAllResources()) {
+					patientBundle.addEntry().setResource((Resource) resource);
 				}
 				bundle.addEntry().setResource(patientBundle);
 			}
 		}
+//		IParser parser = fhirContext.newNDJsonParser().setPrettyPrint(true);
+//		return parser.encodeResourceToString(bundle);
 		return bundle;
 	}
 }

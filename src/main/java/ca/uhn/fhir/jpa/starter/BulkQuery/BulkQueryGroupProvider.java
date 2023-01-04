@@ -1,4 +1,4 @@
-package ca.uhn.fhir.jpa.starter.interceptors;
+package ca.uhn.fhir.jpa.starter.BulkQuery;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.context.FhirVersionEnum;
@@ -32,8 +32,8 @@ import java.util.List;
 
 @Controller
 @Conditional(OnR5Condition.class)
-public class BulkQueryProvider extends GroupResourceProvider {
-	Logger logger = LoggerFactory.getLogger(BulkQueryProvider.class);
+public class BulkQueryGroupProvider extends GroupResourceProvider {
+	Logger logger = LoggerFactory.getLogger(BulkQueryGroupProvider.class);
 
 	@Autowired
 	FhirContext fhirContext;
@@ -42,14 +42,14 @@ public class BulkQueryProvider extends GroupResourceProvider {
 	@Autowired
 	BaseJpaResourceProvider<Patient> patientProvider;
 
-//	@Autowired
+	//	@Autowired
 //	BaseJpaResourceProvider<org.hl7.fhir.r4.model.Patient> patientR4Provider;
 	@Autowired
 	IFhirSystemDao fhirSystemDao;
 	@Autowired
 	IFhirResourceDao<Group> fhirResourceGroupDao;
 
-	public BulkQueryProvider() {
+	public BulkQueryGroupProvider() {
 		super();
 		setDao(fhirResourceGroupDao);
 	}
