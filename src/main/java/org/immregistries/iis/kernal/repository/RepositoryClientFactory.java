@@ -57,24 +57,25 @@ public class RepositoryClientFactory extends ApacheRestfulClientFactory implemen
 		client.registerInterceptor(authInterceptor);
 		return client;
 	}
-	public synchronized IGenericClient newGenericClientForPartition(String partitionName) {
-		asynchInit();
-		IGenericClient client = newGenericClient(serverBase + "/" + partitionName);
-//		UrlTenantSelectionInterceptor urlTenantSelectionInterceptor = new UrlTenantSelectionInterceptor(partitionName);
-//		client.registerInterceptor(urlTenantSelectionInterceptor);
-//		IClientInterceptor authInterceptor = new BasicAuthInterceptor(orgAccess.getAccessName(),orgAccess.getAccessKey());
-		return client;
-	}
+	
+//	public synchronized IGenericClient newGenericClientForPartition(String partitionName) {
+//		asynchInit();
+//		IGenericClient client = newGenericClient(serverBase + "/" + partitionName);
+////		UrlTenantSelectionInterceptor urlTenantSelectionInterceptor = new UrlTenantSelectionInterceptor(partitionName);
+////		client.registerInterceptor(urlTenantSelectionInterceptor);
+////		IClientInterceptor authInterceptor = new BasicAuthInterceptor(orgAccess.getAccessName(),orgAccess.getAccessKey());
+//		return client;
+//	}
 
-	 @Override
-    public synchronized IGenericClient newGenericClient(String theServerBase) {
-		 asynchInit();
-		 IGenericClient client = super.newGenericClient(theServerBase);
-		 client.registerInterceptor(loggingInterceptor);
+	@Override
+	public synchronized IGenericClient newGenericClient(String theServerBase) {
+		asynchInit();
+		IGenericClient client = super.newGenericClient(theServerBase);
+		client.registerInterceptor(loggingInterceptor);
 //		  IClientInterceptor authInterceptor = new BearerTokenAuthInterceptor("Inside-job " + key ); // TODO
 //		  client.registerInterceptor(authInterceptor);
-		 AdditionalRequestHeadersInterceptor interceptor = new AdditionalRequestHeadersInterceptor();
-		 interceptor.addHeaderValue("Cache-Control", "no-cache");
+		AdditionalRequestHeadersInterceptor interceptor = new AdditionalRequestHeadersInterceptor();
+		interceptor.addHeaderValue("Cache-Control", "no-cache");
 		 client.registerInterceptor(interceptor);
 		 return client;
 	 }
