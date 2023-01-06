@@ -269,7 +269,7 @@ public class BaseJpaRestfulServer extends RestfulServer {
 		* Custom Authorization interceptor
 		*/
 	  this.registerInterceptor(sessionAuthorizationInterceptor);
-	  this.registerInterceptor(new ExceptionFilteringInterceptor());
+//	  this.registerInterceptor(new ExceptionFilteringInterceptor());
 
     /*
      * This interceptor formats the output using nice colourful

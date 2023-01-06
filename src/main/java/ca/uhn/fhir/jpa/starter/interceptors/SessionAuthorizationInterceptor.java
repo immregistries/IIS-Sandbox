@@ -66,6 +66,7 @@ public class SessionAuthorizationInterceptor extends AuthorizationInterceptor {
 		}
 
 		if (orgAccess.getOrg().getOrganizationName() != null) {
+			theRequestDetails.setAttribute("orgAccess", orgAccess);
 			return new RuleBuilder()
 				.allow() .read()
 				.resourcesOfType("Subscriptions").withAnyId().forTenantIds("DEFAULT")

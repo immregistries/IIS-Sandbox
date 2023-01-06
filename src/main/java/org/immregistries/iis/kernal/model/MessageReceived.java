@@ -11,7 +11,6 @@ public class MessageReceived implements Serializable {
   private OrgMaster orgMaster = null;
   private String messageRequest = "";
   private String messageResponse = "";
-//  private PatientReported patientReported = null;
   private String patientReportedId = null;
   private Date reportedDate = null;
   private String categoryRequest = "";
@@ -56,14 +55,6 @@ public class MessageReceived implements Serializable {
   public void setMessageResponse(String messageResponse) {
     this.messageResponse = messageResponse;
   }
-
-//  public PatientReported getPatientReported() {
-//    return patientReported;
-//  }
-
-//  public void setPatientReported(PatientReported patientReported) {
-//    this.patientReported = patientReported;
-//  }
 
   public Date getReportedDate() {
     return reportedDate;

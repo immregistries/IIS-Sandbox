@@ -1,10 +1,9 @@
 package ca.uhn.fhir.jpa.starter;
 
 import ca.uhn.fhir.batch2.jobs.config.Batch2JobsConfig;
-import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.jpa.batch2.JpaBatch2Config;
+import ca.uhn.fhir.jpa.starter.BulkQuery.NDJsonServlet;
 import ca.uhn.fhir.jpa.starter.annotations.OnEitherVersion;
-import ca.uhn.fhir.jpa.starter.annotations.OnR4Condition;
 import ca.uhn.fhir.jpa.starter.annotations.OnR5Condition;
 import ca.uhn.fhir.jpa.starter.mdm.MdmConfig;
 import ca.uhn.fhir.jpa.subscription.channel.config.SubscriptionChannelConfig;
@@ -22,14 +21,12 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Import;
 import org.springframework.web.context.request.RequestContextListener;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
-import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 import org.springframework.web.servlet.DispatcherServlet;
 
 import javax.servlet.http.HttpServlet;
@@ -114,7 +111,7 @@ public class Application extends SpringBootServletInitializer {
 	  HomeServlet servlet = new HomeServlet();
 	  beanFactory.autowireBean(servlet);
 	  registrationBean.setServlet(servlet);
-	  registrationBean.addUrlMappings("/","/home");
+	  registrationBean.addUrlMappings("/home");
 	  registrationBean.setLoadOnStartup(1);
 	  return registrationBean;
   }
@@ -333,7 +330,18 @@ public class Application extends SpringBootServletInitializer {
 		HttpServlet servlet = new TestMapping();
 		beanFactory.autowireBean(servlet);
 		registrationBean.setServlet(servlet);
-		registrationBean.addUrlMappings( "/utest");
+		registrationBean.addUrlMappings("/utest");
+//		registrationBean.setLoadOnStartup(1);
+		return registrationBean;
+	}
+
+	@Bean
+	public ServletRegistrationBean ndJsonRegistrationBean() {
+		ServletRegistrationBean registrationBean = new ServletRegistrationBean();
+		HttpServlet servlet = new NDJsonServlet();
+		beanFactory.autowireBean(servlet);
+		registrationBean.setServlet(servlet);
+		registrationBean.addUrlMappings("/ndjson");
 //		registrationBean.setLoadOnStartup(1);
 		return registrationBean;
 	}

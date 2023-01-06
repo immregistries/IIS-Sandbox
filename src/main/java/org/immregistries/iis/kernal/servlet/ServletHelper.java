@@ -89,7 +89,7 @@ public class ServletHelper {
 	  return  getFhirClient(session,repositoryClientFactory);
   }
 
-  private static OrgAccess getOrgAccess() {
+  public static OrgAccess getOrgAccess() {
 	  return (OrgAccess) ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest().getSession(false).getAttribute("orgAccess");
   }
 
