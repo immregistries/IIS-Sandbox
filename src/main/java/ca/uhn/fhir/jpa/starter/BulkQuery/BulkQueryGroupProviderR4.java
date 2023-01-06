@@ -52,21 +52,25 @@ public class BulkQueryGroupProviderR4 extends GroupResourceProvider {
 	}
 
 	/**
-	 * Group/123/$everything
+	 * Group/123/$export
 	 */
 	@Operation(name = JpaConstants.OPERATION_EVERYTHING, idempotent = true, bundleType = BundleTypeEnum.SEARCHSET)
-	public Bundle groupInstanceEverything(
+	public Bundle groupInstanceExport(
 
 		javax.servlet.http.HttpServletRequest theServletRequest,
 
 		@IdParam
 			IdType theId,
 
+		@Description(formalDefinition = "The format for the requested Bulk Data files to be generated as per FHIR Asynchronous Request Pattern. Defaults to application/fhir+ndjson. The server SHALL support Newline Delimited JSON, but MAY choose to support additional output formats. The server SHALL accept the full content type of application/fhir+ndjson as well as the abbreviated representations application/ndjson and ndjson.")
+		@OperationParam(name = "_outputFormat")
+			UnsignedIntType theOutputFormat,
+
 		@Description(formalDefinition = "Results from this method are returned across multiple pages. This parameter controls the size of those pages.")
 		@OperationParam(name = Constants.PARAM_COUNT)
 			UnsignedIntType theCount,
 
-		@Description(formalDefinition="Results from this method are returned across multiple pages. This parameter controls the offset when fetching a page.")
+		@Description(formalDefinition = "Results from this method are returned across multiple pages. This parameter controls the offset when fetching a page.")
 		@OperationParam(name = Constants.PARAM_OFFSET)
 			UnsignedIntType theOffset,
 
@@ -95,8 +99,7 @@ public class BulkQueryGroupProviderR4 extends GroupResourceProvider {
 
 		RequestDetails theRequestDetails
 	) {
-		Bundle bundle = new Bundle().setIdentifier(new Identifier().setValue("test-bulk"));
-		FhirVersionEnum fhirVersion = fhirSystemDao.getContext().getVersion().getVersion();
+		Bundle bundle = new Bundle();
 		Group group = read(theServletRequest, theId, theRequestDetails);
 		for (Group.GroupMemberComponent member : group.getMember()) {
 			if (member.getEntity().getReference().split("/")[0].equals("Patient")) {
@@ -108,6 +111,11 @@ public class BulkQueryGroupProviderR4 extends GroupResourceProvider {
 				bundle.addEntry().setResource(patientBundle);
 			}
 		}
+
+		if (theOutputFormat == null) {
+//			theRequestDetails.se
+		}
+
 //		IParser parser = fhirContext.newNDJsonParser().setPrettyPrint(true);
 //		return parser.encodeResourceToString(bundle);
 		return bundle;

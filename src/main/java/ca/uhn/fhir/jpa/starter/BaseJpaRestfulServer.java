@@ -100,25 +100,27 @@ public class BaseJpaRestfulServer extends RestfulServer {
   ApplicationContext myApplicationContext;
   @Autowired(required = false)
   IRepositoryValidationInterceptorFactory factory;
-  // These are set only if the features are enabled
-  @Autowired
-  Optional<CqlProviderLoader> cqlProviderLoader;
-  @Autowired
-  Optional<MdmProviderLoader> mdmProviderProvider;
+	// These are set only if the features are enabled
+	@Autowired
+	Optional<CqlProviderLoader> cqlProviderLoader;
+	@Autowired
+	Optional<MdmProviderLoader> mdmProviderProvider;
 	@Autowired
 	AutowireCapableBeanFactory beanFactory;
 
-  @Autowired
+	@Autowired
 	PartitionCreationInterceptor partitionCreationInterceptor;
+	@Autowired
+	SessionAuthorizationInterceptor sessionAuthorizationInterceptor;
 
-  @Autowired
-  private IValidationSupport myValidationSupport;
+	@Autowired
+	private IValidationSupport myValidationSupport;
 
 
-  @Autowired(required=false)
-  IFhirResourceDao<org.hl7.fhir.r4.model.Group> fhirResourceGroupR4Dao;
-  @Autowired(required=false)
-  IFhirResourceDao<org.hl7.fhir.r5.model.Group> fhirResourceGroupR5Dao;
+	@Autowired(required = false)
+	IFhirResourceDao<org.hl7.fhir.r4.model.Group> fhirResourceGroupR4Dao;
+	@Autowired(required = false)
+	IFhirResourceDao<org.hl7.fhir.r5.model.Group> fhirResourceGroupR5Dao;
 
 
   public BaseJpaRestfulServer() {
@@ -266,8 +268,8 @@ public class BaseJpaRestfulServer extends RestfulServer {
 	  /**
 		* Custom Authorization interceptor
 		*/
-	 this.registerInterceptor(new SessionAuthorizationInterceptor());
-	 this.registerInterceptor(new ExceptionFilteringInterceptor());
+	  this.registerInterceptor(sessionAuthorizationInterceptor);
+	  this.registerInterceptor(new ExceptionFilteringInterceptor());
 
     /*
      * This interceptor formats the output using nice colourful

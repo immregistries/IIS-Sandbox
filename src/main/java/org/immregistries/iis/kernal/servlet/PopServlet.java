@@ -71,7 +71,7 @@ public class PopServlet extends HttpServlet {
         } else {
 			  session.setAttribute("orgAccess", orgAccess);
 			  messages = message.split("MSH\\|\\^~\\\\&\\|");
-			  if (messages.length > 1) {
+			  if (messages.length > 2) {
 				  req.setAttribute("groupPatientIds", new ArrayList<String>());
 			  }
 			  for (String msh : messages) {
