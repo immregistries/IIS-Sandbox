@@ -50,7 +50,12 @@ public class RepositoryClientFactory extends ApacheRestfulClientFactory implemen
 	}
 
 	public synchronized IGenericClient newGenericClient(OrgAccess orgAccess) {
-		return newGenericClientForPartition(orgAccess.getAccessName());
+//		return newGenericClientForPartition(orgAccess.getAccessName());
+		asynchInit();
+		IGenericClient client = newGenericClient(serverBase + "/" + orgAccess.getOrg().getOrganizationName());
+		IClientInterceptor authInterceptor = new BasicAuthInterceptor(orgAccess.getAccessName(), orgAccess.getAccessKey());
+		client.registerInterceptor(authInterceptor);
+		return client;
 	}
 	public synchronized IGenericClient newGenericClientForPartition(String partitionName) {
 		asynchInit();
@@ -63,16 +68,16 @@ public class RepositoryClientFactory extends ApacheRestfulClientFactory implemen
 
 	 @Override
     public synchronized IGenericClient newGenericClient(String theServerBase) {
-		  asynchInit();
-        IGenericClient client = super.newGenericClient(theServerBase);
-		  client.registerInterceptor(loggingInterceptor);
-		  IClientInterceptor authInterceptor = new BearerTokenAuthInterceptor("Inside-job " + key ); // TODO
-		  client.registerInterceptor(authInterceptor);
-		  AdditionalRequestHeadersInterceptor interceptor = new AdditionalRequestHeadersInterceptor();
-		  interceptor.addHeaderValue("Cache-Control", "no-cache");
-		  client.registerInterceptor(interceptor);
-        return client;
-    }
+		 asynchInit();
+		 IGenericClient client = super.newGenericClient(theServerBase);
+		 client.registerInterceptor(loggingInterceptor);
+//		  IClientInterceptor authInterceptor = new BearerTokenAuthInterceptor("Inside-job " + key ); // TODO
+//		  client.registerInterceptor(authInterceptor);
+		 AdditionalRequestHeadersInterceptor interceptor = new AdditionalRequestHeadersInterceptor();
+		 interceptor.addHeaderValue("Cache-Control", "no-cache");
+		 client.registerInterceptor(interceptor);
+		 return client;
+	 }
 
 	@Override
 	public IGenericClient newClient(FhirContext fhirContext, HttpServletRequest httpServletRequest, String s) {

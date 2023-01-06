@@ -15,13 +15,17 @@ import ca.uhn.fhir.mdm.provider.MdmProviderDstu3Plus;
 import ca.uhn.fhir.mdm.util.GoldenResourceHelper;
 import ca.uhn.fhir.rest.api.server.RequestDetails;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
+import ca.uhn.fhir.rest.server.exceptions.AuthenticationException;
 import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
 import ca.uhn.fhir.rest.server.provider.ResourceProviderFactory;
 import ca.uhn.fhir.rest.server.servlet.ServletRequestDetails;
+import org.hibernate.Session;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r5.model.*;
 import org.immregistries.iis.kernal.mapping.forR5.ImmunizationMapperR5;
+import org.immregistries.iis.kernal.model.OrgAccess;
 import org.immregistries.iis.kernal.repository.RepositoryClientFactory;
+import org.immregistries.iis.kernal.servlet.PopServlet;
 import org.immregistries.vaccination_deduplication.computation_classes.Deterministic;
 import org.immregistries.vaccination_deduplication.reference.ComparisonResult;
 import org.immregistries.vaccination_deduplication.reference.ImmunizationSource;
@@ -70,6 +74,8 @@ public class MdmCustomInterceptor {
 	MdmProviderDstu3Plus mdmProvider;
 	@Autowired
 	RepositoryClientFactory repositoryClientFactory;
+	@Autowired
+	SessionAuthorizationInterceptor sessionAuthorizationInterceptor;
 
 	private void initialize() {
 		mdmProvider = new MdmProviderDstu3Plus(fhirSystemDao.getContext(), this.myMdmControllerSvc, this.myMdmControllerHelper, this.myMdmSubmitSvc, this.myMdmSettings);
@@ -101,15 +107,20 @@ public class MdmCustomInterceptor {
 			MdmTransactionContext mdmTransactionContext = new MdmTransactionContext(MdmTransactionContext.OperationType.CREATE_RESOURCE);
 			mdmTransactionContext.setResourceType("Immunization");
 			Bundle bundle;
-			IGenericClient client = repositoryClientFactory.newGenericClientForPartition(theRequestDetails.getTenantId());
+			Session dataSession = PopServlet.getDataSession();
+			OrgAccess orgAccess = sessionAuthorizationInterceptor.tryAuthHeader(theRequestDetails.getHeader("Authentication"), theRequestDetails.getTenantId(), dataSession);
+			if (orgAccess == null) {
+				throw new AuthenticationException();
+			}
+//			IGenericClient client = repositoryClientFactory.newGenericClientForPartition(theRequestDetails.getTenantId());
+			IGenericClient client = repositoryClientFactory.newGenericClient(orgAccess);
 
 			if (immunization.getPatient().getReference() != null) {
-				bundle = (Bundle) client.search().byUrl("Immunization?_tag="+ GOLDEN_SYSTEM_TAG + "|"+ GOLDEN_RECORD +"&patient:mdm=" + immunization.getPatient().getReference()).execute();
-			}
-			else if (immunization.getPatient().getIdentifier() != null) {
+				bundle = (Bundle) client.search().byUrl("Immunization?_tag=" + GOLDEN_SYSTEM_TAG + "|" + GOLDEN_RECORD + "&patient:mdm=" + immunization.getPatient().getReference()).execute();
+			} else if (immunization.getPatient().getIdentifier() != null) {
 				bundle = (Bundle) client.search().byUrl(
-					"1/Immunization?_tag="+ GOLDEN_SYSTEM_TAG + "|"+ GOLDEN_RECORD
-					+ "&patient.identifier=" + immunization.getPatient().getIdentifier().getSystem()
+					"1/Immunization?_tag=" + GOLDEN_SYSTEM_TAG + "|" + GOLDEN_RECORD
+						+ "&patient.identifier=" + immunization.getPatient().getIdentifier().getSystem()
 						+ "|" + immunization.getPatient().getIdentifier().getValue()
 				);
 			} else {

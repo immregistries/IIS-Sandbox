@@ -39,12 +39,13 @@ public class SessionAuthorizationInterceptor extends AuthorizationInterceptor {
 		String authHeader = theRequestDetails.getHeader("Authorization");
 		OrgAccess orgAccess = null;
 		try {
-			if (authHeader != null && authHeader.startsWith("Bearer " + "Inside-job " + key)) { // TODO set random hidden key generation
-				dataSession.close();
-				return new RuleBuilder()
-					.allowAll("Self made request") // TODO use tenant id in header
-					.build();
-			}
+			// Necessary for Mdm to run correctly
+//			if (authHeader != null && authHeader.startsWith("Bearer " + "Inside-job " + key)) { // TODO set random hidden key generation
+//				dataSession.close();
+//				return new RuleBuilder()
+//					.allowAll("Self made request") // TODO use tenant id in header
+//					.build();
+//			}
 			orgAccess = tryAuthHeader(authHeader, theRequestDetails.getTenantId(), dataSession);
 			if (orgAccess != null && session != null) { // If connection with authHeader was successful
 				session.setAttribute("orgAccess", orgAccess);
@@ -53,20 +54,18 @@ public class SessionAuthorizationInterceptor extends AuthorizationInterceptor {
 			}
 
 			if (orgAccess == null) {
-				dataSession.close();
 				throw new AuthenticationException(Msg.code(644) + "Missing or invalid Authorization header value");
 			}
-		}
-		catch (AuthenticationException authenticationException) {
-			dataSession.close();
+		} catch (AuthenticationException authenticationException) {
 			// TODO raise issue or figure why examples are wrong on overriding and exceptions
 			return new RuleBuilder()
 				.denyAll(authenticationException.getMessage())
 				.build();
+		} finally {
+			dataSession.close();
 		}
 
 		if (orgAccess.getOrg().getOrganizationName() != null) {
-			dataSession.close();
 			return new RuleBuilder()
 				.allow() .read()
 				.resourcesOfType("Subscriptions").withAnyId().forTenantIds("DEFAULT")
@@ -77,7 +76,6 @@ public class SessionAuthorizationInterceptor extends AuthorizationInterceptor {
 				.forTenantIds(orgAccess.getOrg().getOrganizationName())
 				.build();
 		}
-		dataSession.close();
 		return new RuleBuilder()
 			.denyAll("Missing or invalid Authorization header value")
 			.build();
@@ -89,7 +87,7 @@ public class SessionAuthorizationInterceptor extends AuthorizationInterceptor {
 			String base64decoded = new String(Base64.decodeBase64(base64));
 			String[] parts = base64decoded.split(":");
 			return ServletHelper.authenticateOrgAccess(parts[0], parts[1], tenantId, dataSession);
-		} else {
+		} else { // TODO token ?
 			return null;
 		}
 	}
