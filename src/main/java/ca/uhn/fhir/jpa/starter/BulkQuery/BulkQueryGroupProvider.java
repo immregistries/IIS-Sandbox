@@ -21,6 +21,7 @@ import ca.uhn.fhir.rest.param.*;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r5.model.*;
 import org.immregistries.iis.kernal.repository.RepositoryClientFactory;
+import org.immregistries.iis.kernal.servlet.ServletHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -98,23 +99,17 @@ public class BulkQueryGroupProvider extends GroupResourceProvider {
 
 		RequestDetails theRequestDetails
 	) {
-		IGenericClient client = repositoryClientFactory.newGenericClientForPartition(theRequestDetails.getTenantId());
 		Bundle bundle = new Bundle().setIdentifier(new Identifier().setValue("test-bulk"));
 		FhirVersionEnum fhirVersion = fhirSystemDao.getContext().getVersion().getVersion();
-
-//		Parameters inParams = new Parameters();
-//		for (Map.Entry<String,String[]> entry : theRequestDetails.getParameters().entrySet()) {
-//			inParams.addParameter(entry.getKey(),entry.getValue()[0]);
-//		}
-
-		Group group = client.read().resource(Group.class).withId(theId).execute();
-		for (Group.GroupMemberComponent member: group.getMember()) {
+		Group group = read(theServletRequest, theId, theRequestDetails);
+		;
+		for (Group.GroupMemberComponent member : group.getMember()) {
 			if (member.getEntity().getReference().split("/")[0].equals("Patient")) {
 				Bundle patientBundle = new Bundle();
 //				patientBundle = client.operation().onInstance(member.getEntity().getReference()).named("$everything").withParameters(inParams).returnResourceType(Bundle.class).execute();
-				IBundleProvider bundleProvider = ((BaseJpaResourceProviderPatientR5) patientProvider).patientInstanceEverything(theServletRequest, new IdType( member.getEntity().getReference()), theCount, theOffset, theLastUpdated, theContent, theNarrative, theFilter, theTypes, theSortSpec, theRequestDetails);
-				for (IBaseResource resource: bundleProvider.getAllResources()) {
-					patientBundle.addEntry().setResource( (Resource) resource);
+				IBundleProvider bundleProvider = ((BaseJpaResourceProviderPatientR5) patientProvider).patientInstanceEverything(theServletRequest, new IdType(member.getEntity().getReference()), theCount, theOffset, theLastUpdated, theContent, theNarrative, theFilter, theTypes, theSortSpec, theRequestDetails);
+				for (IBaseResource resource : bundleProvider.getAllResources()) {
+					patientBundle.addEntry().setResource((Resource) resource);
 				}
 //				VersionConvertorFactory_40_50.convertResource(patientBundle);
 				bundle.addEntry().setResource(patientBundle);
