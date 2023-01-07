@@ -2,16 +2,15 @@ package ca.uhn.fhir.jpa.starter;
 
 import ca.uhn.fhir.batch2.jobs.config.Batch2JobsConfig;
 import ca.uhn.fhir.jpa.batch2.JpaBatch2Config;
-import ca.uhn.fhir.jpa.starter.BulkQuery.NDJsonServlet;
 import ca.uhn.fhir.jpa.starter.annotations.OnEitherVersion;
-import ca.uhn.fhir.jpa.starter.annotations.OnR5Condition;
+import ca.uhn.fhir.jpa.starter.common.FhirTesterConfig;
 import ca.uhn.fhir.jpa.starter.mdm.MdmConfig;
 import ca.uhn.fhir.jpa.subscription.channel.config.SubscriptionChannelConfig;
 import ca.uhn.fhir.jpa.subscription.match.config.SubscriptionProcessorConfig;
 import ca.uhn.fhir.jpa.subscription.match.config.WebsocketDispatcherConfig;
 import ca.uhn.fhir.jpa.subscription.submit.config.SubscriptionSubmitterConfig;
+import ca.uhn.fhir.rest.server.RestfulServer;
 import org.immregistries.iis.kernal.logic.CodeMapManager;
-import org.immregistries.iis.kernal.servlet.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.boot.SpringApplication;
@@ -29,10 +28,8 @@ import org.springframework.web.context.request.RequestContextListener;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.servlet.DispatcherServlet;
 
-import javax.servlet.http.HttpServlet;
-
 @ServletComponentScan(basePackageClasses = {
-  JpaRestfulServer.class}, basePackages = {
+	RestfulServer.class}, basePackages = {
 	"org.immregistries.iis.kernal.servlet"
 //	,"org.immregistries.iis.kernal.repository"
 })
@@ -44,7 +41,9 @@ import javax.servlet.http.HttpServlet;
 	WebsocketDispatcherConfig.class,
 	MdmConfig.class,
 	JpaBatch2Config.class,
-	Batch2JobsConfig.class
+	Batch2JobsConfig.class,
+	ServletRegistrationConfig.class,
+	ServerConfig.class,
 })
 @ComponentScan(basePackages = {
 	"ca.uhn.fhir.jpa.starter",
@@ -69,18 +68,17 @@ public class Application extends SpringBootServletInitializer {
   @Autowired
   AutowireCapableBeanFactory beanFactory;
 
-  @Bean
-  @Conditional(OnEitherVersion.class)
-  public ServletRegistrationBean hapiServletRegistration() {
-    ServletRegistrationBean servletRegistrationBean = new ServletRegistrationBean();
-    JpaRestfulServer jpaRestfulServer = new JpaRestfulServer();
-    beanFactory.autowireBean(jpaRestfulServer);
-    servletRegistrationBean.setServlet(jpaRestfulServer);
-    servletRegistrationBean.addUrlMappings("/fhir/*");
-    servletRegistrationBean.setLoadOnStartup(1);
+	@Bean
+	@Conditional(OnEitherVersion.class)
+	public ServletRegistrationBean hapiServletRegistration(RestfulServer restfulServer) {
+		ServletRegistrationBean servletRegistrationBean = new ServletRegistrationBean();
+		beanFactory.autowireBean(restfulServer);
+		servletRegistrationBean.setServlet(restfulServer);
+		servletRegistrationBean.addUrlMappings("/fhir/*");
+		servletRegistrationBean.setLoadOnStartup(1);
 
-    return servletRegistrationBean;
-  }
+		return servletRegistrationBean;
+	}
 
   @Bean
   public ServletRegistrationBean overlayRegistrationBean() {
@@ -91,258 +89,25 @@ public class Application extends SpringBootServletInitializer {
     DispatcherServlet dispatcherServlet = new DispatcherServlet(
       annotationConfigWebApplicationContext);
     dispatcherServlet.setContextClass(AnnotationConfigWebApplicationContext.class);
-    dispatcherServlet.setContextConfigLocation(FhirTesterConfig.class.getName());
+	  dispatcherServlet.setContextConfigLocation(FhirTesterConfig.class.getName());
 
-    ServletRegistrationBean registrationBean = new ServletRegistrationBean();
-    registrationBean.setServlet(dispatcherServlet);
-    registrationBean.addUrlMappings("/overlay/*");
-    registrationBean.setLoadOnStartup(1);
-    return registrationBean;
-
-  }
-
-  @Bean public RequestContextListener requestContextListener(){
-	  return new RequestContextListener();
-  }
-
-  @Bean
-  public ServletRegistrationBean homeServletRegistrationBean() {
 	  ServletRegistrationBean registrationBean = new ServletRegistrationBean();
-	  HomeServlet servlet = new HomeServlet();
-	  beanFactory.autowireBean(servlet);
-	  registrationBean.setServlet(servlet);
-	  registrationBean.addUrlMappings("/home");
+	  registrationBean.setServlet(dispatcherServlet);
+	  registrationBean.addUrlMappings("/overlay/*");
 	  registrationBean.setLoadOnStartup(1);
 	  return registrationBean;
+
   }
 
-
+	/**
+	 * Required to get access to httpRequest qnd session through spring, important to use the fhir client inside the servlets
+	 *
+	 * @return
+	 */
 	@Bean
-	public ServletRegistrationBean popServletRegistrationBean() {
-		ServletRegistrationBean registrationBean = new ServletRegistrationBean();
-		HttpServlet servlet = new PopServlet();
-		beanFactory.autowireBean(servlet);
-		registrationBean.setServlet(servlet);
-		registrationBean.addUrlMappings( "/pop");
-//		registrationBean.setLoadOnStartup(1);
-		return registrationBean;
+	public RequestContextListener requestContextListener() {
+		return new RequestContextListener();
 	}
 
-	@Bean
-	public ServletRegistrationBean messageServletRegistrationBean() {
-		ServletRegistrationBean registrationBean = new ServletRegistrationBean();
-		HttpServlet servlet = new MessageServlet();
-		beanFactory.autowireBean(servlet);
-		registrationBean.setServlet(servlet);
-		registrationBean.addUrlMappings( "/message");
-//		registrationBean.setLoadOnStartup(1);
-		return registrationBean;
-	}
 
-	@Bean
-	public ServletRegistrationBean soapServletRegistrationBean() {
-		ServletRegistrationBean registrationBean = new ServletRegistrationBean();
-		HttpServlet servlet = new SoapServlet();
-		beanFactory.autowireBean(servlet);
-		registrationBean.setServlet(servlet);
-		registrationBean.addUrlMappings( "/soap");
-//		registrationBean.setLoadOnStartup(1);
-		return registrationBean;
-	}
-	@Bean
-	public ServletRegistrationBean patientServletRegistrationBean() {
-		ServletRegistrationBean registrationBean = new ServletRegistrationBean();
-		HttpServlet servlet = new PatientServlet();
-		beanFactory.autowireBean(servlet);
-		registrationBean.setServlet(servlet);
-		registrationBean.addUrlMappings( "/patient");
-//		registrationBean.setLoadOnStartup(1);
-		return registrationBean;
-	}
-	@Bean
-	public ServletRegistrationBean vaccinationServletRegistrationBean() {
-		ServletRegistrationBean registrationBean = new ServletRegistrationBean();
-		HttpServlet servlet = new VaccinationServlet();
-		beanFactory.autowireBean(servlet);
-		registrationBean.setServlet(servlet);
-		registrationBean.addUrlMappings( "/vaccination");
-//		registrationBean.setLoadOnStartup(1);
-		return registrationBean;
-	}
-	@Bean
-	@Conditional(OnR5Condition.class)
-	public ServletRegistrationBean subscriptionServletRegistrationBean() {
-		ServletRegistrationBean registrationBean = new ServletRegistrationBean();
-		HttpServlet servlet = new SubscriptionServlet();
-		beanFactory.autowireBean(servlet);
-		registrationBean.setServlet(servlet);
-		registrationBean.addUrlMappings( "/subscription");
-//		registrationBean.setLoadOnStartup(1);
-		return registrationBean;
-	}
-	@Bean
-	public ServletRegistrationBean subscriptionTopicServletRegistrationBean() {
-		ServletRegistrationBean registrationBean = new ServletRegistrationBean();
-		HttpServlet servlet = new SubscriptionTopicServlet();
-		beanFactory.autowireBean(servlet);
-		registrationBean.setServlet(servlet);
-		registrationBean.addUrlMappings( "/SubscriptionTopic");
-//		registrationBean.setLoadOnStartup(1);
-		return registrationBean;
-	}
-	@Bean
-	public ServletRegistrationBean locationServletRegistrationBean() {
-		ServletRegistrationBean registrationBean = new ServletRegistrationBean();
-		HttpServlet servlet = new LocationServlet();
-		beanFactory.autowireBean(servlet);
-		registrationBean.setServlet(servlet);
-		registrationBean.addUrlMappings( "/location");
-//		registrationBean.setLoadOnStartup(1);
-		return registrationBean;
-	}
-
-	@Bean
-	@Conditional(OnR5Condition.class)
-	public ServletRegistrationBean covidServletRegistrationBean() {
-		ServletRegistrationBean registrationBean = new ServletRegistrationBean();
-		HttpServlet servlet = new CovidServlet();
-		beanFactory.autowireBean(servlet);
-		registrationBean.setServlet(servlet);
-		registrationBean.addUrlMappings( "/covid");
-//		registrationBean.setLoadOnStartup(1);
-		return registrationBean;
-	}
-	@Bean
-	public ServletRegistrationBean fitsServletRegistrationBean() {
-		ServletRegistrationBean registrationBean = new ServletRegistrationBean();
-		HttpServlet servlet = new FitsServlet();
-		beanFactory.autowireBean(servlet);
-		registrationBean.setServlet(servlet);
-		registrationBean.addUrlMappings( "/fits");
-//		registrationBean.setLoadOnStartup(1);
-		return registrationBean;
-	}
-	@Bean
-	public ServletRegistrationBean fhirTestServletRegistrationBean() {
-		ServletRegistrationBean registrationBean = new ServletRegistrationBean();
-		HttpServlet servlet = new FhirTestServlet();
-		beanFactory.autowireBean(servlet);
-		registrationBean.setServlet(servlet);
-		registrationBean.addUrlMappings( "/fhirTest");
-//		registrationBean.setLoadOnStartup(1);
-		return registrationBean;
-	}
-	@Bean
-	public ServletRegistrationBean labServletRegistrationBean() {
-		ServletRegistrationBean registrationBean = new ServletRegistrationBean();
-		HttpServlet servlet = new LabServlet();
-		beanFactory.autowireBean(servlet);
-		registrationBean.setServlet(servlet);
-		registrationBean.addUrlMappings( "/lab");
-//		registrationBean.setLoadOnStartup(1);
-		return registrationBean;
-	}
-	@Bean
-	public ServletRegistrationBean eventServletRegistrationBean() {
-		ServletRegistrationBean registrationBean = new ServletRegistrationBean();
-		HttpServlet servlet = new EventServlet();
-		beanFactory.autowireBean(servlet);
-		registrationBean.setServlet(servlet);
-		registrationBean.addUrlMappings( "/event");
-//		registrationBean.setLoadOnStartup(1);
-		return registrationBean;
-	}
-	@Bean
-	public ServletRegistrationBean queryConverterServletRegistrationBean() {
-		ServletRegistrationBean registrationBean = new ServletRegistrationBean();
-		HttpServlet servlet = new QueryConverterServlet();
-		beanFactory.autowireBean(servlet);
-		registrationBean.setServlet(servlet);
-		registrationBean.addUrlMappings( "/queryConverter");
-//		registrationBean.setLoadOnStartup(1);
-		return registrationBean;
-	}
-	@Bean
-	public ServletRegistrationBean v2ToFhirServletRegistrationBean() {
-		ServletRegistrationBean registrationBean = new ServletRegistrationBean();
-		HttpServlet servlet = new V2ToFhirServlet();
-		beanFactory.autowireBean(servlet);
-		registrationBean.setServlet(servlet);
-		registrationBean.addUrlMappings( "/v2ToFhir");
-//		registrationBean.setLoadOnStartup(1);
-		return registrationBean;
-	}
-	@Bean
-	public ServletRegistrationBean vacDedupServletRegistrationBean() {
-		ServletRegistrationBean registrationBean = new ServletRegistrationBean();
-		HttpServlet servlet = new VacDedupServlet();
-		beanFactory.autowireBean(servlet);
-		registrationBean.setServlet(servlet);
-		registrationBean.addUrlMappings( "/vacDedup");
-//		registrationBean.setLoadOnStartup(1);
-		return registrationBean;
-	}
-	@Bean
-	public ServletRegistrationBean vciServletRegistrationBean() {
-		ServletRegistrationBean registrationBean = new ServletRegistrationBean();
-		HttpServlet servlet = new VciServlet();
-		beanFactory.autowireBean(servlet);
-		registrationBean.setServlet(servlet);
-		registrationBean.addUrlMappings( "/vciDemo");
-//		registrationBean.setLoadOnStartup(1);
-		return registrationBean;
-	}
-	@Bean
-	public ServletRegistrationBean vXUDownloadServletRegistrationBean() {
-		ServletRegistrationBean registrationBean = new ServletRegistrationBean();
-		HttpServlet servlet = new VXUDownloadServlet();
-		beanFactory.autowireBean(servlet);
-		registrationBean.setServlet(servlet);
-		registrationBean.addUrlMappings( "/VXUDownload");
-//		registrationBean.setLoadOnStartup(1);
-		return registrationBean;
-	}
-	@Bean
-	public ServletRegistrationBean vXUDownloadFormServletRegistrationBean() {
-		ServletRegistrationBean registrationBean = new ServletRegistrationBean();
-		HttpServlet servlet = new VXUDownloadFormServlet();
-		beanFactory.autowireBean(servlet);
-		registrationBean.setServlet(servlet);
-		registrationBean.addUrlMappings( "/VXUDownloadForm");
-//		registrationBean.setLoadOnStartup(1);
-		return registrationBean;
-	}
-	@Bean
-	public ServletRegistrationBean covidGenerateServletRegistrationBean() {
-		ServletRegistrationBean registrationBean = new ServletRegistrationBean();
-		HttpServlet servlet = new CovidGenerateServlet();
-		beanFactory.autowireBean(servlet);
-		registrationBean.setServlet(servlet);
-		registrationBean.addUrlMappings( "/covidGenerate");
-//		registrationBean.setLoadOnStartup(1);
-		return registrationBean;
-	}
-
-	@Bean
-	@Conditional(OnR5Condition.class)
-	public ServletRegistrationBean testMappingRegistrationBean() {
-		ServletRegistrationBean registrationBean = new ServletRegistrationBean();
-		HttpServlet servlet = new TestMapping();
-		beanFactory.autowireBean(servlet);
-		registrationBean.setServlet(servlet);
-		registrationBean.addUrlMappings("/utest");
-//		registrationBean.setLoadOnStartup(1);
-		return registrationBean;
-	}
-
-	@Bean
-	public ServletRegistrationBean ndJsonRegistrationBean() {
-		ServletRegistrationBean registrationBean = new ServletRegistrationBean();
-		HttpServlet servlet = new NDJsonServlet();
-		beanFactory.autowireBean(servlet);
-		registrationBean.setServlet(servlet);
-		registrationBean.addUrlMappings("/ndjson");
-//		registrationBean.setLoadOnStartup(1);
-		return registrationBean;
-	}
 }

@@ -4,23 +4,20 @@ import ca.uhn.fhir.jpa.api.dao.IFhirResourceDao;
 import ca.uhn.fhir.jpa.api.dao.IFhirSystemDao;
 import ca.uhn.fhir.jpa.model.util.JpaConstants;
 import ca.uhn.fhir.jpa.provider.BaseJpaResourceProviderPatient;
-import ca.uhn.fhir.jpa.rp.r4.GroupResourceProvider;
-import ca.uhn.fhir.jpa.starter.annotations.OnR4Condition;
+import ca.uhn.fhir.jpa.rp.r5.GroupResourceProvider;
+import ca.uhn.fhir.jpa.starter.annotations.OnR5Condition;
 import ca.uhn.fhir.model.api.annotation.Description;
 import ca.uhn.fhir.parser.IParser;
-import ca.uhn.fhir.rest.annotation.IdParam;
-import ca.uhn.fhir.rest.annotation.Operation;
-import ca.uhn.fhir.rest.annotation.OperationParam;
-import ca.uhn.fhir.rest.annotation.Sort;
+import ca.uhn.fhir.rest.annotation.*;
 import ca.uhn.fhir.rest.api.Constants;
 import ca.uhn.fhir.rest.api.SortSpec;
 import ca.uhn.fhir.rest.api.server.IBundleProvider;
-import ca.uhn.fhir.rest.param.DateRangeParam;
+import ca.uhn.fhir.rest.param.*;
 import ca.uhn.fhir.rest.server.servlet.ServletRequestDetails;
 import org.hibernate.Session;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.instance.model.api.IPrimitiveType;
-import org.hl7.fhir.r4.model.*;
+import org.hl7.fhir.r5.model.*;
 import org.immregistries.iis.kernal.model.MessageReceived;
 import org.immregistries.iis.kernal.model.OrgAccess;
 import org.immregistries.iis.kernal.servlet.PopServlet;
@@ -36,9 +33,9 @@ import java.util.List;
 
 
 @Controller
-@Conditional(OnR4Condition.class)
-public class BulkQueryGroupProviderR4 extends GroupResourceProvider {
-	Logger logger = LoggerFactory.getLogger(BulkQueryGroupProviderR4.class);
+@Conditional(OnR5Condition.class)
+public class BulkQueryGroupProviderR5 extends GroupResourceProvider {
+	Logger logger = LoggerFactory.getLogger(BulkQueryGroupProviderR5.class);
 
 	@Autowired
 	BaseJpaResourceProviderPatient<Patient> patientProvider;
@@ -48,7 +45,7 @@ public class BulkQueryGroupProviderR4 extends GroupResourceProvider {
 	@Autowired
 	IFhirResourceDao<Group> fhirResourceGroupDao;
 
-	public BulkQueryGroupProviderR4() {
+	public BulkQueryGroupProviderR5() {
 		super();
 		setDao(fhirResourceGroupDao);
 	}

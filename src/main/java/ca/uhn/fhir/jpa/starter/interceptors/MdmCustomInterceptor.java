@@ -1,13 +1,11 @@
 package ca.uhn.fhir.jpa.starter.interceptors;
 
-import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.interceptor.api.Hook;
 import ca.uhn.fhir.interceptor.api.Pointcut;
 import ca.uhn.fhir.jpa.api.dao.IFhirSystemDao;
 import ca.uhn.fhir.jpa.mdm.dao.MdmLinkDaoSvc;
 import ca.uhn.fhir.jpa.mdm.svc.MdmLinkSvcImpl;
 import ca.uhn.fhir.jpa.mdm.svc.MdmResourceDaoSvc;
-import ca.uhn.fhir.jpa.starter.mdm.MdmConfigCondition;
 import ca.uhn.fhir.mdm.api.*;
 import ca.uhn.fhir.mdm.model.MdmTransactionContext;
 import ca.uhn.fhir.mdm.provider.MdmControllerHelper;
@@ -46,7 +44,7 @@ import static org.immregistries.iis.kernal.repository.FhirRequester.GOLDEN_SYSTE
 
 @Component
 @Interceptor
-@Conditional(MdmConfigCondition.class)
+//@Conditional(MdmConfigCondition.class)
 public class MdmCustomInterceptor {
 	Logger logger = LoggerFactory.getLogger(MdmCustomInterceptor.class);
 	@Autowired
@@ -158,7 +156,7 @@ public class MdmCustomInterceptor {
 		org.immregistries.vaccination_deduplication.Immunization i1 = new org.immregistries.vaccination_deduplication.Immunization();
 		i1.setCVX(immunization.getVaccineCode().getCode(ImmunizationMapperR5.CVX));
 		if(immunization.hasManufacturer()){
-			i1.setMVX(immunization.getManufacturer().getIdentifier().getValue());
+			i1.setMVX(immunization.getManufacturer().getReference().getIdentifier().getValue());
 		}
 		try {
 			if (immunization.hasOccurrenceStringType()){
@@ -177,8 +175,8 @@ public class MdmCustomInterceptor {
 			i1.setSource(ImmunizationSource.SOURCE);
 		} else {
 			if (immunization.hasInformationSource()) {
-				if (immunization.hasInformationSourceCodeableConcept()){
-					if(immunization.getInformationSourceCodeableConcept().getCode(ImmunizationMapperR5.INFORMATION_SOURCE).equals("00")){
+				if (immunization.getInformationSource().getConcept() != null) {
+					if (immunization.getInformationSource().getConcept().getCode(ImmunizationMapperR5.INFORMATION_SOURCE).equals("00")) {
 						i1.setSource(ImmunizationSource.SOURCE);
 					} else {
 						i1.setSource(ImmunizationSource.HISTORICAL);
@@ -187,13 +185,13 @@ public class MdmCustomInterceptor {
 			}
 		}
 
-		if (immunization.hasInformationSource()){ // TODO improve organisation naming and designation among tenancy or in resource info
-			if (immunization.hasInformationSourceReference()) {
-				if(immunization.getInformationSourceReference().getIdentifier() != null){
-					i1.setOrganisationID(immunization.getInformationSourceReference().getIdentifier().getValue());
-				} else if (immunization.getInformationSourceReference().getReference() != null
-					&& immunization.getInformationSourceReference().getReference().startsWith("Organisation/")) {
-					i1.setOrganisationID(immunization.getInformationSourceReference().getReference()); // TODO get organisation name from db
+		if (immunization.hasInformationSource()) { // TODO improve organisation naming and designation among tenancy or in resource info
+			if (immunization.getInformationSource().getReference() != null) {
+				if (immunization.getInformationSource().getReference().getIdentifier() != null) {
+					i1.setOrganisationID(immunization.getInformationSource().getReference().getIdentifier().getValue());
+				} else if (immunization.getInformationSource().getReference().getReference() != null
+					&& immunization.getInformationSource().getReference().getReference().startsWith("Organisation/")) {
+					i1.setOrganisationID(immunization.getInformationSource().getReference().getReference()); // TODO get organisation name from db
 				}
 			}
 		}

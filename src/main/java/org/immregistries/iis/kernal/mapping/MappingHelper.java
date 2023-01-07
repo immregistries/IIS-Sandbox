@@ -20,16 +20,25 @@ public class MappingHelper {
 	public static final SimpleDateFormat sdf = new SimpleDateFormat("E MMM dd HH:mm:ss yyyy");
 
 	//TODO choose system id or not
-	public  static Reference getFhirReference(String fhirType, String dbType, String identifier) {
+	public static Reference getFhirReference(String fhirType, String dbType, String identifier) {
 		if (identifier == null || identifier.isBlank()) {
 			return null;
 		} else {
 			return new Reference()
 				.setType(fhirType)
-				.setIdentifier(getFhirIdentifier(dbType,identifier));
+				.setIdentifier(getFhirIdentifier(dbType, identifier));
 		}
 	}
-	public  static org.hl7.fhir.r4.model.Reference getFhirR4Reference(String fhirType, String dbType, String identifier) {
+
+	public static CodeableReference getFhirCodeableReference(String fhirType, String dbType, String identifier) {
+		if (identifier == null || identifier.isBlank()) {
+			return null;
+		} else {
+			return new CodeableReference(getFhirReference(fhirType, dbType, identifier));
+		}
+	}
+
+	public static org.hl7.fhir.r4.model.Reference getFhirR4Reference(String fhirType, String dbType, String identifier) {
 		if (identifier == null || identifier.isBlank()) {
 			return null;
 		} else {

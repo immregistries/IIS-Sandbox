@@ -1,4 +1,4 @@
-package ca.uhn.fhir.jpa.starter;
+package ca.uhn.fhir.jpa.starter.deprecated;
 
 import ca.uhn.fhir.batch2.jobs.reindex.ReindexProvider;
 import ca.uhn.fhir.context.FhirContext;
@@ -14,15 +14,16 @@ import ca.uhn.fhir.jpa.api.dao.IFhirSystemDao;
 import ca.uhn.fhir.jpa.binary.interceptor.BinaryStorageInterceptor;
 import ca.uhn.fhir.jpa.bulk.export.provider.BulkDataExportProvider;
 import ca.uhn.fhir.jpa.graphql.GraphQLProvider;
-import ca.uhn.fhir.jpa.interceptor.CascadingDeleteInterceptor;
 import ca.uhn.fhir.jpa.packages.IPackageInstallerSvc;
 import ca.uhn.fhir.jpa.packages.PackageInstallationSpec;
 import ca.uhn.fhir.jpa.partition.PartitionManagementProvider;
 import ca.uhn.fhir.jpa.provider.*;
 import ca.uhn.fhir.jpa.provider.dstu3.JpaConformanceProviderDstu3;
 import ca.uhn.fhir.jpa.search.DatabaseBackedPagingProvider;
-import ca.uhn.fhir.jpa.starter.BulkQuery.BulkQueryGroupProvider;
+import ca.uhn.fhir.jpa.starter.AppProperties;
+import ca.uhn.fhir.jpa.starter.BulkQuery.BulkQueryGroupProviderR5;
 import ca.uhn.fhir.jpa.starter.BulkQuery.BulkQueryGroupProviderR4;
+import ca.uhn.fhir.jpa.starter.common.validation.IRepositoryValidationInterceptorFactory;
 import ca.uhn.fhir.jpa.starter.interceptors.*;
 import ca.uhn.fhir.jpa.subscription.util.SubscriptionDebugLogInterceptor;
 import ca.uhn.fhir.mdm.provider.MdmProviderLoader;
@@ -50,17 +51,20 @@ import javax.servlet.ServletException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Deprecated not used anymore, now dealt with in StarterJpaConfig
+ */
 public class BaseJpaRestfulServer extends RestfulServer {
-  private static final org.slf4j.Logger ourLog = org.slf4j.LoggerFactory.getLogger(BaseJpaRestfulServer.class);
+	private static final org.slf4j.Logger ourLog = org.slf4j.LoggerFactory.getLogger(BaseJpaRestfulServer.class);
 
 	private static final long serialVersionUID = 1L;
-  @Autowired
-  DaoRegistry daoRegistry;
-  @Autowired
-  DaoConfig daoConfig;
-  @Autowired
-  ISearchParamRegistry searchParamRegistry;
-  @Autowired
+	@Autowired
+	DaoRegistry daoRegistry;
+	@Autowired
+	DaoConfig daoConfig;
+	@Autowired
+	ISearchParamRegistry searchParamRegistry;
+	@Autowired
   IFhirSystemDao fhirSystemDao;
   @Autowired
   ResourceProviderFactory resourceProviderFactory;
@@ -90,48 +94,45 @@ public class BaseJpaRestfulServer extends RestfulServer {
   ValueSetOperationProvider valueSetOperationProvider;
   @Autowired
   ReindexProvider reindexProvider;
-  @Autowired
-  BinaryStorageInterceptor binaryStorageInterceptor;
-  @Autowired
-  IPackageInstallerSvc packageInstallerSvc;
-  @Autowired
-  AppProperties appProperties;
-  @Autowired
-  ApplicationContext myApplicationContext;
-  @Autowired(required = false)
-  IRepositoryValidationInterceptorFactory factory;
+	@Autowired
+	BinaryStorageInterceptor binaryStorageInterceptor;
+	@Autowired
+	IPackageInstallerSvc packageInstallerSvc;
+	@Autowired
+	AppProperties appProperties;
+	@Autowired
+	ApplicationContext myApplicationContext;
+	@Autowired(required = false)
+	IRepositoryValidationInterceptorFactory factory;
 	// These are set only if the features are enabled
 	@Autowired
 	Optional<CqlProviderLoader> cqlProviderLoader;
 	@Autowired
 	Optional<MdmProviderLoader> mdmProviderProvider;
+
 	@Autowired
 	AutowireCapableBeanFactory beanFactory;
-
 	@Autowired
 	PartitionCreationInterceptor partitionCreationInterceptor;
 	@Autowired
 	SessionAuthorizationInterceptor sessionAuthorizationInterceptor;
-
-	@Autowired
-	private IValidationSupport myValidationSupport;
-
-
 	@Autowired(required = false)
 	IFhirResourceDao<org.hl7.fhir.r4.model.Group> fhirResourceGroupR4Dao;
 	@Autowired(required = false)
 	IFhirResourceDao<org.hl7.fhir.r5.model.Group> fhirResourceGroupR5Dao;
 
+	@Autowired
+	private IValidationSupport myValidationSupport;
 
-  public BaseJpaRestfulServer() {
-  }
+	public BaseJpaRestfulServer() {
+	}
 
-  @SuppressWarnings("unchecked")
-  @Override
-  protected void initialize() throws ServletException {
-    super.initialize();
+	@SuppressWarnings("unchecked")
+	@Override
+	protected void initialize() throws ServletException {
+		super.initialize();
 
-    /*
+		/*
      * Create a FhirContext object that uses the version of FHIR
      * specified in the properties file.
      */
@@ -145,7 +146,6 @@ public class BaseJpaRestfulServer extends RestfulServer {
       daoRegistry.setSupportedResourceTypes(supportedResourceTypes);
     }
 
-	  System.out.println(fhirSystemDao.getContext().getVersion().getVersion());
     setFhirContext(fhirSystemDao.getContext());
 
     /*
@@ -156,8 +156,6 @@ public class BaseJpaRestfulServer extends RestfulServer {
 		 mdmProviderProvider.get().loadProvider();
 	 }
 
-
-
 	 // Bulk Query
 	  FhirVersionEnum fhirVersion = fhirSystemDao.getContext().getVersion().getVersion();
 
@@ -166,7 +164,7 @@ public class BaseJpaRestfulServer extends RestfulServer {
 		  /**
 			* Bulk FHIR Query provider
 			*/
-		  BulkQueryGroupProvider bulkQueryProvider = new BulkQueryGroupProvider();
+		  BulkQueryGroupProviderR5 bulkQueryProvider = new BulkQueryGroupProviderR5();
 		  beanFactory.autowireBean(bulkQueryProvider);
 		  bulkQueryProvider.setContext(fhirSystemDao.getContext());
 		  bulkQueryProvider.setDao(fhirResourceGroupR5Dao);
@@ -187,6 +185,7 @@ public class BaseJpaRestfulServer extends RestfulServer {
 		  bulkQueryProviderR4.setDao(fhirResourceGroupR4Dao);
 		  resourceProviderFactory.addSupplier(() -> bulkQueryProviderR4);
 	  }
+
 	 registerProviders(resourceProviderFactory.createProviders());
     registerProvider(jpaSystemProvider);
     /*
@@ -370,10 +369,10 @@ public class BaseJpaRestfulServer extends RestfulServer {
 
 
     if (appProperties.getAllow_cascading_deletes()) {
-      CascadingDeleteInterceptor cascadingDeleteInterceptor = new CascadingDeleteInterceptor(ctx,
-        daoRegistry, interceptorBroadcaster);
-      getInterceptorService().registerInterceptor(cascadingDeleteInterceptor);
-    }
+//      CascadingDeleteInterceptor cascadingDeleteInterceptor = new CascadingDeleteInterceptor(ctx,
+//        daoRegistry, interceptorBroadcaster);
+//      getInterceptorService().registerInterceptor(cascadingDeleteInterceptor);
+	 }
 
     // Binary Storage
     if (appProperties.getBinary_storage_enabled()) {

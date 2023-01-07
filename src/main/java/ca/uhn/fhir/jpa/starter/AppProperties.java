@@ -45,8 +45,10 @@ public class AppProperties {
   private Boolean filter_search_enabled = true;
   private Boolean graphql_enabled = false;
   private Boolean binary_storage_enabled = false;
-  private Boolean bulk_export_enabled = false;
-  private Boolean default_pretty_print = true;
+	private Integer inline_resource_storage_below_size = 0;
+	private Boolean bulk_export_enabled = false;
+	private Boolean bulk_import_enabled = false;
+	private Boolean default_pretty_print = true;
   private Integer default_page_size = 20;
   private Integer max_binary_size = null;
   private Integer max_page_size = Integer.MAX_VALUE;
@@ -61,25 +63,43 @@ public class AppProperties {
   private List<Bundle.BundleType> allowed_bundle_types = null;
   private Boolean narrative_enabled = true;
 
-  private Validation validation = new Validation();
-  private Map<String, Tester> tester = null;
-  private Logger logger = new Logger();
-  private Subscription subscription = new Subscription();
-  private Cors cors = null;
-  private Partitioning partitioning = null;
-  private Boolean install_transitive_ig_dependencies = true;
-  private Map<String, ImplementationGuide> implementationGuides = null;
+	private Validation validation = new Validation();
+	private Map<String, Tester> tester = null;
+	private Logger logger = new Logger();
+	private Subscription subscription = new Subscription();
+	private Cors cors = null;
+	private Partitioning partitioning = null;
+	private Boolean install_transitive_ig_dependencies = true;
+	private Map<String, ImplementationGuide> implementationGuides = null;
 
-  private Boolean lastn_enabled = false;
-  private boolean store_resource_in_lucene_index_enabled = false;
-  private NormalizedQuantitySearchLevel normalized_quantity_search_level = NormalizedQuantitySearchLevel.NORMALIZED_QUANTITY_SEARCH_NOT_SUPPORTED;
+	private String staticLocation = null;
 
-  private Boolean use_apache_address_strategy = false;
-  private Boolean use_apache_address_strategy_https = false;
+	private Boolean lastn_enabled = false;
+	private boolean store_resource_in_lucene_index_enabled = false;
+	private NormalizedQuantitySearchLevel normalized_quantity_search_level = NormalizedQuantitySearchLevel.NORMALIZED_QUANTITY_SEARCH_NOT_SUPPORTED;
 
-  private Integer bundle_batch_pool_size = 20;
-  private Integer bundle_batch_pool_max_size = 100;
-  private List<String> local_base_urls = new ArrayList<>();
+	private Boolean use_apache_address_strategy = false;
+	private Boolean use_apache_address_strategy_https = false;
+
+	private Integer bundle_batch_pool_size = 20;
+	private Integer bundle_batch_pool_max_size = 100;
+	private final List<String> local_base_urls = new ArrayList<>();
+
+	private final List<String> custom_interceptor_classes = new ArrayList<>();
+
+	public List<String> getCustomInterceptorClasses() {
+		return custom_interceptor_classes;
+	}
+
+
+	public String getStaticLocation() {
+		return staticLocation;
+	}
+
+	public void setStaticLocation(String staticLocation) {
+		this.staticLocation = staticLocation;
+	}
+
 
 	public Boolean getOpenapi_enabled() {
 		return openapi_enabled;
@@ -97,9 +117,9 @@ public class AppProperties {
     this.use_apache_address_strategy = use_apache_address_strategy;
   }
 
-    public Boolean getUse_apache_address_strategy_https() {
-    return use_apache_address_strategy_https;
-  }
+	public Boolean getUse_apache_address_strategy_https() {
+		return use_apache_address_strategy_https;
+	}
 
   public void setUse_apache_address_strategy_https(Boolean use_apache_address_strategy_https) {
     this.use_apache_address_strategy_https = use_apache_address_strategy_https;
@@ -386,31 +406,47 @@ public class AppProperties {
     this.graphql_enabled = graphql_enabled;
   }
 
-  public Boolean getBinary_storage_enabled() {
-    return binary_storage_enabled;
-  }
+	public Boolean getBinary_storage_enabled() {
+		return binary_storage_enabled;
+	}
 
-  public void setBinary_storage_enabled(Boolean binary_storage_enabled) {
-    this.binary_storage_enabled = binary_storage_enabled;
-  }
+	public void setBinary_storage_enabled(Boolean binary_storage_enabled) {
+		this.binary_storage_enabled = binary_storage_enabled;
+	}
 
-  public Boolean getBulk_export_enabled() {
-    return bulk_export_enabled;
-  }
+	public Integer getInline_resource_storage_below_size() {
+		return inline_resource_storage_below_size;
+	}
 
-  public void setBulk_export_enabled(Boolean bulk_export_enabled) {
-    this.bulk_export_enabled = bulk_export_enabled;
-  }
+	public void setInline_resource_storage_below_size(Integer inline_resource_storage_below_size) {
+		this.inline_resource_storage_below_size = inline_resource_storage_below_size;
+	}
 
-  public EncodingEnum getDefault_encoding() {
-    return default_encoding;
-  }
+	public Boolean getBulk_export_enabled() {
+		return bulk_export_enabled;
+	}
 
-  public void setDefault_encoding(EncodingEnum default_encoding) {
-    this.default_encoding = default_encoding;
-  }
+	public void setBulk_export_enabled(Boolean bulk_export_enabled) {
+		this.bulk_export_enabled = bulk_export_enabled;
+	}
 
-  public FhirVersionEnum getFhir_version() {
+	public Boolean getBulk_import_enabled() {
+		return bulk_import_enabled;
+	}
+
+	public void setBulk_import_enabled(Boolean bulk_import_enabled) {
+		this.bulk_import_enabled = bulk_import_enabled;
+	}
+
+	public EncodingEnum getDefault_encoding() {
+		return default_encoding;
+	}
+
+	public void setDefault_encoding(EncodingEnum default_encoding) {
+		this.default_encoding = default_encoding;
+	}
+
+	public FhirVersionEnum getFhir_version() {
     return fhir_version;
   }
 

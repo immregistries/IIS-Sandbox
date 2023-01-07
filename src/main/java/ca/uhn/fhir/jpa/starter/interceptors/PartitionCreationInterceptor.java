@@ -3,9 +3,11 @@ package ca.uhn.fhir.jpa.starter.interceptors;
 import ca.uhn.fhir.i18n.Msg;
 import ca.uhn.fhir.interceptor.model.RequestPartitionId;
 import ca.uhn.fhir.jpa.dao.data.IPartitionDao;
+import ca.uhn.fhir.jpa.partition.IPartitionLookupSvc;
 import ca.uhn.fhir.jpa.partition.PartitionManagementProvider;
 import ca.uhn.fhir.rest.api.server.RequestDetails;
 import ca.uhn.fhir.rest.server.exceptions.InternalErrorException;
+import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
 import ca.uhn.fhir.rest.server.interceptor.partition.RequestTenantPartitionInterceptor;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.r5.model.IntegerType;
@@ -28,6 +30,8 @@ import java.util.Random;
 @Interceptor
 public class PartitionCreationInterceptor extends RequestTenantPartitionInterceptor {
 	@Autowired
+	IPartitionLookupSvc partitionLookupSvc;
+	@Autowired
 	private IPartitionDao myPartitionDao;
 	@Autowired
 	private PartitionManagementProvider partitionManagementProvider;
@@ -40,11 +44,12 @@ public class PartitionCreationInterceptor extends RequestTenantPartitionIntercep
 		if (StringUtils.isBlank(tenantId)) {
 			throw new InternalErrorException(Msg.code(343) + "No tenant ID has been specified");
 		} else {
-			if (myPartitionDao.findForName(theRequestDetails.getTenantId()).isPresent()) {
+			try {
+				partitionLookupSvc.getPartitionByName(theRequestDetails.getTenantId());
 				return RequestPartitionId.fromPartitionName(tenantId);
-			} else {
-				return createPartition(theRequestDetails);
+			} catch (ResourceNotFoundException e) {
 			}
+			return createPartition(theRequestDetails);
 		}
 	}
 
