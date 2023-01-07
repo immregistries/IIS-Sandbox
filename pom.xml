@@ -14,7 +14,7 @@
     <parent>
         <groupId>ca.uhn.hapi.fhir</groupId>
         <artifactId>hapi-fhir</artifactId>
-        <version>6.1.2-SUB</version>
+        <version>6.2.3-SUB</version>
     </parent>
 
     <artifactId>iis-sandbox</artifactId>
@@ -401,7 +401,7 @@
         <dependency>
             <groupId>io.micrometer</groupId>
             <artifactId>micrometer-registry-prometheus</artifactId>
-            <version>1.8.5</version>
+            <version>1.9.4</version>
         </dependency>
 
         <dependency>
