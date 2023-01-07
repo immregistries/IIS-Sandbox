@@ -5,6 +5,7 @@ import org.hl7.fhir.instance.model.api.IBaseParameters;
 import org.hl7.fhir.r5.model.*;
 
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 public class MappingHelper {
@@ -105,6 +106,14 @@ public class MappingHelper {
 
 	public static org.hl7.fhir.r4.model.Coding extensionGetCoding(org.hl7.fhir.r4.model.Extension extension) {
 		return extension.castToCoding(extension.getValue());
+	}
+
+	public static Date extensionGetDate(Extension extension) {
+		return extension.getValueDateType().getValue();
+	}
+
+	public static Date extensionGetDate(org.hl7.fhir.r4.model.Extension extension) {
+		return extension.castToDate(extension.getValue()).getValue();
 	}
 
 	public static IBaseParameters resourceToPatch(Resource resource) {

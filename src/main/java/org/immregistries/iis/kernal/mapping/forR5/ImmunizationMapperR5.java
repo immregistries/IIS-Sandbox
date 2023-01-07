@@ -47,7 +47,16 @@ public class ImmunizationMapperR5 implements ImmunizationMapper<Immunization> {
 //			vr.setPatientReported(fhirRequests.readPatientReported(i.getPatient().getReference().split("Patient/")[0]));
 		}
 
-		vr.setReportedDate(i.getMeta().getLastUpdated()); // TODO change
+		if (vr.getReportedDate() != null) {
+			Extension recorded = i.addExtension()
+				.setUrl(RECORDED)
+				.setValue(new DateType(vr.getReportedDate()));
+		}
+		Extension recorded = i.getExtensionByUrl(RECORDED);
+		if (recorded != null) {
+			vr.setReportedDate(MappingHelper.extensionGetDate(recorded));
+		}
+//		vr.setReportedDate(i.getMeta().getLastUpdated()); // TODO change
 		vr.setAdministeredDate(i.getOccurrenceDateTimeType().getValue());
 
 		vr.setVaccineCvxCode(i.getVaccineCode().getCode(CVX));
@@ -138,16 +147,21 @@ public class ImmunizationMapperR5 implements ImmunizationMapper<Immunization> {
    * @return the Immunization resource
    */
   public Immunization getFhirResource(VaccinationReported vr) {
-     Immunization i = new Immunization();
+	  Immunization i = new Immunization();
 	  i.addIdentifier(MappingHelper.getFhirIdentifier(vr.getVaccinationReportedExternalLinkSystem(), vr.getVaccinationReportedExternalLink())); // TODO if system empty ?
-	  i.setPatient(new Reference().setReference("Patient/"+ vr.getPatientReported().getPatientReportedId()));
+	  i.setPatient(new Reference().setReference("Patient/" + vr.getPatientReported().getPatientReportedId()));
 //	  i.setRecorded(vr.getReportedDate());
+	  if (vr.getReportedDate() != null) {
+		  Extension recorded = i.addExtension()
+			  .setUrl(RECORDED)
+			  .setValue(new DateType(vr.getReportedDate()));
+	  }
 	  i.getOccurrenceDateTimeType().setValue(vr.getAdministeredDate());
 
-	  if(!vr.getVaccineCvxCode().isBlank()){
+	  if (!vr.getVaccineCvxCode().isBlank()) {
 		  i.getVaccineCode().addCoding().setCode(vr.getVaccineCvxCode()).setSystem(CVX);
 	  }
-	  if(!vr.getVaccineNdcCode().isBlank()){
+	  if (!vr.getVaccineNdcCode().isBlank()) {
 		  i.getVaccineCode().addCoding().setCode(vr.getVaccineNdcCode()).setSystem(NDC);
 	  }
 	  i.setManufacturer(MappingHelper.getFhirCodeableReference(MappingHelper.ORGANISATION, MVX, vr.getVaccineMvxCode()));

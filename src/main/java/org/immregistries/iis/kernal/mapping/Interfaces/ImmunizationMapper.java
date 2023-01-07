@@ -18,6 +18,7 @@ public interface ImmunizationMapper<Immunization> {
 	String BODY_ROUTE = "bodyRoute";
 	String FUNDING_SOURCE = "fundingSource";
 	String FUNDING_ELIGIBILITY = "fundingEligibility";
+	String RECORDED = "recorded";
 
 	VaccinationReported getReportedWithMaster(Immunization i);
 

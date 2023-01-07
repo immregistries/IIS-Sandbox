@@ -1748,17 +1748,21 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler<Organizatio
 	}
 
 	private Organization processSendingOrganization(HL7Reader reader) {
-		Organization sendingOrganization = (Organization) fhirRequester.searchOrganization(Organization.IDENTIFIER.exactly()
-			.systemAndIdentifier(reader.getValue(4, 1), reader.getValue(4, 2)));
-		if (sendingOrganization == null) {
-			sendingOrganization = new Organization()
-				.setName(reader.getValue(4, 1))
-				.addIdentifier(new Identifier()
-					.setSystem(reader.getValue(4, 2))
-					.setValue(reader.getValue(4, 10)));
-			sendingOrganization = (Organization) fhirRequester.saveOrganization(sendingOrganization);
+		if (!reader.getValue(4, 2).isBlank()) {
+			Organization sendingOrganization = (Organization) fhirRequester.searchOrganization(Organization.IDENTIFIER.exactly()
+				.systemAndIdentifier(reader.getValue(4, 1), reader.getValue(4, 2)));
+			if (sendingOrganization == null) {
+				sendingOrganization = new Organization()
+					.setName(reader.getValue(4, 1))
+					.addIdentifier(new Identifier()
+						.setSystem(reader.getValue(4, 2))
+						.setValue(reader.getValue(4, 10)));
+				sendingOrganization = (Organization) fhirRequester.saveOrganization(sendingOrganization);
+			}
+			return sendingOrganization;
+		} else {
+			return null;
 		}
-		return sendingOrganization;
 	}
 
 	public Organization processManagingOrganization(HL7Reader reader) {

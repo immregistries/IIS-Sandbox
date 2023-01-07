@@ -151,20 +151,20 @@ hapi:
 #    tester:
 #      home:
 ##        id: home
-#        name: Local Tester
-#        server_address: 'http://localhost:8080/iis-sandbox-jpa/fhir/overlay-test'
-#        refuse_to_fetch_third_party_urls: false
-#        fhir_version: R5
-#      global:
-#        name: Global Tester
-#        server_address: "http://hapi.fhir.org/baseR5"
+    #        name: Local Tester
+    #        server_address: 'http://localhost:8080/iis-sandbox-jpa/fhir/overlay-test'
+    #        refuse_to_fetch_third_party_urls: false
+    #        fhir_version: R5
+    #      global:
+    #        name: Global Tester
+    #        server_address: "http://hapi.fhir.org/baseR5"
     #        refuse_to_fetch_third_party_urls: false
     #        fhir_version: R5
     #    validation:
     #      requests_enabled: true
     #      responses_enabled: true
-    #    binary_storage_enabled: true
-    #    bulk_export_enabled: true
+    binary_storage_enabled: true
+    bulk_export_enabled: true
     subscription:
       resthook_enabled: true
     #     comma-separated package names, will be @ComponentScan'ed by Spring to allow for creating custom Spring beans
