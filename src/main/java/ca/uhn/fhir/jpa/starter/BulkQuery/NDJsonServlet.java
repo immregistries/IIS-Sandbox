@@ -15,6 +15,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 
 
@@ -34,11 +35,19 @@ public class NDJsonServlet extends HttpServlet {
 	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse resp) throws ServletException, IOException {
 		String authHeader;
-		Session dataSession = PopServlet.getDataSession();
-		OrgAccess orgAccess = (OrgAccess) request.getSession(false).getAttribute("orgAccess");
+		HttpSession session = request.getSession(false);
+		OrgAccess orgAccess = null;
+		String tenantId = request.getParameter("tenantId");
+		Integer ndJsonId = Integer.parseInt(request.getParameter("ndJsonId"));
+		if (session != null) {
+			orgAccess = (OrgAccess) session.getAttribute("orgAccess");
+			if (!orgAccess.getOrg().getOrganizationName().equals(tenantId)) {
+				orgAccess = null;
+			}
+		}
+		Session dataSession = null;
 		try {
-			String tenantId = request.getParameter("tenantId");
-			Integer ndJsonId = Integer.parseInt(request.getParameter("ndJsonId"));
+			dataSession = PopServlet.getDataSession();
 			if (orgAccess == null) {
 				if (request.getHeader("Authorization") == null || request.getHeader("Authorization").isEmpty()) {
 					throw new AuthenticationException();
@@ -60,7 +69,9 @@ public class NDJsonServlet extends HttpServlet {
 		} catch (Exception e) {
 			throw e;
 		} finally {
-			dataSession.close();
+			if (dataSession != null) {
+				dataSession.close();
+			}
 		}
 
 	}

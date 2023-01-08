@@ -9,6 +9,7 @@ import ca.uhn.fhir.interceptor.api.IInterceptorBroadcaster;
 import ca.uhn.fhir.jpa.api.config.DaoConfig;
 import ca.uhn.fhir.jpa.api.config.ThreadPoolFactoryConfig;
 import ca.uhn.fhir.jpa.api.dao.DaoRegistry;
+import ca.uhn.fhir.jpa.api.dao.IFhirResourceDao;
 import ca.uhn.fhir.jpa.api.dao.IFhirSystemDao;
 import ca.uhn.fhir.jpa.binary.interceptor.BinaryStorageInterceptor;
 import ca.uhn.fhir.jpa.binary.provider.BinaryAccessProvider;
@@ -22,6 +23,8 @@ import ca.uhn.fhir.jpa.partition.PartitionManagementProvider;
 import ca.uhn.fhir.jpa.provider.*;
 import ca.uhn.fhir.jpa.provider.dstu3.JpaConformanceProviderDstu3;
 import ca.uhn.fhir.jpa.search.DatabaseBackedPagingProvider;
+import ca.uhn.fhir.jpa.starter.BulkQuery.BulkQueryGroupProviderR4;
+import ca.uhn.fhir.jpa.starter.BulkQuery.CustomBulkDataExportProvider;
 import ca.uhn.fhir.jpa.starter.common.StarterJpaConfig;
 import ca.uhn.fhir.jpa.starter.interceptors.PartitionCreationInterceptor;
 import ca.uhn.fhir.jpa.subscription.util.SubscriptionDebugLogInterceptor;
@@ -37,7 +40,9 @@ import ca.uhn.fhir.rest.server.util.ISearchParamRegistry;
 import ca.uhn.fhir.validation.IValidatorModule;
 import ca.uhn.fhir.validation.ResultSeverityEnum;
 import com.google.common.base.Strings;
+import org.hl7.fhir.r4.model.Group;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -56,9 +61,14 @@ import java.util.Optional;
 public class ServerConfig {
 	private static final org.slf4j.Logger ourLog = org.slf4j.LoggerFactory.getLogger(ServerConfig.class);
 
+	@Autowired
+	IFhirResourceDao<Group> fhirResourceGroupDao;
+
 	@Bean
-	public RestfulServer restfulServer(IFhirSystemDao<?, ?> fhirSystemDao, AppProperties appProperties, DaoRegistry daoRegistry, Optional<MdmProviderLoader> mdmProviderProvider, IJpaSystemProvider jpaSystemProvider, ResourceProviderFactory resourceProviderFactory, DaoConfig daoConfig, ISearchParamRegistry searchParamRegistry, IValidationSupport theValidationSupport, DatabaseBackedPagingProvider databaseBackedPagingProvider, LoggingInterceptor loggingInterceptor, Optional<TerminologyUploaderProvider> terminologyUploaderProvider, Optional<SubscriptionTriggeringProvider> subscriptionTriggeringProvider, Optional<CorsInterceptor> corsInterceptor, IInterceptorBroadcaster interceptorBroadcaster, Optional<BinaryAccessProvider> binaryAccessProvider, BinaryStorageInterceptor binaryStorageInterceptor, IValidatorModule validatorModule, Optional<GraphQLProvider> graphQLProvider, BulkDataExportProvider bulkDataExportProvider, BulkDataImportProvider bulkDataImportProvider, ValueSetOperationProvider theValueSetOperationProvider, ReindexProvider reindexProvider, PartitionManagementProvider partitionManagementProvider, Optional<RepositoryValidatingInterceptor> repositoryValidatingInterceptor, IPackageInstallerSvc packageInstallerSvc, ThreadSafeResourceDeleterSvc theThreadSafeResourceDeleterSvc, ApplicationContext appContext
+	public RestfulServer restfulServer(IFhirSystemDao<?, ?> fhirSystemDao, AppProperties appProperties, DaoRegistry daoRegistry, Optional<MdmProviderLoader> mdmProviderProvider, IJpaSystemProvider jpaSystemProvider, ResourceProviderFactory resourceProviderFactory, DaoConfig daoConfig, ISearchParamRegistry searchParamRegistry, IValidationSupport theValidationSupport, DatabaseBackedPagingProvider databaseBackedPagingProvider, LoggingInterceptor loggingInterceptor, Optional<TerminologyUploaderProvider> terminologyUploaderProvider, Optional<SubscriptionTriggeringProvider> subscriptionTriggeringProvider, Optional<CorsInterceptor> corsInterceptor, IInterceptorBroadcaster interceptorBroadcaster, Optional<BinaryAccessProvider> binaryAccessProvider, BinaryStorageInterceptor binaryStorageInterceptor, IValidatorModule validatorModule, Optional<GraphQLProvider> graphQLProvider, CustomBulkDataExportProvider customBulkDataExportProvider, BulkDataImportProvider bulkDataImportProvider, ValueSetOperationProvider theValueSetOperationProvider, ReindexProvider reindexProvider, PartitionManagementProvider partitionManagementProvider, Optional<RepositoryValidatingInterceptor> repositoryValidatingInterceptor, IPackageInstallerSvc packageInstallerSvc, ThreadSafeResourceDeleterSvc theThreadSafeResourceDeleterSvc, ApplicationContext appContext
 		, PartitionCreationInterceptor partitionCreationInterceptor
+		, BulkQueryGroupProviderR4 bulkQueryGroupProviderR4
+
 //		, SessionAuthorizationInterceptor sessionAuthorizationInterceptor
 //		, MdmCustomInterceptor mdmCustomInterceptor
 	) {
@@ -205,7 +215,14 @@ public class ServerConfig {
 
 		// Bulk Export
 		if (appProperties.getBulk_export_enabled()) {
-			fhirServer.registerProvider(bulkDataExportProvider);
+			/**
+			 * Customized to support synch export
+			 */
+			fhirServer.registerProvider(customBulkDataExportProvider);
+			if (bulkQueryGroupProviderR4 != null) {
+				bulkQueryGroupProviderR4.setDao(fhirResourceGroupDao);
+			}
+//			fhirServer.registerProvider(bulkQueryGroupProviderR4);
 		}
 
 		//Bulk Import
