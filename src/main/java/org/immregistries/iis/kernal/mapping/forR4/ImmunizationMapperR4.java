@@ -8,7 +8,6 @@ import org.immregistries.iis.kernal.model.ModelPerson;
 import org.immregistries.iis.kernal.model.VaccinationMaster;
 import org.immregistries.iis.kernal.model.VaccinationReported;
 import org.immregistries.iis.kernal.repository.FhirRequesterR4;
-import org.immregistries.iis.kernal.repository.FhirRequesterR5;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Service;
@@ -170,7 +169,7 @@ public class ImmunizationMapperR4 implements ImmunizationMapper<Immunization> {
   public Immunization getFhirResource(VaccinationReported vr) {
      Immunization i = new Immunization();
 //	  i.addIdentifier(MappingHelper.getFhirIdentifier(MappingHelper.VACCINATION_REPORTED, vr.getVaccinationReportedExternalLink()));
-	  i.setPatient(new Reference().setReference("Patient/"+ vr.getPatientReported().getPatientReportedId()));
+	  i.setPatient(new Reference().setReference("Patient/" + vr.getPatientReported().getId()));
 	  i.setRecorded(vr.getReportedDate());
 	  i.getOccurrenceDateTimeType().setValue(vr.getAdministeredDate());
 

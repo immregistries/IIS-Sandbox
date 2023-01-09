@@ -2,7 +2,6 @@ package org.immregistries.iis.kernal.mapping.forR5;
 
 import ca.uhn.fhir.jpa.starter.annotations.OnR5Condition;
 import org.hl7.fhir.r5.model.HumanName;
-import org.hl7.fhir.r5.model.Patient;
 import org.hl7.fhir.r5.model.Reference;
 import org.hl7.fhir.r5.model.RelatedPerson;
 import org.immregistries.iis.kernal.mapping.Interfaces.RelatedPersonMapper;
@@ -27,7 +26,7 @@ public class RelatedPersonMapperR5 implements RelatedPersonMapper<RelatedPerson>
 
 	public RelatedPerson getFhirRelatedPersonFromPatient(PatientReported pr){
 		RelatedPerson relatedPerson = new RelatedPerson();
-		relatedPerson.setPatient(new Reference("Patient/" + pr.getPatientReportedId()));
+		relatedPerson.setPatient(new Reference("Patient/" + pr.getId()));
 		relatedPerson.addRelationship().addCoding().setSystem("").setCode(pr.getGuardianRelationship());
 		HumanName name = relatedPerson.addName();
 		name.setFamily(pr.getGuardianLast());

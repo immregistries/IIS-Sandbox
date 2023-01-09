@@ -9,52 +9,52 @@ import java.util.Date;
 public class PatientReported implements Serializable {
 
   private static final long serialVersionUID = 1L;
-	
-  private String patientReportedId = "";
-  private OrgMaster orgReported = null;
-  private String patientReportedExternalLink = "";
-  private PatientMaster patient = null;
-  private Date reportedDate = null;
-  private Date updatedDate = null;
 
-  private String patientReportedAuthority = "";
-  private String patientReportedType = "";
-  private String patientNameLast = "";
-  private String patientNameFirst = "";
-  private String patientNameMiddle = "";
-  private String patientMotherMaiden = "";
-  private Date patientBirthDate = null;
-  private String patientSex = "";
-  private String patientRace = "";
-  private String patientRace2 = "";
-  private String patientRace3 = "";
-  private String patientRace4 = "";
-  private String patientRace5 = "";
-  private String patientRace6 = "";
-  private String patientAddressLine1 = "";
-  private String patientAddressLine2 = "";
-  private String patientAddressCity = "";
-  private String patientAddressState = "";
-  private String patientAddressZip = "";
-  private String patientAddressCountry = "";
-  private String patientAddressCountyParish = "";
-  private String patientPhone = "";
-  private String patientEmail = "";
-  private String patientEthnicity = "";
-  private String patientBirthFlag = "";
-  private String patientBirthOrder = "";
-  private String patientDeathFlag = "";
-  private Date patientDeathDate = null;
-  private String publicityIndicator = "";
-  private Date publicityIndicatorDate = null;
-  private String protectionIndicator = "";
-  private Date protectionIndicatorDate = null;
-  private String registryStatusIndicator = "";
-  private Date registryStatusIndicatorDate = null;
-  private String guardianLast = "";
-  private String guardianFirst = "";
-  private String guardianMiddle = "";
-  private String guardianRelationship = "";
+	private String id = "";
+	private OrgMaster orgReported = null;
+	private String patientReportedExternalLink = "";
+	private PatientMaster patient = null;
+	private Date reportedDate = null;
+	private Date updatedDate = null;
+
+	private String patientReportedAuthority = "";
+	private String patientReportedType = "";
+	private String nameLast = "";
+	private String nameFirst = "";
+	private String nameMiddle = "";
+	private String motherMaidenName = "";
+	private Date birthDate = null;
+	private String sex = "";
+	private String race = "";
+	private String race2 = "";
+	private String race3 = "";
+	private String race4 = "";
+	private String race5 = "";
+	private String race6 = "";
+	private String addressLine1 = "";
+	private String addressLine2 = "";
+	private String addressCity = "";
+	private String addressState = "";
+	private String addressZip = "";
+	private String addressCountry = "";
+	private String addressCountyParish = "";
+	private String phone = "";
+	private String email = "";
+	private String ethnicity = "";
+	private String birthFlag = "";
+	private String birthOrder = "";
+	private String deathFlag = "";
+	private Date deathDate = null;
+	private String publicityIndicator = "";
+	private Date publicityIndicatorDate = null;
+	private String protectionIndicator = "";
+	private Date protectionIndicatorDate = null;
+	private String registryStatusIndicator = "";
+	private Date registryStatusIndicatorDate = null;
+	private String guardianLast = "";
+	private String guardianFirst = "";
+	private String guardianMiddle = "";
+	private String guardianRelationship = "";
 
 
 	private String managingOrganizationId;
@@ -75,189 +75,189 @@ public class PatientReported implements Serializable {
     this.patientReportedAuthority = patientReportedAuthority;
   }
 
-  public String getPatientReportedType() {
-    return patientReportedType;
-  }
+	public String getPatientReportedType() {
+		return patientReportedType;
+	}
 
-  public void setPatientReportedType(String patientReportedType) {
-    this.patientReportedType = patientReportedType;
-  }
+	public void setPatientReportedType(String patientReportedType) {
+		this.patientReportedType = patientReportedType;
+	}
 
-  public String getPatientNameLast() {
-    return patientNameLast;
-  }
+	public String getNameLast() {
+		return nameLast;
+	}
 
-  public void setPatientNameLast(String patientNameLast) {
-    this.patientNameLast = patientNameLast;
-  }
+	public void setNameLast(String nameLast) {
+		this.nameLast = nameLast;
+	}
 
-  public String getPatientNameFirst() {
-    return patientNameFirst;
-  }
+	public String getNameFirst() {
+		return nameFirst;
+	}
 
-  public void setPatientNameFirst(String patientNameFirst) {
-    this.patientNameFirst = patientNameFirst;
-  }
+	public void setNameFirst(String nameFirst) {
+		this.nameFirst = nameFirst;
+	}
 
-  public String getPatientNameMiddle() {
-    return patientNameMiddle;
-  }
+	public String getNameMiddle() {
+		return nameMiddle;
+	}
 
-  public void setPatientNameMiddle(String patientNameMiddle) {
-    this.patientNameMiddle = patientNameMiddle;
-  }
+	public void setNameMiddle(String nameMiddle) {
+		this.nameMiddle = nameMiddle;
+	}
 
-  public String getPatientMotherMaiden() {
-    return patientMotherMaiden;
-  }
+	public String getMotherMaidenName() {
+		return motherMaidenName;
+	}
 
-  public void setPatientMotherMaiden(String patientMotherMaiden) {
-    this.patientMotherMaiden = patientMotherMaiden;
-  }
+	public void setMotherMaidenName(String motherMaidenName) {
+		this.motherMaidenName = motherMaidenName;
+	}
 
-  public Date getPatientBirthDate() {
-    return patientBirthDate;
-  }
+	public Date getBirthDate() {
+		return birthDate;
+	}
 
-  public void setPatientBirthDate(Date patientBirthDate) {
-    this.patientBirthDate = patientBirthDate;
-  }
+	public void setBirthDate(Date birthDate) {
+		this.birthDate = birthDate;
+	}
 
-  public String getPatientSex() {
-    return patientSex;
-  }
+	public String getSex() {
+		return sex;
+	}
 
-  public void setPatientSex(String patientSex) {
-    this.patientSex = patientSex;
-  }
+	public void setSex(String sex) {
+		this.sex = sex;
+	}
 
-  public String getPatientRace() {
-    return patientRace;
-  }
+	public String getRace() {
+		return race;
+	}
 
-  public void setPatientRace(String patientRace) {
-    this.patientRace = patientRace;
-  }
+	public void setRace(String race) {
+		this.race = race;
+	}
 
-  public String getPatientAddressLine1() {
-    return patientAddressLine1;
-  }
+	public String getAddressLine1() {
+		return addressLine1;
+	}
 
-  public void setPatientAddressLine1(String patientAddressLine1) {
-    this.patientAddressLine1 = patientAddressLine1;
-  }
+	public void setAddressLine1(String addressLine1) {
+		this.addressLine1 = addressLine1;
+	}
 
-  public String getPatientAddressLine2() {
-    return patientAddressLine2;
-  }
+	public String getAddressLine2() {
+		return addressLine2;
+	}
 
-  public void setPatientAddressLine2(String patientAddressLine2) {
-    this.patientAddressLine2 = patientAddressLine2;
-  }
+	public void setAddressLine2(String addressLine2) {
+		this.addressLine2 = addressLine2;
+	}
 
-  public String getPatientAddressCity() {
-    return patientAddressCity;
-  }
+	public String getAddressCity() {
+		return addressCity;
+	}
 
-  public void setPatientAddressCity(String patientAddressCity) {
-    this.patientAddressCity = patientAddressCity;
-  }
+	public void setAddressCity(String addressCity) {
+		this.addressCity = addressCity;
+	}
 
-  public String getPatientAddressState() {
-    return patientAddressState;
-  }
+	public String getAddressState() {
+		return addressState;
+	}
 
-  public void setPatientAddressState(String patientAddressState) {
-    this.patientAddressState = patientAddressState;
-  }
+	public void setAddressState(String addressState) {
+		this.addressState = addressState;
+	}
 
-  public String getPatientAddressZip() {
-    return patientAddressZip;
-  }
+	public String getAddressZip() {
+		return addressZip;
+	}
 
-  public void setPatientAddressZip(String patientAddressZip) {
-    this.patientAddressZip = patientAddressZip;
-  }
+	public void setAddressZip(String addressZip) {
+		this.addressZip = addressZip;
+	}
 
-  public String getPatientAddressCountry() {
-    return patientAddressCountry;
-  }
+	public String getAddressCountry() {
+		return addressCountry;
+	}
 
-  public void setPatientAddressCountry(String patientAddressCountry) {
-    this.patientAddressCountry = patientAddressCountry;
-  }
+	public void setAddressCountry(String addressCountry) {
+		this.addressCountry = addressCountry;
+	}
 
-  public String getPatientAddressCountyParish() {
-    return patientAddressCountyParish;
-  }
+	public String getAddressCountyParish() {
+		return addressCountyParish;
+	}
 
-  public void setPatientAddressCountyParish(String patientAddressCountyParish) {
-    this.patientAddressCountyParish = patientAddressCountyParish;
-  }
+	public void setAddressCountyParish(String addressCountyParish) {
+		this.addressCountyParish = addressCountyParish;
+	}
 
-  public String getPatientPhone() {
-    return patientPhone;
-  }
+	public String getPhone() {
+		return phone;
+	}
 
-  public void setPatientPhone(String patientPhone) {
-    this.patientPhone = patientPhone;
-  }
+	public void setPhone(String phone) {
+		this.phone = phone;
+	}
 
-  public String getPatientEmail() {
-    return patientEmail;
-  }
+	public String getEmail() {
+		return email;
+	}
 
-  public void setPatientEmail(String patientEmail) {
-    this.patientEmail = patientEmail;
-  }
+	public void setEmail(String email) {
+		this.email = email;
+	}
 
-  public String getPatientEthnicity() {
-    return patientEthnicity;
-  }
+	public String getEthnicity() {
+		return ethnicity;
+	}
 
-  public void setPatientEthnicity(String patientEthnicity) {
-    this.patientEthnicity = patientEthnicity;
-  }
+	public void setEthnicity(String ethnicity) {
+		this.ethnicity = ethnicity;
+	}
 
-  public String getPatientBirthFlag() {
-    return patientBirthFlag;
-  }
+	public String getBirthFlag() {
+		return birthFlag;
+	}
 
-  public void setPatientBirthFlag(String patientBirthFlag) {
-    this.patientBirthFlag = patientBirthFlag;
-  }
+	public void setBirthFlag(String birthFlag) {
+		this.birthFlag = birthFlag;
+	}
 
-  public String getPatientBirthOrder() {
-    return patientBirthOrder;
-  }
+	public String getBirthOrder() {
+		return birthOrder;
+	}
 
-  public void setPatientBirthOrder(String patientBirthOrder) {
-    this.patientBirthOrder = patientBirthOrder;
-  }
+	public void setBirthOrder(String birthOrder) {
+		this.birthOrder = birthOrder;
+	}
 
-  public String getPatientDeathFlag() {
-    return patientDeathFlag;
-  }
+	public String getDeathFlag() {
+		return deathFlag;
+	}
 
-  public void setPatientDeathFlag(String patientDeathFlag) {
-    this.patientDeathFlag = patientDeathFlag;
-  }
+	public void setDeathFlag(String deathFlag) {
+		this.deathFlag = deathFlag;
+	}
 
-  public Date getPatientDeathDate() {
-    return patientDeathDate;
-  }
+	public Date getDeathDate() {
+		return deathDate;
+	}
 
-  public void setPatientDeathDate(Date patientDeathDate) {
-    this.patientDeathDate = patientDeathDate;
-  }
+	public void setDeathDate(Date deathDate) {
+		this.deathDate = deathDate;
+	}
 
-  public String getPublicityIndicator() {
-    return publicityIndicator;
-  }
+	public String getPublicityIndicator() {
+		return publicityIndicator;
+	}
 
-  public void setPublicityIndicator(String publicityIndicator) {
-    this.publicityIndicator = publicityIndicator;
-  }
+	public void setPublicityIndicator(String publicityIndicator) {
+		this.publicityIndicator = publicityIndicator;
+	}
 
   public Date getPublicityIndicatorDate() {
     return publicityIndicatorDate;
@@ -331,30 +331,30 @@ public class PatientReported implements Serializable {
     this.guardianRelationship = guardianRelationship;
   }
 
-  public OrgMaster getOrgReported() {
-    return orgReported;
-  }
+	public OrgMaster getOrgReported() {
+		return orgReported;
+	}
 
-  public void setOrgReported(OrgMaster reportedOrg) {
-    this.orgReported = reportedOrg;
-  }
+	public void setOrgReported(OrgMaster reportedOrg) {
+		this.orgReported = reportedOrg;
+	}
 
-  public String getPatientReportedId() {
-    return patientReportedId;
-  }
+	public String getId() {
+		return id;
+	}
 
-  public void setPatientReportedId(String reportedPatientId) {
-    this.patientReportedId = reportedPatientId;
-  }
+	public void setId(String reportedPatientId) {
+		this.id = reportedPatientId;
+	}
 
-  public String getPatientReportedExternalLink() {
-    return patientReportedExternalLink;
-  }
+	public String getPatientReportedExternalLink() {
+		return patientReportedExternalLink;
+	}
 //  public String getPatientReportedExternalLink() {
 //    return patientReportedId;
 //  }
 
-  public void setPatientReportedExternalLink(String reportedMrn) {
+	public void setPatientReportedExternalLink(String reportedMrn) {
     this.patientReportedExternalLink = reportedMrn;
   }
 //  public void setPatientReportedExternalLink(String reportedMrn) {
@@ -377,83 +377,83 @@ public class PatientReported implements Serializable {
     this.reportedDate = reportedDate;
   }
 
-  public Date getUpdatedDate() {
-    return updatedDate;
-  }
+	public Date getUpdatedDate() {
+		return updatedDate;
+	}
 
-  public void setUpdatedDate(Date updatedDate) {
-    this.updatedDate = updatedDate;
-  }
+	public void setUpdatedDate(Date updatedDate) {
+		this.updatedDate = updatedDate;
+	}
 
-  public String getPatientRace2() {
-    return patientRace2;
-  }
+	public String getRace2() {
+		return race2;
+	}
 
-  public void setPatientRace2(String patientRace2) {
-    this.patientRace2 = patientRace2;
-  }
+	public void setRace2(String race2) {
+		this.race2 = race2;
+	}
 
-  public String getPatientRace3() {
-    return patientRace3;
-  }
+	public String getRace3() {
+		return race3;
+	}
 
-  public void setPatientRace3(String patientRace3) {
-    this.patientRace3 = patientRace3;
-  }
+	public void setRace3(String race3) {
+		this.race3 = race3;
+	}
 
-  public String getPatientRace4() {
-    return patientRace4;
-  }
+	public String getRace4() {
+		return race4;
+	}
 
-  public void setPatientRace4(String patientRace4) {
-    this.patientRace4 = patientRace4;
-  }
+	public void setRace4(String race4) {
+		this.race4 = race4;
+	}
 
-  public String getPatientRace5() {
-    return patientRace5;
-  }
+	public String getRace5() {
+		return race5;
+	}
 
-  public void setPatientRace5(String patientRace5) {
-    this.patientRace5 = patientRace5;
-  }
+	public void setRace5(String race5) {
+		this.race5 = race5;
+	}
 
-  public String getPatientRace6() {
-    return patientRace6;
-  }
+	public String getRace6() {
+		return race6;
+	}
 
-  public void setPatientRace6(String patientRace6) {
-    this.patientRace6 = patientRace6;
-  }
+	public void setRace6(String race6) {
+		this.race6 = race6;
+	}
 
-  @Override
-  public String toString() {
-    return "PatientReported{" + "patientReportedId=" + patientReportedId + ", orgReported="
-        + orgReported
-		 + ", patientReportedExternalLink='" + patientReportedExternalLink + '\''
-        + ", patient=" + patient + ", reportedDate=" + reportedDate + ", updatedDate=" + updatedDate
-        + ", patientReportedAuthority='" + patientReportedAuthority + '\''
-        + ", patientReportedType='" + patientReportedType + '\'' + ", patientNameLast='"
-        + patientNameLast + '\'' + ", patientNameFirst='" + patientNameFirst + '\''
-        + ", patientNameMiddle='" + patientNameMiddle + '\'' + ", patientMotherMaiden='"
-        + patientMotherMaiden + '\'' + ", patientBirthDate=" + patientBirthDate + ", patientSex='"
-        + patientSex + '\'' + ", patientRace='" + patientRace + '\'' + ", patientRace2='"
-        + patientRace2 + '\'' + ", patientRace3='" + patientRace3 + '\'' + ", patientRace4='"
-        + patientRace4 + '\'' + ", patientRace5='" + patientRace5 + '\'' + ", patientRace6='"
-        + patientRace6 + '\'' + ", patientAddressLine1='" + patientAddressLine1 + '\''
-        + ", patientAddressLine2='" + patientAddressLine2 + '\'' + ", patientAddressCity='"
-        + patientAddressCity + '\'' + ", patientAddressState='" + patientAddressState + '\''
-        + ", patientAddressZip='" + patientAddressZip + '\'' + ", patientAddressCountry='"
-        + patientAddressCountry + '\'' + ", patientAddressCountyParish='"
-        + patientAddressCountyParish + '\'' + ", patientPhone='" + patientPhone + '\''
-        + ", patientEmail='" + patientEmail + '\'' + ", patientEthnicity='" + patientEthnicity
-        + '\'' + ", patientBirthFlag='" + patientBirthFlag + '\'' + ", patientBirthOrder='"
-        + patientBirthOrder + '\'' + ", patientDeathFlag='" + patientDeathFlag + '\''
-        + ", patientDeathDate=" + patientDeathDate + ", publicityIndicator='" + publicityIndicator
-        + '\'' + ", publicityIndicatorDate=" + publicityIndicatorDate + ", protectionIndicator='"
-        + protectionIndicator + '\'' + ", protectionIndicatorDate=" + protectionIndicatorDate
-        + ", registryStatusIndicator='" + registryStatusIndicator + '\''
-        + ", registryStatusIndicatorDate=" + registryStatusIndicatorDate + ", guardianLast='"
-        + guardianLast + '\'' + ", guardianFirst='" + guardianFirst + '\'' + ", guardianMiddle='"
-        + guardianMiddle + '\'' + ", guardianRelationship='" + guardianRelationship + '\'' + '}';
-  }
+//  @Override
+//  public String toString() {
+//    return "PatientReported{" + "patientReportedId=" + id + ", orgReported="
+//        + orgReported
+//		 + ", patientReportedExternalLink='" + patientReportedExternalLink + '\''
+//        + ", patient=" + patient + ", reportedDate=" + reportedDate + ", updatedDate=" + updatedDate
+//        + ", patientReportedAuthority='" + patientReportedAuthority + '\''
+//        + ", patientReportedType='" + patientReportedType + '\'' + ", patientNameLast='"
+//        + nameLast + '\'' + ", patientNameFirst='" + nameFirst + '\''
+//        + ", patientNameMiddle='" + nameMiddle + '\'' + ", patientMotherMaiden='"
+//        + motherMaidenName + '\'' + ", patientBirthDate=" + birthDate + ", patientSex='"
+//        + sex + '\'' + ", patientRace='" + race + '\'' + ", patientRace2='"
+//        + race2 + '\'' + ", patientRace3='" + race3 + '\'' + ", patientRace4='"
+//        + race4 + '\'' + ", patientRace5='" + race5 + '\'' + ", patientRace6='"
+//        + race6 + '\'' + ", patientAddressLine1='" + addressLine1 + '\''
+//        + ", patientAddressLine2='" + addressLine2 + '\'' + ", patientAddressCity='"
+//        + addressCity + '\'' + ", patientAddressState='" + addressState + '\''
+//        + ", patientAddressZip='" + addressZip + '\'' + ", patientAddressCountry='"
+//        + addressCountry + '\'' + ", patientAddressCountyParish='"
+//        + addressCountyParish + '\'' + ", patientPhone='" + phone + '\''
+//        + ", patientEmail='" + email + '\'' + ", patientEthnicity='" + ethnicity
+//        + '\'' + ", patientBirthFlag='" + birthFlag + '\'' + ", patientBirthOrder='"
+//        + birthOrder + '\'' + ", patientDeathFlag='" + deathFlag + '\''
+//        + ", patientDeathDate=" + deathDate + ", publicityIndicator='" + publicityIndicator
+//        + '\'' + ", publicityIndicatorDate=" + publicityIndicatorDate + ", protectionIndicator='"
+//        + protectionIndicator + '\'' + ", protectionIndicatorDate=" + protectionIndicatorDate
+//        + ", registryStatusIndicator='" + registryStatusIndicator + '\''
+//        + ", registryStatusIndicatorDate=" + registryStatusIndicatorDate + ", guardianLast='"
+//        + guardianLast + '\'' + ", guardianFirst='" + guardianFirst + '\'' + ", guardianMiddle='"
+//        + guardianMiddle + '\'' + ", guardianRelationship='" + guardianRelationship + '\'' + '}';
+//  }
 }

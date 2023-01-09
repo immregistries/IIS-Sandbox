@@ -5,7 +5,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.immregistries.iis.kernal.mapping.Interfaces.LocationMapper;
-import org.immregistries.iis.kernal.mapping.forR5.LocationMapperR5;
 import org.immregistries.iis.kernal.model.*;
 import org.immregistries.iis.kernal.repository.FhirRequester;
 import org.immregistries.iis.kernal.repository.RepositoryClientFactory;
@@ -394,15 +393,15 @@ public class LocationServlet extends HttpServlet {
     out.println("  </tr>");
     out.println("  <tr>");
     out.println("    <th class=\"w3-green\">Patient Name</th>");
-    out.println("    <td>" + patientReportedSelected.getPatientNameLast() + ", "
-        + patientReportedSelected.getPatientNameFirst() + " "
-        + patientReportedSelected.getPatientNameMiddle() + "</td>");
+    out.println("    <td>" + patientReportedSelected.getNameLast() + ", "
+       + patientReportedSelected.getNameFirst() + " "
+       + patientReportedSelected.getNameMiddle() + "</td>");
     out.println("  </tr>");
     {
       out.println("  <tr>");
       out.println("    <th class=\"w3-green\">Birth Date</th>");
       out.println(
-          "    <td>" + sdfDate.format(patientReportedSelected.getPatientBirthDate()) + "</td>");
+         "    <td>" + sdfDate.format(patientReportedSelected.getBirthDate()) + "</td>");
       out.println("  </tr>");
     }
     out.println("  </tbody>");

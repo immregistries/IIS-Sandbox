@@ -165,10 +165,10 @@ public class FhirRequesterR5 extends FhirRequester<Patient,Immunization,Location
 		MethodOutcome outcome = save(patient,
 			Patient.IDENTIFIER.exactly().systemAndIdentifier(patientReported.getPatientReportedAuthority(),patientReported.getPatientReportedExternalLink()));
 		if (!outcome.getResource().isEmpty()) {
-			patientReported.setPatientReportedId(outcome.getResource().getIdElement().getIdPart());
+			patientReported.setId(outcome.getResource().getIdElement().getIdPart());
 			return patientMapper.getReportedWithMaster((Patient) outcome.getResource());
 		} else if (outcome.getCreated() != null && outcome.getCreated()) {
-			patientReported.setPatientReportedId(outcome.getId().getIdPart());
+			patientReported.setId(outcome.getId().getIdPart());
 			return readPatientReported(outcome.getId().getIdPart());
 		} else {
 			return patientReported;
@@ -191,7 +191,7 @@ public class FhirRequesterR5 extends FhirRequester<Patient,Immunization,Location
 	public PatientReported saveRelatedPerson(PatientReported patientReported) {
 		RelatedPerson relatedPerson = (RelatedPerson) relatedPersonMapper.getFhirRelatedPersonFromPatient(patientReported);
 		MethodOutcome outcome = save(relatedPerson,
-			RelatedPerson.PATIENT.hasId(patientReported.getPatientReportedId()));
+			RelatedPerson.PATIENT.hasId(patientReported.getId()));
 		if (outcome.getResource() != null)  {
 			patientReported = relatedPersonMapper.fillGuardianInformation(patientReported, (RelatedPerson) outcome.getResource());
 		}

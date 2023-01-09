@@ -222,77 +222,77 @@ public class V2ToFhirServlet extends HttpServlet {
   private void createPatientResource(PatientReported pr, Patient p) {
     PatientMaster pm = pr.getPatient();
     {
-      Identifier id = p.addIdentifier();
-      id.setValue(pm.getPatientExternalLink());
-      CodeableConcept type = new CodeableConcept();
-      type.addCoding().setCode("MR");
-      id.setType(type);
-    }
-    {
-      HumanName name = p.addName();
-      name.setFamily(pr.getPatientNameLast());
-      name.addGiven(pr.getPatientNameFirst());
-      name.addGiven(pr.getPatientNameMiddle());
-    }
+		 Identifier id = p.addIdentifier();
+		 id.setValue(pm.getPatientExternalLink());
+		 CodeableConcept type = new CodeableConcept();
+		 type.addCoding().setCode("MR");
+		 id.setType(type);
+	 }
+	  {
+		  HumanName name = p.addName();
+		  name.setFamily(pr.getNameLast());
+		  name.addGiven(pr.getNameFirst());
+		  name.addGiven(pr.getNameMiddle());
+	  }
     // TODO Mother's maiden name
-    p.setBirthDate(pr.getPatientBirthDate());
+	  p.setBirthDate(pr.getBirthDate());
     {
       AdministrativeGender administrativeGender = null;
-      if (pr.getPatientSex().equals("F")) {
-        administrativeGender = AdministrativeGender.FEMALE;
-      } else if (pr.getPatientSex().equals("M")) {
-        administrativeGender = AdministrativeGender.MALE;
-      } else if (pr.getPatientSex().equals("O")) {
-        administrativeGender = AdministrativeGender.OTHER;
-      } else if (pr.getPatientSex().equals("U")) {
-        administrativeGender = AdministrativeGender.UNKNOWN;
-      } else if (pr.getPatientSex().equals("X")) {
-        administrativeGender = AdministrativeGender.OTHER;
-      }
-      if (administrativeGender != null) {
-        p.setGender(administrativeGender);
-      }
-    }
-    // TODO Race - not supported by base specification, probably have to use extensions
-    if (StringUtils.isNotEmpty(pr.getPatientAddressLine1())
-        || StringUtils.isNotEmpty(pr.getPatientAddressZip())) {
-      Address address = p.addAddress();
-      if (StringUtils.isNotEmpty(pr.getPatientAddressLine1())) {
-        address.addLine(pr.getPatientAddressLine1());
-      }
-      if (StringUtils.isNotEmpty(pr.getPatientAddressLine2())) {
-        address.addLine(pr.getPatientAddressLine2());
-      }
-      address.setCity(pr.getPatientAddressCity());
-      address.setState(pr.getPatientAddressState());
-      address.setPostalCode(pr.getPatientAddressZip());
-      address.setCountry(pr.getPatientAddressCountry());
-      address.setDistrict(pr.getPatientAddressCountyParish());
-    }
+		 if (pr.getSex().equals("F")) {
+			 administrativeGender = AdministrativeGender.FEMALE;
+		 } else if (pr.getSex().equals("M")) {
+			 administrativeGender = AdministrativeGender.MALE;
+		 } else if (pr.getSex().equals("O")) {
+			 administrativeGender = AdministrativeGender.OTHER;
+		 } else if (pr.getSex().equals("U")) {
+			 administrativeGender = AdministrativeGender.UNKNOWN;
+		 } else if (pr.getSex().equals("X")) {
+			 administrativeGender = AdministrativeGender.OTHER;
+		 }
+		 if (administrativeGender != null) {
+			 p.setGender(administrativeGender);
+		 }
+	 }
+	  // TODO Race - not supported by base specification, probably have to use extensions
+	  if (StringUtils.isNotEmpty(pr.getAddressLine1())
+		  || StringUtils.isNotEmpty(pr.getAddressZip())) {
+		  Address address = p.addAddress();
+		  if (StringUtils.isNotEmpty(pr.getAddressLine1())) {
+			  address.addLine(pr.getAddressLine1());
+		  }
+		  if (StringUtils.isNotEmpty(pr.getAddressLine2())) {
+			  address.addLine(pr.getAddressLine2());
+		  }
+		  address.setCity(pr.getAddressCity());
+		  address.setState(pr.getAddressState());
+		  address.setPostalCode(pr.getAddressZip());
+		  address.setCountry(pr.getAddressCountry());
+		  address.setDistrict(pr.getAddressCountyParish());
+	  }
     {
       ContactPoint contactPoint = p.addTelecom();
-      contactPoint.setSystem(ContactPointSystem.PHONE);
-      contactPoint.setValue(pr.getPatientPhone());
+		 contactPoint.setSystem(ContactPointSystem.PHONE);
+		 contactPoint.setValue(pr.getPhone());
     }
     // TODO Ethnicity not supported by base standard
 
-    if (pr.getPatientBirthFlag().equals("Y")) {
-      BooleanType booleanType = new BooleanType(true);
-      p.setMultipleBirth(booleanType);
-      if (StringUtils.isNotEmpty(pr.getPatientBirthOrder())) {
-        try {
-          int birthOrder = Integer.parseInt(pr.getPatientBirthOrder());
-          IntegerType integerType = new IntegerType();
-          integerType.setValue(birthOrder);
-          p.setMultipleBirth(integerType);
-        } catch (NumberFormatException nfe) {
-          // ignore
-        }
-      }
-    } else if (pr.getPatientBirthFlag().equals("N")) {
-      BooleanType booleanType = new BooleanType(false);
-      p.setMultipleBirth(booleanType);
-    }
+	  if (pr.getBirthFlag().equals("Y")) {
+		  BooleanType booleanType = new BooleanType(true);
+		  p.setMultipleBirth(booleanType);
+		  if (StringUtils.isNotEmpty(pr.getBirthOrder())) {
+			  try {
+				  int birthOrder = Integer.parseInt(pr.getBirthOrder());
+				  IntegerType integerType = new IntegerType();
+				  integerType.setValue(birthOrder);
+				  p.setMultipleBirth(integerType);
+			  } catch (NumberFormatException nfe) {
+				  // ignore
+			  }
+		  }
+	  } else if (pr.getBirthFlag().equals("N")) {
+		  BooleanType booleanType = new BooleanType(false);
+		  p.setMultipleBirth(booleanType);
+	  }
 
     if (!pr.getGuardianRelationship().equals("")
         && (!pr.getGuardianLast().equals("") || !pr.getGuardianFirst().equals(""))) {

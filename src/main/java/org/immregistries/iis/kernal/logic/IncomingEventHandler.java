@@ -1,7 +1,6 @@
 package org.immregistries.iis.kernal.logic;
 
 import ca.uhn.fhir.rest.api.server.RequestDetails;
-import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.server.servlet.ServletRequestDetails;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.r5.model.*;
@@ -10,7 +9,6 @@ import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.model.*;
 import org.immregistries.iis.kernal.repository.FhirRequester;
-import org.immregistries.iis.kernal.servlet.ServletHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -136,9 +134,9 @@ public class IncomingEventHandler {
           "Vaccination is indicated as occuring in the future, unable to accept future vaccination events");
     }
 	  vaccinationReported = fhirRequester.searchVaccinationReported(
-		  Immunization.PATIENT.hasId(patientReported.getPatientReportedId()),
-		 Immunization.IDENTIFIER.exactly().code(vaccinationReportedExternalLink)
-		 );
+		  Immunization.PATIENT.hasId(patientReported.getId()),
+		  Immunization.IDENTIFIER.exactly().code(vaccinationReportedExternalLink)
+	  );
     if (vaccinationReported == null) {
 //      vaccinationMaster = new VaccinationMaster();
 //		vaccinationMaster.setVaccinationId(vaccinationReportedExternalLink);
@@ -221,10 +219,10 @@ public class IncomingEventHandler {
     vaccinationReported.setActionCode(req.getParameter(ACTION_CODE));
     vaccinationReported.setBodyRoute(req.getParameter(BODY_ROUTE));
     vaccinationReported.setBodySite(req.getParameter(BODY_SITE));
-    if (vaccinationReported.getAdministeredDate().before(patientReported.getPatientBirthDate())) {
-      throw new Exception(
-          "Vaccination is reported as having been administered before the patient was born");
-    }
+	  if (vaccinationReported.getAdministeredDate().before(patientReported.getBirthDate())) {
+		  throw new Exception(
+			  "Vaccination is reported as having been administered before the patient was born");
+	  }
 
     vaccinationReported.setFundingEligibility(req.getParameter(FUNDING_ELIGIBILITY));
     vaccinationReported.setFundingSource(req.getParameter(FUNDING_SOURCE));
@@ -315,45 +313,45 @@ public class IncomingEventHandler {
 //    patientMaster.setPatientBirthDate(patientBirthDate);
 //    patientMaster.setPatientSoundexFirst(""); // TODO, later
 //    patientMaster.setPatientSoundexLast(""); // TODO, later
-    patientReported.setPatientReportedExternalLink(patientReportedExternalLink);
-    patientReported.setPatientReportedType(patientReportedType);
-    patientReported.setPatientNameFirst(patientNameFirst);
-    patientReported.setPatientNameLast(patientNameLast);
-    patientReported.setPatientNameMiddle(patientNameMiddle);
-    patientReported.setPatientMotherMaiden(req.getParameter(PATIENT_MOTHER_MAIDEN));
-    patientReported.setPatientBirthDate(patientBirthDate);
-    patientReported.setPatientSex(req.getParameter(PATIENT_SEX));
-    patientReported.setPatientRace(req.getParameter(PATIENT_RACE));
-    patientReported.setPatientRace2(req.getParameter(PATIENT_RACE2));
-    patientReported.setPatientRace3(req.getParameter(PATIENT_RACE3));
-    patientReported.setPatientRace4(req.getParameter(PATIENT_RACE4));
-    patientReported.setPatientRace5(req.getParameter(PATIENT_RACE5));
-    patientReported.setPatientRace6(req.getParameter(PATIENT_RACE6));
-    patientReported.setPatientAddressLine1(req.getParameter(PATIENT_ADDRESS_LINE1));
-    patientReported.setPatientAddressLine2(req.getParameter(PATIENT_ADDRESS_LINE2));
-    patientReported.setPatientAddressCity(req.getParameter(PATIENT_ADDRESS_CITY));
-    patientReported.setPatientAddressState(req.getParameter(PATIENT_ADDRESS_STATE));
-    patientReported.setPatientAddressZip(req.getParameter(PATIENT_ADDRESS_ZIP));
-    patientReported.setPatientAddressCountry(req.getParameter(PATIENT_ADDRESS_COUNTRY));
-    patientReported.setPatientAddressCountyParish(req.getParameter(PATIENT_ADDRESS_COUNTY_PARISH));
-    patientReported.setPatientEthnicity(req.getParameter(PATIENT_ETHNICITY));
-    patientReported.setPatientBirthFlag(req.getParameter(PATIENT_BIRTH_FLAG));
-    patientReported.setPatientBirthOrder(req.getParameter(PATIENT_BIRTH_ORDER));
-    patientReported
-        .setPatientDeathDate(incomingMessageHandler.parseDateInternal(req.getParameter(PATIENT_DEATH_DATE), true));
-    patientReported.setPatientDeathFlag(req.getParameter(PATIENT_DEATH_FLAG));
-    patientReported.setPatientEmail(req.getParameter(PATIENT_EMAIL));
-    patientReported.setPatientPhone(patientPhone);
-    patientReported.setPatientReportedAuthority(patientReportedAuthority);
-    patientReported.setPublicityIndicator(req.getParameter(PUBLICITY_INDICATOR));
-    patientReported.setProtectionIndicator(req.getParameter(PROTECTION_INDICATOR));
-    patientReported.setProtectionIndicatorDate(
-		 incomingMessageHandler.parseDateInternal(req.getParameter(PROTECTION_INDICATOR_DATE), true));
-    patientReported.setRegistryStatusIndicator(req.getParameter(REGISTRY_STATUS_INDICATOR));
-    patientReported.setRegistryStatusIndicatorDate(
-		 incomingMessageHandler.parseDateInternal(req.getParameter(PROTECTION_INDICATOR_DATE), true));
-    patientReported.setPublicityIndicatorDate(
-		 incomingMessageHandler.parseDateInternal(req.getParameter(PUBLICITY_INDICATOR_DATE), true));
+	  patientReported.setPatientReportedExternalLink(patientReportedExternalLink);
+	  patientReported.setPatientReportedType(patientReportedType);
+	  patientReported.setNameFirst(patientNameFirst);
+	  patientReported.setNameLast(patientNameLast);
+	  patientReported.setNameMiddle(patientNameMiddle);
+	  patientReported.setMotherMaidenName(req.getParameter(PATIENT_MOTHER_MAIDEN));
+	  patientReported.setBirthDate(patientBirthDate);
+	  patientReported.setSex(req.getParameter(PATIENT_SEX));
+	  patientReported.setRace(req.getParameter(PATIENT_RACE));
+	  patientReported.setRace2(req.getParameter(PATIENT_RACE2));
+	  patientReported.setRace3(req.getParameter(PATIENT_RACE3));
+	  patientReported.setRace4(req.getParameter(PATIENT_RACE4));
+	  patientReported.setRace5(req.getParameter(PATIENT_RACE5));
+	  patientReported.setRace6(req.getParameter(PATIENT_RACE6));
+	  patientReported.setAddressLine1(req.getParameter(PATIENT_ADDRESS_LINE1));
+	  patientReported.setAddressLine2(req.getParameter(PATIENT_ADDRESS_LINE2));
+	  patientReported.setAddressCity(req.getParameter(PATIENT_ADDRESS_CITY));
+	  patientReported.setAddressState(req.getParameter(PATIENT_ADDRESS_STATE));
+	  patientReported.setAddressZip(req.getParameter(PATIENT_ADDRESS_ZIP));
+	  patientReported.setAddressCountry(req.getParameter(PATIENT_ADDRESS_COUNTRY));
+	  patientReported.setAddressCountyParish(req.getParameter(PATIENT_ADDRESS_COUNTY_PARISH));
+	  patientReported.setEthnicity(req.getParameter(PATIENT_ETHNICITY));
+	  patientReported.setBirthFlag(req.getParameter(PATIENT_BIRTH_FLAG));
+	  patientReported.setBirthOrder(req.getParameter(PATIENT_BIRTH_ORDER));
+	  patientReported
+		  .setDeathDate(incomingMessageHandler.parseDateInternal(req.getParameter(PATIENT_DEATH_DATE), true));
+	  patientReported.setDeathFlag(req.getParameter(PATIENT_DEATH_FLAG));
+	  patientReported.setEmail(req.getParameter(PATIENT_EMAIL));
+	  patientReported.setPhone(patientPhone);
+	  patientReported.setPatientReportedAuthority(patientReportedAuthority);
+	  patientReported.setPublicityIndicator(req.getParameter(PUBLICITY_INDICATOR));
+	  patientReported.setProtectionIndicator(req.getParameter(PROTECTION_INDICATOR));
+	  patientReported.setProtectionIndicatorDate(
+		  incomingMessageHandler.parseDateInternal(req.getParameter(PROTECTION_INDICATOR_DATE), true));
+	  patientReported.setRegistryStatusIndicator(req.getParameter(REGISTRY_STATUS_INDICATOR));
+	  patientReported.setRegistryStatusIndicatorDate(
+		  incomingMessageHandler.parseDateInternal(req.getParameter(PROTECTION_INDICATOR_DATE), true));
+	  patientReported.setPublicityIndicatorDate(
+		  incomingMessageHandler.parseDateInternal(req.getParameter(PUBLICITY_INDICATOR_DATE), true));
     patientReported.setGuardianLast(req.getParameter(GUARDIAN_LAST));
     patientReported.setGuardianFirst(req.getParameter(GUARDIAN_FIRST));
     patientReported.setGuardianMiddle(req.getParameter(GUARDIAN_MIDDLE));

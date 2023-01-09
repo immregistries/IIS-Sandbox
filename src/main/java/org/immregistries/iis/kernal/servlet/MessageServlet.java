@@ -172,19 +172,19 @@ public class MessageServlet extends HttpServlet {
         } else {
           int count = 0;
           for (MessageReceived messageReceived : messageReceivedList) {
-            if (search.length() > 0) {
-              if (!messageReceived.getMessageRequest().contains(search)
-                  && !messageReceived.getMessageResponse().contains(search)) {
-                continue;
-              }
-            }
-            count++;
-            if (count > 100) {
-              out.println("  <em>Only showing first 100 messages</em>");
-              break;
-            }
-            PatientServlet.printMessageReceived(out, messageReceived);
-          }
+				 if (search.length() > 0) {
+					 if (!messageReceived.getMessageRequest().contains(search)
+						 && !messageReceived.getMessageResponse().contains(search)) {
+						 continue;
+					 }
+				 }
+				 count++;
+				 if (count > 10) {
+					 out.println("  <em>Only showing first 10 messages</em>");
+					 break;
+				 }
+				 PatientServlet.printMessageReceived(out, messageReceived);
+			 }
         }
         out.println("    </div>");
       }

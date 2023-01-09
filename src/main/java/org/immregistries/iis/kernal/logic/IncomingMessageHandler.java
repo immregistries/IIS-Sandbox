@@ -100,7 +100,7 @@ public abstract class IncomingMessageHandler<Organization extends IBaseResource>
     messageReceived.setOrgMaster(orgMaster);
     messageReceived.setMessageRequest(message);
 	 if (patientReported != null) {
-		 messageReceived.setPatientReportedId(patientReported.getPatientReportedId());
+		 messageReceived.setPatientReportedId(patientReported.getId());
 	 }
     messageReceived.setMessageResponse(messageResponse);
     messageReceived.setReportedDate(new Date());
@@ -177,14 +177,14 @@ public abstract class IncomingMessageHandler<Organization extends IBaseResource>
     // PID-6
     sb.append("|");
     if (patientReported != null) {
-      sb.append(patientReported.getPatientMotherMaiden()).append("^^^^^^M");
+      sb.append(patientReported.getMotherMaidenName()).append("^^^^^^M");
     }
     // PID-7
     sb.append("|").append(dateOfBirth);
     if (patientReported != null) {
       // PID-8
       {
-        String sex = patientReported.getPatientSex();
+        String sex = patientReported.getSex();
         if (!sex.equals("F") && !sex.equals("M") && !sex.equals("X")) {
           sex = "U";
         }
@@ -195,7 +195,7 @@ public abstract class IncomingMessageHandler<Organization extends IBaseResource>
       // PID-10
       sb.append("|");
       {
-        String race = patientReported.getPatientRace();
+        String race = patientReported.getRace();
         if (!race.equals("")) {
           if (processingFlavorSet.contains(ProcessingFlavor.PITAYA)
               || processingFlavorSet.contains(ProcessingFlavor.PERSIMMON)) {
@@ -215,7 +215,7 @@ public abstract class IncomingMessageHandler<Organization extends IBaseResource>
         }
       }
       // PID-11
-      sb.append("|").append(patientReported.getPatientAddressLine1()).append("^").append(patientReported.getPatientAddressLine2()).append("^").append(patientReported.getPatientAddressCity()).append("^").append(patientReported.getPatientAddressState()).append("^").append(patientReported.getPatientAddressZip()).append("^").append(patientReported.getPatientAddressCountry()).append("^");
+      sb.append("|").append(patientReported.getAddressLine1()).append("^").append(patientReported.getAddressLine2()).append("^").append(patientReported.getAddressCity()).append("^").append(patientReported.getAddressState()).append("^").append(patientReported.getAddressZip()).append("^").append(patientReported.getAddressCountry()).append("^");
       if (!processingFlavorSet.contains(ProcessingFlavor.LIME)) {
         sb.append("P");
       }
@@ -223,7 +223,7 @@ public abstract class IncomingMessageHandler<Organization extends IBaseResource>
       sb.append("|");
       // PID-13
       sb.append("|");
-      String phone = patientReported.getPatientPhone();
+      String phone = patientReported.getPhone();
       if (phone.length() == 10) {
         sb.append("^PRN^PH^^^").append(phone, 0, 3).append("^").append(phone, 3, 10);
       }
@@ -246,7 +246,7 @@ public abstract class IncomingMessageHandler<Organization extends IBaseResource>
       // PID-22
       sb.append("|");
       {
-        String ethnicity = patientReported.getPatientEthnicity();
+        String ethnicity = patientReported.getEthnicity();
         if (!ethnicity.equals("")) {
           if (processingFlavorSet.contains(ProcessingFlavor.PITAYA)
               || processingFlavorSet.contains(ProcessingFlavor.PERSIMMON)) {
@@ -269,10 +269,10 @@ public abstract class IncomingMessageHandler<Organization extends IBaseResource>
       sb.append("|");
       // PID-24
       sb.append("|");
-      sb.append(patientReported.getPatientBirthFlag());
+      sb.append(patientReported.getBirthFlag());
       // PID-25
       sb.append("|");
-      sb.append(patientReported.getPatientBirthOrder());
+      sb.append(patientReported.getBirthOrder());
 
     }
     sb.append("\r");
@@ -312,7 +312,7 @@ public abstract class IncomingMessageHandler<Organization extends IBaseResource>
     try {
       TestCase testCase = new TestCase();
       testCase.setEvalDate(new Date());
-      testCase.setPatientSex(patientReported == null ? "F" : patientReported.getPatientSex());
+      testCase.setPatientSex(patientReported == null ? "F" : patientReported.getSex());
       testCase.setPatientDob(patient.getPatientBirthDate());
       List<TestEvent> testEventList = new ArrayList<>();
       for (VaccinationMaster vaccination : vaccinationMasterList) {

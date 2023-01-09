@@ -231,7 +231,7 @@ public class VaccinationReported implements Serializable {
 
   public void setPatientReported(PatientReported reportedPatient) {
 	  if (reportedPatient != null) {
-		  patientReportedId = reportedPatient.getPatientReportedId();
+		  patientReportedId = reportedPatient.getId();
 	  } else  {
 		  patientReportedId = "";
 	  }
@@ -289,7 +289,7 @@ public class VaccinationReported implements Serializable {
 	}
 
 	public void setPatientReportedId(String patientReportedId) {
-		if (patientReported != null && !Objects.equals(patientReportedId, patientReported.getPatientReportedId())) {
+		if (patientReported != null && !Objects.equals(patientReportedId, patientReported.getId())) {
 			patientReported = null;
 		}
 		this.patientReportedId = patientReportedId;

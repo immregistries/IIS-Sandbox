@@ -278,45 +278,45 @@ public class CovidServlet extends HttpServlet {
     // 4: Recipient ID
     printField(patient.getPatientId(), out);
     // 5:  Recipient name: first
-    printField(patientReported.getPatientNameFirst(), includePhi, out);
+    printField(patientReported.getNameFirst(), includePhi, out);
     // 6:  Recipient name: middle
-    printField(patientReported.getPatientNameMiddle(), includePhi, out);
+    printField(patientReported.getNameMiddle(), includePhi, out);
     // 7:  Recipient name: last
-    printField(patientReported.getPatientNameLast(), includePhi, out);
+    printField(patientReported.getNameLast(), includePhi, out);
     // 8:  Recipient date of birth
-    printField(patientReported.getPatientBirthDate(), out);
+    printField(patientReported.getBirthDate(), out);
     // 9:  Recipient sex
-    printField(patientReported.getPatientSex(), out);
+    printField(patientReported.getSex(), out);
     // 10:  Recipient address: street
-    printField(patientReported.getPatientAddressLine1(), includePhi, out);
+    printField(patientReported.getAddressLine1(), includePhi, out);
     // 11: Recipient address: street 2
-    printField(patientReported.getPatientAddressLine2(), includePhi, out);
+    printField(patientReported.getAddressLine2(), includePhi, out);
     // 12:  Recipient address: city
-    printField(patientReported.getPatientAddressCity(), includePhi, out);
+    printField(patientReported.getAddressCity(), includePhi, out);
     // 13:  Recipient address:  county
-    printField(patientReported.getPatientAddressCountyParish(), out);
+    printField(patientReported.getAddressCountyParish(), out);
     // 14:  Recipient address: state
-    printField(patientReported.getPatientAddressState(), out);
+    printField(patientReported.getAddressState(), out);
     // 15:  Recipient address: zip code
-    printField(patientReported.getPatientAddressZip(), out);
+    printField(patientReported.getAddressZip(), out);
     // 16:  Recipient race 1
-    if (StringUtils.isEmpty(patientReported.getPatientRace())) {
+    if (StringUtils.isEmpty(patientReported.getRace())) {
       printField("UNK", out);
     } else {
-      printField(patientReported.getPatientRace(), out);
+      printField(patientReported.getRace(), out);
     }
     // 17:  Recipient race 2
-    printField(patientReported.getPatientRace2(), out);
+    printField(patientReported.getRace2(), out);
     // 18:  Recipient race 3
-    printField(patientReported.getPatientRace3(), out);
+    printField(patientReported.getRace3(), out);
     // 19:  Recipient race 4
-    printField(patientReported.getPatientRace4(), out);
+    printField(patientReported.getRace4(), out);
     // 20:  Recipient race 5
-    printField(patientReported.getPatientRace5(), out);
+    printField(patientReported.getRace5(), out);
     // 21:  Recipient race 6
-    printField(patientReported.getPatientRace6(), out);
+    printField(patientReported.getRace6(), out);
     // 22:  Recipient ethnicity
-    printField(patientReported.getPatientEthnicity(), out);
+    printField(patientReported.getEthnicity(), out);
     // 23:  Administration date
     printField(vaccinationReported.getAdministeredDate(), out);
 

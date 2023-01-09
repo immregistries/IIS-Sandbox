@@ -26,7 +26,7 @@ public class RelatedPersonMapperR4 implements RelatedPersonMapper<RelatedPerson>
 
 	public RelatedPerson getFhirRelatedPersonFromPatient(PatientReported pr){
 		RelatedPerson relatedPerson = new RelatedPerson();
-		relatedPerson.setPatient(new Reference("Patient/" + pr.getPatientReportedId()));
+		relatedPerson.setPatient(new Reference("Patient/" + pr.getId()));
 		relatedPerson.addRelationship().addCoding().setSystem("").setCode(pr.getGuardianRelationship());
 		HumanName name = relatedPerson.addName();
 		name.setFamily(pr.getGuardianLast());

@@ -113,18 +113,18 @@ public class FhirTestServlet extends HttpServlet {
           if (reader.advanceToSegment("PID", "ORC")) {
             pr.setPatientReportedExternalLink(reader.getValue(3, 1));
             pm.setPatientExternalLink(reader.getValue(3, 1));
-            pr.setPatientNameLast(reader.getValue(5, 1));
-            pr.setPatientNameFirst(reader.getValue(5, 2));
-            pr.setPatientNameMiddle(reader.getValue(5, 3));
-            pr.setPatientBirthDate(getDateSafe(reader.getValue(7)));
-            pr.setPatientSex(reader.getValue(8));
-            pr.setPatientAddressLine1(reader.getValue(11, 1));
-            pr.setPatientAddressLine2(reader.getValue(11, 2));
-            pr.setPatientAddressCity(reader.getValue(11, 3));
-            pr.setPatientAddressState(reader.getValue(11, 4));
-            pr.setPatientAddressZip(reader.getValue(11, 5));
-            pr.setPatientAddressCountry(reader.getValue(11, 6));
-            pr.setPatientPhone(reader.getValue(13, 7) + reader.getValue(13, 8));
+            pr.setNameLast(reader.getValue(5, 1));
+            pr.setNameFirst(reader.getValue(5, 2));
+            pr.setNameMiddle(reader.getValue(5, 3));
+            pr.setBirthDate(getDateSafe(reader.getValue(7)));
+            pr.setSex(reader.getValue(8));
+            pr.setAddressLine1(reader.getValue(11, 1));
+            pr.setAddressLine2(reader.getValue(11, 2));
+            pr.setAddressCity(reader.getValue(11, 3));
+            pr.setAddressState(reader.getValue(11, 4));
+            pr.setAddressZip(reader.getValue(11, 5));
+            pr.setAddressCountry(reader.getValue(11, 6));
+            pr.setPhone(reader.getValue(13, 7) + reader.getValue(13, 8));
             if (reader.advanceToSegment("NK1", "ORC")) {
               pr.setGuardianLast(reader.getValue(2, 1));
               pr.setGuardianFirst(reader.getValue(2, 2));
@@ -456,23 +456,23 @@ public class FhirTestServlet extends HttpServlet {
     p.setId(pm.getPatientExternalLink());
     {
       HumanName name = p.addName();
-      name.setFamily(pr.getPatientNameLast());
-      name.addGiven(pr.getPatientNameFirst());
-      name.addGiven(pr.getPatientNameMiddle());
+      name.setFamily(pr.getNameLast());
+      name.addGiven(pr.getNameFirst());
+      name.addGiven(pr.getNameMiddle());
     }
     // TODO Mother's maiden name
-    p.setBirthDate(pr.getPatientBirthDate());
+    p.setBirthDate(pr.getBirthDate());
     {
       AdministrativeGender administrativeGender = null;
-      if (pr.getPatientSex().equals("F")) {
+      if (pr.getSex().equals("F")) {
         administrativeGender = AdministrativeGender.FEMALE;
-      } else if (pr.getPatientSex().equals("M")) {
+      } else if (pr.getSex().equals("M")) {
         administrativeGender = AdministrativeGender.MALE;
-      } else if (pr.getPatientSex().equals("O")) {
+      } else if (pr.getSex().equals("O")) {
         administrativeGender = AdministrativeGender.OTHER;
-      } else if (pr.getPatientSex().equals("U")) {
+      } else if (pr.getSex().equals("U")) {
         administrativeGender = AdministrativeGender.UNKNOWN;
-      } else if (pr.getPatientSex().equals("X")) {
+      } else if (pr.getSex().equals("X")) {
         administrativeGender = AdministrativeGender.OTHER;
       }
       if (administrativeGender != null) {
@@ -481,34 +481,34 @@ public class FhirTestServlet extends HttpServlet {
     }
     // TODO Race - not supported by base specification, probably have to use
     // extensions
-    if (StringUtils.isNotEmpty(pr.getPatientAddressLine1())
-        || StringUtils.isNotEmpty(pr.getPatientAddressZip())) {
+    if (StringUtils.isNotEmpty(pr.getAddressLine1())
+       || StringUtils.isNotEmpty(pr.getAddressZip())) {
       Address address = p.addAddress();
-      if (StringUtils.isNotEmpty(pr.getPatientAddressLine1())) {
-        address.addLine(pr.getPatientAddressLine1());
+      if (StringUtils.isNotEmpty(pr.getAddressLine1())) {
+        address.addLine(pr.getAddressLine1());
       }
-      if (StringUtils.isNotEmpty(pr.getPatientAddressLine2())) {
-        address.addLine(pr.getPatientAddressLine2());
+      if (StringUtils.isNotEmpty(pr.getAddressLine2())) {
+        address.addLine(pr.getAddressLine2());
       }
-      address.setCity(pr.getPatientAddressCity());
-      address.setState(pr.getPatientAddressState());
-      address.setPostalCode(pr.getPatientAddressZip());
-      address.setCountry(pr.getPatientAddressCountry());
-      address.setDistrict(pr.getPatientAddressCountyParish());
+      address.setCity(pr.getAddressCity());
+      address.setState(pr.getAddressState());
+      address.setPostalCode(pr.getAddressZip());
+      address.setCountry(pr.getAddressCountry());
+      address.setDistrict(pr.getAddressCountyParish());
     }
     {
       ContactPoint contactPoint = p.addTelecom();
       contactPoint.setSystem(ContactPointSystem.PHONE);
-      contactPoint.setValue(pr.getPatientPhone());
+      contactPoint.setValue(pr.getPhone());
     }
     // TODO Ethnicity not supported by base standard
 
-    if (pr.getPatientBirthFlag().equals("Y")) {
+    if (pr.getBirthFlag().equals("Y")) {
       BooleanType booleanType = new BooleanType(true);
       p.setMultipleBirth(booleanType);
-      if (StringUtils.isNotEmpty(pr.getPatientBirthOrder())) {
+      if (StringUtils.isNotEmpty(pr.getBirthOrder())) {
         try {
-          int birthOrder = Integer.parseInt(pr.getPatientBirthOrder());
+          int birthOrder = Integer.parseInt(pr.getBirthOrder());
           IntegerType integerType = new IntegerType();
           integerType.setValue(birthOrder);
           p.setMultipleBirth(integerType);
@@ -516,7 +516,7 @@ public class FhirTestServlet extends HttpServlet {
           // ignore
         }
       }
-    } else if (pr.getPatientBirthFlag().equals("N")) {
+    } else if (pr.getBirthFlag().equals("N")) {
       BooleanType booleanType = new BooleanType(false);
       p.setMultipleBirth(booleanType);
     }

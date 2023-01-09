@@ -149,7 +149,7 @@ public class ImmunizationMapperR5 implements ImmunizationMapper<Immunization> {
   public Immunization getFhirResource(VaccinationReported vr) {
 	  Immunization i = new Immunization();
 	  i.addIdentifier(MappingHelper.getFhirIdentifier(vr.getVaccinationReportedExternalLinkSystem(), vr.getVaccinationReportedExternalLink())); // TODO if system empty ?
-	  i.setPatient(new Reference().setReference("Patient/" + vr.getPatientReported().getPatientReportedId()));
+	  i.setPatient(new Reference().setReference("Patient/" + vr.getPatientReported().getId()));
 //	  i.setRecorded(vr.getReportedDate());
 	  if (vr.getReportedDate() != null) {
 		  Extension recorded = i.addExtension()

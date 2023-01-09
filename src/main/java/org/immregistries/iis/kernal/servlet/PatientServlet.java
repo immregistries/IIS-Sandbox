@@ -4,7 +4,6 @@ import ca.uhn.fhir.rest.client.api.IGenericClient;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
-import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.Immunization;
 import org.hl7.fhir.r4.model.Observation;
@@ -72,7 +71,7 @@ public class PatientServlet extends HttpServlet {
     resp.setContentType("text/html");
     PrintWriter out = new PrintWriter(resp.getOutputStream());
     Session dataSession = PopServlet.getDataSession();
-	  IGenericClient fhirClient = ServletHelper.getFhirClient(session,repositoryClientFactory);
+	  IGenericClient fhirClient = ServletHelper.getFhirClient(session, repositoryClientFactory);
     try {
       String patientNameLast = req.getParameter(PARAM_PATIENT_NAME_LAST);
       String patientNameFirst = req.getParameter(PARAM_PATIENT_NAME_FIRST);
@@ -185,20 +184,20 @@ public class PatientServlet extends HttpServlet {
               out.println("  <tr>");
               out.println("    <td><a href=\"" + link + "\">"
                   + patientReported.getPatientReportedExternalLink() + "</a></td>");
-              out.println("    <td><a href=\"" + link + "\">" + patientReported.getPatientNameLast()
-                  + "</a></td>");
-              out.println("    <td><a href=\"" + link + "\">"
-                  + patientReported.getPatientNameFirst() + "</a></td>");
-              out.println("    <td><a href=\"" + link + "\">"
-                  + sdf.format(patientReported.getUpdatedDate()) + "</a></td>");
+					out.println("    <td><a href=\"" + link + "\">" + patientReported.getNameLast()
+						+ "</a></td>");
+					out.println("    <td><a href=\"" + link + "\">"
+						+ patientReported.getNameFirst() + "</a></td>");
+					out.println("    <td><a href=\"" + link + "\">"
+						+ sdf.format(patientReported.getUpdatedDate()) + "</a></td>");
               out.println("  </tr>");
             }
             out.println("  </tbody>");
             out.println("</table>");
 
-            if (count > 100) {
-              out.println("<em>Only the first 100 are shown</em>");
-            }
+				 if (count > 99) {
+					 out.println("<em>Only the first 100 are shown</em>");
+				 }
           }
         }
         out.println("  </div>");
@@ -210,7 +209,7 @@ public class PatientServlet extends HttpServlet {
         List<VaccinationReported> vaccinationReportedList = null;
         {
 			  vaccinationReportedList = fhirRequests.searchVaccinationReportedList(
-				  Immunization.PATIENT.hasId(patientReportedSelected.getPatientReportedId())
+				  Immunization.PATIENT.hasId(patientReportedSelected.getId())
 			  );
 		  }
         if (vaccinationReportedList.size() == 0) {
@@ -318,7 +317,7 @@ public class PatientServlet extends HttpServlet {
         out.println("<h3>Messages Received</h3>");
         Query query = dataSession.createQuery( // TODO Support MessageReceived mapping through logger or metadata
             "from MessageReceived where patientReportedId = :patientReportedId order by reportedDate asc");
-        query.setParameter("patientReportedId", patientReportedSelected.getPatientReportedId());
+			query.setParameter("patientReportedId", patientReportedSelected.getId());
         List<MessageReceived> messageReceivedList = new ArrayList<>();
          messageReceivedList = query.list();
         if (messageReceivedList.size() == 0) {
@@ -330,8 +329,8 @@ public class PatientServlet extends HttpServlet {
         }
 
         {
-          String link = req.getContextPath().split("/patient")[0] = "/iis-sandbox-jpa/fhir/" + orgAccess.getAccessName() + "/Patient/"
-	              + patientReportedSelected.getPatientReportedId();
+			  String link = req.getContextPath().split("/patient")[0] = "/iis-sandbox-jpa/fhir/" + orgAccess.getAccessName() + "/Patient/"
+				  + patientReportedSelected.getId();
 			  out.println("<a href=\"" + link + "\">FHIR Resource</a>");
         }
 		  {
@@ -492,29 +491,29 @@ public class PatientServlet extends HttpServlet {
   }
 
   public void printPatient(PrintWriter out, PatientReported patientReportedSelected) {
-    SimpleDateFormat sdfDate = new SimpleDateFormat("MM/dd/yyyy");
-    out.println("    <div class=\"w3-container w3-half w3-margin-top\">");
-    out.println("<table class=\"w3-table w3-bordered w3-striped w3-border test w3-hoverable\">");
-    out.println("  <tbody>");
-    out.println("  <tr>");
-    out.println("    <th class=\"w3-green\">External Id (MRN)</th>");
-    out.println("    <td>" + patientReportedSelected.getPatientReportedExternalLink() + "</td>");
-    out.println("  </tr>");
-    out.println("  <tr>");
-    out.println("    <th class=\"w3-green\">Patient Name</th>");
-    out.println("    <td>" + patientReportedSelected.getPatientNameLast() + ", "
-        + patientReportedSelected.getPatientNameFirst() + " "
-        + patientReportedSelected.getPatientNameMiddle() + "</td>");
-    out.println("  </tr>");
-    {
-      out.println("  <tr>");
-      out.println("    <th class=\"w3-green\">Birth Date</th>");
-      out.println(
-          "    <td>" + sdfDate.format(patientReportedSelected.getPatientBirthDate()) + "</td>");
-      out.println("  </tr>");
-    }
-    out.println("  </tbody>");
-    out.println("</table>");
+	  SimpleDateFormat sdfDate = new SimpleDateFormat("MM/dd/yyyy");
+	  out.println("    <div class=\"w3-container w3-half w3-margin-top\">");
+	  out.println("<table class=\"w3-table w3-bordered w3-striped w3-border test w3-hoverable\">");
+	  out.println("  <tbody>");
+	  out.println("  <tr>");
+	  out.println("    <th class=\"w3-green\">External Id (MRN)</th>");
+	  out.println("    <td>" + patientReportedSelected.getPatientReportedExternalLink() + "</td>");
+	  out.println("  </tr>");
+	  out.println("  <tr>");
+	  out.println("    <th class=\"w3-green\">Patient Name</th>");
+	  out.println("    <td>" + patientReportedSelected.getNameLast() + ", "
+		  + patientReportedSelected.getNameFirst() + " "
+		  + patientReportedSelected.getNameMiddle() + "</td>");
+	  out.println("  </tr>");
+	  {
+		  out.println("  <tr>");
+		  out.println("    <th class=\"w3-green\">Birth Date</th>");
+		  out.println(
+			  "    <td>" + sdfDate.format(patientReportedSelected.getBirthDate()) + "</td>");
+		  out.println("  </tr>");
+	  }
+	  out.println("  </tbody>");
+	  out.println("</table>");
     out.println("</div>");
   }
 
@@ -523,7 +522,7 @@ public List<ObservationReported> getObservationList(IGenericClient fhirClient,
     List<ObservationReported> observationReportedList = new ArrayList<>();
     {
 		 observationReportedList = fhirRequests.searchObservationReportedList(
-                 Observation.SUBJECT.hasId(patientReportedSelected.getPatientReportedId()));
+			 Observation.SUBJECT.hasId(patientReportedSelected.getId()));
 //		 observationReportedList = observationReportedList.stream().filter(observationReported -> observationReported.getVaccinationReported() == null).collect(Collectors.toList());
       Set<String> suppressSet = LoincIdentifier.getSuppressIdentifierCodeSet();
       for (Iterator<ObservationReported> it = observationReportedList.iterator(); it.hasNext();) {
