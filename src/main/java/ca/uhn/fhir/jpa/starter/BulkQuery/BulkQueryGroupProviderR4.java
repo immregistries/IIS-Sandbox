@@ -241,6 +241,7 @@ public class BulkQueryGroupProviderR4 extends GroupResourceProvider {
 
 			bulkResponseDocument.setTransactionTime(new Date(System.currentTimeMillis()));
 			bulkResponseDocument.setRequiresAccessToken(true);
+			bulkResponseDocument.setRequest(theRequestDetails.getServletRequest().getRequestURI());
 
 			HttpServletResponse response = theRequestDetails.getServletResponse();
 			JsonUtil.serialize(bulkResponseDocument, response.getWriter());
