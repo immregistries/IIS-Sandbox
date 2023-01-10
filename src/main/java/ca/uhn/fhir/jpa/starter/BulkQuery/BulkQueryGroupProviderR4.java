@@ -2,23 +2,31 @@ package ca.uhn.fhir.jpa.starter.BulkQuery;
 
 import ca.uhn.fhir.jpa.api.dao.IFhirResourceDao;
 import ca.uhn.fhir.jpa.api.dao.IFhirSystemDao;
+import ca.uhn.fhir.jpa.api.model.DaoMethodOutcome;
 import ca.uhn.fhir.jpa.bulk.export.model.BulkExportResponseJson;
+import ca.uhn.fhir.jpa.model.util.JpaConstants;
+import ca.uhn.fhir.jpa.partition.SystemRequestDetails;
 import ca.uhn.fhir.jpa.provider.BaseJpaResourceProviderPatient;
 import ca.uhn.fhir.jpa.rp.r4.GroupResourceProvider;
 import ca.uhn.fhir.jpa.starter.annotations.OnR4Condition;
 import ca.uhn.fhir.model.api.annotation.Description;
+import ca.uhn.fhir.model.valueset.BundleTypeEnum;
 import ca.uhn.fhir.parser.IParser;
 import ca.uhn.fhir.rest.annotation.IdParam;
+import ca.uhn.fhir.rest.annotation.Operation;
 import ca.uhn.fhir.rest.annotation.OperationParam;
 import ca.uhn.fhir.rest.annotation.Sort;
 import ca.uhn.fhir.rest.api.Constants;
 import ca.uhn.fhir.rest.api.SortSpec;
 import ca.uhn.fhir.rest.api.server.IBundleProvider;
+import ca.uhn.fhir.rest.api.server.RequestDetails;
 import ca.uhn.fhir.rest.param.DateRangeParam;
 import ca.uhn.fhir.rest.server.servlet.ServletRequestDetails;
 import ca.uhn.fhir.util.JsonUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Session;
 import org.hl7.fhir.instance.model.api.IBaseResource;
+import org.hl7.fhir.instance.model.api.IIdType;
 import org.hl7.fhir.instance.model.api.IPrimitiveType;
 import org.hl7.fhir.r4.model.*;
 import org.immregistries.iis.kernal.model.MessageReceived;
@@ -32,6 +40,7 @@ import org.springframework.stereotype.Controller;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -51,31 +60,26 @@ public class BulkQueryGroupProviderR4 extends GroupResourceProvider {
 	@Autowired
 	IFhirResourceDao<Group> fhirResourceGroupDao;
 
+	@Autowired
+	private IFhirResourceDao<Binary> binaryDao;
+
 	public BulkQueryGroupProviderR4() {
 		super();
 		setDao(fhirResourceGroupDao);
 	}
 
 	/**
-	 * Group/123/$export
+	 * Group/123/$everything
 	 */
-//	@Operation(name = JpaConstants.OPERATION_EXPORT
-//		, idempotent = true, manualResponse = true
-//	)
-	public void groupInstanceEverything(
-
-		javax.servlet.http.HttpServletRequest theServletRequest,
+	@Operation(name = JpaConstants.OPERATION_EVERYTHING, idempotent = true, bundleType = BundleTypeEnum.SEARCHSET)
+	public Bundle groupInstanceEverything(
 
 		@IdParam
-			IdType theId,
-
-		@Description(formalDefinition = "The format for the requested Bulk Data files to be generated as per FHIR Asynchronous Request Pattern. Defaults to application/fhir+ndjson. The server SHALL support Newline Delimited JSON, but MAY choose to support additional output formats. The server SHALL accept the full content type of application/fhir+ndjson as well as the abbreviated representations application/ndjson and ndjson.")
-		@OperationParam(name = "_outputFormat")
-			UnsignedIntType theOutputFormat,
+		IdType theId,
 
 		@Description(shortDefinition = "Results from this method are returned across multiple pages. This parameter controls the size of those pages.")
 		@OperationParam(name = Constants.PARAM_COUNT, typeName = "unsignedInt")
-			IPrimitiveType<Integer> theCount,
+		IPrimitiveType<Integer> theCount,
 
 		@Description(shortDefinition = "Results from this method are returned across multiple pages. This parameter controls the offset when fetching a page.")
 		@OperationParam(name = Constants.PARAM_OFFSET, typeName = "unsignedInt")
@@ -109,36 +113,18 @@ public class BulkQueryGroupProviderR4 extends GroupResourceProvider {
 		Session dataSession = PopServlet.getDataSession();
 		try {
 			Bundle bundle = new Bundle();
-			Group group = read(theServletRequest, theId, theRequestDetails);
-			if (theOutputFormat == null) {
-//			theRequestDetails.se
-			}
-			IParser parser = fhirResourceGroupDao.getContext().newNDJsonParser();
+			Group group = read(theRequestDetails.getServletRequest(), theId, theRequestDetails);
 			for (Group.GroupMemberComponent member : group.getMember()) {
 				if (member.getEntity().getReference().split("/")[0].equals("Patient")) {
 					Bundle patientBundle = new Bundle();
-					IBundleProvider bundleProvider = patientProvider.patientInstanceEverything(theServletRequest, new IdType(member.getEntity().getReference()), theCount, theOffset, theLastUpdated, theContent, theNarrative, theFilter, theTypes, theSortSpec, theRequestDetails);
+					IBundleProvider bundleProvider = patientProvider.patientInstanceEverything(theRequestDetails.getServletRequest(), new IdType(member.getEntity().getReference()), theCount, theOffset, theLastUpdated, theContent, theNarrative, theFilter, theTypes, theSortSpec, theRequestDetails);
 					for (IBaseResource resource : bundleProvider.getAllResources()) {
 						patientBundle.addEntry().setResource((Resource) resource);
 					}
-
 					bundle.addEntry().setResource(patientBundle);
 				}
 			}
-
-			MessageReceived ndJson = new MessageReceived();
-			OrgAccess orgAccess = (OrgAccess) theRequestDetails.getAttribute("orgAccess");
-
-			ndJson.setOrgMaster(orgAccess.getOrg());
-			ndJson.setMessageResponse(parser.encodeResourceToString(bundle));
-			ndJson.setReportedDate(new Date());
-			int id = (int) dataSession.save(ndJson);
-			logger.info("{}/ndjson?tenantId={}&ndJsonId={}", theRequestDetails.getCompleteUrl().split("/fhir")[0], theRequestDetails.getTenantId(), id);
-//			return parser.encodeResourceToString(bundle);
-
-//			parser.encodeResourceToWriter(bundle,theRequestDetails.getServletResponse().getWriter());
-			theRequestDetails.getServletResponse().getWriter().print(ndJson.getMessageResponse());
-			theRequestDetails.getServletResponse().getWriter().close();
+			return bundle;
 		} catch (Exception e) {
 			throw e;
 		} finally {
@@ -146,16 +132,16 @@ public class BulkQueryGroupProviderR4 extends GroupResourceProvider {
 		}
 	}
 
-	public void groupInstanceExport(
+	public void groupInstanceSynchExport(
 
 		javax.servlet.http.HttpServletRequest theServletRequest,
 
 		@IdParam
-			IdType theId,
+		IdType theId,
 
 		@Description(formalDefinition = "The format for the requested Bulk Data files to be generated as per FHIR Asynchronous Request Pattern. Defaults to application/fhir+ndjson. The server SHALL support Newline Delimited JSON, but MAY choose to support additional output formats. The server SHALL accept the full content type of application/fhir+ndjson as well as the abbreviated representations application/ndjson and ndjson.")
 		@OperationParam(name = "_outputFormat")
-			IPrimitiveType<String> theOutputFormat,
+		IPrimitiveType<String> theOutputFormat,
 
 		@Description(shortDefinition = "Results from this method are returned across multiple pages. This parameter controls the size of those pages.")
 		@OperationParam(name = Constants.PARAM_COUNT, typeName = "unsignedInt")
@@ -198,6 +184,7 @@ public class BulkQueryGroupProviderR4 extends GroupResourceProvider {
 			}
 			BulkExportResponseJson bulkResponseDocument = new BulkExportResponseJson();
 
+			String serverBase = StringUtils.removeEnd(theRequestDetails.getServerBaseForRequest(), "/");
 			Map<String, Bundle> bundleMap = new HashMap<>();
 			Group group = read(theServletRequest, theId, theRequestDetails);
 			for (Group.GroupMemberComponent member : group.getMember()) {
@@ -213,19 +200,43 @@ public class BulkQueryGroupProviderR4 extends GroupResourceProvider {
 			}
 
 			IParser parser = fhirResourceGroupDao.getContext().newNDJsonParser();
+			RequestDetails detailsCopy = new SystemRequestDetails();
+			detailsCopy.setTenantId(theRequestDetails.getTenantId());
 			for (Map.Entry<String, Bundle> entry :
 				bundleMap.entrySet()) {
-				MessageReceived ndJson = new MessageReceived();
-				OrgAccess orgAccess = (OrgAccess) theRequestDetails.getAttribute("orgAccess");
-				ndJson.setOrgMaster(orgAccess.getOrg());
-				ndJson.setMessageResponse(parser.encodeResourceToString(entry.getValue()));
-				ndJson.setReportedDate(new Date());
-				int id = (int) dataSession.save(ndJson);
-				logger.info("{}/ndjson?tenantId={}&ndJsonId={}", theRequestDetails.getCompleteUrl().split("/fhir")[0], theRequestDetails.getTenantId(), id);
+				Binary binary = new Binary();
+				binary.setContentType("Bulk");
+				binary.setContent(parser.encodeResourceToString(entry.getValue()).getBytes(StandardCharsets.UTF_8));
+				DaoMethodOutcome outcome = binaryDao.create(binary, detailsCopy);
+				IIdType newIId;
+				String nextUrl;
+				if (outcome.getResource() != null) {
+					newIId = outcome.getResource().getIdElement();
+					nextUrl = serverBase + "/" + newIId.toUnqualifiedVersionless().getValue();
+				} else if (outcome.getId() != null) {
+					newIId = outcome.getId();
+					nextUrl = serverBase + "/" + newIId.toUnqualifiedVersionless().getValue();
+				} else {
+//					throw RuntimeException();
+					nextUrl = "ERROR";
+
+				}
 				bulkResponseDocument.addOutput()
 					.setType(entry.getKey())
-					.setUrl(theRequestDetails.getCompleteUrl().split("/fhir")[0]
-						+ "/ndjson?tenantId=" + theRequestDetails.getTenantId() + "&ndJsonId=" + id);
+					.setUrl(nextUrl);
+//
+//				MessageReceived ndJson = new MessageReceived();
+//				OrgAccess orgAccess = (OrgAccess) theRequestDetails.getAttribute("orgAccess");
+//				ndJson.setOrgMaster(orgAccess.getOrg());
+//				ndJson.setMessageRequest(theRequestDetails.getCompleteUrl());
+//				ndJson.setMessageResponse(parser.encodeResourceToString(entry.getValue()));
+//				ndJson.setReportedDate(new Date());
+//				int id = (int) dataSession.save(ndJson);
+//				logger.info("{}/ndjson?tenantId={}&ndJsonId={}", theRequestDetails.getCompleteUrl().split("/fhir")[0], theRequestDetails.getTenantId(), id);
+//				bulkResponseDocument.addOutput()
+//					.setType(entry.getKey())
+//					.setUrl(theRequestDetails.getCompleteUrl().split("/fhir")[0]
+//						+ "/ndjson?tenantId=" + theRequestDetails.getTenantId() + "&ndJsonId=" + id);
 			}
 
 			bulkResponseDocument.setTransactionTime(new Date(System.currentTimeMillis()));

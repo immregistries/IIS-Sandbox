@@ -1,14 +1,14 @@
 # IIS Sandbox with Hapi Fhir Jpa Database
 Based on Hapi fhir Jpa starter and IIS Sandbox.
 
-JDK  17  needed.
+JDK 17 needed.
 
 Currently working with a customized version of Hapi fhir hosted here :
-https://github.com/cerbeor/hapi-fhir-Subscription-custom/tree/6.1.2-sub-sandbox
+https://github.com/cerbeor/hapi-fhir-Subscription-custom/tree/v6.2.4-SUB  in branch v6.2.4-SUB
 
-In production mode HAPI FHIR requires a postgresql database 
- 
- - On address ``postgresql://localhost:5432/hapi_fhir_iis`` (this can be changed in application.yaml).
+In production mode HAPI FHIR requires a postgresql database
+
+- On address ``postgresql://localhost:5432/hapi_fhir_iis`` (this can be changed in application.yaml).
  - Generation script: ``/src/main/database/create-postgresql-for-hapi-fhir.sql``
 
 

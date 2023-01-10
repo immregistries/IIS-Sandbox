@@ -7,10 +7,8 @@ import ca.uhn.fhir.interceptor.api.IInterceptorBroadcaster;
 import ca.uhn.fhir.interceptor.api.Pointcut;
 import ca.uhn.fhir.jpa.api.config.DaoConfig;
 import ca.uhn.fhir.jpa.api.dao.DaoRegistry;
-import ca.uhn.fhir.jpa.api.model.Batch2JobInfo;
-import ca.uhn.fhir.jpa.api.model.Batch2JobOperationResult;
-import ca.uhn.fhir.jpa.api.model.BulkExportJobResults;
-import ca.uhn.fhir.jpa.api.model.BulkExportParameters;
+import ca.uhn.fhir.jpa.api.dao.IFhirResourceDao;
+import ca.uhn.fhir.jpa.api.model.*;
 import ca.uhn.fhir.jpa.api.svc.IBatch2JobRunner;
 import ca.uhn.fhir.jpa.batch.models.Batch2JobStartResponse;
 import ca.uhn.fhir.jpa.bulk.export.model.BulkExportJobStatusEnum;
@@ -18,6 +16,7 @@ import ca.uhn.fhir.jpa.bulk.export.model.BulkExportResponseJson;
 import ca.uhn.fhir.jpa.bulk.export.provider.BulkDataExportProvider;
 import ca.uhn.fhir.jpa.bulk.export.provider.JobInfo;
 import ca.uhn.fhir.jpa.model.util.JpaConstants;
+import ca.uhn.fhir.jpa.partition.SystemRequestDetails;
 import ca.uhn.fhir.jpa.util.BulkExportUtils;
 import ca.uhn.fhir.model.primitive.StringDt;
 import ca.uhn.fhir.rest.annotation.IdParam;
@@ -31,6 +30,7 @@ import ca.uhn.fhir.rest.api.server.IRestfulServer;
 import ca.uhn.fhir.rest.api.server.RequestDetails;
 import ca.uhn.fhir.rest.api.server.bulk.BulkDataExportOptions;
 import ca.uhn.fhir.rest.param.DateRangeParam;
+import ca.uhn.fhir.rest.server.IResourceProvider;
 import ca.uhn.fhir.rest.server.RestfulServerUtils;
 import ca.uhn.fhir.rest.server.exceptions.InternalErrorException;
 import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
@@ -42,10 +42,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.instance.model.api.IBaseOperationOutcome;
 import org.hl7.fhir.instance.model.api.IIdType;
 import org.hl7.fhir.instance.model.api.IPrimitiveType;
-import org.hl7.fhir.r4.model.IdType;
-import org.hl7.fhir.r4.model.InstantType;
-import org.hl7.fhir.r4.model.IntegerType;
-import org.hl7.fhir.r4.model.StringType;
+import org.hl7.fhir.r4.model.*;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -78,6 +75,9 @@ public class CustomBulkDataExportProvider extends BulkDataExportProvider {
 
 	@Autowired
 	private DaoRegistry myDaoRegistry;
+
+	@Autowired
+	private IFhirResourceDao<Binary> binaryDao;
 
 	@Autowired
 	BulkQueryGroupProviderR4 bulkQueryGroupProviderR4;
@@ -163,6 +163,18 @@ public class CustomBulkDataExportProvider extends BulkDataExportProvider {
 		if (theRequestDetails.getTenantId() == null || theRequestDetails.getTenantId().equals(JpaConstants.DEFAULT_PARTITION_NAME)) {
 			return getServerBase(theRequestDetails);
 		} else {
+			return StringUtils.removeEnd(theRequestDetails.getServerBaseForRequest().replace(theRequestDetails.getTenantId(), JpaConstants.DEFAULT_PARTITION_NAME), "/");
+			/**
+			 * Prevent the change of tenant to default for NDJSON
+			 */
+//			return StringUtils.removeEnd(theRequestDetails.getServerBaseForRequest(), "/");
+		}
+	}
+
+	private String getPartitionServerBase(ServletRequestDetails theRequestDetails) {
+		if (theRequestDetails.getTenantId() == null || theRequestDetails.getTenantId().equals(JpaConstants.DEFAULT_PARTITION_NAME)) {
+			return getServerBase(theRequestDetails);
+		} else {
 //			return StringUtils.removeEnd(theRequestDetails.getServerBaseForRequest().replace(theRequestDetails.getTenantId(), JpaConstants.DEFAULT_PARTITION_NAME), "/");
 			/**
 			 * Prevent the change of tenant to default for NDJSON
@@ -208,9 +220,8 @@ public class CustomBulkDataExportProvider extends BulkDataExportProvider {
 			if (theSince != null) {
 				theLastUpdated.setLowerBound(theSince.getValueAsString());
 			}
-			bulkQueryGroupProviderR4.groupInstanceExport(theRequestDetails.getServletRequest(), new IdType(theIdParam.getValue()), theOutputFormat, null, null, theLastUpdated, null, null, null, theTypes, null, theRequestDetails);
+			bulkQueryGroupProviderR4.groupInstanceSynchExport(theRequestDetails.getServletRequest(), new IdType(theIdParam.getValue()), theOutputFormat, null, null, theLastUpdated, null, null, null, theTypes, null, theRequestDetails);
 		}
-
 	}
 
 	private void validateResourceTypesAllContainPatientSearchParams(Set<String> theResourceTypes) {
@@ -312,14 +323,35 @@ public class CustomBulkDataExportProvider extends BulkDataExportProvider {
 						bulkResponseDocument.setMsg(results.getReportMsg());
 						bulkResponseDocument.setRequest(results.getOriginalRequestUrl());
 
-						String serverBase = getDefaultPartitionServerBase(theRequestDetails);
+						String defaultServerBase = getDefaultPartitionServerBase(theRequestDetails);
+						String serverBase = getPartitionServerBase(theRequestDetails);
 
+						RequestDetails systemDefaultRequestDetails = new SystemRequestDetails();
+						systemDefaultRequestDetails.setTenantId("DEFAULT");
+						RequestDetails systemRequestDetails = new SystemRequestDetails();
+						systemRequestDetails.setTenantId(theRequestDetails.getTenantId());
 						for (Map.Entry<String, List<String>> entrySet : results.getResourceTypeToBinaryIds().entrySet()) {
 							String resourceType = entrySet.getKey();
 							List<String> binaryIds = entrySet.getValue();
 							for (String binaryId : binaryIds) {
 								IIdType iId = new IdType(binaryId);
-								String nextUrl = serverBase + "/" + iId.toUnqualifiedVersionless().getValue();
+								/**
+								 * Copy Binary in right partition
+								 * TODO diminish duplicates chances
+								 */
+								Binary binary = binaryDao.read(iId, systemDefaultRequestDetails);
+								DaoMethodOutcome outcome = binaryDao.create(binary, systemRequestDetails);
+								IIdType newIId;
+								String nextUrl;
+								if (outcome.getResource() != null) {
+									newIId = outcome.getResource().getIdElement();
+									nextUrl = serverBase + "/" + newIId.toUnqualifiedVersionless().getValue();
+								} else if (outcome.getId() != null) {
+									newIId = outcome.getId();
+									nextUrl = serverBase + "/" + newIId.toUnqualifiedVersionless().getValue();
+								} else {
+									nextUrl = defaultServerBase + "/" + iId.toUnqualifiedVersionless().getValue();
+								}
 								bulkResponseDocument
 									.addOutput()
 									.setType(resourceType)

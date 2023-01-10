@@ -23,6 +23,8 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.servlet.http.HttpServletRequest;
 
+import static ca.uhn.fhir.jpa.starter.interceptors.SessionAuthorizationInterceptor.CONNECTATHON_USER;
+
 @Component
 public class RepositoryClientFactory extends ApacheRestfulClientFactory implements ITestingUiClientFactory {
 	 @Autowired
@@ -50,30 +52,30 @@ public class RepositoryClientFactory extends ApacheRestfulClientFactory implemen
 	}
 
 	public synchronized IGenericClient newGenericClient(OrgAccess orgAccess) {
-//		return newGenericClientForPartition(orgAccess.getAccessName());
 		asynchInit();
 		IGenericClient client = newGenericClient(serverBase + "/" + orgAccess.getOrg().getOrganizationName());
-		IClientInterceptor authInterceptor = new BasicAuthInterceptor(orgAccess.getAccessName(), orgAccess.getAccessKey());
+		IClientInterceptor authInterceptor;
+		if (orgAccess.getOrg().getOrganizationName().equals(CONNECTATHON_USER) && orgAccess.getAccessName() == null) {
+			/**
+			 * SPECIFIC Connection User for Connectathon
+			 * specific auth when logged in with token,
+			 * AccessName is null and AccessKey bears token,
+			 *
+			 * see SessionAuthorizationInterceptor
+			 */
+			authInterceptor = new BearerTokenAuthInterceptor(orgAccess.getAccessKey());
+		} else {
+			authInterceptor = new BasicAuthInterceptor(orgAccess.getAccessName(), orgAccess.getAccessKey());
+		}
 		client.registerInterceptor(authInterceptor);
 		return client;
 	}
-	
-//	public synchronized IGenericClient newGenericClientForPartition(String partitionName) {
-//		asynchInit();
-//		IGenericClient client = newGenericClient(serverBase + "/" + partitionName);
-////		UrlTenantSelectionInterceptor urlTenantSelectionInterceptor = new UrlTenantSelectionInterceptor(partitionName);
-////		client.registerInterceptor(urlTenantSelectionInterceptor);
-////		IClientInterceptor authInterceptor = new BasicAuthInterceptor(orgAccess.getAccessName(),orgAccess.getAccessKey());
-//		return client;
-//	}
 
 	@Override
 	public synchronized IGenericClient newGenericClient(String theServerBase) {
 		asynchInit();
 		IGenericClient client = super.newGenericClient(theServerBase);
 		client.registerInterceptor(loggingInterceptor);
-//		  IClientInterceptor authInterceptor = new BearerTokenAuthInterceptor("Inside-job " + key ); // TODO
-//		  client.registerInterceptor(authInterceptor);
 		AdditionalRequestHeadersInterceptor interceptor = new AdditionalRequestHeadersInterceptor();
 		interceptor.addHeaderValue("Cache-Control", "no-cache");
 		 client.registerInterceptor(interceptor);
