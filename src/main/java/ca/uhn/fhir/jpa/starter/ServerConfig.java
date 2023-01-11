@@ -220,6 +220,7 @@ public class ServerConfig {
 			 */
 			fhirServer.registerProvider(customBulkDataExportProvider);
 			if (bulkQueryGroupProviderR4 != null) {
+				fhirServer.registerProvider(bulkQueryGroupProviderR4);
 				bulkQueryGroupProviderR4.setDao(fhirResourceGroupDao);
 			}
 //			fhirServer.registerProvider(bulkQueryGroupProviderR4);

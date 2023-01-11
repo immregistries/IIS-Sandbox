@@ -41,10 +41,7 @@ import org.springframework.stereotype.Controller;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 @Controller
@@ -110,7 +107,7 @@ public class BulkQueryGroupProviderR4 extends GroupResourceProvider {
 
 		ServletRequestDetails theRequestDetails
 	) throws IOException {
-		Session dataSession = PopServlet.getDataSession();
+//		Session dataSession = PopServlet.getDataSession();
 		try {
 			Bundle bundle = new Bundle();
 			Group group = read(theRequestDetails.getServletRequest(), theId, theRequestDetails);
@@ -126,15 +123,15 @@ public class BulkQueryGroupProviderR4 extends GroupResourceProvider {
 			}
 			return bundle;
 		} catch (Exception e) {
+			e.printStackTrace();
 			throw e;
-		} finally {
-			dataSession.close();
 		}
+//		finally {
+//			dataSession.close();
+//		}
 	}
 
 	public void groupInstanceSynchExport(
-
-		javax.servlet.http.HttpServletRequest theServletRequest,
 
 		@IdParam
 		IdType theId,
@@ -177,6 +174,8 @@ public class BulkQueryGroupProviderR4 extends GroupResourceProvider {
 		ServletRequestDetails theRequestDetails
 	) throws IOException {
 		Session dataSession = PopServlet.getDataSession();
+		javax.servlet.http.HttpServletRequest theServletRequest = theRequestDetails.getServletRequest();
+		logger.info("Parameters {}", (Object) theRequestDetails.getParameters().get("_elements"));
 		try {
 
 			if (theOutputFormat == null) {
@@ -187,14 +186,27 @@ public class BulkQueryGroupProviderR4 extends GroupResourceProvider {
 			String serverBase = StringUtils.removeEnd(theRequestDetails.getServerBaseForRequest(), "/");
 			Map<String, Bundle> bundleMap = new HashMap<>();
 			Group group = read(theServletRequest, theId, theRequestDetails);
+
+			Bundle errorsBundle = new Bundle();
 			for (Group.GroupMemberComponent member : group.getMember()) {
 				if (member.getEntity().getReference().split("/")[0].equals("Patient")) {
 					Bundle memberBundle = new Bundle();
 					// TODO add normal filter for type filter
-					IBundleProvider bundleProvider = patientProvider.patientInstanceEverything(theServletRequest, new IdType(member.getEntity().getReference()), theCount, theOffset, theLastUpdated, theContent, theNarrative, theFilter, theTypes, theSortSpec, theRequestDetails);
-					for (IBaseResource resource : bundleProvider.getAllResources()) {
-						bundleMap.putIfAbsent(resource.fhirType(), new Bundle());
-						bundleMap.get(resource.fhirType()).addEntry().setResource((Resource) resource);
+					try {
+						IBundleProvider bundleProvider = patientProvider.patientInstanceEverything(theServletRequest, new IdType(member.getEntity().getReference()), theCount, theOffset, theLastUpdated, theContent, theNarrative, theFilter, theTypes, theSortSpec, theRequestDetails);
+						for (IBaseResource resource : bundleProvider.getAllResources()) {
+							bundleMap.putIfAbsent(resource.fhirType(), new Bundle());
+							bundleMap.get(resource.fhirType()).addEntry().setResource((Resource) resource);
+						}
+					} catch (Exception e) {
+						/**
+						 * Caught Exceptions are exported in a ndJson Binary file
+						 */
+						e.printStackTrace();
+						OperationOutcome operationOutcome = new OperationOutcome();
+						operationOutcome.addIssue()
+							.setDetails(new CodeableConcept(new Coding().setDisplay(e.getMessage())));
+						errorsBundle.addEntry().setResource(operationOutcome); // TODO Add informations
 					}
 				}
 			}
@@ -202,8 +214,7 @@ public class BulkQueryGroupProviderR4 extends GroupResourceProvider {
 			IParser parser = fhirResourceGroupDao.getContext().newNDJsonParser();
 			RequestDetails detailsCopy = new SystemRequestDetails();
 			detailsCopy.setTenantId(theRequestDetails.getTenantId());
-			for (Map.Entry<String, Bundle> entry :
-				bundleMap.entrySet()) {
+			for (Map.Entry<String, Bundle> entry : bundleMap.entrySet()) {
 				Binary binary = new Binary();
 				binary.setContentType("Bulk");
 				binary.setContent(parser.encodeResourceToString(entry.getValue()).getBytes(StandardCharsets.UTF_8));
@@ -217,31 +228,40 @@ public class BulkQueryGroupProviderR4 extends GroupResourceProvider {
 					newIId = outcome.getId();
 					nextUrl = serverBase + "/" + newIId.toUnqualifiedVersionless().getValue();
 				} else {
-//					throw RuntimeException();
 					nextUrl = "ERROR";
-
 				}
 				bulkResponseDocument.addOutput()
 					.setType(entry.getKey())
 					.setUrl(nextUrl);
-//
-//				MessageReceived ndJson = new MessageReceived();
-//				OrgAccess orgAccess = (OrgAccess) theRequestDetails.getAttribute("orgAccess");
-//				ndJson.setOrgMaster(orgAccess.getOrg());
-//				ndJson.setMessageRequest(theRequestDetails.getCompleteUrl());
-//				ndJson.setMessageResponse(parser.encodeResourceToString(entry.getValue()));
-//				ndJson.setReportedDate(new Date());
-//				int id = (int) dataSession.save(ndJson);
-//				logger.info("{}/ndjson?tenantId={}&ndJsonId={}", theRequestDetails.getCompleteUrl().split("/fhir")[0], theRequestDetails.getTenantId(), id);
-//				bulkResponseDocument.addOutput()
-//					.setType(entry.getKey())
-//					.setUrl(theRequestDetails.getCompleteUrl().split("/fhir")[0]
-//						+ "/ndjson?tenantId=" + theRequestDetails.getTenantId() + "&ndJsonId=" + id);
 			}
+
+			if (!errorsBundle.getEntry().isEmpty()) { // If exceptions were caught
+				Binary binary = new Binary();
+				binary.setContentType("Bulk-Error");
+				binary.setContent(parser.encodeResourceToString(errorsBundle).getBytes(StandardCharsets.UTF_8));
+				DaoMethodOutcome outcome = binaryDao.create(binary, detailsCopy);
+
+				IIdType newIId;
+				String nextUrl;
+				if (outcome.getResource() != null) {
+					newIId = outcome.getResource().getIdElement();
+					nextUrl = serverBase + "/" + newIId.toUnqualifiedVersionless().getValue();
+				} else if (outcome.getId() != null) {
+					newIId = outcome.getId();
+					nextUrl = serverBase + "/" + newIId.toUnqualifiedVersionless().getValue();
+				} else {
+					nextUrl = "ERROR";
+				}
+				BulkExportResponseJson.Output errorOutput = new BulkExportResponseJson.Output();
+				errorOutput.setType("OperationOutcome");
+				errorOutput.setUrl(nextUrl);
+				bulkResponseDocument.getError().add(errorOutput);
+			}
+
 
 			bulkResponseDocument.setTransactionTime(new Date(System.currentTimeMillis()));
 			bulkResponseDocument.setRequiresAccessToken(true);
-			bulkResponseDocument.setRequest(theRequestDetails.getServletRequest().getRequestURI());
+			bulkResponseDocument.setRequest(theRequestDetails.getCompleteUrl());
 
 			HttpServletResponse response = theRequestDetails.getServletResponse();
 			JsonUtil.serialize(bulkResponseDocument, response.getWriter());

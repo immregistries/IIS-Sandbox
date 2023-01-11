@@ -44,7 +44,9 @@ CREATE TABLE `org_access` (
 insert into org_master (org_id, organization_name) values (1, 'Mercy-Healthcare');
 insert into org_master (org_id, organization_name) values (2, 'Family-Physician');
 insert into org_master (org_id, organization_name) values (3, 'DEFAULT');
+insert into org_master (org_id, organization_name) values (4, 'Connectathon');
 
 insert into org_access (org_id, access_name, access_key) values (1, 'Mercy', 'password1234');
 insert into org_access (org_id, access_name, access_key) values (2, 'Bob', '1234password1234');
 insert into org_access (org_id, access_name, access_key) values (3, 'DEFAULT', 'BabySharkJaws');
+insert into org_access (org_id, access_name, access_key) values (4, 'Connectathon', 'SundaysR0ck!');

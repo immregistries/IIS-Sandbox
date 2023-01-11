@@ -220,7 +220,7 @@ public class CustomBulkDataExportProvider extends BulkDataExportProvider {
 			if (theSince != null) {
 				theLastUpdated.setLowerBound(theSince.getValueAsString());
 			}
-			bulkQueryGroupProviderR4.groupInstanceSynchExport(theRequestDetails.getServletRequest(), new IdType(theIdParam.getValue()), theOutputFormat, null, null, theLastUpdated, null, null, null, theTypes, null, theRequestDetails);
+			bulkQueryGroupProviderR4.groupInstanceSynchExport(new IdType(theIdParam.getValue()), theOutputFormat, null, null, theLastUpdated, null, null, null, theTypes, null, theRequestDetails);
 		}
 	}
 

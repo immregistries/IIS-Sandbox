@@ -8,6 +8,7 @@ public interface ImmunizationMapper<Immunization> {
 	String MVX = "http://terminology.hl7.org/CodeSystem/MVX";
 	String NDC = "NDC";
 	String INFORMATION_SOURCE = "NIP001"; //TODO get system from actual message
+	String INFORMATION_SOURCE_EXTENSION = "informationSource"; //TODO get system from actual message
 	String FUNCTION = "http://hl7.org/fhir/ValueSet/immunization-function";
 	String ORDERING = "OP";
 	String ORDERING_DISPLAY = "Ordering Provider";
