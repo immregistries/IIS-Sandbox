@@ -188,7 +188,9 @@ public class ImmunizationMapperR4 implements ImmunizationMapper<Immunization> {
 	  }
 //	  i.setManufacturer(MappingHelper.getFhirReference(MappingHelper.ORGANISATION,MVX,vr.getVaccineMvxCode()));
 
-	  i.setDoseQuantity(new Quantity().setValue(new BigDecimal(vr.getAdministeredAmount())));
+	  if (vr.getAdministeredAmount() != null && !vr.getAdministeredAmount().isBlank()) {
+		  i.setDoseQuantity(new Quantity().setValue(new BigDecimal(vr.getAdministeredAmount())));
+	  }
 
 	  Extension informationSource = new Extension(INFORMATION_SOURCE_EXTENSION);
 	  informationSource.setValue(new Coding().setSystem(INFORMATION_SOURCE).setCode(vr.getInformationSource()));
