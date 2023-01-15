@@ -516,7 +516,8 @@ public class CustomBulkDataExportProvider extends BulkDataExportProvider {
 	public static boolean preferAsyncHeader(ServletRequestDetails theRequestDetails, String theOperationName) {
 		String preferHeader = theRequestDetails.getHeader("Prefer");
 		if (preferHeader == null) {
-			throw new InvalidRequestException(Msg.code(513) + "Must request async or sync processing for " + theOperationName);
+			return true;
+//			throw new InvalidRequestException(Msg.code(513) + "Must request async or sync processing for " + theOperationName);
 		}
 		PreferHeader prefer = RestfulServerUtils.parsePreferHeader((IRestfulServer) null, preferHeader);
 		if (!prefer.getRespondAsync()) {

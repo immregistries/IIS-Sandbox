@@ -22,8 +22,8 @@ spring:
     check-location: false
     baselineOnMigrate: true
   datasource:
-    # Handled in spring profiles
-    max-active: 15
+    # rest is Handled in spring profiles
+    max-active: 50
     # database connection pool size
     hikari:
       maximum-pool-size: 10
