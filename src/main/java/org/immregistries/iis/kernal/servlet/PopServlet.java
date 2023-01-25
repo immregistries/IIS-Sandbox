@@ -1,6 +1,5 @@
 package org.immregistries.iis.kernal.servlet;
 
-import ca.uhn.fhir.rest.client.api.IGenericClient;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
@@ -22,8 +21,6 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
 
 public class PopServlet extends HttpServlet {
 	public static final String PARAM_MESSAGE = "MESSAGEDATA";
@@ -88,7 +85,7 @@ public class PopServlet extends HttpServlet {
 					  groupPatientIds) {
 					  group.addMember().setEntity(new Reference().setReference("Patient/" + id));
 				  }
-				  ServletHelper.getFhirClient(repositoryClientFactory).create().resource(group).execute();
+				  repositoryClientFactory.newGenericClient(orgAccess).create().resource(group).execute();
 			  }
 		  }
       } finally {

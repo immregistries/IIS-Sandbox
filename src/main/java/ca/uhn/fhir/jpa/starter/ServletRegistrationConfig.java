@@ -1,6 +1,5 @@
 package ca.uhn.fhir.jpa.starter;
 
-import ca.uhn.fhir.jpa.starter.BulkQuery.NDJsonServlet;
 import ca.uhn.fhir.jpa.starter.annotations.OnR5Condition;
 import org.immregistries.iis.kernal.servlet.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -259,17 +258,6 @@ public class ServletRegistrationConfig {
 		beanFactory.autowireBean(servlet);
 		registrationBean.setServlet(servlet);
 		registrationBean.addUrlMappings("/utest");
-//		registrationBean.setLoadOnStartup(1);
-		return registrationBean;
-	}
-
-	@Bean
-	public ServletRegistrationBean ndJsonRegistrationBean() {
-		ServletRegistrationBean registrationBean = new ServletRegistrationBean();
-		HttpServlet servlet = new NDJsonServlet();
-		beanFactory.autowireBean(servlet);
-		registrationBean.setServlet(servlet);
-		registrationBean.addUrlMappings("/ndjson");
 //		registrationBean.setLoadOnStartup(1);
 		return registrationBean;
 	}

@@ -77,7 +77,7 @@ public class SubscriptionServlet extends HttpServlet {
 			dispatcher.forward(req, resp);
 			return;
 		}
-		IGenericClient localClient = ServletHelper.getFhirClient(session,repositoryClientFactory);
+		IGenericClient localClient = repositoryClientFactory.newGenericClient(session);
 
 
 		String subscriptionId = req.getParameter(PARAM_SUBSCRIPTION_ID);
@@ -167,7 +167,7 @@ public class SubscriptionServlet extends HttpServlet {
 			return;
 		}
 		resp.setContentType("text/html");
-		IGenericClient fhirClient = ServletHelper.getFhirClient(session,repositoryClientFactory);
+		IGenericClient fhirClient = repositoryClientFactory.newGenericClient(session);
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 
 		String subscriptionId = req.getParameter(PARAM_SUBSCRIPTION_ID);

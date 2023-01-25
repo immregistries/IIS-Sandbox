@@ -71,7 +71,7 @@ public class LocationServlet extends HttpServlet {
       dispatcher.forward(req, resp);
       return;
     }
-	  IGenericClient fhirClient = ServletHelper.getFhirClient(session,repositoryClientFactory);
+	  IGenericClient fhirClient = repositoryClientFactory.newGenericClient(session);
 
 	  resp.setContentType("text/html");
     PrintWriter out = new PrintWriter(resp.getOutputStream());

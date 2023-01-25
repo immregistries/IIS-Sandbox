@@ -54,7 +54,7 @@ public class VaccinationServlet extends PatientServlet {
 
     HttpSession session = req.getSession(true);
     OrgAccess orgAccess = (OrgAccess) session.getAttribute("orgAccess");
-	  IGenericClient fhirClient = ServletHelper.getFhirClient(session, repositoryClientFactory);
+	  IGenericClient fhirClient = repositoryClientFactory.newGenericClient(session);
 
 	  if (orgAccess == null) {
       RequestDispatcher dispatcher = req.getRequestDispatcher("home");

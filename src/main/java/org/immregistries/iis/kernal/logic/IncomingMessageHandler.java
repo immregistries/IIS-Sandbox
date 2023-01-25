@@ -48,7 +48,7 @@ public abstract class IncomingMessageHandler<Organization extends IBaseResource>
 	LocationMapper locationMapper;
 
   protected IGenericClient getFhirClient() {
-	  return ServletHelper.getFhirClient(repositoryClientFactory);
+	  return repositoryClientFactory.getFhirClientFromSession();
   }
 
   protected static final String PATIENT_MIDDLE_NAME_MULTI = "Multi";

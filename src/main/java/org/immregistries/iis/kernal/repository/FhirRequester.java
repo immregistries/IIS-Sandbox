@@ -72,7 +72,7 @@ public abstract class FhirRequester<
 	private static final ICriterion NOT_GOLDEN_CRITERION = new TokenCriterion("_tag:not", GOLDEN_SYSTEM_TAG, GOLDEN_RECORD);
 
 	MethodOutcome save(IBaseResource resource, ICriterion... where) {
-		IGenericClient fhirClient = ServletHelper.getFhirClient(repositoryClientFactory);
+		IGenericClient fhirClient = repositoryClientFactory.getFhirClientFromSession();
 		MethodOutcome outcome;
 		try {
 			IUpdateTyped query = fhirClient.update().resource(resource);
@@ -93,7 +93,7 @@ public abstract class FhirRequester<
 	}
 
 	public IBaseResource read(Class<? extends IBaseResource> aClass,String id) {
-		IGenericClient fhirClient = ServletHelper.getFhirClient(repositoryClientFactory);
+		IGenericClient fhirClient = repositoryClientFactory.getFhirClientFromSession();
 		try {
 			return fhirClient.read().resource(aClass).withId(id).execute();
 		} catch (ResourceNotFoundException e){
@@ -102,7 +102,7 @@ public abstract class FhirRequester<
 	}
 
 	IBaseBundle searchGoldenRecord(Class<? extends IBaseResource> aClass, ICriterion... where) {
-		IGenericClient fhirClient = ServletHelper.getFhirClient(repositoryClientFactory);
+		IGenericClient fhirClient = repositoryClientFactory.getFhirClientFromSession();
 		try {
 			IQuery<IBaseBundle> query = fhirClient.search().forResource(aClass);
 			int size = where.length;
@@ -138,7 +138,7 @@ public abstract class FhirRequester<
 	}
 
 	IBaseBundle searchRegularRecord(Class<? extends IBaseResource> aClass, ICriterion... where) {
-		IGenericClient fhirClient = ServletHelper.getFhirClient(repositoryClientFactory);
+		IGenericClient fhirClient = repositoryClientFactory.getFhirClientFromSession();
 		try {
 			IQuery<IBaseBundle> query = fhirClient.search().forResource(aClass);
 			int size = where.length;
@@ -157,7 +157,7 @@ public abstract class FhirRequester<
 	IBaseBundle search(
 		Class<? extends IBaseResource> aClass,
 		ICriterion... where) {
-		IGenericClient fhirClient = ServletHelper.getFhirClient(repositoryClientFactory);
+		IGenericClient fhirClient = repositoryClientFactory.getFhirClientFromSession();
 		try {
 			IQuery<IBaseBundle> query = fhirClient.search().forResource(aClass);
 			int size = where.length;

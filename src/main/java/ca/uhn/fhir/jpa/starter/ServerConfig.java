@@ -24,6 +24,7 @@ import ca.uhn.fhir.jpa.provider.*;
 import ca.uhn.fhir.jpa.provider.dstu3.JpaConformanceProviderDstu3;
 import ca.uhn.fhir.jpa.search.DatabaseBackedPagingProvider;
 import ca.uhn.fhir.jpa.starter.BulkQuery.BulkQueryGroupProviderR4;
+import ca.uhn.fhir.jpa.starter.BulkQuery.BulkQueryGroupProviderR5;
 import ca.uhn.fhir.jpa.starter.BulkQuery.CustomBulkDataExportProvider;
 import ca.uhn.fhir.jpa.starter.common.StarterJpaConfig;
 import ca.uhn.fhir.jpa.starter.interceptors.PartitionCreationInterceptor;
@@ -40,7 +41,6 @@ import ca.uhn.fhir.rest.server.util.ISearchParamRegistry;
 import ca.uhn.fhir.validation.IValidatorModule;
 import ca.uhn.fhir.validation.ResultSeverityEnum;
 import com.google.common.base.Strings;
-import org.hl7.fhir.r4.model.Group;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -61,13 +61,16 @@ import java.util.Optional;
 public class ServerConfig {
 	private static final org.slf4j.Logger ourLog = org.slf4j.LoggerFactory.getLogger(ServerConfig.class);
 
-	@Autowired
-	IFhirResourceDao<Group> fhirResourceGroupDao;
+	@Autowired(required = false)
+	IFhirResourceDao<org.hl7.fhir.r4.model.Group> fhirResourceGroupDaoR4;
+	@Autowired(required = false)
+	IFhirResourceDao<org.hl7.fhir.r5.model.Group> fhirResourceGroupDaoR5;
 
 	@Bean
 	public RestfulServer restfulServer(IFhirSystemDao<?, ?> fhirSystemDao, AppProperties appProperties, DaoRegistry daoRegistry, Optional<MdmProviderLoader> mdmProviderProvider, IJpaSystemProvider jpaSystemProvider, ResourceProviderFactory resourceProviderFactory, DaoConfig daoConfig, ISearchParamRegistry searchParamRegistry, IValidationSupport theValidationSupport, DatabaseBackedPagingProvider databaseBackedPagingProvider, LoggingInterceptor loggingInterceptor, Optional<TerminologyUploaderProvider> terminologyUploaderProvider, Optional<SubscriptionTriggeringProvider> subscriptionTriggeringProvider, Optional<CorsInterceptor> corsInterceptor, IInterceptorBroadcaster interceptorBroadcaster, Optional<BinaryAccessProvider> binaryAccessProvider, BinaryStorageInterceptor binaryStorageInterceptor, IValidatorModule validatorModule, Optional<GraphQLProvider> graphQLProvider, CustomBulkDataExportProvider customBulkDataExportProvider, BulkDataImportProvider bulkDataImportProvider, ValueSetOperationProvider theValueSetOperationProvider, ReindexProvider reindexProvider, PartitionManagementProvider partitionManagementProvider, Optional<RepositoryValidatingInterceptor> repositoryValidatingInterceptor, IPackageInstallerSvc packageInstallerSvc, ThreadSafeResourceDeleterSvc theThreadSafeResourceDeleterSvc, ApplicationContext appContext
 		, PartitionCreationInterceptor partitionCreationInterceptor
-		, BulkQueryGroupProviderR4 bulkQueryGroupProviderR4
+		, Optional<BulkQueryGroupProviderR5> bulkQueryGroupProviderR5
+		, Optional<BulkQueryGroupProviderR4> bulkQueryGroupProviderR4
 
 //		, SessionAuthorizationInterceptor sessionAuthorizationInterceptor
 //		, MdmCustomInterceptor mdmCustomInterceptor
@@ -219,11 +222,13 @@ public class ServerConfig {
 			 * Customized to support synch export
 			 */
 			fhirServer.registerProvider(customBulkDataExportProvider);
-			if (bulkQueryGroupProviderR4 != null) {
-				fhirServer.registerProvider(bulkQueryGroupProviderR4);
-				bulkQueryGroupProviderR4.setDao(fhirResourceGroupDao);
+			if (bulkQueryGroupProviderR4.isPresent()) {
+				fhirServer.registerProvider(bulkQueryGroupProviderR4.get());
+				bulkQueryGroupProviderR4.get().setDao(fhirResourceGroupDaoR4);
+			} else if (bulkQueryGroupProviderR5.isPresent()) {
+				fhirServer.registerProvider(bulkQueryGroupProviderR5.get());
+				bulkQueryGroupProviderR5.get().setDao(fhirResourceGroupDaoR5);
 			}
-//			fhirServer.registerProvider(bulkQueryGroupProviderR4);
 		}
 
 		//Bulk Import

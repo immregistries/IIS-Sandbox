@@ -12,6 +12,7 @@ import ca.uhn.fhir.rest.client.interceptor.AdditionalRequestHeadersInterceptor;
 import ca.uhn.fhir.rest.client.interceptor.BasicAuthInterceptor;
 import ca.uhn.fhir.rest.client.interceptor.BearerTokenAuthInterceptor;
 import ca.uhn.fhir.rest.client.interceptor.UrlTenantSelectionInterceptor;
+import ca.uhn.fhir.rest.server.exceptions.AuthenticationException;
 import ca.uhn.fhir.rest.server.interceptor.LoggingInterceptor;
 import ca.uhn.fhir.rest.server.util.ITestingUiClientFactory;
 import org.immregistries.iis.kernal.model.OrgAccess;
@@ -19,9 +20,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import static ca.uhn.fhir.jpa.starter.interceptors.SessionAuthorizationInterceptor.CONNECTATHON_USER;
 
@@ -51,7 +55,7 @@ public class RepositoryClientFactory extends ApacheRestfulClientFactory implemen
 		}
 	}
 
-	public synchronized IGenericClient newGenericClient(OrgAccess orgAccess) {
+	public IGenericClient newGenericClient(OrgAccess orgAccess) {
 		asynchInit();
 		IGenericClient client = newGenericClient(serverBase + "/" + orgAccess.getOrg().getOrganizationName());
 		IClientInterceptor authInterceptor;
@@ -71,6 +75,43 @@ public class RepositoryClientFactory extends ApacheRestfulClientFactory implemen
 		return client;
 	}
 
+	/**
+	 * Used to get a fhir client within HAPIFHIR Interceptors
+	 *
+	 * @param theRequestDetails
+	 * @return
+	 */
+	public IGenericClient newGenericClient(RequestDetails theRequestDetails) {
+		asynchInit();
+		OrgAccess orgAccess = (OrgAccess) theRequestDetails.getAttribute("orgAccess");
+		if (orgAccess == null) {
+			throw new AuthenticationException();
+		}
+		return newGenericClient(orgAccess);
+	}
+
+	/**
+	 * Used to get a fhir client within Java Servlets
+	 *
+	 * @param session
+	 * @return
+	 */
+	public IGenericClient newGenericClient(HttpSession session) {
+		asynchInit();
+		if (session.getAttribute("fhirClient") == null) {
+			OrgAccess orgAccess = (OrgAccess) session.getAttribute("orgAccess");
+			session.setAttribute("fhirClient", newGenericClient(orgAccess));
+		}
+		return (IGenericClient) session.getAttribute("fhirClient");
+	}
+
+
+	public IGenericClient getFhirClientFromSession() {
+		HttpSession session = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest().getSession(false);
+		return newGenericClient(session);
+	}
+
+
 	@Override
 	public synchronized IGenericClient newGenericClient(String theServerBase) {
 		asynchInit();
@@ -78,8 +119,8 @@ public class RepositoryClientFactory extends ApacheRestfulClientFactory implemen
 		client.registerInterceptor(loggingInterceptor);
 		AdditionalRequestHeadersInterceptor interceptor = new AdditionalRequestHeadersInterceptor();
 		interceptor.addHeaderValue("Cache-Control", "no-cache");
-		 client.registerInterceptor(interceptor);
-		 return client;
+		client.registerInterceptor(interceptor);
+		return client;
 	 }
 
 	@Override

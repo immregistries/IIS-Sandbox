@@ -3,7 +3,6 @@ package org.immregistries.iis.kernal.servlet;
 import ca.uhn.fhir.jpa.partition.SystemRequestDetails;
 import ca.uhn.fhir.rest.api.server.RequestDetails;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
-import ca.uhn.fhir.rest.client.impl.RestfulClientFactory;
 import ca.uhn.fhir.rest.server.exceptions.AuthenticationException;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -11,8 +10,6 @@ import org.hibernate.Transaction;
 import org.immregistries.iis.kernal.model.OrgAccess;
 import org.immregistries.iis.kernal.model.OrgMaster;
 import org.immregistries.iis.kernal.repository.RepositoryClientFactory;
-import org.mindrot.jbcrypt.BCrypt;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -82,13 +79,6 @@ public class ServletHelper {
     return orgAccess;
   }
 
-
-
-  public static IGenericClient getFhirClient( RepositoryClientFactory repositoryClientFactory) {
-	  HttpSession session = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest().getSession(false);
-	  return  getFhirClient(session,repositoryClientFactory);
-  }
-
   public static OrgAccess getOrgAccess() {
 	  return (OrgAccess) ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest().getSession(false).getAttribute("orgAccess");
   }
@@ -97,13 +87,6 @@ public class ServletHelper {
 	  RequestDetails requestDetails =  new SystemRequestDetails();
 	  requestDetails.setTenantId(ServletHelper.getOrgAccess().getAccessName());
 	  return requestDetails;
-  }
-  public static IGenericClient getFhirClient(HttpSession session, RepositoryClientFactory repositoryClientFactory) {
-	  if (session.getAttribute("fhirClient") == null) {
-		  OrgAccess orgAccess = (OrgAccess) session.getAttribute("orgAccess");
-		  session.setAttribute("fhirClient", repositoryClientFactory.newGenericClient(orgAccess));
-	  }
-	  return (IGenericClient) session.getAttribute("fhirClient");
   }
 
 	public static void logout(){

@@ -6,6 +6,7 @@ import ca.uhn.fhir.jpa.api.dao.IFhirSystemDao;
 import ca.uhn.fhir.jpa.mdm.dao.MdmLinkDaoSvc;
 import ca.uhn.fhir.jpa.mdm.svc.MdmLinkSvcImpl;
 import ca.uhn.fhir.jpa.mdm.svc.MdmResourceDaoSvc;
+import ca.uhn.fhir.jpa.starter.mdm.MdmConfigCondition;
 import ca.uhn.fhir.mdm.api.*;
 import ca.uhn.fhir.mdm.model.MdmTransactionContext;
 import ca.uhn.fhir.mdm.provider.MdmControllerHelper;
@@ -44,7 +45,7 @@ import static org.immregistries.iis.kernal.repository.FhirRequester.GOLDEN_SYSTE
 
 @Component
 @Interceptor
-//@Conditional(MdmConfigCondition.class)
+@Conditional(MdmConfigCondition.class)
 public class MdmCustomInterceptor {
 	Logger logger = LoggerFactory.getLogger(MdmCustomInterceptor.class);
 	@Autowired
@@ -105,13 +106,7 @@ public class MdmCustomInterceptor {
 			MdmTransactionContext mdmTransactionContext = new MdmTransactionContext(MdmTransactionContext.OperationType.CREATE_RESOURCE);
 			mdmTransactionContext.setResourceType("Immunization");
 			Bundle bundle;
-			Session dataSession = PopServlet.getDataSession();
-			OrgAccess orgAccess = sessionAuthorizationInterceptor.tryAuthHeader(theRequestDetails.getHeader("Authentication"), theRequestDetails.getTenantId(), dataSession);
-			if (orgAccess == null) {
-				throw new AuthenticationException();
-			}
-//			IGenericClient client = repositoryClientFactory.newGenericClientForPartition(theRequestDetails.getTenantId());
-			IGenericClient client = repositoryClientFactory.newGenericClient(orgAccess);
+			IGenericClient client = repositoryClientFactory.newGenericClient(theRequestDetails);
 
 			if (immunization.getPatient().getReference() != null) {
 				bundle = (Bundle) client.search().byUrl("Immunization?_tag=" + GOLDEN_SYSTEM_TAG + "|" + GOLDEN_RECORD + "&patient:mdm=" + immunization.getPatient().getReference()).execute();
@@ -195,7 +190,7 @@ public class MdmCustomInterceptor {
 				}
 			}
 		}
-		if ( i1.getOrganisationID().isBlank() && theRequestDetails != null){
+		if ((i1.getOrganisationID() == null || i1.getOrganisationID().isBlank()) && theRequestDetails != null) {
 			i1.setOrganisationID(theRequestDetails.getTenantId());
 		}
 		logger.info("Organisation id {}", i1);

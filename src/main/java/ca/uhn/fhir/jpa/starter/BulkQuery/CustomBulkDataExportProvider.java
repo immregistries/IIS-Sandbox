@@ -30,7 +30,6 @@ import ca.uhn.fhir.rest.api.server.IRestfulServer;
 import ca.uhn.fhir.rest.api.server.RequestDetails;
 import ca.uhn.fhir.rest.api.server.bulk.BulkDataExportOptions;
 import ca.uhn.fhir.rest.param.DateRangeParam;
-import ca.uhn.fhir.rest.server.IResourceProvider;
 import ca.uhn.fhir.rest.server.RestfulServerUtils;
 import ca.uhn.fhir.rest.server.exceptions.InternalErrorException;
 import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
@@ -42,7 +41,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.instance.model.api.IBaseOperationOutcome;
 import org.hl7.fhir.instance.model.api.IIdType;
 import org.hl7.fhir.instance.model.api.IPrimitiveType;
-import org.hl7.fhir.r4.model.*;
+import org.hl7.fhir.r5.model.*;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -80,7 +79,7 @@ public class CustomBulkDataExportProvider extends BulkDataExportProvider {
 	private IFhirResourceDao<Binary> binaryDao;
 
 	@Autowired
-	BulkQueryGroupProviderR4 bulkQueryGroupProviderR4;
+	BulkQueryGroupProviderR5 bulkQueryGroupProviderR5;
 
 	/**
 	 * $export
@@ -94,7 +93,7 @@ public class CustomBulkDataExportProvider extends BulkDataExportProvider {
 		ServletRequestDetails theRequestDetails
 	) throws Exception {
 		// JPA export provider
-		if (preferAsyncHeader(theRequestDetails, JpaConstants.OPERATION_EXPORT)) {
+		if (hasAsyncHeader(theRequestDetails, JpaConstants.OPERATION_EXPORT)) {
 			BulkDataExportOptions bulkDataExportOptions = buildSystemBulkExportOptions(theOutputFormat, theType, theSince, theTypeFilter);
 
 			startJob(theRequestDetails, bulkDataExportOptions);
@@ -202,7 +201,7 @@ public class CustomBulkDataExportProvider extends BulkDataExportProvider {
 		ourLog.debug("_typeFilter={}", theTypeFilter);
 		ourLog.debug("_mdm=", theMdm);
 
-		if (preferAsyncHeader(theRequestDetails, JpaConstants.OPERATION_EXPORT)) {
+		if (hasAsyncHeader(theRequestDetails, JpaConstants.OPERATION_EXPORT)) {
 			BulkDataExportOptions bulkDataExportOptions = buildGroupBulkExportOptions(theOutputFormat, theType, theSince, theTypeFilter, theIdParam, theMdm);
 
 			if (bulkDataExportOptions.getResourceTypes() != null && !bulkDataExportOptions.getResourceTypes().isEmpty()) {
@@ -220,7 +219,7 @@ public class CustomBulkDataExportProvider extends BulkDataExportProvider {
 			if (theSince != null) {
 				theLastUpdated.setLowerBound(theSince.getValueAsString());
 			}
-			bulkQueryGroupProviderR4.groupInstanceSynchExport(new IdType(theIdParam.getValue()), theOutputFormat, null, null, theLastUpdated, null, null, null, theTypes, null, theRequestDetails);
+			bulkQueryGroupProviderR5.groupInstanceSynchExport(new IdType(theIdParam.getValue()), theOutputFormat, null, null, theLastUpdated, null, null, null, theTypes, null, theRequestDetails);
 		}
 	}
 
@@ -256,7 +255,7 @@ public class CustomBulkDataExportProvider extends BulkDataExportProvider {
 		@OperationParam(name = JpaConstants.PARAM_EXPORT_PATIENT, min = 0, max = OperationParam.MAX_UNLIMITED, typeName = "string") List<IPrimitiveType<String>> thePatient,
 		ServletRequestDetails theRequestDetails
 	) throws Exception {
-		if (preferAsyncHeader(theRequestDetails, JpaConstants.OPERATION_EXPORT)) {
+		if (hasAsyncHeader(theRequestDetails, JpaConstants.OPERATION_EXPORT)) {
 			BulkDataExportOptions bulkDataExportOptions = buildPatientBulkExportOptions(theOutputFormat, theType, theSince, theTypeFilter, thePatient);
 			validateResourceTypesAllContainPatientSearchParams(bulkDataExportOptions.getResourceTypes());
 
@@ -277,7 +276,7 @@ public class CustomBulkDataExportProvider extends BulkDataExportProvider {
 		@OperationParam(name = JpaConstants.PARAM_EXPORT_TYPE_FILTER, min = 0, max = OperationParam.MAX_UNLIMITED, typeName = "string") List<IPrimitiveType<String>> theTypeFilter,
 		ServletRequestDetails theRequestDetails
 	) throws Exception {
-		if (preferAsyncHeader(theRequestDetails, JpaConstants.OPERATION_EXPORT)) {
+		if (hasAsyncHeader(theRequestDetails, JpaConstants.OPERATION_EXPORT)) {
 			BulkDataExportOptions bulkDataExportOptions = buildPatientBulkExportOptions(theOutputFormat, theType, theSince, theTypeFilter, theIdParam);
 			validateResourceTypesAllContainPatientSearchParams(bulkDataExportOptions.getResourceTypes());
 
@@ -513,7 +512,7 @@ public class CustomBulkDataExportProvider extends BulkDataExportProvider {
 		return retVal;
 	}
 
-	public static boolean preferAsyncHeader(ServletRequestDetails theRequestDetails, String theOperationName) {
+	public static boolean hasAsyncHeader(ServletRequestDetails theRequestDetails, String theOperationName) {
 		String preferHeader = theRequestDetails.getHeader("Prefer");
 		if (preferHeader == null) {
 			return true;

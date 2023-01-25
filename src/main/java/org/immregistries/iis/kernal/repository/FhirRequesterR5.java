@@ -87,7 +87,7 @@ public class FhirRequesterR5 extends FhirRequester<Patient,Immunization,Location
 	}
 
 	public ObservationReported searchObservationReported(ICriterion... where) {
-		IGenericClient fhirClient = ServletHelper.getFhirClient(repositoryClientFactory);
+		IGenericClient fhirClient = repositoryClientFactory.getFhirClientFromSession();
 		ObservationReported observationReported = null;
 		Bundle bundle = (Bundle) searchRegularRecord(Observation.class, where);
 		if (bundle != null && bundle.hasEntry()) {
@@ -106,7 +106,7 @@ public class FhirRequesterR5 extends FhirRequester<Patient,Immunization,Location
 	}
 
 	public List<ObservationReported> searchObservationReportedList(ICriterion... where) {
-		IGenericClient fhirClient = ServletHelper.getFhirClient(repositoryClientFactory);
+		IGenericClient fhirClient = repositoryClientFactory.getFhirClientFromSession();
 		List<ObservationReported> observationReportedList = new ArrayList<>();
 		Bundle bundle = (Bundle) search(Observation.class, where);
 		for (Bundle.BundleEntryComponent entry: bundle.getEntry()) {
