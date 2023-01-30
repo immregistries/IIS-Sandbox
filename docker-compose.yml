@@ -1,23 +1,41 @@
 version: "3"
 services:
-  hapi-fhir-jpaserver-start:
+  hapi-fhir-postgres:
+    image: postgres:13-alpine
+    container_name: hapi-fhir-postgres
+    restart: always
+    environment:
+      POSTGRES_DB: "hapi_fhir_iis"
+      POSTGRES_USER: "hapi_iis_web"
+      POSTGRES_PASSWORD: "SicMundusCreatusEst"
+  #    volumes:
+  #      - "./src/main/database/create-postgresql-for-hapi-fhir.sql:/docker-entrypoint-initdb.d/3.sql"
+  #      - hapi-fhir-postgres:/var/lib/postgresql/data
+  #    ports:
+  #      - "5432:5432"
+  iis-sandbox-mysql:
+    image: mysql:latest
+    container_name: iis-sandbox-mysql
+    command:
+      --lower_case_table_names=1
+    restart: always
+    environment:
+      #      MYSQL_DATABASE: 'iis_alongside_jpa'
+      MYSQL_USER: 'iis_web'
+      MYSQL_PASSWORD: 'SharkBaitHooHaHa'
+      MYSQL_ROOT_PASSWORD: 'password123456789'
+    volumes:
+      #      - ./src/main/database/create-mysql-user.sql:/docker-entrypoint-initdb.d/1.sql
+      - ./src/main/database/create-mysql-database.sql:/docker-entrypoint-initdb.d/2.sql
+  #    ports:
+  #      - "3307:3306"
+  iis-sandbox-jpa:
     build: .
-    container_name: hapi-fhir-jpaserver-start
+    container_name: iis-sandbox-jpa
     restart: on-failure
     ports:
       - "8080:8080"
-  hapi-fhir-mysql:
-    image: mysql:latest
-    container_name: hapi-fhir-mysql
-    #https://dev.mysql.com/doc/refman/8.0/en/identifier-case-sensitivity.html
-    command: --lower_case_table_names=1
-    restart: always
-    environment:
-      MYSQL_DATABASE: 'hapi'
-      MYSQL_USER: 'admin'
-      MYSQL_PASSWORD: 'admin'
-      MYSQL_ROOT_PASSWORD: 'admin'
-    volumes:
-      - hapi-fhir-mysql:/var/lib/mysql
+
 volumes:
-  hapi-fhir-mysql:
+  hapi-fhir-postgres:
+  sandbox-mysql:

@@ -1,10 +1,9 @@
-DROP DATABASE iis_alongside_jpa;
 CREATE DATABASE iis_alongside_jpa;
 
 USE iis_alongside_jpa;
 
 
-GRANT ALL ON iis_alongside_jpa.* TO 'iis_web'@'localhost';
+GRANT ALL ON iis_alongside_jpa.* TO 'iis_web';
 
 DROP TABLE IF EXISTS `message_received`;
 DROP TABLE IF EXISTS `org_access`;

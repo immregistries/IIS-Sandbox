@@ -11,6 +11,7 @@ import ca.uhn.fhir.jpa.starter.annotations.OnR4Condition;
 import ca.uhn.fhir.rest.api.server.IBundleProvider;
 import ca.uhn.fhir.rest.param.TokenParam;
 import org.hl7.fhir.r4.model.StructureDefinition;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
@@ -31,13 +32,14 @@ import java.util.stream.Collectors;
 @Conditional(OnR4Condition.class)
 public class RepositoryValidationInterceptorFactoryR4 implements IRepositoryValidationInterceptorFactory {
 
-	private final FhirContext fhirContext;
+	@Autowired
+	private FhirContext fhirContext;
 	private final RepositoryValidatingRuleBuilder repositoryValidatingRuleBuilder;
 	private final IFhirResourceDao structureDefinitionResourceProvider;
 
 	public RepositoryValidationInterceptorFactoryR4(RepositoryValidatingRuleBuilder repositoryValidatingRuleBuilder, DaoRegistry daoRegistry) {
 		this.repositoryValidatingRuleBuilder = repositoryValidatingRuleBuilder;
-		this.fhirContext = daoRegistry.getSystemDao().getContext();
+//		this.fhirContext = daoRegistry.getSystemDao().getContext();
 		structureDefinitionResourceProvider = daoRegistry.getResourceDao("StructureDefinition");
 
 	}

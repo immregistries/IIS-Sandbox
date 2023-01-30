@@ -213,12 +213,13 @@ hapi:
 spring:
   config.activate.on-profile: prod
   datasource:
-    url: 'jdbc:postgresql://localhost:5432/hapi_fhir_iis'
+    url: '@postgres.datasource.url@'
     username: hapi_iis_web
     password: SicMundusCreatusEst
     driver-class-name: org.postgresql.Driver
-#jpa.properties.hibernate.dialect: ca.uhn.fhir.jpa.model.dialect.HapiFhirPostgres94Dialect set in pom.xml
-#
+#jpa.properties.hibernate.dialect: ca.uhn.fhir.jpa.model.dialect.HapiFhirPostgres94Dialect
+#  set in pom.xml TODO see why it sometimes does not work
+
 ## Dev profile only properties to set up with H2
 ---
 spring:

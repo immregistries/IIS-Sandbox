@@ -1,16 +1,19 @@
-FROM maven:3.8-openjdk-17-slim as build-hapi
-WORKDIR /tmp/hapi-fhir-jpaserver-starter
+#FROM maven:3.8-openjdk-17-slim as build-hapi
+#WORKDIR /tmp/iis-sandbox-jpa
 
-COPY pom.xml .
-COPY server.xml .
-RUN mvn -ntp dependency:go-offline
+#COPY pom.xml .
+#COPY server.xml .
+#COPY target/iis-sandbox-jpa.war .
+#RUN mvn -ntp dependency:go-offline
 
-COPY src/ /tmp/hapi-fhir-jpaserver-starter/src/
-RUN mvn clean install -DskipTests -Djdk.lang.Process.launchMechanism=vfork
+#COPY src/ /tmp/iis-sandbox-jpa/src/
+#COPY src/main/database /database
+#RUN mvn clean install -DskipTests -Djdk.lang.Process.launchMechanism=vfork
 
-FROM build-hapi AS build-distroless
-RUN mvn package spring-boot:repackage -Pboot
-RUN mkdir /app && cp /tmp/hapi-fhir-jpaserver-starter/target/ROOT.war /app/main.war
+#FROM build-hapi AS build-distroless
+#RUN mvn package spring-boot:repackage -Pboot
+#RUN mkdir /app && cp /tmp/iis-sandbox-jpa/target/iis-sandbox-jpa.war /app/main.war
+
 
 
 ########### bitnami tomcat version is suitable for debugging and comes with a shell
@@ -28,16 +31,17 @@ USER 1001
 
 COPY --chown=1001:1001 catalina.properties /opt/bitnami/tomcat/conf/catalina.properties
 COPY --chown=1001:1001 server.xml /opt/bitnami/tomcat/conf/server.xml
-COPY --from=build-hapi --chown=1001:1001 /tmp/hapi-fhir-jpaserver-starter/target/ROOT.war /opt/bitnami/tomcat/webapps_default/ROOT.war
+COPY --chown=1001:1001 target/iis-sandbox-jpa.war /opt/bitnami/tomcat/webapps_default/iis-sandbox-jpa.war
+#COPY --from=build-hapi --chown=1001:1001 /tmp/iis-sandbox-jpa/iis-sandbox-jpa.war /opt/bitnami/tomcat/webapps_default/iis-sandbox-jpa.war
 
 ENV ALLOW_EMPTY_PASSWORD=yes
 
 ########### distroless brings focus on security and runs on plain spring boot - this is the default image
-FROM gcr.io/distroless/java17:nonroot as default
-COPY --chown=nonroot:nonroot --from=build-distroless /app /app
-# 65532 is the nonroot user's uid
-# used here instead of the name to allow Kubernetes to easily detect that the container
-# is running as a non-root (uid != 0) user.
-USER 65532:65532
-WORKDIR /app
-CMD ["/app/main.war"]
+#FROM gcr.io/distroless/java17:nonroot as default
+#COPY --chown=nonroot:nonroot --from=build-distroless /app /app
+## 65532 is the nonroot user's uid
+## used here instead of the name to allow Kubernetes to easily detect that the container
+## is running as a non-root (uid != 0) user.
+#USER 65532:65532
+#WORKDIR /app
+#CMD ["/app/iis-sandbox-jpa.war"]
