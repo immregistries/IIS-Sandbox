@@ -1,6 +1,6 @@
 package org.immregistries.iis.kernal.mapping.forR5;
 
-import ca.uhn.fhir.jpa.starter.annotations.OnR5Condition;
+import org.immregistries.iis.kernal.fhir.annotations.OnR5Condition;
 import org.hl7.fhir.r5.model.Organization;
 import org.immregistries.iis.kernal.mapping.Interfaces.OrganizationMapper;
 import org.immregistries.iis.kernal.mapping.MappingHelper;

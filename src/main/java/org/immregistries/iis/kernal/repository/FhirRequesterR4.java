@@ -1,12 +1,11 @@
 package org.immregistries.iis.kernal.repository;
 
-import ca.uhn.fhir.jpa.starter.annotations.OnR4Condition;
+import org.immregistries.iis.kernal.fhir.annotations.OnR4Condition;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.gclient.ICriterion;
 import org.hl7.fhir.r4.model.*;
 import org.immregistries.iis.kernal.model.*;
-import org.immregistries.iis.kernal.servlet.ServletHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Conditional;

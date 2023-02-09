@@ -1,6 +1,6 @@
 package org.immregistries.iis.kernal.mapping.forR5;
 
-import ca.uhn.fhir.jpa.starter.annotations.OnR5Condition;
+import org.immregistries.iis.kernal.fhir.annotations.OnR5Condition;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import org.hl7.fhir.r5.model.*;
 import org.immregistries.iis.kernal.mapping.Interfaces.ObservationMapper;
@@ -8,7 +8,6 @@ import org.immregistries.iis.kernal.mapping.MappingHelper;
 import org.immregistries.iis.kernal.model.ObservationMaster;
 import org.immregistries.iis.kernal.model.ObservationReported;
 import org.immregistries.iis.kernal.repository.FhirRequester;
-import org.immregistries.iis.kernal.repository.FhirRequesterR5;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Service;

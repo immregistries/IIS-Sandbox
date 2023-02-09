@@ -1,6 +1,6 @@
 package org.immregistries.iis.kernal.mapping.forR4;
 
-import ca.uhn.fhir.jpa.starter.annotations.OnR4Condition;
+import org.immregistries.iis.kernal.fhir.annotations.OnR4Condition;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import org.hl7.fhir.r4.model.*;
 import org.immregistries.iis.kernal.mapping.Interfaces.ObservationMapper;

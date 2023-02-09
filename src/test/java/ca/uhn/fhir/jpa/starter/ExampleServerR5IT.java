@@ -24,6 +24,7 @@ import org.hl7.fhir.r5.model.Observation;
 import org.hl7.fhir.r5.model.Patient;
 import org.hl7.fhir.r5.model.Subscription;
 import org.hl7.fhir.r5.model.SubscriptionTopic;
+import org.immregistries.iis.kernal.fhir.Application;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

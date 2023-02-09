@@ -464,7 +464,7 @@
                             <goal>repackage</goal>
                         </goals>
                         <configuration>
-                            <mainClass>ca.uhn.fhir.jpa.starter.Application</mainClass>
+                            <mainClass>org.immregistries.iis.kernal.fhir.Application</mainClass>
                         </configuration>
                     </execution>
                 </executions>

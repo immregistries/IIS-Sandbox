@@ -1,6 +1,6 @@
 package org.immregistries.iis.kernal.logic;
 
-import ca.uhn.fhir.jpa.starter.annotations.OnR5Condition;
+import org.immregistries.iis.kernal.fhir.annotations.OnR5Condition;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
 import org.apache.commons.lang3.StringUtils;
