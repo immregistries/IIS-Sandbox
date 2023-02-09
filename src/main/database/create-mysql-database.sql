@@ -1,3 +1,4 @@
+DROP DATABASE IF EXISTS iis_alongside_jpa;
 CREATE DATABASE iis_alongside_jpa;
 
 USE iis_alongside_jpa;

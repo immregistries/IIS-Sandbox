@@ -112,7 +112,7 @@ public class MdmCustomInterceptor {
 				bundle = (Bundle) client.search().byUrl("Immunization?_tag=" + GOLDEN_SYSTEM_TAG + "|" + GOLDEN_RECORD + "&patient:mdm=" + immunization.getPatient().getReference()).execute();
 			} else if (immunization.getPatient().getIdentifier() != null) {
 				bundle = (Bundle) client.search().byUrl(
-					"1/Immunization?_tag=" + GOLDEN_SYSTEM_TAG + "|" + GOLDEN_RECORD
+					"/Immunization?_tag=" + GOLDEN_SYSTEM_TAG + "|" + GOLDEN_RECORD
 						+ "&patient.identifier=" + immunization.getPatient().getIdentifier().getSystem()
 						+ "|" + immunization.getPatient().getIdentifier().getValue()
 				);

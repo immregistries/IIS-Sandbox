@@ -103,6 +103,9 @@ public class MappingHelper {
 	public static Coding extensionGetCoding(Extension extension) {
 		return extension.getValueCoding();
 	}
+//	public static String extensionGetCode(Extension extension) {
+//		return extension.getValueCodeType().getValue();
+//	}
 
 	public static org.hl7.fhir.r4.model.Coding extensionGetCoding(org.hl7.fhir.r4.model.Extension extension) {
 		return extension.castToCoding(extension.getValue());

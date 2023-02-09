@@ -1,19 +1,11 @@
 package org.immregistries.iis.kernal.servlet;
 
-import ca.uhn.fhir.context.FhirContext;
-import ca.uhn.fhir.interceptor.model.RequestPartitionId;
-import ca.uhn.fhir.jpa.api.dao.IFhirSystemDao;
-import ca.uhn.fhir.jpa.provider.SubscriptionTriggeringProvider;
-import ca.uhn.fhir.jpa.rp.r5.OperationOutcomeResourceProvider;
-import ca.uhn.fhir.jpa.subscription.match.deliver.resthook.SubscriptionDeliveringRestHookSubscriber;
-import ca.uhn.fhir.jpa.subscription.match.registry.SubscriptionCanonicalizer;
-import ca.uhn.fhir.jpa.subscription.model.ResourceDeliveryMessage;
+
 import ca.uhn.fhir.parser.IParser;
-import ca.uhn.fhir.rest.api.EncodingEnum;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
-import ca.uhn.fhir.rest.server.messaging.BaseResourceMessage;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r5.model.*;
+import org.immregistries.iis.kernal.SubscriptionService;
 import org.immregistries.iis.kernal.model.OrgAccess;
 import org.immregistries.iis.kernal.repository.RepositoryClientFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,17 +25,13 @@ import java.text.SimpleDateFormat;
  */
 public class SubscriptionServlet extends HttpServlet {
 	@Autowired
-	IFhirSystemDao fhirSystemDao;
-	@Autowired
 	RepositoryClientFactory repositoryClientFactory;
 	@Autowired
-	SubscriptionDeliveringRestHookSubscriber subscriptionDeliveringRestHookSubscriber;
-	@Autowired
-	SubscriptionCanonicalizer subscriptionCanonicalizer;
-	@Autowired
-	SubscriptionTriggeringProvider subscriptionTriggeringProvider;
-	@Autowired
-	OperationOutcomeResourceProvider operationOutcomeResourceProvider;
+	SubscriptionService subscriptionService;
+//	@Autowired
+//	SubscriptionTriggeringProvider subscriptionTriggeringProvider;
+//	@Autowired
+//	OperationOutcomeResourceProvider operationOutcomeResourceProvider;
 
 	public static final String PARAM_ACTION = "action";
 	public static final String PARAM_MESSAGE = "message";
@@ -100,44 +88,9 @@ public class SubscriptionServlet extends HttpServlet {
 				}
 				IBaseResource parsedResource = parser.parseResource(message);
 				Subscription subscription = (Subscription) searchBundle.getEntryFirstRep().getResource();
-
-//				MethodOutcome methodOutcome = localClient.create().resource(parsedResource).execute();
-//				List<IPrimitiveType<String>> ids = new ArrayList<>();
-//				ids.add(methodOutcome.getId());
-//				List<IPrimitiveType<String>> urls = new ArrayList<>();
-//				urls.add(new StringType("OperationOutcome?"));
-//				subscriptionTriggeringProvider.triggerSubscription(new IdType(subscription.getId()),ids,urls);
+				subscriptionService.triggerWithResource(subscription, parsedResource);
 
 
-				ResourceDeliveryMessage resourceDeliveryMessage = new ResourceDeliveryMessage();
-				resourceDeliveryMessage.setSubscription(subscriptionCanonicalizer.canonicalize(subscription));
-				resourceDeliveryMessage.setPartitionId(RequestPartitionId.fromPartitionName(""+orgAccess.getAccessName()));
-				resourceDeliveryMessage.setOperationType(BaseResourceMessage.OperationTypeEnum.UPDATE);
-				resourceDeliveryMessage.setPayload(fhirSystemDao.getContext(),parsedResource, EncodingEnum.JSON);
-				subscriptionDeliveringRestHookSubscriber.handleMessage(resourceDeliveryMessage);
-
-
-//				IGenericClient endpointClient = repositoryClientFactory.newGenericClient(subscription.getEndpoint());
-//				Bundle notificationBundle = new Bundle(Bundle.BundleType.SUBSCRIPTIONNOTIFICATION);
-//				SubscriptionStatus status = new SubscriptionStatus()
-//					.setType(SubscriptionStatus.SubscriptionNotificationType.EVENTNOTIFICATION)
-//					.setStatus(subscription.getStatus())
-//					.setSubscription(subscription.getIdentifierFirstRep().getAssigner())
-//					.setEventsInNotification(1)
-//					.setEventsSinceSubscriptionStart(1)
-//					.setTopic(subscription.getTopic());
-//				notificationBundle.addEntry().setResource(status);
-//				notificationBundle.addEntry().setResource((Resource) parsedResource);
-//				MethodOutcome outcome = endpointClient.create().resource(notificationBundle).execute();
-//				if (outcome.getResource() != null) {
-//					out.println(parser.encodeResourceToString(outcome.getResource()));
-//				}
-//				if (outcome.getOperationOutcome() != null) {
-//					out.println(parser.encodeResourceToString(outcome.getOperationOutcome()));
-//				}
-//				if (outcome.getId() != null){
-//					out.println(outcome.getId());
-//				}
 				out.println(message);
 			} else {
 				out.println("NO SUBSCRIPTION FOUND FOR THIS IDENTIFIER");

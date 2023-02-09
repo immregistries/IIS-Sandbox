@@ -112,6 +112,12 @@ public class RepositoryClientFactory extends ApacheRestfulClientFactory implemen
 	}
 
 
+	/**
+	 * Used for manual subscription trigger
+	 *
+	 * @param theServerBase
+	 * @return
+	 */
 	@Override
 	public synchronized IGenericClient newGenericClient(String theServerBase) {
 		asynchInit();
@@ -121,7 +127,7 @@ public class RepositoryClientFactory extends ApacheRestfulClientFactory implemen
 		interceptor.addHeaderValue("Cache-Control", "no-cache");
 		client.registerInterceptor(interceptor);
 		return client;
-	 }
+	}
 
 	@Override
 	public IGenericClient newClient(FhirContext fhirContext, HttpServletRequest httpServletRequest, String s) {

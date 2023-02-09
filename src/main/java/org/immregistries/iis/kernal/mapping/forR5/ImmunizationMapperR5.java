@@ -101,7 +101,7 @@ public class ImmunizationMapperR5 implements ImmunizationMapper<Immunization> {
 		if (i.getLocation() != null && i.getLocation().getReference() != null && !i.getLocation().getReference().isBlank()) {
 			vr.setOrgLocation(fhirRequests.readOrgLocation(i.getLocation().getReference()));
 		}
-		if (i.hasInformationSource() && i.getInformationSource().getReference() != null && !i.getInformationSource().getReference().getReference().isBlank()) {
+		if (i.hasInformationSource() && i.getInformationSource().getReference() != null && i.getInformationSource().getReference().getReference() != null && !i.getInformationSource().getReference().getReference().isBlank()) {
 			vr.setEnteredBy(fhirRequests.readPractitionerPerson(i.getInformationSource().getReference().getReference()));
 		} else {
 //			vr.set

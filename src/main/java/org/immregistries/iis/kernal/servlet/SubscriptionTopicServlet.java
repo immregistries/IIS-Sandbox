@@ -56,6 +56,12 @@ public class SubscriptionTopicServlet extends HttpServlet {
 				.setCurrent("OperationOutcome?")
 			)
 		);
+//		topic.addResourceTrigger(new SubscriptionTopic.SubscriptionTopicResourceTriggerComponent()
+//			.setResource("Immunization")
+//			.setQueryCriteria(new SubscriptionTopic.SubscriptionTopicResourceTriggerQueryCriteriaComponent()
+//				.setCurrent("Immunization?")
+//			)
+//		);
 		topic.addCanFilterBy(new SubscriptionTopic.SubscriptionTopicCanFilterByComponent()
 			.setDescription("test")
 			.setResource("OperationOutcome")
