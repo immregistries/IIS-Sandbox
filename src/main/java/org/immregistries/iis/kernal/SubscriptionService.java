@@ -5,8 +5,8 @@ import ca.uhn.fhir.jpa.api.dao.IFhirSystemDao;
 import ca.uhn.fhir.jpa.subscription.match.deliver.resthook.SubscriptionDeliveringRestHookSubscriber;
 import ca.uhn.fhir.jpa.subscription.match.registry.SubscriptionCanonicalizer;
 import ca.uhn.fhir.jpa.subscription.model.ResourceDeliveryMessage;
-import ca.uhn.fhir.rest.api.EncodingEnum;
 import ca.uhn.fhir.rest.api.MethodOutcome;
+import ca.uhn.fhir.rest.api.server.RequestDetails;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.client.interceptor.AdditionalRequestHeadersInterceptor;
 import ca.uhn.fhir.rest.server.messaging.BaseResourceMessage;
@@ -34,6 +34,24 @@ public class SubscriptionService {
 	SubscriptionDeliveringRestHookSubscriber subscriptionDeliveringRestHookSubscriber;
 	@Autowired
 	SubscriptionCanonicalizer subscriptionCanonicalizer;
+
+	public Subscription searchRelatedSubscription(Immunization baseResource, RequestDetails requestDetails) {
+		OrgAccess orgAccess = (OrgAccess) requestDetails.getAttribute("orgAccess");
+		/**
+		 * define materialization of subscription on immunizaton with
+		 * 	- TAG ?
+		 * 	- Identifier System ?
+		 * 	- $match operations ?
+		 */
+		Bundle bundle = repositoryClientFactory.newGenericClient(orgAccess).search().forResource(Subscription.class)
+			.where(Subscription.STATUS.exactly().code(Enumerations.SubscriptionStatusCodes.ACTIVE.toCode()))
+//			.and(Subscription.IDENTIFIER.hasSystemWithAnyCode(baseResource.getIdentifier()))  TODO change
+//			.and(Subscription.)  TODO change
+			.returnBundle(Bundle.class).execute();
+		Subscription subscription = (Subscription) bundle.getEntryFirstRep().getResource();
+//		subscription.gets
+		return subscription;
+	}
 
 	public String triggerWithResource(Subscription subscription, IBaseResource resource) {
 		try {

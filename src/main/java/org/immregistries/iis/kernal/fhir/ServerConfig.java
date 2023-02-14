@@ -26,6 +26,7 @@ import org.immregistries.iis.kernal.fhir.BulkQuery.BulkQueryGroupProviderR4;
 import org.immregistries.iis.kernal.fhir.BulkQuery.BulkQueryGroupProviderR5;
 import org.immregistries.iis.kernal.fhir.BulkQuery.CustomBulkDataExportProvider;
 import org.immregistries.iis.kernal.fhir.common.StarterJpaConfig;
+import org.immregistries.iis.kernal.fhir.interceptors.MdmCustomInterceptor;
 import org.immregistries.iis.kernal.fhir.interceptors.PartitionCreationInterceptor;
 import ca.uhn.fhir.jpa.subscription.util.SubscriptionDebugLogInterceptor;
 import ca.uhn.fhir.mdm.provider.MdmProviderLoader;
@@ -91,7 +92,10 @@ public class ServerConfig {
 			fhirSystemDao.getContext().setNarrativeGenerator(new NullNarrativeGenerator());
 		}
 
-		if (appProperties.getMdm_enabled()) mdmProviderProvider.get().loadProvider();
+		if (appProperties.getMdm_enabled()) {
+			mdmProviderProvider.get().loadProvider();
+			daoConfig.setAllowMdmExpansion(true);
+		}
 		// CUSTOM PROVIDERS HERE
 		fhirServer.registerProviders(resourceProviderFactory.createProviders());
 		fhirServer.registerProvider(jpaSystemProvider);

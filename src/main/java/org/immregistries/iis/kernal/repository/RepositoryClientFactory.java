@@ -27,14 +27,16 @@ import javax.servlet.http.HttpSession;
 
 import static org.immregistries.iis.kernal.fhir.interceptors.SessionAuthorizationInterceptor.CONNECTATHON_USER;
 
+/**
+ * Generates fhir client to interact with the jpa repository
+ */
 @Component
 public class RepositoryClientFactory extends ApacheRestfulClientFactory implements ITestingUiClientFactory {
-	 @Autowired
-	 private IFhirSystemDao fhirSystemDao;
-    private final Logger logger = LoggerFactory.getLogger(RepositoryClientFactory.class);
-    private LoggingInterceptor loggingInterceptor;
-	 private static String serverBase = "";
-	 private static final String key = "wertyuhkjbasv!#$GFRqer678GaefgAgdf:[rW4r5ty1gv2y1532efu1yeb1 k!@$534t"; // TODO automatic generation at start and chang regularly
+	@Autowired
+	private IFhirSystemDao fhirSystemDao;
+	private final Logger logger = LoggerFactory.getLogger(RepositoryClientFactory.class);
+	private LoggingInterceptor loggingInterceptor;
+	private static String serverBase = "";
 
 	@Autowired
 	public RepositoryClientFactory(){

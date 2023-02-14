@@ -6,6 +6,9 @@ import ca.uhn.fhir.jpa.api.dao.IFhirSystemDao;
 import ca.uhn.fhir.jpa.mdm.dao.MdmLinkDaoSvc;
 import ca.uhn.fhir.jpa.mdm.svc.MdmLinkSvcImpl;
 import ca.uhn.fhir.jpa.mdm.svc.MdmResourceDaoSvc;
+import ca.uhn.fhir.rest.server.TransactionLogMessages;
+import ca.uhn.fhir.rest.server.messaging.ResourceOperationMessage;
+import org.immregistries.iis.kernal.SubscriptionService;
 import org.immregistries.iis.kernal.fhir.mdm.MdmConfigCondition;
 import ca.uhn.fhir.mdm.api.*;
 import ca.uhn.fhir.mdm.model.MdmTransactionContext;
@@ -69,11 +72,22 @@ public class MdmCustomInterceptor {
 	MdmProviderDstu3Plus mdmProvider;
 	@Autowired
 	RepositoryClientFactory repositoryClientFactory;
+
 	@Autowired
 	SessionAuthorizationInterceptor sessionAuthorizationInterceptor;
 
+	@Autowired
+	SubscriptionService subscriptionService;
+
 	private void initialize() {
 		mdmProvider = new MdmProviderDstu3Plus(fhirSystemDao.getContext(), this.myMdmControllerSvc, this.myMdmControllerHelper, this.myMdmSubmitSvc, this.myMdmSettings);
+	}
+
+	@Hook(Pointcut.MDM_AFTER_PERSISTED_RESOURCE_CHECKED)
+	public void test(ResourceOperationMessage resourceOperationMessage, TransactionLogMessages transactionLogMessages, MdmLinkEvent mdmLinkEvent) {
+		logger.info("ResourceOperationMessage {}", resourceOperationMessage.getPayloadString());
+		logger.info("TransactionLogMessages {}", transactionLogMessages.getValues());
+		logger.info("mdmLinkEvent {}", mdmLinkEvent.toString());
 	}
 
 	@Hook(Pointcut.STORAGE_PRECOMMIT_RESOURCE_CREATED)
@@ -83,10 +97,12 @@ public class MdmCustomInterceptor {
 		//TODO find a better way to figure type out
 		try {
 			Immunization immunization = (Immunization) theResource;
+			logger.info("Custom MDM applied for Immunization");
+
 //			if(immunization.hasMeta() && immunization.getMeta().getTag(GOLDEN_SYSTEM_TAG,GOLDEN_RECORD) != null) { // if is golden record
 //				return;
 //			}
-			if (immunization.getPatient() == null){
+			if (immunization.getPatient() == null) {
 				throw new InvalidRequestException("No patient specified");
 			}
 			Deterministic comparer = new Deterministic();
@@ -115,13 +131,17 @@ public class MdmCustomInterceptor {
 			} else {
 				throw new InvalidRequestException("No patient specified");
 			}
+			logger.info("Potential matches found: {}", bundle.getEntry().size());
+
 			boolean hasMatch = false;
-			for (Bundle.BundleEntryComponent entry: bundle.getEntry()){
+			for (Bundle.BundleEntryComponent entry : bundle.getEntry()) {
 				Immunization golden_i = (Immunization) entry.getResource();
 				i2 = toVaccDedupImmunization(golden_i, theRequestDetails);
-				comparison = comparer.compare(i1,i2);
-				String matching_level = (golden_i.getPatient().equals(immunization.getPatient()))? "MATCH" : "POSSIBLE_MATCH";
+				comparison = comparer.compare(i1, i2);
+				String matching_level = (golden_i.getPatient().equals(immunization.getPatient())) ? "MATCH" : "POSSIBLE_MATCH";
 				// TODO scan mdm links to check match level
+				logger.info("Matching level with Immunization {} : {}", golden_i.getId(), matching_level);
+
 				if (comparison.equals(ComparisonResult.EQUAL)) {
 					mdmProvider.createLink(
 						new StringType("Immunization/" + golden_i.getId().split("Immunization/")[1]),
@@ -130,6 +150,8 @@ public class MdmCustomInterceptor {
 						servletRequestDetails
 					);
 					hasMatch = true;
+//					Subscription subscription = client.search().forResource(Subscription.class).where()
+//					subscriptionService.triggerWithResource(subscription,golden_i);
 					break;
 				}
 			}
