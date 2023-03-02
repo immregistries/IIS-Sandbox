@@ -4800,6 +4800,9 @@
             <code-status>
                 <status>Valid</status>
             </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">302</link-to>
+            </reference>
         </code>
         <code>
             <value>91312</value>
@@ -4819,6 +4822,9 @@
             <code-status>
                 <status>Valid</status>
             </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">230</link-to>
+            </reference>
         </code>
         <code>
             <value>91314</value>
@@ -20185,6 +20191,48 @@
             </code-status>
         </code>
         <code>
+            <value>80631-0102-01</value>
+            <label>NOVAVAX COVID-19 Vaccine, Adjuvanted</label>
+            <description>Novavax, Inc. - SARS-COV-2 (COVID-19) vaccine, Subunit, recombinant spike protein-nanoparticle+Matrix-M1 Adjuvant, preservative free, 0.5mL per dose</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">211</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">NVX</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">80631-0102-10</link-to>
+            </reference>
+            <use-date>
+                <not-before>20230201</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>80631-102-01</value>
+            <label>NOVAVAX COVID-19 Vaccine, Adjuvanted</label>
+            <description>Novavax, Inc. - SARS-COV-2 (COVID-19) vaccine, Subunit, recombinant spike protein-nanoparticle+Matrix-M1 Adjuvant, preservative free, 0.5mL per dose</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>80631-0102-01</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20230222</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>80631010201</value>
+            <label>NOVAVAX COVID-19 Vaccine, Adjuvanted</label>
+            <description>Novavax, Inc. - SARS-COV-2 (COVID-19) vaccine, Subunit, recombinant spike protein-nanoparticle+Matrix-M1 Adjuvant, preservative free, 0.5mL per dose</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>80631-0102-01</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20230222</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
             <value>58160-0811-43</value>
             <label>PEDIARIX</label>
             <description>GlaxoSmithKline Biologicals SA - DIPHTHERIA AND TETANUS TOXOIDS AND ACELLULAR PERTUSSIS ADSORBED, HEPATITIS B (RECOMBINANT) AND INACT</description>
@@ -22068,6 +22116,48 @@
                     <new-code-value>58160-0851-01</new-code-value>
                     <reason>Use 11-digit format with dashes</reason>
                     <effective-date>20141113</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>58160-0740-02</value>
+            <label>Rotarix</label>
+            <description>GlaxoSmithKline Biologicals SA - ROTAVIRUS VACCINE, LIVE, ORAL, PRE-FILLED APPLICATOR</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">119</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">SKB</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">58160-0740-21</link-to>
+            </reference>
+            <use-date>
+                <not-before>20230201</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>58160-740-02</value>
+            <label>Rotarix</label>
+            <description>GlaxoSmithKline Biologicals SA - ROTAVIRUS VACCINE, LIVE, ORAL, PRE-FILLED APPLICATOR</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>58160-0740-02</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20230213</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>58160074002</value>
+            <label>Rotarix</label>
+            <description>GlaxoSmithKline Biologicals SA - ROTAVIRUS VACCINE, LIVE, ORAL, PRE-FILLED APPLICATOR</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>58160-0740-02</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20230213</effective-date>
                 </deprecated>
             </code-status>
         </code>
@@ -24327,6 +24417,18 @@
             <concept-type>foreign vaccine</concept-type>
         </code>
         <code>
+            <value>521</value>
+            <label>COVID-19 SP, protein-based, adjuvanted (VidPrevtyn Beta), Sanofi-GSK</label>
+            <description>SARS-COV-2 (COVID-19) vaccine SP, protein-based, adjuvanted, B.1.351 strain (VidPrevtyn Beta), Sanofi-GSK Notes: Pandemic Non-US Vaccine not Authorized by WHO - not counted toward immunity in US</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINE_GROUP">COVID-19</link-to>
+            </reference>
+            <concept-type>foreign vaccine</concept-type>
+        </code>
+        <code>
             <value>211</value>
             <label>COVID-19 vaccine, Subunit, rS-nanoparticle+Matrix-M1 Adjuvant, PF, 0.5 mL</label>
             <description>SARS-COV-2 (COVID-19) vaccine, Subunit, recombinant spike protein-nanoparticle+Matrix-M1 Adjuvant, preservative free, 0.5mL per dose Notes: Pending FDA EUA Authorization</description>
@@ -24340,6 +24442,8 @@
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">80631-0100-10</link-to>
                 <link-to codeset="VACCINATION_CPT_CODE">91304</link-to>
                 <link-to codeset="VACCINATION_TRADE_NAME">Novavax COVID-19 Vaccine (Non-US Tradenames NUVAXOVID, COVOVAX)</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">80631-0102-01</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">80631-0102-10</link-to>
             </reference>
             <use-date>
                 <not-before>20210406</not-before>
@@ -24477,6 +24581,7 @@
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">80777-0283-02</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">80777-0283-99</link-to>
                 <link-to codeset="VACCINATION_TRADE_NAME">Moderna COVID-19 Bivalent, Original + BA.4/BA.5 (Non-US Tradename Spikevax Bivalent)</link-to>
+                <link-to codeset="VACCINATION_CPT_CODE">91316</link-to>
             </reference>
             <use-date>
                 <not-before>20221014</not-before>
@@ -24548,6 +24653,7 @@
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">59267-0609-01</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">59267-0609-02</link-to>
                 <link-to codeset="VACCINATION_TRADE_NAME">Pfizer-BioNTech COVID-19 Bivalent, Original + BA.4/BA.5 (Non-US Tradename COMIRNATY Bivalent)</link-to>
+                <link-to codeset="VACCINATION_CPT_CODE">91317</link-to>
             </reference>
             <use-date>
                 <not-before>20221019</not-before>
@@ -28777,6 +28883,8 @@
                 <link-to codeset="VACCINATION_TRADE_NAME">ROTARIX</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">58160-0851-01</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">58160-0854-52</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">58160-0740-02</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">58160-0740-21</link-to>
             </reference>
             <use-date>
                 <not-before>20100528</not-before>
@@ -30616,6 +30724,8 @@
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">58160-0890-52</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">58160-0827-03</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">58160-0827-30</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">58160-0740-02</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">58160-0740-21</link-to>
             </reference>
             <use-date>
                 <not-before>20100528</not-before>
@@ -31193,6 +31303,8 @@
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">80631-0100-01</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">80631-0100-10</link-to>
                 <link-to codeset="VACCINATION_TRADE_NAME">Novavax COVID-19 Vaccine (Non-US Tradenames NUVAXOVID, COVOVAX)</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">80631-0102-01</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">80631-0102-10</link-to>
             </reference>
             <use-date>
                 <not-before>20100528</not-before>
@@ -32242,6 +32354,7 @@
                 <link-to codeset="VACCINATION_CVX_CODE">518</link-to>
                 <link-to codeset="VACCINATION_CVX_CODE">519</link-to>
                 <link-to codeset="VACCINATION_CVX_CODE">520</link-to>
+                <link-to codeset="VACCINATION_CVX_CODE">521</link-to>
             </reference>
         </code>
         <code>
@@ -60937,6 +61050,48 @@
             </code-status>
         </code>
         <code>
+            <value>80631-0102-10</value>
+            <label>NOVAVAX COVID-19 Vaccine, Adjuvanted</label>
+            <description>Novavax, Inc. - SARS-COV-2 (COVID-19) vaccine, Subunit, recombinant spike protein-nanoparticle+Matrix-M1 Adjuvant, preservative free, 0.5mL per dose</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">211</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">NVX</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">80631-0102-01</link-to>
+            </reference>
+            <use-date>
+                <not-before>20230201</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>80631-102-10</value>
+            <label>NOVAVAX COVID-19 Vaccine, Adjuvanted</label>
+            <description>Novavax, Inc. - SARS-COV-2 (COVID-19) vaccine, Subunit, recombinant spike protein-nanoparticle+Matrix-M1 Adjuvant, preservative free, 0.5mL per dose</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>80631-0102-10</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20230222</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>80631010210</value>
+            <label>NOVAVAX COVID-19 Vaccine, Adjuvanted</label>
+            <description>Novavax, Inc. - SARS-COV-2 (COVID-19) vaccine, Subunit, recombinant spike protein-nanoparticle+Matrix-M1 Adjuvant, preservative free, 0.5mL per dose</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>80631-0102-10</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20230222</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
             <value>58160-0811-52</value>
             <label>PEDIARIX</label>
             <description>GlaxoSmithKline Biologicals SA - DIPHTHERIA AND TETANUS TOXOIDS AND ACELLULAR PERTUSSIS ADSORBED, HEPATITIS B (RECOMBINANT) AND INACT</description>
@@ -63328,6 +63483,48 @@
                     <new-code-value>58160-0854-52</new-code-value>
                     <reason>Use 11-digit format with dashes</reason>
                     <effective-date>20141113</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>58160-0740-21</value>
+            <label>Rotarix</label>
+            <description>GlaxoSmithKline Biologicals SA - ROTAVIRUS VACCINE, LIVE, ORAL, PRE-FILLED APPLICATOR</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">119</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">SKB</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">58160-0740-02</link-to>
+            </reference>
+            <use-date>
+                <not-before>20230201</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>58160-740-21</value>
+            <label>Rotarix</label>
+            <description>GlaxoSmithKline Biologicals SA - ROTAVIRUS VACCINE, LIVE, ORAL, PRE-FILLED APPLICATOR</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>58160-0740-21</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20230213</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>58160074021</value>
+            <label>Rotarix</label>
+            <description>GlaxoSmithKline Biologicals SA - ROTAVIRUS VACCINE, LIVE, ORAL, PRE-FILLED APPLICATOR</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>58160-0740-21</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20230213</effective-date>
                 </deprecated>
             </code-status>
         </code>
