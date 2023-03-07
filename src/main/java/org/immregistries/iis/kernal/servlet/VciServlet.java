@@ -164,8 +164,8 @@ public class VciServlet extends HttpServlet {
 
         message = mapper.writeValueAsString(verifiableCredential);
       }
-      HomeServlet.doHeader(out, session);
-      out.println("    <h2>VCI Demonstration</h2>");
+      HomeServlet.doHeader(out, session, "IIS Sandbox");
+		 out.println("    <h2>VCI Demonstration</h2>");
       out.println("    <form action=\"vciDemo\" method=\"POST\">");
       if (conversionStep == null) {
         out.println("      <h3>Response (RSP) Message</h3>");

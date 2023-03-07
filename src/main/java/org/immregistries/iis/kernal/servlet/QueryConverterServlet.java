@@ -1,6 +1,5 @@
 package org.immregistries.iis.kernal.servlet;
 
-import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.immregistries.smm.tester.manager.query.QueryConverter;
 import org.immregistries.smm.tester.manager.query.QueryType;
@@ -55,8 +54,8 @@ public class QueryConverterServlet extends HttpServlet {
         message = queryConverter.convert(message);
       }
       {
-        HomeServlet.doHeader(out, session);
-        out.println("    <h2>Convert VXU to QBP</h2>");
+        HomeServlet.doHeader(out, session, "IIS Sandbox");
+			out.println("    <h2>Convert VXU to QBP</h2>");
         out.println("    <form action=\"queryConverter\" method=\"POST\">");
         if (queryConverter == null) {
           out.println("      <h3>Update (VXU) Message</h3>");

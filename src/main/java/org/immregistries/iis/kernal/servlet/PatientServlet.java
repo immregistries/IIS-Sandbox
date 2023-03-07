@@ -1,5 +1,6 @@
 package org.immregistries.iis.kernal.servlet;
 
+import ca.uhn.fhir.parser.IParser;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Session;
@@ -7,6 +8,9 @@ import org.hibernate.query.Query;
 import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.Immunization;
 import org.hl7.fhir.r4.model.Observation;
+import org.hl7.fhir.r5.model.Bundle;
+import org.hl7.fhir.r5.model.Resource;
+import org.hl7.fhir.r5.model.Subscription;
 import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
@@ -29,13 +33,15 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import static org.immregistries.iis.kernal.servlet.SubscriptionServlet.PARAM_MESSAGE;
+import static org.immregistries.iis.kernal.servlet.SubscriptionServlet.PARAM_SUBSCRIPTION_ID;
+
 public class PatientServlet extends HttpServlet {
 	@Autowired
 	private RepositoryClientFactory repositoryClientFactory;
 
 	@Autowired
-	FhirRequester fhirRequests;
-
+	FhirRequester fhirRequester;
 	@Autowired
 	PatientMapper patientMapper;
 
@@ -45,8 +51,7 @@ public class PatientServlet extends HttpServlet {
 	public static final String PARAM_PATIENT_NAME_LAST = "patientNameLast";
 	public static final String PARAM_PATIENT_NAME_FIRST = "patientNameFirst";
 	public static final String PARAM_PATIENT_REPORTED_EXTERNAL_LINK = "patientReportedExternalLink";
-
-	public static final String PARAM_PATIENT_REPORTED_ID = "patientReportedId";
+	public static final String PARAM_PATIENT_REPORTED_ID = "patientId";
 
 
 	@Override
@@ -70,7 +75,7 @@ public class PatientServlet extends HttpServlet {
 
     resp.setContentType("text/html");
     PrintWriter out = new PrintWriter(resp.getOutputStream());
-    Session dataSession = PopServlet.getDataSession();
+	  Session dataSession = PopServlet.getDataSession();
 	  IGenericClient fhirClient = repositoryClientFactory.newGenericClient(session);
     try {
       String patientNameLast = req.getParameter(PARAM_PATIENT_NAME_LAST);
@@ -81,11 +86,11 @@ public class PatientServlet extends HttpServlet {
       String action = req.getParameter(PARAM_ACTION);
       if (action != null) {
         if (action.equals(ACTION_SEARCH)) {
-			  patientReportedList = fhirRequests.searchPatientReportedList(
+			  patientReportedList = fhirRequester.searchPatientReportedList(
 				  Patient.FAMILY.matches().value(patientNameLast),
 				  Patient.NAME.matches().value(patientNameFirst),
 				  Patient.IDENTIFIER.exactly().code(patientReportedExternalLink)
-				  );
+			  );
 //			  Bundle bundle = fhirClient
 //				  .search()
 //				  .forResource(Patient.class)
@@ -109,12 +114,12 @@ public class PatientServlet extends HttpServlet {
         patientReportedExternalLink = "";
       }
 
-      HomeServlet.doHeader(out, session);
+		 HomeServlet.doHeader(out, session, "IIS Sandbox - Patients");
 
       out.println("    <h2>" + orgAccess.getOrg().getOrganizationName() + "</h2>");
       PatientReported patientReportedSelected = null;
       if (req.getParameter(PARAM_PATIENT_REPORTED_ID) != null) {
-			patientReportedSelected = fhirRequests.searchPatientReported(
+			patientReportedSelected = fhirRequester.searchPatientReported(
 				Patient.IDENTIFIER.exactly().identifier(req.getParameter(PARAM_PATIENT_REPORTED_ID))
 			);
       }
@@ -146,7 +151,7 @@ public class PatientServlet extends HttpServlet {
         boolean showingRecent = false;
         if (patientReportedList == null) {
 			  showingRecent = true;
-			  patientReportedList = fhirRequests.searchPatientReportedList(); // TODO Paging
+			  patientReportedList = fhirRequester.searchPatientReportedList(); // TODO Paging
 //			  Bundle bundle = fhirClient
 //				  .search()
 //				  .forResource(Patient.class)
@@ -202,125 +207,36 @@ public class PatientServlet extends HttpServlet {
         }
         out.println("  </div>");
       } else {
-        SimpleDateFormat sdfDate = new SimpleDateFormat("MM/dd/yyyy");
-        printPatient(out, patientReportedSelected);
-        out.println("  <div class=\"w3-container\">");
-        out.println("<h4>Vaccinations</h4>");
-        List<VaccinationReported> vaccinationReportedList = null;
-        {
-			  vaccinationReportedList = fhirRequests.searchVaccinationReportedList(
-				  Immunization.PATIENT.hasId(patientReportedSelected.getId())
-			  );
-		  }
-        if (vaccinationReportedList.size() == 0) {
-          out.println("<div class=\"w3-panel w3-yellow\"><p>No Vaccinations</p></div>");
-        } else {
-          CodeMap codeMap = CodeMapManager.getCodeMap();
-          out.println(
-              "<table class=\"w3-table w3-bordered w3-striped w3-border test w3-hoverable\">");
-          out.println("  <tr class=\"w3-green\">");
-          out.println("    <th>Vaccine</th>");
-          out.println("    <th>Admin Date</th>");
-          out.println("    <th>Manufacturer</th>");
-          out.println("    <th>Lot Number</th>");
-          out.println("    <th>Information</th>");
-          out.println("    <th>Completion</th>");
-          out.println("    <th>Action</th>");
-          out.println("  </tr>");
-          out.println("  <tbody>");
-          for (VaccinationReported vaccinationReported : vaccinationReportedList) {
-            out.println("  <tr>");
-            out.println("    <td>");
-            String link = "vaccination?" + VaccinationServlet.PARAM_VACCINATION_REPORTED_ID + "="
-                + vaccinationReported.getVaccinationReportedId();
-            out.println("      <a href=\"" + link + "\">");
-            if (!StringUtils.isEmpty(vaccinationReported.getVaccineCvxCode())) {
-              Code cvxCode = codeMap.getCodeForCodeset(CodesetType.VACCINATION_CVX_CODE,
-                  vaccinationReported.getVaccineCvxCode());
-              if (cvxCode == null) {
-                out.println("Unknown CVX (" + vaccinationReported.getVaccineCvxCode() + ")");
-              } else {
-                out.println(
-                    cvxCode.getLabel() + " (" + vaccinationReported.getVaccineCvxCode() + ")");
-              }
-            }
-            out.println("      </a>");
-            out.println("    </td>");
-            out.println("    <td>");
-            if (vaccinationReported.getAdministeredDate() == null) {
-              out.println("null");
-            } else {
-              out.println(sdfDate.format(vaccinationReported.getAdministeredDate()));
-            }
-            out.println("    </td>");
-            out.println("    <td>");
-            if (!StringUtils.isEmpty(vaccinationReported.getVaccineMvxCode())) {
-              Code mvxCode = codeMap.getCodeForCodeset(CodesetType.VACCINATION_MANUFACTURER_CODE,
-                  vaccinationReported.getVaccineMvxCode());
-              if (mvxCode == null) {
-                out.print("Unknown MVX");
-              } else {
-                out.print(mvxCode.getLabel());
-              }
-              out.println(" (" + vaccinationReported.getVaccineMvxCode() + ")");
-            }
-            out.println("    </td>");
-            out.println("    <td>" + vaccinationReported.getLotnumber() + "</td>");
-            out.println("    <td>");
-            if (!StringUtils.isEmpty(vaccinationReported.getInformationSource())) {
-              Code informationCode =
-                  codeMap.getCodeForCodeset(CodesetType.VACCINATION_INFORMATION_SOURCE,
-                      vaccinationReported.getInformationSource());
-              if (informationCode != null) {
-                out.print(informationCode.getLabel());
-                out.println(" (" + vaccinationReported.getInformationSource() + ")");
-              }
-            }
-            out.println("    </td>");
-            out.println("    <td>");
-            if (!StringUtils.isEmpty(vaccinationReported.getCompletionStatus())) {
-              Code completionCode = codeMap.getCodeForCodeset(CodesetType.VACCINATION_COMPLETION,
-                  vaccinationReported.getCompletionStatus());
-              if (completionCode != null) {
-                out.print(completionCode.getLabel());
-                out.println(" (" + vaccinationReported.getCompletionStatus() + ")");
-              }
-            }
-            out.println("    <td>");
-            if (!StringUtils.isEmpty(vaccinationReported.getActionCode())) {
-              Code actionCode = codeMap.getCodeForCodeset(CodesetType.VACCINATION_ACTION_CODE,
-                  vaccinationReported.getActionCode());
-              if (actionCode != null) {
-                out.print(actionCode.getLabel());
-                out.println(" (" + vaccinationReported.getActionCode() + ")");
-              }
-            }
-            out.println("    </td>");
-            out.println("  </tr>");
-          }
-          out.println("  </tbody>");
-          out.println("</table>");
-        }
 
-        List<ObservationReported> observationReportedList =
-            getObservationList(fhirClient, patientReportedSelected);
+			printPatient(out, patientReportedSelected);
+			printVaccinationList(req, resp, out, fhirClient, patientReportedSelected.getId());
 
-        if (observationReportedList.size() != 0) {
-          out.println("<h4>Patient Observations</h4>");
-          printObservations(out, observationReportedList);
-        }
+			List<ObservationReported> observationReportedList =
+				getObservationList(fhirClient, patientReportedSelected);
 
-        out.println("  </div>");
+			if (observationReportedList.size() != 0) {
+				out.println("<h4>Patient Observations</h4>");
+				printObservations(out, observationReportedList);
+			}
 
-        out.println("  <div class=\"w3-container\">");
+			out.println("  </div>");
 
-        out.println("<h3>Messages Received</h3>");
-        Query query = dataSession.createQuery( // TODO Support MessageReceived mapping through logger or metadata
-            "from MessageReceived where patientReportedId = :patientReportedId order by reportedDate asc");
+			Bundle bundle = fhirClient.search().forResource(Subscription.class).returnBundle(Bundle.class).execute();
+
+			IParser parser = repositoryClientFactory.getFhirContext().newJsonParser().setPrettyPrint(true);
+
+			org.hl7.fhir.r5.model.Patient patient = (org.hl7.fhir.r5.model.Patient) patientMapper.getFhirResource(patientReportedSelected);
+			printSubscriptions(out, parser, bundle, patient);
+
+			out.println("  <div class=\"w3-container\">");
+
+			out.println("<h3>Messages Received</h3>");
+			Query query = dataSession.createQuery( // TODO Support MessageReceived mapping through logger or metadata
+				"from MessageReceived where patientReportedId = :patientReportedId order by reportedDate asc");
 			query.setParameter("patientReportedId", patientReportedSelected.getId());
-        List<MessageReceived> messageReceivedList = new ArrayList<>();
-         messageReceivedList = query.list();
-        if (messageReceivedList.size() == 0) {
+			List<MessageReceived> messageReceivedList = new ArrayList<>();
+			messageReceivedList = query.list();
+			if (messageReceivedList.size() == 0) {
           out.println("<div class=\"w3-panel w3-yellow\"><p>No Messages Received</p></div>");
         } else {
           for (MessageReceived messageReceived : messageReceivedList) {
@@ -340,25 +256,127 @@ public class PatientServlet extends HttpServlet {
         }
 
         out.println("  </div>");
-      }
-    } catch (Exception e) {
-      e.printStackTrace(System.err);
-    } finally {
-      dataSession.close();
-    }
-    HomeServlet.doFooter(out, session);
-    out.flush();
-    out.close();
+		}
+	 } catch (Exception e) {
+		 e.printStackTrace(System.err);
+	 } finally {
+		 dataSession.close();
+	 }
+	  HomeServlet.doFooter(out, session);
+	  out.flush();
+	  out.close();
   }
 
-  public void printObservations(PrintWriter out,
-      List<ObservationReported> observationReportedList) {
-    SimpleDateFormat sdfDate = new SimpleDateFormat("MM/dd/yyyy");
-    out.println("<table class=\"w3-table w3-bordered w3-striped w3-border test w3-hoverable\">");
-    out.println("  <tr class=\"w3-green\">");
-    out.println("    <th>Identifier</th>");
-    out.println("    <th>Value</th>");
-    out.println("    <th>Date</th>");
+	public void printVaccinationList(HttpServletRequest req, HttpServletResponse resp, PrintWriter out, IGenericClient fhirClient, String patientId) {
+		SimpleDateFormat sdfDate = new SimpleDateFormat("MM/dd/yyyy");
+		out.println("  <div class=\"w3-container\">");
+		out.println("<h4>Vaccinations</h4>");
+		List<VaccinationReported> vaccinationReportedList = null;
+		{
+			vaccinationReportedList = fhirRequester.searchVaccinationReportedList(
+				Immunization.PATIENT.hasId(patientId)
+			);
+		}
+		if (vaccinationReportedList.size() == 0) {
+			out.println("<div class=\"w3-panel w3-yellow\"><p>No Vaccinations</p></div>");
+		} else {
+			CodeMap codeMap = CodeMapManager.getCodeMap();
+			out.println(
+				"<table class=\"w3-table w3-bordered w3-striped w3-border test w3-hoverable\">");
+			out.println("  <tr class=\"w3-green\">");
+			out.println("    <th>Vaccine</th>");
+			out.println("    <th>Admin Date</th>");
+			out.println("    <th>Manufacturer</th>");
+			out.println("    <th>Lot Number</th>");
+			out.println("    <th>Information</th>");
+			out.println("    <th>Completion</th>");
+			out.println("    <th>Action</th>");
+			out.println("  </tr>");
+			out.println("  <tbody>");
+			for (VaccinationReported vaccinationReported : vaccinationReportedList) {
+				out.println("  <tr>");
+				out.println("    <td>");
+				String link = "vaccination?" + VaccinationServlet.PARAM_VACCINATION_REPORTED_ID + "="
+					+ vaccinationReported.getVaccinationReportedId();
+				out.println("      <a href=\"" + link + "\">");
+				if (!StringUtils.isEmpty(vaccinationReported.getVaccineCvxCode())) {
+					Code cvxCode = codeMap.getCodeForCodeset(CodesetType.VACCINATION_CVX_CODE,
+						vaccinationReported.getVaccineCvxCode());
+					if (cvxCode == null) {
+						out.println("Unknown CVX (" + vaccinationReported.getVaccineCvxCode() + ")");
+					} else {
+						out.println(
+							cvxCode.getLabel() + " (" + vaccinationReported.getVaccineCvxCode() + ")");
+					}
+				}
+				out.println("      </a>");
+				out.println("    </td>");
+				out.println("    <td>");
+				if (vaccinationReported.getAdministeredDate() == null) {
+					out.println("null");
+				} else {
+					out.println(sdfDate.format(vaccinationReported.getAdministeredDate()));
+				}
+				out.println("    </td>");
+				out.println("    <td>");
+				if (!StringUtils.isEmpty(vaccinationReported.getVaccineMvxCode())) {
+					Code mvxCode = codeMap.getCodeForCodeset(CodesetType.VACCINATION_MANUFACTURER_CODE,
+						vaccinationReported.getVaccineMvxCode());
+					if (mvxCode == null) {
+						out.print("Unknown MVX");
+					} else {
+						out.print(mvxCode.getLabel());
+					}
+					out.println(" (" + vaccinationReported.getVaccineMvxCode() + ")");
+				}
+				out.println("    </td>");
+				out.println("    <td>" + vaccinationReported.getLotnumber() + "</td>");
+				out.println("    <td>");
+				if (!StringUtils.isEmpty(vaccinationReported.getInformationSource())) {
+					Code informationCode =
+						codeMap.getCodeForCodeset(CodesetType.VACCINATION_INFORMATION_SOURCE,
+							vaccinationReported.getInformationSource());
+					if (informationCode != null) {
+						out.print(informationCode.getLabel());
+						out.println(" (" + vaccinationReported.getInformationSource() + ")");
+					}
+				}
+				out.println("    </td>");
+				out.println("    <td>");
+				if (!StringUtils.isEmpty(vaccinationReported.getCompletionStatus())) {
+					Code completionCode = codeMap.getCodeForCodeset(CodesetType.VACCINATION_COMPLETION,
+						vaccinationReported.getCompletionStatus());
+					if (completionCode != null) {
+						out.print(completionCode.getLabel());
+						out.println(" (" + vaccinationReported.getCompletionStatus() + ")");
+					}
+				}
+				out.println("    <td>");
+				if (!StringUtils.isEmpty(vaccinationReported.getActionCode())) {
+					Code actionCode = codeMap.getCodeForCodeset(CodesetType.VACCINATION_ACTION_CODE,
+						vaccinationReported.getActionCode());
+					if (actionCode != null) {
+						out.print(actionCode.getLabel());
+						out.println(" (" + vaccinationReported.getActionCode() + ")");
+					}
+				}
+				out.println("    </td>");
+				out.println("  </tr>");
+			}
+			out.println("  </tbody>");
+			out.println("</table>");
+		}
+	}
+
+
+	public void printObservations(PrintWriter out,
+											List<ObservationReported> observationReportedList) {
+		SimpleDateFormat sdfDate = new SimpleDateFormat("MM/dd/yyyy");
+		out.println("<table class=\"w3-table w3-bordered w3-striped w3-border test w3-hoverable\">");
+		out.println("  <tr class=\"w3-green\">");
+		out.println("    <th>Identifier</th>");
+		out.println("    <th>Value</th>");
+		out.println("    <th>Date</th>");
     out.println("  </tr>");
     out.println("  <tbody>");
     for (ObservationReported observationReported : observationReportedList) {
@@ -521,7 +539,7 @@ public List<ObservationReported> getObservationList(IGenericClient fhirClient,
       PatientReported patientReportedSelected) {
     List<ObservationReported> observationReportedList = new ArrayList<>();
     {
-		 observationReportedList = fhirRequests.searchObservationReportedList(
+		 observationReportedList = fhirRequester.searchObservationReportedList(
 			 Observation.SUBJECT.hasId(patientReportedSelected.getId()));
 //		 observationReportedList = observationReportedList.stream().filter(observationReported -> observationReported.getVaccinationReported() == null).collect(Collectors.toList());
       Set<String> suppressSet = LoincIdentifier.getSuppressIdentifierCodeSet();
@@ -533,15 +551,60 @@ public List<ObservationReported> getObservationList(IGenericClient fhirClient,
       }
     }
     return observationReportedList;
-  }
+}
 
-  public static void printMessageReceived(PrintWriter out, MessageReceived messageReceived) {
-    SimpleDateFormat sdfTime = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
-    out.println("     <h3>" + messageReceived.getCategoryRequest() + " - "
-        + messageReceived.getCategoryResponse() + " "
-        + sdfTime.format(messageReceived.getReportedDate()) + "</h3>");
-    out.println("     <pre>" + messageReceived.getMessageRequest() + "</pre>");
-    out.println("     <pre>" + messageReceived.getMessageResponse() + "</pre>");
-  }
+	public static void printMessageReceived(PrintWriter out, MessageReceived messageReceived) {
+		SimpleDateFormat sdfTime = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+		out.println("     <h3>" + messageReceived.getCategoryRequest() + " - "
+			+ messageReceived.getCategoryResponse() + " "
+			+ sdfTime.format(messageReceived.getReportedDate()) + "</h3>");
+		out.println("     <pre>" + messageReceived.getMessageRequest() + "</pre>");
+		out.println("     <pre>" + messageReceived.getMessageResponse() + "</pre>");
+	}
+
+	public void printSubscriptions(PrintWriter out, IParser parser, Bundle bundle, Resource resource) {
+		String resourceString = parser.encodeResourceToString(resource);
+//		  .replace("\"","\'")
+		out.println("<h4>Send through subscriptions</h4>");
+		out.println("<div class=\"w3-container\">");
+		if (bundle.hasEntry()) {
+			out.println("<table class=\"w3-table w3-bordered w3-striped w3-border test w3-hoverable\">");
+			out.println("  <tr class=\"w3-green\">");
+			out.println("    <th>Name</th>");
+			out.println("    <th>Endpoint</th>");
+			out.println("    <th>Status</th>");
+			out.println("    <th></th>");
+			out.println("  </tr>");
+			out.println("<tbody>");
+			SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+			int count = 0;
+			for (Bundle.BundleEntryComponent entry : bundle.getEntry()) {
+				Subscription subscription = (Subscription) entry.getResource();
+				count++;
+				if (count > 100) {
+					break;
+				}
+				out.println("  <tr>");
+				out.println("    <td><a >" + subscription.getName() + "</a></td>");
+				out.println("    <td><a >" + subscription.getEndpoint() + "</a></td>");
+				out.println("    <td><a >" + subscription.getStatus() + "</a></td>");
+				out.println("<td><form method=\"GET\" action=\"subscription\" target=\"_blank\" style=\"margin: 0;\">");
+				out.println("<input type=\"hidden\" name=\""
+					+ PARAM_SUBSCRIPTION_ID + "\" value=\"" + subscription.getIdentifierFirstRep().getValue() + "\"/>");
+				out.println("<input type=\"hidden\" name=\""
+					+ PARAM_MESSAGE + "\" value='" + resourceString + "'/>");
+				out.println("<input class=\"w3-button w3-teal w3-ripple\" type=\"submit\" name=\"submit\" value=\"Send\" style=\"padding-bottom: 2px;padding-top: 2px;\"/>");
+				out.println("</form></td>");
+				out.println("</tr>");
+			}
+			out.println("</tbody>");
+			out.println("</table>");
+			out.println("</div>");
+		} else {
+			out.println("<div class=\"w3-panel w3-yellow\"><p>No Subscription Found</p></div>");
+		}
+
+
+	}
 
 }

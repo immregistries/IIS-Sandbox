@@ -130,7 +130,7 @@ public class LocationServlet extends HttpServlet {
       List<OrgLocation> orgLocationList = null;
       orgLocationList = fhirRequests.searchOrgLocationList();
 
-      HomeServlet.doHeader(out, session);
+      HomeServlet.doHeader(out, session, "IIS Sandbox");
 
       out.println("    <h2>" + orgAccess.getOrg().getOrganizationName() + "</h2>");
       if (orgLocationSelected == null) {

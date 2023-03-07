@@ -6,7 +6,6 @@ import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.iis.kernal.logic.*;
 import org.immregistries.iis.kernal.mapping.Interfaces.*;
 import org.immregistries.iis.kernal.model.OrgAccess;
-import org.immregistries.iis.kernal.model.PatientReported;
 import org.immregistries.iis.kernal.model.ProcessingFlavor;
 import org.immregistries.smm.tester.manager.HL7Reader;
 import org.immregistries.smm.transform.ScenarioManager;
@@ -117,7 +116,7 @@ public class TestMapping extends HttpServlet {
 				message = testCaseMessage.getMessageText();
 			}
 			{
-				HomeServlet.doHeader(out, session);
+				HomeServlet.doHeader(out, session, "IIS Sandbox");
 				out.println("    <h2>Send Now to Test Mapping</h2>");
 				out.println("    <form action=\"utest\" method=\"POST\" target=\"_blank\">");
 				out.println("      <h3>VXU Message</h3>");

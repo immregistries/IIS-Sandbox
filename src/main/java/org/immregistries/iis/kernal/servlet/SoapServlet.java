@@ -137,8 +137,8 @@ public class SoapServlet extends HttpServlet {
       HttpSession session = req.getSession(true);
       PrintWriter out = resp.getWriter();
       try {
-        HomeServlet.doHeader(out, session);
-        out.println("<h2>CDC SOAP Endpoint</h2>");
+        HomeServlet.doHeader(out, session, "IIS Sandbox");
+			out.println("<h2>CDC SOAP Endpoint</h2>");
         out.println("<p>");
         out.println("This demonstration system supports the use of the ");
         out.println(

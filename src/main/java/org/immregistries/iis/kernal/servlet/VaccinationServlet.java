@@ -1,8 +1,9 @@
 package org.immregistries.iis.kernal.servlet;
 
+import ca.uhn.fhir.parser.IParser;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import org.apache.commons.lang3.StringUtils;
-import org.hl7.fhir.r5.model.Observation;
+import org.hl7.fhir.r5.model.*;
 import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
@@ -35,9 +36,10 @@ public class VaccinationServlet extends PatientServlet {
 	@Autowired
 	PatientMapper patientMapper;
 	@Autowired
-	ImmunizationMapper immunizationMapper;
+	ImmunizationMapper<Immunization> immunizationMapper;
 
-  public static final String PARAM_ACTION = "action";
+	public static final String PARAM_ACTION = "action";
+	public static final String PARAM_RESOURCE = "resource";
 
   public static final String PARAM_VACCINATION_REPORTED_ID = "vaccinationReportedId";
 
@@ -73,7 +75,7 @@ public class VaccinationServlet extends PatientServlet {
       if (action != null) {
       }
 
-      HomeServlet.doHeader(out, session);
+		 HomeServlet.doHeader(out, session, "IIS Sandbox - Vaccinations");
 
       out.println("    <h2>" + orgAccess.getOrg().getOrganizationName() + "</h2>");
       PatientReported patientReportedSelected = fhirRequester.readPatientReported(vaccinationReported.getPatientReportedId());
@@ -154,18 +156,31 @@ public class VaccinationServlet extends PatientServlet {
           }
           out.println("  </tbody>");
           out.println("</table>");
-        }
+		  }
 
-        List<ObservationReported> observationReportedList =
-            getObservationList(fhirClient, vaccinationReported);
+			List<ObservationReported> observationReportedList =
+				getObservationList(fhirClient, vaccinationReported);
 
-        if (observationReportedList.size() != 0) {
-          out.println("<h4>Observations</h4>");
-          printObservations(out, observationReportedList);
-        }
-        out.println("  </div>");
+			if (observationReportedList.size() != 0) {
+				out.println("<h4>Observations</h4>");
+				printObservations(out, observationReportedList);
+			}
+			out.println("  </div>");
 
-      }
+			Bundle bundle = fhirClient.search().forResource(Subscription.class).returnBundle(Bundle.class).execute();
+
+			Immunization immunization = immunizationMapper.getFhirResource(vaccinationReported);
+			/**
+			 * Setting external identifier in reference
+			 */
+			immunization.getPatient().setIdentifier(new Identifier()
+				.setValue(vaccinationReported.getPatientReported().getPatientReportedExternalLink())
+				.setSystem(vaccinationReported.getPatientReported().getPatientReportedAuthority()));
+			IParser parser = repositoryClientFactory.getFhirContext().newJsonParser().setPrettyPrint(true);
+
+			printSubscriptions(out, parser, bundle, immunization);
+
+		}
     } catch (Exception e) {
       e.printStackTrace(System.err);
     }
@@ -201,5 +216,6 @@ public List<ObservationReported> getObservationList(IGenericClient fhirClient,
     out.println("     <pre>" + messageReceived.getMessageRequest() + "</pre>");
     out.println("     <pre>" + messageReceived.getMessageResponse() + "</pre>");
   }
+
 
 }

@@ -14,7 +14,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -95,7 +94,7 @@ public class MessageServlet extends HttpServlet {
           }
         }
       }
-      HomeServlet.doHeader(out, session);
+      HomeServlet.doHeader(out, session, "IIS Sandbox");
       if (messageError != null) {
         out.println("  <div class=\"w3-panel w3-red\">");
         out.println("    <p>" + messageError + "</p>");

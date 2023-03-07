@@ -6,19 +6,16 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Map;
 import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import org.hibernate.Query;
 import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.immregistries.iis.kernal.SoftwareVersion;
 import org.immregistries.iis.kernal.model.OrgAccess;
 import org.immregistries.iis.kernal.model.OrgMaster;
 import org.immregistries.iis.kernal.model.ProcessingFlavor;
-import org.springframework.stereotype.Component;
 
 //@SuppressWarnings("serial")
 //@Component
@@ -43,7 +40,7 @@ public class HomeServlet extends HttpServlet {
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		try {
 			{
-				doHeader(out, session);
+				doHeader(out, session, "IIS Sandbox - Home");
 				String show = req.getParameter(PARAM_SHOW);
 				out.println("    <div class=\"w3-container w3-half w3-margin-top\">");
 				if (show == null) {
@@ -148,10 +145,10 @@ public class HomeServlet extends HttpServlet {
 		out.close();
 	}
 
-	public static void doHeader(PrintWriter out, HttpSession session) {
+	public static void doHeader(PrintWriter out, HttpSession session, String title) {
 		out.println("<html>");
 		out.println("  <head>");
-		out.println("    <title>IIS Sandbox - Pop</title>");
+		out.println("    <title>" + title + "</title>");
 		out.println("    <link rel=\"stylesheet\" href=\"https://www.w3schools.com/w3css/4/w3.css\"/>");
 		out.println("  </head>");
 		out.println("  <body>");

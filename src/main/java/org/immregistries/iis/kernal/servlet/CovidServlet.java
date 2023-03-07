@@ -76,7 +76,7 @@ public class CovidServlet extends HttpServlet {
       String messageError = null;
       String dateStartString = req.getParameter(PARAM_DATE_START);
       String dateEndString = req.getParameter(PARAM_DATE_END);
-      HomeServlet.doHeader(out, session);
+      HomeServlet.doHeader(out, session, "IIS Sandbox");
 
 
       Date dateStart = null;

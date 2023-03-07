@@ -71,7 +71,7 @@ public class FhirTestServlet extends HttpServlet {
     resp.setContentType("text/html");
     PrintWriter out = new PrintWriter(resp.getOutputStream());
 //    Session dataSession = PopServlet.getDataSession();
-    HomeServlet.doHeader(out, session);
+    HomeServlet.doHeader(out, session, "IIS Sandbox");
     try {
 
       try {

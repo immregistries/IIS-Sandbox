@@ -11,7 +11,6 @@ import ca.uhn.fhir.rest.api.server.IBundleProvider;
 import ca.uhn.fhir.rest.api.server.RequestDetails;
 import ca.uhn.fhir.rest.param.TokenParam;
 import ca.uhn.fhir.rest.server.servlet.ServletRequestDetails;
-import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r5.model.*;
 import org.immregistries.iis.kernal.fhir.annotations.OnR5Condition;
 import org.slf4j.Logger;
@@ -44,89 +43,58 @@ public class IdentifierSolverInterceptor {
 	IFhirResourceDao<Patient> patientDao;
 
 	/**
-	 * TODO determine hook
-	 * if immunization solve patient, observation, subject
-	 * <p>
-	 * Point to Golden resource or to same source normal resource ?
+	 * Resolves business identifier resources to actual resources references id
+	 * Currently only Immunization supported
+	 * TODO support Observation and other
+	 * TODO add flavours
 	 */
-
 	@Hook(SERVER_INCOMING_REQUEST_PRE_HANDLED)
 	public void handle(RequestDetails requestDetails, ServletRequestDetails servletRequestDetails, RestOperationTypeEnum restOperationTypeEnum) {
 		try {
 			Immunization immunization = (Immunization) requestDetails.getResource();
-			if (immunization == null || immunization.getPatient().getIdentifier() == null) {
+			if (immunization == null
+				|| immunization.getPatient().getIdentifier() == null
+				|| immunization.getPatient().getIdentifier().getValue() == null
+				|| immunization.getPatient().getIdentifier().getSystem() == null
+			) {
 				return;
 			}
 			Identifier identifier = immunization.getPatient().getIdentifier();
+			String id = null;
 			/**
-			 * searching for patient golden record
+			 * searching for matching patient golden record first
 			 */
-			SearchParameterMap searchParameterMap = new SearchParameterMap()
+			SearchParameterMap goldenSearchParameterMap = new SearchParameterMap()
 				.add("identifier", new TokenParam()
 					.setSystem(identifier.getSystem())
 					.setValue(identifier.getValue()))
-//				.add("_tag", new TokenParam()
-//					.setSystem(GOLDEN_SYSTEM_TAG)
-//					.setValue(GOLDEN_RECORD))
-				;
+				.add("_tag", new TokenParam()
+					.setSystem(GOLDEN_SYSTEM_TAG)
+					.setValue(GOLDEN_RECORD));
 			// TODO get golden record, or merge and add identifiers to golden record
-
-			IBundleProvider bundleProvider = patientDao.search(searchParameterMap, requestDetails);
-			if (bundleProvider.isEmpty()) {
-				// TODO throw exception or set flavor
-				logger.info("No match found for identifier {} {}", identifier.getSystem(), identifier.getValue());
+			IBundleProvider goldenBundleProvider = patientDao.search(goldenSearchParameterMap, requestDetails);
+			if (!goldenBundleProvider.isEmpty()) {
+				id = goldenBundleProvider.getAllResourceIds().get(0);
 			} else {
-				String id = bundleProvider.getAllResourceIds().get(0);
-				logger.info("Identifier reference solved {} to {}", identifier, id);
-				immunization.setPatient(new Reference("Patient/" + new IdType(id).getIdPart()));
+				/**
+				 * If no golden record matched, regular records are checked
+				 */
+				// TODO set flavor
+				SearchParameterMap searchParameterMap = new SearchParameterMap().add("identifier", new TokenParam()
+					.setSystem(identifier.getSystem()).setValue(identifier.getValue()));
+				IBundleProvider bundleProvider = patientDao.search(searchParameterMap, requestDetails);
+				if (!bundleProvider.isEmpty()) {
+					id = bundleProvider.getAllResourceIds().get(0);
+				}
 			}
-		} catch (ClassCastException classCastException) {
+			if (id != null) {
+				logger.info("Identifier reference solved {}|{} to {}", identifier.getSystem(), identifier.getValue(), id);
+				immunization.setPatient(new Reference("Patient/" + new IdType(id).getIdPart()));
+			} else {
+				logger.info("No match found for identifier {} {}", identifier.getSystem(), identifier.getValue());
+				// TODO throw exception or set flavor
 
-		}
-
+			}
+		} catch (ClassCastException classCastException) {}
 	}
-
-	public void solveIdentifierReference(RequestDetails requestDetails, IBaseResource resource) {
-		Immunization immunization = (Immunization) resource;
-		if (immunization.getPatient().getIdentifier() == null) {
-			return;
-		}
-		Identifier identifier = immunization.getPatient().getIdentifier();
-//		IGenericClient client = repositoryClientFactory.newGenericClient(theRequestDetails);
-
-		/**
-		 * searching for patient golden record
-		 */
-		SearchParameterMap searchParameterMap = new SearchParameterMap()
-			.add("_tag", new TokenParam()
-				.setSystem(GOLDEN_SYSTEM_TAG)
-				.setValue(GOLDEN_RECORD))
-			.add("identifier", new TokenParam()
-				.setSystem(identifier.getSystem())
-				.setValue(identifier.getValue()));
-
-		IBundleProvider bundleProvider = patientDao.search(new SearchParameterMap(), requestDetails);
-		if (bundleProvider.isEmpty()) {
-			// TODO throw exception or set flavor
-			logger.info("No match found for identifier {}", identifier);
-		} else {
-			String id = bundleProvider.getAllResourceIds().get(0);
-			logger.info("Identifier reference solved {} to {}", identifier, id);
-
-			immunization.setPatient(new Reference(id));
-		}
-
-
-//		Bundle bundle = (Bundle) client.search().byUrl(
-//			"/Patient?_tag=" + GOLDEN_SYSTEM_TAG + "|" + GOLDEN_RECORD
-//				+ "&identifier=" + immunization.getPatient().getIdentifier().getSystem()
-//				+ "|" + immunization.getPatient().getIdentifier().getValue()
-//		);
-//		if (bundle.hasEntry()) {
-//
-//		}
-
-	}
-
-
 }

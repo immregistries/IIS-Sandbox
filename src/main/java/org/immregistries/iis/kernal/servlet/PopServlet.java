@@ -142,8 +142,8 @@ public class PopServlet extends HttpServlet {
 		 }
 
       {
-        HomeServlet.doHeader(out, session);
-        out.println("    <h2>Send Now</h2>");
+        HomeServlet.doHeader(out, session, "IIS Sandbox - Pop");
+			out.println("    <h2>Send Now</h2>");
         out.println("    <form action=\"pop\" method=\"POST\" target=\"_blank\">");
         out.println("      <h3>VXU Message</h3>");
         out.println("      <textarea class=\"w3-input\" name=\"" + PARAM_MESSAGE

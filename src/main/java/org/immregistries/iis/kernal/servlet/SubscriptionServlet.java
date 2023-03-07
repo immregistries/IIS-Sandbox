@@ -5,13 +5,14 @@ import ca.uhn.fhir.parser.IParser;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r5.model.*;
-import org.immregistries.iis.kernal.SubscriptionService;
+import org.immregistries.iis.kernal.logic.SubscriptionService;
 import org.immregistries.iis.kernal.model.OrgAccess;
 import org.immregistries.iis.kernal.repository.RepositoryClientFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
+import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -28,10 +29,6 @@ public class SubscriptionServlet extends HttpServlet {
 	RepositoryClientFactory repositoryClientFactory;
 	@Autowired
 	SubscriptionService subscriptionService;
-//	@Autowired
-//	SubscriptionTriggeringProvider subscriptionTriggeringProvider;
-//	@Autowired
-//	OperationOutcomeResourceProvider operationOutcomeResourceProvider;
 
 	public static final String PARAM_ACTION = "action";
 	public static final String PARAM_MESSAGE = "message";
@@ -54,6 +51,14 @@ public class SubscriptionServlet extends HttpServlet {
 		"  ]\n" +
 		"}";
 
+	/**
+	 * used to manually trigger
+	 *
+	 * @param req
+	 * @param resp
+	 * @throws ServletException
+	 * @throws IOException
+	 */
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
 		throws ServletException, IOException {
@@ -78,7 +83,6 @@ public class SubscriptionServlet extends HttpServlet {
 //			Subscription subscription = localClient.read().resource(Subscription.class).withId(subscriptionId).execute();
 			if (searchBundle.hasEntry()) {
 
-
 				String message = req.getParameter(PARAM_MESSAGE);
 				IParser parser;
 				if (message.startsWith("<")) {
@@ -89,7 +93,6 @@ public class SubscriptionServlet extends HttpServlet {
 				IBaseResource parsedResource = parser.parseResource(message);
 				Subscription subscription = (Subscription) searchBundle.getEntryFirstRep().getResource();
 				subscriptionService.triggerWithResource(subscription, parsedResource);
-
 
 				out.println(message);
 			} else {
@@ -112,6 +115,7 @@ public class SubscriptionServlet extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
 		throws ServletException, IOException {
+
 		HttpSession session = req.getSession(true);
 		OrgAccess orgAccess = (OrgAccess) session.getAttribute("orgAccess");
 		if (orgAccess == null) {
@@ -139,19 +143,27 @@ public class SubscriptionServlet extends HttpServlet {
 									PrintWriter out,IGenericClient fhirClient, String subscriptionId) {
 		HttpSession session = req.getSession(true);
 		try {
-			HomeServlet.doHeader(out, session);
-
+			HomeServlet.doHeader(out, session, "IIS Sandbox - Subscriptions");
+			ServletInputStream servletInputStream = req.getInputStream();
+			String initialMessage;
+			if (servletInputStream.isReady() && !servletInputStream.isFinished()) {
+				initialMessage = new String(servletInputStream.readAllBytes());
+			} else if (req.getParameter(PARAM_MESSAGE) != null) {
+				initialMessage = req.getParameter(PARAM_MESSAGE);
+			} else {
+				initialMessage = OPERATION_SAMPLE;
+			}
 			Subscription subscription;
 			Bundle bundle = fhirClient.search().forResource(Subscription.class)
 				.where(Subscription.IDENTIFIER.exactly().code(subscriptionId)).returnBundle(Bundle.class).execute();
 			if (bundle.hasEntry()) {
 				subscription = (Subscription) bundle.getEntryFirstRep().getResource();
-				printSubscription(out,subscription);
+				printSubscription(out, subscription);
 				out.println("<form action=\"subscription?identifier=" + subscription.getIdentifierFirstRep().getValue() + "\" method=\"POST\" target=\"_blank\">");
 				out.println("<textarea class=\"w3-input w3-border\" name=\"" + PARAM_MESSAGE + "\"rows=\"15\" cols=\"160\">"
-					+ OPERATION_SAMPLE
+					+ initialMessage
 					+ "</textarea></td>");
-				out.println("<h4>Send OperationOutcome  resource to subscriber</h4>");
+				out.println("<h4>Send FHIR Resource to subscriber</h4>");
 				out.println("<input class=\"w3-button w3-section w3-teal w3-ripple\" type=\"submit\" name=\"submit\" value=\"Submit\"/>");
 				out.println("</form>");
 
@@ -167,8 +179,8 @@ public class SubscriptionServlet extends HttpServlet {
 
 	}
 
-	private void printSearchAndSelect(HttpServletRequest req, HttpServletResponse resp,
-												 PrintWriter out,IGenericClient fhirClient) {
+	public static void printSearchAndSelect(HttpServletRequest req, HttpServletResponse resp,
+														 PrintWriter out, IGenericClient fhirClient) {
 		HttpSession session = req.getSession(true);
 		try {
 			Bundle bundle;
@@ -186,18 +198,16 @@ public class SubscriptionServlet extends HttpServlet {
 				bundle = fhirClient.search().forResource(Subscription.class).returnBundle(Bundle.class).execute();
 			}
 
-			HomeServlet.doHeader(out, session);
+			HomeServlet.doHeader(out, session, "IIS Sandbox - Subscriptions");
 
 			out.println("    <div class=\"w3-container w3-half w3-margin-top\">");
 			out.println("    <h3>Search Subscription</h3>");
-			out.println(
-				"    <form method=\"GET\" action=\"subscription\" class=\"w3-container w3-card-4\">");
+			out.println("	  <form method=\"GET\" action=\"subscription\" class=\"w3-container w3-card-4\">");
 			out.println("      <input class=\"w3-input\" type=\"text\" name=\""
 				+ PARAM_SUBSCRIPTION_ENDPOINT + "\" value=\"" + endpoint + "\"/>");
 			out.println("      <label>ENDPOINT</label>");
-			out.println(
-				"          <input class=\"w3-button w3-section w3-teal w3-ripple\" type=\"submit\" name=\""
-					+ PARAM_ACTION + "\" value=\"" + ACTION_SEARCH + "\"/>");
+			out.println("<input class=\"w3-button w3-section w3-teal w3-ripple\" type=\"submit\" name=\""
+				+ PARAM_ACTION + "\" value=\"" + ACTION_SEARCH + "\"/>");
 			out.println("    </form>");
 			out.println("    </div>");
 
@@ -207,6 +217,7 @@ public class SubscriptionServlet extends HttpServlet {
 				out.println(
 					"<table class=\"w3-table w3-bordered w3-striped w3-border test w3-hoverable\">");
 				out.println("  <tr class=\"w3-green\">");
+				out.println("    <th>Name</th>");
 				out.println("    <th>Endpoint</th>");
 				out.println("    <th>Status</th>");
 				out.println("  </tr>");
@@ -223,13 +234,15 @@ public class SubscriptionServlet extends HttpServlet {
 						+ subscription.getIdentifierFirstRep().getValue(); // TODO or id
 					out.println("  <tr>");
 					out.println("    <td><a href=\"" + link + "\">"
+						+ subscription.getName() + "</a></td>");
+					out.println("    <td><a href=\"" + link + "\">"
 						+ subscription.getEndpoint() + "</a></td>");
 					out.println("    <td><a href=\"" + link + "\">"
 						+ subscription.getStatus() + "</a></td>");
 					out.println("  </tr>");
 				}
 				out.println("  </tbody>");
-				out.println("</table>");
+				out.println("</table></div>");
 
 				if (count > 100) {
 					out.println("<em>Only the first 100 are shown</em>");
@@ -250,6 +263,10 @@ public class SubscriptionServlet extends HttpServlet {
 		out.println("    <div class=\"w3-container w3-half w3-margin-top\">");
 		out.println("<table class=\"w3-table w3-bordered w3-striped w3-border test w3-hoverable\">");
 		out.println("  <tbody>");
+		out.println("  <tr>");
+		out.println("    <th class=\"w3-green\">Name</th>");
+		out.println("    <td>" + subscription.getName() + "</td>");
+		out.println("  </tr>");
 		out.println("  <tr>");
 		out.println("    <th class=\"w3-green\">Identifier</th>");
 		out.println("    <td>" + subscription.getIdentifierFirstRep().getValue() + "</td>");

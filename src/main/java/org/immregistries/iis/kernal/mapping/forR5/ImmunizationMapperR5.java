@@ -149,8 +149,13 @@ public class ImmunizationMapperR5 implements ImmunizationMapper<Immunization> {
   public Immunization getFhirResource(VaccinationReported vr) {
 	  Immunization i = new Immunization();
 	  i.addIdentifier(MappingHelper.getFhirIdentifier(vr.getVaccinationReportedExternalLinkSystem(), vr.getVaccinationReportedExternalLink())); // TODO if system empty ?
-	  i.setPatient(new Reference().setReference("Patient/" + vr.getPatientReported().getId()));
-//	  i.setRecorded(vr.getReportedDate());
+	  Reference patientReference = new Reference()
+		  .setReference("Patient/" + vr.getPatientReported().getId())
+//		  .setIdentifier(new Identifier()
+//			  .setValue(vr.getPatientReported().getPatientReportedExternalLink())
+//			  .setSystem(vr.getPatientReported().getPatientReportedAuthority()))
+		  ;
+	  i.setPatient(patientReference);
 	  if (vr.getReportedDate() != null) {
 		  Extension recorded = i.addExtension()
 			  .setUrl(RECORDED)
@@ -158,10 +163,10 @@ public class ImmunizationMapperR5 implements ImmunizationMapper<Immunization> {
 	  }
 	  i.getOccurrenceDateTimeType().setValue(vr.getAdministeredDate());
 
-	  if (!vr.getVaccineCvxCode().isBlank()) {
+	  if (vr.getVaccineCvxCode() != null && !vr.getVaccineCvxCode().isBlank()) {
 		  i.getVaccineCode().addCoding().setCode(vr.getVaccineCvxCode()).setSystem(CVX);
 	  }
-	  if (!vr.getVaccineNdcCode().isBlank()) {
+	  if (vr.getVaccineNdcCode() != null && !vr.getVaccineNdcCode().isBlank()) {
 		  i.getVaccineCode().addCoding().setCode(vr.getVaccineNdcCode()).setSystem(NDC);
 	  }
 	  i.setManufacturer(MappingHelper.getFhirCodeableReference(MappingHelper.ORGANISATION, MVX, vr.getVaccineMvxCode()));

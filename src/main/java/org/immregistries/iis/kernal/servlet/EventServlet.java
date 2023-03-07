@@ -88,8 +88,8 @@ public class EventServlet extends PopServlet {
         facilityId = "Mercy Healthcare";
       }
       {
-        HomeServlet.doHeader(out, session);
-        out.println("    <h2>Send Now</h2>");
+        HomeServlet.doHeader(out, session, "IIS Sandbox");
+			out.println("    <h2>Send Now</h2>");
         out.println("    <form action=\"event\" method=\"POST\" target=\"_blank\">");
         out.println("    <div class=\"w3-container w3-half w3-margin-top\">");
         out.println("    <div class=\"w3-container w3-card-4\">");

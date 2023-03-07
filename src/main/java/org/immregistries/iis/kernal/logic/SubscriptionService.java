@@ -1,15 +1,12 @@
-package org.immregistries.iis.kernal;
+package org.immregistries.iis.kernal.logic;
 
-import ca.uhn.fhir.interceptor.model.RequestPartitionId;
 import ca.uhn.fhir.jpa.api.dao.IFhirSystemDao;
 import ca.uhn.fhir.jpa.subscription.match.deliver.resthook.SubscriptionDeliveringRestHookSubscriber;
 import ca.uhn.fhir.jpa.subscription.match.registry.SubscriptionCanonicalizer;
-import ca.uhn.fhir.jpa.subscription.model.ResourceDeliveryMessage;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.api.server.RequestDetails;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.client.interceptor.AdditionalRequestHeadersInterceptor;
-import ca.uhn.fhir.rest.server.messaging.BaseResourceMessage;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r5.model.*;
 import org.immregistries.iis.kernal.model.OrgAccess;
@@ -18,7 +15,6 @@ import org.immregistries.iis.kernal.servlet.ServletHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
 
@@ -53,9 +49,9 @@ public class SubscriptionService {
 		return subscription;
 	}
 
-	public String triggerWithResource(Subscription subscription, IBaseResource resource) {
+	public String triggerWithResource(Subscription subscription, IBaseResource... resources) {
 		try {
-			OrgAccess orgAccess = ServletHelper.getOrgAccess();
+//			OrgAccess orgAccess = ServletHelper.getOrgAccess();
 
 //			ResourceDeliveryMessage resourceDeliveryMessage = new ResourceDeliveryMessage();
 //			resourceDeliveryMessage.setSubscription(subscriptionCanonicalizer.canonicalize(subscription));
@@ -80,13 +76,19 @@ public class SubscriptionService {
 				.setType(SubscriptionStatus.SubscriptionNotificationType.EVENTNOTIFICATION)
 				.setStatus(subscription.getStatus())
 //				.setSubscription(subscription.getIdentifierFirstRep().getAssigner())
-				.setSubscription(new Reference(subscription.getId()))
+				.setSubscription(new Reference().setIdentifier(subscription.getIdentifierFirstRep()))
 //				.set
 //				.setEventsInNotification(1)
-				.setEventsSinceSubscriptionStart(1)
+//				.setEventsSinceSubscriptionStart(1)
 				.setTopic(subscription.getTopic());
+			/**
+			 * First entry is SubscriptionStatus
+			 */
 			notificationBundle.addEntry().setResource(status);
-			notificationBundle.addEntry().setResource((Resource) resource);
+			for (IBaseResource resource : resources) {
+				notificationBundle.addEntry().setResource((Resource) resource);
+			}
+
 			MethodOutcome outcome = endpointClient.create().resource(notificationBundle).execute();
 			if (outcome.getResource() != null) {
 //				out.println(parser.encodeResourceToString(outcome.getResource()));

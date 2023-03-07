@@ -1,6 +1,5 @@
 package org.immregistries.iis.kernal.servlet;
 
-import org.hibernate.Session;
 import org.immregistries.smm.tester.TestCovidReporting;
 
 import javax.servlet.ServletException;
@@ -56,7 +55,7 @@ public class CovidGenerateServlet extends HttpServlet {
         includeMissed = req.getParameter(PARAM_INCLUDE_MISSED) != null;
         includeSerology = req.getParameter(PARAM_INCLUDE_SEROLOGY) != null;
       }
-      HomeServlet.doHeader(out, session);
+      HomeServlet.doHeader(out, session, "IIS Sandbox");
 
 
 
