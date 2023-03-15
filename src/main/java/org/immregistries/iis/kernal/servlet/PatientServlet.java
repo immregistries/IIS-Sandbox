@@ -116,7 +116,7 @@ public class PatientServlet extends HttpServlet {
 
 		 HomeServlet.doHeader(out, session, "IIS Sandbox - Patients");
 
-      out.println("    <h2>" + orgAccess.getOrg().getOrganizationName() + "</h2>");
+      out.println("    <h2>Facility : " + orgAccess.getOrg().getOrganizationName() + "</h2>");
       PatientReported patientReportedSelected = null;
       if (req.getParameter(PARAM_PATIENT_REPORTED_ID) != null) {
 			patientReportedSelected = fhirRequester.searchPatientReported(
@@ -223,7 +223,7 @@ public class PatientServlet extends HttpServlet {
 
 			Bundle bundle = fhirClient.search().forResource(Subscription.class).returnBundle(Bundle.class).execute();
 
-			IParser parser = repositoryClientFactory.getFhirContext().newJsonParser().setPrettyPrint(true);
+			IParser parser = repositoryClientFactory.getFhirContext().newJsonParser().setPrettyPrint(true).setSummaryMode(true).setSuppressNarratives(true);
 
 			org.hl7.fhir.r5.model.Patient patient = (org.hl7.fhir.r5.model.Patient) patientMapper.getFhirResource(patientReportedSelected);
 			printSubscriptions(out, parser, bundle, patient);

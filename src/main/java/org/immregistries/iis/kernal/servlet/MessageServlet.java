@@ -141,8 +141,8 @@ public class MessageServlet extends HttpServlet {
         out.println("    </div>");
       } else {
         out.println("    <div class=\"w3-container w3-half w3-margin-top\">");
-        out.println("    <h2>" + orgAccess.getOrg().getOrganizationName() + "</h2>");
-        out.println("    <h3>Messages Recently Received</h3>");
+			out.println("    <h2>Facility: " + orgAccess.getOrg().getOrganizationName() + "</h2>");
+			out.println("    <h3>Messages Recently Received</h3>");
         String search = req.getParameter(PARAM_SEARCH);
         if (search == null) {
           search = "";

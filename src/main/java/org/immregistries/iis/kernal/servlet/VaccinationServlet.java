@@ -71,25 +71,24 @@ public class VaccinationServlet extends PatientServlet {
 //			 fhirRequests.searchVaccinationReported(fhirClient,
 //			 Immunization.IDENTIFIER.exactly().code(req.getParameter(PARAM_VACCINATION_REPORTED_ID)));
 
-      String action = req.getParameter(PARAM_ACTION);
-      if (action != null) {
-      }
+		 String action = req.getParameter(PARAM_ACTION);
+		 if (action != null) {
+		 }
 
 		 HomeServlet.doHeader(out, session, "IIS Sandbox - Vaccinations");
 
-      out.println("    <h2>" + orgAccess.getOrg().getOrganizationName() + "</h2>");
-      PatientReported patientReportedSelected = fhirRequester.readPatientReported(vaccinationReported.getPatientReportedId());
-      {
-        printPatient(out, patientReportedSelected);
-        SimpleDateFormat sdfDate = new SimpleDateFormat("MM/dd/yyyy");
-        out.println("  <div class=\"w3-container\">");
-        out.println("<h4>Vaccination</h4>");
-        {
-          CodeMap codeMap = CodeMapManager.getCodeMap();
-          out.println(
-              "<table class=\"w3-table w3-bordered w3-striped w3-border test w3-hoverable\">");
-          out.println("  <tr class=\"w3-green\">");
-          out.println("    <th>Vaccine</th>");
+		 out.println("<h2>Facility : " + orgAccess.getOrg().getOrganizationName() + "</h2>");
+		 PatientReported patientReportedSelected = fhirRequester.readPatientReported(vaccinationReported.getPatientReportedId());
+		 {
+			 printPatient(out, patientReportedSelected);
+			 SimpleDateFormat sdfDate = new SimpleDateFormat("MM/dd/yyyy");
+			 out.println("  <div class=\"w3-container\">");
+			 out.println("<h4>Vaccination</h4>");
+			 {
+				 CodeMap codeMap = CodeMapManager.getCodeMap();
+				 out.println("<table class=\"w3-table w3-bordered w3-striped w3-border test w3-hoverable\">");
+				 out.println("  <tr class=\"w3-green\">");
+				 out.println("    <th>Vaccine</th>");
           out.println("    <th>Admin Date</th>");
           out.println("    <th>Manufacturer</th>");
           out.println("    <th>Lot Number</th>");

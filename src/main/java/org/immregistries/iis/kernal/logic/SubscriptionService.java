@@ -17,6 +17,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 
 @Service
 public class SubscriptionService {
@@ -49,7 +51,8 @@ public class SubscriptionService {
 		return subscription;
 	}
 
-	public String triggerWithResource(Subscription subscription, IBaseResource... resources) {
+
+	public String triggerWithResource(Subscription subscription, List<IBaseResource> resources) {
 		try {
 //			OrgAccess orgAccess = ServletHelper.getOrgAccess();
 
@@ -67,7 +70,6 @@ public class SubscriptionService {
 			AdditionalRequestHeadersInterceptor additionalRequestHeadersInterceptor = new AdditionalRequestHeadersInterceptor();
 			for (StringType header : subscription.getHeader()) {
 				String[] headerSplit = header.getValue().split(":");
-				logger.info("Subscription header is : {}", header.getValue());
 				additionalRequestHeadersInterceptor.addHeaderValue(headerSplit[0], headerSplit[1]);
 			}
 			endpointClient.registerInterceptor(additionalRequestHeadersInterceptor);

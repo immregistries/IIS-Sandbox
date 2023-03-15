@@ -20,6 +20,10 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Only Supported with Fhir R5
@@ -35,6 +39,7 @@ public class SubscriptionServlet extends HttpServlet {
 	public static final String ACTION_SEARCH = "search";
 	public static final String PARAM_SUBSCRIPTION_ENDPOINT = "endpoint";
 	public static final String PARAM_SUBSCRIPTION_ID = "identifier";
+	public static final String PARAM_FORM_LENGTH = "formLength";
 	private static final String OPERATION_SAMPLE = "{\n" +
 		"  \"resourceType\": \"OperationOutcome\",\n" +
 		"  \"id\": \"generated\",\n" +
@@ -77,24 +82,33 @@ public class SubscriptionServlet extends HttpServlet {
 
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
+		HomeServlet.doHeader(out, session, "IIS Sandbox - SubscriptionsResult");
+
 		try {
 			Bundle searchBundle = localClient.search().forResource(Subscription.class)
 				.where(Subscription.IDENTIFIER.exactly().identifier(subscriptionId)).returnBundle(Bundle.class).execute();
 //			Subscription subscription = localClient.read().resource(Subscription.class).withId(subscriptionId).execute();
 			if (searchBundle.hasEntry()) {
 
-				String message = req.getParameter(PARAM_MESSAGE);
+				String[] messages = req.getParameterValues(PARAM_MESSAGE);
 				IParser parser;
-				if (message.startsWith("<")) {
-					parser = repositoryClientFactory.getFhirContext().newXmlParser();
-				} else {
-					parser = repositoryClientFactory.getFhirContext().newJsonParser();
+				List<IBaseResource> parsedResources = new ArrayList<>();
+				for (String message : messages
+				) {
+					if (!message.isBlank()) {
+						if (message.startsWith("<")) {
+							parser = repositoryClientFactory.getFhirContext().newXmlParser();
+						} else {
+							parser = repositoryClientFactory.getFhirContext().newJsonParser();
+						}
+						parsedResources.add(parser.parseResource(message));
+					}
 				}
-				IBaseResource parsedResource = parser.parseResource(message);
-				Subscription subscription = (Subscription) searchBundle.getEntryFirstRep().getResource();
-				subscriptionService.triggerWithResource(subscription, parsedResource);
 
-				out.println(message);
+				Subscription subscription = (Subscription) searchBundle.getEntryFirstRep().getResource();
+				subscriptionService.triggerWithResource(subscription, parsedResources);
+
+				out.println("SENT");
 			} else {
 				out.println("NO SUBSCRIPTION FOUND FOR THIS IDENTIFIER");
 			}
@@ -108,8 +122,6 @@ public class SubscriptionServlet extends HttpServlet {
 		out.close();
 //		doGet(req, resp);
 	}
-
-
 
 
 	@Override
@@ -145,26 +157,54 @@ public class SubscriptionServlet extends HttpServlet {
 		try {
 			HomeServlet.doHeader(out, session, "IIS Sandbox - Subscriptions");
 			ServletInputStream servletInputStream = req.getInputStream();
-			String initialMessage;
+
+			String[] initialMessages = new String[]{OPERATION_SAMPLE};
+
 			if (servletInputStream.isReady() && !servletInputStream.isFinished()) {
-				initialMessage = new String(servletInputStream.readAllBytes());
+				initialMessages[0] = new String(servletInputStream.readAllBytes()); // TODO check array
 			} else if (req.getParameter(PARAM_MESSAGE) != null) {
-				initialMessage = req.getParameter(PARAM_MESSAGE);
-			} else {
-				initialMessage = OPERATION_SAMPLE;
+				initialMessages = req.getParameterValues(PARAM_MESSAGE);
 			}
+
+			int initialMessageLength = initialMessages.length;
+			int formLength = initialMessageLength;
+			if (req.getParameter(PARAM_FORM_LENGTH) != null) {
+				formLength = Math.max(Integer.parseInt(req.getParameter(PARAM_FORM_LENGTH)), initialMessages.length);
+			}
+
+
 			Subscription subscription;
 			Bundle bundle = fhirClient.search().forResource(Subscription.class)
 				.where(Subscription.IDENTIFIER.exactly().code(subscriptionId)).returnBundle(Bundle.class).execute();
 			if (bundle.hasEntry()) {
 				subscription = (Subscription) bundle.getEntryFirstRep().getResource();
 				printSubscription(out, subscription);
+				out.println("<form action=\"" + req.getRequestURI() + "\" method=\"Get\" target=\"_blank\">");
+				out.println("<input type=\"hidden\" name=\"" + PARAM_FORM_LENGTH + "\" value=\"" + (formLength + 1) + "\"/>");
+				for (Map.Entry<String, String[]> param : req.getParameterMap().entrySet()) {
+					for (String value : param.getValue()) {
+						if (!param.getKey().equals(PARAM_FORM_LENGTH) && !param.getKey().equals("submit")) {
+							out.println("<input type=\"hidden\" name=\"" + param.getKey() + "\" value=\"" + value.strip() + "\"/>");
+						}
+					}
+				}
+				out.println("<input class=\"w3-button w3-section w3-teal w3-ripple\" type=\"submit\" name=\"submit\" value=\"Open tab with extra space\"/>");
+				out.println("</form>");
+
 				out.println("<form action=\"subscription?identifier=" + subscription.getIdentifierFirstRep().getValue() + "\" method=\"POST\" target=\"_blank\">");
-				out.println("<textarea class=\"w3-input w3-border\" name=\"" + PARAM_MESSAGE + "\"rows=\"15\" cols=\"160\">"
-					+ initialMessage
-					+ "</textarea></td>");
-				out.println("<h4>Send FHIR Resource to subscriber</h4>");
-				out.println("<input class=\"w3-button w3-section w3-teal w3-ripple\" type=\"submit\" name=\"submit\" value=\"Submit\"/>");
+				for (int i = 0; i < formLength; i++) {
+
+					out.println("<div class=\"w3-half\">");
+					out.println("<textarea class=\"w3-input w3-border\" name=\"" + PARAM_MESSAGE + "\"rows=\"15\" cols=\"160\">");
+					if (initialMessageLength > i) {
+						out.println(initialMessages[i]);
+					}
+					out.println("</textarea>");
+					out.println("</div>");
+				}
+				out.println("<div class=\"\"><h4>Send FHIR Resource to subscriber</h4>");
+				out.println("	<input class=\"w3-button w3-section w3-teal w3-ripple\" type=\"submit\" name=\"submit\" value=\"Submit\"/>");
+				out.println("</div>");
 				out.println("</form>");
 
 
@@ -260,7 +300,7 @@ public class SubscriptionServlet extends HttpServlet {
 
 	public void printSubscription(PrintWriter out, Subscription subscription) {
 		SimpleDateFormat sdfDate = new SimpleDateFormat("MM/dd/yyyy");
-		out.println("    <div class=\"w3-container w3-half w3-margin-top\">");
+		out.println("    <div class=\"w3-container w3-half w3-margin\">");
 		out.println("<table class=\"w3-table w3-bordered w3-striped w3-border test w3-hoverable\">");
 		out.println("  <tbody>");
 		out.println("  <tr>");

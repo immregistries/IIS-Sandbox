@@ -66,6 +66,7 @@ public class PopServlet extends HttpServlet {
           out.println(
               "Access is not authorized. Facilityid, userid and/or password are not recognized. ");
         } else {
+			  HomeServlet.doHeader(out, session, "IIS Sandbox - PopResult");
 			  session.setAttribute("orgAccess", orgAccess);
 			  messages = message.split("MSH\\|\\^~\\\\&\\|");
 			  if (messages.length > 2) {
@@ -88,12 +89,15 @@ public class PopServlet extends HttpServlet {
 				  repositoryClientFactory.newGenericClient(orgAccess).create().resource(group).execute();
 			  }
 		  }
-      } finally {
-        dataSession.close();
-      }
-      resp.setContentType("text/plain");
-      out.print(ack);
-    } catch (Exception e) {
+		} finally {
+			dataSession.close();
+		}
+//      resp.setContentType("text/plain");
+			out.println("<p>");
+			out.print(ack);
+			out.println("<p>");
+
+		} catch (Exception e) {
       resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
       e.printStackTrace(out);
       e.printStackTrace(System.err);
