@@ -149,6 +149,7 @@ public class HomeServlet extends HttpServlet {
 		out.println("<html>");
 		out.println("  <head>");
 		out.println("    <title>" + title + "</title>");
+		out.println("	  <link rel=\"icon\" type=\"image/x-icon\" href=\"img/favicon.ico\">");
 		out.println("    <link rel=\"stylesheet\" href=\"https://www.w3schools.com/w3css/4/w3.css\"/>");
 		out.println("  </head>");
 		out.println("  <body>");

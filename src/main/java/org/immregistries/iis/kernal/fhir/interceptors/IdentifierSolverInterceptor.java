@@ -10,6 +10,7 @@ import ca.uhn.fhir.rest.api.RestOperationTypeEnum;
 import ca.uhn.fhir.rest.api.server.IBundleProvider;
 import ca.uhn.fhir.rest.api.server.RequestDetails;
 import ca.uhn.fhir.rest.param.TokenParam;
+import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
 import ca.uhn.fhir.rest.server.servlet.ServletRequestDetails;
 import org.hl7.fhir.r5.model.*;
 import org.immregistries.iis.kernal.fhir.annotations.OnR5Condition;
@@ -22,6 +23,7 @@ import org.springframework.stereotype.Service;
 import javax.interceptor.Interceptor;
 
 import static ca.uhn.fhir.interceptor.api.Pointcut.SERVER_INCOMING_REQUEST_PRE_HANDLED;
+import static org.immregistries.iis.kernal.mapping.Interfaces.PatientMapper.MRN_SYSTEM;
 import static org.immregistries.iis.kernal.repository.FhirRequester.GOLDEN_RECORD;
 import static org.immregistries.iis.kernal.repository.FhirRequester.GOLDEN_SYSTEM_TAG;
 
@@ -49,7 +51,11 @@ public class IdentifierSolverInterceptor {
 	 * TODO add flavours
 	 */
 	@Hook(SERVER_INCOMING_REQUEST_PRE_HANDLED)
-	public void handle(RequestDetails requestDetails, ServletRequestDetails servletRequestDetails, RestOperationTypeEnum restOperationTypeEnum) {
+	public void handle(RequestDetails requestDetails,
+							 ServletRequestDetails servletRequestDetails,
+							 RestOperationTypeEnum restOperationTypeEnum)
+		throws InvalidRequestException {
+
 		try {
 			Immunization immunization = (Immunization) requestDetails.getResource();
 			if (immunization == null
@@ -91,9 +97,12 @@ public class IdentifierSolverInterceptor {
 				logger.info("Identifier reference solved {}|{} to {}", identifier.getSystem(), identifier.getValue(), id);
 				immunization.setPatient(new Reference("Patient/" + new IdType(id).getIdPart()));
 			} else {
-				logger.info("No match found for identifier {} {}", identifier.getSystem(), identifier.getValue());
-				// TODO throw exception or set flavor
-
+				// TODO set flavor
+				if (identifier.getSystem().equals(MRN_SYSTEM)) {
+					throw new InvalidRequestException("There is no matching patient for MRN " + identifier.getValue());
+				} else {
+					throw new InvalidRequestException("There is no matching patient for " + identifier.getSystem() + " " + identifier.getValue());
+				}
 			}
 		} catch (ClassCastException classCastException) {}
 	}

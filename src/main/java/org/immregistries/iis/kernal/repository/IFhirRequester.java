@@ -1,6 +1,7 @@
 package org.immregistries.iis.kernal.repository;
 
 import ca.uhn.fhir.rest.gclient.ICriterion;
+import org.hl7.fhir.instance.model.api.IBaseBundle;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r5.model.Immunization;
 import org.hl7.fhir.r5.model.RelatedPerson;
@@ -43,14 +44,27 @@ public interface IFhirRequester<
 	public PatientReported savePatientReported(PatientReported patientReported);
 	public ModelPerson savePractitioner(ModelPerson modelPerson);
 	public ObservationReported saveObservationReported(ObservationReported observationReported);
+
 	public VaccinationReported saveVaccinationReported(VaccinationReported vaccinationReported);
+
 	public OrgLocation saveOrgLocation(OrgLocation orgLocation);
+
 	public Organization saveOrganization(Organization organization);
+
 	public PatientReported saveRelatedPerson(PatientReported patientReported);
 
 	public PatientMaster readPatientMaster(String id);
+
 	public PatientReported readPatientReported(String id);
+
 	public ModelPerson readPractitionerPerson(String id);
+
 	public OrgLocation readOrgLocation(String id);
+
 	public VaccinationReported readVaccinationReported(String id);
+
+	IBaseBundle searchRegularRecord(Class<? extends IBaseResource> aClass, ICriterion... where);
+
+	IBaseBundle searchGoldenRecord(Class<? extends IBaseResource> aClass, ICriterion... where);
+
 }

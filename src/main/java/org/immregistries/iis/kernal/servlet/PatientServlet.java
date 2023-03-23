@@ -5,12 +5,7 @@ import ca.uhn.fhir.rest.client.api.IGenericClient;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
-import org.hl7.fhir.r4.model.Patient;
-import org.hl7.fhir.r4.model.Immunization;
-import org.hl7.fhir.r4.model.Observation;
-import org.hl7.fhir.r5.model.Bundle;
-import org.hl7.fhir.r5.model.Resource;
-import org.hl7.fhir.r5.model.Subscription;
+import org.hl7.fhir.r5.model.*;
 import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
@@ -38,8 +33,7 @@ import static org.immregistries.iis.kernal.servlet.SubscriptionServlet.PARAM_SUB
 
 public class PatientServlet extends HttpServlet {
 	@Autowired
-	private RepositoryClientFactory repositoryClientFactory;
-
+	RepositoryClientFactory repositoryClientFactory;
 	@Autowired
 	FhirRequester fhirRequester;
 	@Autowired
@@ -50,7 +44,7 @@ public class PatientServlet extends HttpServlet {
 
 	public static final String PARAM_PATIENT_NAME_LAST = "patientNameLast";
 	public static final String PARAM_PATIENT_NAME_FIRST = "patientNameFirst";
-	public static final String PARAM_PATIENT_REPORTED_EXTERNAL_LINK = "patientReportedExternalLink";
+	public static final String PARAM_PATIENT_REPORTED_EXTERNAL_LINK = "patientIdentifier";
 	public static final String PARAM_PATIENT_REPORTED_ID = "patientId";
 
 
@@ -91,16 +85,6 @@ public class PatientServlet extends HttpServlet {
 				  Patient.NAME.matches().value(patientNameFirst),
 				  Patient.IDENTIFIER.exactly().code(patientReportedExternalLink)
 			  );
-//			  Bundle bundle = fhirClient
-//				  .search()
-//				  .forResource(Patient.class)
-//				  .where(Patient.FAMILY.matches().value(patientNameLast))
-//				  .and(Patient.NAME.matches().value(patientNameFirst))
-//				  .and(Patient.IDENTIFIER.exactly().code(patientReportedExternalLink))
-//				  .returnBundle(Bundle.class).execute();
-//			  for (Bundle.BundleEntryComponent entry: bundle.getEntry()) {
-//				  patientReportedList.add(PatientHandler.getReported((Patient) entry.getResource()));
-//			  }
         }
       }
 
@@ -118,11 +102,11 @@ public class PatientServlet extends HttpServlet {
 
       out.println("    <h2>Facility : " + orgAccess.getOrg().getOrganizationName() + "</h2>");
       PatientReported patientReportedSelected = null;
-      if (req.getParameter(PARAM_PATIENT_REPORTED_ID) != null) {
-			patientReportedSelected = fhirRequester.searchPatientReported(
-				Patient.IDENTIFIER.exactly().identifier(req.getParameter(PARAM_PATIENT_REPORTED_ID))
-			);
-      }
+		 if (req.getParameter(PARAM_PATIENT_REPORTED_EXTERNAL_LINK) != null) {
+			 patientReportedSelected = fhirRequester.searchPatientReported(
+				 Patient.IDENTIFIER.exactly().identifier(req.getParameter(PARAM_PATIENT_REPORTED_EXTERNAL_LINK))
+			 );
+		 }
 
       if (patientReportedSelected == null) {
 
@@ -184,8 +168,8 @@ public class PatientServlet extends HttpServlet {
               if (count > 100) {
                 break;
               }
-              String link = "patient?" + PARAM_PATIENT_REPORTED_ID + "="
-                  + patientReported.getPatientReportedExternalLink();
+					String link = "patient?" + PARAM_PATIENT_REPORTED_EXTERNAL_LINK + "="
+						+ patientReported.getPatientReportedExternalLink();
               out.println("  <tr>");
               out.println("    <td><a href=\"" + link + "\">"
                   + patientReported.getPatientReportedExternalLink() + "</a></td>");
@@ -223,10 +207,24 @@ public class PatientServlet extends HttpServlet {
 
 			Bundle bundle = fhirClient.search().forResource(Subscription.class).returnBundle(Bundle.class).execute();
 
-			IParser parser = repositoryClientFactory.getFhirContext().newJsonParser().setPrettyPrint(true).setSummaryMode(true).setSuppressNarratives(true);
+			IParser parser = repositoryClientFactory.getFhirContext()
+				.newJsonParser().setPrettyPrint(true).setSummaryMode(true).setSuppressNarratives(true);
 
-			org.hl7.fhir.r5.model.Patient patient = (org.hl7.fhir.r5.model.Patient) patientMapper.getFhirResource(patientReportedSelected);
-			printSubscriptions(out, parser, bundle, patient);
+			Patient patient = (Patient) patientMapper.getFhirResource(patientReportedSelected);
+			{
+				printSubscriptions(out, parser, bundle, patient);
+			}
+			{
+				out.println("<form method=\"GET\" action=\"recommendation\">");
+				out.println("<input type=\"hidden\" name=\""
+					+ PARAM_PATIENT_REPORTED_EXTERNAL_LINK + "\" value=\"" + patientReportedExternalLink
+					+ "\"/>");
+				out.println("<input class=\"w3-button w3-section w3-teal w3-ripple\" type=\"submit\" name=\"\" value=\"Vaccination Recommendations\"/>");
+				out.println("    </form>");
+				String link = req.getContextPath().split("/patient")[0] + "/recommendation?patientId=" + patient.getId();
+				out.println("<a href=\"" + link + "\">Vaccination Recommendation</a>");
+			}
+
 
 			out.println("  <div class=\"w3-container\">");
 
@@ -593,7 +591,7 @@ public List<ObservationReported> getObservationList(IGenericClient fhirClient,
 					+ PARAM_SUBSCRIPTION_ID + "\" value=\"" + subscription.getIdentifierFirstRep().getValue() + "\"/>");
 				out.println("<input type=\"hidden\" name=\""
 					+ PARAM_MESSAGE + "\" value='" + resourceString + "'/>");
-				out.println("<input class=\"w3-button w3-teal w3-ripple\" type=\"submit\" name=\"submit\" value=\"Send\" style=\"padding-bottom: 2px;padding-top: 2px;\"/>");
+				out.println("<input class=\"w3-button w3-teal w3-ripple\" type=\"submit\" name=\"\" value=\"Send\" style=\"padding-bottom: 2px;padding-top: 2px;\"/>");
 				out.println("</form></td>");
 				out.println("</tr>");
 			}

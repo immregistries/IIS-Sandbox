@@ -5,6 +5,8 @@ import org.immregistries.iis.kernal.model.PatientReported;
 
 public interface PatientMapper<Patient> {
 
+	String MRN_SYSTEM = "urn:mrns";
+
 	String MOTHER_MAIDEN_NAME = "http://hl7.org/fhir/StructureDefinition/patient-mothersMaidenName";
 	String REGISTRY_STATUS_EXTENSION = "registryStatus";
 	String REGISTRY_STATUS_INDICATOR = "registryStatusIndicator";

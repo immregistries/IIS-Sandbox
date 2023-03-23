@@ -261,4 +261,16 @@ public class ServletRegistrationConfig {
 //		registrationBean.setLoadOnStartup(1);
 		return registrationBean;
 	}
+
+	@Bean
+	@Conditional(OnR5Condition.class)
+	public ServletRegistrationBean recommendationRegistrationBean() {
+		ServletRegistrationBean registrationBean = new ServletRegistrationBean();
+		HttpServlet servlet = new RecommendationServlet();
+		beanFactory.autowireBean(servlet);
+		registrationBean.setServlet(servlet);
+		registrationBean.addUrlMappings("/recommendation");
+//		registrationBean.setLoadOnStartup(1);
+		return registrationBean;
+	}
 }

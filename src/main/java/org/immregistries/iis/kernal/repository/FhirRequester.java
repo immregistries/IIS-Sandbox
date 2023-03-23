@@ -101,7 +101,7 @@ public abstract class FhirRequester<
 		}
 	}
 
-	IBaseBundle searchGoldenRecord(Class<? extends IBaseResource> aClass, ICriterion... where) {
+	public IBaseBundle searchGoldenRecord(Class<? extends IBaseResource> aClass, ICriterion... where) {
 		IGenericClient fhirClient = repositoryClientFactory.getFhirClientFromSession();
 		try {
 			IQuery<IBaseBundle> query = fhirClient.search().forResource(aClass);
@@ -137,7 +137,7 @@ public abstract class FhirRequester<
 		}
 	}
 
-	IBaseBundle searchRegularRecord(Class<? extends IBaseResource> aClass, ICriterion... where) {
+	public IBaseBundle searchRegularRecord(Class<? extends IBaseResource> aClass, ICriterion... where) {
 		IGenericClient fhirClient = repositoryClientFactory.getFhirClientFromSession();
 		try {
 			IQuery<IBaseBundle> query = fhirClient.search().forResource(aClass);
