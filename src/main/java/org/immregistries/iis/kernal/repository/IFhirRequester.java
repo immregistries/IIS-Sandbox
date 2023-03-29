@@ -21,14 +21,20 @@ public interface IFhirRequester<
 	RelatedPerson extends IBaseResource> {
 
 	public PatientMaster searchPatientMaster(ICriterion... where);
+
+	public PatientReported searchPatientReportedGolden(ICriterion... where);
+
 	public PatientReported searchPatientReported(ICriterion... where);
+
 	public List<PatientReported> searchPatientReportedList(ICriterion... where);
 
 	//	public List<PatientReported> searchPatientReportedList(ICriterion... where);
 	public VaccinationMaster searchVaccinationMaster(ICriterion... where);
 
 	public VaccinationReported searchVaccinationReported(ICriterion... where);
+
 	public List<VaccinationReported> searchVaccinationReportedList(ICriterion... where);
+
 	public ObservationReported searchObservationReported(ICriterion... where);
 	public Organization searchOrganization(ICriterion... where);
 	public RelatedPerson searchRelatedPerson(ICriterion... where);

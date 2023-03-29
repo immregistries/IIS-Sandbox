@@ -103,7 +103,7 @@ public class PatientServlet extends HttpServlet {
       out.println("    <h2>Facility : " + orgAccess.getOrg().getOrganizationName() + "</h2>");
       PatientReported patientReportedSelected = null;
 		 if (req.getParameter(PARAM_PATIENT_REPORTED_EXTERNAL_LINK) != null) {
-			 patientReportedSelected = fhirRequester.searchPatientReported(
+			 patientReportedSelected = fhirRequester.searchPatientReportedGolden(
 				 Patient.IDENTIFIER.exactly().identifier(req.getParameter(PARAM_PATIENT_REPORTED_EXTERNAL_LINK))
 			 );
 		 }
@@ -216,13 +216,11 @@ public class PatientServlet extends HttpServlet {
 			}
 			{
 				out.println("<form method=\"GET\" action=\"recommendation\">");
-				out.println("<input type=\"hidden\" name=\""
+				out.println("		<input type=\"hidden\" name=\""
 					+ PARAM_PATIENT_REPORTED_EXTERNAL_LINK + "\" value=\"" + patientReportedExternalLink
 					+ "\"/>");
-				out.println("<input class=\"w3-button w3-section w3-teal w3-ripple\" type=\"submit\" name=\"\" value=\"Vaccination Recommendations\"/>");
-				out.println("    </form>");
-				String link = req.getContextPath().split("/patient")[0] + "/recommendation?patientId=" + patient.getId();
-				out.println("<a href=\"" + link + "\">Vaccination Recommendation</a>");
+				out.println("	<input class=\"w3-button w3-section w3-teal w3-ripple\" type=\"submit\" name=\"\" value=\"Vaccination Recommendations\"/>");
+				out.println("</form>");
 			}
 
 

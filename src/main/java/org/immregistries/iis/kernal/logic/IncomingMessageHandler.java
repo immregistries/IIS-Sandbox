@@ -1,6 +1,7 @@
 package org.immregistries.iis.kernal.logic;
 
 import ca.uhn.fhir.rest.client.api.IGenericClient;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hl7.fhir.instance.model.api.IBaseResource;
@@ -114,19 +115,20 @@ public abstract class IncomingMessageHandler<Organization extends IBaseResource>
 
   public void printQueryNK1(PatientReported patientReported, StringBuilder sb, CodeMap codeMap) {
     if (patientReported != null) {
-      if (!patientReported.getGuardianRelationship().equals("")
-          && !patientReported.getGuardianLast().equals("")
-          && !patientReported.getGuardianFirst().equals("")) {
-        Code code = codeMap.getCodeForCodeset(CodesetType.PERSON_RELATIONSHIP,
-            patientReported.getGuardianRelationship());
-        if (code != null) {
-          sb.append("NK1");
-          sb.append("|1");
-          sb.append("|").append(patientReported.getGuardianLast()).append("^").append(patientReported.getGuardianFirst()).append("^^^^^L");
-          sb.append("|").append(code.getValue()).append("^").append(code.getLabel()).append("^HL70063");
-          sb.append("\r");
-        }
-      }
+
+		 if (!StringUtils.isBlank(patientReported.getGuardianRelationship())
+			 && !StringUtils.isBlank(patientReported.getGuardianLast())
+			 && !StringUtils.isBlank(patientReported.getGuardianFirst())) {
+			 Code code = codeMap.getCodeForCodeset(CodesetType.PERSON_RELATIONSHIP,
+				 patientReported.getGuardianRelationship());
+			 if (code != null) {
+				 sb.append("NK1");
+				 sb.append("|1");
+				 sb.append("|").append(patientReported.getGuardianLast()).append("^").append(patientReported.getGuardianFirst()).append("^^^^^L");
+				 sb.append("|").append(code.getValue()).append("^").append(code.getLabel()).append("^HL70063");
+				 sb.append("\r");
+			 }
+		 }
     }
   }
 
@@ -196,17 +198,17 @@ public abstract class IncomingMessageHandler<Organization extends IBaseResource>
       sb.append("|");
       {
         String race = patientReported.getRace();
-        if (!race.equals("")) {
-          if (processingFlavorSet.contains(ProcessingFlavor.PITAYA)
-              || processingFlavorSet.contains(ProcessingFlavor.PERSIMMON)) {
-            CodeMap codeMap = CodeMapManager.getCodeMap();
-            Code raceCode = codeMap.getCodeForCodeset(CodesetType.PATIENT_RACE, race);
-            if (processingFlavorSet.contains(ProcessingFlavor.PITAYA) || (raceCode != null
-                && CodeStatusValue.getBy(raceCode.getCodeStatus()) != CodeStatusValue.VALID)) {
-              sb.append(raceCode);
-              sb.append("^");
-              if (raceCode != null) {
-                sb.append(raceCode.getDescription());
+			if (!race.isBlank()) {
+				if (processingFlavorSet.contains(ProcessingFlavor.PITAYA)
+					|| processingFlavorSet.contains(ProcessingFlavor.PERSIMMON)) {
+					CodeMap codeMap = CodeMapManager.getCodeMap();
+					Code raceCode = codeMap.getCodeForCodeset(CodesetType.PATIENT_RACE, race);
+					if (processingFlavorSet.contains(ProcessingFlavor.PITAYA) || (raceCode != null
+						&& CodeStatusValue.getBy(raceCode.getCodeStatus()) != CodeStatusValue.VALID)) {
+						sb.append(raceCode);
+						sb.append("^");
+						if (raceCode != null) {
+							sb.append(raceCode.getDescription());
               }
               sb.append("^CDCREC");
             }
@@ -247,17 +249,17 @@ public abstract class IncomingMessageHandler<Organization extends IBaseResource>
       sb.append("|");
       {
         String ethnicity = patientReported.getEthnicity();
-        if (!ethnicity.equals("")) {
-          if (processingFlavorSet.contains(ProcessingFlavor.PITAYA)
-              || processingFlavorSet.contains(ProcessingFlavor.PERSIMMON)) {
-            CodeMap codeMap = CodeMapManager.getCodeMap();
-            Code ethnicityCode =
-                codeMap.getCodeForCodeset(CodesetType.PATIENT_ETHNICITY, ethnicity);
-            if (processingFlavorSet.contains(ProcessingFlavor.PITAYA) || (ethnicityCode != null
-                && CodeStatusValue.getBy(ethnicityCode.getCodeStatus()) != CodeStatusValue.VALID)) {
-              sb.append(ethnicityCode);
-              sb.append("^");
-              if (ethnicityCode != null) {
+			if (!ethnicity.isBlank()) {
+				if (processingFlavorSet.contains(ProcessingFlavor.PITAYA)
+					|| processingFlavorSet.contains(ProcessingFlavor.PERSIMMON)) {
+					CodeMap codeMap = CodeMapManager.getCodeMap();
+					Code ethnicityCode =
+						codeMap.getCodeForCodeset(CodesetType.PATIENT_ETHNICITY, ethnicity);
+					if (processingFlavorSet.contains(ProcessingFlavor.PITAYA) || (ethnicityCode != null
+						&& CodeStatusValue.getBy(ethnicityCode.getCodeStatus()) != CodeStatusValue.VALID)) {
+						sb.append(ethnicityCode);
+						sb.append("^");
+						if (ethnicityCode != null) {
                 sb.append(ethnicityCode.getDescription());
               }
               sb.append("^CDCREC");
@@ -413,18 +415,18 @@ public abstract class IncomingMessageHandler<Organization extends IBaseResource>
     sb.append(obsSubId);
     // OBX-5
     sb.append("|");
-    if (ob.getValueTable().equals("")) {
-      sb.append(ob.getValueCode());
-    } else {
-      sb.append(ob.getValueCode()).append("^").append(ob.getValueLabel()).append("^").append(ob.getValueTable());
-    }
+	  if (StringUtils.isBlank(ob.getValueTable())) {
+		  sb.append(ob.getValueCode());
+	  } else {
+		  sb.append(ob.getValueCode()).append("^").append(ob.getValueLabel()).append("^").append(ob.getValueTable());
+	  }
     // OBX-6
     sb.append("|");
-    if (ob.getUnitsTable().equals("")) {
-      sb.append(ob.getUnitsCode());
-    } else {
-      sb.append(ob.getUnitsCode()).append("^").append(ob.getUnitsLabel()).append("^").append(ob.getUnitsTable());
-    }
+	  if (StringUtils.isBlank(ob.getUnitsTable())) {
+		  sb.append(ob.getUnitsCode());
+	  } else {
+		  sb.append(ob.getUnitsCode()).append("^").append(ob.getUnitsLabel()).append("^").append(ob.getUnitsTable());
+	  }
     // OBX-7
     sb.append("|");
     // OBX-8
@@ -452,11 +454,11 @@ public abstract class IncomingMessageHandler<Organization extends IBaseResource>
     sb.append("|");
     // OBX-17
     sb.append("|");
-    if (ob.getMethodTable().equals("")) {
-      sb.append(ob.getMethodCode());
-    } else {
-      sb.append(ob.getMethodCode()).append("^").append(ob.getMethodLabel()).append("^").append(ob.getMethodTable());
-    }
+	  if (StringUtils.isBlank(ob.getMethodTable())) {
+		  sb.append(ob.getMethodCode());
+	  } else {
+		  sb.append(ob.getMethodCode()).append("^").append(ob.getMethodLabel()).append("^").append(ob.getMethodTable());
+	  }
     sb.append("\r");
   }
 
@@ -556,14 +558,14 @@ public abstract class IncomingMessageHandler<Organization extends IBaseResource>
 
     String sendersUniqueId = "";
     reader.resetPostion();
-    if (reader.advanceToSegment("MSH")) {
-      sendersUniqueId = reader.getValue(10);
-    } else {
-      sendersUniqueId = "MSH NOT FOUND";
-    }
-    if (sendersUniqueId.equals("")) {
-      sendersUniqueId = "MSH-10 NOT VALUED";
-    }
+	  if (reader.advanceToSegment("MSH")) {
+		  sendersUniqueId = reader.getValue(10);
+	  } else {
+		  sendersUniqueId = "MSH NOT FOUND";
+	  }
+	  if (sendersUniqueId.isBlank()) {
+		  sendersUniqueId = "MSH-10 NOT VALUED";
+	  }
     String overallStatus = "AA";
     for (ProcessingException pe : processingExceptionList) {
       if (pe.isError() || pe.isWarning()) {
@@ -582,12 +584,12 @@ public abstract class IncomingMessageHandler<Organization extends IBaseResource>
   public void printERRSegment(ProcessingException e, StringBuilder sb) {
     sb.append("ERR|");
     sb.append("|"); // 2
-    if (e.getSegmentId() != null && !e.getSegmentId().equals("")) {
-      sb.append(e.getSegmentId()).append("^").append(e.getSegmentRepeat());
-      if (e.getFieldPosition() > 0) {
-        sb.append("^").append(e.getFieldPosition());
-      }
-    }
+	  if (!StringUtils.isBlank(e.getSegmentId())) {
+		  sb.append(e.getSegmentId()).append("^").append(e.getSegmentRepeat());
+		  if (e.getFieldPosition() > 0) {
+			  sb.append("^").append(e.getFieldPosition());
+		  }
+	  }
     sb.append("|101^Required field missing^HL70357"); // 3
     sb.append("|"); // 4
     if (e.isError()) {

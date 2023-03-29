@@ -193,6 +193,7 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler<Organizatio
       }
       for (Iterator<PatientReported> it = patientReportedPossibleList.iterator(); it.hasNext();) {
         PatientReported pr = it.next();
+
         if (cutoff.before(pr.getReportedDate())) {
           it.remove();
         }
@@ -619,7 +620,8 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler<Organizatio
           boolean invalidCharFound = false;
           char invalidChar = ' ';
           for (char c : patientPhone.toCharArray()) {
-            if (c >= '0' && c <= '9') {
+
+				 if (c >= '0' && c <= '9') {
               countNums++;
             } else if (c != '-' && c != '.' && c != ' ' && c != '(' && c != ')') {
               if (!invalidCharFound) {
@@ -1334,7 +1336,8 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler<Organizatio
         TestEvent testEvent = vaccinationReported.getTestEvent();
         if (testEvent != null && testEvent.getEvaluationActualList() != null) {
           for (EvaluationActual evaluationActual : testEvent.getEvaluationActualList()) {
-            obsSubId++;
+
+				 obsSubId++;
             {
               obxSetId++;
               String loinc = "30956-7";
@@ -1692,8 +1695,8 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler<Organizatio
 			 for (Bundle.BundleEntryComponent entry : bundle.getEntry()) {
 				 Immunization immunization = (Immunization) entry.getResource();
 				 if (immunization.getOccurrenceDateTimeType() != null) {
-					 String key = sdf.format(immunization.getOccurrenceDateTimeType());
-					 if (!immunization.getVaccineCode().getText().equals("")) {
+					 String key = sdf.format(immunization.getOccurrenceDateTimeType().getValue());
+					 if (immunization.getVaccineCode() != null && !StringUtils.isBlank(immunization.getVaccineCode().getText())) {
 						 key += key + immunization.getVaccineCode().getText();
 						 VaccinationMaster vaccinationMaster = immunizationMapper.getMaster(immunization);
 						 map.put(key, vaccinationMaster);

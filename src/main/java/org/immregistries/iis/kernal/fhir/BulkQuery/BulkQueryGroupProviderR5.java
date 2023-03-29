@@ -12,7 +12,10 @@ import org.immregistries.iis.kernal.fhir.annotations.OnR5Condition;
 import ca.uhn.fhir.model.api.annotation.Description;
 import ca.uhn.fhir.model.valueset.BundleTypeEnum;
 import ca.uhn.fhir.parser.IParser;
-import ca.uhn.fhir.rest.annotation.*;
+import ca.uhn.fhir.rest.annotation.IdParam;
+import ca.uhn.fhir.rest.annotation.Operation;
+import ca.uhn.fhir.rest.annotation.OperationParam;
+import ca.uhn.fhir.rest.annotation.Sort;
 import ca.uhn.fhir.rest.api.Constants;
 import ca.uhn.fhir.rest.api.SortSpec;
 import ca.uhn.fhir.rest.api.server.IBundleProvider;
@@ -46,6 +49,7 @@ import java.util.Map;
 @Conditional(OnR5Condition.class)
 public class BulkQueryGroupProviderR5 extends GroupResourceProvider {
 	Logger logger = LoggerFactory.getLogger(BulkQueryGroupProviderR5.class);
+
 	@Autowired
 	BaseJpaResourceProviderPatient<Patient> patientProvider;
 

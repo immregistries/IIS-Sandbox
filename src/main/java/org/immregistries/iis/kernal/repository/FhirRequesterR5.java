@@ -29,6 +29,15 @@ public class FhirRequesterR5 extends FhirRequester<Patient,Immunization,Location
 		return patientMaster;
 	}
 
+	public PatientReported searchPatientReportedGolden(ICriterion... where) {
+		PatientReported patientReported = null;
+		Bundle bundle = (Bundle) searchGoldenRecord(Patient.class, where);
+		if (bundle != null && bundle.hasEntry()) {
+			patientReported = patientMapper.getReportedWithMaster((Patient) bundle.getEntryFirstRep().getResource());
+		}
+		return patientReported;
+	}
+
 	public PatientReported searchPatientReported(ICriterion... where) {
 		PatientReported patientReported = null;
 		Bundle bundle = (Bundle) searchRegularRecord(Patient.class, where);
@@ -241,7 +250,7 @@ public class FhirRequesterR5 extends FhirRequester<Patient,Immunization,Location
 			);
 		if (!outcome.getResource().isEmpty()) {
 			return (Organization) outcome.getResource();
-		} else if (outcome.getCreated() != null && outcome.getCreated()){
+		} else if (outcome.getCreated() != null && outcome.getCreated()) {
 			organization.setId(outcome.getId().getIdPart());
 			return organization;
 		} else {
@@ -249,8 +258,23 @@ public class FhirRequesterR5 extends FhirRequester<Patient,Immunization,Location
 		}
 	}
 
+	public PatientMaster readPatientMasterWithMdmLink(String patientId) {
+		Parameters out = repositoryClientFactory.getFhirClientFromSession().operation().onServer().named("$mdm-query-links").withParameters(new Parameters().addParameter("resourceId", patientId)).execute();
+		List<Parameters.ParametersParameterComponent> part = out.getParameter().stream()
+			.filter(parametersParameterComponent -> parametersParameterComponent.getName().equals("link"))
+			.findFirst().orElseThrow().getPart();
+		String goldenId = ((StringType) part.stream()
+			.filter(parametersParameterComponent -> parametersParameterComponent.getName().equals("goldenResourceId"))
+			.findFirst().orElseThrow().getValue()).getValueNotNull();
+		if (!goldenId.isBlank()) {
+			return readPatientMaster(goldenId);
+		} else {
+			return null;
+		}
+	}
+
 	public PatientMaster readPatientMaster(String id) {
-		return patientMapper.getMaster((Patient) read(Patient.class,id));
+		return patientMapper.getMaster((Patient) read(Patient.class, id));
 	}
 
 	public PatientReported readPatientReported(String id) {
@@ -258,7 +282,7 @@ public class FhirRequesterR5 extends FhirRequester<Patient,Immunization,Location
 	}
 
 	public ModelPerson readPractitionerPerson(String id) {
-		return practitionerMapper.getModelPerson((Practitioner) read(Practitioner.class,id));
+		return practitionerMapper.getModelPerson((Practitioner) read(Practitioner.class, id));
 	}
 
 	public OrgLocation readOrgLocation(String id) {

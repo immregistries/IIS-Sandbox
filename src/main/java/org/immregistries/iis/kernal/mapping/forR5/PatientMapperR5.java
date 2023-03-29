@@ -30,10 +30,11 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 
 	public PatientReported getReportedWithMaster(Patient p) {
 		PatientReported patientReported = getReported(p);
-		patientReported.setPatient(
-			fhirRequests.searchPatientMaster(
-				Patient.IDENTIFIER.exactly().systemAndIdentifier(patientReported.getPatientReportedAuthority(), patientReported.getPatientReportedExternalLink())
-			));
+		if (!p.getId().isBlank()) {
+			patientReported.setPatient(
+				fhirRequests.readPatientMasterWithMdmLink(p.getId())
+			);
+		}
 		return patientReported;
 	}
 	public PatientReported getReported(Patient p) {
@@ -190,7 +191,7 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 		// Patient Contact / Guardian
 		RelatedPerson relatedPerson = fhirRequests.searchRelatedPerson(RelatedPerson.PATIENT.hasAnyOfIds(patientReported.getId(), patientReported.getPatientReportedExternalLink()));
 		if (relatedPerson != null) {
-			relatedPersonMapperR5.fillGuardianInformation(patientReported, relatedPerson);
+			patientReported = relatedPersonMapperR5.fillGuardianInformation(patientReported, relatedPerson);
 		}
 		return patientReported;
 	}
@@ -204,6 +205,7 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 		}
 		patientMaster.setPatientNameLast(p.getNameFirstRep().getFamily());
 		patientMaster.setPatientExternalLink(p.getIdentifierFirstRep().getValue());
+		patientMaster.setPatientBirthDate(p.getBirthDate());
 //	  patientMaster.setPatientAddressFrag();
 		return patientMaster;
 	}

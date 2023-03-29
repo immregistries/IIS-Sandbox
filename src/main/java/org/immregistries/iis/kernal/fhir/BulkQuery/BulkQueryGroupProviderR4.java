@@ -140,34 +140,34 @@ public class BulkQueryGroupProviderR4 extends GroupResourceProvider {
 
 		@Description(shortDefinition = "Results from this method are returned across multiple pages. This parameter controls the size of those pages.")
 		@OperationParam(name = Constants.PARAM_COUNT, typeName = "unsignedInt")
-			IPrimitiveType<Integer> theCount,
+		IPrimitiveType<Integer> theCount,
 
 		@Description(shortDefinition = "Results from this method are returned across multiple pages. This parameter controls the offset when fetching a page.")
 		@OperationParam(name = Constants.PARAM_OFFSET, typeName = "unsignedInt")
-			IPrimitiveType<Integer> theOffset,
+		IPrimitiveType<Integer> theOffset,
 
 		@Description(shortDefinition = "Only return resources which were last updated as specified by the given range")
 		@OperationParam(name = Constants.PARAM_LASTUPDATED, min = 0, max = 1)
-			DateRangeParam theLastUpdated,
+		DateRangeParam theLastUpdated,
 
 		@Description(shortDefinition = "Filter the resources to return only resources matching the given _content filter (note that this filter is applied only to results which link to the given patient, not to the patient itself or to supporting resources linked to by the matched resources)")
 		@OperationParam(name = Constants.PARAM_CONTENT, min = 0, max = OperationParam.MAX_UNLIMITED, typeName = "string")
-			List<IPrimitiveType<String>> theContent,
+		List<IPrimitiveType<String>> theContent,
 
 		@Description(shortDefinition = "Filter the resources to return only resources matching the given _text filter (note that this filter is applied only to results which link to the given patient, not to the patient itself or to supporting resources linked to by the matched resources)")
 		@OperationParam(name = Constants.PARAM_TEXT, min = 0, max = OperationParam.MAX_UNLIMITED, typeName = "string")
-			List<IPrimitiveType<String>> theNarrative,
+		List<IPrimitiveType<String>> theNarrative,
 
 		@Description(shortDefinition = "Filter the resources to return only resources matching the given _filter filter (note that this filter is applied only to results which link to the given patient, not to the patient itself or to supporting resources linked to by the matched resources)")
 		@OperationParam(name = Constants.PARAM_FILTER, min = 0, max = OperationParam.MAX_UNLIMITED, typeName = "string")
-			List<IPrimitiveType<String>> theFilter,
+		List<IPrimitiveType<String>> theFilter,
 
 		@Description(shortDefinition = "Filter the resources to return only resources matching the given _type filter (note that this filter is applied only to results which link to the given patient, not to the patient itself or to supporting resources linked to by the matched resources)")
 		@OperationParam(name = Constants.PARAM_TYPE, min = 0, max = OperationParam.MAX_UNLIMITED, typeName = "string")
-			List<IPrimitiveType<String>> theTypes,
+		List<IPrimitiveType<String>> theTypes,
 
 		@Sort
-			SortSpec theSortSpec,
+		SortSpec theSortSpec,
 
 		ServletRequestDetails theRequestDetails
 	) throws IOException {

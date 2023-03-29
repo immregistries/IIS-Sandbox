@@ -36,6 +36,15 @@ public class FhirRequesterR4 extends FhirRequester<Patient,Immunization,Location
 		return patientMaster;
 	}
 
+	public PatientReported searchPatientReportedGolden(ICriterion... where) {
+		PatientReported patientReported = null;
+		org.hl7.fhir.r4.model.Bundle bundle = (org.hl7.fhir.r4.model.Bundle) searchGoldenRecord(org.hl7.fhir.r4.model.Patient.class, where);
+		if (bundle != null && bundle.hasEntry()) {
+			patientReported = patientMapper.getReportedWithMaster((org.hl7.fhir.r4.model.Patient) bundle.getEntryFirstRep().getResource());
+		}
+		return patientReported;
+	}
+
 	public PatientReported searchPatientReported(ICriterion... where) {
 		PatientReported patientReported = null;
 		org.hl7.fhir.r4.model.Bundle bundle = (org.hl7.fhir.r4.model.Bundle) searchRegularRecord(org.hl7.fhir.r4.model.Patient.class, where);

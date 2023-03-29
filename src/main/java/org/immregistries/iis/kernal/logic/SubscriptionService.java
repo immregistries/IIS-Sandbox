@@ -36,7 +36,7 @@ public class SubscriptionService {
 	public Subscription searchRelatedSubscription(Immunization baseResource, RequestDetails requestDetails) {
 		OrgAccess orgAccess = (OrgAccess) requestDetails.getAttribute("orgAccess");
 		/**
-		 * define materialization of subscription on immunizaton with
+		 * define materialization of subscription on immunization with
 		 * 	- TAG ?
 		 * 	- Identifier System ?
 		 * 	- $match operations ?
