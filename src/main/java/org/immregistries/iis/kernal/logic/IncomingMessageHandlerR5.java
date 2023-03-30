@@ -23,6 +23,8 @@ import javax.servlet.http.HttpServletRequest;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import static org.immregistries.iis.kernal.mapping.Interfaces.PatientMapper.MRN_SYSTEM;
+
 @org.springframework.stereotype.Service()
 @Conditional(OnR5Condition.class)
 public class IncomingMessageHandlerR5 extends IncomingMessageHandler<Organization>{
@@ -90,7 +92,7 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler<Organizatio
       int fieldPosition = 0;
       if (!mrn.equals("")) {
 			patientReported = fhirRequester.searchPatientReported(
-				Patient.IDENTIFIER.exactly().code(mrn)
+				Patient.IDENTIFIER.exactly().systemAndCode(MRN_SYSTEM, mrn)
 			);
       }
       String patientNameLast = reader.getValue(4, 1);
@@ -140,27 +142,27 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler<Organizatio
           if (patientBirthDate != null
              && patientBirthDate.equals(patientReported.getBirthDate())) {
             points = points + 2;
-          }
-          if (!patientSex.equals("")
-             && patientSex.equalsIgnoreCase(patientReported.getSex())) {
-            points = points + 2;
-          }
-          if (points < 6) {
-            // not enough matching so don't indicate this as a match
-            patientReported = null;
-          }
-        }
-        if (patientReported == null) {
-			  patientReportedPossibleList = fhirRequester.searchPatientReportedList(
-				  Patient.NAME.matches().values(patientNameFirst,patientNameLast),
-				  Patient.BIRTHDATE.exactly().day(patientBirthDate));
-        }
-        if (patientReported != null
-            && patientNameMiddle.equalsIgnoreCase(PATIENT_MIDDLE_NAME_MULTI)) {
-          patientReportedPossibleList.add(patientReported);
-          patientReportedPossibleList.add(patientReported);
-          patientReported = null;
-        }
+			 }
+			  if (!patientSex.equals("")
+				  && patientSex.equalsIgnoreCase(patientReported.getSex())) {
+				  points = points + 2;
+			  }
+			  if (points < 6) {
+				  // not enough matching so don't indicate this as a match
+				  patientReported = null;
+			  }
+		  }
+			if (patientReported == null) { //TODO change merging
+				patientReportedPossibleList = fhirRequester.searchPatientReportedList(
+					Patient.NAME.matches().values(patientNameFirst, patientNameLast),
+					Patient.BIRTHDATE.exactly().day(patientBirthDate));
+			}
+			if (patientReported != null
+				&& patientNameMiddle.equalsIgnoreCase(PATIENT_MIDDLE_NAME_MULTI)) {
+				patientReportedPossibleList.add(patientReported);
+				patientReportedPossibleList.add(patientReported);
+				patientReported = null;
+			}
       }
     } else {
       processingExceptionList.add(new ProcessingException("QPD segment not found", null, 0, 0));

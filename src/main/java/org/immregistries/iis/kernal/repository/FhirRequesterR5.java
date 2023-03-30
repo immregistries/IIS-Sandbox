@@ -262,10 +262,10 @@ public class FhirRequesterR5 extends FhirRequester<Patient,Immunization,Location
 		Parameters out = repositoryClientFactory.getFhirClientFromSession().operation().onServer().named("$mdm-query-links").withParameters(new Parameters().addParameter("resourceId", patientId)).execute();
 		List<Parameters.ParametersParameterComponent> part = out.getParameter().stream()
 			.filter(parametersParameterComponent -> parametersParameterComponent.getName().equals("link"))
-			.findFirst().orElseThrow().getPart();
+			.findFirst().orElse(new Parameters.ParametersParameterComponent()).getPart();
 		String goldenId = ((StringType) part.stream()
 			.filter(parametersParameterComponent -> parametersParameterComponent.getName().equals("goldenResourceId"))
-			.findFirst().orElseThrow().getValue()).getValueNotNull();
+			.findFirst().orElse(new Parameters.ParametersParameterComponent()).getValue()).getValueNotNull();
 		if (!goldenId.isBlank()) {
 			return readPatientMaster(goldenId);
 		} else {
