@@ -3,6 +3,8 @@ package org.immregistries.iis.kernal.servlet;
 
 import ca.uhn.fhir.parser.IParser;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
+import org.apache.commons.lang3.tuple.MutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r5.model.*;
 import org.immregistries.iis.kernal.logic.SubscriptionService;
@@ -36,6 +38,7 @@ public class SubscriptionServlet extends HttpServlet {
 
 	public static final String PARAM_ACTION = "action";
 	public static final String PARAM_MESSAGE = "message";
+	public static final String PARAM_HTTP_VERB = "httpVerb";
 	public static final String ACTION_SEARCH = "search";
 	public static final String PARAM_SUBSCRIPTION_ENDPOINT = "endpoint";
 	public static final String PARAM_SUBSCRIPTION_ID = "identifier";
@@ -88,27 +91,27 @@ public class SubscriptionServlet extends HttpServlet {
 			Bundle searchBundle = localClient.search().forResource(Subscription.class)
 				.where(Subscription.IDENTIFIER.exactly().identifier(subscriptionId)).returnBundle(Bundle.class).execute();
 //			Subscription subscription = localClient.read().resource(Subscription.class).withId(subscriptionId).execute();
-			if (searchBundle.hasEntry()) {
 
+			if (searchBundle.hasEntry()) {
 				String[] messages = req.getParameterValues(PARAM_MESSAGE);
-				IParser parser;
-				List<IBaseResource> parsedResources = new ArrayList<>();
-				for (String message : messages
-				) {
-					if (!message.isBlank()) {
-						if (message.startsWith("<")) {
-							parser = repositoryClientFactory.getFhirContext().newXmlParser();
-						} else {
-							parser = repositoryClientFactory.getFhirContext().newJsonParser();
+				String[] httpVerbs = req.getParameterValues(PARAM_HTTP_VERB);
+				if (messages.length == httpVerbs.length) {
+					IParser parser;
+					List<Pair<String, Bundle.HTTPVerb>> parsedResources = new ArrayList<>();
+					for (int i = 0; i < messages.length; i++) {
+						String message = messages[i];
+						if (!message.isBlank()) {
+							parsedResources.add(new MutablePair<>(message, Bundle.HTTPVerb.valueOf(httpVerbs[i])));
 						}
-						parsedResources.add(parser.parseResource(message));
 					}
+
+					Subscription subscription = (Subscription) searchBundle.getEntryFirstRep().getResource();
+					String result = subscriptionService.triggerWithResource(subscription, parsedResources);
+					out.println(result);
+				} else {
+					out.println("Incorrect parameters length");
 				}
 
-				Subscription subscription = (Subscription) searchBundle.getEntryFirstRep().getResource();
-				subscriptionService.triggerWithResource(subscription, parsedResources);
-
-				out.println("SENT");
 			} else {
 				out.println("NO SUBSCRIPTION FOUND FOR THIS IDENTIFIER");
 			}
@@ -188,13 +191,17 @@ public class SubscriptionServlet extends HttpServlet {
 						}
 					}
 				}
-				out.println("<input class=\"w3-button w3-section w3-teal w3-ripple\" type=\"submit\" name=\"submit\" value=\"Open tab with extra space\"/>");
+				out.println("<input class=\"w3-button w3-section w3-teal w3-ripple\" type=\"submit\" name=\"submit\" value=\"Open tab with extra slot\"/>");
 				out.println("</form>");
 
 				out.println("<form action=\"subscription?identifier=" + subscription.getIdentifierFirstRep().getValue() + "\" method=\"POST\" target=\"_blank\">");
 				for (int i = 0; i < formLength; i++) {
-
 					out.println("<div class=\"w3-half\">");
+					out.println("<select class=\"w3-select w3-border\" name=\"" + PARAM_HTTP_VERB + "\">" +
+						"<option value=\"PUT\" selected>PUT</option>" +
+						"<option value=\"POST\">POST</option>" +
+						"<option value=\"DELETE\">DELETE<option>" +
+						"</select>");
 					out.println("<textarea class=\"w3-input w3-border\" name=\"" + PARAM_MESSAGE + "\"rows=\"15\" cols=\"160\">");
 					if (initialMessageLength > i) {
 						out.println(initialMessages[i]);
@@ -202,7 +209,7 @@ public class SubscriptionServlet extends HttpServlet {
 					out.println("</textarea>");
 					out.println("</div>");
 				}
-				out.println("<div class=\"\"><h4>Send FHIR Resource to subscriber</h4>");
+				out.println("<div class=\"w3-threequarter\"><h4>Send FHIR Resource to subscriber</h4>");
 				out.println("	<input class=\"w3-button w3-section w3-teal w3-ripple\" type=\"submit\" name=\"submit\" value=\"Submit\"/>");
 				out.println("</div>");
 				out.println("</form>");

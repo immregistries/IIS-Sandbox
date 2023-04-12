@@ -1,5 +1,6 @@
 package org.immregistries.iis.kernal.servlet;
 
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
@@ -126,21 +127,21 @@ public class PopServlet extends HttpServlet {
         transformer.transform(testCaseMessage);
         message = testCaseMessage.getMessageText();
       }
-		if (req.getParameter(PARAM_USERID) != null && !req.getParameter(PARAM_USERID).isBlank() ) {
+		if (!StringUtils.isBlank(req.getParameter(PARAM_USERID))) {
 			userId = req.getParameter(PARAM_USERID);
 		}
-		if (userId == null || userId.isBlank()) {
+		if (StringUtils.isBlank(userId)) {
 			userId = "Mercy";
 		}
-		if (req.getParameter(PARAM_PASSWORD) != null && !req.getParameter(PARAM_PASSWORD).isBlank() ) {
+		if (!StringUtils.isBlank(req.getParameter(PARAM_PASSWORD))) {
 			password = req.getParameter(PARAM_PASSWORD);
 		}
-		if (password == null || password.isBlank()) {
+		if (StringUtils.isBlank(password)) {
 			password = "password1234";
 		}
 		 if (req.getParameter(PARAM_FACILITYID) == null || req.getParameter(PARAM_FACILITYID).isBlank() ) {
 			 facilityId = req.getParameter(PARAM_FACILITYID);
-			 if (facilityId == null || facilityId.isBlank()) {
+			 if (StringUtils.isBlank(facilityId)) {
 				 facilityId = "Mercy-Healthcare";
 			 }
 		 }

@@ -127,20 +127,16 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler<Organizatio
         }
         if (patientReported != null) {
           int points = 0;
-          if (!patientNameLast.equals("")
-             && patientNameLast.equalsIgnoreCase(patientReported.getNameLast())) {
+          if (!patientNameLast.isBlank() && patientNameLast.equalsIgnoreCase(patientReported.getNameLast())) {
             points = points + 2;
           }
-          if (!patientNameFirst.equals("")
-             && patientNameFirst.equalsIgnoreCase(patientReported.getNameFirst())) {
+          if (!patientNameFirst.isBlank() && patientNameFirst.equalsIgnoreCase(patientReported.getNameFirst())) {
             points = points + 2;
           }
-          if (!patientNameMiddle.equals("")
-             && patientNameMiddle.equalsIgnoreCase(patientReported.getNameFirst())) {
+          if (!patientNameMiddle.isBlank() && patientNameMiddle.equalsIgnoreCase(patientReported.getNameFirst())) {
             points = points + 2;
           }
-          if (patientBirthDate != null
-             && patientBirthDate.equals(patientReported.getBirthDate())) {
+          if (patientBirthDate != null && patientBirthDate.equals(patientReported.getBirthDate())) {
             points = points + 2;
 			 }
 			  if (!patientSex.equals("")
@@ -152,14 +148,13 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler<Organizatio
 				  patientReported = null;
 			  }
 		  }
-			if (patientReported == null) { //TODO change merging
+			if (patientReported == null) { // TODO change merging with MDM & FHIR ?
 				patientReportedPossibleList = fhirRequester.searchPatientReportedList(
 					Patient.NAME.matches().values(patientNameFirst, patientNameLast),
 					Patient.BIRTHDATE.exactly().day(patientBirthDate));
 			}
 			if (patientReported != null
 				&& patientNameMiddle.equalsIgnoreCase(PATIENT_MIDDLE_NAME_MULTI)) {
-				patientReportedPossibleList.add(patientReported);
 				patientReportedPossibleList.add(patientReported);
 				patientReported = null;
 			}
@@ -899,13 +894,11 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler<Organizatio
 	  patientReported.setUpdatedDate(new Date());
 	  patientReported = fhirRequester.savePatientReported(patientReported);
 	  patientReported = fhirRequester.saveRelatedPerson(patientReported);
-	  // TODO for group generation with message assert option activated, switch to arraylist ?
+
 	  HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
 	  ArrayList<String> groupPatientIds = (ArrayList<String>) request.getAttribute("groupPatientIds");
 	  if (groupPatientIds != null) { // If there are numerous patients added and option was activated
        groupPatientIds.add(patientReported.getId());
-
-//		  groupPatientIds = new String[]{patientReported.getPatientReportedId()};
 	  }
 	  request.setAttribute("groupPatientIds", groupPatientIds);
 

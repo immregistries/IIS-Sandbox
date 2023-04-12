@@ -1,6 +1,7 @@
 package org.immregistries.iis.kernal.mapping;
 
 
+import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.instance.model.api.IBaseParameters;
 import org.hl7.fhir.r5.model.*;
 
@@ -22,7 +23,7 @@ public class MappingHelper {
 
 	//TODO choose system id or not
 	public static Reference getFhirReference(String fhirType, String dbType, String identifier) {
-		if (identifier == null || identifier.isBlank()) {
+		if (StringUtils.isBlank(identifier)) {
 			return null;
 		} else {
 			return new Reference()
@@ -32,7 +33,7 @@ public class MappingHelper {
 	}
 
 	public static CodeableReference getFhirCodeableReference(String fhirType, String dbType, String identifier) {
-		if (identifier == null || identifier.isBlank()) {
+		if (StringUtils.isBlank(identifier)) {
 			return null;
 		} else {
 			return new CodeableReference(getFhirReference(fhirType, dbType, identifier));
@@ -40,7 +41,7 @@ public class MappingHelper {
 	}
 
 	public static org.hl7.fhir.r4.model.Reference getFhirR4Reference(String fhirType, String dbType, String identifier) {
-		if (identifier == null || identifier.isBlank()) {
+		if (StringUtils.isBlank(identifier)) {
 			return null;
 		} else {
 			return new org.hl7.fhir.r4.model.Reference()

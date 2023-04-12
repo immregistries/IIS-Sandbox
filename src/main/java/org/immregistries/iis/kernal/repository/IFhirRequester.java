@@ -27,6 +27,7 @@ public interface IFhirRequester<
 	public PatientReported searchPatientReported(ICriterion... where);
 
 	public List<PatientReported> searchPatientReportedList(ICriterion... where);
+	public List<PatientReported> searchPatientReportedGoldenList(ICriterion... where);
 
 	//	public List<PatientReported> searchPatientReportedList(ICriterion... where);
 	public VaccinationMaster searchVaccinationMaster(ICriterion... where);

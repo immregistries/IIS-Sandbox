@@ -1,5 +1,6 @@
 package org.immregistries.iis.kernal.repository;
 
+import org.apache.commons.lang3.StringUtils;
 import org.immregistries.iis.kernal.fhir.annotations.OnR5Condition;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Component
 @Conditional(OnR5Condition.class)
@@ -50,6 +52,17 @@ public class FhirRequesterR5 extends FhirRequester<Patient,Immunization,Location
 	public List<PatientReported> searchPatientReportedList(ICriterion... where) {
 		List<PatientReported> patientReportedList = new ArrayList<>();
 		Bundle bundle = (Bundle) searchRegularRecord(Patient.class, where);
+		if (bundle != null) {
+			for (Bundle.BundleEntryComponent entry: bundle.getEntry()) {
+				patientReportedList.add(patientMapper.getReportedWithMaster((Patient) entry.getResource()));
+			}
+		}
+		return patientReportedList;
+	}
+
+	public List<PatientReported> searchPatientReportedGoldenList(ICriterion... where) {
+		List<PatientReported> patientReportedList = new ArrayList<>();
+		Bundle bundle = (Bundle) searchGoldenRecord(Patient.class, where);
 		if (bundle != null) {
 			for (Bundle.BundleEntryComponent entry: bundle.getEntry()) {
 				patientReportedList.add(patientMapper.getReportedWithMaster((Patient) entry.getResource()));
@@ -218,7 +231,7 @@ public class FhirRequesterR5 extends FhirRequester<Patient,Immunization,Location
 	}
 
 	public VaccinationReported saveVaccinationReported(VaccinationReported vaccinationReported) {
-		Immunization immunization =  (Immunization) immunizationMapper.getFhirResource(vaccinationReported);
+		Immunization immunization = immunizationMapper.getFhirResource(vaccinationReported);
 		MethodOutcome outcome = save(immunization,
 			Immunization.IDENTIFIER.exactly()
 				.identifier(vaccinationReported.getVaccinationReportedExternalLink())
@@ -263,11 +276,11 @@ public class FhirRequesterR5 extends FhirRequester<Patient,Immunization,Location
 		List<Parameters.ParametersParameterComponent> part = out.getParameter().stream()
 			.filter(parametersParameterComponent -> parametersParameterComponent.getName().equals("link"))
 			.findFirst().orElse(new Parameters.ParametersParameterComponent()).getPart();
-		String goldenId = ((StringType) part.stream()
+		Optional<Parameters.ParametersParameterComponent> goldenIdComponent = part.stream()
 			.filter(parametersParameterComponent -> parametersParameterComponent.getName().equals("goldenResourceId"))
-			.findFirst().orElse(new Parameters.ParametersParameterComponent()).getValue()).getValueNotNull();
-		if (!goldenId.isBlank()) {
-			return readPatientMaster(goldenId);
+			.findFirst();
+		if (goldenIdComponent.isPresent() && !StringUtils.isBlank(goldenIdComponent.get().getValueStringType().getValue())) {
+			return readPatientMaster(goldenIdComponent.get().getValueStringType().getValue());
 		} else {
 			return null;
 		}

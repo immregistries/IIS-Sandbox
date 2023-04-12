@@ -1,5 +1,6 @@
 package org.immregistries.iis.kernal.mapping.forR4;
 
+import org.apache.commons.lang3.StringUtils;
 import org.immregistries.iis.kernal.fhir.annotations.OnR4Condition;
 import org.hl7.fhir.r4.model.*;
 import org.immregistries.iis.kernal.mapping.Interfaces.ImmunizationMapper;
@@ -39,7 +40,7 @@ public class ImmunizationMapperR4 implements ImmunizationMapper<Immunization> {
 		vr.setUpdatedDate(i.getMeta().getLastUpdated());
 //		vr.setVaccinationReportedExternalLink(MappingHelper.filterIdentifier(i.getIdentifier(),MappingHelper.VACCINATION_REPORTED).getValue());
 		vr.setVaccinationReportedExternalLink(i.getIdentifierFirstRep().getValue()); // TODO
-		if (i.getPatient() != null && i.getPatient().getReference() != null && !i.getPatient().getReference().isBlank()) {
+		if (i.getPatient() != null && !StringUtils.isBlank(i.getPatient().getReference())) {
 			vr.setPatientReported(fhirRequests.readPatientReported(i.getPatient().getReference()));
 //			vr.setPatientReported(fhirRequests.readPatientReported(i.getPatient().getReference().split("Patient/")[0]));
 		}
@@ -99,7 +100,7 @@ public class ImmunizationMapperR4 implements ImmunizationMapper<Immunization> {
 		vr.setFundingSource(i.getFundingSource().getCodingFirstRep().getCode());
 		vr.setFundingEligibility(i.getProgramEligibilityFirstRep().getCodingFirstRep().getCode());
 
-		if (i.getLocation() != null && i.getLocation().getReference() != null && !i.getLocation().getReference().isBlank()) {
+		if (i.getLocation() != null && !StringUtils.isBlank(i.getLocation().getReference())) {
 			vr.setOrgLocation(fhirRequests.readOrgLocation(i.getLocation().getReference()));
 		}
 
@@ -109,12 +110,12 @@ public class ImmunizationMapperR4 implements ImmunizationMapper<Immunization> {
 			&& MappingHelper.extensionGetCoding(informationSource).getSystem().equals(INFORMATION_SOURCE)) {
 			vr.setEnteredBy(fhirRequests.readPractitionerPerson(MappingHelper.extensionGetCoding(informationSource).getCode()));
 		}
-//		if (i.getsou.getInformationSource() && i.getInformationSource().getReference() != null && !i.getInformationSourceReference().getReference().isBlank()) {
+//		if (!StringUtils.isBlank(i.getsou.getInformationSource() && i.getInformationSource().getReference())) {
 //			vr.setEnteredBy(fhirRequests.readPractitionerPerson(i.getInformationSourceReference().getReference()));
 //		} else {
 //		}
 		for (Immunization.ImmunizationPerformerComponent performer : i.getPerformer()) {
-			if (performer.getActor() != null && performer.getActor().getReference() != null && !performer.getActor().getReference().isBlank()) {
+			if (performer.getActor() != null && !StringUtils.isBlank(performer.getActor().getReference())) {
 				switch (performer.getFunction().getCodingFirstRep().getCode()) {
 					case ADMINISTERING: {
 						vr.setAdministeringProvider(fhirRequests.readPractitionerPerson(performer.getActor().getReference()));
@@ -170,7 +171,7 @@ public class ImmunizationMapperR4 implements ImmunizationMapper<Immunization> {
 	  }
 //	  i.setManufacturer(MappingHelper.getFhirReference(MappingHelper.ORGANISATION,MVX,vr.getVaccineMvxCode()));
 
-	  if (vr.getAdministeredAmount() != null && !vr.getAdministeredAmount().isBlank()) {
+	  if (!StringUtils.isBlank(vr.getAdministeredAmount())) {
 		  i.setDoseQuantity(new Quantity().setValue(new BigDecimal(vr.getAdministeredAmount())));
 	  }
 

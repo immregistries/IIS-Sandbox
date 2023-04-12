@@ -44,8 +44,8 @@ public class HomeServlet extends HttpServlet {
 				String show = req.getParameter(PARAM_SHOW);
 				out.println("    <div class=\"w3-container w3-half w3-margin-top\">");
 				if (show == null) {
-					out.println(
-						"    <div class=\"w3-panel w3-red\"><p class=\"w3-left-align\">This version is specifically deployed for the January 2023 Connectathon Bulk Data track.  Some functionalities including subscription are not available due to a switch from Fhir R5 to R4 for the event</p></div>");
+//					out.println(
+//						"    <div class=\"w3-panel w3-red\"><p class=\"w3-left-align\">This version is specifically deployed for the January 2023 Connectathon Bulk Data track.  Some functionalities including subscription are not available due to a switch from Fhir R5 to R4 for the event</p></div>");
 					out.println(
 						"    <div class=\"w3-panel w3-yellow\"><p class=\"w3-left-align\">This system is for test purposes only. "
 							+ "Do not submit production data. As a precaution all submitted data will be deleted once a day.  </p></div>");

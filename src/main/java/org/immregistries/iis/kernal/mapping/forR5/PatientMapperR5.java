@@ -1,6 +1,7 @@
 package org.immregistries.iis.kernal.mapping.forR5;
 
 
+import org.apache.commons.lang3.StringUtils;
 import org.immregistries.iis.kernal.fhir.annotations.OnR5Condition;
 import org.hl7.fhir.r5.model.*;
 import org.hl7.fhir.r5.model.ContactPoint.ContactPointSystem;
@@ -154,7 +155,7 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 		if (publicity != null) {
 			Coding value = MappingHelper.extensionGetCoding(publicity);
 			patientReported.setPublicityIndicator(value.getCode());
-			if (value.getVersion() != null && !value.getVersion().isBlank()) {
+			if (!StringUtils.isBlank(value.getVersion())) {
 				try {
 					patientReported.setPublicityIndicatorDate(MappingHelper.sdf.parse(value.getVersion()));
 				} catch (ParseException e) {
@@ -166,7 +167,7 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 		if (protection != null) {
 			Coding value = MappingHelper.extensionGetCoding(protection);
 			patientReported.setProtectionIndicator(value.getCode());
-			if (value.getVersion() != null && !value.getVersion().isBlank()) {
+			if (!StringUtils.isBlank(value.getVersion())) {
 				try {
 					patientReported.setProtectionIndicatorDate(MappingHelper.sdf.parse(value.getVersion()));
 				} catch (ParseException e) {
@@ -178,7 +179,7 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 		if (registry != null) {
 			Coding value = MappingHelper.extensionGetCoding(registry);
 			patientReported.setRegistryStatusIndicator(value.getCode());
-			if (value.getVersion() != null && !value.getVersion().isBlank()) {
+			if (!StringUtils.isBlank(value.getVersion())) {
 				try {
 					patientReported.setRegistryStatusIndicatorDate(MappingHelper.sdf.parse(value.getVersion()));
 				} catch (ParseException e) {
@@ -213,6 +214,7 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 	public Patient getFhirResource(PatientReported pr) {
 		Patient p = new Patient();
 
+		p.setId(pr.getId());
 		p.addIdentifier(new Identifier()
 			.setSystem(pr.getPatientReportedAuthority())
 			.setValue(pr.getPatientReportedExternalLink())
@@ -251,22 +253,22 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 		raceExtension.setUrl(RACE);
 		CodeableConcept race = new CodeableConcept().setText(RACE_SYSTEM);
 		raceExtension.setValue(race);
-		if (pr.getRace() != null && !pr.getRace().isBlank()) {
+		if (!StringUtils.isBlank(pr.getRace())) {
 			race.addCoding().setCode(pr.getRace());
 		}
-		if (pr.getRace2() != null && !pr.getRace2().isBlank()) {
+		if (!StringUtils.isBlank(pr.getRace2())) {
 			race.addCoding().setCode(pr.getRace2());
 		}
-		if (pr.getRace3() != null && !pr.getRace3().isBlank()) {
+		if (!StringUtils.isBlank(pr.getRace3())) {
 			race.addCoding().setCode(pr.getRace3());
 		}
-		if (pr.getRace4() != null && !pr.getRace4().isBlank()) {
+		if (!StringUtils.isBlank(pr.getRace4())) {
 			race.addCoding().setCode(pr.getRace4());
 		}
-		if (pr.getRace5() != null && !pr.getRace5().isBlank()) {
+		if (!StringUtils.isBlank(pr.getRace5())) {
 			race.addCoding().setCode(pr.getRace5());
 		}
-		if (pr.getRace6() != null && !pr.getRace6().isBlank()) {
+		if (!StringUtils.isBlank(pr.getRace6())) {
 			race.addCoding().setCode(pr.getRace6());
 		}
 		p.addExtension(ETHNICITY_EXTENSION, new Coding().setSystem(ETHNICITY_SYSTEM).setCode(pr.getEthnicity()));
@@ -297,7 +299,7 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 			.setDistrict(pr.getAddressCountyParish())
 			.setPostalCode(pr.getAddressZip());
 
-		if (pr.getBirthOrder() != null && !pr.getBirthOrder().isBlank()) {
+		if (!StringUtils.isBlank(pr.getBirthOrder())) {
 			p.setMultipleBirth(new IntegerType().setValue(Integer.parseInt(pr.getBirthOrder())));
 		} else if (pr.getBirthFlag().equals(YES)) {
 			p.setMultipleBirth(new BooleanType(true));

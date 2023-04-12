@@ -1,5 +1,6 @@
 package org.immregistries.iis.kernal.mapping.forR5;
 
+import org.apache.commons.lang3.StringUtils;
 import org.immregistries.iis.kernal.fhir.annotations.OnR5Condition;
 import org.hl7.fhir.r5.model.*;
 import org.immregistries.iis.kernal.mapping.Interfaces.ImmunizationMapper;
@@ -42,7 +43,7 @@ public class ImmunizationMapperR5 implements ImmunizationMapper<Immunization> {
 		vr.setUpdatedDate(i.getMeta().getLastUpdated());
 		vr.setVaccinationReportedExternalLink(i.getIdentifierFirstRep().getValue());
 		vr.setVaccinationReportedExternalLinkSystem(i.getIdentifierFirstRep().getSystem());
-		if (i.getPatient() != null && i.getPatient().getReference() != null && !i.getPatient().getReference().isBlank()) {
+		if (i.getPatient() != null && !StringUtils.isBlank(i.getPatient().getReference())) {
 			vr.setPatientReported(fhirRequests.readPatientReported(i.getPatient().getReference()));
 //			vr.setPatientReported(fhirRequests.readPatientReported(i.getPatient().getReference().split("Patient/")[0]));
 		}
@@ -98,16 +99,16 @@ public class ImmunizationMapperR5 implements ImmunizationMapper<Immunization> {
 		vr.setFundingSource(i.getFundingSource().getCodingFirstRep().getCode());
 		vr.setFundingEligibility(i.getProgramEligibilityFirstRep().getProgram().getCodingFirstRep().getCode());
 
-		if (i.getLocation() != null && i.getLocation().getReference() != null && !i.getLocation().getReference().isBlank()) {
+		if (i.getLocation() != null && !StringUtils.isBlank(i.getLocation().getReference())) {
 			vr.setOrgLocation(fhirRequests.readOrgLocation(i.getLocation().getReference()));
 		}
-		if (i.hasInformationSource() && i.getInformationSource().getReference() != null && i.getInformationSource().getReference().getReference() != null && !i.getInformationSource().getReference().getReference().isBlank()) {
+		if (i.hasInformationSource() && i.getInformationSource().getReference() != null && !StringUtils.isBlank(i.getInformationSource().getReference().getReference())) {
 			vr.setEnteredBy(fhirRequests.readPractitionerPerson(i.getInformationSource().getReference().getReference()));
 		} else {
 //			vr.set
 		}
 		for (Immunization.ImmunizationPerformerComponent performer : i.getPerformer()) {
-			if (performer.getActor() != null && performer.getActor().getReference() != null && !performer.getActor().getReference().isBlank()) {
+			if (performer.getActor() != null && !StringUtils.isBlank(performer.getActor().getReference())) {
 				switch (performer.getFunction().getCode(FUNCTION)) {
 					case ADMINISTERING: {
 						vr.setAdministeringProvider(fhirRequests.readPractitionerPerson(performer.getActor().getReference()));
@@ -163,10 +164,10 @@ public class ImmunizationMapperR5 implements ImmunizationMapper<Immunization> {
 	  }
 	  i.getOccurrenceDateTimeType().setValue(vr.getAdministeredDate());
 
-	  if (vr.getVaccineCvxCode() != null && !vr.getVaccineCvxCode().isBlank()) {
+	  if (!StringUtils.isBlank(vr.getVaccineCvxCode())) {
 		  i.getVaccineCode().addCoding().setCode(vr.getVaccineCvxCode()).setSystem(CVX);
 	  }
-	  if (vr.getVaccineNdcCode() != null && !vr.getVaccineNdcCode().isBlank()) {
+	  if (!StringUtils.isBlank(vr.getVaccineNdcCode())) {
 		  i.getVaccineCode().addCoding().setCode(vr.getVaccineNdcCode()).setSystem(NDC);
 	  }
 	  i.setManufacturer(MappingHelper.getFhirCodeableReference(MappingHelper.ORGANISATION, MVX, vr.getVaccineMvxCode()));

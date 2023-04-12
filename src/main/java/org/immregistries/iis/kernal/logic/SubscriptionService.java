@@ -7,17 +7,21 @@ import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.api.server.RequestDetails;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.client.interceptor.AdditionalRequestHeadersInterceptor;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.MutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r5.model.*;
 import org.immregistries.iis.kernal.model.OrgAccess;
 import org.immregistries.iis.kernal.repository.RepositoryClientFactory;
-import org.immregistries.iis.kernal.servlet.ServletHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+
+import static org.hl7.fhir.r5.model.Bundle.HTTPVerb.DELETE;
 
 
 @Service
@@ -52,8 +56,8 @@ public class SubscriptionService {
 	}
 
 
-	public String triggerWithResource(Subscription subscription, List<IBaseResource> resources) {
-		try {
+	public String triggerWithResource(Subscription subscription, List<Pair<String, Bundle.HTTPVerb>> requests) {
+//		try {
 //			OrgAccess orgAccess = ServletHelper.getOrgAccess();
 
 //			ResourceDeliveryMessage resourceDeliveryMessage = new ResourceDeliveryMessage();
@@ -87,9 +91,39 @@ public class SubscriptionService {
 			 * First entry is SubscriptionStatus
 			 */
 			notificationBundle.addEntry().setResource(status);
-			for (IBaseResource resource : resources) {
-				notificationBundle.addEntry().setResource((Resource) resource);
+			for (Pair<String, Bundle.HTTPVerb> pair : requests) {
+				switch(pair.getValue()){
+					case PUT:
+					case POST: {
+						Resource resource = (Resource) parseResource(pair.getKey());
+						notificationBundle.addEntry()
+							.setResource(resource)
+							.setRequest(new Bundle.BundleEntryRequestComponent(pair.getValue(), resource.getId()));
+						break;
+					}
+					case DELETE: {
+						String url = ""; // TODO get resourceType?
+						try {
+							Identifier identifier = (Identifier) parseResource(pair.getKey());
+							url = "?identifier=";
+							if (!StringUtils.isBlank(identifier.getSystem())) {
+								url += identifier.getSystem() + "|";
+							}
+							url += identifier.getValue();
+						} catch (ClassCastException classCastException) {}
+
+						if (url.isBlank()) {
+							url = new  UrlType(pair.getKey()).getValue();
+						}
+
+						Bundle.BundleEntryComponent entry = notificationBundle.addEntry()
+							.setRequest(new Bundle.BundleEntryRequestComponent(DELETE, url));
+						break;
+					}
+				}
 			}
+
+
 
 			MethodOutcome outcome = endpointClient.create().resource(notificationBundle).execute();
 			if (outcome.getResource() != null) {
@@ -110,11 +144,19 @@ public class SubscriptionService {
 //				subscriptionTriggeringProvider.triggerSubscription(new IdType(subscription.getId()),ids,urls);
 
 
-			return "Sent";
-		} catch (Exception e) {
-			e.printStackTrace();
-			return e.getLocalizedMessage();
-		}
+			return "Success : \n\n" + fhirSystemDao.getContext().newJsonParser().setPrettyPrint(true).encodeResourceToString(notificationBundle);
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//			return e.getLocalizedMessage();
+//		}
 
+	}
+
+	private IBaseResource parseResource(String message) {
+		if (message.startsWith("<")) {
+			return repositoryClientFactory.getFhirContext().newXmlParser().parseResource(message);
+		} else {
+			return repositoryClientFactory.getFhirContext().newJsonParser().parseResource(message);
+		}
 	}
 }

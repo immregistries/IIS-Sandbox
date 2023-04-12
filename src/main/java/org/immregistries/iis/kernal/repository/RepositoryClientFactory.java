@@ -131,7 +131,6 @@ public class RepositoryClientFactory extends ApacheRestfulClientFactory implemen
 
 	@Override
 	public IGenericClient newClient(FhirContext fhirContext, HttpServletRequest httpServletRequest, String s) {
-		//TODO deal with authentication/authorisation
 		return null;
 	}
 }

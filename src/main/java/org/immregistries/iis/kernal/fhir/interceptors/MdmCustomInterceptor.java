@@ -146,7 +146,6 @@ public class MdmCustomInterceptor {
 				i2 = toVaccDedupImmunization(golden_i, theRequestDetails);
 				comparison = comparer.compare(i1, i2);
 				String matching_level = (golden_i.getPatient().equals(immunization.getPatient())) ? "MATCH" : "POSSIBLE_MATCH";
-				// TODO scan mdm links to check match level
 				logger.info("Matching level with Immunization {} : {}", golden_i.getId(), matching_level);
 
 				if (comparison.equals(ComparisonResult.EQUAL)) {
