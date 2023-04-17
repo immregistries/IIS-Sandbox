@@ -20,18 +20,19 @@ services:
       --lower_case_table_names=1
     restart: always
     environment:
-      #      MYSQL_DATABASE: 'iis_alongside_jpa'
       MYSQL_USER: 'iis_web'
       MYSQL_PASSWORD: 'SharkBaitHooHaHa'
       MYSQL_ROOT_PASSWORD: 'password123456789'
     volumes:
       #      - ./src/main/database/create-mysql-user.sql:/docker-entrypoint-initdb.d/1.sql
       - ./src/main/database/create-mysql-database.sql:/docker-entrypoint-initdb.d/2.sql
-  #    ports:
-  #      - "3307:3306"
   iis-sandbox-jpa:
     build: .
     container_name: iis-sandbox-jpa
+    environment:
+      #      hibernate.connection.url: jdbc:mysql://iis-sandbox-mysql:3306/iis_alongside_jpa
+      IIS_MYSQL_HIBERNATE_CONNECTION_URL: jdbc:mysql://iis-sandbox-mysql:3306/iis_alongside_jpa
+      SPRING_DATASOURCE_URL: jdbc:postgresql://hapi-fhir-postgres:5432/hapi_fhir_iis
     restart: on-failure
     ports:
       - "8080:8080"

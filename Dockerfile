@@ -21,9 +21,10 @@
 FROM bitnami/tomcat:9.0 as tomcat
 
 RUN rm -rf /opt/bitnami/tomcat/webapps/ROOT && \
-    rm -rf /opt/bitnami/tomcat/webapps_default/ROOT && \
-    mkdir -p /opt/bitnami/hapi/data/hapi/lucenefiles && \
-    chmod 775 /opt/bitnami/hapi/data/hapi/lucenefiles
+    rm -rf /opt/bitnami/tomcat/webapps_default/ROOT
+#    && \
+#    mkdir -p /opt/bitnami/hapi/data/hapi/lucenefiles && \
+#    chmod 775 /opt/bitnami/hapi/data/hapi/lucenefiles
 
 USER root
 RUN mkdir -p /target && chown -R 1001:1001 target

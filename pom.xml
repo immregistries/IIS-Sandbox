@@ -652,8 +652,8 @@
             </activation>
             <properties>
                 <spring.profiles.active>prod</spring.profiles.active>
-                <postgres.datasource.url>jdbc:postgresql://localhost:5432/hapi_fhir_iis</postgres.datasource.url>
-                <mysql.hibernate.connection.host>localhost</mysql.hibernate.connection.host>
+                <iis.mysql.hibernate.connection.url>jdbc:mysql://localhost/iis_alongside_jpa
+                </iis.mysql.hibernate.connection.url>
                 <jpa.properties.hibernate.dialect>ca.uhn.fhir.jpa.model.dialect.HapiFhirPostgres94Dialect
                 </jpa.properties.hibernate.dialect>
                 <maven.test.skip>true</maven.test.skip>
@@ -663,9 +663,8 @@
             <id>docker</id>
             <properties>
                 <spring.profiles.active>prod</spring.profiles.active>
-                <mysql.hibernate.connection.host>iis-sandbox-mysql:3306</mysql.hibernate.connection.host>
-                <postgres.datasource.url>jdbc:postgresql://hapi-fhir-postgres:5432/hapi_fhir_iis
-                </postgres.datasource.url>
+                <iis.mysql.hibernate.connection.url>jdbc:mysql://iis-sandbox-mysql:3306/iis_alongside_jpa
+                </iis.mysql.hibernate.connection.url>
                 <jpa.properties.hibernate.dialect>ca.uhn.fhir.jpa.model.dialect.HapiFhirPostgres94Dialect
                 </jpa.properties.hibernate.dialect>
                 <maven.test.skip>true</maven.test.skip>
@@ -675,7 +674,8 @@
             <id>dev</id>
             <properties>
                 <spring.profiles.active>dev</spring.profiles.active>
-                <mysql.hibernate.connection.host>localhost</mysql.hibernate.connection.host>
+                <mysql.hibernate.connection.url>jdbc:mysql://localhost/iis_alongside_jpa
+                </mysql.hibernate.connection.url>
                 <jpa.properties.hibernate.dialect>ca.uhn.fhir.jpa.model.dialect.HapiFhirH2Dialect
                 </jpa.properties.hibernate.dialect>
                 <maven.test.skip>true</maven.test.skip>

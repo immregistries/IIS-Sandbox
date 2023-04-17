@@ -214,7 +214,7 @@ hapi:
 spring:
   config.activate.on-profile: prod
   datasource:
-    url: '@postgres.datasource.url@'
+    url: jdbc:postgresql://localhost:5432/hapi_fhir_iis
     username: hapi_iis_web
     password: SicMundusCreatusEst
     driver-class-name: org.postgresql.Driver
