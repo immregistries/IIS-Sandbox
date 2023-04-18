@@ -1,18 +1,18 @@
 #FROM maven:3.8-openjdk-17-slim as build-hapi
-#WORKDIR /tmp/iis-sandbox-jpa
+#WORKDIR /tmp/iis
 
 #COPY pom.xml .
 #COPY server.xml .
-#COPY target/iis-sandbox-jpa.war .
+#COPY target/iis.war .
 #RUN mvn -ntp dependency:go-offline
 
-#COPY src/ /tmp/iis-sandbox-jpa/src/
+#COPY src/ /tmp/iis/src/
 #COPY src/main/database /database
 #RUN mvn clean install -DskipTests -Djdk.lang.Process.launchMechanism=vfork
 
 #FROM build-hapi AS build-distroless
 #RUN mvn package spring-boot:repackage -Pboot
-#RUN mkdir /app && cp /tmp/iis-sandbox-jpa/target/iis-sandbox-jpa.war /app/main.war
+#RUN mkdir /app && cp /tmp/iis/target/iis.war /app/main.war
 
 
 
@@ -32,8 +32,8 @@ USER 1001
 
 COPY --chown=1001:1001 catalina.properties /opt/bitnami/tomcat/conf/catalina.properties
 COPY --chown=1001:1001 server.xml /opt/bitnami/tomcat/conf/server.xml
-COPY --chown=1001:1001 target/iis-sandbox-jpa.war /opt/bitnami/tomcat/webapps_default/iis-sandbox-jpa.war
-#COPY --from=build-hapi --chown=1001:1001 /tmp/iis-sandbox-jpa/iis-sandbox-jpa.war /opt/bitnami/tomcat/webapps_default/iis-sandbox-jpa.war
+COPY --chown=1001:1001 target/iis.war /opt/bitnami/tomcat/webapps_default/iis.war
+#COPY --from=build-hapi --chown=1001:1001 /tmp/iis/iis.war /opt/bitnami/tomcat/webapps_default/iis.war
 
 ENV ALLOW_EMPTY_PASSWORD=yes
 
@@ -45,4 +45,4 @@ ENV ALLOW_EMPTY_PASSWORD=yes
 ## is running as a non-root (uid != 0) user.
 #USER 65532:65532
 #WORKDIR /app
-#CMD ["/app/iis-sandbox-jpa.war"]
+#CMD ["/app/iis.war"]

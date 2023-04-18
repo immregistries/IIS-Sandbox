@@ -21,7 +21,7 @@ mvn clean package
 
 Compile and run with embedded H2 database:
 ```
-mvn clean package -Pdev && java -jar --add-opens java.base/java.lang=ALL-UNNAMED target/iis-sandbox-jpa.war
+mvn clean package -Pdev && java -jar --add-opens java.base/java.lang=ALL-UNNAMED target/iis.war
 ```
 
 

@@ -237,7 +237,7 @@ public class PatientServlet extends HttpServlet {
 				}
 			}
 
-			String apiBaseUrl =  "/iis-sandbox-jpa/fhir/" + orgAccess.getAccessName();
+			String apiBaseUrl = "/iis/fhir/" + orgAccess.getAccessName();
         {
 			  String link = apiBaseUrl + "/Patient/"
 				  + patientReportedSelected.getId();

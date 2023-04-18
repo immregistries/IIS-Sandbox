@@ -451,8 +451,8 @@
             </plugins>
         </pluginManagement>
 
-        <!-- Tells Maven to name the generated WAR file as iis-sandbox-jpa.war -->
-        <finalName>iis-sandbox-jpa</finalName>
+        <!-- Tells Maven to name the generated WAR file as iis.war -->
+        <finalName>iis</finalName>
 
         <plugins>
             <plugin>
