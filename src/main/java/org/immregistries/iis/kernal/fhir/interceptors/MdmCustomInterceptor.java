@@ -13,6 +13,7 @@ import ca.uhn.fhir.rest.param.ReferenceParam;
 import ca.uhn.fhir.rest.param.TokenParam;
 import ca.uhn.fhir.rest.server.TransactionLogMessages;
 import ca.uhn.fhir.rest.server.messaging.ResourceOperationMessage;
+import org.apache.commons.lang3.StringUtils;
 import org.immregistries.iis.kernal.logic.SubscriptionService;
 import org.immregistries.iis.kernal.fhir.mdm.MdmConfigCondition;
 import ca.uhn.fhir.mdm.api.*;
@@ -195,6 +196,7 @@ public class MdmCustomInterceptor {
 			i1.setSource(ImmunizationSource.SOURCE);
 		} else if (immunization.hasInformationSource()
 			&& immunization.getInformationSource().getConcept() != null
+			&& !StringUtils.isBlank(immunization.getInformationSource().getConcept().getCode(ImmunizationMapperR5.INFORMATION_SOURCE))
 			&& immunization.getInformationSource().getConcept().getCode(ImmunizationMapperR5.INFORMATION_SOURCE).equals("00")) {
 			i1.setSource(ImmunizationSource.SOURCE);
 		} else {
