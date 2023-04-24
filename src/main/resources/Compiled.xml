@@ -408,6 +408,20 @@
             </use-date>
         </code>
         <code>
+            <value>253088698300059211230401</value>
+            <label>COVID-19 Moderna EUA Recipient-Caregiver Fact Sheet - all ages 6 months and older</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_VIS_VACCINES">230</link-to>
+                <link-to codeset="VACCINATION_VIS_VACCINES">229</link-to>
+            </reference>
+            <use-date>
+                <not-before>20230418</not-before>
+            </use-date>
+        </code>
+        <code>
             <value>253088698300051611220501</value>
             <label>COVID-19 Moderna EUA Recipient-Caregiver Fact Sheet - Pediatric 6mo to &lt;6yrs</label>
             <code-status>
@@ -517,6 +531,21 @@
             </reference>
             <use-date>
                 <not-before>20210510</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>253088698300058511230401</value>
+            <label>COVID-19 Pfizer BioNTech EUA Recipient-Caregiver Fact Sheet - all ages 6 months and older</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_VIS_VACCINES">301</link-to>
+                <link-to codeset="VACCINATION_VIS_VACCINES">300</link-to>
+                <link-to codeset="VACCINATION_VIS_VACCINES">302</link-to>
+            </reference>
+            <use-date>
+                <not-before>20230418</not-before>
             </use-date>
         </code>
         <code>
@@ -5991,6 +6020,7 @@
                 <link-to codeset="VACCINATION_CVX_CODE">143</link-to>
                 <link-to codeset="VACCINATION_MANUFACTURER_CODE">BRR</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">51285-0138-50</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">TVA</link-to>
             </reference>
             <use-date>
                 <not-before>20110531</not-before>
@@ -6035,6 +6065,7 @@
                 <link-to codeset="VACCINATION_CVX_CODE">143</link-to>
                 <link-to codeset="VACCINATION_MANUFACTURER_CODE">BRR</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">51285-0138-50</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">TVA</link-to>
             </reference>
             <use-date>
                 <not-before>20110531</not-before>
@@ -7540,6 +7571,7 @@
             <reference>
                 <link-to codeset="VACCINATION_CVX_CODE">210</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">00310-1222-15</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">ASZ</link-to>
             </reference>
             <use-date>
                 <not-before>20201222</not-before>
@@ -15080,6 +15112,48 @@
             </code-status>
         </code>
         <code>
+            <value>49281-0379-88</value>
+            <label>FLUZONE High-Dose Quadrivalent Southern Hemisphere</label>
+            <description>Sanofi Pasteur Inc. - Influenza, Southern Hemisphere, Single-Dose 0.7 mL (2023 season southern hemisphere)</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">231</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">PMC</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">49281-0379-50</link-to>
+            </reference>
+            <use-date>
+                <not-before>20230213</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>49281-379-88</value>
+            <label>FLUZONE High-Dose Quadrivalent Southern Hemisphere</label>
+            <description>Sanofi Pasteur Inc. - Influenza, Southern Hemisphere, Single-Dose 0.7 mL (2023 season southern hemisphere)</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>49281-0379-88</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20230306</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>49281037988</value>
+            <label>FLUZONE High-Dose Quadrivalent Southern Hemisphere</label>
+            <description>Sanofi Pasteur Inc. - Influenza, Southern Hemisphere, Single-Dose 0.7 mL (2023 season southern hemisphere)</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>49281-0379-88</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20230306</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
             <value>49281-0709-48</value>
             <label>FLUZONE Intradermal</label>
             <description>Sanofi Pasteur Inc. - </description>
@@ -17055,6 +17129,90 @@
                     <new-code-value>49281-0322-88</new-code-value>
                     <reason>Use 11-digit format with dashes</reason>
                     <effective-date>20220311</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>49281-0323-88</value>
+            <label>FLUZONE QUADRIVALENT SOUTHERN HEMISPHERE</label>
+            <description>Sanofi Pasteur Inc. - Influenza, Southern Hemisphere, Single-Dose 0.5 mL (2023 season southern hemisphere)</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">201</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">PMC</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">49281-0323-50</link-to>
+            </reference>
+            <use-date>
+                <not-before>20230213</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>49281-323-88</value>
+            <label>FLUZONE QUADRIVALENT SOUTHERN HEMISPHERE</label>
+            <description>Sanofi Pasteur Inc. - Influenza, Southern Hemisphere, Single-Dose 0.5 mL (2023 season southern hemisphere)</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>49281-0323-88</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20230306</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>49281032388</value>
+            <label>FLUZONE QUADRIVALENT SOUTHERN HEMISPHERE</label>
+            <description>Sanofi Pasteur Inc. - Influenza, Southern Hemisphere, Single-Dose 0.5 mL (2023 season southern hemisphere)</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>49281-0323-88</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20230306</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>49281-0355-78</value>
+            <label>FLUZONE QUADRIVALENT SOUTHERN HEMISPHERE</label>
+            <description>Sanofi Pasteur Inc. - Influenza, Southern Hemisphere, Multi-Dose 5 mL (2023 season southern hemisphere)</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">202</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">PMC</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">49281-0355-15</link-to>
+            </reference>
+            <use-date>
+                <not-before>20230213</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>49281-355-78</value>
+            <label>FLUZONE QUADRIVALENT SOUTHERN HEMISPHERE</label>
+            <description>Sanofi Pasteur Inc. - Influenza, Southern Hemisphere, Multi-Dose 5 mL (2023 season southern hemisphere)</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>49281-0355-78</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20230306</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>49281035578</value>
+            <label>FLUZONE QUADRIVALENT SOUTHERN HEMISPHERE</label>
+            <description>Sanofi Pasteur Inc. - Influenza, Southern Hemisphere, Multi-Dose 5 mL (2023 season southern hemisphere)</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>49281-0355-78</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20230306</effective-date>
                 </deprecated>
             </code-status>
         </code>
@@ -19072,6 +19230,7 @@
             <reference>
                 <link-to codeset="VACCINATION_CVX_CODE">212</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">59676-0580-15</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">JSN</link-to>
             </reference>
             <use-date>
                 <not-before>20210201</not-before>
@@ -19114,6 +19273,7 @@
             <reference>
                 <link-to codeset="VACCINATION_CVX_CODE">206</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">50632-0001-02</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">BN</link-to>
             </reference>
             <use-date>
                 <not-before>20210317</not-before>
@@ -21122,6 +21282,7 @@
             <reference>
                 <link-to codeset="VACCINATION_CVX_CODE">220</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">75052-0001-10</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">VBI</link-to>
             </reference>
             <use-date>
                 <not-before>20211201</not-before>
@@ -23628,6 +23789,7 @@
                 <link-to codeset="VACCINATION_CVX_CODE">146</link-to>
                 <link-to codeset="VACCINATION_MANUFACTURER_CODE">PMC</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">63361-0243-10</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">MSP</link-to>
             </reference>
             <use-date>
                 <not-before>20200401</not-before>
@@ -23672,6 +23834,7 @@
                 <link-to codeset="VACCINATION_CVX_CODE">146</link-to>
                 <link-to codeset="VACCINATION_MANUFACTURER_CODE">PMC</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">63361-0243-15</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">MSP</link-to>
             </reference>
             <use-date>
                 <not-before>20201001</not-before>
@@ -27268,6 +27431,24 @@
             <concept-type>unspecified</concept-type>
         </code>
         <code>
+            <value>231</value>
+            <label>influenza, Southern Hemisphere, high-dose, quadrivalent</label>
+            <description>influenza, seasonal, Southern Hemisphere, high-dose, quadrivalent, 0.7mL dose, preservative free Notes: Target population 65 and older, starting Southern Hemisphere season 2023</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINE_GROUP">FLU</link-to>
+                <link-to codeset="VACCINATION_TRADE_NAME">FLUZONE High-Dose Quadrivalent Southern Hemisphere</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">49281-0379-88</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">49281-0379-50</link-to>
+            </reference>
+            <use-date>
+                <not-before>20230314</not-before>
+            </use-date>
+            <concept-type>vaccine</concept-type>
+        </code>
+        <code>
             <value>200</value>
             <label>influenza, Southern Hemisphere, pediatric, preservative free</label>
             <description>influenza, seasonal, Southern Hemisphere, quadrivalent, pediatric 0.25mL dose, preservative free Notes: Pediatric dose for ages 6-35 months</description>
@@ -27303,6 +27484,8 @@
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">49281-0321-50</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">49281-0322-88</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">49281-0322-50</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">49281-0323-88</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">49281-0323-50</link-to>
             </reference>
             <use-date>
                 <not-before>20200506</not-before>
@@ -27325,6 +27508,8 @@
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">49281-0337-15</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">49281-0339-78</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">49281-0339-15</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">49281-0355-78</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">49281-0355-15</link-to>
             </reference>
             <use-date>
                 <not-before>20200506</not-before>
@@ -30242,6 +30427,22 @@
             </use-date>
         </code>
         <code>
+            <value>ASZ</value>
+            <label>AstraZeneca</label>
+            <description>Parent Company of MedImmune</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_TRADE_NAME">AstraZeneca COVID-19 Vaccine (Non-US tradenames include VAXZEVRIA, COVISHIELD)</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">00310-1222-10</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">00310-1222-15</link-to>
+            </reference>
+            <use-date>
+                <not-before>20221101</not-before>
+            </use-date>
+        </code>
+        <code>
             <value>AVB</value>
             <label>Aventis Behring L.L.C.</label>
             <description>part of CSL</description>
@@ -30281,6 +30482,22 @@
             <use-date>
                 <not-before>20110320</not-before>
                 <not-after>20171116</not-after>
+            </use-date>
+        </code>
+        <code>
+            <value>BN</value>
+            <label>Bavarian Nordic A/S</label>
+            <description>manufacturer of national stockpile smallpox vaccine Jynneos</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_TRADE_NAME">JYNNEOS</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">50632-0001-01</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">50632-0001-02</link-to>
+            </reference>
+            <use-date>
+                <not-before>20200717</not-before>
             </use-date>
         </code>
         <code>
@@ -30344,6 +30561,20 @@
             </use-date>
         </code>
         <code>
+            <value>BBI</value>
+            <label>Bharat Biotech International Limited</label>
+            <description>Non-US COVID-19 Vaccine Manufacturer - WHO Authorized (COVAXIN)</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_TRADE_NAME">COVAXIN (Bharat) COVID-19 Vaccine</link-to>
+            </reference>
+            <use-date>
+                <not-before>20211109</not-before>
+            </use-date>
+        </code>
+        <code>
             <value>BTP</value>
             <label>Biotest Pharmaceuticals Corporation</label>
             <description>New owner of NABI HB as of December 2007, Does NOT replace NABI Biopharmaceuticals in this code list.</description>
@@ -30363,6 +30594,20 @@
             </code-status>
             <use-date>
                 <not-after>20140429</not-after>
+            </use-date>
+        </code>
+        <code>
+            <value>CAN</value>
+            <label>CanSino Biologics, Inc</label>
+            <description>Non-US COVID-19 vaccine manufacturer, WHO Authorized (CONVIDECIA) on 5/19/2022</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_TRADE_NAME">CONVIDECIA (CanSino Biologics) COVID-19 Vaccine</link-to>
+            </reference>
+            <use-date>
+                <not-before>20221101</not-before>
             </use-date>
         </code>
         <code>
@@ -30859,6 +31104,22 @@
             </use-date>
         </code>
         <code>
+            <value>JSN</value>
+            <label>Janssen</label>
+            <description>Division of Johnson and Johnson, manufacturer of Covid-19 vaccine</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_TRADE_NAME">Janssen (J&amp;J) COVID-19 Vaccine</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">59676-0580-05</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">59676-0580-15</link-to>
+            </reference>
+            <use-date>
+                <not-before>20221101</not-before>
+            </use-date>
+        </code>
+        <code>
             <value>JNJ</value>
             <label>Johnson and Johnson</label>
             <description>acquired CRUCELL which acquired Berna</description>
@@ -30949,6 +31210,20 @@
             <use-date>
                 <not-before>20150921</not-before>
                 <not-after>20171116</not-after>
+            </use-date>
+        </code>
+        <code>
+            <value>MDO</value>
+            <label>Medicago, Inc</label>
+            <description>Non-US COVID-19 vaccine manufacturer Cofivenz vaccine recognized by ACIP</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_TRADE_NAME">Covifenz</link-to>
+            </reference>
+            <use-date>
+                <not-before>20220413</not-before>
             </use-date>
         </code>
         <code>
@@ -31177,6 +31452,24 @@
             </use-date>
         </code>
         <code>
+            <value>MSP</value>
+            <label>MSP Vaccine Company - (partnership Merck and Sanofi Pasteur)</label>
+            <description>US Based - Joint manufacturing partnership, initial vaccine Vaxelis 10/2020</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_TRADE_NAME">VAXELIS</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">63361-0243-58</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">63361-0243-88</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">63361-0243-10</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">63361-0243-15</link-to>
+            </reference>
+            <use-date>
+                <not-before>20210727</not-before>
+            </use-date>
+        </code>
+        <code>
             <value>NAB</value>
             <label>NABI</label>
             <description>formerly North American Biologicals, Inc.</description>
@@ -31324,6 +31617,7 @@
             </reference>
             <use-date>
                 <not-before>20101102</not-before>
+                <not-after>20210721</not-after>
             </use-date>
         </code>
         <code>
@@ -31364,7 +31658,7 @@
         <code>
             <value>PAX</value>
             <label>PaxVax</label>
-            <description></description>
+            <description>Emergent Biosolutions acquired PaxVax 8/2021, US Vaccines starting to label under Emergent Travel Health Inc.</description>
             <code-status>
                 <status>Valid</status>
             </code-status>
@@ -31845,6 +32139,13 @@
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">49281-0422-50</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">49281-0422-10</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">49281-0637-15</link-to>
+                <link-to codeset="VACCINATION_TRADE_NAME">FLUZONE High-Dose Quadrivalent Southern Hemisphere</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">49281-0379-88</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">49281-0323-88</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">49281-0355-78</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">49281-0379-50</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">49281-0355-15</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">49281-0323-50</link-to>
             </reference>
             <use-date>
                 <not-before>20100528</not-before>
@@ -31991,6 +32292,34 @@
             </use-date>
         </code>
         <code>
+            <value>SPH</value>
+            <label>Sinopharm-Biotech</label>
+            <description>Non-US COVID-19 Vaccine Manufacturer - WHO Authorized</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_TRADE_NAME">Sinopharm (BIBP) COVID-19 Vaccine</link-to>
+            </reference>
+            <use-date>
+                <not-before>20210715</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>SNV</value>
+            <label>Sinovac</label>
+            <description>Non-US COVID-19 Vaccine Manufacturer - WHO Authorized (Sinovac, CoronaVac)</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_TRADE_NAME">Coronavac (Sinovac) COVID-19 Vaccine</link-to>
+            </reference>
+            <use-date>
+                <not-before>20210712</not-before>
+            </use-date>
+        </code>
+        <code>
             <value>SOL</value>
             <label>Solvay Pharmaceuticals</label>
             <description>Part of Abbott</description>
@@ -32024,6 +32353,23 @@
             <use-date>
                 <not-before>20100528</not-before>
                 <not-after>20171116</not-after>
+            </use-date>
+        </code>
+        <code>
+            <value>TVA</value>
+            <label>TEVA Pharmaceuticals USA</label>
+            <description>BARR Laboratories merged with TEVA in 2007. The MVX for Barr was retired in 2011, TEVA continues to produce the former BARR vaccines</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_TRADE_NAME">Adenovirus types 4 and 7</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">51285-0174-02</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">51285-0175-02</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">51285-0138-50</link-to>
+            </reference>
+            <use-date>
+                <not-before>20190723</not-before>
             </use-date>
         </code>
         <code>
@@ -32096,6 +32442,22 @@
             <use-date>
                 <not-expected-after>20100528</not-expected-after>
                 <not-after>20100528</not-after>
+            </use-date>
+        </code>
+        <code>
+            <value>VBI</value>
+            <label>VBI Vaccines, Inc</label>
+            <description>New Vaccine Manufacturer added 1/2022</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_TRADE_NAME">PREHEVBRIO Hepatitis B Vaccine (Recombinant)</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">75052-0001-01</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">75052-0001-10</link-to>
+            </reference>
+            <use-date>
+                <not-before>20220413</not-before>
             </use-date>
         </code>
         <code>
@@ -32574,6 +32936,7 @@
                 <link-to codeset="VACCINATION_CVX_CODE">200</link-to>
                 <link-to codeset="VACCINATION_CVX_CODE">201</link-to>
                 <link-to codeset="VACCINATION_CVX_CODE">202</link-to>
+                <link-to codeset="VACCINATION_CVX_CODE">231</link-to>
             </reference>
         </code>
         <code>
@@ -33006,6 +33369,7 @@
             <reference>
                 <link-to codeset="VACCINATION_CVX_CODE">143</link-to>
                 <link-to codeset="VACCINATION_MANUFACTURER_CODE">BRR</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">TVA</link-to>
             </reference>
             <use-date>
                 <not-before>20120807</not-before>
@@ -33090,6 +33454,7 @@
             </code-status>
             <reference>
                 <link-to codeset="VACCINATION_CVX_CODE">510</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">SPH</link-to>
             </reference>
             <use-date>
                 <not-before>20210713</not-before>
@@ -33103,6 +33468,7 @@
             </code-status>
             <reference>
                 <link-to codeset="VACCINATION_CVX_CODE">511</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">SNV</link-to>
             </reference>
             <use-date>
                 <not-before>20210713</not-before>
@@ -33116,6 +33482,7 @@
             </code-status>
             <reference>
                 <link-to codeset="VACCINATION_CVX_CODE">502</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">BBI</link-to>
             </reference>
             <use-date>
                 <not-before>20211109</not-before>
@@ -33171,6 +33538,7 @@
             </code-status>
             <reference>
                 <link-to codeset="VACCINATION_CVX_CODE">212</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">JSN</link-to>
             </reference>
             <use-date>
                 <not-before>20210113</not-before>
@@ -33197,6 +33565,7 @@
             </code-status>
             <reference>
                 <link-to codeset="VACCINATION_CVX_CODE">210</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">ASZ</link-to>
             </reference>
             <use-date>
                 <not-before>20210713</not-before>
@@ -33210,6 +33579,7 @@
             </code-status>
             <reference>
                 <link-to codeset="VACCINATION_CVX_CODE">506</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">CAN</link-to>
             </reference>
             <use-date>
                 <not-before>20221101</not-before>
@@ -33505,6 +33875,7 @@
             <reference>
                 <link-to codeset="VACCINATION_CVX_CODE">146</link-to>
                 <link-to codeset="VACCINATION_MANUFACTURER_CODE">PMC</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">MSP</link-to>
             </reference>
             <use-date>
                 <not-before>20190213</not-before>
@@ -33757,6 +34128,7 @@
             </code-status>
             <reference>
                 <link-to codeset="VACCINATION_CVX_CODE">220</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">VBI</link-to>
             </reference>
             <use-date>
                 <not-before>20220112</not-before>
@@ -34405,6 +34777,20 @@
             </use-date>
         </code>
         <code>
+            <value>FLUZONE High-Dose Quadrivalent Southern Hemisphere</value>
+            <label>influenza, Southern Hemisphere, high-dose, quadrivalent</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">231</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">PMC</link-to>
+            </reference>
+            <use-date>
+                <not-before>20230314</not-before>
+            </use-date>
+        </code>
+        <code>
             <value>FLUZONE Quadrivalent Southern Hemisphere, Pediatric</value>
             <label>influenza, Southern Hemisphere, pediatric, preservative free</label>
             <code-status>
@@ -34906,6 +35292,7 @@
             </code-status>
             <reference>
                 <link-to codeset="VACCINATION_CVX_CODE">512</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">MDO</link-to>
             </reference>
             <use-date>
                 <not-before>20220411</not-before>
@@ -34919,6 +35306,7 @@
             </code-status>
             <reference>
                 <link-to codeset="VACCINATION_CVX_CODE">206</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">BN</link-to>
             </reference>
             <use-date>
                 <not-before>20200717</not-before>
@@ -43946,6 +44334,7 @@
             </code-status>
             <reference>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300051611220501</link-to>
+                <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300059211230401</link-to>
             </reference>
             <use-date>
                 <not-before>20221207</not-before>
@@ -43973,6 +44362,7 @@
             <reference>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300034911210601</link-to>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300034911220901</link-to>
+                <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300059211230401</link-to>
             </reference>
             <use-date>
                 <not-before>20220831</not-before>
@@ -44043,6 +44433,7 @@
             </code-status>
             <reference>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300042411211001</link-to>
+                <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300058511230401</link-to>
             </reference>
             <use-date>
                 <not-before>20221012</not-before>
@@ -44069,6 +44460,7 @@
             </code-status>
             <reference>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300048611220101</link-to>
+                <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300058511230401</link-to>
             </reference>
             <use-date>
                 <not-before>20221208</not-before>
@@ -44082,6 +44474,7 @@
             </code-status>
             <reference>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300033211210501</link-to>
+                <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300058511230401</link-to>
             </reference>
             <use-date>
                 <not-before>20220831</not-before>
@@ -46771,6 +47164,7 @@
                 <link-to codeset="VACCINATION_MANUFACTURER_CODE">BRR</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">51285-0174-02</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">51285-0175-02</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">TVA</link-to>
             </reference>
             <use-date>
                 <not-before>20110531</not-before>
@@ -48233,6 +48627,7 @@
             <reference>
                 <link-to codeset="VACCINATION_CVX_CODE">210</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">00310-1222-10</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">ASZ</link-to>
             </reference>
             <use-date>
                 <not-before>20201222</not-before>
@@ -55892,6 +56287,48 @@
             </code-status>
         </code>
         <code>
+            <value>49281-0379-50</value>
+            <label>FLUZONE High-Dose Quadrivalent Southern Hemisphere</label>
+            <description>Sanofi Pasteur Inc. - Influenza, Southern Hemisphere, Single-dose 0.7 mL SYRINGE  (2023 season southern hemisphere)</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">231</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">PMC</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">49281-0379-88</link-to>
+            </reference>
+            <use-date>
+                <not-before>20230213</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>49281-379-50</value>
+            <label>FLUZONE High-Dose Quadrivalent Southern Hemisphere</label>
+            <description>Sanofi Pasteur Inc. - Influenza, Southern Hemisphere, Single-dose 0.7 mL SYRINGE  (2023 season southern hemisphere)</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>49281-0379-50</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20230306</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>49281037950</value>
+            <label>FLUZONE High-Dose Quadrivalent Southern Hemisphere</label>
+            <description>Sanofi Pasteur Inc. - Influenza, Southern Hemisphere, Single-dose 0.7 mL SYRINGE  (2023 season southern hemisphere)</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>49281-0379-50</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20230306</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
             <value>49281-0712-40</value>
             <label>fluzone ID quadrivalent</label>
             <description>Sanofi - influenza vaccine quadrivalent ID</description>
@@ -57826,6 +58263,90 @@
                     <new-code-value>49281-0339-15</new-code-value>
                     <reason>Use 11-digit format with dashes</reason>
                     <effective-date>20220304</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>49281-0355-15</value>
+            <label>FLUZONE QUADRIVALENT SOUTHERN HEMISPHERE</label>
+            <description>Sanofi Pasteur Inc. - Influenza, Southern Hemisphere, Multi-dose 5 mL VIAL  (2023 season southern hemisphere)</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">202</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">PMC</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">49281-0355-78</link-to>
+            </reference>
+            <use-date>
+                <not-before>20230213</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>49281-355-15</value>
+            <label>FLUZONE QUADRIVALENT SOUTHERN HEMISPHERE</label>
+            <description>Sanofi Pasteur Inc. - Influenza, Southern Hemisphere, Multi-dose 5 mL VIAL  (2023 season southern hemisphere)</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>49281-0355-15</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20230306</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>49281035515</value>
+            <label>FLUZONE QUADRIVALENT SOUTHERN HEMISPHERE</label>
+            <description>Sanofi Pasteur Inc. - Influenza, Southern Hemisphere, Multi-dose 5 mL VIAL  (2023 season southern hemisphere)</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>49281-0355-15</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20230306</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>49281-0323-50</value>
+            <label>FLUZONE QUADRIVALENT SOUTHERN HEMISPHERE</label>
+            <description>Sanofi Pasteur Inc. - Influenza, Southern Hemisphere, Single-dose 0.5 mL SYRINGE  (2023 season southern hemisphere)</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">201</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">PMC</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">49281-0323-88</link-to>
+            </reference>
+            <use-date>
+                <not-before>20230213</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>49281-323-50</value>
+            <label>FLUZONE QUADRIVALENT SOUTHERN HEMISPHERE</label>
+            <description>Sanofi Pasteur Inc. - Influenza, Southern Hemisphere, Single-dose 0.5 mL SYRINGE  (2023 season southern hemisphere)</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>49281-0323-50</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20230306</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>49281032350</value>
+            <label>FLUZONE QUADRIVALENT SOUTHERN HEMISPHERE</label>
+            <description>Sanofi Pasteur Inc. - Influenza, Southern Hemisphere, Single-dose 0.5 mL SYRINGE  (2023 season southern hemisphere)</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>49281-0323-50</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20230306</effective-date>
                 </deprecated>
             </code-status>
         </code>
@@ -59970,6 +60491,7 @@
             <reference>
                 <link-to codeset="VACCINATION_CVX_CODE">212</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">59676-0580-05</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">JSN</link-to>
             </reference>
             <use-date>
                 <not-before>20210201</not-before>
@@ -60013,6 +60535,7 @@
             <reference>
                 <link-to codeset="VACCINATION_CVX_CODE">206</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">50632-0001-01</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">BN</link-to>
             </reference>
             <use-date>
                 <not-before>20210317</not-before>
@@ -62194,6 +62717,7 @@
             <reference>
                 <link-to codeset="VACCINATION_CVX_CODE">220</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">75052-0001-01</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">VBI</link-to>
             </reference>
             <use-date>
                 <not-before>20211201</not-before>
@@ -65465,6 +65989,7 @@
                 <link-to codeset="VACCINATION_CVX_CODE">146</link-to>
                 <link-to codeset="VACCINATION_MANUFACTURER_CODE">PMC</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">63361-0243-58</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">MSP</link-to>
             </reference>
             <use-date>
                 <not-before>20200410</not-before>
@@ -65509,6 +66034,7 @@
                 <link-to codeset="VACCINATION_CVX_CODE">146</link-to>
                 <link-to codeset="VACCINATION_MANUFACTURER_CODE">PMC</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">63361-0243-88</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">MSP</link-to>
             </reference>
             <use-date>
                 <not-before>20201001</not-before>
