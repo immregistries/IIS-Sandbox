@@ -178,7 +178,7 @@ public class PatientServlet extends HttpServlet {
       } else {
 
 			IParser parser = repositoryClientFactory.getFhirContext()
-				.newJsonParser().setPrettyPrint(true).setSummaryMode(true).setSuppressNarratives(true);
+				.newJsonParser().setPrettyPrint(true).setSuppressNarratives(true);
 			Patient patientSelected = (Patient) patientMapper.getFhirResource(patientReportedSelected);
 			out.println("<h2>Patient : " + patientSelected.getNameFirstRep().getNameAsSingleString() + "</h2>");
 			{
