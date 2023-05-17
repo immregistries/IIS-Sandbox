@@ -127,13 +127,13 @@ public class PopServlet extends HttpServlet {
         transformer.transform(testCaseMessage);
         message = testCaseMessage.getMessageText();
       }
-		if (!StringUtils.isBlank(req.getParameter(PARAM_USERID))) {
+		if (StringUtils.isNotBlank(req.getParameter(PARAM_USERID))) {
 			userId = req.getParameter(PARAM_USERID);
 		}
 		if (StringUtils.isBlank(userId)) {
 			userId = "Mercy";
 		}
-		if (!StringUtils.isBlank(req.getParameter(PARAM_PASSWORD))) {
+		if (StringUtils.isNotBlank(req.getParameter(PARAM_PASSWORD))) {
 			password = req.getParameter(PARAM_PASSWORD);
 		}
 		if (StringUtils.isBlank(password)) {

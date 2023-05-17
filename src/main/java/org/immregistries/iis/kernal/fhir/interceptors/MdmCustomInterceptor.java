@@ -196,7 +196,7 @@ public class MdmCustomInterceptor {
 			i1.setSource(ImmunizationSource.SOURCE);
 		} else if (immunization.hasInformationSource()
 			&& immunization.getInformationSource().getConcept() != null
-			&& !StringUtils.isBlank(immunization.getInformationSource().getConcept().getCode(ImmunizationMapperR5.INFORMATION_SOURCE))
+			&& StringUtils.isNotBlank(immunization.getInformationSource().getConcept().getCode(ImmunizationMapperR5.INFORMATION_SOURCE))
 			&& immunization.getInformationSource().getConcept().getCode(ImmunizationMapperR5.INFORMATION_SOURCE).equals("00")) {
 			i1.setSource(ImmunizationSource.SOURCE);
 		} else {

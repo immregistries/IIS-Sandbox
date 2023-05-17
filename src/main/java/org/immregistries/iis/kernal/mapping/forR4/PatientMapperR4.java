@@ -153,7 +153,7 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 		if (publicity != null) {
 			Coding value = MappingHelper.extensionGetCoding(publicity);
 			patientReported.setPublicityIndicator(value.getCode());
-			if (!StringUtils.isBlank(value.getVersion())) {
+			if (StringUtils.isNotBlank(value.getVersion())) {
 				try {
 					patientReported.setPublicityIndicatorDate(MappingHelper.sdf.parse(value.getVersion()));
 				} catch (ParseException e) {
@@ -165,7 +165,7 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 		if (protection != null) {
 			Coding value = MappingHelper.extensionGetCoding(protection);
 			patientReported.setProtectionIndicator(value.getCode());
-			if (!StringUtils.isBlank(value.getVersion())) {
+			if (StringUtils.isNotBlank(value.getVersion())) {
 				try {
 					patientReported.setProtectionIndicatorDate(MappingHelper.sdf.parse(value.getVersion()));
 				} catch (ParseException e) {
@@ -177,7 +177,7 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 		if (registry != null) {
 			Coding value = MappingHelper.extensionGetCoding(registry);
 			patientReported.setRegistryStatusIndicator(value.getCode());
-			if (!StringUtils.isBlank(value.getVersion())) {
+			if (StringUtils.isNotBlank(value.getVersion())) {
 				try {
 					patientReported.setRegistryStatusIndicatorDate(MappingHelper.sdf.parse(value.getVersion()));
 				} catch (ParseException e) {
@@ -249,22 +249,22 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 		raceExtension.setUrl(RACE);
 		CodeableConcept race = new CodeableConcept().setText(RACE_SYSTEM);
 		raceExtension.setValue(race);
-		if (!StringUtils.isBlank(pr.getRace())) {
+		if (StringUtils.isNotBlank(pr.getRace())) {
 			race.addCoding().setCode(pr.getRace());
 		}
-		if (!StringUtils.isBlank(pr.getRace2())) {
+		if (StringUtils.isNotBlank(pr.getRace2())) {
 			race.addCoding().setCode(pr.getRace2());
 		}
-		if (!StringUtils.isBlank(pr.getRace3())) {
+		if (StringUtils.isNotBlank(pr.getRace3())) {
 			race.addCoding().setCode(pr.getRace3());
 		}
-		if (!StringUtils.isBlank(pr.getRace4())) {
+		if (StringUtils.isNotBlank(pr.getRace4())) {
 			race.addCoding().setCode(pr.getRace4());
 		}
-		if (!StringUtils.isBlank(pr.getRace5())) {
+		if (StringUtils.isNotBlank(pr.getRace5())) {
 			race.addCoding().setCode(pr.getRace5());
 		}
-		if (!StringUtils.isBlank(pr.getRace6())) {
+		if (StringUtils.isNotBlank(pr.getRace6())) {
 			race.addCoding().setCode(pr.getRace6());
 		}
 		p.addExtension(ETHNICITY_EXTENSION, new Coding().setSystem(ETHNICITY_SYSTEM).setCode(pr.getEthnicity()));
@@ -295,7 +295,7 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 			.setDistrict(pr.getAddressCountyParish())
 			.setPostalCode(pr.getAddressZip());
 
-		if (!StringUtils.isBlank(pr.getBirthOrder())) {
+		if (StringUtils.isNotBlank(pr.getBirthOrder())) {
 			p.setMultipleBirth(new IntegerType().setValue(Integer.parseInt(pr.getBirthOrder())));
 		} else if (pr.getBirthFlag().equals(YES)) {
 			p.setMultipleBirth(new BooleanType(true));

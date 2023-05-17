@@ -26,9 +26,9 @@ services:
     volumes:
       #      - ./src/main/database/create-mysql-user.sql:/docker-entrypoint-initdb.d/1.sql
       - ./src/main/database/create-mysql-database.sql:/docker-entrypoint-initdb.d/2.sql
-  iis-sandbox-jpa:
+  iis-sandbox:
     build: .
-    container_name: iis-sandbox-jpa
+    container_name: iis-sandbox
     environment:
       #      hibernate.connection.url: jdbc:mysql://iis-sandbox-mysql:3306/iis_alongside_jpa
       IIS_MYSQL_HIBERNATE_CONNECTION_URL: jdbc:mysql://iis-sandbox-mysql:3306/iis_alongside_jpa

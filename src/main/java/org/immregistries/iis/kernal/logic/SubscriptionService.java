@@ -106,7 +106,7 @@ public class SubscriptionService {
 						try {
 							Identifier identifier = (Identifier) parseResource(pair.getKey());
 							url = "?identifier=";
-							if (!StringUtils.isBlank(identifier.getSystem())) {
+							if (StringUtils.isNotBlank(identifier.getSystem())) {
 								url += identifier.getSystem() + "|";
 							}
 							url += identifier.getValue();

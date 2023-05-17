@@ -1691,7 +1691,7 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler<Organizatio
 				 Immunization immunization = (Immunization) entry.getResource();
 				 if (immunization.getOccurrenceDateTimeType() != null) {
 					 String key = sdf.format(immunization.getOccurrenceDateTimeType().getValue());
-					 if (immunization.getVaccineCode() != null && !StringUtils.isBlank(immunization.getVaccineCode().getText())) {
+					 if (immunization.getVaccineCode() != null && StringUtils.isNotBlank(immunization.getVaccineCode().getText())) {
 						 key += key + immunization.getVaccineCode().getText();
 						 VaccinationMaster vaccinationMaster = immunizationMapper.getMaster(immunization);
 						 map.put(key, vaccinationMaster);

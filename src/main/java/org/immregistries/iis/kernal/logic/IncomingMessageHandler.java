@@ -116,9 +116,9 @@ public abstract class IncomingMessageHandler<Organization extends IBaseResource>
   public void printQueryNK1(PatientReported patientReported, StringBuilder sb, CodeMap codeMap) {
     if (patientReported != null) {
 
-		 if (!StringUtils.isBlank(patientReported.getGuardianRelationship())
-			 && !StringUtils.isBlank(patientReported.getGuardianLast())
-			 && !StringUtils.isBlank(patientReported.getGuardianFirst())) {
+		 if (StringUtils.isNotBlank(patientReported.getGuardianRelationship())
+			 && StringUtils.isNotBlank(patientReported.getGuardianLast())
+			 && StringUtils.isNotBlank(patientReported.getGuardianFirst())) {
 			 Code code = codeMap.getCodeForCodeset(CodesetType.PERSON_RELATIONSHIP,
 				 patientReported.getGuardianRelationship());
 			 if (code != null) {
@@ -584,7 +584,7 @@ public abstract class IncomingMessageHandler<Organization extends IBaseResource>
   public void printERRSegment(ProcessingException e, StringBuilder sb) {
     sb.append("ERR|");
     sb.append("|"); // 2
-	  if (!StringUtils.isBlank(e.getSegmentId())) {
+	  if (StringUtils.isNotBlank(e.getSegmentId())) {
 		  sb.append(e.getSegmentId()).append("^").append(e.getSegmentRepeat());
 		  if (e.getFieldPosition() > 0) {
 			  sb.append("^").append(e.getFieldPosition());

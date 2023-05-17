@@ -43,7 +43,7 @@ public class ImmunizationMapperR5 implements ImmunizationMapper<Immunization> {
 		vr.setUpdatedDate(i.getMeta().getLastUpdated());
 		vr.setVaccinationReportedExternalLink(i.getIdentifierFirstRep().getValue());
 		vr.setVaccinationReportedExternalLinkSystem(i.getIdentifierFirstRep().getSystem());
-		if (i.getPatient() != null && !StringUtils.isBlank(i.getPatient().getReference())) {
+		if (i.getPatient() != null && StringUtils.isNotBlank(i.getPatient().getReference())) {
 			vr.setPatientReported(fhirRequests.readPatientReported(i.getPatient().getReference()));
 //			vr.setPatientReported(fhirRequests.readPatientReported(i.getPatient().getReference().split("Patient/")[0]));
 		}
@@ -99,16 +99,16 @@ public class ImmunizationMapperR5 implements ImmunizationMapper<Immunization> {
 		vr.setFundingSource(i.getFundingSource().getCodingFirstRep().getCode());
 		vr.setFundingEligibility(i.getProgramEligibilityFirstRep().getProgram().getCodingFirstRep().getCode());
 
-		if (i.getLocation() != null && !StringUtils.isBlank(i.getLocation().getReference())) {
+		if (i.getLocation() != null && StringUtils.isNotBlank(i.getLocation().getReference())) {
 			vr.setOrgLocation(fhirRequests.readOrgLocation(i.getLocation().getReference()));
 		}
-		if (i.hasInformationSource() && i.getInformationSource().getReference() != null && !StringUtils.isBlank(i.getInformationSource().getReference().getReference())) {
+		if (i.hasInformationSource() && i.getInformationSource().getReference() != null && StringUtils.isNotBlank(i.getInformationSource().getReference().getReference())) {
 			vr.setEnteredBy(fhirRequests.readPractitionerPerson(i.getInformationSource().getReference().getReference()));
 		} else {
 //			vr.set
 		}
 		for (Immunization.ImmunizationPerformerComponent performer : i.getPerformer()) {
-			if (performer.getActor() != null && !StringUtils.isBlank(performer.getActor().getReference())) {
+			if (performer.getActor() != null && StringUtils.isNotBlank(performer.getActor().getReference())) {
 				switch (performer.getFunction().getCode(FUNCTION)) {
 					case ADMINISTERING: {
 						vr.setAdministeringProvider(fhirRequests.readPractitionerPerson(performer.getActor().getReference()));
@@ -164,10 +164,10 @@ public class ImmunizationMapperR5 implements ImmunizationMapper<Immunization> {
 	  }
 	  i.getOccurrenceDateTimeType().setValue(vr.getAdministeredDate());
 
-	  if (!StringUtils.isBlank(vr.getVaccineCvxCode())) {
+	  if (StringUtils.isNotBlank(vr.getVaccineCvxCode())) {
 		  i.getVaccineCode().addCoding().setCode(vr.getVaccineCvxCode()).setSystem(CVX);
 	  }
-	  if (!StringUtils.isBlank(vr.getVaccineNdcCode())) {
+	  if (StringUtils.isNotBlank(vr.getVaccineNdcCode())) {
 		  i.getVaccineCode().addCoding().setCode(vr.getVaccineNdcCode()).setSystem(NDC);
 	  }
 	  i.setManufacturer(MappingHelper.getFhirCodeableReference(MappingHelper.ORGANISATION, MVX, vr.getVaccineMvxCode()));
