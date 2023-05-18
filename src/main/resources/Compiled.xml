@@ -3858,6 +3858,7 @@
             </code-status>
             <reference>
                 <link-to codeset="VACCINATION_CVX_CODE">44</link-to>
+                <link-to codeset="VACCINATION_CVX_CODE">43</link-to>
             </reference>
             <use-date/>
         </code>
@@ -19309,6 +19310,7 @@
                 <link-to codeset="VACCINATION_CVX_CODE">206</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">50632-0001-02</link-to>
                 <link-to codeset="VACCINATION_MANUFACTURER_CODE">BN</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">50632-0001-03</link-to>
             </reference>
             <use-date>
                 <not-before>20210317</not-before>
@@ -19944,6 +19946,48 @@
                     <new-code-value>49281-0590-58</new-code-value>
                     <reason>Use 11-digit format with dashes</reason>
                     <effective-date>20200527</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>50090-6180-01</value>
+            <label>MENQUADFI</label>
+            <description>A-S Medication Solutions - meningococcal polysaccharide (groups A, C, Y, W-135) tetanus toxoid conjugate</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">203</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">PMC</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">50090-6180-00</link-to>
+            </reference>
+            <use-date>
+                <not-before>20230503</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>50090-6180-1</value>
+            <label>MENQUADFI</label>
+            <description>A-S Medication Solutions - meningococcal polysaccharide (groups A, C, Y, W-135) tetanus toxoid conjugate</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>50090-6180-01</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20230510</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>50090618001</value>
+            <label>MENQUADFI</label>
+            <description>A-S Medication Solutions - meningococcal polysaccharide (groups A, C, Y, W-135) tetanus toxoid conjugate</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>50090-6180-01</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20230510</effective-date>
                 </deprecated>
             </code-status>
         </code>
@@ -25968,6 +26012,7 @@
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">54868-0734-00</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">54868-2219-01</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">54868-2219-00</link-to>
+                <link-to codeset="VACCINATION_CPT_CODE">90747</link-to>
             </reference>
             <use-date>
                 <not-before>20100528</not-before>
@@ -28188,6 +28233,8 @@
                 <link-to codeset="VACCINATION_TRADE_NAME">MenQuadfi</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">49281-0590-58</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">49281-0590-05</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">50090-6180-01</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">50090-6180-00</link-to>
             </reference>
             <use-date>
                 <not-before>20200527</not-before>
@@ -29391,6 +29438,7 @@
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">50632-0001-02</link-to>
                 <link-to codeset="VACCINE_GROUP">Orthopoxvirus</link-to>
                 <link-to codeset="VACCINATION_CPT_CODE">90611</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">50632-0001-03</link-to>
             </reference>
             <use-date>
                 <not-before>20200720</not-before>
@@ -30530,6 +30578,7 @@
                 <link-to codeset="VACCINATION_TRADE_NAME">JYNNEOS</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">50632-0001-01</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">50632-0001-02</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">50632-0001-03</link-to>
             </reference>
             <use-date>
                 <not-before>20200717</not-before>
@@ -32181,6 +32230,8 @@
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">49281-0379-50</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">49281-0355-15</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">49281-0323-50</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">50090-6180-01</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">50090-6180-00</link-to>
             </reference>
             <use-date>
                 <not-before>20100528</not-before>
@@ -60616,6 +60667,48 @@
             </code-status>
         </code>
         <code>
+            <value>50632-0001-03</value>
+            <label>JYNNEOS</label>
+            <description>Bavarian Nordic A/S - Vaccinia, smallpox and monkeypox vaccine, live, non-replicating</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">206</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">BN</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">50632-0001-01</link-to>
+            </reference>
+            <use-date>
+                <not-before>20210317</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>50632-001-03</value>
+            <label>JYNNEOS</label>
+            <description>Bavarian Nordic A/S - Vaccinia, smallpox and monkeypox vaccine, live, non-replicating</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>50632-0001-03</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20230424</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>50632000103</value>
+            <label>JYNNEOS</label>
+            <description>Bavarian Nordic A/S - Vaccinia, smallpox and monkeypox vaccine, live, non-replicating</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>50632-0001-03</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20230424</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
             <value>58160-0812-11</value>
             <label>KINRIX</label>
             <description>GlaxoSmithKline Biologicals SA - DIPHTHERIA AND TETANUS TOXOIDS AND ACELLULAR PERTUSSIS ADSORBED AND INACTIVATED POLIOVIRUS VACCINE</description>
@@ -61175,6 +61268,48 @@
                     <new-code-value>49281-0590-05</new-code-value>
                     <reason>Use 11-digit format with dashes</reason>
                     <effective-date>20200527</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>50090-6180-00</value>
+            <label>MENQUADFI</label>
+            <description>A-S Medication Solutions - meningococcal polysaccharide (groups A, C, Y, W-135) tetanus toxoid conjugate</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">203</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">PMC</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">50090-6180-01</link-to>
+            </reference>
+            <use-date>
+                <not-before>20230503</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>50090-6180-0</value>
+            <label>MENQUADFI</label>
+            <description>A-S Medication Solutions - meningococcal polysaccharide (groups A, C, Y, W-135) tetanus toxoid conjugate</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>50090-6180-00</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20230510</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>50090618000</value>
+            <label>MENQUADFI</label>
+            <description>A-S Medication Solutions - meningococcal polysaccharide (groups A, C, Y, W-135) tetanus toxoid conjugate</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>50090-6180-00</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20230510</effective-date>
                 </deprecated>
             </code-status>
         </code>
