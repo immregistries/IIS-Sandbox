@@ -80,21 +80,27 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 			switch (raceNumber) {
 				case 1: {
 					patientReported.setRace(coding.getCode());
+					break;
 				}
 				case 2: {
 					patientReported.setRace2(coding.getCode());
+					break;
 				}
 				case 3: {
 					patientReported.setRace3(coding.getCode());
+					break;
 				}
 				case 4:{
 					patientReported.setRace4(coding.getCode());
+					break;
 				}
 				case 5:{
 					patientReported.setRace5(coding.getCode());
+					break;
 				}
 				case 6:{
 					patientReported.setRace6(coding.getCode());
+					break;
 				}
 			}
 		}
