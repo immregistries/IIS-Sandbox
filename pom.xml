@@ -107,9 +107,9 @@
         <!--        </dependency>-->
 
         <dependency>
-            <groupId>org.immregistries.vfa</groupId>
+            <groupId>org.immregistries</groupId>
             <artifactId>ForecastConnector</artifactId>
-            <version>3.20.2</version>
+            <version>3.20.3</version>
         </dependency>
 
         <dependency>
