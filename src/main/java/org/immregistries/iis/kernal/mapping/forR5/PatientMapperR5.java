@@ -11,6 +11,8 @@ import org.immregistries.iis.kernal.mapping.MappingHelper;
 import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.model.PatientReported;
 import org.immregistries.iis.kernal.repository.FhirRequesterR5;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Service;
@@ -23,6 +25,7 @@ import static org.immregistries.iis.kernal.repository.FhirRequester.GOLDEN_SYSTE
 @Service
 @Conditional(OnR5Condition.class)
 public class PatientMapperR5 implements PatientMapper<Patient> {
+	Logger logger = LoggerFactory.getLogger(PatientMapperR5.class);
 
 	@Autowired
 	FhirRequesterR5 fhirRequests;
@@ -290,7 +293,7 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 
 
 		if (pr.getDeathDate() != null) {
-			p.setDeceased(new DateType(pr.getDeathDate()));
+			p.setDeceased(new DateTimeType(pr.getDeathDate()));
 		} else if (pr.getDeathFlag().equals(YES)) {
 			p.setDeceased(new BooleanType(true));
 		} else if (pr.getDeathFlag().equals(NO)) {

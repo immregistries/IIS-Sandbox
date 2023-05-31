@@ -14,6 +14,7 @@ import ca.uhn.fhir.rest.param.TokenParam;
 import ca.uhn.fhir.rest.server.TransactionLogMessages;
 import ca.uhn.fhir.rest.server.messaging.ResourceOperationMessage;
 import org.apache.commons.lang3.StringUtils;
+import org.immregistries.iis.kernal.fhir.mdm.MdmCustomProvider;
 import org.immregistries.iis.kernal.logic.SubscriptionService;
 import org.immregistries.iis.kernal.fhir.mdm.MdmConfigCondition;
 import ca.uhn.fhir.mdm.api.*;
@@ -73,7 +74,8 @@ public class MdmCustomInterceptor {
 	private IMdmSettings myMdmSettings;
 	@Autowired
 	private GoldenResourceHelper myGoldenResourceHelper;
-	MdmProviderDstu3Plus mdmProvider;
+	@Autowired
+	MdmCustomProvider mdmProvider;
 	@Autowired
 	IFhirResourceDao<Immunization> immunizationDao;
 
@@ -84,7 +86,7 @@ public class MdmCustomInterceptor {
 	SubscriptionService subscriptionService;
 
 	private void initialize() {
-		mdmProvider = new MdmProviderDstu3Plus(fhirSystemDao.getContext(), this.myMdmControllerSvc, this.myMdmControllerHelper, this.myMdmSubmitSvc, this.myMdmSettings);
+//		mdmProvider = new MdmCustomProvider(fhirSystemDao.getContext(), this.myMdmControllerSvc, this.myMdmControllerHelper, this.myMdmSubmitSvc, this.myMdmSettings);
 	}
 
 	@Hook(Pointcut.MDM_AFTER_PERSISTED_RESOURCE_CHECKED)

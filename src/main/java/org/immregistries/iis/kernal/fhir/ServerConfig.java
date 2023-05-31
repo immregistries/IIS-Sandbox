@@ -41,6 +41,7 @@ import ca.uhn.fhir.rest.server.util.ISearchParamRegistry;
 import ca.uhn.fhir.validation.IValidatorModule;
 import ca.uhn.fhir.validation.ResultSeverityEnum;
 import com.google.common.base.Strings;
+import org.immregistries.iis.kernal.fhir.mdm.MdmCustomProvider;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -71,6 +72,7 @@ public class ServerConfig {
 		, PartitionCreationInterceptor partitionCreationInterceptor
 		, Optional<BulkQueryGroupProviderR5> bulkQueryGroupProviderR5
 		, Optional<BulkQueryGroupProviderR4> bulkQueryGroupProviderR4
+		, Optional<MdmCustomProvider> mdmCustomProvider
 
 //		, SessionAuthorizationInterceptor sessionAuthorizationInterceptor
 //		, MdmCustomInterceptor mdmCustomInterceptor
@@ -93,10 +95,17 @@ public class ServerConfig {
 		}
 
 		if (appProperties.getMdm_enabled()) {
-			mdmProviderProvider.get().loadProvider();
+//			mdmProviderProvider.get().loadProvider();
+			/**
+			 * CUSTOM MDM PROVIDERS HERE
+			 */
+			resourceProviderFactory.addSupplier(mdmCustomProvider::get);
+//			fhirServer.registerProvider(mdmCustomProvider.get());
 			daoConfig.setAllowMdmExpansion(true);
 		}
-		// CUSTOM PROVIDERS HERE
+		/**
+		 * CUSTOM PROVIDERS HERE
+		 */
 		fhirServer.registerProviders(resourceProviderFactory.createProviders());
 		fhirServer.registerProvider(jpaSystemProvider);
 		fhirServer.setServerConformanceProvider(calculateConformanceProvider(fhirSystemDao, fhirServer, daoConfig, searchParamRegistry, theValidationSupport));

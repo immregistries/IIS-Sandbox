@@ -14,6 +14,8 @@ import org.immregistries.iis.kernal.mapping.Interfaces.PatientMapper;
 import org.immregistries.iis.kernal.model.*;
 import org.immregistries.iis.kernal.repository.FhirRequester;
 import org.immregistries.iis.kernal.repository.RepositoryClientFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.RequestDispatcher;
@@ -33,6 +35,7 @@ import static org.immregistries.iis.kernal.servlet.SubscriptionServlet.PARAM_MES
 import static org.immregistries.iis.kernal.servlet.SubscriptionServlet.PARAM_SUBSCRIPTION_ID;
 
 public class PatientServlet extends HttpServlet {
+	Logger logger = LoggerFactory.getLogger(PatientServlet.class);
 	@Autowired
 	RepositoryClientFactory repositoryClientFactory;
 	@Autowired
