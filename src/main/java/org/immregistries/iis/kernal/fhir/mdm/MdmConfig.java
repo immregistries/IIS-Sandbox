@@ -20,7 +20,7 @@ import java.io.IOException;
 
 @Configuration
 @Conditional(MdmConfigCondition.class)
-@Import({MdmConsumerConfig.class, MdmSubmitterConfig.class})
+@Import({MdmCustomConsumerConfig.class, MdmSubmitterConfig.class})
 public class MdmConfig {
 
 	@Bean

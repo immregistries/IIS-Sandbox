@@ -47,9 +47,10 @@ import java.text.ParseException;
 import static org.immregistries.iis.kernal.repository.FhirRequester.GOLDEN_RECORD;
 import static org.immregistries.iis.kernal.repository.FhirRequester.GOLDEN_SYSTEM_TAG;
 
-@Component
-@Interceptor
-@Conditional(MdmConfigCondition.class)
+/**
+ * Deprecated
+ * replaced by MdmCustomMatchFinder
+ */
 public class MdmCustomInterceptor {
 	Logger logger = LoggerFactory.getLogger(MdmCustomInterceptor.class);
 	@Autowired
@@ -91,6 +92,7 @@ public class MdmCustomInterceptor {
 
 	@Hook(Pointcut.MDM_AFTER_PERSISTED_RESOURCE_CHECKED)
 	public void test(ResourceOperationMessage resourceOperationMessage, TransactionLogMessages transactionLogMessages, MdmLinkEvent mdmLinkEvent) {
+		logger.info("Pointcut test {}", Pointcut.MDM_AFTER_PERSISTED_RESOURCE_CHECKED);
 		logger.info("ResourceOperationMessage {}", resourceOperationMessage.getPayloadString());
 		logger.info("TransactionLogMessages {}", transactionLogMessages.getValues());
 		logger.info("mdmLinkEvent {}", mdmLinkEvent.toString());
@@ -100,7 +102,7 @@ public class MdmCustomInterceptor {
 	@Hook(Pointcut.STORAGE_PRECOMMIT_RESOURCE_CREATED)
 	public void invoke(IBaseResource theResource, RequestDetails theRequestDetails) {
 		initialize();
-		try {
+		if (theResource instanceof Immunization) {
 			Immunization immunization = (Immunization) theResource;
 			logger.info("Custom MDM applied for Immunization");
 
@@ -172,7 +174,6 @@ public class MdmCustomInterceptor {
 //				golden.setUserData(Constants.RESOURCE_PARTITION_ID, RequestPartitionId.fromPartitionName(theRequestDetails.getTenantId()));
 //				mdmLinkSvc.updateLink(golden,immunization,MdmMatchOutcome.NEW_GOLDEN_RESOURCE_MATCH,MdmLinkSourceEnum.MANUAL,mdmTransactionContext);
 			}
-		} catch (ClassCastException c) {
 		}
 	}
 
