@@ -8,6 +8,7 @@ import ca.uhn.fhir.jpa.model.util.JpaConstants;
 import ca.uhn.fhir.jpa.partition.SystemRequestDetails;
 import ca.uhn.fhir.jpa.provider.BaseJpaResourceProviderPatient;
 import ca.uhn.fhir.jpa.rp.r5.GroupResourceProvider;
+import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
 import org.immregistries.iis.kernal.fhir.annotations.OnR5Condition;
 import ca.uhn.fhir.model.api.annotation.Description;
 import ca.uhn.fhir.model.valueset.BundleTypeEnum;
@@ -132,145 +133,260 @@ public class BulkQueryGroupProviderR5 extends GroupResourceProvider {
 //		}
 	}
 
-	public void groupInstanceSynchExport(
+//	public void groupInstanceSynchExport(
+//
+//		@IdParam
+//		IdType theId,
+//
+//		@Description(formalDefinition = "The format for the requested Bulk Data files to be generated as per FHIR Asynchronous Request Pattern. Defaults to application/fhir+ndjson. The server SHALL support Newline Delimited JSON, but MAY choose to support additional output formats. The server SHALL accept the full content type of application/fhir+ndjson as well as the abbreviated representations application/ndjson and ndjson.")
+//		@OperationParam(name = "_outputFormat")
+//		IPrimitiveType<String> theOutputFormat,
+//
+//		@Description(shortDefinition = "Results from this method are returned across multiple pages. This parameter controls the size of those pages.")
+//		@OperationParam(name = Constants.PARAM_COUNT, typeName = "unsignedInt")
+//		IPrimitiveType<Integer> theCount,
+//
+//		@Description(shortDefinition = "Results from this method are returned across multiple pages. This parameter controls the offset when fetching a page.")
+//		@OperationParam(name = Constants.PARAM_OFFSET, typeName = "unsignedInt")
+//		IPrimitiveType<Integer> theOffset,
+//
+//		@Description(shortDefinition = "Only return resources which were last updated as specified by the given range")
+//		@OperationParam(name = Constants.PARAM_LASTUPDATED, min = 0, max = 1)
+//		DateRangeParam theLastUpdated,
+//
+//		@Description(shortDefinition = "Filter the resources to return only resources matching the given _content filter (note that this filter is applied only to results which link to the given patient, not to the patient itself or to supporting resources linked to by the matched resources)")
+//		@OperationParam(name = Constants.PARAM_CONTENT, min = 0, max = OperationParam.MAX_UNLIMITED, typeName = "string")
+//		List<IPrimitiveType<String>> theContent,
+//
+//		@Description(shortDefinition = "Filter the resources to return only resources matching the given _text filter (note that this filter is applied only to results which link to the given patient, not to the patient itself or to supporting resources linked to by the matched resources)")
+//		@OperationParam(name = Constants.PARAM_TEXT, min = 0, max = OperationParam.MAX_UNLIMITED, typeName = "string")
+//		List<IPrimitiveType<String>> theNarrative,
+//
+//		@Description(shortDefinition = "Filter the resources to return only resources matching the given _filter filter (note that this filter is applied only to results which link to the given patient, not to the patient itself or to supporting resources linked to by the matched resources)")
+//		@OperationParam(name = Constants.PARAM_FILTER, min = 0, max = OperationParam.MAX_UNLIMITED, typeName = "string")
+//		List<IPrimitiveType<String>> theFilter,
+//
+//		@Description(shortDefinition = "Filter the resources to return only resources matching the given _type filter (note that this filter is applied only to results which link to the given patient, not to the patient itself or to supporting resources linked to by the matched resources)")
+//		@OperationParam(name = Constants.PARAM_TYPE, min = 0, max = OperationParam.MAX_UNLIMITED, typeName = "string")
+//		List<IPrimitiveType<String>> theTypes,
+//
+//		@Sort
+//		SortSpec theSortSpec,
+//
+//		ServletRequestDetails theRequestDetails
+//	) throws IOException {
+//		Session dataSession = PopServlet.getDataSession();
+//		javax.servlet.http.HttpServletRequest theServletRequest = theRequestDetails.getServletRequest();
+//		logger.info("Parameters {}", (Object) theRequestDetails.getParameters().get("_elements"));
+//		try {
+//
+//			if (theOutputFormat == null) {
+////			theRequestDetails.se
+//			}
+//			BulkExportResponseJson bulkResponseDocument = new BulkExportResponseJson();
+//
+//			String serverBase = StringUtils.removeEnd(theRequestDetails.getServerBaseForRequest(), "/");
+//			Map<String, Bundle> bundleMap = new HashMap<>();
+//			Group group = read(theServletRequest, theId, theRequestDetails);
+//
+//			Bundle errorsBundle = new Bundle();
+//			for (Group.GroupMemberComponent member : group.getMember()) {
+//				if (member.getEntity().getReference().split("/")[0].equals("Patient")) {
+//					Bundle memberBundle = new Bundle();
+//					// TODO add normal filter for type filter
+//					try {
+//						IBundleProvider bundleProvider = patientProvider.patientInstanceEverything(theServletRequest, new IdType(member.getEntity().getReference()), theCount, theOffset, theLastUpdated, theContent, theNarrative, theFilter, theTypes, theSortSpec, theRequestDetails);
+//						for (IBaseResource resource : bundleProvider.getAllResources()) {
+//							bundleMap.putIfAbsent(resource.fhirType(), new Bundle());
+//							bundleMap.get(resource.fhirType()).addEntry().setResource((Resource) resource);
+//						}
+//					} catch (Exception e) {
+//						/**
+//						 * Caught Exceptions are exported in a ndJson Binary file
+//						 */
+//						e.printStackTrace();
+//						OperationOutcome operationOutcome = new OperationOutcome();
+//						operationOutcome.addIssue()
+//							.setDetails(new CodeableConcept(new Coding().setDisplay(e.getMessage())));
+//						errorsBundle.addEntry().setResource(operationOutcome); // TODO Add informations
+//					}
+//				}
+//			}
+//
+//			IParser parser = fhirResourceGroupDao.getContext().newNDJsonParser();
+//			RequestDetails detailsCopy = new SystemRequestDetails();
+//			detailsCopy.setTenantId(theRequestDetails.getTenantId());
+//			for (Map.Entry<String, Bundle> entry : bundleMap.entrySet()) {
+//				Binary binary = new Binary();
+//				binary.setContentType("Bulk");
+//				binary.setContent(parser.encodeResourceToString(entry.getValue()).getBytes(StandardCharsets.UTF_8));
+//				DaoMethodOutcome outcome = binaryDao.create(binary, detailsCopy);
+//				IIdType newIId;
+//				String nextUrl;
+//				if (outcome.getResource() != null) {
+//					newIId = outcome.getResource().getIdElement();
+//					nextUrl = serverBase + "/" + newIId.toUnqualifiedVersionless().getValue();
+//				} else if (outcome.getId() != null) {
+//					newIId = outcome.getId();
+//					nextUrl = serverBase + "/" + newIId.toUnqualifiedVersionless().getValue();
+//				} else {
+//					nextUrl = "ERROR";
+//				}
+//				bulkResponseDocument.addOutput()
+//					.setType(entry.getKey())
+//					.setUrl(nextUrl);
+//			}
+//
+//			if (!errorsBundle.getEntry().isEmpty()) { // If exceptions were caught
+//				Binary binary = new Binary();
+//				binary.setContentType("Bulk-Error");
+//				binary.setContent(parser.encodeResourceToString(errorsBundle).getBytes(StandardCharsets.UTF_8));
+//				DaoMethodOutcome outcome = binaryDao.create(binary, detailsCopy);
+//
+//				IIdType newIId;
+//				String nextUrl;
+//				if (outcome.getResource() != null) {
+//					newIId = outcome.getResource().getIdElement();
+//					nextUrl = serverBase + "/" + newIId.toUnqualifiedVersionless().getValue();
+//				} else if (outcome.getId() != null) {
+//					newIId = outcome.getId();
+//					nextUrl = serverBase + "/" + newIId.toUnqualifiedVersionless().getValue();
+//				} else {
+//					nextUrl = "ERROR";
+//				}
+//				BulkExportResponseJson.Output errorOutput = new BulkExportResponseJson.Output();
+//				errorOutput.setType("OperationOutcome");
+//				errorOutput.setUrl(nextUrl);
+//				bulkResponseDocument.getError().add(errorOutput);
+//			}
+//
+//
+//			bulkResponseDocument.setTransactionTime(new Date(System.currentTimeMillis()));
+//			bulkResponseDocument.setRequiresAccessToken(true);
+//			bulkResponseDocument.setRequest(theRequestDetails.getCompleteUrl());
+//
+//			HttpServletResponse response = theRequestDetails.getServletResponse();
+//			JsonUtil.serialize(bulkResponseDocument, response.getWriter());
+//			response.getWriter().close();
+//		} catch (Exception e) {
+//			throw e;
+//		} finally {
+//			dataSession.close();
+//		}
+//	}
+
+
+	/**
+	 * Group/123/$member-add
+	 */
+	@Operation(name = "member-add", idempotent = true, bundleType = BundleTypeEnum.SEARCHSET)
+	public void groupInstanceMemberAdd(
 
 		@IdParam
 		IdType theId,
 
-		@Description(formalDefinition = "The format for the requested Bulk Data files to be generated as per FHIR Asynchronous Request Pattern. Defaults to application/fhir+ndjson. The server SHALL support Newline Delimited JSON, but MAY choose to support additional output formats. The server SHALL accept the full content type of application/fhir+ndjson as well as the abbreviated representations application/ndjson and ndjson.")
-		@OperationParam(name = "_outputFormat")
-		IPrimitiveType<String> theOutputFormat,
+		@Description(shortDefinition = "The MemberId of the member to be added to the Group.")
+		@OperationParam(name = "memberId", typeName = "Identifier")
+		Identifier memberId,
 
-		@Description(shortDefinition = "Results from this method are returned across multiple pages. This parameter controls the size of those pages.")
-		@OperationParam(name = Constants.PARAM_COUNT, typeName = "unsignedInt")
-		IPrimitiveType<Integer> theCount,
+		@Description(shortDefinition = "The Provider to whom the member is being attributed to.")
+		@OperationParam(name = "providerNpi", typeName = "Identifier")
+		Identifier providerNpi,
 
-		@Description(shortDefinition = "Results from this method are returned across multiple pages. This parameter controls the offset when fetching a page.")
-		@OperationParam(name = Constants.PARAM_OFFSET, typeName = "unsignedInt")
-		IPrimitiveType<Integer> theOffset,
+		@Description(shortDefinition = "The reference of the member to be added to the Group.")
+		@OperationParam(name = "patientReference", typeName = "Reference")
+		Reference patientReference,
 
-		@Description(shortDefinition = "Only return resources which were last updated as specified by the given range")
-		@OperationParam(name = Constants.PARAM_LASTUPDATED, min = 0, max = 1)
-		DateRangeParam theLastUpdated,
+		@Description(shortDefinition = "The reference to the Provider to whom the member is being attributed to.")
+		@OperationParam(name = "providerReference", typeName = "Reference")
+		Reference providerReference,
 
-		@Description(shortDefinition = "Filter the resources to return only resources matching the given _content filter (note that this filter is applied only to results which link to the given patient, not to the patient itself or to supporting resources linked to by the matched resources)")
-		@OperationParam(name = Constants.PARAM_CONTENT, min = 0, max = OperationParam.MAX_UNLIMITED, typeName = "string")
-		List<IPrimitiveType<String>> theContent,
+		@Description(shortDefinition = "The period over which the patient is being attributed to the provider.")
+		@OperationParam(name = "attributionPeriod", typeName = "Period")
+		Period attributionPeriod,
 
-		@Description(shortDefinition = "Filter the resources to return only resources matching the given _text filter (note that this filter is applied only to results which link to the given patient, not to the patient itself or to supporting resources linked to by the matched resources)")
-		@OperationParam(name = Constants.PARAM_TEXT, min = 0, max = OperationParam.MAX_UNLIMITED, typeName = "string")
-		List<IPrimitiveType<String>> theNarrative,
-
-		@Description(shortDefinition = "Filter the resources to return only resources matching the given _filter filter (note that this filter is applied only to results which link to the given patient, not to the patient itself or to supporting resources linked to by the matched resources)")
-		@OperationParam(name = Constants.PARAM_FILTER, min = 0, max = OperationParam.MAX_UNLIMITED, typeName = "string")
-		List<IPrimitiveType<String>> theFilter,
-
-		@Description(shortDefinition = "Filter the resources to return only resources matching the given _type filter (note that this filter is applied only to results which link to the given patient, not to the patient itself or to supporting resources linked to by the matched resources)")
-		@OperationParam(name = Constants.PARAM_TYPE, min = 0, max = OperationParam.MAX_UNLIMITED, typeName = "string")
-		List<IPrimitiveType<String>> theTypes,
-
-		@Sort
-		SortSpec theSortSpec,
-
-		ServletRequestDetails theRequestDetails
+		RequestDetails theRequestDetails
 	) throws IOException {
-		Session dataSession = PopServlet.getDataSession();
-		javax.servlet.http.HttpServletRequest theServletRequest = theRequestDetails.getServletRequest();
-		logger.info("Parameters {}", (Object) theRequestDetails.getParameters().get("_elements"));
-		try {
-
-			if (theOutputFormat == null) {
-//			theRequestDetails.se
+		Group group = this.fhirResourceGroupDao.read(theId,theRequestDetails);
+		Group.GroupMemberComponent memberComponent;
+		if (memberId != null && providerNpi != null)  {
+			if (!group.getManagingEntity().getIdentifier().equals(providerNpi)) {
+				throw new InvalidRequestException("Not the right provider for this group");
 			}
-			BulkExportResponseJson bulkResponseDocument = new BulkExportResponseJson();
-
-			String serverBase = StringUtils.removeEnd(theRequestDetails.getServerBaseForRequest(), "/");
-			Map<String, Bundle> bundleMap = new HashMap<>();
-			Group group = read(theServletRequest, theId, theRequestDetails);
-
-			Bundle errorsBundle = new Bundle();
-			for (Group.GroupMemberComponent member : group.getMember()) {
-				if (member.getEntity().getReference().split("/")[0].equals("Patient")) {
-					Bundle memberBundle = new Bundle();
-					// TODO add normal filter for type filter
-					try {
-						IBundleProvider bundleProvider = patientProvider.patientInstanceEverything(theServletRequest, new IdType(member.getEntity().getReference()), theCount, theOffset, theLastUpdated, theContent, theNarrative, theFilter, theTypes, theSortSpec, theRequestDetails);
-						for (IBaseResource resource : bundleProvider.getAllResources()) {
-							bundleMap.putIfAbsent(resource.fhirType(), new Bundle());
-							bundleMap.get(resource.fhirType()).addEntry().setResource((Resource) resource);
-						}
-					} catch (Exception e) {
-						/**
-						 * Caught Exceptions are exported in a ndJson Binary file
-						 */
-						e.printStackTrace();
-						OperationOutcome operationOutcome = new OperationOutcome();
-						operationOutcome.addIssue()
-							.setDetails(new CodeableConcept(new Coding().setDisplay(e.getMessage())));
-						errorsBundle.addEntry().setResource(operationOutcome); // TODO Add informations
-					}
-				}
+			memberComponent = group.getMember().stream()
+				.filter(member -> memberId.equals(member.getEntity().getIdentifier())) //TODO better conditions
+				.findFirst()
+				.orElse(group.addMember());
+			memberComponent.setEntity(new Reference().setIdentifier(memberId)); //TODO solve reference with interceptor ?
+		} else if (patientReference != null && providerReference != null) {
+			if (!group.getManagingEntity().equals(providerReference)) {
+				throw new InvalidRequestException("Not the right provider for this group");
 			}
+			memberComponent = group.getMember().stream()
+				.filter(member -> patientReference.equals(member.getEntity()))
+				.findFirst()
+				.orElse(group.addMember());
+			memberComponent.setEntity(patientReference); //TODO solve reference with interceptor ?
+		} else {
+			throw new InvalidRequestException("parameters combination not supported");
+		}
+		memberComponent.setPeriod(attributionPeriod);
+	}
 
-			IParser parser = fhirResourceGroupDao.getContext().newNDJsonParser();
-			RequestDetails detailsCopy = new SystemRequestDetails();
-			detailsCopy.setTenantId(theRequestDetails.getTenantId());
-			for (Map.Entry<String, Bundle> entry : bundleMap.entrySet()) {
-				Binary binary = new Binary();
-				binary.setContentType("Bulk");
-				binary.setContent(parser.encodeResourceToString(entry.getValue()).getBytes(StandardCharsets.UTF_8));
-				DaoMethodOutcome outcome = binaryDao.create(binary, detailsCopy);
-				IIdType newIId;
-				String nextUrl;
-				if (outcome.getResource() != null) {
-					newIId = outcome.getResource().getIdElement();
-					nextUrl = serverBase + "/" + newIId.toUnqualifiedVersionless().getValue();
-				} else if (outcome.getId() != null) {
-					newIId = outcome.getId();
-					nextUrl = serverBase + "/" + newIId.toUnqualifiedVersionless().getValue();
-				} else {
-					nextUrl = "ERROR";
-				}
-				bulkResponseDocument.addOutput()
-					.setType(entry.getKey())
-					.setUrl(nextUrl);
+
+	/**
+	 * Group/123/$member-remove
+	 */
+	@Operation(name = "member-remove", idempotent = true, bundleType = BundleTypeEnum.SEARCHSET)
+	public void groupInstanceMemberRemove(
+
+		@IdParam
+		IdType theId,
+
+		@Description(shortDefinition = "The MemberId of the member to be added to the Group.")
+		@OperationParam(name = "memberId", typeName = "Identifier")
+		Identifier memberId,
+
+		@Description(shortDefinition = "The Provider to whom the member is being attributed to.")
+		@OperationParam(name = "providerNpi", typeName = "Identifier")
+		Identifier providerNpi,
+
+		@Description(shortDefinition = "The reference of the member to be added to the Group.")
+		@OperationParam(name = "patientReference", typeName = "Reference")
+		Reference patientReference,
+
+		@Description(shortDefinition = "The reference to the Provider to whom the member is being attributed to.")
+		@OperationParam(name = "providerReference", typeName = "Reference")
+		Reference providerReference,
+
+		@Description(shortDefinition = "The period over which the patient is being attributed to the provider.")
+		@OperationParam(name = "attributionPeriod", typeName = "Period")
+		Period attributionPeriod,
+
+		RequestDetails theRequestDetails
+	) throws IOException {
+		Group group = this.fhirResourceGroupDao.read(theId,theRequestDetails);
+		Group.GroupMemberComponent memberComponent;
+		if (memberId != null && providerNpi != null)  {
+			if (!group.getManagingEntity().getIdentifier().equals(providerNpi)) {
+				throw new InvalidRequestException("Not the right provider for this group");
 			}
-
-			if (!errorsBundle.getEntry().isEmpty()) { // If exceptions were caught
-				Binary binary = new Binary();
-				binary.setContentType("Bulk-Error");
-				binary.setContent(parser.encodeResourceToString(errorsBundle).getBytes(StandardCharsets.UTF_8));
-				DaoMethodOutcome outcome = binaryDao.create(binary, detailsCopy);
-
-				IIdType newIId;
-				String nextUrl;
-				if (outcome.getResource() != null) {
-					newIId = outcome.getResource().getIdElement();
-					nextUrl = serverBase + "/" + newIId.toUnqualifiedVersionless().getValue();
-				} else if (outcome.getId() != null) {
-					newIId = outcome.getId();
-					nextUrl = serverBase + "/" + newIId.toUnqualifiedVersionless().getValue();
-				} else {
-					nextUrl = "ERROR";
-				}
-				BulkExportResponseJson.Output errorOutput = new BulkExportResponseJson.Output();
-				errorOutput.setType("OperationOutcome");
-				errorOutput.setUrl(nextUrl);
-				bulkResponseDocument.getError().add(errorOutput);
+			group.getMember()
+				.remove(group.getMember().stream()
+					.filter(member -> memberId.equals(member.getEntity().getIdentifier())) //TODO better conditions
+					.findFirst()
+					.orElse(null));
+		} else if (patientReference != null && providerReference != null) {
+			if (!group.getManagingEntity().equals(providerReference)) {
+				throw new InvalidRequestException("Not the right provider for this group");
 			}
-
-
-			bulkResponseDocument.setTransactionTime(new Date(System.currentTimeMillis()));
-			bulkResponseDocument.setRequiresAccessToken(true);
-			bulkResponseDocument.setRequest(theRequestDetails.getCompleteUrl());
-
-			HttpServletResponse response = theRequestDetails.getServletResponse();
-			JsonUtil.serialize(bulkResponseDocument, response.getWriter());
-			response.getWriter().close();
-		} catch (Exception e) {
-			throw e;
-		} finally {
-			dataSession.close();
+			group.getMember()
+				.remove(group.getMember().stream()
+					.filter(member -> patientReference.equals(member.getEntity()))
+					.findFirst()
+					.orElse(null));
+		} else {
+			throw new InvalidRequestException("parameters combination not supported");
 		}
 	}
 }

@@ -182,46 +182,46 @@ public class CustomBulkDataExportProvider extends BulkDataExportProvider {
 		}
 	}
 
-	/**
-	 * Group/[id]/$export
-	 */
-	@Operation(name = JpaConstants.OPERATION_EXPORT, manualResponse = true, idempotent = true, typeName = "Group")
-	public void groupExport(
-		@IdParam IIdType theIdParam,
-		@OperationParam(name = JpaConstants.PARAM_EXPORT_OUTPUT_FORMAT, min = 0, max = 1, typeName = "string") IPrimitiveType<String> theOutputFormat,
-		@OperationParam(name = JpaConstants.PARAM_EXPORT_TYPE, min = 0, max = 1, typeName = "string") IPrimitiveType<String> theType,
-		@OperationParam(name = JpaConstants.PARAM_EXPORT_SINCE, min = 0, max = 1, typeName = "instant") IPrimitiveType<Date> theSince,
-		@OperationParam(name = JpaConstants.PARAM_EXPORT_TYPE_FILTER, min = 0, max = OperationParam.MAX_UNLIMITED, typeName = "string") List<IPrimitiveType<String>> theTypeFilter,
-		@OperationParam(name = JpaConstants.PARAM_EXPORT_MDM, min = 0, max = 1, typeName = "boolean") IPrimitiveType<Boolean> theMdm,
-		ServletRequestDetails theRequestDetails
-	) throws Exception {
-		ourLog.debug("Received Group Bulk Export Request for Group {}", theIdParam);
-		ourLog.debug("_type={}", theIdParam);
-		ourLog.debug("_since={}", theSince);
-		ourLog.debug("_typeFilter={}", theTypeFilter);
-		ourLog.debug("_mdm=", theMdm);
-
-		if (hasAsyncHeader(theRequestDetails, JpaConstants.OPERATION_EXPORT)) {
-			BulkDataExportOptions bulkDataExportOptions = buildGroupBulkExportOptions(theOutputFormat, theType, theSince, theTypeFilter, theIdParam, theMdm);
-
-			if (bulkDataExportOptions.getResourceTypes() != null && !bulkDataExportOptions.getResourceTypes().isEmpty()) {
-				validateResourceTypesAllContainPatientSearchParams(bulkDataExportOptions.getResourceTypes());
-			} else {
-				// all patient resource types
-				bulkDataExportOptions.setResourceTypes(getPatientCompartmentResources());
-			}
-
-			startJob(theRequestDetails, bulkDataExportOptions);
-		} else {
-			List<IPrimitiveType<String>> theTypes = new ArrayList<>();
-			theTypes.add(theType);
-			DateRangeParam theLastUpdated = new DateRangeParam();
-			if (theSince != null) {
-				theLastUpdated.setLowerBound(theSince.getValueAsString());
-			}
-			bulkQueryGroupProviderR5.groupInstanceSynchExport(new IdType(theIdParam.getValue()), theOutputFormat, null, null, theLastUpdated, null, null, null, theTypes, null, theRequestDetails);
-		}
-	}
+//	/**
+//	 * Group/[id]/$export
+//	 */
+//	@Operation(name = JpaConstants.OPERATION_EXPORT, manualResponse = true, idempotent = true, typeName = "Group")
+//	public void groupExport(
+//		@IdParam IIdType theIdParam,
+//		@OperationParam(name = JpaConstants.PARAM_EXPORT_OUTPUT_FORMAT, min = 0, max = 1, typeName = "string") IPrimitiveType<String> theOutputFormat,
+//		@OperationParam(name = JpaConstants.PARAM_EXPORT_TYPE, min = 0, max = 1, typeName = "string") IPrimitiveType<String> theType,
+//		@OperationParam(name = JpaConstants.PARAM_EXPORT_SINCE, min = 0, max = 1, typeName = "instant") IPrimitiveType<Date> theSince,
+//		@OperationParam(name = JpaConstants.PARAM_EXPORT_TYPE_FILTER, min = 0, max = OperationParam.MAX_UNLIMITED, typeName = "string") List<IPrimitiveType<String>> theTypeFilter,
+//		@OperationParam(name = JpaConstants.PARAM_EXPORT_MDM, min = 0, max = 1, typeName = "boolean") IPrimitiveType<Boolean> theMdm,
+//		ServletRequestDetails theRequestDetails
+//	) throws Exception {
+//		ourLog.debug("Received Group Bulk Export Request for Group {}", theIdParam);
+//		ourLog.debug("_type={}", theIdParam);
+//		ourLog.debug("_since={}", theSince);
+//		ourLog.debug("_typeFilter={}", theTypeFilter);
+//		ourLog.debug("_mdm=", theMdm);
+//
+//		if (hasAsyncHeader(theRequestDetails, JpaConstants.OPERATION_EXPORT)) {
+//			BulkDataExportOptions bulkDataExportOptions = buildGroupBulkExportOptions(theOutputFormat, theType, theSince, theTypeFilter, theIdParam, theMdm);
+//
+//			if (bulkDataExportOptions.getResourceTypes() != null && !bulkDataExportOptions.getResourceTypes().isEmpty()) {
+//				validateResourceTypesAllContainPatientSearchParams(bulkDataExportOptions.getResourceTypes());
+//			} else {
+//				// all patient resource types
+//				bulkDataExportOptions.setResourceTypes(getPatientCompartmentResources());
+//			}
+//
+//			startJob(theRequestDetails, bulkDataExportOptions);
+//		} else {
+//			List<IPrimitiveType<String>> theTypes = new ArrayList<>();
+//			theTypes.add(theType);
+//			DateRangeParam theLastUpdated = new DateRangeParam();
+//			if (theSince != null) {
+//				theLastUpdated.setLowerBound(theSince.getValueAsString());
+//			}
+//			bulkQueryGroupProviderR5.groupInstanceSynchExport(new IdType(theIdParam.getValue()), theOutputFormat, null, null, theLastUpdated, null, null, null, theTypes, null, theRequestDetails);
+//		}
+//	}
 
 	private void validateResourceTypesAllContainPatientSearchParams(Set<String> theResourceTypes) {
 		if (theResourceTypes != null) {
