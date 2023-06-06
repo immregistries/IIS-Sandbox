@@ -170,12 +170,6 @@ hapi:
     #     comma-separated package names, will be @ComponentScan'ed by Spring to allow for creating custom Spring beans
     custom-bean-packages: org.immregistries.iis.kernal.fhir.interceptors
 
-    # comma-separated list of fully qualified interceptor classes.
-    # classes listed here will be fetched from the Spring context when combined with 'custom-bean-packages',
-    # or will be instantiated via reflection using an no-arg contructor; then registered with the server
-    custom-interceptor-classes:
-      org.immregistries.iis.kernal.fhir.interceptors.SessionAuthorizationInterceptor
-
 #      websocket_enabled: false
 #      email:
 #        from: some@test.com

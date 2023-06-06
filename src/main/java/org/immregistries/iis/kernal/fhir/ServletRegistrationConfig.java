@@ -40,6 +40,17 @@ public class ServletRegistrationConfig {
 	}
 
 	@Bean
+	public ServletRegistrationBean<GroupServlet> groupServletRegistrationBean() {
+		ServletRegistrationBean<GroupServlet> registrationBean = new ServletRegistrationBean<>();
+		GroupServlet servlet = new GroupServlet();
+		beanFactory.autowireBean(servlet);
+		registrationBean.setServlet(servlet);
+		registrationBean.addUrlMappings("/group");
+		registrationBean.setLoadOnStartup(1);
+		return registrationBean;
+	}
+
+	@Bean
 	public ServletRegistrationBean messageServletRegistrationBean() {
 		ServletRegistrationBean registrationBean = new ServletRegistrationBean();
 		HttpServlet servlet = new MessageServlet();

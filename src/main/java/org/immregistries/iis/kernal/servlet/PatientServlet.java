@@ -59,7 +59,7 @@ public class PatientServlet extends HttpServlet {
 	}
 
   @SuppressWarnings("unchecked")
-@Override
+	@Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
 

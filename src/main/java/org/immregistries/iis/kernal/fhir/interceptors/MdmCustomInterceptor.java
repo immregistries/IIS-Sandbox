@@ -62,7 +62,6 @@ public class MdmCustomInterceptor {
 	MdmResourceDaoSvc mdmResourceDaoSvc;
 	@Autowired
 	MdmLinkSvcImpl mdmLinkSvc;
-//	MdmLinkDaoSvc mdmLinkDaoSvc;
 	@Autowired
 	private ResourceProviderFactory myResourceProviderFactory;
 	@Autowired
@@ -79,9 +78,6 @@ public class MdmCustomInterceptor {
 	MdmCustomProvider mdmProvider;
 	@Autowired
 	IFhirResourceDao<Immunization> immunizationDao;
-
-	@Autowired
-	SessionAuthorizationInterceptor sessionAuthorizationInterceptor;
 
 	@Autowired
 	SubscriptionService subscriptionService;
