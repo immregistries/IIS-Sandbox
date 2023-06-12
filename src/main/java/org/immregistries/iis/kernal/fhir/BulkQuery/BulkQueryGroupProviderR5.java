@@ -27,8 +27,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Controller;
+import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 
@@ -95,7 +97,6 @@ public class BulkQueryGroupProviderR5 extends GroupResourceProvider {
 
 		ServletRequestDetails theRequestDetails
 	) throws IOException {
-//		Session dataSession = PopServlet.getDataSession();
 		try {
 			Bundle bundle = new Bundle();
 			Group group = read(theRequestDetails.getServletRequest(), theId, theRequestDetails);
@@ -114,9 +115,6 @@ public class BulkQueryGroupProviderR5 extends GroupResourceProvider {
 			e.printStackTrace();
 			throw e;
 		}
-//		finally {
-//			dataSession.close();
-//		}
 	}
 
 //	public void groupInstanceSynchExport(
@@ -261,12 +259,11 @@ public class BulkQueryGroupProviderR5 extends GroupResourceProvider {
 //		}
 //	}
 
-
 	/**
 	 * Group/123/$member-add
 	 */
-	@Operation(name = "member-add", idempotent = true, bundleType = BundleTypeEnum.SEARCHSET)
-	public void groupInstanceMemberAdd(
+	@Operation(name = "$member-add", idempotent = true)
+	public Group groupInstanceMemberAdd(
 
 		@IdParam
 		IdType theId,
@@ -291,16 +288,17 @@ public class BulkQueryGroupProviderR5 extends GroupResourceProvider {
 		@OperationParam(name = "attributionPeriod", typeName = "Period")
 		Period attributionPeriod,
 
-		RequestDetails theRequestDetails
-	) throws IOException {
-		Group group = this.fhirResourceGroupDao.read(theId,theRequestDetails);
+		ServletRequestDetails theRequestDetails
+	) {
+		Group group = read(theRequestDetails.getServletRequest(), theId, theRequestDetails);
+		;
 		Group.GroupMemberComponent memberComponent;
-		if (memberId != null && providerNpi != null)  {
-			if (!group.getManagingEntity().getIdentifier().equals(providerNpi)) {
-				throw new InvalidRequestException("Not the right provider for this group");
+		if (memberId != null && providerNpi != null) {
+			if (!group.getManagingEntity().getIdentifier().getValue().equals(providerNpi.getValue()) || !group.getManagingEntity().getIdentifier().getSystem().equals(providerNpi.getSystem())) {
+				throw new InvalidRequestException("Not the right provider for this group" + providerNpi.getValue() + " " + group.getManagingEntity().getIdentifier().getSystem().equals(providerNpi.getSystem()) + " " + group.getManagingEntity().getIdentifier().getValue().equals(providerNpi.getValue()));
 			}
 			memberComponent = group.getMember().stream()
-				.filter(member -> memberId.equals(member.getEntity().getIdentifier())) //TODO better conditions
+				.filter(member -> memberId.getValue().equals(member.getEntity().getIdentifier().getValue()) && memberId.getSystem().equals(member.getEntity().getIdentifier().getSystem())) //TODO better conditions
 				.findFirst()
 				.orElse(group.addMember());
 			memberComponent.setEntity(new Reference().setIdentifier(memberId)); //TODO solve reference with interceptor ?
@@ -317,14 +315,15 @@ public class BulkQueryGroupProviderR5 extends GroupResourceProvider {
 			throw new InvalidRequestException("parameters combination not supported");
 		}
 		memberComponent.setPeriod(attributionPeriod);
+		return (Group) update(theRequestDetails.getServletRequest(), group, theId, "", theRequestDetails).getResource();
 	}
 
 
 	/**
 	 * Group/123/$member-remove
 	 */
-	@Operation(name = "member-remove", idempotent = true, bundleType = BundleTypeEnum.SEARCHSET)
-	public void groupInstanceMemberRemove(
+	@Operation(name = "$member-remove", idempotent = true, bundleType = BundleTypeEnum.SEARCHSET)
+	public Group groupInstanceMemberRemove(
 
 		@IdParam
 		IdType theId,
@@ -349,19 +348,26 @@ public class BulkQueryGroupProviderR5 extends GroupResourceProvider {
 		@OperationParam(name = "coverageReference", typeName = "Reference")
 		Reference coverageReference,
 
-		RequestDetails theRequestDetails
+		ServletRequestDetails theRequestDetails
 	) throws IOException {
-		Group group = this.fhirResourceGroupDao.read(theId,theRequestDetails);
+		Group group = this.fhirResourceGroupDao.read(theId, theRequestDetails);
 		Group.GroupMemberComponent memberComponent;
-		if (memberId != null && providerNpi != null)  {
-			if (!group.getManagingEntity().getIdentifier().equals(providerNpi)) {
+		if (memberId != null && providerNpi != null) {
+			if (!group.getManagingEntity().getIdentifier().getValue().equals(providerNpi.getValue()) || !group.getManagingEntity().getIdentifier().getSystem().equals(providerNpi.getSystem())) {
 				throw new InvalidRequestException("Not the right provider for this group");
 			}
 			group.getMember()
 				.remove(group.getMember().stream()
-					.filter(member -> memberId.equals(member.getEntity().getIdentifier())) //TODO better conditions
+					.filter((member) -> {
+						return memberId.getValue().equals(member.getEntity().getIdentifier().getValue())
+							&& (
+							(memberId.getSystem() == null && member.getEntity().getIdentifier().getSystem() == null)
+								|| memberId.getSystem().equals(member.getEntity().getIdentifier().getSystem())
+						); //TODO better conditions
+					})
 					.findFirst()
 					.orElse(null));
+
 		} else if (patientReference != null && providerReference != null) {
 			if (!group.getManagingEntity().equals(providerReference)) {
 				throw new InvalidRequestException("Not the right provider for this group");
@@ -371,8 +377,10 @@ public class BulkQueryGroupProviderR5 extends GroupResourceProvider {
 					.filter(member -> patientReference.equals(member.getEntity()))
 					.findFirst()
 					.orElse(null));
+
 		} else {
 			throw new InvalidRequestException("parameters combination not supported");
 		}
+		return (Group) update(theRequestDetails.getServletRequest(), group, theId, "", theRequestDetails).getResource();
 	}
 }

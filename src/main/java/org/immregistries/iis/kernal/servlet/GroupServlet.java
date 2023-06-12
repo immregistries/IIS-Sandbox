@@ -1,7 +1,6 @@
 package org.immregistries.iis.kernal.servlet;
 
-import org.hl7.fhir.r5.model.Group;
-import org.hl7.fhir.r5.model.Reference;
+import org.hl7.fhir.r5.model.*;
 import org.immregistries.iis.kernal.model.OrgAccess;
 import org.immregistries.iis.kernal.repository.FhirRequester;
 import org.immregistries.iis.kernal.repository.RepositoryClientFactory;
@@ -63,9 +62,14 @@ public class GroupServlet extends HttpServlet {
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		HomeServlet.doHeader(out, session, "IIS Sandbox - Groups");
 		Group group = new Group();
+		group.setManagingEntity(new Reference().setIdentifier(new Identifier().setType(new CodeableConcept(new Coding().setCode("Organization"))).setSystem("AIRA_TEST").setValue("test")));
 		group.setDescription("Generated Group in IIS sandbox, for Bulk data export use case and Synchronisation with subscription synchronisation");
 		out.println("<p>");
 		out.println(repositoryClientFactory.getFhirContext().newJsonParser().setPrettyPrint(true).encodeResourceToString(group));
+		out.println("</p>");
+		Parameters parameters = new Parameters().addParameter("test", new Identifier().setValue("iii"));
+		out.println("<p>");
+		out.println(repositoryClientFactory.getFhirContext().newJsonParser().setPrettyPrint(true).encodeResourceToString(parameters));
 		out.println("</p>");
 		HomeServlet.doFooter(out, session);
 		out.flush();
