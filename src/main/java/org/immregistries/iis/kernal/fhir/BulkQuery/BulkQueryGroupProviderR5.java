@@ -27,10 +27,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Controller;
-import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 
 
@@ -369,7 +367,7 @@ public class BulkQueryGroupProviderR5 extends GroupResourceProvider {
 					.orElse(null));
 
 		} else if (patientReference != null && providerReference != null) {
-			if (!group.getManagingEntity().equals(providerReference)) {
+			if (!group.getManagingEntity().getReference().equals(providerReference)) {
 				throw new InvalidRequestException("Not the right provider for this group");
 			}
 			group.getMember()

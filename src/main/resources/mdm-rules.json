@@ -104,6 +104,6 @@
     "patient-identifier" : "MATCH"
   },
   "eidSystems": {
-    "Patient": "urn:mrns"
+    "Patient": "sabbia:mrns"
   }
 }
