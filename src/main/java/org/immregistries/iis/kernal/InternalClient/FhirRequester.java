@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal.repository;
+package org.immregistries.iis.kernal.InternalClient;
 
 import ca.uhn.fhir.jpa.api.dao.IFhirResourceDao;
 import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;

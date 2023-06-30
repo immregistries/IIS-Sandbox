@@ -171,6 +171,8 @@ public class HomeServlet extends HttpServlet {
 		if (orgAccess != null) {
 			out.println("<a class='w3-bar-item w3-button w3-right' href=\"message?" + MessageServlet.PARAM_ACTION + "="
 				+ MessageServlet.ACTION_LOGOUT + "\">Logout</a>");
+		} else {
+			out.println("    <a href=\"/oauth2/authorization/github\" class=\"w3-bar-item w3-button\">Login with GITHUB</a>\n");
 		}
 		out.println("      </div>");
 		out.println("    </header>");

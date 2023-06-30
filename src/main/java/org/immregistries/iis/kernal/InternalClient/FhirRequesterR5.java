@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal.repository;
+package org.immregistries.iis.kernal.InternalClient;
 
 import org.apache.commons.lang3.StringUtils;
 import org.immregistries.iis.kernal.fhir.annotations.OnR5Condition;

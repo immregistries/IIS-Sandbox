@@ -5,7 +5,7 @@ import ca.uhn.fhir.jpa.partition.PartitionManagementProvider;
 import org.immregistries.iis.kernal.fhir.AppProperties;
 import ca.uhn.fhir.to.FhirTesterMvcConfig;
 import ca.uhn.fhir.to.TesterConfig;
-import org.immregistries.iis.kernal.repository.RepositoryClientFactory;
+import org.immregistries.iis.kernal.InternalClient.RepositoryClientFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

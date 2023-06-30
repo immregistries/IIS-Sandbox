@@ -1,10 +1,8 @@
-package org.immregistries.iis.kernal.repository;
+package org.immregistries.iis.kernal.InternalClient;
 
 import ca.uhn.fhir.rest.gclient.ICriterion;
 import org.hl7.fhir.instance.model.api.IBaseBundle;
 import org.hl7.fhir.instance.model.api.IBaseResource;
-import org.hl7.fhir.r5.model.Immunization;
-import org.hl7.fhir.r5.model.RelatedPerson;
 import org.immregistries.iis.kernal.model.*;
 
 import java.util.List;

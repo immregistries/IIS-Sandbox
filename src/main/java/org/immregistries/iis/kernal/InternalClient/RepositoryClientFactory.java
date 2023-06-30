@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal.repository;
+package org.immregistries.iis.kernal.InternalClient;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.jpa.api.dao.IFhirSystemDao;

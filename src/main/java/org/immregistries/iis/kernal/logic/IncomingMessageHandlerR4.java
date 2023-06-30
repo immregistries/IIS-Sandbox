@@ -10,7 +10,7 @@ import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodeStatusValue;
 import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.model.*;
-import org.immregistries.iis.kernal.repository.FhirRequester;
+import org.immregistries.iis.kernal.InternalClient.FhirRequester;
 import org.immregistries.smm.tester.manager.HL7Reader;
 import org.immregistries.vfa.connect.model.Admin;
 import org.immregistries.vfa.connect.model.EvaluationActual;

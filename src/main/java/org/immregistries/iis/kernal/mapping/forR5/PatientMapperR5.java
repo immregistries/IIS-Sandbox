@@ -10,7 +10,7 @@ import org.immregistries.iis.kernal.mapping.Interfaces.PatientMapper;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
 import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.model.PatientReported;
-import org.immregistries.iis.kernal.repository.FhirRequesterR5;
+import org.immregistries.iis.kernal.InternalClient.FhirRequesterR5;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
 
-import static org.immregistries.iis.kernal.repository.FhirRequester.GOLDEN_SYSTEM_IDENTIFIER;
+import static org.immregistries.iis.kernal.InternalClient.FhirRequester.GOLDEN_SYSTEM_IDENTIFIER;
 
 
 @Service

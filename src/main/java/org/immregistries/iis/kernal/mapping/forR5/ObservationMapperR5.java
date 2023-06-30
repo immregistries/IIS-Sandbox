@@ -7,7 +7,7 @@ import org.immregistries.iis.kernal.mapping.Interfaces.ObservationMapper;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
 import org.immregistries.iis.kernal.model.ObservationMaster;
 import org.immregistries.iis.kernal.model.ObservationReported;
-import org.immregistries.iis.kernal.repository.FhirRequester;
+import org.immregistries.iis.kernal.InternalClient.FhirRequester;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Service;

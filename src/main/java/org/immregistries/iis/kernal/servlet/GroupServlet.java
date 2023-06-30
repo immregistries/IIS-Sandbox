@@ -2,8 +2,8 @@ package org.immregistries.iis.kernal.servlet;
 
 import org.hl7.fhir.r5.model.*;
 import org.immregistries.iis.kernal.model.OrgAccess;
-import org.immregistries.iis.kernal.repository.FhirRequester;
-import org.immregistries.iis.kernal.repository.RepositoryClientFactory;
+import org.immregistries.iis.kernal.InternalClient.FhirRequester;
+import org.immregistries.iis.kernal.InternalClient.RepositoryClientFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

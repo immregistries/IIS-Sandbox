@@ -16,11 +16,9 @@ import ca.uhn.fhir.rest.server.messaging.ResourceOperationMessage;
 import org.apache.commons.lang3.StringUtils;
 import org.immregistries.iis.kernal.fhir.mdm.MdmCustomProvider;
 import org.immregistries.iis.kernal.logic.SubscriptionService;
-import org.immregistries.iis.kernal.fhir.mdm.MdmConfigCondition;
 import ca.uhn.fhir.mdm.api.*;
 import ca.uhn.fhir.mdm.model.MdmTransactionContext;
 import ca.uhn.fhir.mdm.provider.MdmControllerHelper;
-import ca.uhn.fhir.mdm.provider.MdmProviderDstu3Plus;
 import ca.uhn.fhir.mdm.util.GoldenResourceHelper;
 import ca.uhn.fhir.rest.api.server.RequestDetails;
 import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
@@ -35,17 +33,14 @@ import org.immregistries.vaccination_deduplication.reference.ImmunizationSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Conditional;
-import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import javax.interceptor.Interceptor;
 import javax.servlet.http.HttpServletRequest;
 import java.text.ParseException;
 
-import static org.immregistries.iis.kernal.repository.FhirRequester.GOLDEN_RECORD;
-import static org.immregistries.iis.kernal.repository.FhirRequester.GOLDEN_SYSTEM_TAG;
+import static org.immregistries.iis.kernal.InternalClient.FhirRequester.GOLDEN_RECORD;
+import static org.immregistries.iis.kernal.InternalClient.FhirRequester.GOLDEN_SYSTEM_TAG;
 
 /**
  * Deprecated

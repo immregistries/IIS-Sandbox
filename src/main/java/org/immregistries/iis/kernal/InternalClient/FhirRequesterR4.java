@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal.repository;
+package org.immregistries.iis.kernal.InternalClient;
 
 import org.immregistries.iis.kernal.fhir.annotations.OnR4Condition;
 import ca.uhn.fhir.rest.api.MethodOutcome;

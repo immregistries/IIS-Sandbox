@@ -1,5 +1,6 @@
 package org.immregistries.iis.kernal.fhir;
 
+import org.immregistries.iis.kernal.OAuthLoginServlet;
 import org.immregistries.iis.kernal.fhir.annotations.OnR5Condition;
 import org.immregistries.iis.kernal.servlet.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,17 @@ public class ServletRegistrationConfig {
 
 
 	@Bean
+	public ServletRegistrationBean loginServletRegistrationBean() {
+		ServletRegistrationBean registrationBean = new ServletRegistrationBean();
+		HttpServlet servlet = new OAuthLoginServlet();
+		beanFactory.autowireBean(servlet);
+		registrationBean.setServlet(servlet);
+		registrationBean.addUrlMappings("/oauth2/authorization/github");
+//		registrationBean.setLoadOnStartup(1);
+		return registrationBean;
+	}
+
+	@Bean
 	public ServletRegistrationBean popServletRegistrationBean() {
 		ServletRegistrationBean registrationBean = new ServletRegistrationBean();
 		HttpServlet servlet = new PopServlet();
@@ -56,7 +68,7 @@ public class ServletRegistrationConfig {
 		HttpServlet servlet = new MessageServlet();
 		beanFactory.autowireBean(servlet);
 		registrationBean.setServlet(servlet);
-		registrationBean.addUrlMappings("/message");
+		registrationBean.addUrlMappings("/message","/login");
 //		registrationBean.setLoadOnStartup(1);
 		return registrationBean;
 	}

@@ -8,14 +8,14 @@ import org.immregistries.iis.kernal.mapping.Interfaces.PatientMapper;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
 import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.model.PatientReported;
-import org.immregistries.iis.kernal.repository.FhirRequesterR4;
+import org.immregistries.iis.kernal.InternalClient.FhirRequesterR4;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
 
-import static org.immregistries.iis.kernal.repository.FhirRequester.GOLDEN_SYSTEM_IDENTIFIER;
+import static org.immregistries.iis.kernal.InternalClient.FhirRequester.GOLDEN_SYSTEM_IDENTIFIER;
 
 
 @Service
