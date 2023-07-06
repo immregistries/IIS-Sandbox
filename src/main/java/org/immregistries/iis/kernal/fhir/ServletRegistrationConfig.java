@@ -68,7 +68,7 @@ public class ServletRegistrationConfig {
 		HttpServlet servlet = new MessageServlet();
 		beanFactory.autowireBean(servlet);
 		registrationBean.setServlet(servlet);
-		registrationBean.addUrlMappings("/message","/login");
+		registrationBean.addUrlMappings("/message");
 //		registrationBean.setLoadOnStartup(1);
 		return registrationBean;
 	}
@@ -91,7 +91,7 @@ public class ServletRegistrationConfig {
 		beanFactory.autowireBean(servlet);
 		registrationBean.setServlet(servlet);
 		registrationBean.addUrlMappings("/patient");
-//		registrationBean.setLoadOnStartup(1);
+		registrationBean.setLoadOnStartup(1);
 		return registrationBean;
 	}
 

@@ -6,6 +6,8 @@ import org.hl7.fhir.r5.model.*;
 import org.immregistries.iis.kernal.logic.ImmunizationRecommendationService;
 import org.immregistries.iis.kernal.model.OrgAccess;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
+
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -45,9 +47,7 @@ public class RecommendationServlet extends PatientServlet {
 			HttpSession session = req.getSession(true);
 			OrgAccess orgAccess = (OrgAccess) session.getAttribute("orgAccess");
 			if (orgAccess == null) {
-				RequestDispatcher dispatcher = req.getRequestDispatcher("home");
-				dispatcher.forward(req, resp);
-				return;
+				throw new AuthenticationCredentialsNotFoundException("");
 			}
 			IGenericClient fhirClient = repositoryClientFactory.newGenericClient(session);
 			Patient patient = getPatientFromParameter(req,fhirClient);
@@ -77,9 +77,7 @@ public class RecommendationServlet extends PatientServlet {
 		HttpSession session = req.getSession(true);
 		OrgAccess orgAccess = (OrgAccess) session.getAttribute("orgAccess");
 		if (orgAccess == null) {
-			RequestDispatcher dispatcher = req.getRequestDispatcher("home");
-			dispatcher.forward(req, resp);
-			return;
+			throw new AuthenticationCredentialsNotFoundException("");
 		}
 
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
@@ -111,9 +109,7 @@ public class RecommendationServlet extends PatientServlet {
 		HttpSession session = req.getSession(true);
 		OrgAccess orgAccess = (OrgAccess) session.getAttribute("orgAccess");
 		if (orgAccess == null) {
-			RequestDispatcher dispatcher = req.getRequestDispatcher("home");
-			dispatcher.forward(req, resp);
-			return;
+			throw new AuthenticationCredentialsNotFoundException("");
 		}
 
 		resp.setContentType("text/html");

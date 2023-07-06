@@ -6,6 +6,7 @@ import org.hibernate.Session;
 import org.immregistries.iis.kernal.model.MessageReceived;
 import org.immregistries.iis.kernal.model.OrgAccess;
 import org.immregistries.iis.kernal.model.OrgMaster;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -106,7 +107,8 @@ public class MessageServlet extends HttpServlet {
         out.println("  </div>");
       }
 
-      OrgAccess orgAccess = (OrgAccess) session.getAttribute("orgAccess");
+      OrgAccess orgAccess = (OrgAccess) SecurityContextHolder.getContext().getAuthentication();
+		session.setAttribute("orgAccess",orgAccess);
       if (orgAccess == null) {
         String userId = req.getParameter(PARAM_USERID);
         String facilityId = req.getParameter(PARAM_FACILITYID);

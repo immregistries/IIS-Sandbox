@@ -3,6 +3,8 @@ package org.immregistries.iis.kernal.servlet;
 import org.immregistries.iis.kernal.model.OrgAccess;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
+
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -45,10 +47,11 @@ public class VXUDownloadFormServlet extends HttpServlet {
     resp.setContentType("text/html");
     PrintWriter out = new PrintWriter(resp.getOutputStream());
     OrgAccess orgAccess = (OrgAccess) session.getAttribute("orgAccess");
-    if (orgAccess == null) {
-      RequestDispatcher dispatcher = req.getRequestDispatcher("home");
-      dispatcher.forward(req, resp);
-      return;
+   if (orgAccess == null) {
+//      RequestDispatcher dispatcher = req.getRequestDispatcher("home");
+//      dispatcher.forward(req, resp);
+//      return;
+		 throw new AuthenticationCredentialsNotFoundException("");
     }
 
     try {

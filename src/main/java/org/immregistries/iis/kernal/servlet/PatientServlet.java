@@ -17,6 +17,8 @@ import org.immregistries.iis.kernal.InternalClient.RepositoryClientFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
+
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -66,9 +68,10 @@ public class PatientServlet extends HttpServlet {
     HttpSession session = req.getSession(true);
     OrgAccess orgAccess = (OrgAccess) session.getAttribute("orgAccess");
     if (orgAccess == null) {
-      RequestDispatcher dispatcher = req.getRequestDispatcher("home");
-      dispatcher.forward(req, resp);
-      return;
+//      RequestDispatcher dispatcher = req.getRequestDispatcher("home");
+//      dispatcher.forward(req, resp);
+//      return;
+		 throw new AuthenticationCredentialsNotFoundException("");
     }
 
     resp.setContentType("text/html");

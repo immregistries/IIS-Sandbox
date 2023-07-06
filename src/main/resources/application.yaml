@@ -15,7 +15,7 @@ spring:
   oauth2:
     client:
       registration:
-        gituhub:
+        github:
           client-id: 09a6c6915895bf8400db
           client-secret: fc50e940f07d79db61d340f322accae582e6c933
   profiles:

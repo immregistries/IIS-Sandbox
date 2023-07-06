@@ -1,11 +1,20 @@
 package org.immregistries.iis.kernal.model;
 
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * Created by Eric on 12/20/17.
  */
-public class OrgAccess implements Serializable {
+
+/**
+ * TODO IMPRove integration with spring security, especially grantedAuthority
+ */
+public class OrgAccess implements Serializable, Authentication {
 
   private static final long serialVersionUID = 1L;
 
@@ -47,4 +56,38 @@ public class OrgAccess implements Serializable {
   }
 
 
+	@Override
+	public Collection<? extends GrantedAuthority> getAuthorities() {
+		return new ArrayList<>(0);
+	}
+
+	@Override
+	public Object getCredentials() {
+		return accessKey;
+	}
+
+	@Override
+	public Object getDetails() {
+		return org.getOrganizationName();
+	}
+
+	@Override
+	public Object getPrincipal() {
+		return org;
+	}
+
+	@Override
+	public boolean isAuthenticated() {
+		return true;
+	}
+
+	@Override
+	public void setAuthenticated(boolean isAuthenticated) throws IllegalArgumentException {
+
+	}
+
+	@Override
+	public String getName() {
+		return this.accessName;
+	}
 }

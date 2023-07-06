@@ -18,6 +18,8 @@ import org.immregistries.iis.kernal.mapping.Interfaces.ImmunizationMapper;
 import org.immregistries.iis.kernal.model.*;
 import org.immregistries.iis.kernal.InternalClient.RepositoryClientFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
+
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -58,10 +60,11 @@ public class V2ToFhirServlet extends HttpServlet {
     HttpSession session = req.getSession(true);
     OrgAccess orgAccess = (OrgAccess) session.getAttribute("orgAccess");
 	  IGenericClient fhirClient = repositoryClientFactory.newGenericClient(session);
-    if (orgAccess == null) {
-      RequestDispatcher dispatcher = req.getRequestDispatcher("home");
-      dispatcher.forward(req, resp);
-      return;
+   if (orgAccess == null) {
+//      RequestDispatcher dispatcher = req.getRequestDispatcher("home");
+//      dispatcher.forward(req, resp);
+//      return;
+		 throw new AuthenticationCredentialsNotFoundException("");
     }
 
     resp.setContentType("text/html");

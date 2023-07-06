@@ -5,19 +5,25 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
+import java.io.Serializable;
 import java.util.Collection;
 
-public class CustomAuthentication implements Authentication {
+public class CustomAuthentication implements Serializable
+//	implements Authentication
+{
 	private OrgAccess orgAccess;
-	private String credential;
+
 
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		return null;
 	}
 
 	public Object getCredentials() {
-		return credential;
-//		return "credentials";
+		if (orgAccess != null) {
+			return orgAccess.getAccessKey();
+		} else {
+			return null;
+		}
 	}
 
 	public Object getDetails() {
@@ -38,5 +44,9 @@ public class CustomAuthentication implements Authentication {
 
 	public String getName() {
 		return orgAccess.getAccessName();
+	}
+
+	public void setOrgAccess(OrgAccess orgAccess) {
+		this.orgAccess = orgAccess;
 	}
 }

@@ -2,6 +2,8 @@ package org.immregistries.iis.kernal.servlet;
 
 import org.hibernate.Session;
 import org.immregistries.iis.kernal.model.OrgAccess;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
+
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -28,10 +30,11 @@ public class VXUDownloadServlet extends VXUDownloadFormServlet {
     resp.setContentType("text/plain");
     PrintWriter out = new PrintWriter(resp.getOutputStream());
     OrgAccess orgAccess = (OrgAccess) session.getAttribute("orgAccess");
-    if (orgAccess == null) {
-      RequestDispatcher dispatcher = req.getRequestDispatcher("home");
-      dispatcher.forward(req, resp);
-      return;
+   if (orgAccess == null) {
+//      RequestDispatcher dispatcher = req.getRequestDispatcher("home");
+//      dispatcher.forward(req, resp);
+//      return;
+		 throw new AuthenticationCredentialsNotFoundException("");
     }
 
     try {

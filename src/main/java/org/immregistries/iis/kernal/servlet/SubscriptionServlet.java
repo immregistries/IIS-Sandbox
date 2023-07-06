@@ -10,6 +10,8 @@ import org.immregistries.iis.kernal.logic.SubscriptionService;
 import org.immregistries.iis.kernal.model.OrgAccess;
 import org.immregistries.iis.kernal.InternalClient.RepositoryClientFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
+
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -72,9 +74,7 @@ public class SubscriptionServlet extends HttpServlet {
 		HttpSession session = req.getSession(true);
 		OrgAccess orgAccess = (OrgAccess) session.getAttribute("orgAccess");
 		if (orgAccess == null) {
-			RequestDispatcher dispatcher = req.getRequestDispatcher("home");
-			dispatcher.forward(req, resp);
-			return;
+			throw new AuthenticationCredentialsNotFoundException("");
 		}
 		IGenericClient localClient = repositoryClientFactory.newGenericClient(session);
 
@@ -132,9 +132,7 @@ public class SubscriptionServlet extends HttpServlet {
 		HttpSession session = req.getSession(true);
 		OrgAccess orgAccess = (OrgAccess) session.getAttribute("orgAccess");
 		if (orgAccess == null) {
-			RequestDispatcher dispatcher = req.getRequestDispatcher("home");
-			dispatcher.forward(req, resp);
-			return;
+			throw new AuthenticationCredentialsNotFoundException("");
 		}
 		resp.setContentType("text/html");
 		IGenericClient fhirClient = repositoryClientFactory.newGenericClient(session);

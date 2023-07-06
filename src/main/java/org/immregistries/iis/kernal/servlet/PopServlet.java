@@ -12,6 +12,8 @@ import org.immregistries.iis.kernal.InternalClient.RepositoryClientFactory;
 import org.immregistries.smm.transform.ScenarioManager;
 import org.immregistries.smm.transform.TestCaseMessage;
 import org.immregistries.smm.transform.Transformer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.ServletException;
@@ -24,6 +26,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 
 public class PopServlet extends HttpServlet {
+	Logger logger = LoggerFactory.getLogger(PopServlet.class);
 	public static final String PARAM_MESSAGE = "MESSAGEDATA";
 	public static final String PARAM_USERID = "USERID";
 	public static final String PARAM_PASSWORD = "PASSWORD";
@@ -44,6 +47,7 @@ public class PopServlet extends HttpServlet {
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
 		throws ServletException, IOException {
+		logger.info("POP POST {}", 1);
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		try {

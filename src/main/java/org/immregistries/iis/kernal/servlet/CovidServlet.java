@@ -9,6 +9,8 @@ import org.immregistries.iis.kernal.model.*;
 import org.immregistries.iis.kernal.InternalClient.FhirRequester;
 import org.immregistries.iis.kernal.InternalClient.RepositoryClientFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
+
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -62,10 +64,11 @@ public class CovidServlet extends HttpServlet {
     PrintWriter out = new PrintWriter(resp.getOutputStream());
 //    Session dataSession = PopServlet.getDataSession();
     OrgAccess orgAccess = (OrgAccess) session.getAttribute("orgAccess");
-    if (orgAccess == null) {
-      RequestDispatcher dispatcher = req.getRequestDispatcher("home");
-      dispatcher.forward(req, resp);
-      return;
+   if (orgAccess == null) {
+//      RequestDispatcher dispatcher = req.getRequestDispatcher("home");
+//      dispatcher.forward(req, resp);
+//      return;
+		 throw new AuthenticationCredentialsNotFoundException("");
     }
 	  IGenericClient fhirClient = repositoryClientFactory.newGenericClient(session);
 
