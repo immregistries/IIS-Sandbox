@@ -114,7 +114,7 @@ public class LabServlet extends HttpServlet {
   protected void doGet(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
 
-    HttpSession session = req.getSession(true);
+
 
     resp.setContentType("text/html");
     PrintWriter out = new PrintWriter(resp.getOutputStream());
@@ -185,7 +185,7 @@ public class LabServlet extends HttpServlet {
           }
         }
       }
-      HomeServlet.doHeader(out, session, "IIS Sandbox");
+      HomeServlet.doHeader(out, "IIS Sandbox");
 
 
 
@@ -218,7 +218,7 @@ public class LabServlet extends HttpServlet {
       System.err.println("Unable to render page: " + e.getMessage());
       e.printStackTrace(System.err);
     }
-    HomeServlet.doFooter(out, session);
+    HomeServlet.doFooter(out);
     out.flush();
     out.close();
   }

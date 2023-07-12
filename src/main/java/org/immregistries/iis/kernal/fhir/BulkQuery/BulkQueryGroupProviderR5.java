@@ -257,6 +257,8 @@ public class BulkQueryGroupProviderR5 extends GroupResourceProvider {
 //		}
 //	}
 
+	private static final String ATR_EXTENSION_URI = "http://hl7.org/fhir/us/davinci-atr/StructureDefinition/atr-any-resource-extension";
+
 	/**
 	 * Group/123/$member-add
 	 */
@@ -292,23 +294,26 @@ public class BulkQueryGroupProviderR5 extends GroupResourceProvider {
 		;
 		Group.GroupMemberComponent memberComponent;
 		if (memberId != null && providerNpi != null) {
-			if (!group.getManagingEntity().getIdentifier().getValue().equals(providerNpi.getValue()) || !group.getManagingEntity().getIdentifier().getSystem().equals(providerNpi.getSystem())) {
-				throw new InvalidRequestException("Not the right provider for this group" + providerNpi.getValue() + " " + group.getManagingEntity().getIdentifier().getSystem().equals(providerNpi.getSystem()) + " " + group.getManagingEntity().getIdentifier().getValue().equals(providerNpi.getValue()));
-			}
+//			if (!group.getManagingEntity().getIdentifier().getValue().equals(providerNpi.getValue()) || !group.getManagingEntity().getIdentifier().getSystem().equals(providerNpi.getSystem())) {
+//				throw new InvalidRequestException("Not the right provider for this group" + providerNpi.getValue() + " " + group.getManagingEntity().getIdentifier().getSystem().equals(providerNpi.getSystem()) + " " + group.getManagingEntity().getIdentifier().getValue().equals(providerNpi.getValue()));
+//			}
 			memberComponent = group.getMember().stream()
 				.filter(member -> memberId.getValue().equals(member.getEntity().getIdentifier().getValue()) && memberId.getSystem().equals(member.getEntity().getIdentifier().getSystem())) //TODO better conditions
 				.findFirst()
 				.orElse(group.addMember());
 			memberComponent.setEntity(new Reference().setIdentifier(memberId)); //TODO solve reference with interceptor ?
+			memberComponent.addExtension(ATR_EXTENSION_URI,new Reference().setIdentifier(providerNpi));
 		} else if (patientReference != null && providerReference != null) {
-			if (!group.getManagingEntity().equals(providerReference)) {
-				throw new InvalidRequestException("Not the right provider for this group");
-			}
+//			if (!group.getManagingEntity().equals(providerReference)) {
+//				throw new InvalidRequestException("Not the right provider for this group");
+//			}
 			memberComponent = group.getMember().stream()
 				.filter(member -> patientReference.equals(member.getEntity()))
 				.findFirst()
 				.orElse(group.addMember());
 			memberComponent.setEntity(patientReference); //TODO solve reference with interceptor ?
+			memberComponent.addExtension(ATR_EXTENSION_URI,providerReference);
+
 		} else {
 			throw new InvalidRequestException("parameters combination not supported");
 		}
@@ -351,31 +356,36 @@ public class BulkQueryGroupProviderR5 extends GroupResourceProvider {
 		Group group = this.fhirResourceGroupDao.read(theId, theRequestDetails);
 		Group.GroupMemberComponent memberComponent;
 		if (memberId != null && providerNpi != null) {
-			if (!group.getManagingEntity().getIdentifier().getValue().equals(providerNpi.getValue()) || !group.getManagingEntity().getIdentifier().getSystem().equals(providerNpi.getSystem())) {
-				throw new InvalidRequestException("Not the right provider for this group");
-			}
 			group.getMember()
 				.remove(group.getMember().stream()
-					.filter((member) -> {
-						return memberId.getValue().equals(member.getEntity().getIdentifier().getValue())
-							&& (
-							(memberId.getSystem() == null && member.getEntity().getIdentifier().getSystem() == null)
-								|| memberId.getSystem().equals(member.getEntity().getIdentifier().getSystem())
-						); //TODO better conditions
-					})
+					.filter((member) -> providerNpi.getValue().equals(member.getExtensionByUrl(ATR_EXTENSION_URI).getValueReference().getIdentifier().getValue())
+						&& memberId.getValue().equals(member.getEntity().getIdentifier().getValue())
+						&& ((memberId.getSystem() == null && member.getEntity().getIdentifier().getSystem() == null)
+							|| memberId.getSystem().equals(member.getEntity().getIdentifier().getSystem())))
+					.findFirst()
+					.orElse(null));
+
+		} else if (memberId != null) {
+			group.getMember()
+				.remove(group.getMember().stream()
+					.filter((member) -> memberId.getValue().equals(member.getEntity().getIdentifier().getValue())
+						&& ((memberId.getSystem() == null && member.getEntity().getIdentifier().getSystem() == null)
+							|| memberId.getSystem().equals(member.getEntity().getIdentifier().getSystem()))) //TODO better conditions
 					.findFirst()
 					.orElse(null));
 
 		} else if (patientReference != null && providerReference != null) {
-			if (!group.getManagingEntity().getReference().equals(providerReference)) {
-				throw new InvalidRequestException("Not the right provider for this group");
-			}
 			group.getMember()
 				.remove(group.getMember().stream()
-					.filter(member -> patientReference.equals(member.getEntity()))
+					.filter(member -> patientReference.equals(member.getEntity()) && providerReference.equals(member.getExtensionByUrl(ATR_EXTENSION_URI).getValueReference()))
 					.findFirst()
 					.orElse(null));
-
+		} else if (patientReference != null) {
+			group.getMember()
+				.remove(group.getMember().stream()
+					.filter((member) -> patientReference.equals(member.getEntity())) //TODO better conditions
+					.findFirst()
+					.orElse(null));
 		} else {
 			throw new InvalidRequestException("parameters combination not supported");
 		}

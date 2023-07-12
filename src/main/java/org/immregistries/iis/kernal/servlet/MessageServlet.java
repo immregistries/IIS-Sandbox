@@ -6,7 +6,6 @@ import org.hibernate.Session;
 import org.immregistries.iis.kernal.model.MessageReceived;
 import org.immregistries.iis.kernal.model.OrgAccess;
 import org.immregistries.iis.kernal.model.OrgMaster;
-import org.springframework.security.core.context.SecurityContextHolder;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -47,7 +46,6 @@ public class MessageServlet extends HttpServlet {
       throws ServletException, IOException {
 
     HttpSession session = req.getSession(true);
-	  IGenericClient fhirClient;
 
     resp.setContentType("text/html");
     PrintWriter out = new PrintWriter(resp.getOutputStream());
@@ -57,31 +55,30 @@ public class MessageServlet extends HttpServlet {
       String messageError = null;
       String messageConfirmation = null;
       if (action != null) {
-        if (action.equals(ACTION_LOGOUT)) {
-          ServletHelper.logout(session);
-        } else if (action.equals(ACTION_LOGIN)) {
-          String userId = req.getParameter(PARAM_USERID);
-          String facilityId = req.getParameter(PARAM_FACILITYID);
-          String password = req.getParameter(PARAM_PASSWORD);
-          OrgAccess orgAccess = ServletHelper.authenticateOrgAccess(userId, password, facilityId, dataSession);
-          if (orgAccess == null) {
-            messageError = "Unable to login, unrecognized credentials";
-          } else {
-            session.setAttribute("orgAccess", orgAccess);
-//            Map<Integer, OrgAccess> orgAccessMap = new HashMap<Integer, OrgAccess>();
-//            Query query = dataSession.createQuery("from OrgMaster order by organizationName");
-//            List<OrgMaster> orgMasterList = query.list();
-//            for (OrgMaster orgMaster : orgMasterList) {
-//              OrgAccess oa = ServletHelper.authenticateOrgAccessForFacility(
-//                userId, password, dataSession, orgMaster);
-//              if (oa != null) {
-//                orgAccessMap.put(orgMaster.getOrgId(), oa);
-//              }
-//            }
-//            session.setAttribute("orgAccessMap", orgAccessMap);
-            messageConfirmation = "Logged in to " + orgAccess.getOrg().getOrganizationName();
-          }
-        } else if (action.equals(ACTION_SWITCH)) {
+//        if (action.equals(ACTION_LOGIN)) {
+//          String userId = req.getParameter(PARAM_USERID);
+//          String facilityId = req.getParameter(PARAM_FACILITYID);
+//          String password = req.getParameter(PARAM_PASSWORD);
+//          OrgAccess orgAccess = ServletHelper.authenticateOrgAccess(userId, password, facilityId, dataSession);
+//          if (orgAccess == null) {
+//            messageError = "Unable to login, unrecognized credentials";
+//          } else {
+//            session.setAttribute("orgAccess", orgAccess);
+////            Map<Integer, OrgAccess> orgAccessMap = new HashMap<Integer, OrgAccess>();
+////            Query query = dataSession.createQuery("from OrgMaster order by organizationName");
+////            List<OrgMaster> orgMasterList = query.list();
+////            for (OrgMaster orgMaster : orgMasterList) {
+////              OrgAccess oa = ServletHelper.authenticateOrgAccessForFacility(
+////                userId, password, dataSession, orgMaster);
+////              if (oa != null) {
+////                orgAccessMap.put(orgMaster.getOrgId(), oa);
+////              }
+////            }
+////            session.setAttribute("orgAccessMap", orgAccessMap);
+//            messageConfirmation = "Logged in to " + orgAccess.getOrg().getOrganizationName();
+//          }
+//        } else
+			  if (action.equals(ACTION_SWITCH)) {
           OrgMaster orgMaster = dataSession.get(OrgMaster.class,
               Integer.parseInt(req.getParameter(PARAM_ORG_ID)));
           Map<Integer, OrgAccess> orgAccessMap =
@@ -95,7 +92,7 @@ public class MessageServlet extends HttpServlet {
           }
         }
       }
-      HomeServlet.doHeader(out, session, "IIS Sandbox");
+      HomeServlet.doHeader(out, "IIS Sandbox");
       if (messageError != null) {
         out.println("  <div class=\"w3-panel w3-red\">");
         out.println("    <p>" + messageError + "</p>");
@@ -107,9 +104,8 @@ public class MessageServlet extends HttpServlet {
         out.println("  </div>");
       }
 
-      OrgAccess orgAccess = (OrgAccess) SecurityContextHolder.getContext().getAuthentication();
-		session.setAttribute("orgAccess",orgAccess);
-      if (orgAccess == null) {
+      OrgAccess orgAccess = ServletHelper.getOrgAccess();
+      if (orgAccess == null) { // LOGIN FORM, inherited, could be made in a separate class and improved
         String userId = req.getParameter(PARAM_USERID);
         String facilityId = req.getParameter(PARAM_FACILITYID);
         if (userId == null) {
@@ -126,7 +122,7 @@ public class MessageServlet extends HttpServlet {
         out.println("    <div class=\"w3-container w3-card-4\">");
         out.println("    <h2>Login</h2>");
         out.println(
-            "    <form method=\"POST\" action=\"message\" class=\"w3-container w3-card-4\">");
+            "    <form method=\"POST\" action=\"login\" class=\"w3-container w3-card-4\">");
         out.println("      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_USERID
             + "\" value=\"" + userId + "\" required/>");
         out.println("          <label>User Id</label>");
@@ -195,7 +191,7 @@ public class MessageServlet extends HttpServlet {
     } finally {
       dataSession.close();
     }
-    HomeServlet.doFooter(out, session);
+    HomeServlet.doFooter(out);
     out.flush();
     out.close();
   }

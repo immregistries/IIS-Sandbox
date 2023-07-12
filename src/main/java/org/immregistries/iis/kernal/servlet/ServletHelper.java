@@ -8,6 +8,8 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.immregistries.iis.kernal.model.OrgAccess;
 import org.immregistries.iis.kernal.model.OrgMaster;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -78,22 +80,24 @@ public class ServletHelper {
   }
 
   public static OrgAccess getOrgAccess() {
-	  return (OrgAccess) ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest().getSession(false).getAttribute("orgAccess");
+	  Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+	  if (authentication instanceof OrgAccess) {
+		  return (OrgAccess) authentication;
+	  } else {
+//		   return null;
+		  HttpSession session = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest().getSession(false);
+		  if (session != null) {
+			  return (OrgAccess) session.getAttribute("orgAccess");
+		  } else {
+			  return null;
+		  }
+	  }
   }
 
   public static RequestDetails requestDetailsWithPartitionName() {
 	  RequestDetails requestDetails =  new SystemRequestDetails();
 	  requestDetails.setTenantId(ServletHelper.getOrgAccess().getAccessName());
 	  return requestDetails;
-  }
-
-	public static void logout(){
-		HttpSession session = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest().getSession(false);
-		logout(session);
-	}
-  public static void logout(HttpSession session){
-	  session.removeAttribute("orgAccess");
-	  session.removeAttribute("fhirClient");
   }
 
 

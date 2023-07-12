@@ -134,10 +134,10 @@ public class SoapServlet extends HttpServlet {
       out.close();
     } else {
       resp.setContentType("text/html;charset=UTF-8");
-      HttpSession session = req.getSession(true);
+
       PrintWriter out = resp.getWriter();
       try {
-        HomeServlet.doHeader(out, session, "IIS Sandbox");
+        HomeServlet.doHeader(out, "IIS Sandbox");
 			out.println("<h2>CDC SOAP Endpoint</h2>");
         out.println("<p>");
         out.println("This demonstration system supports the use of the ");
@@ -182,7 +182,7 @@ public class SoapServlet extends HttpServlet {
       } finally {
         out.close();
       }
-      HomeServlet.doFooter(out, session);
+      HomeServlet.doFooter(out);
     }
   }
 

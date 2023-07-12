@@ -6,7 +6,6 @@ import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -46,7 +45,7 @@ public class VXUDownloadFormServlet extends HttpServlet {
 
     resp.setContentType("text/html");
     PrintWriter out = new PrintWriter(resp.getOutputStream());
-    OrgAccess orgAccess = (OrgAccess) session.getAttribute("orgAccess");
+    OrgAccess orgAccess = ServletHelper.getOrgAccess();
    if (orgAccess == null) {
 //      RequestDispatcher dispatcher = req.getRequestDispatcher("home");
 //      dispatcher.forward(req, resp);
@@ -66,7 +65,7 @@ public class VXUDownloadFormServlet extends HttpServlet {
 		  beanFactory.autowireBean(generator);
         session.setAttribute(CACHED_GENERATOR, generator);
       }
-      HomeServlet.doHeader(out, session, "IIS Sandbox");
+      HomeServlet.doHeader(out, "IIS Sandbox");
 
       if (action.equals(ACTION_GENERATE) && generator.canGenerate()) {
         generator.start();
@@ -124,7 +123,7 @@ public class VXUDownloadFormServlet extends HttpServlet {
       System.err.println("Unable to render page: " + e.getMessage());
       e.printStackTrace(System.err);
     }
-    HomeServlet.doFooter(out, session);
+    HomeServlet.doFooter(out);
     out.flush();
     out.close();
   }

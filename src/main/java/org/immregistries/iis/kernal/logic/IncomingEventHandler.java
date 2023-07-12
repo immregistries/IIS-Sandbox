@@ -118,7 +118,7 @@ public class IncomingEventHandler {
 
 
   public void processEvent(OrgAccess orgAccess, HttpServletRequest req) throws Exception {
-	  HttpSession session = req.getSession(true);
+
     CodeMap codeMap = CodeMapManager.getCodeMap();
     PatientReported patientReported = processPatient(orgAccess, req, codeMap);
     VaccinationReported vaccinationReported = null;
@@ -238,7 +238,7 @@ public class IncomingEventHandler {
       CodeMap codeMap) throws Exception {
 	 RequestDetails requestDetails = new ServletRequestDetails();
 	 requestDetails.setTenantId(orgAccess.getAccessName());
-	 HttpSession session = req.getSession(true);
+
     PatientReported patientReported = null;
 //    PatientMaster patientMaster = null;
 

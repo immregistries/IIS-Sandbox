@@ -12,7 +12,7 @@ public class MdmCustomConsumerConfig extends MdmConsumerConfig {
 
 	@Bean
 	IMdmMatchFinderSvc mdmMatchFinderSvc() {
-		return new MdmCustomMatchFinderSvc();
+		return new MdmCustomMatchFinderSvcR5();
 	}
 
 }

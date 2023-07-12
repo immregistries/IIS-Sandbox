@@ -2,6 +2,7 @@ package org.immregistries.iis.kernal.model;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -14,7 +15,10 @@ import java.util.Collection;
 /**
  * TODO IMPRove integration with spring security, especially grantedAuthority
  */
-public class OrgAccess implements Serializable, Authentication {
+public class OrgAccess implements Serializable
+	, Authentication
+//	, OAuth2User
+{
 
   private static final long serialVersionUID = 1L;
 

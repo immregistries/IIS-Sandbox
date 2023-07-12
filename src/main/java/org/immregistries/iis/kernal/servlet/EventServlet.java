@@ -36,7 +36,7 @@ public class EventServlet extends PopServlet {
       String password = req.getParameter(PARAM_PASSWORD);
       String facilityId = req.getParameter(PARAM_FACILITYID);
       HttpSession session = req.getSession(true);
-      OrgAccess orgAccess = (OrgAccess) session.getAttribute("orgAccess");
+      OrgAccess orgAccess = ServletHelper.getOrgAccess();
       String ack = "";
       Session dataSession = getDataSession();
       try {
@@ -70,7 +70,7 @@ public class EventServlet extends PopServlet {
   protected void doGet(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
 
-    HttpSession session = req.getSession(true);
+
     resp.setContentType("text/html");
     PrintWriter out = new PrintWriter(resp.getOutputStream());
     try {
@@ -88,13 +88,13 @@ public class EventServlet extends PopServlet {
         facilityId = "Mercy Healthcare";
       }
       {
-        HomeServlet.doHeader(out, session, "IIS Sandbox");
+        HomeServlet.doHeader(out, "IIS Sandbox");
 			out.println("    <h2>Send Now</h2>");
         out.println("    <form action=\"event\" method=\"POST\" target=\"_blank\">");
         out.println("    <div class=\"w3-container w3-half w3-margin-top\">");
         out.println("    <div class=\"w3-container w3-card-4\">");
         out.println("      <h3>Authentication</h3>");
-        OrgAccess orgAccess = (OrgAccess) session.getAttribute("orgAccess");
+        OrgAccess orgAccess = ServletHelper.getOrgAccess();
         if (orgAccess == null) {
           out.println("      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_USERID
               + "\" value=\"" + userId + "\"/>");
@@ -130,7 +130,7 @@ public class EventServlet extends PopServlet {
         out.println("    </div>");
         out.println("    </div>");
         out.println("    </form>");
-        HomeServlet.doFooter(out, session);
+        HomeServlet.doFooter(out);
       }
     } catch (Exception e) {
       e.printStackTrace(System.err);

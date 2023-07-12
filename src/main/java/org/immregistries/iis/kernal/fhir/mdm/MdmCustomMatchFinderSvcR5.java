@@ -41,7 +41,7 @@ import static org.immregistries.iis.kernal.InternalClient.FhirRequester.GOLDEN_S
 /**
  * Custom, based on MdmMatchFinderSvcImpl from Hapi-fhir v6.2.4, to allow for Immunization matching with external library
  */
-public class MdmCustomMatchFinderSvc extends MdmMatchFinderSvcImpl implements IMdmMatchFinderSvc {
+public class MdmCustomMatchFinderSvcR5 extends MdmMatchFinderSvcImpl implements IMdmMatchFinderSvc {
 	private static final Logger ourLog = Logs.getMdmTroubleshootingLog();
 	@Autowired
 	private MdmCandidateSearchSvc myMdmCandidateSearchSvc;

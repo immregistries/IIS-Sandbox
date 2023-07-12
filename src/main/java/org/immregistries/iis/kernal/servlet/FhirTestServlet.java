@@ -66,12 +66,12 @@ public class FhirTestServlet extends HttpServlet {
       throws ServletException, IOException {
 
     HttpSession session = req.getSession(true);
-    OrgAccess orgAccess = (OrgAccess) session.getAttribute("orgAccess");
+    OrgAccess orgAccess = ServletHelper.getOrgAccess();
 
     resp.setContentType("text/html");
     PrintWriter out = new PrintWriter(resp.getOutputStream());
 //    Session dataSession = PopServlet.getDataSession();
-    HomeServlet.doHeader(out, session, "IIS Sandbox");
+    HomeServlet.doHeader(out, "IIS Sandbox");
     try {
 
       try {
@@ -340,7 +340,7 @@ public class FhirTestServlet extends HttpServlet {
       System.err.println("Unable to render page: " + e.getMessage());
       e.printStackTrace(System.err);
     }
-    HomeServlet.doFooter(out, session);
+    HomeServlet.doFooter(out);
     out.flush();
     out.close();
   }

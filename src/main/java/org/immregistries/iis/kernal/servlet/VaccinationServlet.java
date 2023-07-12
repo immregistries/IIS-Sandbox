@@ -17,7 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -57,7 +56,7 @@ public class VaccinationServlet extends PatientServlet {
       throws ServletException, IOException {
 
     HttpSession session = req.getSession(true);
-    OrgAccess orgAccess = (OrgAccess) session.getAttribute("orgAccess");
+    OrgAccess orgAccess = ServletHelper.getOrgAccess();
 	  IGenericClient fhirClient = repositoryClientFactory.newGenericClient(session);
 
 	 if (orgAccess == null) {
@@ -78,7 +77,7 @@ public class VaccinationServlet extends PatientServlet {
 		 if (action != null) {
 		 }
 
-		 HomeServlet.doHeader(out, session, "IIS Sandbox - Vaccinations");
+		 HomeServlet.doHeader(out, "IIS Sandbox - Vaccinations");
 
 		 out.println("<h2>Facility : " + orgAccess.getOrg().getOrganizationName() + "</h2>");
 		 PatientReported patientReportedSelected = fhirRequester.readPatientReported(vaccinationReported.getPatientReportedId());
@@ -186,7 +185,7 @@ public class VaccinationServlet extends PatientServlet {
     } catch (Exception e) {
       e.printStackTrace(System.err);
     }
-    HomeServlet.doFooter(out, session);
+    HomeServlet.doFooter(out);
     out.flush();
     out.close();
   }

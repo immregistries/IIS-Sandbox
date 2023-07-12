@@ -11,7 +11,6 @@ import org.immregistries.iis.kernal.InternalClient.RepositoryClientFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -66,7 +65,7 @@ public class LocationServlet extends HttpServlet {
       throws ServletException, IOException {
 
     HttpSession session = req.getSession(true);
-    OrgAccess orgAccess = (OrgAccess) session.getAttribute("orgAccess");
+    OrgAccess orgAccess = ServletHelper.getOrgAccess();
    if (orgAccess == null) {
 //      RequestDispatcher dispatcher = req.getRequestDispatcher("home");
 //      dispatcher.forward(req, resp);
@@ -132,7 +131,7 @@ public class LocationServlet extends HttpServlet {
       List<OrgLocation> orgLocationList = null;
       orgLocationList = fhirRequests.searchOrgLocationList();
 
-      HomeServlet.doHeader(out, session, "IIS Sandbox");
+      HomeServlet.doHeader(out, "IIS Sandbox");
 
       out.println("    <h2>Facility: " + orgAccess.getOrg().getOrganizationName() + "</h2>");
       if (orgLocationSelected == null) {
@@ -238,7 +237,7 @@ public class LocationServlet extends HttpServlet {
     } catch (Exception e) {
       e.printStackTrace(System.err);
     }
-    HomeServlet.doFooter(out, session);
+    HomeServlet.doFooter(out);
     out.flush();
     out.close();
   }

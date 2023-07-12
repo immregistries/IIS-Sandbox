@@ -28,17 +28,27 @@ public class ServletRegistrationConfig {
 		return registrationBean;
 	}
 
-
 	@Bean
 	public ServletRegistrationBean loginServletRegistrationBean() {
 		ServletRegistrationBean registrationBean = new ServletRegistrationBean();
-		HttpServlet servlet = new OAuthLoginServlet();
+		HttpServlet servlet = new LoginServlet();
 		beanFactory.autowireBean(servlet);
 		registrationBean.setServlet(servlet);
-		registrationBean.addUrlMappings("/oauth2/authorization/github");
-//		registrationBean.setLoadOnStartup(1);
+		registrationBean.addUrlMappings("/loginForm");
+		registrationBean.setLoadOnStartup(1);
 		return registrationBean;
 	}
+
+//	@Bean
+//	public ServletRegistrationBean loginServletRegistrationBean() {
+//		ServletRegistrationBean registrationBean = new ServletRegistrationBean();
+//		HttpServlet servlet = new OAuthLoginServlet();
+//		beanFactory.autowireBean(servlet);
+//		registrationBean.setServlet(servlet);
+//		registrationBean.addUrlMappings("/oauth2/authorization/github");
+////		registrationBean.setLoadOnStartup(1);
+//		return registrationBean;
+//	}
 
 	@Bean
 	public ServletRegistrationBean popServletRegistrationBean() {

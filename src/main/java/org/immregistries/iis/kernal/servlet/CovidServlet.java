@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -63,7 +62,7 @@ public class CovidServlet extends HttpServlet {
     resp.setContentType("text/html");
     PrintWriter out = new PrintWriter(resp.getOutputStream());
 //    Session dataSession = PopServlet.getDataSession();
-    OrgAccess orgAccess = (OrgAccess) session.getAttribute("orgAccess");
+    OrgAccess orgAccess = ServletHelper.getOrgAccess();
    if (orgAccess == null) {
 //      RequestDispatcher dispatcher = req.getRequestDispatcher("home");
 //      dispatcher.forward(req, resp);
@@ -79,7 +78,7 @@ public class CovidServlet extends HttpServlet {
       String messageError = null;
       String dateStartString = req.getParameter(PARAM_DATE_START);
       String dateEndString = req.getParameter(PARAM_DATE_END);
-      HomeServlet.doHeader(out, session, "IIS Sandbox");
+      HomeServlet.doHeader(out, "IIS Sandbox");
 
 
       Date dateStart = null;
@@ -188,7 +187,7 @@ public class CovidServlet extends HttpServlet {
       System.err.println("Unable to render page: " + e.getMessage());
       e.printStackTrace(System.err);
     }
-    HomeServlet.doFooter(out, session);
+    HomeServlet.doFooter(out);
     out.flush();
     out.close();
   }

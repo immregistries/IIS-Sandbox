@@ -59,7 +59,7 @@ public class TestMapping extends HttpServlet {
 			String password = "utest";
 			String facilityId = "utest";
 			HttpSession session = req.getSession(true);
-			OrgAccess orgAccess = (OrgAccess) session.getAttribute("orgAccess");
+			OrgAccess orgAccess = ServletHelper.getOrgAccess();
 			String ack = "";
 			String[] messages;
 			StringBuilder ackBuilder = new StringBuilder();
@@ -102,10 +102,10 @@ public class TestMapping extends HttpServlet {
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
 		throws ServletException, IOException {
 
-		HttpSession session = req.getSession(true);
+
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
-		OrgAccess orgAccess = (OrgAccess) session.getAttribute("orgAccess");
+		OrgAccess orgAccess = ServletHelper.getOrgAccess();
 		try {
 			String message = req.getParameter(PARAM_MESSAGE);
 			if (message == null || message.equals("")) {
@@ -116,7 +116,7 @@ public class TestMapping extends HttpServlet {
 				message = testCaseMessage.getMessageText();
 			}
 			{
-				HomeServlet.doHeader(out, session, "IIS Sandbox");
+				HomeServlet.doHeader(out, "IIS Sandbox");
 				out.println("    <h2>Send Now to Test Mapping</h2>");
 				out.println("    <form action=\"utest\" method=\"POST\" target=\"_blank\">");
 				out.println("      <h3>VXU Message</h3>");
@@ -132,7 +132,7 @@ public class TestMapping extends HttpServlet {
 				out.println("    </div>");
 				out.println("    </div>");
 				out.println("    </form>");
-				HomeServlet.doFooter(out, session);
+				HomeServlet.doFooter(out);
 			}
 		} catch (Exception e) {
 			e.printStackTrace(System.err);

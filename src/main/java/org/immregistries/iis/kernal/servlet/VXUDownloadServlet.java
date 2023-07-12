@@ -29,7 +29,7 @@ public class VXUDownloadServlet extends VXUDownloadFormServlet {
 
     resp.setContentType("text/plain");
     PrintWriter out = new PrintWriter(resp.getOutputStream());
-    OrgAccess orgAccess = (OrgAccess) session.getAttribute("orgAccess");
+    OrgAccess orgAccess = ServletHelper.getOrgAccess();
    if (orgAccess == null) {
 //      RequestDispatcher dispatcher = req.getRequestDispatcher("home");
 //      dispatcher.forward(req, resp);

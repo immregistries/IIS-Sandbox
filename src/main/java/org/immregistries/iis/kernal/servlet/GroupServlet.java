@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -38,8 +37,8 @@ public class GroupServlet extends HttpServlet {
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
 		throws ServletException, IOException {
 		doGet(req, resp);
-		HttpSession session = req.getSession(true);
-		OrgAccess orgAccess = (OrgAccess) session.getAttribute("orgAccess");
+
+		OrgAccess orgAccess = ServletHelper.getOrgAccess();
 		if (orgAccess == null) {
 			throw new AuthenticationCredentialsNotFoundException("");
 		}
@@ -51,14 +50,14 @@ public class GroupServlet extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
 		throws ServletException, IOException {
-		HttpSession session = req.getSession(true);
-		OrgAccess orgAccess = (OrgAccess) session.getAttribute("orgAccess");
+
+		OrgAccess orgAccess = ServletHelper.getOrgAccess();
 		if (orgAccess == null) {
 			throw new AuthenticationCredentialsNotFoundException("");
 		}
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
-		HomeServlet.doHeader(out, session, "IIS Sandbox - Groups");
+		HomeServlet.doHeader(out, "IIS Sandbox - Groups");
 		Group group = new Group();
 		group.setManagingEntity(new Reference().setIdentifier(new Identifier().setType(new CodeableConcept(new Coding().setCode("Organization"))).setSystem("AIRA_TEST").setValue("test")));
 		group.setDescription("Generated Group in IIS sandbox, for Bulk data export use case and Synchronisation with subscription synchronisation");
@@ -69,7 +68,7 @@ public class GroupServlet extends HttpServlet {
 		out.println("<p>");
 		out.println(repositoryClientFactory.getFhirContext().newJsonParser().setPrettyPrint(true).encodeResourceToString(parameters));
 		out.println("</p>");
-		HomeServlet.doFooter(out, session);
+		HomeServlet.doFooter(out);
 		out.flush();
 		out.close();
 	}

@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -45,7 +44,7 @@ public class RecommendationServlet extends PatientServlet {
 			doPut(req,resp);
 		} else {
 			HttpSession session = req.getSession(true);
-			OrgAccess orgAccess = (OrgAccess) session.getAttribute("orgAccess");
+			OrgAccess orgAccess = ServletHelper.getOrgAccess();
 			if (orgAccess == null) {
 				throw new AuthenticationCredentialsNotFoundException("");
 			}
@@ -75,7 +74,7 @@ public class RecommendationServlet extends PatientServlet {
 	protected void doPut(HttpServletRequest req, HttpServletResponse resp)
 		throws ServletException, IOException {
 		HttpSession session = req.getSession(true);
-		OrgAccess orgAccess = (OrgAccess) session.getAttribute("orgAccess");
+		OrgAccess orgAccess = ServletHelper.getOrgAccess();
 		if (orgAccess == null) {
 			throw new AuthenticationCredentialsNotFoundException("");
 		}
@@ -107,14 +106,14 @@ public class RecommendationServlet extends PatientServlet {
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
 		throws ServletException, IOException {
 		HttpSession session = req.getSession(true);
-		OrgAccess orgAccess = (OrgAccess) session.getAttribute("orgAccess");
+		OrgAccess orgAccess = ServletHelper.getOrgAccess();
 		if (orgAccess == null) {
 			throw new AuthenticationCredentialsNotFoundException("");
 		}
 
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
-		HomeServlet.doHeader(out, session, "Recommendations");
+		HomeServlet.doHeader(out, "Recommendations");
 
 		try {
 			IGenericClient fhirClient = repositoryClientFactory.newGenericClient(session);
@@ -172,7 +171,7 @@ public class RecommendationServlet extends PatientServlet {
 		} catch (Exception e) {
 			e.printStackTrace(System.err);
 		}
-		HomeServlet.doFooter(out, session);
+		HomeServlet.doFooter(out);
 		out.flush();
 		out.close();
 	}

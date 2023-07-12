@@ -40,7 +40,7 @@ public class HomeServlet extends HttpServlet {
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		try {
 			{
-				doHeader(out, session, "IIS Sandbox - Home");
+				doHeader(out, "IIS Sandbox - Home");
 				String show = req.getParameter(PARAM_SHOW);
 				out.println("    <div class=\"w3-container w3-half w3-margin-top\">");
 				if (show == null) {
@@ -99,7 +99,7 @@ public class HomeServlet extends HttpServlet {
 					out.println("    </ul>");
 
 				} else if (show.equals(SHOW_FACILITIES)) {
-					OrgAccess orgAccess = (OrgAccess) session.getAttribute("orgAccess");
+					OrgAccess orgAccess = ServletHelper.getOrgAccess();
 					if (orgAccess != null) {
 						out.println("    <h2>Facilities</h2>");
 						Session dataSession = PopServlet.getDataSession();
@@ -136,7 +136,7 @@ public class HomeServlet extends HttpServlet {
 					"  <img src=\"img/markus-spiske-dWaRJ3WBnGs-unsplash.jpg\" class=\"w3-round\" alt=\"Sandbox\" width=\"400\">");
 				out.println(
 					"<a style=\"background-color:black;color:white;text-decoration:none;padding:4px 6px;font-family:-apple-system, BlinkMacSystemFont, &quot;San Francisco&quot;, &quot;Helvetica Neue&quot;, Helvetica, Ubuntu, Roboto, Noto, &quot;Segoe UI&quot;, Arial, sans-serif;font-size:12px;font-weight:bold;line-height:1.2;display:inline-block;border-radius:3px\" href=\"https://unsplash.com/@markusspiske?utm_medium=referral&amp;utm_campaign=photographer-credit&amp;utm_content=creditBadge\" target=\"_blank\" rel=\"noopener noreferrer\" title=\"Download free do whatever you want high-resolution photos from Markus Spiske\"><span style=\"display:inline-block;padding:2px 3px\"><svg xmlns=\"http://www.w3.org/2000/svg\" style=\"height:12px;width:auto;position:relative;vertical-align:middle;top:-2px;fill:white\" viewBox=\"0 0 32 32\"><title>unsplash-logo</title><path d=\"M10 9V0h12v9H10zm12 5h10v18H0V14h10v9h12v-9z\"></path></svg></span><span style=\"display:inline-block;padding:2px 3px\">Markus Spiske</span></a>");
-				doFooter(out, session);
+				doFooter(out);
 			}
 		} catch (Exception e) {
 			e.printStackTrace(System.err);
@@ -145,7 +145,7 @@ public class HomeServlet extends HttpServlet {
 		out.close();
 	}
 
-	public static void doHeader(PrintWriter out, HttpSession session, String title) {
+	public static void doHeader(PrintWriter out, String title) {
 		out.println("<html>");
 		out.println("  <head>");
 		out.println("    <title>" + title + "</title>");
@@ -155,24 +155,24 @@ public class HomeServlet extends HttpServlet {
 		out.println("  <body>");
 		out.println("    <header class=\"w3-container w3-light-grey\">");
 		out.println("      <div class=\"w3-bar w3-light-grey\">");
-		out.println(
-			"        <a href=\"home\" class=\"w3-bar-item w3-button w3-green\">IIS Sandbox</a>");
-		OrgAccess orgAccess = (OrgAccess) session.getAttribute("orgAccess");
+		out.println("<a href=\"home\" class=\"w3-bar-item w3-button w3-green\">IIS Sandbox</a>");
+		OrgAccess orgAccess = ServletHelper.getOrgAccess();
 		if (orgAccess != null) {
 			String link = "home?" + PARAM_SHOW + "=" + SHOW_FACILITIES;
 			out.println("<a href=\"" + link + "\" class=\"w3-bar-item w3-button\">Facilities</a>");
 		}
-		out.println("        <a href=\"pop\" class=\"w3-bar-item w3-button\">Send Now</a>");
-		out.println("        <a href=\"message\" class=\"w3-bar-item w3-button\">Messages</a>");
-		out.println("        <a href=\"patient\" class=\"w3-bar-item w3-button\">Patients</a>");
-		out.println("        <a href=\"location\" class=\"w3-bar-item w3-button\">Locations</a>");
-		out.println("        <a href=\"subscription\" class=\"w3-bar-item w3-button\">Subscriptions</a>");
-		out.println("        <a href=\"soap\" class=\"w3-bar-item w3-button\">CDC WSDL</a>");
+		out.println("<a href=\"pop\" class=\"w3-bar-item w3-button\">Send Now</a>");
+		out.println("<a href=\"message\" class=\"w3-bar-item w3-button\">Messages</a>");
+		out.println("<a href=\"patient\" class=\"w3-bar-item w3-button\">Patients</a>");
+		out.println("<a href=\"location\" class=\"w3-bar-item w3-button\">Locations</a>");
+		out.println("<a href=\"subscription\" class=\"w3-bar-item w3-button\">Subscriptions</a>");
+		out.println("<a href=\"soap\" class=\"w3-bar-item w3-button\">CDC WSDL</a>");
 		if (orgAccess != null) {
-			out.println("<a class='w3-bar-item w3-button w3-right' href=\"message?" + MessageServlet.PARAM_ACTION + "="
-				+ MessageServlet.ACTION_LOGOUT + "\">Logout</a>");
+			out.println("<a class='w3-bar-item w3-button w3-right' href=\"logout\">Logout</a>");
 		} else {
-			out.println("    <a href=\"/oauth2/authorization/github\" class=\"w3-bar-item w3-button\">Login with GITHUB</a>\n");
+//			out.println("<a href=\"oauth2/authorization/github\" class=\"w3-bar-item w3-button w3-right\">Login with GITHUB</a>\n");
+
+			out.println("<a class='w3-bar-item w3-button w3-right' href=\"loginForm\">Login</a>");
 		}
 		out.println("      </div>");
 		out.println("    </header>");
@@ -180,14 +180,13 @@ public class HomeServlet extends HttpServlet {
 
 	}
 
-	public static void doFooter(PrintWriter out, HttpSession session) {
+	public static void doFooter(PrintWriter out) {
 		out.println("  </div>");
 		SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
-		OrgAccess orgAccess = (OrgAccess) session.getAttribute("orgAccess");
+		OrgAccess orgAccess = ServletHelper.getOrgAccess();
 		if (orgAccess != null) {
 			out.println("  <div class=\"w3-container\">");
-			out.println("    <p><a href=\"message?" + MessageServlet.PARAM_ACTION + "="
-				+ MessageServlet.ACTION_LOGOUT + "\">Logout</a></p>");
+			out.println("    <p><a href=\"logout\">Logout</a></p>");
 			out.println("  </div>");
 		}
 

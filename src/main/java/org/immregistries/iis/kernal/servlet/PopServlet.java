@@ -15,7 +15,11 @@ import org.immregistries.smm.transform.Transformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
+import org.springframework.beans.factory.config.SingletonBeanRegistry;
+import org.springframework.context.ApplicationContext;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -47,31 +51,27 @@ public class PopServlet extends HttpServlet {
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
 		throws ServletException, IOException {
-		logger.info("POP POST {}", 1);
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		try {
 			String message = req.getParameter(PARAM_MESSAGE);
-			HttpSession session = req.getSession(true);
-			OrgAccess orgAccess = (OrgAccess) session.getAttribute("orgAccess");
+
+			OrgAccess orgAccess = ServletHelper.getOrgAccess();
 			String ack = "";
 			String[] messages;
 			StringBuilder ackBuilder = new StringBuilder();
 			Session dataSession = getDataSession();
 			try {
 				if (orgAccess == null) {
-					String userId = req.getParameter(PARAM_USERID);
-					String password = req.getParameter(PARAM_PASSWORD);
-					String facilityId = req.getParameter(PARAM_FACILITYID);
-					orgAccess = ServletHelper.authenticateOrgAccess(userId, password, facilityId, dataSession);
-				}
-				if (orgAccess == null) {
+					RequestDispatcher dispatcher = getServletContext()
+						.getRequestDispatcher("/login?pop");
+					dispatcher.forward(req, resp);
 					resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 					out.println(
 						"Access is not authorized. Facilityid, userid and/or password are not recognized. ");
 				} else {
-					HomeServlet.doHeader(out, session, "IIS Sandbox - PopResult");
-					session.setAttribute("orgAccess", orgAccess);
+					HomeServlet.doHeader(out, "IIS Sandbox - PopResult");
+
 					messages = message.split("MSH\\|\\^~\\\\&\\|");
 					if (messages.length > 2) {
 						req.setAttribute("groupPatientIds", new ArrayList<String>());
@@ -110,14 +110,22 @@ public class PopServlet extends HttpServlet {
 		out.close();
 	}
 
+//	@Autowired
+//	ApplicationContext applicationContext;
+
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
 		throws ServletException, IOException {
-
-		HttpSession session = req.getSession(true);
+//		AutowireCapableBeanFactory autowireCapableBeanFactory = applicationContext.getAutowireCapableBeanFactory();
+//		if (autowireCapableBeanFactory instanceof SingletonBeanRegistry) {
+//			String[] singletonNames = ((SingletonBeanRegistry) autowireCapableBeanFactory).getSingletonNames();
+//			for (String singleton : singletonNames) {
+//				System.out.println(singleton);
+//			}
+//		}
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
-		OrgAccess orgAccess = (OrgAccess) session.getAttribute("orgAccess");
+		OrgAccess orgAccess = ServletHelper.getOrgAccess();
 		String userId = null;
 		String password = null;
 		String facilityId = null;
@@ -150,7 +158,7 @@ public class PopServlet extends HttpServlet {
 			}
 
 			{
-				HomeServlet.doHeader(out, session, "IIS Sandbox - Pop");
+				HomeServlet.doHeader(out, "IIS Sandbox - Pop");
 				out.println("    <h2>Send Now</h2>");
 				out.println("    <form action=\"pop\" method=\"POST\" target=\"_blank\">");
 				out.println("      <h3>VXU Message</h3>");
@@ -158,35 +166,40 @@ public class PopServlet extends HttpServlet {
 					+ "\" rows=\"15\" cols=\"160\">" + message + "</textarea></td>");
 				out.println("    <div class=\"w3-container w3-half w3-margin-top\">");
 
-				out.println("    <div class=\"w3-container w3-card-4\">");
-				out.println("      <h3>Authentication</h3>");
+
 				if (orgAccess == null) {
-					out.println("      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_USERID
-						+ "\" value=\"" + userId + "\"/>");
-					out.println("      <label>User Id</label>");
-					out.println("      <input class=\"w3-input\" type=\"password\" name=\"" + PARAM_PASSWORD
-						+ "\"/>");
-					out.println("      <label>Password</label>");
-					out.println("      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_FACILITYID
-						+ "\" value=\"" + facilityId + "\"/>");
-					out.println("      <label>Facility Id</label>");
+					// TODO duplicate login form ?
+//					out.println("      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_USERID
+//						+ "\" value=\"" + userId + "\"/>");
+//					out.println("      <label>User Id</label>");
+//					out.println("      <input class=\"w3-input\" type=\"password\" name=\"" + PARAM_PASSWORD
+//						+ "\"/>");
+//					out.println("      <label>Password</label>");
+//					out.println("      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_FACILITYID
+//						+ "\" value=\"" + facilityId + "\"/>");
+//					out.println("      <label>Facility Id</label>");
+					out.println("<input class=\"w3-button w3-section w3-teal w3-ripple\" type=\"submit\" name=\"submit\" value=\"Submit\"/>");
+					out.println("    <span class=\"w3-yellow\">Test Data Only</span>");
 				} else {
+					out.println("    <div class=\"w3-container w3-card-4\">");
+					out.println("      <h3>Authentication</h3>");
 					out.println("      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_USERID
 						+ "\" value=\"" + orgAccess.getAccessName() + "\"/ disabled>");
 					out.println("      <label>User Id</label>");
 					out.println("      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_FACILITYID
 						+ "\" value=\"" + orgAccess.getOrg().getOrganizationName() + "\" disabled/>");
 					out.println("      <label>Facility Id</label>");
+					out.println("      <br/>");
+					out.println("<input class=\"w3-button w3-section w3-teal w3-ripple\" type=\"submit\" name=\"submit\" value=\"Submit\"/>");
+					out.println("    <span class=\"w3-yellow\">Test Data Only</span>");
+
+					out.println("    </div>");
 				}
-				out.println("      <br/>");
-				out.println(
-					"      <input class=\"w3-button w3-section w3-teal w3-ripple\" type=\"submit\" name=\"submit\" value=\"Submit\"/>");
-				out.println("    <span class=\"w3-yellow\">Test Data Only</span>");
+
 
 				out.println("    </div>");
-				out.println("    </div>");
 				out.println("    </form>");
-				HomeServlet.doFooter(out, session);
+				HomeServlet.doFooter(out);
 			}
 		} catch (Exception e) {
 			e.printStackTrace(System.err);

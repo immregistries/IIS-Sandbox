@@ -69,7 +69,7 @@ public class VciServlet extends HttpServlet {
   protected void doGet(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
 
-    HttpSession session = req.getSession(true);
+
     resp.setContentType("text/html");
     PrintWriter out = new PrintWriter(resp.getOutputStream());
     try {
@@ -164,7 +164,7 @@ public class VciServlet extends HttpServlet {
 
         message = mapper.writeValueAsString(verifiableCredential);
       }
-      HomeServlet.doHeader(out, session, "IIS Sandbox");
+      HomeServlet.doHeader(out, "IIS Sandbox");
 		 out.println("    <h2>VCI Demonstration</h2>");
       out.println("    <form action=\"vciDemo\" method=\"POST\">");
       if (conversionStep == null) {
@@ -213,7 +213,7 @@ public class VciServlet extends HttpServlet {
 
       out.println("    </div>");
       out.println("    </form>");
-      HomeServlet.doFooter(out, session);
+      HomeServlet.doFooter(out);
     } catch (Exception e) {
       e.printStackTrace(System.err);
     }

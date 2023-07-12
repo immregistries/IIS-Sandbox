@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServlet;
@@ -72,7 +71,7 @@ public class SubscriptionServlet extends HttpServlet {
 		throws ServletException, IOException {
 		// TODO action as manual trigger with content
 		HttpSession session = req.getSession(true);
-		OrgAccess orgAccess = (OrgAccess) session.getAttribute("orgAccess");
+		OrgAccess orgAccess = ServletHelper.getOrgAccess();
 		if (orgAccess == null) {
 			throw new AuthenticationCredentialsNotFoundException("");
 		}
@@ -83,7 +82,7 @@ public class SubscriptionServlet extends HttpServlet {
 
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
-		HomeServlet.doHeader(out, session, "IIS Sandbox - SubscriptionsResult");
+		HomeServlet.doHeader(out, "IIS Sandbox - SubscriptionsResult");
 
 		try {
 			Bundle searchBundle = localClient.search().forResource(Subscription.class)
@@ -130,7 +129,7 @@ public class SubscriptionServlet extends HttpServlet {
 		throws ServletException, IOException {
 
 		HttpSession session = req.getSession(true);
-		OrgAccess orgAccess = (OrgAccess) session.getAttribute("orgAccess");
+		OrgAccess orgAccess = ServletHelper.getOrgAccess();
 		if (orgAccess == null) {
 			throw new AuthenticationCredentialsNotFoundException("");
 		}
@@ -152,9 +151,9 @@ public class SubscriptionServlet extends HttpServlet {
 
 	private void printTools(HttpServletRequest req, HttpServletResponse resp,
 									PrintWriter out,IGenericClient fhirClient, String subscriptionId) {
-		HttpSession session = req.getSession(true);
+
 		try {
-			HomeServlet.doHeader(out, session, "IIS Sandbox - Subscriptions");
+			HomeServlet.doHeader(out, "IIS Sandbox - Subscriptions");
 			ServletInputStream servletInputStream = req.getInputStream();
 
 			String[] initialMessages = new String[]{OPERATION_SAMPLE};
@@ -214,7 +213,7 @@ public class SubscriptionServlet extends HttpServlet {
 			} else {
 				out.println("<div class=\"w3-panel w3-yellow\"><p>Not Found</p></div>");
 			}
-			HomeServlet.doFooter(out,session);
+			HomeServlet.doFooter(out);
 
 		} catch (Exception e) {
 			e.printStackTrace(System.err);
@@ -224,7 +223,7 @@ public class SubscriptionServlet extends HttpServlet {
 
 	public static void printSearchAndSelect(HttpServletRequest req, HttpServletResponse resp,
 														 PrintWriter out, IGenericClient fhirClient) {
-		HttpSession session = req.getSession(true);
+
 		try {
 			Bundle bundle;
 
@@ -241,7 +240,7 @@ public class SubscriptionServlet extends HttpServlet {
 				bundle = fhirClient.search().forResource(Subscription.class).returnBundle(Bundle.class).execute();
 			}
 
-			HomeServlet.doHeader(out, session, "IIS Sandbox - Subscriptions");
+			HomeServlet.doHeader(out, "IIS Sandbox - Subscriptions");
 
 			out.println("    <div class=\"w3-container w3-half w3-margin-top\">");
 			out.println("    <h3>Search Subscription</h3>");
@@ -293,7 +292,7 @@ public class SubscriptionServlet extends HttpServlet {
 			} else {
 				out.println("<div class=\"w3-panel w3-yellow\"><p>No Records Found</p></div>");
 			}
-			HomeServlet.doFooter(out,session);
+			HomeServlet.doFooter(out);
 
 		} catch (Exception e) {
 			e.printStackTrace(System.err);

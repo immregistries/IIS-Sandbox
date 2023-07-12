@@ -20,7 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -66,7 +65,7 @@ public class PatientServlet extends HttpServlet {
       throws ServletException, IOException {
 
     HttpSession session = req.getSession(true);
-    OrgAccess orgAccess = (OrgAccess) session.getAttribute("orgAccess");
+    OrgAccess orgAccess = ServletHelper.getOrgAccess();
     if (orgAccess == null) {
 //      RequestDispatcher dispatcher = req.getRequestDispatcher("home");
 //      dispatcher.forward(req, resp);
@@ -105,7 +104,7 @@ public class PatientServlet extends HttpServlet {
         patientReportedExternalLink = "";
       }
 
-		 HomeServlet.doHeader(out, session, "IIS Sandbox - Patients");
+		 HomeServlet.doHeader(out, "IIS Sandbox - Patients");
 
       PatientReported patientReportedSelected = getPatientReportedFromParameter(req, fhirClient);
 
@@ -267,7 +266,7 @@ public class PatientServlet extends HttpServlet {
 	 } finally {
 		 dataSession.close();
 	 }
-	  HomeServlet.doFooter(out, session);
+	  HomeServlet.doFooter(out);
 	  out.flush();
 	  out.close();
   }

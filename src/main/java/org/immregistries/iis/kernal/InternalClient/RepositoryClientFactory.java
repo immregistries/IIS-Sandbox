@@ -14,6 +14,7 @@ import ca.uhn.fhir.rest.server.exceptions.AuthenticationException;
 import ca.uhn.fhir.rest.server.interceptor.LoggingInterceptor;
 import ca.uhn.fhir.rest.server.util.ITestingUiClientFactory;
 import org.immregistries.iis.kernal.model.OrgAccess;
+import org.immregistries.iis.kernal.servlet.ServletHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -99,8 +100,12 @@ public class RepositoryClientFactory extends ApacheRestfulClientFactory implemen
 	public IGenericClient newGenericClient(HttpSession session) {
 		asynchInit();
 		if (session.getAttribute("fhirClient") == null) {
-			OrgAccess orgAccess = (OrgAccess) session.getAttribute("orgAccess");
-			session.setAttribute("fhirClient", newGenericClient(orgAccess));
+			OrgAccess orgAccess = ServletHelper.getOrgAccess();
+			if (orgAccess != null) {
+				session.setAttribute("fhirClient", newGenericClient(orgAccess));
+			} else {
+				session.setAttribute("fhirClient", null);
+			}
 		}
 		return (IGenericClient) session.getAttribute("fhirClient");
 	}

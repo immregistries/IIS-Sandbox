@@ -21,7 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -58,7 +57,7 @@ public class V2ToFhirServlet extends HttpServlet {
       throws ServletException, IOException {
 
     HttpSession session = req.getSession(true);
-    OrgAccess orgAccess = (OrgAccess) session.getAttribute("orgAccess");
+    OrgAccess orgAccess = ServletHelper.getOrgAccess();
 	  IGenericClient fhirClient = repositoryClientFactory.newGenericClient(session);
    if (orgAccess == null) {
 //      RequestDispatcher dispatcher = req.getRequestDispatcher("home");
@@ -70,7 +69,7 @@ public class V2ToFhirServlet extends HttpServlet {
     resp.setContentType("text/html");
     PrintWriter out = new PrintWriter(resp.getOutputStream());
     Session dataSession = PopServlet.getDataSession();
-    HomeServlet.doHeader(out, session, "IIS Sandbox");
+    HomeServlet.doHeader(out, "IIS Sandbox");
     try {
       PatientReported pr = (PatientReported) dataSession.get(PatientReported.class,
           Integer.parseInt(req.getParameter(PARAM_PATIENT_REPORTED_ID)));
@@ -126,7 +125,7 @@ public class V2ToFhirServlet extends HttpServlet {
     } finally {
       dataSession.close();
     }
-    HomeServlet.doFooter(out, session);
+    HomeServlet.doFooter(out);
     out.flush();
     out.close();
   }
