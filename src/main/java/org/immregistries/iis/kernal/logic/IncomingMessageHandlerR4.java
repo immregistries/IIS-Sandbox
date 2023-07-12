@@ -12,10 +12,7 @@ import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.model.*;
 import org.immregistries.iis.kernal.InternalClient.FhirRequester;
 import org.immregistries.smm.tester.manager.HL7Reader;
-import org.immregistries.vfa.connect.model.Admin;
-import org.immregistries.vfa.connect.model.EvaluationActual;
-import org.immregistries.vfa.connect.model.ForecastActual;
-import org.immregistries.vfa.connect.model.TestEvent;
+import org.immregistries.vfa.connect.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Conditional;
@@ -25,6 +22,8 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import javax.servlet.http.HttpServletRequest;
 import java.text.SimpleDateFormat;
 import java.util.*;
+
+import static org.immregistries.iis.kernal.mapping.Interfaces.PatientMapper.MRN_SYSTEM;
 
 /**
  * DO NOT EDIT THE CONTENT OF THIS FILE
@@ -99,7 +98,7 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler<Organizatio
 			int fieldPosition = 0;
 			if (!mrn.equals("")) {
 				patientReported = fhirRequester.searchPatientReported(
-					Patient.IDENTIFIER.exactly().code(mrn)
+					Patient.IDENTIFIER.exactly().systemAndCode(MRN_SYSTEM, mrn)
 				);
 			}
 			String patientNameLast = reader.getValue(4, 1);
@@ -134,20 +133,16 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler<Organizatio
 				}
 				if (patientReported != null) {
 					int points = 0;
-					if (!patientNameLast.equals("")
-						&& patientNameLast.equalsIgnoreCase(patientReported.getNameLast())) {
+					if (!patientNameLast.isBlank() && patientNameLast.equalsIgnoreCase(patientReported.getNameLast())) {
 						points = points + 2;
 					}
-					if (!patientNameFirst.equals("")
-						&& patientNameFirst.equalsIgnoreCase(patientReported.getNameFirst())) {
+					if (!patientNameFirst.isBlank() && patientNameFirst.equalsIgnoreCase(patientReported.getNameFirst())) {
 						points = points + 2;
 					}
-					if (!patientNameMiddle.equals("")
-						&& patientNameMiddle.equalsIgnoreCase(patientReported.getNameFirst())) {
+					if (!patientNameMiddle.isBlank() && patientNameMiddle.equalsIgnoreCase(patientReported.getNameFirst())) {
 						points = points + 2;
 					}
-					if (patientBirthDate != null
-						&& patientBirthDate.equals(patientReported.getBirthDate())) {
+					if (patientBirthDate != null && patientBirthDate.equals(patientReported.getBirthDate())) {
 						points = points + 2;
 					}
 					if (!patientSex.equals("")
@@ -159,14 +154,13 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler<Organizatio
 						patientReported = null;
 					}
 				}
-				if (patientReported == null) {
+				if (patientReported == null) { // TODO change merging with MDM & FHIR ?
 					patientReportedPossibleList = fhirRequester.searchPatientReportedList(
 						Patient.NAME.matches().values(patientNameFirst, patientNameLast),
 						Patient.BIRTHDATE.exactly().day(patientBirthDate));
 				}
 				if (patientReported != null
 					&& patientNameMiddle.equalsIgnoreCase(PATIENT_MIDDLE_NAME_MULTI)) {
-					patientReportedPossibleList.add(patientReported);
 					patientReportedPossibleList.add(patientReported);
 					patientReported = null;
 				}
@@ -626,6 +620,7 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler<Organizatio
 					boolean invalidCharFound = false;
 					char invalidChar = ' ';
 					for (char c : patientPhone.toCharArray()) {
+
 						if (c >= '0' && c <= '9') {
 							countNums++;
 						} else if (c != '-' && c != '.' && c != ' ' && c != '(' && c != ')') {
@@ -907,8 +902,6 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler<Organizatio
 		ArrayList<String> groupPatientIds = (ArrayList<String>) request.getAttribute("groupPatientIds");
 		if (groupPatientIds != null) { // If there are numerous patients added and option was activated
 			groupPatientIds.add(patientReported.getId());
-
-//		  groupPatientIds = new String[]{patientReported.getPatientReportedId()};
 		}
 		request.setAttribute("groupPatientIds", groupPatientIds);
 
@@ -1702,8 +1695,8 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler<Organizatio
 				for (Bundle.BundleEntryComponent entry : bundle.getEntry()) {
 					Immunization immunization = (Immunization) entry.getResource();
 					if (immunization.getOccurrenceDateTimeType() != null) {
-						String key = sdf.format(immunization.getOccurrenceDateTimeType());
-						if (!immunization.getVaccineCode().getText().equals("")) {
+						String key = sdf.format(immunization.getOccurrenceDateTimeType().getValue());
+						if (immunization.getVaccineCode() != null && StringUtils.isNotBlank(immunization.getVaccineCode().getText())) {
 							key += key + immunization.getVaccineCode().getText();
 							VaccinationMaster vaccinationMaster = immunizationMapper.getMaster(immunization);
 							map.put(key, vaccinationMaster);
@@ -1748,21 +1741,17 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler<Organizatio
 	}
 
 	private Organization processSendingOrganization(HL7Reader reader) {
-		if (!reader.getValue(4, 2).isBlank()) {
-			Organization sendingOrganization = (Organization) fhirRequester.searchOrganization(Organization.IDENTIFIER.exactly()
-				.systemAndIdentifier(reader.getValue(4, 1), reader.getValue(4, 2)));
-			if (sendingOrganization == null) {
-				sendingOrganization = new Organization()
-					.setName(reader.getValue(4, 1))
-					.addIdentifier(new Identifier()
-						.setSystem(reader.getValue(4, 2))
-						.setValue(reader.getValue(4, 10)));
-				sendingOrganization = (Organization) fhirRequester.saveOrganization(sendingOrganization);
-			}
-			return sendingOrganization;
-		} else {
-			return null;
+		Organization sendingOrganization = (Organization) fhirRequester.searchOrganization(Organization.IDENTIFIER.exactly()
+			.systemAndIdentifier(reader.getValue(4, 1), reader.getValue(4, 2)));
+		if (sendingOrganization == null) {
+			sendingOrganization = new Organization()
+				.setName(reader.getValue(4, 1))
+				.addIdentifier(new Identifier()
+					.setSystem(reader.getValue(4, 2))
+					.setValue(reader.getValue(4, 10)));
+			sendingOrganization = (Organization) fhirRequester.saveOrganization(sendingOrganization);
 		}
+		return sendingOrganization;
 	}
 
 	public Organization processManagingOrganization(HL7Reader reader) {

@@ -88,6 +88,8 @@ public class SessionAuthorizationInterceptor extends AuthorizationInterceptor {
 
 								.andThen().allow().read()
 								.resourcesOfType("Group").withAnyId().forTenantIds(CONNECTATHON_USER)
+								.andThen().allow().create()
+								.resourcesOfType("Group").withAnyId().forTenantIds(CONNECTATHON_USER)
 								.andThen().allow().read()
 								.resourcesOfType("Immunization").withAnyId().forTenantIds(CONNECTATHON_USER)
 								.andThen().allow().read()

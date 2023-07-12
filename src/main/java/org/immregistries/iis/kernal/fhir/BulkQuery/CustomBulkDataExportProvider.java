@@ -29,7 +29,6 @@ import ca.uhn.fhir.rest.api.RequestTypeEnum;
 import ca.uhn.fhir.rest.api.server.IRestfulServer;
 import ca.uhn.fhir.rest.api.server.RequestDetails;
 import ca.uhn.fhir.rest.api.server.bulk.BulkDataExportOptions;
-import ca.uhn.fhir.rest.param.DateRangeParam;
 import ca.uhn.fhir.rest.server.RestfulServerUtils;
 import ca.uhn.fhir.rest.server.exceptions.InternalErrorException;
 import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
@@ -41,7 +40,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.instance.model.api.IBaseOperationOutcome;
 import org.hl7.fhir.instance.model.api.IIdType;
 import org.hl7.fhir.instance.model.api.IPrimitiveType;
-import org.hl7.fhir.r5.model.*;
+import org.hl7.fhir.r4.model.*; // TODO change after connectathon
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -79,7 +78,7 @@ public class CustomBulkDataExportProvider extends BulkDataExportProvider {
 	private IFhirResourceDao<Binary> binaryDao;
 
 	@Autowired
-	BulkQueryGroupProviderR5 bulkQueryGroupProviderR5;
+	BulkQueryGroupProviderR4 bulkQueryGroupProviderR4;
 
 	/**
 	 * $export

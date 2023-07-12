@@ -16,7 +16,6 @@ import ca.uhn.fhir.rest.annotation.Sort;
 import ca.uhn.fhir.rest.api.Constants;
 import ca.uhn.fhir.rest.api.SortSpec;
 import ca.uhn.fhir.rest.api.server.IBundleProvider;
-import ca.uhn.fhir.rest.api.server.RequestDetails;
 import ca.uhn.fhir.rest.param.*;
 import ca.uhn.fhir.rest.server.servlet.ServletRequestDetails;
 import org.hl7.fhir.instance.model.api.IBaseResource;
@@ -358,10 +357,16 @@ public class BulkQueryGroupProviderR5 extends GroupResourceProvider {
 		if (memberId != null && providerNpi != null) {
 			group.getMember()
 				.remove(group.getMember().stream()
-					.filter((member) -> providerNpi.getValue().equals(member.getExtensionByUrl(ATR_EXTENSION_URI).getValueReference().getIdentifier().getValue())
-						&& memberId.getValue().equals(member.getEntity().getIdentifier().getValue())
-						&& ((memberId.getSystem() == null && member.getEntity().getIdentifier().getSystem() == null)
-							|| memberId.getSystem().equals(member.getEntity().getIdentifier().getSystem())))
+					.filter((member) -> {
+						Extension ref = member.getExtensionByUrl(ATR_EXTENSION_URI);
+						return  ref != null
+							&& ref.hasValueReference()
+							&& providerNpi.getValue().equals(ref.getValueReference().getIdentifier().getValue())
+							&& memberId.getValue().equals(member.getEntity().getIdentifier().getValue())
+							&& ((memberId.getSystem() == null && member.getEntity().getIdentifier().getSystem() == null)
+								|| memberId.getSystem().equals(member.getEntity().getIdentifier().getSystem()));
+					}
+						)
 					.findFirst()
 					.orElse(null));
 
@@ -377,7 +382,10 @@ public class BulkQueryGroupProviderR5 extends GroupResourceProvider {
 		} else if (patientReference != null && providerReference != null) {
 			group.getMember()
 				.remove(group.getMember().stream()
-					.filter(member -> patientReference.equals(member.getEntity()) && providerReference.equals(member.getExtensionByUrl(ATR_EXTENSION_URI).getValueReference()))
+					.filter((member) -> {
+						Extension ext = member.getExtensionByUrl(ATR_EXTENSION_URI);
+						return patientReference.equals(member.getEntity()) && ext.hasValueReference() && providerReference.equals(ext.getValueReference());
+					})
 					.findFirst()
 					.orElse(null));
 		} else if (patientReference != null) {

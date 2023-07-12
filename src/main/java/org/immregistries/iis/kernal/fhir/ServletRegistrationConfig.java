@@ -13,6 +13,7 @@ import org.springframework.context.annotation.Configuration;
 import javax.servlet.http.HttpServlet;
 
 @Configuration
+@Conditional(OnR5Condition.class)
 public class ServletRegistrationConfig {
 	@Autowired
 	AutowireCapableBeanFactory beanFactory;

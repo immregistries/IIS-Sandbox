@@ -27,6 +27,7 @@ import org.immregistries.iis.kernal.fhir.BulkQuery.BulkQueryGroupProviderR5;
 import org.immregistries.iis.kernal.fhir.BulkQuery.CustomBulkDataExportProvider;
 import org.immregistries.iis.kernal.fhir.common.StarterJpaConfig;
 import org.immregistries.iis.kernal.fhir.interceptors.IdentifierSolverInterceptor;
+import org.immregistries.iis.kernal.fhir.interceptors.IdentifierSolverInterceptorR4;
 import org.immregistries.iis.kernal.fhir.interceptors.PartitionCreationInterceptor;
 import ca.uhn.fhir.jpa.subscription.util.SubscriptionDebugLogInterceptor;
 import ca.uhn.fhir.mdm.provider.MdmProviderLoader;
@@ -74,7 +75,8 @@ public class ServerConfig {
 												  Optional<BulkQueryGroupProviderR5> bulkQueryGroupProviderR5,
 												  Optional<BulkQueryGroupProviderR4> bulkQueryGroupProviderR4,
 												  Optional<MdmCustomProvider> mdmCustomProvider,
-												  IdentifierSolverInterceptor identifierSolverInterceptor,
+												  Optional<IdentifierSolverInterceptor> identifierSolverInterceptor,
+												  Optional<IdentifierSolverInterceptorR4> identifierSolverInterceptorR4,
 												  SessionAuthorizationInterceptor sessionAuthorizationInterceptor) {
 		RestfulServer fhirServer = new RestfulServer(fhirSystemDao.getContext());
 
@@ -268,7 +270,11 @@ public class ServerConfig {
 
 		// register custom interceptors
 		fhirServer.registerInterceptor(sessionAuthorizationInterceptor);
-		fhirServer.registerInterceptor(identifierSolverInterceptor);
+		if (identifierSolverInterceptor.isPresent()) {
+			fhirServer.registerInterceptor(identifierSolverInterceptor);
+		} else if (identifierSolverInterceptorR4.isPresent()) {
+			fhirServer.registerInterceptor(identifierSolverInterceptorR4);
+		}
 //		registerCustomInterceptors(fhirServer, appContext, appProperties.getCustomInterceptorClasses());
 
 		return fhirServer;

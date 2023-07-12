@@ -4,8 +4,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
-import org.hl7.fhir.r5.model.Group;
-import org.hl7.fhir.r5.model.Reference;
+import org.hl7.fhir.r4.model.Group;
+import org.hl7.fhir.r4.model.Reference;
 import org.immregistries.iis.kernal.logic.IncomingMessageHandler;
 import org.immregistries.iis.kernal.model.OrgAccess;
 import org.immregistries.iis.kernal.InternalClient.RepositoryClientFactory;
@@ -25,7 +25,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 
-public class PopServlet extends HttpServlet {
+public class PopServletR4 extends HttpServlet {
 	Logger logger = LoggerFactory.getLogger(PopServlet.class);
 	public static final String PARAM_MESSAGE = "MESSAGEDATA";
 	public static final String PARAM_USERID = "USERID";

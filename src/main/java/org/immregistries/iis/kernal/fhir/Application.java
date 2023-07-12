@@ -3,6 +3,7 @@ package org.immregistries.iis.kernal.fhir;
 import ca.uhn.fhir.batch2.jobs.config.Batch2JobsConfig;
 import ca.uhn.fhir.jpa.batch2.JpaBatch2Config;
 import org.immregistries.iis.kernal.fhir.annotations.OnEitherVersion;
+import org.immregistries.iis.kernal.fhir.annotations.OnR4Condition;
 import org.immregistries.iis.kernal.fhir.mdm.MdmConfig;
 import ca.uhn.fhir.jpa.subscription.channel.config.SubscriptionChannelConfig;
 import ca.uhn.fhir.jpa.subscription.match.config.SubscriptionProcessorConfig;
@@ -11,6 +12,8 @@ import ca.uhn.fhir.jpa.subscription.submit.config.SubscriptionSubmitterConfig;
 import ca.uhn.fhir.rest.server.RestfulServer;
 import org.immregistries.iis.kernal.fhir.security.ServerSecurityConfig;
 import org.immregistries.iis.kernal.logic.CodeMapManager;
+import org.immregistries.iis.kernal.servlet.LoginServlet;
+import org.immregistries.iis.kernal.servlet.PopServlet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.boot.SpringApplication;
@@ -25,6 +28,8 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Import;
 import org.springframework.web.context.request.RequestContextListener;
+
+import javax.servlet.http.HttpServlet;
 
 @ServletComponentScan(basePackageClasses = {
 	RestfulServer.class}, basePackages = {
@@ -79,24 +84,29 @@ public class Application extends SpringBootServletInitializer {
 		return servletRegistrationBean;
 	}
 
-//  @Bean
-//  public ServletRegistrationBean overlayRegistrationBean() {
-//
-//    AnnotationConfigWebApplicationContext annotationConfigWebApplicationContext = new AnnotationConfigWebApplicationContext();
-//    annotationConfigWebApplicationContext.register(FhirTesterConfig.class);
-//
-//    DispatcherServlet dispatcherServlet = new DispatcherServlet(
-//      annotationConfigWebApplicationContext);
-//    dispatcherServlet.setContextClass(AnnotationConfigWebApplicationContext.class);
-//	  dispatcherServlet.setContextConfigLocation(FhirTesterConfig.class.getName());
-//
-//	  ServletRegistrationBean registrationBean = new ServletRegistrationBean();
-//	  registrationBean.setServlet(dispatcherServlet);
-//	  registrationBean.addUrlMappings("/overlay/*");
-//	  registrationBean.setLoadOnStartup(1);
-//	  return registrationBean;
-//
-//  }
+	@Bean
+	@Conditional(OnR4Condition.class)
+	public ServletRegistrationBean loginServletRegistrationBean() {
+		ServletRegistrationBean registrationBean = new ServletRegistrationBean();
+		HttpServlet servlet = new LoginServlet();
+		beanFactory.autowireBean(servlet);
+		registrationBean.setServlet(servlet);
+		registrationBean.addUrlMappings("/loginForm");
+		registrationBean.setLoadOnStartup(1);
+		return registrationBean;
+	}
+
+	@Bean
+	@Conditional(OnR4Condition.class)
+	public ServletRegistrationBean popServletRegistrationBean() {
+		ServletRegistrationBean registrationBean = new ServletRegistrationBean();
+		HttpServlet servlet = new PopServlet();
+		beanFactory.autowireBean(servlet);
+		registrationBean.setServlet(servlet);
+		registrationBean.addUrlMappings("/pop");
+//		registrationBean.setLoadOnStartup(1);
+		return registrationBean;
+	}
 
 	/**
 	 * Required to get access to httpRequest qnd session through spring, important to use the fhir client inside the servlets

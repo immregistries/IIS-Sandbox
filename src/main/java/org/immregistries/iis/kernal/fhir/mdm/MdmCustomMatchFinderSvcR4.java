@@ -17,10 +17,11 @@ import ca.uhn.fhir.rest.param.TokenParam;
 import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.instance.model.api.IAnyResource;
-import org.hl7.fhir.r5.model.Immunization;
-import org.hl7.fhir.r5.model.ResourceType;
-import org.immregistries.iis.kernal.fhir.annotations.OnR5Condition;
-import org.immregistries.iis.kernal.mapping.forR5.ImmunizationMapperR5;
+import org.hl7.fhir.r4.model.Immunization;
+import org.hl7.fhir.r4.model.ResourceType;
+import org.immregistries.iis.kernal.fhir.annotations.OnR4Condition;
+import org.immregistries.iis.kernal.mapping.Interfaces.ImmunizationMapper;
+import org.immregistries.iis.kernal.mapping.forR4.ImmunizationMapperR4;
 import org.immregistries.vaccination_deduplication.computation_classes.Deterministic;
 import org.immregistries.vaccination_deduplication.reference.ComparisonResult;
 import org.immregistries.vaccination_deduplication.reference.ImmunizationSource;
@@ -45,8 +46,8 @@ import static org.immregistries.iis.kernal.InternalClient.FhirRequester.GOLDEN_S
  * Custom, based on MdmMatchFinderSvcImpl from Hapi-fhir v6.2.4, to allow for Immunization matching with external library
  */
 //@Component
-//@Conditional(OnR5Condition.class)
-public class MdmCustomMatchFinderSvcR5 extends MdmMatchFinderSvcImpl implements IMdmMatchFinderSvc {
+//@Conditional(OnR4Condition.class)
+public class MdmCustomMatchFinderSvcR4 extends MdmMatchFinderSvcImpl implements IMdmMatchFinderSvc {
 	private static final Logger ourLog = Logs.getMdmTroubleshootingLog();
 	@Autowired
 	private MdmCandidateSearchSvc myMdmCandidateSearchSvc;
@@ -124,9 +125,9 @@ public class MdmCustomMatchFinderSvcR5 extends MdmMatchFinderSvcImpl implements 
 
 	private org.immregistries.vaccination_deduplication.Immunization toVaccDedupImmunization(Immunization immunization, RequestPartitionId theRequestPartitionId){
 		org.immregistries.vaccination_deduplication.Immunization i1 = new org.immregistries.vaccination_deduplication.Immunization();
-		i1.setCVX(immunization.getVaccineCode().getCode(ImmunizationMapperR5.CVX));
+		i1.setCVX(immunization.getVaccineCode().getCodingFirstRep().getCode());
 		if(immunization.hasManufacturer()){
-			i1.setMVX(immunization.getManufacturer().getReference().getIdentifier().getValue());
+			i1.setMVX(immunization.getManufacturer().getIdentifier().getValue());
 		}
 		try {
 			if (immunization.hasOccurrenceStringType()){
@@ -142,25 +143,25 @@ public class MdmCustomMatchFinderSvcR5 extends MdmMatchFinderSvcImpl implements 
 
 		if (immunization.getPrimarySource()) {
 			i1.setSource(ImmunizationSource.SOURCE);
-		} else if (immunization.hasInformationSource()
-			&& immunization.getInformationSource().getConcept() != null
-			&& StringUtils.isNotBlank(immunization.getInformationSource().getConcept().getCode(ImmunizationMapperR5.INFORMATION_SOURCE))
-			&& immunization.getInformationSource().getConcept().getCode(ImmunizationMapperR5.INFORMATION_SOURCE).equals("00")) {
-			i1.setSource(ImmunizationSource.SOURCE);
+//		} else if (immunization.hasInformationSource()
+//			&& immunization.getInformationSource().getConcept() != null
+//			&& StringUtils.isNotBlank(immunization.getInformationSource().getConcept().getCode(ImmunizationMapperR4.INFORMATION_SOURCE))
+//			&& immunization.getInformationSource().getConcept().getCode(ImmunizationMapperR4.INFORMATION_SOURCE).equals("00")) {
+//			i1.setSource(ImmunizationSource.SOURCE);
 		} else {
 			i1.setSource(ImmunizationSource.HISTORICAL);
 		}
 
-		if (immunization.hasInformationSource()) { // TODO improve organisation naming and designation among tenancy or in resource info
-			if (immunization.getInformationSource().getReference() != null) {
-				if (immunization.getInformationSource().getReference().getIdentifier() != null) {
-					i1.setOrganisationID(immunization.getInformationSource().getReference().getIdentifier().getValue());
-				} else if (immunization.getInformationSource().getReference().getReference() != null
-					&& immunization.getInformationSource().getReference().getReference().startsWith("Organisation/")) {
-					i1.setOrganisationID(immunization.getInformationSource().getReference().getReference()); // TODO get organisation name from db
-				}
-			}
-		}
+//		if (immunization.hasInformationSource()) { // TODO improve organisation naming and designation among tenancy or in resource info
+//			if (immunization.getInformationSource().getReference() != null) {
+//				if (immunization.getInformationSource().getReference().getIdentifier() != null) {
+//					i1.setOrganisationID(immunization.getInformationSource().getReference().getIdentifier().getValue());
+//				} else if (immunization.getInformationSource().getReference().getReference() != null
+//					&& immunization.getInformationSource().getReference().getReference().startsWith("Organisation/")) {
+//					i1.setOrganisationID(immunization.getInformationSource().getReference().getReference()); // TODO get organisation name from db
+//				}
+//			}
+//		}
 		if ((i1.getOrganisationID() == null || i1.getOrganisationID().isBlank()) && theRequestPartitionId.hasPartitionNames()) {
 			i1.setOrganisationID(theRequestPartitionId.getFirstPartitionNameOrNull());
 		}
