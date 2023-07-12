@@ -6,7 +6,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.hl7.fhir.r4.model.Group;
 import org.hl7.fhir.r4.model.Reference;
-import org.immregistries.iis.kernal.logic.IncomingMessageHandler;
+import org.immregistries.iis.kernal.logic.IncomingMessageHandlerR4;
 import org.immregistries.iis.kernal.model.OrgAccess;
 import org.immregistries.iis.kernal.InternalClient.RepositoryClientFactory;
 import org.immregistries.smm.transform.ScenarioManager;
@@ -35,7 +35,7 @@ public class PopServletR4 extends HttpServlet {
 	@Autowired
 	RepositoryClientFactory repositoryClientFactory;
 	@Autowired
-	private IncomingMessageHandler handler;
+	private IncomingMessageHandlerR4 handler;
 
 	public static Session getDataSession() {
 		if (factory == null) {

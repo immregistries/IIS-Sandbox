@@ -14,6 +14,7 @@ import org.immregistries.iis.kernal.fhir.security.ServerSecurityConfig;
 import org.immregistries.iis.kernal.logic.CodeMapManager;
 import org.immregistries.iis.kernal.servlet.LoginServlet;
 import org.immregistries.iis.kernal.servlet.PopServlet;
+import org.immregistries.iis.kernal.servlet.PopServletR4;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.boot.SpringApplication;
@@ -100,7 +101,7 @@ public class Application extends SpringBootServletInitializer {
 	@Conditional(OnR4Condition.class)
 	public ServletRegistrationBean popServletRegistrationBean() {
 		ServletRegistrationBean registrationBean = new ServletRegistrationBean();
-		HttpServlet servlet = new PopServlet();
+		HttpServlet servlet = new PopServletR4();
 		beanFactory.autowireBean(servlet);
 		registrationBean.setServlet(servlet);
 		registrationBean.addUrlMappings("/pop");
