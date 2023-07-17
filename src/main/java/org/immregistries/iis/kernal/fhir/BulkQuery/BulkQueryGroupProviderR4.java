@@ -8,6 +8,7 @@ import ca.uhn.fhir.jpa.model.util.JpaConstants;
 import ca.uhn.fhir.jpa.partition.SystemRequestDetails;
 import ca.uhn.fhir.jpa.provider.BaseJpaResourceProviderPatient;
 import ca.uhn.fhir.jpa.rp.r4.GroupResourceProvider;
+import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
 import org.immregistries.iis.kernal.fhir.annotations.OnR4Condition;
 import ca.uhn.fhir.model.api.annotation.Description;
 import ca.uhn.fhir.model.valueset.BundleTypeEnum;
@@ -269,5 +270,155 @@ public class BulkQueryGroupProviderR4 extends GroupResourceProvider {
 		} finally {
 			dataSession.close();
 		}
+	}
+
+	private static final String ATR_EXTENSION_URI = "http://hl7.org/fhir/us/davinci-atr/StructureDefinition/atr-any-resource-extension";
+
+	/**
+	 * Group/123/$member-add
+	 */
+	@Operation(name = "$member-add", idempotent = true)
+	public Group groupInstanceMemberAdd(
+
+		@IdParam
+		IdType theId,
+
+		@Description(shortDefinition = "The MemberId of the member to be added to the Group.")
+		@OperationParam(name = "memberId", typeName = "Identifier")
+		Identifier memberId,
+
+		@Description(shortDefinition = "The Provider to whom the member is being attributed to.")
+		@OperationParam(name = "providerNpi", typeName = "Identifier")
+		Identifier providerNpi,
+
+		@Description(shortDefinition = "The reference of the member to be added to the Group.")
+		@OperationParam(name = "patientReference", typeName = "Reference")
+		Reference patientReference,
+
+		@Description(shortDefinition = "The reference to the Provider to whom the member is being attributed to.")
+		@OperationParam(name = "providerReference", typeName = "Reference")
+		Reference providerReference,
+
+		@Description(shortDefinition = "The period over which the patient is being attributed to the provider.")
+		@OperationParam(name = "attributionPeriod", typeName = "Period")
+		Period attributionPeriod,
+
+		ServletRequestDetails theRequestDetails
+	) {
+		Group group = read(theRequestDetails.getServletRequest(), theId, theRequestDetails);
+		;
+		Group.GroupMemberComponent memberComponent;
+		if (memberId != null && providerNpi != null) {
+			memberComponent = group.getMember().stream()
+				.filter(member -> memberId.getValue().equals(member.getEntity().getIdentifier().getValue()) && memberId.getSystem().equals(member.getEntity().getIdentifier().getSystem())) //TODO better conditions
+				.findFirst()
+				.orElse(group.addMember());
+			memberComponent.setEntity(new Reference().setIdentifier(memberId)); //TODO solve reference with interceptor ?
+			memberComponent.addExtension(ATR_EXTENSION_URI,new Reference().setIdentifier(providerNpi));
+		} else  if (memberId != null){
+			memberComponent = group.getMember().stream()
+				.filter(member -> memberId.getValue().equals(member.getEntity().getIdentifier().getValue()) && memberId.getSystem().equals(member.getEntity().getIdentifier().getSystem())) //TODO better conditions
+				.findFirst()
+				.orElse(group.addMember());
+			memberComponent.setEntity(new Reference().setIdentifier(memberId)); //TODO solve reference with interceptor ?
+		} else if (patientReference != null && providerReference != null) {
+			memberComponent = group.getMember().stream()
+				.filter(member -> patientReference.equals(member.getEntity().getReference()))
+				.findFirst()
+				.orElse(group.addMember());
+			memberComponent.setEntity(patientReference); //TODO solve reference with interceptor ?
+			memberComponent.addExtension(ATR_EXTENSION_URI,providerReference);
+		} else if (patientReference != null) {
+			memberComponent = group.getMember().stream()
+				.filter(member -> patientReference.getReference().equals(member.getEntity().getReference()))
+				.findFirst()
+				.orElse(group.addMember());
+			memberComponent.setEntity(patientReference);
+		} else {
+				throw new InvalidRequestException("parameters combination not supported");
+		}
+		memberComponent.setPeriod(attributionPeriod);
+		return (Group) update(theRequestDetails.getServletRequest(), group, theId, "", theRequestDetails).getResource();
+	}
+
+
+	/**
+	 * Group/123/$member-remove
+	 */
+	@Operation(name = "$member-remove", idempotent = true, bundleType = BundleTypeEnum.SEARCHSET)
+	public Group groupInstanceMemberRemove(
+
+		@IdParam
+		IdType theId,
+
+		@Description(shortDefinition = "The MemberId of the member to be added to the Group.")
+		@OperationParam(name = "memberId", typeName = "Identifier")
+		Identifier memberId,
+
+		@Description(shortDefinition = "The Provider to whom the member is being attributed to.")
+		@OperationParam(name = "providerNpi", typeName = "Identifier")
+		Identifier providerNpi,
+
+		@Description(shortDefinition = "The reference of the member to be added to the Group.")
+		@OperationParam(name = "patientReference", typeName = "Reference")
+		Reference patientReference,
+
+		@Description(shortDefinition = "The reference to the Provider to whom the member is being attributed to.")
+		@OperationParam(name = "providerReference", typeName = "Reference")
+		Reference providerReference,
+
+		@Description(shortDefinition = "The reference to the coverage based on which the attribution has to be removed.")
+		@OperationParam(name = "coverageReference", typeName = "Reference")
+		Reference coverageReference,
+
+		ServletRequestDetails theRequestDetails
+	) throws IOException {
+		Group group = this.fhirResourceGroupDao.read(theId, theRequestDetails);
+		Group.GroupMemberComponent memberComponent;
+		if (memberId != null && providerNpi != null) {
+			group.getMember()
+				.remove(group.getMember().stream()
+					.filter((member) -> {
+							Extension ref = member.getExtensionByUrl(ATR_EXTENSION_URI);
+							return  ref != null
+								&& ref.hasValue()
+								&& ref.getValue() instanceof Reference
+								&& providerNpi.getValue().equals(ref.getValue().castToReference(ref).getIdentifier().getValue())
+								&& memberId.getValue().equals(member.getEntity().getIdentifier().getValue())
+								&& ((memberId.getSystem() == null && member.getEntity().getIdentifier().getSystem() == null)
+								|| memberId.getSystem().equals(member.getEntity().getIdentifier().getSystem()));
+						}
+					)
+					.findFirst()
+					.orElse(null));
+
+		} else if (memberId != null) {
+			group.getMember()
+				.remove(group.getMember().stream()
+					.filter((member) -> memberId.getValue().equals(member.getEntity().getIdentifier().getValue())
+						&& ((memberId.getSystem() == null && member.getEntity().getIdentifier().getSystem() == null)
+						|| memberId.getSystem().equals(member.getEntity().getIdentifier().getSystem()))) //TODO better conditions
+					.findFirst()
+					.orElse(null));
+
+		} else if (patientReference != null && providerReference != null) {
+			group.getMember()
+				.remove(group.getMember().stream()
+					.filter((member) -> {
+						Extension ext = member.getExtensionByUrl(ATR_EXTENSION_URI);
+						return patientReference.equals(member.getEntity()) && ext.hasValue() && ext.getValue() instanceof Reference && providerReference.equals(ext.getValue());
+					})
+					.findFirst()
+					.orElse(null));
+		} else if (patientReference != null) {
+			group.getMember()
+				.remove(group.getMember().stream()
+					.filter((member) -> patientReference.getReference().equals(member.getEntity().getReference())) //TODO better conditions
+					.findFirst()
+					.orElse(null));
+		} else {
+			throw new InvalidRequestException("parameters combination not supported");
+		}
+		return (Group) update(theRequestDetails.getServletRequest(), group, theId, "", theRequestDetails).getResource();
 	}
 }

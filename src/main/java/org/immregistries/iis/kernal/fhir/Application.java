@@ -12,6 +12,7 @@ import ca.uhn.fhir.jpa.subscription.submit.config.SubscriptionSubmitterConfig;
 import ca.uhn.fhir.rest.server.RestfulServer;
 import org.immregistries.iis.kernal.fhir.security.ServerSecurityConfig;
 import org.immregistries.iis.kernal.logic.CodeMapManager;
+import org.immregistries.iis.kernal.servlet.HomeServlet;
 import org.immregistries.iis.kernal.servlet.LoginServlet;
 import org.immregistries.iis.kernal.servlet.PopServlet;
 import org.immregistries.iis.kernal.servlet.PopServletR4;
@@ -106,6 +107,18 @@ public class Application extends SpringBootServletInitializer {
 		registrationBean.setServlet(servlet);
 		registrationBean.addUrlMappings("/pop");
 //		registrationBean.setLoadOnStartup(1);
+		return registrationBean;
+	}
+
+	@Bean
+	@Conditional(OnR4Condition.class)
+	public ServletRegistrationBean homeServletRegistrationBean() {
+		ServletRegistrationBean registrationBean = new ServletRegistrationBean();
+		HomeServlet servlet = new HomeServlet();
+		beanFactory.autowireBean(servlet);
+		registrationBean.setServlet(servlet);
+		registrationBean.addUrlMappings("/home");
+		registrationBean.setLoadOnStartup(1);
 		return registrationBean;
 	}
 

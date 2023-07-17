@@ -18,7 +18,7 @@ spring:
         registration:
           github:
             client-id: 09a6c6915895bf8400db
-            client-secret: fc50e940f07d79db61d340f322accae582e6c933
+            client-secret: eb62539a2e310a133cdcf0ac0f2b0fda8786169a
             scope: read:user,user:email
             token-uri: https://api.github.com/login/oauth/access_token
             authorization-uri: https://api.github.com/login/oauth/authorize
@@ -70,7 +70,7 @@ hapi:
     ### This enables the swagger-ui at /fhir/swagger-ui/index.html as well as the /fhir/api-docs (see https://hapifhir.io/hapi-fhir/docs/server_plain/openapi.html)
     openapi_enabled: true
     ### This is the FHIR version. Choose between, DSTU2, DSTU3, R4 or R5
-    fhir_version: R4
+    fhir_version: R5
     #    fhir_version: R5
     ### enable to use the ApacheProxyAddressStrategy which uses X-Forwarded-* headers
     ### to determine the FHIR server address

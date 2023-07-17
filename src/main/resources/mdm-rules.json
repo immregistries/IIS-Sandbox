@@ -101,6 +101,7 @@
   "matchResultMap": {
     "cosine-given-name" : "POSSIBLE_MATCH",
     "cosine-given-name,jaro-last-name,birthDate" : "MATCH",
+    "jaro-last-name,birthDate" : "POSSIBLE_MATCH",
     "patient-identifier" : "MATCH"
   },
   "eidSystems": {

@@ -1,12 +1,10 @@
 package org.immregistries.iis.kernal.fhir.interceptors;
 
 import ca.uhn.fhir.i18n.Msg;
-import ca.uhn.fhir.jpa.model.util.JpaConstants;
 import ca.uhn.fhir.rest.api.server.RequestDetails;
 import ca.uhn.fhir.rest.server.interceptor.auth.AuthorizationInterceptor;
 import ca.uhn.fhir.rest.server.interceptor.auth.IAuthRule;
 import ca.uhn.fhir.rest.server.interceptor.auth.RuleBuilder;
-import com.google.common.collect.Lists;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.auth.AuthenticationException;
 import org.hibernate.Session;
@@ -68,40 +66,59 @@ public class SessionAuthorizationInterceptor extends AuthorizationInterceptor {
 							orgAccess.setOrgAccessId(-1);
 							theRequestDetails.setAttribute("orgAccess", orgAccess);
 //							session.setAttribute("orgAccess", orgAccess);
+
 							return new RuleBuilder()
-								.allow().operation()
-								.named(JpaConstants.OPERATION_EXPORT).atAnyLevel()
-								.andAllowAllResponses().forTenantIds(CONNECTATHON_USER)
-								.andThen().allow().operation()
-								.named(JpaConstants.OPERATION_EXPORT_POLL_STATUS).atAnyLevel()
-								.andAllowAllResponses().forTenantIds(CONNECTATHON_USER)
-								.andThen().allow().operation()
-								.named(JpaConstants.OPERATION_EVERYTHING).atAnyLevel()
-								.andAllowAllResponses().forTenantIds(CONNECTATHON_USER)
-
-								.andThen().allow().operation()
-								.named("$match").atAnyLevel()
-								.andAllowAllResponses().forTenantIds(CONNECTATHON_USER)
-
-								.andThen().allow().operation().named(JpaConstants.OPERATION_EVERYTHING)
-								.atAnyLevel().andAllowAllResponses().forTenantIds(CONNECTATHON_USER)
-
+								.allow().read()
+								.resourcesOfType("Subscription").withAnyId().forTenantIds(DEFAULT_USER)
 								.andThen().allow().read()
-								.resourcesOfType("Group").withAnyId().forTenantIds(CONNECTATHON_USER)
-								.andThen().allow().create()
-								.resourcesOfType("Group").withAnyId().forTenantIds(CONNECTATHON_USER)
-								.andThen().allow().read()
-								.resourcesOfType("Immunization").withAnyId().forTenantIds(CONNECTATHON_USER)
-								.andThen().allow().read()
-								.resourcesOfType("Patient").withAnyId().forTenantIds(CONNECTATHON_USER)
-								.andThen().allow().read()
-								.resourcesOfType("Binary").withAnyId().forTenantIds(CONNECTATHON_USER)
-
-								.andThen().allow()
-								.bulkExport().any()
-								.withResourceTypes(Lists.newArrayList("Patient", "Immunization", "RelatedPerson"))
-
+								.resourcesOfType("SubscriptionTopic").withAnyId().forTenantIds(DEFAULT_USER)
+								.andThen()
+								.allowAll("Logged in as " + orgAccess.getOrg().getOrganizationName())
+								.forTenantIds(orgAccess.getOrg().getOrganizationName())
 								.build();
+//							return new RuleBuilder()
+//								.allow().operation()
+//								.named(JpaConstants.OPERATION_EXPORT).atAnyLevel()
+//								.andAllowAllResponses().forTenantIds(CONNECTATHON_USER)
+//								.andThen().allow().operation()
+//								.named(JpaConstants.OPERATION_EXPORT_POLL_STATUS).atAnyLevel()
+//								.andAllowAllResponses().forTenantIds(CONNECTATHON_USER)
+//								.andThen().allow().operation()
+//								.named(JpaConstants.OPERATION_EVERYTHING).atAnyLevel()
+//								.andAllowAllResponses().forTenantIds(CONNECTATHON_USER)
+//
+//								.andThen().allow().operation()
+//								.named("$match").atAnyLevel()
+//								.andAllowAllResponses().forTenantIds(CONNECTATHON_USER)
+//
+////								.andThen().allow().operation().withAnyName().atAnyLevel().andAllowAllResponses().forTenantIds(CONNECTATHON_USER)
+//								.andThen().allow().operation().withAnyName().atAnyLevel().andAllowAllResponses().forTenantIds(CONNECTATHON_USER)
+////								.andThen().allow().operation().named("$member-remove").atAnyLevel().andAllowAllResponses().forTenantIds(CONNECTATHON_USER)
+//
+//
+//								.andThen().allow().operation().named(JpaConstants.OPERATION_EVERYTHING)
+//								.atAnyLevel().andAllowAllResponses().forTenantIds(CONNECTATHON_USER)
+//
+//								.andThen().allow().read()
+//								.resourcesOfType("Group").withAnyId().forTenantIds(CONNECTATHON_USER)
+//								.andThen().allow().create()
+//								.resourcesOfType("Group").withAnyId().forTenantIds(CONNECTATHON_USER)
+//								.andThen().allow().read()
+//								.resourcesOfType("Immunization").withAnyId().forTenantIds(CONNECTATHON_USER)
+//								.andThen().allow().create()
+//								.resourcesOfType("Immunization").withAnyId().forTenantIds(CONNECTATHON_USER)
+//								.andThen().allow().read()
+//								.resourcesOfType("Patient").withAnyId().forTenantIds(CONNECTATHON_USER)
+//								.andThen().allow().create()
+//								.resourcesOfType("Patient").withAnyId().forTenantIds(CONNECTATHON_USER)
+//								.andThen().allow().read()
+//								.resourcesOfType("Binary").withAnyId().forTenantIds(CONNECTATHON_USER)
+//
+//								.andThen().allow()
+//								.bulkExport().any()
+//								.withResourceTypes(Lists.newArrayList("Patient", "Immunization", "RelatedPerson"))
+//
+//								.build();
 							// TODO Make list of allowed Binary read, right now every binary is accessible
 						}
 					}
