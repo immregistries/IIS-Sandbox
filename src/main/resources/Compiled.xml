@@ -4788,6 +4788,9 @@
             <code-status>
                 <status>Valid</status>
             </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">305</link-to>
+            </reference>
         </code>
         <code>
             <value>90380</value>
@@ -4796,6 +4799,9 @@
             <code-status>
                 <status>Valid</status>
             </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">306</link-to>
+            </reference>
         </code>
         <code>
             <value>90381</value>
@@ -4804,6 +4810,9 @@
             <code-status>
                 <status>Valid</status>
             </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">307</link-to>
+            </reference>
         </code>
         <code>
             <value>90375</value>
@@ -30119,6 +30128,7 @@
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">00069-0344-01</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">00069-0344-10</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">00069-0344-05</link-to>
+                <link-to codeset="VACCINATION_CPT_CODE">90678</link-to>
             </reference>
             <use-date>
                 <not-before>20230713</not-before>
@@ -30137,6 +30147,7 @@
                 <link-to codeset="VACCINATION_TRADE_NAME">BEYFORTUS</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">49281-0575-00</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">49281-0575-15</link-to>
+                <link-to codeset="VACCINATION_CPT_CODE">90380</link-to>
             </reference>
             <use-date>
                 <not-before>20230725</not-before>
@@ -30155,6 +30166,7 @@
                 <link-to codeset="VACCINATION_TRADE_NAME">BEYFORTUS</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">49281-0574-88</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">49281-0574-15</link-to>
+                <link-to codeset="VACCINATION_CPT_CODE">90381</link-to>
             </reference>
             <use-date>
                 <not-before>20230725</not-before>
