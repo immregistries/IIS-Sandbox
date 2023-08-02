@@ -40,7 +40,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.instance.model.api.IBaseOperationOutcome;
 import org.hl7.fhir.instance.model.api.IIdType;
 import org.hl7.fhir.instance.model.api.IPrimitiveType;
-import org.hl7.fhir.r4.model.*; // TODO change after connectathon
+import org.hl7.fhir.r5.model.*;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -77,8 +77,7 @@ public class CustomBulkDataExportProvider extends BulkDataExportProvider {
 	@Autowired
 	private IFhirResourceDao<Binary> binaryDao;
 
-	@Autowired
-	BulkQueryGroupProviderR4 bulkQueryGroupProviderR4;
+
 
 	/**
 	 * $export

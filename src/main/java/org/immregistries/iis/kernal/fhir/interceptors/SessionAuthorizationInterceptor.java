@@ -46,84 +46,84 @@ public class SessionAuthorizationInterceptor extends AuthorizationInterceptor {
 		String authHeader = theRequestDetails.getHeader("Authorization");
 		OrgAccess orgAccess = null;
 		try {
-			if (theRequestDetails.getTenantId().equals(CONNECTATHON_USER)) {
-				/**
-				 *	If connecting as Connectathon with TOKEN : give only specific rights
-				 * Else : treat as usual
-				 */
-				if (authHeader != null && authHeader.startsWith("Bearer " + CONNECTATHON_AUTH)) {
-					Query query = dataSession.createQuery("from OrgMaster where organizationName = ?1");
-					query.setParameter(1, CONNECTATHON_USER);
-					Iterator<OrgMaster> orgMaster = query.iterate();
-					if (orgMaster.hasNext()) {
-						Query queryAccess = dataSession.createQuery("from OrgAccess where org = ?0");
-						queryAccess.setParameter(0, orgMaster.next());
-						Iterator<OrgAccess> orgAccessIterator = queryAccess.iterate();
-						if (orgAccessIterator.hasNext()) {
-							orgAccess = orgAccessIterator.next();
-							orgAccess.setAccessKey(CONNECTATHON_AUTH);
-							orgAccess.setAccessName(null);
-							orgAccess.setOrgAccessId(-1);
-							theRequestDetails.setAttribute("orgAccess", orgAccess);
-//							session.setAttribute("orgAccess", orgAccess);
-
-							return new RuleBuilder()
-								.allow().read()
-								.resourcesOfType("Subscription").withAnyId().forTenantIds(DEFAULT_USER)
-								.andThen().allow().read()
-								.resourcesOfType("SubscriptionTopic").withAnyId().forTenantIds(DEFAULT_USER)
-								.andThen()
-								.allowAll("Logged in as " + orgAccess.getOrg().getOrganizationName())
-								.forTenantIds(orgAccess.getOrg().getOrganizationName())
-								.build();
+//			if (theRequestDetails.getTenantId().equals(CONNECTATHON_USER)) {
+//				/**
+//				 *	If connecting as Connectathon with TOKEN : give only specific rights
+//				 * Else : treat as usual
+//				 */
+//				if (authHeader != null && authHeader.startsWith("Bearer " + CONNECTATHON_AUTH)) {
+//					Query query = dataSession.createQuery("from OrgMaster where organizationName = ?1");
+//					query.setParameter(1, CONNECTATHON_USER);
+//					Iterator<OrgMaster> orgMaster = query.iterate();
+//					if (orgMaster.hasNext()) {
+//						Query queryAccess = dataSession.createQuery("from OrgAccess where org = ?0");
+//						queryAccess.setParameter(0, orgMaster.next());
+//						Iterator<OrgAccess> orgAccessIterator = queryAccess.iterate();
+//						if (orgAccessIterator.hasNext()) {
+//							orgAccess = orgAccessIterator.next();
+//							orgAccess.setAccessKey(CONNECTATHON_AUTH);
+//							orgAccess.setAccessName(null);
+//							orgAccess.setOrgAccessId(-1);
+//							theRequestDetails.setAttribute("orgAccess", orgAccess);
+////							session.setAttribute("orgAccess", orgAccess);
+//
 //							return new RuleBuilder()
-//								.allow().operation()
-//								.named(JpaConstants.OPERATION_EXPORT).atAnyLevel()
-//								.andAllowAllResponses().forTenantIds(CONNECTATHON_USER)
-//								.andThen().allow().operation()
-//								.named(JpaConstants.OPERATION_EXPORT_POLL_STATUS).atAnyLevel()
-//								.andAllowAllResponses().forTenantIds(CONNECTATHON_USER)
-//								.andThen().allow().operation()
-//								.named(JpaConstants.OPERATION_EVERYTHING).atAnyLevel()
-//								.andAllowAllResponses().forTenantIds(CONNECTATHON_USER)
-//
-//								.andThen().allow().operation()
-//								.named("$match").atAnyLevel()
-//								.andAllowAllResponses().forTenantIds(CONNECTATHON_USER)
-//
-////								.andThen().allow().operation().withAnyName().atAnyLevel().andAllowAllResponses().forTenantIds(CONNECTATHON_USER)
-//								.andThen().allow().operation().withAnyName().atAnyLevel().andAllowAllResponses().forTenantIds(CONNECTATHON_USER)
-////								.andThen().allow().operation().named("$member-remove").atAnyLevel().andAllowAllResponses().forTenantIds(CONNECTATHON_USER)
-//
-//
-//								.andThen().allow().operation().named(JpaConstants.OPERATION_EVERYTHING)
-//								.atAnyLevel().andAllowAllResponses().forTenantIds(CONNECTATHON_USER)
-//
+//								.allow().read()
+//								.resourcesOfType("Subscription").withAnyId().forTenantIds(DEFAULT_USER)
 //								.andThen().allow().read()
-//								.resourcesOfType("Group").withAnyId().forTenantIds(CONNECTATHON_USER)
-//								.andThen().allow().create()
-//								.resourcesOfType("Group").withAnyId().forTenantIds(CONNECTATHON_USER)
-//								.andThen().allow().read()
-//								.resourcesOfType("Immunization").withAnyId().forTenantIds(CONNECTATHON_USER)
-//								.andThen().allow().create()
-//								.resourcesOfType("Immunization").withAnyId().forTenantIds(CONNECTATHON_USER)
-//								.andThen().allow().read()
-//								.resourcesOfType("Patient").withAnyId().forTenantIds(CONNECTATHON_USER)
-//								.andThen().allow().create()
-//								.resourcesOfType("Patient").withAnyId().forTenantIds(CONNECTATHON_USER)
-//								.andThen().allow().read()
-//								.resourcesOfType("Binary").withAnyId().forTenantIds(CONNECTATHON_USER)
-//
-//								.andThen().allow()
-//								.bulkExport().any()
-//								.withResourceTypes(Lists.newArrayList("Patient", "Immunization", "RelatedPerson"))
-//
+//								.resourcesOfType("SubscriptionTopic").withAnyId().forTenantIds(DEFAULT_USER)
+//								.andThen()
+//								.allowAll("Logged in as " + orgAccess.getOrg().getOrganizationName())
+//								.forTenantIds(orgAccess.getOrg().getOrganizationName())
 //								.build();
-							// TODO Make list of allowed Binary read, right now every binary is accessible
-						}
-					}
-				}
-			}
+////							return new RuleBuilder()
+////								.allow().operation()
+////								.named(JpaConstants.OPERATION_EXPORT).atAnyLevel()
+////								.andAllowAllResponses().forTenantIds(CONNECTATHON_USER)
+////								.andThen().allow().operation()
+////								.named(JpaConstants.OPERATION_EXPORT_POLL_STATUS).atAnyLevel()
+////								.andAllowAllResponses().forTenantIds(CONNECTATHON_USER)
+////								.andThen().allow().operation()
+////								.named(JpaConstants.OPERATION_EVERYTHING).atAnyLevel()
+////								.andAllowAllResponses().forTenantIds(CONNECTATHON_USER)
+////
+////								.andThen().allow().operation()
+////								.named("$match").atAnyLevel()
+////								.andAllowAllResponses().forTenantIds(CONNECTATHON_USER)
+////
+//////								.andThen().allow().operation().withAnyName().atAnyLevel().andAllowAllResponses().forTenantIds(CONNECTATHON_USER)
+////								.andThen().allow().operation().withAnyName().atAnyLevel().andAllowAllResponses().forTenantIds(CONNECTATHON_USER)
+//////								.andThen().allow().operation().named("$member-remove").atAnyLevel().andAllowAllResponses().forTenantIds(CONNECTATHON_USER)
+////
+////
+////								.andThen().allow().operation().named(JpaConstants.OPERATION_EVERYTHING)
+////								.atAnyLevel().andAllowAllResponses().forTenantIds(CONNECTATHON_USER)
+////
+////								.andThen().allow().read()
+////								.resourcesOfType("Group").withAnyId().forTenantIds(CONNECTATHON_USER)
+////								.andThen().allow().create()
+////								.resourcesOfType("Group").withAnyId().forTenantIds(CONNECTATHON_USER)
+////								.andThen().allow().read()
+////								.resourcesOfType("Immunization").withAnyId().forTenantIds(CONNECTATHON_USER)
+////								.andThen().allow().create()
+////								.resourcesOfType("Immunization").withAnyId().forTenantIds(CONNECTATHON_USER)
+////								.andThen().allow().read()
+////								.resourcesOfType("Patient").withAnyId().forTenantIds(CONNECTATHON_USER)
+////								.andThen().allow().create()
+////								.resourcesOfType("Patient").withAnyId().forTenantIds(CONNECTATHON_USER)
+////								.andThen().allow().read()
+////								.resourcesOfType("Binary").withAnyId().forTenantIds(CONNECTATHON_USER)
+////
+////								.andThen().allow()
+////								.bulkExport().any()
+////								.withResourceTypes(Lists.newArrayList("Patient", "Immunization", "RelatedPerson"))
+////
+////								.build();
+//							// TODO Make list of allowed Binary read, right now every binary is accessible
+//						}
+//					}
+//				}
+//			}
 			orgAccess = tryAuthHeader(authHeader, theRequestDetails.getTenantId(), dataSession);
 			if (orgAccess != null && session != null) { // If connection with authHeader was successful
 				session.setAttribute("orgAccess", orgAccess);

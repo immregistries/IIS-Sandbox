@@ -34,8 +34,8 @@ public class ServerSecurityConfig {
 		http
 			.authenticationManager(customAuthenticationManager)
 			.authorizeRequests()
-				.antMatchers(HttpMethod.GET,"/","/home","/pop").permitAll()
-				.antMatchers("/loginForm","/fhir/**","/oauth2/**", "/login").permitAll()
+				.antMatchers(HttpMethod.GET,"/","/home","/pop","/SubscriptionTopic").permitAll()
+				.antMatchers("/loginForm","/fhir/**","/oauth2/**", "/login","/soap").permitAll()
 				.anyRequest().authenticated()
 			.and()
 			// ... endpoints

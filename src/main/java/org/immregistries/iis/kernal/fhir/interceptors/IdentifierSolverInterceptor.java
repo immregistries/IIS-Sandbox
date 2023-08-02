@@ -12,6 +12,7 @@ import ca.uhn.fhir.rest.api.server.RequestDetails;
 import ca.uhn.fhir.rest.param.TokenParam;
 import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
 import ca.uhn.fhir.rest.server.servlet.ServletRequestDetails;
+import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r5.model.*;
 import org.immregistries.iis.kernal.fhir.annotations.OnR5Condition;
 import org.slf4j.Logger;
@@ -51,12 +52,9 @@ public class IdentifierSolverInterceptor {
 	 * TODO add flavours
 	 */
 	@Hook(SERVER_INCOMING_REQUEST_PRE_HANDLED)
-	public void handle(RequestDetails requestDetails,
-							 ServletRequestDetails servletRequestDetails,
-							 RestOperationTypeEnum restOperationTypeEnum)
+	public void handle(RequestDetails requestDetails)
 		throws InvalidRequestException {
-
-		try {
+		if (requestDetails.getResource() instanceof  Immunization) {
 			Immunization immunization = (Immunization) requestDetails.getResource();
 			if (immunization == null
 				|| immunization.getPatient().getIdentifier() == null
@@ -104,6 +102,6 @@ public class IdentifierSolverInterceptor {
 					throw new InvalidRequestException("There is no matching patient for " + identifier.getSystem() + " " + identifier.getValue());
 				}
 			}
-		} catch (ClassCastException classCastException) {}
+		}
 	}
 }
