@@ -170,7 +170,7 @@ public class HomeServlet extends HttpServlet {
 		if (orgAccess != null) {
 			out.println("<a class='w3-bar-item w3-button w3-right' href=\"logout\">Logout</a>");
 		} else {
-//			out.println("<a href=\"oauth2/authorization/github\" class=\"w3-bar-item w3-button w3-right\">Login with GITHUB</a>\n");
+			out.println("<a href=\"oauth2/authorization/github\" class=\"w3-bar-item w3-button w3-right\">Login GITHUB</a>\n");
 
 			out.println("<a class='w3-bar-item w3-button w3-right' href=\"loginForm\">Login</a>");
 		}

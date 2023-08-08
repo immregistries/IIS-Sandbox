@@ -7,6 +7,7 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Map;
 
 /**
  * Created by Eric on 12/20/17.
@@ -15,9 +16,7 @@ import java.util.Collection;
 /**
  * TODO IMPRove integration with spring security, especially grantedAuthority
  */
-public class OrgAccess implements Serializable
-	, Authentication
-//	, OAuth2User
+public class OrgAccess implements Serializable, Authentication, OAuth2User
 {
 
   private static final long serialVersionUID = 1L;
@@ -26,6 +25,7 @@ public class OrgAccess implements Serializable
   private OrgMaster org = null;
   private String accessName = "";
   private String accessKey = "";
+
 
   public int getOrgAccessId() {
     return orgAccessId;
@@ -59,6 +59,16 @@ public class OrgAccess implements Serializable
     this.accessKey = accessKey;
   }
 
+
+	@Override
+	public <A> A getAttribute(String name) {
+		return OAuth2User.super.getAttribute(name);
+	}
+
+	@Override
+	public Map<String, Object> getAttributes() {
+		return null;
+	}
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {

@@ -38,7 +38,7 @@ public class SessionAuthorizationInterceptor extends AuthorizationInterceptor {
 		/**
 		 * could be
 		 * HttpServletRequest request = theRequestDetails.getRequest()
-		 * but
+		 *
 		 */
 		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
 		HttpSession session = request.getSession(false);

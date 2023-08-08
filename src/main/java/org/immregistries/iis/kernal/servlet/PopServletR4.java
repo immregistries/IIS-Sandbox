@@ -25,12 +25,11 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 
+import static org.immregistries.iis.kernal.servlet.LoginServlet.*;
+
 public class PopServletR4 extends HttpServlet {
 	Logger logger = LoggerFactory.getLogger(PopServlet.class);
 	public static final String PARAM_MESSAGE = "MESSAGEDATA";
-	public static final String PARAM_USERID = "USERID";
-	public static final String PARAM_PASSWORD = "PASSWORD";
-	public static final String PARAM_FACILITYID = "FACILITYID";
 	private static SessionFactory factory;
 	@Autowired
 	RepositoryClientFactory repositoryClientFactory;

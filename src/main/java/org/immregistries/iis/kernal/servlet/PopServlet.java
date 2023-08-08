@@ -15,6 +15,7 @@ import org.immregistries.smm.transform.Transformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -25,12 +26,11 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 
+import static org.immregistries.iis.kernal.servlet.LoginServlet.*;
+
 public class PopServlet extends HttpServlet {
 	Logger logger = LoggerFactory.getLogger(PopServlet.class);
 	public static final String PARAM_MESSAGE = "MESSAGEDATA";
-	public static final String PARAM_USERID = "USERID";
-	public static final String PARAM_PASSWORD = "PASSWORD";
-	public static final String PARAM_FACILITYID = "FACILITYID";
 	private static SessionFactory factory;
 	@Autowired
 	RepositoryClientFactory repositoryClientFactory;
@@ -165,6 +165,8 @@ public class PopServlet extends HttpServlet {
 
 				if (orgAccess == null) {
 					// TODO duplicate login form ?
+					logger.info("SESSION INFO {}", SecurityContextHolder.getContext().getAuthentication());
+
 //					out.println("      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_USERID
 //						+ "\" value=\"" + userId + "\"/>");
 //					out.println("      <label>User Id</label>");
@@ -177,6 +179,7 @@ public class PopServlet extends HttpServlet {
 					out.println("<input class=\"w3-button w3-section w3-teal w3-ripple\" type=\"submit\" name=\"submit\" value=\"Submit\"/>");
 					out.println("    <span class=\"w3-yellow\">Test Data Only</span>");
 				} else {
+
 					out.println("    <div class=\"w3-container w3-card-4\">");
 					out.println("      <h3>Authentication</h3>");
 					out.println("      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_USERID

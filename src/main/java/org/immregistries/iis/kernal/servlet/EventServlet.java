@@ -13,17 +13,12 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.PrintWriter;
 
+import static org.immregistries.iis.kernal.servlet.LoginServlet.*;
+
 @SuppressWarnings("serial")
 public class EventServlet extends PopServlet {
 	@Autowired
 	IncomingEventHandler incomingEventHandler;
-
-  public static final String PARAM_USERID = "USERID";
-  public static final String PARAM_PASSWORD = "PASSWORD";
-  public static final String PARAM_FACILITYID = "FACILITYID";
-
-
-
   private static SessionFactory factory;
 
   @Override

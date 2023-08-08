@@ -9,12 +9,20 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.oauth2.client.registration.ClientRegistration;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
+import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
 import org.springframework.security.web.SecurityFilterChain;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
-import static org.immregistries.iis.kernal.servlet.PopServlet.PARAM_PASSWORD;
-import static org.immregistries.iis.kernal.servlet.PopServlet.PARAM_USERID;
+import static org.immregistries.iis.kernal.servlet.LoginServlet.PARAM_PASSWORD;
+import static org.immregistries.iis.kernal.servlet.LoginServlet.PARAM_USERID;
+
 
 @Configuration
 public class ServerSecurityConfig {
@@ -29,12 +37,12 @@ public class ServerSecurityConfig {
 
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http, RejectedRequestRedirector rejectedRequestRedirector
-														,AuthenticationManager customAuthenticationManager
+														, AuthenticationProvider customAuthenticationProvider
 	) throws Exception {
 		http
-			.authenticationManager(customAuthenticationManager)
+//			.authenticationProvider(customAuthenticationProvider)
 			.authorizeRequests()
-				.antMatchers(HttpMethod.GET,"/","/home","/pop","/SubscriptionTopic").permitAll()
+				.antMatchers(HttpMethod.GET,"/","/home","/pop","/SubscriptionTopic","/img/**").permitAll()
 				.antMatchers("/loginForm","/fhir/**","/oauth2/**", "/login","/soap").permitAll()
 				.anyRequest().authenticated()
 			.and()
@@ -44,9 +52,10 @@ public class ServerSecurityConfig {
 				.passwordParameter(PARAM_PASSWORD)
 				.loginPage("/loginForm") // Page where redirected when unauthorised
 				.loginProcessingUrl("/login") // url for login request to be processed (hollow)
-//				.failureHandler(rejectedRequestRedirector) // Used for testing but could be removed
-//			.and()
-//				.oauth2Login()
+				.defaultSuccessUrl("/home")
+			.and()
+				.oauth2Login()
+				.defaultSuccessUrl("/pop")
 			.and()
 			.logout()
 				.logoutUrl("/logout")
@@ -62,19 +71,15 @@ public class ServerSecurityConfig {
 		return http.build();
 	}
 
-
+//	private static List<String> clients = Arrays.asList("github");
 //	@Bean
-//	public ReactiveClientRegistrationRepository clientRegistrationRepository() {
-//		return new InMemoryReactiveClientRegistrationRepository(this.githubClientRegistration());
-//	}
+//	public ClientRegistrationRepository clientRegistrationRepository() {
+//		List<ClientRegistration> registrations = clients.stream()
+//			.map(c -> getRegistration(c))
+//			.filter(registration -> registration != null)
+//			.collect(Collectors.toList());
 //
-//	private ClientRegistration githubClientRegistration() {
-//		String clientId = env.getProperty(
-//			CLIENT_PROPERTY_KEY + "github.client-id");
-//		String clientSecret = env.getProperty(
-//			CLIENT_PROPERTY_KEY  + "github.client-secret");
-//		return CommonOAuth2Provider.GITHUB.getBuilder("github")
-//			.clientId(clientId).clientSecret(clientSecret).build();
+//		return new InMemoryClientRegistrationRepository(registrations);
 //	}
 
 }

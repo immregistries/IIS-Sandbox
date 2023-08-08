@@ -18,11 +18,11 @@ spring:
         registration:
           github:
             client-id: 09a6c6915895bf8400db
-            client-secret: eb62539a2e310a133cdcf0ac0f2b0fda8786169a
+            client-secret: 5aafa488e359286c8ccb26ed065d84b040ae2fd7
             scope: read:user,user:email
-            token-uri: https://api.github.com/login/oauth/access_token
-            authorization-uri: https://api.github.com/login/oauth/authorize
-            user-info-uri: https://api.github.com/user
+#            token-uri: https://api.github.com/login/oauth/access_token
+#            authorization-uri: https://api.github.com/login/oauth/authorize
+#            user-info-uri: https://api.github.com/user
   profiles:
     active: '@spring.profiles.active@'
   main:

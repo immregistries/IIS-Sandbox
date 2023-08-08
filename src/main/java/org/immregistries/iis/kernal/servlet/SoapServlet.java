@@ -20,9 +20,6 @@ import java.io.PrintWriter;
 public class SoapServlet extends HttpServlet {
 
   public static final String PARAM_MESSAGE = "MESSAGEDATA";
-  public static final String PARAM_USERID = "USERID";
-  public static final String PARAM_PASSWORD = "PASSWORD";
-  public static final String PARAM_FACILITYID = "FACILITYID";
 
    @Autowired
    IncomingMessageHandler handler;
