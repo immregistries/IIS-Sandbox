@@ -25,6 +25,8 @@ import javax.servlet.http.HttpSession;
 import java.util.Iterator;
 import java.util.List;
 
+import static org.immregistries.iis.kernal.servlet.ServletHelper.SESSION_ORGMASTER;
+
 @Component
 @Interceptor
 public class SessionAuthorizationInterceptor extends AuthorizationInterceptor {
@@ -44,7 +46,7 @@ public class SessionAuthorizationInterceptor extends AuthorizationInterceptor {
 		HttpSession session = request.getSession(false);
 		Session dataSession = PopServlet.getDataSession();
 		String authHeader = theRequestDetails.getHeader("Authorization");
-		OrgAccess orgAccess = null;
+		OrgMaster orgMaster = null;
 		try {
 //			if (theRequestDetails.getTenantId().equals(CONNECTATHON_USER)) {
 //				/**
@@ -73,8 +75,8 @@ public class SessionAuthorizationInterceptor extends AuthorizationInterceptor {
 //								.andThen().allow().read()
 //								.resourcesOfType("SubscriptionTopic").withAnyId().forTenantIds(DEFAULT_USER)
 //								.andThen()
-//								.allowAll("Logged in as " + orgAccess.getOrg().getOrganizationName())
-//								.forTenantIds(orgAccess.getOrg().getOrganizationName())
+//								.allowAll("Logged in as " + orgAccess.getOrganizationName())
+//								.forTenantIds(orgAccess.getOrganizationName())
 //								.build();
 ////							return new RuleBuilder()
 ////								.allow().operation()
@@ -124,14 +126,14 @@ public class SessionAuthorizationInterceptor extends AuthorizationInterceptor {
 //					}
 //				}
 //			}
-			orgAccess = tryAuthHeader(authHeader, theRequestDetails.getTenantId(), dataSession);
-			if (orgAccess != null && session != null) { // If connection with authHeader was successful
-				session.setAttribute("orgAccess", orgAccess);
+			orgMaster = tryAuthHeader(authHeader, theRequestDetails.getTenantId(), dataSession);
+			if (orgMaster != null && session != null) { // If connection with authHeader was successful
+				session.setAttribute(SESSION_ORGMASTER, orgMaster);
 			} else if (authHeader == null && session != null && ServletHelper.getOrgAccess() != null) { //If no header specified and there is a valid session running
-				orgAccess = ServletHelper.getOrgAccess();
+				orgMaster = ServletHelper.getOrgMaster();
 			}
 
-			if (orgAccess == null) {
+			if (orgMaster == null) {
 				throw new AuthenticationException(Msg.code(644) + "Missing or invalid Authorization header value");
 			}
 		} catch (AuthenticationException authenticationException) {
@@ -143,16 +145,16 @@ public class SessionAuthorizationInterceptor extends AuthorizationInterceptor {
 			dataSession.close();
 		}
 
-		if (orgAccess.getOrg().getOrganizationName() != null) {
-			theRequestDetails.setAttribute("orgAccess", orgAccess);
+		if (orgMaster.getOrganizationName() != null) {
+			theRequestDetails.setAttribute(SESSION_ORGMASTER, orgMaster);
 			return new RuleBuilder()
 				.allow().read()
 				.resourcesOfType("Subscription").withAnyId().forTenantIds(DEFAULT_USER)
 				.andThen().allow().read()
 				.resourcesOfType("SubscriptionTopic").withAnyId().forTenantIds(DEFAULT_USER)
 				.andThen()
-				.allowAll("Logged in as " + orgAccess.getOrg().getOrganizationName())
-				.forTenantIds(orgAccess.getOrg().getOrganizationName())
+				.allowAll("Logged in as " + orgMaster.getOrganizationName())
+				.forTenantIds(orgMaster.getOrganizationName())
 				.build();
 		}
 		return new RuleBuilder()
@@ -160,12 +162,12 @@ public class SessionAuthorizationInterceptor extends AuthorizationInterceptor {
 			.build();
 	}
 
-	public OrgAccess tryAuthHeader(String authHeader, String tenantId, Session dataSession) {
+	public OrgMaster tryAuthHeader(String authHeader, String tenantId, Session dataSession) {
 		if (authHeader != null && authHeader.startsWith("Basic ")) {
 			String base64 = authHeader.substring("Basic ".length());
 			String base64decoded = new String(Base64.decodeBase64(base64));
 			String[] parts = base64decoded.split(":");
-			return ServletHelper.authenticateOrgAccess(parts[0], parts[1], tenantId, dataSession);
+			return ServletHelper.authenticateOrgMaster(parts[0], parts[1], tenantId, dataSession);
 		} else { // TODO token ?
 			return null;
 		}

@@ -62,7 +62,6 @@ public class MessageServlet extends HttpServlet {
           if (orgAccessMap != null) {
             OrgAccess orgAccess = orgAccessMap.get(orgMaster.getOrgId());
             if (orgAccess != null) {
-              session.setAttribute("orgAccess", orgAccess);
               messageConfirmation = "Switched to " + orgMaster.getOrganizationName() + "";
             }
           }

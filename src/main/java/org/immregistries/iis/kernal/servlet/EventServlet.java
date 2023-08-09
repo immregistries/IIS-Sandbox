@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 import static org.immregistries.iis.kernal.servlet.LoginServlet.*;
+import static org.immregistries.iis.kernal.servlet.ServletHelper.SESSION_ORGMASTER;
 
 @SuppressWarnings("serial")
 public class EventServlet extends PopServlet {
@@ -47,7 +48,7 @@ public class EventServlet extends PopServlet {
         } else {
 //          IncomingEventHandler incomingEventHandler = new IncomingEventHandler(dataSession);
           ack = incomingEventHandler.process(req, orgMaster);
-          session.setAttribute("orgAccess", orgMaster);
+          session.setAttribute(SESSION_ORGMASTER, orgMaster);
         }
       } finally {
         dataSession.close();

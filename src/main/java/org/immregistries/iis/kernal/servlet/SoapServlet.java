@@ -68,7 +68,7 @@ public class SoapServlet extends HttpServlet {
 			 String[] messages;
 			 StringBuilder ackBuilder = new StringBuilder();
           try {
-            OrgMaster orgMaster = ServletHelper.authenticateOrgMasterTenant(userId, password, facilityId, dataSession);
+            OrgMaster orgMaster = ServletHelper.authenticateOrgMaster(userId, password, facilityId, dataSession);
             if (orgMaster == null) {
               throw new SecurityException("Username/password combination is unrecognized");
             } else {

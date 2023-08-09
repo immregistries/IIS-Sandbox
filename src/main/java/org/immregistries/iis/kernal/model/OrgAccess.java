@@ -16,8 +16,7 @@ import java.util.Map;
 /**
  * TODO IMPRove integration with spring security, especially grantedAuthority
  */
-public class OrgAccess implements Serializable, Authentication
-{
+public class OrgAccess implements Serializable, Authentication {
 
   private static final long serialVersionUID = 1L;
 

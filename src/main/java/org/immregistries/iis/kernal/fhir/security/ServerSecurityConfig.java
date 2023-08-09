@@ -41,7 +41,6 @@ public class ServerSecurityConfig {
 
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http, RejectedRequestRedirector rejectedRequestRedirector
-														, OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler
 	) throws Exception {
 		http
 			.authorizeRequests()

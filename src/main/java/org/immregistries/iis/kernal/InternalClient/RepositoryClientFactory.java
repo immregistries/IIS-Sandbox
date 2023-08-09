@@ -28,6 +28,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import static org.immregistries.iis.kernal.fhir.interceptors.SessionAuthorizationInterceptor.CONNECTATHON_USER;
+import static org.immregistries.iis.kernal.servlet.ServletHelper.SESSION_ORGMASTER;
 
 /**
  * Generates fhir client to interact with the jpa repository
@@ -83,14 +84,14 @@ public class RepositoryClientFactory extends ApacheRestfulClientFactory implemen
 	 * @param theRequestDetails
 	 * @return
 	 */
-//	public IGenericClient newGenericClient(RequestDetails theRequestDetails) {
-//		asynchInit();
-//		OrgAccess orgAccess = (OrgAccess) theRequestDetails.getAttribute("orgAccess");
-//		if (orgAccess == null) {
-//			throw new AuthenticationException();
-//		}
-//		return newGenericClient(orgAccess);
-//	}
+	public IGenericClient newGenericClient(RequestDetails theRequestDetails) {
+		asynchInit();
+		OrgMaster orgMaster = (OrgMaster) theRequestDetails.getAttribute(SESSION_ORGMASTER);
+		if (orgMaster == null) {
+			throw new AuthenticationException();
+		}
+		return newGenericClient(orgMaster);
+	}
 
 	/**
 	 * Used to get a fhir client within Java Servlets

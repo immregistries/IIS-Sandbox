@@ -5,7 +5,6 @@
     <id name="orgAccessId" column="org_access_id">
       <generator class="native"/>
     </id>
-    <many-to-one name="org" column="org_id" class="OrgMaster"/>
     <property name="accessName" column="access_name" type="string"/>
     <property name="accessKey" column="access_key" type="string"/>
   </class>
