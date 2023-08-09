@@ -279,9 +279,9 @@ public abstract class IncomingMessageHandler<Organization extends IBaseResource>
     sb.append("\r");
   }
 
-  public void printORC(OrgAccess orgAccess, StringBuilder sb, VaccinationMaster vaccination,
+  public void printORC(OrgMaster orgMaster, StringBuilder sb, VaccinationMaster vaccination,
       VaccinationReported vaccinationReported, boolean originalReporter) {
-    Set<ProcessingFlavor> processingFlavorSet = orgAccess.getOrg().getProcessingFlavorSet();
+    Set<ProcessingFlavor> processingFlavorSet = orgMaster.getProcessingFlavorSet();
     sb.append("ORC");
     // ORC-1
     sb.append("|RE");
@@ -300,16 +300,16 @@ public abstract class IncomingMessageHandler<Organization extends IBaseResource>
       }
     } else {
       if (originalReporter) {
-        sb.append(vaccinationReported.getVaccinationReportedExternalLink()).append("^").append(orgAccess.getOrg().getOrganizationName());
+        sb.append(vaccinationReported.getVaccinationReportedExternalLink()).append("^").append(orgMaster.getOrganizationName());
       }
     }
     sb.append("\r");
   }
 
   public List<ForecastActual> doForecast(PatientMaster patient, PatientReported patientReported,
-      CodeMap codeMap, List<VaccinationMaster> vaccinationMasterList, OrgAccess orgAccess) {
+      CodeMap codeMap, List<VaccinationMaster> vaccinationMasterList, OrgMaster orgMaster) {
     List<ForecastActual> forecastActualList = null;
-    Set<ProcessingFlavor> processingFlavorSet = orgAccess.getOrg().getProcessingFlavorSet();
+    Set<ProcessingFlavor> processingFlavorSet = orgMaster.getProcessingFlavorSet();
     try {
       TestCase testCase = new TestCase();
       testCase.setEvalDate(new Date());

@@ -65,8 +65,9 @@ public class PatientServlet extends HttpServlet {
       throws ServletException, IOException {
 
     HttpSession session = req.getSession(true);
-    OrgAccess orgAccess = ServletHelper.getOrgAccess();
-    if (orgAccess == null) {
+	  OrgMaster orgMaster = ServletHelper.getOrgMaster();
+
+    if (orgMaster == null) {
 //      RequestDispatcher dispatcher = req.getRequestDispatcher("home");
 //      dispatcher.forward(req, resp);
 //      return;
@@ -109,7 +110,7 @@ public class PatientServlet extends HttpServlet {
       PatientReported patientReportedSelected = getPatientReportedFromParameter(req, fhirClient);
 
       if (patientReportedSelected == null) {
-		  out.println("<h2>Patients from Facility : " + orgAccess.getOrg().getOrganizationName() + "</h2>");
+		  out.println("<h2>Patients from Facility : " + orgMaster.getOrganizationName() + "</h2>");
         out.println("<div class=\"w3-container w3-half w3-margin-top\">");
         out.println("    <h3>Search Patient Registry</h3>");
         out.println("    <form method=\"GET\" action=\"patient\" class=\"w3-container w3-card-4\">");
@@ -242,7 +243,7 @@ public class PatientServlet extends HttpServlet {
 				}
 			}
 
-			String apiBaseUrl = "/iis/fhir/" + orgAccess.getAccessName();
+			String apiBaseUrl = "/iis/fhir/" + orgMaster.getOrganizationName();
         {
 			  String link = apiBaseUrl + "/Patient/"
 				  + patientReportedSelected.getId();

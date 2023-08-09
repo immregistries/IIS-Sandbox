@@ -30,16 +30,16 @@ import static org.immregistries.iis.kernal.mapping.Interfaces.PatientMapper.MRN_
 public class IncomingMessageHandlerR5 extends IncomingMessageHandler<Organization> {
 	private final Logger logger = LoggerFactory.getLogger(IncomingMessageHandler.class);
 
-	public String process(String message, OrgAccess orgAccess) {
+	public String process(String message, OrgMaster orgMaster) {
 		HL7Reader reader = new HL7Reader(message);
 		String messageType = reader.getValue(9);
 		String responseMessage;
 		try {
-			Set<ProcessingFlavor> processingFlavorSet = orgAccess.getOrg().getProcessingFlavorSet();
+			Set<ProcessingFlavor> processingFlavorSet = orgMaster.getProcessingFlavorSet();
 			String facilityId = reader.getValue(4);
 
 			if (processingFlavorSet.contains(ProcessingFlavor.SOURSOP)) {
-				if (!facilityId.equals(orgAccess.getOrg().getOrganizationName())) {
+				if (!facilityId.equals(orgMaster.getOrganizationName())) {
 					throw new ProcessingException("Not allowed to submit for facility indicated in MSH-4",
 						"MSH", 1, 4);
 				}
@@ -48,13 +48,13 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler<Organizatio
 			Organization managingOrganization = processManagingOrganization(reader);
 			switch (messageType) {
 				case "VXU":
-					responseMessage = processVXU(orgAccess, reader, message, managingOrganization);
+					responseMessage = processVXU(orgMaster, reader, message, managingOrganization);
 					break;
 				case "ORU":
-					responseMessage = processORU(orgAccess, reader, message, managingOrganization);
+					responseMessage = processORU(orgMaster, reader, message, managingOrganization);
 					break;
 				case "QBP":
-					responseMessage = processQBP(orgAccess, reader, message);
+					responseMessage = processQBP(orgMaster, reader, message);
 					break;
 				default:
 					ProcessingException pe = new ProcessingException("Unsupported message", "", 0, 0);
@@ -62,7 +62,7 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler<Organizatio
 					processingExceptionList.add(pe);
 					responseMessage = buildAck(reader, processingExceptionList);
 					recordMessageReceived(message, null, responseMessage, "Unknown", "NAck",
-						orgAccess.getOrg());
+						orgMaster);
 					break;
 			}
 
@@ -76,7 +76,7 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler<Organizatio
 		return responseMessage;
 	}
 
-	public String processQBP(OrgAccess orgAccess, HL7Reader reader, String messageReceived) {
+	public String processQBP(OrgMaster orgMaster, HL7Reader reader, String messageReceived) {
 		PatientReported patientReported = null;
 		List<PatientReported> patientReportedPossibleList = new ArrayList<>();
 		List<ProcessingException> processingExceptionList = new ArrayList<>();
@@ -163,7 +163,7 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler<Organizatio
 			processingExceptionList.add(new ProcessingException("QPD segment not found", null, 0, 0));
 		}
 
-		Set<ProcessingFlavor> processingFlavorSet = orgAccess.getOrg().getProcessingFlavorSet();
+		Set<ProcessingFlavor> processingFlavorSet = orgMaster.getProcessingFlavorSet();
 		if (processingFlavorSet.contains(ProcessingFlavor.SNAIL)
 			|| processingFlavorSet.contains(ProcessingFlavor.SNAIL30)
 			|| processingFlavorSet.contains(ProcessingFlavor.SNAIL60)
@@ -196,19 +196,19 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler<Organizatio
 			}
 		}
 
-		return buildRSP(reader, messageReceived, patientReported, orgAccess,
+		return buildRSP(reader, messageReceived, patientReported, orgMaster,
 			patientReportedPossibleList, processingExceptionList);
 	}
 
 	@SuppressWarnings("unchecked")
-	public String processVXU(OrgAccess orgAccess, HL7Reader reader, String message, Organization managingOrganization) {
+	public String processVXU(OrgMaster orgMaster, HL7Reader reader, String message, Organization managingOrganization) {
 		List<ProcessingException> processingExceptionList = new ArrayList<>();
 		try {
-			Set<ProcessingFlavor> processingFlavorSet = orgAccess.getOrg().getProcessingFlavorSet();
+			Set<ProcessingFlavor> processingFlavorSet = orgMaster.getProcessingFlavorSet();
 			CodeMap codeMap = CodeMapManager.getCodeMap();
 
 			boolean strictDate = !processingFlavorSet.contains(ProcessingFlavor.CANTALOUPE);
-			PatientReported patientReported = processPatient(orgAccess, reader, processingExceptionList,
+			PatientReported patientReported = processPatient(orgMaster, reader, processingExceptionList,
 				processingFlavorSet, codeMap, strictDate, null, managingOrganization);
 
 
@@ -380,7 +380,7 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler<Organizatio
 								}
 								orgLocation = new OrgLocation();
 								orgLocation.setOrgFacilityCode(administeredAtLocation);
-								orgLocation.setOrgMaster(orgAccess.getOrg());
+								orgLocation.setOrgMaster(orgMaster);
 								orgLocation.setOrgFacilityName(administeredAtLocation);
 								orgLocation.setLocationType("");
 								orgLocation.setAddressLine1(reader.getValue(11, 9));
@@ -401,7 +401,7 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler<Organizatio
 							if (modelPerson == null) {
 								modelPerson = new ModelPerson();
 								modelPerson.setPersonExternalLink(administeringProvider);
-								modelPerson.setOrgMaster(orgAccess.getOrg());
+								modelPerson.setOrgMaster(orgMaster);
 								modelPerson.setNameLast(reader.getValue(10, 2));
 								modelPerson.setNameFirst(reader.getValue(10, 3));
 								modelPerson.setNameMiddle(reader.getValue(10, 4));
@@ -531,21 +531,21 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler<Organizatio
 					"", 0, 0);
 			}
 			String ack = buildAck(reader, processingExceptionList);
-			recordMessageReceived(message, patientReported, ack, "Update", "Ack", orgAccess.getOrg());
+			recordMessageReceived(message, patientReported, ack, "Update", "Ack", orgMaster);
 			return ack;
 		} catch (ProcessingException e) {
 			if (!processingExceptionList.contains(e)) {
 				processingExceptionList.add(e);
 			}
 			String ack = buildAck(reader, processingExceptionList);
-			recordMessageReceived(message, null, ack, "Update", "Exception", orgAccess.getOrg());
+			recordMessageReceived(message, null, ack, "Update", "Exception", orgMaster);
 			return ack;
 		}
 
 	}
 
 	@SuppressWarnings("unchecked")
-	public PatientReported processPatient(OrgAccess orgAccess, HL7Reader reader,
+	public PatientReported processPatient(OrgMaster orgMaster, HL7Reader reader,
 													  List<ProcessingException> processingExceptionList, Set<ProcessingFlavor> processingFlavorSet,
 													  CodeMap codeMap, boolean strictDate, PatientReported patientReported, Organization managingOrganization)
 		throws ProcessingException {
@@ -587,7 +587,7 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler<Organizatio
 		if (patientReported == null) {
 //      patientMaster = new PatientMaster();
 			patientReported = new PatientReported();
-			patientReported.setOrgReported(orgAccess.getOrg());
+			patientReported.setOrgReported(orgMaster);
 			patientReported.setPatientReportedExternalLink(patientReportedExternalLink);
 			patientReported.setReportedDate(new Date());
 			patientReported.setManagingOrganizationId(managingOrganization.getId());
@@ -903,15 +903,15 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler<Organizatio
 		return patientReported;
 	}
 
-	public String processORU(OrgAccess orgAccess, HL7Reader reader, String message, Organization managingOrganization) {
+	public String processORU(OrgMaster orgMaster, HL7Reader reader, String message, Organization managingOrganization) {
 		List<ProcessingException> processingExceptionList = new ArrayList<>();
 		try {
-			Set<ProcessingFlavor> processingFlavorSet = orgAccess.getOrg().getProcessingFlavorSet();
+			Set<ProcessingFlavor> processingFlavorSet = orgMaster.getProcessingFlavorSet();
 
 			CodeMap codeMap = CodeMapManager.getCodeMap();
 
 			boolean strictDate = !processingFlavorSet.contains(ProcessingFlavor.CANTALOUPE);
-			PatientReported patientReported = processPatient(orgAccess, reader, processingExceptionList,
+			PatientReported patientReported = processPatient(orgMaster, reader, processingExceptionList,
 				processingFlavorSet, codeMap, strictDate, null, managingOrganization);
 
 			int orcCount = 0;
@@ -927,14 +927,14 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler<Organizatio
 				}
 			}
 			String ack = buildAck(reader, processingExceptionList);
-			recordMessageReceived(message, patientReported, ack, "Update", "Ack", orgAccess.getOrg());
+			recordMessageReceived(message, patientReported, ack, "Update", "Ack", orgMaster);
 			return ack;
 		} catch (ProcessingException e) {
 			if (!processingExceptionList.contains(e)) {
 				processingExceptionList.add(e);
 			}
 			String ack = buildAck(reader, processingExceptionList);
-			recordMessageReceived(message, null, ack, "Update", "Exception", orgAccess.getOrg());
+			recordMessageReceived(message, null, ack, "Update", "Exception", orgMaster);
 			return ack;
 		}
 	}
@@ -1045,13 +1045,13 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler<Organizatio
 
 	@SuppressWarnings("unchecked")
 	public String buildRSP(HL7Reader reader, String messageRecieved, PatientReported patientReported,
-								  OrgAccess orgAccess, List<PatientReported> patientReportedPossibleList,
+								  OrgMaster orgMaster, List<PatientReported> patientReportedPossibleList,
 								  List<ProcessingException> processingExceptionList) {
 		IGenericClient fhirClient = getFhirClient();
 		reader.resetPostion();
 		reader.advanceToSegment("MSH");
 
-		Set<ProcessingFlavor> processingFlavorSet = orgAccess.getOrg().getProcessingFlavorSet();
+		Set<ProcessingFlavor> processingFlavorSet = orgMaster.getProcessingFlavorSet();
 		StringBuilder sb = new StringBuilder();
 		String profileIdSubmitted = reader.getValue(21);
 		CodeMap codeMap = CodeMapManager.getCodeMap();
@@ -1189,7 +1189,7 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler<Organizatio
 			List<ForecastActual> forecastActualList = null;
 			if (sendBackForecast) {
 				forecastActualList =
-					doForecast(patientMaster, patientReported, codeMap, vaccinationMasterList, orgAccess);
+					doForecast(patientMaster, patientReported, codeMap, vaccinationMasterList, orgMaster);
 			}
 			int obxSetId = 0;
 			int obsSubId = 0;
@@ -1201,11 +1201,11 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler<Organizatio
 				}
 				VaccinationReported vaccinationReported = vaccination.getVaccinationReported();
 				boolean originalReporter =
-					vaccinationReported.getPatientReported().getOrgReported().equals(orgAccess.getOrg());
+					vaccinationReported.getPatientReported().getOrgReported().equals(orgMaster);
 				if ("D".equals(vaccinationReported.getActionCode())) {
 					continue;
 				}
-				printORC(orgAccess, sb, vaccination, vaccinationReported, originalReporter);
+				printORC(orgMaster, sb, vaccination, vaccinationReported, originalReporter);
 				sb.append("RXA");
 				// RXA-1
 				sb.append("|0");
@@ -1373,7 +1373,7 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler<Organizatio
 					.where(Observation.PART_OF.hasId(patientMaster.getPatientId()))
 					.returnBundle(Bundle.class).execute();
 				if (bundle.hasEntry()) {
-					printORC(orgAccess, sb, null, null, false);
+					printORC(orgMaster, sb, null, null, false);
 					obsSubId++;
 					for (Bundle.BundleEntryComponent entry : bundle.getEntry()) {
 						obxSetId++;
@@ -1386,7 +1386,7 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler<Organizatio
 			}
 
 			if (sendBackForecast && forecastActualList != null && forecastActualList.size() > 0) {
-				printORC(orgAccess, sb, null, null, false);
+				printORC(orgMaster, sb, null, null, false);
 				sb.append("RXA");
 				// RXA-1
 				sb.append("|0");
@@ -1477,15 +1477,15 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler<Organizatio
 
 		String messageResponse = sb.toString();
 		recordMessageReceived(messageRecieved, patientReported, messageResponse, "Query",
-			categoryResponse, orgAccess.getOrg());
+			categoryResponse, orgMaster);
 		return messageResponse;
 	}
 
-	public String buildVxu(VaccinationReported vaccinationReported, OrgAccess orgAccess) {
+	public String buildVxu(VaccinationReported vaccinationReported, OrgMaster orgMaster) {
 		IGenericClient fhirClient = getFhirClient();
 		StringBuilder sb = new StringBuilder();
 		CodeMap codeMap = CodeMapManager.getCodeMap();
-		Set<ProcessingFlavor> processingFlavorSet = orgAccess.getOrg().getProcessingFlavorSet();
+		Set<ProcessingFlavor> processingFlavorSet = orgMaster.getProcessingFlavorSet();
 		PatientReported patientReported = vaccinationReported.getPatientReported();
 		PatientMaster patientMaster = patientReported.getPatient();
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
@@ -1504,8 +1504,8 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler<Organizatio
 			if (cvxCode != null) {
 
 				boolean originalReporter =
-					vaccinationReported.getPatientReported().getOrgReported().equals(orgAccess.getOrg());
-				printORC(orgAccess, sb, vaccination, vaccinationReported, originalReporter);
+					vaccinationReported.getPatientReported().getOrgReported().equals(orgMaster);
+				printORC(orgMaster, sb, vaccination, vaccinationReported, originalReporter);
 				sb.append("RXA");
 				// RXA-1
 				sb.append("|0");
@@ -1771,6 +1771,5 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler<Organizatio
 			managingOrganization = (Organization) fhirRequester.saveOrganization(managingOrganization);
 		}
 		return managingOrganization;
-
 	}
 }

@@ -9,17 +9,14 @@ import org.hl7.fhir.r5.model.Reference;
 import org.immregistries.iis.kernal.logic.IncomingMessageHandler;
 import org.immregistries.iis.kernal.model.OrgAccess;
 import org.immregistries.iis.kernal.InternalClient.RepositoryClientFactory;
+import org.immregistries.iis.kernal.model.OrgMaster;
 import org.immregistries.smm.transform.ScenarioManager;
 import org.immregistries.smm.transform.TestCaseMessage;
 import org.immregistries.smm.transform.Transformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -53,13 +50,14 @@ public class PopServlet extends HttpServlet {
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		try {
 			String message = req.getParameter(PARAM_MESSAGE);
-			OrgAccess orgAccess = ServletHelper.getOrgAccess();
+			OrgMaster orgMaster = ServletHelper.getOrgMaster();
+
 			String ack = "";
 			String[] messages;
 			StringBuilder ackBuilder = new StringBuilder();
 			Session dataSession = getDataSession();
 			try {
-				if (orgAccess == null) {
+				if (orgMaster == null) {
 					resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 					out.println(
 						"Access is not authorized. Facilityid, userid and/or password are not recognized. ");
@@ -72,7 +70,7 @@ public class PopServlet extends HttpServlet {
 					}
 					for (String msh : messages) {
 						if (!msh.isBlank()) {
-							ackBuilder.append(handler.process("MSH|^~\\&|" + msh, orgAccess));
+							ackBuilder.append(handler.process("MSH|^~\\&|" + msh, orgMaster));
 							ackBuilder.append("\r\n");
 						}
 					}
@@ -84,7 +82,7 @@ public class PopServlet extends HttpServlet {
 							groupPatientIds) {
 							group.addMember().setEntity(new Reference().setReference("Patient/" + id));
 						}
-						repositoryClientFactory.newGenericClient(orgAccess).create().resource(group).execute();
+						repositoryClientFactory.newGenericClient(orgMaster).create().resource(group).execute();
 					}
 				}
 			} finally {
@@ -167,14 +165,14 @@ public class PopServlet extends HttpServlet {
 				} else {
 
 					out.println("    <div class=\"w3-container w3-card-4\">");
-					out.println("      <h3>Authentication</h3>");
-					out.println("      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_USERID
-						+ "\" value=\"" + orgAccess.getAccessName() + "\"/ disabled>");
-					out.println("      <label>User Id</label>");
-					out.println("      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_FACILITYID
-						+ "\" value=\"" + orgAccess.getOrg().getOrganizationName() + "\" disabled/>");
-					out.println("      <label>Facility Id</label>");
-					out.println("      <br/>");
+//					out.println("      <h3>Authentication</h3>");
+//					out.println("      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_USERID
+//						+ "\" value=\"" + orgAccess.getAccessName() + "\"/ disabled>");
+//					out.println("      <label>User Id</label>");
+//					out.println("      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_FACILITYID
+//						+ "\" value=\"" + orgAccess.getOrg().getOrganizationName() + "\" disabled/>");
+//					out.println("      <label>Facility Id</label>");
+//					out.println("      <br/>");
 					out.println("<input class=\"w3-button w3-section w3-teal w3-ripple\" type=\"submit\" name=\"submit\" value=\"Submit\"/>");
 					out.println("    <span class=\"w3-yellow\">Test Data Only</span>");
 

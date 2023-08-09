@@ -12,10 +12,7 @@ import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.logic.CodeMapManager;
-import org.immregistries.iis.kernal.model.OrgAccess;
-import org.immregistries.iis.kernal.model.PatientMaster;
-import org.immregistries.iis.kernal.model.PatientReported;
-import org.immregistries.iis.kernal.model.VaccinationReported;
+import org.immregistries.iis.kernal.model.*;
 import org.immregistries.mqe.hl7util.parser.HL7Reader;
 import org.immregistries.smm.transform.ScenarioManager;
 import org.immregistries.smm.transform.TestCaseMessage;
@@ -66,7 +63,9 @@ public class FhirTestServlet extends HttpServlet {
       throws ServletException, IOException {
 
     HttpSession session = req.getSession(true);
-    OrgAccess orgAccess = ServletHelper.getOrgAccess();
+//    OrgAccess orgAccess = ServletHelper.getOrgAccess();
+	  OrgMaster orgMaster = ServletHelper.getOrgMaster();
+
 
     resp.setContentType("text/html");
     PrintWriter out = new PrintWriter(resp.getOutputStream());
@@ -193,8 +192,8 @@ public class FhirTestServlet extends HttpServlet {
         String baseUrl = req.getParameter(BASE_URL);
         if (baseUrl == null) {
           String tenantId = "tenantId";
-          if (orgAccess != null) {
-            tenantId = orgAccess.getOrg().getOrganizationName();
+          if (orgMaster != null) {
+            tenantId = orgMaster.getOrganizationName();
           }
           tenantId = URLEncoder.encode(tenantId, StandardCharsets.UTF_8);
           baseUrl = BASE_URL + "/" + tenantId + "/";
@@ -202,7 +201,7 @@ public class FhirTestServlet extends HttpServlet {
 
         out.println("<h2>FHIR Test Endpoint</h2>");
         out.println("<p>" + baseUrl + "</p>");
-        if (orgAccess == null) {
+        if (orgMaster == null) {
           out.println(
               "    <div class=\"w3-panel w3-yellow\"><p class=\"w3-left-align\">You will need to place the IIS Sandbox Facility Id where the tenantId is indicated. </p></div>");
         }

@@ -54,29 +54,6 @@ public class MessageServlet extends HttpServlet {
       String messageError = null;
       String messageConfirmation = null;
       if (action != null) {
-//        if (action.equals(ACTION_LOGIN)) {
-//          String userId = req.getParameter(PARAM_USERID);
-//          String facilityId = req.getParameter(PARAM_FACILITYID);
-//          String password = req.getParameter(PARAM_PASSWORD);
-//          OrgAccess orgAccess = ServletHelper.authenticateOrgAccess(userId, password, facilityId, dataSession);
-//          if (orgAccess == null) {
-//            messageError = "Unable to login, unrecognized credentials";
-//          } else {
-//            session.setAttribute("orgAccess", orgAccess);
-////            Map<Integer, OrgAccess> orgAccessMap = new HashMap<Integer, OrgAccess>();
-////            Query query = dataSession.createQuery("from OrgMaster order by organizationName");
-////            List<OrgMaster> orgMasterList = query.list();
-////            for (OrgMaster orgMaster : orgMasterList) {
-////              OrgAccess oa = ServletHelper.authenticateOrgAccessForFacility(
-////                userId, password, dataSession, orgMaster);
-////              if (oa != null) {
-////                orgAccessMap.put(orgMaster.getOrgId(), oa);
-////              }
-////            }
-////            session.setAttribute("orgAccessMap", orgAccessMap);
-//            messageConfirmation = "Logged in to " + orgAccess.getOrg().getOrganizationName();
-//          }
-//        } else
 			  if (action.equals(ACTION_SWITCH)) {
           OrgMaster orgMaster = dataSession.get(OrgMaster.class,
               Integer.parseInt(req.getParameter(PARAM_ORG_ID)));
@@ -86,7 +63,7 @@ public class MessageServlet extends HttpServlet {
             OrgAccess orgAccess = orgAccessMap.get(orgMaster.getOrgId());
             if (orgAccess != null) {
               session.setAttribute("orgAccess", orgAccess);
-              messageConfirmation = "Switched to " + orgAccess.getOrg().getOrganizationName() + "";
+              messageConfirmation = "Switched to " + orgMaster.getOrganizationName() + "";
             }
           }
         }
@@ -103,10 +80,10 @@ public class MessageServlet extends HttpServlet {
         out.println("  </div>");
       }
 
-      OrgAccess orgAccess = ServletHelper.getOrgAccess();
-      if (orgAccess != null) {
+      OrgMaster orgMaster = ServletHelper.getOrgMaster();
+      if (orgMaster != null) {
         out.println("    <div class=\"w3-container w3-half w3-margin-top\">");
-			out.println("    <h2>Facility: " + orgAccess.getOrg().getOrganizationName() + "</h2>");
+			out.println("    <h2>Facility: " + orgMaster.getOrganizationName() + "</h2>");
 			out.println("    <h3>Messages Recently Received</h3>");
         String search = req.getParameter(PARAM_SEARCH);
         if (search == null) {
@@ -127,7 +104,7 @@ public class MessageServlet extends HttpServlet {
         {
           Query query = dataSession.createQuery(
               "from MessageReceived where orgMaster = :orgMaster order by reportedDate desc");
-          query.setParameter("orgMaster", orgAccess.getOrg());
+          query.setParameter("orgMaster", orgMaster);
           messageReceivedList = query.list();
         }
 

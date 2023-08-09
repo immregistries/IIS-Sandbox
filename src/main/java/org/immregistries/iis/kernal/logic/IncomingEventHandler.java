@@ -105,9 +105,9 @@ public class IncomingEventHandler {
           BODY_ROUTE, FUNDING_SOURCE, FUNDING_ELIGIBILITY, ORG_LOCATION_FACILITY_CODE};
 
 
-  public String process(HttpServletRequest req, OrgAccess orgAccess) {
+  public String process(HttpServletRequest req, OrgMaster orgMaster) {
     try {
-      processEvent(orgAccess, req);
+      processEvent(orgMaster, req);
     } catch (Exception e) {
       e.printStackTrace(System.err);
       return "Exception processing request" + e.getMessage();
@@ -117,10 +117,10 @@ public class IncomingEventHandler {
   }
 
 
-  public void processEvent(OrgAccess orgAccess, HttpServletRequest req) throws Exception {
+  public void processEvent(OrgMaster orgMaster, HttpServletRequest req) throws Exception {
 
     CodeMap codeMap = CodeMapManager.getCodeMap();
-    PatientReported patientReported = processPatient(orgAccess, req, codeMap);
+    PatientReported patientReported = processPatient(orgMaster, req, codeMap);
     VaccinationReported vaccinationReported = null;
 //    VaccinationMaster vaccinationMaster = null;
     Date administrationDate = null;
@@ -188,7 +188,7 @@ public class IncomingEventHandler {
 			if (orgLocation == null){
 				orgLocation = new OrgLocation();
 				orgLocation.setOrgFacilityCode(administeredAtLocation);
-				orgLocation.setOrgMaster(orgAccess.getOrg());
+				orgLocation.setOrgMaster(orgMaster);
 				orgLocation.setOrgFacilityName(administeredAtLocation);
 				orgLocation.setLocationType("");
 				orgLocation.setAddressLine1("");
@@ -234,10 +234,10 @@ public class IncomingEventHandler {
 
   }
 
-  public PatientReported processPatient(OrgAccess orgAccess, HttpServletRequest req,
+  public PatientReported processPatient(OrgMaster orgMaster, HttpServletRequest req,
       CodeMap codeMap) throws Exception {
 	 RequestDetails requestDetails = new ServletRequestDetails();
-	 requestDetails.setTenantId(orgAccess.getAccessName());
+	 requestDetails.setTenantId(orgMaster.getOrganizationName());
 
     PatientReported patientReported = null;
 //    PatientMaster patientMaster = null;
@@ -261,7 +261,7 @@ public class IncomingEventHandler {
 //      patientMaster.setPatientExternalLink(generatePatientExternalLink(fhirClient));
 //      patientMaster.setOrgMaster(orgAccess.getOrg());
       patientReported = new PatientReported();
-      patientReported.setOrgReported(orgAccess.getOrg());
+      patientReported.setOrgReported(orgMaster);
       patientReported.setPatientReportedExternalLink(patientReportedExternalLink);
 //      patientReported.setPatient(patientMaster);
       patientReported.setReportedDate(new Date());

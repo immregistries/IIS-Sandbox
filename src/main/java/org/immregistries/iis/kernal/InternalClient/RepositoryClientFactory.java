@@ -101,9 +101,9 @@ public class RepositoryClientFactory extends ApacheRestfulClientFactory implemen
 	public IGenericClient newGenericClient(HttpSession session) {
 		asynchInit();
 		if (session.getAttribute("fhirClient") == null) {
-			OrgAccess orgAccess = ServletHelper.getOrgAccess();
-			if (orgAccess != null) {
-				session.setAttribute("fhirClient", newGenericClient(orgAccess));
+			OrgMaster orgMaster = ServletHelper.getOrgMaster();
+			if (orgMaster != null) {
+				session.setAttribute("fhirClient", newGenericClient(orgMaster));
 			} else {
 				session.setAttribute("fhirClient", null);
 			}

@@ -5,6 +5,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.immregistries.iis.kernal.logic.IncomingMessageHandler;
 import org.immregistries.iis.kernal.model.OrgAccess;
+import org.immregistries.iis.kernal.model.OrgMaster;
 import org.immregistries.smm.cdc.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -67,16 +68,16 @@ public class SoapServlet extends HttpServlet {
 			 String[] messages;
 			 StringBuilder ackBuilder = new StringBuilder();
           try {
-            OrgAccess orgAccess = ServletHelper.authenticateOrgAccess(userId, password, facilityId, dataSession);
-            if (orgAccess == null) {
+            OrgMaster orgMaster = ServletHelper.authenticateOrgMasterTenant(userId, password, facilityId, dataSession);
+            if (orgMaster == null) {
               throw new SecurityException("Username/password combination is unrecognized");
             } else {
 					HttpSession session = req.getSession(true);
-					session.setAttribute("orgAccess",orgAccess);
+					session.setAttribute("orgMaster",orgMaster);
 					messages = message.split( "MSH\\|\\^~\\\\&\\|");
 					for (String msh: messages) {
 						if(!msh.isBlank()){
-							ackBuilder.append(handler.process("MSH|^~\\&|" + msh, orgAccess));
+							ackBuilder.append(handler.process("MSH|^~\\&|" + msh, orgMaster));
 							ackBuilder.append("\r\n");
 						}
 					}

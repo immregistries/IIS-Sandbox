@@ -4,6 +4,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.immregistries.iis.kernal.logic.IncomingEventHandler;
 import org.immregistries.iis.kernal.model.OrgAccess;
+import org.immregistries.iis.kernal.model.OrgMaster;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.ServletException;
@@ -32,6 +33,7 @@ public class EventServlet extends PopServlet {
       String facilityId = req.getParameter(PARAM_FACILITYID);
       HttpSession session = req.getSession(true);
       OrgAccess orgAccess = ServletHelper.getOrgAccess();
+      OrgMaster orgMaster = ServletHelper.getOrgMaster();
       String ack = "";
       Session dataSession = getDataSession();
       try {
@@ -44,8 +46,8 @@ public class EventServlet extends PopServlet {
               "Access is not authorized. Facilityid, userid and/or password are not recognized. ");
         } else {
 //          IncomingEventHandler incomingEventHandler = new IncomingEventHandler(dataSession);
-          ack = incomingEventHandler.process(req, orgAccess);
-          session.setAttribute("orgAccess", orgAccess);
+          ack = incomingEventHandler.process(req, orgMaster);
+          session.setAttribute("orgAccess", orgMaster);
         }
       } finally {
         dataSession.close();

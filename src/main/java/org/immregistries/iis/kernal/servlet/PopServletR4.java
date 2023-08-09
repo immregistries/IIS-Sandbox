@@ -6,9 +6,10 @@ import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.hl7.fhir.r4.model.Group;
 import org.hl7.fhir.r4.model.Reference;
-import org.immregistries.iis.kernal.logic.IncomingMessageHandlerR4;
+import org.immregistries.iis.kernal.logic.IncomingMessageHandler;
 import org.immregistries.iis.kernal.model.OrgAccess;
 import org.immregistries.iis.kernal.InternalClient.RepositoryClientFactory;
+import org.immregistries.iis.kernal.model.OrgMaster;
 import org.immregistries.smm.transform.ScenarioManager;
 import org.immregistries.smm.transform.TestCaseMessage;
 import org.immregistries.smm.transform.Transformer;
@@ -16,7 +17,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -28,13 +28,13 @@ import java.util.ArrayList;
 import static org.immregistries.iis.kernal.servlet.LoginServlet.*;
 
 public class PopServletR4 extends HttpServlet {
-	Logger logger = LoggerFactory.getLogger(PopServlet.class);
+	Logger logger = LoggerFactory.getLogger(PopServletR4.class);
 	public static final String PARAM_MESSAGE = "MESSAGEDATA";
 	private static SessionFactory factory;
 	@Autowired
 	RepositoryClientFactory repositoryClientFactory;
 	@Autowired
-	private IncomingMessageHandlerR4 handler;
+	private IncomingMessageHandler handler;
 
 	public static Session getDataSession() {
 		if (factory == null) {
@@ -50,17 +50,14 @@ public class PopServletR4 extends HttpServlet {
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		try {
 			String message = req.getParameter(PARAM_MESSAGE);
+			OrgMaster orgMaster = ServletHelper.getOrgMaster();
 
-			OrgAccess orgAccess = ServletHelper.getOrgAccess();
 			String ack = "";
 			String[] messages;
 			StringBuilder ackBuilder = new StringBuilder();
 			Session dataSession = getDataSession();
 			try {
-				if (orgAccess == null) {
-					RequestDispatcher dispatcher = getServletContext()
-						.getRequestDispatcher("/loginForm");
-					dispatcher.forward(req, resp);
+				if (orgMaster == null) {
 					resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 					out.println(
 						"Access is not authorized. Facilityid, userid and/or password are not recognized. ");
@@ -73,7 +70,7 @@ public class PopServletR4 extends HttpServlet {
 					}
 					for (String msh : messages) {
 						if (!msh.isBlank()) {
-							ackBuilder.append(handler.process("MSH|^~\\&|" + msh, orgAccess));
+							ackBuilder.append(handler.process("MSH|^~\\&|" + msh, orgMaster));
 							ackBuilder.append("\r\n");
 						}
 					}
@@ -85,7 +82,7 @@ public class PopServletR4 extends HttpServlet {
 							groupPatientIds) {
 							group.addMember().setEntity(new Reference().setReference("Patient/" + id));
 						}
-						repositoryClientFactory.newGenericClient(orgAccess).create().resource(group).execute();
+						repositoryClientFactory.newGenericClient(orgMaster).create().resource(group).execute();
 					}
 				}
 			} finally {
@@ -105,19 +102,9 @@ public class PopServletR4 extends HttpServlet {
 		out.close();
 	}
 
-//	@Autowired
-//	ApplicationContext applicationContext;
-
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
 		throws ServletException, IOException {
-//		AutowireCapableBeanFactory autowireCapableBeanFactory = applicationContext.getAutowireCapableBeanFactory();
-//		if (autowireCapableBeanFactory instanceof SingletonBeanRegistry) {
-//			String[] singletonNames = ((SingletonBeanRegistry) autowireCapableBeanFactory).getSingletonNames();
-//			for (String singleton : singletonNames) {
-//				System.out.println(singleton);
-//			}
-//		}
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		OrgAccess orgAccess = ServletHelper.getOrgAccess();
@@ -176,15 +163,16 @@ public class PopServletR4 extends HttpServlet {
 					out.println("<input class=\"w3-button w3-section w3-teal w3-ripple\" type=\"submit\" name=\"submit\" value=\"Submit\"/>");
 					out.println("    <span class=\"w3-yellow\">Test Data Only</span>");
 				} else {
+
 					out.println("    <div class=\"w3-container w3-card-4\">");
-					out.println("      <h3>Authentication</h3>");
-					out.println("      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_USERID
-						+ "\" value=\"" + orgAccess.getAccessName() + "\"/ disabled>");
-					out.println("      <label>User Id</label>");
-					out.println("      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_FACILITYID
-						+ "\" value=\"" + orgAccess.getOrg().getOrganizationName() + "\" disabled/>");
-					out.println("      <label>Facility Id</label>");
-					out.println("      <br/>");
+//					out.println("      <h3>Authentication</h3>");
+//					out.println("      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_USERID
+//						+ "\" value=\"" + orgAccess.getAccessName() + "\"/ disabled>");
+//					out.println("      <label>User Id</label>");
+//					out.println("      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_FACILITYID
+//						+ "\" value=\"" + orgAccess.getOrg().getOrganizationName() + "\" disabled/>");
+//					out.println("      <label>Facility Id</label>");
+//					out.println("      <br/>");
 					out.println("<input class=\"w3-button w3-section w3-teal w3-ripple\" type=\"submit\" name=\"submit\" value=\"Submit\"/>");
 					out.println("    <span class=\"w3-yellow\">Test Data Only</span>");
 

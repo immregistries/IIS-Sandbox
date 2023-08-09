@@ -36,23 +36,23 @@ public class SubscriptionService {
 	@Autowired
 	SubscriptionCanonicalizer subscriptionCanonicalizer;
 
-	public Subscription searchRelatedSubscription(Immunization baseResource, RequestDetails requestDetails) {
-		OrgAccess orgAccess = (OrgAccess) requestDetails.getAttribute("orgAccess");
-		/**
-		 * define materialization of subscription on immunization with
-		 * 	- TAG ?
-		 * 	- Identifier System ?
-		 * 	- $match operations ?
-		 */
-		Bundle bundle = repositoryClientFactory.newGenericClient(orgAccess).search().forResource(Subscription.class)
-			.where(Subscription.STATUS.exactly().code(Enumerations.SubscriptionStatusCodes.ACTIVE.toCode()))
-//			.and(Subscription.IDENTIFIER.hasSystemWithAnyCode(baseResource.getIdentifier()))  TODO change
-//			.and(Subscription.)  TODO change
-			.returnBundle(Bundle.class).execute();
-		Subscription subscription = (Subscription) bundle.getEntryFirstRep().getResource();
-//		subscription.gets
-		return subscription;
-	}
+//	public Subscription searchRelatedSubscription(Immunization baseResource, RequestDetails requestDetails) {
+//		OrgAccess orgAccess = (OrgAccess) requestDetails.getAttribute("orgAccess");
+//		/**
+//		 * define materialization of subscription on immunization with
+//		 * 	- TAG ?
+//		 * 	- Identifier System ?
+//		 * 	- $match operations ?
+//		 */
+//		Bundle bundle = repositoryClientFactory.newGenericClient(orgAccess).search().forResource(Subscription.class)
+//			.where(Subscription.STATUS.exactly().code(Enumerations.SubscriptionStatusCodes.ACTIVE.toCode()))
+////			.and(Subscription.IDENTIFIER.hasSystemWithAnyCode(baseResource.getIdentifier()))  TODO change
+////			.and(Subscription.)  TODO change
+//			.returnBundle(Bundle.class).execute();
+//		Subscription subscription = (Subscription) bundle.getEntryFirstRep().getResource();
+////		subscription.gets
+//		return subscription;
+//	}
 
 
 	public String triggerWithResource(Subscription subscription, List<Pair<String, Bundle.HTTPVerb>> requests) {

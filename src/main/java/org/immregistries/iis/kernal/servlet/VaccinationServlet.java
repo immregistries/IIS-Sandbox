@@ -56,10 +56,11 @@ public class VaccinationServlet extends PatientServlet {
       throws ServletException, IOException {
 
     HttpSession session = req.getSession(true);
-    OrgAccess orgAccess = ServletHelper.getOrgAccess();
+	  OrgMaster orgMaster = ServletHelper.getOrgMaster();
+
 	  IGenericClient fhirClient = repositoryClientFactory.newGenericClient(session);
 
-	 if (orgAccess == null) {
+	 if (orgMaster == null) {
 //      RequestDispatcher dispatcher = req.getRequestDispatcher("home");
 //      dispatcher.forward(req, resp);
 //      return;
@@ -79,7 +80,7 @@ public class VaccinationServlet extends PatientServlet {
 
 		 HomeServlet.doHeader(out, "IIS Sandbox - Vaccinations");
 
-		 out.println("<h2>Facility : " + orgAccess.getOrg().getOrganizationName() + "</h2>");
+		 out.println("<h2>Facility : " + orgMaster.getOrganizationName() + "</h2>");
 		 PatientReported patientReportedSelected = fhirRequester.readPatientReported(vaccinationReported.getPatientReportedId());
 		 {
 			 printPatient(out, patientReportedSelected);

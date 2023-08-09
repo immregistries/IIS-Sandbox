@@ -6,6 +6,7 @@ import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.iis.kernal.logic.*;
 import org.immregistries.iis.kernal.mapping.Interfaces.*;
 import org.immregistries.iis.kernal.model.OrgAccess;
+import org.immregistries.iis.kernal.model.OrgMaster;
 import org.immregistries.iis.kernal.model.ProcessingFlavor;
 import org.immregistries.smm.tester.manager.HL7Reader;
 import org.immregistries.smm.transform.ScenarioManager;
@@ -59,26 +60,22 @@ public class TestMapping extends HttpServlet {
 			String password = "utest";
 			String facilityId = "utest";
 			HttpSession session = req.getSession(true);
-			OrgAccess orgAccess = ServletHelper.getOrgAccess();
+			OrgMaster orgMaster = ServletHelper.getOrgMaster();
 			String ack = "";
 			String[] messages;
 			StringBuilder ackBuilder = new StringBuilder();
 			Session dataSession = PopServlet.getDataSession();
 			try {
-				if (orgAccess == null) {
-					orgAccess = ServletHelper.authenticateOrgAccess(userId, password, facilityId, dataSession);
-				}
-				if (orgAccess == null) {
+				if (orgMaster == null) {
 					resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 					out.println(
 						"Access is not authorized. Facilityid, userid and/or password are not recognized. ");
 				} else {
-					session.setAttribute("orgAccess", orgAccess);
 					messages = message.split( "MSH\\|\\^~\\\\&\\|");
 					for (String msh: messages) {
 						if(!msh.isBlank()){
-							testPatientMapping(orgAccess,msh);
-							ackBuilder.append(handler.process("MSH|^~\\&|" + msh, orgAccess));
+							testPatientMapping(orgMaster,msh);
+							ackBuilder.append(handler.process("MSH|^~\\&|" + msh, orgMaster));
 							ackBuilder.append("\r\n");
 						}
 					}
@@ -141,10 +138,10 @@ public class TestMapping extends HttpServlet {
 		out.close();
 	}
 
-	void  testPatientMapping(OrgAccess orgAccess,String message) throws ProcessingException {
+	void  testPatientMapping(OrgMaster orgMaster,String message) throws ProcessingException {
 		List<ProcessingException> processingExceptionList = new ArrayList<>();
 		HL7Reader hl7Reader = new HL7Reader(message);
-		Set<ProcessingFlavor> processingFlavorSet = orgAccess.getOrg().getProcessingFlavorSet();
+		Set<ProcessingFlavor> processingFlavorSet = orgMaster.getProcessingFlavorSet();
 		CodeMap codeMap = CodeMapManager.getCodeMap();
 
 //		PatientReported patientReported = handler.processPatient(orgAccess,hl7Reader,processingExceptionList, orgAccess.getOrg().getProcessingFlavorSet(),codeMap,true,null,  handler.processManagingOrganization(hl7Reader));
