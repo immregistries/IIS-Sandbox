@@ -14,6 +14,7 @@ import ca.uhn.fhir.rest.server.exceptions.AuthenticationException;
 import ca.uhn.fhir.rest.server.interceptor.LoggingInterceptor;
 import ca.uhn.fhir.rest.server.util.ITestingUiClientFactory;
 import org.immregistries.iis.kernal.model.OrgAccess;
+import org.immregistries.iis.kernal.model.OrgMaster;
 import org.immregistries.iis.kernal.servlet.ServletHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,11 +57,11 @@ public class RepositoryClientFactory extends ApacheRestfulClientFactory implemen
 		}
 	}
 
-	public IGenericClient newGenericClient(OrgAccess orgAccess) {
+	public IGenericClient newGenericClient(OrgMaster orgMaster) {
 		asynchInit();
-		IGenericClient client = newGenericClient(serverBase + "/" + orgAccess.getOrg().getOrganizationName());
+		IGenericClient client = newGenericClient(serverBase + "/" + orgMaster.getOrganizationName());
 		IClientInterceptor authInterceptor;
-		if (orgAccess.getOrg().getOrganizationName().equals(CONNECTATHON_USER) && orgAccess.getAccessName() == null) {
+		if (orgMaster.getOrganizationName().equals(CONNECTATHON_USER) && orgMaster.getOrgAccess().getAccessName() == null) {
 			/**
 			 * SPECIFIC Connection User for Connectathon
 			 * specific auth when logged in with token,
@@ -68,9 +69,9 @@ public class RepositoryClientFactory extends ApacheRestfulClientFactory implemen
 			 *
 			 * see SessionAuthorizationInterceptor
 			 */
-			authInterceptor = new BearerTokenAuthInterceptor(orgAccess.getAccessKey());
+			authInterceptor = new BearerTokenAuthInterceptor(orgMaster.getOrgAccess().getAccessKey());
 		} else {
-			authInterceptor = new BasicAuthInterceptor(orgAccess.getAccessName(), orgAccess.getAccessKey());
+			authInterceptor = new BasicAuthInterceptor(orgMaster.getOrgAccess().getAccessName(), orgMaster.getOrgAccess().getAccessKey());
 		}
 		client.registerInterceptor(authInterceptor);
 		return client;
@@ -82,14 +83,14 @@ public class RepositoryClientFactory extends ApacheRestfulClientFactory implemen
 	 * @param theRequestDetails
 	 * @return
 	 */
-	public IGenericClient newGenericClient(RequestDetails theRequestDetails) {
-		asynchInit();
-		OrgAccess orgAccess = (OrgAccess) theRequestDetails.getAttribute("orgAccess");
-		if (orgAccess == null) {
-			throw new AuthenticationException();
-		}
-		return newGenericClient(orgAccess);
-	}
+//	public IGenericClient newGenericClient(RequestDetails theRequestDetails) {
+//		asynchInit();
+//		OrgAccess orgAccess = (OrgAccess) theRequestDetails.getAttribute("orgAccess");
+//		if (orgAccess == null) {
+//			throw new AuthenticationException();
+//		}
+//		return newGenericClient(orgAccess);
+//	}
 
 	/**
 	 * Used to get a fhir client within Java Servlets

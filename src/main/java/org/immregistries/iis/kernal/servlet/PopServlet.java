@@ -16,6 +16,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -51,7 +53,6 @@ public class PopServlet extends HttpServlet {
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		try {
 			String message = req.getParameter(PARAM_MESSAGE);
-
 			OrgAccess orgAccess = ServletHelper.getOrgAccess();
 			String ack = "";
 			String[] messages;
@@ -59,9 +60,6 @@ public class PopServlet extends HttpServlet {
 			Session dataSession = getDataSession();
 			try {
 				if (orgAccess == null) {
-					RequestDispatcher dispatcher = getServletContext()
-						.getRequestDispatcher("/login?pop");
-					dispatcher.forward(req, resp);
 					resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 					out.println(
 						"Access is not authorized. Facilityid, userid and/or password are not recognized. ");
@@ -106,19 +104,9 @@ public class PopServlet extends HttpServlet {
 		out.close();
 	}
 
-//	@Autowired
-//	ApplicationContext applicationContext;
-
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
 		throws ServletException, IOException {
-//		AutowireCapableBeanFactory autowireCapableBeanFactory = applicationContext.getAutowireCapableBeanFactory();
-//		if (autowireCapableBeanFactory instanceof SingletonBeanRegistry) {
-//			String[] singletonNames = ((SingletonBeanRegistry) autowireCapableBeanFactory).getSingletonNames();
-//			for (String singleton : singletonNames) {
-//				System.out.println(singleton);
-//			}
-//		}
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		OrgAccess orgAccess = ServletHelper.getOrgAccess();
@@ -165,8 +153,6 @@ public class PopServlet extends HttpServlet {
 
 				if (orgAccess == null) {
 					// TODO duplicate login form ?
-					logger.info("SESSION INFO {}", SecurityContextHolder.getContext().getAuthentication());
-
 //					out.println("      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_USERID
 //						+ "\" value=\"" + userId + "\"/>");
 //					out.println("      <label>User Id</label>");

@@ -25,17 +25,17 @@ CREATE TABLE `message_received` (
 CREATE TABLE `org_master` (
   `org_id` int NOT NULL AUTO_INCREMENT,
   `organization_name` varchar(255) NOT NULL,
-  PRIMARY KEY (`org_id`)
+  `org_access_id` int NOT NULL,
+  PRIMARY KEY (`org_id`),
+  CONSTRAINT `org_master_ibfk_1` FOREIGN KEY (`org_access_id`) REFERENCES `Org_access` (`org_access_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 CREATE TABLE `org_access` (
   `org_access_id` int NOT NULL AUTO_INCREMENT,
-  `org_id` int NOT NULL,
   `access_name` varchar(30) NOT NULL,
   `access_key` varchar(250) NOT NULL,
   PRIMARY KEY (`org_access_id`),
   KEY `org_id` (`org_id`),
-  CONSTRAINT `org_access_ibfk_1` FOREIGN KEY (`org_id`) REFERENCES `Org_Master` (`org_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 

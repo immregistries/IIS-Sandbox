@@ -1,6 +1,7 @@
 package org.immregistries.iis.kernal.servlet;
 
 import org.immregistries.iis.kernal.model.OrgAccess;
+import org.immregistries.iis.kernal.model.OrgMaster;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
@@ -45,13 +46,10 @@ public class VXUDownloadFormServlet extends HttpServlet {
 
     resp.setContentType("text/html");
     PrintWriter out = new PrintWriter(resp.getOutputStream());
-    OrgAccess orgAccess = ServletHelper.getOrgAccess();
-   if (orgAccess == null) {
-//      RequestDispatcher dispatcher = req.getRequestDispatcher("home");
-//      dispatcher.forward(req, resp);
-//      return;
-		 throw new AuthenticationCredentialsNotFoundException("");
-    }
+	  OrgMaster orgMaster = ServletHelper.getOrgMaster();
+	  if (orgMaster == null) {
+		  throw new AuthenticationCredentialsNotFoundException("");
+	  }
 
     try {
       String action = req.getParameter(PARAM_ACTION);
@@ -61,7 +59,7 @@ public class VXUDownloadFormServlet extends HttpServlet {
       VXUDownloadGenerator generator =
           (VXUDownloadGenerator) session.getAttribute(CACHED_GENERATOR);
       if (generator == null || action == null || action.equals(ACTION_GENERATE)) {
-        generator = new VXUDownloadGenerator(req, orgAccess.getOrgAccessId());
+        generator = new VXUDownloadGenerator(req, orgMaster);
 		  beanFactory.autowireBean(generator);
         session.setAttribute(CACHED_GENERATOR, generator);
       }

@@ -7,6 +7,7 @@ import org.hl7.fhir.r5.model.Immunization;
 import org.hl7.fhir.r5.model.Patient;
 import org.immregistries.iis.kernal.logic.IncomingMessageHandler;
 import org.immregistries.iis.kernal.model.OrgAccess;
+import org.immregistries.iis.kernal.model.OrgMaster;
 import org.immregistries.iis.kernal.model.VaccinationReported;
 import org.immregistries.iis.kernal.InternalClient.FhirRequesterR5;
 import org.immregistries.iis.kernal.InternalClient.RepositoryClientFactory;
@@ -93,13 +94,13 @@ public class VXUDownloadGenerator extends Thread {
   private boolean running = false;
   private String runningMessage = "Not Started";
   private Session dataSession;
-  private OrgAccess orgAccess;
+  private OrgMaster orgMaster;
   private File file;
 
-  public VXUDownloadGenerator(HttpServletRequest req, int orgAccessId) {
+  public VXUDownloadGenerator(HttpServletRequest req, OrgMaster orgMaster) {
     runningMessage = "Initializing";
     this.dataSession = PopServlet.getDataSession();
-    this.orgAccess = dataSession.get(OrgAccess.class, orgAccessId);
+	 this.orgMaster =  orgMaster;
     sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
     messageError = null;
     dateStartString = req.getParameter(PARAM_DATE_START);
@@ -166,12 +167,12 @@ public class VXUDownloadGenerator extends Thread {
       }
     }
     runningMessage = "Looking for vaccinations";
-	  IGenericClient fhirClient = repositoryClientFactory.newGenericClient(orgAccess);
+	  IGenericClient fhirClient = repositoryClientFactory.newGenericClient(orgMaster);
 
 	  List<VaccinationReported> vaccinationReportedList = fhirRequests.searchVaccinationReportedList(
               Immunization.DATE.after().day(dateStart),
 		  Immunization.DATE.before().day(dateEnd),
-		  Immunization.PATIENT.hasChainedProperty(Patient.ORGANIZATION.hasId(String.valueOf(orgAccess.getOrg().getOrgId())))); // TODO test
+		  Immunization.PATIENT.hasChainedProperty(Patient.ORGANIZATION.hasId(String.valueOf(orgMaster.getOrgId())))); // TODO test
 	  Date finalDateStart = dateStart;
 	  Date finalDateEnd = dateEnd;
 	  vaccinationReportedList = vaccinationReportedList.stream().filter(
@@ -182,7 +183,7 @@ public class VXUDownloadGenerator extends Thread {
 //              + "and patientReported.orgReported = :orgReported");
 //      query.setParameter("dateStart", dateStart);
 //      query.setParameter("dateEnd", dateEnd);
-//      query.setParameter("orgReported", orgAccess.getOrg());
+//      query.setParameter("orgReported", orgMaster);
 //      vaccinationReportedList = query.list();
 //    }
 
@@ -206,7 +207,7 @@ public class VXUDownloadGenerator extends Thread {
             // not reporting missed appointments anymore
             continue;
           }
-          out.print(incomingMessageHandler.buildVxu(vaccinationReported, orgAccess));
+          out.print(incomingMessageHandler.buildVxu(vaccinationReported, orgMaster));
         }
       }
       out.close();

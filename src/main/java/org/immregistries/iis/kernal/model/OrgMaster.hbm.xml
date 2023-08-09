@@ -6,5 +6,6 @@
       <generator class="native"/>
     </id>
     <property name="organizationName" column="organization_name" type="string"/>
+    <many-to-one name="orgAccess" column="org_access_id" class="OrgAccess"/>
   </class>
 </hibernate-mapping>

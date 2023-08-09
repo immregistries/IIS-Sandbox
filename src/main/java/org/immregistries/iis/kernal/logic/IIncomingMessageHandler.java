@@ -49,7 +49,7 @@ public interface IIncomingMessageHandler<Organization extends IBaseResource> {
 								  OrgAccess orgAccess, List<PatientReported> patientReportedPossibleList,
 								  List<ProcessingException> processingExceptionList);
 
-	public String buildVxu(VaccinationReported vaccinationReported, OrgAccess orgAccess);
+	public String buildVxu(VaccinationReported vaccinationReported, OrgMaster orgMaster);
 
 	public List<VaccinationMaster> getVaccinationMasterList(PatientMaster patient);
 

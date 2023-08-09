@@ -99,7 +99,14 @@ public class HomeServlet extends HttpServlet {
 					out.println("    </ul>");
 
 				} else if (show.equals(SHOW_FACILITIES)) {
-					OrgAccess orgAccess = ServletHelper.getOrgAccess();
+					OrgAccess orgAccess;
+					OrgMaster orgMaster = ServletHelper.getOrgMaster();
+					if (orgMaster == null) {
+						orgAccess = ServletHelper.getOrgAccess();
+					} else {
+						orgAccess = orgMaster.getOrgAccess();
+					}
+
 					if (orgAccess != null) {
 						out.println("    <h2>Facilities</h2>");
 						Session dataSession = PopServlet.getDataSession();
@@ -109,19 +116,19 @@ public class HomeServlet extends HttpServlet {
 							Query query = dataSession.createQuery("from OrgMaster order by organizationName");
 							List<OrgMaster> orgMasterList = query.list();
 							out.println("    <ul class=\"w3-ul w3-hoverable\">");
-							for (OrgMaster orgMaster : orgMasterList) {
-								if (orgAccessMap == null || !orgAccessMap.containsKey(orgMaster.getOrgId())) {
-									out.println("      <li>" + orgMaster.getOrganizationName() + "</li>");
+							for (OrgMaster orgMasterMember : orgMasterList) {
+								if (orgAccessMap == null || !orgAccessMap.containsKey(orgMasterMember.getOrgId())) {
+									out.println("      <li>" + orgMasterMember.getOrganizationName() + "</li>");
 								} else {
-									if (orgAccess.getOrg().equals(orgMaster)) {
+									if (orgMasterMember.equals(orgMaster)) {
 										out.println(
-											"      <li>" + orgMaster.getOrganizationName() + " (selected)</li>");
+											"      <li>" + orgMasterMember.getOrganizationName() + " (selected)</li>");
 									} else {
 										String link = "message?" + MessageServlet.PARAM_ACTION + "="
 											+ MessageServlet.ACTION_SWITCH + "&" + MessageServlet.PARAM_ORG_ID + "="
-											+ orgMaster.getOrgId();
+											+ orgMasterMember.getOrgId();
 										out.println("      <li> <a href=\"" + link + "\">"
-											+ orgMaster.getOrganizationName() + "</a></li>");
+											+ orgMasterMember.getOrganizationName() + "</a></li>");
 									}
 								}
 							}

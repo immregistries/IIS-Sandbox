@@ -11,10 +11,14 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.security.oauth2.client.endpoint.OAuth2AccessTokenResponseClient;
+import org.springframework.security.oauth2.client.endpoint.OAuth2AuthorizationCodeGrantRequest;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
 import java.util.Arrays;
 import java.util.List;
@@ -37,10 +41,9 @@ public class ServerSecurityConfig {
 
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http, RejectedRequestRedirector rejectedRequestRedirector
-														, AuthenticationProvider customAuthenticationProvider
+														, OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler
 	) throws Exception {
 		http
-//			.authenticationProvider(customAuthenticationProvider)
 			.authorizeRequests()
 				.antMatchers(HttpMethod.GET,"/","/home","/pop","/SubscriptionTopic","/img/**").permitAll()
 				.antMatchers("/loginForm","/fhir/**","/oauth2/**", "/login","/soap").permitAll()
@@ -56,6 +59,7 @@ public class ServerSecurityConfig {
 			.and()
 				.oauth2Login()
 				.defaultSuccessUrl("/pop")
+//				.successHandler( oAuth2AuthenticationSuccessHandler)
 			.and()
 			.logout()
 				.logoutUrl("/logout")
@@ -80,6 +84,10 @@ public class ServerSecurityConfig {
 //			.collect(Collectors.toList());
 //
 //		return new InMemoryClientRegistrationRepository(registrations);
+//	}
+
+//	public OAuth2AccessTokenResponseClient<OAuth2AuthorizationCodeGrantRequest> accessTokenResponseClient() {
+//
 //	}
 
 }

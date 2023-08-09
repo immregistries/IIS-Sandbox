@@ -9,6 +9,7 @@ public class OrgMaster implements Serializable {
    */
   private static final long serialVersionUID = 1L;
   private int orgId = 0;
+  private OrgAccess orgAccess = null;
   private String organizationName = "";
   private Set<ProcessingFlavor> processingFlavorSet = null;
 
@@ -49,4 +50,11 @@ public class OrgMaster implements Serializable {
     return processingFlavorSet;
   }
 
+	public OrgAccess getOrgAccess() {
+		return orgAccess;
+	}
+
+	public void setOrgAccess(OrgAccess orgAccess) {
+		this.orgAccess = orgAccess;
+	}
 }

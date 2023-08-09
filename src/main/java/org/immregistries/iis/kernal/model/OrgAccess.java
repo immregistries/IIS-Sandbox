@@ -16,13 +16,12 @@ import java.util.Map;
 /**
  * TODO IMPRove integration with spring security, especially grantedAuthority
  */
-public class OrgAccess implements Serializable, Authentication, OAuth2User
+public class OrgAccess implements Serializable, Authentication
 {
 
   private static final long serialVersionUID = 1L;
 
   private int orgAccessId = 0;
-  private OrgMaster org = null;
   private String accessName = "";
   private String accessKey = "";
 
@@ -33,14 +32,6 @@ public class OrgAccess implements Serializable, Authentication, OAuth2User
 
   public void setOrgAccessId(int orgAccessId) {
     this.orgAccessId = orgAccessId;
-  }
-
-  public OrgMaster getOrg() {
-    return org;
-  }
-
-  public void setOrg(OrgMaster org) {
-    this.org = org;
   }
 
   public String getAccessName() {
@@ -61,16 +52,6 @@ public class OrgAccess implements Serializable, Authentication, OAuth2User
 
 
 	@Override
-	public <A> A getAttribute(String name) {
-		return OAuth2User.super.getAttribute(name);
-	}
-
-	@Override
-	public Map<String, Object> getAttributes() {
-		return null;
-	}
-
-	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		return new ArrayList<>(0);
 	}
@@ -82,12 +63,12 @@ public class OrgAccess implements Serializable, Authentication, OAuth2User
 
 	@Override
 	public Object getDetails() {
-		return org.getOrganizationName();
+		return this.getAccessName();
 	}
 
 	@Override
 	public Object getPrincipal() {
-		return org;
+		return this;
 	}
 
 	@Override

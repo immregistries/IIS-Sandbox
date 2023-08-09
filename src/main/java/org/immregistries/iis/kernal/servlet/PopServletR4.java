@@ -59,7 +59,7 @@ public class PopServletR4 extends HttpServlet {
 			try {
 				if (orgAccess == null) {
 					RequestDispatcher dispatcher = getServletContext()
-						.getRequestDispatcher("/login?pop");
+						.getRequestDispatcher("/loginForm");
 					dispatcher.forward(req, resp);
 					resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 					out.println(

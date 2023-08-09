@@ -65,11 +65,8 @@ public class LocationServlet extends HttpServlet {
       throws ServletException, IOException {
 
     HttpSession session = req.getSession(true);
-    OrgAccess orgAccess = ServletHelper.getOrgAccess();
-   if (orgAccess == null) {
-//      RequestDispatcher dispatcher = req.getRequestDispatcher("home");
-//      dispatcher.forward(req, resp);
-//      return;
+    OrgMaster orgMaster = ServletHelper.getOrgMaster();
+	 if (orgMaster == null) {
 		 throw new AuthenticationCredentialsNotFoundException("");
     }
 	  IGenericClient fhirClient = repositoryClientFactory.newGenericClient(session);
@@ -92,7 +89,7 @@ public class LocationServlet extends HttpServlet {
           if (StringUtils.isNotEmpty(orgFacilityCode)) {
             orgLocationSelected = new OrgLocation();
             orgLocationSelected.setOrgFacilityCode(orgFacilityCode);
-            orgLocationSelected.setOrgMaster(orgAccess.getOrg());
+            orgLocationSelected.setOrgMaster(orgMaster);
 				orgLocationSelected = fhirRequests.saveOrgLocation(orgLocationSelected);
 //				Location location = LocationMapper.fhirLocation(orgLocationSelected);
 //				 try {
@@ -133,7 +130,7 @@ public class LocationServlet extends HttpServlet {
 
       HomeServlet.doHeader(out, "IIS Sandbox");
 
-      out.println("    <h2>Facility: " + orgAccess.getOrg().getOrganizationName() + "</h2>");
+      out.println("    <h2>Facility: " + orgMaster.getOrganizationName() + "</h2>");
       if (orgLocationSelected == null) {
         out.println("  <div class=\"w3-container\">");
         {
