@@ -82,7 +82,7 @@ public class PopServletR4 extends HttpServlet {
 							groupPatientIds) {
 							group.addMember().setEntity(new Reference().setReference("Patient/" + id));
 						}
-						repositoryClientFactory.newGenericClient(orgMaster).create().resource(group).execute();
+						repositoryClientFactory.newGenericClient(req).create().resource(group).execute();
 					}
 				}
 			} finally {

@@ -5,6 +5,7 @@ import ca.uhn.fhir.rest.client.api.IGenericClient;
 import org.hl7.fhir.r5.model.*;
 import org.immregistries.iis.kernal.logic.ImmunizationRecommendationService;
 import org.immregistries.iis.kernal.model.OrgAccess;
+import org.immregistries.iis.kernal.model.OrgMaster;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 
@@ -43,12 +44,11 @@ public class RecommendationServlet extends PatientServlet {
 		if (req.getParameter("_method") != null && req.getParameter("_method").equals("put")) {
 			doPut(req,resp);
 		} else {
-			HttpSession session = req.getSession(true);
-			OrgAccess orgAccess = ServletHelper.getOrgAccess();
-			if (orgAccess == null) {
+			OrgMaster orgMaster = ServletHelper.getOrgMaster();
+			if (orgMaster == null) {
 				throw new AuthenticationCredentialsNotFoundException("");
 			}
-			IGenericClient fhirClient = repositoryClientFactory.newGenericClient(session);
+			IGenericClient fhirClient = repositoryClientFactory.newGenericClient(req);
 			Patient patient = getPatientFromParameter(req,fhirClient);
 
 			if (patient != null) {
@@ -59,7 +59,7 @@ public class RecommendationServlet extends PatientServlet {
 					recommendation = immunizationRecommendationService.addGeneratedRecommendation(recommendation);
 					fhirClient.update().resource(recommendation).withId(recommendation.getId()).execute();
 				} else {
-					fhirClient.create().resource(immunizationRecommendationService.generate(orgAccess, patient)).execute();
+					fhirClient.create().resource(immunizationRecommendationService.generate(orgMaster, patient)).execute();
 				}
 			}
 			doGet(req, resp);
@@ -73,21 +73,18 @@ public class RecommendationServlet extends PatientServlet {
 	 */
 	protected void doPut(HttpServletRequest req, HttpServletResponse resp)
 		throws ServletException, IOException {
-		HttpSession session = req.getSession(true);
-		OrgAccess orgAccess = ServletHelper.getOrgAccess();
-		if (orgAccess == null) {
+		OrgMaster orgMaster = ServletHelper.getOrgMaster();
+		if (orgMaster == null) {
 			throw new AuthenticationCredentialsNotFoundException("");
 		}
-
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		try {
 			IParser parser = repositoryClientFactory.getFhirContext()
 				.newJsonParser().setPrettyPrint(true).setSummaryMode(false).setSuppressNarratives(true);
 			if (req.getParameter(PARAM_RECOMMENDATION_RESOURCE) != null) {
-				IGenericClient fhirClient = repositoryClientFactory.newGenericClient(session);
+				IGenericClient fhirClient = repositoryClientFactory.newGenericClient(req);
 
 				ImmunizationRecommendation newReco = parser.parseResource(ImmunizationRecommendation.class, req.getParameter(PARAM_RECOMMENDATION_RESOURCE));
-				System.out.println();
 				ImmunizationRecommendation old = getRecommendation(req, fhirClient);
 				newReco.setId(old.getIdElement().getIdPart());
 				fhirClient.update().resource(newReco).execute();
@@ -105,9 +102,8 @@ public class RecommendationServlet extends PatientServlet {
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
 		throws ServletException, IOException {
-		HttpSession session = req.getSession(true);
-		OrgAccess orgAccess = ServletHelper.getOrgAccess();
-		if (orgAccess == null) {
+		OrgMaster orgMaster = ServletHelper.getOrgMaster();
+		if (orgMaster == null) {
 			throw new AuthenticationCredentialsNotFoundException("");
 		}
 
@@ -116,7 +112,7 @@ public class RecommendationServlet extends PatientServlet {
 		HomeServlet.doHeader(out, "Recommendations");
 
 		try {
-			IGenericClient fhirClient = repositoryClientFactory.newGenericClient(session);
+			IGenericClient fhirClient = repositoryClientFactory.newGenericClient(req);
 
 			ImmunizationRecommendation recommendation = getRecommendation(req, fhirClient);
 			Patient patient = null;

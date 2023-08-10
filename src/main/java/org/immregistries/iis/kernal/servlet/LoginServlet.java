@@ -52,24 +52,22 @@ public class LoginServlet extends HttpServlet {
 						Integer.parseInt(req.getParameter(PARAM_ORG_ID)));
 					facilityId = orgMaster.getOrganizationName();
 				}
-				out.println("    <div class=\"w3-container w3-card-4\">");
-				out.println("    <h2>Login</h2>");
-				out.println(
-					"    <form method=\"POST\" action=\"login\" class=\"w3-container w3-card-4\">");
-				out.println("      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_USERID
-					+ "\" value=\"" + userId + "\" required/>");
-				out.println("          <label>User Id</label>");
-				out.println("          <input class=\"w3-input\" type=\"password\" name=\"" + PARAM_PASSWORD
-					+ "\" value=\"\"/>");
-				out.println("          <label>Password</label>");
-				out.println("          <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_FACILITYID
-					+ "\" value=\"" + facilityId + "\"/>");
-				out.println("          <label>Facility Id</label><br/>");
-				out.println(
-					"          <input class=\"w3-button w3-section w3-teal w3-ripple\" type=\"submit\" name=\""
-						+ PARAM_ACTION + "\" value=\"" + ACTION_LOGIN + "\"/>");
-				out.println("    </form>");
-				out.println("    </div>");
+				out.println("<div class=\"w3-container w3-card-4\">");
+				out.println("	<h2>Login</h2>");
+				out.println("	<form method=\"POST\" action=\"login\" class=\"w3-container w3-card-4 w3-half\">");
+				out.println("		<input class=\"w3-input\" type=\"text\" name=\"" + PARAM_USERID + "\" value=\"" + userId + "\" required/>");
+				out.println("		<label>User Id</label>");
+				out.println("		<input class=\"w3-input\" type=\"password\" name=\"" + PARAM_PASSWORD + "\" value=\"\"/>");
+				out.println("		<label>Password</label>");
+				out.println("		<input class=\"w3-input\" type=\"text\" name=\"" + PARAM_FACILITYID + "\" value=\"" + facilityId + "\"/>");
+				out.println("		<label>Facility Id</label><br/>");
+				out.println("		<input class=\"w3-button w3-section w3-teal w3-ripple\" type=\"submit\" name=\"" + PARAM_ACTION + "\" value=\"" + ACTION_LOGIN + "\"/>");
+				out.println("	</form>");
+				out.println("	<div class=\"w3-container w3-card-4 w3-half\">");
+				out.println("		<h3>OAuth2</h3>");
+				out.println("		<a href=\"oauth2/authorization/github\" class=\"w3-button w3-section w3-teal w3-ripple\">GitHub</a>\n");
+				out.println("	</div>");
+				out.println("</div>");
 			}
 		} catch (Exception e) {
 			System.err.println("Unable to render page: " + e.getMessage());

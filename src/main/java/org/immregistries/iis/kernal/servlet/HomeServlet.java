@@ -16,6 +16,9 @@ import org.immregistries.iis.kernal.SoftwareVersion;
 import org.immregistries.iis.kernal.model.OrgAccess;
 import org.immregistries.iis.kernal.model.OrgMaster;
 import org.immregistries.iis.kernal.model.ProcessingFlavor;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 //@SuppressWarnings("serial")
 //@Component
@@ -35,7 +38,7 @@ public class HomeServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
 		throws ServletException, IOException {
 
-		HttpSession session = req.getSession(true);
+		HttpSession session = req.getSession(false);
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		try {
@@ -107,7 +110,7 @@ public class HomeServlet extends HttpServlet {
 						orgAccess = orgMaster.getOrgAccess();
 					}
 
-					if (orgAccess != null) {
+					if (orgAccess != null && session != null) {
 						out.println("    <h2>Facilities</h2>");
 						Session dataSession = PopServlet.getDataSession();
 						Map<Integer, OrgAccess> orgAccessMap =
@@ -163,8 +166,8 @@ public class HomeServlet extends HttpServlet {
 		out.println("    <header class=\"w3-container w3-light-grey\">");
 		out.println("      <div class=\"w3-bar w3-light-grey\">");
 		out.println("<a href=\"home\" class=\"w3-bar-item w3-button w3-green\">IIS Sandbox</a>");
-		OrgAccess orgAccess = ServletHelper.getOrgAccess();
-		if (orgAccess != null) {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		if (authentication.isAuthenticated() && !(authentication instanceof AnonymousAuthenticationToken)) {
 			String link = "home?" + PARAM_SHOW + "=" + SHOW_FACILITIES;
 			out.println("<a href=\"" + link + "\" class=\"w3-bar-item w3-button\">Facilities</a>");
 		}
@@ -174,7 +177,7 @@ public class HomeServlet extends HttpServlet {
 		out.println("<a href=\"location\" class=\"w3-bar-item w3-button\">Locations</a>");
 		out.println("<a href=\"subscription\" class=\"w3-bar-item w3-button\">Subscriptions</a>");
 		out.println("<a href=\"soap\" class=\"w3-bar-item w3-button\">CDC WSDL</a>");
-		if (orgAccess != null) {
+		if (authentication.isAuthenticated() && !(authentication instanceof AnonymousAuthenticationToken)) {
 			out.println("<a class='w3-bar-item w3-button w3-right' href=\"logout\">Logout</a>");
 		} else {
 			out.println("<a href=\"oauth2/authorization/github\" class=\"w3-bar-item w3-button w3-right\">Login GITHUB</a>\n");

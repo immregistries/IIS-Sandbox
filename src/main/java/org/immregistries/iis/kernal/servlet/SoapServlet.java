@@ -106,8 +106,8 @@ public class SoapServlet extends HttpServlet {
             if("NPE".equals(userId) && "NPE".equals(password)) {
                 throw new UnknownFault("Unknown Fault");
             }
-            OrgAccess orgAccess = ServletHelper.authenticateOrgAccess(userId, password, facilityId, dataSession);
-            if (orgAccess == null) {
+            OrgMaster orgMaster = ServletHelper.authenticateOrgMaster(userId, password, facilityId, dataSession);
+            if (orgMaster == null) {
               throw new SecurityFault("Username/password combination is unrecognized");
             }
           } finally {

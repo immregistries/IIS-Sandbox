@@ -33,20 +33,18 @@ public class EventServlet extends PopServlet {
       String password = req.getParameter(PARAM_PASSWORD);
       String facilityId = req.getParameter(PARAM_FACILITYID);
       HttpSession session = req.getSession(true);
-      OrgAccess orgAccess = ServletHelper.getOrgAccess();
       OrgMaster orgMaster = ServletHelper.getOrgMaster();
       String ack = "";
       Session dataSession = getDataSession();
       try {
-        if (orgAccess == null) {
-          orgAccess = ServletHelper.authenticateOrgAccess(userId, password, facilityId, dataSession);
+        if (orgMaster == null) {
+          orgMaster = ServletHelper.authenticateOrgMaster(userId, password, facilityId, dataSession);
         }
-        if (orgAccess == null) {
+        if (orgMaster == null) {
           resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
           out.println(
               "Access is not authorized. Facilityid, userid and/or password are not recognized. ");
         } else {
-//          IncomingEventHandler incomingEventHandler = new IncomingEventHandler(dataSession);
           ack = incomingEventHandler.process(req, orgMaster);
           session.setAttribute(SESSION_ORGMASTER, orgMaster);
         }

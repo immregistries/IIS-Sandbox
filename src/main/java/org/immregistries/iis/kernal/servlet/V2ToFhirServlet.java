@@ -12,20 +12,18 @@ import org.hl7.fhir.r5.model.Patient.ContactComponent;
 import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
+import org.immregistries.iis.kernal.InternalClient.RepositoryClientFactory;
 import org.immregistries.iis.kernal.logic.CodeMapManager;
 import org.immregistries.iis.kernal.logic.IncomingMessageHandler;
 import org.immregistries.iis.kernal.mapping.Interfaces.ImmunizationMapper;
 import org.immregistries.iis.kernal.model.*;
-import org.immregistries.iis.kernal.InternalClient.RepositoryClientFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
-
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Date;
@@ -36,6 +34,7 @@ import java.util.List;
  */
 @SuppressWarnings("serial")
 public class V2ToFhirServlet extends HttpServlet {
+	public static final String PARAM_PATIENT_REPORTED_ID = "patientReportedId";
 	@Autowired
 	RepositoryClientFactory repositoryClientFactory;
 	@Autowired
@@ -43,269 +42,258 @@ public class V2ToFhirServlet extends HttpServlet {
 	@Autowired
 	IncomingMessageHandler incomingMessageHandler;
 
-  public static final String PARAM_PATIENT_REPORTED_ID = "patientReportedId";
+	@Override
+	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+		throws ServletException, IOException {
+		doGet(req, resp);
+	}
+
+	@Override
+	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+		throws ServletException, IOException {
+		OrgMaster orgMaster = ServletHelper.getOrgMaster();
+		if (orgMaster == null) {
+			throw new AuthenticationCredentialsNotFoundException("");
+		}
+
+		resp.setContentType("text/html");
+		PrintWriter out = new PrintWriter(resp.getOutputStream());
+		Session dataSession = PopServlet.getDataSession();
+		HomeServlet.doHeader(out, "IIS Sandbox");
+		try {
+			PatientReported pr = (PatientReported) dataSession.get(PatientReported.class,
+				Integer.parseInt(req.getParameter(PARAM_PATIENT_REPORTED_ID)));
 
 
-  @Override
-  protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-      throws ServletException, IOException {
-    doGet(req, resp);
-  }
+			try {
+				CodeMap codeMap = CodeMapManager.getCodeMap();
+				FhirContext ctx = repositoryClientFactory.getFhirContext();
+				IParser parser = ctx.newJsonParser();
+				parser.setPrettyPrint(true);
 
-  @Override
-  protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-      throws ServletException, IOException {
+				Bundle bundle = new Bundle();
 
-    HttpSession session = req.getSession(true);
-    OrgAccess orgAccess = ServletHelper.getOrgAccess();
-	  IGenericClient fhirClient = repositoryClientFactory.newGenericClient(session);
-   if (orgAccess == null) {
-//      RequestDispatcher dispatcher = req.getRequestDispatcher("home");
-//      dispatcher.forward(req, resp);
-//      return;
-		 throw new AuthenticationCredentialsNotFoundException("");
-    }
+				Patient p = new Patient();
+				createPatientResource(pr, p);
+				bundle.addEntry().setResource(p);
+				List<VaccinationMaster> vaccinationMasterList =
+					incomingMessageHandler.getVaccinationMasterList(pr.getPatient());
 
-    resp.setContentType("text/html");
-    PrintWriter out = new PrintWriter(resp.getOutputStream());
-    Session dataSession = PopServlet.getDataSession();
-    HomeServlet.doHeader(out, "IIS Sandbox");
-    try {
-      PatientReported pr = (PatientReported) dataSession.get(PatientReported.class,
-          Integer.parseInt(req.getParameter(PARAM_PATIENT_REPORTED_ID)));
-
-
-      try {
-        CodeMap codeMap = CodeMapManager.getCodeMap();
-        FhirContext ctx = repositoryClientFactory.getFhirContext();
-        IParser parser = ctx.newJsonParser();
-        parser.setPrettyPrint(true);
-
-        Bundle bundle = new Bundle();
-
-        Patient p = new Patient();
-        createPatientResource(pr, p);
-        bundle.addEntry().setResource(p);
-        List<VaccinationMaster> vaccinationMasterList =
-            incomingMessageHandler.getVaccinationMasterList(pr.getPatient());
-
-        for (VaccinationMaster vaccination : vaccinationMasterList) {
-          Immunization immunization = new Immunization();
-          Code cvxCode = codeMap.getCodeForCodeset(CodesetType.VACCINATION_CVX_CODE,
-              vaccination.getVaccineCvxCode());
-          if (cvxCode == null) {
-            continue;
-          }
-          VaccinationReported vaccinationReported = vaccination.getVaccinationReported();
-          if ("D".equals(vaccinationReported.getActionCode())) {
-            continue;
-          }
-          createImmunizationResource(vaccination, immunization, cvxCode, codeMap);
-          bundle.addEntry().setResource(immunization);
-        }
+				for (VaccinationMaster vaccination : vaccinationMasterList) {
+					Immunization immunization = new Immunization();
+					Code cvxCode = codeMap.getCodeForCodeset(CodesetType.VACCINATION_CVX_CODE,
+						vaccination.getVaccineCvxCode());
+					if (cvxCode == null) {
+						continue;
+					}
+					VaccinationReported vaccinationReported = vaccination.getVaccinationReported();
+					if ("D".equals(vaccinationReported.getActionCode())) {
+						continue;
+					}
+					createImmunizationResource(vaccination, immunization, cvxCode, codeMap);
+					bundle.addEntry().setResource(immunization);
+				}
 
 
+				String serialized = parser.encodeResourceToString(bundle);
+				out.println("<h3>JSON</h3>");
+				out.println("<textarea cols=\"100\" rows=\"30\">" + serialized + "</textarea>");
 
-        String serialized = parser.encodeResourceToString(bundle);
-        out.println("<h3>JSON</h3>");
-        out.println("<textarea cols=\"100\" rows=\"30\">" + serialized + "</textarea>");
-
-      } catch (Exception e) {
-        out.println("<h3>Exception Thrown</h3>");
-        out.println("<pre>");
-        e.printStackTrace();
-        out.println("</pre>");
-      }
-
+			} catch (Exception e) {
+				out.println("<h3>Exception Thrown</h3>");
+				out.println("<pre>");
+				e.printStackTrace();
+				out.println("</pre>");
+			}
 
 
-    } catch (Exception e) {
-      System.err.println("Unable to render page: " + e.getMessage());
-      e.printStackTrace(System.err);
-    } finally {
-      dataSession.close();
-    }
-    HomeServlet.doFooter(out);
-    out.flush();
-    out.close();
-  }
+		} catch (Exception e) {
+			System.err.println("Unable to render page: " + e.getMessage());
+			e.printStackTrace(System.err);
+		} finally {
+			dataSession.close();
+		}
+		HomeServlet.doFooter(out);
+		out.flush();
+		out.close();
+	}
 
-  public CodeableConcept createCodeableConcept(String value, CodesetType codesetType,
-      String tableName, CodeMap codeMap) {
-    CodeableConcept codeableConcept = null;
-    if (value != null) {
-      Code code = codeMap.getCodeForCodeset(codesetType, value);
-      if (code != null) {
-        if (tableName != null) {
-          codeableConcept = new CodeableConcept();
-          Coding coding = codeableConcept.addCoding();
-          coding.setCode(code.getValue());
-          coding.setDisplay(code.getLabel());
-          coding.setSystem(tableName);
-        }
-      }
-    }
-    return codeableConcept;
-  }
+	public CodeableConcept createCodeableConcept(String value, CodesetType codesetType,
+																String tableName, CodeMap codeMap) {
+		CodeableConcept codeableConcept = null;
+		if (value != null) {
+			Code code = codeMap.getCodeForCodeset(codesetType, value);
+			if (code != null) {
+				if (tableName != null) {
+					codeableConcept = new CodeableConcept();
+					Coding coding = codeableConcept.addCoding();
+					coding.setCode(code.getValue());
+					coding.setDisplay(code.getLabel());
+					coding.setSystem(tableName);
+				}
+			}
+		}
+		return codeableConcept;
+	}
 
-  private void createImmunizationResource(VaccinationMaster vaccination, Immunization immunization,
-      Code cvxCode, CodeMap codeMap) {
-    VaccinationReported vaccinationReported = vaccination.getVaccinationReported();
-	 immunization = (Immunization) immunizationMapper.getFhirResource(vaccinationReported); // TODO Maybe remove this or remove the rest
+	private void createImmunizationResource(VaccinationMaster vaccination, Immunization immunization,
+														 Code cvxCode, CodeMap codeMap) {
+		VaccinationReported vaccinationReported = vaccination.getVaccinationReported();
+		immunization = (Immunization) immunizationMapper.getFhirResource(vaccinationReported); // TODO Maybe remove this or remove the rest
 
-    {
-      DateTimeType occurance = new DateTimeType(vaccinationReported.getAdministeredDate());
-      immunization.setOccurrence(occurance);
-    }
-    {
-      CodeableConcept vaccineCode = new CodeableConcept();
-      Coding cvxCoding = vaccineCode.addCoding();
-      cvxCoding.setCode(cvxCode.getValue());
-      cvxCoding.setDisplay(cvxCode.getLabel());
-      cvxCoding.setSystem("CVX");
-      immunization.setVaccineCode(vaccineCode);
-    }
-    if (StringUtils.isNotEmpty(vaccinationReported.getVaccineNdcCode())) {
-      CodeableConcept ndcCoding = createCodeableConcept(vaccinationReported.getVaccineNdcCode(),
-          CodesetType.VACCINATION_NDC_CODE, "NDC", codeMap); //TODO use CodeSet type in mapping ?
-      immunization.setVaccineCode(ndcCoding);
-    }
-    {
-      String administeredAmount = vaccinationReported.getAdministeredAmount();
-      if (StringUtils.isNotEmpty(administeredAmount)) {
-        SimpleQuantity doseQuantity = new SimpleQuantity();
-        try {
-          double d = Double.parseDouble(administeredAmount);
-          doseQuantity.setValue(d);
-          immunization.setDoseQuantity(doseQuantity);
-        } catch (NumberFormatException nfe) {
-          //ignore
-        }
-      }
-    }
+		{
+			DateTimeType occurance = new DateTimeType(vaccinationReported.getAdministeredDate());
+			immunization.setOccurrence(occurance);
+		}
+		{
+			CodeableConcept vaccineCode = new CodeableConcept();
+			Coding cvxCoding = vaccineCode.addCoding();
+			cvxCoding.setCode(cvxCode.getValue());
+			cvxCoding.setDisplay(cvxCode.getLabel());
+			cvxCoding.setSystem("CVX");
+			immunization.setVaccineCode(vaccineCode);
+		}
+		if (StringUtils.isNotEmpty(vaccinationReported.getVaccineNdcCode())) {
+			CodeableConcept ndcCoding = createCodeableConcept(vaccinationReported.getVaccineNdcCode(),
+				CodesetType.VACCINATION_NDC_CODE, "NDC", codeMap); //TODO use CodeSet type in mapping ?
+			immunization.setVaccineCode(ndcCoding);
+		}
+		{
+			String administeredAmount = vaccinationReported.getAdministeredAmount();
+			if (StringUtils.isNotEmpty(administeredAmount)) {
+				SimpleQuantity doseQuantity = new SimpleQuantity();
+				try {
+					double d = Double.parseDouble(administeredAmount);
+					doseQuantity.setValue(d);
+					immunization.setDoseQuantity(doseQuantity);
+				} catch (NumberFormatException nfe) {
+					//ignore
+				}
+			}
+		}
 
-    {
-      String infoSource = vaccinationReported.getInformationSource();
-      if (StringUtils.isNotEmpty(infoSource)) {
-        immunization.setPrimarySource(infoSource.equals("00"));
-      }
-    }
+		{
+			String infoSource = vaccinationReported.getInformationSource();
+			if (StringUtils.isNotEmpty(infoSource)) {
+				immunization.setPrimarySource(infoSource.equals("00"));
+			}
+		}
 
-    {
-      String lotNumber = vaccinationReported.getLotnumber();
-      if (StringUtils.isNotEmpty(lotNumber)) {
-        immunization.setLotNumber(lotNumber);
-      }
-    }
+		{
+			String lotNumber = vaccinationReported.getLotnumber();
+			if (StringUtils.isNotEmpty(lotNumber)) {
+				immunization.setLotNumber(lotNumber);
+			}
+		}
 
-    {
-      Date expirationDate = vaccinationReported.getExpirationDate();
-      if (expirationDate != null) {
-        immunization.setExpirationDate(expirationDate);
-      }
-    }
+		{
+			Date expirationDate = vaccinationReported.getExpirationDate();
+			if (expirationDate != null) {
+				immunization.setExpirationDate(expirationDate);
+			}
+		}
 
 
-    {
-      CodeableConcept mvxCoding = createCodeableConcept(vaccinationReported.getVaccineMvxCode(),
-          CodesetType.VACCINATION_MANUFACTURER_CODE, "MVX", codeMap);
-      // todo, need to make a reference
-    }
+		{
+			CodeableConcept mvxCoding = createCodeableConcept(vaccinationReported.getVaccineMvxCode(),
+				CodesetType.VACCINATION_MANUFACTURER_CODE, "MVX", codeMap);
+			// todo, need to make a reference
+		}
 
-    // TODO Refusal reasons
-    // TODO Vaccination completion
-    // TODO Route
-    // TODO Site
+		// TODO Refusal reasons
+		// TODO Vaccination completion
+		// TODO Route
+		// TODO Site
 
-    // TODO Observations
+		// TODO Observations
 
-  }
+	}
 
-  private void createPatientResource(PatientReported pr, Patient p) {
-    PatientMaster pm = pr.getPatient();
-    {
-		 Identifier id = p.addIdentifier();
-		 id.setValue(pm.getPatientExternalLink());
-		 CodeableConcept type = new CodeableConcept();
-		 type.addCoding().setCode("MR");
-		 id.setType(type);
-	 }
-	  {
-		  HumanName name = p.addName();
-		  name.setFamily(pr.getNameLast());
-		  name.addGiven(pr.getNameFirst());
-		  name.addGiven(pr.getNameMiddle());
-	  }
-    // TODO Mother's maiden name
-	  p.setBirthDate(pr.getBirthDate());
-    {
-      AdministrativeGender administrativeGender = null;
-		 if (pr.getSex().equals("F")) {
-			 administrativeGender = AdministrativeGender.FEMALE;
-		 } else if (pr.getSex().equals("M")) {
-			 administrativeGender = AdministrativeGender.MALE;
-		 } else if (pr.getSex().equals("O")) {
-			 administrativeGender = AdministrativeGender.OTHER;
-		 } else if (pr.getSex().equals("U")) {
-			 administrativeGender = AdministrativeGender.UNKNOWN;
-		 } else if (pr.getSex().equals("X")) {
-			 administrativeGender = AdministrativeGender.OTHER;
-		 }
-		 if (administrativeGender != null) {
-			 p.setGender(administrativeGender);
-		 }
-	 }
-	  // TODO Race - not supported by base specification, probably have to use extensions
-	  if (StringUtils.isNotEmpty(pr.getAddressLine1())
-		  || StringUtils.isNotEmpty(pr.getAddressZip())) {
-		  Address address = p.addAddress();
-		  if (StringUtils.isNotEmpty(pr.getAddressLine1())) {
-			  address.addLine(pr.getAddressLine1());
-		  }
-		  if (StringUtils.isNotEmpty(pr.getAddressLine2())) {
-			  address.addLine(pr.getAddressLine2());
-		  }
-		  address.setCity(pr.getAddressCity());
-		  address.setState(pr.getAddressState());
-		  address.setPostalCode(pr.getAddressZip());
-		  address.setCountry(pr.getAddressCountry());
-		  address.setDistrict(pr.getAddressCountyParish());
-	  }
-    {
-      ContactPoint contactPoint = p.addTelecom();
-		 contactPoint.setSystem(ContactPointSystem.PHONE);
-		 contactPoint.setValue(pr.getPhone());
-    }
-    // TODO Ethnicity not supported by base standard
+	private void createPatientResource(PatientReported pr, Patient p) {
+		PatientMaster pm = pr.getPatient();
+		{
+			Identifier id = p.addIdentifier();
+			id.setValue(pm.getPatientExternalLink());
+			CodeableConcept type = new CodeableConcept();
+			type.addCoding().setCode("MR");
+			id.setType(type);
+		}
+		{
+			HumanName name = p.addName();
+			name.setFamily(pr.getNameLast());
+			name.addGiven(pr.getNameFirst());
+			name.addGiven(pr.getNameMiddle());
+		}
+		// TODO Mother's maiden name
+		p.setBirthDate(pr.getBirthDate());
+		{
+			AdministrativeGender administrativeGender = null;
+			if (pr.getSex().equals("F")) {
+				administrativeGender = AdministrativeGender.FEMALE;
+			} else if (pr.getSex().equals("M")) {
+				administrativeGender = AdministrativeGender.MALE;
+			} else if (pr.getSex().equals("O")) {
+				administrativeGender = AdministrativeGender.OTHER;
+			} else if (pr.getSex().equals("U")) {
+				administrativeGender = AdministrativeGender.UNKNOWN;
+			} else if (pr.getSex().equals("X")) {
+				administrativeGender = AdministrativeGender.OTHER;
+			}
+			if (administrativeGender != null) {
+				p.setGender(administrativeGender);
+			}
+		}
+		// TODO Race - not supported by base specification, probably have to use extensions
+		if (StringUtils.isNotEmpty(pr.getAddressLine1())
+			|| StringUtils.isNotEmpty(pr.getAddressZip())) {
+			Address address = p.addAddress();
+			if (StringUtils.isNotEmpty(pr.getAddressLine1())) {
+				address.addLine(pr.getAddressLine1());
+			}
+			if (StringUtils.isNotEmpty(pr.getAddressLine2())) {
+				address.addLine(pr.getAddressLine2());
+			}
+			address.setCity(pr.getAddressCity());
+			address.setState(pr.getAddressState());
+			address.setPostalCode(pr.getAddressZip());
+			address.setCountry(pr.getAddressCountry());
+			address.setDistrict(pr.getAddressCountyParish());
+		}
+		{
+			ContactPoint contactPoint = p.addTelecom();
+			contactPoint.setSystem(ContactPointSystem.PHONE);
+			contactPoint.setValue(pr.getPhone());
+		}
+		// TODO Ethnicity not supported by base standard
 
-	  if (pr.getBirthFlag().equals("Y")) {
-		  BooleanType booleanType = new BooleanType(true);
-		  p.setMultipleBirth(booleanType);
-		  if (StringUtils.isNotEmpty(pr.getBirthOrder())) {
-			  try {
-				  int birthOrder = Integer.parseInt(pr.getBirthOrder());
-				  IntegerType integerType = new IntegerType();
-				  integerType.setValue(birthOrder);
-				  p.setMultipleBirth(integerType);
-			  } catch (NumberFormatException nfe) {
-				  // ignore
-			  }
-		  }
-	  } else if (pr.getBirthFlag().equals("N")) {
-		  BooleanType booleanType = new BooleanType(false);
-		  p.setMultipleBirth(booleanType);
-	  }
+		if (pr.getBirthFlag().equals("Y")) {
+			BooleanType booleanType = new BooleanType(true);
+			p.setMultipleBirth(booleanType);
+			if (StringUtils.isNotEmpty(pr.getBirthOrder())) {
+				try {
+					int birthOrder = Integer.parseInt(pr.getBirthOrder());
+					IntegerType integerType = new IntegerType();
+					integerType.setValue(birthOrder);
+					p.setMultipleBirth(integerType);
+				} catch (NumberFormatException nfe) {
+					// ignore
+				}
+			}
+		} else if (pr.getBirthFlag().equals("N")) {
+			BooleanType booleanType = new BooleanType(false);
+			p.setMultipleBirth(booleanType);
+		}
 
-    if (!pr.getGuardianRelationship().equals("")
-        && (!pr.getGuardianLast().equals("") || !pr.getGuardianFirst().equals(""))) {
-      ContactComponent contactComponent = p.addContact();
-      contactComponent.addRelationship().addCoding().setCode(pr.getGuardianRelationship());
-      HumanName humanName = new HumanName();
-      humanName.setFamily(pr.getGuardianLast());
-      humanName.addGiven(pr.getGuardianFirst());
-      contactComponent.setName(humanName);
-    }
+		if (!pr.getGuardianRelationship().equals("")
+			&& (!pr.getGuardianLast().equals("") || !pr.getGuardianFirst().equals(""))) {
+			ContactComponent contactComponent = p.addContact();
+			contactComponent.addRelationship().addCoding().setCode(pr.getGuardianRelationship());
+			HumanName humanName = new HumanName();
+			humanName.setFamily(pr.getGuardianLast());
+			humanName.addGiven(pr.getGuardianFirst());
+			contactComponent.setName(humanName);
+		}
 
-  }
+	}
 
 }

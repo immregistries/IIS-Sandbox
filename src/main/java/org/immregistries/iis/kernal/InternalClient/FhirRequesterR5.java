@@ -108,7 +108,7 @@ public class FhirRequesterR5 extends FhirRequester<Patient,Immunization,Location
 	}
 
 	public ObservationReported searchObservationReported(ICriterion... where) {
-		IGenericClient fhirClient = repositoryClientFactory.getFhirClientFromSession();
+		IGenericClient fhirClient = repositoryClientFactory.getFhirClient();
 		ObservationReported observationReported = null;
 		Bundle bundle = (Bundle) searchRegularRecord(Observation.class, where);
 		if (bundle != null && bundle.hasEntry()) {
@@ -127,7 +127,7 @@ public class FhirRequesterR5 extends FhirRequester<Patient,Immunization,Location
 	}
 
 	public List<ObservationReported> searchObservationReportedList(ICriterion... where) {
-		IGenericClient fhirClient = repositoryClientFactory.getFhirClientFromSession();
+		IGenericClient fhirClient = repositoryClientFactory.getFhirClient();
 		List<ObservationReported> observationReportedList = new ArrayList<>();
 		Bundle bundle = (Bundle) search(Observation.class, where);
 		for (Bundle.BundleEntryComponent entry: bundle.getEntry()) {
@@ -272,7 +272,7 @@ public class FhirRequesterR5 extends FhirRequester<Patient,Immunization,Location
 	}
 
 	public PatientMaster readPatientMasterWithMdmLink(String patientId) {
-		Parameters out = repositoryClientFactory.getFhirClientFromSession().operation().onServer().named("$mdm-query-links").withParameters(new Parameters().addParameter("resourceId", patientId)).execute();
+		Parameters out = repositoryClientFactory.getFhirClient().operation().onServer().named("$mdm-query-links").withParameters(new Parameters().addParameter("resourceId", patientId)).execute();
 		List<Parameters.ParametersParameterComponent> part = out.getParameter().stream()
 			.filter(parametersParameterComponent -> parametersParameterComponent.getName().equals("link"))
 			.findFirst().orElse(new Parameters.ParametersParameterComponent()).getPart();

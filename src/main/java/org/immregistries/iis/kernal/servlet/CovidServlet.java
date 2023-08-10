@@ -60,17 +60,13 @@ public class CovidServlet extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
 		throws ServletException, IOException {
-
-		HttpSession session = req.getSession(true);
-
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
-//    Session dataSession = PopServlet.getDataSession();
 		OrgMaster orgMaster = ServletHelper.getOrgMaster();
 		if (orgMaster == null) {
 			throw new AuthenticationCredentialsNotFoundException("");
 		}
-		IGenericClient fhirClient = repositoryClientFactory.newGenericClient(session);
+		IGenericClient fhirClient = repositoryClientFactory.newGenericClient(req);
 
 
 		try {

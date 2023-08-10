@@ -16,6 +16,8 @@ import org.immregistries.smm.transform.Transformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -82,7 +84,7 @@ public class PopServlet extends HttpServlet {
 							groupPatientIds) {
 							group.addMember().setEntity(new Reference().setReference("Patient/" + id));
 						}
-						repositoryClientFactory.newGenericClient(orgMaster).create().resource(group).execute();
+						repositoryClientFactory.newGenericClient(req).create().resource(group).execute();
 					}
 				}
 			} finally {
@@ -107,6 +109,8 @@ public class PopServlet extends HttpServlet {
 		throws ServletException, IOException {
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		logger.info("{}", authentication);
 		OrgAccess orgAccess = ServletHelper.getOrgAccess();
 		String userId = null;
 		String password = null;

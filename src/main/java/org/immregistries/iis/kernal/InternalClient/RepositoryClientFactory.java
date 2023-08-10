@@ -13,7 +13,6 @@ import ca.uhn.fhir.rest.client.interceptor.BearerTokenAuthInterceptor;
 import ca.uhn.fhir.rest.server.exceptions.AuthenticationException;
 import ca.uhn.fhir.rest.server.interceptor.LoggingInterceptor;
 import ca.uhn.fhir.rest.server.util.ITestingUiClientFactory;
-import org.immregistries.iis.kernal.model.OrgAccess;
 import org.immregistries.iis.kernal.model.OrgMaster;
 import org.immregistries.iis.kernal.servlet.ServletHelper;
 import org.slf4j.Logger;
@@ -24,8 +23,11 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+
+import java.net.http.HttpRequest;
 
 import static org.immregistries.iis.kernal.fhir.interceptors.SessionAuthorizationInterceptor.CONNECTATHON_USER;
 import static org.immregistries.iis.kernal.servlet.ServletHelper.SESSION_ORGMASTER;
@@ -35,6 +37,7 @@ import static org.immregistries.iis.kernal.servlet.ServletHelper.SESSION_ORGMAST
  */
 @Component
 public class RepositoryClientFactory extends ApacheRestfulClientFactory implements ITestingUiClientFactory {
+	public static final String FHIR_CLIENT = "fhirClient";
 	@Autowired
 	private IFhirSystemDao fhirSystemDao;
 	private final Logger logger = LoggerFactory.getLogger(RepositoryClientFactory.class);
@@ -75,6 +78,8 @@ public class RepositoryClientFactory extends ApacheRestfulClientFactory implemen
 			authInterceptor = new BasicAuthInterceptor(orgMaster.getOrgAccess().getAccessName(), orgMaster.getOrgAccess().getAccessKey());
 		}
 		client.registerInterceptor(authInterceptor);
+		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+		request.setAttribute(FHIR_CLIENT, client);
 		return client;
 	}
 
@@ -93,29 +98,23 @@ public class RepositoryClientFactory extends ApacheRestfulClientFactory implemen
 		return newGenericClient(orgMaster);
 	}
 
-	/**
-	 * Used to get a fhir client within Java Servlets
-	 *
-	 * @param session
-	 * @return
-	 */
-	public IGenericClient newGenericClient(HttpSession session) {
+	public IGenericClient newGenericClient(HttpServletRequest request) {
 		asynchInit();
-		if (session.getAttribute("fhirClient") == null) {
+		if (request.getAttribute(FHIR_CLIENT) == null) {
 			OrgMaster orgMaster = ServletHelper.getOrgMaster();
 			if (orgMaster != null) {
-				session.setAttribute("fhirClient", newGenericClient(orgMaster));
+				request.setAttribute(FHIR_CLIENT, newGenericClient(orgMaster));
 			} else {
-				session.setAttribute("fhirClient", null);
+				request.setAttribute(FHIR_CLIENT, null);
 			}
 		}
-		return (IGenericClient) session.getAttribute("fhirClient");
+		return (IGenericClient) request.getAttribute(FHIR_CLIENT);
 	}
 
 
-	public IGenericClient getFhirClientFromSession() {
-		HttpSession session = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest().getSession(false);
-		return newGenericClient(session);
+	public IGenericClient getFhirClient() {
+		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+		return newGenericClient(request);
 	}
 
 

@@ -1,10 +1,9 @@
 package org.immregistries.iis.kernal.logic;
 
 import org.hl7.fhir.r5.model.*;
-import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
-import org.immregistries.iis.kernal.model.OrgAccess;
+import org.immregistries.iis.kernal.model.OrgMaster;
 import org.immregistries.iis.kernal.model.PatientReported;
 import org.springframework.stereotype.Service;
 
@@ -23,19 +22,19 @@ public class ImmunizationRecommendationService {
 	private static String IMMUNIZATION_RECOMMENDATION_STATUS_SYSTEM = "http://hl7.org/fhir/ValueSet/immunization-recommendation-status";
 
 
-	private ImmunizationRecommendation generate(OrgAccess orgAccess) {
+	private ImmunizationRecommendation generate(OrgMaster orgMaster) {
 		ImmunizationRecommendation recommendation = new ImmunizationRecommendation();
 		recommendation.addIdentifier(new Identifier().setValue(UUID.randomUUID().toString().split("-")[0]));
 		recommendation.setDate(new Date());
 		recommendation = addGeneratedRecommendation(recommendation);
 		recommendation.setAuthority(new Reference()
-			.setIdentifier(new Identifier().setSystem("IIS-Sandbox/facility").setValue(orgAccess.getAccessName()))); //TODO change set system, register as org
+			.setIdentifier(new Identifier().setSystem("IIS-Sandbox/facility").setValue(orgMaster.getOrganizationName()))); //TODO change set system, register as org
 		return recommendation;
 	}
 
 
-	public ImmunizationRecommendation generate(OrgAccess orgAccess, PatientReported patientReported) {
-		ImmunizationRecommendation recommendation = generate(orgAccess);
+	public ImmunizationRecommendation generate(OrgMaster orgMaster, PatientReported patientReported) {
+		ImmunizationRecommendation recommendation = generate(orgMaster);
 		recommendation.setPatient(new Reference()
 			.setIdentifier(new Identifier()
 				.setValue(patientReported.getPatientReportedExternalLink())
@@ -44,8 +43,8 @@ public class ImmunizationRecommendationService {
 		return recommendation;
 	}
 
-	public ImmunizationRecommendation generate(OrgAccess orgAccess, Patient patient) {
-		ImmunizationRecommendation recommendation = generate(orgAccess);
+	public ImmunizationRecommendation generate(OrgMaster orgMaster, Patient patient) {
+		ImmunizationRecommendation recommendation = generate(orgMaster);
 		recommendation.setPatient(new Reference()
 				.setReference("Patient/" + new IdType(patient.getId()).getIdPart())
 //			.setIdentifier(patient.getIdentifier().stream()

@@ -59,7 +59,6 @@ public class TestMapping extends HttpServlet {
 			String userId = "utest";
 			String password = "utest";
 			String facilityId = "utest";
-			HttpSession session = req.getSession(true);
 			OrgMaster orgMaster = ServletHelper.getOrgMaster();
 			String ack = "";
 			String[] messages;

@@ -9,6 +9,7 @@ import org.hl7.fhir.r5.model.*;
 import org.immregistries.iis.kernal.logic.SubscriptionService;
 import org.immregistries.iis.kernal.model.OrgAccess;
 import org.immregistries.iis.kernal.InternalClient.RepositoryClientFactory;
+import org.immregistries.iis.kernal.model.OrgMaster;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 
@@ -70,12 +71,11 @@ public class SubscriptionServlet extends HttpServlet {
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
 		throws ServletException, IOException {
 		// TODO action as manual trigger with content
-		HttpSession session = req.getSession(true);
-		OrgAccess orgAccess = ServletHelper.getOrgAccess();
-		if (orgAccess == null) {
+		OrgMaster orgMaster = ServletHelper.getOrgMaster();
+		if (orgMaster == null) {
 			throw new AuthenticationCredentialsNotFoundException("");
 		}
-		IGenericClient localClient = repositoryClientFactory.newGenericClient(session);
+		IGenericClient localClient = repositoryClientFactory.newGenericClient(req);
 
 
 		String subscriptionId = req.getParameter(PARAM_SUBSCRIPTION_ID);
@@ -127,14 +127,12 @@ public class SubscriptionServlet extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
 		throws ServletException, IOException {
-
-		HttpSession session = req.getSession(true);
-		OrgAccess orgAccess = ServletHelper.getOrgAccess();
-		if (orgAccess == null) {
+		OrgMaster orgMaster = ServletHelper.getOrgMaster();
+		if (orgMaster == null) {
 			throw new AuthenticationCredentialsNotFoundException("");
 		}
 		resp.setContentType("text/html");
-		IGenericClient fhirClient = repositoryClientFactory.newGenericClient(session);
+		IGenericClient fhirClient = repositoryClientFactory.newGenericClient(req);
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 
 		String subscriptionId = req.getParameter(PARAM_SUBSCRIPTION_ID);

@@ -40,8 +40,7 @@ public class ServerSecurityConfig {
 
 
 	@Bean
-	public SecurityFilterChain filterChain(HttpSecurity http, RejectedRequestRedirector rejectedRequestRedirector
-	) throws Exception {
+	public SecurityFilterChain filterChain(HttpSecurity http, CustomOAuthSuccessHandler customOAuthSuccessHandler) throws Exception {
 		http
 			.authorizeRequests()
 				.antMatchers(HttpMethod.GET,"/","/home","/pop","/SubscriptionTopic","/img/**").permitAll()
@@ -57,14 +56,13 @@ public class ServerSecurityConfig {
 				.defaultSuccessUrl("/home")
 			.and()
 				.oauth2Login()
-				.defaultSuccessUrl("/pop")
-//				.successHandler( oAuth2AuthenticationSuccessHandler)
+				.defaultSuccessUrl("/home")
+				.successHandler(customOAuthSuccessHandler)
 			.and()
 			.logout()
 				.logoutUrl("/logout")
 				.logoutSuccessUrl("/loginForm")
 				.deleteCookies("JSESSIONID")
-
 			.and()
 				.csrf()
 				.disable()
