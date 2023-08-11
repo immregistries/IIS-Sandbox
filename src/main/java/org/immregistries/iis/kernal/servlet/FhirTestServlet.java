@@ -11,6 +11,7 @@ import org.hl7.fhir.r5.model.Patient.ContactComponent;
 import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
+import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.logic.CodeMapManager;
 import org.immregistries.iis.kernal.model.*;
 import org.immregistries.mqe.hl7util.parser.HL7Reader;

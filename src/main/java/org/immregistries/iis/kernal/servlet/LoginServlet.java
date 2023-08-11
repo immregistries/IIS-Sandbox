@@ -1,6 +1,7 @@
 package org.immregistries.iis.kernal.servlet;
 
 import org.hibernate.Session;
+import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.model.OrgAccess;
 import org.immregistries.iis.kernal.model.OrgMaster;
 
@@ -8,7 +9,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.PrintWriter;
 
@@ -60,7 +60,7 @@ public class LoginServlet extends HttpServlet {
 				out.println("		<input class=\"w3-input\" type=\"password\" name=\"" + PARAM_PASSWORD + "\" value=\"\"/>");
 				out.println("		<label>Password</label>");
 				out.println("		<input class=\"w3-input\" type=\"text\" name=\"" + PARAM_FACILITYID + "\" value=\"" + facilityId + "\"/>");
-				out.println("		<label>Facility Id</label><br/>");
+				out.println("		<label>Facility Id (optional)</label><br/>");
 				out.println("		<input class=\"w3-button w3-section w3-teal w3-ripple\" type=\"submit\" name=\"" + PARAM_ACTION + "\" value=\"" + ACTION_LOGIN + "\"/>");
 				out.println("	</form>");
 				out.println("	<div class=\"w3-container w3-card-4 w3-half\">");

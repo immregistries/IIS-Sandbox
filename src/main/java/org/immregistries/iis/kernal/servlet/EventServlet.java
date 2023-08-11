@@ -2,6 +2,7 @@ package org.immregistries.iis.kernal.servlet;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.logic.IncomingEventHandler;
 import org.immregistries.iis.kernal.model.OrgAccess;
 import org.immregistries.iis.kernal.model.OrgMaster;
@@ -15,7 +16,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 import static org.immregistries.iis.kernal.servlet.LoginServlet.*;
-import static org.immregistries.iis.kernal.servlet.ServletHelper.SESSION_ORGMASTER;
+import static org.immregistries.iis.kernal.fhir.security.ServletHelper.SESSION_ORGMASTER;
 
 @SuppressWarnings("serial")
 public class EventServlet extends PopServlet {

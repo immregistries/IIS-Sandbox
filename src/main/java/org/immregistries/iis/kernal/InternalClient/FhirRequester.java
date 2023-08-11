@@ -12,7 +12,7 @@ import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
 import org.hl7.fhir.instance.model.api.IBaseBundle;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.immregistries.iis.kernal.mapping.Interfaces.*;
-import org.immregistries.iis.kernal.servlet.ServletHelper;
+import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public abstract class FhirRequester<

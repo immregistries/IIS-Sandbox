@@ -1,11 +1,10 @@
 package org.immregistries.iis.kernal.servlet;
 
-import org.hibernate.Session;
+import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.model.OrgAccess;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

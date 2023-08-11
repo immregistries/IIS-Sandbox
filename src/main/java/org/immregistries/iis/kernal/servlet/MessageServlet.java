@@ -1,8 +1,8 @@
 package org.immregistries.iis.kernal.servlet;
 
-import ca.uhn.fhir.rest.client.api.IGenericClient;
 import org.hibernate.Query;
 import org.hibernate.Session;
+import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.model.MessageReceived;
 import org.immregistries.iis.kernal.model.OrgAccess;
 import org.immregistries.iis.kernal.model.OrgMaster;
@@ -16,8 +16,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 import java.util.Map;
-
-import static org.immregistries.iis.kernal.servlet.LoginServlet.*;
 
 @SuppressWarnings("serial")
 public class MessageServlet extends HttpServlet {

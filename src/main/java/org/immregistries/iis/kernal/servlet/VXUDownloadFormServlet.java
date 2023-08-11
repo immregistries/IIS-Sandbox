@@ -1,6 +1,6 @@
 package org.immregistries.iis.kernal.servlet;
 
-import org.immregistries.iis.kernal.model.OrgAccess;
+import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.model.OrgMaster;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;

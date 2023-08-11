@@ -14,23 +14,22 @@ import ca.uhn.fhir.rest.server.exceptions.AuthenticationException;
 import ca.uhn.fhir.rest.server.interceptor.LoggingInterceptor;
 import ca.uhn.fhir.rest.server.util.ITestingUiClientFactory;
 import org.immregistries.iis.kernal.model.OrgMaster;
-import org.immregistries.iis.kernal.servlet.ServletHelper;
+import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
-import java.net.http.HttpRequest;
 
 import static org.immregistries.iis.kernal.fhir.interceptors.SessionAuthorizationInterceptor.CONNECTATHON_USER;
-import static org.immregistries.iis.kernal.servlet.ServletHelper.SESSION_ORGMASTER;
+import static org.immregistries.iis.kernal.fhir.security.ServletHelper.GITHUB_PREFIX;
+import static org.immregistries.iis.kernal.fhir.security.ServletHelper.SESSION_ORGMASTER;
 
 /**
  * Generates fhir client to interact with the jpa repository
@@ -74,6 +73,10 @@ public class RepositoryClientFactory extends ApacheRestfulClientFactory implemen
 			 * see SessionAuthorizationInterceptor
 			 */
 			authInterceptor = new BearerTokenAuthInterceptor(orgMaster.getOrgAccess().getAccessKey());
+		} else if (orgMaster.getOrgAccess().getAccessName().startsWith(GITHUB_PREFIX)) {
+			Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+			authInterceptor = new BearerTokenAuthInterceptor((String) authentication.getCredentials());
 		} else {
 			authInterceptor = new BasicAuthInterceptor(orgMaster.getOrgAccess().getAccessName(), orgMaster.getOrgAccess().getAccessKey());
 		}

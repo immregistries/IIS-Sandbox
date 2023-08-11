@@ -1,16 +1,13 @@
 package org.immregistries.iis.kernal.fhir.security;
 
 import org.hibernate.Session;
-import org.immregistries.iis.kernal.model.OrgAccess;
 import org.immregistries.iis.kernal.model.OrgMaster;
 import org.immregistries.iis.kernal.servlet.PopServlet;
-import org.immregistries.iis.kernal.servlet.ServletHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -18,15 +15,13 @@ import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizedClientRepository;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 
 import static org.immregistries.iis.kernal.servlet.LoginServlet.PARAM_FACILITYID;
-import static org.immregistries.iis.kernal.servlet.ServletHelper.SESSION_ORGMASTER;
+import static org.immregistries.iis.kernal.fhir.security.ServletHelper.SESSION_ORGMASTER;
 
 
 @Component
@@ -59,7 +54,7 @@ public class UsernamePasswordAuthenticationProvider implements AuthenticationPro
 				return null;
 			}
 		} else  {
-			return ServletHelper.authenticateOrgAccess(authentication.getName(), (String) authentication.getCredentials(), dataSession);
+			return ServletHelper.authenticateOrgAccessUsernamePassword(authentication.getName(), (String) authentication.getCredentials(), dataSession);
 		}
 	}
 
