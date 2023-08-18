@@ -71,15 +71,13 @@ public class SessionAuthorizationInterceptor extends AuthorizationInterceptor {
 				/**
 				 * Cookie SESSIONID
 				 */
-				if ( session != null) {
+				if (session != null) {
 					OrgAccess orgAccess = ServletHelper.getOrgAccess();
 					/**
 					 * if user authenticated, orgMaster/Facility is then selected
 					 */
 					if (orgAccess != null) {
 						orgMaster = ServletHelper.authenticateOrgMaster(orgAccess,theRequestDetails.getTenantId(),dataSession);
-						logger.info("name {}", orgMaster.getOrganizationName());
-
 					}
 				}
 			}
