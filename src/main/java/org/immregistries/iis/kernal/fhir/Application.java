@@ -87,31 +87,7 @@ public class Application extends SpringBootServletInitializer {
 	}
 
 	@Bean
-	@Conditional(OnR4Condition.class)
-	public ServletRegistrationBean loginServletRegistrationBean() {
-		ServletRegistrationBean registrationBean = new ServletRegistrationBean();
-		HttpServlet servlet = new LoginServlet();
-		beanFactory.autowireBean(servlet);
-		registrationBean.setServlet(servlet);
-		registrationBean.addUrlMappings("/loginForm");
-		registrationBean.setLoadOnStartup(1);
-		return registrationBean;
-	}
-
-	@Bean
-	@Conditional(OnR4Condition.class)
-	public ServletRegistrationBean popServletRegistrationBean() {
-		ServletRegistrationBean registrationBean = new ServletRegistrationBean();
-		HttpServlet servlet = new PopServletR4();
-		beanFactory.autowireBean(servlet);
-		registrationBean.setServlet(servlet);
-		registrationBean.addUrlMappings("/pop");
-//		registrationBean.setLoadOnStartup(1);
-		return registrationBean;
-	}
-
-	@Bean
-	@Conditional(OnR4Condition.class)
+	@Conditional(OnEitherVersion.class)
 	public ServletRegistrationBean homeServletRegistrationBean() {
 		ServletRegistrationBean registrationBean = new ServletRegistrationBean();
 		HomeServlet servlet = new HomeServlet();
@@ -123,7 +99,7 @@ public class Application extends SpringBootServletInitializer {
 	}
 
 	/**
-	 * Required to get access to httpRequest qnd session through spring, important to use the fhir client inside the servlets
+	 * Required to get access to httpRequest and session statically through spring, important to use the fhir client inside the servlets
 	 *
 	 * @return
 	 */

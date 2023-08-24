@@ -6,7 +6,7 @@ import java.util.Date;
 /**
  * Created by Eric on 12/20/17.
  */
-public class VaccinationMaster implements Serializable {
+public class VaccinationMaster extends VaccinationReported implements Serializable {
   private static final long serialVersionUID = 1L;
 
   private String vaccinationId = "";

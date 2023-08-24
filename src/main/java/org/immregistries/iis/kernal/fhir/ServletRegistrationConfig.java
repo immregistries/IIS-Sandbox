@@ -19,50 +19,6 @@ public class ServletRegistrationConfig {
 	AutowireCapableBeanFactory beanFactory;
 
 	@Bean
-	public ServletRegistrationBean homeServletRegistrationBean() {
-		ServletRegistrationBean registrationBean = new ServletRegistrationBean();
-		HomeServlet servlet = new HomeServlet();
-		beanFactory.autowireBean(servlet);
-		registrationBean.setServlet(servlet);
-		registrationBean.addUrlMappings("/home");
-		registrationBean.setLoadOnStartup(1);
-		return registrationBean;
-	}
-
-	@Bean
-	public ServletRegistrationBean loginServletRegistrationBean() {
-		ServletRegistrationBean registrationBean = new ServletRegistrationBean();
-		HttpServlet servlet = new LoginServlet();
-		beanFactory.autowireBean(servlet);
-		registrationBean.setServlet(servlet);
-		registrationBean.addUrlMappings("/loginForm");
-		registrationBean.setLoadOnStartup(1);
-		return registrationBean;
-	}
-
-//	@Bean
-//	public ServletRegistrationBean loginServletRegistrationBean() {
-//		ServletRegistrationBean registrationBean = new ServletRegistrationBean();
-//		HttpServlet servlet = new OAuthLoginServlet();
-//		beanFactory.autowireBean(servlet);
-//		registrationBean.setServlet(servlet);
-//		registrationBean.addUrlMappings("/oauth2/authorization/github");
-////		registrationBean.setLoadOnStartup(1);
-//		return registrationBean;
-//	}
-
-	@Bean
-	public ServletRegistrationBean popServletRegistrationBean() {
-		ServletRegistrationBean registrationBean = new ServletRegistrationBean();
-		HttpServlet servlet = new PopServlet();
-		beanFactory.autowireBean(servlet);
-		registrationBean.setServlet(servlet);
-		registrationBean.addUrlMappings("/pop");
-//		registrationBean.setLoadOnStartup(1);
-		return registrationBean;
-	}
-
-	@Bean
 	public ServletRegistrationBean<GroupServlet> groupServletRegistrationBean() {
 		ServletRegistrationBean<GroupServlet> registrationBean = new ServletRegistrationBean<>();
 		GroupServlet servlet = new GroupServlet();
@@ -192,17 +148,6 @@ public class ServletRegistrationConfig {
 		beanFactory.autowireBean(servlet);
 		registrationBean.setServlet(servlet);
 		registrationBean.addUrlMappings("/lab");
-//		registrationBean.setLoadOnStartup(1);
-		return registrationBean;
-	}
-
-	@Bean
-	public ServletRegistrationBean eventServletRegistrationBean() {
-		ServletRegistrationBean registrationBean = new ServletRegistrationBean();
-		HttpServlet servlet = new EventServlet();
-		beanFactory.autowireBean(servlet);
-		registrationBean.setServlet(servlet);
-		registrationBean.addUrlMappings("/event");
 //		registrationBean.setLoadOnStartup(1);
 		return registrationBean;
 	}

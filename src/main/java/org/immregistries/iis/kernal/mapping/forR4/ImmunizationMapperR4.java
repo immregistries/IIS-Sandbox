@@ -144,7 +144,7 @@ public class ImmunizationMapperR4 implements ImmunizationMapper<Immunization> {
 	  vaccinationMaster.setVaccineCvxCode(
 		  i.getVaccineCode().getCoding().stream().filter(coding -> coding.getSystem().equals(CVX)).findFirst().orElse(new Coding()).getCode()
 	  );
-	  if (i.getPatient() != null && !i.getPatient().getId().isBlank()) {
+	  if (i.getPatient() != null && StringUtils.isNotBlank(i.getPatient().getId())) {
 		  vaccinationMaster.setPatient(fhirRequests.readPatientMaster(i.getPatient().getId()));
 	  }
 //	  vaccinationMaster.setVaccinationReported();

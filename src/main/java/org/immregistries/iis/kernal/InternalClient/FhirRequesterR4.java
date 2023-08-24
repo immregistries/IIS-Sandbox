@@ -112,6 +112,27 @@ public class FhirRequesterR4 extends FhirRequester<Patient,Immunization,Location
 		return vaccinationReportedList;
 	}
 
+	public List<VaccinationReported> searchVaccinationReportedListOperationEverything(String id) {
+		IGenericClient client = repositoryClientFactory.getFhirClient();
+		Parameters in = new Parameters()
+			.addParameter("_mdm", "true")
+			.addParameter("_type", "Immunization");
+		Bundle bundle = client.operation()
+			.onInstance("Patient/" + id)
+			.named("$everything")
+			.withParameters(in)
+			.prettyPrint()
+			.useHttpGet()
+			.returnResourceType(Bundle.class).execute();
+		List<VaccinationReported> vaccinationReportedList = new ArrayList<>();
+		for (Bundle.BundleEntryComponent entry : bundle.getEntry()) {
+			if (entry.getResource() instanceof Immunization) {
+				vaccinationReportedList.add(immunizationMapper.getReportedWithMaster((Immunization) entry.getResource()));
+			}
+		}
+		return vaccinationReportedList;
+	}
+
 	public ObservationReported searchObservationReported(ICriterion... where) {
 		IGenericClient fhirClient = repositoryClientFactory.getFhirClient();
 		ObservationReported observationReported = null;

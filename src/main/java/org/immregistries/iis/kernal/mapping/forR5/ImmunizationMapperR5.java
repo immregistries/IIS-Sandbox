@@ -135,7 +135,7 @@ public class ImmunizationMapperR5 implements ImmunizationMapper<Immunization> {
 	  vaccinationMaster.setExternalLink(i.getIdentifierFirstRep().getValue());
 	  vaccinationMaster.setAdministeredDate(i.getOccurrenceDateTimeType().getValue());
 	  vaccinationMaster.setVaccineCvxCode(i.getVaccineCode().getCode(CVX));
-	  if (i.getPatient() != null && !i.getPatient().getId().isBlank()) {
+	  if (i.getPatient() != null && StringUtils.isNotBlank(i.getPatient().getId())) {
 		  vaccinationMaster.setPatient(fhirRequests.readPatientMaster(i.getPatient().getId()));
 	  }
 //	  vaccinationMaster.setVaccinationReported();

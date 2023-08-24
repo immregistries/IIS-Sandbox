@@ -1,13 +1,12 @@
 package org.immregistries.iis.kernal.InternalClient;
 
-import org.apache.commons.lang3.StringUtils;
-import org.immregistries.iis.kernal.fhir.annotations.OnR5Condition;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
-import ca.uhn.fhir.rest.gclient.*;
+import ca.uhn.fhir.rest.gclient.ICriterion;
+import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.r5.model.*;
+import org.immregistries.iis.kernal.fhir.annotations.OnR5Condition;
 import org.immregistries.iis.kernal.model.*;
-import org.immregistries.iis.kernal.model.ModelPerson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Conditional;
@@ -19,7 +18,7 @@ import java.util.Optional;
 
 @Component
 @Conditional(OnR5Condition.class)
-public class FhirRequesterR5 extends FhirRequester<Patient,Immunization,Location,Practitioner,Observation,Person, Organization, RelatedPerson> {
+public class FhirRequesterR5 extends FhirRequester<Patient, Immunization, Location, Practitioner, Observation, Person, Organization, RelatedPerson> {
 	Logger logger = LoggerFactory.getLogger(FhirRequesterR5.class);
 
 	public PatientMaster searchPatientMaster(ICriterion... where) {
@@ -53,7 +52,7 @@ public class FhirRequesterR5 extends FhirRequester<Patient,Immunization,Location
 		List<PatientReported> patientReportedList = new ArrayList<>();
 		Bundle bundle = (Bundle) searchRegularRecord(Patient.class, where);
 		if (bundle != null) {
-			for (Bundle.BundleEntryComponent entry: bundle.getEntry()) {
+			for (Bundle.BundleEntryComponent entry : bundle.getEntry()) {
 				patientReportedList.add(patientMapper.getReportedWithMaster((Patient) entry.getResource()));
 			}
 		}
@@ -64,7 +63,7 @@ public class FhirRequesterR5 extends FhirRequester<Patient,Immunization,Location
 		List<PatientReported> patientReportedList = new ArrayList<>();
 		Bundle bundle = (Bundle) searchGoldenRecord(Patient.class, where);
 		if (bundle != null) {
-			for (Bundle.BundleEntryComponent entry: bundle.getEntry()) {
+			for (Bundle.BundleEntryComponent entry : bundle.getEntry()) {
 				patientReportedList.add(patientMapper.getReportedWithMaster((Patient) entry.getResource()));
 			}
 		}
@@ -101,8 +100,29 @@ public class FhirRequesterR5 extends FhirRequester<Patient,Immunization,Location
 	public List<VaccinationReported> searchVaccinationReportedList(ICriterion... where) {
 		List<VaccinationReported> vaccinationReportedList = new ArrayList<>();
 		Bundle bundle = (Bundle) searchRegularRecord(Immunization.class, where);
-		for (Bundle.BundleEntryComponent entry: bundle.getEntry()) {
+		for (Bundle.BundleEntryComponent entry : bundle.getEntry()) {
 			vaccinationReportedList.add(immunizationMapper.getReportedWithMaster((Immunization) entry.getResource()));
+		}
+		return vaccinationReportedList;
+	}
+
+	public List<VaccinationReported> searchVaccinationReportedListOperationEverything(String id) {
+		IGenericClient client = repositoryClientFactory.getFhirClient();
+		Parameters in = new Parameters()
+			.addParameter("_mdm", "true")
+			.addParameter("_type", "Immunization");
+		Bundle bundle = client.operation()
+			.onInstance("Patient/" + id)
+			.named("$everything")
+			.withParameters(in)
+			.prettyPrint()
+			.useHttpGet()
+			.returnResourceType(Bundle.class).execute();
+		List<VaccinationReported> vaccinationReportedList = new ArrayList<>();
+		for (Bundle.BundleEntryComponent entry : bundle.getEntry()) {
+			if (entry.getResource() instanceof  Immunization) {
+				vaccinationReportedList.add(immunizationMapper.getReported((Immunization) entry.getResource()));
+			}
 		}
 		return vaccinationReportedList;
 	}
@@ -112,7 +132,7 @@ public class FhirRequesterR5 extends FhirRequester<Patient,Immunization,Location
 		ObservationReported observationReported = null;
 		Bundle bundle = (Bundle) searchRegularRecord(Observation.class, where);
 		if (bundle != null && bundle.hasEntry()) {
-			observationReported = observationMapper.getReportedWithMaster((Observation) bundle.getEntryFirstRep().getResource(),this,fhirClient);
+			observationReported = observationMapper.getReportedWithMaster((Observation) bundle.getEntryFirstRep().getResource(), this, fhirClient);
 		}
 		return observationReported;
 	}
@@ -130,8 +150,8 @@ public class FhirRequesterR5 extends FhirRequester<Patient,Immunization,Location
 		IGenericClient fhirClient = repositoryClientFactory.getFhirClient();
 		List<ObservationReported> observationReportedList = new ArrayList<>();
 		Bundle bundle = (Bundle) search(Observation.class, where);
-		for (Bundle.BundleEntryComponent entry: bundle.getEntry()) {
-			observationReportedList.add(observationMapper.getReportedWithMaster((Observation) entry.getResource(),this,fhirClient));
+		for (Bundle.BundleEntryComponent entry : bundle.getEntry()) {
+			observationReportedList.add(observationMapper.getReportedWithMaster((Observation) entry.getResource(), this, fhirClient));
 		}
 		return observationReportedList;
 	}
@@ -148,7 +168,7 @@ public class FhirRequesterR5 extends FhirRequester<Patient,Immunization,Location
 	public List<OrgLocation> searchOrgLocationList(ICriterion... where) {
 		List<OrgLocation> locationList = new ArrayList<>();
 		Bundle bundle = (Bundle) search(Location.class, where);
-		for (Bundle.BundleEntryComponent entry: bundle.getEntry()) {
+		for (Bundle.BundleEntryComponent entry : bundle.getEntry()) {
 			locationList.add(locationMapper.orgLocationFromFhir((Location) entry.getResource()));
 		}
 		return locationList;
@@ -184,7 +204,7 @@ public class FhirRequesterR5 extends FhirRequester<Patient,Immunization,Location
 	public PatientReported savePatientReported(PatientReported patientReported) {
 		Patient patient = (Patient) patientMapper.getFhirResource(patientReported);
 		MethodOutcome outcome = save(patient,
-			Patient.IDENTIFIER.exactly().systemAndIdentifier(patientReported.getPatientReportedAuthority(),patientReported.getPatientReportedExternalLink()));
+			Patient.IDENTIFIER.exactly().systemAndIdentifier(patientReported.getPatientReportedAuthority(), patientReported.getPatientReportedExternalLink()));
 		if (!outcome.getResource().isEmpty()) {
 			patientReported.setId(outcome.getResource().getIdElement().getIdPart());
 			return patientMapper.getReportedWithMaster((Patient) outcome.getResource());
@@ -213,7 +233,7 @@ public class FhirRequesterR5 extends FhirRequester<Patient,Immunization,Location
 		RelatedPerson relatedPerson = (RelatedPerson) relatedPersonMapper.getFhirRelatedPersonFromPatient(patientReported);
 		MethodOutcome outcome = save(relatedPerson,
 			RelatedPerson.PATIENT.hasId(patientReported.getId()));
-		if (outcome.getResource() != null)  {
+		if (outcome.getResource() != null) {
 			patientReported = relatedPersonMapper.fillGuardianInformation(patientReported, (RelatedPerson) outcome.getResource());
 		}
 		return patientReported;
@@ -236,7 +256,7 @@ public class FhirRequesterR5 extends FhirRequester<Patient,Immunization,Location
 			Immunization.IDENTIFIER.exactly()
 				.identifier(vaccinationReported.getVaccinationReportedExternalLink())
 		);
-		if (outcome.getCreated() != null && outcome.getCreated()){
+		if (outcome.getCreated() != null && outcome.getCreated()) {
 			vaccinationReported.setVaccinationReportedId(outcome.getId().getIdPart());
 		} else if (!outcome.getResource().isEmpty()) {
 			vaccinationReported.setVaccinationReportedId(outcome.getResource().getIdElement().getIdPart());
@@ -248,8 +268,8 @@ public class FhirRequesterR5 extends FhirRequester<Patient,Immunization,Location
 		Location location = locationMapper.getFhirResource(orgLocation);
 		MethodOutcome outcome = save(location,
 			Location.IDENTIFIER.exactly().identifier(location.getIdentifierFirstRep().getValue())
-			);
-		if (outcome.getCreated() != null && outcome.getCreated()){
+		);
+		if (outcome.getCreated() != null && outcome.getCreated()) {
 			orgLocation.setOrgLocationId(outcome.getId().getIdPart());
 		} else if (!outcome.getResource().isEmpty()) {
 			orgLocation.setOrgLocationId(outcome.getResource().getIdElement().getIdPart());
@@ -260,7 +280,7 @@ public class FhirRequesterR5 extends FhirRequester<Patient,Immunization,Location
 	public Organization saveOrganization(Organization organization) {
 		MethodOutcome outcome = save(organization,
 			Organization.IDENTIFIER.exactly().identifier(organization.getIdentifierFirstRep().getValue())
-			);
+		);
 		if (!outcome.getResource().isEmpty()) {
 			return (Organization) outcome.getResource();
 		} else if (outcome.getCreated() != null && outcome.getCreated()) {
@@ -299,7 +319,7 @@ public class FhirRequesterR5 extends FhirRequester<Patient,Immunization,Location
 	}
 
 	public OrgLocation readOrgLocation(String id) {
-		return locationMapper.orgLocationFromFhir((Location) read(Location.class,id));
+		return locationMapper.orgLocationFromFhir((Location) read(Location.class, id));
 	}
 
 	public VaccinationReported readVaccinationReported(String id) {

@@ -19,6 +19,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -39,8 +43,8 @@ public class PatientServlet extends HttpServlet {
 	public static final String ACTION_SEARCH = "search";
 	public static final String PARAM_PATIENT_NAME_LAST = "patientNameLast";
 	public static final String PARAM_PATIENT_NAME_FIRST = "patientNameFirst";
-	public static final String PARAM_PATIENT_REPORTED_EXTERNAL_LINK = "patientIdentifier";
-	public static final String PARAM_PATIENT_REPORTED_ID = "patientId";
+	public static final String PARAM_PATIENT_REPORTED_EXTERNAL_LINK = "identifier";
+	public static final String PARAM_PATIENT_REPORTED_ID = "id";
 	Logger logger = LoggerFactory.getLogger(PatientServlet.class);
 	@Autowired
 	RepositoryClientFactory repositoryClientFactory;
@@ -278,9 +282,7 @@ public class PatientServlet extends HttpServlet {
 		out.println("<h4>Vaccinations</h4>");
 		List<VaccinationReported> vaccinationReportedList = null;
 		{
-			vaccinationReportedList = fhirRequester.searchVaccinationReportedList(
-				Immunization.PATIENT.hasId(patientId)
-			);
+			vaccinationReportedList = fhirRequester.searchVaccinationReportedListOperationEverything(patientId);
 		}
 		if (vaccinationReportedList.size() == 0) {
 			out.println("<div class=\"w3-panel w3-yellow\"><p>No Vaccinations</p></div>");

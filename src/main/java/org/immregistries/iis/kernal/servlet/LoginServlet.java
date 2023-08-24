@@ -4,6 +4,10 @@ import org.hibernate.Session;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.model.OrgAccess;
 import org.immregistries.iis.kernal.model.OrgMaster;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -12,8 +16,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-
-public class LoginServlet extends HttpServlet {
+@RestController
+@RequestMapping("/loginForm")
+public class LoginServlet {
 
 	public static final String PARAM_USERID = "USERID";
 	public static final String PARAM_PASSWORD = "PASSWORD";
@@ -23,13 +28,13 @@ public class LoginServlet extends HttpServlet {
 	public static final String PARAM_ACTION = "action";
 	public static final String ACTION_LOGIN = "Login";
 
-	@Override
+	@PostMapping()
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
 		throws ServletException, IOException {
 		doGet(req, resp);
 	}
 
-	@Override
+	@GetMapping()
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
 		throws ServletException, IOException {
 		resp.setContentType("text/html");

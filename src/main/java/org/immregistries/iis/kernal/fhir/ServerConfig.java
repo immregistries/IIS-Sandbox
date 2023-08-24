@@ -75,7 +75,7 @@ public class ServerConfig {
 												  Optional<BulkQueryGroupProviderR5> bulkQueryGroupProviderR5,
 												  Optional<BulkQueryGroupProviderR4> bulkQueryGroupProviderR4,
 												  Optional<MdmCustomProvider> mdmCustomProvider,
-												  Optional<IdentifierSolverInterceptor> identifierSolverInterceptor,
+												  IdentifierSolverInterceptor identifierSolverInterceptor,
 												  Optional<IdentifierSolverInterceptorR4> identifierSolverInterceptorR4,
 												  SessionAuthorizationInterceptor sessionAuthorizationInterceptor) {
 		RestfulServer fhirServer = new RestfulServer(fhirSystemDao.getContext());
@@ -270,9 +270,10 @@ public class ServerConfig {
 
 		// register custom interceptors
 		fhirServer.registerInterceptor(sessionAuthorizationInterceptor);
-		if (identifierSolverInterceptor.isPresent()) {
+//		if (identifierSolverInterceptor.isPresent()) {
 			fhirServer.registerInterceptor(identifierSolverInterceptor);
-		} else if (identifierSolverInterceptorR4.isPresent()) {
+//		} else
+		if (identifierSolverInterceptorR4.isPresent()) {
 			fhirServer.registerInterceptor(identifierSolverInterceptorR4);
 		}
 //		registerCustomInterceptors(fhirServer, appContext, appProperties.getCustomInterceptorClasses());

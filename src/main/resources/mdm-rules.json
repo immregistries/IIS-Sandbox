@@ -105,6 +105,6 @@
     "patient-identifier" : "MATCH"
   },
   "eidSystems": {
-    "Patient": "AIRA-TEST/mrn"
+    "Patient": "AIRA-TEST"
   }
 }

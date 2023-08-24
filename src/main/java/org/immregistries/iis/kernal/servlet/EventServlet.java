@@ -7,6 +7,10 @@ import org.immregistries.iis.kernal.logic.IncomingEventHandler;
 import org.immregistries.iis.kernal.model.OrgAccess;
 import org.immregistries.iis.kernal.model.OrgMaster;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -18,13 +22,14 @@ import java.io.PrintWriter;
 import static org.immregistries.iis.kernal.servlet.LoginServlet.*;
 import static org.immregistries.iis.kernal.fhir.security.ServletHelper.SESSION_ORGMASTER;
 
-@SuppressWarnings("serial")
+@RestController
+@RequestMapping("/event")
 public class EventServlet extends PopServlet {
 	@Autowired
 	IncomingEventHandler incomingEventHandler;
   private static SessionFactory factory;
 
-  @Override
+  @PostMapping
   protected void doPost(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
     resp.setContentType("text/html");
@@ -63,7 +68,7 @@ public class EventServlet extends PopServlet {
     out.close();
   }
 
-  @Override
+  @GetMapping
   protected void doGet(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
 

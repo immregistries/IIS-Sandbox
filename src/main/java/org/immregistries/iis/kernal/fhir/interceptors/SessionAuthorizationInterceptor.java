@@ -84,7 +84,7 @@ public class SessionAuthorizationInterceptor extends AuthorizationInterceptor {
 
 			if (session != null ) {
 //				session.setAttribute(SESSION_ORGMASTER, null); // OrgMaster selection is set in requestDetails
-				session.setAttribute(SESSION_ORGMASTER, orgMaster); // TODO MAYBE REMOVE
+//				session.setAttribute(SESSION_ORGMASTER, orgMaster); // TODO MAYBE REMOVE
 			}
 			if (orgMaster == null) {
 				throw new AuthenticationException(Msg.code(644) + "Missing or invalid Authorization header value");

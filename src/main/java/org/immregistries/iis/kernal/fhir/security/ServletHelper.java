@@ -60,7 +60,6 @@ public class ServletHelper {
 		Query query = dataSession.createQuery("from OrgMaster where organizationName = ?1");
 		query.setParameter(1, facilityName);
 
-		logger.info("OrgAccess {}\n\n\n{}", orgAccess,orgAccess);
 		List<OrgMaster> orgMasterList = query.list();
 		if (orgMasterList.size() > 0) {
 			/**

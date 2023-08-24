@@ -2,10 +2,13 @@ package org.immregistries.iis.kernal.mapping.forR5;
 
 
 import org.apache.commons.lang3.StringUtils;
+import org.immregistries.codebase.client.generated.Code;
+import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.fhir.annotations.OnR5Condition;
 import org.hl7.fhir.r5.model.*;
 import org.hl7.fhir.r5.model.ContactPoint.ContactPointSystem;
 import org.hl7.fhir.r5.model.Enumerations.AdministrativeGender;
+import org.immregistries.iis.kernal.logic.CodeMapManager;
 import org.immregistries.iis.kernal.mapping.Interfaces.PatientMapper;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
 import org.immregistries.iis.kernal.model.PatientMaster;
@@ -257,30 +260,31 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 				break;
 		}
 
-		//Race and ethnicity
+		/**
+		 * Race
+		 */
 		Extension raceExtension = p.addExtension();
 		raceExtension.setUrl(RACE);
-		CodeableConcept race = new CodeableConcept().setText(RACE_SYSTEM);
+		CodeableConcept race = new CodeableConcept();
 		raceExtension.setValue(race);
-		if (StringUtils.isNotBlank(pr.getRace())) {
-			race.addCoding().setCode(pr.getRace());
+		addRace(race,pr.getRace());
+		addRace(race,pr.getRace2());
+		addRace(race,pr.getRace3());
+		addRace(race,pr.getRace4());
+		addRace(race,pr.getRace5());
+		addRace(race,pr.getRace6());
+
+		/**
+		 * Ethnicity
+		 */
+		Extension ethnicity = new Extension(ETHNICITY_EXTENSION, new Coding().setSystem(ETHNICITY_SYSTEM).setCode(pr.getEthnicity()));
+		p.addExtension(ethnicity);
+		if (StringUtils.isNotBlank(pr.getEthnicity())) {
+			Code code = CodeMapManager.getCodeMap().getCodeForCodeset(CodesetType.PATIENT_ETHNICITY,pr.getEthnicity());
+			if (code!= null) {
+				ethnicity.getValueCoding().setDisplay(code.getLabel());
+			}
 		}
-		if (StringUtils.isNotBlank(pr.getRace2())) {
-			race.addCoding().setCode(pr.getRace2());
-		}
-		if (StringUtils.isNotBlank(pr.getRace3())) {
-			race.addCoding().setCode(pr.getRace3());
-		}
-		if (StringUtils.isNotBlank(pr.getRace4())) {
-			race.addCoding().setCode(pr.getRace4());
-		}
-		if (StringUtils.isNotBlank(pr.getRace5())) {
-			race.addCoding().setCode(pr.getRace5());
-		}
-		if (StringUtils.isNotBlank(pr.getRace6())) {
-			race.addCoding().setCode(pr.getRace6());
-		}
-		p.addExtension(ETHNICITY_EXTENSION, new Coding().setSystem(ETHNICITY_SYSTEM).setCode(pr.getEthnicity()));
 		// telecom
 		if (null != pr.getPhone()) {
 			p.addTelecom().setSystem(ContactPointSystem.PHONE)
@@ -352,6 +356,19 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 		contactName.addGivenElement().setValue(pr.getGuardianFirst());
 		contactName.addGivenElement().setValue(pr.getGuardianMiddle());
 		return p;
+	}
+
+
+	private Coding addRace(CodeableConcept race,String value) {
+		Coding coding = null;
+		if (StringUtils.isNotBlank(value)) {
+			coding = race.addCoding().setCode(value).setSystem(RACE_SYSTEM);
+			Code code = CodeMapManager.getCodeMap().getCodeForCodeset(CodesetType.PATIENT_RACE,value);
+			if (code != null) {
+				coding.setDisplay(code.getLabel());
+			}
+		}
+		return coding;
 	}
 
 }

@@ -6,13 +6,10 @@ import ca.uhn.fhir.jpa.mdm.dao.MdmLinkDaoSvc;
 import ca.uhn.fhir.jpa.mdm.svc.MdmLinkSvcImpl;
 import ca.uhn.fhir.jpa.mdm.svc.MdmResourceDaoSvc;
 import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
-import ca.uhn.fhir.rest.api.RestOperationTypeEnum;
 import ca.uhn.fhir.rest.api.server.IBundleProvider;
 import ca.uhn.fhir.rest.api.server.RequestDetails;
 import ca.uhn.fhir.rest.param.TokenParam;
 import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
-import ca.uhn.fhir.rest.server.servlet.ServletRequestDetails;
-import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r5.model.*;
 import org.immregistries.iis.kernal.fhir.annotations.OnR5Condition;
 import org.slf4j.Logger;
@@ -24,9 +21,9 @@ import org.springframework.stereotype.Service;
 import javax.interceptor.Interceptor;
 
 import static ca.uhn.fhir.interceptor.api.Pointcut.SERVER_INCOMING_REQUEST_PRE_HANDLED;
-import static org.immregistries.iis.kernal.mapping.Interfaces.PatientMapper.MRN_SYSTEM;
 import static org.immregistries.iis.kernal.InternalClient.FhirRequester.GOLDEN_RECORD;
 import static org.immregistries.iis.kernal.InternalClient.FhirRequester.GOLDEN_SYSTEM_TAG;
+import static org.immregistries.iis.kernal.mapping.Interfaces.PatientMapper.MRN_SYSTEM;
 
 @Interceptor
 @Conditional(OnR5Condition.class)
@@ -54,7 +51,11 @@ public class IdentifierSolverInterceptor {
 	@Hook(SERVER_INCOMING_REQUEST_PRE_HANDLED)
 	public void handle(RequestDetails requestDetails)
 		throws InvalidRequestException {
-		if (requestDetails.getResource() instanceof  Immunization) {
+		logger.info("Identifier reference interception");
+
+		if (requestDetails.getResource() instanceof Immunization) {
+			logger.info("Identifier reference interception");
+
 			Immunization immunization = (Immunization) requestDetails.getResource();
 			if (immunization == null
 				|| immunization.getPatient().getIdentifier() == null
@@ -63,6 +64,9 @@ public class IdentifierSolverInterceptor {
 			) {
 				return;
 			}
+			/**
+			 * Linking record to golden
+			 */
 			Identifier identifier = immunization.getPatient().getIdentifier();
 			String id = null;
 			/**
@@ -91,9 +95,11 @@ public class IdentifierSolverInterceptor {
 					id = bundleProvider.getAllResourceIds().get(0);
 				}
 			}
+
 			if (id != null) {
 				logger.info("Identifier reference solved {}|{} to {}", identifier.getSystem(), identifier.getValue(), id);
 				immunization.setPatient(new Reference("Patient/" + new IdType(id).getIdPart()));
+				requestDetails.setResource(immunization);
 			} else {
 				// TODO set flavor
 				if (identifier.getSystem().equals(MRN_SYSTEM)) {

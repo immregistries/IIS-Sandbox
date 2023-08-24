@@ -6,6 +6,8 @@ import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.hl7.fhir.r4.model.Group;
 import org.hl7.fhir.r4.model.Reference;
+import org.immregistries.iis.kernal.fhir.annotations.OnR4Condition;
+import org.immregistries.iis.kernal.fhir.annotations.OnR5Condition;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.logic.IncomingMessageHandler;
 import org.immregistries.iis.kernal.model.OrgAccess;
@@ -17,6 +19,11 @@ import org.immregistries.smm.transform.Transformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Conditional;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -28,7 +35,10 @@ import java.util.ArrayList;
 
 import static org.immregistries.iis.kernal.servlet.LoginServlet.*;
 
-public class PopServletR4 extends HttpServlet {
+@RestController()
+@RequestMapping("/pop")
+@Conditional(OnR4Condition.class)
+public class PopServletR4  {
 	Logger logger = LoggerFactory.getLogger(PopServletR4.class);
 	public static final String PARAM_MESSAGE = "MESSAGEDATA";
 	private static SessionFactory factory;
@@ -44,7 +54,7 @@ public class PopServletR4 extends HttpServlet {
 		return factory.openSession();
 	}
 
-	@Override
+	@PostMapping()
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
 		throws ServletException, IOException {
 		resp.setContentType("text/html");
@@ -103,7 +113,7 @@ public class PopServletR4 extends HttpServlet {
 		out.close();
 	}
 
-	@Override
+	@GetMapping()
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
 		throws ServletException, IOException {
 		resp.setContentType("text/html");
