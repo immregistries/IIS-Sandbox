@@ -12,25 +12,25 @@ import org.springframework.stereotype.Service;
 @Service
 @Conditional(OnR4Condition.class)
 public class RelatedPersonMapperR4 implements RelatedPersonMapper<RelatedPerson> {
-	public void fillGuardianInformation(PatientMaster patientReported, RelatedPerson relatedPerson){
-		patientReported.setGuardianLast(relatedPerson.getNameFirstRep().getFamily());
+	public void fillGuardianInformation(PatientMaster patientMaster, RelatedPerson relatedPerson){
+		patientMaster.setGuardianLast(relatedPerson.getNameFirstRep().getFamily());
 		if (relatedPerson.getNameFirstRep().getGiven().size() > 0) {
-			patientReported.setGuardianFirst(relatedPerson.getNameFirstRep().getGiven().get(0).getValueNotNull());
+			patientMaster.setGuardianFirst(relatedPerson.getNameFirstRep().getGiven().get(0).getValueNotNull());
 		}
 		if (relatedPerson.getNameFirstRep().getGiven().size() > 1) {
-			patientReported.setGuardianMiddle(relatedPerson.getNameFirstRep().getGiven().get(1).getValueNotNull());
+			patientMaster.setGuardianMiddle(relatedPerson.getNameFirstRep().getGiven().get(1).getValueNotNull());
 		}
-		patientReported.setGuardianRelationship(relatedPerson.getRelationshipFirstRep().getCodingFirstRep().getCode());
+		patientMaster.setGuardianRelationship(relatedPerson.getRelationshipFirstRep().getCodingFirstRep().getCode());
 	}
 
-	public RelatedPerson getFhirRelatedPersonFromPatient(PatientMaster pr){
+	public RelatedPerson getFhirRelatedPersonFromPatient(PatientMaster patientMaster){
 		RelatedPerson relatedPerson = new RelatedPerson();
-		relatedPerson.setPatient(new Reference("Patient/" + pr.getPatientId()));
-		relatedPerson.addRelationship().addCoding().setSystem("").setCode(pr.getGuardianRelationship());
+		relatedPerson.setPatient(new Reference("Patient/" + patientMaster.getPatientId()));
+		relatedPerson.addRelationship().addCoding().setSystem("").setCode(patientMaster.getGuardianRelationship());
 		HumanName name = relatedPerson.addName();
-		name.setFamily(pr.getGuardianLast());
-		name.addGivenElement().setValue(pr.getGuardianFirst());
-		name.addGivenElement().setValue(pr.getGuardianMiddle());
+		name.setFamily(patientMaster.getGuardianLast());
+		name.addGivenElement().setValue(patientMaster.getGuardianFirst());
+		name.addGivenElement().setValue(patientMaster.getGuardianMiddle());
 		return relatedPerson;
 	}
 }

@@ -29,5 +29,10 @@ public interface PatientMapper<Patient> {
 
 	PatientMaster getMaster(Patient patient);
 
-	Patient getFhirResource(PatientMaster pr);
+	/**
+	 * Consvert local model patient information to FHIR Resource
+	 * @param patientMaster any local patient record
+	 * @return
+	 */
+	Patient getFhirResource(PatientMaster patientMaster);
 }

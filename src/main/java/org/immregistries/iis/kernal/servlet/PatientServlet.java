@@ -107,7 +107,8 @@ public class PatientServlet extends HttpServlet {
 
 			HomeServlet.doHeader(out, "IIS Sandbox - Patients");
 
-			PatientReported patientReportedSelected = getPatientReportedFromParameter(req, fhirClient);
+			Patient patientSelected  = getPatientFromParameter(req,fhirClient);
+			PatientReported patientReportedSelected = patientMapper.getReported(patientSelected)
 
 			if (patientReportedSelected == null) {
 				out.println("<h2>Patients from Facility : " + orgMaster.getOrganizationName() + "</h2>");
@@ -185,7 +186,6 @@ public class PatientServlet extends HttpServlet {
 
 				IParser parser = repositoryClientFactory.getFhirContext()
 					.newJsonParser().setPrettyPrint(true).setSuppressNarratives(true);
-				Patient patientSelected = (Patient) patientMapper.getFhirResource(patientReportedSelected);
 				out.println("<h2>Patient : " + patientSelected.getNameFirstRep().getNameAsSingleString() + "</h2>");
 				{
 					printPatient(out, patientReportedSelected);
