@@ -137,7 +137,7 @@ public class FhirTestServlet extends HttpServlet {
             if (reader.advanceToSegment("RXA")) {
               VaccinationReported vr = new VaccinationReported();
               vaccinationReportedList.add(vr);
-              vr.setVaccinationReportedExternalLink(vaccinationId);
+              vr.setExternalLink(vaccinationId);
               vr.setAdministeredDate(getDateSafe(reader.getValue(3)));
               {
                 String vaccineCode = reader.getValue(5, 1);
@@ -265,7 +265,7 @@ public class FhirTestServlet extends HttpServlet {
           count++;
           createImmunizationResource(vr, immunization, cvxCode, codeMap);
           String immUrl = baseUrl + "Immunization/";
-          String immUrlWithId = immUrl + vr.getVaccinationReportedExternalLink();
+          String immUrlWithId = immUrl + vr.getExternalLink();
           out.println("<h3>Immunization #" + count + "</h3>");
           out.println(
               "<table class=\"w3-table w3-bordered w3-striped w3-border test w3-hoverable\">");

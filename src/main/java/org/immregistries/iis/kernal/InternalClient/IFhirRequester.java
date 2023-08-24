@@ -33,7 +33,7 @@ public interface IFhirRequester<
 	public VaccinationReported searchVaccinationReported(ICriterion... where);
 
 	public List<VaccinationReported> searchVaccinationReportedList(ICriterion... where);
-	public List<VaccinationReported> searchVaccinationReportedListOperationEverything(String id);
+	public List<VaccinationMaster> searchVaccinationListOperationEverything(String id);
 
 	public ObservationReported searchObservationReported(ICriterion... where);
 	public Organization searchOrganization(ICriterion... where);

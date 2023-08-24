@@ -199,7 +199,7 @@ public class VaccinationServlet extends PatientServlet {
 		List<ObservationReported> observationReportedList;
 		{
 			observationReportedList = fhirRequester.searchObservationReportedList(
-				Observation.PATIENT.hasId(vaccinationReported.getVaccinationReportedId())
+				Observation.PATIENT.hasId(vaccinationReported.getVaccinationId())
 			);
 			Set<String> suppressSet = LoincIdentifier.getSuppressIdentifierCodeSet();
 			for (Iterator<ObservationReported> it = observationReportedList.iterator(); it.hasNext(); ) {

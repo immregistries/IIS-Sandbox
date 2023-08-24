@@ -106,7 +106,7 @@ public class FhirRequesterR5 extends FhirRequester<Patient, Immunization, Locati
 		return vaccinationReportedList;
 	}
 
-	public List<VaccinationReported> searchVaccinationReportedListOperationEverything(String id) {
+	public List<VaccinationMaster> searchVaccinationListOperationEverything(String id) {
 		IGenericClient client = repositoryClientFactory.getFhirClient();
 		Parameters in = new Parameters()
 			.addParameter("_mdm", "true")
@@ -118,13 +118,15 @@ public class FhirRequesterR5 extends FhirRequester<Patient, Immunization, Locati
 			.prettyPrint()
 			.useHttpGet()
 			.returnResourceType(Bundle.class).execute();
-		List<VaccinationReported> vaccinationReportedList = new ArrayList<>();
+		List<VaccinationMaster> vaccinationList = new ArrayList<>();
 		for (Bundle.BundleEntryComponent entry : bundle.getEntry()) {
 			if (entry.getResource() instanceof  Immunization) {
-				vaccinationReportedList.add(immunizationMapper.getReported((Immunization) entry.getResource()));
+				if (entry.getResource().getMeta().getTag(GOLDEN_SYSTEM_TAG, GOLDEN_RECORD) != null) {
+					vaccinationList.add(immunizationMapper.getMaster((Immunization) entry.getResource()));
+				}
 			}
 		}
-		return vaccinationReportedList;
+		return vaccinationList;
 	}
 
 	public ObservationReported searchObservationReported(ICriterion... where) {
@@ -254,12 +256,12 @@ public class FhirRequesterR5 extends FhirRequester<Patient, Immunization, Locati
 		Immunization immunization = immunizationMapper.getFhirResource(vaccinationReported);
 		MethodOutcome outcome = save(immunization,
 			Immunization.IDENTIFIER.exactly()
-				.identifier(vaccinationReported.getVaccinationReportedExternalLink())
+				.identifier(vaccinationReported.getExternalLink())
 		);
 		if (outcome.getCreated() != null && outcome.getCreated()) {
-			vaccinationReported.setVaccinationReportedId(outcome.getId().getIdPart());
+			vaccinationReported.setVaccinationId(outcome.getId().getIdPart());
 		} else if (!outcome.getResource().isEmpty()) {
-			vaccinationReported.setVaccinationReportedId(outcome.getResource().getIdElement().getIdPart());
+			vaccinationReported.setVaccinationId(outcome.getResource().getIdElement().getIdPart());
 		}
 		return vaccinationReported;
 	}

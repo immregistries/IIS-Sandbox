@@ -263,8 +263,8 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler<Organizatio
 					if (vaccinationReported == null) {
 						vaccinationReported = new VaccinationReported();
 						vaccinationReported.setReportedDate(new Date());
-						vaccinationReported.setVaccinationReportedExternalLink(vaccinationReportedExternalLink);
-						vaccinationReported.setVaccinationReportedExternalLinkSystem(vaccinationReportedExternalLinkSystem);
+						vaccinationReported.setExternalLink(vaccinationReportedExternalLink);
+						vaccinationReported.setExternalLinkSystem(vaccinationReportedExternalLinkSystem);
 					}
 					vaccinationReported.setPatientReportedId(patientReported.getId());
 					vaccinationReported.setPatientReported(patientReported);
@@ -1025,7 +1025,7 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler<Organizatio
 
 		observationReported.setPatientReportedId(patientReported.getId());
 		if (vaccinationReported != null) {
-			observationReported.setVaccinationReportedId(vaccinationReported.getVaccinationReportedId());
+			observationReported.setVaccinationReportedId(vaccinationReported.getVaccinationId());
 		}
 //    observationReported.setObservation(observationMaster);
 		observationReported.setUpdatedDate(new Date());
@@ -1050,7 +1050,7 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler<Organizatio
 	}
 
 	@SuppressWarnings("unchecked")
-	public String buildRSP(HL7Reader reader, String messageRecieved, PatientReported patientReported,
+	public String buildRSP(HL7Reader reader, String messageReceived, PatientReported patientReported,
 								  OrgMaster orgMaster, List<PatientReported> patientReportedPossibleList,
 								  List<ProcessingException> processingExceptionList) {
 		IGenericClient fhirClient = getFhirClient();
@@ -1205,13 +1205,12 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler<Organizatio
 				if (cvxCode == null) {
 					continue;
 				}
-				VaccinationReported vaccinationReported = vaccination.getVaccinationReported();
 				boolean originalReporter =
-					vaccinationReported.getPatientReported().getOrgReported().equals(orgMaster);
-				if ("D".equals(vaccinationReported.getActionCode())) {
+					vaccination.getPatientReported().getOrgReported().equals(orgMaster);
+				if ("D".equals(vaccination.getActionCode())) {
 					continue;
 				}
-				printORC(orgMaster, sb, vaccination, vaccinationReported, originalReporter);
+				printORC(orgMaster, sb, vaccination, originalReporter);
 				sb.append("RXA");
 				// RXA-1
 				sb.append("|0");
@@ -1227,9 +1226,9 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler<Organizatio
 				sb.append("|");
 				// RXA-5
 				sb.append("|").append(cvxCode.getValue()).append("^").append(cvxCode.getLabel()).append("^CVX");
-				if (!vaccinationReported.getVaccineNdcCode().equals("")) {
+				if (!vaccination.getVaccineNdcCode().equals("")) {
 					Code ndcCode = codeMap.getCodeForCodeset(CodesetType.VACCINATION_NDC_CODE,
-						vaccinationReported.getVaccineNdcCode());
+						vaccination.getVaccineNdcCode());
 					if (ndcCode != null) {
 						sb.append("~").append(ndcCode.getValue()).append("^").append(ndcCode.getLabel()).append("^NDC");
 					}
@@ -1238,9 +1237,9 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler<Organizatio
 					// RXA-6
 					sb.append("|");
 					double adminAmount = 0.0;
-					if (!vaccinationReported.getAdministeredAmount().equals("")) {
+					if (!vaccination.getAdministeredAmount().equals("")) {
 						try {
-							adminAmount = Double.parseDouble(vaccinationReported.getAdministeredAmount());
+							adminAmount = Double.parseDouble(vaccination.getAdministeredAmount());
 						} catch (NumberFormatException nfe) {
 							adminAmount = 0.0;
 						}
@@ -1260,9 +1259,9 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler<Organizatio
 				sb.append("|");
 				{
 					Code informationCode = null;
-					if (vaccinationReported.getInformationSource() != null) {
+					if (vaccination.getInformationSource() != null) {
 						informationCode = codeMap.getCodeForCodeset(CodesetType.VACCINATION_INFORMATION_SOURCE,
-							vaccinationReported.getInformationSource());
+							vaccination.getInformationSource());
 					}
 					if (informationCode != null) {
 						sb.append(informationCode.getValue()).append("^").append(informationCode.getLabel()).append("^NIP001");
@@ -1272,12 +1271,12 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler<Organizatio
 				sb.append("|");
 				// RXA-11
 				sb.append("|");
-				if (vaccinationReported.getOrgLocation() == null
-					|| vaccinationReported.getOrgLocation().getOrgFacilityCode() == null
-					|| "".equals(vaccinationReported.getOrgLocation().getOrgFacilityCode())) {
+				if (vaccination.getOrgLocation() == null
+					|| vaccination.getOrgLocation().getOrgFacilityCode() == null
+					|| "".equals(vaccination.getOrgLocation().getOrgFacilityCode())) {
 				} else {
 					sb.append("^^^");
-					sb.append(vaccinationReported.getOrgLocation().getOrgFacilityCode());
+					sb.append(vaccination.getOrgLocation().getOrgFacilityCode());
 				}
 				// RXA-12
 				sb.append("|");
@@ -1287,28 +1286,28 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler<Organizatio
 				sb.append("|");
 				// RXA-15
 				sb.append("|");
-				if (vaccinationReported.getLotnumber() != null) {
-					sb.append(vaccinationReported.getLotnumber());
+				if (vaccination.getLotnumber() != null) {
+					sb.append(vaccination.getLotnumber());
 				}
 				// RXA-16
 				sb.append("|");
-				if (vaccinationReported.getExpirationDate() != null) {
-					sb.append(sdf.format(vaccinationReported.getExpirationDate()));
+				if (vaccination.getExpirationDate() != null) {
+					sb.append(sdf.format(vaccination.getExpirationDate()));
 				}
 				// RXA-17
 				sb.append("|");
-				sb.append(printCode(vaccinationReported.getVaccineMvxCode(),
+				sb.append(printCode(vaccination.getVaccineMvxCode(),
 					CodesetType.VACCINATION_MANUFACTURER_CODE, "MVX", codeMap));
 				// RXA-18
 				sb.append("|");
-				sb.append(printCode(vaccinationReported.getRefusalReasonCode(),
+				sb.append(printCode(vaccination.getRefusalReasonCode(),
 					CodesetType.VACCINATION_REFUSAL, "NIP002", codeMap));
 				// RXA-19
 				sb.append("|");
 				// RXA-20
 				sb.append("|");
 				if (!processingFlavorSet.contains(ProcessingFlavor.LIME)) {
-					String completionStatus = vaccinationReported.getCompletionStatus();
+					String completionStatus = vaccination.getCompletionStatus();
 					if (completionStatus == null || completionStatus.equals("")) {
 						completionStatus = "CP";
 					}
@@ -1318,20 +1317,20 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler<Organizatio
 				// RXA-21
 				sb.append("|A");
 				sb.append("\r");
-				if (vaccinationReported.getBodyRoute() != null
-					&& !vaccinationReported.getBodyRoute().equals("")) {
+				if (vaccination.getBodyRoute() != null
+					&& !vaccination.getBodyRoute().equals("")) {
 					sb.append("RXR");
 					// RXR-1
 					sb.append("|");
-					sb.append(printCode(vaccinationReported.getBodyRoute(), CodesetType.BODY_ROUTE, "NCIT",
+					sb.append(printCode(vaccination.getBodyRoute(), CodesetType.BODY_ROUTE, "NCIT",
 						codeMap));
 					// RXR-2
 					sb.append("|");
-					sb.append(printCode(vaccinationReported.getBodySite(), CodesetType.BODY_SITE, "HL70163",
+					sb.append(printCode(vaccination.getBodySite(), CodesetType.BODY_SITE, "HL70163",
 						codeMap));
 					sb.append("\r");
 				}
-				TestEvent testEvent = vaccinationReported.getTestEvent();
+				TestEvent testEvent = vaccination.getTestEvent();
 				if (testEvent != null && testEvent.getEvaluationActualList() != null) {
 					for (EvaluationActual evaluationActual : testEvent.getEvaluationActualList()) {
 						obsSubId++;
@@ -1379,7 +1378,7 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler<Organizatio
 					.where(Observation.PART_OF.hasId(patientMaster.getPatientId()))
 					.returnBundle(Bundle.class).execute();
 				if (bundle.hasEntry()) {
-					printORC(orgMaster, sb, null, null, false);
+					printORC(orgMaster, sb, null, false);
 					obsSubId++;
 					for (Bundle.BundleEntryComponent entry : bundle.getEntry()) {
 						obxSetId++;
@@ -1392,7 +1391,7 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler<Organizatio
 			}
 
 			if (sendBackForecast && forecastActualList != null && forecastActualList.size() > 0) {
-				printORC(orgMaster, sb, null, null, false);
+				printORC(orgMaster, sb, null, false);
 				sb.append("RXA");
 				// RXA-1
 				sb.append("|0");
@@ -1482,7 +1481,7 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler<Organizatio
 		}
 
 		String messageResponse = sb.toString();
-		recordMessageReceived(messageRecieved, patientReported, messageResponse, "Query",
+		recordMessageReceived(messageReceived, patientReported, messageResponse, "Query",
 			categoryResponse, orgMaster);
 		return messageResponse;
 	}
@@ -1511,7 +1510,7 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler<Organizatio
 
 				boolean originalReporter =
 					vaccinationReported.getPatientReported().getOrgReported().equals(orgMaster);
-				printORC(orgMaster, sb, vaccination, vaccinationReported, originalReporter);
+				printORC(orgMaster, sb, vaccination, originalReporter);
 				sb.append("RXA");
 				// RXA-1
 				sb.append("|0");

@@ -280,7 +280,7 @@ public abstract class IncomingMessageHandler<Organization extends IBaseResource>
   }
 
   public void printORC(OrgMaster orgMaster, StringBuilder sb, VaccinationMaster vaccination,
-      VaccinationReported vaccinationReported, boolean originalReporter) {
+							  boolean originalReporter) {
     Set<ProcessingFlavor> processingFlavorSet = orgMaster.getProcessingFlavorSet();
     sb.append("ORC");
     // ORC-1
@@ -300,7 +300,7 @@ public abstract class IncomingMessageHandler<Organization extends IBaseResource>
       }
     } else {
       if (originalReporter) {
-        sb.append(vaccinationReported.getVaccinationReportedExternalLink()).append("^").append(orgMaster.getOrganizationName());
+        sb.append(vaccination.getExternalLink()).append("^").append(orgMaster.getOrganizationName());
       }
     }
     sb.append("\r");
@@ -322,16 +322,15 @@ public abstract class IncomingMessageHandler<Organization extends IBaseResource>
         if (cvxCode == null) {
           continue;
         }
-        VaccinationReported vaccinationReported = vaccination.getVaccinationReported();
-        if ("D".equals(vaccinationReported.getActionCode())) {
+        if ("D".equals(vaccination.getActionCode())) {
           continue;
         }
         int cvx = 0;
         try {
-          cvx = Integer.parseInt(vaccinationReported.getVaccineCvxCode());
-          TestEvent testEvent = new TestEvent(cvx, vaccinationReported.getAdministeredDate());
+          cvx = Integer.parseInt(vaccination.getVaccineCvxCode());
+          TestEvent testEvent = new TestEvent(cvx, vaccination.getAdministeredDate());
           testEventList.add(testEvent);
-          vaccinationReported.setTestEvent(testEvent);
+          vaccination.setTestEvent(testEvent);
         } catch (NumberFormatException nfe) {
           continue;
         }

@@ -23,9 +23,10 @@ public interface ImmunizationMapper<Immunization> {
 
 	VaccinationReported getReportedWithMaster(Immunization i);
 
-	VaccinationReported getReported(Immunization i);
+//	IVaccinationMaster fillFromFhirResource(VaccinationMaster vaccinationMaster, Immunization i);
 
+	VaccinationReported getReported(Immunization i);
 	VaccinationMaster getMaster(Immunization i);
 
-	Immunization getFhirResource(VaccinationReported vr);
+	Immunization getFhirResource(VaccinationMaster vr);
 }

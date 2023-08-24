@@ -86,8 +86,7 @@ public class V2ToFhirServlet extends HttpServlet {
 					if (cvxCode == null) {
 						continue;
 					}
-					VaccinationReported vaccinationReported = vaccination.getVaccinationReported();
-					if ("D".equals(vaccinationReported.getActionCode())) {
+					if ("D".equals(vaccination.getActionCode())) {
 						continue;
 					}
 					createImmunizationResource(vaccination, immunization, cvxCode, codeMap);
@@ -138,11 +137,10 @@ public class V2ToFhirServlet extends HttpServlet {
 
 	private void createImmunizationResource(VaccinationMaster vaccination, Immunization immunization,
 														 Code cvxCode, CodeMap codeMap) {
-		VaccinationReported vaccinationReported = vaccination.getVaccinationReported();
-		immunization = (Immunization) immunizationMapper.getFhirResource(vaccinationReported); // TODO Maybe remove this or remove the rest
+		immunization = (Immunization) immunizationMapper.getFhirResource(vaccination); // TODO Maybe remove this or remove the rest
 
 		{
-			DateTimeType occurance = new DateTimeType(vaccinationReported.getAdministeredDate());
+			DateTimeType occurance = new DateTimeType(vaccination.getAdministeredDate());
 			immunization.setOccurrence(occurance);
 		}
 		{
@@ -153,13 +151,13 @@ public class V2ToFhirServlet extends HttpServlet {
 			cvxCoding.setSystem("CVX");
 			immunization.setVaccineCode(vaccineCode);
 		}
-		if (StringUtils.isNotEmpty(vaccinationReported.getVaccineNdcCode())) {
-			CodeableConcept ndcCoding = createCodeableConcept(vaccinationReported.getVaccineNdcCode(),
+		if (StringUtils.isNotEmpty(vaccination.getVaccineNdcCode())) {
+			CodeableConcept ndcCoding = createCodeableConcept(vaccination.getVaccineNdcCode(),
 				CodesetType.VACCINATION_NDC_CODE, "NDC", codeMap); //TODO use CodeSet type in mapping ?
 			immunization.setVaccineCode(ndcCoding);
 		}
 		{
-			String administeredAmount = vaccinationReported.getAdministeredAmount();
+			String administeredAmount = vaccination.getAdministeredAmount();
 			if (StringUtils.isNotEmpty(administeredAmount)) {
 				SimpleQuantity doseQuantity = new SimpleQuantity();
 				try {
@@ -173,21 +171,21 @@ public class V2ToFhirServlet extends HttpServlet {
 		}
 
 		{
-			String infoSource = vaccinationReported.getInformationSource();
+			String infoSource = vaccination.getInformationSource();
 			if (StringUtils.isNotEmpty(infoSource)) {
 				immunization.setPrimarySource(infoSource.equals("00"));
 			}
 		}
 
 		{
-			String lotNumber = vaccinationReported.getLotnumber();
+			String lotNumber = vaccination.getLotnumber();
 			if (StringUtils.isNotEmpty(lotNumber)) {
 				immunization.setLotNumber(lotNumber);
 			}
 		}
 
 		{
-			Date expirationDate = vaccinationReported.getExpirationDate();
+			Date expirationDate = vaccination.getExpirationDate();
 			if (expirationDate != null) {
 				immunization.setExpirationDate(expirationDate);
 			}
@@ -195,7 +193,7 @@ public class V2ToFhirServlet extends HttpServlet {
 
 
 		{
-			CodeableConcept mvxCoding = createCodeableConcept(vaccinationReported.getVaccineMvxCode(),
+			CodeableConcept mvxCoding = createCodeableConcept(vaccination.getVaccineMvxCode(),
 				CodesetType.VACCINATION_MANUFACTURER_CODE, "MVX", codeMap);
 			// todo, need to make a reference
 		}

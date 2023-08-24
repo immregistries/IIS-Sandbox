@@ -29,20 +29,25 @@ public class ImmunizationMapperR5 implements ImmunizationMapper<Immunization> {
 		VaccinationReported vaccinationReported = getReported(i);
 		VaccinationMaster vaccinationMaster = fhirRequests.searchVaccinationMaster(
 			Immunization.IDENTIFIER.exactly().identifier(
-				vaccinationReported.getVaccinationReportedExternalLink()));
+				vaccinationReported.getExternalLink()));
 		if (vaccinationMaster!= null) {
 			vaccinationReported.setVaccination(vaccinationMaster);
-			vaccinationMaster.setVaccinationReported(vaccinationReported);
 		}
 		return vaccinationReported;
 	}
 
-	public VaccinationReported getReported(Immunization i) {
-		VaccinationReported vr = new VaccinationReported();
-		vr.setVaccinationReportedId(new IdType(i.getId()).getIdPart());
+	/**
+	 * Returns Vaccination Reported for Casting reasons
+	 *
+	 * @param vr Vaccination object to be filled
+	 * @param i
+	 * @return
+	 */
+	public void fillFromFhirResource(VaccinationMaster vr, Immunization i) {
+		vr.setVaccinationId(new IdType(i.getId()).getIdPart());
 		vr.setUpdatedDate(i.getMeta().getLastUpdated());
-		vr.setVaccinationReportedExternalLink(i.getIdentifierFirstRep().getValue());
-		vr.setVaccinationReportedExternalLinkSystem(i.getIdentifierFirstRep().getSystem());
+		vr.setExternalLink(i.getIdentifierFirstRep().getValue());
+		vr.setExternalLinkSystem(i.getIdentifierFirstRep().getSystem());
 		if (i.getPatient() != null && StringUtils.isNotBlank(i.getPatient().getReference())) {
 			vr.setPatientReported(fhirRequests.readPatientReported(i.getPatient().getReference()));
 //			vr.setPatientReported(fhirRequests.readPatientReported(i.getPatient().getReference().split("Patient/")[0]));
@@ -121,35 +126,45 @@ public class ImmunizationMapperR5 implements ImmunizationMapper<Immunization> {
 				}
 			}
 		}
-		return vr;
 	}
 
-	/**
-	 * Converts golden resource to VaccinationMaster
-	 * @param i
-	 * @return
-	 */
-  public VaccinationMaster getMaster(Immunization i){
-	  VaccinationMaster vaccinationMaster = new VaccinationMaster();
-	  vaccinationMaster.setVaccinationId(i.getId());
-	  vaccinationMaster.setExternalLink(i.getIdentifierFirstRep().getValue());
-	  vaccinationMaster.setAdministeredDate(i.getOccurrenceDateTimeType().getValue());
-	  vaccinationMaster.setVaccineCvxCode(i.getVaccineCode().getCode(CVX));
-	  if (i.getPatient() != null && StringUtils.isNotBlank(i.getPatient().getId())) {
-		  vaccinationMaster.setPatient(fhirRequests.readPatientMaster(i.getPatient().getId()));
-	  }
-//	  vaccinationMaster.setVaccinationReported();
-	  return vaccinationMaster;
-  }
+//	/**
+//	 * Converts golden resource to VaccinationMaster
+//	 * @param i
+//	 * @return
+//	 */
+//  public VaccinationMaster getMaster(Immunization i){
+//	  VaccinationMaster vaccinationMaster = new VaccinationMaster();
+//	  vaccinationMaster.setVaccinationId(i.getId());
+//	  vaccinationMaster.setExternalLink(i.getIdentifierFirstRep().getValue());
+//	  vaccinationMaster.setAdministeredDate(i.getOccurrenceDateTimeType().getValue());
+//	  vaccinationMaster.setVaccineCvxCode(i.getVaccineCode().getCode(CVX));
+//	  if (i.getPatient() != null && StringUtils.isNotBlank(i.getPatient().getId())) {
+//		  vaccinationMaster.setPatient(fhirRequests.readPatientMaster(i.getPatient().getId()));
+//	  }
+////	  vaccinationMaster.setVaccinationReported();
+//	  return vaccinationMaster;
+//  }
+
+	public VaccinationReported getReported(Immunization i){
+		VaccinationReported vaccinationReported = new VaccinationReported();
+		fillFromFhirResource(vaccinationReported, i); // TODO assert not golden record ?
+		return vaccinationReported;
+	}
+	public VaccinationMaster getMaster(Immunization i){
+		VaccinationMaster vaccinationMaster = new VaccinationMaster();
+		fillFromFhirResource(vaccinationMaster, i); // TODO assert golden record ?
+		return vaccinationMaster;
+	}
 
   /**
    * This method create the immunization resource based on the vaccinationReported information
    * @param vr the vaccinationReported
    * @return the Immunization resource
    */
-  public Immunization getFhirResource(VaccinationReported vr) {
+  public Immunization getFhirResource(VaccinationMaster vr) {
 	  Immunization i = new Immunization();
-	  i.addIdentifier(MappingHelper.getFhirIdentifier(vr.getVaccinationReportedExternalLinkSystem(), vr.getVaccinationReportedExternalLink())); // TODO if system empty ?
+	  i.addIdentifier(MappingHelper.getFhirIdentifier(vr.getExternalLinkSystem(), vr.getExternalLink())); // TODO if system empty ?
 	  Reference patientReference = new Reference()
 		  .setReference("Patient/" + vr.getPatientReported().getId())
 //		  .setIdentifier(new Identifier()

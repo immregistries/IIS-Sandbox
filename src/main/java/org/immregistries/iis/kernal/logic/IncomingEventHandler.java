@@ -15,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import java.util.Date;
 
 
@@ -144,7 +143,7 @@ public class IncomingEventHandler {
 //      vaccinationReported.setVaccination(vaccinationMaster);
 //      vaccinationMaster.setVaccinationReported(null);
       vaccinationReported.setReportedDate(new Date());
-      vaccinationReported.setVaccinationReportedExternalLink(vaccinationReportedExternalLink);
+      vaccinationReported.setExternalLink(vaccinationReportedExternalLink);
     }
 	  vaccinationReported.setPatientReported(patientReported);
 //    vaccinationMaster.setPatient(patientReported.getPatient());
