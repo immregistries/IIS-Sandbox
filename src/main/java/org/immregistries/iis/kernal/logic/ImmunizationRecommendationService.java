@@ -37,7 +37,7 @@ public class ImmunizationRecommendationService {
 		ImmunizationRecommendation recommendation = generate(orgMaster);
 		recommendation.setPatient(new Reference()
 			.setIdentifier(new Identifier()
-				.setValue(patientReported.getPatientReportedExternalLink())
+				.setValue(patientReported.getExternalLink())
 				.setSystem(patientReported.getPatientReportedAuthority())));
 
 		return recommendation;

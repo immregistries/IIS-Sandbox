@@ -163,16 +163,16 @@ public class ServletRegistrationConfig {
 		return registrationBean;
 	}
 
-	@Bean
-	public ServletRegistrationBean v2ToFhirServletRegistrationBean() {
-		ServletRegistrationBean registrationBean = new ServletRegistrationBean();
-		HttpServlet servlet = new V2ToFhirServlet();
-		beanFactory.autowireBean(servlet);
-		registrationBean.setServlet(servlet);
-		registrationBean.addUrlMappings("/v2ToFhir");
-//		registrationBean.setLoadOnStartup(1);
-		return registrationBean;
-	}
+//	@Bean
+//	public ServletRegistrationBean v2ToFhirServletRegistrationBean() {
+//		ServletRegistrationBean registrationBean = new ServletRegistrationBean();
+//		HttpServlet servlet = new V2ToFhirServlet();
+//		beanFactory.autowireBean(servlet);
+//		registrationBean.setServlet(servlet);
+//		registrationBean.addUrlMappings("/v2ToFhir");
+////		registrationBean.setLoadOnStartup(1);
+//		return registrationBean;
+//	}
 
 	@Bean
 	public ServletRegistrationBean vacDedupServletRegistrationBean() {

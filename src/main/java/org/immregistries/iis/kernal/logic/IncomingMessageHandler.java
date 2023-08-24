@@ -100,7 +100,7 @@ public abstract class IncomingMessageHandler<Organization extends IBaseResource>
     messageReceived.setOrgMaster(orgMaster);
     messageReceived.setMessageRequest(message);
 	 if (patientReported != null) {
-		 messageReceived.setPatientReportedId(patientReported.getId());
+		 messageReceived.setPatientReportedId(patientReported.getPatientId());
 	 }
     messageReceived.setMessageResponse(messageResponse);
     messageReceived.setReportedDate(new Date());
@@ -141,17 +141,17 @@ public abstract class IncomingMessageHandler<Organization extends IBaseResource>
     // PID-2
     sb.append("|");
     // PID-3
-    sb.append("|").append(patient.getPatientExternalLink()).append("^^^IIS^SR");
+    sb.append("|").append(patient.getExternalLink()).append("^^^IIS^SR");
     if (patientReported != null) {
-      sb.append("~").append(patientReported.getPatientReportedExternalLink()).append("^^^").append(patientReported.getPatientReportedAuthority()).append("^").append(patientReported.getPatientReportedType());
+      sb.append("~").append(patientReported.getExternalLink()).append("^^^").append(patientReported.getPatientReportedAuthority()).append("^").append(patientReported.getPatientReportedType());
     }
     // PID-4
     sb.append("|");
     // PID-5
-    String firstName = patient.getPatientNameFirst();
-    String middleName = patient.getPatientNameMiddle();
-    String lastName = patient.getPatientNameLast();
-    String dateOfBirth = sdf.format(patient.getPatientBirthDate());
+    String firstName = patient.getNameFirst();
+    String middleName = patient.getNameMiddle();
+    String lastName = patient.getNameLast();
+    String dateOfBirth = sdf.format(patient.getBirthDate());
 
     // If "PHI" flavor, strip AIRA from names 10% of the time
     if (processingFlavorSet.contains(ProcessingFlavor.PHI)) {
@@ -314,7 +314,7 @@ public abstract class IncomingMessageHandler<Organization extends IBaseResource>
       TestCase testCase = new TestCase();
       testCase.setEvalDate(new Date());
       testCase.setPatientSex(patientReported == null ? "F" : patientReported.getSex());
-      testCase.setPatientDob(patient.getPatientBirthDate());
+      testCase.setPatientDob(patient.getBirthDate());
       List<TestEvent> testEventList = new ArrayList<>();
       for (VaccinationMaster vaccination : vaccinationMasterList) {
         Code cvxCode = codeMap.getCodeForCodeset(CodesetType.VACCINATION_CVX_CODE,

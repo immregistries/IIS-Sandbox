@@ -133,7 +133,7 @@ public class IncomingEventHandler {
           "Vaccination is indicated as occuring in the future, unable to accept future vaccination events");
     }
 	  vaccinationReported = fhirRequester.searchVaccinationReported(
-		  Immunization.PATIENT.hasId(patientReported.getId()),
+		  Immunization.PATIENT.hasId(patientReported.getPatientId()),
 		  Immunization.IDENTIFIER.exactly().code(vaccinationReportedExternalLink)
 	  );
     if (vaccinationReported == null) {
@@ -261,7 +261,7 @@ public class IncomingEventHandler {
 //      patientMaster.setOrgMaster(orgAccess.getOrg());
       patientReported = new PatientReported();
       patientReported.setOrgReported(orgMaster);
-      patientReported.setPatientReportedExternalLink(patientReportedExternalLink);
+      patientReported.setExternalLink(patientReportedExternalLink);
 //      patientReported.setPatient(patientMaster);
       patientReported.setReportedDate(new Date());
     }else {
@@ -312,7 +312,7 @@ public class IncomingEventHandler {
 //    patientMaster.setPatientBirthDate(patientBirthDate);
 //    patientMaster.setPatientSoundexFirst(""); // TODO, later
 //    patientMaster.setPatientSoundexLast(""); // TODO, later
-	  patientReported.setPatientReportedExternalLink(patientReportedExternalLink);
+	  patientReported.setExternalLink(patientReportedExternalLink);
 	  patientReported.setPatientReportedType(patientReportedType);
 	  patientReported.setNameFirst(patientNameFirst);
 	  patientReported.setNameLast(patientNameLast);
@@ -358,7 +358,7 @@ public class IncomingEventHandler {
     patientReported.setUpdatedDate(new Date());
     patientReported = fhirRequester.savePatientReported(patientReported);
 	 patientReported.setPatient(fhirRequester.searchPatientMaster(
-		 Patient.IDENTIFIER.exactly().systemAndIdentifier(patientReported.getPatientReportedAuthority(),patientReported.getPatientReportedExternalLink())
+		 Patient.IDENTIFIER.exactly().systemAndIdentifier(patientReported.getPatientReportedAuthority(),patientReported.getExternalLink())
 	 ));
     return patientReported;
   }

@@ -206,12 +206,12 @@ public class FhirRequesterR5 extends FhirRequester<Patient, Immunization, Locati
 	public PatientReported savePatientReported(PatientReported patientReported) {
 		Patient patient = (Patient) patientMapper.getFhirResource(patientReported);
 		MethodOutcome outcome = save(patient,
-			Patient.IDENTIFIER.exactly().systemAndIdentifier(patientReported.getPatientReportedAuthority(), patientReported.getPatientReportedExternalLink()));
+			Patient.IDENTIFIER.exactly().systemAndIdentifier(patientReported.getPatientReportedAuthority(), patientReported.getExternalLink()));
 		if (!outcome.getResource().isEmpty()) {
-			patientReported.setId(outcome.getResource().getIdElement().getIdPart());
+			patientReported.setPatientId(outcome.getResource().getIdElement().getIdPart());
 			return patientMapper.getReportedWithMaster((Patient) outcome.getResource());
 		} else if (outcome.getCreated() != null && outcome.getCreated()) {
-			patientReported.setId(outcome.getId().getIdPart());
+			patientReported.setPatientId(outcome.getId().getIdPart());
 			return readPatientReported(outcome.getId().getIdPart());
 		} else {
 			return patientReported;
@@ -232,11 +232,11 @@ public class FhirRequesterR5 extends FhirRequester<Patient, Immunization, Locati
 	}
 
 	public PatientReported saveRelatedPerson(PatientReported patientReported) {
-		RelatedPerson relatedPerson = (RelatedPerson) relatedPersonMapper.getFhirRelatedPersonFromPatient(patientReported);
+		RelatedPerson relatedPerson = relatedPersonMapper.getFhirRelatedPersonFromPatient(patientReported);
 		MethodOutcome outcome = save(relatedPerson,
-			RelatedPerson.PATIENT.hasId(patientReported.getId()));
+			RelatedPerson.PATIENT.hasId(patientReported.getPatientId()));
 		if (outcome.getResource() != null) {
-			patientReported = relatedPersonMapper.fillGuardianInformation(patientReported, (RelatedPerson) outcome.getResource());
+			relatedPersonMapper.fillGuardianInformation(patientReported, (RelatedPerson) outcome.getResource());
 		}
 		return patientReported;
 	}

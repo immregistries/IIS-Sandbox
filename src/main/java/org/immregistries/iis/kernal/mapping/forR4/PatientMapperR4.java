@@ -31,15 +31,14 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 		PatientReported patientReported = getReported(p);
 		patientReported.setPatient(
 			fhirRequests.searchPatientMaster(
-				Patient.IDENTIFIER.exactly().systemAndIdentifier(patientReported.getPatientReportedAuthority(), patientReported.getPatientReportedExternalLink()) // TODO change to get from mdm
+				Patient.IDENTIFIER.exactly().systemAndIdentifier(patientReported.getPatientReportedAuthority(), patientReported.getExternalLink()) // TODO change to get from mdm
 			));
 		return patientReported;
 	}
 
-	public PatientReported getReported(Patient p) {
-		PatientReported patientReported = new PatientReported();
-		patientReported.setId(new IdType(p.getId()).getIdPart());
-		patientReported.setPatientReportedExternalLink(p.getIdentifierFirstRep().getValue());
+	public void fillFromFhirResource(PatientMaster patientReported, Patient p) {
+		patientReported.setPatientId(new IdType(p.getId()).getIdPart());
+		patientReported.setExternalLink(p.getIdentifierFirstRep().getValue());
 		patientReported.setUpdatedDate(p.getMeta().getLastUpdated());
 
 		patientReported.setPatientReportedAuthority(p.getIdentifierFirstRep().getSystem());
@@ -188,32 +187,29 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 
 		// patientReported.setRegistryStatusIndicator(p.getActive());
 		// Patient Contact / Guardian
-		RelatedPerson relatedPerson = fhirRequests.searchRelatedPerson(RelatedPerson.PATIENT.hasAnyOfIds(patientReported.getId(), patientReported.getPatientReportedExternalLink()));
+		RelatedPerson relatedPerson = fhirRequests.searchRelatedPerson(RelatedPerson.PATIENT.hasAnyOfIds(patientReported.getPatientId(), patientReported.getExternalLink()));
 		if (relatedPerson != null) {
 			relatedPersonMapperR4.fillGuardianInformation(patientReported, relatedPerson);
 		}
-		return patientReported;
 	}
 
-	public PatientMaster getMaster(Patient p) {
+	public PatientReported getReported(Patient patient) {
+		PatientReported patientReported = new PatientReported();
+		fillFromFhirResource(patientReported,patient);
+		return patientReported;
+	}
+	public PatientMaster getMaster(Patient patient) {
 		PatientMaster patientMaster = new PatientMaster();
-		patientMaster.setPatientExternalLink(p.getIdentifier().stream().filter(identifier -> !identifier.getSystem().equals(GOLDEN_SYSTEM_IDENTIFIER)).findFirst().orElse(new Identifier()).getValue()); //TODO deal with MDM Identifiers
-		patientMaster.setPatientNameFirst(p.getNameFirstRep().getGiven().get(0).getValue());
-		if (p.getNameFirstRep().getGiven().size() > 1) {
-			patientMaster.setPatientNameMiddle(p.getNameFirstRep().getGiven().get(1).getValue());
-		}
-		patientMaster.setPatientNameLast(p.getNameFirstRep().getFamily());
-		patientMaster.setPatientExternalLink(p.getIdentifierFirstRep().getValue());
-//	  patientMaster.setPatientAddressFrag();
+		fillFromFhirResource(patientMaster,patient);
 		return patientMaster;
 	}
 
-	public Patient getFhirResource(PatientReported pr) {
+	public Patient getFhirResource(PatientMaster pr) {
 		Patient p = new Patient();
 
 		p.addIdentifier(new Identifier()
 			.setSystem(pr.getPatientReportedAuthority())
-			.setValue(pr.getPatientReportedExternalLink())
+			.setValue(pr.getExternalLink())
 			.setType(
 				new CodeableConcept(new Coding()
 					.setSystem("http://terminology.hl7.org/CodeSystem/v2-0203")

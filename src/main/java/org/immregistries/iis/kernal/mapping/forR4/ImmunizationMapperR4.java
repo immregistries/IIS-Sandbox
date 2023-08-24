@@ -147,7 +147,7 @@ public class ImmunizationMapperR4 implements ImmunizationMapper<Immunization> {
   public Immunization getFhirResource(VaccinationMaster vr) {
      Immunization i = new Immunization();
 //	  i.addIdentifier(MappingHelper.getFhirIdentifier(MappingHelper.VACCINATION_REPORTED, vr.getVaccinationReportedExternalLink()));
-	  i.setPatient(new Reference().setReference("Patient/" + vr.getPatientReported().getId()));
+	  i.setPatient(new Reference().setReference("Patient/" + vr.getPatientReported().getPatientId()));
 	  i.setRecorded(vr.getReportedDate());
 	  i.getOccurrenceDateTimeType().setValue(vr.getAdministeredDate());
 

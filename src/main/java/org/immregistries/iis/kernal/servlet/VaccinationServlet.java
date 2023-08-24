@@ -178,7 +178,7 @@ public class VaccinationServlet extends PatientServlet {
 				 * Setting external identifier in reference
 				 */
 				immunization.getPatient().setIdentifier(new Identifier()
-					.setValue(vaccinationReported.getPatientReported().getPatientReportedExternalLink())
+					.setValue(vaccinationReported.getPatientReported().getExternalLink())
 					.setSystem(vaccinationReported.getPatientReported().getPatientReportedAuthority()));
 				IParser parser = repositoryClientFactory.getFhirContext().newJsonParser().setPrettyPrint(true);
 

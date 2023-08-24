@@ -19,10 +19,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -164,10 +160,10 @@ public class PatientServlet extends HttpServlet {
 								break;
 							}
 							String link = "patient?" + PARAM_PATIENT_REPORTED_EXTERNAL_LINK + "="
-								+ patientReported.getPatientReportedExternalLink();
+								+ patientReported.getExternalLink();
 							out.println("  <tr>");
 							out.println("    <td><a href=\"" + link + "\">"
-								+ patientReported.getPatientReportedExternalLink() + "</a></td>");
+								+ patientReported.getExternalLink() + "</a></td>");
 							out.println("    <td><a href=\"" + link + "\">" + patientReported.getNameLast()
 								+ "</a></td>");
 							out.println("    <td><a href=\"" + link + "\">"
@@ -195,7 +191,7 @@ public class PatientServlet extends HttpServlet {
 					printPatient(out, patientReportedSelected);
 				}
 				{
-					printVaccinationList(req, resp, out, fhirClient, patientReportedSelected.getId());
+					printVaccinationList(req, resp, out, fhirClient, patientReportedSelected.getPatientId());
 				}
 				{
 					List<ObservationReported> observationReportedList =
@@ -236,7 +232,7 @@ public class PatientServlet extends HttpServlet {
 					out.println("<h3>Messages Received</h3>");
 					Query query = dataSession.createQuery(
 						"from MessageReceived where patientReportedId = :patientReportedId order by reportedDate asc");
-					query.setParameter("patientReportedId", patientReportedSelected.getId());
+					query.setParameter("patientReportedId", patientReportedSelected.getPatientId());
 					List<MessageReceived> messageReceivedList = query.list();
 					if (messageReceivedList.size() == 0) {
 						out.println("<div class=\"w3-panel w3-yellow\"><p>No Messages Received</p></div>");
@@ -250,7 +246,7 @@ public class PatientServlet extends HttpServlet {
 				String apiBaseUrl = "/iis/fhir/" + orgMaster.getOrganizationName();
 				{
 					String link = apiBaseUrl + "/Patient/"
-						+ patientReportedSelected.getId();
+						+ patientReportedSelected.getPatientId();
 					out.println("<a href=\"" + link + "\">FHIR Resource</a>");
 				}
 //		  {
@@ -259,7 +255,7 @@ public class PatientServlet extends HttpServlet {
 //          out.println("<a href=\"" + link + "\">all FHIR Resources</a>");
 //        }
 				{
-					String link = apiBaseUrl + "/Patient/" + patientReportedSelected.getId() +
+					String link = apiBaseUrl + "/Patient/" + patientReportedSelected.getPatientId() +
 						"/$everything?_mdm=true";
 					out.println("<a href=\"" + link + "\">Everything related to Patient</a>");
 				}
@@ -521,7 +517,7 @@ public class PatientServlet extends HttpServlet {
 		out.println("  <tbody>");
 		out.println("  <tr>");
 		out.println("    <th class=\"w3-green\">External Id (MRN)</th>");
-		out.println("    <td>" + patientReportedSelected.getPatientReportedExternalLink() + "</td>");
+		out.println("    <td>" + patientReportedSelected.getExternalLink() + "</td>");
 		out.println("  </tr>");
 		out.println("  <tr>");
 		out.println("    <th class=\"w3-green\">Patient Name</th>");
@@ -545,7 +541,7 @@ public class PatientServlet extends HttpServlet {
 		List<ObservationReported> observationReportedList = new ArrayList<>();
 		{
 			observationReportedList = fhirRequester.searchObservationReportedList(
-				Observation.SUBJECT.hasId(patientReportedSelected.getId()));
+				Observation.SUBJECT.hasId(patientReportedSelected.getPatientId()));
 //		 observationReportedList = observationReportedList.stream().filter(observationReported -> observationReported.getVaccinationReported() == null).collect(Collectors.toList());
 			Set<String> suppressSet = LoincIdentifier.getSuppressIdentifierCodeSet();
 			for (Iterator<ObservationReported> it = observationReportedList.iterator(); it.hasNext(); ) {

@@ -166,7 +166,7 @@ public class ImmunizationMapperR5 implements ImmunizationMapper<Immunization> {
 	  Immunization i = new Immunization();
 	  i.addIdentifier(MappingHelper.getFhirIdentifier(vr.getExternalLinkSystem(), vr.getExternalLink())); // TODO if system empty ?
 	  Reference patientReference = new Reference()
-		  .setReference("Patient/" + vr.getPatientReported().getId())
+		  .setReference("Patient/" + vr.getPatientReported().getPatientId())
 //		  .setIdentifier(new Identifier()
 //			  .setValue(vr.getPatientReported().getPatientReportedExternalLink())
 //			  .setSystem(vr.getPatientReported().getPatientReportedAuthority()))

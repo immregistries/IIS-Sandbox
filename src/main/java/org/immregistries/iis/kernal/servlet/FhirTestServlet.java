@@ -111,8 +111,8 @@ public class FhirTestServlet extends HttpServlet {
           }
           HL7Reader reader = new HL7Reader(message);
           if (reader.advanceToSegment("PID", "ORC")) {
-            pr.setPatientReportedExternalLink(reader.getValue(3, 1));
-            pm.setPatientExternalLink(reader.getValue(3, 1));
+            pr.setExternalLink(reader.getValue(3, 1));
+            pm.setExternalLink(reader.getValue(3, 1));
             pr.setNameLast(reader.getValue(5, 1));
             pr.setNameFirst(reader.getValue(5, 2));
             pr.setNameMiddle(reader.getValue(5, 3));
@@ -210,7 +210,7 @@ public class FhirTestServlet extends HttpServlet {
             "<p>The IIS Sandbox supports multitenancy for FHIR. Which means that resources submitted to the sandbox will be placed in dedicated buckets of data that are separated from data by different tenants (facilities.) This is different than IIS which will merge data from all submitters. The IIS Sandbox keeps submitted data separate to support testing from multiple agencies. </p>");
         {
           String patientUrl = baseUrl + "Patient/";
-          String patientUrlWithId = patientUrl + pr.getPatientReportedExternalLink();
+          String patientUrlWithId = patientUrl + pr.getExternalLink();
           out.println("<h3>Patient Resource</h3>");
           out.println(
               "<table class=\"w3-table w3-bordered w3-striped w3-border test w3-hoverable\">");
@@ -448,12 +448,12 @@ public class FhirTestServlet extends HttpServlet {
     PatientMaster pm = pr.getPatient();
     {
       Identifier id = p.addIdentifier();
-      id.setValue(pm.getPatientExternalLink());
+      id.setValue(pm.getExternalLink());
       CodeableConcept type = new CodeableConcept();
       type.addCoding().setCode("MR");
       id.setType(type);
     }
-    p.setId(pm.getPatientExternalLink());
+    p.setId(pm.getExternalLink());
     {
       HumanName name = p.addName();
       name.setFamily(pr.getNameLast());

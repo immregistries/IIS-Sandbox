@@ -29,5 +29,5 @@ public interface PatientMapper<Patient> {
 
 	PatientMaster getMaster(Patient patient);
 
-	Patient getFhirResource(PatientReported pr);
+	Patient getFhirResource(PatientMaster pr);
 }

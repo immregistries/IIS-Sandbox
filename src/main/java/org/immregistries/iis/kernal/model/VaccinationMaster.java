@@ -18,7 +18,6 @@ public class VaccinationMaster implements Serializable {
 	private String patientReportedId = "";
 	private String externalLink = "";
 	private String externalLinkSystem = "";
-	private VaccinationMaster vaccination = null;
 	private Date reportedDate = null;
 	private Date updatedDate = null;
 
@@ -273,7 +272,7 @@ public class VaccinationMaster implements Serializable {
 
 	public void setPatientReported(PatientReported reportedPatient) {
 		if (reportedPatient != null) {
-			patientReportedId = reportedPatient.getId();
+			patientReportedId = reportedPatient.getPatientId();
 		} else {
 			patientReportedId = "";
 		}
@@ -289,17 +288,6 @@ public class VaccinationMaster implements Serializable {
 	public void setExternalLink(String reportedOrderId) {
 		this.externalLink = reportedOrderId;
 	}
-
-
-	public VaccinationMaster getVaccination() {
-		return vaccination;
-	}
-
-
-	public void setVaccination(VaccinationMaster vaccination) {
-		this.vaccination = vaccination;
-	}
-
 
 	public Date getReportedDate() {
 		return reportedDate;
@@ -343,7 +331,7 @@ public class VaccinationMaster implements Serializable {
 
 
 	public void setPatientReportedId(String patientReportedId) {
-		if (patientReported != null && !Objects.equals(patientReportedId, patientReported.getId())) {
+		if (patientReported != null && !Objects.equals(patientReportedId, patientReported.getPatientId())) {
 			patientReported = null;
 		}
 		this.patientReportedId = patientReportedId;

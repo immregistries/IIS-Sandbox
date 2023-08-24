@@ -260,7 +260,7 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler<Organizatio
 						vaccinationReported.setExternalLink(vaccinationReportedExternalLink);
 						vaccinationReported.setExternalLinkSystem(vaccinationReportedExternalLinkSystem);
 					}
-					vaccinationReported.setPatientReportedId(patientReported.getId());
+					vaccinationReported.setPatientReportedId(patientReported.getPatientId());
 					vaccinationReported.setPatientReported(patientReported);
 
 					String vaccineCvxCode = "";
@@ -588,7 +588,7 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler<Organizatio
 //      patientMaster = new PatientMaster();
 			patientReported = new PatientReported();
 			patientReported.setOrgReported(orgMaster);
-			patientReported.setPatientReportedExternalLink(patientReportedExternalLink);
+			patientReported.setExternalLink(patientReportedExternalLink);
 			patientReported.setReportedDate(new Date());
 			patientReported.setManagingOrganizationId(managingOrganization.getId());
 		}
@@ -676,7 +676,7 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler<Organizatio
 					"Patient is indicated as being born in the future, unable to record patients who are not yet born",
 					"PID", 1, 7);
 			}
-			patientReported.setPatientReportedExternalLink(patientReportedExternalLink);
+			patientReported.setExternalLink(patientReportedExternalLink);
 			patientReported.setPatientReportedType(patientReportedType);
 			patientReported.setNameFirst(patientNameFirst);
 			patientReported.setNameLast(patientNameLast);
@@ -895,7 +895,7 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler<Organizatio
 		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
 		ArrayList<String> groupPatientIds = (ArrayList<String>) request.getAttribute("groupPatientIds");
 		if (groupPatientIds != null) { // If there are numerous patients added and option was activated
-			groupPatientIds.add(patientReported.getId());
+			groupPatientIds.add(patientReported.getPatientId());
 		}
 		request.setAttribute("groupPatientIds", groupPatientIds);
 
@@ -980,7 +980,7 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler<Organizatio
 				}
 			}
 			{
-				observationReported.setPatientReportedId(patientReported.getId());
+				observationReported.setPatientReportedId(patientReported.getPatientId());
 
 //		  Observation observation = ObservationMapper.getFhirResource(observationMaster,observationReported);
 				observationReported = fhirRequester.saveObservationReported(observationReported);
@@ -1000,11 +1000,11 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler<Organizatio
 		if (vaccination == null) {
 			observationReported = fhirRequester.searchObservationReported(
 				Observation.PART_OF.isMissing(true),
-				Observation.SUBJECT.hasId(patientReported.getId()));
+				Observation.SUBJECT.hasId(patientReported.getPatientId()));
 		} else {
 			observationReported = fhirRequester.searchObservationReported(
 				Observation.PART_OF.hasId(vaccination.getVaccinationId()),
-				Observation.SUBJECT.hasId(patientReported.getId()));
+				Observation.SUBJECT.hasId(patientReported.getPatientId()));
 		}
 		if (observationReported == null) {
 //      observationMaster = new ObservationMaster();
@@ -1017,7 +1017,7 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler<Organizatio
 		}
 //    observationMaster.setValueCode(valueCode);
 
-		observationReported.setPatientReportedId(patientReported.getId());
+		observationReported.setPatientReportedId(patientReported.getPatientId());
 		if (vaccinationReported != null) {
 			observationReported.setVaccinationReportedId(vaccinationReported.getVaccinationId());
 		}

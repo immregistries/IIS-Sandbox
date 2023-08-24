@@ -211,7 +211,7 @@ public class V2ToFhirServlet extends HttpServlet {
 		PatientMaster pm = pr.getPatient();
 		{
 			Identifier id = p.addIdentifier();
-			id.setValue(pm.getPatientExternalLink());
+			id.setValue(pm.getExternalLink());
 			CodeableConcept type = new CodeableConcept();
 			type.addCoding().setCode("MR");
 			id.setType(type);
