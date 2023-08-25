@@ -30,15 +30,6 @@ public class FhirRequesterR5 extends FhirRequester<Patient, Immunization, Locati
 		return patientMaster;
 	}
 
-	public PatientReported searchPatientReportedGolden(ICriterion... where) {
-		PatientReported patientReported = null;
-		Bundle bundle = (Bundle) searchGoldenRecord(Patient.class, where);
-		if (bundle != null && bundle.hasEntry()) {
-			patientReported = patientMapper.getReportedWithMaster((Patient) bundle.getEntryFirstRep().getResource());
-		}
-		return patientReported;
-	}
-
 	public PatientReported searchPatientReported(ICriterion... where) {
 		PatientReported patientReported = null;
 		Bundle bundle = (Bundle) searchRegularRecord(Patient.class, where);
@@ -59,15 +50,15 @@ public class FhirRequesterR5 extends FhirRequester<Patient, Immunization, Locati
 		return patientReportedList;
 	}
 
-	public List<PatientReported> searchPatientReportedGoldenList(ICriterion... where) {
-		List<PatientReported> patientReportedList = new ArrayList<>();
+	public List<PatientMaster> searchPatientMasterGoldenList(ICriterion... where) {
+		List<PatientMaster> patientList = new ArrayList<>();
 		Bundle bundle = (Bundle) searchGoldenRecord(Patient.class, where);
 		if (bundle != null) {
 			for (Bundle.BundleEntryComponent entry : bundle.getEntry()) {
-				patientReportedList.add(patientMapper.getReportedWithMaster((Patient) entry.getResource()));
+				patientList.add(patientMapper.getMaster((Patient) entry.getResource()));
 			}
 		}
-		return patientReportedList;
+		return patientList;
 	}
 
 	public VaccinationMaster searchVaccinationMaster(ICriterion... where) {
@@ -294,7 +285,8 @@ public class FhirRequesterR5 extends FhirRequester<Patient, Immunization, Locati
 	}
 
 	public PatientMaster readPatientMasterWithMdmLink(String patientId) {
-		Parameters out = repositoryClientFactory.getFhirClient().operation().onServer().named("$mdm-query-links").withParameters(new Parameters().addParameter("resourceId", patientId)).execute();
+		Parameters out = repositoryClientFactory.getFhirClient().operation().onServer().named("$mdm-query-links")
+			.withParameters(new Parameters().addParameter("resourceId", patientId)).execute();
 		List<Parameters.ParametersParameterComponent> part = out.getParameter().stream()
 			.filter(parametersParameterComponent -> parametersParameterComponent.getName().equals("link"))
 			.findFirst().orElse(new Parameters.ParametersParameterComponent()).getPart();
@@ -309,7 +301,7 @@ public class FhirRequesterR5 extends FhirRequester<Patient, Immunization, Locati
 	}
 
 	public PatientMaster readPatientMaster(String id) {
-		return patientMapper.getMaster((Patient) read(Patient.class, id));
+		return patientMapper.getMaster((Patient) read(Patient.class, id)); // TODO filter if golden record ?
 	}
 
 	public PatientReported readPatientReported(String id) {

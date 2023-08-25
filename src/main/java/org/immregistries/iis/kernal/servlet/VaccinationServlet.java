@@ -41,15 +41,6 @@ public class VaccinationServlet extends PatientServlet {
 	@Autowired
 	ImmunizationMapper<Immunization> immunizationMapper;
 
-	public static void printMessageReceived(PrintWriter out, MessageReceived messageReceived) {
-		SimpleDateFormat sdfTime = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
-		out.println("     <h3>" + messageReceived.getCategoryRequest() + " - "
-			+ messageReceived.getCategoryResponse() + " "
-			+ sdfTime.format(messageReceived.getReportedDate()) + "</h3>");
-		out.println("     <pre>" + messageReceived.getMessageRequest() + "</pre>");
-		out.println("     <pre>" + messageReceived.getMessageResponse() + "</pre>");
-	}
-
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
 		throws ServletException, IOException {
@@ -72,7 +63,8 @@ public class VaccinationServlet extends PatientServlet {
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		try {
-			VaccinationReported vaccinationReported = fhirRequester.readVaccinationReported(req.getParameter(PARAM_VACCINATION_REPORTED_ID));
+			Immunization immunization = getImmunizationFromParameter(req,fhirClient);
+			VaccinationMaster vaccination = immunizationMapper.getMaster(immunization);
 //			 fhirRequests.searchVaccinationReported(fhirClient,
 //			 Immunization.IDENTIFIER.exactly().code(req.getParameter(PARAM_VACCINATION_REPORTED_ID)));
 
@@ -83,7 +75,7 @@ public class VaccinationServlet extends PatientServlet {
 			HomeServlet.doHeader(out, "IIS Sandbox - Vaccinations");
 
 			out.println("<h2>Facility : " + orgMaster.getOrganizationName() + "</h2>");
-			PatientReported patientReportedSelected = fhirRequester.readPatientReported(vaccinationReported.getPatientReportedId());
+			PatientReported patientReportedSelected = fhirRequester.readPatientReported(vaccination.getPatientReportedId());
 			{
 				printPatient(out, patientReportedSelected);
 				SimpleDateFormat sdfDate = new SimpleDateFormat("MM/dd/yyyy");
@@ -104,55 +96,55 @@ public class VaccinationServlet extends PatientServlet {
 					{
 						out.println("  <tr>");
 						out.println("    <td>");
-						if (!StringUtils.isEmpty(vaccinationReported.getVaccineCvxCode())) {
+						if (!StringUtils.isEmpty(vaccination.getVaccineCvxCode())) {
 							Code cvxCode = codeMap.getCodeForCodeset(CodesetType.VACCINATION_CVX_CODE,
-								vaccinationReported.getVaccineCvxCode());
+								vaccination.getVaccineCvxCode());
 							if (cvxCode == null) {
-								out.println("Unknown CVX (" + vaccinationReported.getVaccineCvxCode() + ")");
+								out.println("Unknown CVX (" + vaccination.getVaccineCvxCode() + ")");
 							} else {
 								out.println(
-									cvxCode.getLabel() + " (" + vaccinationReported.getVaccineCvxCode() + ")");
+									cvxCode.getLabel() + " (" + vaccination.getVaccineCvxCode() + ")");
 							}
 						}
 						out.println("    </td>");
 						out.println("    <td>");
-						if (vaccinationReported.getAdministeredDate() == null) {
+						if (vaccination.getAdministeredDate() == null) {
 							out.println("null");
 						} else {
-							out.println(sdfDate.format(vaccinationReported.getAdministeredDate()));
+							out.println(sdfDate.format(vaccination.getAdministeredDate()));
 						}
 						out.println("    </td>");
 						out.println("    <td>");
-						if (!StringUtils.isEmpty(vaccinationReported.getVaccineMvxCode())) {
+						if (!StringUtils.isEmpty(vaccination.getVaccineMvxCode())) {
 							Code mvxCode = codeMap.getCodeForCodeset(CodesetType.VACCINATION_MANUFACTURER_CODE,
-								vaccinationReported.getVaccineMvxCode());
+								vaccination.getVaccineMvxCode());
 							if (mvxCode == null) {
 								out.print("Unknown MVX");
 							} else {
 								out.print(mvxCode.getLabel());
 							}
-							out.println(" (" + vaccinationReported.getVaccineMvxCode() + ")");
+							out.println(" (" + vaccination.getVaccineMvxCode() + ")");
 						}
 						out.println("    </td>");
-						out.println("    <td>" + vaccinationReported.getLotnumber() + "</td>");
+						out.println("    <td>" + vaccination.getLotnumber() + "</td>");
 						out.println("    <td>");
-						if (!StringUtils.isEmpty(vaccinationReported.getInformationSource())) {
+						if (!StringUtils.isEmpty(vaccination.getInformationSource())) {
 							Code informationCode =
 								codeMap.getCodeForCodeset(CodesetType.VACCINATION_INFORMATION_SOURCE,
-									vaccinationReported.getInformationSource());
+									vaccination.getInformationSource());
 							if (informationCode != null) {
 								out.print(informationCode.getLabel());
-								out.println(" (" + vaccinationReported.getInformationSource() + ")");
+								out.println(" (" + vaccination.getInformationSource() + ")");
 							}
 						}
 						out.println("    </td>");
 						out.println("    <td>");
-						if (!StringUtils.isEmpty(vaccinationReported.getActionCode())) {
+						if (!StringUtils.isEmpty(vaccination.getActionCode())) {
 							Code actionCode = codeMap.getCodeForCodeset(CodesetType.VACCINATION_ACTION_CODE,
-								vaccinationReported.getActionCode());
+								vaccination.getActionCode());
 							if (actionCode != null) {
 								out.print(actionCode.getLabel());
-								out.println(" (" + vaccinationReported.getActionCode() + ")");
+								out.println(" (" + vaccination.getActionCode() + ")");
 							}
 						}
 						out.println("    </td>");
@@ -163,7 +155,7 @@ public class VaccinationServlet extends PatientServlet {
 				}
 
 				List<ObservationReported> observationReportedList =
-					getObservationList(fhirClient, vaccinationReported);
+					getObservationList(vaccination);
 
 				if (observationReportedList.size() != 0) {
 					out.println("<h4>Observations</h4>");
@@ -173,13 +165,12 @@ public class VaccinationServlet extends PatientServlet {
 
 				Bundle bundle = fhirClient.search().forResource(Subscription.class).returnBundle(Bundle.class).execute();
 
-				Immunization immunization = immunizationMapper.getFhirResource(vaccinationReported);
 				/**
 				 * Setting external identifier in reference
 				 */
 				immunization.getPatient().setIdentifier(new Identifier()
-					.setValue(vaccinationReported.getPatientReported().getExternalLink())
-					.setSystem(vaccinationReported.getPatientReported().getPatientReportedAuthority()));
+					.setValue(vaccination.getPatientReported().getExternalLink())
+					.setSystem(vaccination.getPatientReported().getPatientReportedAuthority()));
 				IParser parser = repositoryClientFactory.getFhirContext().newJsonParser().setPrettyPrint(true);
 
 				printSubscriptions(out, parser, bundle, immunization);
@@ -194,12 +185,11 @@ public class VaccinationServlet extends PatientServlet {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<ObservationReported> getObservationList(IGenericClient fhirClient,
-																		 VaccinationReported vaccinationReported) {
+	public List<ObservationReported> getObservationList(VaccinationMaster vaccination) {
 		List<ObservationReported> observationReportedList;
 		{
 			observationReportedList = fhirRequester.searchObservationReportedList(
-				Observation.PATIENT.hasId(vaccinationReported.getVaccinationId())
+				Observation.PATIENT.hasId(vaccination.getVaccinationId())
 			);
 			Set<String> suppressSet = LoincIdentifier.getSuppressIdentifierCodeSet();
 			for (Iterator<ObservationReported> it = observationReportedList.iterator(); it.hasNext(); ) {
@@ -212,5 +202,13 @@ public class VaccinationServlet extends PatientServlet {
 		return observationReportedList;
 	}
 
+
+	protected Immunization getImmunizationFromParameter(HttpServletRequest req, IGenericClient fhirClient) {
+		Immunization immunization = null;
+		if (req.getParameter(PARAM_VACCINATION_REPORTED_ID) != null) {
+			immunization = fhirClient.read().resource(Immunization.class).withId(req.getParameter(PARAM_VACCINATION_REPORTED_ID)).execute();
+		}
+		return immunization;
+	}
 
 }

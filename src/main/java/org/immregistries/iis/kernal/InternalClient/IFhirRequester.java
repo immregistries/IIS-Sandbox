@@ -7,7 +7,17 @@ import org.immregistries.iis.kernal.model.*;
 
 import java.util.List;
 
-
+/**
+ * Helping service to execute Queries alongside fhir mapping
+ * @param <Patient>
+ * @param <Immunization>
+ * @param <Location>
+ * @param <Practitioner>
+ * @param <Observation>
+ * @param <Person>
+ * @param <Organization>
+ * @param <RelatedPerson>
+ */
 public interface IFhirRequester<
 	Patient extends IBaseResource,
 	Immunization extends IBaseResource,
@@ -20,20 +30,17 @@ public interface IFhirRequester<
 
 	public PatientMaster searchPatientMaster(ICriterion... where);
 
-	public PatientReported searchPatientReportedGolden(ICriterion... where);
-
 	public PatientReported searchPatientReported(ICriterion... where);
 
 	public List<PatientReported> searchPatientReportedList(ICriterion... where);
-	public List<PatientReported> searchPatientReportedGoldenList(ICriterion... where);
+	public List<PatientMaster> searchPatientMasterGoldenList(ICriterion... where);
 
-	//	public List<PatientReported> searchPatientReportedList(ICriterion... where);
 	public VaccinationMaster searchVaccinationMaster(ICriterion... where);
 
 	public VaccinationReported searchVaccinationReported(ICriterion... where);
 
 	public List<VaccinationReported> searchVaccinationReportedList(ICriterion... where);
-	public List<VaccinationMaster> searchVaccinationListOperationEverything(String id);
+	public List<VaccinationMaster> searchVaccinationListOperationEverything(String patientId);
 
 	public ObservationReported searchObservationReported(ICriterion... where);
 	public Organization searchOrganization(ICriterion... where);
@@ -59,6 +66,11 @@ public interface IFhirRequester<
 
 	public PatientReported saveRelatedPerson(PatientReported patientReported);
 
+	/**
+	 * Unsafe: doesn't verify golden record quality, read patient golden record and maps to PatientMaster
+	 * @param id
+	 * @return
+	 */
 	public PatientMaster readPatientMaster(String id);
 
 	public PatientReported readPatientReported(String id);

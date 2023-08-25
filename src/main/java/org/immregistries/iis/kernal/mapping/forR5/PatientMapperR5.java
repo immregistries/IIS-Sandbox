@@ -22,7 +22,7 @@ import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
 
-import static org.immregistries.iis.kernal.InternalClient.FhirRequester.GOLDEN_SYSTEM_IDENTIFIER;
+import static org.immregistries.iis.kernal.InternalClient.FhirRequester.*;
 
 
 @Service
@@ -37,7 +37,7 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 
 	public PatientReported getReportedWithMaster(Patient p) {
 		PatientReported patientReported = getReported(p);
-		if (!p.getId().isBlank()) {
+		if (!p.getId().isBlank() && p.getMeta().getTag(GOLDEN_SYSTEM_TAG,GOLDEN_RECORD) == null) {
 			patientReported.setPatient(
 				fhirRequests.readPatientMasterWithMdmLink(p.getId())
 			);

@@ -81,16 +81,16 @@ public class PatientServlet extends HttpServlet {
 		try {
 			String patientNameLast = req.getParameter(PARAM_PATIENT_NAME_LAST);
 			String patientNameFirst = req.getParameter(PARAM_PATIENT_NAME_FIRST);
-			String patientReportedExternalLink = req.getParameter(PARAM_PATIENT_REPORTED_EXTERNAL_LINK);
+			String externalLink = req.getParameter(PARAM_PATIENT_REPORTED_EXTERNAL_LINK);
 
-			List<PatientReported> patientReportedList = null;
+			List<PatientMaster> patientMasterList = null;
 			String action = req.getParameter(PARAM_ACTION);
 			if (action != null) {
 				if (action.equals(ACTION_SEARCH)) {
-					patientReportedList = fhirRequester.searchPatientReportedGoldenList(
+					patientMasterList = fhirRequester.searchPatientMasterGoldenList(
 						Patient.FAMILY.matches().value(patientNameLast),
 						Patient.NAME.matches().value(patientNameFirst),
-						Patient.IDENTIFIER.exactly().code(patientReportedExternalLink)
+						Patient.IDENTIFIER.exactly().code(externalLink)
 					);
 				}
 			}
@@ -101,16 +101,16 @@ public class PatientServlet extends HttpServlet {
 			if (patientNameFirst == null) {
 				patientNameFirst = "";
 			}
-			if (patientReportedExternalLink == null) {
-				patientReportedExternalLink = "";
+			if (externalLink == null) {
+				externalLink = "";
 			}
 
 			HomeServlet.doHeader(out, "IIS Sandbox - Patients");
 
+			PatientMaster patientMasterSelected = null;
 			Patient patientSelected  = getPatientFromParameter(req,fhirClient);
-			PatientReported patientReportedSelected = patientMapper.getReported(patientSelected)
 
-			if (patientReportedSelected == null) {
+			if (patientSelected == null) {
 				out.println("<h2>Patients from Facility : " + orgMaster.getOrganizationName() + "</h2>");
 				out.println("<div class=\"w3-container w3-half w3-margin-top\">");
 				out.println("    <h3>Search Patient Registry</h3>");
@@ -122,7 +122,7 @@ public class PatientServlet extends HttpServlet {
 					+ PARAM_PATIENT_NAME_FIRST + "\" value=\"" + patientNameFirst + "\"/>");
 				out.println("      <label>First Name</label>");
 				out.println("      <input class=\"w3-input\" type=\"text\" name=\""
-					+ PARAM_PATIENT_REPORTED_EXTERNAL_LINK + "\" value=\"" + patientReportedExternalLink
+					+ PARAM_PATIENT_REPORTED_EXTERNAL_LINK + "\" value=\"" + externalLink
 					+ "\"/>");
 				out.println("      <label>Medical Record Number</label><br/>");
 				out.println("      <input class=\"w3-button w3-section w3-teal w3-ripple\" type=\"submit\" name=\""
@@ -133,13 +133,13 @@ public class PatientServlet extends HttpServlet {
 				out.println("<div class=\"w3-container\">");
 
 				boolean showingRecent = false;
-				if (patientReportedList == null) {
+				if (patientMasterList == null) {
 					showingRecent = true;
-					patientReportedList = fhirRequester.searchPatientReportedList(); // TODO Paging ?
+					patientMasterList = fhirRequester.searchPatientMasterGoldenList(); // TODO Paging ?
 				}
 
-				if (patientReportedList != null) {
-					if (patientReportedList.size() == 0) {
+				if (patientMasterList != null) {
+					if (patientMasterList.size() == 0) {
 						out.println("<div class=\"w3-panel w3-yellow\"><p>No Records Found</p></div>");
 					} else {
 						if (showingRecent) {
@@ -155,22 +155,22 @@ public class PatientServlet extends HttpServlet {
 						out.println("  <tbody>");
 						SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
 						int count = 0;
-						for (PatientReported patientReported : patientReportedList) {
+						for (PatientMaster patient : patientMasterList) {
 							count++;
 							if (count > 100) {
 								break;
 							}
-							String link = "patient?" + PARAM_PATIENT_REPORTED_EXTERNAL_LINK + "="
-								+ patientReported.getExternalLink();
+							String link = "patient?" + PARAM_PATIENT_REPORTED_ID+ "="
+								+ patient.getPatientId();
 							out.println("  <tr>");
 							out.println("    <td><a href=\"" + link + "\">"
-								+ patientReported.getExternalLink() + "</a></td>");
-							out.println("    <td><a href=\"" + link + "\">" + patientReported.getNameLast()
+								+ patient.getExternalLink() + "</a></td>");
+							out.println("    <td><a href=\"" + link + "\">" + patient.getNameLast()
 								+ "</a></td>");
 							out.println("    <td><a href=\"" + link + "\">"
-								+ patientReported.getNameFirst() + "</a></td>");
+								+ patient.getNameFirst() + "</a></td>");
 							out.println("    <td><a href=\"" + link + "\">"
-								+ sdf.format(patientReported.getUpdatedDate()) + "</a></td>");
+								+ sdf.format(patient.getUpdatedDate()) + "</a></td>");
 							out.println("  </tr>");
 						}
 						out.println("  </tbody>");
@@ -183,19 +183,19 @@ public class PatientServlet extends HttpServlet {
 				}
 				out.println("  </div>");
 			} else {
-
+				patientMasterSelected = patientMapper.getMaster(patientSelected);
 				IParser parser = repositoryClientFactory.getFhirContext()
 					.newJsonParser().setPrettyPrint(true).setSuppressNarratives(true);
 				out.println("<h2>Patient : " + patientSelected.getNameFirstRep().getNameAsSingleString() + "</h2>");
 				{
-					printPatient(out, patientReportedSelected);
+					printPatient(out, patientMasterSelected);
 				}
 				{
-					printVaccinationList(req, resp, out, fhirClient, patientReportedSelected.getPatientId());
+					printVaccinationList(req, resp, out, fhirClient, patientMasterSelected.getPatientId());
 				}
 				{
 					List<ObservationReported> observationReportedList =
-						getObservationList(fhirClient, patientReportedSelected);
+						getObservationList(fhirClient, patientMasterSelected);
 					if (observationReportedList.size() != 0) {
 						out.println("<h4>Patient Observations</h4>");
 						printObservations(out, observationReportedList);
@@ -207,32 +207,40 @@ public class PatientServlet extends HttpServlet {
 						.forResource(ImmunizationRecommendation.class)
 						.where(ImmunizationRecommendation.PATIENT
 								.hasId(patientSelected.getId())
-//						.hasChainedProperty(Patient.IDENTIFIER.exactly()
-//							.systemAndCode(patientReportedSelected.getPatientReportedAuthority(),patientReportedSelected.getPatientReportedExternalLink()))
 						).returnBundle(Bundle.class).execute();
 					if (recommendationBundle.hasEntry()) {
 						printRecommendation(out, (ImmunizationRecommendation) recommendationBundle.getEntryFirstRep().getResource(), patientSelected);
 					} else {
 						printRecommendation(out, null, patientSelected);
 					}
-//				out.println("<form method=\"GET\" action=\"recommendation\">");
-//				out.println("	<input type=\"hidden\" name=\""
-//					+ PARAM_PATIENT_REPORTED_EXTERNAL_LINK + "\" value=\"" + patientReportedExternalLink
-//					+ "\"/>");
-//				out.println("	<input class=\"w3-button w3-section w3-teal w3-ripple\" type=\"submit\" name=\"\" value=\"Vaccination Recommendations\"/>");
-//				out.println("</form>");
 				}
 
 				{
 					Bundle subcriptionBundle = fhirClient.search().forResource(Subscription.class).returnBundle(Bundle.class).execute();
 					printSubscriptions(out, parser, subcriptionBundle, patientSelected);
 				}
+
 				{
 					out.println("<div class=\"w3-container\">");
-					out.println("<h3>Messages Received</h3>");
+					out.println("<h4>FHIR Api Shortcuts</h4>");
+					String apiBaseUrl = "/iis/fhir/" + orgMaster.getOrganizationName();
+					{
+						String link = apiBaseUrl + "/Patient/" + patientMasterSelected.getPatientId();
+						out.println("<a href=\"" + link + "\">FHIR Resource : " + link + "</a>");
+					}
+					{
+						String link = apiBaseUrl + "/Patient/" + patientMasterSelected.getPatientId() + "/$everything?_mdm=true";
+						out.println("<div><a href=\"" + link + "\">Everything related to this Patient : " + link  +"</a></div>");
+					}
+					out.println("</div>");
+				}
+
+				{
+					out.println("<div class=\"w3-container\">");
+					out.println("<h4>Messages Received</h4>");
 					Query query = dataSession.createQuery(
 						"from MessageReceived where patientReportedId = :patientReportedId order by reportedDate asc");
-					query.setParameter("patientReportedId", patientReportedSelected.getPatientId());
+					query.setParameter("patientReportedId", patientMasterSelected.getPatientId());
 					List<MessageReceived> messageReceivedList = query.list();
 					if (messageReceivedList.size() == 0) {
 						out.println("<div class=\"w3-panel w3-yellow\"><p>No Messages Received</p></div>");
@@ -241,24 +249,10 @@ public class PatientServlet extends HttpServlet {
 							printMessageReceived(out, messageReceived);
 						}
 					}
+					out.println("</div>");
 				}
 
-				String apiBaseUrl = "/iis/fhir/" + orgMaster.getOrganizationName();
-				{
-					String link = apiBaseUrl + "/Patient/"
-						+ patientReportedSelected.getPatientId();
-					out.println("<a href=\"" + link + "\">FHIR Resource</a>");
-				}
-//		  {
-//          String link = apiBaseUrl + "/Patient?identifier="
-//	              + patientReportedSelected.getPatientReportedExternalLink();
-//          out.println("<a href=\"" + link + "\">all FHIR Resources</a>");
-//        }
-				{
-					String link = apiBaseUrl + "/Patient/" + patientReportedSelected.getPatientId() +
-						"/$everything?_mdm=true";
-					out.println("<a href=\"" + link + "\">Everything related to Patient</a>");
-				}
+
 
 				out.println("</div>");
 			}
@@ -510,26 +504,26 @@ public class PatientServlet extends HttpServlet {
 		out.println("</table>");
 	}
 
-	public void printPatient(PrintWriter out, PatientReported patientReportedSelected) {
+	public void printPatient(PrintWriter out, PatientMaster patientSelected) {
 		SimpleDateFormat sdfDate = new SimpleDateFormat("MM/dd/yyyy");
 		out.println("    <div class=\"w3-container w3-half w3-margin-top\">");
 		out.println("<table class=\"w3-table w3-bordered w3-striped w3-border test w3-hoverable\">");
 		out.println("  <tbody>");
 		out.println("  <tr>");
 		out.println("    <th class=\"w3-green\">External Id (MRN)</th>");
-		out.println("    <td>" + patientReportedSelected.getExternalLink() + "</td>");
+		out.println("    <td>" + patientSelected.getExternalLink() + "</td>");
 		out.println("  </tr>");
 		out.println("  <tr>");
 		out.println("    <th class=\"w3-green\">Patient Name</th>");
-		out.println("    <td>" + patientReportedSelected.getNameLast() + ", "
-			+ patientReportedSelected.getNameFirst() + " "
-			+ patientReportedSelected.getNameMiddle() + "</td>");
+		out.println("    <td>" + patientSelected.getNameLast() + ", "
+			+ patientSelected.getNameFirst() + " "
+			+ patientSelected.getNameMiddle() + "</td>");
 		out.println("  </tr>");
 		{
 			out.println("  <tr>");
 			out.println("    <th class=\"w3-green\">Birth Date</th>");
 			out.println(
-				"    <td>" + sdfDate.format(patientReportedSelected.getBirthDate()) + "</td>");
+				"    <td>" + sdfDate.format(patientSelected.getBirthDate()) + "</td>");
 			out.println("  </tr>");
 		}
 		out.println("  </tbody>");
@@ -537,11 +531,11 @@ public class PatientServlet extends HttpServlet {
 		out.println("</div>");
 	}
 
-	public List<ObservationReported> getObservationList(IGenericClient fhirClient, PatientReported patientReportedSelected) {
+	public List<ObservationReported> getObservationList(IGenericClient fhirClient, PatientMaster patientSelected) {
 		List<ObservationReported> observationReportedList = new ArrayList<>();
 		{
 			observationReportedList = fhirRequester.searchObservationReportedList(
-				Observation.SUBJECT.hasId(patientReportedSelected.getPatientId()));
+				Observation.SUBJECT.hasId(patientSelected.getPatientId()));
 //		 observationReportedList = observationReportedList.stream().filter(observationReported -> observationReported.getVaccinationReported() == null).collect(Collectors.toList());
 			Set<String> suppressSet = LoincIdentifier.getSuppressIdentifierCodeSet();
 			for (Iterator<ObservationReported> it = observationReportedList.iterator(); it.hasNext(); ) {
@@ -599,7 +593,7 @@ public class PatientServlet extends HttpServlet {
 
 	public void printRecommendation(PrintWriter out, ImmunizationRecommendation recommendation, Patient patient) {
 		out.println("<div class=\"w3-container\">");
-		out.println("<h3>Recommendations</h3>");
+		out.println("<h4>Recommendations</h4>");
 		if (recommendation != null) {
 			out.println("<table class=\"w3-table w3-bordered w3-striped w3-border test w3-hoverable\">");
 			out.println("  <tr class=\"w3-green\">");
@@ -659,15 +653,6 @@ public class PatientServlet extends HttpServlet {
 			}
 		}
 		return patient;
-	}
-
-	protected PatientReported getPatientReportedFromParameter(HttpServletRequest req, IGenericClient fhirClient) {
-		Patient patient = getPatientFromParameter(req, fhirClient);
-		if (patient != null) {
-			return patientMapper.getReportedWithMaster(patient);
-		} else {
-			return null;
-		}
 	}
 
 }

@@ -36,15 +36,6 @@ public class FhirRequesterR4 extends FhirRequester<Patient,Immunization,Location
 		return patientMaster;
 	}
 
-	public PatientReported searchPatientReportedGolden(ICriterion... where) {
-		PatientReported patientReported = null;
-		org.hl7.fhir.r4.model.Bundle bundle = (org.hl7.fhir.r4.model.Bundle) searchGoldenRecord(org.hl7.fhir.r4.model.Patient.class, where);
-		if (bundle != null && bundle.hasEntry()) {
-			patientReported = patientMapper.getReportedWithMaster((org.hl7.fhir.r4.model.Patient) bundle.getEntryFirstRep().getResource());
-		}
-		return patientReported;
-	}
-
 	public PatientReported searchPatientReported(ICriterion... where) {
 		PatientReported patientReported = null;
 		org.hl7.fhir.r4.model.Bundle bundle = (org.hl7.fhir.r4.model.Bundle) searchRegularRecord(org.hl7.fhir.r4.model.Patient.class, where);
@@ -65,15 +56,15 @@ public class FhirRequesterR4 extends FhirRequester<Patient,Immunization,Location
 		return patientReportedList;
 	}
 
-	public List<PatientReported> searchPatientReportedGoldenList(ICriterion... where) {
-		List<PatientReported> patientReportedList = new ArrayList<>();
+	public List<PatientMaster> searchPatientMasterGoldenList(ICriterion... where) {
+		List<PatientMaster> patientList = new ArrayList<>();
 		org.hl7.fhir.r4.model.Bundle bundle = (org.hl7.fhir.r4.model.Bundle) searchGoldenRecord(org.hl7.fhir.r4.model.Patient.class, where);
 		if (bundle != null) {
 			for (org.hl7.fhir.r4.model.Bundle.BundleEntryComponent entry: bundle.getEntry()) {
-				patientReportedList.add(patientMapper.getReportedWithMaster((org.hl7.fhir.r4.model.Patient) entry.getResource()));
+				patientList.add(patientMapper.getMaster((org.hl7.fhir.r4.model.Patient) entry.getResource()));
 			}
 		}
-		return patientReportedList;
+		return patientList;
 	}
 
 	public VaccinationMaster searchVaccinationMaster(ICriterion... where) {
