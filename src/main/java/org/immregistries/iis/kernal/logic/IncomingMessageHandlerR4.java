@@ -1,6 +1,5 @@
 package org.immregistries.iis.kernal.logic;
 
-import org.immregistries.iis.kernal.fhir.annotations.OnR4Condition;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
 import org.apache.commons.lang3.StringUtils;
@@ -9,10 +8,14 @@ import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodeStatusValue;
 import org.immregistries.codebase.client.reference.CodesetType;
+import org.immregistries.iis.kernal.fhir.annotations.OnR4Condition;
+import org.immregistries.iis.kernal.mapping.forR4.PatientMapperR4;
 import org.immregistries.iis.kernal.model.*;
-import org.immregistries.iis.kernal.InternalClient.FhirRequester;
 import org.immregistries.smm.tester.manager.HL7Reader;
-import org.immregistries.vfa.connect.model.*;
+import org.immregistries.vfa.connect.model.Admin;
+import org.immregistries.vfa.connect.model.EvaluationActual;
+import org.immregistries.vfa.connect.model.ForecastActual;
+import org.immregistries.vfa.connect.model.TestEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Conditional;
@@ -23,17 +26,14 @@ import javax.servlet.http.HttpServletRequest;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-import static org.immregistries.iis.kernal.mapping.Interfaces.PatientMapper.MRN_SYSTEM;
+import static org.immregistries.iis.kernal.InternalClient.FhirRequester.GOLDEN_RECORD;
+import static org.immregistries.iis.kernal.InternalClient.FhirRequester.GOLDEN_SYSTEM_TAG;
 
-/**
- * DO NOT EDIT THE CONTENT OF THIS FILE
- * <p>
- * This is a literal copy of IncomingMessageHandlerR5 except for the name and imported FHIR Model package
- * Please paste any new content from R5 version here to preserve similarity in behavior
- */
 @org.springframework.stereotype.Service()
 @Conditional(OnR4Condition.class)
 public class IncomingMessageHandlerR4 extends IncomingMessageHandler<Organization> {
+
+	private static final double MINIMAL_MATCHING_SCORE = 0.9;
 	private final Logger logger = LoggerFactory.getLogger(IncomingMessageHandler.class);
 
 	public String process(String message, OrgMaster orgMaster) {
@@ -83,8 +83,7 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler<Organizatio
 	}
 
 	public String processQBP(OrgMaster orgMaster, HL7Reader reader, String messageReceived) {
-		PatientReported patientReported = null;
-		List<PatientReported> patientReportedPossibleList = new ArrayList<>(); // TODO fix this with mdm
+		PatientMaster patientMasterForMatchQuery = new PatientMaster();
 		List<ProcessingException> processingExceptionList = new ArrayList<>();
 		if (reader.advanceToSegment("QPD")) {
 			String mrn = "";
@@ -97,9 +96,10 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler<Organizatio
 			String problem = null;
 			int fieldPosition = 0;
 			if (!mrn.equals("")) {
-				patientReported = fhirRequester.searchPatientReported(
-					Patient.IDENTIFIER.exactly().systemAndCode(MRN_SYSTEM, mrn)
-				);
+				patientMasterForMatchQuery.setExternalLink(mrn); // TODO system
+//				patientReported = fhirRequester.searchPatientReported(
+//					Patient.IDENTIFIER.exactly().systemAndCode(MRN_SYSTEM, mrn)
+//				);
 			}
 			String patientNameLast = reader.getValue(4, 1);
 			String patientNameFirst = reader.getValue(4, 2);
@@ -124,52 +124,16 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler<Organizatio
 				processingExceptionList.add(new ProcessingException(problem, "QPD", 1, fieldPosition));
 			} else {
 
-				if (patientReported == null) {
-					patientReported = fhirRequester.searchPatientReported(
-						Patient.NAME.matches().value(patientNameFirst),
-						Patient.FAMILY.matches().value(patientNameLast),
-						Patient.BIRTHDATE.exactly().day(patientBirthDate)
-					);
-				}
-				if (patientReported != null) {
-					int points = 0;
-					if (!patientNameLast.isBlank() && patientNameLast.equalsIgnoreCase(patientReported.getNameLast())) {
-						points = points + 2;
-					}
-					if (!patientNameFirst.isBlank() && patientNameFirst.equalsIgnoreCase(patientReported.getNameFirst())) {
-						points = points + 2;
-					}
-					if (!patientNameMiddle.isBlank() && patientNameMiddle.equalsIgnoreCase(patientReported.getNameFirst())) {
-						points = points + 2;
-					}
-					if (patientBirthDate != null && patientBirthDate.equals(patientReported.getBirthDate())) {
-						points = points + 2;
-					}
-					if (!patientSex.equals("")
-						&& patientSex.equalsIgnoreCase(patientReported.getSex())) {
-						points = points + 2;
-					}
-					if (points < 6) {
-						// not enough matching so don't indicate this as a match
-						patientReported = null;
-					}
-				}
-				if (patientReported == null) { // TODO change merging with MDM & FHIR ?
-					patientReportedPossibleList = fhirRequester.searchPatientReportedList(
-						Patient.NAME.matches().values(patientNameFirst, patientNameLast),
-						Patient.BIRTHDATE.exactly().day(patientBirthDate));
-				}
-				if (patientReported != null
-					&& patientNameMiddle.equalsIgnoreCase(PATIENT_MIDDLE_NAME_MULTI)) {
-					patientReportedPossibleList.add(patientReported);
-					patientReported = null;
-				}
+				patientMasterForMatchQuery.setNameFirst(patientNameFirst);
+				patientMasterForMatchQuery.setNameLast(patientNameLast);
+				patientMasterForMatchQuery.setBirthDate(patientBirthDate);
 			}
 		} else {
 			processingExceptionList.add(new ProcessingException("QPD segment not found", null, 0, 0));
 		}
 
 		Set<ProcessingFlavor> processingFlavorSet = orgMaster.getProcessingFlavorSet();
+		Date cutoff = null;
 		if (processingFlavorSet.contains(ProcessingFlavor.SNAIL)
 			|| processingFlavorSet.contains(ProcessingFlavor.SNAIL30)
 			|| processingFlavorSet.contains(ProcessingFlavor.SNAIL60)
@@ -188,22 +152,54 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler<Organizatio
 			}
 
 			calendar.add(Calendar.SECOND, seconds);
-			Date cutoff = calendar.getTime();
-			if (patientReported != null) {
-				if (cutoff.before(patientReported.getReportedDate())) {
-					patientReported = null;
+			cutoff = calendar.getTime();
+
+//			if (patientReported != null) { TODO map this to FHIR
+//				if (cutoff.before(patientReported.getReportedDate())) {
+//					patientReported = null;
+//				}
+//			}
+
+//			for (Iterator<PatientReported> it = patientReportedPossibleList.iterator(); it.hasNext(); ) {
+//				PatientReported pr = it.next();
+//				if (cutoff.before(pr.getReportedDate())) {
+//					it.remove();
+//				}
+//			}
+		}
+		List<PatientReported> multipleMatches = new ArrayList<>();
+		PatientMaster singleMatch = null;
+		Bundle matches = repositoryClientFactory.getFhirClient().operation().onType(Patient.class).named("match")
+			.withParameter(Parameters.class, "resource", ((PatientMapperR4) patientMapper).getFhirResource(patientMasterForMatchQuery))
+			.returnResourceType(Bundle.class).execute();
+		for (Bundle.BundleEntryComponent entry : matches.getEntry()) {
+			if (entry.getResource() instanceof Patient) {
+				Patient patient = (Patient) entry.getResource();
+				PatientMaster patientMaster = patientMapper.getMaster(patient);
+				/**
+				 * Filter for flavours previously configured
+				 */
+				if (cutoff != null && cutoff.before(patientMaster.getReportedDate())) {
+					break;
 				}
-			}
-			for (Iterator<PatientReported> it = patientReportedPossibleList.iterator(); it.hasNext(); ) {
-				PatientReported pr = it.next();
-				if (cutoff.before(pr.getReportedDate())) {
-					it.remove();
+
+//				/**
+//				 * Filtering only Golden records
+//				 * TODO ask Nathan to assert workflow
+//				 */
+//				if (entry.getResource().getMeta().getTag(GOLDEN_SYSTEM_TAG, GOLDEN_RECORD) == null) {
+//					break;
+//				}
+				if (entry.getSearch().hasScore() && entry.getSearch().getScoreElement().compareTo(new DecimalType(MINIMAL_MATCHING_SCORE)) > 0) {
+					singleMatch = patientMaster;
 				}
+				multipleMatches.add(patientMapper.getReported(entry.getResource()));
 			}
 		}
 
-		return buildRSP(reader, messageReceived, patientReported, orgMaster,
-			patientReportedPossibleList, processingExceptionList);
+
+		return buildRSP(reader, messageReceived, singleMatch, orgMaster,
+			multipleMatches, processingExceptionList);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -1050,9 +1046,9 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler<Organizatio
 	}
 
 	@SuppressWarnings("unchecked")
-	public String buildRSP(HL7Reader reader, String messageReceived, PatientReported patientReported,
+	public String buildRSP(HL7Reader reader, String messageRecieved, PatientMaster patientMaster,
 								  OrgMaster orgMaster, List<PatientReported> patientReportedPossibleList,
-								  List<ProcessingException> processingExceptionList) { // TODO fix with mdm
+								  List<ProcessingException> processingExceptionList) {
 		IGenericClient fhirClient = getFhirClient();
 		reader.resetPostion();
 		reader.advanceToSegment("MSH");
@@ -1089,7 +1085,7 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler<Organizatio
 		String queryResponse = QUERY_OK;
 		{
 			String messageType = "RSP^K11^RSP_K11";
-			if (patientReported == null) {
+			if (patientMaster == null) {
 				queryResponse = QUERY_NOT_FOUND;
 				profileId = RSP_Z33_NO_MATCH;
 				categoryResponse = "No Match";
@@ -1172,11 +1168,14 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler<Organizatio
 				printQueryPID(pr, processingFlavorSet, sb, patient, sdf, count);
 			}
 		} else if (profileId.equals(RSP_Z32_MATCH) || profileId.equals(RSP_Z42_MATCH_WITH_FORECAST)) {
-			PatientMaster patientMaster = patientReported.getPatient();
+			/**
+			 * CONFUSING naming p but no better solution right now but to deal with single match
+			 */
+			PatientMaster patient = patientMaster;
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-			printQueryPID(patientReported, processingFlavorSet, sb, patientMaster, sdf, 1);
+			printQueryPID(patientMaster, processingFlavorSet, sb, patient, sdf, 1);
 			if (profileId.equals(RSP_Z32_MATCH)) {
-				printQueryNK1(patientReported, sb, codeMap);
+				printQueryNK1(patientMaster, sb, codeMap);
 			}
 			List<VaccinationMaster> vaccinationMasterList =
 				getVaccinationMasterList(patientMaster);
@@ -1195,7 +1194,7 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler<Organizatio
 			List<ForecastActual> forecastActualList = null;
 			if (sendBackForecast) {
 				forecastActualList =
-					doForecast(patientMaster, patientReported, codeMap, vaccinationMasterList, orgMaster);
+					doForecast(patientMaster, codeMap, vaccinationMasterList, orgMaster);
 			}
 			int obxSetId = 0;
 			int obsSubId = 0;
@@ -1481,7 +1480,7 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler<Organizatio
 		}
 
 		String messageResponse = sb.toString();
-		recordMessageReceived(messageReceived, patientReported, messageResponse, "Query",
+		recordMessageReceived(messageRecieved, patientMaster, messageResponse, "Query",
 			categoryResponse, orgMaster);
 		return messageResponse;
 	}
@@ -1688,7 +1687,7 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler<Organizatio
 			try {
 				Bundle bundle = fhirClient.search().forResource(Immunization.class)
 					.where(Immunization.PATIENT.hasId(patient.getPatientId()))
-					.withTag(FhirRequester.GOLDEN_SYSTEM_TAG, FhirRequester.GOLDEN_RECORD)
+					.withTag(GOLDEN_SYSTEM_TAG, GOLDEN_RECORD)
 					.sort().ascending(Immunization.IDENTIFIER)
 					.returnBundle(Bundle.class).execute();
 				for (Bundle.BundleEntryComponent entry : bundle.getEntry()) {

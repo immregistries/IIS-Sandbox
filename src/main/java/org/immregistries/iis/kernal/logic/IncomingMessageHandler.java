@@ -93,14 +93,14 @@ public abstract class IncomingMessageHandler<Organization extends IBaseResource>
     return false;
   }
 
-  public void recordMessageReceived(String message, PatientReported patientReported,
+  public void recordMessageReceived(String message, PatientMaster patient,
       String messageResponse, String categoryRequest, String categoryResponse,
       OrgMaster orgMaster) {
     MessageReceived messageReceived = new MessageReceived();
     messageReceived.setOrgMaster(orgMaster);
     messageReceived.setMessageRequest(message);
-	 if (patientReported != null) {
-		 messageReceived.setPatientReportedId(patientReported.getPatientId());
+	 if (patient != null) {
+		 messageReceived.setPatientReportedId(patient.getPatientId());
 	 }
     messageReceived.setMessageResponse(messageResponse);
     messageReceived.setReportedDate(new Date());
@@ -112,18 +112,18 @@ public abstract class IncomingMessageHandler<Organization extends IBaseResource>
     transaction.commit();
   }
 
-  public void printQueryNK1(PatientReported patientReported, StringBuilder sb, CodeMap codeMap) {
-    if (patientReported != null) {
+  public void printQueryNK1(PatientMaster patientMaster, StringBuilder sb, CodeMap codeMap) {
+    if (patientMaster != null) {
 
-		 if (StringUtils.isNotBlank(patientReported.getGuardianRelationship())
-			 && StringUtils.isNotBlank(patientReported.getGuardianLast())
-			 && StringUtils.isNotBlank(patientReported.getGuardianFirst())) {
+		 if (StringUtils.isNotBlank(patientMaster.getGuardianRelationship())
+			 && StringUtils.isNotBlank(patientMaster.getGuardianLast())
+			 && StringUtils.isNotBlank(patientMaster.getGuardianFirst())) {
 			 Code code = codeMap.getCodeForCodeset(CodesetType.PERSON_RELATIONSHIP,
-				 patientReported.getGuardianRelationship());
+				 patientMaster.getGuardianRelationship());
 			 if (code != null) {
 				 sb.append("NK1");
 				 sb.append("|1");
-				 sb.append("|").append(patientReported.getGuardianLast()).append("^").append(patientReported.getGuardianFirst()).append("^^^^^L");
+				 sb.append("|").append(patientMaster.getGuardianLast()).append("^").append(patientMaster.getGuardianFirst()).append("^^^^^L");
 				 sb.append("|").append(code.getValue()).append("^").append(code.getLabel()).append("^HL70063");
 				 sb.append("\r");
 			 }
@@ -131,7 +131,7 @@ public abstract class IncomingMessageHandler<Organization extends IBaseResource>
     }
   }
 
-  public void printQueryPID(PatientReported patientReported,
+  public void printQueryPID(PatientMaster patientReported,
       Set<ProcessingFlavor> processingFlavorSet, StringBuilder sb, PatientMaster patient,
       SimpleDateFormat sdf, int pidCount) {
     // PID
@@ -306,14 +306,14 @@ public abstract class IncomingMessageHandler<Organization extends IBaseResource>
     sb.append("\r");
   }
 
-  public List<ForecastActual> doForecast(PatientMaster patient, PatientReported patientReported,
+  public List<ForecastActual> doForecast(PatientMaster patient,
       CodeMap codeMap, List<VaccinationMaster> vaccinationMasterList, OrgMaster orgMaster) {
     List<ForecastActual> forecastActualList = null;
     Set<ProcessingFlavor> processingFlavorSet = orgMaster.getProcessingFlavorSet();
     try {
       TestCase testCase = new TestCase();
       testCase.setEvalDate(new Date());
-      testCase.setPatientSex(patientReported == null ? "F" : patientReported.getSex());
+      testCase.setPatientSex(patient == null ? "F" : patient.getSex());
       testCase.setPatientDob(patient.getBirthDate());
       List<TestEvent> testEventList = new ArrayList<>();
       for (VaccinationMaster vaccination : vaccinationMasterList) {
