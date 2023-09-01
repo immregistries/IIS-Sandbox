@@ -41,18 +41,10 @@ import static org.immregistries.iis.kernal.servlet.LoginServlet.*;
 public class PopServletR4  {
 	Logger logger = LoggerFactory.getLogger(PopServletR4.class);
 	public static final String PARAM_MESSAGE = "MESSAGEDATA";
-	private static SessionFactory factory;
 	@Autowired
 	RepositoryClientFactory repositoryClientFactory;
 	@Autowired
 	private IncomingMessageHandler handler;
-
-	public static Session getDataSession() {
-		if (factory == null) {
-			factory = new Configuration().configure().buildSessionFactory();
-		}
-		return factory.openSession();
-	}
 
 	@PostMapping()
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
@@ -66,7 +58,7 @@ public class PopServletR4  {
 			String ack = "";
 			String[] messages;
 			StringBuilder ackBuilder = new StringBuilder();
-			Session dataSession = getDataSession();
+			Session dataSession = PopServlet.getDataSession();
 			try {
 				if (orgMaster == null) {
 					resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);

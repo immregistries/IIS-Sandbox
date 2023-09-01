@@ -81,6 +81,8 @@ public interface IFhirRequester<
 
 	public VaccinationReported readVaccinationReported(String id);
 
+	public PatientMaster readPatientMasterWithMdmLink(String patientId);
+
 	IBaseBundle searchRegularRecord(Class<? extends IBaseResource> aClass, ICriterion... where);
 
 	IBaseBundle searchGoldenRecord(Class<? extends IBaseResource> aClass, ICriterion... where);

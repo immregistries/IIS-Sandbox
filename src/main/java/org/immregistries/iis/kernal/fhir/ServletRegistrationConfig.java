@@ -52,28 +52,6 @@ public class ServletRegistrationConfig {
 	}
 
 	@Bean
-	public ServletRegistrationBean patientServletRegistrationBean() {
-		ServletRegistrationBean registrationBean = new ServletRegistrationBean();
-		HttpServlet servlet = new PatientServlet();
-		beanFactory.autowireBean(servlet);
-		registrationBean.setServlet(servlet);
-		registrationBean.addUrlMappings("/patient");
-		registrationBean.setLoadOnStartup(1);
-		return registrationBean;
-	}
-
-	@Bean
-	public ServletRegistrationBean vaccinationServletRegistrationBean() {
-		ServletRegistrationBean registrationBean = new ServletRegistrationBean();
-		HttpServlet servlet = new VaccinationServlet();
-		beanFactory.autowireBean(servlet);
-		registrationBean.setServlet(servlet);
-		registrationBean.addUrlMappings("/vaccination");
-//		registrationBean.setLoadOnStartup(1);
-		return registrationBean;
-	}
-
-	@Bean
 	@Conditional(OnR5Condition.class)
 	public ServletRegistrationBean subscriptionServletRegistrationBean() {
 		ServletRegistrationBean registrationBean = new ServletRegistrationBean();
@@ -241,15 +219,4 @@ public class ServletRegistrationConfig {
 		return registrationBean;
 	}
 
-	@Bean
-	@Conditional(OnR5Condition.class)
-	public ServletRegistrationBean recommendationRegistrationBean() {
-		ServletRegistrationBean registrationBean = new ServletRegistrationBean();
-		HttpServlet servlet = new RecommendationServlet();
-		beanFactory.autowireBean(servlet);
-		registrationBean.setServlet(servlet);
-		registrationBean.addUrlMappings("/recommendation");
-//		registrationBean.setLoadOnStartup(1);
-		return registrationBean;
-	}
 }

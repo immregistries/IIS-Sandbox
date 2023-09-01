@@ -3,12 +3,14 @@ package org.immregistries.iis.kernal.servlet;
 import ca.uhn.fhir.parser.IParser;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import org.hl7.fhir.r5.model.*;
+import org.immregistries.iis.kernal.fhir.annotations.OnR5Condition;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.logic.ImmunizationRecommendationService;
 import org.immregistries.iis.kernal.model.OrgMaster;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
-
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -18,7 +20,11 @@ import java.io.PrintWriter;
 
 import static org.immregistries.iis.kernal.mapping.Interfaces.PatientMapper.MRN_SYSTEM;
 
+@RestController
+@RequestMapping({"/recommendation", "/patient/{patientId}/recommendation", "/facility/{facilityId}/patient/{patientId}/recommendation"})
+@Conditional(OnR5Condition.class)
 public class RecommendationServlet extends PatientServlet {
+
 	public static final String PARAM_RECOMMENDATION_ID = "recommendationId";
 	public static final String PARAM_RECOMMENDATION_IDENTIFIER = "recommendationIdentifier";
 	public static final String PARAM_RECOMMENDATION_RESOURCE = "recommendationResource";
@@ -26,50 +32,50 @@ public class RecommendationServlet extends PatientServlet {
 	@Autowired
 	ImmunizationRecommendationService immunizationRecommendationService;
 
+	public static String linkUrl(String facilityId, String patientId) {
+		return "/facility/" + facilityId + "/patient/" + patientId + "/recommendation";
+	}
+
 	/**
 	 * USed to add a random generated component to recommendation
+	 *
 	 * @param req
 	 * @param resp
 	 * @throws ServletException
 	 * @throws IOException
 	 */
-	@Override
+	@PostMapping
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
 		throws ServletException, IOException { //TODO add support to add new Reco
-
-		/**
-		 * Normal put is impossible with the primitive forms here, so we rely on a hidden parameter
-		 */
-		if (req.getParameter("_method") != null && req.getParameter("_method").equals("put")) {
-			doPut(req,resp);
-		} else {
-			OrgMaster orgMaster = ServletHelper.getOrgMaster();
-			if (orgMaster == null) {
-				throw new AuthenticationCredentialsNotFoundException("");
-			}
-			IGenericClient fhirClient = repositoryClientFactory.newGenericClient(req);
-			Patient patient = getPatientFromParameter(req,fhirClient);
-
-			if (patient != null) {
-				Bundle recommendationBundle =  fhirClient.search().forResource(ImmunizationRecommendation.class)
-					.where(ImmunizationRecommendation.PATIENT.hasId(new IdType(patient.getId()).getIdPart())).returnBundle(Bundle.class).execute();
-				if (recommendationBundle.hasEntry()) {
-					ImmunizationRecommendation recommendation = (ImmunizationRecommendation) recommendationBundle.getEntryFirstRep().getResource();
-					recommendation = immunizationRecommendationService.addGeneratedRecommendation(recommendation);
-					fhirClient.update().resource(recommendation).withId(recommendation.getId()).execute();
-				} else {
-					fhirClient.create().resource(immunizationRecommendationService.generate(orgMaster, patient)).execute();
-				}
-			}
-			doGet(req, resp);
+		OrgMaster orgMaster = ServletHelper.getOrgMaster();
+		if (orgMaster == null) {
+			throw new AuthenticationCredentialsNotFoundException("");
 		}
+		IGenericClient fhirClient = repositoryClientFactory.newGenericClient(req);
+		Patient patient = getPatientFromParameter(req, fhirClient);
+
+		if (patient != null) {
+			Bundle recommendationBundle = fhirClient.search().forResource(ImmunizationRecommendation.class)
+				.where(ImmunizationRecommendation.PATIENT.hasId(new IdType(patient.getId()).getIdPart())).returnBundle(Bundle.class).execute();
+			if (recommendationBundle.hasEntry()) {
+				ImmunizationRecommendation recommendation = (ImmunizationRecommendation) recommendationBundle.getEntryFirstRep().getResource();
+				recommendation = immunizationRecommendationService.addGeneratedRecommendation(recommendation);
+				fhirClient.update().resource(recommendation).withId(recommendation.getId()).execute();
+			} else {
+				fhirClient.create().resource(immunizationRecommendationService.generate(orgMaster, patient)).execute();
+			}
+		}
+		doGet(req, resp);
+
 	}
 
 	/**
 	 * Used to manually edit the Recommendation resource
+	 *
 	 * @param req
 	 * @param resp
 	 */
+	@PutMapping
 	protected void doPut(HttpServletRequest req, HttpServletResponse resp)
 		throws ServletException, IOException {
 		OrgMaster orgMaster = ServletHelper.getOrgMaster();
@@ -95,10 +101,10 @@ public class RecommendationServlet extends PatientServlet {
 			out.flush();
 			out.close();
 		}
-		doGet(req,resp);
+		doGet(req, resp);
 	}
 
-	@Override
+	@GetMapping
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
 		throws ServletException, IOException {
 		OrgMaster orgMaster = ServletHelper.getOrgMaster();

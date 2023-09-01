@@ -24,10 +24,8 @@ public class MessageServlet extends HttpServlet {
 
   public static final String PARAM_ACTION = "action";
 
-  public static final String ACTION_LOGIN = "Login";
-  public static final String ACTION_LOGOUT = "Logout";
   public static final String ACTION_SEARCH = "Search";
-  public static final String ACTION_SWITCH = "Switch";
+
 
   public static final String PARAM_SEARCH = "search";
 
@@ -48,23 +46,8 @@ public class MessageServlet extends HttpServlet {
     PrintWriter out = new PrintWriter(resp.getOutputStream());
     Session dataSession = PopServlet.getDataSession();
     try {
-      String action = req.getParameter(PARAM_ACTION);
       String messageError = null;
       String messageConfirmation = null;
-      if (action != null) {
-			  if (action.equals(ACTION_SWITCH)) {
-          OrgMaster orgMaster = dataSession.get(OrgMaster.class,
-              Integer.parseInt(req.getParameter(PARAM_ORG_ID)));
-          Map<Integer, OrgAccess> orgAccessMap =
-              (Map<Integer, OrgAccess>) session.getAttribute("orgAccessMap");
-          if (orgAccessMap != null) {
-            OrgAccess orgAccess = orgAccessMap.get(orgMaster.getOrgId());
-            if (orgAccess != null) {
-              messageConfirmation = "Switched to " + orgMaster.getOrganizationName() + "";
-            }
-          }
-        }
-      }
       HomeServlet.doHeader(out, "IIS Sandbox");
       if (messageError != null) {
         out.println("  <div class=\"w3-panel w3-red\">");

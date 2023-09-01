@@ -19,6 +19,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -34,7 +38,9 @@ import static org.immregistries.iis.kernal.servlet.RecommendationServlet.PARAM_R
 import static org.immregistries.iis.kernal.servlet.SubscriptionServlet.PARAM_MESSAGE;
 import static org.immregistries.iis.kernal.servlet.SubscriptionServlet.PARAM_SUBSCRIPTION_ID;
 
-public class PatientServlet extends HttpServlet {
+@RestController
+@RequestMapping({"/patient", "/facility/{facilityId}/patient"})
+public class PatientServlet  {
 	public static final String PARAM_ACTION = "action";
 	public static final String ACTION_SEARCH = "search";
 	public static final String PARAM_PATIENT_NAME_LAST = "patientNameLast";
@@ -49,6 +55,10 @@ public class PatientServlet extends HttpServlet {
 	@Autowired
 	PatientMapper patientMapper;
 
+	public static String linkUrl(String facilityId) {
+		return "/facility/" + facilityId + "/patient";
+	}
+
 	public static void printMessageReceived(PrintWriter out, MessageReceived messageReceived) {
 		SimpleDateFormat sdfTime = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
 		out.println("     <h3>" + messageReceived.getCategoryRequest() + " - "
@@ -58,14 +68,14 @@ public class PatientServlet extends HttpServlet {
 		out.println("     <pre>" + messageReceived.getMessageResponse() + "</pre>");
 	}
 
-	@Override
+	@PostMapping
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
 		throws ServletException, IOException {
 		doGet(req, resp);
 	}
 
 	@SuppressWarnings("unchecked")
-	@Override
+	@GetMapping
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
 		throws ServletException, IOException {
 		OrgMaster orgMaster = ServletHelper.getOrgMaster();
@@ -206,7 +216,7 @@ public class PatientServlet extends HttpServlet {
 					Bundle recommendationBundle = fhirClient.search()
 						.forResource(ImmunizationRecommendation.class)
 						.where(ImmunizationRecommendation.PATIENT
-								.hasId(patientSelected.getId())
+								.hasId(new IdType(patientSelected.getId()).getIdPart())
 						).returnBundle(Bundle.class).execute();
 					if (recommendationBundle.hasEntry()) {
 						printRecommendation(out, (ImmunizationRecommendation) recommendationBundle.getEntryFirstRep().getResource(), patientSelected);
@@ -226,11 +236,11 @@ public class PatientServlet extends HttpServlet {
 					String apiBaseUrl = "/iis/fhir/" + orgMaster.getOrganizationName();
 					{
 						String link = apiBaseUrl + "/Patient/" + patientMasterSelected.getPatientId();
-						out.println("<a href=\"" + link + "\">FHIR Resource : " + link + "</a>");
+						out.println("<div>FHIR Resource: <a href=\"" + link + "\">" + link + "</a></div>");
 					}
 					{
 						String link = apiBaseUrl + "/Patient/" + patientMasterSelected.getPatientId() + "/$everything?_mdm=true";
-						out.println("<div><a href=\"" + link + "\">Everything related to this Patient : " + link  +"</a></div>");
+						out.println("<div>Everything related to this Patient: <a href=\"" + link + "\">" + link  +"</a></div>");
 					}
 					out.println("</div>");
 				}
@@ -251,8 +261,6 @@ public class PatientServlet extends HttpServlet {
 					}
 					out.println("</div>");
 				}
-
-
 
 				out.println("</div>");
 			}

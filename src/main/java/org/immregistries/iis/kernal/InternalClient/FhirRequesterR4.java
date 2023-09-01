@@ -1,5 +1,6 @@
 package org.immregistries.iis.kernal.InternalClient;
 
+import org.apache.commons.lang3.StringUtils;
 import org.immregistries.iis.kernal.fhir.annotations.OnR4Condition;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 
 /**
@@ -306,5 +308,21 @@ public class FhirRequesterR4 extends FhirRequester<Patient,Immunization,Location
 
 	public VaccinationReported readVaccinationReported(String id) {
 		return immunizationMapper.getReported((org.hl7.fhir.r4.model.Immunization) read(org.hl7.fhir.r4.model.Immunization.class,id));
+	}
+
+	public PatientMaster readPatientMasterWithMdmLink(String patientId) {
+		Parameters out = repositoryClientFactory.getFhirClient().operation().onServer().named("$mdm-query-links")
+			.withParameters(new Parameters().addParameter("resourceId", patientId)).execute();
+		List<Parameters.ParametersParameterComponent> part = out.getParameter().stream()
+			.filter(parametersParameterComponent -> parametersParameterComponent.getName().equals("link"))
+			.findFirst().orElse(new Parameters.ParametersParameterComponent()).getPart();
+		Optional<Parameters.ParametersParameterComponent> goldenIdComponent = part.stream()
+			.filter(parametersParameterComponent -> parametersParameterComponent.getName().equals("goldenResourceId"))
+			.findFirst();
+		if (goldenIdComponent.isPresent() && StringUtils.isNotBlank((CharSequence) goldenIdComponent.get().getValue())) {
+			return readPatientMaster(String.valueOf(goldenIdComponent.get().getValue()));
+		} else {
+			return null;
+		}
 	}
 }

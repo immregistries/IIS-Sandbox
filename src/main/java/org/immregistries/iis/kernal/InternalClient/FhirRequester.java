@@ -107,8 +107,9 @@ public abstract class FhirRequester<
 			IQuery<IBaseBundle> query = fhirClient.search().forResource(aClass);
 			int size = where.length;
 			if (size > 0) {
-				query = query.where(where[0]).withTag(GOLDEN_SYSTEM_TAG, GOLDEN_RECORD);
+				query = query.where(where[0]);
 			}
+			query = query.withTag(GOLDEN_SYSTEM_TAG, GOLDEN_RECORD);
 			int i = 1;
 			while (i < size) {
 				query = query.and(where[i]);

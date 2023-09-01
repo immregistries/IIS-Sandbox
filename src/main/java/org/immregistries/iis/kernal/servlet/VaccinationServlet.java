@@ -9,13 +9,19 @@ import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.InternalClient.FhirRequester;
 import org.immregistries.iis.kernal.InternalClient.RepositoryClientFactory;
+import org.immregistries.iis.kernal.fhir.annotations.OnR5Condition;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.logic.CodeMapManager;
 import org.immregistries.iis.kernal.mapping.Interfaces.ImmunizationMapper;
 import org.immregistries.iis.kernal.mapping.Interfaces.PatientMapper;
 import org.immregistries.iis.kernal.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -27,7 +33,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-@SuppressWarnings("serial")
+@RestController
+@RequestMapping({"/vaccination","/patient/{patientId}/vaccination", "/facility/{facilityId}/patient/{patientId}/vaccination"})
+@Conditional(OnR5Condition.class)
 public class VaccinationServlet extends PatientServlet {
 	public static final String PARAM_ACTION = "action";
 	public static final String PARAM_RESOURCE = "resource";
@@ -41,13 +49,17 @@ public class VaccinationServlet extends PatientServlet {
 	@Autowired
 	ImmunizationMapper<Immunization> immunizationMapper;
 
-	@Override
+	public static String linkUrl(String facilityId, String patientId) {
+		return "/facility/" + facilityId + "/patient/" + patientId + "/vaccination";
+	}
+
+	@PostMapping
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
 		throws ServletException, IOException {
 		doGet(req, resp);
 	}
 
-	@Override
+	@GetMapping
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
 		throws ServletException, IOException {
 

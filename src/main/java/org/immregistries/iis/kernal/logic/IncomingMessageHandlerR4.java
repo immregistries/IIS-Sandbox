@@ -84,7 +84,7 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler<Organizatio
 
 	public String processQBP(OrgMaster orgMaster, HL7Reader reader, String messageReceived) {
 		PatientReported patientReported = null;
-		List<PatientReported> patientReportedPossibleList = new ArrayList<>();
+		List<PatientReported> patientReportedPossibleList = new ArrayList<>(); // TODO fix this with mdm
 		List<ProcessingException> processingExceptionList = new ArrayList<>();
 		if (reader.advanceToSegment("QPD")) {
 			String mrn = "";
@@ -1052,7 +1052,7 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler<Organizatio
 	@SuppressWarnings("unchecked")
 	public String buildRSP(HL7Reader reader, String messageReceived, PatientReported patientReported,
 								  OrgMaster orgMaster, List<PatientReported> patientReportedPossibleList,
-								  List<ProcessingException> processingExceptionList) {
+								  List<ProcessingException> processingExceptionList) { // TODO fix with mdm
 		IGenericClient fhirClient = getFhirClient();
 		reader.resetPostion();
 		reader.advanceToSegment("MSH");

@@ -1,6 +1,8 @@
 package org.immregistries.iis.kernal.fhir.security;
 
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Session;
+import org.immregistries.iis.kernal.model.OrgAccess;
 import org.immregistries.iis.kernal.model.OrgMaster;
 import org.immregistries.iis.kernal.servlet.PopServlet;
 import org.slf4j.Logger;
@@ -20,6 +22,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 
+import static org.immregistries.iis.kernal.fhir.security.ServletHelper.SESSION_ORGACCESS;
 import static org.immregistries.iis.kernal.servlet.LoginServlet.PARAM_FACILITYID;
 import static org.immregistries.iis.kernal.fhir.security.ServletHelper.SESSION_ORGMASTER;
 
@@ -42,7 +45,7 @@ public class UsernamePasswordAuthenticationProvider implements AuthenticationPro
 		Session dataSession = PopServlet.getDataSession();
 
 		// TODO maybe customize  "PrincipalExtractor" instead and have the orgAccess/orgMaster as principal https://www.baeldung.com/spring-security-oauth-principal-authorities-extractor
-		if (request.getParameter(PARAM_FACILITYID) != null) {
+		if (StringUtils.isNotBlank(request.getParameter(PARAM_FACILITYID))) {
 			OrgMaster orgMaster = ServletHelper.authenticateOrgMaster(authentication.getName(), (String) authentication.getCredentials(), request.getParameter(PARAM_FACILITYID), dataSession);
 			if (orgMaster != null) {
 				/**
@@ -54,7 +57,9 @@ public class UsernamePasswordAuthenticationProvider implements AuthenticationPro
 				return null;
 			}
 		} else  {
-			return ServletHelper.authenticateOrgAccessUsernamePassword(authentication.getName(), (String) authentication.getCredentials(), dataSession);
+			OrgAccess orgAccess = ServletHelper.authenticateOrgAccessUsernamePassword(authentication.getName(), (String) authentication.getCredentials(), dataSession);
+			request.getSession(true).setAttribute(SESSION_ORGACCESS,orgAccess);
+			return orgAccess;
 		}
 	}
 

@@ -29,6 +29,7 @@ public class ServletHelper {
 	private static String BAD_PASSWORD = "badpassword";
 
 
+
 	public static OrgMaster authenticateOrgMaster(String username, String password, String facilityName, Session dataSession) {
 		/**
 		 * First user authentication with USERNAME password
@@ -48,6 +49,9 @@ public class ServletHelper {
 		/**
 		 * Users starting with the prefix can create a user with the same name, any other use of prefix are rejected
 		 */
+		if (StringUtils.isBlank(facilityName)) {
+			throw new AuthenticationException();
+		}
 		if (facilityName.startsWith(GITHUB_PREFIX) ) {
 			if (!orgAccess.getAccessName().startsWith(GITHUB_PREFIX)) {
 				throw new AuthenticationException();

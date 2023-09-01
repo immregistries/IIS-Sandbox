@@ -27,7 +27,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -37,7 +36,7 @@ import java.util.ArrayList;
 import static org.immregistries.iis.kernal.servlet.LoginServlet.*;
 
 @RestController()
-@RequestMapping("/pop")
+@RequestMapping({"/pop","/facility/{facilityId}/pop"})
 @Conditional(OnR5Condition.class)
 public class PopServlet {
 	Logger logger = LoggerFactory.getLogger(PopServlet.class);
@@ -120,7 +119,6 @@ public class PopServlet {
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		logger.info("{}", authentication);
 		OrgAccess orgAccess = ServletHelper.getOrgAccess();
 		String userId = null;
 		String password = null;

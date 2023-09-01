@@ -3,12 +3,17 @@ package org.immregistries.iis.kernal.logic;
 import ca.uhn.fhir.rest.api.server.RequestDetails;
 import ca.uhn.fhir.rest.server.servlet.ServletRequestDetails;
 import org.apache.commons.lang3.StringUtils;
-import org.hl7.fhir.r5.model.*;
+import org.hl7.fhir.r5.model.Immunization;
+import org.hl7.fhir.r5.model.Location;
+import org.hl7.fhir.r5.model.Patient;
 import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
-import org.immregistries.iis.kernal.model.*;
 import org.immregistries.iis.kernal.InternalClient.FhirRequester;
+import org.immregistries.iis.kernal.model.OrgLocation;
+import org.immregistries.iis.kernal.model.OrgMaster;
+import org.immregistries.iis.kernal.model.PatientReported;
+import org.immregistries.iis.kernal.model.VaccinationReported;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,351 +23,327 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 
 
-
 @Service("IncomingEventHandler")
 public class IncomingEventHandler {
+	private static final String ORG_LOCATION_FACILITY_CODE = "orgLocationFacilityCode";
+	private static final String FUNDING_ELIGIBILITY = "fundingEligibility";
+	private static final String FUNDING_SOURCE = "fundingSource";
+	private static final String BODY_ROUTE = "bodyRoute";
+	private static final String BODY_SITE = "bodySite";
+	private static final String REFUSAL_REASON_CODE = "refusalReasonCode";
+	private static final String ACTION_CODE = "actionCode";
+	private static final String COMPLETION_STATUS = "completionStatus";
+	private static final String EXPIRATION_DATE = "expirationDate";
+	private static final String LOTNUMBER = "lotnumber";
+	private static final String INFORMATION_SOURCE = "informationSource";
+	private static final String ADMINISTERED_AMOUNT = "administeredAmount";
+	private static final String VACCINE_MVX_CODE = "vaccineMvxCode";
+	private static final String VACCINE_NDC_CODE = "vaccineNdcCode";
+	private static final String VACCINE_CVX_CODE = "vaccineCvxCode";
+	private static final String ADMINISTERED_DATE = "administeredDate";
+	private static final String VACCINATION_REPORTED_EXTERNAL_LINK =
+		"vaccinationReportedExternalLink";
+	public static final String[] PARAMS_VACCINATION =
+		new String[]{VACCINATION_REPORTED_EXTERNAL_LINK, ADMINISTERED_DATE, VACCINE_CVX_CODE,
+			VACCINE_NDC_CODE, VACCINE_MVX_CODE, ADMINISTERED_AMOUNT, INFORMATION_SOURCE, LOTNUMBER,
+			EXPIRATION_DATE, COMPLETION_STATUS, ACTION_CODE, REFUSAL_REASON_CODE, BODY_SITE,
+			BODY_ROUTE, FUNDING_SOURCE, FUNDING_ELIGIBILITY, ORG_LOCATION_FACILITY_CODE};
+	private static final String GUARDIAN_RELATIONSHIP = "guardianRelationship";
+	private static final String GUARDIAN_MIDDLE = "guardianMiddle";
+	private static final String GUARDIAN_FIRST = "guardianFirst";
+	private static final String GUARDIAN_LAST = "guardianLast";
+	private static final String REGISTRY_STATUS_INDICATOR_DATE = "registryStatusIndicatorDate";
+	private static final String REGISTRY_STATUS_INDICATOR = "registryStatusIndicator";
+	private static final String PROTECTION_INDICATOR_DATE = "protectionIndicatorDate";
+	private static final String PROTECTION_INDICATOR = "protectionIndicator";
+	private static final String PUBLICITY_INDICATOR_DATE = "publicityIndicatorDate";
+	private static final String PUBLICITY_INDICATOR = "publicityIndicator";
+	private static final String PATIENT_DEATH_DATE = "patientDeathDate";
+	private static final String PATIENT_DEATH_FLAG = "patientDeathFlag";
+	private static final String PATIENT_BIRTH_ORDER = "patientBirthOrder";
+	private static final String PATIENT_BIRTH_FLAG = "patientBirthFlag";
+	private static final String PATIENT_ETHNICITY = "patientEthnicity";
+	private static final String PATIENT_EMAIL = "patientEmail";
+	private static final String PATIENT_PHONE = "patientPhone";
+	private static final String PATIENT_ADDRESS_COUNTY_PARISH = "patientAddressCountyParish";
+	private static final String PATIENT_ADDRESS_COUNTRY = "patientAddressCountry";
+	private static final String PATIENT_ADDRESS_ZIP = "patientAddressZip";
+	private static final String PATIENT_ADDRESS_STATE = "patientAddressState";
+	private static final String PATIENT_ADDRESS_CITY = "patientAddressCity";
+	private static final String PATIENT_ADDRESS_LINE2 = "patientAddressLine2";
+	private static final String PATIENT_ADDRESS_LINE1 = "patientAddressLine1";
+	private static final String PATIENT_RACE6 = "patientRace6";
+	private static final String PATIENT_RACE5 = "patientRace5";
+	private static final String PATIENT_RACE4 = "patientRace4";
+	private static final String PATIENT_RACE3 = "patientRace3";
+	private static final String PATIENT_RACE2 = "patientRace2";
+	private static final String PATIENT_RACE = "patientRace";
+	private static final String PATIENT_SEX = "patientSex";
+	private static final String PATIENT_BIRTH_DATE = "patientBirthDate";
+	private static final String PATIENT_MOTHER_MAIDEN = "patientMotherMaiden";
+	private static final String PATIENT_NAME_MIDDLE = "patientNameMiddle";
+	private static final String PATIENT_NAME_FIRST = "patientNameFirst";
+	private static final String PATIENT_NAME_LAST = "patientNameLast";
+	private static final String PATIENT_REPORTED_TYPE = "patientReportedType";
+	private static final String PATIENT_REPORTED_AUTHORITY = "patientReportedAuthority";
+	private static final String PATIENT_REPORTED_EXTERNAL_LINK = "patientReportedExternalLink";
+	public static final String[] PARAMS_PATIENT = new String[]{PATIENT_REPORTED_EXTERNAL_LINK,
+		PATIENT_REPORTED_AUTHORITY, PATIENT_REPORTED_TYPE, PATIENT_NAME_LAST, PATIENT_NAME_FIRST,
+		PATIENT_NAME_MIDDLE, PATIENT_MOTHER_MAIDEN, PATIENT_BIRTH_DATE, PATIENT_SEX, PATIENT_RACE,
+		PATIENT_RACE2, PATIENT_RACE3, PATIENT_RACE4, PATIENT_RACE5, PATIENT_RACE6,
+		PATIENT_ADDRESS_LINE1, PATIENT_ADDRESS_LINE2, PATIENT_ADDRESS_CITY, PATIENT_ADDRESS_STATE,
+		PATIENT_ADDRESS_ZIP, PATIENT_ADDRESS_COUNTRY, PATIENT_ADDRESS_COUNTY_PARISH, PATIENT_PHONE,
+		PATIENT_EMAIL, PATIENT_ETHNICITY, PATIENT_BIRTH_FLAG, PATIENT_BIRTH_ORDER, PATIENT_DEATH_FLAG,
+		PATIENT_DEATH_DATE, PUBLICITY_INDICATOR, PUBLICITY_INDICATOR_DATE, PROTECTION_INDICATOR,
+		PROTECTION_INDICATOR_DATE, REGISTRY_STATUS_INDICATOR, REGISTRY_STATUS_INDICATOR_DATE,
+		GUARDIAN_LAST, GUARDIAN_FIRST, GUARDIAN_MIDDLE, GUARDIAN_RELATIONSHIP};
+	private final Logger logger = LoggerFactory.getLogger(IncomingEventHandler.class);
 	@Autowired
 	protected FhirRequester fhirRequester;
 	@Autowired
 	protected IncomingMessageHandler incomingMessageHandler;
 
-	private final Logger logger = LoggerFactory.getLogger(IncomingEventHandler.class);
+	public String process(HttpServletRequest req, OrgMaster orgMaster) {
+		try {
+			processEvent(orgMaster, req);
+		} catch (Exception e) {
+			e.printStackTrace(System.err);
+			return "Exception processing request" + e.getMessage();
+		}
 
-  private static final String ORG_LOCATION_FACILITY_CODE = "orgLocationFacilityCode";
-  private static final String FUNDING_ELIGIBILITY = "fundingEligibility";
-  private static final String FUNDING_SOURCE = "fundingSource";
-  private static final String BODY_ROUTE = "bodyRoute";
-  private static final String BODY_SITE = "bodySite";
-  private static final String REFUSAL_REASON_CODE = "refusalReasonCode";
-  private static final String ACTION_CODE = "actionCode";
-  private static final String COMPLETION_STATUS = "completionStatus";
-  private static final String EXPIRATION_DATE = "expirationDate";
-  private static final String LOTNUMBER = "lotnumber";
-  private static final String INFORMATION_SOURCE = "informationSource";
-  private static final String ADMINISTERED_AMOUNT = "administeredAmount";
-  private static final String VACCINE_MVX_CODE = "vaccineMvxCode";
-  private static final String VACCINE_NDC_CODE = "vaccineNdcCode";
-  private static final String VACCINE_CVX_CODE = "vaccineCvxCode";
-  private static final String ADMINISTERED_DATE = "administeredDate";
-  private static final String VACCINATION_REPORTED_EXTERNAL_LINK =
-      "vaccinationReportedExternalLink";
-  private static final String GUARDIAN_RELATIONSHIP = "guardianRelationship";
-  private static final String GUARDIAN_MIDDLE = "guardianMiddle";
-  private static final String GUARDIAN_FIRST = "guardianFirst";
-  private static final String GUARDIAN_LAST = "guardianLast";
-  private static final String REGISTRY_STATUS_INDICATOR_DATE = "registryStatusIndicatorDate";
-  private static final String REGISTRY_STATUS_INDICATOR = "registryStatusIndicator";
-  private static final String PROTECTION_INDICATOR_DATE = "protectionIndicatorDate";
-  private static final String PROTECTION_INDICATOR = "protectionIndicator";
-  private static final String PUBLICITY_INDICATOR_DATE = "publicityIndicatorDate";
-  private static final String PUBLICITY_INDICATOR = "publicityIndicator";
-  private static final String PATIENT_DEATH_DATE = "patientDeathDate";
-  private static final String PATIENT_DEATH_FLAG = "patientDeathFlag";
-  private static final String PATIENT_BIRTH_ORDER = "patientBirthOrder";
-  private static final String PATIENT_BIRTH_FLAG = "patientBirthFlag";
-  private static final String PATIENT_ETHNICITY = "patientEthnicity";
-  private static final String PATIENT_EMAIL = "patientEmail";
-  private static final String PATIENT_PHONE = "patientPhone";
-  private static final String PATIENT_ADDRESS_COUNTY_PARISH = "patientAddressCountyParish";
-  private static final String PATIENT_ADDRESS_COUNTRY = "patientAddressCountry";
-  private static final String PATIENT_ADDRESS_ZIP = "patientAddressZip";
-  private static final String PATIENT_ADDRESS_STATE = "patientAddressState";
-  private static final String PATIENT_ADDRESS_CITY = "patientAddressCity";
-  private static final String PATIENT_ADDRESS_LINE2 = "patientAddressLine2";
-  private static final String PATIENT_ADDRESS_LINE1 = "patientAddressLine1";
-  private static final String PATIENT_RACE6 = "patientRace6";
-  private static final String PATIENT_RACE5 = "patientRace5";
-  private static final String PATIENT_RACE4 = "patientRace4";
-  private static final String PATIENT_RACE3 = "patientRace3";
-  private static final String PATIENT_RACE2 = "patientRace2";
-  private static final String PATIENT_RACE = "patientRace";
-  private static final String PATIENT_SEX = "patientSex";
-  private static final String PATIENT_BIRTH_DATE = "patientBirthDate";
-  private static final String PATIENT_MOTHER_MAIDEN = "patientMotherMaiden";
-  private static final String PATIENT_NAME_MIDDLE = "patientNameMiddle";
-  private static final String PATIENT_NAME_FIRST = "patientNameFirst";
-  private static final String PATIENT_NAME_LAST = "patientNameLast";
-  private static final String PATIENT_REPORTED_TYPE = "patientReportedType";
-  private static final String PATIENT_REPORTED_AUTHORITY = "patientReportedAuthority";
-  private static final String PATIENT_REPORTED_EXTERNAL_LINK = "patientReportedExternalLink";
-
-  public static final String[] PARAMS_PATIENT = new String[] {PATIENT_REPORTED_EXTERNAL_LINK,
-      PATIENT_REPORTED_AUTHORITY, PATIENT_REPORTED_TYPE, PATIENT_NAME_LAST, PATIENT_NAME_FIRST,
-      PATIENT_NAME_MIDDLE, PATIENT_MOTHER_MAIDEN, PATIENT_BIRTH_DATE, PATIENT_SEX, PATIENT_RACE,
-      PATIENT_RACE2, PATIENT_RACE3, PATIENT_RACE4, PATIENT_RACE5, PATIENT_RACE6,
-      PATIENT_ADDRESS_LINE1, PATIENT_ADDRESS_LINE2, PATIENT_ADDRESS_CITY, PATIENT_ADDRESS_STATE,
-      PATIENT_ADDRESS_ZIP, PATIENT_ADDRESS_COUNTRY, PATIENT_ADDRESS_COUNTY_PARISH, PATIENT_PHONE,
-      PATIENT_EMAIL, PATIENT_ETHNICITY, PATIENT_BIRTH_FLAG, PATIENT_BIRTH_ORDER, PATIENT_DEATH_FLAG,
-      PATIENT_DEATH_DATE, PUBLICITY_INDICATOR, PUBLICITY_INDICATOR_DATE, PROTECTION_INDICATOR,
-      PROTECTION_INDICATOR_DATE, REGISTRY_STATUS_INDICATOR, REGISTRY_STATUS_INDICATOR_DATE,
-      GUARDIAN_LAST, GUARDIAN_FIRST, GUARDIAN_MIDDLE, GUARDIAN_RELATIONSHIP};
-
-  public static final String[] PARAMS_VACCINATION =
-      new String[] {VACCINATION_REPORTED_EXTERNAL_LINK, ADMINISTERED_DATE, VACCINE_CVX_CODE,
-          VACCINE_NDC_CODE, VACCINE_MVX_CODE, ADMINISTERED_AMOUNT, INFORMATION_SOURCE, LOTNUMBER,
-          EXPIRATION_DATE, COMPLETION_STATUS, ACTION_CODE, REFUSAL_REASON_CODE, BODY_SITE,
-          BODY_ROUTE, FUNDING_SOURCE, FUNDING_ELIGIBILITY, ORG_LOCATION_FACILITY_CODE};
+		return "OK";
+	}
 
 
-  public String process(HttpServletRequest req, OrgMaster orgMaster) {
-    try {
-      processEvent(orgMaster, req);
-    } catch (Exception e) {
-      e.printStackTrace(System.err);
-      return "Exception processing request" + e.getMessage();
-    }
+	public void processEvent(OrgMaster orgMaster, HttpServletRequest req) throws Exception {
 
-    return "OK";
-  }
-
-
-  public void processEvent(OrgMaster orgMaster, HttpServletRequest req) throws Exception {
-
-    CodeMap codeMap = CodeMapManager.getCodeMap();
-    PatientReported patientReported = processPatient(orgMaster, req, codeMap);
-    VaccinationReported vaccinationReported = null;
+		CodeMap codeMap = CodeMapManager.getCodeMap();
+		PatientReported patientReported = processPatient(orgMaster, req, codeMap);
+		VaccinationReported vaccinationReported = null;
 //    VaccinationMaster vaccinationMaster = null;
-    Date administrationDate = null;
-    String vaccinationReportedExternalLink = req.getParameter(VACCINATION_REPORTED_EXTERNAL_LINK);
-    if (vaccinationReportedExternalLink.equals("")) {
-      throw new Exception("Vaccination order id was not found, unable to process");
-    }
-    administrationDate = incomingMessageHandler.parseDateInternal(req.getParameter(ADMINISTERED_DATE), true);
-    if (administrationDate.after(new Date())) {
-      throw new Exception(
-          "Vaccination is indicated as occuring in the future, unable to accept future vaccination events");
-    }
-	  vaccinationReported = fhirRequester.searchVaccinationReported(
-		  Immunization.PATIENT.hasId(patientReported.getPatientId()),
-		  Immunization.IDENTIFIER.exactly().code(vaccinationReportedExternalLink)
-	  );
-    if (vaccinationReported == null) {
+		Date administrationDate = null;
+		String vaccinationReportedExternalLink = req.getParameter(VACCINATION_REPORTED_EXTERNAL_LINK);
+		if (vaccinationReportedExternalLink.equals("")) {
+			throw new Exception("Vaccination order id was not found, unable to process");
+		}
+		administrationDate = incomingMessageHandler.parseDateInternal(req.getParameter(ADMINISTERED_DATE), true);
+		if (administrationDate.after(new Date())) {
+			throw new Exception(
+				"Vaccination is indicated as occuring in the future, unable to accept future vaccination events");
+		}
+		vaccinationReported = fhirRequester.searchVaccinationReported(
+			Immunization.PATIENT.hasId(patientReported.getPatientId()),
+			Immunization.IDENTIFIER.exactly().code(vaccinationReportedExternalLink)
+		);
+		if (vaccinationReported == null) {
 //      vaccinationMaster = new VaccinationMaster();
 //		vaccinationMaster.setVaccinationId(vaccinationReportedExternalLink);
-      vaccinationReported = new VaccinationReported();
+			vaccinationReported = new VaccinationReported();
 //      vaccinationReported.setVaccination(vaccinationMaster);
 //      vaccinationMaster.setVaccinationReported(null);
-      vaccinationReported.setReportedDate(new Date());
-      vaccinationReported.setExternalLink(vaccinationReportedExternalLink);
-    }
-	  vaccinationReported.setPatientReported(patientReported);
+			vaccinationReported.setReportedDate(new Date());
+			vaccinationReported.setExternalLink(vaccinationReportedExternalLink);
+		}
+		vaccinationReported.setPatientReported(patientReported);
 //    vaccinationMaster.setPatient(patientReported.getPatient());
 
-    String vaccineCvxCode = req.getParameter(VACCINE_CVX_CODE);
-    String vaccineNdcCode = req.getParameter(VACCINE_NDC_CODE);
+		String vaccineCvxCode = req.getParameter(VACCINE_CVX_CODE);
+		String vaccineNdcCode = req.getParameter(VACCINE_NDC_CODE);
 
-    {
-      Code ndcCode = codeMap.getCodeForCodeset(CodesetType.VACCINATION_NDC_CODE, vaccineNdcCode);
-      if (ndcCode != null) {
-        if (ndcCode.getCodeStatus() != null && ndcCode.getCodeStatus().getDeprecated() != null
-            && ndcCode.getCodeStatus().getDeprecated().getNewCodeValue() != null
-            && !ndcCode.getCodeStatus().getDeprecated().getNewCodeValue().equals("")) {
-          vaccineNdcCode = ndcCode.getCodeStatus().getDeprecated().getNewCodeValue();
-        }
-        Code cvxCode = codeMap.getRelatedCode(ndcCode, CodesetType.VACCINATION_CVX_CODE);
-        if (cvxCode != null && vaccineCvxCode.equals("")) {
-          vaccineCvxCode = cvxCode.getValue();
-        }
-      }
-    }
-    if (vaccineCvxCode.equals("")) {
-      throw new Exception("Unable to find a recognized vaccine administration code (CVX or NDC)");
-    } else {
-      Code cvxCode = codeMap.getCodeForCodeset(CodesetType.VACCINATION_CVX_CODE, vaccineCvxCode);
-      if (cvxCode != null) {
-        vaccineCvxCode = cvxCode.getValue();
-      } else {
-        throw new Exception("Unrecognized CVX vaccine '" + vaccineCvxCode + "'");
-      }
-    }
-
-    {
-      String administeredAtLocation = req.getParameter(ORG_LOCATION_FACILITY_CODE);
-      if (StringUtils.isNotEmpty(administeredAtLocation)) {
-			OrgLocation orgLocation = null;
-			orgLocation = fhirRequester.searchOrgLocation(
-				Location.IDENTIFIER.exactly().code(administeredAtLocation)
-				// Location.ORGANIZATION.hasAnyOfIds(administeredAtLocation) //Todo verify condition
-			);
-			if (orgLocation == null){
-				orgLocation = new OrgLocation();
-				orgLocation.setOrgFacilityCode(administeredAtLocation);
-				orgLocation.setOrgMaster(orgMaster);
-				orgLocation.setOrgFacilityName(administeredAtLocation);
-				orgLocation.setLocationType("");
-				orgLocation.setAddressLine1("");
-				orgLocation.setAddressLine2("");
-				orgLocation.setAddressCity("");
-				orgLocation.setAddressState("");
-				orgLocation.setAddressZip("");
-				orgLocation.setAddressCountry("");
-				orgLocation = fhirRequester.saveOrgLocation(orgLocation);
+		{
+			Code ndcCode = codeMap.getCodeForCodeset(CodesetType.VACCINATION_NDC_CODE, vaccineNdcCode);
+			if (ndcCode != null) {
+				if (ndcCode.getCodeStatus() != null && ndcCode.getCodeStatus().getDeprecated() != null
+					&& ndcCode.getCodeStatus().getDeprecated().getNewCodeValue() != null
+					&& !ndcCode.getCodeStatus().getDeprecated().getNewCodeValue().equals("")) {
+					vaccineNdcCode = ndcCode.getCodeStatus().getDeprecated().getNewCodeValue();
+				}
+				Code cvxCode = codeMap.getRelatedCode(ndcCode, CodesetType.VACCINATION_CVX_CODE);
+				if (cvxCode != null && vaccineCvxCode.equals("")) {
+					vaccineCvxCode = cvxCode.getValue();
+				}
 			}
-        vaccinationReported.setOrgLocation(orgLocation);
-      }
-    }
+		}
+		if (vaccineCvxCode.equals("")) {
+			throw new Exception("Unable to find a recognized vaccine administration code (CVX or NDC)");
+		} else {
+			Code cvxCode = codeMap.getCodeForCodeset(CodesetType.VACCINATION_CVX_CODE, vaccineCvxCode);
+			if (cvxCode != null) {
+				vaccineCvxCode = cvxCode.getValue();
+			} else {
+				throw new Exception("Unrecognized CVX vaccine '" + vaccineCvxCode + "'");
+			}
+		}
+
+		{
+			String administeredAtLocation = req.getParameter(ORG_LOCATION_FACILITY_CODE);
+			if (StringUtils.isNotEmpty(administeredAtLocation)) {
+				OrgLocation orgLocation = null;
+				orgLocation = fhirRequester.searchOrgLocation(
+					Location.IDENTIFIER.exactly().code(administeredAtLocation)
+					// Location.ORGANIZATION.hasAnyOfIds(administeredAtLocation) //Todo verify condition
+				);
+				if (orgLocation == null) {
+					orgLocation = new OrgLocation();
+					orgLocation.setOrgFacilityCode(administeredAtLocation);
+					orgLocation.setOrgMaster(orgMaster);
+					orgLocation.setOrgFacilityName(administeredAtLocation);
+					orgLocation.setLocationType("");
+					orgLocation.setAddressLine1("");
+					orgLocation.setAddressLine2("");
+					orgLocation.setAddressCity("");
+					orgLocation.setAddressState("");
+					orgLocation.setAddressZip("");
+					orgLocation.setAddressCountry("");
+					orgLocation = fhirRequester.saveOrgLocation(orgLocation);
+				}
+				vaccinationReported.setOrgLocation(orgLocation);
+			}
+		}
 //    vaccinationMaster.setVaccineCvxCode(vaccineCvxCode);
 //    vaccinationMaster.setAdministeredDate(administrationDate);
-    vaccinationReported.setUpdatedDate(new Date());
-    vaccinationReported.setAdministeredDate(administrationDate);
-    vaccinationReported.setVaccineCvxCode(vaccineCvxCode);
-    vaccinationReported.setVaccineNdcCode(vaccineNdcCode);
-    vaccinationReported.setAdministeredAmount(req.getParameter(ADMINISTERED_AMOUNT));
-    vaccinationReported.setInformationSource(req.getParameter(INFORMATION_SOURCE));
-    vaccinationReported.setLotnumber(req.getParameter(LOTNUMBER));
-    vaccinationReported
-        .setExpirationDate(incomingMessageHandler.parseDateInternal(req.getParameter(EXPIRATION_DATE), true));
-    vaccinationReported.setVaccineMvxCode(req.getParameter(VACCINE_MVX_CODE));
-    vaccinationReported.setRefusalReasonCode(req.getParameter(REFUSAL_REASON_CODE));
-    vaccinationReported.setCompletionStatus(req.getParameter(COMPLETION_STATUS));
-    vaccinationReported.setActionCode(req.getParameter(ACTION_CODE));
-    vaccinationReported.setBodyRoute(req.getParameter(BODY_ROUTE));
-    vaccinationReported.setBodySite(req.getParameter(BODY_SITE));
-	  if (vaccinationReported.getAdministeredDate().before(patientReported.getBirthDate())) {
-		  throw new Exception(
-			  "Vaccination is reported as having been administered before the patient was born");
-	  }
+		vaccinationReported.setUpdatedDate(new Date());
+		vaccinationReported.setAdministeredDate(administrationDate);
+		vaccinationReported.setVaccineCvxCode(vaccineCvxCode);
+		vaccinationReported.setVaccineNdcCode(vaccineNdcCode);
+		vaccinationReported.setAdministeredAmount(req.getParameter(ADMINISTERED_AMOUNT));
+		vaccinationReported.setInformationSource(req.getParameter(INFORMATION_SOURCE));
+		vaccinationReported.setLotnumber(req.getParameter(LOTNUMBER));
+		vaccinationReported
+			.setExpirationDate(incomingMessageHandler.parseDateInternal(req.getParameter(EXPIRATION_DATE), true));
+		vaccinationReported.setVaccineMvxCode(req.getParameter(VACCINE_MVX_CODE));
+		vaccinationReported.setRefusalReasonCode(req.getParameter(REFUSAL_REASON_CODE));
+		vaccinationReported.setCompletionStatus(req.getParameter(COMPLETION_STATUS));
+		vaccinationReported.setActionCode(req.getParameter(ACTION_CODE));
+		vaccinationReported.setBodyRoute(req.getParameter(BODY_ROUTE));
+		vaccinationReported.setBodySite(req.getParameter(BODY_SITE));
+		if (vaccinationReported.getAdministeredDate().before(patientReported.getBirthDate())) {
+			throw new Exception(
+				"Vaccination is reported as having been administered before the patient was born");
+		}
 
-    vaccinationReported.setFundingEligibility(req.getParameter(FUNDING_ELIGIBILITY));
-    vaccinationReported.setFundingSource(req.getParameter(FUNDING_SOURCE));
-
-
-    {
-		 vaccinationReported = fhirRequester.saveVaccinationReported(vaccinationReported);
-    }
-
-  }
-
-  public PatientReported processPatient(OrgMaster orgMaster, HttpServletRequest req,
-      CodeMap codeMap) throws Exception {
-	 RequestDetails requestDetails = new ServletRequestDetails();
-	 requestDetails.setTenantId(orgMaster.getOrganizationName());
-
-    PatientReported patientReported = null;
-//    PatientMaster patientMaster = null;
-
-    String patientReportedExternalLink = req.getParameter(PATIENT_REPORTED_EXTERNAL_LINK);
-    String patientReportedAuthority = req.getParameter(PATIENT_REPORTED_AUTHORITY);
-    String patientReportedType = req.getParameter(PATIENT_REPORTED_TYPE);
-    if (StringUtils.isEmpty(patientReportedExternalLink)) {
-      throw new Exception("Patient external link must be indicated");
-    }
+		vaccinationReported.setFundingEligibility(req.getParameter(FUNDING_ELIGIBILITY));
+		vaccinationReported.setFundingSource(req.getParameter(FUNDING_SOURCE));
 
 
-    {
-		 patientReported = fhirRequester.searchPatientReported(
-			 Patient.IDENTIFIER.exactly().code(patientReportedExternalLink)
-		 );
-    }
+		{
+			vaccinationReported = fhirRequester.saveVaccinationReported(vaccinationReported);
+		}
 
-    if (patientReported == null) {
-//      patientMaster = new PatientMaster();
-//      patientMaster.setPatientExternalLink(generatePatientExternalLink(fhirClient));
-//      patientMaster.setOrgMaster(orgAccess.getOrg());
-      patientReported = new PatientReported();
-      patientReported.setOrgReported(orgMaster);
-      patientReported.setExternalLink(patientReportedExternalLink);
-//      patientReported.setPatient(patientMaster);
-      patientReported.setReportedDate(new Date());
-    }else {
-//		 patientMaster = patientReported.getPatient();
-	 }
+	}
 
+	public PatientReported processPatient(OrgMaster orgMaster, HttpServletRequest req,
+													  CodeMap codeMap) throws Exception {
+		RequestDetails requestDetails = new ServletRequestDetails();
+		requestDetails.setTenantId(orgMaster.getOrganizationName());
 
+		PatientReported patientReported = null;
 
-		 String patientNameLast = req.getParameter(PATIENT_NAME_LAST);
-    String patientNameFirst = req.getParameter(PATIENT_NAME_FIRST);
-    String patientNameMiddle = req.getParameter(PATIENT_NAME_MIDDLE);
-    String patientPhone = req.getParameter(PATIENT_PHONE);
-
-    if (patientNameLast.equals("")) {
-      throw new Exception(
-          "Patient last name was not found, required for accepting patient and vaccination history");
-    }
-    if (patientNameFirst.equals("")) {
-      throw new Exception(
-          "Patient first name was not found, required for accepting patient and vaccination history");
-    }
+		String patientReportedExternalLink = req.getParameter(PATIENT_REPORTED_EXTERNAL_LINK);
+		String patientReportedAuthority = req.getParameter(PATIENT_REPORTED_AUTHORITY);
+		String patientReportedType = req.getParameter(PATIENT_REPORTED_TYPE);
+		if (StringUtils.isEmpty(patientReportedExternalLink)) {
+			throw new Exception("Patient external link must be indicated");
+		}
 
 
-    String zip = req.getParameter(PATIENT_ADDRESS_ZIP);
-    if (zip.length() > 5) {
-      zip = zip.substring(0, 5);
-    }
-    String addressFragPrep = req.getParameter(PATIENT_ADDRESS_LINE1);
-    String addressFrag = "";
-    {
-      int spaceIndex = addressFragPrep.indexOf(" ");
-      if (spaceIndex > 0) {
-        addressFragPrep = addressFragPrep.substring(0, spaceIndex);
-      }
-      addressFrag = zip + ":" + addressFragPrep;
-    }
-    Date patientBirthDate = incomingMessageHandler.parseDateInternal(req.getParameter(PATIENT_BIRTH_DATE), true);
+		{
+			patientReported = fhirRequester.searchPatientReported(
+				Patient.IDENTIFIER.exactly().code(patientReportedExternalLink)
+			);
+		}
 
-    if (patientBirthDate.after(new Date())) {
-      throw new Exception(
-          "Patient is indicated as being born in the future, unable to record patients who are not yet born");
-    }
-//    patientMaster.setPatientAddressFrag(addressFrag);
-//    patientMaster.setPatientNameLast(patientNameLast);
-//    patientMaster.setPatientNameFirst(patientNameFirst);
-//    patientMaster.setPatientNameMiddle(patientNameMiddle);
-//    patientMaster.setPatientPhoneFrag(patientPhone);
-//    patientMaster.setPatientBirthDate(patientBirthDate);
-//    patientMaster.setPatientSoundexFirst(""); // TODO, later
-//    patientMaster.setPatientSoundexLast(""); // TODO, later
-	  patientReported.setExternalLink(patientReportedExternalLink);
-	  patientReported.setPatientReportedType(patientReportedType);
-	  patientReported.setNameFirst(patientNameFirst);
-	  patientReported.setNameLast(patientNameLast);
-	  patientReported.setNameMiddle(patientNameMiddle);
-	  patientReported.setMotherMaidenName(req.getParameter(PATIENT_MOTHER_MAIDEN));
-	  patientReported.setBirthDate(patientBirthDate);
-	  patientReported.setSex(req.getParameter(PATIENT_SEX));
-	  patientReported.setRace(req.getParameter(PATIENT_RACE));
-	  patientReported.setRace2(req.getParameter(PATIENT_RACE2));
-	  patientReported.setRace3(req.getParameter(PATIENT_RACE3));
-	  patientReported.setRace4(req.getParameter(PATIENT_RACE4));
-	  patientReported.setRace5(req.getParameter(PATIENT_RACE5));
-	  patientReported.setRace6(req.getParameter(PATIENT_RACE6));
-	  patientReported.setAddressLine1(req.getParameter(PATIENT_ADDRESS_LINE1));
-	  patientReported.setAddressLine2(req.getParameter(PATIENT_ADDRESS_LINE2));
-	  patientReported.setAddressCity(req.getParameter(PATIENT_ADDRESS_CITY));
-	  patientReported.setAddressState(req.getParameter(PATIENT_ADDRESS_STATE));
-	  patientReported.setAddressZip(req.getParameter(PATIENT_ADDRESS_ZIP));
-	  patientReported.setAddressCountry(req.getParameter(PATIENT_ADDRESS_COUNTRY));
-	  patientReported.setAddressCountyParish(req.getParameter(PATIENT_ADDRESS_COUNTY_PARISH));
-	  patientReported.setEthnicity(req.getParameter(PATIENT_ETHNICITY));
-	  patientReported.setBirthFlag(req.getParameter(PATIENT_BIRTH_FLAG));
-	  patientReported.setBirthOrder(req.getParameter(PATIENT_BIRTH_ORDER));
-	  patientReported
-		  .setDeathDate(incomingMessageHandler.parseDateInternal(req.getParameter(PATIENT_DEATH_DATE), true));
-	  patientReported.setDeathFlag(req.getParameter(PATIENT_DEATH_FLAG));
-	  patientReported.setEmail(req.getParameter(PATIENT_EMAIL));
-	  patientReported.setPhone(patientPhone);
-	  patientReported.setPatientReportedAuthority(patientReportedAuthority);
-	  patientReported.setPublicityIndicator(req.getParameter(PUBLICITY_INDICATOR));
-	  patientReported.setProtectionIndicator(req.getParameter(PROTECTION_INDICATOR));
-	  patientReported.setProtectionIndicatorDate(
-		  incomingMessageHandler.parseDateInternal(req.getParameter(PROTECTION_INDICATOR_DATE), true));
-	  patientReported.setRegistryStatusIndicator(req.getParameter(REGISTRY_STATUS_INDICATOR));
-	  patientReported.setRegistryStatusIndicatorDate(
-		  incomingMessageHandler.parseDateInternal(req.getParameter(PROTECTION_INDICATOR_DATE), true));
-	  patientReported.setPublicityIndicatorDate(
-		  incomingMessageHandler.parseDateInternal(req.getParameter(PUBLICITY_INDICATOR_DATE), true));
-    patientReported.setGuardianLast(req.getParameter(GUARDIAN_LAST));
-    patientReported.setGuardianFirst(req.getParameter(GUARDIAN_FIRST));
-    patientReported.setGuardianMiddle(req.getParameter(GUARDIAN_MIDDLE));
-    patientReported.setGuardianRelationship(req.getParameter(GUARDIAN_RELATIONSHIP));
-    patientReported.setUpdatedDate(new Date());
-    patientReported = fhirRequester.savePatientReported(patientReported);
-	 patientReported.setPatient(fhirRequester.searchPatientMaster(
-		 Patient.IDENTIFIER.exactly().systemAndIdentifier(patientReported.getPatientReportedAuthority(),patientReported.getExternalLink())
-	 ));
-    return patientReported;
-  }
+		if (patientReported == null) {
+			patientReported = new PatientReported();
+			patientReported.setOrgReported(orgMaster);
+			patientReported.setExternalLink(patientReportedExternalLink);
+			patientReported.setReportedDate(new Date());
+		}
 
+
+		String patientNameLast = req.getParameter(PATIENT_NAME_LAST);
+		String patientNameFirst = req.getParameter(PATIENT_NAME_FIRST);
+		String patientNameMiddle = req.getParameter(PATIENT_NAME_MIDDLE);
+		String patientPhone = req.getParameter(PATIENT_PHONE);
+
+		if (patientNameLast.equals("")) {
+			throw new Exception(
+				"Patient last name was not found, required for accepting patient and vaccination history");
+		}
+		if (patientNameFirst.equals("")) {
+			throw new Exception(
+				"Patient first name was not found, required for accepting patient and vaccination history");
+		}
+
+
+		String zip = req.getParameter(PATIENT_ADDRESS_ZIP);
+		if (zip.length() > 5) {
+			zip = zip.substring(0, 5);
+		}
+		String addressFragPrep = req.getParameter(PATIENT_ADDRESS_LINE1);
+		String addressFrag = "";
+		{
+			int spaceIndex = addressFragPrep.indexOf(" ");
+			if (spaceIndex > 0) {
+				addressFragPrep = addressFragPrep.substring(0, spaceIndex);
+			}
+			addressFrag = zip + ":" + addressFragPrep;
+		}
+		Date patientBirthDate = incomingMessageHandler.parseDateInternal(req.getParameter(PATIENT_BIRTH_DATE), true);
+
+		if (patientBirthDate.after(new Date())) {
+			throw new Exception(
+				"Patient is indicated as being born in the future, unable to record patients who are not yet born");
+		}
+		patientReported.setExternalLink(patientReportedExternalLink);
+		patientReported.setPatientReportedType(patientReportedType);
+		patientReported.setNameFirst(patientNameFirst);
+		patientReported.setNameLast(patientNameLast);
+		patientReported.setNameMiddle(patientNameMiddle);
+		patientReported.setMotherMaidenName(req.getParameter(PATIENT_MOTHER_MAIDEN));
+		patientReported.setBirthDate(patientBirthDate);
+		patientReported.setSex(req.getParameter(PATIENT_SEX));
+		patientReported.setRace(req.getParameter(PATIENT_RACE));
+		patientReported.setRace2(req.getParameter(PATIENT_RACE2));
+		patientReported.setRace3(req.getParameter(PATIENT_RACE3));
+		patientReported.setRace4(req.getParameter(PATIENT_RACE4));
+		patientReported.setRace5(req.getParameter(PATIENT_RACE5));
+		patientReported.setRace6(req.getParameter(PATIENT_RACE6));
+		patientReported.setAddressLine1(req.getParameter(PATIENT_ADDRESS_LINE1));
+		patientReported.setAddressLine2(req.getParameter(PATIENT_ADDRESS_LINE2));
+		patientReported.setAddressCity(req.getParameter(PATIENT_ADDRESS_CITY));
+		patientReported.setAddressState(req.getParameter(PATIENT_ADDRESS_STATE));
+		patientReported.setAddressZip(req.getParameter(PATIENT_ADDRESS_ZIP));
+		patientReported.setAddressCountry(req.getParameter(PATIENT_ADDRESS_COUNTRY));
+		patientReported.setAddressCountyParish(req.getParameter(PATIENT_ADDRESS_COUNTY_PARISH));
+		patientReported.setEthnicity(req.getParameter(PATIENT_ETHNICITY));
+		patientReported.setBirthFlag(req.getParameter(PATIENT_BIRTH_FLAG));
+		patientReported.setBirthOrder(req.getParameter(PATIENT_BIRTH_ORDER));
+		patientReported
+			.setDeathDate(incomingMessageHandler.parseDateInternal(req.getParameter(PATIENT_DEATH_DATE), true));
+		patientReported.setDeathFlag(req.getParameter(PATIENT_DEATH_FLAG));
+		patientReported.setEmail(req.getParameter(PATIENT_EMAIL));
+		patientReported.setPhone(patientPhone);
+		patientReported.setPatientReportedAuthority(patientReportedAuthority);
+		patientReported.setPublicityIndicator(req.getParameter(PUBLICITY_INDICATOR));
+		patientReported.setProtectionIndicator(req.getParameter(PROTECTION_INDICATOR));
+		patientReported.setProtectionIndicatorDate(
+			incomingMessageHandler.parseDateInternal(req.getParameter(PROTECTION_INDICATOR_DATE), true));
+		patientReported.setRegistryStatusIndicator(req.getParameter(REGISTRY_STATUS_INDICATOR));
+		patientReported.setRegistryStatusIndicatorDate(
+			incomingMessageHandler.parseDateInternal(req.getParameter(PROTECTION_INDICATOR_DATE), true));
+		patientReported.setPublicityIndicatorDate(
+			incomingMessageHandler.parseDateInternal(req.getParameter(PUBLICITY_INDICATOR_DATE), true));
+		patientReported.setGuardianLast(req.getParameter(GUARDIAN_LAST));
+		patientReported.setGuardianFirst(req.getParameter(GUARDIAN_FIRST));
+		patientReported.setGuardianMiddle(req.getParameter(GUARDIAN_MIDDLE));
+		patientReported.setGuardianRelationship(req.getParameter(GUARDIAN_RELATIONSHIP));
+		patientReported.setUpdatedDate(new Date());
+		patientReported = fhirRequester.savePatientReported(patientReported);
+
+		patientReported.setPatient(fhirRequester.readPatientMasterWithMdmLink(patientReported.getPatientId()));
+		return patientReported;
+	}
 
 
 }
