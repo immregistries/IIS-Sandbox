@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -22,7 +21,7 @@ public class LoginServlet {
 
 	public static final String PARAM_USERID = "USERID";
 	public static final String PARAM_PASSWORD = "PASSWORD";
-	public static final String PARAM_FACILITYID = "FACILITYID";
+	public static final String PARAM_TENANTID = "TENANTID";
 	public static final String PARAM_ORG_ID = "orgId";
 
 	public static final String PARAM_ACTION = "action";
@@ -45,17 +44,17 @@ public class LoginServlet {
 			OrgAccess orgAccess = ServletHelper.getOrgAccess();
 			if (orgAccess == null) { // LOGIN FORM, inherited, could be made in a separate class and improved
 				String userId = req.getParameter(PARAM_USERID);
-				String facilityId = req.getParameter(PARAM_FACILITYID);
+				String tenantId = req.getParameter(PARAM_TENANTID);
 				if (userId == null) {
 					userId = "";
 				}
-				if (facilityId == null) {
-					facilityId = "";
+				if (tenantId == null) {
+					tenantId = "";
 				}
 				if (req.getParameter(PARAM_ORG_ID) != null) {
 					OrgMaster orgMaster = dataSession.get(OrgMaster.class,
 						Integer.parseInt(req.getParameter(PARAM_ORG_ID)));
-					facilityId = orgMaster.getOrganizationName();
+					tenantId = orgMaster.getOrganizationName();
 				}
 				out.println("<div class=\"w3-container w3-card-4\">");
 				out.println("	<h2>Login</h2>");
@@ -64,8 +63,8 @@ public class LoginServlet {
 				out.println("		<label>User Id</label>");
 				out.println("		<input class=\"w3-input\" type=\"password\" name=\"" + PARAM_PASSWORD + "\" value=\"\"/>");
 				out.println("		<label>Password</label>");
-				out.println("		<input class=\"w3-input\" type=\"text\" name=\"" + PARAM_FACILITYID + "\" value=\"" + facilityId + "\"/>");
-				out.println("		<label>Facility Name (optional)</label><br/>");
+				out.println("		<input class=\"w3-input\" type=\"text\" name=\"" + PARAM_TENANTID + "\" value=\"" + tenantId + "\"/>");
+				out.println("		<label>Tenant Name (optional)</label><br/>");
 				out.println("		<input class=\"w3-button w3-section w3-teal w3-ripple\" type=\"submit\" name=\"" + PARAM_ACTION + "\" value=\"" + ACTION_LOGIN + "\"/>");
 				out.println("	</form>");
 				out.println("	<div class=\"w3-container w3-card-4 w3-half\">");

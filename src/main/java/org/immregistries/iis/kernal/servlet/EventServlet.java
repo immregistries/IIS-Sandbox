@@ -37,7 +37,7 @@ public class EventServlet extends PopServlet {
     try {
       String userId = req.getParameter(PARAM_USERID);
       String password = req.getParameter(PARAM_PASSWORD);
-      String facilityId = req.getParameter(PARAM_FACILITYID);
+      String facilityId = req.getParameter(PARAM_TENANTID);
       HttpSession session = req.getSession(true);
       OrgMaster orgMaster = ServletHelper.getOrgMaster();
       String ack = "";
@@ -85,7 +85,7 @@ public class EventServlet extends PopServlet {
       if (password == null || password.equals("")) {
         password = "password1234";
       }
-      String facilityId = req.getParameter(PARAM_FACILITYID);
+      String facilityId = req.getParameter(PARAM_TENANTID);
       if (facilityId == null || facilityId.equals("")) {
         facilityId = "Mercy Healthcare";
       }
@@ -104,14 +104,14 @@ public class EventServlet extends PopServlet {
           out.println("      <input class=\"w3-input\" type=\"password\" name=\"" + PARAM_PASSWORD
               + "\"/>");
           out.println("      <label>Password</label>");
-          out.println("      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_FACILITYID
+          out.println("      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_TENANTID
               + "\" value=\"" + facilityId + "\"/>");
           out.println("      <label>Facility Id</label>");
         } else {
           out.println("      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_USERID
               + "\" value=\"" + userId + "\"/ disabled>");
           out.println("      <label>User Id</label>");
-          out.println("      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_FACILITYID
+          out.println("      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_TENANTID
               + "\" value=\"" + facilityId + "\" disabled/>");
           out.println("      <label>Facility Id</label>");
         }

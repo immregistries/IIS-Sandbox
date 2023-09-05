@@ -23,7 +23,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import javax.servlet.http.HttpServletRequest;
 
 import static org.immregistries.iis.kernal.fhir.security.ServletHelper.SESSION_ORGACCESS;
-import static org.immregistries.iis.kernal.servlet.LoginServlet.PARAM_FACILITYID;
+import static org.immregistries.iis.kernal.servlet.LoginServlet.PARAM_TENANTID;
 import static org.immregistries.iis.kernal.fhir.security.ServletHelper.SESSION_ORGMASTER;
 
 
@@ -45,8 +45,8 @@ public class UsernamePasswordAuthenticationProvider implements AuthenticationPro
 		Session dataSession = PopServlet.getDataSession();
 
 		// TODO maybe customize  "PrincipalExtractor" instead and have the orgAccess/orgMaster as principal https://www.baeldung.com/spring-security-oauth-principal-authorities-extractor
-		if (StringUtils.isNotBlank(request.getParameter(PARAM_FACILITYID))) {
-			OrgMaster orgMaster = ServletHelper.authenticateOrgMaster(authentication.getName(), (String) authentication.getCredentials(), request.getParameter(PARAM_FACILITYID), dataSession);
+		if (StringUtils.isNotBlank(request.getParameter(PARAM_TENANTID))) {
+			OrgMaster orgMaster = ServletHelper.authenticateOrgMaster(authentication.getName(), (String) authentication.getCredentials(), request.getParameter(PARAM_TENANTID), dataSession);
 			if (orgMaster != null) {
 				/**
 				 * Creating a new session after login

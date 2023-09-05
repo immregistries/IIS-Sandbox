@@ -16,28 +16,26 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 
 @RestController()
-@RequestMapping("/facility")
-public class FacilityController {
+@RequestMapping("/tenant")
+public class TenantController {
 	public static final String PARAM_ACTION = "action";
 
 	public static final String ACTION_SWITCH = "Switch";
-	public static final String PARAM_FACILITY_NAME = "facilityName";
+	public static final String PARAM_TENANT_NAME = "tenantName";
 	public static final String PARAM_ORG_MASTER_ID = "orgMasterId";
 
 	@PostMapping()
 	@Transactional()
-	protected void doPost(HttpServletRequest req, HttpServletResponse resp, @RequestParam(name= PARAM_FACILITY_NAME, required = false) String facilityName)
+	protected void doPost(HttpServletRequest req, HttpServletResponse resp, @RequestParam(name= PARAM_TENANT_NAME, required = false) String tenantName)
 		throws ServletException, IOException {
 		OrgAccess orgAccess = ServletHelper.getOrgAccess();
 		Session dataSession = PopServlet.getDataSession();
 		try {
-			if (StringUtils.isNotBlank(facilityName)) {
-				OrgMaster orgMaster = ServletHelper.authenticateOrgMaster(orgAccess, facilityName, dataSession);
+			if (StringUtils.isNotBlank(tenantName)) {
+				OrgMaster orgMaster = ServletHelper.authenticateOrgMaster(orgAccess, tenantName, dataSession);
 			}
 		} finally {
 			dataSession.close();
@@ -64,26 +62,26 @@ public class FacilityController {
 				query.setParameter(0, orgAccess);
 				List<OrgMaster> orgMasterList = query.list();
 				for (OrgMaster orgMasterMember : orgMasterList) {
-					if (FacilityController.ACTION_SWITCH.equals(action) && String.valueOf(orgMasterMember.getOrgId()).equals(orgMasterId)) {
+					if (TenantController.ACTION_SWITCH.equals(action) && String.valueOf(orgMasterMember.getOrgId()).equals(orgMasterId)) {
 						orgMaster = orgMasterMember;
 						session.setAttribute("orgMaster",orgMaster);
 					}
 				}
 				/**
-				 * print starts after potential facility switch
+				 * print starts after potential tenant switch
 				 */
 				HomeServlet.doHeader(out, "IIS Sandbox - Home");
 
 				out.println("<div class=\"w3-container w3-half w3-margin-top\">");
 
-				out.println("	<h2>Facilities</h2>");
+				out.println("	<h2>Tenant List</h2>");
 
 				out.println("<ul class=\"w3-ul w3-hoverable\">");
 				for (OrgMaster orgMasterMember : orgMasterList) {
 					if (orgMasterMember.equals(orgMaster)) {
 						out.println("<li>" + orgMasterMember.getOrganizationName() + " (selected)</li>");
 					} else  {
-						String link = "facility?" + PARAM_ACTION + "="
+						String link = "tenant?" + PARAM_ACTION + "="
 							+ ACTION_SWITCH + "&" + PARAM_ORG_MASTER_ID + "="
 							+ orgMasterMember.getOrgId();
 						out.println("<li><a href=\"" + link + "\">" + orgMasterMember.getOrganizationName() + "</a></li>");
@@ -94,10 +92,10 @@ public class FacilityController {
 
 
 				out.println("<div class=\"w3-container w3-half w3-margin-top\">");
-				out.println("    <h3>Add Facility</h3>");
-				out.println("    <form method=\"POST\" action=\"facility\" class=\"w3-container w3-card-4\">");
-				out.println("      <label>Facility Name</label>");
-				out.println("      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_FACILITY_NAME + "\" value=\"\"/>");
+				out.println("    <h3>Add Tenant</h3>");
+				out.println("    <form method=\"POST\" action=\"tenant\" class=\"w3-container w3-card-4\">");
+				out.println("      <label>Tenant Name</label>");
+				out.println("      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_TENANT_NAME + "\" value=\"\"/>");
 				out.println("		<input class=\"w3-button w3-section w3-teal w3-ripple\" type=\"submit\" value=\"Add\"/> ");
 				out.println("    </form>");
 				out.println("</div>");

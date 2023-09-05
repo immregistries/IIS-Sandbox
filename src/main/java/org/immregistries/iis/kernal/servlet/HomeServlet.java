@@ -51,10 +51,11 @@ public class HomeServlet extends HttpServlet {
 			out.println("<a class='w3-bar-item w3-button w3-right' href=\"logout\">Logout</a>");
 			OrgMaster orgMaster = ServletHelper.getOrgMaster();
 			if (orgMaster != null) {
-				out.println("<a class='w3-bar-item w3-button w3-right w3-green' href=\"facility\">Facility : " + orgMaster.getOrganizationName() + " </a>");
-
+				String link = "tenant";
+				out.println("<a class='w3-bar-item w3-button w3-right w3-green' href=\"" + link + "\">Tenant : " + orgMaster.getOrganizationName() + " </a>");
 			} else  {
-				out.println("<a class='w3-bar-item w3-button w3-right w3-green' href=\"facility\">No Facility selected</a>");
+				String link = "tenant";
+				out.println("<a class='w3-bar-item w3-button w3-right w3-green' href=\"" + link + "\">No Tenant selected</a>");
 			}
 		} else {
 			out.println("<a class='w3-bar-item w3-button w3-right' href=\"loginForm\">Login</a>");

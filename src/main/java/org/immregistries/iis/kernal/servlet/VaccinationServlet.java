@@ -34,7 +34,7 @@ import java.util.List;
 import java.util.Set;
 
 @RestController
-@RequestMapping({"/vaccination","/patient/{patientId}/vaccination", "/facility/{facilityId}/patient/{patientId}/vaccination"})
+@RequestMapping({"/vaccination","/patient/{patientId}/vaccination", "/tenant/{tenantId}/patient/{patientId}/vaccination"})
 @Conditional(OnR5Condition.class)
 public class VaccinationServlet extends PatientServlet {
 	public static final String PARAM_ACTION = "action";
@@ -50,7 +50,7 @@ public class VaccinationServlet extends PatientServlet {
 	ImmunizationMapper<Immunization> immunizationMapper;
 
 	public static String linkUrl(String facilityId, String patientId) {
-		return "/facility/" + facilityId + "/patient/" + patientId + "/vaccination";
+		return "/tenant/" + facilityId + "/patient/" + patientId + "/vaccination";
 	}
 
 	@PostMapping
@@ -86,7 +86,7 @@ public class VaccinationServlet extends PatientServlet {
 
 			HomeServlet.doHeader(out, "IIS Sandbox - Vaccinations");
 
-			out.println("<h2>Facility : " + orgMaster.getOrganizationName() + "</h2>");
+			out.println("<h2>Tenant : " + orgMaster.getOrganizationName() + "</h2>");
 			PatientReported patientReportedSelected = fhirRequester.readPatientReported(vaccination.getPatientReportedId());
 			{
 				printPatient(out, patientReportedSelected);

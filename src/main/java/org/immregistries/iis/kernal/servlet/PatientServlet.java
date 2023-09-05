@@ -39,7 +39,7 @@ import static org.immregistries.iis.kernal.servlet.SubscriptionServlet.PARAM_MES
 import static org.immregistries.iis.kernal.servlet.SubscriptionServlet.PARAM_SUBSCRIPTION_ID;
 
 @RestController
-@RequestMapping({"/patient", "/facility/{facilityId}/patient"})
+@RequestMapping({"/patient", "/tenant/{tenantId}/patient"})
 public class PatientServlet  {
 	public static final String PARAM_ACTION = "action";
 	public static final String ACTION_SEARCH = "search";
@@ -56,7 +56,7 @@ public class PatientServlet  {
 	PatientMapper patientMapper;
 
 	public static String linkUrl(String facilityId) {
-		return "/facility/" + facilityId + "/patient";
+		return "/tenant/" + facilityId + "/patient";
 	}
 
 	public static void printMessageReceived(PrintWriter out, MessageReceived messageReceived) {

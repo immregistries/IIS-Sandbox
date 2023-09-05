@@ -41,17 +41,6 @@ public class ServletRegistrationConfig {
 	}
 
 	@Bean
-	public ServletRegistrationBean soapServletRegistrationBean() {
-		ServletRegistrationBean registrationBean = new ServletRegistrationBean();
-		HttpServlet servlet = new SoapServlet();
-		beanFactory.autowireBean(servlet);
-		registrationBean.setServlet(servlet);
-		registrationBean.addUrlMappings("/soap");
-//		registrationBean.setLoadOnStartup(1);
-		return registrationBean;
-	}
-
-	@Bean
 	@Conditional(OnR5Condition.class)
 	public ServletRegistrationBean subscriptionServletRegistrationBean() {
 		ServletRegistrationBean registrationBean = new ServletRegistrationBean();

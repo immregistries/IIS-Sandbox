@@ -2,12 +2,9 @@ package org.immregistries.iis.kernal.servlet;
 
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.cfg.Configuration;
 import org.hl7.fhir.r4.model.Group;
 import org.hl7.fhir.r4.model.Reference;
 import org.immregistries.iis.kernal.fhir.annotations.OnR4Condition;
-import org.immregistries.iis.kernal.fhir.annotations.OnR5Condition;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.logic.IncomingMessageHandler;
 import org.immregistries.iis.kernal.model.OrgAccess;
@@ -26,7 +23,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -135,8 +131,8 @@ public class PopServletR4  {
 			if (StringUtils.isBlank(password)) {
 				password = "password1234";
 			}
-			if (req.getParameter(PARAM_FACILITYID) == null || req.getParameter(PARAM_FACILITYID).isBlank()) {
-				facilityId = req.getParameter(PARAM_FACILITYID);
+			if (req.getParameter(PARAM_TENANTID) == null || req.getParameter(PARAM_TENANTID).isBlank()) {
+				facilityId = req.getParameter(PARAM_TENANTID);
 				if (StringUtils.isBlank(facilityId)) {
 					facilityId = "Mercy-Healthcare";
 				}

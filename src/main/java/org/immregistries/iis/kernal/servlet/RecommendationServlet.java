@@ -21,7 +21,7 @@ import java.io.PrintWriter;
 import static org.immregistries.iis.kernal.mapping.Interfaces.PatientMapper.MRN_SYSTEM;
 
 @RestController
-@RequestMapping({"/recommendation", "/patient/{patientId}/recommendation", "/facility/{facilityId}/patient/{patientId}/recommendation"})
+@RequestMapping({"/recommendation", "/patient/{patientId}/recommendation", "/tenant/{tenantId}/patient/{patientId}/recommendation"})
 @Conditional(OnR5Condition.class)
 public class RecommendationServlet extends PatientServlet {
 
@@ -33,7 +33,7 @@ public class RecommendationServlet extends PatientServlet {
 	ImmunizationRecommendationService immunizationRecommendationService;
 
 	public static String linkUrl(String facilityId, String patientId) {
-		return "/facility/" + facilityId + "/patient/" + patientId + "/recommendation";
+		return "/tenant/" + facilityId + "/patient/" + patientId + "/recommendation";
 	}
 
 	/**
