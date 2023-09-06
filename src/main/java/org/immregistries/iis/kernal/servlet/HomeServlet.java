@@ -2,8 +2,8 @@ package org.immregistries.iis.kernal.servlet;
 
 import org.immregistries.iis.kernal.SoftwareVersion;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
-import org.immregistries.iis.kernal.model.OrgAccess;
-import org.immregistries.iis.kernal.model.OrgMaster;
+import org.immregistries.iis.kernal.model.UserAccess;
+import org.immregistries.iis.kernal.model.Tenant;
 import org.immregistries.iis.kernal.model.ProcessingFlavor;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -42,10 +42,10 @@ public class HomeServlet extends HttpServlet {
 		out.println("<a href=\"soap\" class=\"w3-bar-item w3-button\">CDC WSDL</a>");
 		if (authentication.isAuthenticated() && !(authentication instanceof AnonymousAuthenticationToken)) {
 			out.println("<a class='w3-bar-item w3-button w3-right' href=\"logout\">Logout</a>");
-			OrgMaster orgMaster = ServletHelper.getOrgMaster();
-			if (orgMaster != null) {
+			Tenant tenant = ServletHelper.getTenant();
+			if (tenant != null) {
 				String link = "tenant";
-				out.println("<a class='w3-bar-item w3-button w3-right w3-green' href=\"" + link + "\">Tenant : " + orgMaster.getOrganizationName() + " </a>");
+				out.println("<a class='w3-bar-item w3-button w3-right w3-green' href=\"" + link + "\">Tenant : " + tenant.getOrganizationName() + " </a>");
 			} else  {
 				String link = "tenant";
 				out.println("<a class='w3-bar-item w3-button w3-right w3-green' href=\"" + link + "\">No Tenant selected</a>");
@@ -64,8 +64,8 @@ public class HomeServlet extends HttpServlet {
 	public static void doFooter(PrintWriter out) {
 		out.println("  </div>");
 		SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
-		OrgAccess orgAccess = ServletHelper.getOrgAccess();
-		if (orgAccess != null) {
+		UserAccess userAccess = ServletHelper.getUserAccess();
+		if (userAccess != null) {
 			out.println("  <div class=\"w3-container\">");
 			out.println("    <p><a href=\"logout\">Logout</a></p>");
 			out.println("  </div>");

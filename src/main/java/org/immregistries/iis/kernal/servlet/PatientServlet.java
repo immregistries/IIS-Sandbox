@@ -25,7 +25,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -78,9 +77,9 @@ public class PatientServlet  {
 	@GetMapping
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
 		throws ServletException, IOException {
-		OrgMaster orgMaster = ServletHelper.getOrgMaster();
+		Tenant tenant = ServletHelper.getTenant();
 
-		if (orgMaster == null) {
+		if (tenant == null) {
 			throw new AuthenticationCredentialsNotFoundException("");
 		}
 
@@ -121,7 +120,7 @@ public class PatientServlet  {
 			Patient patientSelected  = getPatientFromParameter(req,fhirClient);
 
 			if (patientSelected == null) {
-				out.println("<h2>Patients from Facility : " + orgMaster.getOrganizationName() + "</h2>");
+				out.println("<h2>Patients from Facility : " + tenant.getOrganizationName() + "</h2>");
 				out.println("<div class=\"w3-container w3-half w3-margin-top\">");
 				out.println("    <h3>Search Patient Registry</h3>");
 				out.println("    <form method=\"GET\" action=\"patient\" class=\"w3-container w3-card-4\">");
@@ -233,7 +232,7 @@ public class PatientServlet  {
 				{
 					out.println("<div class=\"w3-container\">");
 					out.println("<h4>FHIR Api Shortcuts</h4>");
-					String apiBaseUrl = "/iis/fhir/" + orgMaster.getOrganizationName();
+					String apiBaseUrl = "/iis/fhir/" + tenant.getOrganizationName();
 					{
 						String link = apiBaseUrl + "/Patient/" + patientMasterSelected.getPatientId();
 						out.println("<div>FHIR Resource: <a href=\"" + link + "\">" + link + "</a></div>");

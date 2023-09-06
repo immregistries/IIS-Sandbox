@@ -12,7 +12,7 @@ public class PatientMaster implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	private String patientId = "";
-	private OrgMaster orgMaster = null;
+	private Tenant tenant = null;
 	private String externalLink = "";
 	private Date reportedDate = null;
 	private Date updatedDate = null;
@@ -331,12 +331,12 @@ public class PatientMaster implements Serializable {
 		this.guardianRelationship = guardianRelationship;
 	}
 
-	public OrgMaster getOrgMaster() {
-		return orgMaster;
+	public Tenant getTenant() {
+		return tenant;
 	}
 
-	public void setOrgMaster(OrgMaster orgMaster) {
-		this.orgMaster = orgMaster;
+	public void setTenant(Tenant tenant) {
+		this.tenant = tenant;
 	}
 
 	public String getPatientId() {

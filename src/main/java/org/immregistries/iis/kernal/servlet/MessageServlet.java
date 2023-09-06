@@ -4,8 +4,7 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.model.MessageReceived;
-import org.immregistries.iis.kernal.model.OrgAccess;
-import org.immregistries.iis.kernal.model.OrgMaster;
+import org.immregistries.iis.kernal.model.Tenant;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -15,7 +14,6 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
-import java.util.Map;
 
 @SuppressWarnings("serial")
 public class MessageServlet extends HttpServlet {
@@ -60,10 +58,10 @@ public class MessageServlet extends HttpServlet {
         out.println("  </div>");
       }
 
-      OrgMaster orgMaster = ServletHelper.getOrgMaster();
-      if (orgMaster != null) {
+      Tenant tenant = ServletHelper.getTenant();
+      if (tenant != null) {
         out.println("    <div class=\"w3-container w3-half w3-margin-top\">");
-			out.println("    <h2>Facility: " + orgMaster.getOrganizationName() + "</h2>");
+			out.println("    <h2>Facility: " + tenant.getOrganizationName() + "</h2>");
 			out.println("    <h3>Messages Recently Received</h3>");
         String search = req.getParameter(PARAM_SEARCH);
         if (search == null) {
@@ -83,8 +81,8 @@ public class MessageServlet extends HttpServlet {
         List<MessageReceived> messageReceivedList;
         {
           Query query = dataSession.createQuery(
-              "from MessageReceived where orgMaster = :orgMaster order by reportedDate desc");
-          query.setParameter("orgMaster", orgMaster);
+              "from MessageReceived where tenant = :tenant order by reportedDate desc");
+          query.setParameter("tenant", tenant);
           messageReceivedList = query.list();
         }
 

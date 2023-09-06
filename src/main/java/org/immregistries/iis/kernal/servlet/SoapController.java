@@ -3,7 +3,7 @@ package org.immregistries.iis.kernal.servlet;
 import org.hibernate.Session;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.logic.IncomingMessageHandler;
-import org.immregistries.iis.kernal.model.OrgMaster;
+import org.immregistries.iis.kernal.model.Tenant;
 import org.immregistries.smm.cdc.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -46,16 +46,16 @@ public class SoapController extends HttpServlet {
 				String[] messages;
 				StringBuilder ackBuilder = new StringBuilder();
 				try {
-					OrgMaster orgMaster = ServletHelper.authenticateOrgMaster(userId, password, facilityId, dataSession);
-					if (orgMaster == null) {
+					Tenant tenant = ServletHelper.authenticateTenant(userId, password, facilityId, dataSession);
+					if (tenant == null) {
 						throw new SecurityException("Username/password combination is unrecognized");
 					} else {
 						HttpSession session = req.getSession(true);
-						session.setAttribute("orgMaster", orgMaster);
+						session.setAttribute("tenant", tenant);
 						messages = message.split("MSH\\|\\^~\\\\&\\|");
 						for (String msh : messages) {
 							if (!msh.isBlank()) {
-								ackBuilder.append(handler.process("MSH|^~\\&|" + msh, orgMaster));
+								ackBuilder.append(handler.process("MSH|^~\\&|" + msh, tenant));
 								ackBuilder.append("\r\n");
 							}
 						}
@@ -84,8 +84,8 @@ public class SoapController extends HttpServlet {
 					if ("NPE".equals(userId) && "NPE".equals(password)) {
 						throw new UnknownFault("Unknown Fault");
 					}
-					OrgMaster orgMaster = ServletHelper.authenticateOrgMaster(userId, password, facilityId, dataSession);
-					if (orgMaster == null) {
+					Tenant tenant = ServletHelper.authenticateTenant(userId, password, facilityId, dataSession);
+					if (tenant == null) {
 						throw new SecurityFault("Username/password combination is unrecognized");
 					}
 				} finally {

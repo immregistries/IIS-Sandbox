@@ -1,14 +1,12 @@
 package org.immregistries.iis.kernal.servlet;
 
-import ca.uhn.fhir.i18n.Msg;
 import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
-import org.immregistries.iis.kernal.model.OrgAccess;
-import org.immregistries.iis.kernal.model.OrgMaster;
-import org.springframework.transaction.annotation.Transactional;
+import org.immregistries.iis.kernal.model.UserAccess;
+import org.immregistries.iis.kernal.model.Tenant;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.ServletException;
@@ -19,6 +17,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 
+import static org.immregistries.iis.kernal.fhir.interceptors.PartitionCreationInterceptor.PARTITION_NAME_SEPARATOR;
+import static org.immregistries.iis.kernal.fhir.security.ServletHelper.SESSION_TENANT;
 
 @RestController()
 @RequestMapping("/tenant")
@@ -27,20 +27,20 @@ public class TenantController {
 
 	public static final String ACTION_SWITCH = "Switch";
 	public static final String PARAM_TENANT_NAME = "tenantName";
-	public static final String PARAM_ORG_MASTER_ID = "orgMasterId";
+	public static final String PARAM_TENANT_ID = "tenantId";
 
 	@PostMapping()
 //	@Transactional()
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp, @RequestParam(name= PARAM_TENANT_NAME, required = false) String tenantName)
 		throws ServletException, IOException {
-		OrgAccess orgAccess = ServletHelper.getOrgAccess();
+		UserAccess userAccess = ServletHelper.getUserAccess();
 		Session dataSession = PopServlet.getDataSession();
 		try {
 			if (StringUtils.isNotBlank(tenantName)) {
-				if (tenantName.indexOf("-") > 0) { // TODO find better way
+				if (tenantName.indexOf(PARTITION_NAME_SEPARATOR) > 0) {
 					throw new InvalidRequestException("Invalid tenant name , should not use -");
 				}
-				OrgMaster orgMaster = ServletHelper.authenticateOrgMaster(orgAccess, tenantName, dataSession);
+				Tenant tenant = ServletHelper.authenticateTenant(userAccess, tenantName, dataSession);
 			}
 		} finally {
 			dataSession.close();
@@ -56,20 +56,20 @@ public class TenantController {
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		String action = req.getParameter(PARAM_ACTION);
-		String orgMasterId = req.getParameter(PARAM_ORG_MASTER_ID);
+		String tenantId = req.getParameter(PARAM_TENANT_ID);
 
 		Session dataSession = PopServlet.getDataSession();
 		try {
-			OrgMaster orgMaster = ServletHelper.getOrgMaster();
-			OrgAccess orgAccess = ServletHelper.getOrgAccess();
-			if (orgAccess != null && session != null) {
-				Query query = dataSession.createQuery("from OrgMaster where orgAccess=?0 order by organizationName");
-				query.setParameter(0, orgAccess);
-				List<OrgMaster> orgMasterList = query.list();
-				for (OrgMaster orgMasterMember : orgMasterList) {
-					if (TenantController.ACTION_SWITCH.equals(action) && String.valueOf(orgMasterMember.getOrgId()).equals(orgMasterId)) {
-						orgMaster = orgMasterMember;
-						session.setAttribute("orgMaster",orgMaster);
+			Tenant tenant = ServletHelper.getTenant();
+			UserAccess userAccess = ServletHelper.getUserAccess();
+			if (userAccess != null && session != null) {
+				Query query = dataSession.createQuery("from Tenant where userAccess=?0 order by organizationName");
+				query.setParameter(0, userAccess);
+				List<Tenant> tenantList = query.list();
+				for (Tenant tenantMember : tenantList) {
+					if (TenantController.ACTION_SWITCH.equals(action) && String.valueOf(tenantMember.getOrgId()).equals(tenantId)) {
+						tenant = tenantMember;
+						session.setAttribute(SESSION_TENANT, tenant);
 					}
 				}
 				/**
@@ -82,14 +82,14 @@ public class TenantController {
 				out.println("	<h2>Tenant List</h2>");
 
 				out.println("<ul class=\"w3-ul w3-hoverable\">");
-				for (OrgMaster orgMasterMember : orgMasterList) {
-					if (orgMasterMember.equals(orgMaster)) {
-						out.println("<li>" + orgMasterMember.getOrganizationName() + " (selected)</li>");
+				for (Tenant tenantMember : tenantList) {
+					if (tenantMember.equals(tenant)) {
+						out.println("<li>" + tenantMember.getOrganizationName() + " (selected)</li>");
 					} else  {
 						String link = "tenant?" + PARAM_ACTION + "="
-							+ ACTION_SWITCH + "&" + PARAM_ORG_MASTER_ID + "="
-							+ orgMasterMember.getOrgId();
-						out.println("<li><a href=\"" + link + "\">" + orgMasterMember.getOrganizationName() + "</a></li>");
+							+ ACTION_SWITCH + "&" + PARAM_TENANT_ID + "="
+							+ tenantMember.getOrgId();
+						out.println("<li><a href=\"" + link + "\">" + tenantMember.getOrganizationName() + "</a></li>");
 					}
 				}
 				out.println("	  </ul>");

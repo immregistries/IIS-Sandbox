@@ -95,9 +95,9 @@ public abstract class IncomingMessageHandler<Organization extends IBaseResource>
 
   public void recordMessageReceived(String message, PatientMaster patient,
       String messageResponse, String categoryRequest, String categoryResponse,
-      OrgMaster orgMaster) {
+      Tenant tenant) {
     MessageReceived messageReceived = new MessageReceived();
-    messageReceived.setOrgMaster(orgMaster);
+    messageReceived.setTenant(tenant);
     messageReceived.setMessageRequest(message);
 	 if (patient != null) {
 		 messageReceived.setPatientReportedId(patient.getPatientId());
@@ -279,9 +279,9 @@ public abstract class IncomingMessageHandler<Organization extends IBaseResource>
     sb.append("\r");
   }
 
-  public void printORC(OrgMaster orgMaster, StringBuilder sb, VaccinationMaster vaccination,
+  public void printORC(Tenant tenant, StringBuilder sb, VaccinationMaster vaccination,
 							  boolean originalReporter) {
-    Set<ProcessingFlavor> processingFlavorSet = orgMaster.getProcessingFlavorSet();
+    Set<ProcessingFlavor> processingFlavorSet = tenant.getProcessingFlavorSet();
     sb.append("ORC");
     // ORC-1
     sb.append("|RE");
@@ -300,16 +300,16 @@ public abstract class IncomingMessageHandler<Organization extends IBaseResource>
       }
     } else {
       if (originalReporter) {
-        sb.append(vaccination.getExternalLink()).append("^").append(orgMaster.getOrganizationName());
+        sb.append(vaccination.getExternalLink()).append("^").append(tenant.getOrganizationName());
       }
     }
     sb.append("\r");
   }
 
   public List<ForecastActual> doForecast(PatientMaster patient,
-      CodeMap codeMap, List<VaccinationMaster> vaccinationMasterList, OrgMaster orgMaster) {
+      CodeMap codeMap, List<VaccinationMaster> vaccinationMasterList, Tenant tenant) {
     List<ForecastActual> forecastActualList = null;
-    Set<ProcessingFlavor> processingFlavorSet = orgMaster.getProcessingFlavorSet();
+    Set<ProcessingFlavor> processingFlavorSet = tenant.getProcessingFlavorSet();
     try {
       TestCase testCase = new TestCase();
       testCase.setEvalDate(new Date());

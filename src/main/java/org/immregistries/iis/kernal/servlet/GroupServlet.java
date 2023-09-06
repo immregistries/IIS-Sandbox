@@ -2,7 +2,7 @@ package org.immregistries.iis.kernal.servlet;
 
 import org.hl7.fhir.r5.model.*;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
-import org.immregistries.iis.kernal.model.OrgAccess;
+import org.immregistries.iis.kernal.model.UserAccess;
 import org.immregistries.iis.kernal.InternalClient.FhirRequester;
 import org.immregistries.iis.kernal.InternalClient.RepositoryClientFactory;
 import org.slf4j.Logger;
@@ -38,8 +38,8 @@ public class GroupServlet extends HttpServlet {
 		throws ServletException, IOException {
 		doGet(req, resp);
 
-		OrgAccess orgAccess = ServletHelper.getOrgAccess();
-		if (orgAccess == null) {
+		UserAccess userAccess = ServletHelper.getUserAccess();
+		if (userAccess == null) {
 			throw new AuthenticationCredentialsNotFoundException("");
 		}
 		String orgString = req.getParameter("Organization");
@@ -51,8 +51,8 @@ public class GroupServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
 		throws ServletException, IOException {
 
-		OrgAccess orgAccess = ServletHelper.getOrgAccess();
-		if (orgAccess == null) {
+		UserAccess userAccess = ServletHelper.getUserAccess();
+		if (userAccess == null) {
 			throw new AuthenticationCredentialsNotFoundException("");
 		}
 		resp.setContentType("text/html");

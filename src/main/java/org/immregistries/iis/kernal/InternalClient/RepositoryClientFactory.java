@@ -13,7 +13,7 @@ import ca.uhn.fhir.rest.client.interceptor.BearerTokenAuthInterceptor;
 import ca.uhn.fhir.rest.server.exceptions.AuthenticationException;
 import ca.uhn.fhir.rest.server.interceptor.LoggingInterceptor;
 import ca.uhn.fhir.rest.server.util.ITestingUiClientFactory;
-import org.immregistries.iis.kernal.model.OrgMaster;
+import org.immregistries.iis.kernal.model.Tenant;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +29,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import static org.immregistries.iis.kernal.fhir.interceptors.SessionAuthorizationInterceptor.CONNECTATHON_USER;
 import static org.immregistries.iis.kernal.fhir.security.ServletHelper.GITHUB_PREFIX;
-import static org.immregistries.iis.kernal.fhir.security.ServletHelper.SESSION_ORGMASTER;
+import static org.immregistries.iis.kernal.fhir.security.ServletHelper.SESSION_TENANT;
 
 /**
  * Generates fhir client to interact with the jpa repository
@@ -60,11 +60,11 @@ public class RepositoryClientFactory extends ApacheRestfulClientFactory implemen
 		}
 	}
 
-	public IGenericClient newGenericClient(OrgMaster orgMaster) {
+	public IGenericClient newGenericClient(Tenant tenant) {
 		asynchInit();
-		IGenericClient client = newGenericClient(serverBase + "/" + orgMaster.getOrganizationName());
+		IGenericClient client = newGenericClient(serverBase + "/" + tenant.getOrganizationName());
 		IClientInterceptor authInterceptor;
-		if (orgMaster.getOrganizationName().equals(CONNECTATHON_USER) && orgMaster.getOrgAccess().getAccessName() == null) {
+		if (tenant.getOrganizationName().equals(CONNECTATHON_USER) && tenant.getUserAccess().getAccessName() == null) {
 			/**
 			 * SPECIFIC Connection User for Connectathon
 			 * specific auth when logged in with token,
@@ -72,13 +72,13 @@ public class RepositoryClientFactory extends ApacheRestfulClientFactory implemen
 			 *
 			 * see SessionAuthorizationInterceptor
 			 */
-			authInterceptor = new BearerTokenAuthInterceptor(orgMaster.getOrgAccess().getAccessKey());
-		} else if (orgMaster.getOrgAccess().getAccessName().startsWith(GITHUB_PREFIX)) {
+			authInterceptor = new BearerTokenAuthInterceptor(tenant.getUserAccess().getAccessKey());
+		} else if (tenant.getUserAccess().getAccessName().startsWith(GITHUB_PREFIX)) {
 			Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
 			authInterceptor = new BearerTokenAuthInterceptor((String) authentication.getCredentials());
 		} else {
-			authInterceptor = new BasicAuthInterceptor(orgMaster.getOrgAccess().getAccessName(), orgMaster.getOrgAccess().getAccessKey());
+			authInterceptor = new BasicAuthInterceptor(tenant.getUserAccess().getAccessName(), tenant.getUserAccess().getAccessKey());
 		}
 		client.registerInterceptor(authInterceptor);
 		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
@@ -94,19 +94,19 @@ public class RepositoryClientFactory extends ApacheRestfulClientFactory implemen
 	 */
 	public IGenericClient newGenericClient(RequestDetails theRequestDetails) {
 		asynchInit();
-		OrgMaster orgMaster = (OrgMaster) theRequestDetails.getAttribute(SESSION_ORGMASTER);
-		if (orgMaster == null) {
+		Tenant tenant = (Tenant) theRequestDetails.getAttribute(SESSION_TENANT);
+		if (tenant == null) {
 			throw new AuthenticationException();
 		}
-		return newGenericClient(orgMaster);
+		return newGenericClient(tenant);
 	}
 
 	public IGenericClient newGenericClient(HttpServletRequest request) {
 		asynchInit();
 		if (request.getAttribute(FHIR_CLIENT) == null) {
-			OrgMaster orgMaster = ServletHelper.getOrgMaster();
-			if (orgMaster != null) {
-				request.setAttribute(FHIR_CLIENT, newGenericClient(orgMaster));
+			Tenant tenant = ServletHelper.getTenant();
+			if (tenant != null) {
+				request.setAttribute(FHIR_CLIENT, newGenericClient(tenant));
 			} else {
 				request.setAttribute(FHIR_CLIENT, null);
 			}

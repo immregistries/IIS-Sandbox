@@ -2,8 +2,8 @@ package org.immregistries.iis.kernal.servlet;
 
 import org.hibernate.Session;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
-import org.immregistries.iis.kernal.model.OrgAccess;
-import org.immregistries.iis.kernal.model.OrgMaster;
+import org.immregistries.iis.kernal.model.UserAccess;
+import org.immregistries.iis.kernal.model.Tenant;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -41,8 +41,8 @@ public class LoginServlet {
 		Session dataSession = PopServlet.getDataSession();
 		try {
 			HomeServlet.doHeader(out, "IIS Sandbox");
-			OrgAccess orgAccess = ServletHelper.getOrgAccess();
-			if (orgAccess == null) { // LOGIN FORM, inherited, could be made in a separate class and improved
+			UserAccess userAccess = ServletHelper.getUserAccess();
+			if (userAccess == null) { // LOGIN FORM, inherited, could be made in a separate class and improved
 				String userId = req.getParameter(PARAM_USERID);
 				String tenantId = req.getParameter(PARAM_TENANTID);
 				if (userId == null) {
@@ -52,9 +52,9 @@ public class LoginServlet {
 					tenantId = "";
 				}
 				if (req.getParameter(PARAM_ORG_ID) != null) {
-					OrgMaster orgMaster = dataSession.get(OrgMaster.class,
+					Tenant tenant = dataSession.get(Tenant.class,
 						Integer.parseInt(req.getParameter(PARAM_ORG_ID)));
-					tenantId = orgMaster.getOrganizationName();
+					tenantId = tenant.getOrganizationName();
 				}
 				out.println("<div class=\"w3-container w3-card-4\">");
 				out.println("	<h2>Login</h2>");

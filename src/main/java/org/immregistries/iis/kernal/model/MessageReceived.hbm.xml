@@ -5,7 +5,7 @@
     <id name="messageReceivedId" column="message_received_id">
       <generator class="native"/>
     </id>
-    <many-to-one name="orgMaster" column="org_id" class="OrgMaster"/>
+    <many-to-one name="tenant" column="org_id" class="Tenant"/>
     <property name="messageRequest" column="message_request" type="string"/>
     <property name="messageResponse" column="message_response" type="string"/>
     <property name="patientReportedId" column="patient_reported_id" type="string"/>

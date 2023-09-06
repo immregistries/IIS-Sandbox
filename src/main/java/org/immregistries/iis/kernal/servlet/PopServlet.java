@@ -1,6 +1,5 @@
 package org.immregistries.iis.kernal.servlet;
 
-import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
@@ -9,9 +8,9 @@ import org.hl7.fhir.r5.model.Reference;
 import org.immregistries.iis.kernal.fhir.annotations.OnR5Condition;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.logic.IncomingMessageHandler;
-import org.immregistries.iis.kernal.model.OrgAccess;
+import org.immregistries.iis.kernal.model.UserAccess;
 import org.immregistries.iis.kernal.InternalClient.RepositoryClientFactory;
-import org.immregistries.iis.kernal.model.OrgMaster;
+import org.immregistries.iis.kernal.model.Tenant;
 import org.immregistries.smm.transform.ScenarioManager;
 import org.immregistries.smm.transform.TestCaseMessage;
 import org.immregistries.smm.transform.Transformer;
@@ -57,14 +56,14 @@ public class PopServlet {
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		try {
 			String message = req.getParameter(PARAM_MESSAGE);
-			OrgMaster orgMaster = ServletHelper.getOrgMaster();
+			Tenant tenant = ServletHelper.getTenant();
 
 			String ack = "";
 			String[] messages;
 			StringBuilder ackBuilder = new StringBuilder();
 			Session dataSession = getDataSession();
 			try {
-				if (orgMaster == null) {
+				if (tenant == null) {
 					resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 					out.println(
 						"Access is not authorized. Facilityid, userid and/or password are not recognized. ");
@@ -77,7 +76,7 @@ public class PopServlet {
 					}
 					for (String msh : messages) {
 						if (!msh.isBlank()) {
-							ackBuilder.append(handler.process("MSH|^~\\&|" + msh, orgMaster));
+							ackBuilder.append(handler.process("MSH|^~\\&|" + msh, tenant));
 							ackBuilder.append("\r\n");
 						}
 					}
@@ -114,7 +113,7 @@ public class PopServlet {
 		throws ServletException, IOException {
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
-		OrgAccess orgAccess = ServletHelper.getOrgAccess();
+		UserAccess userAccess = ServletHelper.getUserAccess();
 		try {
 			String message = req.getParameter(PARAM_MESSAGE);
 			if (message == null || message.equals("")) {
@@ -136,7 +135,7 @@ public class PopServlet {
 				out.println("    <div class=\"w3-container w3-half w3-margin-top\">");
 
 
-				if (orgAccess == null) {
+				if (userAccess == null) {
 					out.println("<input class=\"w3-button w3-section w3-teal w3-ripple\" type=\"submit\" name=\"submit\" value=\"Submit\"/>");
 					out.println("    <span class=\"w3-yellow\">Test Data Only</span>");
 				} else {

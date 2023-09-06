@@ -6,8 +6,8 @@ import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.logic.*;
 import org.immregistries.iis.kernal.mapping.Interfaces.*;
-import org.immregistries.iis.kernal.model.OrgAccess;
-import org.immregistries.iis.kernal.model.OrgMaster;
+import org.immregistries.iis.kernal.model.UserAccess;
+import org.immregistries.iis.kernal.model.Tenant;
 import org.immregistries.iis.kernal.model.ProcessingFlavor;
 import org.immregistries.smm.tester.manager.HL7Reader;
 import org.immregistries.smm.transform.ScenarioManager;
@@ -59,13 +59,13 @@ public class TestMapping extends HttpServlet {
 			String userId = "utest";
 			String password = "utest";
 			String facilityId = "utest";
-			OrgMaster orgMaster = ServletHelper.getOrgMaster();
+			Tenant tenant = ServletHelper.getTenant();
 			String ack = "";
 			String[] messages;
 			StringBuilder ackBuilder = new StringBuilder();
 			Session dataSession = PopServlet.getDataSession();
 			try {
-				if (orgMaster == null) {
+				if (tenant == null) {
 					resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 					out.println(
 						"Access is not authorized. Facilityid, userid and/or password are not recognized. ");
@@ -73,8 +73,8 @@ public class TestMapping extends HttpServlet {
 					messages = message.split( "MSH\\|\\^~\\\\&\\|");
 					for (String msh: messages) {
 						if(!msh.isBlank()){
-							testPatientMapping(orgMaster,msh);
-							ackBuilder.append(handler.process("MSH|^~\\&|" + msh, orgMaster));
+							testPatientMapping(tenant,msh);
+							ackBuilder.append(handler.process("MSH|^~\\&|" + msh, tenant));
 							ackBuilder.append("\r\n");
 						}
 					}
@@ -101,7 +101,7 @@ public class TestMapping extends HttpServlet {
 
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
-		OrgAccess orgAccess = ServletHelper.getOrgAccess();
+		UserAccess userAccess = ServletHelper.getUserAccess();
 		try {
 			String message = req.getParameter(PARAM_MESSAGE);
 			if (message == null || message.equals("")) {
@@ -137,19 +137,19 @@ public class TestMapping extends HttpServlet {
 		out.close();
 	}
 
-	void  testPatientMapping(OrgMaster orgMaster,String message) throws ProcessingException {
+	void  testPatientMapping(Tenant tenant, String message) throws ProcessingException {
 		List<ProcessingException> processingExceptionList = new ArrayList<>();
 		HL7Reader hl7Reader = new HL7Reader(message);
-		Set<ProcessingFlavor> processingFlavorSet = orgMaster.getProcessingFlavorSet();
+		Set<ProcessingFlavor> processingFlavorSet = tenant.getProcessingFlavorSet();
 		CodeMap codeMap = CodeMapManager.getCodeMap();
 
-//		PatientReported patientReported = handler.processPatient(orgAccess,hl7Reader,processingExceptionList, orgAccess.getOrg().getProcessingFlavorSet(),codeMap,true,null,  handler.processManagingOrganization(hl7Reader));
+//		PatientReported patientReported = handler.processPatient(userAccess,hl7Reader,processingExceptionList, userAccess.getOrg().getProcessingFlavorSet(),codeMap,true,null,  handler.processManagingOrganization(hl7Reader));
 //		PatientReported processedPatientReported = patientMapper.getReported(patientMapper.getFhirResource(patientReported));
 //		patientReported.setPatientNameFirst("fff");
 //
 //		assertEquals(patientReported,processedPatientReported);
 
-//		VaccinationReported vaccinationReported = handler.processVXU(orgAccess,hl7Reader,processingExceptionList, orgAccess.getOrg().getProcessingFlavorSet(),codeMap,true,null, handler.processManagingOrganization(hl7Reader));
+//		VaccinationReported vaccinationReported = handler.processVXU(userAccess,hl7Reader,processingExceptionList, userAccess.getOrg().getProcessingFlavorSet(),codeMap,true,null, handler.processManagingOrganization(hl7Reader));
 
 
 	}

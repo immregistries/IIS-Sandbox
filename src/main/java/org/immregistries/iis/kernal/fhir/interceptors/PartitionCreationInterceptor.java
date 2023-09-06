@@ -38,6 +38,8 @@ public class PartitionCreationInterceptor extends RequestTenantPartitionIntercep
 	private PartitionManagementProvider partitionManagementProvider;
 	private final Logger ourLog = LoggerFactory.getLogger(PartitionCreationInterceptor.class);
 
+	public static final String PARTITION_NAME_SEPARATOR = "-"; // TEMP TODO find good url structure
+
 	@Override
 	@Nonnull
 	protected RequestPartitionId extractPartitionIdFromRequest(RequestDetails theRequestDetails) {
@@ -55,7 +57,7 @@ public class PartitionCreationInterceptor extends RequestTenantPartitionIntercep
 		if (StringUtils.isBlank(tenantId)) {
 			throw new InvalidRequestException(Msg.code(343) + "No tenant ID has been specified, expected structure is fhir/{tenantId}-{facilityId}");
 		} else {
-			String[] ids = tenantId.split("-"); // TEMP TODO find good url structure
+			String[] ids = tenantId.split(PARTITION_NAME_SEPARATOR);
 //			if (ids.length < 2){
 //				throw new InvalidRequestException(Msg.code(343) + "No facility ID has been specified, expected structure is fhir/{tenantId}-{facilityId}");
 //			}

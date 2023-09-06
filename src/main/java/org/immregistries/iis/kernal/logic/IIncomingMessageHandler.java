@@ -5,17 +5,14 @@ import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.model.*;
 import org.immregistries.smm.tester.manager.HL7Reader;
-import org.immregistries.vfa.connect.model.*;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 public interface IIncomingMessageHandler<Organization extends IBaseResource> {
-	public String process(String message, OrgMaster orgMaster);
+	public String process(String message, Tenant tenant);
 
 
-	public String buildVxu(VaccinationReported vaccinationReported, OrgMaster orgMaster);
+	public String buildVxu(VaccinationReported vaccinationReported, Tenant tenant);
 
 	public List<VaccinationMaster> getVaccinationMasterList(PatientMaster patient);
 

@@ -3,13 +3,13 @@ package org.immregistries.iis.kernal.model;
 import java.io.Serializable;
 import java.util.Set;
 
-public class OrgMaster implements Serializable {
+public class Tenant implements Serializable {
   /**
    * 
    */
   private static final long serialVersionUID = 1L;
   private int orgId = 0;
-  private OrgAccess orgAccess = null;
+  private UserAccess userAccess = null;
   private String organizationName = "";
   private Set<ProcessingFlavor> processingFlavorSet = null;
 
@@ -36,8 +36,8 @@ public class OrgMaster implements Serializable {
 
   @Override
   public boolean equals(Object obj) {
-    if (obj instanceof OrgMaster) {
-      OrgMaster other = (OrgMaster) obj;
+    if (obj instanceof Tenant) {
+      Tenant other = (Tenant) obj;
       return other.getOrgId() == this.getOrgId();
     }
     return super.equals(obj);
@@ -50,11 +50,11 @@ public class OrgMaster implements Serializable {
     return processingFlavorSet;
   }
 
-	public OrgAccess getOrgAccess() {
-		return orgAccess;
+	public UserAccess getUserAccess() {
+		return userAccess;
 	}
 
-	public void setOrgAccess(OrgAccess orgAccess) {
-		this.orgAccess = orgAccess;
+	public void setUserAccess(UserAccess userAccess) {
+		this.userAccess = userAccess;
 	}
 }

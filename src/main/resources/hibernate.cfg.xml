@@ -24,8 +24,8 @@
 <!--    TODO maybe antipattern, needed prevent No session error when changing facility-->
     <property name="hibernate.enable_lazy_load_no_trans">true</property>
 
-    <mapping resource="org/immregistries/iis/kernal/model/OrgMaster.hbm.xml"/>
-    <mapping resource="org/immregistries/iis/kernal/model/OrgAccess.hbm.xml"/>
+    <mapping resource="org/immregistries/iis/kernal/model/Tenant.hbm.xml"/>
+    <mapping resource="org/immregistries/iis/kernal/model/UserAccess.hbm.xml"/>
 <!--    <mapping resource="org/immregistries/iis/kernal/model/OrgLocation.hbm.xml"/>-->
 <!--    <mapping resource="org/immregistries/iis/kernal/model/PatientMaster.hbm.xml"/>-->
 <!--    <mapping resource="org/immregistries/iis/kernal/model/PatientMatch.hbm.xml"/>-->

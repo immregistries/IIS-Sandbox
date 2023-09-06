@@ -51,8 +51,8 @@ public class V2ToFhirServlet extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
 		throws ServletException, IOException {
-		OrgMaster orgMaster = ServletHelper.getOrgMaster();
-		if (orgMaster == null) {
+		Tenant tenant = ServletHelper.getTenant();
+		if (tenant == null) {
 			throw new AuthenticationCredentialsNotFoundException("");
 		}
 

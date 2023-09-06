@@ -8,7 +8,7 @@ public class MessageReceived implements Serializable {
   private static final long serialVersionUID = 1L;
   
   private int messageReceivedId = 0;
-  private OrgMaster orgMaster = null;
+  private Tenant tenant = null;
   private String messageRequest = "";
   private String messageResponse = "";
   private String patientReportedId = null;
@@ -64,12 +64,12 @@ public class MessageReceived implements Serializable {
     this.reportedDate = reportedDate;
   }
 
-  public OrgMaster getOrgMaster() {
-    return orgMaster;
+  public Tenant getTenant() {
+    return tenant;
   }
 
-  public void setOrgMaster(OrgMaster orgMaster) {
-    this.orgMaster = orgMaster;
+  public void setTenant(Tenant tenant) {
+    this.tenant = tenant;
   }
 
 	public String getPatientReportedId() {

@@ -4,8 +4,8 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.logic.IncomingEventHandler;
-import org.immregistries.iis.kernal.model.OrgAccess;
-import org.immregistries.iis.kernal.model.OrgMaster;
+import org.immregistries.iis.kernal.model.UserAccess;
+import org.immregistries.iis.kernal.model.Tenant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 import static org.immregistries.iis.kernal.servlet.LoginServlet.*;
-import static org.immregistries.iis.kernal.fhir.security.ServletHelper.SESSION_ORGMASTER;
+import static org.immregistries.iis.kernal.fhir.security.ServletHelper.SESSION_TENANT;
 
 @RestController
 @RequestMapping("/event")
@@ -39,20 +39,20 @@ public class EventServlet extends PopServlet {
       String password = req.getParameter(PARAM_PASSWORD);
       String facilityId = req.getParameter(PARAM_TENANTID);
       HttpSession session = req.getSession(true);
-      OrgMaster orgMaster = ServletHelper.getOrgMaster();
+      Tenant tenant = ServletHelper.getTenant();
       String ack = "";
       Session dataSession = getDataSession();
       try {
-        if (orgMaster == null) {
-          orgMaster = ServletHelper.authenticateOrgMaster(userId, password, facilityId, dataSession);
+        if (tenant == null) {
+          tenant = ServletHelper.authenticateTenant(userId, password, facilityId, dataSession);
         }
-        if (orgMaster == null) {
+        if (tenant == null) {
           resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
           out.println(
               "Access is not authorized. Facilityid, userid and/or password are not recognized. ");
         } else {
-          ack = incomingEventHandler.process(req, orgMaster);
-          session.setAttribute(SESSION_ORGMASTER, orgMaster);
+          ack = incomingEventHandler.process(req, tenant);
+          session.setAttribute(SESSION_TENANT, tenant);
         }
       } finally {
         dataSession.close();
@@ -96,8 +96,8 @@ public class EventServlet extends PopServlet {
         out.println("    <div class=\"w3-container w3-half w3-margin-top\">");
         out.println("    <div class=\"w3-container w3-card-4\">");
         out.println("      <h3>Authentication</h3>");
-        OrgAccess orgAccess = ServletHelper.getOrgAccess();
-        if (orgAccess == null) {
+        UserAccess userAccess = ServletHelper.getUserAccess();
+        if (userAccess == null) {
           out.println("      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_USERID
               + "\" value=\"" + userId + "\"/>");
           out.println("      <label>User Id</label>");

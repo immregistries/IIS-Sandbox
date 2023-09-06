@@ -6,7 +6,7 @@ import org.hl7.fhir.r5.model.*;
 import org.immregistries.iis.kernal.fhir.annotations.OnR5Condition;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.logic.ImmunizationRecommendationService;
-import org.immregistries.iis.kernal.model.OrgMaster;
+import org.immregistries.iis.kernal.model.Tenant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
@@ -47,8 +47,8 @@ public class RecommendationServlet extends PatientServlet {
 	@PostMapping
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
 		throws ServletException, IOException { //TODO add support to add new Reco
-		OrgMaster orgMaster = ServletHelper.getOrgMaster();
-		if (orgMaster == null) {
+		Tenant tenant = ServletHelper.getTenant();
+		if (tenant == null) {
 			throw new AuthenticationCredentialsNotFoundException("");
 		}
 		IGenericClient fhirClient = repositoryClientFactory.newGenericClient(req);
@@ -62,7 +62,7 @@ public class RecommendationServlet extends PatientServlet {
 				recommendation = immunizationRecommendationService.addGeneratedRecommendation(recommendation);
 				fhirClient.update().resource(recommendation).withId(recommendation.getId()).execute();
 			} else {
-				fhirClient.create().resource(immunizationRecommendationService.generate(orgMaster, patient)).execute();
+				fhirClient.create().resource(immunizationRecommendationService.generate(tenant, patient)).execute();
 			}
 		}
 		doGet(req, resp);
@@ -78,8 +78,8 @@ public class RecommendationServlet extends PatientServlet {
 	@PutMapping
 	protected void doPut(HttpServletRequest req, HttpServletResponse resp)
 		throws ServletException, IOException {
-		OrgMaster orgMaster = ServletHelper.getOrgMaster();
-		if (orgMaster == null) {
+		Tenant tenant = ServletHelper.getTenant();
+		if (tenant == null) {
 			throw new AuthenticationCredentialsNotFoundException("");
 		}
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
@@ -107,8 +107,8 @@ public class RecommendationServlet extends PatientServlet {
 	@GetMapping
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
 		throws ServletException, IOException {
-		OrgMaster orgMaster = ServletHelper.getOrgMaster();
-		if (orgMaster == null) {
+		Tenant tenant = ServletHelper.getTenant();
+		if (tenant == null) {
 			throw new AuthenticationCredentialsNotFoundException("");
 		}
 

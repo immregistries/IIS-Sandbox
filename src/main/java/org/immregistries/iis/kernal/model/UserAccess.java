@@ -2,35 +2,33 @@ package org.immregistries.iis.kernal.model;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Map;
 
 /**
  * Created by Eric on 12/20/17.
  */
 
 /**
- * TODO IMPRove integration with spring security, especially grantedAuthority
+ * TODO Improve integration with spring security, especially grantedAuthority
  */
-public class OrgAccess implements Serializable, Authentication {
+public class UserAccess implements Serializable, Authentication {
 
   private static final long serialVersionUID = 1L;
 
-  private int orgAccessId = 0;
+  private int userAccessId = 0;
   private String accessName = "";
   private String accessKey = "";
 
 
-  public int getOrgAccessId() {
-    return orgAccessId;
+  public int getUserAccessId() {
+    return userAccessId;
   }
 
-  public void setOrgAccessId(int orgAccessId) {
-    this.orgAccessId = orgAccessId;
+  public void setUserAccessId(int userAccessId) {
+    this.userAccessId = userAccessId;
   }
 
   public String getAccessName() {

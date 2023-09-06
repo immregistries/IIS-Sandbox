@@ -3,15 +3,9 @@ package org.immregistries.iis.kernal.model;
 import java.io.Serializable;
 
 public class ObservationMaster implements Serializable {
-
-  /**
-   * 
-   */
   private static final long serialVersionUID = 1L;
 
   private String observationId = "";
-  private PatientMaster patient = null;
-  private VaccinationMaster vaccination = null;
   private String patientId = "";
   private String vaccinationId = "";
   private String identifierCode = "";
@@ -26,26 +20,17 @@ public class ObservationMaster implements Serializable {
     this.observationId = observationId;
   }
 
-//  public PatientMaster getPatient() {
-//    return patient;
-//  }
-
   public void setPatient(PatientMaster patient) {
 	  if (patientId != null) {
 		  setPatientId(patient.getPatientId());
 	  }
-    this.patient = patient;
   }
 
-//  public VaccinationMaster getVaccination() {
-//    return vaccination;
-//  }
 
   public void setVaccination(VaccinationMaster vaccination) {
 	  if (vaccinationId != null) {
 		  setVaccinationId(vaccination.getVaccinationId());
 	  }
-    this.vaccination = vaccination;
   }
 
   public String getIdentifierCode() {

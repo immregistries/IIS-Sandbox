@@ -63,10 +63,10 @@ public class VaccinationServlet extends PatientServlet {
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
 		throws ServletException, IOException {
 
-		OrgMaster orgMaster = ServletHelper.getOrgMaster();
+		Tenant tenant = ServletHelper.getTenant();
 
 
-		if (orgMaster == null) {
+		if (tenant == null) {
 			throw new AuthenticationCredentialsNotFoundException("");
 		}
 		IGenericClient fhirClient = repositoryClientFactory.newGenericClient(req);
@@ -86,7 +86,7 @@ public class VaccinationServlet extends PatientServlet {
 
 			HomeServlet.doHeader(out, "IIS Sandbox - Vaccinations");
 
-			out.println("<h2>Tenant : " + orgMaster.getOrganizationName() + "</h2>");
+			out.println("<h2>Tenant : " + tenant.getOrganizationName() + "</h2>");
 			PatientReported patientReportedSelected = fhirRequester.readPatientReported(vaccination.getPatientReportedId());
 			{
 				printPatient(out, patientReportedSelected);

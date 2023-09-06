@@ -4,14 +4,12 @@ import ca.uhn.fhir.jpa.api.dao.IFhirSystemDao;
 import ca.uhn.fhir.jpa.subscription.match.deliver.resthook.SubscriptionDeliveringRestHookSubscriber;
 import ca.uhn.fhir.jpa.subscription.match.registry.SubscriptionCanonicalizer;
 import ca.uhn.fhir.rest.api.MethodOutcome;
-import ca.uhn.fhir.rest.api.server.RequestDetails;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.client.interceptor.AdditionalRequestHeadersInterceptor;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r5.model.*;
-import org.immregistries.iis.kernal.model.OrgAccess;
 import org.immregistries.iis.kernal.InternalClient.RepositoryClientFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,14 +35,14 @@ public class SubscriptionService {
 	SubscriptionCanonicalizer subscriptionCanonicalizer;
 
 //	public Subscription searchRelatedSubscription(Immunization baseResource, RequestDetails requestDetails) {
-//		OrgAccess orgAccess = (OrgAccess) requestDetails.getAttribute("orgAccess");
+//		UserAccess userAccess = (UserAccess) requestDetails.getAttribute("userAccess");
 //		/**
 //		 * define materialization of subscription on immunization with
 //		 * 	- TAG ?
 //		 * 	- Identifier System ?
 //		 * 	- $match operations ?
 //		 */
-//		Bundle bundle = repositoryClientFactory.newGenericClient(orgAccess).search().forResource(Subscription.class)
+//		Bundle bundle = repositoryClientFactory.newGenericClient(userAccess).search().forResource(Subscription.class)
 //			.where(Subscription.STATUS.exactly().code(Enumerations.SubscriptionStatusCodes.ACTIVE.toCode()))
 ////			.and(Subscription.IDENTIFIER.hasSystemWithAnyCode(baseResource.getIdentifier()))  TODO change
 ////			.and(Subscription.)  TODO change
@@ -57,11 +55,11 @@ public class SubscriptionService {
 
 	public String triggerWithResource(Subscription subscription, List<Pair<String, Bundle.HTTPVerb>> requests) {
 //		try {
-//			OrgAccess orgAccess = ServletHelper.getOrgAccess();
+//			UserAccess userAccess = ServletHelper.getUserAccess();
 
 //			ResourceDeliveryMessage resourceDeliveryMessage = new ResourceDeliveryMessage();
 //			resourceDeliveryMessage.setSubscription(subscriptionCanonicalizer.canonicalize(subscription));
-//			resourceDeliveryMessage.setPartitionId(RequestPartitionId.fromPartitionName(""+orgAccess.getAccessName()));
+//			resourceDeliveryMessage.setPartitionId(RequestPartitionId.fromPartitionName(""+userAccess.getAccessName()));
 //			resourceDeliveryMessage.setOperationType(BaseResourceMessage.OperationTypeEnum.UPDATE);
 //			resourceDeliveryMessage.setPayload(fhirSystemDao.getContext(), resource, EncodingEnum.JSON);
 //			subscriptionDeliveringRestHookSubscriber.handleMessage(resourceDeliveryMessage);

@@ -2,8 +2,8 @@ package org.immregistries.iis.kernal.fhir.security;
 
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Session;
-import org.immregistries.iis.kernal.model.OrgAccess;
-import org.immregistries.iis.kernal.model.OrgMaster;
+import org.immregistries.iis.kernal.model.UserAccess;
+import org.immregistries.iis.kernal.model.Tenant;
 import org.immregistries.iis.kernal.servlet.PopServlet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,9 +22,9 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 
-import static org.immregistries.iis.kernal.fhir.security.ServletHelper.SESSION_ORGACCESS;
+import static org.immregistries.iis.kernal.fhir.security.ServletHelper.SESSION_USER_ACCESS;
 import static org.immregistries.iis.kernal.servlet.LoginServlet.PARAM_TENANTID;
-import static org.immregistries.iis.kernal.fhir.security.ServletHelper.SESSION_ORGMASTER;
+import static org.immregistries.iis.kernal.fhir.security.ServletHelper.SESSION_TENANT;
 
 
 @Component
@@ -44,22 +44,22 @@ public class UsernamePasswordAuthenticationProvider implements AuthenticationPro
 		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
 		Session dataSession = PopServlet.getDataSession();
 
-		// TODO maybe customize  "PrincipalExtractor" instead and have the orgAccess/orgMaster as principal https://www.baeldung.com/spring-security-oauth-principal-authorities-extractor
+		// TODO maybe customize  "PrincipalExtractor" instead and have the userAccess/tenant as principal https://www.baeldung.com/spring-security-oauth-principal-authorities-extractor
 		if (StringUtils.isNotBlank(request.getParameter(PARAM_TENANTID))) {
-			OrgMaster orgMaster = ServletHelper.authenticateOrgMaster(authentication.getName(), (String) authentication.getCredentials(), request.getParameter(PARAM_TENANTID), dataSession);
-			if (orgMaster != null) {
+			Tenant tenant = ServletHelper.authenticateTenant(authentication.getName(), (String) authentication.getCredentials(), request.getParameter(PARAM_TENANTID), dataSession);
+			if (tenant != null) {
 				/**
 				 * Creating a new session after login
 				 */
-				request.getSession(true).setAttribute(SESSION_ORGMASTER,orgMaster);
-				return orgMaster.getOrgAccess();
+				request.getSession(true).setAttribute(SESSION_TENANT, tenant);
+				return tenant.getUserAccess();
 			} else {
 				return null;
 			}
 		} else  {
-			OrgAccess orgAccess = ServletHelper.authenticateOrgAccessUsernamePassword(authentication.getName(), (String) authentication.getCredentials(), dataSession);
-			request.getSession(true).setAttribute(SESSION_ORGACCESS,orgAccess);
-			return orgAccess;
+			UserAccess userAccess = ServletHelper.authenticateUserAccessUsernamePassword(authentication.getName(), (String) authentication.getCredentials(), dataSession);
+			request.getSession(true).setAttribute(SESSION_USER_ACCESS, userAccess);
+			return userAccess;
 		}
 	}
 

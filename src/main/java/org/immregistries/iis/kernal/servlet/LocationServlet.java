@@ -68,8 +68,8 @@ public class LocationServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
 		throws ServletException, IOException {
 
-		OrgMaster orgMaster = ServletHelper.getOrgMaster();
-		if (orgMaster == null) {
+		Tenant tenant = ServletHelper.getTenant();
+		if (tenant == null) {
 			throw new AuthenticationCredentialsNotFoundException("");
 		}
 		resp.setContentType("text/html");
@@ -90,7 +90,7 @@ public class LocationServlet extends HttpServlet {
 					if (StringUtils.isNotEmpty(orgFacilityCode)) {
 						orgLocationSelected = new OrgLocation();
 						orgLocationSelected.setOrgFacilityCode(orgFacilityCode);
-						orgLocationSelected.setOrgMaster(orgMaster);
+						orgLocationSelected.setTenant(tenant);
 						orgLocationSelected = fhirRequests.saveOrgLocation(orgLocationSelected);
 //				Location location = LocationMapper.fhirLocation(orgLocationSelected);
 //				 try {
@@ -131,7 +131,7 @@ public class LocationServlet extends HttpServlet {
 
 			HomeServlet.doHeader(out, "IIS Sandbox");
 
-			out.println("    <h2>Facility: " + orgMaster.getOrganizationName() + "</h2>");
+			out.println("    <h2>Facility: " + tenant.getOrganizationName() + "</h2>");
 			if (orgLocationSelected == null) {
 				out.println("  <div class=\"w3-container\">");
 				{

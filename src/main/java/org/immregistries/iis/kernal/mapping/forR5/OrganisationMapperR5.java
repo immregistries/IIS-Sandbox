@@ -4,7 +4,7 @@ import org.immregistries.iis.kernal.fhir.annotations.OnR5Condition;
 import org.hl7.fhir.r5.model.Organization;
 import org.immregistries.iis.kernal.mapping.Interfaces.OrganizationMapper;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
-import org.immregistries.iis.kernal.model.OrgMaster;
+import org.immregistries.iis.kernal.model.Tenant;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Service;
 
@@ -13,17 +13,17 @@ import org.springframework.stereotype.Service;
 public class OrganisationMapperR5 implements OrganizationMapper<Organization> {
 //	TODO
 
-	public Organization getFhirResource(OrgMaster orgMaster) {
+	public Organization getFhirResource(Tenant tenant) {
 		Organization o = new Organization();
-		o.addIdentifier(MappingHelper.getFhirIdentifier("OrgMaster", Integer.toString(orgMaster.getOrgId())));
-		o.setName(orgMaster.getOrganizationName());
+		o.addIdentifier(MappingHelper.getFhirIdentifier("Tenant", Integer.toString(tenant.getOrgId())));
+		o.setName(tenant.getOrganizationName());
 		return  o;
 	}
 
-	public OrgMaster getOrgMaster(Organization organization) {
-		OrgMaster orgMaster = new OrgMaster();
-		orgMaster.setOrganizationName(organization.getName());
-		orgMaster.setOrgId(Integer.parseInt(MappingHelper.filterIdentifier(organization.getIdentifier(),"OrgMaster").getValue()));
-		return orgMaster;
+	public Tenant getTenant(Organization organization) {
+		Tenant tenant = new Tenant();
+		tenant.setOrganizationName(organization.getName());
+		tenant.setOrgId(Integer.parseInt(MappingHelper.filterIdentifier(organization.getIdentifier(),"Tenant").getValue()));
+		return tenant;
 	}
 }

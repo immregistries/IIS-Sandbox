@@ -62,8 +62,8 @@ public class CovidServlet extends HttpServlet {
 		throws ServletException, IOException {
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
-		OrgMaster orgMaster = ServletHelper.getOrgMaster();
-		if (orgMaster == null) {
+		Tenant tenant = ServletHelper.getTenant();
+		if (tenant == null) {
 			throw new AuthenticationCredentialsNotFoundException("");
 		}
 		IGenericClient fhirClient = repositoryClientFactory.newGenericClient(req);
@@ -154,7 +154,7 @@ public class CovidServlet extends HttpServlet {
 						vaccinationReportedList = fhirRequester.searchVaccinationReportedList(
 //						Immunization.DATE.after().day(dateStart),
 //					 Immunization.DATE.before().day(dateEnd),
-							Immunization.PATIENT.hasChainedProperty(Patient.ORGANIZATION.hasId(String.valueOf(orgMaster.getOrgId())))); // TODO test
+							Immunization.PATIENT.hasChainedProperty(Patient.ORGANIZATION.hasId(String.valueOf(tenant.getOrgId())))); // TODO test
 						Date finalDateStart = dateStart;
 						Date finalDateEnd = dateEnd;
 						vaccinationReportedList = vaccinationReportedList.stream().filter(vaccinationReported -> vaccinationReported.getReportedDate().after(finalDateStart) && vaccinationReported.getReportedDate().before(finalDateEnd)).collect(Collectors.toList());

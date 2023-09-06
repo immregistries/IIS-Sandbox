@@ -7,9 +7,9 @@ import org.hl7.fhir.r4.model.Reference;
 import org.immregistries.iis.kernal.fhir.annotations.OnR4Condition;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.logic.IncomingMessageHandler;
-import org.immregistries.iis.kernal.model.OrgAccess;
+import org.immregistries.iis.kernal.model.UserAccess;
 import org.immregistries.iis.kernal.InternalClient.RepositoryClientFactory;
-import org.immregistries.iis.kernal.model.OrgMaster;
+import org.immregistries.iis.kernal.model.Tenant;
 import org.immregistries.smm.transform.ScenarioManager;
 import org.immregistries.smm.transform.TestCaseMessage;
 import org.immregistries.smm.transform.Transformer;
@@ -49,14 +49,14 @@ public class PopServletR4  {
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		try {
 			String message = req.getParameter(PARAM_MESSAGE);
-			OrgMaster orgMaster = ServletHelper.getOrgMaster();
+			Tenant tenant = ServletHelper.getTenant();
 
 			String ack = "";
 			String[] messages;
 			StringBuilder ackBuilder = new StringBuilder();
 			Session dataSession = PopServlet.getDataSession();
 			try {
-				if (orgMaster == null) {
+				if (tenant == null) {
 					resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 					out.println(
 						"Access is not authorized. Facilityid, userid and/or password are not recognized. ");
@@ -69,7 +69,7 @@ public class PopServletR4  {
 					}
 					for (String msh : messages) {
 						if (!msh.isBlank()) {
-							ackBuilder.append(handler.process("MSH|^~\\&|" + msh, orgMaster));
+							ackBuilder.append(handler.process("MSH|^~\\&|" + msh, tenant));
 							ackBuilder.append("\r\n");
 						}
 					}
@@ -106,7 +106,7 @@ public class PopServletR4  {
 		throws ServletException, IOException {
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
-		OrgAccess orgAccess = ServletHelper.getOrgAccess();
+		UserAccess userAccess = ServletHelper.getUserAccess();
 		String userId = null;
 		String password = null;
 		String facilityId = null;
@@ -148,7 +148,7 @@ public class PopServletR4  {
 				out.println("    <div class=\"w3-container w3-half w3-margin-top\">");
 
 
-				if (orgAccess == null) {
+				if (userAccess == null) {
 					// TODO duplicate login form ?
 //					out.println("      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_USERID
 //						+ "\" value=\"" + userId + "\"/>");
@@ -166,10 +166,10 @@ public class PopServletR4  {
 					out.println("    <div class=\"w3-container w3-card-4\">");
 //					out.println("      <h3>Authentication</h3>");
 //					out.println("      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_USERID
-//						+ "\" value=\"" + orgAccess.getAccessName() + "\"/ disabled>");
+//						+ "\" value=\"" + userAccess.getAccessName() + "\"/ disabled>");
 //					out.println("      <label>User Id</label>");
 //					out.println("      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_FACILITYID
-//						+ "\" value=\"" + orgAccess.getOrg().getOrganizationName() + "\" disabled/>");
+//						+ "\" value=\"" + userAccess.getOrg().getOrganizationName() + "\" disabled/>");
 //					out.println("      <label>Facility Id</label>");
 //					out.println("      <br/>");
 					out.println("<input class=\"w3-button w3-section w3-teal w3-ripple\" type=\"submit\" name=\"submit\" value=\"Submit\"/>");

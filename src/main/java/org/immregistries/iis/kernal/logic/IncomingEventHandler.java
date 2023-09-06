@@ -11,7 +11,7 @@ import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.InternalClient.FhirRequester;
 import org.immregistries.iis.kernal.model.OrgLocation;
-import org.immregistries.iis.kernal.model.OrgMaster;
+import org.immregistries.iis.kernal.model.Tenant;
 import org.immregistries.iis.kernal.model.PatientReported;
 import org.immregistries.iis.kernal.model.VaccinationReported;
 import org.slf4j.Logger;
@@ -103,9 +103,9 @@ public class IncomingEventHandler {
 	@Autowired
 	protected IncomingMessageHandler incomingMessageHandler;
 
-	public String process(HttpServletRequest req, OrgMaster orgMaster) {
+	public String process(HttpServletRequest req, Tenant tenant) {
 		try {
-			processEvent(orgMaster, req);
+			processEvent(tenant, req);
 		} catch (Exception e) {
 			e.printStackTrace(System.err);
 			return "Exception processing request" + e.getMessage();
@@ -115,10 +115,10 @@ public class IncomingEventHandler {
 	}
 
 
-	public void processEvent(OrgMaster orgMaster, HttpServletRequest req) throws Exception {
+	public void processEvent(Tenant tenant, HttpServletRequest req) throws Exception {
 
 		CodeMap codeMap = CodeMapManager.getCodeMap();
-		PatientReported patientReported = processPatient(orgMaster, req, codeMap);
+		PatientReported patientReported = processPatient(tenant, req, codeMap);
 		VaccinationReported vaccinationReported = null;
 //    VaccinationMaster vaccinationMaster = null;
 		Date administrationDate = null;
@@ -186,7 +186,7 @@ public class IncomingEventHandler {
 				if (orgLocation == null) {
 					orgLocation = new OrgLocation();
 					orgLocation.setOrgFacilityCode(administeredAtLocation);
-					orgLocation.setOrgMaster(orgMaster);
+					orgLocation.setTenant(tenant);
 					orgLocation.setOrgFacilityName(administeredAtLocation);
 					orgLocation.setLocationType("");
 					orgLocation.setAddressLine1("");
@@ -232,10 +232,10 @@ public class IncomingEventHandler {
 
 	}
 
-	public PatientReported processPatient(OrgMaster orgMaster, HttpServletRequest req,
+	public PatientReported processPatient(Tenant tenant, HttpServletRequest req,
 													  CodeMap codeMap) throws Exception {
 		RequestDetails requestDetails = new ServletRequestDetails();
-		requestDetails.setTenantId(orgMaster.getOrganizationName());
+		requestDetails.setTenantId(tenant.getOrganizationName());
 
 		PatientReported patientReported = null;
 
@@ -255,7 +255,7 @@ public class IncomingEventHandler {
 
 		if (patientReported == null) {
 			patientReported = new PatientReported();
-			patientReported.setOrgMaster(orgMaster);
+			patientReported.setTenant(tenant);
 			patientReported.setExternalLink(patientReportedExternalLink);
 			patientReported.setReportedDate(new Date());
 		}

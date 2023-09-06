@@ -7,7 +7,7 @@ public class ModelPerson implements Serializable {
 	
   private String personId = "";
   private String personExternalLink = "";
-  private OrgMaster orgMaster = null;
+  private Tenant tenant = null;
   private String nameLast = "";
   private String nameFirst = "";
   private String nameMiddle = "";
@@ -40,12 +40,12 @@ public class ModelPerson implements Serializable {
     this.personExternalLink = personExternalLink;
   }
 
-  public OrgMaster getOrgMaster() {
-    return orgMaster;
+  public Tenant getTenant() {
+    return tenant;
   }
 
-  public void setOrgMaster(OrgMaster orgMaster) {
-    this.orgMaster = orgMaster;
+  public void setTenant(Tenant tenant) {
+    this.tenant = tenant;
   }
 
   public String getNameLast() {

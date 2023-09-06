@@ -9,8 +9,8 @@ import org.hibernate.Session;
 import org.hl7.fhir.r5.model.*;
 import org.immregistries.iis.kernal.fhir.annotations.OnR5Condition;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
-import org.immregistries.iis.kernal.model.OrgAccess;
-import org.immregistries.iis.kernal.model.OrgMaster;
+import org.immregistries.iis.kernal.model.UserAccess;
+import org.immregistries.iis.kernal.model.Tenant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.http.ResponseEntity;
@@ -45,30 +45,30 @@ public class MacroEndpointController {
 
 		Bundle facilityBundle = fhirContext.newJsonParser().parseResource(Bundle.class,req.getReader());
 		ServletRequestDetails requestDetails;
-		OrgAccess orgAccess = ServletHelper.getOrgAccess();
+		UserAccess userAccess = ServletHelper.getUserAccess();
 		Session dataSession = PopServlet.getDataSession();
-		OrgMaster orgMaster = null;
+		Tenant tenant = null;
 		/**
 		 * one and only one organization must be specified in bundle
 		 */
 		try {
 			for (Bundle.BundleEntryComponent entry : facilityBundle.getEntry()) {
 				if (entry.getResource() instanceof Organization) {
-					if (orgMaster != null) {
+					if (tenant != null) {
 						throw new InvalidRequestException("More than one organisation present");
 					}
-					orgMaster = ServletHelper.authenticateOrgMaster(orgAccess, ((Organization) entry.getResource()).getName(), dataSession);
+					tenant = ServletHelper.authenticateTenant(userAccess, ((Organization) entry.getResource()).getName(), dataSession);
 				}
 			}
 		} finally {
 			dataSession.close();
 		}
 
-		if (orgMaster == null) {
+		if (tenant == null) {
 			throw new InvalidRequestException("No organisation information specified");
 		} else  {
 			requestDetails = new ServletRequestDetails();
-			requestDetails.setTenantId(orgMaster.getOrganizationName());
+			requestDetails.setTenantId(tenant.getOrganizationName());
 			fillFacility(requestDetails,facilityBundle);
 		}
 	}

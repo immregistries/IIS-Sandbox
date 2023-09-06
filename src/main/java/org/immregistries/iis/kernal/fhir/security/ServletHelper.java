@@ -7,8 +7,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.immregistries.iis.kernal.model.OrgAccess;
-import org.immregistries.iis.kernal.model.OrgMaster;
+import org.immregistries.iis.kernal.model.UserAccess;
+import org.immregistries.iis.kernal.model.Tenant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
@@ -24,28 +24,28 @@ import java.util.List;
 public class ServletHelper {
 	static Logger logger = LoggerFactory.getLogger(ServletHelper.class);
 	public static final String GITHUB_PREFIX = "github-";
-	public static final String SESSION_ORGMASTER = "orgMaster";
-	public static final String SESSION_ORGACCESS = "orgAccess";
+	public static final String SESSION_TENANT = "tenant";
+	public static final String SESSION_USER_ACCESS = "userAccess";
 	private static String BAD_PASSWORD = "badpassword";
 
 
 
-	public static OrgMaster authenticateOrgMaster(String username, String password, String facilityName, Session dataSession) {
+	public static Tenant authenticateTenant(String username, String password, String facilityName, Session dataSession) {
 		/**
 		 * First user authentication with USERNAME password
 		 */
-		OrgAccess orgAccess = authenticateOrgAccessUsernamePassword(username,password,dataSession);
-		return  authenticateOrgMaster(orgAccess,facilityName,dataSession);
+		UserAccess userAccess = authenticateUserAccessUsernamePassword(username,password,dataSession);
+		return  authenticateTenant(userAccess,facilityName,dataSession);
 	}
 
-	public static OrgMaster authenticateOrgMaster(OAuth2User oAuth2User, String facilityName, Session dataSession) {
+	public static Tenant authenticateTenant(OAuth2User oAuth2User, String facilityName, Session dataSession) {
 		/**
 		 * First user authentication with OAUTH
 		 */
-		OrgAccess orgAccess = authenticateOrgAccessOAuth(oAuth2User,dataSession);
-		return authenticateOrgMaster(orgAccess,facilityName,dataSession);
+		UserAccess userAccess = authenticateUserAccessOAuth(oAuth2User,dataSession);
+		return authenticateTenant(userAccess,facilityName,dataSession);
 	}
-	public static OrgMaster authenticateOrgMaster(OrgAccess orgAccess, String facilityName, Session dataSession) {
+	public static Tenant authenticateTenant(UserAccess userAccess, String facilityName, Session dataSession) {
 		/**
 		 * Users starting with the prefix can create a user with the same name, any other use of prefix are rejected
 		 */
@@ -53,169 +53,169 @@ public class ServletHelper {
 			throw new AuthenticationException();
 		}
 		if (facilityName.startsWith(GITHUB_PREFIX) ) {
-			if (!orgAccess.getAccessName().startsWith(GITHUB_PREFIX)) {
+			if (!userAccess.getAccessName().startsWith(GITHUB_PREFIX)) {
 				throw new AuthenticationException();
-			} else if (!facilityName.equals(orgAccess.getAccessName())) {
+			} else if (!facilityName.equals(userAccess.getAccessName())) {
 				throw new AuthenticationException();
 			}
 		}
 
-		OrgMaster orgMaster = null;
-		Query query = dataSession.createQuery("from OrgMaster where organizationName = ?1");
+		Tenant tenant = null;
+		Query query = dataSession.createQuery("from Tenant where organizationName = ?1");
 		query.setParameter(1, facilityName);
 
-		List<OrgMaster> orgMasterList = query.list();
-		if (orgMasterList.size() > 0) {
+		List<Tenant> tenantList = query.list();
+		if (tenantList.size() > 0) {
 			/**
 			 * Important step verifying authorisation
 			 */
-			if (orgMasterList.get(0).getOrgAccess().getOrgAccessId() == orgAccess.getOrgAccessId()) {
-				orgMaster = orgMasterList.get(0);
+			if (tenantList.get(0).getUserAccess().getUserAccessId() == userAccess.getUserAccessId()) {
+				tenant = tenantList.get(0);
 			}
 		} else {
-			orgMaster = registerOrgMaster(facilityName, orgAccess, dataSession);
+			tenant = registerTenant(facilityName, userAccess, dataSession);
 		}
-		return orgMaster;
+		return tenant;
 	}
 
 
 
-	public static OrgAccess authenticateOrgAccessUsernamePassword(String username, String password, Session dataSession) {
+	public static UserAccess authenticateUserAccessUsernamePassword(String username, String password, Session dataSession) {
 		if (username.startsWith(GITHUB_PREFIX) || StringUtils.isBlank(password)) {
 			throw new AuthenticationException();
 		}
 		if (BAD_PASSWORD.equals(password)) {
 			return null;
 		}
-		OrgAccess orgAccess = null;
+		UserAccess userAccess = null;
 
-		List<OrgAccess> orgAccessList = queryOrgAccessWithUsername(username,dataSession);
-		if (orgAccessList.size() == 0) {
+		List<UserAccess> userAccessList = queryUserAccessWithUsername(username,dataSession);
+		if (userAccessList.size() == 0) {
 			/**
 			 * Registration
 			 */
-			orgAccess = registerOrgAccessWithUsernamePassword(username, password, dataSession);
-		} else if (orgAccessList.size() == 1) {
-//      if (BCrypt.checkpw(password, orgAccessList.get(0).getAccessKey())) { TODO after auth checks fix in fhir
-			if (password.equals(orgAccessList.get(0).getAccessKey())) {
-				orgAccess = orgAccessList.get(0);
+			userAccess = registerUserAccessWithUsernamePassword(username, password, dataSession);
+		} else if (userAccessList.size() == 1) {
+//      if (BCrypt.checkpw(password, userAccessList.get(0).getAccessKey())) { TODO after auth checks fix in fhir
+			if (password.equals(userAccessList.get(0).getAccessKey())) {
+				userAccess = userAccessList.get(0);
 			} else {
 				throw new AuthenticationException("password for user : " + username);
 			}
 		} else {
 			throw new AuthenticationException("password for user : " + username);
 		}
-		return orgAccess;
+		return userAccess;
 	}
 
-	public static OrgAccess authenticateOrgAccessOAuth(OAuth2User oAuth2User, Session dataSession) {
+	public static UserAccess authenticateUserAccessOAuth(OAuth2User oAuth2User, Session dataSession) {
 		String username = GITHUB_PREFIX + oAuth2User.getAttribute("login");
-		OrgAccess orgAccess = null;
+		UserAccess userAccess = null;
 
-		List<OrgAccess> orgAccessList = queryOrgAccessWithUsername(username,dataSession);
-		if (orgAccessList.size() == 0) {
+		List<UserAccess> userAccessList = queryUserAccessWithUsername(username,dataSession);
+		if (userAccessList.size() == 0) {
 			/**
 			 * Registration
 			 */
-			orgAccess = registerOrgAccessGithub(username,dataSession);
-		} else if (orgAccessList.size() == 1) {
-			if (StringUtils.isNotBlank(orgAccessList.get(0).getAccessKey())) {
+			userAccess = registerUserAccessGithub(username,dataSession);
+		} else if (userAccessList.size() == 1) {
+			if (StringUtils.isNotBlank(userAccessList.get(0).getAccessKey())) {
 				throw new AuthenticationException("OAuth login failure");
 			}
-			orgAccess = orgAccessList.get(0);
+			userAccess = userAccessList.get(0);
 		} else {
 			throw new AuthenticationException("OAuth login failure");
 		}
-		return orgAccess;
+		return userAccess;
 	}
 
-	private static List<OrgAccess> queryOrgAccessWithUsername(String username, Session dataSession) {
-		String queryString = "from OrgAccess where accessName = ?0";
+	private static List<UserAccess> queryUserAccessWithUsername(String username, Session dataSession) {
+		String queryString = "from UserAccess where accessName = ?0";
 		Query query = dataSession.createQuery(queryString);
 		query.setParameter(0, username);
 
 		return query.list();
 	}
 
-	private static OrgAccess registerOrgAccessGithub(String username, Session dataSession) {
+	private static UserAccess registerUserAccessGithub(String username, Session dataSession) {
 		if (!username.startsWith(GITHUB_PREFIX)) {
 			throw new AuthenticationException();
 		}
-		OrgAccess orgAccess = new OrgAccess();
-		orgAccess.setAccessName(username);
-		orgAccess.setAccessKey("");
+		UserAccess userAccess = new UserAccess();
+		userAccess.setAccessName(username);
+		userAccess.setAccessKey("");
 		Transaction transaction = dataSession.beginTransaction();
-		orgAccess.setOrgAccessId((Integer) dataSession.save(orgAccess));
+		userAccess.setUserAccessId((Integer) dataSession.save(userAccess));
 		transaction.commit();
-		return orgAccess;
+		return userAccess;
 	}
-	private static OrgAccess registerOrgAccessWithUsernamePassword(String username, String password, Session dataSession) {
+	private static UserAccess registerUserAccessWithUsernamePassword(String username, String password, Session dataSession) {
 		if (username.startsWith(GITHUB_PREFIX)) {
 			throw new AuthenticationException();
 		}
-		OrgAccess orgAccess = new OrgAccess();
-		orgAccess.setAccessName(username);
-//      orgAccess.setAccessKey(BCrypt.hashpw(password, BCrypt.gensalt(5))); TODO after auth checks fix in fhir
-		orgAccess.setAccessKey(password);
+		UserAccess userAccess = new UserAccess();
+		userAccess.setAccessName(username);
+//      userAccess.setAccessKey(BCrypt.hashpw(password, BCrypt.gensalt(5))); TODO after auth checks fix in fhir
+		userAccess.setAccessKey(password);
 		Transaction transaction = dataSession.beginTransaction();
-		orgAccess.setOrgAccessId((Integer) dataSession.save(orgAccess));
+		userAccess.setUserAccessId((Integer) dataSession.save(userAccess));
 		transaction.commit();
-		return orgAccess;
+		return userAccess;
 	}
 
-	private static OrgMaster registerOrgMaster(String facilityName, OrgAccess orgAccess, Session dataSession) {
-		OrgMaster orgMaster = new OrgMaster();
-		orgMaster.setOrganizationName(facilityName);
-		orgMaster.setOrgAccess(orgAccess);
+	private static Tenant registerTenant(String facilityName, UserAccess userAccess, Session dataSession) {
+		Tenant tenant = new Tenant();
+		tenant.setOrganizationName(facilityName);
+		tenant.setUserAccess(userAccess);
 		Transaction transaction = dataSession.beginTransaction();
-		orgMaster.setOrgId((Integer) dataSession.save(orgMaster));
+		tenant.setOrgId((Integer) dataSession.save(tenant));
 		transaction.commit();
-		return orgMaster;
+		return tenant;
 	}
 
 
 
 	/**
-	 * asynchroneously provides and registers OrgAccess Object from SecurityContext
+	 * asynchroneously provides and registers UserAccess Object from SecurityContext
 	 *
 	 * @return
 	 */
-	public static OrgAccess getOrgAccess() {
+	public static UserAccess getUserAccess() {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		if (authentication instanceof OrgAccess) {
-			return (OrgAccess) authentication;
+		if (authentication instanceof UserAccess) {
+			return (UserAccess) authentication;
 		}
-		OrgMaster orgMaster = getOrgMaster();
-		if (orgMaster != null) {
-			return orgMaster.getOrgAccess();
+		Tenant tenant = getTenant();
+		if (tenant != null) {
+			return tenant.getUserAccess();
 		}
 		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
 		HttpSession session = request.getSession(false);
 		if (session != null) {
-			return (OrgAccess) session.getAttribute(SESSION_ORGACCESS);
+			return (UserAccess) session.getAttribute(SESSION_USER_ACCESS);
 		} else {
 			return null;
 		}
 	}
 
-	public static OrgMaster getOrgMaster() {
+	public static Tenant getTenant() {
 		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
-		OrgMaster orgMaster = null;
-		if (request.getAttribute(SESSION_ORGMASTER) != null) {
-			orgMaster = (OrgMaster) request.getAttribute(SESSION_ORGMASTER);
+		Tenant tenant = null;
+		if (request.getAttribute(SESSION_TENANT) != null) {
+			tenant = (Tenant) request.getAttribute(SESSION_TENANT);
 		}
-		if (orgMaster == null) {
+		if (tenant == null) {
 			HttpSession session = request.getSession(false);
 			if ( session != null) {
-				orgMaster = (OrgMaster) session.getAttribute(SESSION_ORGMASTER);
+				tenant = (Tenant) session.getAttribute(SESSION_TENANT);
 			}
 		}
-		return  orgMaster;
+		return tenant;
 	}
 
 	public static RequestDetails requestDetailsWithPartitionName() {
 		RequestDetails requestDetails = new SystemRequestDetails();
-		requestDetails.setTenantId(ServletHelper.getOrgMaster().getOrganizationName());
+		requestDetails.setTenantId(ServletHelper.getTenant().getOrganizationName());
 		return requestDetails;
 	}
 

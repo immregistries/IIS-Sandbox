@@ -8,7 +8,7 @@ public class OrgLocation implements Serializable {
   
   private String orgLocationId = "";
   private String orgFacilityCode = "";
-  private OrgMaster orgMaster = null;
+  private Tenant tenant = null;
   private String orgFacilityName = "";
   private String locationType = "";
   private String addressLine1 = "";
@@ -44,12 +44,12 @@ public class OrgLocation implements Serializable {
     this.orgFacilityCode = orgFacilityCode;
   }
 
-  public OrgMaster getOrgMaster() {
-    return orgMaster;
+  public Tenant getTenant() {
+    return tenant;
   }
 
-  public void setOrgMaster(OrgMaster orgMaster) {
-    this.orgMaster = orgMaster;
+  public void setTenant(Tenant tenant) {
+    this.tenant = tenant;
   }
 
   public String getOrgFacilityName() {

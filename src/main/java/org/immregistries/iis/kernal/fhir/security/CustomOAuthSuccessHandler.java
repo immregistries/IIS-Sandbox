@@ -1,7 +1,7 @@
 package org.immregistries.iis.kernal.fhir.security;
 
 import org.hibernate.Session;
-import org.immregistries.iis.kernal.model.OrgMaster;
+import org.immregistries.iis.kernal.model.Tenant;
 import org.immregistries.iis.kernal.servlet.PopServlet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,26 +32,26 @@ public class CustomOAuthSuccessHandler implements AuthenticationSuccessHandler {
 	@Override
 	public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
 		logger.info("Authentication success {}",authentication);
-		String queryString = "from OrgAccess where accessName = ?0";
-//		OrgAccess orgAccess = null;
-		OrgMaster orgMaster = null;
+		String queryString = "from UserAccess where accessName = ?0";
+//		UserAccess userAccess = null;
+		Tenant tenant = null;
 		if (authentication instanceof OAuth2AuthenticationToken) {
 			HttpSession session = request.getSession(true);
 			Session dataSession = PopServlet.getDataSession();
 			try {
 				OAuth2AuthenticationToken oAuth2AuthenticationToken = (OAuth2AuthenticationToken) authentication;
-				orgMaster = ServletHelper.authenticateOrgMaster(
+				tenant = ServletHelper.authenticateTenant(
 					oAuth2AuthenticationToken.getPrincipal(),
 					GITHUB_PREFIX + oAuth2AuthenticationToken.getPrincipal().getAttribute("login"),
 					dataSession);
 				dataSession.close();
-				session.setAttribute(SESSION_ORGMASTER, orgMaster);
+				session.setAttribute(SESSION_TENANT, tenant);
 			} finally {
 				dataSession.close();
 			}
 
-//			session.setAttribute(SESSION_ORGACCESS, orgMaster.orgAccess);
-			// TODO switch to orgAccess when facilities creation implemented
+//			session.setAttribute(SESSION_ORGACCESS, tenant.userAccess);
+			// TODO switch to userAccess when facilities creation implemented
 		}
 
 

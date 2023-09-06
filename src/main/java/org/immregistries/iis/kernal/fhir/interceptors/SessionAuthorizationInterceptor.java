@@ -12,8 +12,8 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.http.auth.AuthenticationException;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
-import org.immregistries.iis.kernal.model.OrgAccess;
-import org.immregistries.iis.kernal.model.OrgMaster;
+import org.immregistries.iis.kernal.model.UserAccess;
+import org.immregistries.iis.kernal.model.Tenant;
 import org.immregistries.iis.kernal.servlet.PopServlet;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.slf4j.Logger;
@@ -26,7 +26,8 @@ import javax.servlet.http.HttpSession;
 import java.util.Iterator;
 import java.util.List;
 
-import static org.immregistries.iis.kernal.fhir.security.ServletHelper.SESSION_ORGMASTER;
+import static org.immregistries.iis.kernal.fhir.security.ServletHelper.SESSION_USER_ACCESS;
+import static org.immregistries.iis.kernal.fhir.security.ServletHelper.SESSION_TENANT;
 
 @Component
 @Interceptor
@@ -47,7 +48,7 @@ public class SessionAuthorizationInterceptor extends AuthorizationInterceptor {
 		HttpSession session = request.getSession(false);
 		Session dataSession = PopServlet.getDataSession();
 		String authHeader = theRequestDetails.getHeader("Authorization");
-		OrgMaster orgMaster = null;
+		Tenant tenant = null;
 		try {
 //			if (PartitionCreationInterceptor.extractPartitionName(theRequestDetails).equals(CONNECTATHON_USER)) {
 //				return connectathonSpecialUser(theRequestDetails,authHeader,dataSession);
@@ -59,11 +60,11 @@ public class SessionAuthorizationInterceptor extends AuthorizationInterceptor {
 				/**
 				 * Basic auth
 				 */
-				orgMaster = tryAuthHeader(authHeader, PartitionCreationInterceptor.extractPartitionName(theRequestDetails), dataSession);
+				tenant = tryAuthHeader(authHeader, PartitionCreationInterceptor.extractPartitionName(theRequestDetails), dataSession);
 				/**
 				 * Token bearer ?
 				 */
-				if (orgMaster == null){
+				if (tenant == null){
 					// TODO TOKEN VERIFICATION
 //					logger.info("token {} ", authHeader);
 				}
@@ -72,21 +73,21 @@ public class SessionAuthorizationInterceptor extends AuthorizationInterceptor {
 				 * Cookie SESSIONID
 				 */
 				if (session != null) {
-					OrgAccess orgAccess = ServletHelper.getOrgAccess();
+					UserAccess userAccess = ServletHelper.getUserAccess();
 					/**
-					 * if user authenticated, orgMaster/Facility is then selected
+					 * if user authenticated, Tenant/Facility is then selected
 					 */
-					if (orgAccess != null) {
-						orgMaster = ServletHelper.authenticateOrgMaster(orgAccess,PartitionCreationInterceptor.extractPartitionName(theRequestDetails),dataSession);
+					if (userAccess != null) {
+						tenant = ServletHelper.authenticateTenant(userAccess,PartitionCreationInterceptor.extractPartitionName(theRequestDetails),dataSession);
 					}
 				}
 			}
 
 			if (session != null ) {
-//				session.setAttribute(SESSION_ORGMASTER, null); // OrgMaster selection is set in requestDetails
-//				session.setAttribute(SESSION_ORGMASTER, orgMaster); // TODO MAYBE REMOVE
+//				session.setAttribute(SESSION_ORGMASTER, null); // Tenant selection is set in requestDetails
+//				session.setAttribute(SESSION_ORGMASTER, tenant); // TODO MAYBE REMOVE
 			}
-			if (orgMaster == null) {
+			if (tenant == null) {
 				throw new AuthenticationException(Msg.code(644) + "Missing or invalid Authorization header value");
 			}
 		} catch (AuthenticationException authenticationException) {
@@ -98,16 +99,16 @@ public class SessionAuthorizationInterceptor extends AuthorizationInterceptor {
 			dataSession.close();
 		}
 
-		if (orgMaster.getOrganizationName() != null) {
-			theRequestDetails.setAttribute(SESSION_ORGMASTER, orgMaster);
+		if (tenant.getOrganizationName() != null) {
+			theRequestDetails.setAttribute(SESSION_TENANT, tenant);
 			return new RuleBuilder()
 				.allow().read()
 				.resourcesOfType("Subscription").withAnyId().forTenantIds(DEFAULT_USER)
 				.andThen().allow().read()
 				.resourcesOfType("SubscriptionTopic").withAnyId().forTenantIds(DEFAULT_USER)
 				.andThen()
-				.allowAll("Logged in as " + orgMaster.getOrganizationName())
-				.forTenantIds(orgMaster.getOrganizationName())
+				.allowAll("Logged in as " + tenant.getOrganizationName())
+				.forTenantIds(tenant.getOrganizationName())
 				.build();
 		}
 		return new RuleBuilder()
@@ -115,12 +116,12 @@ public class SessionAuthorizationInterceptor extends AuthorizationInterceptor {
 			.build();
 	}
 
-	public OrgMaster tryAuthHeader(String authHeader, String tenantId, Session dataSession) {
+	public Tenant tryAuthHeader(String authHeader, String tenantId, Session dataSession) {
 		if (authHeader != null && authHeader.startsWith("Basic ")) {
 			String base64 = authHeader.substring("Basic ".length());
 			String base64decoded = new String(Base64.decodeBase64(base64));
 			String[] parts = base64decoded.split(":");
-			return ServletHelper.authenticateOrgMaster(parts[0], parts[1], tenantId, dataSession);
+			return ServletHelper.authenticateTenant(parts[0], parts[1], tenantId, dataSession);
 		} else { // TODO token ?
 			return null;
 		}
@@ -131,21 +132,21 @@ public class SessionAuthorizationInterceptor extends AuthorizationInterceptor {
 		 *	If connecting as Connectathon with TOKEN : give only specific rights
 		 * Else : treat as usual
 		 */
-		OrgAccess orgAccess = null;
+		UserAccess userAccess = null;
 		if (authHeader != null && authHeader.startsWith("Bearer " + CONNECTATHON_AUTH)) {
-			Query query = dataSession.createQuery("from OrgMaster where organizationName = ?1");
+			Query query = dataSession.createQuery("from Tenant where organizationName = ?1");
 			query.setParameter(1, CONNECTATHON_USER);
-			Iterator<OrgMaster> orgMaster = query.iterate();
-			if (orgMaster.hasNext()) {
-				Query queryAccess = dataSession.createQuery("from OrgAccess where org = ?0");
-				queryAccess.setParameter(0, orgMaster.next());
-				Iterator<OrgAccess> orgAccessIterator = queryAccess.iterate();
-				if (orgAccessIterator.hasNext()) {
-					orgAccess = orgAccessIterator.next();
-					orgAccess.setAccessKey(CONNECTATHON_AUTH);
-					orgAccess.setAccessName(null);
-					orgAccess.setOrgAccessId(-1);
-					theRequestDetails.setAttribute("orgAccess", orgAccess);
+			Iterator<Tenant> tenant = query.iterate();
+			if (tenant.hasNext()) {
+				Query queryAccess = dataSession.createQuery("from UserAccess where org = ?0");
+				queryAccess.setParameter(0, tenant.next());
+				Iterator<UserAccess> userAccessIterator = queryAccess.iterate();
+				if (userAccessIterator.hasNext()) {
+					userAccess = userAccessIterator.next();
+					userAccess.setAccessKey(CONNECTATHON_AUTH);
+					userAccess.setAccessName(null);
+					userAccess.setUserAccessId(-1);
+					theRequestDetails.setAttribute(SESSION_USER_ACCESS, userAccess);
 					return new RuleBuilder()
 						.allow().operation()
 						.named(JpaConstants.OPERATION_EXPORT).atAnyLevel()

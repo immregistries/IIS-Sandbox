@@ -9,7 +9,7 @@ import org.hl7.fhir.r5.model.*;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.logic.SubscriptionService;
 import org.immregistries.iis.kernal.InternalClient.RepositoryClientFactory;
-import org.immregistries.iis.kernal.model.OrgMaster;
+import org.immregistries.iis.kernal.model.Tenant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 
@@ -70,8 +70,8 @@ public class SubscriptionServlet extends HttpServlet {
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
 		throws ServletException, IOException {
 		// TODO action as manual trigger with content
-		OrgMaster orgMaster = ServletHelper.getOrgMaster();
-		if (orgMaster == null) {
+		Tenant tenant = ServletHelper.getTenant();
+		if (tenant == null) {
 			throw new AuthenticationCredentialsNotFoundException("");
 		}
 		IGenericClient localClient = repositoryClientFactory.newGenericClient(req);
@@ -126,8 +126,8 @@ public class SubscriptionServlet extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
 		throws ServletException, IOException {
-		OrgMaster orgMaster = ServletHelper.getOrgMaster();
-		if (orgMaster == null) {
+		Tenant tenant = ServletHelper.getTenant();
+		if (tenant == null) {
 			throw new AuthenticationCredentialsNotFoundException("");
 		}
 		resp.setContentType("text/html");

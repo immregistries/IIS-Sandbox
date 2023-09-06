@@ -1,11 +1,11 @@
 <?xml version="1.0"?>
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "https://hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping package="org.immregistries.iis.kernal.model">
-  <class name="OrgMaster" table="org_master">
+  <class name="Tenant" table="tenant">
     <id name="orgId" column="org_id">
       <generator class="native"/>
     </id>
     <property name="organizationName" column="organization_name" type="string"/>
-    <many-to-one name="orgAccess" column="org_access_id" class="OrgAccess"/>
+    <many-to-one name="userAccess" column="user_access_id" class="UserAccess"/>
   </class>
 </hibernate-mapping>
