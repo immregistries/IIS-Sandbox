@@ -11,7 +11,6 @@ import org.immregistries.codebase.client.reference.CodeStatusValue;
 import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.mapping.forR5.PatientMapperR5;
 import org.immregistries.iis.kernal.model.*;
-import org.immregistries.iis.kernal.InternalClient.FhirRequester;
 import org.immregistries.smm.tester.manager.HL7Reader;
 import org.immregistries.vfa.connect.model.*;
 import org.slf4j.Logger;
@@ -26,7 +25,6 @@ import java.util.*;
 
 import static org.immregistries.iis.kernal.InternalClient.FhirRequester.GOLDEN_RECORD;
 import static org.immregistries.iis.kernal.InternalClient.FhirRequester.GOLDEN_SYSTEM_TAG;
-import static org.immregistries.iis.kernal.mapping.Interfaces.PatientMapper.MRN_SYSTEM;
 
 @org.springframework.stereotype.Service()
 @Conditional(OnR5Condition.class)
@@ -588,10 +586,13 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler<Organizatio
 		if (patientReported == null) {
 //      patientMaster = new PatientMaster();
 			patientReported = new PatientReported();
-			patientReported.setOrgReported(orgMaster);
+			patientReported.setOrgMaster(orgMaster);
 			patientReported.setExternalLink(patientReportedExternalLink);
 			patientReported.setReportedDate(new Date());
-			patientReported.setManagingOrganizationId(managingOrganization.getId());
+			if (managingOrganization != null) {
+				patientReported.setManagingOrganizationId(managingOrganization.getId());
+			}
+
 		}
 
 		{
@@ -1204,7 +1205,7 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler<Organizatio
 					continue;
 				}
 				boolean originalReporter =
-					vaccination.getPatientReported().getOrgReported().equals(orgMaster);
+					vaccination.getPatientReported().getOrgMaster().equals(orgMaster);
 				if ("D".equals(vaccination.getActionCode())) {
 					continue;
 				}
@@ -1507,7 +1508,7 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler<Organizatio
 			if (cvxCode != null) {
 
 				boolean originalReporter =
-					vaccinationReported.getPatientReported().getOrgReported().equals(orgMaster);
+					vaccinationReported.getPatientReported().getOrgMaster().equals(orgMaster);
 				printORC(orgMaster, sb, vaccination, originalReporter);
 				sb.append("RXA");
 				// RXA-1
@@ -1738,11 +1739,12 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler<Organizatio
 	}
 
 	private Organization processSendingOrganization(HL7Reader reader) {
+		String organizationName = reader.getValue(4, 1);
 		Organization sendingOrganization = (Organization) fhirRequester.searchOrganization(Organization.IDENTIFIER.exactly()
-			.systemAndIdentifier(reader.getValue(4, 1), reader.getValue(4, 2)));
-		if (sendingOrganization == null) {
+			.systemAndIdentifier(organizationName, reader.getValue(4, 2)));
+		if (sendingOrganization == null && StringUtils.isNotBlank(organizationName)) {
 			sendingOrganization = new Organization()
-				.setName(reader.getValue(4, 1))
+				.setName(organizationName)
 				.addIdentifier(new Identifier()
 					.setSystem(reader.getValue(4, 2))
 					.setValue(reader.getValue(4, 10)));
@@ -1752,11 +1754,12 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler<Organizatio
 	}
 
 	public Organization processManagingOrganization(HL7Reader reader) {
+		String organizationName = reader.getValue(22, 1);
 		Organization managingOrganization = null;
 		String managingIdentifier = null;
-		if (reader.getValue(22, 11) != null) {
+		if (StringUtils.isNotBlank(reader.getValue(22, 11))) {
 			managingIdentifier = reader.getValue(22, 11);
-		} else if (reader.getValue(22, 3) != null) {
+		} else if (StringUtils.isNotBlank(reader.getValue(22, 3))) {
 			managingIdentifier = reader.getValue(22, 3);
 		}
 		if (managingIdentifier != null) {
@@ -1764,7 +1767,7 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler<Organizatio
 				.systemAndIdentifier(reader.getValue(22, 7), managingIdentifier));
 			if (managingOrganization == null) {
 				managingOrganization = new Organization();
-				managingOrganization.setName(reader.getValue(22, 1));
+				managingOrganization.setName(organizationName);
 				managingOrganization.addIdentifier()
 					.setValue(managingIdentifier)
 					.setSystem(reader.getValue(22, 7));

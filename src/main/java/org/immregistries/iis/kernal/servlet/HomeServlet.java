@@ -22,9 +22,6 @@ import java.text.SimpleDateFormat;
 //@Component
 public class HomeServlet extends HttpServlet {
 
-	public static final String PARAM_SHOW = "show";
-	public static final String SHOW_FACILITIES = "facilities";
-
 	public static void doHeader(PrintWriter out, String title) {
 		out.println("<html>");
 		out.println("  <head>");
@@ -37,10 +34,6 @@ public class HomeServlet extends HttpServlet {
 		out.println("      <div class=\"w3-bar w3-light-grey\">");
 		out.println("<a href=\"home\" class=\"w3-bar-item w3-button w3-green\">IIS Sandbox</a>");
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//		if (authentication.isAuthenticated() && !(authentication instanceof AnonymousAuthenticationToken)) {
-//			String link = "facility";
-//			out.println("<a href=\"" + link + "\" class=\"w3-bar-item w3-button\">Facilities</a>");
-//		}
 		out.println("<a href=\"pop\" class=\"w3-bar-item w3-button\">Send Now</a>");
 		out.println("<a href=\"message\" class=\"w3-bar-item w3-button\">Messages</a>");
 		out.println("<a href=\"patient\" class=\"w3-bar-item w3-button\">Patients</a>");
@@ -104,8 +97,6 @@ public class HomeServlet extends HttpServlet {
 			{
 				doHeader(out, "IIS Sandbox - Home");
 				out.println("    <div class=\"w3-container w3-half w3-margin-top\">");
-//					out.println(
-//						"    <div class=\"w3-panel w3-red\"><p class=\"w3-left-align\">This version is specifically deployed for the January 2023 Connectathon Bulk Data track.  Some functionalities including subscription are not available due to a switch from Fhir R5 to R4 for the event</p></div>");
 				out.println(
 					"    <div class=\"w3-panel w3-yellow\"><p class=\"w3-left-align\">This system is for test purposes only. "
 						+ "Do not submit production data. As a precaution all submitted data will be deleted once a day.  </p></div>");
@@ -147,8 +138,7 @@ public class HomeServlet extends HttpServlet {
 				out.println("    </ul>");
 
 				out.println("    <h2>Processing Flavors</h2>");
-				out.println(
-					"    <p>If any of the following words appear in the name of the facility then special processing rules will apply. "
+				out.println("    <p>If any of the following words appear in the name of the tenant then special processing rules will apply. "
 						+ "These processing rules can be used to simulate specific IIS behavior. </p>");
 				out.println("    <ul class=\"w3-ul w3-hoverable\">");
 				for (ProcessingFlavor processingFlavor : ProcessingFlavor.values()) {

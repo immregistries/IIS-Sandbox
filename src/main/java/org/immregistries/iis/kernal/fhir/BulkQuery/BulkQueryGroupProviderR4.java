@@ -30,6 +30,7 @@ import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.instance.model.api.IIdType;
 import org.hl7.fhir.instance.model.api.IPrimitiveType;
 import org.hl7.fhir.r4.model.*;
+import org.immregistries.iis.kernal.fhir.interceptors.PartitionCreationInterceptor;
 import org.immregistries.iis.kernal.servlet.PopServlet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -212,7 +213,7 @@ public class BulkQueryGroupProviderR4 extends GroupResourceProvider {
 
 			IParser parser = fhirResourceGroupDao.getContext().newNDJsonParser();
 			RequestDetails detailsCopy = new SystemRequestDetails();
-			detailsCopy.setTenantId(theRequestDetails.getTenantId());
+			detailsCopy.setTenantId(PartitionCreationInterceptor.extractPartitionName(theRequestDetails));
 			for (Map.Entry<String, Bundle> entry : bundleMap.entrySet()) {
 				Binary binary = new Binary();
 				binary.setContentType("Bulk");

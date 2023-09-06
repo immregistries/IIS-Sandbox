@@ -7,6 +7,7 @@ import ca.uhn.fhir.jpa.partition.IPartitionLookupSvc;
 import ca.uhn.fhir.jpa.partition.PartitionManagementProvider;
 import ca.uhn.fhir.rest.api.server.RequestDetails;
 import ca.uhn.fhir.rest.server.exceptions.InternalErrorException;
+import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
 import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
 import ca.uhn.fhir.rest.server.interceptor.partition.RequestTenantPartitionInterceptor;
 import org.apache.commons.lang3.StringUtils;
@@ -40,22 +41,31 @@ public class PartitionCreationInterceptor extends RequestTenantPartitionIntercep
 	@Override
 	@Nonnull
 	protected RequestPartitionId extractPartitionIdFromRequest(RequestDetails theRequestDetails) {
-		String tenantId = theRequestDetails.getTenantId();
-		if (StringUtils.isBlank(tenantId)) {
-			throw new InternalErrorException(Msg.code(343) + "No tenant ID has been specified");
-		} else {
-			try {
-				partitionLookupSvc.getPartitionByName(theRequestDetails.getTenantId());
-				return RequestPartitionId.fromPartitionName(tenantId);
-			} catch (ResourceNotFoundException e) {
-			}
+		String partitionName = extractPartitionName(theRequestDetails);
+		try {
+			partitionLookupSvc.getPartitionByName(partitionName);
+			return RequestPartitionId.fromPartitionName(partitionName);
+		} catch (ResourceNotFoundException e) {
 			return createPartition(theRequestDetails);
+		}
+	}
+
+	public static String extractPartitionName(RequestDetails requestDetails) {
+		String tenantId = requestDetails.getTenantId();
+		if (StringUtils.isBlank(tenantId)) {
+			throw new InvalidRequestException(Msg.code(343) + "No tenant ID has been specified, expected structure is fhir/{tenantId}-{facilityId}");
+		} else {
+			String[] ids = tenantId.split("-"); // TEMP TODO find good url structure
+//			if (ids.length < 2){
+//				throw new InvalidRequestException(Msg.code(343) + "No facility ID has been specified, expected structure is fhir/{tenantId}-{facilityId}");
+//			}
+			return ids[0];
 		}
 	}
 
 	private RequestPartitionId createPartition(RequestDetails theRequestDetails) {
 		// Reminder tenantId = partitionName != partitionId
-		StringType partitionName = new StringType(theRequestDetails.getTenantId());
+		StringType partitionName = new StringType(PartitionCreationInterceptor.extractPartitionName(theRequestDetails));
 		Random random = new Random();
 		int idAttempt = random.nextInt(10000);
 		int number_of_attempts = 0;

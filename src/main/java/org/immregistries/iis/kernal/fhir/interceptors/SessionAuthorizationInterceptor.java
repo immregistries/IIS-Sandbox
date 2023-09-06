@@ -49,7 +49,7 @@ public class SessionAuthorizationInterceptor extends AuthorizationInterceptor {
 		String authHeader = theRequestDetails.getHeader("Authorization");
 		OrgMaster orgMaster = null;
 		try {
-//			if (theRequestDetails.getTenantId().equals(CONNECTATHON_USER)) {
+//			if (PartitionCreationInterceptor.extractPartitionName(theRequestDetails).equals(CONNECTATHON_USER)) {
 //				return connectathonSpecialUser(theRequestDetails,authHeader,dataSession);
 //			}
 			/**
@@ -59,7 +59,7 @@ public class SessionAuthorizationInterceptor extends AuthorizationInterceptor {
 				/**
 				 * Basic auth
 				 */
-				orgMaster = tryAuthHeader(authHeader, theRequestDetails.getTenantId(), dataSession);
+				orgMaster = tryAuthHeader(authHeader, PartitionCreationInterceptor.extractPartitionName(theRequestDetails), dataSession);
 				/**
 				 * Token bearer ?
 				 */
@@ -77,7 +77,7 @@ public class SessionAuthorizationInterceptor extends AuthorizationInterceptor {
 					 * if user authenticated, orgMaster/Facility is then selected
 					 */
 					if (orgAccess != null) {
-						orgMaster = ServletHelper.authenticateOrgMaster(orgAccess,theRequestDetails.getTenantId(),dataSession);
+						orgMaster = ServletHelper.authenticateOrgMaster(orgAccess,PartitionCreationInterceptor.extractPartitionName(theRequestDetails),dataSession);
 					}
 				}
 			}

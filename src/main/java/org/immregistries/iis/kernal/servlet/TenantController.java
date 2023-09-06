@@ -1,5 +1,7 @@
 package org.immregistries.iis.kernal.servlet;
 
+import ca.uhn.fhir.i18n.Msg;
+import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -28,13 +30,16 @@ public class TenantController {
 	public static final String PARAM_ORG_MASTER_ID = "orgMasterId";
 
 	@PostMapping()
-	@Transactional()
+//	@Transactional()
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp, @RequestParam(name= PARAM_TENANT_NAME, required = false) String tenantName)
 		throws ServletException, IOException {
 		OrgAccess orgAccess = ServletHelper.getOrgAccess();
 		Session dataSession = PopServlet.getDataSession();
 		try {
 			if (StringUtils.isNotBlank(tenantName)) {
+				if (tenantName.indexOf("-") > 0) { // TODO find better way
+					throw new InvalidRequestException("Invalid tenant name , should not use -");
+				}
 				OrgMaster orgMaster = ServletHelper.authenticateOrgMaster(orgAccess, tenantName, dataSession);
 			}
 		} finally {
@@ -99,6 +104,15 @@ public class TenantController {
 				out.println("		<input class=\"w3-button w3-section w3-teal w3-ripple\" type=\"submit\" value=\"Add\"/> ");
 				out.println("    </form>");
 				out.println("</div>");
+
+				out.println("<div class=\"w3-container w3-margin-top\">");
+				out.println("	<div class=\"w3-panel w3-yellow\"><p class=\"w3-left-align\">" +
+					"Tenants are separated testing environments, One Tenant &#8792; One IIS equivalent, Different Facilities can be registered as information sources to the Tenants" +
+					"</p></div>"); // TODO better explanation
+
+				out.println("</div>");
+
+
 				HomeServlet.doFooter(out);
 			}
 		} finally {

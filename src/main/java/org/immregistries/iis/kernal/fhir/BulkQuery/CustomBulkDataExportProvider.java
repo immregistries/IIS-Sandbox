@@ -41,6 +41,7 @@ import org.hl7.fhir.instance.model.api.IBaseOperationOutcome;
 import org.hl7.fhir.instance.model.api.IIdType;
 import org.hl7.fhir.instance.model.api.IPrimitiveType;
 import org.hl7.fhir.r5.model.*;
+import org.immregistries.iis.kernal.fhir.interceptors.PartitionCreationInterceptor;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -110,7 +111,7 @@ public class CustomBulkDataExportProvider extends BulkDataExportProvider {
 		boolean useCache = shouldUseCache(theRequestDetails);
 
 		BulkExportParameters parameters = BulkExportUtils.createBulkExportJobParametersFromExportOptions(theOptions);
-		parameters.setTenantId(theRequestDetails.getTenantId());
+		parameters.setTenantId(PartitionCreationInterceptor.extractPartitionName(theRequestDetails));
 		parameters.setUseExistingJobsFirst(useCache);
 
 		// Set the original request URL as part of the job information, as this is used in the poll-status-endpoint, and is needed for the report.
@@ -157,10 +158,10 @@ public class CustomBulkDataExportProvider extends BulkDataExportProvider {
 	}
 
 	private String getDefaultPartitionServerBase(ServletRequestDetails theRequestDetails) {
-		if (theRequestDetails.getTenantId() == null || theRequestDetails.getTenantId().equals(JpaConstants.DEFAULT_PARTITION_NAME)) {
+		if (PartitionCreationInterceptor.extractPartitionName(theRequestDetails) == null || PartitionCreationInterceptor.extractPartitionName(theRequestDetails).equals(JpaConstants.DEFAULT_PARTITION_NAME)) {
 			return getServerBase(theRequestDetails);
 		} else {
-			return StringUtils.removeEnd(theRequestDetails.getServerBaseForRequest().replace(theRequestDetails.getTenantId(), JpaConstants.DEFAULT_PARTITION_NAME), "/");
+			return StringUtils.removeEnd(theRequestDetails.getServerBaseForRequest().replace(PartitionCreationInterceptor.extractPartitionName(theRequestDetails), JpaConstants.DEFAULT_PARTITION_NAME), "/");
 			/**
 			 * Prevent the change of tenant to default for NDJSON
 			 */
@@ -169,10 +170,10 @@ public class CustomBulkDataExportProvider extends BulkDataExportProvider {
 	}
 
 	private String getPartitionServerBase(ServletRequestDetails theRequestDetails) {
-		if (theRequestDetails.getTenantId() == null || theRequestDetails.getTenantId().equals(JpaConstants.DEFAULT_PARTITION_NAME)) {
+		if (PartitionCreationInterceptor.extractPartitionName(theRequestDetails) == null || PartitionCreationInterceptor.extractPartitionName(theRequestDetails).equals(JpaConstants.DEFAULT_PARTITION_NAME)) {
 			return getServerBase(theRequestDetails);
 		} else {
-//			return StringUtils.removeEnd(theRequestDetails.getServerBaseForRequest().replace(theRequestDetails.getTenantId(), JpaConstants.DEFAULT_PARTITION_NAME), "/");
+//			return StringUtils.removeEnd(theRequestDetails.getServerBaseForRequest().replace(PartitionCreationInterceptor.extractPartitionName(theRequestDetails), JpaConstants.DEFAULT_PARTITION_NAME), "/");
 			/**
 			 * Prevent the change of tenant to default for NDJSON
 			 */
@@ -326,7 +327,7 @@ public class CustomBulkDataExportProvider extends BulkDataExportProvider {
 						RequestDetails systemDefaultRequestDetails = new SystemRequestDetails();
 						systemDefaultRequestDetails.setTenantId("DEFAULT");
 						RequestDetails systemRequestDetails = new SystemRequestDetails();
-						systemRequestDetails.setTenantId(theRequestDetails.getTenantId());
+						systemRequestDetails.setTenantId(PartitionCreationInterceptor.extractPartitionName(theRequestDetails));
 						for (Map.Entry<String, List<String>> entrySet : results.getResourceTypeToBinaryIds().entrySet()) {
 							String resourceType = entrySet.getKey();
 							List<String> binaryIds = entrySet.getValue();

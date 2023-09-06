@@ -112,7 +112,7 @@ public class MdmCustomInterceptor {
 			ServletRequestDetails servletRequestDetails = new ServletRequestDetails();
 //			servletRequestDetails.setServer((RestfulServer) theRequestDetails.getServer());
 			servletRequestDetails.setServletRequest(request);
-			servletRequestDetails.setTenantId(theRequestDetails.getTenantId());
+			servletRequestDetails.setTenantId(PartitionCreationInterceptor.extractPartitionName(theRequestDetails));
 			MdmTransactionContext mdmTransactionContext = new MdmTransactionContext(MdmTransactionContext.OperationType.CREATE_RESOURCE);
 			mdmTransactionContext.setResourceType("Immunization");
 
@@ -162,7 +162,7 @@ public class MdmCustomInterceptor {
 				 * Create golden resource, currently made by mdm itself
 				 */
 //				IAnyResource golden = myGoldenResourceHelper.createGoldenResourceFromMdmSourceResource(immunization,mdmTransactionContext);
-//				golden.setUserData(Constants.RESOURCE_PARTITION_ID, RequestPartitionId.fromPartitionName(theRequestDetails.getTenantId()));
+//				golden.setUserData(Constants.RESOURCE_PARTITION_ID, RequestPartitionId.fromPartitionName(PartitionCreationInterceptor.extractPartitionName(theRequestDetails)));
 //				mdmLinkSvc.updateLink(golden,immunization,MdmMatchOutcome.NEW_GOLDEN_RESOURCE_MATCH,MdmLinkSourceEnum.MANUAL,mdmTransactionContext);
 			}
 		}
@@ -208,7 +208,7 @@ public class MdmCustomInterceptor {
 			}
 		}
 		if ((i1.getOrganisationID() == null || i1.getOrganisationID().isBlank()) && theRequestDetails != null) {
-			i1.setOrganisationID(theRequestDetails.getTenantId());
+			i1.setOrganisationID(PartitionCreationInterceptor.extractPartitionName(theRequestDetails));
 		}
 		logger.info("Organisation id {}", i1);
 		return i1;

@@ -589,7 +589,7 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler<Organizatio
 		if (patientReported == null) {
 //      patientMaster = new PatientMaster();
 			patientReported = new PatientReported();
-			patientReported.setOrgReported(orgMaster);
+			patientReported.setOrgMaster(orgMaster);
 			patientReported.setExternalLink(patientReportedExternalLink);
 			patientReported.setReportedDate(new Date());
 			patientReported.setManagingOrganizationId(managingOrganization.getId());
@@ -1205,7 +1205,7 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler<Organizatio
 					continue;
 				}
 				boolean originalReporter =
-					vaccination.getPatientReported().getOrgReported().equals(orgMaster);
+					vaccination.getPatientReported().getOrgMaster().equals(orgMaster);
 				if ("D".equals(vaccination.getActionCode())) {
 					continue;
 				}
@@ -1508,7 +1508,7 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler<Organizatio
 			if (cvxCode != null) {
 
 				boolean originalReporter =
-					vaccinationReported.getPatientReported().getOrgReported().equals(orgMaster);
+					vaccinationReported.getPatientReported().getOrgMaster().equals(orgMaster);
 				printORC(orgMaster, sb, vaccination, originalReporter);
 				sb.append("RXA");
 				// RXA-1

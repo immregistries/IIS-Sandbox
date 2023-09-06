@@ -196,7 +196,7 @@ public class BulkQueryGroupProviderR5 extends GroupResourceProvider {
 //
 //			IParser parser = fhirResourceGroupDao.getContext().newNDJsonParser();
 //			RequestDetails detailsCopy = new SystemRequestDetails();
-//			detailsCopy.setTenantId(theRequestDetails.getTenantId());
+//			detailsCopy.setTenantId(PartitionCreationInterceptor.extractPartitionName(theRequestDetails));
 //			for (Map.Entry<String, Bundle> entry : bundleMap.entrySet()) {
 //				Binary binary = new Binary();
 //				binary.setContentType("Bulk");

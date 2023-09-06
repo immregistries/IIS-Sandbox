@@ -255,7 +255,7 @@ public class IncomingEventHandler {
 
 		if (patientReported == null) {
 			patientReported = new PatientReported();
-			patientReported.setOrgReported(orgMaster);
+			patientReported.setOrgMaster(orgMaster);
 			patientReported.setExternalLink(patientReportedExternalLink);
 			patientReported.setReportedDate(new Date());
 		}
