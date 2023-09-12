@@ -50,12 +50,13 @@ public class MacroEndpointController {
 		Tenant tenant = null;
 		/**
 		 * one and only one organization must be specified in bundle
+		 * TODO deal with organization/Facility as managing organization
 		 */
 		try {
 			for (Bundle.BundleEntryComponent entry : facilityBundle.getEntry()) {
 				if (entry.getResource() instanceof Organization) {
 					if (tenant != null) {
-						throw new InvalidRequestException("More than one organisation present");
+						throw new InvalidRequestException("More than one organization present");
 					}
 					tenant = ServletHelper.authenticateTenant(userAccess, ((Organization) entry.getResource()).getName(), dataSession);
 				}
@@ -65,7 +66,7 @@ public class MacroEndpointController {
 		}
 
 		if (tenant == null) {
-			throw new InvalidRequestException("No organisation information specified");
+			throw new InvalidRequestException("No organization information specified");
 		} else  {
 			requestDetails = new ServletRequestDetails();
 			requestDetails.setTenantId(tenant.getOrganizationName());

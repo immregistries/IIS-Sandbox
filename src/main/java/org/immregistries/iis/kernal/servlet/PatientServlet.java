@@ -120,7 +120,7 @@ public class PatientServlet  {
 			Patient patientSelected  = getPatientFromParameter(req,fhirClient);
 
 			if (patientSelected == null) {
-				out.println("<h2>Patients from Facility : " + tenant.getOrganizationName() + "</h2>");
+				out.println("<h2>Patients</h2>");
 				out.println("<div class=\"w3-container w3-half w3-margin-top\">");
 				out.println("    <h3>Search Patient Registry</h3>");
 				out.println("    <form method=\"GET\" action=\"patient\" class=\"w3-container w3-card-4\">");

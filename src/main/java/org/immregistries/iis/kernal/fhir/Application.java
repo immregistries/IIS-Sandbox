@@ -2,20 +2,16 @@ package org.immregistries.iis.kernal.fhir;
 
 import ca.uhn.fhir.batch2.jobs.config.Batch2JobsConfig;
 import ca.uhn.fhir.jpa.batch2.JpaBatch2Config;
-import org.immregistries.iis.kernal.fhir.annotations.OnEitherVersion;
-import org.immregistries.iis.kernal.fhir.annotations.OnR4Condition;
-import org.immregistries.iis.kernal.fhir.mdm.MdmConfig;
 import ca.uhn.fhir.jpa.subscription.channel.config.SubscriptionChannelConfig;
 import ca.uhn.fhir.jpa.subscription.match.config.SubscriptionProcessorConfig;
 import ca.uhn.fhir.jpa.subscription.match.config.WebsocketDispatcherConfig;
 import ca.uhn.fhir.jpa.subscription.submit.config.SubscriptionSubmitterConfig;
 import ca.uhn.fhir.rest.server.RestfulServer;
+import org.immregistries.iis.kernal.fhir.annotations.OnEitherVersion;
+import org.immregistries.iis.kernal.fhir.mdm.MdmConfig;
 import org.immregistries.iis.kernal.fhir.security.ServerSecurityConfig;
 import org.immregistries.iis.kernal.logic.CodeMapManager;
 import org.immregistries.iis.kernal.servlet.HomeServlet;
-import org.immregistries.iis.kernal.servlet.LoginServlet;
-import org.immregistries.iis.kernal.servlet.PopServlet;
-import org.immregistries.iis.kernal.servlet.PopServletR4;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.boot.SpringApplication;
@@ -30,8 +26,6 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Import;
 import org.springframework.web.context.request.RequestContextListener;
-
-import javax.servlet.http.HttpServlet;
 
 @ServletComponentScan(basePackageClasses = {
 	RestfulServer.class}, basePackages = {
@@ -57,22 +51,22 @@ import javax.servlet.http.HttpServlet;
 })
 public class Application extends SpringBootServletInitializer {
 
-  public static void main(String[] args) {
-	  CodeMapManager.getCodeMap(); // Initializes codemaps
-    SpringApplication.run(Application.class, args);
+	@Autowired
+	AutowireCapableBeanFactory beanFactory;
 
-    //Server is now accessible at eg. http://localhost:8080/fhir/metadata
-    //UI is now accessible at http://localhost:8080/
-  }
+	public static void main(String[] args) {
+		CodeMapManager.getCodeMap(); // Initializes codemaps
+		SpringApplication.run(Application.class, args);
 
-  @Override
-  protected SpringApplicationBuilder configure(
-    SpringApplicationBuilder builder) {
-    return builder.sources(Application.class);
-  }
+		//Server is now accessible at eg. http://localhost:8080/fhir/metadata
+		//UI is now accessible at http://localhost:8080/
+	}
 
-  @Autowired
-  AutowireCapableBeanFactory beanFactory;
+	@Override
+	protected SpringApplicationBuilder configure(
+		SpringApplicationBuilder builder) {
+		return builder.sources(Application.class);
+	}
 
 	@Bean
 	@Conditional(OnEitherVersion.class)

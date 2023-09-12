@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Conditional(OnR4Condition.class)
-public class OrganisationMapperR4 implements OrganizationMapper<Organization> {
+public class OrganizationMapperR4 implements OrganizationMapper<Organization> {
 //	TODO
 
 	public Organization getFhirResource(Tenant tenant) {

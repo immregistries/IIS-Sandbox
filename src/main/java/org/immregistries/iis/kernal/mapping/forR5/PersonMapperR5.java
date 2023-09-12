@@ -41,7 +41,7 @@ public class PersonMapperR5 implements PersonMapper<Person> {
 		if ( modelPerson.getProfessionalSuffix() != null) {
 			name.addSuffix(modelPerson.getProfessionalSuffix());
 		}
-		p.setManagingOrganization(MappingHelper.getFhirReference(MappingHelper.ORGANISATION,ORGANISATION_ASSIGNING_AUTHORITY, modelPerson.getAssigningAuthority()));
+		p.setManagingOrganization(MappingHelper.getFhirReference(MappingHelper.ORGANIZATION, ORGANIZATION_ASSIGNING_AUTHORITY, modelPerson.getAssigningAuthority()));
 		return p;
 	}
 

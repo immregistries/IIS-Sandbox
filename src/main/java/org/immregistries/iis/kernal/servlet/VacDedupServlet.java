@@ -188,14 +188,14 @@ public class VacDedupServlet extends HttpServlet {
             out.println("          <th>Org</th>");
             out.println("          <th>Source</th>");
             out.println("        </tr>");
-            for (Immunization immunization : li) {
+            for (Immunization imm : li) {
               out.println("        <tr>");
-              out.println("          <td>" + sdf.format(immunization.getDate()) + "</td>");
-              out.println("          <td>" + immunization.getCVX() + "</td>");
-              out.println("          <td>" + immunization.getMVX() + "</td>");
-              out.println("          <td>" + immunization.getLotNumber() + "</td>");
-              out.println("          <td>" + immunization.getOrganisationID() + "</td>");
-              out.println("          <td>" + immunization.getSource() + "</td>");
+              out.println("          <td>" + sdf.format(imm.getDate()) + "</td>");
+              out.println("          <td>" + imm.getCVX() + "</td>");
+              out.println("          <td>" + imm.getMVX() + "</td>");
+              out.println("          <td>" + imm.getLotNumber() + "</td>");
+              out.println("          <td>" + imm.getOrganisationID() + "</td>");
+              out.println("          <td>" + imm.getSource() + "</td>");
               out.println("        </tr>");
             }
             out.println("      </table>");

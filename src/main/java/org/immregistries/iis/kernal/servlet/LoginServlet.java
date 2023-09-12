@@ -64,7 +64,8 @@ public class LoginServlet {
 				out.println("		<input class=\"w3-input\" type=\"password\" name=\"" + PARAM_PASSWORD + "\" value=\"\"/>");
 				out.println("		<label>Password</label>");
 				out.println("		<input class=\"w3-input\" type=\"text\" name=\"" + PARAM_TENANTID + "\" value=\"" + tenantId + "\"/>");
-				out.println("		<label>Tenant Name (optional)</label><br/>");
+				out.println("		<label>Tenant Name (optional)</label>");
+				out.println("		<br/>");
 				out.println("		<input class=\"w3-button w3-section w3-teal w3-ripple\" type=\"submit\" name=\"" + PARAM_ACTION + "\" value=\"" + ACTION_LOGIN + "\"/>");
 				out.println("	</form>");
 				out.println("	<div class=\"w3-container w3-card-4 w3-half\">");

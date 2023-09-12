@@ -9,7 +9,7 @@ import org.immregistries.smm.tester.manager.HL7Reader;
 import java.util.*;
 
 public interface IIncomingMessageHandler<Organization extends IBaseResource> {
-	public String process(String message, Tenant tenant);
+	public String process(String message, Tenant tenant, String facilityName);
 
 
 	public String buildVxu(VaccinationReported vaccinationReported, Tenant tenant);

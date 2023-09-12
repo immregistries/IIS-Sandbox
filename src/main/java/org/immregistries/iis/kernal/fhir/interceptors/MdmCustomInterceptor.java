@@ -197,12 +197,12 @@ public class MdmCustomInterceptor {
 			i1.setSource(ImmunizationSource.HISTORICAL);
 		}
 
-		if (immunization.hasInformationSource()) { // TODO improve organisation naming and designation among tenancy or in resource info
+		if (immunization.hasInformationSource()) { // TODO improve organization naming and designation among tenancy or in resource info
 			if (immunization.getInformationSource().getReference() != null) {
 				if (immunization.getInformationSource().getReference().getIdentifier() != null) {
 					i1.setOrganisationID(immunization.getInformationSource().getReference().getIdentifier().getValue());
 				} else if (immunization.getInformationSource().getReference().getReference() != null
-					&& immunization.getInformationSource().getReference().getReference().startsWith("Organisation/")) {
+					&& immunization.getInformationSource().getReference().getReference().startsWith("Organization/")) {
 					i1.setOrganisationID(immunization.getInformationSource().getReference().getReference()); // TODO get organisation name from db
 				}
 			}
@@ -210,7 +210,6 @@ public class MdmCustomInterceptor {
 		if ((i1.getOrganisationID() == null || i1.getOrganisationID().isBlank()) && theRequestDetails != null) {
 			i1.setOrganisationID(PartitionCreationInterceptor.extractPartitionName(theRequestDetails));
 		}
-		logger.info("Organisation id {}", i1);
 		return i1;
 	}
 

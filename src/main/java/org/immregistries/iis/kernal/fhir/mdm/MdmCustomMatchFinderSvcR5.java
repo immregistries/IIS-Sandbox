@@ -156,7 +156,7 @@ public class MdmCustomMatchFinderSvcR5 extends MdmMatchFinderSvcImpl implements 
 				if (immunization.getInformationSource().getReference().getIdentifier() != null) {
 					i1.setOrganisationID(immunization.getInformationSource().getReference().getIdentifier().getValue());
 				} else if (immunization.getInformationSource().getReference().getReference() != null
-					&& immunization.getInformationSource().getReference().getReference().startsWith("Organisation/")) {
+					&& immunization.getInformationSource().getReference().getReference().startsWith("Organization/")) {
 					i1.setOrganisationID(immunization.getInformationSource().getReference().getReference()); // TODO get organisation name from db
 				}
 			}

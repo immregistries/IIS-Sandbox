@@ -74,7 +74,7 @@ public class TestMapping extends HttpServlet {
 					for (String msh: messages) {
 						if(!msh.isBlank()){
 							testPatientMapping(tenant,msh);
-							ackBuilder.append(handler.process("MSH|^~\\&|" + msh, tenant));
+							ackBuilder.append(handler.process("MSH|^~\\&|" + msh, tenant, null));
 							ackBuilder.append("\r\n");
 						}
 					}

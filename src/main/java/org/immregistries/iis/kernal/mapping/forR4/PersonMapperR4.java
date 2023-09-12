@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 @Service
 @Conditional(OnR4Condition.class)
 public class PersonMapperR4 implements PersonMapper<Person> {
-	public static final String ORGANISATION_ASSIGNING_AUTHORITY = "AssigningAuthority";
 
 	public ModelPerson getModelPerson(Person p) {
 		ModelPerson modelPerson = new ModelPerson();
@@ -43,7 +42,7 @@ public class PersonMapperR4 implements PersonMapper<Person> {
 		if ( modelPerson.getProfessionalSuffix() != null) {
 			name.addSuffix(modelPerson.getProfessionalSuffix());
 		}
-		p.setManagingOrganization(MappingHelper.getFhirR4Reference(MappingHelper.ORGANISATION,ORGANISATION_ASSIGNING_AUTHORITY, modelPerson.getAssigningAuthority()));
+		p.setManagingOrganization(MappingHelper.getFhirR4Reference(MappingHelper.ORGANIZATION,ORGANIZATION_ASSIGNING_AUTHORITY, modelPerson.getAssigningAuthority()));
 		return p;
 	}
 

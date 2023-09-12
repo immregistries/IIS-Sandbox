@@ -33,7 +33,7 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler<Organizatio
 	private static final double MINIMAL_MATCHING_SCORE = 0.9;
 	private final Logger logger = LoggerFactory.getLogger(IncomingMessageHandler.class);
 
-	public String process(String message, Tenant tenant) {
+	public String process(String message, Tenant tenant, String sendingFacilityName) {
 		HL7Reader reader = new HL7Reader(message);
 		String messageType = reader.getValue(9);
 		String responseMessage;
@@ -47,14 +47,27 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler<Organizatio
 						"MSH", 1, 4);
 				}
 			}
-			Organization sendingOrganization = processSendingOrganization(reader);
-			Organization managingOrganization = processManagingOrganization(reader);
+			Organization sendingOrganization = null;
+			if (StringUtils.isNotBlank(sendingFacilityName) && !sendingFacilityName.equals("null")){
+				sendingOrganization = (Organization) fhirRequester.searchOrganization(Organization.NAME.matches().value(sendingFacilityName));
+				if (sendingOrganization == null) {
+					sendingOrganization = (Organization) fhirRequester.saveOrganization(new Organization()
+						.setName(sendingFacilityName));
+				}
+			}
+
+			if (sendingOrganization == null) {
+				sendingOrganization = processSendingOrganization(reader);
+			}
+			if (sendingOrganization == null) {
+				sendingOrganization = processManagingOrganization(reader);
+			}
 			switch (messageType) {
 				case "VXU":
-					responseMessage = processVXU(tenant, reader, message, managingOrganization);
+					responseMessage = processVXU(tenant, reader, message, sendingOrganization);
 					break;
 				case "ORU":
-					responseMessage = processORU(tenant, reader, message, managingOrganization);
+					responseMessage = processORU(tenant, reader, message, sendingOrganization);
 					break;
 				case "QBP":
 					responseMessage = processQBP(tenant, reader, message);
@@ -590,7 +603,7 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler<Organizatio
 			patientReported.setExternalLink(patientReportedExternalLink);
 			patientReported.setReportedDate(new Date());
 			if (managingOrganization != null) {
-				patientReported.setManagingOrganizationId(managingOrganization.getId());
+				patientReported.setManagingOrganizationId("Organization/" + managingOrganization.getIdElement().getIdPart());
 			}
 
 		}
@@ -1741,7 +1754,7 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler<Organizatio
 	private Organization processSendingOrganization(HL7Reader reader) {
 		String organizationName = reader.getValue(4, 1);
 		Organization sendingOrganization = (Organization) fhirRequester.searchOrganization(Organization.IDENTIFIER.exactly()
-			.systemAndIdentifier(organizationName, reader.getValue(4, 2)));
+			.systemAndIdentifier(reader.getValue(4, 10), reader.getValue(4, 2)));
 		if (sendingOrganization == null && StringUtils.isNotBlank(organizationName)) {
 			sendingOrganization = new Organization()
 				.setName(organizationName)

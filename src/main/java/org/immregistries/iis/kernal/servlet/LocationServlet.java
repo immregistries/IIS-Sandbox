@@ -131,7 +131,7 @@ public class LocationServlet extends HttpServlet {
 
 			HomeServlet.doHeader(out, "IIS Sandbox");
 
-			out.println("    <h2>Facility: " + tenant.getOrganizationName() + "</h2>");
+			out.println("    <h2>Facility</h2>");
 			if (orgLocationSelected == null) {
 				out.println("  <div class=\"w3-container\">");
 				{

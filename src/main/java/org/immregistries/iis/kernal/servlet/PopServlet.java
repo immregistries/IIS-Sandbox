@@ -1,5 +1,6 @@
 package org.immregistries.iis.kernal.servlet;
 
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.transaction.Transactional;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -36,6 +38,7 @@ import java.util.ArrayList;
 public class PopServlet {
 	Logger logger = LoggerFactory.getLogger(PopServlet.class);
 	public static final String PARAM_MESSAGE = "MESSAGEDATA";
+	public static final String PARAM_FACILITY_NAME = "FACILITY_NAME";
 	private static SessionFactory factory;
 	@Autowired
 	RepositoryClientFactory repositoryClientFactory;
@@ -50,12 +53,15 @@ public class PopServlet {
 	}
 
 	@PostMapping
+//	@Transactional
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
 		throws ServletException, IOException {
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		try {
 			String message = req.getParameter(PARAM_MESSAGE);
+			String facility_name = req.getParameter(PARAM_FACILITY_NAME);
+
 			Tenant tenant = ServletHelper.getTenant();
 
 			String ack = "";
@@ -76,7 +82,7 @@ public class PopServlet {
 					}
 					for (String msh : messages) {
 						if (!msh.isBlank()) {
-							ackBuilder.append(handler.process("MSH|^~\\&|" + msh, tenant));
+							ackBuilder.append(handler.process("MSH|^~\\&|" + msh, tenant,facility_name));
 							ackBuilder.append("\r\n");
 						}
 					}
@@ -116,6 +122,10 @@ public class PopServlet {
 		UserAccess userAccess = ServletHelper.getUserAccess();
 		try {
 			String message = req.getParameter(PARAM_MESSAGE);
+			String organizationName = req.getParameter(PARAM_FACILITY_NAME);
+			if (organizationName == null) {
+				organizationName = "";
+			}
 			if (message == null || message.equals("")) {
 				TestCaseMessage testCaseMessage =
 					ScenarioManager.createTestCaseMessage(ScenarioManager.SCENARIO_1_R_ADMIN_CHILD);
@@ -128,23 +138,22 @@ public class PopServlet {
 			{
 				HomeServlet.doHeader(out, "IIS Sandbox - Pop");
 				out.println("    <h2>Send Now</h2>");
-				out.println("    <form action=\"pop\" method=\"POST\" target=\"_blank\">");
+				out.println("    <form action=\"pop\" method=\"POST\" target=\"_blank\" autocomplete=\"on\">");
 				out.println("      <h3>VXU Message</h3>");
-				out.println("      <textarea class=\"w3-input\" name=\"" + PARAM_MESSAGE
+				out.println("      <textarea class=\"w3-input\" autocomplete=\"off\" name=\"" + PARAM_MESSAGE
 					+ "\" rows=\"15\" cols=\"160\">" + message + "</textarea></td>");
 				out.println("    <div class=\"w3-container w3-half w3-margin-top\">");
 
 
-				if (userAccess == null) {
-					out.println("<input class=\"w3-button w3-section w3-teal w3-ripple\" type=\"submit\" name=\"submit\" value=\"Submit\"/>");
-					out.println("    <span class=\"w3-yellow\">Test Data Only</span>");
-				} else {
-					out.println("    <div class=\"w3-container w3-card-4\">");
-					out.println("<input class=\"w3-button w3-section w3-teal w3-ripple\" type=\"submit\" name=\"submit\" value=\"Submit\"/>");
-					out.println("    <span class=\"w3-yellow\">Test Data Only</span>");
+				out.println("    <div class=\"w3-container w3-card-4\">");
+				out.println("		<input class=\"w3-input\" type=\"text\" auto name=\"" + PARAM_FACILITY_NAME + "\" value=\""+  organizationName +"\"/>");
+				out.println("		<label>Sending organization name (Overriding the segments)</label>");
+				out.println("		<br/>");
 
-					out.println("    </div>");
-				}
+				out.println("		<input class=\"w3-button w3-section w3-teal w3-ripple\" type=\"submit\" name=\"submit\" value=\"Submit\"/>");
+				out.println("     <span class=\"w3-yellow\">Test Data Only</span>");
+
+				out.println("    </div>");
 
 
 				out.println("    </div>");

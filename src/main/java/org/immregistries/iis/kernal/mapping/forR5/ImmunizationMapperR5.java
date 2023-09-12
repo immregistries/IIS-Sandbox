@@ -185,7 +185,7 @@ public class ImmunizationMapperR5 implements ImmunizationMapper<Immunization> {
 	  if (StringUtils.isNotBlank(vr.getVaccineNdcCode())) {
 		  i.getVaccineCode().addCoding().setCode(vr.getVaccineNdcCode()).setSystem(NDC);
 	  }
-	  i.setManufacturer(MappingHelper.getFhirCodeableReference(MappingHelper.ORGANISATION, MVX, vr.getVaccineMvxCode()));
+	  i.setManufacturer(MappingHelper.getFhirCodeableReference(MappingHelper.ORGANIZATION, MVX, vr.getVaccineMvxCode()));
 
 	  i.setDoseQuantity(new Quantity().setValue(new BigDecimal(vr.getAdministeredAmount())));
 

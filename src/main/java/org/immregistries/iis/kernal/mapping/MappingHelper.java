@@ -14,7 +14,7 @@ public class MappingHelper {
 	public static final String PATIENT = "Patient";
 	public static final String IMMUNIZATION = "Immunization";
 	public static final String OBSERVATION = "Observation";
-	public static final String ORGANISATION = "Organisation";
+	public static final String ORGANIZATION = "Organization";
 	public static final String LOCATION = "Location";
 	public static final String PERSON = "Person";
 	public static final String PRACTITIONER = "Practitioner";
