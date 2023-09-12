@@ -1,14 +1,18 @@
 package org.immregistries.iis.kernal.InternalClient;
 
+import ca.uhn.fhir.jpa.api.dao.IFhirResourceDao;
+import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.gclient.ICriterion;
+import ca.uhn.fhir.rest.gclient.ICriterionInternal;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.r5.model.*;
 import org.immregistries.iis.kernal.fhir.annotations.OnR5Condition;
 import org.immregistries.iis.kernal.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Component;
 
@@ -19,7 +23,9 @@ import java.util.Optional;
 @Component
 @Conditional(OnR5Condition.class)
 public class FhirRequesterR5 extends FhirRequester<Patient, Immunization, Location, Practitioner, Observation, Person, Organization, RelatedPerson> {
-	Logger logger = LoggerFactory.getLogger(FhirRequesterR5.class);
+
+	@Autowired
+	IFhirResourceDao<Patient> patientDao;
 
 	public PatientMaster searchPatientMaster(ICriterion... where) {
 		PatientMaster patientMaster = null;
