@@ -2,6 +2,8 @@ package org.immregistries.iis.kernal.servlet;
 
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Configuration;
 import org.hl7.fhir.r4.model.Group;
 import org.hl7.fhir.r4.model.Reference;
 import org.immregistries.iis.kernal.fhir.annotations.OnR4Condition;
@@ -25,30 +27,33 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.transaction.Transactional;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 
-import static org.immregistries.iis.kernal.servlet.LoginServlet.*;
+import static org.immregistries.iis.kernal.servlet.PopServlet.PARAM_FACILITY_NAME;
+import static org.immregistries.iis.kernal.servlet.PopServlet.PARAM_MESSAGE;
 
 @RestController()
-@RequestMapping("/pop")
+@RequestMapping({"/pop","/tenant/{tenantId}/pop"})
 @Conditional(OnR4Condition.class)
-public class PopServletR4  {
-	Logger logger = LoggerFactory.getLogger(PopServletR4.class);
-	public static final String PARAM_MESSAGE = "MESSAGEDATA";
+public class PopServletR4 {
+	Logger logger = LoggerFactory.getLogger(PopServlet.class);
 	@Autowired
 	RepositoryClientFactory repositoryClientFactory;
 	@Autowired
 	private IncomingMessageHandler handler;
 
-	@PostMapping()
+	@PostMapping
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
 		throws ServletException, IOException {
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		try {
 			String message = req.getParameter(PARAM_MESSAGE);
+			String facility_name = req.getParameter(PARAM_FACILITY_NAME);
+
 			Tenant tenant = ServletHelper.getTenant();
 
 			String ack = "";
@@ -69,7 +74,7 @@ public class PopServletR4  {
 					}
 					for (String msh : messages) {
 						if (!msh.isBlank()) {
-							ackBuilder.append(handler.process("MSH|^~\\&|" + msh, tenant,null));
+							ackBuilder.append(handler.process("MSH|^~\\&|" + msh, tenant,facility_name));
 							ackBuilder.append("\r\n");
 						}
 					}
@@ -101,17 +106,18 @@ public class PopServletR4  {
 		out.close();
 	}
 
-	@GetMapping()
+	@GetMapping
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
 		throws ServletException, IOException {
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		UserAccess userAccess = ServletHelper.getUserAccess();
-		String userId = null;
-		String password = null;
-		String facilityId = null;
 		try {
 			String message = req.getParameter(PARAM_MESSAGE);
+			String organizationName = req.getParameter(PARAM_FACILITY_NAME);
+			if (organizationName == null) {
+				organizationName = "";
+			}
 			if (message == null || message.equals("")) {
 				TestCaseMessage testCaseMessage =
 					ScenarioManager.createTestCaseMessage(ScenarioManager.SCENARIO_1_R_ADMIN_CHILD);
@@ -119,64 +125,27 @@ public class PopServletR4  {
 				transformer.transform(testCaseMessage);
 				message = testCaseMessage.getMessageText();
 			}
-			if (StringUtils.isNotBlank(req.getParameter(PARAM_USERID))) {
-				userId = req.getParameter(PARAM_USERID);
-			}
-			if (StringUtils.isBlank(userId)) {
-				userId = "Mercy";
-			}
-			if (StringUtils.isNotBlank(req.getParameter(PARAM_PASSWORD))) {
-				password = req.getParameter(PARAM_PASSWORD);
-			}
-			if (StringUtils.isBlank(password)) {
-				password = "password1234";
-			}
-			if (req.getParameter(PARAM_TENANTID) == null || req.getParameter(PARAM_TENANTID).isBlank()) {
-				facilityId = req.getParameter(PARAM_TENANTID);
-				if (StringUtils.isBlank(facilityId)) {
-					facilityId = "Mercy-Healthcare";
-				}
-			}
+
 
 			{
 				HomeServlet.doHeader(out, "IIS Sandbox - Pop");
 				out.println("    <h2>Send Now</h2>");
-				out.println("    <form action=\"pop\" method=\"POST\" target=\"_blank\">");
+				out.println("    <form action=\"pop\" method=\"POST\" target=\"_blank\" autocomplete=\"on\">");
 				out.println("      <h3>VXU Message</h3>");
-				out.println("      <textarea class=\"w3-input\" name=\"" + PARAM_MESSAGE
+				out.println("      <textarea class=\"w3-input\" autocomplete=\"off\" name=\"" + PARAM_MESSAGE
 					+ "\" rows=\"15\" cols=\"160\">" + message + "</textarea></td>");
 				out.println("    <div class=\"w3-container w3-half w3-margin-top\">");
 
 
-				if (userAccess == null) {
-					// TODO duplicate login form ?
-//					out.println("      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_USERID
-//						+ "\" value=\"" + userId + "\"/>");
-//					out.println("      <label>User Id</label>");
-//					out.println("      <input class=\"w3-input\" type=\"password\" name=\"" + PARAM_PASSWORD
-//						+ "\"/>");
-//					out.println("      <label>Password</label>");
-//					out.println("      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_FACILITYID
-//						+ "\" value=\"" + facilityId + "\"/>");
-//					out.println("      <label>Facility Id</label>");
-					out.println("<input class=\"w3-button w3-section w3-teal w3-ripple\" type=\"submit\" name=\"submit\" value=\"Submit\"/>");
-					out.println("    <span class=\"w3-yellow\">Test Data Only</span>");
-				} else {
+				out.println("    <div class=\"w3-container w3-card-4\">");
+				out.println("		<input class=\"w3-input\" type=\"text\" auto name=\"" + PARAM_FACILITY_NAME + "\" value=\""+  organizationName +"\"/>");
+				out.println("		<label>Sending organization name (Overriding the segments)</label>");
+				out.println("		<br/>");
 
-					out.println("    <div class=\"w3-container w3-card-4\">");
-//					out.println("      <h3>Authentication</h3>");
-//					out.println("      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_USERID
-//						+ "\" value=\"" + userAccess.getAccessName() + "\"/ disabled>");
-//					out.println("      <label>User Id</label>");
-//					out.println("      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_FACILITYID
-//						+ "\" value=\"" + userAccess.getOrg().getOrganizationName() + "\" disabled/>");
-//					out.println("      <label>Facility Id</label>");
-//					out.println("      <br/>");
-					out.println("<input class=\"w3-button w3-section w3-teal w3-ripple\" type=\"submit\" name=\"submit\" value=\"Submit\"/>");
-					out.println("    <span class=\"w3-yellow\">Test Data Only</span>");
+				out.println("		<input class=\"w3-button w3-section w3-teal w3-ripple\" type=\"submit\" name=\"submit\" value=\"Submit\"/>");
+				out.println("     <span class=\"w3-yellow\">Test Data Only</span>");
 
-					out.println("    </div>");
-				}
+				out.println("    </div>");
 
 
 				out.println("    </div>");

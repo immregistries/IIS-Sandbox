@@ -561,8 +561,6 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler<Organizatio
 													  List<ProcessingException> processingExceptionList, Set<ProcessingFlavor> processingFlavorSet,
 													  CodeMap codeMap, boolean strictDate, PatientReported patientReported, Organization managingOrganization)
 		throws ProcessingException {
-
-//    PatientMaster patientMaster = null;
 		String patientReportedExternalLink = "";
 		String patientReportedAuthority = "";
 		String patientReportedType = "MR";
@@ -597,7 +595,6 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler<Organizatio
 		);
 
 		if (patientReported == null) {
-//      patientMaster = new PatientMaster();
 			patientReported = new PatientReported();
 			patientReported.setTenant(tenant);
 			patientReported.setExternalLink(patientReportedExternalLink);
@@ -605,7 +602,6 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler<Organizatio
 			if (managingOrganization != null) {
 				patientReported.setManagingOrganizationId("Organization/" + managingOrganization.getIdElement().getIdPart());
 			}
-
 		}
 
 		{

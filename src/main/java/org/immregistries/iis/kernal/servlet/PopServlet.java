@@ -9,7 +9,6 @@ import org.hl7.fhir.r5.model.Reference;
 import org.immregistries.iis.kernal.fhir.annotations.OnR5Condition;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.logic.IncomingMessageHandler;
-import org.immregistries.iis.kernal.model.UserAccess;
 import org.immregistries.iis.kernal.InternalClient.RepositoryClientFactory;
 import org.immregistries.iis.kernal.model.Tenant;
 import org.immregistries.smm.transform.ScenarioManager;
@@ -119,7 +118,6 @@ public class PopServlet {
 		throws ServletException, IOException {
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
-		UserAccess userAccess = ServletHelper.getUserAccess();
 		try {
 			String message = req.getParameter(PARAM_MESSAGE);
 			String organizationName = req.getParameter(PARAM_FACILITY_NAME);

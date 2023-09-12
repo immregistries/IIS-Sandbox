@@ -1,9 +1,10 @@
 package org.immregistries.iis.kernal.servlet;
 
 import org.hibernate.Session;
-import org.immregistries.iis.kernal.fhir.security.ServletHelper;
-import org.immregistries.iis.kernal.model.UserAccess;
 import org.immregistries.iis.kernal.model.Tenant;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,7 +22,7 @@ public class LoginServlet {
 
 	public static final String PARAM_USERID = "USERID";
 	public static final String PARAM_PASSWORD = "PASSWORD";
-	public static final String PARAM_TENANTID = "TENANTID";
+	public static final String PARAM_TENANT_NAME = "TENANTID";
 	public static final String PARAM_ORG_ID = "orgId";
 
 	public static final String PARAM_ACTION = "action";
@@ -41,10 +42,11 @@ public class LoginServlet {
 		Session dataSession = PopServlet.getDataSession();
 		try {
 			HomeServlet.doHeader(out, "IIS Sandbox");
-			UserAccess userAccess = ServletHelper.getUserAccess();
-			if (userAccess == null) { // LOGIN FORM, inherited, could be made in a separate class and improved
+			Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+         // LOGIN FORM, inherited, could be made in a separate class and improved
+			if (!authentication.isAuthenticated() || authentication instanceof AnonymousAuthenticationToken) {
 				String userId = req.getParameter(PARAM_USERID);
-				String tenantId = req.getParameter(PARAM_TENANTID);
+				String tenantId = req.getParameter(PARAM_TENANT_NAME);
 				if (userId == null) {
 					userId = "";
 				}
@@ -63,7 +65,7 @@ public class LoginServlet {
 				out.println("		<label>User Id</label>");
 				out.println("		<input class=\"w3-input\" type=\"password\" name=\"" + PARAM_PASSWORD + "\" value=\"\"/>");
 				out.println("		<label>Password</label>");
-				out.println("		<input class=\"w3-input\" type=\"text\" name=\"" + PARAM_TENANTID + "\" value=\"" + tenantId + "\"/>");
+				out.println("		<input class=\"w3-input\" type=\"text\" name=\"" + PARAM_TENANT_NAME + "\" value=\"" + tenantId + "\"/>");
 				out.println("		<label>Tenant Name (optional)</label>");
 				out.println("		<br/>");
 				out.println("		<input class=\"w3-button w3-section w3-teal w3-ripple\" type=\"submit\" name=\"" + PARAM_ACTION + "\" value=\"" + ACTION_LOGIN + "\"/>");
