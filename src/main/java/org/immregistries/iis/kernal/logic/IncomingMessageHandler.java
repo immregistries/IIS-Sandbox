@@ -10,6 +10,7 @@ import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodeStatusValue;
 import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.SoftwareVersion;
+import org.immregistries.iis.kernal.fhir.interceptors.PartitionCreationInterceptor;
 import org.immregistries.iis.kernal.mapping.Interfaces.ImmunizationMapper;
 import org.immregistries.iis.kernal.mapping.Interfaces.LocationMapper;
 import org.immregistries.iis.kernal.mapping.Interfaces.ObservationMapper;
@@ -46,6 +47,9 @@ public abstract class IncomingMessageHandler<Organization extends IBaseResource>
 	ObservationMapper observationMapper;
 	@Autowired
 	LocationMapper locationMapper;
+
+	@Autowired
+	PartitionCreationInterceptor partitionCreationInterceptor;
 
   protected IGenericClient getFhirClient() {
 	  return repositoryClientFactory.getFhirClient();

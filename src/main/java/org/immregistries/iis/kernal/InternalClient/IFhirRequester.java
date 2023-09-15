@@ -1,7 +1,8 @@
 package org.immregistries.iis.kernal.InternalClient;
 
+import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
+import ca.uhn.fhir.rest.api.server.IBundleProvider;
 import ca.uhn.fhir.rest.gclient.ICriterion;
-import org.hl7.fhir.instance.model.api.IBaseBundle;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.immregistries.iis.kernal.model.*;
 
@@ -28,31 +29,31 @@ public interface IFhirRequester<
 	Organization extends IBaseResource,
 	RelatedPerson extends IBaseResource> {
 
-	public PatientMaster searchPatientMaster(ICriterion... where);
+	public PatientMaster searchPatientMaster(SearchParameterMap searchParameterMap);
 
-	public PatientReported searchPatientReported(ICriterion... where);
+	public PatientReported searchPatientReported(SearchParameterMap searchParameterMap);
 
-	public List<PatientReported> searchPatientReportedList(ICriterion... where);
-	public List<PatientMaster> searchPatientMasterGoldenList(ICriterion... where);
+	public List<PatientReported> searchPatientReportedList(SearchParameterMap searchParameterMap);
+	public List<PatientMaster> searchPatientMasterGoldenList(SearchParameterMap searchParameterMap);
 
-	public VaccinationMaster searchVaccinationMaster(ICriterion... where);
+	public VaccinationMaster searchVaccinationMaster(SearchParameterMap searchParameterMap);
 
-	public VaccinationReported searchVaccinationReported(ICriterion... where);
+	public VaccinationReported searchVaccinationReported(SearchParameterMap searchParameterMap);
 
-	public List<VaccinationReported> searchVaccinationReportedList(ICriterion... where);
+	public List<VaccinationReported> searchVaccinationReportedList(SearchParameterMap searchParameterMap);
 	public List<VaccinationMaster> searchVaccinationListOperationEverything(String patientId);
 
-	public ObservationReported searchObservationReported(ICriterion... where);
-	public Organization searchOrganization(ICriterion... where);
-	public RelatedPerson searchRelatedPerson(ICriterion... where);
+	public ObservationReported searchObservationReported(SearchParameterMap searchParameterMap);
+	public Organization searchOrganization(SearchParameterMap searchParameterMap);
+	public RelatedPerson searchRelatedPerson(SearchParameterMap searchParameterMap);
 
 
-	public ObservationMaster searchObservationMaster(ICriterion... where);
-	public List<ObservationReported> searchObservationReportedList(ICriterion... where);
-	public OrgLocation searchOrgLocation(ICriterion... where);
-	public List<OrgLocation> searchOrgLocationList(ICriterion... where);
-	public ModelPerson searchPerson(ICriterion... where);
-	public ModelPerson searchPractitioner(ICriterion... where);
+	public ObservationMaster searchObservationMaster(SearchParameterMap searchParameterMap);
+	public List<ObservationReported> searchObservationReportedList(SearchParameterMap searchParameterMap);
+	public OrgLocation searchOrgLocation(SearchParameterMap searchParameterMap);
+	public List<OrgLocation> searchOrgLocationList(SearchParameterMap searchParameterMap);
+	public ModelPerson searchPerson(SearchParameterMap searchParameterMap);
+	public ModelPerson searchPractitioner(SearchParameterMap searchParameterMap);
 
 	public PatientReported savePatientReported(PatientReported patientReported);
 	public ModelPerson savePractitioner(ModelPerson modelPerson);
@@ -83,8 +84,8 @@ public interface IFhirRequester<
 
 	public PatientMaster readPatientMasterWithMdmLink(String patientId);
 
-	IBaseBundle searchRegularRecord(Class<? extends IBaseResource> aClass, ICriterion... where);
+	IBundleProvider searchRegularRecord(Class<? extends IBaseResource> aClass, SearchParameterMap searchParameterMap);
 
-	IBaseBundle searchGoldenRecord(Class<? extends IBaseResource> aClass, ICriterion... where);
+	IBundleProvider searchGoldenRecord(Class<? extends IBaseResource> aClass, SearchParameterMap searchParameterMap);
 
 }

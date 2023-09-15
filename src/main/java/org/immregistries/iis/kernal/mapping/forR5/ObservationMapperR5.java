@@ -1,5 +1,7 @@
 package org.immregistries.iis.kernal.mapping.forR5;
 
+import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
+import ca.uhn.fhir.rest.param.TokenParam;
 import org.immregistries.iis.kernal.fhir.annotations.OnR5Condition;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import org.hl7.fhir.r5.model.*;
@@ -51,12 +53,14 @@ public class ObservationMapperR5 implements ObservationMapper<Observation> {
 
 	}
 
-	public ObservationReported getReportedWithMaster(Observation observation, FhirRequester fhirRequests, IGenericClient fhirClient){
+	public ObservationReported getReportedWithMaster(Observation observation, IGenericClient fhirClient){
 		ObservationReported observationReported = getReported(observation);
 		observationReported.setObservation(
 			fhirRequests.searchObservationMaster(
-                    Observation.IDENTIFIER.exactly().systemAndIdentifier(observationReported.getIdentifierTable(),observationReported.getIdentifierCode())
-			));
+				new SearchParameterMap(Observation.SP_IDENTIFIER,new TokenParam().setSystem(observationReported.getIdentifierTable()).setValue(observationReported.getIdentifierCode())))
+		);
+//                    Observation.IDENTIFIER.exactly().systemAndIdentifier(observationReported.getIdentifierTable(),observationReported.getIdentifierCode())
+//			));
 		return observationReported;
 	}
 

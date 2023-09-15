@@ -1,6 +1,10 @@
 package org.immregistries.iis.kernal.logic;
 
+import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
+import ca.uhn.fhir.rest.param.ReferenceParam;
+import ca.uhn.fhir.rest.param.StringParam;
+import ca.uhn.fhir.rest.param.TokenParam;
 import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.r4.model.*;
@@ -32,14 +36,13 @@ import static org.immregistries.iis.kernal.InternalClient.FhirRequester.GOLDEN_S
 @org.springframework.stereotype.Service()
 @Conditional(OnR4Condition.class)
 public class IncomingMessageHandlerR4 extends IncomingMessageHandler<Organization> {
-
 	private static final double MINIMAL_MATCHING_SCORE = 0.9;
-	private final Logger logger = LoggerFactory.getLogger(IncomingMessageHandler.class);
 
 	public String process(String message, Tenant tenant, String sendingFacilityName) {
 		HL7Reader reader = new HL7Reader(message);
 		String messageType = reader.getValue(9);
 		String responseMessage;
+		partitionCreationInterceptor.getOrCreatePartitionId(tenant.getOrganizationName());
 		try {
 			Set<ProcessingFlavor> processingFlavorSet = tenant.getProcessingFlavorSet();
 			String facilityId = reader.getValue(4);
@@ -51,8 +54,14 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler<Organizatio
 				}
 			}
 			Organization sendingOrganization = null;
-			if (StringUtils.isNotBlank(sendingFacilityName)){
-				sendingOrganization = (Organization) fhirRequester.searchOrganization(Organization.NAME.matches().value(sendingFacilityName));
+			if (StringUtils.isNotBlank(sendingFacilityName) && !sendingFacilityName.equals("null")){
+				sendingOrganization = (Organization) fhirRequester.searchOrganization(
+					new SearchParameterMap(Organization.SP_NAME, new StringParam(sendingFacilityName)));
+//					Organization.NAME.matches().value(sendingFacilityName));
+				if (sendingOrganization == null) {
+					sendingOrganization = (Organization) fhirRequester.saveOrganization(new Organization()
+						.setName(sendingFacilityName));
+				}
 			}
 
 			if (sendingOrganization == null) {
@@ -60,7 +69,6 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler<Organizatio
 			}
 			if (sendingOrganization == null) {
 				sendingOrganization = processManagingOrganization(reader);
-
 			}
 			switch (messageType) {
 				case "VXU":
@@ -261,7 +269,9 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler<Organizatio
 							"RXA", rxaCount, 3);
 					}
 
-					vaccinationReported = fhirRequester.searchVaccinationReported(Immunization.IDENTIFIER.exactly().code(vaccinationReportedExternalLink));
+					vaccinationReported = fhirRequester.searchVaccinationReported(
+						new SearchParameterMap(Immunization.SP_IDENTIFIER, new TokenParam().setValue(vaccinationReportedExternalLink)));
+//						Immunization.IDENTIFIER.exactly().code(vaccinationReportedExternalLink));
 					if (vaccinationReported != null) {
 //				 vaccinationMaster = vaccinationReported.getVaccination();
 					}
@@ -382,7 +392,9 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler<Organizatio
 					{
 						String administeredAtLocation = reader.getValue(11, 4);
 						if (StringUtils.isNotEmpty(administeredAtLocation)) {
-							OrgLocation orgLocation = fhirRequester.searchOrgLocation(Location.IDENTIFIER.exactly().code(administeredAtLocation));
+							OrgLocation orgLocation = fhirRequester.searchOrgLocation(
+								new SearchParameterMap(Location.SP_IDENTIFIER, new TokenParam().setValue(administeredAtLocation)));
+//								Location.IDENTIFIER.exactly().code(administeredAtLocation));
 
 							if (orgLocation == null) {
 								if (processingFlavorSet.contains(ProcessingFlavor.PEAR)) {
@@ -409,7 +421,9 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler<Organizatio
 					{
 						String administeringProvider = reader.getValue(10);
 						if (StringUtils.isNotEmpty(administeringProvider)) {
-							ModelPerson modelPerson = fhirRequester.searchPractitioner(Practitioner.IDENTIFIER.exactly().code(administeringProvider));
+							ModelPerson modelPerson = fhirRequester.searchPractitioner(
+								new SearchParameterMap(Practitioner.SP_IDENTIFIER, new TokenParam().setValue(administeringProvider)));
+//								Practitioner.IDENTIFIER.exactly().code(administeringProvider));
 							if (modelPerson == null) {
 								modelPerson = new ModelPerson();
 								modelPerson.setPersonExternalLink(administeringProvider);
@@ -561,8 +575,6 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler<Organizatio
 													  List<ProcessingException> processingExceptionList, Set<ProcessingFlavor> processingFlavorSet,
 													  CodeMap codeMap, boolean strictDate, PatientReported patientReported, Organization managingOrganization)
 		throws ProcessingException {
-
-//    PatientMaster patientMaster = null;
 		String patientReportedExternalLink = "";
 		String patientReportedAuthority = "";
 		String patientReportedType = "MR";
@@ -593,19 +605,17 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler<Organizatio
 				"No PID segment found, required for accepting vaccination report", "", 0, 0);
 		}
 		patientReported = fhirRequester.searchPatientReported(
-			Patient.IDENTIFIER.exactly().identifier(patientReportedExternalLink)
+			new SearchParameterMap("identifier",new TokenParam().setValue(patientReportedExternalLink))
 		);
 
 		if (patientReported == null) {
-//      patientMaster = new PatientMaster();
 			patientReported = new PatientReported();
 			patientReported.setTenant(tenant);
 			patientReported.setExternalLink(patientReportedExternalLink);
 			patientReported.setReportedDate(new Date());
 			if (managingOrganization != null) {
-				patientReported.setManagingOrganizationId(managingOrganization.getId());
+				patientReported.setManagingOrganizationId("Organization/" + managingOrganization.getIdElement().getIdPart());
 			}
-
 		}
 
 		{
@@ -1014,12 +1024,16 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler<Organizatio
 		ObservationReported observationReported = null;
 		if (vaccination == null) {
 			observationReported = fhirRequester.searchObservationReported(
-				Observation.PART_OF.isMissing(true),
-				Observation.SUBJECT.hasId(patientReported.getPatientId()));
+				new SearchParameterMap(Observation.SP_PART_OF, new ReferenceParam().setMissing(true))
+					.add(Observation.SP_SUBJECT, new ReferenceParam(patientReported.getPatientId())));
+//				Observation.PART_OF.isMissing(true),
+//				Observation.SUBJECT.hasId(patientReported.getPatientId()));
 		} else {
 			observationReported = fhirRequester.searchObservationReported(
-				Observation.PART_OF.hasId(vaccination.getVaccinationId()),
-				Observation.SUBJECT.hasId(patientReported.getPatientId()));
+				new SearchParameterMap(Observation.SP_PART_OF, new ReferenceParam(vaccination.getVaccinationId()))
+					.add(Observation.SP_SUBJECT, new ReferenceParam(patientReported.getPatientId())));
+//				Observation.PART_OF.hasId(vaccination.getVaccinationId()),
+//				Observation.SUBJECT.hasId(patientReported.getPatientId()));
 		}
 		if (observationReported == null) {
 //      observationMaster = new ObservationMaster();
@@ -1753,8 +1767,11 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler<Organizatio
 
 	private Organization processSendingOrganization(HL7Reader reader) {
 		String organizationName = reader.getValue(4, 1);
-		Organization sendingOrganization = (Organization) fhirRequester.searchOrganization(Organization.IDENTIFIER.exactly()
-			.systemAndIdentifier(organizationName, reader.getValue(4, 2)));
+		Organization sendingOrganization = (Organization) fhirRequester.searchOrganization(
+			new SearchParameterMap(Organization.SP_IDENTIFIER,
+				new TokenParam().setSystem(reader.getValue(4, 10)).setValue(reader.getValue(4, 2))));
+//			Organization.IDENTIFIER.exactly()
+//			.systemAndIdentifier(reader.getValue(4, 10), reader.getValue(4, 2)));
 		if (sendingOrganization == null && StringUtils.isNotBlank(organizationName)) {
 			sendingOrganization = new Organization()
 				.setName(organizationName)
@@ -1776,8 +1793,11 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler<Organizatio
 			managingIdentifier = reader.getValue(22, 3);
 		}
 		if (managingIdentifier != null) {
-			managingOrganization = (Organization) fhirRequester.searchOrganization(Organization.IDENTIFIER.exactly()
-				.systemAndIdentifier(reader.getValue(22, 7), managingIdentifier));
+			managingOrganization = (Organization) fhirRequester.searchOrganization(
+				new SearchParameterMap(Organization.SP_IDENTIFIER,
+					new TokenParam().setSystem(reader.getValue(22, 7)).setValue(managingIdentifier)));
+//				Organization.IDENTIFIER.exactly()
+//				.systemAndIdentifier(reader.getValue(22, 7), managingIdentifier));
 			if (managingOrganization == null) {
 				managingOrganization = new Organization();
 				managingOrganization.setName(organizationName);

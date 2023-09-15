@@ -1,7 +1,9 @@
 package org.immregistries.iis.kernal.servlet;
 
+import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
 import ca.uhn.fhir.parser.IParser;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
+import ca.uhn.fhir.rest.param.ReferenceParam;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.r5.model.*;
 import org.immregistries.codebase.client.CodeMap;
@@ -201,8 +203,8 @@ public class VaccinationServlet extends PatientServlet {
 		List<ObservationReported> observationReportedList;
 		{
 			observationReportedList = fhirRequester.searchObservationReportedList(
-				Observation.PATIENT.hasId(vaccination.getVaccinationId())
-			);
+				new SearchParameterMap(Observation.SP_PATIENT, new ReferenceParam(vaccination.getPatientReportedId())));
+//				Observation.PATIENT.hasId(vaccination.getPatientReportedId()));
 			Set<String> suppressSet = LoincIdentifier.getSuppressIdentifierCodeSet();
 			for (Iterator<ObservationReported> it = observationReportedList.iterator(); it.hasNext(); ) {
 				ObservationReported observationReported = it.next();

@@ -88,7 +88,7 @@ public class IdentifierSolverInterceptor {
 				 * If no golden record matched, regular records are checked
 				 */
 				// TODO set flavor
-				SearchParameterMap searchParameterMap = new SearchParameterMap().add("identifier", new TokenParam()
+				SearchParameterMap searchParameterMap = new SearchParameterMap().add(Patient.SP_IDENTIFIER, new TokenParam()
 					.setSystem(identifier.getSystem()).setValue(identifier.getValue()));
 				IBundleProvider bundleProvider = patientDao.search(searchParameterMap, requestDetails);
 				if (!bundleProvider.isEmpty()) {

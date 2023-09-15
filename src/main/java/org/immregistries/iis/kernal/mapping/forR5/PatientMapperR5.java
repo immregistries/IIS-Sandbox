@@ -1,6 +1,8 @@
 package org.immregistries.iis.kernal.mapping.forR5;
 
 
+import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
+import ca.uhn.fhir.rest.param.ReferenceParam;
 import org.apache.commons.lang3.StringUtils;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
@@ -38,9 +40,7 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 	public PatientReported getReportedWithMaster(Patient p) {
 		PatientReported patientReported = getReported(p);
 		if (!p.getId().isBlank() && p.getMeta().getTag(GOLDEN_SYSTEM_TAG,GOLDEN_RECORD) == null) {
-			patientReported.setPatient(
-				fhirRequests.readPatientMasterWithMdmLink(p.getId())
-			);
+			patientReported.setPatient(fhirRequests.readPatientMasterWithMdmLink(p.getId()));
 		}
 		return patientReported;
 	}
@@ -201,7 +201,10 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 
 		// pm.setRegistryStatusIndicator(p.getActive());
 		// Patient Contact / Guardian
-		RelatedPerson relatedPerson = fhirRequests.searchRelatedPerson(RelatedPerson.PATIENT.hasAnyOfIds(pm.getPatientId(), pm.getExternalLink()));
+		RelatedPerson relatedPerson = fhirRequests.searchRelatedPerson(
+			new SearchParameterMap(RelatedPerson.SP_PATIENT,new ReferenceParam(pm.getPatientId()))
+				.add(RelatedPerson.SP_PATIENT,new ReferenceParam(pm.getExternalLink())));
+//			RelatedPerson.PATIENT.hasAnyOfIds(pm.getPatientId(), pm.getExternalLink()));
 		if (relatedPerson != null) {
 			relatedPersonMapperR5.fillGuardianInformation(pm, relatedPerson);
 		}

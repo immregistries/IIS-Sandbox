@@ -101,7 +101,7 @@ public class MdmCustomMatchFinderSvcR5 extends MdmMatchFinderSvcImpl implements 
 				.setMdmExpand(true) // Including other patients entities
 				.setValue(immunization.getPatient().getReference()));
 		} else if (immunization.getPatient().getIdentifier() != null) {
-			searchParameterMap.add("identifier", new TokenParam()
+			searchParameterMap.add(Immunization.SP_IDENTIFIER, new TokenParam()
 				.setSystem(immunization.getPatient().getIdentifier().getSystem())
 				.setValue(immunization.getPatient().getIdentifier().getValue()));
 		} else {

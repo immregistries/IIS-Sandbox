@@ -79,7 +79,6 @@ public class ServerConfig {
 												  Optional<IdentifierSolverInterceptorR4> identifierSolverInterceptorR4,
 												  SessionAuthorizationInterceptor sessionAuthorizationInterceptor) {
 		RestfulServer fhirServer = new RestfulServer(fhirSystemDao.getContext());
-
 		List<String> supportedResourceTypes = appProperties.getSupported_resource_types();
 
 		if (!supportedResourceTypes.isEmpty()) {

@@ -1,6 +1,10 @@
 package org.immregistries.iis.kernal.logic;
 
+import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
 import ca.uhn.fhir.rest.api.server.RequestDetails;
+import ca.uhn.fhir.rest.param.ReferenceParam;
+import ca.uhn.fhir.rest.param.TokenParam;
+import ca.uhn.fhir.rest.param.TokenParamModifier;
 import ca.uhn.fhir.rest.server.servlet.ServletRequestDetails;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.r5.model.Immunization;
@@ -132,8 +136,10 @@ public class IncomingEventHandler {
 				"Vaccination is indicated as occuring in the future, unable to accept future vaccination events");
 		}
 		vaccinationReported = fhirRequester.searchVaccinationReported(
-			Immunization.PATIENT.hasId(patientReported.getPatientId()),
-			Immunization.IDENTIFIER.exactly().code(vaccinationReportedExternalLink)
+			new SearchParameterMap(Immunization.SP_PATIENT, new ReferenceParam(patientReported.getPatientId()))
+				.add(Immunization.SP_IDENTIFIER,new TokenParam().setValue(vaccinationReportedExternalLink))
+//			Immunization.PATIENT.hasId(patientReported.getPatientId()),
+//			Immunization.IDENTIFIER.exactly().code(vaccinationReportedExternalLink)
 		);
 		if (vaccinationReported == null) {
 //      vaccinationMaster = new VaccinationMaster();
@@ -180,7 +186,8 @@ public class IncomingEventHandler {
 			if (StringUtils.isNotEmpty(administeredAtLocation)) {
 				OrgLocation orgLocation = null;
 				orgLocation = fhirRequester.searchOrgLocation(
-					Location.IDENTIFIER.exactly().code(administeredAtLocation)
+					new SearchParameterMap(Location.SP_IDENTIFIER, new TokenParam().setValue(administeredAtLocation))
+//					Location.IDENTIFIER.exactly().code(administeredAtLocation)
 					// Location.ORGANIZATION.hasAnyOfIds(administeredAtLocation) //Todo verify condition
 				);
 				if (orgLocation == null) {
@@ -249,7 +256,7 @@ public class IncomingEventHandler {
 
 		{
 			patientReported = fhirRequester.searchPatientReported(
-				Patient.IDENTIFIER.exactly().code(patientReportedExternalLink)
+				new SearchParameterMap("identifier",new TokenParam().setValue(patientReportedExternalLink))
 			);
 		}
 

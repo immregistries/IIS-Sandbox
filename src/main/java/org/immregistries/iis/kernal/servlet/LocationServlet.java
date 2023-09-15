@@ -1,5 +1,6 @@
 package org.immregistries.iis.kernal.servlet;
 
+import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -127,7 +128,7 @@ public class LocationServlet extends HttpServlet {
 			}
 
 			List<OrgLocation> orgLocationList = null;
-			orgLocationList = fhirRequests.searchOrgLocationList();
+			orgLocationList = fhirRequests.searchOrgLocationList(new SearchParameterMap());
 
 			HomeServlet.doHeader(out, "IIS Sandbox");
 

@@ -5,28 +5,18 @@ import ca.uhn.fhir.jpa.api.dao.DaoRegistry;
 import ca.uhn.fhir.jpa.api.dao.IFhirResourceDao;
 import ca.uhn.fhir.jpa.api.model.DaoMethodOutcome;
 import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
-import ca.uhn.fhir.jpa.util.QueryParameterUtils;
-import ca.uhn.fhir.jpa.util.SearchParameterMapCalculator;
-import ca.uhn.fhir.model.api.IQueryParameterAnd;
-import ca.uhn.fhir.model.api.IQueryParameterType;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.api.server.IBundleProvider;
-import ca.uhn.fhir.rest.api.server.RequestDetails;
-import ca.uhn.fhir.rest.client.api.IGenericClient;
-import ca.uhn.fhir.rest.gclient.*;
-import ca.uhn.fhir.rest.param.StringAndListParam;
-import ca.uhn.fhir.rest.param.StringParam;
+import ca.uhn.fhir.rest.gclient.ICriterion;
+import ca.uhn.fhir.rest.gclient.ICriterionInternal;
 import ca.uhn.fhir.rest.param.TokenParam;
-import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
-import ca.uhn.fhir.rest.server.servlet.ServletRequestDetails;
-import org.apache.commons.lang3.ArrayUtils;
+import ca.uhn.fhir.rest.param.TokenParamModifier;
+import ca.uhn.fhir.rest.server.RestfulServer;
 import org.apache.commons.lang3.StringUtils;
-import org.hl7.fhir.SearchParameter;
-import org.hl7.fhir.instance.model.api.IBaseBundle;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.IdType;
-import org.immregistries.iis.kernal.mapping.Interfaces.*;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
+import org.immregistries.iis.kernal.mapping.Interfaces.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,10 +29,14 @@ public abstract class FhirRequester<
 	Observation extends IBaseResource,
 	Person extends IBaseResource,
 	Organization extends IBaseResource,
-	RelatedPerson extends IBaseResource >
-	implements IFhirRequester<Patient,Immunization,Location,Practitioner,Observation,Person,Organization, RelatedPerson> {
+	RelatedPerson extends IBaseResource>
+	implements IFhirRequester<Patient, Immunization, Location, Practitioner, Observation, Person, Organization, RelatedPerson> {
+	public static final String GOLDEN_SYSTEM_TAG = "http://hapifhir.io/fhir/NamingSystem/mdm-record-status";
+	//	public static final String GOLDEN_SYSTEM_IDENTIFIER = "\"http://hapifhir.io/fhir/NamingSystem/mdm-golden-resource-enterprise-id\"";
+	public static final String GOLDEN_RECORD = "GOLDEN_RECORD";
+	private static final String GOLDEN_CRITERION_PART = GOLDEN_SYSTEM_TAG + "|" + GOLDEN_RECORD;
+	private static final String NOT_GOLDEN_CRITERION = "_tag:not=" + GOLDEN_CRITERION_PART;
 	Logger logger = LoggerFactory.getLogger(FhirRequester.class);
-
 	@Autowired
 	PatientMapper<Patient> patientMapper;
 	@Autowired
@@ -58,14 +52,7 @@ public abstract class FhirRequester<
 	@Autowired
 	RelatedPersonMapper<RelatedPerson> relatedPersonMapper;
 
-	@Autowired
-	RepositoryClientFactory repositoryClientFactory;
-	@Autowired
-	DaoRegistry daoRegistry;
-	@Autowired
-	FhirContext fhirContext;
-
-//	private final Class<Patient> patientClass;
+	//	private final Class<Patient> patientClass;
 //	private final Class<Immunization> immunizationClass;
 //	private final Class<Location> locationClass;
 //	private final Class<Practitioner> practitionerClass;
@@ -85,23 +72,24 @@ public abstract class FhirRequester<
 //		this.personClass = (Class<Person>) classes[5];
 //		this.organizationClass = (Class<Organization>) classes[6];
 //	}
-
-	public static final String GOLDEN_SYSTEM_TAG = "http://hapifhir.io/fhir/NamingSystem/mdm-record-status";
-	public static final String GOLDEN_SYSTEM_IDENTIFIER = "\"http://hapifhir.io/fhir/NamingSystem/mdm-golden-resource-enterprise-id\"";
-	public static final String GOLDEN_RECORD = "GOLDEN_RECORD";
-
-	private static final String NOT_GOLDEN_CRITERION =
-//		"_tag:not" +
-			GOLDEN_SYSTEM_TAG + "|" + GOLDEN_RECORD;
+	@Autowired
+	RepositoryClientFactory repositoryClientFactory;
+	@Autowired
+	DaoRegistry daoRegistry;
+	@Autowired
+	FhirContext fhirContext;
+	@Autowired
+	RestfulServer fhirServer;
 
 	private String stringCriterion(ICriterion iCriterion) {
 		ICriterionInternal iCriterionInternal = (ICriterionInternal) iCriterion;
 		return iCriterionInternal.getParameterName() + "=" + iCriterionInternal.getParameterValue(fhirContext);
 	}
+
 	private String stringCriterionList(ICriterion... criteria) {
 		int size = criteria.length;
 		String params = "";
-		if (size > 0){
+		if (size > 0) {
 			params = stringCriterion(criteria[0]);
 			int i = 1;
 			while (i < size) {
@@ -112,21 +100,21 @@ public abstract class FhirRequester<
 		return params;
 	}
 
-
-	private SearchParameterMap searchParameterCriterionList(ICriterion... criteria) {
-		SearchParameterMap map = new SearchParameterMap();
-		int size = criteria.length;
-		int i = 1;
-		while (i < size) {
-			ICriterionInternal iCriterionInternal = (ICriterionInternal) criteria[i];
-//			new QueryParameterUtils()
-			map.add(iCriterionInternal.getParameterName(),
-				new StringParam(iCriterionInternal.getParameterValue(fhirContext)));
-//			params += "&" + stringCriterion(criteria[i]);
-			i++;
-		}
-		return map;
-	}
+//	private SearchParameterMap searchParameterCriterionList(ICriterion... criteria) {
+//		SearchParameterMap map = new SearchParameterMap();
+//		int size = criteria.length;
+//		int i = 0;
+//		while (i < size) {
+//			ICriterionInternal iCriterionInternal = (ICriterionInternal) criteria[i];
+//			if (criteria[i] instanceof TokenCriterion) {
+//
+//			}
+//			map.add(iCriterionInternal.getParameterName(),
+//				new StringParam(iCriterionInternal.getParameterValue(fhirContext)));
+//			i++;
+//		}
+//		return map;
+//	}
 
 
 	protected MethodOutcome save(IBaseResource resource, ICriterion... where) {
@@ -137,51 +125,46 @@ public abstract class FhirRequester<
 			params += "&";
 		}
 		params += NOT_GOLDEN_CRITERION;
-		logger.info("TEST CRITERION \n {}", params);
-		DaoMethodOutcome outcome = dao.update(resource,params,ServletHelper.requestDetailsWithPartitionName());
-		logger.info("TEST outcome \n {}", outcome.getCreated());
+		DaoMethodOutcome outcome = dao.update(resource, params, ServletHelper.requestDetailsWithPartitionName());
 		return outcome;
 	}
 
-	public IBaseResource read(Class<? extends IBaseResource> aClass,String id) {
+	public IBaseResource read(Class<? extends IBaseResource> aClass, String id) {
 		IFhirResourceDao dao = daoRegistry.getResourceDao(aClass);
-		return dao.read(new IdType(id),ServletHelper.requestDetailsWithPartitionName());
+		return dao.read(new IdType(id), ServletHelper.requestDetailsWithPartitionName());
 	}
 
-	public IBaseBundle searchGoldenRecord(Class<? extends IBaseResource> aClass, ICriterion... where) {
-		IFhirResourceDao dao = daoRegistry.getResourceDao(aClass);
-
-		IGenericClient fhirClient = repositoryClientFactory.getFhirClient();
-		try {
-			IQuery<IBaseBundle> query = fhirClient.search().forResource(aClass);
-			int size = where.length;
-			if (size > 0) {
-				query = query.where(where[0]);
-			}
-			query = query.withTag(GOLDEN_SYSTEM_TAG, GOLDEN_RECORD);
-			int i = 1;
-			while (i < size) {
-				query = query.and(where[i]);
-				i++;
-			}
-			return  query.execute();
-		} catch (ResourceNotFoundException e) {
-			return  null;
-		}
-	}
-
-	public IBaseBundle searchRegularRecord(Class<? extends IBaseResource> aClass, ICriterion... where) {
-		IFhirResourceDao dao = daoRegistry.getResourceDao(aClass);
-		SearchParameterMap map = searchParameterCriterionList(where);
-		map.add("_tag:not", new StringParam(NOT_GOLDEN_CRITERION));
-		logger.info("TEST CRITERION \n {}", params);
-		IBundleProvider bundleProvider = dao.search(map, ServletHelper.requestDetailsWithPartitionName());
-		bundleProvider.
+	public IBundleProvider searchGoldenRecord(Class<? extends IBaseResource> aClass, SearchParameterMap searchParameterMap) {
+		searchParameterMap.add("_tag", new TokenParam(GOLDEN_SYSTEM_TAG, GOLDEN_RECORD));
+		return search(aClass, searchParameterMap);
 //		IGenericClient fhirClient = repositoryClientFactory.getFhirClient();
 //		try {
 //			IQuery<IBaseBundle> query = fhirClient.search().forResource(aClass);
 //			int size = where.length;
-//			query = query.where(NOT_GOLDEN_CRITERION);
+//			if (size > 0) {
+//				query = query.where(where[0]);
+//			}
+//			query = query.withTag(GOLDEN_SYSTEM_TAG, GOLDEN_RECORD);
+//			int i = 1;
+//			while (i < size) {
+//				query = query.and(where[i]);
+//				i++;
+//			}
+//			return query.execute();
+//		} catch (ResourceNotFoundException e) {
+//			return null;
+//		}
+	}
+
+	public IBundleProvider searchRegularRecord(Class<? extends IBaseResource> aClass, SearchParameterMap searchParameterMap) {
+		searchParameterMap.add("_tag", new TokenParam(GOLDEN_SYSTEM_TAG, GOLDEN_RECORD).setModifier(TokenParamModifier.NOT));
+		return search(aClass, searchParameterMap);
+//		return dao.search(searchParameterMap, ServletHelper.requestDetailsWithPartitionName());
+//		IGenericClient fhirClient = repositoryClientFactory.getFhirClient();
+//		try {
+//			IQuery<IBaseBundle> query = fhirClient.search().forResource(aClass);
+//			int size = where.length;
+////			query = query.where(NOT_GOLDEN_CRITERION);
 //			int i = 0;
 //			while (i < size) {
 //				query = query.and(where[i]);
@@ -193,24 +176,23 @@ public abstract class FhirRequester<
 //		}
 	}
 
-	IBaseBundle search(
-		Class<? extends IBaseResource> aClass,
-		ICriterion... where) {
-		IGenericClient fhirClient = repositoryClientFactory.getFhirClient();
-		try {
-			IQuery<IBaseBundle> query = fhirClient.search().forResource(aClass);
-			int size = where.length;
-			if (size > 0) {
-				query = query.where(where[0]);
-			}
-			int i = 1;
-			while (i < size) {
-				query = query.and(where[i]);
-				i++;
-			}
-			return  query.execute();
-		} catch (ResourceNotFoundException e) {
-			return null;
-		}
+	IBundleProvider search(Class<? extends IBaseResource> aClass, SearchParameterMap searchParameterMap) {
+		return daoRegistry.getResourceDao(aClass).search(searchParameterMap, ServletHelper.requestDetailsWithPartitionName());
+//		IGenericClient fhirClient = repositoryClientFactory.getFhirClient();
+//		try {
+//			IQuery<IBaseBundle> query = fhirClient.search().forResource(aClass);
+//			int size = where.length;
+//			if (size > 0) {
+//				query = query.where(where[0]);
+//			}
+//			int i = 1;
+//			while (i < size) {
+//				query = query.and(where[i]);
+//				i++;
+//			}
+//			return query.execute();
+//		} catch (ResourceNotFoundException e) {
+//			return null;
+//		}
 	}
 }

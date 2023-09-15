@@ -1,5 +1,7 @@
 package org.immregistries.iis.kernal.mapping.forR5;
 
+import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
+import ca.uhn.fhir.rest.param.TokenParam;
 import org.apache.commons.lang3.StringUtils;
 import org.immregistries.iis.kernal.fhir.annotations.OnR5Condition;
 import org.hl7.fhir.r5.model.*;
@@ -28,8 +30,7 @@ public class ImmunizationMapperR5 implements ImmunizationMapper<Immunization> {
 	public VaccinationReported getReportedWithMaster(Immunization i) {
 		VaccinationReported vaccinationReported = getReported(i);
 		VaccinationMaster vaccinationMaster = fhirRequests.searchVaccinationMaster(
-			Immunization.IDENTIFIER.exactly().identifier(
-				vaccinationReported.getExternalLink()));
+			new SearchParameterMap(Immunization.SP_IDENTIFIER, new TokenParam().setValue(vaccinationReported.getExternalLink())));
 		if (vaccinationMaster!= null) {
 			vaccinationReported.setVaccination(vaccinationMaster);
 		}

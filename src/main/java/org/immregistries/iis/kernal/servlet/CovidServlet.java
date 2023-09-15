@@ -1,6 +1,8 @@
 package org.immregistries.iis.kernal.servlet;
 
+import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
+import ca.uhn.fhir.rest.param.*;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.r5.model.Immunization;
 import org.hl7.fhir.r5.model.Patient;
@@ -152,9 +154,10 @@ public class CovidServlet extends HttpServlet {
 						"<textarea cols=\"80\" rows=\"30\" style=\"white-space: nowrap;  overflow: auto;\">");
 					{
 						vaccinationReportedList = fhirRequester.searchVaccinationReportedList(
+							new SearchParameterMap(Immunization.SP_PATIENT, new ReferenceParam().setChain(Patient.SP_ORGANIZATION).setValue(String.valueOf(tenant.getOrgId()))));// TODO TEST
 //						Immunization.DATE.after().day(dateStart),
 //					 Immunization.DATE.before().day(dateEnd),
-							Immunization.PATIENT.hasChainedProperty(Patient.ORGANIZATION.hasId(String.valueOf(tenant.getOrgId())))); // TODO test
+//							Immunization.PATIENT.hasChainedProperty(Patient.ORGANIZATION.hasId(String.valueOf(tenant.getOrgId()))));
 						Date finalDateStart = dateStart;
 						Date finalDateEnd = dateEnd;
 						vaccinationReportedList = vaccinationReportedList.stream().filter(vaccinationReported -> vaccinationReported.getReportedDate().after(finalDateStart) && vaccinationReported.getReportedDate().before(finalDateEnd)).collect(Collectors.toList());
@@ -247,9 +250,12 @@ public class CovidServlet extends HttpServlet {
 //      query.setParameter("administeredDate", vaccinationReported.getAdministeredDate());
 //      query.setParameter("patientReported", vaccinationReported.getPatientReported());
 			List<VaccinationReported> list = fhirRequester.searchVaccinationReportedList(
-				Immunization.DATE.before().day(vaccinationReported.getAdministeredDate()),
-				Immunization.PATIENT.hasId(vaccinationReported.getPatientReportedId()),
-				Immunization.STATUS.exactly().identifier(Immunization.ImmunizationStatusCodes.COMPLETED.toCode())
+				new SearchParameterMap(Immunization.SP_DATE, new DateParam().setPrefix(ParamPrefixEnum.ENDS_BEFORE).setValue(vaccinationReported.getAdministeredDate()))
+					.add(Immunization.SP_PATIENT, new ReferenceParam(vaccinationReported.getPatientReportedId()))
+					.add(Immunization.SP_STATUS, new TokenParam().setValue(Immunization.ImmunizationStatusCodes.COMPLETED.toCode()))
+//				Immunization.DATE.before().day(vaccinationReported.getAdministeredDate()),
+//				Immunization.PATIENT.hasId(vaccinationReported.getPatientReportedId()),
+//				Immunization.STATUS.exactly().identifier(Immunization.ImmunizationStatusCodes.COMPLETED.toCode())
 			);
 			doseNumber = list.size() + 1;
 		}

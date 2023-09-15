@@ -44,11 +44,15 @@ public class PartitionCreationInterceptor extends RequestTenantPartitionIntercep
 	@Nonnull
 	protected RequestPartitionId extractPartitionIdFromRequest(RequestDetails theRequestDetails) {
 		String partitionName = extractPartitionName(theRequestDetails);
+		return  getOrCreatePartitionId(partitionName);
+	}
+
+	public RequestPartitionId getOrCreatePartitionId(String partitionName) {
 		try {
 			partitionLookupSvc.getPartitionByName(partitionName);
 			return RequestPartitionId.fromPartitionName(partitionName);
 		} catch (ResourceNotFoundException e) {
-			return createPartition(theRequestDetails);
+			return createPartition(partitionName);
 		}
 	}
 
@@ -65,9 +69,9 @@ public class PartitionCreationInterceptor extends RequestTenantPartitionIntercep
 		}
 	}
 
-	private RequestPartitionId createPartition(RequestDetails theRequestDetails) {
+	private RequestPartitionId createPartition(String tenantName) {
 		// Reminder tenantId = partitionName != partitionId
-		StringType partitionName = new StringType(PartitionCreationInterceptor.extractPartitionName(theRequestDetails));
+		StringType partitionName = new StringType(tenantName);
 		Random random = new Random();
 		int idAttempt = random.nextInt(10000);
 		int number_of_attempts = 0;

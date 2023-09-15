@@ -1,6 +1,11 @@
 package org.immregistries.iis.kernal.servlet;
 
+import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
+import ca.uhn.fhir.rest.param.DateParam;
+import ca.uhn.fhir.rest.param.ParamPrefixEnum;
+import ca.uhn.fhir.rest.param.ReferenceParam;
+import ca.uhn.fhir.rest.param.TokenParam;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Session;
 import org.hl7.fhir.r5.model.Immunization;
@@ -169,9 +174,13 @@ public class VXUDownloadGenerator extends Thread {
 	  IGenericClient fhirClient = repositoryClientFactory.newGenericClient(tenant);
 
 	  List<VaccinationReported> vaccinationReportedList = fhirRequests.searchVaccinationReportedList(
-              Immunization.DATE.after().day(dateStart),
-		  Immunization.DATE.before().day(dateEnd),
-		  Immunization.PATIENT.hasChainedProperty(Patient.ORGANIZATION.hasId(String.valueOf(tenant.getOrgId())))); // TODO test
+		  new SearchParameterMap(Immunization.SP_DATE, new DateParam().setPrefix(ParamPrefixEnum.STARTS_AFTER).setValue(dateStart))
+			  .add(Immunization.SP_DATE, new DateParam().setPrefix(ParamPrefixEnum.ENDS_BEFORE).setValue(dateEnd))
+			  .add(Immunization.SP_PATIENT, new ReferenceParam().setChain(Patient.SP_ORGANIZATION).setValue(String.valueOf(tenant.getOrgId()))
+			  ));
+//      Immunization.DATE.after().day(dateStart),
+//		  Immunization.DATE.before().day(dateEnd),
+//		  Immunization.PATIENT.hasChainedProperty(Patient.ORGANIZATION.hasId(String.valueOf(tenant.getOrgId())))); // TODO test
 	  Date finalDateStart = dateStart;
 	  Date finalDateEnd = dateEnd;
 	  vaccinationReportedList = vaccinationReportedList.stream().filter(

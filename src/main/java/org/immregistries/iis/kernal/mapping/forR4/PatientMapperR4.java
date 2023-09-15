@@ -1,6 +1,9 @@
 package org.immregistries.iis.kernal.mapping.forR4;
 
 
+import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
+import ca.uhn.fhir.rest.param.ReferenceParam;
+import ca.uhn.fhir.rest.param.TokenParam;
 import org.apache.commons.lang3.StringUtils;
 import org.immregistries.iis.kernal.fhir.annotations.OnR4Condition;
 import org.hl7.fhir.r4.model.*;
@@ -15,7 +18,8 @@ import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
 
-import static org.immregistries.iis.kernal.InternalClient.FhirRequester.GOLDEN_SYSTEM_IDENTIFIER;
+import static org.immregistries.iis.kernal.InternalClient.FhirRequester.GOLDEN_RECORD;
+import static org.immregistries.iis.kernal.InternalClient.FhirRequester.GOLDEN_SYSTEM_TAG;
 
 
 @Service
@@ -29,10 +33,9 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 
 	public PatientReported getReportedWithMaster(Patient p) {
 		PatientReported patientReported = getReported(p);
-		patientReported.setPatient(
-			fhirRequests.searchPatientMaster(
-				Patient.IDENTIFIER.exactly().systemAndIdentifier(patientReported.getPatientReportedAuthority(), patientReported.getExternalLink()) // TODO change to get from mdm
-			));
+		if (!p.getId().isBlank() && p.getMeta().getTag(GOLDEN_SYSTEM_TAG,GOLDEN_RECORD) == null) {
+			patientReported.setPatient(fhirRequests.readPatientMasterWithMdmLink(p.getId()));
+		}
 		return patientReported;
 	}
 
@@ -187,7 +190,9 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 
 		// pm.setRegistryStatusIndicator(p.getActive());
 		// Patient Contact / Guardian
-		RelatedPerson relatedPerson = fhirRequests.searchRelatedPerson(RelatedPerson.PATIENT.hasAnyOfIds(pm.getPatientId(), pm.getExternalLink()));
+		RelatedPerson relatedPerson = fhirRequests.searchRelatedPerson(
+			new SearchParameterMap(RelatedPerson.SP_PATIENT,new ReferenceParam(pm.getPatientId()))
+			.add(RelatedPerson.SP_PATIENT,new ReferenceParam(pm.getExternalLink())));
 		if (relatedPerson != null) {
 			relatedPersonMapperR4.fillGuardianInformation(pm, relatedPerson);
 		}

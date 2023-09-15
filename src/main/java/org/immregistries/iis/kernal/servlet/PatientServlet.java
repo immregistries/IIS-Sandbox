@@ -1,7 +1,11 @@
 package org.immregistries.iis.kernal.servlet;
 
+import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
 import ca.uhn.fhir.parser.IParser;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
+import ca.uhn.fhir.rest.param.ReferenceParam;
+import ca.uhn.fhir.rest.param.StringParam;
+import ca.uhn.fhir.rest.param.TokenParam;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
@@ -97,9 +101,9 @@ public class PatientServlet  {
 			if (action != null) {
 				if (action.equals(ACTION_SEARCH)) {
 					patientMasterList = fhirRequester.searchPatientMasterGoldenList(
-						Patient.FAMILY.matches().value(patientNameLast),
-						Patient.NAME.matches().value(patientNameFirst),
-						Patient.IDENTIFIER.exactly().code(externalLink)
+						new SearchParameterMap(Patient.SP_FAMILY, new StringParam(patientNameLast))
+							.add(Patient.SP_NAME,new StringParam(patientNameFirst))
+							.add(Patient.SP_IDENTIFIER, new TokenParam().setValue(externalLink))
 					);
 				}
 			}
@@ -144,7 +148,7 @@ public class PatientServlet  {
 				boolean showingRecent = false;
 				if (patientMasterList == null) {
 					showingRecent = true;
-					patientMasterList = fhirRequester.searchPatientMasterGoldenList(); // TODO Paging ?
+					patientMasterList = fhirRequester.searchPatientMasterGoldenList(new SearchParameterMap()); // TODO Paging ?
 				}
 
 				if (patientMasterList != null) {
@@ -542,7 +546,8 @@ public class PatientServlet  {
 		List<ObservationReported> observationReportedList = new ArrayList<>();
 		{
 			observationReportedList = fhirRequester.searchObservationReportedList(
-				Observation.SUBJECT.hasId(patientSelected.getPatientId()));
+				new SearchParameterMap(Observation.SP_SUBJECT, new ReferenceParam().setValue(patientSelected.getPatientId())));
+//				Observation.SUBJECT.hasId(patientSelected.getPatientId()));
 //		 observationReportedList = observationReportedList.stream().filter(observationReported -> observationReported.getVaccinationReported() == null).collect(Collectors.toList());
 			Set<String> suppressSet = LoincIdentifier.getSuppressIdentifierCodeSet();
 			for (Iterator<ObservationReported> it = observationReportedList.iterator(); it.hasNext(); ) {
@@ -648,16 +653,18 @@ public class PatientServlet  {
 			patient = fhirClient.read().resource(Patient.class).withId(req.getParameter(PARAM_PATIENT_REPORTED_ID)).execute();
 		} else if (req.getParameter(PARAM_PATIENT_REPORTED_EXTERNAL_LINK) != null) {
 			Bundle patientBundle = (Bundle) fhirRequester.searchGoldenRecord(Patient.class, //TODO choose priority golden or regular
-				Patient.IDENTIFIER.exactly().identifier(req.getParameter(PARAM_PATIENT_REPORTED_EXTERNAL_LINK)));
+				new SearchParameterMap(Patient.SP_IDENTIFIER,new TokenParam().setValue(req.getParameter(PARAM_PATIENT_REPORTED_EXTERNAL_LINK))));
+//				Patient.IDENTIFIER.exactly().identifier(req.getParameter(PARAM_PATIENT_REPORTED_EXTERNAL_LINK)));
 			if (patientBundle.hasEntry()) {
 				patient = (Patient) patientBundle.getEntryFirstRep().getResource();
-			} else {
-				patientBundle = (Bundle) fhirRequester.searchRegularRecord(Patient.class,
-					Patient.IDENTIFIER.exactly().identifier(req.getParameter(PARAM_PATIENT_REPORTED_EXTERNAL_LINK)));
-				if (patientBundle.hasEntry()) {
-					patient = (Patient) patientBundle.getEntryFirstRep().getResource();
-				}
 			}
+//			else {
+//				patientBundle = (Bundle) fhirRequester.searchRegularRecord(Patient.class,
+//					Patient.IDENTIFIER.exactly().identifier(req.getParameter(PARAM_PATIENT_REPORTED_EXTERNAL_LINK)));
+//				if (patientBundle.hasEntry()) {
+//					patient = (Patient) patientBundle.getEntryFirstRep().getResource();
+//				}
+//			}
 		}
 		return patient;
 	}

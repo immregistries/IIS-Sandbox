@@ -3,15 +3,14 @@ package org.immregistries.iis.kernal.InternalClient;
 import ca.uhn.fhir.jpa.api.dao.IFhirResourceDao;
 import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
 import ca.uhn.fhir.rest.api.MethodOutcome;
+import ca.uhn.fhir.rest.api.server.IBundleProvider;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.gclient.ICriterion;
-import ca.uhn.fhir.rest.gclient.ICriterionInternal;
 import org.apache.commons.lang3.StringUtils;
+import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r5.model.*;
 import org.immregistries.iis.kernal.fhir.annotations.OnR5Condition;
 import org.immregistries.iis.kernal.model.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Component;
@@ -24,81 +23,78 @@ import java.util.Optional;
 @Conditional(OnR5Condition.class)
 public class FhirRequesterR5 extends FhirRequester<Patient, Immunization, Location, Practitioner, Observation, Person, Organization, RelatedPerson> {
 
-	@Autowired
-	IFhirResourceDao<Patient> patientDao;
-
-	public PatientMaster searchPatientMaster(ICriterion... where) {
+	public PatientMaster searchPatientMaster(SearchParameterMap searchParameterMap) {
 		PatientMaster patientMaster = null;
-		Bundle bundle = (Bundle) searchGoldenRecord(Patient.class, where);
-		if (bundle != null && bundle.hasEntry()) {
-			patientMaster = patientMapper.getMaster((Patient) bundle.getEntryFirstRep().getResource());
+		IBundleProvider bundleProvider = searchGoldenRecord(Patient.class, searchParameterMap);
+		if (!bundleProvider.isEmpty()) {
+			patientMaster = patientMapper.getMaster((Patient) bundleProvider.getResources(0, 1).get(0));
 		}
 		return patientMaster;
 	}
 
-	public PatientReported searchPatientReported(ICriterion... where) {
+	public PatientReported searchPatientReported(SearchParameterMap searchParameterMap) {
 		PatientReported patientReported = null;
-		Bundle bundle = (Bundle) searchRegularRecord(Patient.class, where);
-		if (bundle != null && bundle.hasEntry()) {
-			patientReported = patientMapper.getReportedWithMaster((Patient) bundle.getEntryFirstRep().getResource());
+		IBundleProvider bundleProvider = searchRegularRecord(Patient.class, searchParameterMap);
+		if (!bundleProvider.isEmpty()) {
+			patientReported = patientMapper.getReportedWithMaster((Patient) bundleProvider.getResources(0, 1).get(0));
 		}
 		return patientReported;
 	}
 
-	public List<PatientReported> searchPatientReportedList(ICriterion... where) {
+	public List<PatientReported> searchPatientReportedList(SearchParameterMap searchParameterMap) {
 		List<PatientReported> patientReportedList = new ArrayList<>();
-		Bundle bundle = (Bundle) searchRegularRecord(Patient.class, where);
-		if (bundle != null) {
-			for (Bundle.BundleEntryComponent entry : bundle.getEntry()) {
-				patientReportedList.add(patientMapper.getReportedWithMaster((Patient) entry.getResource()));
+		IBundleProvider bundleProvider = searchRegularRecord(Patient.class, searchParameterMap);
+		if (!bundleProvider.isEmpty()) {
+			for (IBaseResource resource : bundleProvider.getAllResources()) {
+				patientReportedList.add(patientMapper.getReportedWithMaster((Patient) resource));
 			}
 		}
 		return patientReportedList;
 	}
 
-	public List<PatientMaster> searchPatientMasterGoldenList(ICriterion... where) {
+	public List<PatientMaster> searchPatientMasterGoldenList(SearchParameterMap searchParameterMap) {
 		List<PatientMaster> patientList = new ArrayList<>();
-		Bundle bundle = (Bundle) searchGoldenRecord(Patient.class, where);
-		if (bundle != null) {
-			for (Bundle.BundleEntryComponent entry : bundle.getEntry()) {
-				patientList.add(patientMapper.getMaster((Patient) entry.getResource()));
+		IBundleProvider bundleProvider = searchGoldenRecord(Patient.class, searchParameterMap);
+		if (!bundleProvider.isEmpty()) {
+			for (IBaseResource resource : bundleProvider.getAllResources()) {
+				patientList.add(patientMapper.getMaster((Patient) resource));
 			}
 		}
 		return patientList;
 	}
 
-	public VaccinationMaster searchVaccinationMaster(ICriterion... where) {
+	public VaccinationMaster searchVaccinationMaster(SearchParameterMap searchParameterMap) {
 		VaccinationMaster vaccinationMaster = null;
-		Bundle bundle = (Bundle) searchGoldenRecord(Immunization.class, where);
-		if (bundle != null && bundle.hasEntry()) {
-			vaccinationMaster = immunizationMapper.getMaster((Immunization) bundle.getEntryFirstRep().getResource());
+		IBundleProvider bundleProvider = searchGoldenRecord(Immunization.class, searchParameterMap);
+		if (!bundleProvider.isEmpty()) {
+			vaccinationMaster = immunizationMapper.getMaster((Immunization) bundleProvider.getResources(0, 1).get(0));
 		}
 		return vaccinationMaster;
 	}
 
-	public VaccinationReported searchVaccinationReported(ICriterion... where) {
+	public VaccinationReported searchVaccinationReported(SearchParameterMap searchParameterMap) {
 		VaccinationReported vaccinationReported = null;
-		Bundle bundle = (Bundle) searchRegularRecord(Immunization.class, where);
-		if (bundle != null && bundle.hasEntry()) {
-			vaccinationReported = immunizationMapper.getReportedWithMaster((Immunization) bundle.getEntryFirstRep().getResource());
+		IBundleProvider bundleProvider = searchRegularRecord(Immunization.class, searchParameterMap);
+		if (!bundleProvider.isEmpty()) {
+			vaccinationReported = immunizationMapper.getReportedWithMaster((Immunization) bundleProvider.getResources(0, 1).get(0));
 		}
 		return vaccinationReported;
 	}
 
-	public Organization searchOrganization(ICriterion... where) {
+	public Organization searchOrganization(SearchParameterMap searchParameterMap) {
 		Organization organization = null;
-		Bundle bundle = (Bundle) search(Organization.class, where);
-		if (bundle != null && bundle.hasEntry()) {
-			organization = (Organization) bundle.getEntryFirstRep().getResource();
+		IBundleProvider bundleProvider = search(Organization.class, searchParameterMap);
+		if (!bundleProvider.isEmpty()) {
+			organization = (Organization) bundleProvider.getResources(0, 1).get(0);
 		}
 		return organization;
 	}
 
-	public List<VaccinationReported> searchVaccinationReportedList(ICriterion... where) {
+	public List<VaccinationReported> searchVaccinationReportedList(SearchParameterMap searchParameterMap) {
 		List<VaccinationReported> vaccinationReportedList = new ArrayList<>();
-		Bundle bundle = (Bundle) searchRegularRecord(Immunization.class, where);
-		for (Bundle.BundleEntryComponent entry : bundle.getEntry()) {
-			vaccinationReportedList.add(immunizationMapper.getReportedWithMaster((Immunization) entry.getResource()));
+		IBundleProvider bundleProvider = searchRegularRecord(Immunization.class, searchParameterMap);
+		for (IBaseResource resource : bundleProvider.getAllResources()) {
+			vaccinationReportedList.add(immunizationMapper.getReportedWithMaster((Immunization) resource));
 		}
 		return vaccinationReportedList;
 	}
@@ -117,7 +113,7 @@ public class FhirRequesterR5 extends FhirRequester<Patient, Immunization, Locati
 			.returnResourceType(Bundle.class).execute();
 		List<VaccinationMaster> vaccinationList = new ArrayList<>();
 		for (Bundle.BundleEntryComponent entry : bundle.getEntry()) {
-			if (entry.getResource() instanceof  Immunization) {
+			if (entry.getResource() instanceof Immunization) {
 				if (entry.getResource().getMeta().getTag(GOLDEN_SYSTEM_TAG, GOLDEN_RECORD) != null) {
 					vaccinationList.add(immunizationMapper.getMaster((Immunization) entry.getResource()));
 				}
@@ -126,82 +122,82 @@ public class FhirRequesterR5 extends FhirRequester<Patient, Immunization, Locati
 		return vaccinationList;
 	}
 
-	public ObservationReported searchObservationReported(ICriterion... where) {
+	public ObservationReported searchObservationReported(SearchParameterMap searchParameterMap) {
 		IGenericClient fhirClient = repositoryClientFactory.getFhirClient();
 		ObservationReported observationReported = null;
-		Bundle bundle = (Bundle) searchRegularRecord(Observation.class, where);
-		if (bundle != null && bundle.hasEntry()) {
-			observationReported = observationMapper.getReportedWithMaster((Observation) bundle.getEntryFirstRep().getResource(), this, fhirClient);
+		IBundleProvider bundleProvider = searchRegularRecord(Observation.class, searchParameterMap);
+		if (!bundleProvider.isEmpty()) {
+			observationReported = observationMapper.getReportedWithMaster((Observation) bundleProvider.getResources(0, 1).get(0),  fhirClient);
 		}
 		return observationReported;
 	}
 
-	public ObservationMaster searchObservationMaster(ICriterion... where) {
+	public ObservationMaster searchObservationMaster(SearchParameterMap searchParameterMap) {
 		ObservationMaster observationMaster = null;
-		Bundle bundle = (Bundle) searchGoldenRecord(Observation.class, where);
-		if (bundle != null && bundle.hasEntry()) {
-			observationMaster = observationMapper.getMaster((Observation) bundle.getEntryFirstRep().getResource());
+		IBundleProvider bundleProvider = searchGoldenRecord(Observation.class, searchParameterMap);
+		if (!bundleProvider.isEmpty()) {
+			observationMaster = observationMapper.getMaster((Observation) bundleProvider.getResources(0, 1).get(0));
 		}
 		return observationMaster;
 	}
 
-	public List<ObservationReported> searchObservationReportedList(ICriterion... where) {
+	public List<ObservationReported> searchObservationReportedList(SearchParameterMap searchParameterMap) {
 		IGenericClient fhirClient = repositoryClientFactory.getFhirClient();
 		List<ObservationReported> observationReportedList = new ArrayList<>();
-		Bundle bundle = (Bundle) search(Observation.class, where);
-		for (Bundle.BundleEntryComponent entry : bundle.getEntry()) {
-			observationReportedList.add(observationMapper.getReportedWithMaster((Observation) entry.getResource(), this, fhirClient));
+		IBundleProvider bundleProvider = search(Observation.class, searchParameterMap);
+		for (IBaseResource resource : bundleProvider.getAllResources()) {
+			observationReportedList.add(observationMapper.getReportedWithMaster((Observation) resource, fhirClient));
 		}
 		return observationReportedList;
 	}
 
-	public OrgLocation searchOrgLocation(ICriterion... where) {
+	public OrgLocation searchOrgLocation(SearchParameterMap searchParameterMap) {
 		OrgLocation orgLocation = null;
-		Bundle bundle = (Bundle) search(Observation.class, where);
-		if (bundle != null && bundle.hasEntry()) {
-			orgLocation = locationMapper.orgLocationFromFhir((Location) bundle.getEntryFirstRep().getResource());
+		IBundleProvider bundleProvider = search(Observation.class, searchParameterMap);
+		if (!bundleProvider.isEmpty()) {
+			orgLocation = locationMapper.orgLocationFromFhir((Location) bundleProvider.getResources(0, 1).get(0));
 		}
 		return orgLocation;
 	}
 
-	public List<OrgLocation> searchOrgLocationList(ICriterion... where) {
+	public List<OrgLocation> searchOrgLocationList(SearchParameterMap searchParameterMap) {
 		List<OrgLocation> locationList = new ArrayList<>();
-		Bundle bundle = (Bundle) search(Location.class, where);
-		for (Bundle.BundleEntryComponent entry : bundle.getEntry()) {
-			locationList.add(locationMapper.orgLocationFromFhir((Location) entry.getResource()));
+		IBundleProvider bundleProvider = search(Location.class, searchParameterMap);
+		for (IBaseResource resource : bundleProvider.getAllResources()) {
+			locationList.add(locationMapper.orgLocationFromFhir((Location) resource));
 		}
 		return locationList;
 	}
 
-	public ModelPerson searchPerson(ICriterion... where) {
+	public ModelPerson searchPerson(SearchParameterMap searchParameterMap) {
 		ModelPerson modelPerson = null;
-		Bundle bundle = (Bundle) search(org.hl7.fhir.r5.model.Person.class, where);
-		if (bundle != null && bundle.hasEntry()) {
-			modelPerson = personMapper.getModelPerson((org.hl7.fhir.r5.model.Person) bundle.getEntryFirstRep().getResource());
+		IBundleProvider bundleProvider = search(org.hl7.fhir.r5.model.Person.class, searchParameterMap);
+		if (!bundleProvider.isEmpty()) {
+			modelPerson = personMapper.getModelPerson((org.hl7.fhir.r5.model.Person) bundleProvider.getResources(0, 1).get(0));
 		}
 		return modelPerson;
 	}
 
-	public ModelPerson searchPractitioner(ICriterion... where) {
+	public ModelPerson searchPractitioner(SearchParameterMap searchParameterMap) {
 		ModelPerson modelPerson = null;
-		Bundle bundle = (Bundle) search(org.hl7.fhir.r5.model.Practitioner.class, where);
-		if (bundle != null && bundle.hasEntry()) {
-			modelPerson = practitionerMapper.getModelPerson((org.hl7.fhir.r5.model.Practitioner) bundle.getEntryFirstRep().getResource());
+		IBundleProvider bundleProvider = search(org.hl7.fhir.r5.model.Practitioner.class, searchParameterMap);
+		if (!bundleProvider.isEmpty()) {
+			modelPerson = practitionerMapper.getModelPerson((org.hl7.fhir.r5.model.Practitioner) bundleProvider.getResources(0, 1).get(0));
 		}
 		return modelPerson;
 	}
 
-	public RelatedPerson searchRelatedPerson(ICriterion... where) {
+	public RelatedPerson searchRelatedPerson(SearchParameterMap searchParameterMap) {
 		RelatedPerson relatedPerson = null;
-		Bundle bundle = (Bundle) search(RelatedPerson.class, where);
-		if (bundle != null && bundle.hasEntry()) {
-			relatedPerson = (RelatedPerson) bundle.getEntryFirstRep().getResource();
+		IBundleProvider bundleProvider = search(RelatedPerson.class, searchParameterMap);
+		if (!bundleProvider.isEmpty()) {
+			relatedPerson = (RelatedPerson) bundleProvider.getResources(0, 1).get(0);
 		}
 		return relatedPerson;
 	}
 
 	public PatientReported savePatientReported(PatientReported patientReported) {
-		Patient patient = (Patient) patientMapper.getFhirResource(patientReported);
+		Patient patient = patientMapper.getFhirResource(patientReported);
 		MethodOutcome outcome = save(patient,
 			Patient.IDENTIFIER.exactly().systemAndIdentifier(patientReported.getPatientReportedAuthority(), patientReported.getExternalLink()));
 		if (!outcome.getResource().isEmpty()) {
@@ -277,9 +273,15 @@ public class FhirRequesterR5 extends FhirRequester<Patient, Immunization, Locati
 	}
 
 	public Organization saveOrganization(Organization organization) {
-		MethodOutcome outcome = save(organization,
-			Organization.IDENTIFIER.exactly().identifier(organization.getIdentifierFirstRep().getValue())
-		);
+		MethodOutcome outcome = null;
+		if (organization.getIdentifierFirstRep().getValue() != null) {
+			outcome = save(organization,
+				Organization.IDENTIFIER.exactly().identifier(organization.getIdentifierFirstRep().getValue())
+			);
+		} else {
+			outcome = save(organization);
+		}
+
 		if (!outcome.getResource().isEmpty()) {
 			return (Organization) outcome.getResource();
 		} else if (outcome.getCreated() != null && outcome.getCreated()) {
