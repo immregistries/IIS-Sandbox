@@ -34,7 +34,7 @@ import java.util.*;
 
 public abstract class IncomingMessageHandler<Organization extends IBaseResource> implements IIncomingMessageHandler<Organization> {
 
-  	private final Logger logger = LoggerFactory.getLogger(IncomingMessageHandler.class);
+  	protected final Logger logger = LoggerFactory.getLogger(IncomingMessageHandler.class);
   	@Autowired
   	protected RepositoryClientFactory repositoryClientFactory;
   	@Autowired

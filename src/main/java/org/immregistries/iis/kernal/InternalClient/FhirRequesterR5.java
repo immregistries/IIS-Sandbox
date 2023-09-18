@@ -199,6 +199,7 @@ public class FhirRequesterR5 extends FhirRequester<Patient, Immunization, Locati
 	public PatientReported savePatientReported(PatientReported patientReported) {
 		Patient patient = patientMapper.getFhirResource(patientReported);
 		MethodOutcome outcome = save(patient,
+			Patient.ORGANIZATION.hasId(patientReported.getManagingOrganizationId()),
 			Patient.IDENTIFIER.exactly().systemAndIdentifier(patientReported.getPatientReportedAuthority(), patientReported.getExternalLink()));
 		if (!outcome.getResource().isEmpty()) {
 			patientReported.setPatientId(outcome.getResource().getIdElement().getIdPart());
@@ -274,7 +275,7 @@ public class FhirRequesterR5 extends FhirRequester<Patient, Immunization, Locati
 
 	public Organization saveOrganization(Organization organization) {
 		MethodOutcome outcome = null;
-		if (organization.getIdentifierFirstRep().getValue() != null) {
+		if (StringUtils.isNotBlank(organization.getIdentifierFirstRep().getValue())) {
 			outcome = save(organization,
 				Organization.IDENTIFIER.exactly().identifier(organization.getIdentifierFirstRep().getValue())
 			);

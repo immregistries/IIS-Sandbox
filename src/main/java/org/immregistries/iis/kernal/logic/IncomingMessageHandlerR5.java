@@ -67,6 +67,7 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler<Organizatio
 			if (sendingOrganization == null) {
 				sendingOrganization = processManagingOrganization(reader);
 			}
+			logger.info("ORGANIZATION {} {}", sendingOrganization.getId(), sendingOrganization.getName());
 			switch (messageType) {
 				case "VXU":
 					responseMessage = processVXU(tenant, reader, message, sendingOrganization);
@@ -601,9 +602,9 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler<Organizatio
 			throw new ProcessingException(
 				"No PID segment found, required for accepting vaccination report", "", 0, 0);
 		}
-		patientReported = fhirRequester.searchPatientReported(
-			new SearchParameterMap("identifier",new TokenParam().setValue(patientReportedExternalLink))
-		);
+//		patientReported = fhirRequester.searchPatientReported(
+//			new SearchParameterMap("identifier",new TokenParam().setValue(patientReportedExternalLink))
+//		); TODO uncomment ?
 
 		if (patientReported == null) {
 			patientReported = new PatientReported();

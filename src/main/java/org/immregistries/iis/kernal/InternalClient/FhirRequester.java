@@ -12,8 +12,9 @@ import ca.uhn.fhir.rest.gclient.ICriterionInternal;
 import ca.uhn.fhir.rest.param.TokenParam;
 import ca.uhn.fhir.rest.param.TokenParamModifier;
 import ca.uhn.fhir.rest.server.RestfulServer;
+import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
 import org.apache.commons.lang3.StringUtils;
-import org.hl7.fhir.instance.model.api.IBaseResource;
+ import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.IdType;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.mapping.Interfaces.*;
@@ -52,26 +53,6 @@ public abstract class FhirRequester<
 	@Autowired
 	RelatedPersonMapper<RelatedPerson> relatedPersonMapper;
 
-	//	private final Class<Patient> patientClass;
-//	private final Class<Immunization> immunizationClass;
-//	private final Class<Location> locationClass;
-//	private final Class<Practitioner> practitionerClass;
-//	private final Class<Observation> observationClass;
-//	private final Class<Person> personClass;
-//	private final Class<Organization> organizationClass;
-//
-//	@SuppressWarnings("unchecked")
-//	public FhirRequester() {
-//		Class[] classes = GenericTypeResolver.resolveTypeArguments(getClass(), FhirRequester.class);
-//		assert classes != null;
-//		this.patientClass = (Class<Patient>) classes[0] ;
-//		this.immunizationClass = (Class<Immunization>) classes[1];
-//		this.locationClass = (Class<Location>) classes[2];
-//		this.practitionerClass = (Class<Practitioner>) classes[3];
-//		this.observationClass = (Class<Observation>) classes[4];
-//		this.personClass = (Class<Person>) classes[5];
-//		this.organizationClass = (Class<Organization>) classes[6];
-//	}
 	@Autowired
 	RepositoryClientFactory repositoryClientFactory;
 	@Autowired
@@ -123,9 +104,14 @@ public abstract class FhirRequester<
 		if (StringUtils.isNotBlank(params)) {
 			// If not empty add &
 			params += "&";
+			params += NOT_GOLDEN_CRITERION;
 		}
-		params += NOT_GOLDEN_CRITERION;
-		DaoMethodOutcome outcome = dao.update(resource, params, ServletHelper.requestDetailsWithPartitionName());
+		DaoMethodOutcome outcome;
+		try {
+			outcome = dao.update(resource, params, ServletHelper.requestDetailsWithPartitionName());
+		} catch (InvalidRequestException invalidRequestException) {
+			outcome = dao.create(resource, ServletHelper.requestDetailsWithPartitionName());
+		}
 		return outcome;
 	}
 
