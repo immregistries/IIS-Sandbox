@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal.fhir.BulkQuery;
+package org.immregistries.iis.kernal.fhir.bulkQuery;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.i18n.Msg;
