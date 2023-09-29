@@ -10,6 +10,7 @@ import ca.uhn.fhir.rest.server.exceptions.InternalErrorException;
 import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
 import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
 import ca.uhn.fhir.rest.server.interceptor.partition.RequestTenantPartitionInterceptor;
+import ca.uhn.fhir.rest.server.servlet.ServletRequestDetails;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.r5.model.IntegerType;
 import org.hl7.fhir.r5.model.Parameters;
@@ -86,7 +87,7 @@ public class PartitionCreationInterceptor extends RequestTenantPartitionIntercep
 		inParams.addParameter().setName("id").setValue(new IntegerType(idAttempt));
 		inParams.addParameter().setName("name").setValue(partitionName);
 		inParams.addParameter().setName("description").setValue(partitionName);
-		partitionManagementProvider.addPartition(inParams,new IntegerType(idAttempt),partitionName,partitionName);
+		partitionManagementProvider.addPartition(inParams,new IntegerType(idAttempt),partitionName,partitionName, new ServletRequestDetails());
 		return RequestPartitionId.fromPartitionId(idAttempt);
 	}
 

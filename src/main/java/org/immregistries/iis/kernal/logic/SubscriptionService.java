@@ -69,9 +69,8 @@ public class SubscriptionService {
 			 * Adding headers for security requirements
 			 */
 			AdditionalRequestHeadersInterceptor additionalRequestHeadersInterceptor = new AdditionalRequestHeadersInterceptor();
-			for (StringType header : subscription.getHeader()) {
-				String[] headerSplit = header.getValue().split(":");
-				additionalRequestHeadersInterceptor.addHeaderValue(headerSplit[0], headerSplit[1]);
+			for (Subscription.SubscriptionParameterComponent parameterComponent : subscription.getParameter()) {
+				additionalRequestHeadersInterceptor.addHeaderValue(parameterComponent.getName(), parameterComponent.getValue());
 			}
 			endpointClient.registerInterceptor(additionalRequestHeadersInterceptor);
 			Bundle notificationBundle = new Bundle(Bundle.BundleType.SUBSCRIPTIONNOTIFICATION);

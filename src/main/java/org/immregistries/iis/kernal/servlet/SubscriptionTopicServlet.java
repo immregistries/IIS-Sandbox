@@ -72,8 +72,7 @@ public class SubscriptionTopicServlet extends HttpServlet {
 			.setDescription("test")
 			.setResource("OperationOutcome")
 			.setFilterParameter("_tag")
-			.addModifier(Enumerations.SubscriptionSearchModifier.EQUAL)
-			.addModifier(Enumerations.SubscriptionSearchModifier.EQ)
+			.addModifier(Enumerations.SearchModifierCode.EXACT)
 		);
 		topic.addNotificationShape().setResource("OperationOutcome");
 		return topic;
