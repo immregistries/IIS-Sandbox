@@ -36,9 +36,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import javax.interceptor.Interceptor;
 import java.util.Optional;
 
-import static org.immregistries.iis.kernal.fhir.mdm.MdmCustomSubscriptionLoader.SUBSCRIPTION_PARTITION_NAME;
 
-@Interceptor
+//@Interceptor
 public class CustomSubscriptionValidatingInterceptor extends SubscriptionValidatingInterceptor {
 
 
@@ -182,7 +181,7 @@ public class CustomSubscriptionValidatingInterceptor extends SubscriptionValidat
 		map.add(SubscriptionTopic.SP_URL, new UriParam(theCriteria));
 		IFhirResourceDao subscriptionTopicDao = myDaoRegistry.getResourceDao("SubscriptionTopic");
 		SystemRequestDetails systemRequestDetails = SystemRequestDetails.forAllPartitions();
-		systemRequestDetails.setTenantId(SUBSCRIPTION_PARTITION_NAME);
+		//systemRequestDetails.setTenantId(SUBSCRIPTION_PARTITION_NAME);
 		IBundleProvider search = subscriptionTopicDao.search(map, systemRequestDetails);
 		return search.getResources(0, 1).stream().findFirst();
 	}

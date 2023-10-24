@@ -28,7 +28,6 @@ import java.util.stream.Collectors;
 public class MdmCustomSubscriptionLoader extends MdmSubscriptionLoader {
 
 	public static final String MDM_SUBSCIPRION_ID_PREFIX = "mdm-";
-	public static final String SUBSCRIPTION_PARTITION_NAME = "DEFAULT";
 	private static final Logger ourLog = Logs.getMdmTroubleshootingLog();
 
 	@Autowired
@@ -86,8 +85,8 @@ public class MdmCustomSubscriptionLoader extends MdmSubscriptionLoader {
 					+ myFhirContext.getVersion().getVersion());
 		}
 
-		SystemRequestDetails systemRequestDetails = SystemRequestDetails.newSystemRequestAllPartitions();
-		systemRequestDetails.setTenantId(SUBSCRIPTION_PARTITION_NAME);
+		SystemRequestDetails systemRequestDetails = SystemRequestDetails.forAllPartitions();
+		//systemRequestDetails.setTenantId(SUBSCRIPTION_PARTITION_NAME);
 		mySubscriptionTopicDao = myDaoRegistry.getResourceDao("SubscriptionTopic");
 		SubscriptionTopic topic = myFhirContext.newJsonParser().parseResource(SubscriptionTopic.class, TOPIC);
 		try {
@@ -108,7 +107,7 @@ public class MdmCustomSubscriptionLoader extends MdmSubscriptionLoader {
 
 	synchronized void updateIfNotPresent(IBaseResource theSubscription) {
 		SystemRequestDetails systemRequestDetails = SystemRequestDetails.newSystemRequestAllPartitions();
-		systemRequestDetails.setTenantId(SUBSCRIPTION_PARTITION_NAME);
+		//systemRequestDetails.setTenantId(SUBSCRIPTION_PARTITION_NAME);
 		try {
 			mySubscriptionDao.read(theSubscription.getIdElement(), systemRequestDetails);
 		} catch (ResourceNotFoundException | ResourceGoneException e) {

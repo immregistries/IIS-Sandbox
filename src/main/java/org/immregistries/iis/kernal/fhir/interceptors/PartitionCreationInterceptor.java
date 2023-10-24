@@ -61,9 +61,10 @@ public class PartitionCreationInterceptor extends RequestTenantPartitionIntercep
 
 	public RequestPartitionId getOrCreatePartitionId(String partitionName) {
 		if (StringUtils.isBlank(partitionName)) { // ALL partitions and DEFAULT partition are set to be the same
-			partitionName = "DEFAULT";
+			partitionName = "default";
+//			return RequestPartitionId.defaultPartition();
 		}
-		if (partitionName.equals("DEFAULT")) {
+		if (partitionName.equals("default") || partitionName.equals("DEFAULT") ) {
 			return RequestPartitionId.defaultPartition();
 		}
 		try {
