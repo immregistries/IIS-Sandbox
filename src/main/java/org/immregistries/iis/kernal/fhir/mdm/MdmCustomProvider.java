@@ -18,7 +18,7 @@ import org.hl7.fhir.instance.model.api.IBaseBundle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-@Component
+//@Component
 public class MdmCustomProvider extends MdmProviderDstu3Plus {
 
 	@Autowired

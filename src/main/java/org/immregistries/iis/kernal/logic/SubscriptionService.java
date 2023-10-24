@@ -29,10 +29,10 @@ public class SubscriptionService {
 	IFhirSystemDao fhirSystemDao;
 	@Autowired
 	RepositoryClientFactory repositoryClientFactory;
-	@Autowired
-	SubscriptionDeliveringRestHookSubscriber subscriptionDeliveringRestHookSubscriber;
-	@Autowired
-	SubscriptionCanonicalizer subscriptionCanonicalizer;
+//	@Autowired
+//	SubscriptionDeliveringRestHookSubscriber subscriptionDeliveringRestHookSubscriber;
+//	@Autowired
+//	SubscriptionCanonicalizer subscriptionCanonicalizer;
 
 //	public Subscription searchRelatedSubscription(Immunization baseResource, RequestDetails requestDetails) {
 //		UserAccess userAccess = (UserAccess) requestDetails.getAttribute("userAccess");
@@ -70,7 +70,7 @@ public class SubscriptionService {
 			 */
 			AdditionalRequestHeadersInterceptor additionalRequestHeadersInterceptor = new AdditionalRequestHeadersInterceptor();
 			for (Subscription.SubscriptionParameterComponent parameterComponent : subscription.getParameter()) {
-				additionalRequestHeadersInterceptor.addHeaderValue(parameterComponent.getName(), parameterComponent.getValue());
+//				additionalRequestHeadersInterceptor.addHeaderValue(parameterComponent.getName(), parameterComponent.getValue());
 			}
 			endpointClient.registerInterceptor(additionalRequestHeadersInterceptor);
 			Bundle notificationBundle = new Bundle(Bundle.BundleType.SUBSCRIPTIONNOTIFICATION);

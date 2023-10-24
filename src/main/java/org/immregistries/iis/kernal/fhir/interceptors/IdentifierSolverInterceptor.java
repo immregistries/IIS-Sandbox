@@ -51,7 +51,7 @@ public class IdentifierSolverInterceptor {
 	@Hook(SERVER_INCOMING_REQUEST_PRE_HANDLED)
 	public void handle(RequestDetails requestDetails)
 		throws InvalidRequestException {
-		logger.info("Identifier reference interception");
+//		logger.info("Identifier reference interception");
 
 		if (requestDetails.getResource() instanceof Immunization) {
 			logger.info("Identifier reference interception");

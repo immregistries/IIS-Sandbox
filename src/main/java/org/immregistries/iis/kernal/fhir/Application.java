@@ -1,3 +1,4 @@
+
 package org.immregistries.iis.kernal.fhir;
 
 import ca.uhn.fhir.batch2.jobs.config.Batch2JobsConfig;
@@ -17,6 +18,7 @@ import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.elasticsearch.ElasticsearchRestClientAutoConfiguration;
+import org.springframework.boot.autoconfigure.thymeleaf.ThymeleafAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
@@ -32,7 +34,7 @@ import org.springframework.web.context.request.RequestContextListener;
 	"org.immregistries.iis.kernal.servlet"
 //	,"org.immregistries.iis.kernal.repository"
 })
-@SpringBootApplication(exclude = {ElasticsearchRestClientAutoConfiguration.class})
+@SpringBootApplication(exclude = {ElasticsearchRestClientAutoConfiguration.class, ThymeleafAutoConfiguration.class})
 @Import({
 	SubscriptionSubmitterConfig.class,
 	SubscriptionProcessorConfig.class,

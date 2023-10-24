@@ -26,13 +26,11 @@ import ca.uhn.fhir.jpa.provider.dstu3.JpaConformanceProviderDstu3;
 import ca.uhn.fhir.jpa.search.DatabaseBackedPagingProvider;
 import org.immregistries.iis.kernal.fhir.bulkQuery.BulkQueryGroupProviderR4;
 import org.immregistries.iis.kernal.fhir.bulkQuery.BulkQueryGroupProviderR5;
-import org.immregistries.iis.kernal.fhir.bulkQuery.CustomBulkDataExportProvider;
 import org.immregistries.iis.kernal.fhir.common.StarterJpaConfig;
 import org.immregistries.iis.kernal.fhir.interceptors.IdentifierSolverInterceptor;
 import org.immregistries.iis.kernal.fhir.interceptors.IdentifierSolverInterceptorR4;
 import org.immregistries.iis.kernal.fhir.interceptors.PartitionCreationInterceptor;
 import ca.uhn.fhir.jpa.subscription.util.SubscriptionDebugLogInterceptor;
-import ca.uhn.fhir.mdm.provider.MdmProviderLoader;
 import ca.uhn.fhir.narrative.DefaultThymeleafNarrativeGenerator;
 import ca.uhn.fhir.narrative2.NullNarrativeGenerator;
 import ca.uhn.fhir.rest.openapi.OpenApiInterceptor;
@@ -45,7 +43,7 @@ import ca.uhn.fhir.validation.IValidatorModule;
 import ca.uhn.fhir.validation.ResultSeverityEnum;
 import com.google.common.base.Strings;
 import org.immregistries.iis.kernal.fhir.interceptors.SessionAuthorizationInterceptor;
-import org.immregistries.iis.kernal.fhir.mdm.MdmCustomProvider;
+import org.immregistries.iis.kernal.fhir.mdm.MdmCustomProviderLoader;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -72,11 +70,10 @@ public class ServerConfig {
 	IFhirResourceDao<org.hl7.fhir.r5.model.Group> fhirResourceGroupDaoR5;
 
 	@Bean
-	public RestfulServer restfulServer(IFhirSystemDao<?, ?> fhirSystemDao, AppProperties appProperties, DaoRegistry daoRegistry, Optional<MdmProviderLoader> mdmProviderProvider, IJpaSystemProvider jpaSystemProvider, ResourceProviderFactory resourceProviderFactory, JpaStorageSettings daoConfig, ISearchParamRegistry searchParamRegistry, IValidationSupport theValidationSupport, DatabaseBackedPagingProvider databaseBackedPagingProvider, LoggingInterceptor loggingInterceptor, Optional<TerminologyUploaderProvider> terminologyUploaderProvider, Optional<SubscriptionTriggeringProvider> subscriptionTriggeringProvider, Optional<CorsInterceptor> corsInterceptor, IInterceptorBroadcaster interceptorBroadcaster, Optional<BinaryAccessProvider> binaryAccessProvider, BinaryStorageInterceptor binaryStorageInterceptor, IValidatorModule validatorModule, Optional<GraphQLProvider> graphQLProvider, BulkDataExportProvider bulkDataExportProvider, BulkDataImportProvider bulkDataImportProvider, ValueSetOperationProvider theValueSetOperationProvider, ReindexProvider reindexProvider, PartitionManagementProvider partitionManagementProvider, Optional<RepositoryValidatingInterceptor> repositoryValidatingInterceptor, IPackageInstallerSvc packageInstallerSvc, ThreadSafeResourceDeleterSvc theThreadSafeResourceDeleterSvc, ApplicationContext appContext,
+	public RestfulServer restfulServer(IFhirSystemDao<?, ?> fhirSystemDao, AppProperties appProperties, DaoRegistry daoRegistry, Optional<MdmCustomProviderLoader> mdmProviderLoader, IJpaSystemProvider jpaSystemProvider, ResourceProviderFactory resourceProviderFactory, JpaStorageSettings daoConfig, ISearchParamRegistry searchParamRegistry, IValidationSupport theValidationSupport, DatabaseBackedPagingProvider databaseBackedPagingProvider, LoggingInterceptor loggingInterceptor, Optional<TerminologyUploaderProvider> terminologyUploaderProvider, Optional<SubscriptionTriggeringProvider> subscriptionTriggeringProvider, Optional<CorsInterceptor> corsInterceptor, IInterceptorBroadcaster interceptorBroadcaster, Optional<BinaryAccessProvider> binaryAccessProvider, BinaryStorageInterceptor binaryStorageInterceptor, IValidatorModule validatorModule, Optional<GraphQLProvider> graphQLProvider, BulkDataExportProvider bulkDataExportProvider, BulkDataImportProvider bulkDataImportProvider, ValueSetOperationProvider theValueSetOperationProvider, ReindexProvider reindexProvider, PartitionManagementProvider partitionManagementProvider, Optional<RepositoryValidatingInterceptor> repositoryValidatingInterceptor, IPackageInstallerSvc packageInstallerSvc, ThreadSafeResourceDeleterSvc theThreadSafeResourceDeleterSvc, ApplicationContext appContext,
 												  PartitionCreationInterceptor partitionCreationInterceptor,
 												  Optional<BulkQueryGroupProviderR5> bulkQueryGroupProviderR5,
 												  Optional<BulkQueryGroupProviderR4> bulkQueryGroupProviderR4,
-												  Optional<MdmCustomProvider> mdmCustomProvider,
 												  IdentifierSolverInterceptor identifierSolverInterceptor,
 												  Optional<IdentifierSolverInterceptorR4> identifierSolverInterceptorR4,
 												  SessionAuthorizationInterceptor sessionAuthorizationInterceptor) {
@@ -97,12 +94,7 @@ public class ServerConfig {
 		}
 
 		if (appProperties.getMdm_enabled()) {
-//			mdmProviderProvider.get().loadProvider();
-			/**
-			 * CUSTOM MDM PROVIDERS HERE
-			 */
-			resourceProviderFactory.addSupplier(mdmCustomProvider::get);
-//			fhirServer.registerProvider(mdmCustomProvider.get());
+			mdmProviderLoader.get().loadProvider();
 			daoConfig.setAllowMdmExpansion(true);
 		}
 		/**

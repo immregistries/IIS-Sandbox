@@ -1,11 +1,15 @@
 package org.immregistries.iis.kernal.fhir.interceptors;
 
 import ca.uhn.fhir.i18n.Msg;
+import ca.uhn.fhir.interceptor.api.Hook;
+import ca.uhn.fhir.interceptor.api.Pointcut;
 import ca.uhn.fhir.interceptor.model.RequestPartitionId;
 import ca.uhn.fhir.jpa.dao.data.IPartitionDao;
+import ca.uhn.fhir.jpa.entity.PartitionEntity;
 import ca.uhn.fhir.jpa.partition.IPartitionLookupSvc;
 import ca.uhn.fhir.jpa.partition.PartitionManagementProvider;
 import ca.uhn.fhir.rest.api.server.RequestDetails;
+import ca.uhn.fhir.rest.api.server.SystemRequestDetails;
 import ca.uhn.fhir.rest.server.exceptions.InternalErrorException;
 import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
 import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
@@ -33,13 +37,20 @@ import java.util.Random;
 public class PartitionCreationInterceptor extends RequestTenantPartitionInterceptor {
 	@Autowired
 	IPartitionLookupSvc partitionLookupSvc;
-	@Autowired
-	private IPartitionDao myPartitionDao;
-	@Autowired
-	private PartitionManagementProvider partitionManagementProvider;
 	private final Logger ourLog = LoggerFactory.getLogger(PartitionCreationInterceptor.class);
 
 	public static final String PARTITION_NAME_SEPARATOR = "-"; // TEMP TODO find good url structure
+
+
+	@Hook(Pointcut.STORAGE_PARTITION_IDENTIFY_READ)
+	public RequestPartitionId partitionIdentifyRead(RequestDetails theRequestDetails) {
+		return extractPartitionIdFromRequest(theRequestDetails);
+	}
+
+	@Hook(Pointcut.STORAGE_PARTITION_IDENTIFY_CREATE)
+	public RequestPartitionId partitionIdentifyCreate(RequestDetails theRequestDetails) {
+		return extractPartitionIdFromRequest(theRequestDetails);
+	}
 
 	@Override
 	@Nonnull
@@ -49,6 +60,12 @@ public class PartitionCreationInterceptor extends RequestTenantPartitionIntercep
 	}
 
 	public RequestPartitionId getOrCreatePartitionId(String partitionName) {
+		if (StringUtils.isBlank(partitionName)) { // ALL partitions and DEFAULT partition are set to be the same
+			partitionName = "DEFAULT";
+		}
+		if (partitionName.equals("DEFAULT")) {
+			return RequestPartitionId.defaultPartition();
+		}
 		try {
 			partitionLookupSvc.getPartitionByName(partitionName);
 			return RequestPartitionId.fromPartitionName(partitionName);
@@ -71,23 +88,8 @@ public class PartitionCreationInterceptor extends RequestTenantPartitionIntercep
 	}
 
 	private RequestPartitionId createPartition(String tenantName) {
-		// Reminder tenantId = partitionName != partitionId
-		StringType partitionName = new StringType(tenantName);
-		Random random = new Random();
-		int idAttempt = random.nextInt(10000);
-		int number_of_attempts = 0;
-		while (number_of_attempts < 1000 && myPartitionDao.existsById(idAttempt)){
-			idAttempt = random.nextInt(10000);
-			number_of_attempts++;
-		}
-		if (number_of_attempts == 1000){
-//			throw new Exception("Impossible to generate new partition id after 1000 attempts");
-		}
-		Parameters inParams = new Parameters();
-		inParams.addParameter().setName("id").setValue(new IntegerType(idAttempt));
-		inParams.addParameter().setName("name").setValue(partitionName);
-		inParams.addParameter().setName("description").setValue(partitionName);
-		partitionManagementProvider.addPartition(inParams,new IntegerType(idAttempt),partitionName,partitionName, new ServletRequestDetails());
+		int idAttempt = partitionLookupSvc.generateRandomUnusedPartitionId();
+		partitionLookupSvc.createPartition(new PartitionEntity().setName(tenantName).setId(idAttempt), new SystemRequestDetails());
 		return RequestPartitionId.fromPartitionId(idAttempt);
 	}
 

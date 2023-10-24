@@ -1,7 +1,7 @@
 package org.immregistries.iis.kernal.fhir.mdm;
 
-import ca.uhn.fhir.jpa.mdm.config.MdmConsumerConfig;
 import ca.uhn.fhir.jpa.mdm.config.MdmSubmitterConfig;
+import ca.uhn.fhir.jpa.searchparam.config.NicknameServiceConfig;
 import org.immregistries.iis.kernal.fhir.AppProperties;
 import ca.uhn.fhir.mdm.api.IMdmSettings;
 import ca.uhn.fhir.mdm.rules.config.MdmRuleValidator;
@@ -9,10 +9,8 @@ import ca.uhn.fhir.mdm.rules.config.MdmSettings;
 import com.google.common.base.Charsets;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Conditional;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
+import org.springframework.context.annotation.*;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 
@@ -20,8 +18,35 @@ import java.io.IOException;
 
 @Configuration
 @Conditional(MdmConfigCondition.class)
-@Import({MdmCustomConsumerConfig.class, MdmSubmitterConfig.class})
+@Import({MdmCustomConsumerConfig.class, MdmSubmitterConfig.class, NicknameServiceConfig.class})
 public class MdmConfig {
+	@Autowired
+	AutowireCapableBeanFactory autowireCapableBeanFactory;
+
+	@Primary
+	@Bean
+	MdmCustomProviderLoader customMdmProviderLoader() {
+		MdmCustomProviderLoader mdmCustomProviderLoader = new MdmCustomProviderLoader();
+		autowireCapableBeanFactory.autowireBean(mdmCustomProviderLoader);
+		return mdmCustomProviderLoader;
+	}
+
+	@Primary
+	@Bean
+	MdmCustomSubscriptionLoader customMdmSubscriptionLoader() {
+		MdmCustomSubscriptionLoader mdmCustomSubscriptionLoader = new MdmCustomSubscriptionLoader();
+		autowireCapableBeanFactory.autowireBean(mdmCustomSubscriptionLoader);
+		return mdmCustomSubscriptionLoader;
+	}
+
+
+	@Primary
+	@Bean
+	CustomSubscriptionValidatingInterceptor customSubscriptionValidatingInterceptor() {
+		CustomSubscriptionValidatingInterceptor customSubscriptionValidatingInterceptor = new CustomSubscriptionValidatingInterceptor();
+		autowireCapableBeanFactory.autowireBean(customSubscriptionValidatingInterceptor);
+		return customSubscriptionValidatingInterceptor;
+	}
 
 	@Bean
 	IMdmSettings mdmSettings(@Autowired MdmRuleValidator theMdmRuleValidator, AppProperties appProperties) throws IOException {
