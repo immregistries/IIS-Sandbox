@@ -28,6 +28,8 @@ import javax.annotation.Nonnull;
 import javax.interceptor.Interceptor;
 import java.util.Random;
 
+import static org.immregistries.iis.kernal.fhir.interceptors.SessionAuthorizationInterceptor.DEFAULT_USER;
+
 /**
  * Intercepts requests, checks if partition aimed at exists, otherwise creates new partition
  * registered in BaseJpaRestfulServer
@@ -61,10 +63,10 @@ public class PartitionCreationInterceptor extends RequestTenantPartitionIntercep
 
 	public RequestPartitionId getOrCreatePartitionId(String partitionName) {
 		if (StringUtils.isBlank(partitionName)) { // ALL partitions and DEFAULT partition are set to be the same
-			partitionName = "default";
+			partitionName = DEFAULT_USER;
 //			return RequestPartitionId.defaultPartition();
 		}
-		if (partitionName.equals("default") || partitionName.equals("DEFAULT") ) {
+		if (partitionName.equals("default") || partitionName.equals(DEFAULT_USER) ) {
 			return RequestPartitionId.defaultPartition();
 		}
 		try {

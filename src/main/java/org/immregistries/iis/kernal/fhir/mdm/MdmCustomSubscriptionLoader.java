@@ -84,17 +84,6 @@ public class MdmCustomSubscriptionLoader extends MdmSubscriptionLoader {
 				throw new ConfigurationException(Msg.code(736) + "MDM not supported for FHIR version "
 					+ myFhirContext.getVersion().getVersion());
 		}
-
-		SystemRequestDetails systemRequestDetails = SystemRequestDetails.forAllPartitions();
-		//systemRequestDetails.setTenantId(SUBSCRIPTION_PARTITION_NAME);
-		mySubscriptionTopicDao = myDaoRegistry.getResourceDao("SubscriptionTopic");
-		SubscriptionTopic topic = myFhirContext.newJsonParser().parseResource(SubscriptionTopic.class, TOPIC);
-		try {
-			mySubscriptionTopicDao.read(topic.getIdElement(), systemRequestDetails);
-		} catch (ResourceNotFoundException | ResourceGoneException e) {
-			ourLog.info("Creating topic " + topic.getIdElement());
-			mySubscriptionTopicDao.update(topic, systemRequestDetails);
-		}
 		mySubscriptionDao = myDaoRegistry.getResourceDao("Subscription");
 		for (IBaseResource subscription : subscriptions) {
 			updateIfNotPresent(subscription);
@@ -106,17 +95,40 @@ public class MdmCustomSubscriptionLoader extends MdmSubscriptionLoader {
 	}
 
 	synchronized void updateIfNotPresent(IBaseResource theSubscription) {
-		SystemRequestDetails systemRequestDetails = SystemRequestDetails.newSystemRequestAllPartitions();
-		//systemRequestDetails.setTenantId(SUBSCRIPTION_PARTITION_NAME);
 		try {
-			mySubscriptionDao.read(theSubscription.getIdElement(), systemRequestDetails);
+			mySubscriptionDao.read(theSubscription.getIdElement(), SystemRequestDetails.forAllPartitions());
 		} catch (ResourceNotFoundException | ResourceGoneException e) {
 			ourLog.info("Creating subscription " + theSubscription.getIdElement());
-			mySubscriptionDao.update(theSubscription, systemRequestDetails);
+			mySubscriptionDao.update(theSubscription, SystemRequestDetails.forAllPartitions());
+		}
+	}
+
+	synchronized void updateTopicIfNotPresent(IBaseResource theSubscriptionTopic) {
+		mySubscriptionTopicDao = myDaoRegistry.getResourceDao("SubscriptionTopic");
+		try {
+			mySubscriptionTopicDao.read(theSubscriptionTopic.getIdElement(), SystemRequestDetails.forAllPartitions());
+		} catch (ResourceNotFoundException | ResourceGoneException e) {
+			ourLog.info("Creating topic " + theSubscriptionTopic.getIdElement());
+			mySubscriptionTopicDao.update(theSubscriptionTopic, SystemRequestDetails.forAllPartitions());
 		}
 	}
 
 	private Subscription buildMdmSubscriptionR5(String theId, String theCriteria) { //TODO test and improve
+
+		//Setting up the topic
+		IParser parser = myFhirContext.newJsonParser();
+		SubscriptionTopic topic = parser.parseResource(SubscriptionTopic.class, TOPIC);
+		topic.setId(theId + "-topic");
+		topic.setUrl(TOPIC_URL + "-" + theId);
+		topic.addResourceTrigger().setResource(theCriteria)
+			.addSupportedInteraction(SubscriptionTopic.InteractionTrigger.CREATE)
+			.addSupportedInteraction(SubscriptionTopic.InteractionTrigger.UPDATE)
+			.setQueryCriteria(new SubscriptionTopic.SubscriptionTopicResourceTriggerQueryCriteriaComponent()
+				.setResultForCreate(SubscriptionTopic.CriteriaNotExistsBehavior.TESTPASSES)
+				.setCurrent(theCriteria)
+			);
+		updateTopicIfNotPresent(topic);
+
 		Subscription retval = new Subscription();
 		retval.setId(theId);
 		retval.setReason("MDM");
@@ -129,17 +141,8 @@ public class MdmCustomSubscriptionLoader extends MdmSubscriptionLoader {
 		ChannelProducerSettings var10003 = new ChannelProducerSettings();
 		retval.setEndpoint("channel:" + var10001.getChannelName("empi", var10003));
 		retval.setContentType("application/json");
-		IParser parser = myFhirContext.newJsonParser();
-		SubscriptionTopic topic = parser.parseResource(SubscriptionTopic.class, TOPIC);
-		topic.addResourceTrigger().setResource(theCriteria)
-			.addSupportedInteraction(SubscriptionTopic.InteractionTrigger.CREATE)
-			.addSupportedInteraction(SubscriptionTopic.InteractionTrigger.UPDATE)
-			.setQueryCriteria(new SubscriptionTopic.SubscriptionTopicResourceTriggerQueryCriteriaComponent()
-				.setResultForCreate(SubscriptionTopic.CriteriaNotExistsBehavior.TESTPASSES)
-				.setCurrent(theCriteria + "?")
-			);
-		retval.setTopicElement(new CanonicalType( TOPIC_URL));
-		retval.addContained(topic);
+		retval.setTopicElement(new CanonicalType(topic.getUrl()));
+//		retval.addContained(topic);
 		return retval;
 	}
 

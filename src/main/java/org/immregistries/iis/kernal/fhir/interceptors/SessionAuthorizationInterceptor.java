@@ -35,7 +35,7 @@ public class SessionAuthorizationInterceptor extends AuthorizationInterceptor {
 	public static final String CONNECTATHON_USER = "Connectathon";
 	private static final Logger logger = LoggerFactory.getLogger(SessionAuthorizationInterceptor.class);
 	private static final String CONNECTATHON_AUTH = "78q3gb#QPGK!FmHKrgJjzkbpSCtiUtlchoClU1pC/UCdKxZ=PhRgtsL!4att8/6QKrUe1gS?p2ME!ixXP0Sg5lWnHP6t=U=6zeJXWnILR-BLc8HxVsfrLhp5/1q-DXuk?ljL?zwqJxB=we0SDKlT2j8WgNEkalit7Sf35F/R8W-QtrFbyO9IZPXJ1172OzvwfJBq-m9Z10DbSxIA?6f=3e!H7TLg/DwHByVlUSlZ6HWrytJkOFXljk9!z/BPrb9H";
-	private static final String DEFAULT_USER = "DEFAULT";
+	public static final String DEFAULT_USER = "DEFAULT";
 
 	@Override
 	public List<IAuthRule> buildRuleList(RequestDetails theRequestDetails) {

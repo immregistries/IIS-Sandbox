@@ -40,13 +40,13 @@ public class MdmConfig {
 	}
 
 
-	@Primary
-	@Bean
-	CustomSubscriptionValidatingInterceptor customSubscriptionValidatingInterceptor() {
-		CustomSubscriptionValidatingInterceptor customSubscriptionValidatingInterceptor = new CustomSubscriptionValidatingInterceptor();
-		autowireCapableBeanFactory.autowireBean(customSubscriptionValidatingInterceptor);
-		return customSubscriptionValidatingInterceptor;
-	}
+//	@Primary
+//	@Bean
+//	CustomSubscriptionValidatingInterceptor customSubscriptionValidatingInterceptor() {
+//		CustomSubscriptionValidatingInterceptor customSubscriptionValidatingInterceptor = new CustomSubscriptionValidatingInterceptor();
+//		autowireCapableBeanFactory.autowireBean(customSubscriptionValidatingInterceptor);
+//		return customSubscriptionValidatingInterceptor;
+//	}
 
 	@Bean
 	IMdmSettings mdmSettings(@Autowired MdmRuleValidator theMdmRuleValidator, AppProperties appProperties) throws IOException {
