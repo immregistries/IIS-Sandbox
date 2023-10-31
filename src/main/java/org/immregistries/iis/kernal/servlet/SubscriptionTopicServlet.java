@@ -1,10 +1,18 @@
 package org.immregistries.iis.kernal.servlet;
 
 import ca.uhn.fhir.context.FhirContext;
+import ca.uhn.fhir.jpa.api.dao.DaoRegistry;
+import ca.uhn.fhir.jpa.api.dao.IFhirResourceDao;
 import ca.uhn.fhir.jpa.api.dao.IFhirSystemDao;
 import ca.uhn.fhir.parser.IParser;
+import ca.uhn.fhir.rest.api.server.SystemRequestDetails;
+import ca.uhn.fhir.rest.server.exceptions.ResourceGoneException;
+import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
+import ca.uhn.fhir.rest.server.servlet.ServletRequestDetails;
+import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r5.hapi.fhirpath.FhirPathR5;
 import org.hl7.fhir.r5.model.*;
+import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,18 +28,20 @@ import java.io.IOException;
 //@Component
 public class SubscriptionTopicServlet extends HttpServlet {
 	@Autowired
-	IFhirSystemDao fhirSystemDao;
+	FhirContext fhirContext;
+
 
 	Logger logger = LoggerFactory.getLogger(SubscriptionTopicServlet.class);
 
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		IParser parser = fhirSystemDao.getContext().newJsonParser().setPrettyPrint(true);
+		IParser parser = fhirContext.newJsonParser().setPrettyPrint(true);
 		SubscriptionTopic topic = getSubscriptionTopic();
+
 		resp.getOutputStream().print(parser.encodeResourceToString(topic));
 	}
 
-	protected SubscriptionTopic getSubscriptionTopic() {
+	static public SubscriptionTopic getSubscriptionTopic() {
 //		SubscriptionTopic.SubscriptionTopicEventTriggerComponent eventTrigger =
 //			new SubscriptionTopic.SubscriptionTopicEventTriggerComponent().setEvent( new CodeableConcept()
 //				// https://terminology.hl7.org/3.1.0/ValueSet-v2-0003.html
@@ -42,6 +52,7 @@ public class SubscriptionTopicServlet extends HttpServlet {
 //				.addCoding(new Coding().setSystem("IIS-Sandbox").setCode("Manual Trigger"))
 //				// TODO add MQE codes ?
 //			).setResource("OperationOutcome?");
+
 
 		SubscriptionTopic topic  = new SubscriptionTopic()
 			.setDescription("Testing communication between EHR and IIS and operation outcome")
@@ -54,6 +65,12 @@ public class SubscriptionTopicServlet extends HttpServlet {
 			.setResource("OperationOutcome")
 			.setQueryCriteria(new SubscriptionTopic.SubscriptionTopicResourceTriggerQueryCriteriaComponent()
 				.setCurrent("OperationOutcome?")
+			)
+		);
+		topic.addResourceTrigger(new SubscriptionTopic.SubscriptionTopicResourceTriggerComponent()
+			.setResource("Patient")
+			.setQueryCriteria(new SubscriptionTopic.SubscriptionTopicResourceTriggerQueryCriteriaComponent()
+				.setCurrent("Patient?")
 			)
 		);
 		topic.addResourceTrigger(new SubscriptionTopic.SubscriptionTopicResourceTriggerComponent()

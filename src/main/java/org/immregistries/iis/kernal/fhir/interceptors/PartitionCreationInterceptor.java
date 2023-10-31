@@ -4,21 +4,20 @@ import ca.uhn.fhir.i18n.Msg;
 import ca.uhn.fhir.interceptor.api.Hook;
 import ca.uhn.fhir.interceptor.api.Pointcut;
 import ca.uhn.fhir.interceptor.model.RequestPartitionId;
-import ca.uhn.fhir.jpa.dao.data.IPartitionDao;
+import ca.uhn.fhir.jpa.api.dao.DaoRegistry;
+import ca.uhn.fhir.jpa.api.dao.IFhirResourceDao;
 import ca.uhn.fhir.jpa.entity.PartitionEntity;
 import ca.uhn.fhir.jpa.partition.IPartitionLookupSvc;
-import ca.uhn.fhir.jpa.partition.PartitionManagementProvider;
 import ca.uhn.fhir.rest.api.server.RequestDetails;
 import ca.uhn.fhir.rest.api.server.SystemRequestDetails;
-import ca.uhn.fhir.rest.server.exceptions.InternalErrorException;
 import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
+import ca.uhn.fhir.rest.server.exceptions.ResourceGoneException;
 import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
 import ca.uhn.fhir.rest.server.interceptor.partition.RequestTenantPartitionInterceptor;
-import ca.uhn.fhir.rest.server.servlet.ServletRequestDetails;
 import org.apache.commons.lang3.StringUtils;
-import org.hl7.fhir.r5.model.IntegerType;
-import org.hl7.fhir.r5.model.Parameters;
-import org.hl7.fhir.r5.model.StringType;
+import org.hl7.fhir.instance.model.api.IBaseResource;
+import org.hl7.fhir.r5.model.SubscriptionTopic;
+import org.immregistries.iis.kernal.servlet.SubscriptionTopicServlet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +25,6 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Nonnull;
 import javax.interceptor.Interceptor;
-import java.util.Random;
 
 import static org.immregistries.iis.kernal.fhir.interceptors.SessionAuthorizationInterceptor.DEFAULT_USER;
 
@@ -39,6 +37,9 @@ import static org.immregistries.iis.kernal.fhir.interceptors.SessionAuthorizatio
 public class PartitionCreationInterceptor extends RequestTenantPartitionInterceptor {
 	@Autowired
 	IPartitionLookupSvc partitionLookupSvc;
+	@Autowired
+	public DaoRegistry myDaoRegistry;
+	private IFhirResourceDao<IBaseResource> mySubscriptionTopicDao;
 	private final Logger ourLog = LoggerFactory.getLogger(PartitionCreationInterceptor.class);
 
 	public static final String PARTITION_NAME_SEPARATOR = "-"; // TEMP TODO find good url structure
@@ -93,6 +94,19 @@ public class PartitionCreationInterceptor extends RequestTenantPartitionIntercep
 	private RequestPartitionId createPartition(String tenantName) {
 		int idAttempt = partitionLookupSvc.generateRandomUnusedPartitionId();
 		partitionLookupSvc.createPartition(new PartitionEntity().setName(tenantName).setId(idAttempt), new SystemRequestDetails());
+
+		//Create subscription topics
+//		if (mySubscriptionTopicDao == null) {
+//			mySubscriptionTopicDao = myDaoRegistry.getResourceDao("SubscriptionTopic");
+//		}
+//		RequestDetails requestDetails = new SystemRequestDetails();
+//		requestDetails.setTenantId(tenantName);
+//		SubscriptionTopic topic = SubscriptionTopicServlet.getSubscriptionTopic();
+//		try {
+//			mySubscriptionTopicDao.read(topic.getIdElement(), requestDetails);
+//		} catch (ResourceNotFoundException | ResourceGoneException e) {
+//			mySubscriptionTopicDao.update(topic, requestDetails);
+//		}
 		return RequestPartitionId.fromPartitionId(idAttempt);
 	}
 

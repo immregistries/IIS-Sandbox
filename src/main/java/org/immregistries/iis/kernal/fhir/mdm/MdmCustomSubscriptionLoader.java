@@ -9,6 +9,7 @@ import ca.uhn.fhir.jpa.mdm.config.MdmSubscriptionLoader;
 import ca.uhn.fhir.jpa.subscription.channel.api.ChannelProducerSettings;
 import ca.uhn.fhir.jpa.subscription.channel.subscription.IChannelNamer;
 import ca.uhn.fhir.jpa.subscription.match.registry.SubscriptionLoader;
+import ca.uhn.fhir.jpa.topic.SubscriptionTopicLoader;
 import ca.uhn.fhir.mdm.api.IMdmSettings;
 import ca.uhn.fhir.mdm.api.MdmConstants;
 import ca.uhn.fhir.mdm.log.Logs;
@@ -39,6 +40,8 @@ public class MdmCustomSubscriptionLoader extends MdmSubscriptionLoader {
 	@Autowired
 	IChannelNamer myChannelNamer;
 
+	@Autowired
+	private SubscriptionTopicLoader mySubscriptionTopicLoader;
 	@Autowired
 	private SubscriptionLoader mySubscriptionLoader;
 
@@ -90,7 +93,9 @@ public class MdmCustomSubscriptionLoader extends MdmSubscriptionLoader {
 		}
 		// After loading all the subscriptions, sync the subscriptions to the registry.
 		if (subscriptions != null && subscriptions.size() > 0) {
+			mySubscriptionTopicLoader.syncDatabaseToCache();
 			mySubscriptionLoader.syncDatabaseToCache();
+			mySubscriptionTopicLoader.registerListener();
 		}
 	}
 
@@ -142,7 +147,7 @@ public class MdmCustomSubscriptionLoader extends MdmSubscriptionLoader {
 		retval.setEndpoint("channel:" + var10001.getChannelName("empi", var10003));
 		retval.setContentType("application/json");
 		retval.setTopicElement(new CanonicalType(topic.getUrl()));
-//		retval.addContained(topic);
+		retval.addContained(topic);
 		return retval;
 	}
 

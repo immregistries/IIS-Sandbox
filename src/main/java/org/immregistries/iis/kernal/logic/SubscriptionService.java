@@ -70,7 +70,7 @@ public class SubscriptionService {
 			 */
 			AdditionalRequestHeadersInterceptor additionalRequestHeadersInterceptor = new AdditionalRequestHeadersInterceptor();
 			for (Subscription.SubscriptionParameterComponent parameterComponent : subscription.getParameter()) {
-//				additionalRequestHeadersInterceptor.addHeaderValue(parameterComponent.getName(), parameterComponent.getValue());
+				additionalRequestHeadersInterceptor.addHeaderValue(parameterComponent.getName(), parameterComponent.getValue());
 			}
 			endpointClient.registerInterceptor(additionalRequestHeadersInterceptor);
 			Bundle notificationBundle = new Bundle(Bundle.BundleType.SUBSCRIPTIONNOTIFICATION);

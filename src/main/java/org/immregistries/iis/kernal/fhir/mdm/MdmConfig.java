@@ -1,7 +1,9 @@
 package org.immregistries.iis.kernal.fhir.mdm;
 
+import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.jpa.mdm.config.MdmSubmitterConfig;
 import ca.uhn.fhir.jpa.searchparam.config.NicknameServiceConfig;
+import ca.uhn.fhir.jpa.topic.SubscriptionTopicConfig;
 import org.immregistries.iis.kernal.fhir.AppProperties;
 import ca.uhn.fhir.mdm.api.IMdmSettings;
 import ca.uhn.fhir.mdm.rules.config.MdmRuleValidator;
@@ -18,10 +20,27 @@ import java.io.IOException;
 
 @Configuration
 @Conditional(MdmConfigCondition.class)
-@Import({MdmCustomConsumerConfig.class, MdmSubmitterConfig.class, NicknameServiceConfig.class})
+@Import({MdmCustomConsumerConfig.class, MdmSubmitterConfig.class, NicknameServiceConfig.class, SubscriptionTopicConfig.class})
 public class MdmConfig {
 	@Autowired
 	AutowireCapableBeanFactory autowireCapableBeanFactory;
+
+
+	@Primary
+	@Bean
+	CustomGoldenResourceHelper customGoldenResourceHelper(FhirContext theFhirContext) {
+		CustomGoldenResourceHelper customGoldenResourceHelper = new CustomGoldenResourceHelper(theFhirContext);
+		autowireCapableBeanFactory.autowireBean(customGoldenResourceHelper);
+		return customGoldenResourceHelper;
+	}
+
+	@Primary
+	@Bean
+	CustomSubscriptionCanonicalizer customSubscriptionCanonicalizer(FhirContext theFhirContext) {
+		CustomSubscriptionCanonicalizer customSubscriptionCanonicalizer = new CustomSubscriptionCanonicalizer(theFhirContext);
+		autowireCapableBeanFactory.autowireBean(customSubscriptionCanonicalizer);
+		return customSubscriptionCanonicalizer;
+	}
 
 	@Primary
 	@Bean
@@ -40,13 +59,13 @@ public class MdmConfig {
 	}
 
 
-//	@Primary
-//	@Bean
-//	CustomSubscriptionValidatingInterceptor customSubscriptionValidatingInterceptor() {
-//		CustomSubscriptionValidatingInterceptor customSubscriptionValidatingInterceptor = new CustomSubscriptionValidatingInterceptor();
-//		autowireCapableBeanFactory.autowireBean(customSubscriptionValidatingInterceptor);
-//		return customSubscriptionValidatingInterceptor;
-//	}
+	@Primary
+	@Bean
+	CustomSubscriptionValidatingInterceptor customSubscriptionValidatingInterceptor() {
+		CustomSubscriptionValidatingInterceptor customSubscriptionValidatingInterceptor = new CustomSubscriptionValidatingInterceptor();
+		autowireCapableBeanFactory.autowireBean(customSubscriptionValidatingInterceptor);
+		return customSubscriptionValidatingInterceptor;
+	}
 
 	@Bean
 	IMdmSettings mdmSettings(@Autowired MdmRuleValidator theMdmRuleValidator, AppProperties appProperties) throws IOException {

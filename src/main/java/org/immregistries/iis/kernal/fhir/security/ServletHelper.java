@@ -47,6 +47,7 @@ public class ServletHelper {
 		UserAccess userAccess = authenticateUserAccessOAuth(oAuth2User,dataSession);
 		return authenticateTenant(userAccess,facilityName,dataSession);
 	}
+
 	public static Tenant authenticateTenant(UserAccess userAccess, String facilityName, Session dataSession) {
 		/**
 		 * Users starting with the prefix can create a user with the same name, any other use of prefix are rejected
