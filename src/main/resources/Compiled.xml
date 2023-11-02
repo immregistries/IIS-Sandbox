@@ -629,6 +629,20 @@
             </use-date>
         </code>
         <code>
+            <value>253088698300063911231019</value>
+            <label>COVID-19 Vaccine VIS - mRNA vaccine for 12 years and older</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_VIS_VACCINES">312</link-to>
+                <link-to codeset="VACCINATION_VIS_VACCINES">309</link-to>
+            </reference>
+            <use-date>
+                <not-before>20231019</not-before>
+            </use-date>
+        </code>
+        <code>
             <value>253088698300046211211217</value>
             <label>Dengue Vaccine VIS</label>
             <code-status>
@@ -2171,8 +2185,8 @@
                 <status>Valid</status>
             </code-status>
             <reference>
-                <link-to codeset="VACCINATION_VIS_VACCINES">306</link-to>
                 <link-to codeset="VACCINATION_VIS_VACCINES">307</link-to>
+                <link-to codeset="VACCINATION_VIS_VACCINES">306</link-to>
             </reference>
             <use-date>
                 <not-before>20230925</not-before>
@@ -2190,6 +2204,20 @@
             </reference>
             <use-date>
                 <not-before>20230724</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>253088698300060811231019</value>
+            <label>RSV (Respiratory Syncytial Virus) Vaccine VIS</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_VIS_VACCINES">303</link-to>
+                <link-to codeset="VACCINATION_VIS_VACCINES">305</link-to>
+            </reference>
+            <use-date>
+                <not-before>20231019</not-before>
             </use-date>
         </code>
         <code>
@@ -46400,6 +46428,32 @@
             </use-date>
         </code>
         <code>
+            <value>312</value>
+            <label>COVID-19 Vaccine VIS - mRNA vaccine for 12 years and older</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300063911231019</link-to>
+            </reference>
+            <use-date>
+                <not-before>20231019</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>309</value>
+            <label>COVID-19 Vaccine VIS - mRNA vaccine for 12 years and older</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300063911231019</link-to>
+            </reference>
+            <use-date>
+                <not-before>20231019</not-before>
+            </use-date>
+        </code>
+        <code>
             <value>56</value>
             <label>Dengue Vaccine VIS</label>
             <code-status>
@@ -47598,7 +47652,7 @@
             </use-date>
         </code>
         <code>
-            <value>306</value>
+            <value>307</value>
             <label>RSV (Respiratory Syncytial Virus) preventative antibody IIS</label>
             <code-status>
                 <status>Valid</status>
@@ -47611,7 +47665,7 @@
             </use-date>
         </code>
         <code>
-            <value>307</value>
+            <value>306</value>
             <label>RSV (Respiratory Syncytial Virus) preventative antibody IIS</label>
             <code-status>
                 <status>Valid</status>
@@ -47631,6 +47685,7 @@
             </code-status>
             <reference>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300060811230724</link-to>
+                <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300060811231019</link-to>
             </reference>
             <use-date>
                 <not-before>20230724</not-before>
@@ -47644,6 +47699,7 @@
             </code-status>
             <reference>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300060811230724</link-to>
+                <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300060811231019</link-to>
             </reference>
             <use-date>
                 <not-before>20230724</not-before>
