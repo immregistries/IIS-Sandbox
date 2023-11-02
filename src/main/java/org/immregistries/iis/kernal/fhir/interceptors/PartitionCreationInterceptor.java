@@ -96,17 +96,17 @@ public class PartitionCreationInterceptor extends RequestTenantPartitionIntercep
 		partitionLookupSvc.createPartition(new PartitionEntity().setName(tenantName).setId(idAttempt), new SystemRequestDetails());
 
 		//Create subscription topics
-//		if (mySubscriptionTopicDao == null) {
-//			mySubscriptionTopicDao = myDaoRegistry.getResourceDao("SubscriptionTopic");
-//		}
-//		RequestDetails requestDetails = new SystemRequestDetails();
-//		requestDetails.setTenantId(tenantName);
-//		SubscriptionTopic topic = SubscriptionTopicServlet.getSubscriptionTopic();
-//		try {
-//			mySubscriptionTopicDao.read(topic.getIdElement(), requestDetails);
-//		} catch (ResourceNotFoundException | ResourceGoneException e) {
-//			mySubscriptionTopicDao.update(topic, requestDetails);
-//		}
+		if (mySubscriptionTopicDao == null) {
+			mySubscriptionTopicDao = myDaoRegistry.getResourceDao("SubscriptionTopic");
+		}
+		RequestDetails requestDetails = new SystemRequestDetails();
+		requestDetails.setTenantId(tenantName);
+		SubscriptionTopic topic = SubscriptionTopicServlet.getSubscriptionTopic();
+		try {
+			mySubscriptionTopicDao.read(topic.getIdElement(), requestDetails);
+		} catch (ResourceNotFoundException | ResourceGoneException e) {
+			mySubscriptionTopicDao.update(topic, requestDetails);
+		}
 		return RequestPartitionId.fromPartitionId(idAttempt);
 	}
 
