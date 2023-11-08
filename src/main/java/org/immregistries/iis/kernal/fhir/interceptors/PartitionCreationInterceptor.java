@@ -17,7 +17,7 @@ import ca.uhn.fhir.rest.server.interceptor.partition.RequestTenantPartitionInter
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r5.model.SubscriptionTopic;
-import org.immregistries.iis.kernal.servlet.SubscriptionTopicServlet;
+import org.immregistries.iis.kernal.servlet.SubscriptionTopicController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -101,11 +101,17 @@ public class PartitionCreationInterceptor extends RequestTenantPartitionIntercep
 		}
 		RequestDetails requestDetails = new SystemRequestDetails();
 		requestDetails.setTenantId(tenantName);
-		SubscriptionTopic topic = SubscriptionTopicServlet.getSubscriptionTopic();
+		SubscriptionTopic topic = SubscriptionTopicController.getDataQualityIssuesSubscriptionTopic();
 		try {
 			mySubscriptionTopicDao.read(topic.getIdElement(), requestDetails);
 		} catch (ResourceNotFoundException | ResourceGoneException e) {
 			mySubscriptionTopicDao.update(topic, requestDetails);
+		}
+		SubscriptionTopic groupTopic = SubscriptionTopicController.getGroupSubscriptionTopic();
+		try {
+			mySubscriptionTopicDao.read(groupTopic.getIdElement(), requestDetails);
+		} catch (ResourceNotFoundException | ResourceGoneException e) {
+			mySubscriptionTopicDao.update(groupTopic, requestDetails);
 		}
 		return RequestPartitionId.fromPartitionId(idAttempt);
 	}

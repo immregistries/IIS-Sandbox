@@ -259,6 +259,7 @@ public class SubscriptionServlet extends HttpServlet {
 				out.println("    <th>Name</th>");
 				out.println("    <th>Endpoint</th>");
 				out.println("    <th>Status</th>");
+				out.println("    <th>Topic</th>");
 				out.println("  </tr>");
 				out.println("  <tbody>");
 				SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
@@ -278,6 +279,8 @@ public class SubscriptionServlet extends HttpServlet {
 						+ subscription.getEndpoint() + "</a></td>");
 					out.println("    <td><a href=\"" + link + "\">"
 						+ subscription.getStatus() + "</a></td>");
+					out.println("    <td><a href=\"" + subscription.getTopic() + "\">"
+						+ subscription.getTopic() + "</a></td>");
 					out.println("  </tr>");
 				}
 				out.println("  </tbody>");

@@ -36,7 +36,13 @@
 
 
     <dependencies>
-    <!-- IIS Sandbox dependencies -->
+        <dependency>
+            <groupId>org.mitre.synthea</groupId>
+            <artifactId>synthea</artifactId>
+            <version>3.2.0</version>
+        </dependency>
+
+        <!-- IIS Sandbox dependencies -->
         <dependency>
             <groupId>org.mindrot</groupId>
             <artifactId>jbcrypt</artifactId>

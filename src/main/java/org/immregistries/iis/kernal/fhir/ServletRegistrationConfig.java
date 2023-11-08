@@ -52,17 +52,6 @@ public class ServletRegistrationConfig {
 	}
 
 	@Bean
-	public ServletRegistrationBean subscriptionTopicServletRegistrationBean() {
-		ServletRegistrationBean registrationBean = new ServletRegistrationBean();
-		HttpServlet servlet = new SubscriptionTopicServlet();
-		beanFactory.autowireBean(servlet);
-		registrationBean.setServlet(servlet);
-		registrationBean.addUrlMappings("/SubscriptionTopic");
-//		registrationBean.setLoadOnStartup(1);
-		return registrationBean;
-	}
-
-	@Bean
 	public ServletRegistrationBean locationServletRegistrationBean() {
 		ServletRegistrationBean registrationBean = new ServletRegistrationBean();
 		HttpServlet servlet = new LocationServlet();

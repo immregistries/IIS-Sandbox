@@ -21,7 +21,7 @@ public class ServerSecurityConfig {
 	public SecurityFilterChain filterChain(HttpSecurity http, CustomOAuthSuccessHandler customOAuthSuccessHandler) throws Exception {
 		http
 			.authorizeRequests()
-			.antMatchers(HttpMethod.GET, "/", "/home", "/pop", "/SubscriptionTopic", "/img/**").permitAll()
+			.antMatchers(HttpMethod.GET, "/", "/home", "/pop", "/SubscriptionTopic/**", "/img/**").permitAll()
 			.antMatchers("/loginForm", "/oauth2/**", "/login" ).permitAll()
 			// API AUTHORIZATION AND AUTHENTICATION SEPARATED
 			.antMatchers("/fhir/**", "/soap").permitAll()
