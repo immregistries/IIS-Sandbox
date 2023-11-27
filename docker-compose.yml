@@ -1,6 +1,6 @@
 version: "3"
 services:
-  hapi-fhir-postgres:
+  hapi-fhir-postgresql:
     image: postgres:13-alpine
     container_name: hapi-fhir-postgres
     restart: always
@@ -29,10 +29,11 @@ services:
   iis-sandbox:
     build: .
     container_name: iis-sandbox
-    environment:
-      #      hibernate.connection.url: jdbc:mysql://iis-sandbox-mysql:3306/iis_alongside_jpa
-      IIS_MYSQL_HIBERNATE_CONNECTION_URL: jdbc:mysql://iis-sandbox-mysql:3306/iis_alongside_jpa
-      SPRING_DATASOURCE_URL: jdbc:postgresql://hapi-fhir-postgres:5432/hapi_fhir_iis
+#    environment:
+#      - iis.mysql.hibernate.connection.url=jdbc:mysql://iis-sandbox-mysql:3306/iis_alongside_jpa
+#      - IIS_MYSQL_URL=jdbc:mysql://iis-sandbox-mysql:3306/iis_alongside_jpa
+#      - SPRING_DATASOURCE_URL=jdbc:postgresql://hapi-fhir-postgres:5432/hapi_fhir_iis
+#      - spring.datasource.url=jdbc:postgresql://hapi-fhir-postgres:5432/hapi_fhir_iis
     restart: on-failure
     ports:
       - "8080:8080"

@@ -107,12 +107,12 @@ public class PartitionCreationInterceptor extends RequestTenantPartitionIntercep
 		} catch (ResourceNotFoundException | ResourceGoneException e) {
 			mySubscriptionTopicDao.update(topic, requestDetails);
 		}
-		SubscriptionTopic groupTopic = SubscriptionTopicController.getGroupSubscriptionTopic();
-		try {
-			mySubscriptionTopicDao.read(groupTopic.getIdElement(), requestDetails);
-		} catch (ResourceNotFoundException | ResourceGoneException e) {
-			mySubscriptionTopicDao.update(groupTopic, requestDetails);
-		}
+//		SubscriptionTopic groupTopic = SubscriptionTopicController.getGroupSubscriptionTopic();
+//		try {
+//			mySubscriptionTopicDao.read(groupTopic.getIdElement(), requestDetails);
+//		} catch (ResourceNotFoundException | ResourceGoneException e) {
+//			mySubscriptionTopicDao.update(groupTopic, requestDetails);
+//		}
 		return RequestPartitionId.fromPartitionId(idAttempt);
 	}
 

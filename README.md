@@ -14,6 +14,12 @@ In production mode HAPI FHIR requires a postgresql database
 
 For the current authentication and message log system, a Mysql Database is required, creation script : ``/src/main/database/create-database.sql``.
 
+Complete details for deployment are readable in docker-compose.yml
+Run project with docker
+```
+mvn clean package -Pdocker; docker-compose up;
+```
+
 Compile only to run with postgres:
 ```
 mvn clean package

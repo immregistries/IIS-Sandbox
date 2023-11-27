@@ -13,6 +13,7 @@ import ca.uhn.fhir.mdm.model.CanonicalEID;
 import ca.uhn.fhir.mdm.model.MdmTransactionContext;
 import ca.uhn.fhir.mdm.util.*;
 import ca.uhn.fhir.rest.api.Constants;
+import ca.uhn.fhir.util.TerserUtil;
 import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.hl7.fhir.instance.model.api.IBase;
 import org.hl7.fhir.instance.model.api.IBaseResource;
@@ -28,7 +29,7 @@ import java.util.Optional;
 import static ca.uhn.fhir.context.FhirVersionEnum.*;
 
 /**
- * Made for Accepting R5
+ * Custom Made for Accepting R5 and adding any original identifier to golden identifiers
  */
 public class CustomGoldenResourceHelper extends GoldenResourceHelper {
 
@@ -107,6 +108,23 @@ public class CustomGoldenResourceHelper extends GoldenResourceHelper {
 		if (!eidsToApply.isEmpty()) {
 			return;
 		}
+//		if(Objects.equals(myFhirContext.getResourceType(theSourceResource), "Patient")) {
+//			if (myFhirContext.getVersion().equals(R5)) {
+//				org.hl7.fhir.r5.model.Patient patient = (org.hl7.fhir.r5.model.Patient) theSourceResource;
+//				for (org.hl7.fhir.r5.model.Identifier identifier: patient.getIdentifier()) {
+////					CanonicalIdentifier canonicalIdentifier = IdentifierUtil.identifierDtFromIdentifier(identifier);
+//					RuntimeResourceDefinition resourceDefinition = myFhirContext.getResourceDefinition(theSourceResource);
+//					BaseRuntimeChildDefinition resourceIdentifier = resourceDefinition.getChildByName("identifier");
+//					TerserUtil.cloneEidIntoResource(myFhirContext, resourceIdentifier, identifier,theSourceResource);
+////					cloneEidIntoResource(the);
+//
+//				}
+//
+//			} else if (myFhirContext.getVersion().equals(R4)) {
+//				org.hl7.fhir.r4.model.Patient patient = (org.hl7.fhir.r4.model.Patient) theSourceResource;
+//
+//			}
+//		}
 
 		CanonicalEID hapiEid = myEIDHelper.createHapiEid();
 		theGoldenResourceIdentifier
@@ -117,6 +135,12 @@ public class CustomGoldenResourceHelper extends GoldenResourceHelper {
 		cloneEidIntoResource(myFhirContext, theSourceResource, hapiEid);
 	}
 
+
+	/**
+	 * TODO Here is experimental IIS Sandbox functionality adding all identifiers
+	 *
+	 */
+	//
 	private void cloneMDMEidsIntoNewGoldenResource(
 		BaseRuntimeChildDefinition theGoldenResourceIdentifier,
 		IAnyResource theIncomingResource,
@@ -124,9 +148,9 @@ public class CustomGoldenResourceHelper extends GoldenResourceHelper {
 		String incomingResourceType = myFhirContext.getResourceType(theIncomingResource);
 		String mdmEIDSystem = myMdmSettings.getMdmRules().getEnterpriseEIDSystemForResourceType(incomingResourceType);
 
-		if (mdmEIDSystem == null) {
-			return;
-		}
+//		if (mdmEIDSystem == null) {
+//			return;
+//		}
 
 		// FHIR choice types - fields within fhir where we have a choice of ids
 		IFhirPath fhirPath = myFhirContext.newFhirPath();
@@ -139,7 +163,11 @@ public class CustomGoldenResourceHelper extends GoldenResourceHelper {
 			if (incomingIdentifierSystem.isPresent()) {
 				String incomingIdentifierSystemString =
 					incomingIdentifierSystem.get().getValueAsString();
-				if (Objects.equals(incomingIdentifierSystemString, mdmEIDSystem)) {
+				/**
+				 * Experimental
+				 */
+				if (true) {
+//				if (Objects.equals(incomingIdentifierSystemString, mdmEIDSystem)) {
 					ourLog.debug(
 						"Incoming resource EID System {} matches EID system in the MDM rules.  Copying to Golden Resource.",
 						incomingIdentifierSystemString);

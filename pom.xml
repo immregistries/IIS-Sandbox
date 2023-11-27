@@ -717,34 +717,34 @@
             </activation>
             <properties>
                 <spring.profiles.active>prod</spring.profiles.active>
-                <iis.mysql.hibernate.connection.url>jdbc:mysql://localhost/iis_alongside_jpa</iis.mysql.hibernate.connection.url>
-                <jpa.properties.hibernate.dialect>ca.uhn.fhir.jpa.model.dialect.HapiFhirPostgres94Dialect
-                </jpa.properties.hibernate.dialect>
+<!--                <iis.mysql.hibernate.connection.url>jdbc:mysql://localhost/iis_alongside_jpa</iis.mysql.hibernate.connection.url>-->
+                <IIS_MYSQL_URL>jdbc:mysql://localhost/iis_alongside_jpa</IIS_MYSQL_URL>
+<!--                <spring.datasource.url>jdbc:postgresql://localhost/hapi_fhir_iis</spring.datasource.url>-->
+                <SPRING_DATASOURCE_URL>jdbc:postgresql://localhost/hapi_fhir_iis</SPRING_DATASOURCE_URL>
+                <jpa.properties.hibernate.dialect>ca.uhn.fhir.jpa.model.dialect.HapiFhirPostgres94Dialect</jpa.properties.hibernate.dialect>
                 <maven.test.skip>true</maven.test.skip>
             </properties>
         </profile>
-<!--        <profile>-->
-<!--            <id>docker</id>-->
-<!--            <properties>-->
-<!--                <spring.profiles.active>prod</spring.profiles.active>-->
-<!--                <iis.mysql.hibernate.connection.url>jdbc:mysql://iis-sandbox-mysql:3306/iis_alongside_jpa-->
-<!--                </iis.mysql.hibernate.connection.url>-->
-<!--                <jpa.properties.hibernate.dialect>ca.uhn.fhir.jpa.model.dialect.HapiFhirPostgres94Dialect-->
-<!--                </jpa.properties.hibernate.dialect>-->
-<!--                <maven.test.skip>true</maven.test.skip>-->
-<!--            </properties>-->
-<!--        </profile>-->
+        <profile>
+            <id>docker</id>
+            <properties>
+                <spring.profiles.active>prod</spring.profiles.active>
+<!--                <iis.mysql.hibernate.connection.url>jdbc:mysql://iis-sandbox-mysql/iis_alongside_jpa</iis.mysql.hibernate.connection.url>-->
+<!--                <spring.datasource.url>jdbc:postgresql://hapi-fhir-postgres:5432/hapi_fhir_iis</spring.datasource.url>-->
+                <IIS_MYSQL_URL>jdbc:mysql://iis-sandbox-mysql:3306/iis_alongside_jpa</IIS_MYSQL_URL>
+                <SPRING_DATASOURCE_URL>jdbc:postgresql://hapi-fhir-postgres:5432/hapi_fhir_iis</SPRING_DATASOURCE_URL>
+                <jpa.properties.hibernate.dialect>ca.uhn.fhir.jpa.model.dialect.HapiFhirPostgres94Dialect</jpa.properties.hibernate.dialect>
+                <maven.test.skip>true</maven.test.skip>
+            </properties>
+        </profile>
         <profile>
             <id>dev</id>
             <properties>
                 <spring.profiles.active>dev</spring.profiles.active>
-                <mysql.hibernate.connection.url>jdbc:mysql://localhost/iis_alongside_jpa
-                </mysql.hibernate.connection.url>
-                <jpa.properties.hibernate.dialect>ca.uhn.fhir.jpa.model.dialect.HapiFhirH2Dialect
-                </jpa.properties.hibernate.dialect>
+                <mysql.hibernate.connection.url>jdbc:mysql://localhost/iis_alongside_jpa</mysql.hibernate.connection.url>
+                <jpa.properties.hibernate.dialect>ca.uhn.fhir.jpa.model.dialect.HapiFhirH2Dialect</jpa.properties.hibernate.dialect>
                 <maven.test.skip>true</maven.test.skip>
             </properties>
         </profile>
-
     </profiles>
 </project>
