@@ -2185,8 +2185,8 @@
                 <status>Valid</status>
             </code-status>
             <reference>
-                <link-to codeset="VACCINATION_VIS_VACCINES">307</link-to>
                 <link-to codeset="VACCINATION_VIS_VACCINES">306</link-to>
+                <link-to codeset="VACCINATION_VIS_VACCINES">307</link-to>
             </reference>
             <use-date>
                 <not-before>20230925</not-before>
@@ -5020,6 +5020,9 @@
             <code-status>
                 <status>Valid</status>
             </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">311</link-to>
+            </reference>
         </code>
         <code>
             <value>91322</value>
@@ -5028,6 +5031,9 @@
             <code-status>
                 <status>Valid</status>
             </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">312</link-to>
+            </reference>
         </code>
         <code>
             <value>91315</value>
@@ -5069,6 +5075,9 @@
             <code-status>
                 <status>Valid</status>
             </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">310</link-to>
+            </reference>
         </code>
         <code>
             <value>91318</value>
@@ -5077,6 +5086,9 @@
             <code-status>
                 <status>Valid</status>
             </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">308</link-to>
+            </reference>
         </code>
         <code>
             <value>91320</value>
@@ -5085,6 +5097,9 @@
             <code-status>
                 <status>Valid</status>
             </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">309</link-to>
+            </reference>
         </code>
         <code>
             <value>91316</value>
@@ -8751,6 +8766,48 @@
                     <new-code-value>80631-0100-01</new-code-value>
                     <reason>Use 11-digit format with dashes</reason>
                     <effective-date>20210504</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>71665-0001-01</value>
+            <label>CYFENDUS</label>
+            <description>Emergent Product Development Gaithersburg Inc. - Bacillus anthracis, adsorbed, adjuvanted (Strategic National Stockpile)</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">24</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">MIP</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">71665-0001-02</link-to>
+            </reference>
+            <use-date>
+                <not-before>20230919</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>71665-001-01</value>
+            <label>CYFENDUS</label>
+            <description>Emergent Product Development Gaithersburg Inc. - Bacillus anthracis, adsorbed, adjuvanted (Strategic National Stockpile)</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>71665-0001-01</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20231102</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>71665000101</value>
+            <label>CYFENDUS</label>
+            <description>Emergent Product Development Gaithersburg Inc. - Bacillus anthracis, adsorbed, adjuvanted (Strategic National Stockpile)</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>71665-0001-01</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20231102</effective-date>
                 </deprecated>
             </code-status>
         </code>
@@ -21492,6 +21549,7 @@
             </reference>
             <use-date>
                 <not-before>20230201</not-before>
+                <not-after>20231003</not-after>
             </use-date>
         </code>
         <code>
@@ -25652,6 +25710,9 @@
                 <link-to codeset="VACCINATION_TRADE_NAME">BIOTHRAX</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">64678-0211-05</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">64678-0211-01</link-to>
+                <link-to codeset="VACCINATION_TRADE_NAME">CYFENDUS</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">71665-0001-01</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">71665-0001-02</link-to>
             </reference>
             <use-date>
                 <not-before>20100528</not-before>
@@ -26033,6 +26094,7 @@
             </reference>
             <use-date>
                 <not-before>20210406</not-before>
+                <not-after>20231024</not-after>
             </use-date>
             <use-age>
                 <not-before-month>132</not-before-month>
@@ -26057,6 +26119,7 @@
             </reference>
             <use-date>
                 <not-before>20210126</not-before>
+                <not-after>20231026</not-after>
             </use-date>
             <use-age>
                 <not-before-month>204</not-before-month>
@@ -26171,6 +26234,7 @@
             </reference>
             <use-date>
                 <not-before>20221014</not-before>
+                <not-after>20231026</not-after>
             </use-date>
             <concept-type>vaccine</concept-type>
         </code>
@@ -26191,6 +26255,7 @@
             </reference>
             <use-date>
                 <not-before>20220817</not-before>
+                <not-after>20231026</not-after>
             </use-date>
             <use-age>
                 <not-before-month>48</not-before-month>
@@ -26218,6 +26283,7 @@
             </reference>
             <use-date>
                 <not-before>20220817</not-before>
+                <not-after>20231026</not-after>
             </use-date>
             <use-age>
                 <not-before-month>132</not-before-month>
@@ -26243,6 +26309,7 @@
             </reference>
             <use-date>
                 <not-before>20221019</not-before>
+                <not-after>20231026</not-after>
             </use-date>
             <concept-type>vaccine</concept-type>
         </code>
@@ -26264,6 +26331,7 @@
             </reference>
             <use-date>
                 <not-before>20220615</not-before>
+                <not-after>20231026</not-after>
             </use-date>
             <use-age>
                 <not-before-month>60</not-before-month>
@@ -26289,6 +26357,7 @@
             </reference>
             <use-date>
                 <not-before>20210913</not-before>
+                <not-after>20231025</not-after>
             </use-date>
             <use-age>
                 <not-before-month>48</not-before-month>
@@ -26320,6 +26389,7 @@
             </reference>
             <use-date>
                 <not-before>20201102</not-before>
+                <not-after>20231024</not-after>
             </use-date>
             <use-age>
                 <not-before-month>132</not-before-month>
@@ -26340,6 +26410,7 @@
                 <link-to codeset="VACCINATION_TRADE_NAME">Moderna COVID-19 Vaccine (US only)</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">80777-0287-07</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">80777-0287-92</link-to>
+                <link-to codeset="VACCINATION_CPT_CODE">91321</link-to>
             </reference>
             <use-date>
                 <not-before>20230913</not-before>
@@ -26363,6 +26434,7 @@
             </reference>
             <use-date>
                 <not-before>20210908</not-before>
+                <not-after>20231026</not-after>
             </use-date>
             <use-age>
                 <not-before-month>5</not-before-month>
@@ -26392,6 +26464,7 @@
             </reference>
             <use-date>
                 <not-before>20201102</not-before>
+                <not-after>20231024</not-after>
             </use-date>
             <use-age>
                 <not-before-month>132</not-before-month>
@@ -26422,6 +26495,7 @@
             </reference>
             <use-date>
                 <not-before>20210913</not-before>
+                <not-after>20231102</not-after>
             </use-date>
             <use-age>
                 <not-before-month>132</not-before-month>
@@ -26445,6 +26519,7 @@
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">80777-0102-95</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">80777-0102-93</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">80777-0102-96</link-to>
+                <link-to codeset="VACCINATION_CPT_CODE">91322</link-to>
             </reference>
             <use-date>
                 <not-before>20230913</not-before>
@@ -26467,6 +26542,7 @@
             </reference>
             <use-date>
                 <not-before>20220214</not-before>
+                <not-after>20231025</not-after>
             </use-date>
             <use-age>
                 <not-before-month>60</not-before-month>
@@ -26491,6 +26567,7 @@
             </reference>
             <use-date>
                 <not-before>20220412</not-before>
+                <not-after>20231027</not-after>
             </use-date>
             <use-age>
                 <not-before-month>5</not-before-month>
@@ -26535,6 +26612,7 @@
                 <link-to codeset="VACCINATION_TRADE_NAME">Pfizer-BioNTech COVID-19 Vaccine (US Only)</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">59267-4331-01</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">59267-4331-02</link-to>
+                <link-to codeset="VACCINATION_CPT_CODE">91319</link-to>
             </reference>
             <use-date>
                 <not-before>20230913</not-before>
@@ -26553,6 +26631,7 @@
                 <link-to codeset="VACCINATION_TRADE_NAME">Pfizer-BioNTech COVID-19 Vaccine (US Only)</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">59267-4315-01</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">59267-4315-02</link-to>
+                <link-to codeset="VACCINATION_CPT_CODE">91318</link-to>
             </reference>
             <use-date>
                 <not-before>20230913</not-before>
@@ -26573,6 +26652,7 @@
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">00069-2362-01</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">00069-2362-10</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">00069-2392-10</link-to>
+                <link-to codeset="VACCINATION_CPT_CODE">91320</link-to>
             </reference>
             <use-date>
                 <not-before>20230913</not-before>
@@ -29733,6 +29813,23 @@
             <test-age>11 years</test-age>
         </code>
         <code>
+            <value>316</value>
+            <label>meningococcal polysaccharide (MenACWY-TT conjugate), (MenB), PF</label>
+            <description>meningococcal polysaccharide (groups A, C, Y, W) tetanus toxoid conjugate, meningococcal B recombinant vaccine, 0.5mL, preservative free Notes: Meningococcal pentavalent vaccine strains ABCW and Y</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINE_GROUP">MENING</link-to>
+                <link-to codeset="VACCINE_GROUP">MeningB</link-to>
+                <link-to codeset="VACCINATION_TRADE_NAME">PENBRAYA</link-to>
+            </reference>
+            <use-date>
+                <not-before>20231102</not-before>
+            </use-date>
+            <concept-type>vaccine</concept-type>
+        </code>
+        <code>
             <value>167</value>
             <label>meningococcal, unknown serogroups</label>
             <description>meningococcal vaccine of unknown formulation and unknown
@@ -32479,6 +32576,9 @@
                 <link-to codeset="VACCINATION_TRADE_NAME">ACAM2000</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">71665-0330-01</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">71665-0330-02</link-to>
+                <link-to codeset="VACCINATION_TRADE_NAME">CYFENDUS</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">71665-0001-01</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">71665-0001-02</link-to>
             </reference>
             <use-date>
                 <not-before>20140429</not-before>
@@ -33471,6 +33571,7 @@
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">00069-2392-10</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">59267-4331-02</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">59267-4315-02</link-to>
+                <link-to codeset="VACCINATION_TRADE_NAME">PENBRAYA</link-to>
             </reference>
             <use-date>
                 <not-before>20100528</not-before>
@@ -34770,6 +34871,7 @@
                 <link-to codeset="VACCINATION_CVX_CODE">114</link-to>
                 <link-to codeset="VACCINATION_CVX_CODE">32</link-to>
                 <link-to codeset="VACCINATION_CVX_CODE">203</link-to>
+                <link-to codeset="VACCINATION_CVX_CODE">316</link-to>
             </reference>
         </code>
         <code>
@@ -34779,6 +34881,7 @@
                 <link-to codeset="VACCINATION_CVX_CODE">164</link-to>
                 <link-to codeset="VACCINATION_CVX_CODE">163</link-to>
                 <link-to codeset="VACCINATION_CVX_CODE">162</link-to>
+                <link-to codeset="VACCINATION_CVX_CODE">316</link-to>
             </reference>
         </code>
         <code>
@@ -35168,6 +35271,20 @@
             </reference>
             <use-date>
                 <not-before>20130809</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>CYFENDUS</value>
+            <label>anthrax</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">24</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">MIP</link-to>
+            </reference>
+            <use-date>
+                <not-before>20231102</not-before>
             </use-date>
         </code>
         <code>
@@ -36818,6 +36935,20 @@
             </reference>
             <use-date>
                 <not-before>20200527</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>PENBRAYA</value>
+            <label>meningococcal polysaccharide (MenACWY-TT conjugate), (MenB), PF</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">316</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">PFR</link-to>
+            </reference>
+            <use-date>
+                <not-before>20231102</not-before>
             </use-date>
         </code>
         <code>
@@ -47652,7 +47783,7 @@
             </use-date>
         </code>
         <code>
-            <value>307</value>
+            <value>306</value>
             <label>RSV (Respiratory Syncytial Virus) preventative antibody IIS</label>
             <code-status>
                 <status>Valid</status>
@@ -47665,7 +47796,7 @@
             </use-date>
         </code>
         <code>
-            <value>306</value>
+            <value>307</value>
             <label>RSV (Respiratory Syncytial Virus) preventative antibody IIS</label>
             <code-status>
                 <status>Valid</status>
@@ -51797,6 +51928,48 @@
                     <new-code-value>80631-0100-10</new-code-value>
                     <reason>Use 11-digit format with dashes</reason>
                     <effective-date>20210504</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>71665-0001-02</value>
+            <label>CYFENDUS</label>
+            <description>Emergent Product Development Gaithersburg Inc. - Bacillus anthracis, adsorbed, adjuvanted (Strategic National Stockpile)</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">24</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">MIP</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">71665-0001-01</link-to>
+            </reference>
+            <use-date>
+                <not-before>20230919</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>71665-001-02</value>
+            <label>CYFENDUS</label>
+            <description>Emergent Product Development Gaithersburg Inc. - Bacillus anthracis, adsorbed, adjuvanted (Strategic National Stockpile)</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>71665-0001-02</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20231102</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>71665000102</value>
+            <label>CYFENDUS</label>
+            <description>Emergent Product Development Gaithersburg Inc. - Bacillus anthracis, adsorbed, adjuvanted (Strategic National Stockpile)</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>71665-0001-02</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20231102</effective-date>
                 </deprecated>
             </code-status>
         </code>
@@ -64619,6 +64792,7 @@
             </reference>
             <use-date>
                 <not-before>20230201</not-before>
+                <not-after>20231003</not-after>
             </use-date>
         </code>
         <code>
