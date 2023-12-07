@@ -8,6 +8,9 @@ public interface PatientMapper<Patient> {
 	String MRN_SYSTEM = "AIRA-TEST";
 
 	String MOTHER_MAIDEN_NAME = "http://hl7.org/fhir/StructureDefinition/patient-mothersMaidenName";
+	String SSN = "http://hl7.org/fhir/sid/us-ssn";
+	String LINK_ID = "http://codi.mitre.org/link_id";
+
 	String REGISTRY_STATUS_EXTENSION = "registryStatus";
 	String REGISTRY_STATUS_INDICATOR = "registryStatusIndicator";
 	String ETHNICITY_EXTENSION = "ethnicity";

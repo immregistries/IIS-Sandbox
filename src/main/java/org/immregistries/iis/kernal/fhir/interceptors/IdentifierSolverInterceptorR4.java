@@ -6,12 +6,10 @@ import ca.uhn.fhir.jpa.mdm.dao.MdmLinkDaoSvc;
 import ca.uhn.fhir.jpa.mdm.svc.MdmLinkSvcImpl;
 import ca.uhn.fhir.jpa.mdm.svc.MdmResourceDaoSvc;
 import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
-import ca.uhn.fhir.rest.api.RestOperationTypeEnum;
 import ca.uhn.fhir.rest.api.server.IBundleProvider;
 import ca.uhn.fhir.rest.api.server.RequestDetails;
 import ca.uhn.fhir.rest.param.TokenParam;
 import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
-import ca.uhn.fhir.rest.server.servlet.ServletRequestDetails;
 import org.hl7.fhir.r4.model.*;
 import org.immregistries.iis.kernal.fhir.annotations.OnR4Condition;
 import org.slf4j.Logger;
@@ -32,14 +30,7 @@ import static org.immregistries.iis.kernal.mapping.Interfaces.PatientMapper.MRN_
 @Service
 public class IdentifierSolverInterceptorR4 {
 
-	Logger logger = LoggerFactory.getLogger(IdentifierSolverInterceptorR4.class);
-
-	@Autowired
-	MdmLinkDaoSvc mdmLinkDaoSvc;
-	@Autowired
-	MdmResourceDaoSvc mdmResourceDaoSvc;
-	@Autowired
-	MdmLinkSvcImpl mdmLinkSvc;
+	Logger logger = LoggerFactory.getLogger(IdentifierSolverInterceptor.class);
 
 	@Autowired
 	IFhirResourceDao<Patient> patientDao;
@@ -51,12 +42,12 @@ public class IdentifierSolverInterceptorR4 {
 	 * TODO add flavours
 	 */
 	@Hook(SERVER_INCOMING_REQUEST_PRE_HANDLED)
-	public void handle(RequestDetails requestDetails,
-							 ServletRequestDetails servletRequestDetails,
-							 RestOperationTypeEnum restOperationTypeEnum)
+	public void handle(RequestDetails requestDetails)
 		throws InvalidRequestException {
 
-		try {
+		if (requestDetails.getResource() instanceof Immunization) {
+			logger.info("Identifier reference interception");
+
 			Immunization immunization = (Immunization) requestDetails.getResource();
 			if (immunization == null
 				|| immunization.getPatient().getIdentifier() == null
@@ -65,6 +56,9 @@ public class IdentifierSolverInterceptorR4 {
 			) {
 				return;
 			}
+			/**
+			 * Linking record to golden
+			 */
 			Identifier identifier = immunization.getPatient().getIdentifier();
 			String id = null;
 			/**
@@ -86,16 +80,18 @@ public class IdentifierSolverInterceptorR4 {
 				 * If no golden record matched, regular records are checked
 				 */
 				// TODO set flavor
-				SearchParameterMap searchParameterMap = new SearchParameterMap().add("identifier", new TokenParam()
+				SearchParameterMap searchParameterMap = new SearchParameterMap().add(Patient.SP_IDENTIFIER, new TokenParam()
 					.setSystem(identifier.getSystem()).setValue(identifier.getValue()));
 				IBundleProvider bundleProvider = patientDao.search(searchParameterMap, requestDetails);
 				if (!bundleProvider.isEmpty()) {
 					id = bundleProvider.getAllResourceIds().get(0);
 				}
 			}
+
 			if (id != null) {
 				logger.info("Identifier reference solved {}|{} to {}", identifier.getSystem(), identifier.getValue(), id);
 				immunization.setPatient(new Reference("Patient/" + new IdType(id).getIdPart()));
+				requestDetails.setResource(immunization);
 			} else {
 				// TODO set flavor
 				if (identifier.getSystem().equals(MRN_SYSTEM)) {
@@ -104,6 +100,6 @@ public class IdentifierSolverInterceptorR4 {
 					throw new InvalidRequestException("There is no matching patient for " + identifier.getSystem() + " " + identifier.getValue());
 				}
 			}
-		} catch (ClassCastException classCastException) {}
+		}
 	}
 }

@@ -46,7 +46,7 @@ spring:
       #If using H2, then supply the value of ca.uhn.fhir.jpa.model.dialect.HapiFhirH2Dialect
       #If using postgres, then supply the value of ca.uhn.fhir.jpa.model.dialect.HapiFhirPostgres94Dialect
 
-      hibernate.dialect: '@jpa.properties.hibernate.dialect@'
+#      hibernate.dialect: '@jpa.properties.hibernate.dialect@'
 #      hibernate.dialect: ca.uhn.fhir.jpa.model.dialect.HapiFhirH2Dialect
 #      hibernate.dialect: ca.uhn.fhir.jpa.model.dialect.HapiFhirPostgres94Dialect
   #      hibernate.hbm2ddl.auto: update
@@ -56,7 +56,7 @@ spring:
   #      hibernate.cache.use_structured_entries: false
   #      hibernate.cache.use_minimal_puts: false
   ###    These settings will enable fulltext search with lucene
-      hibernate.search.enabled: false
+      hibernate.search.enabled: true
   #      hibernate.search.backend.type: lucene
   #      hibernate.search.backend.analysis.configurer: ca.uhn.fhir.jpa.search.HapiLuceneAnalysisConfigurer
   #      hibernate.search.backend.directory.type: local-filesystem
@@ -70,7 +70,7 @@ hapi:
     ### This enables the swagger-ui at /fhir/swagger-ui/index.html as well as the /fhir/api-docs (see https://hapifhir.io/hapi-fhir/docs/server_plain/openapi.html)
     openapi_enabled: true
     ### This is the FHIR version. Choose between, DSTU2, DSTU3, R4 or R5
-    fhir_version: R5
+    fhir_version: R4
     #    fhir_version: R5
     ### enable to use the ApacheProxyAddressStrategy which uses X-Forwarded-* headers
     ### to determine the FHIR server address
@@ -110,7 +110,7 @@ hapi:
     enable_index_missing_fields: true
     #    enable_index_of_type: true
     #    enable_index_contained_resource: false
-    ###  !!Extended Lucene/Elasticsearch Indexing is still a experimental feature, expect some features (e.g. _total=accurate) to not work as expected!!
+    ###  !!Extended Lucene/Elasticsearch Indexing is still an experimental feature, expect some features (e.g. _total=accurate) to not work as expected!!
     ###  more information here: https://hapifhir.io/hapi-fhir/docs/server_jpa/elastic.html
     advanced_lucene_indexing: false
     #    enforce_referential_integrity_on_delete: false

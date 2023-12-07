@@ -1,6 +1,7 @@
 package org.immregistries.iis.kernal.mapping;
 
 
+import ca.uhn.fhir.util.CanonicalIdentifier;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.instance.model.api.IBaseParameters;
 import org.hl7.fhir.r5.model.*;
@@ -77,12 +78,16 @@ public class MappingHelper {
 		}
 	}
 
+//	public  static CanonicalIdentifier filterIdentifier(List<CanonicalIdentifier> identifiers, String system) {
+//		return identifiers.stream().filter(identifier -> identifier.getSystemElement().getValue() != null && identifier.getSystemElement().getValue().equals(system)).findFirst().orElse(identifiers.get(0));
+//	}
+
 	public  static Identifier filterIdentifier(List<Identifier> identifiers, String system) {
-		return identifiers.stream().filter(identifier -> identifier.getSystem() != null && identifier.getSystem().equals(system)).findFirst().orElse(identifiers.get(0));
+		return identifiers.stream().filter(identifier -> identifier.getSystem() != null && identifier.getSystem().equals(system)).findFirst().orElse(null);
 	}
 
 	public static org.hl7.fhir.r4.model.Identifier filterR4Identifier(List<org.hl7.fhir.r4.model.Identifier> identifiers, String system) {
-		return identifiers.stream().filter(identifier -> identifier.getSystem() != null && identifier.getSystem().equals(system)).findFirst().orElse(identifiers.get(0));
+		return identifiers.stream().filter(identifier -> identifier.getSystem() != null && identifier.getSystem().equals(system)).findFirst().orElse(null);
 	}
 
 	public static Coding filterCodeableConcept(CodeableConcept concept, String system) {
@@ -119,21 +124,5 @@ public class MappingHelper {
 	public static Date extensionGetDate(org.hl7.fhir.r4.model.Extension extension) {
 		return extension.castToDate(extension.getValue()).getValue();
 	}
-
-	public static IBaseParameters resourceToPatch(Resource resource) {
-		Parameters patch = new Parameters();
-//		Parameters.ParametersParameterComponent operation = patch.addParameter();
-//		operation.setName("operation");
-//		operation
-//			.addPart()
-//			.setName("type")
-//			.setValue(new CodeType("delete"));
-//		operation
-//			.addPart()
-//			.setName("path")
-//			.setValue(new StringType("Patient.identifier[0]"));
-		return patch;
-	}
-
 
 }

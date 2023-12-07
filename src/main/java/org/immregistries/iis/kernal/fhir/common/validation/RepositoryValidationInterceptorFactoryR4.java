@@ -7,11 +7,10 @@ import ca.uhn.fhir.jpa.interceptor.validation.IRepositoryValidatingRule;
 import ca.uhn.fhir.jpa.interceptor.validation.RepositoryValidatingInterceptor;
 import ca.uhn.fhir.jpa.interceptor.validation.RepositoryValidatingRuleBuilder;
 import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
-import org.immregistries.iis.kernal.fhir.annotations.OnR4Condition;
 import ca.uhn.fhir.rest.api.server.IBundleProvider;
 import ca.uhn.fhir.rest.param.TokenParam;
 import org.hl7.fhir.r4.model.StructureDefinition;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.immregistries.iis.kernal.fhir.annotations.OnR4Condition;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
@@ -20,6 +19,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static org.immregistries.iis.kernal.fhir.common.validation.IRepositoryValidationInterceptorFactory.ENABLE_REPOSITORY_VALIDATING_INTERCEPTOR;
+
 /**
  * This class can be customized to enable the {@link ca.uhn.fhir.jpa.interceptor.validation.RepositoryValidatingInterceptor}
  * on this server.
@@ -27,19 +28,18 @@ import java.util.stream.Collectors;
  * The <code>enable_repository_validating_interceptor</code> property must be enabled in <code>application.yaml</code>
  * in order to use this class.
  */
-@ConditionalOnProperty(prefix = "hapi.fhir", name = "enable_repository_validating_interceptor", havingValue = "true")
+@ConditionalOnProperty(prefix = "hapi.fhir", name = ENABLE_REPOSITORY_VALIDATING_INTERCEPTOR, havingValue = "true")
 @Configuration
 @Conditional(OnR4Condition.class)
 public class RepositoryValidationInterceptorFactoryR4 implements IRepositoryValidationInterceptorFactory {
 
-	@Autowired
-	private FhirContext fhirContext;
+	private final FhirContext fhirContext;
 	private final RepositoryValidatingRuleBuilder repositoryValidatingRuleBuilder;
 	private final IFhirResourceDao structureDefinitionResourceProvider;
 
 	public RepositoryValidationInterceptorFactoryR4(RepositoryValidatingRuleBuilder repositoryValidatingRuleBuilder, DaoRegistry daoRegistry) {
 		this.repositoryValidatingRuleBuilder = repositoryValidatingRuleBuilder;
-//		this.fhirContext = daoRegistry.getSystemDao().getContext();
+		this.fhirContext = daoRegistry.getSystemDao().getContext();
 		structureDefinitionResourceProvider = daoRegistry.getResourceDao("StructureDefinition");
 
 	}
@@ -74,5 +74,4 @@ public class RepositoryValidationInterceptorFactoryR4 implements IRepositoryVali
 		List<IRepositoryValidatingRule> rules = repositoryValidatingRuleBuilder.build();
 		return new RepositoryValidatingInterceptor(fhirContext, rules);
 	}
-
 }

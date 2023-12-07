@@ -36,10 +36,22 @@
 
 
     <dependencies>
+
+        <dependency>
+            <groupId>org.immregistries</groupId>
+            <artifactId>mismo-match</artifactId>
+            <version>1.0</version>
+        </dependency>
         <dependency>
             <groupId>org.mitre.synthea</groupId>
             <artifactId>synthea</artifactId>
             <version>3.2.0</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>ca.uhn.hapi.fhir</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- IIS Sandbox dependencies -->
@@ -157,16 +169,16 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        <dependency>
-            <groupId>com.sun.faces</groupId>
-            <artifactId>jsf-api</artifactId>
-            <version>2.2.20</version>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.faces</groupId>
-            <artifactId>jsf-impl</artifactId>
-            <version>2.2.20</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>com.sun.faces</groupId>-->
+<!--            <artifactId>jsf-api</artifactId>-->
+<!--            <version>2.2.20</version>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>com.sun.faces</groupId>-->
+<!--            <artifactId>jsf-impl</artifactId>-->
+<!--            <version>2.2.20</version>-->
+<!--        </dependency>-->
 
         <!--HAPI FHIR JPA Dependency-->
         <dependency>
@@ -192,7 +204,17 @@
           <groupId>com.microsoft.sqlserver</groupId>
           <artifactId>mssql-jdbc</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>jakarta.xml.bind</groupId>
+            <artifactId>jakarta.xml.bind-api</artifactId>
+            <version>2.3.3</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-ri</artifactId>
+            <version>2.3.5</version>
+            <type>pom</type>
+        </dependency>
         <!-- Needed for Email subscriptions -->
         <dependency>
             <groupId>org.simplejavamail</groupId>
@@ -241,11 +263,11 @@
             </exclusions>
         </dependency>
         <!-- This dependency includes the JPA CQL Server -->
-<!--        <dependency>-->
-<!--            <groupId>ca.uhn.hapi.fhir</groupId>-->
-<!--            <artifactId>hapi-fhir-jpaserver-cql</artifactId>-->
-<!--            <version>${project.version}</version>-->
-<!--        </dependency>-->
+        <dependency>
+            <groupId>ca.uhn.hapi.fhir</groupId>
+            <artifactId>hapi-fhir-storage-cr</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <!-- This dependency includes the JPA MDM Server -->
         <dependency>
             <groupId>ca.uhn.hapi.fhir</groupId>
@@ -257,6 +279,12 @@
             <groupId>ca.uhn.hapi.fhir</groupId>
             <artifactId>hapi-fhir-server-openapi</artifactId>
             <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.yaml</groupId>
+                    <artifactId>snakeyaml</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <!-- This dependency is used for the "FHIR Tester" web app overlay -->
         <dependency>
@@ -271,6 +299,12 @@
             <artifactId>hapi-fhir-testpage-overlay</artifactId>
             <version>${project.version}</version>
             <classifier>classes</classifier>
+        </dependency>
+        <!-- This dependency is used to include the IPS Base Implementation -->
+        <dependency>
+            <groupId>ca.uhn.hapi.fhir</groupId>
+            <artifactId>hapi-fhir-jpaserver-ips</artifactId>
+            <version>${project.version}</version>
         </dependency>
 
         <!-- HAPI-FHIR uses Logback for logging support. The logback library is included automatically by Maven as a part of the hapi-fhir-base dependency, but you also need to include a logging library. Logback
@@ -293,12 +327,7 @@
 <!--            <artifactId>thymeleaf</artifactId>-->
 <!--        </dependency>-->
 
-        <!-- Needed for parsing the config -->
-        <dependency>
-            <groupId>org.yaml</groupId>
-            <artifactId>snakeyaml</artifactId>
-            <version>1.30</version>
-        </dependency>
+
 
         <!-- Used for CORS support -->
         <!-- Spring Web is used to deploy the server to a web container. -->
@@ -363,6 +392,12 @@
 
         <!-- The following dependencies are only needed for automated unit tests, you do not neccesarily need them to run the example. -->
         <dependency>
+            <groupId>ca.uhn.hapi.fhir</groupId>
+            <artifactId>hapi-fhir-jpaserver-test-utilities</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-servlets</artifactId>
             <scope>test</scope>
@@ -372,11 +407,11 @@
             <artifactId>jetty-servlet</artifactId>
             <scope>test</scope>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>org.eclipse.jetty.websocket</groupId>-->
-<!--            <artifactId>websocket-server</artifactId>-->
-<!--            <scope>test</scope>-->
-<!--        </dependency>-->
+        <dependency>
+            <groupId>org.eclipse.jetty.websocket</groupId>
+            <artifactId>websocket-jetty-server</artifactId>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-server</artifactId>
@@ -444,6 +479,13 @@
 <!--            <version>${spring_boot_version}</version>-->
 <!--        </dependency>-->
 
+        <!-- https://mvnrepository.com/artifact/io.micrometer/micrometer-core -->
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-core</artifactId>
+            <version>1.9.4</version>
+        </dependency>
+
         <!-- https://mvnrepository.com/artifact/io.micrometer/micrometer-registry-prometheus -->
         <dependency>
             <groupId>io.micrometer</groupId>
@@ -501,7 +543,6 @@
             <version>${logback-classic.version}</version>
         </dependency>
 
-
     </dependencies>
 
     <build>
@@ -534,20 +575,6 @@
                     </execution>
                 </executions>
             </plugin>
-            <!-- The following is not required for the application to build, but allows you to test it by issuing "mvn package jetty:run -Dspring.batch.job.enabled=false" from the command line. -->
-            <!--
-            <plugin>
-                <groupId>org.eclipse.jetty</groupId>
-                <artifactId>jetty-maven-plugin</artifactId>
-                <version>${jetty_version}</version>
-                <configuration>
-                    <webApp>
-                        <contextPath>/hapi-fhir-jpaserver</contextPath>
-                        <allowDuplicateFragmentNames>true</allowDuplicateFragmentNames>
-                    </webApp>
-                </configuration>
-            </plugin>
-            -->
 
             <!-- Tell Maven which Java source version you want to use -->
             <plugin>
@@ -741,7 +768,8 @@
             <id>dev</id>
             <properties>
                 <spring.profiles.active>dev</spring.profiles.active>
-                <mysql.hibernate.connection.url>jdbc:mysql://localhost/iis_alongside_jpa</mysql.hibernate.connection.url>
+                <IIS_MYSQL_URL>jdbc:mysql://localhost/iis_alongside_jpa</IIS_MYSQL_URL>
+<!--                <mysql.hibernate.connection.url>jdbc:mysql://localhost/iis_alongside_jpa</mysql.hibernate.connection.url>-->
                 <jpa.properties.hibernate.dialect>ca.uhn.fhir.jpa.model.dialect.HapiFhirH2Dialect</jpa.properties.hibernate.dialect>
                 <maven.test.skip>true</maven.test.skip>
             </properties>

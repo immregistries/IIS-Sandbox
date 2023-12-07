@@ -40,7 +40,7 @@ public class MdmCustomSubscriptionLoader extends MdmSubscriptionLoader {
 	@Autowired
 	IChannelNamer myChannelNamer;
 
-	@Autowired
+	@Autowired(required = false)
 	private SubscriptionTopicLoader mySubscriptionTopicLoader;
 	@Autowired
 	private SubscriptionLoader mySubscriptionLoader;

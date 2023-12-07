@@ -1,7 +1,11 @@
 package org.immregistries.iis.kernal.servlet;
 
 import ca.uhn.fhir.context.FhirContext;
+import ca.uhn.fhir.jpa.searchparam.extractor.BaseSearchParamExtractor;
+import ca.uhn.fhir.jpa.searchparam.extractor.ISearchParamExtractor;
 import ca.uhn.fhir.parser.IParser;
+import ca.uhn.fhir.rest.server.util.ISearchParamRegistry;
+import org.hl7.fhir.instance.model.api.IBase;
 import org.hl7.fhir.r5.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +41,26 @@ public class SubscriptionTopicController {
 		IParser parser = fhirContext.newJsonParser().setPrettyPrint(true);
 		SubscriptionTopic topic = getGroupSubscriptionTopic();
 		resp.getOutputStream().print(parser.encodeResourceToString(topic));
+	}
+
+	@Autowired
+	ISearchParamRegistry iSearchParamRegistry;
+	@Autowired
+	ISearchParamExtractor iSearchParamExtractor;
+
+	@GetMapping("/test123")
+	protected void doGetTest(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		iSearchParamRegistry.forceRefresh();
+		String str = iSearchParamRegistry.getActiveSearchParams("Person").get("address").toString();
+		iSearchParamExtractor.extractSearchParamComposites(new org.hl7.fhir.r4.model.Patient()).stream().count();
+//		iSearchParamExtractor.exgetPathValueExtractor(new org.hl7.fhir.r4.model.Person(), "");
+//		iSearchParamExtractor.extractValues("",)
+		resp.getOutputStream().print(
+//			str +
+//			iSearchParamExtractor.extractSearchParamComposites(new org.hl7.fhir.r4.model.Person()).stream().count()
+			iSearchParamExtractor.getPathValueExtractor(new org.hl7.fhir.r4.model.Person(), "").toString()
+			);
+
 	}
 
 	@GetMapping("/data-quality-issues")
