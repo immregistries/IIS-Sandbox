@@ -15,7 +15,7 @@ public class OrganizationMapperR5 implements OrganizationMapper<Organization> {
 
 	public Organization getFhirResource(Tenant tenant) {
 		Organization o = new Organization();
-		o.addIdentifier(MappingHelper.getFhirIdentifier("Tenant", Integer.toString(tenant.getOrgId())));
+		o.addIdentifier(MappingHelper.getFhirIdentifierR5("Tenant", Integer.toString(tenant.getOrgId())));
 		o.setName(tenant.getOrganizationName());
 		return  o;
 	}
@@ -23,7 +23,7 @@ public class OrganizationMapperR5 implements OrganizationMapper<Organization> {
 	public Tenant getTenant(Organization organization) {
 		Tenant tenant = new Tenant();
 		tenant.setOrganizationName(organization.getName());
-		tenant.setOrgId(Integer.parseInt(MappingHelper.filterIdentifier(organization.getIdentifier(),"Tenant").getValue()));
+		tenant.setOrgId(Integer.parseInt(MappingHelper.filterIdentifierR5(organization.getIdentifier(),"Tenant").getValue()));
 		return tenant;
 	}
 }

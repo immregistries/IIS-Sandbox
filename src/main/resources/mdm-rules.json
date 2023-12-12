@@ -105,6 +105,6 @@
     "patient-identifier" : "MATCH"
   },
   "eidSystems": {
-    "Patient": "AIRA-TEST"
+    "Patient": "http://codi.mitre.org/link_id"
   }
 }

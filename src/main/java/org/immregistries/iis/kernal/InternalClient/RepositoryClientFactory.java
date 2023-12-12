@@ -18,6 +18,8 @@ import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -26,6 +28,9 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.servlet.http.HttpServletRequest;
+
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 import static org.immregistries.iis.kernal.fhir.interceptors.SessionAuthorizationInterceptor.CONNECTATHON_USER;
 import static org.immregistries.iis.kernal.fhir.security.ServletHelper.GITHUB_PREFIX;
@@ -41,7 +46,9 @@ public class RepositoryClientFactory extends ApacheRestfulClientFactory implemen
 	private IFhirSystemDao fhirSystemDao;
 	private final Logger logger = LoggerFactory.getLogger(RepositoryClientFactory.class);
 	private LoggingInterceptor loggingInterceptor;
-	private static String serverBase = "";
+
+	@Autowired
+	Environment environment;
 
 	@Autowired
 	public RepositoryClientFactory(){
@@ -55,14 +62,12 @@ public class RepositoryClientFactory extends ApacheRestfulClientFactory implemen
 			loggingInterceptor = new LoggingInterceptor();
 			loggingInterceptor.setLogger(logger);
 		}
-		if (serverBase.equals("")) {
-			serverBase = ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString() + "/fhir";
-		}
 	}
 
 	public IGenericClient newGenericClient(Tenant tenant) {
 		asynchInit();
-		IGenericClient client = newGenericClient(serverBase + "/" + tenant.getOrganizationName());
+		IGenericClient client;
+		client = newGenericClient( "http://" + InetAddress.getLoopbackAddress().getHostAddress() + ":" + environment.getProperty("server.port") + "/iis/fhir/" + tenant.getOrganizationName());
 		IClientInterceptor authInterceptor;
 		if (tenant.getOrganizationName().equals(CONNECTATHON_USER) && tenant.getUserAccess().getAccessName() == null) {
 			/**

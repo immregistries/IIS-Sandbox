@@ -42,7 +42,7 @@ public class PersonMapperR4 implements PersonMapper<Person> {
 		if ( modelPerson.getProfessionalSuffix() != null) {
 			name.addSuffix(modelPerson.getProfessionalSuffix());
 		}
-		p.setManagingOrganization(MappingHelper.getFhirR4Reference(MappingHelper.ORGANIZATION,ORGANIZATION_ASSIGNING_AUTHORITY, modelPerson.getAssigningAuthority()));
+		p.setManagingOrganization(MappingHelper.getFhirReferenceR4(MappingHelper.ORGANIZATION,ORGANIZATION_ASSIGNING_AUTHORITY, modelPerson.getAssigningAuthority()));
 		return p;
 	}
 

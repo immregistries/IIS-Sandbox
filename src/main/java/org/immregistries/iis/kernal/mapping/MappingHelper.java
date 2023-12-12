@@ -1,9 +1,7 @@
 package org.immregistries.iis.kernal.mapping;
 
 
-import ca.uhn.fhir.util.CanonicalIdentifier;
 import org.apache.commons.lang3.StringUtils;
-import org.hl7.fhir.instance.model.api.IBaseParameters;
 import org.hl7.fhir.r5.model.*;
 
 import java.text.SimpleDateFormat;
@@ -23,25 +21,31 @@ public class MappingHelper {
 	public static final SimpleDateFormat sdf = new SimpleDateFormat("E MMM dd HH:mm:ss yyyy");
 
 	//TODO choose system id or not
-	public static Reference getFhirReference(String fhirType, String dbType, String identifier) {
+	public static Reference getFhirReferenceR5(String fhirType, String dbType, String identifier) {
 		if (StringUtils.isBlank(identifier)) {
 			return null;
 		} else {
 			return new Reference()
 				.setType(fhirType)
-				.setIdentifier(getFhirIdentifier(dbType, identifier));
+				.setIdentifier(getFhirIdentifierR5(dbType, identifier));
 		}
 	}
 
-	public static CodeableReference getFhirCodeableReference(String fhirType, String dbType, String identifier) {
+	public static Reference getFhirReferenceR5(String fhirType, String dbType, String identifier, String fhirId) {
+		return new Reference(fhirType + "/" + fhirId)
+			.setType(fhirType)
+			.setIdentifier(getFhirIdentifierR5(dbType, identifier));
+	}
+
+	public static CodeableReference getFhirCodeableReferenceR5(String fhirType, String dbType, String identifier) {
 		if (StringUtils.isBlank(identifier)) {
 			return null;
 		} else {
-			return new CodeableReference(getFhirReference(fhirType, dbType, identifier));
+			return new CodeableReference(getFhirReferenceR5(fhirType, dbType, identifier));
 		}
 	}
 
-	public static org.hl7.fhir.r4.model.Reference getFhirR4Reference(String fhirType, String dbType, String identifier) {
+	public static org.hl7.fhir.r4.model.Reference getFhirReferenceR4(String fhirType, String dbType, String identifier) {
 		if (StringUtils.isBlank(identifier)) {
 			return null;
 		} else {
@@ -52,25 +56,20 @@ public class MappingHelper {
 					.setValue(identifier));
 		}
 	}
-	public  static Reference getFhirReference(String fhirType, String dbType, String identifier, String fhirId) {
-		return new Reference(fhirType + "/" + fhirId)
-			.setType(fhirType)
-			.setIdentifier(getFhirIdentifier(dbType,identifier));
-	}
 
-	public  static Identifier getFhirIdentifier(String dbType, String identifier) {
+	public static Identifier getFhirIdentifierR5(String dbType, String identifier) {
 		return new Identifier()
-				.setSystem(dbType)
-				.setValue(identifier);
+			.setSystem(dbType)
+			.setValue(identifier);
 	}
 
-	public  static org.hl7.fhir.r4.model.Identifier getFhirR4Identifier(String dbType, String identifier) {
+	public static org.hl7.fhir.r4.model.Identifier getFhirIdentifierR4(String dbType, String identifier) {
 		return new org.hl7.fhir.r4.model.Identifier()
-				.setSystem(dbType)
-				.setValue(identifier);
+			.setSystem(dbType)
+			.setValue(identifier);
 	}
 
-	public  static String identifierToString(List<Identifier> identifiers) {
+	public static String identifierToString(List<Identifier> identifiers) {
 		if (identifiers.size() > 0) {
 			return identifiers.get(0).getSystem() + "|" + identifiers.get(0).getValue();
 		} else {
@@ -82,19 +81,27 @@ public class MappingHelper {
 //		return identifiers.stream().filter(identifier -> identifier.getSystemElement().getValue() != null && identifier.getSystemElement().getValue().equals(system)).findFirst().orElse(identifiers.get(0));
 //	}
 
-	public  static Identifier filterIdentifier(List<Identifier> identifiers, String system) {
+	public static Identifier filterIdentifierR5(List<Identifier> identifiers, String system) {
 		return identifiers.stream().filter(identifier -> identifier.getSystem() != null && identifier.getSystem().equals(system)).findFirst().orElse(null);
 	}
 
-	public static org.hl7.fhir.r4.model.Identifier filterR4Identifier(List<org.hl7.fhir.r4.model.Identifier> identifiers, String system) {
+	public static org.hl7.fhir.r4.model.Identifier filterIdentifierR4(List<org.hl7.fhir.r4.model.Identifier> identifiers, String system) {
 		return identifiers.stream().filter(identifier -> identifier.getSystem() != null && identifier.getSystem().equals(system)).findFirst().orElse(null);
 	}
 
-	public static Coding filterCodeableConcept(CodeableConcept concept, String system) {
-		return filterCodingList(concept.getCoding(), system);
+	public static Identifier filterIdentifierTypeR5(List<Identifier> identifiers, String type) {
+		return identifiers.stream().filter(identifier -> identifier.hasType() && identifier.getType().hasCoding() && identifier.getType().getCodingFirstRep().getCode().equals(type)).findFirst().orElse(null);
 	}
 
-	public static Coding filterCodingList(List<Coding> codings, String system) {
+	public static org.hl7.fhir.r4.model.Identifier filterIdentifierTypeR4(List<org.hl7.fhir.r4.model.Identifier> identifiers, String type) {
+		return identifiers.stream().filter(identifier -> identifier.hasType() && identifier.getType().hasCoding() && identifier.getType().getCodingFirstRep().getCode().equals(type)).findFirst().orElse(null);
+	}
+
+	public static Coding filterCodeableConceptR5(CodeableConcept concept, String system) {
+		return filterCodingListR5(concept.getCoding(), system);
+	}
+
+	public static Coding filterCodingListR5(List<Coding> codings, String system) {
 		return codings.stream().filter(coding -> coding.getSystem().equals(system)).findFirst().get();
 	}
 

@@ -165,7 +165,7 @@ public class ImmunizationMapperR5 implements ImmunizationMapper<Immunization> {
    */
   public Immunization getFhirResource(VaccinationMaster vr) {
 	  Immunization i = new Immunization();
-	  i.addIdentifier(MappingHelper.getFhirIdentifier(vr.getExternalLinkSystem(), vr.getExternalLink())); // TODO if system empty ?
+	  i.addIdentifier(MappingHelper.getFhirIdentifierR5(vr.getExternalLinkSystem(), vr.getExternalLink())); // TODO if system empty ?
 	  Reference patientReference = new Reference()
 		  .setReference("Patient/" + vr.getPatientReported().getPatientId())
 //		  .setIdentifier(new Identifier()
@@ -186,7 +186,7 @@ public class ImmunizationMapperR5 implements ImmunizationMapper<Immunization> {
 	  if (StringUtils.isNotBlank(vr.getVaccineNdcCode())) {
 		  i.getVaccineCode().addCoding().setCode(vr.getVaccineNdcCode()).setSystem(NDC);
 	  }
-	  i.setManufacturer(MappingHelper.getFhirCodeableReference(MappingHelper.ORGANIZATION, MVX, vr.getVaccineMvxCode()));
+	  i.setManufacturer(MappingHelper.getFhirCodeableReferenceR5(MappingHelper.ORGANIZATION, MVX, vr.getVaccineMvxCode()));
 
 	  i.setDoseQuantity(new Quantity().setValue(new BigDecimal(vr.getAdministeredAmount())));
 
@@ -255,7 +255,7 @@ public class ImmunizationMapperR5 implements ImmunizationMapper<Immunization> {
 			  break;
 		  }
 		  default:{
-			  actor = MappingHelper.getFhirReference(MappingHelper.PRACTITIONER, person.getIdentifierTypeCode(), person.getPersonExternalLink(), person.getPersonId());
+			  actor = MappingHelper.getFhirReferenceR5(MappingHelper.PRACTITIONER, person.getIdentifierTypeCode(), person.getPersonExternalLink(), person.getPersonId());
 		  }
 	  }
 	  performer.setActor(actor);

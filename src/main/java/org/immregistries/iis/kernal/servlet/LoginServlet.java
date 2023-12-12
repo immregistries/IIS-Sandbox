@@ -1,6 +1,8 @@
 package org.immregistries.iis.kernal.servlet;
 
+import org.apache.commons.codec.binary.Base64;
 import org.hibernate.Session;
+import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.model.Tenant;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;

@@ -1,54 +1,169 @@
 package org.immregistries.iis.kernal.servlet;
 
 import ca.uhn.fhir.context.FhirContext;
-
-import ca.uhn.fhir.mdm.util.IdentifierUtil;
+import ca.uhn.fhir.context.FhirVersionEnum;
+import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
+import ca.uhn.fhir.rest.api.server.IBundleProvider;
+import ca.uhn.fhir.rest.param.TokenParam;
 import ca.uhn.fhir.util.ExtensionUtil;
 import org.hl7.fhir.instance.model.api.IBaseExtension;
+import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r5.model.*;
-//import org.hl7.fhir.r5.model.Patient;
+import org.immregistries.iis.kernal.InternalClient.FhirRequester;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
-import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.mismo.match.StringUtils;
 import org.immregistries.mismo.match.model.Patient;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.Servlet;
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.immregistries.iis.kernal.mapping.Interfaces.PatientMapper.*;
 
 @RestController
-@RequestMapping("patientMatchingDatasetConversion")
+@RequestMapping("/patientMatchingDatasetConversion")
 public class PatientMatchingDatasetConversionController {
 	@Autowired
 	FhirContext fhirContext;
+	@Autowired
+	FhirRequester fhirRequester;
 
 
-
-	public String post(@RequestBody String stringBundle) {
-		Bundle bundle = fhirContext.newJsonParser().parseResource(Bundle.class, stringBundle);
-		for (Bundle.BundleEntryComponent entry: bundle.getEntry()) {
-			if (entry.getResource() instanceof org.hl7.fhir.r5.model.Patient) {
-				org.hl7.fhir.r5.model.Patient fhir = (org.hl7.fhir.r5.model.Patient) entry.getResource();
+	@PostMapping()
+	public String post(@RequestBody String stringBundle) throws FileNotFoundException {
+		List<Patient> list = new ArrayList<>(20);
+		if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R5)) {
+			Bundle bundle = fhirContext.newJsonParser().parseResource(Bundle.class, stringBundle);
+			for (Bundle.BundleEntryComponent entry : bundle.getEntry()) {
+				if (entry.getResource() instanceof org.hl7.fhir.r5.model.Patient) {
+					org.hl7.fhir.r5.model.Patient fhirPatient = (org.hl7.fhir.r5.model.Patient) entry.getResource();
+					Patient patient = convertFromR5(fhirPatient);
+					list.add(patient);
+				}
 			}
+		} else if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R4)) {
+			org.hl7.fhir.r4.model.Bundle bundle = fhirContext.newJsonParser().parseResource(org.hl7.fhir.r4.model.Bundle.class, stringBundle);
+			for (org.hl7.fhir.r4.model.Bundle.BundleEntryComponent entry : bundle.getEntry()) {
+				if (entry.getResource() instanceof org.hl7.fhir.r4.model.Patient) {
+					org.hl7.fhir.r4.model.Patient fhirPatient = (org.hl7.fhir.r4.model.Patient) entry.getResource();
+					Patient patient = convertFromR4(fhirPatient);
+					list.add(patient);
+				}
+			}
+		}
+
+		File csvOutputFile = new File("./target/output.csv");
+		try (PrintWriter pw = new PrintWriter(csvOutputFile)) {
+			csv(list, pw);
+			pw.flush();
+			pw.close();
 		}
 		return "";
 	}
 
+	@GetMapping("/all")
+	public void getFromFacility(HttpServletResponse resp) throws IOException {
+		List<Patient> list = new ArrayList<>(20);
+		if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R5)) {
+			IBundleProvider bundleProvider = fhirRequester.searchRegularRecord(org.hl7.fhir.r5.model.Patient.class, new SearchParameterMap());
+			for (IBaseResource iBaseResource : bundleProvider.getAllResources()) {
+				if (iBaseResource instanceof org.hl7.fhir.r5.model.Patient) {
+					Patient patient = convertFromR5IncludingLink((org.hl7.fhir.r5.model.Patient) iBaseResource);
+					list.add(patient);
+				}
+			}
+		} else if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R4)) {
+			IBundleProvider bundleProvider = fhirRequester.searchRegularRecord(org.hl7.fhir.r4.model.Patient.class, new SearchParameterMap());
+			for (IBaseResource iBaseResource : bundleProvider.getAllResources()) {
+				if (iBaseResource instanceof org.hl7.fhir.r4.model.Patient) {
+					Patient patient = convertFromR4IncludingLink((org.hl7.fhir.r4.model.Patient) iBaseResource);
+					list.add(patient);
+				}
+			}
+		}
+		PrintWriter out = new PrintWriter(resp.getOutputStream());
+		csv(list, out);
+		out.flush();
+		out.close();
+	}
 
+	private void csv(List<Patient> patientList, PrintWriter printWriter) throws FileNotFoundException {
+		String csvHeader =
+			"EnterpriseID," +
+				"LAST," +
+				"FIRST," +
+				"MIDDLE," +
+				"SUFFIX," +
+				"DOB," +
+				"GENDER," +
+				"SSN," +
+				"ADDRESS1," +
+				"ADDRESS2," +
+				"ZIP," +
+				"MOTHERS_MAIDEN_NAME," +
+				"MRN," +
+				"CITY," +
+				"STATE," +
+				"PHONE," +
+				"PHONE2," +
+				"EMAIL," +
+				"ALIAS," +
+				"LINK_ID";
 
-	private Patient convert(org.hl7.fhir.r5.model.Patient patient) {
+		printWriter.println(csvHeader);
+		patientList.stream()
+			.map(this::csv)
+			.forEach(printWriter::println);
+//		return printWriter.;
+	}
+
+	private String csv(Patient patient) {
+		String[] line = new String[]{
+			patient.getValue("identifier"),
+			patient.getNameLast(),
+			patient.getNameFirst(),
+			patient.getNameMiddle(),
+			patient.getNameSuffix(),
+			patient.getBirthDate(),
+			patient.getGender(),
+			patient.getSsn(),
+			patient.getAddress1().getLine1(),
+			patient.getAddress1().getLine2(),
+			patient.getAddress1().getZip(),
+			patient.getMotherMaidenName(),
+			patient.getMrns(),
+			patient.getAddress1().getCity(),
+			patient.getAddress1().getState(),
+			patient.getPhone(),
+			"", //phone 2
+			patient.getValue("email"),
+			patient.getNameAlias(),
+			patient.getLinkWith().getValue("identifier"), // LinkWith
+		};
+
+		return Stream.of(line)
+//			.map(this::escapeSpecialCharacters)
+			.collect(Collectors.joining(","));
+	}
+
+	private Patient convertFromR5(org.hl7.fhir.r5.model.Patient patient) {
 		Patient mismo = new Patient();
-		mismo.setPatientId(Math.toIntExact(patient.getIdElement().getIdPartAsLong()));
-
-
+		org.hl7.fhir.r5.model.Identifier identifier = MappingHelper.filterIdentifierR5(patient.getIdentifier(), "http://codi.mitre.org");
+		if (identifier != null) {
+			mismo.setValue("identifier",identifier.getValue());
+		}
 		if (patient.hasName()) {
-			HumanName humanName = patient.getNameFirstRep();
+			org.hl7.fhir.r5.model.HumanName humanName = patient.getNameFirstRep();
 			mismo.setNameFirst(humanName.getGivenAsSingleString());
 			String[] family = humanName.getFamily().split("-");
-			if (family.length > 1){
+			if (family.length > 1) {
 				mismo.setNameLast(family[0]);
 				mismo.setNameLastHyph(family[1]);
 
@@ -66,14 +181,14 @@ public class PatientMatchingDatasetConversionController {
 		mismo.setBirthDate(patient.getBirthDateElement().asStringValue());
 		mismo.setGender(patient.getGender().toCode());
 
-		Identifier ssn = MappingHelper.filterIdentifier(patient.getIdentifier(),SSN);
+		org.hl7.fhir.r5.model.Identifier ssn = MappingHelper.filterIdentifierTypeR5(patient.getIdentifier(), "SS");
 		if (ssn != null) {
 			mismo.setSsn(ssn.getValue());
 		}
 
 
 		if (patient.hasAddress()) {
-			Address address = patient.getAddressFirstRep();
+			org.hl7.fhir.r5.model.Address address = patient.getAddressFirstRep();
 			mismo.setAddressCity(address.getCity());
 			mismo.setAddressState(address.getState());
 			mismo.setAddressZip(address.getPostalCode());
@@ -86,7 +201,7 @@ public class PatientMatchingDatasetConversionController {
 //			mismo.setAddressStreet1Alt(address.get);
 
 			if (patient.getAddress().size() > 1) {
-				Address address2 = patient.getAddress().get(1);
+				org.hl7.fhir.r5.model.Address address2 = patient.getAddress().get(1);
 				mismo.setAddress2City(address2.getCity());
 				mismo.setAddress2State(address2.getState());
 				mismo.setAddress2Zip(address2.getPostalCode());
@@ -98,36 +213,149 @@ public class PatientMatchingDatasetConversionController {
 				}
 			}
 		}
-		IBaseExtension motherMaiden = ExtensionUtil.getExtensionByUrl(patient,MOTHER_MAIDEN_NAME);
+		IBaseExtension motherMaiden = ExtensionUtil.getExtensionByUrl(patient, MOTHER_MAIDEN_NAME);
 		if (motherMaiden != null) {
 			mismo.setMotherMaidenName(motherMaiden.getValue().toString());
 		}
-//
-//		IBaseExtension linkedWith = ExtensionUtil.getExtensionByUrl(patient,LINK_ID);
-//		if (linkedWith != null) {
-//			mismo.setLinkWith(linkedWith.getValue().toString());
-//		}
 
-		Identifier mrn = MappingHelper.filterIdentifier(patient.getIdentifier(),""); //TODO change
+		org.hl7.fhir.r5.model.Identifier mrn = MappingHelper.filterIdentifierTypeR5(patient.getIdentifier(), "MR");
 		if (mrn != null) {
 			mismo.setMrns(mrn.getValue());
 		}
-		for (ContactPoint telecom : patient.getTelecom()) {
+		for (org.hl7.fhir.r5.model.ContactPoint telecom : patient.getTelecom()) {
 			if (null != telecom.getSystem()) {
-				if (telecom.getSystem().equals(ContactPoint.ContactPointSystem.PHONE) && StringUtils.isNotEmpty(mismo.getPhone())){
+				if (telecom.getSystem().equals(ContactPoint.ContactPointSystem.PHONE) && StringUtils.isNotEmpty(mismo.getPhone())) {
 					mismo.setPhone(telecom.getValue());
-				} else if (telecom.getSystem().equals(ContactPoint.ContactPointSystem.PHONE) && StringUtils.isNotEmpty(mismo.getPhone())){
-					mismo.setValue("phone2",telecom.getValue());
+				} else if (telecom.getSystem().equals(ContactPoint.ContactPointSystem.PHONE) && StringUtils.isNotEmpty(mismo.getPhone())) {
+					mismo.setValue("phone2", telecom.getValue());
 				} else if (telecom.getSystem().equals(ContactPoint.ContactPointSystem.EMAIL)) {
-					mismo.setValue("email",telecom.getValue());
+					mismo.setValue("email", telecom.getValue());
 				}
 			}
 		}
 
-		mismo.setBirthOrder(patient.getMultipleBirthIntegerType().getValueAsString());
-
+		if(patient.hasMultipleBirthBooleanType()) {
+			mismo.setBirthOrder(patient.getMultipleBirthBooleanType().getValueAsString());
+		} else if (patient.hasMultipleBirthIntegerType()) {
+			mismo.setBirthOrder(patient.getMultipleBirthIntegerType().getValueAsString());
+		}
 		return mismo;
 	}
+
+
+	private Patient convertFromR4(org.hl7.fhir.r4.model.Patient patient) {
+		Patient mismo = new Patient();
+		org.hl7.fhir.r4.model.Identifier identifier = MappingHelper.filterIdentifierR4(patient.getIdentifier(), "http://codi.mitre.org");
+		if (identifier != null) {
+			mismo.setValue("identifier",identifier.getValue());
+		}
+		if (patient.hasName()) {
+			org.hl7.fhir.r4.model.HumanName humanName = patient.getNameFirstRep();
+			mismo.setNameFirst(humanName.getGivenAsSingleString());
+			String[] family = humanName.getFamily().split("-");
+			if (family.length > 1) {
+				mismo.setNameLast(family[0]);
+				mismo.setNameLastHyph(family[1]);
+
+			} else {
+				mismo.setNameLast(humanName.getFamily());
+			}
+
+			if (humanName.getGiven().size() > 1) {
+				mismo.setNameMiddle(humanName.getGiven().get(1).getValue());
+			}
+			mismo.setNameSuffix(humanName.getSuffixAsSingleString());
+			mismo.setNameAlias(humanName.getNameAsSingleString());
+		}
+
+		mismo.setBirthDate(patient.getBirthDateElement().asStringValue());
+		mismo.setGender(patient.getGender().toCode());
+
+		org.hl7.fhir.r4.model.Identifier ssn = MappingHelper.filterIdentifierTypeR4(patient.getIdentifier(), "SS");
+		if (ssn != null) {
+			mismo.setSsn(ssn.getValue());
+		}
+
+
+		if (patient.hasAddress()) {
+			org.hl7.fhir.r4.model.Address address = patient.getAddressFirstRep();
+			mismo.setAddressCity(address.getCity());
+			mismo.setAddressState(address.getState());
+			mismo.setAddressZip(address.getPostalCode());
+			if (address.hasLine()) {
+				mismo.setAddressStreet1(address.getLine().get(0).getValue());
+				if (address.getLine().size() > 1) {
+					mismo.setAddressStreet2(address.getLine().get(1).getValue());
+				}
+			}
+//			mismo.setAddressStreet1Alt(address.get);
+
+			if (patient.getAddress().size() > 1) {
+				org.hl7.fhir.r4.model.Address address2 = patient.getAddress().get(1);
+				mismo.setAddress2City(address2.getCity());
+				mismo.setAddress2State(address2.getState());
+				mismo.setAddress2Zip(address2.getPostalCode());
+				if (address2.hasLine()) {
+					mismo.setAddress2Street1(address2.getLine().get(0).getValue());
+					if (address2.getLine().size() > 1) {
+						mismo.setAddress2Street2(address2.getLine().get(1).getValue());
+					}
+				}
+			}
+		}
+		IBaseExtension motherMaiden = ExtensionUtil.getExtensionByUrl(patient, MOTHER_MAIDEN_NAME);
+		if (motherMaiden != null) {
+			mismo.setMotherMaidenName(motherMaiden.getValue().toString());
+		}
+
+		org.hl7.fhir.r4.model.Identifier mrn = MappingHelper.filterIdentifierTypeR4(patient.getIdentifier(), "MR");
+		if (mrn != null) {
+			mismo.setMrns(mrn.getValue());
+		}
+		for (org.hl7.fhir.r4.model.ContactPoint telecom : patient.getTelecom()) {
+			if (null != telecom.getSystem()) {
+				if (telecom.getSystem().equals(ContactPoint.ContactPointSystem.PHONE) && StringUtils.isNotEmpty(mismo.getPhone())) {
+					mismo.setPhone(telecom.getValue());
+				} else if (telecom.getSystem().equals(ContactPoint.ContactPointSystem.PHONE) && StringUtils.isNotEmpty(mismo.getPhone())) {
+					mismo.setValue("phone2", telecom.getValue());
+				} else if (telecom.getSystem().equals(ContactPoint.ContactPointSystem.EMAIL)) {
+					mismo.setValue("email", telecom.getValue());
+				}
+			}
+		}
+
+		if(patient.hasMultipleBirthBooleanType()) {
+			mismo.setBirthOrder(patient.getMultipleBirthBooleanType().getValueAsString());
+		} else if (patient.hasMultipleBirthIntegerType()) {
+			mismo.setBirthOrder(patient.getMultipleBirthIntegerType().getValueAsString());
+		}
+		return mismo;
+	}
+
+	private Patient convertFromR4IncludingLink(org.hl7.fhir.r4.model.Patient patient) {
+		Patient mismo = convertFromR4(patient);
+		org.hl7.fhir.r4.model.Identifier linkedWith = MappingHelper.filterIdentifierR4(patient.getIdentifier(), LINK_ID);
+		if (linkedWith != null) {
+			IBundleProvider bundleProvider = fhirRequester.searchRegularRecord(org.hl7.fhir.r4.model.Patient.class, new SearchParameterMap("identifier", new TokenParam().setSystem(LINK_ID).setValue(linkedWith.getValue())));
+			if (!bundleProvider.isEmpty()) {
+				mismo.setLinkWith(convertFromR4((org.hl7.fhir.r4.model.Patient) bundleProvider.getAllResources().get(0)));
+			}
+		}
+		return mismo;
+	}
+
+	private Patient convertFromR5IncludingLink(org.hl7.fhir.r5.model.Patient patient) {
+		Patient mismo = convertFromR5(patient);
+		org.hl7.fhir.r5.model.Identifier linkedWith = MappingHelper.filterIdentifierR5(patient.getIdentifier(), LINK_ID);
+		if (linkedWith != null) {
+			IBundleProvider bundleProvider = fhirRequester.searchRegularRecord(org.hl7.fhir.r5.model.Patient.class, new SearchParameterMap("identifier", new TokenParam().setSystem(LINK_ID).setValue(linkedWith.getValue())));
+			if (!bundleProvider.isEmpty()) {
+				mismo.setLinkWith(convertFromR5((org.hl7.fhir.r5.model.Patient) bundleProvider.getAllResources().get(0)));
+			}
+		}
+		return mismo;
+	}
+
 
 //	private Patient convertFromMaster(PatientMaster pm) {
 //		Patient m = new Patient();
@@ -137,7 +365,4 @@ public class PatientMatchingDatasetConversionController {
 //		m.setNameMiddle(pm.getName());
 //
 //	}
-
-
-
 }

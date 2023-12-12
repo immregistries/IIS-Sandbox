@@ -40,7 +40,7 @@ public class ObservationMapperR5 implements ObservationMapper<Observation> {
 			.setCode(observationReported.getMethodCode())
 			.setSystem(observationReported.getMethodTable())
 			.setDisplay(observationReported.getMethodLabel());
-		o.addIdentifier(MappingHelper.getFhirIdentifier(
+		o.addIdentifier(MappingHelper.getFhirIdentifierR5(
 			observationReported.getIdentifierTable(),observationReported.getIdentifierCode())); //TODO label
 		o.addComponent().setValue(new DateTimeType(observationReported.getObservationDate()))
 			.setCode(new CodeableConcept().setText(OBSERVATION_DATE));

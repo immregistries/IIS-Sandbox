@@ -39,19 +39,19 @@ public class PractitionerMapperR5 implements PractitionerMapper<Practitioner> {
 		try {
 			switch (new Reference(modelPerson.getIdentifierTypeCode()).getType()) {
 				case "Organization": {
-					practitioner.addIdentifier(MappingHelper.getFhirIdentifier(PRACTITIONER,modelPerson.getPersonExternalLink()).setAssigner(new Reference(modelPerson.getAssigningAuthority())));
+					practitioner.addIdentifier(MappingHelper.getFhirIdentifierR5(PRACTITIONER,modelPerson.getPersonExternalLink()).setAssigner(new Reference(modelPerson.getAssigningAuthority())));
 					break;
 				}
 				case "System" : {
-					practitioner.addIdentifier(MappingHelper.getFhirIdentifier(modelPerson.getIdentifierTypeCode(),modelPerson.getPersonExternalLink()));
+					practitioner.addIdentifier(MappingHelper.getFhirIdentifierR5(modelPerson.getIdentifierTypeCode(),modelPerson.getPersonExternalLink()));
 					break;
 				} default: {
-					practitioner.addIdentifier(MappingHelper.getFhirIdentifier(PRACTITIONER,modelPerson.getPersonExternalLink()));
+					practitioner.addIdentifier(MappingHelper.getFhirIdentifierR5(PRACTITIONER,modelPerson.getPersonExternalLink()));
 					break;
 				}
 			}
 		} catch (NullPointerException e) { // If typecode is not reference
-			practitioner.addIdentifier(MappingHelper.getFhirIdentifier(modelPerson.getIdentifierTypeCode(),modelPerson.getPersonExternalLink()));
+			practitioner.addIdentifier(MappingHelper.getFhirIdentifierR5(modelPerson.getIdentifierTypeCode(),modelPerson.getPersonExternalLink()));
 		}
 
 

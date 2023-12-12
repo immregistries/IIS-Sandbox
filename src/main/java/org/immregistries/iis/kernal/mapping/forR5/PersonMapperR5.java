@@ -33,7 +33,7 @@ public class PersonMapperR5 implements PersonMapper<Person> {
 	public Person getFhirResource(ModelPerson modelPerson) {
 		org.hl7.fhir.r5.model.Person p = new org.hl7.fhir.r5.model.Person();
 		p.setId(modelPerson.getPersonId());
-		p.addIdentifier(MappingHelper.getFhirIdentifier(MappingHelper.PERSON, modelPerson.getPersonExternalLink()));
+		p.addIdentifier(MappingHelper.getFhirIdentifierR5(MappingHelper.PERSON, modelPerson.getPersonExternalLink()));
 		HumanName name = p.addName();
 		name.setFamily(modelPerson.getNameLast());
 		name.addGiven(modelPerson.getNameFirst());
@@ -41,7 +41,7 @@ public class PersonMapperR5 implements PersonMapper<Person> {
 		if ( modelPerson.getProfessionalSuffix() != null) {
 			name.addSuffix(modelPerson.getProfessionalSuffix());
 		}
-		p.setManagingOrganization(MappingHelper.getFhirReference(MappingHelper.ORGANIZATION, ORGANIZATION_ASSIGNING_AUTHORITY, modelPerson.getAssigningAuthority()));
+		p.setManagingOrganization(MappingHelper.getFhirReferenceR5(MappingHelper.ORGANIZATION, ORGANIZATION_ASSIGNING_AUTHORITY, modelPerson.getAssigningAuthority()));
 		return p;
 	}
 

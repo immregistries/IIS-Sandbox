@@ -20,7 +20,7 @@ public class LocationMapperR4 implements LocationMapper<Location> {
 		if (ol != null) {
 			org.hl7.fhir.r4.model.Location location = new org.hl7.fhir.r4.model.Location();
 			location.setId(ol.getOrgLocationId());
-			location.addIdentifier(MappingHelper.getFhirR4Identifier("", ol.getOrgFacilityCode()));
+			location.addIdentifier(MappingHelper.getFhirIdentifierR4("", ol.getOrgFacilityCode()));
 			location.setName(ol.getOrgFacilityName());
 			if (!ol.getVfcProviderPin().isBlank()) {
 				location.addExtension().setUrl(VFC_PROVIDER_PIN).setValue(new StringType(ol.getVfcProviderPin()));

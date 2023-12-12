@@ -40,7 +40,7 @@ public class ObservationMapperR4 implements ObservationMapper<Observation> {
 			.setCode(observationReported.getMethodCode())
 			.setSystem(observationReported.getMethodTable())
 			.setDisplay(observationReported.getMethodLabel());
-		o.addIdentifier(MappingHelper.getFhirR4Identifier(
+		o.addIdentifier(MappingHelper.getFhirIdentifierR4(
 			observationReported.getIdentifierTable(),observationReported.getIdentifierCode())); //TODO label
 		o.addComponent().setValue(new org.hl7.fhir.r4.model.DateTimeType(observationReported.getObservationDate()))
 			.setCode(new org.hl7.fhir.r4.model.CodeableConcept().setText(OBSERVATION_DATE));
