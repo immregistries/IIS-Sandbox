@@ -4,7 +4,6 @@ import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.context.FhirVersionEnum;
 import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
 import ca.uhn.fhir.rest.api.server.IBundleProvider;
-import ca.uhn.fhir.rest.param.TokenParam;
 import ca.uhn.fhir.util.ExtensionUtil;
 import org.hl7.fhir.instance.model.api.IBaseExtension;
 import org.hl7.fhir.instance.model.api.IBaseResource;
@@ -17,7 +16,6 @@ import org.immregistries.mismo.match.model.Patient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.Servlet;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.util.ArrayList;
@@ -35,17 +33,34 @@ public class PatientMatchingDatasetConversionController {
 	@Autowired
 	FhirRequester fhirRequester;
 
+	@PostMapping("/init")
+	public String initBuilder() throws IOException {
+		String tenantId = ServletHelper.getTenant().getOrganizationName();
+		tenantId.strip().replace("/","");
+		File csvOutputFile = new File("./target/"+tenantId+".csv");
+		csvOutputFile.createNewFile();
+		FileWriter fileWriter = new FileWriter(csvOutputFile, false);
+		try (PrintWriter pw = new PrintWriter(csvOutputFile)) {
+			initCsv(pw);
+			pw.flush();
+			pw.close();
+			pw.close();
+			fileWriter.close();
+		}
+		return "OK";
+	}
 
-	@PostMapping()
-	public String post(@RequestBody String stringBundle) throws FileNotFoundException {
-		List<Patient> list = new ArrayList<>(20);
+	@PostMapping("")
+	public String post(@RequestBody String stringBundle) throws IOException {
+		List<Patient> patientList = new ArrayList<>(20);
 		if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R5)) {
 			Bundle bundle = fhirContext.newJsonParser().parseResource(Bundle.class, stringBundle);
 			for (Bundle.BundleEntryComponent entry : bundle.getEntry()) {
 				if (entry.getResource() instanceof org.hl7.fhir.r5.model.Patient) {
 					org.hl7.fhir.r5.model.Patient fhirPatient = (org.hl7.fhir.r5.model.Patient) entry.getResource();
-					Patient patient = convertFromR5(fhirPatient);
-					list.add(patient);
+					Patient patient = convertFromR5IncludingLink(fhirPatient);
+					patientList.add(patient);
+					break;
 				}
 			}
 		} else if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R4)) {
@@ -53,17 +68,21 @@ public class PatientMatchingDatasetConversionController {
 			for (org.hl7.fhir.r4.model.Bundle.BundleEntryComponent entry : bundle.getEntry()) {
 				if (entry.getResource() instanceof org.hl7.fhir.r4.model.Patient) {
 					org.hl7.fhir.r4.model.Patient fhirPatient = (org.hl7.fhir.r4.model.Patient) entry.getResource();
-					Patient patient = convertFromR4(fhirPatient);
-					list.add(patient);
+					Patient patient = convertFromR4IncludingLink(fhirPatient);
+					patientList.add(patient);
 				}
 			}
 		}
 
-		File csvOutputFile = new File("./target/output.csv");
-		try (PrintWriter pw = new PrintWriter(csvOutputFile)) {
-			csv(list, pw);
+		String tenantId = ServletHelper.getTenant().getOrganizationName();
+		tenantId.strip().replace("/","");
+		File csvOutputFile = new File("./target/"+tenantId+".csv");
+		FileWriter fileWriter = new FileWriter(csvOutputFile, true);
+		try (PrintWriter pw = new PrintWriter(fileWriter)) {
+			printCsvPatientList(patientList, pw);
 			pw.flush();
 			pw.close();
+			fileWriter.close();
 		}
 		return "";
 	}
@@ -89,12 +108,13 @@ public class PatientMatchingDatasetConversionController {
 			}
 		}
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
-		csv(list, out);
+		initCsv(out);
+		printCsvPatientList(list, out);
 		out.flush();
 		out.close();
 	}
 
-	private void csv(List<Patient> patientList, PrintWriter printWriter) throws FileNotFoundException {
+	private void initCsv(PrintWriter printWriter) {
 		String csvHeader =
 			"EnterpriseID," +
 				"LAST," +
@@ -116,15 +136,16 @@ public class PatientMatchingDatasetConversionController {
 				"EMAIL," +
 				"ALIAS," +
 				"LINK_ID";
-
 		printWriter.println(csvHeader);
-		patientList.stream()
-			.map(this::csv)
-			.forEach(printWriter::println);
-//		return printWriter.;
 	}
 
-	private String csv(Patient patient) {
+	private void printCsvPatientList(List<Patient> patientList, PrintWriter printWriter) {
+		patientList.stream()
+			.map(this::patientCsvLine)
+			.forEach(printWriter::println);
+	}
+
+	private String patientCsvLine(Patient patient) {
 		String[] line = new String[]{
 			patient.getValue("identifier"),
 			patient.getNameLast(),
@@ -145,9 +166,11 @@ public class PatientMatchingDatasetConversionController {
 			"", //phone 2
 			patient.getValue("email"),
 			patient.getNameAlias(),
-			patient.getLinkWith().getValue("identifier"), // LinkWith
+			"" // LinkWith
 		};
-
+		if (patient.getLinkWith() != null) {
+			line[line.length-1] = patient.getLinkWith().getValue("identifier");
+		}
 		return Stream.of(line)
 //			.map(this::escapeSpecialCharacters)
 			.collect(Collectors.joining(","));
@@ -252,15 +275,15 @@ public class PatientMatchingDatasetConversionController {
 		if (patient.hasName()) {
 			org.hl7.fhir.r4.model.HumanName humanName = patient.getNameFirstRep();
 			mismo.setNameFirst(humanName.getGivenAsSingleString());
-			String[] family = humanName.getFamily().split("-");
-			if (family.length > 1) {
-				mismo.setNameLast(family[0]);
-				mismo.setNameLastHyph(family[1]);
-
-			} else {
-				mismo.setNameLast(humanName.getFamily());
+			if (humanName.hasFamily()) {
+				String[] family = humanName.getFamily().split("-");
+				if (family.length > 1) {
+					mismo.setNameLast(family[0]);
+					mismo.setNameLastHyph(family[1]);
+				} else {
+					mismo.setNameLast(humanName.getFamily());
+				}
 			}
-
 			if (humanName.getGiven().size() > 1) {
 				mismo.setNameMiddle(humanName.getGiven().get(1).getValue());
 			}
@@ -336,10 +359,13 @@ public class PatientMatchingDatasetConversionController {
 		Patient mismo = convertFromR4(patient);
 		org.hl7.fhir.r4.model.Identifier linkedWith = MappingHelper.filterIdentifierR4(patient.getIdentifier(), LINK_ID);
 		if (linkedWith != null) {
-			IBundleProvider bundleProvider = fhirRequester.searchRegularRecord(org.hl7.fhir.r4.model.Patient.class, new SearchParameterMap("identifier", new TokenParam().setSystem(LINK_ID).setValue(linkedWith.getValue())));
-			if (!bundleProvider.isEmpty()) {
-				mismo.setLinkWith(convertFromR4((org.hl7.fhir.r4.model.Patient) bundleProvider.getAllResources().get(0)));
-			}
+			Patient link = new Patient();
+			link.setValue("identifier",linkedWith.getValue());
+			mismo.setLinkWith(link);
+//			IBundleProvider bundleProvider = fhirRequester.searchRegularRecord(org.hl7.fhir.r4.model.Patient.class, new SearchParameterMap("identifier", new TokenParam().setSystem(LINK_ID).setValue(linkedWith.getValue())));
+//			if (!bundleProvider.isEmpty()) {
+//				mismo.setLinkWith(convertFromR4((org.hl7.fhir.r4.model.Patient) bundleProvider.getAllResources().get(0)));
+//			}
 		}
 		return mismo;
 	}
@@ -348,21 +374,14 @@ public class PatientMatchingDatasetConversionController {
 		Patient mismo = convertFromR5(patient);
 		org.hl7.fhir.r5.model.Identifier linkedWith = MappingHelper.filterIdentifierR5(patient.getIdentifier(), LINK_ID);
 		if (linkedWith != null) {
-			IBundleProvider bundleProvider = fhirRequester.searchRegularRecord(org.hl7.fhir.r5.model.Patient.class, new SearchParameterMap("identifier", new TokenParam().setSystem(LINK_ID).setValue(linkedWith.getValue())));
-			if (!bundleProvider.isEmpty()) {
-				mismo.setLinkWith(convertFromR5((org.hl7.fhir.r5.model.Patient) bundleProvider.getAllResources().get(0)));
-			}
+			Patient link = new Patient();
+			link.setValue("identifier",linkedWith.getValue());
+			mismo.setLinkWith(link);
+//			IBundleProvider bundleProvider = fhirRequester.searchRegularRecord(org.hl7.fhir.r5.model.Patient.class, new SearchParameterMap("identifier", new TokenParam().setSystem(LINK_ID).setValue(linkedWith.getValue())));
+//			if (!bundleProvider.isEmpty()) {
+//				mismo.setLinkWith(convertFromR5((org.hl7.fhir.r5.model.Patient) bundleProvider.getAllResources().get(0)));
+//			}
 		}
 		return mismo;
 	}
-
-
-//	private Patient convertFromMaster(PatientMaster pm) {
-//		Patient m = new Patient();
-//		m.setNameFirst(pm.getNameFirst());
-//		m.setNameLast(pm.getNameLast());
-//		m.setNameMiddle(pm.getNameMiddle());
-//		m.setNameMiddle(pm.getName());
-//
-//	}
 }
