@@ -49,4 +49,5 @@ CREATE TABLE `tenant` (
 --insert into user_access (org_id, access_name, access_key) values (1, 'Mercy', 'password1234');
 --insert into user_access (org_id, access_name, access_key) values (2, 'Bob', '1234password1234');
 --insert into user_access (org_id, access_name, access_key) values (3, 'DEFAULT', 'BabySharkJaws');
---insert into user_access (org_id, access_name, access_key) values (4, 'Connectathon', 'SundaysR0ck!');
+insert into user_access (org_id, access_name, access_key) values (4, 'Connectathon', 'SundaysR0ck!');
+insert into user_access (org_id, access_name, access_key) values (4, 'admin', '?whooosM0reSorino?);

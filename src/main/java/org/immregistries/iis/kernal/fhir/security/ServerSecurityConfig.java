@@ -24,7 +24,7 @@ public class ServerSecurityConfig {
 			.antMatchers(HttpMethod.GET, "/", "/home", "/pop", "/SubscriptionTopic/**", "/img/**").permitAll()
 			.antMatchers("/loginForm", "/oauth2/**", "/login" ).permitAll()
 			// API AUTHORIZATION AND AUTHENTICATION SEPARATED
-			.antMatchers("/fhir/**", "/soap").permitAll()
+			.antMatchers("/fhir/**", "/soap","/.well-known/smart-configuration","/registerClient", "/token").permitAll()
 			.anyRequest().authenticated()
 			.and()
 			//USERNAME
