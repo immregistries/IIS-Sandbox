@@ -6,6 +6,9 @@ import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSVerifier;
 import com.nimbusds.jose.crypto.ECDSAVerifier;
 import com.nimbusds.jose.crypto.RSASSAVerifier;
+import com.nimbusds.jose.jwk.ECKey;
+import com.nimbusds.jose.jwk.JWK;
+import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jwt.SignedJWT;
 import org.hibernate.Session;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
@@ -18,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.PublicKey;
 import java.security.interfaces.ECPublicKey;
+import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.text.ParseException;
 import java.util.HashMap;
@@ -49,23 +53,33 @@ public class JwtAuthProvider {
 	@PostMapping("/registerClient")
 	public String register(@RequestBody String jwkString) { //TODO TLS config
 		//		assert(ServletHelper.getUserAccess().getAccessName().equals("admin")); TODO safely define admin user
-		logger.info("Registering client JWK: {}", jwkString); //TODO not log key
-		Map<String,Object> parsedJwk = new Gson().fromJson(jwkString, new TypeToken<HashMap<String, Object>>() {}.getType());
-		String alg = (String) parsedJwk.get("alg");
-		String kid = (String) parsedJwk.get("kid");
-		switch (alg) {
-			case "RS384":
-				RSAPublicKey rsaJwk = new Gson().fromJson(jwkString, RSAPublicKey.class);
-				keystore.put(kid,rsaJwk); // TODO change key ?
-				break;
-			case  "ES384" :
-				ECPublicKey ecJwk = new Gson().fromJson(jwkString, ECPublicKey.class);
-				keystore.put(kid,ecJwk); // TODO change key ?
-				break;
-			default:
-				throw new RuntimeException("Unsupported Algorithm");
+		try {
+			JWK parsedJwk = JWK.parse(jwkString);
+
+			//		String alg = (String) parsedJwk.get("alg");
+			String kty = parsedJwk.getKeyType().getValue();
+			logger.info("Registering client JWK: {}", parsedJwk); //TODO not log key
+			String kid = parsedJwk.getKeyID();
+			switch (kty) {
+				case "RSA":
+					RSAPublicKey rsaJwk = ((RSAKey) parsedJwk).toRSAPublicKey();
+					keystore.put(kid,rsaJwk); // TODO change key ?
+					break;
+				case "EC" :
+					ECPublicKey ecJwk = ((ECKey) parsedJwk).toECPublicKey();;
+					keystore.put(kid,ecJwk); // TODO change key ?
+					break;
+				default:
+					throw new RuntimeException("Unsupported Algorithm");
+			}
+			logger.info("Registering client key id: {}", parsedJwk.getKeyID() );
+
+		} catch (ParseException e) {
+			throw new RuntimeException(e);
+		} catch (JOSEException e) {
+			throw new RuntimeException(e);
 		}
-		return "ok";
+		return "JWK REGISTERED";
 	}
 
 	/**

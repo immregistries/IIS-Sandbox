@@ -14,7 +14,7 @@ server:
 iis:
   api:
     app:
-      secret: "LeVentNousPorterasT0utDizp4ra1tra"
+      jwtSecret: "LeVentNousPorterasT0utDizp4ra1tra"
       jwtExpirationMs: 30000
 #        TODO change secret
 spring:
