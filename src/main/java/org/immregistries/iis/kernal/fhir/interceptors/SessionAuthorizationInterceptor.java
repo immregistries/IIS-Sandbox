@@ -12,12 +12,14 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.http.auth.AuthenticationException;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
+import org.immregistries.iis.kernal.JwtUtils;
 import org.immregistries.iis.kernal.model.UserAccess;
 import org.immregistries.iis.kernal.model.Tenant;
 import org.immregistries.iis.kernal.servlet.PopServlet;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.interceptor.Interceptor;
@@ -37,6 +39,9 @@ public class SessionAuthorizationInterceptor extends AuthorizationInterceptor {
 	private static final String CONNECTATHON_AUTH = "78q3gb#QPGK!FmHKrgJjzkbpSCtiUtlchoClU1pC/UCdKxZ=PhRgtsL!4att8/6QKrUe1gS?p2ME!ixXP0Sg5lWnHP6t=U=6zeJXWnILR-BLc8HxVsfrLhp5/1q-DXuk?ljL?zwqJxB=we0SDKlT2j8WgNEkalit7Sf35F/R8W-QtrFbyO9IZPXJ1172OzvwfJBq-m9Z10DbSxIA?6f=3e!H7TLg/DwHByVlUSlZ6HWrytJkOFXljk9!z/BPrb9H";
 	public static final String DEFAULT_USER = "DEFAULT";
 
+	@Autowired
+	JwtUtils jwtUtils;
+
 	@Override
 	public List<IAuthRule> buildRuleList(RequestDetails theRequestDetails) {
 		/**
@@ -50,13 +55,13 @@ public class SessionAuthorizationInterceptor extends AuthorizationInterceptor {
 		String authHeader = theRequestDetails.getHeader("Authorization");
 		Tenant tenant = null;
 		try {
-//			if (PartitionCreationInterceptor.extractPartitionName(theRequestDetails).equals(CONNECTATHON_USER)) {
-//				return connectathonSpecialUser(theRequestDetails,authHeader,dataSession);
-//			}
+			if (PartitionCreationInterceptor.extractPartitionName(theRequestDetails).equals(CONNECTATHON_USER)) {
+				return connectathonSpecialUser(theRequestDetails, authHeader, dataSession);
+			}
 			/**
 			 * Checking Auth header else SESSION Cookie
 			 */
-			if (authHeader!= null) {
+			if (authHeader != null) {
 				/**
 				 * Basic auth
 				 */
@@ -64,7 +69,7 @@ public class SessionAuthorizationInterceptor extends AuthorizationInterceptor {
 				/**
 				 * Token bearer ?
 				 */
-				if (tenant == null){
+				if (tenant == null) {
 					// TODO TOKEN VERIFICATION
 //					logger.info("token {} ", authHeader);
 				}
@@ -78,12 +83,12 @@ public class SessionAuthorizationInterceptor extends AuthorizationInterceptor {
 					 * if user authenticated, Tenant/Facility is then selected
 					 */
 					if (userAccess != null) {
-						tenant = ServletHelper.authenticateTenant(userAccess,PartitionCreationInterceptor.extractPartitionName(theRequestDetails),dataSession);
+						tenant = ServletHelper.authenticateTenant(userAccess, PartitionCreationInterceptor.extractPartitionName(theRequestDetails), dataSession);
 					}
 				}
 			}
 
-			if (session != null ) {
+			if (session != null) {
 //				session.setAttribute(SESSION_ORGMASTER, null); // Tenant selection is set in requestDetails
 //				session.setAttribute(SESSION_ORGMASTER, tenant); // TODO MAYBE REMOVE
 			}
@@ -127,70 +132,76 @@ public class SessionAuthorizationInterceptor extends AuthorizationInterceptor {
 		}
 	}
 
-	private List<IAuthRule> connectathonSpecialUser(RequestDetails theRequestDetails,String authHeader, Session dataSession) {
+	private List<IAuthRule> connectathonSpecialUser(RequestDetails theRequestDetails, String authHeader, Session dataSession) {
 		/**
 		 *	If connecting as Connectathon with TOKEN : give only specific rights
 		 * Else : treat as usual
 		 */
 		UserAccess userAccess = null;
-		if (authHeader != null && authHeader.startsWith("Bearer " + CONNECTATHON_AUTH)) {
-			Query query = dataSession.createQuery("from Tenant where organizationName = ?1");
-			query.setParameter(1, CONNECTATHON_USER);
-			Iterator<Tenant> tenant = query.iterate();
-			if (tenant.hasNext()) {
-				Query queryAccess = dataSession.createQuery("from UserAccess where org = ?0");
-				queryAccess.setParameter(0, tenant.next());
-				Iterator<UserAccess> userAccessIterator = queryAccess.iterate();
-				if (userAccessIterator.hasNext()) {
-					userAccess = userAccessIterator.next();
-					userAccess.setAccessKey(CONNECTATHON_AUTH);
-					userAccess.setAccessName(null);
-					userAccess.setUserAccessId(-1);
-					theRequestDetails.setAttribute(SESSION_USER_ACCESS, userAccess);
-					return new RuleBuilder()
-						.allow().operation()
-						.named(JpaConstants.OPERATION_EXPORT).atAnyLevel()
-						.andAllowAllResponses().forTenantIds(CONNECTATHON_USER)
-						.andThen().allow().operation()
-						.named(JpaConstants.OPERATION_EXPORT_POLL_STATUS).atAnyLevel()
-						.andAllowAllResponses().forTenantIds(CONNECTATHON_USER)
-						.andThen().allow().operation()
-						.named(JpaConstants.OPERATION_EVERYTHING).atAnyLevel()
-						.andAllowAllResponses().forTenantIds(CONNECTATHON_USER)
+		if (authHeader != null && authHeader.startsWith("Bearer ")) {
+			String token = authHeader.split("Bearer ")[1];
+			logger.info("token {}", token);
+			logger.info("token {}", jwtUtils.validateJwtToken(token));
+			logger.info("token {}", jwtUtils.getUserNameFromJwtToken(token));
+			if (jwtUtils.validateJwtToken(token) && jwtUtils.getUserNameFromJwtToken(token).equals(CONNECTATHON_USER)) {
+				Query query = dataSession.createQuery("from Tenant where organizationName = ?1");
+				query.setParameter(1, CONNECTATHON_USER);
+				Iterator<Tenant> tenant = query.iterate();
+				if (tenant.hasNext()) {
+					Query queryAccess = dataSession.createQuery("from UserAccess where org = ?0");
+					queryAccess.setParameter(0, tenant.next());
+					Iterator<UserAccess> userAccessIterator = queryAccess.iterate();
+					if (userAccessIterator.hasNext()) {
+						userAccess = userAccessIterator.next();
+						userAccess.setAccessKey(CONNECTATHON_AUTH);
+						userAccess.setAccessName(null);
+						userAccess.setUserAccessId(-1);
+						theRequestDetails.setAttribute(SESSION_USER_ACCESS, userAccess);
+						return new RuleBuilder()
+							.allow().operation()
+							.named(JpaConstants.OPERATION_EXPORT).atAnyLevel()
+							.andAllowAllResponses().forTenantIds(CONNECTATHON_USER)
+							.andThen().allow().operation()
+							.named(JpaConstants.OPERATION_EXPORT_POLL_STATUS).atAnyLevel()
+							.andAllowAllResponses().forTenantIds(CONNECTATHON_USER)
+							.andThen().allow().operation()
+							.named(JpaConstants.OPERATION_EVERYTHING).atAnyLevel()
+							.andAllowAllResponses().forTenantIds(CONNECTATHON_USER)
 
-						.andThen().allow().operation()
-						.named("$match").atAnyLevel()
-						.andAllowAllResponses().forTenantIds(CONNECTATHON_USER)
+							.andThen().allow().operation()
+							.named("$match").atAnyLevel()
+							.andAllowAllResponses().forTenantIds(CONNECTATHON_USER)
 
 //								.andThen().allow().operation().withAnyName().atAnyLevel().andAllowAllResponses().forTenantIds(CONNECTATHON_USER)
-						.andThen().allow().operation().withAnyName().atAnyLevel().andAllowAllResponses().forTenantIds(CONNECTATHON_USER)
+							.andThen().allow().operation().withAnyName().atAnyLevel().andAllowAllResponses().forTenantIds(CONNECTATHON_USER)
 //								.andThen().allow().operation().named("$member-remove").atAnyLevel().andAllowAllResponses().forTenantIds(CONNECTATHON_USER)
 
 
-						.andThen().allow().operation().named(JpaConstants.OPERATION_EVERYTHING)
-						.atAnyLevel().andAllowAllResponses().forTenantIds(CONNECTATHON_USER)
+							.andThen().allow().operation().named(JpaConstants.OPERATION_EVERYTHING)
+							.atAnyLevel().andAllowAllResponses().forTenantIds(CONNECTATHON_USER)
 
-						.andThen().allow().read()
-						.resourcesOfType("Group").withAnyId().forTenantIds(CONNECTATHON_USER)
-						.andThen().allow().create()
-						.resourcesOfType("Group").withAnyId().forTenantIds(CONNECTATHON_USER)
-						.andThen().allow().read()
-						.resourcesOfType("Immunization").withAnyId().forTenantIds(CONNECTATHON_USER)
-						.andThen().allow().create()
-						.resourcesOfType("Immunization").withAnyId().forTenantIds(CONNECTATHON_USER)
-						.andThen().allow().read()
-						.resourcesOfType("Patient").withAnyId().forTenantIds(CONNECTATHON_USER)
-						.andThen().allow().create()
-						.resourcesOfType("Patient").withAnyId().forTenantIds(CONNECTATHON_USER)
-						.andThen().allow().read()
-						.resourcesOfType("Binary").withAnyId().forTenantIds(CONNECTATHON_USER)
+							.andThen().allow().read()
+							.resourcesOfType("Group").withAnyId().forTenantIds(CONNECTATHON_USER)
+							.andThen().allow().create()
+							.resourcesOfType("Group").withAnyId().forTenantIds(CONNECTATHON_USER)
+							.andThen().allow().read()
+							.resourcesOfType("Immunization").withAnyId().forTenantIds(CONNECTATHON_USER)
+							.andThen().allow().create()
+							.resourcesOfType("Immunization").withAnyId().forTenantIds(CONNECTATHON_USER)
+							.andThen().allow().read()
+							.resourcesOfType("Patient").withAnyId().forTenantIds(CONNECTATHON_USER)
+							.andThen().allow().create()
+							.resourcesOfType("Patient").withAnyId().forTenantIds(CONNECTATHON_USER)
+							.andThen().allow().read()
+							.resourcesOfType("Binary").withAnyId().forTenantIds(CONNECTATHON_USER)
 
-						.andThen().allow()
-						.bulkExport().any()
-						.withResourceTypes(Lists.newArrayList("Patient", "Immunization", "RelatedPerson"))
+							.andThen().allow()
+							.bulkExport().any()
+							.withResourceTypes(Lists.newArrayList("Patient", "Immunization", "RelatedPerson"))
 
-						.build();
-					// TODO Make list of allowed Binary read, right now every binary is accessible
+							.build();
+						// TODO Make list of allowed Binary read, right now every binary is accessible
+					}
 				}
 			}
 		}
