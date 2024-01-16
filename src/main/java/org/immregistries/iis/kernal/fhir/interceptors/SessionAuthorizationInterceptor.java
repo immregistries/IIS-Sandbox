@@ -144,19 +144,20 @@ public class SessionAuthorizationInterceptor extends AuthorizationInterceptor {
 			logger.info("token {}", jwtUtils.validateJwtToken(token));
 			logger.info("token {}", jwtUtils.getUserNameFromJwtToken(token));
 			if (jwtUtils.validateJwtToken(token) && jwtUtils.getUserNameFromJwtToken(token).equals(CONNECTATHON_USER)) {
-				Query query = dataSession.createQuery("from Tenant where organizationName = ?1");
-				query.setParameter(1, CONNECTATHON_USER);
-				Iterator<Tenant> tenant = query.iterate();
-				if (tenant.hasNext()) {
-					Query queryAccess = dataSession.createQuery("from UserAccess where org = ?0");
-					queryAccess.setParameter(0, tenant.next());
-					Iterator<UserAccess> userAccessIterator = queryAccess.iterate();
-					if (userAccessIterator.hasNext()) {
-						userAccess = userAccessIterator.next();
-						userAccess.setAccessKey(CONNECTATHON_AUTH);
-						userAccess.setAccessName(null);
-						userAccess.setUserAccessId(-1);
+
+				String queryString = "from UserAccess where accessName = ?0";
+				org.hibernate.Query query = dataSession.createQuery(queryString);
+				query.setParameter(0, CONNECTATHON_USER);
+				Iterator<UserAccess> userAccessIterator = query.iterate();
+				if (userAccessIterator.hasNext()) {
+					userAccess = userAccessIterator.next();
+					Query queryTenant = dataSession.createQuery("from Tenant where organizationName = ?1");
+					queryTenant.setParameter(1, CONNECTATHON_USER);
+					Iterator<Tenant> tenantIterator = queryTenant.iterate();
+					if (tenantIterator.hasNext()) {
+						Tenant tenant = tenantIterator.next();
 						theRequestDetails.setAttribute(SESSION_USER_ACCESS, userAccess);
+						theRequestDetails.setAttribute(SESSION_TENANT, tenant);
 						return new RuleBuilder()
 							.allow().operation()
 							.named(JpaConstants.OPERATION_EXPORT).atAnyLevel()

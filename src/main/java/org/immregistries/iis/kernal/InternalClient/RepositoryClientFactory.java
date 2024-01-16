@@ -67,7 +67,11 @@ public class RepositoryClientFactory extends ApacheRestfulClientFactory implemen
 	public IGenericClient newGenericClient(Tenant tenant) {
 		asynchInit();
 		IGenericClient client;
-		client = newGenericClient( "http://" + InetAddress.getLoopbackAddress().getHostAddress() + ":" + environment.getProperty("server.port") + "/iis/fhir/" + tenant.getOrganizationName());
+		String port = "8080";
+		if(environment.getProperty("server.port") != null) {
+			port = environment.getProperty("server.port");
+		}
+		client = newGenericClient( "http://" + InetAddress.getLoopbackAddress().getHostAddress() + ":" + port + "/iis/fhir/" + tenant.getOrganizationName());
 		IClientInterceptor authInterceptor;
 		if (tenant.getOrganizationName().equals(CONNECTATHON_USER) && tenant.getUserAccess().getAccessName() == null) {
 			/**

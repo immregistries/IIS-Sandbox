@@ -40,14 +40,15 @@ CREATE TABLE `tenant` (
   CONSTRAINT `tenant_ibfk_1` FOREIGN KEY (`user_access_id`) REFERENCES `user_access` (`user_access_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+insert into user_access (user_access_id, access_name, access_key) values (1, 'Mercy', 'password1234');
+insert into user_access (user_access_id, access_name, access_key) values (2, 'Bob', '1234password1234');
+insert into user_access (user_access_id, access_name, access_key) values (3, 'Connectathon', 'SundaysR0ck!');
+insert into user_access (user_access_id, access_name, access_key) values (4, 'admin', '?whooosM0reSorino?');
+--insert into user_access (user_access_id, access_name, access_key) values (5, 'DEFAULT', 'BabySharkJaws');
 
---insert into tenant (org_id, organization_name) values (1, 'Mercy-Healthcare');
---insert into tenant (org_id, organization_name) values (2, 'Family-Physician');
---insert into tenant (org_id, organization_name) values (3, 'DEFAULT');
---insert into tenant (org_id, organization_name) values (4, 'Connectathon');
---
---insert into user_access (org_id, access_name, access_key) values (1, 'Mercy', 'password1234');
---insert into user_access (org_id, access_name, access_key) values (2, 'Bob', '1234password1234');
---insert into user_access (org_id, access_name, access_key) values (3, 'DEFAULT', 'BabySharkJaws');
-insert into user_access (org_id, access_name, access_key) values (4, 'Connectathon', 'SundaysR0ck!');
-insert into user_access (org_id, access_name, access_key) values (4, 'admin', '?whooosM0reSorino?);
+insert into tenant (org_id, organization_name, user_access_id) values (1, 'Mercy-Healthcare', 1);
+insert into tenant (org_id, organization_name, user_access_id) values (2, 'Family-Physician', 2);
+insert into tenant (org_id, organization_name, user_access_id) values (3, 'Connectathon', 3);
+insert into tenant (org_id, organization_name, user_access_id) values (4, 'admin', 4);
+--insert into tenant (org_id, organization_name, user_access_id) values (5, 'DEFAULT', 5);
+

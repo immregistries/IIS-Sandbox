@@ -1,5 +1,6 @@
 package org.immregistries.iis.kernal;
 
+import ca.uhn.fhir.rest.server.exceptions.AuthenticationException;
 import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWEDecrypter;
@@ -12,6 +13,7 @@ import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jwt.SignedJWT;
 import io.jsonwebtoken.*;
+import org.apache.commons.codec.binary.Base64;
 import org.hibernate.Session;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.model.UserAccess;
@@ -50,13 +52,29 @@ public class JwtAuthProvider {
 		return "{\n" +
 			"  \"token_endpoint\": \"/token\",\n" +
 			"  \"token_endpoint_auth_methods_supported\": [\"private_key_jwt\"],\n" +
-			"  \"token_endpoint_auth_signing_alg_values_supported\": [\"RS384\", \"ES384\"],\n" +
+			"  \"token_endpoint_auth_signing_alg_values_supported\": [\"RS384\", \"ES384\", \"RS512\", \"ES512\"],\n" +
 			"  \"scopes_supported\": [\"system/*.rs\"]\n" +
 			"}";
 	}
 
 	@PostMapping("/registerClient")
-	public String register(@RequestBody String jwkString) { //TODO TLS config
+	public String register(@RequestBody String jwkString, @RequestHeader("Authorization") String authHeader) { //TODO TLS config
+		Session dataSession = null;
+		UserAccess userAccess = null;
+		try {
+			dataSession = PopServlet.getDataSession();
+			if (authHeader != null && authHeader.startsWith("Basic ")) {
+				String base64 = authHeader.substring("Basic ".length());
+				String base64decoded = new String(Base64.decodeBase64(base64));
+				String[] parts = base64decoded.split(":");
+				userAccess = ServletHelper.authenticateUserAccessUsernamePassword(parts[0], parts[1], dataSession);
+			}
+		} finally {
+			dataSession.close();
+		}
+		if (userAccess == null || !userAccess.getAccessName().equals("admin")) {
+			throw new AuthenticationException();
+		}
 		//		assert(ServletHelper.getUserAccess().getAccessName().equals("admin")); TODO safely define admin user
 		try {
 			JWK parsedJwk = JWK.parse(jwkString);
@@ -88,10 +106,12 @@ public class JwtAuthProvider {
 
 
 	/**
-	 * Only allowed for connectathons users
+	 * Only allowed for connectathon users
 	 */
 	@PostMapping("/token")
-	public String smartJwtAuth(@RequestParam String client_assertion_type,  @RequestParam String client_assertion) throws ParseException, JOSEException {
+	public String smartJwtAuth(@RequestBody Map<String, String> map) throws ParseException, JOSEException {
+		String client_assertion_type = map.get("client_assertion_type");
+		String client_assertion = map.get("client_assertion");
 		if (!client_assertion_type.equals(CLIENT_ASSERTION_TYPE) ) {
 			throw new InvalidRequestException("Unsupported Client Assertion type,supporting only " + CLIENT_ASSERTION_TYPE);
 		}
@@ -116,13 +136,15 @@ public class JwtAuthProvider {
 		 */
 		switch (alg) {
 			case "RS384":
+			case "RS512":
 				verifier = new RSASSAVerifier((RSAPublicKey) keystore.get(kid));
 				break;
 			case  "ES384" :
+			case  "ES512" :
 				verifier = new ECDSAVerifier((ECPublicKey) keystore.get(kid));
 				break;
 			default:
-				throw new RuntimeException("Unsupported Algorithm");
+				throw new RuntimeException("Unsupported Algorithm " + alg);
 		}
 		if (!signedJWT.verify(verifier)) {
 			throw new InvalidRequestException("Authentication Error");
@@ -146,7 +168,7 @@ public class JwtAuthProvider {
 		Session dataSession = null;
 		try {
 			dataSession = PopServlet.getDataSession();
-			UserAccess userAccess = ServletHelper.authenticateUserAccessUsernamePassword(CONNECTATHON_USER,CONNECTATHON_USER,dataSession);
+			UserAccess userAccess = ServletHelper.authenticateUserAccessUsernamePassword(CONNECTATHON_USER,"SundaysR0ck!",dataSession);
 			return jwtUtils.generateJwtToken(userAccess);
 		} finally {
 			if (dataSession != null) {
