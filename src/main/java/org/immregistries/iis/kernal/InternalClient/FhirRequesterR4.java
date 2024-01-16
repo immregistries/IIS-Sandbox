@@ -307,7 +307,7 @@ public class FhirRequesterR4 extends FhirRequester<Patient,Immunization,Location
 		Optional<Parameters.ParametersParameterComponent> goldenIdComponent = part.stream()
 			.filter(parametersParameterComponent -> parametersParameterComponent.getName().equals("goldenResourceId"))
 			.findFirst();
-		if (goldenIdComponent.isPresent() && StringUtils.isNotBlank((CharSequence) goldenIdComponent.get().getValue())) {
+		if (goldenIdComponent.isPresent() && !goldenIdComponent.get().getValue().isEmpty()) {
 			return readPatientMaster(String.valueOf(goldenIdComponent.get().getValue()));
 		} else {
 			return null;
