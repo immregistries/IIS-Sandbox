@@ -2,6 +2,8 @@ package org.immregistries.iis.kernal;
 
 import ca.uhn.fhir.rest.server.exceptions.AuthenticationException;
 import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWEDecrypter;
 import com.nimbusds.jose.JWSVerifier;
@@ -29,6 +31,7 @@ import java.security.interfaces.RSAPublicKey;
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.immregistries.iis.kernal.fhir.interceptors.SessionAuthorizationInterceptor.CONNECTATHON_USER;
 
@@ -37,7 +40,7 @@ public class JwtAuthProvider {
 	@Autowired
 	JwtUtils jwtUtils;
 	Map<String, PublicKey> keystore;
-	Map<String,String> jwtStore;
+	Map<String, String> jwtStore;
 	Logger logger = LoggerFactory.getLogger(JwtAuthProvider.class);
 
 	private final static String CLIENT_ASSERTION_TYPE = "urn:ietf:params:oauth:client-assertion-type:jwt-bearer";
@@ -50,33 +53,34 @@ public class JwtAuthProvider {
 	@GetMapping("/.well-known/smart-configuration")
 	public String wellKnownConfiguration() {
 		return "{\n" +
-			"  \"token_endpoint\": \"/token\",\n" +
-			"  \"token_endpoint_auth_methods_supported\": [\"private_key_jwt\"],\n" +
+			"  \"token_endpoint\": \"https://bulksandbox.pagekite.me/iis/token\",\n" +
+			"  \"token_endpoint_auth_methods_supported\": [\"private_key_jwt\", \"client-confidential-asymmetric\"],\n" +
 			"  \"token_endpoint_auth_signing_alg_values_supported\": [\"RS384\", \"ES384\", \"RS512\", \"ES512\"],\n" +
 			"  \"scopes_supported\": [\"system/*.rs\"]\n" +
 			"}";
 	}
 
 	@PostMapping("/registerClient")
-	public String register(@RequestBody String jwkString, @RequestHeader("Authorization") String authHeader) { //TODO TLS config
-		Session dataSession = null;
-		UserAccess userAccess = null;
-		try {
-			dataSession = PopServlet.getDataSession();
-			if (authHeader != null && authHeader.startsWith("Basic ")) {
-				String base64 = authHeader.substring("Basic ".length());
-				String base64decoded = new String(Base64.decodeBase64(base64));
-				String[] parts = base64decoded.split(":");
-				userAccess = ServletHelper.authenticateUserAccessUsernamePassword(parts[0], parts[1], dataSession);
-			}
-		} finally {
-			dataSession.close();
-		}
-		if (userAccess == null || !userAccess.getAccessName().equals("admin")) {
-			throw new AuthenticationException();
-		}
+	public String register(@RequestBody String jwkString, @RequestHeader("Authorization") Optional<String> authHeader) { //TODO TLS config
+//		Session dataSession = null;
+//		UserAccess userAccess = null;
+//		try {
+//			dataSession = PopServlet.getDataSession();
+//			if (authHeader != null && authHeader.startsWith("Basic ")) {
+//				String base64 = authHeader.substring("Basic ".length());
+//				String base64decoded = new String(Base64.decodeBase64(base64));
+//				String[] parts = base64decoded.split(":");
+//				userAccess = ServletHelper.authenticateUserAccessUsernamePassword(parts[0], parts[1], dataSession);
+//			}
+//		} finally {
+//			dataSession.close();
+//		}
+//		if (userAccess == null || !userAccess.getAccessName().equals("admin")) {
+//			throw new AuthenticationException();
+//		}
 		//		assert(ServletHelper.getUserAccess().getAccessName().equals("admin")); TODO safely define admin user
 		try {
+			logger.info("registering {}", jwkString);
 			JWK parsedJwk = JWK.parse(jwkString);
 
 			//		String alg = (String) parsedJwk.get("alg");
@@ -86,12 +90,17 @@ public class JwtAuthProvider {
 			switch (kty) {
 				case "RSA":
 					RSAPublicKey rsaJwk = ((RSAKey) parsedJwk).toRSAPublicKey();
-					keystore.put(kid,rsaJwk); // TODO change key ?
+					keystore.put(kid, rsaJwk); // TODO change key ?
 					break;
-				case "EC" :
-					ECPublicKey ecJwk = ((ECKey) parsedJwk).toECPublicKey();;
-					keystore.put(kid,ecJwk); // TODO change key ?
+				case "EC":
+				case "EC384":
+					ECPublicKey ecJwk = ((ECKey) parsedJwk).toECPublicKey();
+					keystore.put(kid, ecJwk); // TODO change key ?
 					break;
+//				case "EC" :
+//					ECPublicKey ecJwk = ((ECKey) parsedJwk).toECPublicKey();;
+//					keystore.put(kid,ecJwk); // TODO change key ?
+//					break;
 				default:
 					throw new RuntimeException("Unsupported Algorithm");
 			}
@@ -109,9 +118,18 @@ public class JwtAuthProvider {
 	 * Only allowed for connectathon users
 	 */
 	@PostMapping("/token")
-	public String smartJwtAuth(@RequestBody Map<String, String> map) throws ParseException, JOSEException {
+	public String smartJwtAuth(@RequestParam Map<String, String> map) throws ParseException, JOSEException {
+//		String client_assertion_type = map.get("client_assertion_type");
+//		String client_assertion = map.get("client_assertion");
+		return smartJwtAuthGet(map);
+	}
+
+	@GetMapping("/token")
+	public String smartJwtAuthGet(@RequestParam Map<String, String> map) throws ParseException, JOSEException {
 		String client_assertion_type = map.get("client_assertion_type");
 		String client_assertion = map.get("client_assertion");
+		String scope = map.get("scope");
+		String grant_type = map.get("grant_type");
 		if (!client_assertion_type.equals(CLIENT_ASSERTION_TYPE) ) {
 			throw new InvalidRequestException("Unsupported Client Assertion type,supporting only " + CLIENT_ASSERTION_TYPE);
 		}
@@ -135,6 +153,7 @@ public class JwtAuthProvider {
 		 * Checking supported algorithms
 		 */
 		switch (alg) {
+			case "RS256":
 			case "RS384":
 			case "RS512":
 				verifier = new RSASSAVerifier((RSAPublicKey) keystore.get(kid));
@@ -147,12 +166,12 @@ public class JwtAuthProvider {
 				throw new RuntimeException("Unsupported Algorithm " + alg);
 		}
 		if (!signedJWT.verify(verifier)) {
-			throw new InvalidRequestException("Authentication Error");
+			throw new InvalidRequestException("Authentication Error, Token not verified by public key");
 		}
 		JwtParser jwtParser = Jwts.parser().verifyWith(keystore.get(kid)).build();
 		Jws<Claims> claimsJws = jwtParser.parseSignedClaims(client_assertion);
 		if(claimsJws.getPayload().get("jti") == null) {
-			throw new InvalidRequestException("jti NULL");
+			throw new InvalidRequestException("invalid jti claim : " + claimsJws.getPayload().get("jti"));
 		}
 		/**
 		 * check that the jti value has not been previously encountered for the given iss within the maximum allowed authentication JWT lifetime (e.g., 5 minutes). This check prevents replay attacks.
@@ -160,7 +179,7 @@ public class JwtAuthProvider {
 		String olderToken = jwtStore.get((String) claimsJws.getPayload().get("jti"));
 		if (olderToken != null){
 			Jws<Claims> olderJwt = jwtParser.parseSignedClaims(olderToken);
-			if (olderJwt.getPayload().get("iss").equals(claimsJws.getPayload().get("iss")) && ((long) olderJwt.getPayload().get("exp")) < System.currentTimeMillis()) {
+			if (olderJwt.getPayload().get("iss").equals(claimsJws.getPayload().get("iss")) && ((long) olderJwt.getPayload().get("exp")) < System.currentTimeMillis() / 1000) {
 				throw new RuntimeException("Token already used");
 			}
 		}
@@ -169,7 +188,14 @@ public class JwtAuthProvider {
 		try {
 			dataSession = PopServlet.getDataSession();
 			UserAccess userAccess = ServletHelper.authenticateUserAccessUsernamePassword(CONNECTATHON_USER,"SundaysR0ck!",dataSession);
-			return jwtUtils.generateJwtToken(userAccess);
+			Map<String, String> result = new HashMap<>(5);
+			result.put("access_token", jwtUtils.generateJwtToken(userAccess));
+			result.put("token_type", "bearer");
+			result.put("expires_in", "300");
+			result.put("scope", scope);
+			Gson gson = new Gson();
+			String gsonData = gson.toJson(result, new TypeToken<HashMap>() {}.getType());
+			return gsonData;
 		} finally {
 			if (dataSession != null) {
 				dataSession.close();

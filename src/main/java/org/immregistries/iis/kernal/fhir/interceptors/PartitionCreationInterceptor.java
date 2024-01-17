@@ -29,6 +29,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Nonnull;
 import javax.interceptor.Interceptor;
 
+import static org.immregistries.iis.kernal.fhir.interceptors.SessionAuthorizationInterceptor.CONNECTATHON_USER;
 import static org.immregistries.iis.kernal.fhir.interceptors.SessionAuthorizationInterceptor.DEFAULT_USER;
 
 /**
@@ -88,6 +89,9 @@ public class PartitionCreationInterceptor extends RequestTenantPartitionIntercep
 		if (StringUtils.isBlank(tenantId)) {
 			throw new InvalidRequestException(Msg.code(343) + "No tenant ID has been specified, expected structure is fhir/{tenantId}-{facilityId}");
 		} else {
+			if (requestDetails.getTenantId().equals("ConnectathonUnsafe")) {
+				return CONNECTATHON_USER;
+			}
 			String[] ids = tenantId.split(PARTITION_NAME_SEPARATOR);
 //			if (ids.length < 2){
 //				throw new InvalidRequestException(Msg.code(343) + "No facility ID has been specified, expected structure is fhir/{tenantId}-{facilityId}");

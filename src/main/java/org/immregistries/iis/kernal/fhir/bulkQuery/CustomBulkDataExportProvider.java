@@ -2,11 +2,13 @@ package org.immregistries.iis.kernal.fhir.bulkQuery;
 
 import ca.uhn.fhir.batch2.api.IJobCoordinator;
 import ca.uhn.fhir.batch2.jobs.export.BulkDataExportProvider;
+import ca.uhn.fhir.batch2.model.JobInstance;
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.i18n.Msg;
 import ca.uhn.fhir.interceptor.api.HookParams;
 import ca.uhn.fhir.interceptor.api.IInterceptorBroadcaster;
 import ca.uhn.fhir.interceptor.api.Pointcut;
+import ca.uhn.fhir.interceptor.model.RequestPartitionId;
 import ca.uhn.fhir.jpa.api.config.JpaStorageSettings;
 import ca.uhn.fhir.jpa.api.dao.DaoRegistry;
 import ca.uhn.fhir.jpa.api.dao.IFhirResourceDao;
@@ -25,6 +27,7 @@ import ca.uhn.fhir.rest.api.PreferHeader;
 import ca.uhn.fhir.rest.api.RequestTypeEnum;
 import ca.uhn.fhir.rest.api.server.IRestfulServer;
 import ca.uhn.fhir.rest.api.server.RequestDetails;
+import ca.uhn.fhir.rest.api.server.bulk.BulkExportJobParameters;
 import ca.uhn.fhir.rest.server.RestfulServerUtils;
 import ca.uhn.fhir.rest.server.exceptions.InternalErrorException;
 import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
@@ -36,6 +39,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.instance.model.api.IBaseOperationOutcome;
 import org.hl7.fhir.instance.model.api.IIdType;
 import org.hl7.fhir.instance.model.api.IPrimitiveType;
+import org.hl7.fhir.r4.model.IdType;
 import org.hl7.fhir.r5.model.*;
 import org.immregistries.iis.kernal.fhir.interceptors.PartitionCreationInterceptor;
 import org.slf4j.Logger;
@@ -56,27 +60,154 @@ import static org.slf4j.LoggerFactory.getLogger;
  * Deprecated, used to allow for Binary produced by bulk jobs to be copied to the right FHIR JPA partition
  */
 public class CustomBulkDataExportProvider extends BulkDataExportProvider {
-//	private static final Logger ourLog = getLogger(BulkDataExportProvider.class);
-//
-//	@Autowired
-//	private IInterceptorBroadcaster myInterceptorBroadcaster;
-//
-//	private Set<String> myCompartmentResources;
-//
-//	@Autowired
-//	private FhirContext myFhirContext;
-//
-//	@Autowired
-//	private IJobCoordinator myJobRunner;
-//
-//	@Autowired
-//	private JpaStorageSettings myJpaStorageSettings;
-//
-//	@Autowired
-//	private DaoRegistry myDaoRegistry;
-//
-//	@Autowired
-//	private IFhirResourceDao<Binary> binaryDao;
+	private static final Logger ourLog = getLogger(CustomBulkDataExportProvider.class);
+
+	@Autowired
+	private IInterceptorBroadcaster myInterceptorBroadcaster;
+
+	private Set<String> myCompartmentResources;
+
+	@Autowired
+	private FhirContext myFhirContext;
+
+	@Autowired
+	private IJobCoordinator myJobCoordinator;
+
+	@Autowired
+	private JpaStorageSettings myJpaStorageSettings;
+
+	@Autowired
+	private DaoRegistry myDaoRegistry;
+
+	@Autowired
+	private IFhirResourceDao<Binary> binaryDao;
+	@Autowired
+	private PartitionCreationInterceptor partitionCreationInterceptor;
+
+
+	/**
+	 * $export-poll-status
+	 */
+	@SuppressWarnings("unchecked")
+	@Operation(
+		name = JpaConstants.OPERATION_EXPORT_POLL_STATUS,
+		manualResponse = true,
+		idempotent = true,
+		deleteEnabled = true)
+	@Override
+	public void exportPollStatus(
+		@OperationParam(name = JpaConstants.PARAM_EXPORT_POLL_STATUS_JOB_ID, typeName = "string", min = 0, max = 1)
+		IPrimitiveType<String> theJobId,
+		ServletRequestDetails theRequestDetails)
+		throws IOException {
+		HttpServletResponse response = theRequestDetails.getServletResponse();
+		theRequestDetails.getServer().addHeadersToResponse(response);
+
+		// When export-poll-status through POST
+		// Get theJobId from the request details
+		if (theJobId == null) {
+			org.hl7.fhir.r4.model.Parameters parameters = (org.hl7.fhir.r4.model.Parameters) theRequestDetails.getResource();
+			org.hl7.fhir.r4.model.Parameters.ParametersParameterComponent parameter = parameters.getParameter().stream()
+				.filter(param -> param.getName().equals(JpaConstants.PARAM_EXPORT_POLL_STATUS_JOB_ID))
+				.findFirst()
+				.orElseThrow(() -> new InvalidRequestException(Msg.code(2227)
+					+ "$export-poll-status requires a job ID, please provide the value of target jobId."));
+			theJobId = (IPrimitiveType<String>) parameter.getValue();
+		}
+
+		JobInstance info = myJobCoordinator.getInstance(theJobId.getValueAsString());
+
+		BulkExportJobParameters parameters = info.getParameters(BulkExportJobParameters.class);
+		if (parameters.getPartitionId() != null) {
+			// Determine and validate permissions for partition (if needed)
+			RequestPartitionId partitionId = partitionCreationInterceptor.partitionIdentifyRead(theRequestDetails);
+//				myRequestPartitionHelperService.determineReadPartitionForRequest(theRequestDetails, null);
+//			myRequestPartitionHelperService.validateHasPartitionPermissions(theRequestDetails, "Binary", partitionId);
+			if (!parameters.getPartitionId().equals(partitionId)) {
+				throw new InvalidRequestException(
+					Msg.code(2304) + "Invalid partition in request for Job ID " + theJobId);
+			}
+		}
+
+		switch (info.getStatus()) {
+			case COMPLETED:
+				if (theRequestDetails.getRequestType() == RequestTypeEnum.DELETE) {
+					handleDeleteRequest(theJobId, response, info.getStatus());
+				} else {
+					response.setStatus(Constants.STATUS_HTTP_200_OK);
+					response.setContentType(Constants.CT_JSON);
+
+					// Create a JSON response
+					BulkExportResponseJson bulkResponseDocument = new BulkExportResponseJson();
+					bulkResponseDocument.setTransactionTime(info.getEndTime()); // completed
+
+					bulkResponseDocument.setRequiresAccessToken(true);
+
+					String report = info.getReport();
+					if (isEmpty(report)) {
+						// this should never happen, but just in case...
+						ourLog.error("No report for completed bulk export job.");
+						response.getWriter().close();
+					} else {
+						BulkExportJobResults results = JsonUtil.deserialize(report, BulkExportJobResults.class);
+						bulkResponseDocument.setMsg(results.getReportMsg());
+						bulkResponseDocument.setRequest(results.getOriginalRequestUrl());
+
+						String serverBase = getServerBase(theRequestDetails);
+						for (Map.Entry<String, List<String>> entrySet :
+							results.getResourceTypeToBinaryIds().entrySet()) {
+							String resourceType = entrySet.getKey();
+							List<String> binaryIds = entrySet.getValue();
+							for (String binaryId : binaryIds) {
+								IIdType iId = new IdType(binaryId);
+								String nextUrl = serverBase + "/"
+									+ iId.toUnqualifiedVersionless().getValue();
+								bulkResponseDocument
+									.addOutput()
+									.setType(resourceType)
+									.setUrl(nextUrl);
+							}
+						}
+						JsonUtil.serialize(bulkResponseDocument, response.getWriter());
+						response.getWriter().close();
+					}
+				}
+				break;
+			case FAILED:
+				response.setStatus(Constants.STATUS_HTTP_500_INTERNAL_ERROR);
+				response.setContentType(Constants.CT_FHIR_JSON);
+
+				// Create an OperationOutcome response
+				IBaseOperationOutcome oo = OperationOutcomeUtil.newInstance(myFhirContext);
+
+				OperationOutcomeUtil.addIssue(myFhirContext, oo, "error", info.getErrorMessage(), null, null);
+				myFhirContext.newJsonParser().setPrettyPrint(true).encodeResourceToWriter(oo, response.getWriter());
+				response.getWriter().close();
+				break;
+			default:
+				// Deliberate fall through
+				ourLog.warn(
+					"Unrecognized status encountered: {}. Treating as BUILDING/SUBMITTED",
+					info.getStatus().name());
+				//noinspection fallthrough
+			case FINALIZE:
+			case QUEUED:
+			case IN_PROGRESS:
+			case CANCELLED:
+			case ERRORED:
+				if (theRequestDetails.getRequestType() == RequestTypeEnum.DELETE) {
+					handleDeleteRequest(theJobId, response, info.getStatus());
+				} else {
+					response.setStatus(Constants.STATUS_HTTP_202_ACCEPTED);
+					String dateString = getTransitionTimeOfJobInfo(info);
+					response.addHeader(
+						Constants.HEADER_X_PROGRESS,
+						"Build in progress - Status set to " + info.getStatus() + " at " + dateString);
+					response.addHeader(Constants.HEADER_RETRY_AFTER, "120");
+				}
+				break;
+		}
+	}
 //
 //
 //

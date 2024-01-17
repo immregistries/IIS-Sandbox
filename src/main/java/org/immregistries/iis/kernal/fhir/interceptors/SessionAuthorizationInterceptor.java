@@ -5,6 +5,7 @@ import ca.uhn.fhir.jpa.model.util.JpaConstants;
 import ca.uhn.fhir.rest.api.server.RequestDetails;
 import ca.uhn.fhir.rest.server.interceptor.auth.AuthorizationInterceptor;
 import ca.uhn.fhir.rest.server.interceptor.auth.IAuthRule;
+import ca.uhn.fhir.rest.server.interceptor.auth.IAuthRuleFinished;
 import ca.uhn.fhir.rest.server.interceptor.auth.RuleBuilder;
 import ca.uhn.fhir.rest.server.servlet.ServletRequestDetails;
 import com.google.common.collect.Lists;
@@ -21,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.w3._1999.xhtml.Li;
 
 import javax.interceptor.Interceptor;
 import javax.servlet.http.HttpServletRequest;
@@ -56,7 +58,13 @@ public class SessionAuthorizationInterceptor extends AuthorizationInterceptor {
 		Tenant tenant = null;
 		try {
 			if (PartitionCreationInterceptor.extractPartitionName(theRequestDetails).equals(CONNECTATHON_USER)) {
-				return connectathonSpecialUser(theRequestDetails, authHeader, dataSession);
+				if (theRequestDetails.getTenantId().endsWith("Unsafe")) {
+					return connectathonUserAuthorized(theRequestDetails, dataSession).build();
+				}
+				List<IAuthRule> rules = connectathonSpecialUser(theRequestDetails, authHeader, dataSession);
+				if (rules != null) {
+					return rules;
+				}
 			}
 			/**
 			 * Checking Auth header else SESSION Cookie
@@ -140,70 +148,93 @@ public class SessionAuthorizationInterceptor extends AuthorizationInterceptor {
 		UserAccess userAccess = null;
 		if (authHeader != null && authHeader.startsWith("Bearer ")) {
 			String token = authHeader.split("Bearer ")[1];
-			logger.info("token {}", token);
-			logger.info("token {}", jwtUtils.validateJwtToken(token));
-			logger.info("token {}", jwtUtils.getUserNameFromJwtToken(token));
 			if (jwtUtils.validateJwtToken(token) && jwtUtils.getUserNameFromJwtToken(token).equals(CONNECTATHON_USER)) {
+				return connectathonUserAuthorized(theRequestDetails, dataSession).build();
+			}
+		}
+		return null;
+	}
 
-				String queryString = "from UserAccess where accessName = ?0";
-				org.hibernate.Query query = dataSession.createQuery(queryString);
-				query.setParameter(0, CONNECTATHON_USER);
-				Iterator<UserAccess> userAccessIterator = query.iterate();
-				if (userAccessIterator.hasNext()) {
-					userAccess = userAccessIterator.next();
-					Query queryTenant = dataSession.createQuery("from Tenant where organizationName = ?1");
-					queryTenant.setParameter(1, CONNECTATHON_USER);
-					Iterator<Tenant> tenantIterator = queryTenant.iterate();
-					if (tenantIterator.hasNext()) {
-						Tenant tenant = tenantIterator.next();
-						theRequestDetails.setAttribute(SESSION_USER_ACCESS, userAccess);
-						theRequestDetails.setAttribute(SESSION_TENANT, tenant);
-						return new RuleBuilder()
-							.allow().operation()
-							.named(JpaConstants.OPERATION_EXPORT).atAnyLevel()
-							.andAllowAllResponses().forTenantIds(CONNECTATHON_USER)
-							.andThen().allow().operation()
-							.named(JpaConstants.OPERATION_EXPORT_POLL_STATUS).atAnyLevel()
-							.andAllowAllResponses().forTenantIds(CONNECTATHON_USER)
-							.andThen().allow().operation()
-							.named(JpaConstants.OPERATION_EVERYTHING).atAnyLevel()
-							.andAllowAllResponses().forTenantIds(CONNECTATHON_USER)
-
-							.andThen().allow().operation()
-							.named("$match").atAnyLevel()
-							.andAllowAllResponses().forTenantIds(CONNECTATHON_USER)
-
-//								.andThen().allow().operation().withAnyName().atAnyLevel().andAllowAllResponses().forTenantIds(CONNECTATHON_USER)
-							.andThen().allow().operation().withAnyName().atAnyLevel().andAllowAllResponses().forTenantIds(CONNECTATHON_USER)
-//								.andThen().allow().operation().named("$member-remove").atAnyLevel().andAllowAllResponses().forTenantIds(CONNECTATHON_USER)
-
-
-							.andThen().allow().operation().named(JpaConstants.OPERATION_EVERYTHING)
-							.atAnyLevel().andAllowAllResponses().forTenantIds(CONNECTATHON_USER)
-
-							.andThen().allow().read()
-							.resourcesOfType("Group").withAnyId().forTenantIds(CONNECTATHON_USER)
-							.andThen().allow().create()
-							.resourcesOfType("Group").withAnyId().forTenantIds(CONNECTATHON_USER)
-							.andThen().allow().read()
-							.resourcesOfType("Immunization").withAnyId().forTenantIds(CONNECTATHON_USER)
-							.andThen().allow().create()
-							.resourcesOfType("Immunization").withAnyId().forTenantIds(CONNECTATHON_USER)
-							.andThen().allow().read()
-							.resourcesOfType("Patient").withAnyId().forTenantIds(CONNECTATHON_USER)
-							.andThen().allow().create()
-							.resourcesOfType("Patient").withAnyId().forTenantIds(CONNECTATHON_USER)
-							.andThen().allow().read()
-							.resourcesOfType("Binary").withAnyId().forTenantIds(CONNECTATHON_USER)
-
-							.andThen().allow()
-							.bulkExport().any()
-							.withResourceTypes(Lists.newArrayList("Patient", "Immunization", "RelatedPerson"))
-
-							.build();
-						// TODO Make list of allowed Binary read, right now every binary is accessible
-					}
-				}
+	private IAuthRuleFinished connectathonUserAuthorized(RequestDetails theRequestDetails, Session dataSession) {
+		String tenantId = theRequestDetails.getTenantId();
+		UserAccess userAccess;
+		String queryString = "from UserAccess where accessName = ?0";
+		org.hibernate.Query query = dataSession.createQuery(queryString);
+		query.setParameter(0, CONNECTATHON_USER);
+		Iterator<UserAccess> userAccessIterator = query.iterate();
+		if (userAccessIterator.hasNext()) {
+			userAccess = userAccessIterator.next();
+			Query queryTenant = dataSession.createQuery("from Tenant where organizationName = ?1");
+			queryTenant.setParameter(1, CONNECTATHON_USER);
+			Iterator<Tenant> tenantIterator = queryTenant.iterate();
+			if (tenantIterator.hasNext()) {
+				Tenant tenant = tenantIterator.next();
+				theRequestDetails.setAttribute(SESSION_USER_ACCESS, userAccess);
+				theRequestDetails.setAttribute(SESSION_TENANT, tenant);
+				return new RuleBuilder()
+					.allow().read()
+					.resourcesOfType("Subscription").withAnyId().forTenantIds(DEFAULT_USER)
+					.andThen().allow().read()
+					.resourcesOfType("SubscriptionTopic").withAnyId().forTenantIds(DEFAULT_USER)
+					.andThen()
+					.allowAll("Logged in as " + CONNECTATHON_USER).forTenantIds(CONNECTATHON_USER,"ConnectathonUnsafe")
+					.andThen().allow().read()
+					.resourcesOfType("Binary").withAnyId().forTenantIds(CONNECTATHON_USER,"ConnectathonUnsafe","DEFAULT", "default");
+//				return new RuleBuilder()
+//					.allow().operation()
+//					.named(JpaConstants.OPERATION_EXPORT).atAnyLevel()
+//					.andAllowAllResponses().forTenantIds(tenantId)
+//					.andThen().allow().operation()
+//					.named(JpaConstants.OPERATION_EXPORT_POLL_STATUS).atAnyLevel()
+//					.andAllowAllResponses().forTenantIds(tenantId)
+//					.andThen().allow().operation()
+//					.named(JpaConstants.OPERATION_EVERYTHING).atAnyLevel()
+//					.andAllowAllResponses().forTenantIds(CONNECTATHON_USER,"ConnectathonUnsafe")
+//
+//					.andThen().allow().operation()
+//					.named("$match").atAnyLevel()
+//					.andAllowAllResponses().forTenantIds(CONNECTATHON_USER,"ConnectathonUnsafe")
+//					.andThen().allow().operation()
+//					.named("$member-remove").onAnyType()
+//					.andAllowAllResponses().forTenantIds(CONNECTATHON_USER,"ConnectathonUnsafe")
+//					.andThen().allow().operation()
+//					.named("$member-add").onAnyType()
+//					.andAllowAllResponses().forTenantIds(CONNECTATHON_USER,"ConnectathonUnsafe")
+//
+////								.andThen().allow().operation().withAnyName().atAnyLevel().andAllowAllResponses().forTenantIds(CONNECTATHON_USER,"ConnectathonUnsafe")
+//					.andThen().allow().operation().withAnyName().atAnyLevel().andAllowAllResponses().forTenantIds(CONNECTATHON_USER,"ConnectathonUnsafe")
+////								.andThen().allow().operation().named("$member-remove").atAnyLevel().andAllowAllResponses().forTenantIds(CONNECTATHON_USER,"ConnectathonUnsafe")
+//
+//
+//					.andThen().allow().operation().named(JpaConstants.OPERATION_EVERYTHING)
+//					.atAnyLevel().andAllowAllResponses().forTenantIds(CONNECTATHON_USER,"ConnectathonUnsafe")
+//
+//					.andThen().allow().read()
+//					.resourcesOfType("Group").withAnyId().forTenantIds(CONNECTATHON_USER,"ConnectathonUnsafe")
+//					.andThen().allow().create()
+//					.resourcesOfType("Group").withAnyId().forTenantIds(CONNECTATHON_USER,"ConnectathonUnsafe")
+//					.andThen().allow().write()
+//					.resourcesOfType("Group").withAnyId().forTenantIds(CONNECTATHON_USER,"ConnectathonUnsafe")
+//					.andThen().allow().transaction().withAnyOperation().andApplyNormalRules().forTenantIds(CONNECTATHON_USER,"ConnectathonUnsafe")
+////					.resourcesOfType("Group").withAnyId().forTenantIds(CONNECTATHON_USER,"ConnectathonUnsafe")
+//					.andThen().allow().operation().withAnyName().onAnyType().andAllowAllResponses().forTenantIds(CONNECTATHON_USER,"ConnectathonUnsafe")
+//					.andThen().allow().read()
+//					.resourcesOfType("Immunization").withAnyId().forTenantIds(CONNECTATHON_USER,"ConnectathonUnsafe")
+//					.andThen().allow().read()
+//					.resourcesOfType("Observation").withAnyId().forTenantIds(CONNECTATHON_USER,"ConnectathonUnsafe")
+//					.andThen().allow().create()
+//					.resourcesOfType("Immunization").withAnyId().forTenantIds(CONNECTATHON_USER,"ConnectathonUnsafe")
+//					.andThen().allow().read()
+//					.resourcesOfType("Patient").withAnyId().forTenantIds(CONNECTATHON_USER,"ConnectathonUnsafe")
+//					.andThen().allow().create()
+//					.resourcesOfType("Patient").withAnyId().forTenantIds(CONNECTATHON_USER,"ConnectathonUnsafe")
+//					.andThen().allow().read()
+//					.resourcesOfType("Binary").withAnyId().forTenantIds(CONNECTATHON_USER,"ConnectathonUnsafe","DEFAULT", "default")
+//
+//					.andThen().allow()
+//					.bulkExport().any()
+//					.withResourceTypes(Lists.newArrayList("Patient", "Immunization", "RelatedPerson"));
+				// TODO Make list of allowed Binary read, right now every binary is accessible
 			}
 		}
 		return null;

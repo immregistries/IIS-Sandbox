@@ -170,3 +170,4 @@ Temporary Items
 # Helm Chart dependencies
 **/charts/*.tgz
 /src/test/RS384.key
+/src/test/RS384.key.pub

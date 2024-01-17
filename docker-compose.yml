@@ -36,7 +36,7 @@ services:
 #      - spring.datasource.url=jdbc:postgresql://hapi-fhir-postgres:5432/hapi_fhir_iis
     restart: on-failure
     ports:
-      - "8080:8080"
+      - "8081:8080"
 
 volumes:
   hapi-fhir-postgres:

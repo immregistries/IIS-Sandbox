@@ -30,6 +30,7 @@ import javax.transaction.Transactional;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Date;
 
 @RestController()
 @RequestMapping({"/pop","/tenant/{tenantId}/pop"})
@@ -93,6 +94,8 @@ public class PopServlet {
 							groupPatientIds) {
 							group.addMember().setEntity(new Reference().setReference("Patient/" + id));
 						}
+						group.setDescription("Generated from Hl2v2 VXU Query on  time " + new Date());
+//						group.set
 						repositoryClientFactory.newGenericClient(req).create().resource(group).execute();
 					}
 				}
