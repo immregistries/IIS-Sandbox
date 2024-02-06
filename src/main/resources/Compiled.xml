@@ -336,6 +336,7 @@
             </code-status>
             <reference>
                 <link-to codeset="VACCINATION_VIS_VACCINES">24</link-to>
+                <link-to codeset="VACCINATION_VIS_VACCINES">318</link-to>
             </reference>
             <use-date>
                 <not-before>20200108</not-before>
@@ -2439,6 +2440,20 @@
             </use-date>
         </code>
         <code>
+            <value>253088698300064611231207</value>
+            <label>Tick-borne Encephalitis Vaccine VIS</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_VIS_VACCINES">224</link-to>
+                <link-to codeset="VACCINATION_VIS_VACCINES">223</link-to>
+            </reference>
+            <use-date>
+                <not-before>20231207</not-before>
+            </use-date>
+        </code>
+        <code>
             <value>253088698300023311120529</value>
             <label>Typhoid VIS</label>
             <description></description>
@@ -3660,6 +3675,14 @@
             <use-date/>
         </code>
         <code>
+            <value>90589</value>
+            <label>Chikungunya virus vaccine, live attenuated, for intramuscular use</label>
+            <description></description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+        </code>
+        <code>
             <value>90725</value>
             <label>cholera</label>
             <description></description>
@@ -4602,6 +4625,14 @@
                 <link-to codeset="VACCINATION_CVX_CODE">32</link-to>
             </reference>
             <use-date/>
+        </code>
+        <code>
+            <value>90623</value>
+            <label>Meningococcal pentavalent vaccine, conjugated Men A, C, W, Y- tetanus toxoid carrier, and Men B-FHbp, for intramuscular use</label>
+            <description></description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
         </code>
         <code>
             <value>90621</value>
@@ -8680,6 +8711,48 @@
                     <new-code-value>00069-2362-01</new-code-value>
                     <reason>Use 11-digit format with dashes</reason>
                     <effective-date>20230912</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>00069-2377-01</value>
+            <label>Comirnaty</label>
+            <description>Pfizer Laboratories Div Pfizer Inc - COVID-19, mRNA, tris-sucrose, 30 mcg/0.3 mL, no-freeze formulation (Fall 2023)</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">309</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">PFR</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">00069-2377-10</link-to>
+            </reference>
+            <use-date>
+                <not-before>20231031</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>0069-2377-01</value>
+            <label>Comirnaty</label>
+            <description>Pfizer Laboratories Div Pfizer Inc - COVID-19, mRNA, tris-sucrose, 30 mcg/0.3 mL, no-freeze formulation (Fall 2023)</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>00069-2377-01</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20231211</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>00069237701</value>
+            <label>Comirnaty</label>
+            <description>Pfizer Laboratories Div Pfizer Inc - COVID-19, mRNA, tris-sucrose, 30 mcg/0.3 mL, no-freeze formulation (Fall 2023)</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>00069-2377-01</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20231211</effective-date>
                 </deprecated>
             </code-status>
         </code>
@@ -21751,6 +21824,94 @@
             </code-status>
         </code>
         <code>
+            <value>00069-0271-01</value>
+            <label>PENBRAYA</label>
+            <description>Pfizer Laboratories Div Pfizer Inc - MenACWY lyophilized component for reconstitution with MenB, 0.5 mL</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">316</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">PFR</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">00069-0600-05</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">00069-0600-01</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">00069-0600-10</link-to>
+            </reference>
+            <use-date>
+                <not-before>20231127</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>0069-0271-01</value>
+            <label>PENBRAYA</label>
+            <description>Pfizer Laboratories Div Pfizer Inc - MenACWY lyophilized component for reconstitution with MenB, 0.5 mL</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>00069-0271-01</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20231214</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>00069027101</value>
+            <label>PENBRAYA</label>
+            <description>Pfizer Laboratories Div Pfizer Inc - MenACWY lyophilized component for reconstitution with MenB, 0.5 mL</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>00069-0271-01</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20231214</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>00069-0332-01</value>
+            <label>PENBRAYA</label>
+            <description>Pfizer Laboratories Div Pfizer Inc - MenB recombinant component for reconstitution with MenACWY, 0.5 mL</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">316</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">PFR</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">00069-0600-05</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">00069-0600-01</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">00069-0600-10</link-to>
+            </reference>
+            <use-date>
+                <not-before>20231127</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>0069-0332-01</value>
+            <label>PENBRAYA</label>
+            <description>Pfizer Laboratories Div Pfizer Inc - MenB recombinant component for reconstitution with MenACWY, 0.5 mL</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>00069-0332-01</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20231214</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>00069033201</value>
+            <label>PENBRAYA</label>
+            <description>Pfizer Laboratories Div Pfizer Inc - MenB recombinant component for reconstitution with MenACWY, 0.5 mL</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>00069-0332-01</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20231214</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
             <value>49281-0548-58</value>
             <label>PENTACEL</label>
             <description>Sanofi Pasteur Inc. - DIPHTHERIA AND TETANUS TOXOIDS AND ACELLULAR PERTUSSIS ADSORBED, INACTIVATED POLIOVIRUS AND TETANUS TOXOID CONJUGATE VACCINE KIT</description>
@@ -25738,6 +25899,22 @@
             <concept-type>vaccine</concept-type>
         </code>
         <code>
+            <value>318</value>
+            <label>Anthrax, post-exposure prophylaxis</label>
+            <description>Anthrax vaccine, adsorbed, adjuvanted, post-exposure prophylaxis Notes: National stockpile vaccine (Cyfendus)</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINE_GROUP">ANTHRAX</link-to>
+                <link-to codeset="VACCINATION_TRADE_NAME">CYFENDUS</link-to>
+            </reference>
+            <use-date>
+                <not-before>20240125</not-before>
+            </use-date>
+            <concept-type>vaccine</concept-type>
+        </code>
+        <code>
             <value>801</value>
             <label>AS03 Adjuvant</label>
             <description>AS03 Adjuvant Notes: This is the adjuvant that is
@@ -25804,6 +25981,22 @@
             </use-age>
             <concept-type>non vaccine</concept-type>
             <test-age>2 months</test-age>
+        </code>
+        <code>
+            <value>317</value>
+            <label>Chikungunya live attenuated vaccine, 0.5 mL, PF</label>
+            <description>Chikungunya, live attenuated vaccine, 0.5 mL, preservative free Notes: Chikungunya Vaccine</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINE_GROUP">Chikungunya</link-to>
+                <link-to codeset="VACCINATION_TRADE_NAME">IXCHIQ</link-to>
+            </reference>
+            <use-date>
+                <not-before>20231220</not-before>
+            </use-date>
+            <concept-type>vaccine</concept-type>
         </code>
         <code>
             <value>26</value>
@@ -26196,7 +26389,7 @@
                 <link-to codeset="VACCINE_GROUP">COVID-19</link-to>
                 <link-to codeset="VACCINATION_TRADE_NAME">Sanofi COVID-19</link-to>
             </reference>
-            <concept-type>pending</concept-type>
+            <concept-type>never active</concept-type>
         </code>
         <code>
             <value>225</value>
@@ -26215,7 +26408,7 @@
             <use-date>
                 <not-before>20220310</not-before>
             </use-date>
-            <concept-type>vaccine</concept-type>
+            <concept-type>never active</concept-type>
         </code>
         <code>
             <value>230</value>
@@ -26234,8 +26427,12 @@
             </reference>
             <use-date>
                 <not-before>20221014</not-before>
-                <not-after>20231026</not-after>
+                <not-after>20230911</not-after>
             </use-date>
+            <use-age>
+                <not-before-month>5</not-before-month>
+                <not-after-month>72</not-after-month>
+            </use-age>
             <concept-type>vaccine</concept-type>
         </code>
         <code>
@@ -26311,6 +26508,10 @@
                 <not-before>20221019</not-before>
                 <not-after>20231026</not-after>
             </use-date>
+            <use-age>
+                <not-before-month>5</not-before-month>
+                <not-after-month>60</not-after-month>
+            </use-age>
             <concept-type>vaccine</concept-type>
         </code>
         <code>
@@ -26415,6 +26616,10 @@
             <use-date>
                 <not-before>20230913</not-before>
             </use-date>
+            <use-age>
+                <not-before-month>5</not-before-month>
+                <not-after-month>156</not-after-month>
+            </use-age>
             <concept-type>vaccine</concept-type>
         </code>
         <code>
@@ -26524,6 +26729,10 @@
             <use-date>
                 <not-before>20230913</not-before>
             </use-date>
+            <use-age>
+                <not-before-month>144</not-before-month>
+                <not-after-month>1440</not-after-month>
+            </use-age>
             <concept-type>vaccine</concept-type>
         </code>
         <code>
@@ -26617,6 +26826,10 @@
             <use-date>
                 <not-before>20230913</not-before>
             </use-date>
+            <use-age>
+                <not-before-month>59</not-before-month>
+                <not-after-month>144</not-after-month>
+            </use-age>
             <concept-type>vaccine</concept-type>
         </code>
         <code>
@@ -26636,6 +26849,10 @@
             <use-date>
                 <not-before>20230913</not-before>
             </use-date>
+            <use-age>
+                <not-before-month>5</not-before-month>
+                <not-after-month>60</not-after-month>
+            </use-age>
             <concept-type>vaccine</concept-type>
         </code>
         <code>
@@ -26653,10 +26870,16 @@
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">00069-2362-10</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">00069-2392-10</link-to>
                 <link-to codeset="VACCINATION_CPT_CODE">91320</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">00069-2377-01</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">00069-2377-10</link-to>
             </reference>
             <use-date>
                 <not-before>20230913</not-before>
             </use-date>
+            <use-age>
+                <not-before-month>143</not-before-month>
+                <not-after-month>1440</not-after-month>
+            </use-age>
             <concept-type>vaccine</concept-type>
         </code>
         <code>
@@ -26676,6 +26899,10 @@
             <use-date>
                 <not-before>20230901</not-before>
             </use-date>
+            <use-age>
+                <not-before-month>144</not-before-month>
+                <not-after-month>1440</not-after-month>
+            </use-age>
             <concept-type>vaccine</concept-type>
         </code>
         <code>
@@ -26694,13 +26921,12 @@
             <use-date>
                 <not-before>19700101</not-before>
                 <not-expected-before>19700101</not-expected-before>
-                <not-after>19700101</not-after>
             </use-date>
             <use-age>
                 <not-before-month>96</not-before-month>
                 <not-after-month>216</not-after-month>
             </use-age>
-            <concept-type>never active</concept-type>
+            <concept-type>vaccine</concept-type>
             <test-age>10 years</test-age>
         </code>
         <code>
@@ -29823,10 +30049,19 @@
                 <link-to codeset="VACCINE_GROUP">MENING</link-to>
                 <link-to codeset="VACCINE_GROUP">MeningB</link-to>
                 <link-to codeset="VACCINATION_TRADE_NAME">PENBRAYA</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">00069-0271-01</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">00069-0332-01</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">00069-0600-05</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">00069-0600-10</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">00069-0600-01</link-to>
             </reference>
             <use-date>
                 <not-before>20231102</not-before>
             </use-date>
+            <use-age>
+                <not-before-month>108</not-before-month>
+                <not-after-month>324</not-after-month>
+            </use-age>
             <concept-type>vaccine</concept-type>
         </code>
         <code>
@@ -30334,11 +30569,11 @@
                 <not-before>20210818</not-before>
             </use-date>
             <use-age>
-                <not-before-month>216</not-before-month>
+                <not-before-month>1</not-before-month>
                 <not-after-month>1440</not-after-month>
             </use-age>
             <concept-type>vaccine</concept-type>
-            <test-age>65 years</test-age>
+            <test-age>2 years</test-age>
         </code>
         <code>
             <value>152</value>
@@ -30624,7 +30859,11 @@
             <use-date>
                 <not-after>20230919</not-after>
             </use-date>
-            <concept-type>vaccine</concept-type>
+            <use-age>
+                <not-before-month>0</not-before-month>
+                <not-after-month>25</not-after-month>
+            </use-age>
+            <concept-type>unspecified</concept-type>
         </code>
         <code>
             <value>314</value>
@@ -30639,7 +30878,11 @@
             <use-date>
                 <not-after>20230919</not-after>
             </use-date>
-            <concept-type>vaccine</concept-type>
+            <use-age>
+                <not-before-month>144</not-before-month>
+                <not-after-month>1440</not-after-month>
+            </use-age>
+            <concept-type>unspecified</concept-type>
         </code>
         <code>
             <value>304</value>
@@ -30654,7 +30897,11 @@
             <use-date>
                 <not-after>20230606</not-after>
             </use-date>
-            <concept-type>vaccine</concept-type>
+            <use-age>
+                <not-before-month>0</not-before-month>
+                <not-after-month>1440</not-after-month>
+            </use-age>
+            <concept-type>unspecified</concept-type>
         </code>
         <code>
             <value>72</value>
@@ -30878,6 +31125,10 @@
             <use-date>
                 <not-before>20230713</not-before>
             </use-date>
+            <use-age>
+                <not-before-month>144</not-before-month>
+                <not-after-month>1440</not-after-month>
+            </use-age>
             <concept-type>vaccine</concept-type>
         </code>
         <code>
@@ -30897,6 +31148,10 @@
             <use-date>
                 <not-before>20230725</not-before>
             </use-date>
+            <use-age>
+                <not-before-month>0</not-before-month>
+                <not-after-month>8</not-after-month>
+            </use-age>
             <concept-type>vaccine</concept-type>
         </code>
         <code>
@@ -30916,6 +31171,10 @@
             <use-date>
                 <not-before>20230725</not-before>
             </use-date>
+            <use-age>
+                <not-before-month>7</not-before-month>
+                <not-after-month>24</not-after-month>
+            </use-age>
             <concept-type>vaccine</concept-type>
         </code>
         <code>
@@ -30935,6 +31194,10 @@
             <use-date>
                 <not-before>20230606</not-before>
             </use-date>
+            <use-age>
+                <not-before-month>144</not-before-month>
+                <not-after-month>1440</not-after-month>
+            </use-age>
             <concept-type>vaccine</concept-type>
         </code>
         <code>
@@ -33572,6 +33835,13 @@
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">59267-4331-02</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">59267-4315-02</link-to>
                 <link-to codeset="VACCINATION_TRADE_NAME">PENBRAYA</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">00069-2377-01</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">00069-0271-01</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">00069-0332-01</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">00069-2377-10</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">00069-0600-05</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">00069-0600-10</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">00069-0600-01</link-to>
             </reference>
             <use-date>
                 <not-before>20100528</not-before>
@@ -34289,6 +34559,7 @@
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">62195-0051-10</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">42515-0002-01</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">62195-0051-01</link-to>
+                <link-to codeset="VACCINATION_TRADE_NAME">IXCHIQ</link-to>
             </reference>
             <use-date>
                 <not-before>20160719</not-before>
@@ -34507,6 +34778,7 @@
             </code-status>
             <reference>
                 <link-to codeset="VACCINATION_CVX_CODE">24</link-to>
+                <link-to codeset="VACCINATION_CVX_CODE">318</link-to>
             </reference>
         </code>
         <code>
@@ -34518,6 +34790,13 @@
             </code-status>
             <reference>
                 <link-to codeset="VACCINATION_CVX_CODE">19</link-to>
+            </reference>
+        </code>
+        <code>
+            <value>Chikungunya</value>
+            <label>Chikungunya live attenuated vaccine, 0.5 mL, PF</label>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">317</link-to>
             </reference>
         </code>
         <code>
@@ -35282,6 +35561,7 @@
             <reference>
                 <link-to codeset="VACCINATION_CVX_CODE">24</link-to>
                 <link-to codeset="VACCINATION_MANUFACTURER_CODE">MIP</link-to>
+                <link-to codeset="VACCINATION_CVX_CODE">318</link-to>
             </reference>
             <use-date>
                 <not-before>20231102</not-before>
@@ -35327,6 +35607,20 @@
             </reference>
             <use-date>
                 <not-before>20130809</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>IXCHIQ</value>
+            <label>Chikungunya live attenuated vaccine, 0.5 mL, PF</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">317</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">VAL</link-to>
+            </reference>
+            <use-date>
+                <not-before>20231214</not-before>
             </use-date>
         </code>
         <code>
@@ -46256,6 +46550,19 @@
             </use-date>
         </code>
         <code>
+            <value>318</value>
+            <label>Anthrax Vaccine VIS</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300002811200108</link-to>
+            </reference>
+            <use-date>
+                <not-before>20200108</not-before>
+            </use-date>
+        </code>
+        <code>
             <value>24</value>
             <label>Anthrax VIS</label>
             <code-status>
@@ -47982,6 +48289,32 @@
             </reference>
             <use-date>
                 <not-before>20170411</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>224</value>
+            <label>Tick-borne Encephalitis Vaccine VIS</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300064611231207</link-to>
+            </reference>
+            <use-date>
+                <not-before>20231207</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>223</value>
+            <label>Tick-borne Encephalitis Vaccine VIS</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300064611231207</link-to>
+            </reference>
+            <use-date>
+                <not-before>20231207</not-before>
             </use-date>
         </code>
         <code>
@@ -51842,6 +52175,48 @@
                     <new-code-value>00069-2392-10</new-code-value>
                     <reason>Use 11-digit format with dashes</reason>
                     <effective-date>20230912</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>00069-2377-10</value>
+            <label>Comirnaty</label>
+            <description>Pfizer Laboratories Div Pfizer Inc - COVID-19, mRNA, tris-sucrose, 30 mcg/0.3 mL, no-freeze formulation (Fall 2023)</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">309</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">PFR</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">00069-2377-01</link-to>
+            </reference>
+            <use-date>
+                <not-before>20231031</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>0069-2377-10</value>
+            <label>Comirnaty</label>
+            <description>Pfizer Laboratories Div Pfizer Inc - COVID-19, mRNA, tris-sucrose, 30 mcg/0.3 mL, no-freeze formulation (Fall 2023)</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>00069-2377-10</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20231211</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>00069237710</value>
+            <label>Comirnaty</label>
+            <description>Pfizer Laboratories Div Pfizer Inc - COVID-19, mRNA, tris-sucrose, 30 mcg/0.3 mL, no-freeze formulation (Fall 2023)</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>00069-2377-10</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20231211</effective-date>
                 </deprecated>
             </code-status>
         </code>
@@ -64990,6 +65365,135 @@
                     <new-code-value>00006-4897-00</new-code-value>
                     <reason>Use 11-digit format with dashes</reason>
                     <effective-date>20140127</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>00069-0600-05</value>
+            <label>PENBRAYA</label>
+            <description>Pfizer Laboratories Div Pfizer Inc - MenACWY and MenB vaccine kit</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">316</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">PFR</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">00069-0332-01</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">00069-0271-01</link-to>
+            </reference>
+            <use-date>
+                <not-before>20231127</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>0069-0600-05</value>
+            <label>PENBRAYA</label>
+            <description>Pfizer Laboratories Div Pfizer Inc - MenACWY and MenB vaccine kit</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>00069-0600-05</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20231218</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>00069060005</value>
+            <label>PENBRAYA</label>
+            <description>Pfizer Laboratories Div Pfizer Inc - MenACWY and MenB vaccine kit</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>00069-0600-05</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20231218</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>00069-0600-10</value>
+            <label>PENBRAYA</label>
+            <description>Pfizer Laboratories Div Pfizer Inc - MenACWY and MenB vaccine kit</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">316</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">PFR</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">00069-0332-01</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">00069-0271-01</link-to>
+            </reference>
+            <use-date>
+                <not-before>20231127</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>0069-0600-10</value>
+            <label>PENBRAYA</label>
+            <description>Pfizer Laboratories Div Pfizer Inc - MenACWY and MenB vaccine kit</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>00069-0600-10</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20231218</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>00069060010</value>
+            <label>PENBRAYA</label>
+            <description>Pfizer Laboratories Div Pfizer Inc - MenACWY and MenB vaccine kit</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>00069-0600-10</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20231218</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>00069-0600-01</value>
+            <label>PENBRAYA</label>
+            <description>Pfizer Laboratories Div Pfizer Inc - MenACWY and MenB vaccine kit</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">316</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">PFR</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">00069-0332-01</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">00069-0271-01</link-to>
+            </reference>
+            <use-date>
+                <not-before>20231127</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>0069-0600-01</value>
+            <label>PENBRAYA</label>
+            <description>Pfizer Laboratories Div Pfizer Inc - MenACWY and MenB vaccine kit</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>00069-0600-01</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20231214</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>00069060001</value>
+            <label>PENBRAYA</label>
+            <description>Pfizer Laboratories Div Pfizer Inc - MenACWY and MenB vaccine kit</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>00069-0600-01</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20231214</effective-date>
                 </deprecated>
             </code-status>
         </code>
