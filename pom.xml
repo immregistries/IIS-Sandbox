@@ -73,9 +73,9 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.immregistries.vfa</groupId>
+			<groupId>org.immregistries</groupId>
 			<artifactId>ForecastConnector</artifactId>
-			<version>3.19</version>
+			<version>3.20.5</version>
 		</dependency>
 
 		<dependency>
