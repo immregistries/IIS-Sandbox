@@ -50,15 +50,6 @@ CREATE TABLE `message_received` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `message_received`
---
-
-LOCK TABLES `message_received` WRITE;
-/*!40000 ALTER TABLE `message_received` DISABLE KEYS */;
-/*!40000 ALTER TABLE `message_received` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `observation_master`
 --
 
@@ -76,14 +67,6 @@ CREATE TABLE `observation_master` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
---
--- Dumping data for table `observation_master`
---
-
-LOCK TABLES `observation_master` WRITE;
-/*!40000 ALTER TABLE `observation_master` DISABLE KEYS */;
-/*!40000 ALTER TABLE `observation_master` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `observation_reported`
@@ -119,15 +102,6 @@ CREATE TABLE `observation_reported` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `observation_reported`
---
-
-LOCK TABLES `observation_reported` WRITE;
-/*!40000 ALTER TABLE `observation_reported` DISABLE KEYS */;
-/*!40000 ALTER TABLE `observation_reported` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `org_access`
 --
 
@@ -146,15 +120,6 @@ CREATE TABLE `org_access` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `org_access`
---
-
-LOCK TABLES `org_access` WRITE;
-/*!40000 ALTER TABLE `org_access` DISABLE KEYS */;
-/*!40000 ALTER TABLE `org_access` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `org_master`
 --
 
@@ -167,15 +132,6 @@ CREATE TABLE `org_master` (
   PRIMARY KEY (`org_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `org_master`
---
-
-LOCK TABLES `org_master` WRITE;
-/*!40000 ALTER TABLE `org_master` DISABLE KEYS */;
-/*!40000 ALTER TABLE `org_master` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `patient_master`
@@ -201,15 +157,6 @@ CREATE TABLE `patient_master` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `patient_master`
---
-
-LOCK TABLES `patient_master` WRITE;
-/*!40000 ALTER TABLE `patient_master` DISABLE KEYS */;
-/*!40000 ALTER TABLE `patient_master` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `patient_match`
 --
 
@@ -228,15 +175,6 @@ CREATE TABLE `patient_match` (
   CONSTRAINT `patient_match_ibfk_2` FOREIGN KEY (`reported_patient_b_id`) REFERENCES `patient_master` (`patient_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `patient_match`
---
-
-LOCK TABLES `patient_match` WRITE;
-/*!40000 ALTER TABLE `patient_match` DISABLE KEYS */;
-/*!40000 ALTER TABLE `patient_match` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `patient_reported`
@@ -261,6 +199,11 @@ CREATE TABLE `patient_reported` (
   `patient_birth_date` date NOT NULL,
   `patient_sex` varchar(250) DEFAULT NULL,
   `patient_race` varchar(250) DEFAULT NULL,
+  `patient_race2` varchar(250) DEFAULT NULL,
+  `patient_race3` varchar(250) DEFAULT NULL,
+  `patient_race4` varchar(250) DEFAULT NULL,
+  `patient_race5` varchar(250) DEFAULT NULL,
+  `patient_race6` varchar(250) DEFAULT NULL,
   `patient_address_line1` varchar(250) DEFAULT NULL,
   `patient_address_line2` varchar(250) DEFAULT NULL,
   `patient_address_city` varchar(250) DEFAULT NULL,
@@ -294,15 +237,6 @@ CREATE TABLE `patient_reported` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `patient_reported`
---
-
-LOCK TABLES `patient_reported` WRITE;
-/*!40000 ALTER TABLE `patient_reported` DISABLE KEYS */;
-/*!40000 ALTER TABLE `patient_reported` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `vaccination_master`
 --
 
@@ -320,15 +254,6 @@ CREATE TABLE `vaccination_master` (
   CONSTRAINT `vaccination_master_ibfk_1` FOREIGN KEY (`vaccination_reported_id`) REFERENCES `vaccination_reported` (`vaccination_reported_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `vaccination_master`
---
-
-LOCK TABLES `vaccination_master` WRITE;
-/*!40000 ALTER TABLE `vaccination_master` DISABLE KEYS */;
-/*!40000 ALTER TABLE `vaccination_master` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `vaccination_reported`
@@ -359,6 +284,10 @@ CREATE TABLE `vaccination_reported` (
   `body_route` varchar(250) DEFAULT NULL,
   `funding_source` varchar(250) DEFAULT NULL,
   `funding_eligibility` varchar(250) DEFAULT NULL,
+  `org_location_id`  int(11) DEFAULT NULL,
+  `entered_by` int(11) DEFAULT NULL,
+  `ordering_provider` int(11) DEFAULT NULL,
+  `administering_provider` int(11) DEFAULT NULL,
   PRIMARY KEY (`vaccination_reported_id`),
   KEY `patient_reported_id` (`patient_reported_id`),
   KEY `vaccination_id` (`vaccination_id`),
@@ -367,22 +296,44 @@ CREATE TABLE `vaccination_reported` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
---
--- Dumping data for table `vaccination_reported`
---
 
-LOCK TABLES `vaccination_reported` WRITE;
-/*!40000 ALTER TABLE `vaccination_reported` DISABLE KEYS */;
-/*!40000 ALTER TABLE `vaccination_reported` ENABLE KEYS */;
-UNLOCK TABLES;
-/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
-/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
-/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
-/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
-/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+CREATE TABLE org_location
+(
+  org_location_id         INT            NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  org_facility_code       VARCHAR(250)   NOT NULL,
+  org_id                  INT            NOT NULL,
+  org_facility_name       VARCHAR(250),
+  location_type           VARCHAR(250),
+  address_line1           VARCHAR(250),
+  address_line2           VARCHAR(250),
+  address_city            VARCHAR(250),
+  address_state           VARCHAR(250),
+  address_zip             VARCHAR(250),
+  address_country         VARCHAR(250),
+  address_county_parish   VARCHAR(250), 
+  vfc_provider_pin        VARCHAR(250)
+);
 
--- Dump completed on 2020-10-01  6:47:02
+CREATE TABLE person
+(
+  person_id               INT            NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  person_external_link    VARCHAR(250)   NOT NULL,
+  org_id                  INT            NOT NULL,
+  name_last               VARCHAR(250),
+  name_first              VARCHAR(250),
+  name_middle             VARCHAR(250),
+  assigning_authority     VARCHAR(250),
+  name_type_code          VARCHAR(250),
+  identifier_type_code    VARCHAR(250),
+  professional_suffix     VARCHAR(250)
+);
+
+
+CREATE TABLE patient_link
+(
+  id integer primary key auto_increment,
+  patient_master_ID integer,
+  patient_reported_ID integer,
+  level_confidence integer
+);
