@@ -5,7 +5,7 @@
 
 	<groupId>org.immregistries</groupId>
 	<artifactId>iis-sandbox</artifactId>
-	<version>0.5.5</version>
+	<version>0.5.7</version>
 	<packaging>war</packaging>
 
 	<name>Immunization Information System Kernel - Proof of Concept</name>

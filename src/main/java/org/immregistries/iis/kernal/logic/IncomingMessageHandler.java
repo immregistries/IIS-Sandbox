@@ -1912,6 +1912,10 @@ public class IncomingMessageHandler {
     String firstName = patient.getPatientNameFirst();
     String middleName = patient.getPatientNameMiddle();
     String lastName = patient.getPatientNameLast();
+    String motherMaiden = null;
+    if (patientReported != null) {
+      motherMaiden = patientReported.getPatientMotherMaiden();
+    }
     String dateOfBirth = sdf.format(patient.getPatientBirthDate());
 
     // If "PHI" flavor, strip AIRA from names 10% of the time
@@ -1920,6 +1924,9 @@ public class IncomingMessageHandler {
         firstName = firstName.replace("AIRA", "");
         middleName = middleName.replace("AIRA", "");
         lastName = lastName.replace("AIRA", "");
+        if (motherMaiden != null) {
+          motherMaiden = motherMaiden.replace("AIRA", "");
+        }
       }
     }
 
@@ -1938,8 +1945,8 @@ public class IncomingMessageHandler {
 
     // PID-6
     sb.append("|");
-    if (patientReported != null) {
-      sb.append(patientReported.getPatientMotherMaiden() + "^^^^^^M");
+    if (motherMaiden != null && !motherMaiden.equals("")) {
+      sb.append(motherMaiden + "^^^^^^M");
     }
     // PID-7
     sb.append("|" + dateOfBirth);
