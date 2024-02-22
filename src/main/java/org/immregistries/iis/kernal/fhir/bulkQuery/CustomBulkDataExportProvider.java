@@ -5,42 +5,28 @@ import ca.uhn.fhir.batch2.jobs.export.BulkDataExportProvider;
 import ca.uhn.fhir.batch2.model.JobInstance;
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.i18n.Msg;
-import ca.uhn.fhir.interceptor.api.HookParams;
 import ca.uhn.fhir.interceptor.api.IInterceptorBroadcaster;
-import ca.uhn.fhir.interceptor.api.Pointcut;
 import ca.uhn.fhir.interceptor.model.RequestPartitionId;
 import ca.uhn.fhir.jpa.api.config.JpaStorageSettings;
 import ca.uhn.fhir.jpa.api.dao.DaoRegistry;
 import ca.uhn.fhir.jpa.api.dao.IFhirResourceDao;
-import ca.uhn.fhir.jpa.api.model.*;
-import ca.uhn.fhir.jpa.batch.models.Batch2JobStartResponse;
+import ca.uhn.fhir.jpa.api.model.BulkExportJobResults;
 import ca.uhn.fhir.jpa.bulk.export.model.BulkExportResponseJson;
 import ca.uhn.fhir.jpa.model.util.JpaConstants;
-import ca.uhn.fhir.rest.api.server.SystemRequestDetails;
-import ca.uhn.fhir.model.primitive.StringDt;
-import ca.uhn.fhir.rest.annotation.IdParam;
 import ca.uhn.fhir.rest.annotation.Operation;
 import ca.uhn.fhir.rest.annotation.OperationParam;
-import ca.uhn.fhir.rest.api.CacheControlDirective;
 import ca.uhn.fhir.rest.api.Constants;
-import ca.uhn.fhir.rest.api.PreferHeader;
 import ca.uhn.fhir.rest.api.RequestTypeEnum;
-import ca.uhn.fhir.rest.api.server.IRestfulServer;
-import ca.uhn.fhir.rest.api.server.RequestDetails;
 import ca.uhn.fhir.rest.api.server.bulk.BulkExportJobParameters;
-import ca.uhn.fhir.rest.server.RestfulServerUtils;
-import ca.uhn.fhir.rest.server.exceptions.InternalErrorException;
 import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
 import ca.uhn.fhir.rest.server.servlet.ServletRequestDetails;
-import ca.uhn.fhir.rest.server.util.CompositeInterceptorBroadcaster;
-import ca.uhn.fhir.util.*;
-import com.google.common.annotations.VisibleForTesting;
-import org.apache.commons.lang3.StringUtils;
+import ca.uhn.fhir.util.JsonUtil;
+import ca.uhn.fhir.util.OperationOutcomeUtil;
 import org.hl7.fhir.instance.model.api.IBaseOperationOutcome;
 import org.hl7.fhir.instance.model.api.IIdType;
 import org.hl7.fhir.instance.model.api.IPrimitiveType;
-import org.hl7.fhir.r4.model.IdType;
-import org.hl7.fhir.r5.model.*;
+import org.hl7.fhir.r5.model.Binary;
+import org.hl7.fhir.r5.model.IdType;
 import org.immregistries.iis.kernal.fhir.interceptors.PartitionCreationInterceptor;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,17 +34,14 @@ import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.slf4j.LoggerFactory.getLogger;
 
-//@Component
-
-/**
- * Deprecated, used to allow for Binary produced by bulk jobs to be copied to the right FHIR JPA partition
- */
+@Component
 public class CustomBulkDataExportProvider extends BulkDataExportProvider {
 	private static final Logger ourLog = getLogger(CustomBulkDataExportProvider.class);
 
@@ -106,8 +89,8 @@ public class CustomBulkDataExportProvider extends BulkDataExportProvider {
 		// When export-poll-status through POST
 		// Get theJobId from the request details
 		if (theJobId == null) {
-			org.hl7.fhir.r4.model.Parameters parameters = (org.hl7.fhir.r4.model.Parameters) theRequestDetails.getResource();
-			org.hl7.fhir.r4.model.Parameters.ParametersParameterComponent parameter = parameters.getParameter().stream()
+			org.hl7.fhir.r5.model.Parameters parameters = (org.hl7.fhir.r5.model.Parameters) theRequestDetails.getResource();
+			org.hl7.fhir.r5.model.Parameters.ParametersParameterComponent parameter = parameters.getParameter().stream()
 				.filter(param -> param.getName().equals(JpaConstants.PARAM_EXPORT_POLL_STATUS_JOB_ID))
 				.findFirst()
 				.orElseThrow(() -> new InvalidRequestException(Msg.code(2227)
@@ -123,7 +106,8 @@ public class CustomBulkDataExportProvider extends BulkDataExportProvider {
 			RequestPartitionId partitionId = partitionCreationInterceptor.partitionIdentifyRead(theRequestDetails);
 //				myRequestPartitionHelperService.determineReadPartitionForRequest(theRequestDetails, null);
 //			myRequestPartitionHelperService.validateHasPartitionPermissions(theRequestDetails, "Binary", partitionId);
-			if (!parameters.getPartitionId().equals(partitionId)) {
+			ourLog.info("part {} {} {}", theRequestDetails.getTenantId(), partitionId, parameters.getPartitionId());
+			if (!parameters.getPartitionId().getFirstPartitionNameOrNull().equals(partitionId.getFirstPartitionNameOrNull())) {
 				throw new InvalidRequestException(
 					Msg.code(2304) + "Invalid partition in request for Job ID " + theJobId);
 			}
@@ -159,7 +143,14 @@ public class CustomBulkDataExportProvider extends BulkDataExportProvider {
 							String resourceType = entrySet.getKey();
 							List<String> binaryIds = entrySet.getValue();
 							for (String binaryId : binaryIds) {
+								/**
+								 * New code
+								 */
 								IIdType iId = new IdType(binaryId);
+//								Binary binary = binaryDao.read(iId,theRequestDetails);
+//								IIdType newIid = new IdType(binaryId + ".ndjson");
+//								binary.setId(newIid);
+//								binaryDao.create(binary,theRequestDetails);
 								String nextUrl = serverBase + "/"
 									+ iId.toUnqualifiedVersionless().getValue();
 								bulkResponseDocument
