@@ -25,7 +25,7 @@ services:
       MYSQL_ROOT_PASSWORD: 'password123456789'
     volumes:
       #      - ./src/main/database/create-mysql-user.sql:/docker-entrypoint-initdb.d/1.sql
-      - ./src/main/database/create-mysql-database.sql:/docker-entrypoint-initdb.d/2.sql
+      - ./database/create-mysql-database.sql:/docker-entrypoint-initdb.d/2.sql
   iis-sandbox:
     build: .
     container_name: iis-sandbox
