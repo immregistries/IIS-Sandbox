@@ -195,6 +195,21 @@ public class PatientServlet  {
 					}
 				}
 				out.println("  </div>");
+
+				{
+					out.println("<div class=\"w3-container\">");
+					out.println("<h4>FHIR Api Shortcuts</h4>");
+					String apiBaseUrl = "/iis/fhir/" + tenant.getOrganizationName();
+					{
+						String link = apiBaseUrl + "/Patient";
+						out.println("<div>All FHIR Patient records: <a href=\"" + link + "\">" + link + "</a></div>");
+					}
+					{
+						String link = apiBaseUrl + "/Patient"+ "?_tag=GOLDEN_RECORD";
+						out.println("<div>Patient golden records (records referenced by duplicates): <a href=\"" + link + "\">" + link  +"</a></div>");
+					}
+					out.println("</div>");
+				}
 			} else {
 				patientMasterSelected = patientMapper.getMaster(patientSelected);
 				IParser parser = repositoryClientFactory.getFhirContext()

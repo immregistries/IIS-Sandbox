@@ -189,6 +189,22 @@ public class VaccinationServlet extends PatientServlet {
 
 				printSubscriptions(out, parser, bundle, immunization);
 
+
+				{
+					out.println("<div class=\"w3-container\">");
+					out.println("<h4>FHIR Api Shortcuts</h4>");
+					String apiBaseUrl = "/iis/fhir/" + tenant.getOrganizationName();
+					{
+						String link = apiBaseUrl + "/Immunization?_id=" + vaccination.getVaccinationId();
+						out.println("<div>FHIR Immunization: <a href=\"" + link + "\">" + link + "</a></div>");
+					}
+					{
+						String link = apiBaseUrl + "/Immunization?patient=" + vaccination.getPatientReportedId();
+						out.println("<div>Other immunizations of same patient: <a href=\"" + link + "\">" + link + "</a></div>");
+					}
+					out.println("</div>");
+				}
+
 			}
 		} catch (Exception e) {
 			e.printStackTrace(System.err);

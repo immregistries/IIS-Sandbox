@@ -46,6 +46,7 @@ public class HomeServlet extends HttpServlet {
 			if (tenant != null) {
 				String link = "tenant";
 				out.println("<a class='w3-bar-item w3-button w3-right w3-green' href=\"" + link + "\">Tenant : " + tenant.getOrganizationName() + " </a>");
+				out.println("<a href=\"fhir/"+ ServletHelper.getTenant().getOrganizationName() + "/metadata\" class=\"w3-bar-item w3-button w3-right \">Tenant Fhir Server Base</a>");
 			} else  {
 				String link = "tenant";
 				out.println("<a class='w3-bar-item w3-button w3-right w3-green' href=\"" + link + "\">No Tenant selected</a>");

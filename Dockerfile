@@ -35,7 +35,7 @@ COPY --chown=1001:1001 server.xml /opt/bitnami/tomcat/conf/server.xml
 COPY --chown=1001:1001 target/iis.war /opt/bitnami/tomcat/webapps_default/iis.war
 #COPY --from=build-hapi --chown=1001:1001 /tmp/iis/iis.war /opt/bitnami/tomcat/webapps_default/iis.war
 
-ENV ALLOW_EMPTY_PASSWORD=yes
+#ENV ALLOW_EMPTY_PASSWORD=yes
 
 ########### distroless brings focus on security and runs on plain spring boot - this is the default image
 #FROM gcr.io/distroless/java17:nonroot as default

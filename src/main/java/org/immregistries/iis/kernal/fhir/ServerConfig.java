@@ -30,9 +30,7 @@ import org.immregistries.iis.kernal.fhir.bulkQuery.BulkQueryGroupProviderR4;
 import org.immregistries.iis.kernal.fhir.bulkQuery.BulkQueryGroupProviderR5;
 import org.immregistries.iis.kernal.fhir.bulkQuery.CustomBulkDataExportProvider;
 import org.immregistries.iis.kernal.fhir.common.StarterJpaConfig;
-import org.immregistries.iis.kernal.fhir.interceptors.IdentifierSolverInterceptor;
-import org.immregistries.iis.kernal.fhir.interceptors.IdentifierSolverInterceptorR4;
-import org.immregistries.iis.kernal.fhir.interceptors.PartitionCreationInterceptor;
+import org.immregistries.iis.kernal.fhir.interceptors.*;
 import ca.uhn.fhir.jpa.subscription.util.SubscriptionDebugLogInterceptor;
 import ca.uhn.fhir.narrative.DefaultThymeleafNarrativeGenerator;
 import ca.uhn.fhir.narrative2.NullNarrativeGenerator;
@@ -45,7 +43,6 @@ import ca.uhn.fhir.rest.server.util.ISearchParamRegistry;
 import ca.uhn.fhir.validation.IValidatorModule;
 import ca.uhn.fhir.validation.ResultSeverityEnum;
 import com.google.common.base.Strings;
-import org.immregistries.iis.kernal.fhir.interceptors.SessionAuthorizationInterceptor;
 import org.immregistries.iis.kernal.fhir.mdm.MdmCustomProviderLoader;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,6 +75,7 @@ public class ServerConfig {
 												  Optional<IdentifierSolverInterceptorR4> identifierSolverInterceptorR4,
 												  Optional<IFhirResourceDao<org.hl7.fhir.r4.model.Group>> fhirResourceGroupDaoR4,
 												  Optional<IFhirResourceDao<org.hl7.fhir.r5.model.Group>> fhirResourceGroupDaoR5,
+												  Optional<GroupAuthorityInterceptor> groupAuthorityInterceptor,
 												  SessionAuthorizationInterceptor sessionAuthorizationInterceptor) {
 		RestfulServer fhirServer = new RestfulServer(fhirSystemDao.getContext());
 		List<String> supportedResourceTypes = appProperties.getSupported_resource_types();
@@ -272,10 +270,9 @@ public class ServerConfig {
 		fhirServer.registerInterceptor(sessionAuthorizationInterceptor);
 		if (identifierSolverInterceptor.isPresent()) {
 			fhirServer.registerInterceptor(identifierSolverInterceptor.get());
-		} else if (identifierSolverInterceptorR4.isPresent()) {
-			fhirServer.registerInterceptor(identifierSolverInterceptorR4.get());
-		}
+		} else identifierSolverInterceptorR4.ifPresent(fhirServer::registerInterceptor);
 //		registerCustomInterceptors(fhirServer, appContext, appProperties.getCustomInterceptorClasses());
+		groupAuthorityInterceptor.ifPresent(fhirServer::registerInterceptor);
 
 		return fhirServer;
 	}
