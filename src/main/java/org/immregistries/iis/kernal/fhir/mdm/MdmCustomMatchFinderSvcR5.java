@@ -4,6 +4,7 @@ import ca.uhn.fhir.interceptor.model.RequestPartitionId;
 import ca.uhn.fhir.jpa.api.dao.IFhirResourceDao;
 import ca.uhn.fhir.jpa.mdm.svc.MdmMatchFinderSvcImpl;
 import ca.uhn.fhir.jpa.mdm.svc.candidate.MdmCandidateSearchSvc;
+import ca.uhn.fhir.mdm.api.MdmMatchResultEnum;
 import ca.uhn.fhir.rest.api.server.SystemRequestDetails;
 import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
 import ca.uhn.fhir.mdm.api.IMdmMatchFinderSvc;
@@ -20,7 +21,14 @@ import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.hl7.fhir.r5.model.Immunization;
 import org.hl7.fhir.r5.model.ResourceType;
 import org.immregistries.iis.kernal.fhir.annotations.OnR5Condition;
+import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.mapping.forR5.ImmunizationMapperR5;
+import org.immregistries.iis.kernal.model.ProcessingFlavor;
+import org.immregistries.iis.kernal.servlet.PatientMatchingDatasetConversionController;
+import org.immregistries.mismo.match.PatientMatchDetermination;
+import org.immregistries.mismo.match.PatientMatchResult;
+import org.immregistries.mismo.match.PatientMatcher;
+import org.immregistries.mismo.match.model.Patient;
 import org.immregistries.vaccination_deduplication.computation_classes.Deterministic;
 import org.immregistries.vaccination_deduplication.reference.ComparisonResult;
 import org.immregistries.vaccination_deduplication.reference.ImmunizationSource;
@@ -44,25 +52,42 @@ import static org.immregistries.iis.kernal.InternalClient.FhirRequester.GOLDEN_S
 /**
  * Custom, based on MdmMatchFinderSvcImpl from Hapi-fhir v6.2.4, to allow for Immunization matching with external library
  */
-//@Component
-//@Conditional(OnR5Condition.class)
 public class MdmCustomMatchFinderSvcR5 extends MdmMatchFinderSvcImpl implements IMdmMatchFinderSvc {
 	private static final Logger ourLog = Logs.getMdmTroubleshootingLog();
+	@Autowired
+	IFhirResourceDao<Immunization> immunizationDao;
 	@Autowired
 	private MdmCandidateSearchSvc myMdmCandidateSearchSvc;
 	@Autowired
 	private MdmResourceMatcherSvc myMdmResourceMatcherSvc;
 	@Autowired
-	IFhirResourceDao<Immunization> immunizationDao;
+	private PatientMatchingDatasetConversionController patientMatchingDatasetConversionController;
 
 	@Override
 	@Nonnull
 	@Transactional
 	public List<MatchedTarget> getMatchedTargets(String theResourceType, IAnyResource theResource, RequestPartitionId theRequestPartitionId) {
-		if (theResourceType.equals(ResourceType.Immunization.name())){
-			List<MatchedTarget> matches = matchImmunization((Immunization) theResource,theRequestPartitionId);
+		if (theResourceType.equals(ResourceType.Immunization.name())) {
+			List<MatchedTarget> matches = matchImmunization((Immunization) theResource, theRequestPartitionId);
 			ourLog.trace("Found {} matched targets for {}.", matches.size(), idOrType(theResource, theResourceType));
+			return matches;
+		} else if (theResourceType.equals(ResourceType.Patient.name()) && ProcessingFlavor.getProcessingStyle(theRequestPartitionId.getFirstPartitionNameOrNull()).contains(ProcessingFlavor.MISMO)) {
 
+			/**
+			 * flavour check activating patient Matching with Mismo match
+			 */
+			Collection<IAnyResource> targetCandidates = myMdmCandidateSearchSvc.findCandidates(theResourceType, theResource, theRequestPartitionId);
+			PatientMatcher mismoMatcher = new PatientMatcher();
+			Patient mismoPatient = patientMatchingDatasetConversionController.convertFromR5((org.hl7.fhir.r5.model.Patient) theResource);
+
+			List<MatchedTarget> matches = targetCandidates.stream()
+				.map((candidate) -> {
+					Patient mismoPatientCandidate = patientMatchingDatasetConversionController.convertFromR5((org.hl7.fhir.r5.model.Patient) candidate);
+					return new MatchedTarget(candidate, mismoResultToMdmMatchOutcome(mismoMatcher.match(mismoPatient, mismoPatientCandidate)));
+				}).collect(Collectors.toList());
+
+			ourLog.info("Found {} matched targets for {} with mismo.", matches.size(), idOrType(theResource, theResourceType));
+			ourLog.trace("Found {} matched targets for {}.", matches.size(), idOrType(theResource, theResourceType));
 			return matches;
 		} else {
 			Collection<IAnyResource> targetCandidates = myMdmCandidateSearchSvc.findCandidates(theResourceType, theResource, theRequestPartitionId);
@@ -122,14 +147,14 @@ public class MdmCustomMatchFinderSvcR5 extends MdmMatchFinderSvcImpl implements 
 
 	}
 
-	private org.immregistries.vaccination_deduplication.Immunization toVaccDedupImmunization(Immunization immunization, RequestPartitionId theRequestPartitionId){
+	private org.immregistries.vaccination_deduplication.Immunization toVaccDedupImmunization(Immunization immunization, RequestPartitionId theRequestPartitionId) {
 		org.immregistries.vaccination_deduplication.Immunization i1 = new org.immregistries.vaccination_deduplication.Immunization();
 		i1.setCVX(immunization.getVaccineCode().getCode(ImmunizationMapperR5.CVX));
-		if(immunization.hasManufacturer()){
+		if (immunization.hasManufacturer()) {
 			i1.setMVX(immunization.getManufacturer().getReference().getIdentifier().getValue());
 		}
 		try {
-			if (immunization.hasOccurrenceStringType()){
+			if (immunization.hasOccurrenceStringType()) {
 				i1.setDate(immunization.getOccurrenceStringType().getValue()); // TODO parse correctly
 			} else if (immunization.hasOccurrenceDateTimeType()) {
 				i1.setDate(immunization.getOccurrenceDateTimeType().getValue());
@@ -166,5 +191,24 @@ public class MdmCustomMatchFinderSvcR5 extends MdmMatchFinderSvcImpl implements 
 		}
 		return i1;
 	}
+
+	private MdmMatchOutcome mismoResultToMdmMatchOutcome(PatientMatchResult patientMatchResult) {
+		switch (patientMatchResult.getDetermination()) {
+			case MATCH: {
+				return MdmMatchOutcome.EID_MATCH;
+//				return MdmMatchOutcome.NEW_GOLDEN_RESOURCE_MATCH;
+			}
+			case POSSIBLE_MATCH: {
+				return MdmMatchOutcome.POSSIBLE_MATCH;
+			}
+			case NO_MATCH: {
+				return MdmMatchOutcome.NO_MATCH;
+			}
+			default: {
+				return MdmMatchOutcome.NO_MATCH;
+			}
+		}
+	}
+
 
 }

@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public enum ProcessingFlavor {
+  MISMO("Mismo", "Uses Mismo Model for Patient Matching"),
   LIME("Lime", "Missing non-critical required fields"),
   COCONUT("Coconut", "Forecast never returned"),
   ORANGE("Orange", "Z32 is returned for query matches"),
@@ -66,8 +67,12 @@ public enum ProcessingFlavor {
             || label.endsWith(" " + key)
             || label.indexOf(" " + key + " ") > 0) {
           processingFlavorSet.add(ps);
-        }
-      }
+        } else if (label.startsWith(key + "_")
+			  || label.endsWith("_" + key)
+			  || label.indexOf("_" + key + "_") > 0) {
+			 processingFlavorSet.add(ps);
+		  }
+		}
     }
     return processingFlavorSet;
   }

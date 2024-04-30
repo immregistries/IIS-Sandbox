@@ -106,7 +106,7 @@ public class CustomBulkDataExportProvider extends BulkDataExportProvider {
 			RequestPartitionId partitionId = partitionCreationInterceptor.partitionIdentifyRead(theRequestDetails);
 //				myRequestPartitionHelperService.determineReadPartitionForRequest(theRequestDetails, null);
 //			myRequestPartitionHelperService.validateHasPartitionPermissions(theRequestDetails, "Binary", partitionId);
-			ourLog.info("part {} {} {}", theRequestDetails.getTenantId(), partitionId, parameters.getPartitionId());
+//			ourLog.info("part {} {} {}", theRequestDetails.getTenantId(), partitionId, parameters.getPartitionId());
 			if (!parameters.getPartitionId().getFirstPartitionNameOrNull().equals(partitionId.getFirstPartitionNameOrNull())) {
 				throw new InvalidRequestException(
 					Msg.code(2304) + "Invalid partition in request for Job ID " + theJobId);

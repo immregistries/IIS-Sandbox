@@ -176,7 +176,7 @@ public class PatientMatchingDatasetConversionController {
 			.collect(Collectors.joining(","));
 	}
 
-	private Patient convertFromR5(org.hl7.fhir.r5.model.Patient patient) {
+	public Patient convertFromR5(org.hl7.fhir.r5.model.Patient patient) {
 		Patient mismo = new Patient();
 		org.hl7.fhir.r5.model.Identifier identifier = MappingHelper.filterIdentifierR5(patient.getIdentifier(), "http://codi.mitre.org");
 		if (identifier != null) {
