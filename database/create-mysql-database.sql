@@ -44,11 +44,9 @@ insert into user_access (user_access_id, access_name, access_key) values (1, 'Me
 insert into user_access (user_access_id, access_name, access_key) values (2, 'Bob', '1234password1234');
 insert into user_access (user_access_id, access_name, access_key) values (3, 'Connectathon', 'SundaysR0ck!');
 insert into user_access (user_access_id, access_name, access_key) values (4, 'admin', '?whooosM0reSorino?');
---insert into user_access (user_access_id, access_name, access_key) values (5, 'DEFAULT', 'BabySharkJaws');
 
 insert into tenant (org_id, organization_name, user_access_id) values (1, 'Mercy-Healthcare', 1);
 insert into tenant (org_id, organization_name, user_access_id) values (2, 'Family-Physician', 2);
 insert into tenant (org_id, organization_name, user_access_id) values (3, 'Connectathon', 3);
 insert into tenant (org_id, organization_name, user_access_id) values (4, 'admin', 4);
---insert into tenant (org_id, organization_name, user_access_id) values (5, 'DEFAULT', 5);
 
