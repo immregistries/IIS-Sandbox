@@ -1174,6 +1174,8 @@
                 <link-to codeset="VACCINATION_VIS_VACCINES">155</link-to>
                 <link-to codeset="VACCINATION_VIS_VACCINES">140</link-to>
                 <link-to codeset="VACCINATION_VIS_VACCINES">168</link-to>
+                <link-to codeset="VACCINATION_VIS_VACCINES">153</link-to>
+                <link-to codeset="VACCINATION_VIS_VACCINES">320</link-to>
             </reference>
             <use-date>
                 <not-before>20210806</not-before>
@@ -1187,6 +1189,7 @@
             </code-status>
             <reference>
                 <link-to codeset="VACCINATION_VIS_VACCINES">149</link-to>
+                <link-to codeset="VACCINATION_VIS_VACCINES">111</link-to>
             </reference>
             <use-date>
                 <not-before>20210806</not-before>
@@ -28742,6 +28745,7 @@
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">49281-0403-65</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">49281-0405-88</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">49281-0405-65</link-to>
+                <link-to codeset="VACCINATION_TRADE_NAME">Fluzone High-Dose trivalent, preservative free</link-to>
             </reference>
             <use-date>
                 <not-before>20100528</not-before>
@@ -28771,6 +28775,7 @@
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">49281-0122-65</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">49281-0123-88</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">49281-0123-65</link-to>
+                <link-to codeset="VACCINATION_TRADE_NAME">Fluzone High-Dose quadrivalent, preservative free</link-to>
             </reference>
             <use-date>
                 <not-before>20200129</not-before>
@@ -28804,6 +28809,7 @@
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">63851-0613-01</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">63851-0612-01</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">62577-0613-01</link-to>
+                <link-to codeset="VACCINATION_TRADE_NAME">Flucelvax trivalent, preservative free</link-to>
             </reference>
             <use-date>
                 <not-before>20130717</not-before>
@@ -28847,6 +28853,7 @@
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">70461-0322-03</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">70461-0323-04</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">70461-0323-03</link-to>
+                <link-to codeset="VACCINATION_TRADE_NAME">Flucelvax quadrivalent, preservative free</link-to>
             </reference>
             <use-date>
                 <not-before>20160616</not-before>
@@ -28887,6 +28894,7 @@
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">70461-0422-10</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">70461-0423-11</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">70461-0423-10</link-to>
+                <link-to codeset="VACCINATION_TRADE_NAME">Flucelvax quadrivalent, with preservative</link-to>
             </reference>
             <use-date>
                 <not-before>20170627</not-before>
@@ -28962,6 +28970,7 @@
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">49281-0639-78</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">33332-0423-10</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">49281-0639-15</link-to>
+                <link-to codeset="VACCINATION_TRADE_NAME">Afluria quadrivalent, with preservative</link-to>
             </reference>
             <use-date>
                 <not-before>20130820</not-before>
@@ -29093,6 +29102,9 @@
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">58160-0909-52</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">19515-0814-52</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">49281-0423-50</link-to>
+                <link-to codeset="VACCINATION_TRADE_NAME">Afluria quadrivalent, preservative free</link-to>
+                <link-to codeset="VACCINATION_TRADE_NAME">Fluarix quadrivalent, preservative free</link-to>
+                <link-to codeset="VACCINATION_TRADE_NAME">Flulaval quadrivalent, preservative free</link-to>
             </reference>
             <use-date>
                 <not-before>20130103</not-before>
@@ -29205,6 +29217,7 @@
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">66019-0109-10</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">66019-0108-10</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">66019-0107-01</link-to>
+                <link-to codeset="VACCINATION_TRADE_NAME">FluMist trivalent</link-to>
             </reference>
             <use-date>
                 <not-before>20130103</not-before>
@@ -29267,6 +29280,22 @@
             <test-age>2 years</test-age>
         </code>
         <code>
+            <value>320</value>
+            <label>Influenza, MDCK, trivalent, preservative</label>
+            <description>Influenza, Madin Darby Canine Kidney, subunit, trivalent, injectable, contains preservative Notes: Trivalent code starting 2024/2025 season</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINE_GROUP">FLU</link-to>
+                <link-to codeset="VACCINATION_TRADE_NAME">Flucelvax trivalent, with preservative</link-to>
+            </reference>
+            <use-date>
+                <not-before>20240515</not-before>
+            </use-date>
+            <concept-type>vaccine</concept-type>
+        </code>
+        <code>
             <value>155</value>
             <label>Influenza, recombinant, injectable, preservative free</label>
             <description>Seasonal, trivalent, recombinant, injectable influenza
@@ -29290,6 +29319,7 @@
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">42874-0014-10</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">42874-0015-10</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">42874-0016-10</link-to>
+                <link-to codeset="VACCINATION_TRADE_NAME">Flublok trivalent, preservative free</link-to>
             </reference>
             <use-date>
                 <not-before>20130717</not-before>
@@ -29332,6 +29362,7 @@
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">49281-0722-10</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">49281-0723-88</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">49281-0723-10</link-to>
+                <link-to codeset="VACCINATION_TRADE_NAME">Flublok quadrivalent, preservative free</link-to>
             </reference>
             <use-date>
                 <not-before>20170421</not-before>
@@ -29417,6 +29448,8 @@
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">76420-0470-10</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">33332-0118-11</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">33332-0118-10</link-to>
+                <link-to codeset="VACCINATION_TRADE_NAME">Afluria trivalent, with preservative</link-to>
+                <link-to codeset="VACCINATION_TRADE_NAME">Fluzone trivalent, with preservative</link-to>
             </reference>
             <use-date>
                 <not-before>19450101</not-before>
@@ -29524,6 +29557,10 @@
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">76420-0471-01</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">33332-0018-02</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">33332-0018-01</link-to>
+                <link-to codeset="VACCINATION_TRADE_NAME">Afluria trivalent, preservative free</link-to>
+                <link-to codeset="VACCINATION_TRADE_NAME">Fluarix trivalent, preservative free</link-to>
+                <link-to codeset="VACCINATION_TRADE_NAME">Flulaval trivalent, preservative free</link-to>
+                <link-to codeset="VACCINATION_TRADE_NAME">Fluzone trivalent, preservative free</link-to>
             </reference>
             <use-date>
                 <not-before>20130717</not-before>
@@ -29724,6 +29761,7 @@
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">70461-0019-03</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">70461-0020-04</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">70461-0020-03</link-to>
+                <link-to codeset="VACCINATION_TRADE_NAME">Fluad trivalent, preservative free</link-to>
             </reference>
             <use-date>
                 <not-before>20151210</not-before>
@@ -33328,6 +33366,8 @@
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">58160-0909-52</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">58160-0816-03</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">58160-0726-15</link-to>
+                <link-to codeset="VACCINATION_TRADE_NAME">Fluarix quadrivalent, preservative free</link-to>
+                <link-to codeset="VACCINATION_TRADE_NAME">Fluarix trivalent, preservative free</link-to>
             </reference>
             <use-date>
                 <not-before>20100528</not-before>
@@ -33416,6 +33456,8 @@
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">19515-0808-52</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">19515-0814-41</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">19515-0814-52</link-to>
+                <link-to codeset="VACCINATION_TRADE_NAME">Flulaval quadrivalent, preservative free</link-to>
+                <link-to codeset="VACCINATION_TRADE_NAME">Flulaval trivalent, preservative free</link-to>
             </reference>
             <use-date>
                 <not-before>20130905</not-before>
@@ -33631,6 +33673,7 @@
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">66019-0309-10</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">66019-0310-01</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">66019-0310-10</link-to>
+                <link-to codeset="VACCINATION_TRADE_NAME">FluMist trivalent</link-to>
             </reference>
             <use-date>
                 <not-before>20100528</not-before>
@@ -34571,6 +34614,12 @@
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">49281-0933-50</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">49281-0398-15</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">49281-0324-50</link-to>
+                <link-to codeset="VACCINATION_TRADE_NAME">Fluzone High-Dose quadrivalent, preservative free</link-to>
+                <link-to codeset="VACCINATION_TRADE_NAME">Fluzone High-Dose trivalent, preservative free</link-to>
+                <link-to codeset="VACCINATION_TRADE_NAME">Flublok quadrivalent, preservative free</link-to>
+                <link-to codeset="VACCINATION_TRADE_NAME">Flublok trivalent, preservative free</link-to>
+                <link-to codeset="VACCINATION_TRADE_NAME">Fluzone trivalent, preservative free</link-to>
+                <link-to codeset="VACCINATION_TRADE_NAME">Fluzone trivalent, with preservative</link-to>
             </reference>
             <use-date>
                 <not-before>20100528</not-before>
@@ -34721,6 +34770,15 @@
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">70461-0123-03</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">70461-0423-10</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">70461-0323-03</link-to>
+                <link-to codeset="VACCINATION_TRADE_NAME">Fluad trivalent, preservative free</link-to>
+                <link-to codeset="VACCINATION_TRADE_NAME">Flucelvax quadrivalent, preservative free</link-to>
+                <link-to codeset="VACCINATION_TRADE_NAME">Flucelvax quadrivalent, with preservative</link-to>
+                <link-to codeset="VACCINATION_TRADE_NAME">Flucelvax trivalent, preservative free</link-to>
+                <link-to codeset="VACCINATION_TRADE_NAME">Flucelvax trivalent, with preservative</link-to>
+                <link-to codeset="VACCINATION_TRADE_NAME">Afluria quadrivalent, preservative free</link-to>
+                <link-to codeset="VACCINATION_TRADE_NAME">Afluria quadrivalent, with preservative</link-to>
+                <link-to codeset="VACCINATION_TRADE_NAME">Afluria trivalent, preservative free</link-to>
+                <link-to codeset="VACCINATION_TRADE_NAME">Afluria trivalent, with preservative</link-to>
             </reference>
             <use-date>
                 <not-before>20160413</not-before>
@@ -35390,6 +35448,7 @@
                 <link-to codeset="VACCINATION_CVX_CODE">201</link-to>
                 <link-to codeset="VACCINATION_CVX_CODE">202</link-to>
                 <link-to codeset="VACCINATION_CVX_CODE">231</link-to>
+                <link-to codeset="VACCINATION_CVX_CODE">320</link-to>
             </reference>
         </code>
         <code>
@@ -36870,6 +36929,20 @@
             </use-date>
         </code>
         <code>
+            <value>Fluad trivalent, preservative free</value>
+            <label>Influenza, adjuvanted, trivalent, PF</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">168</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">SEQ</link-to>
+            </reference>
+            <use-date>
+                <not-before>20240514</not-before>
+            </use-date>
+        </code>
+        <code>
             <value>FLUZONE-HIGH DOSE</value>
             <label>Influenza, high dose seasonal</label>
             <code-status>
@@ -36881,6 +36954,7 @@
             </reference>
             <use-date>
                 <not-before>20100528</not-before>
+                <not-after>20240501</not-after>
             </use-date>
         </code>
         <code>
@@ -36895,6 +36969,34 @@
             </reference>
             <use-date>
                 <not-before>20200129</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>Fluzone High-Dose quadrivalent, preservative free</value>
+            <label>Influenza, high-dose, quadrivalent, PF</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">197</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">PMC</link-to>
+            </reference>
+            <use-date>
+                <not-before>20240514</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>Fluzone High-Dose trivalent, preservative free</value>
+            <label>Influenza, high-dose, trivalent, PF</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">135</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">PMC</link-to>
+            </reference>
+            <use-date>
+                <not-before>20240514</not-before>
             </use-date>
         </code>
         <code>
@@ -36965,6 +37067,7 @@
             </reference>
             <use-date>
                 <not-before>20130910</not-before>
+                <not-after>20240514</not-after>
             </use-date>
         </code>
         <code>
@@ -37109,6 +37212,76 @@
             </use-date>
         </code>
         <code>
+            <value>FluMist trivalent</value>
+            <label>Influenza, live, trivalent, intranasal</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">111</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">MED</link-to>
+            </reference>
+            <use-date>
+                <not-before>20240514</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>Flucelvax quadrivalent, preservative free</value>
+            <label>Influenza, MDCK, quadrivalent, PF</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">171</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">SEQ</link-to>
+            </reference>
+            <use-date>
+                <not-before>20240514</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>Flucelvax quadrivalent, with preservative</value>
+            <label>Influenza, MDCK, quadrivalent, preservative</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">186</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">SEQ</link-to>
+            </reference>
+            <use-date>
+                <not-before>20240514</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>Flucelvax trivalent, preservative free</value>
+            <label>Influenza, MDCK, trivalent, PF</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">153</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">SEQ</link-to>
+            </reference>
+            <use-date>
+                <not-before>20240514</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>Flucelvax trivalent, with preservative</value>
+            <label>Influenza, MDCK, trivalent, preservative</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">320</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">SEQ</link-to>
+            </reference>
+            <use-date>
+                <not-before>20240514</not-before>
+            </use-date>
+        </code>
+        <code>
             <value>Flublok</value>
             <label>influenza, recombinant, injectable, preservative free</label>
             <code-status>
@@ -37120,6 +37293,21 @@
             </reference>
             <use-date>
                 <not-before>20130528</not-before>
+                <not-after>20240501</not-after>
+            </use-date>
+        </code>
+        <code>
+            <value>Flublok quadrivalent, preservative free</value>
+            <label>Influenza, recombinant, quadrivalent, PF</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">185</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">PMC</link-to>
+            </reference>
+            <use-date>
+                <not-before>20240514</not-before>
             </use-date>
         </code>
         <code>
@@ -37136,6 +37324,20 @@
             <use-date>
                 <not-before>20170421</not-before>
                 <not-after>20190213</not-after>
+            </use-date>
+        </code>
+        <code>
+            <value>Flublok trivalent, preservative free</value>
+            <label>Influenza, recombinant, trivalent, PF</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">155</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">PMC</link-to>
+            </reference>
+            <use-date>
+                <not-before>20240514</not-before>
             </use-date>
         </code>
         <code>
@@ -37166,6 +37368,7 @@
             </reference>
             <use-date>
                 <not-before>20130910</not-before>
+                <not-after>20240425</not-after>
             </use-date>
         </code>
         <code>
@@ -37181,6 +37384,7 @@
             </reference>
             <use-date>
                 <not-before>20100927</not-before>
+                <not-after>20240425</not-after>
             </use-date>
         </code>
         <code>
@@ -37195,6 +37399,7 @@
             </reference>
             <use-date>
                 <not-before>20100927</not-before>
+                <not-after>20240425</not-after>
             </use-date>
         </code>
         <code>
@@ -37362,6 +37567,146 @@
             </use-date>
         </code>
         <code>
+            <value>Afluria quadrivalent, preservative free</value>
+            <label>Influenza, split virus, quadrivalent, PF</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">150</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">SEQ</link-to>
+            </reference>
+            <use-date>
+                <not-before>20240514</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>Fluarix quadrivalent, preservative free</value>
+            <label>Influenza, split virus, quadrivalent, PF</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">150</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">SKB</link-to>
+            </reference>
+            <use-date>
+                <not-before>20240514</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>Flulaval quadrivalent, preservative free</value>
+            <label>Influenza, split virus, quadrivalent, PF</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">150</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">IDB</link-to>
+            </reference>
+            <use-date>
+                <not-before>20240514</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>Afluria quadrivalent, with preservative</value>
+            <label>Influenza, split virus, quadrivalent, preservative</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">158</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">SEQ</link-to>
+            </reference>
+            <use-date>
+                <not-before>20240514</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>Afluria trivalent, preservative free</value>
+            <label>Influenza, split virus, trivalent, PF</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">140</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">SEQ</link-to>
+            </reference>
+            <use-date>
+                <not-before>20240514</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>Fluarix trivalent, preservative free</value>
+            <label>Influenza, split virus, trivalent, PF</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">140</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">SKB</link-to>
+            </reference>
+            <use-date>
+                <not-before>20240514</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>Flulaval trivalent, preservative free</value>
+            <label>Influenza, split virus, trivalent, PF</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">140</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">IDB</link-to>
+            </reference>
+            <use-date>
+                <not-before>20240514</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>Fluzone trivalent, preservative free</value>
+            <label>Influenza, split virus, trivalent, PF</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">140</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">PMC</link-to>
+            </reference>
+            <use-date>
+                <not-before>20240516</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>Afluria trivalent, with preservative</value>
+            <label>Influenza, split virus, trivalent, preservative</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">141</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">SEQ</link-to>
+            </reference>
+            <use-date>
+                <not-before>20240514</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>Fluzone trivalent, with preservative</value>
+            <label>Influenza, split virus, trivalent, preservative</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">141</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">PMC</link-to>
+            </reference>
+            <use-date>
+                <not-before>20240514</not-before>
+            </use-date>
+        </code>
+        <code>
             <value>Fluad</value>
             <label>influenza, trivalent, adjuvanted</label>
             <code-status>
@@ -37374,6 +37719,7 @@
             </reference>
             <use-date>
                 <not-before>20160809</not-before>
+                <not-after>20240502</not-after>
             </use-date>
         </code>
         <code>
@@ -47742,6 +48088,19 @@
             </use-date>
         </code>
         <code>
+            <value>320</value>
+            <label>Influenza (Flu) Vaccine (Inactivated or Recombinant) VIS</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300010311210806</link-to>
+            </reference>
+            <use-date>
+                <not-before>20210806</not-before>
+            </use-date>
+        </code>
+        <code>
             <value>150</value>
             <label>Influenza Vaccine - Inactivated VIS</label>
             <code-status>
@@ -47771,6 +48130,7 @@
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300010311130726</link-to>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300010311140819</link-to>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300010311190815</link-to>
+                <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300010311210806</link-to>
             </reference>
             <use-date>
                 <not-before>20150807</not-before>
@@ -48012,6 +48372,7 @@
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300009711130726</link-to>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300009711140819</link-to>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300009711190815</link-to>
+                <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300009711210806</link-to>
             </reference>
             <use-date>
                 <not-before>20150807</not-before>
@@ -52470,6 +52831,7 @@
             </reference>
             <use-date>
                 <not-before>20230911</not-before>
+                <not-after>20240630</not-after>
             </use-date>
         </code>
         <code>
@@ -65218,7 +65580,7 @@
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">49281-0590-58</link-to>
             </reference>
             <use-date>
-                <not-before>20230630</not-before>
+                <not-before>20200423</not-before>
             </use-date>
         </code>
         <code>
@@ -65260,7 +65622,7 @@
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">49281-0590-58</link-to>
             </reference>
             <use-date>
-                <not-before>20230630</not-before>
+                <not-before>20200423</not-before>
             </use-date>
         </code>
         <code>
