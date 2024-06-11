@@ -2111,11 +2111,11 @@ public class IncomingMessageHandler {
       }
       testCase.setTestEventList(testEventList);
       Software software = new Software();
-      software.setServiceUrl("https://florence.immregistries.org/lonestar/forecast");
+      software.setServiceUrl("https://sabbia.westus2.cloudapp.azure.com/lonestar/forecast");
       software.setService(Service.LSVF);
       if (processingFlavorSet.contains(ProcessingFlavor.ICE)) {
         software.setServiceUrl(
-            "https://florence.immregistries.org/opencds-decision-support-service/evaluate");
+            "https://sabbia.westus2.cloudapp.azure.com//opencds-decision-support-service/evaluate");
         software.setService(Service.ICE);
       }
 

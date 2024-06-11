@@ -181,8 +181,8 @@ public class HomeServlet extends HttpServlet {
     }
 
     out.println("  <div class=\"w3-container w3-green\">");
-    out.println("    <p>IIS Sandbox v" + SoftwareVersion.VERSION + " - Current Time "
-        + sdf.format(System.currentTimeMillis()) + "</p>");
+    out.println("    <p>IIS Sandbox v" + SoftwareVersion.VERSION + " - ");
+    out.println("    <a href=\"https://aira.memberclicks.net/assets/docs/Organizational_Docs/AIRA%20Privacy%20Policy%20-%20Final%202024_.pdf\" class=\"underline\">Privacy Policy</a></p>");
     out.println("  </div>");
     out.println("  </body>");
     out.println("</html>");
