@@ -182,7 +182,8 @@ public class HomeServlet extends HttpServlet {
 
     out.println("  <div class=\"w3-container w3-green\">");
     out.println("    <p>IIS Sandbox v" + SoftwareVersion.VERSION + " - ");
-    out.println("    <a href=\"https://aira.memberclicks.net/assets/docs/Organizational_Docs/AIRA%20Privacy%20Policy%20-%20Final%202024_.pdf\" class=\"underline\">Privacy Policy</a></p>");
+    out.println("    <a href=\"https://aira.memberclicks.net/assets/docs/Organizational_Docs/AIRA%20Privacy%20Policy%20-%20Final%202024_.pdf\" class=\"underline\">AIRA Privacy Policy</a> - ");
+    out.println("    <a href=\"https://aira.memberclicks.net/assets/docs/Organizational_Docs/AIRA%20Terms%20of%20Use%20-%20Final%202024_.pdf\" class=\"underline\">AIRA Terms and Conditions of Use</a></p>");
     out.println("  </div>");
     out.println("  </body>");
     out.println("</html>");
