@@ -9,6 +9,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -1595,7 +1596,13 @@ public class IncomingMessageHandler {
         // RXA-20
         sb.append("|NA");
         sb.append("\r");
+        HashSet<String> cvxAddedSet = new HashSet<String>();
         for (ForecastActual forecastActual : forecastActualList) {
+          String cvx = forecastActual.getVaccineGroup().getVaccineCvx();
+          if (cvxAddedSet.contains(cvx)) {
+            continue;
+          }
+          cvxAddedSet.add(cvx);
           obsSubId++;
           {
             obxSetId++;
@@ -2111,7 +2118,7 @@ public class IncomingMessageHandler {
       }
       testCase.setTestEventList(testEventList);
       Software software = new Software();
-      software.setServiceUrl("https://florence.immregistries.org/lonestar/forecast");
+      software.setServiceUrl("https://sabbia.westus2.cloudapp.azure.com/lonestar/forecast");
       software.setService(Service.LSVF);
       if (processingFlavorSet.contains(ProcessingFlavor.ICE)) {
         software.setServiceUrl(
