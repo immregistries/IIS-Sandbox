@@ -2122,7 +2122,7 @@ public class IncomingMessageHandler {
       software.setService(Service.LSVF);
       if (processingFlavorSet.contains(ProcessingFlavor.ICE)) {
         software.setServiceUrl(
-            "https://florence.immregistries.org/opencds-decision-support-service/evaluate");
+            "https://sabbia.westus2.cloudapp.azure.com//opencds-decision-support-service/evaluate");
         software.setService(Service.ICE);
       }
 

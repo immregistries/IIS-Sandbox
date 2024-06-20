@@ -60,7 +60,7 @@ public class FhirTestServlet extends HttpServlet {
   private static final String FORMAT_JSON = "JSON";
   private static final String FORMAT_XML = "XML";
 
-  private static final String BASE_URL = "https://florence.immregistries.org/iis-sandbox/fhir";
+  private static final String BASE_URL = "https://sabbia.westus2.cloudapp.azure.com/iis-sandbox/fhir";
 
   @Override
   protected void doPost(HttpServletRequest req, HttpServletResponse resp)
