@@ -4889,6 +4889,14 @@
             </use-date>
         </code>
         <code>
+            <value>90683</value>
+            <label>Respiratory syncytial virus vaccine, mRNA lipid nanoparticles, for intramuscular use</label>
+            <description></description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+        </code>
+        <code>
             <value>90679</value>
             <label>Respiratory syncytial virus vaccine, preF, recombinant, subunit, adjuvanted, for intramuscular use</label>
             <description>CPT Code to be Used for Arexvy</description>
@@ -21830,6 +21838,49 @@
             </code-status>
         </code>
         <code>
+            <value>80777-0345-01</value>
+            <label>mRESVIA</label>
+            <description>Moderna US, INC. - Respiratory Syncytial Virus Vaccine (RSV), mRNA</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">326</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">MOD</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">80777-0345-96</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">80777-0345-90</link-to>
+            </reference>
+            <use-date>
+                <not-before>20240531</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>80777-345-01</value>
+            <label>mRESVIA</label>
+            <description>Moderna US, INC. - Respiratory Syncytial Virus Vaccine (RSV), mRNA</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>80777-0345-01</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20240611</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>80777034501</value>
+            <label>mRESVIA</label>
+            <description>Moderna US, INC. - Respiratory Syncytial Virus Vaccine (RSV), mRNA</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>80777-0345-01</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20240611</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
             <value>80631-0102-01</value>
             <label>NOVAVAX COVID-19 Vaccine, Adjuvanted</label>
             <description>Novavax, Inc. - SARS-COV-2 (COVID-19) vaccine, Subunit, recombinant spike protein-nanoparticle+Matrix-M1 Adjuvant, preservative free, 0.5mL per dose</description>
@@ -25641,6 +25692,48 @@
             </code-status>
         </code>
         <code>
+            <value>50632-0015-02</value>
+            <label>Vaxchora</label>
+            <description>Bavarian Nordic A/S - Cholera, live attenuated, oral</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">174</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">BN</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">50632-0015-02</link-to>
+            </reference>
+            <use-date>
+                <not-before>20240601</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>50632-015-02</value>
+            <label>Vaxchora</label>
+            <description>Bavarian Nordic A/S - Cholera, live attenuated, oral</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>50632-0015-02</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20240614</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>50632001502</value>
+            <label>Vaxchora</label>
+            <description>Bavarian Nordic A/S - Cholera, live attenuated, oral</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>50632-0015-02</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20240614</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
             <value>63361-0245-58</value>
             <label>VAXELIS</label>
             <description>MCM Vaccine Co - Diphtheria and Tetanus Toxoids and Acellular Pertussis Adsorbed, Inactivated Poliovirus, Haemophilus b Conjugate (Meningococcal Protein Conjugate) and Hepatitis B (Recombinant) Vaccine (DTaP-IPV-Hib-HepB dose for 6 wks through 4th yr)</description>
@@ -26332,6 +26425,8 @@
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">70460-0002-01</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">70460-0001-01</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">70460-0004-01</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">50632-0015-02</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">50632-0015-02</link-to>
             </reference>
             <use-date>
                 <not-before>20160617</not-before>
@@ -29825,6 +29920,51 @@
             <test-age>2 years</test-age>
         </code>
         <code>
+            <value>323</value>
+            <label>Influenza-avian, H5, unspecified formulation</label>
+            <description>Influenza-avian, H5, unspecified formulation Notes: Unspecified code H5xx vaccines to be used when specific formulation is unknown - for vaccines administered starting 2024</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINE_GROUP">FLU-Avian-H5</link-to>
+            </reference>
+            <use-date>
+                <not-after>20240606</not-after>
+            </use-date>
+            <concept-type>vaccine</concept-type>
+        </code>
+        <code>
+            <value>321</value>
+            <label>Influenza-avian, H5N8, monovalent, PF</label>
+            <description>Influenza-avian, H5N8, viral-vector, monovalent, injectable, preservative free Notes: Novel Bird Flu H5N8 Vaccine 2024</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINE_GROUP">FLU-Avian-H5</link-to>
+            </reference>
+            <use-date>
+                <not-before>20240612</not-before>
+            </use-date>
+            <concept-type>vaccine</concept-type>
+        </code>
+        <code>
+            <value>322</value>
+            <label>Influenza-avian, H5N8, monovalent, preservative</label>
+            <description>Influenza-avian, H5N8, viral-vector, monovalent, injectable, contains preservative Notes: Novel Bird Flu H5N8 Vaccine 2024</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINE_GROUP">FLU-Avian-H5</link-to>
+            </reference>
+            <use-date>
+                <not-before>20240612</not-before>
+            </use-date>
+            <concept-type>vaccine</concept-type>
+        </code>
+        <code>
             <value>10</value>
             <label>IPV</label>
             <description>poliovirus vaccine, inactivated</description>
@@ -31013,6 +31153,18 @@
             <test-age>2 months</test-age>
         </code>
         <code>
+            <value>324</value>
+            <label>Poliovirus, inactivated, fractional-dose (fIPV)</label>
+            <description>Poliovirus, inactivated, fractional-dose (fIPV) Notes: Non-US polio vaccine administered since 2016</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINE_GROUP">POLIO</link-to>
+            </reference>
+            <concept-type>foreign vaccine</concept-type>
+        </code>
+        <code>
             <value>70</value>
             <label>Q fever</label>
             <description>Q fever vaccine</description>
@@ -31504,6 +31656,25 @@
                 <not-before-month>7</not-before-month>
                 <not-after-month>24</not-after-month>
             </use-age>
+            <concept-type>vaccine</concept-type>
+        </code>
+        <code>
+            <value>326</value>
+            <label>RSV, mRNA, injectable, PF</label>
+            <description>Respiratory syncytial virus (RSV), mRNA, injectable, preservative free Notes: mRNA RSV vaccine 2024</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINE_GROUP">RSV</link-to>
+                <link-to codeset="VACCINATION_TRADE_NAME">mRESVIA</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">80777-0345-01</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">80777-0345-90</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">80777-0345-96</link-to>
+            </reference>
+            <use-date>
+                <not-before>20240605</not-before>
+            </use-date>
             <concept-type>vaccine</concept-type>
         </code>
         <code>
@@ -32880,6 +33051,9 @@
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">50632-0001-01</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">50632-0001-02</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">50632-0001-03</link-to>
+                <link-to codeset="VACCINATION_TRADE_NAME">VAXCHORA</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">50632-0015-02</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">50632-0015-02</link-to>
             </reference>
             <use-date>
                 <not-before>20200717</not-before>
@@ -33862,6 +34036,10 @@
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">80777-0102-95</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">80777-0102-93</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">80777-0102-96</link-to>
+                <link-to codeset="VACCINATION_TRADE_NAME">mRESVIA</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">80777-0345-01</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">80777-0345-90</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">80777-0345-96</link-to>
             </reference>
             <use-date>
                 <not-before>20201001</not-before>
@@ -35464,6 +35642,15 @@
             </reference>
         </code>
         <code>
+            <value>FLU-Avian-H5</value>
+            <label>Influenza-avian, H5N8, monovalent, PF</label>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">323</link-to>
+                <link-to codeset="VACCINATION_CVX_CODE">321</link-to>
+                <link-to codeset="VACCINATION_CVX_CODE">322</link-to>
+            </reference>
+        </code>
+        <code>
             <value>Japanese encephalitis</value>
             <label>Japanese Encephalitis</label>
             <description></description>
@@ -35611,6 +35798,7 @@
                 <link-to codeset="VACCINATION_CVX_CODE">10</link-to>
                 <link-to codeset="VACCINATION_CVX_CODE">02</link-to>
                 <link-to codeset="VACCINATION_CVX_CODE">195</link-to>
+                <link-to codeset="VACCINATION_CVX_CODE">324</link-to>
             </reference>
         </code>
         <code>
@@ -35653,6 +35841,7 @@
                 <link-to codeset="VACCINATION_CVX_CODE">307</link-to>
                 <link-to codeset="VACCINATION_CVX_CODE">315</link-to>
                 <link-to codeset="VACCINATION_CVX_CODE">314</link-to>
+                <link-to codeset="VACCINATION_CVX_CODE">326</link-to>
             </reference>
         </code>
         <code>
@@ -35997,9 +36186,11 @@
             <reference>
                 <link-to codeset="VACCINATION_CVX_CODE">174</link-to>
                 <link-to codeset="VACCINATION_MANUFACTURER_CODE">PAX</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">BN</link-to>
             </reference>
             <use-date>
                 <not-before>20160617</not-before>
+                <not-after>20240612</not-after>
             </use-date>
         </code>
         <code>
@@ -37675,7 +37866,7 @@
                 <link-to codeset="VACCINATION_MANUFACTURER_CODE">PMC</link-to>
             </reference>
             <use-date>
-                <not-before>20240516</not-before>
+                <not-before>20240517</not-before>
             </use-date>
         </code>
         <code>
@@ -37852,6 +38043,7 @@
             </reference>
             <use-date>
                 <not-before>20100528</not-before>
+                <not-after>20240605</not-after>
             </use-date>
         </code>
         <code>
@@ -38186,6 +38378,20 @@
             </reference>
             <use-date>
                 <not-before>20230721</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>mRESVIA</value>
+            <label>RSV, mRNA, injectable, PF</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">326</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">MOD</link-to>
+            </reference>
+            <use-date>
+                <not-before>20240606</not-before>
             </use-date>
         </code>
         <code>
@@ -66134,6 +66340,90 @@
             </code-status>
         </code>
         <code>
+            <value>80777-0345-90</value>
+            <label>mRESVIA</label>
+            <description>Moderna US, INC. - Respiratory Syncytial Virus Vaccine (RSV), mRNA</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">326</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">MOD</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">80777-0345-01</link-to>
+            </reference>
+            <use-date>
+                <not-before>20240531</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>80777-345-90</value>
+            <label>mRESVIA</label>
+            <description>Moderna US, INC. - Respiratory Syncytial Virus Vaccine (RSV), mRNA</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>80777-0345-90</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20240611</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>80777034590</value>
+            <label>mRESVIA</label>
+            <description>Moderna US, INC. - Respiratory Syncytial Virus Vaccine (RSV), mRNA</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>80777-0345-90</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20240611</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>80777-0345-96</value>
+            <label>mRESVIA</label>
+            <description>Moderna US, INC. - Respiratory Syncytial Virus Vaccine (RSV), mRNA</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">326</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">MOD</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">80777-0345-01</link-to>
+            </reference>
+            <use-date>
+                <not-before>20240531</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>80777-345-96</value>
+            <label>mRESVIA</label>
+            <description>Moderna US, INC. - Respiratory Syncytial Virus Vaccine (RSV), mRNA</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>80777-0345-96</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20240611</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>80777034596</value>
+            <label>mRESVIA</label>
+            <description>Moderna US, INC. - Respiratory Syncytial Virus Vaccine (RSV), mRNA</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>80777-0345-96</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20240611</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
             <value>80631-0102-10</value>
             <label>NOVAVAX COVID-19 Vaccine, Adjuvanted</label>
             <description>Novavax, Inc. - SARS-COV-2 (COVID-19) vaccine, Subunit, recombinant spike protein-nanoparticle+Matrix-M1 Adjuvant, preservative free, 0.5mL per dose</description>
@@ -71001,6 +71291,48 @@
                     <new-code-value>70460-0004-01</new-code-value>
                     <reason>Use 11-digit format with dashes</reason>
                     <effective-date>20190925</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>50632-0015-02</value>
+            <label>Vaxchora</label>
+            <description>Bavarian Nordic A/S - Cholera, live attenuated, oral</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">174</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">BN</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">50632-0015-02</link-to>
+            </reference>
+            <use-date>
+                <not-before>20240601</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>50632-015-02</value>
+            <label>Vaxchora</label>
+            <description>Bavarian Nordic A/S - Cholera, live attenuated, oral</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>50632-0015-02</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20240611</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>50632001502</value>
+            <label>Vaxchora</label>
+            <description>Bavarian Nordic A/S - Cholera, live attenuated, oral</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>50632-0015-02</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20240611</effective-date>
                 </deprecated>
             </code-status>
         </code>
