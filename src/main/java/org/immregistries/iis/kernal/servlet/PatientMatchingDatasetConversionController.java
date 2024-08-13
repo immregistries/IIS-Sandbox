@@ -185,11 +185,14 @@ public class PatientMatchingDatasetConversionController {
 		if (patient.hasName()) {
 			org.hl7.fhir.r5.model.HumanName humanName = patient.getNameFirstRep();
 			mismo.setNameFirst(humanName.getGivenAsSingleString());
+
+			/**
+			 * Checking if hyphenated last name
+			 */
 			String[] family = humanName.getFamily().split("-");
 			if (family.length > 1) {
 				mismo.setNameLast(family[0]);
 				mismo.setNameLastHyph(family[1]);
-
 			} else {
 				mismo.setNameLast(humanName.getFamily());
 			}

@@ -8,7 +8,7 @@ import org.immregistries.smm.tester.manager.HL7Reader;
 
 import java.util.*;
 
-public interface IIncomingMessageHandler<Organization extends IBaseResource> {
+public interface IIncomingMessageHandler {
 	public String process(String message, Tenant tenant, String facilityName);
 
 

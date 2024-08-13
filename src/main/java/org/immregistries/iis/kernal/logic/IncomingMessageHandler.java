@@ -32,7 +32,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-public abstract class IncomingMessageHandler<Organization extends IBaseResource> implements IIncomingMessageHandler<Organization> {
+public abstract class IncomingMessageHandler implements IIncomingMessageHandler {
 
   	protected final Logger logger = LoggerFactory.getLogger(IncomingMessageHandler.class);
   	@Autowired
@@ -727,16 +727,5 @@ public abstract class IncomingMessageHandler<Organization extends IBaseResource>
   }
 
   protected static final Random random = new Random();
-  private static final char[] ID_CHARS =
-      {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T',
-          'U', 'V', 'W', 'X', 'Y', 'Z', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
 
-
-  public String generateId() {
-    StringBuilder patientRegistryId = new StringBuilder();
-    for (int i = 0; i < 12; i++) {
-      patientRegistryId.append(ID_CHARS[random.nextInt(ID_CHARS.length)]);
-    }
-    return patientRegistryId.toString();
-  }
 }

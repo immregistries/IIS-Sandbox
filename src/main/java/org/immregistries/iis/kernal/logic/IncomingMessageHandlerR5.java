@@ -32,7 +32,7 @@ import static org.immregistries.iis.kernal.InternalClient.FhirRequester.GOLDEN_S
 
 @org.springframework.stereotype.Service()
 @Conditional(OnR5Condition.class)
-public class IncomingMessageHandlerR5 extends IncomingMessageHandler<Organization> {
+public class IncomingMessageHandlerR5 extends IncomingMessageHandler {
 	private static final double MINIMAL_MATCHING_SCORE = 0.9;
 
 	public String process(String message, Tenant tenant, String sendingFacilityName) {
@@ -67,7 +67,7 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler<Organizatio
 			if (sendingOrganization == null) {
 				sendingOrganization = processManagingOrganization(reader);
 			}
-			logger.info("ORGANIZATION {} {}", sendingOrganization.getId(), sendingOrganization.getName());
+//			logger.info("ORGANIZATION {} {}", sendingOrganization.getId(), sendingOrganization.getName());
 			switch (messageType) {
 				case "VXU":
 					responseMessage = processVXU(tenant, reader, message, sendingOrganization);
@@ -1737,30 +1737,6 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler<Organizatio
 
 		}
 		return vaccinationMasterList;
-	}
-
-	public String generatePatientExternalLink() {
-		IGenericClient fhirClient = getFhirClient();
-		boolean keepLooking = true;
-		int count = 0;
-		while (keepLooking) {
-			count++;
-			if (count > 1000) {
-				throw new RuntimeException("Unable to get a new id, tried 1000 times!");
-			}
-			String patientExternalLink = generateId();
-			try {
-				Bundle bundle = fhirClient.search().forResource(Patient.class)
-					.where(Patient.IDENTIFIER.exactly().code(patientExternalLink)).returnBundle(Bundle.class).execute();
-				if (!bundle.hasEntry()) {
-					return patientExternalLink;
-				}
-			} catch (ResourceNotFoundException e) {
-				return patientExternalLink;
-				// we found a unique id!
-			}
-		}
-		return null;
 	}
 
 	private Organization processSendingOrganization(HL7Reader reader) {

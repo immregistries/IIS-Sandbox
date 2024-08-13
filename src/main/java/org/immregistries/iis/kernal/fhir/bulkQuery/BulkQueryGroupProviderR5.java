@@ -322,10 +322,11 @@ public class BulkQueryGroupProviderR5 extends GroupResourceProvider {
 		if (memberId != null) {
 			logger.info("PATIENT ADD identifier {}", memberId.getValue());
 //			String patientId = identifierSolverInterceptor.solvePatientIdentifier(ServletHelper.requestDetailsWithPartitionName(), memberId);
-			String patientId = patientIFhirResourceDao.search(new SearchParameterMap("identifier", new TokenParam(memberId.getValue())),theRequestDetails).getAllResourceIds().get(0);
-			if (StringUtils.isBlank(patientId)) {
-				throw new InvalidRequestException("Patient with identifier " + memberId.getValue() + " is unknown");
-			}
+			IBundleProvider iBundleProvider = patientIFhirResourceDao.search(new SearchParameterMap("identifier", new TokenParam(memberId.getValue())),theRequestDetails);
+			if (iBundleProvider.isEmpty()) {
+				throw new InvalidRequestException("Patient with identifier " + memberId.getValue() + " is unknown"); // TODO proper exception
+ 			}
+			String patientId = iBundleProvider.getAllResourceIds().get(0);
 			Reference reference = new Reference("Patient/" + patientId).setIdentifier(memberId);
 			memberComponent = group.getMember().stream()
 				.filter(member -> reference.getReference().equals(member.getEntity().getReference()) || (memberId.getValue().equals(member.getEntity().getIdentifier().getValue()) && memberId.getSystem().equals(member.getEntity().getIdentifier().getSystem())))

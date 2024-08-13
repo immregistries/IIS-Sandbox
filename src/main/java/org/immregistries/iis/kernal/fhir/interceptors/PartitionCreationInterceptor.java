@@ -51,12 +51,18 @@ public class PartitionCreationInterceptor extends RequestTenantPartitionIntercep
 	public static final String PARTITION_NAME_SEPARATOR = "-"; // TEMP TODO find good url structure
 
 
-	@Hook(Pointcut.STORAGE_PARTITION_IDENTIFY_READ)
+	@Hook(value = Pointcut.SERVER_INCOMING_REQUEST_POST_PROCESSED)
+	public boolean partitionIdentifyPostProcessed(RequestDetails theRequestDetails) {
+		extractPartitionIdFromRequest(theRequestDetails);
+		return true;
+	}
+
+	@Hook(value = Pointcut.STORAGE_PARTITION_IDENTIFY_READ, order = -1000)
 	public RequestPartitionId partitionIdentifyRead(RequestDetails theRequestDetails) {
 		return extractPartitionIdFromRequest(theRequestDetails);
 	}
 
-	@Hook(Pointcut.STORAGE_PARTITION_IDENTIFY_CREATE)
+	@Hook(value = Pointcut.STORAGE_PARTITION_IDENTIFY_CREATE, order = -1000)
 	public RequestPartitionId partitionIdentifyCreate(RequestDetails theRequestDetails) {
 		return extractPartitionIdFromRequest(theRequestDetails);
 	}

@@ -72,7 +72,9 @@ public class ImmunizationMapperR5 implements ImmunizationMapper<Immunization> {
 
 		vr.setVaccineMvxCode(i.getManufacturer().getReference().getIdentifier().getValue());
 
-		vr.setAdministeredAmount(i.getDoseQuantity().getValue().toString());
+		if (i.getDoseQuantity().hasValue()) {
+			vr.setAdministeredAmount(i.getDoseQuantity().getValue().toString());
+		}
 
 		vr.setInformationSource(i.getInformationSource().getConcept().getCode(INFORMATION_SOURCE));
 		vr.setUpdatedDate(new Date());
@@ -188,7 +190,9 @@ public class ImmunizationMapperR5 implements ImmunizationMapper<Immunization> {
 	  }
 	  i.setManufacturer(MappingHelper.getFhirCodeableReferenceR5(MappingHelper.ORGANIZATION, MVX, vr.getVaccineMvxCode()));
 
-	  i.setDoseQuantity(new Quantity().setValue(new BigDecimal(vr.getAdministeredAmount())));
+	  if (StringUtils.isNotBlank(vr.getAdministeredAmount())) {
+		  i.setDoseQuantity(new Quantity().setValue(new BigDecimal(vr.getAdministeredAmount())));
+	  }
 
 	  i.setInformationSource(new CodeableReference(new CodeableConcept(new Coding().setSystem(INFORMATION_SOURCE).setCode(vr.getInformationSource())))); // TODO change system name
 	  i.setLotNumber(vr.getLotnumber());
