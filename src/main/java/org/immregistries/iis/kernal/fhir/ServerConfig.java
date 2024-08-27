@@ -1,6 +1,5 @@
 package org.immregistries.iis.kernal.fhir;
 
-import ca.uhn.fhir.batch2.jobs.export.BulkDataExportProvider;
 import ca.uhn.fhir.batch2.jobs.imprt.BulkDataImportProvider;
 import ca.uhn.fhir.batch2.jobs.reindex.ReindexProvider;
 import ca.uhn.fhir.context.ConfigurationException;
@@ -43,9 +42,8 @@ import ca.uhn.fhir.rest.server.util.ISearchParamRegistry;
 import ca.uhn.fhir.validation.IValidatorModule;
 import ca.uhn.fhir.validation.ResultSeverityEnum;
 import com.google.common.base.Strings;
-import org.immregistries.iis.kernal.fhir.mdm.MdmCustomProviderLoader;
+import org.immregistries.iis.kernal.fhir.ips.IpsConfig;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -58,7 +56,8 @@ import java.util.Optional;
 @Configuration
 @Import(
 	{ThreadPoolFactoryConfig.class,
-		StarterJpaConfig.class
+		StarterJpaConfig.class,
+		IpsConfig.class
 	}
 )
 public class ServerConfig {
@@ -76,6 +75,7 @@ public class ServerConfig {
 												  Optional<IFhirResourceDao<org.hl7.fhir.r4.model.Group>> fhirResourceGroupDaoR4,
 												  Optional<IFhirResourceDao<org.hl7.fhir.r5.model.Group>> fhirResourceGroupDaoR5,
 												  Optional<GroupAuthorityInterceptor> groupAuthorityInterceptor,
+												  IpsOperationProvider ipsOperationProvider,
 												  SessionAuthorizationInterceptor sessionAuthorizationInterceptor) {
 		RestfulServer fhirServer = new RestfulServer(fhirSystemDao.getContext());
 		List<String> supportedResourceTypes = appProperties.getSupported_resource_types();
@@ -101,6 +101,7 @@ public class ServerConfig {
 		 * CUSTOM PROVIDERS HERE
 		 */
 		fhirServer.registerProviders(resourceProviderFactory.createProviders());
+		fhirServer.registerProvider(ipsOperationProvider);
 		fhirServer.registerProvider(jpaSystemProvider);
 		fhirServer.setServerConformanceProvider(calculateConformanceProvider(fhirSystemDao, fhirServer, jpaStorageSettings, searchParamRegistry, theValidationSupport));
 

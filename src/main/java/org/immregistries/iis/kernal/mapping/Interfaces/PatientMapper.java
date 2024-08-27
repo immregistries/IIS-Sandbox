@@ -1,5 +1,6 @@
 package org.immregistries.iis.kernal.mapping.Interfaces;
 
+import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.model.PatientReported;
 
@@ -31,6 +32,7 @@ public interface PatientMapper<Patient> {
 	PatientReported getReported(Patient patient);
 
 	PatientMaster getMaster(Patient patient);
+//	PatientMaster getMaster(IBaseResource patient);
 
 	/**
 	 * Consvert local model patient information to FHIR Resource

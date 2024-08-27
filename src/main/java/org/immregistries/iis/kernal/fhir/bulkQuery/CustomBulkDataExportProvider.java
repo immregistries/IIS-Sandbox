@@ -25,7 +25,6 @@ import ca.uhn.fhir.util.OperationOutcomeUtil;
 import org.hl7.fhir.instance.model.api.IBaseOperationOutcome;
 import org.hl7.fhir.instance.model.api.IIdType;
 import org.hl7.fhir.instance.model.api.IPrimitiveType;
-import org.hl7.fhir.r5.model.Binary;
 import org.hl7.fhir.r5.model.IdType;
 import org.immregistries.iis.kernal.fhir.interceptors.PartitionCreationInterceptor;
 import org.slf4j.Logger;
@@ -62,8 +61,10 @@ public class CustomBulkDataExportProvider extends BulkDataExportProvider {
 	@Autowired
 	private DaoRegistry myDaoRegistry;
 
-	@Autowired
-	private IFhirResourceDao<Binary> binaryDao;
+//	@Autowired(required = false)
+//	private IFhirResourceDao<Binary> binaryDao;
+//	@Autowired(required = false)
+//	private IFhirResourceDao<Binary> binaryDao;
 	@Autowired
 	private PartitionCreationInterceptor partitionCreationInterceptor;
 

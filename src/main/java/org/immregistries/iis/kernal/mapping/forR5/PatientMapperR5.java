@@ -4,6 +4,7 @@ package org.immregistries.iis.kernal.mapping.forR5;
 import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
 import ca.uhn.fhir.rest.param.ReferenceParam;
 import org.apache.commons.lang3.StringUtils;
+import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.fhir.annotations.OnR5Condition;
@@ -219,6 +220,11 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 		fillFromFhirResource(patientReported,patient);
 		return patientReported;
 	}
+
+	public PatientMaster getMaster(IBaseResource iBaseResource) {
+		return getMaster((Patient) iBaseResource);
+	}
+
 	public PatientMaster getMaster(Patient patient) {
 		PatientMaster patientMaster = new PatientMaster();
 		fillFromFhirResource(patientMaster,patient);

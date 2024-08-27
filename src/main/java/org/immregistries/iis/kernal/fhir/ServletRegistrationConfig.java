@@ -1,5 +1,11 @@
 package org.immregistries.iis.kernal.fhir;
 
+import ca.uhn.fhir.context.FhirContext;
+import ca.uhn.fhir.jpa.api.dao.DaoRegistry;
+import ca.uhn.fhir.jpa.ips.generator.IIpsGeneratorSvc;
+import ca.uhn.fhir.jpa.ips.generator.IpsGeneratorSvcImpl;
+import ca.uhn.fhir.jpa.ips.provider.IpsOperationProvider;
+import ca.uhn.fhir.jpa.ips.strategy.DefaultIpsGenerationStrategy;
 import org.immregistries.iis.kernal.fhir.annotations.OnR5Condition;
 import org.immregistries.iis.kernal.servlet.*;
 import org.springframework.beans.factory.annotation.Autowired;

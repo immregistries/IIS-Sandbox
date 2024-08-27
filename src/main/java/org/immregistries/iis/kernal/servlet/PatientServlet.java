@@ -10,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 import org.hl7.fhir.r5.model.*;
+import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
