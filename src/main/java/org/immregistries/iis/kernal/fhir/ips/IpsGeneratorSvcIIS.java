@@ -352,18 +352,36 @@ public class IpsGeneratorSvcIIS extends IpsGeneratorSvcImpl {
 		ResourceInclusionCollection theGlobalResourceCollection) {
 		CustomThymeleafNarrativeGenerator generator = newNarrativeGenerator(theGlobalResourceCollection);
 
-		org.hl7.fhir.r4.model.Bundle bundle = new org.hl7.fhir.r4.model.Bundle();
-		for (IBaseResource resource : theResources.getResources()) {
-			BundleEntrySearchModeEnum searchMode = ResourceMetadataKeyEnum.ENTRY_SEARCH_MODE.get(resource);
-			if (searchMode == BundleEntrySearchModeEnum.MATCH) {
-				bundle.addEntry().setResource((org.hl7.fhir.r4.model.Resource) resource);
+		if (myFhirContext.getVersion().getVersion().equals(FhirVersionEnum.R4)) {
+			org.hl7.fhir.r4.model.Bundle bundle = new org.hl7.fhir.r4.model.Bundle();
+			for (IBaseResource resource : theResources.getResources()) {
+				BundleEntrySearchModeEnum searchMode = ResourceMetadataKeyEnum.ENTRY_SEARCH_MODE.get(resource);
+				if (searchMode == BundleEntrySearchModeEnum.MATCH) {
+					bundle.addEntry().setResource((org.hl7.fhir.r4.model.Resource) resource);
+				}
 			}
-		}
-		String profile = theSection.getProfile();
-		bundle.getMeta().addProfile(profile);
+			String profile = theSection.getProfile();
+			bundle.getMeta().addProfile(profile);
 
-		// Generate the narrative
-		return generator.generateResourceNarrative(myFhirContext, bundle);
+			// Generate the narrative
+			return generator.generateResourceNarrative(myFhirContext, bundle);
+		} else if (myFhirContext.getVersion().getVersion().equals(FhirVersionEnum.R5)) {
+			org.hl7.fhir.r5.model.Bundle bundle = new org.hl7.fhir.r5.model.Bundle();
+			for (IBaseResource resource : theResources.getResources()) {
+				BundleEntrySearchModeEnum searchMode = ResourceMetadataKeyEnum.ENTRY_SEARCH_MODE.get(resource);
+				if (searchMode == BundleEntrySearchModeEnum.MATCH) {
+					bundle.addEntry().setResource((org.hl7.fhir.r5.model.Resource) resource);
+				}
+			}
+			String profile = theSection.getProfile();
+			bundle.getMeta().addProfile(profile);
+
+			// Generate the narrative
+			return generator.generateResourceNarrative(myFhirContext, bundle);
+		} else {
+			return "";
+		}
+
 	}
 
 	@Nonnull

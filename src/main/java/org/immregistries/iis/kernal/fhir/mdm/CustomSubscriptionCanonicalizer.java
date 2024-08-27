@@ -42,7 +42,7 @@ import static java.util.stream.Collectors.toList;
 public class CustomSubscriptionCanonicalizer extends SubscriptionCanonicalizer {
 	private static final Logger ourLog = LoggerFactory.getLogger(SubscriptionCanonicalizer.class);
 
-	final FhirContext myFhirContext;
+	private final FhirContext myFhirContext;
 	@Autowired
 	public CustomSubscriptionCanonicalizer(FhirContext theFhirContext) {
 		super(theFhirContext);

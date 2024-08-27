@@ -52,7 +52,7 @@ public class RecommendationServlet extends PatientServlet {
 			throw new AuthenticationCredentialsNotFoundException("");
 		}
 		IGenericClient fhirClient = repositoryClientFactory.newGenericClient(req);
-		Patient patient = getPatientFromParameter(req, fhirClient);
+		Patient patient = (Patient) getPatientFromParameter(req, fhirClient);
 
 		if (patient != null) {
 			Bundle recommendationBundle = fhirClient.search().forResource(ImmunizationRecommendation.class)
@@ -124,7 +124,7 @@ public class RecommendationServlet extends PatientServlet {
 			if (recommendation != null) {
 				patient = fhirClient.read().resource(Patient.class).withId(recommendation.getPatient().getReference()).execute();
 			} else {
-				patient = getPatientFromParameter(req, fhirClient);
+				patient = (Patient) getPatientFromParameter(req, fhirClient);
 			}
 
 			if (patient != null) {

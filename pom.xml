@@ -814,9 +814,19 @@
             </properties>
         </profile>
         <profile>
-            <id>dev</id>
+            <id>dev-r4</id>
             <properties>
-                <spring.profiles.active>dev</spring.profiles.active>
+                <spring.profiles.active>dev-r4</spring.profiles.active>
+                <IIS_MYSQL_URL>jdbc:mysql://localhost/iis_alongside_jpa</IIS_MYSQL_URL>
+<!--                <mysql.hibernate.connection.url>jdbc:mysql://localhost/iis_alongside_jpa</mysql.hibernate.connection.url>-->
+                <jpa.properties.hibernate.dialect>ca.uhn.fhir.jpa.model.dialect.HapiFhirH2Dialect</jpa.properties.hibernate.dialect>
+                <maven.test.skip>true</maven.test.skip>
+            </properties>
+        </profile>
+        <profile>
+            <id>dev-r5</id>
+            <properties>
+                <spring.profiles.active>dev-r5</spring.profiles.active>
                 <IIS_MYSQL_URL>jdbc:mysql://localhost/iis_alongside_jpa</IIS_MYSQL_URL>
 <!--                <mysql.hibernate.connection.url>jdbc:mysql://localhost/iis_alongside_jpa</mysql.hibernate.connection.url>-->
                 <jpa.properties.hibernate.dialect>ca.uhn.fhir.jpa.model.dialect.HapiFhirH2Dialect</jpa.properties.hibernate.dialect>

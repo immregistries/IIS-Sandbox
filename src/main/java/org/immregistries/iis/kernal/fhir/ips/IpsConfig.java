@@ -19,7 +19,7 @@ public class IpsConfig {
 	@Bean
 	@Conditional(OnR4Condition.class)
 	public IIpsGenerationStrategy ipsGenerationStrategyR4() {
-		return new DefaultIpsGenerationStrategy();
+		return new IpsGenerationStrategyR4();
 	}
 
 	@Bean
@@ -30,13 +30,11 @@ public class IpsConfig {
 
 	@Bean
 	public IpsGeneratorSvcImpl ipsGeneratorSvc(FhirContext fhirContext, IIpsGenerationStrategy ipsGenerationStrategy,DaoRegistry daoRegistry) {
-		IpsGeneratorSvcImpl ipsGeneratorSvc = new IpsGeneratorSvcIIS(fhirContext, ipsGenerationStrategy, daoRegistry);
-		return ipsGeneratorSvc;
+		return new IpsGeneratorSvcIIS(fhirContext, ipsGenerationStrategy, daoRegistry);
 	}
 
 	@Bean
 	public IpsOperationProvider ipsOperationProvider(IIpsGeneratorSvc iIpsGeneratorSvc) {
-		IpsOperationProvider ipsOperationProvider = new IpsOperationProvider(iIpsGeneratorSvc);
-		return ipsOperationProvider;
+		return new IpsOperationProvider(iIpsGeneratorSvc);
 	}
 }
