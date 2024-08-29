@@ -83,8 +83,9 @@ public class IncomingMessageHandler {
     HL7Reader reader = new HL7Reader(message);
     String messageType = reader.getValue(9);
     String responseMessage;
+    Set<ProcessingFlavor> processingFlavorSet = null;
     try {
-      Set<ProcessingFlavor> processingFlavorSet = orgAccess.getOrg().getProcessingFlavorSet();
+      processingFlavorSet = orgAccess.getOrg().getProcessingFlavorSet();
       if (processingFlavorSet.contains(ProcessingFlavor.SOURSOP)) {
         String facilityId = reader.getValue(4);
         if (!facilityId.equals(orgAccess.getOrg().getOrganizationName())) {
@@ -111,7 +112,7 @@ public class IncomingMessageHandler {
       List<ProcessingException> processingExceptionList = new ArrayList<>();
       processingExceptionList.add(new ProcessingException(
           "Internal error prevented processing: " + e.getMessage(), null, 0, 0));
-      responseMessage = buildAck(reader, processingExceptionList, null);
+      responseMessage = buildAck(reader, processingExceptionList, processingFlavorSet);
     }
     return responseMessage;
   }
@@ -1972,17 +1973,31 @@ public class IncomingMessageHandler {
       sb.append("|");
       {
         String race = patientReported.getPatientRace();
-        if (!race.equals("")) {
+        // if processing flavor is PUNKIN then the race should be reported, and if it is null then it must be reported as UNK
+        if (processingFlavorSet.contains(ProcessingFlavor.PUNKIN)) {
+          CodeMap codeMap = CodeMapManager.getCodeMap();
+          Code raceCode = codeMap.getCodeForCodeset(CodesetType.PATIENT_RACE, race);
+          if (race.equals("") || raceCode == null || CodeStatusValue.getBy(raceCode.getCodeStatus()) != CodeStatusValue.VALID) {  
+            sb.append("UNK^Unknown^CDCREC");
+          }
+          else {
+            sb.append(raceCode.getValue());
+            sb.append("^");
+            sb.append(raceCode.getLabel());
+            sb.append("^CDCREC");
+          }
+        }
+        else if (!race.equals("")) {
           if (processingFlavorSet.contains(ProcessingFlavor.PITAYA)
               || processingFlavorSet.contains(ProcessingFlavor.PERSIMMON)) {
             CodeMap codeMap = CodeMapManager.getCodeMap();
             Code raceCode = codeMap.getCodeForCodeset(CodesetType.PATIENT_RACE, race);
             if (processingFlavorSet.contains(ProcessingFlavor.PITAYA) || (raceCode != null
                 && CodeStatusValue.getBy(raceCode.getCodeStatus()) != CodeStatusValue.VALID)) {
-              sb.append(raceCode);
+              sb.append(raceCode == null ? race : raceCode.getValue());
               sb.append("^");
               if (raceCode != null) {
-                sb.append(raceCode.getDescription());
+                sb.append(raceCode.getLabel());
               }
               sb.append("^CDCREC");
             }
@@ -2027,6 +2042,21 @@ public class IncomingMessageHandler {
       sb.append("|");
       {
         String ethnicity = patientReported.getPatientEthnicity();
+        // if processing flavor is PUNKIN then the race should be reported, and if it is null then it must be reported as UNK
+        if (processingFlavorSet.contains(ProcessingFlavor.PUNKIN)) {
+          CodeMap codeMap = CodeMapManager.getCodeMap();
+          Code ethnicityCode = codeMap.getCodeForCodeset(CodesetType.PATIENT_ETHNICITY, ethnicity);
+          if (ethnicity.equals("") || ethnicityCode == null || CodeStatusValue.getBy(ethnicityCode.getCodeStatus()) != CodeStatusValue.VALID) {  
+            sb.append("UNK^Unknown^CDCREC");
+          }
+          else {
+            sb.append(ethnicityCode.getValue());
+            sb.append("^");
+            sb.append(ethnicityCode.getLabel());
+            sb.append("^CDCREC");
+          }
+        }
+
         if (!ethnicity.equals("")) {
           if (processingFlavorSet.contains(ProcessingFlavor.PITAYA)
               || processingFlavorSet.contains(ProcessingFlavor.PERSIMMON)) {
@@ -2035,10 +2065,10 @@ public class IncomingMessageHandler {
                 codeMap.getCodeForCodeset(CodesetType.PATIENT_ETHNICITY, ethnicity);
             if (processingFlavorSet.contains(ProcessingFlavor.PITAYA) || (ethnicityCode != null
                 && CodeStatusValue.getBy(ethnicityCode.getCodeStatus()) != CodeStatusValue.VALID)) {
-              sb.append(ethnicityCode);
+              sb.append(ethnicityCode == null ? ethnicity : ethnicityCode.getValue());
               sb.append("^");
               if (ethnicityCode != null) {
-                sb.append(ethnicityCode.getDescription());
+                sb.append(ethnicityCode.getLabel());
               }
               sb.append("^CDCREC");
             }
@@ -2335,6 +2365,17 @@ public class IncomingMessageHandler {
       String messageType = "ACK^V04^ACK";
       String profileId = Z23_ACKNOWLEDGEMENT;
       createMSH(messageType, profileId, reader, sb, processingFlavorSet);
+    }
+
+    // if processing flavor contains MEDLAR then all the non E errors have to removed from the processing list
+    if (processingFlavorSet.contains(ProcessingFlavor.MEDLAR)) {
+      List<ProcessingException> tempProcessingExceptionList = new ArrayList<ProcessingException>();
+      for (ProcessingException pe : processingExceptionList) {
+        if (pe.isError()) {
+          tempProcessingExceptionList.add(pe);
+        }
+      }
+      processingExceptionList = tempProcessingExceptionList;
     }
 
     String sendersUniqueId = "";
