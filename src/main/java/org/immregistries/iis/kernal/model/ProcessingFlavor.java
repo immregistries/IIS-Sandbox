@@ -44,7 +44,10 @@ public enum ProcessingFlavor {
       "Patients are not returned until 0, 30, 60, or 90 seconds after they have been submitted"),
   SNAIL30("Snail30", "Patients are not returned until 30 seconds after they have been submitted"),
   SNAIL60("Snail60", "Patients are not returned until 60 seconds after they have been submitted"),
-  SNAIL90("Snail90", "Patients are not returned until 90 seconds after they have been submitted");
+  SNAIL90("Snail90", "Patients are not returned until 90 seconds after they have been submitted"),
+  PUNKIN("Punkin", "Will return unknown race and ethnicity codes in RSP if no race or ethnicity is specified"),
+  MEDLAR("Medlar", "Will only return errors but no warnings or informational error segments in ACK messages");
+
 
   private String key = "";
   private String behaviorDescription = "";
