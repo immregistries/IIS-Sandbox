@@ -10,9 +10,9 @@ public class SectionRegistryR4 extends SectionRegistry {
 	 * customization.
 	 */
 	protected void addSections() {
-//		addSectionAllergyIntolerance();
-//		addSectionMedicationSummary();
-//		addSectionProblemList();
+		addSectionAllergyIntolerance();
+		addSectionMedicationSummary();
+		addSectionProblemList();
 		addSectionImmunizations();
 //		addSectionProcedures();
 //		addSectionMedicalDevices();

@@ -171,3 +171,6 @@ Temporary Items
 **/charts/*.tgz
 /src/test/RS384.key
 /src/test/RS384.key.pub
+/data-h2/*
+/src/test/ES256.key
+/src/test/ES256.key.pub

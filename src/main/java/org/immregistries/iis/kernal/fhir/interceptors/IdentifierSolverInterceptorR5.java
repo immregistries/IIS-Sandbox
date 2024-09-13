@@ -28,14 +28,9 @@ import static org.immregistries.iis.kernal.mapping.Interfaces.PatientMapper.MRN_
 @Interceptor
 @Conditional(OnR5Condition.class)
 @Service
-public class IdentifierSolverInterceptor {
+public class IdentifierSolverInterceptorR5 {
 
-	Logger logger = LoggerFactory.getLogger(IdentifierSolverInterceptor.class);
-
-	@Autowired
-	MdmLinkDaoSvc mdmLinkDaoSvc;
-	@Autowired
-	MdmResourceDaoSvc mdmResourceDaoSvc;
+	Logger logger = LoggerFactory.getLogger(IdentifierSolverInterceptorR5.class);
 
 	@Autowired
 	IFhirResourceDao<Patient> patientDao;
@@ -95,7 +90,7 @@ public class IdentifierSolverInterceptor {
 			String id = solvePatientIdentifier(requestDetails, identifier);
 			if (StringUtils.isNotBlank(id)) {
 				logger.info("Identifier reference solved {}|{} to {} for Group", identifier.getSystem(), identifier.getValue(), id);
-				memberComponent.setEntity(new Reference("Patient/" + new IdType(id).getIdPart()));
+				memberComponent.setEntity(new Reference("Patient/" + new IdType(id).getIdPart()).setIdentifier(identifier));
 			} else {
 //				// TODO set flavor
 //				if (identifier.getSystem().equals(MRN_SYSTEM)) {

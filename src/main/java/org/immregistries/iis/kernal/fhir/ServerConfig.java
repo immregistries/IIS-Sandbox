@@ -70,7 +70,7 @@ public class ServerConfig {
 												  PartitionCreationInterceptor partitionCreationInterceptor,
 												  Optional<BulkQueryGroupProviderR5> bulkQueryGroupProviderR5,
 												  Optional<BulkQueryGroupProviderR4> bulkQueryGroupProviderR4,
-												  Optional<IdentifierSolverInterceptor> identifierSolverInterceptor,
+												  Optional<IdentifierSolverInterceptorR5> identifierSolverInterceptorR5,
 												  Optional<IdentifierSolverInterceptorR4> identifierSolverInterceptorR4,
 												  Optional<IFhirResourceDao<org.hl7.fhir.r4.model.Group>> fhirResourceGroupDaoR4,
 												  Optional<IFhirResourceDao<org.hl7.fhir.r5.model.Group>> fhirResourceGroupDaoR5,
@@ -269,8 +269,8 @@ public class ServerConfig {
 
 		// register custom interceptors
 		fhirServer.registerInterceptor(sessionAuthorizationInterceptor);
-		if (identifierSolverInterceptor.isPresent()) {
-			fhirServer.registerInterceptor(identifierSolverInterceptor.get());
+		if (identifierSolverInterceptorR5.isPresent()) {
+			fhirServer.registerInterceptor(identifierSolverInterceptorR5.get());
 		} else identifierSolverInterceptorR4.ifPresent(fhirServer::registerInterceptor);
 //		registerCustomInterceptors(fhirServer, appContext, appProperties.getCustomInterceptorClasses());
 		groupAuthorityInterceptor.ifPresent(fhirServer::registerInterceptor);

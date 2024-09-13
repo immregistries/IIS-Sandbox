@@ -1,7 +1,6 @@
 package org.immregistries.iis.kernal.fhir.bulkQuery;
 
 import ca.uhn.fhir.jpa.api.dao.IFhirResourceDao;
-import ca.uhn.fhir.jpa.api.dao.IFhirSystemDao;
 import ca.uhn.fhir.jpa.api.model.DaoMethodOutcome;
 import ca.uhn.fhir.jpa.bulk.export.model.BulkExportResponseJson;
 import ca.uhn.fhir.jpa.model.util.JpaConstants;
@@ -31,12 +30,9 @@ import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.instance.model.api.IIdType;
 import org.hl7.fhir.instance.model.api.IPrimitiveType;
 import org.hl7.fhir.r5.model.*;
-import org.immregistries.iis.kernal.InternalClient.FhirRequesterR5;
 import org.immregistries.iis.kernal.fhir.annotations.OnR5Condition;
-import org.immregistries.iis.kernal.fhir.interceptors.IdentifierSolverInterceptor;
+import org.immregistries.iis.kernal.fhir.interceptors.IdentifierSolverInterceptorR5;
 import org.immregistries.iis.kernal.fhir.interceptors.PartitionCreationInterceptor;
-import org.immregistries.iis.kernal.fhir.security.ServletHelper;
-import org.immregistries.iis.kernal.model.PatientReported;
 import org.immregistries.iis.kernal.servlet.PopServlet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,22 +52,21 @@ import java.util.Map;
 @Controller
 @Conditional(OnR5Condition.class)
 public class BulkQueryGroupProviderR5 extends GroupResourceProvider {
-	private static final String ATR_EXTENSION_URI = "http://hl7.org/fhir/us/davinci-atr/StructureDefinition/atr-any-resource-extension";
+	public static final String ATR_EXTENSION_URI = "http://hl7.org/fhir/us/davinci-atr/StructureDefinition/atr-any-resource-extension";
 	Logger logger = LoggerFactory.getLogger(BulkQueryGroupProviderR5.class);
+
 	@Autowired
 	BaseJpaResourceProviderPatient<Patient> patientProvider;
-	@Autowired
-	IFhirSystemDao fhirSystemDao;
+
 	@Autowired
 	IFhirResourceDao<Group> fhirResourceGroupDao;
 	@Autowired
 	private IFhirResourceDao<Binary> binaryDao;
 	@Autowired
-	private IdentifierSolverInterceptor identifierSolverInterceptor;
+	private IdentifierSolverInterceptorR5 identifierSolverInterceptorR5;
 	@Autowired
 	IFhirResourceDao<Patient> patientIFhirResourceDao;
-	@Autowired
-	FhirRequesterR5 fhirRequesterR5;
+
 
 	public BulkQueryGroupProviderR5() {
 		super();
@@ -418,7 +413,7 @@ public class BulkQueryGroupProviderR5 extends GroupResourceProvider {
 							|| memberId.getSystem().equals(member.getEntity().getIdentifier().getSystem()))) //TODO better conditions
 					.findFirst()
 					.orElse(group.getMember().stream().filter((member) ->
-						member.getEntity().getReference().equals(identifierSolverInterceptor.solvePatientIdentifier(theRequestDetails, memberId))
+						member.getEntity().getReference().equals(identifierSolverInterceptorR5.solvePatientIdentifier(theRequestDetails, memberId))
 					).findFirst().orElse(null)));
 
 		} else if (patientReference != null && providerReference != null) {

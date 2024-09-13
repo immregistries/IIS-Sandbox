@@ -1,13 +1,14 @@
 package org.immregistries.iis.kernal.fhir.bulkQuery;
 
 import ca.uhn.fhir.jpa.api.dao.IFhirResourceDao;
-import ca.uhn.fhir.jpa.api.dao.IFhirSystemDao;
 import ca.uhn.fhir.jpa.api.model.DaoMethodOutcome;
 import ca.uhn.fhir.jpa.bulk.export.model.BulkExportResponseJson;
 import ca.uhn.fhir.jpa.model.util.JpaConstants;
 import ca.uhn.fhir.jpa.provider.BaseJpaResourceProviderPatient;
 import ca.uhn.fhir.jpa.rp.r4.GroupResourceProvider;
+import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
 import ca.uhn.fhir.rest.api.server.SystemRequestDetails;
+import ca.uhn.fhir.rest.param.TokenParam;
 import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
 import org.immregistries.iis.kernal.fhir.annotations.OnR4Condition;
 import ca.uhn.fhir.model.api.annotation.Description;
@@ -30,6 +31,7 @@ import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.instance.model.api.IIdType;
 import org.hl7.fhir.instance.model.api.IPrimitiveType;
 import org.hl7.fhir.r4.model.*;
+import org.immregistries.iis.kernal.fhir.interceptors.IdentifierSolverInterceptorR4;
 import org.immregistries.iis.kernal.fhir.interceptors.PartitionCreationInterceptor;
 import org.immregistries.iis.kernal.servlet.PopServlet;
 import org.slf4j.Logger;
@@ -53,9 +55,13 @@ public class BulkQueryGroupProviderR4 extends GroupResourceProvider {
 	BaseJpaResourceProviderPatient<Patient> patientProvider;
 
 	@Autowired
-	IFhirSystemDao fhirSystemDao;
-	@Autowired
 	IFhirResourceDao<Group> fhirResourceGroupDao;
+
+	@Autowired
+	IFhirResourceDao<Patient> patientIFhirResourceDao;
+
+	@Autowired
+	private IdentifierSolverInterceptorR4 identifierSolverInterceptor;
 
 	@Autowired
 	private IFhirResourceDao<Binary> binaryDao;
@@ -307,36 +313,42 @@ public class BulkQueryGroupProviderR4 extends GroupResourceProvider {
 		ServletRequestDetails theRequestDetails
 	) {
 		Group group = read(theRequestDetails.getServletRequest(), theId, theRequestDetails);
-		;
+
 		Group.GroupMemberComponent memberComponent;
-		if (memberId != null && providerNpi != null) {
+		if (memberId != null) {
+			logger.info("PATIENT ADD identifier {}", memberId.getValue());
+//			String patientId = identifierSolverInterceptor.solvePatientIdentifier(ServletHelper.requestDetailsWithPartitionName(), memberId);
+			IBundleProvider iBundleProvider = patientIFhirResourceDao.search(new SearchParameterMap("identifier", new TokenParam(memberId.getValue())),theRequestDetails);
+			if (iBundleProvider.isEmpty()) {
+				throw new InvalidRequestException("Patient with identifier " + memberId.getValue() + " is unknown"); // TODO proper exception
+			}
+			String patientId = iBundleProvider.getAllResourceIds().get(0);
+			Reference reference = new Reference("Patient/" + patientId).setIdentifier(memberId);
 			memberComponent = group.getMember().stream()
-				.filter(member -> memberId.getValue().equals(member.getEntity().getIdentifier().getValue()) && memberId.getSystem().equals(member.getEntity().getIdentifier().getSystem())) //TODO better conditions
+				.filter(member -> reference.getReference().equals(member.getEntity().getReference()) || (memberId.getValue().equals(member.getEntity().getIdentifier().getValue()) && memberId.getSystem().equals(member.getEntity().getIdentifier().getSystem())))
 				.findFirst()
 				.orElse(group.addMember());
-			memberComponent.setEntity(new Reference().setIdentifier(memberId)); //TODO solve reference with interceptor ?
-			memberComponent.addExtension(ATR_EXTENSION_URI,new Reference().setIdentifier(providerNpi));
-		} else  if (memberId != null){
-			memberComponent = group.getMember().stream()
-				.filter(member -> memberId.getValue().equals(member.getEntity().getIdentifier().getValue()) && memberId.getSystem().equals(member.getEntity().getIdentifier().getSystem())) //TODO better conditions
-				.findFirst()
-				.orElse(group.addMember());
-			memberComponent.setEntity(new Reference().setIdentifier(memberId)); //TODO solve reference with interceptor ?
-		} else if (patientReference != null && providerReference != null) {
-			memberComponent = group.getMember().stream()
-				.filter(member -> patientReference.equals(member.getEntity().getReference()))
-				.findFirst()
-				.orElse(group.addMember());
-			memberComponent.setEntity(patientReference); //TODO solve reference with interceptor ?
-			memberComponent.addExtension(ATR_EXTENSION_URI,providerReference);
+			memberComponent.setEntity(reference);
+			if (providerNpi != null) {
+				Extension providerExtension = new Extension(ATR_EXTENSION_URI, new Reference().setIdentifier(providerNpi));
+				if (!memberComponent.hasExtension(ATR_EXTENSION_URI)) {
+					memberComponent.addExtension(ATR_EXTENSION_URI, new Reference().setIdentifier(providerNpi));
+				}
+			}
 		} else if (patientReference != null) {
 			memberComponent = group.getMember().stream()
 				.filter(member -> patientReference.getReference().equals(member.getEntity().getReference()))
 				.findFirst()
 				.orElse(group.addMember());
 			memberComponent.setEntity(patientReference);
+			if (providerReference != null) {
+				Extension providerExtension = new Extension(ATR_EXTENSION_URI, providerReference);
+				if (!memberComponent.hasExtension(ATR_EXTENSION_URI)) {
+					memberComponent.addExtension(ATR_EXTENSION_URI, providerReference);
+				}
+			}
 		} else {
-				throw new InvalidRequestException("parameters combination not supported");
+			throw new InvalidRequestException("parameters combination not supported");
 		}
 		memberComponent.setPeriod(attributionPeriod);
 		return (Group) update(theRequestDetails.getServletRequest(), group, theId, "", theRequestDetails).getResource();
@@ -395,12 +407,14 @@ public class BulkQueryGroupProviderR4 extends GroupResourceProvider {
 
 		} else if (memberId != null) {
 			group.getMember()
-				.remove(group.getMember().stream()
-					.filter((member) -> memberId.getValue().equals(member.getEntity().getIdentifier().getValue())
-						&& ((memberId.getSystem() == null && member.getEntity().getIdentifier().getSystem() == null)
-						|| memberId.getSystem().equals(member.getEntity().getIdentifier().getSystem()))) //TODO better conditions
+				.remove(group.getMember().stream().filter((member) ->
+						memberId.getValue().equals(member.getEntity().getIdentifier().getValue())
+							&& ((memberId.getSystem() == null && member.getEntity().getIdentifier().getSystem() == null)
+							|| memberId.getSystem().equals(member.getEntity().getIdentifier().getSystem()))) //TODO better conditions
 					.findFirst()
-					.orElse(null));
+					.orElse(group.getMember().stream().filter((member) ->
+						member.getEntity().getReference().equals(identifierSolverInterceptor.solvePatientIdentifier(theRequestDetails, memberId))
+					).findFirst().orElse(null)));
 
 		} else if (patientReference != null && providerReference != null) {
 			group.getMember()

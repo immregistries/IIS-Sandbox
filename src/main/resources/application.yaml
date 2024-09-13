@@ -15,7 +15,7 @@ iis:
   api:
     app:
       jwtSecret: "sFiKu+qZpnyJBWzQjzYfne7t1IcIfNAixd+S2c1r+EF9kyoug1K9kJD948ZSiBC9fLkJBMirUPVqdwaidffb0OkYZhGLUPdb2M56QPJtoV+1dbbce2Q6FM7suRt7p90G4J4OR/b/zbK0Y30CnK/7gzLU0ph4KtjrVuHCgq9Di0NtxiFg3Icud92G0Bg0utaam70uOc5nrDMYCOHsg/vxUDQ9+g3fizwbrQmdJA=="
-      jwtExpirationMs: 900000
+      jwtExpirationMs: 600000
 #        TODO change secret
 spring:
   security:
