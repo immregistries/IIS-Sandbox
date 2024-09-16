@@ -20,6 +20,7 @@ import ca.uhn.fhir.narrative.CustomThymeleafNarrativeGenerator;
 import ca.uhn.fhir.rest.api.server.IBundleProvider;
 import ca.uhn.fhir.rest.api.server.RequestDetails;
 import ca.uhn.fhir.rest.param.ReferenceParam;
+import ca.uhn.fhir.rest.param.StringParam;
 import ca.uhn.fhir.rest.param.TokenParam;
 import ca.uhn.fhir.util.BundleBuilder;
 import ca.uhn.fhir.util.CompositionBuilder;
@@ -27,6 +28,7 @@ import ca.uhn.fhir.util.ResourceReferenceInfo;
 import ca.uhn.fhir.util.ValidateUtil;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+import org.hl7.fhir.Parameters;
 import org.hl7.fhir.instance.model.api.*;
 //import org.hl7.fhir.r4.model.*;
 
@@ -42,12 +44,12 @@ public class IpsGeneratorSvcIIS extends IpsGeneratorSvcImpl {
 
 
 	private final FhirContext myFhirContext;
-	private final IIpsGenerationStrategy myGenerationStrategy;
+	private final ICustomIpsGenerationStrategy myGenerationStrategy;
 	private final DaoRegistry myDaoRegistry;
 
 	public IpsGeneratorSvcIIS(FhirContext theFhirContext, IIpsGenerationStrategy theGenerationStrategy, DaoRegistry theDaoRegistry) {
 		super(theFhirContext, theGenerationStrategy, theDaoRegistry);
-		this.myGenerationStrategy = theGenerationStrategy;
+		this.myGenerationStrategy = (ICustomIpsGenerationStrategy) theGenerationStrategy;
 		this.myDaoRegistry = theDaoRegistry;
 		this.myFhirContext = theFhirContext;
 	}
@@ -157,7 +159,10 @@ public class IpsGeneratorSvcIIS extends IpsGeneratorSvcImpl {
 
 			SearchParameterMap searchParameterMap = new SearchParameterMap();
 			String subjectSp = determinePatientCompartmentSearchParameterName(nextResourceType);
-			searchParameterMap.add(subjectSp, new ReferenceParam(theOriginalSubjectId));
+			/**
+			 * Mdm activated
+			 */
+			searchParameterMap.add(subjectSp, new ReferenceParam(theOriginalSubjectId).setMdmExpand(true));
 
 			IpsSectionEnum sectionEnum = theSection.getSectionEnum();
 			IpsContext.IpsSectionContext ipsSectionContext =

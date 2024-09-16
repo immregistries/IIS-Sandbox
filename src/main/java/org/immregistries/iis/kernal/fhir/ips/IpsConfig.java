@@ -18,13 +18,13 @@ public class IpsConfig {
 
 	@Bean
 	@Conditional(OnR4Condition.class)
-	public IIpsGenerationStrategy ipsGenerationStrategyR4() {
+	public ICustomIpsGenerationStrategy ipsGenerationStrategyR4() {
 		return new IpsGenerationStrategyR4();
 	}
 
 	@Bean
 	@Conditional(OnR5Condition.class)
-	public IIpsGenerationStrategy ipsGenerationStrategyR5() {
+	public ICustomIpsGenerationStrategy ipsGenerationStrategyR5() {
 		return new IpsGenerationStrategyR5();
 	}
 
