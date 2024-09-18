@@ -3,7 +3,6 @@ package org.immregistries.iis.kernal.mapping.forR4;
 
 import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
 import ca.uhn.fhir.rest.param.ReferenceParam;
-import ca.uhn.fhir.rest.param.TokenParam;
 import org.apache.commons.lang3.StringUtils;
 import org.immregistries.iis.kernal.fhir.annotations.OnR4Condition;
 import org.hl7.fhir.r4.model.*;
@@ -17,6 +16,8 @@ import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
+import java.util.Iterator;
+import java.util.stream.Stream;
 
 import static org.immregistries.iis.kernal.InternalClient.FhirRequester.GOLDEN_RECORD;
 import static org.immregistries.iis.kernal.InternalClient.FhirRequester.GOLDEN_SYSTEM_TAG;
@@ -73,34 +74,50 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 				pm.setSex("");
 				break;
 		}
+
 		int raceNumber = 0;
-		CodeableConcept races = MappingHelper.extensionGetCodeableConcept(p.getExtensionByUrl(RACE));
-		for (Coding coding : races.getCoding()) {
-			raceNumber++;
-			switch (raceNumber) {
-				case 1: {
-					pm.setRace(coding.getCode());
-				}
-				case 2: {
-					pm.setRace2(coding.getCode());
-				}
-				case 3: {
-					pm.setRace3(coding.getCode());
-				}
-				case 4:{
-					pm.setRace4(coding.getCode());
-				}
-				case 5:{
-					pm.setRace5(coding.getCode());
-				}
-				case 6:{
-					pm.setRace6(coding.getCode());
+		if (p.hasExtension(RACE_EXTENSION)) {
+			for (Iterator<Extension> it = Stream.concat(p.getExtensionsByUrl(RACE_EXTENSION_OMB).stream(), p.getExtensionsByUrl(RACE_EXTENSION_DETAILED).stream()).iterator(); it.hasNext(); ) {
+				Extension ext = it.next();
+				Coding coding = MappingHelper.extensionGetCoding(ext);
+				raceNumber++;
+				switch (raceNumber) {
+					case 1: {
+						pm.setRace(coding.getCode());
+						break;
+					}
+					case 2: {
+						pm.setRace2(coding.getCode());
+						break;
+					}
+					case 3: {
+						pm.setRace3(coding.getCode());
+						break;
+					}
+					case 4:{
+						pm.setRace4(coding.getCode());
+						break;
+					}
+					case 5:{
+						pm.setRace5(coding.getCode());
+						break;
+					}
+					case 6:{
+						pm.setRace6(coding.getCode());
+						break;
+					}
 				}
 			}
 		}
-		if (p.getExtensionByUrl(ETHNICITY_EXTENSION) != null) {
-			Coding ethnicity = MappingHelper.extensionGetCoding(p.getExtensionByUrl(ETHNICITY_EXTENSION));
-			pm.setEthnicity(ethnicity.getCode());
+		Extension ethnicityExtension = p.getExtensionByUrl(ETHNICITY_EXTENSION);
+		if (ethnicityExtension != null) {
+			Extension ombExtention = p.getExtensionByUrl(ETHNICITY_EXTENSION_OMB);
+			Extension detailedExtention = p.getExtensionByUrl(ETHNICITY_EXTENSION_DETAILED);
+			if (ombExtention != null) {
+				pm.setEthnicity(MappingHelper.extensionGetCoding(ombExtention).getCode());
+			} else if (detailedExtention != null) {
+				pm.setEthnicity(MappingHelper.extensionGetCoding(detailedExtention).getCode());
+			}
 		}
 
 		for (ContactPoint telecom : p.getTelecom()) {
@@ -247,7 +264,7 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 
 		//Race and ethnicity
 		Extension raceExtension = p.addExtension();
-		raceExtension.setUrl(RACE);
+		raceExtension.setUrl(RACE_EXTENSION);
 		CodeableConcept race = new CodeableConcept().setText(RACE_SYSTEM);
 		raceExtension.setValue(race);
 		if (StringUtils.isNotBlank(pm.getRace())) {
