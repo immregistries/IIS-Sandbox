@@ -1974,7 +1974,7 @@ public class IncomingMessageHandler {
       {
         String race = patientReported.getPatientRace();
         // if processing flavor is PUNKIN then the race should be reported, and if it is null then it must be reported as UNK
-        if (processingFlavorSet.contains(ProcessingFlavor.PUNKIN)) {
+        if (processingFlavorSet != null && processingFlavorSet.contains(ProcessingFlavor.PUNKIN)) {
           CodeMap codeMap = CodeMapManager.getCodeMap();
           Code raceCode = codeMap.getCodeForCodeset(CodesetType.PATIENT_RACE, race);
           if (race.equals("") || raceCode == null || CodeStatusValue.getBy(raceCode.getCodeStatus()) != CodeStatusValue.VALID) {  
@@ -2043,7 +2043,7 @@ public class IncomingMessageHandler {
       {
         String ethnicity = patientReported.getPatientEthnicity();
         // if processing flavor is PUNKIN then the race should be reported, and if it is null then it must be reported as UNK
-        if (processingFlavorSet.contains(ProcessingFlavor.PUNKIN)) {
+        if (processingFlavorSet != null && processingFlavorSet.contains(ProcessingFlavor.PUNKIN)) {
           CodeMap codeMap = CodeMapManager.getCodeMap();
           Code ethnicityCode = codeMap.getCodeForCodeset(CodesetType.PATIENT_ETHNICITY, ethnicity);
           if (ethnicity.equals("") || ethnicityCode == null || CodeStatusValue.getBy(ethnicityCode.getCodeStatus()) != CodeStatusValue.VALID) {  
@@ -2368,7 +2368,7 @@ public class IncomingMessageHandler {
     }
 
     // if processing flavor contains MEDLAR then all the non E errors have to removed from the processing list
-    if (processingFlavorSet.contains(ProcessingFlavor.MEDLAR)) {
+    if (processingFlavorSet != null && processingFlavorSet.contains(ProcessingFlavor.MEDLAR)) {
       List<ProcessingException> tempProcessingExceptionList = new ArrayList<ProcessingException>();
       for (ProcessingException pe : processingExceptionList) {
         if (pe.isError()) {
