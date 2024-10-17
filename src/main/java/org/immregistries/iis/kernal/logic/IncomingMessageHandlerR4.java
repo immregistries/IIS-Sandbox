@@ -1363,6 +1363,11 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler {
 							String loinc = "30956-7";
 							String loincLabel = "Vaccine type";
 							String value = evaluationActual.getVaccineCvx();
+							if (processingFlavorSet.contains(ProcessingFlavor.KUMQUAT)) {
+								if (value.length() > 2) {
+									value = "BADCVX";
+								}
+							}
 							String valueLabel = evaluationActual.getVaccineCvx();
 							String valueTable = "CVX";
 							printObx(sb, obxSetId, obsSubId, loinc, loincLabel, value, valueLabel, valueTable);
