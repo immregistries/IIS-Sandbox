@@ -1,6 +1,5 @@
 package org.immregistries.iis.kernal.logic;
 
-import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.model.*;
@@ -29,7 +28,7 @@ public interface IIncomingMessageHandler {
 	public String printCode(String value, CodesetType codesetType, String tableName,
 									CodeMap codeMap);
 
-	public String buildAck(HL7Reader reader, List<ProcessingException> processingExceptionList);
+	public String buildAck(HL7Reader reader, List<ProcessingException> processingExceptionList, Set<ProcessingFlavor> processingFlavorSet);
 
 
 

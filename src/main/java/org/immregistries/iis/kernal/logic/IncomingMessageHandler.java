@@ -544,12 +544,12 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
     return "";
   }
 
-  public String buildAck(HL7Reader reader, List<ProcessingException> processingExceptionList) {
+  public String buildAck(HL7Reader reader, List<ProcessingException> processingExceptionList, Set<ProcessingFlavor> processingFlavorSet) {
     StringBuilder sb = new StringBuilder();
     {
       String messageType = "ACK^V04^ACK";
       String profileId = Z23_ACKNOWLEDGEMENT;
-      createMSH(messageType, profileId, reader, sb, null);
+      createMSH(messageType, profileId, reader, sb, processingFlavorSet);
     }
 
     String sendersUniqueId = "";
@@ -643,6 +643,15 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
     sb.append(sendingFac).append("|");
     sb.append(sendingDateString).append("|");
     sb.append("|");
+	  if (processingFlavorSet != null && processingFlavorSet.contains(ProcessingFlavor.MELON)) {
+		  int pos = messageType.indexOf("^");
+		  if (pos > 0) {
+			  messageType = messageType.substring(0, pos);
+			  if (System.currentTimeMillis() % 2 == 0) {
+				  messageType += "^ZZZ";
+			  }
+		  }
+	  }
     sb.append(messageType).append("|");
     sb.append(uniqueId).append("|");
     sb.append(production).append("|");

@@ -5,6 +5,7 @@ import java.util.Set;
 
 public enum ProcessingFlavor {
   MISMO("Mismo", "Uses Mismo Model for Patient Matching"),
+  MELON("Melon", "Missing or incorrect important message headers"),
   LIME("Lime", "Missing non-critical required fields"),
   COCONUT("Coconut", "Forecast never returned"),
   ORANGE("Orange", "Z32 is returned for query matches"),

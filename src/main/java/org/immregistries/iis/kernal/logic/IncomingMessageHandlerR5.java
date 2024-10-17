@@ -39,8 +39,9 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler {
 		String messageType = reader.getValue(9);
 		String responseMessage;
 		partitionCreationInterceptor.getOrCreatePartitionId(tenant.getOrganizationName());
+		Set<ProcessingFlavor> processingFlavorSet = tenant.getProcessingFlavorSet();
+
 		try {
-			Set<ProcessingFlavor> processingFlavorSet = tenant.getProcessingFlavorSet();
 			String facilityId = reader.getValue(4);
 
 			if (processingFlavorSet.contains(ProcessingFlavor.SOURSOP)) {
@@ -81,7 +82,7 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler {
 					ProcessingException pe = new ProcessingException("Unsupported message", "", 0, 0);
 					List<ProcessingException> processingExceptionList = new ArrayList<>();
 					processingExceptionList.add(pe);
-					responseMessage = buildAck(reader, processingExceptionList);
+					responseMessage = buildAck(reader, processingExceptionList, processingFlavorSet);
 					recordMessageReceived(message, null, responseMessage, "Unknown", "NAck",
 						tenant);
 					break;
@@ -92,7 +93,7 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler {
 			List<ProcessingException> processingExceptionList = new ArrayList<>();
 			processingExceptionList.add(new ProcessingException(
 				"Internal error prevented processing: " + e.getMessage(), null, 0, 0));
-			responseMessage = buildAck(reader, processingExceptionList);
+			responseMessage = buildAck(reader, processingExceptionList, processingFlavorSet);
 		}
 		return responseMessage;
 	}
@@ -220,8 +221,8 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler {
 	@SuppressWarnings("unchecked")
 	public String processVXU(Tenant tenant, HL7Reader reader, String message, Organization managingOrganization) {
 		List<ProcessingException> processingExceptionList = new ArrayList<>();
+		Set<ProcessingFlavor> processingFlavorSet = tenant.getProcessingFlavorSet();
 		try {
-			Set<ProcessingFlavor> processingFlavorSet = tenant.getProcessingFlavorSet();
 			CodeMap codeMap = CodeMapManager.getCodeMap();
 
 			boolean strictDate = !processingFlavorSet.contains(ProcessingFlavor.CANTALOUPE);
@@ -553,14 +554,14 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler {
 					"Patient vaccination history cannot be accepted without at least one administered, historical, or refused vaccination specified",
 					"", 0, 0);
 			}
-			String ack = buildAck(reader, processingExceptionList);
+			String ack = buildAck(reader, processingExceptionList, processingFlavorSet);
 			recordMessageReceived(message, patientReported, ack, "Update", "Ack", tenant);
 			return ack;
 		} catch (ProcessingException e) {
 			if (!processingExceptionList.contains(e)) {
 				processingExceptionList.add(e);
 			}
-			String ack = buildAck(reader, processingExceptionList);
+			String ack = buildAck(reader, processingExceptionList, processingFlavorSet);
 			recordMessageReceived(message, null, ack, "Update", "Exception", tenant);
 			return ack;
 		}
@@ -927,8 +928,9 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler {
 
 	public String processORU(Tenant tenant, HL7Reader reader, String message, Organization managingOrganization) {
 		List<ProcessingException> processingExceptionList = new ArrayList<>();
+		Set<ProcessingFlavor> processingFlavorSet = tenant.getProcessingFlavorSet();
+
 		try {
-			Set<ProcessingFlavor> processingFlavorSet = tenant.getProcessingFlavorSet();
 
 			CodeMap codeMap = CodeMapManager.getCodeMap();
 
@@ -948,14 +950,14 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler {
 						orcCount, 0);
 				}
 			}
-			String ack = buildAck(reader, processingExceptionList);
+			String ack = buildAck(reader, processingExceptionList, processingFlavorSet);
 			recordMessageReceived(message, patientReported, ack, "Update", "Ack", tenant);
 			return ack;
 		} catch (ProcessingException e) {
 			if (!processingExceptionList.contains(e)) {
 				processingExceptionList.add(e);
 			}
-			String ack = buildAck(reader, processingExceptionList);
+			String ack = buildAck(reader, processingExceptionList, processingFlavorSet);
 			recordMessageReceived(message, null, ack, "Update", "Exception", tenant);
 			return ack;
 		}
