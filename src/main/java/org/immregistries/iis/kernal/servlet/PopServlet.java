@@ -1,12 +1,10 @@
 package org.immregistries.iis.kernal.servlet;
 
-import org.apache.commons.lang3.StringUtils;
+import ca.uhn.fhir.context.FhirContext;
+import ca.uhn.fhir.context.FhirVersionEnum;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
-import org.hl7.fhir.r5.model.Group;
-import org.hl7.fhir.r5.model.Reference;
-import org.immregistries.iis.kernal.fhir.annotations.OnR5Condition;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.logic.IncomingMessageHandler;
 import org.immregistries.iis.kernal.InternalClient.RepositoryClientFactory;
@@ -34,12 +32,14 @@ import java.util.Date;
 
 @RestController()
 @RequestMapping({"/pop","/tenant/{tenantId}/pop"})
-@Conditional(OnR5Condition.class)
 public class PopServlet {
 	Logger logger = LoggerFactory.getLogger(PopServlet.class);
 	public static final String PARAM_MESSAGE = "MESSAGEDATA";
 	public static final String PARAM_FACILITY_NAME = "FACILITY_NAME";
 	private static SessionFactory factory;
+
+	@Autowired
+	FhirContext fhirContext;
 	@Autowired
 	RepositoryClientFactory repositoryClientFactory;
 	@Autowired
@@ -89,14 +89,23 @@ public class PopServlet {
 					ack = ackBuilder.toString();
 					ArrayList<String> groupPatientIds = (ArrayList<String>) req.getAttribute("groupPatientIds");
 					if (groupPatientIds != null) {
-						Group group = new Group();
-						for (String id :
-							groupPatientIds) {
-							group.addMember().setEntity(new Reference().setReference("Patient/" + id));
+						if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R5)) {
+							org.hl7.fhir.r5.model.Group group = new org.hl7.fhir.r5.model.Group();
+							for (String id :
+								groupPatientIds) {
+								group.addMember().setEntity(new org.hl7.fhir.r5.model.Reference().setReference("Patient/" + id));
+							}
+							group.setDescription("Generated from Hl2v2 VXU Query on  time " + new Date());
+							repositoryClientFactory.newGenericClient(req).create().resource(group).execute();
+						} else  {
+							org.hl7.fhir.r4.model.Group group = new org.hl7.fhir.r4.model.Group();
+							for (String id :
+								groupPatientIds) {
+								group.addMember().setEntity(new org.hl7.fhir.r4.model.Reference().setReference("Patient/" + id));
+							}
+							repositoryClientFactory.newGenericClient(req).create().resource(group).execute();
 						}
-						group.setDescription("Generated from Hl2v2 VXU Query on  time " + new Date());
-//						group.set
-						repositoryClientFactory.newGenericClient(req).create().resource(group).execute();
+
 					}
 				}
 			} finally {
