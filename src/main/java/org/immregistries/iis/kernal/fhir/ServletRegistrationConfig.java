@@ -18,12 +18,13 @@ import org.springframework.context.annotation.Configuration;
 import javax.servlet.http.HttpServlet;
 
 @Configuration
-@Conditional(OnR5Condition.class)
+//@Conditional(OnR5Condition.class)
 public class ServletRegistrationConfig {
 	@Autowired
 	AutowireCapableBeanFactory beanFactory;
 
 	@Bean
+	@Conditional(OnR5Condition.class)
 	public ServletRegistrationBean<GroupServlet> groupServletRegistrationBean() {
 		ServletRegistrationBean<GroupServlet> registrationBean = new ServletRegistrationBean<>();
 		GroupServlet servlet = new GroupServlet();
@@ -92,6 +93,7 @@ public class ServletRegistrationConfig {
 	}
 
 	@Bean
+	@Conditional(OnR5Condition.class)
 	public ServletRegistrationBean fhirTestServletRegistrationBean() {
 		ServletRegistrationBean registrationBean = new ServletRegistrationBean();
 		HttpServlet servlet = new FhirTestServlet();
