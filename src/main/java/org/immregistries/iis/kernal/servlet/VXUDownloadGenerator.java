@@ -10,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Session;
 import org.hl7.fhir.r5.model.Immunization;
 import org.hl7.fhir.r5.model.Patient;
+import org.immregistries.iis.kernal.logic.IExampleMessageWriter;
 import org.immregistries.iis.kernal.logic.IncomingMessageHandler;
 import org.immregistries.iis.kernal.model.Tenant;
 import org.immregistries.iis.kernal.model.VaccinationReported;
@@ -32,7 +33,7 @@ public class VXUDownloadGenerator extends Thread {
 	@Autowired
 	FhirRequesterR5 fhirRequests;
 	@Autowired
-	IncomingMessageHandler incomingMessageHandler;
+	IExampleMessageWriter exampleMessageWriter;
 	@Autowired
 	RepositoryClientFactory repositoryClientFactory;
 
@@ -215,7 +216,7 @@ public class VXUDownloadGenerator extends Thread {
             // not reporting missed appointments anymore
             continue;
           }
-          out.print(incomingMessageHandler.buildVxu(vaccinationReported, tenant));
+          out.print(exampleMessageWriter.buildVxu(vaccinationReported, tenant));
         }
       }
       out.close();

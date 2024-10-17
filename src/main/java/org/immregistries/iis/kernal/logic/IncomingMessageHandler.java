@@ -1,10 +1,8 @@
 package org.immregistries.iis.kernal.logic;
 
-import ca.uhn.fhir.rest.client.api.IGenericClient;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodeStatusValue;
@@ -51,11 +49,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 	@Autowired
 	PartitionCreationInterceptor partitionCreationInterceptor;
 
-  protected IGenericClient getFhirClient() {
-	  return repositoryClientFactory.getFhirClient();
-  }
-
-  protected static final String PATIENT_MIDDLE_NAME_MULTI = "Multi";
+	protected static final String PATIENT_MIDDLE_NAME_MULTI = "Multi";
   // TODO:
   // Organize logic classes, need to have access classes for every object, maybe a new Access
   // package?

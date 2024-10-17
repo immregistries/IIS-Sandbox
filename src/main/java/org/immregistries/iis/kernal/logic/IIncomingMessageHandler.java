@@ -11,9 +11,6 @@ import java.util.*;
 public interface IIncomingMessageHandler {
 	public String process(String message, Tenant tenant, String facilityName);
 
-
-	public String buildVxu(VaccinationReported vaccinationReported, Tenant tenant);
-
 	public List<VaccinationMaster> getVaccinationMasterList(PatientMaster patient);
 
 	public void printObx(StringBuilder sb, int obxSetId, int obsSubId, String loinc,
