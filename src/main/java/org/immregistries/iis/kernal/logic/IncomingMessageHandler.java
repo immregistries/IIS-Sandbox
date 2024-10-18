@@ -572,7 +572,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 		}
 
 		// if processing flavor contains MEDLAR then all the non E errors have to removed from the processing list
-		if (processingFlavorSet.contains(ProcessingFlavor.MEDLAR)) {
+		if (processingFlavorSet != null && processingFlavorSet.contains(ProcessingFlavor.MEDLAR)) {
 			List<ProcessingException> tempProcessingExceptionList = new ArrayList<ProcessingException>();
 			for (ProcessingException pe : processingExceptionList) {
 				if (pe.isError()) {
