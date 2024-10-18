@@ -12,7 +12,6 @@ import ca.uhn.fhir.rest.param.TokenParam;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
-import org.hl7.fhir.r5.model.*;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.generated.Code;
@@ -107,9 +106,9 @@ public class PatientServlet  {
 			if (action != null) {
 				if (action.equals(ACTION_SEARCH)) {
 					patientMasterList = fhirRequester.searchPatientMasterGoldenList(
-						new SearchParameterMap(Patient.SP_FAMILY, new StringParam(patientNameLast))
-							.add(Patient.SP_NAME,new StringParam(patientNameFirst))
-							.add(Patient.SP_IDENTIFIER, new TokenParam().setValue(externalLink))
+						new SearchParameterMap("family", new StringParam(patientNameLast))
+							.add("name", new StringParam(patientNameFirst))
+							.add("identifier", new TokenParam().setValue(externalLink))
 					);
 				}
 			}
@@ -237,22 +236,23 @@ public class PatientServlet  {
 					out.println("  </div>");
 				}
 
-				if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R5)){ // TODO support for R4
-					Bundle recommendationBundle = fhirClient.search()
-						.forResource(ImmunizationRecommendation.class)
-						.where(ImmunizationRecommendation.PATIENT
-								.hasId(new IdType(patientMasterSelected.getPatientId()))
-						).returnBundle(Bundle.class).execute();
+				if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R5)) { // TODO support for R4
+					org.hl7.fhir.r5.model.Bundle recommendationBundle = fhirClient.search()
+						.forResource(org.hl7.fhir.r5.model.ImmunizationRecommendation.class)
+						.where(org.hl7.fhir.r5.model.ImmunizationRecommendation.PATIENT
+							.hasId(new org.hl7.fhir.r5.model.IdType(patientMasterSelected.getPatientId()))
+						).returnBundle(org.hl7.fhir.r5.model.Bundle.class).execute();
 					if (recommendationBundle.hasEntry()) {
-						printRecommendation(out, (ImmunizationRecommendation) recommendationBundle.getEntryFirstRep().getResource(), (Patient) patientSelected);
+						printRecommendation(out, (org.hl7.fhir.r5.model.ImmunizationRecommendation) recommendationBundle.getEntryFirstRep().getResource(), (org.hl7.fhir.r5.model.Patient) patientSelected);
 					} else {
-						printRecommendation(out, (ImmunizationRecommendation) null, (Patient) patientSelected);
+						printRecommendation(out, null, (org.hl7.fhir.r5.model.Patient) patientSelected);
 					}
+					org.hl7.fhir.r5.model.Bundle subcriptionBundle = fhirClient.search().forResource(org.hl7.fhir.r5.model.Subscription.class).returnBundle(org.hl7.fhir.r5.model.Bundle.class).execute();
+					printSubscriptions(out, parser, subcriptionBundle, (org.hl7.fhir.r5.model.Resource) patientSelected);
 				}
 
-				if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R5)){
-					Bundle subcriptionBundle = fhirClient.search().forResource(Subscription.class).returnBundle(Bundle.class).execute();
-					printSubscriptions(out, parser, subcriptionBundle, (Resource) patientSelected);
+				if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R4)) {
+
 				}
 
 				{
@@ -572,7 +572,7 @@ public class PatientServlet  {
 		List<ObservationReported> observationReportedList = new ArrayList<>();
 		{
 			observationReportedList = fhirRequester.searchObservationReportedList(
-				new SearchParameterMap(Observation.SP_SUBJECT, new ReferenceParam().setValue(patientSelected.getPatientId())));
+				new SearchParameterMap("subject", new ReferenceParam().setValue(patientSelected.getPatientId())));
 //				Observation.SUBJECT.hasId(patientSelected.getPatientId()));
 //		 observationReportedList = observationReportedList.stream().filter(observationReported -> observationReported.getVaccinationReported() == null).collect(Collectors.toList());
 			Set<String> suppressSet = LoincIdentifier.getSuppressIdentifierCodeSet();
@@ -586,7 +586,7 @@ public class PatientServlet  {
 		return observationReportedList;
 	}
 
-	public void printSubscriptions(PrintWriter out, IParser parser, Bundle bundle, Resource resource) {
+	public void printSubscriptions(PrintWriter out, IParser parser, org.hl7.fhir.r5.model.Bundle bundle, org.hl7.fhir.r5.model.Resource resource) {
 		String resourceString = parser.encodeResourceToString(resource);
 //		  .replace("\"","\'")
 		out.println("<div class=\"w3-container\">");
@@ -601,8 +601,8 @@ public class PatientServlet  {
 			out.println("  </tr>");
 			out.println("<tbody>");
 			int count = 0;
-			for (Bundle.BundleEntryComponent entry : bundle.getEntry()) {
-				Subscription subscription = (Subscription) entry.getResource();
+			for (org.hl7.fhir.r5.model.Bundle.BundleEntryComponent entry : bundle.getEntry()) {
+				org.hl7.fhir.r5.model.Subscription subscription = (org.hl7.fhir.r5.model.Subscription) entry.getResource();
 				count++;
 				if (count > 100) {
 					break;
@@ -629,7 +629,7 @@ public class PatientServlet  {
 		out.println("</div>");
 	}
 
-	public void printRecommendation(PrintWriter out, ImmunizationRecommendation recommendation, Patient patient) {
+	public void printRecommendation(PrintWriter out, org.hl7.fhir.r5.model.ImmunizationRecommendation recommendation, org.hl7.fhir.r5.model.Patient patient) {
 		out.println("<div class=\"w3-container\">");
 		out.println("<h4>Recommendations</h4>");
 		if (recommendation != null) {
@@ -642,13 +642,13 @@ public class PatientServlet  {
 			out.println("  </tr>");
 			out.println("<tbody>");
 			int count = 0;
-			for (ImmunizationRecommendation.ImmunizationRecommendationRecommendationComponent component : recommendation.getRecommendation()) {
+			for (org.hl7.fhir.r5.model.ImmunizationRecommendation.ImmunizationRecommendationRecommendationComponent component : recommendation.getRecommendation()) {
 				count++;
 				if (count > 100) {
 					break;
 				}
 				String link = "recommendation?" + PARAM_RECOMMENDATION_ID + "="
-					+ new IdType(recommendation.getId()).getIdPart();
+					+ new org.hl7.fhir.r5.model.IdType(recommendation.getId()).getIdPart();
 				out.println("<tr>");
 				out.println("    <td><a href=\"" + link + "\">" + component.getVaccineCodeFirstRep().getCodingFirstRep().getCode() + "</a></td>");
 				out.println("    <td><a href=\"" + link + "\">" + component.getDateCriterionFirstRep().getValue() + "</a></td>");
@@ -659,14 +659,14 @@ public class PatientServlet  {
 			out.println("</table>");
 
 			out.println("<form action=\"recommendation\" method=\"POST\">");
-			out.println("	<input type=\"hidden\" name=\"" + PARAM_PATIENT_REPORTED_ID + "\" value=\"" + new IdType(patient.getId()).getIdPart() + "\"/>");
-			out.println("	<input type=\"hidden\" name=\"" + PARAM_RECOMMENDATION_ID + "\" value=\"" + new IdType(recommendation.getId()).getIdPart() + "\"/>");
+			out.println("	<input type=\"hidden\" name=\"" + PARAM_PATIENT_REPORTED_ID + "\" value=\"" + new org.hl7.fhir.r5.model.IdType(patient.getId()).getIdPart() + "\"/>");
+			out.println("	<input type=\"hidden\" name=\"" + PARAM_RECOMMENDATION_ID + "\" value=\"" + new org.hl7.fhir.r5.model.IdType(recommendation.getId()).getIdPart() + "\"/>");
 			out.println("	<input class=\"w3-button w3-section w3-teal w3-ripple\" type=\"submit\" name=\"submit\" value=\"Add recommendation component\"/>");
 			out.println("</form>");
 		} else {
 			out.println("<div class=\"w3-panel w3-yellow\"><p>No Recommendation Found</p></div>");
 			out.println("<form action=\"recommendation\" method=\"POST\">");
-			out.println("	<input type=\"hidden\" name=\"" + PARAM_PATIENT_REPORTED_ID + "\" value=\"" + new IdType(patient.getId()).getIdPart() + "\"/>");
+			out.println("	<input type=\"hidden\" name=\"" + PARAM_PATIENT_REPORTED_ID + "\" value=\"" + new org.hl7.fhir.r5.model.IdType(patient.getId()).getIdPart() + "\"/>");
 			out.println("	<input class=\"w3-button w3-section w3-teal w3-ripple\" type=\"submit\" name=\"submit\" value=\"Generate new recommendation\"/>");
 			out.println("</form>");
 		}
@@ -678,8 +678,8 @@ public class PatientServlet  {
 		if (req.getParameter(PARAM_PATIENT_REPORTED_ID) != null) {
 			patient = fhirClient.read().resource("Patient").withId(req.getParameter(PARAM_PATIENT_REPORTED_ID)).execute();
 		} else if (req.getParameter(PARAM_PATIENT_REPORTED_EXTERNAL_LINK) != null) {
-			IBundleProvider bundleProvider  = fhirRequester.searchGoldenRecord(Patient.class, //TODO choose priority golden or regular
-				new SearchParameterMap(Patient.SP_IDENTIFIER,new TokenParam().setValue(req.getParameter(PARAM_PATIENT_REPORTED_EXTERNAL_LINK))));
+			IBundleProvider bundleProvider = fhirRequester.searchGoldenRecord(org.hl7.fhir.r5.model.Patient.class, //TODO choose priority golden or regular
+				new SearchParameterMap(org.hl7.fhir.r5.model.Patient.SP_IDENTIFIER, new TokenParam().setValue(req.getParameter(PARAM_PATIENT_REPORTED_EXTERNAL_LINK))));
 //				Patient.IDENTIFIER.exactly().identifier(req.getParameter(PARAM_PATIENT_REPORTED_EXTERNAL_LINK)));
 			if (!bundleProvider.isEmpty()) {
 				patient = bundleProvider.getAllResources().get(0);

@@ -4,7 +4,6 @@ import ca.uhn.fhir.interceptor.model.RequestPartitionId;
 import ca.uhn.fhir.jpa.api.dao.IFhirResourceDao;
 import ca.uhn.fhir.jpa.mdm.svc.MdmMatchFinderSvcImpl;
 import ca.uhn.fhir.jpa.mdm.svc.candidate.MdmCandidateSearchSvc;
-import ca.uhn.fhir.rest.api.server.SystemRequestDetails;
 import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
 import ca.uhn.fhir.mdm.api.IMdmMatchFinderSvc;
 import ca.uhn.fhir.mdm.api.MatchedTarget;
@@ -12,23 +11,25 @@ import ca.uhn.fhir.mdm.api.MdmMatchOutcome;
 import ca.uhn.fhir.mdm.log.Logs;
 import ca.uhn.fhir.mdm.rules.svc.MdmResourceMatcherSvc;
 import ca.uhn.fhir.rest.api.server.IBundleProvider;
+import ca.uhn.fhir.rest.api.server.SystemRequestDetails;
 import ca.uhn.fhir.rest.param.ReferenceParam;
 import ca.uhn.fhir.rest.param.TokenParam;
 import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
-import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.instance.model.api.IAnyResource;
+import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Immunization;
 import org.hl7.fhir.r4.model.ResourceType;
-import org.immregistries.iis.kernal.fhir.annotations.OnR4Condition;
 import org.immregistries.iis.kernal.mapping.Interfaces.ImmunizationMapper;
-import org.immregistries.iis.kernal.mapping.forR4.ImmunizationMapperR4;
+import org.immregistries.iis.kernal.mapping.MappingHelper;
+import org.immregistries.iis.kernal.model.ProcessingFlavor;
+import org.immregistries.iis.kernal.servlet.PatientMatchingDatasetConversionController;
+import org.immregistries.mismo.match.PatientMatcher;
+import org.immregistries.mismo.match.model.Patient;
 import org.immregistries.vaccination_deduplication.computation_classes.Deterministic;
 import org.immregistries.vaccination_deduplication.reference.ComparisonResult;
 import org.immregistries.vaccination_deduplication.reference.ImmunizationSource;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Conditional;
-import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Nonnull;
@@ -45,25 +46,43 @@ import static org.immregistries.iis.kernal.InternalClient.FhirRequester.GOLDEN_S
 /**
  * Custom, based on MdmMatchFinderSvcImpl from Hapi-fhir v6.2.4, to allow for Immunization matching with external library
  */
-//@Component
-//@Conditional(OnR4Condition.class)
 public class MdmCustomMatchFinderSvcR4 extends MdmMatchFinderSvcImpl implements IMdmMatchFinderSvc {
 	private static final Logger ourLog = Logs.getMdmTroubleshootingLog();
+
 	@Autowired
 	private MdmCandidateSearchSvc myMdmCandidateSearchSvc;
 	@Autowired
 	private MdmResourceMatcherSvc myMdmResourceMatcherSvc;
 	@Autowired
 	IFhirResourceDao<Immunization> immunizationDao;
+	@Autowired
+	private PatientMatchingDatasetConversionController patientMatchingDatasetConversionController;
 
 	@Override
 	@Nonnull
 	@Transactional
 	public List<MatchedTarget> getMatchedTargets(String theResourceType, IAnyResource theResource, RequestPartitionId theRequestPartitionId) {
-		if (theResourceType.equals(ResourceType.Immunization.name())){
-			List<MatchedTarget> matches = matchImmunization((Immunization) theResource,theRequestPartitionId);
+		if (theResourceType.equals(ResourceType.Immunization.name())) {
+			List<MatchedTarget> matches = matchImmunization((Immunization) theResource, theRequestPartitionId);
 			ourLog.trace("Found {} matched targets for {}.", matches.size(), idOrType(theResource, theResourceType));
+			return matches;
+		} else if (theResourceType.equals(ResourceType.Patient.name()) && ProcessingFlavor.getProcessingStyle(theRequestPartitionId.getFirstPartitionNameOrNull()).contains(ProcessingFlavor.MISMO)) {
 
+			/**
+			 * flavour check activating patient Matching with Mismo match
+			 */
+			Collection<IAnyResource> targetCandidates = myMdmCandidateSearchSvc.findCandidates(theResourceType, theResource, theRequestPartitionId);
+			PatientMatcher mismoMatcher = new PatientMatcher();
+			Patient mismoPatient = patientMatchingDatasetConversionController.convertFromR5((org.hl7.fhir.r5.model.Patient) theResource);
+
+			List<MatchedTarget> matches = targetCandidates.stream()
+				.map((candidate) -> {
+					Patient mismoPatientCandidate = patientMatchingDatasetConversionController.convertFromR5((org.hl7.fhir.r5.model.Patient) candidate);
+					return new MatchedTarget(candidate, MdmCustomMatchFinderSvcR5.mismoResultToMdmMatchOutcome(mismoMatcher.match(mismoPatient, mismoPatientCandidate)));
+				}).collect(Collectors.toList());
+
+			ourLog.info("Found {} matched targets for {} with mismo.", matches.size(), idOrType(theResource, theResourceType));
+			ourLog.trace("Found {} matched targets for {}.", matches.size(), idOrType(theResource, theResourceType));
 			return matches;
 		} else {
 			Collection<IAnyResource> targetCandidates = myMdmCandidateSearchSvc.findCandidates(theResourceType, theResource, theRequestPartitionId);
@@ -123,14 +142,17 @@ public class MdmCustomMatchFinderSvcR4 extends MdmMatchFinderSvcImpl implements 
 
 	}
 
-	private org.immregistries.vaccination_deduplication.Immunization toVaccDedupImmunization(Immunization immunization, RequestPartitionId theRequestPartitionId){
+	private org.immregistries.vaccination_deduplication.Immunization toVaccDedupImmunization(Immunization immunization, RequestPartitionId theRequestPartitionId) {
 		org.immregistries.vaccination_deduplication.Immunization i1 = new org.immregistries.vaccination_deduplication.Immunization();
-		i1.setCVX(immunization.getVaccineCode().getCodingFirstRep().getCode());
-		if(immunization.hasManufacturer()){
+		Coding cvx = MappingHelper.filterCodeableConceptR4(immunization.getVaccineCode(), ImmunizationMapper.CVX);
+		if (cvx != null) {
+			i1.setCVX(cvx.getCode());
+		}
+		if (immunization.hasManufacturer()) {
 			i1.setMVX(immunization.getManufacturer().getIdentifier().getValue());
 		}
 		try {
-			if (immunization.hasOccurrenceStringType()){
+			if (immunization.hasOccurrenceStringType()) {
 				i1.setDate(immunization.getOccurrenceStringType().getValue()); // TODO parse correctly
 			} else if (immunization.hasOccurrenceDateTimeType()) {
 				i1.setDate(immunization.getOccurrenceDateTimeType().getValue());

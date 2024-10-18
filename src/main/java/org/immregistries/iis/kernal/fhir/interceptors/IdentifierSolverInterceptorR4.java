@@ -2,8 +2,6 @@ package org.immregistries.iis.kernal.fhir.interceptors;
 
 import ca.uhn.fhir.interceptor.api.Hook;
 import ca.uhn.fhir.jpa.api.dao.IFhirResourceDao;
-import ca.uhn.fhir.jpa.mdm.dao.MdmLinkDaoSvc;
-import ca.uhn.fhir.jpa.mdm.svc.MdmResourceDaoSvc;
 import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
 import ca.uhn.fhir.rest.api.server.IBundleProvider;
 import ca.uhn.fhir.rest.api.server.RequestDetails;
@@ -33,11 +31,6 @@ public class IdentifierSolverInterceptorR4 {
 	Logger logger = LoggerFactory.getLogger(IdentifierSolverInterceptorR4.class);
 
 	@Autowired
-	MdmLinkDaoSvc mdmLinkDaoSvc;
-	@Autowired
-	MdmResourceDaoSvc mdmResourceDaoSvc;
-
-	@Autowired
 	IFhirResourceDao<Patient> patientDao;
 
 	/**
@@ -56,7 +49,6 @@ public class IdentifierSolverInterceptorR4 {
 	}
 
 	private void handleImmunization(RequestDetails requestDetails, Immunization immunization) {
-		logger.info("Identifier reference interception");
 
 		if (immunization == null
 			|| immunization.getPatient().getIdentifier() == null

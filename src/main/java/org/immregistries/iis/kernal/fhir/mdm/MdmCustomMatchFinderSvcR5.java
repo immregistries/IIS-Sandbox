@@ -4,8 +4,6 @@ import ca.uhn.fhir.interceptor.model.RequestPartitionId;
 import ca.uhn.fhir.jpa.api.dao.IFhirResourceDao;
 import ca.uhn.fhir.jpa.mdm.svc.MdmMatchFinderSvcImpl;
 import ca.uhn.fhir.jpa.mdm.svc.candidate.MdmCandidateSearchSvc;
-import ca.uhn.fhir.mdm.api.MdmMatchResultEnum;
-import ca.uhn.fhir.rest.api.server.SystemRequestDetails;
 import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
 import ca.uhn.fhir.mdm.api.IMdmMatchFinderSvc;
 import ca.uhn.fhir.mdm.api.MatchedTarget;
@@ -13,6 +11,7 @@ import ca.uhn.fhir.mdm.api.MdmMatchOutcome;
 import ca.uhn.fhir.mdm.log.Logs;
 import ca.uhn.fhir.mdm.rules.svc.MdmResourceMatcherSvc;
 import ca.uhn.fhir.rest.api.server.IBundleProvider;
+import ca.uhn.fhir.rest.api.server.SystemRequestDetails;
 import ca.uhn.fhir.rest.param.ReferenceParam;
 import ca.uhn.fhir.rest.param.TokenParam;
 import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
@@ -20,12 +19,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.hl7.fhir.r5.model.Immunization;
 import org.hl7.fhir.r5.model.ResourceType;
-import org.immregistries.iis.kernal.fhir.annotations.OnR5Condition;
-import org.immregistries.iis.kernal.fhir.security.ServletHelper;
+import org.immregistries.iis.kernal.mapping.Interfaces.ImmunizationMapper;
 import org.immregistries.iis.kernal.mapping.forR5.ImmunizationMapperR5;
 import org.immregistries.iis.kernal.model.ProcessingFlavor;
 import org.immregistries.iis.kernal.servlet.PatientMatchingDatasetConversionController;
-import org.immregistries.mismo.match.PatientMatchDetermination;
 import org.immregistries.mismo.match.PatientMatchResult;
 import org.immregistries.mismo.match.PatientMatcher;
 import org.immregistries.mismo.match.model.Patient;
@@ -34,8 +31,6 @@ import org.immregistries.vaccination_deduplication.reference.ComparisonResult;
 import org.immregistries.vaccination_deduplication.reference.ImmunizationSource;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Conditional;
-import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Nonnull;
@@ -54,12 +49,13 @@ import static org.immregistries.iis.kernal.InternalClient.FhirRequester.GOLDEN_S
  */
 public class MdmCustomMatchFinderSvcR5 extends MdmMatchFinderSvcImpl implements IMdmMatchFinderSvc {
 	private static final Logger ourLog = Logs.getMdmTroubleshootingLog();
-	@Autowired
-	IFhirResourceDao<Immunization> immunizationDao;
+
 	@Autowired
 	private MdmCandidateSearchSvc myMdmCandidateSearchSvc;
 	@Autowired
 	private MdmResourceMatcherSvc myMdmResourceMatcherSvc;
+	@Autowired
+	IFhirResourceDao<Immunization> immunizationDao;
 	@Autowired
 	private PatientMatchingDatasetConversionController patientMatchingDatasetConversionController;
 
@@ -126,7 +122,7 @@ public class MdmCustomMatchFinderSvcR5 extends MdmMatchFinderSvcImpl implements 
 				.setMdmExpand(true) // Including other patients entities
 				.setValue(immunization.getPatient().getReference()));
 		} else if (immunization.getPatient().getIdentifier() != null) {
-			searchParameterMap.add(Immunization.SP_IDENTIFIER, new TokenParam()
+			searchParameterMap.add("identifier", new TokenParam()
 				.setSystem(immunization.getPatient().getIdentifier().getSystem())
 				.setValue(immunization.getPatient().getIdentifier().getValue()));
 		} else {
@@ -149,7 +145,7 @@ public class MdmCustomMatchFinderSvcR5 extends MdmMatchFinderSvcImpl implements 
 
 	private org.immregistries.vaccination_deduplication.Immunization toVaccDedupImmunization(Immunization immunization, RequestPartitionId theRequestPartitionId) {
 		org.immregistries.vaccination_deduplication.Immunization i1 = new org.immregistries.vaccination_deduplication.Immunization();
-		i1.setCVX(immunization.getVaccineCode().getCode(ImmunizationMapperR5.CVX));
+		i1.setCVX(immunization.getVaccineCode().getCode(ImmunizationMapper.CVX));
 		if (immunization.hasManufacturer()) {
 			i1.setMVX(immunization.getManufacturer().getReference().getIdentifier().getValue());
 		}
@@ -192,7 +188,7 @@ public class MdmCustomMatchFinderSvcR5 extends MdmMatchFinderSvcImpl implements 
 		return i1;
 	}
 
-	private MdmMatchOutcome mismoResultToMdmMatchOutcome(PatientMatchResult patientMatchResult) {
+	public static MdmMatchOutcome mismoResultToMdmMatchOutcome(PatientMatchResult patientMatchResult) {
 		switch (patientMatchResult.getDetermination()) {
 			case MATCH: {
 				return MdmMatchOutcome.EID_MATCH;
