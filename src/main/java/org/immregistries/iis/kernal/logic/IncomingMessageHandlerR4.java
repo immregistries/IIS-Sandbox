@@ -1113,7 +1113,11 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler {
 						}
 					}
 					if (adminAmount > 0) {
-						sb.append(adminAmount);
+						if (adminAmount == 999.0) {
+							sb.append("999");
+						} else {
+							sb.append(adminAmount);
+						}
 					}
 					// RXA-7
 					sb.append("|");
