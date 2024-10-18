@@ -2,9 +2,9 @@ package org.immregistries.iis.kernal.servlet;
 
 import org.immregistries.iis.kernal.SoftwareVersion;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
-import org.immregistries.iis.kernal.model.UserAccess;
-import org.immregistries.iis.kernal.model.Tenant;
 import org.immregistries.iis.kernal.model.ProcessingFlavor;
+import org.immregistries.iis.kernal.model.Tenant;
+import org.immregistries.iis.kernal.model.UserAccess;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -75,6 +75,8 @@ public class HomeServlet extends HttpServlet {
 		out.println("  <div class=\"w3-container w3-green\">");
 		out.println("    <p>IIS Sandbox v" + SoftwareVersion.VERSION + " - Current Time "
 			+ sdf.format(System.currentTimeMillis()) + "</p>");
+		out.println("    <a href=\"https://aira.memberclicks.net/assets/docs/Organizational_Docs/AIRA%20Privacy%20Policy%20-%20Final%202024_.pdf\" class=\"underline\">AIRA Privacy Policy</a> - ");
+		out.println("    <a href=\"https://aira.memberclicks.net/assets/docs/Organizational_Docs/AIRA%20Terms%20of%20Use%20-%20Final%202024_.pdf\" class=\"underline\">AIRA Terms and Conditions of Use</a></p>");
 		out.println("  </div>");
 		out.println("  </body>");
 		out.println("</html>");

@@ -27,14 +27,16 @@ public enum ProcessingFlavor {
 	QUINZE("Quinze", "Will not accept phone numbers unless they are of Telecommunication Use Code PRN"),
 	SOURSOP("Soursop", "The facility submitted in MSH-4 must match what is sent in the CDC SOAP WSDL request"),
 	ICE("Ice", "Forecast generated with open-cds ICE"),
-	PHI("PHI", "Trailing \"AIRA\" is removed from patient names 10% of the time on RSPs"),
+	PHI("PHI", "Trailing \"AIRA\" is removed from patient and mother maiden names 10% of the time on RSPs"),
 	CITRUS("Citrus", "Randomly omit first name, last name or date of birth on RSPs"),
 	CHERRY("Cherry", "Omit one vaccination admin date on RSPs"),
 	KUMQUAT("Kumquat", "Vaccination forecast sends back a bad CVX code"),
 	SNAIL("Snail", "Patients are not returned until 0, 30, 60, or 90 seconds after they have been submitted"),
 	SNAIL30("Snail30", "Patients are not returned until 30 seconds after they have been submitted"),
 	SNAIL60("Snail60", "Patients are not returned until 60 seconds after they have been submitted"),
-	SNAIL90("Snail90", "Patients are not returned until 90 seconds after they have been submitted");
+	SNAIL90("Snail90", "Patients are not returned until 90 seconds after they have been submitted"),
+	PUNKIN("Punkin", "Will return unknown race and ethnicity codes in RSP if no race or ethnicity is specified"),
+	MEDLAR("Medlar", "Will only return errors but no warnings or informational error segments in ACK messages");
 
 	private String key = "";
 	private String behaviorDescription = "";

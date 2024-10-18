@@ -1,11 +1,10 @@
 package org.immregistries.iis.kernal.logic;
 
 import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
+import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.param.ReferenceParam;
 import ca.uhn.fhir.rest.param.StringParam;
 import ca.uhn.fhir.rest.param.TokenParam;
-import org.immregistries.iis.kernal.fhir.annotations.OnR5Condition;
-import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.r5.model.*;
@@ -13,10 +12,14 @@ import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodeStatusValue;
 import org.immregistries.codebase.client.reference.CodesetType;
+import org.immregistries.iis.kernal.fhir.annotations.OnR5Condition;
 import org.immregistries.iis.kernal.mapping.forR5.PatientMapperR5;
 import org.immregistries.iis.kernal.model.*;
 import org.immregistries.smm.tester.manager.HL7Reader;
-import org.immregistries.vfa.connect.model.*;
+import org.immregistries.vfa.connect.model.Admin;
+import org.immregistries.vfa.connect.model.EvaluationActual;
+import org.immregistries.vfa.connect.model.ForecastActual;
+import org.immregistries.vfa.connect.model.TestEvent;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -1464,7 +1467,13 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler {
 				// RXA-20
 				sb.append("|NA");
 				sb.append("\r");
+				HashSet<String> cvxAddedSet = new HashSet<String>();
 				for (ForecastActual forecastActual : forecastActualList) {
+					String cvx = forecastActual.getVaccineGroup().getVaccineCvx();
+					if (cvxAddedSet.contains(cvx)) {
+						continue;
+					}
+					cvxAddedSet.add(cvx);
 					obsSubId++;
 					{
 						obxSetId++;

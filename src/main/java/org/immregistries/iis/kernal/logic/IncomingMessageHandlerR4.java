@@ -42,8 +42,9 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler {
 		String messageType = reader.getValue(9);
 		String responseMessage;
 		partitionCreationInterceptor.getOrCreatePartitionId(tenant.getOrganizationName());
-		Set<ProcessingFlavor> processingFlavorSet = tenant.getProcessingFlavorSet();
+		Set<ProcessingFlavor> processingFlavorSet = null;
 		try {
+			processingFlavorSet = tenant.getProcessingFlavorSet();
 			String facilityId = reader.getValue(4);
 
 			if (processingFlavorSet.contains(ProcessingFlavor.SOURSOP)) {
@@ -1463,7 +1464,13 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler {
 				// RXA-20
 				sb.append("|NA");
 				sb.append("\r");
+				HashSet<String> cvxAddedSet = new HashSet<String>();
 				for (ForecastActual forecastActual : forecastActualList) {
+					String cvx = forecastActual.getVaccineGroup().getVaccineCvx();
+					if (cvxAddedSet.contains(cvx)) {
+						continue;
+					}
+					cvxAddedSet.add(cvx);
 					obsSubId++;
 					{
 						obxSetId++;

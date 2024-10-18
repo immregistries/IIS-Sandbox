@@ -129,8 +129,8 @@ public class VciServlet extends HttpServlet {
         ObjectMapper mapper = new ObjectMapper();
 
         Map<String, Object> verifiableCredential = new HashMap<>();
-        verifiableCredential.put("iss", "https://florence.immregistries.org/issuer");
-        verifiableCredential.put("nbf", System.currentTimeMillis() / 1000L);
+		  verifiableCredential.put("iss", "https://sabbia.westus2.cloudapp.azure.com/issuer");
+			verifiableCredential.put("nbf", System.currentTimeMillis() / 1000L);
 
         Map<String, Object> vcObj = new HashMap<>();
         vcObj.put("@context", Arrays.asList("https://www.w3.org/2018/credentials/v1"));

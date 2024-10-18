@@ -7,6 +7,8 @@ import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodeStatusValue;
 import org.immregistries.codebase.client.reference.CodesetType;
+import org.immregistries.iis.kernal.InternalClient.FhirRequester;
+import org.immregistries.iis.kernal.InternalClient.RepositoryClientFactory;
 import org.immregistries.iis.kernal.SoftwareVersion;
 import org.immregistries.iis.kernal.fhir.interceptors.PartitionCreationInterceptor;
 import org.immregistries.iis.kernal.mapping.Interfaces.ImmunizationMapper;
@@ -14,8 +16,6 @@ import org.immregistries.iis.kernal.mapping.Interfaces.LocationMapper;
 import org.immregistries.iis.kernal.mapping.Interfaces.ObservationMapper;
 import org.immregistries.iis.kernal.mapping.Interfaces.PatientMapper;
 import org.immregistries.iis.kernal.model.*;
-import org.immregistries.iis.kernal.InternalClient.FhirRequester;
-import org.immregistries.iis.kernal.InternalClient.RepositoryClientFactory;
 import org.immregistries.iis.kernal.servlet.PopServlet;
 import org.immregistries.smm.tester.manager.HL7Reader;
 import org.immregistries.vfa.connect.ConnectFactory;
@@ -139,76 +139,96 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
     // PID-2
     sb.append("|");
     // PID-3
-    sb.append("|").append(patient.getExternalLink()).append("^^^IIS^SR");
-    if (patientReported != null) {
-      sb.append("~").append(patientReported.getExternalLink()).append("^^^").append(patientReported.getPatientReportedAuthority()).append("^").append(patientReported.getPatientReportedType());
-    }
-    // PID-4
-    sb.append("|");
-    // PID-5
-    String firstName = patient.getNameFirst();
-    String middleName = patient.getNameMiddle();
-    String lastName = patient.getNameLast();
-    String dateOfBirth = sdf.format(patient.getBirthDate());
+	  sb.append("|").append(patient.getExternalLink()).append("^^^IIS^SR");
+	  if (patientReported != null) {
+		  sb.append("~").append(patientReported.getExternalLink()).append("^^^").append(patientReported.getPatientReportedAuthority()).append("^").append(patientReported.getPatientReportedType());
+	  }
+	  // PID-4
+	  sb.append("|");
+	  // PID-5
+	  String firstName = patient.getNameFirst();
+	  String middleName = patient.getNameMiddle();
+	  String lastName = patient.getNameLast();
+	  String motherMaiden = null;
+	  if (patientReported != null) {
+		  motherMaiden = patientReported.getMotherMaidenName();
+	  }
+	  String dateOfBirth = sdf.format(patient.getBirthDate());
 
-    // If "PHI" flavor, strip AIRA from names 10% of the time
-    if (processingFlavorSet.contains(ProcessingFlavor.PHI)) {
-      if (random.nextInt(10) == 0) {
-        firstName = firstName.replace("AIRA", "");
-        middleName = middleName.replace("AIRA", "");
-        lastName = lastName.replace("AIRA", "");
-      }
-    }
+	  // If "PHI" flavor, strip AIRA from names 10% of the time
+	  if (processingFlavorSet.contains(ProcessingFlavor.PHI)) {
+
+		  if (random.nextInt(10) == 0) {
+			  firstName = firstName.replace("AIRA", "");
+			  middleName = middleName.replace("AIRA", "");
+			  lastName = lastName.replace("AIRA", "");
+		  }
+		  if (motherMaiden != null) {
+			  motherMaiden = motherMaiden.replace("AIRA", "");
+		  }
+	  }
 
     if (processingFlavorSet.contains(ProcessingFlavor.CITRUS)) {
       int omission = random.nextInt(3);
       if (omission == 0) {
         firstName = "";
       } else if (omission == 1) {
-        lastName = "";
-      } else {
-        dateOfBirth = "";
-      }
-    }
+			lastName = "";
+		} else {
+			dateOfBirth = "";
+		}
+	 }
 
-    sb.append("|").append(lastName).append("^").append(firstName).append("^").append(middleName).append("^^^^L");
+	  sb.append("|").append(lastName).append("^").append(firstName).append("^").append(middleName).append("^^^^L");
 
-    // PID-6
-    sb.append("|");
-    if (patientReported != null) {
-      sb.append(patientReported.getMotherMaidenName()).append("^^^^^^M");
-    }
-    // PID-7
-    sb.append("|").append(dateOfBirth);
-    if (patientReported != null) {
-      // PID-8
-      {
-        String sex = patientReported.getSex();
-        if (!sex.equals("F") && !sex.equals("M") && !sex.equals("X")) {
-          sex = "U";
-        }
-        sb.append("|").append(sex);
+	  // PID-6
+	  sb.append("|");
+	  if (StringUtils.isNotBlank(motherMaiden)) {
+		  sb.append(motherMaiden).append("^^^^^^M");
+	  }
+	  // PID-7
+	  sb.append("|").append(dateOfBirth);
+	  if (patientReported != null) {
+		  // PID-8
+		  {
+			  String sex = patientReported.getSex();
+			  if (!sex.equals("F") && !sex.equals("M") && !sex.equals("X")) {
+				  sex = "U";
+			  }
+			  sb.append("|").append(sex);
       }
       // PID-9
       sb.append("|");
       // PID-10
       sb.append("|");
-      {
-        String race = patientReported.getRace();
-			if (!race.isBlank()) {
-				if (processingFlavorSet.contains(ProcessingFlavor.PITAYA)
-					|| processingFlavorSet.contains(ProcessingFlavor.PERSIMMON)) {
-					CodeMap codeMap = CodeMapManager.getCodeMap();
-					Code raceCode = codeMap.getCodeForCodeset(CodesetType.PATIENT_RACE, race);
-					if (processingFlavorSet.contains(ProcessingFlavor.PITAYA) || (raceCode != null
-						&& CodeStatusValue.getBy(raceCode.getCodeStatus()) != CodeStatusValue.VALID)) {
-						sb.append(raceCode);
-						sb.append("^");
-						if (raceCode != null) {
-							sb.append(raceCode.getDescription());
-              }
-              sb.append("^CDCREC");
-            }
+		  {
+			  String race = patientReported.getRace();
+			  // if processing flavor is PUNKIN then the race should be reported, and if it is null then it must be reported as UNK
+			  if (processingFlavorSet.contains(ProcessingFlavor.PUNKIN)) {
+				  CodeMap codeMap = CodeMapManager.getCodeMap();
+				  Code raceCode = codeMap.getCodeForCodeset(CodesetType.PATIENT_RACE, race);
+				  if (race.equals("") || raceCode == null || CodeStatusValue.getBy(raceCode.getCodeStatus()) != CodeStatusValue.VALID) {
+					  sb.append("UNK^Unknown^CDCREC");
+				  } else {
+					  sb.append(raceCode.getValue());
+					  sb.append("^");
+					  sb.append(raceCode.getLabel());
+					  sb.append("^CDCREC");
+				  }
+			  } else if (StringUtils.isNotBlank(race)) {
+				  if (processingFlavorSet.contains(ProcessingFlavor.PITAYA)
+					  || processingFlavorSet.contains(ProcessingFlavor.PERSIMMON)) {
+					  CodeMap codeMap = CodeMapManager.getCodeMap();
+					  Code raceCode = codeMap.getCodeForCodeset(CodesetType.PATIENT_RACE, race);
+					  if (processingFlavorSet.contains(ProcessingFlavor.PITAYA) || (raceCode != null
+						  && CodeStatusValue.getBy(raceCode.getCodeStatus()) != CodeStatusValue.VALID)) {
+						  sb.append(raceCode == null ? race : raceCode.getValue());
+						  sb.append("^");
+						  if (raceCode != null) {
+							  sb.append(raceCode.getLabel());
+						  }
+						  sb.append("^CDCREC");
+					  }
 
           }
         }
@@ -244,23 +264,37 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
       sb.append("|");
       // PID-22
       sb.append("|");
-      {
-        String ethnicity = patientReported.getEthnicity();
-			if (!ethnicity.isBlank()) {
-				if (processingFlavorSet.contains(ProcessingFlavor.PITAYA)
-					|| processingFlavorSet.contains(ProcessingFlavor.PERSIMMON)) {
-					CodeMap codeMap = CodeMapManager.getCodeMap();
-					Code ethnicityCode =
-						codeMap.getCodeForCodeset(CodesetType.PATIENT_ETHNICITY, ethnicity);
-					if (processingFlavorSet.contains(ProcessingFlavor.PITAYA) || (ethnicityCode != null
-						&& CodeStatusValue.getBy(ethnicityCode.getCodeStatus()) != CodeStatusValue.VALID)) {
-						sb.append(ethnicityCode);
-						sb.append("^");
-						if (ethnicityCode != null) {
-                sb.append(ethnicityCode.getDescription());
-              }
-              sb.append("^CDCREC");
-            }
+		  {
+			  String ethnicity = patientReported.getEthnicity();
+			  // if processing flavor is PUNKIN then the race should be reported, and if it is null then it must be reported as UNK
+			  if (processingFlavorSet.contains(ProcessingFlavor.PUNKIN)) {
+				  CodeMap codeMap = CodeMapManager.getCodeMap();
+				  Code ethnicityCode = codeMap.getCodeForCodeset(CodesetType.PATIENT_ETHNICITY, ethnicity);
+				  if (ethnicity.equals("") || ethnicityCode == null || CodeStatusValue.getBy(ethnicityCode.getCodeStatus()) != CodeStatusValue.VALID) {
+					  sb.append("UNK^Unknown^CDCREC");
+				  } else {
+					  sb.append(ethnicityCode.getValue());
+					  sb.append("^");
+					  sb.append(ethnicityCode.getLabel());
+					  sb.append("^CDCREC");
+				  }
+			  }
+			  if (StringUtils.isNotBlank(ethnicity)) {
+				  if (processingFlavorSet.contains(ProcessingFlavor.PITAYA)
+					  || processingFlavorSet.contains(ProcessingFlavor.PERSIMMON)) {
+					  CodeMap codeMap = CodeMapManager.getCodeMap();
+					  Code ethnicityCode =
+						  codeMap.getCodeForCodeset(CodesetType.PATIENT_ETHNICITY, ethnicity);
+					  if (processingFlavorSet.contains(ProcessingFlavor.PITAYA) || (ethnicityCode != null
+						  && CodeStatusValue.getBy(ethnicityCode.getCodeStatus()) != CodeStatusValue.VALID)) {
+						  sb.append(ethnicityCode == null ? ethnicity : ethnicityCode.getValue());
+
+						  sb.append("^");
+						  if (ethnicityCode != null) {
+							  sb.append(ethnicityCode.getLabel());
+						  }
+						  sb.append("^CDCREC");
+					  }
           }
         }
       }
@@ -335,12 +369,12 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
       }
       testCase.setTestEventList(testEventList);
       Software software = new Software();
-      software.setServiceUrl("https://florence.immregistries.org/lonestar/forecast");
-      software.setService(Service.LSVF);
+		 software.setServiceUrl("https://sabbia.westus2.cloudapp.azure.com/lonestar/forecast");
+		 software.setService(Service.LSVF);
       if (processingFlavorSet.contains(ProcessingFlavor.ICE)) {
-        software.setServiceUrl(
-            "https://florence.immregistries.org/opencds-decision-support-service/evaluate");
-        software.setService(Service.ICE);
+			software.setServiceUrl(
+				"https://sabbia.westus2.cloudapp.azure.com/opencds-decision-support-service/evaluate");
+			software.setService(Service.ICE);
       }
 
       ConnectorInterface connector =
@@ -545,15 +579,26 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
   }
 
   public String buildAck(HL7Reader reader, List<ProcessingException> processingExceptionList, Set<ProcessingFlavor> processingFlavorSet) {
-    StringBuilder sb = new StringBuilder();
-    {
-      String messageType = "ACK^V04^ACK";
-      String profileId = Z23_ACKNOWLEDGEMENT;
-      createMSH(messageType, profileId, reader, sb, processingFlavorSet);
-    }
+	  StringBuilder sb = new StringBuilder();
+	  {
+		  String messageType = "ACK^V04^ACK";
+		  String profileId = Z23_ACKNOWLEDGEMENT;
+		  createMSH(messageType, profileId, reader, sb, processingFlavorSet);
+	  }
 
-    String sendersUniqueId = "";
-    reader.resetPostion();
+	  // if processing flavor contains MEDLAR then all the non E errors have to removed from the processing list
+	  if (processingFlavorSet.contains(ProcessingFlavor.MEDLAR)) {
+		  List<ProcessingException> tempProcessingExceptionList = new ArrayList<ProcessingException>();
+		  for (ProcessingException pe : processingExceptionList) {
+			  if (pe.isError()) {
+				  tempProcessingExceptionList.add(pe);
+			  }
+		  }
+		  processingExceptionList = tempProcessingExceptionList;
+	  }
+
+	  String sendersUniqueId = "";
+	  reader.resetPostion();
 	  if (reader.advanceToSegment("MSH")) {
 		  sendersUniqueId = reader.getValue(10);
 	  } else {
