@@ -25,8 +25,10 @@ public class RecommendationForecastProviderR5 implements IRecommendationForecast
 	@Autowired
 	ImmunizationRecommendationServiceR5 immunizationRecommendationServiceR5;
 
-	@Override
-	@Operation(name = $_IMMDS_FORECAST)
+	@Operation(name = $_IMMDS_FORECAST,
+		idempotent = true,
+		canonicalUrl = IMM_DSFORECAST_CANONICAL_URL,
+		typeName = "")
 	public Parameters immdsForecastOperation(
 		@Description(shortDefinition = "The date on which to assess the forecast.")
 		@OperationParam(name = ASSESSMENT_DATE, min = 1, max = 1, typeName = "date")

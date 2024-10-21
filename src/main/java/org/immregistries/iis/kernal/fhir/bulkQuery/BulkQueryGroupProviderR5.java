@@ -284,7 +284,7 @@ public class BulkQueryGroupProviderR5 extends GroupResourceProvider {
 	/**
 	 * Group/123/$member-add
 	 */
-	@Operation(name = "$member-add", idempotent = true)
+	@Operation(name = "$member-add", idempotent = true, canonicalUrl = "http://hl7.org/fhir/us/davinci-atr/OperationDefinition/member-add")
 	public Group groupInstanceMemberAdd(
 
 		@IdParam
@@ -358,7 +358,7 @@ public class BulkQueryGroupProviderR5 extends GroupResourceProvider {
 	/**
 	 * Group/123/$member-remove
 	 */
-	@Operation(name = "$member-remove", idempotent = true, bundleType = BundleTypeEnum.SEARCHSET)
+	@Operation(name = "$member-remove", idempotent = true, bundleType = BundleTypeEnum.SEARCHSET, canonicalUrl = "http://hl7.org/fhir/us/davinci-atr/OperationDefinition/member-remove")
 	public Group groupInstanceMemberRemove(
 
 		@IdParam

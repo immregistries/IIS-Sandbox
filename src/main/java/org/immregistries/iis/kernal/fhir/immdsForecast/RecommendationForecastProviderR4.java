@@ -21,13 +21,16 @@ import java.util.List;
 
 @Controller
 @Conditional(OnR4Condition.class)
-public class RecommendationForecastProviderR4 implements IRecommendationForecastProvider<Parameters, Patient, Immunization> {
+public class RecommendationForecastProviderR4
+	implements IRecommendationForecastProvider<Parameters, Patient, Immunization> {
 
 	@Autowired
 	ImmunizationRecommendationServiceR4 immunizationRecommendationServiceR4;
 
-	@Override
-	@Operation(name = $_IMMDS_FORECAST)
+	@Operation(name = $_IMMDS_FORECAST,
+		idempotent = true,
+		canonicalUrl = IMM_DSFORECAST_CANONICAL_URL,
+		typeName = "")
 	public Parameters immdsForecastOperation(
 		@Description(shortDefinition = "The date on which to assess the forecast.")
 		@OperationParam(name = ASSESSMENT_DATE, min = 1, max = 1, typeName = "date")

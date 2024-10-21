@@ -7,10 +7,6 @@ import ca.uhn.fhir.jpa.model.util.JpaConstants;
 import ca.uhn.fhir.jpa.provider.BaseJpaResourceProviderPatient;
 import ca.uhn.fhir.jpa.rp.r4.GroupResourceProvider;
 import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
-import ca.uhn.fhir.rest.api.server.SystemRequestDetails;
-import ca.uhn.fhir.rest.param.TokenParam;
-import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
-import org.immregistries.iis.kernal.fhir.annotations.OnR4Condition;
 import ca.uhn.fhir.model.api.annotation.Description;
 import ca.uhn.fhir.model.valueset.BundleTypeEnum;
 import ca.uhn.fhir.parser.IParser;
@@ -22,7 +18,10 @@ import ca.uhn.fhir.rest.api.Constants;
 import ca.uhn.fhir.rest.api.SortSpec;
 import ca.uhn.fhir.rest.api.server.IBundleProvider;
 import ca.uhn.fhir.rest.api.server.RequestDetails;
+import ca.uhn.fhir.rest.api.server.SystemRequestDetails;
 import ca.uhn.fhir.rest.param.DateRangeParam;
+import ca.uhn.fhir.rest.param.TokenParam;
+import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
 import ca.uhn.fhir.rest.server.servlet.ServletRequestDetails;
 import ca.uhn.fhir.util.JsonUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -31,6 +30,7 @@ import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.instance.model.api.IIdType;
 import org.hl7.fhir.instance.model.api.IPrimitiveType;
 import org.hl7.fhir.r4.model.*;
+import org.immregistries.iis.kernal.fhir.annotations.OnR4Condition;
 import org.immregistries.iis.kernal.fhir.interceptors.IdentifierSolverInterceptorR4;
 import org.immregistries.iis.kernal.fhir.interceptors.PartitionCreationInterceptor;
 import org.immregistries.iis.kernal.servlet.PopServlet;
@@ -43,7 +43,10 @@ import org.springframework.stereotype.Controller;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 @Controller
@@ -284,7 +287,7 @@ public class BulkQueryGroupProviderR4 extends GroupResourceProvider {
 	/**
 	 * Group/123/$member-add
 	 */
-	@Operation(name = "$member-add", idempotent = true)
+	@Operation(name = "$member-add", idempotent = true, canonicalUrl = "http://hl7.org/fhir/us/davinci-atr/OperationDefinition/member-add")
 	public Group groupInstanceMemberAdd(
 
 		@IdParam
@@ -358,7 +361,7 @@ public class BulkQueryGroupProviderR4 extends GroupResourceProvider {
 	/**
 	 * Group/123/$member-remove
 	 */
-	@Operation(name = "$member-remove", idempotent = true, bundleType = BundleTypeEnum.SEARCHSET)
+	@Operation(name = "$member-remove", idempotent = true, bundleType = BundleTypeEnum.SEARCHSET, canonicalUrl = "http://hl7.org/fhir/us/davinci-atr/OperationDefinition/member-remove")
 	public Group groupInstanceMemberRemove(
 
 		@IdParam

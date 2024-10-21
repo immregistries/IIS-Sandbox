@@ -266,7 +266,7 @@ public class ServerConfig {
 
 		//register the IPS Provider
 		theIpsOperationProvider.ifPresent(fhirServer::registerProvider);
-//		recommendationForecastProvider.ifPresent(fhirServer::registerProvider);
+		recommendationForecastProvider.ifPresent(fhirServer::registerProvider);
 
 		// register custom interceptors
 		fhirServer.registerInterceptor(sessionAuthorizationInterceptor);
