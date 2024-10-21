@@ -26,19 +26,14 @@ import static org.immregistries.iis.kernal.mapping.Interfaces.PatientMapper.MRN_
 @Interceptor
 @Conditional(OnR5Condition.class)
 @Service
-public class IdentifierSolverInterceptorR5 {
+public class IdentifierSolverInterceptorR5 implements IIdentifierSolverInterceptor<Identifier, Immunization, Group> {
 
 	Logger logger = LoggerFactory.getLogger(IdentifierSolverInterceptorR5.class);
 
 	@Autowired
 	IFhirResourceDao<Patient> patientDao;
 
-	/**
-	 * Resolves business identifier resources to actual resources references id
-	 * Currently only Immunization supported
-	 * TODO support Observation and other
-	 * TODO add flavours
-	 */
+	@Override
 	@Hook(SERVER_INCOMING_REQUEST_PRE_HANDLED)
 	public void handle(RequestDetails requestDetails) throws InvalidRequestException {
 		if (requestDetails.getResource() instanceof Immunization) {
@@ -48,7 +43,8 @@ public class IdentifierSolverInterceptorR5 {
 		}
 	}
 
-	private void handleImmunization(RequestDetails requestDetails, Immunization immunization) {
+	@Override
+	public void handleImmunization(RequestDetails requestDetails, Immunization immunization) {
 
 		if (immunization == null
 			|| immunization.getPatient().getIdentifier() == null
@@ -77,7 +73,8 @@ public class IdentifierSolverInterceptorR5 {
 		}
 	}
 
-	private void handleGroup(RequestDetails requestDetails, Group group) {
+	@Override
+	public void handleGroup(RequestDetails requestDetails, Group group) {
 		logger.info("Identifier reference interception for Group");
 		for (Group.GroupMemberComponent memberComponent : group.getMember()) {
 			if (!memberComponent.getEntity().hasIdentifier()) {
@@ -101,6 +98,7 @@ public class IdentifierSolverInterceptorR5 {
 	}
 
 
+	@Override
 	public String solvePatientIdentifier(RequestDetails requestDetails, Identifier identifier) {
 		String id = null;
 		/**
@@ -112,8 +110,8 @@ public class IdentifierSolverInterceptorR5 {
 				.setValue(GOLDEN_RECORD));
 		if (StringUtils.isNotBlank(identifier.getSystem())) {
 			goldenSearchParameterMap.add(Patient.SP_IDENTIFIER, new TokenParam()
-					.setSystem(identifier.getSystem())
-					.setValue(identifier.getValue()));
+				.setSystem(identifier.getSystem())
+				.setValue(identifier.getValue()));
 		} else {
 			goldenSearchParameterMap.add(Patient.SP_IDENTIFIER, new TokenParam()
 				.setValue(identifier.getValue()));

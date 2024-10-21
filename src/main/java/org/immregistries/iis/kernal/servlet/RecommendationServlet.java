@@ -5,7 +5,7 @@ import ca.uhn.fhir.rest.client.api.IGenericClient;
 import org.hl7.fhir.r5.model.*;
 import org.immregistries.iis.kernal.fhir.annotations.OnR5Condition;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
-import org.immregistries.iis.kernal.logic.ImmunizationRecommendationService;
+import org.immregistries.iis.kernal.logic.IImmunizationRecommendationService;
 import org.immregistries.iis.kernal.model.Tenant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Date;
 
 import static org.immregistries.iis.kernal.mapping.Interfaces.PatientMapper.MRN_SYSTEM;
 
@@ -30,7 +31,7 @@ public class RecommendationServlet extends PatientServlet {
 	public static final String PARAM_RECOMMENDATION_RESOURCE = "recommendationResource";
 
 	@Autowired
-	ImmunizationRecommendationService immunizationRecommendationService;
+	IImmunizationRecommendationService immunizationRecommendationService;
 
 	public static String linkUrl(String facilityId, String patientId) {
 		return "/tenant/" + facilityId + "/patient/" + patientId + "/recommendation";
@@ -59,10 +60,10 @@ public class RecommendationServlet extends PatientServlet {
 				.where(ImmunizationRecommendation.PATIENT.hasId(new IdType(patient.getId()).getIdPart())).returnBundle(Bundle.class).execute();
 			if (recommendationBundle.hasEntry()) {
 				ImmunizationRecommendation recommendation = (ImmunizationRecommendation) recommendationBundle.getEntryFirstRep().getResource();
-				recommendation = immunizationRecommendationService.addGeneratedRecommendation(recommendation);
+				recommendation = (ImmunizationRecommendation) immunizationRecommendationService.addGeneratedRecommendation(recommendation);
 				fhirClient.update().resource(recommendation).withId(recommendation.getId()).execute();
 			} else {
-				fhirClient.create().resource(immunizationRecommendationService.generate(tenant, patient)).execute();
+				fhirClient.create().resource(immunizationRecommendationService.generate(tenant, new Date(), patient)).execute();
 			}
 		}
 		doGet(req, resp);

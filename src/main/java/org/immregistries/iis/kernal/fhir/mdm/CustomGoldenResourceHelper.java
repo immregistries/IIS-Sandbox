@@ -13,7 +13,6 @@ import ca.uhn.fhir.mdm.model.CanonicalEID;
 import ca.uhn.fhir.mdm.model.MdmTransactionContext;
 import ca.uhn.fhir.mdm.util.*;
 import ca.uhn.fhir.rest.api.Constants;
-import ca.uhn.fhir.util.TerserUtil;
 import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.hl7.fhir.instance.model.api.IBase;
 import org.hl7.fhir.instance.model.api.IBaseResource;
@@ -23,10 +22,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.Nonnull;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
-import static ca.uhn.fhir.context.FhirVersionEnum.*;
+import static ca.uhn.fhir.context.FhirVersionEnum.R4;
+import static ca.uhn.fhir.context.FhirVersionEnum.R5;
 
 /**
  * Custom Made for Accepting R5 and adding any original identifier to golden identifiers
@@ -190,7 +189,7 @@ public class CustomGoldenResourceHelper extends GoldenResourceHelper {
 
 	private void validateContextSupported() {
 		FhirVersionEnum fhirVersion = myFhirContext.getVersion().getVersion();
-		if (fhirVersion == R5 ||fhirVersion == R4 || fhirVersion == DSTU3) {
+		if (fhirVersion == R5 || fhirVersion == R4) {
 			return;
 		}
 		throw new UnsupportedOperationException(Msg.code(1489) + "Version not supported: "

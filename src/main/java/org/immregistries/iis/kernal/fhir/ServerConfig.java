@@ -6,7 +6,6 @@ import ca.uhn.fhir.context.ConfigurationException;
 import ca.uhn.fhir.context.FhirVersionEnum;
 import ca.uhn.fhir.context.support.IValidationSupport;
 import ca.uhn.fhir.interceptor.api.IInterceptorBroadcaster;
-
 import ca.uhn.fhir.jpa.api.config.JpaStorageSettings;
 import ca.uhn.fhir.jpa.api.config.ThreadPoolFactoryConfig;
 import ca.uhn.fhir.jpa.api.dao.DaoRegistry;
@@ -18,19 +17,13 @@ import ca.uhn.fhir.jpa.delete.ThreadSafeResourceDeleterSvc;
 import ca.uhn.fhir.jpa.graphql.GraphQLProvider;
 import ca.uhn.fhir.jpa.interceptor.CascadingDeleteInterceptor;
 import ca.uhn.fhir.jpa.interceptor.validation.RepositoryValidatingInterceptor;
+import ca.uhn.fhir.jpa.ips.provider.IpsOperationProvider;
 import ca.uhn.fhir.jpa.packages.IPackageInstallerSvc;
 import ca.uhn.fhir.jpa.partition.PartitionManagementProvider;
 import ca.uhn.fhir.jpa.provider.*;
-import ca.uhn.fhir.jpa.ips.provider.IpsOperationProvider;
-import ca.uhn.fhir.jpa.provider.dstu3.JpaConformanceProviderDstu3;
 import ca.uhn.fhir.jpa.search.DatabaseBackedPagingProvider;
-import ca.uhn.fhir.mdm.provider.MdmProviderLoader;
-import org.immregistries.iis.kernal.fhir.bulkQuery.BulkQueryGroupProviderR4;
-import org.immregistries.iis.kernal.fhir.bulkQuery.BulkQueryGroupProviderR5;
-import org.immregistries.iis.kernal.fhir.bulkQuery.CustomBulkDataExportProvider;
-import org.immregistries.iis.kernal.fhir.common.StarterJpaConfig;
-import org.immregistries.iis.kernal.fhir.interceptors.*;
 import ca.uhn.fhir.jpa.subscription.util.SubscriptionDebugLogInterceptor;
+import ca.uhn.fhir.mdm.provider.MdmProviderLoader;
 import ca.uhn.fhir.narrative.DefaultThymeleafNarrativeGenerator;
 import ca.uhn.fhir.narrative2.NullNarrativeGenerator;
 import ca.uhn.fhir.rest.openapi.OpenApiInterceptor;
@@ -42,6 +35,15 @@ import ca.uhn.fhir.rest.server.util.ISearchParamRegistry;
 import ca.uhn.fhir.validation.IValidatorModule;
 import ca.uhn.fhir.validation.ResultSeverityEnum;
 import com.google.common.base.Strings;
+import org.immregistries.iis.kernal.fhir.bulkQuery.BulkQueryGroupProviderR4;
+import org.immregistries.iis.kernal.fhir.bulkQuery.BulkQueryGroupProviderR5;
+import org.immregistries.iis.kernal.fhir.bulkQuery.CustomBulkDataExportProvider;
+import org.immregistries.iis.kernal.fhir.common.StarterJpaConfig;
+import org.immregistries.iis.kernal.fhir.immdsForecast.IRecommendationForecastProvider;
+import org.immregistries.iis.kernal.fhir.interceptors.GroupAuthorityInterceptor;
+import org.immregistries.iis.kernal.fhir.interceptors.IIdentifierSolverInterceptor;
+import org.immregistries.iis.kernal.fhir.interceptors.PartitionCreationInterceptor;
+import org.immregistries.iis.kernal.fhir.interceptors.SessionAuthorizationInterceptor;
 import org.immregistries.iis.kernal.fhir.ips.IpsConfig;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
@@ -70,12 +72,12 @@ public class ServerConfig {
 												  PartitionCreationInterceptor partitionCreationInterceptor,
 												  Optional<BulkQueryGroupProviderR5> bulkQueryGroupProviderR5,
 												  Optional<BulkQueryGroupProviderR4> bulkQueryGroupProviderR4,
-												  Optional<IdentifierSolverInterceptorR5> identifierSolverInterceptorR5,
-												  Optional<IdentifierSolverInterceptorR4> identifierSolverInterceptorR4,
+												  Optional<IIdentifierSolverInterceptor> identifierSolverInterceptor,
 												  Optional<IFhirResourceDao<org.hl7.fhir.r4.model.Group>> fhirResourceGroupDaoR4,
 												  Optional<IFhirResourceDao<org.hl7.fhir.r5.model.Group>> fhirResourceGroupDaoR5,
 												  Optional<GroupAuthorityInterceptor> groupAuthorityInterceptor,
 												  IpsOperationProvider ipsOperationProvider,
+												  Optional<IRecommendationForecastProvider> recommendationForecastProvider,
 												  SessionAuthorizationInterceptor sessionAuthorizationInterceptor) {
 		RestfulServer fhirServer = new RestfulServer(fhirSystemDao.getContext());
 		List<String> supportedResourceTypes = appProperties.getSupported_resource_types();
@@ -263,15 +265,12 @@ public class ServerConfig {
 		repositoryValidatingInterceptor.ifPresent(fhirServer::registerInterceptor);
 
 		//register the IPS Provider
-		if (!theIpsOperationProvider.isEmpty()) {
-			fhirServer.registerProvider(theIpsOperationProvider.get());
-		}
+		theIpsOperationProvider.ifPresent(fhirServer::registerProvider);
+//		recommendationForecastProvider.ifPresent(fhirServer::registerProvider);
 
 		// register custom interceptors
 		fhirServer.registerInterceptor(sessionAuthorizationInterceptor);
-		if (identifierSolverInterceptorR5.isPresent()) {
-			fhirServer.registerInterceptor(identifierSolverInterceptorR5.get());
-		} else identifierSolverInterceptorR4.ifPresent(fhirServer::registerInterceptor);
+		identifierSolverInterceptor.ifPresent(fhirServer::registerInterceptor);
 //		registerCustomInterceptors(fhirServer, appContext, appProperties.getCustomInterceptorClasses());
 		groupAuthorityInterceptor.ifPresent(fhirServer::registerInterceptor);
 
@@ -322,16 +321,7 @@ public class ServerConfig {
 
 	public static IServerConformanceProvider<?> calculateConformanceProvider(IFhirSystemDao fhirSystemDao, RestfulServer fhirServer, JpaStorageSettings jpaStorageSettings, ISearchParamRegistry searchParamRegistry, IValidationSupport theValidationSupport) {
 		FhirVersionEnum fhirVersion = fhirSystemDao.getContext().getVersion().getVersion();
-		if (fhirVersion == FhirVersionEnum.DSTU2) {
-			JpaConformanceProviderDstu2 confProvider = new JpaConformanceProviderDstu2(fhirServer, fhirSystemDao, jpaStorageSettings);
-			confProvider.setImplementationDescription("HAPI FHIR DSTU2 Server");
-			return confProvider;
-		} else if (fhirVersion == FhirVersionEnum.DSTU3) {
-
-			JpaConformanceProviderDstu3 confProvider = new JpaConformanceProviderDstu3(fhirServer, fhirSystemDao, jpaStorageSettings, searchParamRegistry);
-			confProvider.setImplementationDescription("HAPI FHIR DSTU3 Server");
-			return confProvider;
-		} else if (fhirVersion == FhirVersionEnum.R4) {
+		if (fhirVersion == FhirVersionEnum.R4) {
 
 			JpaCapabilityStatementProvider confProvider = new JpaCapabilityStatementProvider(fhirServer, fhirSystemDao, jpaStorageSettings, searchParamRegistry, theValidationSupport);
 			confProvider.setImplementationDescription("HAPI FHIR R4 Server");
