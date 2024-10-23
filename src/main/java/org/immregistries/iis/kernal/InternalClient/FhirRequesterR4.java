@@ -1,21 +1,22 @@
 package org.immregistries.iis.kernal.InternalClient;
 
 import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
-import ca.uhn.fhir.rest.api.server.IBundleProvider;
-import org.apache.commons.lang3.StringUtils;
-import org.hl7.fhir.instance.model.api.IBaseResource;
-import org.immregistries.iis.kernal.fhir.annotations.OnR4Condition;
 import ca.uhn.fhir.rest.api.MethodOutcome;
+import ca.uhn.fhir.rest.api.server.IBundleProvider;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
-import ca.uhn.fhir.rest.gclient.ICriterion;
+import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.*;
+import org.immregistries.iis.kernal.fhir.annotations.OnR4Condition;
 import org.immregistries.iis.kernal.model.*;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+
+import static org.immregistries.iis.kernal.logic.IncomingMessageHandler.MINIMAL_MATCHING_SCORE;
 
 
 /**
@@ -333,5 +334,39 @@ public class FhirRequesterR4 extends FhirRequester<Patient,Immunization,Location
 
 	public VaccinationReported readVaccinationReported(String id) {
 		return immunizationMapper.getReportedWithMaster((Immunization) read(Immunization.class, id));
+	}
+
+	public PatientMaster matchPatient(List<PatientReported> multipleMatches, PatientMaster patientMasterForMatchQuery, Date cutoff) {
+		PatientMaster singleMatch = null;
+		Bundle matches = repositoryClientFactory.getFhirClient()
+			.operation().onType(Patient.class)
+			.named("match")
+			.withParameter(Parameters.class, "resource", patientMapper.getFhirResource(patientMasterForMatchQuery))
+			.returnResourceType(Bundle.class).execute();
+		for (Bundle.BundleEntryComponent entry : matches.getEntry()) {
+			if (entry.getResource() instanceof Patient) {
+				Patient patient = (Patient) entry.getResource();
+				PatientMaster patientMaster = patientMapper.getMaster(patient);
+				/**
+				 * Filter for flavours previously configured
+				 */
+				if (cutoff != null && cutoff.before(patientMaster.getReportedDate())) {
+					break;
+				}
+
+//				/**
+//				 * Filtering only Golden records
+//				 * TODO ask Nathan to assert workflow
+//				 */
+//				if (entry.getResource().getMeta().getTag(GOLDEN_SYSTEM_TAG, GOLDEN_RECORD) == null) {
+//					break;
+//				}
+				if (entry.getSearch().hasScore() && entry.getSearch().getScoreElement().compareTo(new DecimalType(MINIMAL_MATCHING_SCORE)) > 0) {
+					singleMatch = patientMaster;
+				}
+				multipleMatches.add(patientMapper.getReported((Patient) entry.getResource()));
+			}
+		}
+		return singleMatch;
 	}
 }

@@ -14,13 +14,18 @@ import ca.uhn.fhir.rest.param.TokenParamModifier;
 import ca.uhn.fhir.rest.server.RestfulServer;
 import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
 import org.apache.commons.lang3.StringUtils;
- import org.hl7.fhir.instance.model.api.IBaseResource;
+import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.IdType;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.mapping.Interfaces.*;
+import org.immregistries.iis.kernal.model.PatientMaster;
+import org.immregistries.iis.kernal.model.PatientReported;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.Date;
+import java.util.List;
 
 public abstract class FhirRequester<
 	Patient extends IBaseResource,
@@ -181,4 +186,15 @@ public abstract class FhirRequester<
 //			return null;
 //		}
 	}
+
+	/**
+	 * Fills multiple matched list and return Single Match
+	 *
+	 * @param multipleMatches
+	 * @param patientMasterForMatchQuery
+	 * @param cutoff
+	 * @return Single match result
+	 */
+	public abstract PatientMaster matchPatient(List<PatientReported> multipleMatches, PatientMaster patientMasterForMatchQuery, Date cutoff);
+
 }
