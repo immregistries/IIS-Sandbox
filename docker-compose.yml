@@ -39,13 +39,14 @@ services:
       #      - ./src/main/database/create-mysql-user.sql:/docker-entrypoint-initdb.d/1.sql
       - ./database/create-mysql-database.sql:/docker-entrypoint-initdb.d/2.sql
   iis-sandbox:
-    build: .
+#    build: .
+    image: clemhen/iis-sandbox:deployable-v1.1
     container_name: iis-sandbox
-#    environment:
-#      - iis.mysql.hibernate.connection.url=jdbc:mysql://iis-sandbox-mysql:3306/iis_alongside_jpa
-#      - IIS_MYSQL_URL=jdbc:mysql://iis-sandbox-mysql:3306/iis_alongside_jpa
-#      - SPRING_DATASOURCE_URL=jdbc:postgresql://hapi-fhir-postgres:5432/hapi_fhir_iis
-#      - spring.datasource.url=jdbc:postgresql://hapi-fhir-postgres:5432/hapi_fhir_iis
+    #    environment:
+    #      - iis.mysql.hibernate.connection.url=jdbc:mysql://iis-sandbox-mysql:3306/iis_alongside_jpa
+    #      - IIS_MYSQL_URL=jdbc:mysql://iis-sandbox-mysql:3306/iis_alongside_jpa
+    #      - SPRING_DATASOURCE_URL=jdbc:postgresql://hapi-fhir-postgres:5432/hapi_fhir_iis
+    #      - spring.datasource.url=jdbc:postgresql://hapi-fhir-postgres:5432/hapi_fhir_iis
     restart: unless-stopped
     ports:
       - "8081:8080"
