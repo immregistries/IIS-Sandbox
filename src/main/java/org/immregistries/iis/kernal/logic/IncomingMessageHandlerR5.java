@@ -561,7 +561,7 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler {
 
 			{
 				String race = patientReported.getRace();
-				if (!race.equals("")) {
+				if (StringUtils.isNotBlank(race)) {
 					Code raceCode = codeMap.getCodeForCodeset(CodesetType.PATIENT_RACE, race);
 					if (raceCode == null || CodeStatusValue.getBy(raceCode.getCodeStatus()) != CodeStatusValue.VALID) {
 						ProcessingException pe = new ProcessingException("Invalid race '" + race + "', message cannot be accepted", "PID", 1, 10);
@@ -718,46 +718,6 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler {
 			recordMessageReceived(message, null, ack, "Update", "Exception", tenant);
 			return ack;
 		}
-	}
-
-	public int readAndCreateObservations(HL7Reader reader, List<ProcessingException> processingExceptionList, PatientReported patientReported, boolean strictDate, int obxCount, VaccinationReported vaccinationReported, VaccinationMaster vaccination) {
-		while (reader.advanceToSegment("OBX", "ORC")) {
-			obxCount++;
-			String identifierCode = reader.getValue(3);
-			String valueCode = reader.getValue(5);
-			ObservationReported observationReported = readObservations(reader, processingExceptionList, patientReported, strictDate, obxCount, vaccinationReported, vaccination, identifierCode, valueCode);
-			if (observationReported.getIdentifierCode().equals("30945-0")) // contraindication!
-			{
-				CodeMap codeMap = CodeMapManager.getCodeMap();
-				Code contraCode = codeMap.getCodeForCodeset(CodesetType.CONTRAINDICATION_OR_PRECAUTION, observationReported.getValueCode());
-				if (contraCode == null) {
-					ProcessingException pe = new ProcessingException("Unrecognized contraindication or precaution", "OBX", obxCount, 5);
-					pe.setWarning();
-					processingExceptionList.add(pe);
-				}
-				if (observationReported.getObservationDate() != null) {
-					Date today = new Date();
-					if (observationReported.getObservationDate().after(today)) {
-						ProcessingException pe = new ProcessingException("Contraindication or precaution observed in the future", "OBX", obxCount, 5);
-						pe.setWarning();
-						processingExceptionList.add(pe);
-					}
-					if (patientReported.getBirthDate() != null && observationReported.getObservationDate().before(patientReported.getBirthDate())) {
-						ProcessingException pe = new ProcessingException("Contraindication or precaution observed before patient was born", "OBX", obxCount, 14);
-						pe.setWarning();
-						processingExceptionList.add(pe);
-					}
-				}
-			}
-			{
-				observationReported.setPatientReportedId(patientReported.getPatientId());
-
-//		  Observation observation = ObservationMapper.getFhirResource(observationMaster,observationReported);
-				observationReported = fhirRequester.saveObservationReported(observationReported);
-
-			}
-		}
-		return obxCount;
 	}
 
 	@SuppressWarnings("unchecked")

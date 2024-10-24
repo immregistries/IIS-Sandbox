@@ -9,11 +9,9 @@ import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Observation;
 import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.generated.Code;
-import org.immregistries.codebase.client.reference.CodeStatusValue;
 import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.InternalClient.FhirRequester;
 import org.immregistries.iis.kernal.InternalClient.RepositoryClientFactory;
-import org.immregistries.iis.kernal.SoftwareVersion;
 import org.immregistries.iis.kernal.fhir.interceptors.PartitionCreationInterceptor;
 import org.immregistries.iis.kernal.mapping.Interfaces.ImmunizationMapper;
 import org.immregistries.iis.kernal.mapping.Interfaces.LocationMapper;
@@ -35,33 +33,15 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 public abstract class IncomingMessageHandler implements IIncomingMessageHandler {
-	public static final double MINIMAL_MATCHING_SCORE = 0.9;
 
-
-	protected static final String PATIENT_MIDDLE_NAME_MULTI = "Multi";
-	protected static final String QBP_Z34 = "Z34";
-	protected static final String QBP_Z44 = "Z44";
-	protected static final String RSP_Z42_MATCH_WITH_FORECAST = "Z42";
-	protected static final String RSP_Z32_MATCH = "Z32";
-	protected static final String RSP_Z31_MULTIPLE_MATCH = "Z31";
-	protected static final String RSP_Z33_NO_MATCH = "Z33";
-	protected static final String Z23_ACKNOWLEDGEMENT = "Z23";
-	protected static final String QUERY_OK = "OK";
-	// TODO:
-	// Organize logic classes, need to have access classes for every object, maybe a new Access
-	// package?
-	// Look at names of database fields, make more consistent
-	protected static final String QUERY_NOT_FOUND = "NF";
-	protected static final String QUERY_TOO_MANY = "TM";
-	protected static final String QUERY_APPLICATION_ERROR = "AE";
-	protected static final Random random = new Random();
-	private static Integer increment = 1;
 	protected final Logger logger = LoggerFactory.getLogger(IncomingMessageHandler.class);
 	@Autowired
-	protected RepositoryClientFactory repositoryClientFactory;
+	RepositoryClientFactory repositoryClientFactory;
 	@Autowired
-	protected FhirRequester fhirRequester;
+	FhirRequester fhirRequester;
 	protected Session dataSession;
+	@Autowired
+	Hl7MessageWriter hl7MessageWriter;
 	@Autowired
 	PatientMapper patientMapper;
 	@Autowired
@@ -75,17 +55,6 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 
 	public IncomingMessageHandler() {
 		dataSession = PopServlet.getDataSession();
-	}
-
-	private static int nextIncrement() {
-		synchronized (increment) {
-			if (increment < Integer.MAX_VALUE) {
-				increment = increment + 1;
-			} else {
-				increment = 1;
-			}
-			return increment;
-		}
 	}
 
 	public void verifyNoErrors(List<ProcessingException> processingExceptionList) throws ProcessingException {
@@ -120,223 +89,6 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 		Transaction transaction = dataSession.beginTransaction();
 		dataSession.save(messageReceived);
 		transaction.commit();
-	}
-
-	public void printQueryNK1(PatientMaster patientMaster, StringBuilder sb, CodeMap codeMap) {
-		if (patientMaster != null) {
-
-			if (StringUtils.isNotBlank(patientMaster.getGuardianRelationship()) && StringUtils.isNotBlank(patientMaster.getGuardianLast()) && StringUtils.isNotBlank(patientMaster.getGuardianFirst())) {
-				Code code = codeMap.getCodeForCodeset(CodesetType.PERSON_RELATIONSHIP, patientMaster.getGuardianRelationship());
-				if (code != null) {
-					sb.append("NK1");
-					sb.append("|1");
-					sb.append("|").append(patientMaster.getGuardianLast()).append("^").append(patientMaster.getGuardianFirst()).append("^^^^^L");
-					sb.append("|").append(code.getValue()).append("^").append(code.getLabel()).append("^HL70063");
-					sb.append("\r");
-				}
-			}
-		}
-	}
-
-	public void printQueryPID(PatientMaster patientReported, Set<ProcessingFlavor> processingFlavorSet, StringBuilder sb, PatientMaster patient, SimpleDateFormat sdf, int pidCount) {
-		// PID
-		sb.append("PID");
-		// PID-1
-		sb.append("|").append(pidCount);
-		// PID-2
-		sb.append("|");
-		// PID-3
-		sb.append("|").append(patient.getExternalLink()).append("^^^IIS^SR");
-		if (patientReported != null) {
-			sb.append("~").append(patientReported.getExternalLink()).append("^^^").append(patientReported.getPatientReportedAuthority()).append("^").append(patientReported.getPatientReportedType());
-		}
-		// PID-4
-		sb.append("|");
-		// PID-5
-		String firstName = patient.getNameFirst();
-		String middleName = patient.getNameMiddle();
-		String lastName = patient.getNameLast();
-		String motherMaiden = null;
-		if (patientReported != null) {
-			motherMaiden = patientReported.getMotherMaidenName();
-		}
-		String dateOfBirth = sdf.format(patient.getBirthDate());
-
-		// If "PHI" flavor, strip AIRA from names 10% of the time
-		if (processingFlavorSet.contains(ProcessingFlavor.PHI)) {
-
-			if (random.nextInt(10) == 0) {
-				firstName = firstName.replace("AIRA", "");
-				middleName = middleName.replace("AIRA", "");
-				lastName = lastName.replace("AIRA", "");
-			}
-			if (motherMaiden != null) {
-				motherMaiden = motherMaiden.replace("AIRA", "");
-			}
-		}
-
-		if (processingFlavorSet.contains(ProcessingFlavor.CITRUS)) {
-			int omission = random.nextInt(3);
-			if (omission == 0) {
-				firstName = "";
-			} else if (omission == 1) {
-				lastName = "";
-			} else {
-				dateOfBirth = "";
-			}
-		}
-
-		sb.append("|").append(lastName).append("^").append(firstName).append("^").append(middleName).append("^^^^L");
-
-		// PID-6
-		sb.append("|");
-		if (StringUtils.isNotBlank(motherMaiden)) {
-			sb.append(motherMaiden).append("^^^^^^M");
-		}
-		// PID-7
-		sb.append("|").append(dateOfBirth);
-		if (patientReported != null) {
-			// PID-8
-			{
-				String sex = patientReported.getSex();
-				if (!sex.equals("F") && !sex.equals("M") && !sex.equals("X")) {
-					sex = "U";
-				}
-				sb.append("|").append(sex);
-			}
-			// PID-9
-			sb.append("|");
-			// PID-10
-			sb.append("|");
-			{
-				String race = patientReported.getRace();
-				// if processing flavor is PUNKIN then the race should be reported, and if it is null then it must be reported as UNK
-				if (processingFlavorSet.contains(ProcessingFlavor.PUNKIN)) {
-					CodeMap codeMap = CodeMapManager.getCodeMap();
-					Code raceCode = codeMap.getCodeForCodeset(CodesetType.PATIENT_RACE, race);
-					if (race.equals("") || raceCode == null || CodeStatusValue.getBy(raceCode.getCodeStatus()) != CodeStatusValue.VALID) {
-						sb.append("UNK^Unknown^CDCREC");
-					} else {
-						sb.append(raceCode.getValue());
-						sb.append("^");
-						sb.append(raceCode.getLabel());
-						sb.append("^CDCREC");
-					}
-				} else if (StringUtils.isNotBlank(race)) {
-					if (processingFlavorSet.contains(ProcessingFlavor.PITAYA) || processingFlavorSet.contains(ProcessingFlavor.PERSIMMON)) {
-						CodeMap codeMap = CodeMapManager.getCodeMap();
-						Code raceCode = codeMap.getCodeForCodeset(CodesetType.PATIENT_RACE, race);
-						if (processingFlavorSet.contains(ProcessingFlavor.PITAYA) || (raceCode != null && CodeStatusValue.getBy(raceCode.getCodeStatus()) != CodeStatusValue.VALID)) {
-							sb.append(raceCode == null ? race : raceCode.getValue());
-							sb.append("^");
-							if (raceCode != null) {
-								sb.append(raceCode.getLabel());
-							}
-							sb.append("^CDCREC");
-						}
-
-					}
-				}
-			}
-			// PID-11
-			sb.append("|").append(patientReported.getAddressLine1()).append("^").append(patientReported.getAddressLine2()).append("^").append(patientReported.getAddressCity()).append("^").append(patientReported.getAddressState()).append("^").append(patientReported.getAddressZip()).append("^").append(patientReported.getAddressCountry()).append("^");
-			if (!processingFlavorSet.contains(ProcessingFlavor.LIME)) {
-				sb.append("P");
-			}
-			// PID-12
-			sb.append("|");
-			// PID-13
-			sb.append("|");
-			String phone = patientReported.getPhone();
-			if (phone.length() == 10) {
-				sb.append("^PRN^PH^^^").append(phone, 0, 3).append("^").append(phone, 3, 10);
-			}
-			// PID-14
-			sb.append("|");
-			// PID-15
-			sb.append("|");
-			// PID-16
-			sb.append("|");
-			// PID-17
-			sb.append("|");
-			// PID-18
-			sb.append("|");
-			// PID-19
-			sb.append("|");
-			// PID-20
-			sb.append("|");
-			// PID-21
-			sb.append("|");
-			// PID-22
-			sb.append("|");
-			{
-				String ethnicity = patientReported.getEthnicity();
-				// if processing flavor is PUNKIN then the race should be reported, and if it is null then it must be reported as UNK
-				if (processingFlavorSet.contains(ProcessingFlavor.PUNKIN)) {
-					CodeMap codeMap = CodeMapManager.getCodeMap();
-					Code ethnicityCode = codeMap.getCodeForCodeset(CodesetType.PATIENT_ETHNICITY, ethnicity);
-					if (ethnicity.equals("") || ethnicityCode == null || CodeStatusValue.getBy(ethnicityCode.getCodeStatus()) != CodeStatusValue.VALID) {
-						sb.append("UNK^Unknown^CDCREC");
-					} else {
-						sb.append(ethnicityCode.getValue());
-						sb.append("^");
-						sb.append(ethnicityCode.getLabel());
-						sb.append("^CDCREC");
-					}
-				}
-				if (StringUtils.isNotBlank(ethnicity)) {
-					if (processingFlavorSet.contains(ProcessingFlavor.PITAYA) || processingFlavorSet.contains(ProcessingFlavor.PERSIMMON)) {
-						CodeMap codeMap = CodeMapManager.getCodeMap();
-						Code ethnicityCode = codeMap.getCodeForCodeset(CodesetType.PATIENT_ETHNICITY, ethnicity);
-						if (processingFlavorSet.contains(ProcessingFlavor.PITAYA) || (ethnicityCode != null && CodeStatusValue.getBy(ethnicityCode.getCodeStatus()) != CodeStatusValue.VALID)) {
-							sb.append(ethnicityCode == null ? ethnicity : ethnicityCode.getValue());
-
-							sb.append("^");
-							if (ethnicityCode != null) {
-								sb.append(ethnicityCode.getLabel());
-							}
-							sb.append("^CDCREC");
-						}
-					}
-				}
-			}
-			// PID-23
-			sb.append("|");
-			// PID-24
-			sb.append("|");
-			sb.append(patientReported.getBirthFlag());
-			// PID-25
-			sb.append("|");
-			sb.append(patientReported.getBirthOrder());
-
-		}
-		sb.append("\r");
-	}
-
-	public void printORC(Tenant tenant, StringBuilder sb, VaccinationMaster vaccination, boolean originalReporter) {
-		Set<ProcessingFlavor> processingFlavorSet = tenant.getProcessingFlavorSet();
-		sb.append("ORC");
-		// ORC-1
-		sb.append("|RE");
-		// ORC-2
-		sb.append("|");
-		if (vaccination != null) {
-			sb.append(vaccination.getVaccinationId()).append("^IIS");
-		}
-		// ORC-3
-		sb.append("|");
-		if (vaccination == null) {
-			if (processingFlavorSet.contains(ProcessingFlavor.LIME)) {
-				sb.append("999^IIS");
-			} else {
-				sb.append("9999^IIS");
-			}
-		} else {
-			if (originalReporter) {
-				sb.append(vaccination.getExternalLink()).append("^").append(tenant.getOrganizationName());
-			}
-		}
-		sb.append("\r");
 	}
 
 	public List<ForecastActual> doForecast(PatientMaster patient, CodeMap codeMap, List<VaccinationMaster> vaccinationMasterList, Tenant tenant) {
@@ -390,191 +142,12 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 		return forecastActualList;
 	}
 
-	public void printObx(StringBuilder sb, int obxSetId, int obsSubId, String loinc, String loincLabel, String value) {
-		sb.append("OBX");
-		// OBX-1
-		sb.append("|");
-		sb.append(obxSetId);
-		// OBX-2
-		sb.append("|");
-		sb.append("CE");
-		// OBX-3
-		sb.append("|");
-		sb.append(loinc).append("^").append(loincLabel).append("^LN");
-		// OBX-4
-		sb.append("|");
-		sb.append(obsSubId);
-		// OBX-5
-		sb.append("|");
-		sb.append(value);
-		// OBX-6
-		sb.append("|");
-		// OBX-7
-		sb.append("|");
-		// OBX-8
-		sb.append("|");
-		// OBX-9
-		sb.append("|");
-		// OBX-10
-		sb.append("|");
-		// OBX-11
-		sb.append("|");
-		sb.append("F");
-		sb.append("\r");
-	}
-
-	public void printObx(StringBuilder sb, int obxSetId, int obsSubId, ObservationReported ob) {
-//    ObservationReported ob = observation.getObservationReported();
-		sb.append("OBX");
-		// OBX-1
-		sb.append("|");
-		sb.append(obxSetId);
-		// OBX-2
-		sb.append("|");
-		sb.append(ob.getValueType());
-		// OBX-3
-		sb.append("|");
-		sb.append(ob.getIdentifierCode()).append("^").append(ob.getIdentifierLabel()).append("^").append(ob.getIdentifierTable());
-		// OBX-4
-		sb.append("|");
-		sb.append(obsSubId);
-		// OBX-5
-		sb.append("|");
-		if (StringUtils.isBlank(ob.getValueTable())) {
-			sb.append(ob.getValueCode());
-		} else {
-			sb.append(ob.getValueCode()).append("^").append(ob.getValueLabel()).append("^").append(ob.getValueTable());
-		}
-		// OBX-6
-		sb.append("|");
-		if (StringUtils.isBlank(ob.getUnitsTable())) {
-			sb.append(ob.getUnitsCode());
-		} else {
-			sb.append(ob.getUnitsCode()).append("^").append(ob.getUnitsLabel()).append("^").append(ob.getUnitsTable());
-		}
-		// OBX-7
-		sb.append("|");
-		// OBX-8
-		sb.append("|");
-		// OBX-9
-		sb.append("|");
-		// OBX-10
-		sb.append("|");
-		// OBX-11
-		sb.append("|");
-		sb.append(ob.getResultStatus());
-		// OBX-12
-		sb.append("|");
-		// OBX-13
-		sb.append("|");
-		// OBX-14
-		sb.append("|");
-		if (ob.getObservationDate() != null) {
-			SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-			sb.append(sdf.format(ob.getObservationDate()));
-		}
-		// OBX-15
-		sb.append("|");
-		// OBX-16
-		sb.append("|");
-		// OBX-17
-		sb.append("|");
-		if (StringUtils.isBlank(ob.getMethodTable())) {
-			sb.append(ob.getMethodCode());
-		} else {
-			sb.append(ob.getMethodCode()).append("^").append(ob.getMethodLabel()).append("^").append(ob.getMethodTable());
-		}
-		sb.append("\r");
-	}
-
-	public void printObx(StringBuilder sb, int obxSetId, int obsSubId, String loinc, String loincLabel, String value, String valueLabel, String valueTable) {
-		sb.append("OBX");
-		// OBX-1
-		sb.append("|");
-		sb.append(obxSetId);
-		// OBX-2
-		sb.append("|");
-		sb.append("CE");
-		// OBX-3
-		sb.append("|");
-		sb.append(loinc).append("^").append(loincLabel).append("^LN");
-		// OBX-4
-		sb.append("|");
-		sb.append(obsSubId);
-		// OBX-5
-		sb.append("|");
-		sb.append(value).append("^").append(valueLabel).append("^").append(valueTable);
-		// OBX-6
-		sb.append("|");
-		// OBX-7
-		sb.append("|");
-		// OBX-8
-		sb.append("|");
-		// OBX-9
-		sb.append("|");
-		// OBX-10
-		sb.append("|");
-		// OBX-11
-		sb.append("|");
-		sb.append("F");
-		sb.append("\r");
-	}
-
-	public void printObx(StringBuilder sb, int obxSetId, int obsSubId, String loinc, String loincLabel, Date value) {
-		sb.append("OBX");
-		// OBX-1
-		sb.append("|");
-		sb.append(obxSetId);
-		// OBX-2
-		sb.append("|");
-		sb.append("DT");
-		// OBX-3
-		sb.append("|");
-		sb.append(loinc).append("^").append(loincLabel).append("^LN");
-		// OBX-4
-		sb.append("|");
-		sb.append(obsSubId);
-		// OBX-5
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-		sb.append("|");
-		if (value != null) {
-			sb.append(sdf.format(value));
-		}
-		// OBX-6
-		sb.append("|");
-		// OBX-7
-		sb.append("|");
-		// OBX-8
-		sb.append("|");
-		// OBX-9
-		sb.append("|");
-		// OBX-10
-		sb.append("|");
-		// OBX-11
-		sb.append("|");
-		sb.append("F");
-		sb.append("\r");
-	}
-
-	public String printCode(String value, CodesetType codesetType, String tableName, CodeMap codeMap) {
-		if (value != null) {
-			Code code = codeMap.getCodeForCodeset(codesetType, value);
-			if (code != null) {
-				if (tableName == null) {
-					return code.getValue();
-				}
-				return code.getValue() + "^" + code.getLabel() + "^" + tableName;
-			}
-		}
-		return "";
-	}
-
 	public String buildAck(HL7Reader reader, List<ProcessingException> processingExceptionList, Set<ProcessingFlavor> processingFlavorSet) {
 		StringBuilder sb = new StringBuilder();
 		{
 			String messageType = "ACK^V04^ACK";
 			String profileId = Z23_ACKNOWLEDGEMENT;
-			createMSH(messageType, profileId, reader, sb, processingFlavorSet);
+			hl7MessageWriter.createMSH(messageType, profileId, reader, sb, processingFlavorSet);
 		}
 
 		// if processing flavor contains MEDLAR then all the non E errors have to removed from the processing list
@@ -638,70 +211,6 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 		sb.append("|\r");
 	}
 
-	public void createMSH(String messageType, String profileId, HL7Reader reader, StringBuilder sb, Set<ProcessingFlavor> processingFlavorSet) {
-		String sendingApp = "";
-		String sendingFac = "";
-		String receivingApp = "";
-		StringBuilder receivingFac = new StringBuilder("IIS Sandbox");
-		if (processingFlavorSet != null) {
-			for (ProcessingFlavor processingFlavor : ProcessingFlavor.values()) {
-				if (processingFlavorSet.contains(processingFlavor)) {
-					receivingFac.append(" ").append(processingFlavor.getKey());
-				}
-			}
-		}
-		receivingFac.append(" v" + SoftwareVersion.VERSION);
-
-		reader.resetPostion();
-		if (reader.advanceToSegment("MSH")) {
-			sendingApp = reader.getValue(3);
-			sendingFac = reader.getValue(4);
-			receivingApp = reader.getValue(5);
-		}
-
-
-		String sendingDateString;
-		{
-			SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddhhmmssZ");
-			sendingDateString = simpleDateFormat.format(new Date());
-		}
-		String uniqueId;
-		{
-			uniqueId = String.valueOf(System.currentTimeMillis()) + nextIncrement();
-		}
-		String production = reader.getValue(11);
-		// build MSH
-		sb.append("MSH|^~\\&|");
-		sb.append(receivingApp).append("|");
-		sb.append(receivingFac).append("|");
-		sb.append(sendingApp).append("|");
-		sb.append(sendingFac).append("|");
-		sb.append(sendingDateString).append("|");
-		sb.append("|");
-		if (processingFlavorSet != null && processingFlavorSet.contains(ProcessingFlavor.MELON)) {
-			int pos = messageType.indexOf("^");
-			if (pos > 0) {
-				messageType = messageType.substring(0, pos);
-				if (System.currentTimeMillis() % 2 == 0) {
-					messageType += "^ZZZ";
-				}
-			}
-		}
-		sb.append(messageType).append("|");
-		sb.append(uniqueId).append("|");
-		sb.append(production).append("|");
-		sb.append("2.5.1|");
-		sb.append("|");
-		sb.append("|");
-		sb.append("NE|");
-		sb.append("NE|");
-		sb.append("|");
-		sb.append("|");
-		sb.append("|");
-		sb.append("|");
-		sb.append(profileId).append("^CDCPHINVS\r");
-	}
-
 	public Date parseDateWarn(String dateString, String errorMessage, String segmentId, int segmentRepeat, int fieldPosition, boolean strict, List<ProcessingException> processingExceptionList) {
 		try {
 			return parseDateInternal(dateString, strict);
@@ -745,7 +254,6 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 		return date;
 	}
 
-
 	public String processQBP(Tenant tenant, HL7Reader reader, String messageReceived) {
 		PatientMaster patientMasterForMatchQuery = new PatientMaster();
 		List<ProcessingException> processingExceptionList = new ArrayList<>();
@@ -783,11 +291,12 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 				problem = "Date of Birth is missing";
 				fieldPosition = 6;
 			}
-			if (problem != null) {
+			if (StringUtils.isNotBlank(problem)) {
 				processingExceptionList.add(new ProcessingException(problem, "QPD", 1, fieldPosition));
 			} else {
 
 				patientMasterForMatchQuery.setNameFirst(patientNameFirst);
+				patientMasterForMatchQuery.setNameMiddle(patientNameMiddle);
 				patientMasterForMatchQuery.setNameLast(patientNameLast);
 				patientMasterForMatchQuery.setBirthDate(patientBirthDate);
 			}
@@ -836,7 +345,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 	}
 
 	@SuppressWarnings("unchecked")
-	public String buildRSP(HL7Reader reader, String messageRecieved, PatientMaster patientMaster, Tenant tenant, List<PatientReported> patientReportedPossibleList, List<ProcessingException> processingExceptionList) {
+	public String buildRSP(HL7Reader reader, String messageReceived, PatientMaster patientMaster, Tenant tenant, List<PatientReported> patientReportedPossibleList, List<ProcessingException> processingExceptionList) {
 		IGenericClient fhirClient = repositoryClientFactory.getFhirClient();
 		reader.resetPostion();
 		reader.advanceToSegment("MSH");
@@ -912,7 +421,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 			} else {
 				processingExceptionList.add(new ProcessingException("Unrecognized profile id '" + profileIdSubmitted + "'", "MSH", 1, 21));
 			}
-			createMSH(messageType, profileId, reader, sb, processingFlavorSet);
+			hl7MessageWriter.createMSH(messageType, profileId, reader, sb, processingFlavorSet);
 		}
 		{
 			String sendersUniqueId = reader.getValue(10);
@@ -952,7 +461,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 			for (PatientReported pr : patientReportedPossibleList) {
 				count++;
 				PatientMaster patient = pr.getPatient();
-				printQueryPID(pr, processingFlavorSet, sb, patient, sdf, count);
+				hl7MessageWriter.printQueryPID(pr, processingFlavorSet, sb, patient, sdf, count);
 			}
 		} else if (profileId.equals(RSP_Z32_MATCH) || profileId.equals(RSP_Z42_MATCH_WITH_FORECAST)) {
 			/**
@@ -960,9 +469,9 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 			 */
 			PatientMaster patient = patientMaster;
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-			printQueryPID(patientMaster, processingFlavorSet, sb, patient, sdf, 1);
+			hl7MessageWriter.printQueryPID(patientMaster, processingFlavorSet, sb, patient, sdf, 1);
 			if (profileId.equals(RSP_Z32_MATCH)) {
-				printQueryNK1(patientMaster, sb, codeMap);
+				hl7MessageWriter.printQueryNK1(patientMaster, sb, codeMap);
 			}
 			List<VaccinationMaster> vaccinationMasterList = getVaccinationMasterList(patientMaster);
 
@@ -992,7 +501,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 				if ("D".equals(vaccination.getActionCode())) {
 					continue;
 				}
-				printORC(tenant, sb, vaccination, originalReporter);
+				hl7MessageWriter.printORC(tenant, sb, vaccination, originalReporter);
 				sb.append("RXA");
 				// RXA-1
 				sb.append("|0");
@@ -1078,10 +587,10 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 				}
 				// RXA-17
 				sb.append("|");
-				sb.append(printCode(vaccination.getVaccineMvxCode(), CodesetType.VACCINATION_MANUFACTURER_CODE, "MVX", codeMap));
+				sb.append(hl7MessageWriter.printCode(vaccination.getVaccineMvxCode(), CodesetType.VACCINATION_MANUFACTURER_CODE, "MVX", codeMap));
 				// RXA-18
 				sb.append("|");
-				sb.append(printCode(vaccination.getRefusalReasonCode(), CodesetType.VACCINATION_REFUSAL, "NIP002", codeMap));
+				sb.append(hl7MessageWriter.printCode(vaccination.getRefusalReasonCode(), CodesetType.VACCINATION_REFUSAL, "NIP002", codeMap));
 				// RXA-19
 				sb.append("|");
 				// RXA-20
@@ -1091,7 +600,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 					if (completionStatus == null || completionStatus.equals("")) {
 						completionStatus = "CP";
 					}
-					sb.append(printCode(completionStatus, CodesetType.VACCINATION_COMPLETION, null, codeMap));
+					sb.append(hl7MessageWriter.printCode(completionStatus, CodesetType.VACCINATION_COMPLETION, null, codeMap));
 				}
 
 				// RXA-21
@@ -1101,10 +610,10 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 					sb.append("RXR");
 					// RXR-1
 					sb.append("|");
-					sb.append(printCode(vaccination.getBodyRoute(), CodesetType.BODY_ROUTE, "NCIT", codeMap));
+					sb.append(hl7MessageWriter.printCode(vaccination.getBodyRoute(), CodesetType.BODY_ROUTE, "NCIT", codeMap));
 					// RXR-2
 					sb.append("|");
-					sb.append(printCode(vaccination.getBodySite(), CodesetType.BODY_SITE, "HL70163", codeMap));
+					sb.append(hl7MessageWriter.printCode(vaccination.getBodySite(), CodesetType.BODY_SITE, "HL70163", codeMap));
 					sb.append("\r");
 				}
 				TestEvent testEvent = vaccination.getTestEvent();
@@ -1123,7 +632,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 							}
 							String valueLabel = evaluationActual.getVaccineCvx();
 							String valueTable = "CVX";
-							printObx(sb, obxSetId, obsSubId, loinc, loincLabel, value, valueLabel, valueTable);
+							hl7MessageWriter.printObx(sb, obxSetId, obsSubId, loinc, loincLabel, value, valueLabel, valueTable);
 						}
 						{
 							obxSetId++;
@@ -1132,7 +641,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 							String value = evaluationActual.getDoseValid();
 							String valueLabel = value;
 							String valueTable = "99107";
-							printObx(sb, obxSetId, obsSubId, loinc, loincLabel, value, valueLabel, valueTable);
+							hl7MessageWriter.printObx(sb, obxSetId, obsSubId, loinc, loincLabel, value, valueLabel, valueTable);
 						}
 					}
 				}
@@ -1141,11 +650,10 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 					if (bundle.hasEntry()) {
 						obsSubId++;
 						for (Bundle.BundleEntryComponent entry : bundle.getEntry()) {
-//						ObservationMaster observationMaster =
-//							ObservationMapper.getMaster((Observation) entry.getResource());
+//						ObservationMaster observationMaster = ObservationMapper.getMaster((Observation) entry.getResource());
 							ObservationReported observationReported = observationMapper.getReported(entry.getResource());
 							obxSetId++;
-							printObx(sb, obxSetId, obsSubId, observationReported);
+							hl7MessageWriter.printObx(sb, obxSetId, obsSubId, observationReported);
 						}
 					}
 				} catch (ResourceNotFoundException e) {
@@ -1154,19 +662,19 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 			try {
 				Bundle bundle = fhirClient.search().forResource(Observation.class).where(Observation.PART_OF.hasId(patientMaster.getPatientId())).returnBundle(Bundle.class).execute();
 				if (bundle.hasEntry()) {
-					printORC(tenant, sb, null, false);
+					hl7MessageWriter.printORC(tenant, sb, null, false);
 					obsSubId++;
 					for (Bundle.BundleEntryComponent entry : bundle.getEntry()) {
 						obxSetId++;
 						ObservationReported observationReported = observationMapper.getReported(entry.getResource());
-						printObx(sb, obxSetId, obsSubId, observationReported);
+						hl7MessageWriter.printObx(sb, obxSetId, obsSubId, observationReported);
 					}
 				}
 			} catch (ResourceNotFoundException e) {
 			}
 
 			if (sendBackForecast && forecastActualList != null && forecastActualList.size() > 0) {
-				printORC(tenant, sb, null, false);
+				hl7MessageWriter.printORC(tenant, sb, null, false);
 				sb.append("RXA");
 				// RXA-1
 				sb.append("|0");
@@ -1224,7 +732,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 						String value = forecastActual.getVaccineGroup().getVaccineCvx();
 						String valueLabel = forecastActual.getVaccineGroup().getLabel();
 						String valueTable = "CVX";
-						printObx(sb, obxSetId, obsSubId, loinc, loincLabel, value, valueLabel, valueTable);
+						hl7MessageWriter.printObx(sb, obxSetId, obsSubId, loinc, loincLabel, value, valueLabel, valueTable);
 					}
 					{
 						obxSetId++;
@@ -1234,36 +742,78 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 						String value = admin.getAdminStatus();
 						String valueLabel = admin.getLabel();
 						String valueTable = "99106";
-						printObx(sb, obxSetId, obsSubId, loinc, loincLabel, value, valueLabel, valueTable);
+						hl7MessageWriter.printObx(sb, obxSetId, obsSubId, loinc, loincLabel, value, valueLabel, valueTable);
 					}
 					if (forecastActual.getDueDate() != null) {
 						obxSetId++;
 						String loinc = "30981-5";
 						String loincLabel = "Earliest date";
 						Date value = forecastActual.getValidDate();
-						printObx(sb, obxSetId, obsSubId, loinc, loincLabel, value);
+						hl7MessageWriter.printObx(sb, obxSetId, obsSubId, loinc, loincLabel, value);
 					}
 					if (forecastActual.getDueDate() != null) {
 						obxSetId++;
 						String loinc = "30980-7";
 						String loincLabel = "Recommended date";
 						Date value = forecastActual.getDueDate();
-						printObx(sb, obxSetId, obsSubId, loinc, loincLabel, value);
+						hl7MessageWriter.printObx(sb, obxSetId, obsSubId, loinc, loincLabel, value);
 					}
 					if (forecastActual.getDueDate() != null) {
 						obxSetId++;
 						String loinc = "59778-1";
 						String loincLabel = "Latest date";
 						Date value = forecastActual.getOverdueDate();
-						printObx(sb, obxSetId, obsSubId, loinc, loincLabel, value);
+						hl7MessageWriter.printObx(sb, obxSetId, obsSubId, loinc, loincLabel, value);
 					}
 				}
 			}
 		}
 
 		String messageResponse = sb.toString();
-		recordMessageReceived(messageRecieved, patientMaster, messageResponse, "Query", categoryResponse, tenant);
+		recordMessageReceived(messageReceived, patientMaster, messageResponse, "Query", categoryResponse, tenant);
 		return messageResponse;
 	}
+
+	public int readAndCreateObservations(HL7Reader reader, List<ProcessingException> processingExceptionList, PatientReported patientReported, boolean strictDate, int obxCount, VaccinationReported vaccinationReported, VaccinationMaster vaccination) {
+		while (reader.advanceToSegment("OBX", "ORC")) {
+			obxCount++;
+			String identifierCode = reader.getValue(3);
+			String valueCode = reader.getValue(5);
+			ObservationReported observationReported = readObservations(reader, processingExceptionList, patientReported, strictDate, obxCount, vaccinationReported, vaccination, identifierCode, valueCode);
+			if (observationReported.getIdentifierCode().equals("30945-0")) // contraindication!
+			{
+				CodeMap codeMap = CodeMapManager.getCodeMap();
+				Code contraCode = codeMap.getCodeForCodeset(CodesetType.CONTRAINDICATION_OR_PRECAUTION, observationReported.getValueCode());
+				if (contraCode == null) {
+					ProcessingException pe = new ProcessingException("Unrecognized contraindication or precaution", "OBX", obxCount, 5);
+					pe.setWarning();
+					processingExceptionList.add(pe);
+				}
+				if (observationReported.getObservationDate() != null) {
+					Date today = new Date();
+					if (observationReported.getObservationDate().after(today)) {
+						ProcessingException pe = new ProcessingException("Contraindication or precaution observed in the future", "OBX", obxCount, 5);
+						pe.setWarning();
+						processingExceptionList.add(pe);
+					}
+					if (patientReported.getBirthDate() != null && observationReported.getObservationDate().before(patientReported.getBirthDate())) {
+						ProcessingException pe = new ProcessingException("Contraindication or precaution observed before patient was born", "OBX", obxCount, 14);
+						pe.setWarning();
+						processingExceptionList.add(pe);
+					}
+				}
+			}
+			{
+				observationReported.setPatientReportedId(patientReported.getPatientId());
+
+//		  Observation observation = ObservationMapper.getFhirResource(observationMaster,observationReported);
+				observationReported = fhirRequester.saveObservationReported(observationReported);
+
+			}
+		}
+		return obxCount;
+	}
+
+	public abstract ObservationReported readObservations(HL7Reader reader, List<ProcessingException> processingExceptionList, PatientReported patientReported, boolean strictDate, int obxCount, VaccinationReported vaccinationReported, VaccinationMaster vaccination, String identifierCode, String valueCode);
 
 }

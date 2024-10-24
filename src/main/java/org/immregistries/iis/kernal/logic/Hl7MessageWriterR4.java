@@ -2,12 +2,12 @@ package org.immregistries.iis.kernal.logic;
 
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
-import org.hl7.fhir.r5.model.Bundle;
-import org.hl7.fhir.r5.model.Observation;
+import org.hl7.fhir.r4.model.Bundle;
+import org.hl7.fhir.r4.model.Observation;
 import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
-import org.immregistries.iis.kernal.fhir.annotations.OnR5Condition;
+import org.immregistries.iis.kernal.fhir.annotations.OnR4Condition;
 import org.immregistries.iis.kernal.model.*;
 import org.immregistries.smm.tester.manager.HL7Reader;
 import org.immregistries.vfa.connect.model.EvaluationActual;
@@ -19,8 +19,8 @@ import java.text.SimpleDateFormat;
 import java.util.Set;
 
 @Service
-@Conditional(OnR5Condition.class)
-public class ExampleMessageWriterR5 extends ExampleMessageWriter {
+@Conditional(OnR4Condition.class)
+public class Hl7MessageWriterR4 extends Hl7MessageWriter {
 
 	public String buildVxu(VaccinationReported vaccinationReported, Tenant tenant) {
 		IGenericClient fhirClient = repositoryClientFactory.getFhirClient();
@@ -32,9 +32,9 @@ public class ExampleMessageWriterR5 extends ExampleMessageWriter {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
 		HL7Reader reader = new HL7Reader(
 			"MSH|^~\\&|||AIRA|IIS Sandbox|20120701082240-0500||VXU^V04^VXU_V04|NIST-IZ-001.00|P|2.5.1|||ER|AL|||||Z22^CDCPHINVS\r");
-		incomingMessageHandler.createMSH("VXU^V04^VXU_V04", "Z22", reader, sb, processingFlavorSet);
-		incomingMessageHandler.printQueryPID(patientReported, processingFlavorSet, sb, patientMaster, sdf, 1);
-		incomingMessageHandler.printQueryNK1(patientReported, sb, codeMap);
+		createMSH("VXU^V04^VXU_V04", "Z22", reader, sb, processingFlavorSet);
+		printQueryPID(patientReported, processingFlavorSet, sb, patientMaster, sdf, 1);
+		printQueryNK1(patientReported, sb, codeMap);
 
 		int obxSetId = 0;
 		int obsSubId = 0;
@@ -46,7 +46,7 @@ public class ExampleMessageWriterR5 extends ExampleMessageWriter {
 
 				boolean originalReporter =
 					vaccinationReported.getPatientReported().getTenant().equals(tenant);
-				incomingMessageHandler.printORC(tenant, sb, vaccination, originalReporter);
+				printORC(tenant, sb, vaccination, originalReporter);
 				sb.append("RXA");
 				// RXA-1
 				sb.append("|0");
@@ -133,11 +133,11 @@ public class ExampleMessageWriterR5 extends ExampleMessageWriter {
 				}
 				// RXA-17
 				sb.append("|");
-				sb.append(incomingMessageHandler.printCode(vaccinationReported.getVaccineMvxCode(),
+				sb.append(printCode(vaccinationReported.getVaccineMvxCode(),
 					CodesetType.VACCINATION_MANUFACTURER_CODE, "MVX", codeMap));
 				// RXA-18
 				sb.append("|");
-				sb.append(incomingMessageHandler.printCode(vaccinationReported.getRefusalReasonCode(),
+				sb.append(printCode(vaccinationReported.getRefusalReasonCode(),
 					CodesetType.VACCINATION_REFUSAL, "NIP002", codeMap));
 				// RXA-19
 				sb.append("|");
@@ -148,7 +148,7 @@ public class ExampleMessageWriterR5 extends ExampleMessageWriter {
 					if (completionStatus == null || completionStatus.equals("")) {
 						completionStatus = "CP";
 					}
-					sb.append(incomingMessageHandler.printCode(completionStatus, CodesetType.VACCINATION_COMPLETION, null, codeMap));
+					sb.append(printCode(completionStatus, CodesetType.VACCINATION_COMPLETION, null, codeMap));
 				}
 
 				// RXA-21
@@ -164,11 +164,11 @@ public class ExampleMessageWriterR5 extends ExampleMessageWriter {
 					sb.append("RXR");
 					// RXR-1
 					sb.append("|");
-					sb.append(incomingMessageHandler.printCode(vaccinationReported.getBodyRoute(), CodesetType.BODY_ROUTE, "NCIT",
+					sb.append(printCode(vaccinationReported.getBodyRoute(), CodesetType.BODY_ROUTE, "NCIT",
 						codeMap));
 					// RXR-2
 					sb.append("|");
-					sb.append(incomingMessageHandler.printCode(vaccinationReported.getBodySite(), CodesetType.BODY_SITE, "HL70163",
+					sb.append(printCode(vaccinationReported.getBodySite(), CodesetType.BODY_SITE, "HL70163",
 						codeMap));
 					sb.append("\r");
 				}
@@ -183,7 +183,7 @@ public class ExampleMessageWriterR5 extends ExampleMessageWriter {
 							String value = evaluationActual.getVaccineCvx();
 							String valueLabel = evaluationActual.getVaccineCvx();
 							String valueTable = "CVX";
-							incomingMessageHandler.printObx(sb, obxSetId, obsSubId, loinc, loincLabel, value, valueLabel, valueTable);
+							printObx(sb, obxSetId, obsSubId, loinc, loincLabel, value, valueLabel, valueTable);
 						}
 						{
 							obxSetId++;
@@ -192,7 +192,7 @@ public class ExampleMessageWriterR5 extends ExampleMessageWriter {
 							String value = evaluationActual.getDoseValid();
 							String valueLabel = value;
 							String valueTable = "99107";
-							incomingMessageHandler.printObx(sb, obxSetId, obsSubId, loinc, loincLabel, value, valueLabel, valueTable);
+							printObx(sb, obxSetId, obsSubId, loinc, loincLabel, value, valueLabel, valueTable);
 						}
 					}
 				}
@@ -208,7 +208,7 @@ public class ExampleMessageWriterR5 extends ExampleMessageWriter {
 							ObservationReported observationReported =
 								observationMapper.getReported((Observation) entry.getResource());
 							obxSetId++;
-							incomingMessageHandler.printObx(sb, obxSetId, obsSubId, observationReported);
+							printObx(sb, obxSetId, obsSubId, observationReported);
 						}
 					}
 				} catch (ResourceNotFoundException e) {
@@ -217,5 +217,6 @@ public class ExampleMessageWriterR5 extends ExampleMessageWriter {
 		}
 		return sb.toString();
 	}
+
 
 }
