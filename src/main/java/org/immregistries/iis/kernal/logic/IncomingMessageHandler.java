@@ -215,11 +215,9 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 		}
 		// if processing flavor contains MEDLAR then all the non E errors have to removed from the processing list
 		if (processingFlavorSet != null && processingFlavorSet.contains(ProcessingFlavor.MEDLAR)) {
-			List<ProcessingException> tempProcessingExceptionList = new ArrayList<ProcessingException>();
 			reportables = reportables.stream().filter(reportable -> !SeverityLevel.ERROR.equals(reportable.getSeverity())).collect(Collectors.toList());
 		}
 		data.setReportables(reportables);
-
 
 		String messageType = "ACK^V04^ACK";
 		if (processingFlavorSet != null && processingFlavorSet.contains(ProcessingFlavor.MELON)) {
@@ -875,55 +873,4 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 
 	public abstract ObservationReported readObservations(HL7Reader reader, List<ProcessingException> processingExceptionList, PatientReported patientReported, boolean strictDate, int obxCount, VaccinationReported vaccinationReported, VaccinationMaster vaccination, String identifierCode, String valueCode);
 
-	private String makeAckFromValidationResults(MqeMessageServiceResponse mqeMessageServiceResponse, List<Reportable> iisReportablesList, List<Reportable> nistReportablesList, Set<ProcessingFlavor> processingFlavorSet) {
-
-		StringBuilder receivingFac = new StringBuilder("IIS Sandbox");
-		if (processingFlavorSet != null) {
-			for (ProcessingFlavor processingFlavor : ProcessingFlavor.values()) {
-				if (processingFlavorSet.contains(processingFlavor)) {
-					receivingFac.append(" ").append(processingFlavor.getKey());
-				}
-			}
-		}
-		receivingFac.append(" v" + SoftwareVersion.VERSION);
-
-
-		List<ValidationRuleResult> resultList = mqeMessageServiceResponse.getValidationResults();
-		List<Reportable> reportables = new ArrayList<>(iisReportablesList);
-		reportables.addAll(nistReportablesList);
-		/* This code needs to get put somewhere better. */
-		for (ValidationRuleResult result : resultList) {
-			reportables.addAll(result.getValidationDetections());
-		}
-
-		AckBuilder ackBuilder = AckBuilder.INSTANCE;
-
-		AckData data = new AckData();
-		MqeMessageHeader header = mqeMessageServiceResponse.getMessageObjects().getMessageHeader();
-		data.setMessageControlId(header.getMessageControl());
-		data.setMessageDate(header.getMessageDate());
-		data.setMessageProfileId(header.getMessageProfile());
-		data.setMessageVersionId(header.getMessageVersion());
-		data.setProcessingControlId(header.getProcessingStatus());
-		data.setReceivingApplication("IIS Sandbox");
-		data.setReceivingFacility(receivingFac.toString());
-		data.setSendingFacility(header.getSendingFacility());
-		data.setSendingApplication(header.getSendingApplication());
-		data.setResponseType("?");
-		data.setReportables(reportables);
-		data.setProfileId(Z23_ACKNOWLEDGEMENT);
-//		String messageType = "ACK^V04^ACK";
-//		if (processingFlavorSet != null && processingFlavorSet.contains(ProcessingFlavor.MELON)) {
-//			int pos = messageType.indexOf("^");
-//			if (pos > 0) {
-//				messageType = messageType.substring(0, pos);
-//				if (System.currentTimeMillis() % 2 == 0) {
-//					messageType += "^ZZZ";
-//				}
-//			}
-//		} //TODO ask for configurability to modify
-
-
-		return ackBuilder.buildAckFrom(data);
-	}
 }
