@@ -2,26 +2,20 @@ package org.immregistries.iis.kernal.fhir.common;
 
 import ca.uhn.fhir.jpa.partition.IPartitionLookupSvc;
 import ca.uhn.fhir.jpa.partition.PartitionManagementProvider;
-import org.immregistries.iis.kernal.fhir.AppProperties;
-import ca.uhn.fhir.to.FhirTesterMvcConfig;
-import ca.uhn.fhir.to.TesterConfig;
 import org.immregistries.iis.kernal.InternalClient.RepositoryClientFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 
 //@formatter:off
 /**
  * This spring config file configures the web testing module. It serves two
  * purposes:
  * 1. It imports FhirTesterMvcConfig, which is the spring config for the
- *    tester itself
+ * tester itself
  * 2. It tells the tester which server(s) to talk to, via the testerConfig()
- *    method below
+ * method below
  */
-@Configuration
-@Import(FhirTesterMvcConfig.class)
+//@Configuration
+//@Import(FhirTesterMvcConfig.class)
 public class FhirTesterConfig {
 
 	@Autowired
@@ -45,9 +39,9 @@ public class FhirTesterConfig {
 	 * deploying your server to a place with a fully qualified domain name,
 	 * you might want to use that instead of using the variable.
 	 */
-  @Bean
-  public TesterConfig testerConfig(AppProperties appProperties) {
-    TesterConfig retVal = new TesterConfig();
+//  @Bean
+//  public TesterConfig testerConfig(AppProperties appProperties) {
+//    TesterConfig retVal = new TesterConfig();
 //    appProperties.getTester().entrySet().stream().forEach(t -> {
 //      retVal
 //        .addServer()
@@ -68,8 +62,8 @@ public class FhirTesterConfig {
 //	  }
 
 //	  retVal.setClientFactory(repositoryClientFactory);
-    return retVal;
-  }
+//    return retVal;
+//  }
 
 }
 //@formatter:on
