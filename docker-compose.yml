@@ -17,8 +17,6 @@ services:
 #    volumes:
 #      - ./database/create-postgresql-for-hapi-fhir.sql:/docker-entrypoint-initdb.d/3.sql
 #        - hapi-fhir-postgres:/var/lib/postgresql/data
-  #    ports:
-  #      - "5432:5432"
   iis-sandbox-mysql:
     image: mysql:latest
     container_name: iis-sandbox-mysql
@@ -36,8 +34,7 @@ services:
       MYSQL_PASSWORD: 'SharkBaitHooHaHa'
       MYSQL_ROOT_PASSWORD: 'password123456789'
     volumes:
-      #      - ./src/main/database/create-mysql-user.sql:/docker-entrypoint-initdb.d/1.sql
-      - ./database/create-mysql-database.sql:/docker-entrypoint-initdb.d/2.sql
+      - ./database/create-mysql-database.sql:/docker-entrypoint-initdb.d/1.sql
   iis-sandbox:
 #    build: .
     image: clemhen/iis-sandbox:deployable-v1.1

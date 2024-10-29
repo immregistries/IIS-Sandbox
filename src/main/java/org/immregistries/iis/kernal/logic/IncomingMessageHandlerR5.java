@@ -14,6 +14,8 @@ import org.immregistries.codebase.client.reference.CodeStatusValue;
 import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.fhir.annotations.OnR5Condition;
 import org.immregistries.iis.kernal.model.*;
+import org.immregistries.mqe.validator.MqeMessageServiceResponse;
+import org.immregistries.mqe.validator.engine.ValidationRuleResult;
 import org.immregistries.smm.tester.manager.HL7Reader;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Service;
@@ -31,6 +33,7 @@ import static org.immregistries.iis.kernal.InternalClient.FhirRequester.GOLDEN_S
 @Conditional(OnR5Condition.class)
 public class IncomingMessageHandlerR5 extends IncomingMessageHandler {
 
+	@Override
 	public String process(String message, Tenant tenant, String sendingFacilityName) {
 		HL7Reader reader = new HL7Reader(message);
 		String messageType = reader.getValue(9);
@@ -61,7 +64,6 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler {
 			if (sendingOrganization == null) {
 				sendingOrganization = processManagingOrganization(reader);
 			}
-//			logger.info("ORGANIZATION {} {}", sendingOrganization.getId(), sendingOrganization.getName());
 			switch (messageType) {
 				case "VXU":
 					responseMessage = processVXU(tenant, reader, message, sendingOrganization);
@@ -94,9 +96,12 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler {
 	public String processVXU(Tenant tenant, HL7Reader reader, String message, Organization managingOrganization) {
 		List<ProcessingException> processingExceptionList = new ArrayList<>();
 		Set<ProcessingFlavor> processingFlavorSet = tenant.getProcessingFlavorSet();
+		MqeMessageServiceResponse mqeMessageServiceResponse = mqeMessageService.processMessage(message);
 		try {
 			CodeMap codeMap = CodeMapManager.getCodeMap();
-
+			for (ValidationRuleResult validationRuleResult : mqeMessageServiceResponse.getValidationResults()) {
+				logger.info("validationRuleResult {} {}", validationRuleResult.getTargetType(), validationRuleResult.isRulePassed());
+			}
 			boolean strictDate = !processingFlavorSet.contains(ProcessingFlavor.CANTALOUPE);
 			PatientReported patientReported = processPatient(tenant, reader, processingExceptionList, processingFlavorSet, codeMap, strictDate, null, managingOrganization);
 
@@ -114,17 +119,20 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler {
 				Date administrationDate = null;
 				String vaccinationReportedExternalLink = reader.getValue(3);
 				String vaccinationReportedExternalLinkSystem = reader.getValue(3, 2);
-				if (reader.advanceToSegment("RXA", "ORC")) {
+				boolean rxaPresent = reader.advanceToSegment("RXA", "ORC");
+				if (!rxaPresent) {
+					throw new ProcessingException("RXA segment was not found after ORC segment", "ORC", orcCount, 0);
+				} else {
 					rxaCount++;
 					vaccineCode = reader.getValue(5, 1);
-					if (vaccineCode.equals("")) {
+					if (StringUtils.isBlank(vaccineCode)) {
 						throw new ProcessingException("Vaccine code is not indicated in RXA-5.1", "RXA", rxaCount, 5);
 					}
 					if (vaccineCode.equals("998")) {
 						obxCount = readAndCreateObservations(reader, processingExceptionList, patientReported, strictDate, obxCount, null, null);
 						continue;
 					}
-					if (vaccinationReportedExternalLink.equals("")) {
+					if (StringUtils.isBlank(vaccinationReportedExternalLink)) {
 						throw new ProcessingException("Vaccination order id was not found, unable to process", "ORC", orcCount, 3);
 					}
 					administrationDate = parseDateError(reader.getValue(3, 1), "Could not read administered date in RXA-5", "RXA", rxaCount, 3, strictDate);
@@ -132,7 +140,7 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler {
 						throw new ProcessingException("Vaccination is indicated as occuring in the future, unable to accept future vaccination events", "RXA", rxaCount, 3);
 					}
 
-					vaccinationReported = fhirRequester.searchVaccinationReported(new SearchParameterMap(Immunization.SP_IDENTIFIER, new TokenParam().setValue(vaccinationReportedExternalLink)));
+					vaccinationReported = fhirRequester.searchVaccinationReported(new SearchParameterMap("identifier", new TokenParam().setValue(vaccinationReportedExternalLink)));
 //						Immunization.IDENTIFIER.exactly().code(vaccinationReportedExternalLink));
 					if (vaccinationReported != null) {
 //				 vaccinationMaster = vaccinationReported.getVaccination();
@@ -150,14 +158,17 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler {
 					String vaccineCvxCode = "";
 					String vaccineNdcCode = "";
 					String vaccineCptCode = "";
-					String vaccineCodeType = reader.getValue(5, 3);
-					if (vaccineCodeType.equals("NDC")) {
-						vaccineNdcCode = vaccineCode;
-					} else if (vaccineCodeType.equals("CPT") || vaccineCodeType.equals("C4") || vaccineCodeType.equals("C5")) {
-						vaccineCptCode = vaccineCode;
-					} else {
-						vaccineCvxCode = vaccineCode;
+					{
+						String vaccineCodeType = reader.getValue(5, 3);
+						if (vaccineCodeType.equals("NDC")) {
+							vaccineNdcCode = vaccineCode;
+						} else if (vaccineCodeType.equals("CPT") || vaccineCodeType.equals("C4") || vaccineCodeType.equals("C5")) {
+							vaccineCptCode = vaccineCode;
+						} else {
+							vaccineCvxCode = vaccineCode;
+						}
 					}
+
 					{
 						String altVaccineCode = reader.getValue(5, 4);
 						String altVaccineCodeType = reader.getValue(5, 6);
@@ -167,11 +178,11 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler {
 									vaccineNdcCode = altVaccineCode;
 								}
 							} else if (altVaccineCodeType.equals("CPT") || altVaccineCodeType.equals("C4") || altVaccineCodeType.equals("C5")) {
-								if (vaccineCptCode.equals("")) {
+								if (StringUtils.isBlank(vaccineCptCode)) {
 									vaccineCptCode = altVaccineCode;
 								}
 							} else {
-								if (vaccineCvxCode.equals("")) {
+								if (StringUtils.isBlank(vaccineCvxCode)) {
 									vaccineCvxCode = altVaccineCode;
 								}
 							}
@@ -233,6 +244,9 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler {
 
 					{
 						String administeredAtLocation = reader.getValue(11, 4);
+						if (StringUtils.isEmpty(administeredAtLocation)) {
+
+						}
 						if (StringUtils.isNotEmpty(administeredAtLocation)) {
 							OrgLocation orgLocation = fhirRequester.searchOrgLocation(new SearchParameterMap(Location.SP_IDENTIFIER, new TokenParam().setValue(administeredAtLocation)));
 //								Location.IDENTIFIER.exactly().code(administeredAtLocation));
@@ -293,7 +307,8 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler {
 					vaccinationReported.setVaccineMvxCode(reader.getValue(17));
 					vaccinationReported.setRefusalReasonCode(reader.getValue(18));
 					vaccinationReported.setCompletionStatus(reader.getValue(20));
-					if (!vaccinationReported.getRefusalReasonCode().equals("")) {
+
+					if (StringUtils.isNotBlank(vaccinationReported.getRefusalReasonCode())) {
 						Code refusalCode = codeMap.getCodeForCodeset(CodesetType.VACCINATION_REFUSAL, vaccinationReported.getRefusalReasonCode());
 						if (refusalCode == null) {
 							ProcessingException pe = new ProcessingException("Unrecognized refusal reason", "RXA", rxaCount, 18);
@@ -358,8 +373,6 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler {
 					vaccinationReported = fhirRequester.saveVaccinationReported(vaccinationReported);
 					reader.gotoSegmentPosition(segmentPosition);
 					obxCount = readAndCreateObservations(reader, processingExceptionList, patientReported, strictDate, obxCount, vaccinationReported, null);
-				} else {
-					throw new ProcessingException("RXA segment was not found after ORC segment", "ORC", orcCount, 0);
 				}
 			}
 			if (processingFlavorSet.contains(ProcessingFlavor.CRANBERRY) && vaccinationCount == 0) {
@@ -369,6 +382,8 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler {
 				throw new ProcessingException("Patient vaccination history cannot be accepted without at least one administered, historical, or refused vaccination specified", "", 0, 0);
 			}
 			String ack = buildAck(reader, processingExceptionList, processingFlavorSet);
+			String mqeAck = mqeValidationVxu(mqeMessageServiceResponse, processingExceptionList, List.of());
+//			ack += "\n" + mqeAck;
 			recordMessageReceived(message, patientReported, ack, "Update", "Ack", tenant);
 			return ack;
 		} catch (ProcessingException e) {
@@ -376,6 +391,8 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler {
 				processingExceptionList.add(e);
 			}
 			String ack = buildAck(reader, processingExceptionList, processingFlavorSet);
+			String mqeAck = mqeValidationVxu(mqeMessageServiceResponse, processingExceptionList, List.of());
+//			ack += "\n" + mqeAck;
 			recordMessageReceived(message, null, ack, "Update", "Exception", tenant);
 			return ack;
 		}
@@ -408,9 +425,7 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler {
 		} else {
 			throw new ProcessingException("No PID segment found, required for accepting vaccination report", "", 0, 0);
 		}
-//		patientReported = fhirRequester.searchPatientReported(
-//			new SearchParameterMap("identifier",new TokenParam().setValue(patientReportedExternalLink))
-//		); TODO uncomment ?
+		patientReported = fhirRequester.searchPatientReported(new SearchParameterMap("identifier", new TokenParam().setValue(patientReportedExternalLink)));
 
 		if (patientReported == null) {
 			patientReported = new PatientReported();
@@ -561,7 +576,7 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler {
 
 			{
 				String race = patientReported.getRace();
-				if (StringUtils.isNotBlank(race)) {
+				if (!race.equals("")) {
 					Code raceCode = codeMap.getCodeForCodeset(CodesetType.PATIENT_RACE, race);
 					if (raceCode == null || CodeStatusValue.getBy(raceCode.getCodeStatus()) != CodeStatusValue.VALID) {
 						ProcessingException pe = new ProcessingException("Invalid race '" + race + "', message cannot be accepted", "PID", 1, 10);
@@ -689,9 +704,7 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler {
 	public String processORU(Tenant tenant, HL7Reader reader, String message, Organization managingOrganization) {
 		List<ProcessingException> processingExceptionList = new ArrayList<>();
 		Set<ProcessingFlavor> processingFlavorSet = tenant.getProcessingFlavorSet();
-
 		try {
-
 			CodeMap codeMap = CodeMapManager.getCodeMap();
 
 			boolean strictDate = !processingFlavorSet.contains(ProcessingFlavor.CANTALOUPE);

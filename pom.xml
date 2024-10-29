@@ -37,6 +37,12 @@
 
     <dependencies>
 
+        <!--        <dependency>-->
+        <!--            <groupId>org.immregistries</groupId>-->
+        <!--            <artifactId>nist-validator-connector</artifactId>-->
+        <!--            <version>2020.02-BETA</version>-->
+        <!--        </dependency>-->
+
         <dependency>
             <groupId>org.immregistries</groupId>
             <artifactId>mismo-match</artifactId>
@@ -177,9 +183,23 @@
             </exclusions>
         </dependency>
 
+        <!--        Warning by defaults for anything IZ tool - GVT -> doesn't break Flavors maybe Flavor to turn it off -->
+        <!--        Follow The decision from MQE for Errors / warnings , look at compatibility with flavors and configurability-->
+        <!--        Fine with dupliactes errors from diff ways-->
         <dependency>
             <groupId>org.immregistries</groupId>
             <artifactId>mqe-hl7-utility</artifactId>
+            <version>2021.07.1</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.commons</groupId>
+                    <artifactId>commons-lang3</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.immregistries</groupId>
+            <artifactId>mqe-validator</artifactId>
             <version>2021.7-BETA</version>
             <exclusions>
                 <exclusion>
@@ -188,8 +208,8 @@
                 </exclusion>
             </exclusions>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>com.sun.faces</groupId>-->
+        <!--        <dependency>-->
+        <!--            <groupId>com.sun.faces</groupId>-->
 <!--            <artifactId>jsf-api</artifactId>-->
 <!--            <version>2.2.20</version>-->
 <!--        </dependency>-->

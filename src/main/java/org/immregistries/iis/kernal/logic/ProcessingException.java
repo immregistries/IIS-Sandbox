@@ -60,4 +60,6 @@ public class ProcessingException extends Exception {
   public void setErrorCode(String errorCode) {
     this.errorCode = errorCode;
   }
+
+
 }

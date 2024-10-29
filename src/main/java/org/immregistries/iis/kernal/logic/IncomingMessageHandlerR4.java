@@ -14,6 +14,8 @@ import org.immregistries.codebase.client.reference.CodeStatusValue;
 import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.fhir.annotations.OnR4Condition;
 import org.immregistries.iis.kernal.model.*;
+import org.immregistries.mqe.validator.MqeMessageServiceResponse;
+import org.immregistries.mqe.validator.engine.ValidationRuleResult;
 import org.immregistries.smm.tester.manager.HL7Reader;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Service;
@@ -94,9 +96,12 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler {
 	public String processVXU(Tenant tenant, HL7Reader reader, String message, Organization managingOrganization) {
 		List<ProcessingException> processingExceptionList = new ArrayList<>();
 		Set<ProcessingFlavor> processingFlavorSet = tenant.getProcessingFlavorSet();
+		MqeMessageServiceResponse mqeMessageServiceResponse = mqeMessageService.processMessage(message);
 		try {
 			CodeMap codeMap = CodeMapManager.getCodeMap();
-
+			for (ValidationRuleResult validationRuleResult : mqeMessageServiceResponse.getValidationResults()) {
+				logger.info("validationRuleResult {}", validationRuleResult);
+			}
 			boolean strictDate = !processingFlavorSet.contains(ProcessingFlavor.CANTALOUPE);
 			PatientReported patientReported = processPatient(tenant, reader, processingExceptionList, processingFlavorSet, codeMap, strictDate, null, managingOrganization);
 
@@ -377,6 +382,7 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler {
 				throw new ProcessingException("Patient vaccination history cannot be accepted without at least one administered, historical, or refused vaccination specified", "", 0, 0);
 			}
 			String ack = buildAck(reader, processingExceptionList, processingFlavorSet);
+			String mqeAck = mqeValidationVxu(mqeMessageServiceResponse, processingExceptionList, List.of());
 			recordMessageReceived(message, patientReported, ack, "Update", "Ack", tenant);
 			return ack;
 		} catch (ProcessingException e) {
@@ -384,6 +390,7 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler {
 				processingExceptionList.add(e);
 			}
 			String ack = buildAck(reader, processingExceptionList, processingFlavorSet);
+			String mqeAck = mqeValidationVxu(mqeMessageServiceResponse, processingExceptionList, List.of());
 			recordMessageReceived(message, null, ack, "Update", "Exception", tenant);
 			return ack;
 		}
