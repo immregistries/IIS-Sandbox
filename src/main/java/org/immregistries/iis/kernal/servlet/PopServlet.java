@@ -5,9 +5,9 @@ import ca.uhn.fhir.context.FhirVersionEnum;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
+import org.immregistries.iis.kernal.InternalClient.RepositoryClientFactory;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.logic.IncomingMessageHandler;
-import org.immregistries.iis.kernal.InternalClient.RepositoryClientFactory;
 import org.immregistries.iis.kernal.model.Tenant;
 import org.immregistries.smm.transform.ScenarioManager;
 import org.immregistries.smm.transform.TestCaseMessage;
@@ -15,7 +15,6 @@ import org.immregistries.smm.transform.Transformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Conditional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,7 +23,6 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.transaction.Transactional;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -83,7 +81,6 @@ public class PopServlet {
 					for (String msh : messages) {
 						if (!msh.isBlank()) {
 							ackBuilder.append(handler.process("MSH|^~\\&|" + msh, tenant,facility_name));
-							ackBuilder.append("\r\n");
 						}
 					}
 					ack = ackBuilder.toString();
@@ -112,9 +109,9 @@ public class PopServlet {
 				dataSession.close();
 			}
 //      resp.setContentType("text/plain");
-			out.println("<p>");
+			out.println("<textarea name=\"ack\" readonly style=\"width: 100%; height: 90%;\" >");
 			out.print(ack);
-			out.println("<p>");
+			out.println("</textarea>");
 
 		} catch (Exception e) {
 			resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
