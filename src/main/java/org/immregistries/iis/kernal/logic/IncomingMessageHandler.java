@@ -195,7 +195,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 
 		sb.append("MSA|").append(overallStatus).append("|").append(sendersUniqueId).append("\r");
 		for (ProcessingException pe : processingExceptionList) {
-			printERRSegment(pe, sb);
+			sb.append(HL7Util.makeERRSegment(new ProcessingExceptionReportable(pe), false));
 		}
 		return sb.toString();
 	}
@@ -268,10 +268,6 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 		data.setReportables(reportables);
 
 		return ackBuilder.buildAckFrom(data);
-	}
-
-	public void printERRSegment(ProcessingException e, StringBuilder sb) {
-		sb.append(HL7Util.makeERRSegment(new ProcessingExceptionReportable(e), false));
 	}
 
 	public Date parseDateWarn(String dateString, String errorMessage, String segmentId, int segmentRepeat, int fieldPosition, boolean strict, List<ProcessingException> processingExceptionList) {
@@ -494,7 +490,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 				sb.append("MSA|AA|").append(sendersUniqueId).append("\r");
 			}
 			if (processingExceptionList.size() > 0) {
-				printERRSegment(processingExceptionList.get(processingExceptionList.size() - 1), sb);
+				sb.append(HL7Util.makeERRSegment(new ProcessingExceptionReportable(processingExceptionList.get(processingExceptionList.size() - 1)), false));
 			}
 		}
 		String profileName = "Request a Complete Immunization History";
