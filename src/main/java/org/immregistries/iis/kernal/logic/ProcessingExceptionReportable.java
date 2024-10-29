@@ -49,7 +49,7 @@ public class ProcessingExceptionReportable implements Reportable {
 	public CodedWithExceptions getApplicationErrorCode() {
 		CodedWithExceptions codedWithExceptions = new CodedWithExceptions();
 		codedWithExceptions.setIdentifier("101");
-		codedWithExceptions.setNameOfCodingSystem("HL70357TEST");
+		codedWithExceptions.setNameOfCodingSystem("HL70357");
 		codedWithExceptions.setText("Required field missing");
 		return codedWithExceptions;
 	}

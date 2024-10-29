@@ -35,6 +35,6 @@ interface IIncomingMessageHandler {
 
 	List<VaccinationMaster> getVaccinationMasterList(PatientMaster patient);
 
-	String buildAck(HL7Reader reader, List<ProcessingException> processingExceptionList, Set<ProcessingFlavor> processingFlavorSet);
+	String buildAck(HL7Reader reader, List<ProcessingException> processingExceptionList, Set<ProcessingFlavor> processingFlavorSetå);
 
 }

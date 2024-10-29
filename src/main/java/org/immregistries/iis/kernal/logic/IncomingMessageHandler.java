@@ -14,6 +14,7 @@ import org.immregistries.iis.kernal.InternalClient.FhirRequester;
 import org.immregistries.iis.kernal.InternalClient.RepositoryClientFactory;
 import org.immregistries.iis.kernal.SoftwareVersion;
 import org.immregistries.iis.kernal.fhir.interceptors.PartitionCreationInterceptor;
+import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.mapping.Interfaces.ImmunizationMapper;
 import org.immregistries.iis.kernal.mapping.Interfaces.LocationMapper;
 import org.immregistries.iis.kernal.mapping.Interfaces.ObservationMapper;
@@ -21,9 +22,10 @@ import org.immregistries.iis.kernal.mapping.Interfaces.PatientMapper;
 import org.immregistries.iis.kernal.model.*;
 import org.immregistries.iis.kernal.servlet.PopServlet;
 import org.immregistries.mqe.hl7util.Reportable;
+import org.immregistries.mqe.hl7util.SeverityLevel;
 import org.immregistries.mqe.hl7util.builder.AckBuilder;
 import org.immregistries.mqe.hl7util.builder.AckData;
-import org.immregistries.mqe.hl7util.builder.AckResult;
+import org.immregistries.mqe.hl7util.builder.HL7Util;
 import org.immregistries.mqe.validator.MqeMessageService;
 import org.immregistries.mqe.validator.MqeMessageServiceResponse;
 import org.immregistries.mqe.validator.engine.ValidationRuleResult;
@@ -198,29 +200,78 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 		return sb.toString();
 	}
 
-	public void printERRSegment(ProcessingException e, StringBuilder sb) {
-		sb.append("ERR|");
-		sb.append("|"); // 2
-		if (StringUtils.isNotBlank(e.getSegmentId())) {
-			sb.append(e.getSegmentId()).append("^").append(e.getSegmentRepeat());
-			if (e.getFieldPosition() > 0) {
-				sb.append("^").append(e.getFieldPosition());
+	public String buildAckMqe(MqeMessageServiceResponse mqeMessageServiceResponse, List<ProcessingException> processingExceptionList, Set<ProcessingFlavor> processingFlavorSet, List<Reportable> validatorReportables) {
+		AckBuilder ackBuilder = AckBuilder.INSTANCE;
+		AckData data = new AckData();
+		MqeMessageHeader header = mqeMessageServiceResponse.getMessageObjects().getMessageHeader();
+		data.setProfileId(Z23_ACKNOWLEDGEMENT);
+
+		List<ValidationRuleResult> resultList = mqeMessageServiceResponse.getValidationResults();
+		List<Reportable> reportables = new ArrayList<>(validatorReportables);
+		reportables.addAll(processingExceptionList.stream().map(ProcessingExceptionReportable::new).collect(Collectors.toList()));
+		/* This code needs to get put somewhere better. */
+		for (ValidationRuleResult result : resultList) {
+			reportables.addAll(result.getValidationDetections());
+		}
+		// if processing flavor contains MEDLAR then all the non E errors have to removed from the processing list
+		if (processingFlavorSet != null && processingFlavorSet.contains(ProcessingFlavor.MEDLAR)) {
+			List<ProcessingException> tempProcessingExceptionList = new ArrayList<ProcessingException>();
+			reportables = reportables.stream().filter(reportable -> !SeverityLevel.ERROR.equals(reportable.getSeverity())).collect(Collectors.toList());
+		}
+		data.setReportables(reportables);
+
+
+		String messageType = "ACK^V04^ACK";
+		if (processingFlavorSet != null && processingFlavorSet.contains(ProcessingFlavor.MELON)) {
+			int pos = messageType.indexOf("^");
+			if (pos > 0) {
+				messageType = messageType.substring(0, pos);
+				if (System.currentTimeMillis() % 2 == 0) {
+					messageType += "^ZZZ";
+				}
 			}
 		}
-		sb.append("|101^Required field missing^HL70357"); // 3
-		sb.append("|"); // 4
-		if (e.isError()) {
-			sb.append("E");
-		} else if (e.isWarning()) {
-			sb.append("W");
-		} else if (e.isInformation()) {
-			sb.append("I");
+
+		StringBuilder receivingApp = new StringBuilder("IIS Sandbox");
+		if (processingFlavorSet != null) {
+			for (ProcessingFlavor processingFlavor : ProcessingFlavor.values()) {
+				if (processingFlavorSet.contains(processingFlavor)) {
+					receivingApp.append(" ").append(processingFlavor.getKey());
+				}
+			}
 		}
-		sb.append("|"); // 5
-		sb.append("|"); // 6
-		sb.append("|"); // 7
-		sb.append("|").append(e.getMessage()); // 8
-		sb.append("|\r");
+		receivingApp.append(" v" + SoftwareVersion.VERSION);
+		data.setReceivingFacility(receivingApp.toString());
+
+
+		String sendersUniqueId = header.getMessageControl();
+//		if (reader.advanceToSegment("MSH")) {
+//			header.getMessageStructure()
+//			sendersUniqueId = reader.getValue(10);
+//		} else {
+//			sendersUniqueId = "MSH NOT FOUND";
+//		}
+		if (sendersUniqueId.isBlank()) {
+			sendersUniqueId = "MSH-10 NOT VALUED";
+		}
+		data.setReceivingApplication(receivingApp.toString());
+		data.setReceivingFacility(ServletHelper.getTenant().getOrganizationName());
+
+		data.setMessageControlId(sendersUniqueId);
+		data.setMessageDate(header.getMessageDate());
+		data.setMessageProfileId(header.getMessageProfile());
+		data.setMessageVersionId(header.getMessageVersion());
+		data.setProcessingControlId(header.getProcessingStatus());
+		data.setSendingFacility(header.getSendingFacility());
+		data.setSendingApplication(header.getSendingApplication());
+		data.setResponseType("?");
+		data.setReportables(reportables);
+
+		return ackBuilder.buildAckFrom(data);
+	}
+
+	public void printERRSegment(ProcessingException e, StringBuilder sb) {
+		sb.append(HL7Util.makeERRSegment(new ProcessingExceptionReportable(e), false));
 	}
 
 	public Date parseDateWarn(String dateString, String errorMessage, String segmentId, int segmentRepeat, int fieldPosition, boolean strict, List<ProcessingException> processingExceptionList) {
@@ -828,16 +879,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 
 	public abstract ObservationReported readObservations(HL7Reader reader, List<ProcessingException> processingExceptionList, PatientReported patientReported, boolean strictDate, int obxCount, VaccinationReported vaccinationReported, VaccinationMaster vaccination, String identifierCode, String valueCode);
 
-//
-
-	public String mqeValidationVxu(MqeMessageServiceResponse mqeMessageServiceResponse, List<ProcessingException> processingExceptionList, List<Reportable> nistReportablesList) {
-//		mqeMessageServiceResponse.getMessageObjects().getMessageHeader().set
-		String ack = makeAckFromValidationResults(mqeMessageServiceResponse, processingExceptionList.stream().map(ProcessingExceptionReportable::new).collect(Collectors.toList()), nistReportablesList, null);
-		logger.info("TEST ACK {}", ack);
-		return ack;
-	}
-
-	private String makeAckFromValidationResults(MqeMessageServiceResponse validationResults, List<Reportable> iisReportablesList, List<Reportable> nistReportablesList, Set<ProcessingFlavor> processingFlavorSet) {
+	private String makeAckFromValidationResults(MqeMessageServiceResponse mqeMessageServiceResponse, List<Reportable> iisReportablesList, List<Reportable> nistReportablesList, Set<ProcessingFlavor> processingFlavorSet) {
 
 		StringBuilder receivingFac = new StringBuilder("IIS Sandbox");
 		if (processingFlavorSet != null) {
@@ -850,7 +892,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 		receivingFac.append(" v" + SoftwareVersion.VERSION);
 
 
-		List<ValidationRuleResult> resultList = validationResults.getValidationResults();
+		List<ValidationRuleResult> resultList = mqeMessageServiceResponse.getValidationResults();
 		List<Reportable> reportables = new ArrayList<>(iisReportablesList);
 		reportables.addAll(nistReportablesList);
 		/* This code needs to get put somewhere better. */
@@ -861,7 +903,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 		AckBuilder ackBuilder = AckBuilder.INSTANCE;
 
 		AckData data = new AckData();
-		MqeMessageHeader header = validationResults.getMessageObjects().getMessageHeader();
+		MqeMessageHeader header = mqeMessageServiceResponse.getMessageObjects().getMessageHeader();
 		data.setMessageControlId(header.getMessageControl());
 		data.setMessageDate(header.getMessageDate());
 		data.setMessageProfileId(header.getMessageProfile());
@@ -874,7 +916,6 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 		data.setResponseType("?");
 		data.setReportables(reportables);
 		data.setProfileId(Z23_ACKNOWLEDGEMENT);
-		data.setResult(AckResult.APP_ACCEPT);
 //		String messageType = "ACK^V04^ACK";
 //		if (processingFlavorSet != null && processingFlavorSet.contains(ProcessingFlavor.MELON)) {
 //			int pos = messageType.indexOf("^");
@@ -885,7 +926,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 //				}
 //			}
 //		} //TODO ask for configurability to modify
-//		data.setmess
+
 
 		return ackBuilder.buildAckFrom(data);
 	}
