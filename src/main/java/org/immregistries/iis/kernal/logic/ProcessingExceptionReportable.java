@@ -15,16 +15,6 @@ public class ProcessingExceptionReportable implements Reportable {
 		this.processingException = processingException;
 	}
 
-	@Override
-	public SeverityLevel getSeverity() {
-		return SeverityLevel.findByCode(processingException.getErrorCode());
-	}
-
-	@Override
-	public CodedWithExceptions getHl7ErrorCode() {
-		CodedWithExceptions codedWithExceptions = new CodedWithExceptions();
-		return new CodedWithExceptions();
-	}
 
 	@Override
 	public List<Hl7Location> getHl7LocationList() {
@@ -33,6 +23,29 @@ public class ProcessingExceptionReportable implements Reportable {
 		location.setFieldRepetition(processingException.getSegmentRepeat());
 		location.setFieldPosition(processingException.getFieldPosition());
 		return List.of(location);
+	}
+
+	@Override
+	public CodedWithExceptions getHl7ErrorCode() {
+		CodedWithExceptions codedWithExceptions = new CodedWithExceptions();
+		codedWithExceptions.setIdentifier("101");
+		codedWithExceptions.setNameOfCodingSystem("HL70357");
+		codedWithExceptions.setText("Required field missing");
+		return codedWithExceptions;
+	}
+
+	@Override
+	public SeverityLevel getSeverity() {
+		return SeverityLevel.findByCode(processingException.getErrorCode());
+	}
+
+	@Override
+	public CodedWithExceptions getApplicationErrorCode() {
+		CodedWithExceptions codedWithExceptions = new CodedWithExceptions();
+//		codedWithExceptions.setIdentifier("101");
+//		codedWithExceptions.setNameOfCodingSystem("HL70357");
+//		codedWithExceptions.setText("Required field missing");
+		return codedWithExceptions;
 	}
 
 	@Override
@@ -45,14 +58,6 @@ public class ProcessingExceptionReportable implements Reportable {
 		return processingException.getMessage();
 	}
 
-	@Override
-	public CodedWithExceptions getApplicationErrorCode() {
-		CodedWithExceptions codedWithExceptions = new CodedWithExceptions();
-		codedWithExceptions.setIdentifier("101");
-		codedWithExceptions.setNameOfCodingSystem("HL70357");
-		codedWithExceptions.setText("Required field missing");
-		return codedWithExceptions;
-	}
 
 	@Override
 	public ReportableSource getSource() {
