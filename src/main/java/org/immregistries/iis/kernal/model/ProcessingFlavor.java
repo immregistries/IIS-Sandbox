@@ -36,7 +36,8 @@ public enum ProcessingFlavor {
 	SNAIL60("Snail60", "Patients are not returned until 60 seconds after they have been submitted"),
 	SNAIL90("Snail90", "Patients are not returned until 90 seconds after they have been submitted"),
 	PUNKIN("Punkin", "Will return unknown race and ethnicity codes in RSP if no race or ethnicity is specified"),
-	MEDLAR("Medlar", "Will only return errors but no warnings or informational error segments in ACK messages");
+	MEDLAR("Medlar", "Will only return errors but no warnings or informational error segments in ACK messages"),
+	APPLESAUCE("Applesauce", "Will activate detect Temporaray name detection including 'Babynames' and 'Test' and change the name type ");
 
 	private String key = "";
 	private String behaviorDescription = "";
