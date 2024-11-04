@@ -84,14 +84,14 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 		mqeMessageService = MqeMessageService.INSTANCE;
 		dataSession = PopServlet.getDataSession();
 
-		InputStream profileXML = IncomingMessageHandler.class.getResourceAsStream("/export/Profile.xml");
-		InputStream constraintsXML = IncomingMessageHandler.class.getResourceAsStream("/export/Constraints.xml");
-		InputStream vsLibraryXML = IncomingMessageHandler.class.getResourceAsStream("/export/ValueSets.xml");
+		InputStream profileXML = IncomingMessageHandler.class.getResourceAsStream("/export/VXU-Z22_Profile.xml");
+		InputStream constraintsXML = IncomingMessageHandler.class.getResourceAsStream("/export/VXU-Z22_Constraints.xml");
+		InputStream vsLibraryXML = IncomingMessageHandler.class.getResourceAsStream("/export/VXU-Z22_ValueSetLibrary.xml");
 
 		Profile profile = XMLDeserializer.deserialize(profileXML).get();
 		ValueSetLibrary valueSetLibrary = ValueSetLibraryImpl.apply(vsLibraryXML).get();
-
 		ConformanceContext conformanceContext = DefaultConformanceContext.apply(Collections.singletonList(constraintsXML)).get();
+
 		syncHL7Validator = new SyncHL7Validator(profile, valueSetLibrary, conformanceContext);
 	}
 
@@ -899,7 +899,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 
 
 	public List<Reportable> nistValidation(String message) throws Exception {
-		String id = "5d1a2e8484ae07947e957897";
+		String id = "aa72383a-7b48-46e5-a74a-82e019591fe7";
 		List<Reportable> reportableList = new ArrayList();
 		Report report = syncHL7Validator.check(message, id);
 		logger.info(report.toText());
