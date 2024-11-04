@@ -42,6 +42,11 @@
         <!--            <artifactId>nist-validator-connector</artifactId>-->
         <!--            <version>2020.02-BETA</version>-->
         <!--        </dependency>-->
+        <dependency>
+            <groupId>gov.nist</groupId>
+            <artifactId>hl7-v2-validation</artifactId>
+            <version>1.6.8</version>
+        </dependency>
 
         <dependency>
             <groupId>org.immregistries</groupId>
@@ -186,6 +191,7 @@
         <!--        Warning by defaults for anything IZ tool - GVT -> doesn't break Flavors maybe Flavor to turn it off -->
         <!--        Follow The decision from MQE for Errors / warnings , look at compatibility with flavors and configurability-->
         <!--        Fine with dupliactes errors from diff ways-->
+        <!--        NIST VALIDATIONS AS WARNINGS-->
         <dependency>
             <groupId>org.immregistries</groupId>
             <artifactId>mqe-hl7-utility</artifactId>

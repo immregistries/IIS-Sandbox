@@ -14,8 +14,8 @@ import org.immregistries.codebase.client.reference.CodeStatusValue;
 import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.fhir.annotations.OnR4Condition;
 import org.immregistries.iis.kernal.model.*;
+import org.immregistries.mqe.hl7util.Reportable;
 import org.immregistries.mqe.validator.MqeMessageServiceResponse;
-import org.immregistries.mqe.validator.engine.ValidationRuleResult;
 import org.immregistries.smm.tester.manager.HL7Reader;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Service;
@@ -93,21 +93,16 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler {
 	}
 
 	@SuppressWarnings("unchecked")
-	public String processVXU(Tenant tenant, HL7Reader reader, String message, Organization managingOrganization) {
+	public String processVXU(Tenant tenant, HL7Reader reader, String message, Organization managingOrganization) throws Exception {
 		List<ProcessingException> processingExceptionList = new ArrayList<>();
 		Set<ProcessingFlavor> processingFlavorSet = tenant.getProcessingFlavorSet();
 		MqeMessageServiceResponse mqeMessageServiceResponse = mqeMessageService.processMessage(message);
+		List<Reportable> nistReportables = nistValidation(message);
+
 		try {
 			CodeMap codeMap = CodeMapManager.getCodeMap();
-			for (ValidationRuleResult validationRuleResult : mqeMessageServiceResponse.getValidationResults()) {
-				logger.info("validationRuleResult {} {}", validationRuleResult.getTargetType(), validationRuleResult.isRulePassed());
-			}
 			boolean strictDate = !processingFlavorSet.contains(ProcessingFlavor.CANTALOUPE);
 			PatientReported patientReported = processPatient(tenant, reader, processingExceptionList, processingFlavorSet, codeMap, strictDate, null, managingOrganization);
-
-			if (true) {
-				throw new ProcessingException("WESH C NON", "MST", 1000, 1000);
-			}
 
 			int orcCount = 0;
 			int rxaCount = 0;
@@ -384,14 +379,14 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler {
 			if (processingFlavorSet.contains(ProcessingFlavor.BILBERRY) && (vaccinationCount == 0 && refusalCount == 0)) {
 				throw new ProcessingException("Patient vaccination history cannot be accepted without at least one administered, historical, or refused vaccination specified", "", 0, 0);
 			}
-			String ack = buildAckMqe(mqeMessageServiceResponse, processingExceptionList, processingFlavorSet, List.of());
+			String ack = buildAckMqe(mqeMessageServiceResponse, processingExceptionList, processingFlavorSet, nistReportables);
 			recordMessageReceived(message, patientReported, ack, "Update", "Ack", tenant);
 			return ack;
 		} catch (ProcessingException e) {
 			if (!processingExceptionList.contains(e)) {
 				processingExceptionList.add(e);
 			}
-			String ack = buildAckMqe(mqeMessageServiceResponse, processingExceptionList, processingFlavorSet, List.of());
+			String ack = buildAckMqe(mqeMessageServiceResponse, processingExceptionList, processingFlavorSet, nistReportables);
 			recordMessageReceived(message, null, ack, "Update", "Exception", tenant);
 			return ack;
 		}

@@ -2,6 +2,15 @@ package org.immregistries.iis.kernal.logic;
 
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
+import gov.nist.validation.report.Entry;
+import gov.nist.validation.report.Report;
+import hl7.v2.profile.Profile;
+import hl7.v2.profile.XMLDeserializer;
+import hl7.v2.validation.SyncHL7Validator;
+import hl7.v2.validation.content.ConformanceContext;
+import hl7.v2.validation.content.DefaultConformanceContext;
+import hl7.v2.validation.vs.ValueSetLibrary;
+import hl7.v2.validation.vs.ValueSetLibraryImpl;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -26,6 +35,8 @@ import org.immregistries.mqe.hl7util.SeverityLevel;
 import org.immregistries.mqe.hl7util.builder.AckBuilder;
 import org.immregistries.mqe.hl7util.builder.AckData;
 import org.immregistries.mqe.hl7util.builder.HL7Util;
+import org.immregistries.mqe.hl7util.model.CodedWithExceptions;
+import org.immregistries.mqe.hl7util.model.Hl7Location;
 import org.immregistries.mqe.validator.MqeMessageService;
 import org.immregistries.mqe.validator.MqeMessageServiceResponse;
 import org.immregistries.mqe.validator.engine.ValidationRuleResult;
@@ -39,6 +50,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -66,9 +78,21 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 	@Autowired
 	PartitionCreationInterceptor partitionCreationInterceptor;
 
+	SyncHL7Validator syncHL7Validator;
+
 	public IncomingMessageHandler() {
 		mqeMessageService = MqeMessageService.INSTANCE;
 		dataSession = PopServlet.getDataSession();
+
+		InputStream profileXML = IncomingMessageHandler.class.getResourceAsStream("/export/Profile.xml");
+		InputStream constraintsXML = IncomingMessageHandler.class.getResourceAsStream("/export/Constraints.xml");
+		InputStream vsLibraryXML = IncomingMessageHandler.class.getResourceAsStream("/export/ValueSets.xml");
+
+		Profile profile = XMLDeserializer.deserialize(profileXML).get();
+		ValueSetLibrary valueSetLibrary = ValueSetLibraryImpl.apply(vsLibraryXML).get();
+
+		ConformanceContext conformanceContext = DefaultConformanceContext.apply(Collections.singletonList(constraintsXML)).get();
+		syncHL7Validator = new SyncHL7Validator(profile, valueSetLibrary, conformanceContext);
 	}
 
 	public void verifyNoErrors(List<ProcessingException> processingExceptionList) throws ProcessingException {
@@ -872,5 +896,64 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 	}
 
 	public abstract ObservationReported readObservations(HL7Reader reader, List<ProcessingException> processingExceptionList, PatientReported patientReported, boolean strictDate, int obxCount, VaccinationReported vaccinationReported, VaccinationMaster vaccination, String identifierCode, String valueCode);
+
+
+	public List<Reportable> nistValidation(String message) throws Exception {
+		String id = "5d1a2e8484ae07947e957897";
+		List<Reportable> reportableList = new ArrayList();
+		Report report = syncHL7Validator.check(message, id);
+		logger.info(report.toText());
+		logger.info(report.toJson());
+		for (Map.Entry<String, List<Entry>> mapEntry : report.getEntries().entrySet()
+		) {
+			for (Entry assertion : mapEntry.getValue()) {
+				logger.info("entry {}", assertion.toText());
+				String severity = assertion.getClassification();
+				SeverityLevel severityLevel = SeverityLevel.ACCEPT;
+				if (severity.equalsIgnoreCase("error")) {
+					severityLevel = SeverityLevel.WARN;
+				}
+
+				if (severityLevel != SeverityLevel.ACCEPT) {
+					NISTReportable reportable = new NISTReportable();
+					reportableList.add(reportable);
+					reportable.setReportedMessage(assertion.getDescription());
+//					reportable.setSeverity(severityLevel);
+					reportable.getHl7ErrorCode().setIdentifier("0");
+					CodedWithExceptions cwe = new CodedWithExceptions();
+					cwe.setAlternateIdentifier(assertion.getCategory());
+					cwe.setAlternateText(assertion.getDescription());
+					cwe.setNameOfAlternateCodingSystem("L");
+					reportable.setApplicationErrorCode(cwe);
+					String path = assertion.getPath();
+					reportable.setDiagnosticMessage(path);
+					this.readErrorLocation(reportable, path);
+				}
+			}
+		}
+
+
+//		ValidationReport validationReport = new ValidationReport(report.toText());
+
+		return reportableList;
+	}
+
+	public void readErrorLocation(NISTReportable reportable, String path) {
+		if (path != null && path.length() >= 3) {
+			String segmentid = path.substring(0, 3);
+			if (path.length() > 3) {
+				path = path.substring(4);
+			} else {
+				path = "";
+			}
+
+			Hl7Location errorLocation = NISTReportable.readErrorLocation(path, segmentid);
+			if (errorLocation != null) {
+				reportable.getHl7LocationList().add(errorLocation);
+			}
+		}
+
+	}
+
 
 }
