@@ -516,6 +516,7 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler {
 			patientReported.setNameFirst(patientNameFirst);
 			patientReported.setNameLast(patientNameLast);
 			patientReported.setNameMiddle(patientNameMiddle);
+			patientReported.setNameType(nameType);
 			patientReported.setMotherMaidenName(reader.getValue(6));
 			patientReported.setBirthDate(patientBirthDate);
 			patientReported.setSex(reader.getValue(8));

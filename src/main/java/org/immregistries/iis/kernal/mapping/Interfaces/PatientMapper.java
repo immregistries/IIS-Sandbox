@@ -35,6 +35,9 @@ public interface PatientMapper<Patient> {
 	String MALE_SEX = "M";
 	String FEMALE_SEX = "F";
 
+	String V_2_NAME_TYPE = "v2-name-type";
+	String V_2_NAME_TYPE_SYSTEM = "http://terminology.hl7.org/CodeSystem/v2-0200";
+
 	PatientReported getReportedWithMaster(Patient patient);
 
 	PatientReported getReported(Patient patient);

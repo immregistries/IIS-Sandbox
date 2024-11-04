@@ -5,18 +5,18 @@ import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
 import ca.uhn.fhir.rest.param.ReferenceParam;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.instance.model.api.IBaseResource;
-import org.immregistries.codebase.client.generated.Code;
-import org.immregistries.codebase.client.reference.CodesetType;
-import org.immregistries.iis.kernal.fhir.annotations.OnR5Condition;
 import org.hl7.fhir.r5.model.*;
 import org.hl7.fhir.r5.model.ContactPoint.ContactPointSystem;
 import org.hl7.fhir.r5.model.Enumerations.AdministrativeGender;
+import org.immregistries.codebase.client.generated.Code;
+import org.immregistries.codebase.client.reference.CodesetType;
+import org.immregistries.iis.kernal.InternalClient.FhirRequesterR5;
+import org.immregistries.iis.kernal.fhir.annotations.OnR5Condition;
 import org.immregistries.iis.kernal.logic.CodeMapManager;
 import org.immregistries.iis.kernal.mapping.Interfaces.PatientMapper;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
 import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.model.PatientReported;
-import org.immregistries.iis.kernal.InternalClient.FhirRequesterR5;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,10 +25,10 @@ import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
 import java.util.Iterator;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.immregistries.iis.kernal.InternalClient.FhirRequester.*;
+import static org.immregistries.iis.kernal.InternalClient.FhirRequester.GOLDEN_RECORD;
+import static org.immregistries.iis.kernal.InternalClient.FhirRequester.GOLDEN_SYSTEM_TAG;
 
 
 @Service
@@ -64,6 +64,11 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 		}
 		if (name.getGiven().size() > 1) {
 			pm.setNameMiddle(name.getGiven().get(1).getValueNotNull());
+		}
+
+		Extension nameType = name.getExtensionByUrl(V_2_NAME_TYPE);
+		if (nameType != null) {
+			pm.setNameType(MappingHelper.extensionGetCoding(nameType).getCode());
 		}
 
 		if (p.hasExtension(MOTHER_MAIDEN_NAME)) {
@@ -259,6 +264,9 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 				.setFamily(pm.getNameLast())
 				.addGiven(pm.getNameFirst())
 				.addGiven(pm.getNameMiddle());
+			if (StringUtils.isNotBlank(pm.getNameType())) {
+				name.addExtension().setUrl(V_2_NAME_TYPE).setValue(new Coding(V_2_NAME_TYPE_SYSTEM, pm.getNameType(), ""));
+			}
 //			   .setUse(HumanName.NameUse.USUAL);
 		}
 

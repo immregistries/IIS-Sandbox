@@ -22,6 +22,7 @@ public class PatientMaster implements Serializable {
 	private String nameLast = "";
 	private String nameFirst = "";
 	private String nameMiddle = "";
+	private String nameType = "";
 	private String motherMaidenName = "";
 	private Date birthDate = null;
 	private String sex = "";
@@ -417,4 +418,11 @@ public class PatientMaster implements Serializable {
 	}
 
 
+	public String getNameType() {
+		return nameType;
+	}
+
+	public void setNameType(String nameType) {
+		this.nameType = nameType;
+	}
 }

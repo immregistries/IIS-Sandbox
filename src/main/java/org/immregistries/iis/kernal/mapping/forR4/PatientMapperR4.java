@@ -4,13 +4,13 @@ package org.immregistries.iis.kernal.mapping.forR4;
 import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
 import ca.uhn.fhir.rest.param.ReferenceParam;
 import org.apache.commons.lang3.StringUtils;
-import org.immregistries.iis.kernal.fhir.annotations.OnR4Condition;
 import org.hl7.fhir.r4.model.*;
+import org.immregistries.iis.kernal.InternalClient.FhirRequesterR4;
+import org.immregistries.iis.kernal.fhir.annotations.OnR4Condition;
 import org.immregistries.iis.kernal.mapping.Interfaces.PatientMapper;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
 import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.model.PatientReported;
-import org.immregistries.iis.kernal.InternalClient.FhirRequesterR4;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Service;
@@ -56,6 +56,10 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 		}
 		if (name.getGiven().size() > 1) {
 			pm.setNameMiddle(name.getGiven().get(1).getValueNotNull());
+		}
+		Extension nameType = name.getExtensionByUrl(V_2_NAME_TYPE);
+		if (nameType != null) {
+			pm.setNameType(MappingHelper.extensionGetCoding(nameType).getCode());
 		}
 
 		Extension motherMaiden = p.getExtensionByUrl(MOTHER_MAIDEN_NAME);
@@ -243,6 +247,9 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 				.setFamily(pm.getNameLast())
 				.addGiven(pm.getNameFirst())
 				.addGiven(pm.getNameMiddle());
+			if (StringUtils.isNotBlank(pm.getNameType())) {
+				name.addExtension().setUrl(V_2_NAME_TYPE).setValue(new Coding(V_2_NAME_TYPE_SYSTEM, pm.getNameType(), ""));
+			}
 //			   .setUse(HumanName.NameUse.USUAL);
 		}
 
