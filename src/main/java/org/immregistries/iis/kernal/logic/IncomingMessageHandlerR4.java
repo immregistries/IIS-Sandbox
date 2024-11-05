@@ -437,7 +437,8 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler {
 			String patientNameMiddle = reader.getValue(5, 3);
 			String nameType = reader.getValue(5, 7);
 			if (processingFlavorSet.contains(ProcessingFlavor.APPLESAUCE)) {
-				if (patientNameFirst.toUpperCase().contains("BABY BOY") || patientNameFirst.toUpperCase().contains("BABY GIRL")) {
+				if (patientNameFirst.toUpperCase().contains("BABY BOY") || patientNameFirst.toUpperCase().contains("BABY GIRL") ||
+					patientNameFirst.toUpperCase().contains("BABY")) {
 					nameType = "NB";
 				} else if (patientNameFirst.toUpperCase().contains("TEST")) {
 					nameType = "TEST";

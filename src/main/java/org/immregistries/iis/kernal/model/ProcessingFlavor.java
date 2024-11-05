@@ -61,6 +61,8 @@ public enum ProcessingFlavor {
 					|| label.endsWith("_" + key)
 					|| label.indexOf("_" + key + "_") > 0) {
 					processingFlavorSet.add(ps);
+				} else if (label.equals(key)) {
+					processingFlavorSet.add(ps);
 				}
 			}
 		}
