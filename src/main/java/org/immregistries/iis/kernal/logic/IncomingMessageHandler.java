@@ -32,7 +32,6 @@ import org.immregistries.iis.kernal.model.*;
 import org.immregistries.iis.kernal.servlet.PopServlet;
 import org.immregistries.mqe.hl7util.Reportable;
 import org.immregistries.mqe.hl7util.SeverityLevel;
-import org.immregistries.mqe.hl7util.builder.AckBuilder;
 import org.immregistries.mqe.hl7util.builder.AckData;
 import org.immregistries.mqe.hl7util.builder.HL7Util;
 import org.immregistries.mqe.hl7util.model.CodedWithExceptions;
@@ -57,6 +56,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public abstract class IncomingMessageHandler implements IIncomingMessageHandler {
+	/**
+	 * DYNAMIC VALUE SETS for validation
+	 */
 	public MqeMessageService mqeMessageService;
 
 	protected final Logger logger = LoggerFactory.getLogger(IncomingMessageHandler.class);
@@ -225,7 +227,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 	}
 
 	public String buildAckMqe(MqeMessageServiceResponse mqeMessageServiceResponse, List<ProcessingException> processingExceptionList, Set<ProcessingFlavor> processingFlavorSet, List<Reportable> validatorReportables) {
-		AckBuilder ackBuilder = AckBuilder.INSTANCE;
+		IisAckBuilder ackBuilder = IisAckBuilder.INSTANCE;
 		AckData data = new AckData();
 		MqeMessageHeader header = mqeMessageServiceResponse.getMessageObjects().getMessageHeader();
 		data.setProfileId(Z23_ACKNOWLEDGEMENT);
