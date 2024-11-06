@@ -417,17 +417,21 @@ public class PatientMaster implements Serializable {
 		return patientNames.stream().filter(patientName -> "L".equals(patientName.getNameType())).findFirst().orElse(null);
 	}
 
+	public PatientName getLegalNameOrFirst() {
+		return patientNames.stream().filter(patientName -> "L".equals(patientName.getNameType())).findFirst().orElse(this.getPatientNameFirst());
+	}
+
 
 	public String getNameLast() {
-		return this.getPatientNameFirst().getNameLast();
+		return this.getLegalNameOrFirst().getNameLast();
 	}
 
 	public String getNameFirst() {
-		return this.getPatientNameFirst().getNameFirst();
+		return this.getLegalNameOrFirst().getNameFirst();
 	}
 
 	public String getNameMiddle() {
-		return this.getPatientNameFirst().getNameMiddle();
+		return this.getLegalNameOrFirst().getNameMiddle();
 	}
 
 }
