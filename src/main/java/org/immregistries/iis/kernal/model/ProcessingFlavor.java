@@ -42,7 +42,14 @@ public enum ProcessingFlavor {
 	UPPERCASENAME("UPPERCASENAME", "Converts all incoming names to uppercase upon storing, regardless of the case sent by the EHR"),
 	LIMITSIZENAME("LIMITSIZENAME", "Truncates names exceeding a set length (e.g., 15 characters) and stores them with a cutoff marker, simulating systems with limited name field lengths"),
 	REJECTLONGNAME("REJECTLONGNAME", "Flags and rejects names that exceed the length limit to demonstrate compliance with strict length constraints."),
-	MANDATORYLEGALNAME("MANDATORYLEGALNAME", "");
+	MANDATORYLEGALNAME("MANDATORYLEGALNAME", ""),
+	MIDDLENAMECONCAT("MIDDLENAMECONCAT", "Stores names by appending the middle name to the first name (e.g., “Sue^Ann” becomes “Sue Ann^”)."),
+	SEPARATEMIDDLENAME("SEPARATEMIDDLENAME", "Ensures the middle name is preserved as a distinct field and not appended to the first name."),
+	ASCIICONVERT("ASCIICONVERT", "Converts special characters (e.g., ñ → n) on receipt to simulate systems that cannot handle non-ASCII characters"),
+	NONASCIIREJECT("NONASCIIREJECT", "Flags names containing unsupported characters, returning an error message."),
+	REMOVEHYPHENSPACES("REMOVEHYPHENSPACES", "Removes hyphens and spaces, storing names in a compressed format (e.g., “AnneMarie” or “DeLaCruz”)."),
+	IGNORENAMETYPE("IGNORENAMETYPE", "Operates in a mode where the system only recognizes the first name received, disregarding other names or name type codes."),
+	NOSINGLECHARNAME("NOSINGLECHARNAME", "Requires a minimum of two characters for each name component and flags single characters as an error.");
 
 	private String key = "";
 	private String behaviorDescription = "";

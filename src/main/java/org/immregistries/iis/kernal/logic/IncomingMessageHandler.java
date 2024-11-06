@@ -54,6 +54,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.Normalizer;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -989,10 +990,47 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 				patientNameFirst = patientNameFirst.toUpperCase();
 				patientNameMiddle = patientNameMiddle.toUpperCase();
 			}
+
+			if (processingFlavorSet.contains(ProcessingFlavor.ASCIICONVERT)) {
+				patientNameLast = Normalizer.normalize(patientNameLast, Normalizer.Form.NFD);
+				patientNameFirst = Normalizer.normalize(patientNameFirst, Normalizer.Form.NFD);
+				patientNameMiddle = Normalizer.normalize(patientNameMiddle, Normalizer.Form.NFD);
+			}
+
+			if (processingFlavorSet.contains(ProcessingFlavor.NONASCIIREJECT)) {
+				if (!Normalizer.isNormalized(patientNameLast, Normalizer.Form.NFD) ||
+					!Normalizer.isNormalized(patientNameFirst, Normalizer.Form.NFD) ||
+					!Normalizer.isNormalized(patientNameMiddle, Normalizer.Form.NFD)) {
+					throw new ProcessingException("Illegal characters found in name", "PID", 1, 5);
+				}
+			}
+
+			if (processingFlavorSet.contains(ProcessingFlavor.REMOVEHYPHENSPACES)) {
+				patientNameLast = patientNameLast.replace(" ", "").replace("-", "");
+				patientNameFirst = patientNameFirst.replace(" ", "").replace("-", "");
+				patientNameMiddle = patientNameMiddle.replace(" ", "").replace("-", "");
+			}
+
 			if (processingFlavorSet.contains(ProcessingFlavor.LIMITSIZENAME)) {
 				patientNameLast = patientNameLast.substring(0, NAME_SIZE_LIMIT);
 				patientNameFirst = patientNameFirst.substring(0, NAME_SIZE_LIMIT);
 				patientNameMiddle = patientNameMiddle.substring(0, NAME_SIZE_LIMIT);
+			}
+
+			if (processingFlavorSet.contains(ProcessingFlavor.NOSINGLECHARNAME)) {
+				if (patientNameLast.replace(".", "").length() == 1 ||
+					patientNameFirst.replace(".", "").length() == 1 ||
+					patientNameMiddle.replace(".", "").length() == 1) {
+					throw new ProcessingException("Single character names not accepted", "PID", 1, 5);
+				}
+				patientNameLast = patientNameLast.substring(0, NAME_SIZE_LIMIT);
+				patientNameFirst = patientNameFirst.substring(0, NAME_SIZE_LIMIT);
+				patientNameMiddle = patientNameMiddle.substring(0, NAME_SIZE_LIMIT);
+			}
+
+			if (processingFlavorSet.contains(ProcessingFlavor.MIDDLENAMECONCAT)) {
+				patientNameFirst += " " + patientNameMiddle;
+				patientNameMiddle = "";
 			}
 			PatientName patientName = new PatientName(patientNameLast, patientNameFirst, patientNameMiddle, nameType);
 
@@ -1000,6 +1038,11 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 			names.add(patientName);
 			if ("L".equals(nameType)) {
 				legalName = patientName;
+			}
+			if (processingFlavorSet.contains(ProcessingFlavor.IGNORENAMETYPE)) {
+				nameType = "";
+				patientName.setNameType("");
+				i = reader.getRepeatCount(5) + 1;
 			}
 		}
 
