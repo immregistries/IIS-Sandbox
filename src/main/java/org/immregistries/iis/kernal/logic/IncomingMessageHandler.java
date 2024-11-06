@@ -972,6 +972,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 			String patientNameFirst = reader.getValueRepeat(5, 2, i);
 			String patientNameMiddle = reader.getValueRepeat(5, 3, i);
 
+
 			String nameType = reader.getValueRepeat(5, 7, i);
 			if (processingFlavorSet.contains(ProcessingFlavor.APPLESAUCE)) {
 				if (patientNameFirst.toUpperCase().contains("BABY BOY") || patientNameFirst.toUpperCase().contains("BABY GIRL") ||
@@ -981,7 +982,15 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 					nameType = "TEST";
 				}
 			}
+
+			if (processingFlavorSet.contains(ProcessingFlavor.MANDATORYLEGALNAME)) {
+				patientNameLast = patientNameLast.toUpperCase();
+				patientNameFirst = patientNameFirst.toUpperCase();
+				patientNameMiddle = patientNameMiddle.toUpperCase();
+			}
 			PatientName patientName = new PatientName(patientNameLast, patientNameFirst, patientNameMiddle, nameType);
+
+
 			names.add(patientName);
 			if ("L".equals(nameType)) {
 				legalName = patientName;

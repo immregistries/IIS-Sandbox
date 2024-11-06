@@ -39,6 +39,7 @@ public enum ProcessingFlavor {
 	MEDLAR("Medlar", "Will only return errors but no warnings or informational error segments in ACK messages"),
 	APPLESAUCE("Applesauce", "Will activate detect Temporaray name detection including 'Babynames' and 'Test' and change the name type "),
 	SINGLENAME("Singlename", ""),
+	UPPERCASENAME("UPPERCASENAME", "Converts all incoming names to uppercase upon storing, regardless of the case sent by the EHR "),
 	MANDATORYLEGALNAME("MANDATORYLEGALNAME", "");
 
 	private String key = "";
