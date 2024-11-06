@@ -967,7 +967,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 		}
 		List<PatientName> names = new ArrayList<>(reader.getRepeatCount(5));
 		PatientName legalName = null;
-		for (int i = 0; i < reader.getRepeatCount(5); i++) {
+		for (int i = 0; i <= reader.getRepeatCount(5); i++) {
 			String patientNameLast = reader.getValueRepeat(5, 1, i);
 			String patientNameFirst = reader.getValueRepeat(5, 2, i);
 			String patientNameMiddle = reader.getValueRepeat(5, 3, i);
