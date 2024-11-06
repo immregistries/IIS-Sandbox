@@ -431,7 +431,31 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler {
 			}
 		}
 
+
 		{
+
+			if (processingFlavorSet.contains(ProcessingFlavor.APPLESAUCE)) {
+
+			}
+			List<PatientName> names = new ArrayList<>(reader.getRepeatCount(5));
+			for (int i = 0; i < reader.getRepeatCount(5); i++) {
+				String patientNameLast = reader.getValue(5, 1);
+				String patientNameFirst = reader.getValue(5, 2);
+				String patientNameMiddle = reader.getValue(5, 3);
+
+				String nameType = reader.getValue(5, 7);
+				if (processingFlavorSet.contains(ProcessingFlavor.APPLESAUCE)) {
+					if (patientNameFirst.toUpperCase().contains("BABY BOY") || patientNameFirst.toUpperCase().contains("BABY GIRL") ||
+						patientNameFirst.toUpperCase().contains("BABY")) {
+						nameType = "NB";
+					} else if (patientNameFirst.toUpperCase().contains("TEST")) {
+						nameType = "TEST";
+					}
+				}
+				PatientName patientName = new PatientName(patientNameLast, patientNameFirst, patientNameMiddle, nameType);
+				names.add(patientName);
+			}
+
 			String patientNameLast = reader.getValue(5, 1);
 			String patientNameFirst = reader.getValue(5, 2);
 			String patientNameMiddle = reader.getValue(5, 3);
@@ -518,6 +542,7 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler {
 			patientReported.setNameLast(patientNameLast);
 			patientReported.setNameMiddle(patientNameMiddle);
 			patientReported.setNameType(nameType);
+			patientReported.setPatientNames(names);
 			patientReported.setMotherMaidenName(reader.getValue(6));
 			patientReported.setBirthDate(patientBirthDate);
 			patientReported.setSex(reader.getValue(8));

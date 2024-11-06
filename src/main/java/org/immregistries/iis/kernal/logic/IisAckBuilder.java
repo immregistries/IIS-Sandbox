@@ -20,16 +20,16 @@ public enum IisAckBuilder {
 
 		String controlId = ackDataIn.getMessageControlId();
 		String processingId = ackDataIn.getProcessingControlId();
-		AckResult ackCode = AckResult.APP_ACCEPT;
+		String ackCode = AckResult.APP_ACCEPT.getCode();
 		String hl7ErrorCode = "0";
 		if (hasErrors(ackDataIn)) {
-			ackCode = AckResult.APP_ERROR;
+			ackCode = AckResult.APP_ERROR.getCode();
 			for (Reportable r : ackDataIn.getReportables()) {
 				if (r.getSeverity() == SeverityLevel.ERROR && r.getHl7ErrorCode() != null
 					&& r.getHl7ErrorCode().getIdentifier() != null) {
 					hl7ErrorCode = r.getHl7ErrorCode().getIdentifier();
 					if (hl7ErrorCode != null && hl7ErrorCode.startsWith("2")) {
-						ackCode = AckResult.APP_REJECT;
+						ackCode = AckResult.APP_REJECT.getCode();
 						break;
 					}
 				}
@@ -41,7 +41,7 @@ public enum IisAckBuilder {
 		// SoftwareVersion.VERSION + "|" + SoftwareVersion.PRODUCT + "|" +
 		// SoftwareVersion.BINARY_ID
 		// + "|\r");
-		ack.append("MSA|" + ackCode.getCode() + "|" + controlId + "|\r");
+		ack.append("MSA|" + ackCode + "|" + controlId + "|\r");
 		for (Reportable r : ackDataIn.getReportables()) {
 			if (r.getSeverity() == SeverityLevel.ERROR) {
 				ack.append(HL7Util.makeERRSegment(r, PROCESSING_ID_DEBUG.equals(processingId)));

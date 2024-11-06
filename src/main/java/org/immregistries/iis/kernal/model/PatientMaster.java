@@ -1,7 +1,9 @@
 package org.immregistries.iis.kernal.model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by Eric on 12/20/17.
@@ -19,6 +21,7 @@ public class PatientMaster implements Serializable {
 
 	private String patientReportedAuthority = "";
 	private String patientReportedType = "";
+	private List<PatientName> patientNames = new ArrayList<PatientName>(1);
 	private String nameLast = "";
 	private String nameFirst = "";
 	private String nameMiddle = "";
@@ -424,5 +427,20 @@ public class PatientMaster implements Serializable {
 
 	public void setNameType(String nameType) {
 		this.nameType = nameType;
+	}
+
+	public List<PatientName> getPatientNames() {
+		return patientNames;
+	}
+
+	public PatientName getPatientNameFirst() {
+		if (patientNames.isEmpty()) {
+			return null;
+		}
+		return patientNames.get(0);
+	}
+
+	public void setPatientNames(List<PatientName> patientNames) {
+		this.patientNames = patientNames;
 	}
 }

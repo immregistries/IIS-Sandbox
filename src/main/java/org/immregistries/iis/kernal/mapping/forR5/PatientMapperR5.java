@@ -16,6 +16,7 @@ import org.immregistries.iis.kernal.logic.CodeMapManager;
 import org.immregistries.iis.kernal.mapping.Interfaces.PatientMapper;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
 import org.immregistries.iis.kernal.model.PatientMaster;
+import org.immregistries.iis.kernal.model.PatientName;
 import org.immregistries.iis.kernal.model.PatientReported;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +25,9 @@ import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.stream.Stream;
 
 import static org.immregistries.iis.kernal.InternalClient.FhirRequester.GOLDEN_RECORD;
@@ -57,18 +60,10 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 		pm.setBirthDate(p.getBirthDate());
 		pm.setManagingOrganizationId(p.getManagingOrganization().getId());
 		// Name
-		HumanName name = p.getNameFirstRep();
-		pm.setNameLast(name.getFamily());
-		if (name.getGiven().size() > 0) {
-			pm.setNameFirst(name.getGiven().get(0).getValueNotNull());
-		}
-		if (name.getGiven().size() > 1) {
-			pm.setNameMiddle(name.getGiven().get(1).getValueNotNull());
-		}
-
-		Extension nameType = name.getExtensionByUrl(V_2_NAME_TYPE);
-		if (nameType != null) {
-			pm.setNameType(MappingHelper.extensionGetCoding(nameType).getCode());
+		List<PatientName> patientNames = new ArrayList<>(p.getName().size());
+		pm.setPatientNames(patientNames);
+		for (HumanName name : p.getName()) {
+			patientNames.add(new PatientName(name));
 		}
 
 		if (p.hasExtension(MOTHER_MAIDEN_NAME)) {
@@ -259,15 +254,8 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 					.setCode(pm.getPatientReportedType()))));
 		p.setManagingOrganization(new Reference(pm.getManagingOrganizationId()));
 		p.setBirthDate(pm.getBirthDate());
-		if (p.getNameFirstRep() != null) {
-			HumanName name = p.addName()
-				.setFamily(pm.getNameLast())
-				.addGiven(pm.getNameFirst())
-				.addGiven(pm.getNameMiddle());
-			if (StringUtils.isNotBlank(pm.getNameType())) {
-				name.addExtension().setUrl(V_2_NAME_TYPE).setValue(new Coding(V_2_NAME_TYPE_SYSTEM, pm.getNameType(), ""));
-			}
-//			   .setUse(HumanName.NameUse.USUAL);
+		for (PatientName patientName : pm.getPatientNames()) {
+			p.addName(patientName.toR5());
 		}
 
 		Extension motherMaidenName = p.addExtension()
