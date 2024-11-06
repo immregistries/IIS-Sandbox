@@ -39,7 +39,9 @@ public enum ProcessingFlavor {
 	MEDLAR("Medlar", "Will only return errors but no warnings or informational error segments in ACK messages"),
 	APPLESAUCE("Applesauce", "Will activate detect Temporaray name detection including 'Babynames' and 'Test' and change the name type "),
 	SINGLENAME("Singlename", ""),
-	UPPERCASENAME("UPPERCASENAME", "Converts all incoming names to uppercase upon storing, regardless of the case sent by the EHR "),
+	UPPERCASENAME("UPPERCASENAME", "Converts all incoming names to uppercase upon storing, regardless of the case sent by the EHR"),
+	LIMITSIZENAME("LIMITSIZENAME", "Truncates names exceeding a set length (e.g., 15 characters) and stores them with a cutoff marker, simulating systems with limited name field lengths"),
+	REJECTLONGNAME("REJECTLONGNAME", "Flags and rejects names that exceed the length limit to demonstrate compliance with strict length constraints."),
 	MANDATORYLEGALNAME("MANDATORYLEGALNAME", "");
 
 	private String key = "";

@@ -60,6 +60,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public abstract class IncomingMessageHandler implements IIncomingMessageHandler {
+	public static final int NAME_SIZE_LIMIT = 15;
 	protected final Logger logger = LoggerFactory.getLogger(IncomingMessageHandler.class);
 	/**
 	 * DYNAMIC VALUE SETS for validation
@@ -988,6 +989,11 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 				patientNameFirst = patientNameFirst.toUpperCase();
 				patientNameMiddle = patientNameMiddle.toUpperCase();
 			}
+			if (processingFlavorSet.contains(ProcessingFlavor.LIMITSIZENAME)) {
+				patientNameLast = patientNameLast.substring(0, NAME_SIZE_LIMIT);
+				patientNameFirst = patientNameFirst.substring(0, NAME_SIZE_LIMIT);
+				patientNameMiddle = patientNameMiddle.substring(0, NAME_SIZE_LIMIT);
+			}
 			PatientName patientName = new PatientName(patientNameLast, patientNameFirst, patientNameMiddle, nameType);
 
 
@@ -995,6 +1001,24 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 			if ("L".equals(nameType)) {
 				legalName = patientName;
 			}
+		}
+
+		if (legalName == null && processingFlavorSet.contains(ProcessingFlavor.MANDATORYLEGALNAME)) {
+			throw new ProcessingException("Patient legal name not found", "PID", 1, 5);
+		}
+		if (legalName != null && processingFlavorSet.contains(ProcessingFlavor.REJECTLONGNAME) && legalName.getNameLast().length() > NAME_SIZE_LIMIT) {
+			if (legalName.getNameLast().length() > NAME_SIZE_LIMIT ||
+				legalName.getNameFirst().length() > NAME_SIZE_LIMIT ||
+				legalName.getNameMiddle().length() > NAME_SIZE_LIMIT) {
+				throw new ProcessingException("Patient name is too long", "PID", 1, 5);
+
+			}
+		}
+		if (legalName != null && legalName.getNameLast().equals("")) {
+			throw new ProcessingException("Patient last name was not found, required for accepting patient and vaccination history", "PID", 1, 5);
+		}
+		if (legalName != null && legalName.getNameFirst().equals("")) {
+			throw new ProcessingException("Patient first name was not found, required for accepting patient and vaccination history", "PID", 1, 5);
 		}
 
 		String patientPhone = reader.getValue(13, 6) + reader.getValue(13, 7);
@@ -1039,15 +1063,6 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 			patientPhone = "";
 		}
 
-		if (legalName == null && processingFlavorSet.contains(ProcessingFlavor.MANDATORYLEGALNAME)) {
-			throw new ProcessingException("Patient legal name not found", "PID", 1, 5);
-		}
-		if (legalName != null && legalName.getNameLast().equals("")) {
-			throw new ProcessingException("Patient last name was not found, required for accepting patient and vaccination history", "PID", 1, 5);
-		}
-		if (legalName != null && legalName.getNameFirst().equals("")) {
-			throw new ProcessingException("Patient first name was not found, required for accepting patient and vaccination history", "PID", 1, 5);
-		}
 
 
 		String zip = reader.getValue(11, 5);
