@@ -983,7 +983,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 			}
 			PatientName patientName = new PatientName(patientNameLast, patientNameFirst, patientNameMiddle, nameType);
 			names.add(patientName);
-			if (nameType.equals("L")) {
+			if ("L".equals(nameType)) {
 				legalName = patientName;
 			}
 		}

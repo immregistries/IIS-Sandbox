@@ -83,17 +83,6 @@ public class PatientMaster implements Serializable {
 		this.patientReportedType = patientReportedType;
 	}
 
-	public String getNameLast() {
-		return this.getPatientNameFirst().getNameLast();
-	}
-
-	public String getNameFirst() {
-		return this.getPatientNameFirst().getNameFirst();
-	}
-
-	public String getNameMiddle() {
-		return this.getPatientNameFirst().getNameMiddle();
-	}
 
 	public String getMotherMaidenName() {
 		return motherMaidenName;
@@ -408,12 +397,6 @@ public class PatientMaster implements Serializable {
 		return patientNames;
 	}
 
-	public PatientName getPatientNameFirst() {
-		if (patientNames.isEmpty()) {
-			return null;
-		}
-		return patientNames.get(0);
-	}
 
 	public void setPatientNames(List<PatientName> patientNames) {
 		this.patientNames = patientNames;
@@ -422,4 +405,29 @@ public class PatientMaster implements Serializable {
 	public void addPatientName(PatientName patientName) {
 		this.patientNames.add(patientName);
 	}
+
+	public PatientName getPatientNameFirst() {
+		if (patientNames.isEmpty()) {
+			return null;
+		}
+		return patientNames.get(0);
+	}
+
+	public PatientName getLegalName() {
+		return patientNames.stream().filter(patientName -> "L".equals(patientName.getNameType())).findFirst().orElse(null);
+	}
+
+
+	public String getNameLast() {
+		return this.getPatientNameFirst().getNameLast();
+	}
+
+	public String getNameFirst() {
+		return this.getPatientNameFirst().getNameFirst();
+	}
+
+	public String getNameMiddle() {
+		return this.getPatientNameFirst().getNameMiddle();
+	}
+
 }
