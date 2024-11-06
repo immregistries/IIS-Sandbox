@@ -1023,9 +1023,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 					patientNameMiddle.replace(".", "").length() == 1) {
 					throw new ProcessingException("Single character names not accepted", "PID", 1, 5);
 				}
-				patientNameLast = patientNameLast.substring(0, NAME_SIZE_LIMIT);
-				patientNameFirst = patientNameFirst.substring(0, NAME_SIZE_LIMIT);
-				patientNameMiddle = patientNameMiddle.substring(0, NAME_SIZE_LIMIT);
+
 			}
 
 			if (processingFlavorSet.contains(ProcessingFlavor.MIDDLENAMECONCAT)) {
