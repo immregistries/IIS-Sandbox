@@ -378,9 +378,8 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 				processingExceptionList.add(new ProcessingException(problem, "QPD", 1, fieldPosition));
 			} else {
 
-				patientMasterForMatchQuery.setNameFirst(patientNameFirst);
-				patientMasterForMatchQuery.setNameMiddle(patientNameMiddle);
-				patientMasterForMatchQuery.setNameLast(patientNameLast);
+				PatientName patientName = new PatientName(patientNameLast, patientNameFirst, patientNameMiddle, "");
+				patientMasterForMatchQuery.addPatientName(patientName);
 				patientMasterForMatchQuery.setBirthDate(patientBirthDate);
 			}
 		} else {

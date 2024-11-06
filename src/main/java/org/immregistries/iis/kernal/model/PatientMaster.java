@@ -22,10 +22,6 @@ public class PatientMaster implements Serializable {
 	private String patientReportedAuthority = "";
 	private String patientReportedType = "";
 	private List<PatientName> patientNames = new ArrayList<PatientName>(1);
-	private String nameLast = "";
-	private String nameFirst = "";
-	private String nameMiddle = "";
-	private String nameType = "";
 	private String motherMaidenName = "";
 	private Date birthDate = null;
 	private String sex = "";
@@ -88,27 +84,15 @@ public class PatientMaster implements Serializable {
 	}
 
 	public String getNameLast() {
-		return nameLast;
-	}
-
-	public void setNameLast(String nameLast) {
-		this.nameLast = nameLast;
+		return this.getPatientNameFirst().getNameLast();
 	}
 
 	public String getNameFirst() {
-		return nameFirst;
-	}
-
-	public void setNameFirst(String nameFirst) {
-		this.nameFirst = nameFirst;
+		return this.getPatientNameFirst().getNameFirst();
 	}
 
 	public String getNameMiddle() {
-		return nameMiddle;
-	}
-
-	public void setNameMiddle(String nameMiddle) {
-		this.nameMiddle = nameMiddle;
+		return this.getPatientNameFirst().getNameMiddle();
 	}
 
 	public String getMotherMaidenName() {
@@ -420,15 +404,6 @@ public class PatientMaster implements Serializable {
 		this.race6 = race6;
 	}
 
-
-	public String getNameType() {
-		return nameType;
-	}
-
-	public void setNameType(String nameType) {
-		this.nameType = nameType;
-	}
-
 	public List<PatientName> getPatientNames() {
 		return patientNames;
 	}
@@ -442,5 +417,9 @@ public class PatientMaster implements Serializable {
 
 	public void setPatientNames(List<PatientName> patientNames) {
 		this.patientNames = patientNames;
+	}
+
+	public void addPatientName(PatientName patientName) {
+		this.patientNames.add(patientName);
 	}
 }

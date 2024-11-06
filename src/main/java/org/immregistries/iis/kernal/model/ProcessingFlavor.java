@@ -38,7 +38,8 @@ public enum ProcessingFlavor {
 	PUNKIN("Punkin", "Will return unknown race and ethnicity codes in RSP if no race or ethnicity is specified"),
 	MEDLAR("Medlar", "Will only return errors but no warnings or informational error segments in ACK messages"),
 	APPLESAUCE("Applesauce", "Will activate detect Temporaray name detection including 'Babynames' and 'Test' and change the name type "),
-	SINGLENAME("Singlename", "");
+	SINGLENAME("Singlename", ""),
+	MANDATORYLEGALNAME("MANDATORYLEGALNAME", "");
 
 	private String key = "";
 	private String behaviorDescription = "";

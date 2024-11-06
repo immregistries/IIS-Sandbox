@@ -439,15 +439,26 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler {
 		}
 
 		{
-			String patientNameLast = reader.getValue(5, 1);
-			String patientNameFirst = reader.getValue(5, 2);
-			String patientNameMiddle = reader.getValue(5, 3);
-			String nameType = reader.getValue(5, 8);
-			if (processingFlavorSet.contains(ProcessingFlavor.APPLESAUCE)) {
-				if (patientNameFirst.toUpperCase().contains("BABY BOY") || patientNameFirst.toUpperCase().contains("BABY GIRL")) {
-					nameType = "NB";
-				} else if (patientNameFirst.toUpperCase().contains("TEST")) {
-					nameType = "TEST";
+			List<PatientName> names = new ArrayList<>(reader.getRepeatCount(5));
+			PatientName legalName = null;
+			for (int i = 0; i < reader.getRepeatCount(5); i++) {
+				String patientNameLast = reader.getValueRepeat(5, 1, i);
+				String patientNameFirst = reader.getValueRepeat(5, 2, i);
+				String patientNameMiddle = reader.getValueRepeat(5, 3, i);
+
+				String nameType = reader.getValueRepeat(5, 7, i);
+				if (processingFlavorSet.contains(ProcessingFlavor.APPLESAUCE)) {
+					if (patientNameFirst.toUpperCase().contains("BABY BOY") || patientNameFirst.toUpperCase().contains("BABY GIRL") ||
+						patientNameFirst.toUpperCase().contains("BABY")) {
+						nameType = "NB";
+					} else if (patientNameFirst.toUpperCase().contains("TEST")) {
+						nameType = "TEST";
+					}
+				}
+				PatientName patientName = new PatientName(patientNameLast, patientNameFirst, patientNameMiddle, nameType);
+				names.add(patientName);
+				if (nameType.equals("L")) {
+					legalName = patientName;
 				}
 			}
 			String patientPhone = reader.getValue(13, 6) + reader.getValue(13, 7);
@@ -492,10 +503,13 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler {
 				patientPhone = "";
 			}
 
-			if (patientNameLast.equals("")) {
+			if (legalName == null && processingFlavorSet.contains(ProcessingFlavor.MANDATORYLEGALNAME)) {
+				throw new ProcessingException("Patient legal name not found", "PID", 1, 5);
+			}
+			if (legalName != null && legalName.getNameLast().equals("")) {
 				throw new ProcessingException("Patient last name was not found, required for accepting patient and vaccination history", "PID", 1, 5);
 			}
-			if (patientNameFirst.equals("")) {
+			if (legalName != null && legalName.getNameFirst().equals("")) {
 				throw new ProcessingException("Patient first name was not found, required for accepting patient and vaccination history", "PID", 1, 5);
 			}
 
@@ -520,10 +534,8 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler {
 			}
 			patientReported.setExternalLink(patientReportedExternalLink);
 			patientReported.setPatientReportedType(patientReportedType);
-			patientReported.setNameFirst(patientNameFirst);
-			patientReported.setNameLast(patientNameLast);
-			patientReported.setNameMiddle(patientNameMiddle);
-			patientReported.setNameType(nameType);
+			patientReported.setPatientNames(names);
+
 			patientReported.setMotherMaidenName(reader.getValue(6));
 			patientReported.setBirthDate(patientBirthDate);
 			patientReported.setSex(reader.getValue(8));
