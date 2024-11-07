@@ -1019,8 +1019,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 
 			if (processingFlavorSet.contains(ProcessingFlavor.NOSINGLECHARNAME)) {
 				if (patientNameLast.replace(".", "").length() == 1 ||
-					patientNameFirst.replace(".", "").length() == 1 ||
-					patientNameMiddle.replace(".", "").length() == 1) {
+					patientNameFirst.replace(".", "").length() == 1) {
 					throw new ProcessingException("Single character names not accepted", "PID", 1, 5);
 				}
 
