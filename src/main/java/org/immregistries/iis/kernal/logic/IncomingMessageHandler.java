@@ -992,15 +992,15 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 			}
 
 			if (processingFlavorSet.contains(ProcessingFlavor.ASCIICONVERT)) {
-				patientNameLast = Normalizer.normalize(patientNameLast, Normalizer.Form.NFD);
-				patientNameFirst = Normalizer.normalize(patientNameFirst, Normalizer.Form.NFD);
-				patientNameMiddle = Normalizer.normalize(patientNameMiddle, Normalizer.Form.NFD);
+				patientNameLast = Normalizer.normalize(patientNameLast, Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "");
+				patientNameFirst = Normalizer.normalize(patientNameFirst, Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "");
+				patientNameMiddle = Normalizer.normalize(patientNameMiddle, Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "");
 			}
 
 			if (processingFlavorSet.contains(ProcessingFlavor.NONASCIIREJECT)) {
-				if (!Normalizer.isNormalized(patientNameLast, Normalizer.Form.NFD) ||
-					!Normalizer.isNormalized(patientNameFirst, Normalizer.Form.NFD) ||
-					!Normalizer.isNormalized(patientNameMiddle, Normalizer.Form.NFD)) {
+				if (!Normalizer.normalize(patientNameLast, Normalizer.Form.NFD).contains("[^\\p{ASCII}]") ||
+					!Normalizer.normalize(patientNameFirst, Normalizer.Form.NFD).contains("[^\\p{ASCII}]") ||
+					!Normalizer.normalize(patientNameMiddle, Normalizer.Form.NFD).contains("[^\\p{ASCII}]")) {
 					throw new ProcessingException("Illegal characters found in name", "PID", 1, 5);
 				}
 			}
