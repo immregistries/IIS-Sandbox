@@ -12,8 +12,8 @@ import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.fhir.annotations.OnR5Condition;
+import org.immregistries.iis.kernal.logic.ack.IisReportable;
 import org.immregistries.iis.kernal.model.*;
-import org.immregistries.mqe.hl7util.Reportable;
 import org.immregistries.mqe.validator.MqeMessageServiceResponse;
 import org.immregistries.mqe.validator.engine.ValidationRuleResult;
 import org.immregistries.smm.tester.manager.HL7Reader;
@@ -95,7 +95,7 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler {
 		List<ProcessingException> processingExceptionList = new ArrayList<>();
 		Set<ProcessingFlavor> processingFlavorSet = tenant.getProcessingFlavorSet();
 		MqeMessageServiceResponse mqeMessageServiceResponse = mqeMessageService.processMessage(message);
-		List<Reportable> nistReportables = nistValidation(message);
+		List<IisReportable> nistReportables = nistValidation(message);
 
 		try {
 			CodeMap codeMap = CodeMapManager.getCodeMap();

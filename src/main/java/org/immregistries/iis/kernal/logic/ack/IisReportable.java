@@ -1,75 +1,108 @@
-package org.immregistries.iis.kernal.logic;
+package org.immregistries.iis.kernal.logic.ack;
 
+import org.immregistries.iis.kernal.logic.ProcessingException;
 import org.immregistries.mqe.hl7util.Reportable;
 import org.immregistries.mqe.hl7util.ReportableSource;
-import org.immregistries.mqe.hl7util.SeverityLevel;
 import org.immregistries.mqe.hl7util.model.CodedWithExceptions;
 import org.immregistries.mqe.hl7util.model.Hl7Location;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class NISTReportable implements Reportable {
+public class IisReportable {
 
 	private CodedWithExceptions applicationErrorCode = new CodedWithExceptions();
 	private String diagnosticMessage = null;
 	private CodedWithExceptions hl7ErrorCode = new CodedWithExceptions();
 	private List<Hl7Location> hl7LocationList = new ArrayList();
 	private String reportedMessage = null;
-	private SeverityLevel severity = null;
+	private IisReportableSeverity severity = null;
 	private ReportableSource source;
 
-	public NISTReportable() {
-		this.source = ReportableSource.NIST;
-		this.severity = SeverityLevel.WARN;
+	public IisReportable() {
 	}
 
-	public ReportableSource getSource() {
-		return this.source;
+	public IisReportable(Reportable reportable) {
+		applicationErrorCode = reportable.getApplicationErrorCode();
+		diagnosticMessage = reportable.getDiagnosticMessage();
+		hl7ErrorCode = reportable.getHl7ErrorCode();
+		reportedMessage = reportable.getReportedMessage();
+		severity = IisReportableSeverity.findByCode(reportable.getSeverity().getCode());
+		source = reportable.getSource();
+	}
+
+
+	public IisReportable(ProcessingException processingException) {
+		Hl7Location location = new Hl7Location();
+		location.setSegmentId(processingException.getSegmentId());
+		location.setFieldRepetition(processingException.getSegmentRepeat());
+		location.setFieldPosition(processingException.getFieldPosition());
+		hl7LocationList = List.of(location);
+		hl7ErrorCode = new CodedWithExceptions();
+		hl7ErrorCode.setIdentifier("101");
+		hl7ErrorCode.setNameOfCodingSystem("HL70357");
+		hl7ErrorCode.setText("Required field missing");
+		severity = IisReportableSeverity.findByCode(processingException.getErrorCode());
+		applicationErrorCode = new CodedWithExceptions();
+		reportedMessage = processingException.getLocalizedMessage();
+		diagnosticMessage = processingException.getMessage();
+		source = ReportableSource.IIS;
+	}
+
+	public CodedWithExceptions getApplicationErrorCode() {
+		return applicationErrorCode;
 	}
 
 	public void setApplicationErrorCode(CodedWithExceptions applicationErrorCode) {
 		this.applicationErrorCode = applicationErrorCode;
 	}
 
+	public String getDiagnosticMessage() {
+		return diagnosticMessage;
+	}
+
 	public void setDiagnosticMessage(String diagnosticMessage) {
 		this.diagnosticMessage = diagnosticMessage;
+	}
+
+	public CodedWithExceptions getHl7ErrorCode() {
+		return hl7ErrorCode;
 	}
 
 	public void setHl7ErrorCode(CodedWithExceptions hl7ErrorCode) {
 		this.hl7ErrorCode = hl7ErrorCode;
 	}
 
+	public List<Hl7Location> getHl7LocationList() {
+		return hl7LocationList;
+	}
+
 	public void setHl7LocationList(List<Hl7Location> hl7LocationList) {
 		this.hl7LocationList = hl7LocationList;
+	}
+
+	public String getReportedMessage() {
+		return reportedMessage;
 	}
 
 	public void setReportedMessage(String reportedMessage) {
 		this.reportedMessage = reportedMessage;
 	}
 
-	public CodedWithExceptions getApplicationErrorCode() {
-		return this.applicationErrorCode;
+	public IisReportableSeverity getSeverity() {
+		return severity;
 	}
 
-	public String getDiagnosticMessage() {
-		return this.diagnosticMessage;
+	public void setSeverity(IisReportableSeverity severity) {
+		this.severity = severity;
 	}
 
-	public CodedWithExceptions getHl7ErrorCode() {
-		return this.hl7ErrorCode;
+	public ReportableSource getSource() {
+		return source;
 	}
 
-	public List<Hl7Location> getHl7LocationList() {
-		return this.hl7LocationList;
-	}
-
-	public String getReportedMessage() {
-		return this.reportedMessage;
-	}
-
-	public SeverityLevel getSeverity() {
-		return this.severity;
+	public void setSource(ReportableSource source) {
+		this.source = source;
 	}
 
 	public static Hl7Location readErrorLocation(String path, String segmentid) {
@@ -157,4 +190,3 @@ public class NISTReportable implements Reportable {
 	}
 
 }
-

@@ -1,10 +1,6 @@
-package org.immregistries.iis.kernal.logic;
+package org.immregistries.iis.kernal.logic.ack;
 
-import org.immregistries.mqe.hl7util.Reportable;
-import org.immregistries.mqe.hl7util.SeverityLevel;
-import org.immregistries.mqe.hl7util.builder.AckData;
 import org.immregistries.mqe.hl7util.builder.AckResult;
-import org.immregistries.mqe.hl7util.builder.HL7Util;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -16,16 +12,16 @@ public enum IisAckBuilder {
 	INSTANCE;
 	public static final String PROCESSING_ID_DEBUG = "D";
 
-	public String buildAckFrom(AckData ackDataIn) {
+	public String buildAckFrom(IisAckData ackDataIn) {
 
 		String controlId = ackDataIn.getMessageControlId();
 		String processingId = ackDataIn.getProcessingControlId();
-		String ackCode = AckResult.APP_ACCEPT.getCode();
+		String ackCode;
 		String hl7ErrorCode = "0";
-		if (hasErrors(ackDataIn)) {
+		if (hasErrorSeverityType(ackDataIn, IisReportableSeverity.ERROR.getCode())) {
 			ackCode = AckResult.APP_ERROR.getCode();
-			for (Reportable r : ackDataIn.getReportables()) {
-				if (r.getSeverity() == SeverityLevel.ERROR && r.getHl7ErrorCode() != null
+			for (IisReportable r : ackDataIn.getReportables()) {
+				if (r.getSeverity() == IisReportableSeverity.ERROR && r.getHl7ErrorCode() != null
 					&& r.getHl7ErrorCode().getIdentifier() != null) {
 					hl7ErrorCode = r.getHl7ErrorCode().getIdentifier();
 					if (hl7ErrorCode != null && hl7ErrorCode.startsWith("2")) {
@@ -34,6 +30,12 @@ public enum IisAckBuilder {
 					}
 				}
 			}
+		} else if (hasErrorSeverityType(ackDataIn, IisReportableSeverity.WARN.getCode())) {
+			ackCode = "AW";
+		} else if (hasErrorSeverityType(ackDataIn, "N")) {
+			ackCode = "AN";
+		} else {
+			ackCode = AckResult.APP_ACCEPT.getCode();
 		}
 		StringBuilder ack = new StringBuilder();
 		makeHeader(ack, ackDataIn, "Z23", null);
@@ -42,25 +44,25 @@ public enum IisAckBuilder {
 		// SoftwareVersion.BINARY_ID
 		// + "|\r");
 		ack.append("MSA|" + ackCode + "|" + controlId + "|\r");
-		for (Reportable r : ackDataIn.getReportables()) {
-			if (r.getSeverity() == SeverityLevel.ERROR) {
-				ack.append(HL7Util.makeERRSegment(r, PROCESSING_ID_DEBUG.equals(processingId)));
+		for (IisReportable r : ackDataIn.getReportables()) {
+			if (r.getSeverity() == IisReportableSeverity.ERROR) {
+				ack.append(IisHL7Util.makeERRSegment(r, PROCESSING_ID_DEBUG.equals(processingId)));
 			}
 		}
-		for (Reportable r : ackDataIn.getReportables()) {
-			if (r.getSeverity() == SeverityLevel.WARN) {
-				ack.append(HL7Util.makeERRSegment(r, PROCESSING_ID_DEBUG.equals(processingId)));
+		for (IisReportable r : ackDataIn.getReportables()) {
+			if (r.getSeverity() == IisReportableSeverity.WARN) {
+				ack.append(IisHL7Util.makeERRSegment(r, PROCESSING_ID_DEBUG.equals(processingId)));
 			}
 		}
-		for (Reportable r : ackDataIn.getReportables()) {
-			if (r.getSeverity() == SeverityLevel.INFO) {
-				ack.append(HL7Util.makeERRSegment(r, PROCESSING_ID_DEBUG.equals(processingId)));
+		for (IisReportable r : ackDataIn.getReportables()) {
+			if (r.getSeverity() == IisReportableSeverity.INFO) {
+				ack.append(IisHL7Util.makeERRSegment(r, PROCESSING_ID_DEBUG.equals(processingId)));
 			}
 		}
 		if (PROCESSING_ID_DEBUG.equals(processingId)) {
-			for (Reportable r : ackDataIn.getReportables()) {
-				if (r.getSeverity() == SeverityLevel.ACCEPT) {
-					ack.append(HL7Util.makeERRSegment(r, PROCESSING_ID_DEBUG.equals(processingId)));
+			for (IisReportable r : ackDataIn.getReportables()) {
+				if (r.getSeverity() == IisReportableSeverity.ACCEPT) {
+					ack.append(IisHL7Util.makeERRSegment(r, PROCESSING_ID_DEBUG.equals(processingId)));
 				}
 			}
 		}
@@ -78,35 +80,34 @@ public enum IisAckBuilder {
 //    // 2 Error Location
 //    ack.append("|" + reportable.getHl7LocationList());
 //    // 3 HL7 Error Code
-//    HL7Util.appendErrorCode(ack, reportable.getHl7ErrorCode());
+//    IisHL7Util.appendErrorCode(ack, reportable.getHl7ErrorCode());
 //    ack.append("|");
 //    // 4 Severity
 //    ack.append(severity);
 //    ack.append("|");
 //    // 5 Application Error Code
-//    HL7Util.appendAppErrorCode(ack, reportable);
+//    IisHL7Util.appendAppErrorCode(ack, reportable);
 //    ack.append("|");
 //    // 6 Application Error Parameter
 //    ack.append("|");
 //    // 7 Diagnostic Information
 //    ack.append("|");
 //    // 8 User Message
-//    ack.append(HL7Util.escapeHL7Chars(reportable.getReportedMessage()));
+//    ack.append(IisHL7Util.escapeHL7Chars(reportable.getReportedMessage()));
 //    ack.append("|\r");
 //
 //  }
 
-	private static boolean hasErrors(AckData ackDataIn) {
-		for (Reportable reportable : ackDataIn.getReportables()) {
-			if (reportable.getSeverity() == SeverityLevel.ERROR) {
-//			   reportable.getSeverity() == SeverityLevel.WARN) {
+	private static boolean hasErrorSeverityType(IisAckData ackDataIn, String severityCode) {
+		for (IisReportable reportable : ackDataIn.getReportables()) {
+			if (reportable.getSeverity().getCode().equals(severityCode)) {
 				return true;
 			}
 		}
 		return false;
 	}
 
-	public static void makeHeader(StringBuilder ack, AckData ackDataIn, String profileId,
+	public static void makeHeader(StringBuilder ack, IisAckData ackDataIn, String profileId,
 											String responseType) {
 		String receivingApplication = ackDataIn.getSendingApplication();
 		String receivingFacility = ackDataIn.getSendingFacility();

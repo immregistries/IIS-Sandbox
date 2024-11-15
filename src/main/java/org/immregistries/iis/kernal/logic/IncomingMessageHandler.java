@@ -25,16 +25,15 @@ import org.immregistries.iis.kernal.InternalClient.RepositoryClientFactory;
 import org.immregistries.iis.kernal.SoftwareVersion;
 import org.immregistries.iis.kernal.fhir.interceptors.PartitionCreationInterceptor;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
+import org.immregistries.iis.kernal.logic.ack.*;
 import org.immregistries.iis.kernal.mapping.Interfaces.ImmunizationMapper;
 import org.immregistries.iis.kernal.mapping.Interfaces.LocationMapper;
 import org.immregistries.iis.kernal.mapping.Interfaces.ObservationMapper;
 import org.immregistries.iis.kernal.mapping.Interfaces.PatientMapper;
 import org.immregistries.iis.kernal.model.*;
 import org.immregistries.iis.kernal.servlet.PopServlet;
-import org.immregistries.mqe.hl7util.Reportable;
+import org.immregistries.mqe.hl7util.ReportableSource;
 import org.immregistries.mqe.hl7util.SeverityLevel;
-import org.immregistries.mqe.hl7util.builder.AckData;
-import org.immregistries.mqe.hl7util.builder.HL7Util;
 import org.immregistries.mqe.hl7util.model.CodedWithExceptions;
 import org.immregistries.mqe.hl7util.model.Hl7Location;
 import org.immregistries.mqe.validator.MqeMessageService;
@@ -226,23 +225,23 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 
 		sb.append("MSA|").append(overallStatus).append("|").append(sendersUniqueId).append("\r");
 		for (ProcessingException pe : processingExceptionList) {
-			sb.append(HL7Util.makeERRSegment(new ProcessingExceptionReportable(pe), false));
+			sb.append(IisHL7Util.makeERRSegment(new IisReportable(pe), false));
 		}
 		return sb.toString();
 	}
 
-	public String buildAckMqe(MqeMessageServiceResponse mqeMessageServiceResponse, List<ProcessingException> processingExceptionList, Set<ProcessingFlavor> processingFlavorSet, List<Reportable> validatorReportables) {
+	public String buildAckMqe(MqeMessageServiceResponse mqeMessageServiceResponse, List<ProcessingException> processingExceptionList, Set<ProcessingFlavor> processingFlavorSet, List<IisReportable> validatorReportables) {
 		IisAckBuilder ackBuilder = IisAckBuilder.INSTANCE;
-		AckData data = new AckData();
+		IisAckData data = new IisAckData();
 		MqeMessageHeader header = mqeMessageServiceResponse.getMessageObjects().getMessageHeader();
 		data.setProfileId(Z23_ACKNOWLEDGEMENT);
 
 		List<ValidationRuleResult> resultList = mqeMessageServiceResponse.getValidationResults();
-		List<Reportable> reportables = new ArrayList<>(validatorReportables);
-		reportables.addAll(processingExceptionList.stream().map(ProcessingExceptionReportable::new).collect(Collectors.toList()));
+		List<IisReportable> reportables = new ArrayList<>(validatorReportables);
+		reportables.addAll(processingExceptionList.stream().map(IisReportable::new).collect(Collectors.toList()));
 		/* This code needs to get put somewhere better. */
 		for (ValidationRuleResult result : resultList) {
-			reportables.addAll(result.getValidationDetections());
+			reportables.addAll(result.getValidationDetections().stream().map(IisReportable::new).collect(Collectors.toList()));
 		}
 		// if processing flavor contains MEDLAR then all the non E errors have to removed from the processing list
 		if (processingFlavorSet != null && processingFlavorSet.contains(ProcessingFlavor.MEDLAR)) {
@@ -518,7 +517,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 				sb.append("MSA|AA|").append(sendersUniqueId).append("\r");
 			}
 			if (processingExceptionList.size() > 0) {
-				sb.append(HL7Util.makeERRSegment(new ProcessingExceptionReportable(processingExceptionList.get(processingExceptionList.size() - 1)), false));
+				sb.append(IisHL7Util.makeERRSegment(new IisReportable(processingExceptionList.get(processingExceptionList.size() - 1)), false));
 			}
 		}
 		String profileName = "Request a Complete Immunization History";
@@ -904,9 +903,9 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 	public abstract ObservationReported readObservations(HL7Reader reader, List<ProcessingException> processingExceptionList, PatientReported patientReported, boolean strictDate, int obxCount, VaccinationReported vaccinationReported, VaccinationMaster vaccination, String identifierCode, String valueCode);
 
 
-	public List<Reportable> nistValidation(String message) throws Exception {
+	public List<IisReportable> nistValidation(String message) throws Exception {
 		String id = "aa72383a-7b48-46e5-a74a-82e019591fe7";
-		List<Reportable> reportableList = new ArrayList();
+		List<IisReportable> reportableList = new ArrayList();
 		Report report = syncHL7Validator.check(message, id);
 		logger.info(report.toText());
 		logger.info(report.toJson());
@@ -921,7 +920,9 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 				}
 
 				if (severityLevel != SeverityLevel.ACCEPT) {
-					NISTReportable reportable = new NISTReportable();
+					IisReportable reportable = new IisReportable();
+					reportable.setSource(ReportableSource.NIST);
+					reportable.setSeverity(IisReportableSeverity.WARN);
 					reportableList.add(reportable);
 					reportable.setReportedMessage(assertion.getDescription());
 //					reportable.setSeverity(severityLevel);
@@ -944,7 +945,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 		return reportableList;
 	}
 
-	public void readErrorLocation(NISTReportable reportable, String path) {
+	public void readErrorLocation(IisReportable reportable, String path) {
 		if (path != null && path.length() >= 3) {
 			String segmentid = path.substring(0, 3);
 			if (path.length() > 3) {
@@ -953,7 +954,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 				path = "";
 			}
 
-			Hl7Location errorLocation = NISTReportable.readErrorLocation(path, segmentid);
+			Hl7Location errorLocation = IisReportable.readErrorLocation(path, segmentid);
 			if (errorLocation != null) {
 				reportable.getHl7LocationList().add(errorLocation);
 			}
