@@ -33,6 +33,7 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler {
 	public String process(String message, Tenant tenant, String sendingFacilityName) {
 		HL7Reader reader = new HL7Reader(message);
 		String messageType = reader.getValue(9);
+		String profileIdentifier = reader.getValue(21);
 		String responseMessage;
 		partitionCreationInterceptor.getOrCreatePartitionId(tenant.getOrganizationName());
 		Set<ProcessingFlavor> processingFlavorSet = null;
@@ -92,6 +93,7 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler {
 	public String processVXU(Tenant tenant, HL7Reader reader, String message, Organization managingOrganization) throws Exception {
 		List<ProcessingException> processingExceptionList = new ArrayList<>();
 		Set<ProcessingFlavor> processingFlavorSet = tenant.getProcessingFlavorSet();
+		String profileIdentifier = reader.getValue(21);
 		MqeMessageServiceResponse mqeMessageServiceResponse = mqeMessageService.processMessage(message);
 		List<IisReportable> nistReportables = nistValidation(message);
 

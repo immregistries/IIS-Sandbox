@@ -15,7 +15,6 @@ import org.immregistries.iis.kernal.fhir.annotations.OnR5Condition;
 import org.immregistries.iis.kernal.logic.ack.IisReportable;
 import org.immregistries.iis.kernal.model.*;
 import org.immregistries.mqe.validator.MqeMessageServiceResponse;
-import org.immregistries.mqe.validator.engine.ValidationRuleResult;
 import org.immregistries.smm.tester.manager.HL7Reader;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Service;
@@ -89,7 +88,6 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler {
 		return responseMessage;
 	}
 
-
 	@SuppressWarnings("unchecked")
 	public String processVXU(Tenant tenant, HL7Reader reader, String message, Organization managingOrganization) throws Exception {
 		List<ProcessingException> processingExceptionList = new ArrayList<>();
@@ -99,9 +97,6 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler {
 
 		try {
 			CodeMap codeMap = CodeMapManager.getCodeMap();
-			for (ValidationRuleResult validationRuleResult : mqeMessageServiceResponse.getValidationResults()) {
-				logger.info("validationRuleResult {} {}", validationRuleResult.getTargetType(), validationRuleResult.isRulePassed());
-			}
 			boolean strictDate = !processingFlavorSet.contains(ProcessingFlavor.CANTALOUPE);
 			PatientReported patientReported = processPatient(tenant, reader, processingExceptionList, processingFlavorSet, codeMap, strictDate, null, managingOrganization);
 
@@ -126,11 +121,11 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler {
 				vaccineCode = reader.getValue(5, 1);
 				if (StringUtils.isBlank(vaccineCode)) {
 					throw new ProcessingException("Vaccine code is not indicated in RXA-5.1", "RXA", rxaCount, 5);
-				} else if (vaccineCode.equals("998")) {
+				}
+				if (vaccineCode.equals("998")) {
 					obxCount = readAndCreateObservations(reader, processingExceptionList, patientReported, strictDate, obxCount, null, null);
 					continue;
 				}
-
 				if (StringUtils.isBlank(vaccinationReportedExternalLink)) {
 					throw new ProcessingException("Vaccination order id was not found, unable to process", "ORC", orcCount, 3);
 				}
@@ -390,8 +385,6 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler {
 			String ack = buildAckMqe(mqeMessageServiceResponse, processingExceptionList, processingFlavorSet, nistReportables);
 			recordMessageReceived(message, null, ack, "Update", "Exception", tenant);
 			return ack;
-		} catch (Exception e) {
-			throw new RuntimeException(e);
 		}
 
 	}
@@ -433,6 +426,7 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler {
 				patientReported.setManagingOrganizationId("Organization/" + managingOrganization.getIdElement().getIdPart());
 			}
 		}
+
 
 		return processPatientFhirAgnostic(reader, processingExceptionList, processingFlavorSet, codeMap, strictDate, patientReported, patientReportedExternalLink, patientReportedAuthority, patientReportedType);
 	}

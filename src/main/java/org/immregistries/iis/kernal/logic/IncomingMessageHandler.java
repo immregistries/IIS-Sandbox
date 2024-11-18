@@ -234,7 +234,12 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 		IisAckBuilder ackBuilder = IisAckBuilder.INSTANCE;
 		IisAckData data = new IisAckData();
 		MqeMessageHeader header = mqeMessageServiceResponse.getMessageObjects().getMessageHeader();
-		data.setProfileId(Z23_ACKNOWLEDGEMENT);
+		String profile = header.getMessageProfile();
+		if (profile.equals(Z22_ADVANCED_VXU)) {
+			data.setProfileId(Z23_ADVANCED_ACKNOWLEDGEMENT);
+		} else {
+			data.setProfileId(Z23_ACKNOWLEDGEMENT);
+		}
 
 		List<ValidationRuleResult> resultList = mqeMessageServiceResponse.getValidationResults();
 		List<IisReportable> reportables = new ArrayList<>(validatorReportables);
@@ -904,11 +909,9 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 
 
 	public List<IisReportable> nistValidation(String message) throws Exception {
-		String id = "aa72383a-7b48-46e5-a74a-82e019591fe7";
+		String id = "aa72383a-7b48-46e5-a74a-82e019591fe7"; // TODO table with profiles ?
 		List<IisReportable> reportableList = new ArrayList();
 		Report report = syncHL7Validator.check(message, id);
-		logger.info(report.toText());
-		logger.info(report.toJson());
 		for (Map.Entry<String, List<Entry>> mapEntry : report.getEntries().entrySet()
 		) {
 			for (Entry assertion : mapEntry.getValue()) {

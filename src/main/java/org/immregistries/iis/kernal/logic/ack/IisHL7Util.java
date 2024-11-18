@@ -23,6 +23,7 @@ public class IisHL7Util {
 	public static final String SEVERITY_ERROR = "E";
 	public static final String SEVERITY_WARNING = "W";
 	public static final String SEVERITY_INFORMATION = "I";
+	public static final String SEVERITY_NOTICE = "N";
 
 	public static final String PROCESSING_ID_DEBUGGING = "D";
 	public static final String PROCESSING_ID_PRODUCTION = "P";
@@ -117,7 +118,7 @@ public class IisHL7Util {
 		ack.append("|"); // MSH-18
 		ack.append("|"); // MSH-19
 		ack.append("|"); // MSH-20
-		ack.append("|Z23^CDCPHINVS"); // MSH-21
+		ack.append("|Z23^CDCPHINVS"); // MSH-21 TODO chANGE FOR advanced
 		ack.append("|\r");
 		// ack.append("SFT|" + SoftwareVersion.VENDOR + "|" +
 		// SoftwareVersion.VERSION + "|" + SoftwareVersion.PRODUCT + "|" +
