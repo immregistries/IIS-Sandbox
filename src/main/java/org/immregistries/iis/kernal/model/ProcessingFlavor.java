@@ -1,5 +1,7 @@
 package org.immregistries.iis.kernal.model;
 
+import org.immregistries.iis.kernal.fhir.security.ServletHelper;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -49,7 +51,8 @@ public enum ProcessingFlavor {
 	NONASCIIREJECT("NONASCIIREJECT", "Flags names containing unsupported characters, returning an error message."),
 	REMOVEHYPHENSPACES("REMOVEHYPHENSPACES", "Removes hyphens and spaces, storing names in a compressed format (e.g., 'AnneMarie' or 'DeLaCruz')."),
 	IGNORENAMETYPE("IGNORENAMETYPE", "Operates in a mode where the system only recognizes the first name received, disregarding other names or name type codes."),
-	NOSINGLECHARNAME("NOSINGLECHARNAME", "Requires a minimum of two characters for each name component and flags single characters as an error.");
+	NOSINGLECHARNAME("NOSINGLECHARNAME", "Requires a minimum of two characters for each name component and flags single characters as an error."),
+	NOTICE("NOTICE", "Return shifts ERR codes Error to Warnings to Notice to Informational");
 
 	private String key = "";
 	private String behaviorDescription = "";
@@ -87,5 +90,9 @@ public enum ProcessingFlavor {
 
 	public String getBehaviorDescription() {
 		return behaviorDescription;
+	}
+
+	public boolean isActive() {
+		return ServletHelper.getTenant().getProcessingFlavorSet().contains(this);
 	}
 }

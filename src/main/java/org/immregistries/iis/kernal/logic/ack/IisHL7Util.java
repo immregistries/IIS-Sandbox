@@ -1,6 +1,7 @@
 package org.immregistries.iis.kernal.logic.ack;
 
 import org.apache.commons.lang3.StringUtils;
+import org.immregistries.iis.kernal.model.ProcessingFlavor;
 import org.immregistries.mqe.hl7util.ReportableSource;
 import org.immregistries.mqe.hl7util.builder.AckERRCode;
 import org.immregistries.mqe.hl7util.builder.AckResult;
@@ -8,6 +9,7 @@ import org.immregistries.mqe.hl7util.model.CodedWithExceptions;
 import org.immregistries.mqe.hl7util.model.Hl7Location;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -364,6 +366,20 @@ public class IisHL7Util {
 	private static String getAckCode(String profileExtension, List<IisReportable> reportables) {
 		String ackCode;
 		String hl7ErrorCode;
+		if (ProcessingFlavor.NOTICE.isActive()) {
+			List<IisReportable> copy = new ArrayList<>(reportables.size());
+			for (IisReportable reportable : reportables) {
+				if (reportable.getSeverity() == IisReportableSeverity.ERROR) {
+					reportable.setSeverity(IisReportableSeverity.WARN);
+				} else if (reportable.getSeverity() == IisReportableSeverity.WARN) {
+					reportable.setSeverity(IisReportableSeverity.NOTICE);
+				} else if (reportable.getSeverity() == IisReportableSeverity.NOTICE) {
+					reportable.setSeverity(IisReportableSeverity.INFO);
+				}
+				copy.add(reportable);
+			}
+			reportables = copy;
+		}
 		if (ADVANCED_ACK.equals(profileExtension)) {  // If extended ACK profile
 			if (hasErrorSeverityType(reportables, IisReportableSeverity.ERROR.getCode())) {
 				ackCode = AckResult.APP_ERROR.getCode();
