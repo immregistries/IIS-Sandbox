@@ -3,12 +3,17 @@ package org.immregistries.iis.kernal.logic.ack;
 import org.apache.commons.lang3.StringUtils;
 import org.immregistries.mqe.hl7util.ReportableSource;
 import org.immregistries.mqe.hl7util.builder.AckERRCode;
+import org.immregistries.mqe.hl7util.builder.AckResult;
 import org.immregistries.mqe.hl7util.model.CodedWithExceptions;
 import org.immregistries.mqe.hl7util.model.Hl7Location;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
+import static org.immregistries.iis.kernal.logic.IIncomingMessageHandler.ADVANCED_ACK;
+import static org.immregistries.iis.kernal.logic.ack.IisAckBuilder.PROCESSING_ID_DEBUG;
 import static org.immregistries.mqe.vxu.parse.HL7ParsingUtil.escapeHL7Chars;
 
 public class IisHL7Util {
@@ -314,4 +319,91 @@ public class IisHL7Util {
 		ack.append("|\r");
 		return ack.toString();
 	}
+
+	public static void makeMsaAndErr(StringBuilder sb, String controlId, String processingId, String profileExtension, List<IisReportable> reportables) {
+		String ackCode = getAckCode(profileExtension, reportables);
+		sb.append("MSA|").append(ackCode).append("|").append(controlId).append("|\r");
+		for (IisReportable r : reportables) {
+			if (r.getSeverity() == IisReportableSeverity.ERROR) {
+				sb.append(IisHL7Util.makeERRSegment(r, PROCESSING_ID_DEBUG.equals(processingId)));
+			}
+		}
+		for (IisReportable r : reportables) {
+			if (r.getSeverity() == IisReportableSeverity.WARN) {
+				sb.append(IisHL7Util.makeERRSegment(r, PROCESSING_ID_DEBUG.equals(processingId)));
+			}
+		}
+		for (IisReportable r : reportables) {
+			if (r.getSeverity() == IisReportableSeverity.INFO) {
+				sb.append(IisHL7Util.makeERRSegment(r, PROCESSING_ID_DEBUG.equals(processingId)));
+			}
+		}
+		for (IisReportable r : reportables) {
+			if (r.getSeverity() == IisReportableSeverity.NOTICE) {
+				sb.append(IisHL7Util.makeERRSegment(r, PROCESSING_ID_DEBUG.equals(processingId)));
+			}
+		}
+		if (PROCESSING_ID_DEBUG.equals(processingId)) {
+			for (IisReportable r : reportables) {
+				if (r.getSeverity() == IisReportableSeverity.ACCEPT) {
+					sb.append(IisHL7Util.makeERRSegment(r, PROCESSING_ID_DEBUG.equals(processingId)));
+				}
+			}
+		}
+	}
+
+	private static boolean hasErrorSeverityType(List<IisReportable> reportables, String severityCode) {
+		for (IisReportable reportable : reportables) {
+			if (reportable.getSeverity().getCode().equals(severityCode)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private static String getAckCode(String profileExtension, List<IisReportable> reportables) {
+		String ackCode;
+		String hl7ErrorCode;
+		if (ADVANCED_ACK.equals(profileExtension)) {  // If extended ACK profile
+			if (hasErrorSeverityType(reportables, IisReportableSeverity.ERROR.getCode())) {
+				ackCode = AckResult.APP_ERROR.getCode();
+				for (IisReportable r : reportables) {
+					if (r.getSeverity() == IisReportableSeverity.ERROR && r.getHl7ErrorCode() != null
+						&& r.getHl7ErrorCode().getIdentifier() != null) {
+						hl7ErrorCode = r.getHl7ErrorCode().getIdentifier();
+						if (hl7ErrorCode != null && hl7ErrorCode.startsWith("2")) {
+							ackCode = AckResult.APP_REJECT.getCode();
+							break;
+						}
+					}
+				}
+			} else if (hasErrorSeverityType(reportables, IisReportableSeverity.WARN.getCode())) {
+				ackCode = "AW";
+			} else if (hasErrorSeverityType(reportables, "N")) {
+				ackCode = "AN";
+			} else {
+				ackCode = AckResult.APP_ACCEPT.getCode();
+			}
+		} else {
+			List<IisReportable> list = reportables.stream().filter(iisReportable -> iisReportable.getSeverity().equals(IisReportableSeverity.NOTICE)).collect(Collectors.toList());
+			reportables = list;
+			if (hasErrorSeverityType(reportables, IisReportableSeverity.ERROR.getCode()) || hasErrorSeverityType(reportables, IisReportableSeverity.WARN.getCode())) {
+				ackCode = AckResult.APP_ERROR.getCode();
+				for (IisReportable r : reportables) {
+					if (r.getSeverity() == IisReportableSeverity.ERROR && r.getHl7ErrorCode() != null
+						&& r.getHl7ErrorCode().getIdentifier() != null) {
+						hl7ErrorCode = r.getHl7ErrorCode().getIdentifier();
+						if (hl7ErrorCode != null && hl7ErrorCode.startsWith("2")) {
+							ackCode = AckResult.APP_REJECT.getCode();
+							break;
+						}
+					}
+				}
+			} else {
+				ackCode = AckResult.APP_ACCEPT.getCode();
+			}
+		}
+		return ackCode;
+	}
+
 }

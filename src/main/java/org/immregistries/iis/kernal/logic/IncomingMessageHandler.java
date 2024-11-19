@@ -61,6 +61,11 @@ import java.util.stream.Collectors;
 
 public abstract class IncomingMessageHandler implements IIncomingMessageHandler {
 	public static final int NAME_SIZE_LIMIT = 15;
+	public static final String RSP_K_11_RSP_K_11 = "RSP^K11^RSP_K11";
+	public static final String MATCH = "Match";
+	public static final String NO_MATCH = "No Match";
+	public static final String POSSIBLE_MATCH = "Possible Match";
+	public static final String TOO_MANY_MATCHES = "Too Many Matches";
 	protected final Logger logger = LoggerFactory.getLogger(IncomingMessageHandler.class);
 	/**
 	 * DYNAMIC VALUE SETS for validation
@@ -109,9 +114,9 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 		}
 	}
 
-	public boolean hasErrors(List<ProcessingException> processingExceptionList) {
-		for (ProcessingException pe : processingExceptionList) {
-			if (pe.isError()) {
+	public boolean hasErrors(List<IisReportable> reportables) {
+		for (IisReportable pe : reportables) {
+			if (pe.getSeverity().equals(IisReportableSeverity.ERROR)) {
 				return true;
 			}
 		}
@@ -317,7 +322,19 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 		return ackBuilder.buildAckFrom(data);
 	}
 
-	public Date parseDateWarn(String dateString, String errorMessage, String segmentId, int segmentRepeat, int fieldPosition, boolean strict, List<ProcessingException> processingExceptionList) {
+	public Date parseDateWarn(String dateString, String errorMessage, String segmentId, int segmentRepeat, int fieldPosition, boolean strict, List<IisReportable> processingExceptionList) {
+		try {
+			return parseDateInternal(dateString, strict);
+		} catch (ParseException e) {
+			if (errorMessage != null) {
+				ProcessingException pe = new ProcessingException(errorMessage + ": " + e.getMessage(), segmentId, segmentRepeat, fieldPosition).setWarning();
+				processingExceptionList.add(new IisReportable(pe));
+			}
+		}
+		return null;
+	}
+
+	public Date parseDateWarnOld(String dateString, String errorMessage, String segmentId, int segmentRepeat, int fieldPosition, boolean strict, List<ProcessingException> processingExceptionList) {
 		try {
 			return parseDateInternal(dateString, strict);
 		} catch (ParseException e) {
@@ -360,9 +377,12 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 		return date;
 	}
 
-	public String processQBP(Tenant tenant, HL7Reader reader, String messageReceived) {
+	public String processQBP(Tenant tenant, HL7Reader reader, String messageReceived) throws Exception {
+		MqeMessageServiceResponse mqeMessageServiceResponse = mqeMessageService.processMessage(messageReceived);
+		List<IisReportable> reportables = nistValidation(messageReceived);
+
 		PatientMaster patientMasterForMatchQuery = new PatientMaster();
-		List<ProcessingException> processingExceptionList = new ArrayList<>();
+//		List<ProcessingException> processingExceptionList = new ArrayList<>();
 		if (reader.advanceToSegment("QPD")) {
 			String mrn = "";
 			{
@@ -384,7 +404,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 			String patientNameMiddle = reader.getValue(4, 3);
 			boolean strictDate = false;
 
-			Date patientBirthDate = parseDateWarn(reader.getValue(6), "Invalid patient birth date", "QPD", 1, 6, strictDate, processingExceptionList);
+			Date patientBirthDate = parseDateWarn(reader.getValue(6), "Invalid patient birth date", "QPD", 1, 6, strictDate, reportables);
 			String patientSex = reader.getValue(7);
 
 			if (patientNameLast.equals("")) {
@@ -398,7 +418,8 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 				fieldPosition = 6;
 			}
 			if (StringUtils.isNotBlank(problem)) {
-				processingExceptionList.add(new ProcessingException(problem, "QPD", 1, fieldPosition));
+				reportables.add(new IisReportable(new ProcessingException(problem, "QPD", 1, fieldPosition)));
+//				processingExceptionList.add(new ProcessingException(problem, "QPD", 1, fieldPosition));
 			} else {
 
 				PatientName patientName = new PatientName(patientNameLast, patientNameFirst, patientNameMiddle, "");
@@ -406,7 +427,8 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 				patientMasterForMatchQuery.setBirthDate(patientBirthDate);
 			}
 		} else {
-			processingExceptionList.add(new ProcessingException("QPD segment not found", null, 0, 0));
+			reportables.add(new IisReportable(new ProcessingException("QPD segment not found", null, 0, 0)));
+//			processingExceptionList.add(new ProcessingException("QPD segment not found", null, 0, 0));
 		}
 
 		Set<ProcessingFlavor> processingFlavorSet = tenant.getProcessingFlavorSet();
@@ -446,11 +468,14 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 
 		singleMatch = fhirRequester.matchPatient(multipleMatches, patientMasterForMatchQuery, cutoff);
 
-		return buildRSP(reader, messageReceived, singleMatch, tenant, multipleMatches, processingExceptionList);
+		return buildRSP(reader, messageReceived, singleMatch, tenant, multipleMatches, reportables);
 	}
 
 	@SuppressWarnings("unchecked")
-	public String buildRSP(HL7Reader reader, String messageReceived, PatientMaster patientMaster, Tenant tenant, List<PatientReported> patientReportedPossibleList, List<ProcessingException> processingExceptionList) {
+	public String buildRSP(HL7Reader reader, String messageReceived, PatientMaster patientMaster, Tenant tenant, List<PatientReported> patientReportedPossibleList, List<IisReportable> iisReportables) {
+
+		MqeMessageServiceResponse mqeMessageServiceResponse = mqeMessageService.processMessage(messageReceived);
+
 		IGenericClient fhirClient = repositoryClientFactory.getFhirClient();
 		reader.resetPostion();
 		reader.advanceToSegment("MSH");
@@ -459,7 +484,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 		StringBuilder sb = new StringBuilder();
 		String profileIdSubmitted = reader.getValue(21);
 		CodeMap codeMap = CodeMapManager.getCodeMap();
-		String categoryResponse = "No Match";
+		String categoryResponse = NO_MATCH;
 		String profileId = RSP_Z33_NO_MATCH;
 		boolean sendBackForecast = true;
 		if (processingFlavorSet.contains(ProcessingFlavor.COCONUT)) {
@@ -486,58 +511,62 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 		}
 		String queryResponse = QUERY_OK;
 		{
-			String messageType = "RSP^K11^RSP_K11";
 			if (patientMaster == null) {
 				queryResponse = QUERY_NOT_FOUND;
 				profileId = RSP_Z33_NO_MATCH;
-				categoryResponse = "No Match";
+				categoryResponse = NO_MATCH;
 				if (patientReportedPossibleList.size() > 0) {
 					if (profileIdSubmitted.equals(QBP_Z34)) {
 						if (patientReportedPossibleList.size() > maxCount) {
 							queryResponse = QUERY_TOO_MANY;
 							profileId = RSP_Z33_NO_MATCH;
-							categoryResponse = "Too Many Matches";
+							categoryResponse = TOO_MANY_MATCHES;
 						} else {
 							queryResponse = QUERY_OK;
 							profileId = RSP_Z31_MULTIPLE_MATCH;
-							categoryResponse = "Possible Match";
+							categoryResponse = POSSIBLE_MATCH;
 						}
 					} else if (profileIdSubmitted.equals("Z44")) {
 						queryResponse = QUERY_NOT_FOUND;
 						profileId = RSP_Z33_NO_MATCH;
-						categoryResponse = "No Match";
+						categoryResponse = NO_MATCH;
 					}
 				}
-				if (hasErrors(processingExceptionList)) {
+				if (hasErrors(iisReportables)) {
 					queryResponse = QUERY_APPLICATION_ERROR;
 				}
 			} else if (profileIdSubmitted.equals(QBP_Z34)) {
 				profileId = RSP_Z32_MATCH;
-				categoryResponse = "Match";
+				categoryResponse = MATCH;
 			} else if (profileIdSubmitted.equals(QBP_Z44)) {
 				if (processingFlavorSet.contains(ProcessingFlavor.ORANGE)) {
 					profileId = RSP_Z32_MATCH;
-					categoryResponse = "Match";
+					categoryResponse = MATCH;
 				} else {
 					sendBackForecast = true;
 					profileId = RSP_Z42_MATCH_WITH_FORECAST;
-					categoryResponse = "Match";
+					categoryResponse = MATCH;
 				}
 			} else {
-				processingExceptionList.add(new ProcessingException("Unrecognized profile id '" + profileIdSubmitted + "'", "MSH", 1, 21));
+				iisReportables.add(new IisReportable(new ProcessingException("Unrecognized profile id '" + profileIdSubmitted + "'", "MSH", 1, 21)));
 			}
-			hl7MessageWriter.createMSH(messageType, profileId, reader, sb, processingFlavorSet);
+			// TODO remove notices ?
+			hl7MessageWriter.createMSH(RSP_K_11_RSP_K_11, profileId, reader, sb, processingFlavorSet);
 		}
 		{
 			String sendersUniqueId = reader.getValue(10);
-			if (hasErrors(processingExceptionList)) {
-				sb.append("MSA|AE|").append(sendersUniqueId).append("\r");
-			} else {
-				sb.append("MSA|AA|").append(sendersUniqueId).append("\r");
-			}
-			if (processingExceptionList.size() > 0) {
-				sb.append(IisHL7Util.makeERRSegment(new IisReportable(processingExceptionList.get(processingExceptionList.size() - 1)), false));
-			}
+			IisHL7Util.makeMsaAndErr(sb, sendersUniqueId, profileId, profileId, iisReportables);
+//			if (hasErrors(iisReportables)) {
+//				sb.append("MSA|AE|").append(sendersUniqueId).append("\r");
+//			} else {
+//				sb.append("MSA|AA|").append(sendersUniqueId).append("\r");
+//			}
+//			if (iisReportables.size() > 0) {
+//				for (IisReportable iisReportable: iisReportables) {
+//					sb.append(IisHL7Util.makeERRSegment(iisReportable, false));
+//				}
+////				sb.append(IisHL7Util.makeERRSegment(new IisReportable(processingExceptionList.get(processingExceptionList.size() - 1)), false));
+//			}
 		}
 		String profileName = "Request a Complete Immunization History";
 		if (profileIdSubmitted.equals("")) {
@@ -1163,7 +1192,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 		patientReported.setEthnicity(reader.getValue(22));
 		patientReported.setBirthFlag(reader.getValue(24));
 		patientReported.setBirthOrder(reader.getValue(25));
-		patientReported.setDeathDate(parseDateWarn(reader.getValue(29), "Invalid patient death date", "PID", 1, 29, strictDate, processingExceptionList));
+		patientReported.setDeathDate(parseDateWarnOld(reader.getValue(29), "Invalid patient death date", "PID", 1, 29, strictDate, processingExceptionList));
 		patientReported.setDeathFlag(reader.getValue(30));
 		patientReported.setEmail(reader.getValueBySearchingRepeats(13, 4, "NET", 2));
 		patientReported.setPhone(patientPhone);
@@ -1276,10 +1305,10 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 		if (reader.advanceToSegment("PD1")) {
 			patientReported.setPublicityIndicator(reader.getValue(11));
 			patientReported.setProtectionIndicator(reader.getValue(12));
-			patientReported.setProtectionIndicatorDate(parseDateWarn(reader.getValue(13), "Invalid protection indicator date", "PD1", 1, 13, strictDate, processingExceptionList));
+			patientReported.setProtectionIndicatorDate(parseDateWarnOld(reader.getValue(13), "Invalid protection indicator date", "PD1", 1, 13, strictDate, processingExceptionList));
 			patientReported.setRegistryStatusIndicator(reader.getValue(16));
-			patientReported.setRegistryStatusIndicatorDate(parseDateWarn(reader.getValue(17), "Invalid registry status indicator date", "PD1", 1, 17, strictDate, processingExceptionList));
-			patientReported.setPublicityIndicatorDate(parseDateWarn(reader.getValue(18), "Invalid publicity indicator date", "PD1", 1, 18, strictDate, processingExceptionList));
+			patientReported.setRegistryStatusIndicatorDate(parseDateWarnOld(reader.getValue(17), "Invalid registry status indicator date", "PD1", 1, 17, strictDate, processingExceptionList));
+			patientReported.setPublicityIndicatorDate(parseDateWarnOld(reader.getValue(18), "Invalid publicity indicator date", "PD1", 1, 18, strictDate, processingExceptionList));
 		}
 		reader.resetPostion();
 		{

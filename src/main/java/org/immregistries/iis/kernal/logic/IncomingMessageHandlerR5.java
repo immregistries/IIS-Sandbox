@@ -297,7 +297,7 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler {
 				vaccinationReported.setAdministeredAmount(reader.getValue(6));
 				vaccinationReported.setInformationSource(reader.getValue(9));
 				vaccinationReported.setLotnumber(reader.getValue(15));
-				vaccinationReported.setExpirationDate(parseDateWarn(reader.getValue(16), "Invalid vaccination expiration date", "RXA", rxaCount, 16, strictDate, processingExceptionList));
+				vaccinationReported.setExpirationDate(parseDateWarnOld(reader.getValue(16), "Invalid vaccination expiration date", "RXA", rxaCount, 16, strictDate, processingExceptionList));
 				vaccinationReported.setVaccineMvxCode(reader.getValue(17));
 				vaccinationReported.setRefusalReasonCode(reader.getValue(18));
 				vaccinationReported.setCompletionStatus(reader.getValue(20));
@@ -504,7 +504,7 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler {
 		observationReported.setUnitsLabel(reader.getValue(6, 2));
 		observationReported.setUnitsTable(reader.getValue(6, 3));
 		observationReported.setResultStatus(reader.getValue(11));
-		observationReported.setObservationDate(parseDateWarn(reader.getValue(14), "Unparsable date/time of observation", "OBX", obxCount, 14, strictDate, processingExceptionList));
+		observationReported.setObservationDate(parseDateWarnOld(reader.getValue(14), "Unparsable date/time of observation", "OBX", obxCount, 14, strictDate, processingExceptionList));
 		observationReported.setMethodCode(reader.getValue(17, 1));
 		observationReported.setMethodLabel(reader.getValue(17, 2));
 		observationReported.setMethodTable(reader.getValue(17, 3));

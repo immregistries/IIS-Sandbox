@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
-interface IIncomingMessageHandler {
+public interface IIncomingMessageHandler {
 	double MINIMAL_MATCHING_SCORE = 0.9;
 
 	String PATIENT_MIDDLE_NAME_MULTI = "Multi";
