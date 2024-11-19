@@ -89,21 +89,46 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 	@Autowired
 	PartitionCreationInterceptor partitionCreationInterceptor;
 
-	SyncHL7Validator syncHL7Validator;
+	SyncHL7Validator syncHL7ValidatorVxuZ22;
+	SyncHL7Validator syncHL7ValidatorQbpZ34;
+	SyncHL7Validator syncHL7ValidatorQbpZ44;
 
 	public IncomingMessageHandler() {
 		mqeMessageService = MqeMessageService.INSTANCE;
 		dataSession = PopServlet.getDataSession();
 
-		InputStream profileXML = IncomingMessageHandler.class.getResourceAsStream("/export/VXU-Z22_Profile.xml");
-		InputStream constraintsXML = IncomingMessageHandler.class.getResourceAsStream("/export/VXU-Z22_Constraints.xml");
-		InputStream vsLibraryXML = IncomingMessageHandler.class.getResourceAsStream("/export/VXU-Z22_ValueSetLibrary.xml");
+		{
+			InputStream profileXML = IncomingMessageHandler.class.getResourceAsStream("/export/VXU-Z22_Profile.xml");
+			InputStream constraintsXML = IncomingMessageHandler.class.getResourceAsStream("/export/VXU-Z22_Constraints.xml");
+			InputStream vsLibraryXML = IncomingMessageHandler.class.getResourceAsStream("/export/VXU-Z22_ValueSetLibrary.xml");
 
-		Profile profile = XMLDeserializer.deserialize(profileXML).get();
-		ValueSetLibrary valueSetLibrary = ValueSetLibraryImpl.apply(vsLibraryXML).get();
-		ConformanceContext conformanceContext = DefaultConformanceContext.apply(Collections.singletonList(constraintsXML)).get();
+			Profile profile = XMLDeserializer.deserialize(profileXML).get();
+			ValueSetLibrary valueSetLibrary = ValueSetLibraryImpl.apply(vsLibraryXML).get();
+			ConformanceContext conformanceContext = DefaultConformanceContext.apply(Collections.singletonList(constraintsXML)).get();
+			syncHL7ValidatorVxuZ22 = new SyncHL7Validator(profile, valueSetLibrary, conformanceContext);
+		}
 
-		syncHL7Validator = new SyncHL7Validator(profile, valueSetLibrary, conformanceContext);
+		{
+			InputStream profileXML = IncomingMessageHandler.class.getResourceAsStream("/export/QBP-Z34_Profile.xml");
+			InputStream constraintsXML = IncomingMessageHandler.class.getResourceAsStream("/export/QBP-Z34_Constraints.xml");
+			InputStream vsLibraryXML = IncomingMessageHandler.class.getResourceAsStream("/export/QBP-Z34_ValueSetLibrary.xml");
+
+			Profile profile = XMLDeserializer.deserialize(profileXML).get();
+			ValueSetLibrary valueSetLibrary = ValueSetLibraryImpl.apply(vsLibraryXML).get();
+			ConformanceContext conformanceContext = DefaultConformanceContext.apply(Collections.singletonList(constraintsXML)).get();
+			syncHL7ValidatorQbpZ34 = new SyncHL7Validator(profile, valueSetLibrary, conformanceContext);
+		}
+
+		{
+			InputStream profileXML = IncomingMessageHandler.class.getResourceAsStream("/export/QBP-Z44_Profile.xml");
+			InputStream constraintsXML = IncomingMessageHandler.class.getResourceAsStream("/export/QBP-Z44_Constraints.xml");
+			InputStream vsLibraryXML = IncomingMessageHandler.class.getResourceAsStream("/export/QBP-Z44_ValueSetLibrary.xml");
+
+			Profile profile = XMLDeserializer.deserialize(profileXML).get();
+			ValueSetLibrary valueSetLibrary = ValueSetLibraryImpl.apply(vsLibraryXML).get();
+			ConformanceContext conformanceContext = DefaultConformanceContext.apply(Collections.singletonList(constraintsXML)).get();
+			syncHL7ValidatorQbpZ44 = new SyncHL7Validator(profile, valueSetLibrary, conformanceContext);
+		}
 	}
 
 	public void verifyNoErrors(List<ProcessingException> processingExceptionList) throws ProcessingException {
@@ -379,8 +404,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 
 	public String processQBP(Tenant tenant, HL7Reader reader, String messageReceived) throws Exception {
 		MqeMessageServiceResponse mqeMessageServiceResponse = mqeMessageService.processMessage(messageReceived);
-		List<IisReportable> reportables = nistValidation(messageReceived);
-
+		List<IisReportable> reportables = nistValidation(messageReceived, mqeMessageServiceResponse.getMessageObjects().getMessageHeader().getMessageProfile());
 		PatientMaster patientMasterForMatchQuery = new PatientMaster();
 //		List<ProcessingException> processingExceptionList = new ArrayList<>();
 		if (reader.advanceToSegment("QPD")) {
@@ -951,14 +975,27 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 	public abstract ObservationReported readObservations(HL7Reader reader, List<ProcessingException> processingExceptionList, PatientReported patientReported, boolean strictDate, int obxCount, VaccinationReported vaccinationReported, VaccinationMaster vaccination, String identifierCode, String valueCode);
 
 
-	public List<IisReportable> nistValidation(String message) throws Exception {
-		String id = "aa72383a-7b48-46e5-a74a-82e019591fe7"; // TODO table with profiles ?
-		List<IisReportable> reportableList = new ArrayList();
+	public List<IisReportable> nistValidation(String message, String profileId) throws Exception {
+		String id;
+		SyncHL7Validator syncHL7Validator;
+		if ("Z34".equals(profileId)) {
+			id = "89df2062-96c4-4cbc-9ef2-817e4b4bc4f1";
+			syncHL7Validator = syncHL7ValidatorQbpZ34;
+		} else if ("Z44".equals(profileId)) {
+			id = "b760d322-9afd-439e-96f5-43db66937c4e";
+			syncHL7Validator = syncHL7ValidatorQbpZ44;
+		} else if ("Z22".equals(profileId)) {
+			id = "aa72383a-7b48-46e5-a74a-82e019591fe7";
+			syncHL7Validator = syncHL7ValidatorVxuZ22;
+		} else {
+			id = "aa72383a-7b48-46e5-a74a-82e019591fe7";
+			syncHL7Validator = syncHL7ValidatorVxuZ22;
+		}
 		Report report = syncHL7Validator.check(message, id);
-		for (Map.Entry<String, List<Entry>> mapEntry : report.getEntries().entrySet()
-		) {
+		List<IisReportable> reportableList = new ArrayList<>();
+		for (Map.Entry<String, List<Entry>> mapEntry : report.getEntries().entrySet()) {
 			for (Entry assertion : mapEntry.getValue()) {
-				logger.info("entry {}", assertion.toText());
+//				logger.info("entry {}", assertion.toText());
 				String severity = assertion.getClassification();
 				SeverityLevel severityLevel = SeverityLevel.ACCEPT;
 				if (severity.equalsIgnoreCase("error")) {
@@ -980,7 +1017,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 					reportable.setApplicationErrorCode(cwe);
 					String path = assertion.getPath();
 					reportable.setDiagnosticMessage(path);
-					this.readErrorLocation(reportable, path);
+					this.addErrorLocation(reportable, path);
 				}
 			}
 		}
@@ -991,7 +1028,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 		return reportableList;
 	}
 
-	public void readErrorLocation(IisReportable reportable, String path) {
+	public void addErrorLocation(IisReportable reportable, String path) {
 		if (path != null && path.length() >= 3) {
 			String segmentid = path.substring(0, 3);
 			if (path.length() > 3) {

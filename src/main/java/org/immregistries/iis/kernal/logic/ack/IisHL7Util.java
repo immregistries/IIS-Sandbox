@@ -346,7 +346,7 @@ public class IisHL7Util {
 		if (PROCESSING_ID_DEBUG.equals(processingId)) {
 			for (IisReportable r : reportables) {
 				if (r.getSeverity() == IisReportableSeverity.ACCEPT) {
-					sb.append(IisHL7Util.makeERRSegment(r, PROCESSING_ID_DEBUG.equals(processingId)));
+					sb.append(IisHL7Util.makeERRSegment(r, true));
 				}
 			}
 		}

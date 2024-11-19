@@ -72,8 +72,7 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler {
 					break;
 				default:
 					ProcessingException pe = new ProcessingException("Unsupported message", "", 0, 0);
-					List<ProcessingException> processingExceptionList = new ArrayList<>();
-					processingExceptionList.add(pe);
+					List<ProcessingException> processingExceptionList = List.of(pe);
 					responseMessage = buildAck(reader, processingExceptionList, processingFlavorSet);
 					recordMessageReceived(message, null, responseMessage, "Unknown", "NAck", tenant);
 					break;
@@ -93,7 +92,7 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler {
 		List<ProcessingException> processingExceptionList = new ArrayList<>();
 		Set<ProcessingFlavor> processingFlavorSet = tenant.getProcessingFlavorSet();
 		MqeMessageServiceResponse mqeMessageServiceResponse = mqeMessageService.processMessage(message);
-		List<IisReportable> nistReportables = nistValidation(message);
+		List<IisReportable> nistReportables = nistValidation(message, "VXU");
 
 		try {
 			CodeMap codeMap = CodeMapManager.getCodeMap();

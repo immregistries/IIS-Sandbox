@@ -93,7 +93,7 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler {
 		List<ProcessingException> processingExceptionList = new ArrayList<>();
 		Set<ProcessingFlavor> processingFlavorSet = tenant.getProcessingFlavorSet();
 		MqeMessageServiceResponse mqeMessageServiceResponse = mqeMessageService.processMessage(message);
-		List<IisReportable> nistReportables = nistValidation(message);
+		List<IisReportable> nistReportables = nistValidation(message, "VXU");
 
 		try {
 			CodeMap codeMap = CodeMapManager.getCodeMap();
