@@ -230,16 +230,30 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 		return sb.toString();
 	}
 
-	public String buildAckMqe(MqeMessageServiceResponse mqeMessageServiceResponse, List<ProcessingException> processingExceptionList, Set<ProcessingFlavor> processingFlavorSet, List<IisReportable> validatorReportables) {
+	public String buildAckMqe(HL7Reader reader, MqeMessageServiceResponse mqeMessageServiceResponse, List<ProcessingException> processingExceptionList, Set<ProcessingFlavor> processingFlavorSet, List<IisReportable> validatorReportables) {
 		IisAckBuilder ackBuilder = IisAckBuilder.INSTANCE;
 		IisAckData data = new IisAckData();
 		MqeMessageHeader header = mqeMessageServiceResponse.getMessageObjects().getMessageHeader();
-		String profile = header.getMessageProfile();
-		if (profile.equals(Z22_ADVANCED_VXU)) {
-			data.setProfileId(Z23_ADVANCED_ACKNOWLEDGEMENT);
+		String profileId = header.getMessageProfile();
+		reader.resetPostion();
+		reader.advanceToSegment("MSH");
+		String profileExtension = null;
+		int count = reader.getRepeatCount(21);
+		if (count > 1) {
+			profileExtension = reader.getValueRepeat(21, 1, 2);
+			if (profileExtension.equals(ADVANCED_ACK)) {
+				data.setProfileExtension(ADVANCED_ACK);
+			} // else not supported
+		}
+		if (profileId.equals(VXU_Z22)) {
+			data.setProfileId(Z23_ACKNOWLEDGEMENT);
+		} else if (profileId.equals(QBP_Z34)) {
+			data.setProfileId(RSP_Z33_NO_MATCH);
+
 		} else {
 			data.setProfileId(Z23_ACKNOWLEDGEMENT);
 		}
+
 
 		List<ValidationRuleResult> resultList = mqeMessageServiceResponse.getValidationResults();
 		List<IisReportable> reportables = new ArrayList<>(validatorReportables);

@@ -21,6 +21,7 @@ public class IisAckData {
 	private Date messageDate = new Date();
 	private String responseType = "";
 	private String profileId = "";
+	private String profileExtension = "";
 
 	public IisAckData() {
 	}
@@ -145,5 +146,13 @@ public class IisAckData {
 
 	public void setProfileId(String profileId) {
 		this.profileId = profileId;
+	}
+
+	public String getProfileExtension() {
+		return profileExtension;
+	}
+
+	public void setProfileExtension(String profileExtension) {
+		this.profileExtension = profileExtension;
 	}
 }

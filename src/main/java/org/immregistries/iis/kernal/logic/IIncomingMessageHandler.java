@@ -21,8 +21,11 @@ interface IIncomingMessageHandler {
 	String RSP_Z31_MULTIPLE_MATCH = "Z31";
 	String RSP_Z33_NO_MATCH = "Z33";
 	String Z23_ACKNOWLEDGEMENT = "Z23";
-	String Z22_ADVANCED_VXU = "Z22_ADV_ACK";
-	String Z23_ADVANCED_ACKNOWLEDGEMENT = "Z22_ADV_ACK";
+	String VXU_Z22 = "Z22^CDCPHINVS";
+	String Z22_ACK = "Z23^CDCPHINVS";
+	String ADVANCED_ACK = "ADVANCED_ACK";
+	String Z22_ADVANCED_VXU = VXU_Z22 + "~" + ADVANCED_ACK;
+	String Z23_ADVANCED_ACKNOWLEDGEMENT = "Z23^CDCPHINVS" + "~" + ADVANCED_ACK;
 	String QUERY_OK = "OK";
 	// TODO:
 	// Organize logic classes, need to have access classes for every object, maybe a new Access

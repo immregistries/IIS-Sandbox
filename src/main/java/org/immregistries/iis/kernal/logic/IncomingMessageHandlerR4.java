@@ -93,7 +93,6 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler {
 	public String processVXU(Tenant tenant, HL7Reader reader, String message, Organization managingOrganization) throws Exception {
 		List<ProcessingException> processingExceptionList = new ArrayList<>();
 		Set<ProcessingFlavor> processingFlavorSet = tenant.getProcessingFlavorSet();
-		String profileIdentifier = reader.getValue(21);
 		MqeMessageServiceResponse mqeMessageServiceResponse = mqeMessageService.processMessage(message);
 		List<IisReportable> nistReportables = nistValidation(message);
 
@@ -377,14 +376,14 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler {
 			if (processingFlavorSet.contains(ProcessingFlavor.BILBERRY) && (vaccinationCount == 0 && refusalCount == 0)) {
 				throw new ProcessingException("Patient vaccination history cannot be accepted without at least one administered, historical, or refused vaccination specified", "", 0, 0);
 			}
-			String ack = buildAckMqe(mqeMessageServiceResponse, processingExceptionList, processingFlavorSet, nistReportables);
+			String ack = buildAckMqe(reader, mqeMessageServiceResponse, processingExceptionList, processingFlavorSet, nistReportables);
 			recordMessageReceived(message, patientReported, ack, "Update", "Ack", tenant);
 			return ack;
 		} catch (ProcessingException e) {
 			if (!processingExceptionList.contains(e)) {
 				processingExceptionList.add(e);
 			}
-			String ack = buildAckMqe(mqeMessageServiceResponse, processingExceptionList, processingFlavorSet, nistReportables);
+			String ack = buildAckMqe(reader, mqeMessageServiceResponse, processingExceptionList, processingFlavorSet, nistReportables);
 			recordMessageReceived(message, null, ack, "Update", "Exception", tenant);
 			return ack;
 		}

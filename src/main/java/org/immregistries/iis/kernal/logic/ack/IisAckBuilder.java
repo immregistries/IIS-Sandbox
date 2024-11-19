@@ -1,5 +1,6 @@
 package org.immregistries.iis.kernal.logic.ack;
 
+import org.apache.commons.lang3.StringUtils;
 import org.immregistries.mqe.hl7util.builder.AckResult;
 
 import java.text.SimpleDateFormat;
@@ -38,7 +39,7 @@ public enum IisAckBuilder {
 			ackCode = AckResult.APP_ACCEPT.getCode();
 		}
 		StringBuilder ack = new StringBuilder();
-		makeHeader(ack, ackDataIn, "Z23", null);
+		makeHeader(ack, ackDataIn, StringUtils.defaultIfBlank(ackDataIn.getProfileId(), "Z23"), null);
 		// ack.append("SFT|" + SoftwareVersion.VENDOR + "|" +
 		// SoftwareVersion.VERSION + "|" + SoftwareVersion.PRODUCT + "|" +
 		// SoftwareVersion.BINARY_ID
@@ -109,6 +110,7 @@ public enum IisAckBuilder {
 
 	public static void makeHeader(StringBuilder ack, IisAckData ackDataIn, String profileId,
 											String responseType) {
+		String profileExtension = ackDataIn.getProfileExtension();
 		String receivingApplication = ackDataIn.getSendingApplication();
 		String receivingFacility = ackDataIn.getSendingFacility();
 		String sendingApplication = ackDataIn.getReceivingApplication();
@@ -147,7 +149,11 @@ public enum IisAckBuilder {
 		ack.append("|2.5.1"); // MSH-12 Version ID
 		ack.append("|");
 		if (profileId != null) {
-			ack.append("||NE|NE|||||" + profileId + "^CDCPHINVS|");
+			ack.append("||NE|NE|||||").append(profileId).append("^CDCPHINVS");
+			if (StringUtils.isNotBlank(profileExtension)) {
+				ack.append("~").append(profileExtension).append("^CDCPHINVS");
+			}
+			ack.append("|");
 		}
 		ack.append("\r");
 
