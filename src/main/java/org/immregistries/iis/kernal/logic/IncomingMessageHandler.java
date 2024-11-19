@@ -411,13 +411,13 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 			String mrn = "";
 			{
 				mrn = reader.getValueBySearchingRepeats(3, 1, "MR", 5);
-				if (mrn.equals("")) {
+				if (StringUtils.isBlank(mrn)) {
 					mrn = reader.getValueBySearchingRepeats(3, 1, "PT", 5);
 				}
 			}
 			String problem = null;
 			int fieldPosition = 0;
-			if (!mrn.equals("")) {
+			if (StringUtils.isNotBlank(mrn)) {
 				patientMasterForMatchQuery.setExternalLink(mrn); // TODO system
 //				patientReported = fhirRequester.searchPatientReported(
 //					Patient.IDENTIFIER.exactly().systemAndCode(MRN_SYSTEM, mrn)
@@ -431,10 +431,10 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 			Date patientBirthDate = parseDateWarn(reader.getValue(6), "Invalid patient birth date", "QPD", 1, 6, strictDate, reportables);
 			String patientSex = reader.getValue(7);
 
-			if (patientNameLast.equals("")) {
+			if (StringUtils.isBlank(patientNameLast)) {
 				problem = "Last name is missing";
 				fieldPosition = 4;
-			} else if (patientNameFirst.equals("")) {
+			} else if (StringUtils.isBlank(patientNameFirst)) {
 				problem = "First name is missing";
 				fieldPosition = 4;
 			} else if (patientBirthDate == null) {
