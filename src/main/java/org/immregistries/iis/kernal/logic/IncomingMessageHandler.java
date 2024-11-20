@@ -131,13 +131,14 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 		}
 	}
 
-	public void verifyNoErrors(List<ProcessingException> processingExceptionList) throws ProcessingException {
-		for (ProcessingException pe : processingExceptionList) {
-			if (pe.isError()) {
-				throw pe;
+	public void verifyNoErrors(List<IisReportable> processingExceptionList) throws ProcessingException {
+		for (IisReportable pe : processingExceptionList) {
+			if (pe.getSeverity().equals(IisReportableSeverity.ERROR)) {
+				throw new ProcessingException(pe);
 			}
 		}
 	}
+
 
 	public boolean hasErrors(List<IisReportable> reportables) {
 		for (IisReportable pe : reportables) {
@@ -216,7 +217,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 		return forecastActualList;
 	}
 
-	public String buildAck(HL7Reader reader, List<ProcessingException> processingExceptionList, Set<ProcessingFlavor> processingFlavorSet) {
+	public String buildAck(HL7Reader reader, List<IisReportable> processingExceptionList, Set<ProcessingFlavor> processingFlavorSet) {
 		StringBuilder sb = new StringBuilder();
 		{
 			String messageType = "ACK^V04^ACK";
@@ -226,8 +227,8 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 
 		// if processing flavor contains MEDLAR then all the non E errors have to removed from the processing list
 		if (processingFlavorSet != null && processingFlavorSet.contains(ProcessingFlavor.MEDLAR)) {
-			List<ProcessingException> tempProcessingExceptionList = new ArrayList<ProcessingException>();
-			for (ProcessingException pe : processingExceptionList) {
+			List<IisReportable> tempProcessingExceptionList = new ArrayList<IisReportable>();
+			for (IisReportable pe : processingExceptionList) {
 				if (pe.isError()) {
 					tempProcessingExceptionList.add(pe);
 				}
@@ -246,7 +247,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 			sendersUniqueId = "MSH-10 NOT VALUED";
 		}
 		String overallStatus = "AA";
-		for (ProcessingException pe : processingExceptionList) {
+		for (IisReportable pe : processingExceptionList) {
 			if (pe.isError() || pe.isWarning()) {
 				overallStatus = "AE";
 				break;
@@ -254,13 +255,13 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 		}
 
 		sb.append("MSA|").append(overallStatus).append("|").append(sendersUniqueId).append("\r");
-		for (ProcessingException pe : processingExceptionList) {
-			sb.append(IisHL7Util.makeERRSegment(new IisReportable(pe), false));
+		for (IisReportable pe : processingExceptionList) {
+			sb.append(IisHL7Util.makeERRSegment(pe, false));
 		}
 		return sb.toString();
 	}
 
-	public String buildAckMqe(HL7Reader reader, MqeMessageServiceResponse mqeMessageServiceResponse, List<ProcessingException> processingExceptionList, Set<ProcessingFlavor> processingFlavorSet, List<IisReportable> validatorReportables) {
+	public String buildAckMqe(HL7Reader reader, MqeMessageServiceResponse mqeMessageServiceResponse, List<IisReportable> processingExceptionList, Set<ProcessingFlavor> processingFlavorSet, List<IisReportable> validatorReportables) {
 		IisAckBuilder ackBuilder = IisAckBuilder.INSTANCE;
 		IisAckData data = new IisAckData();
 		MqeMessageHeader header = mqeMessageServiceResponse.getMessageObjects().getMessageHeader();
@@ -287,7 +288,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 
 		List<ValidationRuleResult> resultList = mqeMessageServiceResponse.getValidationResults();
 		List<IisReportable> reportables = new ArrayList<>(validatorReportables);
-		reportables.addAll(processingExceptionList.stream().map(IisReportable::new).collect(Collectors.toList()));
+		reportables.addAll(processingExceptionList);
 		/* This code needs to get put somewhere better. */
 		for (ValidationRuleResult result : resultList) {
 			reportables.addAll(result.getValidationDetections().stream().map(IisReportable::new).collect(Collectors.toList()));
@@ -354,18 +355,6 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 			if (errorMessage != null) {
 				ProcessingException pe = new ProcessingException(errorMessage + ": " + e.getMessage(), segmentId, segmentRepeat, fieldPosition).setWarning();
 				processingExceptionList.add(new IisReportable(pe));
-			}
-		}
-		return null;
-	}
-
-	public Date parseDateWarnOld(String dateString, String errorMessage, String segmentId, int segmentRepeat, int fieldPosition, boolean strict, List<ProcessingException> processingExceptionList) {
-		try {
-			return parseDateInternal(dateString, strict);
-		} catch (ParseException e) {
-			if (errorMessage != null) {
-				ProcessingException pe = new ProcessingException(errorMessage + ": " + e.getMessage(), segmentId, segmentRepeat, fieldPosition).setWarning();
-				processingExceptionList.add(pe);
 			}
 		}
 		return null;
@@ -943,7 +932,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 		return messageResponse;
 	}
 
-	public int readAndCreateObservations(HL7Reader reader, List<ProcessingException> processingExceptionList, PatientReported patientReported, boolean strictDate, int obxCount, VaccinationReported vaccinationReported, VaccinationMaster vaccination) {
+	public int readAndCreateObservations(HL7Reader reader, List<IisReportable> processingExceptionList, PatientReported patientReported, boolean strictDate, int obxCount, VaccinationReported vaccinationReported, VaccinationMaster vaccination) {
 		while (reader.advanceToSegment("OBX", "ORC")) {
 			obxCount++;
 			String identifierCode = reader.getValue(3);
@@ -956,19 +945,19 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 				if (contraCode == null) {
 					ProcessingException pe = new ProcessingException("Unrecognized contraindication or precaution", "OBX", obxCount, 5);
 					pe.setWarning();
-					processingExceptionList.add(pe);
+					processingExceptionList.add(new IisReportable(pe));
 				}
 				if (observationReported.getObservationDate() != null) {
 					Date today = new Date();
 					if (observationReported.getObservationDate().after(today)) {
 						ProcessingException pe = new ProcessingException("Contraindication or precaution observed in the future", "OBX", obxCount, 5);
 						pe.setWarning();
-						processingExceptionList.add(pe);
+						processingExceptionList.add(new IisReportable(pe));
 					}
 					if (patientReported.getBirthDate() != null && observationReported.getObservationDate().before(patientReported.getBirthDate())) {
 						ProcessingException pe = new ProcessingException("Contraindication or precaution observed before patient was born", "OBX", obxCount, 14);
 						pe.setWarning();
-						processingExceptionList.add(pe);
+						processingExceptionList.add(new IisReportable(pe));
 					}
 				}
 			}
@@ -983,7 +972,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 		return obxCount;
 	}
 
-	public abstract ObservationReported readObservations(HL7Reader reader, List<ProcessingException> processingExceptionList, PatientReported patientReported, boolean strictDate, int obxCount, VaccinationReported vaccinationReported, VaccinationMaster vaccination, String identifierCode, String valueCode);
+	public abstract ObservationReported readObservations(HL7Reader reader, List<IisReportable> processingExceptionList, PatientReported patientReported, boolean strictDate, int obxCount, VaccinationReported vaccinationReported, VaccinationMaster vaccination, String identifierCode, String valueCode);
 
 
 	public List<IisReportable> nistValidation(String message, String profileId) throws Exception {
@@ -1057,7 +1046,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 	}
 
 
-	public PatientReported processPatientFhirAgnostic(HL7Reader reader, List<ProcessingException> processingExceptionList, Set<ProcessingFlavor> processingFlavorSet, CodeMap codeMap, boolean strictDate, PatientReported patientReported, String patientReportedExternalLink, String patientReportedAuthority, String patientReportedType) throws ProcessingException {
+	public PatientReported processPatientFhirAgnostic(HL7Reader reader, List<IisReportable> processingExceptionList, Set<ProcessingFlavor> processingFlavorSet, CodeMap codeMap, boolean strictDate, PatientReported patientReported, String patientReportedExternalLink, String patientReportedAuthority, String patientReportedType) throws ProcessingException {
 
 		if (processingFlavorSet.contains(ProcessingFlavor.APPLESAUCE)) {
 
@@ -1168,7 +1157,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 				if (!processingFlavorSet.contains(ProcessingFlavor.QUINZE)) {
 					pe.setWarning();
 				}
-				processingExceptionList.add(pe);
+				processingExceptionList.add(new IisReportable(pe));
 			}
 
 			{
@@ -1189,12 +1178,12 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 				if (invalidCharFound) {
 					ProcessingException pe = new ProcessingException("Patient phone number has unexpected character: " + invalidChar, "PID", 1, 13);
 					pe.setWarning();
-					processingExceptionList.add(pe);
+					processingExceptionList.add(new IisReportable(pe));
 				}
 				if (countNums != 10 || patientPhone.startsWith("555") || patientPhone.startsWith("0") || patientPhone.startsWith("1")) {
 					ProcessingException pe = new ProcessingException("Patient phone number does not appear to be valid", "PID", 1, 13);
 					pe.setWarning();
-					processingExceptionList.add(pe);
+					processingExceptionList.add(new IisReportable(pe));
 				}
 			}
 		}
@@ -1244,7 +1233,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 		patientReported.setEthnicity(reader.getValue(22));
 		patientReported.setBirthFlag(reader.getValue(24));
 		patientReported.setBirthOrder(reader.getValue(25));
-		patientReported.setDeathDate(parseDateWarnOld(reader.getValue(29), "Invalid patient death date", "PID", 1, 29, strictDate, processingExceptionList));
+		patientReported.setDeathDate(parseDateWarn(reader.getValue(29), "Invalid patient death date", "PID", 1, 29, strictDate, processingExceptionList));
 		patientReported.setDeathFlag(reader.getValue(30));
 		patientReported.setEmail(reader.getValueBySearchingRepeats(13, 4, "NET", 2));
 		patientReported.setPhone(patientPhone);
@@ -1257,7 +1246,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 				if (processingFlavorSet.contains(ProcessingFlavor.ELDERBERRIES)) {
 					pe.setWarning();
 				}
-				processingExceptionList.add(pe);
+				processingExceptionList.add(new IisReportable(pe));
 			}
 		}
 
@@ -1268,7 +1257,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 				if (processingFlavorSet.contains(ProcessingFlavor.GUAVA)) {
 					pe.setWarning();
 				}
-				processingExceptionList.add(pe);
+				processingExceptionList.add(new IisReportable(pe));
 			}
 		}
 		if (patientAddressCountry.equals("") || patientAddressCountry.equals("US") || patientAddressCountry.equals("USA")) {
@@ -1279,7 +1268,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 					if (processingFlavorSet.contains(ProcessingFlavor.GUAVA)) {
 						pe.setWarning();
 					}
-					processingExceptionList.add(pe);
+					processingExceptionList.add(new IisReportable(pe));
 				}
 			}
 		}
@@ -1294,7 +1283,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 					if (!processingFlavorSet.contains(ProcessingFlavor.FIG)) {
 						pe.setWarning();
 					}
-					processingExceptionList.add(pe);
+					processingExceptionList.add(new IisReportable(pe));
 				}
 			}
 		}
@@ -1308,7 +1297,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 					if (!processingFlavorSet.contains(ProcessingFlavor.FIG)) {
 						pe.setWarning();
 					}
-					processingExceptionList.add(pe);
+					processingExceptionList.add(new IisReportable(pe));
 				}
 			}
 		}
@@ -1330,26 +1319,26 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 						if (processingFlavorSet.contains(ProcessingFlavor.PLANTAIN)) {
 							pe.setWarning();
 						}
-						processingExceptionList.add(pe);
+						processingExceptionList.add(new IisReportable(pe));
 					}
 				} else if (birthFlag.equals("Y")) {
 					if (birthOrder.equals("")) {
 						ProcessingException pe = new ProcessingException("Multiple birth but birth order was not specified", "PID", 1, 24);
 						pe.setWarning();
-						processingExceptionList.add(pe);
+						processingExceptionList.add(new IisReportable(pe));
 					} else if (!ValidValues.verifyValidValue(birthOrder, ValidValues.BIRTH_ORDER)) {
 						ProcessingException pe = new ProcessingException("Birth order was specified as " + birthOrder + " but not an expected value, must be between 1 and 9", "PID", 1, 25);
 						if (processingFlavorSet.contains(ProcessingFlavor.PLANTAIN)) {
 							pe.setWarning();
 						}
-						processingExceptionList.add(pe);
+						processingExceptionList.add(new IisReportable(pe));
 					}
 				} else {
 					ProcessingException pe = new ProcessingException("Multiple birth indicator " + birthFlag + " is not recognized", "PID", 1, 24);
 					if (processingFlavorSet.contains(ProcessingFlavor.PLANTAIN)) {
 						pe.setWarning();
 					}
-					processingExceptionList.add(pe);
+					processingExceptionList.add(new IisReportable(pe));
 				}
 			}
 		}
@@ -1357,10 +1346,10 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 		if (reader.advanceToSegment("PD1")) {
 			patientReported.setPublicityIndicator(reader.getValue(11));
 			patientReported.setProtectionIndicator(reader.getValue(12));
-			patientReported.setProtectionIndicatorDate(parseDateWarnOld(reader.getValue(13), "Invalid protection indicator date", "PD1", 1, 13, strictDate, processingExceptionList));
+			patientReported.setProtectionIndicatorDate(parseDateWarn(reader.getValue(13), "Invalid protection indicator date", "PD1", 1, 13, strictDate, processingExceptionList));
 			patientReported.setRegistryStatusIndicator(reader.getValue(16));
-			patientReported.setRegistryStatusIndicatorDate(parseDateWarnOld(reader.getValue(17), "Invalid registry status indicator date", "PD1", 1, 17, strictDate, processingExceptionList));
-			patientReported.setPublicityIndicatorDate(parseDateWarnOld(reader.getValue(18), "Invalid publicity indicator date", "PD1", 1, 18, strictDate, processingExceptionList));
+			patientReported.setRegistryStatusIndicatorDate(parseDateWarn(reader.getValue(17), "Invalid registry status indicator date", "PD1", 1, 17, strictDate, processingExceptionList));
+			patientReported.setPublicityIndicatorDate(parseDateWarn(reader.getValue(18), "Invalid publicity indicator date", "PD1", 1, 18, strictDate, processingExceptionList));
 		}
 		reader.resetPostion();
 		{
@@ -1372,23 +1361,23 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 				String guardianRelationship = reader.getValue(3);
 				patientReported.setGuardianRelationship(guardianRelationship);
 				repeatCount++;
-				if (patientReported.getGuardianLast().equals("")) {
+				if (StringUtils.isBlank(patientReported.getGuardianLast())) {
 					ProcessingException pe = new ProcessingException("Next-of-kin last name is empty", "NK1", repeatCount, 2).setWarning();
-					processingExceptionList.add(pe);
+					processingExceptionList.add(new IisReportable(pe));
 				}
 				if (patientReported.getGuardianFirst().equals("")) {
 					ProcessingException pe = new ProcessingException("Next-of-kin first name is empty", "NK1", repeatCount, 2).setWarning();
-					processingExceptionList.add(pe);
+					processingExceptionList.add(new IisReportable(pe));
 				}
 				if (guardianRelationship.equals("")) {
 					ProcessingException pe = new ProcessingException("Next-of-kin relationship is empty", "NK1", repeatCount, 3).setWarning();
-					processingExceptionList.add(pe);
+					processingExceptionList.add(new IisReportable(pe));
 				}
 				if (guardianRelationship.equals("MTH") || guardianRelationship.equals("FTH") || guardianRelationship.equals("GRD")) {
 					break;
 				} else {
 					ProcessingException pe = new ProcessingException((guardianRelationship.equals("") ? "Next-of-kin relationship not specified so is not recognized as guardian and will be ignored" : ("Next-of-kin relationship '" + guardianRelationship + "' is not a recognized guardian and will be ignored")), "NK1", repeatCount, 3).setWarning();
-					processingExceptionList.add(pe);
+					processingExceptionList.add(new IisReportable(pe));
 				}
 			}
 		}
@@ -1399,6 +1388,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 		patientReported.setUpdatedDate(new Date());
 		patientReported = fhirRequester.savePatientReported(patientReported);
 		patientReported = fhirRequester.saveRelatedPerson(patientReported);
+		processingExceptionList.add(new IisReportable(new ProcessingException("Patient record saved", "PID", 0, 0, "I")));
 
 		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
 		ArrayList<String> groupPatientIds = (ArrayList<String>) request.getAttribute("groupPatientIds");

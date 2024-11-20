@@ -1,5 +1,6 @@
 package org.immregistries.iis.kernal.logic;
 
+import org.immregistries.iis.kernal.logic.ack.IisReportable;
 import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.model.ProcessingFlavor;
 import org.immregistries.iis.kernal.model.Tenant;
@@ -23,8 +24,6 @@ public interface IIncomingMessageHandler {
 	String Z23_ACKNOWLEDGEMENT = "Z23";
 	String VXU_Z22 = "Z22";
 	String ADVANCED_ACK = "ADVANCED_ACK";
-	//	String Z22_ADVANCED_VXU = VXU_Z22 + "~" + ADVANCED_ACK;
-//	String Z23_ADVANCED_ACKNOWLEDGEMENT = "Z23^CDCPHINVS" + "~" + ADVANCED_ACK;
 	String QUERY_OK = "OK";
 	// TODO:
 	// Organize logic classes, need to have access classes for every object, maybe a new Access
@@ -39,6 +38,6 @@ public interface IIncomingMessageHandler {
 
 	List<VaccinationMaster> getVaccinationMasterList(PatientMaster patient);
 
-	String buildAck(HL7Reader reader, List<ProcessingException> processingExceptionList, Set<ProcessingFlavor> processingFlavorSetå);
+	String buildAck(HL7Reader reader, List<IisReportable> processingExceptionList, Set<ProcessingFlavor> processingFlavorSetå);
 
 }

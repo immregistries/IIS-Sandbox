@@ -189,4 +189,12 @@ public class IisReportable {
 		return 0;
 	}
 
+	public boolean isError() {
+		return IisReportableSeverity.ERROR.equals(this.severity);
+	}
+
+	public boolean isWarning() {
+		return IisReportableSeverity.WARN.equals(this.severity);
+	}
+
 }

@@ -203,10 +203,15 @@ public class FhirRequesterR4 extends FhirRequester<Patient,Immunization,Location
 		return relatedPerson;
 	}
 
-	public PatientReported savePatientReported(PatientReported patientReported) {
+	public MethodOutcome savePatientReportedMethodOutcome(PatientReported patientReported) {
 		Patient patient = patientMapper.getFhirResource(patientReported);
-		MethodOutcome outcome = save(patient,
+		return save(patient,
 			Patient.IDENTIFIER.exactly().systemAndIdentifier(patientReported.getPatientReportedAuthority(), patientReported.getExternalLink()));
+	}
+
+	public PatientReported savePatientReported(PatientReported patientReported) {
+		MethodOutcome outcome = savePatientReportedMethodOutcome(patientReported);
+		logger.info("created {} resource {}", outcome.getCreated(), outcome.getResource());
 		if (!outcome.getResource().isEmpty()) {
 			patientReported.setPatientId(outcome.getResource().getIdElement().getIdPart());
 			return patientMapper.getReportedWithMaster((Patient) outcome.getResource());
