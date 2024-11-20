@@ -330,6 +330,10 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler {
 					refusalCount++;
 				}
 
+				if (ProcessingFlavor.HOTSAUCE.isActive() && random.nextBoolean()) {
+					throw new ProcessingException("Vaccination randomly rejected, Patient Accepted", "RXR", 0, 0);
+				}
+
 
 				reader.gotoSegmentPosition(segmentPosition);
 				int tempObxCount = obxCount;
