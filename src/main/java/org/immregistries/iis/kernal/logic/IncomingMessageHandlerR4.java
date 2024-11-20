@@ -13,6 +13,7 @@ import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.fhir.annotations.OnR4Condition;
 import org.immregistries.iis.kernal.logic.ack.IisReportable;
+import org.immregistries.iis.kernal.logic.ack.IisReportableSeverity;
 import org.immregistries.iis.kernal.model.*;
 import org.immregistries.mqe.validator.MqeMessageServiceResponse;
 import org.immregistries.smm.tester.manager.HL7Reader;
@@ -72,24 +73,24 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler {
 					break;
 				default:
 					ProcessingException pe = new ProcessingException("Unsupported message", "", 0, 0);
-					List<IisReportable> processingExceptionList = List.of(new IisReportable(pe));
-					responseMessage = buildAck(reader, processingExceptionList, processingFlavorSet);
+					List<IisReportable> iisReportableList = List.of(IisReportable.fromProcessingException(pe));
+					responseMessage = buildAck(reader, iisReportableList, processingFlavorSet);
 					recordMessageReceived(message, null, responseMessage, "Unknown", "NAck", tenant);
 					break;
 			}
 
 		} catch (Exception e) {
 			e.printStackTrace(System.err);
-			List<IisReportable> processingExceptionList = new ArrayList<>();
-			processingExceptionList.add(new IisReportable(new ProcessingException("Internal error prevented processing: " + e.getMessage(), null, 0, 0)));
-			responseMessage = buildAck(reader, processingExceptionList, processingFlavorSet);
+			List<IisReportable> iisReportableList = new ArrayList<>();
+			iisReportableList.add(IisReportable.fromProcessingException(new ProcessingException("Internal error prevented processing: " + e.getMessage(), null, 0, 0)));
+			responseMessage = buildAck(reader, iisReportableList, processingFlavorSet);
 		}
 		return responseMessage;
 	}
 
 	@SuppressWarnings("unchecked")
 	public String processVXU(Tenant tenant, HL7Reader reader, String message, Organization managingOrganization) throws Exception {
-		List<IisReportable> processingExceptionList = new ArrayList<>();
+		List<IisReportable> iisReportableList = new ArrayList<>();
 		Set<ProcessingFlavor> processingFlavorSet = tenant.getProcessingFlavorSet();
 		MqeMessageServiceResponse mqeMessageServiceResponse = mqeMessageService.processMessage(message);
 		List<IisReportable> nistReportables = nistValidation(message, "VXU");
@@ -97,7 +98,7 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler {
 		try {
 			CodeMap codeMap = CodeMapManager.getCodeMap();
 			boolean strictDate = !processingFlavorSet.contains(ProcessingFlavor.CANTALOUPE);
-			PatientReported patientReported = processPatient(tenant, reader, processingExceptionList, processingFlavorSet, codeMap, strictDate, null, managingOrganization);
+			PatientReported patientReported = processPatient(tenant, reader, iisReportableList, processingFlavorSet, codeMap, strictDate, null, managingOrganization);
 
 			int orcCount = 0;
 			int rxaCount = 0;
@@ -122,7 +123,7 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler {
 					throw new ProcessingException("Vaccine code is not indicated in RXA-5.1", "RXA", rxaCount, 5);
 				}
 				if (vaccineCode.equals("998")) {
-					obxCount = readAndCreateObservations(reader, processingExceptionList, patientReported, strictDate, obxCount, null, null);
+					obxCount = readAndCreateObservations(reader, iisReportableList, patientReported, strictDate, obxCount, null, null);
 					continue;
 				}
 				if (StringUtils.isBlank(vaccinationReportedExternalLink)) {
@@ -190,16 +191,16 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler {
 						}
 						Code cvxCode = codeMap.getRelatedCode(ndcCode, CodesetType.VACCINATION_CVX_CODE);
 						if (cvxCode == null) {
-							ProcessingException pe = new ProcessingException("Unrecognized NDC " + vaccineNdcCode, "RXA", rxaCount, 5).setWarning();
-							processingExceptionList.add(new IisReportable(pe));
+							ProcessingException pe = new ProcessingException("Unrecognized NDC " + vaccineNdcCode, "RXA", rxaCount, 5, IisReportableSeverity.WARN.getCode());
+							;
+							iisReportableList.add(IisReportable.fromProcessingException(pe));
 						} else {
 							if (vaccineCvxCode.equals("")) {
 								vaccineCvxCode = cvxCode.getValue();
 							} else if (!vaccineCvxCode.equals(cvxCode.getValue())) {
 								// NDC doesn't map to the CVX code that was submitted!
-								ProcessingException pe = new ProcessingException("NDC " + vaccineNdcCode + " maps to " + cvxCode.getValue() + " but CVX " + vaccineCvxCode + " was also reported, preferring CVX code", "RXA", rxaCount, 5);
-								pe.setWarning();
-								processingExceptionList.add(new IisReportable(pe));
+								ProcessingException pe = new ProcessingException("NDC " + vaccineNdcCode + " maps to " + cvxCode.getValue() + " but CVX " + vaccineCvxCode + " was also reported, preferring CVX code", "RXA", rxaCount, 5, IisReportableSeverity.WARN.getCode());
+								iisReportableList.add(IisReportable.fromProcessingException(pe));
 							}
 						}
 					}
@@ -209,15 +210,17 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler {
 					if (cptCode != null) {
 						Code cvxCode = codeMap.getRelatedCode(cptCode, CodesetType.VACCINATION_CVX_CODE);
 						if (cvxCode == null) {
-							ProcessingException pe = new ProcessingException("Unrecognized CPT " + cptCode, "RXA", rxaCount, 5).setWarning();
-							processingExceptionList.add(new IisReportable(pe));
+							ProcessingException pe = new ProcessingException("Unrecognized CPT " + cptCode, "RXA", rxaCount, 5, IisReportableSeverity.WARN.getCode());
+							;
+							iisReportableList.add(IisReportable.fromProcessingException(pe));
 						} else {
 							if (vaccineCvxCode.equals("")) {
 								vaccineCvxCode = cvxCode.getValue();
 							} else if (!vaccineCvxCode.equals(cvxCode.getValue())) {
 								// CPT doesn't map to the CVX code that was submitted!
-								ProcessingException pe = new ProcessingException("CPT " + vaccineCptCode + " maps to " + cvxCode.getValue() + " but CVX " + vaccineCvxCode + " was also reported, preferring CVX code", "RXA", rxaCount, 5).setWarning();
-								processingExceptionList.add(new IisReportable(pe));
+								ProcessingException pe = new ProcessingException("CPT " + vaccineCptCode + " maps to " + cvxCode.getValue() + " but CVX " + vaccineCvxCode + " was also reported, preferring CVX code", "RXA", rxaCount, 5, IisReportableSeverity.WARN.getCode());
+								;
+								iisReportableList.add(IisReportable.fromProcessingException(pe));
 							}
 						}
 					}
@@ -296,7 +299,7 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler {
 				vaccinationReported.setAdministeredAmount(reader.getValue(6));
 				vaccinationReported.setInformationSource(reader.getValue(9));
 				vaccinationReported.setLotnumber(reader.getValue(15));
-				vaccinationReported.setExpirationDate(parseDateWarn(reader.getValue(16), "Invalid vaccination expiration date", "RXA", rxaCount, 16, strictDate, processingExceptionList));
+				vaccinationReported.setExpirationDate(parseDateWarn(reader.getValue(16), "Invalid vaccination expiration date", "RXA", rxaCount, 16, strictDate, iisReportableList));
 				vaccinationReported.setVaccineMvxCode(reader.getValue(17));
 				vaccinationReported.setRefusalReasonCode(reader.getValue(18));
 				vaccinationReported.setCompletionStatus(reader.getValue(20));
@@ -305,8 +308,8 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler {
 					Code refusalCode = codeMap.getCodeForCodeset(CodesetType.VACCINATION_REFUSAL, vaccinationReported.getRefusalReasonCode());
 					if (refusalCode == null) {
 						ProcessingException pe = new ProcessingException("Unrecognized refusal reason", "RXA", rxaCount, 18);
-						pe.setWarning();
-						processingExceptionList.add(new IisReportable(pe));
+						pe.setErrorCode(IisReportableSeverity.WARN.getCode());
+						iisReportableList.add(IisReportable.fromProcessingException(pe));
 					}
 				}
 				vaccinationReported.setActionCode(reader.getValue(21));
@@ -345,8 +348,9 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler {
 						if (!fundingEligibility.equals("")) {
 							Code fundingEligibilityCode = codeMap.getCodeForCodeset(CodesetType.FINANCIAL_STATUS_CODE, fundingEligibility);
 							if (fundingEligibilityCode == null) {
-								ProcessingException pe = new ProcessingException("Funding eligibility '" + fundingEligibility + "' was not recognized", "OBX", tempObxCount, 5).setWarning();
-								processingExceptionList.add(new IisReportable(pe));
+								ProcessingException pe = new ProcessingException("Funding eligibility '" + fundingEligibility + "' was not recognized", "OBX", tempObxCount, 5, IisReportableSeverity.WARN.getCode());
+								;
+								iisReportableList.add(IisReportable.fromProcessingException(pe));
 							} else {
 								vaccinationReported.setFundingEligibility(fundingEligibilityCode.getValue());
 							}
@@ -356,8 +360,9 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler {
 						if (!fundingSource.equals("")) {
 							Code fundingSourceCode = codeMap.getCodeForCodeset(CodesetType.VACCINATION_FUNDING_SOURCE, fundingSource);
 							if (fundingSourceCode == null) {
-								ProcessingException pe = new ProcessingException("Funding source '" + fundingSource + "' was not recognized", "OBX", tempObxCount, 5).setWarning();
-								processingExceptionList.add(new IisReportable(pe));
+								ProcessingException pe = new ProcessingException("Funding source '" + fundingSource + "' was not recognized", "OBX", tempObxCount, 5, IisReportableSeverity.WARN.getCode());
+								;
+								iisReportableList.add(IisReportable.fromProcessingException(pe));
 							} else {
 								vaccinationReported.setFundingSource(fundingSourceCode.getValue());
 							}
@@ -365,11 +370,11 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler {
 					}
 				}
 
-				verifyNoErrors(processingExceptionList);
+				verifyNoErrors(iisReportableList);
 				reader.gotoSegmentPosition(segmentPosition);
 				vaccinationReported = fhirRequester.saveVaccinationReported(vaccinationReported);
 				reader.gotoSegmentPosition(segmentPosition);
-				obxCount = readAndCreateObservations(reader, processingExceptionList, patientReported, strictDate, obxCount, vaccinationReported, null);
+				obxCount = readAndCreateObservations(reader, iisReportableList, patientReported, strictDate, obxCount, vaccinationReported, null);
 
 			}
 			if (processingFlavorSet.contains(ProcessingFlavor.CRANBERRY) && vaccinationCount == 0) {
@@ -378,14 +383,14 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler {
 			if (processingFlavorSet.contains(ProcessingFlavor.BILBERRY) && (vaccinationCount == 0 && refusalCount == 0)) {
 				throw new ProcessingException("Patient vaccination history cannot be accepted without at least one administered, historical, or refused vaccination specified", "", 0, 0);
 			}
-			String ack = buildAckMqe(reader, mqeMessageServiceResponse, processingExceptionList, processingFlavorSet, nistReportables);
+			String ack = buildAckMqe(reader, mqeMessageServiceResponse, iisReportableList, processingFlavorSet, nistReportables);
 			recordMessageReceived(message, patientReported, ack, "Update", "Ack", tenant);
 			return ack;
 		} catch (ProcessingException e) {
-			if (!processingExceptionList.contains(e)) {
-				processingExceptionList.add(new IisReportable(e));
+			if (!iisReportableList.contains(e)) {
+				iisReportableList.add(IisReportable.fromProcessingException(e));
 			}
-			String ack = buildAckMqe(reader, mqeMessageServiceResponse, processingExceptionList, processingFlavorSet, nistReportables);
+			String ack = buildAckMqe(reader, mqeMessageServiceResponse, iisReportableList, processingFlavorSet, nistReportables);
 			recordMessageReceived(message, null, ack, "Update", "Exception", tenant);
 			return ack;
 		}
@@ -393,7 +398,7 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler {
 	}
 
 	@SuppressWarnings("unchecked")
-	public PatientReported processPatient(Tenant tenant, HL7Reader reader, List<IisReportable> processingExceptionList, Set<ProcessingFlavor> processingFlavorSet, CodeMap codeMap, boolean strictDate, PatientReported patientReported, Organization managingOrganization) throws ProcessingException {
+	public PatientReported processPatient(Tenant tenant, HL7Reader reader, List<IisReportable> iisReportableList, Set<ProcessingFlavor> processingFlavorSet, CodeMap codeMap, boolean strictDate, PatientReported patientReported, Organization managingOrganization) throws ProcessingException {
 		String patientReportedExternalLink = "";
 		String patientReportedAuthority = "";
 		String patientReportedType = "MR";
@@ -431,43 +436,43 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler {
 		}
 
 
-		return processPatientFhirAgnostic(reader, processingExceptionList, processingFlavorSet, codeMap, strictDate, patientReported, patientReportedExternalLink, patientReportedAuthority, patientReportedType);
+		return processPatientFhirAgnostic(reader, iisReportableList, processingFlavorSet, codeMap, strictDate, patientReported, patientReportedExternalLink, patientReportedAuthority, patientReportedType);
 	}
 
 	public String processORU(Tenant tenant, HL7Reader reader, String message, Organization managingOrganization) {
-		List<IisReportable> processingExceptionList = new ArrayList<>();
+		List<IisReportable> iisReportableList = new ArrayList<>();
 		Set<ProcessingFlavor> processingFlavorSet = tenant.getProcessingFlavorSet();
 		try {
 			CodeMap codeMap = CodeMapManager.getCodeMap();
 
 			boolean strictDate = !processingFlavorSet.contains(ProcessingFlavor.CANTALOUPE);
-			PatientReported patientReported = processPatient(tenant, reader, processingExceptionList, processingFlavorSet, codeMap, strictDate, null, managingOrganization);
+			PatientReported patientReported = processPatient(tenant, reader, iisReportableList, processingFlavorSet, codeMap, strictDate, null, managingOrganization);
 
 			int orcCount = 0;
 			int obxCount = 0;
 			while (reader.advanceToSegment("ORC")) {
 				orcCount++;
 				if (reader.advanceToSegment("OBR", "ORC")) {
-					obxCount = readAndCreateObservations(reader, processingExceptionList, patientReported, strictDate, obxCount, null, null);
+					obxCount = readAndCreateObservations(reader, iisReportableList, patientReported, strictDate, obxCount, null, null);
 				} else {
 					throw new ProcessingException("OBR segment was not found after ORC segment", "ORC", orcCount, 0);
 				}
 			}
-			String ack = buildAck(reader, processingExceptionList, processingFlavorSet);
+			String ack = buildAck(reader, iisReportableList, processingFlavorSet);
 			recordMessageReceived(message, patientReported, ack, "Update", "Ack", tenant);
 			return ack;
 		} catch (ProcessingException e) {
-			if (!processingExceptionList.contains(e)) {
-				processingExceptionList.add(new IisReportable(e));
+			if (!iisReportableList.contains(e)) {
+				iisReportableList.add(IisReportable.fromProcessingException(e));
 			}
-			String ack = buildAck(reader, processingExceptionList, processingFlavorSet);
+			String ack = buildAck(reader, iisReportableList, processingFlavorSet);
 			recordMessageReceived(message, null, ack, "Update", "Exception", tenant);
 			return ack;
 		}
 	}
 
 	@SuppressWarnings("unchecked")
-	public ObservationReported readObservations(HL7Reader reader, List<IisReportable> processingExceptionList, PatientReported patientReported, boolean strictDate, int obxCount, VaccinationReported vaccinationReported, VaccinationMaster vaccination, String identifierCode, String valueCode) {
+	public ObservationReported readObservations(HL7Reader reader, List<IisReportable> iisReportableList, PatientReported patientReported, boolean strictDate, int obxCount, VaccinationReported vaccinationReported, VaccinationMaster vaccination, String identifierCode, String valueCode) {
 //    ObservationMaster observationMaster = null;
 		ObservationReported observationReported = null;
 		if (vaccination == null) {
@@ -507,7 +512,7 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler {
 		observationReported.setUnitsLabel(reader.getValue(6, 2));
 		observationReported.setUnitsTable(reader.getValue(6, 3));
 		observationReported.setResultStatus(reader.getValue(11));
-		observationReported.setObservationDate(parseDateWarn(reader.getValue(14), "Unparsable date/time of observation", "OBX", obxCount, 14, strictDate, processingExceptionList));
+		observationReported.setObservationDate(parseDateWarn(reader.getValue(14), "Unparsable date/time of observation", "OBX", obxCount, 14, strictDate, iisReportableList));
 		observationReported.setMethodCode(reader.getValue(17, 1));
 		observationReported.setMethodLabel(reader.getValue(17, 2));
 		observationReported.setMethodTable(reader.getValue(17, 3));

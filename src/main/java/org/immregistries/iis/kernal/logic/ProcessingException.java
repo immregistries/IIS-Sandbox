@@ -1,42 +1,18 @@
 package org.immregistries.iis.kernal.logic;
 
 import org.immregistries.iis.kernal.logic.ack.IisReportable;
+import org.immregistries.iis.kernal.logic.ack.IisReportableSeverity;
 import org.immregistries.mqe.hl7util.model.Hl7Location;
 
 @SuppressWarnings("serial")
 public class ProcessingException extends Exception {
-  private static final String INFORMATION = "I";
-  private static final String WARNING = "W";
-  private static final String ERROR = "E";
 
   private String segmentId = "";
   private int segmentRepeat = 0;
   private int fieldPosition = 0;
-  private String errorCode = ERROR;
+	private String errorCode = IisReportableSeverity.ERROR.getCode();
 
-  public boolean isError() {
-    return errorCode.equals(ERROR);
-  }
-
-  public boolean isWarning() {
-    return errorCode.equals(WARNING);
-  }
-
-  public boolean isInformation() {
-    return errorCode.equals(INFORMATION);
-  }
-
-  public ProcessingException setWarning() {
-    errorCode = WARNING;
-    return this;
-  }
-
-  public ProcessingException setInformation() {
-    errorCode = INFORMATION;
-    return this;
-  }
-
-  public String getSegmentId() {
+	public String getSegmentId() {
     return segmentId;
   }
 
@@ -66,7 +42,7 @@ public class ProcessingException extends Exception {
 		this.errorCode = errorCode;
 	}
 
-	public ProcessingException(IisReportable iisReportable) {
+	private ProcessingException(IisReportable iisReportable) {
 		super(iisReportable.getDiagnosticMessage());
 		Hl7Location hl7Location = iisReportable.getHl7LocationList().get(0);
 		this.segmentId = hl7Location.getSegmentId();
@@ -83,6 +59,10 @@ public class ProcessingException extends Exception {
   public void setErrorCode(String errorCode) {
     this.errorCode = errorCode;
   }
+
+	public static ProcessingException fromIisReportable(IisReportable iisReportable) {
+		return new ProcessingException(iisReportable);
+	}
 
 
 }

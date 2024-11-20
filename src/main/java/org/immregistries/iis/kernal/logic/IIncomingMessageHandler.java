@@ -38,6 +38,6 @@ public interface IIncomingMessageHandler {
 
 	List<VaccinationMaster> getVaccinationMasterList(PatientMaster patient);
 
-	String buildAck(HL7Reader reader, List<IisReportable> processingExceptionList, Set<ProcessingFlavor> processingFlavorSetå);
+	String buildAck(HL7Reader reader, List<IisReportable> iisReportableList, Set<ProcessingFlavor> processingFlavorSetå);
 
 }

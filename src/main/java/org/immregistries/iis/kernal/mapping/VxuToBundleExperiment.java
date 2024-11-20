@@ -2,6 +2,7 @@ package org.immregistries.iis.kernal.mapping;
 
 import org.hl7.fhir.r5.model.*;
 import org.immregistries.iis.kernal.logic.ProcessingException;
+import org.immregistries.iis.kernal.logic.ack.IisReportableSeverity;
 import org.immregistries.iis.kernal.model.ProcessingFlavor;
 import org.immregistries.smm.tester.manager.HL7Reader;
 
@@ -77,7 +78,7 @@ public class VxuToBundleExperiment {
 				ProcessingException pe = new ProcessingException(
 					"Patient phone telecommunication type must be PRN ", "PID", 1, 13);
 				if (!processingFlavorSet.contains(ProcessingFlavor.QUINZE)) {
-					pe.setWarning();
+					pe.setErrorCode(IisReportableSeverity.WARN.getCode());
 				}
 				processingExceptionList.add(pe);
 			}
@@ -98,14 +99,14 @@ public class VxuToBundleExperiment {
 				if (invalidCharFound) {
 					ProcessingException pe = new ProcessingException(
 						"Patient phone number has unexpected character: " + invalidChar, "PID", 1, 13);
-					pe.setWarning();
+					pe.setErrorCode(IisReportableSeverity.WARN.getCode());
 					processingExceptionList.add(pe);
 				}
 				if (countNums != 10 || phone.getValue().startsWith("555") || phone.getValue().startsWith("0")
 					|| phone.getValue().startsWith("1")) {
 					ProcessingException pe = new ProcessingException(
 						"Patient phone number does not appear to be valid", "PID", 1, 13);
-					pe.setWarning();
+					pe.setErrorCode(IisReportableSeverity.WARN.getCode());
 					processingExceptionList.add(pe);
 				}
 			}

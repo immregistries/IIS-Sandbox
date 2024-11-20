@@ -31,8 +31,24 @@ public class IisReportable {
 		source = reportable.getSource();
 	}
 
+//	public IisReportable(String message, String segmentId, int segmentRepeat,
+//										int fieldPosition, String errorCode) {
+//		diagnosticMessage = message;
+//		Hl7Location location = new Hl7Location();
+//		location.setSegmentId(segmentId);
+//		location.setFieldRepetition(segmentRepeat);
+//		location.setFieldPosition(fieldPosition);
+//		hl7LocationList = List.of(location);
+//		severity = IisReportableSeverity.findByCode(errorCode);
+//		hl7ErrorCode = new CodedWithExceptions();
+//		hl7ErrorCode.setIdentifier("101");
+//		hl7ErrorCode.setNameOfCodingSystem("HL70357");
+//		hl7ErrorCode.setText("Required field missing");
+//		applicationErrorCode = new CodedWithExceptions();
+//		source = ReportableSource.IIS;
+//	}
 
-	public IisReportable(ProcessingException processingException) {
+	private IisReportable(ProcessingException processingException) {
 		Hl7Location location = new Hl7Location();
 		location.setSegmentId(processingException.getSegmentId());
 		location.setFieldRepetition(processingException.getSegmentRepeat());
@@ -103,6 +119,10 @@ public class IisReportable {
 
 	public void setSource(ReportableSource source) {
 		this.source = source;
+	}
+
+	public static IisReportable fromProcessingException(ProcessingException processingException) {
+		return new IisReportable(processingException);
 	}
 
 	public static Hl7Location readErrorLocation(String path, String segmentid) {
