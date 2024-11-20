@@ -380,6 +380,7 @@ public class IisHL7Util {
 			}
 			reportables = copy;
 		}
+
 		if (ADVANCED_ACK.equals(profileExtension)) {  // If extended ACK profile
 			if (hasErrorSeverityType(reportables, IisReportableSeverity.ERROR.getCode())) {
 				ackCode = AckResult.APP_ERROR.getCode();
@@ -401,12 +402,16 @@ public class IisHL7Util {
 				ackCode = AckResult.APP_ACCEPT.getCode();
 			}
 		} else {
-			List<IisReportable> list = reportables.stream().filter(iisReportable -> iisReportable.getSeverity().equals(IisReportableSeverity.NOTICE)).collect(Collectors.toList());
+			List<IisReportable> list = reportables.stream().peek(iisReportable -> {
+				if (iisReportable.getSeverity().equals(IisReportableSeverity.NOTICE)) {
+					iisReportable.setSeverity(IisReportableSeverity.INFO);
+				}
+			}).collect(Collectors.toList());
 			reportables = list;
 			if (hasErrorSeverityType(reportables, IisReportableSeverity.ERROR.getCode()) || hasErrorSeverityType(reportables, IisReportableSeverity.WARN.getCode())) {
 				ackCode = AckResult.APP_ERROR.getCode();
 				for (IisReportable r : reportables) {
-					if (r.getSeverity() == IisReportableSeverity.ERROR && r.getHl7ErrorCode() != null
+					if ((r.getSeverity() == IisReportableSeverity.ERROR || r.getSeverity() == IisReportableSeverity.WARN) && r.getHl7ErrorCode() != null
 						&& r.getHl7ErrorCode().getIdentifier() != null) {
 						hl7ErrorCode = r.getHl7ErrorCode().getIdentifier();
 						if (hl7ErrorCode != null && hl7ErrorCode.startsWith("2")) {

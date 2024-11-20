@@ -55,6 +55,7 @@ public enum ProcessingFlavor {
 	NOSINGLECHARNAME("NOSINGLECHARNAME", "Requires a minimum of two characters for each name component and flags single characters as an error."),
 	STARFRUIT("StarFruit", "Will store but not share info, Will consider patients whose first name start with 'A' or 'S' as non consenting"),
 	MOONFRUIT("MoonFruit", "Will not store but not will not share info, Will consider patients whose first name start with 'A' or 'S' as non consenting"),
+	METEORFRUIT("MeteorFruit", " (incoming) Will reject every patient consent status as unacceptable"),
 	DURIAN("DURIAN", "(incoming) Simulates Public Health Emergency when it comes to consent"),
 	NOTICE("NOTICE", "Return shifts ERR codes Error to Warnings to Notice to Informational");
 
