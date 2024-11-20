@@ -426,6 +426,10 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 			String patientNameLast = reader.getValue(4, 1);
 			String patientNameFirst = reader.getValue(4, 2);
 			String patientNameMiddle = reader.getValue(4, 3);
+
+			if (ProcessingFlavor.MOONFRUIT.isActive() && StringUtils.defaultString(patientNameFirst).startsWith("S") || StringUtils.defaultString(patientNameFirst).startsWith("A")) {
+				throw new ProcessingException("Immunization History cannot be Accepted because of patient's consent status", "PID", 0, 0, "W");
+			}
 			boolean strictDate = false;
 
 			Date patientBirthDate = parseDateWarn(reader.getValue(6), "Invalid patient birth date", "QPD", 1, 6, strictDate, reportables);
@@ -1150,6 +1154,10 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 		}
 		if (legalName != null && legalName.getNameFirst().equals("")) {
 			throw new ProcessingException("Patient first name was not found, required for accepting patient and vaccination history", "PID", 1, 5);
+		}
+
+		if (ProcessingFlavor.MOONFRUIT.isActive() && StringUtils.defaultString(legalName.getNameFirst()).startsWith("S") || StringUtils.defaultString(legalName.getNameFirst()).startsWith("A")) {
+			throw new ProcessingException("Immunization History cannot be stored because of patient's consent status", "PID", 0, 0, "W");
 		}
 
 		String patientPhone = reader.getValue(13, 6) + reader.getValue(13, 7);

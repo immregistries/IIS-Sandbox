@@ -53,8 +53,9 @@ public enum ProcessingFlavor {
 	REMOVEHYPHENSPACES("REMOVEHYPHENSPACES", "Removes hyphens and spaces, storing names in a compressed format (e.g., 'AnneMarie' or 'DeLaCruz')."),
 	IGNORENAMETYPE("IGNORENAMETYPE", "Operates in a mode where the system only recognizes the first name received, disregarding other names or name type codes."),
 	NOSINGLECHARNAME("NOSINGLECHARNAME", "Requires a minimum of two characters for each name component and flags single characters as an error."),
-	STARFRUIT("StarFruit", "Will consider patients whose first name start with 'A' or 'S' as non consenting"),
-	DURIAN("DURIAN", "Simulates Public Health Emergency when it comes to consent"),
+	STARFRUIT("StarFruit", "Will store but not share info, Will consider patients whose first name start with 'A' or 'S' as non consenting"),
+	MOONFRUIT("MoonFruit", "Will not store but not will not share info, Will consider patients whose first name start with 'A' or 'S' as non consenting"),
+	DURIAN("DURIAN", "(incoming) Simulates Public Health Emergency when it comes to consent"),
 	NOTICE("NOTICE", "Return shifts ERR codes Error to Warnings to Notice to Informational");
 
 	private String key = "";
