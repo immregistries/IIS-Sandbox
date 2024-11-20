@@ -331,7 +331,7 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler {
 				}
 
 				if (ProcessingFlavor.HOTSAUCE.isActive() && random.nextBoolean()) {
-					throw new ProcessingException("Vaccination randomly rejected, Patient Accepted", "RXR", 0, 0);
+					throw new ProcessingException("Vaccination randomly rejected, Patient Accepted", "RXR", 0, 0, "N");
 				}
 
 

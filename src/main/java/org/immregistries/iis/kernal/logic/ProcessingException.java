@@ -53,6 +53,16 @@ public class ProcessingException extends Exception {
     this.fieldPosition = fieldPosition;
   }
 
+
+	public ProcessingException(String message, String segmentId, int segmentRepeat,
+										int fieldPosition, String errorCode) {
+		super(message);
+		this.segmentId = segmentId;
+		this.segmentRepeat = segmentRepeat;
+		this.fieldPosition = fieldPosition;
+		this.errorCode = errorCode;
+	}
+
   public String getErrorCode() {
     return errorCode;
   }
