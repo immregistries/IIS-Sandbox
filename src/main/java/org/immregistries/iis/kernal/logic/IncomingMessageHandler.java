@@ -353,7 +353,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 			return parseDateInternal(dateString, strict);
 		} catch (ParseException e) {
 			if (errorMessage != null) {
-				ProcessingException pe = new ProcessingException(errorMessage + ": " + e.getMessage(), segmentId, segmentRepeat, fieldPosition, IisReportableSeverity.WARN.getCode());
+				ProcessingException pe = new ProcessingException(errorMessage + ": " + e.getMessage(), segmentId, segmentRepeat, fieldPosition, IisReportableSeverity.WARN);
 				iisReportableList.add(IisReportable.fromProcessingException(pe));
 			}
 		}
@@ -416,7 +416,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 			String patientNameMiddle = reader.getValue(4, 3);
 
 			if (ProcessingFlavor.MOONFRUIT.isActive() && StringUtils.defaultString(patientNameFirst).startsWith("S") || StringUtils.defaultString(patientNameFirst).startsWith("A")) {
-				throw new ProcessingException("Immunization History cannot be Accepted because of patient's consent status", "PID", 0, 0, "W");
+				throw new ProcessingException("Immunization History cannot be Accepted because of patient's consent status", "PID", 0, 0, IisReportableSeverity.WARN);
 			}
 			boolean strictDate = false;
 
@@ -491,7 +491,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 		MqeMessageServiceResponse mqeMessageServiceResponse = mqeMessageService.processMessage(messageReceived);
 		boolean sendInformations = true;
 		if (ProcessingFlavor.STARFRUIT.isActive() && StringUtils.defaultString(patientMaster.getNameFirst()).startsWith("S") || StringUtils.defaultString(patientMaster.getNameFirst()).startsWith("A")) {
-			iisReportables.add(IisReportable.fromProcessingException(new ProcessingException("Immunization History cannot be shared because of patient's consent status", "PID", 0, 0, "N")));
+			iisReportables.add(IisReportable.fromProcessingException(new ProcessingException("Immunization History cannot be shared because of patient's consent status", "PID", 0, 0, IisReportableSeverity.NOTICE)));
 			sendInformations = false;
 		}
 		IGenericClient fhirClient = repositoryClientFactory.getFhirClient();
@@ -940,17 +940,17 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 				CodeMap codeMap = CodeMapManager.getCodeMap();
 				Code contraCode = codeMap.getCodeForCodeset(CodesetType.CONTRAINDICATION_OR_PRECAUTION, observationReported.getValueCode());
 				if (contraCode == null) {
-					ProcessingException pe = new ProcessingException("Unrecognized contraindication or precaution", "OBX", obxCount, 5, IisReportableSeverity.WARN.getCode());
+					ProcessingException pe = new ProcessingException("Unrecognized contraindication or precaution", "OBX", obxCount, 5, IisReportableSeverity.WARN);
 					iisReportableList.add(IisReportable.fromProcessingException(pe));
 				}
 				if (observationReported.getObservationDate() != null) {
 					Date today = new Date();
 					if (observationReported.getObservationDate().after(today)) {
-						ProcessingException pe = new ProcessingException("Contraindication or precaution observed in the future", "OBX", obxCount, 5, IisReportableSeverity.WARN.getCode());
+						ProcessingException pe = new ProcessingException("Contraindication or precaution observed in the future", "OBX", obxCount, 5, IisReportableSeverity.WARN);
 						iisReportableList.add(IisReportable.fromProcessingException(pe));
 					}
 					if (patientReported.getBirthDate() != null && observationReported.getObservationDate().before(patientReported.getBirthDate())) {
-						ProcessingException pe = new ProcessingException("Contraindication or precaution observed before patient was born", "OBX", obxCount, 14, IisReportableSeverity.WARN.getCode());
+						ProcessingException pe = new ProcessingException("Contraindication or precaution observed before patient was born", "OBX", obxCount, 14, IisReportableSeverity.WARN);
 						iisReportableList.add(IisReportable.fromProcessingException(pe));
 					}
 				}
@@ -1140,7 +1140,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 		}
 
 		if (ProcessingFlavor.MOONFRUIT.isActive() && StringUtils.defaultString(legalName.getNameFirst()).startsWith("S") || StringUtils.defaultString(legalName.getNameFirst()).startsWith("A")) {
-			throw new ProcessingException("Immunization History cannot be stored because of patient's consent status", "PID", 0, 0, "W");
+			throw new ProcessingException("Immunization History cannot be stored because of patient's consent status", "PID", 0, 0, IisReportableSeverity.WARN);
 		}
 
 		String patientPhone = reader.getValue(13, 6) + reader.getValue(13, 7);
@@ -1149,7 +1149,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 			if (!telUseCode.equals("PRN")) {
 				ProcessingException pe = new ProcessingException("Patient phone telecommunication type must be PRN ", "PID", 1, 13);
 				if (!processingFlavorSet.contains(ProcessingFlavor.QUINZE)) {
-					pe.setErrorCode(IisReportableSeverity.WARN.getCode());
+					pe.setErrorCode(IisReportableSeverity.WARN);
 				}
 				iisReportableList.add(IisReportable.fromProcessingException(pe));
 			}
@@ -1171,12 +1171,12 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 				}
 				if (invalidCharFound) {
 					ProcessingException pe = new ProcessingException("Patient phone number has unexpected character: " + invalidChar, "PID", 1, 13);
-					pe.setErrorCode(IisReportableSeverity.WARN.getCode());
+					pe.setErrorCode(IisReportableSeverity.WARN);
 					iisReportableList.add(IisReportable.fromProcessingException(pe));
 				}
 				if (countNums != 10 || patientPhone.startsWith("555") || patientPhone.startsWith("0") || patientPhone.startsWith("1")) {
 					ProcessingException pe = new ProcessingException("Patient phone number does not appear to be valid", "PID", 1, 13);
-					pe.setErrorCode(IisReportableSeverity.WARN.getCode());
+					pe.setErrorCode(IisReportableSeverity.WARN);
 					iisReportableList.add(IisReportable.fromProcessingException(pe));
 				}
 			}
@@ -1236,9 +1236,9 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 		{
 			String patientSex = patientReported.getSex();
 			if (!ValidValues.verifyValidValue(patientSex, ValidValues.SEX)) {
-				ProcessingException pe = new ProcessingException("Patient sex '" + patientSex + "' is not recognized", "PID", 1, 8, IisReportableSeverity.WARN.getCode());
+				ProcessingException pe = new ProcessingException("Patient sex '" + patientSex + "' is not recognized", "PID", 1, 8, IisReportableSeverity.WARN);
 				if (processingFlavorSet.contains(ProcessingFlavor.ELDERBERRIES)) {
-					pe.setErrorCode(IisReportableSeverity.WARN.getCode());
+					pe.setErrorCode(IisReportableSeverity.WARN);
 				}
 				iisReportableList.add(IisReportable.fromProcessingException(pe));
 			}
@@ -1249,7 +1249,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 			if (!ValidValues.verifyValidValue(patientAddressCountry, ValidValues.COUNTRY_2DIGIT) && !ValidValues.verifyValidValue(patientAddressCountry, ValidValues.COUNTRY_3DIGIT)) {
 				ProcessingException pe = new ProcessingException("Patient address country '" + patientAddressCountry + "' is not recognized and cannot be accepted", "PID", 1, 11);
 				if (processingFlavorSet.contains(ProcessingFlavor.GUAVA)) {
-					pe.setErrorCode(IisReportableSeverity.WARN.getCode());
+					pe.setErrorCode(IisReportableSeverity.WARN);
 				}
 				iisReportableList.add(IisReportable.fromProcessingException(pe));
 			}
@@ -1260,7 +1260,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 				if (!ValidValues.verifyValidValue(patientAddressState, ValidValues.STATE)) {
 					ProcessingException pe = new ProcessingException("Patient address state '" + patientAddressState + "' is not recognized and cannot be accepted", "PID", 1, 11);
 					if (processingFlavorSet.contains(ProcessingFlavor.GUAVA)) {
-						pe.setErrorCode(IisReportableSeverity.WARN.getCode());
+						pe.setErrorCode(IisReportableSeverity.WARN);
 					}
 					iisReportableList.add(IisReportable.fromProcessingException(pe));
 				}
@@ -1275,7 +1275,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 				if (raceCode == null || CodeStatusValue.getBy(raceCode.getCodeStatus()) != CodeStatusValue.VALID) {
 					ProcessingException pe = new ProcessingException("Invalid race '" + race + "', message cannot be accepted", "PID", 1, 10);
 					if (!processingFlavorSet.contains(ProcessingFlavor.FIG)) {
-						pe.setErrorCode(IisReportableSeverity.WARN.getCode());
+						pe.setErrorCode(IisReportableSeverity.WARN);
 					}
 					iisReportableList.add(IisReportable.fromProcessingException(pe));
 				}
@@ -1289,7 +1289,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 				if (ethnicityCode == null || CodeStatusValue.getBy(ethnicityCode.getCodeStatus()) != CodeStatusValue.VALID) {
 					ProcessingException pe = new ProcessingException("Invalid ethnicity '" + ethnicity + "', message cannot be accepted", "PID", 1, 10);
 					if (!processingFlavorSet.contains(ProcessingFlavor.FIG)) {
-						pe.setErrorCode(IisReportableSeverity.WARN.getCode());
+						pe.setErrorCode(IisReportableSeverity.WARN);
 					}
 					iisReportableList.add(IisReportable.fromProcessingException(pe));
 				}
@@ -1311,26 +1311,26 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 					if (!birthOrder.equals("1") && !birthOrder.equals("")) {
 						ProcessingException pe = new ProcessingException("Birth order was specified as " + birthOrder + " but not indicated as multiple birth", "PID", 1, 25);
 						if (processingFlavorSet.contains(ProcessingFlavor.PLANTAIN)) {
-							pe.setErrorCode(IisReportableSeverity.WARN.getCode());
+							pe.setErrorCode(IisReportableSeverity.WARN);
 						}
 						iisReportableList.add(IisReportable.fromProcessingException(pe));
 					}
 				} else if (birthFlag.equals("Y")) {
 					if (birthOrder.equals("")) {
 						ProcessingException pe = new ProcessingException("Multiple birth but birth order was not specified", "PID", 1, 24);
-						pe.setErrorCode(IisReportableSeverity.WARN.getCode());
+						pe.setErrorCode(IisReportableSeverity.WARN);
 						iisReportableList.add(IisReportable.fromProcessingException(pe));
 					} else if (!ValidValues.verifyValidValue(birthOrder, ValidValues.BIRTH_ORDER)) {
 						ProcessingException pe = new ProcessingException("Birth order was specified as " + birthOrder + " but not an expected value, must be between 1 and 9", "PID", 1, 25);
 						if (processingFlavorSet.contains(ProcessingFlavor.PLANTAIN)) {
-							pe.setErrorCode(IisReportableSeverity.WARN.getCode());
+							pe.setErrorCode(IisReportableSeverity.WARN);
 						}
 						iisReportableList.add(IisReportable.fromProcessingException(pe));
 					}
 				} else {
 					ProcessingException pe = new ProcessingException("Multiple birth indicator " + birthFlag + " is not recognized", "PID", 1, 24);
 					if (processingFlavorSet.contains(ProcessingFlavor.PLANTAIN)) {
-						pe.setErrorCode(IisReportableSeverity.WARN.getCode());
+						pe.setErrorCode(IisReportableSeverity.WARN);
 					}
 					iisReportableList.add(IisReportable.fromProcessingException(pe));
 				}
@@ -1356,24 +1356,24 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 				patientReported.setGuardianRelationship(guardianRelationship);
 				repeatCount++;
 				if (StringUtils.isBlank(patientReported.getGuardianLast())) {
-					ProcessingException pe = new ProcessingException("Next-of-kin last name is empty", "NK1", repeatCount, 2, IisReportableSeverity.WARN.getCode());
+					ProcessingException pe = new ProcessingException("Next-of-kin last name is empty", "NK1", repeatCount, 2, IisReportableSeverity.WARN);
 					;
 					iisReportableList.add(IisReportable.fromProcessingException(pe));
 				}
 				if (patientReported.getGuardianFirst().equals("")) {
-					ProcessingException pe = new ProcessingException("Next-of-kin first name is empty", "NK1", repeatCount, 2, IisReportableSeverity.WARN.getCode());
+					ProcessingException pe = new ProcessingException("Next-of-kin first name is empty", "NK1", repeatCount, 2, IisReportableSeverity.WARN);
 					;
 					iisReportableList.add(IisReportable.fromProcessingException(pe));
 				}
 				if (guardianRelationship.equals("")) {
-					ProcessingException pe = new ProcessingException("Next-of-kin relationship is empty", "NK1", repeatCount, 3, IisReportableSeverity.WARN.getCode());
+					ProcessingException pe = new ProcessingException("Next-of-kin relationship is empty", "NK1", repeatCount, 3, IisReportableSeverity.WARN);
 					;
 					iisReportableList.add(IisReportable.fromProcessingException(pe));
 				}
 				if (guardianRelationship.equals("MTH") || guardianRelationship.equals("FTH") || guardianRelationship.equals("GRD")) {
 					break;
 				} else {
-					ProcessingException pe = new ProcessingException((guardianRelationship.equals("") ? "Next-of-kin relationship not specified so is not recognized as guardian and will be ignored" : ("Next-of-kin relationship '" + guardianRelationship + "' is not a recognized guardian and will be ignored")), "NK1", repeatCount, 3, IisReportableSeverity.WARN.getCode());
+					ProcessingException pe = new ProcessingException((guardianRelationship.equals("") ? "Next-of-kin relationship not specified so is not recognized as guardian and will be ignored" : ("Next-of-kin relationship '" + guardianRelationship + "' is not a recognized guardian and will be ignored")), "NK1", repeatCount, 3, IisReportableSeverity.WARN);
 					;
 					iisReportableList.add(IisReportable.fromProcessingException(pe));
 				}
@@ -1386,7 +1386,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 		patientReported.setUpdatedDate(new Date());
 		patientReported = fhirRequester.savePatientReported(patientReported);
 		patientReported = fhirRequester.saveRelatedPerson(patientReported);
-		iisReportableList.add(IisReportable.fromProcessingException(new ProcessingException("Patient record saved", "PID", 0, 0, "I")));
+		iisReportableList.add(IisReportable.fromProcessingException(new ProcessingException("Patient record saved", "PID", 0, 0, IisReportableSeverity.INFO)));
 
 		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
 		ArrayList<String> groupPatientIds = (ArrayList<String>) request.getAttribute("groupPatientIds");

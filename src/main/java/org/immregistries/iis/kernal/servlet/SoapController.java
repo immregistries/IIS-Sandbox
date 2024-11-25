@@ -56,7 +56,7 @@ public class SoapController extends HttpServlet {
 						for (String msh : messages) {
 							if (!msh.isBlank()) {
 								ackBuilder.append(handler.process("MSH|^~\\&|" + msh, tenant, null));
-								ackBuilder.append("\r\n");
+								ackBuilder.append("\n");
 							}
 						}
 						ack = ackBuilder.toString();

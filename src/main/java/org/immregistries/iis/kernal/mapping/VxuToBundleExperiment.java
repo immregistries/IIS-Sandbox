@@ -78,7 +78,7 @@ public class VxuToBundleExperiment {
 				ProcessingException pe = new ProcessingException(
 					"Patient phone telecommunication type must be PRN ", "PID", 1, 13);
 				if (!processingFlavorSet.contains(ProcessingFlavor.QUINZE)) {
-					pe.setErrorCode(IisReportableSeverity.WARN.getCode());
+					pe.setErrorCode(IisReportableSeverity.WARN);
 				}
 				processingExceptionList.add(pe);
 			}
@@ -98,15 +98,13 @@ public class VxuToBundleExperiment {
 				}
 				if (invalidCharFound) {
 					ProcessingException pe = new ProcessingException(
-						"Patient phone number has unexpected character: " + invalidChar, "PID", 1, 13);
-					pe.setErrorCode(IisReportableSeverity.WARN.getCode());
+						"Patient phone number has unexpected character: " + invalidChar, "PID", 1, 13, IisReportableSeverity.WARN);
 					processingExceptionList.add(pe);
 				}
 				if (countNums != 10 || phone.getValue().startsWith("555") || phone.getValue().startsWith("0")
 					|| phone.getValue().startsWith("1")) {
 					ProcessingException pe = new ProcessingException(
-						"Patient phone number does not appear to be valid", "PID", 1, 13);
-					pe.setErrorCode(IisReportableSeverity.WARN.getCode());
+						"Patient phone number does not appear to be valid", "PID", 1, 13, IisReportableSeverity.WARN);
 					processingExceptionList.add(pe);
 				}
 			}

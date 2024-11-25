@@ -48,22 +48,7 @@ public class IisReportable {
 //		source = ReportableSource.IIS;
 //	}
 
-	private IisReportable(ProcessingException processingException) {
-		Hl7Location location = new Hl7Location();
-		location.setSegmentId(processingException.getSegmentId());
-		location.setFieldRepetition(processingException.getSegmentRepeat());
-		location.setFieldPosition(processingException.getFieldPosition());
-		hl7LocationList = List.of(location);
-		hl7ErrorCode = new CodedWithExceptions();
-		hl7ErrorCode.setIdentifier("101");
-		hl7ErrorCode.setNameOfCodingSystem("HL70357");
-		hl7ErrorCode.setText("Required field missing");
-		severity = IisReportableSeverity.findByCode(processingException.getErrorCode());
-		applicationErrorCode = new CodedWithExceptions();
-		reportedMessage = processingException.getLocalizedMessage();
-		diagnosticMessage = processingException.getMessage();
-		source = ReportableSource.IIS;
-	}
+
 
 	public CodedWithExceptions getApplicationErrorCode() {
 		return applicationErrorCode;
@@ -121,9 +106,6 @@ public class IisReportable {
 		this.source = source;
 	}
 
-	public static IisReportable fromProcessingException(ProcessingException processingException) {
-		return new IisReportable(processingException);
-	}
 
 	public static Hl7Location readErrorLocation(String path, String segmentid) {
 		Hl7Location errorLocation = new Hl7Location();
@@ -216,5 +198,32 @@ public class IisReportable {
 	public boolean isWarning() {
 		return IisReportableSeverity.WARN.equals(this.severity);
 	}
+
+	private IisReportable(ProcessingException processingException) {
+		Hl7Location location = new Hl7Location();
+		location.setSegmentId(processingException.getSegmentId());
+		location.setFieldRepetition(processingException.getSegmentRepeat());
+		location.setFieldPosition(processingException.getFieldPosition());
+		hl7LocationList = List.of(location);
+		hl7ErrorCode = new CodedWithExceptions();
+		hl7ErrorCode.setIdentifier("101");
+		hl7ErrorCode.setNameOfCodingSystem("HL70357");
+		hl7ErrorCode.setText("Required field missing");
+		severity = processingException.getErrorCode();
+		applicationErrorCode = new CodedWithExceptions();
+		reportedMessage = processingException.getLocalizedMessage();
+		diagnosticMessage = processingException.getMessage();
+		source = ReportableSource.IIS;
+	}
+
+	public static IisReportable fromProcessingException(ProcessingException processingException) {
+		return new IisReportable(processingException);
+	}
+
+
+	public static IisReportable fromProcessingException(ProcessingResult processingResult) {
+		return new IisReportable();
+	}
+
 
 }

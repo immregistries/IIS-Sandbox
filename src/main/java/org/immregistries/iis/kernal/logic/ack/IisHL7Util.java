@@ -99,6 +99,7 @@ public class IisHL7Util {
 
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmssZ");
 		String messageDate = sdf.format(new Date());
+		String profileExtension = ackData.getProfileExtension();
 		// MSH
 		ack.append("MSH|^~\\&");
 		ack.append("|" + ackData.getSendingApplication()); // MSH-3 Sending
@@ -126,6 +127,9 @@ public class IisHL7Util {
 		ack.append("|"); // MSH-19
 		ack.append("|"); // MSH-20
 		ack.append("|Z23^CDCPHINVS"); // MSH-21 TODO chANGE FOR advanced
+		if (StringUtils.isNotBlank(profileExtension)) {
+			ack.append("~").append(profileExtension).append("^CDCPHINVS");
+		}
 		ack.append("|\r");
 		// ack.append("SFT|" + SoftwareVersion.VENDOR + "|" +
 		// SoftwareVersion.VERSION + "|" + SoftwareVersion.PRODUCT + "|" +

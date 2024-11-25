@@ -191,7 +191,7 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler {
 						}
 						Code cvxCode = codeMap.getRelatedCode(ndcCode, CodesetType.VACCINATION_CVX_CODE);
 						if (cvxCode == null) {
-							ProcessingException pe = new ProcessingException("Unrecognized NDC " + vaccineNdcCode, "RXA", rxaCount, 5, IisReportableSeverity.WARN.getCode());
+							ProcessingException pe = new ProcessingException("Unrecognized NDC " + vaccineNdcCode, "RXA", rxaCount, 5, IisReportableSeverity.WARN);
 							;
 							iisReportableList.add(IisReportable.fromProcessingException(pe));
 						} else {
@@ -199,7 +199,7 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler {
 								vaccineCvxCode = cvxCode.getValue();
 							} else if (!vaccineCvxCode.equals(cvxCode.getValue())) {
 								// NDC doesn't map to the CVX code that was submitted!
-								ProcessingException pe = new ProcessingException("NDC " + vaccineNdcCode + " maps to " + cvxCode.getValue() + " but CVX " + vaccineCvxCode + " was also reported, preferring CVX code", "RXA", rxaCount, 5, IisReportableSeverity.WARN.getCode());
+								ProcessingException pe = new ProcessingException("NDC " + vaccineNdcCode + " maps to " + cvxCode.getValue() + " but CVX " + vaccineCvxCode + " was also reported, preferring CVX code", "RXA", rxaCount, 5, IisReportableSeverity.WARN);
 								iisReportableList.add(IisReportable.fromProcessingException(pe));
 							}
 						}
@@ -210,7 +210,7 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler {
 					if (cptCode != null) {
 						Code cvxCode = codeMap.getRelatedCode(cptCode, CodesetType.VACCINATION_CVX_CODE);
 						if (cvxCode == null) {
-							ProcessingException pe = new ProcessingException("Unrecognized CPT " + cptCode, "RXA", rxaCount, 5, IisReportableSeverity.WARN.getCode());
+							ProcessingException pe = new ProcessingException("Unrecognized CPT " + cptCode, "RXA", rxaCount, 5, IisReportableSeverity.WARN);
 							;
 							iisReportableList.add(IisReportable.fromProcessingException(pe));
 						} else {
@@ -218,7 +218,7 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler {
 								vaccineCvxCode = cvxCode.getValue();
 							} else if (!vaccineCvxCode.equals(cvxCode.getValue())) {
 								// CPT doesn't map to the CVX code that was submitted!
-								ProcessingException pe = new ProcessingException("CPT " + vaccineCptCode + " maps to " + cvxCode.getValue() + " but CVX " + vaccineCvxCode + " was also reported, preferring CVX code", "RXA", rxaCount, 5, IisReportableSeverity.WARN.getCode());
+								ProcessingException pe = new ProcessingException("CPT " + vaccineCptCode + " maps to " + cvxCode.getValue() + " but CVX " + vaccineCvxCode + " was also reported, preferring CVX code", "RXA", rxaCount, 5, IisReportableSeverity.WARN);
 								;
 								iisReportableList.add(IisReportable.fromProcessingException(pe));
 							}
@@ -308,7 +308,7 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler {
 					Code refusalCode = codeMap.getCodeForCodeset(CodesetType.VACCINATION_REFUSAL, vaccinationReported.getRefusalReasonCode());
 					if (refusalCode == null) {
 						ProcessingException pe = new ProcessingException("Unrecognized refusal reason", "RXA", rxaCount, 18);
-						pe.setErrorCode(IisReportableSeverity.WARN.getCode());
+						pe.setErrorCode(IisReportableSeverity.WARN);
 						iisReportableList.add(IisReportable.fromProcessingException(pe));
 					}
 				}
@@ -334,7 +334,7 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler {
 				}
 
 				if (ProcessingFlavor.HOTSAUCE.isActive() && random.nextBoolean()) {
-					throw new ProcessingException("Vaccination randomly rejected, Patient Accepted", "RXR", 0, 0, "N");
+					throw new ProcessingException("Vaccination randomly rejected, Patient Accepted", "RXR", 0, 0, IisReportableSeverity.NOTICE);
 				}
 
 
@@ -348,7 +348,7 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler {
 						if (!fundingEligibility.equals("")) {
 							Code fundingEligibilityCode = codeMap.getCodeForCodeset(CodesetType.FINANCIAL_STATUS_CODE, fundingEligibility);
 							if (fundingEligibilityCode == null) {
-								ProcessingException pe = new ProcessingException("Funding eligibility '" + fundingEligibility + "' was not recognized", "OBX", tempObxCount, 5, IisReportableSeverity.WARN.getCode());
+								ProcessingException pe = new ProcessingException("Funding eligibility '" + fundingEligibility + "' was not recognized", "OBX", tempObxCount, 5, IisReportableSeverity.WARN);
 								;
 								iisReportableList.add(IisReportable.fromProcessingException(pe));
 							} else {
@@ -360,7 +360,7 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler {
 						if (!fundingSource.equals("")) {
 							Code fundingSourceCode = codeMap.getCodeForCodeset(CodesetType.VACCINATION_FUNDING_SOURCE, fundingSource);
 							if (fundingSourceCode == null) {
-								ProcessingException pe = new ProcessingException("Funding source '" + fundingSource + "' was not recognized", "OBX", tempObxCount, 5, IisReportableSeverity.WARN.getCode());
+								ProcessingException pe = new ProcessingException("Funding source '" + fundingSource + "' was not recognized", "OBX", tempObxCount, 5, IisReportableSeverity.WARN);
 								;
 								iisReportableList.add(IisReportable.fromProcessingException(pe));
 							} else {
