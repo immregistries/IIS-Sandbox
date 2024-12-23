@@ -12,6 +12,8 @@ import org.hl7.fhir.r4.model.Patient;
 import org.immregistries.iis.kernal.fhir.annotations.OnR4Condition;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.logic.ImmunizationRecommendationServiceR4;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Controller;
@@ -23,6 +25,7 @@ import java.util.List;
 @Conditional(OnR4Condition.class)
 public class RecommendationForecastProviderR4
 	implements IRecommendationForecastProvider<Parameters, Patient, Immunization> {
+	Logger logger = LoggerFactory.getLogger(RecommendationForecastProviderR4.class);
 
 	@Autowired
 	ImmunizationRecommendationServiceR4 immunizationRecommendationServiceR4;

@@ -4,12 +4,12 @@ import org.hl7.fhir.instance.model.api.IBaseParameters;
 import org.hl7.fhir.instance.model.api.IDomainResource;
 
 public interface IRecommendationForecastProvider<Parameters extends IBaseParameters, Patient extends IDomainResource, Immunization extends IDomainResource> {
-	public static final String $_IMMDS_FORECAST = "$immds-forecast";
-	public static final String ASSESSMENT_DATE = "assessmentDate";
-	public static final String PATIENT = "patient";
-	public static final String RECOMMENDATION = "recommendation";
-	public static final String IMMUNIZATION = "immunization";
-	public static final String IMM_DSFORECAST_CANONICAL_URL = "http://hl7.org/fhir/us/immds/OperationDefinition/ImmDSForecastOperation";
+	String $_IMMDS_FORECAST = "$immds-forecast";
+	String ASSESSMENT_DATE = "assessmentDate";
+	String PATIENT = "patient";
+	String RECOMMENDATION = "recommendation";
+	String IMMUNIZATION = "immunization";
+	String IMM_DSFORECAST_CANONICAL_URL = "http://hl7.org/fhir/us/immds/OperationDefinition/ImmDSForecastOperation";
 
 	//	@Operation(name = $_IMMDS_FORECAST)
 //	@Operation(name = $_IMMDS_FORECAST,

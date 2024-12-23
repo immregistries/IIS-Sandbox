@@ -44,6 +44,7 @@ import org.immregistries.smm.tester.manager.HL7Reader;
 import org.immregistries.vfa.connect.ConnectFactory;
 import org.immregistries.vfa.connect.ConnectorInterface;
 import org.immregistries.vfa.connect.model.*;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -481,6 +482,9 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 		PatientMaster singleMatch = null;
 
 		singleMatch = fhirRequester.matchPatient(multipleMatches, patientMasterForMatchQuery, cutoff);
+		if (singleMatch == null) {
+			throw new ProcessingException("Patient not found", "PID", 1, 1); // TODO position
+		}
 
 		return buildRSP(reader, messageReceived, singleMatch, tenant, multipleMatches, reportables);
 	}
@@ -1205,6 +1209,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 		if (patientBirthDate.after(new Date())) {
 			throw new ProcessingException("Patient is indicated as being born in the future, unable to record patients who are not yet born", "PID", 1, 7);
 		}
+
 		patientReported.setExternalLink(patientReportedExternalLink);
 		patientReported.setPatientReportedType(patientReportedType);
 		patientReported.setPatientNames(names);
@@ -1381,6 +1386,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 		}
 		reader.resetPostion();
 
+		doChecks(patientReported, iisReportableList);
 		verifyNoErrors(iisReportableList);
 
 		patientReported.setUpdatedDate(new Date());
@@ -1399,5 +1405,29 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 		return patientReported;
 	}
 
+	public void doChecks(PatientReported patientReported, List<IisReportable> iisReportableList) {
+		Date deathDate = patientReported.getDeathDate();
+		boolean isDead = deathDate != null || StringUtils.equals(patientReported.getDeathFlag(), "Y");
+		if (deathDate != null && deathDate.before(patientReported.getBirthDate())) {
+			IisReportable iisReportable = getIisReportable("2002", "Conflicting Date of Birth and Date of Death", List.of(new Hl7Location("PID-9"), new Hl7Location("PID-27")));
+			iisReportableList.add(iisReportable);
+		}
+		if (isDead && StringUtils.equals("A", patientReported.getRegistryStatusIndicator())) {
+			IisReportable iisReportable = getIisReportable("2007", "Conflicting Patient Status and Patient Death Information", List.of(new Hl7Location("PD1-16"), new Hl7Location("PID-29"), new Hl7Location("PID-30")));
+			iisReportableList.add(iisReportable);
+		}
+	}
+
+	private static @NotNull IisReportable getIisReportable(String number, String text, List<@NotNull Hl7Location> hl7LocationList) {
+		IisReportable iisReportable = new IisReportable();
+		iisReportable.setHl7LocationList(hl7LocationList);
+		CodedWithExceptions applicationErrorCode = new CodedWithExceptions("ERR-5");
+		applicationErrorCode.setIdentifier(number);
+		applicationErrorCode.setText(text);
+		iisReportable.setApplicationErrorCode(applicationErrorCode);
+		iisReportable.setHl7ErrorCode(applicationErrorCode);
+		iisReportable.setSeverity(IisReportableSeverity.WARN);
+		return iisReportable;
+	}
 
 }
