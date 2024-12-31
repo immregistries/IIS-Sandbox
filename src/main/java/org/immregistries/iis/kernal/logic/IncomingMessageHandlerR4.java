@@ -333,7 +333,7 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler {
 					refusalCount++;
 				}
 
-				if (ProcessingFlavor.HOTSAUCE.isActive() && random.nextBoolean()) {
+				if (ProcessingFlavor.GRAPEFRUIT.isActive() && random.nextBoolean()) {
 					throw new ProcessingException("Vaccination randomly rejected, Patient Accepted", "RXR", 0, 0, IisReportableSeverity.NOTICE);
 				}
 
