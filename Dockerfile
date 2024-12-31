@@ -1,6 +1,6 @@
 ########### bitnami tomcat version is suitable for debugging and comes with a shell
 ########### it can be built using eg. `docker build --target tomcat .`
-FROM bitnami/tomcat:9.0 as tomcat
+FROM bitnami/tomcat:9.0 AS tomcat
 
 RUN rm -rf /opt/bitnami/tomcat/webapps/ROOT && \
     rm -rf /opt/bitnami/tomcat/webapps_default/ROOT

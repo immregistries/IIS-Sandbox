@@ -1,4 +1,3 @@
-version: "3"
 services:
   hapi-fhir-postgresql:
     image: postgres:13-alpine
@@ -37,7 +36,7 @@ services:
       - ./database/create-mysql-database.sql:/docker-entrypoint-initdb.d/1.sql
   iis-sandbox:
 #    build: .
-    image: clemhen/iis-sandbox:deployable-v1.1
+    image: clemhen/iis-sandbox:deployable-v1.2
     container_name: iis-sandbox
     #    environment:
     #      - iis.mysql.hibernate.connection.url=jdbc:mysql://iis-sandbox-mysql:3306/iis_alongside_jpa
