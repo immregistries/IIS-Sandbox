@@ -3807,6 +3807,14 @@
             <use-date/>
         </code>
         <code>
+            <value>90587</value>
+            <label>Dengue vaccine, quadrivalent, live, 3 dose schedule, for subcutaneous use</label>
+            <description></description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+        </code>
+        <code>
             <value>90296</value>
             <label>diphtheria antitoxin</label>
             <description></description>
@@ -9614,6 +9622,7 @@
                 <link-to codeset="VACCINATION_CVX_CODE">43</link-to>
                 <link-to codeset="VACCINATION_MANUFACTURER_CODE">SKB</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">58160-0821-11</link-to>
+                <link-to codeset="VACCINATION_CVX_CODE">44</link-to>
             </reference>
             <use-date>
                 <not-before>20070328</not-before>
@@ -9702,6 +9711,7 @@
                 <link-to codeset="VACCINATION_CVX_CODE">43</link-to>
                 <link-to codeset="VACCINATION_MANUFACTURER_CODE">SKB</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">58160-0821-34</link-to>
+                <link-to codeset="VACCINATION_CVX_CODE">44</link-to>
             </reference>
             <use-date>
                 <not-before>20070328</not-before>
@@ -22674,6 +22684,7 @@
                 <link-to codeset="VACCINATION_MANUFACTURER_CODE">MOD</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">80777-0345-96</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">80777-0345-90</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">80777-0345-89</link-to>
             </reference>
             <use-date>
                 <not-before>20240531</not-before>
@@ -28405,6 +28416,7 @@
             <use-date>
                 <not-before>19840101</not-before>
                 <not-expected-before>19840101</not-expected-before>
+                <not-after>20241206</not-after>
             </use-date>
             <use-age>
                 <not-before-month>1</not-before-month>
@@ -28881,7 +28893,7 @@
                 <not-before>20100528</not-before>
             </use-date>
             <use-age>
-                <not-before-month>1</not-before-month>
+                <not-before-month>0</not-before-month>
                 <not-after-month>1440</not-after-month>
             </use-age>
             <concept-type>non vaccine</concept-type>
@@ -29240,6 +29252,9 @@
                 <link-to codeset="VACCINATION_TRADE_NAME">RECOMBIVAX-DIALYSIS</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">00006-4992-01</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">00006-4992-00</link-to>
+                <link-to codeset="VACCINATION_TRADE_NAME">ENGERIX-B-ADULT</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">58160-0821-01</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">58160-0821-05</link-to>
             </reference>
             <use-date>
                 <not-before>20000101</not-before>
@@ -29345,6 +29360,7 @@
             </reference>
             <use-date>
                 <not-before>20220119</not-before>
+                <not-after>20241211</not-after>
             </use-date>
             <use-age>
                 <not-before-month>215</not-before-month>
@@ -29743,7 +29759,7 @@
                 <not-before-month>1</not-before-month>
                 <not-after-month>1440</not-after-month>
             </use-age>
-            <concept-type>unspecified</concept-type>
+            <concept-type>non vaccine</concept-type>
             <test-age>2 months</test-age>
         </code>
         <code>
@@ -30454,6 +30470,10 @@
             <use-date>
                 <not-before>20240515</not-before>
             </use-date>
+            <use-age>
+                <not-before-month>6</not-before-month>
+                <not-after-month>1440</not-after-month>
+            </use-age>
             <concept-type>vaccine</concept-type>
         </code>
         <code>
@@ -32141,6 +32161,10 @@
             <use-date>
                 <not-before>20240711</not-before>
             </use-date>
+            <use-age>
+                <not-before-month>215</not-before-month>
+                <not-after-month>1440</not-after-month>
+            </use-age>
             <concept-type>vaccine</concept-type>
         </code>
         <code>
@@ -32735,7 +32759,7 @@
             </use-date>
             <use-age>
                 <not-before-month>0</not-before-month>
-                <not-after-month>8</not-after-month>
+                <not-after-month>12</not-after-month>
             </use-age>
             <concept-type>vaccine</concept-type>
         </code>
@@ -32757,7 +32781,7 @@
                 <not-before>20230725</not-before>
             </use-date>
             <use-age>
-                <not-before-month>7</not-before-month>
+                <not-before-month>0</not-before-month>
                 <not-after-month>24</not-after-month>
             </use-age>
             <concept-type>vaccine</concept-type>
@@ -32775,10 +32799,15 @@
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">80777-0345-01</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">80777-0345-90</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">80777-0345-96</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">80777-0345-89</link-to>
             </reference>
             <use-date>
                 <not-before>20240605</not-before>
             </use-date>
+            <use-age>
+                <not-before-month>719</not-before-month>
+                <not-after-month>1440</not-after-month>
+            </use-age>
             <concept-type>vaccine</concept-type>
         </code>
         <code>
@@ -33236,7 +33265,7 @@
             <use-date>
                 <not-after>20170206</not-after>
             </use-date>
-            <concept-type>vaccine</concept-type>
+            <concept-type>non vaccine</concept-type>
         </code>
         <code>
             <value>35</value>
@@ -33955,6 +33984,7 @@
             </reference>
             <use-date>
                 <not-before>20100528</not-before>
+                <not-after>20241206</not-after>
             </use-date>
             <use-age>
                 <not-before-month>599</not-before-month>
@@ -35171,6 +35201,7 @@
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">80777-0291-80</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">80777-0110-93</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">80777-0110-96</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">80777-0345-89</link-to>
             </reference>
             <use-date>
                 <not-before>20201001</not-before>
@@ -36292,6 +36323,7 @@
             </reference>
             <use-date>
                 <not-before>20220413</not-before>
+                <not-after>20241206</not-after>
             </use-date>
         </code>
         <code>
@@ -37748,6 +37780,7 @@
             </reference>
             <use-date>
                 <not-before>20100528</not-before>
+                <not-after>20241206</not-after>
             </use-date>
         </code>
         <code>
@@ -38040,6 +38073,7 @@
             <reference>
                 <link-to codeset="VACCINATION_CVX_CODE">43</link-to>
                 <link-to codeset="VACCINATION_MANUFACTURER_CODE">SKB</link-to>
+                <link-to codeset="VACCINATION_CVX_CODE">44</link-to>
             </reference>
             <use-date>
                 <not-before>20100528</not-before>
@@ -38085,6 +38119,7 @@
             </reference>
             <use-date>
                 <not-before>20220112</not-before>
+                <not-after>20241210</not-after>
             </use-date>
         </code>
         <code>
@@ -39910,6 +39945,7 @@
             </reference>
             <use-date>
                 <not-before>20100528</not-before>
+                <not-after>20241206</not-after>
             </use-date>
         </code>
         <code>
@@ -68502,6 +68538,48 @@
                     <new-code-value>80777-0345-96</new-code-value>
                     <reason>Use 11-digit format with dashes</reason>
                     <effective-date>20240611</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>80777-0345-89</value>
+            <label>mRESVIA</label>
+            <description>Moderna US, INC. - Respiratory Syncytial Virus Vaccine (RSV), mRNA</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">326</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">MOD</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">80777-0345-01</link-to>
+            </reference>
+            <use-date>
+                <not-before>20241105</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>80777-345-89</value>
+            <label>mRESVIA</label>
+            <description>Moderna US, INC. - Respiratory Syncytial Virus Vaccine (RSV), mRNA</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>80777-0345-89</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20241121</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>80777034589</value>
+            <label>mRESVIA</label>
+            <description>Moderna US, INC. - Respiratory Syncytial Virus Vaccine (RSV), mRNA</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>80777-0345-89</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20241121</effective-date>
                 </deprecated>
             </code-status>
         </code>
