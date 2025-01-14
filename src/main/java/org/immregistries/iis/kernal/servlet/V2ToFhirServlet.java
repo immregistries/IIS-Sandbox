@@ -7,7 +7,6 @@ import org.hibernate.Session;
 import org.hl7.fhir.r5.model.*;
 import org.hl7.fhir.r5.model.ContactPoint.ContactPointSystem;
 import org.hl7.fhir.r5.model.Enumerations.AdministrativeGender;
-import org.hl7.fhir.r5.model.Patient.ContactComponent;
 import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
@@ -16,7 +15,10 @@ import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.logic.CodeMapManager;
 import org.immregistries.iis.kernal.logic.IncomingMessageHandler;
 import org.immregistries.iis.kernal.mapping.Interfaces.ImmunizationMapper;
-import org.immregistries.iis.kernal.model.*;
+import org.immregistries.iis.kernal.model.PatientMaster;
+import org.immregistries.iis.kernal.model.PatientReported;
+import org.immregistries.iis.kernal.model.Tenant;
+import org.immregistries.iis.kernal.model.VaccinationMaster;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 
@@ -282,15 +284,15 @@ public class V2ToFhirServlet extends HttpServlet {
 			p.setMultipleBirth(booleanType);
 		}
 
-		if (!pr.getGuardianRelationship().equals("")
-			&& (!pr.getGuardianLast().equals("") || !pr.getGuardianFirst().equals(""))) {
-			ContactComponent contactComponent = p.addContact();
-			contactComponent.addRelationship().addCoding().setCode(pr.getGuardianRelationship());
-			HumanName humanName = new HumanName();
-			humanName.setFamily(pr.getGuardianLast());
-			humanName.addGiven(pr.getGuardianFirst());
-			contactComponent.setName(humanName);
-		}
+//		if (!pr.getGuardianRelationship().equals("")
+//			&& (!pr.getGuardianLast().equals("") || !pr.getGuardianFirst().equals(""))) {
+//			ContactComponent contactComponent = p.addContact();
+//			contactComponent.addRelationship().addCoding().setCode(pr.getGuardianRelationship());
+//			HumanName humanName = new HumanName();
+//			humanName.setFamily(pr.getGuardianLast());
+//			humanName.addGiven(pr.getGuardianFirst());
+//			contactComponent.setName(humanName);
+//		}
 
 	}
 

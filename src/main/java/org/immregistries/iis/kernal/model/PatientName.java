@@ -47,6 +47,9 @@ public class PatientName {
 		}
 	}
 
+	public PatientName() {
+	}
+
 	public String getNameLast() {
 		return nameLast;
 	}

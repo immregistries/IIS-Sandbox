@@ -225,15 +225,15 @@ public class FhirRequesterR5 extends FhirRequester<Patient, Immunization, Locati
 		return modelPerson;
 	}
 
-	public PatientReported saveRelatedPerson(PatientReported patientReported) {
-		RelatedPerson relatedPerson = relatedPersonMapper.getFhirRelatedPersonFromPatient(patientReported);
-		MethodOutcome outcome = save(relatedPerson,
-			RelatedPerson.PATIENT.hasId(patientReported.getPatientId()));
-		if (outcome.getResource() != null) {
-			relatedPersonMapper.fillGuardianInformation(patientReported, (RelatedPerson) outcome.getResource());
-		}
-		return patientReported;
-	}
+//	public PatientReported saveRelatedPerson(PatientReported patientReported) {
+//		RelatedPerson relatedPerson = relatedPersonMapper.getFhirRelatedPersonFromPatient(patientReported);
+//		MethodOutcome outcome = save(relatedPerson,
+//			RelatedPerson.PATIENT.hasId(patientReported.getPatientId()));
+//		if (outcome.getResource() != null) {
+//			relatedPersonMapper.fillGuardianInformation(patientReported, (RelatedPerson) outcome.getResource());
+//		}
+//		return patientReported;
+//	}
 
 	public ObservationReported saveObservationReported(ObservationReported observationReported) {
 		Observation observation = observationMapper.getFhirResource(observationReported);

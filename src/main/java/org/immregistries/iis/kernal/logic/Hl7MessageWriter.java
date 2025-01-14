@@ -492,16 +492,20 @@ public abstract class Hl7MessageWriter //extends IncomingMessageHandler
 	public void printQueryNK1(PatientMaster patientMaster, StringBuilder sb, CodeMap codeMap) {
 		if (patientMaster != null) {
 
-			if (StringUtils.isNotBlank(patientMaster.getGuardianRelationship()) && StringUtils.isNotBlank(patientMaster.getGuardianLast()) && StringUtils.isNotBlank(patientMaster.getGuardianFirst())) {
-				Code code = codeMap.getCodeForCodeset(CodesetType.PERSON_RELATIONSHIP, patientMaster.getGuardianRelationship());
-				if (code != null) {
-					sb.append("NK1");
-					sb.append("|1");
-					sb.append("|").append(patientMaster.getGuardianLast()).append("^").append(patientMaster.getGuardianFirst()).append("^^^^^L");
-					sb.append("|").append(code.getValue()).append("^").append(code.getLabel()).append("^HL70063");
-					sb.append("\r");
+			for (int i = 0; i < patientMaster.getPatientGuardians().size(); i++) {
+				PatientGuardian patientGuardian = patientMaster.getPatientGuardians().get(i);
+				if (StringUtils.isNotBlank(patientGuardian.getGuardianRelationship()) && StringUtils.isNotBlank(patientGuardian.getName().getNameLast()) && StringUtils.isNotBlank(patientGuardian.getName().getNameFirst())) {
+					Code code = codeMap.getCodeForCodeset(CodesetType.PERSON_RELATIONSHIP, patientGuardian.getGuardianRelationship());
+					if (code != null) {
+						sb.append("NK1");
+						sb.append("|").append((i + 1));
+						sb.append("|").append(patientGuardian.getName().getNameLast()).append("^").append(patientGuardian.getName().getNameFirst()).append("^^^^^L");
+						sb.append("|").append(code.getValue()).append("^").append(code.getLabel()).append("^HL70063");
+						sb.append("\r");
+					}
 				}
 			}
+
 		}
 	}
 

@@ -51,10 +51,9 @@ public class PatientMaster implements Serializable {
 	private Date protectionIndicatorDate = null;
 	private String registryStatusIndicator = "";
 	private Date registryStatusIndicatorDate = null;
-	private String guardianLast = "";
-	private String guardianFirst = "";
-	private String guardianMiddle = "";
-	private String guardianRelationship = "";
+
+
+	List<PatientGuardian> patientGuardians = new ArrayList<>(1);
 
 
 	private String managingOrganizationId;
@@ -276,37 +275,37 @@ public class PatientMaster implements Serializable {
 		this.registryStatusIndicatorDate = registryStatusIndicator_date;
 	}
 
-	public String getGuardianLast() {
-		return guardianLast;
-	}
-
-	public void setGuardianLast(String guardianLast) {
-		this.guardianLast = guardianLast;
-	}
-
-	public String getGuardianFirst() {
-		return guardianFirst;
-	}
-
-	public void setGuardianFirst(String guardianFirst) {
-		this.guardianFirst = guardianFirst;
-	}
-
-	public String getGuardianMiddle() {
-		return guardianMiddle;
-	}
-
-	public void setGuardianMiddle(String guardianMiddle) {
-		this.guardianMiddle = guardianMiddle;
-	}
-
-	public String getGuardianRelationship() {
-		return guardianRelationship;
-	}
-
-	public void setGuardianRelationship(String guardianRelationship) {
-		this.guardianRelationship = guardianRelationship;
-	}
+//	public String getGuardianLast() {
+//		return guardianLast;
+//	}
+//
+//	public void setGuardianLast(String guardianLast) {
+//		this.guardianLast = guardianLast;
+//	}
+//
+//	public String getGuardianFirst() {
+//		return guardianFirst;
+//	}
+//
+//	public void setGuardianFirst(String guardianFirst) {
+//		this.guardianFirst = guardianFirst;
+//	}
+//
+//	public String getGuardianMiddle() {
+//		return guardianMiddle;
+//	}
+//
+//	public void setGuardianMiddle(String guardianMiddle) {
+//		this.guardianMiddle = guardianMiddle;
+//	}
+//
+//	public String getGuardianRelationship() {
+//		return guardianRelationship;
+//	}
+//
+//	public void setGuardianRelationship(String guardianRelationship) {
+//		this.guardianRelationship = guardianRelationship;
+//	}
 
 	public Tenant getTenant() {
 		return tenant;
@@ -434,4 +433,19 @@ public class PatientMaster implements Serializable {
 		return this.getLegalNameOrFirst().getNameMiddle();
 	}
 
+
+	public List<PatientGuardian> getPatientGuardians() {
+		return patientGuardians;
+	}
+
+	public void setPatientGuardians(List<PatientGuardian> patientGuardians) {
+		this.patientGuardians = patientGuardians;
+	}
+
+	public void addPatientGuardian(PatientGuardian patientGuardian) {
+		if (this.patientGuardians == null) {
+			this.patientGuardians = new ArrayList<>(1);
+		}
+		this.patientGuardians.add(patientGuardian);
+	}
 }

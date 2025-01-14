@@ -2,7 +2,6 @@ package org.immregistries.iis.kernal.InternalClient;
 
 import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
 import ca.uhn.fhir.rest.api.server.IBundleProvider;
-import ca.uhn.fhir.rest.gclient.ICriterion;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.immregistries.iis.kernal.model.*;
 
@@ -65,7 +64,7 @@ public interface IFhirRequester<
 
 	public Organization saveOrganization(Organization organization);
 
-	public PatientReported saveRelatedPerson(PatientReported patientReported);
+//	public PatientReported saveRelatedPerson(PatientReported patientReported);
 
 	/**
 	 * Unsafe: doesn't verify golden record quality, read patient golden record and maps to PatientMaster

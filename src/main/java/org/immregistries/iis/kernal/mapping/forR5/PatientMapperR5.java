@@ -1,8 +1,6 @@
 package org.immregistries.iis.kernal.mapping.forR5;
 
 
-import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
-import ca.uhn.fhir.rest.param.ReferenceParam;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r5.model.*;
@@ -15,6 +13,7 @@ import org.immregistries.iis.kernal.fhir.annotations.OnR5Condition;
 import org.immregistries.iis.kernal.logic.CodeMapManager;
 import org.immregistries.iis.kernal.mapping.Interfaces.PatientMapper;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
+import org.immregistries.iis.kernal.model.PatientGuardian;
 import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.model.PatientName;
 import org.immregistries.iis.kernal.model.PatientReported;
@@ -216,12 +215,17 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 
 		// pm.setRegistryStatusIndicator(p.getActive());
 		// Patient Contact / Guardian
-		RelatedPerson relatedPerson = fhirRequests.searchRelatedPerson(
-			new SearchParameterMap(RelatedPerson.SP_PATIENT,new ReferenceParam(pm.getPatientId()))
-				.add(RelatedPerson.SP_PATIENT,new ReferenceParam(pm.getExternalLink())));
-//			RelatedPerson.PATIENT.hasAnyOfIds(pm.getPatientId(), pm.getExternalLink()));
-		if (relatedPerson != null) {
-			relatedPersonMapperR5.fillGuardianInformation(pm, relatedPerson);
+//		RelatedPerson relatedPerson = fhirRequests.searchRelatedPerson(
+//			new SearchParameterMap(RelatedPerson.SP_PATIENT,new ReferenceParam(pm.getPatientId()))
+//				.add(RelatedPerson.SP_PATIENT,new ReferenceParam(pm.getExternalLink())));
+////			RelatedPerson.PATIENT.hasAnyOfIds(pm.getPatientId(), pm.getExternalLink()));
+//		if (relatedPerson != null) {
+//			relatedPersonMapperR5.fillGuardianInformation(pm, relatedPerson);
+//		}
+		for (Patient.ContactComponent contactComponent : p.getContact()) {
+			PatientGuardian patientGuardian = new PatientGuardian();
+			patientGuardian.setName(new PatientName(contactComponent.getName()));
+			patientGuardian.setGuardianRelationship(contactComponent.getRelationshipFirstRep().getText());
 		}
 	}
 
@@ -362,13 +366,15 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 			registryValue.setVersion(pm.getRegistryStatusIndicatorDate().toString());
 		}
 
-		Patient.ContactComponent contact = p.addContact();
-		HumanName contactName = new HumanName();
-		contact.setName(contactName);
-		contact.addRelationship().setText(pm.getGuardianRelationship());
-		contactName.setFamily(pm.getGuardianLast());
-		contactName.addGivenElement().setValue(pm.getGuardianFirst());
-		contactName.addGivenElement().setValue(pm.getGuardianMiddle());
+		for (PatientGuardian patientGuardian : pm.getPatientGuardians()) {
+			Patient.ContactComponent contact = p.addContact();
+			HumanName contactName = new HumanName();
+			contact.setName(contactName);
+			contact.addRelationship().setText(patientGuardian.getGuardianRelationship());
+			contactName.setFamily(patientGuardian.getName().getNameLast());
+			contactName.addGivenElement().setValue(patientGuardian.getName().getNameFirst());
+			contactName.addGivenElement().setValue(patientGuardian.getName().getNameMiddle());
+		}
 		return p;
 	}
 

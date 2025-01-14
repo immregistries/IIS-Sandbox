@@ -1238,6 +1238,55 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 		patientReported.setPhone(patientPhone);
 		patientReported.setPatientReportedAuthority(patientReportedAuthority);
 
+
+		if (reader.advanceToSegment("PD1")) {
+			patientReported.setPublicityIndicator(reader.getValue(11));
+			patientReported.setProtectionIndicator(reader.getValue(12));
+			patientReported.setProtectionIndicatorDate(parseDateWarn(reader.getValue(13), "Invalid protection indicator date", "PD1", 1, 13, strictDate, iisReportableList));
+			patientReported.setRegistryStatusIndicator(reader.getValue(16));
+			patientReported.setRegistryStatusIndicatorDate(parseDateWarn(reader.getValue(17), "Invalid registry status indicator date", "PD1", 1, 17, strictDate, iisReportableList));
+			patientReported.setPublicityIndicatorDate(parseDateWarn(reader.getValue(18), "Invalid publicity indicator date", "PD1", 1, 18, strictDate, iisReportableList));
+		}
+		reader.resetPostion();
+		{
+			while (reader.advanceToSegment("NK1")) {
+				PatientGuardian patientGuardian = new PatientGuardian();
+				patientReported.addPatientGuardian(patientGuardian);
+				String guardianLast = reader.getValue(2, 1);
+				patientGuardian.getName().setNameLast(guardianLast);
+				;
+				String guardianFirst = reader.getValue(2, 2);
+				patientGuardian.getName().setNameFirst(guardianFirst);
+				;
+				String guardianMiddle = reader.getValue(2, 1);
+				patientGuardian.getName().setNameMiddle(guardianMiddle);
+				String guardianRelationship = reader.getValue(3);
+				patientGuardian.setGuardianRelationship(guardianRelationship);
+			}
+		}
+		reader.resetPostion();
+
+		doChecks(patientReported, iisReportableList, processingFlavorSet);
+		verifyNoErrors(iisReportableList);
+
+		patientReported.setUpdatedDate(new Date());
+		patientReported = fhirRequester.savePatientReported(patientReported);
+//		patientReported = fhirRequester.saveRelatedPerson(patientReported);
+		iisReportableList.add(IisReportable.fromProcessingException(new ProcessingException("Patient record saved", "PID", 0, 0, IisReportableSeverity.INFO)));
+
+		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+		ArrayList<String> groupPatientIds = (ArrayList<String>) request.getAttribute("groupPatientIds");
+		if (groupPatientIds != null) { // If there are numerous patients added and option was activated
+			groupPatientIds.add(patientReported.getPatientId());
+		}
+		request.setAttribute("groupPatientIds", groupPatientIds);
+
+
+		return patientReported;
+	}
+
+	public void doChecks(PatientReported patientReported, List<IisReportable> iisReportableList, Set<ProcessingFlavor> processingFlavorSet) throws ProcessingException {
+		CodeMap codeMap = CodeMapManager.getCodeMap();
 		{
 			String patientSex = patientReported.getSex();
 			if (!ValidValues.verifyValidValue(patientSex, ValidValues.SEX)) {
@@ -1342,70 +1391,29 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 			}
 		}
 
-		if (reader.advanceToSegment("PD1")) {
-			patientReported.setPublicityIndicator(reader.getValue(11));
-			patientReported.setProtectionIndicator(reader.getValue(12));
-			patientReported.setProtectionIndicatorDate(parseDateWarn(reader.getValue(13), "Invalid protection indicator date", "PD1", 1, 13, strictDate, iisReportableList));
-			patientReported.setRegistryStatusIndicator(reader.getValue(16));
-			patientReported.setRegistryStatusIndicatorDate(parseDateWarn(reader.getValue(17), "Invalid registry status indicator date", "PD1", 1, 17, strictDate, iisReportableList));
-			patientReported.setPublicityIndicatorDate(parseDateWarn(reader.getValue(18), "Invalid publicity indicator date", "PD1", 1, 18, strictDate, iisReportableList));
-		}
-		reader.resetPostion();
-		{
-			int repeatCount = 0;
-			while (reader.advanceToSegment("NK1")) {
-				patientReported.setGuardianLast(reader.getValue(2, 1));
-				patientReported.setGuardianFirst(reader.getValue(2, 2));
-				patientReported.setGuardianMiddle(reader.getValue(2, 1));
-				String guardianRelationship = reader.getValue(3);
-				patientReported.setGuardianRelationship(guardianRelationship);
-				repeatCount++;
-				if (StringUtils.isBlank(patientReported.getGuardianLast())) {
-					ProcessingException pe = new ProcessingException("Next-of-kin last name is empty", "NK1", repeatCount, 2, IisReportableSeverity.WARN);
-					;
-					iisReportableList.add(IisReportable.fromProcessingException(pe));
-				}
-				if (patientReported.getGuardianFirst().equals("")) {
-					ProcessingException pe = new ProcessingException("Next-of-kin first name is empty", "NK1", repeatCount, 2, IisReportableSeverity.WARN);
-					;
-					iisReportableList.add(IisReportable.fromProcessingException(pe));
-				}
-				if (guardianRelationship.equals("")) {
-					ProcessingException pe = new ProcessingException("Next-of-kin relationship is empty", "NK1", repeatCount, 3, IisReportableSeverity.WARN);
-					;
-					iisReportableList.add(IisReportable.fromProcessingException(pe));
-				}
-				if (guardianRelationship.equals("MTH") || guardianRelationship.equals("FTH") || guardianRelationship.equals("GRD")) {
-					break;
-				} else {
-					ProcessingException pe = new ProcessingException((guardianRelationship.equals("") ? "Next-of-kin relationship not specified so is not recognized as guardian and will be ignored" : ("Next-of-kin relationship '" + guardianRelationship + "' is not a recognized guardian and will be ignored")), "NK1", repeatCount, 3, IisReportableSeverity.WARN);
-					;
-					iisReportableList.add(IisReportable.fromProcessingException(pe));
-				}
+		for (int i = 0; i < patientReported.getPatientGuardians().size(); i++) {
+			PatientGuardian patientGuardian = patientReported.getPatientGuardians().get(i);
+			if (StringUtils.isBlank(patientGuardian.getName().getNameLast())) {
+				ProcessingException pe = new ProcessingException("Next-of-kin last name is empty", "NK1", i, 2, IisReportableSeverity.WARN);
+				iisReportableList.add(IisReportable.fromProcessingException(pe));
+			}
+			if (StringUtils.isNotBlank(patientGuardian.getName().getNameFirst())) {
+				ProcessingException pe = new ProcessingException("Next-of-kin first name is empty", "NK1", i, 2, IisReportableSeverity.WARN);
+				iisReportableList.add(IisReportable.fromProcessingException(pe));
+			}
+
+			if (StringUtils.isNotBlank(patientGuardian.getGuardianRelationship())) {
+				ProcessingException pe = new ProcessingException("Next-of-kin relationship is empty", "NK1", i, 3, IisReportableSeverity.WARN);
+				iisReportableList.add(IisReportable.fromProcessingException(pe));
+			}
+			if (patientGuardian.getGuardianRelationship().equals("MTH") || patientGuardian.getGuardianRelationship().equals("FTH") || patientGuardian.getGuardianRelationship().equals("GRD")) {
+				break;
+			} else {
+				ProcessingException pe = new ProcessingException((StringUtils.isNotBlank(patientGuardian.getGuardianRelationship()) ? "Next-of-kin relationship not specified so is not recognized as guardian and will be ignored" : ("Next-of-kin relationship '" + patientGuardian.getGuardianRelationship() + "' is not a recognized guardian and will be ignored")), "NK1", i, 3, IisReportableSeverity.WARN);
+				iisReportableList.add(IisReportable.fromProcessingException(pe));
 			}
 		}
-		reader.resetPostion();
 
-		doChecks(patientReported, iisReportableList);
-		verifyNoErrors(iisReportableList);
-
-		patientReported.setUpdatedDate(new Date());
-		patientReported = fhirRequester.savePatientReported(patientReported);
-		patientReported = fhirRequester.saveRelatedPerson(patientReported);
-		iisReportableList.add(IisReportable.fromProcessingException(new ProcessingException("Patient record saved", "PID", 0, 0, IisReportableSeverity.INFO)));
-
-		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
-		ArrayList<String> groupPatientIds = (ArrayList<String>) request.getAttribute("groupPatientIds");
-		if (groupPatientIds != null) { // If there are numerous patients added and option was activated
-			groupPatientIds.add(patientReported.getPatientId());
-		}
-		request.setAttribute("groupPatientIds", groupPatientIds);
-
-
-		return patientReported;
-	}
-
-	public void doChecks(PatientReported patientReported, List<IisReportable> iisReportableList) {
 		Date deathDate = patientReported.getDeathDate();
 		boolean isDead = deathDate != null || StringUtils.equals(patientReported.getDeathFlag(), "Y");
 		if (deathDate != null && deathDate.before(patientReported.getBirthDate())) {
