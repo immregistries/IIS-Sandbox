@@ -25,13 +25,7 @@ public class PatientMaster implements Serializable {
 	private String motherMaidenName = "";
 	private Date birthDate = null;
 	private String sex = "";
-	//	private List<String> races = new ArrayList<>(1);
-	private String race = "";
-	private String race2 = "";
-	private String race3 = "";
-	private String race4 = "";
-	private String race5 = "";
-	private String race6 = "";
+	private List<String> races = new ArrayList<>(1);
 	private String addressLine1 = "";
 	private String addressLine2 = "";
 	private String addressCity = "";
@@ -106,14 +100,6 @@ public class PatientMaster implements Serializable {
 
 	public void setSex(String sex) {
 		this.sex = sex;
-	}
-
-	public String getRace() {
-		return race;
-	}
-
-	public void setRace(String race) {
-		this.race = race;
 	}
 
 	public String getAddressLine1() {
@@ -276,38 +262,6 @@ public class PatientMaster implements Serializable {
 		this.registryStatusIndicatorDate = registryStatusIndicator_date;
 	}
 
-//	public String getGuardianLast() {
-//		return guardianLast;
-//	}
-//
-//	public void setGuardianLast(String guardianLast) {
-//		this.guardianLast = guardianLast;
-//	}
-//
-//	public String getGuardianFirst() {
-//		return guardianFirst;
-//	}
-//
-//	public void setGuardianFirst(String guardianFirst) {
-//		this.guardianFirst = guardianFirst;
-//	}
-//
-//	public String getGuardianMiddle() {
-//		return guardianMiddle;
-//	}
-//
-//	public void setGuardianMiddle(String guardianMiddle) {
-//		this.guardianMiddle = guardianMiddle;
-//	}
-//
-//	public String getGuardianRelationship() {
-//		return guardianRelationship;
-//	}
-//
-//	public void setGuardianRelationship(String guardianRelationship) {
-//		this.guardianRelationship = guardianRelationship;
-//	}
-
 	public Tenant getTenant() {
 		return tenant;
 	}
@@ -351,46 +305,6 @@ public class PatientMaster implements Serializable {
 
 	public void setUpdatedDate(Date updatedDate) {
 		this.updatedDate = updatedDate;
-	}
-
-	public String getRace2() {
-		return race2;
-	}
-
-	public void setRace2(String race2) {
-		this.race2 = race2;
-	}
-
-	public String getRace3() {
-		return race3;
-	}
-
-	public void setRace3(String race3) {
-		this.race3 = race3;
-	}
-
-	public String getRace4() {
-		return race4;
-	}
-
-	public void setRace4(String race4) {
-		this.race4 = race4;
-	}
-
-	public String getRace5() {
-		return race5;
-	}
-
-	public void setRace5(String race5) {
-		this.race5 = race5;
-	}
-
-	public String getRace6() {
-		return race6;
-	}
-
-	public void setRace6(String race6) {
-		this.race6 = race6;
 	}
 
 	public List<PatientName> getPatientNames() {
@@ -448,5 +362,27 @@ public class PatientMaster implements Serializable {
 			this.patientGuardians = new ArrayList<>(1);
 		}
 		this.patientGuardians.add(patientGuardian);
+	}
+
+	public List<String> getRaces() {
+		return races;
+	}
+
+	public void setRaces(List<String> races) {
+		this.races = races;
+	}
+
+	public void addRace(String race) {
+		if (this.races == null) {
+			this.races = new ArrayList<>(1);
+		}
+		this.races.add(race);
+	}
+
+	public String getFirstRace() {
+		if (races.isEmpty()) {
+			return null;
+		}
+		return this.races.get(0);
 	}
 }

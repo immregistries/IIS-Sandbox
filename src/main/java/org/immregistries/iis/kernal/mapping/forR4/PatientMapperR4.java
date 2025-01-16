@@ -3,8 +3,11 @@ package org.immregistries.iis.kernal.mapping.forR4;
 
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.r4.model.*;
+import org.immregistries.codebase.client.generated.Code;
+import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.InternalClient.FhirRequesterR4;
 import org.immregistries.iis.kernal.fhir.annotations.OnR4Condition;
+import org.immregistries.iis.kernal.logic.CodeMapManager;
 import org.immregistries.iis.kernal.mapping.Interfaces.PatientMapper;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
 import org.immregistries.iis.kernal.model.PatientGuardian;
@@ -74,38 +77,11 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 				break;
 		}
 
-		int raceNumber = 0;
 		if (p.hasExtension(RACE_EXTENSION)) {
 			for (Iterator<Extension> it = Stream.concat(p.getExtensionsByUrl(RACE_EXTENSION_OMB).stream(), p.getExtensionsByUrl(RACE_EXTENSION_DETAILED).stream()).iterator(); it.hasNext(); ) {
 				Extension ext = it.next();
 				Coding coding = MappingHelper.extensionGetCoding(ext);
-				raceNumber++;
-				switch (raceNumber) {
-					case 1: {
-						pm.setRace(coding.getCode());
-						break;
-					}
-					case 2: {
-						pm.setRace2(coding.getCode());
-						break;
-					}
-					case 3: {
-						pm.setRace3(coding.getCode());
-						break;
-					}
-					case 4:{
-						pm.setRace4(coding.getCode());
-						break;
-					}
-					case 5:{
-						pm.setRace5(coding.getCode());
-						break;
-					}
-					case 6:{
-						pm.setRace6(coding.getCode());
-						break;
-					}
-				}
+				pm.addRace(coding.getCode());
 			}
 		}
 		Extension ethnicityExtension = p.getExtensionByUrl(ETHNICITY_EXTENSION);
@@ -265,25 +241,16 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 		//Race and ethnicity
 		Extension raceExtension = p.addExtension();
 		raceExtension.setUrl(RACE_EXTENSION);
-		CodeableConcept race = new CodeableConcept().setText(RACE_SYSTEM);
-		raceExtension.setValue(race);
-		if (StringUtils.isNotBlank(pm.getRace())) {
-			race.addCoding().setCode(pm.getRace());
-		}
-		if (StringUtils.isNotBlank(pm.getRace2())) {
-			race.addCoding().setCode(pm.getRace2());
-		}
-		if (StringUtils.isNotBlank(pm.getRace3())) {
-			race.addCoding().setCode(pm.getRace3());
-		}
-		if (StringUtils.isNotBlank(pm.getRace4())) {
-			race.addCoding().setCode(pm.getRace4());
-		}
-		if (StringUtils.isNotBlank(pm.getRace5())) {
-			race.addCoding().setCode(pm.getRace5());
-		}
-		if (StringUtils.isNotBlank(pm.getRace6())) {
-			race.addCoding().setCode(pm.getRace6());
+		CodeableConcept races = new CodeableConcept().setText(RACE_SYSTEM);
+		raceExtension.setValue(races);
+		for (String value : pm.getRaces()) {
+			if (StringUtils.isNotBlank(value)) {
+				Coding coding = races.addCoding().setCode(value).setSystem(RACE_SYSTEM);
+				Code code = CodeMapManager.getCodeMap().getCodeForCodeset(CodesetType.PATIENT_RACE, value);
+				if (code != null) {
+					coding.setDisplay(code.getLabel());
+				}
+			}
 		}
 		p.addExtension(ETHNICITY_EXTENSION, new Coding().setSystem(ETHNICITY_SYSTEM).setCode(pm.getEthnicity()));
 		// telecom

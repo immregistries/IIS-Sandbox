@@ -1130,12 +1130,9 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 		patientReported.setMotherMaidenName(reader.getValue(6));
 		patientReported.setBirthDate(patientBirthDate);
 		patientReported.setSex(reader.getValue(8));
-		patientReported.setRace(reader.getValue(10));
-		patientReported.setRace2(reader.getValueRepeat(10, 1, 2));
-		patientReported.setRace3(reader.getValueRepeat(10, 1, 3));
-		patientReported.setRace4(reader.getValueRepeat(10, 1, 4));
-		patientReported.setRace5(reader.getValueRepeat(10, 1, 5));
-		patientReported.setRace6(reader.getValueRepeat(10, 1, 6));
+		for (int i = 1; i <= reader.getRepeatCount(10); i++) {
+			patientReported.addRace(reader.getValueRepeat(10, 1, i));
+		}
 		patientReported.setAddressLine1(reader.getValue(11, 1));
 		patientReported.setAddressLine2(reader.getValue(11, 2));
 		patientReported.setAddressCity(reader.getValue(11, 3));

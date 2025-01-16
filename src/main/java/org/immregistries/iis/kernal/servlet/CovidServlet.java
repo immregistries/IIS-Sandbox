@@ -2,7 +2,10 @@ package org.immregistries.iis.kernal.servlet;
 
 import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
-import ca.uhn.fhir.rest.param.*;
+import ca.uhn.fhir.rest.param.DateParam;
+import ca.uhn.fhir.rest.param.ParamPrefixEnum;
+import ca.uhn.fhir.rest.param.ReferenceParam;
+import ca.uhn.fhir.rest.param.TokenParam;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.r5.model.Immunization;
 import org.hl7.fhir.r5.model.Patient;
@@ -305,26 +308,13 @@ public class CovidServlet extends HttpServlet {
 		// 15:  Recipient address: zip code
 		printField(patientReported.getAddressZip(), out);
 		// 16:  Recipient race 1
-		if (StringUtils.isEmpty(patientReported.getRace())) {
+		if (patient.getRaces().isEmpty() || StringUtils.isEmpty(patientReported.getRaces().get(0))) {
 			printField("UNK", out);
 		} else {
-			printField(patientReported.getRace(), out);
+			for (String race : patientReported.getRaces()) {
+				printField(race, out);
+			}
 		}
-		// 17:  Recipient race 2
-		printField(patientReported.getRace2(), out);
-		// 18:  Recipient race 3
-		printField(patientReported.getRace3(), out);
-		// 19:  Recipient race 4
-		printField(patientReported.getRace4(), out);
-		// 20:  Recipient race 5
-		printField(patientReported.getRace5(), out);
-		// 21:  Recipient race 6
-		printField(patientReported.getRace6(), out);
-		// 22:  Recipient ethnicity
-		printField(patientReported.getEthnicity(), out);
-		// 23:  Administration date
-		printField(vaccinationReported.getAdministeredDate(), out);
-
 
 		boolean administeredVaccination = StringUtils.isEmpty(vaccinationReported.getCompletionStatus())
 			|| vaccinationReported.getCompletionStatus().equals("CP");

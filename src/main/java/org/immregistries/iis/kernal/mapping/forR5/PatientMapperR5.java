@@ -81,38 +81,11 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 				pm.setSex("");
 				break;
 		}
-		int raceNumber = 0;
 		if (p.hasExtension(RACE_EXTENSION)) {
 			for (Iterator<Extension> it = Stream.concat(p.getExtensionsByUrl(RACE_EXTENSION_OMB).stream(), p.getExtensionsByUrl(RACE_EXTENSION_DETAILED).stream()).iterator(); it.hasNext(); ) {
 				Extension ext = it.next();
 				Coding coding = MappingHelper.extensionGetCoding(ext);
-				raceNumber++;
-				switch (raceNumber) {
-					case 1: {
-						pm.setRace(coding.getCode());
-						break;
-					}
-					case 2: {
-						pm.setRace2(coding.getCode());
-						break;
-					}
-					case 3: {
-						pm.setRace3(coding.getCode());
-						break;
-					}
-					case 4:{
-						pm.setRace4(coding.getCode());
-						break;
-					}
-					case 5:{
-						pm.setRace5(coding.getCode());
-						break;
-					}
-					case 6:{
-						pm.setRace6(coding.getCode());
-						break;
-					}
-				}
+				pm.addRace(coding.getCode());
 			}
 		}
 		Extension ethnicityExtension = p.getExtensionByUrl(ETHNICITY_EXTENSION);
@@ -283,14 +256,17 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 		 */
 		Extension raceExtension = p.addExtension();
 		raceExtension.setUrl(RACE_EXTENSION);
-		CodeableConcept race = new CodeableConcept();
-		raceExtension.setValue(race);
-		addRace(race,pm.getRace());
-		addRace(race,pm.getRace2());
-		addRace(race,pm.getRace3());
-		addRace(race,pm.getRace4());
-		addRace(race,pm.getRace5());
-		addRace(race,pm.getRace6());
+		CodeableConcept races = new CodeableConcept();
+		raceExtension.setValue(races);
+		for (String value : pm.getRaces()) {
+			if (StringUtils.isNotBlank(value)) {
+				Coding coding = races.addCoding().setCode(value).setSystem(RACE_SYSTEM);
+				Code code = CodeMapManager.getCodeMap().getCodeForCodeset(CodesetType.PATIENT_RACE, value);
+				if (code != null) {
+					coding.setDisplay(code.getLabel());
+				}
+			}
+		}
 
 		/**
 		 * Ethnicity
@@ -378,17 +354,5 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 		return p;
 	}
 
-
-	private Coding addRace(CodeableConcept race,String value) {
-		Coding coding = null;
-		if (StringUtils.isNotBlank(value)) {
-			coding = race.addCoding().setCode(value).setSystem(RACE_SYSTEM);
-			Code code = CodeMapManager.getCodeMap().getCodeForCodeset(CodesetType.PATIENT_RACE,value);
-			if (code != null) {
-				coding.setDisplay(code.getLabel());
-			}
-		}
-		return coding;
-	}
 
 }

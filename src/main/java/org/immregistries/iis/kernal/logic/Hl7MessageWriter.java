@@ -179,7 +179,7 @@ public abstract class Hl7MessageWriter //extends IncomingMessageHandler
 			// PID-10
 			sb.append("|");
 			{
-				String race = patientReported.getRace();
+				String race = patientReported.getFirstRace();
 				// if processing flavor is PUNKIN then the race should be reported, and if it is null then it must be reported as UNK
 				if (processingFlavorSet.contains(ProcessingFlavor.PUNKIN)) {
 					CodeMap codeMap = CodeMapManager.getCodeMap();

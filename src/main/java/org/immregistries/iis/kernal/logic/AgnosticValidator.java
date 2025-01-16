@@ -57,8 +57,8 @@ public class AgnosticValidator {
 
 
 		{
-			String race = patientReported.getRace();
-			if (!race.equals("")) {
+			String race = patientReported.getFirstRace();
+			if (StringUtils.isNotBlank(race)) {
 				Code raceCode = codeMap.getCodeForCodeset(CodesetType.PATIENT_RACE, race);
 				if (raceCode == null || CodeStatusValue.getBy(raceCode.getCodeStatus()) != CodeStatusValue.VALID) {
 					ProcessingException pe = new ProcessingException("Invalid race '" + race + "', message cannot be accepted", "PID", 1, 10);
