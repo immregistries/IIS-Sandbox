@@ -56,7 +56,6 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.Normalizer;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -1058,93 +1057,8 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 
 
 			String nameType = reader.getValueRepeat(5, 7, i);
-			if (processingFlavorSet.contains(ProcessingFlavor.APPLESAUCE)) {
-				if (patientNameFirst.toUpperCase().contains("BABY BOY") || patientNameFirst.toUpperCase().contains("BABY GIRL") ||
-					patientNameFirst.toUpperCase().contains("BABY")) {
-					nameType = "NB";
-				} else if (patientNameFirst.toUpperCase().contains("TEST")) {
-					nameType = "TEST";
-				}
-			}
-
-			if (processingFlavorSet.contains(ProcessingFlavor.MANDATORYLEGALNAME)) {
-				patientNameLast = patientNameLast.toUpperCase();
-				patientNameFirst = patientNameFirst.toUpperCase();
-				patientNameMiddle = patientNameMiddle.toUpperCase();
-			}
-
-			if (processingFlavorSet.contains(ProcessingFlavor.ASCIICONVERT)) {
-				patientNameLast = Normalizer.normalize(patientNameLast, Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "");
-				patientNameFirst = Normalizer.normalize(patientNameFirst, Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "");
-				patientNameMiddle = Normalizer.normalize(patientNameMiddle, Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "");
-			}
-
-			if (processingFlavorSet.contains(ProcessingFlavor.NONASCIIREJECT)) {
-				if (!Normalizer.normalize(patientNameLast, Normalizer.Form.NFD).contains("[^\\p{ASCII}]") ||
-					!Normalizer.normalize(patientNameFirst, Normalizer.Form.NFD).contains("[^\\p{ASCII}]") ||
-					!Normalizer.normalize(patientNameMiddle, Normalizer.Form.NFD).contains("[^\\p{ASCII}]")) {
-					throw new ProcessingException("Illegal characters found in name", "PID", 1, 5);
-				}
-			}
-
-			if (processingFlavorSet.contains(ProcessingFlavor.REMOVEHYPHENSPACES)) {
-				patientNameLast = patientNameLast.replace(" ", "").replace("-", "");
-				patientNameFirst = patientNameFirst.replace(" ", "").replace("-", "");
-				patientNameMiddle = patientNameMiddle.replace(" ", "").replace("-", "");
-			}
-
-			if (processingFlavorSet.contains(ProcessingFlavor.LIMITSIZENAME)) {
-				patientNameLast = patientNameLast.substring(0, NAME_SIZE_LIMIT);
-				patientNameFirst = patientNameFirst.substring(0, NAME_SIZE_LIMIT);
-				patientNameMiddle = patientNameMiddle.substring(0, NAME_SIZE_LIMIT);
-			}
-
-			if (processingFlavorSet.contains(ProcessingFlavor.NOSINGLECHARNAME)) {
-				if (patientNameLast.replace(".", "").length() == 1 ||
-					patientNameFirst.replace(".", "").length() == 1) {
-					throw new ProcessingException("Single character names not accepted", "PID", 1, 5);
-				}
-
-			}
-
-			if (processingFlavorSet.contains(ProcessingFlavor.MIDDLENAMECONCAT)) {
-				patientNameFirst += " " + patientNameMiddle;
-				patientNameMiddle = "";
-			}
 			PatientName patientName = new PatientName(patientNameLast, patientNameFirst, patientNameMiddle, nameType);
-
-
 			names.add(patientName);
-			if ("L".equals(nameType)) {
-				legalName = patientName;
-			}
-			if (processingFlavorSet.contains(ProcessingFlavor.IGNORENAMETYPE)) {
-				nameType = "";
-				patientName.setNameType("");
-				i = reader.getRepeatCount(5) + 1;
-			}
-		}
-
-		if (legalName == null && processingFlavorSet.contains(ProcessingFlavor.MANDATORYLEGALNAME)) {
-			throw new ProcessingException("Patient legal name not found", "PID", 1, 5);
-		}
-		if (legalName != null && processingFlavorSet.contains(ProcessingFlavor.REJECTLONGNAME) && legalName.getNameLast().length() > NAME_SIZE_LIMIT) {
-			if (legalName.getNameLast().length() > NAME_SIZE_LIMIT ||
-				legalName.getNameFirst().length() > NAME_SIZE_LIMIT ||
-				legalName.getNameMiddle().length() > NAME_SIZE_LIMIT) {
-				throw new ProcessingException("Patient name is too long", "PID", 1, 5);
-
-			}
-		}
-		if (legalName != null && legalName.getNameLast().equals("")) {
-			throw new ProcessingException("Patient last name was not found, required for accepting patient and vaccination history", "PID", 1, 5);
-		}
-		if (legalName != null && legalName.getNameFirst().equals("")) {
-			throw new ProcessingException("Patient first name was not found, required for accepting patient and vaccination history", "PID", 1, 5);
-		}
-
-		if (ProcessingFlavor.MOONFRUIT.isActive() && StringUtils.defaultString(legalName.getNameFirst()).startsWith("S") || StringUtils.defaultString(legalName.getNameFirst()).startsWith("A")) {
-			throw new ProcessingException("Immunization History cannot be stored because of patient's consent status", "PID", 0, 0, IisReportableSeverity.WARN);
 		}
 
 		String patientPhone = reader.getValue(13, 6) + reader.getValue(13, 7);

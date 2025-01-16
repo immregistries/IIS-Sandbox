@@ -25,6 +25,7 @@ public class PatientMaster implements Serializable {
 	private String motherMaidenName = "";
 	private Date birthDate = null;
 	private String sex = "";
+	//	private List<String> races = new ArrayList<>(1);
 	private String race = "";
 	private String race2 = "";
 	private String race3 = "";
