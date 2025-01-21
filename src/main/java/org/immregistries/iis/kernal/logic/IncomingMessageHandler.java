@@ -1121,6 +1121,15 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 			}
 			addressFrag = zip + ":" + addressFragPrep;
 		}
+		PatientAddress patientAddress = new PatientAddress();
+		patientAddress.setAddressLine1(reader.getValue(11, 1));
+		patientAddress.setAddressLine2(reader.getValue(11, 2));
+		patientAddress.setAddressCity(reader.getValue(11, 3));
+		patientAddress.setAddressState(reader.getValue(11, 4));
+		patientAddress.setAddressZip(reader.getValue(11, 5));
+		patientAddress.setAddressCountry(reader.getValue(11, 6));
+		patientAddress.setAddressCountyParish(reader.getValue(11, 9));
+
 		Date patientBirthDate;
 		patientBirthDate = parseDateError(reader.getValue(7), "Bad format for date of birth", "PID", 1, 7, strictDate);
 		if (patientBirthDate.after(new Date())) {
@@ -1136,13 +1145,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 		for (int i = 1; i <= reader.getRepeatCount(10); i++) {
 			patientReported.addRace(reader.getValueRepeat(10, 1, i));
 		}
-		patientReported.setAddressLine1(reader.getValue(11, 1));
-		patientReported.setAddressLine2(reader.getValue(11, 2));
-		patientReported.setAddressCity(reader.getValue(11, 3));
-		patientReported.setAddressState(reader.getValue(11, 4));
-		patientReported.setAddressZip(reader.getValue(11, 5));
-		patientReported.setAddressCountry(reader.getValue(11, 6));
-		patientReported.setAddressCountyParish(reader.getValue(11, 9));
+		patientReported.addAddress(patientAddress);
 		patientReported.setEthnicity(reader.getValue(22));
 		patientReported.setBirthFlag(reader.getValue(24));
 		patientReported.setBirthOrder(reader.getValue(25));

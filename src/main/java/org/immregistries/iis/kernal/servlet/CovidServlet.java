@@ -296,17 +296,17 @@ public class CovidServlet extends HttpServlet {
 		// 9:  Recipient sex
 		printField(patientReported.getSex(), out);
 		// 10:  Recipient address: street
-		printField(patientReported.getAddressLine1(), includePhi, out);
+        printField(patientReported.getFirstAddress().getAddressLine1(), includePhi, out);
 		// 11: Recipient address: street 2
-		printField(patientReported.getAddressLine2(), includePhi, out);
+        printField(patientReported.getFirstAddress().getAddressLine2(), includePhi, out);
 		// 12:  Recipient address: city
-		printField(patientReported.getAddressCity(), includePhi, out);
+        printField(patientReported.getFirstAddress().getAddressCity(), includePhi, out);
 		// 13:  Recipient address:  county
-		printField(patientReported.getAddressCountyParish(), out);
+        printField(patientReported.getFirstAddress().getAddressCountyParish(), out);
 		// 14:  Recipient address: state
-		printField(patientReported.getAddressState(), out);
+        printField(patientReported.getFirstAddress().getAddressState(), out);
 		// 15:  Recipient address: zip code
-		printField(patientReported.getAddressZip(), out);
+        printField(patientReported.getFirstAddress().getAddressZip(), out);
 		// 16:  Recipient race 1
 		if (patient.getRaces().isEmpty() || StringUtils.isEmpty(patientReported.getRaces().get(0))) {
 			printField("UNK", out);

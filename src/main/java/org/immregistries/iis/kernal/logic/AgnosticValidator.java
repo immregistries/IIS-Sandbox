@@ -32,7 +32,7 @@ public class AgnosticValidator {
 			}
 		}
 
-		String patientAddressCountry = patientReported.getAddressCountry();
+		String patientAddressCountry = patientReported.getFirstAddress().getAddressCountry();
 		if (!patientAddressCountry.equals("")) {
 			if (!ValidValues.verifyValidValue(patientAddressCountry, ValidValues.COUNTRY_2DIGIT) && !ValidValues.verifyValidValue(patientAddressCountry, ValidValues.COUNTRY_3DIGIT)) {
 				ProcessingException pe = new ProcessingException("Patient address country '" + patientAddressCountry + "' is not recognized and cannot be accepted", "PID", 1, 11);
@@ -43,7 +43,7 @@ public class AgnosticValidator {
 			}
 		}
 		if (patientAddressCountry.equals("") || patientAddressCountry.equals("US") || patientAddressCountry.equals("USA")) {
-			String patientAddressState = patientReported.getAddressState();
+			String patientAddressState = patientReported.getFirstAddress().getAddressState();
 			if (!patientAddressState.equals("")) {
 				if (!ValidValues.verifyValidValue(patientAddressState, ValidValues.STATE)) {
 					ProcessingException pe = new ProcessingException("Patient address state '" + patientAddressState + "' is not recognized and cannot be accepted", "PID", 1, 11);
@@ -85,7 +85,7 @@ public class AgnosticValidator {
 		}
 
 		if (processingFlavorSet.contains(ProcessingFlavor.BLACKBERRY)) {
-			if (patientReported.getAddressLine1().equals("") || patientReported.getAddressCity().equals("") || patientReported.getAddressState().equals("") || patientReported.getAddressZip().equals("")) {
+			if (patientReported.getFirstAddress().getAddressLine1().equals("") || patientReported.getFirstAddress().getAddressCity().equals("") || patientReported.getFirstAddress().getAddressState().equals("") || patientReported.getFirstAddress().getAddressZip().equals("")) {
 				throw new ProcessingException("Patient address is required but it was not sent", "PID", 1, 11);
 			}
 		}

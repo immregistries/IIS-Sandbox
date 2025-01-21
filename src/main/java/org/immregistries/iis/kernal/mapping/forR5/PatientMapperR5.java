@@ -99,7 +99,7 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 		for (ContactPoint telecom : p.getTelecom()) {
 			if (null != telecom.getSystem()) {
 				if (telecom.getSystem().equals(ContactPointSystem.PHONE)) {
-					pm.addPhone(new PatientPhone(telecom));
+					pm.addPhone(PatientPhone.fromR5(telecom));
 				} else if (telecom.getSystem().equals(ContactPointSystem.EMAIL)) {
 					pm.setEmail(telecom.getValue());
 				}
@@ -119,19 +119,8 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 			}
 		}
 		// Address
-		if (p.hasAddress()) {
-			Address address = p.getAddressFirstRep();
-			if (address.getLine().size() > 0) {
-				pm.setAddressLine1(address.getLine().get(0).getValueNotNull());
-			}
-			if (address.getLine().size() > 1) {
-				pm.setAddressLine2(address.getLine().get(1).getValueNotNull());
-			}
-			pm.setAddressCity(address.getCity());
-			pm.setAddressState(address.getState());
-			pm.setAddressZip(address.getPostalCode());
-			pm.setAddressCountry(address.getCountry());
-			pm.setAddressCountyParish(address.getDistrict());
+		for (org.hl7.fhir.r5.model.Address address : p.getAddress()) {
+			pm.addAddress(PatientAddress.fromR5(address));
 		}
 
 		if (null != p.getMultipleBirth()) {
@@ -294,13 +283,9 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 			p.setDeceased(new BooleanType(false));
 		}
 
-		p.addAddress().addLine(pm.getAddressLine1())
-			.addLine(pm.getAddressLine2())
-			.setCity(pm.getAddressCity())
-			.setCountry(pm.getAddressCountry())
-			.setState(pm.getAddressState())
-			.setDistrict(pm.getAddressCountyParish())
-			.setPostalCode(pm.getAddressZip());
+		for (PatientAddress patientAddress : pm.getAddresses()) {
+			p.addAddress(patientAddress.toR5());
+		}
 
 		if (StringUtils.isNotBlank(pm.getBirthOrder())) {
 			p.setMultipleBirth(new IntegerType().setValue(Integer.parseInt(pm.getBirthOrder())));

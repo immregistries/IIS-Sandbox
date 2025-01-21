@@ -209,7 +209,7 @@ public abstract class Hl7MessageWriter //extends IncomingMessageHandler
 				}
 			}
 			// PID-11
-			sb.append("|").append(patientReported.getAddressLine1()).append("^").append(patientReported.getAddressLine2()).append("^").append(patientReported.getAddressCity()).append("^").append(patientReported.getAddressState()).append("^").append(patientReported.getAddressZip()).append("^").append(patientReported.getAddressCountry()).append("^");
+			sb.append("|").append(patientReported.getFirstAddress().getAddressLine1()).append("^").append(patientReported.getFirstAddress().getAddressLine2()).append("^").append(patientReported.getFirstAddress().getAddressCity()).append("^").append(patientReported.getFirstAddress().getAddressState()).append("^").append(patientReported.getFirstAddress().getAddressZip()).append("^").append(patientReported.getFirstAddress().getAddressCountry()).append("^");
 			if (!processingFlavorSet.contains(ProcessingFlavor.LIME)) {
 				sb.append("P");
 			}

@@ -244,20 +244,20 @@ public class V2ToFhirServlet extends HttpServlet {
 			}
 		}
 		// TODO Race - not supported by base specification, probably have to use extensions
-		if (StringUtils.isNotEmpty(pr.getAddressLine1())
-			|| StringUtils.isNotEmpty(pr.getAddressZip())) {
+		if (StringUtils.isNotEmpty(pr.getFirstAddress().getAddressLine1())
+				|| StringUtils.isNotEmpty(pr.getFirstAddress().getAddressZip())) {
 			Address address = p.addAddress();
-			if (StringUtils.isNotEmpty(pr.getAddressLine1())) {
-				address.addLine(pr.getAddressLine1());
+			if (StringUtils.isNotEmpty(pr.getFirstAddress().getAddressLine1())) {
+				address.addLine(pr.getFirstAddress().getAddressLine1());
 			}
-			if (StringUtils.isNotEmpty(pr.getAddressLine2())) {
-				address.addLine(pr.getAddressLine2());
+			if (StringUtils.isNotEmpty(pr.getFirstAddress().getAddressLine2())) {
+				address.addLine(pr.getFirstAddress().getAddressLine2());
 			}
-			address.setCity(pr.getAddressCity());
-			address.setState(pr.getAddressState());
-			address.setPostalCode(pr.getAddressZip());
-			address.setCountry(pr.getAddressCountry());
-			address.setDistrict(pr.getAddressCountyParish());
+			address.setCity(pr.getFirstAddress().getAddressCity());
+			address.setState(pr.getFirstAddress().getAddressState());
+			address.setPostalCode(pr.getFirstAddress().getAddressZip());
+			address.setCountry(pr.getFirstAddress().getAddressCountry());
+			address.setDistrict(pr.getFirstAddress().getAddressCountyParish());
 		}
 		{
 			ContactPoint contactPoint = p.addTelecom();

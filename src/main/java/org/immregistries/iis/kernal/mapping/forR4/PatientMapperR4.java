@@ -95,7 +95,7 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 		for (ContactPoint telecom : p.getTelecom()) {
 			if (null != telecom.getSystem()) {
 				if (telecom.getSystem().equals(ContactPoint.ContactPointSystem.PHONE)) {
-					pm.addPhone(new PatientPhone(telecom));
+					pm.addPhone(PatientPhone.fromR4(telecom));
 				} else if (telecom.getSystem().equals(ContactPoint.ContactPointSystem.EMAIL)) {
 					pm.setEmail(telecom.getValue());
 				}
@@ -115,18 +115,9 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 			}
 		}
 		// Address
-		Address address = p.getAddressFirstRep();
-		if (address.getLine().size() > 0) {
-			pm.setAddressLine1(address.getLine().get(0).getValueNotNull());
+		for (Address address : p.getAddress()) {
+			pm.addAddress(PatientAddress.fromR4(address));
 		}
-		if (address.getLine().size() > 1) {
-			pm.setAddressLine2(address.getLine().get(1).getValueNotNull());
-		}
-		pm.setAddressCity(address.getCity());
-		pm.setAddressState(address.getState());
-		pm.setAddressZip(address.getPostalCode());
-		pm.setAddressCountry(address.getCountry());
-		pm.setAddressCountyParish(address.getDistrict());
 
 		if (null != p.getMultipleBirth()) {
 			if (p.getMultipleBirth().isBooleanPrimitive()) {
@@ -268,13 +259,9 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 			p.setDeceased(new BooleanType(false));
 		}
 
-		p.addAddress().addLine(pm.getAddressLine1())
-			.addLine(pm.getAddressLine2())
-			.setCity(pm.getAddressCity())
-			.setCountry(pm.getAddressCountry())
-			.setState(pm.getAddressState())
-			.setDistrict(pm.getAddressCountyParish())
-			.setPostalCode(pm.getAddressZip());
+		for (PatientAddress patientAddress : pm.getAddresses()) {
+			p.addAddress(patientAddress.toR4());
+		}
 
 		if (StringUtils.isNotBlank(pm.getBirthOrder())) {
 			p.setMultipleBirth(new IntegerType().setValue(Integer.parseInt(pm.getBirthOrder())));

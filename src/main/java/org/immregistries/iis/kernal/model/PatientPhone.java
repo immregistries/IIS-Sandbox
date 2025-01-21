@@ -4,15 +4,12 @@ public class PatientPhone {
 	private String number = "";
 	private String use = "";
 
-	public PatientPhone(org.hl7.fhir.r4.model.ContactPoint contactPoint) {
-//		if (!contactPoint.getSystem().equals(org.hl7.fhir.r4.model.ContactPoint.ContactPointSystem.PHONE)) {
-//
-//		}
+	private PatientPhone(org.hl7.fhir.r4.model.ContactPoint contactPoint) {
 		number = contactPoint.getValue();
 		use = contactPoint.getUse().toCode();
 	}
 
-	public PatientPhone(org.hl7.fhir.r5.model.ContactPoint contactPoint) {
+	private PatientPhone(org.hl7.fhir.r5.model.ContactPoint contactPoint) {
 		number = contactPoint.getValue();
 		use = contactPoint.getUse().toCode();
 	}
@@ -52,5 +49,31 @@ public class PatientPhone {
 			.setValue(number)
 			.setUse(org.hl7.fhir.r5.model.ContactPoint.ContactPointUse.fromCode(use));
 		return contactPoint;
+	}
+
+	public static PatientPhone fromR4(org.hl7.fhir.r4.model.ContactPoint contactPoint) {
+		if (!contactPoint.getSystem().equals(org.hl7.fhir.r4.model.ContactPoint.ContactPointSystem.PHONE)) {
+			return null;
+		} else {
+			return new PatientPhone(contactPoint);
+		}
+	}
+
+	public static PatientPhone fromR5(org.hl7.fhir.r5.model.ContactPoint contactPoint) {
+		if (!contactPoint.getSystem().equals(org.hl7.fhir.r5.model.ContactPoint.ContactPointSystem.PHONE)) {
+			return null;
+		} else {
+			return new PatientPhone(contactPoint);
+		}
+	}
+
+	public static PatientPhone fromFhir(org.hl7.fhir.instance.model.api.ICompositeType contactPoint) {
+		if (contactPoint instanceof org.hl7.fhir.r5.model.ContactPoint) {
+			return fromR5((org.hl7.fhir.r5.model.ContactPoint) contactPoint);
+		} else if (contactPoint instanceof org.hl7.fhir.r4.model.ContactPoint) {
+			return fromR4((org.hl7.fhir.r4.model.ContactPoint) contactPoint);
+		} else {
+			return null;
+		}
 	}
 }

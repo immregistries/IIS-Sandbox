@@ -26,13 +26,7 @@ public class PatientMaster implements Serializable {
 	private Date birthDate = null;
 	private String sex = "";
 	private List<String> races = new ArrayList<>(1);
-	private String addressLine1 = "";
-	private String addressLine2 = "";
-	private String addressCity = "";
-	private String addressState = "";
-	private String addressZip = "";
-	private String addressCountry = "";
-	private String addressCountyParish = "";
+	private List<PatientAddress> addresses = new ArrayList<>(1);
 	private List<PatientPhone> phones = null;
 	private String email = "";
 	private String ethnicity = "";
@@ -100,62 +94,6 @@ public class PatientMaster implements Serializable {
 
 	public void setSex(String sex) {
 		this.sex = sex;
-	}
-
-	public String getAddressLine1() {
-		return addressLine1;
-	}
-
-	public void setAddressLine1(String addressLine1) {
-		this.addressLine1 = addressLine1;
-	}
-
-	public String getAddressLine2() {
-		return addressLine2;
-	}
-
-	public void setAddressLine2(String addressLine2) {
-		this.addressLine2 = addressLine2;
-	}
-
-	public String getAddressCity() {
-		return addressCity;
-	}
-
-	public void setAddressCity(String addressCity) {
-		this.addressCity = addressCity;
-	}
-
-	public String getAddressState() {
-		return addressState;
-	}
-
-	public void setAddressState(String addressState) {
-		this.addressState = addressState;
-	}
-
-	public String getAddressZip() {
-		return addressZip;
-	}
-
-	public void setAddressZip(String addressZip) {
-		this.addressZip = addressZip;
-	}
-
-	public String getAddressCountry() {
-		return addressCountry;
-	}
-
-	public void setAddressCountry(String addressCountry) {
-		this.addressCountry = addressCountry;
-	}
-
-	public String getAddressCountyParish() {
-		return addressCountyParish;
-	}
-
-	public void setAddressCountyParish(String addressCountyParish) {
-		this.addressCountyParish = addressCountyParish;
 	}
 
 	public String getEmail() {
@@ -378,7 +316,6 @@ public class PatientMaster implements Serializable {
 		return this.races.get(0);
 	}
 
-
 	public List<PatientPhone> getPhones() {
 		return phones;
 	}
@@ -399,5 +336,27 @@ public class PatientMaster implements Serializable {
 			return null;
 		}
 		return this.phones.get(0);
+	}
+
+	public List<PatientAddress> getAddresses() {
+		return addresses;
+	}
+
+	public void setAddresses(List<PatientAddress> addresses) {
+		this.addresses = addresses;
+	}
+
+	public void addAddress(PatientAddress phone) {
+		if (this.addresses == null) {
+			this.addresses = new ArrayList<>(1);
+		}
+		this.addresses.add(phone);
+	}
+
+	public PatientAddress getFirstAddress() {
+		if (addresses.isEmpty()) {
+			return null;
+		}
+		return this.addresses.get(0);
 	}
 }
