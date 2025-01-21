@@ -3,10 +3,10 @@ package org.immregistries.iis.kernal.model;
 public class PatientIdentifier {
 	public final String MRN_TYPE_SYSTEM = "http://terminology.hl7.org/CodeSystem/v2-0203";
 	public static final String MRN_TYPE_VALUE = "MR";
-	private String system;
-	private String value;
-	private String type;
-	private String assignerReference;
+	private String system = "";
+	private String value = "";
+	private String type = "";
+	private String assignerReference = "";
 
 	public PatientIdentifier() {
 	}

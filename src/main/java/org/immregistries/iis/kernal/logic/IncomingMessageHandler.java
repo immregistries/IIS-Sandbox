@@ -1143,7 +1143,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 			PatientIdentifier patientIdentifier = new PatientIdentifier();
 			patientIdentifier.setValue(reader.getValueRepeat(3, 1, i));
 			patientIdentifier.setSystem(reader.getValueRepeat(3, 4, i));
-			patientIdentifier.setSystem(reader.getValueRepeat(3, 5, i));
+			patientIdentifier.setType(reader.getValueRepeat(3, 5, i));
 			patientReported.addPatientIdentifier(patientIdentifier);
 		}
 

@@ -1,17 +1,27 @@
 package org.immregistries.iis.kernal.model;
 
 public class PatientPhone {
+	public static final String PHONE_USE_V2_SYSTEM = "http://terminology.hl7.org/ValueSet/v2-0201";
+	public static final String USE_EXTENSION_URL = "use";
 	private String number = "";
 	private String use = "";
 
 	private PatientPhone(org.hl7.fhir.r4.model.ContactPoint contactPoint) {
 		number = contactPoint.getValue();
-		use = contactPoint.getUse().toCode();
+		if (contactPoint.hasExtension(USE_EXTENSION_URL)) {
+			use = ((org.hl7.fhir.r4.model.Coding) contactPoint.getExtensionByUrl(USE_EXTENSION_URL).getValue()).getCode();
+		} else if (contactPoint.getUse() != null) {
+			use = contactPoint.getUse().toCode();
+		}
 	}
 
 	private PatientPhone(org.hl7.fhir.r5.model.ContactPoint contactPoint) {
 		number = contactPoint.getValue();
-		use = contactPoint.getUse().toCode();
+		if (contactPoint.hasExtension(USE_EXTENSION_URL)) {
+			use = ((org.hl7.fhir.r5.model.Coding) contactPoint.getExtensionByUrl(USE_EXTENSION_URL).getValue()).getCode();
+		} else if (contactPoint.getUse() != null) {
+			use = contactPoint.getUse().toCode();
+		}
 	}
 
 	public PatientPhone() {
@@ -38,16 +48,66 @@ public class PatientPhone {
 	public org.hl7.fhir.r4.model.ContactPoint toR4() {
 		org.hl7.fhir.r4.model.ContactPoint contactPoint = new org.hl7.fhir.r4.model.ContactPoint();
 		contactPoint.setSystem(org.hl7.fhir.r4.model.ContactPoint.ContactPointSystem.PHONE)
-			.setValue(number)
-			.setUse(org.hl7.fhir.r4.model.ContactPoint.ContactPointUse.fromCode(use));
+			.setValue(number);
+		if (use != null) {
+			switch (use) {
+				case "": {
+					break;
+				}
+				case "PRN":
+				case "ORN":
+				case "VHN": {
+					contactPoint.setUse(org.hl7.fhir.r4.model.ContactPoint.ContactPointUse.HOME);
+					break;
+				}
+				case "WPN": {
+					contactPoint.setUse(org.hl7.fhir.r4.model.ContactPoint.ContactPointUse.WORK);
+					break;
+				}
+				case "PRS": {
+					contactPoint.setUse(org.hl7.fhir.r4.model.ContactPoint.ContactPointUse.MOBILE);
+					break;
+				}
+				default: {
+					contactPoint.setUse(org.hl7.fhir.r4.model.ContactPoint.ContactPointUse.fromCode(use));
+					break;
+				}
+			}
+			contactPoint.addExtension(USE_EXTENSION_URL, new org.hl7.fhir.r4.model.Coding().setSystem(PHONE_USE_V2_SYSTEM).setCode(use));
+		}
 		return contactPoint;
 	}
 
 	public org.hl7.fhir.r5.model.ContactPoint toR5() {
 		org.hl7.fhir.r5.model.ContactPoint contactPoint = new org.hl7.fhir.r5.model.ContactPoint();
 		contactPoint.setSystem(org.hl7.fhir.r5.model.ContactPoint.ContactPointSystem.PHONE)
-			.setValue(number)
-			.setUse(org.hl7.fhir.r5.model.ContactPoint.ContactPointUse.fromCode(use));
+			.setValue(number);
+		if (use != null) {
+			switch (use) {
+				case "": {
+					break;
+				}
+				case "PRN":
+				case "ORN":
+				case "VHN": {
+					contactPoint.setUse(org.hl7.fhir.r5.model.ContactPoint.ContactPointUse.HOME);
+					break;
+				}
+				case "WPN": {
+					contactPoint.setUse(org.hl7.fhir.r5.model.ContactPoint.ContactPointUse.WORK);
+					break;
+				}
+				case "PRS": {
+					contactPoint.setUse(org.hl7.fhir.r5.model.ContactPoint.ContactPointUse.MOBILE);
+					break;
+				}
+				default: {
+					contactPoint.setUse(org.hl7.fhir.r5.model.ContactPoint.ContactPointUse.fromCode(use));
+					break;
+				}
+			}
+			contactPoint.addExtension(USE_EXTENSION_URL, new org.hl7.fhir.r5.model.Coding().setSystem(PHONE_USE_V2_SYSTEM).setCode(use));
+		}
 		return contactPoint;
 	}
 

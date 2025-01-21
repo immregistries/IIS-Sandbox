@@ -335,7 +335,7 @@ public class PatientMaster implements Serializable {
 
 	public void addPatientIdentifier(PatientIdentifier patientIdentifier) {
 		if (this.patientIdentifiers == null) {
-			this.patientIdentifiers = new ArrayList<>(1);
+			this.patientIdentifiers = new ArrayList<>(3);
 		}
 		this.patientIdentifiers.add(patientIdentifier);
 	}
@@ -350,7 +350,7 @@ public class PatientMaster implements Serializable {
 	public PatientIdentifier getMainPatientIdentifier() {
 		PatientIdentifier identifier = null;
 		if (patientIdentifiers.isEmpty()) {
-			return null;
+			return new PatientIdentifier();
 		}
 		identifier = this.patientIdentifiers.stream()
 				.filter(patientIdentifier -> PatientIdentifier.MRN_TYPE_VALUE.equals(patientIdentifier.getType()))
@@ -367,6 +367,9 @@ public class PatientMaster implements Serializable {
 					.filter(patientIdentifier -> "PI".equals(patientIdentifier.getType()))
 					.findFirst()
 					.orElse(null);
+		}
+		if (identifier == null) {
+			identifier = new PatientIdentifier();
 		}
 		return identifier;
 	}
