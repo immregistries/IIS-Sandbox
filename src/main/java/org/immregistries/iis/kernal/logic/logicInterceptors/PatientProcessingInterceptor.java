@@ -43,7 +43,7 @@ public class PatientProcessingInterceptor {
 			PatientReported patientReported = processPatient(patientMapper.getReported(requestDetails.getResource()), processingFlavorSet, iisReportableList);
 			result = (IBaseResource) patientMapper.getFhirResource(patientReported);
 		} else if (requestDetails.getResource() instanceof org.hl7.fhir.r5.model.Patient) {
-			PatientReported patientReported = processPatient(patientMapper.getReported((org.hl7.fhir.r5.model.Patient) requestDetails.getResource()), processingFlavorSet, iisReportableList);
+			PatientReported patientReported = processPatient(patientMapper.getReported(requestDetails.getResource()), processingFlavorSet, iisReportableList);
 			result = (IBaseResource) patientMapper.getFhirResource(patientReported);
 //			org.hl7.fhir.r5.model.Patient patient = (org.hl7.fhir.r5.model.Patient) requestDetails.getResource();
 //			List<org.hl7.fhir.r5.model.HumanName> humanNameList = new ArrayList<>(patient.getName().size());
