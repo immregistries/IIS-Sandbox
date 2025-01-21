@@ -9,6 +9,7 @@ import org.immregistries.iis.kernal.logic.ProcessingException;
 import org.immregistries.iis.kernal.logic.ack.IisReportable;
 import org.immregistries.iis.kernal.logic.ack.IisReportableSeverity;
 import org.immregistries.iis.kernal.model.PatientName;
+import org.immregistries.iis.kernal.model.PatientReported;
 import org.immregistries.iis.kernal.model.ProcessingFlavor;
 import org.springframework.stereotype.Service;
 
@@ -162,6 +163,47 @@ public class PatientProcessingInterceptor {
 
 		if (legalName != null && ProcessingFlavor.MOONFRUIT.isActive() && nameFirst.startsWith("S") || nameFirst.startsWith("A")) {
 			throw new ProcessingException("Immunization History cannot be stored because of patient's consent status", "PID", 0, 0, IisReportableSeverity.WARN);
+		}
+	}
+
+	private void checkPhone(PatientReported patientReported, Set<ProcessingFlavor> processingFlavorSet, List<IisReportable> iisReportableList) {
+		String patientPhone = patientReported.getPhone();
+		String telUseCode = patientReported.getPhoneUse();
+		if (StringUtils.isNotBlank(patientPhone)) {
+			if ("PRN".equals(telUseCode)) {
+				ProcessingException pe = new ProcessingException("Patient phone telecommunication type must be PRN ", "PID", 1, 13);
+				if (!processingFlavorSet.contains(ProcessingFlavor.QUINZE)) {
+					pe.setErrorCode(IisReportableSeverity.WARN);
+				}
+				iisReportableList.add(IisReportable.fromProcessingException(pe));
+			}
+
+			{
+				int countNums = 0;
+				boolean invalidCharFound = false;
+				char invalidChar = ' ';
+				for (char c : patientPhone.toCharArray()) {
+
+					if (c >= '0' && c <= '9') {
+						countNums++;
+					} else if (c != '-' && c != '.' && c != ' ' && c != '(' && c != ')') {
+						if (!invalidCharFound) {
+							invalidCharFound = true;
+							invalidChar = c;
+						}
+					}
+				}
+				if (invalidCharFound) {
+					ProcessingException pe = new ProcessingException("Patient phone number has unexpected character: " + invalidChar, "PID", 1, 13);
+					pe.setErrorCode(IisReportableSeverity.WARN);
+					iisReportableList.add(IisReportable.fromProcessingException(pe));
+				}
+				if (countNums != 10 || patientPhone.startsWith("555") || patientPhone.startsWith("0") || patientPhone.startsWith("1")) {
+					ProcessingException pe = new ProcessingException("Patient phone number does not appear to be valid", "PID", 1, 13);
+					pe.setErrorCode(IisReportableSeverity.WARN);
+					iisReportableList.add(IisReportable.fromProcessingException(pe));
+				}
+			}
 		}
 	}
 

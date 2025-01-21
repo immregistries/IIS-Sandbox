@@ -940,20 +940,21 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 			String identifierCode = reader.getValue(3);
 			String valueCode = reader.getValue(5);
 			ObservationReported observationReported = readObservations(reader, iisReportableList, patientReported, strictDate, obxCount, vaccinationReported, vaccination, identifierCode, valueCode);
+			// Commented contraindication Now checked in Observation Interceptor
 			if (observationReported.getIdentifierCode().equals("30945-0")) // contraindication!
 			{
 				CodeMap codeMap = CodeMapManager.getCodeMap();
-				Code contraCode = codeMap.getCodeForCodeset(CodesetType.CONTRAINDICATION_OR_PRECAUTION, observationReported.getValueCode());
-				if (contraCode == null) {
-					ProcessingException pe = new ProcessingException("Unrecognized contraindication or precaution", "OBX", obxCount, 5, IisReportableSeverity.WARN);
-					iisReportableList.add(IisReportable.fromProcessingException(pe));
-				}
+//				Code contraCode = codeMap.getCodeForCodeset(CodesetType.CONTRAINDICATION_OR_PRECAUTION, observationReported.getValueCode());
+//				if (contraCode == null) {
+//					ProcessingException pe = new ProcessingException("Unrecognized contraindication or precaution", "OBX", obxCount, 5, IisReportableSeverity.WARN);
+//					iisReportableList.add(IisReportable.fromProcessingException(pe));
+//				}
 				if (observationReported.getObservationDate() != null) {
-					Date today = new Date();
-					if (observationReported.getObservationDate().after(today)) {
-						ProcessingException pe = new ProcessingException("Contraindication or precaution observed in the future", "OBX", obxCount, 5, IisReportableSeverity.WARN);
-						iisReportableList.add(IisReportable.fromProcessingException(pe));
-					}
+//					Date today = new Date();
+//					if (observationReported.getObservationDate().after(today)) {
+//						ProcessingException pe = new ProcessingException("Contraindication or precaution observed in the future", "OBX", obxCount, 5, IisReportableSeverity.WARN);
+//						iisReportableList.add(IisReportable.fromProcessingException(pe));
+//					}
 					if (patientReported.getBirthDate() != null && observationReported.getObservationDate().before(patientReported.getBirthDate())) {
 						ProcessingException pe = new ProcessingException("Contraindication or precaution observed before patient was born", "OBX", obxCount, 14, IisReportableSeverity.WARN);
 						iisReportableList.add(IisReportable.fromProcessingException(pe));

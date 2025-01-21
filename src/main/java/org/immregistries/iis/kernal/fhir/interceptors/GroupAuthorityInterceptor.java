@@ -20,7 +20,6 @@ import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Service;
 
 import javax.interceptor.Interceptor;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -60,7 +59,6 @@ public class GroupAuthorityInterceptor {
 	// TODO find right hook
 	public void handleOrganization(RequestDetails requestDetails)
 		throws InvalidRequestException {
-
 		if (requestDetails.getResource() instanceof Organization) {
 			Organization organization = (Organization) requestDetails.getResource();
 			if (requestDetails.getRestOperationType().equals(RestOperationTypeEnum.CREATE) || requestDetails.getRestOperationType().equals(RestOperationTypeEnum.UPDATE)) {

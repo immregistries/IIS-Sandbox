@@ -34,6 +34,7 @@ public class PatientMaster implements Serializable {
 	private String addressCountry = "";
 	private String addressCountyParish = "";
 	private String phone = "";
+	private String phoneUse = "";
 	private String email = "";
 	private String ethnicity = "";
 	private String birthFlag = "";
@@ -384,5 +385,13 @@ public class PatientMaster implements Serializable {
 			return null;
 		}
 		return this.races.get(0);
+	}
+
+	public String getPhoneUse() {
+		return phoneUse;
+	}
+
+	public void setPhoneUse(String phoneUse) {
+		this.phoneUse = phoneUse;
 	}
 }

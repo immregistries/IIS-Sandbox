@@ -99,6 +99,7 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 			if (null != telecom.getSystem()) {
 				if (telecom.getSystem().equals(ContactPoint.ContactPointSystem.PHONE)) {
 					pm.setPhone(telecom.getValue());
+					pm.setPhoneUse(telecom.getUse().toCode());
 				} else if (telecom.getSystem().equals(ContactPoint.ContactPointSystem.EMAIL)) {
 					pm.setEmail(telecom.getValue());
 				}
@@ -256,7 +257,8 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 		// telecom
 		if (null != pm.getPhone()) {
 			p.addTelecom().setSystem(ContactPoint.ContactPointSystem.PHONE)
-				.setValue(pm.getPhone());
+					.setValue(pm.getPhone())
+					.setUse(ContactPoint.ContactPointUse.fromCode(pm.getPhoneUse()));
 		}
 		if (null != pm.getEmail()) {
 			p.addTelecom().setSystem(ContactPoint.ContactPointSystem.EMAIL)
