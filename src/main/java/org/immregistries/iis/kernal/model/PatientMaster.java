@@ -15,12 +15,10 @@ public class PatientMaster implements Serializable {
 
 	private String patientId = "";
 	private Tenant tenant = null;
-	private String externalLink = "";
+	private List<PatientIdentifier> patientIdentifiers = new ArrayList<>(2);
 	private Date reportedDate = null;
 	private Date updatedDate = null;
 
-	private String patientReportedAuthority = "";
-	private String patientReportedType = "";
 	private List<PatientName> patientNames = new ArrayList<PatientName>(1);
 	private String motherMaidenName = "";
 	private Date birthDate = null;
@@ -54,23 +52,6 @@ public class PatientMaster implements Serializable {
 	public void setManagingOrganizationId(String managingOrganizationId) {
 		this.managingOrganizationId = managingOrganizationId;
 	}
-
-	public String getPatientReportedAuthority() {
-		return patientReportedAuthority;
-	}
-
-	public void setPatientReportedAuthority(String patientReportedAuthority) {
-		this.patientReportedAuthority = patientReportedAuthority;
-	}
-
-	public String getPatientReportedType() {
-		return patientReportedType;
-	}
-
-	public void setPatientReportedType(String patientReportedType) {
-		this.patientReportedType = patientReportedType;
-	}
-
 
 	public String getMotherMaidenName() {
 		return motherMaidenName;
@@ -208,19 +189,6 @@ public class PatientMaster implements Serializable {
 		this.patientId = reportedPatientId;
 	}
 
-	public String getExternalLink() {
-		return externalLink;
-	}
-//  public String getPatientReportedExternalLink() {
-//    return patientReportedId;
-//  }
-
-	public void setExternalLink(String reportedMrn) {
-		this.externalLink = reportedMrn;
-	}
-//  public void setPatientReportedExternalLink(String reportedMrn) {
-//    this.patientReportedId = reportedMrn;
-//  }
 	public Date getReportedDate() {
 		return reportedDate;
 	}
@@ -240,7 +208,6 @@ public class PatientMaster implements Serializable {
 	public List<PatientName> getPatientNames() {
 		return patientNames;
 	}
-
 
 	public void setPatientNames(List<PatientName> patientNames) {
 		this.patientNames = patientNames;
@@ -265,7 +232,6 @@ public class PatientMaster implements Serializable {
 		return patientNames.stream().filter(patientName -> "L".equals(patientName.getNameType())).findFirst().orElse(this.getPatientNameFirst());
 	}
 
-
 	public String getNameLast() {
 		return this.getLegalNameOrFirst().getNameLast();
 	}
@@ -277,7 +243,6 @@ public class PatientMaster implements Serializable {
 	public String getNameMiddle() {
 		return this.getLegalNameOrFirst().getNameMiddle();
 	}
-
 
 	public List<PatientGuardian> getPatientGuardians() {
 		return patientGuardians;
@@ -358,5 +323,51 @@ public class PatientMaster implements Serializable {
 			return null;
 		}
 		return this.addresses.get(0);
+	}
+
+	public List<PatientIdentifier> getPatientIdentifiers() {
+		return patientIdentifiers;
+	}
+
+	public void setPatientIdentifiers(List<PatientIdentifier> patientIdentifiers) {
+		this.patientIdentifiers = patientIdentifiers;
+	}
+
+	public void addPatientIdentifier(PatientIdentifier patientIdentifier) {
+		if (this.patientIdentifiers == null) {
+			this.patientIdentifiers = new ArrayList<>(1);
+		}
+		this.patientIdentifiers.add(patientIdentifier);
+	}
+
+	public PatientIdentifier getFirstPatientIdentifier() {
+		if (patientIdentifiers.isEmpty()) {
+			return null;
+		}
+		return this.patientIdentifiers.get(0);
+	}
+
+	public PatientIdentifier getMainPatientIdentifier() {
+		PatientIdentifier identifier = null;
+		if (patientIdentifiers.isEmpty()) {
+			return null;
+		}
+		identifier = this.patientIdentifiers.stream()
+				.filter(patientIdentifier -> PatientIdentifier.MRN_TYPE_VALUE.equals(patientIdentifier.getType()))
+				.findFirst()
+				.orElse(null);
+		if (identifier == null) {
+			identifier = this.patientIdentifiers.stream()
+					.filter(patientIdentifier -> "PT".equals(patientIdentifier.getType()))
+					.findFirst()
+					.orElse(null);
+		}
+		if (identifier == null) {
+			identifier = this.patientIdentifiers.stream()
+					.filter(patientIdentifier -> "PI".equals(patientIdentifier.getType()))
+					.findFirst()
+					.orElse(null);
+		}
+		return identifier;
 	}
 }

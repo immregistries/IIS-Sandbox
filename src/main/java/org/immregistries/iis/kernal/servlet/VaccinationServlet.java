@@ -182,9 +182,11 @@ public class VaccinationServlet extends PatientServlet {
 				/**
 				 * Setting external identifier in reference
 				 */
+				PatientMaster patientMaster = vaccination.getPatientReported();
+				PatientMaster patientMaster1 = vaccination.getPatientReported();
 				immunization.getPatient().setIdentifier(new Identifier()
-					.setValue(vaccination.getPatientReported().getExternalLink())
-					.setSystem(vaccination.getPatientReported().getPatientReportedAuthority()));
+					.setValue(patientMaster.getMainPatientIdentifier().getValue())
+					.setSystem(patientMaster1.getMainPatientIdentifier().getSystem()));
 				IParser parser = repositoryClientFactory.getFhirContext().newJsonParser().setPrettyPrint(true);
 
 				printSubscriptions(out, parser, bundle, immunization);

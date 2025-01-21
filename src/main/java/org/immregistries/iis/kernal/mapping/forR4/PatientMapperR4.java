@@ -44,10 +44,13 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 
 	public void fillFromFhirResource(PatientMaster pm, Patient p) {
 		pm.setPatientId(new IdType(p.getId()).getIdPart());
-		pm.setExternalLink(p.getIdentifierFirstRep().getValue());
+//		pm.setExternalLink(p.getIdentifierFirstRep().getValue());
+		for (Identifier identifier : p.getIdentifier()) {
+			pm.addPatientIdentifier(PatientIdentifier.fromR4(identifier));
+		}
 		pm.setUpdatedDate(p.getMeta().getLastUpdated());
 
-		pm.setPatientReportedAuthority(p.getIdentifierFirstRep().getSystem());
+//		pm.setPatientReportedAuthority(p.getIdentifierFirstRep().getSystem());
 		pm.setBirthDate(p.getBirthDate());
 		pm.setManagingOrganizationId(p.getManagingOrganization().getId());
 		// Name
@@ -197,13 +200,16 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 	public Patient getFhirResource(PatientMaster pm) {
 		Patient p = new Patient();
 
-		p.addIdentifier(new Identifier()
-			.setSystem(pm.getPatientReportedAuthority())
-			.setValue(pm.getExternalLink())
-			.setType(
-				new CodeableConcept(new Coding()
-					.setSystem("http://terminology.hl7.org/CodeSystem/v2-0203")
-					.setCode(pm.getPatientReportedType()))));
+//		p.addIdentifier(new Identifier()
+//			.setSystem(pm.getPatientReportedAuthority())
+//			.setValue(pm.getExternalLink())
+//			.setType(
+//				new CodeableConcept(new Coding()
+//					.setSystem("http://terminology.hl7.org/CodeSystem/v2-0203")
+//					.setCode(pm.getPatientReportedType()))));
+		for (PatientIdentifier patientIdentifier : pm.getPatientIdentifiers()) {
+			p.addIdentifier(patientIdentifier.toR4());
+		}
 		p.setManagingOrganization(new Reference(pm.getManagingOrganizationId()));
 		p.setBirthDate(pm.getBirthDate());
 		for (PatientName patientName : pm.getPatientNames()) {

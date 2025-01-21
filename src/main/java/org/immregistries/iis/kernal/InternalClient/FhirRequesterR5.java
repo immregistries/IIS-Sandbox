@@ -200,7 +200,7 @@ public class FhirRequesterR5 extends FhirRequester<Patient, Immunization, Locati
 		Patient patient = patientMapper.getFhirResource(patientReported);
 		MethodOutcome outcome = save(patient,
 			Patient.ORGANIZATION.hasId(patientReported.getManagingOrganizationId()),
-			Patient.IDENTIFIER.exactly().systemAndIdentifier(patientReported.getPatientReportedAuthority(), patientReported.getExternalLink()));
+				Patient.IDENTIFIER.exactly().systemAndIdentifier(patientReported.getMainPatientIdentifier().getSystem(), patientReported.getMainPatientIdentifier().getValue()));
 		if (!outcome.getResource().isEmpty()) {
 			patientReported.setPatientId(outcome.getResource().getIdElement().getIdPart());
 			return patientMapper.getReportedWithMaster((Patient) outcome.getResource());

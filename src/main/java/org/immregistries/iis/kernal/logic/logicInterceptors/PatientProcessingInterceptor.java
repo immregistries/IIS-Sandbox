@@ -9,8 +9,7 @@ import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.immregistries.iis.kernal.logic.ProcessingException;
 import org.immregistries.iis.kernal.logic.ack.IisReportable;
 import org.immregistries.iis.kernal.logic.ack.IisReportableSeverity;
-import org.immregistries.iis.kernal.mapping.forR4.PatientMapperR4;
-import org.immregistries.iis.kernal.mapping.forR5.PatientMapperR5;
+import org.immregistries.iis.kernal.mapping.Interfaces.PatientMapper;
 import org.immregistries.iis.kernal.model.PatientName;
 import org.immregistries.iis.kernal.model.PatientPhone;
 import org.immregistries.iis.kernal.model.PatientReported;
@@ -31,9 +30,8 @@ import static org.immregistries.iis.kernal.logic.IncomingMessageHandler.NAME_SIZ
 public class PatientProcessingInterceptor {
 	public String IIS_REPORTABLE_LIST = "iisReportableList";
 	@Autowired
-	PatientMapperR4 patientMapperR4;
-	@Autowired
-	PatientMapperR5 patientMapperR5;
+	PatientMapper patientMapper;
+
 
 	@Hook(value = SERVER_INCOMING_REQUEST_PRE_HANDLED, order = 2000)
 	public void handle(RequestDetails requestDetails) throws InvalidRequestException, ProcessingException {
@@ -42,11 +40,11 @@ public class PatientProcessingInterceptor {
 		PatientName legalName = null;
 		IBaseResource result = requestDetails.getResource();
 		if (requestDetails.getResource() instanceof org.hl7.fhir.r4.model.Patient) {
-			PatientReported patientReported = processPatient(patientMapperR4.getReported((org.hl7.fhir.r4.model.Patient) requestDetails.getResource()), processingFlavorSet, iisReportableList);
-			result = patientMapperR5.getFhirResource(patientReported);
+			PatientReported patientReported = processPatient(patientMapper.getReported(requestDetails.getResource()), processingFlavorSet, iisReportableList);
+			result = (IBaseResource) patientMapper.getFhirResource(patientReported);
 		} else if (requestDetails.getResource() instanceof org.hl7.fhir.r5.model.Patient) {
-			PatientReported patientReported = processPatient(patientMapperR5.getReported((org.hl7.fhir.r5.model.Patient) requestDetails.getResource()), processingFlavorSet, iisReportableList);
-			result = patientMapperR5.getFhirResource(patientReported);
+			PatientReported patientReported = processPatient(patientMapper.getReported((org.hl7.fhir.r5.model.Patient) requestDetails.getResource()), processingFlavorSet, iisReportableList);
+			result = (IBaseResource) patientMapper.getFhirResource(patientReported);
 //			org.hl7.fhir.r5.model.Patient patient = (org.hl7.fhir.r5.model.Patient) requestDetails.getResource();
 //			List<org.hl7.fhir.r5.model.HumanName> humanNameList = new ArrayList<>(patient.getName().size());
 //			for (int i = 0; i < patient.getName().size(); i++) {

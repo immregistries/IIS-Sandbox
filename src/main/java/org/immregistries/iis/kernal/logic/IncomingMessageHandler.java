@@ -399,6 +399,9 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 		PatientMaster patientMasterForMatchQuery = new PatientMaster();
 		if (reader.advanceToSegment("QPD")) {
 			String mrn = "";
+			for (int i = 1; i <= reader.getRepeatCount(3); i++) {
+
+			}
 			{
 				mrn = reader.getValueBySearchingRepeats(3, 1, "MR", 5);
 				if (StringUtils.isBlank(mrn)) {
@@ -408,7 +411,10 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 			String problem = null;
 			int fieldPosition = 0;
 			if (StringUtils.isNotBlank(mrn)) {
-				patientMasterForMatchQuery.setExternalLink(mrn); // TODO system
+				PatientIdentifier patientIdentifier = new PatientIdentifier();
+				patientIdentifier.setValue(mrn);
+				patientMasterForMatchQuery.addPatientIdentifier(patientIdentifier);// TODO system
+//				patientMasterForMatchQuery.setExternalLink(mrn); // TODO system
 //				patientReported = fhirRequester.searchPatientReported(
 //					Patient.IDENTIFIER.exactly().systemAndCode(MRN_SYSTEM, mrn)
 //				);
@@ -1044,19 +1050,16 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 	}
 
 
-	public PatientReported processPatientFhirAgnostic(HL7Reader reader, List<IisReportable> iisReportableList, Set<ProcessingFlavor> processingFlavorSet, CodeMap codeMap, boolean strictDate, PatientReported patientReported, String patientReportedExternalLink, String patientReportedAuthority, String patientReportedType) throws ProcessingException {
+	public PatientReported processPatientFhirAgnostic(HL7Reader reader, List<IisReportable> iisReportableList, Set<ProcessingFlavor> processingFlavorSet, CodeMap codeMap, boolean strictDate, PatientReported patientReported) throws ProcessingException {
 
 		if (processingFlavorSet.contains(ProcessingFlavor.APPLESAUCE)) {
 
 		}
 		List<PatientName> names = new ArrayList<>(reader.getRepeatCount(5));
-		PatientName legalName = null;
 		for (int i = 0; i <= reader.getRepeatCount(5); i++) {
 			String patientNameLast = reader.getValueRepeat(5, 1, i);
 			String patientNameFirst = reader.getValueRepeat(5, 2, i);
 			String patientNameMiddle = reader.getValueRepeat(5, 3, i);
-
-
 			String nameType = reader.getValueRepeat(5, 7, i);
 			PatientName patientName = new PatientName(patientNameLast, patientNameFirst, patientNameMiddle, nameType);
 			names.add(patientName);
@@ -1136,8 +1139,14 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 			throw new ProcessingException("Patient is indicated as being born in the future, unable to record patients who are not yet born", "PID", 1, 7);
 		}
 
-		patientReported.setExternalLink(patientReportedExternalLink);
-		patientReported.setPatientReportedType(patientReportedType);
+		for (int i = 0; i <= reader.getRepeatCount(3); i++) {
+			PatientIdentifier patientIdentifier = new PatientIdentifier();
+			patientIdentifier.setValue(reader.getValueRepeat(3, 1, i));
+			patientIdentifier.setSystem(reader.getValueRepeat(3, 4, i));
+			patientIdentifier.setSystem(reader.getValueRepeat(3, 5, i));
+			patientReported.addPatientIdentifier(patientIdentifier);
+		}
+
 		patientReported.setPatientNames(names);
 		patientReported.setMotherMaidenName(reader.getValue(6));
 		patientReported.setBirthDate(patientBirthDate);
@@ -1153,8 +1162,6 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 		patientReported.setDeathFlag(reader.getValue(30));
 		patientReported.setEmail(reader.getValueBySearchingRepeats(13, 4, "NET", 2));
 		patientReported.addPhone(patientPhone);
-		patientReported.setPatientReportedAuthority(patientReportedAuthority);
-
 
 		if (reader.advanceToSegment("PD1")) {
 			patientReported.setPublicityIndicator(reader.getValue(11));

@@ -182,7 +182,7 @@ public class PatientServlet  {
 								+ patient.getPatientId();
 							out.println("  <tr>");
 							out.println("    <td><a href=\"" + link + "\">"
-								+ patient.getExternalLink() + "</a></td>");
+								+ patient.getMainPatientIdentifier().getValue() + "</a></td>");
 							out.println("    <td><a href=\"" + link + "\">" + patient.getNameLast()
 								+ "</a></td>");
 							out.println("    <td><a href=\"" + link + "\">"
@@ -548,7 +548,7 @@ public class PatientServlet  {
 		out.println("  <tbody>");
 		out.println("  <tr>");
 		out.println("    <th class=\"w3-green\">External Id (MRN)</th>");
-		out.println("    <td>" + patientSelected.getExternalLink() + "</td>");
+		out.println("    <td>" + patientSelected.getMainPatientIdentifier().getValue() + "</td>");
 		out.println("  </tr>");
 		out.println("  <tr>");
 		out.println("    <th class=\"w3-green\">Patient Name</th>");

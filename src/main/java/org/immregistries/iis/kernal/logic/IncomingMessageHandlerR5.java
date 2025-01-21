@@ -145,14 +145,14 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler {
 		if (patientReported == null) {
 			patientReported = new PatientReported();
 			patientReported.setTenant(tenant);
-			patientReported.setExternalLink(patientReportedExternalLink);
+//			patientReported.setExternalLink(patientReportedExternalLink);
 			patientReported.setReportedDate(new Date());
 			if (managingOrganization != null) {
 				patientReported.setManagingOrganizationId("Organization/" + managingOrganization.getIdElement().getIdPart());
 			}
 		}
 
-		return processPatientFhirAgnostic(reader, iisReportableList, processingFlavorSet, codeMap, strictDate, patientReported, patientReportedExternalLink, patientReportedAuthority, patientReportedType);
+		return processPatientFhirAgnostic(reader, iisReportableList, processingFlavorSet, codeMap, strictDate, patientReported);
 	}
 
 	public String processORU(Tenant tenant, HL7Reader reader, String message, Organization managingOrganization) {

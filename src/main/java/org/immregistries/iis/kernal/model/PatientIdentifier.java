@@ -1,8 +1,8 @@
 package org.immregistries.iis.kernal.model;
 
 public class PatientIdentifier {
-	private static final String MRN_TYPE_SYSTEM = "http://terminology.hl7.org/CodeSystem/v2-0203";
-	private static final String MRN_TYPE_VALUE = "MR";
+	public final String MRN_TYPE_SYSTEM = "http://terminology.hl7.org/CodeSystem/v2-0203";
+	public static final String MRN_TYPE_VALUE = "MR";
 	private String system;
 	private String value;
 	private String type;
@@ -11,13 +11,13 @@ public class PatientIdentifier {
 	public PatientIdentifier() {
 	}
 
-	public PatientIdentifier(org.hl7.fhir.r5.model.Identifier identifierR5) {
+	private PatientIdentifier(org.hl7.fhir.r5.model.Identifier identifierR5) {
 		system = identifierR5.getSystem();
 		value = identifierR5.getValue();
 		type = identifierR5.getType().getCode(MRN_TYPE_SYSTEM);
 	}
 
-	public PatientIdentifier(org.hl7.fhir.r4.model.Identifier identifierR4) {
+	private PatientIdentifier(org.hl7.fhir.r4.model.Identifier identifierR4) {
 		system = identifierR4.getSystem();
 		value = identifierR4.getValue();
 		type = identifierR4.getType().getCodingFirstRep().getCode();
@@ -71,5 +71,13 @@ public class PatientIdentifier {
 				new org.hl7.fhir.r4.model.Coding(MRN_TYPE_SYSTEM, MRN_TYPE_VALUE, "")));
 		}
 		return identifier;
+	}
+
+	public static PatientIdentifier fromR5(org.hl7.fhir.r5.model.Identifier identifier) {
+		return new PatientIdentifier(identifier);
+	}
+
+	public static PatientIdentifier fromR4(org.hl7.fhir.r4.model.Identifier identifier) {
+		return new PatientIdentifier(identifier);
 	}
 }

@@ -116,9 +116,9 @@ public abstract class Hl7MessageWriter //extends IncomingMessageHandler
 		// PID-2
 		sb.append("|");
 		// PID-3
-		sb.append("|").append(patient.getExternalLink()).append("^^^IIS^SR");
+		sb.append("|").append(patient.getMainPatientIdentifier().getValue()).append("^^^IIS^SR");
 		if (patientReported != null) {
-			sb.append("~").append(patientReported.getExternalLink()).append("^^^").append(patientReported.getPatientReportedAuthority()).append("^").append(patientReported.getPatientReportedType());
+			sb.append("~").append(patientReported.getMainPatientIdentifier().getValue()).append("^^^").append(patientReported.getMainPatientIdentifier().getSystem()).append("^").append(patientReported.getMainPatientIdentifier().getType());
 		}
 		// PID-4
 		sb.append("|");
