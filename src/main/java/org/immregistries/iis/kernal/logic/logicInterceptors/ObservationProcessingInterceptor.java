@@ -27,6 +27,7 @@ import static ca.uhn.fhir.interceptor.api.Pointcut.SERVER_INCOMING_REQUEST_PRE_H
 @Interceptor
 @Service
 public class ObservationProcessingInterceptor {
+	public static final String OBX_COUNT = "ObxCount";
 	public String IIS_REPORTABLE_LIST = "iisReportableList";
 	@Autowired
 	private ObservationMapper observationMapper;
@@ -35,6 +36,10 @@ public class ObservationProcessingInterceptor {
 	public void handle(RequestDetails requestDetails) throws InvalidRequestException, ProcessingException {
 		Set<ProcessingFlavor> processingFlavorSet = ProcessingFlavor.getProcessingStyle(requestDetails.getTenantId());
 		List<IisReportable> iisReportableList = (List<IisReportable>) requestDetails.getAttribute(IIS_REPORTABLE_LIST);
+		int obxCount = 0;
+		if (requestDetails.getAttribute(OBX_COUNT) != null) { // If in a v2 context
+			obxCount = (int) requestDetails.getAttribute(OBX_COUNT);
+		}
 		PatientName legalName = null;
 		ObservationReported observationReported;
 		if (requestDetails.getResource() instanceof org.hl7.fhir.r4.model.Observation) {
@@ -44,7 +49,7 @@ public class ObservationProcessingInterceptor {
 		}
 	}
 
-	private ObservationReported processObservationReported(ObservationReported observationReported, List<IisReportable> iisReportableList) throws ProcessingException {
+	private ObservationReported processObservationReported(ObservationReported observationReported, List<IisReportable> iisReportableList, int obxCount) throws ProcessingException {
 		if (observationReported.getIdentifierCode().equals("30945-0")) // contraindication!
 		{
 			CodeMap codeMap = CodeMapManager.getCodeMap();
@@ -59,12 +64,13 @@ public class ObservationProcessingInterceptor {
 					ProcessingException pe = new ProcessingException("Contraindication or precaution observed in the future", "OBX", obxCount, 5, IisReportableSeverity.WARN);
 					iisReportableList.add(IisReportable.fromProcessingException(pe));
 				}
-				if (patientReported.getBirthDate() != null && observationReported.getObservationDate().before(patientReported.getBirthDate())) {
-					ProcessingException pe = new ProcessingException("Contraindication or precaution observed before patient was born", "OBX", obxCount, 14, IisReportableSeverity.WARN);
-					iisReportableList.add(IisReportable.fromProcessingException(pe));
-				}
+//				if (patientReported.getBirthDate() != null && observationReported.getObservationDate().before(patientReported.getBirthDate())) {
+//					ProcessingException pe = new ProcessingException("Contraindication or precaution observed before patient was born", "OBX", obxCount, 14, IisReportableSeverity.WARN);
+//					iisReportableList.add(IisReportable.fromProcessingException(pe));
+//				} TODO add context ??
 			}
 		}
+		return observationReported;
 
 	}
 

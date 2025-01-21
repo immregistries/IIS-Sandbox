@@ -262,7 +262,7 @@ public class V2ToFhirServlet extends HttpServlet {
 		{
 			ContactPoint contactPoint = p.addTelecom();
 			contactPoint.setSystem(ContactPointSystem.PHONE);
-			contactPoint.setValue(pr.getPhone());
+			contactPoint.setValue(pr.getFirstPhone().getNumber());
 		}
 		// TODO Ethnicity not supported by base standard
 

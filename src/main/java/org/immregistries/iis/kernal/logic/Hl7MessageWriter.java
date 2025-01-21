@@ -217,7 +217,7 @@ public abstract class Hl7MessageWriter //extends IncomingMessageHandler
 			sb.append("|");
 			// PID-13
 			sb.append("|");
-			String phone = patientReported.getPhone();
+			String phone = patientReported.getFirstPhone().getNumber();
 			if (phone.length() == 10) {
 				sb.append("^PRN^PH^^^").append(phone, 0, 3).append("^").append(phone, 3, 10);
 			}

@@ -9,7 +9,7 @@ import org.immregistries.iis.kernal.logic.ProcessingException;
 import org.immregistries.iis.kernal.logic.ack.IisReportable;
 import org.immregistries.iis.kernal.logic.ack.IisReportableSeverity;
 import org.immregistries.iis.kernal.model.PatientName;
-import org.immregistries.iis.kernal.model.PatientReported;
+import org.immregistries.iis.kernal.model.PatientPhone;
 import org.immregistries.iis.kernal.model.ProcessingFlavor;
 import org.springframework.stereotype.Service;
 
@@ -166,11 +166,9 @@ public class PatientProcessingInterceptor {
 		}
 	}
 
-	private void checkPhone(PatientReported patientReported, Set<ProcessingFlavor> processingFlavorSet, List<IisReportable> iisReportableList) {
-		String patientPhone = patientReported.getPhone();
-		String telUseCode = patientReported.getPhoneUse();
-		if (StringUtils.isNotBlank(patientPhone)) {
-			if ("PRN".equals(telUseCode)) {
+	private void checkPhone(PatientPhone patientPhone1, Set<ProcessingFlavor> processingFlavorSet, List<IisReportable> iisReportableList) {
+		if (StringUtils.isNotBlank(patientPhone1.getNumber())) {
+			if ("PRN".equals(patientPhone1.getUse())) { // TODO specify main phone number
 				ProcessingException pe = new ProcessingException("Patient phone telecommunication type must be PRN ", "PID", 1, 13);
 				if (!processingFlavorSet.contains(ProcessingFlavor.QUINZE)) {
 					pe.setErrorCode(IisReportableSeverity.WARN);
@@ -182,7 +180,7 @@ public class PatientProcessingInterceptor {
 				int countNums = 0;
 				boolean invalidCharFound = false;
 				char invalidChar = ' ';
-				for (char c : patientPhone.toCharArray()) {
+				for (char c : patientPhone1.getNumber().toCharArray()) {
 
 					if (c >= '0' && c <= '9') {
 						countNums++;
@@ -198,7 +196,7 @@ public class PatientProcessingInterceptor {
 					pe.setErrorCode(IisReportableSeverity.WARN);
 					iisReportableList.add(IisReportable.fromProcessingException(pe));
 				}
-				if (countNums != 10 || patientPhone.startsWith("555") || patientPhone.startsWith("0") || patientPhone.startsWith("1")) {
+				if (countNums != 10 || patientPhone1.getNumber().startsWith("555") || patientPhone1.getNumber().startsWith("0") || patientPhone1.getNumber().startsWith("1")) {
 					ProcessingException pe = new ProcessingException("Patient phone number does not appear to be valid", "PID", 1, 13);
 					pe.setErrorCode(IisReportableSeverity.WARN);
 					iisReportableList.add(IisReportable.fromProcessingException(pe));

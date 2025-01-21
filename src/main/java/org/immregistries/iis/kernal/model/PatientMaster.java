@@ -33,8 +33,7 @@ public class PatientMaster implements Serializable {
 	private String addressZip = "";
 	private String addressCountry = "";
 	private String addressCountyParish = "";
-	private String phone = "";
-	private String phoneUse = "";
+	private List<PatientPhone> phones = null;
 	private String email = "";
 	private String ethnicity = "";
 	private String birthFlag = "";
@@ -157,14 +156,6 @@ public class PatientMaster implements Serializable {
 
 	public void setAddressCountyParish(String addressCountyParish) {
 		this.addressCountyParish = addressCountyParish;
-	}
-
-	public String getPhone() {
-		return phone;
-	}
-
-	public void setPhone(String phone) {
-		this.phone = phone;
 	}
 
 	public String getEmail() {
@@ -387,11 +378,26 @@ public class PatientMaster implements Serializable {
 		return this.races.get(0);
 	}
 
-	public String getPhoneUse() {
-		return phoneUse;
+
+	public List<PatientPhone> getPhones() {
+		return phones;
 	}
 
-	public void setPhoneUse(String phoneUse) {
-		this.phoneUse = phoneUse;
+	public void setPhones(List<PatientPhone> phones) {
+		this.phones = phones;
+	}
+
+	public void addPhone(PatientPhone phone) {
+		if (this.phones == null) {
+			this.phones = new ArrayList<>(1);
+		}
+		this.phones.add(phone);
+	}
+
+	public PatientPhone getFirstPhone() {
+		if (phones.isEmpty()) {
+			return null;
+		}
+		return this.phones.get(0);
 	}
 }

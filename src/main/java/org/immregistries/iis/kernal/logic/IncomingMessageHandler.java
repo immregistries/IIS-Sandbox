@@ -1062,46 +1062,48 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 			names.add(patientName);
 		}
 
-		String patientPhone = reader.getValue(13, 6) + reader.getValue(13, 7);
-		String telUseCode = reader.getValue(13, 2);
-		if (patientPhone.length() > 0) {
-			if (!telUseCode.equals("PRN")) {
-				ProcessingException pe = new ProcessingException("Patient phone telecommunication type must be PRN ", "PID", 1, 13);
-				if (!processingFlavorSet.contains(ProcessingFlavor.QUINZE)) {
-					pe.setErrorCode(IisReportableSeverity.WARN);
-				}
-				iisReportableList.add(IisReportable.fromProcessingException(pe));
-			}
-
-			{
-				int countNums = 0;
-				boolean invalidCharFound = false;
-				char invalidChar = ' ';
-				for (char c : patientPhone.toCharArray()) {
-
-					if (c >= '0' && c <= '9') {
-						countNums++;
-					} else if (c != '-' && c != '.' && c != ' ' && c != '(' && c != ')') {
-						if (!invalidCharFound) {
-							invalidCharFound = true;
-							invalidChar = c;
-						}
-					}
-				}
-				if (invalidCharFound) {
-					ProcessingException pe = new ProcessingException("Patient phone number has unexpected character: " + invalidChar, "PID", 1, 13);
-					pe.setErrorCode(IisReportableSeverity.WARN);
-					iisReportableList.add(IisReportable.fromProcessingException(pe));
-				}
-				if (countNums != 10 || patientPhone.startsWith("555") || patientPhone.startsWith("0") || patientPhone.startsWith("1")) {
-					ProcessingException pe = new ProcessingException("Patient phone number does not appear to be valid", "PID", 1, 13);
-					pe.setErrorCode(IisReportableSeverity.WARN);
-					iisReportableList.add(IisReportable.fromProcessingException(pe));
-				}
-			}
-		}
-		if (!telUseCode.equals("PRN")) {
-			patientPhone = "";
+		PatientPhone patientPhone = new PatientPhone();
+		patientPhone.setNumber(reader.getValue(13, 6) + reader.getValue(13, 7));
+		patientPhone.setUse(reader.getValue(13, 2));
+		// Logic exported to Patient Processing interceptor
+//		if (patientPhone.getNumber().length() > 0) {
+//			if (!patientPhone.getUse().equals("PRN")) {
+//				ProcessingException pe = new ProcessingException("Patient phone telecommunication type must be PRN ", "PID", 1, 13);
+//				if (!processingFlavorSet.contains(ProcessingFlavor.QUINZE)) {
+//					pe.setErrorCode(IisReportableSeverity.WARN);
+//				}
+//				iisReportableList.add(IisReportable.fromProcessingException(pe));
+//			}
+//
+//			{
+//				int countNums = 0;
+//				boolean invalidCharFound = false;
+//				char invalidChar = ' ';
+//				for (char c : patientPhone.getNumber().toCharArray()) {
+//
+//					if (c >= '0' && c <= '9') {
+//						countNums++;
+//					} else if (c != '-' && c != '.' && c != ' ' && c != '(' && c != ')') {
+//						if (!invalidCharFound) {
+//							invalidCharFound = true;
+//							invalidChar = c;
+//						}
+//					}
+//				}
+//				if (invalidCharFound) {
+//					ProcessingException pe = new ProcessingException("Patient phone number has unexpected character: " + invalidChar, "PID", 1, 13);
+//					pe.setErrorCode(IisReportableSeverity.WARN);
+//					iisReportableList.add(IisReportable.fromProcessingException(pe));
+//				}
+////				if (countNums != 10 || patientPhone.startsWith("555") || patientPhone.startsWith("0") || patientPhone.startsWith("1")) {
+////					ProcessingException pe = new ProcessingException("Patient phone number does not appear to be valid", "PID", 1, 13);
+////					pe.setErrorCode(IisReportableSeverity.WARN);
+////					iisReportableList.add(IisReportable.fromProcessingException(pe));
+////				}
+//			}
+//		}
+		if (!patientPhone.getUse().equals("PRN")) {
+			patientPhone.setUse("");
 		}
 
 
@@ -1147,7 +1149,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 		patientReported.setDeathDate(parseDateWarn(reader.getValue(29), "Invalid patient death date", "PID", 1, 29, strictDate, iisReportableList));
 		patientReported.setDeathFlag(reader.getValue(30));
 		patientReported.setEmail(reader.getValueBySearchingRepeats(13, 4, "NET", 2));
-		patientReported.setPhone(patientPhone);
+		patientReported.addPhone(patientPhone);
 		patientReported.setPatientReportedAuthority(patientReportedAuthority);
 
 
@@ -1166,10 +1168,8 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 				patientReported.addPatientGuardian(patientGuardian);
 				String guardianLast = reader.getValue(2, 1);
 				patientGuardian.getName().setNameLast(guardianLast);
-				;
 				String guardianFirst = reader.getValue(2, 2);
 				patientGuardian.getName().setNameFirst(guardianFirst);
-				;
 				String guardianMiddle = reader.getValue(2, 1);
 				patientGuardian.getName().setNameMiddle(guardianMiddle);
 				String guardianRelationship = reader.getValue(3);

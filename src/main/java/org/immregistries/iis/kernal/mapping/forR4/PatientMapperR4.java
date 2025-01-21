@@ -10,10 +10,7 @@ import org.immregistries.iis.kernal.fhir.annotations.OnR4Condition;
 import org.immregistries.iis.kernal.logic.CodeMapManager;
 import org.immregistries.iis.kernal.mapping.Interfaces.PatientMapper;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
-import org.immregistries.iis.kernal.model.PatientGuardian;
-import org.immregistries.iis.kernal.model.PatientMaster;
-import org.immregistries.iis.kernal.model.PatientName;
-import org.immregistries.iis.kernal.model.PatientReported;
+import org.immregistries.iis.kernal.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Service;
@@ -98,8 +95,7 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 		for (ContactPoint telecom : p.getTelecom()) {
 			if (null != telecom.getSystem()) {
 				if (telecom.getSystem().equals(ContactPoint.ContactPointSystem.PHONE)) {
-					pm.setPhone(telecom.getValue());
-					pm.setPhoneUse(telecom.getUse().toCode());
+					pm.addPhone(new PatientPhone(telecom));
 				} else if (telecom.getSystem().equals(ContactPoint.ContactPointSystem.EMAIL)) {
 					pm.setEmail(telecom.getValue());
 				}
@@ -255,10 +251,8 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 		}
 		p.addExtension(ETHNICITY_EXTENSION, new Coding().setSystem(ETHNICITY_SYSTEM).setCode(pm.getEthnicity()));
 		// telecom
-		if (null != pm.getPhone()) {
-			p.addTelecom().setSystem(ContactPoint.ContactPointSystem.PHONE)
-					.setValue(pm.getPhone())
-					.setUse(ContactPoint.ContactPointUse.fromCode(pm.getPhoneUse()));
+		for (PatientPhone patientPhone : pm.getPhones()) {
+			p.addTelecom(patientPhone.toR4());
 		}
 		if (null != pm.getEmail()) {
 			p.addTelecom().setSystem(ContactPoint.ContactPointSystem.EMAIL)

@@ -13,10 +13,7 @@ import org.immregistries.iis.kernal.fhir.annotations.OnR5Condition;
 import org.immregistries.iis.kernal.logic.CodeMapManager;
 import org.immregistries.iis.kernal.mapping.Interfaces.PatientMapper;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
-import org.immregistries.iis.kernal.model.PatientGuardian;
-import org.immregistries.iis.kernal.model.PatientMaster;
-import org.immregistries.iis.kernal.model.PatientName;
-import org.immregistries.iis.kernal.model.PatientReported;
+import org.immregistries.iis.kernal.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -102,8 +99,7 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 		for (ContactPoint telecom : p.getTelecom()) {
 			if (null != telecom.getSystem()) {
 				if (telecom.getSystem().equals(ContactPointSystem.PHONE)) {
-					pm.setPhone(telecom.getValue());
-					pm.setPhoneUse(telecom.getUse().toCode());
+					pm.addPhone(new PatientPhone(telecom));
 				} else if (telecom.getSystem().equals(ContactPointSystem.EMAIL)) {
 					pm.setEmail(telecom.getValue());
 				}
@@ -281,11 +277,8 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 			}
 		}
 		// telecom
-		if (null != pm.getPhone()) {
-			p.addTelecom().setSystem(ContactPointSystem.PHONE)
-					.setValue(pm.getPhone())
-					.setUse(ContactPoint.ContactPointUse.fromCode(pm.getPhoneUse()));
-			;
+		for (PatientPhone patientPhone : pm.getPhones()) {
+			p.addTelecom(patientPhone.toR5());
 		}
 		if (null != pm.getEmail()) {
 			p.addTelecom().setSystem(ContactPointSystem.EMAIL)
