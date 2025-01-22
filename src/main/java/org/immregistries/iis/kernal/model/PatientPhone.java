@@ -136,4 +136,12 @@ public class PatientPhone {
 			return null;
 		}
 	}
+
+	@Override
+	public String toString() {
+		return "PatientPhone{" +
+			"number='" + number + '\'' +
+			", use='" + use + '\'' +
+			'}';
+	}
 }

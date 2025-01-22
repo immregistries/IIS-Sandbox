@@ -103,4 +103,14 @@ public class PatientName {
 		}
 		return name;
 	}
+
+	@Override
+	public String toString() {
+		return "PatientName{" +
+				"nameLast='" + nameLast + '\'' +
+				", nameFirst='" + nameFirst + '\'' +
+				", nameMiddle='" + nameMiddle + '\'' +
+				", nameType='" + nameType + '\'' +
+				'}';
+	}
 }

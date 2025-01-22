@@ -116,4 +116,17 @@ public class PatientAddress {
 		patientAddress.setAddressCountyParish(address.getDistrict());
 		return patientAddress;
 	}
+
+	@Override
+	public String toString() {
+		return "PatientAddress{" +
+			"addressLine1='" + addressLine1 + '\'' +
+			", addressLine2='" + addressLine2 + '\'' +
+			", addressCity='" + addressCity + '\'' +
+			", addressState='" + addressState + '\'' +
+			", addressZip='" + addressZip + '\'' +
+			", addressCountry='" + addressCountry + '\'' +
+			", addressCountyParish='" + addressCountyParish + '\'' +
+			'}';
+	}
 }

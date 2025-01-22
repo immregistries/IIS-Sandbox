@@ -26,16 +26,15 @@ import static ca.uhn.fhir.interceptor.api.Pointcut.SERVER_INCOMING_REQUEST_PRE_H
 
 @Interceptor
 @Service
-public class ObservationProcessingInterceptor {
+public class ObservationProcessingInterceptor extends AbstractLogicInterceptor {
 	public static final String OBX_COUNT = "ObxCount";
-	public String IIS_REPORTABLE_LIST = "iisReportableList";
 	@Autowired
 	private ObservationMapper observationMapper;
 
-	@Hook(value = SERVER_INCOMING_REQUEST_PRE_HANDLED, order = 2000)
+	@Hook(value = SERVER_INCOMING_REQUEST_PRE_HANDLED, order = 2001)
 	public void handle(RequestDetails requestDetails) throws InvalidRequestException, ProcessingException {
 		Set<ProcessingFlavor> processingFlavorSet = ProcessingFlavor.getProcessingStyle(requestDetails.getTenantId());
-		List<IisReportable> iisReportableList = (List<IisReportable>) requestDetails.getAttribute(IIS_REPORTABLE_LIST);
+		List<IisReportable> iisReportableList = iisReportableList(requestDetails);
 		int obxCount = 0;
 		if (requestDetails.getAttribute(OBX_COUNT) != null) { // If in a v2 context
 			obxCount = (int) requestDetails.getAttribute(OBX_COUNT);

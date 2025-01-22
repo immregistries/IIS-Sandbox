@@ -4,11 +4,13 @@ import org.hibernate.Session;
 import org.hl7.fhir.r5.model.*;
 import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
-import org.immregistries.iis.kernal.logic.*;
+import org.immregistries.iis.kernal.logic.CodeMapManager;
+import org.immregistries.iis.kernal.logic.IncomingMessageHandler;
+import org.immregistries.iis.kernal.logic.ProcessingException;
 import org.immregistries.iis.kernal.mapping.Interfaces.*;
-import org.immregistries.iis.kernal.model.UserAccess;
-import org.immregistries.iis.kernal.model.Tenant;
 import org.immregistries.iis.kernal.model.ProcessingFlavor;
+import org.immregistries.iis.kernal.model.Tenant;
+import org.immregistries.iis.kernal.model.UserAccess;
 import org.immregistries.smm.tester.manager.HL7Reader;
 import org.immregistries.smm.transform.ScenarioManager;
 import org.immregistries.smm.transform.TestCaseMessage;
@@ -24,8 +26,6 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-
-import static javolution.testing.TestContext.assertEquals;
 
 public class TestMapping extends HttpServlet {
 	public static final String PARAM_MESSAGE = "MESSAGEDATA";
@@ -142,15 +142,6 @@ public class TestMapping extends HttpServlet {
 		HL7Reader hl7Reader = new HL7Reader(message);
 		Set<ProcessingFlavor> processingFlavorSet = tenant.getProcessingFlavorSet();
 		CodeMap codeMap = CodeMapManager.getCodeMap();
-
-//		PatientReported patientReported = handler.processPatient(userAccess,hl7Reader,processingExceptionList, userAccess.getOrg().getProcessingFlavorSet(),codeMap,true,null,  handler.processManagingOrganization(hl7Reader));
-//		PatientReported processedPatientReported = patientMapper.getReported(patientMapper.getFhirResource(patientReported));
-//		patientReported.setPatientNameFirst("fff");
-//
-//		assertEquals(patientReported,processedPatientReported);
-
-//		VaccinationReported vaccinationReported = handler.processVXU(userAccess,hl7Reader,processingExceptionList, userAccess.getOrg().getProcessingFlavorSet(),codeMap,true,null, handler.processManagingOrganization(hl7Reader));
-
 
 	}
 

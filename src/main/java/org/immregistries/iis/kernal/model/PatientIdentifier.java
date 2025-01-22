@@ -1,7 +1,7 @@
 package org.immregistries.iis.kernal.model;
 
 public class PatientIdentifier {
-	public final String MRN_TYPE_SYSTEM = "http://terminology.hl7.org/CodeSystem/v2-0203";
+	public static final String MRN_TYPE_SYSTEM = "http://terminology.hl7.org/CodeSystem/v2-0203";
 	public static final String MRN_TYPE_VALUE = "MR";
 	private String system = "";
 	private String value = "";
@@ -79,5 +79,15 @@ public class PatientIdentifier {
 
 	public static PatientIdentifier fromR4(org.hl7.fhir.r4.model.Identifier identifier) {
 		return new PatientIdentifier(identifier);
+	}
+
+	@Override
+	public String toString() {
+		return "PatientIdentifier{" +
+			"system='" + system + '\'' +
+			", value='" + value + '\'' +
+			", type='" + type + '\'' +
+			", assignerReference='" + assignerReference + '\'' +
+			'}';
 	}
 }

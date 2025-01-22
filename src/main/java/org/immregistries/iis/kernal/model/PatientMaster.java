@@ -373,4 +373,36 @@ public class PatientMaster implements Serializable {
 		}
 		return identifier;
 	}
+
+	@Override
+	public String toString() {
+		return "PatientMaster{" +
+				"patientId='" + patientId + '\'' +
+				", tenant=" + tenant +
+				", patientIdentifiers=" + patientIdentifiers +
+				", reportedDate=" + reportedDate +
+				", updatedDate=" + updatedDate +
+				", patientNames=" + patientNames +
+				", motherMaidenName='" + motherMaidenName + '\'' +
+				", birthDate=" + birthDate +
+				", sex='" + sex + '\'' +
+				", races=" + races +
+				", addresses=" + addresses +
+				", phones=" + phones +
+				", email='" + email + '\'' +
+				", ethnicity='" + ethnicity + '\'' +
+				", birthFlag='" + birthFlag + '\'' +
+				", birthOrder='" + birthOrder + '\'' +
+				", deathFlag='" + deathFlag + '\'' +
+				", deathDate=" + deathDate +
+				", publicityIndicator='" + publicityIndicator + '\'' +
+				", publicityIndicatorDate=" + publicityIndicatorDate +
+				", protectionIndicator='" + protectionIndicator + '\'' +
+				", protectionIndicatorDate=" + protectionIndicatorDate +
+				", registryStatusIndicator='" + registryStatusIndicator + '\'' +
+				", registryStatusIndicatorDate=" + registryStatusIndicatorDate +
+				", patientGuardians=" + patientGuardians +
+				", managingOrganizationId='" + managingOrganizationId + '\'' +
+				'}';
+	}
 }

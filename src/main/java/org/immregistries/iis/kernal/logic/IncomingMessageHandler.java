@@ -29,6 +29,8 @@ import org.immregistries.iis.kernal.SoftwareVersion;
 import org.immregistries.iis.kernal.fhir.interceptors.PartitionCreationInterceptor;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.logic.ack.*;
+import org.immregistries.iis.kernal.logic.logicInterceptors.ObservationProcessingInterceptor;
+import org.immregistries.iis.kernal.logic.logicInterceptors.PatientProcessingInterceptor;
 import org.immregistries.iis.kernal.mapping.Interfaces.ImmunizationMapper;
 import org.immregistries.iis.kernal.mapping.Interfaces.LocationMapper;
 import org.immregistries.iis.kernal.mapping.Interfaces.ObservationMapper;
@@ -90,6 +92,11 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 	LocationMapper locationMapper;
 	@Autowired
 	PartitionCreationInterceptor partitionCreationInterceptor;
+
+	@Autowired
+	PatientProcessingInterceptor patientProcessingInterceptor; // TODO decide how/where to implement the execution of interceptors, currently using DAO so some interceptors are skipped by the v2 process and need to be manually triggered
+	@Autowired
+	ObservationProcessingInterceptor observationProcessingInterceptor;
 
 	SyncHL7Validator syncHL7ValidatorVxuZ22;
 	SyncHL7Validator syncHL7ValidatorQbpZ34;
@@ -1188,7 +1195,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 		}
 		reader.resetPostion();
 
-		AgnosticValidator.doChecks(patientReported, iisReportableList, processingFlavorSet);
+		patientProcessingInterceptor.processAndValidatePatient(patientReported, iisReportableList, processingFlavorSet);
 		verifyNoErrors(iisReportableList);
 
 		patientReported.setUpdatedDate(new Date());

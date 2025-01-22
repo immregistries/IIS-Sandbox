@@ -214,9 +214,13 @@ public class FhirRequesterR4 extends FhirRequester<Patient,Immunization,Location
 		logger.info("created {} resource {}", outcome.getCreated(), outcome.getResource());
 		if (!outcome.getResource().isEmpty()) {
 			patientReported.setPatientId(outcome.getResource().getIdElement().getIdPart());
+			PatientReported patientReported1 = patientMapper.getReported((Patient) outcome.getResource());
+			logger.info("test {} {} {}", patientReported1.toString().compareTo(patientReported.getPatient().toString()), patientReported.getPatient(), patientReported1);
 			return patientMapper.getReportedWithMaster((Patient) outcome.getResource());
 		} else if (outcome.getCreated() != null && outcome.getCreated()) {
 			patientReported.setPatientId(outcome.getId().getIdPart());
+			PatientReported patientReported1 = patientMapper.getReported((Patient) outcome.getResource());
+			logger.info("test {} {} {}", patientReported1.toString().compareTo(patientReported.getPatient().toString()), patientReported.getPatient(), patientReported1);
 			return readPatientReported(outcome.getId().getIdPart());
 		} else {
 			return patientReported;
