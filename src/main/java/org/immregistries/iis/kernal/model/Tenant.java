@@ -57,4 +57,12 @@ public class Tenant implements Serializable {
 	public void setUserAccess(UserAccess userAccess) {
 		this.userAccess = userAccess;
 	}
+
+	@Override
+	public String toString() {
+		return "Tenant{" +
+			"orgId=" + orgId +
+			", organizationName='" + organizationName + '\'' +
+			'}';
+	}
 }

@@ -19,4 +19,12 @@ public class PatientGuardian {
 	public void setName(PatientName name) {
 		this.name = name;
 	}
+
+	@Override
+	public String toString() {
+		return "PatientGuardian{" +
+				"name=" + name +
+				", guardianRelationship='" + guardianRelationship + '\'' +
+				'}';
+	}
 }

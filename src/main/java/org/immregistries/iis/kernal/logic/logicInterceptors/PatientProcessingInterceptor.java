@@ -76,9 +76,20 @@ public class PatientProcessingInterceptor extends AbstractLogicInterceptor {
 		requestDetails.setAttribute(IIS_REPORTABLE_LIST, iisReportableList);
 	}
 
-	public PatientReported processAndValidatePatient(PatientReported patientReported, List<IisReportable> iisReportableList, Set<ProcessingFlavor> processingFlavorSet) throws ProcessingException {
-		agnosticValidation(patientReported, iisReportableList, processingFlavorSet);
+	private boolean testMapping(PatientReported patientReported) {
+		IBaseResource patient = (IBaseResource) patientMapper.getFhirResource(patientReported);
+		PatientReported patientReported1 = patientMapper.getReported(patient);
+		logger.info("original {}", patientReported);
+		logger.info("mapped {}", patientReported1);
+		boolean res = patientReported.toString().equals(patientReported1.toString());
+		logger.info("comparison {} {}", res, patientReported.toString().compareTo(patientReported1.toString()));
+		return res;
+	}
 
+	public PatientReported processAndValidatePatient(PatientReported patientReported, List<IisReportable> iisReportableList, Set<ProcessingFlavor> processingFlavorSet) throws ProcessingException {
+		testMapping(patientReported);
+
+		agnosticValidation(patientReported, iisReportableList, processingFlavorSet);
 		PatientName legalName = null;
 		List<PatientName> patientNames = new ArrayList<>(patientReported.getPatientNames().size());
 		for (int i = 0; i < patientReported.getPatientNames().size(); i++) {
