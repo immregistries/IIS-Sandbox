@@ -45,6 +45,8 @@ import org.immregistries.iis.kernal.fhir.interceptors.IIdentifierSolverIntercept
 import org.immregistries.iis.kernal.fhir.interceptors.PartitionCreationInterceptor;
 import org.immregistries.iis.kernal.fhir.interceptors.SessionAuthorizationInterceptor;
 import org.immregistries.iis.kernal.fhir.ips.IpsConfig;
+import org.immregistries.iis.kernal.logic.logicInterceptors.ImmunizationProcessingInterceptor;
+import org.immregistries.iis.kernal.logic.logicInterceptors.ObservationProcessingInterceptor;
 import org.immregistries.iis.kernal.logic.logicInterceptors.PatientProcessingInterceptor;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
@@ -80,7 +82,9 @@ public class ServerConfig {
 												  IpsOperationProvider ipsOperationProvider,
 												  Optional<IRecommendationForecastProvider> recommendationForecastProvider,
 												  SessionAuthorizationInterceptor sessionAuthorizationInterceptor,
-												  PatientProcessingInterceptor patientProcessingInterceptor) {
+												  PatientProcessingInterceptor patientProcessingInterceptor,
+												  ObservationProcessingInterceptor observationProcessingInterceptor,
+												  ImmunizationProcessingInterceptor immunizationProcessingInterceptor) {
 		RestfulServer fhirServer = new RestfulServer(fhirSystemDao.getContext());
 		List<String> supportedResourceTypes = appProperties.getSupported_resource_types();
 
@@ -276,6 +280,8 @@ public class ServerConfig {
 //		registerCustomInterceptors(fhirServer, appContext, appProperties.getCustomInterceptorClasses());
 		groupAuthorityInterceptor.ifPresent(fhirServer::registerInterceptor);
 		fhirServer.registerInterceptor(patientProcessingInterceptor);
+		fhirServer.registerInterceptor(immunizationProcessingInterceptor);
+		fhirServer.registerInterceptor(observationProcessingInterceptor);
 
 		return fhirServer;
 	}

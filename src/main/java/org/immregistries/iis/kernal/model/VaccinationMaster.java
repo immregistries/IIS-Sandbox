@@ -9,7 +9,7 @@ import java.util.Objects;
 /**
  * Created by Eric on 12/20/17.
  */
-public class VaccinationMaster implements Serializable {
+public class VaccinationMaster extends AbstractMappedObject implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
