@@ -2,7 +2,6 @@ package org.immregistries.iis.kernal.mapping.forR5;
 
 
 import org.apache.commons.lang3.StringUtils;
-import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r5.model.*;
 import org.hl7.fhir.r5.model.ContactPoint.ContactPointSystem;
 import org.hl7.fhir.r5.model.Enumerations.AdministrativeGender;
@@ -40,13 +39,23 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 
 	public PatientReported getReportedWithMaster(Patient p) {
 		PatientReported patientReported = getReported(p);
-		if (!p.getId().isBlank() && p.getMeta().getTag(GOLDEN_SYSTEM_TAG,GOLDEN_RECORD) == null) {
+		if (!p.getId().isBlank() && p.getMeta().getTag(GOLDEN_SYSTEM_TAG, GOLDEN_RECORD) == null) {
 			patientReported.setPatient(fhirRequests.readPatientMasterWithMdmLink(p.getId()));
 		}
 		return patientReported;
 	}
 
-	public void fillFromFhirResource(PatientMaster pm,Patient p) {
+	public PatientReported getReported(Patient patient) {
+		PatientReported patientReported = new PatientReported();
+		fillFromFhirResource(patientReported, patient);
+		return patientReported;
+	}
+
+	public PatientMaster getMaster(Patient patient) {
+		return getReported(patient);
+	}
+
+	public void fillFromFhirResource(PatientMaster pm, Patient p) {
 		if (StringUtils.isNotBlank(p.getId())) {
 			pm.setPatientId(new IdType(p.getId()).getIdPart());
 		}
@@ -56,7 +65,9 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 		}
 		pm.setBirthDate(p.getBirthDate());
 		pm.setManagingOrganizationId(StringUtils.defaultString(p.getManagingOrganization().getReference()));
-		// Name
+		/*
+		Name
+		 */
 		List<PatientName> patientNames = new ArrayList<>(p.getName().size());
 		pm.setPatientNames(patientNames);
 		for (HumanName name : p.getName()) {
@@ -124,8 +135,10 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 				pm.setDeathDate(p.getDeceasedDateTimeType().getValue());
 			}
 		}
-		// Address
-		for (org.hl7.fhir.r5.model.Address address : p.getAddress()) {
+		/*
+		Addresses
+		 */
+		for (Address address : p.getAddress()) {
 			pm.addAddress(PatientAddress.fromR5(address));
 		}
 
@@ -148,8 +161,7 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 			if (StringUtils.isNotBlank(value.getVersion())) {
 				try {
 					pm.setPublicityIndicatorDate(MappingHelper.sdf.parse(value.getVersion()));
-				} catch (ParseException e) {
-//					throw new RuntimeException(e);
+				} catch (ParseException ignored) {
 				}
 			}
 		}
@@ -160,8 +172,7 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 			if (StringUtils.isNotBlank(value.getVersion())) {
 				try {
 					pm.setProtectionIndicatorDate(MappingHelper.sdf.parse(value.getVersion()));
-				} catch (ParseException e) {
-//					throw new RuntimeException(e);
+				} catch (ParseException ignored) {
 				}
 			}
 		}
@@ -172,14 +183,14 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 			if (StringUtils.isNotBlank(value.getVersion())) {
 				try {
 					pm.setRegistryStatusIndicatorDate(MappingHelper.sdf.parse(value.getVersion()));
-				} catch (ParseException e) {
-//				throw new RuntimeException(e);
+				} catch (ParseException ignored) {
 				}
 			}
 		}
 
-		// pm.setRegistryStatusIndicator(p.getActive());
-		// Patient Contact / Guardian
+		/*
+		Patient Contact / Guardian
+		 */
 		for (Patient.ContactComponent contactComponent : p.getContact()) {
 			PatientGuardian patientGuardian = new PatientGuardian();
 			patientGuardian.setName(PatientName.fromR5(contactComponent.getName()));
@@ -188,34 +199,11 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 		}
 	}
 
-	public PatientReported getReported(Patient patient) {
-		PatientReported patientReported = new PatientReported();
-		fillFromFhirResource(patientReported,patient);
-		return patientReported;
-	}
-
-	public PatientMaster getMaster(IBaseResource iBaseResource) {
-		return getMaster((Patient) iBaseResource);
-	}
-
-	public PatientMaster getMaster(Patient patient) {
-		PatientMaster patientMaster = new PatientMaster();
-		fillFromFhirResource(patientMaster,patient);
-		return patientMaster;
-	}
-
 	public Patient getFhirResource(PatientMaster pm) {
 		Patient p = new Patient();
 
 		p.getMeta().setLastUpdated(pm.getUpdatedDate());
 		p.setId(pm.getPatientId());
-//		p.addIdentifier(new Identifier()
-//			.setSystem(pm.getPatientReportedAuthority())
-//			.setValue(pm.getExternalLink())
-//			.setType(
-//				new CodeableConcept(new Coding()
-//					.setSystem("http://terminology.hl7.org/CodeSystem/v2-0203")
-//					.setCode(pm.getPatientReportedType()))));
 		for (PatientIdentifier patientIdentifier : pm.getPatientIdentifiers()) {
 			p.addIdentifier(patientIdentifier.toR5());
 		}
@@ -225,9 +213,7 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 			p.addName(patientName.toR5());
 		}
 
-		Extension motherMaidenName = p.addExtension()
-			.setUrl(MOTHER_MAIDEN_NAME)
-			.setValue(new StringType(pm.getMotherMaidenName()));
+		Extension motherMaidenName = p.addExtension().setUrl(MOTHER_MAIDEN_NAME).setValue(new StringType(pm.getMotherMaidenName()));
 
 		switch (pm.getSex()) {
 			case MALE_SEX:
@@ -287,8 +273,7 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 		Email
 		 */
 		if (null != pm.getEmail()) {
-			p.addTelecom().setSystem(ContactPointSystem.EMAIL)
-				.setValue(pm.getEmail());
+			p.addTelecom().setSystem(ContactPointSystem.EMAIL).setValue(pm.getEmail());
 		}
 
 
@@ -312,9 +297,7 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 
 		Extension publicity = p.addExtension();
 		publicity.setUrl(PUBLICITY_EXTENSION);
-		Coding publicityValue = new Coding()
-			.setSystem(PUBLICITY_SYSTEM)
-			.setCode(pm.getPublicityIndicator());
+		Coding publicityValue = new Coding().setSystem(PUBLICITY_SYSTEM).setCode(pm.getPublicityIndicator());
 		publicity.setValue(publicityValue);
 		if (pm.getPublicityIndicatorDate() != null) {
 			publicityValue.setVersion(MappingHelper.sdf.format(pm.getPublicityIndicatorDate()));
@@ -322,9 +305,7 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 
 		Extension protection = p.addExtension();
 		protection.setUrl(PROTECTION_EXTENSION);
-		Coding protectionValue = new Coding()
-			.setSystem(PROTECTION_SYSTEM)
-			.setCode(pm.getProtectionIndicator());
+		Coding protectionValue = new Coding().setSystem(PROTECTION_SYSTEM).setCode(pm.getProtectionIndicator());
 		protection.setValue(protectionValue);
 		if (pm.getProtectionIndicatorDate() != null) {
 			protectionValue.setVersion(MappingHelper.sdf.format(pm.getProtectionIndicatorDate()));
@@ -332,9 +313,7 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 
 		Extension registryStatus = p.addExtension();
 		registryStatus.setUrl(REGISTRY_STATUS_EXTENSION);
-		Coding registryValue = new Coding()
-			.setSystem(REGISTRY_STATUS_INDICATOR)
-			.setCode(pm.getRegistryStatusIndicator());
+		Coding registryValue = new Coding().setSystem(REGISTRY_STATUS_INDICATOR).setCode(pm.getRegistryStatusIndicator());
 		registryStatus.setValue(registryValue);
 		if (pm.getRegistryStatusIndicatorDate() != null) {
 			registryValue.setVersion(MappingHelper.sdf.format(pm.getRegistryStatusIndicatorDate()));

@@ -6,9 +6,8 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * Created by Eric on 12/20/17.
+ * Internal Standard agnostic representation of a patient's information
  */
-
 public class PatientMaster implements Serializable {
 
 	private static final long serialVersionUID = 1L;

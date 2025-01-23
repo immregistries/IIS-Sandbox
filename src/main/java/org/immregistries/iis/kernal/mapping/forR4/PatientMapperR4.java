@@ -3,7 +3,6 @@ package org.immregistries.iis.kernal.mapping.forR4;
 
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.r4.model.*;
-import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.InternalClient.FhirRequesterR4;
@@ -32,19 +31,26 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 
 	@Autowired
 	FhirRequesterR4 fhirRequests;
-//	@Autowired
-//	RelatedPersonMapperR4 relatedPersonMapperR4;
 
 	public PatientReported getReportedWithMaster(Patient p) {
 		PatientReported patientReported = getReported(p);
-		if (!p.getId().isBlank() && p.getMeta().getTag(GOLDEN_SYSTEM_TAG,GOLDEN_RECORD) == null) {
+		if (!p.getId().isBlank() && p.getMeta().getTag(GOLDEN_SYSTEM_TAG, GOLDEN_RECORD) == null) {
 			patientReported.setPatient(fhirRequests.readPatientMasterWithMdmLink(p.getId()));
 		}
 		return patientReported;
 	}
 
+	public PatientReported getReported(Patient patient) {
+		PatientReported patientReported = new PatientReported();
+		fillFromFhirResource(patientReported, patient);
+		return patientReported;
+	}
+
+	public PatientMaster getMaster(Patient patient) {
+		return getReported(patient);
+	}
+
 	private void fillFromFhirResource(PatientMaster pm, Patient p) {
-		CodeMap codeMap = CodeMapManager.getCodeMap();
 		if (StringUtils.isNotBlank(p.getId())) {
 			pm.setPatientId(new IdType(p.getId()).getIdPart());
 		}
@@ -175,8 +181,7 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 			if (StringUtils.isNotBlank(value.getVersion())) {
 				try {
 					pm.setPublicityIndicatorDate(MappingHelper.sdf.parse(value.getVersion()));
-				} catch (ParseException e) {
-//					throw new RuntimeException(e);
+				} catch (ParseException ignored) {
 				}
 			}
 		}
@@ -190,8 +195,7 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 			if (StringUtils.isNotBlank(value.getVersion())) {
 				try {
 					pm.setProtectionIndicatorDate(MappingHelper.sdf.parse(value.getVersion()));
-				} catch (ParseException e) {
-//					throw new RuntimeException(e);
+				} catch (ParseException ignored) {
 				}
 			}
 		}
@@ -205,8 +209,7 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 			if (StringUtils.isNotBlank(value.getVersion())) {
 				try {
 					pm.setRegistryStatusIndicatorDate(MappingHelper.sdf.parse(value.getVersion()));
-				} catch (ParseException e) {
-//				throw new RuntimeException(e);
+				} catch (ParseException ignored) {
 				}
 			}
 		}
@@ -222,28 +225,11 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 		}
 	}
 
-	public PatientReported getReported(Patient patient) {
-		PatientReported patientReported = new PatientReported();
-		fillFromFhirResource(patientReported,patient);
-		return patientReported;
-	}
-
-	public PatientMaster getMaster(Patient patient) {
-		return getReported(patient);
-	}
 
 	public Patient getFhirResource(PatientMaster pm) {
-		CodeMap codeMap = CodeMapManager.getCodeMap();
 		Patient p = new Patient();
 
 		p.getMeta().setLastUpdated(pm.getUpdatedDate());
-//		p.addIdentifier(new Identifier()
-//			.setSystem(pm.getPatientReportedAuthority())
-//			.setValue(pm.getExternalLink())
-//			.setType(
-//				new CodeableConcept(new Coding()
-//					.setSystem("http://terminology.hl7.org/CodeSystem/v2-0203")
-//					.setCode(pm.getPatientReportedType()))));
 		for (PatientIdentifier patientIdentifier : pm.getPatientIdentifiers()) {
 			p.addIdentifier(patientIdentifier.toR4());
 		}
@@ -253,9 +239,7 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 			p.addName(patientName.toR4());
 		}
 
-		Extension motherMaidenName = p.addExtension()
-			.setUrl(MOTHER_MAIDEN_NAME)
-			.setValue(new StringType(pm.getMotherMaidenName()));
+		p.addExtension().setUrl(MOTHER_MAIDEN_NAME).setValue(new StringType(pm.getMotherMaidenName()));
 
 		switch (pm.getSex()) {
 			case MALE_SEX:
@@ -316,8 +300,7 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 		 * Email
 		 */
 		if (null != pm.getEmail()) {
-			p.addTelecom().setSystem(ContactPoint.ContactPointSystem.EMAIL)
-				.setValue(pm.getEmail());
+			p.addTelecom().setSystem(ContactPoint.ContactPointSystem.EMAIL).setValue(pm.getEmail());
 		}
 
 		/*
@@ -352,9 +335,7 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 		 */
 		Extension publicity = p.addExtension();
 		publicity.setUrl(PUBLICITY_EXTENSION);
-		Coding publicityValue = new Coding()
-			.setSystem(PUBLICITY_SYSTEM)
-			.setCode(pm.getPublicityIndicator());
+		Coding publicityValue = new Coding().setSystem(PUBLICITY_SYSTEM).setCode(pm.getPublicityIndicator());
 		publicity.setValue(publicityValue);
 		if (pm.getPublicityIndicatorDate() != null) {
 			publicityValue.setVersion(MappingHelper.sdf.format(pm.getPublicityIndicatorDate()));
@@ -365,9 +346,7 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 		 */
 		Extension protection = p.addExtension();
 		protection.setUrl(PROTECTION_EXTENSION);
-		Coding protectionValue = new Coding()
-			.setSystem(PROTECTION_SYSTEM)
-			.setCode(pm.getProtectionIndicator());
+		Coding protectionValue = new Coding().setSystem(PROTECTION_SYSTEM).setCode(pm.getProtectionIndicator());
 		protection.setValue(protectionValue);
 		if (pm.getProtectionIndicatorDate() != null) {
 			protectionValue.setVersion(MappingHelper.sdf.format(pm.getProtectionIndicatorDate()));
@@ -378,9 +357,7 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 		 */
 		Extension registryStatus = p.addExtension();
 		registryStatus.setUrl(REGISTRY_STATUS_EXTENSION);
-		Coding registryValue = new Coding()
-			.setSystem(REGISTRY_STATUS_INDICATOR)
-			.setCode(pm.getRegistryStatusIndicator());
+		Coding registryValue = new Coding().setSystem(REGISTRY_STATUS_INDICATOR).setCode(pm.getRegistryStatusIndicator());
 		registryStatus.setValue(registryValue);
 		if (pm.getRegistryStatusIndicatorDate() != null) {
 			registryValue.setVersion(MappingHelper.sdf.format(pm.getRegistryStatusIndicatorDate()));

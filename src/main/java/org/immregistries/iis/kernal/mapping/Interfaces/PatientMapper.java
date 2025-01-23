@@ -1,9 +1,15 @@
 package org.immregistries.iis.kernal.mapping.Interfaces;
 
+import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.model.PatientReported;
 
-public interface PatientMapper<Patient> {
+/**
+ * Interface for mapping patient
+ *
+ * @param <Patient> FHIR Resource type
+ */
+public interface PatientMapper<Patient extends IBaseResource> {
 
 	String MRN_SYSTEM = "AIRA-TEST";
 
@@ -38,15 +44,30 @@ public interface PatientMapper<Patient> {
 	String V_2_NAME_TYPE = "v2-name-type";
 	String V_2_NAME_TYPE_SYSTEM = "http://terminology.hl7.org/CodeSystem/v2-0200";
 
+	/**
+	 * Translates from FHIR to reconstruct reported patient, fetching master patient for referencing
+	 *
+	 * @param patient FHIR patient resource
+	 * @return Mapped internal model Patient as reported patient, with
+	 */
 	PatientReported getReportedWithMaster(Patient patient);
 
+	/**
+	 * Translates from FHIR to reconstruct reported patient object
+	 * @param patient FHIR patient Resource
+	 * @return Mapped internal model Patient as reported patient
+	 */
 	PatientReported getReported(Patient patient);
 
+	/**
+	 *
+	 * @param patient FHIR patient Resource
+	 * @return Mapped internal model patient as master patient
+	 */
 	PatientMaster getMaster(Patient patient);
-//	PatientMaster getMaster(IBaseResource patient);
 
 	/**
-	 * Consvert local model patient information to FHIR Resource
+	 * Converts local model patient information to FHIR Resource
 	 * @param patientMaster any local patient record
 	 * @return
 	 */
