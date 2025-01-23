@@ -44,7 +44,9 @@ public class PatientProcessingInterceptor extends AbstractLogicInterceptor {
 	public void handle(RequestDetails requestDetails) throws InvalidRequestException, ProcessingException {
 		Set<ProcessingFlavor> processingFlavorSet = ProcessingFlavor.getProcessingStyle(requestDetails.getTenantId());
 		List<IisReportable> iisReportableList = iisReportableList(requestDetails);
-
+		if (requestDetails.getResource() == null || requestDetails.getOperation() == null) {
+			return;
+		}
 		IBaseResource result = requestDetails.getResource();
 		logger.info("details {} {}", requestDetails.getOperation(), requestDetails.getResource().fhirType());
 		if ((requestDetails.getOperation().equals("create") || requestDetails.getOperation().equals("update"))

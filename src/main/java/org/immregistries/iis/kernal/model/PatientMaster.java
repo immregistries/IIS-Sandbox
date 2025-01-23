@@ -378,9 +378,9 @@ public class PatientMaster implements Serializable {
 	public String toString() {
 		return "PatientMaster{" +
 				"patientId='" + patientId + '\'' +
-				", tenant=" + tenant +
+//				", tenant=" + tenant +
 				", patientIdentifiers=" + patientIdentifiers +
-				", reportedDate=" + reportedDate +
+//				", reportedDate=" + reportedDate +
 				", updatedDate=" + updatedDate +
 				", patientNames=" + patientNames +
 				", motherMaidenName='" + motherMaidenName + '\'' +
@@ -402,7 +402,7 @@ public class PatientMaster implements Serializable {
 				", registryStatusIndicator='" + registryStatusIndicator + '\'' +
 				", registryStatusIndicatorDate=" + registryStatusIndicatorDate +
 				", patientGuardians=" + patientGuardians +
-				", managingOrganizationId='" + managingOrganizationId + '\'' +
+//				", managingOrganizationId='" + managingOrganizationId + '\'' +
 				'}';
 	}
 }

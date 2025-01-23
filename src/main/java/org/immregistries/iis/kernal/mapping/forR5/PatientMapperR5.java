@@ -48,7 +48,9 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 		return patientReported;
 	}
 	public void fillFromFhirResource(PatientMaster pm,Patient p) {
-		pm.setPatientId(new IdType(p.getId()).getIdPart());
+		if (StringUtils.isNotBlank(p.getId())) {
+			pm.setPatientId(new IdType(p.getId()).getIdPart());
+		}
 //		pm.setExternalLink(p.getIdentifierFirstRep().getValue());
 		pm.setUpdatedDate(p.getMeta().getLastUpdated());
 		for (org.hl7.fhir.r5.model.Identifier identifier : p.getIdentifier()) {
@@ -80,30 +82,35 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 				pm.setSex("");
 				break;
 		}
-		if (p.hasExtension(RACE_EXTENSION)) {
-			for (Iterator<Extension> it = Stream.concat(p.getExtensionsByUrl(RACE_EXTENSION_OMB).stream(), p.getExtensionsByUrl(RACE_EXTENSION_DETAILED).stream()).iterator(); it.hasNext(); ) {
+
+		Extension raceExtension = p.getExtensionByUrl(RACE_EXTENSION);
+		if (raceExtension != null) {
+			for (Iterator<Extension> it = Stream.concat(raceExtension.getExtensionsByUrl(RACE_EXTENSION_OMB).stream(), raceExtension.getExtensionsByUrl(RACE_EXTENSION_DETAILED).stream()).iterator(); it.hasNext(); ) {
 				Extension ext = it.next();
 				Coding coding = MappingHelper.extensionGetCoding(ext);
-				pm.addRace(coding.getCode());
+				if (!pm.getRaces().contains(coding.getCode())) {
+					pm.addRace(StringUtils.defaultString(coding.getCode()));
+				}
 			}
 		}
 		Extension ethnicityExtension = p.getExtensionByUrl(ETHNICITY_EXTENSION);
 		if (ethnicityExtension != null) {
-			Extension ombExtention = p.getExtensionByUrl(ETHNICITY_EXTENSION_OMB);
-			Extension detailedExtention = p.getExtensionByUrl(ETHNICITY_EXTENSION_DETAILED);
-			if (ombExtention != null) {
-				pm.setEthnicity(MappingHelper.extensionGetCoding(ombExtention).getCode());
-			} else if (detailedExtention != null) {
-				pm.setEthnicity(MappingHelper.extensionGetCoding(detailedExtention).getCode());
+			Extension ombExtension = ethnicityExtension.getExtensionByUrl(ETHNICITY_EXTENSION_OMB);
+			Extension detailedExtension = ethnicityExtension.getExtensionByUrl(ETHNICITY_EXTENSION_DETAILED);
+			if (ombExtension != null) {
+				pm.setEthnicity(MappingHelper.extensionGetCoding(ombExtension).getCode());
+			} else if (detailedExtension != null) {
+				pm.setEthnicity(MappingHelper.extensionGetCoding(detailedExtension).getCode());
 			}
 		}
+
 
 		for (ContactPoint telecom : p.getTelecom()) {
 			if (null != telecom.getSystem()) {
 				if (telecom.getSystem().equals(ContactPointSystem.PHONE)) {
 					pm.addPhone(PatientPhone.fromR5(telecom));
 				} else if (telecom.getSystem().equals(ContactPointSystem.EMAIL)) {
-					pm.setEmail(telecom.getValue());
+					pm.setEmail(StringUtils.defaultString(telecom.getValue(), ""));
 				}
 			}
 		}
@@ -187,6 +194,7 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 			PatientGuardian patientGuardian = new PatientGuardian();
 			patientGuardian.setName(new PatientName(contactComponent.getName()));
 			patientGuardian.setGuardianRelationship(contactComponent.getRelationshipFirstRep().getText());
+			pm.addPatientGuardian(patientGuardian);
 		}
 	}
 
@@ -209,6 +217,7 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 	public Patient getFhirResource(PatientMaster pm) {
 		Patient p = new Patient();
 
+		p.getMeta().setLastUpdated(pm.getUpdatedDate());
 		p.setId(pm.getPatientId());
 //		p.addIdentifier(new Identifier()
 //			.setSystem(pm.getPatientReportedAuthority())
@@ -247,28 +256,32 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 		 */
 		Extension raceExtension = p.addExtension();
 		raceExtension.setUrl(RACE_EXTENSION);
-		CodeableConcept races = new CodeableConcept();
-		raceExtension.setValue(races);
+		StringBuilder raceText = new StringBuilder();
 		for (String value : pm.getRaces()) {
 			if (StringUtils.isNotBlank(value)) {
-				Coding coding = races.addCoding().setCode(value).setSystem(RACE_SYSTEM);
+				Coding coding = new Coding().setCode(value).setSystem(RACE_SYSTEM);
 				Code code = CodeMapManager.getCodeMap().getCodeForCodeset(CodesetType.PATIENT_RACE, value);
 				if (code != null) {
 					coding.setDisplay(code.getLabel());
 				}
+				if (false) {
+					raceExtension.addExtension(RACE_EXTENSION_OMB, coding);
+				} else {
+					raceExtension.addExtension(RACE_EXTENSION_DETAILED, coding);
+				}
+				raceText.append(value).append(" ");
 			}
 		}
+		raceExtension.addExtension(RACE_EXTENSION_TEXT, new StringType(raceText.toString()));
 
 		/**
 		 * Ethnicity
 		 */
-		Extension ethnicity = new Extension(ETHNICITY_EXTENSION, new Coding().setSystem(ETHNICITY_SYSTEM).setCode(pm.getEthnicity()));
-		p.addExtension(ethnicity);
+		Extension ethnicityExtension = p.addExtension().setUrl(ETHNICITY_EXTENSION);
 		if (StringUtils.isNotBlank(pm.getEthnicity())) {
-			Code code = CodeMapManager.getCodeMap().getCodeForCodeset(CodesetType.PATIENT_ETHNICITY,pm.getEthnicity());
-			if (code!= null) {
-				ethnicity.getValueCoding().setDisplay(code.getLabel());
-			}
+			ethnicityExtension.addExtension(ETHNICITY_EXTENSION_TEXT, new StringType(pm.getEthnicity()));
+			ethnicityExtension.addExtension(ETHNICITY_EXTENSION_OMB, new Coding().setSystem(ETHNICITY_SYSTEM).setCode(pm.getEthnicity())); // TODO add only if code in OMB system
+			ethnicityExtension.addExtension(ETHNICITY_EXTENSION_DETAILED, new Coding().setSystem(ETHNICITY_SYSTEM).setCode(pm.getEthnicity()));
 		}
 		// telecom
 		for (PatientPhone patientPhone : pm.getPhones()) {
@@ -305,7 +318,7 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 			.setCode(pm.getPublicityIndicator());
 		publicity.setValue(publicityValue);
 		if (pm.getPublicityIndicatorDate() != null) {
-			publicityValue.setVersion(pm.getPublicityIndicatorDate().toString());
+			publicityValue.setVersion(MappingHelper.sdf.format(pm.getPublicityIndicatorDate()));
 		}
 
 		Extension protection = p.addExtension();
@@ -315,7 +328,7 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 			.setCode(pm.getProtectionIndicator());
 		protection.setValue(protectionValue);
 		if (pm.getProtectionIndicatorDate() != null) {
-			protectionValue.setVersion(pm.getProtectionIndicatorDate().toString());
+			protectionValue.setVersion(MappingHelper.sdf.format(pm.getProtectionIndicatorDate()));
 		}
 
 		Extension registryStatus = p.addExtension();
@@ -325,7 +338,7 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 			.setCode(pm.getRegistryStatusIndicator());
 		registryStatus.setValue(registryValue);
 		if (pm.getRegistryStatusIndicatorDate() != null) {
-			registryValue.setVersion(pm.getRegistryStatusIndicatorDate().toString());
+			registryValue.setVersion(MappingHelper.sdf.format(pm.getRegistryStatusIndicatorDate()));
 		}
 
 		for (PatientGuardian patientGuardian : pm.getPatientGuardians()) {

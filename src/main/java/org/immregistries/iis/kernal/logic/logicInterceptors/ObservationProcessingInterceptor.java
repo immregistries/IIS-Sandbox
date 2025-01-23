@@ -35,6 +35,9 @@ public class ObservationProcessingInterceptor extends AbstractLogicInterceptor {
 	public void handle(RequestDetails requestDetails) throws InvalidRequestException, ProcessingException {
 		Set<ProcessingFlavor> processingFlavorSet = ProcessingFlavor.getProcessingStyle(requestDetails.getTenantId());
 		List<IisReportable> iisReportableList = iisReportableList(requestDetails);
+		if (requestDetails.getResource() == null || requestDetails.getOperation() == null) {
+			return;
+		}
 		int obxCount = 0;
 		if (requestDetails.getAttribute(OBX_COUNT) != null) { // If in a v2 context
 			obxCount = (int) requestDetails.getAttribute(OBX_COUNT);

@@ -1,5 +1,7 @@
 package org.immregistries.iis.kernal.model;
 
+import org.apache.commons.lang3.StringUtils;
+
 public class PatientAddress {
 	private String addressLine1 = "";
 	private String addressLine2 = "";
@@ -93,11 +95,11 @@ public class PatientAddress {
 		if (address.getLine().size() > 1) {
 			patientAddress.setAddressLine2(address.getLine().get(1).getValueNotNull());
 		}
-		patientAddress.setAddressCity(address.getCity());
-		patientAddress.setAddressState(address.getState());
-		patientAddress.setAddressZip(address.getPostalCode());
-		patientAddress.setAddressCountry(address.getCountry());
-		patientAddress.setAddressCountyParish(address.getDistrict());
+		patientAddress.setAddressCity(StringUtils.defaultString(address.getCity()));
+		patientAddress.setAddressState(StringUtils.defaultString(address.getState()));
+		patientAddress.setAddressZip(StringUtils.defaultString(address.getPostalCode()));
+		patientAddress.setAddressCountry(StringUtils.defaultString(address.getCountry()));
+		patientAddress.setAddressCountyParish(StringUtils.defaultString(address.getDistrict()));
 		return patientAddress;
 	}
 
@@ -109,11 +111,11 @@ public class PatientAddress {
 		if (address.getLine().size() > 1) {
 			patientAddress.setAddressLine2(address.getLine().get(1).getValueNotNull());
 		}
-		patientAddress.setAddressCity(address.getCity());
-		patientAddress.setAddressState(address.getState());
-		patientAddress.setAddressZip(address.getPostalCode());
-		patientAddress.setAddressCountry(address.getCountry());
-		patientAddress.setAddressCountyParish(address.getDistrict());
+		patientAddress.setAddressCity(StringUtils.defaultString(address.getCity()));
+		patientAddress.setAddressState(StringUtils.defaultString(address.getState()));
+		patientAddress.setAddressZip(StringUtils.defaultString(address.getPostalCode()));
+		patientAddress.setAddressCountry(StringUtils.defaultString(address.getCountry()));
+		patientAddress.setAddressCountyParish(StringUtils.defaultString(address.getDistrict()));
 		return patientAddress;
 	}
 

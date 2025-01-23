@@ -1063,7 +1063,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 
 		}
 		List<PatientName> names = new ArrayList<>(reader.getRepeatCount(5));
-		for (int i = 0; i <= reader.getRepeatCount(5); i++) {
+		for (int i = 1; i <= reader.getRepeatCount(5); i++) {
 			String patientNameLast = reader.getValueRepeat(5, 1, i);
 			String patientNameFirst = reader.getValueRepeat(5, 2, i);
 			String patientNameMiddle = reader.getValueRepeat(5, 3, i);
@@ -1146,7 +1146,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 			throw new ProcessingException("Patient is indicated as being born in the future, unable to record patients who are not yet born", "PID", 1, 7);
 		}
 
-		for (int i = 0; i <= reader.getRepeatCount(3); i++) {
+		for (int i = 1; i <= reader.getRepeatCount(3); i++) {
 			PatientIdentifier patientIdentifier = new PatientIdentifier();
 			patientIdentifier.setValue(reader.getValueRepeat(3, 1, i));
 			patientIdentifier.setSystem(reader.getValueRepeat(3, 4, i));
