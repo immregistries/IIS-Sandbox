@@ -253,8 +253,6 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 				Code code = CodeMapManager.getCodeMap().getCodeForCodeset(CodesetType.PATIENT_RACE, value);
 				if (code != null) {
 					coding.setDisplay(code.getLabel());
-				}
-				if (false) {
 					raceExtension.addExtension(RACE_EXTENSION_OMB, coding);
 				} else {
 					raceExtension.addExtension(RACE_EXTENSION_DETAILED, coding);
@@ -269,14 +267,25 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 		 */
 		Extension ethnicityExtension = p.addExtension().setUrl(ETHNICITY_EXTENSION);
 		if (StringUtils.isNotBlank(pm.getEthnicity())) {
+			Coding coding = new Coding().setCode(pm.getEthnicity()).setSystem(RACE_SYSTEM);
+			Code code = CodeMapManager.getCodeMap().getCodeForCodeset(CodesetType.PATIENT_ETHNICITY, pm.getEthnicity());
+			if (code != null) {
+				coding.setDisplay(code.getLabel());
+				ethnicityExtension.addExtension(ETHNICITY_EXTENSION_OMB, coding);
+			} else {
+				ethnicityExtension.addExtension(ETHNICITY_EXTENSION_DETAILED, coding);
+			}
 			ethnicityExtension.addExtension(ETHNICITY_EXTENSION_TEXT, new StringType(pm.getEthnicity()));
-			ethnicityExtension.addExtension(ETHNICITY_EXTENSION_OMB, new Coding().setSystem(ETHNICITY_SYSTEM).setCode(pm.getEthnicity())); // TODO add only if code in OMB system
-			ethnicityExtension.addExtension(ETHNICITY_EXTENSION_DETAILED, new Coding().setSystem(ETHNICITY_SYSTEM).setCode(pm.getEthnicity()));
 		}
-		// telecom
+		/*
+		Phone
+		 */
 		for (PatientPhone patientPhone : pm.getPhones()) {
 			p.addTelecom(patientPhone.toR5());
 		}
+		/*
+		Email
+		 */
 		if (null != pm.getEmail()) {
 			p.addTelecom().setSystem(ContactPointSystem.EMAIL)
 				.setValue(pm.getEmail());

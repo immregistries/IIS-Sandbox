@@ -3,6 +3,7 @@ package org.immregistries.iis.kernal.mapping.forR4;
 
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.r4.model.*;
+import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.InternalClient.FhirRequesterR4;
@@ -42,7 +43,8 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 		return patientReported;
 	}
 
-	public void fillFromFhirResource(PatientMaster pm, Patient p) {
+	private void fillFromFhirResource(PatientMaster pm, Patient p) {
+		CodeMap codeMap = CodeMapManager.getCodeMap();
 		if (StringUtils.isNotBlank(p.getId())) {
 			pm.setPatientId(new IdType(p.getId()).getIdPart());
 		}
@@ -225,13 +227,13 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 		fillFromFhirResource(patientReported,patient);
 		return patientReported;
 	}
+
 	public PatientMaster getMaster(Patient patient) {
-		PatientMaster patientMaster = new PatientMaster();
-		fillFromFhirResource(patientMaster,patient);
-		return patientMaster;
+		return getReported(patient);
 	}
 
 	public Patient getFhirResource(PatientMaster pm) {
+		CodeMap codeMap = CodeMapManager.getCodeMap();
 		Patient p = new Patient();
 
 		p.getMeta().setLastUpdated(pm.getUpdatedDate());
@@ -279,8 +281,6 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 				Code code = CodeMapManager.getCodeMap().getCodeForCodeset(CodesetType.PATIENT_RACE, value);
 				if (code != null) {
 					coding.setDisplay(code.getLabel());
-				}
-				if (false) { // TODO add only if code in OMB system
 					raceExtension.addExtension(RACE_EXTENSION_OMB, coding);
 				} else {
 					raceExtension.addExtension(RACE_EXTENSION_DETAILED, coding);
@@ -295,9 +295,15 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 		 */
 		Extension ethnicityExtension = p.addExtension().setUrl(ETHNICITY_EXTENSION);
 		if (StringUtils.isNotBlank(pm.getEthnicity())) {
+			Coding coding = new Coding().setCode(pm.getEthnicity()).setSystem(RACE_SYSTEM);
+			Code code = CodeMapManager.getCodeMap().getCodeForCodeset(CodesetType.PATIENT_ETHNICITY, pm.getEthnicity());
+			if (code != null) {
+				coding.setDisplay(code.getLabel());
+				ethnicityExtension.addExtension(ETHNICITY_EXTENSION_OMB, coding);
+			} else {
+				ethnicityExtension.addExtension(ETHNICITY_EXTENSION_DETAILED, coding);
+			}
 			ethnicityExtension.addExtension(ETHNICITY_EXTENSION_TEXT, new StringType(pm.getEthnicity()));
-			ethnicityExtension.addExtension(ETHNICITY_EXTENSION_OMB, new Coding().setSystem(ETHNICITY_SYSTEM).setCode(pm.getEthnicity())); // TODO add only if code in OMB system
-			ethnicityExtension.addExtension(ETHNICITY_EXTENSION_DETAILED, new Coding().setSystem(ETHNICITY_SYSTEM).setCode(pm.getEthnicity()));
 		}
 
 		/*
