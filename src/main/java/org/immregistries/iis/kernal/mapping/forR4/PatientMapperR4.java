@@ -31,8 +31,8 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 
 	@Autowired
 	FhirRequesterR4 fhirRequests;
-	@Autowired
-	RelatedPersonMapperR4 relatedPersonMapperR4;
+//	@Autowired
+//	RelatedPersonMapperR4 relatedPersonMapperR4;
 
 	public PatientReported getReportedWithMaster(Patient p) {
 		PatientReported patientReported = getReported(p);
@@ -46,26 +46,32 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 		if (StringUtils.isNotBlank(p.getId())) {
 			pm.setPatientId(new IdType(p.getId()).getIdPart());
 		}
-//		pm.setExternalLink(p.getIdentifierFirstRep().getValue());
+		/*
+		 * Identifiers
+		 */
 		for (Identifier identifier : p.getIdentifier()) {
 			pm.addPatientIdentifier(PatientIdentifier.fromR4(identifier));
 		}
 		pm.setUpdatedDate(p.getMeta().getLastUpdated());
 
-//		pm.setPatientReportedAuthority(p.getIdentifierFirstRep().getSystem());
 		pm.setBirthDate(p.getBirthDate());
 		pm.setManagingOrganizationId(StringUtils.defaultString(p.getManagingOrganization().getReference()));
-		// Name
+		/*
+		 * Names
+		 */
 		List<PatientName> patientNames = new ArrayList<>(p.getName().size());
 		pm.setPatientNames(patientNames);
 		for (HumanName name : p.getName()) {
-			patientNames.add(new PatientName(name));
+			patientNames.add(PatientName.fromR4(name));
 		}
 
 		Extension motherMaiden = p.getExtensionByUrl(MOTHER_MAIDEN_NAME);
 		if (motherMaiden != null) {
 			pm.setMotherMaidenName(motherMaiden.getValue().toString());
 		}
+		/*
+		 * Gender
+		 */
 		switch (p.getGender()) {
 			case MALE:
 				pm.setSex(MALE_SEX);
@@ -79,6 +85,9 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 				break;
 		}
 
+		/*
+		 * Races
+		 */
 		Extension raceExtension = p.getExtensionByUrl(RACE_EXTENSION);
 		if (raceExtension != null) {
 			for (Iterator<Extension> it = Stream.concat(raceExtension.getExtensionsByUrl(RACE_EXTENSION_OMB).stream(), raceExtension.getExtensionsByUrl(RACE_EXTENSION_DETAILED).stream()).iterator(); it.hasNext(); ) {
@@ -89,6 +98,9 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 				}
 			}
 		}
+		/*
+		 * Ethnicity
+		 */
 		Extension ethnicityExtension = p.getExtensionByUrl(ETHNICITY_EXTENSION);
 		if (ethnicityExtension != null) {
 			Extension ombExtension = ethnicityExtension.getExtensionByUrl(ETHNICITY_EXTENSION_OMB);
@@ -100,6 +112,9 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 			}
 		}
 
+		/*
+		 * Phone email
+		 */
 		for (ContactPoint telecom : p.getTelecom()) {
 			if (null != telecom.getSystem()) {
 				if (telecom.getSystem().equals(ContactPoint.ContactPointSystem.PHONE)) {
@@ -110,6 +125,9 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 			}
 		}
 
+		/*
+		 * Deceased
+		 */
 		if (null != p.getDeceased()) {
 			if (p.getDeceased().isBooleanPrimitive()) {
 				if (p.getDeceasedBooleanType().booleanValue()) {
@@ -122,11 +140,17 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 				pm.setDeathDate(p.getDeceasedDateTimeType().getValue());
 			}
 		}
-		// Address
+
+		/*
+		 * Addresses
+		 */
 		for (Address address : p.getAddress()) {
 			pm.addAddress(PatientAddress.fromR4(address));
 		}
 
+		/*
+		 * Multiple birth
+		 */
 		if (null != p.getMultipleBirth()) {
 			if (p.getMultipleBirth().isBooleanPrimitive()) {
 				if (p.getMultipleBirthBooleanType().booleanValue()) {
@@ -139,6 +163,9 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 			}
 		}
 
+		/*
+		 * Publicity
+		 */
 		Extension publicity = p.getExtensionByUrl(PUBLICITY_EXTENSION);
 		if (publicity != null) {
 			Coding value = MappingHelper.extensionGetCoding(publicity);
@@ -151,6 +178,9 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 				}
 			}
 		}
+		/*
+		 * Protection
+		 */
 		Extension protection = p.getExtensionByUrl(PROTECTION_EXTENSION);
 		if (protection != null) {
 			Coding value = MappingHelper.extensionGetCoding(protection);
@@ -163,6 +193,9 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 				}
 			}
 		}
+		/*
+		 * Registry status
+		 */
 		Extension registry = p.getExtensionByUrl(REGISTRY_STATUS_EXTENSION);
 		if (registry != null) {
 			Coding value = MappingHelper.extensionGetCoding(registry);
@@ -176,18 +209,13 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 			}
 		}
 
-		// pm.setRegistryStatusIndicator(p.getActive());
-		// Patient Contact / Guardian
-//		RelatedPerson relatedPerson = fhirRequests.searchRelatedPerson(
-//			new SearchParameterMap(RelatedPerson.SP_PATIENT,new ReferenceParam(pm.getPatientId()))
-//			.add(RelatedPerson.SP_PATIENT,new ReferenceParam(pm.getExternalLink())));
-//		if (relatedPerson != null) {
-//			relatedPersonMapperR4.fillGuardianInformation(pm, relatedPerson);
-//		}
+		/*
+		 * Patient Contact / Guardian
+		 */
 		for (Patient.ContactComponent contactComponent : p.getContact()) {
 			PatientGuardian patientGuardian = new PatientGuardian();
-			patientGuardian.setName(new PatientName(contactComponent.getName()));
-			patientGuardian.setGuardianRelationship(contactComponent.getRelationshipFirstRep().getText());
+			patientGuardian.setName(PatientName.fromR4(contactComponent.getName()));
+			patientGuardian.setGuardianRelationship(contactComponent.getRelationshipFirstRep().getCodingFirstRep().getCode());
 			pm.addPatientGuardian(patientGuardian);
 		}
 	}
@@ -239,7 +267,7 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 				break;
 		}
 
-		/**
+		/*
 		 * Race
 		 */
 		Extension raceExtension = p.addExtension();
@@ -262,7 +290,7 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 		}
 		raceExtension.addExtension(RACE_EXTENSION_TEXT, new StringType(raceText.toString()));
 
-		/**
+		/*
 		 * Ethnicity
 		 */
 		Extension ethnicityExtension = p.addExtension().setUrl(ETHNICITY_EXTENSION);
@@ -272,16 +300,23 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 			ethnicityExtension.addExtension(ETHNICITY_EXTENSION_DETAILED, new Coding().setSystem(ETHNICITY_SYSTEM).setCode(pm.getEthnicity()));
 		}
 
-		// telecom
+		/*
+		 * Phone
+		 */
 		for (PatientPhone patientPhone : pm.getPhones()) {
 			p.addTelecom(patientPhone.toR4());
 		}
+		/*
+		 * Email
+		 */
 		if (null != pm.getEmail()) {
 			p.addTelecom().setSystem(ContactPoint.ContactPointSystem.EMAIL)
 				.setValue(pm.getEmail());
 		}
 
-
+		/*
+		 * Death
+		 */
 		if (pm.getDeathDate() != null) {
 			p.setDeceased(new DateType(pm.getDeathDate()));
 		} else if (pm.getDeathFlag().equals(YES)) {
@@ -290,16 +325,25 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 			p.setDeceased(new BooleanType(false));
 		}
 
+		/*
+		 * Addresses
+		 */
 		for (PatientAddress patientAddress : pm.getAddresses()) {
 			p.addAddress(patientAddress.toR4());
 		}
 
+		/*
+		 * Birth Order
+		 */
 		if (StringUtils.isNotBlank(pm.getBirthOrder())) {
 			p.setMultipleBirth(new IntegerType().setValue(Integer.parseInt(pm.getBirthOrder())));
 		} else if (pm.getBirthFlag().equals(YES)) {
 			p.setMultipleBirth(new BooleanType(true));
 		}
 
+		/*
+		 * Publicity
+		 */
 		Extension publicity = p.addExtension();
 		publicity.setUrl(PUBLICITY_EXTENSION);
 		Coding publicityValue = new Coding()
@@ -310,6 +354,9 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 			publicityValue.setVersion(MappingHelper.sdf.format(pm.getPublicityIndicatorDate()));
 		}
 
+		/*
+		 * Protection
+		 */
 		Extension protection = p.addExtension();
 		protection.setUrl(PROTECTION_EXTENSION);
 		Coding protectionValue = new Coding()
@@ -320,6 +367,9 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 			protectionValue.setVersion(MappingHelper.sdf.format(pm.getProtectionIndicatorDate()));
 		}
 
+		/*
+		 * Registry status
+		 */
 		Extension registryStatus = p.addExtension();
 		registryStatus.setUrl(REGISTRY_STATUS_EXTENSION);
 		Coding registryValue = new Coding()
@@ -330,11 +380,14 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 			registryValue.setVersion(MappingHelper.sdf.format(pm.getRegistryStatusIndicatorDate()));
 		}
 
+		/*
+		 * Guardian next of kin
+		 */
 		for (PatientGuardian patientGuardian : pm.getPatientGuardians()) {
 			Patient.ContactComponent contact = p.addContact();
 			HumanName contactName = new HumanName();
 			contact.setName(contactName);
-			contact.addRelationship().setText(patientGuardian.getGuardianRelationship());
+			contact.addRelationship().setText(patientGuardian.getGuardianRelationship()).addCoding().setCode(patientGuardian.getGuardianRelationship());
 			contactName.setFamily(patientGuardian.getName().getNameLast());
 			contactName.addGivenElement().setValue(patientGuardian.getName().getNameFirst());
 			contactName.addGivenElement().setValue(patientGuardian.getName().getNameMiddle());

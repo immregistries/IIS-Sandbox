@@ -19,9 +19,9 @@ public class PatientName {
 		this.nameType = nameType;
 	}
 
-	public PatientName(org.hl7.fhir.r4.model.HumanName name) {
+	private PatientName(org.hl7.fhir.r4.model.HumanName name) {
 		this.setNameLast(name.getFamily());
-		if (name.getGiven().size() > 0) {
+		if (!name.getGiven().isEmpty()) {
 			this.setNameFirst(name.getGiven().get(0).getValueNotNull());
 		}
 		if (name.getGiven().size() > 1) {
@@ -33,9 +33,9 @@ public class PatientName {
 		}
 	}
 
-	public PatientName(org.hl7.fhir.r5.model.HumanName name) {
+	private PatientName(org.hl7.fhir.r5.model.HumanName name) {
 		this.setNameLast(name.getFamily());
-		if (name.getGiven().size() > 0) {
+		if (!name.getGiven().isEmpty()) {
 			this.setNameFirst(name.getGiven().get(0).getValueNotNull());
 		}
 		if (name.getGiven().size() > 1) {
@@ -102,6 +102,14 @@ public class PatientName {
 			name.addExtension().setUrl(V_2_NAME_TYPE).setValue(new org.hl7.fhir.r5.model.Coding(V_2_NAME_TYPE_SYSTEM, this.getNameType(), ""));
 		}
 		return name;
+	}
+
+	public static PatientName fromR4(org.hl7.fhir.r4.model.HumanName name) {
+		return new PatientName(name);
+	}
+
+	public static PatientName fromR5(org.hl7.fhir.r5.model.HumanName name) {
+		return new PatientName(name);
 	}
 
 	@Override

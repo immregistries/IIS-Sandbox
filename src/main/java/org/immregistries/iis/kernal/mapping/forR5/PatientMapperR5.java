@@ -37,8 +37,6 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 
 	@Autowired
 	FhirRequesterR5 fhirRequests;
-	@Autowired
-	RelatedPersonMapperR5 relatedPersonMapperR5;
 
 	public PatientReported getReportedWithMaster(Patient p) {
 		PatientReported patientReported = getReported(p);
@@ -47,23 +45,22 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 		}
 		return patientReported;
 	}
+
 	public void fillFromFhirResource(PatientMaster pm,Patient p) {
 		if (StringUtils.isNotBlank(p.getId())) {
 			pm.setPatientId(new IdType(p.getId()).getIdPart());
 		}
-//		pm.setExternalLink(p.getIdentifierFirstRep().getValue());
 		pm.setUpdatedDate(p.getMeta().getLastUpdated());
-		for (org.hl7.fhir.r5.model.Identifier identifier : p.getIdentifier()) {
+		for (Identifier identifier : p.getIdentifier()) {
 			pm.addPatientIdentifier(PatientIdentifier.fromR5(identifier));
 		}
-//		pm.setPatientReportedAuthority(p.getIdentifierFirstRep().getSystem());
 		pm.setBirthDate(p.getBirthDate());
 		pm.setManagingOrganizationId(StringUtils.defaultString(p.getManagingOrganization().getReference()));
 		// Name
 		List<PatientName> patientNames = new ArrayList<>(p.getName().size());
 		pm.setPatientNames(patientNames);
 		for (HumanName name : p.getName()) {
-			patientNames.add(new PatientName(name));
+			patientNames.add(PatientName.fromR5(name));
 		}
 
 		if (p.hasExtension(MOTHER_MAIDEN_NAME)) {
@@ -183,17 +180,10 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 
 		// pm.setRegistryStatusIndicator(p.getActive());
 		// Patient Contact / Guardian
-//		RelatedPerson relatedPerson = fhirRequests.searchRelatedPerson(
-//			new SearchParameterMap(RelatedPerson.SP_PATIENT,new ReferenceParam(pm.getPatientId()))
-//				.add(RelatedPerson.SP_PATIENT,new ReferenceParam(pm.getExternalLink())));
-////			RelatedPerson.PATIENT.hasAnyOfIds(pm.getPatientId(), pm.getExternalLink()));
-//		if (relatedPerson != null) {
-//			relatedPersonMapperR5.fillGuardianInformation(pm, relatedPerson);
-//		}
 		for (Patient.ContactComponent contactComponent : p.getContact()) {
 			PatientGuardian patientGuardian = new PatientGuardian();
-			patientGuardian.setName(new PatientName(contactComponent.getName()));
-			patientGuardian.setGuardianRelationship(contactComponent.getRelationshipFirstRep().getText());
+			patientGuardian.setName(PatientName.fromR5(contactComponent.getName()));
+			patientGuardian.setGuardianRelationship(contactComponent.getRelationshipFirstRep().getCodingFirstRep().getCode());
 			pm.addPatientGuardian(patientGuardian);
 		}
 	}
@@ -251,7 +241,7 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 				break;
 		}
 
-		/**
+		/*
 		 * Race
 		 */
 		Extension raceExtension = p.addExtension();
@@ -274,7 +264,7 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 		}
 		raceExtension.addExtension(RACE_EXTENSION_TEXT, new StringType(raceText.toString()));
 
-		/**
+		/*
 		 * Ethnicity
 		 */
 		Extension ethnicityExtension = p.addExtension().setUrl(ETHNICITY_EXTENSION);
@@ -345,7 +335,7 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 			Patient.ContactComponent contact = p.addContact();
 			HumanName contactName = new HumanName();
 			contact.setName(contactName);
-			contact.addRelationship().setText(patientGuardian.getGuardianRelationship());
+			contact.addRelationship().setText(patientGuardian.getGuardianRelationship()).addCoding().setCode(patientGuardian.getGuardianRelationship());
 			contactName.setFamily(patientGuardian.getName().getNameLast());
 			contactName.addGivenElement().setValue(patientGuardian.getName().getNameFirst());
 			contactName.addGivenElement().setValue(patientGuardian.getName().getNameMiddle());
