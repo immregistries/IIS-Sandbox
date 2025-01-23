@@ -58,7 +58,7 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 		}
 //		pm.setPatientReportedAuthority(p.getIdentifierFirstRep().getSystem());
 		pm.setBirthDate(p.getBirthDate());
-		pm.setManagingOrganizationId(p.getManagingOrganization().getId());
+		pm.setManagingOrganizationId(StringUtils.defaultString(p.getManagingOrganization().getReference()));
 		// Name
 		List<PatientName> patientNames = new ArrayList<>(p.getName().size());
 		pm.setPatientNames(patientNames);

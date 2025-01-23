@@ -402,7 +402,7 @@ public class PatientMaster implements Serializable {
 				", registryStatusIndicator='" + registryStatusIndicator + '\'' +
 				", registryStatusIndicatorDate=" + registryStatusIndicatorDate +
 				", patientGuardians=" + patientGuardians +
-//				", managingOrganizationId='" + managingOrganizationId + '\'' +
+			", managingOrganizationId='" + managingOrganizationId + '\'' +
 				'}';
 	}
 }
