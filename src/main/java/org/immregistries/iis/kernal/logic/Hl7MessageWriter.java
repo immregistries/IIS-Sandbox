@@ -18,15 +18,11 @@ import java.util.Date;
 import java.util.Random;
 import java.util.Set;
 
-public abstract class Hl7MessageWriter //extends IncomingMessageHandler
-	implements IExampleMessageWriter {
+public abstract class Hl7MessageWriter implements IExampleMessageWriter {
 	private static Integer increment = 1;
-
 
 	@Autowired
 	protected RepositoryClientFactory repositoryClientFactory;
-
-
 	@Autowired
 	ObservationMapper observationMapper;
 
@@ -491,7 +487,6 @@ public abstract class Hl7MessageWriter //extends IncomingMessageHandler
 
 	public void printQueryNK1(PatientMaster patientMaster, StringBuilder sb, CodeMap codeMap) {
 		if (patientMaster != null) {
-
 			for (int i = 0; i < patientMaster.getPatientGuardians().size(); i++) {
 				PatientGuardian patientGuardian = patientMaster.getPatientGuardians().get(i);
 				if (StringUtils.isNotBlank(patientGuardian.getGuardianRelationship()) && StringUtils.isNotBlank(patientGuardian.getName().getNameLast()) && StringUtils.isNotBlank(patientGuardian.getName().getNameFirst())) {

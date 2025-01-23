@@ -3,7 +3,7 @@ package org.immregistries.iis.kernal.model;
 import java.io.Serializable;
 import java.util.Date;
 
-public class ObservationReported implements Serializable {
+public class ObservationReported extends AbstractMappedObject implements Serializable {
 
   private static final long serialVersionUID = 1L;
 

@@ -2,7 +2,7 @@ package org.immregistries.iis.kernal.model;
 
 import java.io.Serializable;
 
-public class ObservationMaster implements Serializable {
+public class ObservationMaster extends AbstractMappedObject implements Serializable {
   private static final long serialVersionUID = 1L;
 
   private String observationId = "";

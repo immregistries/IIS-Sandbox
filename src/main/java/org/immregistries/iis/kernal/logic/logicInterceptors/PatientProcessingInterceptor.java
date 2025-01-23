@@ -39,7 +39,6 @@ public class PatientProcessingInterceptor extends AbstractLogicInterceptor {
 	@Autowired
 	PatientMapper patientMapper;
 
-
 	@Hook(value = SERVER_INCOMING_REQUEST_PRE_HANDLED, order = 2000)
 	public void handle(RequestDetails requestDetails) throws InvalidRequestException, ProcessingException {
 		Set<ProcessingFlavor> processingFlavorSet = ProcessingFlavor.getProcessingStyle(requestDetails.getTenantId());
@@ -52,46 +51,14 @@ public class PatientProcessingInterceptor extends AbstractLogicInterceptor {
 		if ((requestDetails.getOperation().equals("create") || requestDetails.getOperation().equals("update"))
 				&& (requestDetails.getResource() instanceof org.hl7.fhir.r4.model.Patient || requestDetails.getResource() instanceof org.hl7.fhir.r5.model.Patient)) {
 			PatientReported patientReported = processAndValidatePatient(patientMapper.getReported(requestDetails.getResource()), iisReportableList, processingFlavorSet);
-			result = (IBaseResource) patientMapper.getFhirResource(patientReported);
+			result = patientMapper.getFhirResource(patientReported);
 		}
-//			else if (requestDetails.getResource() instanceof org.hl7.fhir.r5.model.Patient) {
-//			org.hl7.fhir.r5.model.Patient patient = (org.hl7.fhir.r5.model.Patient) requestDetails.getResource();
-//			List<org.hl7.fhir.r5.model.HumanName> humanNameList = new ArrayList<>(patient.getName().size());
-//			for (int i = 0; i < patient.getName().size(); i++) {
-//				PatientName patientName = new PatientName(patient.getName().get(i));
-//				patientName = processName(patientName, processingFlavorSet);
-//				if ("L".equals(patientName.getNameType())) {
-//					legalName = patientName;
-//				}
-//				if (processingFlavorSet.contains(ProcessingFlavor.IGNORENAMETYPE)) {
-//					patientName.setNameType("");
-//					legalName = patientName;
-//					i = patient.getName().size();
-//				}
-//				humanNameList.add(patientName.toR5());
-//			}
-//			checkLegalName(legalName, processingFlavorSet);
-//			patient.setName(humanNameList);
-//			requestDetails.setResource(patient);
-//		}
 		requestDetails.setResource(result);
 		requestDetails.setAttribute(IIS_REPORTABLE_LIST, iisReportableList);
 	}
 
-	private boolean testMapping(PatientReported patientReported) {
-		IBaseResource patient = (IBaseResource) patientMapper.getFhirResource(patientReported);
-		PatientReported patientReported1 = patientMapper.getReported(patient);
-		logger.info("original {}", patientReported);
-		logger.info("mapped {}", patientReported1);
-		boolean res = patientReported.toString().equals(patientReported1.toString());
-		logger.info("comparison {} {}", res, patientReported.toString().compareTo(patientReported1.toString()));
-		return res;
-	}
-
 	public PatientReported processAndValidatePatient(PatientReported patientReported, List<IisReportable> iisReportableList, Set<ProcessingFlavor> processingFlavorSet) throws ProcessingException {
-		testMapping(patientReported);
-
-		agnosticValidation(patientReported, iisReportableList, processingFlavorSet);
+//		testMapping(patientMapper, patientReported);
 		PatientName legalName = null;
 		List<PatientName> patientNames = new ArrayList<>(patientReported.getPatientNames().size());
 		for (int i = 0; i < patientReported.getPatientNames().size(); i++) {
@@ -128,6 +95,7 @@ public class PatientProcessingInterceptor extends AbstractLogicInterceptor {
 			}
 			iisReportableList.add(IisReportable.fromProcessingException(pe));
 		}
+		agnosticValidation(patientReported, iisReportableList, processingFlavorSet);
 		return patientReported;
 	}
 
@@ -218,8 +186,6 @@ public class PatientProcessingInterceptor extends AbstractLogicInterceptor {
 
 			}
 		}
-
-
 		if (legalName != null && ProcessingFlavor.MOONFRUIT.isActive() && nameFirst.startsWith("S") || nameFirst.startsWith("A")) {
 			throw new ProcessingException("Immunization History cannot be stored because of patient's consent status", "PID", 0, 0, IisReportableSeverity.WARN);
 		}

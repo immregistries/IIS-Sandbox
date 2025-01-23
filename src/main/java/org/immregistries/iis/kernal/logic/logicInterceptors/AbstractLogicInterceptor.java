@@ -1,16 +1,22 @@
 package org.immregistries.iis.kernal.logic.logicInterceptors;
 
 import ca.uhn.fhir.rest.api.server.RequestDetails;
+import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.immregistries.iis.kernal.logic.ack.IisReportable;
 import org.immregistries.iis.kernal.logic.ack.IisReportableSeverity;
+import org.immregistries.iis.kernal.mapping.Interfaces.IisFhirMapper;
+import org.immregistries.iis.kernal.model.AbstractMappedObject;
 import org.immregistries.mqe.hl7util.model.CodedWithExceptions;
 import org.immregistries.mqe.hl7util.model.Hl7Location;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public abstract class AbstractLogicInterceptor {
+	Logger logger = LoggerFactory.getLogger(AbstractLogicInterceptor.class);
 
 	public static final String IIS_REPORTABLE_LIST = "iisReportableList";
 
@@ -31,6 +37,16 @@ public abstract class AbstractLogicInterceptor {
 		iisReportable.setHl7ErrorCode(applicationErrorCode);
 		iisReportable.setSeverity(IisReportableSeverity.WARN);
 		return iisReportable;
+	}
+
+	protected boolean testMapping(IisFhirMapper mapper, AbstractMappedObject abstractMappedObject) {
+		IBaseResource resource = mapper.getFhirResource(abstractMappedObject);
+		AbstractMappedObject abstractMappedObject1 = mapper.getReported(resource);
+		logger.info("original {}", abstractMappedObject);
+		logger.info("mapped {}", abstractMappedObject1);
+		boolean res = abstractMappedObject.toString().equals(abstractMappedObject1.toString());
+		logger.info("comparison {} {}", res, abstractMappedObject.toString().compareTo(abstractMappedObject1.toString()));
+		return res;
 	}
 
 

@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * Internal Standard agnostic representation of a patient's information
  */
-public class PatientMaster implements Serializable {
+public class PatientMaster extends AbstractMappedObject implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 

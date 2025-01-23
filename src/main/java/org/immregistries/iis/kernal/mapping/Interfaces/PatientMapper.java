@@ -9,7 +9,7 @@ import org.immregistries.iis.kernal.model.PatientReported;
  *
  * @param <Patient> FHIR Resource type
  */
-public interface PatientMapper<Patient extends IBaseResource> {
+public interface PatientMapper<Patient extends IBaseResource> extends IisFhirMapper<PatientMaster, PatientReported, Patient> {
 
 	String MRN_SYSTEM = "AIRA-TEST";
 
