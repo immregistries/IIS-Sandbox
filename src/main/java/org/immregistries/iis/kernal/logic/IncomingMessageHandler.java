@@ -29,6 +29,7 @@ import org.immregistries.iis.kernal.SoftwareVersion;
 import org.immregistries.iis.kernal.fhir.interceptors.PartitionCreationInterceptor;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.logic.ack.*;
+import org.immregistries.iis.kernal.logic.logicInterceptors.ImmunizationProcessingInterceptor;
 import org.immregistries.iis.kernal.logic.logicInterceptors.ObservationProcessingInterceptor;
 import org.immregistries.iis.kernal.logic.logicInterceptors.PatientProcessingInterceptor;
 import org.immregistries.iis.kernal.mapping.Interfaces.ImmunizationMapper;
@@ -97,6 +98,8 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 	PatientProcessingInterceptor patientProcessingInterceptor; // TODO decide how/where to implement the execution of interceptors, currently using DAO so some interceptors are skipped by the v2 process and need to be manually triggered
 	@Autowired
 	ObservationProcessingInterceptor observationProcessingInterceptor;
+	@Autowired
+	ImmunizationProcessingInterceptor immunizationProcessingInterceptor;
 
 	SyncHL7Validator syncHL7ValidatorVxuZ22;
 	SyncHL7Validator syncHL7ValidatorQbpZ34;
@@ -1246,9 +1249,9 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 				throw new ProcessingException("Vaccination order id was not found, unable to process", "ORC", orcCount, 3);
 			}
 			administrationDate = parseDateError(reader.getValue(3, 1), "Could not read administered date in RXA-5", "RXA", rxaCount, 3, strictDate);
-			if (administrationDate.after(new Date())) {
-				throw new ProcessingException("Vaccination is indicated as occuring in the future, unable to accept future vaccination events", "RXA", rxaCount, 3);
-			}
+//			if (administrationDate.after(new Date())) {
+//				throw new ProcessingException("Vaccination is indicated as occurring in the future, unable to accept future vaccination events", "RXA", rxaCount, 3);
+//			}
 
 			vaccinationReported = fhirRequester.searchVaccinationReported(new SearchParameterMap("identifier", new TokenParam().setValue(vaccinationReportedExternalLink)));
 //						Immunization.IDENTIFIER.exactly().code(vaccinationReportedExternalLink));
@@ -1298,57 +1301,56 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 					}
 				}
 			}
-
-			{
-				Code ndcCode = codeMap.getCodeForCodeset(CodesetType.VACCINATION_NDC_CODE, vaccineNdcCode);
-				if (ndcCode != null) {
-					if (ndcCode.getCodeStatus() != null && ndcCode.getCodeStatus().getDeprecated() != null && ndcCode.getCodeStatus().getDeprecated().getNewCodeValue() != null && !ndcCode.getCodeStatus().getDeprecated().getNewCodeValue().equals("")) {
-						vaccineNdcCode = ndcCode.getCodeStatus().getDeprecated().getNewCodeValue();
-					}
-					Code cvxCode = codeMap.getRelatedCode(ndcCode, CodesetType.VACCINATION_CVX_CODE);
-					if (cvxCode == null) {
-						ProcessingException pe = new ProcessingException("Unrecognized NDC " + vaccineNdcCode, "RXA", rxaCount, 5, IisReportableSeverity.WARN);
-						iisReportableList.add(IisReportable.fromProcessingException(pe));
-					} else {
-						if (vaccineCvxCode.equals("")) {
-							vaccineCvxCode = cvxCode.getValue();
-						} else if (!vaccineCvxCode.equals(cvxCode.getValue())) {
-							// NDC doesn't map to the CVX code that was submitted!
-							ProcessingException pe = new ProcessingException("NDC " + vaccineNdcCode + " maps to " + cvxCode.getValue() + " but CVX " + vaccineCvxCode + " was also reported, preferring CVX code", "RXA", rxaCount, 5, IisReportableSeverity.WARN);
-							iisReportableList.add(IisReportable.fromProcessingException(pe));
-						}
-					}
-				}
-			}
-			{
-				Code cptCode = codeMap.getCodeForCodeset(CodesetType.VACCINATION_CPT_CODE, vaccineCptCode);
-				if (cptCode != null) {
-					Code cvxCode = codeMap.getRelatedCode(cptCode, CodesetType.VACCINATION_CVX_CODE);
-					if (cvxCode == null) {
-						ProcessingException pe = new ProcessingException("Unrecognized CPT " + cptCode, "RXA", rxaCount, 5, IisReportableSeverity.WARN);
-						iisReportableList.add(IisReportable.fromProcessingException(pe));
-					} else {
-						if (vaccineCvxCode.equals("")) {
-							vaccineCvxCode = cvxCode.getValue();
-						} else if (!vaccineCvxCode.equals(cvxCode.getValue())) {
-							// CPT doesn't map to the CVX code that was submitted!
-							ProcessingException pe = new ProcessingException("CPT " + vaccineCptCode + " maps to " + cvxCode.getValue() + " but CVX " + vaccineCvxCode + " was also reported, preferring CVX code", "RXA", rxaCount, 5, IisReportableSeverity.WARN);
-							iisReportableList.add(IisReportable.fromProcessingException(pe));
-						}
-					}
-				}
-			}
-			if (vaccineCvxCode.equals("")) {
-				throw new ProcessingException("Unable to find a recognized vaccine administration code (CVX, NDC, or CPT)", "RXA", rxaCount, 5);
-			} else {
-				Code cvxCode = codeMap.getCodeForCodeset(CodesetType.VACCINATION_CVX_CODE, vaccineCvxCode);
-				if (cvxCode != null) {
-					vaccineCvxCode = cvxCode.getValue();
-				} else {
-					throw new ProcessingException("Unrecognized CVX vaccine '" + vaccineCvxCode + "'", "RXA", rxaCount, 5);
-				}
-
-			}
+//
+//			{// TODO sort key logic steps integrable in FHIR
+//				Code ndcCode = codeMap.getCodeForCodeset(CodesetType.VACCINATION_NDC_CODE, vaccineNdcCode);
+//				if (ndcCode != null) {
+//					if (ndcCode.getCodeStatus() != null && ndcCode.getCodeStatus().getDeprecated() != null && ndcCode.getCodeStatus().getDeprecated().getNewCodeValue() != null && !ndcCode.getCodeStatus().getDeprecated().getNewCodeValue().equals("")) {
+//						vaccineNdcCode = ndcCode.getCodeStatus().getDeprecated().getNewCodeValue();
+//					}
+//					Code cvxCode = codeMap.getRelatedCode(ndcCode, CodesetType.VACCINATION_CVX_CODE);
+//					if (cvxCode == null) {
+//						ProcessingException pe = new ProcessingException("Unrecognized NDC " + vaccineNdcCode, "RXA", rxaCount, 5, IisReportableSeverity.WARN);
+//						iisReportableList.add(IisReportable.fromProcessingException(pe));
+//					} else {
+//						if (vaccineCvxCode.equals("")) {
+//							vaccineCvxCode = cvxCode.getValue();
+//						} else if (!vaccineCvxCode.equals(cvxCode.getValue())) {
+//							// NDC doesn't map to the CVX code that was submitted!
+//							ProcessingException pe = new ProcessingException("NDC " + vaccineNdcCode + " maps to " + cvxCode.getValue() + " but CVX " + vaccineCvxCode + " was also reported, preferring CVX code", "RXA", rxaCount, 5, IisReportableSeverity.WARN);
+//							iisReportableList.add(IisReportable.fromProcessingException(pe));
+//						}
+//					}
+//				}
+//			}
+//			{
+//				Code cptCode = codeMap.getCodeForCodeset(CodesetType.VACCINATION_CPT_CODE, vaccineCptCode);
+//				if (cptCode != null) {
+//					Code cvxCode = codeMap.getRelatedCode(cptCode, CodesetType.VACCINATION_CVX_CODE);
+//					if (cvxCode == null) {
+//						ProcessingException pe = new ProcessingException("Unrecognized CPT " + cptCode, "RXA", rxaCount, 5, IisReportableSeverity.WARN);
+//						iisReportableList.add(IisReportable.fromProcessingException(pe));
+//					} else {
+//						if (vaccineCvxCode.equals("")) {
+//							vaccineCvxCode = cvxCode.getValue();
+//						} else if (!vaccineCvxCode.equals(cvxCode.getValue())) {
+//							// CPT doesn't map to the CVX code that was submitted!
+//							ProcessingException pe = new ProcessingException("CPT " + vaccineCptCode + " maps to " + cvxCode.getValue() + " but CVX " + vaccineCvxCode + " was also reported, preferring CVX code", "RXA", rxaCount, 5, IisReportableSeverity.WARN);
+//							iisReportableList.add(IisReportable.fromProcessingException(pe));
+//						}
+//					}
+//				}
+//			}
+//			if (vaccineCvxCode.equals("")) {
+//				throw new ProcessingException("Unable to find a recognized vaccine administration code (CVX, NDC, or CPT)", "RXA", rxaCount, 5);
+//			} else {
+//				Code cvxCode = codeMap.getCodeForCodeset(CodesetType.VACCINATION_CVX_CODE, vaccineCvxCode);
+//				if (cvxCode != null) {
+//					vaccineCvxCode = cvxCode.getValue();
+//				} else {
+//					throw new ProcessingException("Unrecognized CVX vaccine '" + vaccineCvxCode + "'", "RXA", rxaCount, 5);
+//				}
+//			}
 
 
 			{
@@ -1417,14 +1419,6 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 			vaccinationReported.setRefusalReasonCode(reader.getValue(18));
 			vaccinationReported.setCompletionStatus(reader.getValue(20));
 
-			if (StringUtils.isNotBlank(vaccinationReported.getRefusalReasonCode())) {
-				Code refusalCode = codeMap.getCodeForCodeset(CodesetType.VACCINATION_REFUSAL, vaccinationReported.getRefusalReasonCode());
-				if (refusalCode == null) {
-					ProcessingException pe = new ProcessingException("Unrecognized refusal reason", "RXA", rxaCount, 18);
-					pe.setErrorCode(IisReportableSeverity.WARN);
-					iisReportableList.add(IisReportable.fromProcessingException(pe));
-				}
-			}
 			vaccinationReported.setActionCode(reader.getValue(21));
 			int segmentPosition = reader.getSegmentPosition();
 			if (reader.advanceToSegment("RXR", "ORC")) {
@@ -1446,44 +1440,30 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 				refusalCount++;
 			}
 
-			if (ProcessingFlavor.GRAPEFRUIT.isActive() && random.nextBoolean()) {
-				throw new ProcessingException("Vaccination randomly rejected, Patient Accepted", "RXR", 0, 0, IisReportableSeverity.NOTICE);
-			}
-
-
 			reader.gotoSegmentPosition(segmentPosition);
 			int tempObxCount = obxCount;
+			int fundingSourceObxCount = -1;
+			int fundingEligibilityObxCount = -1;
 			while (reader.advanceToSegment("OBX", "ORC")) { //TODO store entering and ordering practitioners
 				tempObxCount++;
 				String indicator = reader.getValue(3);
 				if (indicator.equals("64994-7")) {
 					String fundingEligibility = reader.getValue(5);
-					if (!fundingEligibility.equals("")) {
-						Code fundingEligibilityCode = codeMap.getCodeForCodeset(CodesetType.FINANCIAL_STATUS_CODE, fundingEligibility);
-						if (fundingEligibilityCode == null) {
-							ProcessingException pe = new ProcessingException("Funding eligibility '" + fundingEligibility + "' was not recognized", "OBX", tempObxCount, 5, IisReportableSeverity.WARN);
-							;
-							iisReportableList.add(IisReportable.fromProcessingException(pe));
-						} else {
-							vaccinationReported.setFundingEligibility(fundingEligibilityCode.getValue());
-						}
+					if (StringUtils.isNotBlank(fundingEligibility)) {
+						vaccinationReported.setFundingEligibility(fundingEligibility);
+						fundingEligibilityObxCount = obxCount;
 					}
 				} else if (indicator.equals("30963-3")) {
 					String fundingSource = reader.getValue(5);
-					if (!fundingSource.equals("")) {
-						Code fundingSourceCode = codeMap.getCodeForCodeset(CodesetType.VACCINATION_FUNDING_SOURCE, fundingSource);
-						if (fundingSourceCode == null) {
-							ProcessingException pe = new ProcessingException("Funding source '" + fundingSource + "' was not recognized", "OBX", tempObxCount, 5, IisReportableSeverity.WARN);
-							;
-							iisReportableList.add(IisReportable.fromProcessingException(pe));
-						} else {
-							vaccinationReported.setFundingSource(fundingSourceCode.getValue());
-						}
+					if (StringUtils.isNotBlank(fundingSource)) {
+						vaccinationReported.setFundingSource(fundingSource);
+						fundingSourceObxCount = tempObxCount;
 					}
 				}
 			}
 
 			verifyNoErrors(iisReportableList);
+			immunizationProcessingInterceptor.processAndValidateVaccinationReported(vaccinationReported, iisReportableList, processingFlavorSet, fundingSourceObxCount, fundingEligibilityObxCount, rxaCount, vaccineCptCode);
 			reader.gotoSegmentPosition(segmentPosition);
 			vaccinationReported = fhirRequester.saveVaccinationReported(vaccinationReported);
 			vaccinationReportedList.add(vaccinationReported);
