@@ -6,6 +6,15 @@
     <artifactId>iis-sandbox</artifactId>
     <!--    <version>0.5.8</version>-->
     <packaging>war</packaging>
+
+
+    <repositories>
+        <repository>
+            <id>hit-nexus</id>
+            <url>https://hit-nexus.nist.gov/repository/releases</url>
+        </repository>
+    </repositories>
+
     <!-- one-liner to take you to the cloud with settings form the application.yaml file: -->
     <!-- 'mvn clean package com.google.cloud.tools:jib-maven-plugin:dockerBuild -Dimage=distroless-hapi && docker run -p 8080:8080 -e spring.batch.job.enabled=false distroless-hapi' -->
     <!--
