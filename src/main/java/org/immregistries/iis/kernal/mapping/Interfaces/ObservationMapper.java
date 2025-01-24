@@ -14,7 +14,7 @@ public interface ObservationMapper<Observation extends IBaseResource> extends Ii
 
 	ObservationMaster getMaster(Observation i);
 
-	Observation getFhirResource(ObservationReported vr);
+	Observation getFhirResource(ObservationMaster observationMaster);
 
 	ObservationReported getReportedWithMaster(Observation observation, IGenericClient fhirClient);
 }
