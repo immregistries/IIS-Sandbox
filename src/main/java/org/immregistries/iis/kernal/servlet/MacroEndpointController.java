@@ -6,13 +6,12 @@ import ca.uhn.fhir.jpa.api.dao.IFhirResourceDao;
 import ca.uhn.fhir.jpa.api.model.DaoMethodOutcome;
 import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
 import ca.uhn.fhir.rest.server.servlet.ServletRequestDetails;
-import ca.uhn.fhir.util.ClasspathUtil;
 import org.hibernate.Session;
 import org.hl7.fhir.r5.model.*;
 import org.immregistries.iis.kernal.fhir.annotations.OnR5Condition;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
-import org.immregistries.iis.kernal.model.UserAccess;
 import org.immregistries.iis.kernal.model.Tenant;
+import org.immregistries.iis.kernal.model.UserAccess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +33,7 @@ import java.io.IOException;
 public class MacroEndpointController {
 	Logger logger = LoggerFactory.getLogger(MacroEndpointController.class);
 	@Autowired
-	private FhirContext fhirContext;
+	FhirContext fhirContext;
 	@Autowired
 	IFhirResourceDao<Patient> patientDao;
 	@Autowired

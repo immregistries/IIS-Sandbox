@@ -25,7 +25,6 @@ public class MdmConfig {
 	@Autowired
 	AutowireCapableBeanFactory autowireCapableBeanFactory;
 
-
 	@Primary
 	@Bean
 	CustomGoldenResourceHelper customGoldenResourceHelper(FhirContext theFhirContext) {

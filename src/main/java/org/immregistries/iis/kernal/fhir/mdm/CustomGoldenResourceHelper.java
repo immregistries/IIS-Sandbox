@@ -37,16 +37,16 @@ public class CustomGoldenResourceHelper extends GoldenResourceHelper {
 	static final String FIELD_NAME_IDENTIFIER = "identifier";
 
 	@Autowired
-	private IMdmSettings myMdmSettings;
+	IMdmSettings myMdmSettings;
 
 	@Autowired
-	private EIDHelper myEIDHelper;
+	EIDHelper myEIDHelper;
 
 	@Autowired
-	private IMdmSurvivorshipService myMdmSurvivorshipService;
+	IMdmSurvivorshipService myMdmSurvivorshipService;
 
 	@Autowired
-	private MdmPartitionHelper myMdmPartitionHelper;
+	MdmPartitionHelper myMdmPartitionHelper;
 
 	private final FhirContext myFhirContext;
 

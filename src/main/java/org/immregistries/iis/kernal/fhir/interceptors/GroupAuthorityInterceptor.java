@@ -11,8 +11,8 @@ import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
 import org.hl7.fhir.r5.model.Group;
 import org.hl7.fhir.r5.model.Organization;
 import org.hl7.fhir.r5.model.Reference;
-import org.immregistries.iis.kernal.mapping.internalClient.FhirRequesterR5;
 import org.immregistries.iis.kernal.fhir.annotations.OnR5Condition;
+import org.immregistries.iis.kernal.mapping.internalClient.FhirRequesterR5;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +38,7 @@ public class GroupAuthorityInterceptor {
 	private Map<String, Map<String,String>> organizationAuthorityTree = new HashMap<>(DEFAULT_MAP_SIZE);
 
 	@Autowired
-	FhirRequesterR5 fhirRequesterR5;
+	private FhirRequesterR5 fhirRequesterR5;
 	@Autowired
 	private IFhirResourceDao<Organization> organizationDao;
 

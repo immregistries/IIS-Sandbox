@@ -5,9 +5,9 @@ import ca.uhn.fhir.context.FhirVersionEnum;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
-import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.logic.IncomingMessageHandler;
+import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
 import org.immregistries.iis.kernal.model.Tenant;
 import org.immregistries.smm.transform.ScenarioManager;
 import org.immregistries.smm.transform.TestCaseMessage;
@@ -41,7 +41,7 @@ public class PopServlet {
 	@Autowired
 	RepositoryClientFactory repositoryClientFactory;
 	@Autowired
-	private IncomingMessageHandler handler;
+	IncomingMessageHandler handler;
 
 	public static Session getDataSession() {
 		if (factory == null) {

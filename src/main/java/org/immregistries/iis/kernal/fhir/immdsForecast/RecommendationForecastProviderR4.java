@@ -28,7 +28,7 @@ public class RecommendationForecastProviderR4
 	Logger logger = LoggerFactory.getLogger(RecommendationForecastProviderR4.class);
 
 	@Autowired
-	ImmunizationRecommendationServiceR4 immunizationRecommendationServiceR4;
+	private ImmunizationRecommendationServiceR4 immunizationRecommendationServiceR4;
 
 	@Operation(name = $_IMMDS_FORECAST,
 		idempotent = true,

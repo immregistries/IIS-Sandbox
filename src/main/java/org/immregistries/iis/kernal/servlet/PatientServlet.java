@@ -16,11 +16,11 @@ import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
-import org.immregistries.iis.kernal.mapping.internalClient.FhirRequester;
-import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.logic.CodeMapManager;
 import org.immregistries.iis.kernal.mapping.interfaces.PatientMapper;
+import org.immregistries.iis.kernal.mapping.internalClient.FhirRequester;
+import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
 import org.immregistries.iis.kernal.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,7 +53,9 @@ public class PatientServlet  {
 	public static final String PARAM_PATIENT_NAME_FIRST = "patientNameFirst";
 	public static final String PARAM_PATIENT_REPORTED_EXTERNAL_LINK = "identifier";
 	public static final String PARAM_PATIENT_REPORTED_ID = "id";
-	Logger logger = LoggerFactory.getLogger(PatientServlet.class);
+
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
+	
 	@Autowired
 	RepositoryClientFactory repositoryClientFactory;
 	@Autowired

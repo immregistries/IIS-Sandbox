@@ -6,9 +6,9 @@ import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodeStatusValue;
 import org.immregistries.codebase.client.reference.CodesetType;
-import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
 import org.immregistries.iis.kernal.SoftwareVersion;
 import org.immregistries.iis.kernal.mapping.interfaces.ObservationMapper;
+import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
 import org.immregistries.iis.kernal.model.*;
 import org.immregistries.smm.tester.manager.HL7Reader;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +22,7 @@ public abstract class Hl7MessageWriter implements IExampleMessageWriter {
 	private static Integer increment = 1;
 
 	@Autowired
-	protected RepositoryClientFactory repositoryClientFactory;
+	RepositoryClientFactory repositoryClientFactory;
 	@Autowired
 	ObservationMapper observationMapper;
 

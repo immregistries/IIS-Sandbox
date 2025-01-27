@@ -16,17 +16,16 @@ import ca.uhn.fhir.rest.server.provider.ResourceProviderFactory;
 import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.hl7.fhir.instance.model.api.IBaseBundle;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 //@Component
 public class MdmCustomProvider extends MdmProviderDstu3Plus {
 
 	@Autowired
-	private FhirContext myFhirContext;
+	FhirContext myFhirContext;
 	@Autowired
-	private ResourceProviderFactory myResourceProviderFactory;
+	ResourceProviderFactory myResourceProviderFactory;
 	@Autowired
-	private MdmControllerHelper myMdmControllerHelper;
+	MdmControllerHelper myMdmControllerHelper;
 	@Autowired
 	private IMdmControllerSvc myMdmControllerSvc;
 	@Autowired

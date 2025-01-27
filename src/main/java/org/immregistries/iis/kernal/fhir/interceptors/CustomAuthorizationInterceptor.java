@@ -44,7 +44,7 @@ public class CustomAuthorizationInterceptor extends AuthorizationInterceptor {
 	public static final String BEARER_PREFIX = "Bearer ";
 
 	@Autowired
-	JwtUtils jwtUtils;
+	private JwtUtils jwtUtils;
 
 	/**
 	 * Authenticates request with Session cookie, Basic Auth (Token bearer currently only for specific usage ) and produces HAPI FHIR Authorization rules

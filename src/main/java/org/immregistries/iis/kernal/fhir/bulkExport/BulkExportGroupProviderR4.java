@@ -52,20 +52,16 @@ import java.util.Map;
 @Controller
 @Conditional(OnR4Condition.class)
 public class BulkExportGroupProviderR4 extends GroupResourceProvider implements IBulkExportGroupProvider<Group> {
-	Logger logger = LoggerFactory.getLogger(BulkExportGroupProviderR4.class);
+	private final Logger logger = LoggerFactory.getLogger(BulkExportGroupProviderR4.class);
 
 	@Autowired
-	BaseJpaResourceProviderPatient<Patient> patientProvider;
-
+	private BaseJpaResourceProviderPatient<Patient> patientProvider;
 	@Autowired
-	IFhirResourceDao<Group> fhirResourceGroupDao;
-
+	private IFhirResourceDao<Group> fhirResourceGroupDao;
 	@Autowired
-	IFhirResourceDao<Patient> patientIFhirResourceDao;
-
+	private IFhirResourceDao<Patient> patientIFhirResourceDao;
 	@Autowired
 	private IdentifierSolverInterceptorR4 identifierSolverInterceptor;
-
 	@Autowired
 	private IFhirResourceDao<Binary> binaryDao;
 

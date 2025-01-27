@@ -13,7 +13,7 @@ public class ElasticsearchConfig {
 	private static final org.slf4j.Logger ourLog = org.slf4j.LoggerFactory.getLogger(ElasticsearchConfig.class);
 
 	@Autowired
-	private ConfigurableEnvironment configurableEnvironment;
+	ConfigurableEnvironment configurableEnvironment;
 
 	@Bean
 	public ElasticsearchSvcImpl elasticsearchSvc() {

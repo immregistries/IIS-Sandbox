@@ -19,9 +19,9 @@ import org.springframework.stereotype.Service;
 import javax.interceptor.Interceptor;
 
 import static ca.uhn.fhir.interceptor.api.Pointcut.SERVER_INCOMING_REQUEST_PRE_HANDLED;
+import static org.immregistries.iis.kernal.mapping.interfaces.PatientMapper.MRN_SYSTEM;
 import static org.immregistries.iis.kernal.mapping.internalClient.FhirRequester.GOLDEN_RECORD;
 import static org.immregistries.iis.kernal.mapping.internalClient.FhirRequester.GOLDEN_SYSTEM_TAG;
-import static org.immregistries.iis.kernal.mapping.interfaces.PatientMapper.MRN_SYSTEM;
 
 @Interceptor
 @Conditional(OnR4Condition.class)
@@ -31,7 +31,7 @@ public class IdentifierSolverInterceptorR4 implements IIdentifierSolverIntercept
 	Logger logger = LoggerFactory.getLogger(IdentifierSolverInterceptorR4.class);
 
 	@Autowired
-	IFhirResourceDao<Patient> patientDao;
+	private IFhirResourceDao<Patient> patientDao;
 
 
 	@Override

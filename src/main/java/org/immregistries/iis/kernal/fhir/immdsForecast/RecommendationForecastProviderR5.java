@@ -23,7 +23,7 @@ import java.util.List;
 public class RecommendationForecastProviderR5 implements IRecommendationForecastProvider<Parameters, Patient, Immunization> {
 
 	@Autowired
-	ImmunizationRecommendationServiceR5 immunizationRecommendationServiceR5;
+	private ImmunizationRecommendationServiceR5 immunizationRecommendationServiceR5;
 
 	@Operation(name = $_IMMDS_FORECAST,
 		idempotent = true,

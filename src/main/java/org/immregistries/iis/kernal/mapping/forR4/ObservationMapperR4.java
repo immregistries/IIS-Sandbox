@@ -5,10 +5,10 @@ import ca.uhn.fhir.rest.param.TokenParam;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Observation;
 import org.hl7.fhir.r4.model.Reference;
-import org.immregistries.iis.kernal.mapping.internalClient.FhirRequester;
 import org.immregistries.iis.kernal.fhir.annotations.OnR4Condition;
-import org.immregistries.iis.kernal.mapping.interfaces.ObservationMapper;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
+import org.immregistries.iis.kernal.mapping.interfaces.ObservationMapper;
+import org.immregistries.iis.kernal.mapping.internalClient.FhirRequester;
 import org.immregistries.iis.kernal.model.ObservationMaster;
 import org.immregistries.iis.kernal.model.ObservationReported;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +22,7 @@ import static org.immregistries.iis.kernal.mapping.MappingHelper.PATIENT;
 @Conditional(OnR4Condition.class)
 public class ObservationMapperR4 implements ObservationMapper<Observation> {
 	@Autowired
-	FhirRequester fhirRequests;
+	private FhirRequester fhirRequests;
 
 	public Observation fhirResource(ObservationMaster om) {
 		Observation o = new Observation();

@@ -2,8 +2,8 @@ package org.immregistries.iis.kernal.fhir.security;
 
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Session;
-import org.immregistries.iis.kernal.model.UserAccess;
 import org.immregistries.iis.kernal.model.Tenant;
+import org.immregistries.iis.kernal.model.UserAccess;
 import org.immregistries.iis.kernal.servlet.PopServlet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,9 +22,9 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 
+import static org.immregistries.iis.kernal.fhir.security.ServletHelper.SESSION_TENANT;
 import static org.immregistries.iis.kernal.fhir.security.ServletHelper.SESSION_USER_ACCESS;
 import static org.immregistries.iis.kernal.servlet.LoginServlet.PARAM_TENANT_NAME;
-import static org.immregistries.iis.kernal.fhir.security.ServletHelper.SESSION_TENANT;
 
 
 @Component
@@ -32,7 +32,7 @@ public class UsernamePasswordAuthenticationProvider implements AuthenticationPro
 	private static String CLIENT_PROPERTY_KEY = "spring.security.oauth2.client.registration.";
 	Logger logger = LoggerFactory.getLogger(UsernamePasswordAuthenticationProvider.class);
 	@Autowired
-	private Environment env;
+	Environment env;
 	@Autowired
 	private OAuth2AuthorizedClientService authorizedClientService;
 	@Autowired

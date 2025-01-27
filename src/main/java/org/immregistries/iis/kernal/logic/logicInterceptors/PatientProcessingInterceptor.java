@@ -37,7 +37,7 @@ import static org.immregistries.iis.kernal.logic.IncomingMessageHandler.NAME_SIZ
 public class PatientProcessingInterceptor extends AbstractLogicInterceptor {
 	Logger logger = LoggerFactory.getLogger(PatientProcessingInterceptor.class);
 	@Autowired
-	PatientMapper patientMapper;
+	private PatientMapper patientMapper;
 
 	@Hook(value = SERVER_INCOMING_REQUEST_PRE_HANDLED, order = 2000)
 	public void handle(RequestDetails requestDetails) throws InvalidRequestException, ProcessingException {

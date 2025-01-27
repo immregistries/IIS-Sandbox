@@ -19,8 +19,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.hl7.fhir.r5.model.Immunization;
 import org.hl7.fhir.r5.model.ResourceType;
-import org.immregistries.iis.kernal.mapping.interfaces.ImmunizationMapper;
 import org.immregistries.iis.kernal.mapping.forR5.ImmunizationMapperR5;
+import org.immregistries.iis.kernal.mapping.interfaces.ImmunizationMapper;
 import org.immregistries.iis.kernal.model.ProcessingFlavor;
 import org.immregistries.iis.kernal.servlet.PatientMatchingDatasetConversionController;
 import org.immregistries.mismo.match.PatientMatchResult;
@@ -51,13 +51,13 @@ public class MdmCustomMatchFinderSvcR5 extends MdmMatchFinderSvcImpl implements 
 	private static final Logger ourLog = Logs.getMdmTroubleshootingLog();
 
 	@Autowired
-	private MdmCandidateSearchSvc myMdmCandidateSearchSvc;
+	MdmCandidateSearchSvc myMdmCandidateSearchSvc;
 	@Autowired
-	private MdmResourceMatcherSvc myMdmResourceMatcherSvc;
+	MdmResourceMatcherSvc myMdmResourceMatcherSvc;
 	@Autowired
 	IFhirResourceDao<Immunization> immunizationDao;
 	@Autowired
-	private PatientMatchingDatasetConversionController patientMatchingDatasetConversionController;
+	PatientMatchingDatasetConversionController patientMatchingDatasetConversionController;
 
 	@Override
 	@Nonnull

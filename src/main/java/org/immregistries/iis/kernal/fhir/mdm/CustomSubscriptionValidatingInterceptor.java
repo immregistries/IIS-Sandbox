@@ -27,13 +27,11 @@ import ca.uhn.fhir.rest.server.exceptions.InternalErrorException;
 import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
 import ca.uhn.fhir.rest.server.exceptions.UnprocessableEntityException;
 import ca.uhn.fhir.util.HapiExtensions;
-import ca.uhn.fhir.util.SubscriptionUtil;
 import com.google.common.annotations.VisibleForTesting;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r5.model.SubscriptionTopic;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.interceptor.Interceptor;
 import java.util.Optional;
 
 
@@ -42,25 +40,25 @@ public class CustomSubscriptionValidatingInterceptor extends SubscriptionValidat
 
 
 	@Autowired
-	private SubscriptionCanonicalizer mySubscriptionCanonicalizer;
+	SubscriptionCanonicalizer mySubscriptionCanonicalizer;
 
 	@Autowired
-	private DaoRegistry myDaoRegistry;
+	DaoRegistry myDaoRegistry;
 
 	@Autowired
-	private StorageSettings myStorageSettings;
+	StorageSettings myStorageSettings;
 
 	@Autowired
-	private SubscriptionStrategyEvaluator mySubscriptionStrategyEvaluator;
+	SubscriptionStrategyEvaluator mySubscriptionStrategyEvaluator;
 
 	@Autowired
-	private FhirContext myFhirContext;
+	FhirContext myFhirContext;
 
 	@Autowired
-	private IRequestPartitionHelperSvc myRequestPartitionHelperSvc;
+	IRequestPartitionHelperSvc myRequestPartitionHelperSvc;
 
 	@Autowired
-	private SubscriptionQueryValidator mySubscriptionQueryValidator;
+	SubscriptionQueryValidator mySubscriptionQueryValidator;
 
 	@Hook(Pointcut.STORAGE_PRESTORAGE_RESOURCE_CREATED)
 	@Override

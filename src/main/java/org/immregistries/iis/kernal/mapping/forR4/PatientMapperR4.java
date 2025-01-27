@@ -5,11 +5,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.r4.model.*;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
-import org.immregistries.iis.kernal.mapping.internalClient.FhirRequesterR4;
 import org.immregistries.iis.kernal.fhir.annotations.OnR4Condition;
 import org.immregistries.iis.kernal.logic.CodeMapManager;
-import org.immregistries.iis.kernal.mapping.interfaces.PatientMapper;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
+import org.immregistries.iis.kernal.mapping.interfaces.PatientMapper;
+import org.immregistries.iis.kernal.mapping.internalClient.FhirRequesterR4;
 import org.immregistries.iis.kernal.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
@@ -30,7 +30,7 @@ import static org.immregistries.iis.kernal.mapping.internalClient.FhirRequester.
 public class PatientMapperR4 implements PatientMapper<Patient> {
 
 	@Autowired
-	FhirRequesterR4 fhirRequests;
+	private FhirRequesterR4 fhirRequests;
 
 	public PatientReported localObjectReportedWithMaster(Patient p) {
 		PatientReported patientReported = localObjectReported(p);

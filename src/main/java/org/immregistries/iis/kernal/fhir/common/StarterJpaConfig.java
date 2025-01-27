@@ -61,7 +61,7 @@ public class StarterJpaConfig {
 
 	private static final org.slf4j.Logger ourLog = org.slf4j.LoggerFactory.getLogger(StarterJpaConfig.class);
 	@Autowired
-	private ConfigurableEnvironment configurableEnvironment;
+	ConfigurableEnvironment configurableEnvironment;
 
 	@Bean
 	public IFulltextSearchSvc fullTextSearchSvc() {

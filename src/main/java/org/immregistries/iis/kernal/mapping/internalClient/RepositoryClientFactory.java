@@ -39,7 +39,7 @@ import static org.immregistries.iis.kernal.fhir.security.ServletHelper.SESSION_T
 public class RepositoryClientFactory extends ApacheRestfulClientFactory implements ITestingUiClientFactory {
 	public static final String FHIR_CLIENT = "fhirClient";
 	@Autowired
-	private IFhirSystemDao fhirSystemDao;
+	IFhirSystemDao fhirSystemDao;
 	private final Logger logger = LoggerFactory.getLogger(RepositoryClientFactory.class);
 	private LoggingInterceptor loggingInterceptor;
 

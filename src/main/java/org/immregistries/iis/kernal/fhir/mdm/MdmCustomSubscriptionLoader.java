@@ -18,8 +18,8 @@ import ca.uhn.fhir.rest.api.server.SystemRequestDetails;
 import ca.uhn.fhir.rest.server.exceptions.ResourceGoneException;
 import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
 import ca.uhn.fhir.util.HapiExtensions;
-import org.hl7.fhir.r5.model.*;
 import org.hl7.fhir.instance.model.api.IBaseResource;
+import org.hl7.fhir.r5.model.*;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -43,10 +43,10 @@ public class MdmCustomSubscriptionLoader extends MdmSubscriptionLoader {
 	@Autowired(required = false)
 	private SubscriptionTopicLoader mySubscriptionTopicLoader;
 	@Autowired
-	private SubscriptionLoader mySubscriptionLoader;
+	SubscriptionLoader mySubscriptionLoader;
 
 	@Autowired
-	private IMdmSettings myMdmSettings;
+	IMdmSettings myMdmSettings;
 
 	private IFhirResourceDao<IBaseResource> mySubscriptionDao;
 	private IFhirResourceDao<IBaseResource> mySubscriptionTopicDao;

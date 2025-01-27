@@ -7,7 +7,10 @@ import ca.uhn.fhir.jpa.api.config.JpaStorageSettings;
 import ca.uhn.fhir.mdm.api.IMdmControllerSvc;
 import ca.uhn.fhir.mdm.api.IMdmSettings;
 import ca.uhn.fhir.mdm.api.IMdmSubmitSvc;
-import ca.uhn.fhir.mdm.provider.*;
+import ca.uhn.fhir.mdm.provider.BaseMdmProvider;
+import ca.uhn.fhir.mdm.provider.MdmControllerHelper;
+import ca.uhn.fhir.mdm.provider.MdmLinkHistoryProviderDstu3Plus;
+import ca.uhn.fhir.mdm.provider.MdmProviderLoader;
 import ca.uhn.fhir.rest.server.provider.ResourceProviderFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
@@ -18,19 +21,19 @@ import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
  */
 public class MdmCustomProviderLoader extends MdmProviderLoader {
 	@Autowired
-	private FhirContext myFhirContext;
+	FhirContext myFhirContext;
 	@Autowired
-	private ResourceProviderFactory myResourceProviderFactory;
+	ResourceProviderFactory myResourceProviderFactory;
 	@Autowired
-	private MdmControllerHelper myMdmControllerHelper;
+	MdmControllerHelper myMdmControllerHelper;
 	@Autowired
-	private IMdmControllerSvc myMdmControllerSvc;
+	IMdmControllerSvc myMdmControllerSvc;
 	@Autowired
-	private IMdmSubmitSvc myMdmSubmitSvc;
+	IMdmSubmitSvc myMdmSubmitSvc;
 	@Autowired
-	private IMdmSettings myMdmSettings;
+	IMdmSettings myMdmSettings;
 	@Autowired
-	private JpaStorageSettings myStorageSettings;
+	JpaStorageSettings myStorageSettings;
 
 	@Autowired
 	AutowireCapableBeanFactory autowireCapableBeanFactory;

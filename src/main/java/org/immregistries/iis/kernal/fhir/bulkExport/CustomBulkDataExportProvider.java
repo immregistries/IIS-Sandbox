@@ -44,7 +44,7 @@ public class CustomBulkDataExportProvider extends BulkDataExportProvider {
 	private static final Logger ourLog = getLogger(CustomBulkDataExportProvider.class);
 
 	@Autowired
-	private IInterceptorBroadcaster myInterceptorBroadcaster;
+	IInterceptorBroadcaster myInterceptorBroadcaster;
 
 	private Set<String> myCompartmentResources;
 

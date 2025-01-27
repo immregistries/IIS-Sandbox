@@ -38,14 +38,15 @@ import static org.immregistries.iis.kernal.fhir.interceptors.CustomAuthorization
 @Component
 @Interceptor
 public class PartitionCreationInterceptor extends RequestTenantPartitionInterceptor {
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
 	@Autowired
-	IPartitionLookupSvc partitionLookupSvc;
+	private IPartitionLookupSvc partitionLookupSvc;
 	@Autowired
-	public DaoRegistry myDaoRegistry;
+	private DaoRegistry myDaoRegistry;
 	@Autowired
-	FhirContext fhirContext;
+	private FhirContext fhirContext;
 	private IFhirResourceDao<IBaseResource> mySubscriptionTopicDao;
-	private final Logger ourLog = LoggerFactory.getLogger(PartitionCreationInterceptor.class);
 
 	public static final String PARTITION_NAME_SEPARATOR = "-"; // TEMP TODO find good url structure
 

@@ -7,11 +7,11 @@ import org.hl7.fhir.r5.model.ContactPoint.ContactPointSystem;
 import org.hl7.fhir.r5.model.Enumerations.AdministrativeGender;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
-import org.immregistries.iis.kernal.mapping.internalClient.FhirRequesterR5;
 import org.immregistries.iis.kernal.fhir.annotations.OnR5Condition;
 import org.immregistries.iis.kernal.logic.CodeMapManager;
-import org.immregistries.iis.kernal.mapping.interfaces.PatientMapper;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
+import org.immregistries.iis.kernal.mapping.interfaces.PatientMapper;
+import org.immregistries.iis.kernal.mapping.internalClient.FhirRequesterR5;
 import org.immregistries.iis.kernal.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +35,7 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 	Logger logger = LoggerFactory.getLogger(PatientMapperR5.class);
 
 	@Autowired
-	FhirRequesterR5 fhirRequests;
+	private FhirRequesterR5 fhirRequests;
 
 	public PatientReported localObjectReportedWithMaster(Patient p) {
 		PatientReported patientReported = localObjectReported(p);

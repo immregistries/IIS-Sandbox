@@ -34,7 +34,7 @@ public class TestMapping extends HttpServlet {
 	public static final String PARAM_MESSAGE = "MESSAGEDATA";
 
 	@Autowired
-	private IncomingMessageHandler handler;
+	IncomingMessageHandler handler;
 
 	@Autowired
 	PatientMapper<Patient> patientMapper;
