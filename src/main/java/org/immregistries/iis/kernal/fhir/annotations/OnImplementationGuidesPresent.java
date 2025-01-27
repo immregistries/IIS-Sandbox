@@ -1,6 +1,6 @@
 package org.immregistries.iis.kernal.fhir.annotations;
 
-import org.immregistries.iis.kernal.fhir.AppProperties;
+import org.immregistries.iis.kernal.fhir.common.AppProperties;
 import org.springframework.boot.context.properties.bind.Binder;
 import org.springframework.context.annotation.Condition;
 import org.springframework.context.annotation.ConditionContext;

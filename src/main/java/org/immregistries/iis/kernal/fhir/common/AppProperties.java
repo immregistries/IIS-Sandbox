@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal.fhir;
+package org.immregistries.iis.kernal.fhir.common;
 
 
 import ca.uhn.fhir.context.FhirVersionEnum;
@@ -11,12 +11,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 @ConfigurationProperties(prefix = "hapi.fhir")
 @Configuration

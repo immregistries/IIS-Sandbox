@@ -27,6 +27,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * Experimental and probably deprecated
+ */
 public class TestMapping extends HttpServlet {
 	public static final String PARAM_MESSAGE = "MESSAGEDATA";
 

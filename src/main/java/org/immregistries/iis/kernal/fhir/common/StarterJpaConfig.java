@@ -29,7 +29,6 @@ import ca.uhn.fhir.rest.server.interceptor.CorsInterceptor;
 import ca.uhn.fhir.rest.server.interceptor.LoggingInterceptor;
 import ca.uhn.fhir.rest.server.util.ISearchParamRegistry;
 import org.hl7.fhir.common.hapi.validation.support.CachingValidationSupport;
-import org.immregistries.iis.kernal.fhir.AppProperties;
 import org.immregistries.iis.kernal.fhir.annotations.OnCorsPresent;
 import org.immregistries.iis.kernal.fhir.annotations.OnImplementationGuidesPresent;
 import org.immregistries.iis.kernal.fhir.common.validation.IRepositoryValidationInterceptorFactory;

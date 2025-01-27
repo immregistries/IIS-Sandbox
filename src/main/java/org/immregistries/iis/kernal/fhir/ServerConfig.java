@@ -35,6 +35,7 @@ import ca.uhn.fhir.validation.ResultSeverityEnum;
 import com.google.common.base.Strings;
 import org.immregistries.iis.kernal.fhir.bulkQuery.CustomBulkDataExportProvider;
 import org.immregistries.iis.kernal.fhir.bulkQuery.IBulkQueryGroupProvider;
+import org.immregistries.iis.kernal.fhir.common.AppProperties;
 import org.immregistries.iis.kernal.fhir.common.StarterJpaConfig;
 import org.immregistries.iis.kernal.fhir.immdsForecast.IRecommendationForecastProvider;
 import org.immregistries.iis.kernal.fhir.interceptors.CustomAuthorizationInterceptor;
@@ -54,6 +55,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Class responsible for executing the HAPIFHIR Server config, registering providers and interceptors, including custom ones
+ */
 @Configuration
 @Import(
 	{
@@ -62,9 +66,6 @@ import java.util.Optional;
 		IpsConfig.class
 	}
 )
-/**
- * Class responsible for executing the HAPIFHIR Server config, registering providers and interceptors, including custom ones
- */
 public class ServerConfig {
 	private static final org.slf4j.Logger ourLog = org.slf4j.LoggerFactory.getLogger(ServerConfig.class);
 

@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal.fhir;
+package org.immregistries.iis.kernal.fhir.common;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
