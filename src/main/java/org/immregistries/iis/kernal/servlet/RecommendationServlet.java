@@ -185,6 +185,13 @@ public class RecommendationServlet extends PatientServlet {
 		out.close();
 	}
 
+	/**
+	 * Helping method to get Recommendation from server
+	 *
+	 * @param req        request
+	 * @param fhirClient Fhir client
+	 * @return ImmunizationRecommendation
+	 */
 	protected ImmunizationRecommendation getRecommendation(HttpServletRequest req, IGenericClient fhirClient) {
 		ImmunizationRecommendation recommendation = null;
 		if (req.getParameter(PARAM_RECOMMENDATION_ID) != null) {
