@@ -2,14 +2,12 @@ package org.immregistries.iis.kernal.fhir;
 
 import ca.uhn.fhir.batch2.jobs.imprt.BulkDataImportProvider;
 import ca.uhn.fhir.batch2.jobs.reindex.ReindexProvider;
-import ca.uhn.fhir.context.ConfigurationException;
 import ca.uhn.fhir.context.FhirVersionEnum;
 import ca.uhn.fhir.context.support.IValidationSupport;
 import ca.uhn.fhir.interceptor.api.IInterceptorBroadcaster;
 import ca.uhn.fhir.jpa.api.config.JpaStorageSettings;
 import ca.uhn.fhir.jpa.api.config.ThreadPoolFactoryConfig;
 import ca.uhn.fhir.jpa.api.dao.DaoRegistry;
-import ca.uhn.fhir.jpa.api.dao.IFhirResourceDao;
 import ca.uhn.fhir.jpa.api.dao.IFhirSystemDao;
 import ca.uhn.fhir.jpa.binary.interceptor.BinaryStorageInterceptor;
 import ca.uhn.fhir.jpa.binary.provider.BinaryAccessProvider;
@@ -35,9 +33,8 @@ import ca.uhn.fhir.rest.server.util.ISearchParamRegistry;
 import ca.uhn.fhir.validation.IValidatorModule;
 import ca.uhn.fhir.validation.ResultSeverityEnum;
 import com.google.common.base.Strings;
-import org.immregistries.iis.kernal.fhir.bulkQuery.BulkQueryGroupProviderR4;
-import org.immregistries.iis.kernal.fhir.bulkQuery.BulkQueryGroupProviderR5;
 import org.immregistries.iis.kernal.fhir.bulkQuery.CustomBulkDataExportProvider;
+import org.immregistries.iis.kernal.fhir.bulkQuery.IBulkQueryGroupProvider;
 import org.immregistries.iis.kernal.fhir.common.StarterJpaConfig;
 import org.immregistries.iis.kernal.fhir.immdsForecast.IRecommendationForecastProvider;
 import org.immregistries.iis.kernal.fhir.interceptors.GroupAuthorityInterceptor;
@@ -48,7 +45,6 @@ import org.immregistries.iis.kernal.fhir.ips.IpsConfig;
 import org.immregistries.iis.kernal.logic.logicInterceptors.ImmunizationProcessingInterceptor;
 import org.immregistries.iis.kernal.logic.logicInterceptors.ObservationProcessingInterceptor;
 import org.immregistries.iis.kernal.logic.logicInterceptors.PatientProcessingInterceptor;
-import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -60,26 +56,69 @@ import java.util.Optional;
 
 @Configuration
 @Import(
-	{ThreadPoolFactoryConfig.class,
+	{
+		ThreadPoolFactoryConfig.class,
 		StarterJpaConfig.class,
 		IpsConfig.class
 	}
 )
+/**
+ * Class responsible for executing the HAPIFHIR Server config, registering providers and interceptors, including custom ones
+ */
 public class ServerConfig {
 	private static final org.slf4j.Logger ourLog = org.slf4j.LoggerFactory.getLogger(ServerConfig.class);
 
+	/**
+	 * FHIR Server Configuration method, registering providers and interceptors, including customization
+	 *
+	 * @param fhirSystemDao                     fhirSystemDao
+	 * @param appProperties                     appProperties
+	 * @param daoRegistry                       daoRegistry
+	 * @param jpaSystemProvider                 jpaSystemProvider
+	 * @param resourceProviderFactory           resourceProviderFactory
+	 * @param jpaStorageSettings                jpaStorageSettings
+	 * @param searchParamRegistry               searchParamRegistry
+	 * @param theValidationSupport              theValidationSupport
+	 * @param databaseBackedPagingProvider      databaseBackedPagingProvider
+	 * @param loggingInterceptor                loggingInterceptor
+	 * @param terminologyUploaderProvider       terminologyUploaderProvider
+	 * @param subscriptionTriggeringProvider    subscriptionTriggeringProvider
+	 * @param corsInterceptor                   corsInterceptor
+	 * @param interceptorBroadcaster            interceptorBroadcaster
+	 * @param binaryAccessProvider              binaryAccessProvider
+	 * @param binaryStorageInterceptor          binaryStorageInterceptor
+	 * @param validatorModule                   validatorModule
+	 * @param graphQLProvider                   graphQLProvider
+	 * @param bulkDataExportProvider            bulkDataExportProvider
+	 * @param bulkDataImportProvider            bulkDataImportProvider
+	 * @param theValueSetOperationProvider      theValueSetOperationProvider
+	 * @param reindexProvider                   reindexProvider
+	 * @param partitionManagementProvider       partitionManagementProvider
+	 * @param repositoryValidatingInterceptor   repositoryValidatingInterceptor
+	 * @param packageInstallerSvc               packageInstallerSvc
+	 * @param theThreadSafeResourceDeleterSvc   theThreadSafeResourceDeleterSvc
+	 * @param appContext                        appContext
+	 * @param theIpsOperationProvider           IPS Provider
+	 * @param mdmProviderLoader                 mdmProviderLoader
+	 * @param partitionCreationInterceptor      partitionCreationInterceptor
+	 * @param bulkQueryGroupProvider            bulkQueryGroupProvider
+	 * @param identifierSolverInterceptor       identifierSolverInterceptor
+	 * @param groupAuthorityInterceptor         groupAuthorityInterceptor
+	 * @param recommendationForecastProvider    IMMDS Forecast operations provider
+	 * @param sessionAuthorizationInterceptor   sessionAuthorizationInterceptor
+	 * @param patientProcessingInterceptor      custom patientProcessingInterceptor
+	 * @param observationProcessingInterceptor  custom observationProcessingInterceptor
+	 * @param immunizationProcessingInterceptor custom immunizationProcessingInterceptor
+	 * @return Restful Server
+	 */
 	@Bean
 	public RestfulServer restfulServer(IFhirSystemDao<?, ?> fhirSystemDao, AppProperties appProperties, DaoRegistry daoRegistry, IJpaSystemProvider jpaSystemProvider, ResourceProviderFactory resourceProviderFactory, JpaStorageSettings jpaStorageSettings, ISearchParamRegistry searchParamRegistry, IValidationSupport theValidationSupport, DatabaseBackedPagingProvider databaseBackedPagingProvider, LoggingInterceptor loggingInterceptor, Optional<TerminologyUploaderProvider> terminologyUploaderProvider, Optional<SubscriptionTriggeringProvider> subscriptionTriggeringProvider, Optional<CorsInterceptor> corsInterceptor, IInterceptorBroadcaster interceptorBroadcaster, Optional<BinaryAccessProvider> binaryAccessProvider, BinaryStorageInterceptor binaryStorageInterceptor, IValidatorModule validatorModule, Optional<GraphQLProvider> graphQLProvider, CustomBulkDataExportProvider bulkDataExportProvider, BulkDataImportProvider bulkDataImportProvider, ValueSetOperationProvider theValueSetOperationProvider, ReindexProvider reindexProvider, PartitionManagementProvider partitionManagementProvider, Optional<RepositoryValidatingInterceptor> repositoryValidatingInterceptor, IPackageInstallerSvc packageInstallerSvc, ThreadSafeResourceDeleterSvc theThreadSafeResourceDeleterSvc, ApplicationContext appContext,
 												  Optional<IpsOperationProvider> theIpsOperationProvider,
 												  Optional<MdmProviderLoader> mdmProviderLoader,
 												  PartitionCreationInterceptor partitionCreationInterceptor,
-												  Optional<BulkQueryGroupProviderR5> bulkQueryGroupProviderR5,
-												  Optional<BulkQueryGroupProviderR4> bulkQueryGroupProviderR4,
+												  Optional<IBulkQueryGroupProvider> bulkQueryGroupProvider,
 												  Optional<IIdentifierSolverInterceptor> identifierSolverInterceptor,
-												  Optional<IFhirResourceDao<org.hl7.fhir.r4.model.Group>> fhirResourceGroupDaoR4,
-												  Optional<IFhirResourceDao<org.hl7.fhir.r5.model.Group>> fhirResourceGroupDaoR5,
 												  Optional<GroupAuthorityInterceptor> groupAuthorityInterceptor,
-												  IpsOperationProvider ipsOperationProvider,
 												  Optional<IRecommendationForecastProvider> recommendationForecastProvider,
 												  SessionAuthorizationInterceptor sessionAuthorizationInterceptor,
 												  PatientProcessingInterceptor patientProcessingInterceptor,
@@ -105,40 +144,32 @@ public class ServerConfig {
 			mdmProviderLoader.get().loadProvider();
 			jpaStorageSettings.setAllowMdmExpansion(true);
 		}
-		/**
+		/*
 		 * CUSTOM PROVIDERS HERE
 		 */
 		fhirServer.registerProviders(resourceProviderFactory.createProviders());
-		fhirServer.registerProvider(ipsOperationProvider);
 		fhirServer.registerProvider(jpaSystemProvider);
 		fhirServer.setServerConformanceProvider(calculateConformanceProvider(fhirSystemDao, fhirServer, jpaStorageSettings, searchParamRegistry, theValidationSupport));
 
 		/*
 		 * ETag Support
 		 */
-
 		if (!appProperties.getEtag_support_enabled()) fhirServer.setETagSupport(ETagSupportEnum.DISABLED);
-
-
 		/*
 		 * Default to JSON and pretty printing
 		 */
 		fhirServer.setDefaultPrettyPrint(appProperties.getDefault_pretty_print());
-
 		/*
 		 * Default encoding
 		 */
 		fhirServer.setDefaultResponseEncoding(appProperties.getDefault_encoding());
-
 		/*
 		 * This configures the server to page search results to and from
 		 * the database, instead of only paging them to memory. This may mean
 		 * a performance hit when performing searches that return lots of results,
 		 * but makes the server much more scalable.
 		 */
-
 		fhirServer.setPagingProvider(databaseBackedPagingProvider);
-
 		/*
 		 * This interceptor formats the output using nice colourful
 		 * HTML output when the request is detected to come from a
@@ -168,17 +199,6 @@ public class ServerConfig {
 			fhirServer.setServerAddressStrategy(new IncomingRequestAddressStrategy());
 		}
 
-		/*
-		 * If you are using DSTU3+, you may want to add a terminology uploader, which allows
-		 * uploading of external terminologies such as Snomed CT. Note that this uploader
-		 * does not have any security attached (any anonymous user may use it by default)
-		 * so it is a potential security vulnerability. Consider using an AuthorizationInterceptor
-		 * with this feature.
-		 */
-		if (fhirSystemDao.getContext().getVersion().getVersion().isEqualOrNewerThan(FhirVersionEnum.DSTU3)) { // <-- ENABLED RIGHT NOW
-			fhirServer.registerProvider(terminologyUploaderProvider.get());
-		}
-
 		// If you want to enable the $trigger-subscription operation to allow
 		// manual triggering of a subscription delivery, enable this provider
 		if (true) { // <-- ENABLED RIGHT NOW
@@ -187,7 +207,7 @@ public class ServerConfig {
 
 		corsInterceptor.ifPresent(fhirServer::registerInterceptor);
 
-		if (jpaStorageSettings.getSupportedSubscriptionTypes().size() > 0) {
+		if (!jpaStorageSettings.getSupportedSubscriptionTypes().isEmpty()) {
 			// Subscription debug logging
 			fhirServer.registerInterceptor(new SubscriptionDebugLogInterceptor());
 		}
@@ -204,7 +224,6 @@ public class ServerConfig {
 		}
 
 		// Validation
-
 		if (validatorModule != null) {
 			if (appProperties.getValidation().getRequests_enabled()) {
 				RequestValidatingInterceptor interceptor = new RequestValidatingInterceptor();
@@ -233,20 +252,17 @@ public class ServerConfig {
 
 		// Bulk Export
 		if (appProperties.getBulk_export_enabled()) {
-			/**
-			 * Customized to support synch export
+			/*
+			 * Customized
 			 */
 			fhirServer.registerProvider(bulkDataExportProvider);
-			if (bulkQueryGroupProviderR4.isPresent()) {
-				fhirServer.registerProvider(bulkQueryGroupProviderR4.get());
-				bulkQueryGroupProviderR4.get().setDao(fhirResourceGroupDaoR4.get());
-			} else if (bulkQueryGroupProviderR5.isPresent()) {
-				fhirServer.registerProvider(bulkQueryGroupProviderR5.get());
-				bulkQueryGroupProviderR5.get().setDao(fhirResourceGroupDaoR5.get());
+			if (bulkQueryGroupProvider.isPresent()) {
+				bulkQueryGroupProvider.get().setDao(daoRegistry.getResourceDao("Group"));
+				fhirServer.registerProvider(bulkQueryGroupProvider.get());
 			}
 		}
 
-		//Bulk Import
+		// Bulk Import
 		if (appProperties.getBulk_import_enabled()) {
 			fhirServer.registerProvider(bulkDataImportProvider);
 		}
@@ -260,9 +276,8 @@ public class ServerConfig {
 
 		// Partitioning
 		if (appProperties.getPartitioning() != null) {
-//			fhirServer.registerInterceptor(new RequestTenantPartitionInterceptor());
-			/**
-			 * registered custom interceptor for automatic partition generation
+			/*
+			 * Registered custom interceptor for automatic partition generation
 			 */
 			fhirServer.registerInterceptor(partitionCreationInterceptor);
 			fhirServer.setTenantIdentificationStrategy(new UrlBaseTenantIdentificationStrategy());
@@ -274,60 +289,30 @@ public class ServerConfig {
 		theIpsOperationProvider.ifPresent(fhirServer::registerProvider);
 		recommendationForecastProvider.ifPresent(fhirServer::registerProvider);
 
-		// register custom interceptors
+		/*
+		 * CUSTOM INTERCEPTORS HERE
+		 */
 		fhirServer.registerInterceptor(sessionAuthorizationInterceptor);
 		identifierSolverInterceptor.ifPresent(fhirServer::registerInterceptor);
-//		registerCustomInterceptors(fhirServer, appContext, appProperties.getCustomInterceptorClasses());
 		groupAuthorityInterceptor.ifPresent(fhirServer::registerInterceptor);
+		/*
+		 * Processing and validating interceptors, adding part of inherited V2 validation logic with Flavors.
+		 */
 		fhirServer.registerInterceptor(patientProcessingInterceptor);
 		fhirServer.registerInterceptor(immunizationProcessingInterceptor);
 		fhirServer.registerInterceptor(observationProcessingInterceptor);
-
 		return fhirServer;
 	}
 
 	/**
-	 * check the properties for custom interceptor classes and registers them.
+	 * Inherited from HAPI FHIR Skeleton
+	 * @param fhirSystemDao system Dao
+	 * @param fhirServer server
+	 * @param jpaStorageSettings storage settings
+	 * @param searchParamRegistry searchParamRegistry
+	 * @param theValidationSupport validation support
+	 * @return Conformance provider
 	 */
-	@SuppressWarnings({"unchecked", "rawtypes"})
-	private void registerCustomInterceptors(RestfulServer fhirServer, ApplicationContext theAppContext, List<String> customInterceptorClasses) {
-
-		if (customInterceptorClasses == null) {
-			return;
-		}
-
-
-		for (String className : customInterceptorClasses) {
-			Class clazz;
-			try {
-				clazz = Class.forName(className);
-			} catch (ClassNotFoundException e) {
-				throw new ConfigurationException("Interceptor class was not found on classpath: " + className, e);
-			}
-
-			// first check if the class a Bean in the app context
-
-			Object interceptor = null;
-			try {
-				interceptor = theAppContext.getBean(clazz);
-				ourLog.info("className bean {}", className);
-			} catch (NoSuchBeanDefinitionException ex) {
-				// no op - if it's not a bean we'll try to create it
-			}
-
-			// if not a bean, instantiate the interceptor via reflection
-			if (interceptor == null) {
-				try {
-					interceptor = clazz.getConstructor().newInstance();
-				} catch (Exception e) {
-					throw new ConfigurationException("Unable to instantiate interceptor class : " + className, e);
-				}
-			}
-
-			fhirServer.registerInterceptor(interceptor);
-		}
-	}
-
 	public static IServerConformanceProvider<?> calculateConformanceProvider(IFhirSystemDao fhirSystemDao, RestfulServer fhirServer, JpaStorageSettings jpaStorageSettings, ISearchParamRegistry searchParamRegistry, IValidationSupport theValidationSupport) {
 		FhirVersionEnum fhirVersion = fhirSystemDao.getContext().getVersion().getVersion();
 		if (fhirVersion == FhirVersionEnum.R4) {

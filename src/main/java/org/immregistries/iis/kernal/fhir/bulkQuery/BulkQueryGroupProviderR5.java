@@ -51,8 +51,7 @@ import java.util.Map;
 
 @Controller
 @Conditional(OnR5Condition.class)
-public class BulkQueryGroupProviderR5 extends GroupResourceProvider {
-	public static final String ATR_EXTENSION_URI = "http://hl7.org/fhir/us/davinci-atr/StructureDefinition/atr-any-resource-extension";
+public class BulkQueryGroupProviderR5 extends GroupResourceProvider implements IBulkQueryGroupProvider<Group> {
 	Logger logger = LoggerFactory.getLogger(BulkQueryGroupProviderR5.class);
 
 	@Autowired
@@ -71,6 +70,10 @@ public class BulkQueryGroupProviderR5 extends GroupResourceProvider {
 	public BulkQueryGroupProviderR5() {
 		super();
 		setDao(fhirResourceGroupDao);
+	}
+
+	public void setDao(IFhirResourceDao<Group> theDao) {
+		super.setDao(theDao);
 	}
 
 	/**

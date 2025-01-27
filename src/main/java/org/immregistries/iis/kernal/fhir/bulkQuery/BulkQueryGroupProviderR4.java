@@ -51,7 +51,7 @@ import java.util.Map;
 
 @Controller
 @Conditional(OnR4Condition.class)
-public class BulkQueryGroupProviderR4 extends GroupResourceProvider {
+public class BulkQueryGroupProviderR4 extends GroupResourceProvider implements IBulkQueryGroupProvider<Group> {
 	Logger logger = LoggerFactory.getLogger(BulkQueryGroupProviderR4.class);
 
 	@Autowired
@@ -72,6 +72,10 @@ public class BulkQueryGroupProviderR4 extends GroupResourceProvider {
 	public BulkQueryGroupProviderR4() {
 		super();
 		setDao(fhirResourceGroupDao);
+	}
+
+	public void setDao(IFhirResourceDao<Group> theDao) {
+		super.setDao(theDao);
 	}
 
 	/**
