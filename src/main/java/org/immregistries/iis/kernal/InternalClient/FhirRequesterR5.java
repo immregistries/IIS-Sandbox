@@ -310,7 +310,11 @@ public class FhirRequesterR5 extends FhirRequester<Patient, Immunization, Locati
 	}
 
 	public PatientMaster readPatientMaster(String id) {
-		return patientMapper.localObject((Patient) read(Patient.class, id)); // TODO filter if golden record ?
+		Patient patient = (Patient) read(Patient.class, id);
+		if (FhirRequester.isGoldenRecord(patient)) {
+			return patientMapper.localObject(patient);
+		}
+		return null;
 	}
 
 	public PatientReported readPatientReported(String id) {

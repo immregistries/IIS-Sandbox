@@ -323,8 +323,10 @@ public class FhirRequesterR4 extends FhirRequester<Patient,Immunization,Location
 
 	public PatientMaster readPatientMaster(String id) {
 		Patient patient = (Patient) read(Patient.class, id);
-		if (patient != null && patient.hasMeta())
+		if (FhirRequester.isGoldenRecord(patient)) {
 			return patientMapper.localObject(patient);
+		}
+		return null;
 	}
 
 	public PatientReported readPatientReported(String id) {
