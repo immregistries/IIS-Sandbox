@@ -2,11 +2,11 @@ package org.immregistries.iis.kernal.servlet;
 
 import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
 import org.apache.commons.lang3.StringUtils;
-import org.hibernate.Query;
 import org.hibernate.Session;
+import org.hibernate.query.Query;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
-import org.immregistries.iis.kernal.model.UserAccess;
 import org.immregistries.iis.kernal.model.Tenant;
+import org.immregistries.iis.kernal.model.UserAccess;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.ServletException;
@@ -20,6 +20,9 @@ import java.util.List;
 import static org.immregistries.iis.kernal.fhir.interceptors.PartitionCreationInterceptor.PARTITION_NAME_SEPARATOR;
 import static org.immregistries.iis.kernal.fhir.security.ServletHelper.SESSION_TENANT;
 
+/**
+ * Tenant management UI page
+ */
 @RestController()
 @RequestMapping("/tenant")
 public class TenantController {
@@ -29,26 +32,37 @@ public class TenantController {
 	public static final String PARAM_TENANT_NAME = "tenantName";
 	public static final String PARAM_TENANT_ID = "tenantId";
 
+	/**
+	 * Adds a new tenant from form
+	 *
+	 * @param req        request
+	 * @param resp       response
+	 * @param tenantName form parameter
+	 * @throws ServletException servlet exception
+	 * @throws IOException      outputStream exception
+	 */
 	@PostMapping()
-//	@Transactional()
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp, @RequestParam(name= PARAM_TENANT_NAME, required = false) String tenantName)
 		throws ServletException, IOException {
 		UserAccess userAccess = ServletHelper.getUserAccess();
-		Session dataSession = PopServlet.getDataSession();
-		try {
+		try (Session dataSession = PopServlet.getDataSession()) {
 			if (StringUtils.isNotBlank(tenantName)) {
 				if (tenantName.indexOf(PARTITION_NAME_SEPARATOR) > 0) {
 					throw new InvalidRequestException("Invalid tenant name , should not use -");
 				}
-				Tenant tenant = ServletHelper.authenticateTenant(userAccess, tenantName, dataSession);
+				ServletHelper.authenticateTenant(userAccess, tenantName, dataSession);
 			}
-		} finally {
-			dataSession.close();
 		}
 		doGet(req, resp);
 	}
 
-
+	/**
+	 * UI tenant page
+	 * @param req request
+	 * @param resp response
+	 * @throws ServletException servlet exception
+	 * @throws IOException outputStream exception
+	 */
 	@GetMapping()
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
 		throws ServletException, IOException {
@@ -58,12 +72,11 @@ public class TenantController {
 		String action = req.getParameter(PARAM_ACTION);
 		String tenantId = req.getParameter(PARAM_TENANT_ID);
 
-		Session dataSession = PopServlet.getDataSession();
-		try {
+		try (Session dataSession = PopServlet.getDataSession()) {
 			Tenant tenant = ServletHelper.getTenant();
 			UserAccess userAccess = ServletHelper.getUserAccess();
 			if (userAccess != null && session != null) {
-				Query query = dataSession.createQuery("from Tenant where userAccess=?0 order by organizationName");
+				Query<Tenant> query = dataSession.createQuery("from Tenant where userAccess=?0 order by organizationName", Tenant.class);
 				query.setParameter(0, userAccess);
 				List<Tenant> tenantList = query.list();
 				for (Tenant tenantMember : tenantList) {
@@ -72,7 +85,7 @@ public class TenantController {
 						session.setAttribute(SESSION_TENANT, tenant);
 					}
 				}
-				/**
+				/*
 				 * print starts after potential tenant switch
 				 */
 				HomeServlet.doHeader(out, "IIS Sandbox - Home");
@@ -85,7 +98,7 @@ public class TenantController {
 				for (Tenant tenantMember : tenantList) {
 					if (tenantMember.equals(tenant)) {
 						out.println("<li>" + tenantMember.getOrganizationName() + " (selected)</li>");
-					} else  {
+					} else {
 						String link = "tenant?" + PARAM_ACTION + "="
 							+ ACTION_SWITCH + "&" + PARAM_TENANT_ID + "="
 							+ tenantMember.getOrgId();
@@ -112,14 +125,10 @@ public class TenantController {
 
 				out.println("</div>");
 
-
 				HomeServlet.doFooter(out);
 			}
-		} finally {
-			dataSession.close();
 		}
 		out.flush();
 		out.close();
-
 	}
 }

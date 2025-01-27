@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal.servlet;
+package org.immregistries.iis.kernal.servlet.deprecated;
 
 import javax.servlet.http.HttpServlet;
 

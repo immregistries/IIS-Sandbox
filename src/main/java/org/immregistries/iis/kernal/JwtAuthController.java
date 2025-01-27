@@ -34,21 +34,31 @@ import java.util.Optional;
 
 import static org.immregistries.iis.kernal.fhir.interceptors.CustomAuthorizationInterceptor.CONNECTATHON_USER;
 
+/**
+ * Used for SMART AUTH, and testing around keystores
+ * TODO proper key store
+ */
 @RestController()
-public class JwtAuthProvider {
+public class JwtAuthController {
 	@Autowired
 	JwtUtils jwtUtils;
-	Map<String, PublicKey> keystore;
-	Map<String, String> jwtStore;
+	private final Map<String, PublicKey> keystore;
+	private final Map<String, String> jwtStore;
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	private final static String CLIENT_ASSERTION_TYPE = "urn:ietf:params:oauth:client-assertion-type:jwt-bearer";
 
-	public JwtAuthProvider() {
+	public JwtAuthController() {
 		this.keystore = new HashMap<>(10);
 		this.jwtStore = new HashMap<>(10);
 	}
 
+	/**
+	 * Well known configuration for SMART auth
+	 * TODO update
+	 *
+	 * @return Well known configuration
+	 */
 	@GetMapping("/.well-known/smart-configuration")
 	public String wellKnownConfiguration() {
 		return "{\n" +
@@ -59,6 +69,12 @@ public class JwtAuthProvider {
 			"}";
 	}
 
+	/**
+	 * Registers JWK for SMART Auth operations
+	 * @param jwkString JSON Web Key in String format
+	 * @param authHeader Optional authHeader
+	 * @return Confirmation or exception message
+	 */
 	@PostMapping("/registerClient")
 	public String register(@RequestBody String jwkString, @RequestHeader("Authorization") Optional<String> authHeader) { //TODO TLS config
 //		Session dataSession = null;
@@ -104,9 +120,7 @@ public class JwtAuthProvider {
 					throw new RuntimeException("Unsupported Algorithm");
 			}
 			logger.info("Registered client key id: {}, {}", parsedJwk.getKeyID(), keystore.size());
-		} catch (ParseException e) {
-			throw new RuntimeException(e);
-		} catch (JOSEException e) {
+		} catch (ParseException | JOSEException e) {
 			throw new RuntimeException(e);
 		}
 		return "JWK REGISTERED";
@@ -123,6 +137,13 @@ public class JwtAuthProvider {
 		return smartJwtAuthGet(map);
 	}
 
+	/**
+	 * SMART Auth get JWT
+	 * @param map HTTP Parameters map
+	 * @return JWT
+	 * @throws ParseException Parsing exception
+	 * @throws JOSEException Invalid Key exception
+	 */
 	@GetMapping("/token")
 	public String smartJwtAuthGet(@RequestParam Map<String, String> map) throws ParseException, JOSEException {
 		String client_assertion_type = map.get("client_assertion_type");
@@ -133,7 +154,7 @@ public class JwtAuthProvider {
 			throw new InvalidRequestException("Unsupported Client Assertion type,supporting only " + CLIENT_ASSERTION_TYPE);
 		}
 		SignedJWT signedJWT = SignedJWT.parse(client_assertion);
-		/**
+		/*
 		 * Reading Jwt Headers
 		 */
 		String alg = signedJWT.getHeader().getAlgorithm().getName();
@@ -148,7 +169,7 @@ public class JwtAuthProvider {
 			throw new InvalidRequestException("Unknown key id " + kid);
 		}
 		JWSVerifier verifier;
-		/**
+		/*
 		 * Checking supported algorithms
 		 */
 		switch (alg) {
@@ -172,7 +193,7 @@ public class JwtAuthProvider {
 		if(claimsJws.getPayload().get("jti") == null) {
 			throw new InvalidRequestException("invalid jti claim : " + claimsJws.getPayload().get("jti"));
 		}
-		/**
+		/*
 		 * check that the jti value has not been previously encountered for the given iss within the maximum allowed authentication JWT lifetime (e.g., 5 minutes). This check prevents replay attacks.
 		 */
 		String olderToken = jwtStore.get((String) claimsJws.getPayload().get("jti"));
@@ -193,7 +214,7 @@ public class JwtAuthProvider {
 			result.put("expires_in", "300");
 			result.put("scope", scope);
 			Gson gson = new Gson();
-			String gsonData = gson.toJson(result, new TypeToken<HashMap>() {}.getType());
+			String gsonData = gson.toJson(result, new TypeToken<HashMap>(){}.getType());
 			return gsonData;
 		} finally {
 			if (dataSession != null) {

@@ -18,10 +18,17 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 
-//@SuppressWarnings("serial")
-//@Component
+/**
+ * UI Homepage
+ */
 public class HomeServlet extends HttpServlet {
 
+	/**
+	 * Helping method for unified Header printing in UI
+	 *
+	 * @param out   PrintWriter
+	 * @param title Page title
+	 */
 	public static void doHeader(PrintWriter out, String title) {
 		out.println("<html>");
 		out.println("  <head>");
@@ -46,8 +53,8 @@ public class HomeServlet extends HttpServlet {
 			if (tenant != null) {
 				String link = "tenant";
 				out.println("<a class='w3-bar-item w3-button w3-right w3-green' href=\"" + link + "\">Tenant : " + tenant.getOrganizationName() + " </a>");
-				out.println("<a href=\"fhir/"+ ServletHelper.getTenant().getOrganizationName() + "/metadata\" class=\"w3-bar-item w3-button w3-right \">Tenant Fhir Server Base</a>");
-			} else  {
+				out.println("<a href=\"fhir/" + ServletHelper.getTenant().getOrganizationName() + "/metadata\" class=\"w3-bar-item w3-button w3-right \">Tenant Fhir Server Base</a>");
+			} else {
 				String link = "tenant";
 				out.println("<a class='w3-bar-item w3-button w3-right w3-green' href=\"" + link + "\">No Tenant selected</a>");
 			}
@@ -55,13 +62,16 @@ public class HomeServlet extends HttpServlet {
 			out.println("<a class='w3-bar-item w3-button w3-right' href=\"loginForm\">Login</a>");
 		}
 
-
 		out.println("      </div>");
 		out.println("    </header>");
 		out.println("    <div class=\"w3-container\">");
-
 	}
 
+	/**
+	 * Helping method for unified Header printing in UI
+	 *
+	 * @param out PrintWriter
+	 */
 	public static void doFooter(PrintWriter out) {
 		out.println("  </div>");
 		SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
@@ -73,8 +83,7 @@ public class HomeServlet extends HttpServlet {
 		}
 
 		out.println("  <div class=\"w3-container w3-green\">");
-		out.println("    <p>IIS Sandbox v" + SoftwareVersion.VERSION + " - Current Time "
-			+ sdf.format(System.currentTimeMillis()) + "</p>");
+		out.println("    <p>IIS Sandbox v" + SoftwareVersion.VERSION + " - Current Time " + sdf.format(System.currentTimeMillis()) + "</p>");
 		out.println("    <a href=\"https://aira.memberclicks.net/assets/docs/Organizational_Docs/AIRA%20Privacy%20Policy%20-%20Final%202024_.pdf\" class=\"underline\">AIRA Privacy Policy</a> - ");
 		out.println("    <a href=\"https://aira.memberclicks.net/assets/docs/Organizational_Docs/AIRA%20Terms%20of%20Use%20-%20Final%202024_.pdf\" class=\"underline\">AIRA Terms and Conditions of Use</a></p>");
 		out.println("  </div>");
@@ -83,79 +92,53 @@ public class HomeServlet extends HttpServlet {
 	}
 
 	@Override
-	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-		throws ServletException, IOException {
+	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		doGet(req, resp);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-		throws ServletException, IOException {
-
+	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		HttpSession session = req.getSession(false);
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		try {
-			{
-				doHeader(out, "IIS Sandbox - Home");
-				out.println("    <div class=\"w3-container w3-half w3-margin-top\">");
-				out.println(
-					"    <div class=\"w3-panel w3-yellow\"><p class=\"w3-left-align\">This system is for test purposes only. "
-						+ "Do not submit production data. As a precaution all submitted data will be deleted once a day.  </p></div>");
-				out.println("    <h2>Documentation</h2>");
-				out.println("    <p class=\"w3-left-align\">Please see the project wiki: "
-					+ "<a href=\"https://github.com/immregistries/IIS-Sandbox/wiki\">https://github.com/immregistries/IIS-Sandbox/wiki</a></p>");
-				out.println("    <h2>Primary Functions Supported</h2>");
-				out.println("    <ul class=\"w3-ul w3-hoverable\">");
-				out.println("      <li><a href=\"pop\">Send Now</a>: Send an HL7 message in now.</li>");
-				out.println(
-					"      <li><a href=\"message\">Messages</a>: Review recently submitted messages</li>");
-				out.println(
-					"      <li><a href=\"patient\">Patients</a>: See data received by patient</li>");
-				out.println(
-					"      <li><a href=\"location\">Patients</a>: See administered-at-locations</li>");
-				out.println(
-					"      <li><a href=\"subscription\">Subscriptions</a>: See fhir subscriptions</li>");
-				out.println(
-					"      <li><a href=\"soap\">CDC WSDL</a>: HL7 realtime interfacing using CDC WSDL</li>");
-				out.println("    </ul>");
-				out.println("    <h3>Secondary Functions Supported</h3>");
-				out.println("    <ul class=\"w3-ul w3-hoverable\">");
-				out.println(
-					"      <li><a href=\"lab\">Convert ORU to VXU</a>: Convert an ORU lab message to a VXU. </li>");
-				out.println(
-					"      <li><a href=\"queryConverter\">Convert VXU to QBP</a>: Convert an VXU immunization message into an immunization query. </li>");
-				out.println(
-					"      <li><a href=\"covid\">COVID-19 Reporting</a>: Export data to demonstrate COVID-19 reporting </li>");
-				out.println(
-					"      <li><a href=\"VXUDownloadForm\">COVID-19 Reporting (HL7)</a>: Download data in HL7 format demonstrate COVID-19 reporting </li>");
-				out.println(
-					"      <li><a href=\"covidGenerate\">COVID-19 HL7 Generator</a>: Generate HL7 Messages</li>");
-				out.println(
-					"      <li><a href=\"event\">Submit Event</a>: Submit a patient and vaccination event manually.</li>");
-				out.println(
-					"      <li><a href=\"fhirTest\">FHIR Test Endpoint</a>: Create FHIR resources to test with IIS Sandbox.</li>");
-				out.println(
-					"      <li><a href=\"vciDemo\">VCI Demonstration</a>: Demonstration of RSP conversion steps for the Vaccine Credential Initiative</li>");
-				out.println("    </ul>");
+			doHeader(out, "IIS Sandbox - Home");
+			out.println("    <div class=\"w3-container w3-half w3-margin-top\">");
+			out.println("    <div class=\"w3-panel w3-yellow\"><p class=\"w3-left-align\">This system is for test purposes only. " + "Do not submit production data. As a precaution all submitted data will be deleted once a day.  </p></div>");
+			out.println("    <h2>Documentation</h2>");
+			out.println("    <p class=\"w3-left-align\">Please see the project wiki: " + "<a href=\"https://github.com/immregistries/IIS-Sandbox/wiki\">https://github.com/immregistries/IIS-Sandbox/wiki</a></p>");
+			out.println("    <h2>Primary Functions Supported</h2>");
+			out.println("    <ul class=\"w3-ul w3-hoverable\">");
+			out.println("      <li><a href=\"pop\">Send Now</a>: Send an HL7 message in now.</li>");
+			out.println("      <li><a href=\"message\">Messages</a>: Review recently submitted messages</li>");
+			out.println("      <li><a href=\"patient\">Patients</a>: See data received by patient</li>");
+			out.println("      <li><a href=\"location\">Patients</a>: See administered-at-locations</li>");
+			out.println("      <li><a href=\"subscription\">Subscriptions</a>: See fhir subscriptions</li>");
+			out.println("      <li><a href=\"soap\">CDC WSDL</a>: HL7 realtime interfacing using CDC WSDL</li>");
+			out.println("    </ul>");
+			out.println("    <h3>Secondary Functions Supported</h3>");
+			out.println("    <ul class=\"w3-ul w3-hoverable\">");
+			out.println("      <li><a href=\"lab\">Convert ORU to VXU</a>: Convert an ORU lab message to a VXU. </li>");
+			out.println("      <li><a href=\"queryConverter\">Convert VXU to QBP</a>: Convert an VXU immunization message into an immunization query. </li>");
+			out.println("      <li><a href=\"covid\">COVID-19 Reporting</a>: Export data to demonstrate COVID-19 reporting </li>");
+			out.println("      <li><a href=\"VXUDownloadForm\">COVID-19 Reporting (HL7)</a>: Download data in HL7 format demonstrate COVID-19 reporting </li>");
+			out.println("      <li><a href=\"covidGenerate\">COVID-19 HL7 Generator</a>: Generate HL7 Messages</li>");
+			out.println("      <li><a href=\"event\">Submit Event</a>: Submit a patient and vaccination event manually.</li>");
+			out.println("      <li><a href=\"fhirTest\">FHIR Test Endpoint</a>: Create FHIR resources to test with IIS Sandbox.</li>");
+			out.println("      <li><a href=\"vciDemo\">VCI Demonstration</a>: Demonstration of RSP conversion steps for the Vaccine Credential Initiative</li>");
+			out.println("    </ul>");
 
-				out.println("    <h2>Processing Flavors</h2>");
-				out.println("    <p>If any of the following words appear in the name of the tenant then special processing rules will apply. "
-						+ "These processing rules can be used to simulate specific IIS behavior. </p>");
-				out.println("    <ul class=\"w3-ul w3-hoverable\">");
-				for (ProcessingFlavor processingFlavor : ProcessingFlavor.values()) {
-					out.println("      <li>" + processingFlavor.getKey() + ": "
-						+ processingFlavor.getBehaviorDescription() + "</li>");
-				}
-				out.println("    </ul>");
-				out.println("  </div>");
-				out.println(
-					"  <img src=\"img/markus-spiske-dWaRJ3WBnGs-unsplash.jpg\" class=\"w3-round\" alt=\"Sandbox\" width=\"400\">");
-				out.println(
-					"<a style=\"background-color:black;color:white;text-decoration:none;padding:4px 6px;font-family:-apple-system, BlinkMacSystemFont, &quot;San Francisco&quot;, &quot;Helvetica Neue&quot;, Helvetica, Ubuntu, Roboto, Noto, &quot;Segoe UI&quot;, Arial, sans-serif;font-size:12px;font-weight:bold;line-height:1.2;display:inline-block;border-radius:3px\" href=\"https://unsplash.com/@markusspiske?utm_medium=referral&amp;utm_campaign=photographer-credit&amp;utm_content=creditBadge\" target=\"_blank\" rel=\"noopener noreferrer\" title=\"Download free do whatever you want high-resolution photos from Markus Spiske\"><span style=\"display:inline-block;padding:2px 3px\"><svg xmlns=\"http://www.w3.org/2000/svg\" style=\"height:12px;width:auto;position:relative;vertical-align:middle;top:-2px;fill:white\" viewBox=\"0 0 32 32\"><title>unsplash-logo</title><path d=\"M10 9V0h12v9H10zm12 5h10v18H0V14h10v9h12v-9z\"></path></svg></span><span style=\"display:inline-block;padding:2px 3px\">Markus Spiske</span></a>");
-				doFooter(out);
+			out.println("    <h2>Processing Flavors</h2>");
+			out.println("    <p>If any of the following words appear in the name of the tenant then special processing rules will apply. " + "These processing rules can be used to simulate specific IIS behavior. </p>");
+			out.println("    <ul class=\"w3-ul w3-hoverable\">");
+			for (ProcessingFlavor processingFlavor : ProcessingFlavor.values()) {
+				out.println("      <li>" + processingFlavor.getKey() + ": " + processingFlavor.getBehaviorDescription() + "</li>");
 			}
+			out.println("    </ul>");
+			out.println("  </div>");
+			out.println("  <img src=\"img/markus-spiske-dWaRJ3WBnGs-unsplash.jpg\" class=\"w3-round\" alt=\"Sandbox\" width=\"400\">");
+			out.println("<a style=\"background-color:black;color:white;text-decoration:none;padding:4px 6px;font-family:-apple-system, BlinkMacSystemFont, &quot;San Francisco&quot;, &quot;Helvetica Neue&quot;, Helvetica, Ubuntu, Roboto, Noto, &quot;Segoe UI&quot;, Arial, sans-serif;font-size:12px;font-weight:bold;line-height:1.2;display:inline-block;border-radius:3px\" href=\"https://unsplash.com/@markusspiske?utm_medium=referral&amp;utm_campaign=photographer-credit&amp;utm_content=creditBadge\" target=\"_blank\" rel=\"noopener noreferrer\" title=\"Download free do whatever you want high-resolution photos from Markus Spiske\"><span style=\"display:inline-block;padding:2px 3px\"><svg xmlns=\"http://www.w3.org/2000/svg\" style=\"height:12px;width:auto;position:relative;vertical-align:middle;top:-2px;fill:white\" viewBox=\"0 0 32 32\"><title>unsplash-logo</title><path d=\"M10 9V0h12v9H10zm12 5h10v18H0V14h10v9h12v-9z\"></path></svg></span><span style=\"display:inline-block;padding:2px 3px\">Markus Spiske</span></a>");
+			doFooter(out);
 		} catch (Exception e) {
 			e.printStackTrace(System.err);
 		}

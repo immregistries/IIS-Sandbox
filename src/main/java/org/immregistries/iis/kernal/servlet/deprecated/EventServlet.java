@@ -1,10 +1,9 @@
-package org.immregistries.iis.kernal.servlet;
+package org.immregistries.iis.kernal.servlet.deprecated;
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.immregistries.iis.kernal.servlet.PopServlet;
 
-@RestController
-@RequestMapping("/event")
+//@RestController
+//@RequestMapping("/event")
 public class EventServlet extends PopServlet {
 //	@Autowired
 //	IncomingEventHandler incomingEventHandler;

@@ -31,23 +31,23 @@ public class RecommendationServlet extends PatientServlet {
 	public static final String PARAM_RECOMMENDATION_RESOURCE = "recommendationResource";
 
 	@Autowired
-	IImmunizationRecommendationService immunizationRecommendationService;
+	private IImmunizationRecommendationService immunizationRecommendationService;
 
 	public static String linkUrl(String facilityId, String patientId) {
 		return "/tenant/" + facilityId + "/patient/" + patientId + "/recommendation";
 	}
 
 	/**
-	 * USed to add a random generated component to recommendation
+	 * Used to add a random generated component to recommendation
 	 *
-	 * @param req
-	 * @param resp
-	 * @throws ServletException
-	 * @throws IOException
+	 * @param req request
+	 * @param resp response
+	 * @throws ServletException Servlet Exception
+	 * @throws IOException print output stream exception
 	 */
 	@PostMapping
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-		throws ServletException, IOException { //TODO add support to add new Reco
+		throws ServletException, IOException { //TODO add support to add new Recommendation
 		Tenant tenant = ServletHelper.getTenant();
 		if (tenant == null) {
 			throw new AuthenticationCredentialsNotFoundException("");
@@ -67,14 +67,13 @@ public class RecommendationServlet extends PatientServlet {
 			}
 		}
 		doGet(req, resp);
-
 	}
 
 	/**
 	 * Used to manually edit the Recommendation resource
 	 *
-	 * @param req
-	 * @param resp
+	 * @param req request
+	 * @param resp response
 	 */
 	@PutMapping
 	protected void doPut(HttpServletRequest req, HttpServletResponse resp)
@@ -90,10 +89,10 @@ public class RecommendationServlet extends PatientServlet {
 			if (req.getParameter(PARAM_RECOMMENDATION_RESOURCE) != null) {
 				IGenericClient fhirClient = repositoryClientFactory.newGenericClient(req);
 
-				ImmunizationRecommendation newReco = parser.parseResource(ImmunizationRecommendation.class, req.getParameter(PARAM_RECOMMENDATION_RESOURCE));
+				ImmunizationRecommendation newRecommendation = parser.parseResource(ImmunizationRecommendation.class, req.getParameter(PARAM_RECOMMENDATION_RESOURCE));
 				ImmunizationRecommendation old = getRecommendation(req, fhirClient);
-				newReco.setId(old.getIdElement().getIdPart());
-				fhirClient.update().resource(newReco).execute();
+				newRecommendation.setId(old.getIdElement().getIdPart());
+				fhirClient.update().resource(newRecommendation).execute();
 			}
 		} catch (Exception exception) {
 			exception.printStackTrace(out);
@@ -105,6 +104,14 @@ public class RecommendationServlet extends PatientServlet {
 		doGet(req, resp);
 	}
 
+	/**
+	 * UI page for recommendations
+	 *
+	 * @param req  request
+	 * @param resp response
+	 * @throws ServletException servlet exception
+	 * @throws IOException      OutputStream exception
+	 */
 	@GetMapping
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
 		throws ServletException, IOException {
@@ -121,7 +128,7 @@ public class RecommendationServlet extends PatientServlet {
 			IGenericClient fhirClient = repositoryClientFactory.newGenericClient(req);
 
 			ImmunizationRecommendation recommendation = getRecommendation(req, fhirClient);
-			Patient patient = null;
+			Patient patient;
 			if (recommendation != null) {
 				patient = fhirClient.read().resource(Patient.class).withId(recommendation.getPatient().getReference()).execute();
 			} else {
@@ -161,7 +168,7 @@ public class RecommendationServlet extends PatientServlet {
 					out.println("</div>");
 
 
-					/**
+					/*
 					 * Temporary change to send through subscription
 					 */
 					Identifier identifier = patient.getIdentifier().stream().filter((identifier1 -> identifier1.getSystem().equals(MRN_SYSTEM)))
