@@ -5,7 +5,7 @@ import org.hl7.fhir.r5.model.HumanName;
 import org.hl7.fhir.r5.model.Practitioner;
 import org.hl7.fhir.r5.model.Reference;
 import org.immregistries.iis.kernal.fhir.annotations.OnR5Condition;
-import org.immregistries.iis.kernal.mapping.Interfaces.PractitionerMapper;
+import org.immregistries.iis.kernal.mapping.interfaces.PractitionerMapper;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
 import org.immregistries.iis.kernal.model.ModelPerson;
 import org.springframework.context.annotation.Conditional;

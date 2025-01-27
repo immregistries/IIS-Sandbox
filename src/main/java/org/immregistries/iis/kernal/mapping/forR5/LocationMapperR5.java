@@ -2,7 +2,7 @@ package org.immregistries.iis.kernal.mapping.forR5;
 
 import org.hl7.fhir.r5.model.*;
 import org.immregistries.iis.kernal.fhir.annotations.OnR5Condition;
-import org.immregistries.iis.kernal.mapping.Interfaces.LocationMapper;
+import org.immregistries.iis.kernal.mapping.interfaces.LocationMapper;
 import org.immregistries.iis.kernal.model.OrgLocation;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Service;

@@ -5,10 +5,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.r4.model.*;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
-import org.immregistries.iis.kernal.InternalClient.FhirRequesterR4;
+import org.immregistries.iis.kernal.mapping.internalClient.FhirRequesterR4;
 import org.immregistries.iis.kernal.fhir.annotations.OnR4Condition;
 import org.immregistries.iis.kernal.logic.CodeMapManager;
-import org.immregistries.iis.kernal.mapping.Interfaces.PatientMapper;
+import org.immregistries.iis.kernal.mapping.interfaces.PatientMapper;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
 import org.immregistries.iis.kernal.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,8 +21,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static org.immregistries.iis.kernal.InternalClient.FhirRequester.GOLDEN_RECORD;
-import static org.immregistries.iis.kernal.InternalClient.FhirRequester.GOLDEN_SYSTEM_TAG;
+import static org.immregistries.iis.kernal.mapping.internalClient.FhirRequester.GOLDEN_RECORD;
+import static org.immregistries.iis.kernal.mapping.internalClient.FhirRequester.GOLDEN_SYSTEM_TAG;
 
 
 @Service

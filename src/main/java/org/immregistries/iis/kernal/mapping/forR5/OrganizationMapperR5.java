@@ -2,7 +2,7 @@ package org.immregistries.iis.kernal.mapping.forR5;
 
 import org.immregistries.iis.kernal.fhir.annotations.OnR5Condition;
 import org.hl7.fhir.r5.model.Organization;
-import org.immregistries.iis.kernal.mapping.Interfaces.OrganizationMapper;
+import org.immregistries.iis.kernal.mapping.interfaces.OrganizationMapper;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
 import org.immregistries.iis.kernal.model.Tenant;
 import org.springframework.context.annotation.Conditional;

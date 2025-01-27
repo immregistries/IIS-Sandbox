@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal.mapping.Interfaces;
+package org.immregistries.iis.kernal.mapping.interfaces;
 
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.immregistries.iis.kernal.model.PatientMaster;

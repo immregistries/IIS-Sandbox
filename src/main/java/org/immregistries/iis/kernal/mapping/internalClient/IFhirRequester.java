@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal.InternalClient;
+package org.immregistries.iis.kernal.mapping.internalClient;
 
 import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
 import ca.uhn.fhir.rest.api.server.IBundleProvider;

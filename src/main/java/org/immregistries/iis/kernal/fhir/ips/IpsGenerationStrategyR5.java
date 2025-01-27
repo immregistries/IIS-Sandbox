@@ -1,40 +1,27 @@
 package org.immregistries.iis.kernal.fhir.ips;
 
-import ca.uhn.fhir.jpa.api.dao.IFhirResourceDao;
 import ca.uhn.fhir.jpa.ips.api.IpsContext;
 import ca.uhn.fhir.jpa.ips.api.IpsSectionEnum;
 import ca.uhn.fhir.jpa.ips.api.SectionRegistry;
 import ca.uhn.fhir.jpa.ips.strategy.DefaultIpsGenerationStrategy;
 import ca.uhn.fhir.jpa.model.util.JpaConstants;
 import ca.uhn.fhir.jpa.provider.BaseJpaResourceProviderPatient;
-import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
-import ca.uhn.fhir.model.api.Include;
-import ca.uhn.fhir.rest.api.server.RequestDetails;
-import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.instance.model.api.IBaseBundle;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.instance.model.api.IIdType;
 import org.hl7.fhir.r5.model.*;
-import org.immregistries.iis.kernal.InternalClient.FhirRequester;
-import org.immregistries.iis.kernal.InternalClient.FhirRequesterR5;
-import org.immregistries.iis.kernal.InternalClient.RepositoryClientFactory;
+import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.mapping.forR5.OrganizationMapperR5;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
-import static org.immregistries.iis.kernal.InternalClient.FhirRequester.GOLDEN_RECORD;
-import static org.immregistries.iis.kernal.InternalClient.FhirRequester.GOLDEN_SYSTEM_TAG;
+import static org.immregistries.iis.kernal.mapping.internalClient.FhirRequester.GOLDEN_RECORD;
+import static org.immregistries.iis.kernal.mapping.internalClient.FhirRequester.GOLDEN_SYSTEM_TAG;
 
 
 /**

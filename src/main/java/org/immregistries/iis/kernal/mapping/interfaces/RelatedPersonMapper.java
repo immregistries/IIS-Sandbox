@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal.mapping.Interfaces;
+package org.immregistries.iis.kernal.mapping.interfaces;
 
 /**
  * Deprecated

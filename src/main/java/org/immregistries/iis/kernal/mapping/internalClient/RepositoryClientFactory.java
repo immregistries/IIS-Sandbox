@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal.InternalClient;
+package org.immregistries.iis.kernal.mapping.internalClient;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.jpa.api.dao.IFhirSystemDao;
@@ -18,19 +18,16 @@ import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.servlet.http.HttpServletRequest;
 
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 
 import static org.immregistries.iis.kernal.fhir.interceptors.SessionAuthorizationInterceptor.CONNECTATHON_USER;
 import static org.immregistries.iis.kernal.fhir.security.ServletHelper.GITHUB_PREFIX;

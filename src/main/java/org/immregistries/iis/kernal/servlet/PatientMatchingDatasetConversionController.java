@@ -8,7 +8,7 @@ import ca.uhn.fhir.util.ExtensionUtil;
 import org.hl7.fhir.instance.model.api.IBaseExtension;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r5.model.*;
-import org.immregistries.iis.kernal.InternalClient.FhirRequester;
+import org.immregistries.iis.kernal.mapping.internalClient.FhirRequester;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
 import org.immregistries.mismo.match.StringUtils;
@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.immregistries.iis.kernal.mapping.Interfaces.PatientMapper.*;
+import static org.immregistries.iis.kernal.mapping.interfaces.PatientMapper.*;
 
 @RestController
 @RequestMapping("/patientMatchingDatasetConversion")

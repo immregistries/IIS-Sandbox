@@ -4,7 +4,7 @@ import ca.uhn.fhir.rest.api.server.RequestDetails;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.immregistries.iis.kernal.logic.ack.IisReportable;
 import org.immregistries.iis.kernal.logic.ack.IisReportableSeverity;
-import org.immregistries.iis.kernal.mapping.Interfaces.IisFhirMapperMasterReported;
+import org.immregistries.iis.kernal.mapping.interfaces.IisFhirMapperMasterReported;
 import org.immregistries.iis.kernal.model.AbstractMappedObject;
 import org.immregistries.mqe.hl7util.model.CodedWithExceptions;
 import org.immregistries.mqe.hl7util.model.Hl7Location;

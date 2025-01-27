@@ -11,7 +11,7 @@ import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
 import org.hl7.fhir.r5.model.Group;
 import org.hl7.fhir.r5.model.Organization;
 import org.hl7.fhir.r5.model.Reference;
-import org.immregistries.iis.kernal.InternalClient.FhirRequesterR5;
+import org.immregistries.iis.kernal.mapping.internalClient.FhirRequesterR5;
 import org.immregistries.iis.kernal.fhir.annotations.OnR5Condition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

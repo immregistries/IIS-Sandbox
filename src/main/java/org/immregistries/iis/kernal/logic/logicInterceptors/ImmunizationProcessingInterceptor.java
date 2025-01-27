@@ -13,7 +13,7 @@ import org.immregistries.iis.kernal.logic.CodeMapManager;
 import org.immregistries.iis.kernal.logic.ProcessingException;
 import org.immregistries.iis.kernal.logic.ack.IisReportable;
 import org.immregistries.iis.kernal.logic.ack.IisReportableSeverity;
-import org.immregistries.iis.kernal.mapping.Interfaces.ImmunizationMapper;
+import org.immregistries.iis.kernal.mapping.interfaces.ImmunizationMapper;
 import org.immregistries.iis.kernal.model.ProcessingFlavor;
 import org.immregistries.iis.kernal.model.VaccinationReported;
 import org.slf4j.Logger;

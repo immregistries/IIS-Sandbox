@@ -7,10 +7,10 @@ import org.hl7.fhir.r5.model.ContactPoint.ContactPointSystem;
 import org.hl7.fhir.r5.model.Enumerations.AdministrativeGender;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
-import org.immregistries.iis.kernal.InternalClient.FhirRequesterR5;
+import org.immregistries.iis.kernal.mapping.internalClient.FhirRequesterR5;
 import org.immregistries.iis.kernal.fhir.annotations.OnR5Condition;
 import org.immregistries.iis.kernal.logic.CodeMapManager;
-import org.immregistries.iis.kernal.mapping.Interfaces.PatientMapper;
+import org.immregistries.iis.kernal.mapping.interfaces.PatientMapper;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
 import org.immregistries.iis.kernal.model.*;
 import org.slf4j.Logger;
@@ -25,8 +25,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static org.immregistries.iis.kernal.InternalClient.FhirRequester.GOLDEN_RECORD;
-import static org.immregistries.iis.kernal.InternalClient.FhirRequester.GOLDEN_SYSTEM_TAG;
+import static org.immregistries.iis.kernal.mapping.internalClient.FhirRequester.GOLDEN_RECORD;
+import static org.immregistries.iis.kernal.mapping.internalClient.FhirRequester.GOLDEN_SYSTEM_TAG;
 
 
 @Service

@@ -5,7 +5,7 @@ import org.hl7.fhir.r4.model.Extension;
 import org.hl7.fhir.r4.model.Location;
 import org.hl7.fhir.r4.model.StringType;
 import org.immregistries.iis.kernal.fhir.annotations.OnR4Condition;
-import org.immregistries.iis.kernal.mapping.Interfaces.LocationMapper;
+import org.immregistries.iis.kernal.mapping.interfaces.LocationMapper;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
 import org.immregistries.iis.kernal.model.OrgLocation;
 import org.springframework.context.annotation.Conditional;

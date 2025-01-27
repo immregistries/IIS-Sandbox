@@ -3,8 +3,8 @@ package org.immregistries.iis.kernal.model;
 import org.apache.commons.lang3.StringUtils;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
 
-import static org.immregistries.iis.kernal.mapping.Interfaces.PatientMapper.V_2_NAME_TYPE;
-import static org.immregistries.iis.kernal.mapping.Interfaces.PatientMapper.V_2_NAME_TYPE_SYSTEM;
+import static org.immregistries.iis.kernal.mapping.interfaces.PatientMapper.V_2_NAME_TYPE;
+import static org.immregistries.iis.kernal.mapping.interfaces.PatientMapper.V_2_NAME_TYPE_SYSTEM;
 
 public class PatientName {
 	private String nameLast = "";

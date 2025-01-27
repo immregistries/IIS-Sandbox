@@ -14,7 +14,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.UUID;
 
-import static org.immregistries.iis.kernal.mapping.Interfaces.ImmunizationMapper.CVX;
+import static org.immregistries.iis.kernal.mapping.interfaces.ImmunizationMapper.CVX;
 
 @Service
 @Conditional(OnR4Condition.class)
