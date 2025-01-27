@@ -113,7 +113,13 @@ public abstract class FhirRequester<
 //		return map;
 //	}
 
-
+	/**
+	 * Helping method for saving, executes conditional update and create on HAPI DAO, adds parameter to avoid golden records
+	 *
+	 * @param resource
+	 * @param where
+	 * @return methodOutcome
+	 */
 	protected MethodOutcome save(IBaseResource resource, ICriterion... where) {
 		IFhirResourceDao dao = daoRegistry.getResourceDao(resource);
 		String params = stringCriterionList(where);
@@ -131,12 +137,27 @@ public abstract class FhirRequester<
 		return outcome;
 	}
 
+	/**
+	 *
+	 * @param aClass FHIR Resource Class
+	 * @param id resource id
+	 * @return resource found
+	 */
 	public IBaseResource read(Class<? extends IBaseResource> aClass, String id) {
 		IFhirResourceDao dao = daoRegistry.getResourceDao(aClass);
 		return dao.read(new IdType(id), ServletHelper.requestDetailsWithPartitionName());
 	}
 
+	/**
+	 * Search only golden record by adding extra parameter
+	 * @param aClass FHIR Resource Class
+	 * @param searchParameterMap search parameters
+	 * @return Bundle of search result with only Golden/Master records
+	 */
 	public IBundleProvider searchGoldenRecord(Class<? extends IBaseResource> aClass, SearchParameterMap searchParameterMap) {
+		if (searchParameterMap == null) {
+			searchParameterMap = new SearchParameterMap();
+		}
 		searchParameterMap.add("_tag", new TokenParam(GOLDEN_SYSTEM_TAG, GOLDEN_RECORD));
 		return search(aClass, searchParameterMap);
 //		IGenericClient fhirClient = repositoryClientFactory.getFhirClient();
@@ -158,7 +179,16 @@ public abstract class FhirRequester<
 //		}
 	}
 
+	/**
+	 * Search only regular record by adding extra parameter excluding golden record
+	 * @param aClass FHIR Resource Class
+	 * @param searchParameterMap Search parameters
+	 * @return Bundle of search result excluding Golden/Master records
+	 */
 	public IBundleProvider searchRegularRecord(Class<? extends IBaseResource> aClass, SearchParameterMap searchParameterMap) {
+		if (searchParameterMap == null) {
+			searchParameterMap = new SearchParameterMap();
+		}
 		searchParameterMap.add("_tag", new TokenParam(GOLDEN_SYSTEM_TAG, GOLDEN_RECORD).setModifier(TokenParamModifier.NOT));
 		return search(aClass, searchParameterMap);
 //		return dao.search(searchParameterMap, ServletHelper.requestDetailsWithPartitionName());
@@ -178,6 +208,12 @@ public abstract class FhirRequester<
 //		}
 	}
 
+	/**
+	 * Search Operation
+	 * @param aClass FHIR Resource Class
+	 * @param searchParameterMap Search parameters
+	 * @return Bundle of search result
+	 */
 	IBundleProvider search(Class<? extends IBaseResource> aClass, SearchParameterMap searchParameterMap) {
 		return daoRegistry.getResourceDao(aClass).search(searchParameterMap, ServletHelper.requestDetailsWithPartitionName());
 //		IGenericClient fhirClient = repositoryClientFactory.getFhirClient();
@@ -208,6 +244,11 @@ public abstract class FhirRequester<
 	 */
 	public abstract PatientMaster matchPatient(List<PatientReported> multipleMatches, PatientMaster patientMasterForMatchQuery, Date cutoff);
 
+	/**
+	 * Checks Meta and Tags
+	 * @param iBaseResource FHIR resource
+	 * @return if resource is golden record
+	 */
 	public static boolean isGoldenRecord(IBaseResource iBaseResource) {
 		if (iBaseResource != null && iBaseResource.getMeta() != null && !iBaseResource.getMeta().isEmpty()) {
 			return iBaseResource.getMeta().getTag(GOLDEN_SYSTEM_TAG, GOLDEN_RECORD) != null;

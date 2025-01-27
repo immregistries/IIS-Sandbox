@@ -28,60 +28,66 @@ public interface IFhirRequester<
 	Organization extends IBaseResource,
 	RelatedPerson extends IBaseResource> {
 
-	public PatientMaster searchPatientMaster(SearchParameterMap searchParameterMap);
+	PatientMaster searchPatientMaster(SearchParameterMap searchParameterMap);
 
-	public PatientReported searchPatientReported(SearchParameterMap searchParameterMap);
+	PatientReported searchPatientReported(SearchParameterMap searchParameterMap);
 
-	public List<PatientReported> searchPatientReportedList(SearchParameterMap searchParameterMap);
-	public List<PatientMaster> searchPatientMasterGoldenList(SearchParameterMap searchParameterMap);
+	List<PatientReported> searchPatientReportedList(SearchParameterMap searchParameterMap);
 
-	public VaccinationMaster searchVaccinationMaster(SearchParameterMap searchParameterMap);
+	List<PatientMaster> searchPatientMasterGoldenList(SearchParameterMap searchParameterMap);
 
-	public VaccinationReported searchVaccinationReported(SearchParameterMap searchParameterMap);
+	VaccinationMaster searchVaccinationMaster(SearchParameterMap searchParameterMap);
 
-	public List<VaccinationReported> searchVaccinationReportedList(SearchParameterMap searchParameterMap);
-	public List<VaccinationMaster> searchVaccinationListOperationEverything(String patientId);
+	VaccinationReported searchVaccinationReported(SearchParameterMap searchParameterMap);
 
-	public ObservationReported searchObservationReported(SearchParameterMap searchParameterMap);
-	public Organization searchOrganization(SearchParameterMap searchParameterMap);
-	public RelatedPerson searchRelatedPerson(SearchParameterMap searchParameterMap);
+	List<VaccinationReported> searchVaccinationReportedList(SearchParameterMap searchParameterMap);
+
+	List<VaccinationMaster> searchVaccinationListOperationEverything(String patientId);
+
+	ObservationReported searchObservationReported(SearchParameterMap searchParameterMap);
+
+	Organization searchOrganization(SearchParameterMap searchParameterMap);
+
+	RelatedPerson searchRelatedPerson(SearchParameterMap searchParameterMap);
 
 
-	public ObservationMaster searchObservationMaster(SearchParameterMap searchParameterMap);
-	public List<ObservationReported> searchObservationReportedList(SearchParameterMap searchParameterMap);
-	public OrgLocation searchOrgLocation(SearchParameterMap searchParameterMap);
-	public List<OrgLocation> searchOrgLocationList(SearchParameterMap searchParameterMap);
-	public ModelPerson searchPerson(SearchParameterMap searchParameterMap);
-	public ModelPerson searchPractitioner(SearchParameterMap searchParameterMap);
+	ObservationMaster searchObservationMaster(SearchParameterMap searchParameterMap);
 
-	public PatientReported savePatientReported(PatientReported patientReported);
-	public ModelPerson savePractitioner(ModelPerson modelPerson);
-	public ObservationReported saveObservationReported(ObservationReported observationReported);
+	List<ObservationReported> searchObservationReportedList(SearchParameterMap searchParameterMap);
 
-	public VaccinationReported saveVaccinationReported(VaccinationReported vaccinationReported);
+	OrgLocation searchOrgLocation(SearchParameterMap searchParameterMap);
 
-	public OrgLocation saveOrgLocation(OrgLocation orgLocation);
+	List<OrgLocation> searchOrgLocationList(SearchParameterMap searchParameterMap);
 
-	public Organization saveOrganization(Organization organization);
+	ModelPerson searchPerson(SearchParameterMap searchParameterMap);
 
-//	public PatientReported saveRelatedPerson(PatientReported patientReported);
+	ModelPerson searchPractitioner(SearchParameterMap searchParameterMap);
 
-	/**
-	 * Unsafe: doesn't verify golden record quality, read patient golden record and maps to PatientMaster
-	 * @param id
-	 * @return
-	 */
-	public PatientMaster readPatientMaster(String id);
+	PatientReported savePatientReported(PatientReported patientReported);
 
-	public PatientReported readPatientReported(String id);
+	ModelPerson savePractitioner(ModelPerson modelPerson);
 
-	public ModelPerson readPractitionerPerson(String id);
+	ObservationReported saveObservationReported(ObservationReported observationReported);
 
-	public OrgLocation readOrgLocation(String id);
+	VaccinationReported saveVaccinationReported(VaccinationReported vaccinationReported);
 
-	public VaccinationReported readVaccinationReported(String id);
+	OrgLocation saveOrgLocation(OrgLocation orgLocation);
 
-	public PatientMaster readPatientMasterWithMdmLink(String patientId);
+	Organization saveOrganization(Organization organization);
+
+//	PatientReported saveRelatedPerson(PatientReported patientReported);
+
+	PatientMaster readPatientMaster(String id);
+
+	PatientReported readPatientReported(String id);
+
+	ModelPerson readPractitionerPerson(String id);
+
+	OrgLocation readOrgLocation(String id);
+
+	VaccinationReported readVaccinationReported(String id);
+
+	PatientMaster readPatientMasterWithMdmLink(String patientId);
 
 	IBundleProvider searchRegularRecord(Class<? extends IBaseResource> aClass, SearchParameterMap searchParameterMap);
 
