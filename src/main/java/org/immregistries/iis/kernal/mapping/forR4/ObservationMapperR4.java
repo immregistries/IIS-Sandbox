@@ -1,7 +1,6 @@
 package org.immregistries.iis.kernal.mapping.forR4;
 
 import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
-import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.param.TokenParam;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Observation;
@@ -25,7 +24,7 @@ public class ObservationMapperR4 implements ObservationMapper<Observation> {
 	@Autowired
 	FhirRequester fhirRequests;
 
-	public Observation getFhirResource(ObservationMaster om) {
+	public Observation fhirResource(ObservationMaster om) {
 		Observation o = new Observation();
 		o.setId(om.getObservationId());
 		if (!om.getVaccinationReportedId().isBlank()) {
@@ -56,8 +55,8 @@ public class ObservationMapperR4 implements ObservationMapper<Observation> {
 
 	}
 
-	public ObservationReported getReportedWithMaster(Observation observation, IGenericClient fhirClient){
-		ObservationReported observationReported = getReported(observation);
+	public ObservationReported localObjectReportedWithMaster(Observation observation) {
+		ObservationReported observationReported = localObjectReported(observation);
 		observationReported.setObservationMaster(
 			fhirRequests.searchObservationMaster(
 				new SearchParameterMap(Observation.SP_IDENTIFIER, new TokenParam().setSystem(observationReported.getIdentifierTable()).setValue(observationReported.getIdentifierCode()))
@@ -67,7 +66,7 @@ public class ObservationMapperR4 implements ObservationMapper<Observation> {
 	}
 
 
-	public ObservationReported getReported(Observation o){
+	public ObservationReported localObjectReported(Observation o) {
 		ObservationReported observationReported = new ObservationReported();
 		observationReported.setUpdatedDate(o.getMeta().getLastUpdated());
 		observationReported.setObservationId(o.getId());
@@ -103,8 +102,8 @@ public class ObservationMapperR4 implements ObservationMapper<Observation> {
 		return  observationReported;
 	}
 
-	public ObservationMaster getMaster(Observation o){
-		return getReported(o);
+	public ObservationMaster localObject(Observation o) {
+		return localObjectReported(o);
 	}
 
 

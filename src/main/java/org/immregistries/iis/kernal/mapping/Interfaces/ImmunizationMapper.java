@@ -4,7 +4,7 @@ import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.immregistries.iis.kernal.model.VaccinationMaster;
 import org.immregistries.iis.kernal.model.VaccinationReported;
 
-public interface ImmunizationMapper<Immunization extends IBaseResource> extends IisFhirMapper<VaccinationMaster, VaccinationReported, Immunization> {
+public interface ImmunizationMapper<Immunization extends IBaseResource> extends IisFhirMapperMasterReported<VaccinationMaster, VaccinationReported, Immunization> {
 	String CVX = "http://hl7.org/fhir/sid/cvx";
 	String MVX = "http://terminology.hl7.org/CodeSystem/MVX";
 	String NDC = "NDC";
@@ -22,13 +22,13 @@ public interface ImmunizationMapper<Immunization extends IBaseResource> extends 
 	String FUNDING_ELIGIBILITY = "fundingEligibility";
 	String RECORDED = "recorded";
 
-	VaccinationReported getReportedWithMaster(Immunization immunization);
+	VaccinationReported localObjectReportedWithMaster(Immunization immunization);
 
 //	IVaccinationMaster fillFromFhirResource(VaccinationMaster vaccinationMaster, Immunization i);
 
-	VaccinationReported getReported(Immunization immunization);
+	VaccinationReported localObjectReported(Immunization immunization);
 
-	VaccinationMaster getMaster(Immunization immunization);
+	VaccinationMaster localObject(Immunization immunization);
 
-	Immunization getFhirResource(VaccinationMaster vaccinationMaster);
+	Immunization fhirResource(VaccinationMaster vaccinationMaster);
 }

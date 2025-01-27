@@ -55,8 +55,8 @@ public abstract class FhirRequester<
 	ObservationMapper<Observation> observationMapper;
 	@Autowired
 	PersonMapper<Person> personMapper;
-	@Autowired
-	RelatedPersonMapper<RelatedPerson> relatedPersonMapper;
+//	@Autowired
+//	RelatedPersonMapper<RelatedPerson> relatedPersonMapper;
 
 	@Autowired
 	RepositoryClientFactory repositoryClientFactory;
@@ -67,11 +67,22 @@ public abstract class FhirRequester<
 	@Autowired
 	RestfulServer fhirServer;
 
+	/**
+	 * Converts HAPI ICriterion Object to HTTP URI  parameter substring
+	 *
+	 * @param iCriterion
+	 * @return HTTP parameter String equivalent
+	 */
 	private String stringCriterion(ICriterion iCriterion) {
 		ICriterionInternal iCriterionInternal = (ICriterionInternal) iCriterion;
 		return iCriterionInternal.getParameterName() + "=" + iCriterionInternal.getParameterValue(fhirContext);
 	}
 
+	/**
+	 * Converts list HAPI ICriterion to a complete HTTP URI parameter suffix
+	 * @param criteria
+	 * @return Complete HTTP URI suffix
+	 */
 	private String stringCriterionList(ICriterion... criteria) {
 		int size = criteria.length;
 		String params = "";
@@ -196,5 +207,12 @@ public abstract class FhirRequester<
 	 * @return Single match result
 	 */
 	public abstract PatientMaster matchPatient(List<PatientReported> multipleMatches, PatientMaster patientMasterForMatchQuery, Date cutoff);
+
+	public static boolean isGoldenRecord(IBaseResource iBaseResource) {
+		if (iBaseResource != null && iBaseResource.getMeta() != null && !iBaseResource.getMeta().isEmpty()) {
+			return iBaseResource.getMeta().getTag(GOLDEN_SYSTEM_TAG, GOLDEN_RECORD) != null;
+		}
+		return false;
+	}
 
 }

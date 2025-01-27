@@ -206,7 +206,7 @@ public class Hl7MessageWriterR4 extends Hl7MessageWriter {
 						obsSubId++;
 						for (Bundle.BundleEntryComponent entry : bundle.getEntry()) {
 							ObservationReported observationReported =
-								observationMapper.getReported((Observation) entry.getResource());
+								observationMapper.localObjectReported((Observation) entry.getResource());
 							obxSetId++;
 							printObx(sb, obxSetId, obsSubId, observationReported);
 						}

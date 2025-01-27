@@ -3,14 +3,14 @@ package org.immregistries.iis.kernal.mapping.forR5;
 import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
 import ca.uhn.fhir.rest.param.TokenParam;
 import org.apache.commons.lang3.StringUtils;
-import org.immregistries.iis.kernal.fhir.annotations.OnR5Condition;
 import org.hl7.fhir.r5.model.*;
+import org.immregistries.iis.kernal.InternalClient.FhirRequesterR5;
+import org.immregistries.iis.kernal.fhir.annotations.OnR5Condition;
 import org.immregistries.iis.kernal.mapping.Interfaces.ImmunizationMapper;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
 import org.immregistries.iis.kernal.model.ModelPerson;
 import org.immregistries.iis.kernal.model.VaccinationMaster;
 import org.immregistries.iis.kernal.model.VaccinationReported;
-import org.immregistries.iis.kernal.InternalClient.FhirRequesterR5;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Service;
@@ -27,8 +27,8 @@ public class ImmunizationMapperR5 implements ImmunizationMapper<Immunization> {
 	FhirRequesterR5 fhirRequests;
 
 
-	public VaccinationReported getReportedWithMaster(Immunization i) {
-		VaccinationReported vaccinationReported = getReported(i);
+	public VaccinationReported localObjectReportedWithMaster(Immunization i) {
+		VaccinationReported vaccinationReported = this.localObjectReported(i);
 		VaccinationMaster vaccinationMaster = fhirRequests.searchVaccinationMaster(
 			new SearchParameterMap(Immunization.SP_IDENTIFIER, new TokenParam().setValue(vaccinationReported.getExternalLink())));
 		if (vaccinationMaster!= null) {
@@ -148,13 +148,13 @@ public class ImmunizationMapperR5 implements ImmunizationMapper<Immunization> {
 ////	  vaccinationMaster.setVaccinationReported();
 //	  return vaccinationMaster;
 //  }
-
-	public VaccinationReported getReported(Immunization i){
+public VaccinationReported localObjectReported(Immunization i) {
 		VaccinationReported vaccinationReported = new VaccinationReported();
 		fillFromFhirResource(vaccinationReported, i); // TODO assert not golden record ?
 		return vaccinationReported;
 	}
-	public VaccinationMaster getMaster(Immunization i){
+
+	public VaccinationMaster localObject(Immunization i) {
 		VaccinationMaster vaccinationMaster = new VaccinationMaster();
 		fillFromFhirResource(vaccinationMaster, i); // TODO assert golden record ?
 		return vaccinationMaster;
@@ -165,7 +165,7 @@ public class ImmunizationMapperR5 implements ImmunizationMapper<Immunization> {
    * @param vr the vaccinationReported
    * @return the Immunization resource
    */
-  public Immunization getFhirResource(VaccinationMaster vr) {
+  public Immunization fhirResource(VaccinationMaster vr) {
 	  Immunization i = new Immunization();
 	  i.addIdentifier(MappingHelper.getFhirIdentifierR5(vr.getExternalLinkSystem(), vr.getExternalLink())); // TODO if system empty ?
 	  Reference patientReference = new Reference()
@@ -227,7 +227,7 @@ public class ImmunizationMapperR5 implements ImmunizationMapper<Immunization> {
 	  i.addProgramEligibility().setProgram(new CodeableConcept(new Coding().setSystem(FUNDING_ELIGIBILITY).setCode(vr.getFundingEligibility())));
 
 
-	  Location location  = locationMapper.getFhirResource(vr.getOrgLocation()); // Should have been saved in Event/MessageHandler
+	  Location location = locationMapper.fhirResource(vr.getOrgLocation()); // Should have been saved in Event/MessageHandler
 	  if (location != null) {
 		  i.setLocation(new Reference(MappingHelper.LOCATION + "/" + location.getId()));
 	  }

@@ -9,7 +9,7 @@ import org.immregistries.iis.kernal.model.PatientReported;
  *
  * @param <Patient> FHIR Resource type
  */
-public interface PatientMapper<Patient extends IBaseResource> extends IisFhirMapper<PatientMaster, PatientReported, Patient> {
+public interface PatientMapper<Patient extends IBaseResource> extends IisFhirMapperMasterReported<PatientMaster, PatientReported, Patient> {
 
 	String MRN_SYSTEM = "AIRA-TEST";
 
@@ -50,26 +50,26 @@ public interface PatientMapper<Patient extends IBaseResource> extends IisFhirMap
 	 * @param patient FHIR patient resource
 	 * @return Mapped internal model Patient as reported patient, with
 	 */
-	PatientReported getReportedWithMaster(Patient patient);
+	PatientReported localObjectReportedWithMaster(Patient patient);
 
 	/**
 	 * Translates from FHIR to reconstruct reported patient object
 	 * @param patient FHIR patient Resource
 	 * @return Mapped internal model Patient as reported patient
 	 */
-	PatientReported getReported(Patient patient);
+	PatientReported localObjectReported(Patient patient);
 
 	/**
 	 *
 	 * @param patient FHIR patient Resource
 	 * @return Mapped internal model patient as master patient
 	 */
-	PatientMaster getMaster(Patient patient);
+	PatientMaster localObject(Patient patient);
 
 	/**
 	 * Converts local model patient information to FHIR Resource
 	 * @param patientMaster any local patient record
 	 * @return
 	 */
-	Patient getFhirResource(PatientMaster patientMaster);
+	Patient fhirResource(PatientMaster patientMaster);
 }

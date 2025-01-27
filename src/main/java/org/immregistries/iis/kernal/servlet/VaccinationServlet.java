@@ -78,7 +78,7 @@ public class VaccinationServlet extends PatientServlet {
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		try {
 			Immunization immunization = getImmunizationFromParameter(req,fhirClient);
-			VaccinationMaster vaccination = immunizationMapper.getMaster(immunization);
+			VaccinationMaster vaccination = immunizationMapper.localObject(immunization);
 //			 fhirRequests.searchVaccinationReported(fhirClient,
 //			 Immunization.IDENTIFIER.exactly().code(req.getParameter(PARAM_VACCINATION_REPORTED_ID)));
 

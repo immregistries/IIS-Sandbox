@@ -139,7 +139,7 @@ public class V2ToFhirServlet extends HttpServlet {
 
 	private void createImmunizationResource(VaccinationMaster vaccination, Immunization immunization,
 														 Code cvxCode, CodeMap codeMap) {
-		immunization = (Immunization) immunizationMapper.getFhirResource(vaccination); // TODO Maybe remove this or remove the rest
+		immunization = (Immunization) immunizationMapper.fhirResource(vaccination); // TODO Maybe remove this or remove the rest
 
 		{
 			DateTimeType occurance = new DateTimeType(vaccination.getAdministeredDate());

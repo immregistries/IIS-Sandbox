@@ -3,7 +3,7 @@ package org.immregistries.iis.kernal.model;
 import java.io.Serializable;
 import java.util.Set;
 
-public class Tenant implements Serializable {
+public class Tenant extends AbstractMappedObject implements Serializable {
   /**
    * 
    */

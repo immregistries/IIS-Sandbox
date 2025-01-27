@@ -24,8 +24,8 @@ public class ImmunizationMapperR4 implements ImmunizationMapper<Immunization> {
 	@Autowired
 	FhirRequesterR4 fhirRequests;
 
-	public VaccinationReported getReportedWithMaster(Immunization i) {
-		VaccinationReported vaccinationReported = getReported(i);
+	public VaccinationReported localObjectReportedWithMaster(Immunization i) {
+		VaccinationReported vaccinationReported = this.localObjectReported(i);
 		VaccinationMaster vaccinationMaster = fhirRequests.searchVaccinationMaster(
 			new SearchParameterMap(Immunization.SP_IDENTIFIER, new TokenParam().setValue(vaccinationReported.getExternalLink()))
 //			Immunization.IDENTIFIER.exactly().systemAndIdentifier(
@@ -133,13 +133,13 @@ public class ImmunizationMapperR4 implements ImmunizationMapper<Immunization> {
 		}
 	}
 
-	public VaccinationReported getReported(Immunization i) {
+	public VaccinationReported localObjectReported(Immunization i) {
 		VaccinationReported vaccinationReported = new VaccinationReported();
 		fillFromFhirResource(vaccinationReported, i); // TODO assert not golden record ?
 		return vaccinationReported;
 	}
 
-	public VaccinationMaster getMaster(Immunization i) {
+	public VaccinationMaster localObject(Immunization i) {
 		VaccinationMaster vaccinationMaster = new VaccinationMaster();
 		fillFromFhirResource(vaccinationMaster, i); // TODO assert golden record ?
 		return vaccinationMaster;
@@ -151,7 +151,7 @@ public class ImmunizationMapperR4 implements ImmunizationMapper<Immunization> {
 	 * @param vr the vaccinationReported
 	 * @return the Immunization resource
 	 */
-	public Immunization getFhirResource(VaccinationMaster vr) {
+	public Immunization fhirResource(VaccinationMaster vr) {
 		Immunization i = new Immunization();
 //	  i.addIdentifier(MappingHelper.getFhirIdentifier(MappingHelper.VACCINATION_REPORTED, vr.getVaccinationReportedExternalLink()));
 		i.setPatient(new Reference().setReference("Patient/" + vr.getPatientReported().getPatientId()));

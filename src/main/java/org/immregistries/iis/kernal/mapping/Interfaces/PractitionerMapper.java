@@ -1,11 +1,11 @@
 package org.immregistries.iis.kernal.mapping.Interfaces;
 
 
+import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.immregistries.iis.kernal.model.ModelPerson;
 
-public interface PractitionerMapper<Practitioner> {
-	public static final String PRACTITIONER = "Practitioner";
-	public ModelPerson getModelPerson(Practitioner practitioner);
-	public Practitioner getFhirResource(ModelPerson modelPerson);
-
+public interface PractitionerMapper<Practitioner extends IBaseResource> extends IisFhirMapperMaster<ModelPerson, Practitioner> {
+	String PRACTITIONER = "Practitioner";
+//	ModelPerson localObject(Practitioner practitioner);
+//	Practitioner fhirResource(ModelPerson modelPerson);
 }

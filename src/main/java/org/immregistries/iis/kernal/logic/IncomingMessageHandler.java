@@ -826,7 +826,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 							obsSubId++;
 							for (Bundle.BundleEntryComponent entry : bundle.getEntry()) {
 //						ObservationMaster observationMaster = ObservationMapper.getMaster((Observation) entry.getResource());
-								ObservationReported observationReported = observationMapper.getReported(entry.getResource());
+								ObservationReported observationReported = observationMapper.localObjectReported(entry.getResource());
 								obxSetId++;
 								hl7MessageWriter.printObx(sb, obxSetId, obsSubId, observationReported);
 							}
@@ -841,7 +841,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 						obsSubId++;
 						for (Bundle.BundleEntryComponent entry : bundle.getEntry()) {
 							obxSetId++;
-							ObservationReported observationReported = observationMapper.getReported(entry.getResource());
+							ObservationReported observationReported = observationMapper.localObjectReported(entry.getResource());
 							hl7MessageWriter.printObx(sb, obxSetId, obsSubId, observationReported);
 						}
 					}

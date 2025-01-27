@@ -4,7 +4,7 @@ import ca.uhn.fhir.rest.api.server.RequestDetails;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.immregistries.iis.kernal.logic.ack.IisReportable;
 import org.immregistries.iis.kernal.logic.ack.IisReportableSeverity;
-import org.immregistries.iis.kernal.mapping.Interfaces.IisFhirMapper;
+import org.immregistries.iis.kernal.mapping.Interfaces.IisFhirMapperMasterReported;
 import org.immregistries.iis.kernal.model.AbstractMappedObject;
 import org.immregistries.mqe.hl7util.model.CodedWithExceptions;
 import org.immregistries.mqe.hl7util.model.Hl7Location;
@@ -39,9 +39,9 @@ public abstract class AbstractLogicInterceptor {
 		return iisReportable;
 	}
 
-	protected boolean testMapping(IisFhirMapper mapper, AbstractMappedObject abstractMappedObject) {
-		IBaseResource resource = mapper.getFhirResource(abstractMappedObject);
-		AbstractMappedObject abstractMappedObject1 = mapper.getReported(resource);
+	protected boolean testMapping(IisFhirMapperMasterReported mapper, AbstractMappedObject abstractMappedObject) {
+		IBaseResource resource = mapper.fhirResource(abstractMappedObject);
+		AbstractMappedObject abstractMappedObject1 = mapper.localObjectReported(resource);
 		logger.info("original {}", abstractMappedObject);
 		logger.info("mapped {}", abstractMappedObject1);
 		boolean res = abstractMappedObject.toString().equals(abstractMappedObject1.toString());

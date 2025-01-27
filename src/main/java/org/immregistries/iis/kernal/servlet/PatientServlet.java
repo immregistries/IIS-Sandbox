@@ -216,7 +216,7 @@ public class PatientServlet  {
 					out.println("</div>");
 				}
 			} else {
-				patientMasterSelected = patientMapper.getMaster(patientSelected);
+				patientMasterSelected = patientMapper.localObject(patientSelected);
 				IParser parser = repositoryClientFactory.getFhirContext()
 					.newJsonParser().setPrettyPrint(true).setSuppressNarratives(true);
 				out.println("<h2>Patient : " + patientMasterSelected.getNameFirst() + " " + patientMasterSelected.getNameMiddle() + " " + patientMasterSelected.getNameLast() + "</h2>");

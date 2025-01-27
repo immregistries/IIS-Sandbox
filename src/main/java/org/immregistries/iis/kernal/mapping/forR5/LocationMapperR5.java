@@ -1,7 +1,7 @@
 package org.immregistries.iis.kernal.mapping.forR5;
 
-import org.immregistries.iis.kernal.fhir.annotations.OnR5Condition;
 import org.hl7.fhir.r5.model.*;
+import org.immregistries.iis.kernal.fhir.annotations.OnR5Condition;
 import org.immregistries.iis.kernal.mapping.Interfaces.LocationMapper;
 import org.immregistries.iis.kernal.model.OrgLocation;
 import org.springframework.context.annotation.Conditional;
@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 @Conditional(OnR5Condition.class)
 public class LocationMapperR5 implements LocationMapper<Location> {
 
-	public Location getFhirResource(OrgLocation ol) {
+	public Location fhirResource(OrgLocation ol) {
 
 		if (ol != null) {
 			Location location = new Location();
@@ -38,7 +38,7 @@ public class LocationMapperR5 implements LocationMapper<Location> {
 		return null;
 	}
 
-	public OrgLocation orgLocationFromFhir(Location l) {
+	public OrgLocation localObject(Location l) {
 		OrgLocation orgLocation = new OrgLocation();
 		orgLocation.setOrgLocationId(l.getId());
 		orgLocation.setOrgFacilityCode(l.getIdentifierFirstRep().getValue());

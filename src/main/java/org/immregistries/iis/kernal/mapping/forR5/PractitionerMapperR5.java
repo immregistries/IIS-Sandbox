@@ -1,8 +1,10 @@
 package org.immregistries.iis.kernal.mapping.forR5;
 
 
+import org.hl7.fhir.r5.model.HumanName;
+import org.hl7.fhir.r5.model.Practitioner;
+import org.hl7.fhir.r5.model.Reference;
 import org.immregistries.iis.kernal.fhir.annotations.OnR5Condition;
-import org.hl7.fhir.r5.model.*;
 import org.immregistries.iis.kernal.mapping.Interfaces.PractitionerMapper;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
 import org.immregistries.iis.kernal.model.ModelPerson;
@@ -14,8 +16,7 @@ import org.springframework.stereotype.Service;
 public class PractitionerMapperR5 implements PractitionerMapper<Practitioner> {
 
 
-
-  public ModelPerson getModelPerson(Practitioner practitioner) {
+	public ModelPerson localObject(Practitioner practitioner) {
 	  ModelPerson modelPerson = new ModelPerson();
 	  modelPerson.setPersonId(practitioner.getId());
 	  modelPerson.setPersonExternalLink(practitioner.getIdentifierFirstRep().getValue());
@@ -34,7 +35,7 @@ public class PractitionerMapperR5 implements PractitionerMapper<Practitioner> {
 	  return modelPerson;
   }
 
-	public Practitioner getFhirResource(ModelPerson modelPerson) {
+	public Practitioner fhirResource(ModelPerson modelPerson) {
 		Practitioner practitioner = new Practitioner();
 		try {
 			switch (new Reference(modelPerson.getIdentifierTypeCode()).getType()) {

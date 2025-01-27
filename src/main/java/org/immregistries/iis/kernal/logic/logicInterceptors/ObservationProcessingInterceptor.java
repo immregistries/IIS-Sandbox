@@ -54,8 +54,8 @@ public class ObservationProcessingInterceptor extends AbstractLogicInterceptor {
 		IBaseResource result = requestDetails.getResource();
 		if ((requestDetails.getOperation().equals("create") || requestDetails.getOperation().equals("update"))
 			&& (requestDetails.getResource() instanceof org.hl7.fhir.r4.model.Observation || requestDetails.getResource() instanceof org.hl7.fhir.r5.model.Observation)) {
-			ObservationReported observationReported = processAndValidateObservationReported(observationMapper.getReported(requestDetails.getResource()), iisReportableList, processingFlavorSet, obxCount, patientBirthDate);
-			result = observationMapper.getFhirResource(observationReported);
+			ObservationReported observationReported = processAndValidateObservationReported(observationMapper.localObjectReported(requestDetails.getResource()), iisReportableList, processingFlavorSet, obxCount, patientBirthDate);
+			result = observationMapper.fhirResource(observationReported);
 		}
 		requestDetails.setResource(result);
 		requestDetails.setAttribute(IIS_REPORTABLE_LIST, iisReportableList);

@@ -1,8 +1,8 @@
 package org.immregistries.iis.kernal.mapping.forR5;
 
-import org.immregistries.iis.kernal.fhir.annotations.OnR5Condition;
 import org.hl7.fhir.r5.model.HumanName;
 import org.hl7.fhir.r5.model.Person;
+import org.immregistries.iis.kernal.fhir.annotations.OnR5Condition;
 import org.immregistries.iis.kernal.mapping.Interfaces.PersonMapper;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
 import org.immregistries.iis.kernal.model.ModelPerson;
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 @Conditional(OnR5Condition.class)
 public class PersonMapperR5 implements PersonMapper<Person> {
 
-	public ModelPerson getModelPerson(org.hl7.fhir.r5.model.Person p) {
+	public ModelPerson localObject(org.hl7.fhir.r5.model.Person p) {
 		ModelPerson modelPerson = new ModelPerson();
 		modelPerson.setPersonId(p.getId());
 		modelPerson.setPersonExternalLink(p.getIdentifier().get(0).getValue());
@@ -30,7 +30,7 @@ public class PersonMapperR5 implements PersonMapper<Person> {
 		return modelPerson;
 	}
 
-	public Person getFhirResource(ModelPerson modelPerson) {
+	public Person fhirResource(ModelPerson modelPerson) {
 		org.hl7.fhir.r5.model.Person p = new org.hl7.fhir.r5.model.Person();
 		p.setId(modelPerson.getPersonId());
 		p.addIdentifier(MappingHelper.getFhirIdentifierR5(MappingHelper.PERSON, modelPerson.getPersonExternalLink()));

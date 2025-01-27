@@ -37,22 +37,22 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 	@Autowired
 	FhirRequesterR5 fhirRequests;
 
-	public PatientReported getReportedWithMaster(Patient p) {
-		PatientReported patientReported = getReported(p);
+	public PatientReported localObjectReportedWithMaster(Patient p) {
+		PatientReported patientReported = localObjectReported(p);
 		if (!p.getId().isBlank() && p.getMeta().getTag(GOLDEN_SYSTEM_TAG, GOLDEN_RECORD) == null) {
 			patientReported.setPatient(fhirRequests.readPatientMasterWithMdmLink(p.getId()));
 		}
 		return patientReported;
 	}
 
-	public PatientReported getReported(Patient patient) {
+	public PatientReported localObjectReported(Patient patient) {
 		PatientReported patientReported = new PatientReported();
 		fillFromFhirResource(patientReported, patient);
 		return patientReported;
 	}
 
-	public PatientMaster getMaster(Patient patient) {
-		return getReported(patient);
+	public PatientMaster localObject(Patient patient) {
+		return localObjectReported(patient);
 	}
 
 	public void fillFromFhirResource(PatientMaster pm, Patient p) {
@@ -199,7 +199,7 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 		}
 	}
 
-	public Patient getFhirResource(PatientMaster pm) {
+	public Patient fhirResource(PatientMaster pm) {
 		Patient p = new Patient();
 
 		p.getMeta().setLastUpdated(pm.getUpdatedDate());

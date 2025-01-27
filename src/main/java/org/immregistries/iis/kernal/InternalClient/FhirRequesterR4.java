@@ -34,7 +34,7 @@ public class FhirRequesterR4 extends FhirRequester<Patient,Immunization,Location
 		PatientMaster patientMaster = null;
 		IBundleProvider bundleProvider = searchGoldenRecord(Patient.class, searchParameterMap);
 		if (!bundleProvider.isEmpty()) {
-			patientMaster = patientMapper.getMaster((Patient) bundleProvider.getResources(0, 1).get(0));
+			patientMaster = patientMapper.localObject((Patient) bundleProvider.getResources(0, 1).get(0));
 		}
 		return patientMaster;
 	}
@@ -43,7 +43,7 @@ public class FhirRequesterR4 extends FhirRequester<Patient,Immunization,Location
 		PatientReported patientReported = null;
 		IBundleProvider bundleProvider = searchRegularRecord(Patient.class, searchParameterMap);
 		if (!bundleProvider.isEmpty()) {
-			patientReported = patientMapper.getReportedWithMaster((Patient) bundleProvider.getResources(0, 1).get(0));
+			patientReported = patientMapper.localObjectReportedWithMaster((Patient) bundleProvider.getResources(0, 1).get(0));
 		}
 		return patientReported;
 	}
@@ -53,7 +53,7 @@ public class FhirRequesterR4 extends FhirRequester<Patient,Immunization,Location
 		IBundleProvider bundleProvider = searchRegularRecord(Patient.class, searchParameterMap);
 		if (!bundleProvider.isEmpty()) {
 			for (IBaseResource resource : bundleProvider.getAllResources()) {
-				patientReportedList.add(patientMapper.getReportedWithMaster((Patient) resource));
+				patientReportedList.add(patientMapper.localObjectReportedWithMaster((Patient) resource));
 			}
 		}
 		return patientReportedList;
@@ -64,7 +64,7 @@ public class FhirRequesterR4 extends FhirRequester<Patient,Immunization,Location
 		IBundleProvider bundleProvider = searchGoldenRecord(Patient.class, searchParameterMap);
 		if (!bundleProvider.isEmpty()) {
 			for (IBaseResource resource : bundleProvider.getAllResources()) {
-				patientList.add(patientMapper.getMaster((Patient) resource));
+				patientList.add(patientMapper.localObject((Patient) resource));
 			}
 		}
 		return patientList;
@@ -74,7 +74,7 @@ public class FhirRequesterR4 extends FhirRequester<Patient,Immunization,Location
 		VaccinationMaster vaccinationMaster = null;
 		IBundleProvider bundleProvider = searchGoldenRecord(Immunization.class, searchParameterMap);
 		if (!bundleProvider.isEmpty()) {
-			vaccinationMaster = immunizationMapper.getMaster((Immunization) bundleProvider.getResources(0, 1).get(0));
+			vaccinationMaster = immunizationMapper.localObject((Immunization) bundleProvider.getResources(0, 1).get(0));
 		}
 		return vaccinationMaster;
 	}
@@ -83,7 +83,7 @@ public class FhirRequesterR4 extends FhirRequester<Patient,Immunization,Location
 		VaccinationReported vaccinationReported = null;
 		IBundleProvider bundleProvider = searchRegularRecord(Immunization.class, searchParameterMap);
 		if (!bundleProvider.isEmpty()) {
-			vaccinationReported = immunizationMapper.getReportedWithMaster((Immunization) bundleProvider.getResources(0, 1).get(0));
+			vaccinationReported = immunizationMapper.localObjectReportedWithMaster((Immunization) bundleProvider.getResources(0, 1).get(0));
 		}
 		return vaccinationReported;
 	}
@@ -101,7 +101,7 @@ public class FhirRequesterR4 extends FhirRequester<Patient,Immunization,Location
 		List<VaccinationReported> vaccinationReportedList = new ArrayList<>();
 		IBundleProvider bundleProvider = searchRegularRecord(Immunization.class, searchParameterMap);
 		for (IBaseResource resource : bundleProvider.getAllResources()) {
-			vaccinationReportedList.add(immunizationMapper.getReportedWithMaster((Immunization) resource));
+			vaccinationReportedList.add(immunizationMapper.localObjectReportedWithMaster((Immunization) resource));
 		}
 		return vaccinationReportedList;
 	}
@@ -122,7 +122,7 @@ public class FhirRequesterR4 extends FhirRequester<Patient,Immunization,Location
 		for (Bundle.BundleEntryComponent entry : bundle.getEntry()) {
 			if (entry.getResource() instanceof Immunization) {
 				if (entry.getResource().getMeta().getTag(GOLDEN_SYSTEM_TAG, GOLDEN_RECORD) != null) {
-					vaccinationList.add(immunizationMapper.getMaster((Immunization) entry.getResource()));
+					vaccinationList.add(immunizationMapper.localObject((Immunization) entry.getResource()));
 				}
 			}
 		}
@@ -134,7 +134,7 @@ public class FhirRequesterR4 extends FhirRequester<Patient,Immunization,Location
 		ObservationReported observationReported = null;
 		IBundleProvider bundleProvider = searchRegularRecord(Observation.class, searchParameterMap);
 		if (!bundleProvider.isEmpty()) {
-			observationReported = observationMapper.getReportedWithMaster((Observation) bundleProvider.getResources(0, 1).get(0),  fhirClient);
+			observationReported = observationMapper.localObjectReportedWithMaster((Observation) bundleProvider.getResources(0, 1).get(0));
 		}
 		return observationReported;
 	}
@@ -143,7 +143,7 @@ public class FhirRequesterR4 extends FhirRequester<Patient,Immunization,Location
 		ObservationMaster observationMaster = null;
 		IBundleProvider bundleProvider = searchGoldenRecord(Observation.class, searchParameterMap);
 		if (!bundleProvider.isEmpty()) {
-			observationMaster = observationMapper.getMaster((Observation) bundleProvider.getResources(0, 1).get(0));
+			observationMaster = observationMapper.localObject((Observation) bundleProvider.getResources(0, 1).get(0));
 		}
 		return observationMaster;
 	}
@@ -153,7 +153,7 @@ public class FhirRequesterR4 extends FhirRequester<Patient,Immunization,Location
 		List<ObservationReported> observationReportedList = new ArrayList<>();
 		IBundleProvider bundleProvider = search(Observation.class, searchParameterMap);
 		for (IBaseResource resource : bundleProvider.getAllResources()) {
-			observationReportedList.add(observationMapper.getReportedWithMaster((Observation) resource, fhirClient));
+			observationReportedList.add(observationMapper.localObjectReportedWithMaster((Observation) resource));
 		}
 		return observationReportedList;
 	}
@@ -162,7 +162,7 @@ public class FhirRequesterR4 extends FhirRequester<Patient,Immunization,Location
 		OrgLocation orgLocation = null;
 		IBundleProvider bundleProvider = search(Observation.class, searchParameterMap);
 		if (!bundleProvider.isEmpty()) {
-			orgLocation = locationMapper.orgLocationFromFhir((Location) bundleProvider.getResources(0, 1).get(0));
+			orgLocation = locationMapper.localObject((Location) bundleProvider.getResources(0, 1).get(0));
 		}
 		return orgLocation;
 	}
@@ -171,7 +171,7 @@ public class FhirRequesterR4 extends FhirRequester<Patient,Immunization,Location
 		List<OrgLocation> locationList = new ArrayList<>();
 		IBundleProvider bundleProvider = search(Location.class, searchParameterMap);
 		for (IBaseResource resource : bundleProvider.getAllResources()) {
-			locationList.add(locationMapper.orgLocationFromFhir((Location) resource));
+			locationList.add(locationMapper.localObject((Location) resource));
 		}
 		return locationList;
 	}
@@ -180,7 +180,7 @@ public class FhirRequesterR4 extends FhirRequester<Patient,Immunization,Location
 		ModelPerson modelPerson = null;
 		IBundleProvider bundleProvider = search(Person.class, searchParameterMap);
 		if (!bundleProvider.isEmpty()) {
-			modelPerson = personMapper.getModelPerson((Person) bundleProvider.getResources(0, 1).get(0));
+			modelPerson = personMapper.localObject((Person) bundleProvider.getResources(0, 1).get(0));
 		}
 		return modelPerson;
 	}
@@ -189,7 +189,7 @@ public class FhirRequesterR4 extends FhirRequester<Patient,Immunization,Location
 		ModelPerson modelPerson = null;
 		IBundleProvider bundleProvider = search(Practitioner.class, searchParameterMap);
 		if (!bundleProvider.isEmpty()) {
-			modelPerson = practitionerMapper.getModelPerson((Practitioner) bundleProvider.getResources(0, 1).get(0));
+			modelPerson = practitionerMapper.localObject((Practitioner) bundleProvider.getResources(0, 1).get(0));
 		}
 		return modelPerson;
 	}
@@ -204,7 +204,7 @@ public class FhirRequesterR4 extends FhirRequester<Patient,Immunization,Location
 	}
 
 	public MethodOutcome savePatientReportedMethodOutcome(PatientReported patientReported) {
-		Patient patient = patientMapper.getFhirResource(patientReported);
+		Patient patient = patientMapper.fhirResource(patientReported);
 		return save(patient,
 				Patient.IDENTIFIER.exactly().systemAndIdentifier(patientReported.getMainPatientIdentifier().getSystem(), patientReported.getMainPatientIdentifier().getValue()));
 	}
@@ -214,7 +214,7 @@ public class FhirRequesterR4 extends FhirRequester<Patient,Immunization,Location
 //		logger.info("created {} resource {}", outcome.getCreated(), outcome.getResource());
 		if (!outcome.getResource().isEmpty()) {
 			patientReported.setPatientId(outcome.getResource().getIdElement().getIdPart());
-			return patientMapper.getReportedWithMaster((Patient) outcome.getResource());
+			return patientMapper.localObjectReportedWithMaster((Patient) outcome.getResource());
 		} else if (outcome.getCreated() != null && outcome.getCreated()) {
 			patientReported.setPatientId(outcome.getId().getIdPart());
 			return readPatientReported(outcome.getId().getIdPart());
@@ -225,7 +225,7 @@ public class FhirRequesterR4 extends FhirRequester<Patient,Immunization,Location
 	}
 
 	public ModelPerson savePractitioner(ModelPerson modelPerson) {
-		Practitioner practitioner = practitionerMapper.getFhirResource(modelPerson);
+		Practitioner practitioner = practitionerMapper.fhirResource(modelPerson);
 		MethodOutcome outcome = save(practitioner,
 			Patient.IDENTIFIER.exactly().identifier(modelPerson.getPersonExternalLink()));
 		if (outcome.getCreated() != null && outcome.getCreated()) {
@@ -247,7 +247,7 @@ public class FhirRequesterR4 extends FhirRequester<Patient,Immunization,Location
 //	}
 
 	public ObservationReported saveObservationReported(ObservationReported observationReported) {
-		Observation observation = observationMapper.getFhirResource(observationReported);
+		Observation observation = observationMapper.fhirResource(observationReported);
 		MethodOutcome outcome = save(observation);
 		if (outcome.getCreated() != null && outcome.getCreated()) {
 			observationReported.setPatientReportedId(outcome.getId().getIdPart());
@@ -258,7 +258,7 @@ public class FhirRequesterR4 extends FhirRequester<Patient,Immunization,Location
 	}
 
 	public VaccinationReported saveVaccinationReported(VaccinationReported vaccinationReported) {
-		Immunization immunization = immunizationMapper.getFhirResource(vaccinationReported);
+		Immunization immunization = immunizationMapper.fhirResource(vaccinationReported);
 		// TODO change conditional create to update ?
 		MethodOutcome outcome = save(immunization,
 			Immunization.IDENTIFIER.exactly()
@@ -273,7 +273,7 @@ public class FhirRequesterR4 extends FhirRequester<Patient,Immunization,Location
 	}
 
 	public OrgLocation saveOrgLocation(OrgLocation orgLocation) {
-		Location location = locationMapper.getFhirResource(orgLocation);
+		Location location = locationMapper.fhirResource(orgLocation);
 		MethodOutcome outcome = save(location,
 			Location.IDENTIFIER.exactly().identifier(location.getIdentifierFirstRep().getValue())
 		);
@@ -322,23 +322,25 @@ public class FhirRequesterR4 extends FhirRequester<Patient,Immunization,Location
 	}
 
 	public PatientMaster readPatientMaster(String id) {
-		return patientMapper.getMaster((Patient) read(Patient.class, id)); // TODO filter if golden record ?
+		Patient patient = (Patient) read(Patient.class, id);
+		if (patient != null && patient.hasMeta())
+			return patientMapper.localObject(patient);
 	}
 
 	public PatientReported readPatientReported(String id) {
-		return patientMapper.getReportedWithMaster((Patient) read(Patient.class, id));
+		return patientMapper.localObjectReportedWithMaster((Patient) read(Patient.class, id));
 	}
 
 	public ModelPerson readPractitionerPerson(String id) {
-		return practitionerMapper.getModelPerson((Practitioner) read(Practitioner.class, id));
+		return practitionerMapper.localObject((Practitioner) read(Practitioner.class, id));
 	}
 
 	public OrgLocation readOrgLocation(String id) {
-		return locationMapper.orgLocationFromFhir((Location) read(Location.class, id));
+		return locationMapper.localObject((Location) read(Location.class, id));
 	}
 
 	public VaccinationReported readVaccinationReported(String id) {
-		return immunizationMapper.getReportedWithMaster((Immunization) read(Immunization.class, id));
+		return immunizationMapper.localObjectReportedWithMaster((Immunization) read(Immunization.class, id));
 	}
 
 	public PatientMaster matchPatient(List<PatientReported> multipleMatches, PatientMaster patientMasterForMatchQuery, Date cutoff) {
@@ -346,12 +348,12 @@ public class FhirRequesterR4 extends FhirRequester<Patient,Immunization,Location
 		Bundle matches = repositoryClientFactory.getFhirClient()
 			.operation().onType(Patient.class)
 			.named("match")
-			.withParameter(Parameters.class, "resource", patientMapper.getFhirResource(patientMasterForMatchQuery))
+			.withParameter(Parameters.class, "resource", patientMapper.fhirResource(patientMasterForMatchQuery))
 			.returnResourceType(Bundle.class).execute();
 		for (Bundle.BundleEntryComponent entry : matches.getEntry()) {
 			if (entry.getResource() instanceof Patient) {
 				Patient patient = (Patient) entry.getResource();
-				PatientMaster patientMaster = patientMapper.getMaster(patient);
+				PatientMaster patientMaster = patientMapper.localObject(patient);
 				/**
 				 * Filter for flavours previously configured
 				 */
@@ -369,7 +371,7 @@ public class FhirRequesterR4 extends FhirRequester<Patient,Immunization,Location
 				if (entry.getSearch().hasScore() && entry.getSearch().getScoreElement().compareTo(new DecimalType(MINIMAL_MATCHING_SCORE)) > 0) {
 					singleMatch = patientMaster;
 				}
-				multipleMatches.add(patientMapper.getReported((Patient) entry.getResource()));
+				multipleMatches.add(patientMapper.localObjectReported((Patient) entry.getResource()));
 			}
 		}
 		return singleMatch;

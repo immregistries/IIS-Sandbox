@@ -1,10 +1,10 @@
 package org.immregistries.iis.kernal.mapping.forR4;
 
-import org.immregistries.iis.kernal.fhir.annotations.OnR4Condition;
-import org.hl7.fhir.r4.model.Location;
 import org.hl7.fhir.r4.model.Address;
 import org.hl7.fhir.r4.model.Extension;
+import org.hl7.fhir.r4.model.Location;
 import org.hl7.fhir.r4.model.StringType;
+import org.immregistries.iis.kernal.fhir.annotations.OnR4Condition;
 import org.immregistries.iis.kernal.mapping.Interfaces.LocationMapper;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
 import org.immregistries.iis.kernal.model.OrgLocation;
@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 @Conditional(OnR4Condition.class)
 public class LocationMapperR4 implements LocationMapper<Location> {
 
-	public org.hl7.fhir.r4.model.Location getFhirResource(OrgLocation ol) {
+	public org.hl7.fhir.r4.model.Location fhirResource(OrgLocation ol) {
 
 		if (ol != null) {
 			org.hl7.fhir.r4.model.Location location = new org.hl7.fhir.r4.model.Location();
@@ -42,7 +42,7 @@ public class LocationMapperR4 implements LocationMapper<Location> {
 		return null;
 	}
 
-	public OrgLocation orgLocationFromFhir(org.hl7.fhir.r4.model.Location l) {
+	public OrgLocation localObject(org.hl7.fhir.r4.model.Location l) {
 		OrgLocation orgLocation = new OrgLocation();
 		orgLocation.setOrgLocationId(l.getId());
 		orgLocation.setOrgFacilityCode(l.getIdentifierFirstRep().getValue());

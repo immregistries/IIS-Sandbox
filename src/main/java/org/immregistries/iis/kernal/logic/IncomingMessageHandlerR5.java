@@ -203,7 +203,7 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler {
 						String key = sdf.format(immunization.getOccurrenceDateTimeType().getValue());
 						if (immunization.getVaccineCode() != null && StringUtils.isNotBlank(immunization.getVaccineCode().getText())) {
 							key += key + immunization.getVaccineCode().getText();
-							VaccinationMaster vaccinationMaster = immunizationMapper.getMaster(immunization);
+							VaccinationMaster vaccinationMaster = immunizationMapper.localObject(immunization);
 							map.put(key, vaccinationMaster);
 						}
 					}

@@ -1,11 +1,11 @@
 package org.immregistries.iis.kernal.mapping.forR4;
 
 
-import org.immregistries.iis.kernal.fhir.annotations.OnR4Condition;
 import org.hl7.fhir.r4.model.HumanName;
 import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.Practitioner;
 import org.hl7.fhir.r4.model.Reference;
+import org.immregistries.iis.kernal.fhir.annotations.OnR4Condition;
 import org.immregistries.iis.kernal.mapping.Interfaces.PractitionerMapper;
 import org.immregistries.iis.kernal.model.ModelPerson;
 import org.springframework.context.annotation.Conditional;
@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 public class PractitionerMapperR4 implements PractitionerMapper<Practitioner> {
 
 
-  public ModelPerson getModelPerson(Practitioner practitioner) {
+	public ModelPerson localObject(Practitioner practitioner) {
 	  ModelPerson modelPerson = new ModelPerson();
 	  modelPerson.setPersonId(practitioner.getId());
 	  modelPerson.setPersonExternalLink(practitioner.getIdentifierFirstRep().getValue());
@@ -35,7 +35,7 @@ public class PractitionerMapperR4 implements PractitionerMapper<Practitioner> {
 	  return modelPerson;
   }
 
-	public Practitioner getFhirResource(ModelPerson modelPerson) {
+	public Practitioner fhirResource(ModelPerson modelPerson) {
 		Practitioner practitioner = new Practitioner();
 		try {
 			switch (new Reference(modelPerson.getIdentifierTypeCode()).getType()) {

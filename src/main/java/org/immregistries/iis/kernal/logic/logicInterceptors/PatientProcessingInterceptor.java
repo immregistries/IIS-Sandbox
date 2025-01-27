@@ -50,8 +50,8 @@ public class PatientProcessingInterceptor extends AbstractLogicInterceptor {
 		logger.info("details {} {}", requestDetails.getOperation(), requestDetails.getResource().fhirType());
 		if ((requestDetails.getOperation().equals("create") || requestDetails.getOperation().equals("update"))
 				&& (requestDetails.getResource() instanceof org.hl7.fhir.r4.model.Patient || requestDetails.getResource() instanceof org.hl7.fhir.r5.model.Patient)) {
-			PatientReported patientReported = processAndValidatePatient(patientMapper.getReported(requestDetails.getResource()), iisReportableList, processingFlavorSet);
-			result = patientMapper.getFhirResource(patientReported);
+			PatientReported patientReported = processAndValidatePatient(patientMapper.localObjectReported(requestDetails.getResource()), iisReportableList, processingFlavorSet);
+			result = patientMapper.fhirResource(patientReported);
 		}
 		requestDetails.setResource(result);
 		requestDetails.setAttribute(IIS_REPORTABLE_LIST, iisReportableList);

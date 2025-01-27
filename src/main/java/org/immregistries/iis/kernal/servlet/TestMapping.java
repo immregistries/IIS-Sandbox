@@ -45,8 +45,8 @@ public class TestMapping extends HttpServlet {
 	ObservationMapper<Observation> observationMapper;
 	@Autowired
 	PersonMapper<Person> personMapper;
-	@Autowired
-	RelatedPersonMapper<RelatedPerson> relatedPersonMapper;
+//	@Autowired
+//	RelatedPersonMapper<RelatedPerson> relatedPersonMapper;
 
 
 	@Override

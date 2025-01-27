@@ -1,9 +1,9 @@
 package org.immregistries.iis.kernal.mapping.forR4;
 
-import org.immregistries.iis.kernal.fhir.annotations.OnR4Condition;
 import org.hl7.fhir.r4.model.HumanName;
 import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.Person;
+import org.immregistries.iis.kernal.fhir.annotations.OnR4Condition;
 import org.immregistries.iis.kernal.mapping.Interfaces.PersonMapper;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
 import org.immregistries.iis.kernal.model.ModelPerson;
@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 @Conditional(OnR4Condition.class)
 public class PersonMapperR4 implements PersonMapper<Person> {
 
-	public ModelPerson getModelPerson(Person p) {
+	public ModelPerson localObject(Person p) {
 		ModelPerson modelPerson = new ModelPerson();
 		modelPerson.setPersonId(p.getId());
 		modelPerson.setPersonExternalLink(p.getIdentifier().get(0).getValue());
@@ -31,7 +31,7 @@ public class PersonMapperR4 implements PersonMapper<Person> {
 		return modelPerson;
 	}
 
-	public Person getFhirResource(ModelPerson modelPerson) {
+	public Person fhirResource(ModelPerson modelPerson) {
 		Person p = new Person();
 		p.setId(modelPerson.getPersonId());
 		p.addIdentifier(new Identifier().setSystem(MappingHelper.PERSON).setValue(modelPerson.getPersonExternalLink()));
