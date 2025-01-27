@@ -52,7 +52,7 @@ import java.util.Map;
 @Controller
 @Conditional(OnR4Condition.class)
 public class BulkExportGroupProviderR4 extends GroupResourceProvider implements IBulkExportGroupProvider<Group> {
-	private final Logger logger = LoggerFactory.getLogger(BulkExportGroupProviderR4.class);
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	@Autowired
 	private BaseJpaResourceProviderPatient<Patient> patientProvider;

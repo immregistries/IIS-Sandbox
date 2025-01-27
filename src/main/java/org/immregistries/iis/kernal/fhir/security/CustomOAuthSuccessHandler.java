@@ -20,7 +20,7 @@ import static org.immregistries.iis.kernal.fhir.security.ServletHelper.*;
 
 @Component
 public class CustomOAuthSuccessHandler implements AuthenticationSuccessHandler {
-	Logger logger = LoggerFactory.getLogger(CustomOAuthSuccessHandler.class);
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 //	@Override
 //	public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication) throws IOException, ServletException {

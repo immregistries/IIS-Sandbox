@@ -40,7 +40,7 @@ public class RepositoryClientFactory extends ApacheRestfulClientFactory implemen
 	public static final String FHIR_CLIENT = "fhirClient";
 	@Autowired
 	IFhirSystemDao fhirSystemDao;
-	private final Logger logger = LoggerFactory.getLogger(RepositoryClientFactory.class);
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	private LoggingInterceptor loggingInterceptor;
 
 	@Autowired

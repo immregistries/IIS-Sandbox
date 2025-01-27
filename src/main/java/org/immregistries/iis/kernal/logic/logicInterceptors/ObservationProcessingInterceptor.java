@@ -29,7 +29,7 @@ import static ca.uhn.fhir.interceptor.api.Pointcut.SERVER_INCOMING_REQUEST_PRE_H
 @Interceptor
 @Service
 public class ObservationProcessingInterceptor extends AbstractLogicInterceptor {
-	Logger logger = LoggerFactory.getLogger(ObservationProcessingInterceptor.class);
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	public static final String OBX_COUNT = "ObxCount";
 	public static final String PATIENT_BIRTH_DATE = "patientBirthDate";

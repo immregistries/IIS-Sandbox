@@ -30,7 +30,7 @@ import static org.immregistries.iis.kernal.servlet.LoginServlet.PARAM_TENANT_NAM
 @Component
 public class UsernamePasswordAuthenticationProvider implements AuthenticationProvider {
 	private static String CLIENT_PROPERTY_KEY = "spring.security.oauth2.client.registration.";
-	Logger logger = LoggerFactory.getLogger(UsernamePasswordAuthenticationProvider.class);
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	@Autowired
 	Environment env;
 	@Autowired

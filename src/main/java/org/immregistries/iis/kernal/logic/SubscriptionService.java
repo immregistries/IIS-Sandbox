@@ -21,7 +21,7 @@ import static org.hl7.fhir.r5.model.Bundle.HTTPVerb.DELETE;
 
 @Service
 public class SubscriptionService {
-	Logger logger = LoggerFactory.getLogger(SubscriptionService.class);
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	@Autowired
 	IFhirSystemDao fhirSystemDao;

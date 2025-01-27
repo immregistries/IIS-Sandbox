@@ -31,7 +31,7 @@ import java.util.Date;
 @RestController()
 @RequestMapping({"/pop","/tenant/{tenantId}/pop"})
 public class PopServlet {
-	Logger logger = LoggerFactory.getLogger(PopServlet.class);
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	public static final String PARAM_MESSAGE = "MESSAGEDATA";
 	public static final String PARAM_FACILITY_NAME = "FACILITY_NAME";
 	private static SessionFactory factory;

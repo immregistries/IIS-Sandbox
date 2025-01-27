@@ -40,7 +40,7 @@ public class JwtAuthProvider {
 	JwtUtils jwtUtils;
 	Map<String, PublicKey> keystore;
 	Map<String, String> jwtStore;
-	Logger logger = LoggerFactory.getLogger(JwtAuthProvider.class);
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	private final static String CLIENT_ASSERTION_TYPE = "urn:ietf:params:oauth:client-assertion-type:jwt-bearer";
 

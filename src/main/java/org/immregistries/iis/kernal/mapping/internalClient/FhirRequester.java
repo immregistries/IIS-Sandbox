@@ -42,7 +42,8 @@ public abstract class FhirRequester<
 	public static final String GOLDEN_RECORD = "GOLDEN_RECORD";
 	private static final String GOLDEN_CRITERION_PART = GOLDEN_SYSTEM_TAG + "|" + GOLDEN_RECORD;
 	private static final String NOT_GOLDEN_CRITERION = "_tag:not=" + GOLDEN_CRITERION_PART;
-	Logger logger = LoggerFactory.getLogger(FhirRequester.class);
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
 	@Autowired
 	PatientMapper<Patient> patientMapper;
 	@Autowired

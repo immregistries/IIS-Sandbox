@@ -32,7 +32,7 @@ import static org.immregistries.iis.kernal.mapping.internalClient.FhirRequester.
 @Service
 @Conditional(OnR5Condition.class)
 public class PatientMapperR5 implements PatientMapper<Patient> {
-	Logger logger = LoggerFactory.getLogger(PatientMapperR5.class);
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	@Autowired
 	private FhirRequesterR5 fhirRequests;

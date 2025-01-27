@@ -14,8 +14,7 @@ import static org.immregistries.iis.kernal.servlet.LoginServlet.PARAM_USERID;
 
 @Configuration
 public class ServerSecurityConfig {
-	public static String PRINCIPAL_NAME = "cerbeor";
-	Logger logger = LoggerFactory.getLogger(ServerSecurityConfig.class);
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http, CustomOAuthSuccessHandler customOAuthSuccessHandler) throws Exception {

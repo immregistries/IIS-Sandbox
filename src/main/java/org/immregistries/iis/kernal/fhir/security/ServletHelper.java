@@ -24,7 +24,7 @@ import javax.servlet.http.HttpSession;
 import java.util.List;
 
 public class ServletHelper {
-	static Logger logger = LoggerFactory.getLogger(ServletHelper.class);
+	private static final Logger logger = LoggerFactory.getLogger(ServletHelper.class);
 	public static final String GITHUB_PREFIX = "github-";
 	public static final String SESSION_TENANT = "tenant";
 	public static final String SESSION_USER_ACCESS = "userAccess";

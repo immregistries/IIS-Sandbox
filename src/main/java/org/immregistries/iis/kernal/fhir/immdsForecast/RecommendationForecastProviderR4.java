@@ -23,9 +23,9 @@ import java.util.List;
 
 @Controller
 @Conditional(OnR4Condition.class)
-public class RecommendationForecastProviderR4
-	implements IRecommendationForecastProvider<Parameters, Patient, Immunization> {
-	Logger logger = LoggerFactory.getLogger(RecommendationForecastProviderR4.class);
+public class RecommendationForecastProviderR4 implements IRecommendationForecastProvider<Parameters, Patient, Immunization> {
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
 
 	@Autowired
 	private ImmunizationRecommendationServiceR4 immunizationRecommendationServiceR4;

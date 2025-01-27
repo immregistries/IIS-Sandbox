@@ -1,11 +1,9 @@
 package org.immregistries.iis.kernal.servlet;
 
 import ca.uhn.fhir.context.FhirContext;
-import ca.uhn.fhir.jpa.searchparam.extractor.BaseSearchParamExtractor;
 import ca.uhn.fhir.jpa.searchparam.extractor.ISearchParamExtractor;
 import ca.uhn.fhir.parser.IParser;
 import ca.uhn.fhir.rest.server.util.ISearchParamRegistry;
-import org.hl7.fhir.instance.model.api.IBase;
 import org.hl7.fhir.r5.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,11 +21,10 @@ import java.io.IOException;
 @RestController
 @RequestMapping("/SubscriptionTopic")
 public class SubscriptionTopicController {
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
 	@Autowired
 	FhirContext fhirContext;
-
-
-	Logger logger = LoggerFactory.getLogger(SubscriptionTopicController.class);
 
 	@GetMapping
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {

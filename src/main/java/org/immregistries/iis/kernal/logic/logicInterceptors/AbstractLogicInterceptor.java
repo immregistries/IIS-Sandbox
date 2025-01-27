@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class AbstractLogicInterceptor {
-	Logger logger = LoggerFactory.getLogger(AbstractLogicInterceptor.class);
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	public static final String IIS_REPORTABLE_LIST = "iisReportableList";
 

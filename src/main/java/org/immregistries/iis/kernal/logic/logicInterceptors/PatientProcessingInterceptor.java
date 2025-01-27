@@ -35,7 +35,7 @@ import static org.immregistries.iis.kernal.logic.IncomingMessageHandler.NAME_SIZ
 @Interceptor
 @Service
 public class PatientProcessingInterceptor extends AbstractLogicInterceptor {
-	Logger logger = LoggerFactory.getLogger(PatientProcessingInterceptor.class);
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	@Autowired
 	private PatientMapper patientMapper;
 

@@ -26,7 +26,7 @@ import java.io.PrintWriter;
  *
  */
 public class GroupServlet extends HttpServlet {
-	Logger logger = LoggerFactory.getLogger(GroupServlet.class);
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	@Autowired
 	RepositoryClientFactory repositoryClientFactory;
 	@Autowired
