@@ -13,8 +13,8 @@ import ca.uhn.fhir.rest.client.interceptor.BearerTokenAuthInterceptor;
 import ca.uhn.fhir.rest.server.exceptions.AuthenticationException;
 import ca.uhn.fhir.rest.server.interceptor.LoggingInterceptor;
 import ca.uhn.fhir.rest.server.util.ITestingUiClientFactory;
-import org.immregistries.iis.kernal.model.Tenant;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
+import org.immregistries.iis.kernal.model.Tenant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,10 +26,9 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
-
 import java.net.InetAddress;
 
-import static org.immregistries.iis.kernal.fhir.interceptors.SessionAuthorizationInterceptor.CONNECTATHON_USER;
+import static org.immregistries.iis.kernal.fhir.interceptors.CustomAuthorizationInterceptor.CONNECTATHON_USER;
 import static org.immregistries.iis.kernal.fhir.security.ServletHelper.GITHUB_PREFIX;
 import static org.immregistries.iis.kernal.fhir.security.ServletHelper.SESSION_TENANT;
 

@@ -37,10 +37,10 @@ import org.immregistries.iis.kernal.fhir.bulkQuery.CustomBulkDataExportProvider;
 import org.immregistries.iis.kernal.fhir.bulkQuery.IBulkQueryGroupProvider;
 import org.immregistries.iis.kernal.fhir.common.StarterJpaConfig;
 import org.immregistries.iis.kernal.fhir.immdsForecast.IRecommendationForecastProvider;
+import org.immregistries.iis.kernal.fhir.interceptors.CustomAuthorizationInterceptor;
 import org.immregistries.iis.kernal.fhir.interceptors.GroupAuthorityInterceptor;
 import org.immregistries.iis.kernal.fhir.interceptors.IIdentifierSolverInterceptor;
 import org.immregistries.iis.kernal.fhir.interceptors.PartitionCreationInterceptor;
-import org.immregistries.iis.kernal.fhir.interceptors.SessionAuthorizationInterceptor;
 import org.immregistries.iis.kernal.fhir.ips.IpsConfig;
 import org.immregistries.iis.kernal.logic.logicInterceptors.ImmunizationProcessingInterceptor;
 import org.immregistries.iis.kernal.logic.logicInterceptors.ObservationProcessingInterceptor;
@@ -105,7 +105,7 @@ public class ServerConfig {
 	 * @param identifierSolverInterceptor       identifierSolverInterceptor
 	 * @param groupAuthorityInterceptor         groupAuthorityInterceptor
 	 * @param recommendationForecastProvider    IMMDS Forecast operations provider
-	 * @param sessionAuthorizationInterceptor   sessionAuthorizationInterceptor
+	 * @param customAuthorizationInterceptor   sessionAuthorizationInterceptor
 	 * @param patientProcessingInterceptor      custom patientProcessingInterceptor
 	 * @param observationProcessingInterceptor  custom observationProcessingInterceptor
 	 * @param immunizationProcessingInterceptor custom immunizationProcessingInterceptor
@@ -120,7 +120,7 @@ public class ServerConfig {
 												  Optional<IIdentifierSolverInterceptor> identifierSolverInterceptor,
 												  Optional<GroupAuthorityInterceptor> groupAuthorityInterceptor,
 												  Optional<IRecommendationForecastProvider> recommendationForecastProvider,
-												  SessionAuthorizationInterceptor sessionAuthorizationInterceptor,
+												  CustomAuthorizationInterceptor customAuthorizationInterceptor,
 												  PatientProcessingInterceptor patientProcessingInterceptor,
 												  ObservationProcessingInterceptor observationProcessingInterceptor,
 												  ImmunizationProcessingInterceptor immunizationProcessingInterceptor) {
@@ -292,7 +292,7 @@ public class ServerConfig {
 		/*
 		 * CUSTOM INTERCEPTORS HERE
 		 */
-		fhirServer.registerInterceptor(sessionAuthorizationInterceptor);
+		fhirServer.registerInterceptor(customAuthorizationInterceptor);
 		identifierSolverInterceptor.ifPresent(fhirServer::registerInterceptor);
 		groupAuthorityInterceptor.ifPresent(fhirServer::registerInterceptor);
 		/*

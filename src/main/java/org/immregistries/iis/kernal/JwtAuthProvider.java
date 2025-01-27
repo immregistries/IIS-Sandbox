@@ -1,21 +1,20 @@
 package org.immregistries.iis.kernal;
 
-import ca.uhn.fhir.rest.server.exceptions.AuthenticationException;
 import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.nimbusds.jose.JOSEException;
-import com.nimbusds.jose.JWEDecrypter;
 import com.nimbusds.jose.JWSVerifier;
 import com.nimbusds.jose.crypto.ECDSAVerifier;
-import com.nimbusds.jose.crypto.RSADecrypter;
 import com.nimbusds.jose.crypto.RSASSAVerifier;
 import com.nimbusds.jose.jwk.ECKey;
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jwt.SignedJWT;
-import io.jsonwebtoken.*;
-import org.apache.commons.codec.binary.Base64;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
+import io.jsonwebtoken.JwtParser;
+import io.jsonwebtoken.Jwts;
 import org.hibernate.Session;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.model.UserAccess;
@@ -33,7 +32,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import static org.immregistries.iis.kernal.fhir.interceptors.SessionAuthorizationInterceptor.CONNECTATHON_USER;
+import static org.immregistries.iis.kernal.fhir.interceptors.CustomAuthorizationInterceptor.CONNECTATHON_USER;
 
 @RestController()
 public class JwtAuthProvider {
