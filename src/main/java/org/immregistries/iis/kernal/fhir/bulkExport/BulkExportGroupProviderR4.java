@@ -1,11 +1,11 @@
-package org.immregistries.iis.kernal.fhir.bulkQuery;
+package org.immregistries.iis.kernal.fhir.bulkExport;
 
 import ca.uhn.fhir.jpa.api.dao.IFhirResourceDao;
 import ca.uhn.fhir.jpa.api.model.DaoMethodOutcome;
 import ca.uhn.fhir.jpa.bulk.export.model.BulkExportResponseJson;
 import ca.uhn.fhir.jpa.model.util.JpaConstants;
 import ca.uhn.fhir.jpa.provider.BaseJpaResourceProviderPatient;
-import ca.uhn.fhir.jpa.rp.r5.GroupResourceProvider;
+import ca.uhn.fhir.jpa.rp.r4.GroupResourceProvider;
 import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
 import ca.uhn.fhir.model.api.annotation.Description;
 import ca.uhn.fhir.model.valueset.BundleTypeEnum;
@@ -29,9 +29,9 @@ import org.hibernate.Session;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.instance.model.api.IIdType;
 import org.hl7.fhir.instance.model.api.IPrimitiveType;
-import org.hl7.fhir.r5.model.*;
-import org.immregistries.iis.kernal.fhir.annotations.OnR5Condition;
-import org.immregistries.iis.kernal.fhir.interceptors.IdentifierSolverInterceptorR5;
+import org.hl7.fhir.r4.model.*;
+import org.immregistries.iis.kernal.fhir.annotations.OnR4Condition;
+import org.immregistries.iis.kernal.fhir.interceptors.IdentifierSolverInterceptorR4;
 import org.immregistries.iis.kernal.fhir.interceptors.PartitionCreationInterceptor;
 import org.immregistries.iis.kernal.servlet.PopServlet;
 import org.slf4j.Logger;
@@ -50,24 +50,26 @@ import java.util.Map;
 
 
 @Controller
-@Conditional(OnR5Condition.class)
-public class BulkQueryGroupProviderR5 extends GroupResourceProvider implements IBulkQueryGroupProvider<Group> {
-	Logger logger = LoggerFactory.getLogger(BulkQueryGroupProviderR5.class);
+@Conditional(OnR4Condition.class)
+public class BulkExportGroupProviderR4 extends GroupResourceProvider implements IBulkExportGroupProvider<Group> {
+	Logger logger = LoggerFactory.getLogger(BulkExportGroupProviderR4.class);
 
 	@Autowired
 	BaseJpaResourceProviderPatient<Patient> patientProvider;
 
 	@Autowired
 	IFhirResourceDao<Group> fhirResourceGroupDao;
-	@Autowired
-	private IFhirResourceDao<Binary> binaryDao;
-	@Autowired
-	private IdentifierSolverInterceptorR5 identifierSolverInterceptorR5;
+
 	@Autowired
 	IFhirResourceDao<Patient> patientIFhirResourceDao;
 
+	@Autowired
+	private IdentifierSolverInterceptorR4 identifierSolverInterceptor;
 
-	public BulkQueryGroupProviderR5() {
+	@Autowired
+	private IFhirResourceDao<Binary> binaryDao;
+
+	public BulkExportGroupProviderR4() {
 		super();
 		setDao(fhirResourceGroupDao);
 	}
@@ -91,30 +93,30 @@ public class BulkQueryGroupProviderR5 extends GroupResourceProvider implements I
 
 		@Description(shortDefinition = "Results from this method are returned across multiple pages. This parameter controls the offset when fetching a page.")
 		@OperationParam(name = Constants.PARAM_OFFSET, typeName = "unsignedInt")
-		IPrimitiveType<Integer> theOffset,
+			IPrimitiveType<Integer> theOffset,
 
 		@Description(shortDefinition = "Only return resources which were last updated as specified by the given range")
 		@OperationParam(name = Constants.PARAM_LASTUPDATED, min = 0, max = 1)
-		DateRangeParam theLastUpdated,
+			DateRangeParam theLastUpdated,
 
 		@Description(shortDefinition = "Filter the resources to return only resources matching the given _content filter (note that this filter is applied only to results which link to the given patient, not to the patient itself or to supporting resources linked to by the matched resources)")
 		@OperationParam(name = Constants.PARAM_CONTENT, min = 0, max = OperationParam.MAX_UNLIMITED, typeName = "string")
-		List<IPrimitiveType<String>> theContent,
+			List<IPrimitiveType<String>> theContent,
 
 		@Description(shortDefinition = "Filter the resources to return only resources matching the given _text filter (note that this filter is applied only to results which link to the given patient, not to the patient itself or to supporting resources linked to by the matched resources)")
 		@OperationParam(name = Constants.PARAM_TEXT, min = 0, max = OperationParam.MAX_UNLIMITED, typeName = "string")
-		List<IPrimitiveType<String>> theNarrative,
+			List<IPrimitiveType<String>> theNarrative,
 
 		@Description(shortDefinition = "Filter the resources to return only resources matching the given _filter filter (note that this filter is applied only to results which link to the given patient, not to the patient itself or to supporting resources linked to by the matched resources)")
 		@OperationParam(name = Constants.PARAM_FILTER, min = 0, max = OperationParam.MAX_UNLIMITED, typeName = "string")
-		List<IPrimitiveType<String>> theFilter,
+			List<IPrimitiveType<String>> theFilter,
 
 		@Description(shortDefinition = "Filter the resources to return only resources matching the given _type filter (note that this filter is applied only to results which link to the given patient, not to the patient itself or to supporting resources linked to by the matched resources)")
 		@OperationParam(name = Constants.PARAM_TYPE, min = 0, max = OperationParam.MAX_UNLIMITED, typeName = "string")
-		List<IPrimitiveType<String>> theTypes,
+			List<IPrimitiveType<String>> theTypes,
 
 		@Sort
-		SortSpec theSortSpec,
+			SortSpec theSortSpec,
 
 		ServletRequestDetails theRequestDetails
 	) throws IOException {
@@ -284,6 +286,8 @@ public class BulkQueryGroupProviderR5 extends GroupResourceProvider implements I
 		}
 	}
 
+	private static final String ATR_EXTENSION_URI = "http://hl7.org/fhir/us/davinci-atr/StructureDefinition/atr-any-resource-extension";
+
 	/**
 	 * Group/123/$member-add
 	 */
@@ -316,6 +320,7 @@ public class BulkQueryGroupProviderR5 extends GroupResourceProvider implements I
 		ServletRequestDetails theRequestDetails
 	) {
 		Group group = read(theRequestDetails.getServletRequest(), theId, theRequestDetails);
+
 		Group.GroupMemberComponent memberComponent;
 		if (memberId != null) {
 			logger.info("PATIENT ADD identifier {}", memberId.getValue());
@@ -323,7 +328,7 @@ public class BulkQueryGroupProviderR5 extends GroupResourceProvider implements I
 			IBundleProvider iBundleProvider = patientIFhirResourceDao.search(new SearchParameterMap("identifier", new TokenParam(memberId.getValue())),theRequestDetails);
 			if (iBundleProvider.isEmpty()) {
 				throw new InvalidRequestException("Patient with identifier " + memberId.getValue() + " is unknown"); // TODO proper exception
- 			}
+			}
 			String patientId = iBundleProvider.getAllResourceIds().get(0);
 			Reference reference = new Reference("Patient/" + patientId).setIdentifier(memberId);
 			memberComponent = group.getMember().stream()
@@ -333,7 +338,7 @@ public class BulkQueryGroupProviderR5 extends GroupResourceProvider implements I
 			memberComponent.setEntity(reference);
 			if (providerNpi != null) {
 				Extension providerExtension = new Extension(ATR_EXTENSION_URI, new Reference().setIdentifier(providerNpi));
-				if (!memberComponent.hasExtension(providerExtension)) {
+				if (!memberComponent.hasExtension(ATR_EXTENSION_URI)) {
 					memberComponent.addExtension(ATR_EXTENSION_URI, new Reference().setIdentifier(providerNpi));
 				}
 			}
@@ -345,7 +350,7 @@ public class BulkQueryGroupProviderR5 extends GroupResourceProvider implements I
 			memberComponent.setEntity(patientReference);
 			if (providerReference != null) {
 				Extension providerExtension = new Extension(ATR_EXTENSION_URI, providerReference);
-				if (!memberComponent.hasExtension(providerExtension)) {
+				if (!memberComponent.hasExtension(ATR_EXTENSION_URI)) {
 					memberComponent.addExtension(ATR_EXTENSION_URI, providerReference);
 				}
 			}
@@ -353,7 +358,6 @@ public class BulkQueryGroupProviderR5 extends GroupResourceProvider implements I
 			throw new InvalidRequestException("parameters combination not supported");
 		}
 		memberComponent.setPeriod(attributionPeriod);
-		logger.info("PATIENT ADD {}", memberComponent.getEntity().getReference());
 		return (Group) update(theRequestDetails.getServletRequest(), group, theId, "", theRequestDetails).getResource();
 	}
 
@@ -396,10 +400,10 @@ public class BulkQueryGroupProviderR5 extends GroupResourceProvider implements I
 				.remove(group.getMember().stream()
 					.filter((member) -> {
 							Extension ref = member.getExtensionByUrl(ATR_EXTENSION_URI);
-							return ref != null
+							return  ref != null
 								&& ref.hasValue()
 								&& ref.getValue() instanceof Reference
-								&& providerNpi.getValue().equals(((Reference) ref.getValue()).getIdentifier().getValue())
+								&& providerNpi.getValue().equals(ref.getValue().castToReference(ref).getIdentifier().getValue())
 								&& memberId.getValue().equals(member.getEntity().getIdentifier().getValue())
 								&& ((memberId.getSystem() == null && member.getEntity().getIdentifier().getSystem() == null)
 								|| memberId.getSystem().equals(member.getEntity().getIdentifier().getSystem()));
@@ -416,7 +420,7 @@ public class BulkQueryGroupProviderR5 extends GroupResourceProvider implements I
 							|| memberId.getSystem().equals(member.getEntity().getIdentifier().getSystem()))) //TODO better conditions
 					.findFirst()
 					.orElse(group.getMember().stream().filter((member) ->
-						member.getEntity().getReference().equals(identifierSolverInterceptorR5.solvePatientIdentifier(theRequestDetails, memberId))
+						member.getEntity().getReference().equals(identifierSolverInterceptor.solvePatientIdentifier(theRequestDetails, memberId))
 					).findFirst().orElse(null)));
 
 		} else if (patientReference != null && providerReference != null) {

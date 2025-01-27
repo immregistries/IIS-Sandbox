@@ -33,8 +33,8 @@ import ca.uhn.fhir.rest.server.util.ISearchParamRegistry;
 import ca.uhn.fhir.validation.IValidatorModule;
 import ca.uhn.fhir.validation.ResultSeverityEnum;
 import com.google.common.base.Strings;
-import org.immregistries.iis.kernal.fhir.bulkQuery.CustomBulkDataExportProvider;
-import org.immregistries.iis.kernal.fhir.bulkQuery.IBulkQueryGroupProvider;
+import org.immregistries.iis.kernal.fhir.bulkExport.CustomBulkDataExportProvider;
+import org.immregistries.iis.kernal.fhir.bulkExport.IBulkExportGroupProvider;
 import org.immregistries.iis.kernal.fhir.common.AppProperties;
 import org.immregistries.iis.kernal.fhir.common.StarterJpaConfig;
 import org.immregistries.iis.kernal.fhir.immdsForecast.IRecommendationForecastProvider;
@@ -117,7 +117,7 @@ public class ServerConfig {
 												  Optional<IpsOperationProvider> theIpsOperationProvider,
 												  Optional<MdmProviderLoader> mdmProviderLoader,
 												  PartitionCreationInterceptor partitionCreationInterceptor,
-												  Optional<IBulkQueryGroupProvider> bulkQueryGroupProvider,
+												  Optional<IBulkExportGroupProvider> bulkQueryGroupProvider,
 												  Optional<IIdentifierSolverInterceptor> identifierSolverInterceptor,
 												  Optional<GroupAuthorityInterceptor> groupAuthorityInterceptor,
 												  Optional<IRecommendationForecastProvider> recommendationForecastProvider,
