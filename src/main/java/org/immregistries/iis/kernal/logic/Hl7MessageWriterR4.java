@@ -7,7 +7,7 @@ import org.hl7.fhir.r4.model.Observation;
 import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
-import org.immregistries.iis.kernal.fhir.annotations.OnR4Condition;
+import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
 import org.immregistries.iis.kernal.model.*;
 import org.immregistries.smm.tester.manager.HL7Reader;
 import org.immregistries.vfa.connect.model.EvaluationActual;

@@ -11,7 +11,7 @@ import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
 import org.hl7.fhir.r5.model.Group;
 import org.hl7.fhir.r5.model.Organization;
 import org.hl7.fhir.r5.model.Reference;
-import org.immregistries.iis.kernal.fhir.annotations.OnR5Condition;
+import org.immregistries.iis.kernal.fhir.common.annotations.OnR5Condition;
 import org.immregistries.iis.kernal.mapping.internalClient.FhirRequesterR5;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,14 +27,21 @@ import java.util.Objects;
 import static ca.uhn.fhir.interceptor.api.Pointcut.SERVER_INCOMING_REQUEST_PRE_HANDLED;
 import static ca.uhn.fhir.interceptor.api.Pointcut.SERVER_PROCESSING_COMPLETED_NORMALLY;
 
+/**
+ * In progress
+ * Aims at allowing Groups access by Facilities ruling over the managing facility
+ */
 @Interceptor
 @Conditional(OnR5Condition.class)
 @Service
 public class GroupAuthorityInterceptor {
-	Logger logger = LoggerFactory.getLogger(GroupAuthorityInterceptor.class);
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-	private int DEFAULT_MAP_SIZE = 20;
-//	Map <tenantId,Map<parentOrgId,childrenOrgId
+	private static final int DEFAULT_MAP_SIZE = 20;
+
+	/**
+	 * Map <tenantId,Map<parentOrgId,childrenOrgId>
+	 */
 	private Map<String, Map<String,String>> organizationAuthorityTree = new HashMap<>(DEFAULT_MAP_SIZE);
 
 	@Autowired
@@ -50,7 +57,6 @@ public class GroupAuthorityInterceptor {
 			Group group = (Group) requestDetails.getResource();
 			if (group.hasManagingEntity()) {
 				Organization managingOrganization = organizationFromReference(group.getManagingEntity(),requestDetails);
-
 			}
 		}
 	 }

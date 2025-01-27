@@ -8,7 +8,7 @@ import ca.uhn.fhir.jpa.subscription.match.config.SubscriptionProcessorConfig;
 import ca.uhn.fhir.jpa.subscription.match.config.WebsocketDispatcherConfig;
 import ca.uhn.fhir.jpa.subscription.submit.config.SubscriptionSubmitterConfig;
 import ca.uhn.fhir.rest.server.RestfulServer;
-import org.immregistries.iis.kernal.fhir.annotations.OnEitherVersion;
+import org.immregistries.iis.kernal.fhir.common.annotations.OnEitherVersion;
 import org.immregistries.iis.kernal.fhir.mdm.MdmConfig;
 import org.immregistries.iis.kernal.fhir.security.ServerSecurityConfig;
 import org.immregistries.iis.kernal.logic.CodeMapManager;

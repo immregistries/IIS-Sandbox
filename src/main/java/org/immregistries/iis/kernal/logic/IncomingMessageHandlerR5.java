@@ -11,7 +11,7 @@ import org.hl7.fhir.r5.model.Identifier;
 import org.hl7.fhir.r5.model.Immunization;
 import org.hl7.fhir.r5.model.Organization;
 import org.immregistries.codebase.client.CodeMap;
-import org.immregistries.iis.kernal.fhir.annotations.OnR5Condition;
+import org.immregistries.iis.kernal.fhir.common.annotations.OnR5Condition;
 import org.immregistries.iis.kernal.logic.ack.IisReportable;
 import org.immregistries.iis.kernal.model.*;
 import org.immregistries.mqe.validator.MqeMessageServiceResponse;

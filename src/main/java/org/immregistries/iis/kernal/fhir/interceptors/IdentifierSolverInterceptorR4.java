@@ -9,7 +9,7 @@ import ca.uhn.fhir.rest.param.TokenParam;
 import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.r4.model.*;
-import org.immregistries.iis.kernal.fhir.annotations.OnR4Condition;
+import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,13 +26,11 @@ import static org.immregistries.iis.kernal.mapping.internalClient.FhirRequester.
 @Interceptor
 @Conditional(OnR4Condition.class)
 @Service
-public class IdentifierSolverInterceptorR4 implements IIdentifierSolverInterceptor<Identifier, Immunization, Group> {
-
-	Logger logger = LoggerFactory.getLogger(IdentifierSolverInterceptorR4.class);
+public class IdentifierSolverInterceptorR4 implements IIdentifierSolverInterceptor<Identifier, Immunization, Group, Observation> {
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	@Autowired
 	private IFhirResourceDao<Patient> patientDao;
-
 
 	@Override
 	@Hook(SERVER_INCOMING_REQUEST_PRE_HANDLED)
@@ -41,12 +39,13 @@ public class IdentifierSolverInterceptorR4 implements IIdentifierSolverIntercept
 			handleImmunization(requestDetails, (Immunization) requestDetails.getResource());
 		} else if (requestDetails.getResource() instanceof Group) {
 			handleGroup(requestDetails, (Group) requestDetails.getResource());
+		} else if (requestDetails.getResource() instanceof Observation) {
+			handleObservation(requestDetails, (Observation) requestDetails.getResource());
 		}
 	}
 
 	@Override
 	public void handleImmunization(RequestDetails requestDetails, Immunization immunization) {
-
 		if (immunization == null
 			|| immunization.getPatient().getIdentifier() == null
 			|| immunization.getPatient().getIdentifier().getValue() == null
@@ -54,7 +53,7 @@ public class IdentifierSolverInterceptorR4 implements IIdentifierSolverIntercept
 		) {
 			return;
 		}
-		/**
+		/*
 		 * Linking record to golden
 		 */
 		Identifier identifier = immunization.getPatient().getIdentifier();
@@ -64,6 +63,35 @@ public class IdentifierSolverInterceptorR4 implements IIdentifierSolverIntercept
 			logger.info("Identifier reference solved {}|{} to {}", identifier.getSystem(), identifier.getValue(), id);
 			immunization.setPatient(new Reference("Patient/" + new IdType(id).getIdPart()));
 			requestDetails.setResource(immunization);
+		} else {
+			// TODO set flavor
+			if (identifier.getSystem().equals(MRN_SYSTEM)) {
+				throw new InvalidRequestException("There is no matching patient for MRN " + identifier.getValue());
+			} else {
+				throw new InvalidRequestException("There is no matching patient for " + identifier.getSystem() + " " + identifier.getValue());
+			}
+		}
+	}
+
+	@Override
+	public void handleObservation(RequestDetails requestDetails, Observation observation) {
+		if (observation == null
+			|| observation.getSubject().getIdentifier() == null
+			|| observation.getSubject().getIdentifier().getValue() == null
+			|| observation.getSubject().getIdentifier().getSystem() == null
+		) {
+			return;
+		}
+		/*
+		 * Linking record to golden
+		 */
+		Identifier identifier = observation.getSubject().getIdentifier();
+		String id = solvePatientIdentifier(requestDetails, identifier);
+
+		if (id != null) {
+			logger.info("Identifier reference solved {}|{} to {}", identifier.getSystem(), identifier.getValue(), id);
+			observation.setSubject(new Reference("Patient/" + new IdType(id).getIdPart()));
+			requestDetails.setResource(observation);
 		} else {
 			// TODO set flavor
 			if (identifier.getSystem().equals(MRN_SYSTEM)) {
@@ -86,14 +114,15 @@ public class IdentifierSolverInterceptorR4 implements IIdentifierSolverIntercept
 			if (StringUtils.isNotBlank(id)) {
 				logger.info("Identifier reference solved {}|{} to {} for Group", identifier.getSystem(), identifier.getValue(), id);
 				memberComponent.setEntity(new Reference("Patient/" + new IdType(id).getIdPart()).setIdentifier(identifier));
-			} else {
+			}
+//			else {
 //				// TODO set flavor
 //				if (identifier.getSystem().equals(MRN_SYSTEM)) {
 //					throw new InvalidRequestException("There is no matching patient for MRN " + identifier.getValue());
 //				} else {
 //					throw new InvalidRequestException("There is no matching patient for " + identifier.getSystem() + " " + identifier.getValue());
 //				}
-			}
+//			}
 		}
 		requestDetails.setResource(group);
 	}
@@ -102,7 +131,7 @@ public class IdentifierSolverInterceptorR4 implements IIdentifierSolverIntercept
 	@Override
 	public String solvePatientIdentifier(RequestDetails requestDetails, Identifier identifier) {
 		String id = null;
-		/**
+		/*
 		 * searching for matching patient golden record first
 		 */
 		SearchParameterMap goldenSearchParameterMap = new SearchParameterMap()
@@ -123,7 +152,7 @@ public class IdentifierSolverInterceptorR4 implements IIdentifierSolverIntercept
 		if (!goldenBundleProvider.isEmpty()) {
 			id = goldenBundleProvider.getAllResourceIds().get(0);
 		} else {
-			/**
+			/*
 			 * If no golden record matched, regular records are checked
 			 */
 			// TODO set flavor

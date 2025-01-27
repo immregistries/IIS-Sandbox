@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal.fhir.annotations;
+package org.immregistries.iis.kernal.fhir.common.annotations;
 
 import org.springframework.boot.autoconfigure.condition.AnyNestedCondition;
 import org.springframework.boot.autoconfigure.condition.ConditionOutcome;

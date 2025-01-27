@@ -2,7 +2,7 @@ package org.immregistries.iis.kernal.fhir.common;
 
 import ca.uhn.fhir.jpa.config.r5.JpaR5Config;
 import org.immregistries.iis.kernal.fhir.ServerConfig;
-import org.immregistries.iis.kernal.fhir.annotations.OnR5Condition;
+import org.immregistries.iis.kernal.fhir.common.annotations.OnR5Condition;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;

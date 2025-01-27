@@ -1,11 +1,11 @@
-package org.immregistries.iis.kernal.fhir.annotations;
+package org.immregistries.iis.kernal.fhir.common.annotations;
 
 import ca.uhn.fhir.context.FhirVersionEnum;
 import org.springframework.context.annotation.Condition;
 import org.springframework.context.annotation.ConditionContext;
 import org.springframework.core.type.AnnotatedTypeMetadata;
 
-public class OnR4Condition implements Condition {
+public class OnDSTU3Condition implements Condition {
   @Override
   public boolean matches(ConditionContext conditionContext, AnnotatedTypeMetadata metadata) {
     FhirVersionEnum version = FhirVersionEnum.forVersionString(conditionContext.
@@ -13,7 +13,7 @@ public class OnR4Condition implements Condition {
       .getProperty("hapi.fhir.fhir_version")
       .toUpperCase());
 
-    return version == FhirVersionEnum.R4;
+    return version == FhirVersionEnum.DSTU3;
 
   }
 }
