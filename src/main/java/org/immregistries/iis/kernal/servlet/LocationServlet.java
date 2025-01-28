@@ -4,10 +4,10 @@ import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Query;
 import org.hibernate.Session;
-import org.immregistries.iis.kernal.mapping.internalClient.FhirRequester;
-import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.mapping.interfaces.LocationMapper;
+import org.immregistries.iis.kernal.mapping.internalClient.FhirRequester;
+import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
 import org.immregistries.iis.kernal.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
@@ -116,6 +116,7 @@ public class LocationServlet extends HttpServlet {
 					orgLocationSelected.setVfcProviderPin(req.getParameter(PARAM_VFC_PROVIDER_PIN));
 					orgLocationSelected = fhirRequests.saveOrgLocation(orgLocationSelected);
 
+					resp.sendRedirect("/iis/location");
 //			  Location location = LocationMapper.fhirLocation(orgLocationSelected);
 //			  try {
 //				  MethodOutcome outcome = fhirClient.update().resource(location).conditional()
@@ -136,7 +137,7 @@ public class LocationServlet extends HttpServlet {
 			if (orgLocationSelected == null) {
 				out.println("  <div class=\"w3-container\">");
 				{
-					if (orgLocationList.size() == 0) {
+					if (orgLocationList.isEmpty()) {
 						out.println("<div class=\"w3-panel w3-yellow\"><p>No Locations Found</p></div>");
 					} else {
 						out.println(
