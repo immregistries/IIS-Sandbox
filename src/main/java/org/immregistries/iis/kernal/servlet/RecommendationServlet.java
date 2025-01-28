@@ -1,14 +1,17 @@
 package org.immregistries.iis.kernal.servlet;
 
+import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.parser.IParser;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import org.hl7.fhir.r5.model.*;
-import org.immregistries.iis.kernal.fhir.common.annotations.OnR5Condition;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.logic.IImmunizationRecommendationService;
+import org.immregistries.iis.kernal.mapping.internalClient.FhirRequester;
+import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
 import org.immregistries.iis.kernal.model.Tenant;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Conditional;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,8 +26,8 @@ import static org.immregistries.iis.kernal.mapping.interfaces.PatientMapper.MRN_
 
 @RestController
 @RequestMapping({"/recommendation", "/patient/{patientId}/recommendation", "/tenant/{tenantId}/patient/{patientId}/recommendation"})
-@Conditional(OnR5Condition.class)
 public class RecommendationServlet extends PatientServlet {
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	public static final String PARAM_RECOMMENDATION_ID = "recommendationId";
 	public static final String PARAM_RECOMMENDATION_IDENTIFIER = "recommendationIdentifier";
@@ -32,6 +35,13 @@ public class RecommendationServlet extends PatientServlet {
 
 	@Autowired
 	private IImmunizationRecommendationService immunizationRecommendationService;
+
+	@Autowired
+	private RepositoryClientFactory repositoryClientFactory;
+	@Autowired
+	private FhirRequester fhirRequester;
+	@Autowired
+	private FhirContext fhirContext;
 
 	public static String linkUrl(String facilityId, String patientId) {
 		return "/tenant/" + facilityId + "/patient/" + patientId + "/recommendation";

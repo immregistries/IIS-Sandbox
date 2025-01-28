@@ -58,13 +58,13 @@ public class PatientServlet  {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	
 	@Autowired
-	RepositoryClientFactory repositoryClientFactory;
+	private RepositoryClientFactory repositoryClientFactory;
 	@Autowired
-	FhirRequester fhirRequester;
+	private FhirRequester fhirRequester;
 	@Autowired
-	FhirContext fhirContext;
+	private FhirContext fhirContext;
 	@Autowired
-	PatientMapper patientMapper;
+	private PatientMapper patientMapper;
 
 	public static String linkUrl(String facilityId) {
 		return "/tenant/" + facilityId + "/patient";
@@ -324,17 +324,12 @@ public class PatientServlet  {
 					if (count > 100) {
 						break;
 					}
-					String link = "patient?" + PARAM_PATIENT_REPORTED_ID + "="
-						+ patient.getPatientId();
+					String link = "patient?" + PARAM_PATIENT_REPORTED_ID + "=" + patient.getPatientId();
 					out.println("  <tr>");
-					out.println("    <td><a href=\"" + link + "\">"
-						+ patient.getMainPatientIdentifier().getValue() + "</a></td>");
-					out.println("    <td><a href=\"" + link + "\">" + patient.getNameLast()
-						+ "</a></td>");
-					out.println("    <td><a href=\"" + link + "\">"
-						+ patient.getNameFirst() + "</a></td>");
-					out.println("    <td><a href=\"" + link + "\">"
-						+ sdf.format(patient.getUpdatedDate()) + "</a></td>");
+					out.println("    <td><a href=\"" + link + "\">" + patient.getMainPatientIdentifier().getValue() + "</a></td>");
+					out.println("    <td><a href=\"" + link + "\">" + patient.getNameLast() + "</a></td>");
+					out.println("    <td><a href=\"" + link + "\">" + patient.getNameFirst() + "</a></td>");
+					out.println("    <td><a href=\"" + link + "\">" + sdf.format(patient.getUpdatedDate()) + "</a></td>");
 					out.println("  </tr>");
 				}
 				out.println("  </tbody>");
@@ -583,7 +578,7 @@ public class PatientServlet  {
 		out.println("</table>");
 	}
 
-	public void printPatient(PrintWriter out, PatientMaster patientSelected) {
+	public static void printPatient(PrintWriter out, PatientMaster patientSelected) {
 		SimpleDateFormat sdfDate = new SimpleDateFormat("MM/dd/yyyy");
 		out.println("    <div class=\"w3-container w3-half w3-margin-top\">");
 		out.println("<table class=\"w3-table w3-bordered w3-striped w3-border test w3-hoverable\">");
@@ -665,7 +660,6 @@ public class PatientServlet  {
 //				Patient.IDENTIFIER.exactly().identifier(req.getParameter(PARAM_PATIENT_REPORTED_EXTERNAL_LINK)));
 			if (!bundleProvider.isEmpty()) {
 				patient = bundleProvider.getAllResources().get(0);
-
 			}
 //			if (patientBundle.hasEntry()) {
 //				patient = (Patient) patientBundle.getEntryFirstRep().getResource();

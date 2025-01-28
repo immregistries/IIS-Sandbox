@@ -1,24 +1,25 @@
 package org.immregistries.iis.kernal.servlet;
 
+import ca.uhn.fhir.context.FhirContext;
+import ca.uhn.fhir.context.FhirVersionEnum;
 import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
 import ca.uhn.fhir.parser.IParser;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.param.ReferenceParam;
 import org.apache.commons.lang3.StringUtils;
-import org.hl7.fhir.r5.model.*;
+import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
-import org.immregistries.iis.kernal.fhir.common.annotations.OnR5Condition;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.logic.CodeMapManager;
 import org.immregistries.iis.kernal.mapping.interfaces.ImmunizationMapper;
-import org.immregistries.iis.kernal.mapping.interfaces.PatientMapper;
 import org.immregistries.iis.kernal.mapping.internalClient.FhirRequester;
 import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
 import org.immregistries.iis.kernal.model.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Conditional;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -37,8 +38,9 @@ import java.util.Set;
 
 @RestController
 @RequestMapping({"/vaccination","/patient/{patientId}/vaccination", "/tenant/{tenantId}/patient/{patientId}/vaccination"})
-@Conditional(OnR5Condition.class)
-public class VaccinationServlet extends PatientServlet {
+public class VaccinationServlet {
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
 	public static final String PARAM_ACTION = "action";
 	public static final String PARAM_RESOURCE = "resource";
 	public static final String PARAM_VACCINATION_REPORTED_ID = "vaccinationReportedId";
@@ -47,9 +49,9 @@ public class VaccinationServlet extends PatientServlet {
 	@Autowired
 	FhirRequester fhirRequester;
 	@Autowired
-	PatientMapper patientMapper;
+	ImmunizationMapper immunizationMapper;
 	@Autowired
-	ImmunizationMapper<Immunization> immunizationMapper;
+	FhirContext fhirContext;
 
 	public static String linkUrl(String facilityId, String patientId) {
 		return "/tenant/" + facilityId + "/patient/" + patientId + "/vaccination";
@@ -62,25 +64,20 @@ public class VaccinationServlet extends PatientServlet {
 	}
 
 	@GetMapping
-	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-		throws ServletException, IOException {
-
+	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		Tenant tenant = ServletHelper.getTenant();
-
 
 		if (tenant == null) {
 			throw new AuthenticationCredentialsNotFoundException("");
 		}
 		IGenericClient fhirClient = repositoryClientFactory.newGenericClient(req);
 
-
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		try {
-			Immunization immunization = getImmunizationFromParameter(req,fhirClient);
-			VaccinationMaster vaccination = immunizationMapper.localObject(immunization);
-//			 fhirRequests.searchVaccinationReported(fhirClient,
-//			 Immunization.IDENTIFIER.exactly().code(req.getParameter(PARAM_VACCINATION_REPORTED_ID)));
+			IBaseResource immunizationResource = getImmunizationFromParameter(req, fhirClient);
+			VaccinationMaster vaccination = immunizationMapper.localObject(immunizationResource);
+//			 fhirRequests.searchVaccinationReported(fhirClient, Immunization.IDENTIFIER.exactly().code(req.getParameter(PARAM_VACCINATION_REPORTED_ID)));
 
 			String action = req.getParameter(PARAM_ACTION);
 			if (action != null) {
@@ -91,7 +88,7 @@ public class VaccinationServlet extends PatientServlet {
 			out.println("<h2>Tenant : " + tenant.getOrganizationName() + "</h2>");
 			PatientReported patientReportedSelected = fhirRequester.readPatientReported(vaccination.getPatientReportedId());
 			{
-				printPatient(out, patientReportedSelected);
+				PatientServlet.printPatient(out, patientReportedSelected);
 				SimpleDateFormat sdfDate = new SimpleDateFormat("MM/dd/yyyy");
 				out.println("  <div class=\"w3-container\">");
 				out.println("<h4>Vaccination</h4>");
@@ -171,25 +168,30 @@ public class VaccinationServlet extends PatientServlet {
 				List<ObservationReported> observationReportedList =
 					getObservationList(vaccination);
 
-				if (observationReportedList.size() != 0) {
+				if (!observationReportedList.isEmpty()) {
 					out.println("<h4>Observations</h4>");
-					printObservationList(out, observationReportedList);
+					PatientServlet.printObservationList(out, observationReportedList);
 				}
 				out.println("  </div>");
 
-				Bundle bundle = fhirClient.search().forResource(Subscription.class).returnBundle(Bundle.class).execute();
+				if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R5)) {
+					org.hl7.fhir.r5.model.Bundle bundle = fhirClient.search().forResource(org.hl7.fhir.r5.model.Subscription.class).returnBundle(org.hl7.fhir.r5.model.Bundle.class).execute();
 
-				/**
-				 * Setting external identifier in reference
-				 */
-				PatientMaster patientMaster = vaccination.getPatientReported();
-				PatientMaster patientMaster1 = vaccination.getPatientReported();
-				immunization.getPatient().setIdentifier(new Identifier()
-					.setValue(patientMaster.getMainPatientIdentifier().getValue())
-					.setSystem(patientMaster1.getMainPatientIdentifier().getSystem()));
-				IParser parser = repositoryClientFactory.getFhirContext().newJsonParser().setPrettyPrint(true);
+					org.hl7.fhir.r5.model.Immunization immunization = (org.hl7.fhir.r5.model.Immunization) immunizationResource;
+					/*
+					 * Setting external identifier in reference
+					 */
+					PatientMaster patientMaster = vaccination.getPatientReported();
+					PatientMaster patientMaster1 = vaccination.getPatientReported();
+					immunization.getPatient().setIdentifier(new org.hl7.fhir.r5.model.Identifier()
+						.setValue(patientMaster.getMainPatientIdentifier().getValue())
+						.setSystem(patientMaster1.getMainPatientIdentifier().getSystem()));
+					IParser parser = repositoryClientFactory.getFhirContext().newJsonParser().setPrettyPrint(true);
 
-				printSubscriptions(out, parser, bundle, immunization);
+					PatientServlet.printSubscriptions(out, parser, bundle, immunization);
+				}
+
+
 
 
 				{
@@ -221,7 +223,7 @@ public class VaccinationServlet extends PatientServlet {
 		List<ObservationReported> observationReportedList;
 		{
 			observationReportedList = fhirRequester.searchObservationReportedList(
-				new SearchParameterMap(Observation.SP_PATIENT, new ReferenceParam(vaccination.getPatientReportedId())));
+				new SearchParameterMap("patient", new ReferenceParam(vaccination.getPatientReportedId())));
 //				Observation.PATIENT.hasId(vaccination.getPatientReportedId()));
 			Set<String> suppressSet = LoincIdentifier.getSuppressIdentifierCodeSet();
 			for (Iterator<ObservationReported> it = observationReportedList.iterator(); it.hasNext(); ) {
@@ -235,10 +237,10 @@ public class VaccinationServlet extends PatientServlet {
 	}
 
 
-	protected Immunization getImmunizationFromParameter(HttpServletRequest req, IGenericClient fhirClient) {
-		Immunization immunization = null;
+	protected IBaseResource getImmunizationFromParameter(HttpServletRequest req, IGenericClient fhirClient) {
+		IBaseResource immunization = null;
 		if (req.getParameter(PARAM_VACCINATION_REPORTED_ID) != null) {
-			immunization = fhirClient.read().resource(Immunization.class).withId(req.getParameter(PARAM_VACCINATION_REPORTED_ID)).execute();
+			immunization = fhirClient.read().resource("Immunization").withId(req.getParameter(PARAM_VACCINATION_REPORTED_ID)).execute();
 		}
 		return immunization;
 	}
