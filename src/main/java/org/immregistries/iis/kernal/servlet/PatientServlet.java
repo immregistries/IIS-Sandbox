@@ -13,6 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 import org.hl7.fhir.instance.model.api.IBaseResource;
+import org.hl7.fhir.instance.model.api.IDomainResource;
 import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
@@ -64,7 +65,7 @@ public class PatientServlet  {
 	@Autowired
 	private FhirContext fhirContext;
 	@Autowired
-	private PatientMapper patientMapper;
+	PatientMapper patientMapper;
 
 	public static String linkUrl(String facilityId) {
 		return "/tenant/" + facilityId + "/patient";
@@ -129,7 +130,7 @@ public class PatientServlet  {
 			HomeServlet.doHeader(out, "IIS Sandbox - Patients");
 
 			PatientMaster patientMasterSelected = null;
-			IBaseResource patientSelected  = getPatientFromParameter(req,fhirClient);
+			IBaseResource patientSelected = fetchPatientFromParameter(req, fhirClient);
 
 			if (patientSelected == null) {
 				out.println("<h2>Patients</h2>");
@@ -211,9 +212,9 @@ public class PatientServlet  {
 							.hasId(new org.hl7.fhir.r5.model.IdType(patientMasterSelected.getPatientId()))
 						).returnBundle(org.hl7.fhir.r5.model.Bundle.class).execute();
 					if (recommendationBundle.hasEntry()) {
-						RecommendationServlet.printRecommendation(out, (org.hl7.fhir.r5.model.ImmunizationRecommendation) recommendationBundle.getEntryFirstRep().getResource(), (org.hl7.fhir.r5.model.Patient) patientSelected);
+						RecommendationServlet.printRecommendationR5(out, (org.hl7.fhir.r5.model.ImmunizationRecommendation) recommendationBundle.getEntryFirstRep().getResource(), (org.hl7.fhir.r5.model.Patient) patientSelected);
 					} else {
-						RecommendationServlet.printRecommendation(out, null, (org.hl7.fhir.r5.model.Patient) patientSelected);
+						RecommendationServlet.printRecommendationR5(out, null, (org.hl7.fhir.r5.model.Patient) patientSelected);
 					}
 					org.hl7.fhir.r5.model.Bundle subcriptionBundle = fhirClient.search().forResource(org.hl7.fhir.r5.model.Subscription.class).returnBundle(org.hl7.fhir.r5.model.Bundle.class).execute();
 					printSubscriptions(out, parser, subcriptionBundle, (org.hl7.fhir.r5.model.Resource) patientSelected);
@@ -226,9 +227,9 @@ public class PatientServlet  {
 							.hasId(new org.hl7.fhir.r4.model.IdType(patientMasterSelected.getPatientId()))
 						).returnBundle(org.hl7.fhir.r4.model.Bundle.class).execute();
 					if (recommendationBundle.hasEntry()) {
-						RecommendationServlet.printRecommendation(out, (org.hl7.fhir.r4.model.ImmunizationRecommendation) recommendationBundle.getEntryFirstRep().getResource(), (org.hl7.fhir.r4.model.Patient) patientSelected);
+						RecommendationServlet.printRecommendationR4(out, (org.hl7.fhir.r4.model.ImmunizationRecommendation) recommendationBundle.getEntryFirstRep().getResource(), (org.hl7.fhir.r4.model.Patient) patientSelected);
 					} else {
-						RecommendationServlet.printRecommendation(out, null, (org.hl7.fhir.r4.model.Patient) patientSelected);
+						RecommendationServlet.printRecommendationR4(out, null, (org.hl7.fhir.r4.model.Patient) patientSelected);
 					}
 //					org.hl7.fhir.r4.model.Bundle subcriptionBundle = fhirClient.search().forResource(org.hl7.fhir.r4.model.Subscription.class).returnBundle(org.hl7.fhir.r4.model.Bundle.class).execute();
 //					printSubscriptions(out, parser, subcriptionBundle, (org.hl7.fhir.r4.model.Resource) patientSelected);
@@ -649,17 +650,16 @@ public class PatientServlet  {
 	}
 
 
-
-	protected IBaseResource getPatientFromParameter(HttpServletRequest req, IGenericClient fhirClient) {
-		IBaseResource patient = null;
+	protected IDomainResource fetchPatientFromParameter(HttpServletRequest req, IGenericClient fhirClient) {
+		IDomainResource patient = null;
 		if (req.getParameter(PARAM_PATIENT_REPORTED_ID) != null) {
-			patient = fhirClient.read().resource("Patient").withId(req.getParameter(PARAM_PATIENT_REPORTED_ID)).execute();
+			patient = (IDomainResource) fhirClient.read().resource("Patient").withId(req.getParameter(PARAM_PATIENT_REPORTED_ID)).execute();
 		} else if (req.getParameter(PARAM_PATIENT_REPORTED_EXTERNAL_LINK) != null) {
 			IBundleProvider bundleProvider = fhirRequester.searchGoldenRecord(org.hl7.fhir.r5.model.Patient.class, //TODO choose priority golden or regular
 				new SearchParameterMap(org.hl7.fhir.r5.model.Patient.SP_IDENTIFIER, new TokenParam().setValue(req.getParameter(PARAM_PATIENT_REPORTED_EXTERNAL_LINK))));
 //				Patient.IDENTIFIER.exactly().identifier(req.getParameter(PARAM_PATIENT_REPORTED_EXTERNAL_LINK)));
 			if (!bundleProvider.isEmpty()) {
-				patient = bundleProvider.getAllResources().get(0);
+				patient = (IDomainResource) bundleProvider.getAllResources().get(0);
 			}
 //			if (patientBundle.hasEntry()) {
 //				patient = (Patient) patientBundle.getEntryFirstRep().getResource();

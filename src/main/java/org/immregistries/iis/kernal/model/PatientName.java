@@ -112,6 +112,13 @@ public class PatientName {
 		return new PatientName(name);
 	}
 
+	public String asSingleString() {
+		return this.nameFirst +
+			(StringUtils.isNotBlank(this.nameMiddle) ? ", " + this.nameMiddle : "") +
+			" " +
+			this.nameLast;
+	}
+
 	@Override
 	public String toString() {
 		return "PatientName{" +
