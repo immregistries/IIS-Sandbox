@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.immregistries.iis.kernal.logic.IncomingMessageHandlerR5.MINIMAL_MATCHING_SCORE;
 
@@ -99,13 +101,13 @@ public class FhirRequesterR5 extends FhirRequester<Patient, Immunization, Locati
 		return vaccinationReportedList;
 	}
 
-	public List<VaccinationMaster> searchVaccinationListOperationEverything(String id) {
+	public List<VaccinationMaster> searchVaccinationListOperationEverything(String patientId) {
 		IGenericClient client = repositoryClientFactory.getFhirClient();
 		Parameters in = new Parameters()
 			.addParameter("_mdm", "true")
 			.addParameter("_type", "Immunization");
 		Bundle bundle = client.operation()
-			.onInstance("Patient/" + id)
+			.onInstance("Patient/" + patientId)
 			.named("$everything")
 			.withParameters(in)
 			.prettyPrint()
@@ -114,9 +116,9 @@ public class FhirRequesterR5 extends FhirRequester<Patient, Immunization, Locati
 		List<VaccinationMaster> vaccinationList = new ArrayList<>();
 		for (Bundle.BundleEntryComponent entry : bundle.getEntry()) {
 			if (entry.getResource() instanceof Immunization) {
-				if (entry.getResource().getMeta().getTag(GOLDEN_SYSTEM_TAG, GOLDEN_RECORD) != null) {
+//				if (entry.getResource().getMeta().getTag(GOLDEN_SYSTEM_TAG, GOLDEN_RECORD) != null) { TODO choose or sort later
 					vaccinationList.add(immunizationMapper.localObject((Immunization) entry.getResource()));
-				}
+//				}
 			}
 		}
 		return vaccinationList;
@@ -366,5 +368,21 @@ public class FhirRequesterR5 extends FhirRequester<Patient, Immunization, Locati
 			}
 		}
 		return singleMatch;
+	}
+
+	public List<PatientReported> searchPatientsReportedFromGoldenIdWithMdmLinks(String patientMasterId) {
+		Parameters out = repositoryClientFactory.getFhirClient().operation().onServer().named("$mdm-query-links")
+			.withParameters(new Parameters().addParameter("goldenResourceId", patientMasterId)).execute();
+		Stream<Parameters.ParametersParameterComponent> links = out.getParameter().stream()
+			.filter(parametersParameterComponent -> parametersParameterComponent.getName().equals("link"));
+		return links
+			.map(link -> link.getPart()
+				.stream()
+				.filter(part -> part.getName().equals("sourceResourceId"))
+				.findFirst()
+				.map(part -> ((StringType) part.getValue()).getValue())
+				.map(this::readPatientReported))
+			.flatMap(Optional::stream)
+			.collect(Collectors.toList());
 	}
 }

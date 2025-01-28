@@ -173,7 +173,7 @@ public class VaccinationServlet extends PatientServlet {
 
 				if (observationReportedList.size() != 0) {
 					out.println("<h4>Observations</h4>");
-					printObservations(out, observationReportedList);
+					printObservationList(out, observationReportedList);
 				}
 				out.println("  </div>");
 

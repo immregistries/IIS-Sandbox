@@ -58,6 +58,9 @@ public class TenantController {
 
 	/**
 	 * UI tenant page
+	 * Allows tenant switching
+	 * TODO switch to controller based URI Variable paradigm ?
+	 *
 	 * @param req request
 	 * @param resp response
 	 * @throws ServletException servlet exception
@@ -80,7 +83,7 @@ public class TenantController {
 				query.setParameter(0, userAccess);
 				List<Tenant> tenantList = query.list();
 				for (Tenant tenantMember : tenantList) {
-					if (TenantController.ACTION_SWITCH.equals(action) && String.valueOf(tenantMember.getOrgId()).equals(tenantId)) {
+					if (ACTION_SWITCH.equals(action) && String.valueOf(tenantMember.getOrgId()).equals(tenantId)) {
 						tenant = tenantMember;
 						session.setAttribute(SESSION_TENANT, tenant);
 					}
@@ -123,6 +126,7 @@ public class TenantController {
 					"Tenants are separated testing environments, One Tenant &#8792; One IIS equivalent, Different Facilities can be registered as information sources to the Tenants" +
 					"</p></div>"); // TODO better explanation
 
+				HomeServlet.printFlavors(out);
 				out.println("</div>");
 
 				HomeServlet.doFooter(out);

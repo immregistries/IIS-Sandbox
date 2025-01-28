@@ -53,7 +53,7 @@ public class GroupAuthorityInterceptor {
 	public void handleGroup(RequestDetails requestDetails)
 		throws InvalidRequestException {
 		Organization sendingOrganization = new Organization(); // TODO identify sending facility
-		if (requestDetails.getResource() instanceof Group) {
+		if ((requestDetails.getOperation().equals("Create") || requestDetails.getOperation().equals("Update")) && requestDetails.getResource() instanceof Group) {
 			Group group = (Group) requestDetails.getResource();
 			if (group.hasManagingEntity()) {
 				Organization managingOrganization = organizationFromReference(group.getManagingEntity(),requestDetails);

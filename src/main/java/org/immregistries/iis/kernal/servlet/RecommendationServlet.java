@@ -205,4 +205,93 @@ public class RecommendationServlet extends PatientServlet {
 		}
 		return recommendation;
 	}
+
+	public static void printRecommendation(PrintWriter out, org.hl7.fhir.r5.model.ImmunizationRecommendation recommendation, org.hl7.fhir.r5.model.Patient patient) {
+		out.println("<div class=\"w3-container\">");
+		out.println("<h4>Recommendations</h4>");
+		if (recommendation != null) {
+			out.println("<table class=\"w3-table w3-bordered w3-striped w3-border test w3-hoverable\">");
+			out.println("  <tr class=\"w3-green\">");
+			out.println("    <th>Code</th>");
+			out.println("    <th>Date</th>");
+			out.println("    <th>Date Criterion</th>");
+			out.println("    <th></th>");
+			out.println("  </tr>");
+			out.println("<tbody>");
+			int count = 0;
+			for (org.hl7.fhir.r5.model.ImmunizationRecommendation.ImmunizationRecommendationRecommendationComponent component : recommendation.getRecommendation()) {
+				count++;
+				if (count > 100) {
+					break;
+				}
+				String link = "recommendation?" + PARAM_RECOMMENDATION_ID + "="
+					+ new org.hl7.fhir.r5.model.IdType(recommendation.getId()).getIdPart();
+				out.println("<tr>");
+				out.println("    <td><a href=\"" + link + "\">" + component.getVaccineCodeFirstRep().getCodingFirstRep().getCode() + "</a></td>");
+				out.println("    <td><a href=\"" + link + "\">" + component.getDateCriterionFirstRep().getValue() + "</a></td>");
+				out.println("    <td><a href=\"" + link + "\">" + component.getDateCriterionFirstRep().getCode().getCodingFirstRep().getDisplay() + "</a></td>");
+				out.println("</tr>");
+			}
+			out.println("</tbody>");
+			out.println("</table>");
+
+			out.println("<form action=\"recommendation\" method=\"POST\">");
+			out.println("	<input type=\"hidden\" name=\"" + PARAM_PATIENT_REPORTED_ID + "\" value=\"" + new org.hl7.fhir.r5.model.IdType(patient.getId()).getIdPart() + "\"/>");
+			out.println("	<input type=\"hidden\" name=\"" + PARAM_RECOMMENDATION_ID + "\" value=\"" + new org.hl7.fhir.r5.model.IdType(recommendation.getId()).getIdPart() + "\"/>");
+			out.println("	<input class=\"w3-button w3-section w3-teal w3-ripple\" type=\"submit\" name=\"submit\" value=\"Add recommendation component\"/>");
+			out.println("</form>");
+		} else {
+			out.println("<div class=\"w3-panel w3-yellow\"><p>No Recommendation Found</p></div>");
+			out.println("<form action=\"recommendation\" method=\"POST\">");
+			out.println("	<input type=\"hidden\" name=\"" + PARAM_PATIENT_REPORTED_ID + "\" value=\"" + new org.hl7.fhir.r5.model.IdType(patient.getId()).getIdPart() + "\"/>");
+			out.println("	<input class=\"w3-button w3-section w3-teal w3-ripple\" type=\"submit\" name=\"submit\" value=\"Generate new recommendation\"/>");
+			out.println("</form>");
+		}
+		out.println("</div>");
+	}
+
+	// TODO Remove redundancy
+	public static void printRecommendation(PrintWriter out, org.hl7.fhir.r4.model.ImmunizationRecommendation recommendation, org.hl7.fhir.r4.model.Patient patient) {
+		out.println("<div class=\"w3-container\">");
+		out.println("<h4>Recommendations</h4>");
+		if (recommendation != null) {
+			out.println("<table class=\"w3-table w3-bordered w3-striped w3-border test w3-hoverable\">");
+			out.println("  <tr class=\"w3-green\">");
+			out.println("    <th>Code</th>");
+			out.println("    <th>Date</th>");
+			out.println("    <th>Date Criterion</th>");
+			out.println("    <th></th>");
+			out.println("  </tr>");
+			out.println("<tbody>");
+			int count = 0;
+			for (org.hl7.fhir.r4.model.ImmunizationRecommendation.ImmunizationRecommendationRecommendationComponent component : recommendation.getRecommendation()) {
+				count++;
+				if (count > 100) {
+					break;
+				}
+				String link = "recommendation?" + PARAM_RECOMMENDATION_ID + "="
+					+ new org.hl7.fhir.r4.model.IdType(recommendation.getId()).getIdPart();
+				out.println("<tr>");
+				out.println("    <td><a href=\"" + link + "\">" + component.getVaccineCodeFirstRep().getCodingFirstRep().getCode() + "</a></td>");
+				out.println("    <td><a href=\"" + link + "\">" + component.getDateCriterionFirstRep().getValue() + "</a></td>");
+				out.println("    <td><a href=\"" + link + "\">" + component.getDateCriterionFirstRep().getCode().getCodingFirstRep().getDisplay() + "</a></td>");
+				out.println("</tr>");
+			}
+			out.println("</tbody>");
+			out.println("</table>");
+
+			out.println("<form action=\"recommendation\" method=\"POST\">");
+			out.println("	<input type=\"hidden\" name=\"" + PARAM_PATIENT_REPORTED_ID + "\" value=\"" + new org.hl7.fhir.r4.model.IdType(patient.getId()).getIdPart() + "\"/>");
+			out.println("	<input type=\"hidden\" name=\"" + PARAM_RECOMMENDATION_ID + "\" value=\"" + new org.hl7.fhir.r4.model.IdType(recommendation.getId()).getIdPart() + "\"/>");
+			out.println("	<input class=\"w3-button w3-section w3-teal w3-ripple\" type=\"submit\" name=\"submit\" value=\"Add recommendation component\"/>");
+			out.println("</form>");
+		} else {
+			out.println("<div class=\"w3-panel w3-yellow\"><p>No Recommendation Found</p></div>");
+			out.println("<form action=\"recommendation\" method=\"POST\">");
+			out.println("	<input type=\"hidden\" name=\"" + PARAM_PATIENT_REPORTED_ID + "\" value=\"" + new org.hl7.fhir.r4.model.IdType(patient.getId()).getIdPart() + "\"/>");
+			out.println("	<input class=\"w3-button w3-section w3-teal w3-ripple\" type=\"submit\" name=\"submit\" value=\"Generate new recommendation\"/>");
+			out.println("</form>");
+		}
+		out.println("</div>");
+	}
 }

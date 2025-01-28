@@ -93,4 +93,7 @@ public interface IFhirRequester<
 
 	IBundleProvider searchGoldenRecord(Class<? extends IBaseResource> aClass, SearchParameterMap searchParameterMap);
 
+	List<PatientReported> searchPatientsReportedFromGoldenIdWithMdmLinks(String patientMasterId);
+
+
 }

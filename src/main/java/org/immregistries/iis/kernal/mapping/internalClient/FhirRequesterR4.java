@@ -8,6 +8,8 @@ import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.*;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
 import org.immregistries.iis.kernal.model.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Component;
 
@@ -15,6 +17,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.immregistries.iis.kernal.logic.IncomingMessageHandler.MINIMAL_MATCHING_SCORE;
 
@@ -29,6 +33,7 @@ import static org.immregistries.iis.kernal.logic.IncomingMessageHandler.MINIMAL_
 @Component
 @Conditional(OnR4Condition.class)
 public class FhirRequesterR4 extends FhirRequester<Patient,Immunization,Location,Practitioner,Observation,Person,Organization,RelatedPerson> {
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	public PatientMaster searchPatientMaster(SearchParameterMap searchParameterMap) {
 		PatientMaster patientMaster = null;
@@ -106,13 +111,13 @@ public class FhirRequesterR4 extends FhirRequester<Patient,Immunization,Location
 		return vaccinationReportedList;
 	}
 
-	public List<VaccinationMaster> searchVaccinationListOperationEverything(String id) {
+	public List<VaccinationMaster> searchVaccinationListOperationEverything(String patientId) {
 		IGenericClient client = repositoryClientFactory.getFhirClient();
 		Parameters in = new Parameters()
 			.addParameter("_mdm", "true")
 			.addParameter("_type", "Immunization");
 		Bundle bundle = client.operation()
-			.onInstance("Patient/" + id)
+			.onInstance("Patient/" + patientId)
 			.named("$everything")
 			.withParameters(in)
 			.prettyPrint()
@@ -121,9 +126,9 @@ public class FhirRequesterR4 extends FhirRequester<Patient,Immunization,Location
 		List<VaccinationMaster> vaccinationList = new ArrayList<>();
 		for (Bundle.BundleEntryComponent entry : bundle.getEntry()) {
 			if (entry.getResource() instanceof Immunization) {
-				if (entry.getResource().getMeta().getTag(GOLDEN_SYSTEM_TAG, GOLDEN_RECORD) != null) {
+//				if (entry.getResource().getMeta().getTag(GOLDEN_SYSTEM_TAG, GOLDEN_RECORD) != null) { TODO choose or sort later
 					vaccinationList.add(immunizationMapper.localObject((Immunization) entry.getResource()));
-				}
+//				}
 			}
 		}
 		return vaccinationList;
@@ -303,6 +308,22 @@ public class FhirRequesterR4 extends FhirRequester<Patient,Immunization,Location
 		} else {
 			return null;
 		}
+	}
+
+	public List<PatientReported> searchPatientsReportedFromGoldenIdWithMdmLinks(String patientMasterId) {
+		Parameters out = repositoryClientFactory.getFhirClient().operation().onServer().named("$mdm-query-links")
+			.withParameters(new Parameters().addParameter("goldenResourceId", patientMasterId)).execute();
+		Stream<Parameters.ParametersParameterComponent> links = out.getParameter().stream()
+			.filter(parametersParameterComponent -> parametersParameterComponent.getName().equals("link"));
+		return links
+			.map(link -> link.getPart()
+				.stream()
+				.filter(part -> part.getName().equals("sourceResourceId"))
+				.findFirst()
+				.map(part -> ((StringType) part.getValue()).getValue())
+				.map(this::readPatientReported))
+			.flatMap(Optional::stream)
+			.collect(Collectors.toList());
 	}
 
 	public PatientMaster readPatientMasterWithMdmLink(String patientId) {
