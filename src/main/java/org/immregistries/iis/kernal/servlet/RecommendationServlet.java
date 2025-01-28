@@ -180,12 +180,11 @@ public class RecommendationServlet extends PatientServlet {
 				identifier = patientMaster.getFirstPatientIdentifier();
 			}
 
-
 			if (patientResource != null) {
 				out.println("<h2>Immunization recommendations of " + patientMaster.getLegalNameOrFirst().asSingleString() + "</h2>");
 				if (recommendationResource == null) {
 					IBaseBundle baseBundle = fhirClient.search()
-						.forResource(org.hl7.fhir.r5.model.ImmunizationRecommendation.class)
+						.forResource("ImmunizationRecommendation")
 						.where(org.hl7.fhir.r5.model.ImmunizationRecommendation.PATIENT
 							.hasChainedProperty(org.hl7.fhir.r5.model.Patient.IDENTIFIER.exactly()
 								.systemAndCode(identifier.getSystem(), identifier.getValue()))).execute();
