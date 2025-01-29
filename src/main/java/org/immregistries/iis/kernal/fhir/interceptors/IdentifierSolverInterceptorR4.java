@@ -3,6 +3,7 @@ package org.immregistries.iis.kernal.fhir.interceptors;
 import ca.uhn.fhir.interceptor.api.Hook;
 import ca.uhn.fhir.jpa.api.dao.IFhirResourceDao;
 import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
+import ca.uhn.fhir.rest.api.RestOperationTypeEnum;
 import ca.uhn.fhir.rest.api.server.IBundleProvider;
 import ca.uhn.fhir.rest.api.server.RequestDetails;
 import ca.uhn.fhir.rest.param.TokenParam;
@@ -35,12 +36,17 @@ public class IdentifierSolverInterceptorR4 implements IIdentifierSolverIntercept
 	@Override
 	@Hook(SERVER_INCOMING_REQUEST_PRE_HANDLED)
 	public void handle(RequestDetails requestDetails) throws InvalidRequestException {
-		if (requestDetails.getResource() instanceof Immunization) {
-			handleImmunization(requestDetails, (Immunization) requestDetails.getResource());
-		} else if (requestDetails.getResource() instanceof Group) {
-			handleGroup(requestDetails, (Group) requestDetails.getResource());
-		} else if (requestDetails.getResource() instanceof Observation) {
-			handleObservation(requestDetails, (Observation) requestDetails.getResource());
+		if (requestDetails.getResource() == null || requestDetails.getRestOperationType() == null) {
+			return;
+		}
+		if (requestDetails.getRestOperationType().equals(RestOperationTypeEnum.UPDATE) || requestDetails.getRestOperationType().equals(RestOperationTypeEnum.CREATE)) {
+			if (requestDetails.getResource() instanceof Immunization) {
+				handleImmunization(requestDetails, (Immunization) requestDetails.getResource());
+			} else if (requestDetails.getResource() instanceof Group) {
+				handleGroup(requestDetails, (Group) requestDetails.getResource());
+			} else if (requestDetails.getResource() instanceof Observation) {
+				handleObservation(requestDetails, (Observation) requestDetails.getResource());
+			}
 		}
 	}
 

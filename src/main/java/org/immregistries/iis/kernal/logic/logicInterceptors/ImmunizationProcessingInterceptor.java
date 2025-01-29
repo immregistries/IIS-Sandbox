@@ -2,6 +2,7 @@ package org.immregistries.iis.kernal.logic.logicInterceptors;
 
 import ca.uhn.fhir.interceptor.api.Hook;
 import ca.uhn.fhir.interceptor.api.Interceptor;
+import ca.uhn.fhir.rest.api.RestOperationTypeEnum;
 import ca.uhn.fhir.rest.api.server.RequestDetails;
 import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
 import org.apache.commons.lang3.StringUtils;
@@ -41,16 +42,16 @@ public class ImmunizationProcessingInterceptor extends AbstractLogicInterceptor 
 	public void handle(RequestDetails requestDetails) throws InvalidRequestException, ProcessingException {
 		Set<ProcessingFlavor> processingFlavorSet = ProcessingFlavor.getProcessingStyle(requestDetails.getTenantId());
 		List<IisReportable> iisReportableList = iisReportableList(requestDetails);
-		if (requestDetails.getResource() == null || requestDetails.getOperation() == null) {
+		if (requestDetails.getResource() == null || requestDetails.getRestOperationType() == null) {
 			return;
 		}
 		IBaseResource result = requestDetails.getResource();
-
-		if ((requestDetails.getOperation().equals("create") || requestDetails.getOperation().equals("update"))
-			&& (requestDetails.getResource() instanceof org.hl7.fhir.r4.model.Immunization || requestDetails.getResource() instanceof org.hl7.fhir.r5.model.Immunization)) {
-			VaccinationReported vaccinationReported = immunizationMapper.localObjectReported(requestDetails.getResource());
-			vaccinationReported = processAndValidateVaccinationReported(vaccinationReported, iisReportableList, processingFlavorSet, -1, -1, -1, "");
-			result = immunizationMapper.fhirResource(vaccinationReported);
+		if (requestDetails.getRestOperationType().equals(RestOperationTypeEnum.UPDATE) || requestDetails.getRestOperationType().equals(RestOperationTypeEnum.CREATE)) {
+			if (requestDetails.getResource() instanceof org.hl7.fhir.r4.model.Immunization || requestDetails.getResource() instanceof org.hl7.fhir.r5.model.Immunization) {
+				VaccinationReported vaccinationReported = immunizationMapper.localObjectReported(requestDetails.getResource());
+				vaccinationReported = processAndValidateVaccinationReported(vaccinationReported, iisReportableList, processingFlavorSet, -1, -1, -1, "");
+				result = immunizationMapper.fhirResource(vaccinationReported);
+			}
 		}
 		requestDetails.setResource(result);
 		requestDetails.setAttribute(IIS_REPORTABLE_LIST, iisReportableList);

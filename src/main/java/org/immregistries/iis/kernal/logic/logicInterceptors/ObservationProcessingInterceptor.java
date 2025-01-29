@@ -2,6 +2,7 @@ package org.immregistries.iis.kernal.logic.logicInterceptors;
 
 import ca.uhn.fhir.interceptor.api.Hook;
 import ca.uhn.fhir.interceptor.api.Interceptor;
+import ca.uhn.fhir.rest.api.RestOperationTypeEnum;
 import ca.uhn.fhir.rest.api.server.RequestDetails;
 import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
 import org.hl7.fhir.instance.model.api.IBaseResource;
@@ -40,7 +41,7 @@ public class ObservationProcessingInterceptor extends AbstractLogicInterceptor {
 	public void handle(RequestDetails requestDetails) throws InvalidRequestException, ProcessingException {
 		Set<ProcessingFlavor> processingFlavorSet = ProcessingFlavor.getProcessingStyle(requestDetails.getTenantId());
 		List<IisReportable> iisReportableList = iisReportableList(requestDetails);
-		if (requestDetails.getResource() == null || requestDetails.getOperation() == null) {
+		if (requestDetails.getResource() == null || requestDetails.getRestOperationType() == null) {
 			return;
 		}
 		int obxCount = 0;
@@ -52,10 +53,11 @@ public class ObservationProcessingInterceptor extends AbstractLogicInterceptor {
 			patientBirthDate = (Date) requestDetails.getAttribute(PATIENT_BIRTH_DATE);
 		}
 		IBaseResource result = requestDetails.getResource();
-		if ((requestDetails.getOperation().equals("create") || requestDetails.getOperation().equals("update"))
-			&& (requestDetails.getResource() instanceof org.hl7.fhir.r4.model.Observation || requestDetails.getResource() instanceof org.hl7.fhir.r5.model.Observation)) {
-			ObservationReported observationReported = processAndValidateObservationReported(observationMapper.localObjectReported(requestDetails.getResource()), iisReportableList, processingFlavorSet, obxCount, patientBirthDate);
-			result = observationMapper.fhirResource(observationReported);
+		if (requestDetails.getRestOperationType().equals(RestOperationTypeEnum.CREATE) || requestDetails.getRestOperationType().equals(RestOperationTypeEnum.CREATE)) {
+			if (requestDetails.getResource() instanceof org.hl7.fhir.r4.model.Observation || requestDetails.getResource() instanceof org.hl7.fhir.r5.model.Observation) {
+				ObservationReported observationReported = processAndValidateObservationReported(observationMapper.localObjectReported(requestDetails.getResource()), iisReportableList, processingFlavorSet, obxCount, patientBirthDate);
+				result = observationMapper.fhirResource(observationReported);
+			}
 		}
 		requestDetails.setResource(result);
 		requestDetails.setAttribute(IIS_REPORTABLE_LIST, iisReportableList);

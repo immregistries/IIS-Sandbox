@@ -8,7 +8,6 @@ import ca.uhn.fhir.rest.api.RestOperationTypeEnum;
 import ca.uhn.fhir.rest.api.server.RequestDetails;
 import ca.uhn.fhir.rest.param.TokenParam;
 import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
-import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.r5.model.Group;
 import org.hl7.fhir.r5.model.Organization;
 import org.hl7.fhir.r5.model.Reference;
@@ -51,14 +50,13 @@ public class GroupAuthorityInterceptor {
 	private IFhirResourceDao<Organization> organizationDao;
 
 	@Hook(value = SERVER_INCOMING_REQUEST_PRE_HANDLED,order = 1500 )
-	public void handleGroup(RequestDetails requestDetails)
-		throws InvalidRequestException {
-		if (requestDetails.getResource() == null || requestDetails.getOperation() == null) {
+	public void handleGroup(RequestDetails requestDetails) throws InvalidRequestException {
+		if (requestDetails.getResource() == null || requestDetails.getRestOperationType() == null) {
 			return;
 		}
 		Organization sendingOrganization = new Organization(); // TODO identify sending facility
-		String operation = StringUtils.defaultString(requestDetails.getOperation());
-		if (requestDetails.getResource() instanceof Group && (operation.equals("Create") || operation.equals("Update"))) {
+		RestOperationTypeEnum operation = requestDetails.getRestOperationType();
+		if (requestDetails.getResource() instanceof Group && (operation.equals(RestOperationTypeEnum.CREATE) || operation.equals(RestOperationTypeEnum.UPDATE))) {
 			Group group = (Group) requestDetails.getResource();
 			if (group.hasManagingEntity()) {
 				Organization managingOrganization = organizationFromReference(group.getManagingEntity(),requestDetails);
@@ -68,8 +66,7 @@ public class GroupAuthorityInterceptor {
 
 	@Hook(SERVER_PROCESSING_COMPLETED_NORMALLY)
 	// TODO find right hook
-	public void handleOrganization(RequestDetails requestDetails)
-		throws InvalidRequestException {
+	public void handleOrganization(RequestDetails requestDetails) throws InvalidRequestException {
 		if (requestDetails.getResource() instanceof Organization) {
 			Organization organization = (Organization) requestDetails.getResource();
 			if (requestDetails.getRestOperationType().equals(RestOperationTypeEnum.CREATE) || requestDetails.getRestOperationType().equals(RestOperationTypeEnum.UPDATE)) {
