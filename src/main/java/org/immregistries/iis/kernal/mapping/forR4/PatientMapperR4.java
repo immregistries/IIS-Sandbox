@@ -307,11 +307,13 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 		 * Death
 		 */
 		if (pm.getDeathDate() != null) {
-			p.setDeceased(new DateType(pm.getDeathDate()));
-		} else if (pm.getDeathFlag().equals(YES)) {
-			p.setDeceased(new BooleanType(true));
-		} else if (pm.getDeathFlag().equals(NO)) {
-			p.setDeceased(new BooleanType(false));
+			p.setDeceased(new DateTimeType(pm.getDeathDate()));
+		} else if (StringUtils.isNotBlank(pm.getDeathFlag())) {
+			if (pm.getDeathFlag().equals(YES)) {
+				p.setDeceased(new BooleanType(true));
+			} else if (pm.getDeathFlag().equals(NO)) {
+				p.setDeceased(new BooleanType(false));
+			}
 		}
 
 		/*
