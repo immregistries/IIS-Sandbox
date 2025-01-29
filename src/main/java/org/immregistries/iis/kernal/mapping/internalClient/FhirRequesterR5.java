@@ -4,11 +4,12 @@ import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.api.server.IBundleProvider;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
-import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r5.model.*;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR5Condition;
 import org.immregistries.iis.kernal.model.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Component;
 
@@ -19,11 +20,20 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.immregistries.iis.kernal.logic.IncomingMessageHandlerR5.MINIMAL_MATCHING_SCORE;
+import static org.immregistries.iis.kernal.logic.IncomingMessageHandler.MINIMAL_MATCHING_SCORE;
 
+
+/**
+ * DO NOT EDIT THE CONTENT OF THIS FILE
+ * <p>
+ * This is a literal copy of FhirRequesterR5 except for the name and imported FHIR Model package
+ * <p>
+ * Please paste any new content from R5 version here to preserve similarity in behavior.
+ */
 @Component
 @Conditional(OnR5Condition.class)
 public class FhirRequesterR5 extends FhirRequester<Patient, Immunization, Location, Practitioner, Observation, Person, Organization, RelatedPerson> {
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	public PatientMaster searchPatientMaster(SearchParameterMap searchParameterMap) {
 		PatientMaster patientMaster = null;
@@ -117,7 +127,7 @@ public class FhirRequesterR5 extends FhirRequester<Patient, Immunization, Locati
 		for (Bundle.BundleEntryComponent entry : bundle.getEntry()) {
 			if (entry.getResource() instanceof Immunization) {
 //				if (entry.getResource().getMeta().getTag(GOLDEN_SYSTEM_TAG, GOLDEN_RECORD) != null) { TODO choose or sort later
-					vaccinationList.add(immunizationMapper.localObject((Immunization) entry.getResource()));
+				vaccinationList.add(immunizationMapper.localObject((Immunization) entry.getResource()));
 //				}
 			}
 		}
@@ -173,18 +183,18 @@ public class FhirRequesterR5 extends FhirRequester<Patient, Immunization, Locati
 
 	public ModelPerson searchPerson(SearchParameterMap searchParameterMap) {
 		ModelPerson modelPerson = null;
-		IBundleProvider bundleProvider = search(org.hl7.fhir.r5.model.Person.class, searchParameterMap);
+		IBundleProvider bundleProvider = search(Person.class, searchParameterMap);
 		if (!bundleProvider.isEmpty()) {
-			modelPerson = personMapper.localObject((org.hl7.fhir.r5.model.Person) bundleProvider.getResources(0, 1).get(0));
+			modelPerson = personMapper.localObject((Person) bundleProvider.getResources(0, 1).get(0));
 		}
 		return modelPerson;
 	}
 
 	public ModelPerson searchPractitioner(SearchParameterMap searchParameterMap) {
 		ModelPerson modelPerson = null;
-		IBundleProvider bundleProvider = search(org.hl7.fhir.r5.model.Practitioner.class, searchParameterMap);
+		IBundleProvider bundleProvider = search(Practitioner.class, searchParameterMap);
 		if (!bundleProvider.isEmpty()) {
-			modelPerson = practitionerMapper.localObject((org.hl7.fhir.r5.model.Practitioner) bundleProvider.getResources(0, 1).get(0));
+			modelPerson = practitionerMapper.localObject((Practitioner) bundleProvider.getResources(0, 1).get(0));
 		}
 		return modelPerson;
 	}
@@ -198,11 +208,15 @@ public class FhirRequesterR5 extends FhirRequester<Patient, Immunization, Locati
 		return relatedPerson;
 	}
 
-	public PatientReported savePatientReported(PatientReported patientReported) {
+	public MethodOutcome savePatientReportedMethodOutcome(PatientReported patientReported) {
 		Patient patient = patientMapper.fhirResource(patientReported);
-		MethodOutcome outcome = save(patient,
-			Patient.ORGANIZATION.hasId(patientReported.getManagingOrganizationId()),
-				Patient.IDENTIFIER.exactly().systemAndIdentifier(patientReported.getMainPatientIdentifier().getSystem(), patientReported.getMainPatientIdentifier().getValue()));
+		return save(patient,
+			Patient.IDENTIFIER.exactly().systemAndIdentifier(patientReported.getMainPatientIdentifier().getSystem(), patientReported.getMainPatientIdentifier().getValue()));
+	}
+
+	public PatientReported savePatientReported(PatientReported patientReported) {
+		MethodOutcome outcome = savePatientReportedMethodOutcome(patientReported);
+//		logger.info("created {} resource {}", outcome.getCreated(), outcome.getResource());
 		if (!outcome.getResource().isEmpty()) {
 			patientReported.setPatientId(outcome.getResource().getIdElement().getIdPart());
 			return patientMapper.localObjectReportedWithMaster((Patient) outcome.getResource());
@@ -250,9 +264,10 @@ public class FhirRequesterR5 extends FhirRequester<Patient, Immunization, Locati
 
 	public VaccinationReported saveVaccinationReported(VaccinationReported vaccinationReported) {
 		Immunization immunization = immunizationMapper.fhirResource(vaccinationReported);
-		MethodOutcome outcome = save(immunization,
-			Immunization.IDENTIFIER.exactly()
-				.identifier(vaccinationReported.getExternalLink())
+		// TODO change conditional create to update ?
+		MethodOutcome outcome = save(immunization
+//			, Immunization.IDENTIFIER.exactly()
+//				.identifier(vaccinationReported.getExternalLink())
 		);
 		if (outcome.getCreated() != null && outcome.getCreated()) {
 			vaccinationReported.setVaccinationId(outcome.getId().getIdPart());
@@ -277,7 +292,7 @@ public class FhirRequesterR5 extends FhirRequester<Patient, Immunization, Locati
 
 	public Organization saveOrganization(Organization organization) {
 		MethodOutcome outcome = null;
-		if (StringUtils.isNotBlank(organization.getIdentifierFirstRep().getValue())) {
+		if (organization.getIdentifierFirstRep().getValue() != null) {
 			outcome = save(organization,
 				Organization.IDENTIFIER.exactly().identifier(organization.getIdentifierFirstRep().getValue())
 			);
@@ -290,22 +305,6 @@ public class FhirRequesterR5 extends FhirRequester<Patient, Immunization, Locati
 		} else if (outcome.getCreated() != null && outcome.getCreated()) {
 			organization.setId(outcome.getId().getIdPart());
 			return organization;
-		} else {
-			return null;
-		}
-	}
-
-	public PatientMaster readPatientMasterWithMdmLink(String patientId) {
-		Parameters out = repositoryClientFactory.getFhirClient().operation().onServer().named("$mdm-query-links")
-			.withParameters(new Parameters().addParameter("resourceId", patientId)).execute();
-		List<Parameters.ParametersParameterComponent> part = out.getParameter().stream()
-			.filter(parametersParameterComponent -> parametersParameterComponent.getName().equals("link"))
-			.findFirst().orElse(new Parameters.ParametersParameterComponent()).getPart();
-		Optional<Parameters.ParametersParameterComponent> goldenIdComponent = part.stream()
-			.filter(parametersParameterComponent -> parametersParameterComponent.getName().equals("goldenResourceId"))
-			.findFirst();
-		if (goldenIdComponent.isPresent() && !goldenIdComponent.get().getValueStringType().isEmpty()) {
-			return readPatientMaster(goldenIdComponent.get().getValueStringType().getValue());
 		} else {
 			return null;
 		}
@@ -338,8 +337,7 @@ public class FhirRequesterR5 extends FhirRequester<Patient, Immunization, Locati
 	public PatientMaster matchPatient(List<PatientReported> multipleMatches, PatientMaster patientMasterForMatchQuery, Date cutoff) {
 		PatientMaster singleMatch = null;
 		Bundle matches = repositoryClientFactory.getFhirClient()
-			.operation()
-			.onType(Patient.class)
+			.operation().onType(Patient.class)
 			.named("match")
 			.withParameter(Parameters.class, "resource", patientMapper.fhirResource(patientMasterForMatchQuery))
 			.returnResourceType(Bundle.class).execute();
@@ -370,9 +368,21 @@ public class FhirRequesterR5 extends FhirRequester<Patient, Immunization, Locati
 		return singleMatch;
 	}
 
-	public List<PatientReported> searchPatientsReportedFromGoldenIdWithMdmLinks(String patientMasterId) {
+	public List<PatientReported> searchPatientReportedFromGoldenIdWithMdmLinks(String patientMasterId) {
+		return readMdmlinksReportedIds(patientMasterId)
+			.map(this::readPatientReported)
+			.collect(Collectors.toList());
+	}
+
+	public List<VaccinationReported> searchVaccinationReportedFromGoldenIdWithMdmLinks(String vaccinationMasterId) {
+		return readMdmlinksReportedIds(vaccinationMasterId)
+			.map(this::readVaccinationReported)
+			.collect(Collectors.toList());
+	}
+
+	public Stream<String> readMdmlinksReportedIds(String masterId) {
 		Parameters out = repositoryClientFactory.getFhirClient().operation().onServer().named("$mdm-query-links")
-			.withParameters(new Parameters().addParameter("goldenResourceId", patientMasterId)).execute();
+			.withParameters(new Parameters().addParameter("goldenResourceId", masterId)).execute();
 		Stream<Parameters.ParametersParameterComponent> links = out.getParameter().stream()
 			.filter(parametersParameterComponent -> parametersParameterComponent.getName().equals("link"));
 		return links
@@ -380,9 +390,30 @@ public class FhirRequesterR5 extends FhirRequester<Patient, Immunization, Locati
 				.stream()
 				.filter(part -> part.getName().equals("sourceResourceId"))
 				.findFirst()
-				.map(part -> ((StringType) part.getValue()).getValue())
-				.map(this::readPatientReported))
-			.flatMap(Optional::stream)
-			.collect(Collectors.toList());
+				.map(part -> ((StringType) part.getValue()).getValue())).flatMap(Optional::stream);
+	}
+
+	public Optional<String> readGoldenResourceId(String reportId) {
+		Parameters out = repositoryClientFactory.getFhirClient().operation().onServer().named("$mdm-query-links")
+			.withParameters(new Parameters().addParameter("resourceId", reportId)).execute();
+		List<Parameters.ParametersParameterComponent> part = out.getParameter().stream()
+			.filter(parametersParameterComponent -> parametersParameterComponent.getName().equals("link"))
+			.findFirst().orElse(new Parameters.ParametersParameterComponent()).getPart();
+		Optional<Parameters.ParametersParameterComponent> goldenIdComponent = part.stream()
+			.filter(parametersParameterComponent -> parametersParameterComponent.getName().equals("goldenResourceId"))
+			.findFirst();
+		return goldenIdComponent
+			.filter(component -> !component.getValue().isEmpty())
+			.map(component -> String.valueOf(component.getValue()));
+	}
+
+	public PatientMaster readPatientMasterWithMdmLink(String patientId) {
+		Optional<String> goldenId = readGoldenResourceId(patientId);
+		return goldenId.map(this::readPatientMaster).orElse(null);
+	}
+
+	public VaccinationMaster readVaccinationMasterWithMdmLink(String vaccinationReportedId) {
+		Optional<String> goldenId = readGoldenResourceId(vaccinationReportedId);
+		return goldenId.map(this::readVaccinationReported).orElse(null);
 	}
 }

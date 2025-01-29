@@ -193,11 +193,14 @@ public class PatientServlet  {
 					printObservationList(out, observationReportedList);
 				}
 				{
-					List<PatientMaster> relatedPatients;
+					List<PatientMaster> relatedPatients = List.of();
 					if (FhirRequester.isGoldenRecord(patientSelected)) {
-						relatedPatients = fhirRequester.searchPatientsReportedFromGoldenIdWithMdmLinks(patientMasterSelected.getPatientId());
+						relatedPatients = fhirRequester.searchPatientReportedFromGoldenIdWithMdmLinks(patientMasterSelected.getPatientId());
 					} else {
-						relatedPatients = List.of(fhirRequester.readPatientMasterWithMdmLink(patientMasterSelected.getPatientId()));
+						PatientMaster goldenRecord = fhirRequester.readPatientMasterWithMdmLink(patientMasterSelected.getPatientId());
+						if (goldenRecord != null) {
+							relatedPatients = List.of(goldenRecord);
+						}
 					}
 					out.println("<h4>Related Patient records</h4>");
 					printPatientList(out, relatedPatients, false);

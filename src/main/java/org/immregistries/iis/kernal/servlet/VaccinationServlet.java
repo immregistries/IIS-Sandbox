@@ -172,6 +172,21 @@ public class VaccinationServlet {
 					out.println("<h4>Observations</h4>");
 					PatientServlet.printObservationList(out, observationReportedList);
 				}
+
+				{
+					List<VaccinationMaster> relatedVaccinations = List.of();
+					if (FhirRequester.isGoldenRecord(immunizationResource)) {
+						relatedVaccinations = fhirRequester.searchVaccinationReportedFromGoldenIdWithMdmLinks(vaccination.getVaccinationId());
+					} else {
+						VaccinationMaster goldenRecord = fhirRequester.readVaccinationMasterWithMdmLink(vaccination.getVaccinationId());
+						if (goldenRecord != null) {
+							relatedVaccinations = List.of(goldenRecord);
+						}
+					}
+					out.println("<h4>Related Vaccination Records</h4>");
+					PatientServlet.printVaccinationList(out, relatedVaccinations);
+				}
+
 				out.println("  </div>");
 
 				if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R5)) {
@@ -205,6 +220,15 @@ public class VaccinationServlet {
 					{
 						String link = apiBaseUrl + "/Immunization?patient=" + vaccination.getPatientReportedId();
 						out.println("<div>Other immunizations of same patient: <a href=\"" + link + "\">" + link + "</a></div>");
+					}
+					{
+						String link;
+						if (FhirRequester.isGoldenRecord(immunizationResource)) {
+							link = apiBaseUrl + "/$mdm-query-links?goldenResourceId=" + vaccination.getVaccinationId();
+						} else {
+							link = apiBaseUrl + "/$mdm-query-links?resourceId=" + vaccination.getVaccinationId();
+						}
+						out.println("<div>Related Patient Records: <a href=\"" + link + "\">" + link + "</a></div>");
 					}
 					out.println("</div>");
 				}

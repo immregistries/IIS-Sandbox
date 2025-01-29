@@ -87,13 +87,18 @@ public interface IFhirRequester<
 
 	VaccinationReported readVaccinationReported(String id);
 
-	PatientMaster readPatientMasterWithMdmLink(String patientId);
-
 	IBundleProvider searchRegularRecord(Class<? extends IBaseResource> aClass, SearchParameterMap searchParameterMap);
 
 	IBundleProvider searchGoldenRecord(Class<? extends IBaseResource> aClass, SearchParameterMap searchParameterMap);
 
-	List<PatientReported> searchPatientsReportedFromGoldenIdWithMdmLinks(String patientMasterId);
+	List<PatientReported> searchPatientReportedFromGoldenIdWithMdmLinks(String patientMasterId);
+
+	PatientMaster readPatientMasterWithMdmLink(String patientId);
+
+	public List<VaccinationReported> searchVaccinationReportedFromGoldenIdWithMdmLinks(String vaccinationMasterId);
+
+	public VaccinationMaster readVaccinationMasterWithMdmLink(String vaccinationReportedId);
+
 
 
 }
