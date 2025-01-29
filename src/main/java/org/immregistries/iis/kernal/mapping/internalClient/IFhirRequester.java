@@ -95,9 +95,9 @@ public interface IFhirRequester<
 
 	PatientMaster readPatientMasterWithMdmLink(String patientId);
 
-	public List<VaccinationReported> searchVaccinationReportedFromGoldenIdWithMdmLinks(String vaccinationMasterId);
+	List<VaccinationReported> searchVaccinationReportedFromGoldenIdWithMdmLinks(String vaccinationMasterId);
 
-	public VaccinationMaster readVaccinationMasterWithMdmLink(String vaccinationReportedId);
+	VaccinationMaster readVaccinationMasterWithMdmLink(String vaccinationReportedId);
 
 
 
