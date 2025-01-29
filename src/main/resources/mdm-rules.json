@@ -96,13 +96,23 @@
       "matcher": {
         "algorithm": "IDENTIFIER"
       }
+    },
+    {
+      "name": "observation-identifier",
+      "resourceType": "Observation",
+      "resourcePath": "identifier",
+      "matcher": {
+        "algorithm": "IDENTIFIER"
+      }
     }
   ],
   "matchResultMap": {
     "cosine-given-name" : "POSSIBLE_MATCH",
     "cosine-given-name,jaro-last-name,birthDate" : "MATCH",
     "jaro-last-name,birthDate" : "POSSIBLE_MATCH",
-    "patient-identifier" : "MATCH"
+    "patient-identifier": "MATCH",
+    "observation-identifier": "MATCH",
+    "immunization-identifier": "MATCH"
   },
   "eidSystems": {
     "Patient": "http://codi.mitre.org/link_id"

@@ -265,9 +265,9 @@ public class FhirRequesterR4 extends FhirRequester<Patient,Immunization,Location
 	public VaccinationReported saveVaccinationReported(VaccinationReported vaccinationReported) {
 		Immunization immunization = immunizationMapper.fhirResource(vaccinationReported);
 		// TODO change conditional create to update ?
-		MethodOutcome outcome = save(immunization,
-			Immunization.IDENTIFIER.exactly()
-				.identifier(vaccinationReported.getExternalLink())
+		MethodOutcome outcome = save(immunization
+//			, Immunization.IDENTIFIER.exactly()
+//				.identifier(vaccinationReported.getExternalLink())
 		);
 		if (outcome.getCreated() != null && outcome.getCreated()) {
 			vaccinationReported.setVaccinationId(outcome.getId().getIdPart());

@@ -56,6 +56,8 @@ public class MdmCustomMatchFinderSvcR4 extends MdmMatchFinderSvcImpl implements 
 	@Autowired
 	IFhirResourceDao<Immunization> immunizationDao;
 	@Autowired
+	IFhirResourceDao<org.hl7.fhir.r4.model.Patient> patientDao;
+	@Autowired
 	private PatientMatchingDatasetConversionController patientMatchingDatasetConversionController;
 
 	@Override
@@ -64,12 +66,12 @@ public class MdmCustomMatchFinderSvcR4 extends MdmMatchFinderSvcImpl implements 
 	public List<MatchedTarget> getMatchedTargets(String theResourceType, IAnyResource theResource, RequestPartitionId theRequestPartitionId) {
 		if (theResourceType.equals(ResourceType.Immunization.name())) {
 			List<MatchedTarget> matches = matchImmunization((Immunization) theResource, theRequestPartitionId);
+			ourLog.info("Found {} matched targets for {}.", matches.size(), idOrType(theResource, theResourceType));
 			ourLog.trace("Found {} matched targets for {}.", matches.size(), idOrType(theResource, theResourceType));
 			return matches;
 		} else if (theResourceType.equals(ResourceType.Patient.name()) && ProcessingFlavor.getProcessingStyle(theRequestPartitionId.getFirstPartitionNameOrNull()).contains(ProcessingFlavor.MISMO)) {
-
-			/**
-			 * flavour check activating patient Matching with Mismo match
+			/*
+			 * Flavour check activating patient Matching with Mismo match
 			 */
 			Collection<IAnyResource> targetCandidates = myMdmCandidateSearchSvc.findCandidates(theResourceType, theResource, theRequestPartitionId);
 			PatientMatcher mismoMatcher = new PatientMatcher();
@@ -85,6 +87,9 @@ public class MdmCustomMatchFinderSvcR4 extends MdmMatchFinderSvcImpl implements 
 			ourLog.trace("Found {} matched targets for {}.", matches.size(), idOrType(theResource, theResourceType));
 			return matches;
 		} else {
+			/*
+			 * Original code for all cases
+			 */
 			Collection<IAnyResource> targetCandidates = myMdmCandidateSearchSvc.findCandidates(theResourceType, theResource, theRequestPartitionId);
 
 			List<MatchedTarget> matches = targetCandidates.stream()
@@ -112,21 +117,30 @@ public class MdmCustomMatchFinderSvcR4 extends MdmMatchFinderSvcImpl implements 
 				.setSystem(GOLDEN_SYSTEM_TAG)
 				.setValue(GOLDEN_RECORD));
 
-		/**
+		/*
 		 * Looking for matching patient through reference and mdm operation,
 		 * or with identifier
 		 */
+		String patientParameterValue = null;
 		if (immunization.getPatient().getReference() != null) {
-			searchParameterMap.add("patient", new ReferenceParam()
-				.setMdmExpand(true) // Including other patients entities
-				.setValue(immunization.getPatient().getReference()));
+			patientParameterValue = immunization.getPatient().getReference();
 		} else if (immunization.getPatient().getIdentifier() != null) {
-			searchParameterMap.add("identifier", new TokenParam()
-				.setSystem(immunization.getPatient().getIdentifier().getSystem())
-				.setValue(immunization.getPatient().getIdentifier().getValue()));
+			SystemRequestDetails patientRequestDetails = new SystemRequestDetails();
+			patientRequestDetails.setRequestPartitionId(theRequestPartitionId);
+			SearchParameterMap patientSearchParameter = new SearchParameterMap()
+				.add("_tag", new TokenParam()
+					.setSystem(GOLDEN_SYSTEM_TAG)
+					.setValue(GOLDEN_RECORD))
+				.add("identifier", new TokenParam()
+					.setSystem(immunization.getPatient().getIdentifier().getSystem())
+					.setValue(immunization.getPatient().getIdentifier().getValue()));
+			patientParameterValue = String.join(",", patientDao.search(patientSearchParameter, patientRequestDetails).getAllResourceIds());
 		} else {
 			throw new InvalidRequestException("No patient specified");
 		}
+		searchParameterMap.add("patient", new ReferenceParam()
+			.setMdmExpand(true) // Including other patients entities
+			.setValue(patientParameterValue));
 		targetCandidates = immunizationDao.search(searchParameterMap, requestDetails);
 		return targetCandidates.getAllResources().stream()
 			.map((resource) -> (Immunization) resource)
@@ -157,8 +171,8 @@ public class MdmCustomMatchFinderSvcR4 extends MdmMatchFinderSvcImpl implements 
 			} else if (immunization.hasOccurrenceDateTimeType()) {
 				i1.setDate(immunization.getOccurrenceDateTimeType().getValue());
 			}
-		} catch (ParseException e) {
-			e.printStackTrace();
+		} catch (ParseException ignored) {
+//			e.printStackTrace();
 		}
 
 		i1.setLotNumber(immunization.getLotNumber());

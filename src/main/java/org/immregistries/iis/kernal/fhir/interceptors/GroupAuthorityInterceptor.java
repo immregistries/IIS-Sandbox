@@ -8,6 +8,7 @@ import ca.uhn.fhir.rest.api.RestOperationTypeEnum;
 import ca.uhn.fhir.rest.api.server.RequestDetails;
 import ca.uhn.fhir.rest.param.TokenParam;
 import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
+import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.r5.model.Group;
 import org.hl7.fhir.r5.model.Organization;
 import org.hl7.fhir.r5.model.Reference;
@@ -52,8 +53,12 @@ public class GroupAuthorityInterceptor {
 	@Hook(value = SERVER_INCOMING_REQUEST_PRE_HANDLED,order = 1500 )
 	public void handleGroup(RequestDetails requestDetails)
 		throws InvalidRequestException {
+		if (requestDetails.getResource() == null || requestDetails.getOperation() == null) {
+			return;
+		}
 		Organization sendingOrganization = new Organization(); // TODO identify sending facility
-		if ((requestDetails.getOperation().equals("Create") || requestDetails.getOperation().equals("Update")) && requestDetails.getResource() instanceof Group) {
+		String operation = StringUtils.defaultString(requestDetails.getOperation());
+		if (requestDetails.getResource() instanceof Group && (operation.equals("Create") || operation.equals("Update"))) {
 			Group group = (Group) requestDetails.getResource();
 			if (group.hasManagingEntity()) {
 				Organization managingOrganization = organizationFromReference(group.getManagingEntity(),requestDetails);

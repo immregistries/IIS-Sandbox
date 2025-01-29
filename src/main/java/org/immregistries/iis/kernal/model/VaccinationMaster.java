@@ -399,41 +399,40 @@ public class VaccinationMaster extends AbstractMappedObject implements Serializa
 		this.externalLinkSystem = externalLinkSystem;
 	}
 
-//  private String vaccinationId = "";
-//  private PatientMaster patient = null;
-//  private VaccinationReported vaccinationReported = null;
-//
-//	private String externalLink = "";
-//
-//  public VaccinationReported getVaccinationReported() {
-//    return vaccinationReported;
-//  }
-//
-//  public void setVaccinationReported(VaccinationReported vaccinationReported) {
-//    this.vaccinationReported = vaccinationReported;
-//  }
-//
-//  public String getVaccinationId() {
-//    return vaccinationId;
-//  }
-//
-//  public void setVaccinationId(String vaccinationId) {
-//    this.vaccinationId = vaccinationId;
-//  }
-//
-//  public PatientMaster getPatient() {
-//    return patient;
-//  }
-//
-//  public void setPatient(PatientMaster patient) {
-//    this.patient = patient;
-//  }
-//
-//	public String getExternalLink() {
-//		return externalLink;
-//	}
-//
-//	public void setExternalLink(String externalLink) {
-//		this.externalLink = externalLink;
-//	}
+	@Override
+	public String toString() {
+		return "VaccinationMaster{" +
+			"vaccinationId='" + vaccinationId + '\'' +
+//			", patientReported=" + patientReported +
+			", patientReportedId='" + patientReportedId + '\'' +
+			", externalLink='" + externalLink + '\'' +
+			", externalLinkSystem='" + externalLinkSystem + '\'' +
+			", reportedDate=" + reportedDate +
+			", updatedDate=" + updatedDate +
+			", administeredDate=" + administeredDate +
+			", vaccineCvxCode='" + vaccineCvxCode + '\'' +
+			", vaccineNdcCode='" + vaccineNdcCode + '\'' +
+			", vaccineMvxCode='" + vaccineMvxCode + '\'' +
+			", administeredAmount='" + administeredAmount + '\'' +
+			", informationSource='" + informationSource + '\'' +
+			", lotnumber='" + lotnumber + '\'' +
+			", expirationDate=" + expirationDate +
+			", completionStatus='" + completionStatus + '\'' +
+			", actionCode='" + actionCode + '\'' +
+			", refusalReasonCode='" + refusalReasonCode + '\'' +
+			", bodySite='" + bodySite + '\'' +
+			", bodyRoute='" + bodyRoute + '\'' +
+			", fundingSource='" + fundingSource + '\'' +
+			", fundingEligibility='" + fundingEligibility + '\'' +
+			", testEvent=" + testEvent +
+			", orgLocationId='" + orgLocationId + '\'' +
+			", orgLocation=" + orgLocation +
+			", enteredBy=" + enteredBy +
+			", enteredById='" + enteredById + '\'' +
+			", orderingProvider=" + orderingProvider +
+			", orderingProviderId='" + orderingProviderId + '\'' +
+			", administeringProvider=" + administeringProvider +
+			", administeringProviderId='" + administeringProviderId + '\'' +
+			'}';
+	}
 }

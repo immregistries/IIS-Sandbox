@@ -129,7 +129,7 @@ public class CustomSubscriptionValidatingInterceptor extends SubscriptionValidat
 			if (subscription.isTopicSubscription()) {
 				if (myFhirContext.getVersion().getVersion()
 					!= FhirVersionEnum
-					.R4) { // In R4 topic subscriptions exist without a corresponidng SubscriptionTopic
+					.R4) { // In R4 topic subscriptions exist without a corresponding SubscriptionTopic
 					// resource
 					Optional<IBaseResource> oTopic = findSubscriptionTopicByUrl(subscription.getTopic());
 					if (!oTopic.isPresent()) {

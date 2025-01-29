@@ -15,10 +15,13 @@ import ca.uhn.fhir.rest.server.provider.ProviderConstants;
 import ca.uhn.fhir.rest.server.provider.ResourceProviderFactory;
 import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.hl7.fhir.instance.model.api.IBaseBundle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-//@Component
 public class MdmCustomProvider extends MdmProviderDstu3Plus {
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
 
 	@Autowired
 	FhirContext myFhirContext;

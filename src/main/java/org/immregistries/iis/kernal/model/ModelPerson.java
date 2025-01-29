@@ -96,4 +96,19 @@ public class ModelPerson extends AbstractMappedObject implements Serializable {
     this.identifierTypeCode = identifierTypeCode;
   }
 
+	@Override
+	public String toString() {
+		return "ModelPerson{" +
+			"personId='" + personId + '\'' +
+			", personExternalLink='" + personExternalLink + '\'' +
+			", tenant=" + tenant +
+			", nameLast='" + nameLast + '\'' +
+			", nameFirst='" + nameFirst + '\'' +
+			", nameMiddle='" + nameMiddle + '\'' +
+			", assigningAuthority='" + assigningAuthority + '\'' +
+			", nameTypeCode='" + nameTypeCode + '\'' +
+			", identifierTypeCode='" + identifierTypeCode + '\'' +
+			", professionalSuffix='" + professionalSuffix + '\'' +
+			'}';
+	}
 }

@@ -45,17 +45,19 @@ public class ImmunizationProcessingInterceptor extends AbstractLogicInterceptor 
 			return;
 		}
 		IBaseResource result = requestDetails.getResource();
+
 		if ((requestDetails.getOperation().equals("create") || requestDetails.getOperation().equals("update"))
 			&& (requestDetails.getResource() instanceof org.hl7.fhir.r4.model.Immunization || requestDetails.getResource() instanceof org.hl7.fhir.r5.model.Immunization)) {
-//			VaccinationReported vaccinationReported = processAndValidateVaccinationReported(immunizationMapper.getReported(requestDetails.getResource()), iisReportableList, processingFlavorSet);
-//			result = immunizationMapper.getFhirResource(vaccinationReported);
+			VaccinationReported vaccinationReported = immunizationMapper.localObjectReported(requestDetails.getResource());
+			vaccinationReported = processAndValidateVaccinationReported(vaccinationReported, iisReportableList, processingFlavorSet, -1, -1, -1, "");
+			result = immunizationMapper.fhirResource(vaccinationReported);
 		}
 		requestDetails.setResource(result);
 		requestDetails.setAttribute(IIS_REPORTABLE_LIST, iisReportableList);
 	}
 
 	public VaccinationReported processAndValidateVaccinationReported(VaccinationReported vaccinationReported, List<IisReportable> iisReportableList, Set<ProcessingFlavor> processingFlavorSet, int fundingSourceObxCount, int fundingEligibilityObxCount, int rxaCount, String vaccineCptCode) throws ProcessingException {
-		testMapping(immunizationMapper, vaccinationReported);
+//		testMapping(immunizationMapper, vaccinationReported);
 		CodeMap codeMap = CodeMapManager.getCodeMap();
 
 		Date administrationDate = vaccinationReported.getAdministeredDate();
