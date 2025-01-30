@@ -100,7 +100,7 @@ public class ImmunizationMapperR4 implements ImmunizationMapper<Immunization> {
 			}
 		}
 		Extension actionCode = i.getExtensionByUrl(ACTION_CODE_EXTENSION);
-		if (actionCode.hasValue()) {
+		if (actionCode != null && actionCode.hasValue()) {
 			vr.setActionCode(MappingHelper.extensionGetCoding(actionCode).getCode());
 		}
 		vr.setRefusalReasonCode(StringUtils.defaultString(i.getStatusReason().getCodingFirstRep().getCode()));
