@@ -78,7 +78,8 @@ public class ImmunizationProcessingInterceptor extends AbstractLogicInterceptor 
 			}
 		}
 
-		if (ProcessingFlavor.GRAPEFRUIT.isActive() && random.nextBoolean()) {
+
+		if (processingFlavorSet.contains(ProcessingFlavor.GRAPEFRUIT) && random.nextBoolean()) {
 			throw new ProcessingException("Vaccination randomly rejected, Patient Accepted", "RXR", 0, 0, IisReportableSeverity.NOTICE);
 		}
 

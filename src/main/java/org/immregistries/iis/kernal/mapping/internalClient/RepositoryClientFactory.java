@@ -2,7 +2,6 @@ package org.immregistries.iis.kernal.mapping.internalClient;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.jpa.api.dao.IFhirSystemDao;
-import ca.uhn.fhir.rest.api.server.RequestDetails;
 import ca.uhn.fhir.rest.client.apache.ApacheRestfulClientFactory;
 import ca.uhn.fhir.rest.client.api.IClientInterceptor;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
@@ -12,6 +11,7 @@ import ca.uhn.fhir.rest.client.interceptor.BasicAuthInterceptor;
 import ca.uhn.fhir.rest.client.interceptor.BearerTokenAuthInterceptor;
 import ca.uhn.fhir.rest.server.exceptions.AuthenticationException;
 import ca.uhn.fhir.rest.server.interceptor.LoggingInterceptor;
+import ca.uhn.fhir.rest.server.servlet.ServletRequestDetails;
 import ca.uhn.fhir.rest.server.util.ITestingUiClientFactory;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.model.Tenant;
@@ -26,7 +26,6 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
-import java.net.InetAddress;
 
 import static org.immregistries.iis.kernal.fhir.interceptors.CustomAuthorizationInterceptor.CONNECTATHON_USER;
 import static org.immregistries.iis.kernal.fhir.security.ServletHelper.GITHUB_PREFIX;
@@ -60,14 +59,10 @@ public class RepositoryClientFactory extends ApacheRestfulClientFactory implemen
 		}
 	}
 
-	public IGenericClient newGenericClient(Tenant tenant) {
+	public IGenericClient newGenericClient(Tenant tenant, HttpServletRequest httpServletRequest) {
 		asynchInit();
 		IGenericClient client;
-		String port = "8080";
-		if(environment.getProperty("server.port") != null) {
-			port = environment.getProperty("server.port");
-		}
-		client = newGenericClient( "http://" + InetAddress.getLoopbackAddress().getHostAddress() + ":" + port + "/iis/fhir/" + tenant.getOrganizationName());
+		client = newGenericClient("http://" + httpServletRequest.getLocalAddr() + ":" + httpServletRequest.getLocalPort() + "/iis/fhir/" + tenant.getOrganizationName());
 		IClientInterceptor authInterceptor;
 		if (tenant.getOrganizationName().equals(CONNECTATHON_USER) && tenant.getUserAccess().getAccessName() == null) {
 			/**
@@ -97,13 +92,13 @@ public class RepositoryClientFactory extends ApacheRestfulClientFactory implemen
 	 * @param theRequestDetails
 	 * @return
 	 */
-	public IGenericClient newGenericClient(RequestDetails theRequestDetails) {
+	public IGenericClient newGenericClient(ServletRequestDetails theRequestDetails) {
 		asynchInit();
 		Tenant tenant = (Tenant) theRequestDetails.getAttribute(SESSION_TENANT);
 		if (tenant == null) {
 			throw new AuthenticationException();
 		}
-		return newGenericClient(tenant);
+		return newGenericClient(tenant, theRequestDetails.getServletRequest());
 	}
 
 	public IGenericClient newGenericClient(HttpServletRequest request) {
@@ -111,7 +106,7 @@ public class RepositoryClientFactory extends ApacheRestfulClientFactory implemen
 		if (request.getAttribute(FHIR_CLIENT) == null) {
 			Tenant tenant = ServletHelper.getTenant();
 			if (tenant != null) {
-				request.setAttribute(FHIR_CLIENT, newGenericClient(tenant));
+				request.setAttribute(FHIR_CLIENT, newGenericClient(tenant, request));
 			} else {
 				request.setAttribute(FHIR_CLIENT, null);
 			}

@@ -38,6 +38,7 @@ import java.text.ParseException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static ca.uhn.fhir.jpa.mdm.svc.candidate.CandidateSearcher.idOrType;
@@ -78,12 +79,13 @@ public class MdmCustomMatchFinderSvcR4 extends MdmMatchFinderSvcImpl implements 
 	@Transactional
 	public List<MatchedTarget> getMatchedTargets(String theResourceType, IAnyResource theResource, RequestPartitionId theRequestPartitionId) {
 		ourLog.info("getMatchedTargets called {} {}", theResourceType, theResource.fhirType());
+		Set<ProcessingFlavor> processingFlavorSet = ProcessingFlavor.getProcessingStyle(theRequestPartitionId.getFirstPartitionNameOrNull());
 		if (theResourceType.equals(ResourceType.Immunization.name())) {
 			List<MatchedTarget> matches = matchImmunization((Immunization) theResource, theRequestPartitionId);
 			ourLog.info("Found {} matched targets for {}.", matches.size(), idOrType(theResource, theResourceType));
 			ourLog.trace("Found {} matched targets for {}.", matches.size(), idOrType(theResource, theResourceType));
 			return matches;
-		} else if (theResourceType.equals(ResourceType.Patient.name()) && ProcessingFlavor.MISMO.isActive()) {
+		} else if (theResourceType.equals(ResourceType.Patient.name()) && processingFlavorSet.contains(ProcessingFlavor.MISMO)) {
 			/*
 			 * Flavour check activating patient Matching with Mismo match
 			 */

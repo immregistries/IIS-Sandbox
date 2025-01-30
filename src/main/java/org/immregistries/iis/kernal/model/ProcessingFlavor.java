@@ -97,6 +97,12 @@ public enum ProcessingFlavor {
 		return behaviorDescription;
 	}
 
+	/**
+	 * Should only be used in Servlet Context
+	 * TODO remove
+	 *
+	 * @return flavor Active
+	 */
 	public boolean isActive() {
 		return ServletHelper.getTenant().getProcessingFlavorSet().contains(this);
 	}

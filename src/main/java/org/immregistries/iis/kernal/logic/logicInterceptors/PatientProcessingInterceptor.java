@@ -187,7 +187,7 @@ public class PatientProcessingInterceptor extends AbstractLogicInterceptor {
 
 			}
 		}
-		if (legalName != null && ProcessingFlavor.MOONFRUIT.isActive() && nameFirst.startsWith("S") || nameFirst.startsWith("A")) {
+		if (legalName != null && processingFlavorSet.contains(ProcessingFlavor.MOONFRUIT) && nameFirst.startsWith("S") || nameFirst.startsWith("A")) {
 			throw new ProcessingException("Immunization History cannot be stored because of patient's consent status", "PID", 0, 0, IisReportableSeverity.WARN);
 		}
 	}

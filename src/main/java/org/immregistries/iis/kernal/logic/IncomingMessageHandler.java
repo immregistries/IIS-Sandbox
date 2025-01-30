@@ -404,6 +404,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 	}
 
 	public String processQBP(Tenant tenant, HL7Reader reader, String messageReceived) throws Exception {
+		Set<ProcessingFlavor> processingFlavorSet = tenant.getProcessingFlavorSet();
 		MqeMessageServiceResponse mqeMessageServiceResponse = mqeMessageService.processMessage(messageReceived);
 		List<IisReportable> reportables = nistValidation(messageReceived, mqeMessageServiceResponse.getMessageObjects().getMessageHeader().getMessageProfile());
 		PatientMaster patientMasterForMatchQuery = new PatientMaster();
@@ -433,7 +434,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 			String patientNameFirst = reader.getValue(4, 2);
 			String patientNameMiddle = reader.getValue(4, 3);
 
-			if (ProcessingFlavor.MOONFRUIT.isActive() && StringUtils.defaultString(patientNameFirst).startsWith("S") || StringUtils.defaultString(patientNameFirst).startsWith("A")) {
+			if (processingFlavorSet.contains(ProcessingFlavor.MOONFRUIT) && StringUtils.defaultString(patientNameFirst).startsWith("S") || StringUtils.defaultString(patientNameFirst).startsWith("A")) {
 				throw new ProcessingException("Immunization History cannot be Accepted because of patient's consent status", "PID", 0, 0, IisReportableSeverity.WARN);
 			}
 			boolean strictDate = false;
@@ -463,7 +464,6 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 			reportables.add(IisReportable.fromProcessingException(new ProcessingException("QPD segment not found", null, 0, 0)));
 		}
 
-		Set<ProcessingFlavor> processingFlavorSet = tenant.getProcessingFlavorSet();
 		Date cutoff = null;
 		if (processingFlavorSet.contains(ProcessingFlavor.SNAIL) || processingFlavorSet.contains(ProcessingFlavor.SNAIL30) || processingFlavorSet.contains(ProcessingFlavor.SNAIL60) || processingFlavorSet.contains(ProcessingFlavor.SNAIL90)) {
 			Calendar calendar = Calendar.getInstance();
@@ -508,10 +508,10 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 
 	@SuppressWarnings("unchecked")
 	public String buildRSP(HL7Reader reader, String messageReceived, PatientMaster patientMaster, Tenant tenant, List<PatientReported> patientReportedPossibleList, List<IisReportable> iisReportables) {
-
+		Set<ProcessingFlavor> processingFlavorSet = tenant.getProcessingFlavorSet();
 		MqeMessageServiceResponse mqeMessageServiceResponse = mqeMessageService.processMessage(messageReceived);
 		boolean sendInformations = true;
-		if (ProcessingFlavor.STARFRUIT.isActive() && StringUtils.defaultString(patientMaster.getNameFirst()).startsWith("S") || StringUtils.defaultString(patientMaster.getNameFirst()).startsWith("A")) {
+		if (processingFlavorSet.contains(ProcessingFlavor.STARFRUIT) && StringUtils.defaultString(patientMaster.getNameFirst()).startsWith("S") || StringUtils.defaultString(patientMaster.getNameFirst()).startsWith("A")) {
 			iisReportables.add(IisReportable.fromProcessingException(new ProcessingException("Immunization History cannot be shared because of patient's consent status", "PID", 0, 0, IisReportableSeverity.NOTICE)));
 			sendInformations = false;
 		}
@@ -519,7 +519,6 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 		reader.resetPostion();
 		reader.advanceToSegment("MSH");
 
-		Set<ProcessingFlavor> processingFlavorSet = tenant.getProcessingFlavorSet();
 		StringBuilder sb = new StringBuilder();
 		String profileIdSubmitted = reader.getValue(21);
 		CodeMap codeMap = CodeMapManager.getCodeMap();

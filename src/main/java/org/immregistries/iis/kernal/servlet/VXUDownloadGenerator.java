@@ -10,10 +10,10 @@ import org.hibernate.Session;
 import org.hl7.fhir.r5.model.Immunization;
 import org.hl7.fhir.r5.model.Patient;
 import org.immregistries.iis.kernal.logic.IExampleMessageWriter;
-import org.immregistries.iis.kernal.model.Tenant;
-import org.immregistries.iis.kernal.model.VaccinationReported;
 import org.immregistries.iis.kernal.mapping.internalClient.FhirRequesterR5;
 import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
+import org.immregistries.iis.kernal.model.Tenant;
+import org.immregistries.iis.kernal.model.VaccinationReported;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.http.HttpServletRequest;
@@ -98,6 +98,7 @@ public class VXUDownloadGenerator extends Thread {
   private String runningMessage = "Not Started";
   private Session dataSession;
   private Tenant tenant;
+	private HttpServletRequest req;
   private File file;
 
   public VXUDownloadGenerator(HttpServletRequest req, Tenant tenant) {
@@ -140,6 +141,7 @@ public class VXUDownloadGenerator extends Thread {
     includePhi =
         req.getParameter(PARAM_CVX_CODES) == null || req.getParameter(PARAM_INCLUDE_PHI) != null;
     runningMessage = "Initialized " + sdf.format(new Date());
+	  this.req = req;
 
   }
 
@@ -170,7 +172,7 @@ public class VXUDownloadGenerator extends Thread {
       }
     }
     runningMessage = "Looking for vaccinations";
-	  IGenericClient fhirClient = repositoryClientFactory.newGenericClient(tenant);
+	  IGenericClient fhirClient = repositoryClientFactory.newGenericClient(tenant, req);
 
 	  List<VaccinationReported> vaccinationReportedList = fhirRequests.searchVaccinationReportedList(
 		  new SearchParameterMap(Immunization.SP_DATE, new DateParam().setPrefix(ParamPrefixEnum.STARTS_AFTER).setValue(dateStart))

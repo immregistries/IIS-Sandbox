@@ -4,6 +4,7 @@ import ca.uhn.fhir.interceptor.model.RequestPartitionId;
 import ca.uhn.fhir.jpa.api.dao.IFhirResourceDao;
 import ca.uhn.fhir.jpa.mdm.svc.MdmMatchFinderSvcImpl;
 import ca.uhn.fhir.jpa.mdm.svc.candidate.MdmCandidateSearchSvc;
+import ca.uhn.fhir.jpa.partition.IPartitionLookupSvc;
 import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
 import ca.uhn.fhir.mdm.api.IMdmMatchFinderSvc;
 import ca.uhn.fhir.mdm.api.MatchedTarget;
@@ -38,6 +39,7 @@ import java.text.ParseException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static ca.uhn.fhir.jpa.mdm.svc.candidate.CandidateSearcher.idOrType;
@@ -61,6 +63,9 @@ public class MdmCustomMatchFinderSvcR5 extends MdmMatchFinderSvcImpl implements 
 	@Autowired
 	private PatientMatchingDatasetConversionController patientMatchingDatasetConversionController;
 
+	@Autowired
+	private IPartitionLookupSvc partitionLookupSvc;
+
 
 	private PatientMatcher patientMismoMatcher;
 
@@ -77,12 +82,13 @@ public class MdmCustomMatchFinderSvcR5 extends MdmMatchFinderSvcImpl implements 
 	@Nonnull
 	@Transactional
 	public List<MatchedTarget> getMatchedTargets(String theResourceType, IAnyResource theResource, RequestPartitionId theRequestPartitionId) {
+		Set<ProcessingFlavor> processingFlavorSet = ProcessingFlavor.getProcessingStyle(theRequestPartitionId.getFirstPartitionNameOrNull());
 		if (theResourceType.equals(org.hl7.fhir.r5.model.ResourceType.Immunization.name())) {
 			List<MatchedTarget> matches = matchImmunization((org.hl7.fhir.r5.model.Immunization) theResource, theRequestPartitionId);
 			ourLog.info("Found {} matched targets for {}.", matches.size(), idOrType(theResource, theResourceType));
 			ourLog.trace("Found {} matched targets for {}.", matches.size(), idOrType(theResource, theResourceType));
 			return matches;
-		} else if (theResourceType.equals(ResourceType.Patient.name()) && ProcessingFlavor.MISMO.isActive()) {
+		} else if (theResourceType.equals(ResourceType.Patient.name()) && processingFlavorSet.contains(ProcessingFlavor.MISMO)) {
 			/*
 			 * Flavour check activating patient Matching with Mismo match
 			 */
