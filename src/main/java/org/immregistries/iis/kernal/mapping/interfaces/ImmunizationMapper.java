@@ -21,6 +21,8 @@ public interface ImmunizationMapper<Immunization extends IBaseResource> extends 
 	String FUNDING_SOURCE = "fundingSource";
 	String FUNDING_ELIGIBILITY = "fundingEligibility";
 	String RECORDED = "recorded";
+	String ACTION_CODE_EXTENSION = "actionCode";
+	String ACTION_CODE_SYSTEM = "0206";
 
 	VaccinationReported localObjectReportedWithMaster(Immunization immunization);
 

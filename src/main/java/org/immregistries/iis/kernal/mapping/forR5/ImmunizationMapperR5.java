@@ -103,6 +103,10 @@ public class ImmunizationMapperR5 implements ImmunizationMapper<Immunization> {
 					break;
 			}
 		}
+		Extension actionCode = i.getExtensionByUrl(ACTION_CODE_EXTENSION);
+		if (actionCode.hasValue()) {
+			vr.setActionCode(MappingHelper.extensionGetCoding(actionCode).getCode());
+		}
 		vr.setRefusalReasonCode(i.getStatusReason().getCodingFirstRep().getCode());
 		vr.setBodySite(i.getSite().getCodingFirstRep().getCode());
 		vr.setBodyRoute(i.getRoute().getCodingFirstRep().getCode());
@@ -112,6 +116,8 @@ public class ImmunizationMapperR5 implements ImmunizationMapper<Immunization> {
 		if (i.getLocation() != null && StringUtils.isNotBlank(i.getLocation().getReference())) {
 			vr.setOrgLocation(fhirRequests.readOrgLocation(i.getLocation().getReference()));
 		}
+
+
 		if (i.hasInformationSource() && i.getInformationSource().getReference() != null && StringUtils.isNotBlank(i.getInformationSource().getReference().getReference())) {
 			vr.setEnteredBy(fhirRequests.readPractitionerPerson(i.getInformationSource().getReference().getReference()));
 		} else {
@@ -133,24 +139,7 @@ public class ImmunizationMapperR5 implements ImmunizationMapper<Immunization> {
 		}
 	}
 
-//	/**
-//	 * Converts golden resource to VaccinationMaster
-//	 * @param i
-//	 * @return
-//	 */
-//  public VaccinationMaster getMaster(Immunization i){
-//	  VaccinationMaster vaccinationMaster = new VaccinationMaster();
-//	  vaccinationMaster.setVaccinationId(i.getId());
-//	  vaccinationMaster.setExternalLink(i.getIdentifierFirstRep().getValue());
-//	  vaccinationMaster.setAdministeredDate(i.getOccurrenceDateTimeType().getValue());
-//	  vaccinationMaster.setVaccineCvxCode(i.getVaccineCode().getCode(CVX));
-//	  if (i.getPatient() != null && StringUtils.isNotBlank(i.getPatient().getId())) {
-//		  vaccinationMaster.setPatient(fhirRequests.readPatientMaster(i.getPatient().getId()));
-//	  }
-////	  vaccinationMaster.setVaccinationReported();
-//	  return vaccinationMaster;
-//  }
-public VaccinationReported localObjectReported(Immunization i) {
+	public VaccinationReported localObjectReported(Immunization i) {
 		VaccinationReported vaccinationReported = new VaccinationReported();
 		fillFromFhirResource(vaccinationReported, i); // TODO assert not golden record ?
 		return vaccinationReported;
@@ -194,7 +183,9 @@ public VaccinationReported localObjectReported(Immunization i) {
 		  i.getVaccineCode().addCoding().setCode(vr.getVaccineNdcCode()).setSystem(NDC);
 	  }
 	  i.setManufacturer(MappingHelper.getFhirCodeableReferenceR5(MappingHelper.ORGANIZATION, MVX, vr.getVaccineMvxCode()));
-
+//	  if (StringUtils.isNotBlank(vr.getVaccineMvxCode())) {
+//		  i.setManufacturer(new Reference().setIdentifier(new Identifier().setSystem(MVX).setValue(vr.getVaccineMvxCode())));
+//	  }
 	  if (StringUtils.isNotBlank(vr.getAdministeredAmount())) {
 		  i.setDoseQuantity(new Quantity().setValue(new BigDecimal(vr.getAdministeredAmount())));
 	  }
@@ -224,6 +215,7 @@ public VaccinationReported localObjectReported(Immunization i) {
 			  }
 		  }
 	  }
+	  Extension actionCode = i.addExtension().setUrl(ACTION_CODE_EXTENSION).setValue(new Coding().setCode(vr.getActionCode()).setSystem(ACTION_CODE_SYSTEM));
 	  i.setStatusReason(new CodeableConcept(new Coding(REFUSAL_REASON_CODE,vr.getRefusalReasonCode(),vr.getRefusalReasonCode())));
 //	  i.addReason().setConcept());
 	  i.getSite().addCoding().setSystem(BODY_PART).setCode(vr.getBodySite());
