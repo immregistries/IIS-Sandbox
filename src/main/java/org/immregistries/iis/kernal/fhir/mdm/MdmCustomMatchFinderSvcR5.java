@@ -23,7 +23,6 @@ import org.immregistries.iis.kernal.mapping.forR5.ImmunizationMapperR5;
 import org.immregistries.iis.kernal.mapping.interfaces.ImmunizationMapper;
 import org.immregistries.iis.kernal.model.ProcessingFlavor;
 import org.immregistries.iis.kernal.servlet.PatientMatchingDatasetConversionController;
-import org.immregistries.mismo.match.PatientMatchResult;
 import org.immregistries.mismo.match.PatientMatcher;
 import org.immregistries.mismo.match.model.Patient;
 import org.immregistries.vaccination_deduplication.computation_classes.Deterministic;
@@ -47,7 +46,7 @@ import static org.immregistries.iis.kernal.mapping.internalClient.FhirRequester.
 /**
  * Custom, based on MdmMatchFinderSvcImpl from Hapi-fhir v6.2.4, to allow for Immunization matching with external library
  */
-public class MdmCustomMatchFinderSvcR5 extends MdmMatchFinderSvcImpl implements IMdmMatchFinderSvc {
+public class MdmCustomMatchFinderSvcR5 extends MdmMatchFinderSvcImpl implements IMdmMatchFinderSvc, IMdmCustomMatchFinderSvc {
 	private static final Logger ourLog = Logs.getMdmTroubleshootingLog();
 
 	@Autowired
@@ -55,7 +54,7 @@ public class MdmCustomMatchFinderSvcR5 extends MdmMatchFinderSvcImpl implements 
 	@Autowired
 	MdmResourceMatcherSvc myMdmResourceMatcherSvc;
 	@Autowired
-	IFhirResourceDao<Immunization> immunizationDao;
+	IFhirResourceDao<org.hl7.fhir.r5.model.Immunization> immunizationDao;
 	@Autowired
 	IFhirResourceDao<org.hl7.fhir.r5.model.Patient> patientDao;
 	@Autowired
@@ -82,7 +81,7 @@ public class MdmCustomMatchFinderSvcR5 extends MdmMatchFinderSvcImpl implements 
 			List<MatchedTarget> matches = targetCandidates.stream()
 				.map((candidate) -> {
 					Patient mismoPatientCandidate = patientMatchingDatasetConversionController.convertFromR5((org.hl7.fhir.r5.model.Patient) candidate);
-					return new MatchedTarget(candidate, mismoResultToMdmMatchOutcome(mismoMatcher.match(mismoPatient, mismoPatientCandidate)));
+					return new MatchedTarget(candidate, IMdmCustomMatchFinderSvc.mismoResultToMdmMatchOutcome(mismoMatcher.match(mismoPatient, mismoPatientCandidate)));
 				}).collect(Collectors.toList());
 
 			ourLog.info("Found {} matched targets for {} with mismo.", matches.size(), idOrType(theResource, theResourceType));
@@ -197,24 +196,6 @@ public class MdmCustomMatchFinderSvcR5 extends MdmMatchFinderSvcImpl implements 
 			i1.setOrganisationID(theRequestPartitionId.getFirstPartitionNameOrNull());
 		}
 		return i1;
-	}
-
-	public static MdmMatchOutcome mismoResultToMdmMatchOutcome(PatientMatchResult patientMatchResult) {
-		switch (patientMatchResult.getDetermination()) {
-			case MATCH: {
-				return MdmMatchOutcome.EID_MATCH;
-//				return MdmMatchOutcome.NEW_GOLDEN_RESOURCE_MATCH;
-			}
-			case POSSIBLE_MATCH: {
-				return MdmMatchOutcome.POSSIBLE_MATCH;
-			}
-			case NO_MATCH: {
-				return MdmMatchOutcome.NO_MATCH;
-			}
-			default: {
-				return MdmMatchOutcome.NO_MATCH;
-			}
-		}
 	}
 
 

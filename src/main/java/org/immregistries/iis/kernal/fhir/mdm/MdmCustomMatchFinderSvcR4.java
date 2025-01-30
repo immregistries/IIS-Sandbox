@@ -46,7 +46,7 @@ import static org.immregistries.iis.kernal.mapping.internalClient.FhirRequester.
 /**
  * Custom, based on MdmMatchFinderSvcImpl from Hapi-fhir v6.2.4, to allow for Immunization matching with external library
  */
-public class MdmCustomMatchFinderSvcR4 extends MdmMatchFinderSvcImpl implements IMdmMatchFinderSvc {
+public class MdmCustomMatchFinderSvcR4 extends MdmMatchFinderSvcImpl implements IMdmMatchFinderSvc, IMdmCustomMatchFinderSvc {
 	private static final Logger ourLog = Logs.getMdmTroubleshootingLog();
 
 	@Autowired
@@ -80,7 +80,7 @@ public class MdmCustomMatchFinderSvcR4 extends MdmMatchFinderSvcImpl implements 
 			List<MatchedTarget> matches = targetCandidates.stream()
 				.map((candidate) -> {
 					Patient mismoPatientCandidate = patientMatchingDatasetConversionController.convertFromR5((org.hl7.fhir.r5.model.Patient) candidate);
-					return new MatchedTarget(candidate, MdmCustomMatchFinderSvcR5.mismoResultToMdmMatchOutcome(mismoMatcher.match(mismoPatient, mismoPatientCandidate)));
+					return new MatchedTarget(candidate, IMdmCustomMatchFinderSvc.mismoResultToMdmMatchOutcome(mismoMatcher.match(mismoPatient, mismoPatientCandidate)));
 				}).collect(Collectors.toList());
 
 			ourLog.info("Found {} matched targets for {} with mismo.", matches.size(), idOrType(theResource, theResourceType));
