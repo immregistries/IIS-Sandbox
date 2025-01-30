@@ -33,6 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Nonnull;
+import java.io.InputStream;
 import java.text.ParseException;
 import java.util.Collection;
 import java.util.List;
@@ -58,36 +59,49 @@ public class MdmCustomMatchFinderSvcR5 extends MdmMatchFinderSvcImpl implements 
 	@Autowired
 	IFhirResourceDao<org.hl7.fhir.r5.model.Patient> patientDao;
 	@Autowired
-	PatientMatchingDatasetConversionController patientMatchingDatasetConversionController;
+	private PatientMatchingDatasetConversionController patientMatchingDatasetConversionController;
+
+
+	private PatientMatcher patientMismoMatcher;
+
+	public MdmCustomMatchFinderSvcR5() {
+		super();
+		InputStream is = this.getClass().getResourceAsStream("/Mismo-Configuration.yml");
+		if (is == null) {
+			ourLog.error("Unable to find Mismo-Configuration file");
+		}
+		patientMismoMatcher = new PatientMatcher(is);
+	}
 
 	@Override
 	@Nonnull
 	@Transactional
 	public List<MatchedTarget> getMatchedTargets(String theResourceType, IAnyResource theResource, RequestPartitionId theRequestPartitionId) {
-		if (theResourceType.equals(ResourceType.Immunization.name())) {
-			List<MatchedTarget> matches = matchImmunization((Immunization) theResource, theRequestPartitionId);
+		if (theResourceType.equals(org.hl7.fhir.r5.model.ResourceType.Immunization.name())) {
+			List<MatchedTarget> matches = matchImmunization((org.hl7.fhir.r5.model.Immunization) theResource, theRequestPartitionId);
 			ourLog.info("Found {} matched targets for {}.", matches.size(), idOrType(theResource, theResourceType));
 			ourLog.trace("Found {} matched targets for {}.", matches.size(), idOrType(theResource, theResourceType));
 			return matches;
-		} else if (theResourceType.equals(ResourceType.Patient.name()) && ProcessingFlavor.getProcessingStyle(theRequestPartitionId.getFirstPartitionNameOrNull()).contains(ProcessingFlavor.MISMO)) {
-
+		} else if (theResourceType.equals(ResourceType.Patient.name()) && ProcessingFlavor.MISMO.isActive()) {
 			/*
-			 * flavour check activating patient Matching with Mismo match
+			 * Flavour check activating patient Matching with Mismo match
 			 */
 			Collection<IAnyResource> targetCandidates = myMdmCandidateSearchSvc.findCandidates(theResourceType, theResource, theRequestPartitionId);
-			PatientMatcher mismoMatcher = new PatientMatcher();
 			Patient mismoPatient = patientMatchingDatasetConversionController.convertFromR5((org.hl7.fhir.r5.model.Patient) theResource);
 
 			List<MatchedTarget> matches = targetCandidates.stream()
 				.map((candidate) -> {
 					Patient mismoPatientCandidate = patientMatchingDatasetConversionController.convertFromR5((org.hl7.fhir.r5.model.Patient) candidate);
-					return new MatchedTarget(candidate, IMdmCustomMatchFinderSvc.mismoResultToMdmMatchOutcome(mismoMatcher.match(mismoPatient, mismoPatientCandidate)));
+					return new MatchedTarget(candidate, IMdmCustomMatchFinderSvc.mismoResultToMdmMatchOutcome(patientMismoMatcher.match(mismoPatient, mismoPatientCandidate)));
 				}).collect(Collectors.toList());
 
 			ourLog.info("Found {} matched targets for {} with mismo.", matches.size(), idOrType(theResource, theResourceType));
 			ourLog.trace("Found {} matched targets for {}.", matches.size(), idOrType(theResource, theResourceType));
 			return matches;
 		} else {
+			/*
+			 * Original code for all cases
+			 */
 			Collection<IAnyResource> targetCandidates = myMdmCandidateSearchSvc.findCandidates(theResourceType, theResource, theRequestPartitionId);
 
 			List<MatchedTarget> matches = targetCandidates.stream()
@@ -151,6 +165,7 @@ public class MdmCustomMatchFinderSvcR5 extends MdmMatchFinderSvcImpl implements 
 					return null;
 				}
 			}).filter((Objects::nonNull)).collect(Collectors.toList());
+
 	}
 
 	private org.immregistries.vaccination_deduplication.Immunization toVaccDedupImmunization(Immunization immunization, RequestPartitionId theRequestPartitionId) {

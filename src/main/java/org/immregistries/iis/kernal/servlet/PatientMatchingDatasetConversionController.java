@@ -7,23 +7,28 @@ import ca.uhn.fhir.rest.api.server.IBundleProvider;
 import ca.uhn.fhir.util.ExtensionUtil;
 import org.hl7.fhir.instance.model.api.IBaseExtension;
 import org.hl7.fhir.instance.model.api.IBaseResource;
-import org.hl7.fhir.r5.model.*;
-import org.immregistries.iis.kernal.mapping.internalClient.FhirRequester;
+import org.hl7.fhir.r5.model.Bundle;
+import org.hl7.fhir.r5.model.ContactPoint;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
+import org.immregistries.iis.kernal.mapping.internalClient.FhirRequester;
 import org.immregistries.mismo.match.StringUtils;
 import org.immregistries.mismo.match.model.Patient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.immregistries.iis.kernal.mapping.interfaces.PatientMapper.*;
+import static org.immregistries.iis.kernal.mapping.interfaces.PatientMapper.LINK_ID;
+import static org.immregistries.iis.kernal.mapping.interfaces.PatientMapper.MOTHER_MAIDEN_NAME;
 
 @RestController
 @RequestMapping("/patientMatchingDatasetConversion")
@@ -269,7 +274,7 @@ public class PatientMatchingDatasetConversionController {
 	}
 
 
-	private Patient convertFromR4(org.hl7.fhir.r4.model.Patient patient) {
+	public Patient convertFromR4(org.hl7.fhir.r4.model.Patient patient) {
 		Patient mismo = new Patient();
 		org.hl7.fhir.r4.model.Identifier identifier = MappingHelper.filterIdentifierR4(patient.getIdentifier(), "http://codi.mitre.org");
 		if (identifier != null) {
