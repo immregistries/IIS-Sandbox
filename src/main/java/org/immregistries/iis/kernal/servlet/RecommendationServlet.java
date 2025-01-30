@@ -11,7 +11,7 @@ import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.logic.IImmunizationRecommendationService;
 import org.immregistries.iis.kernal.mapping.internalClient.FhirRequester;
 import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
-import org.immregistries.iis.kernal.model.PatientIdentifier;
+import org.immregistries.iis.kernal.model.BusinessIdentifier;
 import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.model.Tenant;
 import org.slf4j.Logger;
@@ -175,9 +175,9 @@ public class RecommendationServlet extends PatientServlet {
 				patientResource = fetchPatientFromParameter(req, fhirClient);
 			}
 			PatientMaster patientMaster = patientMapper.localObject(patientResource);
-			PatientIdentifier identifier = patientMaster.getMainPatientIdentifier();
+			BusinessIdentifier identifier = patientMaster.getMainBusinessIdentifier();
 			if (StringUtils.isBlank(identifier.getValue())) {
-				identifier = patientMaster.getFirstPatientIdentifier();
+				identifier = patientMaster.getFirstBusinessIdentifier();
 			}
 
 			if (patientResource != null) {

@@ -8,6 +8,7 @@ import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
 import org.immregistries.iis.kernal.mapping.interfaces.ImmunizationMapper;
 import org.immregistries.iis.kernal.mapping.internalClient.FhirRequesterR4;
+import org.immregistries.iis.kernal.model.BusinessIdentifier;
 import org.immregistries.iis.kernal.model.ModelPerson;
 import org.immregistries.iis.kernal.model.VaccinationMaster;
 import org.immregistries.iis.kernal.model.VaccinationReported;
@@ -27,7 +28,7 @@ public class ImmunizationMapperR4 implements ImmunizationMapper<Immunization> {
 	public VaccinationReported localObjectReportedWithMaster(Immunization i) {
 		VaccinationReported vaccinationReported = this.localObjectReported(i);
 		VaccinationMaster vaccinationMaster = fhirRequests.searchVaccinationMaster(
-			new SearchParameterMap(Immunization.SP_IDENTIFIER, new TokenParam().setValue(vaccinationReported.getExternalLink()))
+			new SearchParameterMap(Immunization.SP_IDENTIFIER, new TokenParam().setValue(vaccinationReported.getFillerBusinessIdentifier().getValue()))
 //			Immunization.IDENTIFIER.exactly().systemAndIdentifier(
 //				vaccinationReported.getExternalLinkSystem(),
 //				vaccinationReported.getExternalLink())
@@ -39,10 +40,11 @@ public class ImmunizationMapperR4 implements ImmunizationMapper<Immunization> {
 	}
 
 	public void fillFromFhirResource(VaccinationMaster vr, Immunization i) {
-		vr.setVaccinationId(new IdType(i.getId()).getIdPart());
+		vr.setVaccinationId(StringUtils.defaultString(new IdType(i.getId()).getIdPart()));
 		vr.setUpdatedDate(i.getMeta().getLastUpdated());
-//		vr.setVaccinationReportedExternalLink(MappingHelper.filterIdentifier(i.getIdentifier(),MappingHelper.VACCINATION_REPORTED).getValue());
-		vr.setExternalLink(i.getIdentifierFirstRep().getValue()); // TODO
+		for (Identifier identifier : i.getIdentifier()) {
+			vr.addBusinessIdentifier(BusinessIdentifier.fromR4(identifier));
+		}
 		if (i.getPatient() != null && StringUtils.isNotBlank(i.getPatient().getReference())) {
 			vr.setPatientReported(fhirRequests.readPatientReported(i.getPatient().getReference()));
 //			vr.setPatientReported(fhirRequests.readPatientReported(i.getPatient().getReference().split("Patient/")[0]));
@@ -54,28 +56,28 @@ public class ImmunizationMapperR4 implements ImmunizationMapper<Immunization> {
 		i.getVaccineCode().getCoding().forEach(coding -> {
 			switch (coding.getSystem()) {
 				case CVX: {
-					vr.setVaccineCvxCode(coding.getCode());
+					vr.setVaccineCvxCode(StringUtils.defaultString(coding.getCode()));
 					break;
 				}
 				case NDC: {
-					vr.setVaccineNdcCode(coding.getCode());
+					vr.setVaccineNdcCode(StringUtils.defaultString(coding.getCode()));
 					break;
 				}
 				case MVX: {
-					vr.setVaccineMvxCode(coding.getCode());
+					vr.setVaccineMvxCode(StringUtils.defaultString(coding.getCode()));
 					break;
 				}
 			}
 		});
 
-		vr.setVaccineMvxCode(i.getManufacturer().getIdentifier().getValue());
+		vr.setVaccineMvxCode(i.getManufacturer().getIdentifier().getValueElement().getValueNotNull());
 
 		vr.setAdministeredAmount(i.getDoseQuantity().getValue().toString());
 
-		vr.setInformationSource(i.getReportOrigin().getCodingFirstRep().getCode());
+		vr.setInformationSource(StringUtils.defaultString(i.getReportOrigin().getCodingFirstRep().getCode()));
 		vr.setUpdatedDate(new Date());
 
-		vr.setLotnumber(i.getLotNumber());
+		vr.setLotnumber(StringUtils.defaultString(i.getLotNumber()));
 		vr.setExpirationDate(i.getExpirationDate());
 		if (i.getStatus() != null) {
 			switch (i.getStatus()) {
@@ -97,11 +99,11 @@ public class ImmunizationMapperR4 implements ImmunizationMapper<Immunization> {
 					break;
 			}
 		}
-		vr.setRefusalReasonCode(i.getStatusReason().getCodingFirstRep().getCode());
-		vr.setBodySite(i.getSite().getCodingFirstRep().getCode());
-		vr.setBodyRoute(i.getRoute().getCodingFirstRep().getCode());
-		vr.setFundingSource(i.getFundingSource().getCodingFirstRep().getCode());
-		vr.setFundingEligibility(i.getProgramEligibilityFirstRep().getCodingFirstRep().getCode());
+		vr.setRefusalReasonCode(StringUtils.defaultString(i.getStatusReason().getCodingFirstRep().getCode()));
+		vr.setBodySite(StringUtils.defaultString(i.getSite().getCodingFirstRep().getCode()));
+		vr.setBodyRoute(StringUtils.defaultString(i.getRoute().getCodingFirstRep().getCode()));
+		vr.setFundingSource(StringUtils.defaultString(i.getFundingSource().getCodingFirstRep().getCode()));
+		vr.setFundingEligibility(StringUtils.defaultString(i.getProgramEligibilityFirstRep().getCodingFirstRep().getCode()));
 
 		if (i.getLocation() != null && StringUtils.isNotBlank(i.getLocation().getReference())) {
 			vr.setOrgLocation(fhirRequests.readOrgLocation(i.getLocation().getReference()));
@@ -153,7 +155,10 @@ public class ImmunizationMapperR4 implements ImmunizationMapper<Immunization> {
 	 */
 	public Immunization fhirResource(VaccinationMaster vr) {
 		Immunization i = new Immunization();
-//	  i.addIdentifier(MappingHelper.getFhirIdentifier(MappingHelper.VACCINATION_REPORTED, vr.getVaccinationReportedExternalLink()));
+		i.setId(StringUtils.defaultString(vr.getVaccinationId())); // TODO maybe remove ?
+		for (BusinessIdentifier businessIdentifier : vr.getBusinessIdentifiers()) {
+			i.addIdentifier(businessIdentifier.toR4());
+		}
 		i.setPatient(new Reference().setReference("Patient/" + vr.getPatientReported().getPatientId()));
 		i.setRecorded(vr.getReportedDate());
 		i.getOccurrenceDateTimeType().setValue(vr.getAdministeredDate());

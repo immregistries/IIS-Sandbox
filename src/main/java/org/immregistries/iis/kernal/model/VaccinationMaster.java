@@ -3,7 +3,9 @@ package org.immregistries.iis.kernal.model;
 import org.immregistries.vfa.connect.model.TestEvent;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -13,11 +15,11 @@ public class VaccinationMaster extends AbstractMappedObject implements Serializa
 
 	private static final long serialVersionUID = 1L;
 
+	private List<BusinessIdentifier> businessIdentifiers = new ArrayList<>(2);
+
 	private String vaccinationId = "";
 	private PatientReported patientReported = null;
 	private String patientReportedId = "";
-	private String externalLink = "";
-	private String externalLinkSystem = "";
 	private Date reportedDate = null;
 	private Date updatedDate = null;
 
@@ -279,16 +281,6 @@ public class VaccinationMaster extends AbstractMappedObject implements Serializa
 		this.patientReported = reportedPatient;
 	}
 
-
-	public String getExternalLink() {
-		return externalLink;
-	}
-
-
-	public void setExternalLink(String reportedOrderId) {
-		this.externalLink = reportedOrderId;
-	}
-
 	public Date getReportedDate() {
 		return reportedDate;
 	}
@@ -391,22 +383,58 @@ public class VaccinationMaster extends AbstractMappedObject implements Serializa
 
 
 	public String getExternalLinkSystem() {
-		return externalLinkSystem;
+		return getFirstBusinessIdentifier().getSystem();
 	}
 
 
 	public void setExternalLinkSystem(String externalLinkSystem) {
-		this.externalLinkSystem = externalLinkSystem;
+		getFirstBusinessIdentifier().setSystem(externalLinkSystem);
+	}
+
+	public List<BusinessIdentifier> getBusinessIdentifiers() {
+		return businessIdentifiers;
+	}
+
+	public void setBusinessIdentifiers(List<BusinessIdentifier> businessIdentifiers) {
+		this.businessIdentifiers = businessIdentifiers;
+	}
+
+	public void addBusinessIdentifier(BusinessIdentifier businessIdentifier) {
+		if (this.businessIdentifiers == null) {
+			this.businessIdentifiers = new ArrayList<>(3);
+		}
+		this.businessIdentifiers.add(businessIdentifier);
+	}
+
+	public BusinessIdentifier getFirstBusinessIdentifier() {
+		if (businessIdentifiers.isEmpty()) {
+			return null;
+		}
+		return this.businessIdentifiers.get(0);
+	}
+
+	public BusinessIdentifier getFillerBusinessIdentifier() {
+		BusinessIdentifier identifier = null;
+		if (businessIdentifiers.isEmpty()) {
+			return new BusinessIdentifier();
+		}
+		identifier = this.businessIdentifiers.stream()
+			.filter(businessIdentifier -> BusinessIdentifier.PLACER_TYPE_VALUE.equals(businessIdentifier.getType()))
+			.findFirst()
+			.orElse(null);
+		if (identifier == null) {
+			identifier = new BusinessIdentifier();
+		}
+		return identifier;
 	}
 
 	@Override
 	public String toString() {
 		return "VaccinationMaster{" +
-			"vaccinationId='" + vaccinationId + '\'' +
-//			", patientReported=" + patientReported +
+			"businessIdentifiers=" + businessIdentifiers +
+			", vaccinationId='" + vaccinationId + '\'' +
+			", patientReported=" + patientReported +
 			", patientReportedId='" + patientReportedId + '\'' +
-			", externalLink='" + externalLink + '\'' +
-			", externalLinkSystem='" + externalLinkSystem + '\'' +
 			", reportedDate=" + reportedDate +
 			", updatedDate=" + updatedDate +
 			", administeredDate=" + administeredDate +

@@ -422,9 +422,9 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 			String problem = null;
 			int fieldPosition = 0;
 			if (StringUtils.isNotBlank(mrn)) {
-				PatientIdentifier patientIdentifier = new PatientIdentifier();
-				patientIdentifier.setValue(mrn);
-				patientMasterForMatchQuery.addPatientIdentifier(patientIdentifier);// TODO system
+				BusinessIdentifier businessIdentifier = new BusinessIdentifier();
+				businessIdentifier.setValue(mrn);
+				patientMasterForMatchQuery.addBusinessIdentifier(businessIdentifier);// TODO system
 //				patientMasterForMatchQuery.setExternalLink(mrn); // TODO system
 //				patientReported = fhirRequester.searchPatientReported(
 //					Patient.IDENTIFIER.exactly().systemAndCode(MRN_SYSTEM, mrn)
@@ -1149,11 +1149,11 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 		}
 
 		for (int i = 1; i <= reader.getRepeatCount(3); i++) {
-			PatientIdentifier patientIdentifier = new PatientIdentifier();
-			patientIdentifier.setValue(reader.getValueRepeat(3, 1, i));
-			patientIdentifier.setSystem(reader.getValueRepeat(3, 4, i));
-			patientIdentifier.setType(reader.getValueRepeat(3, 5, i));
-			patientReported.addPatientIdentifier(patientIdentifier);
+			BusinessIdentifier businessIdentifier = new BusinessIdentifier();
+			businessIdentifier.setValue(reader.getValueRepeat(3, 1, i));
+			businessIdentifier.setSystem(reader.getValueRepeat(3, 4, i));
+			businessIdentifier.setType(reader.getValueRepeat(3, 5, i));
+			patientReported.addBusinessIdentifier(businessIdentifier);
 		}
 
 		patientReported.setPatientNames(names);
@@ -1229,8 +1229,21 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 //        VaccinationMaster vaccinationMaster = null;
 			String vaccineCode = "";
 			Date administrationDate = null;
-			String vaccinationReportedExternalLink = reader.getValue(3);
-			String vaccinationReportedExternalLinkSystem = reader.getValue(3, 2);
+			String vaccinationReportedExternalLinkPlacer = reader.getValue(2);
+			BusinessIdentifier placerIdentifier = null;
+			if (StringUtils.isNotBlank(reader.getValue(2))) {
+				placerIdentifier = new BusinessIdentifier();
+				placerIdentifier.setValue(reader.getValue(2));
+				placerIdentifier.setSystem(reader.getValue(2, 2));
+				placerIdentifier.setType("PLAC"); // According to v2 to FHIR
+			}
+			BusinessIdentifier fillerIdentifier = null;
+			if (StringUtils.isNotBlank(reader.getValue(3))) {
+				fillerIdentifier = new BusinessIdentifier();
+				fillerIdentifier.setValue(reader.getValue(3));
+				fillerIdentifier.setSystem(reader.getValue(3, 2));
+				fillerIdentifier.setType("FILL"); // According to v2 to FHIR
+			}
 			boolean rxaPresent = reader.advanceToSegment("RXA", "ORC");
 			if (!rxaPresent) {
 				throw new ProcessingException("RXA segment was not found after ORC segment", "ORC", orcCount, 0);
@@ -1244,7 +1257,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 				obxCount = readAndCreateObservations(reader, iisReportableList, patientReported, strictDate, obxCount, null, null);
 				continue;
 			}
-			if (StringUtils.isBlank(vaccinationReportedExternalLink)) {
+			if (fillerIdentifier == null) {
 				throw new ProcessingException("Vaccination order id was not found, unable to process", "ORC", orcCount, 3);
 			}
 			administrationDate = parseDateError(reader.getValue(3, 1), "Could not read administered date in RXA-5", "RXA", rxaCount, 3, strictDate);
@@ -1252,7 +1265,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 //				throw new ProcessingException("Vaccination is indicated as occurring in the future, unable to accept future vaccination events", "RXA", rxaCount, 3);
 //			}
 
-			vaccinationReported = fhirRequester.searchVaccinationReported(new SearchParameterMap("identifier", new TokenParam().setValue(vaccinationReportedExternalLink)));
+			vaccinationReported = fhirRequester.searchVaccinationReported(new SearchParameterMap("identifier", new TokenParam().setValue(fillerIdentifier.getValue()))); // TODO system and identifier type
 //						Immunization.IDENTIFIER.exactly().code(vaccinationReportedExternalLink));
 			if (vaccinationReported != null) {
 //				 vaccinationMaster = vaccinationReported.getVaccination();
@@ -1261,8 +1274,12 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 			if (vaccinationReported == null) {
 				vaccinationReported = new VaccinationReported();
 				vaccinationReported.setReportedDate(new Date());
-				vaccinationReported.setExternalLink(vaccinationReportedExternalLink);
-				vaccinationReported.setExternalLinkSystem(vaccinationReportedExternalLinkSystem);
+				if (placerIdentifier != null) {
+					vaccinationReported.addBusinessIdentifier(placerIdentifier);
+				}
+				if (fillerIdentifier != null) {
+					vaccinationReported.addBusinessIdentifier(fillerIdentifier);
+				}
 			}
 			vaccinationReported.setPatientReportedId(patientReported.getPatientId());
 			vaccinationReported.setPatientReported(patientReported);

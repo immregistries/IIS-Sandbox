@@ -211,7 +211,7 @@ public class FhirRequesterR4 extends FhirRequester<Patient,Immunization,Location
 	public MethodOutcome savePatientReportedMethodOutcome(PatientReported patientReported) {
 		Patient patient = patientMapper.fhirResource(patientReported);
 		return save(patient,
-				Patient.IDENTIFIER.exactly().systemAndIdentifier(patientReported.getMainPatientIdentifier().getSystem(), patientReported.getMainPatientIdentifier().getValue()));
+			Patient.IDENTIFIER.exactly().systemAndIdentifier(patientReported.getMainBusinessIdentifier().getSystem(), patientReported.getMainBusinessIdentifier().getValue()));
 	}
 
 	public PatientReported savePatientReported(PatientReported patientReported) {

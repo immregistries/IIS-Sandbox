@@ -199,8 +199,8 @@ public class VaccinationServlet {
 					PatientMaster patientMaster = vaccination.getPatientReported();
 					PatientMaster patientMaster1 = vaccination.getPatientReported();
 					immunization.getPatient().setIdentifier(new org.hl7.fhir.r5.model.Identifier()
-						.setValue(patientMaster.getMainPatientIdentifier().getValue())
-						.setSystem(patientMaster1.getMainPatientIdentifier().getSystem()));
+						.setValue(patientMaster.getMainBusinessIdentifier().getValue())
+						.setSystem(patientMaster1.getMainBusinessIdentifier().getSystem()));
 					IParser parser = repositoryClientFactory.getFhirContext().newJsonParser().setPrettyPrint(true);
 
 					PatientServlet.printSubscriptions(out, parser, bundle, immunization);

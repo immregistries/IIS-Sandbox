@@ -58,7 +58,7 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 		 * Identifiers
 		 */
 		for (Identifier identifier : p.getIdentifier()) {
-			pm.addPatientIdentifier(PatientIdentifier.fromR4(identifier));
+			pm.addBusinessIdentifier(BusinessIdentifier.fromR4(identifier));
 		}
 		pm.setUpdatedDate(p.getMeta().getLastUpdated());
 
@@ -230,8 +230,8 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 		Patient p = new Patient();
 
 		p.getMeta().setLastUpdated(pm.getUpdatedDate());
-		for (PatientIdentifier patientIdentifier : pm.getPatientIdentifiers()) {
-			p.addIdentifier(patientIdentifier.toR4());
+		for (BusinessIdentifier businessIdentifier : pm.getBusinessIdentifiers()) {
+			p.addIdentifier(businessIdentifier.toR4());
 		}
 		p.setManagingOrganization(new Reference(pm.getManagingOrganizationId()));
 		p.setBirthDate(pm.getBirthDate());

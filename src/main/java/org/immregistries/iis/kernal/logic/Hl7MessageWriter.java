@@ -112,9 +112,9 @@ public abstract class Hl7MessageWriter implements IExampleMessageWriter {
 		// PID-2
 		sb.append("|");
 		// PID-3
-		sb.append("|").append(patient.getMainPatientIdentifier().getValue()).append("^^^IIS^SR");
+		sb.append("|").append(patient.getMainBusinessIdentifier().getValue()).append("^^^IIS^SR");
 		if (patientReported != null) {
-			sb.append("~").append(patientReported.getMainPatientIdentifier().getValue()).append("^^^").append(patientReported.getMainPatientIdentifier().getSystem()).append("^").append(patientReported.getMainPatientIdentifier().getType());
+			sb.append("~").append(patientReported.getMainBusinessIdentifier().getValue()).append("^^^").append(patientReported.getMainBusinessIdentifier().getSystem()).append("^").append(patientReported.getMainBusinessIdentifier().getType());
 		}
 		// PID-4
 		sb.append("|");
@@ -299,7 +299,7 @@ public abstract class Hl7MessageWriter implements IExampleMessageWriter {
 			}
 		} else {
 			if (originalReporter) {
-				sb.append(vaccination.getExternalLink()).append("^").append(tenant.getOrganizationName());
+				sb.append(vaccination.getFillerBusinessIdentifier().getValue()).append("^").append(tenant.getOrganizationName());
 			}
 		}
 		sb.append("\r");

@@ -8,6 +8,7 @@ import org.immregistries.iis.kernal.fhir.common.annotations.OnR5Condition;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
 import org.immregistries.iis.kernal.mapping.interfaces.ImmunizationMapper;
 import org.immregistries.iis.kernal.mapping.internalClient.FhirRequesterR5;
+import org.immregistries.iis.kernal.model.BusinessIdentifier;
 import org.immregistries.iis.kernal.model.ModelPerson;
 import org.immregistries.iis.kernal.model.VaccinationMaster;
 import org.immregistries.iis.kernal.model.VaccinationReported;
@@ -30,7 +31,7 @@ public class ImmunizationMapperR5 implements ImmunizationMapper<Immunization> {
 	public VaccinationReported localObjectReportedWithMaster(Immunization i) {
 		VaccinationReported vaccinationReported = this.localObjectReported(i);
 		VaccinationMaster vaccinationMaster = fhirRequests.searchVaccinationMaster(
-			new SearchParameterMap(Immunization.SP_IDENTIFIER, new TokenParam().setValue(vaccinationReported.getExternalLink())));
+			new SearchParameterMap(Immunization.SP_IDENTIFIER, new TokenParam().setValue(vaccinationReported.getFillerBusinessIdentifier().getValue())));
 		if (vaccinationMaster!= null) {
 			vaccinationReported.setVaccination(vaccinationMaster);
 		}
@@ -45,10 +46,11 @@ public class ImmunizationMapperR5 implements ImmunizationMapper<Immunization> {
 	 * @return
 	 */
 	public void fillFromFhirResource(VaccinationMaster vr, Immunization i) {
-		vr.setVaccinationId(new IdType(i.getId()).getIdPart());
+		vr.setVaccinationId(StringUtils.defaultString(new IdType(i.getId()).getIdPart()));
 		vr.setUpdatedDate(i.getMeta().getLastUpdated());
-		vr.setExternalLink(i.getIdentifierFirstRep().getValue());
-		vr.setExternalLinkSystem(i.getIdentifierFirstRep().getSystem());
+		for (Identifier identifier : i.getIdentifier()) {
+			vr.addBusinessIdentifier(BusinessIdentifier.fromR5(identifier));
+		}
 		if (i.getPatient() != null && StringUtils.isNotBlank(i.getPatient().getReference())) {
 			vr.setPatientReported(fhirRequests.readPatientReported(i.getPatient().getReference()));
 //			vr.setPatientReported(fhirRequests.readPatientReported(i.getPatient().getReference().split("Patient/")[0]));
@@ -167,7 +169,10 @@ public VaccinationReported localObjectReported(Immunization i) {
    */
   public Immunization fhirResource(VaccinationMaster vr) {
 	  Immunization i = new Immunization();
-	  i.addIdentifier(MappingHelper.getFhirIdentifierR5(vr.getExternalLinkSystem(), vr.getExternalLink())); // TODO if system empty ?
+	  i.setId(StringUtils.defaultString(vr.getVaccinationId()));
+	  for (BusinessIdentifier businessIdentifier : vr.getBusinessIdentifiers()) {
+		  i.addIdentifier(businessIdentifier.toR5());
+	  }
 	  Reference patientReference = new Reference()
 		  .setReference("Patient/" + vr.getPatientReported().getPatientId())
 //		  .setIdentifier(new Identifier()

@@ -1,23 +1,25 @@
 package org.immregistries.iis.kernal.model;
 
-public class PatientIdentifier {
-	public static final String MRN_TYPE_SYSTEM = "http://terminology.hl7.org/CodeSystem/v2-0203";
+public class BusinessIdentifier {
+	public static final String IDENTIFIER_TYPE_SYSTEM = "http://terminology.hl7.org/CodeSystem/v2-0203";
 	public static final String MRN_TYPE_VALUE = "MR";
+	public static final String FILLER_TYPE_VALUE = "FILL";
+	public static final String PLACER_TYPE_VALUE = "PLAC";
 	private String system = "";
 	private String value = "";
 	private String type = "";
 	private String assignerReference = "";
 
-	public PatientIdentifier() {
+	public BusinessIdentifier() {
 	}
 
-	private PatientIdentifier(org.hl7.fhir.r5.model.Identifier identifierR5) {
+	private BusinessIdentifier(org.hl7.fhir.r5.model.Identifier identifierR5) {
 		system = identifierR5.getSystem();
 		value = identifierR5.getValue();
-		type = identifierR5.getType().getCode(MRN_TYPE_SYSTEM);
+		type = identifierR5.getType().getCode(IDENTIFIER_TYPE_SYSTEM);
 	}
 
-	private PatientIdentifier(org.hl7.fhir.r4.model.Identifier identifierR4) {
+	private BusinessIdentifier(org.hl7.fhir.r4.model.Identifier identifierR4) {
 		system = identifierR4.getSystem();
 		value = identifierR4.getValue();
 		type = identifierR4.getType().getCodingFirstRep().getCode();
@@ -59,7 +61,7 @@ public class PatientIdentifier {
 		org.hl7.fhir.r5.model.Identifier identifier = new org.hl7.fhir.r5.model.Identifier().setValue(value).setSystem(system);
 		if (this.getType() != null) {
 			identifier.setType(new org.hl7.fhir.r5.model.CodeableConcept(
-				new org.hl7.fhir.r5.model.Coding(MRN_TYPE_SYSTEM, MRN_TYPE_VALUE, "")));
+				new org.hl7.fhir.r5.model.Coding(IDENTIFIER_TYPE_SYSTEM, this.getType(), "")));
 		}
 		return identifier;
 	}
@@ -68,17 +70,17 @@ public class PatientIdentifier {
 		org.hl7.fhir.r4.model.Identifier identifier = new org.hl7.fhir.r4.model.Identifier().setValue(value).setSystem(system);
 		if (this.getType() != null) {
 			identifier.setType(new org.hl7.fhir.r4.model.CodeableConcept(
-				new org.hl7.fhir.r4.model.Coding(MRN_TYPE_SYSTEM, MRN_TYPE_VALUE, "")));
+				new org.hl7.fhir.r4.model.Coding(IDENTIFIER_TYPE_SYSTEM, this.getType(), "")));
 		}
 		return identifier;
 	}
 
-	public static PatientIdentifier fromR5(org.hl7.fhir.r5.model.Identifier identifier) {
-		return new PatientIdentifier(identifier);
+	public static BusinessIdentifier fromR5(org.hl7.fhir.r5.model.Identifier identifier) {
+		return new BusinessIdentifier(identifier);
 	}
 
-	public static PatientIdentifier fromR4(org.hl7.fhir.r4.model.Identifier identifier) {
-		return new PatientIdentifier(identifier);
+	public static BusinessIdentifier fromR4(org.hl7.fhir.r4.model.Identifier identifier) {
+		return new BusinessIdentifier(identifier);
 	}
 
 	@Override

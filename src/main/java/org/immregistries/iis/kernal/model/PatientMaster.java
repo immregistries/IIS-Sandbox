@@ -14,7 +14,7 @@ public class PatientMaster extends AbstractMappedObject implements Serializable 
 
 	private String patientId = "";
 	private Tenant tenant = null;
-	private List<PatientIdentifier> patientIdentifiers = new ArrayList<>(2);
+	private List<BusinessIdentifier> businessIdentifiers = new ArrayList<>(2);
 	private Date reportedDate = null;
 	private Date updatedDate = null;
 
@@ -324,51 +324,51 @@ public class PatientMaster extends AbstractMappedObject implements Serializable 
 		return this.addresses.get(0);
 	}
 
-	public List<PatientIdentifier> getPatientIdentifiers() {
-		return patientIdentifiers;
+	public List<BusinessIdentifier> getBusinessIdentifiers() {
+		return businessIdentifiers;
 	}
 
-	public void setPatientIdentifiers(List<PatientIdentifier> patientIdentifiers) {
-		this.patientIdentifiers = patientIdentifiers;
+	public void setBusinessIdentifiers(List<BusinessIdentifier> businessIdentifiers) {
+		this.businessIdentifiers = businessIdentifiers;
 	}
 
-	public void addPatientIdentifier(PatientIdentifier patientIdentifier) {
-		if (this.patientIdentifiers == null) {
-			this.patientIdentifiers = new ArrayList<>(3);
+	public void addBusinessIdentifier(BusinessIdentifier businessIdentifier) {
+		if (this.businessIdentifiers == null) {
+			this.businessIdentifiers = new ArrayList<>(3);
 		}
-		this.patientIdentifiers.add(patientIdentifier);
+		this.businessIdentifiers.add(businessIdentifier);
 	}
 
-	public PatientIdentifier getFirstPatientIdentifier() {
-		if (patientIdentifiers.isEmpty()) {
+	public BusinessIdentifier getFirstBusinessIdentifier() {
+		if (businessIdentifiers.isEmpty()) {
 			return null;
 		}
-		return this.patientIdentifiers.get(0);
+		return this.businessIdentifiers.get(0);
 	}
 
-	public PatientIdentifier getMainPatientIdentifier() {
-		PatientIdentifier identifier = null;
-		if (patientIdentifiers.isEmpty()) {
-			return new PatientIdentifier();
+	public BusinessIdentifier getMainBusinessIdentifier() {
+		BusinessIdentifier identifier = null;
+		if (businessIdentifiers.isEmpty()) {
+			return new BusinessIdentifier();
 		}
-		identifier = this.patientIdentifiers.stream()
-				.filter(patientIdentifier -> PatientIdentifier.MRN_TYPE_VALUE.equals(patientIdentifier.getType()))
+		identifier = this.businessIdentifiers.stream()
+			.filter(businessIdentifier -> BusinessIdentifier.MRN_TYPE_VALUE.equals(businessIdentifier.getType()))
 				.findFirst()
 				.orElse(null);
 		if (identifier == null) {
-			identifier = this.patientIdentifiers.stream()
-					.filter(patientIdentifier -> "PT".equals(patientIdentifier.getType()))
+			identifier = this.businessIdentifiers.stream()
+				.filter(businessIdentifier -> "PT".equals(businessIdentifier.getType()))
 					.findFirst()
 					.orElse(null);
 		}
 		if (identifier == null) {
-			identifier = this.patientIdentifiers.stream()
-					.filter(patientIdentifier -> "PI".equals(patientIdentifier.getType()))
+			identifier = this.businessIdentifiers.stream()
+				.filter(businessIdentifier -> "PI".equals(businessIdentifier.getType()))
 					.findFirst()
 					.orElse(null);
 		}
 		if (identifier == null) {
-			identifier = new PatientIdentifier();
+			identifier = new BusinessIdentifier();
 		}
 		return identifier;
 	}
@@ -378,7 +378,7 @@ public class PatientMaster extends AbstractMappedObject implements Serializable 
 		return "PatientMaster{" +
 				"patientId='" + patientId + '\'' +
 //				", tenant=" + tenant +
-				", patientIdentifiers=" + patientIdentifiers +
+			", businessIdentifiers=" + businessIdentifiers +
 //				", reportedDate=" + reportedDate +
 				", updatedDate=" + updatedDate +
 				", patientNames=" + patientNames +

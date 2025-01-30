@@ -61,7 +61,7 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 		}
 		pm.setUpdatedDate(p.getMeta().getLastUpdated());
 		for (Identifier identifier : p.getIdentifier()) {
-			pm.addPatientIdentifier(PatientIdentifier.fromR5(identifier));
+			pm.addBusinessIdentifier(BusinessIdentifier.fromR5(identifier));
 		}
 		pm.setBirthDate(p.getBirthDate());
 		pm.setManagingOrganizationId(StringUtils.defaultString(p.getManagingOrganization().getReference()));
@@ -204,8 +204,8 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 
 		p.getMeta().setLastUpdated(pm.getUpdatedDate());
 		p.setId(pm.getPatientId());
-		for (PatientIdentifier patientIdentifier : pm.getPatientIdentifiers()) {
-			p.addIdentifier(patientIdentifier.toR5());
+		for (BusinessIdentifier businessIdentifier : pm.getBusinessIdentifiers()) {
+			p.addIdentifier(businessIdentifier.toR5());
 		}
 		p.setManagingOrganization(new Reference(pm.getManagingOrganizationId()));
 		p.setBirthDate(pm.getBirthDate());

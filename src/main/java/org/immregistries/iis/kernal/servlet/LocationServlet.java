@@ -390,7 +390,7 @@ public class LocationServlet extends HttpServlet {
 		out.println("  <tbody>");
 		out.println("  <tr>");
 		out.println("    <th class=\"w3-green\">External Id (MRN)</th>");
-		out.println("    <td>" + patientReportedSelected.getMainPatientIdentifier().getValue() + "</td>");
+		out.println("    <td>" + patientReportedSelected.getMainBusinessIdentifier().getValue() + "</td>");
 		out.println("  </tr>");
 		out.println("  <tr>");
 		out.println("    <th class=\"w3-green\">Patient Name</th>");

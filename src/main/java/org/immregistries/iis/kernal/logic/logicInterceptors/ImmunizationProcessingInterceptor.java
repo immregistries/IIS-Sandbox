@@ -58,7 +58,7 @@ public class ImmunizationProcessingInterceptor extends AbstractLogicInterceptor 
 	}
 
 	public VaccinationReported processAndValidateVaccinationReported(VaccinationReported vaccinationReported, List<IisReportable> iisReportableList, Set<ProcessingFlavor> processingFlavorSet, int fundingSourceObxCount, int fundingEligibilityObxCount, int rxaCount, String vaccineCptCode) throws ProcessingException {
-//		testMapping(immunizationMapper, vaccinationReported);
+		testMapping(immunizationMapper, vaccinationReported);
 		CodeMap codeMap = CodeMapManager.getCodeMap();
 
 		Date administrationDate = vaccinationReported.getAdministeredDate();

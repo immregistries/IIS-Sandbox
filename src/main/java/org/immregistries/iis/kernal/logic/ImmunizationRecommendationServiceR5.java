@@ -37,8 +37,8 @@ public class ImmunizationRecommendationServiceR5 implements IImmunizationRecomme
 		ImmunizationRecommendation recommendation = generate(tenant, date);
 		recommendation.setPatient(new Reference()
 			.setIdentifier(new Identifier()
-					.setValue(patientReported.getMainPatientIdentifier().getValue())
-					.setSystem(patientReported.getMainPatientIdentifier().getSystem())));
+					.setValue(patientReported.getMainBusinessIdentifier().getValue())
+					.setSystem(patientReported.getMainBusinessIdentifier().getSystem())));
 
 		return recommendation;
 	}
