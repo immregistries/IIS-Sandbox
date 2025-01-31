@@ -1,5 +1,6 @@
 package org.immregistries.iis.kernal.logic.logicInterceptors;
 
+import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.interceptor.api.Hook;
 import ca.uhn.fhir.interceptor.api.Interceptor;
 import ca.uhn.fhir.rest.api.RestOperationTypeEnum;
@@ -36,6 +37,8 @@ public class ImmunizationProcessingInterceptor extends AbstractLogicInterceptor 
 
 	@Autowired
 	private ImmunizationMapper immunizationMapper;
+	@Autowired
+	private FhirContext fhirContext;
 	private Random random = new Random();
 
 	@Hook(value = SERVER_INCOMING_REQUEST_PRE_HANDLED, order = 2001)
@@ -48,6 +51,7 @@ public class ImmunizationProcessingInterceptor extends AbstractLogicInterceptor 
 		IBaseResource result = requestDetails.getResource();
 		if (requestDetails.getRestOperationType().equals(RestOperationTypeEnum.UPDATE) || requestDetails.getRestOperationType().equals(RestOperationTypeEnum.CREATE)) {
 			if (requestDetails.getResource() instanceof org.hl7.fhir.r4.model.Immunization || requestDetails.getResource() instanceof org.hl7.fhir.r5.model.Immunization) {
+				testMappingFhir(immunizationMapper, requestDetails.getResource(), fhirContext.newJsonParser());
 				VaccinationReported vaccinationReported = immunizationMapper.localObjectReported(requestDetails.getResource());
 				vaccinationReported = processAndValidateVaccinationReported(vaccinationReported, iisReportableList, processingFlavorSet, -1, -1, -1, "");
 				result = immunizationMapper.fhirResource(vaccinationReported);

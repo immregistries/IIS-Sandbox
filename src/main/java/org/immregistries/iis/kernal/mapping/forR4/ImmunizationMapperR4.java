@@ -4,7 +4,10 @@ import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
 import ca.uhn.fhir.rest.param.TokenParam;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.r4.model.*;
+import org.immregistries.codebase.client.generated.Code;
+import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
+import org.immregistries.iis.kernal.logic.CodeMapManager;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
 import org.immregistries.iis.kernal.mapping.interfaces.ImmunizationMapper;
 import org.immregistries.iis.kernal.mapping.internalClient.FhirRequesterR4;
@@ -214,50 +217,86 @@ public class ImmunizationMapperR4 implements ImmunizationMapper<Immunization> {
 		/*
 		 * Action code Status
 		 */
-		if (vr.getActionCode().equals("D")) {
-			i.setStatus(Immunization.ImmunizationStatus.ENTEREDINERROR);
-		} else {
-			switch (vr.getCompletionStatus()) {
-				case "CP": {
-					i.setStatus(Immunization.ImmunizationStatus.COMPLETED);
-					break;
-				}
-				case "NA":
-				case "PA":
-				case "RE": {
-					i.setStatus(Immunization.ImmunizationStatus.NOTDONE);
-					break;
-				}
-				case "":
-				default: {
-//					 i.setStatus(Immunization.ImmunizationStatus.NULL);
-					break;
-				}
-			}
-		}
 		if (vr.getActionCode() != null) {
 			i.addExtension().setUrl(ACTION_CODE_EXTENSION).setValue(new Coding().setCode(vr.getActionCode()).setSystem(ACTION_CODE_SYSTEM));
+			if (vr.getActionCode().equals("D")) {
+				i.setStatus(Immunization.ImmunizationStatus.ENTEREDINERROR);
+			} else {
+				switch (vr.getCompletionStatus()) {
+					case "CP": {
+						i.setStatus(Immunization.ImmunizationStatus.COMPLETED);
+						break;
+					}
+					case "NA":
+					case "PA":
+					case "RE": {
+						i.setStatus(Immunization.ImmunizationStatus.NOTDONE);
+						break;
+					}
+					case "":
+					default: {
+						//					 i.setStatus(Immunization.ImmunizationStatus.NULL);
+						break;
+					}
+				}
+			}
 		}
 		/*
 		 * Status Reason
 		 */
-		i.setStatusReason(new CodeableConcept(new Coding(REFUSAL_REASON_CODE, vr.getRefusalReasonCode(), vr.getRefusalReasonCode())));
+		if (vr.getRefusalReasonCode() != null) {
+			Coding coding = new Coding().setSystem(REFUSAL_REASON_CODE).setCode(vr.getRefusalReasonCode());
+			Code code = CodeMapManager.getCodeMap().getCodeForCodeset(CodesetType.VACCINATION_REFUSAL, vr.getRefusalReasonCode());
+			if (code != null) {
+				coding.setDisplay(code.getLabel());
+			}
+			CodeableConcept codeableConcept = new CodeableConcept(coding);
+			i.setStatusReason(codeableConcept);
+		}
 		/*
 		 * Body Part
 		 */
-		i.getSite().addCoding().setSystem(BODY_PART).setCode(vr.getBodySite());
+		if (vr.getBodySite() != null) {
+			Coding coding = new Coding().setSystem(BODY_PART).setCode(vr.getBodySite());
+			Code code = CodeMapManager.getCodeMap().getCodeForCodeset(CodesetType.BODY_SITE, vr.getBodySite());
+			if (code != null) {
+				coding.setDisplay(code.getLabel());
+			}
+			i.getSite().addCoding(coding);
+		}
 		/*
 		 * Body Route
 		 */
-		i.getRoute().addCoding().setSystem(BODY_ROUTE).setCode(vr.getBodyRoute());
+		if (vr.getBodyRoute() != null) {
+			Coding coding = new Coding().setSystem(BODY_ROUTE).setCode(vr.getBodyRoute());
+			Code code = CodeMapManager.getCodeMap().getCodeForCodeset(CodesetType.BODY_ROUTE, vr.getBodyRoute());
+			if (code != null) {
+				coding.setDisplay(code.getLabel());
+			}
+			i.getRoute().addCoding(coding);
+		}
 		/*
 		 * Funding Source
 		 */
-		i.getFundingSource().addCoding().setSystem(FUNDING_SOURCE).setCode(vr.getFundingSource());
+		if (vr.getFundingSource() != null) {
+			Coding coding = new Coding().setSystem(FUNDING_SOURCE).setCode(vr.getFundingSource());
+			Code code = CodeMapManager.getCodeMap().getCodeForCodeset(CodesetType.VACCINATION_FUNDING_SOURCE, vr.getFundingSource());
+			if (code != null) {
+				coding.setDisplay(code.getLabel());
+			}
+			i.getFundingSource().addCoding(coding);
+		}
 		/*
 		 * Program Funding Eligibility
 		 */
-		i.addProgramEligibility().addCoding().setSystem(FUNDING_ELIGIBILITY).setCode(vr.getFundingEligibility());
+		if (vr.getFundingEligibility() != null) {
+			Coding coding = new Coding().setSystem(FUNDING_ELIGIBILITY).setCode(vr.getFundingEligibility());
+			Code code = CodeMapManager.getCodeMap().getCodeForCodeset(CodesetType.FINANCIAL_STATUS_CODE, vr.getFundingEligibility());
+			if (code != null) {
+				coding.setDisplay(code.getLabel());
+			}
+			i.addProgramEligibility().addCoding(coding);
+		}
 		/*
 		 * Location
 		 */
@@ -268,7 +307,12 @@ public class ImmunizationMapperR4 implements ImmunizationMapper<Immunization> {
 		 * Information Source / Report Origin
 		 */
 		if (vr.getInformationSource() != null) {
-			i.setReportOrigin(new CodeableConcept(new Coding().setSystem(INFORMATION_SOURCE).setCode(vr.getInformationSource())));
+			Coding coding = new Coding().setSystem(INFORMATION_SOURCE).setCode(vr.getInformationSource());
+			Code code = CodeMapManager.getCodeMap().getCodeForCodeset(CodesetType.VACCINATION_INFORMATION_SOURCE, vr.getInformationSource());
+			if (code != null) {
+				coding.setDisplay(code.getLabel());
+			}
+			i.setReportOrigin(new CodeableConcept(coding));
 		}
 		/*
 		 * Entering Performer

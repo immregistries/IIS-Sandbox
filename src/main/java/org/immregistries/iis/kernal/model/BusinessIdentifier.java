@@ -1,8 +1,6 @@
 package org.immregistries.iis.kernal.model;
 
 
-import org.apache.commons.lang3.StringUtils;
-
 public class BusinessIdentifier {
 	public static final String IDENTIFIER_TYPE_SYSTEM = "http://terminology.hl7.org/CodeSystem/v2-0203";
 	public static final String MRN_TYPE_VALUE = "MR";
@@ -22,13 +20,13 @@ public class BusinessIdentifier {
 	private BusinessIdentifier(org.hl7.fhir.r5.model.Identifier identifierR5) {
 		system = identifierR5.getSystem();
 		value = identifierR5.getValue();
-		type = StringUtils.defaultString(identifierR5.getType().getCode(IDENTIFIER_TYPE_SYSTEM));
+		type = identifierR5.getType().getCode(IDENTIFIER_TYPE_SYSTEM);
 	}
 
 	private BusinessIdentifier(org.hl7.fhir.r4.model.Identifier identifierR4) {
 		system = identifierR4.getSystem();
 		value = identifierR4.getValue();
-		type = StringUtils.defaultString(identifierR4.getType().getCodingFirstRep().getCode());
+		type = identifierR4.getType().getCodingFirstRep().getCode();
 	}
 
 	public String getSystem() {
