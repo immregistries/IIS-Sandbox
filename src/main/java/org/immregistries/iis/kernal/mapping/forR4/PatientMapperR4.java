@@ -405,11 +405,7 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 		 */
 		for (PatientGuardian patientGuardian : pm.getPatientGuardians()) {
 			Patient.ContactComponent contact = p.addContact();
-			HumanName contactName = new HumanName();
-			contact.setName(contactName);
-			contactName.setFamily(patientGuardian.getName().getNameLast());
-			contactName.addGivenElement().setValue(patientGuardian.getName().getNameFirst());
-			contactName.addGivenElement().setValue(patientGuardian.getName().getNameMiddle());
+			contact.setName(patientGuardian.getName().toR4());
 			Coding coding = new Coding().setSystem(RELATIONSHIP_SYSTEM).setCode(patientGuardian.getGuardianRelationship());
 			Code code = CodeMapManager.getCodeMap().getCodeForCodeset(CodesetType.PERSON_RELATIONSHIP, patientGuardian.getGuardianRelationship());
 			if (code != null) {
