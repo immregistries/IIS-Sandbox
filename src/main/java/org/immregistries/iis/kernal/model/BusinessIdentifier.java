@@ -11,6 +11,9 @@ public class BusinessIdentifier {
 	private String system = "";
 	private String value = "";
 	private String type = "";
+	/**
+	 * Currently unused
+	 */
 	private String assignerReference = "";
 
 	public BusinessIdentifier() {

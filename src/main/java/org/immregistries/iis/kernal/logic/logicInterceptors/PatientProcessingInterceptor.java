@@ -59,7 +59,7 @@ public class PatientProcessingInterceptor extends AbstractLogicInterceptor {
 	}
 
 	public PatientReported processAndValidatePatient(PatientReported patientReported, List<IisReportable> iisReportableList, Set<ProcessingFlavor> processingFlavorSet) throws ProcessingException {
-//		testMapping(patientMapper, patientReported);
+		testMapping(patientMapper, patientReported);
 		PatientName legalName = null;
 		List<PatientName> patientNames = new ArrayList<>(patientReported.getPatientNames().size());
 		for (int i = 0; i < patientReported.getPatientNames().size(); i++) {

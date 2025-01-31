@@ -1,5 +1,7 @@
 package org.immregistries.iis.kernal.model;
 
+import org.apache.commons.lang3.StringUtils;
+
 public class PatientPhone {
 	public static final String PHONE_USE_V2_SYSTEM = "http://terminology.hl7.org/ValueSet/v2-0201";
 	public static final String USE_EXTENSION_URL = "use";
@@ -9,7 +11,7 @@ public class PatientPhone {
 	private PatientPhone(org.hl7.fhir.r4.model.ContactPoint contactPoint) {
 		number = contactPoint.getValue();
 		if (contactPoint.hasExtension(USE_EXTENSION_URL)) {
-			use = ((org.hl7.fhir.r4.model.Coding) contactPoint.getExtensionByUrl(USE_EXTENSION_URL).getValue()).getCode();
+			use = StringUtils.defaultString(((org.hl7.fhir.r4.model.Coding) contactPoint.getExtensionByUrl(USE_EXTENSION_URL).getValue()).getCode());
 		} else if (contactPoint.getUse() != null) {
 			use = contactPoint.getUse().toCode();
 		}
@@ -18,7 +20,7 @@ public class PatientPhone {
 	private PatientPhone(org.hl7.fhir.r5.model.ContactPoint contactPoint) {
 		number = contactPoint.getValue();
 		if (contactPoint.hasExtension(USE_EXTENSION_URL)) {
-			use = ((org.hl7.fhir.r5.model.Coding) contactPoint.getExtensionByUrl(USE_EXTENSION_URL).getValue()).getCode();
+			use = StringUtils.defaultString(((org.hl7.fhir.r5.model.Coding) contactPoint.getExtensionByUrl(USE_EXTENSION_URL).getValue()).getCode());
 		} else if (contactPoint.getUse() != null) {
 			use = contactPoint.getUse().toCode();
 		}
@@ -73,7 +75,7 @@ public class PatientPhone {
 					break;
 				}
 			}
-			contactPoint.addExtension(USE_EXTENSION_URL, new org.hl7.fhir.r4.model.Coding().setSystem(PHONE_USE_V2_SYSTEM).setCode(use));
+			contactPoint.addExtension(USE_EXTENSION_URL, new org.hl7.fhir.r4.model.Coding().setSystem(PHONE_USE_V2_SYSTEM).setCode(StringUtils.defaultString(use)));
 		}
 		return contactPoint;
 	}
@@ -106,7 +108,7 @@ public class PatientPhone {
 					break;
 				}
 			}
-			contactPoint.addExtension(USE_EXTENSION_URL, new org.hl7.fhir.r5.model.Coding().setSystem(PHONE_USE_V2_SYSTEM).setCode(use));
+			contactPoint.addExtension(USE_EXTENSION_URL, new org.hl7.fhir.r5.model.Coding().setSystem(PHONE_USE_V2_SYSTEM).setCode(StringUtils.defaultString(use)));
 		}
 		return contactPoint;
 	}
