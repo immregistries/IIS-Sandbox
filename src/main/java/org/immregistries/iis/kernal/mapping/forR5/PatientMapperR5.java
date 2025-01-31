@@ -59,25 +59,44 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 		if (StringUtils.isNotBlank(p.getId())) {
 			pm.setPatientId(new IdType(p.getId()).getIdPart());
 		}
+		/*
+		 * Updated date
+		 */
 		pm.setUpdatedDate(p.getMeta().getLastUpdated());
+		/*
+		 * Identifiers
+		 */
 		for (Identifier identifier : p.getIdentifier()) {
 			pm.addBusinessIdentifier(BusinessIdentifier.fromR5(identifier));
 		}
+		/*
+		 * Birth Date
+		 */
 		pm.setBirthDate(p.getBirthDate());
+		/*
+		 * Managing organization
+		 */
 		pm.setManagingOrganizationId(StringUtils.defaultString(p.getManagingOrganization().getReference()));
 		/*
-		Name
+		 * Names
 		 */
 		List<PatientName> patientNames = new ArrayList<>(p.getName().size());
 		pm.setPatientNames(patientNames);
 		for (HumanName name : p.getName()) {
 			patientNames.add(PatientName.fromR5(name));
 		}
-
+		/*
+		 * Mother Maiden name
+		 */
 		if (p.hasExtension(MOTHER_MAIDEN_NAME)) {
 			Extension motherMaiden = p.getExtensionByUrl(MOTHER_MAIDEN_NAME);
 			pm.setMotherMaidenName(motherMaiden.getValue().toString());
+		} else {
+			pm.setMotherMaidenName(null);
 		}
+		/*
+		 * Gender
+		 */
 		switch (p.getGender()) {
 			case MALE:
 				pm.setSex(MALE_SEX);
@@ -90,7 +109,9 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 				pm.setSex("");
 				break;
 		}
-
+		/*
+		 * Races
+		 */
 		Extension raceExtension = p.getExtensionByUrl(RACE_EXTENSION);
 		if (raceExtension != null) {
 			for (Iterator<Extension> it = Stream.concat(raceExtension.getExtensionsByUrl(RACE_EXTENSION_OMB).stream(), raceExtension.getExtensionsByUrl(RACE_EXTENSION_DETAILED).stream()).iterator(); it.hasNext(); ) {
@@ -101,6 +122,9 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 				}
 			}
 		}
+		/*
+		 * Ethnicity
+		 */
 		Extension ethnicityExtension = p.getExtensionByUrl(ETHNICITY_EXTENSION);
 		if (ethnicityExtension != null) {
 			Extension ombExtension = ethnicityExtension.getExtensionByUrl(ETHNICITY_EXTENSION_OMB);
@@ -110,9 +134,12 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 			} else if (detailedExtension != null) {
 				pm.setEthnicity(MappingHelper.extensionGetCoding(detailedExtension).getCode());
 			}
+		} else {
+			pm.setEthnicity(null);
 		}
-
-
+		/*
+		 * Phone email
+		 */
 		for (ContactPoint telecom : p.getTelecom()) {
 			if (null != telecom.getSystem()) {
 				if (telecom.getSystem().equals(ContactPointSystem.PHONE)) {
@@ -122,7 +149,9 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 				}
 			}
 		}
-
+		/*
+		 * Deceased
+		 */
 		if (null != p.getDeceased()) {
 			if (p.getDeceased().isBooleanPrimitive()) {
 				if (p.getDeceasedBooleanType().booleanValue()) {
@@ -136,12 +165,14 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 			}
 		}
 		/*
-		Addresses
+		 * Addresses
 		 */
 		for (Address address : p.getAddress()) {
 			pm.addAddress(PatientAddress.fromR5(address));
 		}
-
+		/*
+		 * Multiple birth
+		 */
 		if (null != p.getMultipleBirth()) {
 			if (p.getMultipleBirth().isBooleanPrimitive()) {
 				if (p.getMultipleBirthBooleanType().booleanValue()) {
@@ -153,7 +184,9 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 				pm.setBirthOrder(String.valueOf(p.getMultipleBirthIntegerType()));
 			}
 		}
-
+		/*
+		 * Publicity indicator
+		 */
 		if (p.hasExtension(PUBLICITY_EXTENSION)) {
 			Extension publicity = p.getExtensionByUrl(PUBLICITY_EXTENSION);
 			Coding value = MappingHelper.extensionGetCoding(publicity);
@@ -164,7 +197,12 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 				} catch (ParseException ignored) {
 				}
 			}
+		} else {
+			pm.setPublicityIndicator(null);
 		}
+		/*
+		 * Protection
+		 */
 		if (p.hasExtension(PROTECTION_EXTENSION)) {
 			Extension protection = p.getExtensionByUrl(PROTECTION_EXTENSION);
 			Coding value = MappingHelper.extensionGetCoding(protection);
@@ -175,7 +213,12 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 				} catch (ParseException ignored) {
 				}
 			}
+		} else {
+			pm.setProtectionIndicator(null);
 		}
+		/*
+		 * Registry status
+		 */
 		if (p.hasExtension(REGISTRY_STATUS_EXTENSION)) {
 			Extension registry = p.getExtensionByUrl(REGISTRY_STATUS_EXTENSION);
 			Coding value = MappingHelper.extensionGetCoding(registry);
@@ -186,6 +229,8 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 				} catch (ParseException ignored) {
 				}
 			}
+		} else {
+			pm.setRegistryStatusIndicator(null);
 		}
 
 		/*

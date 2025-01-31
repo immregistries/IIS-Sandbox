@@ -55,14 +55,22 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 			pm.setPatientId(new IdType(p.getId()).getIdPart());
 		}
 		/*
+		 * Updated date
+		 */
+		pm.setUpdatedDate(p.getMeta().getLastUpdated());
+		/*
 		 * Identifiers
 		 */
 		for (Identifier identifier : p.getIdentifier()) {
 			pm.addBusinessIdentifier(BusinessIdentifier.fromR4(identifier));
 		}
-		pm.setUpdatedDate(p.getMeta().getLastUpdated());
-
+		/*
+		 * Birth Date
+		 */
 		pm.setBirthDate(p.getBirthDate());
+		/*
+		 * Managing organization
+		 */
 		pm.setManagingOrganizationId(StringUtils.defaultString(p.getManagingOrganization().getReference()));
 		/*
 		 * Names
@@ -72,10 +80,14 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 		for (HumanName name : p.getName()) {
 			patientNames.add(PatientName.fromR4(name));
 		}
-
+		/*
+		 * Mother Maiden name
+		 */
 		Extension motherMaiden = p.getExtensionByUrl(MOTHER_MAIDEN_NAME);
 		if (motherMaiden != null) {
 			pm.setMotherMaidenName(motherMaiden.getValue().toString());
+		} else {
+			pm.setMotherMaidenName(null);
 		}
 		/*
 		 * Gender
@@ -92,7 +104,6 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 				pm.setSex("");
 				break;
 		}
-
 		/*
 		 * Races
 		 */
@@ -118,8 +129,9 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 			} else if (detailedExtension != null) {
 				pm.setEthnicity(MappingHelper.extensionGetCoding(detailedExtension).getCode());
 			}
+		} else {
+			pm.setEthnicity(null);
 		}
-
 		/*
 		 * Phone email
 		 */
@@ -132,7 +144,6 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 				}
 			}
 		}
-
 		/*
 		 * Deceased
 		 */
@@ -148,14 +159,12 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 				pm.setDeathDate(p.getDeceasedDateTimeType().getValue());
 			}
 		}
-
 		/*
 		 * Addresses
 		 */
 		for (Address address : p.getAddress()) {
 			pm.addAddress(PatientAddress.fromR4(address));
 		}
-
 		/*
 		 * Multiple birth
 		 */
@@ -170,9 +179,8 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 				pm.setBirthOrder(String.valueOf(p.getMultipleBirthIntegerType()));
 			}
 		}
-
 		/*
-		 * Publicity
+		 * Publicity indicator
 		 */
 		Extension publicity = p.getExtensionByUrl(PUBLICITY_EXTENSION);
 		if (publicity != null) {
@@ -184,6 +192,8 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 				} catch (ParseException ignored) {
 				}
 			}
+		} else {
+			pm.setPublicityIndicator(null);
 		}
 		/*
 		 * Protection
@@ -198,6 +208,8 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 				} catch (ParseException ignored) {
 				}
 			}
+		} else {
+			pm.setProtectionIndicator(null);
 		}
 		/*
 		 * Registry status
@@ -212,8 +224,9 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 				} catch (ParseException ignored) {
 				}
 			}
+		} else {
+			pm.setRegistryStatusIndicator(null);
 		}
-
 		/*
 		 * Patient Contact / Guardian
 		 */
