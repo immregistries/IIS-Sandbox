@@ -40,202 +40,198 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 		return patientReported;
 	}
 
-	public PatientReported localObjectReported(Patient patient) {
-		PatientReported patientReported = new PatientReported();
-		fillFromFhirResource(patientReported, patient);
-		return patientReported;
-	}
-
 	public PatientMaster localObject(Patient patient) {
 		return localObjectReported(patient);
 	}
 
-	private void fillFromFhirResource(PatientMaster pm, Patient p) {
-		if (StringUtils.isNotBlank(p.getId())) {
-			pm.setPatientId(new IdType(p.getId()).getIdPart());
+	public PatientReported localObjectReported(Patient patient) {
+		PatientReported patientReported = new PatientReported();
+		if (StringUtils.isNotBlank(patient.getId())) {
+			patientReported.setPatientId(new IdType(patient.getId()).getIdPart());
 		}
 		/*
 		 * Updated date
 		 */
-		pm.setUpdatedDate(p.getMeta().getLastUpdated());
+		patientReported.setUpdatedDate(patient.getMeta().getLastUpdated());
 		/*
 		 * Identifiers
 		 */
-		for (Identifier identifier : p.getIdentifier()) {
-			pm.addBusinessIdentifier(BusinessIdentifier.fromR4(identifier));
+		for (Identifier identifier : patient.getIdentifier()) {
+			patientReported.addBusinessIdentifier(BusinessIdentifier.fromR4(identifier));
 		}
 		/*
 		 * Birth Date
 		 */
-		pm.setBirthDate(p.getBirthDate());
+		patientReported.setBirthDate(patient.getBirthDate());
 		/*
 		 * Managing organization
 		 */
-		pm.setManagingOrganizationId(StringUtils.defaultString(p.getManagingOrganization().getReference()));
+		patientReported.setManagingOrganizationId(StringUtils.defaultString(patient.getManagingOrganization().getReference()));
 		/*
 		 * Names
 		 */
-		List<PatientName> patientNames = new ArrayList<>(p.getName().size());
-		pm.setPatientNames(patientNames);
-		for (HumanName name : p.getName()) {
+		List<PatientName> patientNames = new ArrayList<>(patient.getName().size());
+		patientReported.setPatientNames(patientNames);
+		for (HumanName name : patient.getName()) {
 			patientNames.add(PatientName.fromR4(name));
 		}
 		/*
 		 * Mother Maiden name
 		 */
-		Extension motherMaiden = p.getExtensionByUrl(MOTHER_MAIDEN_NAME);
+		Extension motherMaiden = patient.getExtensionByUrl(MOTHER_MAIDEN_NAME);
 		if (motherMaiden != null) {
-			pm.setMotherMaidenName(motherMaiden.getValue().toString());
+			patientReported.setMotherMaidenName(motherMaiden.getValue().toString());
 		} else {
-			pm.setMotherMaidenName(null);
+			patientReported.setMotherMaidenName(null);
 		}
 		/*
 		 * Gender
 		 */
-		switch (p.getGender()) {
+		switch (patient.getGender()) {
 			case MALE:
-				pm.setSex(MALE_SEX);
+				patientReported.setSex(MALE_SEX);
 				break;
 			case FEMALE:
-				pm.setSex(FEMALE_SEX);
+				patientReported.setSex(FEMALE_SEX);
 				break;
 			case OTHER:
 			default:
-				pm.setSex("");
+				patientReported.setSex("");
 				break;
 		}
 		/*
 		 * Races
 		 */
-		Extension raceExtension = p.getExtensionByUrl(RACE_EXTENSION);
+		Extension raceExtension = patient.getExtensionByUrl(RACE_EXTENSION);
 		if (raceExtension != null) {
 			for (Iterator<Extension> it = Stream.concat(raceExtension.getExtensionsByUrl(RACE_EXTENSION_OMB).stream(), raceExtension.getExtensionsByUrl(RACE_EXTENSION_DETAILED).stream()).iterator(); it.hasNext(); ) {
 				Extension ext = it.next();
 				Coding coding = MappingHelper.extensionGetCoding(ext);
-				if (!pm.getRaces().contains(coding.getCode())) {
-					pm.addRace(StringUtils.defaultString(coding.getCode()));
+				if (!patientReported.getRaces().contains(coding.getCode())) {
+					patientReported.addRace(StringUtils.defaultString(coding.getCode()));
 				}
 			}
 		}
 		/*
 		 * Ethnicity
 		 */
-		Extension ethnicityExtension = p.getExtensionByUrl(ETHNICITY_EXTENSION);
+		Extension ethnicityExtension = patient.getExtensionByUrl(ETHNICITY_EXTENSION);
 		if (ethnicityExtension != null) {
 			Extension ombExtension = ethnicityExtension.getExtensionByUrl(ETHNICITY_EXTENSION_OMB);
 			Extension detailedExtension = ethnicityExtension.getExtensionByUrl(ETHNICITY_EXTENSION_DETAILED);
 			if (ombExtension != null) {
-				pm.setEthnicity(MappingHelper.extensionGetCoding(ombExtension).getCode());
+				patientReported.setEthnicity(MappingHelper.extensionGetCoding(ombExtension).getCode());
 			} else if (detailedExtension != null) {
-				pm.setEthnicity(MappingHelper.extensionGetCoding(detailedExtension).getCode());
+				patientReported.setEthnicity(MappingHelper.extensionGetCoding(detailedExtension).getCode());
 			}
 		} else {
-			pm.setEthnicity(null);
+			patientReported.setEthnicity(null);
 		}
 		/*
 		 * Phone email
 		 */
-		for (ContactPoint telecom : p.getTelecom()) {
+		for (ContactPoint telecom : patient.getTelecom()) {
 			if (null != telecom.getSystem()) {
 				if (telecom.getSystem().equals(ContactPoint.ContactPointSystem.PHONE)) {
-					pm.addPhone(PatientPhone.fromR4(telecom));
+					patientReported.addPhone(PatientPhone.fromR4(telecom));
 				} else if (telecom.getSystem().equals(ContactPoint.ContactPointSystem.EMAIL)) {
-					pm.setEmail(StringUtils.defaultString(telecom.getValue()));
+					patientReported.setEmail(StringUtils.defaultString(telecom.getValue()));
 				}
 			}
 		}
 		/*
 		 * Deceased
 		 */
-		if (null != p.getDeceased()) {
-			if (p.getDeceased().isBooleanPrimitive()) {
-				if (p.getDeceasedBooleanType().booleanValue()) {
-					pm.setDeathFlag(YES);
+		if (null != patient.getDeceased()) {
+			if (patient.getDeceased().isBooleanPrimitive()) {
+				if (patient.getDeceasedBooleanType().booleanValue()) {
+					patientReported.setDeathFlag(YES);
 				} else {
-					pm.setDeathFlag(NO);
+					patientReported.setDeathFlag(NO);
 				}
 			}
-			if (p.getDeceased().isDateTime()) {
-				pm.setDeathDate(p.getDeceasedDateTimeType().getValue());
+			if (patient.getDeceased().isDateTime()) {
+				patientReported.setDeathDate(patient.getDeceasedDateTimeType().getValue());
 			}
 		}
 		/*
 		 * Addresses
 		 */
-		for (Address address : p.getAddress()) {
-			pm.addAddress(PatientAddress.fromR4(address));
+		for (Address address : patient.getAddress()) {
+			patientReported.addAddress(PatientAddress.fromR4(address));
 		}
 		/*
 		 * Multiple birth
 		 */
-		if (null != p.getMultipleBirth()) {
-			if (p.getMultipleBirth().isBooleanPrimitive()) {
-				if (p.getMultipleBirthBooleanType().booleanValue()) {
-					pm.setBirthFlag(YES);
+		if (null != patient.getMultipleBirth()) {
+			if (patient.getMultipleBirth().isBooleanPrimitive()) {
+				if (patient.getMultipleBirthBooleanType().booleanValue()) {
+					patientReported.setBirthFlag(YES);
 				} else {
-					pm.setBirthFlag(NO);
+					patientReported.setBirthFlag(NO);
 				}
 			} else {
-				pm.setBirthOrder(String.valueOf(p.getMultipleBirthIntegerType()));
+				patientReported.setBirthOrder(String.valueOf(patient.getMultipleBirthIntegerType()));
 			}
 		}
 		/*
 		 * Publicity indicator
 		 */
-		Extension publicity = p.getExtensionByUrl(PUBLICITY_EXTENSION);
+		Extension publicity = patient.getExtensionByUrl(PUBLICITY_EXTENSION);
 		if (publicity != null) {
 			Coding value = MappingHelper.extensionGetCoding(publicity);
-			pm.setPublicityIndicator(StringUtils.defaultString(value.getCode()));
+			patientReported.setPublicityIndicator(StringUtils.defaultString(value.getCode()));
 			if (StringUtils.isNotBlank(value.getVersion())) {
 				try {
-					pm.setPublicityIndicatorDate(MappingHelper.sdf.parse(value.getVersion()));
+					patientReported.setPublicityIndicatorDate(MappingHelper.sdf.parse(value.getVersion()));
 				} catch (ParseException ignored) {
 				}
 			}
 		} else {
-			pm.setPublicityIndicator(null);
+			patientReported.setPublicityIndicator(null);
 		}
 		/*
 		 * Protection
 		 */
-		Extension protection = p.getExtensionByUrl(PROTECTION_EXTENSION);
+		Extension protection = patient.getExtensionByUrl(PROTECTION_EXTENSION);
 		if (protection != null) {
 			Coding value = MappingHelper.extensionGetCoding(protection);
-			pm.setProtectionIndicator(StringUtils.defaultString(value.getCode()));
+			patientReported.setProtectionIndicator(StringUtils.defaultString(value.getCode()));
 			if (StringUtils.isNotBlank(value.getVersion())) {
 				try {
-					pm.setProtectionIndicatorDate(MappingHelper.sdf.parse(value.getVersion()));
+					patientReported.setProtectionIndicatorDate(MappingHelper.sdf.parse(value.getVersion()));
 				} catch (ParseException ignored) {
 				}
 			}
 		} else {
-			pm.setProtectionIndicator(null);
+			patientReported.setProtectionIndicator(null);
 		}
 		/*
 		 * Registry status
 		 */
-		Extension registry = p.getExtensionByUrl(REGISTRY_STATUS_EXTENSION);
+		Extension registry = patient.getExtensionByUrl(REGISTRY_STATUS_EXTENSION);
 		if (registry != null) {
 			Coding value = MappingHelper.extensionGetCoding(registry);
-			pm.setRegistryStatusIndicator(StringUtils.defaultString(value.getCode()));
+			patientReported.setRegistryStatusIndicator(StringUtils.defaultString(value.getCode()));
 			if (StringUtils.isNotBlank(value.getVersion())) {
 				try {
-					pm.setRegistryStatusIndicatorDate(MappingHelper.sdf.parse(value.getVersion()));
+					patientReported.setRegistryStatusIndicatorDate(MappingHelper.sdf.parse(value.getVersion()));
 				} catch (ParseException ignored) {
 				}
 			}
 		} else {
-			pm.setRegistryStatusIndicator(null);
+			patientReported.setRegistryStatusIndicator(null);
 		}
 		/*
 		 * Patient Contact / Guardian
 		 */
-		for (Patient.ContactComponent contactComponent : p.getContact()) {
+		for (Patient.ContactComponent contactComponent : patient.getContact()) {
 			PatientGuardian patientGuardian = new PatientGuardian();
 			patientGuardian.setName(PatientName.fromR4(contactComponent.getName()));
 			patientGuardian.setGuardianRelationship(contactComponent.getRelationshipFirstRep().getCodingFirstRep().getCode());
-			pm.addPatientGuardian(patientGuardian);
+			patientReported.addPatientGuardian(patientGuardian);
 		}
+		return patientReported;
 	}
 
 
@@ -296,6 +292,9 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 				if (StringUtils.isNotBlank(value)) {
 					Coding coding = new Coding().setCode(value).setSystem(RACE_SYSTEM);
 					Code code = CodeMapManager.getCodeMap().getCodeForCodeset(CodesetType.PATIENT_RACE, value);
+					/*
+					 * Added to OMB extension if code recognised
+					 */
 					if (code != null) {
 						coding.setDisplay(code.getLabel());
 						raceExtension.addExtension(RACE_EXTENSION_OMB, coding);
@@ -315,6 +314,9 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 			if (StringUtils.isNotBlank(pm.getEthnicity())) {
 				Coding coding = new Coding().setCode(pm.getEthnicity()).setSystem(ETHNICITY_SYSTEM);
 				Code code = CodeMapManager.getCodeMap().getCodeForCodeset(CodesetType.PATIENT_ETHNICITY, pm.getEthnicity());
+				/*
+				 * Added to OMB extension if code recognised
+				 */
 				if (code != null) {
 					coding.setDisplay(code.getLabel());
 					ethnicityExtension.addExtension(ETHNICITY_EXTENSION_OMB, coding);
