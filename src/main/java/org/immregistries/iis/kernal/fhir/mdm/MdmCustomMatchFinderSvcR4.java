@@ -78,7 +78,6 @@ public class MdmCustomMatchFinderSvcR4 extends MdmMatchFinderSvcImpl implements 
 	@Nonnull
 	@Transactional
 	public List<MatchedTarget> getMatchedTargets(String theResourceType, IAnyResource theResource, RequestPartitionId theRequestPartitionId) {
-		ourLog.info("getMatchedTargets called {} {}", theResourceType, theResource.fhirType());
 		Set<ProcessingFlavor> processingFlavorSet = ProcessingFlavor.getProcessingStyle(theRequestPartitionId.getFirstPartitionNameOrNull());
 		if (theResourceType.equals(ResourceType.Immunization.name())) {
 			List<MatchedTarget> matches = matchImmunization((Immunization) theResource, theRequestPartitionId);

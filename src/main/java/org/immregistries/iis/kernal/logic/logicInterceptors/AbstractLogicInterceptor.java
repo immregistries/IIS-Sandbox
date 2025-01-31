@@ -42,10 +42,10 @@ public abstract class AbstractLogicInterceptor {
 	protected boolean testMapping(IisFhirMapperMasterReported mapper, AbstractMappedObject abstractMappedObject) {
 		IBaseResource resource = mapper.fhirResource(abstractMappedObject);
 		AbstractMappedObject abstractMappedObject1 = mapper.localObjectReported(resource);
-		logger.info("original {}", abstractMappedObject);
-		logger.info("mapped {}", abstractMappedObject1);
 		boolean res = abstractMappedObject.toString().equals(abstractMappedObject1.toString());
-		logger.info("comparison {} {}", res, abstractMappedObject.toString().compareTo(abstractMappedObject1.toString()));
+		if (!res) {
+			logger.info("Object Mapping check failed {}\n\n{}", abstractMappedObject, abstractMappedObject1);
+		}
 		return res;
 	}
 
