@@ -101,7 +101,7 @@ public class ImmunizationMapperR4 implements ImmunizationMapper<Immunization> {
 		}
 		Extension actionCode = i.getExtensionByUrl(ACTION_CODE_EXTENSION);
 		if (actionCode != null && actionCode.hasValue()) {
-			vr.setActionCode(MappingHelper.extensionGetCoding(actionCode).getCode());
+			vr.setActionCode(StringUtils.defaultString(MappingHelper.extensionGetCoding(actionCode).getCode()));
 		}
 		vr.setRefusalReasonCode(StringUtils.defaultString(i.getStatusReason().getCodingFirstRep().getCode()));
 		vr.setBodySite(StringUtils.defaultString(i.getSite().getCodingFirstRep().getCode()));
@@ -211,7 +211,7 @@ public class ImmunizationMapperR4 implements ImmunizationMapper<Immunization> {
 				}
 			}
 		}
-		Extension actionCode = i.addExtension().setUrl(ACTION_CODE_EXTENSION).setValue(new Coding().setCode(vr.getActionCode()).setSystem(ACTION_CODE_SYSTEM));
+		Extension actionCode = i.addExtension().setUrl(ACTION_CODE_EXTENSION).setValue(new Coding().setCode(StringUtils.defaultString(vr.getActionCode())).setSystem(ACTION_CODE_SYSTEM));
 		i.setStatusReason(new CodeableConcept(new Coding(REFUSAL_REASON_CODE, vr.getRefusalReasonCode(), vr.getRefusalReasonCode())));
 		i.getSite().addCoding().setSystem(BODY_PART).setCode(vr.getBodySite());
 		i.getRoute().addCoding().setSystem(BODY_ROUTE).setCode(vr.getBodyRoute());

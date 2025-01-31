@@ -183,7 +183,8 @@ public class PatientServlet  {
 				}
 				out.println("  <div class=\"w3-container\">");
 				{
-					List<VaccinationMaster> vaccinationList = fhirRequester.searchVaccinationListOperationEverything(patientMasterSelected.getPatientId());
+//					List<VaccinationMaster> vaccinationList = fhirRequester.searchVaccinationListOperationEverything(patientMasterSelected.getPatientId());
+					List<VaccinationMaster> vaccinationList = fhirRequester.searchVaccinationMasterGoldenList(new SearchParameterMap().add("patient", new ReferenceParam().setValue(patientMasterSelected.getPatientId())));
 					out.println("<h4>Vaccinations</h4>");
 					printVaccinationList(out, vaccinationList);
 				}

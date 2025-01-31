@@ -93,6 +93,18 @@ public class FhirRequesterR5 extends FhirRequester<Patient, Immunization, Locati
 		return vaccinationReported;
 	}
 
+	public List<VaccinationMaster> searchVaccinationMasterGoldenList(SearchParameterMap searchParameterMap) {
+		List<VaccinationMaster> vaccinationMasterList = new ArrayList<>();
+		IBundleProvider bundleProvider = searchGoldenRecord(Immunization.class, searchParameterMap);
+		if (!bundleProvider.isEmpty()) {
+			for (IBaseResource resource : bundleProvider.getAllResources()) {
+				vaccinationMasterList.add(immunizationMapper.localObject((Immunization) resource));
+			}
+		}
+		return vaccinationMasterList;
+	}
+
+
 	public Organization searchOrganization(SearchParameterMap searchParameterMap) {
 		Organization organization = null;
 		IBundleProvider bundleProvider = search(Organization.class, searchParameterMap);

@@ -42,6 +42,8 @@ public interface IFhirRequester<
 
 	List<VaccinationReported> searchVaccinationReportedList(SearchParameterMap searchParameterMap);
 
+	List<VaccinationMaster> searchVaccinationMasterGoldenList(SearchParameterMap searchParameterMap);
+
 	List<VaccinationMaster> searchVaccinationListOperationEverything(String patientId);
 
 	ObservationReported searchObservationReported(SearchParameterMap searchParameterMap);
