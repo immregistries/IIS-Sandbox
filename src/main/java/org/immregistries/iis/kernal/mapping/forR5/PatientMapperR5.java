@@ -201,20 +201,40 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 
 	public Patient fhirResource(PatientMaster pm) {
 		Patient p = new Patient();
-
-		p.getMeta().setLastUpdated(pm.getUpdatedDate());
 		p.setId(pm.getPatientId());
+		/*
+		 * Updated Date
+		 */
+		p.getMeta().setLastUpdated(pm.getUpdatedDate());
+		/*
+		 * Business Identifiers
+		 */
 		for (BusinessIdentifier businessIdentifier : pm.getBusinessIdentifiers()) {
 			p.addIdentifier(businessIdentifier.toR5());
 		}
+		/*
+		 * Managing Organization
+		 */
 		p.setManagingOrganization(new Reference(pm.getManagingOrganizationId()));
+		/*
+		 * Birth Date
+		 */
 		p.setBirthDate(pm.getBirthDate());
+		/*
+		 * Names
+		 */
 		for (PatientName patientName : pm.getPatientNames()) {
 			p.addName(patientName.toR5());
 		}
-
-		Extension motherMaidenName = p.addExtension().setUrl(MOTHER_MAIDEN_NAME).setValue(new StringType(pm.getMotherMaidenName()));
-
+		/*
+		 * Mother Maiden Name
+		 */
+		if (pm.getMotherMaidenName() != null) {
+			p.addExtension().setUrl(MOTHER_MAIDEN_NAME).setValue(new StringType(pm.getMotherMaidenName()));
+		}
+		/*
+		 * Sex Gender
+		 */
 		switch (pm.getSex()) {
 			case MALE_SEX:
 				p.setGender(AdministrativeGender.MALE);
@@ -226,57 +246,60 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 				p.setGender(AdministrativeGender.OTHER);
 				break;
 		}
-
 		/*
 		 * Race
 		 */
-		Extension raceExtension = p.addExtension();
-		raceExtension.setUrl(RACE_EXTENSION);
-		StringBuilder raceText = new StringBuilder();
-		for (String value : pm.getRaces()) {
-			if (StringUtils.isNotBlank(value)) {
-				Coding coding = new Coding().setCode(value).setSystem(RACE_SYSTEM);
-				Code code = CodeMapManager.getCodeMap().getCodeForCodeset(CodesetType.PATIENT_RACE, value);
-				if (code != null) {
-					coding.setDisplay(code.getLabel());
-					raceExtension.addExtension(RACE_EXTENSION_OMB, coding);
-				} else {
-					raceExtension.addExtension(RACE_EXTENSION_DETAILED, coding);
+		if (!pm.getRaces().isEmpty()) {
+			Extension raceExtension = p.addExtension();
+			raceExtension.setUrl(RACE_EXTENSION);
+			StringBuilder raceText = new StringBuilder();
+			for (String value : pm.getRaces()) {
+				if (StringUtils.isNotBlank(value)) {
+					Coding coding = new Coding().setCode(value).setSystem(RACE_SYSTEM);
+					Code code = CodeMapManager.getCodeMap().getCodeForCodeset(CodesetType.PATIENT_RACE, value);
+					if (code != null) {
+						coding.setDisplay(code.getLabel());
+						raceExtension.addExtension(RACE_EXTENSION_OMB, coding);
+					} else {
+						raceExtension.addExtension(RACE_EXTENSION_DETAILED, coding);
+					}
+					raceText.append(value).append(" ");
 				}
-				raceText.append(value).append(" ");
 			}
+			raceExtension.addExtension(RACE_EXTENSION_TEXT, new StringType(raceText.toString()));
 		}
-		raceExtension.addExtension(RACE_EXTENSION_TEXT, new StringType(raceText.toString()));
-
 		/*
 		 * Ethnicity
 		 */
-		Extension ethnicityExtension = p.addExtension().setUrl(ETHNICITY_EXTENSION);
-		if (StringUtils.isNotBlank(pm.getEthnicity())) {
-			Coding coding = new Coding().setCode(pm.getEthnicity()).setSystem(RACE_SYSTEM);
-			Code code = CodeMapManager.getCodeMap().getCodeForCodeset(CodesetType.PATIENT_ETHNICITY, pm.getEthnicity());
-			if (code != null) {
-				coding.setDisplay(code.getLabel());
-				ethnicityExtension.addExtension(ETHNICITY_EXTENSION_OMB, coding);
-			} else {
-				ethnicityExtension.addExtension(ETHNICITY_EXTENSION_DETAILED, coding);
+		if (pm.getEthnicity() != null) {
+			Extension ethnicityExtension = p.addExtension().setUrl(ETHNICITY_EXTENSION);
+			if (StringUtils.isNotBlank(pm.getEthnicity())) {
+				Coding coding = new Coding().setCode(pm.getEthnicity()).setSystem(RACE_SYSTEM);
+				Code code = CodeMapManager.getCodeMap().getCodeForCodeset(CodesetType.PATIENT_ETHNICITY, pm.getEthnicity());
+				if (code != null) {
+					coding.setDisplay(code.getLabel());
+					ethnicityExtension.addExtension(ETHNICITY_EXTENSION_OMB, coding);
+				} else {
+					ethnicityExtension.addExtension(ETHNICITY_EXTENSION_DETAILED, coding);
+				}
+				ethnicityExtension.addExtension(ETHNICITY_EXTENSION_TEXT, new StringType(pm.getEthnicity()));
 			}
-			ethnicityExtension.addExtension(ETHNICITY_EXTENSION_TEXT, new StringType(pm.getEthnicity()));
 		}
 		/*
-		Phone
+		 * Phone
 		 */
 		for (PatientPhone patientPhone : pm.getPhones()) {
 			p.addTelecom(patientPhone.toR5());
 		}
 		/*
-		Email
+		 * Email
 		 */
 		if (null != pm.getEmail()) {
 			p.addTelecom().setSystem(ContactPointSystem.EMAIL).setValue(pm.getEmail());
 		}
-
-
+		/*
+		 * Death
+		 */
 		if (pm.getDeathDate() != null) {
 			p.setDeceased(new DateTimeType(pm.getDeathDate()));
 		} else if (pm.getDeathFlag().equals(YES)) {
@@ -284,41 +307,60 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 		} else if (pm.getDeathFlag().equals(NO)) {
 			p.setDeceased(new BooleanType(false));
 		}
-
+		/*
+		 * Addresses
+		 */
 		for (PatientAddress patientAddress : pm.getAddresses()) {
 			p.addAddress(patientAddress.toR5());
 		}
-
+		/*
+		 * Birth Order
+		 */
 		if (StringUtils.isNotBlank(pm.getBirthOrder())) {
 			p.setMultipleBirth(new IntegerType().setValue(Integer.parseInt(pm.getBirthOrder())));
 		} else if (pm.getBirthFlag().equals(YES)) {
 			p.setMultipleBirth(new BooleanType(true));
 		}
 
-		Extension publicity = p.addExtension();
-		publicity.setUrl(PUBLICITY_EXTENSION);
-		Coding publicityValue = new Coding().setSystem(PUBLICITY_SYSTEM).setCode(pm.getPublicityIndicator());
-		publicity.setValue(publicityValue);
-		if (pm.getPublicityIndicatorDate() != null) {
-			publicityValue.setVersion(MappingHelper.sdf.format(pm.getPublicityIndicatorDate()));
+		/*
+		 * Publicity
+		 */
+		if (pm.getPublicityIndicator() != null) {
+			Extension publicity = p.addExtension();
+			publicity.setUrl(PUBLICITY_EXTENSION);
+			Coding publicityValue = new Coding().setSystem(PUBLICITY_SYSTEM).setCode(pm.getPublicityIndicator());
+			publicity.setValue(publicityValue);
+			if (pm.getPublicityIndicatorDate() != null) {
+				publicityValue.setVersion(MappingHelper.sdf.format(pm.getPublicityIndicatorDate()));
+			}
 		}
-
-		Extension protection = p.addExtension();
-		protection.setUrl(PROTECTION_EXTENSION);
-		Coding protectionValue = new Coding().setSystem(PROTECTION_SYSTEM).setCode(pm.getProtectionIndicator());
-		protection.setValue(protectionValue);
-		if (pm.getProtectionIndicatorDate() != null) {
-			protectionValue.setVersion(MappingHelper.sdf.format(pm.getProtectionIndicatorDate()));
+		/*
+		 * Protection
+		 */
+		if (pm.getProtectionIndicator() != null) {
+			Extension protection = p.addExtension();
+			protection.setUrl(PROTECTION_EXTENSION);
+			Coding protectionValue = new Coding().setSystem(PROTECTION_SYSTEM).setCode(pm.getProtectionIndicator());
+			protection.setValue(protectionValue);
+			if (pm.getProtectionIndicatorDate() != null) {
+				protectionValue.setVersion(MappingHelper.sdf.format(pm.getProtectionIndicatorDate()));
+			}
 		}
-
-		Extension registryStatus = p.addExtension();
-		registryStatus.setUrl(REGISTRY_STATUS_EXTENSION);
-		Coding registryValue = new Coding().setSystem(REGISTRY_STATUS_INDICATOR).setCode(pm.getRegistryStatusIndicator());
-		registryStatus.setValue(registryValue);
-		if (pm.getRegistryStatusIndicatorDate() != null) {
-			registryValue.setVersion(MappingHelper.sdf.format(pm.getRegistryStatusIndicatorDate()));
+		/*
+		 * Registry status
+		 */
+		if (pm.getRegistryStatusIndicator() != null) {
+			Extension registryStatus = p.addExtension();
+			registryStatus.setUrl(REGISTRY_STATUS_EXTENSION);
+			Coding registryValue = new Coding().setSystem(REGISTRY_STATUS_INDICATOR).setCode(pm.getRegistryStatusIndicator());
+			registryStatus.setValue(registryValue);
+			if (pm.getRegistryStatusIndicatorDate() != null) {
+				registryValue.setVersion(MappingHelper.sdf.format(pm.getRegistryStatusIndicatorDate()));
+			}
 		}
-
+		/*
+		 * Guardian next of kin
+		 */
 		for (PatientGuardian patientGuardian : pm.getPatientGuardians()) {
 			Patient.ContactComponent contact = p.addContact();
 			HumanName contactName = new HumanName();
