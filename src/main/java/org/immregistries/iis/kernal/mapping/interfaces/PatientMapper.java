@@ -44,6 +44,8 @@ public interface PatientMapper<Patient extends IBaseResource> extends IisFhirMap
 	String V_2_NAME_TYPE = "v2-name-type";
 	String V_2_NAME_TYPE_SYSTEM = "http://terminology.hl7.org/CodeSystem/v2-0200";
 
+	String RELATIONSHIP_SYSTEM = "";
+
 	/**
 	 * Translates from FHIR to reconstruct reported patient, fetching master patient for referencing
 	 *
