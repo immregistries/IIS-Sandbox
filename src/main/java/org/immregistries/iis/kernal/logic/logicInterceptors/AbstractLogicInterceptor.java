@@ -1,5 +1,6 @@
 package org.immregistries.iis.kernal.logic.logicInterceptors;
 
+import ca.uhn.fhir.parser.IParser;
 import ca.uhn.fhir.rest.api.server.RequestDetails;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.immregistries.iis.kernal.logic.ack.IisReportable;
@@ -49,5 +50,16 @@ public abstract class AbstractLogicInterceptor {
 		return res;
 	}
 
+	protected boolean testMappingFhir(IisFhirMapperMasterReported mapper, IBaseResource resource, IParser parser) {
+		AbstractMappedObject abstractMappedObject1 = mapper.localObjectReported(resource);
+		IBaseResource resource1 = mapper.fhirResource(abstractMappedObject1);
+		String s1 = parser.encodeResourceToString(resource);
+		String s2 = parser.encodeResourceToString(resource1);
+		boolean res = s1.equals(s2);
+		if (!res) {
+			logger.info("FHIR Mapping check failed {}\n\n{}", s1, s2);
+		}
+		return res;
+	}
 
 }

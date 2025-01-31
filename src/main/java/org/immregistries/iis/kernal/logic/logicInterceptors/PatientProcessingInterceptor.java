@@ -1,5 +1,6 @@
 package org.immregistries.iis.kernal.logic.logicInterceptors;
 
+import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.interceptor.api.Hook;
 import ca.uhn.fhir.interceptor.api.Interceptor;
 import ca.uhn.fhir.rest.api.RestOperationTypeEnum;
@@ -39,6 +40,8 @@ public class PatientProcessingInterceptor extends AbstractLogicInterceptor {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	@Autowired
 	private PatientMapper patientMapper;
+	@Autowired
+	private FhirContext fhirContext;
 
 	@Hook(value = SERVER_INCOMING_REQUEST_PRE_HANDLED, order = 2000)
 	public void handle(RequestDetails requestDetails) throws InvalidRequestException, ProcessingException {
@@ -50,6 +53,7 @@ public class PatientProcessingInterceptor extends AbstractLogicInterceptor {
 		IBaseResource result = requestDetails.getResource();
 		if (requestDetails.getRestOperationType().equals(RestOperationTypeEnum.UPDATE) || requestDetails.getRestOperationType().equals(RestOperationTypeEnum.CREATE)) {
 			if (requestDetails.getResource() instanceof org.hl7.fhir.r4.model.Patient || requestDetails.getResource() instanceof org.hl7.fhir.r5.model.Patient) {
+				testMappingFhir(patientMapper, requestDetails.getResource(), fhirContext.newJsonParser());
 				PatientReported patientReported = processAndValidatePatient(patientMapper.localObjectReported(requestDetails.getResource()), iisReportableList, processingFlavorSet);
 				result = patientMapper.fhirResource(patientReported);
 			}

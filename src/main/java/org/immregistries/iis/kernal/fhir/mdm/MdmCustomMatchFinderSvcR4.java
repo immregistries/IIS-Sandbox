@@ -86,7 +86,7 @@ public class MdmCustomMatchFinderSvcR4 extends MdmMatchFinderSvcImpl implements 
 			return matches;
 		} else if (theResourceType.equals(ResourceType.Patient.name()) && processingFlavorSet.contains(ProcessingFlavor.MISMO)) {
 			/*
-			 * Flavour check activating patient Matching with Mismo match
+			 * Flavor check activating patient Matching with Mismo match
 			 */
 			Collection<IAnyResource> targetCandidates = myMdmCandidateSearchSvc.findCandidates(theResourceType, theResource, theRequestPartitionId);
 			Patient mismoPatient = patientMatchingDatasetConversionController.convertFromR4((org.hl7.fhir.r4.model.Patient) theResource);
