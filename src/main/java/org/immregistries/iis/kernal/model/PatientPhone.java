@@ -75,7 +75,9 @@ public class PatientPhone {
 					break;
 				}
 			}
-			contactPoint.addExtension(USE_EXTENSION_URL, new org.hl7.fhir.r4.model.Coding().setSystem(PHONE_USE_V2_SYSTEM).setCode(StringUtils.defaultString(use)));
+			if (use != null) {
+				contactPoint.addExtension(USE_EXTENSION_URL, new org.hl7.fhir.r4.model.Coding().setSystem(PHONE_USE_V2_SYSTEM).setCode(StringUtils.defaultString(use)));
+			}
 		}
 		return contactPoint;
 	}
@@ -108,7 +110,9 @@ public class PatientPhone {
 					break;
 				}
 			}
-			contactPoint.addExtension(USE_EXTENSION_URL, new org.hl7.fhir.r5.model.Coding().setSystem(PHONE_USE_V2_SYSTEM).setCode(StringUtils.defaultString(use)));
+			if (use != null) {
+				contactPoint.addExtension(USE_EXTENSION_URL, new org.hl7.fhir.r5.model.Coding().setSystem(PHONE_USE_V2_SYSTEM).setCode(StringUtils.defaultString(use)));
+			}
 		}
 		return contactPoint;
 	}

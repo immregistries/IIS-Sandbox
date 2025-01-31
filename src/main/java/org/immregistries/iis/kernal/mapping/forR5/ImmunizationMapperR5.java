@@ -56,16 +56,12 @@ public class ImmunizationMapperR5 implements ImmunizationMapper<Immunization> {
 //			vr.setPatientReported(fhirRequests.readPatientReported(i.getPatient().getReference().split("Patient/")[0]));
 		}
 
-		if (vr.getReportedDate() != null) {
-			Extension recorded = i.addExtension()
-				.setUrl(RECORDED)
-				.setValue(new DateType(vr.getReportedDate()));
-		}
 		Extension recorded = i.getExtensionByUrl(RECORDED);
 		if (recorded != null) {
 			vr.setReportedDate(MappingHelper.extensionGetDate(recorded));
+		} else {
+			vr.setReportedDate(null);
 		}
-//		vr.setReportedDate(i.getMeta().getLastUpdated()); // TODO change
 		vr.setAdministeredDate(i.getOccurrenceDateTimeType().getValue());
 
 		vr.setVaccineCvxCode(i.getVaccineCode().getCode(CVX));
@@ -104,8 +100,12 @@ public class ImmunizationMapperR5 implements ImmunizationMapper<Immunization> {
 			}
 		}
 		Extension actionCode = i.getExtensionByUrl(ACTION_CODE_EXTENSION);
-		if (actionCode != null && actionCode.hasValue()) {
-			vr.setActionCode(MappingHelper.extensionGetCoding(actionCode).getCode());
+		if (actionCode != null) {
+			if (actionCode.hasValue()) {
+				vr.setActionCode(MappingHelper.extensionGetCoding(actionCode).getCode());
+			}
+		} else {
+			vr.setActionCode(null);
 		}
 		vr.setRefusalReasonCode(i.getStatusReason().getCodingFirstRep().getCode());
 		vr.setBodySite(i.getSite().getCodingFirstRep().getCode());
@@ -120,18 +120,20 @@ public class ImmunizationMapperR5 implements ImmunizationMapper<Immunization> {
 
 		if (i.hasInformationSource() && i.getInformationSource().getReference() != null && StringUtils.isNotBlank(i.getInformationSource().getReference().getReference())) {
 			vr.setEnteredBy(fhirRequests.readPractitionerPerson(i.getInformationSource().getReference().getReference()));
-		} else {
-//			vr.set
-		}
+		} // TODO where to put and read information Source
 		for (Immunization.ImmunizationPerformerComponent performer : i.getPerformer()) {
 			if (performer.getActor() != null && StringUtils.isNotBlank(performer.getActor().getReference())) {
-				switch (performer.getFunction().getCode(FUNCTION)) {
+				switch (performer.getFunction().getCode(PERFORMER_FUNCTION_SYSTEM)) {
 					case ADMINISTERING: {
 						vr.setAdministeringProvider(fhirRequests.readPractitionerPerson(performer.getActor().getReference()));
 						break;
 					}
 					case ORDERING: {
 						vr.setOrderingProvider(fhirRequests.readPractitionerPerson(performer.getActor().getReference()));
+						break;
+					}
+					case ENTERING: {
+						vr.setEnteredBy(fhirRequests.readPractitionerPerson(performer.getActor().getReference()));
 						break;
 					}
 				}
@@ -158,42 +160,68 @@ public class ImmunizationMapperR5 implements ImmunizationMapper<Immunization> {
    */
   public Immunization fhirResource(VaccinationMaster vr) {
 	  Immunization i = new Immunization();
+	  /*
+		* Id
+		*/
 	  i.setId(StringUtils.defaultString(vr.getVaccinationId()));
+	  /*
+		* Identifiers
+		*/
 	  for (BusinessIdentifier businessIdentifier : vr.getBusinessIdentifiers()) {
 		  i.addIdentifier(businessIdentifier.toR5());
 	  }
-	  Reference patientReference = new Reference()
-		  .setReference("Patient/" + vr.getPatientReported().getPatientId())
-//		  .setIdentifier(new Identifier()
-//			  .setValue(vr.getPatientReported().getPatientReportedExternalLink())
-//			  .setSystem(vr.getPatientReported().getPatientReportedAuthority()))
-		  ;
-	  i.setPatient(patientReference);
+	  /*
+		* Patient
+		*/
+	  i.setPatient(new Reference().setReference("Patient/" + vr.getPatientReported().getPatientId()));
+	  /*
+		* Recorded Date
+		*/
 	  if (vr.getReportedDate() != null) {
-		  Extension recorded = i.addExtension()
+		  i.addExtension()
 			  .setUrl(RECORDED)
 			  .setValue(new DateType(vr.getReportedDate()));
 	  }
+	  /*
+		* Occurrence
+		*/
 	  i.getOccurrenceDateTimeType().setValue(vr.getAdministeredDate());
-
+	  /*
+		* CVX
+		*/
 	  if (StringUtils.isNotBlank(vr.getVaccineCvxCode())) {
 		  i.getVaccineCode().addCoding().setCode(vr.getVaccineCvxCode()).setSystem(CVX);
 	  }
+	  /*
+		* NDC
+		*/
 	  if (StringUtils.isNotBlank(vr.getVaccineNdcCode())) {
 		  i.getVaccineCode().addCoding().setCode(vr.getVaccineNdcCode()).setSystem(NDC);
 	  }
-	  i.setManufacturer(MappingHelper.getFhirCodeableReferenceR5(MappingHelper.ORGANIZATION, MVX, vr.getVaccineMvxCode()));
-//	  if (StringUtils.isNotBlank(vr.getVaccineMvxCode())) {
-//		  i.setManufacturer(new Reference().setIdentifier(new Identifier().setSystem(MVX).setValue(vr.getVaccineMvxCode())));
-//	  }
+	  /*
+		* Manufacturer MVX
+		*/
+	  if (StringUtils.isNotBlank(vr.getVaccineMvxCode())) {
+		  i.setManufacturer(MappingHelper.getFhirCodeableReferenceR5(MappingHelper.ORGANIZATION, MVX, vr.getVaccineMvxCode()));
+	  }
+	  /*
+		* Administered Amount
+		*/
 	  if (StringUtils.isNotBlank(vr.getAdministeredAmount())) {
 		  i.setDoseQuantity(new Quantity().setValue(new BigDecimal(vr.getAdministeredAmount())));
 	  }
 
-	  i.setInformationSource(new CodeableReference(new CodeableConcept(new Coding().setSystem(INFORMATION_SOURCE).setCode(vr.getInformationSource())))); // TODO change system name
+	  /*
+		* Lot Number
+		*/
 	  i.setLotNumber(vr.getLotnumber());
+	  /*
+		* Expiration Date
+		*/
 	  i.setExpirationDate(vr.getExpirationDate());
-
+	  /*
+		* Action code Status
+		*/
 	  if (vr.getActionCode().equals("D")) {
 		  i.setStatus(Immunization.ImmunizationStatusCodes.ENTEREDINERROR);
 	  } else {
@@ -215,26 +243,69 @@ public class ImmunizationMapperR5 implements ImmunizationMapper<Immunization> {
 			  }
 		  }
 	  }
-	  Extension actionCode = i.addExtension().setUrl(ACTION_CODE_EXTENSION).setValue(new Coding().setCode(vr.getActionCode()).setSystem(ACTION_CODE_SYSTEM));
+	  if (vr.getActionCode() != null) {
+		  i.addExtension().setUrl(ACTION_CODE_EXTENSION).setValue(new Coding().setCode(vr.getActionCode()).setSystem(ACTION_CODE_SYSTEM));
+	  }
+	  /*
+		* Status Reason
+		*/
 	  i.setStatusReason(new CodeableConcept(new Coding(REFUSAL_REASON_CODE,vr.getRefusalReasonCode(),vr.getRefusalReasonCode())));
-//	  i.addReason().setConcept());
+	  /*
+		* Body Part
+		*/
 	  i.getSite().addCoding().setSystem(BODY_PART).setCode(vr.getBodySite());
+	  /*
+		* Body Route
+		*/
 	  i.getRoute().addCoding().setSystem(BODY_ROUTE).setCode(vr.getBodyRoute());
+	  /*
+		* Funding Source
+		*/
 	  i.getFundingSource().addCoding().setSystem(FUNDING_SOURCE).setCode(vr.getFundingSource());
+	  /*
+		* Program Funding Eligibility
+		*/
 	  i.addProgramEligibility().setProgram(new CodeableConcept(new Coding().setSystem(FUNDING_ELIGIBILITY).setCode(vr.getFundingEligibility())));
-
-
+	  /*
+		* Location
+		*/
 	  Location location = locationMapper.fhirResource(vr.getOrgLocation()); // Should have been saved in Event/MessageHandler
 	  if (location != null) {
 		  i.setLocation(new Reference(MappingHelper.LOCATION + "/" + location.getId()));
 	  }
-
-	  if (vr.getEnteredBy() != null) {
-		  i.setInformationSource(new CodeableReference(new Reference(MappingHelper.PRACTITIONER + "/" + vr.getEnteredBy().getPersonId())));
+	  /*
+		* Information Source / Report Origin code
+		*/
+	  if (vr.getInformationSource() != null) {
+		  CodeableReference informationSource = i.getInformationSource();
+		  if (informationSource == null) {
+			  informationSource = new CodeableReference();
+			  i.setInformationSource(informationSource);
+		  }
+		  informationSource.setConcept(new CodeableConcept(new Coding().setSystem(INFORMATION_SOURCE).setCode(vr.getInformationSource()))); // TODO change system name
 	  }
+	  /*
+		* Information Source
+		* Entering Performer
+		*/
+	  if (vr.getEnteredBy() != null) {
+//		  CodeableReference informationSource = i.getInformationSource();
+//		  if (informationSource == null) {
+//			  informationSource = new CodeableReference();
+//			  i.setInformationSource(informationSource);
+//		  }
+//		  informationSource.setReference(new Reference(MappingHelper.PRACTITIONER + "/" + vr.getEnteredBy().getPersonId()));
+		  i.addPerformer(performer(vr.getEnteredBy(), ENTERING, ENTERING_DISPLAY));
+	  }
+	  /*
+		* Ordering Performer
+		*/
 	  if (vr.getOrderingProvider() != null) {
 		  i.addPerformer(performer(vr.getOrderingProvider(),ORDERING, ORDERING_DISPLAY));
 	  }
+	  /*
+		* Administering Performer
+		*/
 	  if (vr.getAdministeringProvider() != null) {
 		  i.addPerformer(performer(vr.getAdministeringProvider(),ADMINISTERING, ADMINISTERING_DISPLAY));
 	  }
@@ -243,7 +314,7 @@ public class ImmunizationMapperR5 implements ImmunizationMapper<Immunization> {
 
   private Immunization.ImmunizationPerformerComponent performer(ModelPerson person, String functionCode, String functionDisplay ) {
 	  Immunization.ImmunizationPerformerComponent performer = new Immunization.ImmunizationPerformerComponent();
-	  performer.setFunction(new CodeableConcept().addCoding(new Coding().setSystem(FUNCTION).setCode(functionCode).setDisplay(functionDisplay)));
+	  performer.setFunction(new CodeableConcept().addCoding(new Coding().setSystem(PERFORMER_FUNCTION_SYSTEM).setCode(functionCode).setDisplay(functionDisplay)));
 	  Reference actor;
 	  switch (person.getIdentifierTypeCode()) {
 		  case MappingHelper.PRACTITIONER: {

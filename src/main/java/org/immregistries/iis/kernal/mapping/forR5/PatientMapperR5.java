@@ -319,7 +319,7 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 		if (pm.getEthnicity() != null) {
 			Extension ethnicityExtension = p.addExtension().setUrl(ETHNICITY_EXTENSION);
 			if (StringUtils.isNotBlank(pm.getEthnicity())) {
-				Coding coding = new Coding().setCode(pm.getEthnicity()).setSystem(RACE_SYSTEM);
+				Coding coding = new Coding().setCode(pm.getEthnicity()).setSystem(ETHNICITY_SYSTEM);
 				Code code = CodeMapManager.getCodeMap().getCodeForCodeset(CodesetType.PATIENT_ETHNICITY, pm.getEthnicity());
 				if (code != null) {
 					coding.setDisplay(code.getLabel());

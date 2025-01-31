@@ -30,6 +30,8 @@ public class PatientName {
 		org.hl7.fhir.r4.model.Extension nameType = name.getExtensionByUrl(V_2_NAME_TYPE);
 		if (nameType != null) {
 			this.setNameType(MappingHelper.extensionGetCoding(nameType).getCode());
+		} else {
+			this.setNameType(null);
 		}
 	}
 
@@ -44,6 +46,8 @@ public class PatientName {
 		org.hl7.fhir.r5.model.Extension nameType = name.getExtensionByUrl(V_2_NAME_TYPE);
 		if (nameType != null) {
 			this.setNameType(MappingHelper.extensionGetCoding(nameType).getCode());
+		} else {
+			this.setNameType(null);
 		}
 	}
 
@@ -87,7 +91,7 @@ public class PatientName {
 			.setFamily(this.getNameLast())
 			.addGiven(this.getNameFirst())
 			.addGiven(this.getNameMiddle());
-		if (StringUtils.isNotBlank(this.getNameType())) {
+		if (this.getNameType() != null) {
 			name.addExtension().setUrl(V_2_NAME_TYPE).setValue(new org.hl7.fhir.r4.model.Coding(V_2_NAME_TYPE_SYSTEM, this.getNameType(), ""));
 		}
 		return name;
@@ -98,7 +102,7 @@ public class PatientName {
 			.setFamily(this.getNameLast())
 			.addGiven(this.getNameFirst())
 			.addGiven(this.getNameMiddle());
-		if (StringUtils.isNotBlank(this.getNameType())) {
+		if (this.getNameType() != null) {
 			name.addExtension().setUrl(V_2_NAME_TYPE).setValue(new org.hl7.fhir.r5.model.Coding(V_2_NAME_TYPE_SYSTEM, this.getNameType(), ""));
 		}
 		return name;

@@ -10,7 +10,9 @@ public interface ImmunizationMapper<Immunization extends IBaseResource> extends 
 	String NDC = "NDC";
 	String INFORMATION_SOURCE = "NIP001"; //TODO get system from actual message
 	String INFORMATION_SOURCE_EXTENSION = "informationSource"; //TODO get system from actual message
-	String FUNCTION = "http://hl7.org/fhir/ValueSet/immunization-function";
+	String PERFORMER_FUNCTION_SYSTEM = "http://terminology.hl7.org/CodeSystem/v2-0443";
+	String ENTERING = "EP";
+	String ENTERING_DISPLAY = "Entering Provider";
 	String ORDERING = "OP";
 	String ORDERING_DISPLAY = "Ordering Provider";
 	String ADMINISTERING = "AP";
