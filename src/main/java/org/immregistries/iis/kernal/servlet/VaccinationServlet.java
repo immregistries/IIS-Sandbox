@@ -76,7 +76,13 @@ public class VaccinationServlet {
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		try {
 			IBaseResource immunizationResource = getImmunizationFromParameter(req, fhirClient);
-			VaccinationMaster vaccination = immunizationMapper.localObject(immunizationResource);
+			VaccinationMaster vaccination;
+
+			if (FhirRequester.isGoldenRecord(immunizationResource)) {
+				vaccination = immunizationMapper.localObject(immunizationResource);
+			} else {
+				vaccination = immunizationMapper.localObjectReported(immunizationResource);
+			}
 //			 fhirRequests.searchVaccinationReported(fhirClient, Immunization.IDENTIFIER.exactly().code(req.getParameter(PARAM_VACCINATION_REPORTED_ID)));
 
 			String action = req.getParameter(PARAM_ACTION);

@@ -45,6 +45,16 @@ public class MappingHelper {
 		}
 	}
 
+	public static org.hl7.fhir.r4.model.Reference getFhirReferenceR4(String fhirType, String dbType, String identifier, String fhirId) {
+		if (StringUtils.isBlank(identifier)) {
+			return null;
+		} else {
+			return new org.hl7.fhir.r4.model.Reference(fhirType + "/" + fhirId)
+				.setType(fhirType)
+				.setIdentifier(getFhirIdentifierR4(dbType, identifier));
+		}
+	}
+
 	public static org.hl7.fhir.r4.model.Reference getFhirReferenceR4(String fhirType, String dbType, String identifier) {
 		if (StringUtils.isBlank(identifier)) {
 			return null;

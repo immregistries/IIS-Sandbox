@@ -15,6 +15,8 @@ import org.immregistries.iis.kernal.model.BusinessIdentifier;
 import org.immregistries.iis.kernal.model.ModelPerson;
 import org.immregistries.iis.kernal.model.VaccinationMaster;
 import org.immregistries.iis.kernal.model.VaccinationReported;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Service;
@@ -24,8 +26,9 @@ import java.math.BigDecimal;
 @Service
 @Conditional(OnR5Condition.class)
 public class ImmunizationMapperR5 implements ImmunizationMapper<Immunization> {
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	@Autowired
-    LocationMapperR5 locationMapper;
+	private LocationMapperR5 locationMapper;
 	@Autowired
 	private FhirRequesterR5 fhirRequests;
 
@@ -37,6 +40,26 @@ public class ImmunizationMapperR5 implements ImmunizationMapper<Immunization> {
 			vaccinationReported.setVaccination(vaccinationMaster);
 		}
 		return vaccinationReported;
+	}
+
+	public VaccinationReported localObjectReported(Immunization i) {
+		VaccinationReported vaccinationReported = new VaccinationReported();
+//		if (FhirRequester.isGoldenRecord(i)) {
+//			logger.info("Mapping refused for report as patient is golden");
+//			return null;
+//		}
+		fillFromFhirResource(vaccinationReported, i);
+		return vaccinationReported;
+	}
+
+	public VaccinationMaster localObject(Immunization i) {
+		VaccinationMaster vaccinationMaster = new VaccinationMaster();
+//		if (!FhirRequester.isGoldenRecord(i)) {
+//			logger.info("Mapping refused for golden as patient is report");
+//			return null;
+//		}
+		fillFromFhirResource(vaccinationMaster, i);
+		return vaccinationMaster;
 	}
 
 	public void fillFromFhirResource(VaccinationMaster vr, Immunization i) {
@@ -208,18 +231,6 @@ public class ImmunizationMapperR5 implements ImmunizationMapper<Immunization> {
 				}
 			}
 		}
-	}
-
-	public VaccinationReported localObjectReported(Immunization i) {
-		VaccinationReported vaccinationReported = new VaccinationReported();
-		fillFromFhirResource(vaccinationReported, i); // TODO assert not golden record ?
-		return vaccinationReported;
-	}
-
-	public VaccinationMaster localObject(Immunization i) {
-		VaccinationMaster vaccinationMaster = new VaccinationMaster();
-		fillFromFhirResource(vaccinationMaster, i); // TODO assert golden record ?
-		return vaccinationMaster;
 	}
 
   public Immunization fhirResource(VaccinationMaster vr) {
@@ -421,19 +432,10 @@ public class ImmunizationMapperR5 implements ImmunizationMapper<Immunization> {
 	  Immunization.ImmunizationPerformerComponent performer = new Immunization.ImmunizationPerformerComponent();
 	  performer.setFunction(new CodeableConcept().addCoding(new Coding().setSystem(PERFORMER_FUNCTION_SYSTEM).setCode(functionCode).setDisplay(functionDisplay)));
 	  Reference actor;
-	  switch (person.getIdentifierTypeCode()) {
-		  case MappingHelper.PRACTITIONER: {
-			  actor = new Reference(MappingHelper.PRACTITIONER+"/"+person.getPersonId());
-			  break;
-		  }
-		  case MappingHelper.PERSON: {
-			  actor = new Reference(MappingHelper.PERSON + "/" + person.getPersonId());
-			  ;
-			  break;
-		  }
-		  default:{
-			  actor = MappingHelper.getFhirReferenceR5(MappingHelper.PRACTITIONER, person.getIdentifierTypeCode(), person.getPersonExternalLink(), person.getPersonId());
-		  }
+	  if (person.getIdentifierTypeCode().equals(MappingHelper.PRACTITIONER)) {
+		  actor = new Reference(MappingHelper.PRACTITIONER + "/" + person.getPersonId());
+	  } else {
+		  actor = MappingHelper.getFhirReferenceR5(MappingHelper.PRACTITIONER, person.getIdentifierTypeCode(), person.getPersonExternalLink(), person.getPersonId());
 	  }
 	  performer.setActor(actor);
 	  return performer;

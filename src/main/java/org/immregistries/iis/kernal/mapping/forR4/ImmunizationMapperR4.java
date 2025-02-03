@@ -10,11 +10,14 @@ import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
 import org.immregistries.iis.kernal.logic.CodeMapManager;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
 import org.immregistries.iis.kernal.mapping.interfaces.ImmunizationMapper;
+import org.immregistries.iis.kernal.mapping.internalClient.FhirRequester;
 import org.immregistries.iis.kernal.mapping.internalClient.FhirRequesterR4;
 import org.immregistries.iis.kernal.model.BusinessIdentifier;
 import org.immregistries.iis.kernal.model.ModelPerson;
 import org.immregistries.iis.kernal.model.VaccinationMaster;
 import org.immregistries.iis.kernal.model.VaccinationReported;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Service;
@@ -24,6 +27,8 @@ import java.math.BigDecimal;
 @Service("ImmunizationMapperR4")
 @Conditional(OnR4Condition.class)
 public class ImmunizationMapperR4 implements ImmunizationMapper<Immunization> {
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
 	@Autowired
 	private FhirRequesterR4 fhirRequests;
 
@@ -39,6 +44,26 @@ public class ImmunizationMapperR4 implements ImmunizationMapper<Immunization> {
 			vaccinationReported.setVaccination(vaccinationMaster);
 		}
 		return vaccinationReported;
+	}
+
+	public VaccinationReported localObjectReported(Immunization i) {
+		VaccinationReported vaccinationReported = new VaccinationReported();
+		if (FhirRequester.isGoldenRecord(i)) {
+			logger.info("Mapping refused for report as patient is golden");
+			return null;
+		}
+		fillFromFhirResource(vaccinationReported, i);
+		return vaccinationReported;
+	}
+
+	public VaccinationMaster localObject(Immunization i) {
+		VaccinationMaster vaccinationMaster = new VaccinationMaster();
+		if (!FhirRequester.isGoldenRecord(i)) {
+			logger.info("Mapping refused for golden as patient is report");
+			return null;
+		}
+		fillFromFhirResource(vaccinationMaster, i);
+		return vaccinationMaster;
 	}
 
 	public void fillFromFhirResource(VaccinationMaster vr, Immunization i) {
@@ -207,18 +232,6 @@ public class ImmunizationMapperR4 implements ImmunizationMapper<Immunization> {
 				}
 			}
 		}
-	}
-
-	public VaccinationReported localObjectReported(Immunization i) { // TODO assert not golden record ?
-		VaccinationReported vaccinationReported = new VaccinationReported();
-		fillFromFhirResource(vaccinationReported, i);
-		return vaccinationReported;
-	}
-
-	public VaccinationMaster localObject(Immunization i) { // TODO assert golden record ?
-		VaccinationMaster vaccinationMaster = new VaccinationMaster();
-		fillFromFhirResource(vaccinationMaster, i);
-		return vaccinationMaster;
 	}
 
 	public Immunization fhirResource(VaccinationMaster vr) {
@@ -403,22 +416,10 @@ public class ImmunizationMapperR4 implements ImmunizationMapper<Immunization> {
 		Immunization.ImmunizationPerformerComponent performer = new Immunization.ImmunizationPerformerComponent();
 		performer.setFunction(new CodeableConcept().addCoding(new Coding().setSystem(PERFORMER_FUNCTION_SYSTEM).setCode(functionCode).setDisplay(functionDisplay)));
 		Reference actor = null;
-		switch (person.getIdentifierTypeCode()) {
-			case MappingHelper.PRACTITIONER: {
-				actor = new Reference(MappingHelper.PRACTITIONER + "/" + person.getPersonId());
-				break;
-			}
-//		  case MappingHelper.PERSON: { TODO
-//			  actor = MappingHelper.getFhirReference(
-//				  MappingHelper.PERSON,
-//				  MappingHelper.PERSON_MODEL,
-//				  person.getPersonId(),
-//				  person.getPersonId());
-//			  break;
-//		  }
-//		  default:{
-//			  actor = MappingHelper.getFhirReference(MappingHelper.PRACTITIONER, person.getIdentifierTypeCode(), person.getPersonExternalLink(), person.getPersonId());
-//		  }
+		if (person.getIdentifierTypeCode().equals(MappingHelper.PRACTITIONER)) {
+			actor = new Reference(MappingHelper.PRACTITIONER + "/" + person.getPersonId());
+		} else {
+			actor = MappingHelper.getFhirReferenceR4(MappingHelper.PRACTITIONER, person.getIdentifierTypeCode(), person.getPersonExternalLink(), person.getPersonId());
 		}
 		performer.setActor(actor);
 		return performer;

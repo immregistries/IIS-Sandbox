@@ -28,8 +28,6 @@ public interface ImmunizationMapper<Immunization extends IBaseResource> extends 
 
 	VaccinationReported localObjectReportedWithMaster(Immunization immunization);
 
-//	IVaccinationMaster fillFromFhirResource(VaccinationMaster vaccinationMaster, Immunization i);
-
 	VaccinationReported localObjectReported(Immunization immunization);
 
 	VaccinationMaster localObject(Immunization immunization);

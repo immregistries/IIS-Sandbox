@@ -138,9 +138,10 @@ public class FhirRequesterR5 extends FhirRequester<Patient, Immunization, Locati
 		List<VaccinationMaster> vaccinationList = new ArrayList<>();
 		for (Bundle.BundleEntryComponent entry : bundle.getEntry()) {
 			if (entry.getResource() instanceof Immunization) {
-//				if (entry.getResource().getMeta().getTag(GOLDEN_SYSTEM_TAG, GOLDEN_RECORD) != null) { TODO choose or sort later
-				vaccinationList.add(immunizationMapper.localObject((Immunization) entry.getResource()));
-//				}
+				VaccinationMaster vaccinationMaster = immunizationMapper.localObject((Immunization) entry.getResource());
+				if (vaccinationMaster != null) {
+					vaccinationList.add(vaccinationMaster);
+				}
 			}
 		}
 		return vaccinationList;
