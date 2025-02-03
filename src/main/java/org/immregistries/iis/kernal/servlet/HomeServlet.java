@@ -1,7 +1,9 @@
 package org.immregistries.iis.kernal.servlet;
 
+import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.immregistries.iis.kernal.SoftwareVersion;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
+import org.immregistries.iis.kernal.mapping.internalClient.FhirRequester;
 import org.immregistries.iis.kernal.model.ProcessingFlavor;
 import org.immregistries.iis.kernal.model.Tenant;
 import org.immregistries.iis.kernal.model.UserAccess;
@@ -148,4 +150,18 @@ public class HomeServlet extends HttpServlet {
 		out.println("    </ul>");
 	}
 
+	public static void printGoldenRecordExplanation(PrintWriter out, IBaseResource iBaseResource, String resourceLabel) {
+		String color;
+		String message;
+		if (FhirRequester.isGoldenRecord(iBaseResource)) {
+			color = "yellow";
+			message = "Golden/Master record, As part of the Master Data Management (MDM), this record was generated aggregating the information across records identified as potential duplicates";
+		} else {
+			color = "light-blue";
+			message = "Non-Golden/Reported record, As part of the Master Data Management (MDM), This record represents the information as it was first received,  before a merging process, and is kept separated from the golden record for preserving history and later potential merging";
+		}
+		out.println("<div class=\"w3-panel w3-" + color + "\"><p class=\"w3-left-align\">");
+		out.println(message);
+		out.println("</p></div>");
+	}
 }

@@ -205,6 +205,7 @@ public class PatientServlet  {
 					}
 					out.println("<h4>Related Patient records</h4>");
 					printPatientList(out, relatedPatients, false);
+					HomeServlet.printGoldenRecordExplanation(out, patientSelected, "patient");
 				}
 				out.println("  </div>");
 

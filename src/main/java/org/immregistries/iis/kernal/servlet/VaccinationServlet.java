@@ -76,6 +76,9 @@ public class VaccinationServlet {
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		try {
 			IBaseResource immunizationResource = getImmunizationFromParameter(req, fhirClient);
+			if (immunizationResource == null) {
+				out.println("<h2>Failed to find Vaccination with id : " + req.getParameter(PARAM_VACCINATION_REPORTED_ID) + "</h2>");
+			}
 			VaccinationMaster vaccination;
 
 			if (FhirRequester.isGoldenRecord(immunizationResource)) {
@@ -83,21 +86,21 @@ public class VaccinationServlet {
 			} else {
 				vaccination = immunizationMapper.localObjectReported(immunizationResource);
 			}
-//			 fhirRequests.searchVaccinationReported(fhirClient, Immunization.IDENTIFIER.exactly().code(req.getParameter(PARAM_VACCINATION_REPORTED_ID)));
 
 			String action = req.getParameter(PARAM_ACTION);
 			if (action != null) {
 			}
 
 			HomeServlet.doHeader(out, "IIS Sandbox - Vaccinations");
-
-			out.println("<h2>Tenant : " + tenant.getOrganizationName() + "</h2>");
+			out.println("<h2>Vaccination Record: " + vaccination.getVaccineCvxCode() + " " + vaccination.getAdministeredDate() + "</h2>");
 			PatientReported patientReportedSelected = fhirRequester.readPatientReported(vaccination.getPatientReportedId());
 			{
+				out.println("<h4>Patient information</h4>");
 				PatientServlet.printPatient(out, patientReportedSelected);
 				SimpleDateFormat sdfDate = new SimpleDateFormat("MM/dd/yyyy");
+
 				out.println("  <div class=\"w3-container\">");
-				out.println("<h4>Vaccination</h4>");
+				out.println("<h4>Vaccination details</h4>");
 				{
 					CodeMap codeMap = CodeMapManager.getCodeMap();
 					out.println("<table class=\"w3-table w3-bordered w3-striped w3-border test w3-hoverable\">");
@@ -191,6 +194,7 @@ public class VaccinationServlet {
 					}
 					out.println("<h4>Related Vaccination Records</h4>");
 					PatientServlet.printVaccinationList(out, relatedVaccinations);
+					HomeServlet.printGoldenRecordExplanation(out, immunizationResource, "vaccination");
 				}
 
 				out.println("  </div>");

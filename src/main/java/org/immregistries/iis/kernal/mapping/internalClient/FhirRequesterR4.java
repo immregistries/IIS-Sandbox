@@ -346,6 +346,10 @@ public class FhirRequesterR4 extends FhirRequester<Patient,Immunization,Location
 		return immunizationMapper.localObjectReportedWithMaster((Immunization) read(Immunization.class, id));
 	}
 
+	public VaccinationReported readVaccinationMaster(String id) {
+		return immunizationMapper.localObjectReported((Immunization) read(Immunization.class, id));
+	}
+
 	public PatientMaster matchPatient(List<PatientReported> multipleMatches, PatientMaster patientMasterForMatchQuery, Date cutoff) {
 		PatientMaster singleMatch = null;
 		Bundle matches = repositoryClientFactory.getFhirClient()
@@ -426,6 +430,6 @@ public class FhirRequesterR4 extends FhirRequester<Patient,Immunization,Location
 
 	public VaccinationMaster readVaccinationMasterWithMdmLink(String vaccinationReportedId) {
 		Optional<String> goldenId = readGoldenResourceId(vaccinationReportedId);
-		return goldenId.map(this::readVaccinationReported).orElse(null);
+		return goldenId.map(this::readVaccinationMaster).orElse(null);
 	}
 }
