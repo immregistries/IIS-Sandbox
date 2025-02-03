@@ -257,7 +257,7 @@ public class ImmunizationMapperR4 implements ImmunizationMapper<Immunization> {
 		 * Body Part
 		 */
 		if (vr.getBodySite() != null) {
-			Coding coding = new Coding().setSystem(BODY_PART).setCode(vr.getBodySite());
+			Coding coding = new Coding().setSystem(BODY_PART_SITE_SYSTEM).setCode(vr.getBodySite());
 			Code code = CodeMapManager.getCodeMap().getCodeForCodeset(CodesetType.BODY_SITE, vr.getBodySite());
 			if (code != null) {
 				coding.setDisplay(code.getLabel());
@@ -268,7 +268,7 @@ public class ImmunizationMapperR4 implements ImmunizationMapper<Immunization> {
 		 * Body Route
 		 */
 		if (vr.getBodyRoute() != null) {
-			Coding coding = new Coding().setSystem(BODY_ROUTE).setCode(vr.getBodyRoute());
+			Coding coding = new Coding().setSystem(BODY_ROUTE_SYSTEM).setCode(vr.getBodyRoute());
 			Code code = CodeMapManager.getCodeMap().getCodeForCodeset(CodesetType.BODY_ROUTE, vr.getBodyRoute());
 			if (code != null) {
 				coding.setDisplay(code.getLabel());
@@ -279,7 +279,7 @@ public class ImmunizationMapperR4 implements ImmunizationMapper<Immunization> {
 		 * Funding Source
 		 */
 		if (vr.getFundingSource() != null) {
-			Coding coding = new Coding().setSystem(FUNDING_SOURCE).setCode(vr.getFundingSource());
+			Coding coding = new Coding().setSystem(FUNDING_SOURCE_SYSTEM).setCode(vr.getFundingSource());
 			Code code = CodeMapManager.getCodeMap().getCodeForCodeset(CodesetType.VACCINATION_FUNDING_SOURCE, vr.getFundingSource());
 			if (code != null) {
 				coding.setDisplay(code.getLabel());

@@ -18,10 +18,10 @@ public interface ImmunizationMapper<Immunization extends IBaseResource> extends 
 	String ADMINISTERING = "AP";
 	String ADMINISTERING_DISPLAY = "Administering Provider";
 	String REFUSAL_REASON_CODE = "refusalReasonCode";
-	String BODY_PART = "bodyPart";
-	String BODY_ROUTE = "bodyRoute";
-	String FUNDING_SOURCE = "fundingSource";
-	String FUNDING_ELIGIBILITY = "fundingEligibility";
+	String BODY_PART_SITE_SYSTEM = "http://hl7.org/fhir/ValueSet/immunization-site";
+	String BODY_ROUTE_SYSTEM = "http://hl7.org/fhir/ValueSet/immunization-route";
+	String FUNDING_SOURCE_SYSTEM = "http://hl7.org/fhir/ValueSet/immunization-funding-source";
+	String FUNDING_ELIGIBILITY = "http://hl7.org/fhir/ValueSet/immunization-program-eligibility";
 	String RECORDED = "recorded";
 	String ACTION_CODE_EXTENSION = "actionCode";
 	String ACTION_CODE_SYSTEM = "0206";
