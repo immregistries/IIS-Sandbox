@@ -58,15 +58,15 @@ public class ImmunizationMapperR4 implements ImmunizationMapper<Immunization> {
 
 		i.getVaccineCode().getCoding().forEach(coding -> {
 			switch (coding.getSystem()) {
-				case CVX: {
+				case CVX_SYSTEM: {
 					vr.setVaccineCvxCode(StringUtils.defaultString(coding.getCode()));
 					break;
 				}
-				case NDC: {
+				case NDC_SYSTEM: {
 					vr.setVaccineNdcCode(StringUtils.defaultString(coding.getCode()));
 					break;
 				}
-				case MVX: {
+				case MVX_SYSTEM: {
 					vr.setVaccineMvxCode(StringUtils.defaultString(coding.getCode()));
 					break;
 				}
@@ -122,15 +122,15 @@ public class ImmunizationMapperR4 implements ImmunizationMapper<Immunization> {
 		for (Immunization.ImmunizationPerformerComponent performer : i.getPerformer()) {
 			if (performer.getActor() != null && StringUtils.isNotBlank(performer.getActor().getReference())) {
 				switch (performer.getFunction().getCodingFirstRep().getCode()) {
-					case ADMINISTERING: {
+					case ADMINISTERING_VALUE: {
 						vr.setAdministeringProvider(fhirRequests.readPractitionerPerson(performer.getActor().getReference()));
 						break;
 					}
-					case ORDERING: {
+					case ORDERING_VALUE: {
 						vr.setOrderingProvider(fhirRequests.readPractitionerPerson(performer.getActor().getReference()));
 						break;
 					}
-					case ENTERING: {
+					case ENTERING_VALUE: {
 						vr.setEnteredBy(fhirRequests.readPractitionerPerson(performer.getActor().getReference()));
 						break;
 					}
@@ -185,19 +185,19 @@ public class ImmunizationMapperR4 implements ImmunizationMapper<Immunization> {
 		 * CVX
 		 */
 		if (!vr.getVaccineCvxCode().isBlank()) {
-			i.getVaccineCode().addCoding().setCode(vr.getVaccineCvxCode()).setSystem(CVX);
+			i.getVaccineCode().addCoding().setCode(vr.getVaccineCvxCode()).setSystem(CVX_SYSTEM);
 		}
 		/*
 		 * NDC
 		 */
 		if (!vr.getVaccineNdcCode().isBlank()) {
-			i.getVaccineCode().addCoding().setCode(vr.getVaccineNdcCode()).setSystem(NDC);
+			i.getVaccineCode().addCoding().setCode(vr.getVaccineNdcCode()).setSystem(NDC_SYSTEM);
 		}
 		/*
 		 * Manufacturer MVX
 		 */
 		if (StringUtils.isNotBlank(vr.getVaccineMvxCode())) {
-			i.setManufacturer(new Reference().setIdentifier(new Identifier().setSystem(MVX).setValue(vr.getVaccineMvxCode())));
+			i.setManufacturer(new Reference().setIdentifier(new Identifier().setSystem(MVX_SYSTEM).setValue(vr.getVaccineMvxCode())));
 		}
 		/*
 		 * Administered Amount
@@ -318,19 +318,19 @@ public class ImmunizationMapperR4 implements ImmunizationMapper<Immunization> {
 		 * Entering Performer
 		 */
 		if (vr.getEnteredBy() != null) {
-			i.addPerformer(performer(vr.getEnteredBy(), ENTERING, ENTERING_DISPLAY));
+			i.addPerformer(performer(vr.getEnteredBy(), ENTERING_VALUE, ENTERING_DISPLAY));
 		}
 		/*
 		 * Ordering Performer
 		 */
 		if (vr.getOrderingProvider() != null) {
-			i.addPerformer(performer(vr.getOrderingProvider(), ORDERING, ORDERING_DISPLAY));
+			i.addPerformer(performer(vr.getOrderingProvider(), ORDERING_VALUE, ORDERING_DISPLAY));
 		}
 		/*
 		 * Administering Performer
 		 */
 		if (vr.getAdministeringProvider() != null) {
-			i.addPerformer(performer(vr.getAdministeringProvider(), ADMINISTERING, ADMINISTERING_DISPLAY));
+			i.addPerformer(performer(vr.getAdministeringProvider(), ADMINISTERING_VALUE, ADMINISTERING_DISPLAY));
 		}
 		return i;
 	}

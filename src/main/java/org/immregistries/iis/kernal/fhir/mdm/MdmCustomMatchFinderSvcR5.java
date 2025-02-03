@@ -176,7 +176,7 @@ public class MdmCustomMatchFinderSvcR5 extends MdmMatchFinderSvcImpl implements 
 
 	private org.immregistries.vaccination_deduplication.Immunization toVaccDedupImmunization(Immunization immunization, RequestPartitionId theRequestPartitionId) {
 		org.immregistries.vaccination_deduplication.Immunization i1 = new org.immregistries.vaccination_deduplication.Immunization();
-		i1.setCVX(immunization.getVaccineCode().getCode(ImmunizationMapper.CVX));
+		i1.setCVX(immunization.getVaccineCode().getCode(ImmunizationMapper.CVX_SYSTEM));
 		if (immunization.hasManufacturer()) {
 			i1.setMVX(immunization.getManufacturer().getReference().getIdentifier().getValue());
 		}

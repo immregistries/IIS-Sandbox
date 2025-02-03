@@ -5,17 +5,17 @@ import org.immregistries.iis.kernal.model.VaccinationMaster;
 import org.immregistries.iis.kernal.model.VaccinationReported;
 
 public interface ImmunizationMapper<Immunization extends IBaseResource> extends IisFhirMapperMasterReported<VaccinationMaster, VaccinationReported, Immunization> {
-	String CVX = "http://hl7.org/fhir/sid/cvx";
-	String MVX = "http://terminology.hl7.org/CodeSystem/MVX";
-	String NDC = "NDC";
+	String CVX_SYSTEM = "http://hl7.org/fhir/sid/cvx";
+	String MVX_SYSTEM = "http://terminology.hl7.org/CodeSystem/MVX";
+	String NDC_SYSTEM = "NDC";
 	String INFORMATION_SOURCE = "NIP001"; //TODO get system from actual message
 	String INFORMATION_SOURCE_EXTENSION = "informationSource"; //TODO get system from actual message
 	String PERFORMER_FUNCTION_SYSTEM = "http://terminology.hl7.org/CodeSystem/v2-0443";
-	String ENTERING = "EP";
+	String ENTERING_VALUE = "EP";
 	String ENTERING_DISPLAY = "Entering Provider";
-	String ORDERING = "OP";
+	String ORDERING_VALUE = "OP";
 	String ORDERING_DISPLAY = "Ordering Provider";
-	String ADMINISTERING = "AP";
+	String ADMINISTERING_VALUE = "AP";
 	String ADMINISTERING_DISPLAY = "Administering Provider";
 	String REFUSAL_REASON_CODE = "refusalReasonCode";
 	String BODY_PART_SITE_SYSTEM = "http://hl7.org/fhir/ValueSet/immunization-site";

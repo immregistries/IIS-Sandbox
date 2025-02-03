@@ -14,7 +14,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.UUID;
 
-import static org.immregistries.iis.kernal.mapping.interfaces.ImmunizationMapper.CVX;
+import static org.immregistries.iis.kernal.mapping.interfaces.ImmunizationMapper.CVX_SYSTEM;
 
 @Service
 @Conditional(OnR5Condition.class)
@@ -64,7 +64,7 @@ public class ImmunizationRecommendationServiceR5 implements IImmunizationRecomme
 
 		Collection<Code> col =  CodeMapManager.getCodeMap().getCodesForTable(CodesetType.VACCINATION_CVX_CODE);
 		Code cvx = col.stream().skip((int) (col.size() * Math.random())).findFirst().get();
-		recommendationComponent.addVaccineCode().addCoding().setSystem(CVX).setCode(cvx.getValue()).setDisplay(cvx.getLabel());
+		recommendationComponent.addVaccineCode().addCoding().setSystem(CVX_SYSTEM).setCode(cvx.getValue()).setDisplay(cvx.getLabel());
 
 		int randN = (int) (Math.random() * 4);
 		int randDateN = (int) (1 + Math.random() * 15);
