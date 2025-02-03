@@ -90,19 +90,30 @@ public class VaccinationServlet {
 			String action = req.getParameter(PARAM_ACTION);
 			if (action != null) {
 			}
+			CodeMap codeMap = CodeMapManager.getCodeMap();
+			String cvxPrint = "Unknown CVX";
+			if (!StringUtils.isEmpty(vaccination.getVaccineCvxCode())) {
+				Code cvxCode = codeMap.getCodeForCodeset(CodesetType.VACCINATION_CVX_CODE,
+					vaccination.getVaccineCvxCode());
+				if (cvxCode == null) {
+					cvxPrint = "Unknown CVX (" + vaccination.getVaccineCvxCode() + ")";
+				} else {
+					cvxPrint = cvxCode.getLabel() + " (" + vaccination.getVaccineCvxCode() + ")";
+				}
+			}
 
 			HomeServlet.doHeader(out, "IIS Sandbox - Vaccinations");
-			out.println("<h2>Vaccination Record: " + vaccination.getVaccineCvxCode() + " " + vaccination.getAdministeredDate() + "</h2>");
+			SimpleDateFormat sdfDate = new SimpleDateFormat("MM/dd/yyyy");
+
+			out.println("<h2>Vaccination Record: " + cvxPrint + " " + sdfDate.format(vaccination.getAdministeredDate()) + "</h2>");
 			PatientReported patientReportedSelected = fhirRequester.readPatientReported(vaccination.getPatientReportedId());
 			{
 				out.println("<h4>Patient information</h4>");
 				PatientServlet.printPatient(out, patientReportedSelected);
-				SimpleDateFormat sdfDate = new SimpleDateFormat("MM/dd/yyyy");
 
 				out.println("  <div class=\"w3-container\">");
 				out.println("<h4>Vaccination details</h4>");
 				{
-					CodeMap codeMap = CodeMapManager.getCodeMap();
 					out.println("<table class=\"w3-table w3-bordered w3-striped w3-border test w3-hoverable\">");
 					out.println("  <tr class=\"w3-green\">");
 					out.println("    <th>Vaccine</th>");
@@ -116,16 +127,7 @@ public class VaccinationServlet {
 					{
 						out.println("  <tr>");
 						out.println("    <td>");
-						if (!StringUtils.isEmpty(vaccination.getVaccineCvxCode())) {
-							Code cvxCode = codeMap.getCodeForCodeset(CodesetType.VACCINATION_CVX_CODE,
-								vaccination.getVaccineCvxCode());
-							if (cvxCode == null) {
-								out.println("Unknown CVX (" + vaccination.getVaccineCvxCode() + ")");
-							} else {
-								out.println(
-									cvxCode.getLabel() + " (" + vaccination.getVaccineCvxCode() + ")");
-							}
-						}
+						out.println(cvxPrint);
 						out.println("    </td>");
 						out.println("    <td>");
 						if (vaccination.getAdministeredDate() == null) {
