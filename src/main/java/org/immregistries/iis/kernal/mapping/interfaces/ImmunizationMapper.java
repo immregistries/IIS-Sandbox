@@ -34,5 +34,11 @@ public interface ImmunizationMapper<Immunization extends IBaseResource> extends 
 
 	VaccinationMaster localObject(Immunization immunization);
 
+	/**
+	 * This method create the immunization resource based on the vaccinationReported information
+	 *
+	 * @param vaccinationMaster the vaccination local object
+	 * @return the Immunization resource
+	 */
 	Immunization fhirResource(VaccinationMaster vaccinationMaster);
 }

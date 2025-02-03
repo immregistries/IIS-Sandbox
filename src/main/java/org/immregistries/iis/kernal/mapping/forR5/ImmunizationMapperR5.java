@@ -20,7 +20,6 @@ import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.Date;
 
 @Service
 @Conditional(OnR5Condition.class)
@@ -29,7 +28,6 @@ public class ImmunizationMapperR5 implements ImmunizationMapper<Immunization> {
     LocationMapperR5 locationMapper;
 	@Autowired
 	private FhirRequesterR5 fhirRequests;
-
 
 	public VaccinationReported localObjectReportedWithMaster(Immunization i) {
 		VaccinationReported vaccinationReported = this.localObjectReported(i);
@@ -41,47 +39,77 @@ public class ImmunizationMapperR5 implements ImmunizationMapper<Immunization> {
 		return vaccinationReported;
 	}
 
-	/**
-	 * Returns Vaccination Reported for Casting reasons
-	 *
-	 * @param vr Vaccination object to be filled
-	 * @param i
-	 * @return
-	 */
 	public void fillFromFhirResource(VaccinationMaster vr, Immunization i) {
+		/*
+		 * Id
+		 */
 		vr.setVaccinationId(StringUtils.defaultString(new IdType(i.getId()).getIdPart()));
+		/*
+		 * Updated date
+		 */
 		vr.setUpdatedDate(i.getMeta().getLastUpdated());
+		/*
+		 * Business identifier
+		 */
 		for (Identifier identifier : i.getIdentifier()) {
 			vr.addBusinessIdentifier(BusinessIdentifier.fromR5(identifier));
 		}
+		/*
+		 * Patient
+		 */
 		if (i.getPatient() != null && StringUtils.isNotBlank(i.getPatient().getReference())) {
 			vr.setPatientReported(fhirRequests.readPatientReported(i.getPatient().getReference()));
-//			vr.setPatientReported(fhirRequests.readPatientReported(i.getPatient().getReference().split("Patient/")[0]));
 		}
-
+		/*
+		 * Reported Date
+		 */
 		Extension recorded = i.getExtensionByUrl(RECORDED);
 		if (recorded != null) {
 			vr.setReportedDate(MappingHelper.extensionGetDate(recorded));
 		} else {
 			vr.setReportedDate(null);
 		}
+		/*
+		 * Administered Date
+		 */
 		vr.setAdministeredDate(i.getOccurrenceDateTimeType().getValue());
 
+		/*
+		 * Vaccine Codes CVX NDC
+		 * MVX ?
+		 */
 		vr.setVaccineCvxCode(i.getVaccineCode().getCode(CVX_SYSTEM));
 		vr.setVaccineNdcCode(i.getVaccineCode().getCode(NDC_SYSTEM));
 		vr.setVaccineMvxCode(i.getVaccineCode().getCode(MVX_SYSTEM));
 
+		/*
+		 * Manufacturer MVX
+		 */
 		vr.setVaccineMvxCode(i.getManufacturer().getReference().getIdentifier().getValue());
 
+		/*
+		 * Administered Amount
+		 */
 		if (i.getDoseQuantity().hasValue()) {
 			vr.setAdministeredAmount(i.getDoseQuantity().getValue().toString());
 		}
 
-		vr.setInformationSource(i.getInformationSource().getConcept().getCode(INFORMATION_SOURCE));
-		vr.setUpdatedDate(new Date());
 
+		/*
+		 * Updated Date
+		 */
+		vr.setUpdatedDate(i.getMeta().getLastUpdated());
+		/*
+		 * Lot Number
+		 */
 		vr.setLotnumber(i.getLotNumber());
+		/*
+		 * Expiration Date
+		 */
 		vr.setExpirationDate(i.getExpirationDate());
+		/*
+		 * Status Action code
+		 */
 		if (i.getStatus() != null) {
 			switch(i.getStatus()){
 				case COMPLETED: {
@@ -102,6 +130,9 @@ public class ImmunizationMapperR5 implements ImmunizationMapper<Immunization> {
 					break;
 			}
 		}
+		/*
+		 * Action Code extension to store exact value
+		 */
 		Extension actionCode = i.getExtensionByUrl(ACTION_CODE_EXTENSION);
 		if (actionCode != null) {
 			if (actionCode.hasValue()) {
@@ -110,20 +141,55 @@ public class ImmunizationMapperR5 implements ImmunizationMapper<Immunization> {
 		} else {
 			vr.setActionCode(null);
 		}
-		vr.setRefusalReasonCode(i.getStatusReason().getCodingFirstRep().getCode());
-		vr.setBodySite(i.getSite().getCodingFirstRep().getCode());
-		vr.setBodyRoute(i.getRoute().getCodingFirstRep().getCode());
-		vr.setFundingSource(i.getFundingSource().getCodingFirstRep().getCode());
-		vr.setFundingEligibility(i.getProgramEligibilityFirstRep().getProgram().getCodingFirstRep().getCode());
-
+		/*
+		 * Refusal reason code
+		 */
+		if (i.getStatusReason().hasCoding()) {
+			vr.setRefusalReasonCode(StringUtils.defaultString(i.getStatusReason().getCodingFirstRep().getCode()));
+		}
+		/*
+		 * Injection Site
+		 */
+		if (i.getSite().hasCoding()) {
+			vr.setBodySite(StringUtils.defaultString(i.getSite().getCodingFirstRep().getCode()));
+		}
+		/*
+		 * Injection Route
+		 */
+		if (i.getRoute().hasCoding()) {
+			vr.setBodyRoute(StringUtils.defaultString(i.getRoute().getCodingFirstRep().getCode()));
+		}
+		/*
+		 * Funding Source
+		 */
+		if (i.getFundingSource().hasCoding()) {
+			vr.setFundingSource(StringUtils.defaultString(i.getFundingSource().getCodingFirstRep().getCode()));
+		}
+		/*
+		 * Funding, program eligibility
+		 */
+		if (i.getProgramEligibilityFirstRep().hasProgram() && i.getProgramEligibilityFirstRep().getProgram().hasCoding()) {
+			vr.setFundingEligibility(i.getProgramEligibilityFirstRep().getProgram().getCodingFirstRep().getCode());
+		}
+		/*
+		 * Location
+		 */
 		if (i.getLocation() != null && StringUtils.isNotBlank(i.getLocation().getReference())) {
 			vr.setOrgLocation(fhirRequests.readOrgLocation(i.getLocation().getReference()));
 		}
-
-
+		/*
+		 * Information Source
+		 */
+		if (i.getInformationSource().hasConcept() && i.getInformationSource().getConcept().hasCoding()) {
+			vr.setInformationSource(i.getInformationSource().getConcept().getCode(INFORMATION_SOURCE));
+		}
+		/*
+		 * Performers
+		 * TODO choose where to get entering Practitioner between information source and Performer
+		 */
 		if (i.hasInformationSource() && i.getInformationSource().getReference() != null && StringUtils.isNotBlank(i.getInformationSource().getReference().getReference())) {
 			vr.setEnteredBy(fhirRequests.readPractitionerPerson(i.getInformationSource().getReference().getReference()));
-		} // TODO where to put and read information Source
+		}
 		for (Immunization.ImmunizationPerformerComponent performer : i.getPerformer()) {
 			if (performer.getActor() != null && StringUtils.isNotBlank(performer.getActor().getReference())) {
 				switch (performer.getFunction().getCode(PERFORMER_FUNCTION_SYSTEM)) {
@@ -156,11 +222,6 @@ public class ImmunizationMapperR5 implements ImmunizationMapper<Immunization> {
 		return vaccinationMaster;
 	}
 
-  /**
-   * This method create the immunization resource based on the vaccinationReported information
-   * @param vr the vaccinationReported
-   * @return the Immunization resource
-   */
   public Immunization fhirResource(VaccinationMaster vr) {
 	  Immunization i = new Immunization();
 	  /*

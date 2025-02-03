@@ -20,7 +20,6 @@ import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.Date;
 
 @Service("ImmunizationMapperR4")
 @Conditional(OnR4Condition.class)
@@ -43,19 +42,38 @@ public class ImmunizationMapperR4 implements ImmunizationMapper<Immunization> {
 	}
 
 	public void fillFromFhirResource(VaccinationMaster vr, Immunization i) {
+		/*
+		 * Id
+		 */
 		vr.setVaccinationId(StringUtils.defaultString(new IdType(i.getId()).getIdPart()));
+		/*
+		 * Updated date
+		 */
 		vr.setUpdatedDate(i.getMeta().getLastUpdated());
+		/*
+		 * Business identifier
+		 */
 		for (Identifier identifier : i.getIdentifier()) {
 			vr.addBusinessIdentifier(BusinessIdentifier.fromR4(identifier));
 		}
+		/*
+		 * Patient
+		 */
 		if (i.getPatient() != null && StringUtils.isNotBlank(i.getPatient().getReference())) {
 			vr.setPatientReported(fhirRequests.readPatientReported(i.getPatient().getReference()));
-//			vr.setPatientReported(fhirRequests.readPatientReported(i.getPatient().getReference().split("Patient/")[0]));
 		}
-
+		/*
+		 * Reported Date
+		 */
 		vr.setReportedDate(i.getRecorded());
+		/*
+		 * Administered Date
+		 */
 		vr.setAdministeredDate(i.getOccurrenceDateTimeType().getValue());
-
+		/*
+		 * Vaccine Codes CVX NDC
+		 * MVX ?
+		 */
 		i.getVaccineCode().getCoding().forEach(coding -> {
 			switch (coding.getSystem()) {
 				case CVX_SYSTEM: {
@@ -72,16 +90,35 @@ public class ImmunizationMapperR4 implements ImmunizationMapper<Immunization> {
 				}
 			}
 		});
-
+		/*
+		 * Manufacturer MVX
+		 */
 		vr.setVaccineMvxCode(i.getManufacturer().getIdentifier().getValueElement().getValueNotNull());
-
+		/*
+		 * Administered Amount
+		 */
 		vr.setAdministeredAmount(i.getDoseQuantity().getValue().toString());
-
-		vr.setInformationSource(StringUtils.defaultString(i.getReportOrigin().getCodingFirstRep().getCode()));
-		vr.setUpdatedDate(new Date());
-
+		/*
+		 * Information Source
+		 */
+		if (i.getReportOrigin().hasCoding()) {
+			vr.setInformationSource(StringUtils.defaultString(i.getReportOrigin().getCodingFirstRep().getCode()));
+		}
+		/*
+		 * Updated Date
+		 */
+		vr.setUpdatedDate(i.getMeta().getLastUpdated());
+		/*
+		 * Lot Number
+		 */
 		vr.setLotnumber(StringUtils.defaultString(i.getLotNumber()));
+		/*
+		 * Expiration Date
+		 */
 		vr.setExpirationDate(i.getExpirationDate());
+		/*
+		 * Status Action code
+		 */
 		if (i.getStatus() != null) {
 			switch (i.getStatus()) {
 				case COMPLETED: {
@@ -102,6 +139,9 @@ public class ImmunizationMapperR4 implements ImmunizationMapper<Immunization> {
 					break;
 			}
 		}
+		/*
+		 * Action Code extension to store exact value
+		 */
 		Extension actionCode = i.getExtensionByUrl(ACTION_CODE_EXTENSION);
 		if (actionCode != null) {
 			if (actionCode.hasValue()) {
@@ -110,15 +150,45 @@ public class ImmunizationMapperR4 implements ImmunizationMapper<Immunization> {
 		} else {
 			vr.setActionCode(null);
 		}
-		vr.setRefusalReasonCode(StringUtils.defaultString(i.getStatusReason().getCodingFirstRep().getCode()));
-		vr.setBodySite(StringUtils.defaultString(i.getSite().getCodingFirstRep().getCode()));
-		vr.setBodyRoute(StringUtils.defaultString(i.getRoute().getCodingFirstRep().getCode()));
-		vr.setFundingSource(StringUtils.defaultString(i.getFundingSource().getCodingFirstRep().getCode()));
-		vr.setFundingEligibility(StringUtils.defaultString(i.getProgramEligibilityFirstRep().getCodingFirstRep().getCode()));
-
+		/*
+		 * Refusal reason code
+		 */
+		if (i.getStatusReason().hasCoding()) {
+			vr.setRefusalReasonCode(StringUtils.defaultString(i.getStatusReason().getCodingFirstRep().getCode()));
+		}
+		/*
+		 * Injection Site
+		 */
+		if (i.getSite().hasCoding()) {
+			vr.setBodySite(StringUtils.defaultString(i.getSite().getCodingFirstRep().getCode()));
+		}
+		/*
+		 * Injection Route
+		 */
+		if (i.getRoute().hasCoding()) {
+			vr.setBodyRoute(StringUtils.defaultString(i.getRoute().getCodingFirstRep().getCode()));
+		}
+		/*
+		 * Funding Source
+		 */
+		if (i.getFundingSource().hasCoding()) {
+			vr.setFundingSource(StringUtils.defaultString(i.getFundingSource().getCodingFirstRep().getCode()));
+		}
+		/*
+		 * Funding, program eligibility
+		 */
+		if (i.getProgramEligibilityFirstRep().hasCoding()) {
+			vr.setFundingEligibility(StringUtils.defaultString(i.getProgramEligibilityFirstRep().getCodingFirstRep().getCode()));
+		}
+		/*
+		 * Location
+		 */
 		if (i.getLocation() != null && StringUtils.isNotBlank(i.getLocation().getReference())) {
 			vr.setOrgLocation(fhirRequests.readOrgLocation(i.getLocation().getReference()));
 		}
+		/*
+		 * Performers
+		 */
 		for (Immunization.ImmunizationPerformerComponent performer : i.getPerformer()) {
 			if (performer.getActor() != null && StringUtils.isNotBlank(performer.getActor().getReference())) {
 				switch (performer.getFunction().getCodingFirstRep().getCode()) {
@@ -139,30 +209,24 @@ public class ImmunizationMapperR4 implements ImmunizationMapper<Immunization> {
 		}
 	}
 
-	public VaccinationReported localObjectReported(Immunization i) {
+	public VaccinationReported localObjectReported(Immunization i) { // TODO assert not golden record ?
 		VaccinationReported vaccinationReported = new VaccinationReported();
-		fillFromFhirResource(vaccinationReported, i); // TODO assert not golden record ?
+		fillFromFhirResource(vaccinationReported, i);
 		return vaccinationReported;
 	}
 
-	public VaccinationMaster localObject(Immunization i) {
+	public VaccinationMaster localObject(Immunization i) { // TODO assert golden record ?
 		VaccinationMaster vaccinationMaster = new VaccinationMaster();
-		fillFromFhirResource(vaccinationMaster, i); // TODO assert golden record ?
+		fillFromFhirResource(vaccinationMaster, i);
 		return vaccinationMaster;
 	}
 
-	/**
-	 * This method create the immunization resource based on the vaccinationReported information
-	 *
-	 * @param vr the vaccinationReported
-	 * @return the Immunization resource
-	 */
 	public Immunization fhirResource(VaccinationMaster vr) {
 		Immunization i = new Immunization();
 		/*
 		 * Id
 		 */
-		i.setId(StringUtils.defaultString(vr.getVaccinationId())); // TODO maybe remove ?
+		i.setId(StringUtils.defaultString(vr.getVaccinationId()));
 		/*
 		 * Identifiers
 		 */
