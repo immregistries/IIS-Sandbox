@@ -1,5 +1,7 @@
 package org.immregistries.iis.kernal.servlet;
 
+import ca.uhn.fhir.context.FhirContext;
+import ca.uhn.fhir.context.FhirVersionEnum;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.immregistries.iis.kernal.SoftwareVersion;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
@@ -7,6 +9,7 @@ import org.immregistries.iis.kernal.mapping.internalClient.FhirRequester;
 import org.immregistries.iis.kernal.model.ProcessingFlavor;
 import org.immregistries.iis.kernal.model.Tenant;
 import org.immregistries.iis.kernal.model.UserAccess;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -23,6 +26,8 @@ import java.text.SimpleDateFormat;
  * UI Homepage
  */
 public class HomeServlet extends HttpServlet {
+	@Autowired
+	FhirContext fhirContext;
 
 	/**
 	 * Helping method for unified Header printing in UI
@@ -105,6 +110,11 @@ public class HomeServlet extends HttpServlet {
 			doHeader(out, "IIS Sandbox - Home");
 			out.println("    <div class=\"w3-container w3-half w3-margin-top\">");
 			out.println("    <div class=\"w3-panel w3-yellow\"><p class=\"w3-left-align\">This system is for test purposes only. " + "Do not submit production data. As a precaution all submitted data will be deleted once a day.  </p></div>");
+			if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R5)) {
+				out.println("    <div class=\"w3-panel w3-light-blue\"><p class=\"w3-left-align\">This sandbox is deployed using a R5 FHIR Server, functionalities related to FHIR Subscriptions and Covid are enabled</p></div>");
+			} else if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R4)) {
+				out.println("    <div class=\"w3-panel w3-light-green\"><p class=\"w3-left-align\">This sandbox is deployed using a R4 FHIR Server, functionalities related to FHIR Subscriptions and Covid are disabled</p></div>");
+			}
 			out.println("    <h2>Documentation</h2>");
 			out.println("    <p class=\"w3-left-align\">Please see the project wiki: " + "<a href=\"https://github.com/immregistries/IIS-Sandbox/wiki\">https://github.com/immregistries/IIS-Sandbox/wiki</a></p>");
 			out.println("    <h2>Primary Functions Supported</h2>");
@@ -112,15 +122,28 @@ public class HomeServlet extends HttpServlet {
 			out.println("      <li><a href=\"pop\">Send Now</a>: Send an HL7 message in now.</li>");
 			out.println("      <li><a href=\"message\">Messages</a>: Review recently submitted messages</li>");
 			out.println("      <li><a href=\"patient\">Patients</a>: See data received by patient</li>");
-			out.println("      <li><a href=\"location\">Patients</a>: See administered-at-locations</li>");
-			out.println("      <li><a href=\"subscription\">Subscriptions</a>: See fhir subscriptions</li>");
+			out.println("      <li><a href=\"location\">Locations</a>: See administered-at-locations</li>");
+			if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R5)) {
+				out.println("      <li><a href=\"subscription\">Subscriptions</a>: Visualize and manually trigger FHIR subscriptions</li>");
+			} else if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R4)) {
+				out.println("      <li><a>Subscriptions</a>: (Unavailable in R4 mode) Visualize and manually trigger FHIR subscriptions</li>");
+			}
 			out.println("      <li><a href=\"soap\">CDC WSDL</a>: HL7 realtime interfacing using CDC WSDL</li>");
+			if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R5)) {
+				out.println("      <li><a href=\"fhir\">FHIR Server</a>: FHIR Restful server, partitioned for each tenants</li>");
+			} else if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R4)) {
+				out.println("      <li><a href=\"fhir\">FHIR Server</a>: FHIR Restful server, partitioned for each tenants</li>");
+			}
 			out.println("    </ul>");
 			out.println("    <h3>Secondary Functions Supported</h3>");
 			out.println("    <ul class=\"w3-ul w3-hoverable\">");
 			out.println("      <li><a href=\"lab\">Convert ORU to VXU</a>: Convert an ORU lab message to a VXU. </li>");
 			out.println("      <li><a href=\"queryConverter\">Convert VXU to QBP</a>: Convert an VXU immunization message into an immunization query. </li>");
-			out.println("      <li><a href=\"covid\">COVID-19 Reporting</a>: Export data to demonstrate COVID-19 reporting </li>");
+			if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R5)) {
+				out.println("      <li><a href=\"covid\">COVID-19 Reporting</a>: Export data to demonstrate COVID-19 reporting </li>");
+			} else if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R4)) {
+				out.println("      <li><a href=\"covid\">COVID-19 Reporting</a>:(Unavailable in R4 mode)  Export data to demonstrate COVID-19 reporting </li>");
+			}
 			out.println("      <li><a href=\"VXUDownloadForm\">COVID-19 Reporting (HL7)</a>: Download data in HL7 format demonstrate COVID-19 reporting </li>");
 			out.println("      <li><a href=\"covidGenerate\">COVID-19 HL7 Generator</a>: Generate HL7 Messages</li>");
 			out.println("      <li><a href=\"event\">Submit Event</a>: Submit a patient and vaccination event manually.</li>");
@@ -157,10 +180,10 @@ public class HomeServlet extends HttpServlet {
 			color = "yellow";
 			message = "Golden/Master record, As part of the Master Data Management (MDM), this record was generated aggregating the information across records identified as potential duplicates";
 		} else {
-			color = "light-blue";
+			color = "blue";
 			message = "Non-Golden/Reported record, As part of the Master Data Management (MDM), This record represents the information as it was first received,  before a merging process, and is kept separated from the golden record for preserving history and later potential merging";
 		}
-		out.println("<div class=\"w3-panel w3-" + color + "\"><p class=\"w3-left-align\">");
+		out.println("<div class=\"w3-panel w3-leftbar w3-border-" + color + " w3-pale-" + color + "\"><p class=\"w3-left-align\">");
 		out.println(message);
 		out.println("</p></div>");
 	}
