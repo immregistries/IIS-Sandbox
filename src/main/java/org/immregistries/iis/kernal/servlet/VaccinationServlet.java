@@ -106,7 +106,7 @@ public class VaccinationServlet {
 			SimpleDateFormat sdfDate = new SimpleDateFormat("MM/dd/yyyy");
 
 			out.println("<h2>Vaccination Record: " + cvxPrint + " " + sdfDate.format(vaccination.getAdministeredDate()) + "</h2>");
-			PatientReported patientReportedSelected = fhirRequester.readPatientReported(vaccination.getPatientReportedId());
+			PatientReported patientReportedSelected = fhirRequester.readAsPatientReported(vaccination.getPatientReportedId());
 			{
 				out.println("<h4>Patient information</h4>");
 				PatientServlet.printPatient(out, patientReportedSelected);
@@ -176,8 +176,7 @@ public class VaccinationServlet {
 					out.println("</table>");
 				}
 
-				List<ObservationReported> observationReportedList =
-					getObservationList(vaccination);
+				List<ObservationReported> observationReportedList = getObservationList(vaccination);
 
 				if (!observationReportedList.isEmpty()) {
 					out.println("<h4>Observations</h4>");

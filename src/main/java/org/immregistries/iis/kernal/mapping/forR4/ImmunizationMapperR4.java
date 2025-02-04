@@ -85,7 +85,7 @@ public class ImmunizationMapperR4 implements ImmunizationMapper<Immunization> {
 		 * Patient
 		 */
 		if (i.getPatient() != null && StringUtils.isNotBlank(i.getPatient().getReference())) {
-			vr.setPatientReported(fhirRequests.readPatientReported(i.getPatient().getReference()));
+			vr.setPatientReported(fhirRequests.readAsPatientReported(i.getPatient().getReference()));
 		}
 		/*
 		 * Reported Date
@@ -209,7 +209,7 @@ public class ImmunizationMapperR4 implements ImmunizationMapper<Immunization> {
 		 * Location
 		 */
 		if (i.getLocation() != null && StringUtils.isNotBlank(i.getLocation().getReference())) {
-			vr.setOrgLocation(fhirRequests.readOrgLocation(i.getLocation().getReference()));
+			vr.setOrgLocation(fhirRequests.readAsOrgLocation(i.getLocation().getReference()));
 		}
 		/*
 		 * Performers
@@ -218,15 +218,15 @@ public class ImmunizationMapperR4 implements ImmunizationMapper<Immunization> {
 			if (performer.getActor() != null && StringUtils.isNotBlank(performer.getActor().getReference())) {
 				switch (performer.getFunction().getCodingFirstRep().getCode()) {
 					case ADMINISTERING_VALUE: {
-						vr.setAdministeringProvider(fhirRequests.readPractitionerPerson(performer.getActor().getReference()));
+						vr.setAdministeringProvider(fhirRequests.readPractitionerAsPerson(performer.getActor().getReference()));
 						break;
 					}
 					case ORDERING_VALUE: {
-						vr.setOrderingProvider(fhirRequests.readPractitionerPerson(performer.getActor().getReference()));
+						vr.setOrderingProvider(fhirRequests.readPractitionerAsPerson(performer.getActor().getReference()));
 						break;
 					}
 					case ENTERING_VALUE: {
-						vr.setEnteredBy(fhirRequests.readPractitionerPerson(performer.getActor().getReference()));
+						vr.setEnteredBy(fhirRequests.readPractitionerAsPerson(performer.getActor().getReference()));
 						break;
 					}
 				}

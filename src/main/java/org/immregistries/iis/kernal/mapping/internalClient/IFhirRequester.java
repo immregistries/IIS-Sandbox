@@ -79,15 +79,18 @@ public interface IFhirRequester<
 
 //	PatientReported saveRelatedPerson(PatientReported patientReported);
 
-	PatientMaster readPatientMaster(String id);
+	PatientMaster readAsPatientMaster(String id);
 
-	PatientReported readPatientReported(String id);
+	PatientReported readAsPatientReported(String id);
 
-	ModelPerson readPractitionerPerson(String id);
+	ModelPerson readPractitionerAsPerson(String id);
 
-	OrgLocation readOrgLocation(String id);
+	OrgLocation readAsOrgLocation(String id);
 
-	VaccinationReported readVaccinationReported(String id);
+	VaccinationReported readAsVaccinationReported(String id);
+
+	VaccinationMaster readAsVaccinationMaster(String id);
+
 
 	IBundleProvider searchRegularRecord(Class<? extends IBaseResource> aClass, SearchParameterMap searchParameterMap);
 

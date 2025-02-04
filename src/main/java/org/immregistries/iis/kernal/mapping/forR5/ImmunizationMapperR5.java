@@ -81,7 +81,7 @@ public class ImmunizationMapperR5 implements ImmunizationMapper<Immunization> {
 		 * Patient
 		 */
 		if (i.getPatient() != null && StringUtils.isNotBlank(i.getPatient().getReference())) {
-			vr.setPatientReported(fhirRequests.readPatientReported(i.getPatient().getReference()));
+			vr.setPatientReported(fhirRequests.readAsPatientReported(i.getPatient().getReference()));
 		}
 		/*
 		 * Reported Date
@@ -198,7 +198,7 @@ public class ImmunizationMapperR5 implements ImmunizationMapper<Immunization> {
 		 * Location
 		 */
 		if (i.getLocation() != null && StringUtils.isNotBlank(i.getLocation().getReference())) {
-			vr.setOrgLocation(fhirRequests.readOrgLocation(i.getLocation().getReference()));
+			vr.setOrgLocation(fhirRequests.readAsOrgLocation(i.getLocation().getReference()));
 		}
 		/*
 		 * Information Source
@@ -211,21 +211,21 @@ public class ImmunizationMapperR5 implements ImmunizationMapper<Immunization> {
 		 * TODO choose where to get entering Practitioner between information source and Performer
 		 */
 		if (i.hasInformationSource() && i.getInformationSource().getReference() != null && StringUtils.isNotBlank(i.getInformationSource().getReference().getReference())) {
-			vr.setEnteredBy(fhirRequests.readPractitionerPerson(i.getInformationSource().getReference().getReference()));
+			vr.setEnteredBy(fhirRequests.readPractitionerAsPerson(i.getInformationSource().getReference().getReference()));
 		}
 		for (Immunization.ImmunizationPerformerComponent performer : i.getPerformer()) {
 			if (performer.getActor() != null && StringUtils.isNotBlank(performer.getActor().getReference())) {
 				switch (performer.getFunction().getCode(PERFORMER_FUNCTION_SYSTEM)) {
 					case ADMINISTERING_VALUE: {
-						vr.setAdministeringProvider(fhirRequests.readPractitionerPerson(performer.getActor().getReference()));
+						vr.setAdministeringProvider(fhirRequests.readPractitionerAsPerson(performer.getActor().getReference()));
 						break;
 					}
 					case ORDERING_VALUE: {
-						vr.setOrderingProvider(fhirRequests.readPractitionerPerson(performer.getActor().getReference()));
+						vr.setOrderingProvider(fhirRequests.readPractitionerAsPerson(performer.getActor().getReference()));
 						break;
 					}
 					case ENTERING_VALUE: {
-						vr.setEnteredBy(fhirRequests.readPractitionerPerson(performer.getActor().getReference()));
+						vr.setEnteredBy(fhirRequests.readPractitionerAsPerson(performer.getActor().getReference()));
 						break;
 					}
 				}

@@ -234,7 +234,7 @@ public class FhirRequesterR4 extends FhirRequester<Patient,Immunization,Location
 			return patientMapper.localObjectReportedWithMaster((Patient) outcome.getResource());
 		} else if (outcome.getCreated() != null && outcome.getCreated()) {
 			patientReported.setPatientId(outcome.getId().getIdPart());
-			return readPatientReported(outcome.getId().getIdPart());
+			return readAsPatientReported(outcome.getId().getIdPart());
 		} else {
 			return patientReported;
 //			return searchPatientReported(Patient.IDENTIFIER.exactly().systemAndIdentifier(patientReported.getPatientReportedAuthority(),patientReported.getPatientReportedExternalLink()));
@@ -322,7 +322,7 @@ public class FhirRequesterR4 extends FhirRequester<Patient,Immunization,Location
 		}
 	}
 
-	public PatientMaster readPatientMaster(String id) {
+	public PatientMaster readAsPatientMaster(String id) {
 		Patient patient = (Patient) read(Patient.class, id);
 		if (FhirRequester.isGoldenRecord(patient)) {
 			return patientMapper.localObject(patient);
@@ -330,24 +330,24 @@ public class FhirRequesterR4 extends FhirRequester<Patient,Immunization,Location
 		return null;
 	}
 
-	public PatientReported readPatientReported(String id) {
+	public PatientReported readAsPatientReported(String id) {
 		return patientMapper.localObjectReportedWithMaster((Patient) read(Patient.class, id));
 	}
 
-	public ModelPerson readPractitionerPerson(String id) {
+	public ModelPerson readPractitionerAsPerson(String id) {
 		return practitionerMapper.localObject((Practitioner) read(Practitioner.class, id));
 	}
 
-	public OrgLocation readOrgLocation(String id) {
+	public OrgLocation readAsOrgLocation(String id) {
 		return locationMapper.localObject((Location) read(Location.class, id));
 	}
 
-	public VaccinationReported readVaccinationReported(String id) {
+	public VaccinationReported readAsVaccinationReported(String id) {
 		return immunizationMapper.localObjectReportedWithMaster((Immunization) read(Immunization.class, id));
 	}
 
-	public VaccinationReported readVaccinationMaster(String id) {
-		return immunizationMapper.localObjectReported((Immunization) read(Immunization.class, id));
+	public VaccinationMaster readAsVaccinationMaster(String id) {
+		return immunizationMapper.localObject((Immunization) read(Immunization.class, id));
 	}
 
 	public PatientMaster matchPatient(List<PatientReported> multipleMatches, PatientMaster patientMasterForMatchQuery, Date cutoff) {
@@ -386,13 +386,13 @@ public class FhirRequesterR4 extends FhirRequester<Patient,Immunization,Location
 
 	public List<PatientReported> searchPatientReportedFromGoldenIdWithMdmLinks(String patientMasterId) {
 		return readMdmlinksReportedIds(patientMasterId)
-			.map(this::readPatientReported)
+			.map(this::readAsPatientReported)
 			.collect(Collectors.toList());
 	}
 
 	public List<VaccinationReported> searchVaccinationReportedFromGoldenIdWithMdmLinks(String vaccinationMasterId) {
 		return readMdmlinksReportedIds(vaccinationMasterId)
-			.map(this::readVaccinationReported)
+			.map(this::readAsVaccinationReported)
 			.collect(Collectors.toList());
 	}
 
@@ -425,11 +425,11 @@ public class FhirRequesterR4 extends FhirRequester<Patient,Immunization,Location
 
 	public PatientMaster readPatientMasterWithMdmLink(String patientId) {
 		Optional<String> goldenId = readGoldenResourceId(patientId);
-		return goldenId.map(this::readPatientMaster).orElse(null);
+		return goldenId.map(this::readAsPatientMaster).orElse(null);
 	}
 
 	public VaccinationMaster readVaccinationMasterWithMdmLink(String vaccinationReportedId) {
 		Optional<String> goldenId = readGoldenResourceId(vaccinationReportedId);
-		return goldenId.map(this::readVaccinationMaster).orElse(null);
+		return goldenId.map(this::readAsVaccinationMaster).orElse(null);
 	}
 }

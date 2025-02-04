@@ -9,10 +9,10 @@ import ca.uhn.fhir.rest.param.TokenParam;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.r5.model.Immunization;
 import org.hl7.fhir.r5.model.Patient;
-import org.immregistries.iis.kernal.mapping.internalClient.FhirRequester;
-import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.mapping.forR5.LocationMapperR5;
+import org.immregistries.iis.kernal.mapping.internalClient.FhirRequester;
+import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
 import org.immregistries.iis.kernal.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
@@ -382,7 +382,7 @@ public class CovidServlet extends HttpServlet {
 
 		OrgLocation orgLocation = vaccinationReported.getOrgLocation();
 		if (orgLocation == null) {
-			orgLocation = fhirRequester.readOrgLocation(vaccinationReported.getOrgLocationId());
+			orgLocation = fhirRequester.readAsOrgLocation(vaccinationReported.getOrgLocationId());
 		}
 		if (orgLocation == null) {
 			// 33: Responsible organization
