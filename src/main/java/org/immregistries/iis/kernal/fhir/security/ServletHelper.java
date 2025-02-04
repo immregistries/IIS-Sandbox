@@ -209,10 +209,19 @@ public class ServletHelper {
 		}
 	}
 
-	public static Tenant getTenant(String pathVariable, Session dataSession, HttpServletRequest request) {
+	public static Tenant getTenant(String pathVariable, HttpServletRequest request) {
+		if (StringUtils.isBlank(pathVariable)) {
+			return getTenant(request);
+		}
+		try (Session dataSession = getDataSession()) {
+			return getTenant(pathVariable, request, dataSession);
+		}
+	}
+
+	public static Tenant getTenant(String pathVariable, HttpServletRequest request, Session dataSession) {
 		Tenant tenant = null;
 		if (StringUtils.isBlank(pathVariable)) {
-			tenant = getTenant();
+			tenant = getTenant(request);
 		} else {
 			UserAccess userAccess = getUserAccess();
 			tenant = authenticateTenant(userAccess, pathVariable, dataSession);
@@ -223,8 +232,8 @@ public class ServletHelper {
 		request.setAttribute(SESSION_TENANT, tenant);
 		return tenant;
 	}
-	public static Tenant getTenant() {
-		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+
+	public static Tenant getTenant(HttpServletRequest request) {
 		Tenant tenant = null;
 		if (request.getAttribute(SESSION_TENANT) != null) {
 			tenant = (Tenant) request.getAttribute(SESSION_TENANT);
@@ -236,6 +245,11 @@ public class ServletHelper {
 			}
 		}
 		return tenant;
+	}
+
+	public static Tenant getTenant() {
+		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+		return getTenant(request);
 	}
 
 	public static RequestDetails requestDetailsWithPartitionName() {

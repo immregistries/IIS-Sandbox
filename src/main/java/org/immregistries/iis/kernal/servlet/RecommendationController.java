@@ -29,10 +29,13 @@ import java.io.PrintWriter;
 import java.util.Date;
 
 import static org.immregistries.iis.kernal.servlet.PatientController.PARAM_PATIENT_REPORTED_ID;
+import static org.immregistries.iis.kernal.servlet.RecommendationController.RECOMMENDATION_BASE_PATH;
 
 @RestController
-@RequestMapping({"/recommendation", "/patient/{patientId}/recommendation", "/tenant/{tenantId}/patient/{patientId}/recommendation"})
+@RequestMapping({RECOMMENDATION_BASE_PATH, TenantController.TENANT_PATH + RECOMMENDATION_BASE_PATH})
 public class RecommendationController {
+	public static final String RECOMMENDATION_BASE_PATH = "/recommendation";
+
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	public static final String PARAM_RECOMMENDATION_ID = "recommendationId";
@@ -41,7 +44,6 @@ public class RecommendationController {
 
 	@Autowired
 	private IImmunizationRecommendationService immunizationRecommendationService;
-
 	@Autowired
 	private RepositoryClientFactory repositoryClientFactory;
 	@Autowired
@@ -50,10 +52,6 @@ public class RecommendationController {
 	private FhirContext fhirContext;
 	@Autowired
 	private PatientMapper patientMapper;
-
-	public static String linkUrl(String facilityId, String patientId) {
-		return "/tenant/" + facilityId + "/patient/" + patientId + "/recommendation";
-	}
 
 	/**
 	 * Used to add a random generated component to recommendation
@@ -64,9 +62,9 @@ public class RecommendationController {
 	 * @throws IOException print output stream exception
 	 */
 	@PostMapping
-	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-		throws ServletException, IOException { //TODO add support to add new Recommendation
-		Tenant tenant = ServletHelper.getTenant();
+	protected void doPost(HttpServletRequest req, HttpServletResponse resp, @PathVariable(name = TenantController.PATH_VARIABLE_TENANT_NAME, required = false) String tenantName)
+		throws ServletException, IOException {
+		Tenant tenant = ServletHelper.getTenant(tenantName, req);
 		if (tenant == null) {
 			throw new AuthenticationCredentialsNotFoundException("");
 		}
@@ -96,9 +94,8 @@ public class RecommendationController {
 					fhirClient.create().resource(immunizationRecommendationService.generate(tenant, new Date(), patient)).execute();
 				}
 			}
-
 		}
-		doGet(req, resp);
+		doGet(req, resp, tenantName);
 	}
 
 	/**
@@ -108,9 +105,9 @@ public class RecommendationController {
 	 * @param resp response
 	 */
 	@PutMapping
-	protected void doPut(HttpServletRequest req, HttpServletResponse resp)
+	protected void doPut(HttpServletRequest req, HttpServletResponse resp, @PathVariable(name = TenantController.PATH_VARIABLE_TENANT_NAME, required = false) String tenantName)
 		throws ServletException, IOException {
-		Tenant tenant = ServletHelper.getTenant();
+		Tenant tenant = ServletHelper.getTenant(tenantName, req);
 		if (tenant == null) {
 			throw new AuthenticationCredentialsNotFoundException("");
 		}
@@ -140,7 +137,7 @@ public class RecommendationController {
 			out.flush();
 			out.close();
 		}
-		doGet(req, resp);
+		doGet(req, resp, tenantName);
 	}
 
 	/**
@@ -152,9 +149,9 @@ public class RecommendationController {
 	 * @throws IOException      OutputStream exception
 	 */
 	@GetMapping
-	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+	protected void doGet(HttpServletRequest req, HttpServletResponse resp, @PathVariable(name = TenantController.PATH_VARIABLE_TENANT_NAME, required = false) String tenantName)
 		throws ServletException, IOException {
-		Tenant tenant = ServletHelper.getTenant();
+		Tenant tenant = ServletHelper.getTenant(tenantName, req);
 		if (tenant == null) {
 			throw new AuthenticationCredentialsNotFoundException("");
 		}

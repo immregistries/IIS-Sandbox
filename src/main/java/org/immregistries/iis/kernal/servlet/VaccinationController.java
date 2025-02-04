@@ -21,10 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -36,9 +33,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import static org.immregistries.iis.kernal.servlet.VaccinationController.VACCINATION_BASE_PATH;
+
 @RestController
-@RequestMapping({"/vaccination","/patient/{patientId}/vaccination", "/tenant/{tenantId}/patient/{patientId}/vaccination"})
+@RequestMapping({VACCINATION_BASE_PATH, TenantController.TENANT_PATH + VACCINATION_BASE_PATH})
 public class VaccinationController {
+	public static final String VACCINATION_BASE_PATH = "/vaccination";
+
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	public static final String PARAM_ACTION = "action";
@@ -53,20 +54,15 @@ public class VaccinationController {
 	@Autowired
 	FhirContext fhirContext;
 
-	public static String linkUrl(String facilityId, String patientId) {
-		return "/tenant/" + facilityId + "/patient/" + patientId + "/vaccination";
-	}
-
 	@PostMapping
-	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+	protected void doPost(HttpServletRequest req, HttpServletResponse resp, @PathVariable(name = TenantController.PATH_VARIABLE_TENANT_NAME, required = false) String tenantName)
 		throws ServletException, IOException {
-		doGet(req, resp);
+		doGet(req, resp, tenantName);
 	}
 
 	@GetMapping
-	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		Tenant tenant = ServletHelper.getTenant();
-
+	protected void doGet(HttpServletRequest req, HttpServletResponse resp, @PathVariable(name = TenantController.PATH_VARIABLE_TENANT_NAME, required = false) String tenantName) throws ServletException, IOException {
+		Tenant tenant = ServletHelper.getTenant(tenantName, req);
 		if (tenant == null) {
 			throw new AuthenticationCredentialsNotFoundException("");
 		}

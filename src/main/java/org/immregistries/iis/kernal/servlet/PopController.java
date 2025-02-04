@@ -2,6 +2,7 @@ package org.immregistries.iis.kernal.servlet;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.context.FhirVersionEnum;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Session;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.logic.IncomingMessageHandler;
@@ -23,14 +24,17 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Date;
 
-import static org.immregistries.iis.kernal.servlet.TenantController.PARAM_TENANT_NAME;
+import static org.immregistries.iis.kernal.servlet.PopController.POP_BASE_PATH;
+import static org.immregistries.iis.kernal.servlet.TenantController.PATH_VARIABLE_TENANT_NAME;
 
 /**
  * Generated from PopServlet, changed to se PathVariable functionality
  */
 @RestController()
-@RequestMapping({"/pop", "/tenant/{tenantName}/pop"})
+@RequestMapping({POP_BASE_PATH, TenantController.TENANT_PATH + POP_BASE_PATH})
 public class PopController {
+	public static final String POP_BASE_PATH = "/pop";
+
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	public static final String PARAM_MESSAGE = "MESSAGEDATA";
 	public static final String PARAM_FACILITY_NAME = "FACILITY_NAME";
@@ -44,13 +48,13 @@ public class PopController {
 
 	@PostMapping
 //	@Transactional
-	protected void doPost(HttpServletRequest req, HttpServletResponse resp, @RequestParam(name = PARAM_TENANT_NAME, required = false) String tenantName)
+	protected void doPost(HttpServletRequest req, HttpServletResponse resp, @PathVariable(name = PATH_VARIABLE_TENANT_NAME, required = false) String tenantName)
 		throws ServletException, IOException {
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		try {
 			Session dataSession = ServletHelper.getDataSession();
-			Tenant tenant = ServletHelper.getTenant(tenantName, dataSession, req);
+			Tenant tenant = ServletHelper.getTenant(tenantName, req, dataSession);
 
 			String ack = "";
 			String[] messages;
@@ -60,7 +64,7 @@ public class PopController {
 			try {
 				if (tenant == null) {
 					resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-					out.println("Access is not authorized. Facilityid, userid and/or password are not recognized. ");
+					out.println("Access is not authorized. FacilityId, userid and/or password are not recognized. ");
 				} else {
 					HomeServlet.doHeader(out, "IIS Sandbox - PopResult", tenant);
 
@@ -113,10 +117,13 @@ public class PopController {
 	}
 
 	@GetMapping
-	protected void doGet(HttpServletRequest req, HttpServletResponse resp, @RequestParam(name = PARAM_TENANT_NAME, required = false) String tenantName)
+	protected void doGet(HttpServletRequest req, HttpServletResponse resp, @PathVariable(name = PATH_VARIABLE_TENANT_NAME, required = false) String tenantName)
 		throws ServletException, IOException {
 		resp.setContentType("text/html");
-		Tenant tenant = ServletHelper.getTenant(tenantName, ServletHelper.getDataSession(), req);
+		logger.info("tenant {}", tenantName);
+		Tenant tenant = ServletHelper.getTenant(tenantName, req, ServletHelper.getDataSession());
+		logger.info("tenant {}", tenant.getOrganizationName());
+
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		try {
 			String message = req.getParameter(PARAM_MESSAGE);
@@ -124,7 +131,7 @@ public class PopController {
 			if (organizationName == null) {
 				organizationName = "";
 			}
-			if (message == null || message.equals("")) {
+			if (StringUtils.isBlank(message)) {
 				TestCaseMessage testCaseMessage =
 					ScenarioManager.createTestCaseMessage(ScenarioManager.SCENARIO_1_R_ADMIN_CHILD);
 				Transformer transformer = new Transformer();

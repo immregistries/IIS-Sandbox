@@ -40,13 +40,15 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import static org.immregistries.iis.kernal.servlet.PatientController.PATIENT_BASE_PATH;
 import static org.immregistries.iis.kernal.servlet.SubscriptionServlet.PARAM_MESSAGE;
 import static org.immregistries.iis.kernal.servlet.SubscriptionServlet.PARAM_SUBSCRIPTION_ID;
-import static org.immregistries.iis.kernal.servlet.TenantController.PARAM_TENANT_ID;
 
 @RestController
-@RequestMapping({"/patient", "/tenant/{tenantName}/patient"})
+@RequestMapping({PATIENT_BASE_PATH, TenantController.TENANT_PATH + PATIENT_BASE_PATH})
 public class PatientController {
+	public static final String PATIENT_BASE_PATH = "/patient";
+
 	public static final String PARAM_ACTION = "action";
 	public static final String ACTION_SEARCH = "search";
 	public static final String PARAM_PATIENT_NAME_LAST = "patientNameLast";
@@ -79,17 +81,17 @@ public class PatientController {
 	}
 
 	@PostMapping
-	protected void doPost(HttpServletRequest req, HttpServletResponse resp, @PathVariable(value = PARAM_TENANT_ID, required = false) String tenantId)
+	protected void doPost(HttpServletRequest req, HttpServletResponse resp, @PathVariable(name = TenantController.PATH_VARIABLE_TENANT_NAME, required = false) String tenantName)
 		throws ServletException, IOException {
-		doGet(req, resp, tenantId);
+		doGet(req, resp, tenantName);
 	}
 
 	@GetMapping
-	protected void doGet(HttpServletRequest req, HttpServletResponse resp, @PathVariable(value = PARAM_TENANT_ID, required = false) String tenantId)
+	protected void doGet(HttpServletRequest req, HttpServletResponse resp, @PathVariable(name = TenantController.PATH_VARIABLE_TENANT_NAME, required = false) String tenantName)
 		throws ServletException, IOException {
 		resp.setContentType("text/html");
 		Session dataSession = ServletHelper.getDataSession();
-		Tenant tenant = ServletHelper.getTenant(tenantId, dataSession, req);
+		Tenant tenant = ServletHelper.getTenant(tenantName, req, dataSession);
 		if (tenant == null) {
 			throw new AuthenticationCredentialsNotFoundException("");
 		}
