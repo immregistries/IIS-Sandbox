@@ -196,7 +196,7 @@ public class VaccinationServlet {
 					}
 					out.println("<h4>Related Vaccination Records</h4>");
 					PatientServlet.printVaccinationList(out, relatedVaccinations);
-					HomeServlet.printGoldenRecordExplanation(out, immunizationResource, "vaccination");
+					HomeServlet.printGoldenRecordExplanation(out, immunizationResource);
 				}
 
 				out.println("  </div>");
