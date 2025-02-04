@@ -140,10 +140,10 @@ public class HomeServlet extends HttpServlet {
 			out.println("    <div class=\"w3-panel w3-yellow\"><p class=\"w3-left-align\">This system is for test purposes only. " +
 				"Do not submit production data. As a precaution all submitted data will be deleted once a day.  </p></div>");
 			if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R5)) {
-				out.println("    <div class=\"w3-panel w3-light-blue\"><p class=\"w3-left-align\">" +
+				out.println("    <div class=\"w3-panel w3-pale-blue\"><p class=\"w3-left-align\">" +
 					"IIS Sandbox is deployed using a R5 FHIR Server, functionalities related to FHIR Subscriptions and Covid are enabled</p></div>");
 			} else if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R4)) {
-				out.println("    <div class=\"w3-panel w3-light-green\"><p class=\"w3-left-align\">" +
+				out.println("    <div class=\"w3-panel w3-pale-green\"><p class=\"w3-left-align\">" +
 					"IIS Sandbox is deployed using a R4 FHIR Server, functionalities related to FHIR Subscriptions and Covid are disabled</p></div>");
 			}
 			out.println("    <h2>Documentation</h2>");
