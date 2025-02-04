@@ -134,6 +134,12 @@ public class HomeServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
+		Tenant tenant = ServletHelper.getTenant();
+		String tenantName = "{tenantName}";
+		if (tenant != null) {
+			tenantName = tenant.getOrganizationName();
+		}
+
 		try {
 			doHeader(out, "IIS Sandbox - Home");
 			out.println("    <div class=\"w3-container w3-half w3-margin-top\">");
@@ -174,7 +180,7 @@ public class HomeServlet extends HttpServlet {
 				"using an experimental mapping layer to use inherited Hl7v2 based functionalities, current version of HAPIFHIR is a " +
 				"<a href='https://github.com/cerbeor/hapi-fhir-Subscription-custom'>modded</a> 6.8.3</li>");
 			out.println("      <li><h4>Multitenancy:</h4> Tenants allow separate testing environments, using different Flavors and different partitions of FHIR Server,	" +
-				"Base URLs are formatted as <a href='fhir'>/iis/fhir/{tenantName}</a></li>");
+				"Base URLs are formatted as <a href='fhir'>/iis/fhir/" + tenantName + "</a></li>");
 			out.println("      <li><h4>Record's Matching:</h4>Matching resources using " +
 				"<a href='https://github.com/immregistries/mismo-match'>MISMO</a> for Patients (Activated with a Flavor), " +
 				"<a href='https://github.com/usnistgov/vaccination_deduplication'>vaccination_deduplication</a> for Immunizations</li>");

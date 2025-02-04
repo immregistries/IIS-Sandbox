@@ -9,6 +9,7 @@ import org.hl7.fhir.instance.model.api.IBaseBundle;
 import org.hl7.fhir.instance.model.api.IDomainResource;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.logic.IImmunizationRecommendationService;
+import org.immregistries.iis.kernal.mapping.interfaces.PatientMapper;
 import org.immregistries.iis.kernal.mapping.internalClient.FhirRequester;
 import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
 import org.immregistries.iis.kernal.model.BusinessIdentifier;
@@ -27,9 +28,11 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Date;
 
+import static org.immregistries.iis.kernal.servlet.PatientController.PARAM_PATIENT_REPORTED_ID;
+
 @RestController
 @RequestMapping({"/recommendation", "/patient/{patientId}/recommendation", "/tenant/{tenantId}/patient/{patientId}/recommendation"})
-public class RecommendationServlet extends PatientServlet {
+public class RecommendationController {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	public static final String PARAM_RECOMMENDATION_ID = "recommendationId";
@@ -45,6 +48,8 @@ public class RecommendationServlet extends PatientServlet {
 	private FhirRequester fhirRequester;
 	@Autowired
 	private FhirContext fhirContext;
+	@Autowired
+	private PatientMapper patientMapper;
 
 	public static String linkUrl(String facilityId, String patientId) {
 		return "/tenant/" + facilityId + "/patient/" + patientId + "/recommendation";
@@ -66,7 +71,7 @@ public class RecommendationServlet extends PatientServlet {
 			throw new AuthenticationCredentialsNotFoundException("");
 		}
 		IGenericClient fhirClient = repositoryClientFactory.newGenericClient(req);
-		IDomainResource patient = fetchPatientFromParameter(req, fhirClient);
+		IDomainResource patient = PatientController.fetchPatientFromParameter(req, fhirClient, fhirRequester);
 
 		if (patient != null) {
 
@@ -172,7 +177,7 @@ public class RecommendationServlet extends PatientServlet {
 						.withId(((org.hl7.fhir.r4.model.ImmunizationRecommendation) recommendationResource).getPatient().getReference()).execute();
 				}
 			} else {
-				patientResource = fetchPatientFromParameter(req, fhirClient);
+				patientResource = PatientController.fetchPatientFromParameter(req, fhirClient, fhirRequester);
 			}
 			if (patientResource == null) {
 				out.println("No patient or recommendation found with request parameters.");
@@ -227,7 +232,7 @@ public class RecommendationServlet extends PatientServlet {
 					 */
 					org.hl7.fhir.r5.model.ImmunizationRecommendation immunizationRecommendation = (org.hl7.fhir.r5.model.ImmunizationRecommendation) recommendationResource;
 					immunizationRecommendation.setPatient(new org.hl7.fhir.r5.model.Reference().setIdentifier(identifier.toR5())); // TODO filter to take always MRN ?
-					printSubscriptions(out, parser, subcriptionBundle, immunizationRecommendation);
+					PatientController.printSubscriptions(out, parser, subcriptionBundle, immunizationRecommendation);
 				}
 			}
 		} catch (Exception e) {

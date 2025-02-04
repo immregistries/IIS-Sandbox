@@ -102,7 +102,7 @@ public class MessageServlet extends HttpServlet {
 					 out.println("  <em>Only showing first 10 messages</em>");
 					 break;
 				 }
-				 PatientServlet.printMessageReceived(out, messageReceived);
+				 PatientController.printMessageReceived(out, messageReceived);
 			 }
         }
         out.println("    </div>");

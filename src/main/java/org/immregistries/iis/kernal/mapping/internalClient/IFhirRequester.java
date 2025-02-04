@@ -52,7 +52,6 @@ public interface IFhirRequester<
 
 	RelatedPerson searchRelatedPerson(SearchParameterMap searchParameterMap);
 
-
 	ObservationMaster searchObservationMaster(SearchParameterMap searchParameterMap);
 
 	List<ObservationReported> searchObservationReportedList(SearchParameterMap searchParameterMap);
@@ -77,8 +76,6 @@ public interface IFhirRequester<
 
 	Organization saveOrganization(Organization organization);
 
-//	PatientReported saveRelatedPerson(PatientReported patientReported);
-
 	PatientMaster readAsPatientMaster(String id);
 
 	PatientReported readAsPatientReported(String id);
@@ -91,14 +88,13 @@ public interface IFhirRequester<
 
 	VaccinationMaster readAsVaccinationMaster(String id);
 
-
 	IBundleProvider searchRegularRecord(Class<? extends IBaseResource> aClass, SearchParameterMap searchParameterMap);
 
 	IBundleProvider searchGoldenRecord(Class<? extends IBaseResource> aClass, SearchParameterMap searchParameterMap);
 
 	List<PatientReported> searchPatientReportedFromGoldenIdWithMdmLinks(String patientMasterId);
 
-	PatientMaster readPatientMasterWithMdmLink(String patientId);
+	PatientMaster readPatientMasterWithMdmLink(String patientReportedId);
 
 	List<VaccinationReported> searchVaccinationReportedFromGoldenIdWithMdmLinks(String vaccinationMasterId);
 

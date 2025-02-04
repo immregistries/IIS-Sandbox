@@ -38,7 +38,7 @@ import java.util.Set;
 
 @RestController
 @RequestMapping({"/vaccination","/patient/{patientId}/vaccination", "/tenant/{tenantId}/patient/{patientId}/vaccination"})
-public class VaccinationServlet {
+public class VaccinationController {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	public static final String PARAM_ACTION = "action";
@@ -109,7 +109,7 @@ public class VaccinationServlet {
 			PatientReported patientReportedSelected = fhirRequester.readAsPatientReported(vaccination.getPatientReportedId());
 			{
 				out.println("<h4>Patient information</h4>");
-				PatientServlet.printPatient(out, patientReportedSelected);
+				PatientController.printPatient(out, patientReportedSelected);
 
 				out.println("  <div class=\"w3-container\">");
 				out.println("<h4>Vaccination details</h4>");
@@ -180,7 +180,7 @@ public class VaccinationServlet {
 
 				if (!observationReportedList.isEmpty()) {
 					out.println("<h4>Observations</h4>");
-					PatientServlet.printObservationList(out, observationReportedList);
+					PatientController.printObservationList(out, observationReportedList);
 				}
 
 				{
@@ -194,7 +194,7 @@ public class VaccinationServlet {
 						}
 					}
 					out.println("<h4>Related Vaccination Records</h4>");
-					PatientServlet.printVaccinationList(out, relatedVaccinations);
+					PatientController.printVaccinationList(out, relatedVaccinations);
 					HomeServlet.printGoldenRecordExplanation(out, immunizationResource);
 				}
 
@@ -214,7 +214,7 @@ public class VaccinationServlet {
 						.setSystem(patientMaster1.getMainBusinessIdentifier().getSystem()));
 					IParser parser = repositoryClientFactory.getFhirContext().newJsonParser().setPrettyPrint(true);
 
-					PatientServlet.printSubscriptions(out, parser, bundle, immunization);
+					PatientController.printSubscriptions(out, parser, bundle, immunization);
 				}
 
 

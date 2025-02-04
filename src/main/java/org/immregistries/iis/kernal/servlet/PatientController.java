@@ -26,11 +26,7 @@ import org.immregistries.iis.kernal.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -48,7 +44,7 @@ import static org.immregistries.iis.kernal.servlet.SubscriptionServlet.PARAM_SUB
 
 @RestController
 @RequestMapping({"/patient", "/tenant/{tenantId}/patient"})
-public class PatientServlet  {
+public class PatientController {
 	public static final String PARAM_ACTION = "action";
 	public static final String ACTION_SEARCH = "search";
 	public static final String PARAM_PATIENT_NAME_LAST = "patientNameLast";
@@ -65,7 +61,7 @@ public class PatientServlet  {
 	@Autowired
 	private FhirContext fhirContext;
 	@Autowired
-	PatientMapper patientMapper;
+	private PatientMapper patientMapper;
 
 	public static String linkUrl(String facilityId) {
 		return "/tenant/" + facilityId + "/patient";
@@ -81,25 +77,23 @@ public class PatientServlet  {
 	}
 
 	@PostMapping
-	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+	protected void doPost(HttpServletRequest req, HttpServletResponse resp, @PathVariable(value = "tenantId", required = false) String tenantId)
 		throws ServletException, IOException {
-		doGet(req, resp);
+		doGet(req, resp, tenantId);
 	}
 
-	@SuppressWarnings("unchecked")
 	@GetMapping
-	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+	protected void doGet(HttpServletRequest req, HttpServletResponse resp, @PathVariable(value = "tenantId", required = false) String tenantId)
 		throws ServletException, IOException {
-		Tenant tenant = ServletHelper.getTenant();
-
-		if (tenant == null) {
-			throw new AuthenticationCredentialsNotFoundException("");
-		}
-
 		resp.setContentType("text/html");
-		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		Session dataSession = PopServlet.getDataSession();
+		Tenant tenant = ServletHelper.getTenant(tenantId, dataSession, req);
+//		if (tenant == null) {
+//			throw new AuthenticationCredentialsNotFoundException("");
+//		}
+
 		IGenericClient fhirClient = repositoryClientFactory.newGenericClient(req);
+		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		try {
 			String patientNameLast = req.getParameter(PARAM_PATIENT_NAME_LAST);
 			String patientNameFirst = req.getParameter(PARAM_PATIENT_NAME_FIRST);
@@ -130,7 +124,7 @@ public class PatientServlet  {
 			HomeServlet.doHeader(out, "IIS Sandbox - Patients");
 
 			PatientMaster patientMasterSelected = null;
-			IBaseResource patientSelected = fetchPatientFromParameter(req, fhirClient);
+			IBaseResource patientSelected = fetchPatientFromParameter(req, fhirClient, fhirRequester);
 
 			if (patientSelected == null) {
 				out.println("<h2>Patients</h2>");
@@ -217,9 +211,9 @@ public class PatientServlet  {
 							.hasId(new org.hl7.fhir.r5.model.IdType(patientMasterSelected.getPatientId()))
 						).returnBundle(org.hl7.fhir.r5.model.Bundle.class).execute();
 					if (recommendationBundle.hasEntry()) {
-						RecommendationServlet.printRecommendationR5(out, (org.hl7.fhir.r5.model.ImmunizationRecommendation) recommendationBundle.getEntryFirstRep().getResource(), (org.hl7.fhir.r5.model.Patient) patientSelected);
+						RecommendationController.printRecommendationR5(out, (org.hl7.fhir.r5.model.ImmunizationRecommendation) recommendationBundle.getEntryFirstRep().getResource(), (org.hl7.fhir.r5.model.Patient) patientSelected);
 					} else {
-						RecommendationServlet.printRecommendationR5(out, null, (org.hl7.fhir.r5.model.Patient) patientSelected);
+						RecommendationController.printRecommendationR5(out, null, (org.hl7.fhir.r5.model.Patient) patientSelected);
 					}
 					org.hl7.fhir.r5.model.Bundle subcriptionBundle = fhirClient.search().forResource(org.hl7.fhir.r5.model.Subscription.class).returnBundle(org.hl7.fhir.r5.model.Bundle.class).execute();
 					printSubscriptions(out, parser, subcriptionBundle, (org.hl7.fhir.r5.model.Resource) patientSelected);
@@ -232,9 +226,9 @@ public class PatientServlet  {
 							.hasId(new org.hl7.fhir.r4.model.IdType(patientMasterSelected.getPatientId()))
 						).returnBundle(org.hl7.fhir.r4.model.Bundle.class).execute();
 					if (recommendationBundle.hasEntry()) {
-						RecommendationServlet.printRecommendationR4(out, (org.hl7.fhir.r4.model.ImmunizationRecommendation) recommendationBundle.getEntryFirstRep().getResource(), (org.hl7.fhir.r4.model.Patient) patientSelected);
+						RecommendationController.printRecommendationR4(out, (org.hl7.fhir.r4.model.ImmunizationRecommendation) recommendationBundle.getEntryFirstRep().getResource(), (org.hl7.fhir.r4.model.Patient) patientSelected);
 					} else {
-						RecommendationServlet.printRecommendationR4(out, null, (org.hl7.fhir.r4.model.Patient) patientSelected);
+						RecommendationController.printRecommendationR4(out, null, (org.hl7.fhir.r4.model.Patient) patientSelected);
 					}
 //					org.hl7.fhir.r4.model.Bundle subcriptionBundle = fhirClient.search().forResource(org.hl7.fhir.r4.model.Subscription.class).returnBundle(org.hl7.fhir.r4.model.Bundle.class).execute();
 //					printSubscriptions(out, parser, subcriptionBundle, (org.hl7.fhir.r4.model.Resource) patientSelected);
@@ -271,11 +265,11 @@ public class PatientServlet  {
 				{
 					out.println("<div class=\"w3-container\">");
 					out.println("<h4>Messages Received</h4>");
-					Query query = dataSession.createQuery(
-						"from MessageReceived where patientReportedId = :patientReportedId order by reportedDate asc");
+					Query<MessageReceived> query = dataSession.createQuery(
+						"from MessageReceived where patientReportedId = :patientReportedId order by reportedDate asc", MessageReceived.class);
 					query.setParameter("patientReportedId", patientMasterSelected.getPatientId());
 					List<MessageReceived> messageReceivedList = query.list();
-					if (messageReceivedList.size() == 0) {
+					if (messageReceivedList.isEmpty()) {
 						out.println("<div class=\"w3-panel w3-yellow\"><p>No Messages Received</p></div>");
 					} else {
 						for (MessageReceived messageReceived : messageReceivedList) {
@@ -370,7 +364,7 @@ public class PatientServlet  {
 			for (VaccinationMaster vaccination : vaccinationList) {
 				out.println("  <tr>");
 				out.println("    <td>");
-				String link = "vaccination?" + VaccinationServlet.PARAM_VACCINATION_REPORTED_ID + "="
+				String link = "vaccination?" + VaccinationController.PARAM_VACCINATION_REPORTED_ID + "="
 					+ vaccination.getVaccinationId();
 				out.println("      <a href=\"" + link + "\">");
 				if (!StringUtils.isEmpty(vaccination.getVaccineCvxCode())) {
@@ -527,7 +521,7 @@ public class PatientServlet  {
 					+ observationReported.getValueTable() + " " + observationReported.getValueCode());
 			} else {
 				String code = observationReported.getValueCode();
-				if (observationReported.getValueLabel() == null || observationReported.getValueLabel().equals("")) {
+				if (StringUtils.isBlank(observationReported.getValueLabel())) {
 					out.println("      " + code);
 				} else {
 					String table = observationReported.getValueTable();
@@ -655,7 +649,7 @@ public class PatientServlet  {
 	}
 
 
-	protected IDomainResource fetchPatientFromParameter(HttpServletRequest req, IGenericClient fhirClient) {
+	public static IDomainResource fetchPatientFromParameter(HttpServletRequest req, IGenericClient fhirClient, FhirRequester fhirRequester) {
 		IDomainResource patient = null;
 		if (req.getParameter(PARAM_PATIENT_REPORTED_ID) != null) {
 			patient = (IDomainResource) fhirClient.read().resource("Patient").withId(req.getParameter(PARAM_PATIENT_REPORTED_ID)).execute();

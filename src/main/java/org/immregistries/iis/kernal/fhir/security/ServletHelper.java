@@ -1,18 +1,17 @@
 package org.immregistries.iis.kernal.fhir.security;
 
-import ca.uhn.fhir.rest.api.server.SystemRequestDetails;
 import ca.uhn.fhir.rest.api.server.RequestDetails;
+import ca.uhn.fhir.rest.api.server.SystemRequestDetails;
 import ca.uhn.fhir.rest.server.exceptions.AuthenticationException;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.immregistries.iis.kernal.fhir.interceptors.PartitionCreationInterceptor;
-import org.immregistries.iis.kernal.model.UserAccess;
 import org.immregistries.iis.kernal.model.Tenant;
+import org.immregistries.iis.kernal.model.UserAccess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -201,6 +200,20 @@ public class ServletHelper {
 		}
 	}
 
+	public static Tenant getTenant(String pathVariable, Session dataSession, HttpServletRequest request) {
+		Tenant tenant = null;
+		if (StringUtils.isBlank(pathVariable)) {
+			tenant = getTenant();
+		} else {
+			UserAccess userAccess = getUserAccess();
+			tenant = authenticateTenant(userAccess, pathVariable, dataSession);
+		}
+		if (tenant == null) {
+			throw new AuthenticationCredentialsNotFoundException("");
+		}
+		request.setAttribute(SESSION_TENANT, tenant);
+		return tenant;
+	}
 	public static Tenant getTenant() {
 		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
 		Tenant tenant = null;
