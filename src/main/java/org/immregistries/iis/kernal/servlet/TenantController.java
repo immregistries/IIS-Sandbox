@@ -28,7 +28,7 @@ import static org.immregistries.iis.kernal.fhir.security.ServletHelper.SESSION_T
 public class TenantController {
 	public static final String TENANT_BASE_PATH = "/tenant";
 	public static final String PATH_VARIABLE_TENANT_NAME = "tenantName";
-	public static final String TENANT_PATH = TENANT_BASE_PATH + "/" + PATH_VARIABLE_TENANT_NAME;
+	public static final String TENANT_PATH = TENANT_BASE_PATH + "/{" + PATH_VARIABLE_TENANT_NAME + "}";
 
 	public static final String PARAM_ACTION = "action";
 
