@@ -42,7 +42,7 @@ public class SoapController extends HttpServlet {
 				String password = ssm.getPassword();
 				String facilityId = ssm.getFacilityID();
 				String ack = "";
-				Session dataSession = PopServlet.getDataSession();
+				Session dataSession = ServletHelper.getDataSession();
 				String[] messages;
 				StringBuilder ackBuilder = new StringBuilder();
 				try {
@@ -79,7 +79,7 @@ public class SoapController extends HttpServlet {
 				String userId = ssm.getUsername();
 				String password = ssm.getPassword();
 				String facilityId = ssm.getFacilityID();
-				Session dataSession = PopServlet.getDataSession();
+				Session dataSession = ServletHelper.getDataSession();
 				try {
 					if ("NPE".equals(userId) && "NPE".equals(password)) {
 						throw new UnknownFault("Unknown Fault");
@@ -111,7 +111,7 @@ public class SoapController extends HttpServlet {
 
 			PrintWriter out = resp.getWriter();
 			try {
-				HomeServlet.doHeader(out, "IIS Sandbox");
+				HomeServlet.doHeader(out, "IIS Sandbox", ServletHelper.getTenant());
 				out.println("<h2>CDC SOAP Endpoint</h2>");
 				out.println("<p>");
 				out.println("This demonstration system supports the use of the ");

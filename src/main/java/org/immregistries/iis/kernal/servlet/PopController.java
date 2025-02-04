@@ -3,8 +3,6 @@ package org.immregistries.iis.kernal.servlet;
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.context.FhirVersionEnum;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.cfg.Configuration;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.logic.IncomingMessageHandler;
 import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
@@ -15,10 +13,7 @@ import org.immregistries.smm.transform.Transformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -28,13 +23,17 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Date;
 
+import static org.immregistries.iis.kernal.servlet.TenantController.PARAM_TENANT_NAME;
+
+/**
+ * Generated from PopServlet, changed to se PathVariable functionality
+ */
 @RestController()
-@RequestMapping({"/pop","/tenant/{tenantId}/pop"})
-public class PopServlet {
+@RequestMapping({"/pop", "/tenant/{tenantName}/pop"})
+public class PopController {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	public static final String PARAM_MESSAGE = "MESSAGEDATA";
 	public static final String PARAM_FACILITY_NAME = "FACILITY_NAME";
-	private static SessionFactory factory;
 
 	@Autowired
 	FhirContext fhirContext;
@@ -43,36 +42,27 @@ public class PopServlet {
 	@Autowired
 	IncomingMessageHandler handler;
 
-	public static Session getDataSession() {
-		if (factory == null) {
-			factory = new Configuration().configure().buildSessionFactory();
-		}
-		return factory.openSession();
-	}
-
 	@PostMapping
 //	@Transactional
-	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+	protected void doPost(HttpServletRequest req, HttpServletResponse resp, @RequestParam(name = PARAM_TENANT_NAME, required = false) String tenantName)
 		throws ServletException, IOException {
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		try {
-			String message = req.getParameter(PARAM_MESSAGE);
-			String facility_name = req.getParameter(PARAM_FACILITY_NAME);
-
-			Tenant tenant = ServletHelper.getTenant();
+			Session dataSession = ServletHelper.getDataSession();
+			Tenant tenant = ServletHelper.getTenant(tenantName, dataSession, req);
 
 			String ack = "";
 			String[] messages;
 			StringBuilder ackBuilder = new StringBuilder();
-			Session dataSession = getDataSession();
+			String message = req.getParameter(PARAM_MESSAGE);
+			String facility_name = req.getParameter(PARAM_FACILITY_NAME);
 			try {
 				if (tenant == null) {
 					resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-					out.println(
-						"Access is not authorized. Facilityid, userid and/or password are not recognized. ");
+					out.println("Access is not authorized. Facilityid, userid and/or password are not recognized. ");
 				} else {
-					HomeServlet.doHeader(out, "IIS Sandbox - PopResult");
+					HomeServlet.doHeader(out, "IIS Sandbox - PopResult", tenant);
 
 					messages = message.split("MSH\\|\\^~\\\\&\\|");
 					if (messages.length > 2) {
@@ -123,9 +113,10 @@ public class PopServlet {
 	}
 
 	@GetMapping
-	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+	protected void doGet(HttpServletRequest req, HttpServletResponse resp, @RequestParam(name = PARAM_TENANT_NAME, required = false) String tenantName)
 		throws ServletException, IOException {
 		resp.setContentType("text/html");
+		Tenant tenant = ServletHelper.getTenant(tenantName, ServletHelper.getDataSession(), req);
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		try {
 			String message = req.getParameter(PARAM_MESSAGE);
@@ -143,7 +134,7 @@ public class PopServlet {
 
 
 			{
-				HomeServlet.doHeader(out, "IIS Sandbox - Pop");
+				HomeServlet.doHeader(out, "IIS Sandbox - Pop", tenant);
 				out.println("    <h2>Send Now</h2>");
 				out.println("    <form action=\"pop\" method=\"POST\" target=\"_blank\" autocomplete=\"on\">");
 				out.println("      <h3>VXU Message</h3>");

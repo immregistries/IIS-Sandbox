@@ -6,12 +6,13 @@ import ca.uhn.fhir.rest.server.exceptions.AuthenticationException;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Query;
 import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.hibernate.cfg.Configuration;
 import org.immregistries.iis.kernal.model.Tenant;
 import org.immregistries.iis.kernal.model.UserAccess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -29,6 +30,14 @@ public class ServletHelper {
 	public static final String SESSION_USER_ACCESS = "userAccess";
 	private static String BAD_PASSWORD = "badpassword";
 
+	private static SessionFactory factory;
+
+	public static Session getDataSession() {
+		if (factory == null) {
+			factory = new Configuration().configure().buildSessionFactory();
+		}
+		return factory.openSession();
+	}
 
 
 	public static Tenant authenticateTenant(String username, String password, String facilityName, Session dataSession) {
@@ -208,9 +217,9 @@ public class ServletHelper {
 			UserAccess userAccess = getUserAccess();
 			tenant = authenticateTenant(userAccess, pathVariable, dataSession);
 		}
-		if (tenant == null) {
-			throw new AuthenticationCredentialsNotFoundException("");
-		}
+//		if (tenant == null) {
+//			throw new AuthenticationCredentialsNotFoundException("");
+//		}
 		request.setAttribute(SESSION_TENANT, tenant);
 		return tenant;
 	}

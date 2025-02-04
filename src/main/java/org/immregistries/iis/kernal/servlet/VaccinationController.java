@@ -102,7 +102,7 @@ public class VaccinationController {
 				}
 			}
 
-			HomeServlet.doHeader(out, "IIS Sandbox - Vaccinations");
+			HomeServlet.doHeader(out, "IIS Sandbox - Vaccinations", tenant);
 			SimpleDateFormat sdfDate = new SimpleDateFormat("MM/dd/yyyy");
 
 			out.println("<h2>Vaccination Record: " + cvxPrint + " " + sdfDate.format(vaccination.getAdministeredDate()) + "</h2>");

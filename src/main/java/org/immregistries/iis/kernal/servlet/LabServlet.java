@@ -1,12 +1,12 @@
 package org.immregistries.iis.kernal.servlet;
 
+import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.mqe.hl7util.parser.HL7Reader;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.HashMap;
@@ -185,7 +185,7 @@ public class LabServlet extends HttpServlet {
           }
         }
       }
-      HomeServlet.doHeader(out, "IIS Sandbox");
+		 HomeServlet.doHeader(out, "IIS Sandbox", ServletHelper.getTenant());
 
 
 

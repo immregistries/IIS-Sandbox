@@ -20,7 +20,6 @@ import org.immregistries.iis.kernal.model.PatientReported;
 import org.immregistries.iis.kernal.model.Tenant;
 import org.immregistries.iis.kernal.model.VaccinationMaster;
 import org.immregistries.iis.kernal.servlet.HomeServlet;
-import org.immregistries.iis.kernal.servlet.PopServlet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 
@@ -62,8 +61,8 @@ public class V2ToFhirServlet extends HttpServlet {
 
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
-		Session dataSession = PopServlet.getDataSession();
-		HomeServlet.doHeader(out, "IIS Sandbox");
+		Session dataSession = ServletHelper.getDataSession();
+		HomeServlet.doHeader(out, "IIS Sandbox", tenant);
 		try {
 			PatientReported pr = (PatientReported) dataSession.get(PatientReported.class,
 				Integer.parseInt(req.getParameter(PARAM_PATIENT_REPORTED_ID)));

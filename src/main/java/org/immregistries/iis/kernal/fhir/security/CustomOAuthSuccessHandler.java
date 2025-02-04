@@ -2,7 +2,6 @@ package org.immregistries.iis.kernal.fhir.security;
 
 import org.hibernate.Session;
 import org.immregistries.iis.kernal.model.Tenant;
-import org.immregistries.iis.kernal.servlet.PopServlet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
@@ -16,7 +15,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 
-import static org.immregistries.iis.kernal.fhir.security.ServletHelper.*;
+import static org.immregistries.iis.kernal.fhir.security.ServletHelper.GITHUB_PREFIX;
+import static org.immregistries.iis.kernal.fhir.security.ServletHelper.SESSION_TENANT;
 
 @Component
 public class CustomOAuthSuccessHandler implements AuthenticationSuccessHandler {
@@ -37,7 +37,7 @@ public class CustomOAuthSuccessHandler implements AuthenticationSuccessHandler {
 		Tenant tenant = null;
 		if (authentication instanceof OAuth2AuthenticationToken) {
 			HttpSession session = request.getSession(true);
-			Session dataSession = PopServlet.getDataSession();
+			Session dataSession = ServletHelper.getDataSession();
 			try {
 				OAuth2AuthenticationToken oAuth2AuthenticationToken = (OAuth2AuthenticationToken) authentication;
 				tenant = ServletHelper.authenticateTenant(

@@ -65,7 +65,7 @@ public class MacroEndpointControllerR5 {
 		Bundle facilityBundle = fhirContext.newJsonParser().parseResource(Bundle.class,req.getReader());
 		ServletRequestDetails requestDetails;
 		UserAccess userAccess = ServletHelper.getUserAccess();
-		Session dataSession = PopServlet.getDataSession();
+		Session dataSession = ServletHelper.getDataSession();
 		Tenant tenant = null;
 		/**
 		 * one and only one organization must be specified in bundle

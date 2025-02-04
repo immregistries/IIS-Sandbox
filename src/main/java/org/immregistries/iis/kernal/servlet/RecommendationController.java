@@ -161,7 +161,7 @@ public class RecommendationController {
 
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
-		HomeServlet.doHeader(out, "Recommendations");
+		HomeServlet.doHeader(out, "Recommendations", tenant);
 
 		try {
 			IGenericClient fhirClient = repositoryClientFactory.newGenericClient(req);

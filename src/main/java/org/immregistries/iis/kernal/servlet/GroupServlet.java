@@ -59,7 +59,7 @@ public class GroupServlet extends HttpServlet {
 		}
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
-		HomeServlet.doHeader(out, "IIS Sandbox - Groups");
+		HomeServlet.doHeader(out, "IIS Sandbox - Groups", ServletHelper.getTenant());
 		Group group = new Group();
 		group.setManagingEntity(new Reference().setIdentifier(new Identifier().setType(new CodeableConcept(new Coding().setCode("Organization"))).setSystem("AIRA_TEST").setValue("test")));
 		group.setDescription("Generated Group in IIS sandbox, for Bulk data export use case and Synchronisation with subscription synchronisation");

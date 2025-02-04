@@ -33,7 +33,7 @@ import org.hl7.fhir.r4.model.*;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
 import org.immregistries.iis.kernal.fhir.interceptors.IdentifierSolverInterceptorR4;
 import org.immregistries.iis.kernal.fhir.interceptors.PartitionCreationInterceptor;
-import org.immregistries.iis.kernal.servlet.PopServlet;
+import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -182,7 +182,7 @@ public class BulkExportGroupProviderR4 extends GroupResourceProvider implements 
 
 		ServletRequestDetails theRequestDetails
 	) throws IOException {
-		Session dataSession = PopServlet.getDataSession();
+		Session dataSession = ServletHelper.getDataSession();
 		javax.servlet.http.HttpServletRequest theServletRequest = theRequestDetails.getServletRequest();
 		logger.info("Parameters {}", (Object) theRequestDetails.getParameters().get("_elements"));
 		try {

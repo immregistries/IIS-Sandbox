@@ -15,7 +15,6 @@ import org.immregistries.iis.kernal.JwtUtils;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.model.Tenant;
 import org.immregistries.iis.kernal.model.UserAccess;
-import org.immregistries.iis.kernal.servlet.PopServlet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,7 +59,7 @@ public class CustomAuthorizationInterceptor extends AuthorizationInterceptor {
 		 */
 		HttpServletRequest request = ((ServletRequestDetails) theRequestDetails).getServletRequest();
 		HttpSession httpSession = request.getSession(false);
-		Session dataSession = PopServlet.getDataSession();
+		Session dataSession = ServletHelper.getDataSession();
 		String authHeader = theRequestDetails.getHeader("Authorization");
 		Tenant tenant = null;
 		try {

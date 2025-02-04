@@ -1,10 +1,10 @@
 package org.immregistries.iis.kernal.servlet.deprecated;
 
-import org.immregistries.iis.kernal.servlet.PopServlet;
+import org.immregistries.iis.kernal.servlet.PopController;
 
 //@RestController
 //@RequestMapping("/event")
-public class EventServlet extends PopServlet {
+public class EventServlet extends PopController {
 //	@Autowired
 //	IncomingEventHandler incomingEventHandler;
 //  private static SessionFactory factory;

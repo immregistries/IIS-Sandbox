@@ -1,6 +1,7 @@
 package org.immregistries.iis.kernal.servlet;
 
 import org.hibernate.Session;
+import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.model.Tenant;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -39,9 +40,9 @@ public class LoginServlet {
 		throws ServletException, IOException {
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
-		Session dataSession = PopServlet.getDataSession();
+		Session dataSession = ServletHelper.getDataSession();
 		try {
-			HomeServlet.doHeader(out, "IIS Sandbox");
+			HomeServlet.doHeader(out, "IIS Sandbox", ServletHelper.getTenant());
 			Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
          // LOGIN FORM, inherited, could be made in a separate class and improved
 			if (!authentication.isAuthenticated() || authentication instanceof AnonymousAuthenticationToken) {

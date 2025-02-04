@@ -18,7 +18,6 @@ import io.jsonwebtoken.Jwts;
 import org.hibernate.Session;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.model.UserAccess;
-import org.immregistries.iis.kernal.servlet.PopServlet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -206,7 +205,7 @@ public class JwtAuthController {
 		jwtStore.put((String) signedJWT.getJWTClaimsSet().getClaim("jti"), client_assertion);
 		Session dataSession = null;
 		try {
-			dataSession = PopServlet.getDataSession();
+			dataSession = ServletHelper.getDataSession();
 			UserAccess userAccess = ServletHelper.authenticateUserAccessUsernamePassword(CONNECTATHON_USER,"SundaysR0ck!",dataSession);
 			Map<String, String> result = new HashMap<>(5);
 			result.put("access_token", jwtUtils.generateJwtToken(userAccess));

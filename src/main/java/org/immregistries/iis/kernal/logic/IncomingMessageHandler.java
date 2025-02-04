@@ -37,7 +37,6 @@ import org.immregistries.iis.kernal.mapping.interfaces.PatientMapper;
 import org.immregistries.iis.kernal.mapping.internalClient.FhirRequester;
 import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
 import org.immregistries.iis.kernal.model.*;
-import org.immregistries.iis.kernal.servlet.PopServlet;
 import org.immregistries.mqe.hl7util.ReportableSource;
 import org.immregistries.mqe.hl7util.SeverityLevel;
 import org.immregistries.mqe.hl7util.model.CodedWithExceptions;
@@ -107,7 +106,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 
 	public IncomingMessageHandler() {
 		mqeMessageService = MqeMessageService.INSTANCE;
-		dataSession = PopServlet.getDataSession();
+		dataSession = ServletHelper.getDataSession();
 
 		{
 			InputStream profileXML = IncomingMessageHandler.class.getResourceAsStream("/export/VXU-Z22_Profile.xml");

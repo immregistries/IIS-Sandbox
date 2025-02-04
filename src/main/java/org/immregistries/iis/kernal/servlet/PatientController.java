@@ -26,6 +26,7 @@ import org.immregistries.iis.kernal.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.ServletException;
@@ -41,9 +42,10 @@ import java.util.Set;
 
 import static org.immregistries.iis.kernal.servlet.SubscriptionServlet.PARAM_MESSAGE;
 import static org.immregistries.iis.kernal.servlet.SubscriptionServlet.PARAM_SUBSCRIPTION_ID;
+import static org.immregistries.iis.kernal.servlet.TenantController.PARAM_TENANT_ID;
 
 @RestController
-@RequestMapping({"/patient", "/tenant/{tenantId}/patient"})
+@RequestMapping({"/patient", "/tenant/{tenantName}/patient"})
 public class PatientController {
 	public static final String PARAM_ACTION = "action";
 	public static final String ACTION_SEARCH = "search";
@@ -77,20 +79,20 @@ public class PatientController {
 	}
 
 	@PostMapping
-	protected void doPost(HttpServletRequest req, HttpServletResponse resp, @PathVariable(value = "tenantId", required = false) String tenantId)
+	protected void doPost(HttpServletRequest req, HttpServletResponse resp, @PathVariable(value = PARAM_TENANT_ID, required = false) String tenantId)
 		throws ServletException, IOException {
 		doGet(req, resp, tenantId);
 	}
 
 	@GetMapping
-	protected void doGet(HttpServletRequest req, HttpServletResponse resp, @PathVariable(value = "tenantId", required = false) String tenantId)
+	protected void doGet(HttpServletRequest req, HttpServletResponse resp, @PathVariable(value = PARAM_TENANT_ID, required = false) String tenantId)
 		throws ServletException, IOException {
 		resp.setContentType("text/html");
-		Session dataSession = PopServlet.getDataSession();
+		Session dataSession = ServletHelper.getDataSession();
 		Tenant tenant = ServletHelper.getTenant(tenantId, dataSession, req);
-//		if (tenant == null) {
-//			throw new AuthenticationCredentialsNotFoundException("");
-//		}
+		if (tenant == null) {
+			throw new AuthenticationCredentialsNotFoundException("");
+		}
 
 		IGenericClient fhirClient = repositoryClientFactory.newGenericClient(req);
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
@@ -121,7 +123,7 @@ public class PatientController {
 				externalLink = "";
 			}
 
-			HomeServlet.doHeader(out, "IIS Sandbox - Patients");
+			HomeServlet.doHeader(out, "IIS Sandbox - Patients", tenant);
 
 			PatientMaster patientMasterSelected = null;
 			IBaseResource patientSelected = fetchPatientFromParameter(req, fhirClient, fhirRequester);

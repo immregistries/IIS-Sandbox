@@ -42,11 +42,11 @@ public class MessageServlet extends HttpServlet {
 
     resp.setContentType("text/html");
     PrintWriter out = new PrintWriter(resp.getOutputStream());
-    Session dataSession = PopServlet.getDataSession();
+	  Session dataSession = ServletHelper.getDataSession();
     try {
       String messageError = null;
       String messageConfirmation = null;
-      HomeServlet.doHeader(out, "IIS Sandbox");
+		 HomeServlet.doHeader(out, "IIS Sandbox", ServletHelper.getTenant());
       if (messageError != null) {
         out.println("  <div class=\"w3-panel w3-red\">");
         out.println("    <p>" + messageError + "</p>");

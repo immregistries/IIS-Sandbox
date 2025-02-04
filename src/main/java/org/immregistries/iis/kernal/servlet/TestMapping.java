@@ -66,7 +66,7 @@ public class TestMapping extends HttpServlet {
 			String ack = "";
 			String[] messages;
 			StringBuilder ackBuilder = new StringBuilder();
-			Session dataSession = PopServlet.getDataSession();
+			Session dataSession = ServletHelper.getDataSession();
 			try {
 				if (tenant == null) {
 					resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -115,7 +115,7 @@ public class TestMapping extends HttpServlet {
 				message = testCaseMessage.getMessageText();
 			}
 			{
-				HomeServlet.doHeader(out, "IIS Sandbox");
+				HomeServlet.doHeader(out, "IIS Sandbox", ServletHelper.getTenant());
 				out.println("    <h2>Send Now to Test Mapping</h2>");
 				out.println("    <form action=\"utest\" method=\"POST\" target=\"_blank\">");
 				out.println("      <h3>VXU Message</h3>");

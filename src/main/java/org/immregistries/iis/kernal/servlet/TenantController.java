@@ -45,7 +45,7 @@ public class TenantController {
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp, @RequestParam(name= PARAM_TENANT_NAME, required = false) String tenantName)
 		throws ServletException, IOException {
 		UserAccess userAccess = ServletHelper.getUserAccess();
-		try (Session dataSession = PopServlet.getDataSession()) {
+		try (Session dataSession = ServletHelper.getDataSession()) {
 			if (StringUtils.isNotBlank(tenantName)) {
 				if (tenantName.indexOf(PARTITION_NAME_SEPARATOR) > 0) {
 					throw new InvalidRequestException("Invalid tenant name , should not use -");
@@ -75,7 +75,7 @@ public class TenantController {
 		String action = req.getParameter(PARAM_ACTION);
 		String tenantId = req.getParameter(PARAM_TENANT_ID);
 
-		try (Session dataSession = PopServlet.getDataSession()) {
+		try (Session dataSession = ServletHelper.getDataSession()) {
 			Tenant tenant = ServletHelper.getTenant();
 			UserAccess userAccess = ServletHelper.getUserAccess();
 			if (userAccess != null && session != null) {
@@ -91,7 +91,7 @@ public class TenantController {
 				/*
 				 * print starts after potential tenant switch
 				 */
-				HomeServlet.doHeader(out, "IIS Sandbox - Home");
+				HomeServlet.doHeader(out, "IIS Sandbox - Home", tenant);
 
 				out.println("<div class=\"w3-container w3-half w3-margin-top\">");
 

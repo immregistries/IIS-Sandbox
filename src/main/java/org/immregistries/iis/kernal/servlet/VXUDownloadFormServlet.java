@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 
-
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -63,7 +62,7 @@ public class VXUDownloadFormServlet extends HttpServlet {
 		  beanFactory.autowireBean(generator);
         session.setAttribute(CACHED_GENERATOR, generator);
       }
-      HomeServlet.doHeader(out, "IIS Sandbox");
+		 HomeServlet.doHeader(out, "IIS Sandbox", tenant);
 
       if (action.equals(ACTION_GENERATE) && generator.canGenerate()) {
         generator.start();

@@ -4,7 +4,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Session;
 import org.immregistries.iis.kernal.model.Tenant;
 import org.immregistries.iis.kernal.model.UserAccess;
-import org.immregistries.iis.kernal.servlet.PopServlet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +41,7 @@ public class UsernamePasswordAuthenticationProvider implements AuthenticationPro
 
 	public Authentication authenticate(Authentication authentication) throws AuthenticationException {
 		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
-		Session dataSession = PopServlet.getDataSession();
+		Session dataSession = ServletHelper.getDataSession();
 
 		// TODO maybe customize  "PrincipalExtractor" instead and have the userAccess/tenant as principal https://www.baeldung.com/spring-security-oauth-principal-authorities-extractor
 		if (StringUtils.isNotBlank(request.getParameter(PARAM_TENANT_NAME))) {

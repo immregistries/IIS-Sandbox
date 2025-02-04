@@ -7,6 +7,7 @@ import ca.uhn.hl7v2.parser.Parser;
 import ca.uhn.hl7v2.util.Terser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hibernate.SessionFactory;
+import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -163,7 +164,7 @@ public class VciServlet extends HttpServlet {
 
         message = mapper.writeValueAsString(verifiableCredential);
       }
-      HomeServlet.doHeader(out, "IIS Sandbox");
+      HomeServlet.doHeader(out, "IIS Sandbox", ServletHelper.getTenant());
 		 out.println("    <h2>VCI Demonstration</h2>");
       out.println("    <form action=\"vciDemo\" method=\"POST\">");
       if (conversionStep == null) {

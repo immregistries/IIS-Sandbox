@@ -32,10 +32,11 @@ public class HomeServlet extends HttpServlet {
 	/**
 	 * Helping method for unified Header printing in UI
 	 *
-	 * @param out   PrintWriter
-	 * @param title Page title for tab header
+	 * @param out    PrintWriter
+	 * @param title  Page title for tab header
+	 * @param tenant
 	 */
-	public static void doHeader(PrintWriter out, String title) {
+	public static void doHeader(PrintWriter out, String title, Tenant tenant) {
 		out.println("<html>");
 		out.println("  <head>");
 		out.println("    <title>" + title + "</title>");
@@ -55,13 +56,11 @@ public class HomeServlet extends HttpServlet {
 		out.println("<a href=\"soap\" class=\"w3-bar-item w3-button\">CDC WSDL</a>");
 		if (authentication.isAuthenticated() && !(authentication instanceof AnonymousAuthenticationToken)) {
 			out.println("<a class='w3-bar-item w3-button w3-right' href=\"logout\">Logout</a>");
-			Tenant tenant = ServletHelper.getTenant();
+			String link = "tenant";
 			if (tenant != null) {
-				String link = "tenant";
 				out.println("<a class='w3-bar-item w3-button w3-right w3-green' href=\"" + link + "\">Tenant : " + tenant.getOrganizationName() + " </a>");
-				out.println("<a href=\"fhir/" + ServletHelper.getTenant().getOrganizationName() + "/metadata\" class=\"w3-bar-item w3-button w3-right \">Tenant Fhir Server Base</a>");
+				out.println("<a href=\"fhir/" + tenant.getOrganizationName() + "/metadata\" class=\"w3-bar-item w3-button w3-right \">Tenant Fhir Server Base</a>");
 			} else {
-				String link = "tenant";
 				out.println("<a class='w3-bar-item w3-button w3-right w3-green' href=\"" + link + "\">No Tenant selected</a>");
 			}
 		} else {
@@ -141,7 +140,7 @@ public class HomeServlet extends HttpServlet {
 		}
 
 		try {
-			doHeader(out, "IIS Sandbox - Home");
+			doHeader(out, "IIS Sandbox - Home", ServletHelper.getTenant());
 			out.println("    <div class=\"w3-container w3-half w3-margin-top\">");
 			out.println("    <div class=\"w3-panel w3-yellow\"><p class=\"w3-left-align\">This system is for test purposes only. " +
 				"Do not submit production data. As a precaution all submitted data will be deleted once a day.  </p></div>");

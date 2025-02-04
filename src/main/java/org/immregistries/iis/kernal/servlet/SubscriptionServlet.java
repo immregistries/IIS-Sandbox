@@ -5,14 +5,14 @@ import ca.uhn.fhir.parser.IParser;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import org.apache.commons.lang3.tuple.MutablePair;
 import org.apache.commons.lang3.tuple.Pair;
-import org.hl7.fhir.r5.model.*;
+import org.hl7.fhir.r5.model.Bundle;
+import org.hl7.fhir.r5.model.Subscription;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.logic.SubscriptionService;
 import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
 import org.immregistries.iis.kernal.model.Tenant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
-
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletInputStream;
@@ -81,7 +81,7 @@ public class SubscriptionServlet extends HttpServlet {
 
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
-		HomeServlet.doHeader(out, "IIS Sandbox - SubscriptionsResult");
+		HomeServlet.doHeader(out, "IIS Sandbox - SubscriptionsResult", tenant);
 
 		try {
 			Bundle searchBundle = localClient.search().forResource(Subscription.class)
@@ -150,7 +150,7 @@ public class SubscriptionServlet extends HttpServlet {
 									PrintWriter out,IGenericClient fhirClient, String subscriptionId) {
 
 		try {
-			HomeServlet.doHeader(out, "IIS Sandbox - Subscriptions");
+			HomeServlet.doHeader(out, "IIS Sandbox - Subscriptions", ServletHelper.getTenant());
 			ServletInputStream servletInputStream = req.getInputStream();
 
 			String[] initialMessages = new String[]{OPERATION_SAMPLE};
@@ -237,7 +237,7 @@ public class SubscriptionServlet extends HttpServlet {
 				bundle = fhirClient.search().forResource(Subscription.class).returnBundle(Bundle.class).execute();
 			}
 
-			HomeServlet.doHeader(out, "IIS Sandbox - Subscriptions");
+			HomeServlet.doHeader(out, "IIS Sandbox - Subscriptions", ServletHelper.getTenant());
 
 			out.println("    <div class=\"w3-container w3-half w3-margin-top\">");
 			out.println("    <h3>Search Subscription</h3>");
