@@ -97,6 +97,34 @@ public class HomeServlet extends HttpServlet {
 		out.println("</html>");
 	}
 
+	public static void printFlavors(PrintWriter out) {
+		out.println("    <h2>Processing Flavors</h2>");
+		out.println("    <p>If any of the following words appear in the name of the tenant then special processing rules will apply. " +
+			"These processing rules can be used to simulate specific IIS behavior. </p>");
+		out.println("    <ul class=\"w3-ul w3-hoverable\">");
+		for (ProcessingFlavor processingFlavor : ProcessingFlavor.values()) {
+			out.println("      <li>" + processingFlavor.getKey() + ": " + processingFlavor.getBehaviorDescription() + "</li>");
+		}
+		out.println("    </ul>");
+	}
+
+	public static void printGoldenRecordExplanation(PrintWriter out, IBaseResource iBaseResource) {
+		String color;
+		String message;
+		if (FhirRequester.isGoldenRecord(iBaseResource)) {
+			color = "yellow";
+			message = "Golden/Master record, As part of the Master Data Management (MDM), this record was generated aggregating the information across records identified as potential duplicates";
+		} else {
+			color = "blue";
+			message = "Non-Golden/Reported record, As part of the Master Data Management (MDM), " +
+				"This record represents the information as it was first received, before a merging process, " +
+				"and is kept separated from the golden record for preserving history and later potential merging";
+		}
+		out.println("<div class=\"w3-panel w3-leftbar w3-border-" + color + " w3-pale-" + color + "\"><p class=\"w3-left-align\">");
+		out.println(message);
+		out.println("</p></div>");
+	}
+
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		doGet(req, resp);
@@ -109,14 +137,18 @@ public class HomeServlet extends HttpServlet {
 		try {
 			doHeader(out, "IIS Sandbox - Home");
 			out.println("    <div class=\"w3-container w3-half w3-margin-top\">");
-			out.println("    <div class=\"w3-panel w3-yellow\"><p class=\"w3-left-align\">This system is for test purposes only. " + "Do not submit production data. As a precaution all submitted data will be deleted once a day.  </p></div>");
+			out.println("    <div class=\"w3-panel w3-yellow\"><p class=\"w3-left-align\">This system is for test purposes only. " +
+				"Do not submit production data. As a precaution all submitted data will be deleted once a day.  </p></div>");
 			if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R5)) {
-				out.println("    <div class=\"w3-panel w3-light-blue\"><p class=\"w3-left-align\">IIS Sandbox is deployed using a R5 FHIR Server, functionalities related to FHIR Subscriptions and Covid are enabled</p></div>");
+				out.println("    <div class=\"w3-panel w3-light-blue\"><p class=\"w3-left-align\">" +
+					"IIS Sandbox is deployed using a R5 FHIR Server, functionalities related to FHIR Subscriptions and Covid are enabled</p></div>");
 			} else if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R4)) {
-				out.println("    <div class=\"w3-panel w3-light-green\"><p class=\"w3-left-align\">IIS Sandbox is deployed using a R4 FHIR Server, functionalities related to FHIR Subscriptions and Covid are disabled</p></div>");
+				out.println("    <div class=\"w3-panel w3-light-green\"><p class=\"w3-left-align\">" +
+					"IIS Sandbox is deployed using a R4 FHIR Server, functionalities related to FHIR Subscriptions and Covid are disabled</p></div>");
 			}
 			out.println("    <h2>Documentation</h2>");
-			out.println("    <p class=\"w3-left-align\">Please see the project wiki: " + "<a href=\"https://github.com/immregistries/IIS-Sandbox/wiki\">https://github.com/immregistries/IIS-Sandbox/wiki</a></p>");
+			out.println("    <p class=\"w3-left-align\">Please see the project wiki: " +
+				"<a href=\"https://github.com/immregistries/IIS-Sandbox/wiki\">https://github.com/immregistries/IIS-Sandbox/wiki</a></p>");
 			out.println("    <h2>Primary Functions Supported</h2>");
 			out.println("    <ul class=\"w3-ul w3-hoverable\">");
 			out.println("      <li><a href=\"pop\">Send Now</a>: Send an HL7 message in now.</li>");
@@ -138,9 +170,11 @@ public class HomeServlet extends HttpServlet {
 			out.println("    </ul>");
 			out.println("    <h3>Concepts and dependencies</h3>");
 			out.println("    <ul class=\"w3-ul w3-hoverable\">");
-			out.println("      <li><h4>HAPIFHIR Server Backend:</h4> This sandbox uses HAPIFHIR JPA Server framework as an end layer to store records, using an experimental mapping layer to use inherited Hl7v2 based functionalities, current version of HAPIFHIR is a " +
+			out.println("      <li><h4>HAPIFHIR Server Backend:</h4> This sandbox uses HAPIFHIR JPA Server framework as an end layer to store records, " +
+				"using an experimental mapping layer to use inherited Hl7v2 based functionalities, current version of HAPIFHIR is a " +
 				"<a href='https://github.com/cerbeor/hapi-fhir-Subscription-custom'>modded</a> 6.8.3</li>");
-			out.println("      <li><h4>Multitenancy:</h4> Tenants allow separate testing environments, using different Flavors and different partitions of FHIR Server,	Base URLs are formatted as <a href='fhir'>/iis/fhir/{tenantName}</a></li>");
+			out.println("      <li><h4>Multitenancy:</h4> Tenants allow separate testing environments, using different Flavors and different partitions of FHIR Server,	" +
+				"Base URLs are formatted as <a href='fhir'>/iis/fhir/{tenantName}</a></li>");
 			out.println("      <li><h4>Record's Matching:</h4>Matching resources using " +
 				"<a href='https://github.com/immregistries/mismo-match'>MISMO</a> for Patients (Activated with a Flavor), " +
 				"<a href='https://github.com/usnistgov/vaccination_deduplication'>vaccination_deduplication</a> for Immunizations</li>");
@@ -148,10 +182,8 @@ public class HomeServlet extends HttpServlet {
 				"<a href='https://hapifhir.io/hapi-fhir/docs/server_jpa_mdm/mdm.html'>HAPIFHIR's MDM</a>" +
 				", Customization includes the above matching logic, a layer to add all the record's identifiers in Golden records, and R5 Support");
 			out.println("      <li><h4>Golden/Master record:</h4>Golden records are generated by MDM system as the reference records to match with and merge information in");
-			out.println("      <li><h4>Bulk data exchange server:</h4>Bulk data export implemented, alongside $member-add and $member-remove operations on Groups, SMART authentication support in progress (Currently disabled)");
-//			if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R5)) {
-//			} else if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R4)) {
-//			}
+			out.println("      <li><h4>Bulk data exchange server:</h4>Bulk data <a href='https://build.fhir.org/ig/HL7/bulk-data/export.html'>export</a> implemented, " +
+				"alongside $member-add and $member-remove operations on Groups, SMART authentication support in progress (Currently disabled)");
 			out.println("    </ul>");
 			out.println("    <h3>Secondary Functions Supported</h3>");
 			out.println("    <ul class=\"w3-ul w3-hoverable\">");
@@ -174,10 +206,12 @@ public class HomeServlet extends HttpServlet {
 			out.println("  <img src=\"img/markus-spiske-dWaRJ3WBnGs-unsplash.jpg\" class=\"w3-round\" alt=\"Sandbox\" width=\"400\">");
 			out.println("<a " +
 				"style=\"background-color:black;color:white;text-decoration:none;padding:4px 6px;font-family:-apple-system, " +
-				"BlinkMacSystemFont, &quot;San Francisco&quot;, &quot;Helvetica Neue&quot;, Helvetica, Ubuntu, Roboto, Noto, &quot;Segoe UI&quot;, Arial, sans-serif;font-size:12px;font-weight:bold;line-height:1.2;display:inline-block;border-radius:3px\" " +
+				"BlinkMacSystemFont, &quot;San Francisco&quot;, &quot;Helvetica Neue&quot;, Helvetica, Ubuntu, Roboto, Noto," +
+				" &quot;Segoe UI&quot;, Arial, sans-serif;font-size:12px;font-weight:bold;line-height:1.2;display:inline-block;border-radius:3px\" " +
 				"href=\"https://unsplash.com/@markusspiske?utm_medium=referral&amp;utm_campaign=photographer-credit&amp;utm_content=creditBadge\" " +
 				"target=\"_blank\" rel=\"noopener noreferrer\" title=\"Download free do whatever you want high-resolution photos from Markus Spiske\">" +
-				"<span style=\"display:inline-block;padding:2px 3px\"><svg xmlns=\"http://www.w3.org/2000/svg\" style=\"height:12px;width:auto;position:relative;vertical-align:middle;top:-2px;fill:white\" viewBox=\"0 0 32 32\">" +
+				"<span style=\"display:inline-block;padding:2px 3px\">" +
+				"<svg xmlns=\"http://www.w3.org/2000/svg\" style=\"height:12px;width:auto;position:relative;vertical-align:middle;top:-2px;fill:white\" viewBox=\"0 0 32 32\">" +
 				"<title>unsplash-logo</title>" +
 				"<path d=\"M10 9V0h12v9H10zm12 5h10v18H0V14h10v9h12v-9z\"></path></svg></span><span style=\"display:inline-block;padding:2px 3px\">Markus Spiske</span></a>");
 			doFooter(out);
@@ -186,30 +220,5 @@ public class HomeServlet extends HttpServlet {
 		}
 		out.flush();
 		out.close();
-	}
-
-	public static void printFlavors(PrintWriter out) {
-		out.println("    <h2>Processing Flavors</h2>");
-		out.println("    <p>If any of the following words appear in the name of the tenant then special processing rules will apply. " + "These processing rules can be used to simulate specific IIS behavior. </p>");
-		out.println("    <ul class=\"w3-ul w3-hoverable\">");
-		for (ProcessingFlavor processingFlavor : ProcessingFlavor.values()) {
-			out.println("      <li>" + processingFlavor.getKey() + ": " + processingFlavor.getBehaviorDescription() + "</li>");
-		}
-		out.println("    </ul>");
-	}
-
-	public static void printGoldenRecordExplanation(PrintWriter out, IBaseResource iBaseResource) {
-		String color;
-		String message;
-		if (FhirRequester.isGoldenRecord(iBaseResource)) {
-			color = "yellow";
-			message = "Golden/Master record, As part of the Master Data Management (MDM), this record was generated aggregating the information across records identified as potential duplicates";
-		} else {
-			color = "blue";
-			message = "Non-Golden/Reported record, As part of the Master Data Management (MDM), This record represents the information as it was first received, before a merging process, and is kept separated from the golden record for preserving history and later potential merging";
-		}
-		out.println("<div class=\"w3-panel w3-leftbar w3-border-" + color + " w3-pale-" + color + "\"><p class=\"w3-left-align\">");
-		out.println(message);
-		out.println("</p></div>");
 	}
 }
