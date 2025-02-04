@@ -174,6 +174,9 @@ public class RecommendationServlet extends PatientServlet {
 			} else {
 				patientResource = fetchPatientFromParameter(req, fhirClient);
 			}
+			if (patientResource == null) {
+				out.println("No patient or recommendation found with request parameters.");
+			}
 			PatientMaster patientMaster = patientMapper.localObject(patientResource);
 			BusinessIdentifier identifier = patientMaster.getMainBusinessIdentifier();
 			if (StringUtils.isBlank(identifier.getValue())) {
