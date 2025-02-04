@@ -1,15 +1,15 @@
 package org.immregistries.iis.kernal.servlet;
 
+import ca.uhn.fhir.context.FhirContext;
 import org.hl7.fhir.r5.model.*;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
-import org.immregistries.iis.kernal.model.UserAccess;
 import org.immregistries.iis.kernal.mapping.internalClient.FhirRequester;
 import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
+import org.immregistries.iis.kernal.model.UserAccess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
-
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -31,6 +31,8 @@ public class GroupServlet extends HttpServlet {
 	RepositoryClientFactory repositoryClientFactory;
 	@Autowired
 	FhirRequester fhirRequester;
+	@Autowired
+	FhirContext fhirContext;
 
 
 	@Override
@@ -62,11 +64,11 @@ public class GroupServlet extends HttpServlet {
 		group.setManagingEntity(new Reference().setIdentifier(new Identifier().setType(new CodeableConcept(new Coding().setCode("Organization"))).setSystem("AIRA_TEST").setValue("test")));
 		group.setDescription("Generated Group in IIS sandbox, for Bulk data export use case and Synchronisation with subscription synchronisation");
 		out.println("<p>");
-		out.println(repositoryClientFactory.getFhirContext().newJsonParser().setPrettyPrint(true).encodeResourceToString(group));
+		out.println(fhirContext.newJsonParser().setPrettyPrint(true).encodeResourceToString(group));
 		out.println("</p>");
 		Parameters parameters = new Parameters().addParameter("test", new Identifier().setValue("iii"));
 		out.println("<p>");
-		out.println(repositoryClientFactory.getFhirContext().newJsonParser().setPrettyPrint(true).encodeResourceToString(parameters));
+		out.println(fhirContext.newJsonParser().setPrettyPrint(true).encodeResourceToString(parameters));
 		out.println("</p>");
 		HomeServlet.doFooter(out);
 		out.flush();

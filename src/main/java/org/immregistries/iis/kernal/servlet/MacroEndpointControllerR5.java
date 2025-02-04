@@ -30,7 +30,7 @@ import java.io.IOException;
 @RestController()
 @RequestMapping("/$create")
 @Conditional(OnR5Condition.class)
-public class MacroEndpointController {
+public class MacroEndpointControllerR5 {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	@Autowired
 	FhirContext fhirContext;

@@ -17,17 +17,17 @@ public class ServletRegistrationConfig {
 	@Autowired
 	AutowireCapableBeanFactory beanFactory;
 
-	@Bean
-	@Conditional(OnR5Condition.class)
-	public ServletRegistrationBean<GroupServlet> groupServletRegistrationBean() {
-		ServletRegistrationBean<GroupServlet> registrationBean = new ServletRegistrationBean<>();
-		GroupServlet servlet = new GroupServlet();
-		beanFactory.autowireBean(servlet);
-		registrationBean.setServlet(servlet);
-		registrationBean.addUrlMappings("/group");
-		registrationBean.setLoadOnStartup(1);
-		return registrationBean;
-	}
+//	@Bean
+//	@Conditional(OnR5Condition.class)
+//	public ServletRegistrationBean<GroupServlet> groupServletRegistrationBean() {
+//		ServletRegistrationBean<GroupServlet> registrationBean = new ServletRegistrationBean<>();
+//		GroupServlet servlet = new GroupServlet();
+//		beanFactory.autowireBean(servlet);
+//		registrationBean.setServlet(servlet);
+//		registrationBean.addUrlMappings("/group");
+//		registrationBean.setLoadOnStartup(1);
+//		return registrationBean;
+//	}
 
 	@Bean
 	public ServletRegistrationBean<MessageServlet> messageServletRegistrationBean() {

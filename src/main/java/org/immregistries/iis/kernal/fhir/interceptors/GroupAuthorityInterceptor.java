@@ -11,13 +11,10 @@ import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
 import org.hl7.fhir.r5.model.Group;
 import org.hl7.fhir.r5.model.Organization;
 import org.hl7.fhir.r5.model.Reference;
-import org.immregistries.iis.kernal.fhir.common.annotations.OnR5Condition;
 import org.immregistries.iis.kernal.mapping.internalClient.FhirRequesterR5;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Conditional;
-import org.springframework.stereotype.Service;
 
 import javax.interceptor.Interceptor;
 import java.util.HashMap;
@@ -32,8 +29,8 @@ import static ca.uhn.fhir.interceptor.api.Pointcut.SERVER_PROCESSING_COMPLETED_N
  * Aims at allowing Groups access by Facilities ruling over the managing facility
  */
 @Interceptor
-@Conditional(OnR5Condition.class)
-@Service
+//@Conditional(OnR5Condition.class)
+//@Service
 public class GroupAuthorityInterceptor {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -57,10 +54,10 @@ public class GroupAuthorityInterceptor {
 		Organization sendingOrganization = new Organization(); // TODO identify sending facility
 		RestOperationTypeEnum operation = requestDetails.getRestOperationType();
 		if (requestDetails.getResource() instanceof Group && (operation.equals(RestOperationTypeEnum.CREATE) || operation.equals(RestOperationTypeEnum.UPDATE))) {
-			Group group = (Group) requestDetails.getResource();
-			if (group.hasManagingEntity()) {
-				Organization managingOrganization = organizationFromReference(group.getManagingEntity(),requestDetails);
-			}
+//			Group group = (Group) requestDetails.getResource();
+//			if (group.hasManagingEntity()) {
+//				Organization managingOrganization = organizationFromReference(group.getManagingEntity(),requestDetails);
+//			}
 		}
 	 }
 
