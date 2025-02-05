@@ -45,7 +45,7 @@ public class VXUDownloadFormServlet extends HttpServlet {
 
     resp.setContentType("text/html");
     PrintWriter out = new PrintWriter(resp.getOutputStream());
-	  Tenant tenant = ServletHelper.getTenant();
+	  Tenant tenant = ServletHelper.getTenant(req);
 	  if (tenant == null) {
 		  throw new AuthenticationCredentialsNotFoundException("");
 	  }

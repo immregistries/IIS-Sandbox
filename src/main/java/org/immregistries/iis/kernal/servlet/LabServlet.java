@@ -185,7 +185,7 @@ public class LabServlet extends HttpServlet {
           }
         }
       }
-		 HomeServlet.doHeader(out, "IIS Sandbox", ServletHelper.getTenant());
+		 HomeServlet.doHeader(out, "IIS Sandbox", ServletHelper.getTenant(req));
 
 
 

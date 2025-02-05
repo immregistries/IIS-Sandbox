@@ -1,10 +1,12 @@
 package org.immregistries.iis.kernal.logic.ack;
 
 import org.apache.commons.lang3.StringUtils;
+import org.immregistries.iis.kernal.model.ProcessingFlavor;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Taken from Mqe-util AckBuilder to allow introduction of new codes
@@ -13,7 +15,7 @@ public enum IisAckBuilder {
 	INSTANCE;
 	public static final String PROCESSING_ID_DEBUG = "D";
 
-	public String buildAckFrom(IisAckData ackDataIn) {
+	public String buildAckFrom(IisAckData ackDataIn, Set<ProcessingFlavor> processingFlavorSet) {
 
 		String controlId = ackDataIn.getMessageControlId();
 		String processingId = ackDataIn.getProcessingControlId();
@@ -28,7 +30,7 @@ public enum IisAckBuilder {
 		String profileExtension = ackDataIn.getProfileExtension();
 		List<IisReportable> reportables = ackDataIn.getReportables();
 
-		IisHL7Util.makeMsaAndErr(ack, controlId, processingId, profileExtension, reportables);
+		IisHL7Util.makeMsaAndErr(ack, controlId, processingId, profileExtension, reportables, processingFlavorSet);
 		return ack.toString();
 	}
 

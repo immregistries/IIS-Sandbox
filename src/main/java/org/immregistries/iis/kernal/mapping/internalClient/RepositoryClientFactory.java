@@ -104,7 +104,7 @@ public class RepositoryClientFactory extends ApacheRestfulClientFactory implemen
 	public IGenericClient newGenericClient(HttpServletRequest request) {
 		asynchInit();
 		if (request.getAttribute(FHIR_CLIENT) == null) {
-			Tenant tenant = ServletHelper.getTenant();
+			Tenant tenant = ServletHelper.getTenant(request);
 			if (tenant != null) {
 				request.setAttribute(FHIR_CLIENT, newGenericClient(tenant, request));
 			} else {

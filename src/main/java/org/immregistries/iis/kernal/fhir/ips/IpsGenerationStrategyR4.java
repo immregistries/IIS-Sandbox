@@ -10,9 +10,9 @@ import org.hl7.fhir.instance.model.api.IBaseBundle;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.instance.model.api.IIdType;
 import org.hl7.fhir.r4.model.*;
-import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.mapping.forR4.OrganizationMapperR4;
+import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
 import org.immregistries.iis.kernal.model.Tenant;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -41,7 +41,6 @@ public class IpsGenerationStrategyR4 extends DefaultIpsGenerationStrategy  imple
 	@Override
 	public IBaseResource createAuthor() {
 		Tenant tenant = ServletHelper.getTenant();
-
 		Organization organization = organizationMapper.getFhirResource(tenant);
 		return organization;
 	}

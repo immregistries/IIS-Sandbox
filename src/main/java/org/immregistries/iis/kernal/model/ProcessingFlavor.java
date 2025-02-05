@@ -1,7 +1,5 @@
 package org.immregistries.iis.kernal.model;
 
-import org.immregistries.iis.kernal.fhir.security.ServletHelper;
-
 import java.util.HashSet;
 import java.util.Set;
 
@@ -95,15 +93,5 @@ public enum ProcessingFlavor {
 
 	public String getBehaviorDescription() {
 		return behaviorDescription;
-	}
-
-	/**
-	 * Should only be used in Servlet Context
-	 * TODO remove
-	 *
-	 * @return flavor Active
-	 */
-	public boolean isActive() {
-		return ServletHelper.getTenant().getProcessingFlavorSet().contains(this);
 	}
 }

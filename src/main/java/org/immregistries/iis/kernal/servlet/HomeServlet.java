@@ -34,7 +34,7 @@ public class HomeServlet extends HttpServlet {
 	 *
 	 * @param out    PrintWriter
 	 * @param title  Page title for tab header
-	 * @param tenant
+	 * @param tenant Currently usedO Tenant or null
 	 */
 	public static void doHeader(PrintWriter out, String title, Tenant tenant) {
 		out.println("<html>");

@@ -12,6 +12,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.immregistries.iis.kernal.logic.IIncomingMessageHandler.ADVANCED_ACK;
@@ -326,8 +327,8 @@ public class IisHL7Util {
 		return ack.toString();
 	}
 
-	public static void makeMsaAndErr(StringBuilder sb, String controlId, String processingId, String profileExtension, List<IisReportable> reportables) {
-		String ackCode = getAckCode(profileExtension, reportables);
+	public static void makeMsaAndErr(StringBuilder sb, String controlId, String processingId, String profileExtension, List<IisReportable> reportables, Set<ProcessingFlavor> processingFlavorSet) {
+		String ackCode = getAckCode(profileExtension, reportables, processingFlavorSet);
 		sb.append("MSA|").append(ackCode).append("|").append(controlId).append("|\r");
 		for (IisReportable r : reportables) {
 			if (r.getSeverity() == IisReportableSeverity.ERROR) {
@@ -367,10 +368,10 @@ public class IisHL7Util {
 		return false;
 	}
 
-	private static String getAckCode(String profileExtension, List<IisReportable> reportables) {
+	private static String getAckCode(String profileExtension, List<IisReportable> reportables, Set<ProcessingFlavor> processingFlavorSet) {
 		String ackCode;
 		String hl7ErrorCode;
-		if (ProcessingFlavor.NOTICE.isActive()) {
+		if (processingFlavorSet.contains(ProcessingFlavor.NOTICE)) {
 			List<IisReportable> copy = new ArrayList<>(reportables.size());
 			for (IisReportable reportable : reportables) {
 				if (reportable.getSeverity() == IisReportableSeverity.ERROR) {

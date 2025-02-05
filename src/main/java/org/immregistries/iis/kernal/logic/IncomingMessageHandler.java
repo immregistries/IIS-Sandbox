@@ -356,7 +356,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 		data.setResponseType("?");
 		data.setReportables(reportables);
 
-		return ackBuilder.buildAckFrom(data);
+		return ackBuilder.buildAckFrom(data, processingFlavorSet);
 	}
 
 	public Date parseDateWarn(String dateString, String errorMessage, String segmentId, int segmentRepeat, int fieldPosition, boolean strict, List<IisReportable> iisReportableList) {
@@ -593,7 +593,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 
 		{
 			String sendersUniqueId = reader.getValue(10);
-			IisHL7Util.makeMsaAndErr(sb, sendersUniqueId, profileId, profileId, iisReportables);
+			IisHL7Util.makeMsaAndErr(sb, sendersUniqueId, profileId, profileId, iisReportables, processingFlavorSet);
 //			if (hasErrors(iisReportables)) {
 //				sb.append("MSA|AE|").append(sendersUniqueId).append("\r");
 //			} else {
