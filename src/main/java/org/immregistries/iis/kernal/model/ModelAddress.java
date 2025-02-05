@@ -2,7 +2,7 @@ package org.immregistries.iis.kernal.model;
 
 import org.apache.commons.lang3.StringUtils;
 
-public class PatientAddress {
+public class ModelAddress {
 	private String addressLine1 = "";
 	private String addressLine2 = "";
 	private String addressCity = "";
@@ -87,36 +87,36 @@ public class PatientAddress {
 			.setPostalCode(getAddressZip());
 	}
 
-	public static PatientAddress fromR4(org.hl7.fhir.r4.model.Address address) {
-		PatientAddress patientAddress = new PatientAddress();
+	public static ModelAddress fromR4(org.hl7.fhir.r4.model.Address address) {
+		ModelAddress modelAddress = new ModelAddress();
 		if (!address.getLine().isEmpty()) {
-			patientAddress.setAddressLine1(address.getLine().get(0).getValueNotNull());
+			modelAddress.setAddressLine1(address.getLine().get(0).getValueNotNull());
 		}
 		if (address.getLine().size() > 1) {
-			patientAddress.setAddressLine2(address.getLine().get(1).getValueNotNull());
+			modelAddress.setAddressLine2(address.getLine().get(1).getValueNotNull());
 		}
-		patientAddress.setAddressCity(StringUtils.defaultString(address.getCity()));
-		patientAddress.setAddressState(StringUtils.defaultString(address.getState()));
-		patientAddress.setAddressZip(StringUtils.defaultString(address.getPostalCode()));
-		patientAddress.setAddressCountry(StringUtils.defaultString(address.getCountry()));
-		patientAddress.setAddressCountyParish(StringUtils.defaultString(address.getDistrict()));
-		return patientAddress;
+		modelAddress.setAddressCity(StringUtils.defaultString(address.getCity()));
+		modelAddress.setAddressState(StringUtils.defaultString(address.getState()));
+		modelAddress.setAddressZip(StringUtils.defaultString(address.getPostalCode()));
+		modelAddress.setAddressCountry(StringUtils.defaultString(address.getCountry()));
+		modelAddress.setAddressCountyParish(StringUtils.defaultString(address.getDistrict()));
+		return modelAddress;
 	}
 
-	public static PatientAddress fromR5(org.hl7.fhir.r5.model.Address address) {
-		PatientAddress patientAddress = new PatientAddress();
+	public static ModelAddress fromR5(org.hl7.fhir.r5.model.Address address) {
+		ModelAddress modelAddress = new ModelAddress();
 		if (!address.getLine().isEmpty()) {
-			patientAddress.setAddressLine1(address.getLine().get(0).getValueNotNull());
+			modelAddress.setAddressLine1(address.getLine().get(0).getValueNotNull());
 		}
 		if (address.getLine().size() > 1) {
-			patientAddress.setAddressLine2(address.getLine().get(1).getValueNotNull());
+			modelAddress.setAddressLine2(address.getLine().get(1).getValueNotNull());
 		}
-		patientAddress.setAddressCity(StringUtils.defaultString(address.getCity()));
-		patientAddress.setAddressState(StringUtils.defaultString(address.getState()));
-		patientAddress.setAddressZip(StringUtils.defaultString(address.getPostalCode()));
-		patientAddress.setAddressCountry(StringUtils.defaultString(address.getCountry()));
-		patientAddress.setAddressCountyParish(StringUtils.defaultString(address.getDistrict()));
-		return patientAddress;
+		modelAddress.setAddressCity(StringUtils.defaultString(address.getCity()));
+		modelAddress.setAddressState(StringUtils.defaultString(address.getState()));
+		modelAddress.setAddressZip(StringUtils.defaultString(address.getPostalCode()));
+		modelAddress.setAddressCountry(StringUtils.defaultString(address.getCountry()));
+		modelAddress.setAddressCountyParish(StringUtils.defaultString(address.getDistrict()));
+		return modelAddress;
 	}
 
 	@Override

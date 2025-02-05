@@ -6,7 +6,7 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.mapping.interfaces.LocationMapper;
-import org.immregistries.iis.kernal.mapping.internalClient.FhirRequester;
+import org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester;
 import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
 import org.immregistries.iis.kernal.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +45,7 @@ public class LocationServlet extends HttpServlet {
 	@Autowired
 	RepositoryClientFactory repositoryClientFactory;
 	@Autowired
-	FhirRequester fhirRequests;
+	AbstractFhirRequester fhirRequests;
 	@Autowired
 	LocationMapper locationMapper;
 

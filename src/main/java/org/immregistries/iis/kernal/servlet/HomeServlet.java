@@ -5,7 +5,7 @@ import ca.uhn.fhir.context.FhirVersionEnum;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.immregistries.iis.kernal.SoftwareVersion;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
-import org.immregistries.iis.kernal.mapping.internalClient.FhirRequester;
+import org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester;
 import org.immregistries.iis.kernal.model.ProcessingFlavor;
 import org.immregistries.iis.kernal.model.Tenant;
 import org.immregistries.iis.kernal.model.UserAccess;
@@ -110,7 +110,7 @@ public class HomeServlet extends HttpServlet {
 	public static void printGoldenRecordExplanation(PrintWriter out, IBaseResource iBaseResource) {
 		String color;
 		String message;
-		if (FhirRequester.isGoldenRecord(iBaseResource)) {
+		if (AbstractFhirRequester.isGoldenRecord(iBaseResource)) {
 			color = "yellow";
 			message = "Golden/Master record, As part of the Master Data Management (MDM), this record was generated aggregating the information across records identified as potential duplicates";
 		} else {

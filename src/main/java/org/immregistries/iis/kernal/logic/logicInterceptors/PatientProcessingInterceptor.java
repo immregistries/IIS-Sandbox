@@ -64,28 +64,28 @@ public class PatientProcessingInterceptor extends AbstractLogicInterceptor {
 
 	public PatientReported processAndValidatePatient(PatientReported patientReported, List<IisReportable> iisReportableList, Set<ProcessingFlavor> processingFlavorSet) throws ProcessingException {
 		testMapping(patientMapper, patientReported);
-		PatientName legalName = null;
-		List<PatientName> patientNames = new ArrayList<>(patientReported.getPatientNames().size());
+		ModelName legalName = null;
+		List<ModelName> modelNames = new ArrayList<>(patientReported.getPatientNames().size());
 		for (int i = 0; i < patientReported.getPatientNames().size(); i++) {
-			PatientName patientName = patientReported.getPatientNames().get(i);
-			patientName = processName(patientName, processingFlavorSet);
-			if ("L".equals(patientName.getNameType())) {
-				legalName = patientName;
+			ModelName modelName = patientReported.getPatientNames().get(i);
+			modelName = processName(modelName, processingFlavorSet);
+			if ("L".equals(modelName.getNameType())) {
+				legalName = modelName;
 			}
 			if (processingFlavorSet.contains(ProcessingFlavor.IGNORENAMETYPE)) {
-				patientName.setNameType("");
-				legalName = patientName;
+				modelName.setNameType("");
+				legalName = modelName;
 				i = patientReported.getPatientNames().size();
 			}
-			patientNames.add(patientName);
+			modelNames.add(modelName);
 		}
 		checkLegalName(legalName, processingFlavorSet);
 
-		patientReported.setPatientNames(patientNames);
+		patientReported.setPatientNames(modelNames);
 
-		PatientPhone prn = null;
+		ModelPhone prn = null;
 		for (int i = 0; i < patientReported.getPhones().size(); i++) {
-			PatientPhone patientPhone = patientReported.getPhones().get(i);
+			ModelPhone patientPhone = patientReported.getPhones().get(i);
 			if (patientPhone != null) {
 				checkPhone(patientPhone, processingFlavorSet, iisReportableList);
 				if (patientPhone.getUse().equals("PRN")) {
@@ -104,12 +104,12 @@ public class PatientProcessingInterceptor extends AbstractLogicInterceptor {
 		return patientReported;
 	}
 
-	private PatientName processName(PatientName patientName, Set<ProcessingFlavor> processingFlavorSet) throws ProcessingException {
+	private ModelName processName(ModelName modelName, Set<ProcessingFlavor> processingFlavorSet) throws ProcessingException {
 
-		String patientNameLast = patientName.getNameLast();
-		String patientNameFirst = patientName.getNameFirst();
-		String patientNameMiddle = patientName.getNameMiddle();
-		String nameType = patientName.getNameType();
+		String patientNameLast = modelName.getNameLast();
+		String patientNameFirst = modelName.getNameFirst();
+		String patientNameMiddle = modelName.getNameMiddle();
+		String nameType = modelName.getNameType();
 
 		if (processingFlavorSet.contains(ProcessingFlavor.APPLESAUCE)) {
 			if (patientNameFirst.toUpperCase().contains("BABY BOY") || patientNameFirst.toUpperCase().contains("BABY GIRL") ||
@@ -162,10 +162,10 @@ public class PatientProcessingInterceptor extends AbstractLogicInterceptor {
 			patientNameFirst += " " + patientNameMiddle;
 			patientNameMiddle = "";
 		}
-		return new PatientName(patientNameLast, patientNameFirst, patientNameMiddle, nameType);
+		return new ModelName(patientNameLast, patientNameFirst, patientNameMiddle, nameType);
 	}
 
-	private void checkLegalName(PatientName legalName, Set<ProcessingFlavor> processingFlavorSet) throws ProcessingException {
+	private void checkLegalName(ModelName legalName, Set<ProcessingFlavor> processingFlavorSet) throws ProcessingException {
 		if (legalName == null && processingFlavorSet.contains(ProcessingFlavor.MANDATORYLEGALNAME)) {
 			throw new ProcessingException("Patient legal name not found", "PID", 1, 5);
 		}
@@ -196,7 +196,7 @@ public class PatientProcessingInterceptor extends AbstractLogicInterceptor {
 		}
 	}
 
-	private void checkPhone(PatientPhone patientPhone, Set<ProcessingFlavor> processingFlavorSet, List<IisReportable> iisReportableList) {
+	private void checkPhone(ModelPhone patientPhone, Set<ProcessingFlavor> processingFlavorSet, List<IisReportable> iisReportableList) {
 		if (StringUtils.isNotBlank(patientPhone.getNumber())) {
 //			if ("PRN".equals(patientPhone.getUse())) { // TODO specify main phone number
 //				ProcessingException pe = new ProcessingException("Patient phone telecommunication type must be PRN ", "PID", 1, 13);

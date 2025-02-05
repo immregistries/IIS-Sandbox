@@ -23,8 +23,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static org.immregistries.iis.kernal.mapping.internalClient.FhirRequester.GOLDEN_RECORD;
-import static org.immregistries.iis.kernal.mapping.internalClient.FhirRequester.GOLDEN_SYSTEM_TAG;
+import static org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester.GOLDEN_RECORD;
+import static org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester.GOLDEN_SYSTEM_TAG;
 
 
 @Service
@@ -45,7 +45,7 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 
 	public PatientMaster localObject(Patient patient) {
 		PatientMaster patientMaster = new PatientMaster();
-//		if (FhirRequester.isGoldenRecord(patient)) {
+//		if (AbstractFhirRequester.isGoldenRecord(patient)) {
 //			logger.info("Mapping refused for report as patient is golden");
 //			return null;
 //		}
@@ -55,7 +55,7 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 
 	public PatientReported localObjectReported(Patient patient) {
 		PatientReported patientReported = new PatientReported();
-//		if (!FhirRequester.isGoldenRecord(patient)) {
+//		if (!AbstractFhirRequester.isGoldenRecord(patient)) {
 //			logger.info("Mapping refused for golden as Patient is reported");
 //			return null;
 //		}
@@ -88,10 +88,10 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 		/*
 		 * Names
 		 */
-		List<PatientName> patientNames = new ArrayList<>(patient.getName().size());
-		localPatient.setPatientNames(patientNames);
+		List<ModelName> modelNames = new ArrayList<>(patient.getName().size());
+		localPatient.setPatientNames(modelNames);
 		for (HumanName name : patient.getName()) {
-			patientNames.add(PatientName.fromR4(name));
+			modelNames.add(ModelName.fromR4(name));
 		}
 		/*
 		 * Mother Maiden name
@@ -151,7 +151,7 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 		for (ContactPoint telecom : patient.getTelecom()) {
 			if (null != telecom.getSystem()) {
 				if (telecom.getSystem().equals(ContactPoint.ContactPointSystem.PHONE)) {
-					localPatient.addPhone(PatientPhone.fromR4(telecom));
+					localPatient.addPhone(ModelPhone.fromR4(telecom));
 				} else if (telecom.getSystem().equals(ContactPoint.ContactPointSystem.EMAIL)) {
 					localPatient.setEmail(StringUtils.defaultString(telecom.getValue()));
 				}
@@ -176,7 +176,7 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 		 * Addresses
 		 */
 		for (Address address : patient.getAddress()) {
-			localPatient.addAddress(PatientAddress.fromR4(address));
+			localPatient.addAddress(ModelAddress.fromR4(address));
 		}
 		/*
 		 * Multiple birth
@@ -245,7 +245,7 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 		 */
 		for (Patient.ContactComponent contactComponent : patient.getContact()) {
 			PatientGuardian patientGuardian = new PatientGuardian();
-			patientGuardian.setName(PatientName.fromR4(contactComponent.getName()));
+			patientGuardian.setName(ModelName.fromR4(contactComponent.getName()));
 			patientGuardian.setGuardianRelationship(contactComponent.getRelationshipFirstRep().getCodingFirstRep().getCode());
 			localPatient.addPatientGuardian(patientGuardian);
 		}
@@ -275,8 +275,8 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 		/*
 		 * Names
 		 */
-		for (PatientName patientName : pm.getPatientNames()) {
-			p.addName(patientName.toR4());
+		for (ModelName modelName : pm.getPatientNames()) {
+			p.addName(modelName.toR4());
 		}
 		/*
 		 * Mother Maiden Name
@@ -346,7 +346,7 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 		/*
 		 * Phone
 		 */
-		for (PatientPhone patientPhone : pm.getPhones()) {
+		for (ModelPhone patientPhone : pm.getPhones()) {
 			p.addTelecom(patientPhone.toR4());
 		}
 		/*
@@ -370,8 +370,8 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 		/*
 		 * Addresses
 		 */
-		for (PatientAddress patientAddress : pm.getAddresses()) {
-			p.addAddress(patientAddress.toR4());
+		for (ModelAddress modelAddress : pm.getAddresses()) {
+			p.addAddress(modelAddress.toR4());
 		}
 		/*
 		 * Birth Order

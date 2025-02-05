@@ -25,8 +25,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static org.immregistries.iis.kernal.mapping.internalClient.FhirRequester.GOLDEN_RECORD;
-import static org.immregistries.iis.kernal.mapping.internalClient.FhirRequester.GOLDEN_SYSTEM_TAG;
+import static org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester.GOLDEN_RECORD;
+import static org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester.GOLDEN_SYSTEM_TAG;
 
 
 @Service
@@ -90,10 +90,10 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 		/*
 		 * Names
 		 */
-		List<PatientName> patientNames = new ArrayList<>(patient.getName().size());
-		localPatient.setPatientNames(patientNames);
+		List<ModelName> modelNames = new ArrayList<>(patient.getName().size());
+		localPatient.setPatientNames(modelNames);
 		for (HumanName name : patient.getName()) {
-			patientNames.add(PatientName.fromR5(name));
+			modelNames.add(ModelName.fromR5(name));
 		}
 		/*
 		 * Mother Maiden name
@@ -153,7 +153,7 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 		for (ContactPoint telecom : patient.getTelecom()) {
 			if (null != telecom.getSystem()) {
 				if (telecom.getSystem().equals(ContactPointSystem.PHONE)) {
-					localPatient.addPhone(PatientPhone.fromR5(telecom));
+					localPatient.addPhone(ModelPhone.fromR5(telecom));
 				} else if (telecom.getSystem().equals(ContactPointSystem.EMAIL)) {
 					localPatient.setEmail(StringUtils.defaultString(telecom.getValue(), ""));
 				}
@@ -178,7 +178,7 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 		 * Addresses
 		 */
 		for (Address address : patient.getAddress()) {
-			localPatient.addAddress(PatientAddress.fromR5(address));
+			localPatient.addAddress(ModelAddress.fromR5(address));
 		}
 		/*
 		 * Multiple birth
@@ -248,7 +248,7 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 		 */
 		for (Patient.ContactComponent contactComponent : patient.getContact()) {
 			PatientGuardian patientGuardian = new PatientGuardian();
-			patientGuardian.setName(PatientName.fromR5(contactComponent.getName()));
+			patientGuardian.setName(ModelName.fromR5(contactComponent.getName()));
 			patientGuardian.setGuardianRelationship(contactComponent.getRelationshipFirstRep().getCodingFirstRep().getCode());
 			localPatient.addPatientGuardian(patientGuardian);
 		}
@@ -278,8 +278,8 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 		/*
 		 * Names
 		 */
-		for (PatientName patientName : pm.getPatientNames()) {
-			p.addName(patientName.toR5());
+		for (ModelName modelName : pm.getPatientNames()) {
+			p.addName(modelName.toR5());
 		}
 		/*
 		 * Mother Maiden Name
@@ -346,7 +346,7 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 		/*
 		 * Phone
 		 */
-		for (PatientPhone patientPhone : pm.getPhones()) {
+		for (ModelPhone patientPhone : pm.getPhones()) {
 			p.addTelecom(patientPhone.toR5());
 		}
 		/*
@@ -368,8 +368,8 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 		/*
 		 * Addresses
 		 */
-		for (PatientAddress patientAddress : pm.getAddresses()) {
-			p.addAddress(patientAddress.toR5());
+		for (ModelAddress modelAddress : pm.getAddresses()) {
+			p.addAddress(modelAddress.toR5());
 		}
 		/*
 		 * Birth Order

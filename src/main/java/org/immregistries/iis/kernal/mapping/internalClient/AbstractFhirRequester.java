@@ -27,7 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.Date;
 import java.util.List;
 
-public abstract class FhirRequester<
+public abstract class AbstractFhirRequester<
 	Patient extends IBaseResource,
 	Immunization extends IBaseResource,
 	Location extends IBaseResource,
@@ -71,7 +71,7 @@ public abstract class FhirRequester<
 	/**
 	 * Converts HAPI ICriterion Object to HTTP URI  parameter substring
 	 *
-	 * @param iCriterion
+	 * @param iCriterion HAPIFHIR criterion
 	 * @return HTTP parameter String equivalent
 	 */
 	private String stringCriterion(ICriterion iCriterion) {
@@ -81,21 +81,21 @@ public abstract class FhirRequester<
 
 	/**
 	 * Converts list HAPI ICriterion to a complete HTTP URI parameter suffix
-	 * @param criteria
+	 * @param criteria HAPIFHIR criteria list
 	 * @return Complete HTTP URI suffix
 	 */
 	private String stringCriterionList(ICriterion... criteria) {
 		int size = criteria.length;
-		String params = "";
+		StringBuilder params = new StringBuilder();
 		if (size > 0) {
-			params = stringCriterion(criteria[0]);
+			params = new StringBuilder(stringCriterion(criteria[0]));
 			int i = 1;
 			while (i < size) {
-				params += "&" + stringCriterion(criteria[i]);
+				params.append("&").append(stringCriterion(criteria[i]));
 				i++;
 			}
 		}
-		return params;
+		return params.toString();
 	}
 
 //	private SearchParameterMap searchParameterCriterionList(ICriterion... criteria) {
@@ -117,8 +117,8 @@ public abstract class FhirRequester<
 	/**
 	 * Helping method for saving, executes conditional update and create on HAPI DAO, adds parameter to avoid golden records
 	 *
-	 * @param resource
-	 * @param where
+	 * @param resource Resource to save
+	 * @param where HAPIFHIR Criteria list
 	 * @return methodOutcome
 	 */
 	protected MethodOutcome save(IBaseResource resource, ICriterion... where) {
@@ -238,9 +238,9 @@ public abstract class FhirRequester<
 	/**
 	 * Fills multiple matched list and return Single Match
 	 *
-	 * @param multipleMatches
-	 * @param patientMasterForMatchQuery
-	 * @param cutoff
+	 * @param multipleMatches List to add multiple matches in
+	 * @param patientMasterForMatchQuery patient Information to match
+	 * @param cutoff cutoff date to ignore old records
 	 * @return Single match result
 	 */
 	public abstract PatientMaster matchPatient(List<PatientReported> multipleMatches, PatientMaster patientMasterForMatchQuery, Date cutoff);

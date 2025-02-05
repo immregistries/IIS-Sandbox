@@ -11,7 +11,7 @@ import org.hl7.fhir.r5.model.Immunization;
 import org.hl7.fhir.r5.model.Patient;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.mapping.forR5.LocationMapperR5;
-import org.immregistries.iis.kernal.mapping.internalClient.FhirRequester;
+import org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester;
 import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
 import org.immregistries.iis.kernal.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,7 +52,7 @@ public class CovidServlet extends HttpServlet {
 	@Autowired
 	RepositoryClientFactory repositoryClientFactory;
 	@Autowired
-	FhirRequester fhirRequester;
+	AbstractFhirRequester fhirRequester;
 	@Autowired
 	LocationMapperR5 locationMapper;
 

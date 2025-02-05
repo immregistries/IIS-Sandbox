@@ -10,7 +10,7 @@ import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
 import org.immregistries.iis.kernal.logic.CodeMapManager;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
 import org.immregistries.iis.kernal.mapping.interfaces.ImmunizationMapper;
-import org.immregistries.iis.kernal.mapping.internalClient.FhirRequester;
+import org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester;
 import org.immregistries.iis.kernal.mapping.internalClient.FhirRequesterR4;
 import org.immregistries.iis.kernal.model.BusinessIdentifier;
 import org.immregistries.iis.kernal.model.ModelPerson;
@@ -48,7 +48,7 @@ public class ImmunizationMapperR4 implements ImmunizationMapper<Immunization> {
 
 	public VaccinationReported localObjectReported(Immunization i) {
 		VaccinationReported vaccinationReported = new VaccinationReported();
-		if (FhirRequester.isGoldenRecord(i)) {
+		if (AbstractFhirRequester.isGoldenRecord(i)) {
 			logger.info("Mapping refused for report as Immunization is golden");
 			return null;
 		}
@@ -58,10 +58,10 @@ public class ImmunizationMapperR4 implements ImmunizationMapper<Immunization> {
 
 	public VaccinationMaster localObject(Immunization i) {
 		VaccinationMaster vaccinationMaster = new VaccinationMaster();
-		if (!FhirRequester.isGoldenRecord(i)) {
-			logger.info("Mapping refused for golden as Immunization is reported");
-			return null;
-		}
+//		if (!AbstractFhirRequester.isGoldenRecord(i)) {
+//			logger.info("Mapping refused for golden as Immunization is reported");
+//			return null;
+//		}
 		fillFromFhirResource(vaccinationMaster, i);
 		return vaccinationMaster;
 	}

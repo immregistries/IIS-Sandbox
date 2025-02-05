@@ -20,7 +20,7 @@ import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.logic.CodeMapManager;
 import org.immregistries.iis.kernal.mapping.interfaces.PatientMapper;
-import org.immregistries.iis.kernal.mapping.internalClient.FhirRequester;
+import org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester;
 import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
 import org.immregistries.iis.kernal.model.*;
 import org.slf4j.Logger;
@@ -61,7 +61,7 @@ public class PatientController {
 	@Autowired
 	private RepositoryClientFactory repositoryClientFactory;
 	@Autowired
-	private FhirRequester fhirRequester;
+	private AbstractFhirRequester fhirRequester;
 	@Autowired
 	private FhirContext fhirContext;
 	@Autowired
@@ -193,7 +193,7 @@ public class PatientController {
 				}
 				{
 					List<PatientMaster> relatedPatients = List.of();
-					if (FhirRequester.isGoldenRecord(patientSelected)) {
+					if (AbstractFhirRequester.isGoldenRecord(patientSelected)) {
 						relatedPatients = fhirRequester.searchPatientReportedFromGoldenIdWithMdmLinks(patientMasterSelected.getPatientId());
 					} else {
 						PatientMaster goldenRecord = fhirRequester.readPatientMasterWithMdmLink(patientMasterSelected.getPatientId());
@@ -256,7 +256,7 @@ public class PatientController {
 					}
 					{
 						String link;
-						if (FhirRequester.isGoldenRecord(patientSelected)) {
+						if (AbstractFhirRequester.isGoldenRecord(patientSelected)) {
 							link = apiBaseUrl + "/$mdm-query-links?goldenResourceId=" + patientMasterSelected.getPatientId();
 						} else {
 							link = apiBaseUrl + "/$mdm-query-links?resourceId=" + patientMasterSelected.getPatientId();
@@ -653,7 +653,7 @@ public class PatientController {
 	}
 
 
-	public static IDomainResource fetchPatientFromParameter(HttpServletRequest req, IGenericClient fhirClient, FhirRequester fhirRequester) {
+	public static IDomainResource fetchPatientFromParameter(HttpServletRequest req, IGenericClient fhirClient, AbstractFhirRequester fhirRequester) {
 		IDomainResource patient = null;
 		if (req.getParameter(PARAM_PATIENT_REPORTED_ID) != null) {
 			patient = (IDomainResource) fhirClient.read().resource("Patient").withId(req.getParameter(PARAM_PATIENT_REPORTED_ID)).execute();

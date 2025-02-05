@@ -2,13 +2,13 @@ package org.immregistries.iis.kernal.model;
 
 import org.apache.commons.lang3.StringUtils;
 
-public class PatientPhone {
+public class ModelPhone {
 	public static final String PHONE_USE_V2_SYSTEM = "http://terminology.hl7.org/ValueSet/v2-0201";
 	public static final String USE_EXTENSION_URL = "use";
 	private String number = "";
 	private String use = "";
 
-	private PatientPhone(org.hl7.fhir.r4.model.ContactPoint contactPoint) {
+	private ModelPhone(org.hl7.fhir.r4.model.ContactPoint contactPoint) {
 		number = contactPoint.getValue();
 		if (contactPoint.hasExtension(USE_EXTENSION_URL)) {
 			use = StringUtils.defaultString(((org.hl7.fhir.r4.model.Coding) contactPoint.getExtensionByUrl(USE_EXTENSION_URL).getValue()).getCode());
@@ -17,7 +17,7 @@ public class PatientPhone {
 		}
 	}
 
-	private PatientPhone(org.hl7.fhir.r5.model.ContactPoint contactPoint) {
+	private ModelPhone(org.hl7.fhir.r5.model.ContactPoint contactPoint) {
 		number = contactPoint.getValue();
 		if (contactPoint.hasExtension(USE_EXTENSION_URL)) {
 			use = StringUtils.defaultString(((org.hl7.fhir.r5.model.Coding) contactPoint.getExtensionByUrl(USE_EXTENSION_URL).getValue()).getCode());
@@ -26,7 +26,7 @@ public class PatientPhone {
 		}
 	}
 
-	public PatientPhone() {
+	public ModelPhone() {
 	}
 
 
@@ -117,23 +117,23 @@ public class PatientPhone {
 		return contactPoint;
 	}
 
-	public static PatientPhone fromR4(org.hl7.fhir.r4.model.ContactPoint contactPoint) {
+	public static ModelPhone fromR4(org.hl7.fhir.r4.model.ContactPoint contactPoint) {
 		if (!contactPoint.getSystem().equals(org.hl7.fhir.r4.model.ContactPoint.ContactPointSystem.PHONE)) {
 			return null;
 		} else {
-			return new PatientPhone(contactPoint);
+			return new ModelPhone(contactPoint);
 		}
 	}
 
-	public static PatientPhone fromR5(org.hl7.fhir.r5.model.ContactPoint contactPoint) {
+	public static ModelPhone fromR5(org.hl7.fhir.r5.model.ContactPoint contactPoint) {
 		if (!contactPoint.getSystem().equals(org.hl7.fhir.r5.model.ContactPoint.ContactPointSystem.PHONE)) {
 			return null;
 		} else {
-			return new PatientPhone(contactPoint);
+			return new ModelPhone(contactPoint);
 		}
 	}
 
-	public static PatientPhone fromFhir(org.hl7.fhir.instance.model.api.ICompositeType contactPoint) {
+	public static ModelPhone fromFhir(org.hl7.fhir.instance.model.api.ICompositeType contactPoint) {
 		if (contactPoint instanceof org.hl7.fhir.r5.model.ContactPoint) {
 			return fromR5((org.hl7.fhir.r5.model.ContactPoint) contactPoint);
 		} else if (contactPoint instanceof org.hl7.fhir.r4.model.ContactPoint) {

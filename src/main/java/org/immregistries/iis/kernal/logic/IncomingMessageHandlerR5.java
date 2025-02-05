@@ -22,8 +22,8 @@ import org.springframework.stereotype.Service;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-import static org.immregistries.iis.kernal.mapping.internalClient.FhirRequester.GOLDEN_RECORD;
-import static org.immregistries.iis.kernal.mapping.internalClient.FhirRequester.GOLDEN_SYSTEM_TAG;
+import static org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester.GOLDEN_RECORD;
+import static org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester.GOLDEN_SYSTEM_TAG;
 
 @Service
 @Conditional(OnR5Condition.class)
@@ -99,7 +99,7 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler {
 			boolean strictDate = !processingFlavorSet.contains(ProcessingFlavor.CANTALOUPE);
 			PatientReported patientReported = processPatient(tenant, reader, iisReportableList, processingFlavorSet, codeMap, strictDate, managingOrganization);
 
-			List<VaccinationReported> vaccinationReportedList = processVaccinations(tenant, reader, iisReportableList, patientReported, strictDate, codeMap, processingFlavorSet);
+			List<VaccinationReported> vaccinationReportedList = processVaccinations(tenant, reader, iisReportableList, patientReported, strictDate, processingFlavorSet);
 			String ack = buildAckMqe(reader, mqeMessageServiceResponse, iisReportableList, processingFlavorSet, nistReportables);
 			recordMessageReceived(message, patientReported, ack, "Update", "Ack", tenant);
 			return ack;
@@ -152,7 +152,7 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler {
 			}
 		}
 
-		return processPatientFhirAgnostic(reader, iisReportableList, processingFlavorSet, codeMap, strictDate, patientReported);
+		return processPatientFhirAgnostic(reader, iisReportableList, processingFlavorSet, strictDate, patientReported);
 	}
 
 	public String processORU(Tenant tenant, HL7Reader reader, String message, Organization managingOrganization) {

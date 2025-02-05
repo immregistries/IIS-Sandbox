@@ -32,7 +32,7 @@ import static org.immregistries.iis.kernal.logic.IncomingMessageHandler.MINIMAL_
  */
 @Component
 @Conditional(OnR4Condition.class)
-public class FhirRequesterR4 extends FhirRequester<Patient,Immunization,Location,Practitioner,Observation,Person,Organization,RelatedPerson> {
+public class FhirRequesterR4 extends AbstractFhirRequester<Patient, Immunization, Location, Practitioner, Observation, Person, Organization, RelatedPerson> {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	public PatientMaster searchPatientMaster(SearchParameterMap searchParameterMap) {
@@ -324,7 +324,7 @@ public class FhirRequesterR4 extends FhirRequester<Patient,Immunization,Location
 
 	public PatientMaster readAsPatientMaster(String id) {
 		Patient patient = (Patient) read(Patient.class, id);
-		if (FhirRequester.isGoldenRecord(patient)) {
+		if (AbstractFhirRequester.isGoldenRecord(patient)) {
 			return patientMapper.localObject(patient);
 		}
 		return null;

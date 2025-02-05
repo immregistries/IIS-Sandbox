@@ -3,7 +3,7 @@ package org.immregistries.iis.kernal.servlet;
 import ca.uhn.fhir.context.FhirContext;
 import org.hl7.fhir.r5.model.*;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
-import org.immregistries.iis.kernal.mapping.internalClient.FhirRequester;
+import org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester;
 import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
 import org.immregistries.iis.kernal.model.UserAccess;
 import org.slf4j.Logger;
@@ -30,7 +30,7 @@ public class GroupServlet extends HttpServlet {
 	@Autowired
 	RepositoryClientFactory repositoryClientFactory;
 	@Autowired
-	FhirRequester fhirRequester;
+	AbstractFhirRequester fhirRequester;
 	@Autowired
 	FhirContext fhirContext;
 

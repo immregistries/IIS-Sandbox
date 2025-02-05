@@ -10,7 +10,7 @@ import org.hl7.fhir.instance.model.api.IDomainResource;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.logic.IImmunizationRecommendationService;
 import org.immregistries.iis.kernal.mapping.interfaces.PatientMapper;
-import org.immregistries.iis.kernal.mapping.internalClient.FhirRequester;
+import org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester;
 import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
 import org.immregistries.iis.kernal.model.BusinessIdentifier;
 import org.immregistries.iis.kernal.model.PatientMaster;
@@ -47,7 +47,7 @@ public class RecommendationController {
 	@Autowired
 	private RepositoryClientFactory repositoryClientFactory;
 	@Autowired
-	private FhirRequester fhirRequester;
+	private AbstractFhirRequester fhirRequester;
 	@Autowired
 	private FhirContext fhirContext;
 	@Autowired

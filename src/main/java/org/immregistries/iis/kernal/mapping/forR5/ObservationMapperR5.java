@@ -6,7 +6,7 @@ import org.hl7.fhir.r5.model.*;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR5Condition;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
 import org.immregistries.iis.kernal.mapping.interfaces.ObservationMapper;
-import org.immregistries.iis.kernal.mapping.internalClient.FhirRequester;
+import org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester;
 import org.immregistries.iis.kernal.model.ObservationMaster;
 import org.immregistries.iis.kernal.model.ObservationReported;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +20,7 @@ import static org.immregistries.iis.kernal.mapping.MappingHelper.PATIENT;
 @Conditional(OnR5Condition.class)
 public class ObservationMapperR5 implements ObservationMapper<Observation> {
 	@Autowired
-	private FhirRequester fhirRequests;
+	private AbstractFhirRequester fhirRequests;
 
 	public Observation fhirResource(ObservationMaster om) {
 		Observation o = new Observation();

@@ -14,7 +14,7 @@ import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.logic.CodeMapManager;
 import org.immregistries.iis.kernal.mapping.interfaces.ImmunizationMapper;
-import org.immregistries.iis.kernal.mapping.internalClient.FhirRequester;
+import org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester;
 import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
 import org.immregistries.iis.kernal.model.*;
 import org.slf4j.Logger;
@@ -48,7 +48,7 @@ public class VaccinationController {
 	@Autowired
 	RepositoryClientFactory repositoryClientFactory;
 	@Autowired
-	FhirRequester fhirRequester;
+	AbstractFhirRequester fhirRequester;
 	@Autowired
 	ImmunizationMapper immunizationMapper;
 	@Autowired
@@ -77,7 +77,7 @@ public class VaccinationController {
 			}
 			VaccinationMaster vaccination;
 
-			if (FhirRequester.isGoldenRecord(immunizationResource)) {
+			if (AbstractFhirRequester.isGoldenRecord(immunizationResource)) {
 				vaccination = immunizationMapper.localObject(immunizationResource);
 			} else {
 				vaccination = immunizationMapper.localObjectReported(immunizationResource);
@@ -181,7 +181,7 @@ public class VaccinationController {
 
 				{
 					List<VaccinationMaster> relatedVaccinations = List.of();
-					if (FhirRequester.isGoldenRecord(immunizationResource)) {
+					if (AbstractFhirRequester.isGoldenRecord(immunizationResource)) {
 						relatedVaccinations = fhirRequester.searchVaccinationReportedFromGoldenIdWithMdmLinks(vaccination.getVaccinationId());
 					} else {
 						VaccinationMaster goldenRecord = fhirRequester.readVaccinationMasterWithMdmLink(vaccination.getVaccinationId());
@@ -230,7 +230,7 @@ public class VaccinationController {
 					}
 					{
 						String link;
-						if (FhirRequester.isGoldenRecord(immunizationResource)) {
+						if (AbstractFhirRequester.isGoldenRecord(immunizationResource)) {
 							link = apiBaseUrl + "/$mdm-query-links?goldenResourceId=" + vaccination.getVaccinationId();
 						} else {
 							link = apiBaseUrl + "/$mdm-query-links?resourceId=" + vaccination.getVaccinationId();

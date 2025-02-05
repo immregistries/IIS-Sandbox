@@ -17,7 +17,6 @@ import hl7.v2.validation.vs.ValueSetLibraryImpl;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Observation;
 import org.hl7.fhir.r5.model.Practitioner;
@@ -35,7 +34,7 @@ import org.immregistries.iis.kernal.mapping.interfaces.ImmunizationMapper;
 import org.immregistries.iis.kernal.mapping.interfaces.LocationMapper;
 import org.immregistries.iis.kernal.mapping.interfaces.ObservationMapper;
 import org.immregistries.iis.kernal.mapping.interfaces.PatientMapper;
-import org.immregistries.iis.kernal.mapping.internalClient.FhirRequester;
+import org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester;
 import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
 import org.immregistries.iis.kernal.model.*;
 import org.immregistries.mqe.hl7util.ReportableSource;
@@ -80,20 +79,19 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 	@Autowired
 	RepositoryClientFactory repositoryClientFactory;
 	@Autowired
-	FhirRequester fhirRequester;
+	AbstractFhirRequester fhirRequester;
 	@Autowired
 	Hl7MessageWriter hl7MessageWriter;
 	@Autowired
-	PatientMapper<IBaseResource> patientMapper;
+	PatientMapper patientMapper;
 	@Autowired
-	ImmunizationMapper<IBaseResource> immunizationMapper;
+	ImmunizationMapper immunizationMapper;
 	@Autowired
-	ObservationMapper<IBaseResource> observationMapper;
+	ObservationMapper observationMapper;
 	@Autowired
-	LocationMapper<IBaseResource> locationMapper;
+	LocationMapper locationMapper;
 	@Autowired
 	PartitionCreationInterceptor partitionCreationInterceptor;
-
 	@Autowired
 	PatientProcessingInterceptor patientProcessingInterceptor; // TODO decide how/where to implement the execution of interceptors, currently using DAO so some interceptors are skipped by the v2 process and need to be manually triggered
 	@Autowired
@@ -458,8 +456,8 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 			if (StringUtils.isNotBlank(problem)) {
 				reportables.add(IisReportable.fromProcessingException(new ProcessingException(problem, "QPD", 1, fieldPosition)));
 			} else {
-				PatientName patientName = new PatientName(patientNameLast, patientNameFirst, patientNameMiddle, "");
-				patientMasterForMatchQuery.addPatientName(patientName);
+				ModelName modelName = new ModelName(patientNameLast, patientNameFirst, patientNameMiddle, "");
+				patientMasterForMatchQuery.addPatientName(modelName);
 				patientMasterForMatchQuery.setBirthDate(patientBirthDate);
 			}
 		} else {
@@ -1056,19 +1054,19 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 	}
 
 
-	public PatientReported processPatientFhirAgnostic(HL7Reader reader, List<IisReportable> iisReportableList, Set<ProcessingFlavor> processingFlavorSet, CodeMap codeMap, boolean strictDate, PatientReported patientReported) throws ProcessingException {
+	public PatientReported processPatientFhirAgnostic(HL7Reader reader, List<IisReportable> iisReportableList, Set<ProcessingFlavor> processingFlavorSet, boolean strictDate, PatientReported patientReported) throws ProcessingException {
 
-		List<PatientName> names = new ArrayList<>(reader.getRepeatCount(5));
+		List<ModelName> names = new ArrayList<>(reader.getRepeatCount(5));
 		for (int i = 1; i <= reader.getRepeatCount(5); i++) {
 			String patientNameLast = reader.getValueRepeat(5, 1, i);
 			String patientNameFirst = reader.getValueRepeat(5, 2, i);
 			String patientNameMiddle = reader.getValueRepeat(5, 3, i);
 			String nameType = reader.getValueRepeat(5, 7, i);
-			PatientName patientName = new PatientName(patientNameLast, patientNameFirst, patientNameMiddle, nameType);
-			names.add(patientName);
+			ModelName modelName = new ModelName(patientNameLast, patientNameFirst, patientNameMiddle, nameType);
+			names.add(modelName);
 		}
 
-		PatientPhone patientPhone = new PatientPhone();
+		ModelPhone patientPhone = new ModelPhone();
 		patientPhone.setNumber(reader.getValue(13, 6) + reader.getValue(13, 7));
 		patientPhone.setUse(reader.getValue(13, 2));
 		// Logic exported to Patient Processing interceptor
@@ -1127,14 +1125,14 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 			}
 			addressFrag = zip + ":" + addressFragPrep;
 		}
-		PatientAddress patientAddress = new PatientAddress();
-		patientAddress.setAddressLine1(reader.getValue(11, 1));
-		patientAddress.setAddressLine2(reader.getValue(11, 2));
-		patientAddress.setAddressCity(reader.getValue(11, 3));
-		patientAddress.setAddressState(reader.getValue(11, 4));
-		patientAddress.setAddressZip(reader.getValue(11, 5));
-		patientAddress.setAddressCountry(reader.getValue(11, 6));
-		patientAddress.setAddressCountyParish(reader.getValue(11, 9));
+		ModelAddress modelAddress = new ModelAddress();
+		modelAddress.setAddressLine1(reader.getValue(11, 1));
+		modelAddress.setAddressLine2(reader.getValue(11, 2));
+		modelAddress.setAddressCity(reader.getValue(11, 3));
+		modelAddress.setAddressState(reader.getValue(11, 4));
+		modelAddress.setAddressZip(reader.getValue(11, 5));
+		modelAddress.setAddressCountry(reader.getValue(11, 6));
+		modelAddress.setAddressCountyParish(reader.getValue(11, 9));
 
 		Date patientBirthDate;
 		patientBirthDate = parseDateError(reader.getValue(7), "Bad format for date of birth", "PID", 1, 7, strictDate);
@@ -1157,7 +1155,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 		for (int i = 1; i <= reader.getRepeatCount(10); i++) {
 			patientReported.addRace(reader.getValueRepeat(10, 1, i));
 		}
-		patientReported.addAddress(patientAddress);
+		patientReported.addAddress(modelAddress);
 		patientReported.setEthnicity(reader.getValue(22));
 		patientReported.setBirthFlag(reader.getValue(24));
 		patientReported.setBirthOrder(reader.getValue(25));
@@ -1210,7 +1208,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 		return patientReported;
 	}
 
-	public List<VaccinationReported> processVaccinations(Tenant tenant, HL7Reader reader, List<IisReportable> iisReportableList, PatientReported patientReported, boolean strictDate, CodeMap codeMap, Set<ProcessingFlavor> processingFlavorSet) throws ProcessingException {
+	public List<VaccinationReported> processVaccinations(Tenant tenant, HL7Reader reader, List<IisReportable> iisReportableList, PatientReported patientReported, boolean strictDate, Set<ProcessingFlavor> processingFlavorSet) throws ProcessingException {
 		int orcCount = 0;
 		int rxaCount = 0;
 		int obxCount = 0;
@@ -1484,34 +1482,22 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 
 	@SuppressWarnings("unchecked")
 	public ObservationReported readObservations(HL7Reader reader, List<IisReportable> iisReportableList, PatientReported patientReported, boolean strictDate, int obxCount, VaccinationReported vaccinationReported, VaccinationMaster vaccination, String identifierCode, String valueCode) {
-//    ObservationMaster observationMaster = null;
 		ObservationReported observationReported = null;
 		if (vaccination == null) {
 			observationReported = fhirRequester.searchObservationReported(new SearchParameterMap("part-of", new ReferenceParam().setMissing(true))
 				.add("subject", new ReferenceParam(patientReported.getPatientId())));
-//				Observation.PART_OF.isMissing(true),
-//				Observation.SUBJECT.hasId(patientReported.getPatientId()));
 		} else {
 			observationReported = fhirRequester.searchObservationReported(new SearchParameterMap("part-of", new ReferenceParam(vaccination.getVaccinationId())).add("subject", new ReferenceParam(patientReported.getPatientId())));
-//				Observation.PART_OF.hasId(vaccination.getVaccinationId()),
-//				Observation.SUBJECT.hasId(patientReported.getPatientId()));
 		}
 		if (observationReported == null) {
-//      observationMaster = new ObservationMaster();
-//      observationMaster.setPatientId(patientReported.getPatient().getPatientId());
-//      observationMaster.setVaccination(vaccination);
-//      observationMaster.setIdentifierCode(identifierCode);
 			observationReported = new ObservationReported();
-//      observationMaster.setObservationReported(observationReported);
 			observationReported.setReportedDate(new Date());
 		}
-//    observationMaster.setValueCode(valueCode);
 
 		observationReported.setPatientReportedId(patientReported.getPatientId());
 		if (vaccinationReported != null) {
 			observationReported.setVaccinationReportedId(vaccinationReported.getVaccinationId());
 		}
-//    observationReported.setObservation(observationMaster);
 		observationReported.setUpdatedDate(new Date());
 		observationReported.setIdentifierCode(identifierCode);
 		observationReported.setValueType(reader.getValue(2));

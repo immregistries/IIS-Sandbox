@@ -6,20 +6,20 @@ import org.immregistries.iis.kernal.mapping.MappingHelper;
 import static org.immregistries.iis.kernal.mapping.interfaces.PatientMapper.V_2_NAME_TYPE;
 import static org.immregistries.iis.kernal.mapping.interfaces.PatientMapper.V_2_NAME_TYPE_SYSTEM;
 
-public class PatientName {
+public class ModelName {
 	private String nameLast = "";
 	private String nameFirst = "";
 	private String nameMiddle = "";
 	private String nameType = "";
 
-	public PatientName(String nameLast, String nameFirst, String nameMiddle, String nameType) {
+	public ModelName(String nameLast, String nameFirst, String nameMiddle, String nameType) {
 		this.nameLast = nameLast;
 		this.nameFirst = nameFirst;
 		this.nameMiddle = nameMiddle;
 		this.nameType = nameType;
 	}
 
-	private PatientName(org.hl7.fhir.r4.model.HumanName name) {
+	private ModelName(org.hl7.fhir.r4.model.HumanName name) {
 		this.setNameLast(name.getFamily());
 		if (!name.getGiven().isEmpty()) {
 			this.setNameFirst(name.getGiven().get(0).getValueNotNull());
@@ -35,7 +35,7 @@ public class PatientName {
 		}
 	}
 
-	private PatientName(org.hl7.fhir.r5.model.HumanName name) {
+	private ModelName(org.hl7.fhir.r5.model.HumanName name) {
 		this.setNameLast(name.getFamily());
 		if (!name.getGiven().isEmpty()) {
 			this.setNameFirst(name.getGiven().get(0).getValueNotNull());
@@ -51,7 +51,7 @@ public class PatientName {
 		}
 	}
 
-	public PatientName() {
+	public ModelName() {
 	}
 
 	public String getNameLast() {
@@ -108,12 +108,12 @@ public class PatientName {
 		return name;
 	}
 
-	public static PatientName fromR4(org.hl7.fhir.r4.model.HumanName name) {
-		return new PatientName(name);
+	public static ModelName fromR4(org.hl7.fhir.r4.model.HumanName name) {
+		return new ModelName(name);
 	}
 
-	public static PatientName fromR5(org.hl7.fhir.r5.model.HumanName name) {
-		return new PatientName(name);
+	public static ModelName fromR5(org.hl7.fhir.r5.model.HumanName name) {
+		return new ModelName(name);
 	}
 
 	public String asSingleString() {

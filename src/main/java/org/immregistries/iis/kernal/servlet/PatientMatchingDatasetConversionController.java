@@ -11,7 +11,7 @@ import org.hl7.fhir.r5.model.Bundle;
 import org.hl7.fhir.r5.model.ContactPoint;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
-import org.immregistries.iis.kernal.mapping.internalClient.FhirRequester;
+import org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester;
 import org.immregistries.mismo.match.StringUtils;
 import org.immregistries.mismo.match.model.Patient;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +36,7 @@ public class PatientMatchingDatasetConversionController {
 	@Autowired
 	FhirContext fhirContext;
 	@Autowired
-	FhirRequester fhirRequester;
+	AbstractFhirRequester fhirRequester;
 
 	@PostMapping("/init")
 	public String initBuilder() throws IOException {

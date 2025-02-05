@@ -1,7 +1,7 @@
 package org.immregistries.iis.kernal.model;
 
 public class PatientGuardian {
-	private PatientName name = new PatientName();
+	private ModelName name = new ModelName();
 	private String guardianRelationship = "";
 
 	public String getGuardianRelationship() {
@@ -12,11 +12,11 @@ public class PatientGuardian {
 		this.guardianRelationship = guardianRelationship;
 	}
 
-	public PatientName getName() {
+	public ModelName getName() {
 		return name;
 	}
 
-	public void setName(PatientName name) {
+	public void setName(ModelName name) {
 		this.name = name;
 	}
 

@@ -17,13 +17,13 @@ public class PatientMaster extends AbstractMappedObject implements Serializable 
 	private Date reportedDate = null;
 	private Date updatedDate = null;
 
-	private List<PatientName> patientNames = new ArrayList<PatientName>(1);
+	private List<ModelName> modelNames = new ArrayList<ModelName>(1);
 	private String motherMaidenName = "";
 	private Date birthDate = null;
 	private String sex = "";
 	private List<String> races = new ArrayList<>(1);
-	private List<PatientAddress> addresses = new ArrayList<>(1);
-	private List<PatientPhone> phones = null;
+	private List<ModelAddress> addresses = new ArrayList<>(1);
+	private List<ModelPhone> phones = null;
 	private String email = "";
 	private String ethnicity = "";
 	private String birthFlag = "";
@@ -201,31 +201,31 @@ public class PatientMaster extends AbstractMappedObject implements Serializable 
 		this.updatedDate = updatedDate;
 	}
 
-	public List<PatientName> getPatientNames() {
-		return patientNames;
+	public List<ModelName> getPatientNames() {
+		return modelNames;
 	}
 
-	public void setPatientNames(List<PatientName> patientNames) {
-		this.patientNames = patientNames;
+	public void setPatientNames(List<ModelName> modelNames) {
+		this.modelNames = modelNames;
 	}
 
-	public void addPatientName(PatientName patientName) {
-		this.patientNames.add(patientName);
+	public void addPatientName(ModelName modelName) {
+		this.modelNames.add(modelName);
 	}
 
-	public PatientName getPatientNameFirst() {
-		if (patientNames.isEmpty()) {
+	public ModelName getPatientNameFirst() {
+		if (modelNames.isEmpty()) {
 			return null;
 		}
-		return patientNames.get(0);
+		return modelNames.get(0);
 	}
 
-	public PatientName getLegalName() {
-		return patientNames.stream().filter(patientName -> "L".equals(patientName.getNameType())).findFirst().orElse(null);
+	public ModelName getLegalName() {
+		return modelNames.stream().filter(patientName -> "L".equals(patientName.getNameType())).findFirst().orElse(null);
 	}
 
-	public PatientName getLegalNameOrFirst() {
-		return patientNames.stream().filter(patientName -> "L".equals(patientName.getNameType())).findFirst().orElse(this.getPatientNameFirst());
+	public ModelName getLegalNameOrFirst() {
+		return modelNames.stream().filter(patientName -> "L".equals(patientName.getNameType())).findFirst().orElse(this.getPatientNameFirst());
 	}
 
 	public String getNameLast() {
@@ -277,44 +277,44 @@ public class PatientMaster extends AbstractMappedObject implements Serializable 
 		return this.races.get(0);
 	}
 
-	public List<PatientPhone> getPhones() {
+	public List<ModelPhone> getPhones() {
 		return phones;
 	}
 
-	public void setPhones(List<PatientPhone> phones) {
+	public void setPhones(List<ModelPhone> phones) {
 		this.phones = phones;
 	}
 
-	public void addPhone(PatientPhone phone) {
+	public void addPhone(ModelPhone phone) {
 		if (this.phones == null) {
 			this.phones = new ArrayList<>(1);
 		}
 		this.phones.add(phone);
 	}
 
-	public PatientPhone getFirstPhone() {
+	public ModelPhone getFirstPhone() {
 		if (phones.isEmpty()) {
 			return null;
 		}
 		return this.phones.get(0);
 	}
 
-	public List<PatientAddress> getAddresses() {
+	public List<ModelAddress> getAddresses() {
 		return addresses;
 	}
 
-	public void setAddresses(List<PatientAddress> addresses) {
+	public void setAddresses(List<ModelAddress> addresses) {
 		this.addresses = addresses;
 	}
 
-	public void addAddress(PatientAddress phone) {
+	public void addAddress(ModelAddress phone) {
 		if (this.addresses == null) {
 			this.addresses = new ArrayList<>(1);
 		}
 		this.addresses.add(phone);
 	}
 
-	public PatientAddress getFirstAddress() {
+	public ModelAddress getFirstAddress() {
 		if (addresses.isEmpty()) {
 			return null;
 		}
@@ -378,7 +378,7 @@ public class PatientMaster extends AbstractMappedObject implements Serializable 
 			", businessIdentifiers=" + businessIdentifiers +
 			", reportedDate=" + reportedDate +
 				", updatedDate=" + updatedDate +
-				", patientNames=" + patientNames +
+			", patientNames=" + modelNames +
 				", motherMaidenName='" + motherMaidenName + '\'' +
 				", birthDate=" + birthDate +
 				", sex='" + sex + '\'' +
