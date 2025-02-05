@@ -120,9 +120,7 @@ public class PopController {
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp, @PathVariable(name = PATH_VARIABLE_TENANT_NAME, required = false) String tenantName)
 		throws ServletException, IOException {
 		resp.setContentType("text/html");
-		logger.info("tenant {}", tenantName);
 		Tenant tenant = ServletHelper.getTenant(tenantName, req, ServletHelper.getDataSession());
-		logger.info("tenant {}", tenant.getOrganizationName());
 
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		try {

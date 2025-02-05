@@ -45,7 +45,7 @@ public abstract class AbstractLogicInterceptor {
 		AbstractMappedObject abstractMappedObject1 = mapper.localObjectReported(resource);
 		boolean res = abstractMappedObject.toString().equals(abstractMappedObject1.toString());
 		if (!res) {
-			logger.info("Object Mapping check failed {}\n\n{}", abstractMappedObject, abstractMappedObject1);
+//			logger.info("Object Mapping check failed {}\n\n{}", abstractMappedObject, abstractMappedObject1);
 		}
 		return res;
 	}
@@ -57,7 +57,7 @@ public abstract class AbstractLogicInterceptor {
 		String s2 = parser.encodeResourceToString(resource1);
 		boolean res = s1.equals(s2);
 		if (!res) {
-			logger.info("FHIR Mapping check failed {}\n\n{}", s1, s2);
+//			logger.info("FHIR Mapping check failed {}\n\n{}", s1, s2);
 		}
 		return res;
 	}
