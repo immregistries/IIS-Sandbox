@@ -138,9 +138,11 @@ public class FhirRequesterR5 extends AbstractFhirRequester<Patient, Immunization
 		List<VaccinationMaster> vaccinationList = new ArrayList<>();
 		for (Bundle.BundleEntryComponent entry : bundle.getEntry()) {
 			if (entry.getResource() instanceof Immunization) {
-				VaccinationMaster vaccinationMaster = immunizationMapper.localObject((Immunization) entry.getResource());
-				if (vaccinationMaster != null) {
-					vaccinationList.add(vaccinationMaster);
+				if (AbstractFhirRequester.isGoldenRecord(entry.getResource())) {
+					VaccinationMaster vaccinationMaster = immunizationMapper.localObject((Immunization) entry.getResource());
+					if (vaccinationMaster != null) {
+						vaccinationList.add(vaccinationMaster);
+					}
 				}
 			}
 		}
@@ -348,7 +350,11 @@ public class FhirRequesterR5 extends AbstractFhirRequester<Patient, Immunization
 	}
 
 	public VaccinationMaster readAsVaccinationMaster(String id) {
-		return immunizationMapper.localObject((Immunization) read(Immunization.class, id));
+		Immunization immunization = (Immunization) read(Immunization.class, id);
+		if (AbstractFhirRequester.isGoldenRecord(immunization)) {
+			return immunizationMapper.localObject(immunization);
+		}
+		return null;
 	}
 
 

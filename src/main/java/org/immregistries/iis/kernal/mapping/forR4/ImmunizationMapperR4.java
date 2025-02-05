@@ -10,7 +10,6 @@ import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
 import org.immregistries.iis.kernal.logic.CodeMapManager;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
 import org.immregistries.iis.kernal.mapping.interfaces.ImmunizationMapper;
-import org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester;
 import org.immregistries.iis.kernal.mapping.internalClient.FhirRequesterR4;
 import org.immregistries.iis.kernal.model.BusinessIdentifier;
 import org.immregistries.iis.kernal.model.ModelPerson;
@@ -48,10 +47,10 @@ public class ImmunizationMapperR4 implements ImmunizationMapper<Immunization> {
 
 	public VaccinationReported localObjectReported(Immunization i) {
 		VaccinationReported vaccinationReported = new VaccinationReported();
-		if (AbstractFhirRequester.isGoldenRecord(i)) {
-			logger.info("Mapping refused for report as Immunization is golden");
-			return null;
-		}
+//		if (AbstractFhirRequester.isGoldenRecord(i)) {
+//			logger.info("Mapping refused for report as Immunization is golden");
+//			return null;
+//		}
 		fillFromFhirResource(vaccinationReported, i);
 		return vaccinationReported;
 	}
@@ -415,7 +414,7 @@ public class ImmunizationMapperR4 implements ImmunizationMapper<Immunization> {
 	private Immunization.ImmunizationPerformerComponent performer(ModelPerson person, String functionCode, String functionDisplay) {
 		Immunization.ImmunizationPerformerComponent performer = new Immunization.ImmunizationPerformerComponent();
 		performer.setFunction(new CodeableConcept().addCoding(new Coding().setSystem(PERFORMER_FUNCTION_SYSTEM).setCode(functionCode).setDisplay(functionDisplay)));
-		Reference actor = null;
+		Reference actor;
 		if (person.getIdentifierTypeCode().equals(MappingHelper.PRACTITIONER)) {
 			actor = new Reference(MappingHelper.PRACTITIONER + "/" + person.getPersonId());
 		} else {
