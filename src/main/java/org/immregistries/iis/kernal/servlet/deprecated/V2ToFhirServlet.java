@@ -80,7 +80,7 @@ public class V2ToFhirServlet extends HttpServlet {
 				createPatientResource(pr, p);
 				bundle.addEntry().setResource(p);
 				List<VaccinationMaster> vaccinationMasterList =
-					incomingMessageHandler.getVaccinationMasterList(pr.getPatient());
+					incomingMessageHandler.getVaccinationMasterList(pr.getPatientMaster());
 
 				for (VaccinationMaster vaccination : vaccinationMasterList) {
 					Immunization immunization = new Immunization();
@@ -211,7 +211,7 @@ public class V2ToFhirServlet extends HttpServlet {
 	}
 
 	private void createPatientResource(PatientReported pr, Patient p) {
-		PatientMaster pm = pr.getPatient();
+		PatientMaster pm = pr.getPatientMaster();
 		{
 			Identifier id = p.addIdentifier();
 			id.setValue(pm.getMainBusinessIdentifier().getValue());

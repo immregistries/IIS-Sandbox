@@ -9,7 +9,8 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Created by Eric on 12/20/17.
+ * Internal Standard agnostic representation of a Vaccination record, this class should only be used when dealing with Golden Record except for display,
+ * When dealing with a report use VaccinationReported
  */
 public class VaccinationMaster extends AbstractMappedObject implements Serializable {
 
@@ -40,11 +41,12 @@ public class VaccinationMaster extends AbstractMappedObject implements Serializa
 	private String fundingEligibility = "";
 	private TestEvent testEvent = null;
 
-
 	private String orgLocationId = "";
 	private OrgLocation orgLocation = null;
+
 	private ModelPerson enteredBy = null;
 	private String enteredById = "";
+
 	private ModelPerson orderingProvider = null;
 	private String orderingProviderId = "";
 

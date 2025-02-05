@@ -37,7 +37,7 @@ public class ImmunizationMapperR5 implements ImmunizationMapper<Immunization> {
 		VaccinationMaster vaccinationMaster = fhirRequests.searchVaccinationMaster(
 			new SearchParameterMap(Immunization.SP_IDENTIFIER, new TokenParam().setValue(vaccinationReported.getFillerBusinessIdentifier().getValue())));
 		if (vaccinationMaster!= null) {
-			vaccinationReported.setVaccination(vaccinationMaster);
+			vaccinationReported.setVaccinationMaster(vaccinationMaster);
 		}
 		return vaccinationReported;
 	}

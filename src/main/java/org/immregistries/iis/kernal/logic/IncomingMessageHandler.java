@@ -634,7 +634,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 				int count = 0;
 				for (PatientReported pr : patientReportedPossibleList) {
 					count++;
-					PatientMaster patient = pr.getPatient();
+					PatientMaster patient = pr.getPatientMaster();
 					hl7MessageWriter.printQueryPID(pr, processingFlavorSet, sb, patient, sdf, count);
 				}
 			} else if (profileId.equals(RSP_Z32_MATCH) || profileId.equals(RSP_Z42_MATCH_WITH_FORECAST)) {

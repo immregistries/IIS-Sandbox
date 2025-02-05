@@ -41,7 +41,7 @@ public class ImmunizationMapperR4 implements ImmunizationMapper<Immunization> {
 //				vaccinationReported.getExternalLink())
 		);
 		if (vaccinationMaster != null) {
-			vaccinationReported.setVaccination(vaccinationMaster);
+			vaccinationReported.setVaccinationMaster(vaccinationMaster);
 		}
 		return vaccinationReported;
 	}
@@ -49,7 +49,7 @@ public class ImmunizationMapperR4 implements ImmunizationMapper<Immunization> {
 	public VaccinationReported localObjectReported(Immunization i) {
 		VaccinationReported vaccinationReported = new VaccinationReported();
 		if (FhirRequester.isGoldenRecord(i)) {
-			logger.info("Mapping refused for report as patient is golden");
+			logger.info("Mapping refused for report as Immunization is golden");
 			return null;
 		}
 		fillFromFhirResource(vaccinationReported, i);
@@ -59,7 +59,7 @@ public class ImmunizationMapperR4 implements ImmunizationMapper<Immunization> {
 	public VaccinationMaster localObject(Immunization i) {
 		VaccinationMaster vaccinationMaster = new VaccinationMaster();
 		if (!FhirRequester.isGoldenRecord(i)) {
-			logger.info("Mapping refused for golden as patient is report");
+			logger.info("Mapping refused for golden as Immunization is reported");
 			return null;
 		}
 		fillFromFhirResource(vaccinationMaster, i);

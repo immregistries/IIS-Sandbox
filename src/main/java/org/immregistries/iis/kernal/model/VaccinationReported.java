@@ -3,20 +3,21 @@ package org.immregistries.iis.kernal.model;
 import java.io.Serializable;
 
 /**
- * Created by Eric on 12/20/17.
+ * Internal Standard agnostic representation of a record, extending VaccinationMaster with Reference to the actual Master patient or Golden Record,
+ * Used when dealing with a report
  */
 public class VaccinationReported extends VaccinationMaster implements Serializable {
-	private static final long serialVersionUID = 1L;
+	/**
+	 * Master Immunization reference or Golden Record
+	 */
+	private VaccinationMaster vaccinationMaster = null;
 
-	private VaccinationMaster vaccination = null;
-
-
-	public VaccinationMaster getVaccination() {
-		return vaccination;
+	public VaccinationMaster getVaccinationMaster() {
+		return vaccinationMaster;
 	}
 
-	public void setVaccination(VaccinationMaster vaccination) {
-		this.vaccination = vaccination;
+	public void setVaccinationMaster(VaccinationMaster vaccination) {
+		this.vaccinationMaster = vaccination;
 	}
 
 }

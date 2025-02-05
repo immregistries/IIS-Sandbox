@@ -269,11 +269,11 @@ public class CovidServlet extends HttpServlet {
 								  boolean includePhi, int doseNumber) {
 
 		PatientReported patientReported = vaccinationReported.getPatientReported();
-		PatientMaster patient = patientReported.getPatient();
+		PatientMaster patient = patientReported.getPatientMaster();
 
 
 		// 1: Vaccination event ID
-		printField(vaccinationReported.getVaccination().getVaccinationId(), out);
+		printField(vaccinationReported.getVaccinationMaster().getVaccinationId(), out);
 
 		// 2: Extract type
 		if (includePhi) {

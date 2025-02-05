@@ -28,7 +28,7 @@ public class Hl7MessageWriterR4 extends Hl7MessageWriter {
 		CodeMap codeMap = CodeMapManager.getCodeMap();
 		Set<ProcessingFlavor> processingFlavorSet = tenant.getProcessingFlavorSet();
 		PatientReported patientReported = vaccinationReported.getPatientReported();
-		PatientMaster patientMaster = patientReported.getPatient();
+		PatientMaster patientMaster = patientReported.getPatientMaster();
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
 		HL7Reader reader = new HL7Reader(
 			"MSH|^~\\&|||AIRA|IIS Sandbox|20120701082240-0500||VXU^V04^VXU_V04|NIST-IZ-001.00|P|2.5.1|||ER|AL|||||Z22^CDCPHINVS\r");
@@ -39,7 +39,7 @@ public class Hl7MessageWriterR4 extends Hl7MessageWriter {
 		int obxSetId = 0;
 		int obsSubId = 0;
 		{
-			VaccinationMaster vaccination = vaccinationReported.getVaccination();
+			VaccinationMaster vaccination = vaccinationReported.getVaccinationMaster();
 			Code cvxCode = codeMap.getCodeForCodeset(CodesetType.VACCINATION_CVX_CODE,
 				vaccination.getVaccineCvxCode());
 			if (cvxCode != null) {

@@ -6,11 +6,10 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * Internal Standard agnostic representation of a patient's information
+ * Internal Standard agnostic representation of a patient's information, this class should only be used when dealing with Golden Record except for Display,
+ * When dealing with a report use PatientReported
  */
 public class PatientMaster extends AbstractMappedObject implements Serializable {
-
-	private static final long serialVersionUID = 1L;
 
 	private String patientId = "";
 	private Tenant tenant = null;
@@ -38,9 +37,7 @@ public class PatientMaster extends AbstractMappedObject implements Serializable 
 	private String registryStatusIndicator = "";
 	private Date registryStatusIndicatorDate = null;
 
-
-	List<PatientGuardian> patientGuardians = new ArrayList<>(1);
-
+	private List<PatientGuardian> patientGuardians = new ArrayList<>(1);
 
 	private String managingOrganizationId;
 
@@ -377,9 +374,9 @@ public class PatientMaster extends AbstractMappedObject implements Serializable 
 	public String toString() {
 		return "PatientMaster{" +
 				"patientId='" + patientId + '\'' +
-//				", tenant=" + tenant +
+			", tenant=" + tenant +
 			", businessIdentifiers=" + businessIdentifiers +
-//				", reportedDate=" + reportedDate +
+			", reportedDate=" + reportedDate +
 				", updatedDate=" + updatedDate +
 				", patientNames=" + patientNames +
 				", motherMaidenName='" + motherMaidenName + '\'' +

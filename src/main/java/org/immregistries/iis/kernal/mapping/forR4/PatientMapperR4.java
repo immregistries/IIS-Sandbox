@@ -11,6 +11,8 @@ import org.immregistries.iis.kernal.mapping.MappingHelper;
 import org.immregistries.iis.kernal.mapping.interfaces.PatientMapper;
 import org.immregistries.iis.kernal.mapping.internalClient.FhirRequesterR4;
 import org.immregistries.iis.kernal.model.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Service;
@@ -28,6 +30,7 @@ import static org.immregistries.iis.kernal.mapping.internalClient.FhirRequester.
 @Service
 @Conditional(OnR4Condition.class)
 public class PatientMapperR4 implements PatientMapper<Patient> {
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	@Autowired
 	private FhirRequesterR4 fhirRequests;
@@ -35,43 +38,58 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 	public PatientReported localObjectReportedWithMaster(Patient p) {
 		PatientReported patientReported = localObjectReported(p);
 		if (!p.getId().isBlank() && p.getMeta().getTag(GOLDEN_SYSTEM_TAG, GOLDEN_RECORD) == null) {
-			patientReported.setPatient(fhirRequests.readPatientMasterWithMdmLink(p.getId()));
+			patientReported.setPatientMaster(fhirRequests.readPatientMasterWithMdmLink(p.getId()));
 		}
 		return patientReported;
 	}
 
 	public PatientMaster localObject(Patient patient) {
+		PatientMaster patientMaster = new PatientMaster();
+//		if (FhirRequester.isGoldenRecord(patient)) {
+//			logger.info("Mapping refused for report as patient is golden");
+//			return null;
+//		}
+		fillFromFhirResource(patientMaster, patient);
 		return localObjectReported(patient);
 	}
 
 	public PatientReported localObjectReported(Patient patient) {
 		PatientReported patientReported = new PatientReported();
+//		if (!FhirRequester.isGoldenRecord(patient)) {
+//			logger.info("Mapping refused for golden as Patient is reported");
+//			return null;
+//		}
+		fillFromFhirResource(patientReported, patient);
+		return patientReported;
+	}
+
+	private void fillFromFhirResource(PatientMaster localPatient, Patient patient) {
 		if (StringUtils.isNotBlank(patient.getId())) {
-			patientReported.setPatientId(new IdType(patient.getId()).getIdPart());
+			localPatient.setPatientId(new IdType(patient.getId()).getIdPart());
 		}
 		/*
 		 * Updated date
 		 */
-		patientReported.setUpdatedDate(patient.getMeta().getLastUpdated());
+		localPatient.setUpdatedDate(patient.getMeta().getLastUpdated());
 		/*
 		 * Identifiers
 		 */
 		for (Identifier identifier : patient.getIdentifier()) {
-			patientReported.addBusinessIdentifier(BusinessIdentifier.fromR4(identifier));
+			localPatient.addBusinessIdentifier(BusinessIdentifier.fromR4(identifier));
 		}
 		/*
 		 * Birth Date
 		 */
-		patientReported.setBirthDate(patient.getBirthDate());
+		localPatient.setBirthDate(patient.getBirthDate());
 		/*
 		 * Managing organization
 		 */
-		patientReported.setManagingOrganizationId(StringUtils.defaultString(patient.getManagingOrganization().getReference()));
+		localPatient.setManagingOrganizationId(StringUtils.defaultString(patient.getManagingOrganization().getReference()));
 		/*
 		 * Names
 		 */
 		List<PatientName> patientNames = new ArrayList<>(patient.getName().size());
-		patientReported.setPatientNames(patientNames);
+		localPatient.setPatientNames(patientNames);
 		for (HumanName name : patient.getName()) {
 			patientNames.add(PatientName.fromR4(name));
 		}
@@ -80,23 +98,23 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 		 */
 		Extension motherMaiden = patient.getExtensionByUrl(MOTHER_MAIDEN_NAME);
 		if (motherMaiden != null) {
-			patientReported.setMotherMaidenName(motherMaiden.getValue().toString());
+			localPatient.setMotherMaidenName(motherMaiden.getValue().toString());
 		} else {
-			patientReported.setMotherMaidenName(null);
+			localPatient.setMotherMaidenName(null);
 		}
 		/*
 		 * Gender
 		 */
 		switch (patient.getGender()) {
 			case MALE:
-				patientReported.setSex(MALE_SEX);
+				localPatient.setSex(MALE_SEX);
 				break;
 			case FEMALE:
-				patientReported.setSex(FEMALE_SEX);
+				localPatient.setSex(FEMALE_SEX);
 				break;
 			case OTHER:
 			default:
-				patientReported.setSex("");
+				localPatient.setSex("");
 				break;
 		}
 		/*
@@ -107,8 +125,8 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 			for (Iterator<Extension> it = Stream.concat(raceExtension.getExtensionsByUrl(RACE_EXTENSION_OMB).stream(), raceExtension.getExtensionsByUrl(RACE_EXTENSION_DETAILED).stream()).iterator(); it.hasNext(); ) {
 				Extension ext = it.next();
 				Coding coding = MappingHelper.extensionGetCoding(ext);
-				if (!patientReported.getRaces().contains(coding.getCode())) {
-					patientReported.addRace(StringUtils.defaultString(coding.getCode()));
+				if (!localPatient.getRaces().contains(coding.getCode())) {
+					localPatient.addRace(StringUtils.defaultString(coding.getCode()));
 				}
 			}
 		}
@@ -120,12 +138,12 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 			Extension ombExtension = ethnicityExtension.getExtensionByUrl(ETHNICITY_EXTENSION_OMB);
 			Extension detailedExtension = ethnicityExtension.getExtensionByUrl(ETHNICITY_EXTENSION_DETAILED);
 			if (ombExtension != null) {
-				patientReported.setEthnicity(MappingHelper.extensionGetCoding(ombExtension).getCode());
+				localPatient.setEthnicity(MappingHelper.extensionGetCoding(ombExtension).getCode());
 			} else if (detailedExtension != null) {
-				patientReported.setEthnicity(MappingHelper.extensionGetCoding(detailedExtension).getCode());
+				localPatient.setEthnicity(MappingHelper.extensionGetCoding(detailedExtension).getCode());
 			}
 		} else {
-			patientReported.setEthnicity(null);
+			localPatient.setEthnicity(null);
 		}
 		/*
 		 * Phone email
@@ -133,9 +151,9 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 		for (ContactPoint telecom : patient.getTelecom()) {
 			if (null != telecom.getSystem()) {
 				if (telecom.getSystem().equals(ContactPoint.ContactPointSystem.PHONE)) {
-					patientReported.addPhone(PatientPhone.fromR4(telecom));
+					localPatient.addPhone(PatientPhone.fromR4(telecom));
 				} else if (telecom.getSystem().equals(ContactPoint.ContactPointSystem.EMAIL)) {
-					patientReported.setEmail(StringUtils.defaultString(telecom.getValue()));
+					localPatient.setEmail(StringUtils.defaultString(telecom.getValue()));
 				}
 			}
 		}
@@ -145,20 +163,20 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 		if (null != patient.getDeceased()) {
 			if (patient.getDeceased().isBooleanPrimitive()) {
 				if (patient.getDeceasedBooleanType().booleanValue()) {
-					patientReported.setDeathFlag(YES);
+					localPatient.setDeathFlag(YES);
 				} else {
-					patientReported.setDeathFlag(NO);
+					localPatient.setDeathFlag(NO);
 				}
 			}
 			if (patient.getDeceased().isDateTime()) {
-				patientReported.setDeathDate(patient.getDeceasedDateTimeType().getValue());
+				localPatient.setDeathDate(patient.getDeceasedDateTimeType().getValue());
 			}
 		}
 		/*
 		 * Addresses
 		 */
 		for (Address address : patient.getAddress()) {
-			patientReported.addAddress(PatientAddress.fromR4(address));
+			localPatient.addAddress(PatientAddress.fromR4(address));
 		}
 		/*
 		 * Multiple birth
@@ -166,12 +184,12 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 		if (null != patient.getMultipleBirth()) {
 			if (patient.getMultipleBirth().isBooleanPrimitive()) {
 				if (patient.getMultipleBirthBooleanType().booleanValue()) {
-					patientReported.setBirthFlag(YES);
+					localPatient.setBirthFlag(YES);
 				} else {
-					patientReported.setBirthFlag(NO);
+					localPatient.setBirthFlag(NO);
 				}
 			} else {
-				patientReported.setBirthOrder(String.valueOf(patient.getMultipleBirthIntegerType()));
+				localPatient.setBirthOrder(String.valueOf(patient.getMultipleBirthIntegerType()));
 			}
 		}
 		/*
@@ -180,15 +198,15 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 		Extension publicity = patient.getExtensionByUrl(PUBLICITY_EXTENSION);
 		if (publicity != null) {
 			Coding value = MappingHelper.extensionGetCoding(publicity);
-			patientReported.setPublicityIndicator(StringUtils.defaultString(value.getCode()));
+			localPatient.setPublicityIndicator(StringUtils.defaultString(value.getCode()));
 			if (StringUtils.isNotBlank(value.getVersion())) {
 				try {
-					patientReported.setPublicityIndicatorDate(MappingHelper.sdf.parse(value.getVersion()));
+					localPatient.setPublicityIndicatorDate(MappingHelper.sdf.parse(value.getVersion()));
 				} catch (ParseException ignored) {
 				}
 			}
 		} else {
-			patientReported.setPublicityIndicator(null);
+			localPatient.setPublicityIndicator(null);
 		}
 		/*
 		 * Protection
@@ -196,15 +214,15 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 		Extension protection = patient.getExtensionByUrl(PROTECTION_EXTENSION);
 		if (protection != null) {
 			Coding value = MappingHelper.extensionGetCoding(protection);
-			patientReported.setProtectionIndicator(StringUtils.defaultString(value.getCode()));
+			localPatient.setProtectionIndicator(StringUtils.defaultString(value.getCode()));
 			if (StringUtils.isNotBlank(value.getVersion())) {
 				try {
-					patientReported.setProtectionIndicatorDate(MappingHelper.sdf.parse(value.getVersion()));
+					localPatient.setProtectionIndicatorDate(MappingHelper.sdf.parse(value.getVersion()));
 				} catch (ParseException ignored) {
 				}
 			}
 		} else {
-			patientReported.setProtectionIndicator(null);
+			localPatient.setProtectionIndicator(null);
 		}
 		/*
 		 * Registry status
@@ -212,15 +230,15 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 		Extension registry = patient.getExtensionByUrl(REGISTRY_STATUS_EXTENSION);
 		if (registry != null) {
 			Coding value = MappingHelper.extensionGetCoding(registry);
-			patientReported.setRegistryStatusIndicator(StringUtils.defaultString(value.getCode()));
+			localPatient.setRegistryStatusIndicator(StringUtils.defaultString(value.getCode()));
 			if (StringUtils.isNotBlank(value.getVersion())) {
 				try {
-					patientReported.setRegistryStatusIndicatorDate(MappingHelper.sdf.parse(value.getVersion()));
+					localPatient.setRegistryStatusIndicatorDate(MappingHelper.sdf.parse(value.getVersion()));
 				} catch (ParseException ignored) {
 				}
 			}
 		} else {
-			patientReported.setRegistryStatusIndicator(null);
+			localPatient.setRegistryStatusIndicator(null);
 		}
 		/*
 		 * Patient Contact / Guardian
@@ -229,9 +247,8 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 			PatientGuardian patientGuardian = new PatientGuardian();
 			patientGuardian.setName(PatientName.fromR4(contactComponent.getName()));
 			patientGuardian.setGuardianRelationship(contactComponent.getRelationshipFirstRep().getCodingFirstRep().getCode());
-			patientReported.addPatientGuardian(patientGuardian);
+			localPatient.addPatientGuardian(patientGuardian);
 		}
-		return patientReported;
 	}
 
 
