@@ -4,7 +4,8 @@
   <session-factory>
     <property name="hibernate.connection.driver_class">com.mysql.cj.jdbc.Driver</property>
 
-    <property name="hibernate.connection.url">@IIS_MYSQL_URL@</property>
+    <!--    OVERRIDEN IN SERVLET HELPER ON RUNTIME FOR ENV -->
+    <property name="hibernate.connection.url">${IIS_MYSQL_URL}</property>
 <!--    <property name="hibernate.connection.url">${iis.mysql.hibernate.connection.url}</property>-->
 <!--    <property name="hibernate.connection.url">jdbc:mysql://localhost/iis_alongside_jpa</property>-->
     <property name="hibernate.connection.username">iis_web</property>

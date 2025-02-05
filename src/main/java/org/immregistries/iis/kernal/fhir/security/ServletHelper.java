@@ -32,9 +32,22 @@ public class ServletHelper {
 
 	private static SessionFactory factory;
 
+	/**
+	 * Initialises data Session Factory if needed
+	 *
+	 * @return Data Session for Mysql
+	 */
 	public static Session getDataSession() {
 		if (factory == null) {
-			factory = new Configuration().configure().buildSessionFactory();
+			Configuration cfg = new Configuration().configure();
+			/*
+			 * For deploying time configuration with ENV variable
+			 */
+			String database_url = System.getenv("IIS_MYSQL_URL");
+			if (StringUtils.isNotBlank(database_url)) {
+				cfg.setProperty("hibernate.connection.url", database_url);
+			}
+			factory = cfg.buildSessionFactory();
 		}
 		return factory.openSession();
 	}
