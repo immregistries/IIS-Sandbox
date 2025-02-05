@@ -37,7 +37,7 @@ public enum ProcessingFlavor {
 	SNAIL90("Snail90", "Patients are not returned until 90 seconds after they have been submitted"),
 	PUNKIN("Punkin", "Will return unknown race and ethnicity codes in RSP if no race or ethnicity is specified"),
 	MEDLAR("Medlar", "Will only return errors but no warnings or informational error segments in ACK messages"),
-	APPLESAUCE("Applesauce", "Will activate detect Temporaray name detection including 'Babynames' and 'Test' and change the name type "),
+	APPLESAUCE("Applesauce", "Will activate detect Temporary name detection including 'Babynames' and 'Test' and change the name type "),
 	GRAPEFRUIT("Grapefruit", "Will randomly (60%) reject only vaccines and not patient"),
 	SINGLENAME("Singlename", "Only first name recieved will be processed and stored"),
 	UPPERCASENAME("UPPERCASENAME", "Converts all incoming names to uppercase upon storing, regardless of the case sent by the EHR"),

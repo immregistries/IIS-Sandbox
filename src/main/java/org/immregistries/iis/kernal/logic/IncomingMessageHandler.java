@@ -17,6 +17,7 @@ import hl7.v2.validation.vs.ValueSetLibraryImpl;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Observation;
 import org.hl7.fhir.r5.model.Practitioner;
@@ -83,13 +84,13 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 	@Autowired
 	Hl7MessageWriter hl7MessageWriter;
 	@Autowired
-	PatientMapper patientMapper;
+	PatientMapper<IBaseResource> patientMapper;
 	@Autowired
-	ImmunizationMapper immunizationMapper;
+	ImmunizationMapper<IBaseResource> immunizationMapper;
 	@Autowired
-	ObservationMapper observationMapper;
+	ObservationMapper<IBaseResource> observationMapper;
 	@Autowired
-	LocationMapper locationMapper;
+	LocationMapper<IBaseResource> locationMapper;
 	@Autowired
 	PartitionCreationInterceptor partitionCreationInterceptor;
 
@@ -183,8 +184,12 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 		try {
 			TestCase testCase = new TestCase();
 			testCase.setEvalDate(new Date());
-			testCase.setPatientSex(patient == null ? "F" : patient.getSex());
-			testCase.setPatientDob(patient.getBirthDate());
+			if (patient != null) {
+				testCase.setPatientSex(patient.getSex());
+				testCase.setPatientDob(patient.getBirthDate());
+			} else {
+				testCase.setPatientSex("F");
+			}
 			List<TestEvent> testEventList = new ArrayList<>();
 			for (VaccinationMaster vaccination : vaccinationMasterList) {
 				Code cvxCode = codeMap.getCodeForCodeset(CodesetType.VACCINATION_CVX_CODE, vaccination.getVaccineCvxCode());
@@ -194,14 +199,13 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 				if ("D".equals(vaccination.getActionCode())) {
 					continue;
 				}
-				int cvx = 0;
+				int cvx;
 				try {
 					cvx = Integer.parseInt(vaccination.getVaccineCvxCode());
 					TestEvent testEvent = new TestEvent(cvx, vaccination.getAdministeredDate());
 					testEventList.add(testEvent);
 					vaccination.setTestEvent(testEvent);
-				} catch (NumberFormatException nfe) {
-					continue;
+				} catch (NumberFormatException ignored) {
 				}
 			}
 			testCase.setTestEventList(testEventList);
@@ -238,7 +242,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 
 		// if processing flavor contains MEDLAR then all the non E errors have to removed from the processing list
 		if (processingFlavorSet != null && processingFlavorSet.contains(ProcessingFlavor.MEDLAR)) {
-			List<IisReportable> tempIisReportableList = new ArrayList<IisReportable>();
+			List<IisReportable> tempIisReportableList = new ArrayList<>();
 			for (IisReportable reportable : iisReportableList) {
 				if (reportable.isError()) {
 					tempIisReportableList.add(reportable);
@@ -247,7 +251,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 			iisReportableList = tempIisReportableList;
 		}
 
-		String sendersUniqueId = "";
+		String sendersUniqueId;
 		reader.resetPostion();
 		if (reader.advanceToSegment("MSH")) {
 			sendersUniqueId = reader.getValue(10);
@@ -306,7 +310,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 		}
 		// if processing flavor contains MEDLAR then all the non E errors have to removed from the processing list
 		if (processingFlavorSet != null && processingFlavorSet.contains(ProcessingFlavor.MEDLAR)) {
-			reportables = reportables.stream().filter(reportable -> !SeverityLevel.ERROR.equals(reportable.getSeverity())).collect(Collectors.toList());
+			reportables = reportables.stream().filter(reportable -> !IisReportableSeverity.ERROR.equals(reportable.getSeverity())).collect(Collectors.toList());
 		}
 		data.setReportables(reportables);
 
@@ -389,7 +393,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 	}
 
 	public Date parseDateInternal(String dateString, boolean strict) throws ParseException {
-		if (dateString.length() == 0) {
+		if (StringUtils.isBlank(dateString)) {
 			return null;
 		}
 		Date date;
@@ -409,9 +413,9 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 		PatientMaster patientMasterForMatchQuery = new PatientMaster();
 		if (reader.advanceToSegment("QPD")) {
 			String mrn = "";
-			for (int i = 1; i <= reader.getRepeatCount(3); i++) {
-
-			}
+//			for (int i = 1; i <= reader.getRepeatCount(3); i++) {
+//
+//			}
 			{
 				mrn = reader.getValueBySearchingRepeats(3, 1, "MR", 5);
 				if (StringUtils.isBlank(mrn)) {
@@ -454,7 +458,6 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 			if (StringUtils.isNotBlank(problem)) {
 				reportables.add(IisReportable.fromProcessingException(new ProcessingException(problem, "QPD", 1, fieldPosition)));
 			} else {
-
 				PatientName patientName = new PatientName(patientNameLast, patientNameFirst, patientNameMiddle, "");
 				patientMasterForMatchQuery.addPatientName(patientName);
 				patientMasterForMatchQuery.setBirthDate(patientBirthDate);
@@ -495,9 +498,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 //			}
 		}
 		List<PatientReported> multipleMatches = new ArrayList<>();
-		PatientMaster singleMatch = null;
-
-		singleMatch = fhirRequester.matchPatient(multipleMatches, patientMasterForMatchQuery, cutoff);
+		PatientMaster singleMatch = fhirRequester.matchPatient(multipleMatches, patientMasterForMatchQuery, cutoff);
 		if (singleMatch == null) {
 			throw new ProcessingException("Patient not found", "PID", 1, 1); // TODO position
 		}
@@ -552,7 +553,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 				queryResponse = QUERY_NOT_FOUND;
 				profileId = RSP_Z33_NO_MATCH;
 				categoryResponse = NO_MATCH;
-				if (patientReportedPossibleList.size() > 0) {
+				if (!patientReportedPossibleList.isEmpty()) {
 					if (profileIdSubmitted.equals(QBP_Z34)) {
 						if (patientReportedPossibleList.size() > maxCount) {
 							queryResponse = QUERY_TOO_MANY;
@@ -608,7 +609,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 		}
 		if (sendInformations) {
 			String profileName = "Request a Complete Immunization History";
-			if (profileIdSubmitted.equals("")) {
+			if (StringUtils.isBlank(profileIdSubmitted)) {
 				profileIdSubmitted = "Z34";
 				profileName = "Request a Complete Immunization History";
 			} else if (profileIdSubmitted.equals("Z34")) {
@@ -690,7 +691,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 					sb.append("|");
 					// RXA-5
 					sb.append("|").append(cvxCode.getValue()).append("^").append(cvxCode.getLabel()).append("^CVX");
-					if (!vaccination.getVaccineNdcCode().equals("")) {
+					if (StringUtils.isNotBlank(vaccination.getVaccineNdcCode())) {
 						Code ndcCode = codeMap.getCodeForCodeset(CodesetType.VACCINATION_NDC_CODE, vaccination.getVaccineNdcCode());
 						if (ndcCode != null) {
 							sb.append("~").append(ndcCode.getValue()).append("^").append(ndcCode.getLabel()).append("^NDC");
@@ -700,7 +701,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 						// RXA-6
 						sb.append("|");
 						double adminAmount = 0.0;
-						if (!vaccination.getAdministeredAmount().equals("")) {
+						if (StringUtils.isNotBlank(vaccination.getAdministeredAmount())) {
 							try {
 								adminAmount = Double.parseDouble(vaccination.getAdministeredAmount());
 							} catch (NumberFormatException nfe) {
@@ -770,7 +771,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 					sb.append("|");
 					if (!processingFlavorSet.contains(ProcessingFlavor.LIME)) {
 						String completionStatus = vaccination.getCompletionStatus();
-						if (completionStatus == null || completionStatus.equals("")) {
+						if (StringUtils.isBlank(completionStatus)) {
 							completionStatus = "CP";
 						}
 						sb.append(hl7MessageWriter.printCode(completionStatus, CodesetType.VACCINATION_COMPLETION, null, codeMap));
@@ -779,7 +780,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 					// RXA-21
 					sb.append("|A");
 					sb.append("\r");
-					if (vaccination.getBodyRoute() != null && !vaccination.getBodyRoute().equals("")) {
+					if (StringUtils.isNotBlank(vaccination.getBodyRoute())) {
 						sb.append("RXR");
 						// RXR-1
 						sb.append("|");
@@ -829,7 +830,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 								hl7MessageWriter.printObx(sb, obxSetId, obsSubId, observationReported);
 							}
 						}
-					} catch (ResourceNotFoundException e) {
+					} catch (ResourceNotFoundException ignored) {
 					}
 				}
 				try {
@@ -843,10 +844,10 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 							hl7MessageWriter.printObx(sb, obxSetId, obsSubId, observationReported);
 						}
 					}
-				} catch (ResourceNotFoundException e) {
+				} catch (ResourceNotFoundException ignored) {
 				}
 
-				if (sendBackForecast && forecastActualList != null && forecastActualList.size() > 0) {
+				if (sendBackForecast && forecastActualList != null && !forecastActualList.isEmpty()) {
 					hl7MessageWriter.printORC(tenant, sb, null, false);
 					sb.append("RXA");
 					// RXA-1
@@ -977,10 +978,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 			}
 			{
 				observationReported.setPatientReportedId(patientReported.getPatientId());
-
-//		  Observation observation = ObservationMapper.getFhirResource(observationMaster,observationReported);
-				observationReported = fhirRequester.saveObservationReported(observationReported);
-
+				fhirRequester.saveObservationReported(observationReported);
 			}
 		}
 		return obxCount;
@@ -1060,9 +1058,6 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 
 	public PatientReported processPatientFhirAgnostic(HL7Reader reader, List<IisReportable> iisReportableList, Set<ProcessingFlavor> processingFlavorSet, CodeMap codeMap, boolean strictDate, PatientReported patientReported) throws ProcessingException {
 
-		if (processingFlavorSet.contains(ProcessingFlavor.APPLESAUCE)) {
-
-		}
 		List<PatientName> names = new ArrayList<>(reader.getRepeatCount(5));
 		for (int i = 1; i <= reader.getRepeatCount(5); i++) {
 			String patientNameLast = reader.getValueRepeat(5, 1, i);
@@ -1225,7 +1220,6 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 		while (reader.advanceToSegment("ORC")) {
 			orcCount++;
 			VaccinationReported vaccinationReported = null;
-//        VaccinationMaster vaccinationMaster = null;
 			String vaccineCode = "";
 			Date administrationDate = null;
 			String vaccinationReportedExternalLinkPlacer = reader.getValue(2);
@@ -1265,10 +1259,6 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 //			}
 
 			vaccinationReported = fhirRequester.searchVaccinationReported(new SearchParameterMap("identifier", new TokenParam().setValue(fillerIdentifier.getValue()))); // TODO system and identifier type
-//						Immunization.IDENTIFIER.exactly().code(vaccinationReportedExternalLink));
-			if (vaccinationReported != null) {
-//				 vaccinationMaster = vaccinationReported.getVaccination();
-			}
 
 			if (vaccinationReported == null) {
 				vaccinationReported = new VaccinationReported();
@@ -1300,9 +1290,9 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 			{
 				String altVaccineCode = reader.getValue(5, 4);
 				String altVaccineCodeType = reader.getValue(5, 6);
-				if (!altVaccineCode.equals("")) {
+				if (StringUtils.isNotBlank(altVaccineCode)) {
 					if (altVaccineCodeType.equals("NDC")) {
-						if (vaccineNdcCode.equals("")) {
+						if (StringUtils.isBlank(vaccineNdcCode)) {
 							vaccineNdcCode = altVaccineCode;
 						}
 					} else if (altVaccineCodeType.equals("CPT") || altVaccineCodeType.equals("C4") || altVaccineCodeType.equals("C5")) {
@@ -1370,12 +1360,11 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 
 			{
 				String administeredAtLocation = reader.getValue(11, 4);
-				if (StringUtils.isEmpty(administeredAtLocation)) {
-
-				}
+//				if (StringUtils.isEmpty(administeredAtLocation)) {
+//
+//				}
 				if (StringUtils.isNotEmpty(administeredAtLocation)) {
 					OrgLocation orgLocation = fhirRequester.searchOrgLocation(new SearchParameterMap("identifier", new TokenParam().setValue(administeredAtLocation)));
-//								Location.IDENTIFIER.exactly().code(administeredAtLocation));
 
 					if (orgLocation == null) {
 						if (processingFlavorSet.contains(ProcessingFlavor.PEAR)) {
@@ -1420,8 +1409,6 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 				}
 
 			}
-//          vaccinationMaster.setVaccineCvxCode(vaccineCvxCode);
-//          vaccinationMaster.setAdministeredDate(administrationDate);
 			vaccinationReported.setUpdatedDate(new Date());
 			vaccinationReported.setAdministeredDate(administrationDate);
 			vaccinationReported.setVaccineCvxCode(vaccineCvxCode);
@@ -1447,7 +1434,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 			if (vaccinationReported.getAdministeredDate().before(patientReported.getBirthDate()) && !processingFlavorSet.contains(ProcessingFlavor.CLEMENTINE)) {
 				throw new ProcessingException("Vaccination is reported as having been administered before the patient was born", "RXA", rxaCount, 3);
 			}
-			if (!vaccinationReported.getVaccineCvxCode().equals("998") && !vaccinationReported.getVaccineCvxCode().equals("999") && (vaccinationReported.getCompletionStatus().equals("CP") || vaccinationReported.getCompletionStatus().equals("PA") || vaccinationReported.getCompletionStatus().equals(""))) {
+			if (!vaccinationReported.getVaccineCvxCode().equals("998") && !vaccinationReported.getVaccineCvxCode().equals("999") && (vaccinationReported.getCompletionStatus().equals("CP") || vaccinationReported.getCompletionStatus().equals("PA") || vaccinationReported.getCompletionStatus().isEmpty())) {
 				vaccinationCount++;
 			}
 
