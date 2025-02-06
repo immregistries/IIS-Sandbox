@@ -34,12 +34,11 @@ services:
       - ./database/create-mysql-database.sql:/docker-entrypoint-initdb.d/1.sql
   iis-sandbox:
     build: .
-    #    image: clemhen/iis-sandbox:deployable-v1.2
     container_name: iis-sandbox
     environment:
       FHIR_VERSION: R4
-      IIS_MYSQL_URL: jdbc:mysql://iis-sandbox-mysql:3306/iis_alongside_jpa
-      SPRING_DATASOURCE_URL: jdbc:postgresql://hapi-fhir-postgresql:5432/hapi_fhir_iis
+      IIS_MYSQL_URL: "jdbc:mysql://iis-sandbox-mysql:3306/iis_alongside_jpa"
+      SPRING_DATASOURCE_URL: "jdbc:postgresql://hapi-fhir-postgresql:5432/hapi_fhir_iis"
     restart: unless-stopped
     ports:
       - "8081:8080"

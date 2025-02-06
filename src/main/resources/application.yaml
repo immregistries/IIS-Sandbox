@@ -43,7 +43,7 @@ spring:
     url: '@SPRING_DATASOURCE_URL@'
     username: hapi_iis_web
     password: SicMundusCreatusEst
-    driver-class-name: org.postgresql.Driver
+    #    driver-class-name: org.postgresql.Driver
     # rest is Handled in spring profiles
     max-active: 50
     # database connection pool size
@@ -81,8 +81,8 @@ spring:
 hapi:
   fhir:
     ### This is the FHIR version. Choose between, DSTU2, DSTU3, R4 or R5
-    #    HERE R5 selected by default, can be modified with environment variable hapi.fhir.fhir_version
-    #    fhir_version: '@hapi.fhir.fhir_version@'
+    #    HERE R5 selected by default, can be modified with environment variable FHIR_VERSION, OnCondition classes were modified for this override
+    fhir_version: '@FHIR_VERSION@'
 
     ### This enables the swagger-ui at /fhir/swagger-ui/index.html as well as the /fhir/api-docs (see https://hapifhir.io/hapi-fhir/docs/server_plain/openapi.html)
 #    openapi_enabled: true
@@ -231,21 +231,13 @@ hapi:
 ## Dev profile only properties to set up with H2
 ---
 spring:
+  config.activate.on-profile: prod
+  jpa.properties.hibernate.dialect: ca.uhn.fhir.jpa.model.dialect.HapiFhirPostgres94Dialect
+---
+spring:
   config.activate.on-profile: dev
   datasource:
     username: sa
     password: null
     driverClassName: org.h2.Driver
   jpa.properties.hibernate.dialect: ca.uhn.fhir.jpa.model.dialect.HapiFhirH2Dialect
-#---
-#spring:
-#  config.activate.on-profile: R5
-#hapi:
-#  fhir:
-#    fhir_version: R5
-#---
-#spring:
-#  config.activate.on-profile: R4
-#hapi:
-#  fhir:
-#    fhir_version: R4

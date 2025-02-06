@@ -15,7 +15,7 @@ USER 1001
 
 # Used to deactivate dev profile, even if prod profile no longer exists
 ENV spring.profiles.active=prod
-ENV spring.jpa.properties.hibernate.dialect=ca.uhn.fhir.jpa.model.dialect.HapiFhirPostgres94Dialect
+#ENV spring.jpa.properties.hibernate.dialect=ca.uhn.fhir.jpa.model.dialect.HapiFhirPostgres94Dialect
 
 COPY --chown=1001:1001 catalina.properties /opt/bitnami/tomcat/conf/catalina.properties
 COPY --chown=1001:1001 server.xml /opt/bitnami/tomcat/conf/server.xml
