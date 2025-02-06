@@ -37,7 +37,7 @@ services:
     image: clemhen/iis-sandbox:deployable-v1.3
     container_name: iis-sandbox
     environment:
-      FHIR_VERSION: R4
+      FHIR_VERSION: R5
       IIS_MYSQL_URL: "jdbc:mysql://iis-sandbox-mysql:3306/iis_alongside_jpa"
       SPRING_DATASOURCE_URL: "jdbc:postgresql://hapi-fhir-postgresql:5432/hapi_fhir_iis"
     restart: unless-stopped
