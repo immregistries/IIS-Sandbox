@@ -13,11 +13,9 @@ USER root
 RUN mkdir -p /target && chown -R 1001:1001 target
 USER 1001
 
+# Used to deactivate dev profile, even if prod profile no longer exists
 ENV spring.profiles.active=prod
 ENV spring.jpa.properties.hibernate.dialect=ca.uhn.fhir.jpa.model.dialect.HapiFhirPostgres94Dialect
-
-ENV IIS_MYSQL_URL="jdbc:mysql://iis-sandbox-mysql:3306/iis_alongside_jpa"
-ENV SPRING_DATASOURCE_URL="jdbc:postgresql://hapi-fhir-postgresql:5432/hapi_fhir_iis"
 
 COPY --chown=1001:1001 catalina.properties /opt/bitnami/tomcat/conf/catalina.properties
 COPY --chown=1001:1001 server.xml /opt/bitnami/tomcat/conf/server.xml
