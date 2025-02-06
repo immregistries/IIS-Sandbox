@@ -4,6 +4,7 @@ services:
     container_name: hapi-fhir-postgres
     restart: unless-stopped
     environment:
+      #      Postgres DB name should be changed when trying to switch between FHIR version
       POSTGRES_DB: "hapi_fhir_iis"
       POSTGRES_USER: "hapi_iis_web"
       POSTGRES_PASSWORD: "SicMundusCreatusEst"
@@ -13,9 +14,6 @@ services:
       timeout: 10s
       retries: 10
       start_period: 5s
-#    volumes:
-#      - ./database/create-postgresql-for-hapi-fhir.sql:/docker-entrypoint-initdb.d/3.sql
-#        - hapi-fhir-postgres:/var/lib/postgresql/data
   iis-sandbox-mysql:
     image: mysql:latest
     container_name: iis-sandbox-mysql
@@ -36,13 +34,12 @@ services:
       - ./database/create-mysql-database.sql:/docker-entrypoint-initdb.d/1.sql
   iis-sandbox:
 #    build: .
-    image: clemhen/iis-sandbox:deployable-v1.2
+    image: clemhen/iis-sandbox:deployable-v1.3
     container_name: iis-sandbox
-    #    environment:
-    #      - iis.mysql.hibernate.connection.url=jdbc:mysql://iis-sandbox-mysql:3306/iis_alongside_jpa
-    #      - IIS_MYSQL_URL=jdbc:mysql://iis-sandbox-mysql:3306/iis_alongside_jpa
-    #      - SPRING_DATASOURCE_URL=jdbc:postgresql://hapi-fhir-postgres:5432/hapi_fhir_iis
-    #      - spring.datasource.url=jdbc:postgresql://hapi-fhir-postgres:5432/hapi_fhir_iis
+    environment:
+      FHIR_VERSION: R4
+      IIS_MYSQL_URL: "jdbc:mysql://iis-sandbox-mysql:3306/iis_alongside_jpa"
+      SPRING_DATASOURCE_URL: "jdbc:postgresql://hapi-fhir-postgresql:5432/hapi_fhir_iis"
     restart: unless-stopped
     ports:
       - "8081:8080"
