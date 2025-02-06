@@ -169,7 +169,7 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler {
 			while (reader.advanceToSegment("ORC")) {
 				orcCount++;
 				if (reader.advanceToSegment("OBR", "ORC")) {
-					obxCount = readAndCreateObservations(reader, iisReportableList, patientReported, strictDate, obxCount, null, null);
+					obxCount = readAndCreateObservations(reader, iisReportableList, processingFlavorSet, patientReported, strictDate, obxCount, null, null);
 				} else {
 					throw new ProcessingException("OBR segment was not found after ORC segment", "ORC", orcCount, 0);
 				}

@@ -947,35 +947,36 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 		return messageResponse;
 	}
 
-	public int readAndCreateObservations(HL7Reader reader, List<IisReportable> iisReportableList, PatientReported patientReported, boolean strictDate, int obxCount, VaccinationReported vaccinationReported, VaccinationMaster vaccination) {
+	public int readAndCreateObservations(HL7Reader reader, List<IisReportable> iisReportableList, Set<ProcessingFlavor> processingFlavorSet, PatientReported patientReported, boolean strictDate, int obxCount, VaccinationReported vaccinationReported, VaccinationMaster vaccination) throws ProcessingException {
 		while (reader.advanceToSegment("OBX", "ORC")) {
 			obxCount++;
 			String identifierCode = reader.getValue(3);
 			String valueCode = reader.getValue(5);
 			ObservationReported observationReported = readObservations(reader, iisReportableList, patientReported, strictDate, obxCount, vaccinationReported, vaccination, identifierCode, valueCode);
 			// Commented contraindication Now checked in Observation Interceptor
-			if (observationReported.getIdentifierCode().equals("30945-0")) // contraindication!
-			{
-				CodeMap codeMap = CodeMapManager.getCodeMap();
-//				Code contraCode = codeMap.getCodeForCodeset(CodesetType.CONTRAINDICATION_OR_PRECAUTION, observationReported.getValueCode());
+//			if (observationReported.getIdentifierCode().equals("30945-0")) // contraindication!
+//			{
+//				CodeMap codeMap = CodeMapManager.getCodeMap();
+////				Code contraCode = codeMap.getCodeForCodeset(CodesetType.CONTRAINDICATION_OR_PRECAUTION, observationReported.getValueCode());
 //				if (contraCode == null) {
 //					ProcessingException pe = new ProcessingException("Unrecognized contraindication or precaution", "OBX", obxCount, 5, IisReportableSeverity.WARN);
 //					iisReportableList.add(IisReportable.fromProcessingException(pe));
 //				}
-				if (observationReported.getObservationDate() != null) {
+//				if (observationReported.getObservationDate() != null) {
 //					Date today = new Date();
 //					if (observationReported.getObservationDate().after(today)) {
 //						ProcessingException pe = new ProcessingException("Contraindication or precaution observed in the future", "OBX", obxCount, 5, IisReportableSeverity.WARN);
 //						iisReportableList.add(IisReportable.fromProcessingException(pe));
 //					}
-					if (patientReported.getBirthDate() != null && observationReported.getObservationDate().before(patientReported.getBirthDate())) {
-						ProcessingException pe = new ProcessingException("Contraindication or precaution observed before patient was born", "OBX", obxCount, 14, IisReportableSeverity.WARN);
-						iisReportableList.add(IisReportable.fromProcessingException(pe));
-					}
-				}
-			}
+//					if (patientReported.getBirthDate() != null && observationReported.getObservationDate().before(patientReported.getBirthDate())) {
+//						ProcessingException pe = new ProcessingException("Contraindication or precaution observed before patient was born", "OBX", obxCount, 14, IisReportableSeverity.WARN);
+//						iisReportableList.add(IisReportable.fromProcessingException(pe));
+//					}
+//				}
+//			}
 			{
 				observationReported.setPatientReportedId(patientReported.getPatientId());
+				observationProcessingInterceptor.processAndValidateObservationReported(observationReported, iisReportableList, processingFlavorSet, obxCount, patientReported.getBirthDate());
 				fhirRequester.saveObservationReported(observationReported);
 			}
 		}
@@ -1245,7 +1246,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 				throw new ProcessingException("Vaccine code is not indicated in RXA-5.1", "RXA", rxaCount, 5);
 			}
 			if (vaccineCode.equals("998")) {
-				obxCount = readAndCreateObservations(reader, iisReportableList, patientReported, strictDate, obxCount, null, null);
+				obxCount = readAndCreateObservations(reader, iisReportableList, processingFlavorSet, patientReported, strictDate, obxCount, null, null);
 				continue;
 			}
 			if (fillerIdentifier == null) {
@@ -1467,7 +1468,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 			vaccinationReported = fhirRequester.saveVaccinationReported(vaccinationReported);
 			vaccinationReportedList.add(vaccinationReported);
 			reader.gotoSegmentPosition(segmentPosition);
-			obxCount = readAndCreateObservations(reader, iisReportableList, patientReported, strictDate, obxCount, vaccinationReported, null);
+			obxCount = readAndCreateObservations(reader, iisReportableList, processingFlavorSet, patientReported, strictDate, obxCount, vaccinationReported, vaccinationReported.getVaccinationMaster());
 
 		}
 		if (processingFlavorSet.contains(ProcessingFlavor.CRANBERRY) && vaccinationCount == 0) {

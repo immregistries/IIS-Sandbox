@@ -189,4 +189,30 @@ public class ObservationMaster extends AbstractMappedObject implements Serializa
 	public void setObservationId(String observationId) {
 		this.observationId = observationId;
 	}
+
+	@Override
+	public String toString() {
+		return "ObservationMaster{" +
+			"observationId='" + observationId + '\'' +
+			", identifierCode='" + identifierCode + '\'' +
+			", valueCode='" + valueCode + '\'' +
+			", patientReportedId='" + patientReportedId + '\'' +
+			", vaccinationReportedId='" + vaccinationReportedId + '\'' +
+			", reportedDate=" + reportedDate +
+			", updatedDate=" + updatedDate +
+			", valueType='" + valueType + '\'' +
+			", identifierLabel='" + identifierLabel + '\'' +
+			", identifierTable='" + identifierTable + '\'' +
+			", valueLabel='" + valueLabel + '\'' +
+			", valueTable='" + valueTable + '\'' +
+			", unitsCode='" + unitsCode + '\'' +
+			", unitsLabel='" + unitsLabel + '\'' +
+			", unitsTable='" + unitsTable + '\'' +
+			", resultStatus='" + resultStatus + '\'' +
+			", observationDate=" + observationDate +
+			", methodCode='" + methodCode + '\'' +
+			", methodLabel='" + methodLabel + '\'' +
+			", methodTable='" + methodTable + '\'' +
+			'}';
+	}
 }

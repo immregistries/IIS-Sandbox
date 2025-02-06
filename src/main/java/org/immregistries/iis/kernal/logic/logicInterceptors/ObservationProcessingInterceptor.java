@@ -63,8 +63,8 @@ public class ObservationProcessingInterceptor extends AbstractLogicInterceptor {
 		requestDetails.setAttribute(IIS_REPORTABLE_LIST, iisReportableList);
 	}
 
-	private ObservationReported processAndValidateObservationReported(ObservationReported observationReported, List<IisReportable> iisReportableList, Set<ProcessingFlavor> processingFlavorSet, int obxCount, Date patientBirthDate) throws ProcessingException {
-//		testMapping(observationMapper,observationReported);
+	public ObservationReported processAndValidateObservationReported(ObservationReported observationReported, List<IisReportable> iisReportableList, Set<ProcessingFlavor> processingFlavorSet, int obxCount, Date patientBirthDate) throws ProcessingException {
+		testMapping(observationMapper, observationReported);
 		if (observationReported.getIdentifierCode().equals("30945-0")) // contraindication!
 		{
 			CodeMap codeMap = CodeMapManager.getCodeMap();
