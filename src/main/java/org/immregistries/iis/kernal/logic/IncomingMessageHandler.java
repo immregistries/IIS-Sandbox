@@ -103,6 +103,10 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 	SyncHL7Validator syncHL7ValidatorQbpZ34;
 	SyncHL7Validator syncHL7ValidatorQbpZ44;
 
+	public static SimpleDateFormat getV2SDF() {
+		return new SimpleDateFormat("yyyyMMdd");
+	}
+
 	public IncomingMessageHandler() {
 		mqeMessageService = MqeMessageService.INSTANCE;
 		dataSession = ServletHelper.getDataSession();
@@ -361,7 +365,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 		return ackBuilder.buildAckFrom(data, processingFlavorSet);
 	}
 
-	public Date parseDateWarn(String dateString, String errorMessage, String segmentId, int segmentRepeat, int fieldPosition, boolean strict, List<IisReportable> iisReportableList) {
+	public static Date parseDateWarn(String dateString, String errorMessage, String segmentId, int segmentRepeat, int fieldPosition, boolean strict, List<IisReportable> iisReportableList) {
 		try {
 			return parseDateInternal(dateString, strict);
 		} catch (ParseException e) {
@@ -390,7 +394,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 		return null;
 	}
 
-	public Date parseDateInternal(String dateString, boolean strict) throws ParseException {
+	public static Date parseDateInternal(String dateString, boolean strict) throws ParseException {
 		if (StringUtils.isBlank(dateString)) {
 			return null;
 		}
@@ -398,7 +402,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 		if (dateString.length() > 8) {
 			dateString = dateString.substring(0, 8);
 		}
-		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
+		SimpleDateFormat simpleDateFormat = getV2SDF();
 		simpleDateFormat.setLenient(!strict);
 		date = simpleDateFormat.parse(dateString);
 		return date;
@@ -628,7 +632,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 				sb.append("QPD|");
 			}
 			if (profileId.equals(RSP_Z31_MULTIPLE_MATCH)) {
-				SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+				SimpleDateFormat sdf = getV2SDF();
 				int count = 0;
 				for (PatientReported pr : patientReportedPossibleList) {
 					count++;
@@ -640,7 +644,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 				 * CONFUSING naming p but no better solution right now but to deal with single match
 				 */
 				PatientMaster patient = patientMaster;
-				SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+				SimpleDateFormat sdf = getV2SDF();
 				hl7MessageWriter.printQueryPID(patientMaster, processingFlavorSet, sb, patient, sdf, 1);
 				if (profileId.equals(RSP_Z32_MATCH)) {
 					hl7MessageWriter.printQueryNK1(patientMaster, sb, codeMap);
