@@ -1519,6 +1519,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 		observationReported.setMethodCode(reader.getValue(17, 1));
 		observationReported.setMethodLabel(reader.getValue(17, 2));
 		observationReported.setMethodTable(reader.getValue(17, 3));
+		// TODO OBX-21 Business identifier
 		return observationReported;
 	}
 

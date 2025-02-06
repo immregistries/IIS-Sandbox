@@ -78,7 +78,7 @@ public class ObservationMapperR4 implements ObservationMapper<Observation> {
 
 		switch (om.getValueType()) {
 			case "NM": {
-				o.setValue(valueQuantity(om));
+				o.setValue(valueQuantity(om.getValueCode(), om));
 				break;
 			}
 			case "ST":
@@ -123,10 +123,12 @@ public class ObservationMapperR4 implements ObservationMapper<Observation> {
 					o.setValue(new StringType().setValue(om.getValueCode()));
 				} else if (":".equals(om.getValueTable()) || "\\".equals(om.getValueTable())) {
 					Ratio ratio = new Ratio();
-					ratio.getNumerator().setComparator(Quantity.QuantityComparator.valueOf(om.getValueCode()));
-					ratio.getNumerator().setValue(NumberUtils.createBigDecimal(om.getValueLabel()));
-//					ratio.set
+					Quantity numerator = valueQuantity(om.getValueLabel(), om);
+					numerator.setComparator(Quantity.QuantityComparator.valueOf(om.getValueCode()));
+					ratio.setNumerator(numerator);
 //					ratio.setDenominator(); NOT SUPPORTED TODO
+
+					o.setValue(ratio);
 				} else if ("-".equals(om.getValueTable())) {
 
 				} else if ("+".equals(om.getValueTable())) {
@@ -147,12 +149,12 @@ public class ObservationMapperR4 implements ObservationMapper<Observation> {
 
 	private static @NotNull Range valueRange(ObservationMaster om) {
 		Range range = new Range();
-		if (NumberUtils.isCreatable(om.getValueCode())) {
-			Quantity low = new Quantity(NumberUtils.createDouble(om.getValueCode()));
+		Quantity low = valueQuantity(om.getValueCode(), om);
+		if (low.getValue() != null) {
 			range.setLow(low);
 		}
-		if (NumberUtils.isCreatable(om.getValueLabel())) {
-			Quantity high = new Quantity(NumberUtils.createDouble(om.getValueLabel()));
+		Quantity high = valueQuantity(om.getValueLabel(), om);
+		if (high.getValue() != null) {
 			range.setHigh(high);
 		}
 		return range;
@@ -191,10 +193,10 @@ public class ObservationMapperR4 implements ObservationMapper<Observation> {
 		return value;
 	}
 
-	private static Quantity valueQuantity(ObservationMaster om) {
+	private static Quantity valueQuantity(String value, ObservationMaster om) {
 		Quantity quantity = new Quantity();
-		if (NumberUtils.isCreatable(om.getValueCode())) {
-			quantity.setValue(NumberUtils.createDouble(om.getValueCode()));
+		if (NumberUtils.isCreatable(value)) {
+			quantity.setValue(NumberUtils.createDouble(value));
 		}
 		if (StringUtils.isNotBlank(om.getUnitsLabel())) {
 			quantity.setUnit(om.getUnitsLabel());
