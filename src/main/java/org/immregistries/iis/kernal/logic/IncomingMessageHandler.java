@@ -1519,6 +1519,23 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 		observationReported.setMethodCode(reader.getValue(17, 1));
 		observationReported.setMethodLabel(reader.getValue(17, 2));
 		observationReported.setMethodTable(reader.getValue(17, 3));
+
+		for (int i = 1; i <= reader.getRepeatCount(21); i++) {
+			String value = reader.getValueRepeat(21, 1, i);
+			String system = reader.getValueRepeat(21, 3, i);
+			String type = reader.getValueRepeat(21, 4, i);
+			BusinessIdentifier businessIdentifier = new BusinessIdentifier();
+			if (StringUtils.isNotBlank(value)) {
+				businessIdentifier.setValue(value);
+			}
+			if (StringUtils.isNotBlank(system)) {
+				businessIdentifier.setSystem(system);
+			}
+			if (StringUtils.isNotBlank(type)) {
+				businessIdentifier.setType(type);
+			}
+			observationReported.addBusinessIdentifier(businessIdentifier);
+		}
 		// TODO OBX-21 Business identifier
 		return observationReported;
 	}

@@ -1,7 +1,9 @@
 package org.immregistries.iis.kernal.model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class ObservationMaster extends AbstractMappedObject implements Serializable {
   private static final long serialVersionUID = 1L;
@@ -28,6 +30,7 @@ public class ObservationMaster extends AbstractMappedObject implements Serializa
 	private String methodCode = "";
 	private String methodLabel = "";
 	private String methodTable = "";
+	private List<BusinessIdentifier> businessIdentifiers = new ArrayList<>(2);
 
 	public Date getReportedDate() {
 		return reportedDate;
@@ -188,6 +191,28 @@ public class ObservationMaster extends AbstractMappedObject implements Serializa
 
 	public void setObservationId(String observationId) {
 		this.observationId = observationId;
+	}
+
+	public List<BusinessIdentifier> getBusinessIdentifiers() {
+		return businessIdentifiers;
+	}
+
+	public void setBusinessIdentifiers(List<BusinessIdentifier> businessIdentifiers) {
+		this.businessIdentifiers = businessIdentifiers;
+	}
+
+	public void addBusinessIdentifier(BusinessIdentifier businessIdentifier) {
+		if (this.businessIdentifiers == null) {
+			this.businessIdentifiers = new ArrayList<>(3);
+		}
+		this.businessIdentifiers.add(businessIdentifier);
+	}
+
+	public BusinessIdentifier getFirstBusinessIdentifier() {
+		if (businessIdentifiers.isEmpty()) {
+			return null;
+		}
+		return this.businessIdentifiers.get(0);
 	}
 
 	@Override

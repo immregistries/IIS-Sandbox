@@ -7,9 +7,10 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.hl7.fhir.r4.model.*;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
 import org.immregistries.iis.kernal.logic.IncomingMessageHandler;
-import org.immregistries.iis.kernal.mapping.MappingHelper;
+import org.immregistries.iis.kernal.mapping.interfaces.ImmunizationMapper;
 import org.immregistries.iis.kernal.mapping.interfaces.ObservationMapper;
 import org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester;
+import org.immregistries.iis.kernal.model.BusinessIdentifier;
 import org.immregistries.iis.kernal.model.ObservationMaster;
 import org.immregistries.iis.kernal.model.ObservationReported;
 import org.jetbrains.annotations.NotNull;
@@ -27,6 +28,7 @@ import static org.immregistries.iis.kernal.mapping.MappingHelper.PATIENT;
 @Service
 @Conditional(OnR4Condition.class)
 public class ObservationMapperR4 implements ObservationMapper<Observation> {
+	public static final String V_2_STATUS_EXTENSION = "v2Status";
 	@Autowired
 	private AbstractFhirRequester fhirRequests;
 
@@ -49,33 +51,84 @@ public class ObservationMapperR4 implements ObservationMapper<Observation> {
 	public Observation fhirResource(ObservationMaster om) {
 		Observation o = new Observation();
 		o.setId(StringUtils.defaultString(om.getObservationId()));
+		/*
+		 * Updated Date
+		 */
+		o.getMeta().setLastUpdated(om.getUpdatedDate());
+		/*
+		 * Recorded Date
+		 */
+		if (om.getReportedDate() != null) {
+			o.addExtension()
+				.setUrl(ImmunizationMapper.RECORDED)
+				.setValue(new DateType(om.getReportedDate()));
+		}
+		//TODO reported Date
+		/*
+		 * OBX-2 extension Value type
+		 */
+		Extension oType = o.addExtension().setUrl("ObsType-OBX-2").setValue(new StringType(om.getValueType()));
+		/*
+		 * Part of Vaccination
+		 */
 		if (!om.getVaccinationReportedId().isBlank()) {
-			o.addPartOf(new org.hl7.fhir.r4.model.Reference().setReference(IMMUNIZATION + "/" + om.getVaccinationReportedId()));
+			o.addPartOf(new Reference().setReference(IMMUNIZATION + "/" + om.getVaccinationReportedId()));
 		}
+		/*
+		 * Patient/Subject
+		 */
 		if (om.getPatientReportedId() != null) {
-			o.setSubject(new org.hl7.fhir.r4.model.Reference().setReference(PATIENT + "/" + om.getPatientReportedId()));
-//				o.setSubject(MappingHelper.getFhirReference(PATIENT,PATIENT_REPORTED,observationReported.getPatientReported().getPatientReportedExternalLink()));
+			o.setSubject(new Reference().setReference(PATIENT + "/" + om.getPatientReportedId()));
 		}
-		o.setValue(new org.hl7.fhir.r4.model.CodeableConcept(new org.hl7.fhir.r4.model.Coding()
-			.setCode(om.getValueCode())
-			.setSystem(om.getValueTable())
-			.setDisplay(om.getValueLabel())));
-		o.setMethod(new org.hl7.fhir.r4.model.CodeableConcept()).getMethod().addCoding()
-			.setCode(om.getMethodCode())
-			.setSystem(om.getMethodTable())
-			.setDisplay(om.getMethodLabel());
-		o.addIdentifier(MappingHelper.getFhirIdentifierR4(
-			om.getIdentifierTable(), om.getIdentifierCode())); //TODO label
-		o.addComponent().setValue(new org.hl7.fhir.r4.model.DateTimeType(om.getObservationDate()))
-			.setCode(new org.hl7.fhir.r4.model.CodeableConcept().setText(OBSERVATION_DATE));
-		o.addReferenceRange().setText(om.getUnitsLabel())
-			.addAppliesTo().setText(om.getUnitsTable())
-			.addCoding().setCode(om.getUnitsCode());
-		o.addInterpretation().setText(RESULT_STATUS)
-			.addCoding().setCode(om.getResultStatus());
-
-		SimpleDateFormat simpleDateFormat = IncomingMessageHandler.getV2SDF();
-
+		/*
+		 * OBX-3 observation code
+		 */
+		boolean codeNonNull = false;
+		Coding observationCodeCoding = new Coding();
+		if (om.getIdentifierCode() != null) {
+			observationCodeCoding.setCode(om.getIdentifierCode());
+			codeNonNull = true;
+		}
+		if (om.getIdentifierLabel() != null) {
+			observationCodeCoding.setDisplay(om.getIdentifierLabel());
+			codeNonNull = true;
+		}
+		if (om.getIdentifierTable() != null) {
+			observationCodeCoding.setSystem(om.getIdentifierTable());
+			codeNonNull = true;
+		}
+		if (codeNonNull) {
+			o.setCode(new CodeableConcept().addCoding(observationCodeCoding));
+		}
+		/*
+		 * OBX-17 observation Method
+		 */
+		boolean methodNonNull = false;
+		Coding observationMethodCoding = new Coding();
+		if (om.getMethodCode() != null) {
+			observationMethodCoding.setCode(om.getMethodCode());
+			methodNonNull = true;
+		}
+		if (om.getMethodLabel() != null) {
+			observationMethodCoding.setDisplay(om.getMethodLabel());
+			methodNonNull = true;
+		}
+		if (om.getValueTable() != null) {
+			observationMethodCoding.setSystem(om.getMethodCode());
+			methodNonNull = true;
+		}
+		if (methodNonNull) {
+			o.setMethod(new CodeableConcept().addCoding(observationMethodCoding));
+		}
+		/*
+		 * OBX-14 Observation date
+		 */
+		if (om.getObservationDate() != null) {
+			o.setEffective(new DateTimeType(om.getObservationDate()));
+		}
+		/*
+		 * OBX 5, observation Value , depending on OBX-2 value
+		 */
 		switch (om.getValueType()) {
 			case "NM": {
 				o.setValue(valueQuantity(om.getValueCode(), om));
@@ -98,13 +151,13 @@ public class ObservationMapperR4 implements ObservationMapper<Observation> {
 				break;
 			}
 			case "DR": {
-				Period period = valuePeriod(om, simpleDateFormat);
+				Period period = valuePeriod(om);
 				o.setValue(period);
 				break;
 			}
 			case "DTM":
 			case "DT": {
-				DateTimeType dateTimeType = valueDateTimeType(om, simpleDateFormat);
+				DateTimeType dateTimeType = valueDateTimeType(om);
 				o.setValue(dateTimeType);
 				break;
 			}
@@ -127,7 +180,6 @@ public class ObservationMapperR4 implements ObservationMapper<Observation> {
 					numerator.setComparator(Quantity.QuantityComparator.valueOf(om.getValueCode()));
 					ratio.setNumerator(numerator);
 //					ratio.setDenominator(); NOT SUPPORTED TODO
-
 					o.setValue(ratio);
 				} else if ("-".equals(om.getValueTable())) {
 
@@ -142,7 +194,71 @@ public class ObservationMapperR4 implements ObservationMapper<Observation> {
 			case "RP": {
 				break;
 			}
+		}
+		/*
+		 * OBX-6 unit levels is dealt with in Quantity methods
+		 */
+		o.addReferenceRange().setText(om.getUnitsLabel())
+			.addAppliesTo().setText(om.getUnitsTable())
+			.addCoding().setCode(om.getUnitsCode());
+		/*
+		 * OBX-11
+		 */
+		Observation.ObservationStatus observationStatus;
+		switch (om.getResultStatus()) {
+			case "A": {
+				observationStatus = Observation.ObservationStatus.AMENDED;
+				break;
+			}
+			case "C": {
+				observationStatus = Observation.ObservationStatus.CORRECTED;
+				break;
+			}
+			case "D": {
+				observationStatus = Observation.ObservationStatus.ENTEREDINERROR;
+				break;
+			}
+			case "F": {
+				observationStatus = Observation.ObservationStatus.FINAL;
+				break;
+			}
+			case "P": {
+				observationStatus = Observation.ObservationStatus.PRELIMINARY;
+				break;
+			}
+			case "X": {
+				Extension extension = o.addExtension().setUrl("http://hl7.org/fhir/StructureDefinition/alternate-codes");
+				CodeableConcept codeableConcept = new CodeableConcept();
+				codeableConcept.addCoding().setSystem("http://terminology.hl7.org/CodeSystem/v2-0085").setCode("X");
+				extension.setValue(codeableConcept);
+				observationStatus = Observation.ObservationStatus.CANCELLED;
+				break;
+			}
+			case "N": {
+				o.setDataAbsentReason(new CodeableConcept(new Coding().setCode("not-asked").setSystem("http://terminology.hl7.org/CodeSystem/data-absent-reason")));
+				observationStatus = Observation.ObservationStatus.UNKNOWN;
+				break;
+			}
+			case "B":
+			case "I":
+			case "O":
+			case "R":
+			case "S":
+			case "V":
+			case "U":
+			case "W":
+			default: {
+				observationStatus = Observation.ObservationStatus.NULL;
+				break;
+			}
+		}
+		o.setStatus(observationStatus);
+		o.addExtension()
+			.setUrl(V_2_STATUS_EXTENSION)
+			.setValue(new Coding().setCode(om.getResultStatus()).setSystem("HL70085"));
 
+		for (BusinessIdentifier businessIdentifier : om.getBusinessIdentifiers()) {
+			o.addIdentifier(businessIdentifier.toR4());
 		}
 		return o;
 	}
@@ -160,7 +276,8 @@ public class ObservationMapperR4 implements ObservationMapper<Observation> {
 		return range;
 	}
 
-	private static @NotNull DateTimeType valueDateTimeType(ObservationMaster om, SimpleDateFormat simpleDateFormat) {
+	private static @NotNull DateTimeType valueDateTimeType(ObservationMaster om) {
+		SimpleDateFormat simpleDateFormat = IncomingMessageHandler.getV2SDF();
 		DateTimeType dateTimeType = new DateTimeType();
 		try {
 			dateTimeType.setValue(simpleDateFormat.parse(om.getValueCode()));
@@ -169,7 +286,8 @@ public class ObservationMapperR4 implements ObservationMapper<Observation> {
 		return dateTimeType;
 	}
 
-	private static @NotNull Period valuePeriod(ObservationMaster om, SimpleDateFormat simpleDateFormat) {
+	private static @NotNull Period valuePeriod(ObservationMaster om) {
+		SimpleDateFormat simpleDateFormat = IncomingMessageHandler.getV2SDF();
 		Period period = new Period();
 		try {
 			Date start = simpleDateFormat.parse(om.getValueCode());
