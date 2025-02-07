@@ -270,9 +270,9 @@ public class FhirRequesterR5 extends AbstractFhirRequester<Patient, Immunization
 		Observation observation = observationMapper.fhirResource(observationReported);
 		MethodOutcome outcome = save(observation);
 		if (outcome.getCreated() != null && outcome.getCreated()) {
-			observationReported.setPatientReportedId(outcome.getId().getIdPart());
+			observationReported.setObservationId(outcome.getId().getIdPart());
 		} else if (!outcome.getResource().isEmpty()) {
-			observationReported.setPatientReportedId(outcome.getResource().getIdElement().getIdPart());
+			observationReported.setObservationId(outcome.getResource().getIdElement().getIdPart());
 		}
 		return observationReported;
 	}

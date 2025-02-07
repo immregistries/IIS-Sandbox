@@ -6,13 +6,11 @@ import java.util.Date;
 import java.util.List;
 
 public class ObservationMaster extends AbstractMappedObject implements Serializable {
-  private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-  private String observationId = "";
-  private String identifierCode = "";
-  private String valueCode = "";
-	//  private PatientReported patientReported = null;
-//  private VaccinationReported vaccinationReported = null;
+	private String observationId = "";
+	private String identifierCode = "";
+	private String valueCode = "";
 	private String patientReportedId = "";
 	private String vaccinationReportedId = "";
 	private Date reportedDate = null;
@@ -31,6 +29,16 @@ public class ObservationMaster extends AbstractMappedObject implements Serializa
 	private String methodLabel = "";
 	private String methodTable = "";
 	private List<BusinessIdentifier> businessIdentifiers = new ArrayList<>(2);
+	private String partOfObservationId = "";
+	private List<ObservationMaster> components = new ArrayList<>();
+
+	public String getPartOfObservationId() {
+		return partOfObservationId;
+	}
+
+	public void setPartOfObservationId(String partOfObservationId) {
+		this.partOfObservationId = partOfObservationId;
+	}
 
 	public Date getReportedDate() {
 		return reportedDate;
@@ -240,6 +248,19 @@ public class ObservationMaster extends AbstractMappedObject implements Serializa
 			", methodLabel='" + methodLabel + '\'' +
 			", methodTable='" + methodTable + '\'' +
 			", businessIdentifiers=" + businessIdentifiers +
+			", partOfObservationId='" + partOfObservationId + '\'' +
 			'}';
+	}
+
+	public List<ObservationMaster> getComponents() {
+		return components;
+	}
+
+	public void setComponents(List<ObservationMaster> components) {
+		this.components = components;
+	}
+
+	public void addComponent(ObservationMaster component) {
+		this.components.add(component);
 	}
 }

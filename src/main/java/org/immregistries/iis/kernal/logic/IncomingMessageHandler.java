@@ -952,36 +952,40 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 	}
 
 	public int readAndCreateObservations(HL7Reader reader, List<IisReportable> iisReportableList, Set<ProcessingFlavor> processingFlavorSet, PatientReported patientReported, boolean strictDate, int obxCount, VaccinationReported vaccinationReported, VaccinationMaster vaccination) throws ProcessingException {
+		String previousSubId = "";
+		ObservationReported currentMainObservation = null;
 		while (reader.advanceToSegment("OBX", "ORC")) {
 			obxCount++;
-			String identifierCode = reader.getValue(3);
-			String valueCode = reader.getValue(5);
-			ObservationReported observationReported = readObservations(reader, iisReportableList, patientReported, strictDate, obxCount, vaccinationReported, vaccination, identifierCode, valueCode);
-			// Commented contraindication Now checked in Observation Interceptor
-//			if (observationReported.getIdentifierCode().equals("30945-0")) // contraindication!
-//			{
-//				CodeMap codeMap = CodeMapManager.getCodeMap();
-////				Code contraCode = codeMap.getCodeForCodeset(CodesetType.CONTRAINDICATION_OR_PRECAUTION, observationReported.getValueCode());
-//				if (contraCode == null) {
-//					ProcessingException pe = new ProcessingException("Unrecognized contraindication or precaution", "OBX", obxCount, 5, IisReportableSeverity.WARN);
-//					iisReportableList.add(IisReportable.fromProcessingException(pe));
-//				}
-//				if (observationReported.getObservationDate() != null) {
-//					Date today = new Date();
-//					if (observationReported.getObservationDate().after(today)) {
-//						ProcessingException pe = new ProcessingException("Contraindication or precaution observed in the future", "OBX", obxCount, 5, IisReportableSeverity.WARN);
-//						iisReportableList.add(IisReportable.fromProcessingException(pe));
-//					}
-//					if (patientReported.getBirthDate() != null && observationReported.getObservationDate().before(patientReported.getBirthDate())) {
-//						ProcessingException pe = new ProcessingException("Contraindication or precaution observed before patient was born", "OBX", obxCount, 14, IisReportableSeverity.WARN);
-//						iisReportableList.add(IisReportable.fromProcessingException(pe));
-//					}
-//				}
+			String subId = reader.getValue(4);
+			logger.info("sub id {}", subId);
+			/*
+			 * If no sub id or sub id changed, no main observation is set in iteration
+			 */
+			if (StringUtils.isBlank(subId) || !StringUtils.equals(previousSubId, subId)) {
+				if (currentMainObservation != null) {
+					observationProcessingInterceptor.processAndValidateObservationReported(currentMainObservation, iisReportableList, processingFlavorSet, obxCount, patientReported.getBirthDate());
+					fhirRequester.saveObservationReported(currentMainObservation);
+					currentMainObservation = null;
+				}
+			}
+
+			ObservationReported observationReported = readObservations(reader, iisReportableList, patientReported, strictDate, obxCount, vaccinationReported, vaccination);
+//			if (currentMainObservation != null) {
+//				observationReported.setPartOfObservationId(currentMainObservation.getPartOfObservationId());
 //			}
 			{
-				observationReported.setPatientReportedId(patientReported.getPatientId());
-				observationProcessingInterceptor.processAndValidateObservationReported(observationReported, iisReportableList, processingFlavorSet, obxCount, patientReported.getBirthDate());
-				fhirRequester.saveObservationReported(observationReported);
+//				observationReported.setPatientReportedId(patientReported.getPatientId());
+//				observationProcessingInterceptor.processAndValidateObservationReported(observationReported, iisReportableList, processingFlavorSet, obxCount, patientReported.getBirthDate());
+//				observationReported =  fhirRequester.saveObservationReported(observationReported);
+				/*
+				 * if subId Changed, new Main Observation
+				 */
+				if (!StringUtils.equals(previousSubId, subId) && StringUtils.isNotBlank(subId)) {
+					currentMainObservation = observationReported;
+				} else {
+					currentMainObservation.addComponent(observationReported);
+				}
+				previousSubId = subId;
 			}
 		}
 		return obxCount;
@@ -1486,7 +1490,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 
 
 	@SuppressWarnings("unchecked")
-	public ObservationReported readObservations(HL7Reader reader, List<IisReportable> iisReportableList, PatientReported patientReported, boolean strictDate, int obxCount, VaccinationReported vaccinationReported, VaccinationMaster vaccination, String identifierCode, String valueCode) {
+	public ObservationReported readObservations(HL7Reader reader, List<IisReportable> iisReportableList, PatientReported patientReported, boolean strictDate, int obxCount, VaccinationReported vaccinationReported, VaccinationMaster vaccination) {
 		ObservationReported observationReported = null;
 		if (vaccination == null) {
 			observationReported = fhirRequester.searchObservationReported(new SearchParameterMap("part-of", new ReferenceParam().setMissing(true))
@@ -1504,11 +1508,11 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 			observationReported.setVaccinationReportedId(vaccinationReported.getVaccinationId());
 		}
 		observationReported.setUpdatedDate(new Date());
-		observationReported.setIdentifierCode(identifierCode);
+		observationReported.setIdentifierCode(reader.getValue(3));
 		observationReported.setValueType(reader.getValue(2));
 		observationReported.setIdentifierLabel(reader.getValue(3, 2));
 		observationReported.setIdentifierTable(reader.getValue(3, 3));
-		observationReported.setValueCode(valueCode);
+		observationReported.setValueCode(reader.getValue(5));
 		observationReported.setValueLabel(reader.getValue(5, 2));
 		observationReported.setValueTable(reader.getValue(5, 3));
 		observationReported.setUnitsCode(reader.getValue(6, 1));

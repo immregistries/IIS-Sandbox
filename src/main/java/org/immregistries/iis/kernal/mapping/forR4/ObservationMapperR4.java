@@ -15,6 +15,7 @@ import org.immregistries.iis.kernal.model.BusinessIdentifier;
 import org.immregistries.iis.kernal.model.ObservationMaster;
 import org.immregistries.iis.kernal.model.ObservationReported;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Service;
@@ -23,8 +24,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import static org.immregistries.iis.kernal.mapping.MappingHelper.IMMUNIZATION;
-import static org.immregistries.iis.kernal.mapping.MappingHelper.PATIENT;
+import static org.immregistries.iis.kernal.mapping.MappingHelper.*;
 import static org.immregistries.iis.kernal.mapping.interfaces.ImmunizationMapper.RECORDED;
 
 @Service
@@ -134,8 +134,14 @@ public class ObservationMapperR4 implements ObservationMapper<Observation> {
 		/*
 		 * Part of Vaccination
 		 */
-		if (!om.getVaccinationReportedId().isBlank()) {
+		if (StringUtils.isNotBlank(om.getVaccinationReportedId())) {
 			o.addPartOf(new Reference().setReference(IMMUNIZATION + "/" + om.getVaccinationReportedId()));
+		}
+		/*
+		 * Has member Observation TODO choose hasmember direction or change field
+		 */
+		if (StringUtils.isNotBlank(om.getPartOfObservationId())) {
+			o.addHasMember(new Reference().setReference(OBSERVATION + "/" + om.getObservationId()));
 		}
 		/*
 		 * Patient/Subject
@@ -150,23 +156,8 @@ public class ObservationMapperR4 implements ObservationMapper<Observation> {
 		/*
 		 * OBX-3 observation code
 		 */
-		boolean codeNonNull = false;
-		Coding observationCodeCoding = new Coding();
-		if (om.getIdentifierCode() != null) {
-			observationCodeCoding.setCode(om.getIdentifierCode());
-			codeNonNull = true;
-		}
-		if (om.getIdentifierLabel() != null) {
-			observationCodeCoding.setDisplay(om.getIdentifierLabel());
-			codeNonNull = true;
-		}
-		if (om.getIdentifierTable() != null) {
-			observationCodeCoding.setSystem(om.getIdentifierTable());
-			codeNonNull = true;
-		}
-		if (codeNonNull) {
-			o.setCode(new CodeableConcept().addCoding(observationCodeCoding));
-		}
+		o.setCode(getValueCodeCodeableConcept(om));
+
 		/*
 		 * OBX-17 observation Method
 		 */
@@ -196,73 +187,8 @@ public class ObservationMapperR4 implements ObservationMapper<Observation> {
 		/*
 		 * OBX 5, observation Value , depending on OBX-2 value
 		 */
-		switch (om.getValueType()) {
-			case "NM": {
-				o.setValue(valueQuantity(om.getValueCode(), om));
-				break;
-			}
-			case "CF":
-			case "CNE":
-			case "CE":
-			case "CWE":
-			case "IS": {
-				CodeableConcept value = valueCodeableConcept(om);
-				o.setValue(value);
-				break;
-			}
-			case "DR": {
-				Period period = valuePeriod(om);
-				o.setValue(period);
-				break;
-			}
-			case "DTM":
-			case "TS": // TODO signal issue in V2-to-FHIR IG
-			case "DT": {
-				DateTimeType dateTimeType = valueDateTimeType(om);
-				o.setValue(dateTimeType);
-				break;
-			}
-			case "NR": {
-				Range range = valueRange(om);
-				o.setValue(range);
-				break;
-			}
-			case "TM": {
-				o.setValue(new TimeType().setValue(om.getValueCode()));
-				break;
-			}
-			case "SN": {
-				if ("<>".equals(om.getValueCode())) { // TODO complete
-					o.setValue(new StringType().setValue(om.getValueCode()));
-				} else if (":".equals(om.getValueTable()) || "\\".equals(om.getValueTable())) {
-					Ratio ratio = new Ratio();
-					Quantity numerator = valueQuantity(om.getValueLabel(), om);
-					numerator.setComparator(Quantity.QuantityComparator.valueOf(om.getValueCode()));
-					ratio.setNumerator(numerator);
-//					ratio.setDenominator(); NOT SUPPORTED TODO
-					o.setValue(ratio);
-				} else if ("-".equals(om.getValueTable())) {
-
-				} else if ("+".equals(om.getValueTable())) {
-				}
-
-				break;
-			}
-			case "NA":
-			case "ED":
-			case "EI":
-			case "RP": {
-				break;
-			}
-			case "ST":
-			case "FT":
-			case "TX":
-			case "VR":
-			default: {
-				o.setValue(new StringType().setValue(om.getValueCode()));
-				break;
-			}
-		}
+		Type value = getObservationReportedValue(om);
+		o.setValue(value);
 		/*
 		 * OBX-6 unit levels is dealt with in Quantity methods
 		 */
@@ -328,7 +254,101 @@ public class ObservationMapperR4 implements ObservationMapper<Observation> {
 		for (BusinessIdentifier businessIdentifier : om.getBusinessIdentifiers()) {
 			o.addIdentifier(businessIdentifier.toR4());
 		}
+		for (ObservationMaster component : om.getComponents()) {
+			o.addComponent().setCode(getValueCodeCodeableConcept(component)).setValue(getObservationReportedValue(component));
+		}
+
 		return o;
+	}
+
+	private static @Nullable Type getObservationReportedValue(ObservationMaster om) {
+		Type value = null;
+		switch (om.getValueType()) {
+			case "NM": {
+				value = valueQuantity(om.getValueCode(), om);
+				break;
+			}
+			case "CF":
+			case "CNE":
+			case "CE":
+			case "CWE":
+			case "IS": {
+				value = valueCodeableConcept(om);
+				break;
+			}
+			case "DR": {
+				value = valuePeriod(om);
+				break;
+			}
+			case "DTM":
+			case "TS": // TODO signal issue in V2-to-FHIR IG
+			case "DT": {
+				value = valueDateTimeType(om);
+				break;
+			}
+			case "NR": {
+				value = valueRange(om);
+				break;
+			}
+			case "TM": {
+				value = new TimeType().setValue(om.getValueCode());
+				break;
+			}
+			case "SN": {
+				if ("<>".equals(om.getValueCode())) { // TODO complete
+					value = new StringType().setValue(om.getValueCode());
+				} else if (":".equals(om.getValueTable()) || "\\".equals(om.getValueTable())) {
+					Ratio ratio = new Ratio();
+					Quantity numerator = valueQuantity(om.getValueLabel(), om);
+					numerator.setComparator(Quantity.QuantityComparator.valueOf(om.getValueCode()));
+					ratio.setNumerator(numerator);
+//					ratio.setDenominator(); NOT SUPPORTED TODO
+					value = ratio;
+				} else if ("-".equals(om.getValueTable())) {
+
+				} else if ("+".equals(om.getValueTable())) {
+				}
+
+				break;
+			}
+			case "NA":
+			case "ED":
+			case "EI":
+			case "RP": {
+				break;
+			}
+			case "ST":
+			case "FT":
+			case "TX":
+			case "VR":
+			default: {
+				value = new StringType().setValue(om.getValueCode());
+				break;
+			}
+		}
+		return value;
+	}
+
+	private static CodeableConcept getValueCodeCodeableConcept(ObservationMaster om) {
+		boolean codeNonNull = false;
+		Coding observationCodeCoding = new Coding();
+		if (om.getIdentifierCode() != null) {
+			observationCodeCoding.setCode(om.getIdentifierCode());
+			codeNonNull = true;
+		}
+		if (om.getIdentifierLabel() != null) {
+			observationCodeCoding.setDisplay(om.getIdentifierLabel());
+			codeNonNull = true;
+		}
+		if (om.getIdentifierTable() != null) {
+			observationCodeCoding.setSystem(om.getIdentifierTable());
+			codeNonNull = true;
+		}
+		CodeableConcept codeableConcept = null;
+		if (codeNonNull) {
+			codeableConcept = new CodeableConcept(observationCodeCoding);
+		}
+		return codeableConcept;
 	}
 
 	public ObservationReported localObjectReported(Observation o) {
@@ -364,6 +384,13 @@ public class ObservationMapperR4 implements ObservationMapper<Observation> {
 		Reference vaccinationReference = o.getPartOf().stream().filter(ref -> ref.getReference().startsWith("Immunization/")).findFirst().orElse(null);
 		if (vaccinationReference != null) {
 			observationReported.setVaccinationReportedId(vaccinationReference.getReferenceElement().getIdPart());
+		}
+		/*
+		 * Observation member
+		 */
+		Reference observationReference = o.getHasMember().stream().filter(ref -> ref.getReference().startsWith(OBSERVATION + "/")).findFirst().orElse(null);
+		if (observationReference != null) {
+			observationReported.setPartOfObservationId(observationReference.getReferenceElement().getIdPart());
 		}
 		/*
 		 * Patient subject
