@@ -142,4 +142,8 @@ public class MappingHelper {
 		return extension.castToDate(extension.getValue()).getValue();
 	}
 
+	public static String extensionGetString(org.hl7.fhir.r4.model.Extension extension) {
+		return extension.castToString(extension.getValue()).getValue();
+	}
+
 }
