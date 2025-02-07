@@ -1525,16 +1525,22 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 			String system = reader.getValueRepeat(21, 3, i);
 			String type = reader.getValueRepeat(21, 4, i);
 			BusinessIdentifier businessIdentifier = new BusinessIdentifier();
+			boolean valueChanged = false;
 			if (StringUtils.isNotBlank(value)) {
 				businessIdentifier.setValue(value);
+				valueChanged = true;
 			}
 			if (StringUtils.isNotBlank(system)) {
 				businessIdentifier.setSystem(system);
+				valueChanged = true;
 			}
 			if (StringUtils.isNotBlank(type)) {
 				businessIdentifier.setType(type);
+				valueChanged = true;
 			}
-			observationReported.addBusinessIdentifier(businessIdentifier);
+			if (valueChanged) {
+				observationReported.addBusinessIdentifier(businessIdentifier);
+			}
 		}
 		// TODO OBX-21 Business identifier
 		return observationReported;

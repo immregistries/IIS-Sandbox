@@ -181,7 +181,7 @@ public class ObservationMapperR4 implements ObservationMapper<Observation> {
 			methodNonNull = true;
 		}
 		if (om.getValueTable() != null) {
-			observationMethodCoding.setSystem(om.getMethodCode());
+			observationMethodCoding.setSystem(om.getMethodTable());
 			methodNonNull = true;
 		}
 		if (methodNonNull) {
@@ -201,13 +201,6 @@ public class ObservationMapperR4 implements ObservationMapper<Observation> {
 				o.setValue(valueQuantity(om.getValueCode(), om));
 				break;
 			}
-			case "ST":
-			case "FT":
-			case "TX":
-			case "VR": {
-				o.setValue(new StringType().setValue(om.getValueCode()));
-				break;
-			}
 			case "CF":
 			case "CNE":
 			case "CE":
@@ -223,6 +216,7 @@ public class ObservationMapperR4 implements ObservationMapper<Observation> {
 				break;
 			}
 			case "DTM":
+			case "TS": // TODO signal issue in V2-to-FHIR IG
 			case "DT": {
 				DateTimeType dateTimeType = valueDateTimeType(om);
 				o.setValue(dateTimeType);
@@ -231,7 +225,6 @@ public class ObservationMapperR4 implements ObservationMapper<Observation> {
 			case "NR": {
 				Range range = valueRange(om);
 				o.setValue(range);
-
 				break;
 			}
 			case "TM": {
@@ -259,6 +252,14 @@ public class ObservationMapperR4 implements ObservationMapper<Observation> {
 			case "ED":
 			case "EI":
 			case "RP": {
+				break;
+			}
+			case "ST":
+			case "FT":
+			case "TX":
+			case "VR":
+			default: {
+				o.setValue(new StringType().setValue(om.getValueCode()));
 				break;
 			}
 		}
@@ -360,11 +361,17 @@ public class ObservationMapperR4 implements ObservationMapper<Observation> {
 		/*
 		 * Vaccination Part of
 		 */
-		observationReported.setVaccinationReportedId(StringUtils.defaultString(o.getPartOf().stream().filter(ref -> ref.getReference().startsWith("Immunization/")).findFirst().orElse(new Reference("")).getId()));
+		Reference vaccinationReference = o.getPartOf().stream().filter(ref -> ref.getReference().startsWith("Immunization/")).findFirst().orElse(null);
+		if (vaccinationReference != null) {
+			observationReported.setVaccinationReportedId(vaccinationReference.getReferenceElement().getIdPart());
+		}
 		/*
 		 * Patient subject
 		 */
-		observationReported.setPatientReportedId(StringUtils.defaultString(o.getSubject().getId()));
+		Reference patientReference = o.getSubject();
+		if (patientReference != null) {
+			observationReported.setPatientReportedId(patientReference.getReferenceElement().getIdPart());
+		}
 		/*
 		 * Value type
 		 */

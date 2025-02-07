@@ -215,6 +215,7 @@ public class ObservationMaster extends AbstractMappedObject implements Serializa
 		return this.businessIdentifiers.get(0);
 	}
 
+
 	@Override
 	public String toString() {
 		return "ObservationMaster{" +
@@ -238,6 +239,7 @@ public class ObservationMaster extends AbstractMappedObject implements Serializa
 			", methodCode='" + methodCode + '\'' +
 			", methodLabel='" + methodLabel + '\'' +
 			", methodTable='" + methodTable + '\'' +
+			", businessIdentifiers=" + businessIdentifiers +
 			'}';
 	}
 }
