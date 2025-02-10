@@ -266,7 +266,7 @@ public class ImmunizationMapperR4 implements ImmunizationMapper<Immunization> {
 		/*
 		 * NDC
 		 */
-		if (!vr.getVaccineNdcCode().isBlank()) {
+		if (StringUtils.isNotBlank(vr.getVaccineNdcCode())) {
 			i.getVaccineCode().addCoding().setCode(vr.getVaccineNdcCode()).setSystem(NDC_SYSTEM);
 		}
 		/*

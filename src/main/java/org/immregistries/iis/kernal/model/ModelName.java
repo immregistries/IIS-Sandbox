@@ -33,7 +33,7 @@ public class ModelName {
 			if (coding != null && StringUtils.isNotBlank(coding.getCode())) {
 				this.setNameType(coding.getCode());
 			} else {
-				this.setNameType(null);
+				this.setNameType("");
 			}
 		} else {
 			this.setNameType(null);
@@ -54,7 +54,7 @@ public class ModelName {
 			if (coding != null && StringUtils.isNotBlank(coding.getCode())) {
 				this.setNameType(coding.getCode());
 			} else {
-				this.setNameType(null);
+				this.setNameType("");
 			}
 		} else {
 			this.setNameType(null);

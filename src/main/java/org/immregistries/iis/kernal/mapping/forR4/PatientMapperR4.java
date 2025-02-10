@@ -51,7 +51,7 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 //			return null;
 //		}
 		fillFromFhirResource(patientMaster, patient);
-		return localObjectReported(patient);
+		return patientMaster;
 	}
 
 	public PatientReported localObjectReported(Patient patient) {
