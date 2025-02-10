@@ -129,10 +129,6 @@ public class ImmunizationMapperR4 implements ImmunizationMapper<Immunization> {
 			vr.setInformationSource(StringUtils.defaultString(i.getReportOrigin().getCodingFirstRep().getCode()));
 		}
 		/*
-		 * Updated Date
-		 */
-		vr.setUpdatedDate(i.getMeta().getLastUpdated());
-		/*
 		 * Lot Number
 		 */
 		vr.setLotnumber(StringUtils.defaultString(i.getLotNumber()));
@@ -239,6 +235,10 @@ public class ImmunizationMapperR4 implements ImmunizationMapper<Immunization> {
 		 * Id
 		 */
 		i.setId(StringUtils.defaultString(vr.getVaccinationId()));
+		/*
+		 * Last updated Date
+		 */
+		i.getMeta().setLastUpdated(vr.getUpdatedDate());
 		/*
 		 * Identifiers
 		 */

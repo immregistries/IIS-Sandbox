@@ -96,7 +96,6 @@ public class ImmunizationMapperR5 implements ImmunizationMapper<Immunization> {
 		 * Administered Date
 		 */
 		vr.setAdministeredDate(i.getOccurrenceDateTimeType().getValue());
-
 		/*
 		 * Vaccine Codes CVX NDC
 		 * MVX ?
@@ -239,6 +238,10 @@ public class ImmunizationMapperR5 implements ImmunizationMapper<Immunization> {
 		* Id
 		*/
 	  i.setId(StringUtils.defaultString(vr.getVaccinationId()));
+	  /*
+		* Last updated Date
+		*/
+	  i.getMeta().setLastUpdated(vr.getUpdatedDate());
 	  /*
 		* Identifiers
 		*/

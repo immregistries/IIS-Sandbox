@@ -9,6 +9,8 @@ public interface ObservationMapper<Observation extends IBaseResource> extends Ii
 	String OBSERVATION_DATE = "observationDate";
 	String RESULT_STATUS = "resultStatus";
 	String SUBIDENTIFIER_EXTENSION = "http://hl7.org/fhir/uv/v2mappings/ConceptMap/datatype-og-subidentifier-to-extension";
+	String V_2_STATUS_EXTENSION = "v2Status";
+	String OBS_TYPE_OBX_2 = "ObsType-OBX-2";
 
 	ObservationReported localObjectReported(Observation i);
 

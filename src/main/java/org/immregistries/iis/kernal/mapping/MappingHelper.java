@@ -131,7 +131,11 @@ public class MappingHelper {
 //	}
 
 	public static org.hl7.fhir.r4.model.Coding extensionGetCoding(org.hl7.fhir.r4.model.Extension extension) {
-		return extension.castToCoding(extension.getValue());
+		if (extension.getValue() == null) {
+			return null;
+		} else {
+			return extension.castToCoding(extension.getValue());
+		}
 	}
 
 	public static Date extensionGetDate(Extension extension) {

@@ -23,6 +23,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Stream;
 
+import static org.immregistries.iis.kernal.mapping.interfaces.ImmunizationMapper.RECORDED;
 import static org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester.GOLDEN_RECORD;
 import static org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester.GOLDEN_SYSTEM_TAG;
 
@@ -71,6 +72,15 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 		 * Updated date
 		 */
 		localPatient.setUpdatedDate(patient.getMeta().getLastUpdated());
+		/*
+		 * Reported Date
+		 */
+		Extension recorded = patient.getExtensionByUrl(RECORDED);
+		if (recorded != null) {
+			localPatient.setReportedDate(MappingHelper.extensionGetDate(recorded));
+		} else {
+			localPatient.setReportedDate(null);
+		}
 		/*
 		 * Identifiers
 		 */
@@ -258,6 +268,14 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 		 * Updated Date
 		 */
 		p.getMeta().setLastUpdated(pm.getUpdatedDate());
+		/*
+		 * Recorded Date
+		 */
+		if (pm.getReportedDate() != null) {
+			p.addExtension()
+				.setUrl(RECORDED)
+				.setValue(new org.hl7.fhir.r5.model.DateType(pm.getReportedDate()));
+		}
 		/*
 		 * Business Identifiers
 		 */

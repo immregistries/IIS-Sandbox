@@ -30,8 +30,6 @@ import static org.immregistries.iis.kernal.mapping.interfaces.ImmunizationMapper
 @Service
 @Conditional(OnR4Condition.class)
 public class ObservationMapperR4 implements ObservationMapper<Observation> {
-	public static final String V_2_STATUS_EXTENSION = "v2Status";
-	public static final String OBS_TYPE_OBX_2 = "ObsType-OBX-2";
 	@Autowired
 	private AbstractFhirRequester fhirRequests;
 
@@ -89,7 +87,7 @@ public class ObservationMapperR4 implements ObservationMapper<Observation> {
 		 * OBX-2 extension Value type
 		 */
 		if (om.getValueType() != null) {
-			Extension oType = o.addExtension().setUrl(OBS_TYPE_OBX_2).setValue(new StringType(om.getValueType()));
+			o.addExtension().setUrl(OBS_TYPE_OBX_2).setValue(new StringType(om.getValueType()));
 		}
 		/*
 		 * OBX-3 observation code
@@ -281,11 +279,9 @@ public class ObservationMapperR4 implements ObservationMapper<Observation> {
 		 * Value type
 		 */
 		{
-			String valueType = "";
 			Extension obx2 = o.getExtensionByUrl(OBS_TYPE_OBX_2);
 			if (obx2 != null) {
-				valueType = MappingHelper.extensionGetString(obx2);
-				observationReported.setValueType(valueType);
+				observationReported.setValueType(MappingHelper.extensionGetString(obx2));
 			} else {
 				observationReported.setValueType(null);
 			}
@@ -443,8 +439,7 @@ public class ObservationMapperR4 implements ObservationMapper<Observation> {
 		valueCoding.setCode(om.getValueCode());
 		valueCoding.setDisplay(om.getValueLabel());
 		valueCoding.setSystem(om.getValueTable());
-		CodeableConcept value = new CodeableConcept().addCoding(valueCoding);
-		return value;
+		return new CodeableConcept().addCoding(valueCoding);
 	}
 
 	private static Quantity valueQuantity(String value, ObservationMaster om) {

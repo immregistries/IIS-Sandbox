@@ -374,7 +374,7 @@ public class PatientMaster extends AbstractMappedObject implements Serializable 
 	public String toString() {
 		return "PatientMaster{" +
 				"patientId='" + patientId + '\'' +
-			", tenant=" + tenant +
+//			", tenant=" + tenant +
 			", businessIdentifiers=" + businessIdentifiers +
 			", reportedDate=" + reportedDate +
 				", updatedDate=" + updatedDate +
