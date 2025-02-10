@@ -223,6 +223,17 @@ public class ObservationMaster extends AbstractMappedObject implements Serializa
 		return this.businessIdentifiers.get(0);
 	}
 
+	public List<ObservationMaster> getComponents() {
+		return components;
+	}
+
+	public void setComponents(List<ObservationMaster> components) {
+		this.components = components;
+	}
+
+	public void addComponent(ObservationMaster component) {
+		this.components.add(component);
+	}
 
 	@Override
 	public String toString() {
@@ -249,18 +260,7 @@ public class ObservationMaster extends AbstractMappedObject implements Serializa
 			", methodTable='" + methodTable + '\'' +
 			", businessIdentifiers=" + businessIdentifiers +
 			", partOfObservationId='" + partOfObservationId + '\'' +
+			", components=" + components +
 			'}';
-	}
-
-	public List<ObservationMaster> getComponents() {
-		return components;
-	}
-
-	public void setComponents(List<ObservationMaster> components) {
-		this.components = components;
-	}
-
-	public void addComponent(ObservationMaster component) {
-		this.components.add(component);
 	}
 }

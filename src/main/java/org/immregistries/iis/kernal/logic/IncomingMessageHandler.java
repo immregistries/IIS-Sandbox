@@ -959,7 +959,8 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 			String subId = reader.getValue(4);
 			logger.info("sub id {}", subId);
 			/*
-			 * If no sub id or sub id changed, no main observation is set in iteration
+			 * If no sub id or sub id changed, no main observation is set in iteration,
+			 * Saving if changing the main observation
 			 */
 			if (StringUtils.isBlank(subId) || !StringUtils.equals(previousSubId, subId)) {
 				if (currentMainObservation != null) {
@@ -974,19 +975,20 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 //				observationReported.setPartOfObservationId(currentMainObservation.getPartOfObservationId());
 //			}
 			{
-//				observationReported.setPatientReportedId(patientReported.getPatientId());
-//				observationProcessingInterceptor.processAndValidateObservationReported(observationReported, iisReportableList, processingFlavorSet, obxCount, patientReported.getBirthDate());
-//				observationReported =  fhirRequester.saveObservationReported(observationReported);
 				/*
 				 * if subId Changed, new Main Observation
 				 */
 				if (!StringUtils.equals(previousSubId, subId) && StringUtils.isNotBlank(subId)) {
 					currentMainObservation = observationReported;
-				} else {
+				} else if (currentMainObservation != null) {
 					currentMainObservation.addComponent(observationReported);
 				}
 				previousSubId = subId;
 			}
+		}
+		if (currentMainObservation != null) {
+			observationProcessingInterceptor.processAndValidateObservationReported(currentMainObservation, iisReportableList, processingFlavorSet, obxCount, patientReported.getBirthDate());
+			fhirRequester.saveObservationReported(currentMainObservation);
 		}
 		return obxCount;
 	}

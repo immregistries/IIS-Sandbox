@@ -35,70 +35,6 @@ public class ObservationMapperR4 implements ObservationMapper<Observation> {
 	@Autowired
 	private AbstractFhirRequester fhirRequests;
 
-	private static @NotNull Range valueRange(ObservationMaster om) {
-		Range range = new Range();
-		Quantity low = valueQuantity(om.getValueCode(), om);
-		if (low.getValue() != null) {
-			range.setLow(low);
-		}
-		Quantity high = valueQuantity(om.getValueLabel(), om);
-		if (high.getValue() != null) {
-			range.setHigh(high);
-		}
-		return range;
-	}
-
-	private static @NotNull DateTimeType valueDateTimeType(ObservationMaster om) {
-		SimpleDateFormat simpleDateFormat = IncomingMessageHandler.getV2SDF();
-		DateTimeType dateTimeType = new DateTimeType();
-		try {
-			dateTimeType.setValue(simpleDateFormat.parse(om.getValueCode()));
-		} catch (ParseException ignored) {
-		}
-		return dateTimeType;
-	}
-
-	private static @NotNull Period valuePeriod(ObservationMaster om) {
-		SimpleDateFormat simpleDateFormat = IncomingMessageHandler.getV2SDF();
-		Period period = new Period();
-		try {
-			Date start = simpleDateFormat.parse(om.getValueCode());
-			period.setStart(start);
-		} catch (ParseException ignored) {
-		}
-		try {
-			Date end = simpleDateFormat.parse(om.getValueLabel());
-			period.setEnd(end);
-		} catch (ParseException ignored) {
-		}
-		return period;
-	}
-
-	private static CodeableConcept valueCodeableConcept(ObservationMaster om) {
-		Coding valueCoding = new Coding();
-		valueCoding.setCode(om.getValueCode());
-		valueCoding.setDisplay(om.getValueLabel());
-		valueCoding.setSystem(om.getValueTable());
-		CodeableConcept value = new CodeableConcept().addCoding(valueCoding);
-		return value;
-	}
-
-	private static Quantity valueQuantity(String value, ObservationMaster om) {
-		Quantity quantity = new Quantity();
-		if (NumberUtils.isCreatable(value)) {
-			quantity.setValue(NumberUtils.createDouble(value));
-		}
-		if (StringUtils.isNotBlank(om.getUnitsLabel())) {
-			quantity.setUnit(om.getUnitsLabel());
-		} else {
-			quantity.setUnit(StringUtils.defaultString(om.getUnitsCode()));
-		}
-		if (StringUtils.isNotBlank(om.getUnitsCode()) && StringUtils.isNotBlank(om.getUnitsLabel())) {
-			quantity.setSystem(om.getUnitsTable());
-		}
-		return quantity;
-	}
-
 	public ObservationReported localObjectReportedWithMaster(Observation observation) {
 		ObservationReported observationReported = localObjectReported(observation);
 		observationReported.setObservationMaster(
@@ -152,12 +88,13 @@ public class ObservationMapperR4 implements ObservationMapper<Observation> {
 		/*
 		 * OBX-2 extension Value type
 		 */
-		Extension oType = o.addExtension().setUrl(OBS_TYPE_OBX_2).setValue(new StringType(om.getValueType()));
+		if (om.getValueType() != null) {
+			Extension oType = o.addExtension().setUrl(OBS_TYPE_OBX_2).setValue(new StringType(om.getValueType()));
+		}
 		/*
 		 * OBX-3 observation code
 		 */
 		o.setCode(getValueCodeCodeableConcept(om));
-
 		/*
 		 * OBX-17 observation Method
 		 */
@@ -247,18 +184,283 @@ public class ObservationMapperR4 implements ObservationMapper<Observation> {
 			}
 		}
 		o.setStatus(observationStatus);
-		o.addExtension()
-			.setUrl(V_2_STATUS_EXTENSION)
-			.setValue(new Coding().setCode(om.getResultStatus()).setSystem("HL70085"));
-
+		if (om.getResultStatus() != null) {
+			o.addExtension()
+				.setUrl(V_2_STATUS_EXTENSION)
+				.setValue(new Coding().setCode(om.getResultStatus()).setSystem("HL70085"));
+		}
+		/*
+		 * OBX-21
+		 */
 		for (BusinessIdentifier businessIdentifier : om.getBusinessIdentifiers()) {
 			o.addIdentifier(businessIdentifier.toR4());
 		}
+		/*
+		 * Components , other OBX with same subId
+		 */
 		for (ObservationMaster component : om.getComponents()) {
-			o.addComponent().setCode(getValueCodeCodeableConcept(component)).setValue(getObservationReportedValue(component));
+			Observation.ObservationComponentComponent observationComponent = fhirObservationComponent(component);
+			o.addComponent(observationComponent);
+		}
+		return o;
+	}
+
+	private static Observation.ObservationComponentComponent fhirObservationComponent(ObservationMaster component) {
+		Observation.ObservationComponentComponent observationComponent = new Observation.ObservationComponentComponent();
+		/*
+		 * OBX-2 extension Value type
+		 */
+		if (component.getValueType() != null) {
+			observationComponent.addExtension().setUrl(OBS_TYPE_OBX_2).setValue(new StringType(component.getValueType()));
+		}
+		/*
+		 * OBX-3
+		 */
+		observationComponent.setCode(getValueCodeCodeableConcept(component));
+		/*
+		 * OBX-5 & OBX-6
+		 */
+		observationComponent.setValue(getObservationReportedValue(component));
+		/*
+		 * OBX-11
+		 */
+		if (component.getResultStatus() != null) {
+			observationComponent.addExtension()
+				.setUrl(V_2_STATUS_EXTENSION)
+				.setValue(new Coding().setCode(component.getResultStatus()).setSystem("HL70085"));
 		}
 
-		return o;
+		if (component.getReportedDate() != null) {
+			observationComponent.addExtension()
+				.setUrl(RECORDED)
+				.setValue(new DateType(component.getReportedDate()));
+		}
+		return observationComponent;
+	}
+
+	public ObservationReported localObjectReported(Observation o) {
+		ObservationReported observationReported = new ObservationReported();
+		/*
+		 * Id
+		 */
+		observationReported.setObservationId(StringUtils.defaultString(o.getId()));
+		/*
+		 * Updated Date
+		 */
+		observationReported.setUpdatedDate(o.getMeta().getLastUpdated());
+		/*
+		 * Reported Date
+		 */
+		{
+			Extension recorded = o.getExtensionByUrl(ImmunizationMapper.RECORDED);
+			if (recorded != null) {
+				observationReported.setReportedDate(MappingHelper.extensionGetDate(recorded));
+			} else {
+				observationReported.setReportedDate(null);
+			}
+		}
+		/*
+		 * Observation Date
+		 */
+		if (o.hasEffectiveDateTimeType()) {
+			observationReported.setObservationDate(o.getEffectiveDateTimeType().getValue());
+		}
+		/*
+		 * Vaccination Part of
+		 */
+		Reference vaccinationReference = o.getPartOf().stream().filter(ref -> ref.getReference().startsWith("Immunization/")).findFirst().orElse(null);
+		if (vaccinationReference != null) {
+			observationReported.setVaccinationReportedId(vaccinationReference.getReferenceElement().getIdPart());
+		}
+		/*
+		 * Observation member
+		 */
+		Reference observationReference = o.getHasMember().stream().filter(ref -> ref.getReference().startsWith(OBSERVATION + "/")).findFirst().orElse(null);
+		if (observationReference != null) {
+			observationReported.setPartOfObservationId(observationReference.getReferenceElement().getIdPart());
+		}
+		/*
+		 * Patient subject
+		 */
+		Reference patientReference = o.getSubject();
+		if (patientReference != null) {
+			observationReported.setPatientReportedId(patientReference.getReferenceElement().getIdPart());
+		}
+		/*
+		 * Value type
+		 */
+		{
+			String valueType = "";
+			Extension obx2 = o.getExtensionByUrl(OBS_TYPE_OBX_2);
+			if (obx2 != null) {
+				valueType = MappingHelper.extensionGetString(obx2);
+				observationReported.setValueType(valueType);
+			} else {
+				observationReported.setValueType(null);
+			}
+		}
+		/*
+		 * OBX-3 Observation code / Identifier
+		 */
+		if (o.hasCode() && o.getCode().hasCoding()) {
+			observationReported.setIdentifierCode(o.getCode().getCodingFirstRep().getCode());
+			observationReported.setIdentifierLabel(o.getCode().getCodingFirstRep().getDisplay());
+			observationReported.setIdentifierTable(o.getCode().getCodingFirstRep().getSystem());
+		}
+		/*
+		 * OBX-5 Value , OBX 6 Unit when Quantity are available
+		 */
+		if (o.hasValueCodeableConcept() && o.getValueCodeableConcept().hasCoding()) {
+			observationReported.setValueCode(o.getValueCodeableConcept().getCodingFirstRep().getCode());
+			observationReported.setValueLabel(o.getValueCodeableConcept().getCodingFirstRep().getDisplay());
+			observationReported.setValueTable(o.getValueCodeableConcept().getCodingFirstRep().getSystem());
+		} else if (o.hasValueQuantity()) {
+			Quantity quantity = o.getValueQuantity();
+//			observationReported.setUnitsCode(quantity.getUnit()); // TODO get from codemap ?
+			observationReported.setUnitsTable(quantity.getSystem());
+			observationReported.setUnitsLabel(quantity.getUnit());
+		} else if (o.hasValueDateTimeType()) {
+			SimpleDateFormat simpleDateFormat = IncomingMessageHandler.getV2SDF();
+			observationReported.setValueCode(simpleDateFormat.format(o.getValueDateTimeType().getValue()));
+		}
+		/*
+		 * OBX 17 method
+		 */
+		if (o.hasMethod() && o.getMethod().hasCoding()) {
+			observationReported.setMethodCode(o.getMethod().getCodingFirstRep().getCode());
+			observationReported.setMethodTable(o.getMethod().getCodingFirstRep().getSystem());
+			observationReported.setMethodLabel(o.getMethod().getCodingFirstRep().getDisplay());
+		}
+		/*
+		 * status
+		 */
+		Extension status = o.getExtensionByUrl(V_2_STATUS_EXTENSION);
+		if (status != null && status.hasValue()) {
+			observationReported.setResultStatus(MappingHelper.extensionGetCoding(status).getCode());
+		}
+		/*
+		 * Identifiers
+		 */
+		for (Identifier identifier : o.getIdentifier()) {
+			observationReported.addBusinessIdentifier(BusinessIdentifier.fromR4(identifier));
+		}
+		/*
+		 * Components
+		 */
+		for (Observation.ObservationComponentComponent observationComponent : o.getComponent()) {
+			ObservationMaster component = fromFhirComponent(observationComponent);
+			component.setVaccinationReportedId(observationReported.getVaccinationReportedId());
+			component.setPatientReportedId(observationReported.getPatientReportedId());
+			component.setUpdatedDate(observationReported.getUpdatedDate());
+			observationReported.addComponent(component);
+		}
+		return observationReported;
+	}
+
+	private static @NotNull ObservationMaster fromFhirComponent(Observation.ObservationComponentComponent observationComponent) {
+		ObservationMaster component = new ObservationMaster();
+		/*
+		 * Value type
+		 */
+		{
+			String valueType = "";
+			Extension obx2 = observationComponent.getExtensionByUrl(OBS_TYPE_OBX_2);
+			if (obx2 != null) {
+				valueType = MappingHelper.extensionGetString(obx2);
+				component.setValueType(valueType);
+			} else {
+				component.setValueType(null);
+			}
+		}
+		/*
+		 * OBX-3 Observation code / Identifier
+		 */
+		if (observationComponent.hasCode() && observationComponent.getCode().hasCoding()) {
+			component.setIdentifierCode(observationComponent.getCode().getCodingFirstRep().getCode());
+			component.setIdentifierLabel(observationComponent.getCode().getCodingFirstRep().getDisplay());
+			component.setIdentifierTable(observationComponent.getCode().getCodingFirstRep().getSystem());
+		}
+		/*
+		 * OBX-5 Value , OBX 6 Unit when Quantity are available
+		 */
+		if (observationComponent.hasValueCodeableConcept() && observationComponent.getValueCodeableConcept().hasCoding()) {
+			component.setValueCode(observationComponent.getValueCodeableConcept().getCodingFirstRep().getCode());
+			component.setValueLabel(observationComponent.getValueCodeableConcept().getCodingFirstRep().getDisplay());
+			component.setValueTable(observationComponent.getValueCodeableConcept().getCodingFirstRep().getSystem());
+		} else if (observationComponent.hasValueQuantity()) {
+			Quantity quantity = observationComponent.getValueQuantity();
+//			component.setUnitsCode(quantity.getUnit()); // TODO get from codemap ?
+			component.setUnitsTable(quantity.getSystem());
+			component.setUnitsLabel(quantity.getUnit());
+		} else if (observationComponent.hasValueDateTimeType()) {
+			SimpleDateFormat simpleDateFormat = IncomingMessageHandler.getV2SDF();
+			component.setValueCode(simpleDateFormat.format(observationComponent.getValueDateTimeType().getValue()));
+		}
+		return component;
+	}
+
+	private static @NotNull Range valueRange(ObservationMaster om) {
+		Range range = new Range();
+		Quantity low = valueQuantity(om.getValueCode(), om);
+		if (low.getValue() != null) {
+			range.setLow(low);
+		}
+		Quantity high = valueQuantity(om.getValueLabel(), om);
+		if (high.getValue() != null) {
+			range.setHigh(high);
+		}
+		return range;
+	}
+
+	private static @NotNull DateTimeType valueDateTimeType(ObservationMaster om) {
+		SimpleDateFormat simpleDateFormat = IncomingMessageHandler.getV2SDF();
+		DateTimeType dateTimeType = new DateTimeType();
+		try {
+			dateTimeType.setValue(simpleDateFormat.parse(om.getValueCode()));
+		} catch (ParseException ignored) {
+		}
+		return dateTimeType;
+	}
+
+	private static @NotNull Period valuePeriod(ObservationMaster om) {
+		SimpleDateFormat simpleDateFormat = IncomingMessageHandler.getV2SDF();
+		Period period = new Period();
+		try {
+			Date start = simpleDateFormat.parse(om.getValueCode());
+			period.setStart(start);
+		} catch (ParseException ignored) {
+		}
+		try {
+			Date end = simpleDateFormat.parse(om.getValueLabel());
+			period.setEnd(end);
+		} catch (ParseException ignored) {
+		}
+		return period;
+	}
+
+	private static CodeableConcept valueCodeableConcept(ObservationMaster om) {
+		Coding valueCoding = new Coding();
+		valueCoding.setCode(om.getValueCode());
+		valueCoding.setDisplay(om.getValueLabel());
+		valueCoding.setSystem(om.getValueTable());
+		CodeableConcept value = new CodeableConcept().addCoding(valueCoding);
+		return value;
+	}
+
+	private static Quantity valueQuantity(String value, ObservationMaster om) {
+		Quantity quantity = new Quantity();
+		if (NumberUtils.isCreatable(value)) {
+			quantity.setValue(NumberUtils.createDouble(value));
+		}
+		if (StringUtils.isNotBlank(om.getUnitsLabel())) {
+			quantity.setUnit(om.getUnitsLabel());
+		} else {
+			quantity.setUnit(StringUtils.defaultString(om.getUnitsCode()));
+		}
+		if (StringUtils.isNotBlank(om.getUnitsCode()) && StringUtils.isNotBlank(om.getUnitsLabel())) {
+			quantity.setSystem(om.getUnitsTable());
+		}
+		return quantity;
 	}
 
 	private static @Nullable Type getObservationReportedValue(ObservationMaster om) {
@@ -350,116 +552,5 @@ public class ObservationMapperR4 implements ObservationMapper<Observation> {
 		}
 		return codeableConcept;
 	}
-
-	public ObservationReported localObjectReported(Observation o) {
-		ObservationReported observationReported = new ObservationReported();
-		/*
-		 * Id
-		 */
-		observationReported.setObservationId(StringUtils.defaultString(o.getId()));
-		/*
-		 * Updated Date
-		 */
-		observationReported.setUpdatedDate(o.getMeta().getLastUpdated());
-		/*
-		 * Reported Date
-		 */
-		{
-			Extension recorded = o.getExtensionByUrl(ImmunizationMapper.RECORDED);
-			if (recorded != null) {
-				observationReported.setReportedDate(MappingHelper.extensionGetDate(recorded));
-			} else {
-				observationReported.setReportedDate(null);
-			}
-		}
-		/*
-		 * Observation Date
-		 */
-		if (o.hasEffectiveDateTimeType()) {
-			observationReported.setObservationDate(o.getEffectiveDateTimeType().getValue());
-		}
-		/*
-		 * Vaccination Part of
-		 */
-		Reference vaccinationReference = o.getPartOf().stream().filter(ref -> ref.getReference().startsWith("Immunization/")).findFirst().orElse(null);
-		if (vaccinationReference != null) {
-			observationReported.setVaccinationReportedId(vaccinationReference.getReferenceElement().getIdPart());
-		}
-		/*
-		 * Observation member
-		 */
-		Reference observationReference = o.getHasMember().stream().filter(ref -> ref.getReference().startsWith(OBSERVATION + "/")).findFirst().orElse(null);
-		if (observationReference != null) {
-			observationReported.setPartOfObservationId(observationReference.getReferenceElement().getIdPart());
-		}
-		/*
-		 * Patient subject
-		 */
-		Reference patientReference = o.getSubject();
-		if (patientReference != null) {
-			observationReported.setPatientReportedId(patientReference.getReferenceElement().getIdPart());
-		}
-		/*
-		 * Value type
-		 */
-		String valueType = "";
-		Extension obx2 = o.getExtensionByUrl(OBS_TYPE_OBX_2);
-		if (obx2 != null) {
-			valueType = MappingHelper.extensionGetString(obx2);
-			observationReported.setValueType(valueType);
-		} else {
-			observationReported.setValueType(null);
-		}
-		/*
-		 * OBX-3 Observation code / Identifier
-		 */
-		if (o.hasCode() && o.getCode().hasCoding()) {
-			observationReported.setIdentifierCode(o.getCode().getCodingFirstRep().getCode());
-			observationReported.setIdentifierLabel(o.getCode().getCodingFirstRep().getDisplay());
-			observationReported.setIdentifierTable(o.getCode().getCodingFirstRep().getSystem());
-		}
-		/*
-		 * OBX-5 Value , OBX 6 Unit when Quantity are available
-		 */
-		if (o.hasValueCodeableConcept() && o.getValueCodeableConcept().hasCoding()) {
-			observationReported.setValueCode(o.getValueCodeableConcept().getCodingFirstRep().getCode());
-			observationReported.setValueLabel(o.getValueCodeableConcept().getCodingFirstRep().getDisplay());
-			observationReported.setValueTable(o.getValueCodeableConcept().getCodingFirstRep().getSystem());
-		} else if (o.hasValueQuantity()) {
-			Quantity quantity = o.getValueQuantity();
-//			observationReported.setUnitsCode(quantity.getUnit()); // TODO get from codemap ?
-			observationReported.setUnitsTable(quantity.getSystem());
-			observationReported.setUnitsLabel(quantity.getUnit());
-		} else if (o.hasValueDateTimeType()) {
-			SimpleDateFormat simpleDateFormat = IncomingMessageHandler.getV2SDF();
-			observationReported.setValueCode(simpleDateFormat.format(o.getValueDateTimeType().getValue()));
-		}
-		/*
-		 * OBX 17 method
-		 */
-		if (o.hasMethod() && o.getMethod().hasCoding()) {
-			observationReported.setMethodCode(o.getMethod().getCodingFirstRep().getCode());
-			observationReported.setMethodTable(o.getMethod().getCodingFirstRep().getSystem());
-			observationReported.setMethodLabel(o.getMethod().getCodingFirstRep().getDisplay());
-		}
-		/*
-		 * status
-		 */
-		Extension status = o.getExtensionByUrl(V_2_STATUS_EXTENSION);
-		if (status != null && status.hasValue()) {
-			observationReported.setResultStatus(MappingHelper.extensionGetCoding(status).getCode());
-		}
-
-//		for (Observation.ObservationComponentComponent component: o.getComponent()) {
-//			if (component.getCode().getText().equals(OBSERVATION_DATE)) {
-//				observationReported.setObservationDate(component.getValueDateTimeType().getValue());
-//			}
-//		}
-		for (Identifier identifier : o.getIdentifier()) {
-			observationReported.addBusinessIdentifier(BusinessIdentifier.fromR4(identifier));
-		}
-		return observationReported;
-	}
-
 
 }

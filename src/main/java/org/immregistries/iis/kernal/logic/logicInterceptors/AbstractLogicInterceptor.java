@@ -48,7 +48,7 @@ public abstract class AbstractLogicInterceptor {
 		}
 		boolean res = abstractMappedObject.toString().equals(abstractMappedObject1.toString());
 		if (!res) {
-			logger.info("Object Mapping check failed {}\n\n{}", abstractMappedObject, abstractMappedObject1);
+			logger.info("Object Mapping check failed\n{}\n\n{}\n", abstractMappedObject, abstractMappedObject1);
 		}
 		return res;
 	}
