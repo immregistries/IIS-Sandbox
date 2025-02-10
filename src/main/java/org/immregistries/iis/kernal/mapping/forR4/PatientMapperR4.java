@@ -264,6 +264,7 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 
 	public Patient fhirResource(PatientMaster pm) {
 		Patient p = new Patient();
+		p.setId(pm.getPatientId());
 		/*
 		 * Updated Date
 		 */
@@ -274,7 +275,7 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 		if (pm.getReportedDate() != null) {
 			p.addExtension()
 				.setUrl(RECORDED)
-				.setValue(new org.hl7.fhir.r5.model.DateType(pm.getReportedDate()));
+				.setValue(new DateType(pm.getReportedDate()));
 		}
 		/*
 		 * Business Identifiers
@@ -329,6 +330,7 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 					Code code = CodeMapManager.getCodeMap().getCodeForCodeset(CodesetType.PATIENT_RACE, value);
 					/*
 					 * Added to OMB extension if code recognised
+					 * TODO make sure this is using the right codeset
 					 */
 					if (code != null) {
 						coding.setDisplay(code.getLabel());

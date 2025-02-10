@@ -28,10 +28,10 @@ public class ModelName {
 			this.setNameMiddle(name.getGiven().get(1).getValueNotNull());
 		}
 		org.hl7.fhir.r4.model.Extension nameType = name.getExtensionByUrl(V_2_NAME_TYPE);
-		if (nameType != null && nameType.hasValue()) {
+		if (nameType != null) {
 			org.hl7.fhir.r4.model.Coding coding = MappingHelper.extensionGetCoding(nameType);
-			if (coding != null && coding.hasCode()) {
-				this.setNameType(StringUtils.defaultString(coding.getCode()));
+			if (coding != null && StringUtils.isNotBlank(coding.getCode())) {
+				this.setNameType(coding.getCode());
 			} else {
 				this.setNameType(null);
 			}
@@ -49,10 +49,10 @@ public class ModelName {
 			this.setNameMiddle(name.getGiven().get(1).getValueNotNull());
 		}
 		org.hl7.fhir.r5.model.Extension nameType = name.getExtensionByUrl(V_2_NAME_TYPE);
-		if (nameType != null && nameType.hasValueCoding()) {
+		if (nameType != null) {
 			org.hl7.fhir.r5.model.Coding coding = MappingHelper.extensionGetCoding(nameType);
-			if (coding != null && coding.hasCode()) {
-				this.setNameType(StringUtils.defaultString(coding.getCode()));
+			if (coding != null && StringUtils.isNotBlank(coding.getCode())) {
+				this.setNameType(coding.getCode());
 			} else {
 				this.setNameType(null);
 			}
@@ -102,7 +102,7 @@ public class ModelName {
 			.addGiven(this.getNameFirst())
 			.addGiven(this.getNameMiddle());
 		if (this.getNameType() != null) {
-			name.addExtension().setUrl(V_2_NAME_TYPE).setValue(new org.hl7.fhir.r4.model.Coding(V_2_NAME_TYPE_SYSTEM, null, ""));
+			name.addExtension().setUrl(V_2_NAME_TYPE).setValue(new org.hl7.fhir.r4.model.Coding(V_2_NAME_TYPE_SYSTEM, this.getNameType(), ""));
 		}
 		return name;
 	}

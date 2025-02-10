@@ -277,7 +277,7 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 		if (pm.getReportedDate() != null) {
 			p.addExtension()
 				.setUrl(RECORDED)
-				.setValue(new org.hl7.fhir.r5.model.DateType(pm.getReportedDate()));
+				.setValue(new DateType(pm.getReportedDate()));
 		}
 		/*
 		 * Business Identifiers
