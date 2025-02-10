@@ -129,9 +129,6 @@ public class ObservationMapperR4 implements ObservationMapper<Observation> {
 		/*
 		 * OBX-6 unit levels is dealt with in Quantity methods
 		 */
-		o.addReferenceRange().setText(om.getUnitsLabel())
-			.addAppliesTo().setText(om.getUnitsTable())
-			.addCoding().setCode(om.getUnitsCode());
 		/*
 		 * OBX-11
 		 */
@@ -228,12 +225,6 @@ public class ObservationMapperR4 implements ObservationMapper<Observation> {
 			observationComponent.addExtension()
 				.setUrl(V_2_STATUS_EXTENSION)
 				.setValue(new Coding().setCode(component.getResultStatus()).setSystem("HL70085"));
-		}
-
-		if (component.getReportedDate() != null) {
-			observationComponent.addExtension()
-				.setUrl(RECORDED)
-				.setValue(new DateType(component.getReportedDate()));
 		}
 		return observationComponent;
 	}
@@ -352,6 +343,8 @@ public class ObservationMapperR4 implements ObservationMapper<Observation> {
 			component.setVaccinationReportedId(observationReported.getVaccinationReportedId());
 			component.setPatientReportedId(observationReported.getPatientReportedId());
 			component.setUpdatedDate(observationReported.getUpdatedDate());
+			component.setReportedDate(observationReported.getReportedDate());
+			component.setObservationDate(observationReported.getObservationDate());
 			observationReported.addComponent(component);
 		}
 		return observationReported;
@@ -395,6 +388,13 @@ public class ObservationMapperR4 implements ObservationMapper<Observation> {
 		} else if (observationComponent.hasValueDateTimeType()) {
 			SimpleDateFormat simpleDateFormat = IncomingMessageHandler.getV2SDF();
 			component.setValueCode(simpleDateFormat.format(observationComponent.getValueDateTimeType().getValue()));
+		}
+		/*
+		 * status
+		 */
+		Extension status = observationComponent.getExtensionByUrl(V_2_STATUS_EXTENSION);
+		if (status != null && status.hasValue()) {
+			component.setResultStatus(MappingHelper.extensionGetCoding(status).getCode());
 		}
 		return component;
 	}
