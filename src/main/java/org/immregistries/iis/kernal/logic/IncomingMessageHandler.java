@@ -382,9 +382,6 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 		PatientMaster patientMasterForMatchQuery = new PatientMaster();
 		if (reader.advanceToSegment("QPD")) {
 			String mrn = "";
-//			for (int i = 1; i <= reader.getRepeatCount(3); i++) {
-//
-//			}
 			{
 				mrn = reader.getValueBySearchingRepeats(3, 1, "MR", 5);
 				if (StringUtils.isBlank(mrn)) {
@@ -564,17 +561,6 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 		{
 			String sendersUniqueId = reader.getValue(10);
 			IisHL7Util.makeMsaAndErr(sb, sendersUniqueId, profileId, profileId, iisReportables, processingFlavorSet);
-//			if (hasErrors(iisReportables)) {
-//				sb.append("MSA|AE|").append(sendersUniqueId).append("\r");
-//			} else {
-//				sb.append("MSA|AA|").append(sendersUniqueId).append("\r");
-//			}
-//			if (iisReportables.size() > 0) {
-//				for (IisReportable iisReportable: iisReportables) {
-//					sb.append(IisHL7Util.makeERRSegment(iisReportable, false));
-//				}
-//				sb.append(IisHL7Util.makeERRSegment(IisReportable.fromProcessingException(iisReportableList.get(iisReportableList.size() - 1)), false));
-//			}
 		}
 		if (sendInformations) {
 			String profileName = "Request a Complete Immunization History";
@@ -1383,57 +1369,6 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 					}
 				}
 			}
-//
-//			{// TODO sort key logic steps integrable in FHIR
-//				Code ndcCode = codeMap.getCodeForCodeset(CodesetType.VACCINATION_NDC_CODE, vaccineNdcCode);
-//				if (ndcCode != null) {
-//					if (ndcCode.getCodeStatus() != null && ndcCode.getCodeStatus().getDeprecated() != null && ndcCode.getCodeStatus().getDeprecated().getNewCodeValue() != null && !ndcCode.getCodeStatus().getDeprecated().getNewCodeValue().equals("")) {
-//						vaccineNdcCode = ndcCode.getCodeStatus().getDeprecated().getNewCodeValue();
-//					}
-//					Code cvxCode = codeMap.getRelatedCode(ndcCode, CodesetType.VACCINATION_CVX_CODE);
-//					if (cvxCode == null) {
-//						ProcessingException pe = new ProcessingException("Unrecognized NDC " + vaccineNdcCode, "RXA", rxaCount, 5, IisReportableSeverity.WARN);
-//						iisReportableList.add(IisReportable.fromProcessingException(pe));
-//					} else {
-//						if (vaccineCvxCode.equals("")) {
-//							vaccineCvxCode = cvxCode.getValue();
-//						} else if (!vaccineCvxCode.equals(cvxCode.getValue())) {
-//							// NDC doesn't map to the CVX code that was submitted!
-//							ProcessingException pe = new ProcessingException("NDC " + vaccineNdcCode + " maps to " + cvxCode.getValue() + " but CVX " + vaccineCvxCode + " was also reported, preferring CVX code", "RXA", rxaCount, 5, IisReportableSeverity.WARN);
-//							iisReportableList.add(IisReportable.fromProcessingException(pe));
-//						}
-//					}
-//				}
-//			}
-//			{
-//				Code cptCode = codeMap.getCodeForCodeset(CodesetType.VACCINATION_CPT_CODE, vaccineCptCode);
-//				if (cptCode != null) {
-//					Code cvxCode = codeMap.getRelatedCode(cptCode, CodesetType.VACCINATION_CVX_CODE);
-//					if (cvxCode == null) {
-//						ProcessingException pe = new ProcessingException("Unrecognized CPT " + cptCode, "RXA", rxaCount, 5, IisReportableSeverity.WARN);
-//						iisReportableList.add(IisReportable.fromProcessingException(pe));
-//					} else {
-//						if (vaccineCvxCode.equals("")) {
-//							vaccineCvxCode = cvxCode.getValue();
-//						} else if (!vaccineCvxCode.equals(cvxCode.getValue())) {
-//							// CPT doesn't map to the CVX code that was submitted!
-//							ProcessingException pe = new ProcessingException("CPT " + vaccineCptCode + " maps to " + cvxCode.getValue() + " but CVX " + vaccineCvxCode + " was also reported, preferring CVX code", "RXA", rxaCount, 5, IisReportableSeverity.WARN);
-//							iisReportableList.add(IisReportable.fromProcessingException(pe));
-//						}
-//					}
-//				}
-//			}
-//			if (vaccineCvxCode.equals("")) {
-//				throw new ProcessingException("Unable to find a recognized vaccine administration code (CVX, NDC, or CPT)", "RXA", rxaCount, 5);
-//			} else {
-//				Code cvxCode = codeMap.getCodeForCodeset(CodesetType.VACCINATION_CVX_CODE, vaccineCvxCode);
-//				if (cvxCode != null) {
-//					vaccineCvxCode = cvxCode.getValue();
-//				} else {
-//					throw new ProcessingException("Unrecognized CVX vaccine '" + vaccineCvxCode + "'", "RXA", rxaCount, 5);
-//				}
-//			}
-
 
 			{
 				String administeredAtLocation = reader.getValue(11, 4);
@@ -1561,7 +1496,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 
 	@SuppressWarnings("unchecked")
 	public ObservationReported readObservations(HL7Reader reader, List<IisReportable> iisReportableList, PatientReported patientReported, boolean strictDate, int obxCount, VaccinationReported vaccinationReported, VaccinationMaster vaccination) {
-		ObservationReported observationReported = null;
+		ObservationReported observationReported;
 		if (vaccination == null) {
 			observationReported = fhirRequester.searchObservationReported(new SearchParameterMap("part-of", new ReferenceParam().setMissing(true))
 				.add("subject", new ReferenceParam(patientReported.getPatientId())));
