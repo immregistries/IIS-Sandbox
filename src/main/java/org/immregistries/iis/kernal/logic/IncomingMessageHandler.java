@@ -41,7 +41,6 @@ import org.immregistries.iis.kernal.model.*;
 import org.immregistries.mqe.hl7util.ReportableSource;
 import org.immregistries.mqe.hl7util.SeverityLevel;
 import org.immregistries.mqe.hl7util.model.CodedWithExceptions;
-import org.immregistries.mqe.hl7util.model.Hl7Location;
 import org.immregistries.mqe.validator.MqeMessageService;
 import org.immregistries.mqe.validator.MqeMessageServiceResponse;
 import org.immregistries.mqe.validator.engine.ValidationRuleResult;
@@ -59,7 +58,6 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -135,24 +133,6 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 			ConformanceContext conformanceContext = DefaultConformanceContext.apply(Collections.singletonList(constraintsXML)).get();
 			syncHL7ValidatorQbpZ44 = new SyncHL7Validator(profile, valueSetLibrary, conformanceContext);
 		}
-	}
-
-	public void verifyNoErrors(List<IisReportable> iisReportableList) throws ProcessingException {
-		for (IisReportable reportable : iisReportableList) {
-			if (reportable.getSeverity().equals(IisReportableSeverity.ERROR)) {
-				throw ProcessingException.fromIisReportable(reportable);
-			}
-		}
-	}
-
-
-	public boolean hasErrors(List<IisReportable> reportables) {
-		for (IisReportable reportable : reportables) {
-			if (reportable.getSeverity().equals(IisReportableSeverity.ERROR)) {
-				return true;
-			}
-		}
-		return false;
 	}
 
 	public void recordMessageReceived(String message, PatientMaster patient, String messageResponse, String categoryRequest, String categoryResponse, Tenant tenant) {
@@ -357,24 +337,6 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 		return ackBuilder.buildAckFrom(data, processingFlavorSet);
 	}
 
-
-	public Date parseDateError(String dateString, String errorMessage, String segmentId, int segmentRepeat, int fieldPosition, boolean strict) throws ProcessingException {
-		try {
-			Date date = IIncomingMessageHandler.parseDateInternal(dateString, strict);
-			if (date == null) {
-				if (errorMessage != null) {
-					throw new ProcessingException(errorMessage + ": No date was specified", segmentId, segmentRepeat, fieldPosition);
-				}
-			}
-			return date;
-		} catch (ParseException e) {
-			if (errorMessage != null) {
-				throw new ProcessingException(errorMessage + ": " + e.getMessage(), segmentId, segmentRepeat, fieldPosition);
-			}
-		}
-		return null;
-	}
-
 	public String processQBP(Tenant tenant, HL7Reader reader, String messageReceived) throws Exception {
 		Set<ProcessingFlavor> processingFlavorSet = tenant.getProcessingFlavorSet();
 		MqeMessageServiceResponse mqeMessageServiceResponse = mqeMessageService.processMessage(messageReceived);
@@ -536,7 +498,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 						categoryResponse = NO_MATCH;
 					}
 				}
-				if (hasErrors(iisReportables)) {
+				if (IIncomingMessageHandler.hasErrors(iisReportables)) {
 					queryResponse = QUERY_APPLICATION_ERROR;
 				}
 			} else if (profileIdSubmitted.equals(QBP_Z34)) {
@@ -945,7 +907,6 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 		return obxCount;
 	}
 
-
 	public List<IisReportable> nistValidation(String message, String profileId) throws Exception {
 		String id;
 		SyncHL7Validator syncHL7Validator;
@@ -988,31 +949,13 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 					reportable.setApplicationErrorCode(cwe);
 					String path = assertion.getPath();
 					reportable.setDiagnosticMessage(path);
-					this.addErrorLocation(reportable, path);
+					IIncomingMessageHandler.addErrorLocation(reportable, path);
 				}
 			}
 		}
-
-
 //		ValidationReport validationReport = new ValidationReport(report.toText());
 
 		return reportableList;
-	}
-
-	public void addErrorLocation(IisReportable reportable, String path) {
-		if (path != null && path.length() >= 3) {
-			String segmentid = path.substring(0, 3);
-			if (path.length() > 3) {
-				path = path.substring(4);
-			} else {
-				path = "";
-			}
-
-			Hl7Location errorLocation = IisReportable.readErrorLocation(path, segmentid);
-			if (errorLocation != null) {
-				reportable.getHl7LocationList().add(errorLocation);
-			}
-		}
 	}
 
 	@SuppressWarnings("unchecked")
@@ -1075,37 +1018,8 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 
 
 	public PatientReported processPatient(Tenant tenant, HL7Reader reader, List<IisReportable> iisReportableList, Set<ProcessingFlavor> processingFlavorSet, CodeMap codeMap, boolean strictDate, IIdType managingOrganizationId) throws ProcessingException {
-		String patientReportedExternalLink = "";
-		String patientReportedAuthority = "";
-		String patientReportedType = "MR";
-		if (reader.advanceToSegment("PID")) {
-			patientReportedExternalLink = reader.getValueBySearchingRepeats(3, 1, patientReportedType, 5);
-			patientReportedAuthority = reader.getValueBySearchingRepeats(3, 4, patientReportedType, 5);
-			if (StringUtils.isBlank(patientReportedExternalLink)) {
-				patientReportedAuthority = "";
-				patientReportedType = "PT";
-				patientReportedExternalLink = reader.getValueBySearchingRepeats(3, 1, patientReportedType, 5);
-				patientReportedAuthority = reader.getValueBySearchingRepeats(3, 4, patientReportedType, 5);
-				if (StringUtils.isBlank(patientReportedExternalLink)) {
-					patientReportedAuthority = "";
-					patientReportedType = "PI";
-					patientReportedExternalLink = reader.getValueBySearchingRepeats(3, 1, patientReportedType, 5);
-					patientReportedAuthority = reader.getValueBySearchingRepeats(3, 4, patientReportedType, 5);
-					if (StringUtils.isBlank(patientReportedExternalLink)) {
-						throw new ProcessingException("MRN was not found, required for accepting vaccination report", "PID", 1, 3);
-					}
-				}
-			}
-		} else {
-			throw new ProcessingException("No PID segment found, required for accepting vaccination report", "", 0, 0);
-		}
-//		PatientIdentifier patientIdentifier = new PatientIdentifier();
-//		patientIdentifier.setSystem(patientReportedAuthority);
-//		patientIdentifier.setValue(patientReportedExternalLink);
-//		patientIdentifier.setType("MR");
 		PatientReported patientReported = null; // TODO figure out process before
 //			fhirRequester.searchPatientReported(new SearchParameterMap("identifier", new TokenParam().setValue(patientReportedExternalLink)));
-
 		if (patientReported == null) {
 			patientReported = new PatientReported();
 			patientReported.setTenant(tenant);
@@ -1115,11 +1029,20 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 				patientReported.setManagingOrganizationId("Organization/" + managingOrganizationId.getIdPart());
 			}
 		}
+		if (!reader.advanceToSegment("PID")) {
+			throw new ProcessingException("No PID segment found, required for accepting vaccination report", "", 0, 0);
+		}
 
-		return processPatientFhirAgnostic(reader, iisReportableList, processingFlavorSet, strictDate, patientReported);
-	}
-
-	public PatientReported processPatientFhirAgnostic(HL7Reader reader, List<IisReportable> iisReportableList, Set<ProcessingFlavor> processingFlavorSet, boolean strictDate, PatientReported patientReported) throws ProcessingException {
+		for (int i = 1; i <= reader.getRepeatCount(3); i++) {
+			BusinessIdentifier businessIdentifier = new BusinessIdentifier();
+			businessIdentifier.setValue(reader.getValueRepeat(3, 1, i));
+			businessIdentifier.setSystem(reader.getValueRepeat(3, 4, i));
+			businessIdentifier.setType(reader.getValueRepeat(3, 5, i));
+			patientReported.addBusinessIdentifier(businessIdentifier);
+		}
+		if (patientReported.getMainBusinessIdentifier() == null || StringUtils.isBlank(patientReported.getMainBusinessIdentifier().getValue())) {
+			throw new ProcessingException("MRN was not found, required for accepting vaccination report", "PID", 1, 3);
+		}
 
 		List<ModelName> names = new ArrayList<>(reader.getRepeatCount(5));
 		for (int i = 1; i <= reader.getRepeatCount(5); i++) {
@@ -1135,47 +1058,9 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 		patientPhone.setNumber(reader.getValue(13, 6) + reader.getValue(13, 7));
 		patientPhone.setUse(reader.getValue(13, 2));
 		// Logic exported to Patient Processing interceptor
-//		if (patientPhone.getNumber().length() > 0) {
-//			if (!patientPhone.getUse().equals("PRN")) {
-//				ProcessingException pe = new ProcessingException("Patient phone telecommunication type must be PRN ", "PID", 1, 13);
-//				if (!processingFlavorSet.contains(ProcessingFlavor.QUINZE)) {
-//					pe.setErrorCode(IisReportableSeverity.WARN);
-//				}
-//				iisReportableList.add(IisReportable.fromProcessingException(pe));
-//			}
-//
-//			{
-//				int countNums = 0;
-//				boolean invalidCharFound = false;
-//				char invalidChar = ' ';
-//				for (char c : patientPhone.getNumber().toCharArray()) {
-//
-//					if (c >= '0' && c <= '9') {
-//						countNums++;
-//					} else if (c != '-' && c != '.' && c != ' ' && c != '(' && c != ')') {
-//						if (!invalidCharFound) {
-//							invalidCharFound = true;
-//							invalidChar = c;
-//						}
-//					}
-//				}
-//				if (invalidCharFound) {
-//					ProcessingException pe = new ProcessingException("Patient phone number has unexpected character: " + invalidChar, "PID", 1, 13);
-//					pe.setErrorCode(IisReportableSeverity.WARN);
-//					iisReportableList.add(IisReportable.fromProcessingException(pe));
-//				}
-////				if (countNums != 10 || patientPhone.startsWith("555") || patientPhone.startsWith("0") || patientPhone.startsWith("1")) {
-////					ProcessingException pe = new ProcessingException("Patient phone number does not appear to be valid", "PID", 1, 13);
-////					pe.setErrorCode(IisReportableSeverity.WARN);
-////					iisReportableList.add(IisReportable.fromProcessingException(pe));
-////				}
-//			}
-//		}
 		if (!"PRN".equals(patientPhone.getUse())) {
 			patientPhone.setUse("");
 		}
-
-
 
 		String zip = reader.getValue(11, 5);
 		if (zip.length() > 5) {
@@ -1200,18 +1085,12 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 		modelAddress.setAddressCountyParish(reader.getValue(11, 9));
 
 		Date patientBirthDate;
-		patientBirthDate = parseDateError(reader.getValue(7), "Bad format for date of birth", "PID", 1, 7, strictDate);
+		patientBirthDate = IIncomingMessageHandler.parseDateError(reader.getValue(7), "Bad format for date of birth", "PID", 1, 7, strictDate);
 		if (patientBirthDate.after(new Date())) {
 			throw new ProcessingException("Patient is indicated as being born in the future, unable to record patients who are not yet born", "PID", 1, 7);
 		}
 
-		for (int i = 1; i <= reader.getRepeatCount(3); i++) {
-			BusinessIdentifier businessIdentifier = new BusinessIdentifier();
-			businessIdentifier.setValue(reader.getValueRepeat(3, 1, i));
-			businessIdentifier.setSystem(reader.getValueRepeat(3, 4, i));
-			businessIdentifier.setType(reader.getValueRepeat(3, 5, i));
-			patientReported.addBusinessIdentifier(businessIdentifier);
-		}
+
 
 		patientReported.setPatientNames(names);
 		patientReported.setMotherMaidenName(reader.getValue(6));
@@ -1255,7 +1134,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 		reader.resetPostion();
 
 		patientProcessingInterceptor.processAndValidatePatient(patientReported, iisReportableList, processingFlavorSet);
-		verifyNoErrors(iisReportableList);
+		IIncomingMessageHandler.verifyNoErrors(iisReportableList);
 
 		patientReported.setUpdatedDate(new Date());
 		patientReported = fhirRequester.savePatientReported(patientReported);
@@ -1316,7 +1195,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 			if (fillerIdentifier == null) {
 				throw new ProcessingException("Vaccination order id was not found, unable to process", "ORC", orcCount, 3);
 			}
-			administrationDate = parseDateError(reader.getValue(3, 1), "Could not read administered date in RXA-5", "RXA", rxaCount, 3, strictDate);
+			administrationDate = IIncomingMessageHandler.parseDateError(reader.getValue(3, 1), "Could not read administered date in RXA-5", "RXA", rxaCount, 3, strictDate);
 //			if (administrationDate.after(new Date())) {
 //				throw new ProcessingException("Vaccination is indicated as occurring in the future, unable to accept future vaccination events", "RXA", rxaCount, 3);
 //			}
@@ -1476,7 +1355,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 				}
 			}
 
-			verifyNoErrors(iisReportableList);
+			IIncomingMessageHandler.verifyNoErrors(iisReportableList);
 			immunizationProcessingInterceptor.processAndValidateVaccinationReported(vaccinationReported, iisReportableList, processingFlavorSet, fundingSourceObxCount, fundingEligibilityObxCount, rxaCount, vaccineCptCode);
 			vaccinationReported = fhirRequester.saveVaccinationReported(vaccinationReported);
 			vaccinationReportedList.add(vaccinationReported);

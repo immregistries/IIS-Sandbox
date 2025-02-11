@@ -7,6 +7,7 @@ import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.model.ProcessingFlavor;
 import org.immregistries.iis.kernal.model.Tenant;
 import org.immregistries.iis.kernal.model.VaccinationMaster;
+import org.immregistries.mqe.hl7util.model.Hl7Location;
 import org.immregistries.smm.tester.manager.HL7Reader;
 
 import java.text.ParseException;
@@ -81,5 +82,55 @@ public interface IIncomingMessageHandler {
 		return date;
 	}
 
+	static Date parseDateError(String dateString, String errorMessage, String segmentId, int segmentRepeat, int fieldPosition, boolean strict) throws ProcessingException {
+		try {
+			Date date = IIncomingMessageHandler.parseDateInternal(dateString, strict);
+			if (date == null) {
+				if (errorMessage != null) {
+					throw new ProcessingException(errorMessage + ": No date was specified", segmentId, segmentRepeat, fieldPosition);
+				}
+			}
+			return date;
+		} catch (ParseException e) {
+			if (errorMessage != null) {
+				throw new ProcessingException(errorMessage + ": " + e.getMessage(), segmentId, segmentRepeat, fieldPosition);
+			}
+		}
+		return null;
+	}
+
+	static void addErrorLocation(IisReportable reportable, String path) {
+		if (path != null && path.length() >= 3) {
+			String segmentid = path.substring(0, 3);
+			if (path.length() > 3) {
+				path = path.substring(4);
+			} else {
+				path = "";
+			}
+
+			Hl7Location errorLocation = IisReportable.readErrorLocation(path, segmentid);
+			if (errorLocation != null) {
+				reportable.getHl7LocationList().add(errorLocation);
+			}
+		}
+	}
+
+	static void verifyNoErrors(List<IisReportable> iisReportableList) throws ProcessingException {
+		for (IisReportable reportable : iisReportableList) {
+			if (reportable.getSeverity().equals(IisReportableSeverity.ERROR)) {
+				throw ProcessingException.fromIisReportable(reportable);
+			}
+		}
+	}
+
+
+	static boolean hasErrors(List<IisReportable> reportables) {
+		for (IisReportable reportable : reportables) {
+			if (reportable.getSeverity().equals(IisReportableSeverity.ERROR)) {
+				return true;
+			}
+		}
+		return false;
+	}
 
 }
