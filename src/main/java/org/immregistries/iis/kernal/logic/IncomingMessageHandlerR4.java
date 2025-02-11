@@ -6,6 +6,7 @@ import ca.uhn.fhir.rest.param.StringParam;
 import ca.uhn.fhir.rest.param.TokenParam;
 import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
 import org.apache.commons.lang3.StringUtils;
+import org.hl7.fhir.instance.model.api.IIdType;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.Immunization;
@@ -97,7 +98,7 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler {
 		try {
 			CodeMap codeMap = CodeMapManager.getCodeMap();
 			boolean strictDate = !processingFlavorSet.contains(ProcessingFlavor.CANTALOUPE);
-			PatientReported patientReported = processPatient(tenant, reader, iisReportableList, processingFlavorSet, codeMap, strictDate, managingOrganization);
+			PatientReported patientReported = processPatient(tenant, reader, iisReportableList, processingFlavorSet, codeMap, strictDate, managingOrganization.getIdElement());
 
 			List<VaccinationReported> vaccinationReportedList = processVaccinations(tenant, reader, iisReportableList, patientReported, strictDate, processingFlavorSet);
 			String ack = buildAckMqe(reader, mqeMessageServiceResponse, iisReportableList, processingFlavorSet, nistReportables);
@@ -115,7 +116,7 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler {
 	}
 
 	@SuppressWarnings("unchecked")
-	public PatientReported processPatient(Tenant tenant, HL7Reader reader, List<IisReportable> iisReportableList, Set<ProcessingFlavor> processingFlavorSet, CodeMap codeMap, boolean strictDate, Organization managingOrganization) throws ProcessingException {
+	public PatientReported processPatient(Tenant tenant, HL7Reader reader, List<IisReportable> iisReportableList, Set<ProcessingFlavor> processingFlavorSet, CodeMap codeMap, boolean strictDate, IIdType managingOrganizationId) throws ProcessingException {
 		String patientReportedExternalLink = "";
 		String patientReportedAuthority = "";
 		String patientReportedType = "MR";
@@ -144,15 +145,16 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler {
 //		patientIdentifier.setSystem(patientReportedAuthority);
 //		patientIdentifier.setValue(patientReportedExternalLink);
 //		patientIdentifier.setType("MR");
-		PatientReported patientReported = fhirRequester.searchPatientReported(new SearchParameterMap("identifier", new TokenParam().setValue(patientReportedExternalLink)));
+		PatientReported patientReported = null; // TODO figure out process before
+//			fhirRequester.searchPatientReported(new SearchParameterMap("identifier", new TokenParam().setValue(patientReportedExternalLink)));
 
 		if (patientReported == null) {
 			patientReported = new PatientReported();
 			patientReported.setTenant(tenant);
 //			patientReported.setExternalLink(patientReportedExternalLink); now dealt with in agnostic method
 			patientReported.setReportedDate(new Date());
-			if (managingOrganization != null) {
-				patientReported.setManagingOrganizationId("Organization/" + managingOrganization.getIdElement().getIdPart());
+			if (managingOrganizationId != null) {
+				patientReported.setManagingOrganizationId("Organization/" + managingOrganizationId.getIdPart());
 			}
 		}
 

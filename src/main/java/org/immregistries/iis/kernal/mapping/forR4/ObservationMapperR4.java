@@ -299,7 +299,7 @@ public class ObservationMapperR4 implements ObservationMapper<Observation> {
 		 */
 		if (o.hasValueCodeableConcept() && o.getValueCodeableConcept().hasCoding()) {
 			observationReported.setValueCode(o.getValueCodeableConcept().getCodingFirstRep().getCode());
-			observationReported.setValueLabel(o.getValueCodeableConcept().getCodingFirstRep().getDisplay());
+			observationReported.setValueLabel(StringUtils.defaultString(o.getValueCodeableConcept().getCodingFirstRep().getDisplay()));
 			observationReported.setValueTable(o.getValueCodeableConcept().getCodingFirstRep().getSystem());
 		} else if (o.hasValueQuantity()) {
 			Quantity quantity = o.getValueQuantity();

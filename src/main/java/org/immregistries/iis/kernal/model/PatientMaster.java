@@ -264,6 +264,7 @@ public class PatientMaster extends AbstractMappedObject implements Serializable 
 	}
 
 	public void addRace(String race) {
+		System.out.println("race added \n " + race);
 		if (this.races == null) {
 			this.races = new ArrayList<>(1);
 		}

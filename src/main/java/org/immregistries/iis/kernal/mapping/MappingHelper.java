@@ -2,6 +2,7 @@ package org.immregistries.iis.kernal.mapping;
 
 
 import org.apache.commons.lang3.StringUtils;
+import org.hl7.fhir.exceptions.FHIRException;
 import org.hl7.fhir.r5.model.*;
 
 import java.text.SimpleDateFormat;
@@ -130,10 +131,18 @@ public class MappingHelper {
 //		return extension.getValueCodeType().getValue();
 //	}
 
+	/**
+	 * imitating org.hl7.fhir.r4.model.Extension.getValueCoding()
+	 *
+	 * @param extension R4 Extension
+	 * @return Value coding or empty value
+	 */
 	public static org.hl7.fhir.r4.model.Coding extensionGetCoding(org.hl7.fhir.r4.model.Extension extension) {
 		if (extension.getValue() == null) {
-			return null;
+			return new org.hl7.fhir.r4.model.Coding();
 		} else {
+			if (!(extension.getValue() instanceof org.hl7.fhir.r4.model.Coding))
+				throw new FHIRException("Type mismatch: the type Coding was expected, but " + extension.getValue().getClass().getName() + " was encountered");
 			return extension.castToCoding(extension.getValue());
 		}
 	}

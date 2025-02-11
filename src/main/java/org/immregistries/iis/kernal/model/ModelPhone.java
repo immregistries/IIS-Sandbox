@@ -1,5 +1,6 @@
 package org.immregistries.iis.kernal.model;
 
+import org.apache.commons.lang3.StringUtils;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
 
 public class ModelPhone {
@@ -13,7 +14,7 @@ public class ModelPhone {
 		org.hl7.fhir.r4.model.Extension useExtension = contactPoint.getExtensionByUrl(USE_EXTENSION_URL);
 		if (useExtension != null) {
 			org.hl7.fhir.r4.model.Coding coding = MappingHelper.extensionGetCoding(useExtension);
-			if (coding != null) {
+			if (coding != null && StringUtils.isNotBlank(coding.getCode())) {
 				setUse(coding.getCode());
 			} else {
 				setUse("");
@@ -30,7 +31,7 @@ public class ModelPhone {
 		org.hl7.fhir.r5.model.Extension useExtension = contactPoint.getExtensionByUrl(USE_EXTENSION_URL);
 		if (useExtension != null) {
 			org.hl7.fhir.r5.model.Coding coding = MappingHelper.extensionGetCoding(useExtension);
-			if (coding != null) {
+			if (coding != null && StringUtils.isNotBlank(coding.getCode())) {
 				setUse(coding.getCode());
 			} else {
 				setUse("");
