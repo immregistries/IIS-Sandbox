@@ -660,7 +660,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 					}
 				}
 				if (processingFlavorSet.contains(ProcessingFlavor.GREEN)) {
-					vaccinationMasterList.removeIf(vaccinationMaster -> vaccinationMaster.getVaccineCvxCode().equals("91"));
+					vaccinationMasterList.removeIf(vaccinationMaster -> "91".equals(vaccinationMaster.getVaccineCvxCode()));
 				}
 				List<ForecastActual> forecastActualList = null;
 				if (sendBackForecast) {
@@ -1117,7 +1117,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 ////				}
 //			}
 //		}
-		if (!patientPhone.getUse().equals("PRN")) {
+		if (!"PRN".equals(patientPhone.getUse())) {
 			patientPhone.setUse("");
 		}
 
@@ -1436,7 +1436,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 				vaccinationReported.setBodyRoute(reader.getValue(1));
 				vaccinationReported.setBodySite(reader.getValue(2));
 			} else if (processingFlavorSet.contains(ProcessingFlavor.SPRUCE)) {
-				if (vaccinationReported.getInformationSource().equals("00")) {
+				if ("00".equals(vaccinationReported.getInformationSource())) {
 					throw new ProcessingException("RXR segment is required for administered vaccinations", "RXA", rxaCount, 0);
 				}
 			}

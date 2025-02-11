@@ -65,7 +65,7 @@ public class ObservationProcessingInterceptor extends AbstractLogicInterceptor {
 
 	public ObservationReported processAndValidateObservationReported(ObservationReported observationReported, List<IisReportable> iisReportableList, Set<ProcessingFlavor> processingFlavorSet, int obxCount, Date patientBirthDate) throws ProcessingException {
 		testMapping(observationMapper, observationReported);
-		if (observationReported.getIdentifierCode().equals("30945-0")) // contraindication!
+		if ("30945-0".equals(observationReported.getIdentifierCode())) // contraindication!
 		{
 			CodeMap codeMap = CodeMapManager.getCodeMap();
 			Code contraCode = codeMap.getCodeForCodeset(CodesetType.CONTRAINDICATION_OR_PRECAUTION, observationReported.getValueCode());

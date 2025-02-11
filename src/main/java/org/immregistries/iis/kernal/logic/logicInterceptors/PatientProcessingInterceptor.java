@@ -88,7 +88,7 @@ public class PatientProcessingInterceptor extends AbstractLogicInterceptor {
 			ModelPhone patientPhone = patientReported.getPhones().get(i);
 			if (patientPhone != null) {
 				checkPhone(patientPhone, processingFlavorSet, iisReportableList);
-				if (patientPhone.getUse().equals("PRN")) {
+				if ("PRN".equals(patientPhone.getUse())) {
 					prn = patientPhone;
 				}
 			}
@@ -300,7 +300,7 @@ public class PatientProcessingInterceptor extends AbstractLogicInterceptor {
 		}
 
 		if (processingFlavorSet.contains(ProcessingFlavor.BLACKBERRY)) {
-			if (patientReported.getFirstAddress().getAddressLine1().equals("") || patientReported.getFirstAddress().getAddressCity().equals("") || patientReported.getFirstAddress().getAddressState().equals("") || patientReported.getFirstAddress().getAddressZip().equals("")) {
+			if (StringUtils.isBlank(patientReported.getFirstAddress().getAddressLine1()) || StringUtils.isBlank(patientReported.getFirstAddress().getAddressCity()) || StringUtils.isBlank(patientReported.getFirstAddress().getAddressState()) || StringUtils.isBlank(patientReported.getFirstAddress().getAddressZip())) {
 				throw new ProcessingException("Patient address is required but it was not sent", "PID", 1, 11);
 			}
 		}
@@ -346,16 +346,16 @@ public class PatientProcessingInterceptor extends AbstractLogicInterceptor {
 				ProcessingException pe = new ProcessingException("Next-of-kin last name is empty", "NK1", i, 2, IisReportableSeverity.WARN);
 				iisReportableList.add(IisReportable.fromProcessingException(pe));
 			}
-			if (StringUtils.isNotBlank(patientGuardian.getName().getNameFirst())) {
+			if (StringUtils.isBlank(patientGuardian.getName().getNameFirst())) {
 				ProcessingException pe = new ProcessingException("Next-of-kin first name is empty", "NK1", i, 2, IisReportableSeverity.WARN);
 				iisReportableList.add(IisReportable.fromProcessingException(pe));
 			}
 
-			if (StringUtils.isNotBlank(patientGuardian.getGuardianRelationship())) {
+			if (StringUtils.isBlank(patientGuardian.getGuardianRelationship())) {
 				ProcessingException pe = new ProcessingException("Next-of-kin relationship is empty", "NK1", i, 3, IisReportableSeverity.WARN);
 				iisReportableList.add(IisReportable.fromProcessingException(pe));
 			}
-			if (patientGuardian.getGuardianRelationship().equals("MTH") || patientGuardian.getGuardianRelationship().equals("FTH") || patientGuardian.getGuardianRelationship().equals("GRD")) {
+			if ("MTH".equals(patientGuardian.getGuardianRelationship()) || "FTH".equals(patientGuardian.getGuardianRelationship()) || "GRD".equals(patientGuardian.getGuardianRelationship())) {
 				break;
 			} else {
 				ProcessingException pe = new ProcessingException((StringUtils.isNotBlank(patientGuardian.getGuardianRelationship()) ? "Next-of-kin relationship not specified so is not recognized as guardian and will be ignored" : ("Next-of-kin relationship '" + patientGuardian.getGuardianRelationship() + "' is not a recognized guardian and will be ignored")), "NK1", i, 3, IisReportableSeverity.WARN);

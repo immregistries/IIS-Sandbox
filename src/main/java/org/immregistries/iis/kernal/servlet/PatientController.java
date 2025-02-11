@@ -480,8 +480,7 @@ public class PatientController {
 							+ code + ")");
 					}
 				}
-				if (StringUtils.isNotBlank(observationReported.getIdentifierTable())
-					&& (observationReported.getIdentifierTable().equals("LN") || observationReported.getIdentifierTable().equals("99TPG"))) {
+				if ("LN".equals(observationReported.getIdentifierTable()) || "99TPG".equals(observationReported.getIdentifierTable())) {
 					LoincIdentifier loincIdentifier = null;
 					for (LoincIdentifier oi : LoincIdentifier.values()) {
 						if (oi.getIdentifierCode().equalsIgnoreCase(code)) {
@@ -547,9 +546,9 @@ public class PatientController {
 							"      " + observationReported.getValueLabel() + " (" + table + " " + code + ")");
 					}
 				}
-				if (StringUtils.isNotBlank(observationReported.getValueTable()) && (observationReported.getValueTable().equals("SCT")
-					|| observationReported.getValueTable().equals("CDCPHINVS")
-					|| observationReported.getValueTable().equals("99TPG"))) {
+				if ("SCT".equals(observationReported.getValueTable())
+					|| "CDCPHINVS".equals(observationReported.getValueTable())
+					|| "99TPG".equals(observationReported.getValueTable())) {
 					SnomedValue snomedValue = null;
 					for (SnomedValue sv : SnomedValue.values()) {
 						if (sv.getIdentifierCode().equalsIgnoreCase(code)) {

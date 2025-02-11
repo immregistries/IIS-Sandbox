@@ -2,6 +2,7 @@ package org.immregistries.iis.kernal.logic;
 
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
+import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Observation;
 import org.immregistries.codebase.client.CodeMap;
@@ -58,7 +59,7 @@ public class Hl7MessageWriterR4 extends Hl7MessageWriter {
 				sb.append("|");
 				// RXA-5
 				sb.append("|").append(cvxCode.getValue()).append("^").append(cvxCode.getLabel()).append("^CVX");
-				if (!vaccinationReported.getVaccineNdcCode().equals("")) {
+				if (StringUtils.isNotBlank(vaccinationReported.getVaccineNdcCode())) {
 					Code ndcCode = codeMap.getCodeForCodeset(CodesetType.VACCINATION_NDC_CODE,
 						vaccinationReported.getVaccineNdcCode());
 					if (ndcCode != null) {
@@ -69,7 +70,7 @@ public class Hl7MessageWriterR4 extends Hl7MessageWriter {
 					// RXA-6
 					sb.append("|");
 					double adminAmount = 0.0;
-					if (!vaccinationReported.getAdministeredAmount().equals("")) {
+					if (StringUtils.isNotBlank(vaccinationReported.getAdministeredAmount())) {
 						try {
 							adminAmount = Double.parseDouble(vaccinationReported.getAdministeredAmount());
 						} catch (NumberFormatException nfe) {
@@ -159,8 +160,7 @@ public class Hl7MessageWriterR4 extends Hl7MessageWriter {
 				}
 				sb.append("|").append(vaccinationReported.getActionCode());
 				sb.append("\r");
-				if (vaccinationReported.getBodyRoute() != null
-					&& !vaccinationReported.getBodyRoute().equals("")) {
+				if (StringUtils.isNotBlank(vaccinationReported.getBodyRoute())) {
 					sb.append("RXR");
 					// RXR-1
 					sb.append("|");
