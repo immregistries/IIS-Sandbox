@@ -957,7 +957,6 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 		while (reader.advanceToSegment("OBX", "ORC")) {
 			obxCount++;
 			String subId = reader.getValue(4);
-			logger.info("sub id {}", subId);
 			/*
 			 * If no sub id or sub id changed, no main observation is set in iteration,
 			 * Saving if changing the main observation

@@ -435,7 +435,7 @@ public class VaccinationMaster extends AbstractMappedObject implements Serializa
 		return "VaccinationMaster{" +
 			"businessIdentifiers=" + businessIdentifiers +
 			", vaccinationId='" + vaccinationId + '\'' +
-			", patientReported=" + patientReported +
+//			", patientReported=" + patientReported +
 			", patientReportedId='" + patientReportedId + '\'' +
 //			", reportedDate=" + reportedDate +
 			", updatedDate=" + updatedDate +

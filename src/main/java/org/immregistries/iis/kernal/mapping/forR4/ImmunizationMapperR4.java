@@ -168,6 +168,17 @@ public class ImmunizationMapperR4 implements ImmunizationMapper<Immunization> {
 			}
 		}
 		/*
+		 * Completion Status Code extension to store exact value
+		 */
+		Extension completionStatusExtension = i.getExtensionByUrl(COMPLETION_STATUS_EXTENSION);
+		if (completionStatusExtension != null) {
+			if (completionStatusExtension.hasValue()) {
+				vr.setCompletionStatus(MappingHelper.extensionGetCoding(completionStatusExtension).getCode());
+			}
+		} else {
+			vr.setCompletionStatus(null);
+		}
+		/*
 		 * Action Code extension to store exact value
 		 */
 		Extension actionCode = i.getExtensionByUrl(ACTION_CODE_EXTENSION);
@@ -325,6 +336,12 @@ public class ImmunizationMapperR4 implements ImmunizationMapper<Immunization> {
 				}
 			}
 		}
+		if (vr.getCompletionStatus() != null) {
+			Extension completionStatusExtension = i.addExtension().setUrl(COMPLETION_STATUS_EXTENSION);
+			if (StringUtils.isNotBlank(vr.getCompletionStatus())) {
+				completionStatusExtension.setValue(new Coding().setCode(vr.getCompletionStatus()).setSystem(COMPLETION_STATUS_SYSTEM));
+			}
+		}
 		/*
 		 * Status Reason
 		 */
@@ -362,7 +379,7 @@ public class ImmunizationMapperR4 implements ImmunizationMapper<Immunization> {
 		/*
 		 * Funding Source
 		 */
-		if (vr.getFundingSource() != null) {
+		if (StringUtils.isNotBlank(vr.getFundingSource())) {
 			Coding coding = new Coding().setSystem(FUNDING_SOURCE_SYSTEM).setCode(vr.getFundingSource());
 			Code code = CodeMapManager.getCodeMap().getCodeForCodeset(CodesetType.VACCINATION_FUNDING_SOURCE, vr.getFundingSource());
 			if (code != null) {
@@ -373,7 +390,7 @@ public class ImmunizationMapperR4 implements ImmunizationMapper<Immunization> {
 		/*
 		 * Program Funding Eligibility
 		 */
-		if (vr.getFundingEligibility() != null) {
+		if (StringUtils.isNotBlank(vr.getFundingEligibility())) {
 			Coding coding = new Coding().setSystem(FUNDING_ELIGIBILITY).setCode(vr.getFundingEligibility());
 			Code code = CodeMapManager.getCodeMap().getCodeForCodeset(CodesetType.FINANCIAL_STATUS_CODE, vr.getFundingEligibility());
 			if (code != null) {

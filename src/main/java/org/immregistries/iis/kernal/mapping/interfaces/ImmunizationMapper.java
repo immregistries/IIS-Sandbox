@@ -25,6 +25,9 @@ public interface ImmunizationMapper<Immunization extends IBaseResource> extends 
 	String RECORDED = "recorded";
 	String ACTION_CODE_EXTENSION = "actionCode";
 	String ACTION_CODE_SYSTEM = "0206";
+	String COMPLETION_STATUS_EXTENSION = "completionStatus";
+	String COMPLETION_STATUS_SYSTEM = "0322";
+
 
 	VaccinationReported localObjectReportedWithMaster(Immunization immunization);
 
