@@ -134,10 +134,11 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 		 */
 		Extension raceExtension = patient.getExtensionByUrl(RACE_EXTENSION);
 		if (raceExtension != null) {
-			for (Iterator<Extension> it = Stream.concat(raceExtension.getExtensionsByUrl(RACE_EXTENSION_OMB).stream(), raceExtension.getExtensionsByUrl(RACE_EXTENSION_DETAILED).stream()).iterator(); it.hasNext(); ) {
+			Stream<Extension> raceExtensionStream = Stream.concat(raceExtension.getExtensionsByUrl(RACE_EXTENSION_OMB).stream(), raceExtension.getExtensionsByUrl(RACE_EXTENSION_DETAILED).stream());
+			for (Iterator<Extension> it = raceExtensionStream.iterator(); it.hasNext(); ) {
 				Extension ext = it.next();
 				Coding coding = MappingHelper.extensionGetCoding(ext);
-				if (!localPatient.getRaces().contains(coding.getCode())) {
+				if (coding != null && !localPatient.getRaces().contains(coding.getCode())) {
 					localPatient.addRace(StringUtils.defaultString(coding.getCode()));
 				}
 			}
@@ -210,10 +211,10 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 		if (patient.hasExtension(PUBLICITY_EXTENSION)) {
 			Extension publicity = patient.getExtensionByUrl(PUBLICITY_EXTENSION);
 			Coding value = MappingHelper.extensionGetCoding(publicity);
-			localPatient.setPublicityIndicator(value.getCode());
+			localPatient.setPublicityIndicator(StringUtils.defaultString(value.getCode()));
 			if (StringUtils.isNotBlank(value.getVersion())) {
 				try {
-					localPatient.setPublicityIndicatorDate(MappingHelper.sdf.parse(value.getVersion()));
+					localPatient.setPublicityIndicatorDate(MappingHelper.FHIR_SDF.parse(value.getVersion()));
 				} catch (ParseException ignored) {
 				}
 			}
@@ -226,10 +227,10 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 		if (patient.hasExtension(PROTECTION_EXTENSION)) {
 			Extension protection = patient.getExtensionByUrl(PROTECTION_EXTENSION);
 			Coding value = MappingHelper.extensionGetCoding(protection);
-			localPatient.setProtectionIndicator(value.getCode());
+			localPatient.setProtectionIndicator(StringUtils.defaultString(value.getCode()));
 			if (StringUtils.isNotBlank(value.getVersion())) {
 				try {
-					localPatient.setProtectionIndicatorDate(MappingHelper.sdf.parse(value.getVersion()));
+					localPatient.setProtectionIndicatorDate(MappingHelper.FHIR_SDF.parse(value.getVersion()));
 				} catch (ParseException ignored) {
 				}
 			}
@@ -242,10 +243,10 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 		if (patient.hasExtension(REGISTRY_STATUS_EXTENSION)) {
 			Extension registry = patient.getExtensionByUrl(REGISTRY_STATUS_EXTENSION);
 			Coding value = MappingHelper.extensionGetCoding(registry);
-			localPatient.setRegistryStatusIndicator(value.getCode());
+			localPatient.setRegistryStatusIndicator(StringUtils.defaultString(value.getCode()));
 			if (StringUtils.isNotBlank(value.getVersion())) {
 				try {
-					localPatient.setRegistryStatusIndicatorDate(MappingHelper.sdf.parse(value.getVersion()));
+					localPatient.setRegistryStatusIndicatorDate(MappingHelper.FHIR_SDF.parse(value.getVersion()));
 				} catch (ParseException ignored) {
 				}
 			}
@@ -400,14 +401,17 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 
 		/*
 		 * Publicity
+		 * Rule used for indicators: null value means no added extension, blank value means adding extension but no value/coding
 		 */
 		if (pm.getPublicityIndicator() != null) {
 			Extension publicity = p.addExtension();
 			publicity.setUrl(PUBLICITY_EXTENSION);
-			Coding publicityValue = new Coding().setSystem(PUBLICITY_SYSTEM).setCode(pm.getPublicityIndicator());
-			publicity.setValue(publicityValue);
-			if (pm.getPublicityIndicatorDate() != null) {
-				publicityValue.setVersion(MappingHelper.sdf.format(pm.getPublicityIndicatorDate()));
+			if (StringUtils.isNotBlank(pm.getPublicityIndicator())) {
+				Coding publicityValue = new Coding().setSystem(PUBLICITY_SYSTEM).setCode(pm.getPublicityIndicator());
+				publicity.setValue(publicityValue);
+				if (pm.getPublicityIndicatorDate() != null) {
+					publicityValue.setVersion(MappingHelper.FHIR_SDF.format(pm.getPublicityIndicatorDate()));
+				}
 			}
 		}
 		/*
@@ -416,10 +420,12 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 		if (pm.getProtectionIndicator() != null) {
 			Extension protection = p.addExtension();
 			protection.setUrl(PROTECTION_EXTENSION);
-			Coding protectionValue = new Coding().setSystem(PROTECTION_SYSTEM).setCode(pm.getProtectionIndicator());
-			protection.setValue(protectionValue);
-			if (pm.getProtectionIndicatorDate() != null) {
-				protectionValue.setVersion(MappingHelper.sdf.format(pm.getProtectionIndicatorDate()));
+			if (StringUtils.isNotBlank(pm.getProtectionIndicator())) {
+				Coding protectionValue = new Coding().setSystem(PROTECTION_SYSTEM).setCode(pm.getProtectionIndicator());
+				protection.setValue(protectionValue);
+				if (pm.getProtectionIndicatorDate() != null) {
+					protectionValue.setVersion(MappingHelper.FHIR_SDF.format(pm.getProtectionIndicatorDate()));
+				}
 			}
 		}
 		/*
@@ -428,10 +434,12 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 		if (pm.getRegistryStatusIndicator() != null) {
 			Extension registryStatus = p.addExtension();
 			registryStatus.setUrl(REGISTRY_STATUS_EXTENSION);
-			Coding registryValue = new Coding().setSystem(REGISTRY_STATUS_INDICATOR).setCode(pm.getRegistryStatusIndicator());
-			registryStatus.setValue(registryValue);
-			if (pm.getRegistryStatusIndicatorDate() != null) {
-				registryValue.setVersion(MappingHelper.sdf.format(pm.getRegistryStatusIndicatorDate()));
+			if (StringUtils.isNotBlank(pm.getRegistryStatusIndicator())) {
+				Coding registryValue = new Coding().setSystem(REGISTRY_STATUS_INDICATOR).setCode(pm.getRegistryStatusIndicator());
+				registryStatus.setValue(registryValue);
+				if (pm.getRegistryStatusIndicatorDate() != null) {
+					registryValue.setVersion(MappingHelper.FHIR_SDF.format(pm.getRegistryStatusIndicatorDate()));
+				}
 			}
 		}
 		/*

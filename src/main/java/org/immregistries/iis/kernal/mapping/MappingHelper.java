@@ -18,7 +18,7 @@ public class MappingHelper {
 	public static final String PERSON = "Person";
 	public static final String PRACTITIONER = "Practitioner";
 
-	public static final SimpleDateFormat sdf = new SimpleDateFormat("E MMM dd HH:mm:ss yyyy");
+	public static final SimpleDateFormat FHIR_SDF = new SimpleDateFormat("E MMM dd HH:mm:ss yyyy");
 
 	//TODO choose system id or not
 	public static Reference getFhirReferenceR5(String fhirType, String dbType, String identifier) {

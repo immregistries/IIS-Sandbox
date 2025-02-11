@@ -100,9 +100,15 @@ public class ImmunizationMapperR5 implements ImmunizationMapper<Immunization> {
 		 * Vaccine Codes CVX NDC
 		 * MVX ?
 		 */
-		vr.setVaccineCvxCode(i.getVaccineCode().getCode(CVX_SYSTEM));
-		vr.setVaccineNdcCode(i.getVaccineCode().getCode(NDC_SYSTEM));
-		vr.setVaccineMvxCode(i.getVaccineCode().getCode(MVX_SYSTEM));
+		vr.setVaccineCvxCode(StringUtils.defaultString(i.getVaccineCode().getCode(CVX_SYSTEM)));
+		vr.setVaccineNdcCode(StringUtils.defaultString(i.getVaccineCode().getCode(NDC_SYSTEM)));
+		vr.setVaccineMvxCode(StringUtils.defaultString(i.getVaccineCode().getCode(MVX_SYSTEM)));
+		/*
+		 * if only one code specified without system
+		 */
+		if (i.getVaccineCode().getCoding().size() == 1 && StringUtils.isBlank(i.getVaccineCode().getCodingFirstRep().getSystem())) {
+			vr.setVaccineCvxCode(StringUtils.defaultString(i.getVaccineCode().getCodingFirstRep().getCode()));
+		}
 
 		/*
 		 * Manufacturer MVX

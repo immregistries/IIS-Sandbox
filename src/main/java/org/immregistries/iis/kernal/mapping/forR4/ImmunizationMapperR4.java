@@ -115,9 +115,17 @@ public class ImmunizationMapperR4 implements ImmunizationMapper<Immunization> {
 			}
 		});
 		/*
-		 * Manufacturer MVX
+		 * if only one code specified without system, considered cvx , TODO remove or make flavor ?
 		 */
-		vr.setVaccineMvxCode(i.getManufacturer().getIdentifier().getValueElement().getValueNotNull());
+		if (i.getVaccineCode().getCoding().size() == 1 && StringUtils.isBlank(i.getVaccineCode().getCodingFirstRep().getSystem())) {
+			vr.setVaccineCvxCode(StringUtils.defaultString(i.getVaccineCode().getCodingFirstRep().getCode()));
+		}
+		/*
+		 * Manufacturer MVX TODO establish priority
+		 */
+		if (i.hasManufacturer()) {
+			vr.setVaccineMvxCode(i.getManufacturer().getIdentifier().getValueElement().getValueNotNull());
+		}
 		/*
 		 * Administered Amount
 		 */
@@ -260,7 +268,7 @@ public class ImmunizationMapperR4 implements ImmunizationMapper<Immunization> {
 		/*
 		 * CVX
 		 */
-		if (!vr.getVaccineCvxCode().isBlank()) {
+		if (StringUtils.isNotBlank(vr.getVaccineCvxCode())) {
 			i.getVaccineCode().addCoding().setCode(vr.getVaccineCvxCode()).setSystem(CVX_SYSTEM);
 		}
 		/*
