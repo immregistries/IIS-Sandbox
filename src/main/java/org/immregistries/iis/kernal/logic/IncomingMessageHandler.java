@@ -65,12 +65,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public abstract class IncomingMessageHandler implements IIncomingMessageHandler {
-	public static final int NAME_SIZE_LIMIT = 15;
-	public static final String RSP_K_11_RSP_K_11 = "RSP^K11^RSP_K11";
-	public static final String MATCH = "Match";
-	public static final String NO_MATCH = "No Match";
-	public static final String POSSIBLE_MATCH = "Possible Match";
-	public static final String TOO_MANY_MATCHES = "Too Many Matches";
 	protected final Logger logger = LoggerFactory.getLogger(IncomingMessageHandler.class);
 	/**
 	 * DYNAMIC VALUE SETS for validation
@@ -104,9 +98,6 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 	SyncHL7Validator syncHL7ValidatorQbpZ34;
 	SyncHL7Validator syncHL7ValidatorQbpZ44;
 
-	public static SimpleDateFormat getV2SDF() {
-		return new SimpleDateFormat("yyyyMMdd");
-	}
 
 	public IncomingMessageHandler() {
 		mqeMessageService = MqeMessageService.INSTANCE;
@@ -366,21 +357,10 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 		return ackBuilder.buildAckFrom(data, processingFlavorSet);
 	}
 
-	public static Date parseDateWarn(String dateString, String errorMessage, String segmentId, int segmentRepeat, int fieldPosition, boolean strict, List<IisReportable> iisReportableList) {
-		try {
-			return parseDateInternal(dateString, strict);
-		} catch (ParseException e) {
-			if (errorMessage != null) {
-				ProcessingException pe = new ProcessingException(errorMessage + ": " + e.getMessage(), segmentId, segmentRepeat, fieldPosition, IisReportableSeverity.WARN);
-				iisReportableList.add(IisReportable.fromProcessingException(pe));
-			}
-		}
-		return null;
-	}
 
 	public Date parseDateError(String dateString, String errorMessage, String segmentId, int segmentRepeat, int fieldPosition, boolean strict) throws ProcessingException {
 		try {
-			Date date = parseDateInternal(dateString, strict);
+			Date date = IIncomingMessageHandler.parseDateInternal(dateString, strict);
 			if (date == null) {
 				if (errorMessage != null) {
 					throw new ProcessingException(errorMessage + ": No date was specified", segmentId, segmentRepeat, fieldPosition);
@@ -393,20 +373,6 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 			}
 		}
 		return null;
-	}
-
-	public static Date parseDateInternal(String dateString, boolean strict) throws ParseException {
-		if (StringUtils.isBlank(dateString)) {
-			return null;
-		}
-		Date date;
-		if (dateString.length() > 8) {
-			dateString = dateString.substring(0, 8);
-		}
-		SimpleDateFormat simpleDateFormat = getV2SDF();
-		simpleDateFormat.setLenient(!strict);
-		date = simpleDateFormat.parse(dateString);
-		return date;
 	}
 
 	public String processQBP(Tenant tenant, HL7Reader reader, String messageReceived) throws Exception {
@@ -445,7 +411,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 			}
 			boolean strictDate = false;
 
-			Date patientBirthDate = parseDateWarn(reader.getValue(6), "Invalid patient birth date", "QPD", 1, 6, strictDate, reportables);
+			Date patientBirthDate = IIncomingMessageHandler.parseDateWarn(reader.getValue(6), "Invalid patient birth date", "QPD", 1, 6, strictDate, reportables);
 			String patientSex = reader.getValue(7);
 
 			if (StringUtils.isBlank(patientNameLast)) {
@@ -633,7 +599,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 				sb.append("QPD|");
 			}
 			if (profileId.equals(RSP_Z31_MULTIPLE_MATCH)) {
-				SimpleDateFormat sdf = getV2SDF();
+				SimpleDateFormat sdf = IIncomingMessageHandler.generateV2SDF();
 				int count = 0;
 				for (PatientReported pr : patientReportedPossibleList) {
 					count++;
@@ -645,7 +611,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 				 * CONFUSING naming p but no better solution right now but to deal with single match
 				 */
 				PatientMaster patient = patientMaster;
-				SimpleDateFormat sdf = getV2SDF();
+				SimpleDateFormat sdf = IIncomingMessageHandler.generateV2SDF();
 				hl7MessageWriter.printQueryPID(patientMaster, processingFlavorSet, sb, patient, sdf, 1);
 				if (profileId.equals(RSP_Z32_MATCH)) {
 					hl7MessageWriter.printQueryNK1(patientMaster, sb, codeMap);
@@ -1272,7 +1238,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 		patientReported.setEthnicity(reader.getValue(22));
 		patientReported.setBirthFlag(reader.getValue(24));
 		patientReported.setBirthOrder(reader.getValue(25));
-		patientReported.setDeathDate(parseDateWarn(reader.getValue(29), "Invalid patient death date", "PID", 1, 29, strictDate, iisReportableList));
+		patientReported.setDeathDate(IIncomingMessageHandler.parseDateWarn(reader.getValue(29), "Invalid patient death date", "PID", 1, 29, strictDate, iisReportableList));
 		patientReported.setDeathFlag(reader.getValue(30));
 		patientReported.setEmail(reader.getValueBySearchingRepeats(13, 4, "NET", 2));
 		patientReported.addPhone(patientPhone);
@@ -1280,10 +1246,10 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 		if (reader.advanceToSegment("PD1")) {
 			patientReported.setPublicityIndicator(reader.getValue(11));
 			patientReported.setProtectionIndicator(reader.getValue(12));
-			patientReported.setProtectionIndicatorDate(parseDateWarn(reader.getValue(13), "Invalid protection indicator date", "PD1", 1, 13, strictDate, iisReportableList));
+			patientReported.setProtectionIndicatorDate(IIncomingMessageHandler.parseDateWarn(reader.getValue(13), "Invalid protection indicator date", "PD1", 1, 13, strictDate, iisReportableList));
 			patientReported.setRegistryStatusIndicator(reader.getValue(16));
-			patientReported.setRegistryStatusIndicatorDate(parseDateWarn(reader.getValue(17), "Invalid registry status indicator date", "PD1", 1, 17, strictDate, iisReportableList));
-			patientReported.setPublicityIndicatorDate(parseDateWarn(reader.getValue(18), "Invalid publicity indicator date", "PD1", 1, 18, strictDate, iisReportableList));
+			patientReported.setRegistryStatusIndicatorDate(IIncomingMessageHandler.parseDateWarn(reader.getValue(17), "Invalid registry status indicator date", "PD1", 1, 17, strictDate, iisReportableList));
+			patientReported.setPublicityIndicatorDate(IIncomingMessageHandler.parseDateWarn(reader.getValue(18), "Invalid publicity indicator date", "PD1", 1, 18, strictDate, iisReportableList));
 		}
 		reader.resetPostion();
 		{
@@ -1527,7 +1493,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 			vaccinationReported.setAdministeredAmount(reader.getValue(6));
 			vaccinationReported.setInformationSource(reader.getValue(9));
 			vaccinationReported.setLotnumber(reader.getValue(15));
-			vaccinationReported.setExpirationDate(parseDateWarn(reader.getValue(16), "Invalid vaccination expiration date", "RXA", rxaCount, 16, strictDate, iisReportableList));
+			vaccinationReported.setExpirationDate(IIncomingMessageHandler.parseDateWarn(reader.getValue(16), "Invalid vaccination expiration date", "RXA", rxaCount, 16, strictDate, iisReportableList));
 			vaccinationReported.setVaccineMvxCode(reader.getValue(17));
 			vaccinationReported.setRefusalReasonCode(reader.getValue(18));
 			vaccinationReported.setCompletionStatus(reader.getValue(20));
@@ -1623,7 +1589,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 		observationReported.setUnitsLabel(reader.getValue(6, 2));
 		observationReported.setUnitsTable(reader.getValue(6, 3));
 		observationReported.setResultStatus(reader.getValue(11));
-		observationReported.setObservationDate(parseDateWarn(reader.getValue(14), "Unparsable date/time of observation", "OBX", obxCount, 14, strictDate, iisReportableList));
+		observationReported.setObservationDate(IIncomingMessageHandler.parseDateWarn(reader.getValue(14), "Unparsable date/time of observation", "OBX", obxCount, 14, strictDate, iisReportableList));
 		observationReported.setMethodCode(reader.getValue(17, 1));
 		observationReported.setMethodLabel(reader.getValue(17, 2));
 		observationReported.setMethodTable(reader.getValue(17, 3));

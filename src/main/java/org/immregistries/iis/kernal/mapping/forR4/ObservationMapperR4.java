@@ -6,7 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.hl7.fhir.r4.model.*;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
-import org.immregistries.iis.kernal.logic.IncomingMessageHandler;
+import org.immregistries.iis.kernal.logic.IIncomingMessageHandler;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
 import org.immregistries.iis.kernal.mapping.interfaces.ImmunizationMapper;
 import org.immregistries.iis.kernal.mapping.interfaces.ObservationMapper;
@@ -307,7 +307,7 @@ public class ObservationMapperR4 implements ObservationMapper<Observation> {
 			observationReported.setUnitsTable(quantity.getSystem());
 			observationReported.setUnitsLabel(quantity.getUnit());
 		} else if (o.hasValueDateTimeType()) {
-			SimpleDateFormat simpleDateFormat = IncomingMessageHandler.getV2SDF();
+			SimpleDateFormat simpleDateFormat = IIncomingMessageHandler.generateV2SDF();
 			observationReported.setValueCode(simpleDateFormat.format(o.getValueDateTimeType().getValue()));
 		}
 		/*
@@ -382,7 +382,7 @@ public class ObservationMapperR4 implements ObservationMapper<Observation> {
 			component.setUnitsTable(quantity.getSystem());
 			component.setUnitsLabel(quantity.getUnit());
 		} else if (observationComponent.hasValueDateTimeType()) {
-			SimpleDateFormat simpleDateFormat = IncomingMessageHandler.getV2SDF();
+			SimpleDateFormat simpleDateFormat = IIncomingMessageHandler.generateV2SDF();
 			component.setValueCode(simpleDateFormat.format(observationComponent.getValueDateTimeType().getValue()));
 		}
 		/*
@@ -409,7 +409,7 @@ public class ObservationMapperR4 implements ObservationMapper<Observation> {
 	}
 
 	private static @NotNull DateTimeType valueDateTimeType(ObservationMaster om) {
-		SimpleDateFormat simpleDateFormat = IncomingMessageHandler.getV2SDF();
+		SimpleDateFormat simpleDateFormat = IIncomingMessageHandler.generateV2SDF();
 		DateTimeType dateTimeType = new DateTimeType();
 		try {
 			dateTimeType.setValue(simpleDateFormat.parse(om.getValueCode()));
@@ -419,7 +419,7 @@ public class ObservationMapperR4 implements ObservationMapper<Observation> {
 	}
 
 	private static @NotNull Period valuePeriod(ObservationMaster om) {
-		SimpleDateFormat simpleDateFormat = IncomingMessageHandler.getV2SDF();
+		SimpleDateFormat simpleDateFormat = IIncomingMessageHandler.generateV2SDF();
 		Period period = new Period();
 		try {
 			Date start = simpleDateFormat.parse(om.getValueCode());
