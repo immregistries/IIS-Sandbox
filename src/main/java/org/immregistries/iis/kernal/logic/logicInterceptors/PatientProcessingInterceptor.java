@@ -64,6 +64,10 @@ public class PatientProcessingInterceptor extends AbstractLogicInterceptor {
 
 	public PatientReported processAndValidatePatient(PatientReported patientReported, List<IisReportable> iisReportableList, Set<ProcessingFlavor> processingFlavorSet) throws ProcessingException {
 		testMapping(patientMapper, patientReported);
+
+		if (patientReported.getBirthDate() != null && patientReported.getBirthDate().after(new Date())) {
+			throw new ProcessingException("Patient is indicated as being born in the future, unable to record patients who are not yet born", "PID", 1, 7);
+		}
 		ModelName legalName = null;
 		List<ModelName> modelNames = new ArrayList<>(patientReported.getPatientNames().size());
 		for (int i = 0; i < patientReported.getPatientNames().size(); i++) {

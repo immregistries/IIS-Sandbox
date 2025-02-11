@@ -1029,85 +1029,81 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 				patientReported.setManagingOrganizationId("Organization/" + managingOrganizationId.getIdPart());
 			}
 		}
-		if (!reader.advanceToSegment("PID")) {
+		if (reader.advanceToSegment("PID")) {
+			for (int i = 1; i <= reader.getRepeatCount(3); i++) {
+				BusinessIdentifier businessIdentifier = new BusinessIdentifier();
+				businessIdentifier.setValue(reader.getValueRepeat(3, 1, i));
+				businessIdentifier.setSystem(reader.getValueRepeat(3, 4, i));
+				businessIdentifier.setType(reader.getValueRepeat(3, 5, i));
+				patientReported.addBusinessIdentifier(businessIdentifier);
+			}
+			if (patientReported.getMainBusinessIdentifier() == null || StringUtils.isBlank(patientReported.getMainBusinessIdentifier().getValue())) {
+				throw new ProcessingException("MRN was not found, required for accepting vaccination report", "PID", 1, 3);
+			}
+
+			List<ModelName> names = new ArrayList<>(reader.getRepeatCount(5));
+			for (int i = 1; i <= reader.getRepeatCount(5); i++) {
+				String patientNameLast = reader.getValueRepeat(5, 1, i);
+				String patientNameFirst = reader.getValueRepeat(5, 2, i);
+				String patientNameMiddle = reader.getValueRepeat(5, 3, i);
+				String nameType = reader.getValueRepeat(5, 7, i);
+				ModelName modelName = new ModelName(patientNameLast, patientNameFirst, patientNameMiddle, nameType);
+				names.add(modelName);
+			}
+			patientReported.setPatientNames(names);
+
+			Date patientBirthDate;
+			patientBirthDate = IIncomingMessageHandler.parseDateError(reader.getValue(7), "Bad format for date of birth", "PID", 1, 7, strictDate);
+			patientReported.setMotherMaidenName(reader.getValue(6));
+			patientReported.setBirthDate(patientBirthDate);
+			patientReported.setSex(reader.getValue(8));
+
+			for (int i = 1; i <= reader.getRepeatCount(10); i++) {
+				patientReported.addRace(reader.getValueRepeat(10, 1, i));
+			}
+
+			String zip = reader.getValue(11, 5);
+			if (zip.length() > 5) {
+				zip = zip.substring(0, 5);
+			}
+			String addressFragPrep = reader.getValue(11, 1);
+			String addressFrag = "";
+			{
+				int spaceIndex = addressFragPrep.indexOf(" ");
+				if (spaceIndex > 0) {
+					addressFragPrep = addressFragPrep.substring(0, spaceIndex);
+				}
+				addressFrag = zip + ":" + addressFragPrep;
+			}
+			ModelAddress modelAddress = new ModelAddress();
+			modelAddress.setAddressLine1(reader.getValue(11, 1));
+			modelAddress.setAddressLine2(reader.getValue(11, 2));
+			modelAddress.setAddressCity(reader.getValue(11, 3));
+			modelAddress.setAddressState(reader.getValue(11, 4));
+			modelAddress.setAddressZip(reader.getValue(11, 5));
+			modelAddress.setAddressCountry(reader.getValue(11, 6));
+			modelAddress.setAddressCountyParish(reader.getValue(11, 9));
+			patientReported.addAddress(modelAddress);
+
+
+			ModelPhone patientPhone = new ModelPhone();
+			patientPhone.setNumber(reader.getValue(13, 6) + reader.getValue(13, 7));
+			patientPhone.setUse(reader.getValue(13, 2));
+			// Logic exported to Patient Processing interceptor
+//		if (!"PRN".equals(patientPhone.getUse())) {
+//			patientPhone.setUse("");
+//		}
+			patientReported.setEthnicity(reader.getValue(22));
+			patientReported.setBirthFlag(reader.getValue(24));
+			patientReported.setBirthOrder(reader.getValue(25));
+			patientReported.setDeathDate(IIncomingMessageHandler.parseDateWarn(reader.getValue(29), "Invalid patient death date", "PID", 1, 29, strictDate, iisReportableList));
+			patientReported.setDeathFlag(reader.getValue(30));
+			patientReported.setEmail(reader.getValueBySearchingRepeats(13, 4, "NET", 2));
+			patientReported.addPhone(patientPhone);
+		} else {
 			throw new ProcessingException("No PID segment found, required for accepting vaccination report", "", 0, 0);
 		}
-
-		for (int i = 1; i <= reader.getRepeatCount(3); i++) {
-			BusinessIdentifier businessIdentifier = new BusinessIdentifier();
-			businessIdentifier.setValue(reader.getValueRepeat(3, 1, i));
-			businessIdentifier.setSystem(reader.getValueRepeat(3, 4, i));
-			businessIdentifier.setType(reader.getValueRepeat(3, 5, i));
-			patientReported.addBusinessIdentifier(businessIdentifier);
-		}
-		if (patientReported.getMainBusinessIdentifier() == null || StringUtils.isBlank(patientReported.getMainBusinessIdentifier().getValue())) {
-			throw new ProcessingException("MRN was not found, required for accepting vaccination report", "PID", 1, 3);
-		}
-
-		List<ModelName> names = new ArrayList<>(reader.getRepeatCount(5));
-		for (int i = 1; i <= reader.getRepeatCount(5); i++) {
-			String patientNameLast = reader.getValueRepeat(5, 1, i);
-			String patientNameFirst = reader.getValueRepeat(5, 2, i);
-			String patientNameMiddle = reader.getValueRepeat(5, 3, i);
-			String nameType = reader.getValueRepeat(5, 7, i);
-			ModelName modelName = new ModelName(patientNameLast, patientNameFirst, patientNameMiddle, nameType);
-			names.add(modelName);
-		}
-
-		ModelPhone patientPhone = new ModelPhone();
-		patientPhone.setNumber(reader.getValue(13, 6) + reader.getValue(13, 7));
-		patientPhone.setUse(reader.getValue(13, 2));
-		// Logic exported to Patient Processing interceptor
-		if (!"PRN".equals(patientPhone.getUse())) {
-			patientPhone.setUse("");
-		}
-
-		String zip = reader.getValue(11, 5);
-		if (zip.length() > 5) {
-			zip = zip.substring(0, 5);
-		}
-		String addressFragPrep = reader.getValue(11, 1);
-		String addressFrag = "";
-		{
-			int spaceIndex = addressFragPrep.indexOf(" ");
-			if (spaceIndex > 0) {
-				addressFragPrep = addressFragPrep.substring(0, spaceIndex);
-			}
-			addressFrag = zip + ":" + addressFragPrep;
-		}
-		ModelAddress modelAddress = new ModelAddress();
-		modelAddress.setAddressLine1(reader.getValue(11, 1));
-		modelAddress.setAddressLine2(reader.getValue(11, 2));
-		modelAddress.setAddressCity(reader.getValue(11, 3));
-		modelAddress.setAddressState(reader.getValue(11, 4));
-		modelAddress.setAddressZip(reader.getValue(11, 5));
-		modelAddress.setAddressCountry(reader.getValue(11, 6));
-		modelAddress.setAddressCountyParish(reader.getValue(11, 9));
-
-		Date patientBirthDate;
-		patientBirthDate = IIncomingMessageHandler.parseDateError(reader.getValue(7), "Bad format for date of birth", "PID", 1, 7, strictDate);
-		if (patientBirthDate.after(new Date())) {
-			throw new ProcessingException("Patient is indicated as being born in the future, unable to record patients who are not yet born", "PID", 1, 7);
-		}
-
-
-
-		patientReported.setPatientNames(names);
-		patientReported.setMotherMaidenName(reader.getValue(6));
-		patientReported.setBirthDate(patientBirthDate);
-		patientReported.setSex(reader.getValue(8));
-		for (int i = 1; i <= reader.getRepeatCount(10); i++) {
-			patientReported.addRace(reader.getValueRepeat(10, 1, i));
-		}
-		patientReported.addAddress(modelAddress);
-		patientReported.setEthnicity(reader.getValue(22));
-		patientReported.setBirthFlag(reader.getValue(24));
-		patientReported.setBirthOrder(reader.getValue(25));
-		patientReported.setDeathDate(IIncomingMessageHandler.parseDateWarn(reader.getValue(29), "Invalid patient death date", "PID", 1, 29, strictDate, iisReportableList));
-		patientReported.setDeathFlag(reader.getValue(30));
-		patientReported.setEmail(reader.getValueBySearchingRepeats(13, 4, "NET", 2));
-		patientReported.addPhone(patientPhone);
-
+		
 		if (reader.advanceToSegment("PD1")) {
 			patientReported.setPublicityIndicator(reader.getValue(11));
 			patientReported.setProtectionIndicator(reader.getValue(12));
