@@ -150,4 +150,8 @@ public class MappingHelper {
 		return extension.castToString(extension.getValue()).getValue();
 	}
 
+	public static String extensionGetString(org.hl7.fhir.r5.model.Extension extension) {
+		return extension.getValueStringType().getValue();
+	}
+
 }
