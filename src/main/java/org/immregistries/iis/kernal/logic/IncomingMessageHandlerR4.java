@@ -11,11 +11,12 @@ import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.Immunization;
 import org.hl7.fhir.r4.model.Organization;
-import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
 import org.immregistries.iis.kernal.logic.ack.IisReportable;
-import org.immregistries.iis.kernal.model.*;
-import org.immregistries.mqe.validator.MqeMessageServiceResponse;
+import org.immregistries.iis.kernal.model.PatientMaster;
+import org.immregistries.iis.kernal.model.ProcessingFlavor;
+import org.immregistries.iis.kernal.model.Tenant;
+import org.immregistries.iis.kernal.model.VaccinationMaster;
 import org.immregistries.smm.tester.manager.HL7Reader;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Service;
@@ -61,12 +62,16 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler {
 			if (sendingOrganization == null) {
 				sendingOrganization = processManagingOrganization(reader);
 			}
+			IIdType organizationIdType = null;
+			if (sendingOrganization != null) {
+				organizationIdType = sendingOrganization.getIdElement();
+			}
 			switch (messageType) {
 				case "VXU":
-					responseMessage = processVXU(tenant, reader, message, sendingOrganization);
+					responseMessage = processVXU(tenant, reader, message, organizationIdType);
 					break;
 				case "ORU":
-					responseMessage = processORU(tenant, reader, message, sendingOrganization);
+					responseMessage = processORU(tenant, reader, message, organizationIdType);
 					break;
 				case "QBP":
 					responseMessage = processQBP(tenant, reader, message);
@@ -88,112 +93,6 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler {
 		return responseMessage;
 	}
 
-	@SuppressWarnings("unchecked")
-	public String processVXU(Tenant tenant, HL7Reader reader, String message, Organization managingOrganization) throws Exception {
-		List<IisReportable> iisReportableList = new ArrayList<>();
-		Set<ProcessingFlavor> processingFlavorSet = tenant.getProcessingFlavorSet();
-		MqeMessageServiceResponse mqeMessageServiceResponse = mqeMessageService.processMessage(message);
-		List<IisReportable> nistReportables = nistValidation(message, "VXU");
-
-		try {
-			CodeMap codeMap = CodeMapManager.getCodeMap();
-			boolean strictDate = !processingFlavorSet.contains(ProcessingFlavor.CANTALOUPE);
-			PatientReported patientReported = processPatient(tenant, reader, iisReportableList, processingFlavorSet, codeMap, strictDate, managingOrganization.getIdElement());
-
-			List<VaccinationReported> vaccinationReportedList = processVaccinations(tenant, reader, iisReportableList, patientReported, strictDate, processingFlavorSet);
-			String ack = buildAckMqe(reader, mqeMessageServiceResponse, iisReportableList, processingFlavorSet, nistReportables);
-			recordMessageReceived(message, patientReported, ack, "Update", "Ack", tenant);
-			return ack;
-		} catch (ProcessingException e) {
-			if (!iisReportableList.contains(e)) {
-				iisReportableList.add(IisReportable.fromProcessingException(e));
-			}
-			String ack = buildAckMqe(reader, mqeMessageServiceResponse, iisReportableList, processingFlavorSet, nistReportables);
-			recordMessageReceived(message, null, ack, "Update", "Exception", tenant);
-			return ack;
-		}
-
-	}
-
-	@SuppressWarnings("unchecked")
-	public PatientReported processPatient(Tenant tenant, HL7Reader reader, List<IisReportable> iisReportableList, Set<ProcessingFlavor> processingFlavorSet, CodeMap codeMap, boolean strictDate, IIdType managingOrganizationId) throws ProcessingException {
-		String patientReportedExternalLink = "";
-		String patientReportedAuthority = "";
-		String patientReportedType = "MR";
-		if (reader.advanceToSegment("PID")) {
-			patientReportedExternalLink = reader.getValueBySearchingRepeats(3, 1, patientReportedType, 5);
-			patientReportedAuthority = reader.getValueBySearchingRepeats(3, 4, patientReportedType, 5);
-			if (StringUtils.isBlank(patientReportedExternalLink)) {
-				patientReportedAuthority = "";
-				patientReportedType = "PT";
-				patientReportedExternalLink = reader.getValueBySearchingRepeats(3, 1, patientReportedType, 5);
-				patientReportedAuthority = reader.getValueBySearchingRepeats(3, 4, patientReportedType, 5);
-				if (StringUtils.isBlank(patientReportedExternalLink)) {
-					patientReportedAuthority = "";
-					patientReportedType = "PI";
-					patientReportedExternalLink = reader.getValueBySearchingRepeats(3, 1, patientReportedType, 5);
-					patientReportedAuthority = reader.getValueBySearchingRepeats(3, 4, patientReportedType, 5);
-					if (StringUtils.isBlank(patientReportedExternalLink)) {
-						throw new ProcessingException("MRN was not found, required for accepting vaccination report", "PID", 1, 3);
-					}
-				}
-			}
-		} else {
-			throw new ProcessingException("No PID segment found, required for accepting vaccination report", "", 0, 0);
-		}
-//		PatientIdentifier patientIdentifier = new PatientIdentifier();
-//		patientIdentifier.setSystem(patientReportedAuthority);
-//		patientIdentifier.setValue(patientReportedExternalLink);
-//		patientIdentifier.setType("MR");
-		PatientReported patientReported = null; // TODO figure out process before
-//			fhirRequester.searchPatientReported(new SearchParameterMap("identifier", new TokenParam().setValue(patientReportedExternalLink)));
-
-		if (patientReported == null) {
-			patientReported = new PatientReported();
-			patientReported.setTenant(tenant);
-//			patientReported.setExternalLink(patientReportedExternalLink); now dealt with in agnostic method
-			patientReported.setReportedDate(new Date());
-			if (managingOrganizationId != null) {
-				patientReported.setManagingOrganizationId("Organization/" + managingOrganizationId.getIdPart());
-			}
-		}
-
-		return processPatientFhirAgnostic(reader, iisReportableList, processingFlavorSet, strictDate, patientReported);
-	}
-
-	public String processORU(Tenant tenant, HL7Reader reader, String message, Organization managingOrganization) {
-		List<IisReportable> iisReportableList = new ArrayList<>();
-		Set<ProcessingFlavor> processingFlavorSet = tenant.getProcessingFlavorSet();
-		try {
-			CodeMap codeMap = CodeMapManager.getCodeMap();
-
-			boolean strictDate = !processingFlavorSet.contains(ProcessingFlavor.CANTALOUPE);
-			PatientReported patientReported = processPatient(tenant, reader, iisReportableList, processingFlavorSet, codeMap, strictDate, managingOrganization);
-
-			int orcCount = 0;
-			int obxCount = 0;
-			while (reader.advanceToSegment("ORC")) {
-				orcCount++;
-				if (reader.advanceToSegment("OBR", "ORC")) {
-					obxCount = readAndCreateObservations(reader, iisReportableList, processingFlavorSet, patientReported, strictDate, obxCount, null, null);
-				} else {
-					throw new ProcessingException("OBR segment was not found after ORC segment", "ORC", orcCount, 0);
-				}
-			}
-			String ack = buildAck(reader, iisReportableList, processingFlavorSet);
-			recordMessageReceived(message, patientReported, ack, "Update", "Ack", tenant);
-			return ack;
-		} catch (ProcessingException e) {
-			if (!iisReportableList.contains(e)) {
-				iisReportableList.add(IisReportable.fromProcessingException(e));
-			}
-			String ack = buildAck(reader, iisReportableList, processingFlavorSet);
-			recordMessageReceived(message, null, ack, "Update", "Exception", tenant);
-			return ack;
-		}
-	}
-
-
 	public List<VaccinationMaster> getVaccinationMasterList(PatientMaster patient) {
 		IGenericClient fhirClient = repositoryClientFactory.getFhirClient();
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
@@ -214,7 +113,7 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler {
 						}
 					}
 				}
-			} catch (ResourceNotFoundException e) {
+			} catch (ResourceNotFoundException ignored) {
 			}
 
 			List<String> keyList = new ArrayList<>(map.keySet());

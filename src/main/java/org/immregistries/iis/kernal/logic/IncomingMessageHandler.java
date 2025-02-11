@@ -17,6 +17,7 @@ import hl7.v2.validation.vs.ValueSetLibraryImpl;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hl7.fhir.instance.model.api.IIdType;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Observation;
 import org.hl7.fhir.r5.model.Practitioner;
@@ -1060,9 +1061,111 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 				reportable.getHl7LocationList().add(errorLocation);
 			}
 		}
-
 	}
 
+	@SuppressWarnings("unchecked")
+	public String processVXU(Tenant tenant, HL7Reader reader, String message, IIdType managingOrganizationId) throws Exception {
+		List<IisReportable> iisReportableList = new ArrayList<>();
+		Set<ProcessingFlavor> processingFlavorSet = tenant.getProcessingFlavorSet();
+		MqeMessageServiceResponse mqeMessageServiceResponse = mqeMessageService.processMessage(message);
+		List<IisReportable> nistReportables = nistValidation(message, "VXU");
+
+		try {
+			CodeMap codeMap = CodeMapManager.getCodeMap();
+			boolean strictDate = !processingFlavorSet.contains(ProcessingFlavor.CANTALOUPE);
+			PatientReported patientReported = processPatient(tenant, reader, iisReportableList, processingFlavorSet, codeMap, strictDate, managingOrganizationId);
+
+			List<VaccinationReported> vaccinationReportedList = processVaccinations(tenant, reader, iisReportableList, patientReported, strictDate, processingFlavorSet);
+			String ack = buildAckMqe(reader, mqeMessageServiceResponse, iisReportableList, processingFlavorSet, nistReportables);
+			recordMessageReceived(message, patientReported, ack, "Update", "Ack", tenant);
+			return ack;
+		} catch (ProcessingException e) {
+			if (!iisReportableList.contains(e)) {
+				iisReportableList.add(IisReportable.fromProcessingException(e));
+			}
+			String ack = buildAckMqe(reader, mqeMessageServiceResponse, iisReportableList, processingFlavorSet, nistReportables);
+			recordMessageReceived(message, null, ack, "Update", "Exception", tenant);
+			return ack;
+		}
+	}
+
+	public String processORU(Tenant tenant, HL7Reader reader, String message, IIdType managingOrganizationId) {
+		List<IisReportable> iisReportableList = new ArrayList<>();
+		Set<ProcessingFlavor> processingFlavorSet = tenant.getProcessingFlavorSet();
+		try {
+			CodeMap codeMap = CodeMapManager.getCodeMap();
+
+			boolean strictDate = !processingFlavorSet.contains(ProcessingFlavor.CANTALOUPE);
+			PatientReported patientReported = processPatient(tenant, reader, iisReportableList, processingFlavorSet, codeMap, strictDate, managingOrganizationId);
+
+			int orcCount = 0;
+			int obxCount = 0;
+			while (reader.advanceToSegment("ORC")) {
+				orcCount++;
+				if (reader.advanceToSegment("OBR", "ORC")) {
+					obxCount = readAndCreateObservations(reader, iisReportableList, processingFlavorSet, patientReported, strictDate, obxCount, null, null);
+				} else {
+					throw new ProcessingException("OBR segment was not found after ORC segment", "ORC", orcCount, 0);
+				}
+			}
+			String ack = buildAck(reader, iisReportableList, processingFlavorSet);
+			recordMessageReceived(message, patientReported, ack, "Update", "Ack", tenant);
+			return ack;
+		} catch (ProcessingException e) {
+			if (!iisReportableList.contains(e)) {
+				iisReportableList.add(IisReportable.fromProcessingException(e));
+			}
+			String ack = buildAck(reader, iisReportableList, processingFlavorSet);
+			recordMessageReceived(message, null, ack, "Update", "Exception", tenant);
+			return ack;
+		}
+	}
+
+
+	public PatientReported processPatient(Tenant tenant, HL7Reader reader, List<IisReportable> iisReportableList, Set<ProcessingFlavor> processingFlavorSet, CodeMap codeMap, boolean strictDate, IIdType managingOrganizationId) throws ProcessingException {
+		String patientReportedExternalLink = "";
+		String patientReportedAuthority = "";
+		String patientReportedType = "MR";
+		if (reader.advanceToSegment("PID")) {
+			patientReportedExternalLink = reader.getValueBySearchingRepeats(3, 1, patientReportedType, 5);
+			patientReportedAuthority = reader.getValueBySearchingRepeats(3, 4, patientReportedType, 5);
+			if (StringUtils.isBlank(patientReportedExternalLink)) {
+				patientReportedAuthority = "";
+				patientReportedType = "PT";
+				patientReportedExternalLink = reader.getValueBySearchingRepeats(3, 1, patientReportedType, 5);
+				patientReportedAuthority = reader.getValueBySearchingRepeats(3, 4, patientReportedType, 5);
+				if (StringUtils.isBlank(patientReportedExternalLink)) {
+					patientReportedAuthority = "";
+					patientReportedType = "PI";
+					patientReportedExternalLink = reader.getValueBySearchingRepeats(3, 1, patientReportedType, 5);
+					patientReportedAuthority = reader.getValueBySearchingRepeats(3, 4, patientReportedType, 5);
+					if (StringUtils.isBlank(patientReportedExternalLink)) {
+						throw new ProcessingException("MRN was not found, required for accepting vaccination report", "PID", 1, 3);
+					}
+				}
+			}
+		} else {
+			throw new ProcessingException("No PID segment found, required for accepting vaccination report", "", 0, 0);
+		}
+//		PatientIdentifier patientIdentifier = new PatientIdentifier();
+//		patientIdentifier.setSystem(patientReportedAuthority);
+//		patientIdentifier.setValue(patientReportedExternalLink);
+//		patientIdentifier.setType("MR");
+		PatientReported patientReported = null; // TODO figure out process before
+//			fhirRequester.searchPatientReported(new SearchParameterMap("identifier", new TokenParam().setValue(patientReportedExternalLink)));
+
+		if (patientReported == null) {
+			patientReported = new PatientReported();
+			patientReported.setTenant(tenant);
+//			patientReported.setExternalLink(patientReportedExternalLink); now dealt with in agnostic method
+			patientReported.setReportedDate(new Date());
+			if (managingOrganizationId != null) {
+				patientReported.setManagingOrganizationId("Organization/" + managingOrganizationId.getIdPart());
+			}
+		}
+
+		return processPatientFhirAgnostic(reader, iisReportableList, processingFlavorSet, strictDate, patientReported);
+	}
 
 	public PatientReported processPatientFhirAgnostic(HL7Reader reader, List<IisReportable> iisReportableList, Set<ProcessingFlavor> processingFlavorSet, boolean strictDate, PatientReported patientReported) throws ProcessingException {
 
