@@ -457,11 +457,11 @@ public class VaccinationMaster extends AbstractMappedObject implements Serializa
 			", testEvent=" + testEvent +
 			", orgLocationId='" + orgLocationId + '\'' +
 			", orgLocation=" + orgLocation +
-			", enteredBy=" + enteredBy +
+//			", enteredBy=" + enteredBy +
 			", enteredById='" + enteredById + '\'' +
-			", orderingProvider=" + orderingProvider +
+//			", orderingProvider=" + orderingProvider +
 			", orderingProviderId='" + orderingProviderId + '\'' +
-			", administeringProvider=" + administeringProvider +
+//			", administeringProvider=" + administeringProvider +
 			", administeringProviderId='" + administeringProviderId + '\'' +
 			'}';
 	}

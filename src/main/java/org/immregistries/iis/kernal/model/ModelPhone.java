@@ -1,6 +1,7 @@
 package org.immregistries.iis.kernal.model;
 
 import org.apache.commons.lang3.StringUtils;
+import org.hl7.fhir.exceptions.FHIRException;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
 
 public class ModelPhone {
@@ -88,7 +89,10 @@ public class ModelPhone {
 					break;
 				}
 				default: {
-					contactPoint.setUse(org.hl7.fhir.r4.model.ContactPoint.ContactPointUse.fromCode(use));
+					try {
+						contactPoint.setUse(org.hl7.fhir.r4.model.ContactPoint.ContactPointUse.fromCode(use));
+					} catch (FHIRException ignored) {
+					}
 					break;
 				}
 			}
@@ -123,7 +127,10 @@ public class ModelPhone {
 					break;
 				}
 				default: {
-					contactPoint.setUse(org.hl7.fhir.r5.model.ContactPoint.ContactPointUse.fromCode(use));
+					try {
+						contactPoint.setUse(org.hl7.fhir.r5.model.ContactPoint.ContactPointUse.fromCode(use));
+					} catch (FHIRException ignored) {
+					}
 					break;
 				}
 			}

@@ -96,7 +96,9 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 		/*
 		 * Managing organization
 		 */
-		localPatient.setManagingOrganizationId(StringUtils.defaultString(patient.getManagingOrganization().getReference()));
+		if (patient.hasManagingOrganization()) {
+			localPatient.setManagingOrganizationId(StringUtils.defaultString(patient.getManagingOrganization().getReference()));
+		}
 		/*
 		 * Names
 		 */
@@ -289,7 +291,9 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 		/*
 		 * Managing Organization
 		 */
-		p.setManagingOrganization(new Reference(pm.getManagingOrganizationId()));
+		if (StringUtils.isNotBlank(pm.getManagingOrganizationId())) {
+			p.setManagingOrganization(new Reference(pm.getManagingOrganizationId()));
+		}
 		/*
 		 * Birth Date
 		 */

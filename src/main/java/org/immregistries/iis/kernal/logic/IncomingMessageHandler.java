@@ -411,19 +411,6 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 
 			calendar.add(Calendar.SECOND, seconds);
 			cutoff = calendar.getTime();
-
-//			if (patientReported != null) { TODO map this to FHIR
-//				if (cutoff.before(patientReported.getReportedDate())) {
-//					patientReported = null;
-//				}
-//			}
-
-//			for (Iterator<PatientReported> it = patientReportedPossibleList.iterator(); it.hasNext(); ) {
-//				PatientReported pr = it.next();
-//				if (cutoff.before(pr.getReportedDate())) {
-//					it.remove();
-//				}
-//			}
 		}
 		List<PatientReported> multipleMatches = new ArrayList<>();
 		PatientMaster singleMatch = fhirRequester.matchPatient(multipleMatches, patientMasterForMatchQuery, cutoff);
@@ -1018,14 +1005,14 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 
 
 	public PatientReported processPatient(Tenant tenant, HL7Reader reader, List<IisReportable> iisReportableList, Set<ProcessingFlavor> processingFlavorSet, CodeMap codeMap, boolean strictDate, IIdType managingOrganizationId) throws ProcessingException {
-		PatientReported patientReported = null; // TODO figure out process before
+		PatientReported patientReported = null; // TODO figure out process of merging information in golden record
 //			fhirRequester.searchPatientReported(new SearchParameterMap("identifier", new TokenParam().setValue(patientReportedExternalLink)));
 		if (patientReported == null) {
 			patientReported = new PatientReported();
 			patientReported.setTenant(tenant);
 //			patientReported.setExternalLink(patientReportedExternalLink); now dealt with in agnostic method
 			patientReported.setReportedDate(new Date());
-			if (managingOrganizationId != null) {
+			if (managingOrganizationId != null && managingOrganizationId.hasIdPart()) {
 				patientReported.setManagingOrganizationId("Organization/" + managingOrganizationId.getIdPart());
 			}
 		}
@@ -1103,7 +1090,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 		} else {
 			throw new ProcessingException("No PID segment found, required for accepting vaccination report", "", 0, 0);
 		}
-		
+
 		if (reader.advanceToSegment("PD1")) {
 			patientReported.setPublicityIndicator(reader.getValue(11));
 			patientReported.setProtectionIndicator(reader.getValue(12));
@@ -1143,8 +1130,6 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 			groupPatientIds.add(patientReported.getPatientId());
 		}
 		request.setAttribute("groupPatientIds", groupPatientIds);
-
-
 		return patientReported;
 	}
 
@@ -1160,7 +1145,6 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 			VaccinationReported vaccinationReported = null;
 			String vaccineCode = "";
 			Date administrationDate = null;
-			String vaccinationReportedExternalLinkPlacer = reader.getValue(2);
 			BusinessIdentifier placerIdentifier = null;
 			if (StringUtils.isNotBlank(reader.getValue(2))) {
 				placerIdentifier = new BusinessIdentifier();
@@ -1196,7 +1180,10 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 //				throw new ProcessingException("Vaccination is indicated as occurring in the future, unable to accept future vaccination events", "RXA", rxaCount, 3);
 //			}
 
-			vaccinationReported = fhirRequester.searchVaccinationReported(new SearchParameterMap("identifier", new TokenParam().setValue(fillerIdentifier.getValue()))); // TODO system and identifier type
+			TokenParam fillerIdentifierParam = fillerIdentifier.asTokenParam();
+			if (fillerIdentifierParam != null) {
+//				vaccinationReported = fhirRequester.searchVaccinationReported(new SearchParameterMap("identifier", fillerIdentifierParam));
+			}
 
 			if (vaccinationReported == null) {
 				vaccinationReported = new VaccinationReported();

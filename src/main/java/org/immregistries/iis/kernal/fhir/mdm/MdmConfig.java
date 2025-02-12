@@ -73,4 +73,13 @@ public class MdmConfig {
 		String json = IOUtils.toString(resource.getInputStream(), Charsets.UTF_8);
 		return new MdmSettings(theMdmRuleValidator).setEnabled(appProperties.getMdm_enabled()).setScriptText(json);
 	}
+
+//	@Primary
+//	@Bean
+//	MdmCustomResourceFilteringSvc mdmCustomResourceFilteringSvc() {
+//		MdmCustomResourceFilteringSvc mdmCustomResourceFilteringSvc = new MdmCustomResourceFilteringSvc();
+//		autowireCapableBeanFactory.autowireBean(mdmCustomResourceFilteringSvc);
+//		return mdmCustomResourceFilteringSvc;
+//	}
+
 }

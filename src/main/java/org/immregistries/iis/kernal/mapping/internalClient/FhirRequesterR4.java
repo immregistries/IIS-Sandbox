@@ -367,8 +367,8 @@ public class FhirRequesterR4 extends AbstractFhirRequester<Patient, Immunization
 			if (entry.getResource() instanceof Patient) {
 				Patient patient = (Patient) entry.getResource();
 				PatientMaster patientMaster = patientMapper.localObject(patient);
-				/**
-				 * Filter for flavours previously configured
+				/*
+				 * Filter for flavours previously configured SNAIL
 				 */
 				if (cutoff != null && cutoff.before(patientMaster.getReportedDate())) {
 					break;

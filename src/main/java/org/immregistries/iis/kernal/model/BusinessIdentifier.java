@@ -1,6 +1,9 @@
 package org.immregistries.iis.kernal.model;
 
 
+import ca.uhn.fhir.rest.param.TokenParam;
+import org.apache.commons.lang3.StringUtils;
+
 public class BusinessIdentifier {
 	public static final String IDENTIFIER_TYPE_SYSTEM = "http://terminology.hl7.org/CodeSystem/v2-0203";
 	public static final String MRN_TYPE_VALUE = "MR";
@@ -77,6 +80,25 @@ public class BusinessIdentifier {
 				new org.hl7.fhir.r4.model.Coding(IDENTIFIER_TYPE_SYSTEM, this.getType(), "")));
 		}
 		return identifier;
+	}
+
+	/**
+	 * Converts to token param with System and value
+	 *
+	 * @return tokenParam
+	 */
+	public TokenParam asTokenParam() {
+		TokenParam tokenParam = new TokenParam();
+		if (StringUtils.isNotBlank(value)) {
+			tokenParam.setValue(this.value);
+			if (StringUtils.isNotBlank(this.system)) {
+				tokenParam.setSystem(this.system);
+			}
+//		tokenParam.setModifier(TokenParamModifier.OF_TYPE).;
+
+			return tokenParam;
+		}
+		return null;
 	}
 
 	public static BusinessIdentifier fromR5(org.hl7.fhir.r5.model.Identifier identifier) {

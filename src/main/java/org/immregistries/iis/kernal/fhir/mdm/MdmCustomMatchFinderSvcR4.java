@@ -14,6 +14,7 @@ import ca.uhn.fhir.rest.api.server.IBundleProvider;
 import ca.uhn.fhir.rest.api.server.SystemRequestDetails;
 import ca.uhn.fhir.rest.param.ReferenceParam;
 import ca.uhn.fhir.rest.param.TokenParam;
+import ca.uhn.fhir.rest.param.TokenParamModifier;
 import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
 import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.hl7.fhir.r4.model.Coding;
@@ -130,7 +131,7 @@ public class MdmCustomMatchFinderSvcR4 extends MdmMatchFinderSvcImpl implements 
 		SearchParameterMap searchParameterMap = new SearchParameterMap()
 			.add("_tag", new TokenParam()
 				.setSystem(GOLDEN_SYSTEM_TAG)
-				.setValue(GOLDEN_RECORD));
+				.setValue(GOLDEN_RECORD).setModifier(TokenParamModifier.NOT));
 
 		/*
 		 * Looking for matching patient through reference and mdm operation,
