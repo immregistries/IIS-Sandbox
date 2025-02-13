@@ -3,8 +3,10 @@ package org.immregistries.iis.kernal.logic;
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.context.FhirVersionEnum;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
+import ca.uhn.fhir.rest.gclient.IQuery;
 import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
 import org.apache.commons.lang3.StringUtils;
+import org.hl7.fhir.instance.model.api.IBaseBundle;
 import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
@@ -674,14 +676,16 @@ public class IncomingQueryHandler {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
 		List<VaccinationMaster> vaccinationMasterList = new ArrayList<>();
 		Map<String, VaccinationMaster> map = new HashMap<>();
+		IQuery<IBaseBundle> query = fhirClient.search().forResource("Immunization")
+			.withTag(GOLDEN_SYSTEM_TAG, GOLDEN_RECORD)
+			.sort()
+			.ascending("identifier");
 		if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R5)) {
 			try {
-				org.hl7.fhir.r5.model.Bundle bundle = fhirClient.search().forResource(org.hl7.fhir.r5.model.Immunization.class)
+				org.hl7.fhir.r5.model.Bundle bundle = query
 					.where(org.hl7.fhir.r5.model.Immunization.PATIENT.hasId(patient.getPatientId()))
-					.withTag(GOLDEN_SYSTEM_TAG, GOLDEN_RECORD)
-					.sort()
-					.ascending(org.hl7.fhir.r5.model.Immunization.IDENTIFIER)
-					.returnBundle(org.hl7.fhir.r5.model.Bundle.class).execute();
+					.returnBundle(org.hl7.fhir.r5.model.Bundle.class)
+					.execute();
 				for (org.hl7.fhir.r5.model.Bundle.BundleEntryComponent entry : bundle.getEntry()) {
 					org.hl7.fhir.r5.model.Immunization immunization = (org.hl7.fhir.r5.model.Immunization) entry.getResource();
 					if (immunization.getOccurrenceDateTimeType() != null) {
@@ -697,10 +701,10 @@ public class IncomingQueryHandler {
 			}
 		} else if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R4)) {
 			try {
-				org.hl7.fhir.r4.model.Bundle bundle = fhirClient.search().forResource(org.hl7.fhir.r4.model.Immunization.class)
-					.where(org.hl7.fhir.r4.model.Immunization.PATIENT.hasId(patient.getPatientId())).withTag(GOLDEN_SYSTEM_TAG, GOLDEN_RECORD)
-					.sort().ascending(org.hl7.fhir.r4.model.Immunization.IDENTIFIER)
-					.returnBundle(org.hl7.fhir.r4.model.Bundle.class).execute();
+				org.hl7.fhir.r4.model.Bundle bundle = query
+					.where(org.hl7.fhir.r4.model.Immunization.PATIENT.hasId(patient.getPatientId()))
+					.returnBundle(org.hl7.fhir.r4.model.Bundle.class)
+					.execute();
 				for (org.hl7.fhir.r4.model.Bundle.BundleEntryComponent entry : bundle.getEntry()) {
 					org.hl7.fhir.r4.model.Immunization immunization = (org.hl7.fhir.r4.model.Immunization) entry.getResource();
 					if (immunization.getOccurrenceDateTimeType() != null) {
