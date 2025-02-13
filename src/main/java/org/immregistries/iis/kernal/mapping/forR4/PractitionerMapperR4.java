@@ -18,7 +18,7 @@ public class PractitionerMapperR4 implements PractitionerMapper<Practitioner> {
 
 	public ModelPerson localObject(Practitioner practitioner) {
 	  ModelPerson modelPerson = new ModelPerson();
-	  modelPerson.setPersonId(practitioner.getId());
+		modelPerson.setPersonId(practitioner.getIdElement().getIdPart());
 	  modelPerson.setPersonExternalLink(practitioner.getIdentifierFirstRep().getValue());
 		if (practitioner.getNameFirstRep().getGiven().size() > 0) {
 			modelPerson.setNameFirst(practitioner.getNameFirstRep().getGiven().get(0).getValue());
