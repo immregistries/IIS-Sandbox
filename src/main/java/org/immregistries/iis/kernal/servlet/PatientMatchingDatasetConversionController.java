@@ -274,6 +274,15 @@ public class PatientMatchingDatasetConversionController {
 	}
 
 
+	public Patient convertFromFhir(IBaseResource patient) {
+		if (patient instanceof org.hl7.fhir.r4.model.Patient) {
+			return convertFromR4((org.hl7.fhir.r4.model.Patient) patient);
+		} else if (patient instanceof org.hl7.fhir.r5.model.Patient) {
+			return convertFromR5((org.hl7.fhir.r5.model.Patient) patient);
+		} else {
+			return null; // TODO throw exception
+		}
+	}
 	public Patient convertFromR4(org.hl7.fhir.r4.model.Patient patient) {
 		Patient mismo = new Patient();
 		org.hl7.fhir.r4.model.Identifier identifier = MappingHelper.filterIdentifierR4(patient.getIdentifier(), "http://codi.mitre.org");

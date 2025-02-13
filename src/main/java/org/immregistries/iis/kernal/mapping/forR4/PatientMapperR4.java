@@ -94,7 +94,7 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 		/*
 		 * Managing organization
 		 */
-		if (patient.hasManagingOrganization()) {
+		if (patient.hasManagingOrganization() && patient.getManagingOrganization().hasReference()) {
 			localPatient.setManagingOrganizationId(StringUtils.defaultString(patient.getManagingOrganization().getReference()));
 		}
 		/*

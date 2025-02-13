@@ -12,6 +12,7 @@ import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.ResourceType;
 import org.immregistries.iis.kernal.model.ProcessingFlavor;
 import org.immregistries.iis.kernal.servlet.PatientMatchingDatasetConversionController;
+import org.immregistries.mismo.match.PatientMatchResult;
 import org.immregistries.mismo.match.PatientMatcher;
 import org.immregistries.mismo.match.model.Patient;
 import org.slf4j.Logger;
@@ -66,12 +67,13 @@ public abstract class AbstractMdmCustomMatchFinderSvc<Immunization extends IBase
 			 * Flavor check activating patient Matching with Mismo match
 			 */
 			Collection<IAnyResource> targetCandidates = myMdmCandidateSearchSvc.findCandidates(theResourceType, theResource, theRequestPartitionId);
-			Patient mismoPatient = patientMatchingDatasetConversionController.convertFromR4((org.hl7.fhir.r4.model.Patient) theResource);
+			Patient mismoPatient = patientMatchingDatasetConversionController.convertFromFhir(theResource);
 
 			List<MatchedTarget> matches = targetCandidates.stream()
 				.map((candidate) -> {
-					Patient mismoPatientCandidate = patientMatchingDatasetConversionController.convertFromR4((org.hl7.fhir.r4.model.Patient) candidate);
-					return new MatchedTarget(candidate, IMdmCustomMatchFinderSvc.mismoResultToMdmMatchOutcome(patientMismoMatcher.match(mismoPatient, mismoPatientCandidate)));
+					Patient mismoPatientCandidate = patientMatchingDatasetConversionController.convertFromFhir(candidate);
+					PatientMatchResult mismoMatchResult = patientMismoMatcher.match(mismoPatient, mismoPatientCandidate);
+					return new MatchedTarget(candidate, IMdmCustomMatchFinderSvc.mismoResultToMdmMatchOutcome(mismoMatchResult));
 				}).collect(Collectors.toList());
 
 			ourLog.info("Found {} matched targets for {} with mismo.", matches.size(), idOrType(theResource, theResourceType));
