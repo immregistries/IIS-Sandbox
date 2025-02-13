@@ -1,27 +1,21 @@
 package org.immregistries.iis.kernal.logic;
 
 import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
-import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.param.StringParam;
 import ca.uhn.fhir.rest.param.TokenParam;
-import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.instance.model.api.IIdType;
-import org.hl7.fhir.r4.model.Bundle;
-import org.hl7.fhir.r4.model.Immunization;
 import org.hl7.fhir.r4.model.Organization;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
-import org.immregistries.iis.kernal.model.*;
+import org.immregistries.iis.kernal.model.BusinessIdentifier;
+import org.immregistries.iis.kernal.model.ProcessingFlavor;
+import org.immregistries.iis.kernal.model.Tenant;
 import org.immregistries.smm.tester.manager.HL7Reader;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Service;
 
-import java.text.SimpleDateFormat;
-import java.util.*;
-
-import static org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester.GOLDEN_RECORD;
-import static org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester.GOLDEN_SYSTEM_TAG;
+import java.util.Set;
 
 @Service
 @Conditional(OnR4Condition.class)
@@ -55,39 +49,6 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler {
 			organizationIdType = responsibleOrganization.getIdElement();
 		}
 		return organizationIdType;
-	}
-
-	public List<VaccinationMaster> getVaccinationMasterList(PatientMaster patient) {
-		IGenericClient fhirClient = repositoryClientFactory.getFhirClient();
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-		List<VaccinationMaster> vaccinationMasterList;
-		{
-			vaccinationMasterList = new ArrayList<>();
-			Map<String, VaccinationMaster> map = new HashMap<>();
-			try {
-				Bundle bundle = fhirClient.search().forResource(Immunization.class).where(Immunization.PATIENT.hasId(patient.getPatientId())).withTag(GOLDEN_SYSTEM_TAG, GOLDEN_RECORD).sort().ascending(Immunization.IDENTIFIER).returnBundle(Bundle.class).execute();
-				for (Bundle.BundleEntryComponent entry : bundle.getEntry()) {
-					Immunization immunization = (Immunization) entry.getResource();
-					if (immunization.getOccurrenceDateTimeType() != null) {
-						String key = sdf.format(immunization.getOccurrenceDateTimeType().getValue());
-						if (immunization.getVaccineCode() != null && StringUtils.isNotBlank(immunization.getVaccineCode().getText())) {
-							key += key + immunization.getVaccineCode().getText();
-							VaccinationMaster vaccinationMaster = immunizationMapper.localObject(immunization);
-							map.put(key, vaccinationMaster);
-						}
-					}
-				}
-			} catch (ResourceNotFoundException ignored) {
-			}
-
-			List<String> keyList = new ArrayList<>(map.keySet());
-			Collections.sort(keyList);
-			for (String key : keyList) {
-				vaccinationMasterList.add(map.get(key));
-			}
-
-		}
-		return vaccinationMasterList;
 	}
 
 	private Organization processSendingOrganization(HL7Reader reader) {

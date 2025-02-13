@@ -3,11 +3,8 @@ package org.immregistries.iis.kernal.logic;
 import org.apache.commons.lang3.StringUtils;
 import org.immregistries.iis.kernal.logic.ack.IisReportable;
 import org.immregistries.iis.kernal.logic.ack.IisReportableSeverity;
-import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.model.ProcessingFlavor;
 import org.immregistries.iis.kernal.model.Tenant;
-import org.immregistries.iis.kernal.model.VaccinationMaster;
-import org.immregistries.mqe.hl7util.model.Hl7Location;
 import org.immregistries.smm.tester.manager.HL7Reader;
 
 import java.text.ParseException;
@@ -48,7 +45,7 @@ public interface IIncomingMessageHandler {
 
 	String process(String message, Tenant tenant, String facilityName);
 
-	List<VaccinationMaster> getVaccinationMasterList(PatientMaster patient);
+//	List<VaccinationMaster> getVaccinationMasterList(PatientMaster patient);
 
 	String buildAck(HL7Reader reader, List<IisReportable> iisReportableList, Set<ProcessingFlavor> processingFlavorSet);
 
@@ -99,21 +96,7 @@ public interface IIncomingMessageHandler {
 		return null;
 	}
 
-	static void addErrorLocation(IisReportable reportable, String path) {
-		if (path != null && path.length() >= 3) {
-			String segmentid = path.substring(0, 3);
-			if (path.length() > 3) {
-				path = path.substring(4);
-			} else {
-				path = "";
-			}
 
-			Hl7Location errorLocation = IisReportable.readErrorLocation(path, segmentid);
-			if (errorLocation != null) {
-				reportable.getHl7LocationList().add(errorLocation);
-			}
-		}
-	}
 
 	static void verifyNoErrors(List<IisReportable> iisReportableList) throws ProcessingException {
 		for (IisReportable reportable : iisReportableList) {
