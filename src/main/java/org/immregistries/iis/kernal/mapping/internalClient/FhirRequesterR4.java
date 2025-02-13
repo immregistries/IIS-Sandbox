@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -356,6 +357,7 @@ public class FhirRequesterR4 extends AbstractFhirRequester<Patient, Immunization
 			.named("match")
 			.withParameter(Parameters.class, "resource", patientMapper.fhirResource(patientMasterForMatchQuery))
 			.returnResourceType(Bundle.class).execute();
+		BigDecimal singleMatchScore = new BigDecimal(-1);
 		for (Bundle.BundleEntryComponent entry : matches.getEntry()) {
 			if (entry.getResource() instanceof Patient) {
 				Patient patient = (Patient) entry.getResource();
@@ -374,8 +376,18 @@ public class FhirRequesterR4 extends AbstractFhirRequester<Patient, Immunization
 //				if (entry.getResource().getMeta().getTag(GOLDEN_SYSTEM_TAG, GOLDEN_RECORD) == null) {
 //					break;
 //				}
-				if (entry.getSearch().hasScore() && entry.getSearch().getScoreElement().compareTo(new DecimalType(MINIMAL_MATCHING_SCORE)) > 0) {
-					singleMatch = patientMaster;
+//				if (entry.getSearch().hasScore() && entry.getSearch().getScoreElement().compareTo(new DecimalType(MINIMAL_MATCHING_SCORE))) {
+//					singleMatch = patientMaster;
+//				}
+				if (isGoldenRecord(entry.getResource())) {
+					if (singleMatch == null) {
+						if (!entry.getSearch().hasScore()) {
+							singleMatch = patientMaster;
+						} else if (entry.getSearch().getScoreElement().compareTo(new DecimalType(Math.max(MINIMAL_MATCHING_SCORE, singleMatchScore.toBigInteger().intValue()))) >= 0) {
+							singleMatch = patientMaster;
+							singleMatchScore = entry.getSearch().getScore();
+						}
+					}
 				}
 				multipleMatches.add(patientMapper.localObjectReported((Patient) entry.getResource()));
 			}

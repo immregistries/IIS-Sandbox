@@ -11,9 +11,9 @@ import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Immunization;
 import org.hl7.fhir.r4.model.Organization;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
-import org.immregistries.iis.kernal.logic.ack.IisReportable;
 import org.immregistries.iis.kernal.model.*;
 import org.immregistries.smm.tester.manager.HL7Reader;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Service;
 
@@ -27,66 +27,34 @@ import static org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRe
 @Conditional(OnR4Condition.class)
 public class IncomingMessageHandlerR4 extends IncomingMessageHandler {
 
-	@Override
-	public String process(String message, Tenant tenant, String sendingFacilityName) {
-		HL7Reader reader = new HL7Reader(message);
-		String messageType = reader.getValue(9);
-		String responseMessage;
-		partitionCreationInterceptor.getOrCreatePartitionId(tenant.getOrganizationName());
-		Set<ProcessingFlavor> processingFlavorSet = null;
-		try {
-			processingFlavorSet = tenant.getProcessingFlavorSet();
-			String facilityId = reader.getValue(4);
+	public @Nullable IIdType readResponsibleOrganizationIIdType(Tenant tenant, HL7Reader reader, String sendingFacilityName, Set<ProcessingFlavor> processingFlavorSet) throws ProcessingException {
+		String facilityId = reader.getValue(4);
 
-			if (processingFlavorSet.contains(ProcessingFlavor.SOURSOP)) {
-				if (!facilityId.equals(tenant.getOrganizationName())) {
-					throw new ProcessingException("Not allowed to submit for facility indicated in MSH-4", "MSH", 1, 4);
-				}
+		if (processingFlavorSet.contains(ProcessingFlavor.SOURSOP)) {
+			if (!facilityId.equals(tenant.getOrganizationName())) {
+				throw new ProcessingException("Not allowed to submit for facility indicated in MSH-4", "MSH", 1, 4);
 			}
-			Organization sendingOrganization = null;
-			if (StringUtils.isNotBlank(sendingFacilityName) && !sendingFacilityName.equals("null")) {
-				sendingOrganization = (Organization) fhirRequester.searchOrganization(new SearchParameterMap(Organization.SP_NAME, new StringParam(sendingFacilityName)));
-//					Organization.NAME.matches().value(sendingFacilityName));
-				if (sendingOrganization == null) {
-					sendingOrganization = (Organization) fhirRequester.saveOrganization(new Organization().setName(sendingFacilityName));
-				}
-			}
-
-			if (sendingOrganization == null) {
-				sendingOrganization = processSendingOrganization(reader);
-			}
-			if (sendingOrganization == null) {
-				sendingOrganization = processManagingOrganization(reader);
-			}
-			IIdType organizationIdType = null;
-			if (sendingOrganization != null) {
-				organizationIdType = sendingOrganization.getIdElement();
-			}
-			switch (messageType) {
-				case "VXU":
-					responseMessage = processVXU(tenant, reader, message, organizationIdType);
-					break;
-				case "ORU":
-					responseMessage = processORU(tenant, reader, message, organizationIdType);
-					break;
-				case "QBP":
-					responseMessage = processQBP(tenant, reader, message);
-					break;
-				default:
-					ProcessingException pe = new ProcessingException("Unsupported message", "", 0, 0);
-					List<IisReportable> iisReportableList = List.of(IisReportable.fromProcessingException(pe));
-					responseMessage = buildAck(reader, iisReportableList, processingFlavorSet);
-					recordMessageReceived(message, null, responseMessage, "Unknown", "NAck", tenant);
-					break;
-			}
-
-		} catch (Exception e) {
-			e.printStackTrace(System.err);
-			List<IisReportable> iisReportableList = new ArrayList<>();
-			iisReportableList.add(IisReportable.fromProcessingException(new ProcessingException("Internal error prevented processing: " + e.getMessage(), null, 0, 0)));
-			responseMessage = buildAck(reader, iisReportableList, processingFlavorSet);
 		}
-		return responseMessage;
+		Organization responsibleOrganization = null;
+		if (StringUtils.isNotBlank(sendingFacilityName) && !sendingFacilityName.equals("null")) {
+			responsibleOrganization = (Organization) fhirRequester.searchOrganization(new SearchParameterMap(Organization.SP_NAME, new StringParam(sendingFacilityName)));
+//					Organization.NAME.matches().value(sendingFacilityName));
+			if (responsibleOrganization == null) {
+				responsibleOrganization = (Organization) fhirRequester.saveOrganization(new Organization().setName(sendingFacilityName));
+			}
+		}
+
+		if (responsibleOrganization == null) {
+			responsibleOrganization = processSendingOrganization(reader);
+		}
+		if (responsibleOrganization == null) {
+			responsibleOrganization = processManagingOrganization(reader);
+		}
+		IIdType organizationIdType = null;
+		if (responsibleOrganization != null) {
+			organizationIdType = responsibleOrganization.getIdElement();
+		}
+		return organizationIdType;
 	}
 
 	public List<VaccinationMaster> getVaccinationMasterList(PatientMaster patient) {

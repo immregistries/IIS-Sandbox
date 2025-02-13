@@ -49,6 +49,7 @@ import org.immregistries.smm.tester.manager.HL7Reader;
 import org.immregistries.vfa.connect.ConnectFactory;
 import org.immregistries.vfa.connect.ConnectorInterface;
 import org.immregistries.vfa.connect.model.*;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -337,6 +338,45 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 		return ackBuilder.buildAckFrom(data, processingFlavorSet);
 	}
 
+	@Override
+	public String process(String message, Tenant tenant, String sendingFacilityName) {
+		HL7Reader reader = new HL7Reader(message);
+		String messageType = reader.getValue(9);
+		String responseMessage;
+		partitionCreationInterceptor.getOrCreatePartitionId(tenant.getOrganizationName());
+		Set<ProcessingFlavor> processingFlavorSet = null;
+		try {
+			processingFlavorSet = tenant.getProcessingFlavorSet();
+			IIdType organizationIdType = readResponsibleOrganizationIIdType(tenant, reader, sendingFacilityName, processingFlavorSet);
+			switch (messageType) {
+				case "VXU":
+					responseMessage = processVXU(tenant, reader, message, organizationIdType);
+					break;
+				case "ORU":
+					responseMessage = processORU(tenant, reader, message, organizationIdType);
+					break;
+				case "QBP":
+					responseMessage = processQBP(tenant, reader, message);
+					break;
+				default:
+					ProcessingException pe = new ProcessingException("Unsupported message", "", 0, 0);
+					List<IisReportable> iisReportableList = List.of(IisReportable.fromProcessingException(pe));
+					responseMessage = buildAck(reader, iisReportableList, processingFlavorSet);
+					recordMessageReceived(message, null, responseMessage, "Unknown", "NAck", tenant);
+					break;
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace(System.err);
+			List<IisReportable> iisReportableList = new ArrayList<>();
+			iisReportableList.add(IisReportable.fromProcessingException(new ProcessingException("Internal error prevented processing: " + e.getMessage(), null, 0, 0)));
+			responseMessage = buildAck(reader, iisReportableList, processingFlavorSet);
+		}
+		return responseMessage;
+	}
+
+	abstract @Nullable IIdType readResponsibleOrganizationIIdType(Tenant tenant, HL7Reader reader, String sendingFacilityName, Set<ProcessingFlavor> processingFlavorSet) throws ProcessingException;
+
 	public String processQBP(Tenant tenant, HL7Reader reader, String messageReceived) throws Exception {
 		Set<ProcessingFlavor> processingFlavorSet = tenant.getProcessingFlavorSet();
 		MqeMessageServiceResponse mqeMessageServiceResponse = mqeMessageService.processMessage(messageReceived);
@@ -436,7 +476,6 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 
 		StringBuilder sb = new StringBuilder();
 		String profileIdSubmitted = reader.getValue(21);
-		logger.info("PROFILE ID SUBMITTED {}", profileIdSubmitted);
 		CodeMap codeMap = CodeMapManager.getCodeMap();
 		String categoryResponse = NO_MATCH;
 		String profileId = RSP_Z33_NO_MATCH;

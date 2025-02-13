@@ -18,7 +18,7 @@ import java.util.Random;
 import java.util.Set;
 
 public interface IIncomingMessageHandler {
-	double MINIMAL_MATCHING_SCORE = 0.9;
+	double MINIMAL_MATCHING_SCORE = 0.75;
 	int NAME_SIZE_LIMIT = 15;
 	String RSP_K_11_RSP_K_11 = "RSP^K11^RSP_K11";
 	String MATCH = "Match";

@@ -8,16 +8,12 @@ import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.instance.model.api.IIdType;
 import org.hl7.fhir.r5.model.Bundle;
-import org.hl7.fhir.r5.model.Identifier;
 import org.hl7.fhir.r5.model.Immunization;
 import org.hl7.fhir.r5.model.Organization;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR5Condition;
-import org.immregistries.iis.kernal.logic.ack.IisReportable;
-import org.immregistries.iis.kernal.model.PatientMaster;
-import org.immregistries.iis.kernal.model.ProcessingFlavor;
-import org.immregistries.iis.kernal.model.Tenant;
-import org.immregistries.iis.kernal.model.VaccinationMaster;
+import org.immregistries.iis.kernal.model.*;
 import org.immregistries.smm.tester.manager.HL7Reader;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Service;
 
@@ -31,66 +27,34 @@ import static org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRe
 @Conditional(OnR5Condition.class)
 public class IncomingMessageHandlerR5 extends IncomingMessageHandler {
 
-	@Override
-	public String process(String message, Tenant tenant, String sendingFacilityName) {
-		HL7Reader reader = new HL7Reader(message);
-		String messageType = reader.getValue(9);
-		String responseMessage;
-		partitionCreationInterceptor.getOrCreatePartitionId(tenant.getOrganizationName());
-		Set<ProcessingFlavor> processingFlavorSet = null;
-		try {
-			processingFlavorSet = tenant.getProcessingFlavorSet();
-			String facilityId = reader.getValue(4);
+	public @Nullable IIdType readResponsibleOrganizationIIdType(Tenant tenant, HL7Reader reader, String sendingFacilityName, Set<ProcessingFlavor> processingFlavorSet) throws ProcessingException {
+		String facilityId = reader.getValue(4);
 
-			if (processingFlavorSet.contains(ProcessingFlavor.SOURSOP)) {
-				if (!facilityId.equals(tenant.getOrganizationName())) {
-					throw new ProcessingException("Not allowed to submit for facility indicated in MSH-4", "MSH", 1, 4);
-				}
+		if (processingFlavorSet.contains(ProcessingFlavor.SOURSOP)) {
+			if (!facilityId.equals(tenant.getOrganizationName())) {
+				throw new ProcessingException("Not allowed to submit for facility indicated in MSH-4", "MSH", 1, 4);
 			}
-			Organization sendingOrganization = null;
-			if (StringUtils.isNotBlank(sendingFacilityName) && !sendingFacilityName.equals("null")) {
-				sendingOrganization = (Organization) fhirRequester.searchOrganization(new SearchParameterMap(Organization.SP_NAME, new StringParam(sendingFacilityName)));
-//					Organization.NAME.matches().value(sendingFacilityName));
-				if (sendingOrganization == null) {
-					sendingOrganization = (Organization) fhirRequester.saveOrganization(new Organization().setName(sendingFacilityName));
-				}
-			}
-
-			if (sendingOrganization == null) {
-				sendingOrganization = processSendingOrganization(reader);
-			}
-			if (sendingOrganization == null) {
-				sendingOrganization = processManagingOrganization(reader);
-			}
-			IIdType organizationIdType = null;
-			if (sendingOrganization != null) {
-				organizationIdType = sendingOrganization.getIdElement();
-			}
-			switch (messageType) {
-				case "VXU":
-					responseMessage = processVXU(tenant, reader, message, organizationIdType);
-					break;
-				case "ORU":
-					responseMessage = processORU(tenant, reader, message, organizationIdType);
-					break;
-				case "QBP":
-					responseMessage = processQBP(tenant, reader, message);
-					break;
-				default:
-					ProcessingException pe = new ProcessingException("Unsupported message", "", 0, 0);
-					List<IisReportable> iisReportableList = List.of(IisReportable.fromProcessingException(pe));
-					responseMessage = buildAck(reader, iisReportableList, processingFlavorSet);
-					recordMessageReceived(message, null, responseMessage, "Unknown", "NAck", tenant);
-					break;
-			}
-
-		} catch (Exception e) {
-			e.printStackTrace(System.err);
-			List<IisReportable> iisReportableList = new ArrayList<>();
-			iisReportableList.add(IisReportable.fromProcessingException(new ProcessingException("Internal error prevented processing: " + e.getMessage(), null, 0, 0)));
-			responseMessage = buildAck(reader, iisReportableList, processingFlavorSet);
 		}
-		return responseMessage;
+		Organization responsibleOrganization = null;
+		if (StringUtils.isNotBlank(sendingFacilityName) && !sendingFacilityName.equals("null")) {
+			responsibleOrganization = (Organization) fhirRequester.searchOrganization(new SearchParameterMap(Organization.SP_NAME, new StringParam(sendingFacilityName)));
+//					Organization.NAME.matches().value(sendingFacilityName));
+			if (responsibleOrganization == null) {
+				responsibleOrganization = (Organization) fhirRequester.saveOrganization(new Organization().setName(sendingFacilityName));
+			}
+		}
+
+		if (responsibleOrganization == null) {
+			responsibleOrganization = processSendingOrganization(reader);
+		}
+		if (responsibleOrganization == null) {
+			responsibleOrganization = processManagingOrganization(reader);
+		}
+		IIdType organizationIdType = null;
+		if (responsibleOrganization != null) {
+			organizationIdType = responsibleOrganization.getIdElement();
+		}
+		return organizationIdType;
 	}
 
 	public List<VaccinationMaster> getVaccinationMasterList(PatientMaster patient) {
@@ -128,11 +92,22 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler {
 
 	private Organization processSendingOrganization(HL7Reader reader) {
 		String organizationName = reader.getValue(4, 1);
-		Organization sendingOrganization = (Organization) fhirRequester.searchOrganization(new SearchParameterMap(Organization.SP_IDENTIFIER, new TokenParam().setSystem(reader.getValue(4, 10)).setValue(reader.getValue(4, 2))));
-//			Organization.IDENTIFIER.exactly()
-//			.systemAndIdentifier(reader.getValue(4, 10), reader.getValue(4, 2)));
-		if (sendingOrganization == null && StringUtils.isNotBlank(organizationName)) {
-			sendingOrganization = new Organization().setName(organizationName).addIdentifier(new Identifier().setSystem(reader.getValue(4, 2)).setValue(reader.getValue(4, 10)));
+		BusinessIdentifier businessIdentifier = new BusinessIdentifier();
+		businessIdentifier.setValue(reader.getValue(4, 2));
+//		businessIdentifier.setType(reader.getValue(4, 3)); TODO support TYPE in TOKEN PARAM
+		TokenParam tokenParam = businessIdentifier.asTokenParam();
+		Organization sendingOrganization = null;
+		if (tokenParam != null) {
+			sendingOrganization = (Organization) fhirRequester.searchOrganization(new SearchParameterMap(Organization.SP_IDENTIFIER, tokenParam));
+		} else if (organizationName != null) {
+			sendingOrganization = (Organization) fhirRequester.searchOrganization(new SearchParameterMap(Organization.SP_NAME, new StringParam(organizationName)));
+		}
+		if (sendingOrganization == null && (StringUtils.isNotBlank(organizationName) || tokenParam != null)) {
+			sendingOrganization = new Organization()
+				.setName(organizationName);
+			if (tokenParam != null) {
+				sendingOrganization.addIdentifier(businessIdentifier.toR5());
+			}
 			sendingOrganization = (Organization) fhirRequester.saveOrganization(sendingOrganization);
 		}
 		return sendingOrganization;
@@ -142,9 +117,8 @@ public class IncomingMessageHandlerR5 extends IncomingMessageHandler {
 		String organizationName = reader.getValue(22, 1);
 		Organization managingOrganization = null;
 		String managingIdentifier = null;
-		if (StringUtils.isNotBlank(reader.getValue(22, 11))) {
-			managingIdentifier = reader.getValue(22, 11);
-		} else if (StringUtils.isNotBlank(reader.getValue(22, 3))) {
+		managingIdentifier = reader.getValue(22, 11);
+		if (StringUtils.isBlank(managingIdentifier)) {
 			managingIdentifier = reader.getValue(22, 3);
 		}
 		if (managingIdentifier != null) {
