@@ -117,11 +117,12 @@ public abstract class AbstractFhirRequester<
 	/**
 	 * Helping method for saving, executes conditional update and create on HAPI DAO, adds parameter to avoid golden records
 	 *
-	 * @param resource Resource to save
-	 * @param where HAPIFHIR Criteria list
+	 * @param createOnly
+	 * @param resource   Resource to save
+	 * @param where      HAPIFHIR Criteria list
 	 * @return methodOutcome
 	 */
-	protected MethodOutcome save(IBaseResource resource, ICriterion... where) {
+	protected MethodOutcome save(boolean createOnly, IBaseResource resource, ICriterion... where) {
 		IFhirResourceDao dao = daoRegistry.getResourceDao(resource);
 		String params = stringCriterionList(where);
 		if (StringUtils.isNotBlank(params)) {
@@ -130,12 +131,14 @@ public abstract class AbstractFhirRequester<
 			params += NOT_GOLDEN_CRITERION;
 		}
 		DaoMethodOutcome outcome;
-		try {
-			outcome = dao.update(resource, params, ServletHelper.requestDetailsWithPartitionName());
-		} catch (InvalidRequestException invalidRequestException) {
-			outcome = dao.create(resource, ServletHelper.requestDetailsWithPartitionName());
+		if (createOnly) {
+			return dao.create(resource, ServletHelper.requestDetailsWithPartitionName());
 		}
-		return outcome;
+		try {
+			return dao.update(resource, params, ServletHelper.requestDetailsWithPartitionName());
+		} catch (InvalidRequestException invalidRequestException) {
+			return dao.create(resource, ServletHelper.requestDetailsWithPartitionName());
+		}
 	}
 
 	/**

@@ -94,7 +94,7 @@ public class BusinessIdentifier {
 			if (StringUtils.isNotBlank(this.system)) {
 				tokenParam.setSystem(this.system);
 			}
-//		tokenParam.setModifier(TokenParamModifier.OF_TYPE).;
+//		tokenParam.setModifier(TokenParamModifier.OF_TYPE).; TODO TYPE
 
 			return tokenParam;
 		}

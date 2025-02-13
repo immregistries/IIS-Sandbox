@@ -4,6 +4,8 @@ import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.api.server.IBundleProvider;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
+import ca.uhn.fhir.rest.gclient.ICriterion;
+import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r5.model.*;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR5Condition;
@@ -25,9 +27,9 @@ import static org.immregistries.iis.kernal.logic.IncomingMessageHandler.MINIMAL_
 
 /**
  * DO NOT EDIT THE CONTENT OF THIS FILE
- * <p>
+ *
  * This is a literal copy of FhirRequesterR5 except for the name and imported FHIR Model package
- * <p>
+ *
  * Please paste any new content from R5 version here to preserve similarity in behavior.
  */
 @Component
@@ -103,7 +105,6 @@ public class FhirRequesterR5 extends AbstractFhirRequester<Patient, Immunization
 		}
 		return vaccinationMasterList;
 	}
-
 
 	public Organization searchOrganization(SearchParameterMap searchParameterMap) {
 		Organization organization = null;
@@ -223,15 +224,17 @@ public class FhirRequesterR5 extends AbstractFhirRequester<Patient, Immunization
 		return relatedPerson;
 	}
 
-	public MethodOutcome savePatientReportedMethodOutcome(PatientReported patientReported) {
-		Patient patient = patientMapper.fhirResource(patientReported);
-		return save(patient,
-			Patient.IDENTIFIER.exactly().systemAndIdentifier(patientReported.getMainBusinessIdentifier().getSystem(), patientReported.getMainBusinessIdentifier().getValue()));
-	}
-
 	public PatientReported savePatientReported(PatientReported patientReported) {
-		MethodOutcome outcome = savePatientReportedMethodOutcome(patientReported);
-//		logger.info("created {} resource {}", outcome.getCreated(), outcome.getResource());
+		Patient patient = patientMapper.fhirResource(patientReported);
+		boolean createOnly = false;
+		List<ICriterion> criteria = new ArrayList<>(2);
+		criteria.add(Patient.IDENTIFIER.exactly().systemAndIdentifier(patientReported.getMainBusinessIdentifier().getSystem(), patientReported.getMainBusinessIdentifier().getValue()));
+		if (StringUtils.isNotBlank(patientReported.getManagingOrganizationId())) {
+			criteria.add(Patient.ORGANIZATION.hasAnyOfIds(patientReported.getManagingOrganizationId()));
+		} else {
+			createOnly = true;
+		}
+		MethodOutcome outcome = save(createOnly, patient, criteria.toArray(new ICriterion[0]));
 		if (!outcome.getResource().isEmpty()) {
 			patientReported.setPatientId(outcome.getResource().getIdElement().getIdPart());
 			return patientMapper.localObjectReportedWithMaster((Patient) outcome.getResource());
@@ -240,13 +243,12 @@ public class FhirRequesterR5 extends AbstractFhirRequester<Patient, Immunization
 			return readAsPatientReported(outcome.getId().getIdPart());
 		} else {
 			return patientReported;
-//			return searchPatientReported(Patient.IDENTIFIER.exactly().systemAndIdentifier(patientReported.getPatientReportedAuthority(),patientReported.getPatientReportedExternalLink()));
 		}
 	}
 
 	public ModelPerson savePractitioner(ModelPerson modelPerson) {
 		Practitioner practitioner = practitionerMapper.fhirResource(modelPerson);
-		MethodOutcome outcome = save(practitioner,
+		MethodOutcome outcome = save(false, practitioner,
 			Patient.IDENTIFIER.exactly().identifier(modelPerson.getPersonExternalLink()));
 		if (outcome.getCreated() != null && outcome.getCreated()) {
 			modelPerson.setPersonId(outcome.getId().getIdPart());
@@ -268,7 +270,7 @@ public class FhirRequesterR5 extends AbstractFhirRequester<Patient, Immunization
 
 	public ObservationReported saveObservationReported(ObservationReported observationReported) {
 		Observation observation = observationMapper.fhirResource(observationReported);
-		MethodOutcome outcome = save(observation);
+		MethodOutcome outcome = save(false, observation);
 		if (outcome.getCreated() != null && outcome.getCreated()) {
 			observationReported.setObservationId(outcome.getId().getIdPart());
 		} else if (!outcome.getResource().isEmpty()) {
@@ -280,7 +282,7 @@ public class FhirRequesterR5 extends AbstractFhirRequester<Patient, Immunization
 	public VaccinationReported saveVaccinationReported(VaccinationReported vaccinationReported) {
 		Immunization immunization = immunizationMapper.fhirResource(vaccinationReported);
 		// TODO change conditional create to update ?
-		MethodOutcome outcome = save(immunization
+		MethodOutcome outcome = save(false, immunization
 //			, Immunization.IDENTIFIER.exactly()
 //				.identifier(vaccinationReported.getExternalLink())
 		);
@@ -294,7 +296,7 @@ public class FhirRequesterR5 extends AbstractFhirRequester<Patient, Immunization
 
 	public OrgLocation saveOrgLocation(OrgLocation orgLocation) {
 		Location location = locationMapper.fhirResource(orgLocation);
-		MethodOutcome outcome = save(location,
+		MethodOutcome outcome = save(false, location,
 			Location.IDENTIFIER.exactly().identifier(location.getIdentifierFirstRep().getValue())
 		);
 		if (outcome.getCreated() != null && outcome.getCreated()) {
@@ -308,11 +310,11 @@ public class FhirRequesterR5 extends AbstractFhirRequester<Patient, Immunization
 	public Organization saveOrganization(Organization organization) {
 		MethodOutcome outcome = null;
 		if (organization.getIdentifierFirstRep().getValue() != null) {
-			outcome = save(organization,
+			outcome = save(false, organization,
 				Organization.IDENTIFIER.exactly().identifier(organization.getIdentifierFirstRep().getValue())
 			);
 		} else {
-			outcome = save(organization);
+			outcome = save(false, organization);
 		}
 
 		if (!outcome.getResource().isEmpty()) {
@@ -357,7 +359,6 @@ public class FhirRequesterR5 extends AbstractFhirRequester<Patient, Immunization
 		return null;
 	}
 
-
 	public PatientMaster matchPatient(List<PatientReported> multipleMatches, PatientMaster patientMasterForMatchQuery, Date cutoff) {
 		PatientMaster singleMatch = null;
 		Bundle matches = repositoryClientFactory.getFhirClient()
@@ -370,7 +371,7 @@ public class FhirRequesterR5 extends AbstractFhirRequester<Patient, Immunization
 				Patient patient = (Patient) entry.getResource();
 				PatientMaster patientMaster = patientMapper.localObject(patient);
 				/*
-				 * Filter for flavours previously configured
+				 * Filter for flavours previously configured SNAIL
 				 */
 				if (cutoff != null && cutoff.before(patientMaster.getReportedDate())) {
 					break;

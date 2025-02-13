@@ -436,6 +436,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 
 		StringBuilder sb = new StringBuilder();
 		String profileIdSubmitted = reader.getValue(21);
+		logger.info("PROFILE ID SUBMITTED {}", profileIdSubmitted);
 		CodeMap codeMap = CodeMapManager.getCodeMap();
 		String categoryResponse = NO_MATCH;
 		String profileId = RSP_Z33_NO_MATCH;
@@ -1120,6 +1121,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 		IIncomingMessageHandler.verifyNoErrors(iisReportableList);
 
 		patientReported.setUpdatedDate(new Date());
+		logger.info("MANAGING ORG ID = {}", patientReported.getManagingOrganizationId());
 		patientReported = fhirRequester.savePatientReported(patientReported);
 //		patientReported = fhirRequester.saveRelatedPerson(patientReported);
 		iisReportableList.add(IisReportable.fromProcessingException(new ProcessingException("Patient record saved", "PID", 0, 0, IisReportableSeverity.INFO)));

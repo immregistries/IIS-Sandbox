@@ -8,15 +8,11 @@ import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.instance.model.api.IIdType;
 import org.hl7.fhir.r4.model.Bundle;
-import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.Immunization;
 import org.hl7.fhir.r4.model.Organization;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
 import org.immregistries.iis.kernal.logic.ack.IisReportable;
-import org.immregistries.iis.kernal.model.PatientMaster;
-import org.immregistries.iis.kernal.model.ProcessingFlavor;
-import org.immregistries.iis.kernal.model.Tenant;
-import org.immregistries.iis.kernal.model.VaccinationMaster;
+import org.immregistries.iis.kernal.model.*;
 import org.immregistries.smm.tester.manager.HL7Reader;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Service;
@@ -128,11 +124,22 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler {
 
 	private Organization processSendingOrganization(HL7Reader reader) {
 		String organizationName = reader.getValue(4, 1);
-		Organization sendingOrganization = (Organization) fhirRequester.searchOrganization(new SearchParameterMap(Organization.SP_IDENTIFIER, new TokenParam().setSystem(reader.getValue(4, 10)).setValue(reader.getValue(4, 2))));
-//			Organization.IDENTIFIER.exactly()
-//			.systemAndIdentifier(reader.getValue(4, 10), reader.getValue(4, 2)));
-		if (sendingOrganization == null && StringUtils.isNotBlank(organizationName)) {
-			sendingOrganization = new Organization().setName(organizationName).addIdentifier(new Identifier().setSystem(reader.getValue(4, 2)).setValue(reader.getValue(4, 10)));
+		BusinessIdentifier businessIdentifier = new BusinessIdentifier();
+		businessIdentifier.setValue(reader.getValue(4, 2));
+//		businessIdentifier.setType(reader.getValue(4, 3)); TODO support TYPE in TOKEN PARAM
+		TokenParam tokenParam = businessIdentifier.asTokenParam();
+		Organization sendingOrganization = null;
+		if (tokenParam != null) {
+			sendingOrganization = (Organization) fhirRequester.searchOrganization(new SearchParameterMap(Organization.SP_IDENTIFIER, tokenParam));
+		} else if (organizationName != null) {
+			sendingOrganization = (Organization) fhirRequester.searchOrganization(new SearchParameterMap(Organization.SP_NAME, new StringParam(organizationName)));
+		}
+		if (sendingOrganization == null && (StringUtils.isNotBlank(organizationName) || tokenParam != null)) {
+			sendingOrganization = new Organization()
+				.setName(organizationName);
+			if (tokenParam != null) {
+				sendingOrganization.addIdentifier(businessIdentifier.toR4());
+			}
 			sendingOrganization = (Organization) fhirRequester.saveOrganization(sendingOrganization);
 		}
 		return sendingOrganization;
@@ -142,9 +149,8 @@ public class IncomingMessageHandlerR4 extends IncomingMessageHandler {
 		String organizationName = reader.getValue(22, 1);
 		Organization managingOrganization = null;
 		String managingIdentifier = null;
-		if (StringUtils.isNotBlank(reader.getValue(22, 11))) {
-			managingIdentifier = reader.getValue(22, 11);
-		} else if (StringUtils.isNotBlank(reader.getValue(22, 3))) {
+		managingIdentifier = reader.getValue(22, 11);
+		if (StringUtils.isBlank(managingIdentifier)) {
 			managingIdentifier = reader.getValue(22, 3);
 		}
 		if (managingIdentifier != null) {

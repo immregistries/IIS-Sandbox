@@ -23,7 +23,7 @@ public class PatientMaster extends AbstractMappedObject implements Serializable 
 	private String sex = "";
 	private List<String> races = new ArrayList<>(1);
 	private List<ModelAddress> addresses = new ArrayList<>(1);
-	private List<ModelPhone> phones = null;
+	private List<ModelPhone> phones = new ArrayList<>(1);
 	private String email = "";
 	private String ethnicity = "";
 	private String birthFlag = "";
