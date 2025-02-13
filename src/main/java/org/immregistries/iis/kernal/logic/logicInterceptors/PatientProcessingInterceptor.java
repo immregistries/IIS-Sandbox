@@ -251,32 +251,32 @@ public class PatientProcessingInterceptor extends AbstractLogicInterceptor {
 			}
 		}
 
-		String patientAddressCountry = patientReported.getFirstAddress().getAddressCountry();
-		if (!patientAddressCountry.equals("")) {
-			if (!ValidValues.verifyValidValue(patientAddressCountry, ValidValues.COUNTRY_2DIGIT) && !ValidValues.verifyValidValue(patientAddressCountry, ValidValues.COUNTRY_3DIGIT)) {
-				ProcessingException pe = new ProcessingException("Patient address country '" + patientAddressCountry + "' is not recognized and cannot be accepted", "PID", 1, 11);
-				if (processingFlavorSet.contains(ProcessingFlavor.GUAVA)) {
-					pe.setErrorCode(IisReportableSeverity.WARN);
-				}
-				iisReportableList.add(IisReportable.fromProcessingException(pe));
-			}
-		}
-		if (patientAddressCountry.equals("") || patientAddressCountry.equals("US") || patientAddressCountry.equals("USA")) {
-			String patientAddressState = patientReported.getFirstAddress().getAddressState();
-			if (!patientAddressState.equals("")) {
-				if (!ValidValues.verifyValidValue(patientAddressState, ValidValues.STATE)) {
-					ProcessingException pe = new ProcessingException("Patient address state '" + patientAddressState + "' is not recognized and cannot be accepted", "PID", 1, 11);
+		if (!patientReported.getAddresses().isEmpty()) {
+			String patientAddressCountry = patientReported.getFirstAddress().getAddressCountry();
+			if (StringUtils.isNotBlank(patientAddressCountry)) {
+				if (!ValidValues.verifyValidValue(patientAddressCountry, ValidValues.COUNTRY_2DIGIT) && !ValidValues.verifyValidValue(patientAddressCountry, ValidValues.COUNTRY_3DIGIT)) {
+					ProcessingException pe = new ProcessingException("Patient address country '" + patientAddressCountry + "' is not recognized and cannot be accepted", "PID", 1, 11);
 					if (processingFlavorSet.contains(ProcessingFlavor.GUAVA)) {
 						pe.setErrorCode(IisReportableSeverity.WARN);
 					}
 					iisReportableList.add(IisReportable.fromProcessingException(pe));
 				}
 			}
+			if (StringUtils.isBlank(patientAddressCountry) || "US".equals(patientAddressCountry) || "USA".equals(patientAddressCountry)) {
+				String patientAddressState = patientReported.getFirstAddress().getAddressState();
+				if (StringUtils.isNotBlank(patientAddressState)) {
+					if (!ValidValues.verifyValidValue(patientAddressState, ValidValues.STATE)) {
+						ProcessingException pe = new ProcessingException("Patient address state '" + patientAddressState + "' is not recognized and cannot be accepted", "PID", 1, 11);
+						if (processingFlavorSet.contains(ProcessingFlavor.GUAVA)) {
+							pe.setErrorCode(IisReportableSeverity.WARN);
+						}
+						iisReportableList.add(IisReportable.fromProcessingException(pe));
+					}
+				}
+			}
 		}
 
-
-		{
-			String race = patientReported.getFirstRace();
+		for (String race : patientReported.getRaces()) {
 			if (StringUtils.isNotBlank(race)) {
 				Code raceCode = codeMap.getCodeForCodeset(CodesetType.PATIENT_RACE, race);
 				if (raceCode == null || CodeStatusValue.getBy(raceCode.getCodeStatus()) != CodeStatusValue.VALID) {
@@ -289,9 +289,10 @@ public class PatientProcessingInterceptor extends AbstractLogicInterceptor {
 			}
 		}
 
+
 		{
 			String ethnicity = patientReported.getEthnicity();
-			if (!ethnicity.equals("")) {
+			if (StringUtils.isNotBlank(ethnicity)) {
 				Code ethnicityCode = codeMap.getCodeForCodeset(CodesetType.PATIENT_ETHNICITY, ethnicity);
 				if (ethnicityCode == null || CodeStatusValue.getBy(ethnicityCode.getCodeStatus()) != CodeStatusValue.VALID) {
 					ProcessingException pe = new ProcessingException("Invalid ethnicity '" + ethnicity + "', message cannot be accepted", "PID", 1, 10);
