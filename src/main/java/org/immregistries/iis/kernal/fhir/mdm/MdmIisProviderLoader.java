@@ -19,7 +19,7 @@ import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
  * Overrides default Hapi MdmProviderLoader
  * Allows for Activation with FHIR R5
  */
-public class MdmCustomProviderLoader extends MdmProviderLoader {
+public class MdmIisProviderLoader extends MdmProviderLoader {
 	@Autowired
 	FhirContext myFhirContext;
 	@Autowired
@@ -46,9 +46,9 @@ public class MdmCustomProviderLoader extends MdmProviderLoader {
 			case R4:
 			case R5:
 				this.myResourceProviderFactory.addSupplier(() -> {
-					MdmCustomProvider mdmCustomProvider = new MdmCustomProvider(this.myFhirContext, this.myMdmControllerSvc, this.myMdmControllerHelper, this.myMdmSubmitSvc, this.myMdmSettings);
-					autowireCapableBeanFactory.autowireBean(mdmCustomProvider);
-					return mdmCustomProvider ;
+					MdmIisProvider mdmIisProvider = new MdmIisProvider(this.myFhirContext, this.myMdmControllerSvc, this.myMdmControllerHelper, this.myMdmSubmitSvc, this.myMdmSettings);
+					autowireCapableBeanFactory.autowireBean(mdmIisProvider);
+					return mdmIisProvider;
 				});
 				if (this.myStorageSettings.isNonResourceDbHistoryEnabled()) {
 					this.myResourceProviderFactory.addSupplier(() -> {

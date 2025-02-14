@@ -3,7 +3,7 @@ package org.immregistries.iis.kernal.fhir.mdm;
 import ca.uhn.fhir.mdm.api.MdmMatchOutcome;
 import org.immregistries.mismo.match.PatientMatchResult;
 
-public interface IMdmCustomMatchFinderSvc {
+public interface IMdmIisMatchFinderSvc {
 
 	static MdmMatchOutcome mismoResultToMdmMatchOutcome(PatientMatchResult patientMatchResult) {
 		switch (patientMatchResult.getDetermination()) {

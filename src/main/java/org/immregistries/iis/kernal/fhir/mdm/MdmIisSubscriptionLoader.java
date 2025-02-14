@@ -26,7 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class MdmCustomSubscriptionLoader extends MdmSubscriptionLoader {
+public class MdmIisSubscriptionLoader extends MdmSubscriptionLoader {
 
 	public static final String MDM_SUBSCIPRION_ID_PREFIX = "mdm-";
 	private static final Logger ourLog = Logs.getMdmTroubleshootingLog();

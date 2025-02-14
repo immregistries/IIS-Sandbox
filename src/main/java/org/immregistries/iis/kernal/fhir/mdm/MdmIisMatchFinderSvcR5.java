@@ -13,9 +13,9 @@ import ca.uhn.fhir.rest.param.ReferenceParam;
 import ca.uhn.fhir.rest.param.TokenParam;
 import ca.uhn.fhir.rest.param.TokenParamModifier;
 import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
-import org.hl7.fhir.r4.model.Coding;
-import org.hl7.fhir.r4.model.Immunization;
-import org.immregistries.iis.kernal.mapping.MappingHelper;
+import org.apache.commons.lang3.StringUtils;
+import org.hl7.fhir.r5.model.Immunization;
+import org.immregistries.iis.kernal.mapping.forR5.ImmunizationMapperR5;
 import org.immregistries.iis.kernal.mapping.interfaces.ImmunizationMapper;
 import org.immregistries.vaccination_deduplication.computation_classes.Deterministic;
 import org.immregistries.vaccination_deduplication.reference.ComparisonResult;
@@ -31,15 +31,15 @@ import java.util.stream.Collectors;
 import static org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester.GOLDEN_RECORD;
 import static org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester.GOLDEN_SYSTEM_TAG;
 
-public class MdmCustomMatchFinderSvcR4 extends AbstractMdmCustomMatchFinderSvc<org.hl7.fhir.r4.model.Immunization> implements IMdmMatchFinderSvc, IMdmCustomMatchFinderSvc {
+public class MdmIisMatchFinderSvcR5 extends AbstractMdmIisMatchFinderSvc<Immunization> implements IMdmMatchFinderSvc, IMdmIisMatchFinderSvc {
 	private static final Logger ourLog = Logs.getMdmTroubleshootingLog();
 
 	@Autowired
-	IFhirResourceDao<org.hl7.fhir.r4.model.Immunization> immunizationDao;
+	IFhirResourceDao<org.hl7.fhir.r5.model.Immunization> immunizationDao;
 	@Autowired
-	IFhirResourceDao<org.hl7.fhir.r4.model.Patient> patientDao;
+	IFhirResourceDao<org.hl7.fhir.r5.model.Patient> patientDao;
 
-	public MdmCustomMatchFinderSvcR4() {
+	public MdmIisMatchFinderSvcR5() {
 		super();
 	}
 
@@ -85,7 +85,7 @@ public class MdmCustomMatchFinderSvcR4 extends AbstractMdmCustomMatchFinderSvc<o
 			.setValue(patientParameterValue));
 		targetCandidates = immunizationDao.search(searchParameterMap, requestDetails);
 		return targetCandidates.getAllResources().stream()
-			.map((resource) -> (Immunization) resource)
+			.map((resource) -> (org.hl7.fhir.r5.model.Immunization) resource)
 			.map((immunization2) -> {
 				org.immregistries.vaccination_deduplication.Immunization i2 = toVaccDedupImmunization(immunization2, theRequestPartitionId);
 				ComparisonResult comparison = comparer.compare(i1, i2);
@@ -100,12 +100,9 @@ public class MdmCustomMatchFinderSvcR4 extends AbstractMdmCustomMatchFinderSvc<o
 
 	private org.immregistries.vaccination_deduplication.Immunization toVaccDedupImmunization(Immunization immunization, RequestPartitionId theRequestPartitionId) {
 		org.immregistries.vaccination_deduplication.Immunization i1 = new org.immregistries.vaccination_deduplication.Immunization();
-		Coding cvx = MappingHelper.filterCodeableConceptR4(immunization.getVaccineCode(), ImmunizationMapper.CVX_SYSTEM);
-		if (cvx != null) {
-			i1.setCVX(cvx.getCode());
-		}
+		i1.setCVX(immunization.getVaccineCode().getCode(ImmunizationMapper.CVX_SYSTEM));
 		if (immunization.hasManufacturer()) {
-			i1.setMVX(immunization.getManufacturer().getIdentifier().getValue());
+			i1.setMVX(immunization.getManufacturer().getReference().getIdentifier().getValue());
 		}
 		try {
 			if (immunization.hasOccurrenceStringType()) {
@@ -121,29 +118,30 @@ public class MdmCustomMatchFinderSvcR4 extends AbstractMdmCustomMatchFinderSvc<o
 
 		if (immunization.getPrimarySource()) {
 			i1.setSource(ImmunizationSource.SOURCE);
-//		} else if (immunization.hasInformationSource()
-//			&& immunization.getInformationSource().getConcept() != null
-//			&& StringUtils.isNotBlank(immunization.getInformationSource().getConcept().getCode(ImmunizationMapperR4.INFORMATION_SOURCE))
-//			&& immunization.getInformationSource().getConcept().getCode(ImmunizationMapperR4.INFORMATION_SOURCE).equals("00")) {
-//			i1.setSource(ImmunizationSource.SOURCE);
+		} else if (immunization.hasInformationSource()
+			&& immunization.getInformationSource().getConcept() != null
+			&& StringUtils.isNotBlank(immunization.getInformationSource().getConcept().getCode(ImmunizationMapperR5.INFORMATION_SOURCE))
+			&& immunization.getInformationSource().getConcept().getCode(ImmunizationMapperR5.INFORMATION_SOURCE).equals("00")) {
+			i1.setSource(ImmunizationSource.SOURCE);
 		} else {
 			i1.setSource(ImmunizationSource.HISTORICAL);
 		}
 
-//		if (immunization.hasInformationSource()) { // TODO improve organisation naming and designation among tenancy or in resource info
-//			if (immunization.getInformationSource().getReference() != null) {
-//				if (immunization.getInformationSource().getReference().getIdentifier() != null) {
-//					i1.setOrganisationID(immunization.getInformationSource().getReference().getIdentifier().getValue());
-//				} else if (immunization.getInformationSource().getReference().getReference() != null
-//					&& immunization.getInformationSource().getReference().getReference().startsWith("Organisation/")) {
-//					i1.setOrganisationID(immunization.getInformationSource().getReference().getReference()); // TODO get organisation name from db
-//				}
-//			}
-//		}
+		if (immunization.hasInformationSource()) { // TODO improve organisation naming and designation among tenancy or in resource info
+			if (immunization.getInformationSource().getReference() != null) {
+				if (immunization.getInformationSource().getReference().getIdentifier() != null) {
+					i1.setOrganisationID(immunization.getInformationSource().getReference().getIdentifier().getValue());
+				} else if (immunization.getInformationSource().getReference().getReference() != null
+					&& immunization.getInformationSource().getReference().getReference().startsWith("Organization/")) {
+					i1.setOrganisationID(immunization.getInformationSource().getReference().getReference()); // TODO get organisation name from db
+				}
+			}
+		}
 		if ((i1.getOrganisationID() == null || i1.getOrganisationID().isBlank()) && theRequestPartitionId.hasPartitionNames()) {
 			i1.setOrganisationID(theRequestPartitionId.getFirstPartitionNameOrNull());
 		}
 		return i1;
 	}
+
 
 }

@@ -16,7 +16,7 @@ import java.util.List;
 /**
  * Not always active, used for testing
  */
-public class MdmCustomResourceFilteringSvc extends MdmResourceFilteringSvc {
+public class MdmIisResourceFilteringSvc extends MdmResourceFilteringSvc {
 	private static final Logger ourLog = Logs.getMdmTroubleshootingLog();
 
 	@Autowired
@@ -28,7 +28,7 @@ public class MdmCustomResourceFilteringSvc extends MdmResourceFilteringSvc {
 	@Autowired
 	FhirContext myFhirContext;
 
-	public MdmCustomResourceFilteringSvc() {
+	public MdmIisResourceFilteringSvc() {
 		super();
 	}
 

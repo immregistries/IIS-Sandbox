@@ -20,7 +20,7 @@ import java.io.IOException;
 
 @Configuration
 @Conditional(MdmConfigCondition.class)
-@Import({MdmCustomConsumerConfig.class, MdmSubmitterConfig.class, NicknameServiceConfig.class, SubscriptionTopicConfig.class})
+@Import({MdmIisConsumerConfig.class, MdmSubmitterConfig.class, NicknameServiceConfig.class, SubscriptionTopicConfig.class})
 public class MdmConfig {
 	@Autowired
 	AutowireCapableBeanFactory autowireCapableBeanFactory;
@@ -43,18 +43,18 @@ public class MdmConfig {
 
 	@Primary
 	@Bean
-	MdmCustomProviderLoader customMdmProviderLoader() {
-		MdmCustomProviderLoader mdmCustomProviderLoader = new MdmCustomProviderLoader();
-		autowireCapableBeanFactory.autowireBean(mdmCustomProviderLoader);
-		return mdmCustomProviderLoader;
+	MdmIisProviderLoader customMdmProviderLoader() {
+		MdmIisProviderLoader mdmIisProviderLoader = new MdmIisProviderLoader();
+		autowireCapableBeanFactory.autowireBean(mdmIisProviderLoader);
+		return mdmIisProviderLoader;
 	}
 
 	@Primary
 	@Bean
-	MdmCustomSubscriptionLoader customMdmSubscriptionLoader() {
-		MdmCustomSubscriptionLoader mdmCustomSubscriptionLoader = new MdmCustomSubscriptionLoader();
-		autowireCapableBeanFactory.autowireBean(mdmCustomSubscriptionLoader);
-		return mdmCustomSubscriptionLoader;
+	MdmIisSubscriptionLoader customMdmSubscriptionLoader() {
+		MdmIisSubscriptionLoader mdmIisSubscriptionLoader = new MdmIisSubscriptionLoader();
+		autowireCapableBeanFactory.autowireBean(mdmIisSubscriptionLoader);
+		return mdmIisSubscriptionLoader;
 	}
 
 
@@ -76,8 +76,8 @@ public class MdmConfig {
 
 //	@Primary
 //	@Bean
-//	MdmCustomResourceFilteringSvc mdmCustomResourceFilteringSvc() {
-//		MdmCustomResourceFilteringSvc mdmCustomResourceFilteringSvc = new MdmCustomResourceFilteringSvc();
+//	MdmIisResourceFilteringSvc mdmCustomResourceFilteringSvc() {
+//		MdmIisResourceFilteringSvc mdmCustomResourceFilteringSvc = new MdmIisResourceFilteringSvc();
 //		autowireCapableBeanFactory.autowireBean(mdmCustomResourceFilteringSvc);
 //		return mdmCustomResourceFilteringSvc;
 //	}

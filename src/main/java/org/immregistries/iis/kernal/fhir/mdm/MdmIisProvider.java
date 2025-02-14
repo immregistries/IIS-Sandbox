@@ -19,7 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public class MdmCustomProvider extends MdmProviderDstu3Plus {
+public class MdmIisProvider extends MdmProviderDstu3Plus {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 
@@ -36,7 +36,7 @@ public class MdmCustomProvider extends MdmProviderDstu3Plus {
 	@Autowired
 	private IMdmSettings myMdmSettings;
 
-	public MdmCustomProvider(FhirContext theFhirContext, IMdmControllerSvc theMdmControllerSvc, MdmControllerHelper theMdmHelper, IMdmSubmitSvc theMdmSubmitSvc, IMdmSettings theIMdmSettings) {
+	public MdmIisProvider(FhirContext theFhirContext, IMdmControllerSvc theMdmControllerSvc, MdmControllerHelper theMdmHelper, IMdmSubmitSvc theMdmSubmitSvc, IMdmSettings theIMdmSettings) {
 		super(theFhirContext, theMdmControllerSvc, theMdmHelper, theMdmSubmitSvc, theIMdmSettings);
 	}
 

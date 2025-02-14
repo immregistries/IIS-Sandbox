@@ -31,7 +31,7 @@ import static ca.uhn.fhir.jpa.mdm.svc.candidate.CandidateSearcher.idOrType;
 /**
  * Custom, based on MdmMatchFinderSvcImpl from Hapi-fhir v6.2.4, to allow for Immunization matching with external library
  */
-public abstract class AbstractMdmCustomMatchFinderSvc<Immunization extends IBaseResource> extends MdmMatchFinderSvcImpl implements IMdmMatchFinderSvc, IMdmCustomMatchFinderSvc {
+public abstract class AbstractMdmIisMatchFinderSvc<Immunization extends IBaseResource> extends MdmMatchFinderSvcImpl implements IMdmMatchFinderSvc, IMdmIisMatchFinderSvc {
 	private static final Logger ourLog = Logs.getMdmTroubleshootingLog();
 
 	@Autowired
@@ -43,7 +43,7 @@ public abstract class AbstractMdmCustomMatchFinderSvc<Immunization extends IBase
 
 	private final PatientMatcher patientMismoMatcher;
 
-	public AbstractMdmCustomMatchFinderSvc() {
+	public AbstractMdmIisMatchFinderSvc() {
 		super();
 		InputStream is = this.getClass().getResourceAsStream("/Mismo-Configuration.yml");
 		if (is == null) {
@@ -73,7 +73,7 @@ public abstract class AbstractMdmCustomMatchFinderSvc<Immunization extends IBase
 				.map((candidate) -> {
 					Patient mismoPatientCandidate = patientMatchingDatasetConversionController.convertFromFhir(candidate);
 					PatientMatchResult mismoMatchResult = patientMismoMatcher.match(mismoPatient, mismoPatientCandidate);
-					return new MatchedTarget(candidate, IMdmCustomMatchFinderSvc.mismoResultToMdmMatchOutcome(mismoMatchResult));
+					return new MatchedTarget(candidate, IMdmIisMatchFinderSvc.mismoResultToMdmMatchOutcome(mismoMatchResult));
 				}).collect(Collectors.toList());
 
 			ourLog.info("Found {} matched targets for {} with mismo.", matches.size(), idOrType(theResource, theResourceType));

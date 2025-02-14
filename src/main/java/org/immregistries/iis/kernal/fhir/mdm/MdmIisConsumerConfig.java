@@ -10,18 +10,18 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @Conditional(MdmConfigCondition.class)
-public class MdmCustomConsumerConfig extends MdmConsumerConfig {
+public class MdmIisConsumerConfig extends MdmConsumerConfig {
 
 	@Bean
 	@Conditional(OnR5Condition.class)
 	IMdmMatchFinderSvc mdmMatchFinderSvc() {
-		return new MdmCustomMatchFinderSvcR5();
+		return new MdmIisMatchFinderSvcR5();
 	}
 
 	@Bean
 	@Conditional(OnR4Condition.class)
 	IMdmMatchFinderSvc mdmMatchFinderSvcR4() {
-		return new MdmCustomMatchFinderSvcR4();
+		return new MdmIisMatchFinderSvcR4();
 	}
 
 }
