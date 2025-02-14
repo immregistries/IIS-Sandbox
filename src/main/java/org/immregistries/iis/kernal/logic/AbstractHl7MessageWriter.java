@@ -18,7 +18,7 @@ import java.util.Date;
 import java.util.Random;
 import java.util.Set;
 
-public abstract class Hl7MessageWriter implements IExampleMessageWriter {
+public abstract class AbstractHl7MessageWriter implements IExampleMessageWriter {
 	private static Integer increment = 1;
 
 	@Autowired

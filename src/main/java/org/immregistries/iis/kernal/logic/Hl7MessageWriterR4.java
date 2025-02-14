@@ -21,7 +21,7 @@ import java.util.Set;
 
 @Service
 @Conditional(OnR4Condition.class)
-public class Hl7MessageWriterR4 extends Hl7MessageWriter {
+public class Hl7MessageWriterR4 extends AbstractHl7MessageWriter {
 
 	public String buildVxu(VaccinationReported vaccinationReported, Tenant tenant) {
 		IGenericClient fhirClient = repositoryClientFactory.getFhirClient();

@@ -22,7 +22,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.immregistries.iis.kernal.logic.IncomingMessageHandler.MINIMAL_MATCHING_SCORE;
+import static org.immregistries.iis.kernal.logic.IIncomingMessageHandler.MINIMAL_MATCHING_SCORE;
 
 
 /**

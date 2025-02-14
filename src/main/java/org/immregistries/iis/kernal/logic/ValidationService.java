@@ -45,9 +45,9 @@ public class ValidationService {
 		mqeMessageService = MqeMessageService.INSTANCE;
 
 		{
-			InputStream profileXML = IncomingMessageHandler.class.getResourceAsStream("/export/VXU-Z22_Profile.xml");
-			InputStream constraintsXML = IncomingMessageHandler.class.getResourceAsStream("/export/VXU-Z22_Constraints.xml");
-			InputStream vsLibraryXML = IncomingMessageHandler.class.getResourceAsStream("/export/VXU-Z22_ValueSetLibrary.xml");
+			InputStream profileXML = ValidationService.class.getResourceAsStream("/export/VXU-Z22_Profile.xml");
+			InputStream constraintsXML = ValidationService.class.getResourceAsStream("/export/VXU-Z22_Constraints.xml");
+			InputStream vsLibraryXML = ValidationService.class.getResourceAsStream("/export/VXU-Z22_ValueSetLibrary.xml");
 
 			Profile profile = XMLDeserializer.deserialize(profileXML).get();
 			ValueSetLibrary valueSetLibrary = ValueSetLibraryImpl.apply(vsLibraryXML).get();
@@ -56,9 +56,9 @@ public class ValidationService {
 		}
 
 		{
-			InputStream profileXML = IncomingMessageHandler.class.getResourceAsStream("/export/QBP-Z34_Profile.xml");
-			InputStream constraintsXML = IncomingMessageHandler.class.getResourceAsStream("/export/QBP-Z34_Constraints.xml");
-			InputStream vsLibraryXML = IncomingMessageHandler.class.getResourceAsStream("/export/QBP-Z34_ValueSetLibrary.xml");
+			InputStream profileXML = ValidationService.class.getResourceAsStream("/export/QBP-Z34_Profile.xml");
+			InputStream constraintsXML = ValidationService.class.getResourceAsStream("/export/QBP-Z34_Constraints.xml");
+			InputStream vsLibraryXML = ValidationService.class.getResourceAsStream("/export/QBP-Z34_ValueSetLibrary.xml");
 
 			Profile profile = XMLDeserializer.deserialize(profileXML).get();
 			ValueSetLibrary valueSetLibrary = ValueSetLibraryImpl.apply(vsLibraryXML).get();
@@ -67,9 +67,9 @@ public class ValidationService {
 		}
 
 		{
-			InputStream profileXML = IncomingMessageHandler.class.getResourceAsStream("/export/QBP-Z44_Profile.xml");
-			InputStream constraintsXML = IncomingMessageHandler.class.getResourceAsStream("/export/QBP-Z44_Constraints.xml");
-			InputStream vsLibraryXML = IncomingMessageHandler.class.getResourceAsStream("/export/QBP-Z44_ValueSetLibrary.xml");
+			InputStream profileXML = ValidationService.class.getResourceAsStream("/export/QBP-Z44_Profile.xml");
+			InputStream constraintsXML = ValidationService.class.getResourceAsStream("/export/QBP-Z44_Constraints.xml");
+			InputStream vsLibraryXML = ValidationService.class.getResourceAsStream("/export/QBP-Z44_ValueSetLibrary.xml");
 
 			Profile profile = XMLDeserializer.deserialize(profileXML).get();
 			ValueSetLibrary valueSetLibrary = ValueSetLibraryImpl.apply(vsLibraryXML).get();

@@ -4,8 +4,8 @@ import org.hibernate.Session;
 import org.hl7.fhir.r5.model.*;
 import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
+import org.immregistries.iis.kernal.logic.AbstractIncomingMessageHandler;
 import org.immregistries.iis.kernal.logic.CodeMapManager;
-import org.immregistries.iis.kernal.logic.IncomingMessageHandler;
 import org.immregistries.iis.kernal.logic.ProcessingException;
 import org.immregistries.iis.kernal.mapping.interfaces.*;
 import org.immregistries.iis.kernal.model.ProcessingFlavor;
@@ -34,7 +34,7 @@ public class TestMapping extends HttpServlet {
 	public static final String PARAM_MESSAGE = "MESSAGEDATA";
 
 	@Autowired
-	IncomingMessageHandler handler;
+	AbstractIncomingMessageHandler handler;
 
 	@Autowired
 	PatientMapper<Patient> patientMapper;

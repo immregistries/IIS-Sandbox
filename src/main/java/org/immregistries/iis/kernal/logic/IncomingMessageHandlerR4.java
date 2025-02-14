@@ -19,7 +19,7 @@ import java.util.Set;
 
 @Service
 @Conditional(OnR4Condition.class)
-public class IncomingMessageHandlerR4 extends IncomingMessageHandler {
+public class IncomingMessageHandlerR4 extends AbstractIncomingMessageHandler {
 
 	public @Nullable IIdType readResponsibleOrganizationIIdType(Tenant tenant, HL7Reader reader, String sendingFacilityName, Set<ProcessingFlavor> processingFlavorSet) throws ProcessingException {
 		String facilityId = reader.getValue(4);

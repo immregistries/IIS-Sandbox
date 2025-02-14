@@ -39,7 +39,7 @@ public class IncomingQueryHandler {
 	@Autowired
 	AbstractFhirRequester fhirRequester;
 	@Autowired
-	Hl7MessageWriter hl7MessageWriter;
+	AbstractHl7MessageWriter hl7MessageWriter;
 	@Autowired
 	ValidationService validationService;
 	@Autowired

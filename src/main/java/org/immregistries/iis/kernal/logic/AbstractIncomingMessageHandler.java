@@ -38,8 +38,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public abstract class IncomingMessageHandler implements IIncomingMessageHandler {
-	protected final Logger logger = LoggerFactory.getLogger(IncomingMessageHandler.class);
+public abstract class AbstractIncomingMessageHandler implements IIncomingMessageHandler {
+	protected final Logger logger = LoggerFactory.getLogger(AbstractIncomingMessageHandler.class);
 
 	@Autowired
 	ValidationService validationService;
@@ -48,7 +48,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 	@Autowired
 	AbstractFhirRequester fhirRequester;
 	@Autowired
-	Hl7MessageWriter hl7MessageWriter;
+	AbstractHl7MessageWriter hl7MessageWriter;
 	@Autowired
 	PatientMapper patientMapper;
 	@Autowired
@@ -72,7 +72,7 @@ public abstract class IncomingMessageHandler implements IIncomingMessageHandler 
 	MessageRecordingService messageRecordingService;
 
 
-	public IncomingMessageHandler() {
+	public AbstractIncomingMessageHandler() {
 	}
 
 

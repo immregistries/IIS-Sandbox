@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.Set;
 
 import static ca.uhn.fhir.interceptor.api.Pointcut.SERVER_INCOMING_REQUEST_PRE_HANDLED;
-import static org.immregistries.iis.kernal.logic.IncomingMessageHandler.NAME_SIZE_LIMIT;
+import static org.immregistries.iis.kernal.logic.IIncomingMessageHandler.NAME_SIZE_LIMIT;
 
 @Interceptor
 @Service

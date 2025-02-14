@@ -2,7 +2,7 @@
 
 import org.hibernate.Session;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
-import org.immregistries.iis.kernal.logic.IncomingMessageHandler;
+import org.immregistries.iis.kernal.logic.AbstractIncomingMessageHandler;
 import org.immregistries.iis.kernal.model.Tenant;
 import org.immregistries.smm.cdc.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +24,7 @@ import java.io.PrintWriter;
 public class SoapController extends HttpServlet {
 
 	@Autowired
-	IncomingMessageHandler handler;
+	AbstractIncomingMessageHandler handler;
 
 	@PostMapping
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)

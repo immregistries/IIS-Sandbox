@@ -25,7 +25,7 @@ import static org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRe
 
 @Service
 @Conditional(OnR5Condition.class)
-public class IncomingMessageHandlerR5 extends IncomingMessageHandler {
+public class IncomingMessageHandlerR5 extends AbstractIncomingMessageHandler {
 
 	public @Nullable IIdType readResponsibleOrganizationIIdType(Tenant tenant, HL7Reader reader, String sendingFacilityName, Set<ProcessingFlavor> processingFlavorSet) throws ProcessingException {
 		String facilityId = reader.getValue(4);
