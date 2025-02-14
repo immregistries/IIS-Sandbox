@@ -27,18 +27,18 @@ public class MdmConfig {
 
 	@Primary
 	@Bean
-	CustomGoldenResourceHelper customGoldenResourceHelper(FhirContext theFhirContext) {
-		CustomGoldenResourceHelper customGoldenResourceHelper = new CustomGoldenResourceHelper(theFhirContext);
-		autowireCapableBeanFactory.autowireBean(customGoldenResourceHelper);
-		return customGoldenResourceHelper;
+	MdmIisGoldenResourceHelper customGoldenResourceHelper(FhirContext theFhirContext) {
+		MdmIisGoldenResourceHelper mdmIisGoldenResourceHelper = new MdmIisGoldenResourceHelper(theFhirContext);
+		autowireCapableBeanFactory.autowireBean(mdmIisGoldenResourceHelper);
+		return mdmIisGoldenResourceHelper;
 	}
 
 	@Primary
 	@Bean
-	CustomSubscriptionCanonicalizer customSubscriptionCanonicalizer(FhirContext theFhirContext) {
-		CustomSubscriptionCanonicalizer customSubscriptionCanonicalizer = new CustomSubscriptionCanonicalizer(theFhirContext);
-		autowireCapableBeanFactory.autowireBean(customSubscriptionCanonicalizer);
-		return customSubscriptionCanonicalizer;
+	IisSubscriptionCanonicalizer customSubscriptionCanonicalizer(FhirContext theFhirContext) {
+		IisSubscriptionCanonicalizer iisSubscriptionCanonicalizer = new IisSubscriptionCanonicalizer(theFhirContext);
+		autowireCapableBeanFactory.autowireBean(iisSubscriptionCanonicalizer);
+		return iisSubscriptionCanonicalizer;
 	}
 
 	@Primary
@@ -60,10 +60,10 @@ public class MdmConfig {
 
 	@Primary
 	@Bean
-	CustomSubscriptionValidatingInterceptor customSubscriptionValidatingInterceptor() {
-		CustomSubscriptionValidatingInterceptor customSubscriptionValidatingInterceptor = new CustomSubscriptionValidatingInterceptor();
-		autowireCapableBeanFactory.autowireBean(customSubscriptionValidatingInterceptor);
-		return customSubscriptionValidatingInterceptor;
+	IisSubscriptionValidatingInterceptor customSubscriptionValidatingInterceptor() {
+		IisSubscriptionValidatingInterceptor iisSubscriptionValidatingInterceptor = new IisSubscriptionValidatingInterceptor();
+		autowireCapableBeanFactory.autowireBean(iisSubscriptionValidatingInterceptor);
+		return iisSubscriptionValidatingInterceptor;
 	}
 
 	@Bean

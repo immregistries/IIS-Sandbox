@@ -30,7 +30,7 @@ import static ca.uhn.fhir.context.FhirVersionEnum.R5;
 /**
  * Custom Made for Accepting R5 and adding any original identifier to golden identifiers
  */
-public class CustomGoldenResourceHelper extends GoldenResourceHelper {
+public class MdmIisGoldenResourceHelper extends GoldenResourceHelper {
 
 	private static final Logger ourLog = Logs.getMdmTroubleshootingLog();
 
@@ -51,7 +51,7 @@ public class CustomGoldenResourceHelper extends GoldenResourceHelper {
 	private final FhirContext myFhirContext;
 
 	@Autowired
-	public CustomGoldenResourceHelper(FhirContext theFhirContext) {
+	public MdmIisGoldenResourceHelper(FhirContext theFhirContext) {
 		super(theFhirContext);
 		myFhirContext = theFhirContext;
 	}

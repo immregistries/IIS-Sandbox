@@ -36,7 +36,11 @@ import java.util.Optional;
 
 
 //@Interceptor
-public class CustomSubscriptionValidatingInterceptor extends SubscriptionValidatingInterceptor {
+
+/**
+ * Modified from original to support R5 Subscription (experimental), especially for MDM
+ */
+public class IisSubscriptionValidatingInterceptor extends SubscriptionValidatingInterceptor {
 
 
 	@Autowired

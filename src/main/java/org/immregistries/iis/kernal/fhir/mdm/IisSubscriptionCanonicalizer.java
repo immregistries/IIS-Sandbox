@@ -39,12 +39,15 @@ import static ca.uhn.fhir.util.HapiExtensions.EX_SEND_DELETE_MESSAGES;
 import static java.util.stream.Collectors.mapping;
 import static java.util.stream.Collectors.toList;
 
-public class CustomSubscriptionCanonicalizer extends SubscriptionCanonicalizer {
+/**
+ * Modified from original to support R5 Subscription (experimental), especially for MDM
+ */
+public class IisSubscriptionCanonicalizer extends SubscriptionCanonicalizer {
 	private static final Logger ourLog = LoggerFactory.getLogger(SubscriptionCanonicalizer.class);
 
 	private final FhirContext myFhirContext;
 	@Autowired
-	public CustomSubscriptionCanonicalizer(FhirContext theFhirContext) {
+	public IisSubscriptionCanonicalizer(FhirContext theFhirContext) {
 		super(theFhirContext);
 		myFhirContext = theFhirContext;
 	}
