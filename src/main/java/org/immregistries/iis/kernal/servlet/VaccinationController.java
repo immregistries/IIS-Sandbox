@@ -235,7 +235,7 @@ public class VaccinationController {
 						} else {
 							link = apiBaseUrl + "/$mdm-query-links?resourceId=" + vaccination.getVaccinationId();
 						}
-						out.println("<div>Related Patient Records: <a href=\"" + link + "\">" + link + "</a></div>");
+						out.println("<div>Related Immunization Records: <a href=\"" + link + "\">" + link + "</a></div>");
 					}
 					out.println("</div>");
 				}
