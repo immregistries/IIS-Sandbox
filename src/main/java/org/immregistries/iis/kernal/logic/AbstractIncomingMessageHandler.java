@@ -503,6 +503,10 @@ public abstract class AbstractIncomingMessageHandler implements IIncomingMessage
 				fillerIdentifier.setSystem(reader.getValue(3, 2));
 				fillerIdentifier.setType("FILL"); // According to v2 to FHIR
 			}
+			ModelPerson enteringProvider = processPersonPractitioner(tenant, reader, 10);
+
+			ModelPerson orderingProvider = processPersonPractitioner(tenant, reader, 12);
+
 			boolean rxaPresent = reader.advanceToSegment("RXA", "ORC");
 			if (!rxaPresent) {
 				throw new ProcessingException("RXA segment was not found after ORC segment", "ORC", orcCount, 0);
@@ -539,8 +543,12 @@ public abstract class AbstractIncomingMessageHandler implements IIncomingMessage
 					vaccinationReported.addBusinessIdentifier(fillerIdentifier);
 				}
 			}
-			vaccinationReported.setPatientReportedId(patientReported.getPatientId());
+
+//			vaccinationReported.setPatientReportedId(patientReported.getPatientId());
 			vaccinationReported.setPatientReported(patientReported);
+
+			vaccinationReported.setEnteredBy(enteringProvider);
+			vaccinationReported.setAdministeringProvider(orderingProvider);
 
 			String vaccineCvxCode = "";
 			String vaccineNdcCode = "";
@@ -604,29 +612,10 @@ public abstract class AbstractIncomingMessageHandler implements IIncomingMessage
 					vaccinationReported.setOrgLocation(orgLocation);
 				}
 			}
-			{
-				String administeringProvider = reader.getValue(10);
-				if (StringUtils.isNotEmpty(administeringProvider)) {
-					ModelPerson modelPerson = fhirRequester.searchPractitioner(new SearchParameterMap("identifier", new TokenParam().setValue(administeringProvider)));
-//								Practitioner.IDENTIFIER.exactly().code(administeringProvider));
-					if (modelPerson == null) {
-						modelPerson = new ModelPerson();
-						modelPerson.setPersonExternalLink(administeringProvider);
-						modelPerson.setTenant(tenant);
-						modelPerson.setNameLast(reader.getValue(10, 2));
-						modelPerson.setNameFirst(reader.getValue(10, 3));
-						modelPerson.setNameMiddle(reader.getValue(10, 4));
-						modelPerson.setAssigningAuthority(reader.getValue(10, 9));
-						modelPerson.setNameTypeCode(reader.getValue(10, 10));
-						modelPerson.setIdentifierTypeCode(reader.getValue(10, 13));
-						modelPerson.setProfessionalSuffix(reader.getValue(10, 21));
-//					  Person  p = PersonMapper.getFhirPerson(modelPerson);
-						modelPerson = fhirRequester.savePractitioner(modelPerson);
-					}
-					vaccinationReported.setAdministeringProvider(modelPerson);
-				}
+			ModelPerson administeringProvider = processPersonPractitioner(tenant, reader, 10);
+			vaccinationReported.setAdministeringProvider(administeringProvider);
 
-			}
+
 			vaccinationReported.setUpdatedDate(new Date());
 			vaccinationReported.setAdministeredDate(administrationDate);
 			vaccinationReported.setVaccineCvxCode(vaccineCvxCode);
@@ -697,6 +686,30 @@ public abstract class AbstractIncomingMessageHandler implements IIncomingMessage
 			throw new ProcessingException("Patient vaccination history cannot be accepted without at least one administered, historical, or refused vaccination specified", "", 0, 0);
 		}
 		return vaccinationReportedList;
+	}
+
+	private ModelPerson processPersonPractitioner(Tenant tenant, HL7Reader reader, int fieldNum) {
+		ModelPerson modelPerson = null;
+		String administeringProvider = reader.getValue(fieldNum);
+		if (StringUtils.isNotEmpty(administeringProvider)) {
+			modelPerson = fhirRequester.searchPractitioner(new SearchParameterMap("identifier", new TokenParam().setValue(administeringProvider)));
+//								Practitioner.IDENTIFIER.exactly().code(administeringProvider));
+			if (modelPerson == null) {
+				modelPerson = new ModelPerson();
+				modelPerson.setPersonExternalLink(administeringProvider);
+				modelPerson.setTenant(tenant);
+				modelPerson.setNameLast(reader.getValue(fieldNum, 2));
+				modelPerson.setNameFirst(reader.getValue(fieldNum, 3));
+				modelPerson.setNameMiddle(reader.getValue(fieldNum, 4));
+				modelPerson.setAssigningAuthority(reader.getValue(fieldNum, 9));
+				modelPerson.setNameTypeCode(reader.getValue(fieldNum, 10));
+				modelPerson.setIdentifierTypeCode(reader.getValue(fieldNum, 13));
+				modelPerson.setProfessionalSuffix(reader.getValue(fieldNum, 21));
+//					  Person  p = PersonMapper.getFhirPerson(modelPerson);
+				modelPerson = fhirRequester.savePractitioner(modelPerson);
+			}
+		}
+		return modelPerson;
 	}
 
 
