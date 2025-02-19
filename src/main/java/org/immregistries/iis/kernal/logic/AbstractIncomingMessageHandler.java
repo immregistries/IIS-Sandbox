@@ -435,6 +435,10 @@ public abstract class AbstractIncomingMessageHandler implements IIncomingMessage
 		}
 
 		if (reader.advanceToSegment("PD1")) {
+			ModelPerson generalPractitioner = processPersonPractitioner(tenant, reader, 4);
+			if (generalPractitioner != null) {
+				patientReported.setGeneralPractitionerId("Practitioner/" + generalPractitioner.getPersonId());
+			}
 			patientReported.setPublicityIndicator(reader.getValue(11));
 			patientReported.setProtectionIndicator(reader.getValue(12));
 			patientReported.setProtectionIndicatorDate(IIncomingMessageHandler.parseDateWarn(reader.getValue(13), "Invalid protection indicator date", "PD1", 1, 13, strictDate, iisReportableList));

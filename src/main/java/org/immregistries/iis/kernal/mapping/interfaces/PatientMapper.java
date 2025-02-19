@@ -40,6 +40,8 @@ public interface PatientMapper<Patient extends IBaseResource> extends IisFhirMap
 	String NO = "N";
 	String MALE_SEX = "M";
 	String FEMALE_SEX = "F";
+	String UNKNOWN_SEX = "U";
+	String OTHER_SEX = "O";
 
 	String V_2_NAME_TYPE = "v2-name-type";
 	String V_2_NAME_TYPE_SYSTEM = "http://terminology.hl7.org/CodeSystem/v2-0200";

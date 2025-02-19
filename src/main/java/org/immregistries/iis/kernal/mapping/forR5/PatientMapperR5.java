@@ -119,6 +119,9 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 		/*
 		 * Gender
 		 */
+		/*
+		 * Gender
+		 */
 		switch (patient.getGender()) {
 			case MALE:
 				localPatient.setSex(MALE_SEX);
@@ -126,7 +129,12 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 			case FEMALE:
 				localPatient.setSex(FEMALE_SEX);
 				break;
+			case UNKNOWN:
+				localPatient.setSex(UNKNOWN_SEX);
+				break;
 			case OTHER:
+				localPatient.setSex(OTHER_SEX);
+				break;
 			default:
 				localPatient.setSex("");
 				break;
@@ -265,6 +273,12 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 			patientGuardian.setGuardianRelationship(contactComponent.getRelationshipFirstRep().getCodingFirstRep().getCode());
 			localPatient.addPatientGuardian(patientGuardian);
 		}
+		/*
+		 * GeneralPractitioner
+		 */
+		if (!patient.getGeneralPractitioner().isEmpty() && patient.getGeneralPractitionerFirstRep().hasReference()) {
+			localPatient.setGeneralPractitionerId("Practitioner/" + patient.getGeneralPractitionerFirstRep().getReferenceElement().getIdPart());
+		}
 	}
 
 	public Patient fhirResource(PatientMaster pm) {
@@ -319,6 +333,12 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 				break;
 			case FEMALE_SEX:
 				p.setGender(AdministrativeGender.FEMALE);
+				break;
+			case UNKNOWN_SEX:
+				p.setGender(AdministrativeGender.UNKNOWN);
+				break;
+			case OTHER_SEX:
+				p.setGender(AdministrativeGender.OTHER);
 				break;
 			default:
 				p.setGender(AdministrativeGender.OTHER);
@@ -463,6 +483,12 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 				contact.addRelationship()
 					.setText(patientGuardian.getGuardianRelationship());
 			}
+		}
+		/*
+		 * General Practitioner
+		 */
+		if (StringUtils.isNotBlank(pm.getGeneralPractitionerId())) {
+			p.addGeneralPractitioner(new Reference(pm.getGeneralPractitionerId()).setType("Practitioner"));
 		}
 		return p;
 	}

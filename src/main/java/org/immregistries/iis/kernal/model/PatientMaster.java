@@ -40,6 +40,8 @@ public class PatientMaster extends AbstractMappedObject implements Serializable 
 	private List<PatientGuardian> patientGuardians = new ArrayList<>(1);
 
 	private String managingOrganizationId;
+	private String generalPractitionerId;
+
 
 	public String getManagingOrganizationId() {
 		return managingOrganizationId;
@@ -399,6 +401,15 @@ public class PatientMaster extends AbstractMappedObject implements Serializable 
 				", registryStatusIndicatorDate=" + registryStatusIndicatorDate +
 				", patientGuardians=" + patientGuardians +
 			", managingOrganizationId='" + managingOrganizationId + '\'' +
+			", generalPractitionerId='" + generalPractitionerId + '\'' +
 				'}';
+	}
+
+	public String getGeneralPractitionerId() {
+		return generalPractitionerId;
+	}
+
+	public void setGeneralPractitionerId(String generalPractitionerId) {
+		this.generalPractitionerId = generalPractitionerId;
 	}
 }
