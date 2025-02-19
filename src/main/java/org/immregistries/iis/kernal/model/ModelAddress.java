@@ -2,7 +2,7 @@ package org.immregistries.iis.kernal.model;
 
 import org.apache.commons.lang3.StringUtils;
 
-public class ModelAddress {
+public class ModelAddress extends AbstractDiffable<ModelAddress> {
 	private String addressLine1 = "";
 	private String addressLine2 = "";
 	private String addressCity = "";

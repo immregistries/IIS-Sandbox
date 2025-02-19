@@ -2,7 +2,7 @@ package org.immregistries.iis.kernal.fhir.ips;
 
 import ca.uhn.fhir.jpa.ips.api.SectionRegistry;
 
-public class SectionRegistryR5  extends SectionRegistry {
+public class SectionRegistryR5 extends SectionRegistry {
 
 	@Override
 	/**

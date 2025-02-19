@@ -4,7 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.exceptions.FHIRException;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
 
-public class ModelPhone {
+public class ModelPhone extends AbstractDiffable<ModelPhone> {
 	public static final String PHONE_USE_V2_SYSTEM = "http://terminology.hl7.org/ValueSet/v2-0201";
 	public static final String USE_EXTENSION_URL = "use";
 	private String number = "";
@@ -169,7 +169,7 @@ public class ModelPhone {
 
 	@Override
 	public String toString() {
-		return "PatientPhone{" +
+		return "ModelPhone{" +
 			"number='" + number + '\'' +
 			", use='" + use + '\'' +
 			'}';

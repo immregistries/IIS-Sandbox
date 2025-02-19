@@ -4,7 +4,7 @@ package org.immregistries.iis.kernal.model;
 import ca.uhn.fhir.rest.param.TokenParam;
 import org.apache.commons.lang3.StringUtils;
 
-public class BusinessIdentifier {
+public class BusinessIdentifier extends AbstractDiffable<BusinessIdentifier> {
 	public static final String IDENTIFIER_TYPE_SYSTEM = "http://terminology.hl7.org/CodeSystem/v2-0203";
 	public static final String MRN_TYPE_VALUE = "MR";
 	public static final String FILLER_TYPE_VALUE = "FILL";

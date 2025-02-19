@@ -7,9 +7,13 @@ import ca.uhn.fhir.mdm.api.IMdmMatchFinderSvc;
 import ca.uhn.fhir.mdm.api.MatchedTarget;
 import ca.uhn.fhir.mdm.log.Logs;
 import ca.uhn.fhir.mdm.rules.svc.MdmResourceMatcherSvc;
+import org.apache.commons.lang3.builder.DiffResult;
 import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.ResourceType;
+import org.immregistries.iis.kernal.logic.logicInterceptors.AbstractLogicInterceptor;
+import org.immregistries.iis.kernal.logic.logicInterceptors.PatientProcessingInterceptor;
+import org.immregistries.iis.kernal.mapping.interfaces.PatientMapper;
 import org.immregistries.iis.kernal.model.ProcessingFlavor;
 import org.immregistries.iis.kernal.servlet.PatientMatchingDatasetConversionController;
 import org.immregistries.mismo.match.PatientMatchResult;
@@ -40,6 +44,10 @@ public abstract class AbstractMdmIisMatchFinderSvc<Immunization extends IBaseRes
 	MdmResourceMatcherSvc myMdmResourceMatcherSvc;
 	@Autowired
 	private PatientMatchingDatasetConversionController patientMatchingDatasetConversionController;
+	@Autowired
+	PatientProcessingInterceptor patientProcessingInterceptor;
+	@Autowired
+	PatientMapper patientMapper;
 
 	private final PatientMatcher patientMismoMatcher;
 
@@ -91,6 +99,12 @@ public abstract class AbstractMdmIisMatchFinderSvc<Immunization extends IBaseRes
 
 			ourLog.trace("Found {} matched targets for {}.", matches.size(), idOrType(theResource, theResourceType));
 			ourLog.info("Found {} matched targets for {}.", matches.size(), idOrType(theResource, theResourceType));
+			if (theResourceType.equals(ResourceType.Patient.name())) {
+				for (MatchedTarget matchedTarget : matches) {
+					DiffResult diff = patientMapper.localObject(theResource).diff(patientMapper.localObject(matchedTarget.getTarget()));
+					AbstractLogicInterceptor.printDiff(ourLog, diff);
+				}
+			}
 			return matches;
 		}
 	}

@@ -2,6 +2,7 @@ package org.immregistries.iis.kernal.logic.logicInterceptors;
 
 import ca.uhn.fhir.parser.IParser;
 import ca.uhn.fhir.rest.api.server.RequestDetails;
+import org.apache.commons.lang3.builder.DiffResult;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.immregistries.iis.kernal.logic.ack.IisReportable;
 import org.immregistries.iis.kernal.logic.ack.IisReportableSeverity;
@@ -40,7 +41,7 @@ public abstract class AbstractLogicInterceptor {
 		return iisReportable;
 	}
 
-	protected boolean testMapping(IisFhirMapperMasterReported<AbstractMappedObject, AbstractMappedObject, IBaseResource> mapper, AbstractMappedObject abstractMappedObject) {
+	public boolean testMapping(IisFhirMapperMasterReported<AbstractMappedObject, AbstractMappedObject, IBaseResource> mapper, AbstractMappedObject abstractMappedObject) {
 		IBaseResource resource = mapper.fhirResource(abstractMappedObject);
 		AbstractMappedObject abstractMappedObject1 = mapper.localObjectReported(resource);
 		if (abstractMappedObject1 == null) {
@@ -50,10 +51,15 @@ public abstract class AbstractLogicInterceptor {
 		if (!res) {
 			logger.info("Object Mapping check failed\n{}\n\n{}\n", abstractMappedObject, abstractMappedObject1);
 		}
+		DiffResult<AbstractMappedObject> diffResult = abstractMappedObject.diff(abstractMappedObject1);
+		if (!diffResult.getDiffs().isEmpty()) {
+			logger.info("Object Mapping check FAILED");
+			printDiff(logger, diffResult);
+		}
 		return res;
 	}
 
-	protected boolean testMappingFhir(IisFhirMapperMasterReported<AbstractMappedObject, AbstractMappedObject, IBaseResource> mapper, IBaseResource resource, IParser parser) {
+	public boolean testMappingFhir(IisFhirMapperMasterReported<AbstractMappedObject, AbstractMappedObject, IBaseResource> mapper, IBaseResource resource, IParser parser) {
 		AbstractMappedObject abstractMappedObject1 = mapper.localObjectReported(resource);
 		IBaseResource resource1 = mapper.fhirResource(abstractMappedObject1);
 		String s1 = parser.encodeResourceToString(resource);
@@ -63,6 +69,14 @@ public abstract class AbstractLogicInterceptor {
 //			logger.info("FHIR Mapping check failed {}\n\n{}", s1, s2);
 //		}
 		return res;
+	}
+
+	public static void printDiff(Logger logger, DiffResult<AbstractMappedObject> diffResult) {
+//		logger.info("Object Mapping check DIFF: \n{}", JsonFormatter.prettyPrint(diffResult.toString(ToStringStyle.JSON_STYLE)));
+//		logger.info("Object Mapping check DIFF: {}", diffResult.toString(ToStringStyle.SHORT_PREFIX_STYLE));
+		diffResult.getDiffs().stream().forEach((dif) -> {
+			logger.info("Object Mapping check DIFF: {}\n{}\n{}", dif.getFieldName(), dif.getRight(), dif.getLeft());
+		});
 	}
 
 }

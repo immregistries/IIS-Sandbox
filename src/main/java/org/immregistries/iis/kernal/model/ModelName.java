@@ -6,7 +6,7 @@ import org.immregistries.iis.kernal.mapping.MappingHelper;
 import static org.immregistries.iis.kernal.mapping.interfaces.PatientMapper.V_2_NAME_TYPE;
 import static org.immregistries.iis.kernal.mapping.interfaces.PatientMapper.V_2_NAME_TYPE_SYSTEM;
 
-public class ModelName {
+public class ModelName extends AbstractDiffable<ModelName> {
 	private String nameLast = "";
 	private String nameFirst = "";
 	private String nameMiddle = "";
