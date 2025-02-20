@@ -4,6 +4,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.exceptions.FHIRException;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
 
+import java.util.Objects;
+
 public class ModelPhone extends AbstractDiffable<ModelPhone> {
 	public static final String PHONE_USE_V2_SYSTEM = "http://terminology.hl7.org/ValueSet/v2-0201";
 	public static final String USE_EXTENSION_URL = "use";
@@ -173,5 +175,17 @@ public class ModelPhone extends AbstractDiffable<ModelPhone> {
 			"number='" + number + '\'' +
 			", use='" + use + '\'' +
 			'}';
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (o == null || getClass() != o.getClass()) return false;
+		ModelPhone that = (ModelPhone) o;
+		return Objects.equals(number, that.number) && Objects.equals(use, that.use);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(number, use);
 	}
 }

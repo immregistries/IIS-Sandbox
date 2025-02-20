@@ -2,6 +2,8 @@ package org.immregistries.iis.kernal.model;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Objects;
+
 public class ModelAddress extends AbstractDiffable<ModelAddress> {
 	private String addressLine1 = "";
 	private String addressLine2 = "";
@@ -130,5 +132,17 @@ public class ModelAddress extends AbstractDiffable<ModelAddress> {
 			", addressCountry='" + addressCountry + '\'' +
 			", addressCountyParish='" + addressCountyParish + '\'' +
 			'}';
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (o == null || getClass() != o.getClass()) return false;
+		ModelAddress that = (ModelAddress) o;
+		return Objects.equals(addressLine1, that.addressLine1) && Objects.equals(addressLine2, that.addressLine2) && Objects.equals(addressCity, that.addressCity) && Objects.equals(addressState, that.addressState) && Objects.equals(addressZip, that.addressZip) && Objects.equals(addressCountry, that.addressCountry) && Objects.equals(addressCountyParish, that.addressCountyParish);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(addressLine1, addressLine2, addressCity, addressState, addressZip, addressCountry, addressCountyParish);
 	}
 }

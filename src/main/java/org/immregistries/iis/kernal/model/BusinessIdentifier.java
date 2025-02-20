@@ -4,6 +4,8 @@ package org.immregistries.iis.kernal.model;
 import ca.uhn.fhir.rest.param.TokenParam;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Objects;
+
 public class BusinessIdentifier extends AbstractDiffable<BusinessIdentifier> {
 	public static final String IDENTIFIER_TYPE_SYSTEM = "http://terminology.hl7.org/CodeSystem/v2-0203";
 	public static final String MRN_TYPE_VALUE = "MR";
@@ -111,11 +113,23 @@ public class BusinessIdentifier extends AbstractDiffable<BusinessIdentifier> {
 
 	@Override
 	public String toString() {
-		return "PatientIdentifier{" +
+		return "BusinessIdentifier{" +
 			"system='" + system + '\'' +
 			", value='" + value + '\'' +
 			", type='" + type + '\'' +
 			", assignerReference='" + assignerReference + '\'' +
 			'}';
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (o == null || getClass() != o.getClass()) return false;
+		BusinessIdentifier that = (BusinessIdentifier) o;
+		return Objects.equals(system, that.system) && Objects.equals(value, that.value) && Objects.equals(type, that.type) && Objects.equals(assignerReference, that.assignerReference);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(system, value, type, assignerReference);
 	}
 }

@@ -472,16 +472,18 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 		for (PatientGuardian patientGuardian : pm.getPatientGuardians()) {
 			Patient.ContactComponent contact = p.addContact();
 			contact.setName(patientGuardian.getName().toR5());
-			Coding coding = new Coding().setSystem(RELATIONSHIP_SYSTEM).setCode(patientGuardian.getGuardianRelationship());
-			Code code = CodeMapManager.getCodeMap().getCodeForCodeset(CodesetType.PERSON_RELATIONSHIP, patientGuardian.getGuardianRelationship());
-			if (code != null) {
-				coding.setDisplay(code.getLabel());
-				contact.addRelationship()
-					.setText(patientGuardian.getGuardianRelationship())
-					.addCoding(coding);
-			} else {
-				contact.addRelationship()
-					.setText(patientGuardian.getGuardianRelationship());
+			if (StringUtils.isNotBlank(patientGuardian.getGuardianRelationship())) {
+				Coding coding = new Coding().setSystem(RELATIONSHIP_SYSTEM).setCode(patientGuardian.getGuardianRelationship());
+				Code code = CodeMapManager.getCodeMap().getCodeForCodeset(CodesetType.PERSON_RELATIONSHIP, patientGuardian.getGuardianRelationship());
+				if (code != null) {
+					coding.setDisplay(code.getLabel());
+					contact.addRelationship()
+						.setText(patientGuardian.getGuardianRelationship())
+						.addCoding(coding);
+				} else {
+					contact.addRelationship()
+						.setText(patientGuardian.getGuardianRelationship());
+				}
 			}
 		}
 		/*

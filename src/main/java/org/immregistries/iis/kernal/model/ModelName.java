@@ -3,6 +3,8 @@ package org.immregistries.iis.kernal.model;
 import org.apache.commons.lang3.StringUtils;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
 
+import java.util.Objects;
+
 import static org.immregistries.iis.kernal.mapping.interfaces.PatientMapper.V_2_NAME_TYPE;
 import static org.immregistries.iis.kernal.mapping.interfaces.PatientMapper.V_2_NAME_TYPE_SYSTEM;
 
@@ -30,7 +32,7 @@ public class ModelName extends AbstractDiffable<ModelName> {
 		org.hl7.fhir.r4.model.Extension nameType = name.getExtensionByUrl(V_2_NAME_TYPE);
 		if (nameType != null) {
 			org.hl7.fhir.r4.model.Coding coding = MappingHelper.extensionGetCoding(nameType);
-			if (coding != null && StringUtils.isNotBlank(coding.getCode())) {
+			if (coding != null && coding.hasCode()) {
 				this.setNameType(coding.getCode());
 			} else {
 				this.setNameType("");
@@ -51,7 +53,7 @@ public class ModelName extends AbstractDiffable<ModelName> {
 		org.hl7.fhir.r5.model.Extension nameType = name.getExtensionByUrl(V_2_NAME_TYPE);
 		if (nameType != null) {
 			org.hl7.fhir.r5.model.Coding coding = MappingHelper.extensionGetCoding(nameType);
-			if (coding != null && StringUtils.isNotBlank(coding.getCode())) {
+			if (coding != null && coding.hasCode()) {
 				this.setNameType(coding.getCode());
 			} else {
 				this.setNameType("");
@@ -141,5 +143,18 @@ public class ModelName extends AbstractDiffable<ModelName> {
 				", nameMiddle='" + nameMiddle + '\'' +
 				", nameType='" + nameType + '\'' +
 				'}';
+	}
+
+
+	@Override
+	public boolean equals(Object o) {
+		if (o == null || getClass() != o.getClass()) return false;
+		ModelName modelName = (ModelName) o;
+		return Objects.equals(nameLast, modelName.nameLast) && Objects.equals(nameFirst, modelName.nameFirst) && Objects.equals(nameMiddle, modelName.nameMiddle) && Objects.equals(nameType, modelName.nameType);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(nameLast, nameFirst, nameMiddle, nameType);
 	}
 }

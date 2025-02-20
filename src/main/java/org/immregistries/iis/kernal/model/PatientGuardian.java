@@ -1,6 +1,8 @@
 package org.immregistries.iis.kernal.model;
 
-public class PatientGuardian {
+import java.util.Objects;
+
+public class PatientGuardian extends AbstractDiffable<PatientGuardian> {
 	private ModelName name = new ModelName();
 	private String guardianRelationship = "";
 
@@ -26,5 +28,17 @@ public class PatientGuardian {
 			"name=" + name +
 			", guardianRelationship='" + guardianRelationship + '\'' +
 			'}';
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (o == null || getClass() != o.getClass()) return false;
+		PatientGuardian that = (PatientGuardian) o;
+		return Objects.equals(name, that.name) && Objects.equals(guardianRelationship, that.guardianRelationship);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(name, guardianRelationship);
 	}
 }
