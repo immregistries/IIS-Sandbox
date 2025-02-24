@@ -455,7 +455,7 @@ public abstract class AbstractIncomingMessageHandler implements IIncomingMessage
 				patientGuardian.getName().setNameLast(guardianLast);
 				String guardianFirst = reader.getValue(2, 2);
 				patientGuardian.getName().setNameFirst(guardianFirst);
-				String guardianMiddle = reader.getValue(2, 1);
+				String guardianMiddle = reader.getValue(2, 3);
 				patientGuardian.getName().setNameMiddle(guardianMiddle);
 				String guardianRelationship = reader.getValue(3);
 				patientGuardian.setGuardianRelationship(guardianRelationship);

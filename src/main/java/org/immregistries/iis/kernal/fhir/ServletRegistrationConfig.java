@@ -198,5 +198,15 @@ public class ServletRegistrationConfig {
 ////		registrationBean.setLoadOnStartup(1);
 //		return registrationBean;
 //	}
+@Bean
+public ServletRegistrationBean<TenantCompareServlet> tenantCompareServletServletRegistrationBean() {
+	ServletRegistrationBean<TenantCompareServlet> registrationBean = new ServletRegistrationBean<>();
+	TenantCompareServlet servlet = new TenantCompareServlet();
+	beanFactory.autowireBean(servlet);
+	registrationBean.setServlet(servlet);
+	registrationBean.addUrlMappings("/tenantCompare");
+//		registrationBean.setLoadOnStartup(1);
+	return registrationBean;
+}
 
 }

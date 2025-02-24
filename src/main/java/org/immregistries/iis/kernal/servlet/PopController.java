@@ -34,11 +34,9 @@ import static org.immregistries.iis.kernal.servlet.TenantController.PATH_VARIABL
 @RequestMapping({POP_BASE_PATH, TenantController.TENANT_PATH + POP_BASE_PATH})
 public class PopController {
 	public static final String POP_BASE_PATH = "/pop";
-
-	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	public static final String PARAM_MESSAGE = "MESSAGEDATA";
 	public static final String PARAM_FACILITY_NAME = "FACILITY_NAME";
-
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	@Autowired
 	FhirContext fhirContext;
 	@Autowired
@@ -52,8 +50,9 @@ public class PopController {
 		throws ServletException, IOException {
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
+		Session dataSession = null;
 		try {
-			Session dataSession = ServletHelper.getDataSession();
+			dataSession = ServletHelper.getDataSession();
 			Tenant tenant = ServletHelper.getTenant(tenantName, req, dataSession);
 
 			String ack = "";
@@ -61,46 +60,42 @@ public class PopController {
 			StringBuilder ackBuilder = new StringBuilder();
 			String message = req.getParameter(PARAM_MESSAGE);
 			String facility_name = req.getParameter(PARAM_FACILITY_NAME);
-			try {
-				if (tenant == null) {
-					resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-					out.println("Access is not authorized. FacilityId, userid and/or password are not recognized. ");
-				} else {
-					HomeServlet.doHeader(out, "IIS Sandbox - PopResult", tenant);
+			if (tenant == null) {
+				resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+				out.println("Access is not authorized. FacilityId, userid and/or password are not recognized. ");
+			} else {
+				HomeServlet.doHeader(out, "IIS Sandbox - PopResult", tenant);
 
-					messages = message.split("MSH\\|\\^~\\\\&\\|");
-					if (messages.length > 2) {
-						req.setAttribute("groupPatientIds", new ArrayList<String>());
-					}
-					for (String msh : messages) {
-						if (!msh.isBlank()) {
-							ackBuilder.append(handler.process("MSH|^~\\&|" + msh, tenant,facility_name));
-						}
-					}
-					ack = ackBuilder.toString();
-					ArrayList<String> groupPatientIds = (ArrayList<String>) req.getAttribute("groupPatientIds");
-					if (groupPatientIds != null) {
-						if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R5)) {
-							org.hl7.fhir.r5.model.Group group = new org.hl7.fhir.r5.model.Group();
-							for (String id :
-								groupPatientIds) {
-								group.addMember().setEntity(new org.hl7.fhir.r5.model.Reference().setReference("Patient/" + id));
-							}
-							group.setDescription("Generated from Hl2v2 VXU Query on  time " + new Date());
-							repositoryClientFactory.newGenericClient(req).create().resource(group).execute();
-						} else  {
-							org.hl7.fhir.r4.model.Group group = new org.hl7.fhir.r4.model.Group();
-							for (String id :
-								groupPatientIds) {
-								group.addMember().setEntity(new org.hl7.fhir.r4.model.Reference().setReference("Patient/" + id));
-							}
-							repositoryClientFactory.newGenericClient(req).create().resource(group).execute();
-						}
-
+				messages = message.split("MSH\\|\\^~\\\\&\\|");
+				if (messages.length > 2) {
+					req.setAttribute("groupPatientIds", new ArrayList<String>());
+				}
+				for (String msh : messages) {
+					if (!msh.isBlank()) {
+						ackBuilder.append(handler.process("MSH|^~\\&|" + msh, tenant, facility_name));
 					}
 				}
-			} finally {
-				dataSession.close();
+				ack = ackBuilder.toString();
+				ArrayList<String> groupPatientIds = (ArrayList<String>) req.getAttribute("groupPatientIds");
+				if (groupPatientIds != null) {
+					if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R5)) {
+						org.hl7.fhir.r5.model.Group group = new org.hl7.fhir.r5.model.Group();
+						for (String id :
+							groupPatientIds) {
+							group.addMember().setEntity(new org.hl7.fhir.r5.model.Reference().setReference("Patient/" + id));
+						}
+						group.setDescription("Generated from Hl2v2 VXU Query on  time " + new Date());
+						repositoryClientFactory.newGenericClient(req).create().resource(group).execute();
+					} else {
+						org.hl7.fhir.r4.model.Group group = new org.hl7.fhir.r4.model.Group();
+						for (String id :
+							groupPatientIds) {
+							group.addMember().setEntity(new org.hl7.fhir.r4.model.Reference().setReference("Patient/" + id));
+						}
+						repositoryClientFactory.newGenericClient(req).create().resource(group).execute();
+					}
+
+				}
 			}
 //      resp.setContentType("text/plain");
 			out.println("<textarea name=\"ack\" readonly style=\"width: 100%; height: 90%;\" >");
@@ -111,9 +106,13 @@ public class PopController {
 			resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 			e.printStackTrace(out);
 			e.printStackTrace(System.err);
+		} finally {
+			if (dataSession != null) {
+				dataSession.close();
+			}
+			out.flush();
+			out.close();
 		}
-		out.flush();
-		out.close();
 	}
 
 	@GetMapping
@@ -149,7 +148,7 @@ public class PopController {
 
 
 				out.println("    <div class=\"w3-container w3-card-4\">");
-				out.println("		<input class=\"w3-input\" type=\"text\" auto name=\"" + PARAM_FACILITY_NAME + "\" value=\""+  organizationName +"\"/>");
+				out.println("		<input class=\"w3-input\" type=\"text\" auto name=\"" + PARAM_FACILITY_NAME + "\" value=\"" + organizationName + "\"/>");
 				out.println("		<label>Sending organization name (Overriding the segments)</label>");
 				out.println("		<br/>");
 

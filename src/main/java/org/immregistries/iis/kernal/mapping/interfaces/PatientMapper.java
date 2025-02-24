@@ -24,12 +24,16 @@ public interface PatientMapper<Patient extends IBaseResource> extends IisFhirMap
 	String ETHNICITY_EXTENSION_OMB = "ombCategory";
 	String ETHNICITY_EXTENSION_TEXT = "text";
 	String ETHNICITY_SYSTEM = "urn:oid:2.16.840.1.113883.6.238";
+	String ETHNICITY_SYSTEM_OMB = "http://hl7.org/fhir/us/core/ValueSet/omb-ethnicity-category";
+	String ETHNICITY_SYSTEM_DETAILED = "http://hl7.org/fhir/us/core/ValueSet/detailed-ethnicity";
+
+
 	String RACE_EXTENSION = "http://hl7.org/fhir/us/core/StructureDefinition/us-core-race";
 	String RACE_EXTENSION_DETAILED = "detailed";
 	String RACE_EXTENSION_OMB = "ombCategory";
 	String RACE_EXTENSION_TEXT = "text";
 	String RACE_SYSTEM = "urn:oid:2.16.840.1.113883.6.238";
-	String RACE_SYSTEM_OMB = "http://hl7.org/fhir/us/core/ValueSet/omb-ethnicity-category";
+	String RACE_SYSTEM_OMB = "http://hl7.org/fhir/us/core/ValueSet/omb-race-category";
 	String RACE_SYSTEM_DETAILED = "http://hl7.org/fhir/us/core/ValueSet/detailed-race";
 
 	String PUBLICITY_EXTENSION = "publicity";
