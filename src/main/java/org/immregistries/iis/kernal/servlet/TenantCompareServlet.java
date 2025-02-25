@@ -5,7 +5,6 @@ import ca.uhn.fhir.interceptor.model.RequestPartitionId;
 import ca.uhn.fhir.jpa.api.dao.DaoRegistry;
 import ca.uhn.fhir.jpa.api.dao.IFhirResourceDao;
 import ca.uhn.fhir.jpa.partition.IPartitionLookupSvc;
-import ca.uhn.fhir.jpa.provider.DiffProvider;
 import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
 import ca.uhn.fhir.rest.api.server.IBundleProvider;
 import ca.uhn.fhir.rest.api.server.SystemRequestDetails;
@@ -14,6 +13,7 @@ import org.hibernate.Session;
 import org.hl7.fhir.instance.model.api.IBaseParameters;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.BooleanType;
+import org.immregistries.iis.kernal.fhir.CustomDiffProvider;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.model.Tenant;
 import org.immregistries.iis.kernal.model.UserAccess;
@@ -43,7 +43,7 @@ public class TenantCompareServlet extends HttpServlet {
 	private IPartitionLookupSvc partitionLookupSvc;
 
 	@Autowired
-	private DiffProvider diffProvider;
+	private CustomDiffProvider diffProvider;
 	@Autowired
 	private DaoRegistry daoRegistry;
 	@Autowired
@@ -115,8 +115,7 @@ public class TenantCompareServlet extends HttpServlet {
 
 				IBaseParameters diff = diffProvider.diff(iBaseResource1.getIdElement(), iBaseResource2.getIdElement(), new BooleanType(false), diffRequestDetail);
 				logger.info("Diff Patient {}, {}", i, fhirContext.newJsonParser().setPrettyPrint(true).encodeResourceToString(diff));
-				out.println("<pre>" + fhirContext.newJsonParser().setPrettyPrint(true).encodeResourceToString(diff) +
-					"</pre>");
+				out.println("<pre>" + fhirContext.newJsonParser().setPrettyPrint(true).encodeResourceToString(diff) + "</pre>");
 			}
 //			for(IBundleProvider iBundleProvider: bundleProviderStream) {
 //				iBundleProvider.getAllResources()
