@@ -13,6 +13,7 @@ import ca.uhn.fhir.rest.param.TokenParamModifier;
 import ca.uhn.fhir.rest.server.RestfulServer;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Session;
 import org.hl7.fhir.instance.model.api.IBaseParameters;
 import org.hl7.fhir.instance.model.api.IBaseResource;
@@ -41,6 +42,7 @@ import static org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRe
 
 
 public class TenantCompareServlet extends HttpServlet {
+	public static final String INCLUDE_GOLDEN = "includeGolden";
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	public static final String TENANT_IDS = "tenantIds";
@@ -62,9 +64,20 @@ public class TenantCompareServlet extends HttpServlet {
 		doGet(req, resp);
 	}
 
+	/**
+	 * Currently adapted only for origins loaded in the right order,
+	 * TODO add cross resource checks with ids and matching
+	 *
+	 * @param req
+	 * @param resp
+	 * @throws ServletException
+	 * @throws IOException
+	 */
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		String[] tenantNames = req.getParameter(TENANT_IDS).split(",");
+
+		boolean includeGolden = StringUtils.equalsIgnoreCase("true", req.getParameter(INCLUDE_GOLDEN));
 
 		logger.info("Testing Tenant comparison");
 		resp.setContentType("text/html");
@@ -85,13 +98,13 @@ public class TenantCompareServlet extends HttpServlet {
 			}).collect(Collectors.toList());
 
 			IFhirResourceDao patientDao = daoRegistry.getResourceDao("Patient");
-			checkResourceType(systemRequestDetailsList, patientDao, out);
+			checkResourceType(systemRequestDetailsList, patientDao, out, includeGolden);
 			IFhirResourceDao immunizationDao = daoRegistry.getResourceDao("Immunization");
-			checkResourceType(systemRequestDetailsList, immunizationDao, out);
+			checkResourceType(systemRequestDetailsList, immunizationDao, out, includeGolden);
 			IFhirResourceDao observationDao = daoRegistry.getResourceDao("Observation");
-			checkResourceType(systemRequestDetailsList, observationDao, out);
+			checkResourceType(systemRequestDetailsList, observationDao, out, includeGolden);
 			IFhirResourceDao organizationDao = daoRegistry.getResourceDao("Organization");
-			checkResourceType(systemRequestDetailsList, organizationDao, out);
+			checkResourceType(systemRequestDetailsList, organizationDao, out, includeGolden);
 
 			/*
 			 * Check references, match resources
@@ -102,9 +115,13 @@ public class TenantCompareServlet extends HttpServlet {
 		}
 	}
 
-	private void checkResourceType(List<SystemRequestDetails> systemRequestDetailsList, IFhirResourceDao resourceDao, PrintWriter out) {
+	private void checkResourceType(List<SystemRequestDetails> systemRequestDetailsList, IFhirResourceDao resourceDao, PrintWriter out, Boolean includeGolden) {
+		SearchParameterMap searchParameterMap = new SearchParameterMap();
+		if (!includeGolden) {
+			searchParameterMap.add("_tag", new TokenParam(GOLDEN_SYSTEM_TAG, GOLDEN_RECORD).setModifier(TokenParamModifier.NOT));
+		}
 		List<IBundleProvider> bundleProviderStream = systemRequestDetailsList.stream().map(
-			requestDetails -> resourceDao.search(new SearchParameterMap("_tag", new TokenParam(GOLDEN_SYSTEM_TAG, GOLDEN_RECORD).setModifier(TokenParamModifier.NOT)), requestDetails)).collect(Collectors.toList());
+			requestDetails -> resourceDao.search(searchParameterMap, requestDetails)).collect(Collectors.toList());
 		String label = resourceDao.getResourceType().getName().toLowerCase();
 
 		int previousSize = -1;
