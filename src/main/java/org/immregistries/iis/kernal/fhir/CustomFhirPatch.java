@@ -17,6 +17,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
 
+import static org.immregistries.iis.kernal.fhir.CustomDiffProvider.extensionUrlSimilarityComparator;
+
 public class CustomFhirPatch extends FhirPatch {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -112,6 +114,17 @@ public class CustomFhirPatch extends FhirPatch {
 				}
 			}
 
+			/*
+			 * CUSTOM CODE HERE Sorting extensions for same urls to be same position
+			 */
+			if (theOldField instanceof IBaseHasExtensions) {
+				IBaseHasExtensions oldBaseHasExtensions = (IBaseHasExtensions) theOldField;
+				IBaseHasExtensions newBaseHasExtensions = (IBaseHasExtensions) theNewField;
+				if (oldBaseHasExtensions.hasExtension() && newBaseHasExtensions.hasExtension()) {
+					oldBaseHasExtensions.getExtension().sort(extensionUrlSimilarityComparator(newBaseHasExtensions));
+					newBaseHasExtensions.getExtension().sort(extensionUrlSimilarityComparator(oldBaseHasExtensions));
+				}
+			}
 
 			List<BaseRuntimeChildDefinition> children = theDef.getChildren();
 			for (BaseRuntimeChildDefinition nextChild : children) {

@@ -69,8 +69,7 @@ public class CustomDiffProvider extends DiffProvider {
 			logger.info("test1 {} {}", sourceDomain.getExtension().size(), targetDomain.getExtension().size());
 
 			if (targetDomain.hasExtension() && sourceDomain.hasExtension()) {
-				sourceDomain.getExtension().remove(0);
-//					.sort(extensionUrlSimilarityComparator(targetDomain));
+				sourceDomain.getExtension().sort(extensionUrlSimilarityComparator(targetDomain));
 				targetDomain.getExtension().sort(extensionUrlSimilarityComparator(sourceDomain));
 			}
 			logger.info("test2 {} {}", sourceDomain.getExtension().size(), targetDomain.getExtension().size());
@@ -89,7 +88,14 @@ public class CustomDiffProvider extends DiffProvider {
 	@Nonnull
 	@Override
 	public FhirPatch newPatch(IPrimitiveType<Boolean> theIncludeMeta) {
-		FhirPatch fhirPatch = super.newPatch(theIncludeMeta);
+		FhirPatch fhirPatch = new CustomFhirPatch(myContext);
+		fhirPatch.setIncludePreviousValueInDiff(true);
+		if (theIncludeMeta != null && (Boolean) theIncludeMeta.getValue()) {
+			logger.trace("Including resource metadata in patch");
+		} else {
+			fhirPatch.addIgnorePath("*.meta");
+		}
+
 		fhirPatch.addIgnorePath("*.text.div");
 		fhirPatch.addIgnorePath("*.id");
 
@@ -99,16 +105,16 @@ public class CustomDiffProvider extends DiffProvider {
 	/**
 	 * Sorting extensions to harmonize position by ordering through Similarity then Url
 	 */
-	private Comparator<IBaseExtension<?, ?>> extensionUrlSimilarityComparator(IDomainResource otherResource) {
+	public static Comparator<IBaseExtension<?, ?>> extensionUrlSimilarityComparator(IBaseHasExtensions otherResource) {
 		return (e1, e2) -> {
 			boolean targetHas1 = otherResource.getExtension().stream().anyMatch(e -> e.getUrl().equals(e1.getUrl()));
 			boolean targetHas2 = otherResource.getExtension().stream().anyMatch(e -> e.getUrl().equals(e2.getUrl()));
 			if (targetHas1 == targetHas2) {
 				return e1.getUrl().compareTo(e2.getUrl());
 			} else if (targetHas1) {
-				return 1;
-			} else {
 				return -1;
+			} else {
+				return 1;
 			}
 		};
 	}
