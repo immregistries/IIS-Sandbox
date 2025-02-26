@@ -64,17 +64,11 @@ public class CrossTenantDiffProvider {
 		try {
 			IDomainResource sourceDomain = (IDomainResource) sourceResource;
 			IDomainResource targetDomain = (IDomainResource) targetResource;
-			logger.info("test1 {} {}", sourceDomain.getExtension().size(), targetDomain.getExtension().size());
-
 			if (targetDomain.hasExtension() && sourceDomain.hasExtension()) {
 				sourceDomain.getExtension().sort(extensionUrlSimilarityComparator(targetDomain));
 				targetDomain.getExtension().sort(extensionUrlSimilarityComparator(sourceDomain));
 			}
-			logger.info("test2 {} {}", sourceDomain.getExtension().size(), targetDomain.getExtension().size());
-
 		} catch (ClassCastException ignored) {
-			logger.info("testWESH");
-
 		}
 
 		FhirPatch fhirPatch = newPatch(theIncludeMeta);
@@ -95,6 +89,7 @@ public class CrossTenantDiffProvider {
 
 		fhirPatch.addIgnorePath("*.text.div");
 		fhirPatch.addIgnorePath("*.id");
+		fhirPatch.addIgnorePath("*.reference");
 
 		return fhirPatch;
 	}
