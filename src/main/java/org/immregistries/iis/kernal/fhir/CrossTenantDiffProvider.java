@@ -90,6 +90,7 @@ public class CrossTenantDiffProvider {
 		fhirPatch.addIgnorePath("*.text.div");
 		fhirPatch.addIgnorePath("*.id");
 		fhirPatch.addIgnorePath("*.reference");
+		fhirPatch.addIgnorePath("Immunization.recorded");
 
 		return fhirPatch;
 	}

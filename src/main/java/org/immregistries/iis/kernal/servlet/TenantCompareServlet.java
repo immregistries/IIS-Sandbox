@@ -8,7 +8,11 @@ import ca.uhn.fhir.jpa.partition.IPartitionLookupSvc;
 import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
 import ca.uhn.fhir.rest.api.server.IBundleProvider;
 import ca.uhn.fhir.rest.api.server.SystemRequestDetails;
+import ca.uhn.fhir.rest.param.TokenParam;
+import ca.uhn.fhir.rest.param.TokenParamModifier;
 import ca.uhn.fhir.rest.server.RestfulServer;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import org.hibernate.Session;
 import org.hl7.fhir.instance.model.api.IBaseParameters;
 import org.hl7.fhir.instance.model.api.IBaseResource;
@@ -31,7 +35,9 @@ import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
+
+import static org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester.GOLDEN_RECORD;
+import static org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester.GOLDEN_SYSTEM_TAG;
 
 
 public class TenantCompareServlet extends HttpServlet {
@@ -72,58 +78,74 @@ public class TenantCompareServlet extends HttpServlet {
 
 			List<Tenant> tenantList = Arrays.stream(tenantNames).distinct().map(tenantName -> ServletHelper.authenticateTenant(userAccess, tenantName, dataSession)).collect(Collectors.toList());
 
-			Stream<SystemRequestDetails> systemRequestDetailsStream = tenantList.stream().map(tenant -> {
+			List<SystemRequestDetails> systemRequestDetailsList = tenantList.stream().map(tenant -> {
 				SystemRequestDetails systemRequestDetails = new SystemRequestDetails();
 				systemRequestDetails.setTenantId(tenant.getOrganizationName());
 				return systemRequestDetails;
-			});
+			}).collect(Collectors.toList());
 
 			IFhirResourceDao patientDao = daoRegistry.getResourceDao("Patient");
-
-
-			List<IBundleProvider> bundleProviderStream = systemRequestDetailsStream.map(
-				requestDetails -> patientDao.search(new SearchParameterMap(), requestDetails)).collect(Collectors.toList());
-
-			int previousSize = -1;
-			/**
-			 * Counting found patients
-			 */
-			for (IBundleProvider iBundleProvider : bundleProviderStream) {
-				int bundleSize = iBundleProvider.size();
-				if (previousSize >= 0) {
-					if (bundleSize > previousSize) {
-						logger.info("Missing patients in first tenant ,{} found instead of {}", previousSize, bundleSize);
-					} else if (bundleSize < previousSize) {
-						logger.info("Missing patients in second tenant ,{} found instead of {}", previousSize, bundleSize);
-					}
-//					return ;
-				}
-				previousSize = bundleSize;
-			}
+			checkResourceType(systemRequestDetailsList, patientDao, out);
+			IFhirResourceDao immunizationDao = daoRegistry.getResourceDao("Immunization");
+			checkResourceType(systemRequestDetailsList, immunizationDao, out);
+			IFhirResourceDao observationDao = daoRegistry.getResourceDao("Observation");
+			checkResourceType(systemRequestDetailsList, observationDao, out);
+			IFhirResourceDao organizationDao = daoRegistry.getResourceDao("Organization");
+			checkResourceType(systemRequestDetailsList, organizationDao, out);
 
 			/*
-			 * Diff on each patient
+			 * Check references, match resources
 			 */
-			SystemRequestDetails diffRequestDetail = new SystemRequestDetails();
-//			diffRequestDetail.setTenantId("");
-			logger.info("Testing patients with $diff");
-
-			diffRequestDetail.setRequestPartitionId(RequestPartitionId.allPartitions());
-			for (int i = 0; i < previousSize; i++) {
-				IBaseResource iBaseResource1 = bundleProviderStream.get(0).getAllResources().get(i);
-				IBaseResource iBaseResource2 = bundleProviderStream.get(1).getAllResources().get(i);
-
-				IBaseParameters diff = diffProvider.diff(iBaseResource1.getIdElement(), iBaseResource2.getIdElement(), new BooleanType(false), diffRequestDetail);
-//				logger.info("Diff Patient {}, {}", i, fhirContext.newJsonParser().setPrettyPrint(true).encodeResourceToString(diff));
-				out.println("<pre>" + fhirContext.newJsonParser().setPrettyPrint(true).encodeResourceToString(diff) + "</pre>");
-			}
-//			for(IBundleProvider iBundleProvider: bundleProviderStream) {
-//				iBundleProvider.getAllResources()
-//			}
 		} finally {
 			out.flush();
 			out.close();
 		}
+	}
+
+	private void checkResourceType(List<SystemRequestDetails> systemRequestDetailsList, IFhirResourceDao resourceDao, PrintWriter out) {
+		List<IBundleProvider> bundleProviderStream = systemRequestDetailsList.stream().map(
+			requestDetails -> resourceDao.search(new SearchParameterMap("_tag", new TokenParam(GOLDEN_SYSTEM_TAG, GOLDEN_RECORD).setModifier(TokenParamModifier.NOT)), requestDetails)).collect(Collectors.toList());
+		String label = resourceDao.getResourceType().getName().toLowerCase();
+
+		int previousSize = -1;
+		/**
+		 * Counting found patients
+		 */
+		for (IBundleProvider iBundleProvider : bundleProviderStream) {
+			int bundleSize = iBundleProvider.size();
+			if (previousSize >= 0) {
+				if (bundleSize > previousSize) {
+					logger.info("Missing {}s in first tenant ,{} found instead of {}", label, previousSize, bundleSize);
+				} else if (bundleSize < previousSize) {
+					logger.info("Missing {}s in second tenant ,{} found instead of {}", label, previousSize, bundleSize);
+				}
+//					return ;
+			}
+			previousSize = bundleSize;
+		}
+
+		/*
+		 * Diff on each patient
+		 */
+		SystemRequestDetails diffRequestDetail = new SystemRequestDetails();
+		diffRequestDetail.setRequestPartitionId(RequestPartitionId.allPartitions());
+		logger.info("Testing {}s with $diff", label);
+
+		JsonObject jsonObject = new JsonObject();
+		JsonArray diffs = new JsonArray();
+		for (int i = 0; i < previousSize; i++) {
+			IBaseResource iBaseResource1 = bundleProviderStream.get(0).getAllResources().get(i);
+			IBaseResource iBaseResource2 = bundleProviderStream.get(1).getAllResources().get(i);
+
+			IBaseParameters diff = diffProvider.diff(iBaseResource1.getIdElement(), iBaseResource2.getIdElement(), new BooleanType(false), diffRequestDetail);
+//			patientsDiff.add(fhirContext.newJsonParser().setPrettyPrint(true).encodeResourceToString(diff));
+			out.println("<pre>" + fhirContext.newJsonParser().setPrettyPrint(true).encodeResourceToString(diff) + "</pre>");
+//				out.println("<pre>" + fhirContext.newJsonParser().setPrettyPrint(true).encodeResourceToString(diff) + "</pre>");
+
+//				logger.info("Diff Patient {}, {}", i, fhirContext.newJsonParser().setPrettyPrint(true).encodeResourceToString(diff));
+		}
+//		jsonObject.add("patientsDiff", patientsDiff);
+		return;
 	}
 
 
