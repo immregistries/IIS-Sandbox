@@ -114,7 +114,7 @@ public class TenantCompareServlet extends HttpServlet {
 				IBaseResource iBaseResource2 = bundleProviderStream.get(1).getAllResources().get(i);
 
 				IBaseParameters diff = diffProvider.diff(iBaseResource1.getIdElement(), iBaseResource2.getIdElement(), new BooleanType(false), diffRequestDetail);
-				logger.info("Diff Patient {}, {}", i, fhirContext.newJsonParser().setPrettyPrint(true).encodeResourceToString(diff));
+//				logger.info("Diff Patient {}, {}", i, fhirContext.newJsonParser().setPrettyPrint(true).encodeResourceToString(diff));
 				out.println("<pre>" + fhirContext.newJsonParser().setPrettyPrint(true).encodeResourceToString(diff) + "</pre>");
 			}
 //			for(IBundleProvider iBundleProvider: bundleProviderStream) {
