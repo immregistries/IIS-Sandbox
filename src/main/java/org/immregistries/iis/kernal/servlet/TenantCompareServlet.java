@@ -13,7 +13,7 @@ import org.hibernate.Session;
 import org.hl7.fhir.instance.model.api.IBaseParameters;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.BooleanType;
-import org.immregistries.iis.kernal.fhir.CustomDiffProvider;
+import org.immregistries.iis.kernal.fhir.CrossTenantDiffProvider;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.model.Tenant;
 import org.immregistries.iis.kernal.model.UserAccess;
@@ -43,7 +43,7 @@ public class TenantCompareServlet extends HttpServlet {
 	private IPartitionLookupSvc partitionLookupSvc;
 
 	@Autowired
-	private CustomDiffProvider diffProvider;
+	private CrossTenantDiffProvider diffProvider;
 	@Autowired
 	private DaoRegistry daoRegistry;
 	@Autowired
@@ -58,7 +58,7 @@ public class TenantCompareServlet extends HttpServlet {
 
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		String[] tenantNames = req.getParameterValues(TENANT_IDS);
+		String[] tenantNames = req.getParameter(TENANT_IDS).split(",");
 
 		logger.info("Testing Tenant comparison");
 		resp.setContentType("text/html");
@@ -70,7 +70,7 @@ public class TenantCompareServlet extends HttpServlet {
 				throw new AuthenticationCredentialsNotFoundException("");
 			}
 
-			List<Tenant> tenantList = Arrays.stream(tenantNames).map(tenantName -> ServletHelper.authenticateTenant(userAccess, tenantName, dataSession)).collect(Collectors.toList());
+			List<Tenant> tenantList = Arrays.stream(tenantNames).distinct().map(tenantName -> ServletHelper.authenticateTenant(userAccess, tenantName, dataSession)).collect(Collectors.toList());
 
 			Stream<SystemRequestDetails> systemRequestDetailsStream = tenantList.stream().map(tenant -> {
 				SystemRequestDetails systemRequestDetails = new SystemRequestDetails();

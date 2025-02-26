@@ -7,7 +7,6 @@ import ca.uhn.fhir.jpa.api.dao.IFhirResourceDao;
 import ca.uhn.fhir.jpa.patch.FhirPatch;
 import ca.uhn.fhir.jpa.provider.DiffProvider;
 import ca.uhn.fhir.model.api.annotation.Description;
-import ca.uhn.fhir.rest.annotation.Operation;
 import ca.uhn.fhir.rest.annotation.OperationParam;
 import ca.uhn.fhir.rest.api.server.RequestDetails;
 import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
@@ -23,7 +22,11 @@ import javax.annotation.Nonnull;
 import java.util.Comparator;
 
 @Service
-public class CustomDiffProvider extends DiffProvider {
+/**
+ * NOT USED FOR DIFF OPERATION
+ * based on Hapi DiffProvider
+ */
+public class CrossTenantDiffProvider {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	@Autowired
@@ -31,11 +34,6 @@ public class CustomDiffProvider extends DiffProvider {
 	@Autowired
 	private DaoRegistry myDaoRegistry;
 
-
-	@Override
-	@Description(
-		"This operation examines two resource versions (can be two versions of the same resource, or two different resources) and generates a FHIR Patch document showing the differences.")
-	@Operation(name = ProviderConstants.DIFF_OPERATION_NAME, idempotent = true)
 	public IBaseParameters diff(
 		@Description(value = "The resource ID and version to diff from", example = "Patient/example/version/1")
 		@OperationParam(name = ProviderConstants.DIFF_FROM_PARAMETER, typeName = "id", min = 1, max = 1)
@@ -86,9 +84,8 @@ public class CustomDiffProvider extends DiffProvider {
 
 
 	@Nonnull
-	@Override
 	public FhirPatch newPatch(IPrimitiveType<Boolean> theIncludeMeta) {
-		FhirPatch fhirPatch = new CustomFhirPatch(myContext);
+		FhirPatch fhirPatch = new CrossTenantFhirPatch(myContext);
 		fhirPatch.setIncludePreviousValueInDiff(true);
 		if (theIncludeMeta != null && (Boolean) theIncludeMeta.getValue()) {
 			logger.trace("Including resource metadata in patch");

@@ -17,16 +17,16 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
 
-import static org.immregistries.iis.kernal.fhir.CustomDiffProvider.extensionUrlSimilarityComparator;
+import static org.immregistries.iis.kernal.fhir.CrossTenantDiffProvider.extensionUrlSimilarityComparator;
 
-public class CustomFhirPatch extends FhirPatch {
+public class CrossTenantFhirPatch extends FhirPatch {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	private final FhirContext myContext;
 	private boolean myIncludePreviousValueInDiff;
 	private Set<EncodeContextPath> myIgnorePaths = Collections.emptySet();
 
-	public CustomFhirPatch(FhirContext theContext) {
+	public CrossTenantFhirPatch(FhirContext theContext) {
 		super(theContext);
 		this.myContext = theContext;
 	}
