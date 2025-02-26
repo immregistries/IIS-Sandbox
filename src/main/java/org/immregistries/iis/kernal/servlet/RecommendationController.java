@@ -66,6 +66,9 @@ public class RecommendationController {
 		throws ServletException, IOException {
 		Tenant tenant = ServletHelper.getTenant(tenantName, req);
 		if (tenant == null) {
+			if (ServletHelper.getUserAccess() != null) {
+				resp.sendRedirect("/iis/tenant");
+			}
 			throw new AuthenticationCredentialsNotFoundException("");
 		}
 		IGenericClient fhirClient = repositoryClientFactory.newGenericClient(req);
@@ -109,6 +112,9 @@ public class RecommendationController {
 		throws ServletException, IOException {
 		Tenant tenant = ServletHelper.getTenant(tenantName, req);
 		if (tenant == null) {
+			if (ServletHelper.getUserAccess() != null) {
+				resp.sendRedirect("/iis/tenant");
+			}
 			throw new AuthenticationCredentialsNotFoundException("");
 		}
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
@@ -153,6 +159,9 @@ public class RecommendationController {
 		throws ServletException, IOException {
 		Tenant tenant = ServletHelper.getTenant(tenantName, req);
 		if (tenant == null) {
+			if (ServletHelper.getUserAccess() != null) {
+				resp.sendRedirect("/iis/tenant");
+			}
 			throw new AuthenticationCredentialsNotFoundException("");
 		}
 

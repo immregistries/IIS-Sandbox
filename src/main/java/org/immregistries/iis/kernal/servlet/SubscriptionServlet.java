@@ -72,6 +72,9 @@ public class SubscriptionServlet extends HttpServlet {
 		// TODO action as manual trigger with content
 		Tenant tenant = ServletHelper.getTenant();
 		if (tenant == null) {
+			if (ServletHelper.getUserAccess() != null) {
+				resp.sendRedirect("/iis/tenant");
+			}
 			throw new AuthenticationCredentialsNotFoundException("");
 		}
 		IGenericClient localClient = repositoryClientFactory.newGenericClient(req);
@@ -128,6 +131,9 @@ public class SubscriptionServlet extends HttpServlet {
 		throws ServletException, IOException {
 		Tenant tenant = ServletHelper.getTenant();
 		if (tenant == null) {
+			if (ServletHelper.getUserAccess() != null) {
+				resp.sendRedirect("/iis/tenant");
+			}
 			throw new AuthenticationCredentialsNotFoundException("");
 		}
 		resp.setContentType("text/html");

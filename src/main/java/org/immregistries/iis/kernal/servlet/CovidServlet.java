@@ -69,6 +69,9 @@ public class CovidServlet extends HttpServlet {
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		Tenant tenant = ServletHelper.getTenant();
 		if (tenant == null) {
+			if (ServletHelper.getUserAccess() != null) {
+				resp.sendRedirect("/iis/tenant");
+			}
 			throw new AuthenticationCredentialsNotFoundException("");
 		}
 		IGenericClient fhirClient = repositoryClientFactory.newGenericClient(req);

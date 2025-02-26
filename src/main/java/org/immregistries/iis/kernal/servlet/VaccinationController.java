@@ -64,6 +64,9 @@ public class VaccinationController {
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp, @PathVariable(name = TenantController.PATH_VARIABLE_TENANT_NAME, required = false) String tenantName) throws ServletException, IOException {
 		Tenant tenant = ServletHelper.getTenant(tenantName, req);
 		if (tenant == null) {
+			if (ServletHelper.getUserAccess() != null) {
+				resp.sendRedirect("/iis/tenant");
+			}
 			throw new AuthenticationCredentialsNotFoundException("");
 		}
 		IGenericClient fhirClient = repositoryClientFactory.newGenericClient(req);

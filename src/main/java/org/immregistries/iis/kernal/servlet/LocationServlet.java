@@ -71,6 +71,9 @@ public class LocationServlet extends HttpServlet {
 
 		Tenant tenant = ServletHelper.getTenant();
 		if (tenant == null) {
+			if (ServletHelper.getUserAccess() != null) {
+				resp.sendRedirect("/iis/tenant");
+			}
 			throw new AuthenticationCredentialsNotFoundException("");
 		}
 		resp.setContentType("text/html");
