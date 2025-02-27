@@ -225,7 +225,7 @@ public abstract class AbstractIncomingMessageHandler implements IIncomingMessage
 					responseMessage = processORU(tenant, reader, message, organizationIdType);
 					break;
 				case "QBP":
-					responseMessage = incomingQueryHandler.processQBP(tenant, reader, message);
+					responseMessage = incomingQueryHandler.processQBP(tenant, reader, message, organizationIdType);
 					break;
 				default:
 					ProcessingException pe = new ProcessingException("Unsupported message", "", 0, 0);

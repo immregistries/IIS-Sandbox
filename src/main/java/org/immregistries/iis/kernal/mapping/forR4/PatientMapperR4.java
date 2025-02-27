@@ -117,23 +117,26 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 		/*
 		 * Gender
 		 */
-		switch (patient.getGender()) {
-			case MALE:
-				localPatient.setSex(MALE_SEX);
-				break;
-			case FEMALE:
-				localPatient.setSex(FEMALE_SEX);
-				break;
-			case UNKNOWN:
-				localPatient.setSex(UNKNOWN_SEX);
-				break;
-			case OTHER:
-				localPatient.setSex(OTHER_SEX);
-				break;
-			default:
-				localPatient.setSex("");
-				break;
+		if (patient.getGender() != null) {
+			switch (patient.getGender()) {
+				case MALE:
+					localPatient.setSex(MALE_SEX);
+					break;
+				case FEMALE:
+					localPatient.setSex(FEMALE_SEX);
+					break;
+				case UNKNOWN:
+					localPatient.setSex(UNKNOWN_SEX);
+					break;
+				case OTHER:
+					localPatient.setSex(OTHER_SEX);
+					break;
+				default:
+					localPatient.setSex("");
+					break;
+			}
 		}
+
 		/*
 		 * Races
 		 */

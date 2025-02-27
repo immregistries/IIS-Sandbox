@@ -179,6 +179,16 @@ public class FhirRequesterR5 extends AbstractFhirRequester<Patient, Immunization
 		return observationReportedList;
 	}
 
+//	public List<ObservationReported> searchObservationMasterList(SearchParameterMap searchParameterMap) {
+//		IGenericClient fhirClient = repositoryClientFactory.getFhirClient();
+//		List<ObservationReported> observationReportedList = new ArrayList<>();
+//		IBundleProvider bundleProvider = searchGoldenRecord(Observation.class, searchParameterMap);
+//		for (IBaseResource resource : bundleProvider.getAllResources()) {
+//			observationReportedList.add(observationMapper.localObjectReportedWithMaster((Observation) resource));
+//		}
+//		return observationReportedList;
+//	}
+
 	public OrgLocation searchOrgLocation(SearchParameterMap searchParameterMap) {
 		OrgLocation orgLocation = null;
 		IBundleProvider bundleProvider = search(Observation.class, searchParameterMap);

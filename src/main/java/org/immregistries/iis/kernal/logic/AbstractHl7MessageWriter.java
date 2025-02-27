@@ -339,7 +339,7 @@ public abstract class AbstractHl7MessageWriter implements IExampleMessageWriter 
 		sb.append("\r");
 	}
 
-	public void printObx(StringBuilder sb, int obxSetId, int obsSubId, ObservationReported ob) {
+	public void printObx(StringBuilder sb, int obxSetId, int obsSubId, ObservationMaster ob) {
 //    ObservationReported ob = observation.getObservationReported();
 		sb.append("OBX");
 		// OBX-1

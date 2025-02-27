@@ -6,11 +6,8 @@ import ca.uhn.fhir.jpa.api.dao.DaoRegistry;
 import ca.uhn.fhir.jpa.api.dao.IFhirResourceDao;
 import ca.uhn.fhir.jpa.patch.FhirPatch;
 import ca.uhn.fhir.jpa.provider.DiffProvider;
-import ca.uhn.fhir.model.api.annotation.Description;
-import ca.uhn.fhir.rest.annotation.OperationParam;
 import ca.uhn.fhir.rest.api.server.RequestDetails;
 import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
-import ca.uhn.fhir.rest.server.provider.ProviderConstants;
 import com.google.common.base.Objects;
 import org.hl7.fhir.instance.model.api.*;
 import org.slf4j.Logger;
@@ -35,20 +32,8 @@ public class CrossTenantDiffProvider {
 	private DaoRegistry myDaoRegistry;
 
 	public IBaseParameters diff(
-		@Description(value = "The resource ID and version to diff from", example = "Patient/example/version/1")
-		@OperationParam(name = ProviderConstants.DIFF_FROM_PARAMETER, typeName = "id", min = 1, max = 1)
 		IIdType theFromVersion,
-		@Description(value = "The resource ID and version to diff to", example = "Patient/example/version/2")
-		@OperationParam(name = ProviderConstants.DIFF_TO_PARAMETER, typeName = "id", min = 1, max = 1)
 		IIdType theToVersion,
-		@Description(
-			value = "Should differences in the Resource.meta element be included in the diff",
-			example = "false")
-		@OperationParam(
-			name = ProviderConstants.DIFF_INCLUDE_META_PARAMETER,
-			typeName = "boolean",
-			min = 0,
-			max = 1)
 		IPrimitiveType<Boolean> theIncludeMeta,
 		RequestDetails theRequestDetails) {
 

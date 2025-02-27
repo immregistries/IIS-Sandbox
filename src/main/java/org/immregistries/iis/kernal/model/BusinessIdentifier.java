@@ -9,6 +9,7 @@ import java.util.Objects;
 public class BusinessIdentifier extends AbstractDiffable<BusinessIdentifier> {
 	public static final String IDENTIFIER_TYPE_SYSTEM = "http://terminology.hl7.org/CodeSystem/v2-0203";
 	public static final String MRN_TYPE_VALUE = "MR";
+	public static final String PT_TYPE_VALUE = "PT";
 	public static final String FILLER_TYPE_VALUE = "FILL";
 	public static final String PLACER_TYPE_VALUE = "PLAC";
 	private String system = "";

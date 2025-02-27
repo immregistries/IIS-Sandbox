@@ -2,11 +2,14 @@ package org.immregistries.iis.kernal.logic;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.context.FhirVersionEnum;
+import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.gclient.IQuery;
+import ca.uhn.fhir.rest.param.ReferenceParam;
 import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.instance.model.api.IBaseBundle;
+import org.hl7.fhir.instance.model.api.IIdType;
 import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
@@ -23,6 +26,8 @@ import org.immregistries.smm.tester.manager.HL7Reader;
 import org.immregistries.vfa.connect.ConnectFactory;
 import org.immregistries.vfa.connect.ConnectorInterface;
 import org.immregistries.vfa.connect.model.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
@@ -35,6 +40,7 @@ import static org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRe
 
 @org.springframework.stereotype.Service
 public class IncomingQueryHandler {
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	@Autowired
 	AbstractFhirRequester fhirRequester;
@@ -56,17 +62,20 @@ public class IncomingQueryHandler {
 	@Autowired
 	FhirContext fhirContext;
 
-	public String processQBP(Tenant tenant, HL7Reader reader, String messageReceived) throws Exception {
+	public String processQBP(Tenant tenant, HL7Reader reader, String messageReceived, IIdType managingOrganizationId) throws Exception {
 		Set<ProcessingFlavor> processingFlavorSet = tenant.getProcessingFlavorSet();
 		MqeMessageServiceResponse mqeMessageServiceResponse = validationService.getMqeMessageService().processMessage(messageReceived);
 		List<IisReportable> reportables = validationService.nistValidation(messageReceived, mqeMessageServiceResponse.getMessageObjects().getMessageHeader().getMessageProfile());
 		PatientMaster patientMasterForMatchQuery = new PatientMaster();
 		if (reader.advanceToSegment("QPD")) {
 			String mrn = "";
+			String mrnType = "";
 			{
-				mrn = reader.getValueBySearchingRepeats(3, 1, "MR", 5);
+				mrnType = BusinessIdentifier.MRN_TYPE_VALUE;
+				mrn = reader.getValueBySearchingRepeats(3, 1, mrnType, 5);
 				if (StringUtils.isBlank(mrn)) {
-					mrn = reader.getValueBySearchingRepeats(3, 1, "PT", 5);
+					mrnType = BusinessIdentifier.PT_TYPE_VALUE;
+					mrn = reader.getValueBySearchingRepeats(3, 1, mrnType, 5);
 				}
 			}
 			String problem = null;
@@ -74,8 +83,8 @@ public class IncomingQueryHandler {
 			if (StringUtils.isNotBlank(mrn)) {
 				BusinessIdentifier businessIdentifier = new BusinessIdentifier();
 				businessIdentifier.setValue(mrn);
-				patientMasterForMatchQuery.addBusinessIdentifier(businessIdentifier);// TODO system
-//				patientMasterForMatchQuery.setExternalLink(mrn); // TODO system
+				businessIdentifier.setType(BusinessIdentifier.MRN_TYPE_VALUE);
+				patientMasterForMatchQuery.addBusinessIdentifier(businessIdentifier);
 //				patientReported = fhirRequester.searchPatientReported(
 //					Patient.IDENTIFIER.exactly().systemAndCode(MRN_SYSTEM, mrn)
 //				);
@@ -137,10 +146,10 @@ public class IncomingQueryHandler {
 			throw new ProcessingException("Patient not found", "PID", 1, 1); // TODO position
 		}
 
-		return buildRSP(reader, messageReceived, singleMatch, tenant, multipleMatches, reportables);
+		return buildRSP(reader, messageReceived, singleMatch, tenant, multipleMatches, reportables, managingOrganizationId);
 	}
 
-	public String buildRSP(HL7Reader reader, String messageReceived, PatientMaster patientMaster, Tenant tenant, List<PatientReported> patientReportedPossibleList, List<IisReportable> iisReportables) {
+	public String buildRSP(HL7Reader reader, String messageReceived, PatientMaster patientMaster, Tenant tenant, List<PatientReported> patientReportedPossibleList, List<IisReportable> iisReportables, IIdType managingOrganizationId) {
 		Set<ProcessingFlavor> processingFlavorSet = tenant.getProcessingFlavorSet();
 		MqeMessageServiceResponse mqeMessageServiceResponse = validationService.getMqeMessageService().processMessage(messageReceived);
 		boolean sendInformations = true;
@@ -229,6 +238,7 @@ public class IncomingQueryHandler {
 			String sendersUniqueId = reader.getValue(10);
 			IisHL7Util.makeMsaAndErr(sb, sendersUniqueId, profileId, profileId, iisReportables, processingFlavorSet);
 		}
+
 		if (sendInformations) {
 			String profileName = "Request a Complete Immunization History";
 			if (StringUtils.isBlank(profileIdSubmitted)) {
@@ -269,7 +279,11 @@ public class IncomingQueryHandler {
 				if (profileId.equals(RSP_Z32_MATCH)) {
 					hl7MessageWriter.printQueryNK1(patientMaster, sb, codeMap);
 				}
-				List<VaccinationMaster> vaccinationMasterList = getVaccinationMasterList(patientMaster);
+//				List<VaccinationMaster> vaccinationMasterList = fhirRequester.searchVaccinationListOperationEverything(patient.getPatientId());
+				List<VaccinationMaster> vaccinationMasterList = fhirRequester.searchVaccinationMasterGoldenList(
+					new SearchParameterMap("patient", new ReferenceParam().setMdmExpand(true).setValue("Patient/" + patientMaster.getPatientId())));
+
+//					getVaccinationMasterList(patientMaster);
 
 				if (processingFlavorSet.contains(ProcessingFlavor.LEMON)) {
 					for (Iterator<VaccinationMaster> it = vaccinationMasterList.iterator(); it.hasNext(); ) {
@@ -286,6 +300,7 @@ public class IncomingQueryHandler {
 				if (sendBackForecast) {
 					forecastActualList = doForecast(patientMaster, codeMap, vaccinationMasterList, tenant);
 				}
+
 				int obxSetId = 0;
 				int obsSubId = 0;
 				for (VaccinationMaster vaccination : vaccinationMasterList) {
@@ -293,7 +308,8 @@ public class IncomingQueryHandler {
 					if (cvxCode == null) {
 						continue;
 					}
-					boolean originalReporter = vaccination.getPatientReported().getTenant().equals(tenant);
+
+					boolean originalReporter = vaccination.getPatientReported().getManagingOrganizationId().equals(managingOrganizationId.getValue()); // TODO verify
 					if ("D".equals(vaccination.getActionCode())) {
 						continue;
 					}
@@ -360,7 +376,7 @@ public class IncomingQueryHandler {
 					sb.append("|");
 					// RXA-11
 					sb.append("|");
-					if (vaccination.getOrgLocation() == null || vaccination.getOrgLocation().getOrgFacilityCode() == null || "".equals(vaccination.getOrgLocation().getOrgFacilityCode())) {
+					if (vaccination.getOrgLocation() == null || StringUtils.isBlank(vaccination.getOrgLocation().getOrgFacilityCode())) {
 					} else {
 						sb.append("^^^");
 						sb.append(vaccination.getOrgLocation().getOrgFacilityCode());
@@ -441,79 +457,113 @@ public class IncomingQueryHandler {
 							}
 						}
 					}
-					if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R5)) {
-						try {
-							org.hl7.fhir.r5.model.Bundle bundle = fhirClient.search().forResource("Observation")
-								.where(org.hl7.fhir.r5.model.Observation.PART_OF.hasId(patientMaster.getPatientId()))
-								.and(org.hl7.fhir.r5.model.Observation.PART_OF.hasId(vaccination.getVaccinationId()))
-								.returnBundle(org.hl7.fhir.r5.model.Bundle.class).execute();
-							if (bundle.hasEntry()) {
-								obsSubId++;
-								for (org.hl7.fhir.r5.model.Bundle.BundleEntryComponent entry : bundle.getEntry()) {
-//						ObservationMaster observationMaster = ObservationMapper.getMaster((Observation) entry.getResource());
-									ObservationReported observationReported = observationMapper.localObjectReported(entry.getResource());
-									obxSetId++;
-									hl7MessageWriter.printObx(sb, obxSetId, obsSubId, observationReported);
-								}
-							}
-						} catch (ResourceNotFoundException ignored) {
+
+
+					List<ObservationMaster> observationVaccinationList = fhirRequester.searchObservationReportedList(
+						new SearchParameterMap("part-of", new ReferenceParam().setMdmExpand(true).setValue("Immunization/" + vaccination.getVaccinationId())));
+//						observationMasterAllList.stream().filter(observationMaster ->
+//						new IdType(vaccination.getVaccinationId()).getIdPart().equals(
+//							new IdType(observationMaster.getVaccinationReportedId()).getIdPart()
+//						)).collect(Collectors.toList());
+//					observationMasterAllList.removeAll(observationVaccinationList);
+
+					for (ObservationMaster observationMaster : observationVaccinationList) {
+						obxSetId++;
+						obsSubId++;
+						hl7MessageWriter.printObx(sb, obxSetId, obsSubId, observationMaster);
+						for (ObservationMaster sub : observationMaster.getComponents()) {
+							obxSetId++;
+							hl7MessageWriter.printObx(sb, obxSetId, obsSubId, sub);
 						}
-					} else if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R4)) {
-						try {
-							org.hl7.fhir.r4.model.Bundle bundle = fhirClient.search().forResource("Observation")
-								.where(org.hl7.fhir.r4.model.Observation.PART_OF.hasId(patientMaster.getPatientId()))
-								.and(org.hl7.fhir.r4.model.Observation.PART_OF.hasId(vaccination.getVaccinationId()))
-								.returnBundle(org.hl7.fhir.r4.model.Bundle.class).execute();
-							if (bundle.hasEntry()) {
-								obsSubId++;
-								for (org.hl7.fhir.r4.model.Bundle.BundleEntryComponent entry : bundle.getEntry()) {
-//						ObservationMaster observationMaster = ObservationMapper.getMaster((Observation) entry.getResource());
-									ObservationReported observationReported = observationMapper.localObjectReported(entry.getResource());
-									obxSetId++;
-									hl7MessageWriter.printObx(sb, obxSetId, obsSubId, observationReported);
-								}
-							}
-						} catch (ResourceNotFoundException ignored) {
-						}
+					}
+//					if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R5)) {
+//						try {
+//							org.hl7.fhir.r5.model.Bundle bundle = fhirClient.search().forResource("Observation")
+//								.where(org.hl7.fhir.r5.model.Observation.PART_OF.hasId(vaccination.getVaccinationId()))
+//								.returnBundle(org.hl7.fhir.r5.model.Bundle.class).execute();
+//							if (bundle.hasEntry()) {
+//								obsSubId++;
+//								for (org.hl7.fhir.r5.model.Bundle.BundleEntryComponent entry : bundle.getEntry()) {
+////						ObservationMaster observationMaster = ObservationMapper.getMaster((Observation) entry.getResource());
+//									ObservationReported observationReported = observationMapper.localObjectReported(entry.getResource());
+//									obxSetId++;
+//									hl7MessageWriter.printObx(sb, obxSetId, obsSubId, observationReported);
+//								}
+//							}
+//						} catch (ResourceNotFoundException ignored) {
+//						}
+//					} else if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R4)) {
+//						try {
+//							org.hl7.fhir.r4.model.Bundle bundle = fhirClient.search().forResource("Observation")
+//								.where(org.hl7.fhir.r4.model.Observation.PART_OF.hasId(new IdType("Immunization/" + vaccination.getVaccinationId()))
+//								.returnBundle(org.hl7.fhir.r4.model.Bundle.class).execute();
+//							if (bundle.hasEntry()) {
+//								obsSubId++;
+//								for (org.hl7.fhir.r4.model.Bundle.BundleEntryComponent entry : bundle.getEntry()) {
+////						ObservationMaster observationMaster = ObservationMapper.getMaster((Observation) entry.getResource());
+//									ObservationReported observationReported = observationMapper.localObjectReported(entry.getResource());
+//									obxSetId++;
+//									hl7MessageWriter.printObx(sb, obxSetId, obsSubId, observationReported);
+//								}
+//							}
+//						} catch (ResourceNotFoundException ignored) {
+//						}
+//					}
+				}
+
+				List<ObservationMaster> observationReportedPatientList = fhirRequester.searchObservationReportedList(
+					new SearchParameterMap("subject", new ReferenceParam().setMdmExpand(true).setValue("Patient/" + patientMaster.getPatientId()))
+						.add("part-of", new ReferenceParam().setMissing(true))
+				);
+//				logger.info("obs len TEST {}", observationMasterAllList.size());
+//				List<ObservationMaster> observationReportedPatientList =
+//					observationMasterAllList.stream().filter(observationMaster -> StringUtils.isBlank(observationMaster.getVaccinationReportedId())).collect(Collectors.toList());
+				for (ObservationMaster observationMaster : observationReportedPatientList) {
+					obxSetId++;
+					obsSubId++;
+					hl7MessageWriter.printObx(sb, obxSetId, obsSubId, observationMaster);
+					for (ObservationMaster sub : observationMaster.getComponents()) {
+						obxSetId++;
+						hl7MessageWriter.printObx(sb, obxSetId, obsSubId, sub);
 					}
 				}
-				if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R5)) {
-					try {
-						org.hl7.fhir.r5.model.Bundle bundle = fhirClient.search()
-							.forResource(org.hl7.fhir.r5.model.Observation.class)
-							.where(org.hl7.fhir.r5.model.Observation.PART_OF.hasId(patientMaster.getPatientId()))
-							.returnBundle(org.hl7.fhir.r5.model.Bundle.class)
-							.execute();
-						if (bundle.hasEntry()) {
-							hl7MessageWriter.printORC(tenant, sb, null, false);
-							obsSubId++;
-							for (org.hl7.fhir.r5.model.Bundle.BundleEntryComponent entry : bundle.getEntry()) {
-								obxSetId++;
-								ObservationReported observationReported = observationMapper.localObjectReported(entry.getResource());
-								hl7MessageWriter.printObx(sb, obxSetId, obsSubId, observationReported);
-							}
-						}
-					} catch (ResourceNotFoundException ignored) {
-					}
-				} else if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R4)) {
-					try {
-						org.hl7.fhir.r4.model.Bundle bundle = fhirClient.search()
-							.forResource(org.hl7.fhir.r4.model.Observation.class)
-							.where(org.hl7.fhir.r4.model.Observation.PART_OF.hasId(patientMaster.getPatientId()))
-							.returnBundle(org.hl7.fhir.r4.model.Bundle.class)
-							.execute();
-						if (bundle.hasEntry()) {
-							hl7MessageWriter.printORC(tenant, sb, null, false);
-							obsSubId++;
-							for (org.hl7.fhir.r4.model.Bundle.BundleEntryComponent entry : bundle.getEntry()) {
-								obxSetId++;
-								ObservationReported observationReported = observationMapper.localObjectReported(entry.getResource());
-								hl7MessageWriter.printObx(sb, obxSetId, obsSubId, observationReported);
-							}
-						}
-					} catch (ResourceNotFoundException ignored) {
-					}
-				}
+//				if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R5)) {
+//					try {
+//						org.hl7.fhir.r5.model.Bundle bundle = fhirClient.search()
+//							.forResource(org.hl7.fhir.r5.model.Observation.class)
+//							.where(Observation.SUBJECT.hasId(new IdType("Patient/" + patientMaster.getPatientId())))
+//							.returnBundle(org.hl7.fhir.r5.model.Bundle.class)
+//							.execute();
+//						if (bundle.hasEntry()) {
+//							hl7MessageWriter.printORC(tenant, sb, null, false);
+//							obsSubId++;
+//							for (org.hl7.fhir.r5.model.Bundle.BundleEntryComponent entry : bundle.getEntry()) {
+//								obxSetId++;
+//								ObservationReported observationReported = observationMapper.localObjectReported(entry.getResource());
+//								hl7MessageWriter.printObx(sb, obxSetId, obsSubId, observationReported);
+//							}
+//						}
+//					} catch (ResourceNotFoundException ignored) {
+//					}
+//				} else if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R4)) {
+//					try {
+//						org.hl7.fhir.r4.model.Bundle bundle = fhirClient.search()
+//							.forResource(org.hl7.fhir.r4.model.Observation.class)
+//							.where(org.hl7.fhir.r4.model.Observation.PART_OF.hasId(patientMaster.getPatientId()))
+//							.returnBundle(org.hl7.fhir.r4.model.Bundle.class)
+//							.execute();
+//						if (bundle.hasEntry()) {
+//							hl7MessageWriter.printORC(tenant, sb, null, false);
+//							obsSubId++;
+//							for (org.hl7.fhir.r4.model.Bundle.BundleEntryComponent entry : bundle.getEntry()) {
+//								obxSetId++;
+//								ObservationReported observationReported = observationMapper.localObjectReported(entry.getResource());
+//								hl7MessageWriter.printObx(sb, obxSetId, obsSubId, observationReported);
+//							}
+//						}
+//					} catch (ResourceNotFoundException ignored) {
+//					}
+//				}
 
 				if (sendBackForecast && forecastActualList != null && !forecastActualList.isEmpty()) {
 					hl7MessageWriter.printORC(tenant, sb, null, false);

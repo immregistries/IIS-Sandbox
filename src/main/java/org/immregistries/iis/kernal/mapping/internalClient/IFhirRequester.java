@@ -44,7 +44,7 @@ public interface IFhirRequester<
 
 	List<VaccinationMaster> searchVaccinationMasterGoldenList(SearchParameterMap searchParameterMap);
 
-	List<VaccinationMaster> searchVaccinationListOperationEverything(String patientId);
+//	List<VaccinationMaster> searchVaccinationListOperationEverything(String patientId);
 
 	ObservationReported searchObservationReported(SearchParameterMap searchParameterMap);
 
@@ -55,6 +55,8 @@ public interface IFhirRequester<
 	ObservationMaster searchObservationMaster(SearchParameterMap searchParameterMap);
 
 	List<ObservationReported> searchObservationReportedList(SearchParameterMap searchParameterMap);
+
+//	List<ObservationMaster> searchObservationMasterList(SearchParameterMap searchParameterMap);
 
 	OrgLocation searchOrgLocation(SearchParameterMap searchParameterMap);
 
@@ -99,7 +101,6 @@ public interface IFhirRequester<
 	List<VaccinationReported> searchVaccinationReportedFromGoldenIdWithMdmLinks(String vaccinationMasterId);
 
 	VaccinationMaster readVaccinationMasterWithMdmLink(String vaccinationReportedId);
-
 
 
 }

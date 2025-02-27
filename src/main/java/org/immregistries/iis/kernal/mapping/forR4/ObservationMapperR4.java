@@ -1,7 +1,5 @@
 package org.immregistries.iis.kernal.mapping.forR4;
 
-import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
-import ca.uhn.fhir.rest.param.TokenParam;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.hl7.fhir.r4.model.*;
@@ -35,11 +33,11 @@ public class ObservationMapperR4 implements ObservationMapper<Observation> {
 
 	public ObservationReported localObjectReportedWithMaster(Observation observation) {
 		ObservationReported observationReported = localObjectReported(observation);
-		observationReported.setObservationMaster(
-			fhirRequests.searchObservationMaster(
-				new SearchParameterMap(Observation.SP_IDENTIFIER, new TokenParam().setSystem(observationReported.getIdentifierTable()).setValue(observationReported.getIdentifierCode())) // TODO remove
-//				Observation.IDENTIFIER.exactly().systemAndIdentifier(observationReported.getIdentifierTable(),observationReported.getIdentifierCode())
-			));
+//		observationReported.setObservationMaster(
+//			fhirRequests.searchObservationMaster(
+//				new SearchParameterMap(Observation.SP_IDENTIFIER, new TokenParam().setSystem(observationReported.getIdentifierTable()).setValue(observationReported.getIdentifierCode())) // TODO remove
+////				Observation.IDENTIFIER.exactly().systemAndIdentifier(observationReported.getIdentifierTable(),observationReported.getIdentifierCode())
+//			));
 		return observationReported;
 	}
 

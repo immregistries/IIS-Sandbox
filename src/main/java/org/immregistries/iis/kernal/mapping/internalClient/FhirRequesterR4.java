@@ -170,6 +170,16 @@ public class FhirRequesterR4 extends AbstractFhirRequester<Patient, Immunization
 		return observationMaster;
 	}
 
+//	public List<ObservationMaster> searchObservationMasterList(SearchParameterMap searchParameterMap) {
+//		IGenericClient fhirClient = repositoryClientFactory.getFhirClient();
+//		List<ObservationMaster> observationReportedList = new ArrayList<>();
+//		IBundleProvider bundleProvider = searchGoldenRecord(Observation.class, searchParameterMap);
+//		for (IBaseResource resource : bundleProvider.getAllResources()) {
+//			observationReportedList.add(observationMapper.localObjectReportedWithMaster((Observation) resource));
+//		}
+//		return observationReportedList;
+//	}
+
 	public List<ObservationReported> searchObservationReportedList(SearchParameterMap searchParameterMap) {
 		IGenericClient fhirClient = repositoryClientFactory.getFhirClient();
 		List<ObservationReported> observationReportedList = new ArrayList<>();

@@ -210,7 +210,9 @@ public class PatientMatchingDatasetConversionController {
 		}
 
 		mismo.setBirthDate(patient.getBirthDateElement().asStringValue());
-		mismo.setGender(patient.getGender().toCode());
+		if (patient.getGender() != null) {
+			mismo.setGender(patient.getGender().toCode());
+		}
 
 		org.hl7.fhir.r5.model.Identifier ssn = MappingHelper.filterIdentifierTypeR5(patient.getIdentifier(), "SS");
 		if (ssn != null) {
@@ -309,7 +311,9 @@ public class PatientMatchingDatasetConversionController {
 		}
 
 		mismo.setBirthDate(patient.getBirthDateElement().asStringValue());
-		mismo.setGender(patient.getGender().toCode());
+		if (patient.getGender() != null) {
+			mismo.setGender(patient.getGender().toCode());
+		}
 
 		org.hl7.fhir.r4.model.Identifier ssn = MappingHelper.filterIdentifierTypeR4(patient.getIdentifier(), "SS");
 		if (ssn != null) {
