@@ -84,7 +84,7 @@ public class IncomingQueryHandler {
 			String patientNameFirst = reader.getValue(4, 2);
 			String patientNameMiddle = reader.getValue(4, 3);
 
-			if (processingFlavorSet.contains(ProcessingFlavor.MOONFRUIT) && StringUtils.defaultString(patientNameFirst).startsWith("S") || StringUtils.defaultString(patientNameFirst).startsWith("A")) {
+			if (processingFlavorSet.contains(ProcessingFlavor.MOONFRUIT) && (StringUtils.defaultString(patientNameFirst).startsWith("S") || StringUtils.defaultString(patientNameFirst).startsWith("A"))) {
 				throw new ProcessingException("Immunization History cannot be Accepted because of patient's consent status", "PID", 0, 0, IisReportableSeverity.WARN);
 			}
 			boolean strictDate = false;
@@ -144,7 +144,7 @@ public class IncomingQueryHandler {
 		Set<ProcessingFlavor> processingFlavorSet = tenant.getProcessingFlavorSet();
 		MqeMessageServiceResponse mqeMessageServiceResponse = validationService.getMqeMessageService().processMessage(messageReceived);
 		boolean sendInformations = true;
-		if (processingFlavorSet.contains(ProcessingFlavor.STARFRUIT) && StringUtils.defaultString(patientMaster.getNameFirst()).startsWith("S") || StringUtils.defaultString(patientMaster.getNameFirst()).startsWith("A")) {
+		if (processingFlavorSet.contains(ProcessingFlavor.STARFRUIT) && (StringUtils.defaultString(patientMaster.getNameFirst()).startsWith("S") || StringUtils.defaultString(patientMaster.getNameFirst()).startsWith("A"))) {
 			iisReportables.add(IisReportable.fromProcessingException(new ProcessingException("Immunization History cannot be shared because of patient's consent status", "PID", 0, 0, IisReportableSeverity.NOTICE)));
 			sendInformations = false;
 		}
