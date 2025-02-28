@@ -1,14 +1,10 @@
 package org.immregistries.iis.kernal.logic;
 
 import ca.uhn.fhir.context.FhirContext;
-import ca.uhn.fhir.context.FhirVersionEnum;
 import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
-import ca.uhn.fhir.rest.gclient.IQuery;
 import ca.uhn.fhir.rest.param.ReferenceParam;
-import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
 import org.apache.commons.lang3.StringUtils;
-import org.hl7.fhir.instance.model.api.IBaseBundle;
 import org.hl7.fhir.instance.model.api.IIdType;
 import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.generated.Code;
@@ -35,8 +31,6 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static org.immregistries.iis.kernal.logic.IIncomingMessageHandler.*;
-import static org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester.GOLDEN_RECORD;
-import static org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester.GOLDEN_SYSTEM_TAG;
 
 @org.springframework.stereotype.Service
 public class IncomingQueryHandler {
@@ -641,62 +635,6 @@ public class IncomingQueryHandler {
 			e.printStackTrace(System.err);
 		}
 		return forecastActualList;
-	}
-
-	public List<VaccinationMaster> getVaccinationMasterList(PatientMaster patient) {
-		IGenericClient fhirClient = repositoryClientFactory.getFhirClient();
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-		List<VaccinationMaster> vaccinationMasterList = new ArrayList<>();
-		Map<String, VaccinationMaster> map = new HashMap<>();
-		IQuery<IBaseBundle> query = fhirClient.search().forResource("Immunization")
-			.withTag(GOLDEN_SYSTEM_TAG, GOLDEN_RECORD)
-			.sort()
-			.ascending("identifier");
-		if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R5)) {
-			try {
-				org.hl7.fhir.r5.model.Bundle bundle = query
-					.where(org.hl7.fhir.r5.model.Immunization.PATIENT.hasId(patient.getPatientId()))
-					.returnBundle(org.hl7.fhir.r5.model.Bundle.class)
-					.execute();
-				for (org.hl7.fhir.r5.model.Bundle.BundleEntryComponent entry : bundle.getEntry()) {
-					org.hl7.fhir.r5.model.Immunization immunization = (org.hl7.fhir.r5.model.Immunization) entry.getResource();
-					if (immunization.getOccurrenceDateTimeType() != null) {
-						String key = sdf.format(immunization.getOccurrenceDateTimeType().getValue());
-						if (immunization.getVaccineCode() != null && StringUtils.isNotBlank(immunization.getVaccineCode().getText())) {
-							key += key + immunization.getVaccineCode().getText();
-							VaccinationMaster vaccinationMaster = immunizationMapper.localObject(immunization);
-							map.put(key, vaccinationMaster);
-						}
-					}
-				}
-			} catch (ResourceNotFoundException ignored) {
-			}
-		} else if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R4)) {
-			try {
-				org.hl7.fhir.r4.model.Bundle bundle = query
-					.where(org.hl7.fhir.r4.model.Immunization.PATIENT.hasId(patient.getPatientId()))
-					.returnBundle(org.hl7.fhir.r4.model.Bundle.class)
-					.execute();
-				for (org.hl7.fhir.r4.model.Bundle.BundleEntryComponent entry : bundle.getEntry()) {
-					org.hl7.fhir.r4.model.Immunization immunization = (org.hl7.fhir.r4.model.Immunization) entry.getResource();
-					if (immunization.getOccurrenceDateTimeType() != null) {
-						String key = sdf.format(immunization.getOccurrenceDateTimeType().getValue());
-						if (immunization.getVaccineCode() != null && StringUtils.isNotBlank(immunization.getVaccineCode().getText())) {
-							key += key + immunization.getVaccineCode().getText();
-							VaccinationMaster vaccinationMaster = immunizationMapper.localObject(immunization);
-							map.put(key, vaccinationMaster);
-						}
-					}
-				}
-			} catch (ResourceNotFoundException ignored) {
-			}
-		}
-		List<String> keyList = new ArrayList<>(map.keySet());
-		Collections.sort(keyList);
-		for (String key : keyList) {
-			vaccinationMasterList.add(map.get(key));
-		}
-		return vaccinationMasterList;
 	}
 
 }

@@ -1,7 +1,9 @@
 package org.immregistries.iis.kernal.servlet.deprecated;
 
 import ca.uhn.fhir.context.FhirContext;
+import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
 import ca.uhn.fhir.parser.IParser;
+import ca.uhn.fhir.rest.param.ReferenceParam;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Session;
 import org.hl7.fhir.r5.model.*;
@@ -12,8 +14,8 @@ import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.logic.CodeMapManager;
-import org.immregistries.iis.kernal.logic.IncomingQueryHandler;
 import org.immregistries.iis.kernal.mapping.interfaces.ImmunizationMapper;
+import org.immregistries.iis.kernal.mapping.internalClient.IFhirRequester;
 import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
 import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.model.PatientReported;
@@ -29,6 +31,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -43,7 +46,7 @@ public class V2ToFhirServlet extends HttpServlet {
 	@Autowired
 	ImmunizationMapper immunizationMapper;
 	@Autowired
-	IncomingQueryHandler incomingQueryHandler;
+	IFhirRequester fhirRequester;
 
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
@@ -82,8 +85,11 @@ public class V2ToFhirServlet extends HttpServlet {
 				Patient p = new Patient();
 				createPatientResource(pr, p);
 				bundle.addEntry().setResource(p);
-				List<VaccinationMaster> vaccinationMasterList =
-					incomingQueryHandler.getVaccinationMasterList(pr.getPatientMaster());
+				List<VaccinationMaster> vaccinationMasterList = fhirRequester.searchVaccinationMasterGoldenList(
+					new SearchParameterMap("patient", new ReferenceParam().setMdmExpand(true).setValue("Patient/" + pr.getPatientMaster().getPatientId()))
+				);
+				vaccinationMasterList.sort(Comparator.comparing(VaccinationMaster::getAdministeredDate));
+
 
 				for (VaccinationMaster vaccination : vaccinationMasterList) {
 					Immunization immunization = new Immunization();
