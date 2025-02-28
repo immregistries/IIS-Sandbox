@@ -282,6 +282,7 @@ public class IncomingQueryHandler {
 //				List<VaccinationMaster> vaccinationMasterList = fhirRequester.searchVaccinationListOperationEverything(patient.getPatientId());
 				List<VaccinationMaster> vaccinationMasterList = fhirRequester.searchVaccinationMasterGoldenList(
 					new SearchParameterMap("patient", new ReferenceParam().setMdmExpand(true).setValue("Patient/" + patientMaster.getPatientId())));
+				vaccinationMasterList.sort(Comparator.comparing(VaccinationMaster::getAdministeredDate));
 
 //					getVaccinationMasterList(patientMaster);
 
