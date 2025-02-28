@@ -279,12 +279,11 @@ public class IncomingQueryHandler {
 				if (profileId.equals(RSP_Z32_MATCH)) {
 					hl7MessageWriter.printQueryNK1(patientMaster, sb, codeMap);
 				}
-//				List<VaccinationMaster> vaccinationMasterList = fhirRequester.searchVaccinationListOperationEverything(patient.getPatientId());
+
 				List<VaccinationMaster> vaccinationMasterList = fhirRequester.searchVaccinationMasterGoldenList(
 					new SearchParameterMap("patient", new ReferenceParam().setMdmExpand(true).setValue("Patient/" + patientMaster.getPatientId())));
 				vaccinationMasterList.sort(Comparator.comparing(VaccinationMaster::getAdministeredDate));
 
-//					getVaccinationMasterList(patientMaster);
 
 				if (processingFlavorSet.contains(ProcessingFlavor.LEMON)) {
 					for (Iterator<VaccinationMaster> it = vaccinationMasterList.iterator(); it.hasNext(); ) {
@@ -462,11 +461,6 @@ public class IncomingQueryHandler {
 
 					List<ObservationMaster> observationVaccinationList = fhirRequester.searchObservationReportedList(
 						new SearchParameterMap("part-of", new ReferenceParam().setMdmExpand(true).setValue("Immunization/" + vaccination.getVaccinationId())));
-//						observationMasterAllList.stream().filter(observationMaster ->
-//						new IdType(vaccination.getVaccinationId()).getIdPart().equals(
-//							new IdType(observationMaster.getVaccinationReportedId()).getIdPart()
-//						)).collect(Collectors.toList());
-//					observationMasterAllList.removeAll(observationVaccinationList);
 
 					for (ObservationMaster observationMaster : observationVaccinationList) {
 						obxSetId++;
@@ -477,48 +471,12 @@ public class IncomingQueryHandler {
 							hl7MessageWriter.printObx(sb, obxSetId, obsSubId, sub);
 						}
 					}
-//					if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R5)) {
-//						try {
-//							org.hl7.fhir.r5.model.Bundle bundle = fhirClient.search().forResource("Observation")
-//								.where(org.hl7.fhir.r5.model.Observation.PART_OF.hasId(vaccination.getVaccinationId()))
-//								.returnBundle(org.hl7.fhir.r5.model.Bundle.class).execute();
-//							if (bundle.hasEntry()) {
-//								obsSubId++;
-//								for (org.hl7.fhir.r5.model.Bundle.BundleEntryComponent entry : bundle.getEntry()) {
-////						ObservationMaster observationMaster = ObservationMapper.getMaster((Observation) entry.getResource());
-//									ObservationReported observationReported = observationMapper.localObjectReported(entry.getResource());
-//									obxSetId++;
-//									hl7MessageWriter.printObx(sb, obxSetId, obsSubId, observationReported);
-//								}
-//							}
-//						} catch (ResourceNotFoundException ignored) {
-//						}
-//					} else if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R4)) {
-//						try {
-//							org.hl7.fhir.r4.model.Bundle bundle = fhirClient.search().forResource("Observation")
-//								.where(org.hl7.fhir.r4.model.Observation.PART_OF.hasId(new IdType("Immunization/" + vaccination.getVaccinationId()))
-//								.returnBundle(org.hl7.fhir.r4.model.Bundle.class).execute();
-//							if (bundle.hasEntry()) {
-//								obsSubId++;
-//								for (org.hl7.fhir.r4.model.Bundle.BundleEntryComponent entry : bundle.getEntry()) {
-////						ObservationMaster observationMaster = ObservationMapper.getMaster((Observation) entry.getResource());
-//									ObservationReported observationReported = observationMapper.localObjectReported(entry.getResource());
-//									obxSetId++;
-//									hl7MessageWriter.printObx(sb, obxSetId, obsSubId, observationReported);
-//								}
-//							}
-//						} catch (ResourceNotFoundException ignored) {
-//						}
-//					}
 				}
 
 				List<ObservationMaster> observationReportedPatientList = fhirRequester.searchObservationReportedList(
 					new SearchParameterMap("subject", new ReferenceParam().setMdmExpand(true).setValue("Patient/" + patientMaster.getPatientId()))
 						.add("part-of", new ReferenceParam().setMissing(true))
 				);
-//				logger.info("obs len TEST {}", observationMasterAllList.size());
-//				List<ObservationMaster> observationReportedPatientList =
-//					observationMasterAllList.stream().filter(observationMaster -> StringUtils.isBlank(observationMaster.getVaccinationReportedId())).collect(Collectors.toList());
 				for (ObservationMaster observationMaster : observationReportedPatientList) {
 					obxSetId++;
 					obsSubId++;
@@ -528,43 +486,6 @@ public class IncomingQueryHandler {
 						hl7MessageWriter.printObx(sb, obxSetId, obsSubId, sub);
 					}
 				}
-//				if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R5)) {
-//					try {
-//						org.hl7.fhir.r5.model.Bundle bundle = fhirClient.search()
-//							.forResource(org.hl7.fhir.r5.model.Observation.class)
-//							.where(Observation.SUBJECT.hasId(new IdType("Patient/" + patientMaster.getPatientId())))
-//							.returnBundle(org.hl7.fhir.r5.model.Bundle.class)
-//							.execute();
-//						if (bundle.hasEntry()) {
-//							hl7MessageWriter.printORC(tenant, sb, null, false);
-//							obsSubId++;
-//							for (org.hl7.fhir.r5.model.Bundle.BundleEntryComponent entry : bundle.getEntry()) {
-//								obxSetId++;
-//								ObservationReported observationReported = observationMapper.localObjectReported(entry.getResource());
-//								hl7MessageWriter.printObx(sb, obxSetId, obsSubId, observationReported);
-//							}
-//						}
-//					} catch (ResourceNotFoundException ignored) {
-//					}
-//				} else if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R4)) {
-//					try {
-//						org.hl7.fhir.r4.model.Bundle bundle = fhirClient.search()
-//							.forResource(org.hl7.fhir.r4.model.Observation.class)
-//							.where(org.hl7.fhir.r4.model.Observation.PART_OF.hasId(patientMaster.getPatientId()))
-//							.returnBundle(org.hl7.fhir.r4.model.Bundle.class)
-//							.execute();
-//						if (bundle.hasEntry()) {
-//							hl7MessageWriter.printORC(tenant, sb, null, false);
-//							obsSubId++;
-//							for (org.hl7.fhir.r4.model.Bundle.BundleEntryComponent entry : bundle.getEntry()) {
-//								obxSetId++;
-//								ObservationReported observationReported = observationMapper.localObjectReported(entry.getResource());
-//								hl7MessageWriter.printObx(sb, obxSetId, obsSubId, observationReported);
-//							}
-//						}
-//					} catch (ResourceNotFoundException ignored) {
-//					}
-//				}
 
 				if (sendBackForecast && forecastActualList != null && !forecastActualList.isEmpty()) {
 					hl7MessageWriter.printORC(tenant, sb, null, false);
