@@ -129,7 +129,9 @@ public class ImmunizationMapperR4 implements ImmunizationMapper<Immunization> {
 		/*
 		 * Administered Amount
 		 */
-		vr.setAdministeredAmount(i.getDoseQuantity().getValue().toString());
+		if (i.getDoseQuantity().hasValue()) {
+			vr.setAdministeredAmount(i.getDoseQuantity().getValue().toString());
+		}
 		/*
 		 * Information Source
 		 */
