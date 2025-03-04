@@ -449,6 +449,15 @@ public class IncomingQueryHandler {
 								String valueTable = "99107";
 								hl7MessageWriter.printObx(sb, obxSetId, obsSubId, loinc, loincLabel, value, valueLabel, valueTable);
 							}
+							if ("N".equals(evaluationActual.getDoseValid())) {
+								obxSetId++;
+								String loinc = "30982-3";
+								String loincLabel = "Reason for validity";
+								String value = evaluationActual.getReasonCode();
+								String valueLabel = evaluationActual.getReasonText();
+								String valueTable = "99107";
+								hl7MessageWriter.printObx(sb, obxSetId, obsSubId, loinc, loincLabel, value, valueLabel, valueTable);
+							}
 						}
 					}
 
@@ -552,6 +561,15 @@ public class IncomingQueryHandler {
 							String valueTable = "99106";
 							hl7MessageWriter.printObx(sb, obxSetId, obsSubId, loinc, loincLabel, value, valueLabel, valueTable);
 						}
+						if (StringUtils.isNotBlank(forecastActual.getForecastReason())) {
+							obxSetId++;
+							String loinc = "30982-3";
+							String loincLabel = "Reason for recommendation";
+							String value = forecastActual.getForecastReason();
+							String valueLabel = "";
+							String valueTable = "";
+							hl7MessageWriter.printObx(sb, obxSetId, obsSubId, loinc, loincLabel, value, valueLabel, valueTable);
+						}
 						if (forecastActual.getDueDate() != null) {
 							obxSetId++;
 							String loinc = "30981-5";
@@ -569,9 +587,35 @@ public class IncomingQueryHandler {
 						if (forecastActual.getDueDate() != null) {
 							obxSetId++;
 							String loinc = "59778-1";
-							String loincLabel = "Latest date";
+							String loincLabel = "Overdue date";
 							Date value = forecastActual.getOverdueDate();
 							hl7MessageWriter.printObx(sb, obxSetId, obsSubId, loinc, loincLabel, value);
+						}
+						if (forecastActual.getFinishedDate() != null) {
+							obxSetId++;
+							String loinc = "59778-3";
+							String loincLabel = "Latest date";
+							Date value = forecastActual.getFinishedDate(); // TODO  make sure it is the right date
+							hl7MessageWriter.printObx(sb, obxSetId, obsSubId, loinc, loincLabel, value);
+						}
+
+//						if (StringUtils.isNotBlank(forecastActual.getScheduleName())) {
+//							obxSetId++;
+//							String loinc = "59779-9";
+//							String loincLabel = "Schedule used";
+//							String value = forecastActual.getScheduleName();
+//							String valueLabel = "";
+//							String valueTable = "";
+//							hl7MessageWriter.printObx(sb, obxSetId, obsSubId, loinc, loincLabel, value, valueLabel, valueTable);
+//						}
+						if (StringUtils.isNotBlank(forecastActual.getScheduleName())) {
+							obxSetId++;
+							String loinc = "59780-7";
+							String loincLabel = "Series Name";
+							String value = forecastActual.getScheduleName();
+							String valueLabel = "";
+							String valueTable = "";
+							hl7MessageWriter.printObx(sb, obxSetId, obsSubId, loinc, loincLabel, value, valueLabel, valueTable);
 						}
 					}
 				}
