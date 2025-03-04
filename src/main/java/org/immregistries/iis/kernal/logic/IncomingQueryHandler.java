@@ -436,7 +436,14 @@ public class IncomingQueryHandler {
 										value = "BADCVX";
 									}
 								}
-								String valueLabel = evaluationActual.getVaccineCvx();
+								Code code = codeMap.getCodeForCodeset(CodesetType.VACCINATION_CVX_CODE, evaluationActual.getVaccineCvx());
+
+								String valueLabel;
+								if (code != null) {
+									valueLabel = code.getLabel();
+								} else {
+									valueLabel = evaluationActual.getVaccineCvx();
+								}
 								String valueTable = "CVX";
 								hl7MessageWriter.printObx(sb, obxSetId, obsSubId, loinc, loincLabel, value, valueLabel, valueTable);
 							}
