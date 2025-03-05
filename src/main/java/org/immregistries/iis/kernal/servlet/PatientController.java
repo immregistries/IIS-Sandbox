@@ -184,13 +184,26 @@ public class PatientController {
 				}
 				out.println("  <div class=\"w3-container\">");
 				{
-//					List<VaccinationMaster> vaccinationList = fhirRequester.searchVaccinationListOperationEverything(patientMasterSelected.getPatientId());
-					List<VaccinationMaster> vaccinationList = fhirRequester.searchVaccinationMasterGoldenList(new SearchParameterMap().add("patient", new ReferenceParam().setValue(patientMasterSelected.getPatientId()).setMdmExpand(true)));
+					ReferenceParam referenceParam = new ReferenceParam().setValue(patientMasterSelected.getPatientId());
+					if (AbstractFhirRequester.isGoldenRecord(patientSelected)) {
+						referenceParam.setMdmExpand(true);
+					}
+					List<VaccinationMaster> vaccinationList = fhirRequester.searchVaccinationMasterGoldenList(
+						new SearchParameterMap().add("patient", referenceParam)
+					);
 					out.println("<h4>Vaccinations</h4>");
 					printVaccinationList(out, vaccinationList);
 				}
 				{
-					List<ObservationReported> observationReportedList = getObservationReportedList(patientMasterSelected);
+					ReferenceParam referenceParam = new ReferenceParam().setValue(patientMasterSelected.getPatientId());
+					if (AbstractFhirRequester.isGoldenRecord(patientSelected)) {
+						referenceParam.setMdmExpand(true);
+					}
+					List<ObservationReported> observationReportedList = fhirRequester.searchObservationReportedList(
+						new SearchParameterMap("subject", referenceParam));
+					Set<String> suppressSet = LoincIdentifier.getSuppressIdentifierCodeSet();
+					observationReportedList.removeIf(observationReported -> suppressSet.contains(observationReported.getIdentifierCode()));
+
 					out.println("<h4>Patient Observations</h4>");
 					printObservationList(out, observationReportedList);
 				}
@@ -258,6 +271,14 @@ public class PatientController {
 						out.println("<div>International Patient Summary: <a href=\"" + link + "\">" + link  +"</a></div>");
 					}
 					{
+						String link = apiBaseUrl + "/Immunization?patient:mdm=Patient/" + patientMasterSelected.getPatientId();
+						out.println("<div>All Immunizations related<a href=\"" + link + "\">" + link + "</a></div>");
+					}
+					{
+						String link = apiBaseUrl + "/Observation?patient:mdm=Patient/" + patientMasterSelected.getPatientId();
+						out.println("<div>All Observations related<a href=\"" + link + "\">" + link + "</a></div>");
+					}
+					{
 						String link;
 						if (AbstractFhirRequester.isGoldenRecord(patientSelected)) {
 							link = apiBaseUrl + "/$mdm-query-links?goldenResourceId=" + patientMasterSelected.getPatientId();
@@ -296,16 +317,6 @@ public class PatientController {
 		HomeServlet.doFooter(out);
 		out.flush();
 		out.close();
-	}
-
-	private List<ObservationReported> getObservationReportedList(PatientMaster patientMasterSelected) {
-		List<ObservationReported> observationReportedList = fhirRequester.searchObservationReportedList(
-			new SearchParameterMap("subject", new ReferenceParam().setValue(patientMasterSelected.getPatientId())));
-//				Observation.SUBJECT.hasId(patientSelected.getPatientId()));
-//		 observationReportedList = observationReportedList.stream().filter(observationReported -> observationReported.getVaccinationReported() == null).collect(Collectors.toList());
-		Set<String> suppressSet = LoincIdentifier.getSuppressIdentifierCodeSet();
-		observationReportedList.removeIf(observationReported -> suppressSet.contains(observationReported.getIdentifierCode()));
-		return observationReportedList;
 	}
 
 	public static void printPatientList(PrintWriter out, List<PatientMaster> patientMasterList, boolean showingRecent) {
@@ -445,143 +456,147 @@ public class PatientController {
 
 	public static void printObservationList(PrintWriter out, List<ObservationReported> observationReportedList) {
 		SimpleDateFormat sdfDate = new SimpleDateFormat("MM/dd/yyyy");
-		out.println("<table class=\"w3-table w3-bordered w3-striped w3-border test w3-hoverable\">");
-		out.println("  <tr class=\"w3-green\">");
-		out.println("    <th>Identifier</th>");
-		out.println("    <th>Value</th>");
-		out.println("    <th>Date</th>");
-		out.println("  </tr>");
-		out.println("  <tbody>");
-		for (ObservationReported observationReported : observationReportedList) {
-			out.println("<tr>");
-			String valueType = observationReported.getValueType();
-			if (valueType == null) {
-				valueType = "CE";
-			}
-			out.println("<td>");
-			{
-				String code = observationReported.getIdentifierCode();
-				if (StringUtils.isBlank(observationReported.getIdentifierLabel())) {
-					out.println("      " + code);
-				} else {
-					String table = observationReported.getIdentifierTable();
-					if (StringUtils.isBlank(table)) {
-						out.println("      " + observationReported.getIdentifierLabel() + " (" + code + ")");
-					} else {
-						switch (table) {
-							case "LN":
-								table = "Loinc";
-								break;
-							case "99TPG":
-								table = "Priority";
-								break;
-							case "SCT":
-								table = "Snomed";
-								break;
-						}
-						out.println("      " + observationReported.getIdentifierLabel() + " (" + table + " "
-							+ code + ")");
-					}
-				}
-				if ("LN".equals(observationReported.getIdentifierTable()) || "99TPG".equals(observationReported.getIdentifierTable())) {
-					LoincIdentifier loincIdentifier = null;
-					for (LoincIdentifier oi : LoincIdentifier.values()) {
-						if (oi.getIdentifierCode().equalsIgnoreCase(code)) {
-							loincIdentifier = oi;
-							break;
-						}
-					}
-					if (loincIdentifier == null) {
-						out.println("<div class=\"w3-panel w3-yellow\">Not Recognized</div>");
-					} else {
-						out.println("&#10004;");
-						if (!loincIdentifier.getIdentifierLabel()
-							.equalsIgnoreCase(observationReported.getIdentifierLabel())) {
-							out.println("Matches: " + loincIdentifier.getIdentifierLabel());
-						}
-					}
-				}
-			}
-			out.println("</td>");
-			out.println("<td>");
-			if (valueType.equals("DT")) {
-				String value = StringUtils.defaultString(observationReported.getValueCode());
-				Date valueDate = null;
-				if (value.length() > 8) {
-					value = value.substring(8);
-				}
-				if (value.length() == 8) {
-					SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-					try {
-						valueDate = sdf.parse(value);
-					} catch (ParseException ignored) {
-					}
-				}
-				if (valueDate == null) {
-					out.println("      " + value);
-				} else {
-					out.println("      " + sdfDate.format(valueDate));
-				}
-			} else if (valueType.equals("SN")) {
-				out.println("      " + observationReported.getValueLabel() + " "
-					+ observationReported.getValueTable() + " " + observationReported.getValueCode());
-			} else {
-				String code = observationReported.getValueCode();
-				if (StringUtils.isBlank(observationReported.getValueLabel())) {
-					out.println("      " + code);
-				} else {
-					String table = observationReported.getValueTable();
-					if (StringUtils.isBlank(table)) {
-						out.println("      " + observationReported.getValueLabel() + " (" + code + ")");
-					} else {
-						switch (table) {
-							case "LN":
-								table = "Loinc";
-								break;
-							case "99TPG":
-								table = "Priority";
-								break;
-							case "SCT":
-								table = "Snomed";
-								break;
-						}
-						out.println(
-							"      " + observationReported.getValueLabel() + " (" + table + " " + code + ")");
-					}
-				}
-				if ("SCT".equals(observationReported.getValueTable())
-					|| "CDCPHINVS".equals(observationReported.getValueTable())
-					|| "99TPG".equals(observationReported.getValueTable())) {
-					SnomedValue snomedValue = null;
-					for (SnomedValue sv : SnomedValue.values()) {
-						if (sv.getIdentifierCode().equalsIgnoreCase(code)) {
-							snomedValue = sv;
-							break;
-						}
-					}
-					if (snomedValue == null) {
-						out.println("<div class=\"w3-panel w3-yellow\">Not Recognized</div>");
-					} else {
-						out.println("&#10004;");
-						if (!snomedValue.getIdentifierLabel()
-							.equalsIgnoreCase(observationReported.getValueLabel())) {
-							out.println("Matches: " + snomedValue.getIdentifierLabel());
-						}
-					}
-				}
-			}
-			out.println("    </td>");
-
-			if (observationReported.getObservationDate() == null) {
-				out.println("<td></td>");
-			} else {
-				out.println(
-					"    <td>" + sdfDate.format(observationReported.getObservationDate()) + "</td>");
-			}
+		if (observationReportedList.isEmpty()) {
+			out.println("<div class=\"w3-panel w3-yellow\"><p>No Observations found</p></div>");
+		} else {
+			out.println("<table class=\"w3-table w3-bordered w3-striped w3-border test w3-hoverable\">");
+			out.println("  <tr class=\"w3-green\">");
+			out.println("    <th>Identifier</th>");
+			out.println("    <th>Value</th>");
+			out.println("    <th>Date</th>");
 			out.println("  </tr>");
+			out.println("  <tbody>");
+			for (ObservationReported observationReported : observationReportedList) {
+				out.println("<tr>");
+				String valueType = observationReported.getValueType();
+				if (valueType == null) {
+					valueType = "CE";
+				}
+				out.println("<td>");
+				{
+					String code = observationReported.getIdentifierCode();
+					if (StringUtils.isBlank(observationReported.getIdentifierLabel())) {
+						out.println("      " + code);
+					} else {
+						String table = observationReported.getIdentifierTable();
+						if (StringUtils.isBlank(table)) {
+							out.println("      " + observationReported.getIdentifierLabel() + " (" + code + ")");
+						} else {
+							switch (table) {
+								case "LN":
+									table = "Loinc";
+									break;
+								case "99TPG":
+									table = "Priority";
+									break;
+								case "SCT":
+									table = "Snomed";
+									break;
+							}
+							out.println("      " + observationReported.getIdentifierLabel() + " (" + table + " "
+								+ code + ")");
+						}
+					}
+					if ("LN".equals(observationReported.getIdentifierTable()) || "99TPG".equals(observationReported.getIdentifierTable())) {
+						LoincIdentifier loincIdentifier = null;
+						for (LoincIdentifier oi : LoincIdentifier.values()) {
+							if (oi.getIdentifierCode().equalsIgnoreCase(code)) {
+								loincIdentifier = oi;
+								break;
+							}
+						}
+						if (loincIdentifier == null) {
+							out.println("<div class=\"w3-panel w3-yellow\">Not Recognized</div>");
+						} else {
+							out.println("&#10004;");
+							if (!loincIdentifier.getIdentifierLabel()
+								.equalsIgnoreCase(observationReported.getIdentifierLabel())) {
+								out.println("Matches: " + loincIdentifier.getIdentifierLabel());
+							}
+						}
+					}
+				}
+				out.println("</td>");
+				out.println("<td>");
+				if (valueType.equals("DT")) {
+					String value = StringUtils.defaultString(observationReported.getValueCode());
+					Date valueDate = null;
+					if (value.length() > 8) {
+						value = value.substring(8);
+					}
+					if (value.length() == 8) {
+						SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+						try {
+							valueDate = sdf.parse(value);
+						} catch (ParseException ignored) {
+						}
+					}
+					if (valueDate == null) {
+						out.println("      " + value);
+					} else {
+						out.println("      " + sdfDate.format(valueDate));
+					}
+				} else if (valueType.equals("SN")) {
+					out.println("      " + observationReported.getValueLabel() + " "
+						+ observationReported.getValueTable() + " " + observationReported.getValueCode());
+				} else {
+					String code = observationReported.getValueCode();
+					if (StringUtils.isBlank(observationReported.getValueLabel())) {
+						out.println("      " + code);
+					} else {
+						String table = observationReported.getValueTable();
+						if (StringUtils.isBlank(table)) {
+							out.println("      " + observationReported.getValueLabel() + " (" + code + ")");
+						} else {
+							switch (table) {
+								case "LN":
+									table = "Loinc";
+									break;
+								case "99TPG":
+									table = "Priority";
+									break;
+								case "SCT":
+									table = "Snomed";
+									break;
+							}
+							out.println(
+								"      " + observationReported.getValueLabel() + " (" + table + " " + code + ")");
+						}
+					}
+					if ("SCT".equals(observationReported.getValueTable())
+						|| "CDCPHINVS".equals(observationReported.getValueTable())
+						|| "99TPG".equals(observationReported.getValueTable())) {
+						SnomedValue snomedValue = null;
+						for (SnomedValue sv : SnomedValue.values()) {
+							if (sv.getIdentifierCode().equalsIgnoreCase(code)) {
+								snomedValue = sv;
+								break;
+							}
+						}
+						if (snomedValue == null) {
+							out.println("<div class=\"w3-panel w3-yellow\">Not Recognized</div>");
+						} else {
+							out.println("&#10004;");
+							if (!snomedValue.getIdentifierLabel()
+								.equalsIgnoreCase(observationReported.getValueLabel())) {
+								out.println("Matches: " + snomedValue.getIdentifierLabel());
+							}
+						}
+					}
+				}
+				out.println("    </td>");
+
+				if (observationReported.getObservationDate() == null) {
+					out.println("<td></td>");
+				} else {
+					out.println(
+						"    <td>" + sdfDate.format(observationReported.getObservationDate()) + "</td>");
+				}
+				out.println("  </tr>");
+			}
+			out.println("  </tbody>");
+			out.println("</table>");
 		}
-		out.println("  </tbody>");
-		out.println("</table>");
 	}
 
 	public static void printPatient(PrintWriter out, PatientMaster patientSelected) {
