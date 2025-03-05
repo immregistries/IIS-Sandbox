@@ -29,6 +29,7 @@ public class IisReportable {
 		reportedMessage = reportable.getReportedMessage();
 		severity = IisReportableSeverity.findByCode(reportable.getSeverity().getCode());
 		source = reportable.getSource();
+		hl7LocationList = List.copyOf(reportable.getHl7LocationList());
 	}
 
 //	public IisReportable(String message, String segmentId, int segmentRepeat,
@@ -107,6 +108,13 @@ public class IisReportable {
 	}
 
 
+	/**
+	 * Taken form NIST Validator Connector Project
+	 *
+	 * @param path
+	 * @param segmentid
+	 * @return
+	 */
 	public static Hl7Location readErrorLocation(String path, String segmentid) {
 		Hl7Location errorLocation = new Hl7Location();
 		errorLocation.setSegmentId(segmentid);
@@ -202,6 +210,7 @@ public class IisReportable {
 	private IisReportable(ProcessingException processingException) {
 		Hl7Location location = new Hl7Location();
 		location.setSegmentId(processingException.getSegmentId());
+//		location.setComponentNumber(processingException.get);
 		location.setFieldRepetition(processingException.getSegmentRepeat());
 		location.setFieldPosition(processingException.getFieldPosition());
 		hl7LocationList = List.of(location);

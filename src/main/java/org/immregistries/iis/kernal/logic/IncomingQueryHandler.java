@@ -230,7 +230,8 @@ public class IncomingQueryHandler {
 
 		{
 			String sendersUniqueId = reader.getValue(10);
-			IisHL7Util.makeMsaAndErr(sb, sendersUniqueId, profileId, profileId, iisReportables, processingFlavorSet);
+			String processingId = mqeMessageServiceResponse.getMessageObjects().getMessageHeader().getProcessingStatus();
+			IisHL7Util.makeMsaAndErr(sb, sendersUniqueId, processingId, profileId, iisReportables, processingFlavorSet);
 		}
 
 		if (sendInformations) {
@@ -308,119 +309,9 @@ public class IncomingQueryHandler {
 						continue;
 					}
 					hl7MessageWriter.printORC(tenant, sb, vaccination, originalReporter);
-					sb.append("RXA");
-					// RXA-1
-					sb.append("|0");
-					// RXA-2
-					sb.append("|1");
-					String adminDate = sdf.format(vaccination.getAdministeredDate());
-					if (obxSetId == 0 && processingFlavorSet.contains(ProcessingFlavor.CHERRY)) {
-						adminDate = "";
-					}
-					// RXA-3
-					sb.append("|").append(adminDate);
-					// RXA-4
-					sb.append("|");
-					// RXA-5
-					sb.append("|").append(cvxCode.getValue()).append("^").append(cvxCode.getLabel()).append("^CVX");
-					if (StringUtils.isNotBlank(vaccination.getVaccineNdcCode())) {
-						Code ndcCode = codeMap.getCodeForCodeset(CodesetType.VACCINATION_NDC_CODE, vaccination.getVaccineNdcCode());
-						if (ndcCode != null) {
-							sb.append("~").append(ndcCode.getValue()).append("^").append(ndcCode.getLabel()).append("^NDC");
-						}
-					}
-					{
-						// RXA-6
-						sb.append("|");
-						double adminAmount = 0.0;
-						if (StringUtils.isNotBlank(vaccination.getAdministeredAmount())) {
-							try {
-								adminAmount = Double.parseDouble(vaccination.getAdministeredAmount());
-							} catch (NumberFormatException nfe) {
-								adminAmount = 0.0;
-							}
-						}
-						if (adminAmount > 0) {
-							if (adminAmount == 999.0) {
-								sb.append("999");
-							} else {
-								sb.append(adminAmount);
-							}
-						}
-						// RXA-7
-						sb.append("|");
-						if (adminAmount > 0) {
-							sb.append("mL^milliliters^UCUM");
-						}
-					}
-					// RXA-8
-					sb.append("|");
-					// RXA-9
-					sb.append("|");
-					{
-						Code informationCode = null;
-						if (vaccination.getInformationSource() != null) {
-							informationCode = codeMap.getCodeForCodeset(CodesetType.VACCINATION_INFORMATION_SOURCE, vaccination.getInformationSource());
-						}
-						if (informationCode != null) {
-							sb.append(informationCode.getValue()).append("^").append(informationCode.getLabel()).append("^NIP001");
-						}
-					}
-					// RXA-10
-					sb.append("|");
-					// RXA-11
-					sb.append("|");
-					if (vaccination.getOrgLocation() == null || StringUtils.isBlank(vaccination.getOrgLocation().getOrgFacilityCode())) {
-					} else {
-						sb.append("^^^");
-						sb.append(vaccination.getOrgLocation().getOrgFacilityCode());
-					}
-					// RXA-12
-					sb.append("|");
-					// RXA-13
-					sb.append("|");
-					// RXA-14
-					sb.append("|");
-					// RXA-15
-					sb.append("|");
-					if (vaccination.getLotnumber() != null) {
-						sb.append(vaccination.getLotnumber());
-					}
-					// RXA-16
-					sb.append("|");
-					if (vaccination.getExpirationDate() != null) {
-						sb.append(sdf.format(vaccination.getExpirationDate()));
-					}
-					// RXA-17
-					sb.append("|");
-					sb.append(hl7MessageWriter.printCode(vaccination.getVaccineMvxCode(), CodesetType.VACCINATION_MANUFACTURER_CODE, "MVX", codeMap));
-					// RXA-18
-					sb.append("|");
-					sb.append(hl7MessageWriter.printCode(vaccination.getRefusalReasonCode(), CodesetType.VACCINATION_REFUSAL, "NIP002", codeMap));
-					// RXA-19
-					sb.append("|");
-					// RXA-20
-					sb.append("|");
-					if (!processingFlavorSet.contains(ProcessingFlavor.LIME)) {
-						String completionStatus = vaccination.getCompletionStatus();
-						if (StringUtils.isBlank(completionStatus)) {
-							completionStatus = "CP";
-						}
-						sb.append(hl7MessageWriter.printCode(completionStatus, CodesetType.VACCINATION_COMPLETION, null, codeMap));
-					}
-
-					// RXA-21
-					sb.append("|A");
-					sb.append("\r");
+					printRXA(vaccination, sb, obxSetId, processingFlavorSet, cvxCode);
 					if (StringUtils.isNotBlank(vaccination.getBodyRoute())) {
-						sb.append("RXR");
-						// RXR-1
-						sb.append("|");
-						sb.append(hl7MessageWriter.printCode(vaccination.getBodyRoute(), CodesetType.BODY_ROUTE, "NCIT", codeMap));
-						// RXR-2
-						sb.append("|");
-						sb.append(hl7MessageWriter.printCode(vaccination.getBodySite(), CodesetType.BODY_SITE, "HL70163", codeMap));
-						sb.append("\r");
+						printRXR(vaccination, sb);
 					}
 					TestEvent testEvent = vaccination.getTestEvent();
 					if (testEvent != null && testEvent.getEvaluationActualList() != null) {
@@ -632,6 +523,128 @@ public class IncomingQueryHandler {
 		String messageResponse = sb.toString();
 		messageRecordingService.recordMessageReceived(messageReceived, patientMaster, messageResponse, "Query", categoryResponse, tenant);
 		return messageResponse;
+	}
+
+	private void printRXR(VaccinationMaster vaccination, StringBuilder sb) {
+		CodeMap codeMap = CodeMapManager.getCodeMap();
+		sb.append("RXR");
+		// RXR-1
+		sb.append("|");
+		sb.append(hl7MessageWriter.printCode(vaccination.getBodyRoute(), CodesetType.BODY_ROUTE, "NCIT", codeMap));
+		// RXR-2
+		sb.append("|");
+		sb.append(hl7MessageWriter.printCode(vaccination.getBodySite(), CodesetType.BODY_SITE, "HL70163", codeMap));
+		sb.append("\r");
+	}
+
+	private void printRXA(VaccinationMaster vaccination, StringBuilder sb, int obxSetId, Set<ProcessingFlavor> processingFlavorSet, Code cvxCode) {
+		SimpleDateFormat sdf = IIncomingMessageHandler.generateV2SDF();
+		CodeMap codeMap = CodeMapManager.getCodeMap();
+
+		sb.append("RXA");
+		// RXA-1
+		sb.append("|0");
+		// RXA-2
+		sb.append("|1");
+		String adminDate = sdf.format(vaccination.getAdministeredDate());
+		if (obxSetId == 0 && processingFlavorSet.contains(ProcessingFlavor.CHERRY)) {
+			adminDate = "";
+		}
+		// RXA-3
+		sb.append("|").append(adminDate);
+		// RXA-4
+		sb.append("|");
+		// RXA-5
+		sb.append("|").append(cvxCode.getValue()).append("^").append(cvxCode.getLabel()).append("^CVX");
+		if (StringUtils.isNotBlank(vaccination.getVaccineNdcCode())) {
+			Code ndcCode = codeMap.getCodeForCodeset(CodesetType.VACCINATION_NDC_CODE, vaccination.getVaccineNdcCode());
+			if (ndcCode != null) {
+				sb.append("~").append(ndcCode.getValue()).append("^").append(ndcCode.getLabel()).append("^NDC");
+			}
+		}
+		{
+			// RXA-6
+			sb.append("|");
+			double adminAmount = 0.0;
+			if (StringUtils.isNotBlank(vaccination.getAdministeredAmount())) {
+				try {
+					adminAmount = Double.parseDouble(vaccination.getAdministeredAmount());
+				} catch (NumberFormatException nfe) {
+					adminAmount = 0.0;
+				}
+			}
+			if (adminAmount > 0) {
+				if (adminAmount == 999.0) {
+					sb.append("999");
+				} else {
+					sb.append(adminAmount);
+				}
+			}
+			// RXA-7
+			sb.append("|");
+			if (adminAmount > 0) {
+				sb.append("mL^milliliters^UCUM");
+			}
+		}
+		// RXA-8
+		sb.append("|");
+		// RXA-9
+		sb.append("|");
+		{
+			Code informationCode = null;
+			if (vaccination.getInformationSource() != null) {
+				informationCode = codeMap.getCodeForCodeset(CodesetType.VACCINATION_INFORMATION_SOURCE, vaccination.getInformationSource());
+			}
+			if (informationCode != null) {
+				sb.append(informationCode.getValue()).append("^").append(informationCode.getLabel()).append("^NIP001");
+			}
+		}
+		// RXA-10
+		sb.append("|");
+		// RXA-11
+		sb.append("|");
+		if (vaccination.getOrgLocation() == null || StringUtils.isBlank(vaccination.getOrgLocation().getOrgFacilityCode())) {
+		} else {
+			sb.append("^^^");
+			sb.append(vaccination.getOrgLocation().getOrgFacilityCode());
+		}
+		// RXA-12
+		sb.append("|");
+		// RXA-13
+		sb.append("|");
+		// RXA-14
+		sb.append("|");
+		// RXA-15
+		sb.append("|");
+		if (vaccination.getLotnumber() != null) {
+			sb.append(vaccination.getLotnumber());
+		}
+		// RXA-16
+		sb.append("|");
+		if (vaccination.getExpirationDate() != null) {
+			sb.append(sdf.format(vaccination.getExpirationDate()));
+		}
+		// RXA-17
+		sb.append("|");
+		sb.append(hl7MessageWriter.printCode(vaccination.getVaccineMvxCode(), CodesetType.VACCINATION_MANUFACTURER_CODE, "MVX", codeMap));
+		// RXA-18
+		sb.append("|");
+		sb.append(hl7MessageWriter.printCode(vaccination.getRefusalReasonCode(), CodesetType.VACCINATION_REFUSAL, "NIP002", codeMap));
+		// RXA-19
+		sb.append("|");
+		// RXA-20
+		sb.append("|");
+		if (!processingFlavorSet.contains(ProcessingFlavor.LIME)) {
+			String completionStatus = vaccination.getCompletionStatus();
+			if (StringUtils.isBlank(completionStatus)) {
+				completionStatus = "CP";
+			}
+			sb.append(hl7MessageWriter.printCode(completionStatus, CodesetType.VACCINATION_COMPLETION, null, codeMap));
+		}
+
+		// RXA-21
+		sb.append("|A");
+		sb.append("\r");
 	}
 
 	public List<ForecastActual> doForecast(PatientMaster patient, CodeMap codeMap, List<VaccinationMaster> vaccinationMasterList, Tenant tenant) {
