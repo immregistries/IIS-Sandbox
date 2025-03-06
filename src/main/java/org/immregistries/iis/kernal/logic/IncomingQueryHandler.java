@@ -403,33 +403,35 @@ public class IncomingQueryHandler {
 					sb.append("|998^No Vaccination Administered^CVX");
 					// RXA-6
 					sb.append("|999");
-					// RXA-7
-					sb.append("|");
-					// RXA-8
-					sb.append("|");
-					// RXA-9
-					sb.append("|");
-					// RXA-10
-					sb.append("|");
-					// RXA-11
-					sb.append("|");
-					// RXA-12
-					sb.append("|");
-					// RXA-13
-					sb.append("|");
-					// RXA-14
-					sb.append("|");
-					// RXA-15
-					sb.append("|");
-					// RXA-16
-					sb.append("|");
-					// RXA-17
-					sb.append("|");
-					// RXA-18
-					sb.append("|");
-					// RXA-19
-					sb.append("|");
-					// RXA-20
+					{
+						// RXA-7
+						sb.append("|");
+						// RXA-8
+						sb.append("|");
+						// RXA-9
+						sb.append("|");
+						// RXA-10
+						sb.append("|");
+						// RXA-11
+						sb.append("|");
+						// RXA-12
+						sb.append("|");
+						// RXA-13
+						sb.append("|");
+						// RXA-14
+						sb.append("|");
+						// RXA-15
+						sb.append("|");
+						// RXA-16
+						sb.append("|");
+						// RXA-17
+						sb.append("|");
+						// RXA-18
+						sb.append("|");
+						// RXA-19
+						sb.append("|");
+						// RXA-20
+					}
 					sb.append("|NA");
 					sb.append("\r");
 					HashSet<String> cvxAddedSet = new HashSet<String>();
@@ -452,10 +454,10 @@ public class IncomingQueryHandler {
 						{
 							obxSetId++;
 							String loinc = "59783-1";
-							String loincLabel = "Status in series";
-							Admin admin = forecastActual.getAdmin();
-							String value = admin.getAdminStatus();
-							String valueLabel = admin.getLabel();
+							String loincLabel = "Status in immunization series";
+							Code code = convertToLoincResult(forecastActual);
+							String value = code.getValue();
+							String valueLabel = code.getLabel();
 							String valueTable = "99106";
 							hl7MessageWriter.printObx(sb, obxSetId, obsSubId, loinc, loincLabel, value, valueLabel, valueTable);
 						}
@@ -523,6 +525,33 @@ public class IncomingQueryHandler {
 		String messageResponse = sb.toString();
 		messageRecordingService.recordMessageReceived(messageReceived, patientMaster, messageResponse, "Query", categoryResponse, tenant);
 		return messageResponse;
+	}
+
+	private static Code convertToLoincResult(ForecastActual forecastActual) {
+		Admin admin = forecastActual.getAdmin();
+
+		Code code = new Code();
+		switch (admin) {
+			case NOT_COMPLETE: {
+				if (forecastActual.getOverdueDate() != null && new Date().after(forecastActual.getDueDate())) {
+					code.setValue("LA13423-1");
+					code.setLabel("Overdue - person is late getting the next dose in the series.");
+					code.setDescription("LL940-8");
+				} else {
+					code.setValue("LA13423-3");
+					code.setLabel("On schedule - person is not overdue for a given dose in the series. Includes a person too young to start the series.");
+					code.setDescription("LL940-8");
+				}
+				break;
+
+			}
+			case OVERDUE: {
+				code.setValue("LA13423-1");
+				code.setLabel("Overdue - person is late getting the next dose in the series.");
+				code.setDescription("LL940-8");
+			}
+		}
+		return code;
 	}
 
 	private void printRXR(VaccinationMaster vaccination, StringBuilder sb) {
@@ -687,9 +716,12 @@ public class IncomingQueryHandler {
 			}
 
 			ConnectorInterface connector = ConnectFactory.createConnecter(software, VaccineGroup.getForecastItemList());
-			connector.setLogText(false);
+			connector.setLogText(true);
 			try {
-				forecastActualList = connector.queryForForecast(testCase, new SoftwareResult());
+
+				SoftwareResult softwareResult = new SoftwareResult();
+				forecastActualList = connector.queryForForecast(testCase, softwareResult);
+				logger.info("swr {}", softwareResult.getLogText());
 			} catch (IOException ioe) {
 				System.err.println("Unable to query for forecast");
 				ioe.printStackTrace();
