@@ -16,6 +16,8 @@ import org.immregistries.mqe.hl7util.SeverityLevel;
 import org.immregistries.mqe.hl7util.model.CodedWithExceptions;
 import org.immregistries.mqe.hl7util.model.Hl7Location;
 import org.immregistries.mqe.validator.MqeMessageService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
@@ -26,6 +28,7 @@ import java.util.Map;
 
 @Service
 public class ValidationService {
+	Logger logger = LoggerFactory.getLogger(this.getClass());
 	public MqeMessageService getMqeMessageService() {
 		return mqeMessageService;
 	}
@@ -121,6 +124,8 @@ public class ValidationService {
 					String path = assertion.getPath();
 					reportable.setDiagnosticMessage(path);
 					fillErrorLocationFromPath(reportable, path);
+//					if (!reportable.getHl7LocationList().isEmpty())
+//						logger.info("HL7LOCATION {} {}",path, reportable.getHl7LocationList().get(0));
 				}
 			}
 		}
@@ -133,7 +138,7 @@ public class ValidationService {
 		if (path != null && path.length() >= 3) {
 			String segmentid = path.substring(0, 3);
 			if (path.length() > 3) {
-				path = path.substring(4);
+				path = path.substring(3);
 			} else {
 				path = "";
 			}

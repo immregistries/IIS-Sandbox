@@ -161,7 +161,7 @@ public class IisHL7Util {
 		CodedWithExceptions hl7ErrorCode = reportable.getHl7ErrorCode();
 
 		err.append("ERR||");
-		err.append(printErr3(reportable));
+		err.append(printErr2(reportable));
 		// 2 Error Location
 		err.append("|");
 		// 3 HL7 Error Code
@@ -259,7 +259,7 @@ public class IisHL7Util {
 		}
 	}
 
-	private static String printErr3(IisReportable reportable) {
+	private static String printErr2(IisReportable reportable) {
 		StringBuilder ack = new StringBuilder();
 		boolean repeating = false;
 		if (reportable.getHl7LocationList() != null) {

@@ -109,7 +109,7 @@ public class IisReportable {
 
 
 	/**
-	 * Taken form NIST Validator Connector Project
+	 * Taken from NIST Validator Connector Project and fixed issues
 	 *
 	 * @param path
 	 * @param segmentid
@@ -118,7 +118,7 @@ public class IisReportable {
 	public static Hl7Location readErrorLocation(String path, String segmentid) {
 		Hl7Location errorLocation = new Hl7Location();
 		errorLocation.setSegmentId(segmentid);
-		int firstDotPos = path.indexOf(".");
+		int firstDotPos = path.indexOf("-");
 		String segmentSequence = path;
 		if (firstDotPos >= 0) {
 			segmentSequence = path.substring(0, firstDotPos);
@@ -148,7 +148,7 @@ public class IisReportable {
 			try {
 				if (bracketPos >= 0) {
 					fieldPosition = Integer.parseInt(componentString.substring(0, bracketPos).trim());
-					componentString = componentString.substring(bracketPos + 1);
+					componentString = componentString.substring(bracketPos);
 					errorLocation.setFieldRepetition(parseBracketInt(componentString));
 				} else {
 					fieldPosition = Integer.parseInt(componentString.trim());
@@ -188,14 +188,17 @@ public class IisReportable {
 	}
 
 	private static int parseBracketInt(String s) {
-		s = s.trim();
-		if (s.startsWith("[") && s.startsWith("]")) {
+		if (s.startsWith("[") && s.endsWith("]")) {
 			try {
 				return Integer.parseInt(s.substring(1, s.length() - 1).trim());
 			} catch (NumberFormatException var3) {
 			}
+		} else {
+			try {
+				return Integer.parseInt(s.trim());
+			} catch (NumberFormatException var3) {
+			}
 		}
-
 		return 0;
 	}
 
