@@ -455,10 +455,20 @@ public class IncomingQueryHandler {
 							obxSetId++;
 							String loinc = "59783-1";
 							String loincLabel = "Status in immunization series";
-							Code code = convertToLoincResult(forecastActual);
-							String value = code.getValue();
-							String valueLabel = code.getLabel();
-							String valueTable = "99106";
+							VaccinePlanStatus vaccinePlanStatus = VaccinePlanStatus.fromForecastActual(forecastActual);
+							String value;
+							String valueLabel;
+							String valueTable;
+							if (vaccinePlanStatus != null) {
+								value = vaccinePlanStatus.getCode();
+								valueLabel = vaccinePlanStatus.getLabel();
+								valueTable = vaccinePlanStatus.getTable();
+							} else {
+								Admin admin = forecastActual.getAdmin();
+								value = admin.getAdminStatus();
+								valueLabel = admin.getLabel();
+								valueTable = "99106";
+							}
 							hl7MessageWriter.printObx(sb, obxSetId, obsSubId, loinc, loincLabel, value, valueLabel, valueTable);
 						}
 						if (StringUtils.isNotBlank(forecastActual.getForecastReason())) {
@@ -525,33 +535,6 @@ public class IncomingQueryHandler {
 		String messageResponse = sb.toString();
 		messageRecordingService.recordMessageReceived(messageReceived, patientMaster, messageResponse, "Query", categoryResponse, tenant);
 		return messageResponse;
-	}
-
-	private static Code convertToLoincResult(ForecastActual forecastActual) {
-		Admin admin = forecastActual.getAdmin();
-
-		Code code = new Code();
-		switch (admin) {
-			case NOT_COMPLETE: {
-				if (forecastActual.getOverdueDate() != null && new Date().after(forecastActual.getDueDate())) {
-					code.setValue("LA13423-1");
-					code.setLabel("Overdue - person is late getting the next dose in the series.");
-					code.setDescription("LL940-8");
-				} else {
-					code.setValue("LA13423-3");
-					code.setLabel("On schedule - person is not overdue for a given dose in the series. Includes a person too young to start the series.");
-					code.setDescription("LL940-8");
-				}
-				break;
-
-			}
-			case OVERDUE: {
-				code.setValue("LA13423-1");
-				code.setLabel("Overdue - person is late getting the next dose in the series.");
-				code.setDescription("LL940-8");
-			}
-		}
-		return code;
 	}
 
 	private void printRXR(VaccinationMaster vaccination, StringBuilder sb) {
