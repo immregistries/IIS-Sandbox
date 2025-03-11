@@ -263,6 +263,9 @@ public class ServletHelper {
 				return getTenant(urlTenantName, request, dataSession);
 			}
 		}
+		if (requestTenant != null) {
+			return requestTenant;
+		}
 		HttpSession session = request.getSession(false);
 		if (session != null) {
 			return (Tenant) session.getAttribute(SESSION_TENANT);
