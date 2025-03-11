@@ -134,6 +134,7 @@ public class ServletHelper {
 		} else {
 			throw new AuthenticationException("password for user : " + username);
 		}
+		SecurityContextHolder.getContext().setAuthentication(userAccess);
 		return userAccess;
 	}
 
@@ -155,6 +156,7 @@ public class ServletHelper {
 		} else {
 			throw new AuthenticationException("OAuth login failure");
 		}
+		SecurityContextHolder.getContext().setAuthentication(userAccess);
 		return userAccess;
 	}
 
@@ -214,11 +216,14 @@ public class ServletHelper {
 		if (authentication instanceof UserAccess) {
 			return (UserAccess) authentication;
 		}
-		Tenant tenant = getTenant();
+		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+		Tenant tenant = getTenant(request); // TODO test if commenting breaks anything, might be useless, or only used for subscription/ bulk
 		if (tenant != null) {
 			return tenant.getUserAccess();
 		}
-		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+		/*
+		 * Useful for special user like connectathon
+		 */
 		HttpSession session = request.getSession(false);
 		if (session != null) {
 			return (UserAccess) session.getAttribute(SESSION_USER_ACCESS);
@@ -232,7 +237,11 @@ public class ServletHelper {
 		if (StringUtils.isBlank(pathVariable)) {
 			tenant = getTenant(request);
 		} else {
-			UserAccess userAccess = getUserAccess();
+			UserAccess userAccess = null;
+			Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+			if (authentication instanceof UserAccess) {
+				userAccess = (UserAccess) authentication;
+			}
 			tenant = authenticateTenant(userAccess, pathVariable, dataSession);
 		}
 //		if (tenant == null) {

@@ -17,7 +17,6 @@ public class TenantUrlFilter extends OncePerRequestFilter {
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 		String path = request.getServletPath();
-		logger.info("path {}", path);
 
 		if (!path.startsWith(TenantController.TENANT_BASE_PATH + "/")) {
 			filterChain.doFilter(request, response);
@@ -30,9 +29,7 @@ public class TenantUrlFilter extends OncePerRequestFilter {
 			return;
 		}
 		path = path.substring(0, indexOfNext);
-
 		request.setAttribute(TENANT_NAME_URL, path);
-		logger.info("path result {}", path);
 		filterChain.doFilter(request, response);
 	}
 
