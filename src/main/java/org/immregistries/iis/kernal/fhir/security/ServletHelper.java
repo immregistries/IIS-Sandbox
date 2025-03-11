@@ -21,6 +21,8 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 public class ServletHelper {
@@ -76,6 +78,7 @@ public class ServletHelper {
 		if (StringUtils.isBlank(facilityName)) {
 			throw new AuthenticationException();
 		}
+		facilityName = URLEncoder.encode(facilityName, StandardCharsets.UTF_8);
 		if (facilityName.startsWith(GITHUB_PREFIX) ) {
 			if (!userAccess.getAccessName().startsWith(GITHUB_PREFIX)) {
 				throw new AuthenticationException();
