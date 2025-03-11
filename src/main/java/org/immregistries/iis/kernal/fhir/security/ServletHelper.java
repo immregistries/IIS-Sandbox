@@ -25,6 +25,8 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
+import static org.immregistries.iis.kernal.servlet.TenantUrlFilter.TENANT_NAME_URL;
+
 public class ServletHelper {
 	private static final Logger logger = LoggerFactory.getLogger(ServletHelper.class);
 	public static final String GITHUB_PREFIX = "github-";
@@ -225,15 +227,6 @@ public class ServletHelper {
 		}
 	}
 
-	public static Tenant getTenant(String pathVariable, HttpServletRequest request) {
-		if (StringUtils.isBlank(pathVariable)) {
-			return getTenant(request);
-		}
-		try (Session dataSession = getDataSession()) {
-			return getTenant(pathVariable, request, dataSession);
-		}
-	}
-
 	public static Tenant getTenant(String pathVariable, HttpServletRequest request, Session dataSession) {
 		Tenant tenant = null;
 		if (StringUtils.isBlank(pathVariable)) {
@@ -249,18 +242,27 @@ public class ServletHelper {
 		return tenant;
 	}
 
-	public static Tenant getTenant(HttpServletRequest request) {
-		Tenant tenant = null;
-		if (request.getAttribute(SESSION_TENANT) != null) {
-			tenant = (Tenant) request.getAttribute(SESSION_TENANT);
-		}
-		if (tenant == null) {
-			HttpSession session = request.getSession(false);
-			if ( session != null) {
-				tenant = (Tenant) session.getAttribute(SESSION_TENANT);
+	public static Tenant getTenant(HttpServletRequest request, Session existingDataSession) {
+		Tenant requestTenant = (Tenant) request.getAttribute(SESSION_TENANT);
+		String urlTenantName = (String) request.getAttribute(TENANT_NAME_URL);
+		if (StringUtils.isNotBlank(urlTenantName)) {
+			if (requestTenant != null && StringUtils.equals(requestTenant.getOrganizationName(), urlTenantName)) {
+				return requestTenant;
+			} else if (existingDataSession != null) {
+				return getTenant(urlTenantName, request, existingDataSession);
+			} else try (Session dataSession = getDataSession()) {
+				return getTenant(urlTenantName, request, dataSession);
 			}
 		}
-		return tenant;
+		HttpSession session = request.getSession(false);
+		if (session != null) {
+			return (Tenant) session.getAttribute(SESSION_TENANT);
+		}
+		return null;
+	}
+
+	public static Tenant getTenant(HttpServletRequest request) {
+		return getTenant(request, null);
 	}
 
 	public static Tenant getTenant() {

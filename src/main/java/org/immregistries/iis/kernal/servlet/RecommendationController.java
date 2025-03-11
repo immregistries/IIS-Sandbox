@@ -62,9 +62,11 @@ public class RecommendationController {
 	 * @throws IOException print output stream exception
 	 */
 	@PostMapping
-	protected void doPost(HttpServletRequest req, HttpServletResponse resp, @PathVariable(name = TenantController.PATH_VARIABLE_TENANT_NAME, required = false) String tenantName)
+	protected void doPost(HttpServletRequest req, HttpServletResponse resp
+//		, @PathVariable(name = TenantController.PATH_VARIABLE_TENANT_NAME, required = false) String tenantName dealt with in filter
+	)
 		throws ServletException, IOException {
-		Tenant tenant = ServletHelper.getTenant(tenantName, req);
+		Tenant tenant = ServletHelper.getTenant(req);
 		if (tenant == null) {
 			if (ServletHelper.getUserAccess() != null) {
 				resp.sendRedirect("/iis/tenant");
@@ -98,7 +100,7 @@ public class RecommendationController {
 				}
 			}
 		}
-		doGet(req, resp, tenantName);
+		doGet(req, resp);
 	}
 
 	/**
@@ -108,9 +110,11 @@ public class RecommendationController {
 	 * @param resp response
 	 */
 	@PutMapping
-	protected void doPut(HttpServletRequest req, HttpServletResponse resp, @PathVariable(name = TenantController.PATH_VARIABLE_TENANT_NAME, required = false) String tenantName)
+	protected void doPut(HttpServletRequest req, HttpServletResponse resp
+//		, @PathVariable(name = TenantController.PATH_VARIABLE_TENANT_NAME, required = false) String tenantName dealt with in filter
+	)
 		throws ServletException, IOException {
-		Tenant tenant = ServletHelper.getTenant(tenantName, req);
+		Tenant tenant = ServletHelper.getTenant(req);
 		if (tenant == null) {
 			if (ServletHelper.getUserAccess() != null) {
 				resp.sendRedirect("/iis/tenant");
@@ -143,7 +147,7 @@ public class RecommendationController {
 			out.flush();
 			out.close();
 		}
-		doGet(req, resp, tenantName);
+		doGet(req, resp);
 	}
 
 	/**
@@ -155,9 +159,11 @@ public class RecommendationController {
 	 * @throws IOException      OutputStream exception
 	 */
 	@GetMapping
-	protected void doGet(HttpServletRequest req, HttpServletResponse resp, @PathVariable(name = TenantController.PATH_VARIABLE_TENANT_NAME, required = false) String tenantName)
+	protected void doGet(HttpServletRequest req, HttpServletResponse resp
+//		, @PathVariable(name = TenantController.PATH_VARIABLE_TENANT_NAME, required = false) String tenantName dealt with in filter
+	)
 		throws ServletException, IOException {
-		Tenant tenant = ServletHelper.getTenant(tenantName, req);
+		Tenant tenant = ServletHelper.getTenant(req);
 		if (tenant == null) {
 			if (ServletHelper.getUserAccess() != null) {
 				resp.sendRedirect("/iis/tenant");

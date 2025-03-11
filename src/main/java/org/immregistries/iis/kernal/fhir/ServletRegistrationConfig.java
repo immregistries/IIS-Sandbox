@@ -4,6 +4,7 @@ import org.immregistries.iis.kernal.fhir.common.annotations.OnR5Condition;
 import org.immregistries.iis.kernal.servlet.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Conditional;
@@ -28,6 +29,24 @@ public class ServletRegistrationConfig {
 //		registrationBean.setLoadOnStartup(1);
 //		return registrationBean;
 //	}
+
+	@Bean(name = "tenantUrlFilter")
+	public TenantUrlFilter tenantUrlFilter() {
+		TenantUrlFilter tenantUrlFilter = new TenantUrlFilter();
+		return tenantUrlFilter;
+	}
+
+	@Bean
+	public FilterRegistrationBean tenantUrlFilterRegistrationBean(TenantUrlFilter tenantUrlFilter) {
+		FilterRegistrationBean registration = new FilterRegistrationBean();
+		registration.setFilter(tenantUrlFilter);
+		registration.addUrlPatterns("/tenant/*");
+		registration.setName("tenantUrlFilter");
+		registration.setOrder(1);
+		return registration;
+	}
+
+
 
 	@Bean
 	public ServletRegistrationBean<MessageServlet> messageServletRegistrationBean() {

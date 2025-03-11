@@ -21,7 +21,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -55,14 +58,18 @@ public class VaccinationController {
 	FhirContext fhirContext;
 
 	@PostMapping
-	protected void doPost(HttpServletRequest req, HttpServletResponse resp, @PathVariable(name = TenantController.PATH_VARIABLE_TENANT_NAME, required = false) String tenantName)
+	protected void doPost(HttpServletRequest req, HttpServletResponse resp
+//		, @PathVariable(name = TenantController.PATH_VARIABLE_TENANT_NAME, required = false) String tenantName dealt with in filter
+	)
 		throws ServletException, IOException {
-		doGet(req, resp, tenantName);
+		doGet(req, resp);
 	}
 
 	@GetMapping
-	protected void doGet(HttpServletRequest req, HttpServletResponse resp, @PathVariable(name = TenantController.PATH_VARIABLE_TENANT_NAME, required = false) String tenantName) throws ServletException, IOException {
-		Tenant tenant = ServletHelper.getTenant(tenantName, req);
+	protected void doGet(HttpServletRequest req, HttpServletResponse resp
+//		, @PathVariable(name = TenantController.PATH_VARIABLE_TENANT_NAME, required = false) String tenantName dealt with in filter
+	) throws ServletException, IOException {
+		Tenant tenant = ServletHelper.getTenant(req);
 		if (tenant == null) {
 			if (ServletHelper.getUserAccess() != null) {
 				resp.sendRedirect("/iis/tenant");

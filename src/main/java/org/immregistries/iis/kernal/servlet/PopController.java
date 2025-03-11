@@ -14,7 +14,10 @@ import org.immregistries.smm.transform.Transformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -25,7 +28,6 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import static org.immregistries.iis.kernal.servlet.PopController.POP_BASE_PATH;
-import static org.immregistries.iis.kernal.servlet.TenantController.PATH_VARIABLE_TENANT_NAME;
 
 /**
  * Generated from PopServlet, changed to se PathVariable functionality
@@ -46,14 +48,16 @@ public class PopController {
 
 	@PostMapping
 //	@Transactional
-	protected void doPost(HttpServletRequest req, HttpServletResponse resp, @PathVariable(name = PATH_VARIABLE_TENANT_NAME, required = false) String tenantName)
+	protected void doPost(HttpServletRequest req, HttpServletResponse resp
+//		, @PathVariable(name = PATH_VARIABLE_TENANT_NAME, required = false) String tenantName  dealt with in filter
+	)
 		throws ServletException, IOException {
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		Session dataSession = null;
 		try {
 			dataSession = ServletHelper.getDataSession();
-			Tenant tenant = ServletHelper.getTenant(tenantName, req, dataSession);
+			Tenant tenant = ServletHelper.getTenant(req, dataSession);
 
 			String ack = "";
 			String[] messages;
@@ -116,10 +120,12 @@ public class PopController {
 	}
 
 	@GetMapping
-	protected void doGet(HttpServletRequest req, HttpServletResponse resp, @PathVariable(name = PATH_VARIABLE_TENANT_NAME, required = false) String tenantName)
+	protected void doGet(HttpServletRequest req, HttpServletResponse resp
+//		, @PathVariable(name = PATH_VARIABLE_TENANT_NAME, required = false) String tenantName
+	)
 		throws ServletException, IOException {
 		resp.setContentType("text/html");
-		Tenant tenant = ServletHelper.getTenant(tenantName, req, ServletHelper.getDataSession());
+		Tenant tenant = ServletHelper.getTenant(req, ServletHelper.getDataSession());
 
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		try {
