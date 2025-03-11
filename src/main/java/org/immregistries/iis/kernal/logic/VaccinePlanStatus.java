@@ -9,9 +9,9 @@ public enum VaccinePlanStatus {
 	COMPLETE("LA13421-5", "Complete - all required doses have been received to meet the requirements for a particular vaccine group."),
 	ON_SCHEDULE("LA13422-3", "On schedule - person is not overdue for a given dose in the series. Includes a person too young to start the series."),
 	OVERDUE("LA13423-1", "Overdue - person is late getting the next dose in the series."),
-	TOO_OLD("LA13424-9", "Too old - cannot complete the series because the latest age for receiving dose has passed."),
+	TOO_OLD("LA13424-9", "Too old - cannot complete the series because the latest age for receiving dose has passed."), // Not returned by lonestar
 	IMMUNE("LA27183-5", "Immune"),
-	CONTRAINDICATED("LA4216-3", "Contraindicated"),
+	CONTRAINDICATED("LA4216-3", "Contraindicated"), // Not returned by lonestar
 	NOT_RECOMMENDED("LA4695-8", "Not Recommended");
 
 	private final String code;
@@ -55,10 +55,10 @@ public enum VaccinePlanStatus {
 				case DUE:
 				case DUE_LATER:
 					return VaccinePlanStatus.ON_SCHEDULE;
-				case FINISHED: // TODO
 				case NOT_RECOMMENDED:
 					return VaccinePlanStatus.NOT_RECOMMENDED;
 				case ASSUMED_COMPLETE_OR_IMMUNE:
+				case FINISHED:
 				case COMPLETE:
 				case COMPLETE_FOR_SEASON:
 				case IMMUNE:
