@@ -12,7 +12,6 @@ import org.immregistries.iis.kernal.fhir.common.annotations.OnEitherVersion;
 import org.immregistries.iis.kernal.fhir.mdm.MdmConfig;
 import org.immregistries.iis.kernal.fhir.security.ServerSecurityConfig;
 import org.immregistries.iis.kernal.logic.CodeMapManager;
-import org.immregistries.iis.kernal.servlet.HomeServlet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.boot.SpringApplication;
@@ -82,17 +81,17 @@ public class Application extends SpringBootServletInitializer {
 		return servletRegistrationBean;
 	}
 
-	@Bean
-	@Conditional(OnEitherVersion.class)
-	public ServletRegistrationBean homeServletRegistrationBean() {
-		ServletRegistrationBean registrationBean = new ServletRegistrationBean();
-		HomeServlet servlet = new HomeServlet();
-		beanFactory.autowireBean(servlet);
-		registrationBean.setServlet(servlet);
-		registrationBean.addUrlMappings("/home");
-		registrationBean.setLoadOnStartup(1);
-		return registrationBean;
-	}
+//	@Bean
+//	@Conditional(OnEitherVersion.class)
+//	public ServletRegistrationBean homeServletRegistrationBean() {
+//		ServletRegistrationBean registrationBean = new ServletRegistrationBean();
+//		HomeServlet servlet = new HomeServlet();
+//		beanFactory.autowireBean(servlet);
+//		registrationBean.setServlet(servlet);
+//		registrationBean.addUrlMappings("/home");
+//		registrationBean.setLoadOnStartup(1);
+//		return registrationBean;
+//	}
 
 	/**
 	 * Required to get access to httpRequest and session statically through spring, important to use the fhir client inside the servlets

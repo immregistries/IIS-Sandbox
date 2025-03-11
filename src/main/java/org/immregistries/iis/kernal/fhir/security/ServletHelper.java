@@ -79,7 +79,7 @@ public class ServletHelper {
 			throw new AuthenticationException();
 		}
 		facilityName = URLEncoder.encode(facilityName, StandardCharsets.UTF_8);
-		if (facilityName.startsWith(GITHUB_PREFIX) ) {
+		if (facilityName.startsWith(GITHUB_PREFIX)) { // TODO rethink
 			if (!userAccess.getAccessName().startsWith(GITHUB_PREFIX)) {
 				throw new AuthenticationException();
 			} else if (!facilityName.equals(userAccess.getAccessName())) {
