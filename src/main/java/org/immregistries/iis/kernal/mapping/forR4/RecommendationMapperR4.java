@@ -72,11 +72,11 @@ public class RecommendationMapperR4 implements IRecommendationMapper {
 			/*
 			 * Dates
 			 */
-			if (forecastActual.getFinishedDate() != null) {
+			if (forecastActual.getValidDate() != null) {
 				component
 					.addDateCriterion()
-					.setValue(forecastActual.getFinishedDate())
-					.setCode(new CodeableConcept().addCoding(VaccinationRecommendationDateCode.LATEST.toR4()));
+					.setValue(forecastActual.getValidDate())
+					.setCode(new CodeableConcept().addCoding(VaccinationRecommendationDateCode.EARLIEST.toR4()));
 			}
 			if (forecastActual.getDueDate() != null) {
 				component
@@ -90,12 +90,13 @@ public class RecommendationMapperR4 implements IRecommendationMapper {
 					.setValue(forecastActual.getOverdueDate())
 					.setCode(new CodeableConcept().addCoding(VaccinationRecommendationDateCode.OVERDUE.toR4()));
 			}
-			if (forecastActual.getValidDate() != null) {
+			if (forecastActual.getFinishedDate() != null) {
 				component
 					.addDateCriterion()
-					.setValue(forecastActual.getValidDate())
-					.setCode(new CodeableConcept().addCoding(VaccinationRecommendationDateCode.EARLIEST.toR4()));
+					.setValue(forecastActual.getFinishedDate())
+					.setCode(new CodeableConcept().addCoding(VaccinationRecommendationDateCode.LATEST.toR4()));
 			}
+
 			/*
 			 * Description
 			 */

@@ -481,31 +481,31 @@ public class IncomingQueryHandler {
 							String valueTable = "";
 							hl7MessageWriter.printObx(sb, obxSetId, obsSubId, loinc, loincLabel, value, valueLabel, valueTable);
 						}
-						if (forecastActual.getDueDate() != null) {
+						if (forecastActual.getValidDate() != null) {
 							obxSetId++;
-							String loinc = "30981-5";
-							String loincLabel = "Earliest date";
+							String loinc = VaccinationRecommendationDateCode.EARLIEST.getCode();
+							String loincLabel = VaccinationRecommendationDateCode.EARLIEST.getLabel();
 							Date value = forecastActual.getValidDate();
 							hl7MessageWriter.printObx(sb, obxSetId, obsSubId, loinc, loincLabel, value);
 						}
 						if (forecastActual.getDueDate() != null) {
 							obxSetId++;
-							String loinc = "30980-7";
-							String loincLabel = "Recommended date";
+							String loinc = VaccinationRecommendationDateCode.DUE.getCode();
+							String loincLabel = VaccinationRecommendationDateCode.DUE.getLabel();
 							Date value = forecastActual.getDueDate();
 							hl7MessageWriter.printObx(sb, obxSetId, obsSubId, loinc, loincLabel, value);
 						}
-						if (forecastActual.getDueDate() != null) {
+						if (forecastActual.getOverdueDate() != null) {
 							obxSetId++;
-							String loinc = "59778-1";
-							String loincLabel = "Overdue date";
+							String loinc = VaccinationRecommendationDateCode.OVERDUE.getCode();
+							String loincLabel = VaccinationRecommendationDateCode.OVERDUE.getLabel();
 							Date value = forecastActual.getOverdueDate();
 							hl7MessageWriter.printObx(sb, obxSetId, obsSubId, loinc, loincLabel, value);
 						}
 						if (forecastActual.getFinishedDate() != null) {
 							obxSetId++;
-							String loinc = "59778-3";
-							String loincLabel = "Latest date";
+							String loinc = VaccinationRecommendationDateCode.LATEST.getCode();
+							String loincLabel = VaccinationRecommendationDateCode.LATEST.getLabel();
 							Date value = forecastActual.getFinishedDate(); // TODO  make sure it is the right date
 							hl7MessageWriter.printObx(sb, obxSetId, obsSubId, loinc, loincLabel, value);
 						}
@@ -701,12 +701,12 @@ public class IncomingQueryHandler {
 			}
 
 			ConnectorInterface connector = ConnectFactory.createConnecter(software, VaccineGroup.getForecastItemList());
-			connector.setLogText(false);
+			connector.setLogText(true);
 			try {
 
 				SoftwareResult softwareResult = new SoftwareResult();
 				forecastActualList = connector.queryForForecast(testCase, softwareResult);
-//				logger.info("swr {}", softwareResult.getLogText());
+				logger.info("swr {}", softwareResult.getLogText());
 			} catch (IOException ioe) {
 				System.err.println("Unable to query for forecast");
 				ioe.printStackTrace();
