@@ -1,5 +1,6 @@
 package org.immregistries.iis.kernal.mapping.forR4;
 
+import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.ImmunizationRecommendation;
@@ -41,9 +42,15 @@ public class RecommendationMapperR4 implements IRecommendationMapper {
 			/*
 			 * CVX
 			 */
-			Code cvx = codeMap.getCodeForCodeset(CodesetType.VACCINATION_CVX_CODE, forecastActual.getVaccineCvx());
-			if (cvx != null) {
-				component.addVaccineCode(new CodeableConcept(new Coding(CVX_SYSTEM, cvx.getValue(), cvx.getLabel())));
+			String cvx = forecastActual.getVaccineCvx();
+			if (StringUtils.isBlank(cvx)) {
+				cvx = forecastActual.getVaccineGroup().getVaccineCvx();
+			}
+			Code cvxCode = codeMap.getCodeForCodeset(CodesetType.VACCINATION_CVX_CODE, cvx);
+			if (cvxCode != null) {
+				component.addVaccineCode(new CodeableConcept(new Coding(CVX_SYSTEM, cvxCode.getValue(), cvxCode.getLabel())));
+			} else {
+				component.addVaccineCode(new CodeableConcept(new Coding(CVX_SYSTEM, cvx, "")));
 			}
 			/*
 			 * Vaccine Group

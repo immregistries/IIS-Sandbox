@@ -435,7 +435,7 @@ public class IncomingQueryHandler {
 					}
 					sb.append("|NA");
 					sb.append("\r");
-					HashSet<String> cvxAddedSet = new HashSet<String>();
+					HashSet<String> cvxAddedSet = new HashSet<>();
 					for (ForecastActual forecastActual : forecastActualList) {
 						String cvx = forecastActual.getVaccineGroup().getVaccineCvx();
 						if (cvxAddedSet.contains(cvx)) {
