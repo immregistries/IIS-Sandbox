@@ -11,17 +11,29 @@ import org.hl7.fhir.r5.model.Patient;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR5Condition;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.logic.ImmunizationRecommendationServiceR5;
+import org.immregistries.iis.kernal.logic.IncomingQueryHandler;
+import org.immregistries.iis.kernal.mapping.forR5.ImmunizationMapperR5;
+import org.immregistries.iis.kernal.mapping.forR5.PatientMapperR5;
+import org.immregistries.iis.kernal.model.PatientMaster;
+import org.immregistries.iis.kernal.model.VaccinationMaster;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Controller;
 
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 @Conditional(OnR5Condition.class)
 public class RecommendationForecastProviderR5 implements IRecommendationForecastProvider<Parameters, Patient, Immunization> {
 
+	@Autowired
+	IncomingQueryHandler incomingQueryHandler;
+	@Autowired
+	PatientMapperR5 patientMapperR5;
+	@Autowired
+	ImmunizationMapperR5 immunizationMapperR5;
 	@Autowired
 	private ImmunizationRecommendationServiceR5 immunizationRecommendationServiceR5;
 
@@ -41,7 +53,14 @@ public class RecommendationForecastProviderR5 implements IRecommendationForecast
 		List<Immunization> immunization
 	) {
 		Parameters out = new Parameters();
-		ImmunizationRecommendation immunizationRecommendation = immunizationRecommendationServiceR5.generate(ServletHelper.getTenant(), new Date(), patient);// generate(assessmentDate.getValue(), patient);
+		ImmunizationRecommendation immunizationRecommendation;
+		List<VaccinationMaster> vaccinationMasterList = immunization.stream().map(immunization1 -> immunizationMapperR5.localObject(immunization1)).collect(Collectors.toList());
+		PatientMaster patientMaster = patientMapperR5.localObject(patient);
+		try {
+			immunizationRecommendation = immunizationRecommendationServiceR5.queryCds(ServletHelper.getTenant(), assessmentDate.getValue(), patientMaster, vaccinationMasterList);
+		} catch (Exception e) {
+			immunizationRecommendation = immunizationRecommendationServiceR5.generate(ServletHelper.getTenant(), assessmentDate.getValue(), patientMaster);
+		}
 		out.addParameter().setName(RECOMMENDATION).setResource(immunizationRecommendation);
 		return out;
 	}

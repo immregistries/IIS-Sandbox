@@ -5,7 +5,7 @@ import org.immregistries.vfa.connect.model.ForecastActual;
 
 import java.util.Date;
 
-public enum VaccinePlanStatus {
+public enum VaccinePlanStatus implements IisEnum {
 	COMPLETE("LA13421-5", "Complete - all required doses have been received to meet the requirements for a particular vaccine group."),
 	ON_SCHEDULE("LA13422-3", "On schedule - person is not overdue for a given dose in the series. Includes a person too young to start the series."),
 	OVERDUE("LA13423-1", "Overdue - person is late getting the next dose in the series."),
@@ -39,12 +39,25 @@ public enum VaccinePlanStatus {
 		return "LL940-8";
 	}
 
+	public org.hl7.fhir.r4.model.Coding toR4() {
+		return new org.hl7.fhir.r4.model.Coding(this.getTable(), this.getCode(), this.getLabel());
+	}
+
+	public org.hl7.fhir.r5.model.Coding toR5() {
+		return new org.hl7.fhir.r5.model.Coding(this.getTable(), this.getCode(), this.getLabel());
+	}
+
 	public static VaccinePlanStatus fromForecastActual(ForecastActual forecastActual) {
 		Admin admin = forecastActual.getAdmin();
+		return fromAdminCodeAndOverdueDate(admin, forecastActual.getOverdueDate());
+
+	}
+
+	public static VaccinePlanStatus fromAdminCodeAndOverdueDate(Admin admin, Date overdueDate) {
 		if (admin != null) {
 			switch (admin) {
 				case NOT_COMPLETE: {
-					if (forecastActual.getOverdueDate() != null && new Date().after(forecastActual.getDueDate())) {
+					if (overdueDate != null && new Date().after(overdueDate)) {
 						return VaccinePlanStatus.OVERDUE;
 					} else {
 						return VaccinePlanStatus.ON_SCHEDULE;

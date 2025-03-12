@@ -37,17 +37,17 @@ public class IncomingQueryHandler {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	@Autowired
-	AbstractFhirRequester fhirRequester;
+	private AbstractFhirRequester fhirRequester;
 	@Autowired
-	AbstractHl7MessageWriter hl7MessageWriter;
+	private AbstractHl7MessageWriter hl7MessageWriter;
 	@Autowired
-	ValidationService validationService;
+	private ValidationService validationService;
 	@Autowired
-	RepositoryClientFactory repositoryClientFactory;
+	private RepositoryClientFactory repositoryClientFactory;
 	@Autowired
-	ObservationMapper observationMapper;
+	private ObservationMapper observationMapper;
 	@Autowired
-	ImmunizationMapper immunizationMapper;
+	private ImmunizationMapper immunizationMapper;
 
 
 	@Autowired
@@ -293,7 +293,7 @@ public class IncomingQueryHandler {
 				}
 				List<ForecastActual> forecastActualList = null;
 				if (sendBackForecast) {
-					forecastActualList = doForecast(patientMaster, codeMap, vaccinationMasterList, tenant);
+					forecastActualList = doForecast(patientMaster, vaccinationMasterList, tenant, new Date());
 				}
 
 				int obxSetId = 0;
@@ -660,12 +660,13 @@ public class IncomingQueryHandler {
 		sb.append("\r");
 	}
 
-	public List<ForecastActual> doForecast(PatientMaster patient, CodeMap codeMap, List<VaccinationMaster> vaccinationMasterList, Tenant tenant) {
+	public List<ForecastActual> doForecast(PatientMaster patient, List<VaccinationMaster> vaccinationMasterList, Tenant tenant, Date date) {
+		CodeMap codeMap = CodeMapManager.getCodeMap();
 		List<ForecastActual> forecastActualList = null;
 		Set<ProcessingFlavor> processingFlavorSet = tenant.getProcessingFlavorSet();
 		try {
 			TestCase testCase = new TestCase();
-			testCase.setEvalDate(new Date());
+			testCase.setEvalDate(date);
 			if (patient != null) {
 				testCase.setPatientSex(patient.getSex());
 				testCase.setPatientDob(patient.getBirthDate());

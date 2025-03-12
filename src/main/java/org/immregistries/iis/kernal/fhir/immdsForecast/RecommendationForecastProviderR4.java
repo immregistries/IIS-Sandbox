@@ -12,6 +12,11 @@ import org.hl7.fhir.r4.model.Patient;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.logic.ImmunizationRecommendationServiceR4;
+import org.immregistries.iis.kernal.logic.IncomingQueryHandler;
+import org.immregistries.iis.kernal.mapping.forR4.ImmunizationMapperR4;
+import org.immregistries.iis.kernal.mapping.forR4.PatientMapperR4;
+import org.immregistries.iis.kernal.model.PatientMaster;
+import org.immregistries.iis.kernal.model.VaccinationMaster;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +25,7 @@ import org.springframework.stereotype.Controller;
 
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 @Conditional(OnR4Condition.class)
@@ -27,6 +33,12 @@ public class RecommendationForecastProviderR4 implements IRecommendationForecast
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 
+	@Autowired
+	IncomingQueryHandler incomingQueryHandler;
+	@Autowired
+	PatientMapperR4 patientMapperR4;
+	@Autowired
+	ImmunizationMapperR4 immunizationMapperR4;
 	@Autowired
 	private ImmunizationRecommendationServiceR4 immunizationRecommendationServiceR4;
 
@@ -46,7 +58,14 @@ public class RecommendationForecastProviderR4 implements IRecommendationForecast
 		List<Immunization> immunization
 	) {
 		Parameters out = new Parameters();
-		ImmunizationRecommendation immunizationRecommendation = immunizationRecommendationServiceR4.generate(ServletHelper.getTenant(), new Date(), patient);// generate(assessmentDate.getValue(), patient);
+		ImmunizationRecommendation immunizationRecommendation;
+		List<VaccinationMaster> vaccinationMasterList = immunization.stream().map(immunization1 -> immunizationMapperR4.localObject(immunization1)).collect(Collectors.toList());
+		PatientMaster patientMaster = patientMapperR4.localObject(patient);
+		try {
+			immunizationRecommendation = immunizationRecommendationServiceR4.queryCds(ServletHelper.getTenant(), assessmentDate.getValue(), patientMaster, vaccinationMasterList);
+		} catch (Exception e) {
+			immunizationRecommendation = immunizationRecommendationServiceR4.generate(ServletHelper.getTenant(), assessmentDate.getValue(), patientMaster);
+		}
 		out.addParameter().setName(RECOMMENDATION).setResource(immunizationRecommendation);
 		return out;
 	}

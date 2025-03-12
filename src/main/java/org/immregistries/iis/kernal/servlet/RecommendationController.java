@@ -75,6 +75,7 @@ public class RecommendationController {
 		}
 		IGenericClient fhirClient = repositoryClientFactory.newGenericClient(req);
 		IDomainResource patient = PatientController.fetchPatientFromParameter(req, fhirClient, fhirRequester);
+		PatientMaster patientMaster = patientMapper.localObject(patient);
 
 		if (patient != null) {
 
@@ -84,19 +85,19 @@ public class RecommendationController {
 				org.hl7.fhir.r5.model.Bundle recommendationBundle = (org.hl7.fhir.r5.model.Bundle) baseBundle;
 				if (recommendationBundle.hasEntry()) {
 					org.hl7.fhir.r5.model.ImmunizationRecommendation recommendation = (org.hl7.fhir.r5.model.ImmunizationRecommendation) recommendationBundle.getEntryFirstRep().getResource();
-					recommendation = (org.hl7.fhir.r5.model.ImmunizationRecommendation) immunizationRecommendationService.addGeneratedRecommendation(recommendation);
+					recommendation = (org.hl7.fhir.r5.model.ImmunizationRecommendation) immunizationRecommendationService.addRandomGeneratedRecommendation(recommendation);
 					fhirClient.update().resource(recommendation).withId(recommendation.getId()).execute();
 				} else {
-					fhirClient.create().resource(immunizationRecommendationService.generate(tenant, new Date(), patient)).execute();
+					fhirClient.create().resource(immunizationRecommendationService.generate(tenant, new Date(), patientMaster)).execute();
 				}
 			} else if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R4)) {
 				org.hl7.fhir.r4.model.Bundle recommendationBundle = (org.hl7.fhir.r4.model.Bundle) baseBundle;
 				if (recommendationBundle.hasEntry()) {
 					org.hl7.fhir.r4.model.ImmunizationRecommendation recommendation = (org.hl7.fhir.r4.model.ImmunizationRecommendation) recommendationBundle.getEntryFirstRep().getResource();
-					recommendation = (org.hl7.fhir.r4.model.ImmunizationRecommendation) immunizationRecommendationService.addGeneratedRecommendation(recommendation);
+					recommendation = (org.hl7.fhir.r4.model.ImmunizationRecommendation) immunizationRecommendationService.addRandomGeneratedRecommendation(recommendation);
 					fhirClient.update().resource(recommendation).withId(recommendation.getId()).execute();
 				} else {
-					fhirClient.create().resource(immunizationRecommendationService.generate(tenant, new Date(), patient)).execute();
+					fhirClient.create().resource(immunizationRecommendationService.generate(tenant, new Date(), patientMaster)).execute();
 				}
 			}
 		}
