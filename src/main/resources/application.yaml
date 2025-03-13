@@ -19,13 +19,14 @@ iis:
       jwtExpirationMs: 1800000
 #        TODO change secret
 spring:
+  config.import: optional:file:.env[.properties]
   security:
     oauth2:
       client:
         registration:
           github:
-            client-id: ${GITHUB_CLIENT_ID}
-            client-secret: ${GITHUB_CLIENT_SECRET}
+            client-id: ${ENV_IIS_GITHUB_CLIENT_ID}
+            client-secret: ${ENV_IIS_GITHUB_CLIENT_SECRET}
             scope: read:user,user:email
 #            token-uri: https://api.github.com/login/oauth/access_token
 #            authorization-uri: https://api.github.com/login/oauth/authorize
