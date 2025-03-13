@@ -15,7 +15,7 @@ server:
 iis:
   api:
     app:
-      jwtSecret: "sFiKu+qZpnyJBWzQjzYfne7t1IcIfNAixd+S2c1r+EF9kyoug1K9kJD948ZSiBC9fLkJBMirUPVqdwaidffb0OkYZhGLUPdb2M56QPJtoV+1dbbce2Q6FM7suRt7p90G4J4OR/b/zbK0Y30CnK/7gzLU0ph4KtjrVuHCgq9Di0NtxiFg3Icud92G0Bg0utaam70uOc5nrDMYCOHsg/vxUDQ9+g3fizwbrQmdJA=="
+      jwtSecret: ${ENV_IIS_JWT_SECRET}
       jwtExpirationMs: 1800000
 #        TODO change secret
 spring:
@@ -24,8 +24,8 @@ spring:
       client:
         registration:
           github:
-            client-id: 09a6c6915895bf8400db
-            client-secret: 5aafa488e359286c8ccb26ed065d84b040ae2fd7
+            client-id: ${GITHUB_CLIENT_ID}
+            client-secret: ${GITHUB_CLIENT_SECRET}
             scope: read:user,user:email
 #            token-uri: https://api.github.com/login/oauth/access_token
 #            authorization-uri: https://api.github.com/login/oauth/authorize
@@ -40,9 +40,10 @@ spring:
     check-location: false
     baselineOnMigrate: true
   datasource:
-    url: '@SPRING_DATASOURCE_URL@'
-    username: hapi_iis_web
-    password: SicMundusCreatusEst
+    #    url: '@SPRING_DATASOURCE_URL@'
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${ENV_IIS_POSTGRES_USER}
+    password: ${ENV_IIS_POSTGRES_PASSWORD}
     #    driver-class-name: org.postgresql.Driver
     # rest is Handled in spring profiles
     max-active: 50
