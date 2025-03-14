@@ -2,29 +2,5 @@
 <!DOCTYPE hibernate-configuration SYSTEM "https://hibernate.org/dtd/hibernate-configuration-3.0.dtd">
 <hibernate-configuration>
   <session-factory>
-    <property name="hibernate.connection.driver_class">com.mysql.cj.jdbc.Driver</property>
-
-    <!-- OVERRIDEN IN HibernateConfig ON RUNTIME FOR ENV -->
-    <property name="hibernate.connection.url">${IIS_MYSQL_URL}</property>
-    <property name="hibernate.connection.username"/>
-    <property name="hibernate.connection.password"/>
-    <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
-    <!--    <property name="hibernate.dialect">${IIS_MYSQL_DIALECT:org.hibernate.dialect.MySQLDialect}</property>-->
-
-
-    <property name="show_sql">false</property>
-    <property name="hibernate.c3p0.acquire_increment">1</property>
-    <property name="hibernate.c3p0.idle_test_period">100</property><!--  seconds -->
-    <property name="hibernate.c3p0.timeout">100</property><!--  seconds -->
-    <property name="hibernate.c3p0.max_size">30</property>
-    <property name="hibernate.c3p0.min_size">5</property>
-    <property name="hibernate.c3p0.max_statements">10</property>
-
-<!--    TODO maybe antipattern, needed prevent No session error when changing facility-->
-    <property name="hibernate.enable_lazy_load_no_trans">true</property>
-
-    <mapping resource="org/immregistries/iis/kernal/model/Tenant.hbm.xml"/>
-    <mapping resource="org/immregistries/iis/kernal/model/UserAccess.hbm.xml"/>
-    <mapping resource="org/immregistries/iis/kernal/model/MessageReceived.hbm.xml"/>
   </session-factory>
 </hibernate-configuration>

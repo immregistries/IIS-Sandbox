@@ -859,10 +859,10 @@
                 <spring.profiles.active>dev</spring.profiles.active>
                 <FHIR_VERSION>R4</FHIR_VERSION>
                 <!--                <IIS_MYSQL_URL>jdbc:h2:mem:usersTenants</IIS_MYSQL_URL>-->
-                <!--                <IIS_MYSQL_URL>jdbc:h2:file:./data-h2/usersTenants</IIS_MYSQL_URL>-->
+                <IIS_MYSQL_URL>jdbc:h2:file:./data-h2/usersTenants</IIS_MYSQL_URL>
                 <!--                <IIS_MYSQL_DRIVER>org.h2.Driver</IIS_MYSQL_DRIVER>-->
                 <!--                <IIS_MYSQL_DIALECT>org.hibernate.dialect.H2Dialect</IIS_MYSQL_DIALECT>-->
-                <IIS_MYSQL_URL>jdbc:mysql://localhost/iis_alongside_jpa</IIS_MYSQL_URL>
+                <!--                <IIS_MYSQL_URL>jdbc:mysql://localhost/iis_alongside_jpa</IIS_MYSQL_URL>-->
                 <SPRING_DATASOURCE_URL>jdbc:h2:file:./data-h2/r4</SPRING_DATASOURCE_URL>
                 <maven.test.skip>true</maven.test.skip>
             </properties>
