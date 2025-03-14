@@ -1,7 +1,7 @@
 services:
   hapi-fhir-postgresql:
     image: postgres:13-alpine
-    container_name: hapi-fhir-postgres
+    container_name: hapi-fhir-postgres-jojo
     restart: unless-stopped
     environment:
       #      Postgres DB name should be changed when trying to switch between FHIR version
@@ -16,7 +16,7 @@ services:
       start_period: 5s
   iis-sandbox-mysql:
     image: mysql:latest
-    container_name: iis-sandbox-mysql
+    container_name: iis-sandbox-mysql-polnareff
     command:
       --lower_case_table_names=1
     restart: unless-stopped
@@ -34,11 +34,15 @@ services:
       - ./database/create-mysql-database.sql:/docker-entrypoint-initdb.d/1.sql
   iis-sandbox:
     build: .
-    container_name: iis-sandbox
+    image: iis-sandbox:dev
+    container_name: iis-sandbox-iggy
+    env_file: .env
     environment:
       FHIR_VERSION: R4
       IIS_MYSQL_URL: "jdbc:mysql://iis-sandbox-mysql:3306/iis_alongside_jpa"
       SPRING_DATASOURCE_URL: "jdbc:postgresql://hapi-fhir-postgresql:5432/hapi_fhir_iis"
+    #      ENV_IIS_MYSQL_USER: iis_web
+    #      ENV_IIS_MYSQL_PASSWORD: SharkBaitHooHaHa
     restart: unless-stopped
     ports:
       - "8081:8080"

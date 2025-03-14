@@ -9,6 +9,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
+import org.immregistries.iis.kernal.HibernateConfig;
 import org.immregistries.iis.kernal.model.Tenant;
 import org.immregistries.iis.kernal.model.UserAccess;
 import org.slf4j.Logger;
@@ -43,14 +44,7 @@ public class ServletHelper {
 	 */
 	public static Session getDataSession() {
 		if (factory == null) {
-			Configuration cfg = new Configuration().configure();
-			/*
-			 * For deploying time configuration with ENV variable
-			 */
-			String database_url = System.getenv("IIS_MYSQL_URL");
-			if (StringUtils.isNotBlank(database_url)) {
-				cfg.setProperty("hibernate.connection.url", database_url);
-			}
+			Configuration cfg = HibernateConfig.configuration();
 			factory = cfg.buildSessionFactory();
 		}
 		return factory.openSession();

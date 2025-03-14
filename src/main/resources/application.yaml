@@ -4,6 +4,7 @@
 #Used for all profiles
 #Profiles for R5, R4, dev at the bottom
 
+spring.config.import: optional:file:.env[.properties]
 management:
   endpoints:
     web:
@@ -19,7 +20,6 @@ iis:
       jwtExpirationMs: 1800000
 #        TODO change secret
 spring:
-  config.import: optional:file:.env[.properties]
   security:
     oauth2:
       client:

@@ -847,9 +847,9 @@
                 <activeByDefault>true</activeByDefault>
             </activation>
             <properties>
-                <IIS_MYSQL_URL>jdbc:mysql://localhost/iis_alongside_jpa</IIS_MYSQL_URL>
+                <!--                <IIS_MYSQL_URL>jdbc:mysql://localhost/iis_alongside_jpa</IIS_MYSQL_URL>-->
                 <FHIR_VERSION>R5</FHIR_VERSION>
-                <SPRING_DATASOURCE_URL>jdbc:postgresql://localhost/hapi_fhir_iis</SPRING_DATASOURCE_URL>
+                <!--                <SPRING_DATASOURCE_URL>jdbc:postgresql://localhost/hapi_fhir_iis</SPRING_DATASOURCE_URL>-->
                 <maven.test.skip>true</maven.test.skip>
             </properties>
         </profile>
@@ -859,6 +859,8 @@
                 <spring.profiles.active>dev</spring.profiles.active>
                 <FHIR_VERSION>R4</FHIR_VERSION>
                 <IIS_MYSQL_URL>jdbc:mysql://localhost/iis_alongside_jpa</IIS_MYSQL_URL>
+                <!--                <ENV_IIS_MYSQL_USER>iis_web</ENV_IIS_MYSQL_USER>-->
+                <!--                <ENV_IIS_MYSQL_PASSWORD>SharkBaitHooHaHa</ENV_IIS_MYSQL_PASSWORD>-->
                 <SPRING_DATASOURCE_URL>jdbc:h2:file:./data-h2/r4</SPRING_DATASOURCE_URL>
                 <maven.test.skip>true</maven.test.skip>
             </properties>
@@ -869,6 +871,8 @@
                 <spring.profiles.active>dev</spring.profiles.active>
                 <FHIR_VERSION>R5</FHIR_VERSION>
                 <IIS_MYSQL_URL>jdbc:mysql://localhost/iis_alongside_jpa</IIS_MYSQL_URL>
+                <ENV_IIS_MYSQL_USER>iis_web</ENV_IIS_MYSQL_USER>
+                <!--                <ENV_IIS_MYSQL_PASSWORD>SharkBaitHooHaHa</ENV_IIS_MYSQL_PASSWORD>-->
                 <SPRING_DATASOURCE_URL>jdbc:h2:file:./data-h2/r5</SPRING_DATASOURCE_URL>
                 <maven.test.skip>true</maven.test.skip>
             </properties>

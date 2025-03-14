@@ -4,13 +4,11 @@
   <session-factory>
     <property name="hibernate.connection.driver_class">com.mysql.cj.jdbc.Driver</property>
 
-    <!--    OVERRIDEN IN SERVLET HELPER ON RUNTIME FOR ENV -->
-<!--    <property name="hibernate.connection.url">${iis.mysql.hibernate.connection.url}</property>-->
-<!--    <property name="hibernate.connection.url">jdbc:mysql://localhost/iis_alongside_jpa</property>-->
-    <property name="hibernate.connection.url">${IIS_MYSQL_URL}</property>
-    <property name="hibernate.connection.username">${ENV_IIS_MYSQL_USER}</property>
-    <property name="connection.password">${ENV_IIS_MYSQL_PASSWORD}</property>
-    <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
+    <!--    OVERRIDEN IN HibernateConfig ON RUNTIME FOR ENV -->
+    <!--    <property name="hibernate.connection.url">jdbc:mysql://overridenInSessionFactory/placeholder</property>-->
+    <!--    <property name="hibernate.connection.username">overridenInSessionFactory</property>-->
+    <!--    <property name="hibernate.connection.password">overridenInSessionFactory</property>-->
+    <!--    <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>-->
 
 
     <property name="show_sql">false</property>
@@ -26,17 +24,6 @@
 
     <mapping resource="org/immregistries/iis/kernal/model/Tenant.hbm.xml"/>
     <mapping resource="org/immregistries/iis/kernal/model/UserAccess.hbm.xml"/>
-<!--    <mapping resource="org/immregistries/iis/kernal/model/OrgLocation.hbm.xml"/>-->
-<!--    <mapping resource="org/immregistries/iis/kernal/model/PatientMaster.hbm.xml"/>-->
-<!--    <mapping resource="org/immregistries/iis/kernal/model/PatientMatch.hbm.xml"/>-->
-<!--    <mapping resource="org/immregistries/iis/kernal/model/PatientReported.hbm.xml"/>-->
-<!--    <mapping resource="org/immregistries/iis/kernal/model/Person.hbm.xml"/>-->
     <mapping resource="org/immregistries/iis/kernal/model/MessageReceived.hbm.xml"/>
-<!--    <mapping resource="org/immregistries/iis/kernal/model/VaccinationMaster.hbm.xml"/>-->
-<!--    <mapping resource="org/immregistries/iis/kernal/model/VaccinationReported.hbm.xml"/>-->
-<!--    <mapping resource="org/immregistries/iis/kernal/model/ObservationMaster.hbm.xml"/>-->
-<!--    <mapping resource="org/immregistries/iis/kernal/model/ObservationReported.hbm.xml"/>-->
-<!--    <mapping resource="org/immregistries/iis/kernal/model/PatientLink.hbm.xml"/>-->
-<!--    <mapping class="org.immregistries.iis.kernal.model.SubscriptionStore"/>-->
   </session-factory>
 </hibernate-configuration>
