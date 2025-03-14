@@ -8,7 +8,6 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-import org.hibernate.cfg.Configuration;
 import org.immregistries.iis.kernal.HibernateConfig;
 import org.immregistries.iis.kernal.model.Tenant;
 import org.immregistries.iis.kernal.model.UserAccess;
@@ -44,8 +43,8 @@ public class ServletHelper {
 	 */
 	public static Session getDataSession() {
 		if (factory == null) {
-			Configuration cfg = HibernateConfig.configuration();
-			factory = cfg.buildSessionFactory();
+//			factory = HibernateConfig.configuration().buildSessionFactory();
+			factory = HibernateConfig.sessionFactory();
 		}
 		return factory.openSession();
 	}
