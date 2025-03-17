@@ -2,13 +2,19 @@
 
 Default port is 8081, can be changed in docker-compose file in line 45
 
-To deploy, execute these commands in the directory:
+``.env`` file should be copied from ``.env.example`` and modified to change default passwords and secrets.
+
+to quickly deploy with default configuration
 
 ```
-cp .env.example .env
+cp .env.example .env;
+docker compose up;
 ```
+
+or use bash script
+
 ```
-docker compose up
+bash deploy.sh
 ```
 
 Change passwords, secrets and environment variables in ```.env``` file
