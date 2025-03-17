@@ -175,3 +175,4 @@ Temporary Items
 /src/test/ES256.key
 /src/test/ES256.key.pub
 /.env
+/.env.dev

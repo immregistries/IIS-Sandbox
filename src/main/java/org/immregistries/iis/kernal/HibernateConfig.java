@@ -9,10 +9,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Configures the Users and tenant database
+ * Configures the Users and tenant database, outside of spring
  */
 public class HibernateConfig {
-	static Logger logger = LoggerFactory.getLogger(HibernateConfig.class);
+	private static Logger logger = LoggerFactory.getLogger(HibernateConfig.class);
 
 	public static Configuration configuration() {
 		Configuration cfg = new Configuration();
@@ -27,10 +27,10 @@ public class HibernateConfig {
 			if (database_url.startsWith("jdbc:h2:")) {
 				cfg.setProperty("hibernate.connection.driver_class", "org.h2.Driver");
 				cfg.setProperty("hibernate.dialect", "org.hibernate.dialect.H2Dialect");
+				cfg.setProperty("hibernate.hbm2ddl.auto", "create");
 			} else {
 				cfg.setProperty("hibernate.connection.driver_class", "com.mysql.cj.jdbc.Driver");
 				cfg.setProperty("hibernate.dialect", "org.hibernate.dialect.MySQLDialect");
-				cfg.setProperty("hibernate.ddl-auto", "create");
 			}
 		}
 		if (StringUtils.isNotBlank(database_user)) {
@@ -56,18 +56,20 @@ public class HibernateConfig {
 	}
 
 	private static String getSystemVariableFromEnvOrProperty(String variableName) {
-		String database_url = System.getenv(variableName);
-		if (StringUtils.isBlank(database_url)) {
-			database_url = System.getProperty(variableName);
+		String var = System.getenv(variableName);
+		logger.info("test pom var {} {} {}", variableName, System.getProperty(variableName), System.getProperty("iis.mysql.url"));
+		if (StringUtils.isBlank(var)) {
+			var = System.getProperty(variableName);
 		}
-		return database_url;
+		return var;
 	}
 
 	public static SessionFactory sessionFactory() {
 		Configuration configuration = configuration();
 		ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder()
 			.applySettings(configuration.getProperties()).build();
-		SessionFactory sessionFactory = configuration().buildSessionFactory(serviceRegistry);
+//		SessionFactory sessionFactory = configuration().buildSessionFactory(serviceRegistry);
+		SessionFactory sessionFactory = configuration().buildSessionFactory();
 		return sessionFactory;
 	}
 }
