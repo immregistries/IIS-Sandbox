@@ -35,6 +35,8 @@ services:
   iis-sandbox:
     image: clemhen/iis-sandbox:deployable-v1.5
     container_name: iis-sandbox-iggy
+    env_file:
+      - .env
     environment:
       FHIR_VERSION: R5
       IIS_MYSQL_URL: "jdbc:mysql://iis-sandbox-mysql:3306/iis_alongside_jpa"
