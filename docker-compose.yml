@@ -1,13 +1,13 @@
 services:
   hapi-fhir-postgresql:
     image: postgres:13-alpine
-    container_name: hapi-fhir-postgres
+    container_name: hapi-fhir-postgres-jojo
     restart: unless-stopped
     environment:
       #      Postgres DB name should be changed when trying to switch between FHIR version
-      POSTGRES_DB: "hapi_fhir_iis"
-      POSTGRES_USER: "hapi_iis_web"
-      POSTGRES_PASSWORD: "SicMundusCreatusEst"
+      POSTGRES_DB: ${ENV_IIS_POSTGRES_DB}
+      POSTGRES_USER: ${ENV_IIS_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${ENV_IIS_POSTGRES_PASSWORD}
     healthcheck:
       test: pg_isready -d $$POSTGRES_DB -U $$POSTGRES_USER
       interval: 8s
@@ -16,7 +16,7 @@ services:
       start_period: 5s
   iis-sandbox-mysql:
     image: mysql:latest
-    container_name: iis-sandbox-mysql
+    container_name: iis-sandbox-mysql-polnareff
     command:
       --lower_case_table_names=1
     restart: unless-stopped
@@ -27,15 +27,14 @@ services:
       retries: 5
       start_period: 5s
     environment:
-      MYSQL_USER: 'iis_web'
-      MYSQL_PASSWORD: 'SharkBaitHooHaHa'
-      MYSQL_ROOT_PASSWORD: 'password123456789'
+      MYSQL_USER: ${ENV_IIS_MYSQL_USER}
+      MYSQL_PASSWORD: ${ENV_IIS_MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${ENV_IIS_MYSQL_ROOT_PASSWORD}
     volumes:
       - ./database/create-mysql-database.sql:/docker-entrypoint-initdb.d/1.sql
   iis-sandbox:
-#    build: .
-    image: clemhen/iis-sandbox:deployable-v1.3
-    container_name: iis-sandbox
+    image: clemhen/iis-sandbox:deployable-v1.5
+    container_name: iis-sandbox-iggy
     environment:
       FHIR_VERSION: R5
       IIS_MYSQL_URL: "jdbc:mysql://iis-sandbox-mysql:3306/iis_alongside_jpa"
