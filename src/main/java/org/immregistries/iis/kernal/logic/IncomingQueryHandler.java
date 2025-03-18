@@ -315,8 +315,14 @@ public class IncomingQueryHandler {
 					}
 					TestEvent testEvent = vaccination.getTestEvent();
 					if (testEvent != null && testEvent.getEvaluationActualList() != null) {
+						HashSet<String> cvxEvaluatedSet = new HashSet<>();
 						for (EvaluationActual evaluationActual : testEvent.getEvaluationActualList()) {
 //							logger.info("CVX {}, testEvent cvx {}", cvxCode.getLabel(), evaluationActual.getVaccineCvx());
+							String cvx = evaluationActual.getVaccineCvx();
+							if (cvxEvaluatedSet.contains(cvx)) {
+								continue;
+							}
+							cvxEvaluatedSet.add(cvx);
 							obsSubId++;
 							{
 								obxSetId++;
