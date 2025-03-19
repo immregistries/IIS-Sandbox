@@ -16,25 +16,25 @@ services:
       timeout: 10s
       retries: 10
       start_period: 5s
-  iis-sandbox-mysql:
-    image: mysql:latest
-    container_name: iis-sandbox-mysql-polnareff
-    env_file:
-      - .env
-    command:
-      --lower_case_table_names=1
-    restart: unless-stopped
-    environment:
-      MYSQL_USER: ${ENV_IIS_MYSQL_USER}
-      MYSQL_PASSWORD: ${ENV_IIS_MYSQL_PASSWORD}
-    healthcheck:
-      test: [ "CMD", 'mysqladmin', 'ping', '-h', 'iis-sandbox-mysql', '-u', 'root', '-p$$MYSQL_ROOT_PASSWORD' ]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-      start_period: 5s
-    volumes:
-      - ./database/create-mysql-database.sql:/docker-entrypoint-initdb.d/1.sql
+  #  iis-sandbox-mysql:
+  #    image: mysql:latest
+  #    container_name: iis-sandbox-mysql-polnareff
+  #    env_file:
+  #      - .env
+  #    command:
+  #      --lower_case_table_names=1
+  #    restart: unless-stopped
+  #    environment:
+  #      MYSQL_USER: ${ENV_IIS_MYSQL_USER}
+  #      MYSQL_PASSWORD: ${ENV_IIS_MYSQL_PASSWORD}
+  #    healthcheck:
+  #      test: [ "CMD", 'mysqladmin', 'ping', '-h', 'iis-sandbox-mysql', '-u', 'root', '-p$MYSQL_ROOT_PASSWORD' ]
+  #      interval: 5s
+  #      timeout: 5s
+  #      retries: 5
+  #      start_period: 5s
+  #    volumes:
+  #      - ./database/create-mysql-database.sql:/docker-entrypoint-initdb.d/1.sql
   iis-sandbox:
     image: clemhen/iis-sandbox:deployable-v1.5
     container_name: iis-sandbox-iggy
@@ -42,17 +42,19 @@ services:
       - .env
     environment:
       FHIR_VERSION: R4
-      IIS_MYSQL_URL: "jdbc:mysql://iis-sandbox-mysql:3306/iis_alongside_jpa"
+      #      IIS_MYSQL_URL: "jdbc:mysql://iis-sandbox-mysql:3306/iis_alongside_jpa"
+      IIS_MYSQL_URL: "jdbc:h2:mem:iis"
       SPRING_DATASOURCE_URL: "jdbc:postgresql://hapi-fhir-postgresql:5432/hapi_fhir_iis"
     restart: unless-stopped
     ports:
-      - 19022:8080
+      - 19056:8080
+    #    volumes:
+    #      - iis-h2-data:/data-h2
     depends_on:
       hapi-fhir-postgresql:
         condition: service_healthy
-      iis-sandbox-mysql:
-        condition: service_healthy
+#      iis-sandbox-mysql:
+#        condition: service_healthy
 
 volumes:
-  hapi-fhir-postgres:
-  sandbox-mysql:
+  iis-h2-data:
