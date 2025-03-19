@@ -3,6 +3,8 @@ services:
     image: postgres:13-alpine
     container_name: hapi-fhir-postgres-jojo
     restart: unless-stopped
+    env_file:
+      - .env
     environment:
       #      Postgres DB name should be changed when trying to switch between FHIR version
       POSTGRES_DB: ${ENV_IIS_POSTGRES_DB}
@@ -17,11 +19,13 @@ services:
   iis-sandbox-mysql:
     image: mysql:latest
     container_name: iis-sandbox-mysql-polnareff
+    env_file:
+      - .env
     command:
       --lower_case_table_names=1
     restart: unless-stopped
     healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:3306/iis_alongside_jpa" ]
+      test: [ "CMD", 'mysqladmin', 'ping', '-h', 'localhost', '-u', 'root', '-p$$MYSQL_ROOT_PASSWORD' ]
       interval: 5s
       timeout: 5s
       retries: 5
