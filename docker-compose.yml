@@ -24,16 +24,15 @@ services:
     command:
       --lower_case_table_names=1
     restart: unless-stopped
+    environment:
+      MYSQL_USER: ${ENV_IIS_MYSQL_USER}
+      MYSQL_PASSWORD: ${ENV_IIS_MYSQL_PASSWORD}
     healthcheck:
-      test: [ "CMD", 'mysqladmin', 'ping', '-h', 'localhost', '-u', 'root', '-p$$MYSQL_ROOT_PASSWORD' ]
+      test: [ "CMD", 'mysqladmin', 'ping', '-h', 'iis-sandbox-mysql', '-u', 'root', '-p$$MYSQL_ROOT_PASSWORD' ]
       interval: 5s
       timeout: 5s
       retries: 5
       start_period: 5s
-    environment:
-      MYSQL_USER: ${ENV_IIS_MYSQL_USER}
-      MYSQL_PASSWORD: ${ENV_IIS_MYSQL_PASSWORD}
-      MYSQL_ROOT_PASSWORD: ${ENV_IIS_MYSQL_ROOT_PASSWORD}
     volumes:
       - ./database/create-mysql-database.sql:/docker-entrypoint-initdb.d/1.sql
   iis-sandbox:
@@ -42,12 +41,12 @@ services:
     env_file:
       - .env
     environment:
-      FHIR_VERSION: R5
+      FHIR_VERSION: R4
       IIS_MYSQL_URL: "jdbc:mysql://iis-sandbox-mysql:3306/iis_alongside_jpa"
       SPRING_DATASOURCE_URL: "jdbc:postgresql://hapi-fhir-postgresql:5432/hapi_fhir_iis"
     restart: unless-stopped
     ports:
-      - "8081:8080"
+      - ${IIS_PORT}:8080
     depends_on:
       hapi-fhir-postgresql:
         condition: service_healthy

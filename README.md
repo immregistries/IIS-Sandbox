@@ -2,7 +2,7 @@
 
 Kit to easily deploy the IIS sandbox from the images hosted on dockerhub.
 
-Default port is 8081, can be changed in docker-compose file in line 45
+Default port is 19056, can be changed in ``.env``
 
 ``.env`` file should be copied from ``.env.example`` and modified to change default passwords and secrets.
 
@@ -28,6 +28,8 @@ docker compose up;
 Change passwords, secrets and environment variables in ```.env``` file
 
 ### Environments variables used :
+
+- IIS_PORT: port of iis sandbox
 - FHIR_VERSION: sets the Fhir version of the server, beware that switching FHIR version requires a postgres database
   change or reset
   - R4
