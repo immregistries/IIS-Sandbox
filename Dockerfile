@@ -10,9 +10,9 @@ RUN mkdir /opt/bitnami/tomcat/webapps_default/ROOT
 RUN echo '<% response.sendRedirect("/iis/home"); %>' > /opt/bitnami/tomcat/webapps_default/ROOT/index.jsp
 
 USER root
+RUN mkdir ~/data-h2 && chown -R 1001:1001 ~/data-h2
 RUN mkdir -p /target && chown -R 1001:1001 target
 USER 1001
-
 # Used to deactivate dev profile, even if prod profile no longer exists
 ENV spring.profiles.active=prod
 #ENV spring.jpa.properties.hibernate.dialect=ca.uhn.fhir.jpa.model.dialect.HapiFhirPostgres94Dialect
