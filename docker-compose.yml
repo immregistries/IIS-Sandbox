@@ -47,7 +47,7 @@ services:
       SPRING_DATASOURCE_URL: "jdbc:postgresql://hapi-fhir-postgresql:5432/hapi_fhir_iis"
     restart: unless-stopped
     ports:
-      - 19056:8080
+      - ${DOCKER_IIS_PORT}:8080
     #    volumes:
     #      - iis-h2-data:/data-h2
     depends_on:

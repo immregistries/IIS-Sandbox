@@ -14,6 +14,7 @@ else
   echo ".env file already exists."
 fi
 
-docker compose up;
+docker compose up --detach;
+echo "webapp might take 30-60s to deploy"
 
 exit 0 # Exit with success code
