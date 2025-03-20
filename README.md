@@ -27,9 +27,11 @@ docker compose up;
 
 Change passwords, secrets and environment variables in ```.env``` file
 
+If message ``WARN[0000] The "" variable is not set. Defaulting to a blank string. 
+`` appears, refer to ``.env.example`` for a working example of ``.env``
 ### Environments variables used :
 
-- IIS_PORT: port of iis sandbox
+- DOCKER_IIS_PORT: port of iis sandbox
 - FHIR_VERSION: sets the Fhir version of the server, beware that switching FHIR version requires a postgres database
   change or reset
   - R4
