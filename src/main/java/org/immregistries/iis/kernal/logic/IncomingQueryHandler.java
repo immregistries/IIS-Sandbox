@@ -707,12 +707,12 @@ public class IncomingQueryHandler {
 			}
 
 			ConnectorInterface connector = ConnectFactory.createConnecter(software, VaccineGroup.getForecastItemList());
-			connector.setLogText(true);
+			connector.setLogText(false);
 			try {
 
 				SoftwareResult softwareResult = new SoftwareResult();
 				forecastActualList = connector.queryForForecast(testCase, softwareResult);
-				logger.info("swr {}", softwareResult.getLogText());
+//				logger.info("swr {}", softwareResult.getLogText());
 			} catch (IOException ioe) {
 				System.err.println("Unable to query for forecast");
 				ioe.printStackTrace();
