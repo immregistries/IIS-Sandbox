@@ -8,6 +8,8 @@ public interface IRecommendationForecastProvider<Parameters extends IBaseParamet
 	String ASSESSMENT_DATE = "assessmentDate";
 	String PATIENT = "patient";
 	String RECOMMENDATION = "recommendation";
+	String EVALUATION = "evaluation";
+
 	String IMMUNIZATION = "immunization";
 	String IMM_DSFORECAST_CANONICAL_URL = "http://hl7.org/fhir/us/immds/OperationDefinition/ImmDSForecastOperation";
 

@@ -6,6 +6,7 @@ import org.hl7.fhir.r5.model.*;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR5Condition;
+import org.immregistries.iis.kernal.mapping.forR5.ImmunizationEvaluationMapperR5;
 import org.immregistries.iis.kernal.mapping.forR5.ImmunizationRecommendationMapperR5;
 import org.immregistries.iis.kernal.mapping.forR5.PatientMapperR5;
 import org.immregistries.iis.kernal.mapping.internalClient.FhirRequesterR5;
@@ -20,6 +21,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 
+import static org.immregistries.iis.kernal.fhir.immdsForecast.IRecommendationForecastProvider.EVALUATION;
+import static org.immregistries.iis.kernal.fhir.immdsForecast.IRecommendationForecastProvider.RECOMMENDATION;
 import static org.immregistries.iis.kernal.mapping.interfaces.ImmunizationMapper.CVX_SYSTEM;
 
 @Service
@@ -32,6 +35,8 @@ public class ImmunizationRecommendationServiceR5 implements IImmunizationRecomme
 	private FhirRequesterR5 fhirRequesterR5;
 	@Autowired
 	private ImmunizationRecommendationMapperR5 immunizationRecommendationMapperR5;
+	@Autowired
+	private ImmunizationEvaluationMapperR5 immunizationEvaluationMapperR5;
 	@Autowired
 	private PatientMapperR5 patientMapperR5;
 
@@ -81,16 +86,26 @@ public class ImmunizationRecommendationServiceR5 implements IImmunizationRecomme
 		List<VaccinationMaster> vaccinationMasterList = fhirRequesterR5.searchVaccinationMasterGoldenList(
 			new SearchParameterMap("patient", new ReferenceParam("Patient/" + patientMaster.getPatientId()).setMdmExpand(true))
 		);
-		return queryCds(tenant, date, patientMaster, vaccinationMasterList);
+		return (ImmunizationRecommendation) queryCds(tenant, date, patientMaster, vaccinationMasterList).getParameter(RECOMMENDATION).getResource();
 	}
 
-	public ImmunizationRecommendation queryCds(Tenant tenant, Date date, PatientMaster patientpatientMaster, List<VaccinationMaster> vaccinationMasterList) {
+	public Parameters queryCds(Tenant tenant, Date date, PatientMaster patientpatientMaster, List<VaccinationMaster> vaccinationMasterList) {
 		SoftwareResult softwareResult = new SoftwareResult();
 		List<ForecastActual> forecastActualList = incomingQueryHandler.doForecast(softwareResult, patientpatientMaster, vaccinationMasterList, tenant, date);
 		ImmunizationRecommendation immunizationRecommendation = immunizationRecommendationMapperR5.toFhir(forecastActualList, date, patientpatientMaster);
+		immunizationRecommendation.addIdentifier(new Identifier().setValue(UUID.randomUUID().toString().split("-")[0]));
 		immunizationRecommendation.setAuthority(new Reference()
-			.setIdentifier(new Identifier().setSystem("IIS-Sandbox/tenant").setValue(tenant.getOrganizationName())));
-		return immunizationRecommendation;
+			.setIdentifier(new Identifier().setSystem("IIS-Sandbox/tenantAndslonestar").setValue(tenant.getOrganizationName())));
+
+		Parameters parameters = new Parameters();
+		parameters.addParameter().setResource(immunizationRecommendation).setName(RECOMMENDATION);
+		for (VaccinationMaster vaccinationMaster : vaccinationMasterList) {
+			ImmunizationEvaluation immunizationEvaluation = immunizationEvaluationMapperR5.toFhir(vaccinationMaster, date);
+			if (immunizationEvaluation != null) {
+				parameters.addParameter().setResource(immunizationEvaluation).setName(EVALUATION);
+			}
+		}
+		return parameters;
 	}
 
 }

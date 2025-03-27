@@ -56,24 +56,17 @@ public class RecommendationForecastProviderR5 implements IRecommendationForecast
 		List<Immunization> immunization
 	) {
 		Parameters out = new Parameters();
-		ImmunizationRecommendation immunizationRecommendation;
 		List<VaccinationMaster> vaccinationMasterList = List.of();
 		if (immunization != null) {
 			vaccinationMasterList = immunization.stream().map(immunization1 -> immunizationMapperR5.localObject(immunization1)).collect(Collectors.toList());
 		}
 		PatientMaster patientMaster = patientMapperR5.localObject(patient);
 		try {
-			for (int i = 0; i < vaccinationMasterList.size(); i++) {
-				logger.info("testevent before {} {}", i, vaccinationMasterList.get(i).getTestEvent());
-			}
-			immunizationRecommendation = immunizationRecommendationServiceR5.queryCds(ServletHelper.getTenant(), assessmentDate.getValue(), patientMaster, vaccinationMasterList);
-			for (int i = 0; i < vaccinationMasterList.size(); i++) {
-				logger.info("testevent after {} {}", i, vaccinationMasterList.get(i).getTestEvent());
-			}
+			out = immunizationRecommendationServiceR5.queryCds(ServletHelper.getTenant(), assessmentDate.getValue(), patientMaster, vaccinationMasterList);
 		} catch (Exception e) {
-			immunizationRecommendation = immunizationRecommendationServiceR5.generate(ServletHelper.getTenant(), assessmentDate.getValue(), patientMaster);
+			ImmunizationRecommendation immunizationRecommendation = immunizationRecommendationServiceR5.generate(ServletHelper.getTenant(), assessmentDate.getValue(), patientMaster);
+			out.addParameter().setName(RECOMMENDATION).setResource(immunizationRecommendation);
 		}
-		out.addParameter().setName(RECOMMENDATION).setResource(immunizationRecommendation);
 		return out;
 	}
 }

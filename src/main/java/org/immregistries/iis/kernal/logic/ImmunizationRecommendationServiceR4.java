@@ -6,6 +6,7 @@ import org.hl7.fhir.r4.model.*;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
+import org.immregistries.iis.kernal.mapping.forR4.ImmunizationEvaluationMapperR4;
 import org.immregistries.iis.kernal.mapping.forR4.ImmunizationRecommendationMapperR4;
 import org.immregistries.iis.kernal.mapping.forR4.PatientMapperR4;
 import org.immregistries.iis.kernal.mapping.internalClient.FhirRequesterR4;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 
+import static org.immregistries.iis.kernal.fhir.immdsForecast.IRecommendationForecastProvider.EVALUATION;
 import static org.immregistries.iis.kernal.fhir.immdsForecast.IRecommendationForecastProvider.RECOMMENDATION;
 import static org.immregistries.iis.kernal.mapping.interfaces.ImmunizationMapper.CVX_SYSTEM;
 
@@ -33,6 +35,8 @@ public class ImmunizationRecommendationServiceR4 implements IImmunizationRecomme
 	private FhirRequesterR4 fhirRequesterR4;
 	@Autowired
 	private ImmunizationRecommendationMapperR4 immunizationRecommendationMapperR4;
+	@Autowired
+	private ImmunizationEvaluationMapperR4 immunizationEvaluationMapperR4;
 	@Autowired
 	private PatientMapperR4 patientMapperR4;
 
@@ -95,10 +99,12 @@ public class ImmunizationRecommendationServiceR4 implements IImmunizationRecomme
 
 		Parameters parameters = new Parameters();
 		parameters.addParameter().setResource(immunizationRecommendation).setName(RECOMMENDATION);
-
-
-		ImmunizationEvaluation immunizationEvaluation = new ImmunizationEvaluation();
-
+		for (VaccinationMaster vaccinationMaster : vaccinationMasterList) {
+			ImmunizationEvaluation immunizationEvaluation = immunizationEvaluationMapperR4.toFhir(vaccinationMaster, date);
+			if (immunizationEvaluation != null) {
+				parameters.addParameter().setResource(immunizationEvaluation).setName(EVALUATION);
+			}
+		}
 		return parameters;
 	}
 
