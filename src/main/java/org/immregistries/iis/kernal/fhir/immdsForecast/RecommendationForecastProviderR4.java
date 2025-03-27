@@ -58,20 +58,24 @@ public class RecommendationForecastProviderR4 implements IRecommendationForecast
 		List<Immunization> immunization
 	) {
 		Parameters out = new Parameters();
-		List<VaccinationMaster> vaccinationMasterList = List.of();
+		List<VaccinationMaster> vaccinationMasterList;
 		if (immunization != null) {
 			vaccinationMasterList = immunization.stream().map(immunization1 -> immunizationMapperR4.localObject(immunization1)).collect(Collectors.toList());
+		} else {
+			vaccinationMasterList = List.of();
 		}
 		PatientMaster patientMaster = patientMapperR4.localObject(patient);
 		try {
-			for (int i = 0; i < vaccinationMasterList.size(); i++) {
-				logger.info("testevent before {} {}", i, vaccinationMasterList.get(i).getTestEvent());
-			}
+			logger.info("testevent testtt {}", vaccinationMasterList.size());
+//			for (int i = 0; i < vaccinationMasterList.size(); i++) {
+//				logger.info("testevent before {} {}", i, vaccinationMasterList.get(i).getTestEvent());
+//			}
 			out = immunizationRecommendationServiceR4.queryCds(ServletHelper.getTenant(), assessmentDate.getValue(), patientMaster, vaccinationMasterList);
 			for (int i = 0; i < vaccinationMasterList.size(); i++) {
 				logger.info("testevent after {} {}", i, vaccinationMasterList.get(i).getTestEvent());
 			}
 		} catch (Exception e) {
+			e.printStackTrace();
 			ImmunizationRecommendation immunizationRecommendation;
 			immunizationRecommendation = immunizationRecommendationServiceR4.generate(ServletHelper.getTenant(), assessmentDate.getValue(), patientMaster);
 			out.addParameter().setName(RECOMMENDATION).setResource(immunizationRecommendation);

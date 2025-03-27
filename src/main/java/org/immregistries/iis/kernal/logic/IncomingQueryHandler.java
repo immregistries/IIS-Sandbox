@@ -22,7 +22,6 @@ import org.immregistries.smm.tester.manager.HL7Reader;
 import org.immregistries.vfa.connect.ConnectFactory;
 import org.immregistries.vfa.connect.ConnectorInterface;
 import org.immregistries.vfa.connect.model.*;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -667,48 +666,38 @@ public class IncomingQueryHandler {
 		sb.append("\r");
 	}
 
-	private static @NotNull TestCase buildTestCase(PatientMaster patient, List<VaccinationMaster> vaccinationMasterList, Date date) {
+	public List<ForecastActual> doForecast(PatientMaster patient, List<VaccinationMaster> vaccinationMasterList, Tenant tenant, Date date) {
 		CodeMap codeMap = CodeMapManager.getCodeMap();
-		TestCase testCase = new TestCase();
-		testCase.setEvalDate(date);
-		if (patient != null) {
-			testCase.setPatientSex(patient.getSex());
-			testCase.setPatientDob(patient.getBirthDate());
-		} else {
-			testCase.setPatientSex("F");
-		}
-		List<TestEvent> testEventList = new ArrayList<>();
-		for (VaccinationMaster vaccination : vaccinationMasterList) {
-			Code cvxCode = codeMap.getCodeForCodeset(CodesetType.VACCINATION_CVX_CODE, vaccination.getVaccineCvxCode());
-			if (cvxCode == null) {
-				continue;
-			}
-			if ("D".equals(vaccination.getActionCode())) {
-				continue;
-			}
-			int cvx;
-			try {
-				cvx = Integer.parseInt(vaccination.getVaccineCvxCode());
-				TestEvent testEvent = new TestEvent(cvx, vaccination.getAdministeredDate());
-				testEventList.add(testEvent);
-				vaccination.setTestEvent(testEvent);
-			} catch (NumberFormatException ignored) {
-			}
-		}
-		testCase.setTestEventList(testEventList);
-		return testCase;
-	}
-
-	private List<ForecastActual> doForecast(PatientMaster patient, List<VaccinationMaster> vaccinationMasterList, Tenant tenant, Date date) {
-		SoftwareResult softwareResult = new SoftwareResult();
-		return doForecast(softwareResult, patient, vaccinationMasterList, tenant, date);
-	}
-
-	public List<ForecastActual> doForecast(SoftwareResult softwareResult, PatientMaster patient, List<VaccinationMaster> vaccinationMasterList, Tenant tenant, Date date) {
 		List<ForecastActual> forecastActualList = null;
 		Set<ProcessingFlavor> processingFlavorSet = tenant.getProcessingFlavorSet();
 		try {
-			TestCase testCase = buildTestCase(patient, vaccinationMasterList, date);
+			TestCase testCase = new TestCase();
+			testCase.setEvalDate(date);
+			if (patient != null) {
+				testCase.setPatientSex(patient.getSex());
+				testCase.setPatientDob(patient.getBirthDate());
+			} else {
+				testCase.setPatientSex("F");
+			}
+			List<TestEvent> testEventList = new ArrayList<>();
+			for (VaccinationMaster vaccination : vaccinationMasterList) {
+				Code cvxCode = codeMap.getCodeForCodeset(CodesetType.VACCINATION_CVX_CODE, vaccination.getVaccineCvxCode());
+				if (cvxCode == null) {
+					continue;
+				}
+				if ("D".equals(vaccination.getActionCode())) {
+					continue;
+				}
+				int cvx;
+				try {
+					cvx = Integer.parseInt(vaccination.getVaccineCvxCode());
+					TestEvent testEvent = new TestEvent(cvx, vaccination.getAdministeredDate());
+					testEventList.add(testEvent);
+					vaccination.setTestEvent(testEvent);
+				} catch (NumberFormatException ignored) {
+				}
+			}
+			testCase.setTestEventList(testEventList);
 			Software software = new Software();
 			software.setServiceUrl("https://sabbia.westus2.cloudapp.azure.com/lonestar/forecast");
 			software.setService(Service.LSVF);
@@ -720,6 +709,8 @@ public class IncomingQueryHandler {
 			ConnectorInterface connector = ConnectFactory.createConnecter(software, VaccineGroup.getForecastItemList());
 			connector.setLogText(true);
 			try {
+
+				SoftwareResult softwareResult = new SoftwareResult();
 				forecastActualList = connector.queryForForecast(testCase, softwareResult);
 				logger.info("swr {}", softwareResult.getLogText());
 			} catch (IOException ioe) {

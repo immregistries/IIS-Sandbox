@@ -14,7 +14,6 @@ import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.model.Tenant;
 import org.immregistries.iis.kernal.model.VaccinationMaster;
 import org.immregistries.vfa.connect.model.ForecastActual;
-import org.immregistries.vfa.connect.model.SoftwareResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Service;
@@ -90,8 +89,7 @@ public class ImmunizationRecommendationServiceR4 implements IImmunizationRecomme
 	}
 
 	public Parameters queryCds(Tenant tenant, Date date, PatientMaster patientpatientMaster, List<VaccinationMaster> vaccinationMasterList) {
-		SoftwareResult softwareResult = new SoftwareResult();
-		List<ForecastActual> forecastActualList = incomingQueryHandler.doForecast(softwareResult, patientpatientMaster, vaccinationMasterList, tenant, date);
+		List<ForecastActual> forecastActualList = incomingQueryHandler.doForecast(patientpatientMaster, vaccinationMasterList, tenant, date);
 		ImmunizationRecommendation immunizationRecommendation = immunizationRecommendationMapperR4.toFhir(forecastActualList, date, patientpatientMaster);
 		immunizationRecommendation.addIdentifier(new Identifier().setValue(UUID.randomUUID().toString().split("-")[0]));
 		immunizationRecommendation.setAuthority(new Reference()
