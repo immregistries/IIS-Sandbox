@@ -28,8 +28,8 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Nonnull;
 import javax.interceptor.Interceptor;
 
-import static org.immregistries.iis.kernal.fhir.interceptors.CustomAuthorizationInterceptor.CONNECTATHON_USER;
-import static org.immregistries.iis.kernal.fhir.interceptors.CustomAuthorizationInterceptor.DEFAULT_USER;
+import static org.immregistries.iis.kernal.fhir.interceptors.IisAuthorizationInterceptor.CONNECTATHON_USER;
+import static org.immregistries.iis.kernal.fhir.interceptors.IisAuthorizationInterceptor.DEFAULT_USER;
 
 /**
  * Intercepts requests, checks if partition aimed at exists, otherwise creates new partition

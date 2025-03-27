@@ -34,7 +34,7 @@ import static org.immregistries.iis.kernal.fhir.security.ServletHelper.SESSION_U
  */
 @Component
 @Interceptor
-public class CustomAuthorizationInterceptor extends AuthorizationInterceptor {
+public class IisAuthorizationInterceptor extends AuthorizationInterceptor {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	public static final String CONNECTATHON_USER = "Connectathon";

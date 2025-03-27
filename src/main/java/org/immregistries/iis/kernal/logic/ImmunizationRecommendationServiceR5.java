@@ -6,13 +6,14 @@ import org.hl7.fhir.r5.model.*;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR5Condition;
+import org.immregistries.iis.kernal.mapping.forR5.ImmunizationRecommendationMapperR5;
 import org.immregistries.iis.kernal.mapping.forR5.PatientMapperR5;
-import org.immregistries.iis.kernal.mapping.forR5.RecommendationMapperR5;
 import org.immregistries.iis.kernal.mapping.internalClient.FhirRequesterR5;
 import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.model.Tenant;
 import org.immregistries.iis.kernal.model.VaccinationMaster;
 import org.immregistries.vfa.connect.model.ForecastActual;
+import org.immregistries.vfa.connect.model.SoftwareResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Service;
@@ -30,7 +31,7 @@ public class ImmunizationRecommendationServiceR5 implements IImmunizationRecomme
 	@Autowired
 	private FhirRequesterR5 fhirRequesterR5;
 	@Autowired
-	private RecommendationMapperR5 recommendationMapperR5;
+	private ImmunizationRecommendationMapperR5 immunizationRecommendationMapperR5;
 	@Autowired
 	private PatientMapperR5 patientMapperR5;
 
@@ -84,12 +85,12 @@ public class ImmunizationRecommendationServiceR5 implements IImmunizationRecomme
 	}
 
 	public ImmunizationRecommendation queryCds(Tenant tenant, Date date, PatientMaster patientpatientMaster, List<VaccinationMaster> vaccinationMasterList) {
-		List<ForecastActual> forecastActualList = incomingQueryHandler.doForecast(patientpatientMaster, vaccinationMasterList, tenant, date);
-		ImmunizationRecommendation immunizationRecommendation = recommendationMapperR5.toFhir(forecastActualList, date, patientpatientMaster);
+		SoftwareResult softwareResult = new SoftwareResult();
+		List<ForecastActual> forecastActualList = incomingQueryHandler.doForecast(softwareResult, patientpatientMaster, vaccinationMasterList, tenant, date);
+		ImmunizationRecommendation immunizationRecommendation = immunizationRecommendationMapperR5.toFhir(forecastActualList, date, patientpatientMaster);
 		immunizationRecommendation.setAuthority(new Reference()
 			.setIdentifier(new Identifier().setSystem("IIS-Sandbox/tenant").setValue(tenant.getOrganizationName())));
 		return immunizationRecommendation;
 	}
-
 
 }

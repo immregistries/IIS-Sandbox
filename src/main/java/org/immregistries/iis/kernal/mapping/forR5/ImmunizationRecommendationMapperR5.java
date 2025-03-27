@@ -25,7 +25,7 @@ import static org.immregistries.iis.kernal.mapping.interfaces.ImmunizationMapper
 
 @Service
 @Conditional(OnR5Condition.class)
-public class RecommendationMapperR5 implements IRecommendationMapper {
+public class ImmunizationRecommendationMapperR5 implements IRecommendationMapper {
 
 	public ImmunizationRecommendation toFhir(List<ForecastActual> forecastActualList, Date date, PatientMaster patientMaster) {
 		ImmunizationRecommendation immunizationRecommendation = toFhir(forecastActualList, date);

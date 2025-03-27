@@ -22,6 +22,8 @@ import java.util.Comparator;
 /**
  * NOT USED FOR DIFF OPERATION
  * based on Hapi DiffProvider
+ * Used as base of a prototype framework to measure information loss/differences after the use of different workflows or mapping.
+ * Each workflow is executed with a specific tenant, then the diff here is used to obtain the differences between every tenant that was produced
  */
 public class CrossTenantDiffProvider {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());

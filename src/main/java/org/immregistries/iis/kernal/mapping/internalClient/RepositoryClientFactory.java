@@ -27,7 +27,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 
-import static org.immregistries.iis.kernal.fhir.interceptors.CustomAuthorizationInterceptor.CONNECTATHON_USER;
+import static org.immregistries.iis.kernal.fhir.interceptors.IisAuthorizationInterceptor.CONNECTATHON_USER;
 import static org.immregistries.iis.kernal.fhir.security.ServletHelper.GITHUB_PREFIX;
 import static org.immregistries.iis.kernal.fhir.security.ServletHelper.SESSION_TENANT;
 

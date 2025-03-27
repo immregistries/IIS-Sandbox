@@ -16,6 +16,8 @@ import org.immregistries.iis.kernal.mapping.forR5.ImmunizationMapperR5;
 import org.immregistries.iis.kernal.mapping.forR5.PatientMapperR5;
 import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.model.VaccinationMaster;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Controller;
@@ -27,6 +29,7 @@ import java.util.stream.Collectors;
 @Controller
 @Conditional(OnR5Condition.class)
 public class RecommendationForecastProviderR5 implements IRecommendationForecastProvider<Parameters, Patient, Immunization> {
+	private Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	@Autowired
 	IncomingQueryHandler incomingQueryHandler;
@@ -54,10 +57,19 @@ public class RecommendationForecastProviderR5 implements IRecommendationForecast
 	) {
 		Parameters out = new Parameters();
 		ImmunizationRecommendation immunizationRecommendation;
-		List<VaccinationMaster> vaccinationMasterList = immunization.stream().map(immunization1 -> immunizationMapperR5.localObject(immunization1)).collect(Collectors.toList());
+		List<VaccinationMaster> vaccinationMasterList = List.of();
+		if (immunization != null) {
+			vaccinationMasterList = immunization.stream().map(immunization1 -> immunizationMapperR5.localObject(immunization1)).collect(Collectors.toList());
+		}
 		PatientMaster patientMaster = patientMapperR5.localObject(patient);
 		try {
+			for (int i = 0; i < vaccinationMasterList.size(); i++) {
+				logger.info("testevent before {} {}", i, vaccinationMasterList.get(i).getTestEvent());
+			}
 			immunizationRecommendation = immunizationRecommendationServiceR5.queryCds(ServletHelper.getTenant(), assessmentDate.getValue(), patientMaster, vaccinationMasterList);
+			for (int i = 0; i < vaccinationMasterList.size(); i++) {
+				logger.info("testevent after {} {}", i, vaccinationMasterList.get(i).getTestEvent());
+			}
 		} catch (Exception e) {
 			immunizationRecommendation = immunizationRecommendationServiceR5.generate(ServletHelper.getTenant(), assessmentDate.getValue(), patientMaster);
 		}
