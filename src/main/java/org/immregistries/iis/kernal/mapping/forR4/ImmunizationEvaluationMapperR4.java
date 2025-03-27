@@ -28,15 +28,14 @@ public class ImmunizationEvaluationMapperR4 {
 		}
 		immunizationEvaluation.setImmunizationEvent(new Reference("Immunization/" + vaccinationMaster.getVaccinationId()));
 
-		if (vaccinationMaster.getTestEvent() != null) {
+		if (vaccinationMaster.getTestEvent() != null && vaccinationMaster.getTestEvent().getEvaluationActualList() != null) {
 
 			immunizationEvaluation.setStatus(ImmunizationEvaluation.ImmunizationEvaluationStatus.COMPLETED);
-
 			for (EvaluationActual evaluationActual : vaccinationMaster.getTestEvent().getEvaluationActualList()) {
 				immunizationEvaluation.setSeries(evaluationActual.getSeriesUsedCode());
 			}
 		} else {
-			immunizationEvaluation.setStatus(ImmunizationEvaluation.ImmunizationEvaluationStatus.ENTEREDINERROR);
+			return null;
 		}
 		return immunizationEvaluation;
 	}

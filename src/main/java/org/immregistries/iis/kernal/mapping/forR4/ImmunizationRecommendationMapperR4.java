@@ -34,6 +34,9 @@ public class ImmunizationRecommendationMapperR4 implements IRecommendationMapper
 	}
 
 	public ImmunizationRecommendation toFhir(List<ForecastActual> forecastActualList, Date date) {
+		if (forecastActualList == null) {
+			return null;
+		}
 		CodeMap codeMap = CodeMapManager.getCodeMap();
 		ImmunizationRecommendation immunizationRecommendation = new ImmunizationRecommendation();
 		immunizationRecommendation.setDate(date);
