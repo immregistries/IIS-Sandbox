@@ -10,6 +10,7 @@ import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
 import org.immregistries.iis.kernal.logic.CodeMapManager;
+import org.immregistries.iis.kernal.mapping.interfaces.IImmunizationEvaluationMapper;
 import org.immregistries.iis.kernal.model.VaccinationMaster;
 import org.immregistries.vfa.connect.model.EvaluationActual;
 import org.immregistries.vfa.connect.model.TestEvent;
@@ -19,9 +20,12 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 
+/**
+ * Not complete
+ */
 @Service
 @Conditional(OnR4Condition.class)
-public class ImmunizationEvaluationMapperR4 {
+public class ImmunizationEvaluationMapperR4 implements IImmunizationEvaluationMapper<ImmunizationEvaluation> {
 
 	@Autowired
 	private ImmunizationMapperR4 immunizationMapperR4;
@@ -36,7 +40,6 @@ public class ImmunizationEvaluationMapperR4 {
 
 		if (vaccinationMaster.getTestEvent() != null && vaccinationMaster.getTestEvent().getEvaluationActualList() != null) {
 			TestEvent testEvent = vaccinationMaster.getTestEvent();
-//			testEvent.get
 			immunizationEvaluation.setStatus(ImmunizationEvaluation.ImmunizationEvaluationStatus.COMPLETED);
 			for (EvaluationActual evaluationActual : testEvent.getEvaluationActualList()) {
 				immunizationEvaluation.setSeries(evaluationActual.getSeriesUsedCode());
@@ -47,7 +50,6 @@ public class ImmunizationEvaluationMapperR4 {
 				Code cvxCode = codeMap.getCodeForCodeset(CodesetType.VACCINATION_CVX_CODE, cvx);
 				immunizationEvaluation.setTargetDisease(new CodeableConcept().addCoding(new Coding("cvx", cvx, cvxCode.getLabel())));
 			}
-
 			immunizationEvaluation.setDescription(testEvent.getLabelScreen());
 		} else {
 			return null;

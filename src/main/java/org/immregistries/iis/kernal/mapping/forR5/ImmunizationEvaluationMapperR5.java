@@ -5,6 +5,7 @@ import org.hl7.fhir.r5.model.Reference;
 import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR5Condition;
 import org.immregistries.iis.kernal.logic.CodeMapManager;
+import org.immregistries.iis.kernal.mapping.interfaces.IImmunizationEvaluationMapper;
 import org.immregistries.iis.kernal.model.VaccinationMaster;
 import org.immregistries.vfa.connect.model.EvaluationActual;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,9 +14,12 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 
+/**
+ * Not Complete
+ */
 @Service
 @Conditional(OnR5Condition.class)
-public class ImmunizationEvaluationMapperR5 {
+public class ImmunizationEvaluationMapperR5 implements IImmunizationEvaluationMapper<ImmunizationEvaluation> {
 
 	@Autowired
 	private ImmunizationMapperR5 immunizationMapperR5;
