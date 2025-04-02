@@ -45,6 +45,11 @@
 
 
     <dependencies>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.17.0</version>
+        </dependency>
 
         <!--        <dependency>-->
         <!--            <groupId>org.immregistries</groupId>-->
@@ -55,6 +60,12 @@
             <groupId>gov.nist</groupId>
             <artifactId>hl7-v2-validation</artifactId>
             <version>1.6.8</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.commons</groupId>
+                    <artifactId>commons-lang3</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>

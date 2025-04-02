@@ -32,10 +32,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public abstract class AbstractIncomingMessageHandler implements IIncomingMessageHandler {
@@ -439,6 +436,7 @@ public abstract class AbstractIncomingMessageHandler implements IIncomingMessage
 			if (generalPractitioner != null) {
 				patientReported.setGeneralPractitionerId("Practitioner/" + generalPractitioner.getPersonId());
 			}
+			logger.info("PUB {} {}", reader.getValue(11), Objects.isNull(reader.getValue(11)));
 			patientReported.setPublicityIndicator(reader.getValue(11));
 			patientReported.setProtectionIndicator(reader.getValue(12));
 			patientReported.setProtectionIndicatorDate(IIncomingMessageHandler.parseDateWarn(reader.getValue(13), "Invalid protection indicator date", "PD1", 1, 13, strictDate, iisReportableList));
