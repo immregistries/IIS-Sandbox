@@ -9,7 +9,7 @@ import java.util.List;
  * Internal Standard agnostic representation of a patient's information, this class should only be used when dealing with Golden Record except for Display,
  * When dealing with a report use PatientReported
  */
-public class PatientMaster extends AbstractMappedObject implements Serializable {
+public class PatientMaster extends AbstractMappedObject implements Serializable, TenantTiedObject {
 
 	private String patientId = "";
 	private Tenant tenant = null;
@@ -378,7 +378,7 @@ public class PatientMaster extends AbstractMappedObject implements Serializable 
 				"patientId='" + patientId + '\'' +
 //			", tenant=" + tenant +
 			", businessIdentifiers=" + businessIdentifiers +
-			", reportedDate=" + reportedDate +
+//			", reportedDate=" + reportedDate +
 				", updatedDate=" + updatedDate +
 			", patientNames=" + modelNames +
 				", motherMaidenName='" + motherMaidenName + '\'' +

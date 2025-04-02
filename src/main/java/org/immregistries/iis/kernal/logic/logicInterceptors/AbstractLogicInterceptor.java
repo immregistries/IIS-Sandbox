@@ -2,12 +2,14 @@ package org.immregistries.iis.kernal.logic.logicInterceptors;
 
 import ca.uhn.fhir.parser.IParser;
 import ca.uhn.fhir.rest.api.server.RequestDetails;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.DiffResult;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.immregistries.iis.kernal.logic.ack.IisReportable;
 import org.immregistries.iis.kernal.logic.ack.IisReportableSeverity;
 import org.immregistries.iis.kernal.mapping.interfaces.IisFhirMapperMasterReported;
 import org.immregistries.iis.kernal.model.AbstractMappedObject;
+import org.immregistries.iis.kernal.model.TenantTiedObject;
 import org.immregistries.mqe.hl7util.model.CodedWithExceptions;
 import org.immregistries.mqe.hl7util.model.Hl7Location;
 import org.jetbrains.annotations.NotNull;
@@ -51,8 +53,11 @@ public abstract class AbstractLogicInterceptor {
 		if (!res) {
 			logger.info("Object Mapping check failed\n{}\n\n{}\n", abstractMappedObject, abstractMappedObject1);
 		}
+		if (abstractMappedObject1 instanceof TenantTiedObject) {
+			((TenantTiedObject) abstractMappedObject1).setTenant(((TenantTiedObject) abstractMappedObject).getTenant());
+		}
 		DiffResult<AbstractMappedObject> diffResult = abstractMappedObject.diff(abstractMappedObject1);
-		if (!diffResult.getDiffs().isEmpty()) {
+		if (diffResult.getNumberOfDiffs() > 0) {
 			logger.info("Object Mapping check FAILED");
 			printDiff(logger, diffResult);
 		}
@@ -75,7 +80,12 @@ public abstract class AbstractLogicInterceptor {
 //		logger.info("Object Mapping check DIFF: \n{}", JsonFormatter.prettyPrint(diffResult.toString(ToStringStyle.JSON_STYLE)));
 //		logger.info("Object Mapping check DIFF: {}", diffResult.toString(ToStringStyle.SHORT_PREFIX_STYLE));
 		diffResult.getDiffs().stream().forEach((dif) -> {
-			logger.info("Object Mapping check DIFF: {}\n{}\n{}", dif.getFieldName(), dif.getRight(), dif.getLeft());
+			/*
+			 * Temp fix for issue of false negative, probably due to pointer issue
+			 */
+			if (!StringUtils.equals(String.valueOf(dif.getRight()), String.valueOf(dif.getLeft()))) {
+				logger.info("Object Mapping check DIFF: {}\n{}\n{}\n", dif.getFieldName(), dif.getRight(), dif.getLeft());
+			}
 		});
 	}
 

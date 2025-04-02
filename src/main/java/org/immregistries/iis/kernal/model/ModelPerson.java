@@ -2,7 +2,7 @@ package org.immregistries.iis.kernal.model;
 
 import java.io.Serializable;
 
-public class ModelPerson extends AbstractMappedObject implements Serializable {
+public class ModelPerson extends AbstractMappedObject implements Serializable, TenantTiedObject {
   private static final long serialVersionUID = 1L;
 	
   private String personId = "";
