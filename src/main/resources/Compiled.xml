@@ -396,6 +396,19 @@
             </use-date>
         </code>
         <code>
+            <value>253088698300031811250131</value>
+            <label>Cholera Vaccine VIS</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_VIS_VACCINES">174</link-to>
+            </reference>
+            <use-date>
+                <not-before>20250131</not-before>
+            </use-date>
+        </code>
+        <code>
             <value>253088698300035611210201</value>
             <label>COVID-19 AstraZeneca Vaccine EUA Recipient-Caregiver Fact Sheet</label>
             <code-status>
@@ -711,6 +724,20 @@
             </use-date>
         </code>
         <code>
+            <value>253088698300063911250131</value>
+            <label>COVID-19 Vaccine VIS - mRNA vaccine for 12 years and older</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_VIS_VACCINES">312</link-to>
+                <link-to codeset="VACCINATION_VIS_VACCINES">309</link-to>
+            </reference>
+            <use-date>
+                <not-before>20250131</not-before>
+            </use-date>
+        </code>
+        <code>
             <value>253088698300046211211217</value>
             <label>Dengue Vaccine VIS</label>
             <code-status>
@@ -721,6 +748,19 @@
             </reference>
             <use-date>
                 <not-before>20211217</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>253088698300046211250131</value>
+            <label>Dengue Vaccine VIS</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_VIS_VACCINES">56</link-to>
+            </reference>
+            <use-date>
+                <not-before>20250131</not-before>
             </use-date>
         </code>
         <code>
@@ -809,6 +849,19 @@
             </reference>
             <use-date>
                 <not-before>20220630</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>253088698300054711250131</value>
+            <label>Ebola Vaccine VIS</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_VIS_VACCINES">204</link-to>
+            </reference>
+            <use-date>
+                <not-before>20250131</not-before>
             </use-date>
         </code>
         <code>
@@ -928,6 +981,21 @@
             </use-date>
         </code>
         <code>
+            <value>253088698300004211250131</value>
+            <label>Hepatitis A Vaccine VIS</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_VIS_VACCINES">104</link-to>
+                <link-to codeset="VACCINATION_VIS_VACCINES">83</link-to>
+                <link-to codeset="VACCINATION_VIS_VACCINES">52</link-to>
+            </reference>
+            <use-date>
+                <not-before>20250131</not-before>
+            </use-date>
+        </code>
+        <code>
             <value>253088698300005911160720</value>
             <label>Hepatitis B Vaccine VIS</label>
             <code-status>
@@ -1028,6 +1096,26 @@
             </reference>
             <use-date>
                 <not-before>20230512</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>253088698300005911250131</value>
+            <label>Hepatitis B Vaccine VIS</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_VIS_VACCINES">43</link-to>
+                <link-to codeset="VACCINATION_VIS_VACCINES">08</link-to>
+                <link-to codeset="VACCINATION_VIS_VACCINES">104</link-to>
+                <link-to codeset="VACCINATION_VIS_VACCINES">44</link-to>
+                <link-to codeset="VACCINATION_VIS_VACCINES">146</link-to>
+                <link-to codeset="VACCINATION_VIS_VACCINES">189</link-to>
+                <link-to codeset="VACCINATION_VIS_VACCINES">110</link-to>
+                <link-to codeset="VACCINATION_VIS_VACCINES">220</link-to>
+            </reference>
+            <use-date>
+                <not-before>20250131</not-before>
             </use-date>
         </code>
         <code>
@@ -1249,6 +1337,25 @@
             </use-date>
         </code>
         <code>
+            <value>253088698300010311250131</value>
+            <label>Influenza (Flu) Vaccine (Inactivated or Recombinant) VIS</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_VIS_VACCINES">168</link-to>
+                <link-to codeset="VACCINATION_VIS_VACCINES">155</link-to>
+                <link-to codeset="VACCINATION_VIS_VACCINES">140</link-to>
+                <link-to codeset="VACCINATION_VIS_VACCINES">153</link-to>
+                <link-to codeset="VACCINATION_VIS_VACCINES">135</link-to>
+                <link-to codeset="VACCINATION_VIS_VACCINES">320</link-to>
+                <link-to codeset="VACCINATION_VIS_VACCINES">141</link-to>
+            </reference>
+            <use-date>
+                <not-before>20250131</not-before>
+            </use-date>
+        </code>
+        <code>
             <value>253088698300009711210806</value>
             <label>Influenza (Flu) Vaccine (Live, Intranasal) VIS</label>
             <code-status>
@@ -1260,6 +1367,19 @@
             </reference>
             <use-date>
                 <not-before>20210806</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>253088698300009711250131</value>
+            <label>Influenza (Flu) Vaccine (Live, Intranasal) VIS</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_VIS_VACCINES">111</link-to>
+            </reference>
+            <use-date>
+                <not-before>20250131</not-before>
             </use-date>
         </code>
         <code>
@@ -1575,6 +1695,23 @@
             </use-date>
         </code>
         <code>
+            <value>253088698300014111250131</value>
+            <label>Meningococcal ACWY Vaccine VIS</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_VIS_VACCINES">136</link-to>
+                <link-to codeset="VACCINATION_VIS_VACCINES">316</link-to>
+                <link-to codeset="VACCINATION_VIS_VACCINES">328</link-to>
+                <link-to codeset="VACCINATION_VIS_VACCINES">114</link-to>
+                <link-to codeset="VACCINATION_VIS_VACCINES">203</link-to>
+            </reference>
+            <use-date>
+                <not-before>20250131</not-before>
+            </use-date>
+        </code>
+        <code>
             <value>253088698300014111160331</value>
             <label>Meningococcal ACWY Vaccines VIS</label>
             <code-status>
@@ -1633,6 +1770,22 @@
             </use-date>
         </code>
         <code>
+            <value>253088698300030111250131</value>
+            <label>Meningococcal B Vaccine VIS</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_VIS_VACCINES">163</link-to>
+                <link-to codeset="VACCINATION_VIS_VACCINES">316</link-to>
+                <link-to codeset="VACCINATION_VIS_VACCINES">162</link-to>
+                <link-to codeset="VACCINATION_VIS_VACCINES">328</link-to>
+            </reference>
+            <use-date>
+                <not-before>20250131</not-before>
+            </use-date>
+        </code>
+        <code>
             <value>253088698300030111150814</value>
             <label>Meningococcal B VIS</label>
             <code-status>
@@ -1676,6 +1829,19 @@
             </use-date>
         </code>
         <code>
+            <value>253088698300012711250131</value>
+            <label>MMR Vaccine (Measles, Mumps, and Rubella) VIS</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_VIS_VACCINES">03</link-to>
+            </reference>
+            <use-date>
+                <not-before>20250131</not-before>
+            </use-date>
+        </code>
+        <code>
             <value>253088698300012711180212</value>
             <label>MMR Vaccine VIS</label>
             <code-status>
@@ -1699,6 +1865,19 @@
             </reference>
             <use-date>
                 <not-before>20210806</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>253088698300013411250131</value>
+            <label>MMRV Vaccine (Measles, Mumps, Rubella, and Varicella) VIS</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_VIS_VACCINES">94</link-to>
+            </reference>
+            <use-date>
+                <not-before>20250131</not-before>
             </use-date>
         </code>
         <code>
@@ -2055,6 +2234,23 @@
             </use-date>
         </code>
         <code>
+            <value>253088698300017211250131</value>
+            <label>Polio Vaccine VIS</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_VIS_VACCINES">130</link-to>
+                <link-to codeset="VACCINATION_VIS_VACCINES">10</link-to>
+                <link-to codeset="VACCINATION_VIS_VACCINES">110</link-to>
+                <link-to codeset="VACCINATION_VIS_VACCINES">146</link-to>
+                <link-to codeset="VACCINATION_VIS_VACCINES">120</link-to>
+            </reference>
+            <use-date>
+                <not-before>20250131</not-before>
+            </use-date>
+        </code>
+        <code>
             <value>253088698300017211111108</value>
             <label>Polio VIS</label>
             <description></description>
@@ -2311,6 +2507,21 @@
             </use-date>
         </code>
         <code>
+            <value>253088698300060811250131</value>
+            <label>RSV (Respiratory Syncytial Virus) Vaccine VIS</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_VIS_VACCINES">305</link-to>
+                <link-to codeset="VACCINATION_VIS_VACCINES">326</link-to>
+                <link-to codeset="VACCINATION_VIS_VACCINES">303</link-to>
+            </reference>
+            <use-date>
+                <not-before>20250131</not-before>
+            </use-date>
+        </code>
+        <code>
             <value>253088698300030111160809</value>
             <label>Serogroup B Meningococcal Vaccine VIS</label>
             <code-status>
@@ -2378,6 +2589,19 @@
             </use-date>
         </code>
         <code>
+            <value>253088698300053011250131</value>
+            <label>Smallpox-Monkeypox Vaccine VIS</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_VIS_VACCINES">206</link-to>
+            </reference>
+            <use-date>
+                <not-before>20250131</not-before>
+            </use-date>
+        </code>
+        <code>
             <value>253088698300028811210806</value>
             <label>Td (Tetanus, Diphtheria) Vaccine VIS</label>
             <code-status>
@@ -2403,6 +2627,19 @@
             </reference>
             <use-date>
                 <not-before>20210806</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>253088698300027111250131</value>
+            <label>Tdap (Tetanus, Diphtheria, Pertussis) Vaccine VIS</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_VIS_VACCINES">115</link-to>
+            </reference>
+            <use-date>
+                <not-before>20250131</not-before>
             </use-date>
         </code>
         <code>
@@ -2584,6 +2821,19 @@
             </reference>
             <use-date>
                 <not-before>20210806</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>253088698300024011250131</value>
+            <label>Varicella (Chickenpox) Vaccine VIS</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_VIS_VACCINES">21</link-to>
+            </reference>
+            <use-date>
+                <not-before>20250131</not-before>
             </use-date>
         </code>
         <code>
@@ -4726,6 +4976,14 @@
         <code>
             <value>90623</value>
             <label>Meningococcal pentavalent vaccine, conjugated Men A, C, W, Y- tetanus toxoid carrier, and Men B-FHbp, for intramuscular use</label>
+            <description></description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+        </code>
+        <code>
+            <value>90624</value>
+            <label>Meningococcal pentavalent vaccine, Men B-4C recombinant proteins and outer membrane vesicle and conjugated Men A, C, W, Y-diphtheria toxoid carrier, for intramuscular use</label>
             <description></description>
             <code-status>
                 <status>Valid</status>
@@ -16892,6 +17150,7 @@
             </reference>
             <use-date>
                 <not-before>20240326</not-before>
+                <not-after>20241231</not-after>
             </use-date>
         </code>
         <code>
@@ -19085,6 +19344,7 @@
             </reference>
             <use-date>
                 <not-before>20240214</not-before>
+                <not-after>20241231</not-after>
             </use-date>
         </code>
         <code>
@@ -19127,6 +19387,7 @@
             </reference>
             <use-date>
                 <not-before>20240214</not-before>
+                <not-after>20241231</not-after>
             </use-date>
         </code>
         <code>
@@ -21500,6 +21761,90 @@
             </code-status>
         </code>
         <code>
+            <value>50632-0022-04</value>
+            <label>JYNNEOS</label>
+            <description>Bavarian Nordic A/S - Vaccinia, smallpox and monkeypox vaccine, live, non-replicating</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">206</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">BN</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">50632-0022-02</link-to>
+            </reference>
+            <use-date>
+                <not-before>20250214</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>50632-022-04</value>
+            <label>JYNNEOS</label>
+            <description>Bavarian Nordic A/S - Vaccinia, smallpox and monkeypox vaccine, live, non-replicating</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>50632-0022-04</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20250306</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>50632002204</value>
+            <label>JYNNEOS</label>
+            <description>Bavarian Nordic A/S - Vaccinia, smallpox and monkeypox vaccine, live, non-replicating</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>50632-0022-04</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20250306</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>50632-0023-04</value>
+            <label>JYNNEOS</label>
+            <description>Bavarian Nordic A/S - Vaccinia, smallpox and monkeypox vaccine, live, non-replicating</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">206</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">BN</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">50632-0023-02</link-to>
+            </reference>
+            <use-date>
+                <not-before>20250214</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>50632-023-04</value>
+            <label>JYNNEOS</label>
+            <description>Bavarian Nordic A/S - Vaccinia, smallpox and monkeypox vaccine, live, non-replicating</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>50632-0023-04</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20250306</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>50632002304</value>
+            <label>JYNNEOS</label>
+            <description>Bavarian Nordic A/S - Vaccinia, smallpox and monkeypox vaccine, live, non-replicating</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>50632-0023-04</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20250306</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
             <value>58160-0812-43</value>
             <label>KINRIX</label>
             <description>GlaxoSmithKline Biologicals SA - DIPHTHERIA AND TETANUS TOXOIDS AND ACELLULAR PERTUSSIS ADSORBED AND INACTIVATED POLIOVIRUS VACCINE</description>
@@ -23059,6 +23404,90 @@
                     <new-code-value>00069-0332-01</new-code-value>
                     <reason>Use 11-digit format with dashes</reason>
                     <effective-date>20231214</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>58160-0750-03</value>
+            <label>PENMENVY</label>
+            <description>GlaxoSmithKline Biologicals SA - Men A C W Y (oligosaccharide) and Men B vaccine, MenB component</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">328</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">SKB</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">58160-0757-15</link-to>
+            </reference>
+            <use-date>
+                <not-before>20250214</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>58160-750-03</value>
+            <label>PENMENVY</label>
+            <description>GlaxoSmithKline Biologicals SA - Men A C W Y (oligosaccharide) and Men B vaccine, MenB component</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>58160-0750-03</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20250318</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>58160075003</value>
+            <label>PENMENVY</label>
+            <description>GlaxoSmithKline Biologicals SA - Men A C W Y (oligosaccharide) and Men B vaccine, MenB component</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>58160-0750-03</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20250318</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>58160-0730-03</value>
+            <label>PENMENVY</label>
+            <description>GlaxoSmithKline Biologicals SA - Men A C W Y (oligosaccharide) and Men B vaccine, lyophilized MenACWY component</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">328</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">SKB</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">58160-0757-15</link-to>
+            </reference>
+            <use-date>
+                <not-before>20250214</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>58160-730-03</value>
+            <label>PENMENVY</label>
+            <description>GlaxoSmithKline Biologicals SA - Men A C W Y (oligosaccharide) and Men B vaccine, lyophilized MenACWY component</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>58160-0730-03</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20250318</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>58160073003</value>
+            <label>PENMENVY</label>
+            <description>GlaxoSmithKline Biologicals SA - Men A C W Y (oligosaccharide) and Men B vaccine, lyophilized MenACWY component</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>58160-0730-03</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20250318</effective-date>
                 </deprecated>
             </code-status>
         </code>
@@ -26923,6 +27352,48 @@
             </code-status>
         </code>
         <code>
+            <value>50632-0018-04</value>
+            <label>VIMKUNYA</label>
+            <description>Bavarian Nordic A/S - Chikungunya vaccine, VLP, recombinant</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">329</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">BN</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">50632-0018-02</link-to>
+            </reference>
+            <use-date>
+                <not-before>20250301</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>50632-018-04</value>
+            <label>VIMKUNYA</label>
+            <description>Bavarian Nordic A/S - Chikungunya vaccine, VLP, recombinant</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>50632-0018-04</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20250318</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>50632001804</value>
+            <label>VIMKUNYA</label>
+            <description>Bavarian Nordic A/S - Chikungunya vaccine, VLP, recombinant</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>50632-0018-04</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20250318</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
             <value>69401-0000-01</value>
             <label>Vivotif</label>
             <description>PaxVax Berna GmbH - SALMONELLA TYPHI TY21A</description>
@@ -27423,6 +27894,24 @@
             </reference>
             <use-date>
                 <not-before>20231220</not-before>
+            </use-date>
+            <concept-type>vaccine</concept-type>
+        </code>
+        <code>
+            <value>329</value>
+            <label>Chikungunya, VLP, recombinant, 0.8 mL, PF</label>
+            <description>Chikungunya, virus-like particle (VLP), recombinant vaccine, 0.8 mL, preservative free</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINE_GROUP">Chikungunya</link-to>
+                <link-to codeset="VACCINATION_TRADE_NAME">VIMKUNYA</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">50632-0018-04</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">50632-0018-02</link-to>
+            </reference>
+            <use-date>
+                <not-before>20250318</not-before>
             </use-date>
             <concept-type>vaccine</concept-type>
         </code>
@@ -29255,6 +29744,7 @@
                 <link-to codeset="VACCINATION_TRADE_NAME">ENGERIX-B-ADULT</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">58160-0821-01</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">58160-0821-05</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">58160-0821-34</link-to>
             </reference>
             <use-date>
                 <not-before>20000101</not-before>
@@ -31581,6 +32071,26 @@
             <test-age>11 years</test-age>
         </code>
         <code>
+            <value>328</value>
+            <label>Meningococcal oligosaccharide (MenACWY), (MenB), PF</label>
+            <description>Meningococcal oligosaccharide conjugated (groups A, C, W, Y) and group B, 0.5 mL, preservative free Notes: Meningococcal pentavalent vaccine strains ABCW and Y</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINE_GROUP">MENING</link-to>
+                <link-to codeset="VACCINE_GROUP">MeningB</link-to>
+                <link-to codeset="VACCINATION_TRADE_NAME">PENMENVY</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">58160-0750-03</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">58160-0730-03</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">58160-0757-15</link-to>
+            </reference>
+            <use-date>
+                <not-before>20250318</not-before>
+            </use-date>
+            <concept-type>vaccine</concept-type>
+        </code>
+        <code>
             <value>203</value>
             <label>meningococcal polysaccharide (groups A, C, Y, W-135) TT conjugate</label>
             <description>meningococcal polysaccharide (groups A, C, Y, W-135) tetanus toxoid conjugate vaccine .5mL dose, preservative free</description>
@@ -33042,6 +33552,10 @@
                 <link-to codeset="VACCINE_GROUP">Orthopoxvirus</link-to>
                 <link-to codeset="VACCINATION_CPT_CODE">90611</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">50632-0001-03</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">50632-0022-04</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">50632-0023-04</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">50632-0023-02</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">50632-0022-02</link-to>
             </reference>
             <use-date>
                 <not-before>20200720</not-before>
@@ -34197,6 +34711,13 @@
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">50632-0016-04</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">50632-0010-01</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">50632-0016-02</link-to>
+                <link-to codeset="VACCINATION_TRADE_NAME">VIMKUNYA</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">50632-0022-04</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">50632-0023-04</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">50632-0018-04</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">50632-0023-02</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">50632-0022-02</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">50632-0018-02</link-to>
             </reference>
             <use-date>
                 <not-before>20200717</not-before>
@@ -34689,6 +35210,10 @@
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">50090-3781-01</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">58160-0884-52</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">50090-3781-00</link-to>
+                <link-to codeset="VACCINATION_TRADE_NAME">PENMENVY</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">58160-0750-03</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">58160-0730-03</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">58160-0757-15</link-to>
             </reference>
             <use-date>
                 <not-before>20100528</not-before>
@@ -36531,6 +37056,7 @@
             <label>Chikungunya live attenuated vaccine, 0.5 mL, PF</label>
             <reference>
                 <link-to codeset="VACCINATION_CVX_CODE">317</link-to>
+                <link-to codeset="VACCINATION_CVX_CODE">329</link-to>
             </reference>
         </code>
         <code>
@@ -36895,6 +37421,7 @@
                 <link-to codeset="VACCINATION_CVX_CODE">32</link-to>
                 <link-to codeset="VACCINATION_CVX_CODE">203</link-to>
                 <link-to codeset="VACCINATION_CVX_CODE">316</link-to>
+                <link-to codeset="VACCINATION_CVX_CODE">328</link-to>
             </reference>
         </code>
         <code>
@@ -36905,6 +37432,7 @@
                 <link-to codeset="VACCINATION_CVX_CODE">163</link-to>
                 <link-to codeset="VACCINATION_CVX_CODE">162</link-to>
                 <link-to codeset="VACCINATION_CVX_CODE">316</link-to>
+                <link-to codeset="VACCINATION_CVX_CODE">328</link-to>
             </reference>
         </code>
         <code>
@@ -37368,6 +37896,20 @@
             </reference>
             <use-date>
                 <not-before>20231214</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>VIMKUNYA</value>
+            <label>Chikungunya, VLP, recombinant, 0.8 mL, PF</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">329</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">BN</link-to>
+            </reference>
+            <use-date>
+                <not-before>20250318</not-before>
             </use-date>
         </code>
         <code>
@@ -39255,6 +39797,20 @@
             <use-date>
                 <not-before>20100528</not-before>
                 <not-after>20171027</not-after>
+            </use-date>
+        </code>
+        <code>
+            <value>PENMENVY</value>
+            <label>Meningococcal oligosaccharide (MenACWY), (MenB), PF</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">328</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">SKB</link-to>
+            </reference>
+            <use-date>
+                <not-before>20250318</not-before>
             </use-date>
         </code>
         <code>
@@ -48674,6 +49230,7 @@
                 <link-to codeset="VACCINATION_CVX_CODE">174</link-to>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300031811191030</link-to>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300031811241017</link-to>
+                <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300031811250131</link-to>
             </reference>
             <use-date>
                 <not-before>20170706</not-before>
@@ -48964,6 +49521,7 @@
             <reference>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300063911231019</link-to>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300063911241017</link-to>
+                <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300063911250131</link-to>
             </reference>
             <use-date>
                 <not-before>20231019</not-before>
@@ -48978,6 +49536,7 @@
             <reference>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300063911231019</link-to>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300063911241017</link-to>
+                <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300063911250131</link-to>
             </reference>
             <use-date>
                 <not-before>20231019</not-before>
@@ -48991,6 +49550,7 @@
             </code-status>
             <reference>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300046211211217</link-to>
+                <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300046211250131</link-to>
             </reference>
             <use-date>
                 <not-before>20211217</not-before>
@@ -49095,6 +49655,8 @@
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300026411211015</link-to>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300005911230512</link-to>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300026411230724</link-to>
+                <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300005911250131</link-to>
+                <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300017211250131</link-to>
             </reference>
             <use-date>
                 <not-before>20151105</not-before>
@@ -49128,6 +49690,8 @@
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300026411211015</link-to>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300005911230512</link-to>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300026411230724</link-to>
+                <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300005911250131</link-to>
+                <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300017211250131</link-to>
             </reference>
             <use-date>
                 <not-before>20151105</not-before>
@@ -49168,6 +49732,7 @@
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300017211210806</link-to>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300026411211015</link-to>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300026411230724</link-to>
+                <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300017211250131</link-to>
             </reference>
             <use-date>
                 <not-before>20151105</not-before>
@@ -49195,6 +49760,7 @@
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300017211210806</link-to>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300026411211015</link-to>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300026411230724</link-to>
+                <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300017211250131</link-to>
             </reference>
             <use-date>
                 <not-before>20151105</not-before>
@@ -49208,6 +49774,7 @@
             </code-status>
             <reference>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300054711220630</link-to>
+                <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300054711250131</link-to>
             </reference>
             <use-date>
                 <not-before>20220630</not-before>
@@ -49225,6 +49792,7 @@
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300004211160720</link-to>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300004211200728</link-to>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300004211211015</link-to>
+                <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300004211250131</link-to>
             </reference>
             <use-date>
                 <not-before>20160720</not-before>
@@ -49242,6 +49810,7 @@
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300004211160720</link-to>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300004211200728</link-to>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300004211211015</link-to>
+                <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300004211250131</link-to>
             </reference>
             <use-date>
                 <not-before>20160720</not-before>
@@ -49265,6 +49834,8 @@
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300004211211015</link-to>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300005911211015</link-to>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300005911230512</link-to>
+                <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300004211250131</link-to>
+                <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300005911250131</link-to>
             </reference>
             <use-date>
                 <not-before>20160720</not-before>
@@ -49290,6 +49861,7 @@
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300026411211015</link-to>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300005911230512</link-to>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300026411230724</link-to>
+                <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300005911250131</link-to>
             </reference>
             <use-date>
                 <not-before>20151105</not-before>
@@ -49326,6 +49898,7 @@
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300005911190815</link-to>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300005911211015</link-to>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300005911230512</link-to>
+                <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300005911250131</link-to>
             </reference>
             <use-date>
                 <not-before>20160720</not-before>
@@ -49345,6 +49918,7 @@
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300005911190815</link-to>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300005911211015</link-to>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300005911230512</link-to>
+                <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300005911250131</link-to>
             </reference>
             <use-date>
                 <not-before>20160720</not-before>
@@ -49362,6 +49936,7 @@
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300005911190815</link-to>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300005911211015</link-to>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300005911230512</link-to>
+                <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300005911250131</link-to>
             </reference>
             <use-date>
                 <not-before>20160720</not-before>
@@ -49376,6 +49951,7 @@
             <reference>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300005911211015</link-to>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300005911230512</link-to>
+                <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300005911250131</link-to>
             </reference>
             <use-date>
                 <not-before>20211015</not-before>
@@ -49535,6 +50111,7 @@
             </code-status>
             <reference>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300010311210806</link-to>
+                <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300010311250131</link-to>
             </reference>
             <use-date>
                 <not-before>20210806</not-before>
@@ -49571,6 +50148,7 @@
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300010311140819</link-to>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300010311190815</link-to>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300010311210806</link-to>
+                <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300010311250131</link-to>
             </reference>
             <use-date>
                 <not-before>20150807</not-before>
@@ -49589,6 +50167,7 @@
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300010311140819</link-to>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300010311190815</link-to>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300010311210806</link-to>
+                <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300010311250131</link-to>
             </reference>
             <use-date>
                 <not-before>20150807</not-before>
@@ -49655,6 +50234,7 @@
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300010311150807</link-to>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300010311190815</link-to>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300010311210806</link-to>
+                <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300010311250131</link-to>
             </reference>
             <use-date>
                 <not-before>20150807</not-before>
@@ -49737,6 +50317,7 @@
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300010311140819</link-to>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300010311190815</link-to>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300010311210806</link-to>
+                <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300010311250131</link-to>
             </reference>
             <use-date>
                 <not-before>20150807</not-before>
@@ -49756,6 +50337,7 @@
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300010311140819</link-to>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300010311190815</link-to>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300010311210806</link-to>
+                <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300010311250131</link-to>
             </reference>
             <use-date>
                 <not-before>20150807</not-before>
@@ -49775,6 +50357,7 @@
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300010311140819</link-to>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300010311190815</link-to>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300010311210806</link-to>
+                <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300010311250131</link-to>
             </reference>
             <use-date>
                 <not-before>20150807</not-before>
@@ -49813,6 +50396,7 @@
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300009711140819</link-to>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300009711190815</link-to>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300009711210806</link-to>
+                <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300009711250131</link-to>
             </reference>
             <use-date>
                 <not-before>20150807</not-before>
@@ -49836,6 +50420,7 @@
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300017211210806</link-to>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300026411211015</link-to>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300026411230724</link-to>
+                <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300017211250131</link-to>
             </reference>
             <use-date>
                 <not-before>20151105</not-before>
@@ -49865,6 +50450,7 @@
             <reference>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300014111190815</link-to>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300014111210806</link-to>
+                <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300014111250131</link-to>
             </reference>
             <use-date>
                 <not-before>20190815</not-before>
@@ -49879,9 +50465,25 @@
             <reference>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300014111210806</link-to>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300030111210806</link-to>
+                <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300014111250131</link-to>
+                <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300030111250131</link-to>
             </reference>
             <use-date>
                 <not-before>20210806</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>328</value>
+            <label>Meningococcal ACWY Vaccine VIS</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300014111250131</link-to>
+                <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300030111250131</link-to>
+            </reference>
+            <use-date>
+                <not-before>20250131</not-before>
             </use-date>
         </code>
         <code>
@@ -49895,6 +50497,7 @@
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300030111150814</link-to>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300030111190815</link-to>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300030111210806</link-to>
+                <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300030111250131</link-to>
             </reference>
             <use-date>
                 <not-before>20160809</not-before>
@@ -49911,6 +50514,7 @@
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300030111150814</link-to>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300030111190815</link-to>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300030111210806</link-to>
+                <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300030111250131</link-to>
             </reference>
             <use-date>
                 <not-before>20160809</not-before>
@@ -49946,6 +50550,7 @@
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300014111180824</link-to>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300014111190815</link-to>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300014111210806</link-to>
+                <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300014111250131</link-to>
             </reference>
             <use-date>
                 <not-before>20160331</not-before>
@@ -49964,6 +50569,7 @@
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300014111180824</link-to>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300014111190815</link-to>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300014111210806</link-to>
+                <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300014111250131</link-to>
             </reference>
             <use-date>
                 <not-before>20160331</not-before>
@@ -49996,6 +50602,7 @@
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300012711180212</link-to>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300012711190815</link-to>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300012711210806</link-to>
+                <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300012711250131</link-to>
             </reference>
             <use-date>
                 <not-before>20180212</not-before>
@@ -50013,6 +50620,7 @@
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300013411180212</link-to>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300013411190815</link-to>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300013411210806</link-to>
+                <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300013411250131</link-to>
             </reference>
             <use-date>
                 <not-before>20180212</not-before>
@@ -50259,6 +50867,7 @@
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300060811230724</link-to>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300060811231019</link-to>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300060811241017</link-to>
+                <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300060811250131</link-to>
             </reference>
             <use-date>
                 <not-before>20230724</not-before>
@@ -50274,6 +50883,7 @@
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300060811230724</link-to>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300060811231019</link-to>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300060811241017</link-to>
+                <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300060811250131</link-to>
             </reference>
             <use-date>
                 <not-before>20230724</not-before>
@@ -50288,6 +50898,7 @@
             <reference>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300060811231019</link-to>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300060811241017</link-to>
+                <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300060811250131</link-to>
             </reference>
             <use-date>
                 <not-before>20231019</not-before>
@@ -50318,6 +50929,7 @@
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300053011220601</link-to>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300053011220823</link-to>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300053011221114</link-to>
+                <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300053011250131</link-to>
             </reference>
             <use-date>
                 <not-before>20220601</not-before>
@@ -50390,6 +51002,7 @@
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300027111130509</link-to>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300027111200401</link-to>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300027111210806</link-to>
+                <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300027111250131</link-to>
             </reference>
             <use-date>
                 <not-before>20150224</not-before>
@@ -50521,6 +51134,7 @@
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300024011180212</link-to>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300024011190815</link-to>
                 <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300024011210806</link-to>
+                <link-to codeset="VACCINATION_VIS_DOC_TYPE">253088698300024011250131</link-to>
             </reference>
             <use-date>
                 <not-before>20180212</not-before>
@@ -55158,6 +55772,7 @@
                 <link-to codeset="VACCINATION_CVX_CODE">43</link-to>
                 <link-to codeset="VACCINATION_MANUFACTURER_CODE">SKB</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">58160-0821-05</link-to>
+                <link-to codeset="VACCINATION_CVX_CODE">44</link-to>
             </reference>
             <use-date>
                 <not-before>20070328</not-before>
@@ -62466,6 +63081,7 @@
             </reference>
             <use-date>
                 <not-before>20240326</not-before>
+                <not-after>20241231</not-after>
             </use-date>
         </code>
         <code>
@@ -64618,6 +65234,7 @@
             </reference>
             <use-date>
                 <not-before>20240214</not-before>
+                <not-after>20241231</not-after>
             </use-date>
         </code>
         <code>
@@ -64660,6 +65277,7 @@
             </reference>
             <use-date>
                 <not-before>20240214</not-before>
+                <not-after>20241231</not-after>
             </use-date>
         </code>
         <code>
@@ -67202,6 +67820,90 @@
             </code-status>
         </code>
         <code>
+            <value>50632-0023-02</value>
+            <label>JYNNEOS</label>
+            <description>Bavarian Nordic A/S - Vaccinia, smallpox and monkeypox vaccine, live, non-replicating</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">206</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">BN</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">50632-0023-04</link-to>
+            </reference>
+            <use-date>
+                <not-before>20250214</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>50632-023-02</value>
+            <label>JYNNEOS</label>
+            <description>Bavarian Nordic A/S - Vaccinia, smallpox and monkeypox vaccine, live, non-replicating</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>50632-0023-02</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20250306</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>50632002302</value>
+            <label>JYNNEOS</label>
+            <description>Bavarian Nordic A/S - Vaccinia, smallpox and monkeypox vaccine, live, non-replicating</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>50632-0023-02</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20250306</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>50632-0022-02</value>
+            <label>JYNNEOS</label>
+            <description>Bavarian Nordic A/S - Vaccinia, smallpox and monkeypox vaccine, live, non-replicating</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">206</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">BN</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">50632-0022-04</link-to>
+            </reference>
+            <use-date>
+                <not-before>20250214</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>50632-022-02</value>
+            <label>JYNNEOS</label>
+            <description>Bavarian Nordic A/S - Vaccinia, smallpox and monkeypox vaccine, live, non-replicating</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>50632-0022-02</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20250318</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>50632002202</value>
+            <label>JYNNEOS</label>
+            <description>Bavarian Nordic A/S - Vaccinia, smallpox and monkeypox vaccine, live, non-replicating</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>50632-0022-02</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20250318</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
             <value>58160-0812-11</value>
             <label>KINRIX</label>
             <description>GlaxoSmithKline Biologicals SA - DIPHTHERIA AND TETANUS TOXOIDS AND ACELLULAR PERTUSSIS ADSORBED AND INACTIVATED POLIOVIRUS VACCINE</description>
@@ -68967,6 +69669,49 @@
                     <new-code-value>00069-0600-01</new-code-value>
                     <reason>Use 11-digit format with dashes</reason>
                     <effective-date>20231214</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>58160-0757-15</value>
+            <label>PENMENVY</label>
+            <description>GlaxoSmithKline Biologicals SA - MenACWY (oligosaccharide) and Men B, KIT</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">328</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">SKB</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">58160-0750-03</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">58160-0730-03</link-to>
+            </reference>
+            <use-date>
+                <not-before>20250214</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>58160-757-15</value>
+            <label>PENMENVY</label>
+            <description>GlaxoSmithKline Biologicals SA - MenACWY (oligosaccharide) and Men B, KIT</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>58160-0757-15</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20250318</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>58160075715</value>
+            <label>PENMENVY</label>
+            <description>GlaxoSmithKline Biologicals SA - MenACWY (oligosaccharide) and Men B, KIT</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>58160-0757-15</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20250318</effective-date>
                 </deprecated>
             </code-status>
         </code>
@@ -73931,6 +74676,48 @@
                     <new-code-value>00006-4329-03</new-code-value>
                     <reason>Use 11-digit format with dashes</reason>
                     <effective-date>20210816</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>50632-0018-02</value>
+            <label>VIMKUNYA</label>
+            <description>Bavarian Nordic A/S - Chikungunya vaccine, VLP, recombinant</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">329</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">BN</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">50632-0018-04</link-to>
+            </reference>
+            <use-date>
+                <not-before>20250301</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>50632-018-02</value>
+            <label>VIMKUNYA</label>
+            <description>Bavarian Nordic A/S - Chikungunya vaccine, VLP, recombinant</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>50632-0018-02</new-code-value>
+                    <reason>Use full 11-digit format instead of 10-digit format</reason>
+                    <effective-date>20250318</effective-date>
+                </deprecated>
+            </code-status>
+        </code>
+        <code>
+            <value>50632001802</value>
+            <label>VIMKUNYA</label>
+            <description>Bavarian Nordic A/S - Chikungunya vaccine, VLP, recombinant</description>
+            <code-status>
+                <status>Deprecated</status>
+                <deprecated>
+                    <new-code-value>50632-0018-02</new-code-value>
+                    <reason>Use 11-digit format with dashes</reason>
+                    <effective-date>20250318</effective-date>
                 </deprecated>
             </code-status>
         </code>
