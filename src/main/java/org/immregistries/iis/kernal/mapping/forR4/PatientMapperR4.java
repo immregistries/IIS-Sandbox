@@ -425,6 +425,8 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 			p.setMultipleBirth(new IntegerType().setValue(Integer.parseInt(pm.getBirthOrder())));
 		} else if (pm.getBirthFlag().equals(YES)) {
 			p.setMultipleBirth(new BooleanType(true));
+		} else if (pm.getBirthFlag().equals(NO)) {
+			p.setMultipleBirth(new BooleanType(false));
 		}
 		/*
 		 * Publicity
