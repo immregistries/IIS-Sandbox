@@ -50,6 +50,7 @@ public class ImmunizationEvaluationMapperR4 implements IImmunizationEvaluationMa
 				Code cvxCode = codeMap.getCodeForCodeset(CodesetType.VACCINATION_CVX_CODE, cvx);
 				immunizationEvaluation.setTargetDisease(new CodeableConcept().addCoding(new Coding("cvx", cvx, cvxCode.getLabel())));
 			}
+//			immunizationEvaluation.setDoseStatusReason()
 			immunizationEvaluation.setDescription(testEvent.getLabelScreen());
 		} else {
 			return null;
