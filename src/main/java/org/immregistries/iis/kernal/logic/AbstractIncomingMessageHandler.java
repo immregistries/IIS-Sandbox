@@ -413,20 +413,26 @@ public abstract class AbstractIncomingMessageHandler implements IIncomingMessage
 			patientReported.addAddress(modelAddress);
 
 
-			ModelPhone patientPhone = new ModelPhone();
-			patientPhone.setNumber(reader.getValue(13, 6) + reader.getValue(13, 7));
-			patientPhone.setUse(reader.getValue(13, 2));
-			// Logic exported to Patient Processing interceptor
+			for (int i = 1; i <= reader.getRepeatCount(13); i++) {
+				String use = reader.getValueRepeat(13, 2, i);
+				if ("NET".equals(use)) {
+					patientReported.setEmail(reader.getValueRepeat(13, 4, i));
+				} else {
+					ModelPhone patientPhone = new ModelPhone();
+					patientPhone.setNumber(reader.getValueRepeat(13, 6, i) + reader.getValueRepeat(13, 7, i));
+					patientPhone.setUse(use);
+					// Logic exported to Patient Processing interceptor
 //		if (!"PRN".equals(patientPhone.getUse())) {
 //			patientPhone.setUse("");
 //		}
+					patientReported.addPhone(patientPhone);
+				}
+			}
 			patientReported.setEthnicity(reader.getValue(22));
 			patientReported.setBirthFlag(reader.getValue(24));
 			patientReported.setBirthOrder(reader.getValue(25));
 			patientReported.setDeathDate(IIncomingMessageHandler.parseDateWarn(reader.getValue(29), "Invalid patient death date", "PID", 1, 29, strictDate, iisReportableList));
 			patientReported.setDeathFlag(reader.getValue(30));
-			patientReported.setEmail(reader.getValueBySearchingRepeats(13, 4, "NET", 2));
-			patientReported.addPhone(patientPhone);
 		} else {
 			throw new ProcessingException("No PID segment found, required for accepting vaccination report", "", 0, 0);
 		}
