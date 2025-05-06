@@ -2,6 +2,10 @@ package org.immregistries.iis.kernal.model;
 
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.exceptions.FHIRException;
+import org.immregistries.codebase.client.CodeMap;
+import org.immregistries.codebase.client.generated.Code;
+import org.immregistries.codebase.client.reference.CodesetType;
+import org.immregistries.iis.kernal.logic.CodeMapManager;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
 
 import java.util.Objects;
@@ -12,43 +16,8 @@ public class ModelPhone extends AbstractDiffable<ModelPhone> {
 	private String number = "";
 	private String use = "";
 
-	private ModelPhone(org.hl7.fhir.r4.model.ContactPoint contactPoint) {
-		setNumber(contactPoint.getValue());
-		org.hl7.fhir.r4.model.Extension useExtension = contactPoint.getExtensionByUrl(USE_EXTENSION_URL);
-		if (useExtension != null) {
-			org.hl7.fhir.r4.model.Coding coding = MappingHelper.extensionGetCoding(useExtension);
-			if (coding != null && StringUtils.isNotBlank(coding.getCode())) {
-				setUse(coding.getCode());
-			} else {
-				setUse("");
-			}
-		} else if (contactPoint.getUse() != null) {
-			setUse(contactPoint.getUse().toCode());
-		} else {
-			setUse(null);
-		}
-	}
-
-	private ModelPhone(org.hl7.fhir.r5.model.ContactPoint contactPoint) {
-		setNumber(contactPoint.getValue());
-		org.hl7.fhir.r5.model.Extension useExtension = contactPoint.getExtensionByUrl(USE_EXTENSION_URL);
-		if (useExtension != null) {
-			org.hl7.fhir.r5.model.Coding coding = MappingHelper.extensionGetCoding(useExtension);
-			if (coding != null && StringUtils.isNotBlank(coding.getCode())) {
-				setUse(coding.getCode());
-			} else {
-				setUse("");
-			}
-		} else if (contactPoint.getUse() != null) {
-			setUse(contactPoint.getUse().toCode());
-		} else {
-			setUse(null);
-		}
-	}
-
 	public ModelPhone() {
 	}
-
 
 	public String getNumber() {
 		return number;
@@ -70,36 +39,36 @@ public class ModelPhone extends AbstractDiffable<ModelPhone> {
 	public org.hl7.fhir.r4.model.ContactPoint toR4() {
 		org.hl7.fhir.r4.model.ContactPoint contactPoint = new org.hl7.fhir.r4.model.ContactPoint();
 		contactPoint.setSystem(org.hl7.fhir.r4.model.ContactPoint.ContactPointSystem.PHONE)
-			.setValue(number);
+			.setValue(this.getNumber());
+		String use = this.getUse();
 		if (use != null) {
-			switch (use) {
-				case "": {
-					break;
-				}
-				case "PRN":
-				case "ORN":
-				case "VHN": {
-					contactPoint.setUse(org.hl7.fhir.r4.model.ContactPoint.ContactPointUse.HOME);
-					break;
-				}
-				case "WPN": {
-					contactPoint.setUse(org.hl7.fhir.r4.model.ContactPoint.ContactPointUse.WORK);
-					break;
-				}
-				case "PRS": {
-					contactPoint.setUse(org.hl7.fhir.r4.model.ContactPoint.ContactPointUse.MOBILE);
-					break;
-				}
-				default: {
-					try {
-						contactPoint.setUse(org.hl7.fhir.r4.model.ContactPoint.ContactPointUse.fromCode(use));
-					} catch (FHIRException ignored) {
+			try {
+				contactPoint.setUse(org.hl7.fhir.r4.model.ContactPoint.ContactPointUse.fromCode(use));
+			} catch (FHIRException ignored) {
+				CodeMap codeMap = CodeMapManager.getCodeMap();
+				Code useCode = codeMap.getCodeForCodeset(CodesetType.TELECOMMUNICATION_USE, use);
+				if (useCode != null) {
+					contactPoint.addExtension(USE_EXTENSION_URL, new org.hl7.fhir.r4.model.Coding().setSystem(PHONE_USE_V2_SYSTEM).setCode(use));
+					switch (use) {
+						case "": {
+							break;
+						}
+						case "PRN":
+						case "ORN":
+						case "VHN": {
+							contactPoint.setUse(org.hl7.fhir.r4.model.ContactPoint.ContactPointUse.HOME);
+							break;
+						}
+						case "WPN": {
+							contactPoint.setUse(org.hl7.fhir.r4.model.ContactPoint.ContactPointUse.WORK);
+							break;
+						}
+						case "PRS": {
+							contactPoint.setUse(org.hl7.fhir.r4.model.ContactPoint.ContactPointUse.MOBILE);
+							break;
+						}
 					}
-					break;
 				}
-			}
-			if (use != null) {
-				contactPoint.addExtension(USE_EXTENSION_URL, new org.hl7.fhir.r4.model.Coding().setSystem(PHONE_USE_V2_SYSTEM).setCode(use));
 			}
 		}
 		return contactPoint;
@@ -108,36 +77,36 @@ public class ModelPhone extends AbstractDiffable<ModelPhone> {
 	public org.hl7.fhir.r5.model.ContactPoint toR5() {
 		org.hl7.fhir.r5.model.ContactPoint contactPoint = new org.hl7.fhir.r5.model.ContactPoint();
 		contactPoint.setSystem(org.hl7.fhir.r5.model.ContactPoint.ContactPointSystem.PHONE)
-			.setValue(number);
+			.setValue(this.getNumber());
+		String use = this.getUse();
 		if (use != null) {
-			switch (use) {
-				case "": {
-					break;
-				}
-				case "PRN":
-				case "ORN":
-				case "VHN": {
-					contactPoint.setUse(org.hl7.fhir.r5.model.ContactPoint.ContactPointUse.HOME);
-					break;
-				}
-				case "WPN": {
-					contactPoint.setUse(org.hl7.fhir.r5.model.ContactPoint.ContactPointUse.WORK);
-					break;
-				}
-				case "PRS": {
-					contactPoint.setUse(org.hl7.fhir.r5.model.ContactPoint.ContactPointUse.MOBILE);
-					break;
-				}
-				default: {
-					try {
-						contactPoint.setUse(org.hl7.fhir.r5.model.ContactPoint.ContactPointUse.fromCode(use));
-					} catch (FHIRException ignored) {
+			try {
+				contactPoint.setUse(org.hl7.fhir.r5.model.ContactPoint.ContactPointUse.fromCode(use));
+			} catch (FHIRException ignored) {
+				CodeMap codeMap = CodeMapManager.getCodeMap();
+				Code useCode = codeMap.getCodeForCodeset(CodesetType.TELECOMMUNICATION_USE, use);
+				if (useCode != null) {
+					contactPoint.addExtension(USE_EXTENSION_URL, new org.hl7.fhir.r5.model.Coding().setSystem(PHONE_USE_V2_SYSTEM).setCode(use));
+					switch (use) {
+						case "": {
+							break;
+						}
+						case "PRN":
+						case "ORN":
+						case "VHN": {
+							contactPoint.setUse(org.hl7.fhir.r5.model.ContactPoint.ContactPointUse.HOME);
+							break;
+						}
+						case "WPN": {
+							contactPoint.setUse(org.hl7.fhir.r5.model.ContactPoint.ContactPointUse.WORK);
+							break;
+						}
+						case "PRS": {
+							contactPoint.setUse(org.hl7.fhir.r5.model.ContactPoint.ContactPointUse.MOBILE);
+							break;
+						}
 					}
-					break;
 				}
-			}
-			if (use != null) {
-				contactPoint.addExtension(USE_EXTENSION_URL, new org.hl7.fhir.r5.model.Coding().setSystem(PHONE_USE_V2_SYSTEM).setCode(use));
 			}
 		}
 		return contactPoint;
@@ -147,7 +116,22 @@ public class ModelPhone extends AbstractDiffable<ModelPhone> {
 		if (!contactPoint.getSystem().equals(org.hl7.fhir.r4.model.ContactPoint.ContactPointSystem.PHONE)) {
 			return null;
 		} else {
-			return new ModelPhone(contactPoint);
+			ModelPhone modelPhone = new ModelPhone();
+			modelPhone.setNumber(contactPoint.getValue());
+			org.hl7.fhir.r4.model.Extension useExtension = contactPoint.getExtensionByUrl(USE_EXTENSION_URL);
+			if (useExtension != null) {
+				org.hl7.fhir.r4.model.Coding coding = MappingHelper.extensionGetCoding(useExtension);
+				if (coding != null && StringUtils.isNotBlank(coding.getCode())) {
+					modelPhone.setUse(coding.getCode());
+				} else {
+					modelPhone.setUse("");
+				}
+			} else if (contactPoint.getUse() != null) {
+				modelPhone.setUse(contactPoint.getUse().toCode());
+			} else {
+				modelPhone.setUse(null);
+			}
+			return modelPhone;
 		}
 	}
 
@@ -155,7 +139,22 @@ public class ModelPhone extends AbstractDiffable<ModelPhone> {
 		if (!contactPoint.getSystem().equals(org.hl7.fhir.r5.model.ContactPoint.ContactPointSystem.PHONE)) {
 			return null;
 		} else {
-			return new ModelPhone(contactPoint);
+			ModelPhone modelPhone = new ModelPhone();
+			modelPhone.setNumber(contactPoint.getValue());
+			org.hl7.fhir.r5.model.Extension useExtension = contactPoint.getExtensionByUrl(USE_EXTENSION_URL);
+			if (useExtension != null) {
+				org.hl7.fhir.r5.model.Coding coding = MappingHelper.extensionGetCoding(useExtension);
+				if (coding != null && StringUtils.isNotBlank(coding.getCode())) {
+					modelPhone.setUse(coding.getCode());
+				} else {
+					modelPhone.setUse("");
+				}
+			} else if (contactPoint.getUse() != null) {
+				modelPhone.setUse(contactPoint.getUse().toCode());
+			} else {
+				modelPhone.setUse(null);
+			}
+			return modelPhone;
 		}
 	}
 
