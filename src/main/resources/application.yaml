@@ -82,6 +82,7 @@ spring:
       enabled: false
 hapi:
   fhir:
+    app_content_path: "/static/"
     ### This is the FHIR version. Choose between, DSTU2, DSTU3, R4 or R5
     #    HERE R5 selected by default, can be modified with environment variable FHIR_VERSION, OnCondition classes were modified for this override
     fhir_version: '@FHIR_VERSION@'
