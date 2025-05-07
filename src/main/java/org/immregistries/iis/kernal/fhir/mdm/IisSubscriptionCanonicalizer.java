@@ -166,7 +166,7 @@ public class IisSubscriptionCanonicalizer extends SubscriptionCanonicalizer {
 			getExtensionString(subscription, HapiExtensions.EXT_SUBSCRIPTION_PAYLOAD_SEARCH_CRITERIA));
 		retVal.setTags(extractTags(subscription));
 		setPartitionIdOnReturnValue(theSubscription, retVal);
-		retVal.setCrossPartitionEnabled(SubscriptionUtil.isCrossPartition(theSubscription));
+		retVal.setCrossPartitionEnabled(SubscriptionUtil.isDefinedAsCrossPartitionSubcription(theSubscription));
 
 		List<org.hl7.fhir.r4.model.CanonicalType> profiles =
 			subscription.getMeta().getProfile();
@@ -413,7 +413,7 @@ public class IisSubscriptionCanonicalizer extends SubscriptionCanonicalizer {
 		 */
 		if (!subscription.getContained().isEmpty()) {
 			SubscriptionTopic topic = (SubscriptionTopic) subscription.getContained().get(0);
-			retVal.setCrossPartitionEnabled(SubscriptionUtil.isCrossPartition(theSubscription));
+			retVal.setCrossPartitionEnabled(SubscriptionUtil.isDefinedAsCrossPartitionSubcription(theSubscription));
 			if (topic.hasResourceTrigger() && !topic.hasEventTrigger() && topic.getResourceTrigger().size() == 1) {
 				retVal.setTopicSubscription(false);
 				retVal.setCriteriaString(topic.getResourceTrigger().get(0).getQueryCriteria().getCurrent());

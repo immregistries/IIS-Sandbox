@@ -86,7 +86,7 @@ public class ServletHelper {
 		Query query = dataSession.createQuery("from Tenant where organizationName = ?1");
 		query.setParameter(1, facilityName);
 
-		List<Tenant> tenantList = query.list();
+		List<Tenant> tenantList = query.getResultList();
 		if (tenantList.size() > 0) {
 			/**
 			 * Important step verifying authorisation
@@ -158,7 +158,7 @@ public class ServletHelper {
 		Query query = dataSession.createQuery(queryString);
 		query.setParameter(0, username);
 
-		return query.list();
+		return query.getResultList();
 	}
 
 	private static UserAccess registerUserAccessGithub(String username, Session dataSession) {

@@ -1,11 +1,11 @@
 package org.immregistries.iis.kernal.servlet;
 
+import jakarta.persistence.Query;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import org.hibernate.Query;
 import org.hibernate.Session;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.model.MessageReceived;
@@ -83,7 +83,7 @@ public class MessageServlet extends HttpServlet {
           Query query = dataSession.createQuery(
               "from MessageReceived where tenant = :tenant order by reportedDate desc");
           query.setParameter("tenant", tenant);
-          messageReceivedList = query.list();
+			  messageReceivedList = query.getResultList();
         }
 
         if (messageReceivedList.size() == 0) {
