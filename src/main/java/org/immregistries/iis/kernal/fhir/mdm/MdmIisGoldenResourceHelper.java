@@ -36,24 +36,27 @@ public class MdmIisGoldenResourceHelper extends GoldenResourceHelper {
 
 	static final String FIELD_NAME_IDENTIFIER = "identifier";
 
-	@Autowired
-	IMdmSettings myMdmSettings;
+	private final IMdmSettings myMdmSettings;
 
-	@Autowired
-	EIDHelper myEIDHelper;
+	private final EIDHelper myEIDHelper;
 
 	@Autowired
 	IMdmSurvivorshipService myMdmSurvivorshipService;
 
-	@Autowired
-	MdmPartitionHelper myMdmPartitionHelper;
+	private final MdmPartitionHelper myMdmPartitionHelper;
 
 	private final FhirContext myFhirContext;
 
 	@Autowired
-	public MdmIisGoldenResourceHelper(FhirContext theFhirContext) {
-		super(theFhirContext);
+	public MdmIisGoldenResourceHelper(FhirContext theFhirContext,
+												 IMdmSettings theMdmSettings,
+												 EIDHelper theEIDHelper,
+												 MdmPartitionHelper theMdmPartitionHelper) {
+		super(theFhirContext, theMdmSettings, theEIDHelper, theMdmPartitionHelper);
 		myFhirContext = theFhirContext;
+		myMdmSettings = theMdmSettings;
+		myEIDHelper = theEIDHelper;
+		myMdmPartitionHelper = theMdmPartitionHelper;
 	}
 
 	/**
@@ -143,7 +146,7 @@ public class MdmIisGoldenResourceHelper extends GoldenResourceHelper {
 	private void cloneMDMEidsIntoNewGoldenResource(
 		BaseRuntimeChildDefinition theGoldenResourceIdentifier,
 		IAnyResource theIncomingResource,
-		IBase theNewGoldenResource) {
+		IBaseResource theNewGoldenResource) {
 		String incomingResourceType = myFhirContext.getResourceType(theIncomingResource);
 		String mdmEIDSystem = myMdmSettings.getMdmRules().getEnterpriseEIDSystemForResourceType(incomingResourceType);
 
@@ -170,11 +173,11 @@ public class MdmIisGoldenResourceHelper extends GoldenResourceHelper {
 					ourLog.debug(
 						"Incoming resource EID System {} matches EID system in the MDM rules.  Copying to Golden Resource.",
 						incomingIdentifierSystemString);
-					ca.uhn.fhir.util.TerserUtil.cloneEidIntoResource(
+					ca.uhn.fhir.util.TerserUtil.cloneIdentifierIntoResource(
 						myFhirContext,
 						theGoldenResourceIdentifier,
 						incomingResourceIdentifier,
-						theNewGoldenResource);
+						(IBaseResource) theNewGoldenResource);
 				} else {
 					ourLog.debug(
 						"Incoming resource EID System {} differs from EID system in the MDM rules {}.  Not copying to Golden Resource.",

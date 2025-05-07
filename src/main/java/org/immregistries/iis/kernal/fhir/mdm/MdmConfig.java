@@ -7,6 +7,8 @@ import ca.uhn.fhir.jpa.topic.SubscriptionTopicConfig;
 import ca.uhn.fhir.mdm.api.IMdmSettings;
 import ca.uhn.fhir.mdm.rules.config.MdmRuleValidator;
 import ca.uhn.fhir.mdm.rules.config.MdmSettings;
+import ca.uhn.fhir.mdm.util.EIDHelper;
+import ca.uhn.fhir.mdm.util.MdmPartitionHelper;
 import com.google.common.base.Charsets;
 import org.apache.commons.io.IOUtils;
 import org.immregistries.iis.kernal.fhir.common.AppProperties;
@@ -27,8 +29,11 @@ public class MdmConfig {
 
 	@Primary
 	@Bean
-	MdmIisGoldenResourceHelper customGoldenResourceHelper(FhirContext theFhirContext) {
-		MdmIisGoldenResourceHelper mdmIisGoldenResourceHelper = new MdmIisGoldenResourceHelper(theFhirContext);
+	MdmIisGoldenResourceHelper customGoldenResourceHelper(FhirContext theFhirContext,
+																			IMdmSettings theMdmSettings,
+																			EIDHelper theEIDHelper,
+																			MdmPartitionHelper theMdmPartitionHelper) {
+		MdmIisGoldenResourceHelper mdmIisGoldenResourceHelper = new MdmIisGoldenResourceHelper(theFhirContext, theMdmSettings, theEIDHelper, theMdmPartitionHelper);
 		autowireCapableBeanFactory.autowireBean(mdmIisGoldenResourceHelper);
 		return mdmIisGoldenResourceHelper;
 	}

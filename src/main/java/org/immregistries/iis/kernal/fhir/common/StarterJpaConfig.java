@@ -6,11 +6,11 @@ import ca.uhn.fhir.batch2.model.JobDefinition;
 import ca.uhn.fhir.context.ConfigurationException;
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.jpa.api.IDaoRegistry;
+import ca.uhn.fhir.jpa.api.config.JpaStorageSettings;
 import ca.uhn.fhir.jpa.api.config.ThreadPoolFactoryConfig;
 import ca.uhn.fhir.jpa.api.dao.IFhirSystemDao;
 import ca.uhn.fhir.jpa.config.util.HapiEntityManagerFactoryUtil;
 import ca.uhn.fhir.jpa.config.util.ResourceCountCacheUtil;
-import ca.uhn.fhir.jpa.config.util.ValidationSupportConfigUtil;
 import ca.uhn.fhir.jpa.dao.FulltextSearchSvcImpl;
 import ca.uhn.fhir.jpa.dao.IFulltextSearchSvc;
 import ca.uhn.fhir.jpa.dao.search.HSearchSortHelperImpl;
@@ -29,7 +29,7 @@ import ca.uhn.fhir.rest.server.interceptor.CorsInterceptor;
 import ca.uhn.fhir.rest.server.interceptor.LoggingInterceptor;
 import ca.uhn.fhir.rest.server.util.ISearchParamRegistry;
 import jakarta.persistence.EntityManagerFactory;
-import org.hl7.fhir.common.hapi.validation.support.CachingValidationSupport;
+import org.hl7.fhir.common.hapi.validation.support.ValidationSupportChain;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnCorsPresent;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnImplementationGuidesPresent;
 import org.immregistries.iis.kernal.fhir.common.validation.IRepositoryValidationInterceptorFactory;
@@ -75,8 +75,8 @@ public class StarterJpaConfig {
 
 	@Primary
 	@Bean
-	public CachingValidationSupport validationSupportChain(JpaValidationSupportChain theJpaValidationSupportChain) {
-		return ValidationSupportConfigUtil.newCachingValidationSupport(theJpaValidationSupportChain);
+	public ValidationSupportChain validationSupportChain(JpaValidationSupportChain theJpaValidationSupportChain) {
+		return new ValidationSupportChain(theJpaValidationSupportChain); // TODO improve, compare to starter config on github
 	}
 
 	/**
@@ -104,8 +104,13 @@ public class StarterJpaConfig {
 
 	@Primary
 	@Bean
-	public LocalContainerEntityManagerFactoryBean entityManagerFactory(DataSource myDataSource, ConfigurableListableBeanFactory myConfigurableListableBeanFactory, FhirContext theFhirContext) {
-		LocalContainerEntityManagerFactoryBean retVal = HapiEntityManagerFactoryUtil.newEntityManagerFactory(myConfigurableListableBeanFactory, theFhirContext);
+	public LocalContainerEntityManagerFactoryBean entityManagerFactory(
+		DataSource myDataSource,
+		ConfigurableListableBeanFactory myConfigurableListableBeanFactory,
+		FhirContext theFhirContext,
+		JpaStorageSettings theStorageSettings) {
+		LocalContainerEntityManagerFactoryBean retVal = HapiEntityManagerFactoryUtil.newEntityManagerFactory(
+			myConfigurableListableBeanFactory, theFhirContext, theStorageSettings);
 		retVal.setPersistenceUnitName("HAPI_PU");
 
 		try {
@@ -113,7 +118,8 @@ public class StarterJpaConfig {
 		} catch (Exception e) {
 			throw new ConfigurationException("Could not set the data source due to a configuration issue", e);
 		}
-		retVal.setJpaProperties(EnvironmentHelper.getHibernateProperties(configurableEnvironment, myConfigurableListableBeanFactory));
+		retVal.setJpaProperties(
+			EnvironmentHelper.getHibernateProperties(configurableEnvironment, myConfigurableListableBeanFactory));
 		return retVal;
 	}
 

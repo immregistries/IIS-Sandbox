@@ -3,6 +3,7 @@ package org.immregistries.iis.kernal.fhir.mdm;
 import ca.uhn.fhir.context.ConfigurationException;
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.i18n.Msg;
+import ca.uhn.fhir.interceptor.api.IInterceptorBroadcaster;
 import ca.uhn.fhir.jpa.api.config.JpaStorageSettings;
 import ca.uhn.fhir.mdm.api.IMdmControllerSvc;
 import ca.uhn.fhir.mdm.api.IMdmSettings;
@@ -38,6 +39,9 @@ public class MdmIisProviderLoader extends MdmProviderLoader {
 	@Autowired
 	AutowireCapableBeanFactory autowireCapableBeanFactory;
 
+	@Autowired
+	IInterceptorBroadcaster myIInterceptorBroadcaster;
+
 	private BaseMdmProvider myMdmProvider;
 	@Override
 	public void loadProvider() {
@@ -46,13 +50,13 @@ public class MdmIisProviderLoader extends MdmProviderLoader {
 			case R4:
 			case R5:
 				this.myResourceProviderFactory.addSupplier(() -> {
-					MdmIisProvider mdmIisProvider = new MdmIisProvider(this.myFhirContext, this.myMdmControllerSvc, this.myMdmControllerHelper, this.myMdmSubmitSvc, this.myMdmSettings);
+					MdmIisProvider mdmIisProvider = new MdmIisProvider(this.myFhirContext, this.myMdmControllerSvc, this.myMdmControllerHelper, this.myMdmSubmitSvc, this.myIInterceptorBroadcaster, this.myMdmSettings);
 					autowireCapableBeanFactory.autowireBean(mdmIisProvider);
 					return mdmIisProvider;
 				});
 				if (this.myStorageSettings.isNonResourceDbHistoryEnabled()) {
 					this.myResourceProviderFactory.addSupplier(() -> {
-						return new MdmLinkHistoryProviderDstu3Plus(this.myFhirContext, this.myMdmControllerSvc);
+						return new MdmLinkHistoryProviderDstu3Plus(this.myFhirContext, this.myMdmControllerSvc, this.myIInterceptorBroadcaster);
 					});
 				}
 

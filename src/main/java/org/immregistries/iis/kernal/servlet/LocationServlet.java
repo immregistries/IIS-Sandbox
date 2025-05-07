@@ -421,7 +421,7 @@ public class LocationServlet extends HttpServlet {
 			Query query = dataSession.createQuery(
 				"from ObservationReported where patientReported = :patientReported and vaccinationReported is null");
 			query.setParameter("patientReported", patientReportedSelected);
-			observationReportedList = query.list();
+			observationReportedList = query.getResultList();
 			Set<String> suppressSet = LoincIdentifier.getSuppressIdentifierCodeSet();
 			for (Iterator<ObservationReported> it = observationReportedList.iterator(); it.hasNext(); ) {
 				ObservationReported observationReported = it.next();

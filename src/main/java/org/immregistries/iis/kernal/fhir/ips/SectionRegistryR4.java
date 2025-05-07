@@ -1,19 +1,21 @@
 package org.immregistries.iis.kernal.fhir.ips;
 
-import ca.uhn.fhir.jpa.ips.api.SectionRegistry;
+//import ca.uhn.fhir.jpa.ips.api.SectionRegistry;
 
-public class SectionRegistryR4 extends SectionRegistry {
+public class SectionRegistryR4
+//	extends SectionRegistry
+{
 
-	@Override
+//	@Override
 	/**
 	 * Add the various sections to the registry in order. overridden for
 	 * customization.
 	 */
 	protected void addSections() {
-		addSectionAllergyIntolerance();
-		addSectionMedicationSummary();
-		addSectionProblemList();
-		addSectionImmunizations();
+//		addSectionAllergyIntolerance();
+//		addSectionMedicationSummary();
+//		addSectionProblemList();
+//		addSectionImmunizations();
 //		addSectionProcedures();
 //		addSectionMedicalDevices();
 //		addSectionDiagnosticResults();

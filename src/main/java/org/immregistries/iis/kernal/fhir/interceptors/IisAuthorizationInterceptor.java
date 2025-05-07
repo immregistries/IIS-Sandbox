@@ -177,14 +177,14 @@ public class IisAuthorizationInterceptor extends AuthorizationInterceptor {
 		String tenantId = theRequestDetails.getTenantId();
 		UserAccess userAccess;
 		String queryString = "from UserAccess where accessName = ?0";
-		org.hibernate.Query query = dataSession.createQuery(queryString);
+		Query query = dataSession.createQuery(queryString);
 		query.setParameter(0, CONNECTATHON_USER);
-		Iterator<UserAccess> userAccessIterator = query.iterate();
+		Iterator<UserAccess> userAccessIterator = query.getResultStream().iterator(); // TODO TODO test
 		if (userAccessIterator.hasNext()) {
 			userAccess = userAccessIterator.next();
 			Query queryTenant = dataSession.createQuery("from Tenant where organizationName = ?1");
 			queryTenant.setParameter(1, CONNECTATHON_USER);
-			Iterator<Tenant> tenantIterator = queryTenant.iterate();
+			Iterator<Tenant> tenantIterator = queryTenant.getResultStream().iterator(); // TODO TODO verify
 			if (tenantIterator.hasNext()) {
 				Tenant tenant = tenantIterator.next();
 				theRequestDetails.setAttribute(SESSION_USER_ACCESS, userAccess);
