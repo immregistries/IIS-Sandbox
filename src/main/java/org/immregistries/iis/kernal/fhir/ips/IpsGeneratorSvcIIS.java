@@ -20,7 +20,6 @@ import ca.uhn.fhir.narrative.CustomThymeleafNarrativeGenerator;
 import ca.uhn.fhir.rest.api.server.IBundleProvider;
 import ca.uhn.fhir.rest.api.server.RequestDetails;
 import ca.uhn.fhir.rest.param.ReferenceParam;
-import ca.uhn.fhir.rest.param.StringParam;
 import ca.uhn.fhir.rest.param.TokenParam;
 import ca.uhn.fhir.util.BundleBuilder;
 import ca.uhn.fhir.util.CompositionBuilder;
@@ -28,12 +27,10 @@ import ca.uhn.fhir.util.ResourceReferenceInfo;
 import ca.uhn.fhir.util.ValidateUtil;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
-import org.hl7.fhir.Parameters;
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import org.hl7.fhir.instance.model.api.*;
-//import org.hl7.fhir.r4.model.*;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.*;
 import java.util.stream.Collectors;
 

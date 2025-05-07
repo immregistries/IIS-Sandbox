@@ -1,5 +1,9 @@
 package org.immregistries.iis.kernal.fhir.security;
 
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import org.hibernate.Session;
 import org.immregistries.iis.kernal.model.Tenant;
 import org.slf4j.Logger;
@@ -9,10 +13,6 @@ import org.springframework.security.oauth2.client.authentication.OAuth2Authentic
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.io.IOException;
 
 import static org.immregistries.iis.kernal.fhir.security.ServletHelper.GITHUB_PREFIX;

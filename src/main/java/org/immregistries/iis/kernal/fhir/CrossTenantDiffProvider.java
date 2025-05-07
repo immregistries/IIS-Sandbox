@@ -9,13 +9,13 @@ import ca.uhn.fhir.jpa.provider.DiffProvider;
 import ca.uhn.fhir.rest.api.server.RequestDetails;
 import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
 import com.google.common.base.Objects;
+import jakarta.annotation.Nonnull;
 import org.hl7.fhir.instance.model.api.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Nonnull;
 import java.util.Comparator;
 
 @Service

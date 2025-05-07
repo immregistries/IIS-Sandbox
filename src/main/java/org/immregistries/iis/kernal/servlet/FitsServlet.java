@@ -1,5 +1,9 @@
 package org.immregistries.iis.kernal.servlet;
 
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
@@ -10,10 +14,6 @@ import org.immregistries.vfa.connect.IISConnector.ParseDebugLine;
 import org.immregistries.vfa.connect.model.*;
 import org.immregistries.vfa.connect.util.ForecastResultPrinter;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;

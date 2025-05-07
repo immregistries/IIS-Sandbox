@@ -7,14 +7,14 @@ import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.jpa.patch.FhirPatch;
 import ca.uhn.fhir.parser.path.EncodeContextPath;
 import ca.uhn.fhir.util.ParametersUtil;
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import org.apache.commons.lang3.Validate;
 import org.hl7.fhir.instance.model.api.*;
 import org.hl7.fhir.utilities.xhtml.XhtmlNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.*;
 
 import static org.immregistries.iis.kernal.fhir.CrossTenantDiffProvider.extensionUrlSimilarityComparator;

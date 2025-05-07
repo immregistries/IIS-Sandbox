@@ -1,6 +1,6 @@
 package org.immregistries.iis.kernal.servlet.deprecated;
 
-import javax.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServlet;
 
 /**
  * Deprecated, and only working with R5
