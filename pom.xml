@@ -138,7 +138,7 @@
         <dependency>
             <groupId>org.immregistries</groupId>
             <artifactId>smm-tester</artifactId>
-            <version>2.37.1</version>
+            <version>3.1.0</version>
             <classifier>client</classifier>
             <exclusions>
                 <exclusion>
