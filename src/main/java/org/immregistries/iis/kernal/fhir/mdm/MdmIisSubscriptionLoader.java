@@ -93,9 +93,11 @@ public class MdmIisSubscriptionLoader extends MdmSubscriptionLoader {
 		}
 		// After loading all the subscriptions, sync the subscriptions to the registry.
 		if (subscriptions != null && subscriptions.size() > 0) {
-			mySubscriptionTopicLoader.syncDatabaseToCache();
+			if (mySubscriptionTopicLoader != null) { // temp fix TODO adapt new version of loader
+				mySubscriptionTopicLoader.syncDatabaseToCache();
+				mySubscriptionTopicLoader.registerListener();
+			}
 			mySubscriptionLoader.syncDatabaseToCache();
-			mySubscriptionTopicLoader.registerListener();
 		}
 	}
 

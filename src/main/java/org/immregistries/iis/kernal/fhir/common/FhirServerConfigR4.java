@@ -18,4 +18,52 @@ import org.springframework.context.annotation.Import;
 	ServerConfig.class,
 })
 public class FhirServerConfigR4 {
+//
+//	@Bean(name = "myHybridRemoteValidationSupportChain")
+//	@Conditional({OnR4Condition.class, OnRemoteTerminologyPresent.class})
+//	public IValidationSupport addRemoteValidation(
+//		ValidationSupportChain theValidationSupport, FhirContext theFhirContext, AppProperties theAppProperties) {
+//		var values = theAppProperties.getRemoteTerminologyServicesMap().values();
+//
+//		// If the remote terminology service is "*" and is the only one then forward all requests to the remote
+//		// terminology service
+//		if (values.size() == 1 && "*".equalsIgnoreCase(values.iterator().next().getSystem())) {
+//			var remoteSystem = values.iterator().next();
+//			theValidationSupport.addValidationSupport(
+//				0, new RemoteTerminologyServiceValidationSupport(theFhirContext, remoteSystem.getUrl()));
+//			return theValidationSupport;
+//
+//			// If there are multiple remote terminology services, then add each one to the validation chain
+//		} else {
+//			values.forEach((remoteSystem) -> theValidationSupport.addValidationSupport(
+//				0, new RemoteTerminologyServiceValidationSupport(theFhirContext, remoteSystem.getUrl()) {
+//					@Override
+//					public boolean isCodeSystemSupported(
+//						ValidationSupportContext theValidationSupportContext, String theSystem) {
+//						return remoteSystem.getSystem().equalsIgnoreCase(theSystem);
+//					}
+//
+//					@Override
+//					public CodeValidationResult validateCode(
+//						ValidationSupportContext theValidationSupportContext,
+//						ConceptValidationOptions theOptions,
+//						String theCodeSystem,
+//						String theCode,
+//						String theDisplay,
+//						String theValueSetUrl) {
+//						if (remoteSystem.getSystem().equalsIgnoreCase(theCodeSystem)) {
+//							return super.validateCode(
+//								theValidationSupportContext,
+//								theOptions,
+//								theCodeSystem,
+//								theCode,
+//								theDisplay,
+//								theValueSetUrl);
+//						}
+//						return null;
+//					}
+//				}));
+//		}
+//		return theValidationSupport;
+//	}
 }

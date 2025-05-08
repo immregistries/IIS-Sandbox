@@ -23,13 +23,11 @@ import ca.uhn.fhir.jpa.search.DatabaseBackedPagingProvider;
 import ca.uhn.fhir.jpa.search.IStaleSearchDeletingSvc;
 import ca.uhn.fhir.jpa.search.StaleSearchDeletingSvcImpl;
 import ca.uhn.fhir.jpa.util.ResourceCountCache;
-import ca.uhn.fhir.jpa.validation.JpaValidationSupportChain;
 import ca.uhn.fhir.rest.api.IResourceSupportedSvc;
 import ca.uhn.fhir.rest.server.interceptor.CorsInterceptor;
 import ca.uhn.fhir.rest.server.interceptor.LoggingInterceptor;
 import ca.uhn.fhir.rest.server.util.ISearchParamRegistry;
 import jakarta.persistence.EntityManagerFactory;
-import org.hl7.fhir.common.hapi.validation.support.ValidationSupportChain;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnCorsPresent;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnImplementationGuidesPresent;
 import org.immregistries.iis.kernal.fhir.common.validation.IRepositoryValidationInterceptorFactory;
@@ -73,11 +71,11 @@ public class StarterJpaConfig {
 		return new StaleSearchDeletingSvcImpl();
 	}
 
-	@Primary
-	@Bean
-	public ValidationSupportChain validationSupportChain(JpaValidationSupportChain theJpaValidationSupportChain) {
-		return new ValidationSupportChain(theJpaValidationSupportChain); // TODO improve, compare to starter config on github
-	}
+//	@Primary
+//	@Bean
+//	public ValidationSupportChain validationSupportChain(JpaValidationSupportChain theJpaValidationSupportChain) {
+//		return new ValidationSupportChain(theJpaValidationSupportChain); // TODO improve, compare to starter config on github
+//	}
 
 	/**
 	 * Customize the default/max page sizes for search results. You can set these however

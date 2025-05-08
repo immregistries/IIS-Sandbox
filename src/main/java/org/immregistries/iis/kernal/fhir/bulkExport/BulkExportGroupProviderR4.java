@@ -24,6 +24,7 @@ import ca.uhn.fhir.rest.param.TokenParam;
 import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
 import ca.uhn.fhir.rest.server.servlet.ServletRequestDetails;
 import ca.uhn.fhir.util.JsonUtil;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Session;
@@ -123,7 +124,7 @@ public class BulkExportGroupProviderR4 extends GroupResourceProvider implements 
 			for (Group.GroupMemberComponent member : group.getMember()) {
 				if (member.getEntity().getReference().split("/")[0].equals("Patient")) {
 					Bundle patientBundle = new Bundle();
-					IBundleProvider bundleProvider = patientProvider.patientInstanceEverything(theRequestDetails.getServletRequest(), new IdType(member.getEntity().getReference()), theCount, theOffset, theLastUpdated, theContent, theNarrative, theFilter, theTypes, theSortSpec, theRequestDetails);
+					IBundleProvider bundleProvider = patientProvider.patientInstanceEverything(theRequestDetails.getServletRequest(), new IdType(member.getEntity().getReference()), theCount, theOffset, theLastUpdated, theContent, theNarrative, theFilter, theTypes, new BooleanType(true), theSortSpec, theRequestDetails);
 					for (IBaseResource resource : bundleProvider.getAllResources()) {
 						patientBundle.addEntry().setResource((Resource) resource);
 					}
@@ -183,7 +184,7 @@ public class BulkExportGroupProviderR4 extends GroupResourceProvider implements 
 		ServletRequestDetails theRequestDetails
 	) throws IOException {
 		Session dataSession = ServletHelper.getDataSession();
-		javax.servlet.http.HttpServletRequest theServletRequest = theRequestDetails.getServletRequest();
+		HttpServletRequest theServletRequest = theRequestDetails.getServletRequest();
 		logger.info("Parameters {}", (Object) theRequestDetails.getParameters().get("_elements"));
 		try {
 
@@ -202,7 +203,7 @@ public class BulkExportGroupProviderR4 extends GroupResourceProvider implements 
 					Bundle memberBundle = new Bundle();
 					// TODO add normal filter for type filter
 					try {
-						IBundleProvider bundleProvider = patientProvider.patientInstanceEverything(theServletRequest, new IdType(member.getEntity().getReference()), theCount, theOffset, theLastUpdated, theContent, theNarrative, theFilter, theTypes, theSortSpec, theRequestDetails);
+						IBundleProvider bundleProvider = patientProvider.patientInstanceEverything(theServletRequest, new IdType(member.getEntity().getReference()), theCount, theOffset, theLastUpdated, theContent, theNarrative, theFilter, theTypes, new BooleanType(true), theSortSpec, theRequestDetails);
 						for (IBaseResource resource : bundleProvider.getAllResources()) {
 							bundleMap.putIfAbsent(resource.fhirType(), new Bundle());
 							bundleMap.get(resource.fhirType()).addEntry().setResource((Resource) resource);
