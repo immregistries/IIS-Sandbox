@@ -154,9 +154,9 @@ public class ServletHelper {
 	}
 
 	private static List<UserAccess> queryUserAccessWithUsername(String username, Session dataSession) {
-		String queryString = "from UserAccess where accessName = ?0";
+		String queryString = "from UserAccess where accessName = ?1";
 		Query query = dataSession.createQuery(queryString);
-		query.setParameter(0, username);
+		query.setParameter(1, username);
 
 		return query.getResultList();
 	}

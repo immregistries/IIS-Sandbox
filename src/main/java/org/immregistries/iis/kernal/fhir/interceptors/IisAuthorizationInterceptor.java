@@ -176,9 +176,9 @@ public class IisAuthorizationInterceptor extends AuthorizationInterceptor {
 	private IAuthRuleFinished connectathonUserAuthorized(RequestDetails theRequestDetails, Session dataSession) {
 		String tenantId = theRequestDetails.getTenantId();
 		UserAccess userAccess;
-		String queryString = "from UserAccess where accessName = ?0";
+		String queryString = "from UserAccess where accessName = ?1";
 		Query query = dataSession.createQuery(queryString);
-		query.setParameter(0, CONNECTATHON_USER);
+		query.setParameter(1, CONNECTATHON_USER);
 		Iterator<UserAccess> userAccessIterator = query.getResultStream().iterator(); // TODO TODO test
 		if (userAccessIterator.hasNext()) {
 			userAccess = userAccessIterator.next();

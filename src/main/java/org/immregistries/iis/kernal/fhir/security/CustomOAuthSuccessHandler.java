@@ -32,7 +32,7 @@ public class CustomOAuthSuccessHandler implements AuthenticationSuccessHandler {
 	@Override
 	public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
 		logger.info("Authentication success {}",authentication);
-		String queryString = "from UserAccess where accessName = ?0";
+		String queryString = "from UserAccess where accessName = ?1";
 //		UserAccess userAccess = null;
 		Tenant tenant = null;
 		if (authentication instanceof OAuth2AuthenticationToken) {

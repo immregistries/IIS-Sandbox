@@ -1,6 +1,5 @@
 package org.immregistries.iis.kernal.servlet;
 
-import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -17,7 +16,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 
-import static org.immregistries.iis.kernal.fhir.interceptors.PartitionCreationInterceptor.PARTITION_NAME_SEPARATOR;
 import static org.immregistries.iis.kernal.fhir.security.ServletHelper.SESSION_TENANT;
 
 /**
@@ -51,9 +49,9 @@ public class TenantController {
 		UserAccess userAccess = ServletHelper.getUserAccess();
 		try (Session dataSession = ServletHelper.getDataSession()) {
 			if (StringUtils.isNotBlank(tenantName)) {
-				if (tenantName.indexOf(PARTITION_NAME_SEPARATOR) > 0) {
-					throw new InvalidRequestException("Invalid tenant name , should not use -");
-				}
+//				if (tenantName.indexOf(PARTITION_NAME_SEPARATOR) > 0) {
+//					throw new InvalidRequestException("Invalid tenant name , should not use " + PARTITION_NAME_SEPARATOR);
+//				}
 				ServletHelper.authenticateTenant(userAccess, tenantName, dataSession);
 			}
 		}
@@ -83,8 +81,8 @@ public class TenantController {
 			Tenant tenant = ServletHelper.getTenant();
 			UserAccess userAccess = ServletHelper.getUserAccess();
 			if (userAccess != null && session != null) {
-				Query<Tenant> query = dataSession.createQuery("from Tenant where userAccess=?0 order by organizationName", Tenant.class);
-				query.setParameter(0, userAccess);
+				Query<Tenant> query = dataSession.createQuery("from Tenant where userAccess=?1 order by organizationName", Tenant.class);
+				query.setParameter(1, userAccess);
 				List<Tenant> tenantList = query.list();
 				for (Tenant tenantMember : tenantList) {
 					if (ACTION_SWITCH.equals(action) && String.valueOf(tenantMember.getOrgId()).equals(tenantId)) {
