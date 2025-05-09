@@ -170,8 +170,12 @@ public class ServletHelper {
 		userAccess.setAccessName(username);
 		userAccess.setAccessKey("");
 		Transaction transaction = dataSession.beginTransaction();
-		userAccess.setUserAccessId((Integer) dataSession.save(userAccess));
-		transaction.commit();
+		try {
+			userAccess.setUserAccessId((Integer) dataSession.save(userAccess));
+		} finally {
+			transaction.commit();
+		}
+
 		return userAccess;
 	}
 	private static UserAccess registerUserAccessWithUsernamePassword(String username, String password, Session dataSession) {
@@ -183,8 +187,11 @@ public class ServletHelper {
 //      userAccess.setAccessKey(BCrypt.hashpw(password, BCrypt.gensalt(5))); TODO after auth checks fix in fhir
 		userAccess.setAccessKey(password);
 		Transaction transaction = dataSession.beginTransaction();
-		userAccess.setUserAccessId((Integer) dataSession.save(userAccess));
-		transaction.commit();
+		try {
+			userAccess.setUserAccessId((Integer) dataSession.save(userAccess));
+		} finally {
+			transaction.commit();
+		}
 		return userAccess;
 	}
 

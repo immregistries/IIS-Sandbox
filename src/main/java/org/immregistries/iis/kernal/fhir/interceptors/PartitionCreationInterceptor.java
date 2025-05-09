@@ -13,15 +13,12 @@ import ca.uhn.fhir.jpa.partition.IPartitionLookupSvc;
 import ca.uhn.fhir.rest.api.server.RequestDetails;
 import ca.uhn.fhir.rest.api.server.SystemRequestDetails;
 import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
-import ca.uhn.fhir.rest.server.exceptions.ResourceGoneException;
 import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
 import ca.uhn.fhir.rest.server.interceptor.partition.RequestTenantPartitionInterceptor;
 import jakarta.annotation.Nonnull;
 import jakarta.interceptor.Interceptor;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.instance.model.api.IBaseResource;
-import org.hl7.fhir.r5.model.SubscriptionTopic;
-import org.immregistries.iis.kernal.servlet.SubscriptionTopicController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -119,21 +116,20 @@ public class PartitionCreationInterceptor extends RequestTenantPartitionIntercep
 
 	private RequestPartitionId createPartition(String tenantName) {
 		int idAttempt = partitionLookupSvc.generateRandomUnusedPartitionId();
-		partitionLookupSvc.createPartition(new PartitionEntity().setName(tenantName).setId(idAttempt), new SystemRequestDetails());
+		PartitionEntity partitionEntity = partitionLookupSvc.createPartition(new PartitionEntity().setName(tenantName).setId(idAttempt), new SystemRequestDetails());
 
 		//Create subscription topics
 		if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R5)) {
 			if (mySubscriptionTopicDao == null) {
 				mySubscriptionTopicDao = myDaoRegistry.getResourceDao("SubscriptionTopic");
 			}
-			RequestDetails requestDetails = new SystemRequestDetails();
-			requestDetails.setTenantId(tenantName);
-			SubscriptionTopic topic = SubscriptionTopicController.getDataQualityIssuesSubscriptionTopic();
-			try {
-				mySubscriptionTopicDao.read(topic.getIdElement(), requestDetails);
-			} catch (ResourceNotFoundException | ResourceGoneException e) {
-				mySubscriptionTopicDao.update(topic, requestDetails);
-			}
+//			RequestDetails requestDetails =  SystemRequestDetails.forRequestPartitionId(partitionEntity.toRequestPartitionId());
+//			SubscriptionTopic topic = SubscriptionTopicController.getDataQualityIssuesSubscriptionTopic();
+//			try {
+//				mySubscriptionTopicDao.read(topic.getIdElement(), requestDetails);
+//			} catch (ResourceNotFoundException | ResourceGoneException e) {
+//				mySubscriptionTopicDao.update(topic, requestDetails);
+//			}
 			//		SubscriptionTopic groupTopic = SubscriptionTopicController.getGroupSubscriptionTopic();
 	//		try {
 	//			mySubscriptionTopicDao.read(groupTopic.getIdElement(), requestDetails);
@@ -142,7 +138,7 @@ public class PartitionCreationInterceptor extends RequestTenantPartitionIntercep
 	//		}
 		}
 
-		return RequestPartitionId.fromPartitionId(idAttempt);
+		return partitionEntity.toRequestPartitionId();
 	}
 
 

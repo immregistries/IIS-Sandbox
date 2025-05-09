@@ -34,7 +34,6 @@ public class MessageRecordingService {
 		messageReceived.setCategoryResponse(categoryResponse);
 		// TODO interact with internal logs and metadata
 		Transaction transaction = dataSession.beginTransaction();
-		dataSession.save(messageReceived);
-		transaction.commit();
+		dataSession.persist(messageReceived);
 	}
 }
