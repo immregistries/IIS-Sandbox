@@ -93,7 +93,7 @@ public class IisAuthorizationInterceptor extends AuthorizationInterceptor {
 					 * if user authenticated, Tenant/Facility is then selected
 					 */
 					if (userAccess != null) {
-						tenant = ServletHelper.authenticateTenant(userAccess, PartitionCreationInterceptor.extractPartitionName(theRequestDetails), dataSession);
+						tenant = ServletHelper.authenticateTenant(userAccess, PartitionCreationInterceptor.extractPartitionName(theRequestDetails), dataSession, null);
 					}
 				}
 			}
@@ -139,7 +139,7 @@ public class IisAuthorizationInterceptor extends AuthorizationInterceptor {
 			String base64 = authHeader.substring("Basic ".length());
 			String base64decoded = new String(Base64.decodeBase64(base64));
 			String[] parts = base64decoded.split(":");
-			return ServletHelper.authenticateTenant(parts[0], parts[1], tenantName, dataSession);
+			return ServletHelper.authenticateTenant(parts[0], parts[1], tenantName, dataSession, null);
 		} else { // TODO token ?
 			return null;
 		}

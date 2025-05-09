@@ -7,6 +7,7 @@
  import jakarta.servlet.http.HttpSession;
  import org.apache.commons.lang3.StringUtils;
  import org.hibernate.Session;
+ import org.immregistries.iis.kernal.fhir.interceptors.PartitionCreationInterceptor;
  import org.immregistries.iis.kernal.fhir.security.ServletHelper;
  import org.immregistries.iis.kernal.logic.AbstractIncomingMessageHandler;
  import org.immregistries.iis.kernal.model.Tenant;
@@ -26,7 +27,9 @@ public class SoapController extends HttpServlet {
 
 	 public static final String SOAP_BASE_PATH = "/soap";
 	 @Autowired
-	AbstractIncomingMessageHandler handler;
+	 private AbstractIncomingMessageHandler handler;
+	 @Autowired
+	 private PartitionCreationInterceptor partitionCreationInterceptor;
 
 	@PostMapping
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp, @PathVariable(name = PATH_VARIABLE_TENANT_NAME, required = false) String tenantName)
@@ -51,9 +54,9 @@ public class SoapController extends HttpServlet {
 				try {
 					Tenant tenant;
 					if (StringUtils.isNotBlank(tenantName)) {
-						tenant = ServletHelper.authenticateTenant(userId, password, tenantName, dataSession);
+						tenant = ServletHelper.authenticateTenant(userId, password, tenantName, dataSession, partitionCreationInterceptor);
 					} else {
-						tenant = ServletHelper.authenticateTenant(userId, password, facilityId, dataSession);
+						tenant = ServletHelper.authenticateTenant(userId, password, facilityId, dataSession, partitionCreationInterceptor);
 					}
 					if (tenant == null) {
 						throw new SecurityException("Username/password combination is unrecognized");
@@ -94,9 +97,9 @@ public class SoapController extends HttpServlet {
 					}
 					Tenant tenant;
 					if (StringUtils.isNotBlank(tenantName)) {
-						tenant = ServletHelper.authenticateTenant(userId, password, tenantName, dataSession);
+						tenant = ServletHelper.authenticateTenant(userId, password, tenantName, dataSession, partitionCreationInterceptor);
 					} else {
-						tenant = ServletHelper.authenticateTenant(userId, password, facilityId, dataSession);
+						tenant = ServletHelper.authenticateTenant(userId, password, facilityId, dataSession, partitionCreationInterceptor);
 					}
 					if (tenant == null) {
 						throw new SecurityFault("Username/password combination is unrecognized");

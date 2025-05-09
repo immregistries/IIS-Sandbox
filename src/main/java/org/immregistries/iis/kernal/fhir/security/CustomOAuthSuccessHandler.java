@@ -5,9 +5,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.hibernate.Session;
+import org.immregistries.iis.kernal.fhir.interceptors.PartitionCreationInterceptor;
 import org.immregistries.iis.kernal.model.Tenant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -22,12 +24,16 @@ import static org.immregistries.iis.kernal.fhir.security.ServletHelper.SESSION_T
 public class CustomOAuthSuccessHandler implements AuthenticationSuccessHandler {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
+	@Autowired
+	PartitionCreationInterceptor partitionCreationInterceptor;
+
 //	@Override
 //	public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication) throws IOException, ServletException {
 //		this.onAuthenticationSuccess(request, response, authentication);
 //
 //		chain.doFilter(request, response);
 //	}
+
 
 	@Override
 	public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
@@ -43,7 +49,8 @@ public class CustomOAuthSuccessHandler implements AuthenticationSuccessHandler {
 				tenant = ServletHelper.authenticateTenant(
 					oAuth2AuthenticationToken.getPrincipal(),
 					GITHUB_PREFIX + oAuth2AuthenticationToken.getPrincipal().getAttribute("login"),
-					dataSession);
+					dataSession,
+					partitionCreationInterceptor);
 				dataSession.close();
 				session.setAttribute(SESSION_TENANT, tenant);
 			} finally {

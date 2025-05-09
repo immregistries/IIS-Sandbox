@@ -11,6 +11,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.immregistries.iis.kernal.HibernateConfig;
+import org.immregistries.iis.kernal.fhir.interceptors.PartitionCreationInterceptor;
 import org.immregistries.iis.kernal.model.Tenant;
 import org.immregistries.iis.kernal.model.UserAccess;
 import org.slf4j.Logger;
@@ -50,23 +51,20 @@ public class ServletHelper {
 	}
 
 
-	public static Tenant authenticateTenant(String username, String password, String facilityName, Session dataSession) {
-		/**
-		 * First user authentication with USERNAME password
-		 */
+	public static Tenant authenticateTenant(String username, String password, String facilityName, Session dataSession, PartitionCreationInterceptor partitionCreationInterceptor) {
 		UserAccess userAccess = authenticateUserAccessUsernamePassword(username,password,dataSession);
-		return  authenticateTenant(userAccess,facilityName,dataSession);
+		return authenticateTenant(userAccess, facilityName, dataSession, partitionCreationInterceptor);
 	}
 
-	public static Tenant authenticateTenant(OAuth2User oAuth2User, String facilityName, Session dataSession) {
+	public static Tenant authenticateTenant(OAuth2User oAuth2User, String facilityName, Session dataSession, PartitionCreationInterceptor partitionCreationInterceptor) {
 		/**
 		 * First user authentication with OAUTH
 		 */
 		UserAccess userAccess = authenticateUserAccessOAuth(oAuth2User,dataSession);
-		return authenticateTenant(userAccess,facilityName,dataSession);
+		return authenticateTenant(userAccess, facilityName, dataSession, partitionCreationInterceptor);
 	}
 
-	public static Tenant authenticateTenant(UserAccess userAccess, String facilityName, Session dataSession) {
+	public static Tenant authenticateTenant(UserAccess userAccess, String facilityName, Session dataSession, PartitionCreationInterceptor partitionCreationInterceptor) {
 		/**
 		 * Users starting with the prefix can create a user with the same name, any other use of prefix are rejected
 		 */
@@ -96,6 +94,9 @@ public class ServletHelper {
 			}
 		} else {
 			tenant = registerTenant(facilityName, userAccess, dataSession);
+			if (partitionCreationInterceptor != null) {
+				partitionCreationInterceptor.getOrCreatePartitionId(tenant.getOrganizationName());
+			}
 		}
 		return tenant;
 	}
@@ -235,7 +236,7 @@ public class ServletHelper {
 			if (authentication instanceof UserAccess) {
 				userAccess = (UserAccess) authentication;
 			}
-			tenant = authenticateTenant(userAccess, pathVariable, dataSession);
+			tenant = authenticateTenant(userAccess, pathVariable, dataSession, null);
 		}
 //		if (tenant == null) {
 //			throw new AuthenticationCredentialsNotFoundException("");

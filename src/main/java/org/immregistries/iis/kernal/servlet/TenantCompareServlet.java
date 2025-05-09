@@ -89,7 +89,7 @@ public class TenantCompareServlet extends HttpServlet {
 				throw new AuthenticationCredentialsNotFoundException("");
 			}
 
-			List<Tenant> tenantList = Arrays.stream(tenantNames).distinct().map(tenantName -> ServletHelper.authenticateTenant(userAccess, tenantName, dataSession)).collect(Collectors.toList());
+			List<Tenant> tenantList = Arrays.stream(tenantNames).distinct().map(tenantName -> ServletHelper.authenticateTenant(userAccess, tenantName, dataSession, null)).collect(Collectors.toList());
 
 			List<SystemRequestDetails> systemRequestDetailsList = tenantList.stream().map(tenant -> {
 				SystemRequestDetails systemRequestDetails = new SystemRequestDetails();

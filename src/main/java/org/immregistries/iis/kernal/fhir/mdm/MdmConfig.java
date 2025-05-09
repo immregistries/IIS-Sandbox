@@ -1,82 +1,60 @@
 package org.immregistries.iis.kernal.fhir.mdm;
 
-import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.jpa.mdm.config.MdmSubmitterConfig;
 import ca.uhn.fhir.jpa.searchparam.config.NicknameServiceConfig;
 import ca.uhn.fhir.jpa.topic.SubscriptionTopicConfig;
 import ca.uhn.fhir.mdm.api.IMdmSettings;
 import ca.uhn.fhir.mdm.rules.config.MdmRuleValidator;
 import ca.uhn.fhir.mdm.rules.config.MdmSettings;
-import ca.uhn.fhir.mdm.util.EIDHelper;
-import ca.uhn.fhir.mdm.util.MdmPartitionHelper;
-import com.google.common.base.Charsets;
 import org.apache.commons.io.IOUtils;
 import org.immregistries.iis.kernal.fhir.common.AppProperties;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
-import org.springframework.context.annotation.*;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Conditional;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 @Configuration
 @Conditional(MdmConfigCondition.class)
 @Import({MdmIisConsumerConfig.class, MdmSubmitterConfig.class, NicknameServiceConfig.class, SubscriptionTopicConfig.class})
 public class MdmConfig {
-	@Autowired
-	AutowireCapableBeanFactory autowireCapableBeanFactory;
+//	@Autowired
+//	AutowireCapableBeanFactory autowireCapableBeanFactory;
 
-	@Primary
-	@Bean
-	MdmIisGoldenResourceHelper customGoldenResourceHelper(FhirContext theFhirContext,
-																			IMdmSettings theMdmSettings,
-																			EIDHelper theEIDHelper,
-																			MdmPartitionHelper theMdmPartitionHelper) {
-		MdmIisGoldenResourceHelper mdmIisGoldenResourceHelper = new MdmIisGoldenResourceHelper(theFhirContext, theMdmSettings, theEIDHelper, theMdmPartitionHelper);
-		autowireCapableBeanFactory.autowireBean(mdmIisGoldenResourceHelper);
-		return mdmIisGoldenResourceHelper;
-	}
+//	@Primary
+//	@Bean
+//	GoldenResourceHelper customGoldenResourceHelper(FhirContext theFhirContext,
+//																	IMdmSettings theMdmSettings,
+//																	EIDHelper theEIDHelper,
+//																	MdmPartitionHelper theMdmPartitionHelper) {
+//		MdmIisGoldenResourceHelper mdmIisGoldenResourceHelper = new MdmIisGoldenResourceHelper(theFhirContext, theMdmSettings, theEIDHelper, theMdmPartitionHelper);
+//		autowireCapableBeanFactory.autowireBean(mdmIisGoldenResourceHelper);
+//		return mdmIisGoldenResourceHelper;
+//	}
 
-	@Primary
-	@Bean
-	IisSubscriptionCanonicalizer customSubscriptionCanonicalizer(FhirContext theFhirContext) {
-		IisSubscriptionCanonicalizer iisSubscriptionCanonicalizer = new IisSubscriptionCanonicalizer(theFhirContext);
-		autowireCapableBeanFactory.autowireBean(iisSubscriptionCanonicalizer);
-		return iisSubscriptionCanonicalizer;
-	}
-
-	@Primary
-	@Bean
-	MdmIisProviderLoader customMdmProviderLoader() {
-		MdmIisProviderLoader mdmIisProviderLoader = new MdmIisProviderLoader();
-		autowireCapableBeanFactory.autowireBean(mdmIisProviderLoader);
-		return mdmIisProviderLoader;
-	}
-
-	@Primary
-	@Bean
-	MdmIisSubscriptionLoader customMdmSubscriptionLoader() {
-		MdmIisSubscriptionLoader mdmIisSubscriptionLoader = new MdmIisSubscriptionLoader();
-		autowireCapableBeanFactory.autowireBean(mdmIisSubscriptionLoader);
-		return mdmIisSubscriptionLoader;
-	}
-
-
-	@Primary
-	@Bean
-	IisSubscriptionValidatingInterceptor customSubscriptionValidatingInterceptor() {
-		IisSubscriptionValidatingInterceptor iisSubscriptionValidatingInterceptor = new IisSubscriptionValidatingInterceptor();
-		autowireCapableBeanFactory.autowireBean(iisSubscriptionValidatingInterceptor);
-		return iisSubscriptionValidatingInterceptor;
-	}
+//	@Primary
+//	@Bean
+//	MdmIisProviderLoader customMdmProviderLoader() {
+//		MdmIisProviderLoader mdmProviderLoader = new MdmIisProviderLoader();
+//		autowireCapableBeanFactory.autowireBean(mdmProviderLoader);
+//		return mdmProviderLoader;
+//	}
+//
 
 	@Bean
-	IMdmSettings mdmSettings(@Autowired MdmRuleValidator theMdmRuleValidator, AppProperties appProperties) throws IOException {
+	IMdmSettings mdmSettings(@Autowired MdmRuleValidator theMdmRuleValidator, AppProperties appProperties)
+		throws IOException {
 		DefaultResourceLoader resourceLoader = new DefaultResourceLoader();
-		Resource resource = resourceLoader.getResource("mdm-rules.json");
-		String json = IOUtils.toString(resource.getInputStream(), Charsets.UTF_8);
-		return new MdmSettings(theMdmRuleValidator).setEnabled(appProperties.getMdm_enabled()).setScriptText(json);
+		Resource resource = resourceLoader.getResource(appProperties.getMdm_rules_json_location());
+		String json = IOUtils.toString(resource.getInputStream(), StandardCharsets.UTF_8);
+		return new MdmSettings(theMdmRuleValidator)
+			.setEnabled(appProperties.getMdm_enabled())
+			.setScriptText(json);
 	}
 
 //	@Primary

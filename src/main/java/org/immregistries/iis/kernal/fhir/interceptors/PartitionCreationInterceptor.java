@@ -66,6 +66,11 @@ public class PartitionCreationInterceptor extends RequestTenantPartitionIntercep
 		return extractPartitionIdFromRequest(theRequestDetails);
 	}
 
+	@Hook(value = Pointcut.STORAGE_PARTITION_IDENTIFY_ANY, order = -1000)
+	public RequestPartitionId partitionIdentifyAny(RequestDetails theRequestDetails) {
+		return this.extractPartitionIdFromRequest(theRequestDetails);
+	}
+
 	@Override
 	@Nonnull
 	protected RequestPartitionId extractPartitionIdFromRequest(RequestDetails theRequestDetails) {
@@ -87,6 +92,13 @@ public class PartitionCreationInterceptor extends RequestTenantPartitionIntercep
 		} catch (ResourceNotFoundException e) {
 			return createPartition(partitionName);
 		}
+	}
+
+	public static boolean partitionExists(String partitionName) {
+		if (partitionName.equals("default") || partitionName.equals(DEFAULT_USER)) {
+			return true;
+		}
+		return RequestPartitionId.fromPartitionName(partitionName).getFirstPartitionIdOrNull() == null;
 	}
 
 	public static String extractPartitionName(RequestDetails requestDetails) {
@@ -132,5 +144,6 @@ public class PartitionCreationInterceptor extends RequestTenantPartitionIntercep
 
 		return RequestPartitionId.fromPartitionId(idAttempt);
 	}
+
 
 }

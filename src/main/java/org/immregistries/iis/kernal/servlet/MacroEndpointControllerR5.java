@@ -12,6 +12,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.hibernate.Session;
 import org.hl7.fhir.r5.model.*;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR5Condition;
+import org.immregistries.iis.kernal.fhir.interceptors.PartitionCreationInterceptor;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.model.Tenant;
 import org.immregistries.iis.kernal.model.UserAccess;
@@ -42,6 +43,9 @@ public class MacroEndpointControllerR5 {
 	IFhirResourceDao<ImmunizationRecommendation> immunizationRecommendationDao;
 	@Autowired
 	IFhirResourceDao<Practitioner> practitionerDao;
+
+	@Autowired
+	PartitionCreationInterceptor partitionCreationInterceptor;
 
 //	@GetMapping("/StructureDefinition")
 //	public ResponseEntity<String> getStructureDefinition() {
@@ -77,7 +81,7 @@ public class MacroEndpointControllerR5 {
 					if (tenant != null) {
 						throw new InvalidRequestException("More than one organization present");
 					}
-					tenant = ServletHelper.authenticateTenant(userAccess, ((Organization) entry.getResource()).getName(), dataSession);
+					tenant = ServletHelper.authenticateTenant(userAccess, ((Organization) entry.getResource()).getName(), dataSession, partitionCreationInterceptor);
 				}
 			}
 		} finally {

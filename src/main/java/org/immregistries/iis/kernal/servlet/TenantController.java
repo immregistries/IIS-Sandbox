@@ -7,9 +7,11 @@ import jakarta.servlet.http.HttpSession;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
+import org.immregistries.iis.kernal.fhir.interceptors.PartitionCreationInterceptor;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.model.Tenant;
 import org.immregistries.iis.kernal.model.UserAccess;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -34,6 +36,9 @@ public class TenantController {
 	public static final String PARAM_TENANT_NAME = "tenantName";
 	public static final String PARAM_TENANT_ID = "tenantId";
 
+	@Autowired
+	PartitionCreationInterceptor partitionCreationInterceptor;
+
 	/**
 	 * Adds a new tenant from form
 	 *
@@ -52,7 +57,7 @@ public class TenantController {
 //				if (tenantName.indexOf(PARTITION_NAME_SEPARATOR) > 0) {
 //					throw new InvalidRequestException("Invalid tenant name , should not use " + PARTITION_NAME_SEPARATOR);
 //				}
-				ServletHelper.authenticateTenant(userAccess, tenantName, dataSession);
+				ServletHelper.authenticateTenant(userAccess, tenantName, dataSession, partitionCreationInterceptor);
 			}
 		}
 		doGet(req, resp);
