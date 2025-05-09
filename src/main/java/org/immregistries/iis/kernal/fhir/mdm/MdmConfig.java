@@ -8,11 +8,10 @@ import ca.uhn.fhir.mdm.rules.config.MdmRuleValidator;
 import ca.uhn.fhir.mdm.rules.config.MdmSettings;
 import org.apache.commons.io.IOUtils;
 import org.immregistries.iis.kernal.fhir.common.AppProperties;
+import org.immregistries.iis.kernal.fhir.mdm.match.MdmIisConsumerConfig;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Conditional;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
+import org.springframework.context.annotation.*;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 
@@ -23,8 +22,8 @@ import java.nio.charset.StandardCharsets;
 @Conditional(MdmConfigCondition.class)
 @Import({MdmIisConsumerConfig.class, MdmSubmitterConfig.class, NicknameServiceConfig.class, SubscriptionTopicConfig.class})
 public class MdmConfig {
-//	@Autowired
-//	AutowireCapableBeanFactory autowireCapableBeanFactory;
+	@Autowired
+	AutowireCapableBeanFactory autowireCapableBeanFactory;
 
 //	@Primary
 //	@Bean
@@ -55,6 +54,14 @@ public class MdmConfig {
 		return new MdmSettings(theMdmRuleValidator)
 			.setEnabled(appProperties.getMdm_enabled())
 			.setScriptText(json);
+	}
+
+	@Primary
+	@Bean
+	IisSubscriptionValidatingInterceptor iisSubscriptionValidatingInterceptor() {
+		IisSubscriptionValidatingInterceptor iisSubscriptionValidatingInterceptor = new IisSubscriptionValidatingInterceptor();
+		autowireCapableBeanFactory.autowireBean(iisSubscriptionValidatingInterceptor);
+		return iisSubscriptionValidatingInterceptor;
 	}
 
 //	@Primary

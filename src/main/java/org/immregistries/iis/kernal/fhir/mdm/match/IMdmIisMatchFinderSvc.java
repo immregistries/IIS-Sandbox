@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal.fhir.mdm;
+package org.immregistries.iis.kernal.fhir.mdm.match;
 
 import ca.uhn.fhir.mdm.api.MdmMatchOutcome;
 import org.immregistries.mismo.match.PatientMatchResult;

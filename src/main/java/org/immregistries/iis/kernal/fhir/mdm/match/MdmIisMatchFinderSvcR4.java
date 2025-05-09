@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal.fhir.mdm;
+package org.immregistries.iis.kernal.fhir.mdm.match;
 
 import ca.uhn.fhir.interceptor.model.RequestPartitionId;
 import ca.uhn.fhir.jpa.api.dao.IFhirResourceDao;
