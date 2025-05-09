@@ -1,7 +1,6 @@
 package org.immregistries.iis.kernal.logic;
 
 import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.model.MessageReceived;
 import org.immregistries.iis.kernal.model.PatientMaster;
@@ -33,7 +32,6 @@ public class MessageRecordingService {
 		messageReceived.setCategoryRequest(categoryRequest);
 		messageReceived.setCategoryResponse(categoryResponse);
 		// TODO interact with internal logs and metadata
-		Transaction transaction = dataSession.beginTransaction();
 		dataSession.persist(messageReceived);
 	}
 }
