@@ -57,7 +57,8 @@ public class ServerSecurityConfig {
 					new AntPathRequestMatcher("/patient"),
 					new AntPathRequestMatcher("/subscription"),
 					new AntPathRequestMatcher("/vaccination"),
-					new AntPathRequestMatcher("/tenant")
+					new AntPathRequestMatcher("/tenant"),
+					new AntPathRequestMatcher("/soap")
 				)
 			);
 
