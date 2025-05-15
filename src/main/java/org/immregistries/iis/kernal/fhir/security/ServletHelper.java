@@ -1,5 +1,7 @@
 package org.immregistries.iis.kernal.fhir.security;
 
+import ca.uhn.fhir.jpa.entity.PartitionEntity;
+import ca.uhn.fhir.jpa.partition.IPartitionLookupSvc;
 import ca.uhn.fhir.rest.api.server.RequestDetails;
 import ca.uhn.fhir.rest.api.server.SystemRequestDetails;
 import ca.uhn.fhir.rest.server.exceptions.AuthenticationException;
@@ -283,8 +285,13 @@ public class ServletHelper {
 		return getTenant(request);
 	}
 
-	public static RequestDetails requestDetailsWithPartitionName() {
-		RequestDetails requestDetails = new SystemRequestDetails();
+	public static RequestDetails requestDetailsWithPartitionName(IPartitionLookupSvc partitionLookupSvc) {
+		PartitionEntity partitionEntity = partitionLookupSvc.getPartitionByName(ServletHelper.getTenant().getOrganizationName());
+		if (partitionEntity == null) {
+//			return SystemRequestDetails.forAllPartitions();
+			throw new RuntimeException("No partition found");
+		}
+		RequestDetails requestDetails = SystemRequestDetails.forRequestPartitionId(partitionEntity.toRequestPartitionId());
 		requestDetails.setTenantId(ServletHelper.getTenant().getOrganizationName());
 		return requestDetails;
 	}

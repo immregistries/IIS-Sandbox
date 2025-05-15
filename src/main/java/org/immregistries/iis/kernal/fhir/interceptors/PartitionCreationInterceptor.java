@@ -84,19 +84,19 @@ public class PartitionCreationInterceptor extends RequestTenantPartitionIntercep
 			return RequestPartitionId.defaultPartition();
 		}
 		try {
-			partitionLookupSvc.getPartitionByName(partitionName);
-			return RequestPartitionId.fromPartitionName(partitionName);
+			PartitionEntity partitionEntity = partitionLookupSvc.getPartitionByName(partitionName);
+			return partitionEntity.toRequestPartitionId();
 		} catch (ResourceNotFoundException e) {
 			return createPartition(partitionName);
 		}
 	}
 
-	public static boolean partitionExists(String partitionName) {
-		if (partitionName.equals("default") || partitionName.equals(DEFAULT_USER)) {
-			return true;
-		}
-		return RequestPartitionId.fromPartitionName(partitionName).getFirstPartitionIdOrNull() == null;
-	}
+//	public static boolean partitionExists(String partitionName) {
+//		if (partitionName.equals("default") || partitionName.equals(DEFAULT_USER)) {
+//			return true;
+//		}
+//		return RequestPartitionId.fromPartitionName(partitionName).getFirstPartitionIdOrNull() == null;
+//	}
 
 	public static String extractPartitionName(RequestDetails requestDetails) {
 		String tenantId = requestDetails.getTenantId();

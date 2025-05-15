@@ -17,7 +17,7 @@ iis:
   api:
     app:
       jwtSecret: ${ENV_IIS_JWT_SECRET}
-      jwtExpirationMs: 1800000
+      jwtExpirationMs: 3600000
 #        TODO change secret
 spring:
   security:
@@ -149,7 +149,7 @@ hapi:
     partitioning:
       allow_references_across_partitions: false
       partitioning_include_in_search_hashes: false
-      #      conditional_create_duplicate_identifiers_enabled: false
+      conditional_create_duplicate_identifiers_enabled: true
       request_tenant_partitioning_mode: true
     cors:
       allow_Credentials: true

@@ -18,6 +18,7 @@
  import java.io.IOException;
  import java.io.PrintWriter;
 
+ import static org.immregistries.iis.kernal.fhir.security.ServletHelper.SESSION_TENANT;
  import static org.immregistries.iis.kernal.servlet.SoapController.SOAP_BASE_PATH;
  import static org.immregistries.iis.kernal.servlet.TenantController.PATH_VARIABLE_TENANT_NAME;
 
@@ -62,7 +63,7 @@ public class SoapController extends HttpServlet {
 						throw new SecurityException("Username/password combination is unrecognized");
 					} else {
 						HttpSession session = req.getSession(true);
-						session.setAttribute("tenant", tenant);
+						session.setAttribute(SESSION_TENANT, tenant);
 						messages = message.split("MSH\\|\\^~\\\\&\\|");
 						for (String msh : messages) {
 							if (!msh.isBlank()) {

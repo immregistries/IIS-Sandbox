@@ -18,7 +18,6 @@ import ca.uhn.fhir.jpa.interceptor.validation.RepositoryValidatingInterceptor;
 import ca.uhn.fhir.jpa.ips.provider.IpsOperationProvider;
 import ca.uhn.fhir.jpa.model.config.SubscriptionSettings;
 import ca.uhn.fhir.jpa.packages.IPackageInstallerSvc;
-import ca.uhn.fhir.jpa.partition.PartitionManagementProvider;
 import ca.uhn.fhir.jpa.provider.*;
 import ca.uhn.fhir.jpa.search.DatabaseBackedPagingProvider;
 import ca.uhn.fhir.jpa.subscription.util.SubscriptionDebugLogInterceptor;
@@ -29,7 +28,6 @@ import ca.uhn.fhir.rest.openapi.OpenApiInterceptor;
 import ca.uhn.fhir.rest.server.*;
 import ca.uhn.fhir.rest.server.interceptor.*;
 import ca.uhn.fhir.rest.server.provider.ResourceProviderFactory;
-import ca.uhn.fhir.rest.server.tenant.UrlBaseTenantIdentificationStrategy;
 import ca.uhn.fhir.rest.server.util.ISearchParamRegistry;
 import ca.uhn.fhir.validation.IValidatorModule;
 import ca.uhn.fhir.validation.ResultSeverityEnum;
@@ -42,7 +40,7 @@ import org.immregistries.iis.kernal.fhir.immdsForecast.IRecommendationForecastPr
 import org.immregistries.iis.kernal.fhir.interceptors.GroupAuthorityInterceptor;
 import org.immregistries.iis.kernal.fhir.interceptors.IIdentifierSolverInterceptor;
 import org.immregistries.iis.kernal.fhir.interceptors.IisAuthorizationInterceptor;
-import org.immregistries.iis.kernal.fhir.interceptors.PartitionCreationInterceptor;
+import org.immregistries.iis.kernal.fhir.interceptors.IisLoggingInterceptor;
 import org.immregistries.iis.kernal.fhir.ips.IpsConfig;
 import org.immregistries.iis.kernal.logic.logicInterceptors.ImmunizationProcessingInterceptor;
 import org.immregistries.iis.kernal.logic.logicInterceptors.ObservationProcessingInterceptor;
@@ -70,6 +68,7 @@ import java.util.Optional;
 public class ServerConfig {
 	private static final org.slf4j.Logger ourLog = org.slf4j.LoggerFactory.getLogger(ServerConfig.class);
 
+
 	/**
 	 * FHIR Server Configuration method, registering providers and interceptors, including customization
 	 *
@@ -95,14 +94,12 @@ public class ServerConfig {
 	 * @param bulkDataImportProvider            bulkDataImportProvider
 	 * @param theValueSetOperationProvider      theValueSetOperationProvider
 	 * @param reindexProvider                   reindexProvider
-	 * @param partitionManagementProvider       partitionManagementProvider
 	 * @param repositoryValidatingInterceptor   repositoryValidatingInterceptor
 	 * @param packageInstallerSvc               packageInstallerSvc
 	 * @param theThreadSafeResourceDeleterSvc   theThreadSafeResourceDeleterSvc
 	 * @param appContext                        appContext
 	 * @param theIpsOperationProvider           IPS Provider
 	 * @param mdmProviderLoader                 mdmProviderLoader
-	 * @param partitionCreationInterceptor      partitionCreationInterceptor
 	 * @param bulkQueryGroupProvider            bulkQueryGroupProvider
 	 * @param identifierSolverInterceptor       identifierSolverInterceptor
 	 * @param groupAuthorityInterceptor         groupAuthorityInterceptor
@@ -114,11 +111,10 @@ public class ServerConfig {
 	 * @return Restful Server
 	 */
 	@Bean
-	public RestfulServer restfulServer(IFhirSystemDao<?, ?> fhirSystemDao, AppProperties appProperties, DaoRegistry daoRegistry, IJpaSystemProvider jpaSystemProvider, ResourceProviderFactory resourceProviderFactory, JpaStorageSettings jpaStorageSettings, SubscriptionSettings subscriptionSettings, ISearchParamRegistry searchParamRegistry, IValidationSupport theValidationSupport, DatabaseBackedPagingProvider databaseBackedPagingProvider, LoggingInterceptor loggingInterceptor, Optional<TerminologyUploaderProvider> terminologyUploaderProvider, Optional<SubscriptionTriggeringProvider> subscriptionTriggeringProvider, Optional<CorsInterceptor> corsInterceptor, IInterceptorBroadcaster interceptorBroadcaster, Optional<BinaryAccessProvider> binaryAccessProvider, BinaryStorageInterceptor binaryStorageInterceptor, IValidatorModule validatorModule, Optional<GraphQLProvider> graphQLProvider, CustomBulkDataExportProvider bulkDataExportProvider, BulkDataImportProvider bulkDataImportProvider, ValueSetOperationProvider theValueSetOperationProvider, ReindexProvider reindexProvider, PartitionManagementProvider partitionManagementProvider, Optional<RepositoryValidatingInterceptor> repositoryValidatingInterceptor, IPackageInstallerSvc packageInstallerSvc, ThreadSafeResourceDeleterSvc theThreadSafeResourceDeleterSvc, ApplicationContext appContext,
+	public RestfulServer restfulServer(IFhirSystemDao<?, ?> fhirSystemDao, AppProperties appProperties, DaoRegistry daoRegistry, IJpaSystemProvider jpaSystemProvider, ResourceProviderFactory resourceProviderFactory, JpaStorageSettings jpaStorageSettings, SubscriptionSettings subscriptionSettings, ISearchParamRegistry searchParamRegistry, IValidationSupport theValidationSupport, DatabaseBackedPagingProvider databaseBackedPagingProvider, IisLoggingInterceptor loggingInterceptor, Optional<TerminologyUploaderProvider> terminologyUploaderProvider, Optional<SubscriptionTriggeringProvider> subscriptionTriggeringProvider, Optional<CorsInterceptor> corsInterceptor, IInterceptorBroadcaster interceptorBroadcaster, Optional<BinaryAccessProvider> binaryAccessProvider, BinaryStorageInterceptor binaryStorageInterceptor, IValidatorModule validatorModule, Optional<GraphQLProvider> graphQLProvider, CustomBulkDataExportProvider bulkDataExportProvider, BulkDataImportProvider bulkDataImportProvider, ValueSetOperationProvider theValueSetOperationProvider, ReindexProvider reindexProvider, Optional<RepositoryValidatingInterceptor> repositoryValidatingInterceptor, IPackageInstallerSvc packageInstallerSvc, ThreadSafeResourceDeleterSvc theThreadSafeResourceDeleterSvc, ApplicationContext appContext,
 												  Optional<IpsOperationProvider> theIpsOperationProvider,
 												  Optional<MdmProviderLoader> mdmProviderLoader,
 												  Optional<DiffProvider> diffProvider,
-												  PartitionCreationInterceptor partitionCreationInterceptor,
 												  Optional<IBulkExportGroupProvider> bulkQueryGroupProvider,
 												  Optional<IIdentifierSolverInterceptor> identifierSolverInterceptor,
 												  Optional<GroupAuthorityInterceptor> groupAuthorityInterceptor,
@@ -280,15 +276,6 @@ public class ServerConfig {
 		//reindex Provider $reindex
 		fhirServer.registerProvider(reindexProvider);
 
-		// Partitioning
-		if (appProperties.getPartitioning() != null) {
-			/*
-			 * Registered custom interceptor for automatic partition generation
-			 */
-			fhirServer.registerInterceptor(partitionCreationInterceptor);
-			fhirServer.setTenantIdentificationStrategy(new UrlBaseTenantIdentificationStrategy());
-			fhirServer.registerProviders(partitionManagementProvider);
-		}
 		repositoryValidatingInterceptor.ifPresent(fhirServer::registerInterceptor);
 
 		//register the IPS Provider

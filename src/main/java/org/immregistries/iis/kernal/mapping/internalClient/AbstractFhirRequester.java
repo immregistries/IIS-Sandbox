@@ -4,6 +4,7 @@ import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.jpa.api.dao.DaoRegistry;
 import ca.uhn.fhir.jpa.api.dao.IFhirResourceDao;
 import ca.uhn.fhir.jpa.api.model.DaoMethodOutcome;
+import ca.uhn.fhir.jpa.partition.IPartitionLookupSvc;
 import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.api.server.IBundleProvider;
@@ -67,6 +68,9 @@ public abstract class AbstractFhirRequester<
 	FhirContext fhirContext;
 	@Autowired
 	RestfulServer fhirServer;
+
+	@Autowired
+	IPartitionLookupSvc partitionLookupSvc;
 
 	/**
 	 * Converts HAPI ICriterion Object to HTTP URI  parameter substring
@@ -132,13 +136,24 @@ public abstract class AbstractFhirRequester<
 		}
 		DaoMethodOutcome outcome;
 		if (createOnly) {
-			return dao.create(resource, ServletHelper.requestDetailsWithPartitionName());
-		}
-		try {
-			return dao.update(resource, params, ServletHelper.requestDetailsWithPartitionName());
+			return dao.create(resource, ServletHelper.requestDetailsWithPartitionName(partitionLookupSvc));
+		} else try {
+//			IUpdateTyped updateTyped = repositoryClientFactory.getFhirClient().update().resource(resource);
+//			if (where.length == 0) {
+//				return updateTyped.execute();
+//			}
+//			IUpdateWithQueryTyped updateWithQueryTyped = updateTyped.conditional().where(where[0]);
+//			for (int i = 1; i < where.length; i++) {
+//				updateWithQueryTyped = updateWithQueryTyped.and(where[i]);
+//			}
+//			return updateWithQueryTyped.execute();
+			return dao.update(resource, params, ServletHelper.requestDetailsWithPartitionName(partitionLookupSvc));
 		} catch (InvalidRequestException invalidRequestException) {
-			return dao.create(resource, ServletHelper.requestDetailsWithPartitionName());
+			return dao.create(resource, ServletHelper.requestDetailsWithPartitionName(partitionLookupSvc));
 		}
+//		catch (JdbcBatchUpdateException jdbcBatchUpdateException) {
+//			return dao.create(resource, ServletHelper.requestDetailsWithPartitionName());
+//		}
 	}
 
 	/**
@@ -149,7 +164,7 @@ public abstract class AbstractFhirRequester<
 	 */
 	public IBaseResource read(Class<? extends IBaseResource> aClass, String id) {
 		IFhirResourceDao dao = daoRegistry.getResourceDao(aClass);
-		return dao.read(new IdType(id), ServletHelper.requestDetailsWithPartitionName());
+		return dao.read(new IdType(id), ServletHelper.requestDetailsWithPartitionName(partitionLookupSvc));
 	}
 
 	/**
@@ -219,7 +234,7 @@ public abstract class AbstractFhirRequester<
 	 * @return Bundle of search result
 	 */
 	IBundleProvider search(Class<? extends IBaseResource> aClass, SearchParameterMap searchParameterMap) {
-		return daoRegistry.getResourceDao(aClass).search(searchParameterMap, ServletHelper.requestDetailsWithPartitionName());
+		return daoRegistry.getResourceDao(aClass).search(searchParameterMap, ServletHelper.requestDetailsWithPartitionName(partitionLookupSvc));
 //		IGenericClient fhirClient = repositoryClientFactory.getFhirClient();
 //		try {
 //			IQuery<IBaseBundle> query = fhirClient.search().forResource(aClass);
