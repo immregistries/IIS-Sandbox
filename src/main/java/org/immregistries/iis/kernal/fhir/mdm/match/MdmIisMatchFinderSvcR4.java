@@ -55,6 +55,8 @@ public class MdmIisMatchFinderSvcR4 extends AbstractMdmIisMatchFinderSvc<Immuniz
 
 		IBundleProvider targetCandidates;
 		SearchParameterMap searchParameterMap = new SearchParameterMap()
+			.setLoadSynchronous(true)
+			.setLoadSynchronousUpTo(1000)
 			.add("_tag", new TokenParam()
 				.setSystem(GOLDEN_SYSTEM_TAG)
 				.setValue(GOLDEN_RECORD).setModifier(TokenParamModifier.NOT));

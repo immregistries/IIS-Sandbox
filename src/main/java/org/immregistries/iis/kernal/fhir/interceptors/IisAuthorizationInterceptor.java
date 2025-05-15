@@ -179,14 +179,14 @@ public class IisAuthorizationInterceptor extends AuthorizationInterceptor {
 		String queryString = "from UserAccess where accessName = ?1";
 		Query query = dataSession.createQuery(queryString);
 		query.setParameter(1, CONNECTATHON_USER);
-		Iterator<UserAccess> userAccessIterator = query.getResultStream().iterator(); // TODO TODO test
+		Iterator userAccessIterator = query.getResultStream().iterator(); // TODO TODO test
 		if (userAccessIterator.hasNext()) {
-			userAccess = userAccessIterator.next();
+			userAccess = (UserAccess) userAccessIterator.next();
 			Query queryTenant = dataSession.createQuery("from Tenant where organizationName = ?1");
 			queryTenant.setParameter(1, CONNECTATHON_USER);
-			Iterator<Tenant> tenantIterator = queryTenant.getResultStream().iterator(); // TODO TODO verify
+			Iterator tenantIterator = queryTenant.getResultStream().iterator(); // TODO TODO verify
 			if (tenantIterator.hasNext()) {
-				Tenant tenant = tenantIterator.next();
+				Tenant tenant = (Tenant) tenantIterator.next();
 				theRequestDetails.setAttribute(SESSION_USER_ACCESS, userAccess);
 				theRequestDetails.setAttribute(SESSION_TENANT, tenant);
 				return new RuleBuilder()
