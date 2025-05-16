@@ -8,13 +8,12 @@ import ca.uhn.fhir.jpa.api.config.JpaStorageSettings;
 import ca.uhn.fhir.mdm.api.IMdmControllerSvc;
 import ca.uhn.fhir.mdm.api.IMdmSettings;
 import ca.uhn.fhir.mdm.api.IMdmSubmitSvc;
-import ca.uhn.fhir.mdm.provider.BaseMdmProvider;
-import ca.uhn.fhir.mdm.provider.MdmControllerHelper;
-import ca.uhn.fhir.mdm.provider.MdmLinkHistoryProviderDstu3Plus;
-import ca.uhn.fhir.mdm.provider.MdmProviderLoader;
+import ca.uhn.fhir.mdm.provider.*;
 import ca.uhn.fhir.rest.server.provider.ResourceProviderFactory;
+import jakarta.annotation.PreDestroy;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
+
+import java.util.function.Supplier;
 
 /**
  * Overrides default Hapi MdmProviderLoader
@@ -22,48 +21,84 @@ import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
  */
 public class MdmIisProviderLoader extends MdmProviderLoader {
 	@Autowired
-	FhirContext myFhirContext;
-	@Autowired
-	ResourceProviderFactory myResourceProviderFactory;
-	@Autowired
-	MdmControllerHelper myMdmControllerHelper;
-	@Autowired
-	IMdmControllerSvc myMdmControllerSvc;
-	@Autowired
-	IMdmSubmitSvc myMdmSubmitSvc;
-	@Autowired
-	IMdmSettings myMdmSettings;
-	@Autowired
-	JpaStorageSettings myStorageSettings;
+	private FhirContext myFhirContext;
 
 	@Autowired
-	AutowireCapableBeanFactory autowireCapableBeanFactory;
+	private ResourceProviderFactory myResourceProviderFactory;
 
 	@Autowired
-	IInterceptorBroadcaster myIInterceptorBroadcaster;
+	private MdmControllerHelper myMdmControllerHelper;
 
-	private BaseMdmProvider myMdmProvider;
-	@Override
-	public void loadProvider() {
-		switch (this.myFhirContext.getVersion().getVersion()) {
+	@Autowired
+	private IMdmControllerSvc myMdmControllerSvc;
+
+	@Autowired
+	private IMdmSubmitSvc myMdmSubmitSvc;
+
+	@Autowired
+	private IMdmSettings myMdmSettings;
+
+	@Autowired
+	private JpaStorageSettings myStorageSettings;
+
+	@Autowired
+	private IInterceptorBroadcaster myInterceptorBroadcaster;
+
+	private Supplier<Object> myMdmProviderSupplier;
+	private Supplier<Object> myPatientMatchProviderSupplier;
+	private Supplier<Object> myMdmHistoryProviderSupplier;
+
+	public void loadPatientMatchProvider() {
+		switch (myFhirContext.getVersion().getVersion()) {
 			case DSTU3:
 			case R4:
 			case R5:
-				this.myResourceProviderFactory.addSupplier(() -> {
-					MdmIisProvider mdmIisProvider = new MdmIisProvider(this.myFhirContext, this.myMdmControllerSvc, this.myMdmControllerHelper, this.myMdmSubmitSvc, this.myIInterceptorBroadcaster, this.myMdmSettings);
-					autowireCapableBeanFactory.autowireBean(mdmIisProvider);
-					return mdmIisProvider;
-				});
-				if (this.myStorageSettings.isNonResourceDbHistoryEnabled()) {
-					this.myResourceProviderFactory.addSupplier(() -> {
-						return new MdmLinkHistoryProviderDstu3Plus(this.myFhirContext, this.myMdmControllerSvc, this.myIInterceptorBroadcaster);
-					});
-				}
-
-				return;
+				// We store the supplier so that removeSupplier works properly
+				myPatientMatchProviderSupplier = () -> new PatientMatchProvider(myMdmControllerHelper);
+				myResourceProviderFactory.addSupplier(myPatientMatchProviderSupplier);
+				break;
 			default:
-				String var10002 = Msg.code(1497);
-				throw new ConfigurationException(var10002 + "MDM not supported for FHIR version " + this.myFhirContext.getVersion().getVersion());
+				throw new ConfigurationException(Msg.code(2574) + "Patient/$match not supported for FHIR version "
+						+ myFhirContext.getVersion().getVersion());
+		}
+	}
+
+	public void loadProvider() {
+		switch (myFhirContext.getVersion().getVersion()) {
+			case DSTU3:
+			case R4:
+			case R5:
+				// We store the supplier so that removeSupplier works properly
+				myMdmProviderSupplier = () -> new MdmProviderDstu3Plus(
+						myFhirContext,
+						myMdmControllerSvc,
+						myMdmControllerHelper,
+						myMdmSubmitSvc,
+						myInterceptorBroadcaster,
+						myMdmSettings);
+				myResourceProviderFactory.addSupplier(myMdmProviderSupplier);
+				if (myStorageSettings.isNonResourceDbHistoryEnabled()) {
+					myMdmHistoryProviderSupplier = () -> new MdmLinkHistoryProviderDstu3Plus(
+							myFhirContext, myMdmControllerSvc, myInterceptorBroadcaster);
+					myResourceProviderFactory.addSupplier(myMdmHistoryProviderSupplier);
+				}
+				break;
+			default:
+				throw new ConfigurationException(Msg.code(1497) + "MDM not supported for FHIR version "
+						+ myFhirContext.getVersion().getVersion());
+		}
+	}
+
+	@PreDestroy
+	public void unloadProvider() {
+		if (myMdmProviderSupplier != null) {
+			myResourceProviderFactory.removeSupplier(myMdmProviderSupplier);
+		}
+		if (myMdmHistoryProviderSupplier != null) {
+			myResourceProviderFactory.removeSupplier(myMdmHistoryProviderSupplier);
+		}
+		if (myPatientMatchProviderSupplier != null) {
+			myResourceProviderFactory.removeSupplier(myPatientMatchProviderSupplier);
 		}
 	}
 
