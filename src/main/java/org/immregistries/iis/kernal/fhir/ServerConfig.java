@@ -149,6 +149,9 @@ public class ServerConfig {
 		/*
 		 * CUSTOM PROVIDERS HERE
 		 */
+		if (false) {
+//			resourceProviderFactory.removeSupplier();
+		}
 		fhirServer.registerProviders(resourceProviderFactory.createProviders());
 		fhirServer.registerProvider(jpaSystemProvider);
 		fhirServer.setServerConformanceProvider(calculateConformanceProvider(fhirSystemDao, fhirServer, jpaStorageSettings, searchParamRegistry, theValidationSupport));

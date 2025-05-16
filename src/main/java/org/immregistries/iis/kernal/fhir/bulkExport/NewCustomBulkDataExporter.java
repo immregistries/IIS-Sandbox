@@ -35,8 +35,11 @@ import org.hl7.fhir.instance.model.api.IPrimitiveType;
 import org.hl7.fhir.r4.model.IdType;
 import org.hl7.fhir.r4.model.InstantType;
 import org.hl7.fhir.r4.model.Parameters;
+import org.immregistries.iis.kernal.fhir.interceptors.PartitionCreationInterceptor;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Primary;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -48,6 +51,8 @@ import java.util.stream.Collectors;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.slf4j.LoggerFactory.getLogger;
 
+@Component
+@Primary
 public class NewCustomBulkDataExporter extends BulkDataExportProvider {
 
 	private static final Logger ourLog = getLogger(BulkDataExportProvider.class);
@@ -69,6 +74,9 @@ public class NewCustomBulkDataExporter extends BulkDataExportProvider {
 
 	@Autowired
 	private IRequestPartitionHelperSvc myRequestPartitionHelperService;
+
+	@Autowired
+	private PartitionCreationInterceptor partitionCreationInterceptor;
 
 	/**
 	 * Constructor
@@ -111,6 +119,7 @@ public class NewCustomBulkDataExporter extends BulkDataExportProvider {
 		// JPA export provider
 		BulkDataExportUtil.validatePreferAsyncHeader(theRequestDetails, ProviderConstants.OPERATION_EXPORT);
 
+		RequestPartitionId requestPartitionId = partitionCreationInterceptor.partitionIdentifyRead(theRequestDetails);
 		BulkExportJobParameters bulkExportJobParameters = new BulkExportJobParametersBuilder()
 			.outputFormat(theOutputFormat)
 			.resourceTypes(theType)
@@ -119,6 +128,7 @@ public class NewCustomBulkDataExporter extends BulkDataExportProvider {
 			.exportIdentifier(theExportId)
 			.exportStyle(BulkExportJobParameters.ExportStyle.SYSTEM)
 			.postFetchFilterUrl(theTypePostFetchFilterUrl)
+			.partitionId(requestPartitionId)
 			.build();
 
 		getBulkDataExportJobService().startJob(theRequestDetails, bulkExportJobParameters);
@@ -169,6 +179,7 @@ public class NewCustomBulkDataExporter extends BulkDataExportProvider {
 		// verify the Group exists before starting the job
 		getBulkDataExportSupport().validateTargetsExists(theRequestDetails, "Group", List.of(theIdParam));
 
+		RequestPartitionId requestPartitionId = partitionCreationInterceptor.partitionIdentifyRead(theRequestDetails);
 		final BulkExportJobParameters bulkExportJobParameters = new BulkExportJobParametersBuilder()
 			.outputFormat(theOutputFormat)
 			.resourceTypes(theType)
@@ -179,9 +190,14 @@ public class NewCustomBulkDataExporter extends BulkDataExportProvider {
 			.postFetchFilterUrl(theTypePostFetchFilterUrl)
 			.groupId(theIdParam)
 			.expandMdm(theMdm)
+			.partitionId(requestPartitionId)
 			.build();
 
 		getBulkDataExportSupport().validateOrDefaultResourceTypesForGroupBulkExport(bulkExportJobParameters);
+//		IInterceptorBroadcaster compositeBroadcaster =
+//			CompositeInterceptorBroadcaster.newCompositeBroadcaster(myInterceptorBroadcaster, theRequestDetails);
+//
+//		ourLog.info("BULK INI With tenantId {} {}", theRequestDetails.getTenantId(), compositeBroadcaster.hasHooks(Pointcut.STORAGE_PARTITION_IDENTIFY_ANY));
 		getBulkDataExportJobService().startJob(theRequestDetails, bulkExportJobParameters);
 	}
 
@@ -309,6 +325,7 @@ public class NewCustomBulkDataExporter extends BulkDataExportProvider {
 			? new StringDt(String.join(",", getBulkDataExportSupport().getPatientCompartmentResources()))
 			: theType;
 
+		RequestPartitionId requestPartitionId = partitionCreationInterceptor.partitionIdentifyRead(theRequestDetails);
 		BulkExportJobParameters bulkExportJobParameters = new BulkExportJobParametersBuilder()
 			.outputFormat(theOutputFormat)
 			.resourceTypes(resourceTypes)
@@ -318,6 +335,7 @@ public class NewCustomBulkDataExporter extends BulkDataExportProvider {
 			.exportStyle(BulkExportJobParameters.ExportStyle.PATIENT)
 			.postFetchFilterUrl(theTypePostFetchFilterUrl)
 			.patientIds(thePatientIds)
+			.partitionId(requestPartitionId)
 			.build();
 
 		getBulkDataExportSupport()
