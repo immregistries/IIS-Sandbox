@@ -18,6 +18,8 @@ public class IpsGeneratorSvcIIS extends IpsGeneratorSvcImpl {
 		this.myDaoRegistry = theDaoRegistry;
 		this.myFhirContext = theFhirContext;
 	}
+
+
 //
 //	@Override
 //	public IBaseBundle generateIps(RequestDetails theRequestDetails, IIdType thePatientId) {
