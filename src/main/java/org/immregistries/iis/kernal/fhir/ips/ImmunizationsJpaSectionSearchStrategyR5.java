@@ -5,6 +5,7 @@ import ca.uhn.fhir.jpa.ips.jpa.JpaSectionSearchStrategy;
 import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
 import ca.uhn.fhir.rest.api.SortOrderEnum;
 import ca.uhn.fhir.rest.api.SortSpec;
+import ca.uhn.fhir.rest.param.ReferenceParam;
 import jakarta.annotation.Nonnull;
 import org.hl7.fhir.r5.model.Immunization;
 
@@ -22,6 +23,8 @@ public class ImmunizationsJpaSectionSearchStrategyR5 extends JpaSectionSearchStr
 		@Nonnull SearchParameterMap theSearchParameterMap) {
 		theSearchParameterMap.setSort(new SortSpec(Immunization.SP_DATE).setOrder(SortOrderEnum.DESC));
 		theSearchParameterMap.addInclude(Immunization.INCLUDE_MANUFACTURER);
+		ReferenceParam referenceParam = (ReferenceParam) theSearchParameterMap.get("patient").get(0).get(0);
+		referenceParam.setMdmExpand(true);
 	}
 
 	@SuppressWarnings("RedundantIfStatement")
