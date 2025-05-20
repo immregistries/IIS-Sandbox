@@ -35,7 +35,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 		"hapi.fhir.partitioning.partitioning_include_in_search_hashes=false",
 		"hapi.fhir.partitioning.request_tenant_partitioning_mode=true",
 		"IIS_MYSQL_URL=jdbc:h2:mem/usersTenants",
-		"hibernate.dialect=ca.uhn.fhir.jpa.model.dialect.HapiFhirH2Dialect"
+		"hibernate.dialect=ca.uhn.fhir.jpa.model.dialect.HapiFhirH2Dialect",
+		"jpa.properties.hibernate.dialect=ca.uhn.fhir.jpa.model.dialect.HapiFhirH2Dialect",
+		"server.servlet.context-path=/iis",
 	})
 class MultitenantServerR4IT {
 
@@ -51,7 +53,6 @@ class MultitenantServerR4IT {
 	@Test
 	void testCreateAndReadInTenantA() {
 
-		ourLog.info("WESH");
 
 		// Create tenant A
 		ourClientTenantInterceptor.setTenantId("DEFAULT");
