@@ -14,24 +14,27 @@ import java.util.Date;
 @Service
 public class MessageRecordingService {
 	Logger logger = LoggerFactory.getLogger(this.getClass());
-	protected Session dataSession;
+//	protected Session dataSession;
 
 	public MessageRecordingService() {
-		dataSession = ServletHelper.getDataSession();
+//		dataSession = ServletHelper.getDataSession();
 	}
 
 	public void recordMessageReceived(String message, PatientMaster patient, String messageResponse, String categoryRequest, String categoryResponse, Tenant tenant) {
-		MessageReceived messageReceived = new MessageReceived();
-		messageReceived.setTenant(tenant);
-		messageReceived.setMessageRequest(message);
-		if (patient != null) {
-			messageReceived.setPatientReportedId(patient.getPatientId());
+		try (Session dataSession = ServletHelper.getDataSession()) {
+			MessageReceived messageReceived = new MessageReceived();
+			messageReceived.setTenant(tenant);
+			messageReceived.setMessageRequest(message);
+			if (patient != null) {
+				messageReceived.setPatientReportedId(patient.getPatientId());
+			}
+			messageReceived.setMessageResponse(messageResponse);
+			messageReceived.setReportedDate(new Date());
+			messageReceived.setCategoryRequest(categoryRequest);
+			messageReceived.setCategoryResponse(categoryResponse);
+			// TODO interact with internal logs and metadata
+			dataSession.persist(messageReceived);
 		}
-		messageReceived.setMessageResponse(messageResponse);
-		messageReceived.setReportedDate(new Date());
-		messageReceived.setCategoryRequest(categoryRequest);
-		messageReceived.setCategoryResponse(categoryResponse);
-		// TODO interact with internal logs and metadata
-		dataSession.persist(messageReceived);
+
 	}
 }

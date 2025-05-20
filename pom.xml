@@ -249,16 +249,16 @@
 <!--        </dependency>-->
 
         <!--HAPI FHIR JPA Dependency-->
-        <!--        <dependency>-->
-        <!--            <groupId>org.eclipse.jetty.websocket</groupId>-->
-        <!--            <artifactId>websocket-jetty-api</artifactId>-->
-        <!--            <version>${jetty_version}</version>-->
-        <!--        </dependency>-->
-        <!--        <dependency>-->
-        <!--            <groupId>org.eclipse.jetty.websocket</groupId>-->
-        <!--            <artifactId>websocket-jetty-client</artifactId>-->
-        <!--            <version>${jetty_version}</version>-->
-        <!--        </dependency>-->
+        <!--                <dependency>-->
+        <!--                    <groupId>org.eclipse.jetty.websocket</groupId>-->
+        <!--                    <artifactId>websocket-jetty-api</artifactId>-->
+        <!--                    <version>${jetty_version}</version>-->
+        <!--                </dependency>-->
+        <!--                <dependency>-->
+        <!--                    <groupId>org.eclipse.jetty.websocket</groupId>-->
+        <!--                    <artifactId>websocket-jetty-client</artifactId>-->
+        <!--                    <version>${jetty_version}</version>-->
+        <!--                </dependency>-->
         <dependency>
             <groupId>com.mysql</groupId>
             <artifactId>mysql-connector-j</artifactId>
@@ -348,20 +348,6 @@
             <artifactId>hapi-fhir-server-openapi</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
-        <!-- This dependency is used for the "FHIR Tester" web app overlay -->
-        <!--        <dependency>-->
-        <!--            <groupId>ca.uhn.hapi.fhir</groupId>-->
-        <!--            <artifactId>hapi-fhir-testpage-overlay</artifactId>-->
-        <!--            <version>${project.parent.version}</version>-->
-        <!--            <type>war</type>-->
-        <!--            <scope>provided</scope>-->
-        <!--        </dependency>-->
-        <!--        <dependency>-->
-        <!--            <groupId>ca.uhn.hapi.fhir</groupId>-->
-        <!--            <artifactId>hapi-fhir-testpage-overlay</artifactId>-->
-        <!--            <version>${project.parent.version}</version>-->
-        <!--            <classifier>classes</classifier>-->
-        <!--        </dependency>-->
         <!-- This dependency is used to include the IPS Base Implementation -->
         <dependency>
             <groupId>ca.uhn.hapi.fhir</groupId>
@@ -454,41 +440,24 @@
 
         <!-- The following dependencies are only needed for automated unit tests, you do not neccesarily need them to run the example. -->
         <dependency>
+            <groupId>co.elastic.clients</groupId>
+            <artifactId>elasticsearch-java</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
             <groupId>ca.uhn.hapi.fhir</groupId>
             <artifactId>hapi-fhir-jpaserver-test-utilities</artifactId>
             <version>${project.parent.version}</version>
             <scope>test</scope>
+            <!--            <exclusions>-->
+            <!--                <exclusion>-->
+            <!--                    <groupId>com.sun.xml.bind</groupId>-->
+            <!--                    <artifactId>jaxb-impl</artifactId>-->
+            <!--                </exclusion>-->
+            <!--            </exclusions>-->
         </dependency>
-        <!--        <dependency>-->
-        <!--            <groupId>org.eclipse.jetty</groupId>-->
-        <!--            <artifactId>jetty-servlets</artifactId>-->
-        <!--            <scope>test</scope>-->
-        <!--        </dependency>-->
-        <!--        <dependency>-->
-        <!--            <groupId>org.eclipse.jetty</groupId>-->
-        <!--            <artifactId>jetty-servlet</artifactId>-->
-        <!--            <scope>test</scope>-->
-        <!--        </dependency>-->
-        <!--        <dependency>-->
-        <!--            <groupId>org.eclipse.jetty.websocket</groupId>-->
-        <!--            <artifactId>websocket-jetty-server</artifactId>-->
-        <!--            <scope>test</scope>-->
-        <!--        </dependency>-->
-        <!--        <dependency>-->
-        <!--            <groupId>org.eclipse.jetty</groupId>-->
-        <!--            <artifactId>jetty-server</artifactId>-->
-        <!--            <scope>test</scope>-->
-        <!--        </dependency>-->
-        <!--        <dependency>-->
-        <!--            <groupId>org.eclipse.jetty</groupId>-->
-        <!--            <artifactId>jetty-util</artifactId>-->
-        <!--            <scope>test</scope>-->
-        <!--        </dependency>-->
-        <!--        <dependency>-->
-        <!--            <groupId>org.eclipse.jetty</groupId>-->
-        <!--            <artifactId>jetty-webapp</artifactId>-->
-        <!--            <scope>test</scope>-->
-        <!--        </dependency>-->
+
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>testcontainers</artifactId>
@@ -553,28 +522,31 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
-            <version>5.9.2</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
-            <version>5.9.2</version>
             <scope>test</scope>
         </dependency>
 
-        <!--        <dependency>-->
-        <!--            <groupId>org.springframework.boot</groupId>-->
-        <!--            <artifactId>spring-boot-starter-test</artifactId>-->
-        <!--            <version>${spring_boot_version}</version>-->
-        <!--            <scope>test</scope>-->
-        <!--        </dependency>-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.vaadin.external.google</groupId>
+                    <artifactId>android-json</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
 
-        <!--        <dependency>-->
-        <!--            <groupId>org.springframework.boot</groupId>-->
-        <!--            <artifactId>spring-boot-starter-web</artifactId>-->
-        <!--            <version>${spring_boot_version}</version>-->
-        <!--        </dependency>-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+            <version>${spring_boot_version}</version>
+        </dependency>
 
 
         <dependency>
@@ -861,6 +833,31 @@
                 <SPRING_DATASOURCE_URL>jdbc:h2:file:./data-h2/r5</SPRING_DATASOURCE_URL>
                 <maven.test.skip>true</maven.test.skip>
             </properties>
+        </profile>
+        <profile>
+            <id>jetty</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-web</artifactId>
+                    <version>${spring_boot_version}</version>
+                    <exclusions>
+                        <exclusion>
+                            <groupId>org.springframework.boot</groupId>
+                            <artifactId>spring-boot-starter-tomcat</artifactId>
+                        </exclusion>
+                    </exclusions>
+                </dependency>
+                <dependency>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-jetty</artifactId>
+                    <version>${spring_boot_version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>test</id>
+
         </profile>
     </profiles>
 </project>
