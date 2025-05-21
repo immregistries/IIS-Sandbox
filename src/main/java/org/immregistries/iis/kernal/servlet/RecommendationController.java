@@ -278,6 +278,10 @@ public class RecommendationController {
 	}
 
 	public void printRecommendation(PrintWriter out, IDomainResource recommendation, IDomainResource patient) {
+		printRecommendation(out, recommendation, patient, fhirContext);
+	}
+
+	public static void printRecommendation(PrintWriter out, IDomainResource recommendation, IDomainResource patient, FhirContext fhirContext) {
 		out.println("<div class=\"w3-container\">");
 		out.println("<h4>Recommendations</h4>");
 		if (recommendation != null) {

@@ -327,22 +327,11 @@ public class PatientController {
 		if (req.getParameter(PARAM_PATIENT_REPORTED_ID) != null) {
 			patient = (IDomainResource) fhirClient.read().resource("Patient").withId(req.getParameter(PARAM_PATIENT_REPORTED_ID)).execute();
 		} else if (req.getParameter(PARAM_PATIENT_REPORTED_EXTERNAL_LINK) != null) {
-			IBundleProvider bundleProvider = fhirRequester.searchGoldenRecord(org.hl7.fhir.r5.model.Patient.class, //TODO choose priority golden or regular
+			IBundleProvider bundleProvider = fhirRequester.searchGoldenRecord(org.hl7.fhir.r5.model.Patient.class,
 				new SearchParameterMap(org.hl7.fhir.r5.model.Patient.SP_IDENTIFIER, new TokenParam().setValue(req.getParameter(PARAM_PATIENT_REPORTED_EXTERNAL_LINK))));
-//				Patient.IDENTIFIER.exactly().identifier(req.getParameter(PARAM_PATIENT_REPORTED_EXTERNAL_LINK)));
 			if (!bundleProvider.isEmpty()) {
 				patient = (IDomainResource) bundleProvider.getAllResources().get(0);
 			}
-//			if (patientBundle.hasEntry()) {
-//				patient = (Patient) patientBundle.getEntryFirstRep().getResource();
-//			}
-//			else {
-//				patientBundle = (Bundle) fhirRequester.searchRegularRecord(Patient.class,
-//					Patient.IDENTIFIER.exactly().identifier(req.getParameter(PARAM_PATIENT_REPORTED_EXTERNAL_LINK)));
-//				if (patientBundle.hasEntry()) {
-//					patient = (Patient) patientBundle.getEntryFirstRep().getResource();
-//				}
-//			}
 		}
 		return patient;
 	}
@@ -482,9 +471,9 @@ public class PatientController {
 					.hasId(new org.hl7.fhir.r5.model.IdType(patientMasterSelected.getPatientId()))
 				).returnBundle(org.hl7.fhir.r5.model.Bundle.class).execute();
 			if (recommendationBundle.hasEntry()) {
-				RecommendationController.printRecommendationR5(out, (org.hl7.fhir.r5.model.ImmunizationRecommendation) recommendationBundle.getEntryFirstRep().getResource(), (org.hl7.fhir.r5.model.Patient) patientSelected);
+				RecommendationController.printRecommendation(out, (IDomainResource) recommendationBundle.getEntryFirstRep().getResource(), (IDomainResource) patientSelected, fhirContext);
 			} else {
-				RecommendationController.printRecommendationR5(out, null, (org.hl7.fhir.r5.model.Patient) patientSelected);
+				RecommendationController.printRecommendation(out, null, (IDomainResource) patientSelected, fhirContext);
 			}
 			org.hl7.fhir.r5.model.Bundle subcriptionBundle = fhirClient.search().forResource(org.hl7.fhir.r5.model.Subscription.class).returnBundle(org.hl7.fhir.r5.model.Bundle.class).execute();
 			printSubscriptions(out, parser, subcriptionBundle, (org.hl7.fhir.r5.model.Resource) patientSelected);
@@ -497,9 +486,9 @@ public class PatientController {
 					.hasId(new org.hl7.fhir.r4.model.IdType(patientMasterSelected.getPatientId()))
 				).returnBundle(org.hl7.fhir.r4.model.Bundle.class).execute();
 			if (recommendationBundle.hasEntry()) {
-				RecommendationController.printRecommendationR4(out, (org.hl7.fhir.r4.model.ImmunizationRecommendation) recommendationBundle.getEntryFirstRep().getResource(), (org.hl7.fhir.r4.model.Patient) patientSelected);
+				RecommendationController.printRecommendation(out, (org.hl7.fhir.r4.model.ImmunizationRecommendation) recommendationBundle.getEntryFirstRep().getResource(), (org.hl7.fhir.r4.model.Patient) patientSelected, fhirContext);
 			} else {
-				RecommendationController.printRecommendationR4(out, null, (org.hl7.fhir.r4.model.Patient) patientSelected);
+				RecommendationController.printRecommendation(out, null, (org.hl7.fhir.r4.model.Patient) patientSelected, fhirContext);
 			}
 //					org.hl7.fhir.r4.model.Bundle subcriptionBundle = fhirClient.search().forResource(org.hl7.fhir.r4.model.Subscription.class).returnBundle(org.hl7.fhir.r4.model.Bundle.class).execute();
 //					printSubscriptions(out, parser, subcriptionBundle, (org.hl7.fhir.r4.model.Resource) patientSelected);
