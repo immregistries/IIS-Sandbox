@@ -200,7 +200,7 @@ public class VaccinationController {
 						}
 					}
 					out.println("<h4>Related Vaccination Records</h4>");
-					PatientController.printVaccinationList(out, relatedVaccinations);
+					printVaccinationList(out, relatedVaccinations);
 					HomeServlet.printGoldenRecordExplanation(out, immunizationResource);
 				}
 
@@ -284,6 +284,100 @@ public class VaccinationController {
 			immunization = fhirClient.read().resource("Immunization").withId(req.getParameter(PARAM_VACCINATION_REPORTED_ID)).execute();
 		}
 		return immunization;
+	}
+
+	public static void printVaccinationList(PrintWriter out, List<VaccinationMaster> vaccinationList) {
+		SimpleDateFormat sdfDate = new SimpleDateFormat("MM/dd/yyyy");
+
+		if (vaccinationList.isEmpty()) {
+			out.println("<div class=\"w3-panel w3-yellow\"><p>No Vaccinations</p></div>");
+		} else {
+			CodeMap codeMap = CodeMapManager.getCodeMap();
+			out.println(
+				"<table class=\"w3-table w3-bordered w3-striped w3-border test w3-hoverable\">");
+			out.println("  <tr class=\"w3-green\">");
+			out.println("    <th>Vaccine</th>");
+			out.println("    <th>Admin Date</th>");
+			out.println("    <th>Manufacturer</th>");
+			out.println("    <th>Lot Number</th>");
+			out.println("    <th>Information</th>");
+			out.println("    <th>Completion</th>");
+			out.println("    <th>Action</th>");
+			out.println("  </tr>");
+			out.println("  <tbody>");
+			for (VaccinationMaster vaccination : vaccinationList) {
+				out.println("  <tr>");
+				out.println("    <td>");
+				String link = "vaccination?" + VaccinationController.PARAM_VACCINATION_REPORTED_ID + "="
+					+ vaccination.getVaccinationId();
+				out.println("      <a href=\"" + link + "\">");
+				if (!StringUtils.isEmpty(vaccination.getVaccineCvxCode())) {
+					Code cvxCode = codeMap.getCodeForCodeset(CodesetType.VACCINATION_CVX_CODE,
+						vaccination.getVaccineCvxCode());
+					if (cvxCode == null) {
+						out.println("Unknown CVX (" + vaccination.getVaccineCvxCode() + ")");
+					} else {
+						out.println(
+							cvxCode.getLabel() + " (" + vaccination.getVaccineCvxCode() + ")");
+					}
+				}
+				out.println("      </a>");
+				out.println("    </td>");
+				out.println("    <td>");
+				if (vaccination.getAdministeredDate() == null) {
+					out.println("null");
+				} else {
+					out.println(sdfDate.format(vaccination.getAdministeredDate()));
+				}
+				out.println("    </td>");
+				out.println("    <td>");
+				if (!StringUtils.isEmpty(vaccination.getVaccineMvxCode())) {
+					Code mvxCode = codeMap.getCodeForCodeset(CodesetType.VACCINATION_MANUFACTURER_CODE,
+						vaccination.getVaccineMvxCode());
+					if (mvxCode == null) {
+						out.print("Unknown MVX");
+					} else {
+						out.print(mvxCode.getLabel());
+					}
+					out.println(" (" + vaccination.getVaccineMvxCode() + ")");
+				}
+				out.println("    </td>");
+				out.println("    <td>" + vaccination.getLotnumber() + "</td>");
+				out.println("    <td>");
+				if (!StringUtils.isEmpty(vaccination.getInformationSource())) {
+					Code informationCode =
+						codeMap.getCodeForCodeset(CodesetType.VACCINATION_INFORMATION_SOURCE,
+							vaccination.getInformationSource());
+					if (informationCode != null) {
+						out.print(informationCode.getLabel());
+						out.println(" (" + vaccination.getInformationSource() + ")");
+					}
+				}
+				out.println("    </td>");
+				out.println("    <td>");
+				if (!StringUtils.isEmpty(vaccination.getCompletionStatus())) {
+					Code completionCode = codeMap.getCodeForCodeset(CodesetType.VACCINATION_COMPLETION,
+						vaccination.getCompletionStatus());
+					if (completionCode != null) {
+						out.print(completionCode.getLabel());
+						out.println(" (" + vaccination.getCompletionStatus() + ")");
+					}
+				}
+				out.println("    <td>");
+				if (!StringUtils.isEmpty(vaccination.getActionCode())) {
+					Code actionCode = codeMap.getCodeForCodeset(CodesetType.VACCINATION_ACTION_CODE,
+						vaccination.getActionCode());
+					if (actionCode != null) {
+						out.print(actionCode.getLabel());
+						out.println(" (" + vaccination.getActionCode() + ")");
+					}
+				}
+				out.println("    </td>");
+				out.println("  </tr>");
+			}
+			out.println("  </tbody>");
+			out.println("</table>");
+		}
 	}
 
 }

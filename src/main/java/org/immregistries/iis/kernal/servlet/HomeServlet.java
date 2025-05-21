@@ -112,10 +112,15 @@ public class HomeServlet {
 		out.println("    </ul>");
 	}
 
+
 	public static void printGoldenRecordExplanation(PrintWriter out, IBaseResource iBaseResource) {
+		printGoldenRecordExplanation(out, AbstractFhirRequester.isGoldenRecord(iBaseResource));
+	}
+
+	public static void printGoldenRecordExplanation(PrintWriter out, boolean isGolden) {
 		String color;
 		String message;
-		if (AbstractFhirRequester.isGoldenRecord(iBaseResource)) {
+		if (isGolden) {
 			color = "yellow";
 			message = "Consolidated (Golden) record, As part of the Master Data Management (MDM), this record was generated aggregating the information across records identified as potential duplicates";
 		} else {
@@ -128,6 +133,7 @@ public class HomeServlet {
 		out.println(message);
 		out.println("</p></div>");
 	}
+
 
 	@GetMapping
 	@PostMapping

@@ -17,11 +17,7 @@ import org.hibernate.Session;
 import org.hibernate.query.Query;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.instance.model.api.IDomainResource;
-import org.immregistries.codebase.client.CodeMap;
-import org.immregistries.codebase.client.generated.Code;
-import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
-import org.immregistries.iis.kernal.logic.CodeMapManager;
 import org.immregistries.iis.kernal.mapping.interfaces.PatientMapper;
 import org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester;
 import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
@@ -60,7 +56,7 @@ public class PatientController {
 	public static final String PARAM_PATIENT_REPORTED_ID = "id";
 
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
-	
+
 	@Autowired
 	private RepositoryClientFactory repositoryClientFactory;
 	@Autowired
@@ -69,260 +65,6 @@ public class PatientController {
 	private FhirContext fhirContext;
 	@Autowired
 	private PatientMapper patientMapper;
-
-	public static String linkUrl(String facilityId) {
-		return "/tenant/" + facilityId + "/patient";
-	}
-
-	public static void printMessageReceived(PrintWriter out, MessageReceived messageReceived) {
-		SimpleDateFormat sdfTime = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
-		out.println("     <h3>" + messageReceived.getCategoryRequest() + " - "
-			+ messageReceived.getCategoryResponse() + " "
-			+ sdfTime.format(messageReceived.getReportedDate()) + "</h3>");
-		out.println("     <pre>" + messageReceived.getMessageRequest() + "</pre>");
-		out.println("     <pre>" + messageReceived.getMessageResponse() + "</pre>");
-	}
-
-	@PostMapping
-	protected void doPost(HttpServletRequest req, HttpServletResponse resp
-//		, @PathVariable(name = TenantController.PATH_VARIABLE_TENANT_NAME, required = false) String tenantName
-	)
-		throws ServletException, IOException {
-		doGet(req, resp);
-	}
-
-	@GetMapping
-	protected void doGet(HttpServletRequest req, HttpServletResponse resp
-//		, @PathVariable(name = TenantController.PATH_VARIABLE_TENANT_NAME, required = false) String tenantName
-	)
-		throws ServletException, IOException {
-		resp.setContentType("text/html");
-		PrintWriter out = new PrintWriter(resp.getOutputStream());
-		try (Session dataSession = ServletHelper.getDataSession()) {
-			Tenant tenant = ServletHelper.getTenant(req, dataSession);
-			if (tenant == null) {
-				if (ServletHelper.getUserAccess() != null) {
-					resp.sendRedirect("/iis/tenant");
-				}
-				throw new AuthenticationCredentialsNotFoundException("");
-			}
-			IGenericClient fhirClient = repositoryClientFactory.newGenericClient(req);
-			try {
-				String patientNameLast = req.getParameter(PARAM_PATIENT_NAME_LAST);
-				String patientNameFirst = req.getParameter(PARAM_PATIENT_NAME_FIRST);
-				String externalLink = req.getParameter(PARAM_PATIENT_REPORTED_EXTERNAL_LINK);
-
-				List<PatientMaster> patientMasterList = null;
-				String action = req.getParameter(PARAM_ACTION);
-				if (action != null) {
-					if (action.equals(ACTION_SEARCH)) {
-						patientMasterList = fhirRequester.searchPatientMasterGoldenList(
-							new SearchParameterMap("family", new StringParam(patientNameLast))
-								.add("name", new StringParam(patientNameFirst))
-								.add("identifier", new TokenParam().setValue(externalLink))
-						);
-					}
-				}
-
-				if (patientNameLast == null) {
-					patientNameLast = "";
-				}
-				if (patientNameFirst == null) {
-					patientNameFirst = "";
-				}
-				if (externalLink == null) {
-					externalLink = "";
-				}
-
-				HomeServlet.doHeader(out, "IIS Sandbox - Patients", tenant);
-
-				PatientMaster patientMasterSelected = null;
-				IBaseResource patientSelected = fetchPatientFromParameter(req, fhirClient, fhirRequester);
-
-				if (patientSelected == null) {
-					out.println("<h2>Patients</h2>");
-					out.println("<div class=\"w3-container w3-half w3-margin-top\">");
-					out.println("    <h3>Search Patient Registry</h3>");
-					out.println("    <form method=\"GET\" action=\"patient\" class=\"w3-container w3-card-4\">");
-					out.println("      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_PATIENT_NAME_LAST + "\" value=\"" + patientNameLast + "\"/>");
-					out.println("      <label>Last Name</label>");
-					out.println("      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_PATIENT_NAME_FIRST + "\" value=\"" + patientNameFirst + "\"/>");
-					out.println("      <label>First Name</label>");
-					out.println("      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_PATIENT_REPORTED_EXTERNAL_LINK + "\" value=\"" + externalLink + "\"/>");
-					out.println("      <label>Medical Record Number</label><br/>");
-					out.println("      <input class=\"w3-button w3-section w3-teal w3-ripple\" type=\"submit\" name=\""
-						+ PARAM_ACTION + "\" value=\"" + ACTION_SEARCH + "\"/>");
-					out.println("    </form>");
-					out.println("</div>");
-
-					out.println("<div class=\"w3-container\">");
-
-					boolean showingRecent = false;
-					if (patientMasterList == null) {
-						showingRecent = true;
-						patientMasterList = fhirRequester.searchPatientMasterGoldenList(new SearchParameterMap()); // TODO Paging ?
-					}
-
-					printPatientList(out, patientMasterList, showingRecent);
-					out.println("  </div>");
-
-					{
-						out.println("<div class=\"w3-container\">");
-						out.println("<h4>FHIR Api Shortcuts</h4>");
-						String apiBaseUrl = "/iis/fhir/" + tenant.getOrganizationName();
-						{
-							String link = apiBaseUrl + "/Patient";
-							out.println("<div>All FHIR Patient records: <a href=\"" + link + "\">" + link + "</a></div>");
-						}
-						{
-							String link = apiBaseUrl + "/Patient" + "?_tag=GOLDEN_RECORD";
-							out.println("<div>Patient golden records (records referenced by duplicates): <a href=\"" + link + "\">" + link + "</a></div>");
-						}
-						out.println("</div>");
-					}
-				} else {
-					patientMasterSelected = patientMapper.localObject(patientSelected);
-					IParser parser = repositoryClientFactory.getFhirContext()
-						.newJsonParser().setPrettyPrint(true).setSuppressNarratives(true);
-					out.println("<h2>Patient : " + patientMasterSelected.getNameFirst() + " " + patientMasterSelected.getNameMiddle() + " " + patientMasterSelected.getNameLast() + "</h2>");
-					{
-						printPatient(out, patientMasterSelected);
-					}
-					out.println("  <div class=\"w3-container\">");
-					{
-						ReferenceParam referenceParam = new ReferenceParam().setValue(patientMasterSelected.getPatientId());
-						if (AbstractFhirRequester.isGoldenRecord(patientSelected)) {
-							referenceParam.setMdmExpand(true);
-						}
-						List<VaccinationMaster> vaccinationList = fhirRequester.searchVaccinationMasterGoldenList(
-							new SearchParameterMap().add("patient", referenceParam)
-						);
-						out.println("<h4>Vaccinations</h4>");
-						printVaccinationList(out, vaccinationList);
-					}
-					{
-						ReferenceParam referenceParam = new ReferenceParam().setValue(patientMasterSelected.getPatientId());
-						if (AbstractFhirRequester.isGoldenRecord(patientSelected)) {
-							referenceParam.setMdmExpand(true);
-						}
-						List<ObservationReported> observationReportedList = fhirRequester.searchObservationReportedList(
-							new SearchParameterMap("subject", referenceParam));
-						Set<String> suppressSet = LoincIdentifier.getSuppressIdentifierCodeSet();
-						observationReportedList.removeIf(observationReported -> suppressSet.contains(observationReported.getIdentifierCode()));
-
-						out.println("<h4>Patient Observations</h4>");
-						printObservationList(out, observationReportedList);
-					}
-					{
-						List<PatientMaster> relatedPatients = List.of();
-						if (AbstractFhirRequester.isGoldenRecord(patientSelected)) {
-							relatedPatients = fhirRequester.searchPatientReportedFromGoldenIdWithMdmLinks(patientMasterSelected.getPatientId());
-						} else {
-							PatientMaster goldenRecord = fhirRequester.readPatientMasterWithMdmLink(patientMasterSelected.getPatientId());
-							if (goldenRecord != null) {
-								relatedPatients = List.of(goldenRecord);
-							}
-						}
-						out.println("<h4>Related Patient records</h4>");
-						printPatientList(out, relatedPatients, false);
-						HomeServlet.printGoldenRecordExplanation(out, patientSelected);
-					}
-					out.println("  </div>");
-
-
-					if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R5)) { // TODO support for R4
-						org.hl7.fhir.r5.model.Bundle recommendationBundle = fhirClient.search()
-							.forResource(org.hl7.fhir.r5.model.ImmunizationRecommendation.class)
-							.where(org.hl7.fhir.r5.model.ImmunizationRecommendation.PATIENT
-								.hasId(new org.hl7.fhir.r5.model.IdType(patientMasterSelected.getPatientId()))
-							).returnBundle(org.hl7.fhir.r5.model.Bundle.class).execute();
-						if (recommendationBundle.hasEntry()) {
-							RecommendationController.printRecommendationR5(out, (org.hl7.fhir.r5.model.ImmunizationRecommendation) recommendationBundle.getEntryFirstRep().getResource(), (org.hl7.fhir.r5.model.Patient) patientSelected);
-						} else {
-							RecommendationController.printRecommendationR5(out, null, (org.hl7.fhir.r5.model.Patient) patientSelected);
-						}
-						org.hl7.fhir.r5.model.Bundle subcriptionBundle = fhirClient.search().forResource(org.hl7.fhir.r5.model.Subscription.class).returnBundle(org.hl7.fhir.r5.model.Bundle.class).execute();
-						printSubscriptions(out, parser, subcriptionBundle, (org.hl7.fhir.r5.model.Resource) patientSelected);
-					}
-
-					if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R4)) {
-						org.hl7.fhir.r4.model.Bundle recommendationBundle = fhirClient.search()
-							.forResource(org.hl7.fhir.r4.model.ImmunizationRecommendation.class)
-							.where(org.hl7.fhir.r4.model.ImmunizationRecommendation.PATIENT
-								.hasId(new org.hl7.fhir.r4.model.IdType(patientMasterSelected.getPatientId()))
-							).returnBundle(org.hl7.fhir.r4.model.Bundle.class).execute();
-						if (recommendationBundle.hasEntry()) {
-							RecommendationController.printRecommendationR4(out, (org.hl7.fhir.r4.model.ImmunizationRecommendation) recommendationBundle.getEntryFirstRep().getResource(), (org.hl7.fhir.r4.model.Patient) patientSelected);
-						} else {
-							RecommendationController.printRecommendationR4(out, null, (org.hl7.fhir.r4.model.Patient) patientSelected);
-						}
-//					org.hl7.fhir.r4.model.Bundle subcriptionBundle = fhirClient.search().forResource(org.hl7.fhir.r4.model.Subscription.class).returnBundle(org.hl7.fhir.r4.model.Bundle.class).execute();
-//					printSubscriptions(out, parser, subcriptionBundle, (org.hl7.fhir.r4.model.Resource) patientSelected);
-					}
-
-					{
-						out.println("<div class=\"w3-container\">");
-						out.println("<h4>FHIR Api Shortcuts</h4>");
-						String apiBaseUrl = "/iis/fhir/" + tenant.getOrganizationName();
-						{
-							String link = apiBaseUrl + "/Patient/" + patientMasterSelected.getPatientId();
-							out.println("<div>FHIR Resource: <a href=\"" + link + "\">" + link + "</a></div>");
-						}
-						{
-							String link = apiBaseUrl + "/Patient/" + patientMasterSelected.getPatientId() + "/$everything?_mdm=true";
-							out.println("<div>Everything related to this Patient: <a href=\"" + link + "\">" + link + "</a></div>");
-						}
-						{
-							String link = apiBaseUrl + "/Patient/" + patientMasterSelected.getPatientId() + "/$summary";
-							out.println("<div>International Patient Summary: <a href=\"" + link + "\">" + link + "</a></div>");
-						}
-						{
-							String link = apiBaseUrl + "/Immunization?patient:mdm=Patient/" + patientMasterSelected.getPatientId();
-							out.println("<div>All Immunizations related<a href=\"" + link + "\">" + link + "</a></div>");
-						}
-						{
-							String link = apiBaseUrl + "/Observation?patient:mdm=Patient/" + patientMasterSelected.getPatientId();
-							out.println("<div>All Observations related<a href=\"" + link + "\">" + link + "</a></div>");
-						}
-						{
-							String link;
-							if (AbstractFhirRequester.isGoldenRecord(patientSelected)) {
-								link = apiBaseUrl + "/$mdm-query-links?goldenResourceId=" + patientMasterSelected.getPatientId();
-							} else {
-								link = apiBaseUrl + "/$mdm-query-links?resourceId=" + patientMasterSelected.getPatientId();
-							}
-							out.println("<div>Related Patient Records: <a href=\"" + link + "\">" + link + "</a></div>");
-						}
-						out.println("</div>");
-					}
-
-					{
-						out.println("<div class=\"w3-container\">");
-						out.println("<h4>Messages Received</h4>");
-						Query<MessageReceived> query = dataSession.createQuery(
-							"from MessageReceived where patientReportedId = :patientReportedId order by reportedDate asc", MessageReceived.class);
-						query.setParameter("patientReportedId", patientMasterSelected.getPatientId());
-						List<MessageReceived> messageReceivedList = query.list();
-						if (messageReceivedList.isEmpty()) {
-							out.println("<div class=\"w3-panel w3-yellow\"><p>No Messages Received</p></div>");
-						} else {
-							for (MessageReceived messageReceived : messageReceivedList) {
-								printMessageReceived(out, messageReceived);
-							}
-						}
-						out.println("</div>");
-					}
-
-					out.println("</div>");
-				}
-			} catch (Exception e) {
-				e.printStackTrace(System.err);
-			}
-		}
-		HomeServlet.doFooter(out);
-		out.flush();
-		out.close();
-	}
 
 	public static void printPatientList(PrintWriter out, List<PatientMaster> patientMasterList, boolean showingRecent) {
 		if (patientMasterList != null) {
@@ -362,100 +104,6 @@ public class PatientController {
 					out.println("<em>Only the first 100 are shown</em>");
 				}
 			}
-		}
-	}
-
-	public static void printVaccinationList(PrintWriter out, List<VaccinationMaster> vaccinationList) {
-		SimpleDateFormat sdfDate = new SimpleDateFormat("MM/dd/yyyy");
-
-		if (vaccinationList.isEmpty()) {
-			out.println("<div class=\"w3-panel w3-yellow\"><p>No Vaccinations</p></div>");
-		} else {
-			CodeMap codeMap = CodeMapManager.getCodeMap();
-			out.println(
-				"<table class=\"w3-table w3-bordered w3-striped w3-border test w3-hoverable\">");
-			out.println("  <tr class=\"w3-green\">");
-			out.println("    <th>Vaccine</th>");
-			out.println("    <th>Admin Date</th>");
-			out.println("    <th>Manufacturer</th>");
-			out.println("    <th>Lot Number</th>");
-			out.println("    <th>Information</th>");
-			out.println("    <th>Completion</th>");
-			out.println("    <th>Action</th>");
-			out.println("  </tr>");
-			out.println("  <tbody>");
-			for (VaccinationMaster vaccination : vaccinationList) {
-				out.println("  <tr>");
-				out.println("    <td>");
-				String link = "vaccination?" + VaccinationController.PARAM_VACCINATION_REPORTED_ID + "="
-					+ vaccination.getVaccinationId();
-				out.println("      <a href=\"" + link + "\">");
-				if (!StringUtils.isEmpty(vaccination.getVaccineCvxCode())) {
-					Code cvxCode = codeMap.getCodeForCodeset(CodesetType.VACCINATION_CVX_CODE,
-						vaccination.getVaccineCvxCode());
-					if (cvxCode == null) {
-						out.println("Unknown CVX (" + vaccination.getVaccineCvxCode() + ")");
-					} else {
-						out.println(
-							cvxCode.getLabel() + " (" + vaccination.getVaccineCvxCode() + ")");
-					}
-				}
-				out.println("      </a>");
-				out.println("    </td>");
-				out.println("    <td>");
-				if (vaccination.getAdministeredDate() == null) {
-					out.println("null");
-				} else {
-					out.println(sdfDate.format(vaccination.getAdministeredDate()));
-				}
-				out.println("    </td>");
-				out.println("    <td>");
-				if (!StringUtils.isEmpty(vaccination.getVaccineMvxCode())) {
-					Code mvxCode = codeMap.getCodeForCodeset(CodesetType.VACCINATION_MANUFACTURER_CODE,
-						vaccination.getVaccineMvxCode());
-					if (mvxCode == null) {
-						out.print("Unknown MVX");
-					} else {
-						out.print(mvxCode.getLabel());
-					}
-					out.println(" (" + vaccination.getVaccineMvxCode() + ")");
-				}
-				out.println("    </td>");
-				out.println("    <td>" + vaccination.getLotnumber() + "</td>");
-				out.println("    <td>");
-				if (!StringUtils.isEmpty(vaccination.getInformationSource())) {
-					Code informationCode =
-						codeMap.getCodeForCodeset(CodesetType.VACCINATION_INFORMATION_SOURCE,
-							vaccination.getInformationSource());
-					if (informationCode != null) {
-						out.print(informationCode.getLabel());
-						out.println(" (" + vaccination.getInformationSource() + ")");
-					}
-				}
-				out.println("    </td>");
-				out.println("    <td>");
-				if (!StringUtils.isEmpty(vaccination.getCompletionStatus())) {
-					Code completionCode = codeMap.getCodeForCodeset(CodesetType.VACCINATION_COMPLETION,
-						vaccination.getCompletionStatus());
-					if (completionCode != null) {
-						out.print(completionCode.getLabel());
-						out.println(" (" + vaccination.getCompletionStatus() + ")");
-					}
-				}
-				out.println("    <td>");
-				if (!StringUtils.isEmpty(vaccination.getActionCode())) {
-					Code actionCode = codeMap.getCodeForCodeset(CodesetType.VACCINATION_ACTION_CODE,
-						vaccination.getActionCode());
-					if (actionCode != null) {
-						out.print(actionCode.getLabel());
-						out.println(" (" + vaccination.getActionCode() + ")");
-					}
-				}
-				out.println("    </td>");
-				out.println("  </tr>");
-			}
-			out.println("  </tbody>");
-			out.println("</table>");
 		}
 	}
 
@@ -674,7 +322,6 @@ public class PatientController {
 		out.println("</div>");
 	}
 
-
 	public static IDomainResource fetchPatientFromParameter(HttpServletRequest req, IGenericClient fhirClient, AbstractFhirRequester fhirRequester) {
 		IDomainResource patient = null;
 		if (req.getParameter(PARAM_PATIENT_REPORTED_ID) != null) {
@@ -698,6 +345,265 @@ public class PatientController {
 //			}
 		}
 		return patient;
+	}
+
+	public static void printMessageReceived(PrintWriter out, MessageReceived messageReceived) {
+		SimpleDateFormat sdfTime = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+		out.println("     <h3>" + messageReceived.getCategoryRequest() + " - "
+			+ messageReceived.getCategoryResponse() + " "
+			+ sdfTime.format(messageReceived.getReportedDate()) + "</h3>");
+		out.println("     <pre>" + messageReceived.getMessageRequest() + "</pre>");
+		out.println("     <pre>" + messageReceived.getMessageResponse() + "</pre>");
+	}
+
+	private static void printFhirShortcuts(PrintWriter out, IBaseResource patientSelected, PatientMaster patientMasterSelected, Tenant tenant) {
+		out.println("<h4>FHIR Api Shortcuts</h4>");
+		String apiBaseUrl = "/iis/fhir/" + tenant.getOrganizationName();
+		{
+			String link = apiBaseUrl + "/Patient/" + patientMasterSelected.getPatientId();
+			out.println("<div>FHIR Resource: <a href=\"" + link + "\">" + link + "</a></div>");
+		}
+		{
+			String link = apiBaseUrl + "/Patient/" + patientMasterSelected.getPatientId() + "/$everything?_mdm=true";
+			out.println("<div>Everything related to this Patient: <a href=\"" + link + "\">" + link + "</a></div>");
+		}
+		{
+			String link = apiBaseUrl + "/Patient/" + patientMasterSelected.getPatientId() + "/$summary";
+			out.println("<div>International Patient Summary: <a href=\"" + link + "\">" + link + "</a></div>");
+		}
+		{
+			String link = apiBaseUrl + "/Immunization?patient:mdm=Patient/" + patientMasterSelected.getPatientId();
+			out.println("<div>All Immunizations related<a href=\"" + link + "\">" + link + "</a></div>");
+		}
+		{
+			String link = apiBaseUrl + "/Observation?patient:mdm=Patient/" + patientMasterSelected.getPatientId();
+			out.println("<div>All Observations related<a href=\"" + link + "\">" + link + "</a></div>");
+		}
+		{
+			String link;
+			if (AbstractFhirRequester.isGoldenRecord(patientSelected)) {
+				link = apiBaseUrl + "/$mdm-query-links?goldenResourceId=" + patientMasterSelected.getPatientId();
+			} else {
+				link = apiBaseUrl + "/$mdm-query-links?resourceId=" + patientMasterSelected.getPatientId();
+			}
+			out.println("<div>Related Patient Records: <a href=\"" + link + "\">" + link + "</a></div>");
+		}
+	}
+
+	@PostMapping
+	protected void doPost(HttpServletRequest req, HttpServletResponse resp
+//		, @PathVariable(name = TenantController.PATH_VARIABLE_TENANT_NAME, required = false) String tenantName
+	)
+		throws ServletException, IOException {
+		doGet(req, resp);
+	}
+
+	@GetMapping
+	protected void doGet(HttpServletRequest req, HttpServletResponse resp
+//		, @PathVariable(name = TenantController.PATH_VARIABLE_TENANT_NAME, required = false) String tenantName
+	)
+		throws ServletException, IOException {
+		resp.setContentType("text/html");
+		PrintWriter out = new PrintWriter(resp.getOutputStream());
+		try (Session dataSession = ServletHelper.getDataSession()) {
+			Tenant tenant = ServletHelper.getTenant(req, dataSession);
+			if (tenant == null) {
+				if (ServletHelper.getUserAccess() != null) {
+					resp.sendRedirect("/iis/tenant");
+				}
+				throw new AuthenticationCredentialsNotFoundException("");
+			}
+			IGenericClient fhirClient = repositoryClientFactory.newGenericClient(req);
+			try {
+				HomeServlet.doHeader(out, "IIS Sandbox - Patients", tenant);
+				IBaseResource patientSelected = fetchPatientFromParameter(req, fhirClient, fhirRequester);
+
+				if (patientSelected == null) {
+					searchOrPrintAll(req, out, tenant);
+				} else {
+					singlePatientInformationPrintAll(out, patientSelected, fhirClient, tenant, dataSession);
+				}
+			} catch (Exception e) {
+				e.printStackTrace(System.err);
+			}
+		}
+		HomeServlet.doFooter(out);
+		out.flush();
+		out.close();
+	}
+
+	private void singlePatientInformationPrintAll(PrintWriter out, IBaseResource patientSelected, IGenericClient fhirClient, Tenant tenant, Session dataSession) {
+		PatientMaster patientMasterSelected = patientMapper.localObject(patientSelected);
+		boolean isGolden = AbstractFhirRequester.isGoldenRecord(patientSelected);
+
+		out.println("<h2>Patient : " + patientMasterSelected.getNameFirst() + " " + patientMasterSelected.getNameMiddle() + " " + patientMasterSelected.getNameLast() + "</h2>");
+
+		printPatient(out, patientMasterSelected);
+
+		out.println("  <div class=\"w3-container\">");
+
+		printPatientVaccinations(out, patientMasterSelected, isGolden);
+		printPatientObservations(out, patientMasterSelected, isGolden);
+		printRelatedPatients(out, patientMasterSelected, isGolden);
+
+		out.println("  </div>");
+
+		printPatientRecommendationsAndSubscriptions(out, patientSelected, patientMasterSelected, fhirClient);
+
+		out.println("<div class=\"w3-container\">");
+		printFhirShortcuts(out, patientSelected, patientMasterSelected, tenant);
+		out.println("</div>");
+
+		out.println("<div class=\"w3-container\">");
+		out.println("<h4>Messages Received</h4>");
+		Query<MessageReceived> query = dataSession.createQuery(
+			"from MessageReceived where patientReportedId = :patientReportedId order by reportedDate asc", MessageReceived.class);
+		query.setParameter("patientReportedId", patientMasterSelected.getPatientId());
+		List<MessageReceived> messageReceivedList = query.list();
+		if (messageReceivedList.isEmpty()) {
+			out.println("<div class=\"w3-panel w3-yellow\"><p>No Messages Received</p></div>");
+		} else {
+			for (MessageReceived messageReceived : messageReceivedList) {
+				printMessageReceived(out, messageReceived);
+			}
+		}
+		out.println("</div>");
+
+		out.println("</div>");
+	}
+
+	private void printPatientRecommendationsAndSubscriptions(PrintWriter out, IBaseResource patientSelected, PatientMaster patientMasterSelected, IGenericClient fhirClient) {
+		IParser parser = repositoryClientFactory.getFhirContext()
+			.newJsonParser().setPrettyPrint(true).setSuppressNarratives(true);
+		if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R5)) {
+			org.hl7.fhir.r5.model.Bundle recommendationBundle = fhirClient.search()
+				.forResource(org.hl7.fhir.r5.model.ImmunizationRecommendation.class)
+				.where(org.hl7.fhir.r5.model.ImmunizationRecommendation.PATIENT
+					.hasId(new org.hl7.fhir.r5.model.IdType(patientMasterSelected.getPatientId()))
+				).returnBundle(org.hl7.fhir.r5.model.Bundle.class).execute();
+			if (recommendationBundle.hasEntry()) {
+				RecommendationController.printRecommendationR5(out, (org.hl7.fhir.r5.model.ImmunizationRecommendation) recommendationBundle.getEntryFirstRep().getResource(), (org.hl7.fhir.r5.model.Patient) patientSelected);
+			} else {
+				RecommendationController.printRecommendationR5(out, null, (org.hl7.fhir.r5.model.Patient) patientSelected);
+			}
+			org.hl7.fhir.r5.model.Bundle subcriptionBundle = fhirClient.search().forResource(org.hl7.fhir.r5.model.Subscription.class).returnBundle(org.hl7.fhir.r5.model.Bundle.class).execute();
+			printSubscriptions(out, parser, subcriptionBundle, (org.hl7.fhir.r5.model.Resource) patientSelected);
+		}
+
+		if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R4)) {
+			org.hl7.fhir.r4.model.Bundle recommendationBundle = fhirClient.search()
+				.forResource(org.hl7.fhir.r4.model.ImmunizationRecommendation.class)
+				.where(org.hl7.fhir.r4.model.ImmunizationRecommendation.PATIENT
+					.hasId(new org.hl7.fhir.r4.model.IdType(patientMasterSelected.getPatientId()))
+				).returnBundle(org.hl7.fhir.r4.model.Bundle.class).execute();
+			if (recommendationBundle.hasEntry()) {
+				RecommendationController.printRecommendationR4(out, (org.hl7.fhir.r4.model.ImmunizationRecommendation) recommendationBundle.getEntryFirstRep().getResource(), (org.hl7.fhir.r4.model.Patient) patientSelected);
+			} else {
+				RecommendationController.printRecommendationR4(out, null, (org.hl7.fhir.r4.model.Patient) patientSelected);
+			}
+//					org.hl7.fhir.r4.model.Bundle subcriptionBundle = fhirClient.search().forResource(org.hl7.fhir.r4.model.Subscription.class).returnBundle(org.hl7.fhir.r4.model.Bundle.class).execute();
+//					printSubscriptions(out, parser, subcriptionBundle, (org.hl7.fhir.r4.model.Resource) patientSelected);
+			// TODO support for R4
+
+		}
+	}
+
+	private void printRelatedPatients(PrintWriter out, PatientMaster patientMasterSelected, boolean isGolden) {
+		List<PatientMaster> relatedPatients = List.of();
+		if (isGolden) {
+			relatedPatients = fhirRequester.searchPatientReportedFromGoldenIdWithMdmLinks(patientMasterSelected.getPatientId());
+		} else {
+			PatientMaster goldenRecord = fhirRequester.readPatientMasterWithMdmLink(patientMasterSelected.getPatientId());
+			if (goldenRecord != null) {
+				relatedPatients = List.of(goldenRecord);
+			}
+		}
+		out.println("<h4>Related Patient records</h4>");
+		printPatientList(out, relatedPatients, false);
+		HomeServlet.printGoldenRecordExplanation(out, isGolden);
+	}
+
+	private void printPatientVaccinations(PrintWriter out, PatientMaster patientMasterSelected, boolean isGolden) {
+		ReferenceParam referenceParam = new ReferenceParam().setValue(patientMasterSelected.getPatientId());
+		referenceParam.setMdmExpand(isGolden);
+		List<VaccinationMaster> vaccinationList = fhirRequester.searchVaccinationMasterGoldenList(
+			new SearchParameterMap().add("patient", referenceParam)
+		);
+		out.println("<h4>Vaccinations</h4>");
+		VaccinationController.printVaccinationList(out, vaccinationList);
+	}
+
+	private void printPatientObservations(PrintWriter out, PatientMaster patientMasterSelected, boolean isGolden) {
+		ReferenceParam referenceParam = new ReferenceParam().setValue(patientMasterSelected.getPatientId());
+		referenceParam.setMdmExpand(isGolden);
+		List<ObservationReported> observationReportedList = fhirRequester.searchObservationReportedList(
+			new SearchParameterMap("subject", referenceParam));
+		Set<String> suppressSet = LoincIdentifier.getSuppressIdentifierCodeSet();
+		observationReportedList.removeIf(observationReported -> suppressSet.contains(observationReported.getIdentifierCode()));
+
+		out.println("<h4>Patient Observations</h4>");
+		printObservationList(out, observationReportedList);
+	}
+
+	private void searchOrPrintAll(HttpServletRequest req, PrintWriter out, Tenant tenant) {
+		/**
+		 * Extracting Parameters from Request in case of research
+		 */
+		String patientNameLast = StringUtils.defaultString(req.getParameter(PARAM_PATIENT_NAME_LAST));
+		String patientNameFirst = StringUtils.defaultString(req.getParameter(PARAM_PATIENT_NAME_FIRST));
+		String externalLink = StringUtils.defaultString(req.getParameter(PARAM_PATIENT_REPORTED_EXTERNAL_LINK));
+		List<PatientMaster> patientMasterList = null;
+		String action = req.getParameter(PARAM_ACTION);
+		if (action != null) {
+			if (action.equals(ACTION_SEARCH)) {
+				patientMasterList = fhirRequester.searchPatientMasterGoldenList(
+					new SearchParameterMap("family", new StringParam(patientNameLast))
+						.add("name", new StringParam(patientNameFirst))
+						.add("identifier", new TokenParam().setValue(externalLink))
+				);
+			}
+		}
+		List<PatientMaster> patientMasterList1 = patientMasterList;
+		out.println("<h2>Patients</h2>");
+		out.println("<div class=\"w3-container w3-half w3-margin-top\">");
+		out.println("    <h3>Search Patient Registry</h3>");
+		out.println("    <form method=\"GET\" action=\"patient\" class=\"w3-container w3-card-4\">");
+		out.println("      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_PATIENT_NAME_LAST + "\" value=\"" + patientNameLast + "\"/>");
+		out.println("      <label>Last Name</label>");
+		out.println("      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_PATIENT_NAME_FIRST + "\" value=\"" + patientNameFirst + "\"/>");
+		out.println("      <label>First Name</label>");
+		out.println("      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_PATIENT_REPORTED_EXTERNAL_LINK + "\" value=\"" + externalLink + "\"/>");
+		out.println("      <label>Medical Record Number</label><br/>");
+		out.println("      <input class=\"w3-button w3-section w3-teal w3-ripple\" type=\"submit\" name=\""
+			+ PARAM_ACTION + "\" value=\"" + ACTION_SEARCH + "\"/>");
+		out.println("    </form>");
+		out.println("</div>");
+
+		out.println("<div class=\"w3-container\">");
+
+		boolean showingRecent = false;
+		if (patientMasterList1 == null) {
+			showingRecent = true;
+			patientMasterList1 = fhirRequester.searchPatientMasterGoldenList(new SearchParameterMap()); // TODO Paging ?
+		}
+
+		printPatientList(out, patientMasterList1, showingRecent);
+		out.println("  </div>");
+
+		{
+			out.println("<div class=\"w3-container\">");
+			out.println("<h4>FHIR Api Shortcuts</h4>");
+			String apiBaseUrl = "/iis/fhir/" + tenant.getOrganizationName();
+			{
+				String link = apiBaseUrl + "/Patient";
+				out.println("<div>All FHIR Patient records: <a href=\"" + link + "\">" + link + "</a></div>");
+			}
+			{
+				String link = apiBaseUrl + "/Patient" + "?_tag=GOLDEN_RECORD";
+				out.println("<div>Patient golden records (records referenced by duplicates): <a href=\"" + link + "\">" + link + "</a></div>");
+			}
+			out.println("</div>");
+		}
 	}
 
 }
