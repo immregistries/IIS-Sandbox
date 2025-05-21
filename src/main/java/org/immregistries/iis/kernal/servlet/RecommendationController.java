@@ -301,12 +301,14 @@ public class RecommendationController {
 			out.println("	<input class=\"w3-button w3-section w3-teal w3-ripple\" type=\"submit\" name=\"submit\" value=\"Generate new recommendation\"/>");
 			out.println("</form>");
 		}
-		if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R5)) {
-			printRecommendationR5(out, (org.hl7.fhir.r5.model.ImmunizationRecommendation) recommendation);
-		} else if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R4)) {
-			printRecommendationR4(out, (org.hl7.fhir.r4.model.ImmunizationRecommendation) recommendation, (org.hl7.fhir.r4.model.Patient) patient);
-
+		if (recommendation != null) {
+			if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R5)) {
+				printRecommendationLineR5(out, (org.hl7.fhir.r5.model.ImmunizationRecommendation) recommendation);
+			} else if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R4)) {
+				printRecommendationLineR4(out, (org.hl7.fhir.r4.model.ImmunizationRecommendation) recommendation);
+			}
 		}
+
 		out.println("</tbody>");
 		out.println("</table>");
 
@@ -318,7 +320,7 @@ public class RecommendationController {
 		out.println("</div>");
 	}
 
-	public static void printRecommendationR5(PrintWriter out, org.hl7.fhir.r5.model.ImmunizationRecommendation recommendation) {
+	public static void printRecommendationLineR5(PrintWriter out, org.hl7.fhir.r5.model.ImmunizationRecommendation recommendation) {
 		int count = 0;
 		for (org.hl7.fhir.r5.model.ImmunizationRecommendation.ImmunizationRecommendationRecommendationComponent component : recommendation.getRecommendation()) {
 			count++;
@@ -335,7 +337,7 @@ public class RecommendationController {
 		}
 	}
 
-	public static void printRecommendationR4(PrintWriter out, org.hl7.fhir.r4.model.ImmunizationRecommendation recommendation, org.hl7.fhir.r4.model.Patient patient) {
+	public static void printRecommendationLineR4(PrintWriter out, org.hl7.fhir.r4.model.ImmunizationRecommendation recommendation) {
 		int count = 0;
 
 		for (org.hl7.fhir.r4.model.ImmunizationRecommendation.ImmunizationRecommendationRecommendationComponent component : recommendation.getRecommendation()) {
