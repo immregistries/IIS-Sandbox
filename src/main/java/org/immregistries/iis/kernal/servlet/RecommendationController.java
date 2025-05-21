@@ -236,7 +236,7 @@ public class RecommendationController {
 					 * Temporary change to send through subscription
 					 */
 					org.hl7.fhir.r5.model.ImmunizationRecommendation immunizationRecommendation = (org.hl7.fhir.r5.model.ImmunizationRecommendation) recommendationResource;
-					immunizationRecommendation.setPatient(new org.hl7.fhir.r5.model.Reference().setIdentifier(identifier.toR5())); // TODO filter to take always MRN ?
+					immunizationRecommendation.setPatient(new org.hl7.fhir.r5.model.Reference().setIdentifier(identifier.toR5()));
 					PatientController.printSubscriptions(out, parser, subcriptionBundle, immunizationRecommendation);
 				}
 			}

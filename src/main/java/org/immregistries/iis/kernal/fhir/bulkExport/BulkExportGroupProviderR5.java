@@ -117,8 +117,7 @@ public class BulkExportGroupProviderR5 extends GroupResourceProvider implements 
 		SortSpec theSortSpec,
 
 		ServletRequestDetails theRequestDetails
-	) throws IOException {
-//		Session dataSession = PopServlet.getDataSession();
+	) {
 		try {
 			Bundle bundle = new Bundle();
 			Group group = read(theRequestDetails.getServletRequest(), theId, theRequestDetails);
@@ -137,13 +136,25 @@ public class BulkExportGroupProviderR5 extends GroupResourceProvider implements 
 			e.printStackTrace();
 			throw e;
 		}
-//		finally {
-//			dataSession.close();
-//		}
 	}
 
+	/**
+	 * Old deprecated
+	 *
+	 * @param theId
+	 * @param theOutputFormat
+	 * @param theCount
+	 * @param theOffset
+	 * @param theLastUpdated
+	 * @param theContent
+	 * @param theNarrative
+	 * @param theFilter
+	 * @param theTypes
+	 * @param theSortSpec
+	 * @param theRequestDetails
+	 * @throws IOException
+	 */
 	public void groupInstanceSynchExport(
-
 		@IdParam
 		IdType theId,
 
@@ -184,13 +195,12 @@ public class BulkExportGroupProviderR5 extends GroupResourceProvider implements 
 
 		ServletRequestDetails theRequestDetails
 	) throws IOException {
-		Session dataSession = ServletHelper.getDataSession();
-		HttpServletRequest theServletRequest = theRequestDetails.getServletRequest();
-		logger.info("Parameters {}", (Object) theRequestDetails.getParameters().get("_elements"));
-		try {
+		try (Session dataSession = ServletHelper.getDataSession()) {
+			HttpServletRequest theServletRequest = theRequestDetails.getServletRequest();
+			logger.info("Parameters {}", (Object) theRequestDetails.getParameters().get("_elements"));
 
 			if (theOutputFormat == null) {
-//			theRequestDetails.se
+
 			}
 			BulkExportResponseJson bulkResponseDocument = new BulkExportResponseJson();
 
@@ -279,8 +289,6 @@ public class BulkExportGroupProviderR5 extends GroupResourceProvider implements 
 			response.getWriter().close();
 		} catch (Exception e) {
 			throw e;
-		} finally {
-			dataSession.close();
 		}
 	}
 
