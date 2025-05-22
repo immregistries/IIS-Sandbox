@@ -1,22 +1,23 @@
 package org.immregistries.iis.kernal.servlet;
 
 import ca.uhn.fhir.context.FhirContext;
-import ca.uhn.fhir.context.FhirVersionEnum;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Session;
+import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
-import org.immregistries.iis.kernal.logic.AbstractIncomingMessageHandler;
+import org.immregistries.iis.kernal.logic.V2ToFhirMessageHandler;
+import org.immregistries.iis.kernal.mapping.interfaces.ImmunizationMapper;
+import org.immregistries.iis.kernal.mapping.internalClient.IFhirRequester;
 import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
 import org.immregistries.iis.kernal.model.Tenant;
 import org.immregistries.smm.transform.ScenarioManager;
 import org.immregistries.smm.transform.TestCaseMessage;
 import org.immregistries.smm.transform.Transformer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,82 +25,61 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Date;
 
-import static org.immregistries.iis.kernal.servlet.PopController.POP_BASE_PATH;
+import static org.immregistries.iis.kernal.servlet.V2ToFhirController.V2_TO_FHIR_BASE_PATH;
 
-/**
- * Generated from PopServlet, changed to se PathVariable functionality
- */
+
 @RestController()
-@RequestMapping({POP_BASE_PATH, TenantController.TENANT_PATH + POP_BASE_PATH})
-public class PopController {
-	public static final String POP_BASE_PATH = "/pop";
+@RequestMapping({V2_TO_FHIR_BASE_PATH, TenantController.TENANT_PATH + V2_TO_FHIR_BASE_PATH})
+@Conditional(OnR4Condition.class)
+public class V2ToFhirController {
+	public static final String V2_TO_FHIR = "v2ToFhir";
+	public static final String V2_TO_FHIR_BASE_PATH = "/" + V2_TO_FHIR;
 	public static final String PARAM_MESSAGE = "MESSAGEDATA";
 	public static final String PARAM_FACILITY_NAME = "FACILITY_NAME";
-	private final Logger logger = LoggerFactory.getLogger(this.getClass());
+	public static final String MSH_HEADER_REGEX = "MSH\\|\\^~\\\\&\\|";
+	public static final String MSH_HEADER = "MSH|^~\\&|";
 	@Autowired
-	private FhirContext fhirContext;
+	RepositoryClientFactory repositoryClientFactory;
 	@Autowired
-	private RepositoryClientFactory repositoryClientFactory;
+	ImmunizationMapper immunizationMapper;
 	@Autowired
-	private AbstractIncomingMessageHandler handler;
+	IFhirRequester fhirRequester;
+	@Autowired
+	V2ToFhirMessageHandler v2ToFhirMessageHandler;
+	@Autowired
+	FhirContext fhirContext;
 
 	@PostMapping
-//	@Transactional
-	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+		throws ServletException, IOException {
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		Session dataSession = null;
 		try {
 			dataSession = ServletHelper.getDataSession();
 			Tenant tenant = ServletHelper.getTenant(req, dataSession);
-
 			String ack = "";
 			String[] messages;
-			StringBuilder ackBuilder = new StringBuilder();
+			StringBuilder stringBuilder = new StringBuilder();
 			String message = req.getParameter(PARAM_MESSAGE);
 			String facility_name = req.getParameter(PARAM_FACILITY_NAME);
 			if (tenant == null) {
 				resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 				out.println("Access is not authorized. FacilityId, userid and/or password are not recognized. ");
 			} else {
-				HomeServlet.doHeader(out, "IIS Sandbox - PopResult", tenant);
+				HomeServlet.doHeader(out, "IIS Sandbox - V2ToFhir Result", tenant);
 
-				messages = message.split("MSH\\|\\^~\\\\&\\|");
-				if (messages.length > 2) {
-					req.setAttribute("groupPatientIds", new ArrayList<String>());
-				}
+				messages = message.split(MSH_HEADER_REGEX);
 				for (String msh : messages) {
 					if (!msh.isBlank()) {
-						ackBuilder.append(handler.process("MSH|^~\\&|" + msh, tenant, facility_name));
+						stringBuilder.append(v2ToFhirMessageHandler.process(MSH_HEADER + msh, tenant, facility_name));
 					}
 				}
-				ack = ackBuilder.toString();
-				ArrayList<String> groupPatientIds = (ArrayList<String>) req.getAttribute("groupPatientIds");
-				if (groupPatientIds != null) {
-					if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R5)) {
-						org.hl7.fhir.r5.model.Group group = new org.hl7.fhir.r5.model.Group();
-						for (String id :
-							groupPatientIds) {
-							group.addMember().setEntity(new org.hl7.fhir.r5.model.Reference().setReference("Patient/" + id));
-						}
-						group.setDescription("Generated from Hl2v2 VXU Query on  time " + new Date());
-						repositoryClientFactory.newGenericClient(req).create().resource(group).execute();
-					} else {
-						org.hl7.fhir.r4.model.Group group = new org.hl7.fhir.r4.model.Group();
-						for (String id :
-							groupPatientIds) {
-							group.addMember().setEntity(new org.hl7.fhir.r4.model.Reference().setReference("Patient/" + id));
-						}
-						repositoryClientFactory.newGenericClient(req).create().resource(group).execute();
-					}
-
-				}
+				ack = stringBuilder.toString();
 			}
 //      resp.setContentType("text/plain");
-			out.println("<textarea name=\"ack\" readonly style=\"width: 100%; height: 90%;\" >");
+			out.println("<textarea name=\"result\" readonly style=\"width: 100%; height: 90%;\" >");
 			out.print(ack);
 			out.println("</textarea>");
 
@@ -138,9 +118,9 @@ public class PopController {
 
 
 			{
-				HomeServlet.doHeader(out, "IIS Sandbox - Pop", tenant);
+				HomeServlet.doHeader(out, "IIS Sandbox - v2ToFhir", tenant);
 				out.println("    <h2>Send Now</h2>");
-				out.println("    <form action=\"pop\" method=\"POST\" target=\"_blank\" autocomplete=\"on\">");
+				out.println("    <form action=\"" + V2_TO_FHIR + "\" method=\"POST\" target=\"_blank\" autocomplete=\"on\">");
 				out.println("      <h3>VXU Message</h3>");
 				out.println("      <textarea class=\"w3-input\" autocomplete=\"off\" name=\"" + PARAM_MESSAGE
 					+ "\" rows=\"15\" cols=\"160\">" + message + "</textarea></td>");

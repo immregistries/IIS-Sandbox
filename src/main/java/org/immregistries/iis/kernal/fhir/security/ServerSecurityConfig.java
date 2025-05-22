@@ -49,6 +49,7 @@ public class ServerSecurityConfig {
 			.csrf((csrf) -> csrf
 				.ignoringRequestMatchers(
 					new AntPathRequestMatcher("/pop"),
+					new AntPathRequestMatcher("/v2ToFhir"),
 					new AntPathRequestMatcher("/message"),
 					new AntPathRequestMatcher("/fhir/**"),
 					new AntPathRequestMatcher("/loginForm"),

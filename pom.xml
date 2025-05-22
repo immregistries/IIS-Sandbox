@@ -50,6 +50,12 @@
             <version>3.17.0</version>
         </dependency>
 
+        <dependency>
+            <groupId>gov.cdc.izgw</groupId>
+            <artifactId>v2tofhir</artifactId>
+            <version>1.0.0-v2tofhir-SNAPSHOT</version>
+        </dependency>
+
         <!--        <dependency>-->
         <!--            <groupId>org.immregistries</groupId>-->
         <!--            <artifactId>nist-validator-connector</artifactId>-->

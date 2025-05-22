@@ -9,7 +9,7 @@
  import org.hibernate.Session;
  import org.immregistries.iis.kernal.fhir.interceptors.PartitionCreationInterceptor;
  import org.immregistries.iis.kernal.fhir.security.ServletHelper;
- import org.immregistries.iis.kernal.logic.AbstractIncomingMessageHandler;
+ import org.immregistries.iis.kernal.logic.IIncomingMessageHandler;
  import org.immregistries.iis.kernal.model.Tenant;
  import org.immregistries.smm.cdc.*;
  import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +28,7 @@ public class SoapController extends HttpServlet {
 
 	 public static final String SOAP_BASE_PATH = "/soap";
 	 @Autowired
-	 private AbstractIncomingMessageHandler handler;
+	 private IIncomingMessageHandler handler;
 	 @Autowired
 	 private PartitionCreationInterceptor partitionCreationInterceptor;
 
