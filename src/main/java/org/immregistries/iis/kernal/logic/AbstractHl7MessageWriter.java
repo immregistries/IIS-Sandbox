@@ -20,7 +20,7 @@ import java.util.Date;
 import java.util.Random;
 import java.util.Set;
 
-@SuppressWarnings({"rawtypes", "unchecked"})
+@SuppressWarnings({"rawtypes"})
 public abstract class AbstractHl7MessageWriter implements IExampleMessageWriter {
 	private static Integer increment = 1;
 
@@ -54,7 +54,7 @@ public abstract class AbstractHl7MessageWriter implements IExampleMessageWriter 
 				}
 			}
 		}
-		receivingFac.append(" v" + SoftwareVersion.VERSION);
+		receivingFac.append(" v").append(SoftwareVersion.VERSION);
 
 		reader.resetPostion();
 		if (reader.advanceToSegment("MSH")) {

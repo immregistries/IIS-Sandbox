@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Conditional(OnR5Condition.class)
+@SuppressWarnings({"unchecked"})
 public class Hl7MessageWriterR5 extends AbstractHl7MessageWriter {
 
 	public void printStoredObservations(StringBuilder sb, PatientMaster patientMaster, VaccinationMaster vaccination, int obsSubId, int obxSetId) {
@@ -25,8 +26,7 @@ public class Hl7MessageWriterR5 extends AbstractHl7MessageWriter {
 			if (bundle.hasEntry()) {
 				obsSubId++;
 				for (Bundle.BundleEntryComponent entry : bundle.getEntry()) {
-					ObservationReported observationReported =
-						observationMapper.localObjectReported(entry.getResource());
+					ObservationReported observationReported = observationMapper.localObjectReported(entry.getResource());
 					obxSetId++;
 					printObx(sb, obxSetId, obsSubId, observationReported);
 				}
