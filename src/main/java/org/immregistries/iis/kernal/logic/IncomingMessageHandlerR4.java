@@ -19,6 +19,7 @@ import java.util.Set;
 
 @Service
 @Conditional(OnR4Condition.class)
+@SuppressWarnings({"unchecked"})
 public class IncomingMessageHandlerR4 extends AbstractIncomingMessageHandler {
 
 	public @Nullable IIdType readResponsibleOrganizationIIdType(Tenant tenant, HL7Reader reader, String sendingFacilityName, Set<ProcessingFlavor> processingFlavorSet) throws ProcessingException {
@@ -77,7 +78,7 @@ public class IncomingMessageHandlerR4 extends AbstractIncomingMessageHandler {
 	public Organization processManagingOrganization(HL7Reader reader) {
 		String organizationName = reader.getValue(22, 1);
 		Organization managingOrganization = null;
-		String managingIdentifier = null;
+		String managingIdentifier;
 		managingIdentifier = reader.getValue(22, 11);
 		if (StringUtils.isBlank(managingIdentifier)) {
 			managingIdentifier = reader.getValue(22, 3);
