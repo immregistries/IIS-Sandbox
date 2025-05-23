@@ -80,9 +80,15 @@ public class SubscriptionTopicController {
 			).setResource("OperationOutcome?");
 
 
+		String baseUrl = "";
+		try {
+			baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString();
+		} catch (IllegalStateException ignored) {
+		}
+
 		SubscriptionTopic topic  = new SubscriptionTopic()
 			.setDescription("Testing communication between EHR and IIS and operation outcome")
-			.setUrl(ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString() +"/SubscriptionTopic/data-quality-issues")
+			.setUrl(baseUrl + "/SubscriptionTopic/data-quality-issues")
 			.setStatus(Enumerations.PublicationStatus.DRAFT)
 			.setExperimental(true).setPublisher("Aira/Nist")
 			.setTitle("Health equity data quality requests within Immunization systems");

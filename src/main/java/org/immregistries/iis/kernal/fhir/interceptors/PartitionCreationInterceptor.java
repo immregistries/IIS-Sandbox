@@ -1,7 +1,6 @@
 package org.immregistries.iis.kernal.fhir.interceptors;
 
 import ca.uhn.fhir.context.FhirContext;
-import ca.uhn.fhir.context.FhirVersionEnum;
 import ca.uhn.fhir.i18n.Msg;
 import ca.uhn.fhir.interceptor.api.Hook;
 import ca.uhn.fhir.interceptor.api.Pointcut;
@@ -119,10 +118,10 @@ public class PartitionCreationInterceptor extends RequestTenantPartitionIntercep
 		PartitionEntity partitionEntity = partitionLookupSvc.createPartition(new PartitionEntity().setName(tenantName).setId(idAttempt), new SystemRequestDetails());
 
 		//Create subscription topics
-		if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R5)) {
-			if (mySubscriptionTopicDao == null) {
-				mySubscriptionTopicDao = myDaoRegistry.getResourceDao("SubscriptionTopic");
-			}
+//		if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R5)) {
+//			if (mySubscriptionTopicDao == null) {
+//				mySubscriptionTopicDao = myDaoRegistry.getResourceDao("SubscriptionTopic");
+//			}
 //			RequestDetails requestDetails =  SystemRequestDetails.forRequestPartitionId(partitionEntity.toRequestPartitionId());
 //			SubscriptionTopic topic = SubscriptionTopicController.getDataQualityIssuesSubscriptionTopic();
 //			try {
@@ -136,7 +135,7 @@ public class PartitionCreationInterceptor extends RequestTenantPartitionIntercep
 	//		} catch (ResourceNotFoundException | ResourceGoneException e) {
 	//			mySubscriptionTopicDao.update(groupTopic, requestDetails);
 	//		}
-		}
+//		}
 
 		return partitionEntity.toRequestPartitionId();
 	}

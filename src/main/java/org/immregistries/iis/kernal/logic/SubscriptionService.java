@@ -1,6 +1,7 @@
 package org.immregistries.iis.kernal.logic;
 
 import ca.uhn.fhir.jpa.api.dao.IFhirSystemDao;
+import ca.uhn.fhir.jpa.provider.SubscriptionTriggeringProvider;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.client.interceptor.AdditionalRequestHeadersInterceptor;
@@ -27,6 +28,8 @@ public class SubscriptionService {
 	IFhirSystemDao fhirSystemDao;
 	@Autowired
 	RepositoryClientFactory repositoryClientFactory;
+	@Autowired
+	SubscriptionTriggeringProvider subscriptionTriggeringProvider;
 //	@Autowired
 //	SubscriptionDeliveringRestHookSubscriber subscriptionDeliveringRestHookSubscriber;
 //	@Autowired
@@ -50,7 +53,18 @@ public class SubscriptionService {
 //		return subscription;
 //	}
 
+//	public String triggerWithResource(Subscription subscription, List<Pair<String, Bundle.HTTPVerb>> requests, Tenant tenant) {
+//		subscriptionTriggeringProvider.triggerSubscription();
+//	}
 
+
+	/**
+	 * Deprecated
+	 *
+	 * @param subscription
+	 * @param requests
+	 * @return
+	 */
 	public String triggerWithResource(Subscription subscription, List<Pair<String, Bundle.HTTPVerb>> requests) {
 //		try {
 //			UserAccess userAccess = ServletHelper.getUserAccess();

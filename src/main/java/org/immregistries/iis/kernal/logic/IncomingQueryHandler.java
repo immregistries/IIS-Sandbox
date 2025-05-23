@@ -24,6 +24,7 @@ import org.immregistries.vfa.connect.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -31,7 +32,8 @@ import java.util.*;
 
 import static org.immregistries.iis.kernal.logic.IIncomingMessageHandler.*;
 
-@org.springframework.stereotype.Service
+@Service
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class IncomingQueryHandler {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -698,10 +700,10 @@ public class IncomingQueryHandler {
 			testCase.setTestEventList(testEventList);
 			Software software = new Software();
 			software.setServiceUrl("https://sabbia.westus2.cloudapp.azure.com/lonestar/forecast");
-			software.setService(Service.LSVF);
+			software.setService(org.immregistries.vfa.connect.model.Service.LSVF);
 			if (processingFlavorSet.contains(ProcessingFlavor.ICE)) {
 				software.setServiceUrl("https://sabbia.westus2.cloudapp.azure.com/opencds-decision-support-service/evaluate");
-				software.setService(Service.ICE);
+				software.setService(org.immregistries.vfa.connect.model.Service.ICE);
 			}
 
 			ConnectorInterface connector = ConnectFactory.createConnecter(software, VaccineGroup.getForecastItemList());

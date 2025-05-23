@@ -1,6 +1,7 @@
 package org.immregistries.iis.kernal.servlet;
 
 
+import ca.uhn.fhir.jpa.provider.SubscriptionTriggeringProvider;
 import ca.uhn.fhir.parser.IParser;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import jakarta.servlet.ServletException;
@@ -34,6 +35,8 @@ public class SubscriptionServlet extends HttpServlet {
 	RepositoryClientFactory repositoryClientFactory;
 	@Autowired
 	SubscriptionService subscriptionService;
+	@Autowired
+	SubscriptionTriggeringProvider subscriptionTriggeringProvider;
 
 	public static final String PARAM_ACTION = "action";
 	public static final String PARAM_MESSAGE = "message";
