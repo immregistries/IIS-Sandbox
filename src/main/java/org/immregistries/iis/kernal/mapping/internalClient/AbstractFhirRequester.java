@@ -28,6 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.Date;
 import java.util.List;
 
+@SuppressWarnings("rawtypes")
 public abstract class AbstractFhirRequester<
 	Patient extends IBaseResource,
 	Immunization extends IBaseResource,

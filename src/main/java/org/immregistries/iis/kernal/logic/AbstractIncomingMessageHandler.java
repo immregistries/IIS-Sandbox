@@ -35,6 +35,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@SuppressWarnings({"rawtypes", "unchecked"})
 public abstract class AbstractIncomingMessageHandler implements IIncomingMessageHandler {
 	protected final Logger logger = LoggerFactory.getLogger(AbstractIncomingMessageHandler.class);
 
@@ -172,7 +173,7 @@ public abstract class AbstractIncomingMessageHandler implements IIncomingMessage
 				}
 			}
 		}
-		receivingApp.append(" v" + SoftwareVersion.VERSION);
+		receivingApp.append(" v").append(SoftwareVersion.VERSION);
 		data.setReceivingFacility(receivingApp.toString());
 
 
@@ -283,7 +284,6 @@ public abstract class AbstractIncomingMessageHandler implements IIncomingMessage
 	}
 
 
-	@SuppressWarnings("unchecked")
 	public String processVXU(Tenant tenant, HL7Reader reader, String message, IIdType managingOrganizationId) throws Exception {
 		List<IisReportable> iisReportableList = new ArrayList<>();
 		Set<ProcessingFlavor> processingFlavorSet = tenant.getProcessingFlavorSet();
@@ -300,8 +300,9 @@ public abstract class AbstractIncomingMessageHandler implements IIncomingMessage
 			messageRecordingService.recordMessageReceived(message, patientReported, ack, "Update", "Ack", tenant);
 			return ack;
 		} catch (ProcessingException e) {
-			if (!iisReportableList.contains(e)) {
-				iisReportableList.add(IisReportable.fromProcessingException(e));
+			IisReportable exceptionReportable = IisReportable.fromProcessingException(e);
+			if (!iisReportableList.contains(exceptionReportable)) {
+				iisReportableList.add(exceptionReportable);
 			}
 			String ack = buildAckMqe(reader, mqeMessageServiceResponse, iisReportableList, processingFlavorSet, nistReportables);
 			messageRecordingService.recordMessageReceived(message, null, ack, "Update", "Exception", tenant);
@@ -539,7 +540,7 @@ public abstract class AbstractIncomingMessageHandler implements IIncomingMessage
 //				vaccinationReported = fhirRequester.searchVaccinationReported(new SearchParameterMap("identifier", fillerIdentifierParam));
 			}
 
-			/**
+			/*
 			 * Create new vaccine report if null
 			 */
 			if (vaccinationReported == null) {
@@ -732,7 +733,6 @@ public abstract class AbstractIncomingMessageHandler implements IIncomingMessage
 	}
 
 
-	@SuppressWarnings("unchecked")
 	public ObservationReported readObservations(HL7Reader reader, List<IisReportable> iisReportableList, PatientReported patientReported, boolean strictDate, int obxCount, VaccinationReported vaccinationReported, VaccinationMaster vaccination) {
 		ObservationReported observationReported;
 		if (vaccination == null) {
@@ -792,8 +792,6 @@ public abstract class AbstractIncomingMessageHandler implements IIncomingMessage
 		// TODO OBX-21 Business identifier
 		return observationReported;
 	}
-
-
 
 
 }
