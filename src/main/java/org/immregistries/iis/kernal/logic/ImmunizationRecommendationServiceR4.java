@@ -65,7 +65,7 @@ public class ImmunizationRecommendationServiceR4 implements IImmunizationRecomme
 			.setForecastStatus(new CodeableConcept().addCoding(new Coding(IMMUNIZATION_RECOMMENDATION_STATUS_SYSTEM, "due", "Due")));
 
 		Collection<Code> col = CodeMapManager.getCodeMap().getCodesForTable(CodesetType.VACCINATION_CVX_CODE);
-		Code cvx = col.stream().skip((int) (col.size() * Math.random())).findFirst().get();
+		Code cvx = col.stream().skip((int) (col.size() * Math.random())).findFirst().orElseThrow();
 		recommendationComponent.addVaccineCode().addCoding().setSystem(CVX_SYSTEM).setCode(cvx.getValue()).setDisplay(cvx.getLabel());
 
 		int randN = (int) (Math.random() * VaccinationRecommendationDateCode.values().length);
@@ -93,7 +93,7 @@ public class ImmunizationRecommendationServiceR4 implements IImmunizationRecomme
 		ImmunizationRecommendation immunizationRecommendation = immunizationRecommendationMapperR4.toFhir(forecastActualList, date, patientpatientMaster);
 		immunizationRecommendation.addIdentifier(new Identifier().setValue(UUID.randomUUID().toString().split("-")[0]));
 		immunizationRecommendation.setAuthority(new Reference()
-			.setIdentifier(new Identifier().setSystem("IIS-Sandbox/tenantAndslonestar").setValue(tenant.getOrganizationName())));
+			.setIdentifier(new Identifier().setSystem("IIS-Sandbox/tenantAndLonestar").setValue(tenant.getOrganizationName())));
 
 		Parameters parameters = new Parameters();
 		parameters.addParameter().setResource(immunizationRecommendation).setName(RECOMMENDATION);
