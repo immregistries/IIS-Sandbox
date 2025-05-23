@@ -80,7 +80,9 @@ public class V2ToFhirController {
 			}
 //      resp.setContentType("text/plain");
 			out.println("<textarea name=\"result\" readonly style=\"width: 100%; height: 90%;\" >");
+			out.println("<pre>");
 			out.print(ack);
+			out.println("</pre>");
 			out.println("</textarea>");
 
 		} catch (Exception e) {

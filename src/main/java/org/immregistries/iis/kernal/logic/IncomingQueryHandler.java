@@ -2,7 +2,6 @@ package org.immregistries.iis.kernal.logic;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
-import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.param.ReferenceParam;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.instance.model.api.IIdType;
@@ -151,7 +150,6 @@ public class IncomingQueryHandler {
 			iisReportables.add(IisReportable.fromProcessingException(new ProcessingException("Immunization History cannot be shared because of patient's consent status", "PID", 0, 0, IisReportableSeverity.NOTICE)));
 			sendInformations = false;
 		}
-		IGenericClient fhirClient = repositoryClientFactory.getFhirClient();
 		reader.resetPostion();
 		reader.advanceToSegment("MSH");
 

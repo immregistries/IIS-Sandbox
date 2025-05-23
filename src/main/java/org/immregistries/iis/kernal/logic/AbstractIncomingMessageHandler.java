@@ -72,8 +72,6 @@ public abstract class AbstractIncomingMessageHandler implements IIncomingMessage
 	public AbstractIncomingMessageHandler() {
 	}
 
-
-
 	public String buildAck(HL7Reader reader, List<IisReportable> iisReportableList, Set<ProcessingFlavor> processingFlavorSet) {
 		StringBuilder sb = new StringBuilder();
 		{
@@ -260,22 +258,22 @@ public abstract class AbstractIncomingMessageHandler implements IIncomingMessage
 					currentMainObservation = null;
 				}
 			}
-
+			/*
+			 * Reading Observation or Sub Observation
+			 */
 			ObservationReported observationReported = readObservations(reader, iisReportableList, patientReported, strictDate, obxCount, vaccinationReported, vaccination);
 //			if (currentMainObservation != null) {
 //				observationReported.setPartOfObservationId(currentMainObservation.getPartOfObservationId());
 //			}
-			{
-				/*
-				 * if subId Changed, new Main Observation
-				 */
-				if (!StringUtils.equals(previousSubId, subId) && StringUtils.isNotBlank(subId)) {
-					currentMainObservation = observationReported;
-				} else if (currentMainObservation != null) {
-					currentMainObservation.addComponent(observationReported);
-				}
-				previousSubId = subId;
+			/*
+			 * if subId Changed, new Main Observation, else add as subObservation
+			 */
+			if (!StringUtils.equals(previousSubId, subId) && StringUtils.isNotBlank(subId)) {
+				currentMainObservation = observationReported;
+			} else if (currentMainObservation != null) {
+				currentMainObservation.addComponent(observationReported);
 			}
+			previousSubId = subId;
 		}
 		if (currentMainObservation != null) {
 			observationProcessingInterceptor.processAndValidateObservationReported(currentMainObservation, iisReportableList, processingFlavorSet, obxCount, patientReported.getBirthDate());
@@ -541,6 +539,9 @@ public abstract class AbstractIncomingMessageHandler implements IIncomingMessage
 //				vaccinationReported = fhirRequester.searchVaccinationReported(new SearchParameterMap("identifier", fillerIdentifierParam));
 			}
 
+			/**
+			 * Create new vaccine report if null
+			 */
 			if (vaccinationReported == null) {
 				vaccinationReported = new VaccinationReported();
 				vaccinationReported.setReportedDate(new Date());
@@ -552,74 +553,57 @@ public abstract class AbstractIncomingMessageHandler implements IIncomingMessage
 				}
 			}
 
-//			vaccinationReported.setPatientReportedId(patientReported.getPatientId());
 			vaccinationReported.setPatientReported(patientReported);
 
 			vaccinationReported.setEnteredBy(enteringProvider);
 			vaccinationReported.setAdministeringProvider(orderingProvider);
 
+			/*
+			 * Extracting Vaccine Codes
+			 */
 			String vaccineCvxCode = "";
 			String vaccineNdcCode = "";
 			String vaccineCptCode = "";
-			{
-				String vaccineCodeType = reader.getValue(5, 3);
-				if (vaccineCodeType.equals("NDC")) {
-					vaccineNdcCode = vaccineCode;
-				} else if (vaccineCodeType.equals("CPT") || vaccineCodeType.equals("C4") || vaccineCodeType.equals("C5")) {
-					vaccineCptCode = vaccineCode;
+
+			/*
+			 * Checking Vaccine Type
+			 */
+			String vaccineCodeType = reader.getValue(5, 3);
+			if (vaccineCodeType.equals("NDC")) {
+				vaccineNdcCode = vaccineCode;
+			} else if (vaccineCodeType.equals("CPT") || vaccineCodeType.equals("C4") || vaccineCodeType.equals("C5")) {
+				vaccineCptCode = vaccineCode;
+			} else {
+				vaccineCvxCode = vaccineCode;
+			}
+
+			/*
+			 * Checking alt Vaccine code field and Type
+			 */
+			String altVaccineCode = reader.getValue(5, 4);
+			String altVaccineCodeType = reader.getValue(5, 6);
+			if (StringUtils.isNotBlank(altVaccineCode)) {
+				if (altVaccineCodeType.equals("NDC")) {
+					if (StringUtils.isBlank(vaccineNdcCode)) {
+						vaccineNdcCode = altVaccineCode;
+					}
+				} else if (altVaccineCodeType.equals("CPT") || altVaccineCodeType.equals("C4") || altVaccineCodeType.equals("C5")) {
+					if (StringUtils.isBlank(vaccineCptCode)) {
+						vaccineCptCode = altVaccineCode;
+					}
 				} else {
-					vaccineCvxCode = vaccineCode;
-				}
-			}
-
-			{
-				String altVaccineCode = reader.getValue(5, 4);
-				String altVaccineCodeType = reader.getValue(5, 6);
-				if (StringUtils.isNotBlank(altVaccineCode)) {
-					if (altVaccineCodeType.equals("NDC")) {
-						if (StringUtils.isBlank(vaccineNdcCode)) {
-							vaccineNdcCode = altVaccineCode;
-						}
-					} else if (altVaccineCodeType.equals("CPT") || altVaccineCodeType.equals("C4") || altVaccineCodeType.equals("C5")) {
-						if (StringUtils.isBlank(vaccineCptCode)) {
-							vaccineCptCode = altVaccineCode;
-						}
-					} else {
-						if (StringUtils.isBlank(vaccineCvxCode)) {
-							vaccineCvxCode = altVaccineCode;
-						}
+					if (StringUtils.isBlank(vaccineCvxCode)) {
+						vaccineCvxCode = altVaccineCode;
 					}
 				}
 			}
 
-			{
-				String administeredAtLocation = reader.getValue(11, 4);
-//				if (StringUtils.isEmpty(administeredAtLocation)) {
-//
-//				}
-				if (StringUtils.isNotEmpty(administeredAtLocation)) {
-					OrgLocation orgLocation = fhirRequester.searchOrgLocation(new SearchParameterMap("identifier", new TokenParam().setValue(administeredAtLocation)));
+			/*
+			 * Extract Location
+			 */
+			OrgLocation orgLocation = processLocation(tenant, reader, processingFlavorSet, rxaCount, 11);
+			vaccinationReported.setOrgLocation(orgLocation);
 
-					if (orgLocation == null) {
-						if (processingFlavorSet.contains(ProcessingFlavor.PEAR)) {
-							throw new ProcessingException("Unrecognized administered at location, unable to accept immunization report", "RXA", rxaCount, 11);
-						}
-						orgLocation = new OrgLocation();
-						orgLocation.setOrgFacilityCode(administeredAtLocation);
-						orgLocation.setTenant(tenant);
-						orgLocation.setOrgFacilityName(administeredAtLocation);
-						orgLocation.setLocationType("");
-						orgLocation.setAddressLine1(reader.getValue(11, 9));
-						orgLocation.setAddressLine2(reader.getValue(11, 10));
-						orgLocation.setAddressCity(reader.getValue(11, 11));
-						orgLocation.setAddressState(reader.getValue(11, 12));
-						orgLocation.setAddressZip(reader.getValue(11, 13));
-						orgLocation.setAddressCountry(reader.getValue(11, 14));
-						orgLocation = fhirRequester.saveOrgLocation(orgLocation);
-					}
-					vaccinationReported.setOrgLocation(orgLocation);
-				}
-			}
 			ModelPerson administeringProvider = processPersonPractitioner(tenant, reader, 10);
 			vaccinationReported.setAdministeringProvider(administeringProvider);
 
@@ -694,6 +678,33 @@ public abstract class AbstractIncomingMessageHandler implements IIncomingMessage
 			throw new ProcessingException("Patient vaccination history cannot be accepted without at least one administered, historical, or refused vaccination specified", "", 0, 0);
 		}
 		return vaccinationReportedList;
+	}
+
+	private @Nullable OrgLocation processLocation(Tenant tenant, HL7Reader reader, Set<ProcessingFlavor> processingFlavorSet, int rxaCount, int fieldNum) throws ProcessingException {
+		OrgLocation orgLocation = null;
+		String administeredAtLocation = reader.getValue(fieldNum, 4);
+		if (StringUtils.isNotEmpty(administeredAtLocation)) {
+			orgLocation = fhirRequester.searchOrgLocation(new SearchParameterMap("identifier", new TokenParam().setValue(administeredAtLocation)));
+
+			if (orgLocation == null) {
+				if (processingFlavorSet.contains(ProcessingFlavor.PEAR)) {
+					throw new ProcessingException("Unrecognized administered at location, unable to accept immunization report", "RXA", rxaCount, fieldNum);
+				}
+				orgLocation = new OrgLocation();
+				orgLocation.setOrgFacilityCode(administeredAtLocation);
+				orgLocation.setTenant(tenant);
+				orgLocation.setOrgFacilityName(administeredAtLocation);
+				orgLocation.setLocationType("");
+				orgLocation.setAddressLine1(reader.getValue(fieldNum, 9));
+				orgLocation.setAddressLine2(reader.getValue(fieldNum, 10));
+				orgLocation.setAddressCity(reader.getValue(fieldNum, 11));
+				orgLocation.setAddressState(reader.getValue(fieldNum, 12));
+				orgLocation.setAddressZip(reader.getValue(fieldNum, 13));
+				orgLocation.setAddressCountry(reader.getValue(fieldNum, 14));
+				orgLocation = fhirRequester.saveOrgLocation(orgLocation);
+			}
+		}
+		return orgLocation;
 	}
 
 	private ModelPerson processPersonPractitioner(Tenant tenant, HL7Reader reader, int fieldNum) {
