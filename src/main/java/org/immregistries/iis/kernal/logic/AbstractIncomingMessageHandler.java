@@ -32,10 +32,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
+/**
+ * Processes the Incoming Hl7v2 Messages, parsing into local objects and saving into database through FHIR Requester
+ */
 public abstract class AbstractIncomingMessageHandler implements IIncomingMessageHandler {
 	protected final Logger logger = LoggerFactory.getLogger(AbstractIncomingMessageHandler.class);
 
@@ -205,10 +211,14 @@ public abstract class AbstractIncomingMessageHandler implements IIncomingMessage
 
 	@Override
 	public String process(String message, Tenant tenant, String sendingFacilityName) {
+		/*
+		 * Anticipating the partition creation, to prevent conflict when multiple FHIR Request try to create the same partition
+		 */
+		partitionCreationInterceptor.getOrCreatePartitionId(tenant.getOrganizationName());
+
 		HL7Reader reader = new HL7Reader(message);
 		String messageType = reader.getValue(9);
 		String responseMessage;
-		partitionCreationInterceptor.getOrCreatePartitionId(tenant.getOrganizationName());
 		Set<ProcessingFlavor> processingFlavorSet = null;
 		try {
 			processingFlavorSet = tenant.getProcessingFlavorSet();
@@ -295,7 +305,7 @@ public abstract class AbstractIncomingMessageHandler implements IIncomingMessage
 			boolean strictDate = !processingFlavorSet.contains(ProcessingFlavor.CANTALOUPE);
 			PatientReported patientReported = processPatient(tenant, reader, iisReportableList, processingFlavorSet, codeMap, strictDate, managingOrganizationId);
 
-			List<VaccinationReported> vaccinationReportedList = processVaccinations(tenant, reader, iisReportableList, patientReported, strictDate, processingFlavorSet);
+			List<VaccinationReported> vaccinationReportedList = processVaccinations(reader, tenant, iisReportableList, patientReported, processingFlavorSet, strictDate);
 			String ack = buildAckMqe(reader, mqeMessageServiceResponse, iisReportableList, processingFlavorSet, nistReportables);
 			messageRecordingService.recordMessageReceived(message, patientReported, ack, "Update", "Ack", tenant);
 			return ack;
@@ -355,114 +365,22 @@ public abstract class AbstractIncomingMessageHandler implements IIncomingMessage
 				patientReported.setManagingOrganizationId("Organization/" + managingOrganizationId.getIdPart());
 			}
 		}
+		/*
+		 * PID processing
+		 */
 		if (reader.advanceToSegment("PID")) {
-			for (int i = 1; i <= reader.getRepeatCount(3); i++) {
-				BusinessIdentifier businessIdentifier = new BusinessIdentifier();
-				businessIdentifier.setValue(reader.getValueRepeat(3, 1, i));
-				businessIdentifier.setSystem(reader.getValueRepeat(3, 4, i));
-				businessIdentifier.setType(reader.getValueRepeat(3, 5, i));
-				patientReported.addBusinessIdentifier(businessIdentifier);
-			}
-			if (patientReported.getMainBusinessIdentifier() == null || StringUtils.isBlank(patientReported.getMainBusinessIdentifier().getValue())) {
-				throw new ProcessingException("MRN was not found, required for accepting vaccination report", "PID", 1, 3);
-			}
-
-			List<ModelName> names = new ArrayList<>(reader.getRepeatCount(5));
-			for (int i = 1; i <= reader.getRepeatCount(5); i++) {
-				String patientNameLast = reader.getValueRepeat(5, 1, i);
-				String patientNameFirst = reader.getValueRepeat(5, 2, i);
-				String patientNameMiddle = reader.getValueRepeat(5, 3, i);
-				String nameType = reader.getValueRepeat(5, 7, i);
-				ModelName modelName = new ModelName(patientNameLast, patientNameFirst, patientNameMiddle, nameType);
-				names.add(modelName);
-			}
-			patientReported.setPatientNames(names);
-
-			Date patientBirthDate;
-			patientBirthDate = IIncomingMessageHandler.parseDateError(reader.getValue(7), "Bad format for date of birth", "PID", 1, 7, strictDate);
-			patientReported.setMotherMaidenName(reader.getValue(6));
-			patientReported.setBirthDate(patientBirthDate);
-			patientReported.setSex(reader.getValue(8));
-
-			for (int i = 1; i <= reader.getRepeatCount(10); i++) {
-				patientReported.addRace(reader.getValueRepeat(10, 1, i));
-			}
-
-			String zip = reader.getValue(11, 5);
-			if (zip.length() > 5) {
-				zip = zip.substring(0, 5);
-			}
-			String addressFragPrep = reader.getValue(11, 1);
-			String addressFrag = "";
-			{
-				int spaceIndex = addressFragPrep.indexOf(" ");
-				if (spaceIndex > 0) {
-					addressFragPrep = addressFragPrep.substring(0, spaceIndex);
-				}
-				addressFrag = zip + ":" + addressFragPrep;
-			}
-			ModelAddress modelAddress = new ModelAddress();
-			modelAddress.setAddressLine1(reader.getValue(11, 1));
-			modelAddress.setAddressLine2(reader.getValue(11, 2));
-			modelAddress.setAddressCity(reader.getValue(11, 3));
-			modelAddress.setAddressState(reader.getValue(11, 4));
-			modelAddress.setAddressZip(reader.getValue(11, 5));
-			modelAddress.setAddressCountry(reader.getValue(11, 6));
-			modelAddress.setAddressCountyParish(reader.getValue(11, 9));
-			patientReported.addAddress(modelAddress);
-
-
-			for (int i = 1; i <= reader.getRepeatCount(13); i++) {
-				String use = reader.getValueRepeat(13, 2, i);
-				if ("NET".equals(use)) {
-					patientReported.setEmail(reader.getValueRepeat(13, 4, i));
-				} else {
-					ModelPhone patientPhone = new ModelPhone();
-					patientPhone.setNumber(reader.getValueRepeat(13, 6, i) + reader.getValueRepeat(13, 7, i));
-					patientPhone.setUse(use);
-					// Logic exported to Patient Processing interceptor
-//		if (!"PRN".equals(patientPhone.getUse())) {
-//			patientPhone.setUse("");
-//		}
-					patientReported.addPhone(patientPhone);
-				}
-			}
-			patientReported.setEthnicity(reader.getValue(22));
-			patientReported.setBirthFlag(reader.getValue(24));
-			patientReported.setBirthOrder(reader.getValue(25));
-			patientReported.setDeathDate(IIncomingMessageHandler.parseDateWarn(reader.getValue(29), "Invalid patient death date", "PID", 1, 29, strictDate, iisReportableList));
-			patientReported.setDeathFlag(reader.getValue(30));
+			processPID(reader, patientReported, iisReportableList, strictDate);
 		} else {
 			throw new ProcessingException("No PID segment found, required for accepting vaccination report", "", 0, 0);
 		}
 
 		if (reader.advanceToSegment("PD1")) {
-			ModelPerson generalPractitioner = processPersonPractitioner(tenant, reader, 4);
-			if (generalPractitioner != null) {
-				patientReported.setGeneralPractitionerId("Practitioner/" + generalPractitioner.getPersonId());
-			}
-			logger.info("PUB {} {}", reader.getValue(11), Objects.isNull(reader.getValue(11)));
-			patientReported.setPublicityIndicator(reader.getValue(11));
-			patientReported.setProtectionIndicator(reader.getValue(12));
-			patientReported.setProtectionIndicatorDate(IIncomingMessageHandler.parseDateWarn(reader.getValue(13), "Invalid protection indicator date", "PD1", 1, 13, strictDate, iisReportableList));
-			patientReported.setRegistryStatusIndicator(reader.getValue(16));
-			patientReported.setRegistryStatusIndicatorDate(IIncomingMessageHandler.parseDateWarn(reader.getValue(17), "Invalid registry status indicator date", "PD1", 1, 17, strictDate, iisReportableList));
-			patientReported.setPublicityIndicatorDate(IIncomingMessageHandler.parseDateWarn(reader.getValue(18), "Invalid publicity indicator date", "PD1", 1, 18, strictDate, iisReportableList));
+			processPD1(reader, patientReported, tenant, iisReportableList, strictDate);
 		}
 		reader.resetPostion();
-		{
-			while (reader.advanceToSegment("NK1")) {
-				PatientGuardian patientGuardian = new PatientGuardian();
-				patientReported.addPatientGuardian(patientGuardian);
-				String guardianLast = reader.getValue(2, 1);
-				patientGuardian.getName().setNameLast(guardianLast);
-				String guardianFirst = reader.getValue(2, 2);
-				patientGuardian.getName().setNameFirst(guardianFirst);
-				String guardianMiddle = reader.getValue(2, 3);
-				patientGuardian.getName().setNameMiddle(guardianMiddle);
-				String guardianRelationship = reader.getValue(3);
-				patientGuardian.setGuardianRelationship(guardianRelationship);
-			}
+
+		while (reader.advanceToSegment("NK1")) {
+			processNK1(reader, patientReported);
 		}
 		reader.resetPostion();
 
@@ -470,11 +388,13 @@ public abstract class AbstractIncomingMessageHandler implements IIncomingMessage
 		IIncomingMessageHandler.verifyNoErrors(iisReportableList);
 
 		patientReported.setUpdatedDate(new Date());
-		logger.info("MANAGING ORG ID = {}", patientReported.getManagingOrganizationId());
 		patientReported = fhirRequester.savePatientReported(patientReported);
 //		patientReported = fhirRequester.saveRelatedPerson(patientReported);
 		iisReportableList.add(IisReportable.fromProcessingException(new ProcessingException("Patient record saved", "PID", 0, 0, IisReportableSeverity.INFO)));
 
+		/*
+		 * checking if request is gathering patients  Ids to create a group, TODO cleaner solution
+		 */
 		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
 		ArrayList<String> groupPatientIds = (ArrayList<String>) request.getAttribute("groupPatientIds");
 		if (groupPatientIds != null) { // If there are numerous patients added and option was activated
@@ -484,7 +404,112 @@ public abstract class AbstractIncomingMessageHandler implements IIncomingMessage
 		return patientReported;
 	}
 
-	public List<VaccinationReported> processVaccinations(Tenant tenant, HL7Reader reader, List<IisReportable> iisReportableList, PatientReported patientReported, boolean strictDate, Set<ProcessingFlavor> processingFlavorSet) throws ProcessingException {
+	private void processNK1(HL7Reader reader, PatientReported patientReported) {
+		PatientGuardian patientGuardian = new PatientGuardian();
+		patientReported.addPatientGuardian(patientGuardian);
+		String guardianLast = reader.getValue(2, 1);
+		patientGuardian.getName().setNameLast(guardianLast);
+		String guardianFirst = reader.getValue(2, 2);
+		patientGuardian.getName().setNameFirst(guardianFirst);
+		String guardianMiddle = reader.getValue(2, 3);
+		patientGuardian.getName().setNameMiddle(guardianMiddle);
+		String guardianRelationship = reader.getValue(3);
+		patientGuardian.setGuardianRelationship(guardianRelationship);
+	}
+
+	private void processPID(HL7Reader reader, PatientReported patientReported, List<IisReportable> iisReportableList, boolean strictDate) throws ProcessingException {
+		for (int i = 1; i <= reader.getRepeatCount(3); i++) {
+			BusinessIdentifier businessIdentifier = new BusinessIdentifier();
+			businessIdentifier.setValue(reader.getValueRepeat(3, 1, i));
+			businessIdentifier.setSystem(reader.getValueRepeat(3, 4, i));
+			businessIdentifier.setType(reader.getValueRepeat(3, 5, i));
+			patientReported.addBusinessIdentifier(businessIdentifier);
+		}
+		if (patientReported.getMainBusinessIdentifier() == null || StringUtils.isBlank(patientReported.getMainBusinessIdentifier().getValue())) {
+			throw new ProcessingException("MRN was not found, required for accepting vaccination report", "PID", 1, 3);
+		}
+
+		List<ModelName> names = new ArrayList<>(reader.getRepeatCount(5));
+		for (int i = 1; i <= reader.getRepeatCount(5); i++) {
+			String patientNameLast = reader.getValueRepeat(5, 1, i);
+			String patientNameFirst = reader.getValueRepeat(5, 2, i);
+			String patientNameMiddle = reader.getValueRepeat(5, 3, i);
+			String nameType = reader.getValueRepeat(5, 7, i);
+			ModelName modelName = new ModelName(patientNameLast, patientNameFirst, patientNameMiddle, nameType);
+			names.add(modelName);
+		}
+		patientReported.setPatientNames(names);
+
+		Date patientBirthDate;
+		patientBirthDate = IIncomingMessageHandler.parseDateError(reader.getValue(7), "Bad format for date of birth", "PID", 1, 7, strictDate);
+		patientReported.setMotherMaidenName(reader.getValue(6));
+		patientReported.setBirthDate(patientBirthDate);
+		patientReported.setSex(reader.getValue(8));
+
+		for (int i = 1; i <= reader.getRepeatCount(10); i++) {
+			patientReported.addRace(reader.getValueRepeat(10, 1, i));
+		}
+
+		String zip = reader.getValue(11, 5);
+		if (zip.length() > 5) {
+			zip = zip.substring(0, 5);
+		}
+		String addressFragPrep = reader.getValue(11, 1);
+		String addressFrag = "";
+		{
+			int spaceIndex = addressFragPrep.indexOf(" ");
+			if (spaceIndex > 0) {
+				addressFragPrep = addressFragPrep.substring(0, spaceIndex);
+			}
+			addressFrag = zip + ":" + addressFragPrep;
+		}
+		ModelAddress modelAddress = new ModelAddress();
+		modelAddress.setAddressLine1(reader.getValue(11, 1));
+		modelAddress.setAddressLine2(reader.getValue(11, 2));
+		modelAddress.setAddressCity(reader.getValue(11, 3));
+		modelAddress.setAddressState(reader.getValue(11, 4));
+		modelAddress.setAddressZip(reader.getValue(11, 5));
+		modelAddress.setAddressCountry(reader.getValue(11, 6));
+		modelAddress.setAddressCountyParish(reader.getValue(11, 9));
+		patientReported.addAddress(modelAddress);
+
+
+		for (int i = 1; i <= reader.getRepeatCount(13); i++) {
+			String use = reader.getValueRepeat(13, 2, i);
+			if ("NET".equals(use)) {
+				patientReported.setEmail(reader.getValueRepeat(13, 4, i));
+			} else {
+				ModelPhone patientPhone = new ModelPhone();
+				patientPhone.setNumber(reader.getValueRepeat(13, 6, i) + reader.getValueRepeat(13, 7, i));
+				patientPhone.setUse(use);
+				// Logic exported to Patient Processing interceptor
+//		if (!"PRN".equals(patientPhone.getUse())) {
+//			patientPhone.setUse("");
+//		}
+				patientReported.addPhone(patientPhone);
+			}
+		}
+		patientReported.setEthnicity(reader.getValue(22));
+		patientReported.setBirthFlag(reader.getValue(24));
+		patientReported.setBirthOrder(reader.getValue(25));
+		patientReported.setDeathDate(IIncomingMessageHandler.parseDateWarn(reader.getValue(29), "Invalid patient death date", "PID", 1, 29, strictDate, iisReportableList));
+		patientReported.setDeathFlag(reader.getValue(30));
+	}
+
+	private void processPD1(HL7Reader reader, PatientReported patientReported, Tenant tenant, List<IisReportable> iisReportableList, boolean strictDate) {
+		ModelPerson generalPractitioner = processPersonPractitioner(reader, tenant, 4);
+		if (generalPractitioner != null) {
+			patientReported.setGeneralPractitionerId("Practitioner/" + generalPractitioner.getPersonId());
+		}
+		patientReported.setPublicityIndicator(reader.getValue(11));
+		patientReported.setProtectionIndicator(reader.getValue(12));
+		patientReported.setProtectionIndicatorDate(IIncomingMessageHandler.parseDateWarn(reader.getValue(13), "Invalid protection indicator date", "PD1", 1, 13, strictDate, iisReportableList));
+		patientReported.setRegistryStatusIndicator(reader.getValue(16));
+		patientReported.setRegistryStatusIndicatorDate(IIncomingMessageHandler.parseDateWarn(reader.getValue(17), "Invalid registry status indicator date", "PD1", 1, 17, strictDate, iisReportableList));
+		patientReported.setPublicityIndicatorDate(IIncomingMessageHandler.parseDateWarn(reader.getValue(18), "Invalid publicity indicator date", "PD1", 1, 18, strictDate, iisReportableList));
+	}
+
+	public List<VaccinationReported> processVaccinations(HL7Reader reader, Tenant tenant, List<IisReportable> iisReportableList, PatientReported patientReported, Set<ProcessingFlavor> processingFlavorSet, boolean strictDate) throws ProcessingException {
 		int orcCount = 0;
 		int rxaCount = 0;
 		int obxCount = 0;
@@ -510,9 +535,9 @@ public abstract class AbstractIncomingMessageHandler implements IIncomingMessage
 				fillerIdentifier.setSystem(reader.getValue(3, 2));
 				fillerIdentifier.setType("FILL"); // According to v2 to FHIR
 			}
-			ModelPerson enteringProvider = processPersonPractitioner(tenant, reader, 10);
+			ModelPerson enteringProvider = processPersonPractitioner(reader, tenant, 10);
 
-			ModelPerson orderingProvider = processPersonPractitioner(tenant, reader, 12);
+			ModelPerson orderingProvider = processPersonPractitioner(reader, tenant, 12);
 
 			boolean rxaPresent = reader.advanceToSegment("RXA", "ORC");
 			if (!rxaPresent) {
@@ -602,10 +627,10 @@ public abstract class AbstractIncomingMessageHandler implements IIncomingMessage
 			/*
 			 * Extract Location
 			 */
-			OrgLocation orgLocation = processLocation(tenant, reader, processingFlavorSet, rxaCount, 11);
+			OrgLocation orgLocation = processLocation(reader, tenant, processingFlavorSet, rxaCount, 11);
 			vaccinationReported.setOrgLocation(orgLocation);
 
-			ModelPerson administeringProvider = processPersonPractitioner(tenant, reader, 10);
+			ModelPerson administeringProvider = processPersonPractitioner(reader, tenant, 10);
 			vaccinationReported.setAdministeringProvider(administeringProvider);
 
 
@@ -681,7 +706,7 @@ public abstract class AbstractIncomingMessageHandler implements IIncomingMessage
 		return vaccinationReportedList;
 	}
 
-	private @Nullable OrgLocation processLocation(Tenant tenant, HL7Reader reader, Set<ProcessingFlavor> processingFlavorSet, int rxaCount, int fieldNum) throws ProcessingException {
+	private @Nullable OrgLocation processLocation(HL7Reader reader, Tenant tenant, Set<ProcessingFlavor> processingFlavorSet, int rxaCount, int fieldNum) throws ProcessingException {
 		OrgLocation orgLocation = null;
 		String administeredAtLocation = reader.getValue(fieldNum, 4);
 		if (StringUtils.isNotEmpty(administeredAtLocation)) {
@@ -708,7 +733,7 @@ public abstract class AbstractIncomingMessageHandler implements IIncomingMessage
 		return orgLocation;
 	}
 
-	private ModelPerson processPersonPractitioner(Tenant tenant, HL7Reader reader, int fieldNum) {
+	private ModelPerson processPersonPractitioner(HL7Reader reader, Tenant tenant, int fieldNum) {
 		ModelPerson modelPerson = null;
 		String administeringProvider = reader.getValue(fieldNum);
 		if (StringUtils.isNotEmpty(administeringProvider)) {

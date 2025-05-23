@@ -12,6 +12,9 @@ import org.springframework.stereotype.Service;
 import java.util.Date;
 
 @Service
+/**
+ * Deals with storing records of received Hl7v2, through the hibernate database
+ */
 public class MessageRecordingService {
 	Logger logger = LoggerFactory.getLogger(this.getClass());
 //	protected Session dataSession;
