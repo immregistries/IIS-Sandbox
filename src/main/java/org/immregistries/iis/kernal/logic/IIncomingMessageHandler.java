@@ -16,6 +16,28 @@ import java.util.Set;
 public interface IIncomingMessageHandler extends IHl7MessageHandler {
 	double MINIMAL_MATCHING_SCORE = 0.75;
 	int NAME_SIZE_LIMIT = 15;
+
+	String RXA = "RXA";
+	String RXR = "RXR";
+	String ORC = "ORC";
+	String PD_1 = "PD1";
+	String PID = "PID";
+	String OBX = "OBX";
+	String OBR = "OBR";
+	String VXU = "VXU";
+	String MSH = "MSH";
+
+	String COMPLETION_STATUS_COMPLETE = "CP";
+	String COMPLETION_STATUS_PARTIALLY_ADMINISTERED = "PA";
+	String INFORMATION_SOURCE_NEW = "00";
+	String OBX_CODE_FUNDING_ELIGIBILITY = "64994-7";
+	String OBX_CODE_FUNDING_SOURCE = "30963-3";
+	String VACCINE_CODE_TYPE_CPT = "CPT";
+	String VACCINE_CODE_TYPE_NDC = "NDC";
+	String VACCINE_CODE_TYPE_C_4 = "C4";
+	String VACCINE_CODE_TYPE_C_5 = "C5";
+	String EMAIL_USE_CODE = "NET";
+	
 	String RSP_K_11_RSP_K_11 = "RSP^K11^RSP_K11";
 	String MATCH = "Match";
 	String NO_MATCH = "No Match";

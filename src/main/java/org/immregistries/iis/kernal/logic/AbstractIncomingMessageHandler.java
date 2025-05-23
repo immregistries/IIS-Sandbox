@@ -38,11 +38,12 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@SuppressWarnings({"rawtypes", "unchecked"})
 /**
  * Processes the Incoming Hl7v2 Messages, parsing into local objects and saving into database through FHIR Requester
  */
+@SuppressWarnings({"rawtypes", "unchecked"})
 public abstract class AbstractIncomingMessageHandler implements IIncomingMessageHandler {
+
 	protected final Logger logger = LoggerFactory.getLogger(AbstractIncomingMessageHandler.class);
 
 	@Autowired
@@ -100,7 +101,7 @@ public abstract class AbstractIncomingMessageHandler implements IIncomingMessage
 
 		String sendersUniqueId;
 		reader.resetPostion();
-		if (reader.advanceToSegment("MSH")) {
+		if (reader.advanceToSegment(MSH)) {
 			sendersUniqueId = reader.getValue(10);
 		} else {
 			sendersUniqueId = "MSH NOT FOUND";
@@ -129,7 +130,7 @@ public abstract class AbstractIncomingMessageHandler implements IIncomingMessage
 		MqeMessageHeader header = mqeMessageServiceResponse.getMessageObjects().getMessageHeader();
 		String profileId = header.getMessageProfile();
 		reader.resetPostion();
-		reader.advanceToSegment("MSH");
+		reader.advanceToSegment(MSH);
 		String profileExtension = null;
 		int count = reader.getRepeatCount(21);
 		if (count > 1) {
@@ -255,7 +256,7 @@ public abstract class AbstractIncomingMessageHandler implements IIncomingMessage
 	public int readAndCreateObservations(HL7Reader reader, List<IisReportable> iisReportableList, Set<ProcessingFlavor> processingFlavorSet, PatientReported patientReported, boolean strictDate, int obxCount, VaccinationReported vaccinationReported, VaccinationMaster vaccination) throws ProcessingException {
 		String previousSubId = "";
 		ObservationReported currentMainObservation = null;
-		while (reader.advanceToSegment("OBX", "ORC")) {
+		while (reader.advanceToSegment(OBX, ORC)) {
 			obxCount++;
 			String subId = reader.getValue(4);
 			/*
@@ -298,7 +299,7 @@ public abstract class AbstractIncomingMessageHandler implements IIncomingMessage
 		List<IisReportable> iisReportableList = new ArrayList<>();
 		Set<ProcessingFlavor> processingFlavorSet = tenant.getProcessingFlavorSet();
 		MqeMessageServiceResponse mqeMessageServiceResponse = validationService.getMqeMessageService().processMessage(message);
-		List<IisReportable> nistReportables = validationService.nistValidation(message, "VXU");
+		List<IisReportable> nistReportables = validationService.nistValidation(message, VXU);
 
 		try {
 			CodeMap codeMap = CodeMapManager.getCodeMap();
@@ -331,20 +332,21 @@ public abstract class AbstractIncomingMessageHandler implements IIncomingMessage
 
 			int orcCount = 0;
 			int obxCount = 0;
-			while (reader.advanceToSegment("ORC")) {
+			while (reader.advanceToSegment(ORC)) {
 				orcCount++;
-				if (reader.advanceToSegment("OBR", "ORC")) {
+				if (reader.advanceToSegment(OBR, ORC)) {
 					obxCount = readAndCreateObservations(reader, iisReportableList, processingFlavorSet, patientReported, strictDate, obxCount, null, null);
 				} else {
-					throw new ProcessingException("OBR segment was not found after ORC segment", "ORC", orcCount, 0);
+					throw new ProcessingException("OBR segment was not found after ORC segment", ORC, orcCount, 0);
 				}
 			}
 			String ack = buildAck(reader, iisReportableList, processingFlavorSet);
 			messageRecordingService.recordMessageReceived(message, patientReported, ack, "Update", "Ack", tenant);
 			return ack;
 		} catch (ProcessingException e) {
-			if (!iisReportableList.contains(e)) {
-				iisReportableList.add(IisReportable.fromProcessingException(e));
+			IisReportable exceptionReportable = IisReportable.fromProcessingException(e);
+			if (!iisReportableList.contains(exceptionReportable)) {
+				iisReportableList.add(exceptionReportable);
 			}
 			String ack = buildAck(reader, iisReportableList, processingFlavorSet);
 			messageRecordingService.recordMessageReceived(message, null, ack, "Update", "Exception", tenant);
@@ -390,7 +392,7 @@ public abstract class AbstractIncomingMessageHandler implements IIncomingMessage
 		patientReported.setUpdatedDate(new Date());
 		patientReported = fhirRequester.savePatientReported(patientReported);
 //		patientReported = fhirRequester.saveRelatedPerson(patientReported);
-		iisReportableList.add(IisReportable.fromProcessingException(new ProcessingException("Patient record saved", "PID", 0, 0, IisReportableSeverity.INFO)));
+		iisReportableList.add(IisReportable.fromProcessingException(new ProcessingException("Patient record saved", PID, 0, 0, IisReportableSeverity.INFO)));
 
 		/*
 		 * checking if request is gathering patients  Ids to create a group, TODO cleaner solution
@@ -426,7 +428,7 @@ public abstract class AbstractIncomingMessageHandler implements IIncomingMessage
 			patientReported.addBusinessIdentifier(businessIdentifier);
 		}
 		if (patientReported.getMainBusinessIdentifier() == null || StringUtils.isBlank(patientReported.getMainBusinessIdentifier().getValue())) {
-			throw new ProcessingException("MRN was not found, required for accepting vaccination report", "PID", 1, 3);
+			throw new ProcessingException("MRN was not found, required for accepting vaccination report", PID, 1, 3);
 		}
 
 		List<ModelName> names = new ArrayList<>(reader.getRepeatCount(5));
@@ -441,7 +443,7 @@ public abstract class AbstractIncomingMessageHandler implements IIncomingMessage
 		patientReported.setPatientNames(names);
 
 		Date patientBirthDate;
-		patientBirthDate = IIncomingMessageHandler.parseDateError(reader.getValue(7), "Bad format for date of birth", "PID", 1, 7, strictDate);
+		patientBirthDate = IIncomingMessageHandler.parseDateError(reader.getValue(7), "Bad format for date of birth", PID, 1, 7, strictDate);
 		patientReported.setMotherMaidenName(reader.getValue(6));
 		patientReported.setBirthDate(patientBirthDate);
 		patientReported.setSex(reader.getValue(8));
@@ -476,7 +478,7 @@ public abstract class AbstractIncomingMessageHandler implements IIncomingMessage
 
 		for (int i = 1; i <= reader.getRepeatCount(13); i++) {
 			String use = reader.getValueRepeat(13, 2, i);
-			if ("NET".equals(use)) {
+			if (EMAIL_USE_CODE.equals(use)) {
 				patientReported.setEmail(reader.getValueRepeat(13, 4, i));
 			} else {
 				ModelPhone patientPhone = new ModelPhone();
@@ -492,7 +494,7 @@ public abstract class AbstractIncomingMessageHandler implements IIncomingMessage
 		patientReported.setEthnicity(reader.getValue(22));
 		patientReported.setBirthFlag(reader.getValue(24));
 		patientReported.setBirthOrder(reader.getValue(25));
-		patientReported.setDeathDate(IIncomingMessageHandler.parseDateWarn(reader.getValue(29), "Invalid patient death date", "PID", 1, 29, strictDate, iisReportableList));
+		patientReported.setDeathDate(IIncomingMessageHandler.parseDateWarn(reader.getValue(29), "Invalid patient death date", PID, 1, 29, strictDate, iisReportableList));
 		patientReported.setDeathFlag(reader.getValue(30));
 	}
 
@@ -503,10 +505,10 @@ public abstract class AbstractIncomingMessageHandler implements IIncomingMessage
 		}
 		patientReported.setPublicityIndicator(reader.getValue(11));
 		patientReported.setProtectionIndicator(reader.getValue(12));
-		patientReported.setProtectionIndicatorDate(IIncomingMessageHandler.parseDateWarn(reader.getValue(13), "Invalid protection indicator date", "PD1", 1, 13, strictDate, iisReportableList));
+		patientReported.setProtectionIndicatorDate(IIncomingMessageHandler.parseDateWarn(reader.getValue(13), "Invalid protection indicator date", PD_1, 1, 13, strictDate, iisReportableList));
 		patientReported.setRegistryStatusIndicator(reader.getValue(16));
-		patientReported.setRegistryStatusIndicatorDate(IIncomingMessageHandler.parseDateWarn(reader.getValue(17), "Invalid registry status indicator date", "PD1", 1, 17, strictDate, iisReportableList));
-		patientReported.setPublicityIndicatorDate(IIncomingMessageHandler.parseDateWarn(reader.getValue(18), "Invalid publicity indicator date", "PD1", 1, 18, strictDate, iisReportableList));
+		patientReported.setRegistryStatusIndicatorDate(IIncomingMessageHandler.parseDateWarn(reader.getValue(17), "Invalid registry status indicator date", PD_1, 1, 17, strictDate, iisReportableList));
+		patientReported.setPublicityIndicatorDate(IIncomingMessageHandler.parseDateWarn(reader.getValue(18), "Invalid publicity indicator date", PD_1, 1, 18, strictDate, iisReportableList));
 	}
 
 	public List<VaccinationReported> processVaccinations(HL7Reader reader, Tenant tenant, List<IisReportable> iisReportableList, PatientReported patientReported, Set<ProcessingFlavor> processingFlavorSet, boolean strictDate) throws ProcessingException {
@@ -516,7 +518,7 @@ public abstract class AbstractIncomingMessageHandler implements IIncomingMessage
 		int vaccinationCount = 0;
 		int refusalCount = 0;
 		List<VaccinationReported> vaccinationReportedList = new ArrayList<>(4);
-		while (reader.advanceToSegment("ORC")) {
+		while (reader.advanceToSegment(ORC)) {
 			orcCount++;
 			VaccinationReported vaccinationReported = null;
 			String vaccineCode = "";
@@ -539,31 +541,31 @@ public abstract class AbstractIncomingMessageHandler implements IIncomingMessage
 
 			ModelPerson orderingProvider = processPersonPractitioner(reader, tenant, 12);
 
-			boolean rxaPresent = reader.advanceToSegment("RXA", "ORC");
+			boolean rxaPresent = reader.advanceToSegment(RXA, ORC);
 			if (!rxaPresent) {
-				throw new ProcessingException("RXA segment was not found after ORC segment", "ORC", orcCount, 0);
+				throw new ProcessingException("RXA segment was not found after ORC segment", ORC, orcCount, 0);
 			}
 			rxaCount++;
 			vaccineCode = reader.getValue(5, 1);
 			if (StringUtils.isBlank(vaccineCode)) {
-				throw new ProcessingException("Vaccine code is not indicated in RXA-5.1", "RXA", rxaCount, 5);
+				throw new ProcessingException("Vaccine code is not indicated in RXA-5.1", RXA, rxaCount, 5);
 			}
 			if (vaccineCode.equals("998")) {
 				obxCount = readAndCreateObservations(reader, iisReportableList, processingFlavorSet, patientReported, strictDate, obxCount, null, null);
 				continue;
 			}
 			if (fillerIdentifier == null) {
-				throw new ProcessingException("Vaccination order id was not found, unable to process", "ORC", orcCount, 3);
+				throw new ProcessingException("Vaccination order id was not found, unable to process", ORC, orcCount, 3);
 			}
 			administrationDate = IIncomingMessageHandler.parseDateError(reader.getValue(3, 1), "Could not read administered date in RXA-5", "RXA", rxaCount, 3, strictDate);
 //			if (administrationDate.after(new Date())) {
 //				throw new ProcessingException("Vaccination is indicated as occurring in the future, unable to accept future vaccination events", "RXA", rxaCount, 3);
 //			}
 
-			TokenParam fillerIdentifierParam = fillerIdentifier.asTokenParam();
-			if (fillerIdentifierParam != null) {
+//			TokenParam fillerIdentifierParam = fillerIdentifier.asTokenParam();
+//			if (fillerIdentifierParam != null) {
 //				vaccinationReported = fhirRequester.searchVaccinationReported(new SearchParameterMap("identifier", fillerIdentifierParam));
-			}
+//			}
 
 			/*
 			 * Create new vaccine report if null
@@ -595,9 +597,9 @@ public abstract class AbstractIncomingMessageHandler implements IIncomingMessage
 			 * Checking Vaccine Type
 			 */
 			String vaccineCodeType = reader.getValue(5, 3);
-			if (vaccineCodeType.equals("NDC")) {
+			if (vaccineCodeType.equals(VACCINE_CODE_TYPE_NDC)) {
 				vaccineNdcCode = vaccineCode;
-			} else if (vaccineCodeType.equals("CPT") || vaccineCodeType.equals("C4") || vaccineCodeType.equals("C5")) {
+			} else if (vaccineCodeType.equals(VACCINE_CODE_TYPE_CPT) || vaccineCodeType.equals(VACCINE_CODE_TYPE_C_4) || vaccineCodeType.equals(VACCINE_CODE_TYPE_C_5)) {
 				vaccineCptCode = vaccineCode;
 			} else {
 				vaccineCvxCode = vaccineCode;
@@ -609,11 +611,11 @@ public abstract class AbstractIncomingMessageHandler implements IIncomingMessage
 			String altVaccineCode = reader.getValue(5, 4);
 			String altVaccineCodeType = reader.getValue(5, 6);
 			if (StringUtils.isNotBlank(altVaccineCode)) {
-				if (altVaccineCodeType.equals("NDC")) {
+				if (altVaccineCodeType.equals(VACCINE_CODE_TYPE_NDC)) {
 					if (StringUtils.isBlank(vaccineNdcCode)) {
 						vaccineNdcCode = altVaccineCode;
 					}
-				} else if (altVaccineCodeType.equals("CPT") || altVaccineCodeType.equals("C4") || altVaccineCodeType.equals("C5")) {
+				} else if (altVaccineCodeType.equals(VACCINE_CODE_TYPE_CPT) || altVaccineCodeType.equals(VACCINE_CODE_TYPE_C_4) || altVaccineCodeType.equals(VACCINE_CODE_TYPE_C_5)) {
 					if (StringUtils.isBlank(vaccineCptCode)) {
 						vaccineCptCode = altVaccineCode;
 					}
@@ -648,18 +650,18 @@ public abstract class AbstractIncomingMessageHandler implements IIncomingMessage
 
 			vaccinationReported.setActionCode(reader.getValue(21));
 			int segmentPosition = reader.getSegmentPosition();
-			if (reader.advanceToSegment("RXR", "ORC")) {
+			if (reader.advanceToSegment(RXR, ORC)) {
 				vaccinationReported.setBodyRoute(reader.getValue(1));
 				vaccinationReported.setBodySite(reader.getValue(2));
 			} else if (processingFlavorSet.contains(ProcessingFlavor.SPRUCE)) {
-				if ("00".equals(vaccinationReported.getInformationSource())) {
-					throw new ProcessingException("RXR segment is required for administered vaccinations", "RXA", rxaCount, 0);
+				if (INFORMATION_SOURCE_NEW.equals(vaccinationReported.getInformationSource())) {
+					throw new ProcessingException("RXR segment is required for administered vaccinations", RXA, rxaCount, 0);
 				}
 			}
 			if (vaccinationReported.getAdministeredDate().before(patientReported.getBirthDate()) && !processingFlavorSet.contains(ProcessingFlavor.CLEMENTINE)) {
-				throw new ProcessingException("Vaccination is reported as having been administered before the patient was born", "RXA", rxaCount, 3);
+				throw new ProcessingException("Vaccination is reported as having been administered before the patient was born", RXA, rxaCount, 3);
 			}
-			if (!vaccinationReported.getVaccineCvxCode().equals("998") && !vaccinationReported.getVaccineCvxCode().equals("999") && (vaccinationReported.getCompletionStatus().equals("CP") || vaccinationReported.getCompletionStatus().equals("PA") || vaccinationReported.getCompletionStatus().isEmpty())) {
+			if (!vaccinationReported.getVaccineCvxCode().equals("998") && !vaccinationReported.getVaccineCvxCode().equals("999") && (vaccinationReported.getCompletionStatus().equals(COMPLETION_STATUS_COMPLETE) || vaccinationReported.getCompletionStatus().equals(COMPLETION_STATUS_PARTIALLY_ADMINISTERED) || vaccinationReported.getCompletionStatus().isEmpty())) {
 				vaccinationCount++;
 			}
 
@@ -671,16 +673,16 @@ public abstract class AbstractIncomingMessageHandler implements IIncomingMessage
 			int tempObxCount = obxCount;
 			int fundingSourceObxCount = -1;
 			int fundingEligibilityObxCount = -1;
-			while (reader.advanceToSegment("OBX", "ORC")) { //TODO store entering and ordering practitioners
+			while (reader.advanceToSegment(OBX, ORC)) {
 				tempObxCount++;
 				String indicator = reader.getValue(3);
-				if (indicator.equals("64994-7")) {
+				if (indicator.equals(OBX_CODE_FUNDING_ELIGIBILITY)) {
 					String fundingEligibility = reader.getValue(5);
 					if (StringUtils.isNotBlank(fundingEligibility)) {
 						vaccinationReported.setFundingEligibility(fundingEligibility);
 						fundingEligibilityObxCount = obxCount;
 					}
-				} else if (indicator.equals("30963-3")) {
+				} else if (indicator.equals(OBX_CODE_FUNDING_SOURCE)) {
 					String fundingSource = reader.getValue(5);
 					if (StringUtils.isNotBlank(fundingSource)) {
 						vaccinationReported.setFundingSource(fundingSource);
@@ -787,7 +789,7 @@ public abstract class AbstractIncomingMessageHandler implements IIncomingMessage
 		observationReported.setUnitsLabel(reader.getValue(6, 2));
 		observationReported.setUnitsTable(reader.getValue(6, 3));
 		observationReported.setResultStatus(reader.getValue(11));
-		observationReported.setObservationDate(IIncomingMessageHandler.parseDateWarn(reader.getValue(14), "Unparsable date/time of observation", "OBX", obxCount, 14, strictDate, iisReportableList));
+		observationReported.setObservationDate(IIncomingMessageHandler.parseDateWarn(reader.getValue(14), "Unparsable date/time of observation", OBX, obxCount, 14, strictDate, iisReportableList));
 		observationReported.setMethodCode(reader.getValue(17, 1));
 		observationReported.setMethodLabel(reader.getValue(17, 2));
 		observationReported.setMethodTable(reader.getValue(17, 3));
