@@ -25,8 +25,14 @@ public class SubscriptionTopicConfigurer {
 		if (mySubscriptionTopicDao == null) {
 			mySubscriptionTopicDao = myDaoRegistry.getResourceDao("SubscriptionTopic");
 		}
+		saveTopic(SubscriptionTopicController.getDataQualityIssuesSubscriptionTopic());
+		saveTopic(SubscriptionTopicController.getGroupSubscriptionTopic());
+		saveTopic(SubscriptionTopicController.getPatientSubscriptionTopic());
+	}
+
+	private void saveTopic(SubscriptionTopic topic) {
 		RequestDetails requestDetails = SystemRequestDetails.forAllPartitions();
-		SubscriptionTopic topic = SubscriptionTopicController.getDataQualityIssuesSubscriptionTopic();
+
 		try {
 			mySubscriptionTopicDao.read(topic.getIdElement(), requestDetails);
 		} catch (ResourceNotFoundException | ResourceGoneException e) {

@@ -108,7 +108,8 @@ public class SubscriptionServlet extends HttpServlet {
 					}
 
 					Subscription subscription = (Subscription) searchBundle.getEntryFirstRep().getResource();
-					String result = subscriptionService.triggerWithResource(subscription, parsedResources);
+					String result = subscriptionService.triggerWithResourceFullManual(subscription, parsedResources);
+//					String result = subscriptionService.triggerWithResource(subscription,null, null);
 					out.println(result);
 				} else {
 					out.println("Incorrect parameters length");

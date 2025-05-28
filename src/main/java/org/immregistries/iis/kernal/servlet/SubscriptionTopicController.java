@@ -33,8 +33,15 @@ public class SubscriptionTopicController {
 		resp.getOutputStream().print(parser.encodeResourceToString(topic));
 	}
 
+	@GetMapping("/PatientTest")
+	protected void doGetPatientTest(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		IParser parser = fhirContext.newJsonParser().setPrettyPrint(true);
+		SubscriptionTopic topic = getGroupSubscriptionTopic();
+		resp.getOutputStream().print(parser.encodeResourceToString(topic));
+	}
+
 	@GetMapping("/Group")
-	protected void doGet2(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+	protected void doGetGroup(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		IParser parser = fhirContext.newJsonParser().setPrettyPrint(true);
 		SubscriptionTopic topic = getGroupSubscriptionTopic();
 		resp.getOutputStream().print(parser.encodeResourceToString(topic));
@@ -44,21 +51,6 @@ public class SubscriptionTopicController {
 	ISearchParamRegistry iSearchParamRegistry;
 	@Autowired
 	ISearchParamExtractor iSearchParamExtractor;
-
-	@GetMapping("/test123")
-	protected void doGetTest(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		iSearchParamRegistry.forceRefresh();
-		String str = iSearchParamRegistry.getActiveSearchParams("Person").get("address").toString();
-		iSearchParamExtractor.extractSearchParamComposites(new org.hl7.fhir.r4.model.Patient()).stream().count();
-//		iSearchParamExtractor.exgetPathValueExtractor(new org.hl7.fhir.r4.model.Person(), "");
-//		iSearchParamExtractor.extractValues("",)
-		resp.getOutputStream().print(
-//			str +
-//			iSearchParamExtractor.extractSearchParamComposites(new org.hl7.fhir.r4.model.Person()).stream().count()
-			iSearchParamExtractor.getPathValueExtractor(new org.hl7.fhir.r4.model.Person(), "").toString()
-			);
-
-	}
 
 	@GetMapping("/data-quality-issues")
 	protected void doGetDataQualityIssues(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -112,9 +104,14 @@ public class SubscriptionTopicController {
 
 
 	static public SubscriptionTopic getGroupSubscriptionTopic() {
+		String baseUrl = "";
+		try {
+			baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString();
+		} catch (IllegalStateException ignored) {
+		}
 		SubscriptionTopic topic  = new SubscriptionTopic()
 			.setDescription("Testing communication between EHR and IIS and operation outcome")
-			.setUrl(ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString() +"/SubscriptionTopic/Group")
+			.setUrl(baseUrl + "/SubscriptionTopic/Group")
 			.setStatus(Enumerations.PublicationStatus.DRAFT)
 			.setExperimental(true).setPublisher("Aira/Nist")
 			.setTitle("Health equity data quality requests within Immunization systems");
@@ -138,6 +135,36 @@ public class SubscriptionTopicController {
 			.addModifier(Enumerations.SearchModifierCode.IDENTIFIER)
 		);
 		topic.addNotificationShape().setResource("Group");
+		return topic;
+	}
+
+
+	public static SubscriptionTopic getPatientSubscriptionTopic() {
+		String baseUrl = "";
+		try {
+			baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString();
+		} catch (IllegalStateException ignored) {
+		}
+		SubscriptionTopic topic = new SubscriptionTopic()
+			.setDescription("Testing communication between EHR and IIS")
+			.setUrl(baseUrl + "/SubscriptionTopic/Patient")
+			.setStatus(Enumerations.PublicationStatus.DRAFT)
+			.setExperimental(true).setPublisher("Aira/Nist")
+			.setTitle("Health equity data quality requests within Immunization systems");
+		topic.setId("sandboxPatient");
+		topic.addResourceTrigger(new SubscriptionTopic.SubscriptionTopicResourceTriggerComponent()
+			.setResource("Patient")
+			.setQueryCriteria(new SubscriptionTopic.SubscriptionTopicResourceTriggerQueryCriteriaComponent()
+				.setCurrent("Patient?")
+			)
+		);
+		topic.addCanFilterBy(new SubscriptionTopic.SubscriptionTopicCanFilterByComponent()
+			.setDescription("test name filter")
+			.setResource("Patient")
+			.setFilterParameter(Patient.SP_NAME)
+			.addModifier(Enumerations.SearchModifierCode.EXACT)
+		);
+		topic.addNotificationShape().setResource("Patient");
 		return topic;
 	}
 }

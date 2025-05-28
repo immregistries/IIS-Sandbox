@@ -177,3 +177,4 @@ Temporary Items
 /.env
 /.env.dev
 /Compiled.xml
+/.env.test
