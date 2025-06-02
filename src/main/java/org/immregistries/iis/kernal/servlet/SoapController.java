@@ -4,11 +4,10 @@
  import jakarta.servlet.http.HttpServlet;
  import jakarta.servlet.http.HttpServletRequest;
  import jakarta.servlet.http.HttpServletResponse;
- import jakarta.servlet.http.HttpSession;
- import org.apache.commons.lang3.StringUtils;
  import org.hibernate.Session;
  import org.immregistries.iis.kernal.fhir.interceptors.PartitionCreationInterceptor;
  import org.immregistries.iis.kernal.fhir.security.ServletHelper;
+ import org.immregistries.iis.kernal.logic.BaseIISSOAPServer;
  import org.immregistries.iis.kernal.logic.IIncomingMessageHandler;
  import org.immregistries.iis.kernal.model.Tenant;
  import org.immregistries.smm.cdc.*;
@@ -18,7 +17,6 @@
  import java.io.IOException;
  import java.io.PrintWriter;
 
- import static org.immregistries.iis.kernal.fhir.security.ServletHelper.SESSION_TENANT;
  import static org.immregistries.iis.kernal.servlet.SoapController.SOAP_BASE_PATH;
  import static org.immregistries.iis.kernal.servlet.TenantController.PATH_VARIABLE_TENANT_NAME;
 
@@ -39,31 +37,23 @@ public class SoapController extends HttpServlet {
 		String path = req.getPathInfo();
 		final String processorName =
 			path == null ? "" : (path.startsWith("/") ? path.substring(1) : path);
-		CDCWSDLServer server = new CDCWSDLServer() {
+		CDCWSDLServer server = new BaseIISSOAPServer(partitionCreationInterceptor, tenantName) {
 			@Override
 			public void process(SubmitSingleMessage ssm, PrintWriter out) throws Fault {
-
 				String message = ssm.getHl7Message();
-				String userId = ssm.getUsername();
-				String password = ssm.getPassword();
-				String facilityId = ssm.getFacilityID();
 
 				String ack = "";
 				Session dataSession = ServletHelper.getDataSession();
 				String[] messages;
 				StringBuilder ackBuilder = new StringBuilder();
 				try {
-					Tenant tenant;
-					if (StringUtils.isNotBlank(tenantName)) {
-						tenant = ServletHelper.authenticateTenant(userId, password, tenantName, dataSession, partitionCreationInterceptor);
-					} else {
-						tenant = ServletHelper.authenticateTenant(userId, password, facilityId, dataSession, partitionCreationInterceptor);
-					}
+					/*
+					 * Tenant is accessed through RequestContext, and was previously set through the authorize method of WSDL server
+					 */
+					Tenant tenant = ServletHelper.getTenant();
 					if (tenant == null) {
 						throw new SecurityException("Username/password combination is unrecognized");
 					} else {
-						HttpSession session = req.getSession(true);
-						session.setAttribute(SESSION_TENANT, tenant);
 						messages = message.split("MSH\\|\\^~\\\\&\\|");
 						for (String msh : messages) {
 							if (!msh.isBlank()) {
@@ -79,35 +69,6 @@ public class SoapController extends HttpServlet {
 					dataSession.close();
 				}
 				out.print(ack);
-			}
-
-			@Override
-			public String getEchoBackMessage(String message) {
-				return "End-point is ready. Echoing: " + message;
-			}
-
-			@Override
-			public void authorize(SubmitSingleMessage ssm) throws Fault {
-				String userId = ssm.getUsername();
-				String password = ssm.getPassword();
-				String facilityId = ssm.getFacilityID();
-				Session dataSession = ServletHelper.getDataSession();
-				try {
-					if ("NPE".equals(userId) && "NPE".equals(password)) {
-						throw new UnknownFault("Unknown Fault");
-					}
-					Tenant tenant;
-					if (StringUtils.isNotBlank(tenantName)) {
-						tenant = ServletHelper.authenticateTenant(userId, password, tenantName, dataSession, partitionCreationInterceptor);
-					} else {
-						tenant = ServletHelper.authenticateTenant(userId, password, facilityId, dataSession, partitionCreationInterceptor);
-					}
-					if (tenant == null) {
-						throw new SecurityFault("Username/password combination is unrecognized");
-					}
-				} finally {
-					dataSession.close();
-				}
 			}
 		};
 		server.setProcessorName(processorName);

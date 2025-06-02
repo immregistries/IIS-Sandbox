@@ -177,11 +177,11 @@ public class HomeServlet {
 			out.println("      <li><a href=\"recommendation\">Recommendations</a>: Generate Immunization Recommendations for Patients</li>");
 			if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R5)) {
 				out.println("      <li><a href=\"subscription\">Subscriptions</a>: Visualize and manually trigger FHIR subscriptions</li>");
-				out.println("      <li><a href=\"" + FhirMessagingController.FHIR_MESSAGING + "\">Conversion messaging (Unavailable in R5 mode)</a>: Experimental endpoint for FHIR messaging with messages converted from HL7v2</li>");
+				out.println("      <li><a href=\"" + FhirMessagingController.FHIR_MESSAGING_PATH_KEY + "\">Conversion messaging (Unavailable in R5 mode)</a>: Experimental endpoint for FHIR messaging with messages converted from HL7v2</li>");
 			} else if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R4)) {
 				out.println("      <li><a>Subscriptions</a>: (Unavailable in R4 mode) Visualize and manually trigger FHIR subscriptions</li>");
 				out.println("      <li><a href=\"" + V2ToFhirController.V2_TO_FHIR_PATH_KEY + "\">V2ToFhir</a>: V2 to Fhir conversion using v2ToFhir dependency</li>");
-				out.println("      <li><a href=\"" + FhirMessagingController.FHIR_MESSAGING + "\">Conversion messaging </a>: Experimental endpoint for FHIR messaging with messages converted from HL7v2</li>");
+				out.println("      <li><a href=\"" + FhirMessagingController.FHIR_MESSAGING_PATH_KEY + "\">Conversion messaging </a>: Experimental endpoint for FHIR messaging with messages converted from HL7v2</li>");
 
 			}
 			out.println("      <li><a href=\"soap\">CDC WSDL</a>: HL7 realtime interfacing using CDC WSDL</li>");
