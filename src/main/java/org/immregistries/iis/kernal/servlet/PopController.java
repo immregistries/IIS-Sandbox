@@ -35,8 +35,8 @@ import static org.immregistries.iis.kernal.servlet.PopController.POP_BASE_PATH;
 @RestController()
 @RequestMapping({POP_BASE_PATH, TenantController.TENANT_PATH + POP_BASE_PATH})
 public class PopController {
-	public static final String POP = "pop";
-	public static final String POP_BASE_PATH = "/" + POP;
+	public static final String POP_PATH_KEY = "pop";
+	public static final String POP_BASE_PATH = "/" + POP_PATH_KEY;
 	public static final String PARAM_MESSAGE = "MESSAGEDATA";
 	public static final String PARAM_FACILITY_NAME = "FACILITY_NAME";
 	public static final String MSH_HEADER_REGEX = "MSH\\|\\^~\\\\&\\|";
@@ -144,7 +144,7 @@ public class PopController {
 			{
 				HomeServlet.doHeader(out, "IIS Sandbox - Pop", tenant);
 				out.println("    <h2>Send Now</h2>");
-				printForm(out, "VXU Message", message, organizationName, POP);
+				printForm(out, "VXU Message", message, organizationName, POP_PATH_KEY);
 				HomeServlet.doFooter(out);
 			}
 		} catch (Exception e) {

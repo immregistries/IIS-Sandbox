@@ -2,6 +2,7 @@ package org.immregistries.iis.kernal.servlet;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.context.FhirVersionEnum;
+import com.google.common.collect.ImmutableMap;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
+import java.util.Map;
 
 /**
  * UI Homepage
@@ -33,6 +35,12 @@ import java.text.SimpleDateFormat;
 public class HomeServlet {
 	@Autowired
 	FhirContext fhirContext;
+	private final static ImmutableMap<String, String> HEADER_MAP = ImmutableMap.of(PopController.POP_PATH_KEY, "Send Now",
+		"message", "messages",
+		PatientController.PATIENT_PATH_KEY, "Patients",
+		"location", "Locations"
+//		,FhirMessagingController.FHIR_MESSAGING, "Conversion messaging"
+	);
 
 	/**
 	 * Helping method for unified Header printing in UI
@@ -53,12 +61,10 @@ public class HomeServlet {
 		out.println("      <div class=\"w3-bar w3-light-grey\">");
 		out.println("<a href=\"home\" class=\"w3-bar-item w3-button w3-green\">IIS Sandbox</a>");
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		out.println("<a href=\"pop\" class=\"w3-bar-item w3-button\">Send Now</a>");
-		out.println("<a href=\"message\" class=\"w3-bar-item w3-button\">Messages</a>");
-		out.println("<a href=\"patient\" class=\"w3-bar-item w3-button\">Patients</a>");
-		out.println("<a href=\"location\" class=\"w3-bar-item w3-button\">Locations</a>");
-		out.println("<a href=\"subscription\" class=\"w3-bar-item w3-button\">Subscriptions</a>");
-		out.println("<a href=\"fhirMessaging\" class=\"w3-bar-item w3-button\">Conversion Messaging</a>");
+		for (Map.Entry<String, String> header : HEADER_MAP.entrySet()) {
+			out.println("<a href=\"" + header.getKey() + "\" class=\"w3-bar-item w3-button\">" + header.getValue() + "</a>");
+		}
+//		out.println("<a href=\"subscription\" class=\"w3-bar-item w3-button\">Subscriptions</a>");
 		out.println("<a href=\"soap\" class=\"w3-bar-item w3-button\">CDC WSDL</a>");
 		if (authentication.isAuthenticated() && !(authentication instanceof AnonymousAuthenticationToken)) {
 			out.println("<a class='w3-bar-item w3-button w3-right' href=\"logout\">Logout</a>");
@@ -164,15 +170,19 @@ public class HomeServlet {
 				"<a href=\"https://github.com/immregistries/IIS-Sandbox/wiki\">https://github.com/immregistries/IIS-Sandbox/wiki</a></p>");
 			out.println("    <h2>Primary Functions Supported</h2>");
 			out.println("    <ul class=\"w3-ul w3-hoverable\">");
-			out.println("      <li><a href=\"pop\">Send Now</a>: Send an HL7 message in now.</li>");
+			out.println("      <li><a href=\"" + PopController.POP_PATH_KEY + "\">Send Now</a>: Send an HL7 message in now.</li>");
 			out.println("      <li><a href=\"message\">Messages</a>: Review recently submitted messages</li>");
 			out.println("      <li><a href=\"patient\">Patients</a>: See data received by patient</li>");
 			out.println("      <li><a href=\"location\">Locations</a>: See administered-at-locations</li>");
 			out.println("      <li><a href=\"recommendation\">Recommendations</a>: Generate Immunization Recommendations for Patients</li>");
 			if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R5)) {
 				out.println("      <li><a href=\"subscription\">Subscriptions</a>: Visualize and manually trigger FHIR subscriptions</li>");
+				out.println("      <li><a href=\"" + FhirMessagingController.FHIR_MESSAGING + "\">Conversion messaging (Unavailable in R5 mode)</a>: Experimental endpoint for FHIR messaging with messages converted from HL7v2</li>");
 			} else if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R4)) {
 				out.println("      <li><a>Subscriptions</a>: (Unavailable in R4 mode) Visualize and manually trigger FHIR subscriptions</li>");
+				out.println("      <li><a href=\"" + V2ToFhirController.V2_TO_FHIR_PATH_KEY + "\">V2ToFhir</a>: V2 to Fhir conversion using v2ToFhir dependency</li>");
+				out.println("      <li><a href=\"" + FhirMessagingController.FHIR_MESSAGING + "\">Conversion messaging </a>: Experimental endpoint for FHIR messaging with messages converted from HL7v2</li>");
+
 			}
 			out.println("      <li><a href=\"soap\">CDC WSDL</a>: HL7 realtime interfacing using CDC WSDL</li>");
 			if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R5)) {

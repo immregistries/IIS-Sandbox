@@ -46,7 +46,8 @@ import static org.immregistries.iis.kernal.servlet.SubscriptionServlet.PARAM_SUB
 @RestController
 @RequestMapping({PATIENT_BASE_PATH, TenantController.TENANT_PATH + PATIENT_BASE_PATH})
 public class PatientController {
-	public static final String PATIENT_BASE_PATH = "/patient";
+	public static final String PATIENT_PATH_KEY = "patient";
+	public static final String PATIENT_BASE_PATH = "/" + PATIENT_PATH_KEY;
 
 	public static final String PARAM_ACTION = "action";
 	public static final String ACTION_SEARCH = "search";

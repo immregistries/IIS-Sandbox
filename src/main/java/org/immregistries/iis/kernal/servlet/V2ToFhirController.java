@@ -34,8 +34,8 @@ import static org.immregistries.iis.kernal.servlet.V2ToFhirController.V2_TO_FHIR
 @RequestMapping({V2_TO_FHIR_BASE_PATH, TenantController.TENANT_PATH + V2_TO_FHIR_BASE_PATH})
 @Conditional(OnR4Condition.class)
 public class V2ToFhirController {
-	public static final String V2_TO_FHIR = "v2ToFhir";
-	public static final String V2_TO_FHIR_BASE_PATH = "/" + V2_TO_FHIR;
+	public static final String V2_TO_FHIR_PATH_KEY = "v2ToFhir";
+	public static final String V2_TO_FHIR_BASE_PATH = "/" + V2_TO_FHIR_PATH_KEY;
 
 	@Autowired
 	RepositoryClientFactory repositoryClientFactory;
@@ -116,7 +116,7 @@ public class V2ToFhirController {
 
 			HomeServlet.doHeader(out, "IIS Sandbox - v2ToFhir", tenant);
 			out.println("<h2>Convert to FHIR</h2>");
-			PopController.printForm(out, "V2 Message", message, organizationName, V2_TO_FHIR);
+			PopController.printForm(out, "V2 Message", message, organizationName, V2_TO_FHIR_PATH_KEY);
 			HomeServlet.doFooter(out);
 		} catch (Exception e) {
 			e.printStackTrace(System.err);
