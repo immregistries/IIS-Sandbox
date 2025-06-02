@@ -25,6 +25,7 @@ public class V2ToFhirMessageHandler implements IHl7MessageHandler {
 		MessageParser parser = new MessageParser();
 		try {
 			Bundle bundle = parser.convert(message);
+
 			return fhirContext.newJsonParser().setPrettyPrint(true).encodeResourceToString(bundle);
 //			MethodOutcome result = repositoryClientFactory.getFhirClient().create().resource(bundle).execute();
 //			return  fhirContext.newJsonParser().encodeResourceToString(result.getResource());
@@ -32,4 +33,9 @@ public class V2ToFhirMessageHandler implements IHl7MessageHandler {
 			throw new RuntimeException(e);
 		}
 	}
+//
+//	public MethodOutcome methodOutcomeFromAckTest(String ack) {
+//		MessageParser parser = new MessageParser();
+//		parser.convert(ack)
+//	}
 }

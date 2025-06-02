@@ -64,9 +64,6 @@ public interface IIncomingMessageHandler extends IHl7MessageHandler {
 	String QUERY_APPLICATION_ERROR = "AE";
 	Random random = new Random();
 
-
-//	List<VaccinationMaster> getVaccinationMasterList(PatientMaster patient);
-
 	String buildAck(HL7Reader reader, List<IisReportable> iisReportableList, Set<ProcessingFlavor> processingFlavorSet);
 
 	static SimpleDateFormat generateV2SDF() {

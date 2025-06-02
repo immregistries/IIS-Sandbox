@@ -1,5 +1,8 @@
 package org.immregistries.iis.kernal.fhir.security;
 
+import org.immregistries.iis.kernal.servlet.FhirMessagingController;
+import org.immregistries.iis.kernal.servlet.PopController;
+import org.immregistries.iis.kernal.servlet.V2ToFhirController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
@@ -48,8 +51,9 @@ public class ServerSecurityConfig {
 			)
 			.csrf((csrf) -> csrf
 				.ignoringRequestMatchers(
-					new AntPathRequestMatcher("/pop"),
-					new AntPathRequestMatcher("/v2ToFhir"),
+					new AntPathRequestMatcher(PopController.POP_BASE_PATH),
+					new AntPathRequestMatcher(V2ToFhirController.V2_TO_FHIR_BASE_PATH),
+					new AntPathRequestMatcher(FhirMessagingController.FHIR_MESSAGING_BASE_PATH),
 					new AntPathRequestMatcher("/message"),
 					new AntPathRequestMatcher("/fhir/**"),
 					new AntPathRequestMatcher("/loginForm"),

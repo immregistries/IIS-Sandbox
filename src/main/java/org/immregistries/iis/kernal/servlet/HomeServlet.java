@@ -58,6 +58,7 @@ public class HomeServlet {
 		out.println("<a href=\"patient\" class=\"w3-bar-item w3-button\">Patients</a>");
 		out.println("<a href=\"location\" class=\"w3-bar-item w3-button\">Locations</a>");
 		out.println("<a href=\"subscription\" class=\"w3-bar-item w3-button\">Subscriptions</a>");
+		out.println("<a href=\"fhirMessaging\" class=\"w3-bar-item w3-button\">Conversion Messaging</a>");
 		out.println("<a href=\"soap\" class=\"w3-bar-item w3-button\">CDC WSDL</a>");
 		if (authentication.isAuthenticated() && !(authentication instanceof AnonymousAuthenticationToken)) {
 			out.println("<a class='w3-bar-item w3-button w3-right' href=\"logout\">Logout</a>");

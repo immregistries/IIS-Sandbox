@@ -1,17 +1,19 @@
 package org.immregistries.iis.kernal.servlet;
 
 import ca.uhn.fhir.context.FhirContext;
+import ca.uhn.fhir.parser.IParser;
+import gov.cdc.izgw.v2tofhir.converter.MessageParser;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Session;
+import org.hl7.fhir.r4.model.Bundle;
+import org.hl7.fhir.r4.model.DocumentReference;
+import org.hl7.fhir.r4.model.StringType;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
-import org.immregistries.iis.kernal.logic.V2ToFhirMessageHandler;
-import org.immregistries.iis.kernal.mapping.interfaces.ImmunizationMapper;
-import org.immregistries.iis.kernal.mapping.internalClient.IFhirRequester;
-import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
+import org.immregistries.iis.kernal.logic.IIncomingMessageHandler;
 import org.immregistries.iis.kernal.model.Tenant;
 import org.immregistries.smm.transform.ScenarioManager;
 import org.immregistries.smm.transform.TestCaseMessage;
@@ -26,61 +28,63 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import static org.immregistries.iis.kernal.servlet.PopController.*;
-import static org.immregistries.iis.kernal.servlet.V2ToFhirController.V2_TO_FHIR_BASE_PATH;
+import static org.immregistries.iis.kernal.servlet.FhirMessagingController.FHIR_MESSAGING_BASE_PATH;
+import static org.immregistries.iis.kernal.servlet.PopController.PARAM_FACILITY_NAME;
+import static org.immregistries.iis.kernal.servlet.PopController.PARAM_MESSAGE;
 
 
 @RestController()
-@RequestMapping({V2_TO_FHIR_BASE_PATH, TenantController.TENANT_PATH + V2_TO_FHIR_BASE_PATH})
+@RequestMapping({FHIR_MESSAGING_BASE_PATH, TenantController.TENANT_PATH + FHIR_MESSAGING_BASE_PATH})
 @Conditional(OnR4Condition.class)
-public class V2ToFhirController {
-	public static final String V2_TO_FHIR = "v2ToFhir";
-	public static final String V2_TO_FHIR_BASE_PATH = "/" + V2_TO_FHIR;
-
+public class FhirMessagingController {
+	public static final String FHIR_MESSAGING = "FhirMessaging";
+	public static final String FHIR_MESSAGING_BASE_PATH = "/" + FHIR_MESSAGING;
+	public static final String ORIGINAL_TEXT_EXTENSION_URL = "http://hl7.org/fhir/StructureDefinition/originalText";
 	@Autowired
-	RepositoryClientFactory repositoryClientFactory;
-	@Autowired
-	ImmunizationMapper immunizationMapper;
-	@Autowired
-	IFhirRequester fhirRequester;
-	@Autowired
-	V2ToFhirMessageHandler v2ToFhirMessageHandler;
+	IIncomingMessageHandler incomingMessageHandler;
 	@Autowired
 	FhirContext fhirContext;
 
 	@PostMapping
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
 		throws ServletException, IOException {
-		resp.setContentType("text/html");
+//		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		Session dataSession = null;
 		try {
 			dataSession = ServletHelper.getDataSession();
 			Tenant tenant = ServletHelper.getTenant(req, dataSession);
 			String result = "";
-			String[] messages;
-			StringBuilder stringBuilder = new StringBuilder();
 			String message = req.getParameter(PARAM_MESSAGE);
 			String facility_name = req.getParameter(PARAM_FACILITY_NAME);
 			if (tenant == null) {
 				resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 				out.println("Access is not authorized. FacilityId, userid and/or password are not recognized. ");
 			} else {
-				HomeServlet.doHeader(out, "IIS Sandbox - V2ToFhir Result", tenant);
-
-				messages = message.split(MSH_HEADER_REGEX);
-				for (String msh : messages) {
-					if (!msh.isBlank()) {
-						stringBuilder.append(v2ToFhirMessageHandler.process(MSH_HEADER + msh, tenant, facility_name));
-					}
+				if (StringUtils.isBlank(message)) {
+					throw new RuntimeException("Blank message not accepted");
 				}
-				result = stringBuilder.toString();
+				IParser parser;
+				if (message.startsWith("{")) {
+					parser = fhirContext.newJsonParser();
+				} else {
+					parser = fhirContext.newXmlParser();
+				}
+				parser.setPrettyPrint(true);
+				Bundle bundle = (Bundle) parser.parseResource(message);
+				/*
+				 * Temporary solution of extracting the original V2 message from Document reference
+				 * TODO integrate or create a converter of FHIR messaging back to V2 message when available
+				 */
+				DocumentReference documentReference = (DocumentReference) bundle.getEntryFirstRep().getResource();
+				StringType v2Message = (StringType) documentReference.getContent().get(0).getExtensionByUrl(ORIGINAL_TEXT_EXTENSION_URL).getValue();
+				String v2Result = incomingMessageHandler.process(v2Message.getValueNotNull(), tenant, facility_name);
+				MessageParser messageParser = new MessageParser();
+				Bundle resultBundle = messageParser.convert(v2Result);
+				String fhirResult = parser.encodeResourceToString(resultBundle);
+				out.print(fhirResult);
+				resp.setContentType("text/plain");
 			}
-//      resp.setContentType("text/plain");
-			out.println("<textarea name=\"result\" readonly style=\"width: 100%; height: 90%;\" >");
-			out.print(result);
-			out.println("</textarea>");
-
 		} catch (Exception e) {
 			resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 			e.printStackTrace(out);
@@ -111,13 +115,16 @@ public class V2ToFhirController {
 					ScenarioManager.createTestCaseMessage(ScenarioManager.SCENARIO_1_R_ADMIN_CHILD);
 				Transformer transformer = new Transformer();
 				transformer.transform(testCaseMessage);
-				message = testCaseMessage.getMessageText();
+				MessageParser messageParser = new MessageParser();
+				Bundle bundle = messageParser.convert(testCaseMessage.getMessageText());
+				message = fhirContext.newJsonParser().setPrettyPrint(true).encodeResourceToString(bundle);
 			}
 
-			HomeServlet.doHeader(out, "IIS Sandbox - v2ToFhir", tenant);
-			out.println("<h2>Convert to FHIR</h2>");
-			PopController.printForm(out, "V2 Message", message, organizationName, V2_TO_FHIR);
+			HomeServlet.doHeader(out, "IIS Sandbox - FHIR Messaging", tenant);
+			out.println("<h2>Experimental FHIR Messaging Endpoint</h2>");
+			PopController.printForm(out, "FHIR Bundle", message, organizationName, FHIR_MESSAGING);
 			HomeServlet.doFooter(out);
+
 		} catch (Exception e) {
 			e.printStackTrace(System.err);
 		}

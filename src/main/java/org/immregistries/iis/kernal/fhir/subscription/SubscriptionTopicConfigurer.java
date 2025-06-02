@@ -32,7 +32,6 @@ public class SubscriptionTopicConfigurer {
 
 	private void saveTopic(SubscriptionTopic topic) {
 		RequestDetails requestDetails = SystemRequestDetails.forAllPartitions();
-
 		try {
 			mySubscriptionTopicDao.read(topic.getIdElement(), requestDetails);
 		} catch (ResourceNotFoundException | ResourceGoneException e) {

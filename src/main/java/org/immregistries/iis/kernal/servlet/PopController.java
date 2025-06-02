@@ -35,9 +35,12 @@ import static org.immregistries.iis.kernal.servlet.PopController.POP_BASE_PATH;
 @RestController()
 @RequestMapping({POP_BASE_PATH, TenantController.TENANT_PATH + POP_BASE_PATH})
 public class PopController {
-	public static final String POP_BASE_PATH = "/pop";
+	public static final String POP = "pop";
+	public static final String POP_BASE_PATH = "/" + POP;
 	public static final String PARAM_MESSAGE = "MESSAGEDATA";
 	public static final String PARAM_FACILITY_NAME = "FACILITY_NAME";
+	public static final String MSH_HEADER_REGEX = "MSH\\|\\^~\\\\&\\|";
+	public static final String MSH_HEADER = "MSH|^~\\&|";
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	@Autowired
 	private FhirContext fhirContext;
@@ -67,13 +70,14 @@ public class PopController {
 			} else {
 				HomeServlet.doHeader(out, "IIS Sandbox - PopResult", tenant);
 
-				messages = message.split("MSH\\|\\^~\\\\&\\|");
+				messages = message.split(
+					MSH_HEADER_REGEX);
 				if (messages.length > 2) {
 					req.setAttribute("groupPatientIds", new ArrayList<String>());
 				}
 				for (String msh : messages) {
 					if (!msh.isBlank()) {
-						ackBuilder.append(handler.process("MSH|^~\\&|" + msh, tenant, facility_name));
+						ackBuilder.append(handler.process(MSH_HEADER + msh, tenant, facility_name));
 					}
 				}
 				ack = ackBuilder.toString();
@@ -140,26 +144,7 @@ public class PopController {
 			{
 				HomeServlet.doHeader(out, "IIS Sandbox - Pop", tenant);
 				out.println("    <h2>Send Now</h2>");
-				out.println("    <form action=\"pop\" method=\"POST\" target=\"_blank\" autocomplete=\"on\">");
-				out.println("      <h3>VXU Message</h3>");
-				out.println("      <textarea class=\"w3-input\" autocomplete=\"off\" name=\"" + PARAM_MESSAGE
-					+ "\" rows=\"15\" cols=\"160\">" + message + "</textarea></td>");
-				out.println("    <div class=\"w3-container w3-half w3-margin-top\">");
-
-
-				out.println("    <div class=\"w3-container w3-card-4\">");
-				out.println("		<input class=\"w3-input\" type=\"text\" auto name=\"" + PARAM_FACILITY_NAME + "\" value=\"" + organizationName + "\"/>");
-				out.println("		<label>Sending organization name (Overriding the segments)</label>");
-				out.println("		<br/>");
-
-				out.println("		<input class=\"w3-button w3-section w3-teal w3-ripple\" type=\"submit\" name=\"submit\" value=\"Submit\"/>");
-				out.println("     <span class=\"w3-yellow\">Test Data Only</span>");
-
-				out.println("    </div>");
-
-
-				out.println("    </div>");
-				out.println("    </form>");
+				printForm(out, "VXU Message", message, organizationName, POP);
 				HomeServlet.doFooter(out);
 			}
 		} catch (Exception e) {
@@ -167,6 +152,32 @@ public class PopController {
 		}
 		out.flush();
 		out.close();
+	}
+
+	public static void printForm(PrintWriter out, String title, String message, String organizationName, String formDestination) {
+		out.println("    <form action=\"" + formDestination + "\" method=\"POST\" target=\"_blank\" autocomplete=\"on\">");
+		if (StringUtils.isNotBlank(title)) {
+			out.println("      <h3>" + title + "</h3>");
+
+		}
+		out.println("      <textarea class=\"w3-input\" autocomplete=\"off\" name=\"" + PARAM_MESSAGE
+			+ "\" rows=\"15\" cols=\"160\">" + message + "</textarea></td>");
+		out.println("    <div class=\"w3-container w3-half w3-margin-top\">");
+
+
+		out.println("    <div class=\"w3-container w3-card-4\">");
+		out.println("		<input class=\"w3-input\" type=\"text\" auto name=\"" + PARAM_FACILITY_NAME + "\" value=\"" + organizationName + "\"/>");
+		out.println("		<label>Sending organization name (Overriding the segments)</label>");
+		out.println("		<br/>");
+
+		out.println("		<input class=\"w3-button w3-section w3-teal w3-ripple\" type=\"submit\" name=\"submit\" value=\"Submit\"/>");
+		out.println("     <span class=\"w3-yellow\">Test Data Only</span>");
+
+		out.println("    </div>");
+
+
+		out.println("    </div>");
+		out.println("    </form>");
 	}
 
 }

@@ -21,45 +21,48 @@ import java.io.IOException;
 @RestController
 @RequestMapping("/SubscriptionTopic")
 public class SubscriptionTopicController {
+	public static final String DATA_QUALITY_ISSUES_TOPIC_NAME = "/data-quality-issues";
+	public static final String PATIENT_TOPIC_NAME = "/Patient";
+	public static final String GROUP_TOPIC_NAME = "/Group";
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	@Autowired
 	FhirContext fhirContext;
+	@Autowired
+	ISearchParamRegistry iSearchParamRegistry;
+	@Autowired
+	ISearchParamExtractor iSearchParamExtractor;
 
 	@GetMapping
-	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+	protected void doGetDefault(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		IParser parser = fhirContext.newJsonParser().setPrettyPrint(true);
 		SubscriptionTopic topic = getDataQualityIssuesSubscriptionTopic();
 		resp.getOutputStream().print(parser.encodeResourceToString(topic));
 	}
 
-	@GetMapping("/PatientTest")
+	@GetMapping(PATIENT_TOPIC_NAME)
 	protected void doGetPatientTest(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		IParser parser = fhirContext.newJsonParser().setPrettyPrint(true);
-		SubscriptionTopic topic = getGroupSubscriptionTopic();
+		SubscriptionTopic topic = getPatientSubscriptionTopic();
 		resp.getOutputStream().print(parser.encodeResourceToString(topic));
 	}
 
-	@GetMapping("/Group")
+	@GetMapping(GROUP_TOPIC_NAME)
 	protected void doGetGroup(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		IParser parser = fhirContext.newJsonParser().setPrettyPrint(true);
 		SubscriptionTopic topic = getGroupSubscriptionTopic();
 		resp.getOutputStream().print(parser.encodeResourceToString(topic));
 	}
 
-	@Autowired
-	ISearchParamRegistry iSearchParamRegistry;
-	@Autowired
-	ISearchParamExtractor iSearchParamExtractor;
 
-	@GetMapping("/data-quality-issues")
+	@GetMapping(DATA_QUALITY_ISSUES_TOPIC_NAME)
 	protected void doGetDataQualityIssues(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		IParser parser = fhirContext.newJsonParser().setPrettyPrint(true);
 		SubscriptionTopic topic = getDataQualityIssuesSubscriptionTopic();
 		resp.getOutputStream().print(parser.encodeResourceToString(topic));
 	}
 
-	static public SubscriptionTopic getDataQualityIssuesSubscriptionTopic() {
+	public static SubscriptionTopic getDataQualityIssuesSubscriptionTopic() {
 		SubscriptionTopic.SubscriptionTopicEventTriggerComponent eventTrigger =
 			new SubscriptionTopic.SubscriptionTopicEventTriggerComponent().setEvent( new CodeableConcept()
 				// https://terminology.hl7.org/3.1.0/ValueSet-v2-0003.html
@@ -80,7 +83,7 @@ public class SubscriptionTopicController {
 
 		SubscriptionTopic topic  = new SubscriptionTopic()
 			.setDescription("Testing communication between EHR and IIS and operation outcome")
-			.setUrl(baseUrl + "/SubscriptionTopic/data-quality-issues")
+			.setUrl(baseUrl + "/SubscriptionTopic" + DATA_QUALITY_ISSUES_TOPIC_NAME)
 			.setStatus(Enumerations.PublicationStatus.DRAFT)
 			.setExperimental(true).setPublisher("Aira/Nist")
 			.setTitle("Health equity data quality requests within Immunization systems");
@@ -111,7 +114,7 @@ public class SubscriptionTopicController {
 		}
 		SubscriptionTopic topic  = new SubscriptionTopic()
 			.setDescription("Testing communication between EHR and IIS and operation outcome")
-			.setUrl(baseUrl + "/SubscriptionTopic/Group")
+			.setUrl(baseUrl + "/SubscriptionTopic" + GROUP_TOPIC_NAME)
 			.setStatus(Enumerations.PublicationStatus.DRAFT)
 			.setExperimental(true).setPublisher("Aira/Nist")
 			.setTitle("Health equity data quality requests within Immunization systems");
@@ -147,7 +150,7 @@ public class SubscriptionTopicController {
 		}
 		SubscriptionTopic topic = new SubscriptionTopic()
 			.setDescription("Testing communication between EHR and IIS")
-			.setUrl(baseUrl + "/SubscriptionTopic/Patient")
+			.setUrl(baseUrl + "/SubscriptionTopic" + PATIENT_TOPIC_NAME)
 			.setStatus(Enumerations.PublicationStatus.DRAFT)
 			.setExperimental(true).setPublisher("Aira/Nist")
 			.setTitle("Health equity data quality requests within Immunization systems");
