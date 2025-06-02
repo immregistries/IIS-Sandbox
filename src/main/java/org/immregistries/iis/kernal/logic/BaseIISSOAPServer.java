@@ -33,8 +33,7 @@ public abstract class BaseIISSOAPServer extends CDCWSDLServer {
 		String userId = ssm.getUsername();
 		String password = ssm.getPassword();
 		String facilityId = ssm.getFacilityID();
-		Session dataSession = ServletHelper.getDataSession();
-		try {
+		try (Session dataSession = ServletHelper.getDataSession()) {
 			if ("NPE".equals(userId) && "NPE".equals(password)) {
 				throw new UnknownFault("Unknown Fault");
 			}
@@ -52,8 +51,6 @@ public abstract class BaseIISSOAPServer extends CDCWSDLServer {
 //				HttpSession session = req.getSession(true);
 //						session.setAttribute(SESSION_TENANT, tenant);
 			}
-		} finally {
-			dataSession.close();
 		}
 	}
 }

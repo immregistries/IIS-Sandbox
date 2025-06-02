@@ -4,7 +4,6 @@
  import jakarta.servlet.http.HttpServlet;
  import jakarta.servlet.http.HttpServletRequest;
  import jakarta.servlet.http.HttpServletResponse;
- import org.hibernate.Session;
  import org.immregistries.iis.kernal.fhir.interceptors.PartitionCreationInterceptor;
  import org.immregistries.iis.kernal.fhir.security.ServletHelper;
  import org.immregistries.iis.kernal.logic.BaseIISSOAPServer;
@@ -43,9 +42,6 @@ public class SoapController extends HttpServlet {
 				String message = ssm.getHl7Message();
 
 				String ack = "";
-				Session dataSession = ServletHelper.getDataSession();
-				String[] messages;
-				StringBuilder ackBuilder = new StringBuilder();
 				try {
 					/*
 					 * Tenant is accessed through RequestContext, and was previously set through the authorize method of WSDL server
@@ -54,19 +50,10 @@ public class SoapController extends HttpServlet {
 					if (tenant == null) {
 						throw new SecurityException("Username/password combination is unrecognized");
 					} else {
-						messages = message.split("MSH\\|\\^~\\\\&\\|");
-						for (String msh : messages) {
-							if (!msh.isBlank()) {
-								ackBuilder.append(handler.process("MSH|^~\\&|" + msh, tenant, null));
-								ackBuilder.append("\n");
-							}
-						}
-						ack = ackBuilder.toString();
+						ack = handler.process(message, tenant, null);
 					}
 				} catch (Exception e) {
 					throw new UnknownFault("Unable to process request: " + e.getMessage(), e);
-				} finally {
-					dataSession.close();
 				}
 				out.print(ack);
 			}
