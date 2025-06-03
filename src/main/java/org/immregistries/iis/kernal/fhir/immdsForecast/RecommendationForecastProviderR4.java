@@ -12,7 +12,7 @@ import org.hl7.fhir.r4.model.Patient;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.logic.ImmunizationRecommendationServiceR4;
-import org.immregistries.iis.kernal.logic.IncomingQueryHandler;
+import org.immregistries.iis.kernal.logic.messageHandling.IncomingQueryHandler;
 import org.immregistries.iis.kernal.mapping.forR4.ImmunizationMapperR4;
 import org.immregistries.iis.kernal.mapping.forR4.PatientMapperR4;
 import org.immregistries.iis.kernal.model.PatientMaster;

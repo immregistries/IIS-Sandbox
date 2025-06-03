@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal.logic;
+package org.immregistries.iis.kernal.logic.messageHandling;
 
 import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
 import ca.uhn.fhir.rest.param.ReferenceParam;
@@ -9,6 +9,7 @@ import org.hl7.fhir.instance.model.api.IIdType;
 import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.iis.kernal.SoftwareVersion;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
+import org.immregistries.iis.kernal.logic.*;
 import org.immregistries.iis.kernal.logic.ack.*;
 import org.immregistries.iis.kernal.logic.logicInterceptors.ImmunizationProcessingInterceptor;
 import org.immregistries.iis.kernal.logic.logicInterceptors.ObservationProcessingInterceptor;
@@ -41,9 +42,9 @@ import java.util.stream.Collectors;
  * Processes the Incoming Hl7v2 Messages, parsing into local objects and saving into database through FHIR Requester
  */
 @SuppressWarnings({"rawtypes", "unchecked"})
-public abstract class AbstractIncomingMessageHandler extends IncomingMessageHandler<HL7Reader, MqeMessageServiceResponse> {
+public abstract class V2IncomingMessageHandler extends IncomingMessageHandler<HL7Reader, MqeMessageServiceResponse> {
 
-	protected final Logger logger = LoggerFactory.getLogger(AbstractIncomingMessageHandler.class);
+	protected final Logger logger = LoggerFactory.getLogger(V2IncomingMessageHandler.class);
 
 	@Autowired
 	ValidationService validationService;
@@ -74,7 +75,7 @@ public abstract class AbstractIncomingMessageHandler extends IncomingMessageHand
 	MessageRecordingService messageRecordingService;
 
 
-	public AbstractIncomingMessageHandler() {
+	public V2IncomingMessageHandler() {
 	}
 
 	public String buildResultWithoutValidation(HL7Reader reader, List<IisReportable> iisReportableList, Set<ProcessingFlavor> processingFlavorSet) {
@@ -755,9 +756,13 @@ public abstract class AbstractIncomingMessageHandler extends IncomingMessageHand
 	}
 
 
-	public MqeMessageServiceResponse dependencyValidation(String message, List<IisReportable> iisReportableList) throws Exception {
+	public MqeMessageServiceResponse validation(String message, List<IisReportable> iisReportableList) throws Exception {
 		List<IisReportable> nistReportables = validationService.nistValidation(message, VXU);
 		iisReportableList.addAll(nistReportables);
 		return validationService.getMqeMessageService().processMessage(message);
+	}
+
+	public HL7Reader parseSource(String message) {
+		return new HL7Reader(message);
 	}
 }

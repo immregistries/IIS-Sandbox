@@ -6,6 +6,7 @@ import org.hl7.fhir.r5.model.*;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR5Condition;
+import org.immregistries.iis.kernal.logic.messageHandling.IncomingQueryHandler;
 import org.immregistries.iis.kernal.mapping.forR5.ImmunizationEvaluationMapperR5;
 import org.immregistries.iis.kernal.mapping.forR5.ImmunizationRecommendationMapperR5;
 import org.immregistries.iis.kernal.mapping.forR5.PatientMapperR5;

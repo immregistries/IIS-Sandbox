@@ -6,6 +6,7 @@ import org.hl7.fhir.r4.model.*;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
+import org.immregistries.iis.kernal.logic.messageHandling.IncomingQueryHandler;
 import org.immregistries.iis.kernal.mapping.forR4.ImmunizationEvaluationMapperR4;
 import org.immregistries.iis.kernal.mapping.forR4.ImmunizationRecommendationMapperR4;
 import org.immregistries.iis.kernal.mapping.forR4.PatientMapperR4;

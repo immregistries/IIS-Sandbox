@@ -8,7 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Session;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
-import org.immregistries.iis.kernal.logic.AbstractIncomingMessageHandler;
+import org.immregistries.iis.kernal.logic.messageHandling.V2IncomingMessageHandler;
 import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
 import org.immregistries.iis.kernal.model.Tenant;
 import org.immregistries.smm.transform.ScenarioManager;
@@ -47,7 +47,7 @@ public class PopController {
 	@Autowired
 	private RepositoryClientFactory repositoryClientFactory;
 	@Autowired
-	private AbstractIncomingMessageHandler handler;
+	private V2IncomingMessageHandler handler;
 
 	@PostMapping
 //	@Transactional
