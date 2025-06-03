@@ -4,7 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.immregistries.iis.kernal.logic.ack.IisReportable;
 import org.immregistries.iis.kernal.logic.ack.IisReportableSeverity;
 import org.immregistries.iis.kernal.model.ProcessingFlavor;
-import org.immregistries.smm.tester.manager.HL7Reader;
+import org.immregistries.iis.kernal.model.Tenant;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
-public interface IIncomingMessageHandler extends IHl7MessageHandler {
+public interface IIncomingMessageHandler<SourceType> {
 	double MINIMAL_MATCHING_SCORE = 0.75;
 	int NAME_SIZE_LIMIT = 15;
 
@@ -64,7 +64,9 @@ public interface IIncomingMessageHandler extends IHl7MessageHandler {
 	String QUERY_APPLICATION_ERROR = "AE";
 	Random random = new Random();
 
-	String buildAck(HL7Reader reader, List<IisReportable> iisReportableList, Set<ProcessingFlavor> processingFlavorSet);
+	String process(String message, Tenant tenant, String facilityName);
+
+	String buildResultWithoutValidation(SourceType sourceType, List<IisReportable> iisReportableList, Set<ProcessingFlavor> processingFlavorSet);
 
 	static SimpleDateFormat generateV2SDF() {
 		return new SimpleDateFormat("yyyyMMdd");

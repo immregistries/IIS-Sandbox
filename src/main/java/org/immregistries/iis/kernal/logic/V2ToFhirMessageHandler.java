@@ -13,14 +13,13 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Conditional(OnR4Condition.class)
-public class V2ToFhirMessageHandler implements IHl7MessageHandler {
+public class V2ToFhirMessageHandler {
 
 	@Autowired
 	RepositoryClientFactory repositoryClientFactory;
 	@Autowired
 	FhirContext fhirContext;
 
-	@Override
 	public String process(String message, Tenant tenant, String facilityName) {
 		MessageParser parser = new MessageParser();
 		try {

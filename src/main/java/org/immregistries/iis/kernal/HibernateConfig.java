@@ -9,7 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Configures the Users and tenant database, outside of spring
+ * Configures the Users and tenant database, outside of spring, converted form old .cfg.xml file
  */
 public class HibernateConfig {
 	private static Logger logger = LoggerFactory.getLogger(HibernateConfig.class);
@@ -26,7 +26,7 @@ public class HibernateConfig {
 			cfg.setProperty("hibernate.connection.url", database_url);
 			if (database_url.startsWith("jdbc:h2:")) {
 				cfg.setProperty("hibernate.connection.driver_class", "org.h2.Driver");
-				cfg.setProperty("hibernate.dialect", "org.hibernate.dialect.H2Dialect");
+				cfg.setProperty("hibernate.dialect", "ca.uhn.fhir.jpa.model.dialect.HapiFhirH2Dialect"); // TODO remove this experimental
 				cfg.setProperty("hibernate.hbm2ddl.auto", "create");
 			} else {
 				cfg.setProperty("hibernate.connection.driver_class", "com.mysql.cj.jdbc.Driver");
@@ -57,7 +57,7 @@ public class HibernateConfig {
 
 	private static String getSystemVariableFromEnvOrProperty(String variableName) {
 		String var = System.getenv(variableName);
-		logger.info("test pom var {} {} {}", variableName, System.getProperty(variableName), System.getProperty("iis.mysql.url"));
+//		logger.info("test pom var {} {} {}", variableName, System.getProperty(variableName), System.getProperty("iis.mysql.url"));
 		if (StringUtils.isBlank(var)) {
 			var = System.getProperty(variableName);
 		}

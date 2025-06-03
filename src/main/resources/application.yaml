@@ -54,7 +54,7 @@ spring:
 
   jpa:
     properties:
-      hibernate.dialect: ca.uhn.fhir.jpa.model.dialect.HapiFhirPostgres94Dialect
+      hibernate.dialect: ca.uhn.fhir.jpa.model.dialect.HapiFhirH2Dialect
       hibernate.format_sql: false
       hibernate.show_sql: false
       #Hibernate dialect is automatically detected except Postgres and H2.

@@ -8,7 +8,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.instance.model.api.IIdType;
 import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.iis.kernal.SoftwareVersion;
-import org.immregistries.iis.kernal.fhir.interceptors.PartitionCreationInterceptor;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.logic.ack.*;
 import org.immregistries.iis.kernal.logic.logicInterceptors.ImmunizationProcessingInterceptor;
@@ -42,7 +41,7 @@ import java.util.stream.Collectors;
  * Processes the Incoming Hl7v2 Messages, parsing into local objects and saving into database through FHIR Requester
  */
 @SuppressWarnings({"rawtypes", "unchecked"})
-public abstract class AbstractIncomingMessageHandler implements IIncomingMessageHandler {
+public abstract class AbstractIncomingMessageHandler extends IncomingMessageHandler<HL7Reader, MqeMessageServiceResponse> {
 
 	protected final Logger logger = LoggerFactory.getLogger(AbstractIncomingMessageHandler.class);
 
@@ -63,8 +62,6 @@ public abstract class AbstractIncomingMessageHandler implements IIncomingMessage
 	@Autowired
 	LocationMapper locationMapper;
 	@Autowired
-	PartitionCreationInterceptor partitionCreationInterceptor;
-	@Autowired
 	PatientProcessingInterceptor patientProcessingInterceptor; // TODO decide how/where to implement the execution of interceptors, currently using DAO so some interceptors are skipped by the v2 process and need to be manually triggered
 	@Autowired
 	ObservationProcessingInterceptor observationProcessingInterceptor;
@@ -80,7 +77,7 @@ public abstract class AbstractIncomingMessageHandler implements IIncomingMessage
 	public AbstractIncomingMessageHandler() {
 	}
 
-	public String buildAck(HL7Reader reader, List<IisReportable> iisReportableList, Set<ProcessingFlavor> processingFlavorSet) {
+	public String buildResultWithoutValidation(HL7Reader reader, List<IisReportable> iisReportableList, Set<ProcessingFlavor> processingFlavorSet) {
 		StringBuilder sb = new StringBuilder();
 		{
 			String messageType = "ACK^V04^ACK";
@@ -124,7 +121,7 @@ public abstract class AbstractIncomingMessageHandler implements IIncomingMessage
 		return sb.toString();
 	}
 
-	public String buildAckMqe(HL7Reader reader, MqeMessageServiceResponse mqeMessageServiceResponse, List<IisReportable> iisReportableList, Set<ProcessingFlavor> processingFlavorSet, List<IisReportable> validatorReportables) {
+	public String buildResultWithValidation(HL7Reader reader, MqeMessageServiceResponse mqeMessageServiceResponse, List<IisReportable> iisReportableList, Set<ProcessingFlavor> processingFlavorSet) {
 		IisAckBuilder ackBuilder = IisAckBuilder.INSTANCE;
 		IisAckData data = new IisAckData();
 		MqeMessageHeader header = mqeMessageServiceResponse.getMessageObjects().getMessageHeader();
@@ -149,8 +146,7 @@ public abstract class AbstractIncomingMessageHandler implements IIncomingMessage
 
 
 		List<ValidationRuleResult> resultList = mqeMessageServiceResponse.getValidationResults();
-		List<IisReportable> reportables = new ArrayList<>(validatorReportables);
-		reportables.addAll(iisReportableList);
+		List<IisReportable> reportables = iisReportableList;
 		/* This code needs to get put somewhere better. */
 		for (ValidationRuleResult result : resultList) {
 			reportables.addAll(result.getValidationDetections().stream().map(IisReportable::new).collect(Collectors.toList()));
@@ -210,48 +206,10 @@ public abstract class AbstractIncomingMessageHandler implements IIncomingMessage
 		return ackBuilder.buildAckFrom(data, processingFlavorSet);
 	}
 
-	@Override
-	public String process(String message, Tenant tenant, String sendingFacilityName) {
-		/*
-		 * Anticipating the partition creation, to prevent conflict when multiple FHIR Request try to create the same partition
-		 */
-		partitionCreationInterceptor.getOrCreatePartitionId(tenant.getOrganizationName());
 
-		HL7Reader reader = new HL7Reader(message);
-		String messageType = reader.getValue(9);
-		String responseMessage;
-		Set<ProcessingFlavor> processingFlavorSet = null;
-		try {
-			processingFlavorSet = tenant.getProcessingFlavorSet();
-			IIdType organizationIdType = readResponsibleOrganizationIIdType(tenant, reader, sendingFacilityName, processingFlavorSet);
-			switch (messageType) {
-				case "VXU":
-					responseMessage = processVXU(tenant, reader, message, organizationIdType);
-					break;
-				case "ORU":
-					responseMessage = processORU(tenant, reader, message, organizationIdType);
-					break;
-				case "QBP":
-					responseMessage = incomingQueryHandler.processQBP(tenant, reader, message, organizationIdType);
-					break;
-				default:
-					ProcessingException pe = new ProcessingException("Unsupported message", "", 0, 0);
-					List<IisReportable> iisReportableList = List.of(IisReportable.fromProcessingException(pe));
-					responseMessage = buildAck(reader, iisReportableList, processingFlavorSet);
-					messageRecordingService.recordMessageReceived(message, null, responseMessage, "Unknown", "NAck", tenant);
-					break;
-			}
-
-		} catch (Exception e) {
-			e.printStackTrace(System.err);
-			List<IisReportable> iisReportableList = new ArrayList<>();
-			iisReportableList.add(IisReportable.fromProcessingException(new ProcessingException("Internal error prevented processing: " + e.getMessage(), null, 0, 0)));
-			responseMessage = buildAck(reader, iisReportableList, processingFlavorSet);
-		}
-		return responseMessage;
+	public String extractMessageType(HL7Reader reader) {
+		return reader.getValue(9);
 	}
-
-	abstract @Nullable IIdType readResponsibleOrganizationIIdType(Tenant tenant, HL7Reader reader, String sendingFacilityName, Set<ProcessingFlavor> processingFlavorSet) throws ProcessingException;
 
 	public int readAndCreateObservations(HL7Reader reader, List<IisReportable> iisReportableList, Set<ProcessingFlavor> processingFlavorSet, PatientReported patientReported, boolean strictDate, int obxCount, VaccinationReported vaccinationReported, VaccinationMaster vaccination) throws ProcessingException {
 		String previousSubId = "";
@@ -295,32 +253,6 @@ public abstract class AbstractIncomingMessageHandler implements IIncomingMessage
 	}
 
 
-	public String processVXU(Tenant tenant, HL7Reader reader, String message, IIdType managingOrganizationId) throws Exception {
-		List<IisReportable> iisReportableList = new ArrayList<>();
-		Set<ProcessingFlavor> processingFlavorSet = tenant.getProcessingFlavorSet();
-		MqeMessageServiceResponse mqeMessageServiceResponse = validationService.getMqeMessageService().processMessage(message);
-		List<IisReportable> nistReportables = validationService.nistValidation(message, VXU);
-
-		try {
-			CodeMap codeMap = CodeMapManager.getCodeMap();
-			boolean strictDate = !processingFlavorSet.contains(ProcessingFlavor.CANTALOUPE);
-			PatientReported patientReported = processPatient(tenant, reader, iisReportableList, processingFlavorSet, codeMap, strictDate, managingOrganizationId);
-
-			List<VaccinationReported> vaccinationReportedList = processVaccinations(reader, tenant, iisReportableList, patientReported, processingFlavorSet, strictDate);
-			String ack = buildAckMqe(reader, mqeMessageServiceResponse, iisReportableList, processingFlavorSet, nistReportables);
-			messageRecordingService.recordMessageReceived(message, patientReported, ack, "Update", "Ack", tenant);
-			return ack;
-		} catch (ProcessingException e) {
-			IisReportable exceptionReportable = IisReportable.fromProcessingException(e);
-			if (!iisReportableList.contains(exceptionReportable)) {
-				iisReportableList.add(exceptionReportable);
-			}
-			String ack = buildAckMqe(reader, mqeMessageServiceResponse, iisReportableList, processingFlavorSet, nistReportables);
-			messageRecordingService.recordMessageReceived(message, null, ack, "Update", "Exception", tenant);
-			return ack;
-		}
-	}
-
 	public String processORU(Tenant tenant, HL7Reader reader, String message, IIdType managingOrganizationId) {
 		List<IisReportable> iisReportableList = new ArrayList<>();
 		Set<ProcessingFlavor> processingFlavorSet = tenant.getProcessingFlavorSet();
@@ -340,7 +272,7 @@ public abstract class AbstractIncomingMessageHandler implements IIncomingMessage
 					throw new ProcessingException("OBR segment was not found after ORC segment", ORC, orcCount, 0);
 				}
 			}
-			String ack = buildAck(reader, iisReportableList, processingFlavorSet);
+			String ack = buildResultWithoutValidation(reader, iisReportableList, processingFlavorSet);
 			messageRecordingService.recordMessageReceived(message, patientReported, ack, "Update", "Ack", tenant);
 			return ack;
 		} catch (ProcessingException e) {
@@ -348,24 +280,26 @@ public abstract class AbstractIncomingMessageHandler implements IIncomingMessage
 			if (!iisReportableList.contains(exceptionReportable)) {
 				iisReportableList.add(exceptionReportable);
 			}
-			String ack = buildAck(reader, iisReportableList, processingFlavorSet);
+			String ack = buildResultWithoutValidation(reader, iisReportableList, processingFlavorSet);
 			messageRecordingService.recordMessageReceived(message, null, ack, "Update", "Exception", tenant);
 			return ack;
 		}
 	}
 
+	public String processQBP(Tenant tenant, HL7Reader reader, String messageReceived, IIdType managingOrganizationId) throws Exception {
+		return incomingQueryHandler.processQBP(tenant, reader, messageReceived, managingOrganizationId);
+	}
 
 	public PatientReported processPatient(Tenant tenant, HL7Reader reader, List<IisReportable> iisReportableList, Set<ProcessingFlavor> processingFlavorSet, CodeMap codeMap, boolean strictDate, IIdType managingOrganizationId) throws ProcessingException {
-		PatientReported patientReported = null; // TODO figure out process of merging information in golden record
+//		PatientReported patientReported = null; // TODO figure out process of merging information in golden record
 //			fhirRequester.searchPatientReported(new SearchParameterMap("identifier", new TokenParam().setValue(patientReportedExternalLink)));
-		if (patientReported == null) {
-			patientReported = new PatientReported();
-			patientReported.setTenant(tenant);
-//			patientReported.setExternalLink(patientReportedExternalLink); now dealt with in agnostic method
-			patientReported.setReportedDate(new Date());
-			if (managingOrganizationId != null && managingOrganizationId.hasIdPart()) {
-				patientReported.setManagingOrganizationId("Organization/" + managingOrganizationId.getIdPart());
-			}
+//		if (patientReported == null) {
+		PatientReported patientReported;
+		patientReported = new PatientReported();
+		patientReported.setTenant(tenant);
+		patientReported.setReportedDate(new Date());
+		if (managingOrganizationId != null && managingOrganizationId.hasIdPart()) {
+			patientReported.setManagingOrganizationId("Organization/" + managingOrganizationId.getIdPart());
 		}
 		/*
 		 * PID processing
@@ -821,4 +755,9 @@ public abstract class AbstractIncomingMessageHandler implements IIncomingMessage
 	}
 
 
+	public MqeMessageServiceResponse dependencyValidation(String message, List<IisReportable> iisReportableList) throws Exception {
+		List<IisReportable> nistReportables = validationService.nistValidation(message, VXU);
+		iisReportableList.addAll(nistReportables);
+		return validationService.getMqeMessageService().processMessage(message);
+	}
 }
