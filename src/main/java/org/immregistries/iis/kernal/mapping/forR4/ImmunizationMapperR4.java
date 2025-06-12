@@ -231,7 +231,7 @@ public class ImmunizationMapperR4 implements ImmunizationMapper<Immunization> {
 		 * Performers
 		 */
 		for (Immunization.ImmunizationPerformerComponent performer : i.getPerformer()) {
-			if (performer.getActor() != null && StringUtils.isNotBlank(performer.getActor().getReference())) {
+			if (performer.getActor() != null && StringUtils.isNotBlank(performer.getActor().getReference()) && performer.getActor().getReferenceElement().getResourceType().equals("Practitioner")) {
 				switch (performer.getFunction().getCodingFirstRep().getCode()) {
 					case ADMINISTERING_VALUE: {
 						vr.setAdministeringProvider(fhirRequests.readPractitionerAsPerson(performer.getActor().getReference()));

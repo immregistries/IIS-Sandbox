@@ -25,10 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.immregistries.iis.kernal.mapping.interfaces.ImmunizationMapper.*;
@@ -98,6 +95,7 @@ public class FhirMessagingHandler extends IncomingMessageHandler<Bundle, Object>
 	public PatientReported processPatient(Tenant tenant, Bundle bundle, List<IisReportable> iisReportableList, Set<ProcessingFlavor> processingFlavorSet, CodeMap codeMap, boolean strictDate, IIdType managingOrganizationId) throws ProcessingException {
 		Patient patient = ((Patient) bundle.getEntry().stream().filter((entry) -> entry.getResource().getResourceType().equals(ResourceType.Patient)).findFirst().map(Bundle.BundleEntryComponent::getResource).orElse(null));
 		PatientReported patientReported = patientMapper.localObjectReported(patient);
+		patientReported.setPatientId(null);
 		patientReported.setTenant(tenant);
 		patientReported.setReportedDate(new Date());
 		patientReported.setUpdatedDate(new Date());
@@ -118,7 +116,10 @@ public class FhirMessagingHandler extends IncomingMessageHandler<Bundle, Object>
 			if (entryComponent.hasResource() && ResourceType.Immunization.equals(entryComponent.getResource().getResourceType())) {
 
 				Immunization immunization = (Immunization) entryComponent.getResource();
+//				immunization.setId(null);
+				immunization.setPatient(null);
 				VaccinationReported vaccinationReported = immunizationMapper.localObjectReported(immunization);
+				vaccinationReported.setVaccinationId(null);
 				vaccinationReported.setPatientReported(patientReported);
 				vaccinationReported.setReportedDate(new Date());
 				vaccinationReported.setUpdatedDate(new Date());
@@ -206,7 +207,14 @@ public class FhirMessagingHandler extends IncomingMessageHandler<Bundle, Object>
 			codedWithExceptions.getIdentifier(),
 			codedWithExceptions.getText()));
 		details.addCoding(new Coding("Source", reportable.getSource().name(), reportable.getSource().name()));
-		issueComponent.setLocation(reportable.getHl7LocationList().stream().map(Hl7Location::getAbbreviated).map(StringType::new).collect(Collectors.toList()));
+		issueComponent.setLocation(
+			reportable
+				.getHl7LocationList().
+				stream()
+				.filter(Objects::nonNull)
+				.map(Hl7Location::toString)
+				.map(StringType::new)
+				.collect(Collectors.toList()));
 		issueComponent.setDiagnostics(reportable.getDiagnosticMessage());
 		return issueComponent;
 	}
@@ -222,16 +230,31 @@ public class FhirMessagingHandler extends IncomingMessageHandler<Bundle, Object>
 	}
 
 	public ModelPerson processPersonPractitioner(Bundle bundle, Tenant tenant, Reference reference) {
-		return bundle.getEntry().stream()
-			.filter(bundleEntryComponent -> bundleEntryComponent.getFullUrl().equals(reference.getReference()))
-			.findFirst()
-			.map(Bundle.BundleEntryComponent::getResource)
-			.map(resource -> practitionerMapper.localObject((Practitioner) resource))
-			.map(modelPerson -> {
-				modelPerson.setTenant(tenant);
-				return modelPerson;
-			})
-			.map(modelPerson -> fhirRequester.savePractitioner(modelPerson))
-			.orElse(null);
+		if (reference.getReferenceElement().getResourceType().equals("Practitioner")) {
+			return bundle.getEntry().stream()
+				.filter(bundleEntryComponent -> reference.getReference().equals(bundleEntryComponent.getFullUrl()))
+				.findFirst()
+				.map(Bundle.BundleEntryComponent::getResource)
+				.map(resource -> practitionerMapper.localObject((Practitioner) resource))
+				.map(modelPerson -> {
+					modelPerson.setTenant(tenant);
+					return modelPerson;
+				})
+				.map(modelPerson -> fhirRequester.savePractitioner(modelPerson))
+				.orElse(null);
+		} else if (reference.getReferenceElement().getResourceType().equals("PractitionerRole")) {
+			Optional<Reference> practitionerReference = bundle.getEntry().stream()
+				.filter(bundleEntryComponent -> reference.getReference().equals(bundleEntryComponent.getFullUrl()))
+				.findFirst()
+				.map(Bundle.BundleEntryComponent::getResource)
+				.map(resource -> (PractitionerRole) resource)
+				.map(PractitionerRole::getPractitioner);
+			if (practitionerReference.isPresent()) {
+				return processPersonPractitioner(bundle, tenant, practitionerReference.get());
+			} else {
+				return null;
+			}
+		}
+		return null;
 	}
 }
