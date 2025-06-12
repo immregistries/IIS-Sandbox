@@ -86,7 +86,7 @@ public abstract class V2IncomingMessageHandler extends IncomingMessageHandler<HL
 			hl7MessageWriter.createMSH(messageType, profileId, reader, sb, processingFlavorSet);
 		}
 
-		// if processing flavor contains MEDLAR then all the non E errors have to removed from the processing list
+		// if processing flavor contains MEDLAR then all the non E errors have to be removed from the processing list
 		if (processingFlavorSet != null && processingFlavorSet.contains(ProcessingFlavor.MEDLAR)) {
 			List<IisReportable> tempIisReportableList = new ArrayList<>();
 			for (IisReportable reportable : iisReportableList) {
@@ -670,7 +670,7 @@ public abstract class V2IncomingMessageHandler extends IncomingMessageHandler<HL
 		return orgLocation;
 	}
 
-	private ModelPerson processPersonPractitioner(HL7Reader reader, Tenant tenant, int fieldNum) {
+	public ModelPerson processPersonPractitioner(HL7Reader reader, Tenant tenant, int fieldNum) {
 		ModelPerson modelPerson = null;
 		String administeringProvider = reader.getValue(fieldNum);
 		if (StringUtils.isNotEmpty(administeringProvider)) {

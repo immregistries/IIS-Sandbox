@@ -11,13 +11,12 @@ import jakarta.servlet.http.HttpSession;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Session;
 import org.hl7.fhir.r4.model.Bundle;
-import org.hl7.fhir.r4.model.DocumentReference;
-import org.hl7.fhir.r4.model.StringType;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
 import org.immregistries.iis.kernal.fhir.interceptors.PartitionCreationInterceptor;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.logic.BaseIISSOAPServer;
-import org.immregistries.iis.kernal.logic.IIncomingMessageHandler;
+import org.immregistries.iis.kernal.logic.messageHandling.FhirMessagingHandler;
+import org.immregistries.iis.kernal.logic.messageHandling.V2IncomingMessageHandler;
 import org.immregistries.iis.kernal.model.Tenant;
 import org.immregistries.smm.cdc.CDCWSDLServer;
 import org.immregistries.smm.cdc.Fault;
@@ -48,7 +47,9 @@ public class FhirMessagingController {
 	public static final String FHIR_MESSAGING_BASE_PATH = "/" + FHIR_MESSAGING_PATH_KEY;
 	public static final String ORIGINAL_TEXT_EXTENSION_URL = "http://hl7.org/fhir/StructureDefinition/originalText";
 	@Autowired
-	IIncomingMessageHandler incomingMessageHandler;
+	V2IncomingMessageHandler incomingMessageHandler;
+	@Autowired
+	FhirMessagingHandler fhirMessagingHandler;
 	@Autowired
 	FhirContext fhirContext;
 
@@ -99,17 +100,19 @@ public class FhirMessagingController {
 			parser = fhirContext.newXmlParser();
 		}
 		parser.setPrettyPrint(true);
-		Bundle bundle = (Bundle) parser.parseResource(message);
+		String fhirResult;
+		fhirResult = fhirMessagingHandler.process(message, tenant, facility_name);
 		/*
 		 * Temporary solution of extracting the original V2 message from Document reference
 		 * TODO integrate or create a converter of FHIR messaging back to V2 message when available
 		 */
-		DocumentReference documentReference = (DocumentReference) bundle.getEntryFirstRep().getResource();
-		StringType v2Message = (StringType) documentReference.getContent().get(0).getExtensionByUrl(ORIGINAL_TEXT_EXTENSION_URL).getValue();
-		String v2Result = incomingMessageHandler.process(v2Message.getValueNotNull(), tenant, facility_name);
-		MessageParser messageParser = new MessageParser();
-		Bundle resultBundle = messageParser.convert(v2Result);
-		String fhirResult = parser.encodeResourceToString(resultBundle);
+//		Bundle bundle = (Bundle) parser.parseResource(message);
+//		DocumentReference documentReference = (DocumentReference) bundle.getEntryFirstRep().getResource();
+//		StringType v2Message = (StringType) documentReference.getContent().get(0).getExtensionByUrl(ORIGINAL_TEXT_EXTENSION_URL).getValue();
+//		String v2Result = incomingMessageHandler.process(v2Message.getValueNotNull(), tenant, facility_name);
+//		MessageParser messageParser = new MessageParser();
+//		Bundle resultBundle = messageParser.convert(v2Result);
+//		fhirResult = parser.encodeResourceToString(resultBundle);
 		return fhirResult;
 	}
 

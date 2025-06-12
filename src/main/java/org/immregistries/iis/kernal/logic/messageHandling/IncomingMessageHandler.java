@@ -117,4 +117,7 @@ public abstract class IncomingMessageHandler<ParsedSource, ValidationResult> imp
 
 	public abstract ValidationResult validation(String message, List<IisReportable> iisReportableList) throws Exception;
 
+//	public abstract ModelPerson processPersonPractitioner(ParsedSource parsedSource, Tenant tenant, int fieldNum);
+
+
 }

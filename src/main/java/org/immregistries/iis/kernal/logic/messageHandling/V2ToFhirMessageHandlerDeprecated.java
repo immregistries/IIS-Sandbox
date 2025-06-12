@@ -4,16 +4,13 @@ import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.hl7v2.HL7Exception;
 import gov.cdc.izgw.v2tofhir.converter.MessageParser;
 import org.hl7.fhir.r4.model.Bundle;
-import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
 import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
 import org.immregistries.iis.kernal.model.Tenant;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Conditional;
-import org.springframework.stereotype.Service;
 
-@Service
-@Conditional(OnR4Condition.class)
-public class V2ToFhirMessageHandler {
+//@Service
+//@Conditional(OnR4Condition.class)
+public class V2ToFhirMessageHandlerDeprecated {
 
 	@Autowired
 	RepositoryClientFactory repositoryClientFactory;

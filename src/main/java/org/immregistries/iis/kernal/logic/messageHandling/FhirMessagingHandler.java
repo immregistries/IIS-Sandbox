@@ -2,10 +2,9 @@ package org.immregistries.iis.kernal.logic.messageHandling;
 
 import ca.uhn.fhir.context.FhirContext;
 import org.hl7.fhir.instance.model.api.IIdType;
-import org.hl7.fhir.r4.model.Bundle;
-import org.hl7.fhir.r4.model.Patient;
-import org.hl7.fhir.r4.model.ResourceType;
+import org.hl7.fhir.r4.model.*;
 import org.immregistries.codebase.client.CodeMap;
+import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
 import org.immregistries.iis.kernal.fhir.interceptors.PartitionCreationInterceptor;
 import org.immregistries.iis.kernal.logic.AbstractHl7MessageWriter;
 import org.immregistries.iis.kernal.logic.MessageRecordingService;
@@ -14,61 +13,75 @@ import org.immregistries.iis.kernal.logic.ack.IisReportable;
 import org.immregistries.iis.kernal.logic.logicInterceptors.ImmunizationProcessingInterceptor;
 import org.immregistries.iis.kernal.logic.logicInterceptors.ObservationProcessingInterceptor;
 import org.immregistries.iis.kernal.logic.logicInterceptors.PatientProcessingInterceptor;
-import org.immregistries.iis.kernal.mapping.interfaces.ImmunizationMapper;
-import org.immregistries.iis.kernal.mapping.interfaces.LocationMapper;
-import org.immregistries.iis.kernal.mapping.interfaces.ObservationMapper;
-import org.immregistries.iis.kernal.mapping.interfaces.PatientMapper;
+import org.immregistries.iis.kernal.mapping.forR4.*;
 import org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester;
 import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
-import org.immregistries.iis.kernal.model.PatientReported;
-import org.immregistries.iis.kernal.model.ProcessingFlavor;
-import org.immregistries.iis.kernal.model.Tenant;
-import org.immregistries.iis.kernal.model.VaccinationReported;
+import org.immregistries.iis.kernal.model.*;
+import org.immregistries.mqe.hl7util.model.CodedWithExceptions;
+import org.immregistries.mqe.hl7util.model.Hl7Location;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Conditional;
+import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Stream;
+import java.util.stream.Collectors;
 
+import static org.immregistries.iis.kernal.mapping.interfaces.ImmunizationMapper.*;
+
+@Service
+@Conditional(OnR4Condition.class)
 public class FhirMessagingHandler extends IncomingMessageHandler<Bundle, Object> {
 
 	@Autowired
-	AbstractFhirRequester fhirRequester;
+	private AbstractFhirRequester fhirRequester;
 
 	@Autowired
-	RepositoryClientFactory repositoryClientFactory;
+	private RepositoryClientFactory repositoryClientFactory;
 	@Autowired
-	AbstractHl7MessageWriter hl7MessageWriter;
+	private AbstractHl7MessageWriter hl7MessageWriter;
 	@Autowired
-	PartitionCreationInterceptor partitionCreationInterceptor;
+	private PartitionCreationInterceptor partitionCreationInterceptor;
 	@Autowired
-	PatientProcessingInterceptor patientProcessingInterceptor;
+	private PatientProcessingInterceptor patientProcessingInterceptor;
 	@Autowired
-	ObservationProcessingInterceptor observationProcessingInterceptor;
+	private ObservationProcessingInterceptor observationProcessingInterceptor;
 	@Autowired
-	ImmunizationProcessingInterceptor immunizationProcessingInterceptor;
+	private ImmunizationProcessingInterceptor immunizationProcessingInterceptor;
 	@Autowired
-	IncomingQueryHandler incomingQueryHandler;
+	private IncomingQueryHandler incomingQueryHandler;
 
 	@Autowired
-	MessageRecordingService messageRecordingService;
+	private MessageRecordingService messageRecordingService;
 	@Autowired
-	FhirContext fhirContext;
+	private FhirContext fhirContext;
 
 	@Autowired
-	PatientMapper patientMapper;
+	private V2IncomingMessageHandler v2IncomingMessageHandler;
+
 	@Autowired
-	ImmunizationMapper immunizationMapper;
+	PatientMapperR4 patientMapper;
 	@Autowired
-	ObservationMapper observationMapper;
+	ImmunizationMapperR4 immunizationMapper;
 	@Autowired
-	LocationMapper locationMapper;
+	PractitionerMapperR4 practitionerMapper;
+	@Autowired
+	ObservationMapperR4 observationMapper;
+	@Autowired
+	LocationMapperR4 locationMapper;
 
 	@Override
 	public String extractMessageType(Bundle bundle) {
-		return bundle.getEntryFirstRep().getResource().getMeta().getTagFirstRep().getCode();
+		return bundle.getEntry().stream()
+			.filter(bundleEntryComponent -> ResourceType.MessageHeader.equals(bundleEntryComponent.getResource().getResourceType()))
+			.findFirst()
+			.map(Bundle.BundleEntryComponent::getResource)
+			.map(resource -> resource.getMeta().getTagFirstRep().getCode())
+			.orElse(null);
 	}
 
 	@Override
@@ -86,20 +99,59 @@ public class FhirMessagingHandler extends IncomingMessageHandler<Bundle, Object>
 		Patient patient = ((Patient) bundle.getEntry().stream().filter((entry) -> entry.getResource().getResourceType().equals(ResourceType.Patient)).findFirst().map(Bundle.BundleEntryComponent::getResource).orElse(null));
 		PatientReported patientReported = patientMapper.localObjectReported(patient);
 		patientReported.setTenant(tenant);
+		patientReported.setReportedDate(new Date());
+		patientReported.setUpdatedDate(new Date());
+
+		if (managingOrganizationId != null && managingOrganizationId.hasIdPart()) {
+			patientReported.setManagingOrganizationId("Organization/" + managingOrganizationId.getIdPart());
+		}
+
+		patientReported = patientProcessingInterceptor.processAndValidatePatient(patientReported, iisReportableList, processingFlavorSet);
 		patientReported = fhirRequester.savePatientReported(patientReported);
 		return patientReported;
 	}
 
 	@Override
 	public List<VaccinationReported> processVaccinations(Bundle bundle, Tenant tenant, List<IisReportable> iisReportableList, PatientReported patientReported, Set<ProcessingFlavor> processingFlavorSet, boolean strictDate) throws ProcessingException {
-		Stream<VaccinationReported> vaccinationReportedList = bundle.getEntry().stream().map(Bundle.BundleEntryComponent::getResource).filter(resource -> resource.getResourceType().equals(ResourceType.Immunization))
-			.map(resource -> immunizationMapper.localObjectReported(resource))
-			.peek(vaccinationReported -> {
+		List<VaccinationReported> vaccinationReportedList = new ArrayList<>(bundle.getEntry().size());
+		for (Bundle.BundleEntryComponent entryComponent : bundle.getEntry()) {
+			if (entryComponent.hasResource() && ResourceType.Immunization.equals(entryComponent.getResource().getResourceType())) {
+
+				Immunization immunization = (Immunization) entryComponent.getResource();
+				VaccinationReported vaccinationReported = immunizationMapper.localObjectReported(immunization);
 				vaccinationReported.setPatientReported(patientReported);
+				vaccinationReported.setReportedDate(new Date());
 				vaccinationReported.setUpdatedDate(new Date());
-			})
-			.map(vaccinationReported -> fhirRequester.saveVaccinationReported(vaccinationReported));
-		return List.of();
+				vaccinationReported.setPatientReported(patientReported);
+
+				for (Immunization.ImmunizationPerformerComponent performer : immunization.getPerformer()) {
+					ModelPerson modelPerson = processPersonPractitioner(bundle, tenant, performer.getActor());
+					if (modelPerson == null || !performer.hasFunction()) {
+						break;
+					}
+					for (Coding function : performer.getFunction().getCoding()) {
+						switch (function.getCode()) {
+							case ENTERING_VALUE: {
+								vaccinationReported.setEnteredBy(modelPerson);
+								break;
+							}
+							case ORDERING_VALUE: {
+								vaccinationReported.setOrderingProvider(modelPerson);
+								break;
+							}
+							case ADMINISTERING_VALUE: {
+								vaccinationReported.setAdministeringProvider(modelPerson);
+								break;
+							}
+						}
+					}
+				}
+				vaccinationReported = immunizationProcessingInterceptor.processAndValidateVaccinationReported(vaccinationReported, iisReportableList, processingFlavorSet, -1, -1, -1, null);
+				vaccinationReported = fhirRequester.saveVaccinationReported(vaccinationReported);
+				vaccinationReportedList.add(vaccinationReported);
+			}
+		}
+		return vaccinationReportedList;
 	}
 
 	@Override
@@ -114,16 +166,72 @@ public class FhirMessagingHandler extends IncomingMessageHandler<Bundle, Object>
 
 	@Override
 	public String buildResultWithoutValidation(Bundle bundle, List<IisReportable> iisReportableList, Set<ProcessingFlavor> processingFlavorSet) {
-		return "";
+		Bundle resultBundle = new Bundle();
+		/*
+		 * TODO MessageHeader
+		 */
+		OperationOutcome operationOutcome = new OperationOutcome();
+		resultBundle.addEntry().setResource(operationOutcome);
+		for (IisReportable reportable : iisReportableList) {
+			OperationOutcome.OperationOutcomeIssueComponent issueComponent = getIssueComponent(reportable);
+			operationOutcome.addIssue(issueComponent);
+		}
+
+		return fhirContext.newJsonParser().setPrettyPrint(true).encodeResourceToString(resultBundle);
+	}
+
+	private static OperationOutcome.@NotNull OperationOutcomeIssueComponent getIssueComponent(IisReportable reportable) {
+		OperationOutcome.OperationOutcomeIssueComponent issueComponent = new OperationOutcome.OperationOutcomeIssueComponent();
+		switch (reportable.getSeverity()) {
+			case ERROR: {
+				issueComponent.setSeverity(OperationOutcome.IssueSeverity.ERROR);
+				break;
+			}
+			case WARN: {
+				issueComponent.setSeverity(OperationOutcome.IssueSeverity.WARNING);
+				break;
+			}
+			case ACCEPT:
+			case NOTICE:
+			case INFO: {
+				issueComponent.setSeverity(OperationOutcome.IssueSeverity.INFORMATION);
+				break;
+			}
+		}
+		issueComponent.setCode(OperationOutcome.IssueType.VALUE);
+		CodeableConcept details = new CodeableConcept();
+		issueComponent.setDetails(details);
+		CodedWithExceptions codedWithExceptions = reportable.getApplicationErrorCode();
+		details.addCoding(new Coding(codedWithExceptions.getNameOfCodingSystem(),
+			codedWithExceptions.getIdentifier(),
+			codedWithExceptions.getText()));
+		details.addCoding(new Coding("Source", reportable.getSource().name(), reportable.getSource().name()));
+		issueComponent.setLocation(reportable.getHl7LocationList().stream().map(Hl7Location::getAbbreviated).map(StringType::new).collect(Collectors.toList()));
+		issueComponent.setDiagnostics(reportable.getDiagnosticMessage());
+		return issueComponent;
 	}
 
 	@Override
 	public String buildResultWithValidation(Bundle bundle, Object o, List<IisReportable> iisReportableList, Set<ProcessingFlavor> processingFlavorSet) {
-		return "";
+		return buildResultWithoutValidation(bundle, iisReportableList, processingFlavorSet);
 	}
 
 	@Override
 	public Object validation(String message, List<IisReportable> iisReportableList) throws Exception {
 		return null;
+	}
+
+	public ModelPerson processPersonPractitioner(Bundle bundle, Tenant tenant, Reference reference) {
+		return bundle.getEntry().stream()
+			.filter(bundleEntryComponent -> bundleEntryComponent.getFullUrl().equals(reference.getReference()))
+			.findFirst()
+			.map(Bundle.BundleEntryComponent::getResource)
+			.map(resource -> practitionerMapper.localObject((Practitioner) resource))
+			.map(modelPerson -> {
+				modelPerson.setTenant(tenant);
+				return modelPerson;
+			})
+			.map(modelPerson -> fhirRequester.savePractitioner(modelPerson))
+			.orElse(null);
 	}
 }

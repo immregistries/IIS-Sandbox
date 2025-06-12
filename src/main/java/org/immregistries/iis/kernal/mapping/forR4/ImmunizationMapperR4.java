@@ -438,7 +438,7 @@ public class ImmunizationMapperR4 implements ImmunizationMapper<Immunization> {
 		return i;
 	}
 
-	private Immunization.ImmunizationPerformerComponent performer(ModelPerson person, String functionCode, String functionDisplay) {
+	public Immunization.ImmunizationPerformerComponent performer(ModelPerson person, String functionCode, String functionDisplay) {
 		Immunization.ImmunizationPerformerComponent performer = new Immunization.ImmunizationPerformerComponent();
 		performer.setFunction(new CodeableConcept().addCoding(new Coding().setSystem(PERFORMER_FUNCTION_SYSTEM).setCode(functionCode).setDisplay(functionDisplay)));
 		Reference actor;
