@@ -162,33 +162,23 @@ public class FhirMessagingController {
 			public void process(SubmitSingleMessage ssm, PrintWriter out) throws Fault {
 
 				String message = ssm.getHl7Message();
-				String userId = ssm.getUsername();
-				String password = ssm.getPassword();
 				String facilityId = ssm.getFacilityID();
 
 				String ack = "";
-				Session dataSession = ServletHelper.getDataSession();
-				String[] messages;
-				StringBuilder resultBuilder = new StringBuilder();
 				try {
-					Tenant tenant;
-					if (StringUtils.isNotBlank(tenantName)) {
-						tenant = ServletHelper.authenticateTenant(userId, password, tenantName, dataSession, partitionCreationInterceptor);
-					} else {
-						tenant = ServletHelper.authenticateTenant(userId, password, facilityId, dataSession, partitionCreationInterceptor);
-					}
+					/*
+					 * Tenant is accessed through RequestContext, and was previously set through the authorize method of WSDL server in BaseIISSOAPServer.java
+					 */
+					Tenant tenant = ServletHelper.getTenant();
 					if (tenant == null) {
 						throw new SecurityException("Username/password combination is unrecognized");
 					} else {
 						HttpSession session = req.getSession(true);
 						session.setAttribute(SESSION_TENANT, tenant);
-						processInput(message, tenant, facilityId);
-						ack = resultBuilder.toString();
+						ack = processInput(message, tenant, facilityId);
 					}
 				} catch (Exception e) {
 					throw new UnknownFault("Unable to process request: " + e.getMessage(), e);
-				} finally {
-					dataSession.close();
 				}
 				out.print(ack);
 			}

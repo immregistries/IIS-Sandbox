@@ -10,6 +10,8 @@ import org.immregistries.iis.kernal.model.ProcessingFlavor;
 import org.immregistries.iis.kernal.model.Tenant;
 import org.immregistries.iis.kernal.model.VaccinationReported;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
@@ -17,6 +19,8 @@ import java.util.List;
 import java.util.Set;
 
 public abstract class IncomingMessageHandler<ParsedSource, ValidationResult> implements IIncomingMessageHandler<ParsedSource> {
+
+	Logger logger = LoggerFactory.getLogger(this.getClass());
 	@Autowired
 	PartitionCreationInterceptor partitionCreationInterceptor;
 	@Autowired

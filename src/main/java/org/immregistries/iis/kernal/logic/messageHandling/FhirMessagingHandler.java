@@ -7,6 +7,7 @@ import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
 import org.immregistries.iis.kernal.fhir.interceptors.PartitionCreationInterceptor;
 import org.immregistries.iis.kernal.logic.AbstractHl7MessageWriter;
+import org.immregistries.iis.kernal.logic.IIncomingMessageHandler;
 import org.immregistries.iis.kernal.logic.MessageRecordingService;
 import org.immregistries.iis.kernal.logic.ProcessingException;
 import org.immregistries.iis.kernal.logic.ack.IisReportable;
@@ -98,13 +99,14 @@ public class FhirMessagingHandler extends IncomingMessageHandler<Bundle, Object>
 		patientReported.setPatientId(null);
 		patientReported.setTenant(tenant);
 		patientReported.setReportedDate(new Date());
-		patientReported.setUpdatedDate(new Date());
 
 		if (managingOrganizationId != null && managingOrganizationId.hasIdPart()) {
 			patientReported.setManagingOrganizationId("Organization/" + managingOrganizationId.getIdPart());
 		}
 
 		patientReported = patientProcessingInterceptor.processAndValidatePatient(patientReported, iisReportableList, processingFlavorSet);
+		IIncomingMessageHandler.verifyNoErrors(iisReportableList);
+		patientReported.setUpdatedDate(new Date());
 		patientReported = fhirRequester.savePatientReported(patientReported);
 		return patientReported;
 	}
@@ -116,11 +118,16 @@ public class FhirMessagingHandler extends IncomingMessageHandler<Bundle, Object>
 			if (entryComponent.hasResource() && ResourceType.Immunization.equals(entryComponent.getResource().getResourceType())) {
 
 				Immunization immunization = (Immunization) entryComponent.getResource();
+
+				OrgLocation orgLocation = processLocation(bundle, tenant, immunization.getLocation());
+
 //				immunization.setId(null);
 				immunization.setPatient(null);
+				immunization.setLocation(null);
 				VaccinationReported vaccinationReported = immunizationMapper.localObjectReported(immunization);
 				vaccinationReported.setVaccinationId(null);
 				vaccinationReported.setPatientReported(patientReported);
+				vaccinationReported.setOrgLocation(orgLocation);
 				vaccinationReported.setReportedDate(new Date());
 				vaccinationReported.setUpdatedDate(new Date());
 				vaccinationReported.setPatientReported(patientReported);
@@ -227,6 +234,20 @@ public class FhirMessagingHandler extends IncomingMessageHandler<Bundle, Object>
 	@Override
 	public Object validation(String message, List<IisReportable> iisReportableList) throws Exception {
 		return null;
+	}
+
+	public OrgLocation processLocation(Bundle bundle, Tenant tenant, Reference reference) {
+		return bundle.getEntry().stream()
+			.filter(bundleEntryComponent -> reference.getReference().equals(bundleEntryComponent.getFullUrl()) || reference.getReference().equals(bundleEntryComponent.getResource().getId()))
+			.findFirst()
+			.map(Bundle.BundleEntryComponent::getResource)
+			.map(resource -> locationMapper.localObject((Location) resource))
+			.map(orgLocation -> {
+				orgLocation.setTenant(tenant);
+				return orgLocation;
+			})
+			.map(orgLocation -> fhirRequester.saveOrgLocation(orgLocation))
+			.orElse(null);
 	}
 
 	public ModelPerson processPersonPractitioner(Bundle bundle, Tenant tenant, Reference reference) {

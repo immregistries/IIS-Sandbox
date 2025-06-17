@@ -30,7 +30,7 @@ public class ServerSecurityConfig {
 				.requestMatchers(HttpMethod.GET, "/", "/home", "/pop", "/SubscriptionTopic/**", "/img/**").permitAll()
 				.requestMatchers("/loginForm", "/oauth2/**", "/login").permitAll()
 				// API AUTHORIZATION AND AUTHENTICATION SEPARATED
-				.requestMatchers("/fhir/**", "/soap", "/.well-known/smart-configuration", "/registerClient", "/token").permitAll()
+				.requestMatchers("/fhir/**", "/soap", FhirMessagingController.FHIR_MESSAGING_BASE_PATH + "/soap", "/.well-known/smart-configuration", "/registerClient", "/token").permitAll()
 				.anyRequest().authenticated()
 			)
 			.formLogin((form) -> form
@@ -54,6 +54,7 @@ public class ServerSecurityConfig {
 					new AntPathRequestMatcher(PopController.POP_BASE_PATH),
 					new AntPathRequestMatcher(V2ToFhirController.V2_TO_FHIR_BASE_PATH),
 					new AntPathRequestMatcher(FhirMessagingController.FHIR_MESSAGING_BASE_PATH),
+					new AntPathRequestMatcher(FhirMessagingController.FHIR_MESSAGING_BASE_PATH + "/soap"),
 					new AntPathRequestMatcher("/message"),
 					new AntPathRequestMatcher("/fhir/**"),
 					new AntPathRequestMatcher("/loginForm"),
