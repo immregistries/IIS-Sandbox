@@ -208,7 +208,10 @@ public abstract class AbstractHl7MessageWriter implements IExampleMessageWriter 
 				}
 			}
 			// PID-11
-			sb.append("|").append(patientReported.getFirstAddress().getAddressLine1()).append("^").append(patientReported.getFirstAddress().getAddressLine2()).append("^").append(patientReported.getFirstAddress().getAddressCity()).append("^").append(patientReported.getFirstAddress().getAddressState()).append("^").append(patientReported.getFirstAddress().getAddressZip()).append("^").append(patientReported.getFirstAddress().getAddressCountry()).append("^");
+			sb.append("|");
+			if (patientReported.getFirstAddress() != null) {
+				sb.append(patientReported.getFirstAddress().getAddressLine1()).append("^").append(patientReported.getFirstAddress().getAddressLine2()).append("^").append(patientReported.getFirstAddress().getAddressCity()).append("^").append(patientReported.getFirstAddress().getAddressState()).append("^").append(patientReported.getFirstAddress().getAddressZip()).append("^").append(patientReported.getFirstAddress().getAddressCountry()).append("^");
+			}
 			if (!processingFlavorSet.contains(ProcessingFlavor.LIME)) {
 				sb.append("P");
 			}
@@ -216,9 +219,11 @@ public abstract class AbstractHl7MessageWriter implements IExampleMessageWriter 
 			sb.append("|");
 			// PID-13
 			sb.append("|");
-			String phone = patientReported.getFirstPhone().getNumber();
-			if (phone != null && phone.length() == 10) {
-				sb.append("^PRN^PH^^^").append(phone, 0, 3).append("^").append(phone, 3, 10);
+			if (patientReported.getFirstPhone() != null) {
+				String phone = patientReported.getFirstPhone().getNumber();
+				if (phone != null && phone.length() == 10) {
+					sb.append("^PRN^PH^^^").append(phone, 0, 3).append("^").append(phone, 3, 10);
+				}
 			}
 			// PID-14
 			sb.append("|");
