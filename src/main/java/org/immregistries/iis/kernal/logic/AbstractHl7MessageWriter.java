@@ -217,7 +217,7 @@ public abstract class AbstractHl7MessageWriter implements IExampleMessageWriter 
 			// PID-13
 			sb.append("|");
 			String phone = patientReported.getFirstPhone().getNumber();
-			if (phone.length() == 10) {
+			if (phone != null && phone.length() == 10) {
 				sb.append("^PRN^PH^^^").append(phone, 0, 3).append("^").append(phone, 3, 10);
 			}
 			// PID-14
