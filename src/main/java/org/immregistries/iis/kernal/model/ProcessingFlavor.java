@@ -18,6 +18,7 @@ public enum ProcessingFlavor {
 	SPRUCE("Spruce", "The RXR segment is required for all administered vaccinations"),
 	CANTALOUPE("Cantaloupe", "Dates will not be strictly parsed"),
 	CLEMENTINE("Clementine", "Will accept vaccination given before date of birth"),
+	MANDARINE("Mandarine", "Will accept vaccination given in the future"),
 	ELDERBERRIES("Elderberries", "Will accept invalid sex codes and valid sex codes other than M, F, or U"),
 	GUAVA("Guava", "Will accept invalid state or country codes in address"),
 	FIG("Fig", "Will not accept invalid or unrecognized race or ethnicity codes"),

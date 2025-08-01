@@ -66,7 +66,7 @@ public class ImmunizationProcessingInterceptor extends AbstractLogicInterceptor 
 		CodeMap codeMap = CodeMapManager.getCodeMap();
 
 		Date administrationDate = vaccinationReported.getAdministeredDate();
-		if (administrationDate.after(new Date())) {
+		if (administrationDate.after(new Date()) && !processingFlavorSet.contains(ProcessingFlavor.MANDARINE)) {
 			throw new ProcessingException("Vaccination is indicated as occurring in the future, unable to accept future vaccination events", "RXA", rxaCount, 3);
 		}
 
