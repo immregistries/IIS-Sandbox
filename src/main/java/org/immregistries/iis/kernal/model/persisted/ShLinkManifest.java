@@ -12,8 +12,8 @@ import java.util.List;
 public class ShLinkManifest {
 	@JsonIgnore
 	private Tenant tenant;
-	@JsonProperty(value = "id")
-	private Integer id;
+	@JsonIgnore
+	private String id;
 	@JsonProperty(value = "status")
 	private String status; //"finalized"|"can-change"|"no-longer-valid"
 	@JsonProperty(value = "files")
@@ -50,11 +50,11 @@ public class ShLinkManifest {
 		this.tenant = tenant;
 	}
 
-	public Integer getId() {
+	public String getId() {
 		return id;
 	}
 
-	public void setId(Integer id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 

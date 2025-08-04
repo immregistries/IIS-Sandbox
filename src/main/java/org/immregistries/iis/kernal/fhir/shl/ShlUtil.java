@@ -7,6 +7,8 @@ import org.immregistries.iis.kernal.model.persisted.Tenant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.UUID;
+
 public class ShlUtil {
 	private static final Logger logger = LoggerFactory.getLogger(ShlUtil.class);
 
@@ -37,6 +39,7 @@ public class ShlUtil {
 		ShLinkManifest shLinkManifest = new ShLinkManifest();
 		shLinkManifest.setTenant(tenant);
 		shLinkManifest.setStatus("finalized");
+		shLinkManifest.setId(UUID.randomUUID().toString());
 		ShLinkManifest.FileManifest fileManifest = new ShLinkManifest.FileManifest();
 		String fhirVersion = "4.0.1"; // TODO change
 		fileManifest.setContentType("application/fhir+json;fhirVersion=" + fhirVersion);

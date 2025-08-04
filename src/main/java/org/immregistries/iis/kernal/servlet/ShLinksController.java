@@ -7,7 +7,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.hibernate.Session;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.fhir.shl.ShlUtil;
-import org.immregistries.iis.kernal.model.persisted.MessageReceived;
 import org.immregistries.iis.kernal.model.persisted.ShLinkManifest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,7 +46,7 @@ public class ShLinksController {
 		resp.setContentType("application/json");
 		logger.info("ALL");
 		try (Session dataSession = ServletHelper.getDataSession()) {
-			Query query = dataSession.createQuery("from MessageReceived", MessageReceived.class);
+			Query query = dataSession.createQuery("from ShLinkManifest", ShLinkManifest.class);
 			logger.info("Result {}", query.getResultList().size());
 			return query.getResultList();
 		} catch (Exception e) {
@@ -59,12 +58,10 @@ public class ShLinksController {
 
 	@GetMapping("/$generate")
 	public ShLinkManifest genManifest(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-		logger.info("generate");
 		ShLinkManifest shLinkManifest = ShlUtil.generateManifest(ServletHelper.getTenant(req));
 		resp.setContentType("application/json");
 		try (Session dataSession = ServletHelper.getDataSession()) {
 			dataSession.persist(shLinkManifest);
-			logger.info("id {}", shLinkManifest.getId());
 		}
 		return shLinkManifest;
 	}
