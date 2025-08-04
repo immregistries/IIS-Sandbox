@@ -5,6 +5,7 @@ import jakarta.persistence.Query;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.fhir.shl.ShlUtil;
 import org.immregistries.iis.kernal.model.persisted.ShLinkManifest;
@@ -34,6 +35,7 @@ public class ShLinksController {
 			Query query = dataSession.createQuery("from ShLinkManifest where id = :id", ShLinkManifest.class);
 			query.setParameter("id", manifestId);
 			shLinkManifest = (ShLinkManifest) query.getSingleResult();
+			logger.info("Search id {} len {}", manifestId, query.getResultList().size());
 		} catch (Exception e) {
 			System.err.println("Unable to render page: " + e.getMessage());
 			e.printStackTrace(System.err);
@@ -61,7 +63,9 @@ public class ShLinksController {
 		ShLinkManifest shLinkManifest = ShlUtil.generateManifest(ServletHelper.getTenant(req));
 		resp.setContentType("application/json");
 		try (Session dataSession = ServletHelper.getDataSession()) {
+			Transaction transaction = dataSession.beginTransaction();
 			dataSession.persist(shLinkManifest);
+			transaction.commit();
 		}
 		return shLinkManifest;
 	}

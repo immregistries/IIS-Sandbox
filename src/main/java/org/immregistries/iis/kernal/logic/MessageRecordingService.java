@@ -1,6 +1,7 @@
 package org.immregistries.iis.kernal.logic;
 
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.model.persisted.MessageReceived;
@@ -17,14 +18,13 @@ import java.util.Date;
  */
 public class MessageRecordingService {
 	Logger logger = LoggerFactory.getLogger(this.getClass());
-//	protected Session dataSession;
 
 	public MessageRecordingService() {
-//		dataSession = ServletHelper.getDataSession();
 	}
 
 	public void recordMessageReceived(String message, PatientMaster patient, String messageResponse, String categoryRequest, String categoryResponse, Tenant tenant) {
 		try (Session dataSession = ServletHelper.getDataSession()) {
+			Transaction transaction = dataSession.beginTransaction();
 			MessageReceived messageReceived = new MessageReceived();
 			messageReceived.setTenant(tenant);
 			messageReceived.setMessageRequest(message);
@@ -37,6 +37,7 @@ public class MessageRecordingService {
 			messageReceived.setCategoryResponse(categoryResponse);
 			// TODO interact with internal logs and metadata
 			dataSession.persist(messageReceived);
+			transaction.commit();
 		}
 
 	}
