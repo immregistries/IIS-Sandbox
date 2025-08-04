@@ -60,7 +60,7 @@ public class SmartHealthLinkPayload {
 	 */
 	@JsonProperty("v")
 	@JsonInclude(JsonInclude.Include.NON_NULL)
-	private Integer v;
+	private Integer v = 1;
 
 	// Getters and Setters
 

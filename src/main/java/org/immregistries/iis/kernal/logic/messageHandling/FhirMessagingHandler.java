@@ -18,6 +18,7 @@ import org.immregistries.iis.kernal.mapping.forR4.*;
 import org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester;
 import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
 import org.immregistries.iis.kernal.model.*;
+import org.immregistries.iis.kernal.model.persisted.Tenant;
 import org.immregistries.mqe.hl7util.model.CodedWithExceptions;
 import org.immregistries.mqe.hl7util.model.Hl7Location;
 import org.jetbrains.annotations.NotNull;

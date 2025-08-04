@@ -17,7 +17,11 @@ import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.mapping.forR5.LocationMapperR5;
 import org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester;
 import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
-import org.immregistries.iis.kernal.model.*;
+import org.immregistries.iis.kernal.model.OrgLocation;
+import org.immregistries.iis.kernal.model.PatientMaster;
+import org.immregistries.iis.kernal.model.PatientReported;
+import org.immregistries.iis.kernal.model.VaccinationReported;
+import org.immregistries.iis.kernal.model.persisted.Tenant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 

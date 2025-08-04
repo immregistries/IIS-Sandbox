@@ -14,20 +14,21 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import static org.immregistries.iis.kernal.servlet.LoginServlet.PARAM_PASSWORD;
 import static org.immregistries.iis.kernal.servlet.LoginServlet.PARAM_USERID;
+import static org.immregistries.iis.kernal.servlet.ShLinksController.SHLINKS_CONTROLLER_BASE_URL;
 
 
 @Configuration
 public class ServerSecurityConfig {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-	@Bean
 	/**
-	 * upgrades with AI, TODO verify
+	 * upgraded with AI, TODO verify
 	 */
+	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http, CustomOAuthSuccessHandler customOAuthSuccessHandler) throws Exception {
 		http
 			.authorizeHttpRequests((authorize) -> authorize
-				.requestMatchers(HttpMethod.GET, "/", "/home", "/pop", "/SubscriptionTopic/**", "/img/**").permitAll()
+				.requestMatchers(HttpMethod.GET, "/", "/home", "/pop", "/SubscriptionTopic/**", "/img/**", SHLINKS_CONTROLLER_BASE_URL).permitAll()
 				.requestMatchers("/loginForm", "/oauth2/**", "/login").permitAll()
 				// API AUTHORIZATION AND AUTHENTICATION SEPARATED
 				.requestMatchers("/fhir/**", "/soap", FhirMessagingController.FHIR_MESSAGING_BASE_PATH + "/soap", "/.well-known/smart-configuration", "/registerClient", "/token").permitAll()

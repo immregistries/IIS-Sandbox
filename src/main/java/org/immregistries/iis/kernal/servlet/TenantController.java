@@ -9,8 +9,8 @@ import org.hibernate.Session;
 import org.hibernate.query.Query;
 import org.immregistries.iis.kernal.fhir.interceptors.PartitionCreationInterceptor;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
-import org.immregistries.iis.kernal.model.Tenant;
-import org.immregistries.iis.kernal.model.UserAccess;
+import org.immregistries.iis.kernal.model.persisted.Tenant;
+import org.immregistries.iis.kernal.model.persisted.UserAccess;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

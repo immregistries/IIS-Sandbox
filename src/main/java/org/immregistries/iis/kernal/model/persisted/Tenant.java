@@ -1,4 +1,7 @@
-package org.immregistries.iis.kernal.model;
+package org.immregistries.iis.kernal.model.persisted;
+
+import org.immregistries.iis.kernal.model.AbstractMappedObject;
+import org.immregistries.iis.kernal.model.ProcessingFlavor;
 
 import java.io.Serializable;
 import java.util.Set;

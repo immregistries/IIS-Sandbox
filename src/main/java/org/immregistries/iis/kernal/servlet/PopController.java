@@ -10,7 +10,7 @@ import org.hibernate.Session;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.logic.messageHandling.V2IncomingMessageHandler;
 import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
-import org.immregistries.iis.kernal.model.Tenant;
+import org.immregistries.iis.kernal.model.persisted.Tenant;
 import org.immregistries.smm.transform.ScenarioManager;
 import org.immregistries.smm.transform.TestCaseMessage;
 import org.immregistries.smm.transform.Transformer;

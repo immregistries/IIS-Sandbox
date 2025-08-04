@@ -4,7 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.immregistries.iis.kernal.logic.ack.IisReportable;
 import org.immregistries.iis.kernal.logic.ack.IisReportableSeverity;
 import org.immregistries.iis.kernal.model.ProcessingFlavor;
-import org.immregistries.iis.kernal.model.Tenant;
+import org.immregistries.iis.kernal.model.persisted.Tenant;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

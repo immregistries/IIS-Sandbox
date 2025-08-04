@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal.model;
+package org.immregistries.iis.kernal.model.persisted;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;

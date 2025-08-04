@@ -49,9 +49,10 @@ public class HibernateConfig {
 		cfg.setProperty("hibernate.c3p0.max_statements", "10");
 		cfg.setProperty("hibernate.enable_lazy_load_no_trans", "true");
 
-		cfg.addResource("org/immregistries/iis/kernal/model/Tenant.hbm.xml");
-		cfg.addResource("org/immregistries/iis/kernal/model/UserAccess.hbm.xml");
-		cfg.addResource("org/immregistries/iis/kernal/model/MessageReceived.hbm.xml");
+		cfg.addResource("org/immregistries/iis/kernal/model/persisted/Tenant.hbm.xml");
+		cfg.addResource("org/immregistries/iis/kernal/model/persisted/UserAccess.hbm.xml");
+		cfg.addResource("org/immregistries/iis/kernal/model/persisted/MessageReceived.hbm.xml");
+		cfg.addResource("org/immregistries/iis/kernal/model/persisted/ShLinkManifest.hbm.xml");
 		return cfg;
 	}
 

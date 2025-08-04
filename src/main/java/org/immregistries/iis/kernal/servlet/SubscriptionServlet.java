@@ -16,7 +16,7 @@ import org.hl7.fhir.r5.model.Subscription;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.logic.SubscriptionService;
 import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
-import org.immregistries.iis.kernal.model.Tenant;
+import org.immregistries.iis.kernal.model.persisted.Tenant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 

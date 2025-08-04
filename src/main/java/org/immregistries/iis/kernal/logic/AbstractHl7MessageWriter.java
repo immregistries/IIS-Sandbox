@@ -10,6 +10,7 @@ import org.immregistries.iis.kernal.SoftwareVersion;
 import org.immregistries.iis.kernal.mapping.interfaces.ObservationMapper;
 import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
 import org.immregistries.iis.kernal.model.*;
+import org.immregistries.iis.kernal.model.persisted.Tenant;
 import org.immregistries.smm.tester.manager.HL7Reader;
 import org.immregistries.vfa.connect.model.EvaluationActual;
 import org.immregistries.vfa.connect.model.TestEvent;

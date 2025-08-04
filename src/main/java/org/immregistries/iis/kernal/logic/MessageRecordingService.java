@@ -2,9 +2,9 @@ package org.immregistries.iis.kernal.logic;
 
 import org.hibernate.Session;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
-import org.immregistries.iis.kernal.model.MessageReceived;
 import org.immregistries.iis.kernal.model.PatientMaster;
-import org.immregistries.iis.kernal.model.Tenant;
+import org.immregistries.iis.kernal.model.persisted.MessageReceived;
+import org.immregistries.iis.kernal.model.persisted.Tenant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;

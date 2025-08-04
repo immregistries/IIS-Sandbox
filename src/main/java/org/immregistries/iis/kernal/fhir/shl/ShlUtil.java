@@ -2,6 +2,8 @@ package org.immregistries.iis.kernal.fhir.shl;
 
 import com.google.gson.Gson;
 import com.nimbusds.jose.util.Base64URL;
+import org.immregistries.iis.kernal.model.persisted.ShLinkManifest;
+import org.immregistries.iis.kernal.model.persisted.Tenant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,10 +28,22 @@ public class ShlUtil {
 	public String qrCode(SmartHealthLinkPayload smartHealthLinkPayload) {
 		Gson gson = new Gson();
 		String payload = gson.toJson(smartHealthLinkPayload);
-		String minified = payload.trim();
-		Base64URL base64URL = Base64URL.encode(minified);
-		String shLink = SHLINK_PREFIX + base64URL;
-
-		return shLink;
+//		String minified = payload.trim();
+		Base64URL base64URL = Base64URL.encode(payload);
+		return SHLINK_PREFIX + base64URL;
 	}
+
+	public static ShLinkManifest generateManifest(Tenant tenant) {
+		ShLinkManifest shLinkManifest = new ShLinkManifest();
+		shLinkManifest.setTenant(tenant);
+		shLinkManifest.setStatus("finalized");
+		ShLinkManifest.FileManifest fileManifest = new ShLinkManifest.FileManifest();
+		String fhirVersion = "4.0.1"; // TODO change
+		fileManifest.setContentType("application/fhir+json;fhirVersion=" + fhirVersion);
+		fileManifest.setLocation("/fhir" + "/" + tenant.getOrganizationName() + "/Patient?identifier=test");
+		shLinkManifest.addFiles(fileManifest);
+		return shLinkManifest;
+	}
+
+
 }

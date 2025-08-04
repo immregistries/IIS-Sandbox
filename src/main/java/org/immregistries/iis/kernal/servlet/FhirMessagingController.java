@@ -17,7 +17,7 @@ import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.logic.BaseIISSOAPServer;
 import org.immregistries.iis.kernal.logic.messageHandling.FhirMessagingHandler;
 import org.immregistries.iis.kernal.logic.messageHandling.V2IncomingMessageHandler;
-import org.immregistries.iis.kernal.model.Tenant;
+import org.immregistries.iis.kernal.model.persisted.Tenant;
 import org.immregistries.smm.cdc.CDCWSDLServer;
 import org.immregistries.smm.cdc.Fault;
 import org.immregistries.smm.cdc.SubmitSingleMessage;

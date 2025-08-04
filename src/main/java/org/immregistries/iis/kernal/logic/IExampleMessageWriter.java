@@ -1,7 +1,7 @@
 package org.immregistries.iis.kernal.logic;
 
-import org.immregistries.iis.kernal.model.Tenant;
 import org.immregistries.iis.kernal.model.VaccinationReported;
+import org.immregistries.iis.kernal.model.persisted.Tenant;
 
 public interface IExampleMessageWriter {
 

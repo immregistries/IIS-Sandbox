@@ -1,5 +1,7 @@
 package org.immregistries.iis.kernal.model;
 
+import org.immregistries.iis.kernal.model.persisted.Tenant;
+
 public interface TenantTiedObject {
 
 	Tenant getTenant();

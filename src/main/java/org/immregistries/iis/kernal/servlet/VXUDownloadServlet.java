@@ -5,7 +5,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
-import org.immregistries.iis.kernal.model.UserAccess;
+import org.immregistries.iis.kernal.model.persisted.UserAccess;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 
 import java.io.*;

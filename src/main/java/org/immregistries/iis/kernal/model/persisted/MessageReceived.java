@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal.model;
+package org.immregistries.iis.kernal.model.persisted;
 
 import java.io.Serializable;
 import java.util.Date;

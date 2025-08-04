@@ -8,8 +8,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.hibernate.Session;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
-import org.immregistries.iis.kernal.model.MessageReceived;
-import org.immregistries.iis.kernal.model.Tenant;
+import org.immregistries.iis.kernal.model.persisted.MessageReceived;
+import org.immregistries.iis.kernal.model.persisted.Tenant;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -42,77 +42,74 @@ public class MessageServlet extends HttpServlet {
 
     resp.setContentType("text/html");
     PrintWriter out = new PrintWriter(resp.getOutputStream());
-	  Session dataSession = ServletHelper.getDataSession();
-    try {
-      String messageError = null;
-      String messageConfirmation = null;
-		 HomeServlet.doHeader(out, "IIS Sandbox", ServletHelper.getTenant());
-      if (messageError != null) {
-        out.println("  <div class=\"w3-panel w3-red\">");
-        out.println("    <p>" + messageError + "</p>");
-        out.println("  </div>");
-      }
-      if (messageConfirmation != null) {
-        out.println("  <div class=\"w3-panel w3-green\">");
-        out.println("    <p>" + messageConfirmation + "</p>");
-        out.println("  </div>");
-      }
+	  try (Session dataSession = ServletHelper.getDataSession()) {
+		  String messageError = null;
+		  String messageConfirmation = null;
+		  HomeServlet.doHeader(out, "IIS Sandbox", ServletHelper.getTenant());
+		  if (messageError != null) {
+			  out.println("  <div class=\"w3-panel w3-red\">");
+			  out.println("    <p>" + messageError + "</p>");
+			  out.println("  </div>");
+		  }
+		  if (messageConfirmation != null) {
+			  out.println("  <div class=\"w3-panel w3-green\">");
+			  out.println("    <p>" + messageConfirmation + "</p>");
+			  out.println("  </div>");
+		  }
 
-      Tenant tenant = ServletHelper.getTenant();
-      if (tenant != null) {
-        out.println("    <div class=\"w3-container w3-half w3-margin-top\">");
-			out.println("    <h2>Facility: " + tenant.getOrganizationName() + "</h2>");
-			out.println("    <h3>Messages Recently Received</h3>");
-        String search = req.getParameter(PARAM_SEARCH);
-        if (search == null) {
-          search = "";
-        }
-        out.println(
-            "    <form method=\"GET\" action=\"message\" class=\"w3-container w3-card-4\">");
-        out.println("      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_SEARCH
-            + "\" value=\"" + search + "\"/>");
-        out.println(
-            "          <input class=\"w3-button w3-section w3-teal w3-ripple\" type=\"submit\" name=\""
-                + PARAM_ACTION + "\" value=\"" + ACTION_SEARCH + "\"/>");
-        out.println("    </form>");
-        out.println("    </div>");
+		  Tenant tenant = ServletHelper.getTenant();
+		  if (tenant != null) {
+			  out.println("    <div class=\"w3-container w3-half w3-margin-top\">");
+			  out.println("    <h2>Facility: " + tenant.getOrganizationName() + "</h2>");
+			  out.println("    <h3>Messages Recently Received</h3>");
+			  String search = req.getParameter(PARAM_SEARCH);
+			  if (search == null) {
+				  search = "";
+			  }
+			  out.println(
+				  "    <form method=\"GET\" action=\"message\" class=\"w3-container w3-card-4\">");
+			  out.println("      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_SEARCH
+				  + "\" value=\"" + search + "\"/>");
+			  out.println(
+				  "          <input class=\"w3-button w3-section w3-teal w3-ripple\" type=\"submit\" name=\""
+					  + PARAM_ACTION + "\" value=\"" + ACTION_SEARCH + "\"/>");
+			  out.println("    </form>");
+			  out.println("    </div>");
 
-        out.println("    <div class=\"w3-container\">");
-        List<MessageReceived> messageReceivedList;
-        {
-          Query query = dataSession.createQuery(
-              "from MessageReceived where tenant = :tenant order by reportedDate desc");
-          query.setParameter("tenant", tenant);
-			  messageReceivedList = query.getResultList();
-        }
+			  out.println("    <div class=\"w3-container\">");
+			  List<MessageReceived> messageReceivedList;
+			  {
+				  Query query = dataSession.createQuery(
+					  "from MessageReceived where tenant = :tenant order by reportedDate desc");
+				  query.setParameter("tenant", tenant);
+				  messageReceivedList = query.getResultList();
+			  }
 
-        if (messageReceivedList.size() == 0) {
-          out.println("     <em>None Received</em>");
-        } else {
-          int count = 0;
-          for (MessageReceived messageReceived : messageReceivedList) {
-				 if (search.length() > 0) {
-					 if (!messageReceived.getMessageRequest().contains(search)
-						 && !messageReceived.getMessageResponse().contains(search)) {
-						 continue;
-					 }
-				 }
-				 count++;
-				 if (count > 10) {
-					 out.println("  <em>Only showing first 10 messages</em>");
-					 break;
-				 }
-				 PatientController.printMessageReceived(out, messageReceived);
-			 }
-        }
-        out.println("    </div>");
-      }
-    } catch (Exception e) {
-      System.err.println("Unable to render page: " + e.getMessage());
-      e.printStackTrace(System.err);
-    } finally {
-      dataSession.close();
-    }
+			  if (messageReceivedList.size() == 0) {
+				  out.println("     <em>None Received</em>");
+			  } else {
+				  int count = 0;
+				  for (MessageReceived messageReceived : messageReceivedList) {
+					  if (search.length() > 0) {
+						  if (!messageReceived.getMessageRequest().contains(search)
+							  && !messageReceived.getMessageResponse().contains(search)) {
+							  continue;
+						  }
+					  }
+					  count++;
+					  if (count > 10) {
+						  out.println("  <em>Only showing first 10 messages</em>");
+						  break;
+					  }
+					  PatientController.printMessageReceived(out, messageReceived);
+				  }
+			  }
+			  out.println("    </div>");
+		  }
+	  } catch (Exception e) {
+		  System.err.println("Unable to render page: " + e.getMessage());
+		  e.printStackTrace(System.err);
+	  }
     HomeServlet.doFooter(out);
     out.flush();
     out.close();

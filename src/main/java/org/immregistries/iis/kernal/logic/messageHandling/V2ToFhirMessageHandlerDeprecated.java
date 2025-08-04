@@ -5,7 +5,7 @@ import ca.uhn.hl7v2.HL7Exception;
 import gov.cdc.izgw.v2tofhir.converter.MessageParser;
 import org.hl7.fhir.r4.model.Bundle;
 import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
-import org.immregistries.iis.kernal.model.Tenant;
+import org.immregistries.iis.kernal.model.persisted.Tenant;
 import org.springframework.beans.factory.annotation.Autowired;
 
 //@Service
