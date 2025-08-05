@@ -9,7 +9,7 @@ import java.util.Set;
 /**
  * Represents a SMART Health Link, which provides a link to a user's health information.
  */
-public class SmartHealthLinkPayload {
+public class ShLinkPayload {
 
 	/**
 	 * The URL for this SMART Health Link.

@@ -2,6 +2,7 @@ package org.immregistries.iis.kernal.servlet;
 
 
 import jakarta.persistence.Query;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.hibernate.Session;
@@ -13,6 +14,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.List;
 
 import static org.immregistries.iis.kernal.servlet.ShLinksManifestController.SHLINKS_CONTROLLER_BASE_URL;
@@ -34,19 +37,21 @@ public class ShLinksManifestController {
 
 	@GetMapping("/{id}")
 	public ShLinkManifest getManifest(HttpServletRequest req, HttpServletResponse resp, @PathVariable("id") String manifestId) {
-		ShLinkManifest shLinkManifest = null;
 		resp.setContentType("application/json");
-		try (Session dataSession = ServletHelper.getDataSession()) {
-			Query query = dataSession.createQuery("from ShLinkManifest where id = :id", ShLinkManifest.class);
-			query.setParameter("id", manifestId);
-			shLinkManifest = (ShLinkManifest) query.getSingleResult();
-			logger.info("Search id {} len {}", manifestId, query.getResultList().size());
-		} catch (Exception e) {
-			System.err.println("Unable to render page: " + e.getMessage());
-			e.printStackTrace(System.err);
-		}
-		return shLinkManifest;
+		return shlUtilService.readShLinkManifest(manifestId);
 	}
+
+	@GetMapping("/{id}/qr")
+	public void printQr(HttpServletRequest req, HttpServletResponse resp, @PathVariable("id") String manifestId) throws IOException, ServletException {
+		ShLinkManifest shLinkManifest = shlUtilService.readShLinkManifest(manifestId);
+		String url = req.getContextPath().split("/qr")[0];
+		resp.setContentType("image/png"); // Set content type for PNG image
+		OutputStream out = resp.getOutputStream();
+		shlUtilService.printQrCode(out, url);
+		out.flush();
+		out.close();
+	}
+
 
 	@GetMapping()
 	public List getManifestAll(HttpServletRequest req, HttpServletResponse resp) {

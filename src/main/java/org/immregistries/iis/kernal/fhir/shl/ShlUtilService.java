@@ -2,7 +2,14 @@ package org.immregistries.iis.kernal.fhir.shl;
 
 import ca.uhn.fhir.context.FhirContext;
 import com.google.gson.Gson;
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.WriterException;
+import com.google.zxing.client.j2se.MatrixToImageWriter;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.QRCodeWriter;
 import com.nimbusds.jose.util.Base64URL;
+import jakarta.persistence.Query;
+import jakarta.servlet.ServletException;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -15,6 +22,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.UUID;
 
 @Service
@@ -39,9 +48,9 @@ public class ShlUtilService {
 	@Autowired
 	FhirContext fhirContext;
 
-	public String qrCode(SmartHealthLinkPayload smartHealthLinkPayload) {
+	public String qrCode(ShLinkPayload shLinkPayload) {
 		Gson gson = new Gson();
-		String payload = gson.toJson(smartHealthLinkPayload);
+		String payload = gson.toJson(shLinkPayload);
 //		String minified = payload.trim();
 		Base64URL base64URL = Base64URL.encode(payload);
 		return SHLINK_PREFIX + base64URL;
@@ -74,6 +83,29 @@ public class ShlUtilService {
 			transaction.commit();
 		}
 		return shLinkManifest;
+	}
+
+	public ShLinkManifest readShLinkManifest(String manifestId) {
+		ShLinkManifest shLinkManifest;
+		try (Session dataSession = ServletHelper.getDataSession()) {
+			Query query = dataSession.createQuery("from ShLinkManifest where id = :id", ShLinkManifest.class);
+			query.setParameter("id", manifestId);
+			shLinkManifest = (ShLinkManifest) query.getSingleResult();
+		}
+		return shLinkManifest;
+	}
+
+	public void printQrCode(OutputStream outputStream, String data) throws ServletException {
+		int width = 200; // Desired QR code width
+		int height = 200; // Desired QR code height
+		try {
+			QRCodeWriter qrCodeWriter = new QRCodeWriter();
+			BitMatrix bitMatrix = qrCodeWriter.encode(data, BarcodeFormat.QR_CODE, width, height);
+//			response.setContentType("image/png"); // Set content type for PNG image
+			MatrixToImageWriter.writeToStream(bitMatrix, "PNG", outputStream);
+		} catch (WriterException | IOException e) {
+			throw new ServletException("Error generating QR code", e);
+		}
 	}
 
 
