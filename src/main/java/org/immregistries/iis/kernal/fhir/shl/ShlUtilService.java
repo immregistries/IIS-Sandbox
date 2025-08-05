@@ -13,6 +13,7 @@ import jakarta.servlet.ServletException;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hl7.fhir.instance.model.api.IIdType;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
 import org.immregistries.iis.kernal.model.PatientMaster;
@@ -74,6 +75,12 @@ public class ShlUtilService {
 		String patientLocation = "/fhir/" + tenant.getOrganizationName() + "/Patient/" + patientMaster.getPatientId();
 		return generateManifest(tenant, patientLocation);
 	}
+
+	public ShLinkManifest generateExamplePatientManifest(Tenant tenant, IIdType iIdType) {
+		String patientLocation = "/fhir/" + tenant.getOrganizationName() + "/Patient/" + iIdType.getIdPart();
+		return generateManifest(tenant, patientLocation);
+	}
+
 
 	public ShLinkManifest generateManifest(Tenant tenant, String fhirLocation) {
 		ShLinkManifest shLinkManifest = generateManifest(tenant);
