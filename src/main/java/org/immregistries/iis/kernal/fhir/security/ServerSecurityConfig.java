@@ -14,7 +14,7 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import static org.immregistries.iis.kernal.servlet.LoginServlet.PARAM_PASSWORD;
 import static org.immregistries.iis.kernal.servlet.LoginServlet.PARAM_USERID;
-import static org.immregistries.iis.kernal.servlet.ShLinksController.SHLINKS_CONTROLLER_BASE_URL;
+import static org.immregistries.iis.kernal.servlet.ShLinksManifestController.SHLINKS_CONTROLLER_BASE_URL;
 
 
 @Configuration

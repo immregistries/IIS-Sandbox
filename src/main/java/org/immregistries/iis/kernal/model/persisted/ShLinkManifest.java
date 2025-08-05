@@ -12,7 +12,7 @@ import java.util.List;
 public class ShLinkManifest {
 	@JsonIgnore
 	private Tenant tenant;
-	@JsonIgnore
+	//	@JsonIgnore
 	private String id;
 	@JsonProperty(value = "status")
 	private String status; //"finalized"|"can-change"|"no-longer-valid"
