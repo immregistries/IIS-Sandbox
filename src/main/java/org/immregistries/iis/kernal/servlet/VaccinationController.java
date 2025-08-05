@@ -116,7 +116,7 @@ public class VaccinationController {
 			PatientReported patientReportedSelected = fhirRequester.readAsPatientReported(vaccination.getPatientReportedId());
 			{
 				out.println("<h4>Patient information</h4>");
-				PatientController.printPatient(out, patientReportedSelected);
+				PatientServletUtil.printPatient(out, patientReportedSelected);
 
 				out.println("  <div class=\"w3-container\">");
 				out.println("<h4>Vaccination details</h4>");
@@ -187,7 +187,7 @@ public class VaccinationController {
 
 				if (!observationReportedList.isEmpty()) {
 					out.println("<h4>Observations</h4>");
-					PatientController.printObservationList(out, observationReportedList);
+					PatientServletUtil.printObservationList(out, observationReportedList);
 				}
 
 				{
@@ -221,7 +221,7 @@ public class VaccinationController {
 						.setSystem(patientMaster1.getMainBusinessIdentifier().getSystem()));
 					IParser parser = repositoryClientFactory.getFhirContext().newJsonParser().setPrettyPrint(true);
 
-					PatientController.printSubscriptions(out, parser, bundle, immunization);
+					PatientServletUtil.printSubscriptions(out, parser, bundle, immunization);
 				}
 
 

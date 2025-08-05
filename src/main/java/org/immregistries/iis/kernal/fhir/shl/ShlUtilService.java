@@ -14,6 +14,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
+import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
+import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.model.persisted.ShLinkManifest;
 import org.immregistries.iis.kernal.model.persisted.Tenant;
 import org.jetbrains.annotations.NotNull;
@@ -29,6 +31,9 @@ import java.util.UUID;
 @Service
 public class ShlUtilService {
 	private static final Logger logger = LoggerFactory.getLogger(ShlUtilService.class);
+
+	@Autowired
+	private RepositoryClientFactory repositoryClientFactory;
 
 	public static final String EMBEDDED = "embedded";
 	public static final String CONTENT_TYPE = "contentType";
@@ -48,12 +53,34 @@ public class ShlUtilService {
 	@Autowired
 	FhirContext fhirContext;
 
-	public String qrCode(ShLinkPayload shLinkPayload) {
-		Gson gson = new Gson();
-		String payload = gson.toJson(shLinkPayload);
-//		String minified = payload.trim();
-		Base64URL base64URL = Base64URL.encode(payload);
-		return SHLINK_PREFIX + base64URL;
+	public String fullExamplePatientQrCode(Tenant tenant, PatientMaster patientMaster, String baseUrl) {
+
+		ShLinkManifest shLinkManifest = generateExamplePatientManifest(tenant, patientMaster);
+		shLinkManifest = saveManifest(shLinkManifest);
+		String manifestUrl = baseUrl + shLinkManifest.getId();
+
+		ShLinkPayload shLinkPayload = new ShLinkPayload();
+		shLinkPayload.setUrl(manifestUrl);
+		shLinkPayload.setLabel("Generated for testing");
+		shLinkPayload.setKey(null);
+		shLinkPayload.setFlag("LP");
+		shLinkPayload.setExp(10000000L);
+
+		return qrCode(shLinkPayload);
+
+	}
+
+	public ShLinkManifest generateExamplePatientManifest(Tenant tenant, PatientMaster patientMaster) {
+		String patientLocation = "/fhir/" + tenant.getOrganizationName() + "/Patient/" + patientMaster.getPatientId();
+		return generateManifest(tenant, patientLocation);
+	}
+
+	public ShLinkManifest generateManifest(Tenant tenant, String fhirLocation) {
+		ShLinkManifest shLinkManifest = generateManifest(tenant);
+		ShLinkManifest.FileManifest fileManifest = generateFhirFileManifest();
+		fileManifest.setLocation(fhirLocation);
+		shLinkManifest.addFiles(fileManifest);
+		return shLinkManifest;
 	}
 
 	public ShLinkManifest generateManifest(Tenant tenant) {
@@ -62,7 +89,7 @@ public class ShlUtilService {
 		shLinkManifest.setStatus("finalized");
 		ShLinkManifest.FileManifest fileManifest = generateFhirFileManifest();
 		shLinkManifest.addFiles(fileManifest);
-		fileManifest.setLocation("/fhir" + "/" + tenant.getOrganizationName() + "/Patient?identifier=test");
+		fileManifest.setLocation("/fhir/" + tenant.getOrganizationName() + "/Patient?identifier=test");
 		return shLinkManifest;
 	}
 
@@ -93,6 +120,14 @@ public class ShlUtilService {
 			shLinkManifest = (ShLinkManifest) query.getSingleResult();
 		}
 		return shLinkManifest;
+	}
+
+	public String qrCode(ShLinkPayload shLinkPayload) {
+		Gson gson = new Gson();
+		String payload = gson.toJson(shLinkPayload);
+//		String minified = payload.trim();
+		Base64URL base64URL = Base64URL.encode(payload);
+		return SHLINK_PREFIX + base64URL;
 	}
 
 	public void printQrCode(OutputStream outputStream, String data) throws ServletException {

@@ -72,7 +72,7 @@ public class RecommendationController {
 			throw new AuthenticationCredentialsNotFoundException("");
 		}
 		IGenericClient fhirClient = repositoryClientFactory.newGenericClient(req);
-		IDomainResource patient = PatientController.fetchPatientFromParameter(req, fhirClient, fhirRequester);
+		IDomainResource patient = PatientServletUtil.fetchPatientFromParameter(req, fhirClient, fhirRequester);
 		PatientMaster patientMaster = patientMapper.localObject(patient);
 
 		if (patient != null) {
@@ -182,7 +182,7 @@ public class RecommendationController {
 						.withId(((org.hl7.fhir.r4.model.ImmunizationRecommendation) recommendationResource).getPatient().getReference()).execute();
 				}
 			} else {
-				patientResource = PatientController.fetchPatientFromParameter(req, fhirClient, fhirRequester);
+				patientResource = PatientServletUtil.fetchPatientFromParameter(req, fhirClient, fhirRequester);
 			}
 			if (patientResource == null) {
 				out.println("No patient or recommendation found with request parameters.");
@@ -237,7 +237,7 @@ public class RecommendationController {
 					 */
 					org.hl7.fhir.r5.model.ImmunizationRecommendation immunizationRecommendation = (org.hl7.fhir.r5.model.ImmunizationRecommendation) recommendationResource;
 					immunizationRecommendation.setPatient(new org.hl7.fhir.r5.model.Reference().setIdentifier(identifier.toR5()));
-					PatientController.printSubscriptions(out, parser, subcriptionBundle, immunizationRecommendation);
+					PatientServletUtil.printSubscriptions(out, parser, subcriptionBundle, immunizationRecommendation);
 				}
 			}
 		} catch (Exception e) {
@@ -314,7 +314,9 @@ public class RecommendationController {
 
 		out.println("<form action=\"recommendation\" method=\"POST\">");
 		out.println("	<input type=\"hidden\" name=\"" + PARAM_PATIENT_REPORTED_ID + "\" value=\"" + new org.hl7.fhir.r5.model.IdType(patient.getId()).getIdPart() + "\"/>");
-		out.println("	<input type=\"hidden\" name=\"" + PARAM_RECOMMENDATION_ID + "\" value=\"" + new org.hl7.fhir.r5.model.IdType(recommendation.getId()).getIdPart() + "\"/>");
+		if (recommendation != null) {
+			out.println("	<input type=\"hidden\" name=\"" + PARAM_RECOMMENDATION_ID + "\" value=\"" + new org.hl7.fhir.r5.model.IdType(recommendation.getId()).getIdPart() + "\"/>");
+		}
 		out.println("	<input class=\"w3-button w3-section w3-teal w3-ripple\" type=\"submit\" name=\"submit\" value=\"Add recommendation component\"/>");
 		out.println("</form>");
 		out.println("</div>");
