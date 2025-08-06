@@ -16,6 +16,7 @@ import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.model.SnomedValue;
 import org.immregistries.iis.kernal.model.persisted.MessageReceived;
 import org.immregistries.iis.kernal.model.persisted.Tenant;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintWriter;
 import java.text.ParseException;
@@ -287,14 +288,22 @@ public final class PatientServletUtil {
 	}
 
 	public static IDomainResource fetchPatientFromParameter(HttpServletRequest req, IGenericClient fhirClient, AbstractFhirRequester fhirRequester) {
+		String idParam = req.getParameter(PARAM_PATIENT_REPORTED_ID);
+		String identifierParam = req.getParameter(PARAM_PATIENT_REPORTED_EXTERNAL_LINK);
+		return fetchPatientFromParameters(fhirClient, fhirRequester, idParam, identifierParam);
+	}
+
+	public static @Nullable IDomainResource fetchPatientFromParameters(IGenericClient fhirClient, AbstractFhirRequester fhirRequester, String idParam, String identifierParam) {
 		IDomainResource patient = null;
-		if (req.getParameter(PARAM_PATIENT_REPORTED_ID) != null) {
-			patient = (IDomainResource) fhirClient.read().resource("Patient").withId(req.getParameter(PARAM_PATIENT_REPORTED_ID)).execute();
-		} else if (req.getParameter(PARAM_PATIENT_REPORTED_EXTERNAL_LINK) != null) {
-			IBundleProvider bundleProvider = fhirRequester.searchGoldenRecord(org.hl7.fhir.r5.model.Patient.class,
-				new SearchParameterMap(org.hl7.fhir.r5.model.Patient.SP_IDENTIFIER, new TokenParam().setValue(req.getParameter(PARAM_PATIENT_REPORTED_EXTERNAL_LINK))));
-			if (!bundleProvider.isEmpty()) {
-				patient = (IDomainResource) bundleProvider.getAllResources().get(0);
+		if (idParam != null) {
+			patient = (IDomainResource) fhirClient.read().resource("Patient").withId(idParam).execute();
+		} else {
+			if (identifierParam != null) {
+				IBundleProvider bundleProvider = fhirRequester.searchGoldenRecord(org.hl7.fhir.r5.model.Patient.class,
+					new SearchParameterMap(org.hl7.fhir.r5.model.Patient.SP_IDENTIFIER, new TokenParam().setValue(identifierParam)));
+				if (!bundleProvider.isEmpty()) {
+					patient = (IDomainResource) bundleProvider.getAllResources().get(0);
+				}
 			}
 		}
 		return patient;

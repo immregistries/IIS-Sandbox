@@ -47,7 +47,7 @@ public class ShLinksManifestController {
 		String url = req.getContextPath().split("/qr")[0];
 		resp.setContentType("image/png"); // Set content type for PNG image
 		OutputStream out = resp.getOutputStream();
-		shlUtilService.printQrCode(out, url);
+		shlUtilService.printQrCodeAsImage(out, url);
 		out.flush();
 		out.close();
 	}

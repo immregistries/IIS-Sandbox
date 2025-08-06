@@ -137,7 +137,7 @@ public class ShlUtilService {
 		return SHLINK_PREFIX + base64URL;
 	}
 
-	public void printQrCode(OutputStream outputStream, String data) throws ServletException {
+	public void printQrCodeAsImage(OutputStream outputStream, String data) throws ServletException {
 		int width = 200; // Desired QR code width
 		int height = 200; // Desired QR code height
 		try {

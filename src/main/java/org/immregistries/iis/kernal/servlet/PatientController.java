@@ -17,7 +17,6 @@ import org.hibernate.query.Query;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.instance.model.api.IDomainResource;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
-import org.immregistries.iis.kernal.fhir.shl.ShLinkPayload;
 import org.immregistries.iis.kernal.fhir.shl.ShlUtilService;
 import org.immregistries.iis.kernal.mapping.interfaces.PatientMapper;
 import org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester;
@@ -27,7 +26,6 @@ import org.immregistries.iis.kernal.model.ObservationReported;
 import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.model.VaccinationMaster;
 import org.immregistries.iis.kernal.model.persisted.MessageReceived;
-import org.immregistries.iis.kernal.model.persisted.ShLinkManifest;
 import org.immregistries.iis.kernal.model.persisted.Tenant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +37,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.List;
 import java.util.Set;
@@ -59,8 +56,7 @@ public class PatientController {
 	public static final String PARAM_PATIENT_NAME_FIRST = "patientNameFirst";
 	public static final String PARAM_PATIENT_REPORTED_EXTERNAL_LINK = "identifier";
 	public static final String PARAM_PATIENT_REPORTED_ID = "id";
-	public static final String SHLINK_QR_CODE_PATH_SUFFIX = "/qr";
-	public static final String MANIFEST_PATH_SUFFIX = "/manifest";
+
 
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -102,7 +98,6 @@ public class PatientController {
 			IGenericClient fhirClient = repositoryClientFactory.newGenericClient(req);
 			try {
 				HomeServlet.doHeader(out, "IIS Sandbox - Patients", tenant);
-				out.println("<img src=\"/iis/patient/qr?id=" + req.getParameter(PARAM_PATIENT_REPORTED_ID) + "\"  alt=\"shlink\" width=\"200\">");
 				IBaseResource patientSelected = fetchPatientFromParameter(req, fhirClient, fhirRequester);
 
 				if (patientSelected == null) {
@@ -119,61 +114,6 @@ public class PatientController {
 		out.close();
 	}
 
-
-	@GetMapping({MANIFEST_PATH_SUFFIX})
-	protected ShLinkManifest getPatientShLinkManifest(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
-		try (Session dataSession = ServletHelper.getDataSession()) {
-			Tenant tenant = ServletHelper.getTenant(req, dataSession);
-			if (tenant == null) {
-				if (ServletHelper.getUserAccess() != null) {
-					resp.sendRedirect("/iis/tenant");
-				}
-				throw new AuthenticationCredentialsNotFoundException("");
-			}
-			IGenericClient fhirClient = repositoryClientFactory.newGenericClient(req);
-			IBaseResource patientSelected = fetchPatientFromParameter(req, fhirClient, fhirRequester);
-			return shlUtilService.generateExamplePatientManifest(tenant, patientSelected.getIdElement());
-		}
-	}
-
-	@GetMapping({SHLINK_QR_CODE_PATH_SUFFIX})
-	protected void doGetShLink(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
-		resp.setContentType("image/png"); // Set content type for PNG image
-		OutputStream outputStream = resp.getOutputStream();
-//		PrintWriter out = new PrintWriter(outputStream);
-		try (Session dataSession = ServletHelper.getDataSession()) {
-			Tenant tenant = ServletHelper.getTenant(req, dataSession);
-			if (tenant == null) {
-				if (ServletHelper.getUserAccess() != null) {
-					resp.sendRedirect("/iis/tenant");
-				}
-				throw new AuthenticationCredentialsNotFoundException("");
-			}
-			IGenericClient fhirClient = repositoryClientFactory.newGenericClient(req);
-			IBaseResource patientSelected = fetchPatientFromParameter(req, fhirClient, fhirRequester);
-			if (patientSelected == null) {
-			} else {
-				PatientMaster patientMaster = patientMapper.localObject(patientSelected);
-
-				ShLinkManifest shLinkManifest = shlUtilService.generateExamplePatientManifest(tenant, patientMaster);
-				shLinkManifest = shlUtilService.saveManifest(shLinkManifest);
-
-				String manifestUrl = StringUtils.substringBeforeLast(req.getServletPath(), SHLINK_QR_CODE_PATH_SUFFIX) + MANIFEST_PATH_SUFFIX;
-
-				ShLinkPayload shLinkPayload = new ShLinkPayload();
-				shLinkPayload.setUrl(manifestUrl);
-				shLinkPayload.setLabel("Generated for testing");
-				shLinkPayload.setKey(null);
-				shLinkPayload.setFlag("LP");
-				shLinkPayload.setExp(10000000L);
-
-				String qrcode = shlUtilService.qrCode(shLinkPayload);
-				shlUtilService.printQrCode(outputStream, qrcode);
-			}
-		}
-		outputStream.flush();
-		outputStream.close();
-	}
 
 
 	private void singlePatientInformationPrintAll(PrintWriter out, IBaseResource patientSelected, IGenericClient fhirClient, Tenant tenant, Session dataSession) {
@@ -196,6 +136,14 @@ public class PatientController {
 
 		out.println("<div class=\"w3-container\">");
 		printFhirShortcuts(out, patientSelected, patientMasterSelected, tenant);
+		out.println("</div>");
+		out.println("<div class=\"w3-container\">");
+		out.println("<img src=\"/iis/patient/qr?id=" + patientMasterSelected.getPatientId() + "\"  alt=\"shlink\" width=\"200\">");
+		out.println("<p>");
+		out.println(shlUtilService.fullExamplePatientQrCode(tenant, patientMasterSelected, ""));
+		out.println("</p>");
+
+
 		out.println("</div>");
 
 		out.println("<div class=\"w3-container\">");
