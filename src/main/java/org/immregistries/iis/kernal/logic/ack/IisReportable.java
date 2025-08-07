@@ -229,13 +229,7 @@ public class IisReportable {
 	}
 
 	public static IisReportable fromProcessingException(ProcessingException processingException) {
-		return new IisReportable(processingException);
+		return ReportableUtil.fromProcessingException(processingException);
 	}
-
-
-	public static IisReportable fromProcessingException(ProcessingResult processingResult) {
-		return new IisReportable();
-	}
-
 
 }

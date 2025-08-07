@@ -28,7 +28,7 @@ public class ServerSecurityConfig {
 	public SecurityFilterChain filterChain(HttpSecurity http, CustomOAuthSuccessHandler customOAuthSuccessHandler) throws Exception {
 		http
 			.authorizeHttpRequests((authorize) -> authorize
-				.requestMatchers(HttpMethod.GET, "/", "/home", "/pop", "/SubscriptionTopic/**", "/img/**", SHLINKS_CONTROLLER_BASE_URL).permitAll()
+				.requestMatchers(HttpMethod.GET, "/", "/home", "/pop", "/SubscriptionTopic/**", "/img/**", SHLINKS_CONTROLLER_BASE_URL, "/patient/manifest").permitAll()
 				.requestMatchers("/loginForm", "/oauth2/**", "/login").permitAll()
 				// API AUTHORIZATION AND AUTHENTICATION SEPARATED
 				.requestMatchers("/fhir/**", "/soap", FhirMessagingController.FHIR_MESSAGING_BASE_PATH + "/soap", "/.well-known/smart-configuration", "/registerClient", "/token").permitAll()

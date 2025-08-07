@@ -17,6 +17,7 @@ import org.hibernate.query.Query;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.instance.model.api.IDomainResource;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
+import org.immregistries.iis.kernal.fhir.shl.ShLinkPayload;
 import org.immregistries.iis.kernal.fhir.shl.ShlUtilService;
 import org.immregistries.iis.kernal.mapping.interfaces.PatientMapper;
 import org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester;
@@ -43,6 +44,7 @@ import java.util.Set;
 
 import static org.immregistries.iis.kernal.servlet.PatientController.PATIENT_BASE_PATH;
 import static org.immregistries.iis.kernal.servlet.PatientServletUtil.*;
+import static org.immregistries.iis.kernal.servlet.PatientShLinkController.MANIFEST_PATH_SUFFIX;
 
 @RestController
 @RequestMapping({PATIENT_BASE_PATH, TenantController.TENANT_PATH + PATIENT_BASE_PATH})
@@ -103,7 +105,7 @@ public class PatientController {
 				if (patientSelected == null) {
 					searchOrPrintAll(req, out, tenant);
 				} else {
-					singlePatientInformationPrintAll(out, patientSelected, fhirClient, tenant, dataSession);
+					singlePatientInformationPrintAll(out, patientSelected, fhirClient, tenant, dataSession, req);
 				}
 			} catch (Exception e) {
 				e.printStackTrace(System.err);
@@ -115,8 +117,7 @@ public class PatientController {
 	}
 
 
-
-	private void singlePatientInformationPrintAll(PrintWriter out, IBaseResource patientSelected, IGenericClient fhirClient, Tenant tenant, Session dataSession) {
+	private void singlePatientInformationPrintAll(PrintWriter out, IBaseResource patientSelected, IGenericClient fhirClient, Tenant tenant, Session dataSession, HttpServletRequest req) {
 		PatientMaster patientMasterSelected = patientMapper.localObject(patientSelected);
 		boolean isGolden = AbstractFhirRequester.isGoldenRecord(patientSelected);
 
@@ -140,7 +141,11 @@ public class PatientController {
 		out.println("<div class=\"w3-container\">");
 		out.println("<img src=\"/iis/patient/qr?id=" + patientMasterSelected.getPatientId() + "\"  alt=\"shlink\" width=\"200\">");
 		out.println("<p>");
-		out.println(shlUtilService.fullExamplePatientQrCode(tenant, patientMasterSelected, ""));
+//		UriComponentsBuilder..fromHttpRequest(new ServletServerHttpRequest(request)).build().toUriString()
+		String manifestUrl = req.getRequestURL() + MANIFEST_PATH_SUFFIX + "?id=" + patientSelected.getIdElement().getIdPart();
+		ShLinkPayload shLinkPayload = PatientShLinkController.getPatientShLinkPayload(manifestUrl);
+		out.println(manifestUrl);
+		out.println(shlUtilService.qrCode(shLinkPayload));
 		out.println("</p>");
 
 
