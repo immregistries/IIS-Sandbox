@@ -11,6 +11,7 @@ import hl7.v2.validation.vs.ValueSetLibrary;
 import hl7.v2.validation.vs.ValueSetLibraryImpl;
 import org.immregistries.iis.kernal.logic.ack.IisReportable;
 import org.immregistries.iis.kernal.logic.ack.IisReportableSeverity;
+import org.immregistries.iis.kernal.logic.ack.ReportableUtil;
 import org.immregistries.mqe.hl7util.ReportableSource;
 import org.immregistries.mqe.hl7util.SeverityLevel;
 import org.immregistries.mqe.hl7util.model.CodedWithExceptions;
@@ -143,7 +144,7 @@ public class ValidationService {
 				path = "";
 			}
 
-			Hl7Location errorLocation = IisReportable.readErrorLocation(path, segmentid);
+			Hl7Location errorLocation = ReportableUtil.readErrorLocation(path, segmentid);
 			if (errorLocation != null) {
 				reportable.getHl7LocationList().add(errorLocation);
 			}

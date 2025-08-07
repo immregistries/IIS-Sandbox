@@ -3,6 +3,7 @@ package org.immregistries.iis.kernal.logic;
 import org.apache.commons.lang3.StringUtils;
 import org.immregistries.iis.kernal.logic.ack.IisReportable;
 import org.immregistries.iis.kernal.logic.ack.IisReportableSeverity;
+import org.immregistries.iis.kernal.logic.ack.ReportableUtil;
 import org.immregistries.iis.kernal.model.ProcessingFlavor;
 import org.immregistries.iis.kernal.model.persisted.Tenant;
 
@@ -78,7 +79,7 @@ public interface IIncomingMessageHandler<SourceType> {
 		} catch (ParseException e) {
 			if (errorMessage != null) {
 				ProcessingException pe = new ProcessingException(errorMessage + ": " + e.getMessage(), segmentId, segmentRepeat, fieldPosition, IisReportableSeverity.WARN);
-				iisReportableList.add(IisReportable.fromProcessingException(pe));
+				iisReportableList.add(ReportableUtil.fromProcessingException(pe));
 			}
 		}
 		return null;

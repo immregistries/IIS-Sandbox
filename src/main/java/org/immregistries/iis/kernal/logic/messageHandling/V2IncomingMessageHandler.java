@@ -278,7 +278,7 @@ public abstract class V2IncomingMessageHandler extends IncomingMessageHandler<HL
 			messageRecordingService.recordMessageReceived(message, patientReported, ack, "Update", "Ack", tenant);
 			return ack;
 		} catch (ProcessingException e) {
-			IisReportable exceptionReportable = IisReportable.fromProcessingException(e);
+			IisReportable exceptionReportable = ReportableUtil.fromProcessingException(e);
 			if (!iisReportableList.contains(exceptionReportable)) {
 				iisReportableList.add(exceptionReportable);
 			}
@@ -328,7 +328,7 @@ public abstract class V2IncomingMessageHandler extends IncomingMessageHandler<HL
 		patientReported.setUpdatedDate(new Date());
 		patientReported = fhirRequester.savePatientReported(patientReported);
 //		patientReported = fhirRequester.saveRelatedPerson(patientReported);
-		iisReportableList.add(IisReportable.fromProcessingException(new ProcessingException("Patient record saved", PID, 0, 0, IisReportableSeverity.INFO)));
+		iisReportableList.add(ReportableUtil.fromProcessingException(new ProcessingException("Patient record saved", PID, 0, 0, IisReportableSeverity.INFO)));
 
 		/*
 		 * checking if request is gathering patients  Ids to create a group, TODO cleaner solution

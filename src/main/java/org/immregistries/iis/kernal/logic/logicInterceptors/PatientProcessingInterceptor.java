@@ -17,6 +17,7 @@ import org.immregistries.iis.kernal.logic.ProcessingException;
 import org.immregistries.iis.kernal.logic.ValidValues;
 import org.immregistries.iis.kernal.logic.ack.IisReportable;
 import org.immregistries.iis.kernal.logic.ack.IisReportableSeverity;
+import org.immregistries.iis.kernal.logic.ack.ReportableUtil;
 import org.immregistries.iis.kernal.mapping.interfaces.PatientMapper;
 import org.immregistries.iis.kernal.model.*;
 import org.immregistries.mqe.hl7util.model.Hl7Location;
@@ -102,7 +103,7 @@ public class PatientProcessingInterceptor extends AbstractLogicInterceptor {
 			if (!processingFlavorSet.contains(ProcessingFlavor.QUINZE)) {
 				pe.setErrorCode(IisReportableSeverity.WARN);
 			}
-			iisReportableList.add(IisReportable.fromProcessingException(pe));
+			iisReportableList.add(ReportableUtil.fromProcessingException(pe));
 		}
 		agnosticValidation(patientReported, iisReportableList, processingFlavorSet);
 		return patientReported;
@@ -227,12 +228,12 @@ public class PatientProcessingInterceptor extends AbstractLogicInterceptor {
 				if (invalidCharFound) {
 					ProcessingException pe = new ProcessingException("Patient phone number has unexpected character: " + invalidChar, "PID", 1, 13);
 					pe.setErrorCode(IisReportableSeverity.WARN);
-					iisReportableList.add(IisReportable.fromProcessingException(pe));
+					iisReportableList.add(ReportableUtil.fromProcessingException(pe));
 				}
 				if (countNums != 10 || patientPhone.getNumber().startsWith("555") || patientPhone.getNumber().startsWith("0") || patientPhone.getNumber().startsWith("1")) {
 					ProcessingException pe = new ProcessingException("Patient phone number does not appear to be valid", "PID", 1, 13);
 					pe.setErrorCode(IisReportableSeverity.WARN);
-					iisReportableList.add(IisReportable.fromProcessingException(pe));
+					iisReportableList.add(ReportableUtil.fromProcessingException(pe));
 				}
 			}
 		}
@@ -247,7 +248,7 @@ public class PatientProcessingInterceptor extends AbstractLogicInterceptor {
 				if (processingFlavorSet.contains(ProcessingFlavor.ELDERBERRIES)) {
 					pe.setErrorCode(IisReportableSeverity.WARN);
 				}
-				iisReportableList.add(IisReportable.fromProcessingException(pe));
+				iisReportableList.add(ReportableUtil.fromProcessingException(pe));
 			}
 		}
 
@@ -259,7 +260,7 @@ public class PatientProcessingInterceptor extends AbstractLogicInterceptor {
 					if (processingFlavorSet.contains(ProcessingFlavor.GUAVA)) {
 						pe.setErrorCode(IisReportableSeverity.WARN);
 					}
-					iisReportableList.add(IisReportable.fromProcessingException(pe));
+					iisReportableList.add(ReportableUtil.fromProcessingException(pe));
 				}
 			}
 			if (StringUtils.isBlank(patientAddressCountry) || "US".equals(patientAddressCountry) || "USA".equals(patientAddressCountry)) {
@@ -270,7 +271,7 @@ public class PatientProcessingInterceptor extends AbstractLogicInterceptor {
 						if (processingFlavorSet.contains(ProcessingFlavor.GUAVA)) {
 							pe.setErrorCode(IisReportableSeverity.WARN);
 						}
-						iisReportableList.add(IisReportable.fromProcessingException(pe));
+						iisReportableList.add(ReportableUtil.fromProcessingException(pe));
 					}
 				}
 			}
@@ -284,7 +285,7 @@ public class PatientProcessingInterceptor extends AbstractLogicInterceptor {
 					if (!processingFlavorSet.contains(ProcessingFlavor.FIG)) {
 						pe.setErrorCode(IisReportableSeverity.WARN);
 					}
-					iisReportableList.add(IisReportable.fromProcessingException(pe));
+					iisReportableList.add(ReportableUtil.fromProcessingException(pe));
 				}
 			}
 		}
@@ -299,7 +300,7 @@ public class PatientProcessingInterceptor extends AbstractLogicInterceptor {
 					if (!processingFlavorSet.contains(ProcessingFlavor.FIG)) {
 						pe.setErrorCode(IisReportableSeverity.WARN);
 					}
-					iisReportableList.add(IisReportable.fromProcessingException(pe));
+					iisReportableList.add(ReportableUtil.fromProcessingException(pe));
 				}
 			}
 		}
@@ -321,26 +322,26 @@ public class PatientProcessingInterceptor extends AbstractLogicInterceptor {
 						if (processingFlavorSet.contains(ProcessingFlavor.PLANTAIN)) {
 							pe.setErrorCode(IisReportableSeverity.WARN);
 						}
-						iisReportableList.add(IisReportable.fromProcessingException(pe));
+						iisReportableList.add(ReportableUtil.fromProcessingException(pe));
 					}
 				} else if (birthFlag.equals("Y")) {
 					if (birthOrder.equals("")) {
 						ProcessingException pe = new ProcessingException("Multiple birth but birth order was not specified", "PID", 1, 24);
 						pe.setErrorCode(IisReportableSeverity.WARN);
-						iisReportableList.add(IisReportable.fromProcessingException(pe));
+						iisReportableList.add(ReportableUtil.fromProcessingException(pe));
 					} else if (!ValidValues.verifyValidValue(birthOrder, ValidValues.BIRTH_ORDER)) {
 						ProcessingException pe = new ProcessingException("Birth order was specified as " + birthOrder + " but not an expected value, must be between 1 and 9", "PID", 1, 25);
 						if (processingFlavorSet.contains(ProcessingFlavor.PLANTAIN)) {
 							pe.setErrorCode(IisReportableSeverity.WARN);
 						}
-						iisReportableList.add(IisReportable.fromProcessingException(pe));
+						iisReportableList.add(ReportableUtil.fromProcessingException(pe));
 					}
 				} else {
 					ProcessingException pe = new ProcessingException("Multiple birth indicator " + birthFlag + " is not recognized", "PID", 1, 24);
 					if (processingFlavorSet.contains(ProcessingFlavor.PLANTAIN)) {
 						pe.setErrorCode(IisReportableSeverity.WARN);
 					}
-					iisReportableList.add(IisReportable.fromProcessingException(pe));
+					iisReportableList.add(ReportableUtil.fromProcessingException(pe));
 				}
 			}
 		}
@@ -349,22 +350,22 @@ public class PatientProcessingInterceptor extends AbstractLogicInterceptor {
 			PatientGuardian patientGuardian = patientReported.getPatientGuardians().get(i);
 			if (StringUtils.isBlank(patientGuardian.getName().getNameLast())) {
 				ProcessingException pe = new ProcessingException("Next-of-kin last name is empty", "NK1", i, 2, IisReportableSeverity.WARN);
-				iisReportableList.add(IisReportable.fromProcessingException(pe));
+				iisReportableList.add(ReportableUtil.fromProcessingException(pe));
 			}
 			if (StringUtils.isBlank(patientGuardian.getName().getNameFirst())) {
 				ProcessingException pe = new ProcessingException("Next-of-kin first name is empty", "NK1", i, 2, IisReportableSeverity.WARN);
-				iisReportableList.add(IisReportable.fromProcessingException(pe));
+				iisReportableList.add(ReportableUtil.fromProcessingException(pe));
 			}
 
 			if (StringUtils.isBlank(patientGuardian.getGuardianRelationship())) {
 				ProcessingException pe = new ProcessingException("Next-of-kin relationship is empty", "NK1", i, 3, IisReportableSeverity.WARN);
-				iisReportableList.add(IisReportable.fromProcessingException(pe));
+				iisReportableList.add(ReportableUtil.fromProcessingException(pe));
 			}
 			if ("MTH".equals(patientGuardian.getGuardianRelationship()) || "FTH".equals(patientGuardian.getGuardianRelationship()) || "GRD".equals(patientGuardian.getGuardianRelationship())) {
 				break;
 			} else {
 				ProcessingException pe = new ProcessingException((StringUtils.isNotBlank(patientGuardian.getGuardianRelationship()) ? "Next-of-kin relationship not specified so is not recognized as guardian and will be ignored" : ("Next-of-kin relationship '" + patientGuardian.getGuardianRelationship() + "' is not a recognized guardian and will be ignored")), "NK1", i, 3, IisReportableSeverity.WARN);
-				iisReportableList.add(IisReportable.fromProcessingException(pe));
+				iisReportableList.add(ReportableUtil.fromProcessingException(pe));
 			}
 		}
 

@@ -5,6 +5,7 @@ import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.iis.kernal.fhir.interceptors.PartitionCreationInterceptor;
 import org.immregistries.iis.kernal.logic.*;
 import org.immregistries.iis.kernal.logic.ack.IisReportable;
+import org.immregistries.iis.kernal.logic.ack.ReportableUtil;
 import org.immregistries.iis.kernal.model.PatientReported;
 import org.immregistries.iis.kernal.model.ProcessingFlavor;
 import org.immregistries.iis.kernal.model.VaccinationReported;
@@ -54,7 +55,7 @@ public abstract class IncomingMessageHandler<ParsedSource, ValidationResult> imp
 					break;
 				default:
 					ProcessingException pe = new ProcessingException("Unsupported message", "", 0, 0);
-					List<IisReportable> iisReportableList = List.of(IisReportable.fromProcessingException(pe));
+					List<IisReportable> iisReportableList = List.of(ReportableUtil.fromProcessingException(pe));
 					responseMessage = buildResultWithoutValidation(parsedSource, iisReportableList, processingFlavorSet);
 					messageRecordingService.recordMessageReceived(message, null, responseMessage, "Unknown", "NAck", tenant);
 					break;
@@ -63,7 +64,7 @@ public abstract class IncomingMessageHandler<ParsedSource, ValidationResult> imp
 		} catch (Exception e) {
 			e.printStackTrace(System.err);
 			List<IisReportable> iisReportableList = new ArrayList<>();
-			iisReportableList.add(IisReportable.fromProcessingException(new ProcessingException("Internal error prevented processing: " + e.getMessage(), null, 0, 0)));
+			iisReportableList.add(ReportableUtil.fromProcessingException(new ProcessingException("Internal error prevented processing: " + e.getMessage(), null, 0, 0)));
 			responseMessage = buildResultWithoutValidation(parsedSource, iisReportableList, processingFlavorSet);
 		}
 		return responseMessage;
@@ -95,7 +96,7 @@ public abstract class IncomingMessageHandler<ParsedSource, ValidationResult> imp
 			messageRecordingService.recordMessageReceived(message, patientReported, ack, "Update", "Ack", tenant);
 			return ack;
 		} catch (ProcessingException e) {
-			IisReportable exceptionReportable = IisReportable.fromProcessingException(e);
+			IisReportable exceptionReportable = ReportableUtil.fromProcessingException(e);
 			if (!iisReportableList.contains(exceptionReportable)) {
 				iisReportableList.add(exceptionReportable);
 			}

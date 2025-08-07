@@ -12,6 +12,7 @@ import org.immregistries.iis.kernal.logic.*;
 import org.immregistries.iis.kernal.logic.ack.IisHL7Util;
 import org.immregistries.iis.kernal.logic.ack.IisReportable;
 import org.immregistries.iis.kernal.logic.ack.IisReportableSeverity;
+import org.immregistries.iis.kernal.logic.ack.ReportableUtil;
 import org.immregistries.iis.kernal.mapping.interfaces.ImmunizationMapper;
 import org.immregistries.iis.kernal.mapping.interfaces.ObservationMapper;
 import org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester;
@@ -109,14 +110,14 @@ public class IncomingQueryHandler {
 				fieldPosition = 6;
 			}
 			if (StringUtils.isNotBlank(problem)) {
-				reportables.add(IisReportable.fromProcessingException(new ProcessingException(problem, "QPD", 1, fieldPosition)));
+				reportables.add(ReportableUtil.fromProcessingException(new ProcessingException(problem, "QPD", 1, fieldPosition)));
 			} else {
 				ModelName modelName = new ModelName(patientNameLast, patientNameFirst, patientNameMiddle, "");
 				patientMasterForMatchQuery.addPatientName(modelName);
 				patientMasterForMatchQuery.setBirthDate(patientBirthDate);
 			}
 		} else {
-			reportables.add(IisReportable.fromProcessingException(new ProcessingException("QPD segment not found", null, 0, 0)));
+			reportables.add(ReportableUtil.fromProcessingException(new ProcessingException("QPD segment not found", null, 0, 0)));
 		}
 
 		Date cutoff = null;
@@ -151,7 +152,7 @@ public class IncomingQueryHandler {
 		MqeMessageServiceResponse mqeMessageServiceResponse = validationService.getMqeMessageService().processMessage(messageReceived);
 		boolean sendInformations = true;
 		if (processingFlavorSet.contains(ProcessingFlavor.STARFRUIT) && (StringUtils.defaultString(patientMaster.getNameFirst()).startsWith("S") || StringUtils.defaultString(patientMaster.getNameFirst()).startsWith("A"))) {
-			iisReportables.add(IisReportable.fromProcessingException(new ProcessingException("Immunization History cannot be shared because of patient's consent status", "PID", 0, 0, IisReportableSeverity.NOTICE)));
+			iisReportables.add(ReportableUtil.fromProcessingException(new ProcessingException("Immunization History cannot be shared because of patient's consent status", "PID", 0, 0, IisReportableSeverity.NOTICE)));
 			sendInformations = false;
 		}
 		reader.resetPostion();
@@ -224,7 +225,7 @@ public class IncomingQueryHandler {
 					categoryResponse = MATCH;
 				}
 			} else {
-				iisReportables.add(IisReportable.fromProcessingException(new ProcessingException("Unrecognized profile id '" + profileIdSubmitted + "'", "MSH", 1, 21)));
+				iisReportables.add(ReportableUtil.fromProcessingException(new ProcessingException("Unrecognized profile id '" + profileIdSubmitted + "'", "MSH", 1, 21)));
 			}
 			// TODO remove notices ?
 			hl7MessageWriter.createMSH(RSP_K_11_RSP_K_11, profileId, reader, sb, processingFlavorSet);

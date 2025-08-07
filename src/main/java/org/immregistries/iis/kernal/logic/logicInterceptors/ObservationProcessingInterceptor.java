@@ -13,6 +13,7 @@ import org.immregistries.iis.kernal.logic.CodeMapManager;
 import org.immregistries.iis.kernal.logic.ProcessingException;
 import org.immregistries.iis.kernal.logic.ack.IisReportable;
 import org.immregistries.iis.kernal.logic.ack.IisReportableSeverity;
+import org.immregistries.iis.kernal.logic.ack.ReportableUtil;
 import org.immregistries.iis.kernal.mapping.interfaces.ObservationMapper;
 import org.immregistries.iis.kernal.model.ObservationReported;
 import org.immregistries.iis.kernal.model.ProcessingFlavor;
@@ -71,17 +72,17 @@ public class ObservationProcessingInterceptor extends AbstractLogicInterceptor {
 			Code contraCode = codeMap.getCodeForCodeset(CodesetType.CONTRAINDICATION_OR_PRECAUTION, observationReported.getValueCode());
 			if (contraCode == null) {
 				ProcessingException pe = new ProcessingException("Unrecognized contraindication or precaution", "OBX", obxCount, 5, IisReportableSeverity.WARN);
-				iisReportableList.add(IisReportable.fromProcessingException(pe));
+				iisReportableList.add(ReportableUtil.fromProcessingException(pe));
 			}
 			if (observationReported.getObservationDate() != null) {
 				Date today = new Date();
 				if (observationReported.getObservationDate().after(today)) {
 					ProcessingException pe = new ProcessingException("Contraindication or precaution observed in the future", "OBX", obxCount, 5, IisReportableSeverity.WARN);
-					iisReportableList.add(IisReportable.fromProcessingException(pe));
+					iisReportableList.add(ReportableUtil.fromProcessingException(pe));
 				}
 				if (patientBirthDate != null && observationReported.getObservationDate().before(patientBirthDate)) {
 					ProcessingException pe = new ProcessingException("Contraindication or precaution observed before patient was born", "OBX", obxCount, 14, IisReportableSeverity.WARN);
-					iisReportableList.add(IisReportable.fromProcessingException(pe));
+					iisReportableList.add(ReportableUtil.fromProcessingException(pe));
 				} 
 			}
 		}
