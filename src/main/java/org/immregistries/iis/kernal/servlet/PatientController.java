@@ -39,12 +39,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Base64;
 import java.util.List;
 import java.util.Set;
 
+import static org.immregistries.iis.kernal.fhir.shl.ShlUtilService.SHLINK_PREFIX;
 import static org.immregistries.iis.kernal.servlet.PatientController.PATIENT_BASE_PATH;
 import static org.immregistries.iis.kernal.servlet.PatientServletUtil.*;
-import static org.immregistries.iis.kernal.servlet.PatientShLinkController.MANIFEST_PATH_SUFFIX;
+import static org.immregistries.iis.kernal.servlet.PatientShlinkManifestController.MANIFEST_PATH_SUFFIX;
 
 @RestController
 @RequestMapping({PATIENT_BASE_PATH, TenantController.TENANT_PATH + PATIENT_BASE_PATH})
@@ -140,13 +142,28 @@ public class PatientController {
 		out.println("</div>");
 		out.println("<div class=\"w3-container\">");
 		out.println("<img src=\"/iis/patient/qr?id=" + patientMasterSelected.getPatientId() + "\"  alt=\"shlink\" width=\"200\">");
-		out.println("<p>");
-//		UriComponentsBuilder..fromHttpRequest(new ServletServerHttpRequest(request)).build().toUriString()
-		String manifestUrl = req.getRequestURL() + MANIFEST_PATH_SUFFIX + "?id=" + patientSelected.getIdElement().getIdPart();
+
+		String manifestUrl = req.getRequestURL() + MANIFEST_PATH_SUFFIX + "/" + patientSelected.getIdElement().getIdPart();
+
+		out.println("<a href= \"" + manifestUrl + "\">" + manifestUrl + "</a>");
+
+		out.println("<p id =\"qrCode\">");
 		ShLinkPayload shLinkPayload = PatientShLinkController.getPatientShLinkPayload(manifestUrl);
-		out.println(manifestUrl);
-		out.println(shlUtilService.qrCode(shLinkPayload));
+		String qrCode = shlUtilService.qrCode(shLinkPayload);
+		String decodedFrom64 = new String(Base64.getUrlDecoder().decode(qrCode.substring(SHLINK_PREFIX.length()).getBytes()));
+		logger.info(decodedFrom64);
+		out.println(qrCode);
 		out.println("</p>");
+
+		out.println("<button onclick=\"copyHtmlToClipboard()\">Copy HTML</button>");
+		out.println("<script>");
+		out.println("function copyHtmlToClipboard() {");
+		out.println("    const content = ");
+		out.println("    navigator.clipboard.writeText(content)");
+		out.println("        .then(() => { console.log('HTML copied to clipboard'); })");
+		out.println("        .catch(err => { console.error('Failed to copy HTML: ', err); });");
+		out.println("}");
+		out.println("</script>");
 
 
 		out.println("</div>");

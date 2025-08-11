@@ -30,7 +30,7 @@ import java.util.List;
 
 import static org.immregistries.iis.kernal.servlet.TenantUrlFilter.TENANT_NAME_URL;
 
-public class ServletHelper {
+public final class ServletHelper {
 	private static final Logger logger = LoggerFactory.getLogger(ServletHelper.class);
 	public static final String GITHUB_PREFIX = "github-";
 	public static final String SESSION_TENANT = "tenant";
@@ -52,6 +52,20 @@ public class ServletHelper {
 		return factory.openSession();
 	}
 
+
+	public static Tenant authenticateTenantNoUsername(String password, String facilityName, Session dataSession, PartitionCreationInterceptor partitionCreationInterceptor) {
+		Query query = dataSession.createQuery("from Tenant where organizationName = ?1", Tenant.class);
+		query.setParameter(1, facilityName);
+		Tenant tenant = (Tenant) query.getSingleResult();
+		if (tenant == null) {
+			throw new RuntimeException("Invalid tenantName");
+		}
+		UserAccess tenantUserAccess = tenant.getUserAccess();
+		String username = tenantUserAccess.getAccessName();
+
+		UserAccess userAccess = authenticateUserAccessUsernamePassword(username, password, dataSession);
+		return authenticateTenant(userAccess, facilityName, dataSession, partitionCreationInterceptor);
+	}
 
 	public static Tenant authenticateTenant(String username, String password, String facilityName, Session dataSession, PartitionCreationInterceptor partitionCreationInterceptor) {
 		UserAccess userAccess = authenticateUserAccessUsernamePassword(username,password,dataSession);

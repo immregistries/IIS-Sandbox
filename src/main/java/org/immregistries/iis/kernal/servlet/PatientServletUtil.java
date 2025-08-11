@@ -290,10 +290,10 @@ public final class PatientServletUtil {
 	public static IDomainResource fetchPatientFromParameter(HttpServletRequest req, IGenericClient fhirClient, AbstractFhirRequester fhirRequester) {
 		String idParam = req.getParameter(PARAM_PATIENT_REPORTED_ID);
 		String identifierParam = req.getParameter(PARAM_PATIENT_REPORTED_EXTERNAL_LINK);
-		return fetchPatientFromParameters(fhirClient, fhirRequester, idParam, identifierParam);
+		return fetchPatientFromParameters(idParam, identifierParam, fhirClient, fhirRequester);
 	}
 
-	public static @Nullable IDomainResource fetchPatientFromParameters(IGenericClient fhirClient, AbstractFhirRequester fhirRequester, String idParam, String identifierParam) {
+	public static @Nullable IDomainResource fetchPatientFromParameters(String idParam, String identifierParam, IGenericClient fhirClient, AbstractFhirRequester fhirRequester) {
 		IDomainResource patient = null;
 		if (idParam != null) {
 			patient = (IDomainResource) fhirClient.read().resource("Patient").withId(idParam).execute();
