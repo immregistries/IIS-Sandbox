@@ -17,6 +17,8 @@ import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFacto
 import org.immregistries.iis.kernal.model.ShlinkManifestRequestBody;
 import org.immregistries.iis.kernal.model.persisted.ShLinkManifest;
 import org.immregistries.iis.kernal.model.persisted.Tenant;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.web.bind.annotation.*;
@@ -33,6 +35,7 @@ public class PatientShlinkManifestController {
 
 	public static final String MANIFEST_PATH_SUFFIX = "/manifest";
 	public static final String PATIENT_MANIFEST_FULL_PATH = TenantController.TENANT_PATH + MANIFEST_PATH_SUFFIX;
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 
 	@Autowired

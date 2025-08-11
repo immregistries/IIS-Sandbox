@@ -55,6 +55,7 @@ public class ServerSecurityConfig {
 			.csrf((csrf) -> csrf
 				.ignoringRequestMatchers(
 					new AntPathRequestMatcher(PATIENT_MANIFEST_FULL_PATH + "/**"),
+					new AntPathRequestMatcher("/tenant/*/manifest/**"),
 					new AntPathRequestMatcher(PopController.POP_BASE_PATH),
 					new AntPathRequestMatcher(V2ToFhirController.V2_TO_FHIR_BASE_PATH),
 					new AntPathRequestMatcher(FhirMessagingController.FHIR_MESSAGING_BASE_PATH),
