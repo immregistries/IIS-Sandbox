@@ -14,8 +14,6 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import static org.immregistries.iis.kernal.servlet.LoginServlet.PARAM_PASSWORD;
 import static org.immregistries.iis.kernal.servlet.LoginServlet.PARAM_USERID;
-import static org.immregistries.iis.kernal.servlet.PatientController.PATIENT_BASE_PATH;
-import static org.immregistries.iis.kernal.servlet.PatientShlinkManifestController.MANIFEST_PATH_SUFFIX;
 import static org.immregistries.iis.kernal.servlet.PatientShlinkManifestController.PATIENT_MANIFEST_FULL_PATH;
 import static org.immregistries.iis.kernal.servlet.ShLinksManifestController.SHLINKS_CONTROLLER_BASE_URL;
 
@@ -32,7 +30,7 @@ public class ServerSecurityConfig {
 		http
 			.authorizeHttpRequests((authorize) -> authorize
 				.requestMatchers(HttpMethod.GET, "/", "/home", PopController.POP_BASE_PATH, "/SubscriptionTopic/**", "/img/**").permitAll()
-				.requestMatchers(PATIENT_MANIFEST_FULL_PATH + "/**", SHLINKS_CONTROLLER_BASE_URL).permitAll() //Shlinks
+				.requestMatchers("/tenant/*/manifest/**", SHLINKS_CONTROLLER_BASE_URL).permitAll() //Shlinks
 				.requestMatchers("/loginForm", "/oauth2/**", "/login").permitAll()
 				// API AUTHORIZATION AND AUTHENTICATION SEPARATED
 				.requestMatchers("/fhir/**", "/soap", FhirMessagingController.FHIR_MESSAGING_BASE_PATH + "/soap", "/.well-known/smart-configuration", "/registerClient", "/token").permitAll()
@@ -56,7 +54,7 @@ public class ServerSecurityConfig {
 			)
 			.csrf((csrf) -> csrf
 				.ignoringRequestMatchers(
-					new AntPathRequestMatcher(PATIENT_BASE_PATH + MANIFEST_PATH_SUFFIX + "/**"),
+					new AntPathRequestMatcher(PATIENT_MANIFEST_FULL_PATH + "/**"),
 					new AntPathRequestMatcher(PopController.POP_BASE_PATH),
 					new AntPathRequestMatcher(V2ToFhirController.V2_TO_FHIR_BASE_PATH),
 					new AntPathRequestMatcher(FhirMessagingController.FHIR_MESSAGING_BASE_PATH),

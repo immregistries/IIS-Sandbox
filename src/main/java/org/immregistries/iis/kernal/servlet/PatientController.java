@@ -46,7 +46,6 @@ import java.util.Set;
 import static org.immregistries.iis.kernal.fhir.shl.ShlUtilService.SHLINK_PREFIX;
 import static org.immregistries.iis.kernal.servlet.PatientController.PATIENT_BASE_PATH;
 import static org.immregistries.iis.kernal.servlet.PatientServletUtil.*;
-import static org.immregistries.iis.kernal.servlet.PatientShlinkManifestController.MANIFEST_PATH_SUFFIX;
 
 @RestController
 @RequestMapping({PATIENT_BASE_PATH, TenantController.TENANT_PATH + PATIENT_BASE_PATH})
@@ -143,7 +142,7 @@ public class PatientController {
 		out.println("<div class=\"w3-container\">");
 		out.println("<img src=\"/iis/patient/qr?id=" + patientMasterSelected.getPatientId() + "\"  alt=\"shlink\" width=\"200\">");
 
-		String manifestUrl = req.getRequestURL() + MANIFEST_PATH_SUFFIX + "/" + patientSelected.getIdElement().getIdPart();
+		String manifestUrl = PatientShLinkController.getManifestUrl(req, patientSelected, tenant);
 
 		out.println("<a href= \"" + manifestUrl + "\">" + manifestUrl + "</a>");
 

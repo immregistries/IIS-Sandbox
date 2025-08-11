@@ -14,6 +14,7 @@ import org.immregistries.iis.kernal.fhir.shl.ShlUtilService;
 import org.immregistries.iis.kernal.mapping.interfaces.PatientMapper;
 import org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester;
 import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
+import org.immregistries.iis.kernal.model.ShlinkManifestRequestBody;
 import org.immregistries.iis.kernal.model.persisted.ShLinkManifest;
 import org.immregistries.iis.kernal.model.persisted.Tenant;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +32,7 @@ import static org.immregistries.iis.kernal.servlet.PatientShlinkManifestControll
 public class PatientShlinkManifestController {
 
 	public static final String MANIFEST_PATH_SUFFIX = "/manifest";
-	public static final String PATIENT_MANIFEST_FULL_PATH = TenantController.TENANT_PATH + PATIENT_BASE_PATH + MANIFEST_PATH_SUFFIX;
+	public static final String PATIENT_MANIFEST_FULL_PATH = TenantController.TENANT_PATH + MANIFEST_PATH_SUFFIX;
 
 
 	@Autowired
@@ -47,8 +48,29 @@ public class PatientShlinkManifestController {
 	@Autowired
 	private PartitionCreationInterceptor partitionCreationInterceptor;
 
-	@GetMapping({"", "/{id}"})
-	@PostMapping({"", "/{id}"})
+	@PostMapping({PATIENT_BASE_PATH, PATIENT_BASE_PATH + "/{id}"})
+	protected ShLinkManifest postPatientShLinkManifest(HttpServletRequest req, HttpServletResponse resp,
+																	  @PathVariable("id") String id,
+																		@PathVariable("tenantName") String tenantName,
+																		@RequestBody ShlinkManifestRequestBody body) throws IOException, ServletException {
+		String passcode = body.getPasscode();
+		resp.setContentType("application/json");
+		try (Session dataSession = ServletHelper.getDataSession()) {
+			Tenant tenant = null;
+			if (StringUtils.isNotBlank(passcode)) {
+				tenant = ServletHelper.authenticateTenantNoUsername(passcode, tenantName, dataSession, partitionCreationInterceptor);
+			}
+			if (tenant == null) {
+//				if (ServletHelper.getUserAccess() != null) {
+//					resp.sendRedirect("/iis/tenant");
+//				}
+				throw new AuthenticationCredentialsNotFoundException("No tenant found or invalid passcode");
+			}
+			return getShLinkManifest(req, id, tenant);
+		}
+	}
+
+	@GetMapping({PATIENT_BASE_PATH, PATIENT_BASE_PATH + "/{id}"})
 	protected ShLinkManifest getPatientShLinkManifest(HttpServletRequest req, HttpServletResponse resp,
 																	  @PathVariable("id") String id,
 																	  @PathVariable("tenantName") String tenantName,
@@ -58,20 +80,20 @@ public class PatientShlinkManifestController {
 		resp.setContentType("application/json");
 		try (Session dataSession = ServletHelper.getDataSession()) {
 			Tenant tenant;
-			if (StringUtils.isNotBlank(passcode)) {
-				tenant = ServletHelper.authenticateTenantNoUsername(passcode, tenantName, dataSession, partitionCreationInterceptor);
-			} else {
 				tenant = ServletHelper.getTenant(req, dataSession);
-			}
 			if (tenant == null) {
 				if (ServletHelper.getUserAccess() != null) {
 					resp.sendRedirect("/iis/tenant");
 				}
 				throw new AuthenticationCredentialsNotFoundException("");
 			}
-			IGenericClient fhirClient = repositoryClientFactory.newGenericClient(req);
-			IBaseResource patientSelected = fetchPatientFromParameters(id, "", fhirClient, fhirRequester);
-			return shlUtilService.generateExamplePatientManifest(tenant, patientSelected.getIdElement());
+			return getShLinkManifest(req, id, tenant);
 		}
+	}
+
+	private ShLinkManifest getShLinkManifest(HttpServletRequest req, String id, Tenant tenant) {
+		IGenericClient fhirClient = repositoryClientFactory.newGenericClient(req);
+		IBaseResource patientSelected = fetchPatientFromParameters(id, "", fhirClient, fhirRequester);
+		return shlUtilService.generateExamplePatientManifest(tenant, patientSelected.getIdElement());
 	}
 }

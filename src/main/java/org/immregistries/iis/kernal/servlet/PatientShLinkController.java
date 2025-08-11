@@ -29,6 +29,7 @@ import java.io.OutputStream;
 
 import static org.immregistries.iis.kernal.servlet.PatientController.PATIENT_BASE_PATH;
 import static org.immregistries.iis.kernal.servlet.PatientServletUtil.fetchPatientFromParameter;
+import static org.immregistries.iis.kernal.servlet.PatientShlinkManifestController.MANIFEST_PATH_SUFFIX;
 
 @RestController
 @RequestMapping({PATIENT_BASE_PATH, TenantController.TENANT_PATH + PATIENT_BASE_PATH})
@@ -72,7 +73,7 @@ public class PatientShLinkController {
 //				ShLinkManifest shLinkManifest = shlUtilService.generateExamplePatientManifest(tenant, patientMaster);
 //				shLinkManifest = shlUtilService.saveManifest(shLinkManifest);
 
-				String qrcode = getQrcode(req, patientSelected);
+				String qrcode = getQrcode(req, patientSelected, tenant);
 				shlUtilService.printQrCodeAsImage(outputStream, qrcode);
 			}
 		}
@@ -80,16 +81,14 @@ public class PatientShLinkController {
 		outputStream.close();
 	}
 
-	private String getQrcode(HttpServletRequest req, IBaseResource patientSelected) {
-		String manifestUrl = getManifestUrl(req, patientSelected);
+	private String getQrcode(HttpServletRequest req, IBaseResource patientSelected, Tenant tenant) {
+		String manifestUrl = getManifestUrl(req, patientSelected, tenant);
 		ShLinkPayload shLinkPayload = getPatientShLinkPayload(manifestUrl);
 
 		return shlUtilService.qrCode(shLinkPayload);
 	}
 
 	public static @NotNull ShLinkPayload getPatientShLinkPayload(String manifestUrl) {
-
-
 		ShLinkPayload shLinkPayload = new ShLinkPayload();
 		shLinkPayload.setUrl(manifestUrl);
 		shLinkPayload.setLabel("Generated for testing");
@@ -99,8 +98,13 @@ public class PatientShLinkController {
 		return shLinkPayload;
 	}
 
-	private static @NotNull String getManifestUrl(HttpServletRequest req, IBaseResource patientSelected) {
-		return StringUtils.substringBeforeLast(req.getRequestURL().toString(), SHLINK_QR_CODE_PATH_SUFFIX) + MANIFEST_PATH_SUFFIX + "/" + patientSelected.getIdElement().getIdPart();
+	public static @NotNull String getManifestUrl(HttpServletRequest req, IBaseResource patientSelected, Tenant tenant) {
+		String baseUrl = StringUtils.substringBefore(req.getRequestURL().toString(), req.getServletPath());
+		return getManifestUrl(baseUrl, patientSelected, tenant);
+	}
+
+	public static @NotNull String getManifestUrl(String baseUrl, IBaseResource patientSelected, Tenant tenant) {
+		return baseUrl + TenantController.TENANT_BASE_PATH + "/" + tenant.getOrganizationName() + MANIFEST_PATH_SUFFIX + "/patient/" + patientSelected.getIdElement().getIdPart();
 	}
 
 
