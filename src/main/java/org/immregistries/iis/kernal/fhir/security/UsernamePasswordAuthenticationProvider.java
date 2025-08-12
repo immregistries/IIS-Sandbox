@@ -23,7 +23,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import static org.immregistries.iis.kernal.fhir.security.ServletHelper.SESSION_TENANT;
 import static org.immregistries.iis.kernal.fhir.security.ServletHelper.SESSION_USER_ACCESS;
-import static org.immregistries.iis.kernal.servlet.LoginServlet.PARAM_TENANT_NAME;
+import static org.immregistries.iis.kernal.servlet.LoginController.PARAM_TENANT_NAME;
 
 
 @Component

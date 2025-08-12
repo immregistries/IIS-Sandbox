@@ -138,10 +138,10 @@ public class FhirMessagingController {
 				message = fhirContext.newJsonParser().setPrettyPrint(true).encodeResourceToString(bundle);
 			}
 
-			HomeServlet.doHeader(out, "IIS Sandbox - FHIR Messaging", tenant);
+			HomeController.doHeader(out, "IIS Sandbox - FHIR Messaging", tenant);
 			out.println("<h2>Experimental FHIR Messaging Endpoint</h2>");
 			PopController.printForm(out, "FHIR Bundle", message, organizationName, FHIR_MESSAGING_PATH_KEY);
-			HomeServlet.doFooter(out);
+			HomeController.doFooter(out);
 
 		} catch (Exception e) {
 			e.printStackTrace(System.err);

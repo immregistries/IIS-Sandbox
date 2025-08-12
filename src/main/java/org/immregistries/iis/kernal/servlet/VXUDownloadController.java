@@ -7,19 +7,25 @@ import jakarta.servlet.http.HttpSession;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.model.persisted.UserAccess;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.io.*;
 
 @SuppressWarnings("serial")
-public class VXUDownloadServlet extends VXUDownloadFormServlet {
+@RestController
+@RequestMapping({"/VXUDownload", TenantController.TENANT_PATH + "/VXUDownload"})
+public class VXUDownloadController extends VXUDownloadFormController {
 
-
+	@PostMapping
   protected void doPost(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
     doGet(req, resp);
   }
 
-  @Override
+	@GetMapping
   protected void doGet(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
 

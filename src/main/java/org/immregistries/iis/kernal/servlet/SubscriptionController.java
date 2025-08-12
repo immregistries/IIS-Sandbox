@@ -6,19 +6,24 @@ import ca.uhn.fhir.parser.IParser;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletInputStream;
-import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.tuple.MutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.hl7.fhir.r5.model.Bundle;
 import org.hl7.fhir.r5.model.Subscription;
+import org.immregistries.iis.kernal.fhir.common.annotations.OnR5Condition;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.logic.SubscriptionService;
 import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
 import org.immregistries.iis.kernal.model.persisted.Tenant;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -30,7 +35,10 @@ import java.util.Map;
 /**
  * Only Supported with Fhir R5
  */
-public class SubscriptionServlet extends HttpServlet {
+@Conditional(OnR5Condition.class)
+@RestController
+@RequestMapping({"/subscription", TenantController.TENANT_PATH + "/subscription"})
+public class SubscriptionController {
 	@Autowired
 	RepositoryClientFactory repositoryClientFactory;
 	@Autowired
@@ -69,7 +77,7 @@ public class SubscriptionServlet extends HttpServlet {
 	 * @throws ServletException
 	 * @throws IOException
 	 */
-	@Override
+	@PostMapping
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
 		throws ServletException, IOException {
 		// TODO action as manual trigger with content
@@ -87,7 +95,7 @@ public class SubscriptionServlet extends HttpServlet {
 
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
-		HomeServlet.doHeader(out, "IIS Sandbox - SubscriptionsResult", tenant);
+		HomeController.doHeader(out, "IIS Sandbox - SubscriptionsResult", tenant);
 
 		try {
 			Bundle searchBundle = localClient.search().forResource(Subscription.class)
@@ -130,7 +138,7 @@ public class SubscriptionServlet extends HttpServlet {
 	}
 
 
-	@Override
+	@GetMapping
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
 		throws ServletException, IOException {
 		Tenant tenant = ServletHelper.getTenant();
@@ -160,7 +168,7 @@ public class SubscriptionServlet extends HttpServlet {
 									PrintWriter out,IGenericClient fhirClient, String subscriptionId) {
 
 		try {
-			HomeServlet.doHeader(out, "IIS Sandbox - Subscriptions", ServletHelper.getTenant());
+			HomeController.doHeader(out, "IIS Sandbox - Subscriptions", ServletHelper.getTenant());
 			ServletInputStream servletInputStream = req.getInputStream();
 
 			String[] initialMessages = new String[]{OPERATION_SAMPLE};
@@ -220,7 +228,7 @@ public class SubscriptionServlet extends HttpServlet {
 			} else {
 				out.println("<div class=\"w3-panel w3-yellow\"><p>Not Found</p></div>");
 			}
-			HomeServlet.doFooter(out);
+			HomeController.doFooter(out);
 
 		} catch (Exception e) {
 			e.printStackTrace(System.err);
@@ -247,7 +255,7 @@ public class SubscriptionServlet extends HttpServlet {
 				bundle = fhirClient.search().forResource(Subscription.class).returnBundle(Bundle.class).execute();
 			}
 
-			HomeServlet.doHeader(out, "IIS Sandbox - Subscriptions", ServletHelper.getTenant());
+			HomeController.doHeader(out, "IIS Sandbox - Subscriptions", ServletHelper.getTenant());
 
 			out.println("    <div class=\"w3-container w3-half w3-margin-top\">");
 			out.println("    <h3>Search Subscription</h3>");
@@ -302,7 +310,7 @@ public class SubscriptionServlet extends HttpServlet {
 			} else {
 				out.println("<div class=\"w3-panel w3-yellow\"><p>No Records Found</p></div>");
 			}
-			HomeServlet.doFooter(out);
+			HomeController.doFooter(out);
 
 		} catch (Exception e) {
 			e.printStackTrace(System.err);

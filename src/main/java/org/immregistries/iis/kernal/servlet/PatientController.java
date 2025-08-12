@@ -101,7 +101,7 @@ public class PatientController {
 			}
 			IGenericClient fhirClient = repositoryClientFactory.newGenericClient(req);
 			try {
-				HomeServlet.doHeader(out, "IIS Sandbox - Patients", tenant);
+				HomeController.doHeader(out, "IIS Sandbox - Patients", tenant);
 				IBaseResource patientSelected = fetchPatientFromParameter(req, fhirClient, fhirRequester);
 
 				if (patientSelected == null) {
@@ -113,7 +113,7 @@ public class PatientController {
 				e.printStackTrace(System.err);
 			}
 		}
-		HomeServlet.doFooter(out);
+		HomeController.doFooter(out);
 		out.flush();
 		out.close();
 	}
@@ -234,7 +234,7 @@ public class PatientController {
 		}
 		out.println("<h4>Related Patient records</h4>");
 		printPatientList(out, relatedPatients, false);
-		HomeServlet.printGoldenRecordExplanation(out, isGolden);
+		HomeController.printGoldenRecordExplanation(out, isGolden);
 	}
 
 	private void printPatientVaccinations(PrintWriter out, PatientMaster patientMasterSelected, boolean isGolden) {

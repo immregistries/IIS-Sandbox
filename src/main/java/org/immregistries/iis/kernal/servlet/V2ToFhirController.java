@@ -67,7 +67,7 @@ public class V2ToFhirController {
 				resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 				out.println("Access is not authorized. FacilityId, userid and/or password are not recognized. ");
 			} else {
-				HomeServlet.doHeader(out, "IIS Sandbox - V2ToFhir Result", tenant);
+				HomeController.doHeader(out, "IIS Sandbox - V2ToFhir Result", tenant);
 				MessageParser parser = new MessageParser();
 				try {
 					Bundle bundle = parser.convert(message);
@@ -117,10 +117,10 @@ public class V2ToFhirController {
 				message = testCaseMessage.getMessageText();
 			}
 
-			HomeServlet.doHeader(out, "IIS Sandbox - v2ToFhir", tenant);
+			HomeController.doHeader(out, "IIS Sandbox - v2ToFhir", tenant);
 			out.println("<h2>Convert to FHIR</h2>");
 			PopController.printForm(out, "V2 Message", message, organizationName, V2_TO_FHIR_PATH_KEY);
-			HomeServlet.doFooter(out);
+			HomeController.doFooter(out);
 		} catch (Exception e) {
 			e.printStackTrace(System.err);
 		}

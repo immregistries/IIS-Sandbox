@@ -12,7 +12,6 @@ import ca.uhn.fhir.rest.gclient.ICriterion;
 import ca.uhn.fhir.rest.gclient.ICriterionInternal;
 import ca.uhn.fhir.rest.param.TokenParam;
 import ca.uhn.fhir.rest.param.TokenParamModifier;
-import ca.uhn.fhir.rest.server.RestfulServer;
 import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.instance.model.api.IBaseResource;
@@ -67,8 +66,8 @@ public abstract class AbstractFhirRequester<
 	DaoRegistry daoRegistry;
 	@Autowired
 	FhirContext fhirContext;
-	@Autowired
-	RestfulServer fhirServer;
+//	@Autowired
+//	RestfulServer fhirServer;
 
 	@Autowired
 	IPartitionLookupSvc partitionLookupSvc;

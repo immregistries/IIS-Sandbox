@@ -1,7 +1,6 @@
 package org.immregistries.iis.kernal.servlet;
 
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.hibernate.SessionFactory;
@@ -11,25 +10,31 @@ import org.immregistries.smm.tester.manager.query.QueryType;
 import org.immregistries.smm.transform.ScenarioManager;
 import org.immregistries.smm.transform.TestCaseMessage;
 import org.immregistries.smm.transform.Transformer;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 
 @SuppressWarnings("serial")
-public class QueryConverterServlet extends HttpServlet {
+@RestController
+@RequestMapping({"/queryConverter", TenantController.TENANT_PATH + "/queryConverter"})
+public class QueryConverterController {
 
   public static final String PARAM_MESSAGE = "MESSAGEDATA";
   public static final String QUERY_TYPE = "queryType";
 
   private static SessionFactory factory;
 
-  @Override
+	@PostMapping
   protected void doPost(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
     doGet(req, resp);
   }
 
-  @Override
+	@GetMapping
   protected void doGet(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
 
@@ -54,7 +59,7 @@ public class QueryConverterServlet extends HttpServlet {
         message = queryConverter.convert(message);
       }
       {
-			HomeServlet.doHeader(out, "IIS Sandbox", ServletHelper.getTenant());
+			HomeController.doHeader(out, "IIS Sandbox", ServletHelper.getTenant());
 			out.println("    <h2>Convert VXU to QBP</h2>");
         out.println("    <form action=\"queryConverter\" method=\"POST\">");
         if (queryConverter == null) {
@@ -78,7 +83,7 @@ public class QueryConverterServlet extends HttpServlet {
         }
         out.println("    </div>");
         out.println("    </form>");
-        HomeServlet.doFooter(out);
+			HomeController.doFooter(out);
       }
     } catch (Exception e) {
       e.printStackTrace(System.err);

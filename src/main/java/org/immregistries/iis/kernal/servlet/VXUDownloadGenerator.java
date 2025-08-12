@@ -137,7 +137,7 @@ public class VXUDownloadGenerator extends Thread {
     }
     cvxCodes = req.getParameter(PARAM_CVX_CODES);
     if (StringUtils.isEmpty(cvxCodes)) {
-      cvxCodes = CovidServlet.COVID_CVX_CODES;
+      cvxCodes = CovidController.COVID_CVX_CODES;
     }
     includePhi =
         req.getParameter(PARAM_CVX_CODES) == null || req.getParameter(PARAM_INCLUDE_PHI) != null;

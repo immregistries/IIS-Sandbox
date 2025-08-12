@@ -1,11 +1,14 @@
 package org.immregistries.iis.kernal.servlet;
 
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.mqe.hl7util.parser.HL7Reader;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -13,7 +16,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 @SuppressWarnings("serial")
-public class LabServlet extends HttpServlet {
+@RestController
+@RequestMapping({"/lab", TenantController.TENANT_PATH + "/lab"})
+public class LabController {
 
 
   public static final String ACTION_CONVERT = "Convert";
@@ -104,13 +109,13 @@ public class LabServlet extends HttpServlet {
           + "NTE|1|L|94309-2 is a report code. It should be conditional in the panel = either this OR all the target codes MUST be used; both may be used also.\r"
           + "SPM|1|^1905700000256-12&STARLIMS.AR.STAG&2.16.840.1.114222.4.3.3.2.5.2&ISO||258500001^Nasopharyngeal swab (specimen)^SCT|||||||||||||201902281257-0500|201903011118-0500";
 
-  @Override
+	@PostMapping
   protected void doPost(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
     doGet(req, resp);
   }
 
-  @Override
+	@GetMapping
   protected void doGet(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
 
@@ -185,7 +190,7 @@ public class LabServlet extends HttpServlet {
           }
         }
       }
-		 HomeServlet.doHeader(out, "IIS Sandbox", ServletHelper.getTenant(req));
+		 HomeController.doHeader(out, "IIS Sandbox", ServletHelper.getTenant(req));
 
 
 
@@ -218,7 +223,7 @@ public class LabServlet extends HttpServlet {
       System.err.println("Unable to render page: " + e.getMessage());
       e.printStackTrace(System.err);
     }
-    HomeServlet.doFooter(out);
+		HomeController.doFooter(out);
     out.flush();
     out.close();
   }

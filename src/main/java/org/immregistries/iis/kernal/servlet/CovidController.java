@@ -7,12 +7,12 @@ import ca.uhn.fhir.rest.param.ParamPrefixEnum;
 import ca.uhn.fhir.rest.param.ReferenceParam;
 import ca.uhn.fhir.rest.param.TokenParam;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.r5.model.Immunization;
 import org.hl7.fhir.r5.model.Patient;
+import org.immregistries.iis.kernal.fhir.common.annotations.OnR5Condition;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.mapping.forR5.LocationMapperR5;
 import org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester;
@@ -23,7 +23,12 @@ import org.immregistries.iis.kernal.model.PatientReported;
 import org.immregistries.iis.kernal.model.VaccinationReported;
 import org.immregistries.iis.kernal.model.persisted.Tenant;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -33,7 +38,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("serial")
-public class CovidServlet extends HttpServlet {
+@RestController
+@RequestMapping("/covid")
+@Conditional(OnR5Condition.class)
+public class CovidController {
 
 	public static final String COVID_CVX_CODES = "208,207,210,212,211,213";
 	public static final String ACTION_GENERATE = "Generate";
@@ -60,13 +68,14 @@ public class CovidServlet extends HttpServlet {
 	@Autowired
 	LocationMapperR5 locationMapper;
 
+	@PostMapping
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
 		throws ServletException, IOException {
 		doGet(req, resp);
 	}
 
 	@SuppressWarnings("unchecked")
-	@Override
+	@GetMapping
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
 		throws ServletException, IOException {
 		resp.setContentType("text/html");
@@ -87,7 +96,7 @@ public class CovidServlet extends HttpServlet {
 			String messageError = null;
 			String dateStartString = req.getParameter(PARAM_DATE_START);
 			String dateEndString = req.getParameter(PARAM_DATE_END);
-			HomeServlet.doHeader(out, "IIS Sandbox", tenant);
+			HomeController.doHeader(out, "IIS Sandbox", tenant);
 
 
 			Date dateStart = null;
@@ -197,7 +206,7 @@ public class CovidServlet extends HttpServlet {
 			System.err.println("Unable to render page: " + e.getMessage());
 			e.printStackTrace(System.err);
 		}
-		HomeServlet.doFooter(out);
+		HomeController.doFooter(out);
 		out.flush();
 		out.close();
 	}

@@ -12,8 +12,8 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
-import static org.immregistries.iis.kernal.servlet.LoginServlet.PARAM_PASSWORD;
-import static org.immregistries.iis.kernal.servlet.LoginServlet.PARAM_USERID;
+import static org.immregistries.iis.kernal.servlet.LoginController.PARAM_PASSWORD;
+import static org.immregistries.iis.kernal.servlet.LoginController.PARAM_USERID;
 import static org.immregistries.iis.kernal.servlet.shlink.PatientShlinkManifestController.PATIENT_MANIFEST_FULL_PATH;
 import static org.immregistries.iis.kernal.servlet.shlink.ShLinkManifestController.SHLINKS_CONTROLLER_BASE_URL;
 

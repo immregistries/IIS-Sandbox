@@ -68,7 +68,7 @@ public class PopController {
 				resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 				out.println("Access is not authorized. FacilityId, userid and/or password are not recognized. ");
 			} else {
-				HomeServlet.doHeader(out, "IIS Sandbox - PopResult", tenant);
+				HomeController.doHeader(out, "IIS Sandbox - PopResult", tenant);
 
 				messages = message.split(
 					MSH_HEADER_REGEX);
@@ -142,10 +142,10 @@ public class PopController {
 
 
 			{
-				HomeServlet.doHeader(out, "IIS Sandbox - Pop", tenant);
+				HomeController.doHeader(out, "IIS Sandbox - Pop", tenant);
 				out.println("    <h2>Send Now</h2>");
 				printForm(out, "VXU Message", message, organizationName, POP_PATH_KEY);
-				HomeServlet.doFooter(out);
+				HomeController.doFooter(out);
 			}
 		} catch (Exception e) {
 			e.printStackTrace(System.err);

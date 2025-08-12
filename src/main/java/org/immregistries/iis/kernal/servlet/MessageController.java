@@ -2,7 +2,6 @@ package org.immregistries.iis.kernal.servlet;
 
 import jakarta.persistence.Query;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -10,13 +9,19 @@ import org.hibernate.Session;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.model.persisted.MessageReceived;
 import org.immregistries.iis.kernal.model.persisted.Tenant;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 
 @SuppressWarnings("serial")
-public class MessageServlet extends HttpServlet {
+@RestController
+@RequestMapping({"/message", TenantController.TENANT_PATH + "/message"})
+public class MessageController {
 
   public static final String PARAM_ORG_ID = "orgId";
 
@@ -27,14 +32,14 @@ public class MessageServlet extends HttpServlet {
 
   public static final String PARAM_SEARCH = "search";
 
-  @Override
+	@PostMapping
   protected void doPost(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
     doGet(req, resp);
   }
 
   @SuppressWarnings("unchecked")
-@Override
+  @GetMapping
   protected void doGet(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
 
@@ -45,7 +50,7 @@ public class MessageServlet extends HttpServlet {
 	  try (Session dataSession = ServletHelper.getDataSession()) {
 		  String messageError = null;
 		  String messageConfirmation = null;
-		  HomeServlet.doHeader(out, "IIS Sandbox", ServletHelper.getTenant());
+		  HomeController.doHeader(out, "IIS Sandbox", ServletHelper.getTenant());
 		  if (messageError != null) {
 			  out.println("  <div class=\"w3-panel w3-red\">");
 			  out.println("    <p>" + messageError + "</p>");
@@ -110,7 +115,7 @@ public class MessageServlet extends HttpServlet {
 		  System.err.println("Unable to render page: " + e.getMessage());
 		  e.printStackTrace(System.err);
 	  }
-    HomeServlet.doFooter(out);
+	  HomeController.doFooter(out);
     out.flush();
     out.close();
   }

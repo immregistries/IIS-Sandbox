@@ -98,7 +98,7 @@ public class TenantController {
 				/*
 				 * print starts after potential tenant switch
 				 */
-				HomeServlet.doHeader(out, "IIS Sandbox - Home", tenant);
+				HomeController.doHeader(out, "IIS Sandbox - Home", tenant);
 
 				out.println("<div class=\"w3-container w3-half w3-margin-top\">");
 
@@ -133,10 +133,10 @@ public class TenantController {
 					"Tenants are separated testing environments, One Tenant &#8792; One IIS equivalent, Different Facilities can be registered as information sources to the Tenants" +
 					"</p></div>"); // TODO better explanation
 
-				HomeServlet.printFlavors(out);
+				HomeController.printFlavors(out);
 				out.println("</div>");
 
-				HomeServlet.doFooter(out);
+				HomeController.doFooter(out);
 			}
 		}
 		out.flush();

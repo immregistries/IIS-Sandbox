@@ -1,7 +1,6 @@
  package org.immregistries.iis.kernal.servlet;
 
  import jakarta.servlet.ServletException;
- import jakarta.servlet.http.HttpServlet;
  import jakarta.servlet.http.HttpServletRequest;
  import jakarta.servlet.http.HttpServletResponse;
  import org.immregistries.iis.kernal.fhir.interceptors.PartitionCreationInterceptor;
@@ -21,7 +20,7 @@
 
  @RestController
  @RequestMapping({SOAP_BASE_PATH, TenantController.TENANT_PATH + SOAP_BASE_PATH})
-public class SoapController extends HttpServlet {
+ public class SoapController {
 
 	 public static final String SOAP_BASE_PATH = "/soap";
 	 @Autowired
@@ -76,7 +75,7 @@ public class SoapController extends HttpServlet {
 
 			PrintWriter out = resp.getWriter();
 			try {
-				HomeServlet.doHeader(out, "IIS Sandbox", ServletHelper.getTenant());
+				HomeController.doHeader(out, "IIS Sandbox", ServletHelper.getTenant());
 				out.println("<h2>CDC SOAP Endpoint</h2>");
 				out.println("<p>");
 				out.println("This demonstration system supports the use of the ");
@@ -121,7 +120,7 @@ public class SoapController extends HttpServlet {
 			} finally {
 				out.close();
 			}
-			HomeServlet.doFooter(out);
+			HomeController.doFooter(out);
 		}
 	}
 

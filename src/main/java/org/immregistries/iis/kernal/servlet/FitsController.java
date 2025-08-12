@@ -1,7 +1,6 @@
 package org.immregistries.iis.kernal.servlet;
 
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.immregistries.codebase.client.CodeMap;
@@ -13,6 +12,10 @@ import org.immregistries.vfa.connect.IISConnector;
 import org.immregistries.vfa.connect.IISConnector.ParseDebugLine;
 import org.immregistries.vfa.connect.model.*;
 import org.immregistries.vfa.connect.util.ForecastResultPrinter;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -22,14 +25,16 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 @SuppressWarnings("serial")
-public class FitsServlet extends HttpServlet {
+@RestController
+@RequestMapping({"/fits", TenantController.TENANT_PATH + "/fits"})
+public class FitsController {
 
   public static final String RSP_MESSAGE = "rsp";
   public static final String MESSAGE_NAME = "messageName";
   public static final String EXAMPLE_NAME = "exampleName";
 
 
-  @Override
+	@GetMapping
   protected void doGet(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
 
@@ -410,7 +415,7 @@ public class FitsServlet extends HttpServlet {
     out.println("</pre>");
   }
 
-  @Override
+	@PostMapping
   protected void doPost(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
     doGet(req, resp);

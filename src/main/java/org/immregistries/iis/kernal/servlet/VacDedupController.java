@@ -1,13 +1,16 @@
 package org.immregistries.iis.kernal.servlet;
 
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.immregistries.vaccination_deduplication.Immunization;
 import org.immregistries.vaccination_deduplication.LinkedImmunization;
 import org.immregistries.vaccination_deduplication.VaccinationDeduplication;
 import org.immregistries.vaccination_deduplication.reference.ImmunizationSource;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -16,7 +19,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
-public class VacDedupServlet extends HttpServlet {
+@RestController
+@RequestMapping({"/vacDedup", TenantController.TENANT_PATH + "/vacDedup"})
+public class VacDedupController {
   private static final long serialVersionUID = 1L;
 
   public static final String PARAM_ACTION = "action";
@@ -33,13 +38,13 @@ public class VacDedupServlet extends HttpServlet {
   public static final String ALGORITHM_WEIGHTED = "Weighted";
   public static final String ALGORITHM_HYBRID = "Hybrid";
 
-  @Override
+  @PostMapping
   protected void doPost(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
     doGet(req, resp);
   }
 
-  @Override
+  @GetMapping
   protected void doGet(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
 

@@ -14,7 +14,6 @@ import ca.uhn.fhir.rest.server.RestfulServer;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
@@ -30,6 +29,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -40,8 +43,9 @@ import java.util.stream.Collectors;
 import static org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester.GOLDEN_RECORD;
 import static org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester.GOLDEN_SYSTEM_TAG;
 
-
-public class TenantCompareServlet extends HttpServlet {
+@RestController
+@RequestMapping({"/tenantCompare", TenantController.TENANT_PATH + "/tenantCompare"})
+public class TenantCompareController {
 	public static final String INCLUDE_GOLDEN = "includeGolden";
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -59,7 +63,7 @@ public class TenantCompareServlet extends HttpServlet {
 	@Autowired
 	private RestfulServer restfulServer;
 
-	@Override
+	@PostMapping
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		doGet(req, resp);
 	}
@@ -73,7 +77,7 @@ public class TenantCompareServlet extends HttpServlet {
 	 * @throws ServletException
 	 * @throws IOException
 	 */
-	@Override
+	@GetMapping
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		String[] tenantNames = req.getParameter(TENANT_IDS).split(",");
 
@@ -82,7 +86,7 @@ public class TenantCompareServlet extends HttpServlet {
 		logger.info("Testing Tenant comparison");
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
-		HomeServlet.doHeader(out, "Tenant Comparison", ServletHelper.getTenant(req));
+		HomeController.doHeader(out, "Tenant Comparison", ServletHelper.getTenant(req));
 		try (Session dataSession = ServletHelper.getDataSession()) {
 			UserAccess userAccess = ServletHelper.getUserAccess();
 			if (userAccess == null) {

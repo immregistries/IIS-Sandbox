@@ -26,8 +26,8 @@ import java.util.List;
 
 import static org.immregistries.iis.kernal.servlet.PatientController.PARAM_PATIENT_REPORTED_EXTERNAL_LINK;
 import static org.immregistries.iis.kernal.servlet.PatientController.PARAM_PATIENT_REPORTED_ID;
-import static org.immregistries.iis.kernal.servlet.SubscriptionServlet.PARAM_MESSAGE;
-import static org.immregistries.iis.kernal.servlet.SubscriptionServlet.PARAM_SUBSCRIPTION_ID;
+import static org.immregistries.iis.kernal.servlet.SubscriptionController.PARAM_MESSAGE;
+import static org.immregistries.iis.kernal.servlet.SubscriptionController.PARAM_SUBSCRIPTION_ID;
 
 public final class PatientServletUtil {
 

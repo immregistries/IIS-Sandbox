@@ -1,17 +1,22 @@
 package org.immregistries.iis.kernal.servlet;
 
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.smm.tester.TestCovidReporting;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 
 @SuppressWarnings("serial")
-public class CovidGenerateServlet extends HttpServlet {
+@RestController
+@RequestMapping({"/covidGenerate", TenantController.TENANT_PATH + "/covidGenerate"})
+public class CovidGenerateController {
 
 
   public static final String ACTION_GENERATE = "Generate";
@@ -25,12 +30,13 @@ public class CovidGenerateServlet extends HttpServlet {
   public static final String PARAM_INCLUDE_MISSED = "includeMissed";
   public static final String PARAM_INCLUDE_SEROLOGY = "includeSerology";
 
+	@PostMapping
   protected void doPost(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
     doGet(req, resp);
   }
 
-  @Override
+	@GetMapping
   protected void doGet(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
 
@@ -55,7 +61,7 @@ public class CovidGenerateServlet extends HttpServlet {
         includeMissed = req.getParameter(PARAM_INCLUDE_MISSED) != null;
         includeSerology = req.getParameter(PARAM_INCLUDE_SEROLOGY) != null;
       }
-		 HomeServlet.doHeader(out, "IIS Sandbox", ServletHelper.getTenant());
+		 HomeController.doHeader(out, "IIS Sandbox", ServletHelper.getTenant());
 
 
 
@@ -126,7 +132,7 @@ public class CovidGenerateServlet extends HttpServlet {
       System.err.println("Unable to render page: " + e.getMessage());
       e.printStackTrace(System.err);
     }
-    HomeServlet.doFooter(out);
+		HomeController.doFooter(out);
     out.flush();
     out.close();
   }

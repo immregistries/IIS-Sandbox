@@ -27,12 +27,17 @@ import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.Map;
 
+import static org.immregistries.iis.kernal.servlet.HomeController.HOME_BASE_PATH;
+
 /**
  * UI Homepage
  */
 @RestController
-@RequestMapping({"/home", "/", TenantController.TENANT_PATH + "/home"})
-public class HomeServlet {
+@RequestMapping({HOME_BASE_PATH, "/", TenantController.TENANT_PATH + HOME_BASE_PATH})
+public class HomeController {
+
+	public static final String HOME_BASE_PATH = "/home";
+
 	@Autowired
 	FhirContext fhirContext;
 	private final static ImmutableMap<String, String> HEADER_MAP = ImmutableMap.of(PopController.POP_PATH_KEY, "Send Now",

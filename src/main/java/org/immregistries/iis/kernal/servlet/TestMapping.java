@@ -115,7 +115,7 @@ public class TestMapping extends HttpServlet {
 				message = testCaseMessage.getMessageText();
 			}
 			{
-				HomeServlet.doHeader(out, "IIS Sandbox", ServletHelper.getTenant());
+				HomeController.doHeader(out, "IIS Sandbox", ServletHelper.getTenant());
 				out.println("    <h2>Send Now to Test Mapping</h2>");
 				out.println("    <form action=\"utest\" method=\"POST\" target=\"_blank\">");
 				out.println("      <h3>VXU Message</h3>");
@@ -131,7 +131,7 @@ public class TestMapping extends HttpServlet {
 				out.println("    </div>");
 				out.println("    </div>");
 				out.println("    </form>");
-				HomeServlet.doFooter(out);
+				HomeController.doFooter(out);
 			}
 		} catch (Exception e) {
 			e.printStackTrace(System.err);

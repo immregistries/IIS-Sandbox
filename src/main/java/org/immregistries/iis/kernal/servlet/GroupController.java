@@ -2,7 +2,6 @@ package org.immregistries.iis.kernal.servlet;
 
 import ca.uhn.fhir.context.FhirContext;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.hl7.fhir.r5.model.*;
@@ -14,6 +13,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -25,7 +28,9 @@ import java.io.PrintWriter;
  * 	- link with a subscription
  *
  */
-public class GroupServlet extends HttpServlet {
+@RestController
+@RequestMapping({"/group", TenantController.TENANT_PATH + "/group"})
+public class GroupController {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	@Autowired
 	RepositoryClientFactory repositoryClientFactory;
@@ -35,7 +40,7 @@ public class GroupServlet extends HttpServlet {
 	FhirContext fhirContext;
 
 
-	@Override
+	@PostMapping
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
 		throws ServletException, IOException {
 		doGet(req, resp);
@@ -49,7 +54,7 @@ public class GroupServlet extends HttpServlet {
 
 	}
 
-	@Override
+	@GetMapping
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
 		throws ServletException, IOException {
 
@@ -59,7 +64,7 @@ public class GroupServlet extends HttpServlet {
 		}
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
-		HomeServlet.doHeader(out, "IIS Sandbox - Groups", ServletHelper.getTenant());
+		HomeController.doHeader(out, "IIS Sandbox - Groups", ServletHelper.getTenant());
 		Group group = new Group();
 		group.setManagingEntity(new Reference().setIdentifier(new Identifier().setType(new CodeableConcept(new Coding().setCode("Organization"))).setSystem("AIRA_TEST").setValue("test")));
 		group.setDescription("Generated Group in IIS sandbox, for Bulk data export use case and Synchronisation with subscription synchronisation");
@@ -70,7 +75,7 @@ public class GroupServlet extends HttpServlet {
 		out.println("<p>");
 		out.println(fhirContext.newJsonParser().setPrettyPrint(true).encodeResourceToString(parameters));
 		out.println("</p>");
-		HomeServlet.doFooter(out);
+		HomeController.doFooter(out);
 		out.flush();
 		out.close();
 	}

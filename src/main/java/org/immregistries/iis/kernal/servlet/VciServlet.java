@@ -7,18 +7,23 @@ import ca.uhn.hl7v2.parser.Parser;
 import ca.uhn.hl7v2.util.Terser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.hibernate.SessionFactory;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.*;
 
 @SuppressWarnings("serial")
-public class VciServlet extends HttpServlet {
+@RestController
+@RequestMapping({"/vciDemo", TenantController.TENANT_PATH + "/vciDemo"})
+public class VciServlet {
 
   public static final Map<String, String> GENDER_MAP;
 
@@ -59,13 +64,13 @@ public class VciServlet extends HttpServlet {
   private static SessionFactory factory;
 
 
-  @Override
+  @PostMapping
   protected void doPost(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
     doGet(req, resp);
   }
 
-  @Override
+  @GetMapping
   protected void doGet(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
 
@@ -164,7 +169,7 @@ public class VciServlet extends HttpServlet {
 
         message = mapper.writeValueAsString(verifiableCredential);
       }
-      HomeServlet.doHeader(out, "IIS Sandbox", ServletHelper.getTenant());
+      HomeController.doHeader(out, "IIS Sandbox", ServletHelper.getTenant());
 		 out.println("    <h2>VCI Demonstration</h2>");
       out.println("    <form action=\"vciDemo\" method=\"POST\">");
       if (conversionStep == null) {
@@ -213,7 +218,7 @@ public class VciServlet extends HttpServlet {
 
       out.println("    </div>");
       out.println("    </form>");
-      HomeServlet.doFooter(out);
+      HomeController.doFooter(out);
     } catch (Exception e) {
       e.printStackTrace(System.err);
     }

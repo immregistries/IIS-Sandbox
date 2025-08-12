@@ -19,7 +19,7 @@ import java.io.PrintWriter;
 
 @RestController
 @RequestMapping("/loginForm")
-public class LoginServlet {
+public class LoginController {
 
 	public static final String PARAM_USERID = "USERID";
 	public static final String PARAM_PASSWORD = "PASSWORD";
@@ -42,7 +42,7 @@ public class LoginServlet {
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		Session dataSession = ServletHelper.getDataSession();
 		try {
-			HomeServlet.doHeader(out, "IIS Sandbox", ServletHelper.getTenant());
+			HomeController.doHeader(out, "IIS Sandbox", ServletHelper.getTenant());
 			Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
          // LOGIN FORM, inherited, could be made in a separate class and improved
 			if (!authentication.isAuthenticated() || authentication instanceof AnonymousAuthenticationToken) {
@@ -83,7 +83,7 @@ public class LoginServlet {
 		} finally {
 			dataSession.close();
 		}
-		HomeServlet.doFooter(out);
+		HomeController.doFooter(out);
 		out.flush();
 		out.close();
 	}

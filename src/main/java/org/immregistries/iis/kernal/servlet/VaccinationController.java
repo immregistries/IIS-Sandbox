@@ -109,7 +109,7 @@ public class VaccinationController {
 				}
 			}
 
-			HomeServlet.doHeader(out, "IIS Sandbox - Vaccinations", tenant);
+			HomeController.doHeader(out, "IIS Sandbox - Vaccinations", tenant);
 			SimpleDateFormat sdfDate = new SimpleDateFormat("MM/dd/yyyy");
 
 			out.println("<h2>Vaccination Record: " + cvxPrint + " " + sdfDate.format(vaccination.getAdministeredDate()) + "</h2>");
@@ -202,7 +202,7 @@ public class VaccinationController {
 					}
 					out.println("<h4>Related Vaccination Records</h4>");
 					printVaccinationList(out, relatedVaccinations);
-					HomeServlet.printGoldenRecordExplanation(out, immunizationResource);
+					HomeController.printGoldenRecordExplanation(out, immunizationResource);
 				}
 
 				out.println("  </div>");
@@ -255,7 +255,7 @@ public class VaccinationController {
 		} catch (Exception e) {
 			e.printStackTrace(System.err);
 		}
-		HomeServlet.doFooter(out);
+		HomeController.doFooter(out);
 		out.flush();
 		out.close();
 	}

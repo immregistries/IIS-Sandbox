@@ -3,7 +3,6 @@ package org.immregistries.iis.kernal.servlet;
 import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
 import jakarta.persistence.Query;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
@@ -17,6 +16,10 @@ import org.immregistries.iis.kernal.model.persisted.MessageReceived;
 import org.immregistries.iis.kernal.model.persisted.Tenant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -28,7 +31,9 @@ import java.util.List;
 import java.util.Set;
 
 @SuppressWarnings("serial")
-public class LocationServlet extends HttpServlet {
+@RestController
+@RequestMapping({"/location", TenantController.TENANT_PATH + "/location"})
+public class LocationController {
 	public static final String PARAM_ACTION = "action";
 	public static final String ACTION_ADD = "Add";
 	public static final String ACTION_SAVE = "Save";
@@ -60,14 +65,14 @@ public class LocationServlet extends HttpServlet {
 		out.println("     <pre>" + messageReceived.getMessageResponse() + "</pre>");
 	}
 
-	@Override
+	@PostMapping
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
 		throws ServletException, IOException {
 		doGet(req, resp);
 	}
 
 	@SuppressWarnings("unchecked")
-	@Override
+	@GetMapping
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
 		throws ServletException, IOException {
 
@@ -136,7 +141,7 @@ public class LocationServlet extends HttpServlet {
 			List<OrgLocation> orgLocationList = null;
 			orgLocationList = fhirRequests.searchOrgLocationList(new SearchParameterMap());
 
-			HomeServlet.doHeader(out, "IIS Sandbox", ServletHelper.getTenant());
+			HomeController.doHeader(out, "IIS Sandbox", ServletHelper.getTenant());
 
 			out.println("    <h2>Facility</h2>");
 			if (orgLocationSelected == null) {
@@ -242,7 +247,7 @@ public class LocationServlet extends HttpServlet {
 		} catch (Exception e) {
 			e.printStackTrace(System.err);
 		}
-		HomeServlet.doFooter(out);
+		HomeController.doFooter(out);
 		out.flush();
 		out.close();
 	}

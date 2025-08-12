@@ -166,7 +166,7 @@ public class RecommendationController {
 
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
-		HomeServlet.doHeader(out, "Recommendations", tenant);
+		HomeController.doHeader(out, "Recommendations", tenant);
 
 		try {
 			IGenericClient fhirClient = repositoryClientFactory.newGenericClient(req);
@@ -243,7 +243,7 @@ public class RecommendationController {
 		} catch (Exception e) {
 			e.printStackTrace(System.err);
 		}
-		HomeServlet.doFooter(out);
+		HomeController.doFooter(out);
 		out.flush();
 		out.close();
 	}
