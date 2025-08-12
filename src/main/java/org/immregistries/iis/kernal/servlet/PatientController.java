@@ -28,6 +28,7 @@ import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.model.VaccinationMaster;
 import org.immregistries.iis.kernal.model.persisted.MessageReceived;
 import org.immregistries.iis.kernal.model.persisted.Tenant;
+import org.immregistries.iis.kernal.servlet.shlink.PatientShLinkController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

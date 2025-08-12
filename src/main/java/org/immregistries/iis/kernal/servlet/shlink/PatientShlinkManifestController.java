@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal.servlet;
+package org.immregistries.iis.kernal.servlet.shlink;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
@@ -17,6 +17,7 @@ import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFacto
 import org.immregistries.iis.kernal.model.ShlinkManifestRequestBody;
 import org.immregistries.iis.kernal.model.persisted.ShLinkManifest;
 import org.immregistries.iis.kernal.model.persisted.Tenant;
+import org.immregistries.iis.kernal.servlet.TenantController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +28,7 @@ import java.io.IOException;
 
 import static org.immregistries.iis.kernal.servlet.PatientController.PATIENT_BASE_PATH;
 import static org.immregistries.iis.kernal.servlet.PatientServletUtil.fetchPatientFromParameters;
-import static org.immregistries.iis.kernal.servlet.PatientShlinkManifestController.PATIENT_MANIFEST_FULL_PATH;
+import static org.immregistries.iis.kernal.servlet.shlink.PatientShlinkManifestController.PATIENT_MANIFEST_FULL_PATH;
 
 @RestController
 @RequestMapping({PATIENT_MANIFEST_FULL_PATH})

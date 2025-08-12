@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal.servlet;
+package org.immregistries.iis.kernal.servlet.shlink;
 
 
 import jakarta.persistence.Query;
@@ -18,11 +18,11 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
 
-import static org.immregistries.iis.kernal.servlet.ShLinksManifestController.SHLINKS_CONTROLLER_BASE_URL;
+import static org.immregistries.iis.kernal.servlet.shlink.ShLinkManifestController.SHLINKS_CONTROLLER_BASE_URL;
 
 @RestController
 @RequestMapping(SHLINKS_CONTROLLER_BASE_URL)
-public class ShLinksManifestController {
+public class ShLinkManifestController {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	public final static String SHLINKS_CONTROLLER_BASE_URL = "/link";
 

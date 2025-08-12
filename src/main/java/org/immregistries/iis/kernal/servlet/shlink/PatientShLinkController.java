@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal.servlet;
+package org.immregistries.iis.kernal.servlet.shlink;
 
 
 import ca.uhn.fhir.context.FhirContext;
@@ -17,6 +17,7 @@ import org.immregistries.iis.kernal.mapping.interfaces.PatientMapper;
 import org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester;
 import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
 import org.immregistries.iis.kernal.model.persisted.Tenant;
+import org.immregistries.iis.kernal.servlet.TenantController;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
@@ -29,7 +30,7 @@ import java.io.OutputStream;
 
 import static org.immregistries.iis.kernal.servlet.PatientController.PATIENT_BASE_PATH;
 import static org.immregistries.iis.kernal.servlet.PatientServletUtil.fetchPatientFromParameter;
-import static org.immregistries.iis.kernal.servlet.PatientShlinkManifestController.MANIFEST_PATH_SUFFIX;
+import static org.immregistries.iis.kernal.servlet.shlink.PatientShlinkManifestController.MANIFEST_PATH_SUFFIX;
 
 @RestController
 @RequestMapping({PATIENT_BASE_PATH, TenantController.TENANT_PATH + PATIENT_BASE_PATH})
@@ -66,22 +67,16 @@ public class PatientShLinkController {
 			}
 			IGenericClient fhirClient = repositoryClientFactory.newGenericClient(req);
 			IBaseResource patientSelected = fetchPatientFromParameter(req, fhirClient, fhirRequester);
-			if (patientSelected == null) {
-			} else {
-//				PatientMaster patientMaster = patientMapper.localObject(patientSelected);
-//
-//				ShLinkManifest shLinkManifest = shlUtilService.generateExamplePatientManifest(tenant, patientMaster);
-//				shLinkManifest = shlUtilService.saveManifest(shLinkManifest);
-
-				String qrcode = getQrcode(req, patientSelected, tenant);
-				shlUtilService.printQrCodeAsImage(outputStream, qrcode);
+			if (patientSelected != null) {
+				String qrCode = getQrCode(req, patientSelected, tenant);
+				shlUtilService.printQrCodeAsImage(outputStream, qrCode);
 			}
 		}
 		outputStream.flush();
 		outputStream.close();
 	}
 
-	private String getQrcode(HttpServletRequest req, IBaseResource patientSelected, Tenant tenant) {
+	private String getQrCode(HttpServletRequest req, IBaseResource patientSelected, Tenant tenant) {
 		String manifestUrl = getManifestUrl(req, patientSelected, tenant);
 		ShLinkPayload shLinkPayload = getPatientShLinkPayload(manifestUrl);
 
