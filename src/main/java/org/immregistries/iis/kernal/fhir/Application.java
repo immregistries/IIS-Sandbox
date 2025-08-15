@@ -8,6 +8,7 @@ import ca.uhn.fhir.jpa.subscription.match.config.SubscriptionProcessorConfig;
 import ca.uhn.fhir.jpa.subscription.match.config.WebsocketDispatcherConfig;
 import ca.uhn.fhir.jpa.subscription.submit.config.SubscriptionSubmitterConfig;
 import ca.uhn.fhir.rest.server.RestfulServer;
+import org.immregistries.iis.kernal.fhir.common.annotations.OnEitherVersion;
 import org.immregistries.iis.kernal.fhir.mdm.MdmConfig;
 import org.immregistries.iis.kernal.fhir.security.ServerSecurityConfig;
 import org.immregistries.iis.kernal.logic.CodeMapManager;
@@ -19,9 +20,11 @@ import org.springframework.boot.autoconfigure.elasticsearch.ElasticsearchRestCli
 import org.springframework.boot.autoconfigure.thymeleaf.ThymeleafAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.ServletComponentScan;
+import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Import;
 import org.springframework.web.context.request.RequestContextListener;
 
@@ -66,29 +69,17 @@ public class Application extends SpringBootServletInitializer {
 		return builder.sources(Application.class);
 	}
 
-//	@Bean
-//	@Conditional(OnEitherVersion.class)
-//	public ServletRegistrationBean hapiServletRegistration(RestfulServer restfulServer) {
-//		ServletRegistrationBean servletRegistrationBean = new ServletRegistrationBean();
-//		beanFactory.autowireBean(restfulServer);
-//		servletRegistrationBean.setServlet(restfulServer);
-//		servletRegistrationBean.addUrlMappings("/fhir/*");
-//		servletRegistrationBean.setLoadOnStartup(1);
-//
-//		return servletRegistrationBean;
-//	}
+	@Bean
+	@Conditional(OnEitherVersion.class)
+	public ServletRegistrationBean hapiServletRegistration(RestfulServer restfulServer) {
+		ServletRegistrationBean servletRegistrationBean = new ServletRegistrationBean();
+		beanFactory.autowireBean(restfulServer);
+		servletRegistrationBean.setServlet(restfulServer);
+		servletRegistrationBean.addUrlMappings("/fhir/*");
+		servletRegistrationBean.setLoadOnStartup(1);
 
-//	@Bean
-//	@Conditional(OnEitherVersion.class)
-//	public ServletRegistrationBean homeServletRegistrationBean() {
-//		ServletRegistrationBean registrationBean = new ServletRegistrationBean();
-//		HomeServlet servlet = new HomeServlet();
-//		beanFactory.autowireBean(servlet);
-//		registrationBean.setServlet(servlet);
-//		registrationBean.addUrlMappings("/home");
-//		registrationBean.setLoadOnStartup(1);
-//		return registrationBean;
-//	}
+		return servletRegistrationBean;
+	}
 
 	/**
 	 * Required to get access to httpRequest and session statically through spring, important to use the fhir client inside the servlets
