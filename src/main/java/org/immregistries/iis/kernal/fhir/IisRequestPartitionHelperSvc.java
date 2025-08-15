@@ -6,30 +6,19 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 
+/**
+ * Used for logging and debugging
+ */
 @Service
 @Primary
 public class IisRequestPartitionHelperSvc extends RequestPartitionHelperSvc implements IRequestPartitionHelperSvc {
-//	@Autowired
-//	PartitionCreationInterceptor partitionCreationInterceptor;
-
+//	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 //	@Override
-//	public @NotNull RequestPartitionId determineReadPartitionForRequest(@Nullable RequestDetails requestDetails, @NotNull ReadPartitionIdRequestDetails readPartitionIdRequestDetails) {
-//		return partitionCreationInterceptor.partitionIdentifyRead(requestDetails);
-//	}
-//
-//	@Override
-//	public RequestPartitionId determineGenericPartitionForRequest(RequestDetails requestDetails) {
-//		return partitionCreationInterceptor.partitionIdentifyRead(requestDetails);
-//	}
-//
-//	@Override
-//	public @NotNull RequestPartitionId determineCreatePartitionForRequest(@Nullable RequestDetails requestDetails, @NotNull IBaseResource iBaseResource, @NotNull String s) {
-//		return partitionCreationInterceptor.partitionIdentifyRead(requestDetails);
-//	}
-//
-//	@Override
-//	public RequestPartitionId validateAndNormalizePartitionNames(RequestPartitionId requestPartitionId) {
-//		return null;
+//	public RequestPartitionId determineReadPartitionForRequestForSearchType(
+//		@Nullable RequestDetails theRequest,
+//		@Nonnull String theResourceType,
+//		@Nonnull SearchParameterMap theParams) {
+//		return super.determineReadPartitionForRequestForSearchType(theRequest,theResourceType,theParams);
 //	}
 }

@@ -5,6 +5,7 @@ import ca.uhn.fhir.jpa.mdm.config.MdmSubmitterConfig;
 import ca.uhn.fhir.jpa.searchparam.config.NicknameServiceConfig;
 import ca.uhn.fhir.jpa.topic.SubscriptionTopicConfig;
 import ca.uhn.fhir.mdm.api.IMdmSettings;
+import ca.uhn.fhir.mdm.interceptor.MdmSearchExpandingInterceptor;
 import ca.uhn.fhir.mdm.rules.config.MdmRuleValidator;
 import ca.uhn.fhir.mdm.rules.config.MdmSettings;
 import ca.uhn.fhir.mdm.util.EIDHelper;
@@ -66,12 +67,16 @@ public class MdmConfig {
 		return iisSubscriptionValidatingInterceptor;
 	}
 
-//	@Primary
-//	@Bean
-//	MdmIisResourceFilteringSvc mdmCustomResourceFilteringSvc() {
-//		MdmIisResourceFilteringSvc mdmCustomResourceFilteringSvc = new MdmIisResourceFilteringSvc();
-//		autowireCapableBeanFactory.autowireBean(mdmCustomResourceFilteringSvc);
-//		return mdmCustomResourceFilteringSvc;
-//	}
+	/**
+	 * Overriding MdmSearchExpandingInterceptor for metadata search support with multitenancy
+	 *
+	 * @return
+	 */
+	@Primary
+	@Bean
+	@Lazy
+	MdmSearchExpandingInterceptor mdmIisSearchExpandingInterceptor() {
+		return new MdmIisSearchExpandingInterceptor();
+	}
 
 }
