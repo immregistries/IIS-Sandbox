@@ -1,12 +1,9 @@
 package org.immregistries.iis.kernal.fhir.interceptors;
 
-import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.i18n.Msg;
 import ca.uhn.fhir.interceptor.api.Hook;
 import ca.uhn.fhir.interceptor.api.Pointcut;
 import ca.uhn.fhir.interceptor.model.RequestPartitionId;
-import ca.uhn.fhir.jpa.api.dao.DaoRegistry;
-import ca.uhn.fhir.jpa.api.dao.IFhirResourceDao;
 import ca.uhn.fhir.jpa.entity.PartitionEntity;
 import ca.uhn.fhir.jpa.partition.IPartitionLookupSvc;
 import ca.uhn.fhir.rest.api.server.RequestDetails;
@@ -17,7 +14,6 @@ import ca.uhn.fhir.rest.server.interceptor.partition.RequestTenantPartitionInter
 import jakarta.annotation.Nonnull;
 import jakarta.interceptor.Interceptor;
 import org.apache.commons.lang3.StringUtils;
-import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,14 +33,6 @@ public class PartitionCreationInterceptor extends RequestTenantPartitionIntercep
 
 	@Autowired
 	private IPartitionLookupSvc partitionLookupSvc;
-	@Autowired
-	private DaoRegistry myDaoRegistry;
-	@Autowired
-	private FhirContext fhirContext;
-	private IFhirResourceDao<IBaseResource> mySubscriptionTopicDao;
-
-//	public static final String PARTITION_NAME_SEPARATOR = "-"; // TEMP TODO find good url structure
-
 
 	@Hook(value = Pointcut.SERVER_INCOMING_REQUEST_POST_PROCESSED)
 	public boolean partitionIdentifyPostProcessed(RequestDetails theRequestDetails) {
@@ -90,17 +78,10 @@ public class PartitionCreationInterceptor extends RequestTenantPartitionIntercep
 		}
 	}
 
-//	public static boolean partitionExists(String partitionName) {
-//		if (partitionName.equals("default") || partitionName.equals(DEFAULT_USER)) {
-//			return true;
-//		}
-//		return RequestPartitionId.fromPartitionName(partitionName).getFirstPartitionIdOrNull() == null;
-//	}
-
 	public static String extractPartitionName(RequestDetails requestDetails) {
 		String tenantId = requestDetails.getTenantId();
 		if (StringUtils.isBlank(tenantId)) {
-			throw new InvalidRequestException(Msg.code(343) + "No tenant ID has been specified, expected structure is fhir/{tenantId}-{facilityId}");
+			throw new InvalidRequestException(Msg.code(343) + "No tenant ID was specified");
 		} else {
 			if (requestDetails.getTenantId().equals("ConnectathonUnsafe")) {
 				return CONNECTATHON_USER;
