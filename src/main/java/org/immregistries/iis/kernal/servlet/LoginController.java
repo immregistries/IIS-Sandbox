@@ -41,6 +41,7 @@ public class LoginController {
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		Session dataSession = ServletHelper.getDataSession();
+		String locationHeader = req.getHeader("referer");
 		try {
 			HomeController.doHeader(out, "IIS Sandbox", ServletHelper.getTenant());
 			Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -62,6 +63,8 @@ public class LoginController {
 				out.println("<div class=\"w3-container w3-card-4\">");
 				out.println("	<h2>Login</h2>");
 				out.println("	<form method=\"POST\" action=\"login\" class=\"w3-container w3-card-4 w3-half\">");
+				out.println("		<input class=\"w3-input\" type=\"hidden\" name=\"referer\" value=\"" + locationHeader + "\"/>");
+
 				out.println("		<input class=\"w3-input\" type=\"text\" name=\"" + PARAM_USERID + "\" value=\"" + userId + "\" required autofocus/>");
 				out.println("		<label>User Id</label>");
 				out.println("		<input class=\"w3-input\" type=\"password\" name=\"" + PARAM_PASSWORD + "\" value=\"\"/>");

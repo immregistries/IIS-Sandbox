@@ -75,7 +75,8 @@
 
 			PrintWriter out = resp.getWriter();
 			try {
-				HomeController.doHeader(out, "IIS Sandbox", ServletHelper.getTenant());
+				Tenant tenant = ServletHelper.getTenant();
+				HomeController.doHeader(out, "IIS Sandbox", tenant);
 				out.println("<h2>CDC SOAP Endpoint</h2>");
 				out.println("<p>");
 				out.println("This demonstration system supports the use of the ");
@@ -87,7 +88,7 @@
 				out.println("</p>");
 				out.println("<h2>Usage Instructions</h2>");
 				out.println("<h3>WSDL</h3>");
-				out.println("<p><a href=\"soap?wsdl=true\">See WSDL</a></p>");
+				out.println("<p><a href=\"" + ServletHelper.tenantifyUrl(tenant, "soap") + "\">See WSDL</a></p>");
 				out.println("<h3>Authentication</h3>");
 				out.println(
 					"<p>Authentication credentials can be established by submitting a username and password to a facility "

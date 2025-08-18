@@ -16,6 +16,7 @@ import org.immregistries.iis.kernal.HibernateConfig;
 import org.immregistries.iis.kernal.fhir.interceptors.PartitionCreationInterceptor;
 import org.immregistries.iis.kernal.model.persisted.Tenant;
 import org.immregistries.iis.kernal.model.persisted.UserAccess;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
@@ -50,6 +51,31 @@ public final class ServletHelper {
 			factory = HibernateConfig.sessionFactory();
 		}
 		return factory.openSession();
+	}
+
+
+	/**
+	 * Adds tenant prefix to url if tenant is not null
+	 *
+	 * @param tenant
+	 * @param url
+	 * @return
+	 */
+	public static String tenantifyUrl(Tenant tenant, String url) {
+		if (tenant == null || tenant.getOrgId() < 0) {
+			return url;
+		}
+		String organizationName = tenant.getOrganizationName();
+		return "/iis" + tenantifyUrl(organizationName, url);
+	}
+
+	/**
+	 * @param tenantName organisation name
+	 * @param url
+	 * @return
+	 */
+	public static @NotNull String tenantifyUrl(String tenantName, String url) {
+		return "/tenant/" + tenantName + "/" + url;
 	}
 
 
@@ -269,25 +295,21 @@ public final class ServletHelper {
 	}
 
 	public static Tenant getTenant(HttpServletRequest request, Session existingDataSession) {
+		final Tenant tenant;
 		Tenant requestTenant = (Tenant) request.getAttribute(SESSION_TENANT);
 		String urlTenantName = (String) request.getAttribute(TENANT_NAME_URL);
-		if (StringUtils.isNotBlank(urlTenantName)) {
+		if (StringUtils.isBlank(urlTenantName)) {
+			tenant = requestTenant;
+		} else {
 			if (requestTenant != null && StringUtils.equals(requestTenant.getOrganizationName(), urlTenantName)) {
-				return requestTenant;
+				tenant = requestTenant;
 			} else if (existingDataSession != null) {
-				return getTenant(urlTenantName, request, existingDataSession);
+				tenant = getTenant(urlTenantName, request, existingDataSession);
 			} else try (Session dataSession = getDataSession()) {
-				return getTenant(urlTenantName, request, dataSession);
+				tenant = getTenant(urlTenantName, request, dataSession);
 			}
 		}
-		if (requestTenant != null) {
-			return requestTenant;
-		}
-		HttpSession session = request.getSession(false);
-		if (session != null) {
-			return (Tenant) session.getAttribute(SESSION_TENANT);
-		}
-		return null;
+		return tenant;
 	}
 
 	public static Tenant getTenant(HttpServletRequest request) {

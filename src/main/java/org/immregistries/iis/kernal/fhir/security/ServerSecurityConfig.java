@@ -11,6 +11,10 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.immregistries.iis.kernal.servlet.LoginController.PARAM_PASSWORD;
 import static org.immregistries.iis.kernal.servlet.LoginController.PARAM_USERID;
@@ -26,7 +30,7 @@ public class ServerSecurityConfig {
 	 * upgraded with AI, TODO verify
 	 */
 	@Bean
-	public SecurityFilterChain filterChain(HttpSecurity http, CustomOAuthSuccessHandler customOAuthSuccessHandler) throws Exception {
+	public SecurityFilterChain filterChain(HttpSecurity http, CustomOAuthSuccessHandler customOAuthSuccessHandler, FormAuthenticationSuccessHandler formAuthenticationSuccessHandler) throws Exception {
 		http
 			.authorizeHttpRequests((authorize) -> authorize
 				.requestMatchers(HttpMethod.GET, "/", "/home", PopController.POP_BASE_PATH, "/SubscriptionTopic/**", "/img/**").permitAll()
@@ -41,40 +45,65 @@ public class ServerSecurityConfig {
 				.passwordParameter(PARAM_PASSWORD)
 				.loginPage("/loginForm") // Page where redirected when unauthorised
 				.loginProcessingUrl("/login") // url for login request to be processed (hollow)
-				.defaultSuccessUrl("/home")
+				.successHandler(formAuthenticationSuccessHandler)
+
 			)
+
 			.oauth2Login((oauth2) -> oauth2
 				.defaultSuccessUrl("/home")
 				.successHandler(customOAuthSuccessHandler)
 			)
 			.logout((logout) -> logout
-				.logoutRequestMatcher(new AntPathRequestMatcher("/logout")) // Use RequestMatcher
+				.logoutRequestMatcher(new AntPathRequestMatcher("**/logout")) // Use RequestMatcher
 				.logoutSuccessUrl("/loginForm")
 				.deleteCookies("JSESSIONID")
-			)
-			.csrf((csrf) -> csrf
-				.ignoringRequestMatchers(
-					new AntPathRequestMatcher(PATIENT_MANIFEST_FULL_PATH + "/**"),
-					new AntPathRequestMatcher("/tenant/*/manifest/**"),
-					new AntPathRequestMatcher(PopController.POP_BASE_PATH),
-					new AntPathRequestMatcher(V2ToFhirController.V2_TO_FHIR_BASE_PATH),
-					new AntPathRequestMatcher(FhirMessagingController.FHIR_MESSAGING_BASE_PATH),
-					new AntPathRequestMatcher(FhirMessagingController.FHIR_MESSAGING_BASE_PATH + "/soap"),
-					new AntPathRequestMatcher("/message"),
-					new AntPathRequestMatcher("/fhir/**"),
-					new AntPathRequestMatcher("/loginForm"),
-					new AntPathRequestMatcher("/login"),
-					new AntPathRequestMatcher("/logout"),
-					new AntPathRequestMatcher("/patient"),
-					new AntPathRequestMatcher("/subscription"),
-					new AntPathRequestMatcher("/vaccination"),
-					new AntPathRequestMatcher("/tenant"),
-					new AntPathRequestMatcher("/soap")
-				)
 			);
 
+		List<RequestMatcher> csrfIgnoringRequestMatchers = new ArrayList<>(30);
+		addTenantifiedRequestMatcher(csrfIgnoringRequestMatchers, PATIENT_MANIFEST_FULL_PATH + "/**");
+		addTenantifiedRequestMatcher(csrfIgnoringRequestMatchers, "/manifest/**");
+		addTenantifiedRequestMatcher(csrfIgnoringRequestMatchers, PopController.POP_BASE_PATH);
+		addTenantifiedRequestMatcher(csrfIgnoringRequestMatchers, V2ToFhirController.V2_TO_FHIR_BASE_PATH);
+		addTenantifiedRequestMatcher(csrfIgnoringRequestMatchers, FhirMessagingController.FHIR_MESSAGING_BASE_PATH);
+		addTenantifiedRequestMatcher(csrfIgnoringRequestMatchers, FhirMessagingController.FHIR_MESSAGING_BASE_PATH + "/soap");
+		addTenantifiedRequestMatcher(csrfIgnoringRequestMatchers, "/message");
+		addTenantifiedRequestMatcher(csrfIgnoringRequestMatchers, "/fhir/**");
+		addTenantifiedRequestMatcher(csrfIgnoringRequestMatchers, "/loginForm");
+		addTenantifiedRequestMatcher(csrfIgnoringRequestMatchers, "/login");
+		addTenantifiedRequestMatcher(csrfIgnoringRequestMatchers, "/logout");
+		addTenantifiedRequestMatcher(csrfIgnoringRequestMatchers, "/patient");
+		addTenantifiedRequestMatcher(csrfIgnoringRequestMatchers, "/subscription");
+		addTenantifiedRequestMatcher(csrfIgnoringRequestMatchers, "/vaccination");
+		addTenantifiedRequestMatcher(csrfIgnoringRequestMatchers, "/tenant");
+		addTenantifiedRequestMatcher(csrfIgnoringRequestMatchers, "/soap");
+		http.csrf((csrf) -> csrf
+			.ignoringRequestMatchers(csrfIgnoringRequestMatchers.toArray(new RequestMatcher[csrfIgnoringRequestMatchers.size()]))
+		);
 		// ... other configuration
 		return http.build();
+	}
+
+	@Bean
+	FormAuthenticationSuccessHandler formAuthenticationSuccessHandler() {
+		return new FormAuthenticationSuccessHandler();
+	}
+
+
+	private AntPathRequestMatcher tenantifyRequestMatcher(HttpMethod httpMethod, String pathSuffix) {
+		AntPathRequestMatcher antPathRequestMatcher = tenantifyRequestMatcher(pathSuffix);
+		String tenantified = ServletHelper.tenantifyUrl("*", pathSuffix);
+		return new AntPathRequestMatcher(pathSuffix, httpMethod.toString());
+	}
+
+	private void addTenantifiedRequestMatcher(List<RequestMatcher> matchers, String pathSuffix) {
+		String tenantified = ServletHelper.tenantifyUrl("*", pathSuffix);
+		matchers.add(new AntPathRequestMatcher(pathSuffix));
+		matchers.add(new AntPathRequestMatcher(tenantified));
+	}
+
+	private AntPathRequestMatcher tenantifyRequestMatcher(String pathSuffix) {
+		String tenantified = ServletHelper.tenantifyUrl("*", pathSuffix);
+		return new AntPathRequestMatcher(tenantified);
 	}
 
 }

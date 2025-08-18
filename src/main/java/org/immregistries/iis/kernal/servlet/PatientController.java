@@ -244,7 +244,7 @@ public class PatientController {
 			new SearchParameterMap().add("patient", referenceParam)
 		);
 		out.println("<h4>Vaccinations</h4>");
-		VaccinationController.printVaccinationList(out, vaccinationList);
+		VaccinationController.printVaccinationList(out, vaccinationList, null); // TODO test and change
 	}
 
 	private void printPatientObservations(PrintWriter out, PatientMaster patientMasterSelected, boolean isGolden) {

@@ -201,7 +201,7 @@ public class VaccinationController {
 						}
 					}
 					out.println("<h4>Related Vaccination Records</h4>");
-					printVaccinationList(out, relatedVaccinations);
+					printVaccinationList(out, relatedVaccinations, tenant);
 					HomeController.printGoldenRecordExplanation(out, immunizationResource);
 				}
 
@@ -287,7 +287,7 @@ public class VaccinationController {
 		return immunization;
 	}
 
-	public static void printVaccinationList(PrintWriter out, List<VaccinationMaster> vaccinationList) {
+	public static void printVaccinationList(PrintWriter out, List<VaccinationMaster> vaccinationList, Tenant tenant) {
 		SimpleDateFormat sdfDate = new SimpleDateFormat("MM/dd/yyyy");
 
 		if (vaccinationList.isEmpty()) {
@@ -311,7 +311,7 @@ public class VaccinationController {
 				out.println("    <td>");
 				String link = "vaccination?" + VaccinationController.PARAM_VACCINATION_REPORTED_ID + "="
 					+ vaccination.getVaccinationId();
-				out.println("      <a href=\"" + link + "\">");
+				out.println("      <a href=\"" + ServletHelper.tenantifyUrl(tenant, link) + "\">");
 				if (!StringUtils.isEmpty(vaccination.getVaccineCvxCode())) {
 					Code cvxCode = codeMap.getCodeForCodeset(CodesetType.VACCINATION_CVX_CODE,
 						vaccination.getVaccineCvxCode());

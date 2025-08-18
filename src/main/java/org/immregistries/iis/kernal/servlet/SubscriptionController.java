@@ -154,7 +154,7 @@ public class SubscriptionController {
 
 		String subscriptionId = req.getParameter(PARAM_SUBSCRIPTION_ID);
 		if (subscriptionId == null) {
-			printSearchAndSelect(req,resp,out,fhirClient);
+			printSearchAndSelect(req, resp, out, fhirClient, tenant);
 		} else {
 			printTools(req,resp,out,fhirClient, subscriptionId);
 		}
@@ -237,7 +237,7 @@ public class SubscriptionController {
 	}
 
 	public static void printSearchAndSelect(HttpServletRequest req, HttpServletResponse resp,
-														 PrintWriter out, IGenericClient fhirClient) {
+														 PrintWriter out, IGenericClient fhirClient, Tenant tenant) {
 
 		try {
 			Bundle bundle;
@@ -288,14 +288,15 @@ public class SubscriptionController {
 					if (count > 100) {
 						break;
 					}
-					String link = "subscription?" + PARAM_SUBSCRIPTION_ID + "="
+					String baseLink = "subscription?" + PARAM_SUBSCRIPTION_ID + "="
 						+ subscription.getIdentifierFirstRep().getValue(); // TODO or id
+					String linkWithTenantBase = ServletHelper.tenantifyUrl(tenant, baseLink); // TODO or id
 					out.println("  <tr>");
-					out.println("    <td><a href=\"" + link + "\">"
+					out.println("    <td><a href=\"" + linkWithTenantBase + "\">"
 						+ subscription.getName() + "</a></td>");
-					out.println("    <td><a href=\"" + link + "\">"
+					out.println("    <td><a href=\"" + linkWithTenantBase + "\">"
 						+ subscription.getEndpoint() + "</a></td>");
-					out.println("    <td><a href=\"" + link + "\">"
+					out.println("    <td><a href=\"" + linkWithTenantBase + "\">"
 						+ subscription.getStatus() + "</a></td>");
 					out.println("    <td><a href=\"" + subscription.getTopic() + "\">"
 						+ subscription.getTopic() + "</a></td>");

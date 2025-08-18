@@ -116,7 +116,7 @@ public class VXUDownloadFormController {
       if (generator.isFileReady()) {
         String link = "VXUDownload";
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-        out.println("<a href=\"" + link + "\" download=\"export"
+			out.println("<a href=\"" + ServletHelper.tenantifyUrl(tenant, link) + "\" download=\"export"
             + sdf.format(generator.getDateEnd()) + ".vxu.txt\">Download</a>");
       }
       out.println("    </div>");
