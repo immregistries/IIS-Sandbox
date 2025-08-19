@@ -4,6 +4,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
+import org.immregistries.iis.kernal.fhir.Application;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
@@ -48,8 +49,6 @@ public class FormAuthenticationSuccessHandler extends SavedRequestAwareAuthentic
 		if (StringUtils.isNotBlank(tenantName)) {
 			redirectUrl = filterForSuffix(redirectUrl, "/pop", tenantName);
 			redirectUrl = filterForSuffix(redirectUrl, "/home", tenantName);
-		} else {
-			response.sendRedirect("/iis/home");
 		}
 		getRedirectStrategy().sendRedirect(request, response, redirectUrl);
 	}
@@ -59,9 +58,8 @@ public class FormAuthenticationSuccessHandler extends SavedRequestAwareAuthentic
 		UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(targetUrl);
 		logger.info("Source {}, parsed {}, path {}, suffix {}", targetUrl, builder.build(), url.getPath(), pathSuffix);
 
-		if (StringUtils.endsWith(url.getPath(), "/iis" + pathSuffix)) {
-			String newPath = "/iis" + TENANT_BASE_PATH + "/" + tenantName + pathSuffix;
-			String params = StringUtils.substringAfter(targetUrl, "?");
+		if (StringUtils.endsWith(url.getPath(), Application.IIS_PATH_BASE + pathSuffix)) {
+			String newPath = Application.IIS_PATH_BASE + TENANT_BASE_PATH + "/" + tenantName + pathSuffix;
 			builder.replacePath(newPath);
 		}
 		String resultUrl = builder.build().toUri().toURL().toString();

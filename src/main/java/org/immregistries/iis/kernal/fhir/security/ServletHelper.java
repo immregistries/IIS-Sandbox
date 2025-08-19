@@ -14,6 +14,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.immregistries.iis.kernal.HibernateConfig;
+import org.immregistries.iis.kernal.fhir.Application;
 import org.immregistries.iis.kernal.fhir.interceptors.PartitionCreationInterceptor;
 import org.immregistries.iis.kernal.model.persisted.Tenant;
 import org.immregistries.iis.kernal.model.persisted.UserAccess;
@@ -69,7 +70,7 @@ public final class ServletHelper {
 			return url;
 		}
 		String organizationName = tenant.getOrganizationName();
-		return "/iis" + tenantifyUrl(organizationName, url);
+		return Application.IIS_PATH_BASE + tenantifyUrl(organizationName, url);
 	}
 
 	/**

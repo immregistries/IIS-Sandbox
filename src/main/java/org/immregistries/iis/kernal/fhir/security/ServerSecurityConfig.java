@@ -37,7 +37,7 @@ public class ServerSecurityConfig {
 			.requestCache(cache -> cache.requestCache(requestCache))
 			.authorizeHttpRequests((authorize) -> authorize
 				.requestMatchers(HttpMethod.GET, "/", "/home", PopController.POP_BASE_PATH, "/SubscriptionTopic/**", "/img/**").permitAll()
-				.requestMatchers("/tenant/*/manifest/**", SHLINKS_CONTROLLER_BASE_URL).permitAll() //Shlinks
+				.requestMatchers("/tenant/*/manifest/**", SHLINKS_CONTROLLER_BASE_URL).permitAll() // Shlinks
 				.requestMatchers("/loginForm", "/oauth2/**", "/login").permitAll()
 				// API AUTHORIZATION AND AUTHENTICATION SEPARATED
 				.requestMatchers("/fhir/**", "/soap", FhirMessagingController.FHIR_MESSAGING_BASE_PATH + "/soap", "/.well-known/smart-configuration", "/registerClient", "/token").permitAll()
@@ -57,7 +57,7 @@ public class ServerSecurityConfig {
 				.successHandler(customOAuthSuccessHandler)
 			)
 			.logout((logout) -> logout
-				.logoutRequestMatcher(new AntPathRequestMatcher("**/logout")) // Use RequestMatcher
+				.logoutRequestMatcher(new AntPathRequestMatcher("/logout")) // Use RequestMatcher
 				.logoutSuccessUrl("/loginForm")
 				.deleteCookies("JSESSIONID")
 			);

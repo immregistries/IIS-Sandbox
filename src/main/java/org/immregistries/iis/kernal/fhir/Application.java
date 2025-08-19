@@ -52,6 +52,11 @@ import org.springframework.web.context.request.RequestContextListener;
 })
 public class Application extends SpringBootServletInitializer {
 
+	/**
+	 * TODO get from Configuration
+	 */
+	public static final String IIS_PATH_BASE = "/iis";
+
 	@Autowired
 	AutowireCapableBeanFactory beanFactory;
 
