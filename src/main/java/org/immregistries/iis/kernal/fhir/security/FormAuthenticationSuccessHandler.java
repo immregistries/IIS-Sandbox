@@ -43,18 +43,9 @@ public class FormAuthenticationSuccessHandler extends SavedRequestAwareAuthentic
 		}
 		clearAuthenticationAttributes(request);
 		// Use the DefaultSavedRequest URL
-		String targetUrl = savedRequest.getRedirectUrl();
-
-		logger.info("targetUrl {}", targetUrl);
-		logger.info("Authentication success source url ctx path {}\n url {}\n servlet path {}\n location header {}\n location parameter {}\n",
-			request.getContextPath(), request.getRequestURI(), request.getServletPath(), request.getHeader("referer"), request.getParameter("referer"));
-		String redirectUrl = targetUrl;
+		String redirectUrl = savedRequest.getRedirectUrl();
 
 		if (StringUtils.isNotBlank(tenantName)) {
-			logger.info(" match 1 {} \n match 2 {} \n match 3 {} \n",
-				antPathMatcher.match(targetUrl, "/pop"),
-				antPathMatcher.match(targetUrl, "/iis/pop"),
-				antPathMatcher.match(targetUrl, "/iis/pop"));
 			redirectUrl = filterForSuffix(redirectUrl, "/pop", tenantName);
 			redirectUrl = filterForSuffix(redirectUrl, "/home", tenantName);
 		} else {
@@ -68,10 +59,8 @@ public class FormAuthenticationSuccessHandler extends SavedRequestAwareAuthentic
 		UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(targetUrl);
 		logger.info("Source {}, parsed {}, path {}, suffix {}", targetUrl, builder.build(), url.getPath(), pathSuffix);
 
-
-		if (StringUtils.endsWith(url.getPath(), pathSuffix)) {
-			logger.info("MATCH");
-			String newPath = TENANT_BASE_PATH + "/" + tenantName + pathSuffix;
+		if (StringUtils.endsWith(url.getPath(), "/iis" + pathSuffix)) {
+			String newPath = "/iis" + TENANT_BASE_PATH + "/" + tenantName + pathSuffix;
 			String params = StringUtils.substringAfter(targetUrl, "?");
 			builder.replacePath(newPath);
 		}
