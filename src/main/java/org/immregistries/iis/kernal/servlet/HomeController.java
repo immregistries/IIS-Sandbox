@@ -152,6 +152,12 @@ public class HomeController {
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
+
+//		String location = req.getHeader("Location");
+//
+//		if (StringUtils.endsWith(location,"/iis/loginForm")) {
+//
+//		}
 		Tenant tenant = ServletHelper.getTenant(req);
 		String tenantName = "{tenantName}";
 		if (tenant != null) {

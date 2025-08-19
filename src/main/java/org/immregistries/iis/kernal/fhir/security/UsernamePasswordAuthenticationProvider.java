@@ -23,7 +23,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import static org.immregistries.iis.kernal.fhir.security.ServletHelper.SESSION_TENANT;
 import static org.immregistries.iis.kernal.fhir.security.ServletHelper.SESSION_USER_ACCESS;
-import static org.immregistries.iis.kernal.servlet.LoginController.PARAM_TENANT_NAME;
+import static org.immregistries.iis.kernal.servlet.LoginController.LOGIN_PARAM_TENANT_NAME;
 
 
 @Component
@@ -46,8 +46,8 @@ public class UsernamePasswordAuthenticationProvider implements AuthenticationPro
 		Session dataSession = ServletHelper.getDataSession();
 
 		// TODO maybe customize  "PrincipalExtractor" instead and have the userAccess/tenant as principal https://www.baeldung.com/spring-security-oauth-principal-authorities-extractor
-		if (StringUtils.isNotBlank(request.getParameter(PARAM_TENANT_NAME))) {
-			Tenant tenant = ServletHelper.authenticateTenant(authentication.getName(), (String) authentication.getCredentials(), request.getParameter(PARAM_TENANT_NAME), dataSession, partitionCreationInterceptor);
+		if (StringUtils.isNotBlank(request.getParameter(LOGIN_PARAM_TENANT_NAME))) {
+			Tenant tenant = ServletHelper.authenticateTenant(authentication.getName(), (String) authentication.getCredentials(), request.getParameter(LOGIN_PARAM_TENANT_NAME), dataSession, partitionCreationInterceptor);
 			if (tenant != null) {
 				/**
 				 * Creating a new session after login

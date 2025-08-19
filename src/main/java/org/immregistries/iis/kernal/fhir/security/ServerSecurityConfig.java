@@ -10,14 +10,16 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
+import org.springframework.security.web.savedrequest.RequestCache;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.immregistries.iis.kernal.servlet.LoginController.PARAM_PASSWORD;
-import static org.immregistries.iis.kernal.servlet.LoginController.PARAM_USERID;
+import static org.immregistries.iis.kernal.servlet.LoginController.LOGIN_PARAM_PASSWORD;
+import static org.immregistries.iis.kernal.servlet.LoginController.LOGIN_PARAM_USERID;
 import static org.immregistries.iis.kernal.servlet.shlink.PatientShlinkManifestController.PATIENT_MANIFEST_FULL_PATH;
 import static org.immregistries.iis.kernal.servlet.shlink.ShLinkManifestController.SHLINKS_CONTROLLER_BASE_URL;
 
@@ -30,8 +32,9 @@ public class ServerSecurityConfig {
 	 * upgraded with AI, TODO verify
 	 */
 	@Bean
-	public SecurityFilterChain filterChain(HttpSecurity http, CustomOAuthSuccessHandler customOAuthSuccessHandler, FormAuthenticationSuccessHandler formAuthenticationSuccessHandler) throws Exception {
+	public SecurityFilterChain filterChain(HttpSecurity http, CustomOAuthSuccessHandler customOAuthSuccessHandler, FormAuthenticationSuccessHandler formAuthenticationSuccessHandler, RequestCache requestCache) throws Exception {
 		http
+			.requestCache(cache -> cache.requestCache(requestCache))
 			.authorizeHttpRequests((authorize) -> authorize
 				.requestMatchers(HttpMethod.GET, "/", "/home", PopController.POP_BASE_PATH, "/SubscriptionTopic/**", "/img/**").permitAll()
 				.requestMatchers("/tenant/*/manifest/**", SHLINKS_CONTROLLER_BASE_URL).permitAll() //Shlinks
@@ -41,12 +44,12 @@ public class ServerSecurityConfig {
 				.anyRequest().authenticated()
 			)
 			.formLogin((form) -> form
-				.usernameParameter(PARAM_USERID)
-				.passwordParameter(PARAM_PASSWORD)
+					.usernameParameter(LOGIN_PARAM_USERID)
+					.passwordParameter(LOGIN_PARAM_PASSWORD)
 				.loginPage("/loginForm") // Page where redirected when unauthorised
 				.loginProcessingUrl("/login") // url for login request to be processed (hollow)
 				.successHandler(formAuthenticationSuccessHandler)
-
+//				.addObjectPostProcessor()
 			)
 
 			.oauth2Login((oauth2) -> oauth2
@@ -84,8 +87,15 @@ public class ServerSecurityConfig {
 	}
 
 	@Bean
-	FormAuthenticationSuccessHandler formAuthenticationSuccessHandler() {
-		return new FormAuthenticationSuccessHandler();
+	FormAuthenticationSuccessHandler formAuthenticationSuccessHandler(HttpSecurity http, RequestCache requestCache) {
+		FormAuthenticationSuccessHandler formAuthenticationSuccessHandler = new FormAuthenticationSuccessHandler();
+		formAuthenticationSuccessHandler.setRequestCache(requestCache);
+		return formAuthenticationSuccessHandler;
+	}
+
+	@Bean
+	RequestCache requestCache(HttpSecurity http) {
+		return new HttpSessionRequestCache();
 	}
 
 

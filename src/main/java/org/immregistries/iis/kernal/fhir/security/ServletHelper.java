@@ -7,6 +7,7 @@ import ca.uhn.fhir.rest.api.server.SystemRequestDetails;
 import ca.uhn.fhir.rest.server.exceptions.AuthenticationException;
 import jakarta.persistence.Query;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Session;
@@ -19,12 +20,14 @@ import org.immregistries.iis.kernal.model.persisted.UserAccess;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -314,6 +317,17 @@ public final class ServletHelper {
 
 	public static Tenant getTenant(HttpServletRequest request) {
 		return getTenant(request, null);
+	}
+
+	public static @NotNull Tenant getTenantRedirectIfNone(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+		Tenant tenant = getTenant(req);
+		if (tenant == null) {
+			if (ServletHelper.getUserAccess() != null) {
+				resp.sendRedirect("/iis/tenant");
+			}
+			throw new AuthenticationCredentialsNotFoundException("");
+		}
+		return tenant;
 	}
 
 	public static Tenant getTenant() {

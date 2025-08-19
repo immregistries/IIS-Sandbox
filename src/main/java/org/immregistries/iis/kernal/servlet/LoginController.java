@@ -21,9 +21,9 @@ import java.io.PrintWriter;
 @RequestMapping("/loginForm")
 public class LoginController {
 
-	public static final String PARAM_USERID = "USERID";
-	public static final String PARAM_PASSWORD = "PASSWORD";
-	public static final String PARAM_TENANT_NAME = "TENANTID";
+	public static final String LOGIN_PARAM_USERID = "USERID";
+	public static final String LOGIN_PARAM_PASSWORD = "PASSWORD";
+	public static final String LOGIN_PARAM_TENANT_NAME = "TENANTID";
 	public static final String PARAM_ORG_ID = "orgId";
 
 	public static final String PARAM_ACTION = "action";
@@ -47,8 +47,8 @@ public class LoginController {
 			Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
          // LOGIN FORM, inherited, could be made in a separate class and improved
 			if (!authentication.isAuthenticated() || authentication instanceof AnonymousAuthenticationToken) {
-				String userId = req.getParameter(PARAM_USERID);
-				String tenantId = req.getParameter(PARAM_TENANT_NAME);
+				String userId = req.getParameter(LOGIN_PARAM_USERID);
+				String tenantId = req.getParameter(LOGIN_PARAM_TENANT_NAME);
 				if (userId == null) {
 					userId = "";
 				}
@@ -65,11 +65,11 @@ public class LoginController {
 				out.println("	<form method=\"POST\" action=\"login\" class=\"w3-container w3-card-4 w3-half\">");
 				out.println("		<input class=\"w3-input\" type=\"hidden\" name=\"referer\" value=\"" + locationHeader + "\"/>");
 
-				out.println("		<input class=\"w3-input\" type=\"text\" name=\"" + PARAM_USERID + "\" value=\"" + userId + "\" required autofocus/>");
+				out.println("		<input class=\"w3-input\" type=\"text\" name=\"" + LOGIN_PARAM_USERID + "\" value=\"" + userId + "\" required autofocus/>");
 				out.println("		<label>User Id</label>");
-				out.println("		<input class=\"w3-input\" type=\"password\" name=\"" + PARAM_PASSWORD + "\" value=\"\"/>");
+				out.println("		<input class=\"w3-input\" type=\"password\" name=\"" + LOGIN_PARAM_PASSWORD + "\" value=\"\"/>");
 				out.println("		<label>Password</label>");
-				out.println("		<input class=\"w3-input\" type=\"text\" name=\"" + PARAM_TENANT_NAME + "\" value=\"" + tenantId + "\"/>");
+				out.println("		<input class=\"w3-input\" type=\"text\" name=\"" + LOGIN_PARAM_TENANT_NAME + "\" value=\"" + tenantId + "\"/>");
 				out.println("		<label>Tenant Name (optional)</label>");
 				out.println("		<br/>");
 				out.println("		<input class=\"w3-button w3-section w3-teal w3-ripple\" type=\"submit\" name=\"" + PARAM_ACTION + "\" value=\"" + ACTION_LOGIN + "\"/>");
