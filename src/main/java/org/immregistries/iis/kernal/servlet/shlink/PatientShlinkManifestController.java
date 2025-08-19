@@ -65,9 +65,6 @@ public class PatientShlinkManifestController {
 				tenant = ServletHelper.authenticateTenantNoUsername(passcode, tenantName, dataSession, partitionCreationInterceptor);
 			}
 			if (tenant == null) {
-//				if (ServletHelper.getUserAccess() != null) {
-//					resp.sendRedirect("/iis/tenant");
-//				}
 				throw new AuthenticationCredentialsNotFoundException("No tenant found or invalid passcode");
 			}
 			return getShLinkManifest(req, id, tenant);

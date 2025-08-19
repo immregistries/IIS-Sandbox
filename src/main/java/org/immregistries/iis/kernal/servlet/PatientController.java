@@ -135,7 +135,10 @@ public class PatientController {
 		printFhirShortcuts(out, patientSelected, patientMasterSelected, tenant);
 		out.println("</div>");
 		out.println("<div class=\"w3-container\">");
-		out.println("<img src=\"" + Application.IIS_PATH_BASE + "/patient/qr?id=" + patientMasterSelected.getPatientId() + "\"  alt=\"shlink\" width=\"200\">");
+
+//		UriComponentsBuilder uriComponentsBuilder = ServletUriComponentsBuilder.fromRequest(req);
+//		uriComponentsBuilder
+		out.println("<img src=\"" + Application.IIS_PATH_BASE + TenantController.TENANT_BASE_PATH + tenant.getOrganizationName() + "/patient/qr?id=" + patientMasterSelected.getPatientId() + "\"  alt=\"shlink\" width=\"200\">");
 
 		String manifestUrl = PatientShLinkController.getManifestUrl(req, patientSelected, tenant);
 

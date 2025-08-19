@@ -44,6 +44,8 @@ public class ShLinkManifestController {
 	@GetMapping("/{id}/qr")
 	public void printQr(HttpServletRequest req, HttpServletResponse resp, @PathVariable("id") String manifestId) throws IOException, ServletException {
 		ShLinkManifest shLinkManifest = shlUtilService.readShLinkManifest(manifestId);
+//		UriComponentsBuilder builder = ServletUriComponentsBuilder.fromRequestUri(req);
+//		builder.replacePath()
 		String url = req.getContextPath().split("/qr")[0];
 		resp.setContentType("image/png"); // Set content type for PNG image
 		OutputStream out = resp.getOutputStream();
