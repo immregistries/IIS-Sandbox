@@ -21,7 +21,6 @@ import org.immregistries.iis.kernal.model.persisted.Tenant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -64,13 +63,7 @@ public class RecommendationController {
 //		, @PathVariable(name = TenantController.PATH_VARIABLE_TENANT_NAME, required = false) String tenantName dealt with in filter
 	)
 		throws ServletException, IOException {
-		Tenant tenant = ServletHelper.getTenant(req);
-		if (tenant == null) {
-			if (ServletHelper.getUserAccess() != null) {
-				resp.sendRedirect("/iis/tenant");
-			}
-			throw new AuthenticationCredentialsNotFoundException("");
-		}
+		Tenant tenant = ServletHelper.getTenantRedirectIfNone(req, resp);
 		IGenericClient fhirClient = repositoryClientFactory.newGenericClient(req);
 		IDomainResource patient = PatientServletUtil.fetchPatientFromParameter(req, fhirClient, fhirRequester);
 		PatientMaster patientMaster = patientMapper.localObject(patient);
@@ -110,13 +103,7 @@ public class RecommendationController {
 	 */
 	@PutMapping
 	protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		Tenant tenant = ServletHelper.getTenant(req);
-		if (tenant == null) {
-			if (ServletHelper.getUserAccess() != null) {
-				resp.sendRedirect("/iis/tenant");
-			}
-			throw new AuthenticationCredentialsNotFoundException("");
-		}
+		ServletHelper.getTenantRedirectIfNone(req, resp);
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		try {
 			IParser parser = repositoryClientFactory.getFhirContext()
@@ -156,14 +143,7 @@ public class RecommendationController {
 	 */
 	@GetMapping
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		Tenant tenant = ServletHelper.getTenant(req);
-		if (tenant == null) {
-			if (ServletHelper.getUserAccess() != null) {
-				resp.sendRedirect("/iis/tenant");
-			}
-			throw new AuthenticationCredentialsNotFoundException("");
-		}
-
+		Tenant tenant = ServletHelper.getTenantRedirectIfNone(req, resp);
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		HomeController.doHeader(out, "Recommendations", tenant);

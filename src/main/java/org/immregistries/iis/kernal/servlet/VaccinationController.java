@@ -223,7 +223,7 @@ public class VaccinationController {
 				{
 					out.println("<div class=\"w3-container\">");
 					out.println("<h4>FHIR Api Shortcuts</h4>");
-					String apiBaseUrl = "/iis/fhir/" + tenant.getOrganizationName();
+					String apiBaseUrl = RepositoryClientFactory.fhirServerBasePath(tenant);
 					{
 						String link = apiBaseUrl + "/Immunization?_id=" + vaccination.getVaccinationId();
 						out.println("<div>FHIR Immunization: <a href=\"" + link + "\">" + link + "</a></div>");

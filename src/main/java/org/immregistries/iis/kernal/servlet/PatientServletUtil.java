@@ -10,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.instance.model.api.IDomainResource;
 import org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester;
+import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
 import org.immregistries.iis.kernal.model.LoincIdentifier;
 import org.immregistries.iis.kernal.model.ObservationReported;
 import org.immregistries.iis.kernal.model.PatientMaster;
@@ -320,7 +321,7 @@ public final class PatientServletUtil {
 
 	public static void printFhirShortcuts(PrintWriter out, IBaseResource patientSelected, PatientMaster patientMasterSelected, Tenant tenant) {
 		out.println("<h4>FHIR Api Shortcuts</h4>");
-		String apiBaseUrl = "/iis/fhir/" + tenant.getOrganizationName();
+		String apiBaseUrl = RepositoryClientFactory.fhirServerBasePath(tenant);
 		{
 			String link = apiBaseUrl + "/Patient/" + patientMasterSelected.getPatientId();
 			out.println("<div>FHIR Resource: <a href=\"" + link + "\">" + link + "</a></div>");

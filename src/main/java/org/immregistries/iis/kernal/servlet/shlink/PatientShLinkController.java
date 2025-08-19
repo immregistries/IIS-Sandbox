@@ -20,7 +20,6 @@ import org.immregistries.iis.kernal.model.persisted.Tenant;
 import org.immregistries.iis.kernal.servlet.TenantController;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -58,13 +57,7 @@ public class PatientShLinkController {
 		resp.setContentType("image/png"); // Set content type for PNG image
 
 		try (Session dataSession = ServletHelper.getDataSession()) {
-			Tenant tenant = ServletHelper.getTenant(req, dataSession);
-			if (tenant == null) {
-				if (ServletHelper.getUserAccess() != null) {
-					resp.sendRedirect("/iis/tenant");
-				}
-				throw new AuthenticationCredentialsNotFoundException("");
-			}
+			Tenant tenant = ServletHelper.getTenantRedirectIfNone(req, resp, dataSession);
 			IGenericClient fhirClient = repositoryClientFactory.newGenericClient(req);
 			IBaseResource patientSelected = fetchPatientFromParameter(req, fhirClient, fhirRequester);
 			if (patientSelected != null) {

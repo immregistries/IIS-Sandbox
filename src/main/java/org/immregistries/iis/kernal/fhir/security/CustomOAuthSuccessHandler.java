@@ -5,8 +5,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.hibernate.Session;
+import org.immregistries.iis.kernal.fhir.Application;
 import org.immregistries.iis.kernal.fhir.interceptors.PartitionCreationInterceptor;
 import org.immregistries.iis.kernal.model.persisted.Tenant;
+import org.immregistries.iis.kernal.servlet.HomeController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,7 +64,7 @@ public class CustomOAuthSuccessHandler implements AuthenticationSuccessHandler {
 		}
 
 
-		String targetUrl = "/iis/home";
+		String targetUrl = Application.IIS_PATH_BASE + HomeController.HOME_BASE_PATH;
 
 		if (response.isCommitted()) {
 			logger.debug(

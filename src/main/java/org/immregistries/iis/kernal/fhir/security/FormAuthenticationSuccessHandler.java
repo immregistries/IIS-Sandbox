@@ -5,6 +5,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.immregistries.iis.kernal.fhir.Application;
+import org.immregistries.iis.kernal.servlet.HomeController;
+import org.immregistries.iis.kernal.servlet.PopController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
@@ -41,15 +43,15 @@ public class FormAuthenticationSuccessHandler extends SavedRequestAwareAuthentic
 		UriComponentsBuilder builder;
 		if (savedRequest == null) {
 			builder = ServletUriComponentsBuilder.fromRequest(request);
-			builder.replacePath("/iis/");
+			builder.replacePath(Application.IIS_PATH_BASE + "/");
 		} else {
 			// Use the DefaultSavedRequest URL
 			builder = UriComponentsBuilder.fromHttpUrl(savedRequest.getRedirectUrl());
 		}
 		if (StringUtils.isNotBlank(tenantName)) {
-			filterForSuffix(builder, "/iis/pop", tenantName, "/pop");
-			filterForSuffix(builder, "/iis/home", tenantName, "/home");
-			filterForSuffix(builder, "/iis/", tenantName, "/home");
+			filterForSuffix(builder, Application.IIS_PATH_BASE + PopController.POP_BASE_PATH, tenantName, PopController.POP_BASE_PATH);
+			filterForSuffix(builder, Application.IIS_PATH_BASE + HomeController.HOME_BASE_PATH, tenantName, HomeController.HOME_BASE_PATH);
+			filterForSuffix(builder, Application.IIS_PATH_BASE + "/", tenantName, HomeController.HOME_BASE_PATH);
 		}
 
 		clearAuthenticationAttributes(request);

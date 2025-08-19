@@ -16,13 +16,17 @@ import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import org.hibernate.Session;
+import org.immregistries.iis.kernal.fhir.Application;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.model.persisted.UserAccess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.web.util.UriComponentsBuilder;
 
+import java.net.MalformedURLException;
 import java.security.PublicKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
@@ -60,8 +64,17 @@ public class JwtAuthController {
 	 */
 	@GetMapping("/.well-known/smart-configuration")
 	public String wellKnownConfiguration() {
+		UriComponentsBuilder uriComponentsBuilder = ServletUriComponentsBuilder.fromCurrentRequestUri();
+		uriComponentsBuilder.replacePath(Application.IIS_PATH_BASE + "/token");
+		String token_endpoint;
+
+		try {
+			token_endpoint = uriComponentsBuilder.build().toUri().toURL().toString();
+		} catch (MalformedURLException e) {
+			throw new RuntimeException(e);
+		}
 		return "{\n" +
-			"  \"token_endpoint\": \"https://bulksandbox.pagekite.me/iis/token\",\n" +
+			"  \"token_endpoint\": \"" + token_endpoint + "\",\n" +
 			"  \"token_endpoint_auth_methods_supported\": [\"private_key_jwt\", \"client-confidential-asymmetric\"],\n" +
 			"  \"token_endpoint_auth_signing_alg_values_supported\": [\"RS384\", \"ES384\", \"RS512\", \"ES512\"],\n" +
 			"  \"scopes_supported\": [\"system/*.rs\"]\n" +

@@ -18,6 +18,7 @@ import org.immregistries.iis.kernal.fhir.Application;
 import org.immregistries.iis.kernal.fhir.interceptors.PartitionCreationInterceptor;
 import org.immregistries.iis.kernal.model.persisted.Tenant;
 import org.immregistries.iis.kernal.model.persisted.UserAccess;
+import org.immregistries.iis.kernal.servlet.TenantController;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -333,7 +334,7 @@ public final class ServletHelper {
 		Tenant tenant = getTenant(req, existingDataSession);
 		if (tenant == null) {
 			if (ServletHelper.getUserAccess() != null) {
-				resp.sendRedirect("/iis/tenant");
+				resp.sendRedirect(Application.IIS_PATH_BASE + TenantController.TENANT_BASE_PATH);
 			}
 			throw new AuthenticationCredentialsNotFoundException("");
 		}

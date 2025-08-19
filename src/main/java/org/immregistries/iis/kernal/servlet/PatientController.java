@@ -135,7 +135,7 @@ public class PatientController {
 		printFhirShortcuts(out, patientSelected, patientMasterSelected, tenant);
 		out.println("</div>");
 		out.println("<div class=\"w3-container\">");
-		out.println("<img src=\"/iis/patient/qr?id=" + patientMasterSelected.getPatientId() + "\"  alt=\"shlink\" width=\"200\">");
+		out.println("<img src=\"" + Application.IIS_PATH_BASE + "/patient/qr?id=" + patientMasterSelected.getPatientId() + "\"  alt=\"shlink\" width=\"200\">");
 
 		String manifestUrl = PatientShLinkController.getManifestUrl(req, patientSelected, tenant);
 
@@ -301,7 +301,7 @@ public class PatientController {
 		{
 			out.println("<div class=\"w3-container\">");
 			out.println("<h4>FHIR Api Shortcuts</h4>");
-			String apiBaseUrl = Application.IIS_PATH_BASE + "/fhir/" + tenant.getOrganizationName();
+			String apiBaseUrl = RepositoryClientFactory.fhirServerBasePath(tenant);
 			{
 				String link = apiBaseUrl + "/Patient";
 				out.println("<div>All FHIR Patient records: <a href=\"" + link + "\">" + link + "</a></div>");

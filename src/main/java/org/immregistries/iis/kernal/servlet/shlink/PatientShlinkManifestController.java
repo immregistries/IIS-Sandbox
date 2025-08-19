@@ -83,14 +83,7 @@ public class PatientShlinkManifestController {
 																	  @RequestParam(value = "embeddedLengthMax", required = false) String embeddedLengthMax) throws IOException, ServletException {
 		resp.setContentType("application/json");
 		try (Session dataSession = ServletHelper.getDataSession()) {
-			Tenant tenant;
-				tenant = ServletHelper.getTenant(req, dataSession);
-			if (tenant == null) {
-				if (ServletHelper.getUserAccess() != null) {
-					resp.sendRedirect("/iis/tenant");
-				}
-				throw new AuthenticationCredentialsNotFoundException("");
-			}
+			Tenant tenant = ServletHelper.getTenantRedirectIfNone(req, resp, dataSession);
 			return getShLinkManifest(req, id, tenant);
 		}
 	}

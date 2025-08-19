@@ -14,8 +14,10 @@ import ca.uhn.fhir.rest.server.exceptions.AuthenticationException;
 import ca.uhn.fhir.rest.server.servlet.ServletRequestDetails;
 import ca.uhn.fhir.rest.server.util.ITestingUiClientFactory;
 import jakarta.servlet.http.HttpServletRequest;
+import org.immregistries.iis.kernal.fhir.Application;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.model.persisted.Tenant;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,7 +71,7 @@ public class RepositoryClientFactory extends ApacheRestfulClientFactory implemen
 		UriComponentsBuilder uriComponentsBuilder = ServletUriComponentsBuilder.fromRequestUri(httpServletRequest);
 		URL serverBase;
 		try {
-			uriComponentsBuilder.replacePath("/iis/fhir/" + tenant.getOrganizationName());
+			uriComponentsBuilder.replacePath(fhirServerBasePath(tenant));
 			uriComponentsBuilder.replaceQuery("");
 			serverBase = uriComponentsBuilder.build().toUri().toURL();
 		} catch (MalformedURLException e) {
@@ -97,6 +99,10 @@ public class RepositoryClientFactory extends ApacheRestfulClientFactory implemen
 		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
 		request.setAttribute(FHIR_CLIENT, client);
 		return client;
+	}
+
+	public static @NotNull String fhirServerBasePath(Tenant tenant) {
+		return Application.IIS_PATH_BASE + "/fhir/" + tenant.getOrganizationName();
 	}
 
 	/**
