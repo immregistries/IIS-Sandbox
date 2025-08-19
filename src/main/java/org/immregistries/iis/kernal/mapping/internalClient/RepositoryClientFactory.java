@@ -25,6 +25,11 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.web.util.UriComponentsBuilder;
+
+import java.net.MalformedURLException;
+import java.net.URL;
 
 import static org.immregistries.iis.kernal.fhir.interceptors.IisAuthorizationInterceptor.CONNECTATHON_USER;
 import static org.immregistries.iis.kernal.fhir.security.ServletHelper.GITHUB_PREFIX;
@@ -61,7 +66,16 @@ public class RepositoryClientFactory extends ApacheRestfulClientFactory implemen
 	public IGenericClient newGenericClient(Tenant tenant, HttpServletRequest httpServletRequest) {
 		asynchInit();
 		IGenericClient client;
-		client = newGenericClient("http://" + httpServletRequest.getLocalAddr() + ":" + httpServletRequest.getLocalPort() + "/iis/fhir/" + tenant.getOrganizationName());
+		UriComponentsBuilder uriComponentsBuilder = ServletUriComponentsBuilder.fromRequestUri(httpServletRequest);
+		URL serverBase;
+		try {
+			uriComponentsBuilder.replacePath("/iis/fhir/" + tenant.getOrganizationName());
+			uriComponentsBuilder.replaceQuery("");
+			serverBase = uriComponentsBuilder.build().toUri().toURL();
+		} catch (MalformedURLException e) {
+			throw new RuntimeException(e);
+		}
+		client = newGenericClient(serverBase.toString());
 		IClientInterceptor authInterceptor;
 		if (tenant.getOrganizationName().equals(CONNECTATHON_USER) && tenant.getUserAccess().getAccessName() == null) {
 			/**
