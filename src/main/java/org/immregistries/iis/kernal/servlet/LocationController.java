@@ -15,7 +15,6 @@ import org.immregistries.iis.kernal.model.*;
 import org.immregistries.iis.kernal.model.persisted.MessageReceived;
 import org.immregistries.iis.kernal.model.persisted.Tenant;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -76,13 +75,7 @@ public class LocationController {
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
 		throws ServletException, IOException {
 
-		Tenant tenant = ServletHelper.getTenant();
-		if (tenant == null) {
-			if (ServletHelper.getUserAccess() != null) {
-				resp.sendRedirect("/iis/tenant");
-			}
-			throw new AuthenticationCredentialsNotFoundException("");
-		}
+		Tenant tenant = ServletHelper.getTenantRedirectIfNone(req, resp);
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 //    Session dataSession = PopServlet.getDataSession();
