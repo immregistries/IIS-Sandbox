@@ -27,6 +27,7 @@ import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.Map;
 
+import static org.immregistries.iis.kernal.fhir.Application.IIS_PATH_BASE;
 import static org.immregistries.iis.kernal.servlet.HomeController.HOME_BASE_PATH;
 
 /**
@@ -72,11 +73,11 @@ public class HomeController {
 //		out.println("<a href=\"subscription\" class=\"w3-bar-item w3-button\">Subscriptions</a>");
 		out.println("<a href=\"" + ServletHelper.tenantifyUrl(tenant, "soap") + "\" class=\"w3-bar-item w3-button\">CDC WSDL</a>");
 		if (authentication.isAuthenticated() && !(authentication instanceof AnonymousAuthenticationToken)) {
-			out.println("<a class='w3-bar-item w3-button w3-right' href=\"logout\">Logout</a>");
+			out.println("<a class='w3-bar-item w3-button w3-right' href=\"" + IIS_PATH_BASE + "/logout\">Logout</a>");
 			String link = "tenant";
 			if (tenant != null) {
 				out.println("<a class='w3-bar-item w3-button w3-right w3-green' href=\"" + link + "\">Tenant : " + tenant.getOrganizationName() + " </a>");
-				out.println("<a href=\"fhir/" + tenant.getOrganizationName() + "/metadata\" class=\"w3-bar-item w3-button w3-right \">Tenant Fhir Server Base</a>");
+				out.println("<a href=\"" + IIS_PATH_BASE + "/fhir/" + tenant.getOrganizationName() + "/metadata\" class=\"w3-bar-item w3-button w3-right \">Tenant Fhir Server Base</a>");
 			} else {
 				out.println("<a class='w3-bar-item w3-button w3-right w3-green' href=\"" + link + "\">No Tenant selected</a>");
 			}
@@ -100,7 +101,7 @@ public class HomeController {
 		UserAccess userAccess = ServletHelper.getUserAccess();
 		if (userAccess != null) {
 			out.println("  <div class=\"w3-container\">");
-			out.println("    <p><a href=\"logout\">Logout</a></p>");
+			out.println("    <p><a href=\"" + IIS_PATH_BASE + "/logout\">Logout</a></p>");
 			out.println("  </div>");
 		}
 
@@ -153,11 +154,6 @@ public class HomeController {
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 
-//		String location = req.getHeader("Location");
-//
-//		if (StringUtils.endsWith(location,"/iis/loginForm")) {
-//
-//		}
 		Tenant tenant = ServletHelper.getTenant(req);
 		String tenantName = "{tenantName}";
 		if (tenant != null) {
@@ -208,7 +204,7 @@ public class HomeController {
 				"using an experimental mapping layer to use inherited Hl7v2 based functionalities, current version of HAPIFHIR is a " +
 				"<a href='https://github.com/cerbeor/hapi-fhir-Subscription-custom'>modded</a> 6.8.3</li>");
 			out.println("      <li><h4>Multitenancy:</h4> Tenants allow separate testing environments, using different Flavors and different partitions of FHIR Server,	" +
-				"Base URLs are formatted as <a href='fhir'>/iis/fhir/" + tenantName + "</a></li>");
+				"Base URLs are formatted as <a href='fhir'>" + IIS_PATH_BASE + "/fhir/" + tenantName + "</a></li>");
 			out.println("      <li><h4>Record's Matching:</h4>Matching resources using " +
 				"<a href='https://github.com/immregistries/mismo-match'>MISMO</a> for Patients (Activated with a Flavor), " +
 				"<a href='https://github.com/usnistgov/vaccination_deduplication'>vaccination_deduplication</a> for Immunizations</li>");

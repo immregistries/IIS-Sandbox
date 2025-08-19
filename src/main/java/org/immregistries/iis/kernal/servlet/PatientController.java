@@ -16,6 +16,7 @@ import org.hibernate.Session;
 import org.hibernate.query.Query;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.instance.model.api.IDomainResource;
+import org.immregistries.iis.kernal.fhir.Application;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.fhir.shl.ShLinkPayload;
 import org.immregistries.iis.kernal.fhir.shl.ShlUtilService;
@@ -32,7 +33,6 @@ import org.immregistries.iis.kernal.servlet.shlink.PatientShLinkController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -92,13 +92,7 @@ public class PatientController {
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		try (Session dataSession = ServletHelper.getDataSession()) {
-			Tenant tenant = ServletHelper.getTenant(req, dataSession);
-			if (tenant == null) {
-				if (ServletHelper.getUserAccess() != null) {
-					resp.sendRedirect("/iis/tenant");
-				}
-				throw new AuthenticationCredentialsNotFoundException("");
-			}
+			Tenant tenant = ServletHelper.getTenantRedirectIfNone(req, resp, dataSession);
 			IGenericClient fhirClient = repositoryClientFactory.newGenericClient(req);
 			try {
 				HomeController.doHeader(out, "IIS Sandbox - Patients", tenant);
@@ -307,7 +301,7 @@ public class PatientController {
 		{
 			out.println("<div class=\"w3-container\">");
 			out.println("<h4>FHIR Api Shortcuts</h4>");
-			String apiBaseUrl = "/iis/fhir/" + tenant.getOrganizationName();
+			String apiBaseUrl = Application.IIS_PATH_BASE + "/fhir/" + tenant.getOrganizationName();
 			{
 				String link = apiBaseUrl + "/Patient";
 				out.println("<div>All FHIR Patient records: <a href=\"" + link + "\">" + link + "</a></div>");

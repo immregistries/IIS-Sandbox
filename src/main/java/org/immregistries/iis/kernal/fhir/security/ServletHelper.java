@@ -36,6 +36,8 @@ import java.util.List;
 import static org.immregistries.iis.kernal.servlet.TenantUrlFilter.TENANT_NAME_URL;
 
 public final class ServletHelper {
+	// TODO Complete
+	public static final List<String> FORBIDDEN_NAMES = List.of("pop", "iis", "home", "patient", "vaccination", "fhir", "tenant", "facility");
 	private static final Logger logger = LoggerFactory.getLogger(ServletHelper.class);
 	public static final String GITHUB_PREFIX = "github-";
 	public static final String SESSION_TENANT = "tenant";
@@ -243,10 +245,13 @@ public final class ServletHelper {
 
 	private static Tenant registerTenant(String facilityName, UserAccess userAccess, Session dataSession) {
 		Tenant tenant = new Tenant();
+		if (FORBIDDEN_NAMES.contains(facilityName)) {
+			throw new RuntimeException("Tenant name: " + facilityName + " is forbidden");
+		}
 		tenant.setOrganizationName(facilityName);
 		tenant.setUserAccess(userAccess);
 		Transaction transaction = dataSession.beginTransaction();
-		tenant.setOrgId((Integer) dataSession.save(tenant));
+		dataSession.persist(tenant);
 		transaction.commit();
 		return tenant;
 	}
@@ -321,7 +326,11 @@ public final class ServletHelper {
 	}
 
 	public static @NotNull Tenant getTenantRedirectIfNone(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-		Tenant tenant = getTenant(req);
+		return getTenantRedirectIfNone(req, resp, null);
+	}
+
+	public static @NotNull Tenant getTenantRedirectIfNone(HttpServletRequest req, HttpServletResponse resp, Session existingDataSession) throws IOException {
+		Tenant tenant = getTenant(req, existingDataSession);
 		if (tenant == null) {
 			if (ServletHelper.getUserAccess() != null) {
 				resp.sendRedirect("/iis/tenant");

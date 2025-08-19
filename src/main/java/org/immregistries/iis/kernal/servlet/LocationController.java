@@ -19,6 +19,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -119,7 +121,8 @@ public class LocationController {
 					orgLocationSelected.setVfcProviderPin(req.getParameter(PARAM_VFC_PROVIDER_PIN));
 					orgLocationSelected = fhirRequests.saveOrgLocation(orgLocationSelected);
 
-					resp.sendRedirect("/iis/location");
+					UriComponentsBuilder uriComponentsBuilder = ServletUriComponentsBuilder.fromRequestUri(req);
+					resp.sendRedirect(uriComponentsBuilder.build().toUri().toURL().toString());
 //			  Location location = LocationMapper.fhirLocation(orgLocationSelected);
 //			  try {
 //				  MethodOutcome outcome = fhirClient.update().resource(location).conditional()

@@ -78,6 +78,7 @@ public class ServerSecurityConfig {
 		addTenantifiedRequestMatcher(csrfIgnoringRequestMatchers, "/subscription");
 		addTenantifiedRequestMatcher(csrfIgnoringRequestMatchers, "/vaccination");
 		addTenantifiedRequestMatcher(csrfIgnoringRequestMatchers, "/tenant");
+		addTenantifiedRequestMatcher(csrfIgnoringRequestMatchers, "/locationfix");
 		addTenantifiedRequestMatcher(csrfIgnoringRequestMatchers, "/soap");
 		http.csrf((csrf) -> csrf
 			.ignoringRequestMatchers(csrfIgnoringRequestMatchers.toArray(new RequestMatcher[csrfIgnoringRequestMatchers.size()]))

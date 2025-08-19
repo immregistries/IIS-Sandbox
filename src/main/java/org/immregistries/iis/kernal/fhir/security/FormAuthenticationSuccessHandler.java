@@ -14,11 +14,11 @@ import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
 import org.springframework.security.web.savedrequest.RequestCache;
 import org.springframework.security.web.savedrequest.SavedRequest;
 import org.springframework.util.AntPathMatcher;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URL;
 
 import static org.immregistries.iis.kernal.servlet.LoginController.LOGIN_PARAM_TENANT_NAME;
 import static org.immregistries.iis.kernal.servlet.TenantController.TENANT_BASE_PATH;
@@ -38,34 +38,31 @@ public class FormAuthenticationSuccessHandler extends SavedRequestAwareAuthentic
 
 		logger.info("targetUrl CALLED, {}, {}", requestCache, tenantName);
 
+		UriComponentsBuilder builder;
 		if (savedRequest == null) {
-			super.onAuthenticationSuccess(request, response, authentication);
-			return;
+			builder = ServletUriComponentsBuilder.fromRequest(request);
+			builder.replacePath("/iis/");
+		} else {
+			// Use the DefaultSavedRequest URL
+			builder = UriComponentsBuilder.fromHttpUrl(savedRequest.getRedirectUrl());
 		}
-		clearAuthenticationAttributes(request);
-		// Use the DefaultSavedRequest URL
-		String redirectUrl = savedRequest.getRedirectUrl();
-
 		if (StringUtils.isNotBlank(tenantName)) {
-			redirectUrl = filterForSuffix(redirectUrl, "/pop", tenantName);
-			redirectUrl = filterForSuffix(redirectUrl, "/home", tenantName);
+			filterForSuffix(builder, "/iis/pop", tenantName, "/pop");
+			filterForSuffix(builder, "/iis/home", tenantName, "/home");
+			filterForSuffix(builder, "/iis/", tenantName, "/home");
 		}
-		getRedirectStrategy().sendRedirect(request, response, redirectUrl);
+
+		clearAuthenticationAttributes(request);
+		getRedirectStrategy().sendRedirect(request, response, builder.build().toUri().toURL().toString());
 	}
 
-	private String filterForSuffix(String targetUrl, String pathSuffix, String tenantName) throws MalformedURLException {
-		URL url = new URL(targetUrl);
-		UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(targetUrl);
-		logger.info("Source {}, parsed {}, path {}, suffix {}", targetUrl, builder.build(), url.getPath(), pathSuffix);
-
-		if (StringUtils.endsWith(url.getPath(), Application.IIS_PATH_BASE + pathSuffix)) {
-			String newPath = Application.IIS_PATH_BASE + TENANT_BASE_PATH + "/" + tenantName + pathSuffix;
+	private void filterForSuffix(UriComponentsBuilder builder, String pathSuffix, String tenantName, String newSuffix) throws MalformedURLException {
+		if (StringUtils.endsWith(builder.build().getPath(), pathSuffix)) {
+			String newPath = Application.IIS_PATH_BASE + TENANT_BASE_PATH + "/" + tenantName + newSuffix;
 			builder.replacePath(newPath);
 		}
 		String resultUrl = builder.build().toUri().toURL().toString();
-
-		logger.info("Transfo {} {} {}", targetUrl, pathSuffix, resultUrl);
-		return resultUrl;
+//		logger.info("Transfo {} {} ", pathSuffix, resultUrl);
 	}
 
 }
