@@ -33,8 +33,10 @@ import java.util.Set;
 
 @SuppressWarnings("serial")
 @RestController
-@RequestMapping({"/location", TenantController.TENANT_PATH + "/location"})
+@RequestMapping({LocationController.LOCATION_BASE_PATH, TenantController.TENANT_PATH + LocationController.LOCATION_BASE_PATH})
 public class LocationController {
+	public static final String LOCATION_BASE_PATH = "/location";
+
 	public static final String PARAM_ACTION = "action";
 	public static final String ACTION_ADD = "Add";
 	public static final String ACTION_SAVE = "Save";

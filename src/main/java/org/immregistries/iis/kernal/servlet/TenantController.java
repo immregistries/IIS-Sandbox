@@ -111,9 +111,6 @@ public class TenantController {
 						out.println("<li>" + tenantMember.getOrganizationName() + " (selected)</li>");
 					} else {
 						String link = Application.IIS_PATH_BASE + TenantController.TENANT_BASE_PATH + "/" + tenantMember.getOrganizationName();
-//							"tenant?" + PARAM_ACTION + "="
-//							+ ACTION_SWITCH + "&" + PARAM_TENANT_ID + "="
-//							+ tenantMember.getOrgId();
 						out.println("<li><a href=\"" + link + "\">" + tenantMember.getOrganizationName() + "</a></li>");
 					}
 				}
@@ -135,7 +132,7 @@ public class TenantController {
 					"Tenants are separated testing environments, One Tenant &#8792; One IIS equivalent, Different Facilities can be registered as information sources to the Tenants" +
 					"</p></div>"); // TODO better explanation
 
-				HomeController.printFlavors(out);
+				HomeController.printFlavors(out, true);
 				out.println("</div>");
 
 				HomeController.doFooter(out);

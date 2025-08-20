@@ -36,8 +36,9 @@ import java.util.Map;
  */
 @Conditional(OnR5Condition.class)
 @RestController
-@RequestMapping({"/subscription", TenantController.TENANT_PATH + "/subscription"})
+@RequestMapping({SubscriptionController.SUBSCRIPTION_BASE_PATH, TenantController.TENANT_PATH + SubscriptionController.SUBSCRIPTION_BASE_PATH})
 public class SubscriptionController {
+	public static final String SUBSCRIPTION_BASE_PATH = "/subscription";
 	@Autowired
 	RepositoryClientFactory repositoryClientFactory;
 	@Autowired

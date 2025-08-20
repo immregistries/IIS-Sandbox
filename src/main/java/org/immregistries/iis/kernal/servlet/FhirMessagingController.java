@@ -149,7 +149,7 @@ public class FhirMessagingController {
 		out.close();
 	}
 
-	@PostMapping("/soap")
+	@PostMapping(SoapController.SOAP_BASE_PATH)
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp, @PathVariable(name = PATH_VARIABLE_TENANT_NAME, required = false) String tenantName)
 		throws ServletException, IOException {
 

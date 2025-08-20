@@ -6,10 +6,13 @@ import com.google.common.collect.ImmutableMap;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.immregistries.iis.kernal.SoftwareVersion;
+import org.immregistries.iis.kernal.fhir.security.ServerSecurityConfig;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester;
+import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
 import org.immregistries.iis.kernal.model.ProcessingFlavor;
 import org.immregistries.iis.kernal.model.persisted.Tenant;
 import org.immregistries.iis.kernal.model.persisted.UserAccess;
@@ -26,6 +29,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.Map;
+import java.util.UUID;
 
 import static org.immregistries.iis.kernal.fhir.Application.IIS_PATH_BASE;
 import static org.immregistries.iis.kernal.servlet.HomeController.HOME_BASE_PATH;
@@ -73,11 +77,11 @@ public class HomeController {
 //		out.println("<a href=\"subscription\" class=\"w3-bar-item w3-button\">Subscriptions</a>");
 		out.println("<a href=\"" + ServletHelper.tenantifyUrl(tenant, "soap") + "\" class=\"w3-bar-item w3-button\">CDC WSDL</a>");
 		if (authentication.isAuthenticated() && !(authentication instanceof AnonymousAuthenticationToken)) {
-			out.println("<a class='w3-bar-item w3-button w3-right' href=\"" + IIS_PATH_BASE + "/logout\">Logout</a>");
+			out.println("<a class='w3-bar-item w3-button w3-right' href=\"" + IIS_PATH_BASE + ServerSecurityConfig.LOGOUT_PATH + "\">Logout</a>");
 			String link = "tenant";
 			if (tenant != null) {
 				out.println("<a class='w3-bar-item w3-button w3-right w3-green' href=\"" + link + "\">Tenant : " + tenant.getOrganizationName() + " </a>");
-				out.println("<a href=\"" + IIS_PATH_BASE + "/fhir/" + tenant.getOrganizationName() + "/metadata\" class=\"w3-bar-item w3-button w3-right \">Tenant Fhir Server Base</a>");
+				out.println("<a href=\"" + RepositoryClientFactory.fhirServerBasePath(tenant) + "/metadata\" class=\"w3-bar-item w3-button w3-right \">Tenant Fhir Server Base</a>");
 			} else {
 				out.println("<a class='w3-bar-item w3-button w3-right w3-green' href=\"" + link + "\">No Tenant selected</a>");
 			}
@@ -114,13 +118,24 @@ public class HomeController {
 		out.println("</html>");
 	}
 
-	public static void printFlavors(PrintWriter out) {
+	public static void printFlavors(PrintWriter out, boolean allowCreateShortcut) {
 		out.println("    <h2>Processing Flavors</h2>");
 		out.println("    <p>If any of the following words appear in the name of the tenant then special processing rules will apply. " +
 			"These processing rules can be used to simulate specific IIS behavior. </p>");
 		out.println("    <ul class=\"w3-ul w3-hoverable\">");
 		for (ProcessingFlavor processingFlavor : ProcessingFlavor.values()) {
-			out.println("      <li>" + processingFlavor.getKey() + ": " + processingFlavor.getBehaviorDescription() + "</li>");
+			out.println("      <li>");
+			if (allowCreateShortcut) {
+				String randomSuffix = String.valueOf(UUID.randomUUID().getMostSignificantBits());
+				randomSuffix = StringUtils.getDigits(randomSuffix);
+				String link = IIS_PATH_BASE + TenantController.TENANT_BASE_PATH + "/" + processingFlavor.getKey() + "_" + randomSuffix;
+				out.print("<a href=\"" + link + "\">");
+				out.print(processingFlavor.getKey());
+				out.print("</a>");
+			} else {
+				out.print(processingFlavor.getKey());
+			}
+			out.print(": " + processingFlavor.getBehaviorDescription() + "</li>");
 		}
 		out.println("    </ul>");
 	}
@@ -234,7 +249,7 @@ public class HomeController {
 			out.println("      <li><a href=\"" + ServletHelper.tenantifyUrl(tenant, "vciDemo") + "\">VCI Demonstration</a>: Demonstration of RSP conversion steps for the Vaccine Credential Initiative</li>");
 			out.println("    </ul>");
 
-			printFlavors(out);
+			printFlavors(out, false);
 			out.println("  </div>");
 			out.println("  <img src=\"img/markus-spiske-dWaRJ3WBnGs-unsplash.jpg\" class=\"w3-round\" alt=\"Sandbox\" width=\"400\">");
 			out.println("<a " +
