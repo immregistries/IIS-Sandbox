@@ -56,6 +56,8 @@ public class ShCardUtil {
 	private FhirContext fhirContext;
 
 	public List<String> qrCodeWrite(String resourceString, HttpServletRequest request, String kid, UserAccess userAccess) {
+		Gson gson = new Gson();
+
 		Map<String, Object> mapVc = new HashMap<>(2);
 		ArrayList<String> type = new ArrayList<>(3);
 		type.add(VERIFIABLE_CREDENTIAL);
@@ -76,7 +78,6 @@ public class ShCardUtil {
 			.add(VC, mapVc)
 			.build();
 
-		Gson gson = new Gson();
 		String claimsString = gson.toJson(claims).strip();
 		/**
 		 * Compressing the content
