@@ -82,12 +82,12 @@ public class ShLinkController {
 		String url = "";
 		IBaseBundle ips = ipsGeneratorSvcIIS.generateIps(ServletHelper.requestDetailsWithPartitionName(partitionLookupSvc), new TokenParam(patientId), "");
 		if (StringUtils.contains(flag, "U")) {
-			ips = fhirContext.newJsonParser().encodeResourceToString(ips);
+			String content = fhirContext.newJsonParser().encodeResourceToString(ips); // TODO compress
 			IisShlinkContent iisShlinkContent = new IisShlinkContent();
 			iisShlinkContent.setUserAccess(userAccess);
 			iisShlinkContent.setExp(expLong);
-			iisShlinkContent.setContent();
-			iisShlinkContentService.saveIisShlinkContent();
+			iisShlinkContent.setContent(content);
+			iisShlinkContentService.saveIisShlinkContent(iisShlinkContent);
 		} else {
 			ShLinkManifest.FileManifest fileManifest = new ShLinkManifest.FileManifest();
 			fileManifest.setContentType("shcard");
