@@ -6,7 +6,6 @@ import com.google.common.collect.ImmutableMap;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.immregistries.iis.kernal.SoftwareVersion;
 import org.immregistries.iis.kernal.fhir.security.ServerSecurityConfig;
@@ -126,9 +125,8 @@ public class HomeController {
 		for (ProcessingFlavor processingFlavor : ProcessingFlavor.values()) {
 			out.println("      <li>");
 			if (allowCreateShortcut) {
-				String randomSuffix = String.valueOf(UUID.randomUUID().getMostSignificantBits());
-				randomSuffix = StringUtils.getDigits(randomSuffix);
-				String link = IIS_PATH_BASE + TenantController.TENANT_BASE_PATH + "/" + processingFlavor.getKey() + "_" + randomSuffix;
+				String randomSuffix = UUID.randomUUID().toString().substring(0, 9);
+				String link = IIS_PATH_BASE + TenantController.TENANT_BASE_PATH + "/" + processingFlavor.getKey() + "-" + randomSuffix + TenantController.TENANT_BASE_PATH;
 				out.print("<a href=\"" + link + "\">");
 				out.print(processingFlavor.getKey());
 				out.print("</a>");
