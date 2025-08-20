@@ -6,7 +6,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.hibernate.Session;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
-import org.immregistries.iis.kernal.fhir.shl.ShlUtilService;
+import org.immregistries.iis.kernal.logic.shlink.ShlUtilService;
 import org.immregistries.iis.kernal.model.persisted.ShLinkManifest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

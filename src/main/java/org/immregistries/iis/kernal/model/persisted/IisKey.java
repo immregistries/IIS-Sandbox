@@ -9,6 +9,9 @@ import org.apache.commons.lang3.StringUtils;
 import java.security.PublicKey;
 import java.text.ParseException;
 
+/**
+ * Persisting generated key for smart health links and cards
+ */
 public class IisKey {
 
 	private String id;

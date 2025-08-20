@@ -47,8 +47,8 @@ public class ServerSecurityConfig {
 			.formLogin((form) -> form
 					.usernameParameter(LOGIN_PARAM_USERID)
 					.passwordParameter(LOGIN_PARAM_PASSWORD)
-					.loginPage(LOGIN_FORM_PATH) // Page where redirected when unauthorised
-					.loginProcessingUrl(LOGIN_PATH) // url for login request to be processed (hollow)
+					.loginPage("/loginForm") // Page where redirected when unauthorised
+					.loginProcessingUrl("/login") // url for login request to be processed (hollow)
 				.successHandler(formAuthenticationSuccessHandler)
 //				.addObjectPostProcessor()
 			)

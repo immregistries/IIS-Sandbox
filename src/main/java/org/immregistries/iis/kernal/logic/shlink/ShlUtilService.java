@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal.fhir.shl;
+package org.immregistries.iis.kernal.logic.shlink;
 
 import ca.uhn.fhir.context.FhirContext;
 import com.google.gson.Gson;
@@ -15,6 +15,7 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hl7.fhir.instance.model.api.IIdType;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
+import org.immregistries.iis.kernal.fhir.shl.ShLinkPayload;
 import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
 import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.model.persisted.ShLinkManifest;

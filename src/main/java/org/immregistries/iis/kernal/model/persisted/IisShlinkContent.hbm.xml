@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping package="org.immregistries.iis.kernal.model.persisted">
+    <class name="IisShlinkContent" table="IIS_SHLINK_CONTENT">
+        <id name="id" type="string" column="ID">
+            <generator class="uuid"/>
+        </id>
+        <property name="content" type="text" length="131063"/>
+
+        <many-to-one name="userAccess" class="UserAccess" column="USER_ACCESS_ID" not-null="true"/>
+    </class>
+</hibernate-mapping>

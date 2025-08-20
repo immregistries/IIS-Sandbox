@@ -19,7 +19,7 @@ import org.hl7.fhir.instance.model.api.IDomainResource;
 import org.immregistries.iis.kernal.fhir.Application;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.fhir.shl.ShLinkPayload;
-import org.immregistries.iis.kernal.fhir.shl.ShlUtilService;
+import org.immregistries.iis.kernal.logic.shlink.ShlUtilService;
 import org.immregistries.iis.kernal.mapping.interfaces.PatientMapper;
 import org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester;
 import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
@@ -44,7 +44,7 @@ import java.util.Base64;
 import java.util.List;
 import java.util.Set;
 
-import static org.immregistries.iis.kernal.fhir.shl.ShlUtilService.SHLINK_PREFIX;
+import static org.immregistries.iis.kernal.logic.shlink.ShlUtilService.SHLINK_PREFIX;
 import static org.immregistries.iis.kernal.servlet.PatientController.PATIENT_BASE_PATH;
 import static org.immregistries.iis.kernal.servlet.PatientServletUtil.*;
 
