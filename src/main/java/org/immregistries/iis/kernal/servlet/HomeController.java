@@ -125,8 +125,8 @@ public class HomeController {
 		for (ProcessingFlavor processingFlavor : ProcessingFlavor.values()) {
 			out.println("      <li>");
 			if (allowCreateShortcut) {
-				String randomSuffix = UUID.randomUUID().toString().substring(0, 9);
-				String link = IIS_PATH_BASE + TenantController.TENANT_BASE_PATH + "/" + processingFlavor.getKey() + "-" + randomSuffix + TenantController.TENANT_BASE_PATH;
+				String randomSuffix = UUID.randomUUID().toString().substring(0, 8);
+				String link = IIS_PATH_BASE + TenantController.TENANT_BASE_PATH + "/" + processingFlavor.getKey() + "_" + randomSuffix + TenantController.TENANT_BASE_PATH;
 				out.print("<a href=\"" + link + "\">");
 				out.print(processingFlavor.getKey());
 				out.print("</a>");
