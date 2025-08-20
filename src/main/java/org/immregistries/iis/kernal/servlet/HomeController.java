@@ -59,7 +59,7 @@ public class HomeController {
 		out.println("<html>");
 		out.println("  <head>");
 		out.println("    <title>" + title + "</title>");
-		out.println("	  <link rel=\"icon\" type=\"image/x-icon\" href=\"img/favicon.ico\">");
+		out.println("	  <link rel=\"icon\" type=\"image/x-icon\" href=\"" + IIS_PATH_BASE + "/img/favicon.ico\">");
 		out.println("    <link rel=\"stylesheet\" href=\"https://www.w3schools.com/w3css/4/w3.css\"/>");
 		out.println("  </head>");
 		out.println("  <body>");
@@ -178,8 +178,8 @@ public class HomeController {
 			out.println("    <h2>Primary Functions Supported</h2>");
 			out.println("    <ul class=\"w3-ul w3-hoverable\">");
 			out.println("      <li><a href=\"" + ServletHelper.tenantifyUrl(tenant, PopController.POP_PATH_KEY) + "\">Send Now</a>: Send an HL7 message in now.</li>");
-			out.println("      <li><a href=\"" + ServletHelper.tenantifyUrl(tenant, "message") + "\">Messages</a>: Review recently submitted messages</li>");
-			out.println("      <li><a href=\"" + ServletHelper.tenantifyUrl(tenant, "patient") + "\">Patients</a>: See data received by patient</li>");
+			out.println("      <li><a href=\"" + ServletHelper.tenantifyUrl(tenant, MessageController.MESSAGE_PATH_KEY) + "\">Messages</a>: Review recently submitted messages</li>");
+			out.println("      <li><a href=\"" + ServletHelper.tenantifyUrl(tenant, PatientController.PATIENT_PATH_KEY) + "\">Patients</a>: See data received by patient</li>");
 			out.println("      <li><a href=\"" + ServletHelper.tenantifyUrl(tenant, "location") + "\">Locations</a>: See administered-at-locations</li>");
 			out.println("      <li><a href=\"" + ServletHelper.tenantifyUrl(tenant, "recommendation") + "\">Recommendations</a>: Generate Immunization Recommendations for Patients</li>");
 			if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R5)) {

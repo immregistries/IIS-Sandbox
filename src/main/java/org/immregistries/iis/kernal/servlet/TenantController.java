@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpSession;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
+import org.immregistries.iis.kernal.fhir.Application;
 import org.immregistries.iis.kernal.fhir.interceptors.PartitionCreationInterceptor;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.model.persisted.Tenant;
@@ -22,7 +23,7 @@ import java.util.List;
  * Tenant management UI page
  */
 @RestController()
-@RequestMapping(TenantController.TENANT_BASE_PATH)
+@RequestMapping({TenantController.TENANT_BASE_PATH, TenantController.TENANT_PATH, TenantController.TENANT_PATH + TenantController.TENANT_BASE_PATH})
 public class TenantController {
 	public static final String TENANT_BASE_PATH = "/tenant";
 	public static final String PATH_VARIABLE_TENANT_NAME = "tenantName";
@@ -81,7 +82,7 @@ public class TenantController {
 		String tenantId = req.getParameter(PARAM_TENANT_ID);
 
 		try (Session dataSession = ServletHelper.getDataSession()) {
-			Tenant tenant = ServletHelper.getTenant();
+			Tenant tenant = ServletHelper.getTenant(req, dataSession);
 			UserAccess userAccess = ServletHelper.getUserAccess();
 			if (userAccess != null && session != null) {
 				Query<Tenant> query = dataSession.createQuery("from Tenant where userAccess=?1 order by organizationName", Tenant.class);
@@ -98,6 +99,8 @@ public class TenantController {
 				 */
 				HomeController.doHeader(out, "IIS Sandbox - Home", tenant);
 
+				out.println("	<h1>Create or Select to proceed</h1>");
+
 				out.println("<div class=\"w3-container w3-half w3-margin-top\">");
 
 				out.println("	<h2>Tenant List</h2>");
@@ -107,9 +110,10 @@ public class TenantController {
 					if (tenantMember.equals(tenant)) {
 						out.println("<li>" + tenantMember.getOrganizationName() + " (selected)</li>");
 					} else {
-						String link = "tenant?" + PARAM_ACTION + "="
-							+ ACTION_SWITCH + "&" + PARAM_TENANT_ID + "="
-							+ tenantMember.getOrgId();
+						String link = Application.IIS_PATH_BASE + TenantController.TENANT_BASE_PATH + "/" + tenantMember.getOrganizationName();
+//							"tenant?" + PARAM_ACTION + "="
+//							+ ACTION_SWITCH + "&" + PARAM_TENANT_ID + "="
+//							+ tenantMember.getOrgId();
 						out.println("<li><a href=\"" + link + "\">" + tenantMember.getOrganizationName() + "</a></li>");
 					}
 				}

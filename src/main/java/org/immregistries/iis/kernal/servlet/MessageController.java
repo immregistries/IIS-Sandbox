@@ -17,10 +17,16 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 
+import static org.immregistries.iis.kernal.servlet.MessageController.MESSAGE_BASE_PATH;
+
 @SuppressWarnings("serial")
 @RestController
-@RequestMapping({"/message", TenantController.TENANT_PATH + "/message"})
+@RequestMapping({MESSAGE_BASE_PATH, TenantController.TENANT_PATH + MESSAGE_BASE_PATH})
 public class MessageController {
+
+	public static final String MESSAGE_PATH_KEY = "message";
+	public static final String MESSAGE_BASE_PATH = "/" + MESSAGE_PATH_KEY;
+
 
   public static final String PARAM_ORG_ID = "orgId";
 
