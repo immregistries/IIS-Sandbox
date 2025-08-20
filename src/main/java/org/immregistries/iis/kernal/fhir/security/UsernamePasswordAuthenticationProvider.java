@@ -21,7 +21,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import static org.immregistries.iis.kernal.fhir.security.ServletHelper.SESSION_TENANT;
+import static org.immregistries.iis.kernal.fhir.security.ServletHelper.SESSION_REQUEST_TENANT;
 import static org.immregistries.iis.kernal.fhir.security.ServletHelper.SESSION_USER_ACCESS;
 import static org.immregistries.iis.kernal.servlet.LoginController.LOGIN_PARAM_TENANT_NAME;
 
@@ -52,7 +52,7 @@ public class UsernamePasswordAuthenticationProvider implements AuthenticationPro
 				/**
 				 * Creating a new session after login
 				 */
-				request.getSession(true).setAttribute(SESSION_TENANT, tenant);
+				request.getSession(true).setAttribute(SESSION_REQUEST_TENANT, tenant);
 				return tenant.getUserAccess();
 			} else {
 				return null;

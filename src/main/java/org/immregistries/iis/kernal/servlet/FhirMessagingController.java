@@ -7,7 +7,6 @@ import gov.cdc.izgw.v2tofhir.converter.MessageParser;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Session;
 import org.hl7.fhir.r4.model.Bundle;
@@ -32,7 +31,7 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import static org.immregistries.iis.kernal.fhir.security.ServletHelper.SESSION_TENANT;
+import static org.immregistries.iis.kernal.fhir.security.ServletHelper.SESSION_REQUEST_TENANT;
 import static org.immregistries.iis.kernal.servlet.FhirMessagingController.FHIR_MESSAGING_BASE_PATH;
 import static org.immregistries.iis.kernal.servlet.PopController.PARAM_FACILITY_NAME;
 import static org.immregistries.iis.kernal.servlet.PopController.PARAM_MESSAGE;
@@ -173,8 +172,7 @@ public class FhirMessagingController {
 					if (tenant == null) {
 						throw new SecurityException("Username/password combination is unrecognized");
 					} else {
-						HttpSession session = req.getSession(true);
-						session.setAttribute(SESSION_TENANT, tenant);
+						req.setAttribute(SESSION_REQUEST_TENANT, tenant);
 						ack = processInput(message, tenant, facilityId);
 					}
 				} catch (Exception e) {

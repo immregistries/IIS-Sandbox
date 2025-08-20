@@ -18,8 +18,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 
-import static org.immregistries.iis.kernal.fhir.security.ServletHelper.SESSION_TENANT;
-
 /**
  * Tenant management UI page
  */
@@ -92,7 +90,7 @@ public class TenantController {
 				for (Tenant tenantMember : tenantList) {
 					if (ACTION_SWITCH.equals(action) && String.valueOf(tenantMember.getOrgId()).equals(tenantId)) {
 						tenant = tenantMember;
-						session.setAttribute(SESSION_TENANT, tenant);
+//						session.setAttribute(SESSION_TENANT, tenant);
 					}
 				}
 				/*

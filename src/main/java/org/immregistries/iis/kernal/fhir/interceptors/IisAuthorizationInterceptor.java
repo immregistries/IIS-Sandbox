@@ -26,7 +26,7 @@ import org.springframework.stereotype.Component;
 import java.util.Iterator;
 import java.util.List;
 
-import static org.immregistries.iis.kernal.fhir.security.ServletHelper.SESSION_TENANT;
+import static org.immregistries.iis.kernal.fhir.security.ServletHelper.SESSION_REQUEST_TENANT;
 import static org.immregistries.iis.kernal.fhir.security.ServletHelper.SESSION_USER_ACCESS;
 
 /**
@@ -110,7 +110,7 @@ public class IisAuthorizationInterceptor extends AuthorizationInterceptor {
 		}
 
 		if (tenant.getOrganizationName() != null) {
-			theRequestDetails.setAttribute(SESSION_TENANT, tenant);
+			theRequestDetails.setAttribute(SESSION_REQUEST_TENANT, tenant);
 			return new RuleBuilder()
 				.allow().read()
 				.resourcesOfType("Subscription").withAnyId().forTenantIds(DEFAULT_USER)
@@ -188,7 +188,7 @@ public class IisAuthorizationInterceptor extends AuthorizationInterceptor {
 			if (tenantIterator.hasNext()) {
 				Tenant tenant = (Tenant) tenantIterator.next();
 				theRequestDetails.setAttribute(SESSION_USER_ACCESS, userAccess);
-				theRequestDetails.setAttribute(SESSION_TENANT, tenant);
+				theRequestDetails.setAttribute(SESSION_REQUEST_TENANT, tenant);
 				return new RuleBuilder()
 					.allow().read()
 					.resourcesOfType("Subscription").withAnyId().forTenantIds(DEFAULT_USER)

@@ -20,7 +20,7 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 
 import static org.immregistries.iis.kernal.fhir.security.ServletHelper.GITHUB_PREFIX;
-import static org.immregistries.iis.kernal.fhir.security.ServletHelper.SESSION_TENANT;
+import static org.immregistries.iis.kernal.fhir.security.ServletHelper.SESSION_REQUEST_TENANT;
 
 @Component
 public class CustomOAuthSuccessHandler implements AuthenticationSuccessHandler {
@@ -54,7 +54,7 @@ public class CustomOAuthSuccessHandler implements AuthenticationSuccessHandler {
 					dataSession,
 					partitionCreationInterceptor);
 				dataSession.close();
-				session.setAttribute(SESSION_TENANT, tenant);
+				session.setAttribute(SESSION_REQUEST_TENANT, tenant);
 			} finally {
 				dataSession.close();
 			}

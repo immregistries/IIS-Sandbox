@@ -41,7 +41,7 @@ public final class ServletHelper {
 	public static final List<String> FORBIDDEN_NAMES = List.of("pop", "iis", "home", "patient", "vaccination", "fhir", "tenant", "facility");
 	private static final Logger logger = LoggerFactory.getLogger(ServletHelper.class);
 	public static final String GITHUB_PREFIX = "github-";
-	public static final String SESSION_TENANT = "tenant";
+	public static final String SESSION_REQUEST_TENANT = "tenant";
 	public static final String SESSION_USER_ACCESS = "userAccess";
 	private static String BAD_PASSWORD = "badpassword";
 
@@ -300,13 +300,13 @@ public final class ServletHelper {
 //		if (tenant == null) {
 //			throw new AuthenticationCredentialsNotFoundException("");
 //		}
-		request.setAttribute(SESSION_TENANT, tenant);
+		request.setAttribute(SESSION_REQUEST_TENANT, tenant);
 		return tenant;
 	}
 
 	public static Tenant getTenant(HttpServletRequest request, Session existingDataSession) {
 		final Tenant tenant;
-		Tenant requestTenant = (Tenant) request.getAttribute(SESSION_TENANT);
+		Tenant requestTenant = (Tenant) request.getAttribute(SESSION_REQUEST_TENANT);
 		String urlTenantName = (String) request.getAttribute(TENANT_NAME_URL);
 		if (StringUtils.isBlank(urlTenantName)) {
 			tenant = requestTenant;

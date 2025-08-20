@@ -10,7 +10,7 @@ import org.immregistries.smm.cdc.*;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import static org.immregistries.iis.kernal.fhir.security.ServletHelper.SESSION_TENANT;
+import static org.immregistries.iis.kernal.fhir.security.ServletHelper.SESSION_REQUEST_TENANT;
 
 public abstract class BaseIISSOAPServer extends CDCWSDLServer {
 
@@ -47,9 +47,7 @@ public abstract class BaseIISSOAPServer extends CDCWSDLServer {
 				throw new SecurityFault("Username/password combination is unrecognized");
 			} else {
 				HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
-				request.getSession(true).setAttribute(SESSION_TENANT, tenant);
-//				HttpSession session = req.getSession(true);
-//						session.setAttribute(SESSION_TENANT, tenant);
+				request.setAttribute(SESSION_REQUEST_TENANT, tenant);
 			}
 		}
 	}

@@ -35,7 +35,7 @@ import java.net.URL;
 
 import static org.immregistries.iis.kernal.fhir.interceptors.IisAuthorizationInterceptor.CONNECTATHON_USER;
 import static org.immregistries.iis.kernal.fhir.security.ServletHelper.GITHUB_PREFIX;
-import static org.immregistries.iis.kernal.fhir.security.ServletHelper.SESSION_TENANT;
+import static org.immregistries.iis.kernal.fhir.security.ServletHelper.SESSION_REQUEST_TENANT;
 
 /**
  * Generates fhir client to interact with the jpa repository
@@ -113,7 +113,7 @@ public class RepositoryClientFactory extends ApacheRestfulClientFactory implemen
 	 */
 	public IGenericClient newGenericClient(ServletRequestDetails theRequestDetails) {
 		asynchInit();
-		Tenant tenant = (Tenant) theRequestDetails.getAttribute(SESSION_TENANT);
+		Tenant tenant = (Tenant) theRequestDetails.getAttribute(SESSION_REQUEST_TENANT);
 		if (tenant == null) {
 			throw new AuthenticationException();
 		}

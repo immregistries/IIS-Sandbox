@@ -49,6 +49,14 @@ public class FormAuthenticationSuccessHandler extends SavedRequestAwareAuthentic
 			builder = UriComponentsBuilder.fromHttpUrl(savedRequest.getRedirectUrl());
 		}
 		if (StringUtils.isNotBlank(tenantName)) {
+
+			/*
+			 * Asserting that the redirect tenant is the same as the form tenant
+			 */
+
+			/*
+			 * Filtering redirection for login to go back to homepage or pop page
+			 */
 			filterForSuffix(builder, Application.IIS_PATH_BASE + PopController.POP_BASE_PATH, tenantName, PopController.POP_BASE_PATH);
 			filterForSuffix(builder, Application.IIS_PATH_BASE + HomeController.HOME_BASE_PATH, tenantName, HomeController.HOME_BASE_PATH);
 			filterForSuffix(builder, Application.IIS_PATH_BASE + "/", tenantName, HomeController.HOME_BASE_PATH);
