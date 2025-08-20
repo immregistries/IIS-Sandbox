@@ -138,7 +138,7 @@ public class PatientController {
 
 //		UriComponentsBuilder uriComponentsBuilder = ServletUriComponentsBuilder.fromRequest(req);
 //		uriComponentsBuilder
-		out.println("<img src=\"" + Application.IIS_PATH_BASE + TenantController.TENANT_BASE_PATH + tenant.getOrganizationName() + "/patient/qr?id=" + patientMasterSelected.getPatientId() + "\"  alt=\"shlink\" width=\"200\">");
+		out.println("<img src=\"" + Application.IIS_PATH_BASE + TenantController.TENANT_BASE_PATH + "/" + tenant.getOrganizationName() + "/patient/qr?id=" + patientMasterSelected.getPatientId() + "\"  alt=\"shlink\" width=\"200\">");
 
 		String manifestUrl = PatientShLinkController.getManifestUrl(req, patientSelected, tenant);
 
