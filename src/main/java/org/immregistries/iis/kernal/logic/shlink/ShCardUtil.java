@@ -16,13 +16,7 @@ import org.immregistries.iis.kernal.model.persisted.UserAccess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 
 import java.security.KeyPair;
 import java.security.PrivateKey;
@@ -61,7 +55,7 @@ public class ShCardUtil {
 	@Autowired
 	private FhirContext fhirContext;
 
-	public ResponseEntity<List<String>> qrCodeWrite(String resourceString, HttpServletRequest request, String kid, UserAccess userAccess) {
+	public List<String> qrCodeWrite(String resourceString, HttpServletRequest request, String kid, UserAccess userAccess) {
 		Map<String, Object> mapVc = new HashMap<>(2);
 		ArrayList<String> type = new ArrayList<>(3);
 		type.add(VERIFIABLE_CREDENTIAL);
@@ -89,7 +83,6 @@ public class ShCardUtil {
 		 */
 		byte[] deflated = rawDeflate(claimsString);
 
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		IisKey iisKey = keyStoreService.getKey(kid, userAccess);
 		KeyPair keyPair = iisKey.keyPair();
 		PrivateKey privateKey = keyPair.getPrivate();
@@ -134,9 +127,7 @@ public class ShCardUtil {
 			result.add(SHC_HEADER + numberOfChunks + "/" + numberOfChunks + "/" +
 				encodedForQrCode.substring((numberOfChunks - 1) * chunkSize, finalLength - 1));
 		}
-		MultiValueMap<String, String> headers = new LinkedMultiValueMap<>(1);
-		headers.add(ISSUER_KEY, gson.toJsonTree(iisKey.jwk()).toString());
-		return new ResponseEntity<>(result, headers, HttpStatus.OK);
+		return result;
 	}
 
 
