@@ -6,6 +6,7 @@ import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.KeyType;
 import org.apache.commons.lang3.StringUtils;
 
+import java.security.KeyPair;
 import java.security.PublicKey;
 import java.text.ParseException;
 
@@ -56,24 +57,29 @@ public class IisKey {
 	}
 
 	@JsonIgnore
-	public PublicKey publicKey() {
-		PublicKey publicKey = null;
+	public KeyPair keyPair() {
+		KeyPair publicKey = null;
 		JWK jwk = jwk();
 		if (jwk != null) {
 			try {
 				KeyType keyType = jwk.getKeyType();
 				if (keyType.equals(KeyType.EC)) {
-					publicKey = jwk.toECKey().toPublicKey();
+					publicKey = jwk.toECKey().toKeyPair();
 				} else if (keyType.equals(KeyType.RSA)) {
-					publicKey = jwk.toRSAKey().toPublicKey();
+					publicKey = jwk.toRSAKey().toKeyPair();
 				} else if (keyType.equals(KeyType.OCT) || keyType.equals(KeyType.OKP)) {
-					publicKey = jwk.toOctetKeyPair().toPublicKey();
+					publicKey = jwk.toOctetKeyPair().toKeyPair();
 				}
 			} catch (JOSEException e) {
 				throw new RuntimeException(e);
 			}
 		}
 		return publicKey;
+	}
+
+	@JsonIgnore
+	public PublicKey publicKey() {
+		return keyPair().getPublic();
 	}
 
 
