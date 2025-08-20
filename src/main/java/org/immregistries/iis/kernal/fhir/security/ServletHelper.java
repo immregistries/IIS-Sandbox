@@ -38,7 +38,7 @@ import static org.immregistries.iis.kernal.servlet.TenantUrlFilter.TENANT_NAME_U
 
 public final class ServletHelper {
 	// TODO Complete
-	public static final List<String> FORBIDDEN_NAMES = List.of("pop", "iis", "home", "patient", "vaccination", "fhir", "tenant", "facility");
+	public static final List<String> FORBIDDEN_NAMES = List.of("pop", "iis", "home", "patient", "vaccination", "fhir", "tenant", "facility", "tenant");
 	private static final Logger logger = LoggerFactory.getLogger(ServletHelper.class);
 	public static final String GITHUB_PREFIX = "github-";
 	public static final String SESSION_REQUEST_TENANT = "tenant";
