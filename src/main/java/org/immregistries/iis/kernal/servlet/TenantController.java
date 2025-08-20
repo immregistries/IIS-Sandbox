@@ -99,7 +99,7 @@ public class TenantController {
 				 */
 				HomeController.doHeader(out, "IIS Sandbox - Home", tenant);
 
-				out.println("	<h1>Create or Select to proceed</h1>");
+				out.println("	<h1>Create or select Tenant to proceed</h1>");
 
 				out.println("<div class=\"w3-container w3-half w3-margin-top\">");
 
