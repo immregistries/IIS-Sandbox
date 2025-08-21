@@ -15,7 +15,7 @@ public class IisShlinkContentService {
 		try (Session dataSession = ServletHelper.getDataSession()) {
 			Query query = dataSession.createQuery(
 				"from IisShlinkContent where userAccess = :user and id = :id", IisShlinkContent.class);
-			query.setParameter("user", userAccess.getUserAccessId());
+			query.setParameter("user", userAccess);
 			query.setParameter("id", contentId);
 			return (IisShlinkContent) query.getSingleResult();
 		}

@@ -32,16 +32,16 @@ public class KeyStoreService {
 	public IisKey getKey(String keyId, UserAccess userAccess) {
 		try (Session dataSession = ServletHelper.getDataSession()) {
 			Query query = dataSession.createQuery(
-				"from IisKey where userAccess = :user and id = :id", IisKey.class);
-			query.setParameter("user", userAccess.getUserAccessId());
-			query.setParameter("id", keyId);
+				"from IisKey where userAccess = :user and keyId = :kid", IisKey.class);
+			query.setParameter("user", userAccess);
+			query.setParameter("kid", keyId);
 			return (IisKey) query.getSingleResult();
 		}
 	}
 
 	public IisKey saveKey(JWK keyString, Tenant tenant, UserAccess userAccess) {
 		IisKey iisKey = new IisKey();
-		iisKey.setId(keyString.getKeyID());
+		iisKey.setKeyId(keyString.getKeyID());
 		iisKey.setKeyString(keyString.toJSONString());
 		iisKey.setUserAccess(userAccess);
 		recordIisKey(iisKey);

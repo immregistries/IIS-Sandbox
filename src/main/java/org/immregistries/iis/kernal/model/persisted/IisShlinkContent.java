@@ -5,16 +5,16 @@ package org.immregistries.iis.kernal.model.persisted;
  */
 public class IisShlinkContent {
 
-	private String id;
+	private int id;
 	private UserAccess userAccess;
 	private String content;
 	private Long exp;
 
-	public String getId() {
+	public int getId() {
 		return id;
 	}
 
-	public void setId(String id) {
+	public void setId(int id) {
 		this.id = id;
 	}
 

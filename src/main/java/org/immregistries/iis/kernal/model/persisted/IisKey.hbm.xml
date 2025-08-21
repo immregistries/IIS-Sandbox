@@ -5,11 +5,12 @@
 
 <hibernate-mapping package="org.immregistries.iis.kernal.model.persisted">
     <class name="IisKey" table="IIS_KEY">
-        <id name="id" type="string" column="ID">
-            <generator class="uuid"/>
+        <id name="id" column="DB_ID">
+            <generator class="native"/>
         </id>
         <property name="keyString" type="string" column="KEY_STRING"/>
+        <property name="keyId" type="string" column="KEY_ID"/>
 
-        <many-to-one name="userAccess" class="UserAccess" column="USER_ACCESS_ID" not-null="true"/>
+        <many-to-one name="userAccess" class="UserAccess" column="USER_ACCESS_ID"/>
     </class>
 </hibernate-mapping>

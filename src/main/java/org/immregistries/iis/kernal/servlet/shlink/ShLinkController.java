@@ -31,7 +31,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 
-import static org.immregistries.iis.kernal.servlet.LocationController.ACTION_SAVE;
 import static org.immregistries.iis.kernal.servlet.LocationController.PARAM_ACTION;
 import static org.immregistries.iis.kernal.servlet.shlink.ShLinkManifestController.SHLINKS_CONTROLLER_BASE_URL;
 
@@ -47,6 +46,9 @@ public class ShLinkController {
 	public static final String PARAM_PATIENT_ID = "patientId";
 	public static final String PARAM_FLAG = "flag";
 	private static final String PARAM_EXP = "exp";
+
+	public static final String ACTION_SAVE = "Generate";
+
 
 	@Autowired
 	IpsGeneratorSvcIIS ipsGeneratorSvcIIS;
@@ -67,13 +69,13 @@ public class ShLinkController {
 	@Autowired
 	ShCardUtil shCardUtil;
 
-	@PostMapping("/ips")
+	@PostMapping()
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp,
 								 @RequestParam(PARAM_KEY_ID) String keyId,
 								 @RequestParam(PARAM_PATIENT_ID) String patientId,
 								 @RequestParam(PARAM_FLAG) String flag,
 								 @RequestParam(PARAM_EXP) String exp,
-								 @RequestParam("image") boolean image
+								 @RequestParam(value = "image", required = false) boolean image
 	)
 		throws ServletException, IOException {
 		Long expLong = Long.getLong(exp);
@@ -84,17 +86,17 @@ public class ShLinkController {
 		PrintWriter out = new PrintWriter(outputStream);
 
 		IisKey iisKey;
-		if (keyId == null) {
-			iisKey = keyStoreService.saveKey(keyStoreService.generateEc(), tenant, userAccess);
-		} else {
+		if (StringUtils.isNotBlank(keyId)) {
 			iisKey = keyStoreService.getKey(keyId, userAccess);
+		} else {
+			iisKey = keyStoreService.saveKey(keyStoreService.generateEc(), tenant, userAccess);
 		}
 		JWK jwk = iisKey.jwk();
 
 		String url = "";
 		IBaseBundle ips = ipsGeneratorSvcIIS.generateIps(ServletHelper.requestDetailsWithPartitionName(partitionLookupSvc), new TokenParam(patientId), "");
 		String content = fhirContext.newJsonParser().encodeResourceToString(ips); // TODO compress
-		String shCard = shCardUtil.qrCodeWrite(content, req, iisKey.getId(), userAccess);
+		String shCard = shCardUtil.qrCodeWrite(content, req, iisKey.getKeyId(), userAccess);
 		if (StringUtils.contains(flag, "U")) {
 			IisShlinkContent iisShlinkContent = new IisShlinkContent();
 			iisShlinkContent.setUserAccess(userAccess);
@@ -157,7 +159,9 @@ public class ShLinkController {
 		out.println("    <div class=\"w3-container w3-margin-top\">");
 		out.println("    <h3>Generate Shlink</h3>");
 		out.println(
-			"    <form method=\"POST\" action=\"ips\" class=\"w3-container w3-card-4\">");
+			"    <form method=\"POST\" action=\"" +
+				"shlink" +
+				"\" class=\"w3-container w3-card-4\">");
 		out.println("      <label>Patient ID</label>");
 		out.println(
 			"      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_PATIENT_ID

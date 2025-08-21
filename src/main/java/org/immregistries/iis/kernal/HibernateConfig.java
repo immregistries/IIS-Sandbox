@@ -54,6 +54,7 @@ public class HibernateConfig {
 		cfg.addResource("org/immregistries/iis/kernal/model/persisted/MessageReceived.hbm.xml");
 		cfg.addResource("org/immregistries/iis/kernal/model/persisted/ShLinkManifest.hbm.xml");
 		cfg.addResource("org/immregistries/iis/kernal/model/persisted/IisKey.hbm.xml");
+		cfg.addResource("org/immregistries/iis/kernal/model/persisted/IisShlinkContent.hbm.xml");
 		return cfg;
 	}
 

@@ -15,15 +15,16 @@ import java.text.ParseException;
  */
 public class IisKey {
 
-	private String id;
+	private int id;
+	private String keyId;
 	private UserAccess userAccess;
 	private String keyString;
 
-	public String getId() {
+	public int getId() {
 		return id;
 	}
 
-	public void setId(String id) {
+	public void setId(int id) {
 		this.id = id;
 	}
 
@@ -83,4 +84,11 @@ public class IisKey {
 	}
 
 
+	public String getKeyId() {
+		return keyId;
+	}
+
+	public void setKeyId(String keyId) {
+		this.keyId = keyId;
+	}
 }

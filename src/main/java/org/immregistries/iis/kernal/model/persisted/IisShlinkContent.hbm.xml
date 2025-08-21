@@ -5,8 +5,8 @@
 
 <hibernate-mapping package="org.immregistries.iis.kernal.model.persisted">
     <class name="IisShlinkContent" table="IIS_SHLINK_CONTENT">
-        <id name="id" type="string" column="ID">
-            <generator class="uuid"/>
+        <id name="id" column="ID">
+            <generator class="native"/>
         </id>
         <property name="content" type="text" length="131063"/>
 
