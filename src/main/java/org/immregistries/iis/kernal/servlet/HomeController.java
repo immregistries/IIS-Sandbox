@@ -15,6 +15,7 @@ import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFacto
 import org.immregistries.iis.kernal.model.ProcessingFlavor;
 import org.immregistries.iis.kernal.model.persisted.Tenant;
 import org.immregistries.iis.kernal.model.persisted.UserAccess;
+import org.immregistries.iis.kernal.servlet.shlink.ShLinkController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -47,7 +48,8 @@ public class HomeController {
 	private final static ImmutableMap<String, String> HEADER_MAP = ImmutableMap.of(PopController.POP_PATH_KEY, "Send Now",
 		"message", "messages",
 		PatientController.PATIENT_PATH_KEY, "Patients",
-		"location", "Locations"
+			"location", "Locations",
+			ShLinkController.SHLINK_CONTROLLER_PATH_KEY, "ShLink"
 //		,FhirMessagingController.FHIR_MESSAGING, "Conversion messaging"
 	);
 

@@ -13,6 +13,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.immregistries.iis.kernal.logic.KeyStoreService;
 import org.immregistries.iis.kernal.model.persisted.IisKey;
 import org.immregistries.iis.kernal.model.persisted.UserAccess;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,7 +56,7 @@ public class ShCardUtil {
 	@Autowired
 	private FhirContext fhirContext;
 
-	public List<String> qrCodeWrite(String resourceString, HttpServletRequest request, String kid, UserAccess userAccess) {
+	public String qrCodeWrite(String resourceString, HttpServletRequest request, String kid, UserAccess userAccess) {
 		Gson gson = new Gson();
 
 		Map<String, Object> mapVc = new HashMap<>(2);
@@ -110,7 +111,16 @@ public class ShCardUtil {
 //        arrayList.add(compact);
 //        shcMap.put("verifiableCredential", arrayList);
 //        logger.info("shcMap: {}", shcMap);
-		String encodedForQrCode = getEncodedForQrCode(compact);
+		return getEncodedForQrCode(compact);
+	}
+
+	/**
+	 * Split endoded for Qr Code String into several smaller codes
+	 *
+	 * @param encodedForQrCode
+	 * @return
+	 */
+	public static @NotNull List<String> divideQrCode(String encodedForQrCode) {
 		int finalLength = encodedForQrCode.length();
 		List<String> result;
 		if (finalLength < MAX_SINGLE_JWS_SIZE) {

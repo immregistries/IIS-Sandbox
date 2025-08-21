@@ -1,6 +1,7 @@
 package org.immregistries.iis.kernal.fhir.security;
 
 import org.immregistries.iis.kernal.servlet.*;
+import org.immregistries.iis.kernal.servlet.shlink.ShLinkController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
@@ -81,6 +82,7 @@ public class ServerSecurityConfig {
 		addTenantifiedRequestMatcher(csrfIgnoringRequestMatchers, TenantController.TENANT_PATH);
 		addTenantifiedRequestMatcher(csrfIgnoringRequestMatchers, LocationController.LOCATION_BASE_PATH);
 		addTenantifiedRequestMatcher(csrfIgnoringRequestMatchers, SoapController.SOAP_BASE_PATH);
+		addTenantifiedRequestMatcher(csrfIgnoringRequestMatchers, ShLinkController.SHLINK_CONTROLLER_BASE_PATH);
 		http.csrf((csrf) -> csrf
 			.ignoringRequestMatchers(csrfIgnoringRequestMatchers.toArray(new RequestMatcher[csrfIgnoringRequestMatchers.size()]))
 		);
