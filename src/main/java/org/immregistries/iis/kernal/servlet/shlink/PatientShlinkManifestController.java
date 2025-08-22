@@ -77,7 +77,8 @@ public class PatientShlinkManifestController {
 																	  @PathVariable("tenantName") String tenantName,
 																	  @RequestParam(value = "recipient", required = false) String recipient,
 																	  @RequestParam(value = "passcode", required = false) String passcode,
-																	  @RequestParam(value = "embeddedLengthMax", required = false) String embeddedLengthMax) throws IOException, ServletException {
+																	  @RequestParam(value = "embeddedLengthMax", required = false) String embeddedLengthMax
+	) throws IOException, ServletException {
 		resp.setContentType("application/json");
 		try (Session dataSession = ServletHelper.getDataSession()) {
 			Tenant tenant = ServletHelper.getTenantRedirectIfNone(req, resp, dataSession);

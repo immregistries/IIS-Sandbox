@@ -39,7 +39,7 @@ public class ServerSecurityConfig {
 			.requestCache(cache -> cache.requestCache(requestCache))
 			.authorizeHttpRequests((authorize) -> authorize
 				.requestMatchers(HttpMethod.GET, "/", HomeController.HOME_BASE_PATH, PopController.POP_BASE_PATH, "/SubscriptionTopic/**", "/img/**").permitAll()
-				.requestMatchers("/tenant/*/manifest/**", SHLINKS_CONTROLLER_BASE_URL).permitAll() // Shlinks
+				.requestMatchers("/tenant/*/manifest/**", SHLINKS_CONTROLLER_BASE_URL + "/*").permitAll() // Shlinks
 				.requestMatchers(LOGIN_FORM_PATH, "/oauth2/**", LOGIN_PATH).permitAll()
 				// API AUTHORIZATION AND AUTHENTICATION SEPARATED
 				.requestMatchers("/fhir/**", SoapController.SOAP_BASE_PATH, FhirMessagingController.FHIR_MESSAGING_BASE_PATH + SoapController.SOAP_BASE_PATH, "/.well-known/smart-configuration", "/registerClient", "/token").permitAll()

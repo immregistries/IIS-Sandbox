@@ -102,14 +102,13 @@ public class ShLinkController {
 			iisShlinkContent.setContent(shCard);
 			iisShlinkContentService.saveIisShlinkContent(iisShlinkContent);
 		} else {
-			ShLinkManifest.FileManifest fileManifest = new ShLinkManifest.FileManifest();
-			fileManifest.setContentType("shcard");
-			fileManifest.setEmbedded(shCard);
-
-
 			ShLinkManifest shLinkManifest = new ShLinkManifest();
 			shLinkManifest.setTenant(tenant);
 			shLinkManifest.setStatus("finalized");
+
+			ShLinkManifest.FileManifest fileManifest = new ShLinkManifest.FileManifest();
+			fileManifest.setContentType("shcard");
+			fileManifest.setEmbedded(shCard);
 			shLinkManifest.addFiles(fileManifest);
 
 			shlUtilService.saveManifest(shLinkManifest);
@@ -132,10 +131,12 @@ public class ShLinkController {
 		} else {
 			resp.setContentType("text/html");
 			HomeController.doHeader(out, "Smart Health Link Result", tenant);
-			out.println("<textarea name=\"shlink\" readonly style=\"width: 100%; height: 90%;\" >");
+			out.println("<h3>Smart health link</h3>");
+			out.println("<textarea name=\"shlink\" readonly style=\"width: 100%; height: 5em;\" >");
 			out.print(qrCode);
 			out.println("</textarea>");
 
+			IisKeyController.printIisKey(out, iisKey);
 
 			HomeController.doFooter(out);
 		}
