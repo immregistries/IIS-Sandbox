@@ -114,7 +114,7 @@ public class ShLinkController {
 
 			shlUtilService.saveManifest(shLinkManifest);
 			UriComponentsBuilder builder = ServletUriComponentsBuilder.fromRequest(req);
-			builder.replacePath(Application.IIS_PATH_BASE + SHLINKS_CONTROLLER_BASE_URL + shLinkManifest.getId());
+			builder.replacePath(Application.IIS_PATH_BASE + SHLINKS_CONTROLLER_BASE_URL + "/" + shLinkManifest.getId());
 
 			url = builder.build().toUri().toURL().toString();
 		}
