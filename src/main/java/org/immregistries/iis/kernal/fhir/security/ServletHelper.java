@@ -82,7 +82,10 @@ public final class ServletHelper {
 	 * @return
 	 */
 	public static @NotNull String tenantifyUrl(String tenantName, String url) {
-		return "/tenant/" + tenantName + "/" + url;
+		if (!StringUtils.startsWith(url, "/")) {
+			url = "/" + url;
+		}
+		return TenantController.TENANT_BASE_PATH + "/" + tenantName + url;
 	}
 
 

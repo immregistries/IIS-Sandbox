@@ -38,8 +38,6 @@ public class FormAuthenticationSuccessHandler extends SavedRequestAwareAuthentic
 		SavedRequest savedRequest = this.requestCache.getRequest(request, response);
 		String tenantName = StringUtils.defaultString(request.getParameter(LOGIN_PARAM_TENANT_NAME));
 
-		logger.info("targetUrl CALLED, {}, {}", requestCache, tenantName);
-
 		UriComponentsBuilder builder;
 		if (savedRequest == null) {
 			builder = ServletUriComponentsBuilder.fromRequest(request);

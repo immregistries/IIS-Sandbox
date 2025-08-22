@@ -4,7 +4,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import org.apache.commons.lang3.StringUtils;
+import jakarta.validation.constraints.NotBlank;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 import org.immregistries.iis.kernal.fhir.Application;
@@ -48,16 +48,12 @@ public class TenantController {
 	 * @throws IOException      outputStream exception
 	 */
 	@PostMapping()
-	protected void doPost(HttpServletRequest req, HttpServletResponse resp, @RequestParam(name= PARAM_TENANT_NAME, required = false) String tenantName)
+	protected void doPost(HttpServletRequest req, HttpServletResponse resp, @RequestParam(name = PARAM_TENANT_NAME) @NotBlank String tenantName)
 		throws ServletException, IOException {
 		UserAccess userAccess = ServletHelper.getUserAccess();
 		try (Session dataSession = ServletHelper.getDataSession()) {
-			if (StringUtils.isNotBlank(tenantName)) {
-//				if (tenantName.indexOf(PARTITION_NAME_SEPARATOR) > 0) {
-//					throw new InvalidRequestException("Invalid tenant name , should not use " + PARTITION_NAME_SEPARATOR);
-//				}
-				ServletHelper.authenticateTenant(userAccess, tenantName, dataSession, partitionCreationInterceptor);
-			}
+			ServletHelper.authenticateTenant(userAccess, tenantName, dataSession, partitionCreationInterceptor);
+			resp.sendRedirect(Application.IIS_PATH_BASE + TENANT_BASE_PATH + "/" + tenantName + TENANT_BASE_PATH);
 		}
 		doGet(req, resp);
 	}
@@ -110,7 +106,7 @@ public class TenantController {
 					if (tenantMember.equals(tenant)) {
 						out.println("<li>" + tenantMember.getOrganizationName() + " (selected)</li>");
 					} else {
-						String link = Application.IIS_PATH_BASE + TenantController.TENANT_BASE_PATH + "/" + tenantMember.getOrganizationName();
+						String link = Application.IIS_PATH_BASE + TenantController.TENANT_BASE_PATH + "/" + tenantMember.getOrganizationName() + TenantController.TENANT_BASE_PATH;
 						out.println("<li><a href=\"" + link + "\">" + tenantMember.getOrganizationName() + "</a></li>");
 					}
 				}
@@ -123,7 +119,7 @@ public class TenantController {
 				out.println("    <form method=\"POST\" action=\"tenant\" class=\"w3-container w3-card-4\">"); // TODO forbid space in input
 				out.println("      <label>Tenant Name</label>");
 				out.println("      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_TENANT_NAME + "\" value=\"\"/>");
-				out.println("		<input class=\"w3-button w3-section w3-teal w3-ripple\" type=\"submit\" value=\"Add\"/> ");
+				out.println("		<input class=\"w3-button w3-section w3-teal w3-ripple\" type=\"submit\" value=\"Create\"/> ");
 				out.println("    </form>");
 				out.println("</div>");
 
