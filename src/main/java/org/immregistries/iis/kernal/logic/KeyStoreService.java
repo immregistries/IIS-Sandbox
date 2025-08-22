@@ -13,6 +13,7 @@ import org.immregistries.iis.kernal.model.persisted.Tenant;
 import org.immregistries.iis.kernal.model.persisted.UserAccess;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -39,6 +40,19 @@ public class KeyStoreService {
 		}
 	}
 
+	public List<IisKey> getKeys(UserAccess userAccess, Session dataSession) {
+		Query query = dataSession.createQuery(
+			"from IisKey where userAccess = :user", IisKey.class);
+		query.setParameter("user", userAccess);
+		return query.getResultList();
+	}
+
+	public List<IisKey> getKeys(UserAccess userAccess) {
+		try (Session dataSession = ServletHelper.getDataSession()) {
+			return getKeys(userAccess, dataSession);
+		}
+	}
+
 	public IisKey saveKey(JWK keyString, Tenant tenant, UserAccess userAccess) {
 		IisKey iisKey = new IisKey();
 		iisKey.setKeyId(keyString.getKeyID());
@@ -48,11 +62,15 @@ public class KeyStoreService {
 		return iisKey;
 	}
 
+	private void recordIisKey(IisKey iisKey, Session dataSession) {
+		Transaction transaction = dataSession.beginTransaction();
+		dataSession.persist(iisKey);
+		transaction.commit();
+	}
+
 	private void recordIisKey(IisKey iisKey) {
 		try (Session dataSession = ServletHelper.getDataSession()) {
-			Transaction transaction = dataSession.beginTransaction();
-			dataSession.persist(iisKey);
-			transaction.commit();
+			recordIisKey(iisKey, dataSession);
 		}
 	}
 

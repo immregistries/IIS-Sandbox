@@ -29,6 +29,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.util.List;
 
 import static org.immregistries.iis.kernal.servlet.LocationController.PARAM_ACTION;
 import static org.immregistries.iis.kernal.servlet.shlink.ShLinkManifestController.SHLINKS_CONTROLLER_BASE_URL;
@@ -131,10 +132,11 @@ public class ShLinkController {
 		} else {
 			resp.setContentType("text/html");
 			HomeController.doHeader(out, "Smart Health Link Result", tenant);
+			out.println("<textarea name=\"shlink\" readonly style=\"width: 100%; height: 90%;\" >");
+			out.print(qrCode);
+			out.println("</textarea>");
 
-			out.println("<p>" +
-				qrCode +
-				"</p>");
+
 			HomeController.doFooter(out);
 		}
 		out.flush();
@@ -148,6 +150,7 @@ public class ShLinkController {
 		throws ServletException, IOException {
 		logger.info("Called");
 		Tenant tenant = ServletHelper.getTenantRedirectIfNone(req, resp);
+		UserAccess userAccess = ServletHelper.getUserAccess();
 
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
@@ -178,6 +181,16 @@ public class ShLinkController {
 			"          <input class=\"w3-button w3-section w3-teal w3-ripple\" type=\"submit\" name=\""
 				+ PARAM_ACTION + "\" value=\"" + ACTION_SAVE + "\"/>");
 		out.println("    </form>");
+		out.println("    </div>");
+
+		out.println("    <div class=\"w3-container w3-half w3-margin-top\">");
+		out.println("    <h2>Keys Available</h2>");
+		out.println("    <h3>Keys used for shlink and shcard signing (generated for the user)</h3>");
+		out.println("    </div>");
+
+		out.println("    <div class=\"w3-container\">");
+		List<IisKey> iisKeys = keyStoreService.getKeys(userAccess);
+		IisKeyController.printIisKeys(out, iisKeys);
 		out.println("    </div>");
 
 		HomeController.doFooter(out);
