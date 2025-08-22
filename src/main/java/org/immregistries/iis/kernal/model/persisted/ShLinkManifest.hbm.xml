@@ -18,7 +18,8 @@
             <composite-element class="ShLinkManifest$FileManifest">
                 <property name="contentType" type="string" column="CONTENT_TYPE"/>
                 <property name="location" type="string" column="LOCATION"/>
-                <property name="embedded" type="string" column="EMBEDDED" length="4000"/>
+                <property name="embedded" column="EMBEDDED" type="text" length="131063"/>
+                <!--                TODO optimize Storage ?-->
                 <property name="lastUpdated" type="timestamp" column="LAST_UPDATED"/>
             </composite-element>
         </list>

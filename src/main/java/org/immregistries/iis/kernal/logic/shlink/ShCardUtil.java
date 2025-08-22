@@ -71,7 +71,7 @@ public class ShCardUtil {
 		credentialSubject.put(FHIR_BUNDLE, JsonParser.parseString(resourceString).getAsJsonObject());
 		mapVc.put(CREDENTIAL_SUBJECT, credentialSubject);
 
-		String issuerUrl = request.getRequestURL().substring(0, request.getRequestURL().indexOf("/tenants"));
+		String issuerUrl = request.getRequestURL().toString();
 		Claims claims = Jwts.claims()
 			.notBefore(new Date())
 			.issuer(issuerUrl)

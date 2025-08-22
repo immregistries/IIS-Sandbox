@@ -2,13 +2,12 @@ package org.immregistries.iis.kernal.servlet.shlink;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.jpa.partition.IPartitionLookupSvc;
-import ca.uhn.fhir.rest.param.TokenParam;
-import com.nimbusds.jose.jwk.JWK;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.instance.model.api.IBaseBundle;
+import org.hl7.fhir.r4.model.IdType;
 import org.immregistries.iis.kernal.fhir.Application;
 import org.immregistries.iis.kernal.fhir.ips.IpsGeneratorSvcIIS;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
@@ -91,10 +90,8 @@ public class ShLinkController {
 		} else {
 			iisKey = keyStoreService.saveKey(keyStoreService.generateEc(), tenant, userAccess);
 		}
-		JWK jwk = iisKey.jwk();
-
 		String url = "";
-		IBaseBundle ips = ipsGeneratorSvcIIS.generateIps(ServletHelper.requestDetailsWithPartitionName(partitionLookupSvc), new TokenParam(patientId), "");
+		IBaseBundle ips = ipsGeneratorSvcIIS.generateIps(ServletHelper.requestDetailsWithPartitionName(partitionLookupSvc), new IdType(patientId), "");
 		String content = fhirContext.newJsonParser().encodeResourceToString(ips); // TODO compress
 		String shCard = shCardUtil.qrCodeWrite(content, req, iisKey.getKeyId(), userAccess);
 		if (StringUtils.contains(flag, "U")) {
