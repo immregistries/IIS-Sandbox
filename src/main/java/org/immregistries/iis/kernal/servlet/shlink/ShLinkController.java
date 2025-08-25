@@ -2,12 +2,15 @@ package org.immregistries.iis.kernal.servlet.shlink;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.jpa.partition.IPartitionLookupSvc;
+import com.google.gson.Gson;
+import io.jsonwebtoken.Jwts;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.instance.model.api.IBaseBundle;
 import org.hl7.fhir.r4.model.IdType;
+import org.immregistries.iis.kernal.JwtUtils;
 import org.immregistries.iis.kernal.fhir.Application;
 import org.immregistries.iis.kernal.fhir.ips.IpsGeneratorSvcIIS;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
@@ -26,10 +29,12 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.util.List;
+import java.security.NoSuchAlgorithmException;
+import java.util.*;
 
 import static org.immregistries.iis.kernal.servlet.LocationController.PARAM_ACTION;
 import static org.immregistries.iis.kernal.servlet.shlink.ShLinkManifestController.SHLINKS_CONTROLLER_BASE_URL;
@@ -37,6 +42,8 @@ import static org.immregistries.iis.kernal.servlet.shlink.ShLinkManifestControll
 @RestController
 @RequestMapping({ShLinkController.SHLINK_CONTROLLER_BASE_PATH, TenantController.TENANT_PATH + ShLinkController.SHLINK_CONTROLLER_BASE_PATH})
 public class ShLinkController {
+	public static final String APPLICATION_SMART_HEALTH_CARD_CONTENT_TYPE = "application/smart-health-card";
+	public static final String APPLICATION_FHIR_JSON_CONTENT_TYPE = "application/fhir+json";
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	public static final String SHLINK_CONTROLLER_PATH_KEY = "shlink";
@@ -60,6 +67,9 @@ public class ShLinkController {
 	KeyStoreService keyStoreService;
 
 	@Autowired
+	JwtUtils jwtUtils;
+
+	@Autowired
 	IPartitionLookupSvc partitionLookupSvc;
 	@Autowired
 	IisShlinkContentService iisShlinkContentService;
@@ -77,10 +87,13 @@ public class ShLinkController {
 								 @RequestParam(PARAM_EXP) String exp,
 								 @RequestParam(value = "image", required = false) boolean image
 	)
-		throws ServletException, IOException {
+		throws ServletException, IOException, NoSuchAlgorithmException {
+		Gson gson = new Gson();
 		Long expLong = Long.getLong(exp);
 		Tenant tenant = ServletHelper.getTenantRedirectIfNone(req, resp);
 		UserAccess userAccess = ServletHelper.getUserAccess();
+
+		SecretKeySpec encryptionKeySpec = shCardUtil.generateSecretKey();
 
 		OutputStream outputStream = resp.getOutputStream();
 		PrintWriter out = new PrintWriter(outputStream);
@@ -93,13 +106,22 @@ public class ShLinkController {
 		}
 		String url = "";
 		IBaseBundle ips = ipsGeneratorSvcIIS.generateIps(ServletHelper.requestDetailsWithPartitionName(partitionLookupSvc), new IdType(patientId), "");
-		String content = fhirContext.newJsonParser().encodeResourceToString(ips); // TODO compress
-		String shCard = shCardUtil.qrCodeWrite(content, req, iisKey.getKeyId(), userAccess, tenant);
+
+		String shCardCompact = shCardUtil.qrCompact(ips, req, iisKey.getKeyId(), userAccess, tenant);
+
+		Map<String, List<String>> contentToEncrypt = new HashMap<>(2);
+		contentToEncrypt.put("type", List.of("VerifiableCredential", APPLICATION_SMART_HEALTH_CARD_CONTENT_TYPE));
+		contentToEncrypt.put("VerifiableCredential", List.of(shCardCompact));
+		String encryptedContent = Jwts.builder()
+			.content(gson.toJson(contentToEncrypt))
+			.header().add("cty", APPLICATION_SMART_HEALTH_CARD_CONTENT_TYPE).and()
+			.encryptWith(encryptionKeySpec, Jwts.ENC.A256GCM).compact(); // Alg specified in Smart health card IG
+
 		if (StringUtils.contains(flag, "U")) {
 			IisShlinkContent iisShlinkContent = new IisShlinkContent();
 			iisShlinkContent.setUserAccess(userAccess);
 			iisShlinkContent.setExp(expLong);
-			iisShlinkContent.setContent(shCard);
+			iisShlinkContent.setContent(encryptedContent);
 			iisShlinkContentService.saveIisShlinkContent(iisShlinkContent);
 		} else {
 			ShLinkManifest shLinkManifest = new ShLinkManifest();
@@ -107,8 +129,8 @@ public class ShLinkController {
 			shLinkManifest.setStatus("finalized");
 
 			ShLinkManifest.FileManifest fileManifest = new ShLinkManifest.FileManifest();
-			fileManifest.setContentType("application/smart-health-card");
-			fileManifest.setEmbedded(shCard);
+			fileManifest.setContentType(APPLICATION_SMART_HEALTH_CARD_CONTENT_TYPE);
+			fileManifest.setEmbedded(encryptedContent);
 			shLinkManifest.addFiles(fileManifest);
 
 			shlUtilService.saveManifest(shLinkManifest);
@@ -122,7 +144,7 @@ public class ShLinkController {
 		ShLinkPayload shLinkPayload = new ShLinkPayload();
 		shLinkPayload.setLabel("Generated for Shlink testing with IPS of Synthetic Patient");
 		shLinkPayload.setFlag(flag);
-		shLinkPayload.setKey(iisKey.getKeyId());
+		shLinkPayload.setKey(Arrays.toString(Base64.getUrlDecoder().decode(encryptionKeySpec.getEncoded())));
 		shLinkPayload.setExp(expLong);
 		shLinkPayload.setUrl(url);
 

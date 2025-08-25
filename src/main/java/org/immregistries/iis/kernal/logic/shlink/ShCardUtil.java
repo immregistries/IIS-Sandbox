@@ -24,10 +24,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import javax.crypto.spec.SecretKeySpec;
 import java.net.MalformedURLException;
-import java.security.KeyPair;
-import java.security.PrivateKey;
-import java.security.PublicKey;
+import java.security.*;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.zip.DataFormatException;
@@ -39,6 +38,9 @@ import static org.immregistries.iis.kernal.servlet.shlink.IisKeyController.IIS_K
 @Service
 public class ShCardUtil {
 
+	private final static String SIGNATURE_ALGORITHM_NAME = "HmacSha512";
+
+
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	private static final int MAX_SINGLE_JWS_SIZE = 1195;
@@ -46,7 +48,7 @@ public class ShCardUtil {
 
 	public static final int MAXIMUM_DATA_SIZE = 30000;
 	private static final int SMALLEST_B64_CHAR_CODE = 45;
-	public static final String VERIFIABLE_CREDENTIAL = "VerifiableCredential";
+	public static final String VERIFIABLE_CREDENTIAL_TYPE = "VerifiableCredential";
 	public static final String HTTPS_SMARTHEALTH_CARDS_HEALTH_CARD = "https://smarthealth.cards#health-card";
 	public static final String HTTPS_SMARTHEALTH_CARDS_IMMUNIZATION = "https://smarthealth.cards#immunization";
 	public static final String FHIR_VERSION = "fhirVersion";
@@ -64,17 +66,17 @@ public class ShCardUtil {
 	@Autowired
 	private FhirContext fhirContext;
 
-	public String qrCodeWrite(IBaseBundle iBaseBundle, HttpServletRequest request, String kid, UserAccess userAccess, Tenant tenant) {
+	public String qrCompact(IBaseBundle iBaseBundle, HttpServletRequest request, String kid, UserAccess userAccess, Tenant tenant) {
 		String resourceString = fhirContext.newJsonParser().setSummaryMode(true).encodeResourceToString(iBaseBundle);
-		return qrCodeWrite(resourceString, request, kid, userAccess, tenant);
+		return qrCompact(resourceString, request, kid, userAccess, tenant);
 	}
 
-	public String qrCodeWrite(String resourceString, HttpServletRequest request, String kid, UserAccess userAccess, Tenant tenant) {
+	public String qrCompact(String resourceString, HttpServletRequest request, String kid, UserAccess userAccess, Tenant tenant) {
 		Gson gson = new Gson();
 
 		Map<String, Object> mapVc = new HashMap<>(2);
 		ArrayList<String> type = new ArrayList<>(3);
-		type.add(VERIFIABLE_CREDENTIAL);
+		type.add(VERIFIABLE_CREDENTIAL_TYPE);
 		type.add(HTTPS_SMARTHEALTH_CARDS_HEALTH_CARD);
 		type.add(HTTPS_SMARTHEALTH_CARDS_IMMUNIZATION);
 		mapVc.put(TYPE, type);
@@ -121,10 +123,9 @@ public class ShCardUtil {
 //                .compressWith(Jwts.ZIP.DEF)
 			.signWith(privateKey);
 		String compact = jwtBuilder.compact();
-		logger.info("compact {}", compact);
+//		logger.info("compact {}", compact);
 		PublicKey publicKey = keyPair.getPublic();
 		logger.info("parsed {}", Jwts.parser().verifyWith(publicKey).build().parse(compact));
-		logger.info("parsed decrypted {}", Jwts.parser().decryptWith(privateKey).build().parse(compact));
 
 		// for download file
 //        Map<String, ArrayList<String>> shcMap = new HashMap<>(1);
@@ -132,7 +133,7 @@ public class ShCardUtil {
 //        arrayList.add(compact);
 //        shcMap.put("verifiableCredential", arrayList);
 //        logger.info("shcMap: {}", shcMap);
-		return getEncodedForQrCode(compact);
+		return compact;
 	}
 
 	/**
@@ -226,5 +227,12 @@ public class ShCardUtil {
 		}
 		byte[] deflated = Arrays.copyOfRange(output, 0, compressedDataSize);
 		return deflated;
+	}
+
+	public @NotNull SecretKeySpec generateSecretKey() throws NoSuchAlgorithmException {
+		byte[] randomBytes = new byte[32];
+		SecureRandom secureRandom = new SecureRandom();
+		secureRandom.nextBytes(randomBytes);
+		return new SecretKeySpec(Base64.getEncoder().encode(randomBytes), SIGNATURE_ALGORITHM_NAME);
 	}
 }
