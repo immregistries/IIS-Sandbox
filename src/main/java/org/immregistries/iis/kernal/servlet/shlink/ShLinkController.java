@@ -94,7 +94,7 @@ public class ShLinkController {
 		String url = "";
 		IBaseBundle ips = ipsGeneratorSvcIIS.generateIps(ServletHelper.requestDetailsWithPartitionName(partitionLookupSvc), new IdType(patientId), "");
 		String content = fhirContext.newJsonParser().encodeResourceToString(ips); // TODO compress
-		String shCard = shCardUtil.qrCodeWrite(content, req, iisKey.getKeyId(), userAccess);
+		String shCard = shCardUtil.qrCodeWrite(content, req, iisKey.getKeyId(), userAccess, tenant);
 		if (StringUtils.contains(flag, "U")) {
 			IisShlinkContent iisShlinkContent = new IisShlinkContent();
 			iisShlinkContent.setUserAccess(userAccess);

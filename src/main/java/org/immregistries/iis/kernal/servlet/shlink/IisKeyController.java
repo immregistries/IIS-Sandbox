@@ -40,7 +40,7 @@ public class IisKeyController {
 	}
 
 //	@GetMapping("/.well-known/jwks.json")
-
+@GetMapping("/.well-known/jwks.json")
 	/**
 	 * TODO link properly
 	 *

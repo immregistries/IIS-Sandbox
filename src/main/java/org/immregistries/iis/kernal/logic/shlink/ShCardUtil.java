@@ -10,15 +10,21 @@ import io.jsonwebtoken.Jwt;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import jakarta.servlet.http.HttpServletRequest;
+import org.hl7.fhir.instance.model.api.IBaseBundle;
+import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.logic.KeyStoreService;
 import org.immregistries.iis.kernal.model.persisted.IisKey;
+import org.immregistries.iis.kernal.model.persisted.Tenant;
 import org.immregistries.iis.kernal.model.persisted.UserAccess;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.web.util.UriComponentsBuilder;
 
+import java.net.MalformedURLException;
 import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.security.PublicKey;
@@ -27,6 +33,8 @@ import java.util.stream.Collectors;
 import java.util.zip.DataFormatException;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
+
+import static org.immregistries.iis.kernal.servlet.shlink.IisKeyController.IIS_KEY_BASE_PATH;
 
 @Service
 public class ShCardUtil {
@@ -56,7 +64,12 @@ public class ShCardUtil {
 	@Autowired
 	private FhirContext fhirContext;
 
-	public String qrCodeWrite(String resourceString, HttpServletRequest request, String kid, UserAccess userAccess) {
+	public String qrCodeWrite(IBaseBundle iBaseBundle, HttpServletRequest request, String kid, UserAccess userAccess, Tenant tenant) {
+		String resourceString = fhirContext.newJsonParser().setSummaryMode(true).encodeResourceToString(iBaseBundle);
+		return qrCodeWrite(resourceString, request, kid, userAccess, tenant);
+	}
+
+	public String qrCodeWrite(String resourceString, HttpServletRequest request, String kid, UserAccess userAccess, Tenant tenant) {
 		Gson gson = new Gson();
 
 		Map<String, Object> mapVc = new HashMap<>(2);
@@ -71,7 +84,14 @@ public class ShCardUtil {
 		credentialSubject.put(FHIR_BUNDLE, JsonParser.parseString(resourceString).getAsJsonObject());
 		mapVc.put(CREDENTIAL_SUBJECT, credentialSubject);
 
-		String issuerUrl = request.getRequestURL().toString();
+		UriComponentsBuilder uriComponentsBuilder = ServletUriComponentsBuilder.fromRequest(request);
+		uriComponentsBuilder.replacePath(ServletHelper.tenantifyUrlWithBasePath(tenant, IIS_KEY_BASE_PATH));
+		String issuerUrl = null;
+		try {
+			issuerUrl = uriComponentsBuilder.build().toUri().toURL().toString();
+		} catch (MalformedURLException e) {
+			throw new RuntimeException(e);
+		}
 		Claims claims = Jwts.claims()
 			.notBefore(new Date())
 			.issuer(issuerUrl)
