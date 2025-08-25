@@ -122,6 +122,7 @@ public class ShLinkController {
 		ShLinkPayload shLinkPayload = new ShLinkPayload();
 		shLinkPayload.setLabel("Generated for Shlink testing with IPS of Synthetic Patient");
 		shLinkPayload.setFlag(flag);
+		shLinkPayload.setKey(iisKey.getKeyId());
 		shLinkPayload.setExp(expLong);
 		shLinkPayload.setUrl(url);
 
