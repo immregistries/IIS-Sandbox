@@ -1,5 +1,6 @@
 package org.immregistries.iis.kernal.servlet.shlink;
 
+import com.nimbusds.jose.jwk.JWK;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.immregistries.iis.kernal.servlet.shlink.IisKeyController.IIS_KEY_BASE_PATH;
 
@@ -35,6 +37,27 @@ public class IisKeyController {
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
 		throws ServletException, IOException {
 		doGet(req, resp);
+	}
+
+//	@GetMapping("/.well-known/jwks.json")
+
+	/**
+	 * TODO link properly
+	 *
+	 * @param req
+	 * @param resp
+	 * @return
+	 * @throws ServletException
+	 * @throws IOException
+	 */
+	protected List<JWK> doGetWellKnown(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		UserAccess userAccess = ServletHelper.getUserAccess();
+		resp.setContentType("text/json");
+		try (Session dataSession = ServletHelper.getDataSession()) {
+//			Tenant tenant = ServletHelper.getTenantRedirectIfNone(req, resp, dataSession);
+			List<IisKey> iisKeys = keyStoreService.getKeys(userAccess, dataSession);
+			return iisKeys.stream().map(iisKey -> iisKey.jwk().toPublicJWK()).collect(Collectors.toList());
+		}
 	}
 
 	@GetMapping

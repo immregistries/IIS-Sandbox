@@ -104,6 +104,7 @@ public class ShCardUtil {
 		logger.info("compact {}", compact);
 		PublicKey publicKey = keyPair.getPublic();
 		logger.info("parsed {}", Jwts.parser().verifyWith(publicKey).build().parse(compact));
+		logger.info("parsed decrypted {}", Jwts.parser().decryptWith(privateKey).build().parse(compact));
 
 		// for download file
 //        Map<String, ArrayList<String>> shcMap = new HashMap<>(1);
