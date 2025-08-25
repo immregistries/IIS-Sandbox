@@ -68,7 +68,7 @@ public final class ServletHelper {
 	 * @param url
 	 * @return
 	 */
-	public static String tenantifyUrl(Tenant tenant, String url) {
+	public static String tenantifyUrlWithBasePath(Tenant tenant, String url) {
 		if (tenant == null || tenant.getOrgId() < 0) {
 			return url;
 		}

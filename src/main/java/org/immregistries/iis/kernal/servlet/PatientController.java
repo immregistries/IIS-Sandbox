@@ -16,7 +16,6 @@ import org.hibernate.Session;
 import org.hibernate.query.Query;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.instance.model.api.IDomainResource;
-import org.immregistries.iis.kernal.fhir.Application;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.fhir.shl.ShLinkPayload;
 import org.immregistries.iis.kernal.logic.shlink.ShlUtilService;
@@ -30,6 +29,7 @@ import org.immregistries.iis.kernal.model.VaccinationMaster;
 import org.immregistries.iis.kernal.model.persisted.MessageReceived;
 import org.immregistries.iis.kernal.model.persisted.Tenant;
 import org.immregistries.iis.kernal.servlet.shlink.PatientShLinkController;
+import org.immregistries.iis.kernal.servlet.shlink.ShLinkController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -138,11 +138,15 @@ public class PatientController {
 
 //		UriComponentsBuilder uriComponentsBuilder = ServletUriComponentsBuilder.fromRequest(req);
 //		uriComponentsBuilder
-		out.println("<img src=\"" + Application.IIS_PATH_BASE + TenantController.TENANT_BASE_PATH + "/" + tenant.getOrganizationName() + "/patient/qr?id=" + patientMasterSelected.getPatientId() + "\"  alt=\"shlink\" width=\"200\">");
+		out.println("<img src=\"" + ServletHelper.tenantifyUrlWithBasePath(tenant, "/patient/qr?id=" + patientMasterSelected.getPatientId()) + "\"  alt=\"shlink\" width=\"200\">");
 
 		String manifestUrl = PatientShLinkController.getManifestUrl(req, patientSelected, tenant);
 
 		out.println("<a href= \"" + manifestUrl + "\">" + manifestUrl + "</a>");
+		out.println("<a href= \"" +
+			ServletHelper.tenantifyUrlWithBasePath(tenant,
+				ShLinkController.SHLINK_CONTROLLER_BASE_PATH + "?" + ShLinkController.PARAM_PATIENT_ID + "=" + patientMasterSelected.getPatientId()) +
+			"\">Generate a new Smart Health Link with IPS</a>");
 
 		out.println("<p id =\"qrCode\">");
 		ShLinkPayload shLinkPayload = PatientShLinkController.getPatientShLinkPayload(manifestUrl);
@@ -152,15 +156,15 @@ public class PatientController {
 		out.println(qrCode);
 		out.println("</p>");
 
-		out.println("<button onclick=\"copyHtmlToClipboard()\">Copy HTML</button>");
-		out.println("<script>");
-		out.println("function copyHtmlToClipboard() {");
-		out.println("    const content = ");
-		out.println("    navigator.clipboard.writeText(content)");
-		out.println("        .then(() => { console.log('HTML copied to clipboard'); })");
-		out.println("        .catch(err => { console.error('Failed to copy HTML: ', err); });");
-		out.println("}");
-		out.println("</script>");
+//		out.println("<button onclick=\"copyHtmlToClipboard()\">Copy HTML</button>");
+//		out.println("<script>");
+//		out.println("function copyHtmlToClipboard() {");
+//		out.println("    const content = ");
+//		out.println("    navigator.clipboard.writeText(content)");
+//		out.println("        .then(() => { console.log('HTML copied to clipboard'); })");
+//		out.println("        .catch(err => { console.error('Failed to copy HTML: ', err); });");
+//		out.println("}");
+//		out.println("</script>");
 
 
 		out.println("</div>");

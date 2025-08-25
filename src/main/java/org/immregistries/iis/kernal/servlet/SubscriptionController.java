@@ -278,7 +278,7 @@ public class SubscriptionController {
 					}
 					String baseLink = "subscription?" + PARAM_SUBSCRIPTION_ID + "="
 						+ subscription.getIdentifierFirstRep().getValue(); // TODO or id
-					String linkWithTenantBase = ServletHelper.tenantifyUrl(tenant, baseLink); // TODO or id
+					String linkWithTenantBase = ServletHelper.tenantifyUrlWithBasePath(tenant, baseLink); // TODO or id
 					out.println("  <tr>");
 					out.println("    <td><a href=\"" + linkWithTenantBase + "\">"
 						+ subscription.getName() + "</a></td>");

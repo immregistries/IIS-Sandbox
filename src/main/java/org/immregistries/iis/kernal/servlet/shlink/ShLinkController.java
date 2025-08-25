@@ -107,7 +107,7 @@ public class ShLinkController {
 			shLinkManifest.setStatus("finalized");
 
 			ShLinkManifest.FileManifest fileManifest = new ShLinkManifest.FileManifest();
-			fileManifest.setContentType("shcard");
+			fileManifest.setContentType("application/smart-health-card");
 			fileManifest.setEmbedded(shCard);
 			shLinkManifest.addFiles(fileManifest);
 
@@ -147,9 +147,12 @@ public class ShLinkController {
 
 
 	@GetMapping()
-	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+	protected void doGet(HttpServletRequest req, HttpServletResponse resp,
+								@RequestParam(value = PARAM_KEY_ID, required = false) String keyId,
+								@RequestParam(value = PARAM_PATIENT_ID, required = false) String patientId,
+								@RequestParam(value = PARAM_FLAG, required = false) String flag,
+								@RequestParam(value = PARAM_EXP, required = false) String exp)
 		throws ServletException, IOException {
-		logger.info("Called");
 		Tenant tenant = ServletHelper.getTenantRedirectIfNone(req, resp);
 		UserAccess userAccess = ServletHelper.getUserAccess();
 
@@ -166,17 +169,20 @@ public class ShLinkController {
 		out.println("      <label>Patient ID</label>");
 		out.println(
 			"      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_PATIENT_ID
-				+ "\" value=\"Patient/\"/>");
+				+ "\" value=\"" + StringUtils.defaultIfBlank(patientId, "Patient/")
+				+ "\"/>");
 		out.println("      <label>Flag</label>");
 		out.println(
 			"      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_FLAG
-				+ "\" value=\"\"/>");
+				+ "\" value=\"" + StringUtils.defaultIfBlank(flag, "")
+				+ "\"/>"); // TODO add options
 		out.println("      <label>Key id</label>");
 		out.println("      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_KEY_ID
-			+ "\" value=\"\"/>");
+			+ "\" value=\"" + StringUtils.defaultIfBlank(keyId, "")
+			+ "\"/>");
 		out.println("      <label>Expiration (s)</label>");
 		out.println("      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_EXP
-			+ "\" value=\"" + 10000000 + "\"/>");
+			+ "\" value=\"" + StringUtils.defaultIfBlank(exp, "10000000") + "\"/>");
 
 		out.println(
 			"          <input class=\"w3-button w3-section w3-teal w3-ripple\" type=\"submit\" name=\""
