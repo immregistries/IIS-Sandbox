@@ -52,7 +52,7 @@ public class IisKeyController {
 	 */
 	protected List<JWK> doGetWellKnown(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		UserAccess userAccess = ServletHelper.getUserAccess();
-		resp.setContentType("text/json");
+	resp.setContentType("application/json");
 		try (Session dataSession = ServletHelper.getDataSession()) {
 //			Tenant tenant = ServletHelper.getTenantRedirectIfNone(req, resp, dataSession);
 			List<IisKey> iisKeys = keyStoreService.getKeys(userAccess, dataSession);

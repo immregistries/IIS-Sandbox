@@ -1,9 +1,6 @@
 package org.immregistries.iis.kernal.fhir.security;
 
-import org.immregistries.iis.kernal.servlet.FhirMessagingController;
-import org.immregistries.iis.kernal.servlet.HomeController;
-import org.immregistries.iis.kernal.servlet.PopController;
-import org.immregistries.iis.kernal.servlet.SoapController;
+import org.immregistries.iis.kernal.servlet.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
@@ -39,7 +36,7 @@ public class ServerSecurityConfig {
 			.requestCache(cache -> cache.requestCache(requestCache))
 			.authorizeHttpRequests((authorize) -> authorize
 				.requestMatchers(HttpMethod.GET, "/", HomeController.HOME_BASE_PATH, PopController.POP_BASE_PATH, "/SubscriptionTopic/**", "/img/**").permitAll()
-				.requestMatchers("/tenant/*/manifest/**", SHLINKS_CONTROLLER_BASE_URL + "/*").permitAll() // ShLinks
+				.requestMatchers("/tenant/*/manifest/**", SHLINKS_CONTROLLER_BASE_URL + "/*", TenantController.TENANT_PATH + WellKnownKeyController.WELL_KNOWN_PATH_SUFFIX).permitAll() // ShLinks
 				.requestMatchers(LOGIN_FORM_PATH, "/oauth2/**", LOGIN_PATH).permitAll()
 				// API AUTHORIZATION AND AUTHENTICATION SEPARATED
 				.requestMatchers("/fhir/**", SoapController.SOAP_BASE_PATH, FhirMessagingController.FHIR_MESSAGING_BASE_PATH + SoapController.SOAP_BASE_PATH, "/.well-known/smart-configuration", "/registerClient", "/token").permitAll()

@@ -1,6 +1,5 @@
 package org.immregistries.iis.kernal.servlet;
 
-import com.nimbusds.jose.jwk.JWK;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -22,6 +21,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.immregistries.iis.kernal.servlet.WellKnownKeyController.WELL_KNOWN_PATH_SUFFIX;
@@ -36,13 +36,13 @@ public class WellKnownKeyController {
 	KeyStoreService keyStoreService;
 
 	@GetMapping()
-	protected List<JWK> doGetWellKnown(HttpServletRequest req, HttpServletResponse resp, @PathVariable(name = TenantController.PATH_VARIABLE_TENANT_NAME, required = false) String tenantName) throws ServletException, IOException {
+	protected Set<?> doGetWellKnown(HttpServletRequest req, HttpServletResponse resp, @PathVariable(name = TenantController.PATH_VARIABLE_TENANT_NAME, required = false) String tenantName) throws ServletException, IOException {
 		UserAccess userAccess = ServletHelper.getUserAccess();
-		resp.setContentType("text/json");
+		resp.setContentType("application/json");
 		try (Session dataSession = ServletHelper.getDataSession()) {
 //			Tenant tenant = ServletHelper.getTenantRedirectIfNone(req, resp, dataSession);
 			List<IisKey> iisKeys = keyStoreService.getKeys(userAccess, dataSession);
-			return iisKeys.stream().map(iisKey -> iisKey.jwk().toPublicJWK()).collect(Collectors.toList());
+			return iisKeys.stream().map(iisKey -> iisKey.jwk().toPublicJWK().toJSONObject()).collect(Collectors.toSet());
 		}
 	}
 
