@@ -11,7 +11,6 @@ import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import jakarta.servlet.http.HttpServletRequest;
 import org.hl7.fhir.instance.model.api.IBaseBundle;
-import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.logic.KeyStoreService;
 import org.immregistries.iis.kernal.model.persisted.IisKey;
 import org.immregistries.iis.kernal.model.persisted.Tenant;
@@ -21,19 +20,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.crypto.spec.SecretKeySpec;
-import java.net.MalformedURLException;
 import java.security.*;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.zip.DataFormatException;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
-
-import static org.immregistries.iis.kernal.servlet.shlink.IisKeyController.IIS_KEY_BASE_PATH;
 
 @Service
 public class ShCardUtil {
@@ -86,14 +80,7 @@ public class ShCardUtil {
 		credentialSubject.put(FHIR_BUNDLE, JsonParser.parseString(resourceString).getAsJsonObject());
 		mapVc.put(CREDENTIAL_SUBJECT, credentialSubject);
 
-		UriComponentsBuilder uriComponentsBuilder = ServletUriComponentsBuilder.fromRequest(request);
-		uriComponentsBuilder.replacePath(ServletHelper.tenantifyUrlWithBasePath(tenant, IIS_KEY_BASE_PATH));
-		String issuerUrl = null;
-		try {
-			issuerUrl = uriComponentsBuilder.build().toUri().toURL().toString();
-		} catch (MalformedURLException e) {
-			throw new RuntimeException(e);
-		}
+		String issuerUrl = getKeyIssuerUrl(request, tenant);
 		Claims claims = Jwts.claims()
 			.notBefore(new Date())
 			.issuer(issuerUrl)
@@ -135,6 +122,7 @@ public class ShCardUtil {
 //        logger.info("shcMap: {}", shcMap);
 		return compact;
 	}
+
 
 	/**
 	 * Split endoded for Qr Code String into several smaller codes

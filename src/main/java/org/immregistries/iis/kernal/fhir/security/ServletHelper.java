@@ -62,31 +62,48 @@ public final class ServletHelper {
 
 
 	/**
-	 * Adds tenant prefix to url if tenant is not null
+	 * Adds tenant prefix to urlSuffix if tenant is not null
+	 * Used for links in the UI with href
 	 *
-	 * @param tenant
-	 * @param url
-	 * @return
+	 * @param tenant tenant
+	 * @param urlSuffix
+	 * @return  {tenantBasePath}/{tenantName}/ + urlSuffix
 	 */
-	public static String tenantifyUrlWithBasePath(Tenant tenant, String url) {
+	public static String tenantifyPathWithContextPath(Tenant tenant, String urlSuffix) {
 		if (tenant == null || tenant.getOrgId() < 0) {
-			return url;
+			return urlSuffix;
 		}
 		String organizationName = tenant.getOrganizationName();
-		return Application.IIS_PATH_BASE + tenantifyUrl(organizationName, url);
+		return Application.IIS_PATH_BASE + tenantifyPathSuffix(organizationName, urlSuffix);
 	}
 
 	/**
+	 * Standardized converting url Suffix with tenant Name and variable,
+	 * Automatically adds / character if needed
+	 *
+	 * can also be used for security config with * as tenantName
+	 *
 	 * @param tenantName organisation name
-	 * @param url
+	 * @param urlSuffix
+	 * @return {tenantBasePath}/{tenantName}/ + urlSuffix
+	 */
+	public static @NotNull String tenantifyPathSuffix(String tenantName, String urlSuffix) {
+		if (!StringUtils.startsWith(urlSuffix, "/")) {
+			urlSuffix = "/" + urlSuffix;
+		}
+		return TenantController.TENANT_BASE_PATH + "/" + tenantName + urlSuffix;
+	}
+
+	/**
+	 * Deals with tenantName path variable for Authorization config
+	 *
+	 * @param urlSuffix
 	 * @return
 	 */
-	public static @NotNull String tenantifyUrl(String tenantName, String url) {
-		if (!StringUtils.startsWith(url, "/")) {
-			url = "/" + url;
-		}
-		return TenantController.TENANT_BASE_PATH + "/" + tenantName + url;
+	public static @NotNull String securityConfigUrl(String urlSuffix) {
+		return tenantifyPathSuffix("*", urlSuffix);
 	}
+
 
 
 	public static Tenant authenticateTenantNoUsername(String password, String facilityName, Session dataSession, PartitionCreationInterceptor partitionCreationInterceptor) {

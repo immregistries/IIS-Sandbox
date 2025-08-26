@@ -103,7 +103,7 @@ public class ServerSecurityConfig {
 	}
 
 	private void addTenantifiedRequestMatcher(List<RequestMatcher> matchers, String pathSuffix) {
-		String tenantified = ServletHelper.tenantifyUrl("*", pathSuffix);
+		String tenantified = ServletHelper.securityConfigUrl(pathSuffix);
 		matchers.add(new AntPathRequestMatcher(pathSuffix));
 		matchers.add(new AntPathRequestMatcher(tenantified));
 	}

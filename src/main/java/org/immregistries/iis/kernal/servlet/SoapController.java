@@ -88,7 +88,7 @@
 				out.println("</p>");
 				out.println("<h2>Usage Instructions</h2>");
 				out.println("<h3>WSDL</h3>");
-				out.println("<p><a href=\"" + ServletHelper.tenantifyUrlWithBasePath(tenant, "soap") + "\">See WSDL</a></p>");
+				out.println("<p><a href=\"" + ServletHelper.tenantifyPathWithContextPath(tenant, "soap") + "\">See WSDL</a></p>");
 				out.println("<h3>Authentication</h3>");
 				out.println(
 					"<p>Authentication credentials can be established by submitting a username and password to a facility "

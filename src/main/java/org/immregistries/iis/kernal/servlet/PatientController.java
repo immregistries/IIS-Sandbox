@@ -138,13 +138,13 @@ public class PatientController {
 
 //		UriComponentsBuilder uriComponentsBuilder = ServletUriComponentsBuilder.fromRequest(req);
 //		uriComponentsBuilder
-		out.println("<img src=\"" + ServletHelper.tenantifyUrlWithBasePath(tenant, "/patient/qr?id=" + patientMasterSelected.getPatientId()) + "\"  alt=\"shlink\" width=\"200\">");
+		out.println("<img src=\"" + ServletHelper.tenantifyPathWithContextPath(tenant, "/patient/qr?id=" + patientMasterSelected.getPatientId()) + "\"  alt=\"shlink\" width=\"200\">");
 
 		String manifestUrl = PatientShLinkController.getManifestUrl(req, patientSelected, tenant);
 
 		out.println("<a href= \"" + manifestUrl + "\">" + manifestUrl + "</a>");
 		out.println("<a href= \"" +
-			ServletHelper.tenantifyUrlWithBasePath(tenant,
+			ServletHelper.tenantifyPathWithContextPath(tenant,
 				ShLinkController.SHLINK_CONTROLLER_BASE_PATH + "?" + ShLinkController.PARAM_PATIENT_ID + "=" + patientMasterSelected.getPatientId()) +
 			"\">Generate a new Smart Health Link with IPS</a>");
 

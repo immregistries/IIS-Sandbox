@@ -304,7 +304,7 @@ public class VaccinationController {
 				out.println("    <td>");
 				String link = "vaccination?" + VaccinationController.PARAM_VACCINATION_REPORTED_ID + "="
 					+ vaccination.getVaccinationId();
-				out.println("      <a href=\"" + ServletHelper.tenantifyUrlWithBasePath(tenant, link) + "\">");
+				out.println("      <a href=\"" + ServletHelper.tenantifyPathWithContextPath(tenant, link) + "\">");
 				if (!StringUtils.isEmpty(vaccination.getVaccineCvxCode())) {
 					Code cvxCode = codeMap.getCodeForCodeset(CodesetType.VACCINATION_CVX_CODE,
 						vaccination.getVaccineCvxCode());
