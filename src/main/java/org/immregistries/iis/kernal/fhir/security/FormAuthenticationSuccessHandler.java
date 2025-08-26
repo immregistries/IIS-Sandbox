@@ -7,7 +7,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.immregistries.iis.kernal.fhir.Application;
 import org.immregistries.iis.kernal.servlet.HomeController;
 import org.immregistries.iis.kernal.servlet.PopController;
-import org.immregistries.iis.kernal.servlet.TenantController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
@@ -22,10 +21,9 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.util.Map;
 
 import static org.immregistries.iis.kernal.servlet.LoginController.LOGIN_PARAM_TENANT_NAME;
-import static org.immregistries.iis.kernal.servlet.TenantController.TENANT_PATH;
+import static org.immregistries.iis.kernal.servlet.TenantController.TENANT_BASE_PATH;
 
 public class FormAuthenticationSuccessHandler extends SavedRequestAwareAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -52,9 +50,9 @@ public class FormAuthenticationSuccessHandler extends SavedRequestAwareAuthentic
 			/*
 			 * Filtering redirection for login to go back to homepage or pop page
 			 */
-			filterForSuffix(builder, Application.IIS_PATH_BASE + PopController.POP_BASE_PATH, PopController.POP_BASE_PATH);
-			filterForSuffix(builder, Application.IIS_PATH_BASE + HomeController.HOME_BASE_PATH, HomeController.HOME_BASE_PATH);
-			filterForSuffix(builder, Application.IIS_PATH_BASE + "/", HomeController.HOME_BASE_PATH);
+			filterForSuffix(builder, Application.IIS_PATH_BASE + PopController.POP_BASE_PATH, tenantName, PopController.POP_BASE_PATH);
+			filterForSuffix(builder, Application.IIS_PATH_BASE + HomeController.HOME_BASE_PATH, tenantName, HomeController.HOME_BASE_PATH);
+			filterForSuffix(builder, Application.IIS_PATH_BASE + "/", tenantName, HomeController.HOME_BASE_PATH);
 		} else {
 			/**
 			 * Redirect to tenant page to suggest selecting the tenant
@@ -63,15 +61,12 @@ public class FormAuthenticationSuccessHandler extends SavedRequestAwareAuthentic
 		}
 
 		clearAuthenticationAttributes(request);
-		String builtUrl = builder
-				.build(Map.of(TenantController.PATH_VARIABLE_TENANT_NAME, tenantName))
-				.toURL().toString();
-		getRedirectStrategy().sendRedirect(request, response, builtUrl);
+		getRedirectStrategy().sendRedirect(request, response, builder.build().toUri().toURL().toString());
 	}
 
-	private void filterForSuffix(UriComponentsBuilder builder, String filteredFullSuffix, String newSuffixEnd) throws MalformedURLException {
-		if (StringUtils.endsWith(builder.build().getPath(), filteredFullSuffix)) {
-			String newPath = Application.IIS_PATH_BASE + TENANT_PATH + newSuffixEnd;
+	private void filterForSuffix(UriComponentsBuilder builder, String pathSuffix, String tenantName, String newSuffix) throws MalformedURLException {
+		if (StringUtils.endsWith(builder.build().getPath(), pathSuffix)) {
+			String newPath = Application.IIS_PATH_BASE + TENANT_BASE_PATH + "/" + tenantName + newSuffix;
 			builder.replacePath(newPath);
 		}
 	}
