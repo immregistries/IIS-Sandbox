@@ -222,6 +222,7 @@ public class ShCardUtil {
 		byte[] randomBytes = new byte[32];
 		SecureRandom secureRandom = new SecureRandom();
 		secureRandom.nextBytes(randomBytes);
-		return new SecretKeySpec(Base64.getEncoder().encode(randomBytes), SIGNATURE_ALGORITHM_NAME);
+		return new SecretKeySpec(randomBytes, "AES");
 	}
+
 }

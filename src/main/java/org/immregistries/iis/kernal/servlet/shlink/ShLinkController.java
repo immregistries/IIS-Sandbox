@@ -34,8 +34,13 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.security.NoSuchAlgorithmException;
-import java.util.*;
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
+import static org.immregistries.iis.kernal.logic.shlink.ShCardUtil.VERIFIABLE_CREDENTIAL_TYPE;
+import static org.immregistries.iis.kernal.logic.shlink.ShLinkUtilService.VERIFIABLE_CREDENTIAL;
 import static org.immregistries.iis.kernal.servlet.LocationController.PARAM_ACTION;
 import static org.immregistries.iis.kernal.servlet.shlink.ShLinkManifestController.SHLINKS_CONTROLLER_BASE_URL;
 
@@ -110,13 +115,16 @@ public class ShLinkController {
 		String shCardCompact = shCardUtil.qrCompact(ips, req, iisKey.getKeyId(), userAccess, tenant);
 
 		Map<String, List<String>> contentToEncrypt = new HashMap<>(2);
-		contentToEncrypt.put("type", List.of("VerifiableCredential", APPLICATION_SMART_HEALTH_CARD_CONTENT_TYPE));
-		contentToEncrypt.put("VerifiableCredential", List.of(shCardCompact));
+		contentToEncrypt.put("type", List.of(VERIFIABLE_CREDENTIAL_TYPE, APPLICATION_SMART_HEALTH_CARD_CONTENT_TYPE));
+		contentToEncrypt.put(VERIFIABLE_CREDENTIAL, List.of(shCardCompact));
 		String encryptedContent = Jwts.builder()
 			.content(gson.toJson(contentToEncrypt))
 			.header().add("cty", APPLICATION_SMART_HEALTH_CARD_CONTENT_TYPE).and()
 			.encryptWith(encryptionKeySpec, Jwts.ENC.A256GCM).compact(); // Alg specified in Smart health card IG
 
+		byte[] decryptforLog = (byte[]) Jwts.parser().decryptWith(encryptionKeySpec).build().parse(encryptedContent).getPayload();
+		logger.info("Decrypt test 2 {}", new String(decryptforLog));
+//		logger.info("Decrypt test 3 {}", Base64.getUrlDecoder().decode(decryptforLog));
 		if (StringUtils.contains(flag, "U")) {
 			IisShLinkContent iisShLinkContent = new IisShLinkContent();
 			iisShLinkContent.setUserAccess(userAccess);
@@ -135,18 +143,22 @@ public class ShLinkController {
 
 			shLinkUtilService.saveManifest(shLinkManifest);
 			UriComponentsBuilder builder = ServletUriComponentsBuilder.fromRequest(req);
-			builder.replacePath(Application.IIS_PATH_BASE + SHLINKS_CONTROLLER_BASE_URL + "/" + shLinkManifest.getId());
+			builder.replacePath(Application.IIS_PATH_BASE + SHLINKS_CONTROLLER_BASE_URL + "/{manifestId}");
 
-			url = builder.build().toUri().toURL().toString();
+
+			url = builder
+				.build(Map.of("manifestId", shLinkManifest.getId()))
+				.toURL().toString();
 		}
 
 
 		ShLinkPayload shLinkPayload = new ShLinkPayload();
 		shLinkPayload.setLabel("Generated for ShLink testing with IPS of Synthetic Patient");
 		shLinkPayload.setFlag(flag);
-		shLinkPayload.setKey(Arrays.toString(Base64.getUrlDecoder().decode(encryptionKeySpec.getEncoded())));
+		shLinkPayload.setKey(new String(Base64.getUrlEncoder().encode(encryptionKeySpec.getEncoded())));
 		shLinkPayload.setExp(expLong);
 		shLinkPayload.setUrl(url);
+		logger.info("shlink payload {}", shLinkPayload);
 
 		String qrCode = shLinkUtilService.qrCode(shLinkPayload);
 		if (image) {
@@ -188,7 +200,7 @@ public class ShLinkController {
 		out.println(
 			"    <form method=\"POST\" action=\"" +
 				"shlink" +
-				"\" class=\"w3-container w3-card-4\">");
+				"\" target=\"_blank\"  class=\"w3-container w3-card-4\">");
 		out.println("      <label>Patient ID</label>");
 		out.println(
 			"      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_PATIENT_ID

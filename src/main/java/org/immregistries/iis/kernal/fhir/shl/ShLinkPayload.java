@@ -127,4 +127,16 @@ public class ShLinkPayload {
 	public void setV(Integer v) {
 		this.v = v;
 	}
+
+	@Override
+	public String toString() {
+		return "ShLinkPayload{" +
+			"url='" + url + '\'' +
+			", key='" + key + '\'' +
+			", exp=" + exp +
+			", flag='" + flag + '\'' +
+			", label='" + label + '\'' +
+			", v=" + v +
+			'}';
+	}
 }
