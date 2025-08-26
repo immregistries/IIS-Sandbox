@@ -70,7 +70,7 @@ public class IisKeyController {
 			HomeController.doHeader(out, "IIS Sandbox Keystore", ServletHelper.getTenant());
 			out.println("    <div class=\"w3-container w3-half w3-margin-top\">");
 			out.println("    <h2>Facility: " + tenant.getOrganizationName() + "</h2>");
-			out.println("    <h3>Keys used for shlink and shcard signing (generated for the user)</h3>");
+			out.println("    <h3>Keys used for signing Smart Health Cards (generated for the user)</h3>");
 			out.println("    </div>");
 
 			out.println("    <div class=\"w3-container\">");

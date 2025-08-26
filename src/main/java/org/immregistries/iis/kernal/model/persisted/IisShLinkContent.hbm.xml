@@ -4,7 +4,7 @@
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 
 <hibernate-mapping package="org.immregistries.iis.kernal.model.persisted">
-    <class name="IisShlinkContent" table="IIS_SHLINK_CONTENT">
+    <class name="IisShLinkContent" table="IIS_SH_LINK_CONTENT">
         <id name="id" column="ID">
             <generator class="native"/>
         </id>

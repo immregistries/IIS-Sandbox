@@ -3,7 +3,7 @@ package org.immregistries.iis.kernal.model.persisted;
 /**
  * Persisting generated key for smart health links and cards
  */
-public class IisShlinkContent {
+public class IisShLinkContent {
 
 	private int id;
 	private UserAccess userAccess;

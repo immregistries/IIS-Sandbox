@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 /**
- * Represents the JSON structure for ShlinkManifestRequestBody.
+ * Represents the JSON structure for ShLinkManifestRequestBody.
  * This class is ready for JSON serialization using Jackson.
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -14,7 +14,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 	"passcode",
 	"embeddedLengthMax"
 })
-public class ShlinkManifestRequestBody {
+public class ShLinkManifestRequestBody {
 
 	/**
 	 * A string describing the recipient (e.g., the name of an organization or person)
@@ -37,10 +37,10 @@ public class ShlinkManifestRequestBody {
 	@JsonProperty("embeddedLengthMax")
 	private Integer embeddedLengthMax;
 
-	public ShlinkManifestRequestBody() {
+	public ShLinkManifestRequestBody() {
 	}
 
-	public ShlinkManifestRequestBody(String recipient, String passcode, Integer embeddedLengthMax) {
+	public ShLinkManifestRequestBody(String recipient, String passcode, Integer embeddedLengthMax) {
 		this.recipient = recipient;
 		this.passcode = passcode;
 		this.embeddedLengthMax = embeddedLengthMax;

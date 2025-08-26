@@ -16,9 +16,9 @@ import org.immregistries.iis.kernal.fhir.ips.IpsGeneratorSvcIIS;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.fhir.shl.ShLinkPayload;
 import org.immregistries.iis.kernal.logic.KeyStoreService;
-import org.immregistries.iis.kernal.logic.shlink.IisShlinkContentService;
+import org.immregistries.iis.kernal.logic.shlink.IisShLinkContentService;
 import org.immregistries.iis.kernal.logic.shlink.ShCardUtil;
-import org.immregistries.iis.kernal.logic.shlink.ShlUtilService;
+import org.immregistries.iis.kernal.logic.shlink.ShLinkUtilService;
 import org.immregistries.iis.kernal.model.persisted.*;
 import org.immregistries.iis.kernal.servlet.HomeController;
 import org.immregistries.iis.kernal.servlet.TenantController;
@@ -61,7 +61,7 @@ public class ShLinkController {
 	IpsGeneratorSvcIIS ipsGeneratorSvcIIS;
 
 	@Autowired
-	ShlUtilService shlUtilService;
+	ShLinkUtilService shLinkUtilService;
 
 	@Autowired
 	KeyStoreService keyStoreService;
@@ -72,7 +72,7 @@ public class ShLinkController {
 	@Autowired
 	IPartitionLookupSvc partitionLookupSvc;
 	@Autowired
-	IisShlinkContentService iisShlinkContentService;
+	IisShLinkContentService iisShLinkContentService;
 	@Autowired
 	FhirContext fhirContext;
 
@@ -118,11 +118,11 @@ public class ShLinkController {
 			.encryptWith(encryptionKeySpec, Jwts.ENC.A256GCM).compact(); // Alg specified in Smart health card IG
 
 		if (StringUtils.contains(flag, "U")) {
-			IisShlinkContent iisShlinkContent = new IisShlinkContent();
-			iisShlinkContent.setUserAccess(userAccess);
-			iisShlinkContent.setExp(expLong);
-			iisShlinkContent.setContent(encryptedContent);
-			iisShlinkContentService.saveIisShlinkContent(iisShlinkContent);
+			IisShLinkContent iisShLinkContent = new IisShLinkContent();
+			iisShLinkContent.setUserAccess(userAccess);
+			iisShLinkContent.setExp(expLong);
+			iisShLinkContent.setContent(encryptedContent);
+			iisShLinkContentService.saveIisShLinkContent(iisShLinkContent);
 		} else {
 			ShLinkManifest shLinkManifest = new ShLinkManifest();
 			shLinkManifest.setTenant(tenant);
@@ -133,7 +133,7 @@ public class ShLinkController {
 			fileManifest.setEmbedded(encryptedContent);
 			shLinkManifest.addFiles(fileManifest);
 
-			shlUtilService.saveManifest(shLinkManifest);
+			shLinkUtilService.saveManifest(shLinkManifest);
 			UriComponentsBuilder builder = ServletUriComponentsBuilder.fromRequest(req);
 			builder.replacePath(Application.IIS_PATH_BASE + SHLINKS_CONTROLLER_BASE_URL + "/" + shLinkManifest.getId());
 
@@ -142,15 +142,15 @@ public class ShLinkController {
 
 
 		ShLinkPayload shLinkPayload = new ShLinkPayload();
-		shLinkPayload.setLabel("Generated for Shlink testing with IPS of Synthetic Patient");
+		shLinkPayload.setLabel("Generated for ShLink testing with IPS of Synthetic Patient");
 		shLinkPayload.setFlag(flag);
 		shLinkPayload.setKey(Arrays.toString(Base64.getUrlDecoder().decode(encryptionKeySpec.getEncoded())));
 		shLinkPayload.setExp(expLong);
 		shLinkPayload.setUrl(url);
 
-		String qrCode = shlUtilService.qrCode(shLinkPayload);
+		String qrCode = shLinkUtilService.qrCode(shLinkPayload);
 		if (image) {
-			shlUtilService.printQrCodeAsImage(outputStream, qrCode);
+			shLinkUtilService.printQrCodeAsImage(outputStream, qrCode);
 		} else {
 			resp.setContentType("text/html");
 			HomeController.doHeader(out, "Smart Health Link Result", tenant);
@@ -184,7 +184,7 @@ public class ShLinkController {
 		HomeController.doHeader(out, "Smart Health Link Form", tenant);
 
 		out.println("    <div class=\"w3-container w3-margin-top\">");
-		out.println("    <h3>Generate Shlink</h3>");
+		out.println("    <h3>Generate ShLink</h3>");
 		out.println(
 			"    <form method=\"POST\" action=\"" +
 				"shlink" +
@@ -199,7 +199,7 @@ public class ShLinkController {
 			"      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_FLAG
 				+ "\" value=\"" + StringUtils.defaultIfBlank(flag, "")
 				+ "\"/>"); // TODO add options
-		out.println("      <label>Key id</label>");
+		out.println("      <label>Encryption Key for documents (generated if null)</label>");
 		out.println("      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_KEY_ID
 			+ "\" value=\"" + StringUtils.defaultIfBlank(keyId, "")
 			+ "\"/>");
@@ -215,7 +215,7 @@ public class ShLinkController {
 
 		out.println("    <div class=\"w3-container w3-half w3-margin-top\">");
 		out.println("    <h2>Keys Available</h2>");
-		out.println("    <h3>Keys used for shlink and shcard signing (generated for the user)</h3>");
+		out.println("    <h3>Keys used for signing Smart Health Cards signing (generated for the user)</h3>");
 		out.println("    </div>");
 
 		out.println("    <div class=\"w3-container\">");

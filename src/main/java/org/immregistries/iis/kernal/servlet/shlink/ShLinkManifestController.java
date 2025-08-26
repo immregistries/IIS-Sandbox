@@ -9,7 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Session;
 import org.immregistries.iis.kernal.fhir.interceptors.PartitionCreationInterceptor;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
-import org.immregistries.iis.kernal.logic.shlink.ShlUtilService;
+import org.immregistries.iis.kernal.logic.shlink.ShLinkUtilService;
 import org.immregistries.iis.kernal.model.persisted.ShLinkManifest;
 import org.immregistries.iis.kernal.model.persisted.Tenant;
 import org.slf4j.Logger;
@@ -30,14 +30,14 @@ public class ShLinkManifestController {
 	public final static String SHLINKS_CONTROLLER_BASE_URL = "/link";
 
 	@Autowired
-	ShlUtilService shlUtilService;
+	ShLinkUtilService shLinkUtilService;
 	@Autowired
 	PartitionCreationInterceptor partitionCreationInterceptor;
 
 	@GetMapping("/{id}")
 	public ShLinkManifest getManifest(HttpServletRequest req, HttpServletResponse resp, @PathVariable("id") String manifestId) {
 		resp.setContentType("application/json");
-		return shlUtilService.readShLinkManifest(manifestId);
+		return shLinkUtilService.readShLinkManifest(manifestId);
 	}
 
 
@@ -61,7 +61,7 @@ public class ShLinkManifestController {
 				}
 			}
 		}
-		ShLinkManifest shLinkManifest = shlUtilService.readShLinkManifest(manifestId);
+		ShLinkManifest shLinkManifest = shLinkUtilService.readShLinkManifest(manifestId);
 		return shLinkManifest;
 	}
 
@@ -96,8 +96,8 @@ public class ShLinkManifestController {
 
 	@GetMapping("/$generate")
 	public ShLinkManifest genManifest(HttpServletRequest req, HttpServletResponse resp) {
-		ShLinkManifest shLinkManifest = shlUtilService.generateManifest(ServletHelper.getTenant(req));
-		return shlUtilService.saveManifest(shLinkManifest);
+		ShLinkManifest shLinkManifest = shLinkUtilService.generateManifest(ServletHelper.getTenant(req));
+		return shLinkUtilService.saveManifest(shLinkManifest);
 	}
 
 }

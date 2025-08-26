@@ -31,8 +31,8 @@ import java.io.OutputStream;
 import java.util.UUID;
 
 @Service
-public class ShlUtilService {
-	private static final Logger logger = LoggerFactory.getLogger(ShlUtilService.class);
+public class ShLinkUtilService {
+	private static final Logger logger = LoggerFactory.getLogger(ShLinkUtilService.class);
 
 	@Autowired
 	private RepositoryClientFactory repositoryClientFactory;

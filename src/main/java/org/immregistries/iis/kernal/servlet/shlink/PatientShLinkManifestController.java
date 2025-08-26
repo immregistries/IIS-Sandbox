@@ -10,11 +10,11 @@ import org.hibernate.Session;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.immregistries.iis.kernal.fhir.interceptors.PartitionCreationInterceptor;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
-import org.immregistries.iis.kernal.logic.shlink.ShlUtilService;
+import org.immregistries.iis.kernal.logic.shlink.ShLinkUtilService;
 import org.immregistries.iis.kernal.mapping.interfaces.PatientMapper;
 import org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester;
 import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
-import org.immregistries.iis.kernal.model.ShlinkManifestRequestBody;
+import org.immregistries.iis.kernal.model.ShLinkManifestRequestBody;
 import org.immregistries.iis.kernal.model.persisted.ShLinkManifest;
 import org.immregistries.iis.kernal.model.persisted.Tenant;
 import org.immregistries.iis.kernal.servlet.TenantController;
@@ -28,11 +28,11 @@ import java.io.IOException;
 
 import static org.immregistries.iis.kernal.servlet.PatientController.PATIENT_BASE_PATH;
 import static org.immregistries.iis.kernal.servlet.PatientServletUtil.fetchPatientFromParameters;
-import static org.immregistries.iis.kernal.servlet.shlink.PatientShlinkManifestController.PATIENT_MANIFEST_FULL_PATH;
+import static org.immregistries.iis.kernal.servlet.shlink.PatientShLinkManifestController.PATIENT_MANIFEST_FULL_PATH;
 
 @RestController
 @RequestMapping({PATIENT_MANIFEST_FULL_PATH})
-public class PatientShlinkManifestController {
+public class PatientShLinkManifestController {
 
 	public static final String MANIFEST_PATH_SUFFIX = "/manifest";
 	public static final String PATIENT_MANIFEST_FULL_PATH = TenantController.TENANT_PATH + MANIFEST_PATH_SUFFIX;
@@ -40,7 +40,7 @@ public class PatientShlinkManifestController {
 
 
 	@Autowired
-	private ShlUtilService shlUtilService;
+	private ShLinkUtilService shLinkUtilService;
 	@Autowired
 	private RepositoryClientFactory repositoryClientFactory;
 	@Autowired
@@ -56,7 +56,7 @@ public class PatientShlinkManifestController {
 	protected ShLinkManifest postPatientShLinkManifest(HttpServletRequest req, HttpServletResponse resp,
 																	  @PathVariable("id") String id,
 																		@PathVariable("tenantName") String tenantName,
-																		@RequestBody ShlinkManifestRequestBody body) throws IOException, ServletException {
+																		@RequestBody ShLinkManifestRequestBody body) throws IOException, ServletException {
 		String passcode = body.getPasscode();
 		resp.setContentType("application/json");
 		try (Session dataSession = ServletHelper.getDataSession()) {
@@ -89,6 +89,6 @@ public class PatientShlinkManifestController {
 	private ShLinkManifest getShLinkManifest(HttpServletRequest req, String id, Tenant tenant) {
 		IGenericClient fhirClient = repositoryClientFactory.newGenericClient(req);
 		IBaseResource patientSelected = fetchPatientFromParameters(id, "", fhirClient, fhirRequester);
-		return shlUtilService.generateExamplePatientManifest(tenant, patientSelected.getIdElement());
+		return shLinkUtilService.generateExamplePatientManifest(tenant, patientSelected.getIdElement());
 	}
 }

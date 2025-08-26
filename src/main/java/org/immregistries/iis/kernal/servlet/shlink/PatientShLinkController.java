@@ -12,7 +12,7 @@ import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.immregistries.iis.kernal.fhir.interceptors.PartitionCreationInterceptor;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.fhir.shl.ShLinkPayload;
-import org.immregistries.iis.kernal.logic.shlink.ShlUtilService;
+import org.immregistries.iis.kernal.logic.shlink.ShLinkUtilService;
 import org.immregistries.iis.kernal.mapping.interfaces.PatientMapper;
 import org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester;
 import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
@@ -29,7 +29,7 @@ import java.io.OutputStream;
 
 import static org.immregistries.iis.kernal.servlet.PatientController.PATIENT_BASE_PATH;
 import static org.immregistries.iis.kernal.servlet.PatientServletUtil.fetchPatientFromParameter;
-import static org.immregistries.iis.kernal.servlet.shlink.PatientShlinkManifestController.MANIFEST_PATH_SUFFIX;
+import static org.immregistries.iis.kernal.servlet.shlink.PatientShLinkManifestController.MANIFEST_PATH_SUFFIX;
 
 @RestController
 @RequestMapping({PATIENT_BASE_PATH, TenantController.TENANT_PATH + PATIENT_BASE_PATH})
@@ -38,7 +38,7 @@ public class PatientShLinkController {
 	public static final String SHLINK_QR_CODE_PATH_SUFFIX = "/qr";
 
 	@Autowired
-	private ShlUtilService shlUtilService;
+	private ShLinkUtilService shLinkUtilService;
 	@Autowired
 	private RepositoryClientFactory repositoryClientFactory;
 	@Autowired
@@ -62,7 +62,7 @@ public class PatientShLinkController {
 			IBaseResource patientSelected = fetchPatientFromParameter(req, fhirClient, fhirRequester);
 			if (patientSelected != null) {
 				String qrCode = getQrCode(req, patientSelected, tenant);
-				shlUtilService.printQrCodeAsImage(outputStream, qrCode);
+				shLinkUtilService.printQrCodeAsImage(outputStream, qrCode);
 			}
 		}
 		outputStream.flush();
@@ -73,7 +73,7 @@ public class PatientShLinkController {
 		String manifestUrl = getManifestUrl(req, patientSelected, tenant);
 		ShLinkPayload shLinkPayload = getPatientShLinkPayload(manifestUrl);
 
-		return shlUtilService.qrCode(shLinkPayload);
+		return shLinkUtilService.qrCode(shLinkPayload);
 	}
 
 	public static @NotNull ShLinkPayload getPatientShLinkPayload(String manifestUrl) {
