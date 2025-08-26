@@ -21,10 +21,13 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
+import static org.immregistries.iis.kernal.servlet.WellKnownKeyController.WELL_KNOWN_PATH_SUFFIX;
+
 @RestController
-@RequestMapping({TenantController.TENANT_PATH, "/"})
+@RequestMapping({TenantController.TENANT_PATH + WELL_KNOWN_PATH_SUFFIX, WELL_KNOWN_PATH_SUFFIX})
 public class WellKnownKeyController {
 
 	public static final String WELL_KNOWN_PATH_SUFFIX = "/.well-known/jwks.json";
@@ -32,16 +35,7 @@ public class WellKnownKeyController {
 	@Autowired
 	KeyStoreService keyStoreService;
 
-	@GetMapping(WELL_KNOWN_PATH_SUFFIX)
-	/**
-	 * Make
-	 *
-	 * @param req
-	 * @param resp
-	 * @return
-	 * @throws ServletException
-	 * @throws IOException
-	 */
+	@GetMapping()
 	protected List<JWK> doGetWellKnown(HttpServletRequest req, HttpServletResponse resp, @PathVariable(name = TenantController.PATH_VARIABLE_TENANT_NAME, required = false) String tenantName) throws ServletException, IOException {
 		UserAccess userAccess = ServletHelper.getUserAccess();
 		resp.setContentType("text/json");
@@ -52,13 +46,12 @@ public class WellKnownKeyController {
 		}
 	}
 
-	public static String getKeyIssuerPath() {
-		return ServletHelper.tenantifyPathWithContextPath("*", TenantController.TENANT_PATH);
-	}
+
 
 	public static String getKeyIssuerUrl(HttpServletRequest request, Tenant tenant) {
 		UriComponentsBuilder uriComponentsBuilder = ServletUriComponentsBuilder.fromRequest(request);
-		uriComponentsBuilder.replacePath();
+		uriComponentsBuilder.replacePath(TenantController.TENANT_PATH);
+		uriComponentsBuilder.build(Map.of(TenantController.PATH_VARIABLE_TENANT_NAME, tenant.getOrganizationName()));
 		String issuerUrl = null;
 		try {
 			issuerUrl = uriComponentsBuilder.build().toUri().toURL().toString();

@@ -15,6 +15,7 @@ import org.immregistries.iis.kernal.logic.KeyStoreService;
 import org.immregistries.iis.kernal.model.persisted.IisKey;
 import org.immregistries.iis.kernal.model.persisted.Tenant;
 import org.immregistries.iis.kernal.model.persisted.UserAccess;
+import org.immregistries.iis.kernal.servlet.WellKnownKeyController;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,7 +81,7 @@ public class ShCardUtil {
 		credentialSubject.put(FHIR_BUNDLE, JsonParser.parseString(resourceString).getAsJsonObject());
 		mapVc.put(CREDENTIAL_SUBJECT, credentialSubject);
 
-		String issuerUrl = getKeyIssuerUrl(request, tenant);
+		String issuerUrl = WellKnownKeyController.getKeyIssuerUrl(request, tenant);
 		Claims claims = Jwts.claims()
 			.notBefore(new Date())
 			.issuer(issuerUrl)
