@@ -40,11 +40,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Base64;
 import java.util.List;
 import java.util.Set;
 
-import static org.immregistries.iis.kernal.logic.shlink.ShLinkUtilService.SHLINK_PREFIX;
 import static org.immregistries.iis.kernal.servlet.PatientController.PATIENT_BASE_PATH;
 import static org.immregistries.iis.kernal.servlet.PatientServletUtil.*;
 
@@ -134,27 +132,13 @@ public class PatientController {
 		out.println("<div class=\"w3-container\">");
 		printFhirShortcuts(out, patientSelected, patientMasterSelected, tenant);
 		out.println("</div>");
-		out.println("<div class=\"w3-container\">");
-
-//		UriComponentsBuilder uriComponentsBuilder = ServletUriComponentsBuilder.fromRequest(req);
-//		uriComponentsBuilder
-		out.println("<img src=\"" + ServletHelper.tenantifyPathWithContextPath(tenant, "/patient/qr?id=" + patientMasterSelected.getPatientId()) + "\"  alt=\"shlink\" width=\"200\">");
 
 		String manifestUrl = PatientShLinkController.getManifestUrl(req, patientSelected, tenant);
-
-		out.println("<a href= \"" + manifestUrl + "\">" + manifestUrl + "</a>");
-		out.println("<a href= \"" +
-			ServletHelper.tenantifyPathWithContextPath(tenant,
-				ShLinkController.SHLINK_CONTROLLER_BASE_PATH + "?" + ShLinkController.PARAM_PATIENT_ID + "=" + patientMasterSelected.getPatientId()) +
-			"\">Generate a new Smart Health Link with IPS</a>");
-
-		out.println("<p id =\"qrCode\">");
 		ShLinkPayload shLinkPayload = PatientShLinkController.getPatientShLinkPayload(manifestUrl);
-		String qrCode = shLinkUtilService.qrCode(shLinkPayload);
-		String decodedFrom64 = new String(Base64.getUrlDecoder().decode(qrCode.substring(SHLINK_PREFIX.length()).getBytes()));
-		logger.info(decodedFrom64);
-		out.println(qrCode);
-		out.println("</p>");
+
+		out.println("<div class=\"w3-container\">");
+		out.println("<h4>Smart Health link</h4>");
+		printQrCodeAndDetails(out, tenant, patientMasterSelected, shLinkPayload);
 
 //		out.println("<button onclick=\"copyHtmlToClipboard()\">Copy HTML</button>");
 //		out.println("<script>");
@@ -185,6 +169,22 @@ public class PatientController {
 		out.println("</div>");
 
 		out.println("</div>");
+	}
+
+	private void printQrCodeAndDetails(PrintWriter out, Tenant tenant, PatientMaster patientMasterSelected, ShLinkPayload shLinkPayload) {
+		out.println("<div class=\"w3-container\">");
+		out.println("<img src=\"" + ServletHelper.tenantifyPathWithContextPath(tenant, "/patient/qr?id=" + patientMasterSelected.getPatientId()) + "\"  alt=\"shlink\" width=\"200\">");
+		out.println("<div><a href= \"" + shLinkPayload.getUrl() + "\">Manifest URL</a></div>");
+		out.println("<h5>Qr Code Text Value</h5>");
+		out.println("<textarea id =\"qrCode\" cols=\"30\" rows=\"2\" style=\"white-space: nowrap;  overflow: auto;\">");
+		String qrCode = shLinkUtilService.qrCode(shLinkPayload);
+		out.print(qrCode);
+		out.println("</textarea>");
+		out.println("</div>");
+		out.println("<a href= \"" +
+			ServletHelper.tenantifyPathWithContextPath(tenant,
+				ShLinkController.SHLINK_CONTROLLER_BASE_PATH + "?" + ShLinkController.PARAM_PATIENT_ID + "=" + patientMasterSelected.getPatientId()) +
+			"\">Generate a new Smart Health Link with IPS</a>");
 	}
 
 	private void printPatientRecommendationsAndSubscriptions(PrintWriter out, IBaseResource patientSelected, PatientMaster patientMasterSelected, IGenericClient fhirClient) {

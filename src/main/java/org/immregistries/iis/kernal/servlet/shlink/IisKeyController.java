@@ -12,6 +12,7 @@ import org.immregistries.iis.kernal.model.persisted.Tenant;
 import org.immregistries.iis.kernal.model.persisted.UserAccess;
 import org.immregistries.iis.kernal.servlet.HomeController;
 import org.immregistries.iis.kernal.servlet.TenantController;
+import org.immregistries.iis.kernal.servlet.WellKnownKeyController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -75,7 +76,7 @@ public class IisKeyController {
 
 			out.println("    <div class=\"w3-container\">");
 			List<IisKey> iisKeys = keyStoreService.getKeys(userAccess);
-			printIisKeys(out, iisKeys);
+			printIisKeys(out, iisKeys, tenant);
 			out.println("    </div>");
 		} catch (Exception e) {
 			System.err.println("Unable to render page: " + e.getMessage());
@@ -87,7 +88,9 @@ public class IisKeyController {
 
 	}
 
-	protected static void printIisKeys(PrintWriter out, List<IisKey> iisKeys) {
+	protected static void printIisKeys(PrintWriter out, List<IisKey> iisKeys, Tenant tenant) {
+		out.println("<a href=\"" + ServletHelper.tenantifyPathWithContextPath(tenant, WellKnownKeyController.WELL_KNOWN_PATH_SUFFIX) + "\">well-known</a>");
+
 		if (iisKeys.isEmpty()) {
 			out.println("<em>No Key found</em>");
 		} else {

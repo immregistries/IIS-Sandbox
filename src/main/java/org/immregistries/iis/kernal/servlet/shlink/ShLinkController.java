@@ -123,7 +123,7 @@ public class ShLinkController {
 			.encryptWith(encryptionKeySpec, Jwts.ENC.A256GCM).compact(); // Alg specified in Smart health card IG
 
 		byte[] decryptforLog = (byte[]) Jwts.parser().decryptWith(encryptionKeySpec).build().parse(encryptedContent).getPayload();
-		logger.info("Decrypt test 2 {}", new String(decryptforLog));
+//		logger.info("Decrypt test 2 {}", new String(decryptforLog));
 //		logger.info("Decrypt test 3 {}", Base64.getUrlDecoder().decode(decryptforLog));
 		if (StringUtils.contains(flag, "U")) {
 			IisShLinkContent iisShLinkContent = new IisShLinkContent();
@@ -170,9 +170,7 @@ public class ShLinkController {
 			out.println("<textarea name=\"shlink\" readonly style=\"width: 100%; height: 5em;\" >");
 			out.print(qrCode);
 			out.println("</textarea>");
-
 			IisKeyController.printIisKey(out, iisKey);
-
 			HomeController.doFooter(out);
 		}
 		out.flush();
@@ -231,8 +229,9 @@ public class ShLinkController {
 		out.println("    </div>");
 
 		out.println("    <div class=\"w3-container\">");
+
 		List<IisKey> iisKeys = keyStoreService.getKeys(userAccess);
-		IisKeyController.printIisKeys(out, iisKeys);
+		IisKeyController.printIisKeys(out, iisKeys, tenant);
 		out.println("    </div>");
 
 		HomeController.doFooter(out);

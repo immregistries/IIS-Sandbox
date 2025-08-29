@@ -12,7 +12,6 @@ import io.jsonwebtoken.Jwts;
 import jakarta.servlet.http.HttpServletRequest;
 import org.hl7.fhir.instance.model.api.IBaseBundle;
 import org.immregistries.iis.kernal.logic.KeyStoreService;
-import org.immregistries.iis.kernal.model.persisted.IisKey;
 import org.immregistries.iis.kernal.model.persisted.Tenant;
 import org.immregistries.iis.kernal.model.persisted.UserAccess;
 import org.immregistries.iis.kernal.servlet.WellKnownKeyController;
@@ -23,7 +22,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.spec.SecretKeySpec;
-import java.security.*;
+import java.security.KeyPair;
+import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
+import java.security.SecureRandom;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.zip.DataFormatException;
@@ -93,11 +95,9 @@ public class ShCardUtil {
 		/**
 		 * Compressing the content
 		 */
-		byte[] deflated = rawDeflate(claimsString);
+		byte[] deflatedClaims = rawDeflate(claimsString);
 
-		IisKey iisKey = keyStoreService.getKey(kid, userAccess);
-		KeyPair keyPair = iisKey.keyPair();
-		PrivateKey privateKey = keyPair.getPrivate();
+		KeyPair keyPair = keyStoreService.getKey(kid, userAccess).keyPair();
 		/**
 		 * DEF header added manually as we are using raw deflation
 		 */
@@ -107,9 +107,8 @@ public class ShCardUtil {
 			.add("zip", "DEF")
 			.keyId(kid)
 			.and()
-			.content(deflated)
-//                .compressWith(Jwts.ZIP.DEF)
-			.signWith(privateKey);
+			.content(deflatedClaims)
+			.signWith(keyPair.getPrivate());
 		String compact = jwtBuilder.compact();
 //		logger.info("compact {}", compact);
 		PublicKey publicKey = keyPair.getPublic();
