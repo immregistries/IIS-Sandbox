@@ -98,22 +98,23 @@ public class ShLinkController {
 		Tenant tenant = ServletHelper.getTenantRedirectIfNone(req, resp);
 		UserAccess userAccess = ServletHelper.getUserAccess();
 
+		OutputStream outputStream = resp.getOutputStream();
+		PrintWriter out = new PrintWriter(outputStream);
+
 		IBaseBundle ips = ipsGeneratorSvcIIS.generateIps(ServletHelper.requestDetailsWithPartitionName(partitionLookupSvc), new IdType(patientId), "");
 
 		SecretKeySpec encryptionKeySpec = shCardUtil.generateSecretKey();
 
-		OutputStream outputStream = resp.getOutputStream();
-		PrintWriter out = new PrintWriter(outputStream);
-
-		IisKey iisKey;
+		IisKey iisSigningKey;
 		if (StringUtils.isNotBlank(keyId)) {
-			iisKey = keyStoreService.getKey(keyId, userAccess);
+			iisSigningKey = keyStoreService.getKey(keyId, userAccess);
 		} else {
-			iisKey = keyStoreService.saveKey(keyStoreService.generateEc(), tenant, userAccess);
+			iisSigningKey = keyStoreService.saveKey(keyStoreService.generateEc(), tenant, userAccess);
 		}
-		String url = "";
 
-		String shCardCompact = shCardUtil.qrCompact(ips, req, iisKey.getKeyId(), userAccess, tenant);
+		String url;
+
+		String shCardCompact = shCardUtil.qrCompact(ips, req, iisSigningKey, userAccess, tenant);
 
 		Map<String, List<String>> contentToEncrypt = new HashMap<>(2);
 		contentToEncrypt.put("type", List.of(VERIFIABLE_CREDENTIAL_TYPE, APPLICATION_SMART_HEALTH_CARD_CONTENT_TYPE));
@@ -132,6 +133,7 @@ public class ShLinkController {
 			iisShLinkContent.setExp(expLong);
 			iisShLinkContent.setContent(encryptedContent);
 			iisShLinkContentService.saveIisShLinkContent(iisShLinkContent);
+			url = iisShLinkContentService.getUrl(iisShLinkContent);
 		} else {
 			ShLinkManifest shLinkManifest = new ShLinkManifest();
 			shLinkManifest.setTenant(tenant);
@@ -171,7 +173,7 @@ public class ShLinkController {
 			out.println("<textarea name=\"shlink\" readonly style=\"width: 100%; height: 5em;\" >");
 			out.print(qrCode);
 			out.println("</textarea>");
-			IisKeyController.printIisKey(out, iisKey);
+			IisKeyController.printIisKey(out, iisSigningKey);
 			HomeController.doFooter(out);
 		}
 		out.flush();

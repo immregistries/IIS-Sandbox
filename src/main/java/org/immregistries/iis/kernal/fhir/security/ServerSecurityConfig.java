@@ -17,6 +17,7 @@ import java.util.List;
 
 import static org.immregistries.iis.kernal.servlet.LoginController.LOGIN_PARAM_PASSWORD;
 import static org.immregistries.iis.kernal.servlet.LoginController.LOGIN_PARAM_USERID;
+import static org.immregistries.iis.kernal.servlet.shlink.ShLinkContentController.SHLINK_CONTENT_PATH;
 import static org.immregistries.iis.kernal.servlet.shlink.ShLinkManifestController.SHLINKS_CONTROLLER_BASE_URL;
 
 
@@ -36,7 +37,7 @@ public class ServerSecurityConfig {
 			.requestCache(cache -> cache.requestCache(requestCache))
 			.authorizeHttpRequests((authorize) -> authorize
 				.requestMatchers(HttpMethod.GET, "/", HomeController.HOME_BASE_PATH, PopController.POP_BASE_PATH, "/SubscriptionTopic/**", "/img/**").permitAll()
-				.requestMatchers("/tenant/*/manifest/**", SHLINKS_CONTROLLER_BASE_URL + "/*", TenantController.TENANT_PATH + WellKnownKeyController.WELL_KNOWN_PATH_SUFFIX).permitAll() // ShLinks
+				.requestMatchers("/tenant/*/manifest/**", SHLINKS_CONTROLLER_BASE_URL + "/*", TenantController.TENANT_PATH + WellKnownKeyController.WELL_KNOWN_PATH_SUFFIX, SHLINK_CONTENT_PATH).permitAll() // ShLinks
 				.requestMatchers(LOGIN_FORM_PATH, "/oauth2/**", LOGIN_PATH).permitAll()
 				// API AUTHORIZATION AND AUTHENTICATION SEPARATED
 				.requestMatchers("/fhir/**", SoapController.SOAP_BASE_PATH, FhirMessagingController.FHIR_MESSAGING_BASE_PATH + SoapController.SOAP_BASE_PATH, "/.well-known/smart-configuration", "/registerClient", "/token").permitAll()

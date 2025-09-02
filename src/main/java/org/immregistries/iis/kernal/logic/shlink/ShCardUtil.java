@@ -9,6 +9,7 @@ import io.jsonwebtoken.Jwts;
 import jakarta.servlet.http.HttpServletRequest;
 import org.hl7.fhir.instance.model.api.IBaseBundle;
 import org.immregistries.iis.kernal.logic.KeyStoreService;
+import org.immregistries.iis.kernal.model.persisted.IisKey;
 import org.immregistries.iis.kernal.model.persisted.Tenant;
 import org.immregistries.iis.kernal.model.persisted.UserAccess;
 import org.immregistries.iis.kernal.servlet.WellKnownKeyController;
@@ -59,13 +60,13 @@ public class ShCardUtil {
 	@Autowired
 	private FhirContext fhirContext;
 
-	public String qrCompact(IBaseBundle iBaseBundle, HttpServletRequest request, String kid, UserAccess userAccess, Tenant tenant) throws IOException {
+	public String qrCompact(IBaseBundle iBaseBundle, HttpServletRequest request, IisKey signingKey, UserAccess userAccess, Tenant tenant) throws IOException {
 		String resourceString = fhirContext.newJsonParser().setSummaryMode(true).encodeResourceToString(iBaseBundle);
-		return qrCompact(resourceString, request, kid, userAccess, tenant);
+		return qrCompact(resourceString, request, signingKey, userAccess, tenant);
 	}
 
-	public String qrCompact(String resourceString, HttpServletRequest request, String kid, UserAccess userAccess, Tenant tenant) throws IOException {
-		KeyPair signingKeyPair = keyStoreService.getKey(kid, userAccess).keyPair();
+	public String qrCompact(String resourceString, HttpServletRequest request, IisKey iisKey, UserAccess userAccess, Tenant tenant) throws IOException {
+		KeyPair signingKeyPair = iisKey.keyPair();
 
 		Gson gson = new Gson();
 
@@ -96,7 +97,7 @@ public class ShCardUtil {
 			.header()
 			.add("use", "SIG")
 //			.add("zip", "DEF")
-			.keyId(kid)
+			.keyId(iisKey.getKeyId())
 			.and()
 			.content(claimsString)
 			.signWith(signingKeyPair.getPrivate());
