@@ -2,50 +2,42 @@ package org.immregistries.iis.kernal.servlet.shlink;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.jpa.partition.IPartitionLookupSvc;
-import io.jsonwebtoken.Jwts;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.instance.model.api.IBaseBundle;
 import org.hl7.fhir.r4.model.IdType;
-import org.immregistries.iis.kernal.JwtUtils;
-import org.immregistries.iis.kernal.fhir.Application;
 import org.immregistries.iis.kernal.fhir.ips.IpsGeneratorSvcIIS;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.fhir.shl.ShLinkPayload;
 import org.immregistries.iis.kernal.logic.KeyStoreService;
-import org.immregistries.iis.kernal.logic.shlink.CompressionUtil;
-import org.immregistries.iis.kernal.logic.shlink.IisShLinkContentService;
-import org.immregistries.iis.kernal.logic.shlink.ShCardUtil;
 import org.immregistries.iis.kernal.logic.shlink.ShLinkUtilService;
-import org.immregistries.iis.kernal.model.persisted.*;
+import org.immregistries.iis.kernal.model.persisted.IisKey;
+import org.immregistries.iis.kernal.model.persisted.Tenant;
+import org.immregistries.iis.kernal.model.persisted.UserAccess;
 import org.immregistries.iis.kernal.servlet.HomeController;
 import org.immregistries.iis.kernal.servlet.TenantController;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.security.NoSuchAlgorithmException;
-import java.util.*;
+import java.util.Base64;
+import java.util.List;
 
-import static org.immregistries.iis.kernal.logic.shlink.ShCardUtil.VERIFIABLE_CREDENTIAL_TYPE;
-import static org.immregistries.iis.kernal.logic.shlink.ShLinkUtilService.VERIFIABLE_CREDENTIAL;
 import static org.immregistries.iis.kernal.servlet.LocationController.PARAM_ACTION;
-import static org.immregistries.iis.kernal.servlet.shlink.ShLinkManifestController.SHLINKS_CONTROLLER_BASE_URL;
 
 @RestController
 @RequestMapping({ShLinkController.SHLINK_CONTROLLER_BASE_PATH, TenantController.TENANT_PATH + ShLinkController.SHLINK_CONTROLLER_BASE_PATH})
 public class ShLinkController {
-	public static final String APPLICATION_SMART_HEALTH_CARD_CONTENT_TYPE = "application/smart-health-card";
-	public static final String APPLICATION_FHIR_JSON_CONTENT_TYPE = "application/fhir+json";
+
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	public static final String SHLINK_CONTROLLER_PATH_KEY = "shlink";
@@ -70,17 +62,10 @@ public class ShLinkController {
 	KeyStoreService keyStoreService;
 
 	@Autowired
-	JwtUtils jwtUtils;
-
-	@Autowired
 	IPartitionLookupSvc partitionLookupSvc;
-	@Autowired
-	IisShLinkContentService iisShLinkContentService;
+
 	@Autowired
 	FhirContext fhirContext;
-
-	@Autowired
-	ShCardUtil shCardUtil;
 
 	@PostMapping()
 	protected void shLinkIPS(HttpServletRequest req, HttpServletResponse resp,
@@ -92,46 +77,32 @@ public class ShLinkController {
 								 @RequestParam(value = "image", required = false) boolean image
 	)
 		throws ServletException, IOException, NoSuchAlgorithmException {
-		Long expLong = Long.getLong(exp);
 		Tenant tenant = ServletHelper.getTenantRedirectIfNone(req, resp);
 		UserAccess userAccess = ServletHelper.getUserAccess();
-
 		OutputStream outputStream = resp.getOutputStream();
 		PrintWriter out = new PrintWriter(outputStream);
-
-
-		SecretKeySpec encryptionKeySpec;
-		if (StringUtils.isNotBlank(secretKey)) {
-			encryptionKeySpec = new SecretKeySpec(Base64.getDecoder().decode(secretKey), 0, secretKey.length(), "AES");
-		} else {
-			encryptionKeySpec = shLinkUtilService.generateSecretKey();
-		}
-
-		IisKey iisSigningKey;
-		if (StringUtils.isNotBlank(keyId)) {
-			iisSigningKey = keyStoreService.getKey(keyId, userAccess);
-		} else {
-			iisSigningKey = keyStoreService.getAnyKey(userAccess);
-		}
-
-		if (iisSigningKey == null) {
-			iisSigningKey = keyStoreService.saveKey(keyStoreService.generateEc(), tenant, userAccess);
-		}
-
+		/*
+		 * Choosing or generating the keys based on the parameters
+		 */
+		SecretKeySpec encryptionKeySpec = getSecretEncryptionKey(secretKey);
+		IisKey iisSigningKey = getIisSigningKey(keyId, userAccess, tenant);
+		/*
+		 * Payload skeleton
+		 */
 		ShLinkPayload shLinkPayload = new ShLinkPayload();
 		shLinkPayload.setLabel("Generated for ShLink testing with IPS of Synthetic Patient");
 		shLinkPayload.setFlag(flag);
 		shLinkPayload.setKey(new String(Base64.getUrlEncoder().encode(encryptionKeySpec.getEncoded())));
-		shLinkPayload.setExp(expLong);
-
-		IBaseBundle ips = ipsGeneratorSvcIIS.generateIps(ServletHelper.requestDetailsWithPartitionName(partitionLookupSvc), new IdType(patientId), "");
-
-
-		String url = generateShLinkUrlForShCards(List.of(ips), shLinkPayload, req, iisSigningKey, encryptionKeySpec, userAccess, tenant);
-
+		shLinkPayload.setExp(Long.getLong(exp));
+		/*
+		 * Getting the bundle for the payload content
+		 */
+		IBaseBundle ipsToBeEncoded = ipsGeneratorSvcIIS.generateIps(ServletHelper.requestDetailsWithPartitionName(partitionLookupSvc), new IdType(patientId), "");
+		/*
+		 * Convert the bundle to a shcard file
+		 */
+		String url = shLinkUtilService.generateShLinkUrlForShCards(List.of(ipsToBeEncoded), shLinkPayload, req, iisSigningKey, encryptionKeySpec, userAccess, tenant);
 		shLinkPayload.setUrl(url);
-//		logger.info("shlink payload {}", shLinkPayload);
-
 		String qrCode = shLinkUtilService.qrCode(shLinkPayload);
 		if (image) {
 			shLinkUtilService.printQrCodeAsImage(outputStream, qrCode);
@@ -150,64 +121,27 @@ public class ShLinkController {
 
 	}
 
-	private String generateShLinkUrlForShCards(List<IBaseBundle> bundleList, ShLinkPayload shLinkPayload, HttpServletRequest req, IisKey iisSigningKey, SecretKeySpec encryptionKey, UserAccess userAccess, Tenant tenant) throws IOException {
-		String url;
-		UriComponentsBuilder builder = ServletUriComponentsBuilder.fromRequest(req);
-
-		Map<String, List<String>> contentToEncrypt = new HashMap<>(2);
-		contentToEncrypt.put("type",
-			List.of(VERIFIABLE_CREDENTIAL_TYPE, APPLICATION_SMART_HEALTH_CARD_CONTENT_TYPE));
-
-		List<String> verifiableCredentials = new ArrayList<>(bundleList.size());
-		for (IBaseBundle bundle : bundleList) {
-			String shCardCompact = shCardUtil.qrCompact(bundle, req, iisSigningKey, userAccess, tenant);
-			verifiableCredentials.add(shCardCompact);
-		}
-
-		contentToEncrypt.put(VERIFIABLE_CREDENTIAL, verifiableCredentials);
-
-
-		String encryptedContent = Jwts.builder()
-			.content(CompressionUtil
-				.minifyJson(contentToEncrypt))
-			.header().add("cty", APPLICATION_SMART_HEALTH_CARD_CONTENT_TYPE)
-			.and()
-			.encryptWith(encryptionKey, Jwts.ENC.A256GCM).compact(); // Alg specified in Smart health card IG
-
-		/*
-		 * Direct file
-		 */
-		if (StringUtils.contains(shLinkPayload.getFlag().orElse(""), "U")) {
-			IisShLinkContent iisShLinkContent = new IisShLinkContent();
-			iisShLinkContent.setUserAccess(userAccess);
-			iisShLinkContent.setExp(shLinkPayload.getExp().orElse(10000000L));
-			iisShLinkContent.setContent(encryptedContent);
-			iisShLinkContentService.saveIisShLinkContent(iisShLinkContent);
-			builder.replacePath(Application.IIS_PATH_BASE + ShLinkContentController.SHLINK_CONTENT_PATH + "/{contentId}");
-			url = builder
-				.build(Map.of("contentId", iisShLinkContent.getId()))
-				.toURL().toString();
+	private @NotNull SecretKeySpec getSecretEncryptionKey(String secretKey) throws NoSuchAlgorithmException {
+		SecretKeySpec encryptionKeySpec;
+		if (StringUtils.isNotBlank(secretKey)) {
+			encryptionKeySpec = new SecretKeySpec(Base64.getDecoder().decode(secretKey), 0, secretKey.length(), "AES");
 		} else {
-			/*
-			 * Manifest
-			 */
-			ShLinkManifest shLinkManifest = new ShLinkManifest();
-			shLinkManifest.setTenant(tenant);
-			shLinkManifest.setStatus("finalized");
-
-			ShLinkManifest.FileManifest fileManifest = new ShLinkManifest.FileManifest();
-			fileManifest.setContentType(APPLICATION_SMART_HEALTH_CARD_CONTENT_TYPE);
-			fileManifest.setEmbedded(encryptedContent);
-			shLinkManifest.addFiles(fileManifest);
-
-			shLinkUtilService.saveManifest(shLinkManifest);
-
-			builder.replacePath(Application.IIS_PATH_BASE + SHLINKS_CONTROLLER_BASE_URL + "/{manifestId}");
-			url = builder
-				.build(Map.of("manifestId", shLinkManifest.getId()))
-				.toURL().toString();
+			encryptionKeySpec = shLinkUtilService.generateSecretKey();
 		}
-		return url;
+		return encryptionKeySpec;
+	}
+
+	private IisKey getIisSigningKey(String keyId, UserAccess userAccess, Tenant tenant) {
+		IisKey iisSigningKey;
+		if (StringUtils.isNotBlank(keyId)) {
+			iisSigningKey = keyStoreService.getKey(keyId, userAccess);
+		} else {
+			iisSigningKey = keyStoreService.getAnyKey(userAccess);
+		}
+		if (iisSigningKey == null) {
+			iisSigningKey = keyStoreService.saveKey(keyStoreService.generateEc(), tenant, userAccess);
+		}
+		return iisSigningKey;
 	}
 
 
