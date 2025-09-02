@@ -6,7 +6,6 @@ import org.hibernate.Transaction;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.model.persisted.IisShLinkContent;
 import org.immregistries.iis.kernal.model.persisted.UserAccess;
-import org.immregistries.iis.kernal.servlet.shlink.ShLinkContentController;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -37,9 +36,5 @@ public class IisShLinkContentService {
 			dataSession.persist(iisShLinkContent);
 			transaction.commit();
 		}
-	}
-
-	public String getUrl(IisShLinkContent iisShLinkContent) {
-		return ShLinkContentController.SHLINK_CONTENT_PATH + "/" + iisShLinkContent.getId();
 	}
 }

@@ -14,7 +14,8 @@ import static org.immregistries.iis.kernal.servlet.shlink.ShLinkContentControlle
 @RequestMapping(SHLINK_CONTENT_PATH)
 public class ShLinkContentController {
 
-	public static final String SHLINK_CONTENT_PATH = "/shlink/files";
+	public static final String SHLINK_FILES = "shlink/files";
+	public static final String SHLINK_CONTENT_PATH = "/" + SHLINK_FILES;
 
 	@Autowired
 	ShLinkUtilService shLinkUtilService;

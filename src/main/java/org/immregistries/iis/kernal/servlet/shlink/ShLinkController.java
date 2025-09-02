@@ -125,6 +125,8 @@ public class ShLinkController {
 		}
 
 		String url;
+		UriComponentsBuilder builder = ServletUriComponentsBuilder.fromRequest(req);
+
 
 		String shCardCompact = shCardUtil.qrCompact(ips, req, iisSigningKey, userAccess, tenant);
 
@@ -136,16 +138,16 @@ public class ShLinkController {
 			.header().add("cty", APPLICATION_SMART_HEALTH_CARD_CONTENT_TYPE).and()
 			.encryptWith(encryptionKeySpec, Jwts.ENC.A256GCM).compact(); // Alg specified in Smart health card IG
 
-//		byte[] decryptforLog = (byte[]) Jwts.parser().decryptWith(encryptionKeySpec).build().parse(encryptedContent).getPayload();
-//		logger.info("Decrypt test 2 {}", new String(decryptforLog));
-//		logger.info("Decrypt test 3 {}", Base64.getUrlDecoder().decode(decryptforLog));
 		if (StringUtils.contains(flag, "U")) {
 			IisShLinkContent iisShLinkContent = new IisShLinkContent();
 			iisShLinkContent.setUserAccess(userAccess);
 			iisShLinkContent.setExp(expLong);
 			iisShLinkContent.setContent(encryptedContent);
 			iisShLinkContentService.saveIisShLinkContent(iisShLinkContent);
-			url = iisShLinkContentService.getUrl(iisShLinkContent);
+			builder.replacePath(Application.IIS_PATH_BASE + ShLinkContentController.SHLINK_CONTENT_PATH + "/{contentId}");
+			url = builder
+				.build(Map.of("contentId", iisShLinkContent.getId()))
+				.toURL().toString();
 		} else {
 			ShLinkManifest shLinkManifest = new ShLinkManifest();
 			shLinkManifest.setTenant(tenant);
@@ -157,10 +159,8 @@ public class ShLinkController {
 			shLinkManifest.addFiles(fileManifest);
 
 			shLinkUtilService.saveManifest(shLinkManifest);
-			UriComponentsBuilder builder = ServletUriComponentsBuilder.fromRequest(req);
+
 			builder.replacePath(Application.IIS_PATH_BASE + SHLINKS_CONTROLLER_BASE_URL + "/{manifestId}");
-
-
 			url = builder
 				.build(Map.of("manifestId", shLinkManifest.getId()))
 				.toURL().toString();
