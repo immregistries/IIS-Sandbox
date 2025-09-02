@@ -5,7 +5,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.immregistries.iis.kernal.fhir.interceptors.PartitionCreationInterceptor;
 import org.immregistries.iis.kernal.logic.shlink.IisShLinkContentService;
 import org.immregistries.iis.kernal.logic.shlink.ShLinkUtilService;
-import org.immregistries.iis.kernal.model.persisted.IisShLinkContent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,8 +25,8 @@ public class ShLinkContentController {
 
 
 	@GetMapping("/{id}")
-	public IisShLinkContent getContent(HttpServletRequest req, HttpServletResponse resp, @PathVariable("id") String contentId, @RequestParam(value = "recipient", required = false) String recipient) {
-		resp.setContentType("application/json");
-		return iisShLinkContentService.getContent(contentId);
+	public String getContent(HttpServletRequest req, HttpServletResponse resp, @PathVariable("id") String contentId, @RequestParam(value = "recipient", required = false) String recipient) {
+		resp.setContentType("text/plain");
+		return iisShLinkContentService.getContent(contentId).getContent();
 	}
 }
