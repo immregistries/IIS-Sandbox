@@ -27,20 +27,17 @@ public class CompressionUtil {
 		inflater.setInput(input);
 
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream(input.length * 2); // Initial capacity for efficiency
-		byte[] buffer = new byte[1024];
 
-		try {
+		try (outputStream) {
+			byte[] buffer = new byte[1024];
 			while (!inflater.finished()) {
 				int count = inflater.inflate(buffer);
 				outputStream.write(buffer, 0, count);
 			}
+		} catch (IOException e) {
+			// Handle the exception appropriately
+			e.printStackTrace();
 		} finally {
-			try {
-				outputStream.close();
-			} catch (java.io.IOException e) {
-				// Handle the exception appropriately
-				e.printStackTrace();
-			}
 			inflater.end(); // Deallocates native INFLATER resources.
 		}
 
@@ -62,21 +59,19 @@ public class CompressionUtil {
 		deflater.finish(); // Indicates that no more input data will be provided.
 
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream(input.length);
-		byte[] buffer = new byte[1024];
+		try (outputStream) {
+			byte[] buffer = new byte[1024];
 
-		while (!deflater.finished()) {
-			int count = deflater.deflate(buffer);
-			outputStream.write(buffer, 0, count);
-		}
-
-		try {
-			outputStream.close();
+			while (!deflater.finished()) {
+				int count = deflater.deflate(buffer);
+				outputStream.write(buffer, 0, count);
+			}
 		} catch (java.io.IOException e) {
 			// Handle the exception appropriately
 			e.printStackTrace();
+		} finally {
+			deflater.end(); // Deallocates the native DEFLATER resources.
 		}
-
-		deflater.end(); // Deallocates the native DEFLATER resources.
 		return outputStream.toByteArray();
 	}
 
