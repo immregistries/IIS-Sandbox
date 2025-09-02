@@ -40,6 +40,18 @@ public class KeyStoreService {
 		}
 	}
 
+	public IisKey getAnyKey(UserAccess userAccess) {
+		try (Session dataSession = ServletHelper.getDataSession()) {
+			Query query = dataSession.createQuery(
+				"from IisKey where userAccess = :user", IisKey.class);
+			query.setParameter("user", userAccess);
+			if (query.getResultList().size() == 0) {
+				return null;
+			}
+			return (IisKey) query.getSingleResult();
+		}
+	}
+
 	public List<IisKey> getKeys(UserAccess userAccess, Session dataSession) {
 		Query query = dataSession.createQuery(
 			"from IisKey where userAccess = :user", IisKey.class);

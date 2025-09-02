@@ -54,6 +54,7 @@ public class ShLinkController {
 	public static final String SHLINK_CONTROLLER_PATH_KEY = "shlink";
 	public static final String SHLINK_CONTROLLER_BASE_PATH = "/" + SHLINK_CONTROLLER_PATH_KEY;
 
+	public static final String PARAM_SECRET_KEY = "secretKey";
 	public static final String PARAM_KEY_ID = "keyId";
 	public static final String PARAM_PATIENT_ID = "patientId";
 	public static final String PARAM_FLAG = "flag";
@@ -86,7 +87,8 @@ public class ShLinkController {
 
 	@PostMapping()
 	protected void shLinkIPS(HttpServletRequest req, HttpServletResponse resp,
-								 @RequestParam(PARAM_KEY_ID) String keyId,
+									 @RequestParam(value = PARAM_KEY_ID, required = false) String keyId,
+									 @RequestParam(value = PARAM_SECRET_KEY, required = false) String secretKey,
 								 @RequestParam(PARAM_PATIENT_ID) String patientId,
 								 @RequestParam(PARAM_FLAG) String flag,
 								 @RequestParam(PARAM_EXP) String exp,
@@ -103,12 +105,22 @@ public class ShLinkController {
 
 		IBaseBundle ips = ipsGeneratorSvcIIS.generateIps(ServletHelper.requestDetailsWithPartitionName(partitionLookupSvc), new IdType(patientId), "");
 
-		SecretKeySpec encryptionKeySpec = shCardUtil.generateSecretKey();
+		SecretKeySpec encryptionKeySpec;
+
+		if (StringUtils.isNotBlank(secretKey)) {
+			encryptionKeySpec = new SecretKeySpec(Base64.getDecoder().decode(secretKey), 0, secretKey.length(), "AES");
+		} else {
+			encryptionKeySpec = shCardUtil.generateSecretKey();
+		}
 
 		IisKey iisSigningKey;
 		if (StringUtils.isNotBlank(keyId)) {
 			iisSigningKey = keyStoreService.getKey(keyId, userAccess);
 		} else {
+			iisSigningKey = keyStoreService.getAnyKey(userAccess);
+		}
+
+		if (iisSigningKey == null) {
 			iisSigningKey = keyStoreService.saveKey(keyStoreService.generateEc(), tenant, userAccess);
 		}
 
@@ -212,10 +224,10 @@ public class ShLinkController {
 			"      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_FLAG
 				+ "\" value=\"" + StringUtils.defaultIfBlank(flag, "")
 				+ "\"/>"); // TODO add options
-		out.println("      <label>Encryption Key for documents (generated if null)</label>");
-		out.println("      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_KEY_ID
-			+ "\" value=\"" + StringUtils.defaultIfBlank(keyId, "")
-			+ "\"/>");
+//		out.println("      <label>Encryption Key for documents (generated if null)</label>");
+//		out.println("      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_SECRET_KEY
+//			+ "\" value=\"" + StringUtils.defaultIfBlank(keyId, "")
+//			+ "\"/>");
 		out.println("      <label>Expiration (s)</label>");
 		out.println("      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_EXP
 			+ "\" value=\"" + StringUtils.defaultIfBlank(exp, "10000000") + "\"/>");
