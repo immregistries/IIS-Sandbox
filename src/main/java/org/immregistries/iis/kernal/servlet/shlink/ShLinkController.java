@@ -85,7 +85,7 @@ public class ShLinkController {
 	ShCardUtil shCardUtil;
 
 	@PostMapping()
-	protected void doPost(HttpServletRequest req, HttpServletResponse resp,
+	protected void shLinkIPS(HttpServletRequest req, HttpServletResponse resp,
 								 @RequestParam(PARAM_KEY_ID) String keyId,
 								 @RequestParam(PARAM_PATIENT_ID) String patientId,
 								 @RequestParam(PARAM_FLAG) String flag,
@@ -97,6 +97,8 @@ public class ShLinkController {
 		Long expLong = Long.getLong(exp);
 		Tenant tenant = ServletHelper.getTenantRedirectIfNone(req, resp);
 		UserAccess userAccess = ServletHelper.getUserAccess();
+
+		IBaseBundle ips = ipsGeneratorSvcIIS.generateIps(ServletHelper.requestDetailsWithPartitionName(partitionLookupSvc), new IdType(patientId), "");
 
 		SecretKeySpec encryptionKeySpec = shCardUtil.generateSecretKey();
 
@@ -110,7 +112,6 @@ public class ShLinkController {
 			iisKey = keyStoreService.saveKey(keyStoreService.generateEc(), tenant, userAccess);
 		}
 		String url = "";
-		IBaseBundle ips = ipsGeneratorSvcIIS.generateIps(ServletHelper.requestDetailsWithPartitionName(partitionLookupSvc), new IdType(patientId), "");
 
 		String shCardCompact = shCardUtil.qrCompact(ips, req, iisKey.getKeyId(), userAccess, tenant);
 
@@ -122,7 +123,7 @@ public class ShLinkController {
 			.header().add("cty", APPLICATION_SMART_HEALTH_CARD_CONTENT_TYPE).and()
 			.encryptWith(encryptionKeySpec, Jwts.ENC.A256GCM).compact(); // Alg specified in Smart health card IG
 
-		byte[] decryptforLog = (byte[]) Jwts.parser().decryptWith(encryptionKeySpec).build().parse(encryptedContent).getPayload();
+//		byte[] decryptforLog = (byte[]) Jwts.parser().decryptWith(encryptionKeySpec).build().parse(encryptedContent).getPayload();
 //		logger.info("Decrypt test 2 {}", new String(decryptforLog));
 //		logger.info("Decrypt test 3 {}", Base64.getUrlDecoder().decode(decryptforLog));
 		if (StringUtils.contains(flag, "U")) {

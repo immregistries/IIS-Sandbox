@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.spec.SecretKeySpec;
+import java.io.IOException;
 import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
@@ -27,7 +28,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.zip.DataFormatException;
 
 @Service
 public class ShCardUtil {
@@ -59,12 +59,12 @@ public class ShCardUtil {
 	@Autowired
 	private FhirContext fhirContext;
 
-	public String qrCompact(IBaseBundle iBaseBundle, HttpServletRequest request, String kid, UserAccess userAccess, Tenant tenant) {
+	public String qrCompact(IBaseBundle iBaseBundle, HttpServletRequest request, String kid, UserAccess userAccess, Tenant tenant) throws IOException {
 		String resourceString = fhirContext.newJsonParser().setSummaryMode(true).encodeResourceToString(iBaseBundle);
 		return qrCompact(resourceString, request, kid, userAccess, tenant);
 	}
 
-	public String qrCompact(String resourceString, HttpServletRequest request, String kid, UserAccess userAccess, Tenant tenant) {
+	public String qrCompact(String resourceString, HttpServletRequest request, String kid, UserAccess userAccess, Tenant tenant) throws IOException {
 		KeyPair signingKeyPair = keyStoreService.getKey(kid, userAccess).keyPair();
 
 		Gson gson = new Gson();
@@ -89,28 +89,19 @@ public class ShCardUtil {
 			.add(VC, mapVc)
 			.build();
 
-		String claimsString = gson.toJson(claims).strip();
-		/**
-		 * Compressing the content
-		 */
-		byte[] deflatedClaims = rawDeflate(claimsString);
+		String claimsString = CompressionUtil.minifyJson(gson.toJson(claims));
 
-		/**
-		 * DEF header added manually as we are using raw deflation
-		 */
 		JwtBuilder jwtBuilder = Jwts.builder()
+			.compressWith(Jwts.ZIP.DEF)
 			.header()
 			.add("use", "SIG")
-			.add("zip", "DEF")
+//			.add("zip", "DEF")
 			.keyId(kid)
 			.and()
-			.content(deflatedClaims)
+			.content(claimsString)
 			.signWith(signingKeyPair.getPrivate());
 		String compact = jwtBuilder.compact();
-//		logger.info("compact {}", compact);
-
-		logger.info("parsed {}", Jwts.parser().verifyWith(signingKeyPair.getPublic()).build().parse(compact));
-		logger.info("parsed inflated  {}", rawInflate((byte[]) Jwts.parser().verifyWith(signingKeyPair.getPublic()).build().parse(compact).getPayload()));
+//		logger.info("parsed {}", Jwts.parser().verifyWith(signingKeyPair.getPublic()).build().parse(compact));
 		return compact;
 	}
 
@@ -121,18 +112,6 @@ public class ShCardUtil {
 			.map(integer -> String.valueOf(integer / 10) + integer % 10)
 			.collect(Collectors.joining());
 		return encodedForQrCode;
-	}
-
-	public static String rawInflate(byte[] deflated) {
-		try {
-			return new String(CompressionUtil.inflate(deflated));
-		} catch (DataFormatException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	private static byte[] rawDeflate(String claimsString) {
-		return CompressionUtil.deflate(claimsString.getBytes());
 	}
 
 	public @NotNull SecretKeySpec generateSecretKey() throws NoSuchAlgorithmException {
