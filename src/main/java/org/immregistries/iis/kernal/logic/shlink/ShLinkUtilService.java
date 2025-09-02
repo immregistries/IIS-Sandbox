@@ -26,8 +26,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.UUID;
 
 @Service
@@ -150,5 +153,13 @@ public class ShLinkUtilService {
 			throw new ServletException("Error generating QR code", e);
 		}
 	}
+
+	public @NotNull SecretKeySpec generateSecretKey() throws NoSuchAlgorithmException {
+		byte[] randomBytes = new byte[32];
+		SecureRandom secureRandom = new SecureRandom();
+		secureRandom.nextBytes(randomBytes);
+		return new SecretKeySpec(randomBytes, "AES");
+	}
+
 
 }

@@ -90,4 +90,19 @@ public class CompressionUtil {
 		JsonNode jsonNode = objectMapper.readTree(jsonString);
 		return objectMapper.writeValueAsString(jsonNode);
 	}
+
+	/**
+	 * Removes all useless whitespace from a JSON string.
+	 * This method uses the Jackson library to parse and then write the JSON
+	 * in a compact format, preserving whitespace within string values.
+	 *
+	 * @param jsonObject The input JSON serializable object.
+	 * @return A minified JSON string with no useless whitespace.
+	 * @throws IOException If the JSON string is invalid.
+	 */
+	public static String minifyJson(Object json) throws IOException {
+		ObjectMapper objectMapper = new ObjectMapper();
+		JsonNode jsonNode = objectMapper.valueToTree(json);
+		return objectMapper.writeValueAsString(jsonNode);
+	}
 }

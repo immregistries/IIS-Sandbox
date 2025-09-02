@@ -1,7 +1,6 @@
 package org.immregistries.iis.kernal.logic.shlink;
 
 import ca.uhn.fhir.context.FhirContext;
-import com.google.gson.Gson;
 import com.google.gson.JsonParser;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtBuilder;
@@ -13,17 +12,13 @@ import org.immregistries.iis.kernal.model.persisted.IisKey;
 import org.immregistries.iis.kernal.model.persisted.Tenant;
 import org.immregistries.iis.kernal.model.persisted.UserAccess;
 import org.immregistries.iis.kernal.servlet.WellKnownKeyController;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
 import java.security.KeyPair;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -68,8 +63,6 @@ public class ShCardUtil {
 	public String qrCompact(String resourceString, HttpServletRequest request, IisKey iisKey, UserAccess userAccess, Tenant tenant) throws IOException {
 		KeyPair signingKeyPair = iisKey.keyPair();
 
-		Gson gson = new Gson();
-
 		Map<String, Object> mapVc = new HashMap<>(2);
 		ArrayList<String> type = new ArrayList<>(3);
 		type.add(VERIFIABLE_CREDENTIAL_TYPE);
@@ -90,13 +83,12 @@ public class ShCardUtil {
 			.add(VC, mapVc)
 			.build();
 
-		String claimsString = CompressionUtil.minifyJson(gson.toJson(claims));
+		String claimsString = CompressionUtil.minifyJson(claims);
 
 		JwtBuilder jwtBuilder = Jwts.builder()
 			.compressWith(Jwts.ZIP.DEF)
 			.header()
 			.add("use", "SIG")
-//			.add("zip", "DEF")
 			.keyId(iisKey.getKeyId())
 			.and()
 			.content(claimsString)
@@ -115,11 +107,5 @@ public class ShCardUtil {
 		return encodedForQrCode;
 	}
 
-	public @NotNull SecretKeySpec generateSecretKey() throws NoSuchAlgorithmException {
-		byte[] randomBytes = new byte[32];
-		SecureRandom secureRandom = new SecureRandom();
-		secureRandom.nextBytes(randomBytes);
-		return new SecretKeySpec(randomBytes, "AES");
-	}
 
 }
