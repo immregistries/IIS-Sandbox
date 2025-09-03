@@ -100,9 +100,9 @@ public class CompressionUtil {
 	 * @return A minified JSON string with no useless whitespace.
 	 * @throws IOException If the JSON string is invalid.
 	 */
-	public static String minifyJson(Object json) throws IOException {
+	public static String minifyJson(Object jsonObject) throws IOException {
 		ObjectMapper objectMapper = new ObjectMapper();
-		JsonNode jsonNode = objectMapper.valueToTree(json);
+		JsonNode jsonNode = objectMapper.valueToTree(jsonObject);
 		return objectMapper.writeValueAsString(jsonNode);
 	}
 }

@@ -1,6 +1,7 @@
 package org.immregistries.iis.kernal.logic.shlink;
 
 import ca.uhn.fhir.context.FhirContext;
+import com.google.gson.Gson;
 import com.google.gson.JsonParser;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtBuilder;
@@ -48,6 +49,7 @@ public class ShCardUtil {
 	public static final String ISSUER_KEY = "issuerKey";
 	public static final String VC = "vc";
 
+	private Gson gson = new Gson();
 
 	@Autowired
 	KeyStoreService keyStoreService;
@@ -83,7 +85,7 @@ public class ShCardUtil {
 			.add(VC, mapVc)
 			.build();
 
-		String claimsString = CompressionUtil.minifyJson(claims);
+		String claimsString = CompressionUtil.minifyJson(gson.toJson(claims));
 
 		JwtBuilder jwtBuilder = Jwts.builder()
 			.compressWith(Jwts.ZIP.DEF)

@@ -22,6 +22,7 @@ import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.fhir.shl.ShLinkPayload;
 import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
 import org.immregistries.iis.kernal.model.PatientMaster;
+import org.immregistries.iis.kernal.model.ShLinkFilePayload;
 import org.immregistries.iis.kernal.model.persisted.*;
 import org.immregistries.iis.kernal.servlet.shlink.ShLinkContentController;
 import org.jetbrains.annotations.NotNull;
@@ -37,7 +38,10 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 import static org.immregistries.iis.kernal.logic.shlink.ShCardUtil.VERIFIABLE_CREDENTIAL_TYPE;
 import static org.immregistries.iis.kernal.servlet.shlink.ShLinkManifestController.SHLINKS_CONTROLLER_BASE_URL;
@@ -59,7 +63,6 @@ public class ShLinkUtilService {
 	public static final String APPLICATION_FHIR_JSON_CONTENT_TYPE = "application/fhir+json";
 
 	public static final String SHLINK_PREFIX = "shlink:/";
-	public static final String VERIFIABLE_CREDENTIAL = "verifiableCredential";
 
 	@Autowired
 	FhirContext fhirContext;
@@ -165,22 +168,19 @@ public class ShLinkUtilService {
 		String url;
 		UriComponentsBuilder builder = ServletUriComponentsBuilder.fromRequest(req);
 
-		Map<String, List<String>> contentToEncrypt = new HashMap<>(2);
-		contentToEncrypt.put("type",
-			List.of(VERIFIABLE_CREDENTIAL_TYPE, APPLICATION_SMART_HEALTH_CARD_CONTENT_TYPE));
+		ShLinkFilePayload shLinkFilePayload = new ShLinkFilePayload();
+		shLinkFilePayload.setType(List.of(VERIFIABLE_CREDENTIAL_TYPE, APPLICATION_SMART_HEALTH_CARD_CONTENT_TYPE));
 
 		List<String> verifiableCredentials = new ArrayList<>(bundleList.size());
 		for (IBaseBundle bundle : bundleList) {
 			String shCardCompact = shCardUtil.qrCompact(bundle, req, iisSigningKey, userAccess, tenant);
 			verifiableCredentials.add(shCardCompact);
 		}
-
-		contentToEncrypt.put(VERIFIABLE_CREDENTIAL, verifiableCredentials);
-
+		shLinkFilePayload.setVerifiableCredential(verifiableCredentials);
 
 		String encryptedContent = Jwts.builder()
 			.content(CompressionUtil
-				.minifyJson(contentToEncrypt))
+				.minifyJson(shLinkFilePayload))
 			.header().add("cty", APPLICATION_SMART_HEALTH_CARD_CONTENT_TYPE)
 			.and()
 			.encryptWith(encryptionKey, Jwts.ENC.A256GCM).compact(); // Alg specified in Smart health card IG
