@@ -2,10 +2,14 @@ package org.immregistries.iis.kernal.logic.shlink.evc;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.dataformat.cbor.databind.CBORMapper;
+import org.immregistries.iis.kernal.model.persisted.IisKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.io.ByteArrayOutputStream;
+import java.security.PrivateKey;
+import java.util.Collections;
 import java.util.zip.DataFormatException;
 
 @Service
@@ -22,6 +26,77 @@ public class EvcService {
 		byte[] cborData = cborMapper.writeValueAsBytes(input);
 		logger.info("CBOR byte array created successfully. {}", new String(cborData));
 		return cborData;
+	}
+
+	public static byte[] createCoseSign1(IisKey iisKey, byte[] cborPayload) throws Exception {
+//		Security.addProvider(new BouncyCastleProvider());
+
+		PrivateKey privateKey = iisKey.keyPair().getPrivate();
+
+		// 1. Define the protected header as a CBOR Map
+		// We'll use a simple CBOR map with the algorithm identifier (-7 for ES256)
+		CBORMapper mapper = new CBORMapper();
+
+		// This is a minimal protected header. In a real-world scenario, you might add more claims.
+		byte[] protectedHeader = mapper.writeValueAsBytes(Collections.singletonMap(1, -7)); // alg: ES256
+
+		// 2. Define the unprotected header (an empty CBOR map for this example)
+		byte[] unprotectedHeader = mapper.writeValueAsBytes(Collections.emptyMap());
+
+		// 3. Construct the 'Sig_structure' for signing, as defined in RFC 9052 Section 4.4
+		ByteArrayOutputStream sigStructureStream = new ByteArrayOutputStream();
+
+		// This is a simplified representation of the CBOR array for 'Sig_structure'
+		// [
+		//   "Signature1",
+		//   protected_header_bstr,
+		//   aad_bstr,
+		//   payload_bstr
+		// ]
+		sigStructureStream.write(0x84); // CBOR array of 4 items
+		sigStructureStream.write(0x6a); // CBOR text string of length 10
+		sigStructureStream.write("Signature1".getBytes());
+		sigStructureStream.write(0x40 + protectedHeader.length); // CBOR byte string
+		sigStructureStream.write(protectedHeader);
+		sigStructureStream.write(0x40); // CBOR empty byte string for AAD
+		sigStructureStream.write(0x40 + cborPayload.length); // CBOR byte string
+		sigStructureStream.write(cborPayload);
+
+		byte[] toBeSigned = sigStructureStream.toByteArray();
+
+		// 4. Sign the 'ToBeSigned' data
+		java.security.Signature signature = java.security.Signature.getInstance("SHA256withECDSA", "BC");
+		signature.initSign(privateKey);
+		signature.update(toBeSigned);
+		byte[] coseSignature = signature.sign();
+
+		// 5. Assemble the final COSE_Sign1 message
+		ByteArrayOutputStream coseStream = new ByteArrayOutputStream();
+
+		// The final structure is a CBOR array of 4 elements
+		// [
+		//   protected_header_bstr,
+		//   unprotected_header_map,
+		//   payload_bstr,
+		//   signature_bstr
+		// ]
+
+		// The headers and payload are all CBOR-tagged as byte strings.
+		// We need to construct the final array manually for this simple example.
+		coseStream.write(0x84); // CBOR array of 4 items
+
+		coseStream.write(0x40 + protectedHeader.length); // CBOR byte string
+		coseStream.write(protectedHeader);
+
+		coseStream.write(0xa0); // CBOR empty map (unprotected header)
+
+		coseStream.write(0x40 + cborPayload.length); // CBOR byte string
+		coseStream.write(cborPayload);
+
+		coseStream.write(0x40 + coseSignature.length); // CBOR byte string
+		coseStream.write(coseSignature);
+
+		return coseStream.toByteArray();
 	}
 
 }
