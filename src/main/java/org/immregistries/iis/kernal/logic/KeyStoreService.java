@@ -5,6 +5,7 @@ import com.nimbusds.jose.jwk.Curve;
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.gen.ECKeyGenerator;
 import jakarta.persistence.Query;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
@@ -84,6 +85,19 @@ public class KeyStoreService {
 		try (Session dataSession = ServletHelper.getDataSession()) {
 			recordIisKey(iisKey, dataSession);
 		}
+	}
+
+	public IisKey getIisSigningKeyOrCreate(String keyId, UserAccess userAccess, Tenant tenant) {
+		IisKey iisSigningKey;
+		if (StringUtils.isNotBlank(keyId)) {
+			iisSigningKey = getKey(keyId, userAccess);
+		} else {
+			iisSigningKey = getAnyKey(userAccess);
+		}
+		if (iisSigningKey == null) {
+			iisSigningKey = saveKey(generateEc(), tenant, userAccess);
+		}
+		return iisSigningKey;
 	}
 
 }

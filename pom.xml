@@ -595,7 +595,13 @@
             <version>2.17.1</version>
         </dependency>
 
-<!--        <dependency>-->
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk18on</artifactId>
+            <version>1.76</version> <!-- Use the latest stable version -->
+        </dependency>
+
+        <!--        <dependency>-->
 <!--            <groupId>io.jsonwebtoken</groupId>-->
 <!--            <artifactId>jjwt</artifactId>-->
 <!--            <version>0.9.1</version>-->

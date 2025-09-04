@@ -2,20 +2,26 @@ package org.immregistries.iis.kernal.logic.shlink.evc;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.dataformat.cbor.databind.CBORMapper;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.immregistries.iis.kernal.model.persisted.IisKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
-import java.security.PrivateKey;
+import java.io.IOException;
+import java.security.*;
 import java.util.Collections;
 import java.util.zip.DataFormatException;
 
 @Service
 public class EvcService {
 	Logger logger = LoggerFactory.getLogger(this.getClass());
-	private CBORMapper cborMapper = new CBORMapper();
+	private final CBORMapper cborMapper = new CBORMapper();
+
+	public EvcService() {
+		Security.addProvider(new BouncyCastleProvider());
+	}
 
 	public byte[] cbor(EvCPayload evCPayload) throws DataFormatException, JsonProcessingException {
 		return cborMapper.writeValueAsBytes(evCPayload);
@@ -24,24 +30,21 @@ public class EvcService {
 	public byte[] cbor(byte[] input) throws DataFormatException, JsonProcessingException {
 		// Convert the map to a CBOR-encoded byte array
 		byte[] cborData = cborMapper.writeValueAsBytes(input);
-		logger.info("CBOR byte array created successfully. {}", new String(cborData));
+		logger.info("CBOR byte array created successfully.{} \ncbor: {}", new String(input), new String(cborData));
 		return cborData;
 	}
 
-	public static byte[] createCoseSign1(IisKey iisKey, byte[] cborPayload) throws Exception {
-//		Security.addProvider(new BouncyCastleProvider());
-
+	public byte[] createCoseSign1(IisKey iisKey, byte[] cborPayload) throws IOException, InvalidKeyException, SignatureException, NoSuchAlgorithmException, NoSuchProviderException {
 		PrivateKey privateKey = iisKey.keyPair().getPrivate();
 
 		// 1. Define the protected header as a CBOR Map
 		// We'll use a simple CBOR map with the algorithm identifier (-7 for ES256)
-		CBORMapper mapper = new CBORMapper();
 
 		// This is a minimal protected header. In a real-world scenario, you might add more claims.
-		byte[] protectedHeader = mapper.writeValueAsBytes(Collections.singletonMap(1, -7)); // alg: ES256
+		byte[] protectedHeader = cborMapper.writeValueAsBytes(Collections.singletonMap(1, -7)); // alg: ES256
 
 		// 2. Define the unprotected header (an empty CBOR map for this example)
-		byte[] unprotectedHeader = mapper.writeValueAsBytes(Collections.emptyMap());
+		byte[] unprotectedHeader = cborMapper.writeValueAsBytes(Collections.emptyMap());
 
 		// 3. Construct the 'Sig_structure' for signing, as defined in RFC 9052 Section 4.4
 		ByteArrayOutputStream sigStructureStream = new ByteArrayOutputStream();

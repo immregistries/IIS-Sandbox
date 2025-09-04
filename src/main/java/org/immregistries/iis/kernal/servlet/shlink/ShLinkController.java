@@ -85,7 +85,7 @@ public class ShLinkController {
 		 * Choosing or generating the keys based on the parameters
 		 */
 		SecretKeySpec encryptionKeySpec = getSecretEncryptionKey(secretKey);
-		IisKey iisSigningKey = getIisSigningKey(keyId, userAccess, tenant);
+		IisKey iisSigningKey = keyStoreService.getIisSigningKeyOrCreate(keyId, userAccess, tenant);
 		/*
 		 * Payload skeleton
 		 */
@@ -105,6 +105,7 @@ public class ShLinkController {
 		shLinkPayload.setUrl(url);
 		String qrCode = shLinkUtilService.qrCode(shLinkPayload);
 		if (image) {
+			resp.setContentType("image/png"); // Set content type for PNG image
 			shLinkUtilService.printQrCodeAsImage(outputStream, qrCode);
 		} else {
 			resp.setContentType("text/html");

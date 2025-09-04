@@ -4,6 +4,7 @@ import org.hl7.fhir.r4.model.*;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class EvCUtil {
@@ -26,8 +27,10 @@ public class EvCUtil {
 
 		// Assumption: Registry Code (reg) is derived from the profile URL in meta.
 		// This is a placeholder and may need to be adjusted based on the actual FHIR implementation.
-		String profileUrl = immunization.getMeta().getProfile().get(0).getValue();
-		record.setRegistryCode(extractRegistryCodeFromUrl(profileUrl));
+		if (immunization.getMeta().hasProfile()) {
+			String profileUrl = immunization.getMeta().getProfile().get(0).getValue();
+			record.setRegistryCode(extractRegistryCodeFromUrl(profileUrl));
+		}
 
 		// Assumption: Repository Index (rep) and Reference (i) are available as extensions or identifiers.
 		// For this example, we'll use a placeholder or check for a specific identifier.
@@ -126,5 +129,46 @@ public class EvCUtil {
 			return parts[parts.length - 1];
 		}
 		return "N/A";
+	}
+
+	/**
+	 * Converts a FHIR IPS Bundle resource to an EvCPayload.
+	 * <p>
+	 * This method extracts patient and immunization data from the bundle
+	 * to create the EvCPayload.
+	 * </p>
+	 *
+	 * @param ipsBundle The FHIR IPS Bundle resource to convert.
+	 * @return An EvCPayload object containing the data from the bundle.
+	 */
+	public static EvCPayload toEvCPayloadFromBundle(Bundle ipsBundle) {
+		Patient patient = null;
+		List<Immunization> immunizations = new ArrayList<>();
+
+		// Find the Patient and Immunization resources in the bundle
+		for (Bundle.BundleEntryComponent entry : ipsBundle.getEntry()) {
+			Resource resource = entry.getResource();
+			if (resource.getResourceType() == ResourceType.Patient) {
+				patient = (Patient) resource;
+			} else if (resource.getResourceType() == ResourceType.Immunization) {
+				immunizations.add((Immunization) resource);
+			}
+		}
+
+		if (patient == null) {
+			throw new IllegalArgumentException("FHIR IPS Bundle must contain a Patient resource.");
+		}
+
+		// Create the EvC Payload and populate patient data
+		EvCPayload payload = toEvCPayload(patient);
+
+		// Convert and add immunization records
+		List<EvCPayload.VaccinationRecord> vaccinationRecords = new ArrayList<>();
+		for (Immunization immunization : immunizations) {
+			vaccinationRecords.add(toVaccinationRecord(immunization, patient));
+		}
+		payload.setVaccinationRecords(vaccinationRecords);
+
+		return payload;
 	}
 }
