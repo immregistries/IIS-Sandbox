@@ -2,6 +2,11 @@ package org.immregistries.iis.kernal.logic.shlink;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.WriterException;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.QRCodeWriter;
+import jakarta.servlet.ServletException;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -104,5 +109,16 @@ public class CompressionUtil {
 		ObjectMapper objectMapper = new ObjectMapper();
 		JsonNode jsonNode = objectMapper.valueToTree(jsonObject);
 		return objectMapper.writeValueAsString(jsonNode);
+	}
+
+	public static BitMatrix qrCodeBitMatrix(String data) throws ServletException {
+		int width = 200; // Desired QR code width
+		int height = 200; // Desired QR code height
+		try {
+			QRCodeWriter qrCodeWriter = new QRCodeWriter();
+			return qrCodeWriter.encode(data, BarcodeFormat.QR_CODE, width, height);
+		} catch (WriterException e) {
+			throw new ServletException("Error generating QR code Bit Matrix", e);
+		}
 	}
 }

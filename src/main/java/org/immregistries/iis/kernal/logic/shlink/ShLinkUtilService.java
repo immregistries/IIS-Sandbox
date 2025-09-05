@@ -2,11 +2,8 @@ package org.immregistries.iis.kernal.logic.shlink;
 
 import ca.uhn.fhir.context.FhirContext;
 import com.google.gson.Gson;
-import com.google.zxing.BarcodeFormat;
-import com.google.zxing.WriterException;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
-import com.google.zxing.qrcode.QRCodeWriter;
 import com.nimbusds.jose.util.Base64URL;
 import io.jsonwebtoken.Jwts;
 import jakarta.persistence.Query;
@@ -154,11 +151,9 @@ public class ShLinkUtilService {
 		int width = 200; // Desired QR code width
 		int height = 200; // Desired QR code height
 		try {
-			QRCodeWriter qrCodeWriter = new QRCodeWriter();
-			BitMatrix bitMatrix = qrCodeWriter.encode(data, BarcodeFormat.QR_CODE, width, height);
-//			response.setContentType("image/png"); // Set content type for PNG image
+			BitMatrix bitMatrix = CompressionUtil.qrCodeBitMatrix(data);
 			MatrixToImageWriter.writeToStream(bitMatrix, "PNG", outputStream);
-		} catch (WriterException | IOException e) {
+		} catch (IOException e) {
 			throw new ServletException("Error generating QR code", e);
 		}
 	}
