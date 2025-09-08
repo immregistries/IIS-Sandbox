@@ -58,7 +58,7 @@ public class EvcService {
 		// ]
 		sigStructureStream.write(0x84); // CBOR array of 4 items
 		sigStructureStream.write(0x6a); // CBOR text string of length 10
-		sigStructureStream.write("Signature1".getBytes());
+		sigStructureStream.write("Signature1".getBytes()); // TODO sigh with key ?
 		sigStructureStream.write(0x40 + protectedHeader.length); // CBOR byte string
 		sigStructureStream.write(protectedHeader);
 		sigStructureStream.write(0x40); // CBOR empty byte string for AAD

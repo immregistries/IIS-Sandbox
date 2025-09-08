@@ -2,18 +2,13 @@ package org.immregistries.iis.kernal.servlet.shlink;
 
 import ca.uhn.fhir.jpa.partition.IPartitionLookupSvc;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.zxing.BarcodeFormat;
 import com.google.zxing.WriterException;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
-import com.google.zxing.qrcode.QRCodeWriter;
 import com.nimbusds.jose.util.Base64URL;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.apache.pdfbox.cos.COSBoolean;
-import org.apache.pdfbox.cos.COSDictionary;
-import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentInformation;
 import org.apache.pdfbox.pdmodel.PDPage;
@@ -106,11 +101,11 @@ public class EvcController {
 			shLinkUtilService.printQrCodeAsImage(outputStream, qrCode);
 		} else {
 			PDDocument pdDocument = createPdf(evCPayload, qrCode.getBytes());
-			pringPdf(req, resp, pdDocument, "testEvc");
+			printPdf(req, resp, pdDocument, "testEvc");
 		}
 	}
 
-	protected void pringPdf(
+	protected void printPdf(
 		HttpServletRequest req,
 		HttpServletResponse resp,
 		PDDocument pdDocument,
@@ -120,12 +115,13 @@ public class EvcController {
 		resp.setHeader("Content-Disposition", "attachment; filename=" + name);
 //		resp.setContentLength(pdDocument.getfileToDownload.available());
 		pdDocument.save(resp.getOutputStream());
+//		pdDocument.save("CACA.pdf");
 		pdDocument.close();
 		resp.getOutputStream().flush();
 		resp.getOutputStream().close();
 	}
 
-	private static PDDocument createPdf(EvCPayload evCPayload, byte[] qrCode) throws IOException, WriterException {
+	private static PDDocument createPdf(EvCPayload evCPayload, byte[] qrCode) throws IOException, WriterException, ServletException {
 		ObjectMapper objectMapper = new ObjectMapper();
 		PDDocument document = new PDDocument();
 		PDPage page = new PDPage();
@@ -135,35 +131,37 @@ public class EvcController {
 		document.setDocumentInformation(pdDocumentInformation);
 		pdDocumentInformation.setCreator("IIS SANDBOX");
 		pdDocumentInformation.setCustomMetadataValue("evc", objectMapper.writeValueAsString(evCPayload));
-
 		PDPageContentStream contentStream = new PDPageContentStream(document, page);
 
-		BufferedImage bufferedImage;
-		QRCodeWriter qrCodeWriter = new QRCodeWriter();
-		int width = 200; // Desired QR code width
-		int height = 200; // Desired QR code height
-		BitMatrix bitMatrix = qrCodeWriter.encode(new String(qrCode), BarcodeFormat.QR_CODE, width, height);
-		bufferedImage = MatrixToImageWriter.toBufferedImage(bitMatrix);
+		PDImageXObject qrCodeImageObject;
 		{
-			// Create a dictionary for the inline image parameters
-			COSDictionary parameters = new COSDictionary();
-			parameters.setItem(COSName.IM, COSBoolean.TRUE); // Indicate it's an inline image
-			parameters.setInt(COSName.W, width); // Width of the image
-			parameters.setInt(COSName.H, height); // Height of the image
-			parameters.setInt(COSName.BPC, 1); // Bits per component (for a 1-bit image)
-
-			PDImageXObject imageXObject;
-			imageXObject = LosslessFactory.createFromImage(document, bufferedImage);
-
-//			PDInlineImage inlineImage = new PDInlineImage(parameters, qrCode, null);
-//			inlineImage.setColorSpace(new PDJPXColorSpace(ColorSpace.getInstance(ColorSpace.CS_GRAY)));
-			contentStream.drawImage(imageXObject, 0, 0);
+			int width = 300; // Desired QR code width
+			int height = 300; // Desired QR code height
+			BitMatrix bitMatrix = CompressionUtil.qrCodeBitMatrix(new String(qrCode), width, height);
+			BufferedImage bufferedImage = MatrixToImageWriter.toBufferedImage(bitMatrix);
+			qrCodeImageObject = LosslessFactory.createFromImage(document, bufferedImage);
 		}
+		contentStream.drawImage(qrCodeImageObject, 150, 150);
 
 
+		// Creating Paragraph object
 		contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.COURIER), 12);
 		contentStream.beginText();
-		contentStream.showText("IIS Sandbox Test EVC");
+		contentStream.newLineAtOffset(25, 25);
+		contentStream.showText("IIS Sandbox Test IPS to EVC");
+		contentStream.newLineAtOffset(25, 25);
+		contentStream.showText("Patient Information for " +
+			evCPayload.getName().getFamilyName() +
+			", " +
+			evCPayload.getName().getGivenName());
+
+		contentStream.newLineAtOffset(25, 25);
+		contentStream.showText("Identifier: " +
+			evCPayload.getPersonIdentifier().getObjectIdentifier() +
+			"" +
+			"");
+		contentStream.newLineAtOffset(25, 25);
+		contentStream.showText(evCPayload.getName().getGivenName());
 		contentStream.endText();
 		contentStream.close();
 

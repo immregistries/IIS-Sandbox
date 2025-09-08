@@ -190,7 +190,7 @@ public class PatientController {
 		out.println("<div><a href= \"" +
 			ServletHelper.tenantifyPathWithContextPath(tenant,
 				EvcController.EVC_PATH_SUFFIX + "/" + patientMasterSelected.getPatientId()) +
-			"\">Generate a EVC with IPS</a></div>");
+			"?pdf=true\">Generate a EVC with IPS</a></div>");
 	}
 
 	private void printPatientRecommendationsAndSubscriptions(PrintWriter out, IBaseResource patientSelected, PatientMaster patientMasterSelected, IGenericClient fhirClient) {

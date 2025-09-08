@@ -111,9 +111,7 @@ public class CompressionUtil {
 		return objectMapper.writeValueAsString(jsonNode);
 	}
 
-	public static BitMatrix qrCodeBitMatrix(String data) throws ServletException {
-		int width = 200; // Desired QR code width
-		int height = 200; // Desired QR code height
+	public static BitMatrix qrCodeBitMatrix(String data, int width, int height) throws ServletException {
 		try {
 			QRCodeWriter qrCodeWriter = new QRCodeWriter();
 			return qrCodeWriter.encode(data, BarcodeFormat.QR_CODE, width, height);

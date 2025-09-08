@@ -151,7 +151,7 @@ public class ShLinkUtilService {
 		int width = 200; // Desired QR code width
 		int height = 200; // Desired QR code height
 		try {
-			BitMatrix bitMatrix = CompressionUtil.qrCodeBitMatrix(data);
+			BitMatrix bitMatrix = CompressionUtil.qrCodeBitMatrix(data, width, height);
 			MatrixToImageWriter.writeToStream(bitMatrix, "PNG", outputStream);
 		} catch (IOException e) {
 			throw new ServletException("Error generating QR code", e);
