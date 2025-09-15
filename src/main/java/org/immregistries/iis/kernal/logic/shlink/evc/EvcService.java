@@ -6,6 +6,7 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.immregistries.iis.kernal.model.persisted.IisKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
@@ -16,6 +17,9 @@ import java.util.zip.DataFormatException;
 
 @Service
 public class EvcService {
+
+	@Autowired
+	NuvaService nuvaService;
 	Logger logger = LoggerFactory.getLogger(this.getClass());
 	private final CBORMapper cborMapper = new CBORMapper();
 
