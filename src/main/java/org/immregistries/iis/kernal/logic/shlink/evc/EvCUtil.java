@@ -1,14 +1,20 @@
 package org.immregistries.iis.kernal.logic.shlink.evc;
 
+import com.syadem.nuva.Vaccine;
 import org.hl7.fhir.r4.model.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+@Service
 public class EvCUtil {
 
+	@Autowired
+	NuvaService nuvaService;
 
 	/**
 	 * Converts a FHIR Immunization resource into an EvC VaccinationRecord.
@@ -22,7 +28,8 @@ public class EvCUtil {
 	 * @param patient      The FHIR Patient resource to calculate age from.
 	 * @return A VaccinationRecord object populated with data from the FHIR resource.
 	 */
-	public static EvCPayload.VaccinationRecord toVaccinationRecord(Immunization immunization, Patient patient) {
+	public EvCPayload.VaccinationRecord toVaccinationRecord(Immunization immunization, Patient patient) {
+		nuvaService.getNuva();
 		EvCPayload.VaccinationRecord record = new EvCPayload.VaccinationRecord();
 
 		// Assumption: Registry Code (reg) is derived from the profile URL in meta.
@@ -44,7 +51,8 @@ public class EvCUtil {
 		// Here we'll just parse the display as an int for the example.
 		if (vaccineCoding != null && vaccineCoding.getDisplay() != null) {
 			try {
-				record.setNuvaCode(Integer.parseInt(vaccineCoding.getDisplay()));
+				Vaccine vaccine = nuvaService.getNuva().getQueries().lookupVaccineByCode(Integer.parseInt(vaccineCoding.getCode()));
+				record.setNuvaCode(vaccine.getCode());
 			} catch (NumberFormatException e) {
 				// Handle error or set a default value
 			}
@@ -72,7 +80,7 @@ public class EvCUtil {
 	 * @param patient The FHIR Patient resource to convert.
 	 * @return An EvCPayload object populated with patient data.
 	 */
-	public static EvCPayload toEvCPayload(Patient patient) {
+	public EvCPayload toEvCPayload(Patient patient) {
 		EvCPayload payload = new EvCPayload();
 
 		// Set version
@@ -121,7 +129,7 @@ public class EvCUtil {
 	 * @param url The profile URL string.
 	 * @return The extracted registry code.
 	 */
-	private static String extractRegistryCodeFromUrl(String url) {
+	private String extractRegistryCodeFromUrl(String url) {
 		// This is a simple example. A more robust implementation might be needed.
 		// E.g., urn:example:registry:FRA -> FRA
 		String[] parts = url.split(":");
@@ -141,7 +149,7 @@ public class EvCUtil {
 	 * @param ipsBundle The FHIR IPS Bundle resource to convert.
 	 * @return An EvCPayload object containing the data from the bundle.
 	 */
-	public static EvCPayload toEvCPayloadFromBundle(Bundle ipsBundle) {
+	public EvCPayload toEvCPayloadFromBundle(Bundle ipsBundle) {
 		Patient patient = null;
 		List<Immunization> immunizations = new ArrayList<>();
 

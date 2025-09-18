@@ -69,6 +69,9 @@ public class EvcController {
 	@Autowired
 	IPartitionLookupSvc partitionLookupSvc;
 
+	@Autowired
+	EvCUtil evCUtil;
+
 
 	@GetMapping("/{patientId}")
 	protected void doGetPatientEvc(
@@ -85,7 +88,7 @@ public class EvcController {
 		IisKey iisSigningKey = keyStoreService.getIisSigningKeyOrCreate("", userAccess, tenant);
 
 		IBaseBundle ipsToBeEncoded = ipsGeneratorSvcIIS.generateIps(ServletHelper.requestDetailsWithPartitionName(partitionLookupSvc), new IdType(patientId), "");
-		EvCPayload evCPayload = EvCUtil.toEvCPayloadFromBundle((Bundle) ipsToBeEncoded);
+		EvCPayload evCPayload = evCUtil.toEvCPayloadFromBundle((Bundle) ipsToBeEncoded);
 
 		byte[] bytes = CompressionUtil.minifyJson(evCPayload).getBytes();
 		byte[] cborPayload = evcService.cbor(bytes);
