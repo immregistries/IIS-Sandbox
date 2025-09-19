@@ -8,6 +8,8 @@ import ca.uhn.fhir.jpa.subscription.match.config.SubscriptionProcessorConfig;
 import ca.uhn.fhir.jpa.subscription.match.config.WebsocketDispatcherConfig;
 import ca.uhn.fhir.jpa.subscription.submit.config.SubscriptionSubmitterConfig;
 import ca.uhn.fhir.rest.server.RestfulServer;
+import com.syadem.nuva.NUVA;
+import com.syadem.nuva.SupportedLocale;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnEitherVersion;
 import org.immregistries.iis.kernal.fhir.mdm.MdmConfig;
 import org.immregistries.iis.kernal.fhir.security.ServerSecurityConfig;
@@ -27,6 +29,8 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Import;
 import org.springframework.web.context.request.RequestContextListener;
+
+import java.io.IOException;
 
 @ServletComponentScan(basePackageClasses = {
 	RestfulServer.class}, basePackages = {
@@ -96,10 +100,10 @@ public class Application extends SpringBootServletInitializer {
 		return new RequestContextListener();
 	}
 
-//	@Bean
-//	public NUVA nuva() throws IOException {
-//		return NUVA.load(SupportedLocale.English);
-//	}
+	@Bean
+	public NUVA nuva() throws IOException {
+		return NUVA.load(SupportedLocale.English);
+	}
 
 
 
