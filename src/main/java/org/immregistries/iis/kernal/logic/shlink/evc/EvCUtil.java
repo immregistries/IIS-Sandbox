@@ -53,10 +53,9 @@ public class EvCUtil {
 		record.setReference(1296);
 
 		// TODO support more codes like snomed
-		Coding vaccineCoding = MappingHelper.filterCodeableConceptR4(immunization.getVaccineCode(), ImmunizationMapper.CVX_SYSTEM);
-		;
-		if (vaccineCoding != null && StringUtils.isNotBlank(vaccineCoding.getCode())) {
-			Optional<Vaccine> byCvx = nuvaService.findByCvx(vaccineCoding.getCode());
+		Coding cvxCoding = MappingHelper.filterCodeableConceptR4(immunization.getVaccineCode(), ImmunizationMapper.CVX_SYSTEM);
+		if (cvxCoding != null && StringUtils.isNotBlank(cvxCoding.getCode())) {
+			Optional<Vaccine> byCvx = nuvaService.findByCvx(cvxCoding.getCode());
 			byCvx.ifPresent(vaccine -> record.setNuvaCode(vaccine.getCode()));
 		}
 
