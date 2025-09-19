@@ -46,6 +46,7 @@ public class FormAuthenticationSuccessHandler extends SavedRequestAwareAuthentic
 			// Use the DefaultSavedRequest URL
 			builder = UriComponentsBuilder.fromHttpUrl(savedRequest.getRedirectUrl());
 		}
+		// If tenant name was specified in Form
 		if (StringUtils.isNotBlank(tenantName)) {
 			/*
 			 * Filtering redirection for login to go back to homepage or pop page

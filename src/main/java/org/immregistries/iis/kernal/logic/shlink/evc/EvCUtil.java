@@ -1,17 +1,25 @@
 package org.immregistries.iis.kernal.logic.shlink.evc;
 
 import com.syadem.nuva.Vaccine;
+import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.r4.model.*;
+import org.immregistries.iis.kernal.mapping.MappingHelper;
+import org.immregistries.iis.kernal.mapping.interfaces.ImmunizationMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 @Service
 public class EvCUtil {
+	Logger logger = LoggerFactory.getLogger(this.getClass());
+
 
 	@Autowired
 	NuvaService nuvaService;
@@ -29,7 +37,6 @@ public class EvCUtil {
 	 * @return A VaccinationRecord object populated with data from the FHIR resource.
 	 */
 	public EvCPayload.VaccinationRecord toVaccinationRecord(Immunization immunization, Patient patient) {
-		nuvaService.getNuva();
 		EvCPayload.VaccinationRecord record = new EvCPayload.VaccinationRecord();
 
 		// Assumption: Registry Code (reg) is derived from the profile URL in meta.
@@ -45,17 +52,12 @@ public class EvCUtil {
 		record.setRepositoryIndex(5);
 		record.setReference(1296);
 
-		// Map the vaccine code (mp)
-		Coding vaccineCoding = immunization.getVaccineCode().getCodingFirstRep();
-		// Assuming NUVA code is in the display or system, or a specific extension.
-		// Here we'll just parse the display as an int for the example.
-		if (vaccineCoding != null && vaccineCoding.getDisplay() != null) {
-			try {
-				Vaccine vaccine = nuvaService.getNuva().getQueries().lookupVaccineByCode(Integer.parseInt(vaccineCoding.getCode()));
-				record.setNuvaCode(vaccine.getCode());
-			} catch (NumberFormatException e) {
-				// Handle error or set a default value
-			}
+		// TODO support more codes like snomed
+		Coding vaccineCoding = MappingHelper.filterCodeableConceptR4(immunization.getVaccineCode(), ImmunizationMapper.CVX_SYSTEM);
+		;
+		if (vaccineCoding != null && StringUtils.isNotBlank(vaccineCoding.getCode())) {
+			Optional<Vaccine> byCvx = nuvaService.findByCvx(vaccineCoding.getCode());
+			byCvx.ifPresent(vaccine -> record.setNuvaCode(vaccine.getCode()));
 		}
 
 		// Calculate age in days (a)
