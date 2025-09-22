@@ -5,6 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.r4.model.*;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
 import org.immregistries.iis.kernal.mapping.interfaces.ImmunizationMapper;
+import org.immregistries.iis.kernal.model.BusinessIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -108,9 +109,12 @@ public class EvCUtil {
 			payload.setDateOfBirth(patient.getBirthDate());
 		}
 
-		// Populate person identifier (pid) if available
+		// Populate person identifier (pid) if available, TODO functionality to choose Identifier
 		if (patient.hasIdentifier()) {
-			Identifier fhirIdentifier = patient.getIdentifierFirstRep();
+			Identifier fhirIdentifier = patient.getIdentifier().stream()
+				.filter(businessIdentifier -> BusinessIdentifier.MRN_TYPE_VALUE.equals(businessIdentifier.getType().getCodingFirstRep().getCode()))
+				.findFirst()
+				.orElse(patient.getIdentifierFirstRep());
 			EvCPayload.PersonIdentifier evcId = new EvCPayload.PersonIdentifier();
 			if (fhirIdentifier.hasSystem()) {
 				evcId.setObjectIdentifier(fhirIdentifier.getSystem());
