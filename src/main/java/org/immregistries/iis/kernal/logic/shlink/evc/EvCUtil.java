@@ -39,18 +39,21 @@ public class EvCUtil {
 	public EvCPayload.VaccinationRecord toVaccinationRecord(Immunization immunization, Patient patient) {
 		EvCPayload.VaccinationRecord record = new EvCPayload.VaccinationRecord();
 
-		// Assumption: Registry Code (reg) is derived from the profile URL in meta.
-		// This is a placeholder and may need to be adjusted based on the actual FHIR implementation.
-		if (immunization.getMeta().hasProfile()) {
-			String profileUrl = immunization.getMeta().getProfile().get(0).getValue();
-			record.setRegistryCode(extractRegistryCodeFromUrl(profileUrl));
+
+		// tODO map for registry of registries
+		if (immunization.hasReportOrigin()) {
+			immunization.getReportOrigin().getCodingFirstRep().getCode();
+			record.setRegistryCode("USA");
+			//Arbitrary values, since IIs sandbox in no registry info
+			record.setRepositoryIndex(0);
+			record.setReference(0);
 		}
 
-		// Assumption: Repository Index (rep) and Reference (i) are available as extensions or identifiers.
-		// For this example, we'll use a placeholder or check for a specific identifier.
-		// This may need to be customized based on your FHIR data.
-		record.setRepositoryIndex(5);
-		record.setReference(1296);
+		try {
+			record.setRepositoryIndex(immunization.getIdElement().getIdPartAsBigDecimal().intValue());
+		} catch (NumberFormatException ignored) {
+		}
+
 
 		// TODO support more codes like snomed
 		Coding cvxCoding = MappingHelper.filterCodeableConceptR4(immunization.getVaccineCode(), ImmunizationMapper.CVX_SYSTEM);
