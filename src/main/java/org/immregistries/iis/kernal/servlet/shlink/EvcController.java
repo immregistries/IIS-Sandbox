@@ -90,8 +90,10 @@ public class EvcController {
 		IBaseBundle ipsToBeEncoded = ipsGeneratorSvcIIS.generateIps(ServletHelper.requestDetailsWithPartitionName(partitionLookupSvc), new IdType(patientId), "");
 		EvCPayload evCPayload = evCUtil.toEvCPayloadFromBundle((Bundle) ipsToBeEncoded);
 
-		byte[] bytes = CompressionUtil.minifyJson(evCPayload).getBytes();
-		byte[] cborPayload = evcService.cbor(bytes);
+		String minifiedJson = CompressionUtil.minifyJson(evCPayload);
+		logger.info("minified {}", minifiedJson);
+		byte[] minifiedJsonBytes = minifiedJson.getBytes();
+		byte[] cborPayload = evcService.cbor(minifiedJsonBytes);
 
 		byte[] cosePayload = evcService.createCoseSign1(iisSigningKey, cborPayload);
 		logger.info("cosePayload {}", cosePayload);
@@ -150,21 +152,18 @@ public class EvcController {
 		// Creating Paragraph object
 		contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.COURIER), 12);
 		contentStream.beginText();
-		contentStream.newLineAtOffset(25, 25);
+		contentStream.setLeading(14.5f);
+		contentStream.newLineAtOffset(25, 700);
 		contentStream.showText("IIS Sandbox Test IPS to EVC");
-		contentStream.newLineAtOffset(25, 25);
+		contentStream.newLine();
 		contentStream.showText("Patient Information for " +
 			evCPayload.getName().getFamilyName() +
 			", " +
 			evCPayload.getName().getGivenName());
-
-		contentStream.newLineAtOffset(25, 25);
-		contentStream.showText("Identifier: " +
-			evCPayload.getPersonIdentifier().getObjectIdentifier() +
-			"" +
-			"");
-		contentStream.newLineAtOffset(25, 25);
-		contentStream.showText(evCPayload.getName().getGivenName());
+		contentStream.newLine();
+		contentStream.showText("Identifier: " + evCPayload.getPersonIdentifier().getObjectIdentifier());
+		contentStream.newLine();
+//		contentStream.showText(evCPayload.getName().getGivenName());
 		contentStream.endText();
 		contentStream.close();
 

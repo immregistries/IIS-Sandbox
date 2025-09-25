@@ -31,10 +31,10 @@ public class EvcService {
 		return cborMapper.writeValueAsBytes(evCPayload);
 	}
 
-	public byte[] cbor(byte[] input) throws DataFormatException, JsonProcessingException {
+	public byte[] cbor(byte[] input) throws DataFormatException, IOException {
 		// Convert the map to a CBOR-encoded byte array
 		byte[] cborData = cborMapper.writeValueAsBytes(input);
-		logger.info("CBOR byte array created successfully.{} \ncbor: {}", new String(input), new String(cborData));
+		logger.info("CBOR byte array created successfully.\ninput: {}\ncbor: {}\nparsed: {}", new String(input), new String(cborData), cborMapper.readValue(cborData, String.class));
 		return cborData;
 	}
 
