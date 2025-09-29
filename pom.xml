@@ -596,6 +596,12 @@
         </dependency>
 
         <dependency>
+            <groupId>com.authlete</groupId>
+            <artifactId>cbor</artifactId>
+            <version>1.19</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcprov-jdk18on</artifactId>
             <version>1.78</version> <!-- Use the latest stable version -->

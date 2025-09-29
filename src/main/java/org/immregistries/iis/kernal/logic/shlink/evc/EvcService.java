@@ -1,5 +1,9 @@
 package org.immregistries.iis.kernal.logic.shlink.evc;
 
+import com.authlete.cbor.CBORDecoder;
+import com.authlete.cbor.CBORItem;
+import com.authlete.cose.*;
+import com.authlete.cose.constants.COSEAlgorithms;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.dataformat.cbor.databind.CBORMapper;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -11,7 +15,9 @@ import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.security.*;
+import java.security.interfaces.ECPrivateKey;
 import java.util.Collections;
 import java.util.zip.DataFormatException;
 
@@ -38,7 +44,45 @@ public class EvcService {
 		return cborData;
 	}
 
-	public byte[] createCoseSign1(IisKey iisKey, byte[] cborPayload) throws IOException, InvalidKeyException, SignatureException, NoSuchAlgorithmException, NoSuchProviderException {
+	public byte[] createCoseSign1(IisKey iisKey, byte[] cborPayload) throws IOException {
+		ECPrivateKey ec = (ECPrivateKey) iisKey.keyPair().getPrivate();
+		logger.info("ecKey {}", ec.getEncoded());
+		COSESign1 sign1 = new COSESign1Builder()
+			// Protected header
+			.protectedHeader(
+				// <<{1:-7}>>
+				new COSEProtectedHeaderBuilder().alg(COSEAlgorithms.ES256).build()
+			)
+			// Unprotected header
+			.unprotectedHeader(
+				// {4:'11'}
+				new COSEUnprotectedHeaderBuilder().kid("11").build()
+			)
+			// Payload
+			.payload(cborPayload)
+			// Signature
+			.signature(
+				iisKey.keyPair().getPrivate().getEncoded()
+			)
+			// Construct a COSESign1 instance.
+			.build();
+
+		byte[] encode = sign1.encode();
+		COSEVerifier coseVerifier = new COSEVerifier(iisKey.keyPair().getPublic());
+		CBORDecoder cborDecoder = new CBORDecoder(encode);
+		CBORItem cborItem = cborDecoder.next();
+		boolean verify = false;
+		try {
+			verify = coseVerifier.verify(sign1, "test".getBytes(StandardCharsets.UTF_8));
+		} catch (COSEException e) {
+			logger.error(e.getMessage());
+		}
+		logger.info("Code Sign encode: {}\n VERIFIED: {}\n {}\n {}\n", encode, verify, cborDecoder.all(), cborItem.prettify());
+		return encode;
+	}
+
+
+	public byte[] createCoseSign1Old(IisKey iisKey, byte[] cborPayload) throws IOException, InvalidKeyException, SignatureException, NoSuchAlgorithmException, NoSuchProviderException {
 		PrivateKey privateKey = iisKey.keyPair().getPrivate();
 
 		// 1. Define the protected header as a CBOR Map
