@@ -1,6 +1,7 @@
 package org.immregistries.iis.kernal.servlet.shlink;
 
 import ca.uhn.fhir.jpa.partition.IPartitionLookupSvc;
+import com.authlete.cose.COSEException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.zxing.WriterException;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
@@ -79,24 +80,22 @@ public class EvcController {
 		HttpServletResponse resp,
 		@PathVariable("patientId") String patientId,
 		@RequestParam(value = "pdf", required = false) boolean pdf
-	) throws IOException, ServletException, DataFormatException, SignatureException, NoSuchAlgorithmException, InvalidKeyException, NoSuchProviderException, WriterException {
+	) throws IOException, ServletException, DataFormatException, SignatureException, NoSuchAlgorithmException, InvalidKeyException, NoSuchProviderException, WriterException, COSEException {
 //		ObjectMapper objectMapper = new ObjectMapper();
 		Tenant tenant = ServletHelper.getTenantRedirectIfNone(req, resp);
 		UserAccess userAccess = ServletHelper.getUserAccess();
 		OutputStream outputStream = resp.getOutputStream();
-//		Gson gson = new Gson();
+
 		IisKey iisSigningKey = keyStoreService.getIisSigningKeyOrCreate("", userAccess, tenant);
 
 		IBaseBundle ipsToBeEncoded = ipsGeneratorSvcIIS.generateIps(ServletHelper.requestDetailsWithPartitionName(partitionLookupSvc), new IdType(patientId), "");
 		EvCPayload evCPayload = evCUtil.toEvCPayloadFromBundle((Bundle) ipsToBeEncoded);
 
-		String minifiedJson = CompressionUtil.minifyJson(evCPayload);
-		logger.info("minified {}", minifiedJson);
-		byte[] minifiedJsonBytes = minifiedJson.getBytes();
-		byte[] cborPayload = evcService.cbor(minifiedJsonBytes);
+		byte[] cborPayload;
+		cborPayload = evcService.cbor(evCPayload);
 
 		byte[] cosePayload = evcService.createCoseSign1(iisSigningKey, cborPayload);
-		logger.info("cosePayload {}", cosePayload);
+		logger.info("cosePayload {}", new String(cosePayload));
 		String qrCode = Base64URL.encode(cosePayload).toString();
 //		String qrCode = new String(cosePayload);
 //		logger.info("qrCode {}", qrCode);
@@ -161,7 +160,7 @@ public class EvcController {
 			", " +
 			evCPayload.getName().getGivenName());
 		contentStream.newLine();
-		contentStream.showText("Identifier: " + evCPayload.getPersonIdentifier().getObjectIdentifier());
+		contentStream.showText("Identifier: " + evCPayload.getPersonIdentifier().getObjectIdentifier() + " " + evCPayload.getPersonIdentifier().getId());
 		contentStream.newLine();
 //		contentStream.showText(evCPayload.getName().getGivenName());
 		contentStream.endText();

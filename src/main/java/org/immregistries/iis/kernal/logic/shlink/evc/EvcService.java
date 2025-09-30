@@ -1,7 +1,6 @@
 package org.immregistries.iis.kernal.logic.shlink.evc;
 
 import com.authlete.cbor.CBORDecoder;
-import com.authlete.cbor.CBORItem;
 import com.authlete.cose.*;
 import com.authlete.cose.constants.COSEAlgorithms;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -15,7 +14,6 @@ import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.security.interfaces.ECPrivateKey;
 import java.util.Collections;
@@ -26,6 +24,7 @@ public class EvcService {
 
 	@Autowired
 	NuvaService nuvaService;
+
 	Logger logger = LoggerFactory.getLogger(this.getClass());
 	private final CBORMapper cborMapper = new CBORMapper();
 
@@ -33,51 +32,67 @@ public class EvcService {
 		Security.addProvider(new BouncyCastleProvider());
 	}
 
-	public byte[] cbor(EvCPayload evCPayload) throws DataFormatException, JsonProcessingException {
-		return cborMapper.writeValueAsBytes(evCPayload);
+	/**
+	 * Uses Jackson specification to cborize evCPayload
+	 *
+	 * @param evCPayload
+	 * @return
+	 * @throws DataFormatException
+	 * @throws JsonProcessingException
+	 */
+	public byte[] cbor(EvCPayload evCPayload) throws IOException {
+		byte[] bytes = cborMapper.writeValueAsBytes(evCPayload);
+//		logger.info("CBOR byte array created successfully.\ninputObject: {}\ncbor: {}\nparsed: {}", new ObjectMapper().writeValueAsString(evCPayload), new String(bytes), cborMapper.createParser(bytes).readValueAsTree());
+		return bytes;
 	}
 
-	public byte[] cbor(byte[] input) throws DataFormatException, IOException {
-		// Convert the map to a CBOR-encoded byte array
-		byte[] cborData = cborMapper.writeValueAsBytes(input);
-		logger.info("CBOR byte array created successfully.\ninput: {}\ncbor: {}\nparsed: {}", new String(input), new String(cborData), cborMapper.readValue(cborData, String.class));
-		return cborData;
-	}
+	public byte[] createCoseSign1(IisKey iisKey, byte[] cborPayload) throws IOException, COSEException {
+		ECPrivateKey priKey = (ECPrivateKey) iisKey.keyPair().getPrivate();
 
-	public byte[] createCoseSign1(IisKey iisKey, byte[] cborPayload) throws IOException {
-		ECPrivateKey ec = (ECPrivateKey) iisKey.keyPair().getPrivate();
-		logger.info("ecKey {}", ec.getEncoded());
+		// Create a signer with the private key.
+		COSESigner signer = new COSESigner(priKey);
+
+		// Signature algorithm
+		int algorithm = COSEAlgorithms.ES256;
+
+		// Protected header
+		COSEProtectedHeader protectedHeader =
+			new COSEProtectedHeaderBuilder().alg(algorithm).build();
+
+		// Unprotected header
+		COSEUnprotectedHeader unprotectedHeader =
+			new COSEUnprotectedHeaderBuilder().kid("11").build();
+
+		// Sig_structure
+		SigStructure structure = new SigStructureBuilder()
+			.signature1()
+			.bodyAttributes(protectedHeader)
+			.payload(cborPayload).build();
+		// Sign the Sig_structure (= generate a signature).
+		byte[] signature = signer.sign(structure, COSEAlgorithms.ES256);
 		COSESign1 sign1 = new COSESign1Builder()
-			// Protected header
 			.protectedHeader(
-				// <<{1:-7}>>
-				new COSEProtectedHeaderBuilder().alg(COSEAlgorithms.ES256).build()
+				protectedHeader
 			)
-			// Unprotected header
 			.unprotectedHeader(
-				// {4:'11'}
-				new COSEUnprotectedHeaderBuilder().kid("11").build()
+				unprotectedHeader
 			)
-			// Payload
 			.payload(cborPayload)
-			// Signature
 			.signature(
-				iisKey.keyPair().getPrivate().getEncoded()
+				signature
 			)
-			// Construct a COSESign1 instance.
 			.build();
 
 		byte[] encode = sign1.encode();
 		COSEVerifier coseVerifier = new COSEVerifier(iisKey.keyPair().getPublic());
 		CBORDecoder cborDecoder = new CBORDecoder(encode);
-		CBORItem cborItem = cborDecoder.next();
 		boolean verify = false;
 		try {
-			verify = coseVerifier.verify(sign1, "test".getBytes(StandardCharsets.UTF_8));
+			verify = coseVerifier.verify(sign1, null);
 		} catch (COSEException e) {
 			logger.error(e.getMessage());
 		}
-		logger.info("Code Sign encode: {}\n VERIFIED: {}\n {}\n {}\n", encode, verify, cborDecoder.all(), cborItem.prettify());
+		logger.info("Cose Sign encode: {}\n VERIFIED: {}\n DECODED: {}\n  alg: {}\n", new String(encode), verify, cborDecoder.all(), iisKey.keyPair().getPublic().getAlgorithm());
 		return encode;
 	}
 
