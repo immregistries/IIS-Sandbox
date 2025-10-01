@@ -1,6 +1,8 @@
 package org.immregistries.iis.kernal.logic.shlink.evc;
 
 import com.authlete.cbor.CBORDecoder;
+import com.authlete.cbor.CBORItem;
+import com.authlete.cbor.CBORParser;
 import com.authlete.cose.*;
 import com.authlete.cose.constants.COSEAlgorithms;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -71,28 +73,38 @@ public class EvcService {
 		// Sign the Sig_structure (= generate a signature).
 		byte[] signature = signer.sign(structure, COSEAlgorithms.ES256);
 		COSESign1 sign1 = new COSESign1Builder()
-			.protectedHeader(
-				protectedHeader
-			)
-			.unprotectedHeader(
-				unprotectedHeader
-			)
+			.protectedHeader(protectedHeader)
+			.unprotectedHeader(unprotectedHeader)
 			.payload(cborPayload)
-			.signature(
-				signature
-			)
+			.signature(signature)
 			.build();
 
 		byte[] encode = sign1.encode();
 		COSEVerifier coseVerifier = new COSEVerifier(iisKey.keyPair().getPublic());
-		CBORDecoder cborDecoder = new CBORDecoder(encode);
 		boolean verify = false;
 		try {
 			verify = coseVerifier.verify(sign1, null);
 		} catch (COSEException e) {
 			logger.error(e.getMessage());
 		}
-		logger.info("Cose Sign encode: {}\n VERIFIED: {}\n DECODED: {}\n  alg: {}\n", new String(encode), verify, cborDecoder.all(), iisKey.keyPair().getPublic().getAlgorithm());
+		logger.info("Cose Sign encode: {}\n VERIFIED: {}\n  payload: {}\n", new String(encode), verify, sign1.getPayload());
+		{
+			CBORDecoder cborDecoder = new CBORDecoder(encode);
+			CBORItem item = cborDecoder.next();
+			while (item != null) {
+				logger.info("DECODED \nCborItem: {}\n encode: {}\n, parse {}\n", cborMapper.createParser(item.encode()).readValueAsTree(), new String(item.encode()), item.parse());
+				item = cborDecoder.next();
+			}
+		}
+		{
+			CBORParser cborParser = new CBORParser(encode);
+			Object object = cborParser.next();
+			while (object != null) {
+				logger.info("PARSED \nOBJECT: {}\n", object);
+				object = cborParser.next();
+			}
+		}
+
 		return encode;
 	}
 
