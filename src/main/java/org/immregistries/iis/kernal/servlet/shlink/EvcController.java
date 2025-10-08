@@ -10,6 +10,7 @@ import com.nimbusds.jose.util.Base64URL;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import nl.minvws.encoding.Base45;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentInformation;
 import org.apache.pdfbox.pdmodel.PDPage;
@@ -96,9 +97,10 @@ public class EvcController {
 
 		byte[] cosePayload = evcService.createCoseSign1(iisSigningKey, cborPayload);
 		logger.info("cosePayload {}", new String(cosePayload));
-		String qrCode = Base64URL.encode(cosePayload).toString();
-//		String qrCode = new String(cosePayload);
-//		logger.info("qrCode {}", qrCode);
+		byte[] deflated = CompressionUtil.deflate(cosePayload);
+		String qrCode = "VC1:"+ Base45.getEncoder().encodeToString(deflated);
+
+		logger.info("qrCode {}", qrCode);
 
 		if (!pdf) {
 			resp.setContentType("image/png"); // Set content type for PNG image

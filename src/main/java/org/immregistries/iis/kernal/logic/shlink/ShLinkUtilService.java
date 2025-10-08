@@ -148,8 +148,8 @@ public class ShLinkUtilService {
 	}
 
 	public void printQrCodeAsImage(OutputStream outputStream, String data) throws ServletException {
-		int width = 200; // Desired QR code width
-		int height = 200; // Desired QR code height
+		int width = 300; // Desired QR code width
+		int height = 300; // Desired QR code height
 		try {
 			BitMatrix bitMatrix = CompressionUtil.qrCodeBitMatrix(data, width, height);
 			MatrixToImageWriter.writeToStream(bitMatrix, "PNG", outputStream);
