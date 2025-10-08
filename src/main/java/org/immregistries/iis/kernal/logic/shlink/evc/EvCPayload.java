@@ -1,9 +1,13 @@
 package org.immregistries.iis.kernal.logic.shlink.evc;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSetter;
 
 import java.io.Serializable;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -13,13 +17,16 @@ import java.util.List;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class EvCPayload implements Serializable {
+	private static final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+	public static final String DOB = "dob";
+
 	@JsonProperty("ver")
 	private String version;
 
 	@JsonProperty("nam")
 	private Name name;
 
-	@JsonProperty("dob")
+//	@JsonProperty(DOB)
 	private Date dateOfBirth;
 
 	@JsonProperty("pid")
@@ -42,6 +49,16 @@ public class EvCPayload implements Serializable {
 
 	public void setName(Name name) {
 		this.name = name;
+	}
+
+	@JsonGetter(DOB)
+	public String getJsonDateOfBirth() {
+		return simpleDateFormat.format(getDateOfBirth());
+	}
+
+	@JsonSetter(DOB)
+	public void setJsonDateOfBirth(String string) throws ParseException {
+		setDateOfBirth(simpleDateFormat.parse(string));
 	}
 
 	public Date getDateOfBirth() {
