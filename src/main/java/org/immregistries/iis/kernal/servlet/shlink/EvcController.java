@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.zxing.WriterException;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
-import com.nimbusds.jose.util.Base64URL;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -34,6 +33,7 @@ import org.immregistries.iis.kernal.model.persisted.IisKey;
 import org.immregistries.iis.kernal.model.persisted.Tenant;
 import org.immregistries.iis.kernal.model.persisted.UserAccess;
 import org.immregistries.iis.kernal.servlet.TenantController;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +47,8 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.SignatureException;
 import java.util.zip.DataFormatException;
+
+import static org.immregistries.iis.kernal.logic.shlink.evc.EvcService.VC_1;
 
 @RestController
 @RequestMapping(TenantController.TENANT_PATH + EvcController.EVC_PATH_SUFFIX)
@@ -92,15 +94,8 @@ public class EvcController {
 		IBaseBundle ipsToBeEncoded = ipsGeneratorSvcIIS.generateIps(ServletHelper.requestDetailsWithPartitionName(partitionLookupSvc), new IdType(patientId), "");
 		EvCPayload evCPayload = evCUtil.toEvCPayloadFromBundle((Bundle) ipsToBeEncoded);
 
-		byte[] cborPayload;
-		cborPayload = evcService.cbor(evCPayload);
-
-		byte[] cosePayload = evcService.createCoseSign1(iisSigningKey, cborPayload);
-		logger.info("cosePayload {}", new String(cosePayload));
-		byte[] deflated = CompressionUtil.deflate(cosePayload);
-		String qrCode = "VC1:"+ Base45.getEncoder().encodeToString(deflated);
-
-		logger.info("qrCode {}", qrCode);
+		String qrCode = evcService.encodeQrCode(evCPayload, iisSigningKey);
+//		logger.info("qrCode {}", qrCode);
 
 		if (!pdf) {
 			resp.setContentType("image/png"); // Set content type for PNG image
@@ -109,7 +104,9 @@ public class EvcController {
 			PDDocument pdDocument = createPdf(evCPayload, qrCode.getBytes());
 			printPdf(req, resp, pdDocument, "testEvc");
 		}
+		evcService.decodeFullQrCode(qrCode.getBytes(), iisSigningKey);
 	}
+
 
 	protected void printPdf(
 		HttpServletRequest req,
@@ -164,6 +161,7 @@ public class EvcController {
 		contentStream.newLine();
 		contentStream.showText("Identifier: " + evCPayload.getPersonIdentifier().getObjectIdentifier() + " " + evCPayload.getPersonIdentifier().getId());
 		contentStream.newLine();
+		contentStream.showText(new String(qrCode));
 //		contentStream.showText(evCPayload.getName().getGivenName());
 		contentStream.endText();
 		contentStream.close();

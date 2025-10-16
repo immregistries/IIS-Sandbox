@@ -2,13 +2,17 @@ package org.immregistries.iis.kernal.logic.shlink.evc;
 
 import com.authlete.cbor.CBORDecoder;
 import com.authlete.cbor.CBORItem;
-import com.authlete.cbor.CBORParser;
 import com.authlete.cose.*;
 import com.authlete.cose.constants.COSEAlgorithms;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.cbor.databind.CBORMapper;
+import nl.minvws.encoding.Base45;
+import org.apache.commons.lang3.StringUtils;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.immregistries.iis.kernal.logic.shlink.CompressionUtil;
 import org.immregistries.iis.kernal.model.persisted.IisKey;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,11 +22,15 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.security.*;
 import java.security.interfaces.ECPrivateKey;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.zip.DataFormatException;
 
 @Service
 public class EvcService {
+
+	public static final String VC_1 = "VC1:";
+
 
 	@Autowired
 	NuvaService nuvaService;
@@ -42,13 +50,44 @@ public class EvcService {
 	 * @throws DataFormatException
 	 * @throws JsonProcessingException
 	 */
-	public byte[] cbor(EvCPayload evCPayload) throws IOException {
-		byte[] bytes = cborMapper.writeValueAsBytes(evCPayload);
-//		logger.info("CBOR byte array created successfully.\ninputObject: {}\ncbor: {}\nparsed: {}", new ObjectMapper().writeValueAsString(evCPayload), new String(bytes), cborMapper.createParser(bytes).readValueAsTree());
-		return bytes;
+	public byte[] toCbor(EvCPayload evCPayload) throws IOException {
+		byte[] cbor = cborMapper.writeValueAsBytes(evCPayload);
+		logger.info("CBOR byte array created successfully.\ninputObject: {}\ncbor: {}\nparsed: {}", new ObjectMapper().writeValueAsString(evCPayload), new String(cbor), cborMapper.createParser(cbor).readValueAsTree());
+		return cbor;
 	}
 
-	public byte[] createCoseSign1(IisKey iisKey, byte[] cborPayload) throws IOException, COSEException {
+	public EvCPayload undoCbor(byte[] cbor) throws IOException {
+		logger.info("parse CBOR cbor: {}\nparsed: {}", new String(cbor), cborMapper.createParser(cbor).readValueAsTree());
+		EvCPayload evCPayload = cborMapper.readValue(cbor, EvCPayload.class);
+		return evCPayload;
+	}
+
+	public byte[] decodeQrCode(byte[] qrcode) {
+		String s = new String(qrcode);
+		String s2 = StringUtils.substringAfter(s,VC_1);
+		return Base45.getDecoder().decode(s2);
+	}
+
+	public String encodeQrCode(EvCPayload evCPayload, IisKey iisSigningKey) throws IOException, COSEException {
+		byte[] cborPayload = toCbor(evCPayload);
+		logger.info("HERE: {} {} {}", new String(cborPayload), cborPayload.length, undoCbor(cborPayload));
+		byte[] cosePayload = createCoseSign1(cborPayload, iisSigningKey);
+		byte[] deflated = CompressionUtil.deflate(cosePayload);
+		return VC_1 + Base45.getEncoder().encodeToString(deflated);
+	}
+
+
+	public EvCPayload decodeFullQrCode(byte[] qrcode, IisKey iisKey) throws COSEException, IOException, DataFormatException {
+		byte[] compressed = decodeQrCode(qrcode);
+		byte[] cose = CompressionUtil.inflate(compressed);
+		byte[] decoded = decodeCoseSign1(cose, iisKey.publicKey());
+		logger.info("DECODEFULL: {}  {}", new String(decoded), decoded.length);
+
+		EvCPayload evCPayload = undoCbor(decoded);
+		return evCPayload;
+	}
+
+	public byte[] createCoseSign1(byte[] cborPayload, IisKey iisKey) throws IOException, COSEException {
 		ECPrivateKey priKey = (ECPrivateKey) iisKey.keyPair().getPrivate();
 
 		// Create a signer with the private key.
@@ -80,32 +119,47 @@ public class EvcService {
 			.build();
 
 		byte[] encode = sign1.encode();
-		COSEVerifier coseVerifier = new COSEVerifier(iisKey.keyPair().getPublic());
-		boolean verify = false;
-		try {
-			verify = coseVerifier.verify(sign1, null);
-		} catch (COSEException e) {
-			logger.error(e.getMessage());
-		}
-		logger.info("Cose Sign encode: {}\n VERIFIED: {}\n  payload: {}\n", new String(encode), verify, sign1.getPayload());
-		{
-			CBORDecoder cborDecoder = new CBORDecoder(encode);
-			CBORItem item = cborDecoder.next();
-			while (item != null) {
-				logger.info("DECODED \nCborItem: {}\n encode: {}\n, parse {}\n", cborMapper.createParser(item.encode()).readValueAsTree(), new String(item.encode()), item.parse());
-				item = cborDecoder.next();
-			}
-		}
-		{
-			CBORParser cborParser = new CBORParser(encode);
-			Object object = cborParser.next();
-			while (object != null) {
-				logger.info("PARSED \nOBJECT: {}\n", object);
-				object = cborParser.next();
+//		logger.info("ENCODE TEST {}", new String(encode));
+		decodeCoseSign1(encode, iisKey.publicKey());
+		return encode;
+	}
+
+	private byte[] decodeCoseSign1(byte[] encode, PublicKey publicKey) throws IOException, COSEException {
+		/*
+		 * Decode
+		 */
+		CBORDecoder cborDecoder = new CBORDecoder(encode);
+		CBORItem item = cborDecoder.next();
+//		logger.info("DECODED \nCborItem: {}\n encode: {}\n, parse {}\n, all size {}\n", cborMapper.createParser(item.encode()).readValueAsTree(), new String(item.encode()), item.parse(), cborDecoder.all().size());
+		COSESign1 coseSign1 = COSESign1.build(item);
+//		while (item != null) {
+//			item = cborDecoder.next();
+//		}
+		/*
+		 * Verify signature
+		 */
+		if (publicKey != null){
+			COSEVerifier coseVerifier = new COSEVerifier(publicKey);
+			boolean verify = false;
+			try {
+				verify = coseVerifier.verify(coseSign1, null);
+//				logger.info("VERIFIER Cose Sign encode: {}\n VERIFIED: {}\n  payload: {}\n", new String(encode), verify, coseSign1.getPayload());
+			} catch (COSEException e) {
+				logger.error(e.getMessage());
 			}
 		}
 
-		return encode;
+//		CBORParser cborParser = new CBORParser(encode);
+//		Object object = cborParser.next();
+//		while (object != null) {
+//			logger.info("PARSED \nOBJECT: {}\n", object);
+//			object = cborParser.next();
+//		}
+		byte[] bytes = coseSign1.getPayload().encode();
+		/*
+		 * Removing bytes added through Cose to only get the payload
+		 */
+		return Arrays.copyOfRange(bytes,2, bytes.length);
 	}
 
 

@@ -1,9 +1,8 @@
 package org.immregistries.iis.kernal.logic.shlink.evc;
 
-import com.fasterxml.jackson.annotation.JsonGetter;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.Serializable;
 import java.text.ParseException;
@@ -19,6 +18,7 @@ import java.util.List;
 public class EvCPayload implements Serializable {
 	private static final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 	public static final String DOB = "dob";
+	public static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
 	@JsonProperty("ver")
 	private String version;
@@ -27,6 +27,10 @@ public class EvCPayload implements Serializable {
 	private Name name;
 
 //	@JsonProperty(DOB)
+	/*
+	 * See getter and setter for logic with formatting
+	 */
+	@JsonIgnore()
 	private Date dateOfBirth;
 
 	@JsonProperty("pid")
@@ -85,6 +89,15 @@ public class EvCPayload implements Serializable {
 		this.vaccinationRecords = vaccinationRecords;
 	}
 
+	@Override
+	public String toString() {
+		try {
+			return OBJECT_MAPPER.writeValueAsString(this);
+		} catch (JsonProcessingException e) {
+			return super.toString();
+		}
+	}
+
 	/**
 	 * Nested class representing the "nam" structure.
 	 */
@@ -109,6 +122,15 @@ public class EvCPayload implements Serializable {
 
 		public void setGivenName(String givenName) {
 			this.givenName = givenName;
+		}
+
+		@Override
+		public String toString() {
+			try {
+				return OBJECT_MAPPER.writeValueAsString(this);
+			} catch (JsonProcessingException e) {
+				return super.toString();
+			}
 		}
 	}
 
@@ -137,6 +159,15 @@ public class EvCPayload implements Serializable {
 
 		public void setId(String id) {
 			this.id = id;
+		}
+
+		@Override
+		public String toString() {
+			try {
+				return OBJECT_MAPPER.writeValueAsString(this);
+			} catch (JsonProcessingException e) {
+				return super.toString();
+			}
 		}
 	}
 
@@ -197,6 +228,15 @@ public class EvCPayload implements Serializable {
 
 		public void setNuvaCode(int nuvaCode) {
 			this.nuvaCode = nuvaCode;
+		}
+
+		@Override
+		public String toString() {
+			try {
+				return OBJECT_MAPPER.writeValueAsString(this);
+			} catch (JsonProcessingException e) {
+				return super.toString();
+			}
 		}
 	}
 }
