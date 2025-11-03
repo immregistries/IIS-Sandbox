@@ -95,7 +95,7 @@ public class EvcController {
 		EvCPayload evCPayload = evCUtil.toEvCPayloadFromBundle((Bundle) ipsToBeEncoded);
 
 		String qrCode = evcService.encodeQrCode(evCPayload, iisSigningKey);
-//		logger.info("qrCode {}", qrCode);
+		logger.info("qrCode {}", qrCode);
 
 		if (!pdf) {
 			resp.setContentType("image/png"); // Set content type for PNG image
@@ -104,7 +104,18 @@ public class EvcController {
 			PDDocument pdDocument = createPdf(evCPayload, qrCode.getBytes());
 			printPdf(req, resp, pdDocument, "testEvc");
 		}
-		evcService.decodeFullQrCode(qrCode.getBytes(), iisSigningKey);
+//		evcService.decodeFullQrCode(qrCode.getBytes(), iisSigningKey);
+		logger.info("TESTS");
+		String test = "6BFOXN*TS0BI$ZDZRH AENUKSIL3W8 G2RTC RIQJDA+Q910OJL102M5IPF60:5G%5TW5A 6YO6XL6Q3QR$PJZIC0JRPINSS3DN-975IPYSPKEP9/9-3APF6A46D9R%76NZ6FS9WPD6NJHZI44KA+2741HI1CSA/K6RGB1$4.J94-CB/S299/LCVK9+H0YLR$00+X4YHBLS3N.3GHTU4LCN7/:C*:47RCD.4G$PEKFZO3RXMARD*VM-H7-6K91S4 BPE1LMAWH8FO8**KS2HTZ9X$BDRFHPBZ5R:KJ6/6H4C/DHV50T.OYJA";
+		evcService.decodeFullQrCode(test.getBytes(), iisSigningKey);
+		logger.info("TESTS 2");
+		String test2 = "VC1:6BFOXN*TS0BI$ZDZRH AENUKSIL3W8 G2RTC RIQJD4$I1-0OJL395NSR:ZH-\n" +
+			"O9UVPQRHIY1VS1NQ1 WUXOE9Y431T3$KOGVV5U+%9SI6%RU/TUPRAAUIWVH$R1+ZE6%P\n" +
+			"/T1RM2JOJV 4G.K115WT0PG0QB00.I:S9M2JJHHIOI.CBPHNGG2M53%H2W58.0NW58:D\n" +
+			"9N/IZ.0SBGR:8%HPAQBI1V99S+LF Q8TTEX/H6LG9Q2.D4DS3UQ5A+I8DV DNH51TSP0\n" +
+			"FHTU4:9Q:3H6Y7R/JD UH6E:ZBBTN1RERORJ14000K96$HA";
+		evcService.decodeFullQrCode(test2.getBytes(), iisSigningKey);
+
 	}
 
 

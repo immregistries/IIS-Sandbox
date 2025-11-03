@@ -21,14 +21,15 @@ public class CompressionUtil {
 	 * Applies raw RFC1951 INFLATE decompression to a byte array.
 	 * This method expects a raw DEFLATE-compressed byte array without zlib headers or footers.
 	 *
-	 * @param input The compressed byte array.
+	 * @param input  The compressed byte array.
+	 * @param nowrap
 	 * @return The decompressed byte array.
 	 * @throws DataFormatException If the input data format is invalid.
 	 */
-	public static byte[] inflate(byte[] input) throws DataFormatException {
+	public static byte[] inflate(byte[] input, boolean nowrap) throws DataFormatException {
 		// Create a new Inflater instance with the "nowrap" parameter set to true.
 		// This indicates that the input is a raw DEFLATE stream, not a zlib stream.
-		Inflater inflater = new Inflater(true);
+		Inflater inflater = new Inflater(nowrap);
 		inflater.setInput(input);
 
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream(input.length * 2); // Initial capacity for efficiency
@@ -37,7 +38,7 @@ public class CompressionUtil {
 			byte[] buffer = new byte[1024];
 			while (!inflater.finished()) {
 				int count = inflater.inflate(buffer);
-				outputStream.write(buffer, 0, count);
+				outputStream.write(buffer, 0,  count);
 			}
 		} catch (IOException e) {
 			// Handle the exception appropriately
@@ -53,13 +54,14 @@ public class CompressionUtil {
 	 * Applies raw RFC1951 DEFLATE compression to a byte array.
 	 * This method does not include zlib or gzip headers/footers.
 	 *
-	 * @param input The uncompressed byte array.
+	 * @param input  The uncompressed byte array.
+	 * @param nowrap
 	 * @return The compressed byte array.
 	 */
-	public static byte[] deflate(byte[] input) {
+	public static byte[] deflate(byte[] input, boolean nowrap) {
 		// Create a new Deflater instance with the desired compression level.
 		// A level of 9 represents the best compression.
-		Deflater deflater = new Deflater(Deflater.BEST_COMPRESSION, true); // The `true` parameter signifies "nowrap" for raw DEFLATE.
+		Deflater deflater = new Deflater(Deflater.BEST_COMPRESSION, nowrap); // The `true` parameter signifies "nowrap" for raw DEFLATE.
 		deflater.setInput(input);
 		deflater.finish(); // Indicates that no more input data will be provided.
 

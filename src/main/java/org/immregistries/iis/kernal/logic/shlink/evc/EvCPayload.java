@@ -33,7 +33,12 @@ public class EvCPayload implements Serializable {
 	@JsonIgnore()
 	private Date dateOfBirth;
 
-	@JsonProperty("pid")
+
+	/*
+	 * Not present in CLVR anymore apparently TODO ask
+	 */
+	@JsonIgnore()
+//	@JsonProperty("pid")
 	private PersonIdentifier personIdentifier;
 
 	@JsonProperty("v")
