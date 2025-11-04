@@ -28,7 +28,7 @@ import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.model.VaccinationMaster;
 import org.immregistries.iis.kernal.model.persisted.MessageReceived;
 import org.immregistries.iis.kernal.model.persisted.Tenant;
-import org.immregistries.iis.kernal.servlet.shlink.EvcController;
+import org.immregistries.iis.kernal.servlet.shlink.CLVRController;
 import org.immregistries.iis.kernal.servlet.shlink.PatientShLinkController;
 import org.immregistries.iis.kernal.servlet.shlink.ShLinkController;
 import org.slf4j.Logger;
@@ -189,7 +189,7 @@ public class PatientController {
 			"\">Generate a new Smart Health Link with IPS</a></div>");
 		out.println("<div><a href= \"" +
 			ServletHelper.tenantifyPathWithContextPath(tenant,
-				EvcController.EVC_PATH_SUFFIX + "/" + patientMasterSelected.getPatientId()) +
+				CLVRController.CLVR_PATH_SUFFIX + "/" + patientMasterSelected.getPatientId()) +
 			"?pdf=true\">Generate a EVC with IPS</a></div>");
 	}
 

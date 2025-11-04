@@ -46,7 +46,7 @@ public class HomeController {
 	@Autowired
 	FhirContext fhirContext;
 	private final static ImmutableMap<String, String> HEADER_MAP = ImmutableMap.of(PopController.POP_PATH_KEY, "Send Now",
-		"message", "messages",
+		"message", "Messages",
 		PatientController.PATIENT_PATH_KEY, "Patients",
 			"location", "Locations",
 			ShLinkController.SHLINK_CONTROLLER_PATH_KEY, "ShLink"

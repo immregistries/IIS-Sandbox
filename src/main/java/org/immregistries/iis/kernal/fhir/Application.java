@@ -100,11 +100,4 @@ public class Application extends SpringBootServletInitializer {
 		return new RequestContextListener();
 	}
 
-	@Bean
-	public NUVA nuva() throws IOException {
-		return NUVA.load(SupportedLocale.English);
-	}
-
-
-
 }
