@@ -188,18 +188,6 @@ hapi:
     max_page_size: 200
     #    retain_cached_searches_mins: 60
     #    reuse_cached_search_results_millis: 60000
-    #    tester:
-    #      home:
-    #        id: home
-    #        name: Local Tester
-    #        server_address: 'http://localhost:8080/iis/fhir/overlay-test'
-    #        refuse_to_fetch_third_party_urls: false
-    #        fhir_version: R5
-    #      global:
-    #        name: Global Tester
-    #        server_address: "http://hapi.fhir.org/baseR5"
-    #        refuse_to_fetch_third_party_urls: false
-    #        fhir_version: R5
     #    validation:
     #      requests_enabled: true
     #      responses_enabled: true
@@ -250,6 +238,14 @@ spring:
 ---
 spring:
   config.activate.on-profile: dev
+  datasource:
+    username: sa
+    password: null
+    driverClassName: org.h2.Driver
+  jpa.properties.hibernate.dialect: ca.uhn.fhir.jpa.model.dialect.HapiFhirH2Dialect
+---
+spring:
+  config.activate.on-profile: test
   datasource:
     username: sa
     password: null

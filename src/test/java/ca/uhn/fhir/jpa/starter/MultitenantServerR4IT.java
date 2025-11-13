@@ -31,12 +31,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 		"hapi.fhir.fhir_version=r4",
 		"hapi.fhir.subscription.websocket_enabled=true",
 		"hapi.fhir.cr_enabled=false",
+		"springdoc.swagger-ui.enabled=false",
 		"hapi.fhir.mdm_enabled=true",
 		"hapi.fhir.partitioning.partitioning_include_in_search_hashes=false",
 		"hapi.fhir.partitioning.request_tenant_partitioning_mode=true",
 		"IIS_MYSQL_URL=jdbc:h2:mem/usersTenants",
-		"hibernate.dialect=ca.uhn.fhir.jpa.model.dialect.HapiFhirH2Dialect",
 		"jpa.properties.hibernate.dialect=ca.uhn.fhir.jpa.model.dialect.HapiFhirH2Dialect",
+		"hibernate.dialect=ca.uhn.fhir.jpa.model.dialect.HapiFhirH2Dialect",
+
 		"server.servlet.context-path=/iis",
 	})
 class MultitenantServerR4IT {

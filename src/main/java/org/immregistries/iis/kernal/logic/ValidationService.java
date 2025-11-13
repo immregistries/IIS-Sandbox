@@ -17,11 +17,15 @@ import org.immregistries.mqe.hl7util.SeverityLevel;
 import org.immregistries.mqe.hl7util.model.CodedWithExceptions;
 import org.immregistries.mqe.hl7util.model.Hl7Location;
 import org.immregistries.mqe.validator.MqeMessageService;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -44,42 +48,34 @@ public class ValidationService {
 	SyncHL7Validator syncHL7ValidatorQbpZ44;
 
 
-	public ValidationService() {
-
+	public ValidationService() throws IOException {
 		mqeMessageService = MqeMessageService.INSTANCE;
 
-		{
-			InputStream profileXML = ValidationService.class.getResourceAsStream("/export/VXU-Z22_Profile.xml");
-			InputStream constraintsXML = ValidationService.class.getResourceAsStream("/export/VXU-Z22_Constraints.xml");
-			InputStream vsLibraryXML = ValidationService.class.getResourceAsStream("/export/VXU-Z22_ValueSetLibrary.xml");
+		syncHL7ValidatorVxuZ22 = getSyncHL7Validator(
+			"src/main/resources/export/VXU-Z22_Profile.xml",
+			"src/main/resources/export/VXU-Z22_Constraints.xml",
+			"src/main/resources/export/VXU-Z22_ValueSetLibrary.xml");
+		syncHL7ValidatorQbpZ34 = getSyncHL7Validator(
+			"src/main/resources/export/QBP-Z34_Profile.xml",
+			"src/main/resources/export/QBP-Z34_Constraints.xml",
+			"src/main/resources/export/QBP-Z34_ValueSetLibrary.xml"
+		);
+		syncHL7ValidatorQbpZ44 = getSyncHL7Validator(
+			"src/main/resources/export/QBP-Z44_Profile.xml",
+			"src/main/resources/export/QBP-Z44_Constraints.xml",
+			"src/main/resources/export/QBP-Z44_ValueSetLibrary.xml"
+		);
+	}
 
-			Profile profile = XMLDeserializer.deserialize(profileXML).get();
-			ValueSetLibrary valueSetLibrary = ValueSetLibraryImpl.apply(vsLibraryXML).get();
-			ConformanceContext conformanceContext = DefaultConformanceContext.apply(Collections.singletonList(constraintsXML)).get();
-			syncHL7ValidatorVxuZ22 = new SyncHL7Validator(profile, valueSetLibrary, conformanceContext);
-		}
+	private static @NotNull SyncHL7Validator getSyncHL7Validator(String profilePath, String constraintsPath, String vsLibraryPath) throws IOException {
+		InputStream profileXML = Files.newInputStream(Path.of(profilePath));
+		InputStream constraintsXML = Files.newInputStream(Path.of(constraintsPath));
+		InputStream vsLibraryXML = Files.newInputStream(Path.of(vsLibraryPath));
 
-		{
-			InputStream profileXML = ValidationService.class.getResourceAsStream("/export/QBP-Z34_Profile.xml");
-			InputStream constraintsXML = ValidationService.class.getResourceAsStream("/export/QBP-Z34_Constraints.xml");
-			InputStream vsLibraryXML = ValidationService.class.getResourceAsStream("/export/QBP-Z34_ValueSetLibrary.xml");
-
-			Profile profile = XMLDeserializer.deserialize(profileXML).get();
-			ValueSetLibrary valueSetLibrary = ValueSetLibraryImpl.apply(vsLibraryXML).get();
-			ConformanceContext conformanceContext = DefaultConformanceContext.apply(Collections.singletonList(constraintsXML)).get();
-			syncHL7ValidatorQbpZ34 = new SyncHL7Validator(profile, valueSetLibrary, conformanceContext);
-		}
-
-		{
-			InputStream profileXML = ValidationService.class.getResourceAsStream("/export/QBP-Z44_Profile.xml");
-			InputStream constraintsXML = ValidationService.class.getResourceAsStream("/export/QBP-Z44_Constraints.xml");
-			InputStream vsLibraryXML = ValidationService.class.getResourceAsStream("/export/QBP-Z44_ValueSetLibrary.xml");
-
-			Profile profile = XMLDeserializer.deserialize(profileXML).get();
-			ValueSetLibrary valueSetLibrary = ValueSetLibraryImpl.apply(vsLibraryXML).get();
-			ConformanceContext conformanceContext = DefaultConformanceContext.apply(Collections.singletonList(constraintsXML)).get();
-			syncHL7ValidatorQbpZ44 = new SyncHL7Validator(profile, valueSetLibrary, conformanceContext);
-		}
+		Profile profile = XMLDeserializer.deserialize(profileXML).get();
+		ValueSetLibrary valueSetLibrary = ValueSetLibraryImpl.apply(vsLibraryXML).get();
+		ConformanceContext conformanceContext = DefaultConformanceContext.apply(Collections.singletonList(constraintsXML)).get();
+		return new SyncHL7Validator(profile, valueSetLibrary, conformanceContext);
 	}
 
 	public List<IisReportable> nistValidation(String message, String profileId) throws Exception {
