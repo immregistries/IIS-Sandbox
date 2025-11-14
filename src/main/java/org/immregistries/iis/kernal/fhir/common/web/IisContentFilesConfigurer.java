@@ -12,12 +12,12 @@ import java.net.MalformedURLException;
 
 @Configuration
 @ConditionalOnProperty(prefix = "hapi.fhir", name = "custom_content_path")
-public class CustomContentFilesConfigurer implements WebMvcConfigurer {
+public class IisContentFilesConfigurer implements WebMvcConfigurer {
 
 	public static final String CUSTOM_CONTENT = "/content";
 	private String customContentPath;
 
-	public CustomContentFilesConfigurer(AppProperties appProperties) {
+	public IisContentFilesConfigurer(AppProperties appProperties) {
 		customContentPath = appProperties.getCustom_content_path();
 		if (customContentPath.endsWith("/"))
 			customContentPath = customContentPath.substring(0, customContentPath.lastIndexOf('/'));

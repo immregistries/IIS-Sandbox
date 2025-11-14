@@ -8,7 +8,7 @@ import jakarta.validation.constraints.NotBlank;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 import org.immregistries.iis.kernal.fhir.Application;
-import org.immregistries.iis.kernal.fhir.interceptors.PartitionCreationInterceptor;
+import org.immregistries.iis.kernal.fhir.interceptors.PartitionTenantCreationInterceptor;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.model.persisted.Tenant;
 import org.immregistries.iis.kernal.model.persisted.UserAccess;
@@ -36,7 +36,7 @@ public class TenantController {
 	public static final String PARAM_TENANT_ID = "tenantId";
 
 	@Autowired
-	PartitionCreationInterceptor partitionCreationInterceptor;
+	PartitionTenantCreationInterceptor partitionTenantCreationInterceptor;
 
 	/**
 	 * Adds a new tenant from form
@@ -52,7 +52,7 @@ public class TenantController {
 		throws ServletException, IOException {
 		UserAccess userAccess = ServletHelper.getUserAccess();
 		try (Session dataSession = ServletHelper.getDataSession()) {
-			ServletHelper.authenticateTenant(userAccess, tenantName, dataSession, partitionCreationInterceptor);
+			ServletHelper.authenticateTenant(userAccess, tenantName, dataSession, partitionTenantCreationInterceptor);
 			resp.sendRedirect(Application.IIS_PATH_BASE + TENANT_BASE_PATH + "/" + tenantName + TENANT_BASE_PATH);
 		}
 		doGet(req, resp);

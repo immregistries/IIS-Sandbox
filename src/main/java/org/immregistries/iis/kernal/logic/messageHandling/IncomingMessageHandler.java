@@ -2,7 +2,7 @@ package org.immregistries.iis.kernal.logic.messageHandling;
 
 import org.hl7.fhir.instance.model.api.IIdType;
 import org.immregistries.codebase.client.CodeMap;
-import org.immregistries.iis.kernal.fhir.interceptors.PartitionCreationInterceptor;
+import org.immregistries.iis.kernal.fhir.interceptors.PartitionTenantCreationInterceptor;
 import org.immregistries.iis.kernal.logic.*;
 import org.immregistries.iis.kernal.logic.ack.IisReportable;
 import org.immregistries.iis.kernal.logic.ack.ReportableUtil;
@@ -23,7 +23,7 @@ public abstract class IncomingMessageHandler<ParsedSource, ValidationResult> imp
 
 	Logger logger = LoggerFactory.getLogger(this.getClass());
 	@Autowired
-	PartitionCreationInterceptor partitionCreationInterceptor;
+	PartitionTenantCreationInterceptor partitionTenantCreationInterceptor;
 	@Autowired
 	ValidationService validationService;
 	@Autowired
@@ -34,7 +34,7 @@ public abstract class IncomingMessageHandler<ParsedSource, ValidationResult> imp
 		/*
 		 * Anticipating the partition creation, to prevent conflict when multiple FHIR Request try to create the same partition
 		 */
-		partitionCreationInterceptor.getOrCreatePartitionId(tenant.getOrganizationName());
+		partitionTenantCreationInterceptor.getOrCreatePartitionId(tenant.getOrganizationName());
 
 		ParsedSource parsedSource = parseSource(message);
 		String messageType = extractMessageType(parsedSource);

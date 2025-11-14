@@ -3,7 +3,7 @@ package org.immregistries.iis.kernal.logic;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Session;
-import org.immregistries.iis.kernal.fhir.interceptors.PartitionCreationInterceptor;
+import org.immregistries.iis.kernal.fhir.interceptors.PartitionTenantCreationInterceptor;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.model.persisted.Tenant;
 import org.immregistries.smm.cdc.*;
@@ -14,11 +14,11 @@ import static org.immregistries.iis.kernal.fhir.security.ServletHelper.SESSION_R
 
 public abstract class BaseIISSOAPServer extends CDCWSDLServer {
 
-	private PartitionCreationInterceptor partitionCreationInterceptor;
+	private PartitionTenantCreationInterceptor partitionTenantCreationInterceptor;
 	private String tenantName;
 
-	protected BaseIISSOAPServer(PartitionCreationInterceptor partitionCreationInterceptor, String tenantNameParameter) {
-		this.partitionCreationInterceptor = partitionCreationInterceptor;
+	protected BaseIISSOAPServer(PartitionTenantCreationInterceptor partitionTenantCreationInterceptor, String tenantNameParameter) {
+		this.partitionTenantCreationInterceptor = partitionTenantCreationInterceptor;
 		this.tenantName = tenantNameParameter;
 	}
 
@@ -39,9 +39,9 @@ public abstract class BaseIISSOAPServer extends CDCWSDLServer {
 			}
 			Tenant tenant;
 			if (StringUtils.isNotBlank(tenantName)) {
-				tenant = ServletHelper.authenticateTenant(userId, password, tenantName, dataSession, partitionCreationInterceptor);
+				tenant = ServletHelper.authenticateTenant(userId, password, tenantName, dataSession, partitionTenantCreationInterceptor);
 			} else {
-				tenant = ServletHelper.authenticateTenant(userId, password, facilityId, dataSession, partitionCreationInterceptor);
+				tenant = ServletHelper.authenticateTenant(userId, password, facilityId, dataSession, partitionTenantCreationInterceptor);
 			}
 			if (tenant == null) {
 				throw new SecurityFault("Username/password combination is unrecognized");

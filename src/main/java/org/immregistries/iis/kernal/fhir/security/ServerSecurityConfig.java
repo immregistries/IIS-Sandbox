@@ -32,7 +32,7 @@ public class ServerSecurityConfig {
 	 * upgraded with AI, TODO verify
 	 */
 	@Bean
-	public SecurityFilterChain filterChain(HttpSecurity http, CustomOAuthSuccessHandler customOAuthSuccessHandler, FormAuthenticationSuccessHandler formAuthenticationSuccessHandler, RequestCache requestCache) throws Exception {
+	public SecurityFilterChain filterChain(HttpSecurity http, IisOAuthSuccessHandler iisOAuthSuccessHandler, FormAuthenticationSuccessHandler formAuthenticationSuccessHandler, RequestCache requestCache) throws Exception {
 		http
 			.requestCache(cache -> cache.requestCache(requestCache))
 			.authorizeHttpRequests((authorize) -> authorize
@@ -54,7 +54,7 @@ public class ServerSecurityConfig {
 
 			.oauth2Login((oauth2) -> oauth2
 				.defaultSuccessUrl(HomeController.HOME_BASE_PATH)
-				.successHandler(customOAuthSuccessHandler)
+				.successHandler(iisOAuthSuccessHandler)
 			)
 			.logout((logout) -> logout
 				.logoutRequestMatcher(new AntPathRequestMatcher(LOGOUT_PATH)) // Use RequestMatcher

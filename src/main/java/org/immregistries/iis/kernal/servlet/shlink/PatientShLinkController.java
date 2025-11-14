@@ -9,7 +9,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Session;
 import org.hl7.fhir.instance.model.api.IBaseResource;
-import org.immregistries.iis.kernal.fhir.interceptors.PartitionCreationInterceptor;
+import org.immregistries.iis.kernal.fhir.interceptors.PartitionTenantCreationInterceptor;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.fhir.shl.ShLinkPayload;
 import org.immregistries.iis.kernal.logic.shlink.ShLinkUtilService;
@@ -48,7 +48,7 @@ public class PatientShLinkController {
 	@Autowired
 	private PatientMapper patientMapper;
 	@Autowired
-	private PartitionCreationInterceptor partitionCreationInterceptor;
+	private PartitionTenantCreationInterceptor partitionTenantCreationInterceptor;
 
 	@GetMapping({SHLINK_QR_CODE_PATH_SUFFIX})
 	protected void doGetShLinkQrCode(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {

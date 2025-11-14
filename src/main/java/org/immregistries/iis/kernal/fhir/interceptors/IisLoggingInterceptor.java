@@ -24,14 +24,14 @@ import java.io.IOException;
 public class IisLoggingInterceptor extends LoggingInterceptor {
 
 	@Autowired
-	PartitionCreationInterceptor partitionCreationInterceptor;
+	PartitionTenantCreationInterceptor partitionTenantCreationInterceptor;
 
 	private final Logger myLogger = LoggerFactory.getLogger(IisLoggingInterceptor.class);
 
 	@Hook(Pointcut.SERVER_HANDLE_EXCEPTION)
 	@Override
 	public boolean handleException(RequestDetails theRequestDetails, BaseServerResponseException theException, HttpServletRequest theServletRequest, HttpServletResponse theServletResponse) throws ServletException, IOException {
-		this.myLogger.info("Request ID\n {}\n {}\n {}\n", theRequestDetails.getTenantId(), RequestPartitionId.defaultPartition().getPartitionNames(), partitionCreationInterceptor.partitionIdentifyRead(theRequestDetails).getFirstPartitionIdOrNull());
+		this.myLogger.info("Request ID\n {}\n {}\n {}\n", theRequestDetails.getTenantId(), RequestPartitionId.defaultPartition().getPartitionNames(), partitionTenantCreationInterceptor.partitionIdentifyRead(theRequestDetails).getFirstPartitionIdOrNull());
 
 		theException.printStackTrace();
 		this.myLogger.error(theException.toString());

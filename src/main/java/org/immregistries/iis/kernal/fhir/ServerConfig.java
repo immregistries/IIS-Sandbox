@@ -101,7 +101,7 @@ public class ServerConfig {
 	 * @param appContext                        appContext
 	 * @param theIpsOperationProvider           IPS Provider
 	 * @param mdmProviderLoader                 mdmProviderLoader
-	 * @param partitionCreationInterceptor      partitionCreationInterceptor
+	 * @param partitionTenantCreationInterceptor      partitionCreationInterceptor
 	 * @param bulkQueryGroupProvider            bulkQueryGroupProvider
 	 * @param identifierSolverInterceptor       identifierSolverInterceptor
 	 * @param groupAuthorityInterceptor         groupAuthorityInterceptor
@@ -117,7 +117,7 @@ public class ServerConfig {
 												  Optional<IpsOperationProvider> theIpsOperationProvider,
 												  Optional<MdmProviderLoader> mdmProviderLoader,
 												  Optional<DiffProvider> diffProvider,
-												  PartitionCreationInterceptor partitionCreationInterceptor,
+												  PartitionTenantCreationInterceptor partitionTenantCreationInterceptor,
 												  Optional<IBulkExportGroupProvider> bulkQueryGroupProvider,
 												  Optional<IIdentifierSolverInterceptor> identifierSolverInterceptor,
 												  Optional<GroupAuthorityInterceptor> groupAuthorityInterceptor,
@@ -289,7 +289,7 @@ public class ServerConfig {
 			 * Registered custom interceptor for automatic partition generation
 			 * Rest is dealt with in PartitionModeConfigurer.class
 			 */
-			fhirServer.registerInterceptor(partitionCreationInterceptor);
+			fhirServer.registerInterceptor(partitionTenantCreationInterceptor);
 			fhirServer.setTenantIdentificationStrategy(new UrlBaseTenantIdentificationStrategy());
 			fhirServer.registerProviders(partitionManagementProvider);
 		}

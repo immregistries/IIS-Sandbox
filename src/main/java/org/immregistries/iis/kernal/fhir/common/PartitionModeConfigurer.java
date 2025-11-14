@@ -6,7 +6,7 @@ import ca.uhn.fhir.jpa.partition.PartitionManagementProvider;
 import ca.uhn.fhir.jpa.searchparam.extractor.ISearchParamExtractor;
 import ca.uhn.fhir.rest.server.RestfulServer;
 import jakarta.annotation.PostConstruct;
-import org.immregistries.iis.kernal.fhir.interceptors.PartitionCreationInterceptor;
+import org.immregistries.iis.kernal.fhir.interceptors.PartitionTenantCreationInterceptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +33,7 @@ public class PartitionModeConfigurer {
 	private PartitionManagementProvider myPartitionManagementProvider;
 
 	@Autowired
-	private PartitionCreationInterceptor partitionCreationInterceptor;
+	private PartitionTenantCreationInterceptor partitionTenantCreationInterceptor;
 
 	@PostConstruct
 	public void start() {

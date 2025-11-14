@@ -28,7 +28,7 @@ import static org.immregistries.iis.kernal.fhir.interceptors.IisAuthorizationInt
  */
 @Component
 @Interceptor
-public class PartitionCreationInterceptor extends RequestTenantPartitionInterceptor {
+public class PartitionTenantCreationInterceptor extends RequestTenantPartitionInterceptor {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	@Autowired

@@ -34,7 +34,7 @@ import org.hl7.fhir.instance.model.api.IPrimitiveType;
 import org.hl7.fhir.r5.model.*;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR5Condition;
 import org.immregistries.iis.kernal.fhir.interceptors.IdentifierSolverInterceptorR5;
-import org.immregistries.iis.kernal.fhir.interceptors.PartitionCreationInterceptor;
+import org.immregistries.iis.kernal.fhir.interceptors.PartitionTenantCreationInterceptor;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -234,7 +234,7 @@ public class BulkExportGroupProviderR5 extends GroupResourceProvider implements 
 
 			IParser parser = fhirResourceGroupDao.getContext().newNDJsonParser();
 			RequestDetails detailsCopy = new SystemRequestDetails();
-			detailsCopy.setTenantId(PartitionCreationInterceptor.extractPartitionName(theRequestDetails));
+			detailsCopy.setTenantId(PartitionTenantCreationInterceptor.extractPartitionName(theRequestDetails));
 			for (Map.Entry<String, Bundle> entry : bundleMap.entrySet()) {
 				Binary binary = new Binary();
 				binary.setContentType("Bulk");

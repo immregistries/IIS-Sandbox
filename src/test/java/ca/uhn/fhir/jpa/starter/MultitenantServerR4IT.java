@@ -56,15 +56,15 @@ class MultitenantServerR4IT {
 	void testCreateAndReadInTenantA() {
 
 
-		// Create tenant A
-		ourClientTenantInterceptor.setTenantId("DEFAULT");
-		ourClient
-			.operation()
-			.onServer()
-			.named(ProviderConstants.PARTITION_MANAGEMENT_CREATE_PARTITION)
-			.withParameter(Parameters.class, ProviderConstants.PARTITION_MANAGEMENT_PARTITION_ID, new IntegerType(1))
-			.andParameter(ProviderConstants.PARTITION_MANAGEMENT_PARTITION_NAME, new CodeType("TENANT-A"))
-			.execute();
+//		// Create tenant A
+//		ourClientTenantInterceptor.setTenantId("DEFAULT");
+//		ourClient
+//			.operation()
+//			.onServer()
+//			.named(ProviderConstants.PARTITION_MANAGEMENT_CREATE_PARTITION)
+//			.withParameter(Parameters.class, ProviderConstants.PARTITION_MANAGEMENT_PARTITION_ID, new IntegerType(1))
+//			.andParameter(ProviderConstants.PARTITION_MANAGEMENT_PARTITION_NAME, new CodeType("TENANT-A"))
+//			.execute();
 
 
 		ourClientTenantInterceptor.setTenantId("TENANT-A");

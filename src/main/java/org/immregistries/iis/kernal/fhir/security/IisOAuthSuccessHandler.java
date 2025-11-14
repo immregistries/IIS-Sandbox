@@ -6,7 +6,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.hibernate.Session;
 import org.immregistries.iis.kernal.fhir.Application;
-import org.immregistries.iis.kernal.fhir.interceptors.PartitionCreationInterceptor;
+import org.immregistries.iis.kernal.fhir.interceptors.PartitionTenantCreationInterceptor;
 import org.immregistries.iis.kernal.model.persisted.Tenant;
 import org.immregistries.iis.kernal.servlet.HomeController;
 import org.slf4j.Logger;
@@ -23,11 +23,11 @@ import static org.immregistries.iis.kernal.fhir.security.ServletHelper.GITHUB_PR
 import static org.immregistries.iis.kernal.fhir.security.ServletHelper.SESSION_REQUEST_TENANT;
 
 @Component
-public class CustomOAuthSuccessHandler implements AuthenticationSuccessHandler {
+public class IisOAuthSuccessHandler implements AuthenticationSuccessHandler {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	@Autowired
-	PartitionCreationInterceptor partitionCreationInterceptor;
+	PartitionTenantCreationInterceptor partitionTenantCreationInterceptor;
 
 //	@Override
 //	public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication) throws IOException, ServletException {
@@ -52,7 +52,7 @@ public class CustomOAuthSuccessHandler implements AuthenticationSuccessHandler {
 					oAuth2AuthenticationToken.getPrincipal(),
 					GITHUB_PREFIX + oAuth2AuthenticationToken.getPrincipal().getAttribute("login"),
 					dataSession,
-					partitionCreationInterceptor);
+					partitionTenantCreationInterceptor);
 				dataSession.close();
 				session.setAttribute(SESSION_REQUEST_TENANT, tenant);
 			} finally {

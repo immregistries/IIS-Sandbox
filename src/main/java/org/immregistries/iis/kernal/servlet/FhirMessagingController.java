@@ -11,7 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Session;
 import org.hl7.fhir.r4.model.Bundle;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
-import org.immregistries.iis.kernal.fhir.interceptors.PartitionCreationInterceptor;
+import org.immregistries.iis.kernal.fhir.interceptors.PartitionTenantCreationInterceptor;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.logic.BaseIISSOAPServer;
 import org.immregistries.iis.kernal.logic.messageHandling.FhirMessagingHandler;
@@ -53,7 +53,7 @@ public class FhirMessagingController {
 	FhirContext fhirContext;
 
 	@Autowired
-	private PartitionCreationInterceptor partitionCreationInterceptor;
+	private PartitionTenantCreationInterceptor partitionTenantCreationInterceptor;
 
 	@PostMapping
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
@@ -156,7 +156,7 @@ public class FhirMessagingController {
 		String path = req.getPathInfo();
 		final String processorName =
 			path == null ? "" : (path.startsWith("/") ? path.substring(1) : path);
-		CDCWSDLServer server = new BaseIISSOAPServer(partitionCreationInterceptor, tenantName) {
+		CDCWSDLServer server = new BaseIISSOAPServer(partitionTenantCreationInterceptor, tenantName) {
 			@Override
 			public void process(SubmitSingleMessage ssm, PrintWriter out) throws Fault {
 

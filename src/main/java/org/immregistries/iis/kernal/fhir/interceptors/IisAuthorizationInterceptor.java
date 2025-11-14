@@ -63,7 +63,7 @@ public class IisAuthorizationInterceptor extends AuthorizationInterceptor {
 		String authHeader = theRequestDetails.getHeader("Authorization");
 		Tenant tenant = null;
 		try {
-			if (PartitionCreationInterceptor.extractPartitionName(theRequestDetails).equals(CONNECTATHON_USER)) {
+			if (PartitionTenantCreationInterceptor.extractPartitionName(theRequestDetails).equals(CONNECTATHON_USER)) {
 				if (theRequestDetails.getTenantId().endsWith("Unsafe")) {
 					return connectathonUserAuthorized(theRequestDetails, dataSession).build();
 				}
@@ -79,7 +79,7 @@ public class IisAuthorizationInterceptor extends AuthorizationInterceptor {
 				/*
 				 * Basic auth
 				 */
-				tenant = tryAuthHeaderBasic(authHeader, PartitionCreationInterceptor.extractPartitionName(theRequestDetails), dataSession);
+				tenant = tryAuthHeaderBasic(authHeader, PartitionTenantCreationInterceptor.extractPartitionName(theRequestDetails), dataSession);
 				/*
 				 * Token bearer  TODO
 				 */
@@ -93,7 +93,7 @@ public class IisAuthorizationInterceptor extends AuthorizationInterceptor {
 					 * if user authenticated, Tenant/Facility is then selected
 					 */
 					if (userAccess != null) {
-						tenant = ServletHelper.authenticateTenant(userAccess, PartitionCreationInterceptor.extractPartitionName(theRequestDetails), dataSession, null);
+						tenant = ServletHelper.authenticateTenant(userAccess, PartitionTenantCreationInterceptor.extractPartitionName(theRequestDetails), dataSession, null);
 					}
 				}
 			}

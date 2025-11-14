@@ -3,7 +3,7 @@ package org.immregistries.iis.kernal.fhir.security;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Session;
-import org.immregistries.iis.kernal.fhir.interceptors.PartitionCreationInterceptor;
+import org.immregistries.iis.kernal.fhir.interceptors.PartitionTenantCreationInterceptor;
 import org.immregistries.iis.kernal.model.persisted.Tenant;
 import org.immregistries.iis.kernal.model.persisted.UserAccess;
 import org.slf4j.Logger;
@@ -39,7 +39,7 @@ public class UsernamePasswordAuthenticationProvider implements AuthenticationPro
 	@Autowired
 	private ClientRegistrationRepository clientRegistrationRepository;
 	@Autowired
-	private PartitionCreationInterceptor partitionCreationInterceptor;
+	private PartitionTenantCreationInterceptor partitionTenantCreationInterceptor;
 
 	public Authentication authenticate(Authentication authentication) throws AuthenticationException {
 		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
@@ -47,7 +47,7 @@ public class UsernamePasswordAuthenticationProvider implements AuthenticationPro
 
 		// TODO maybe customize  "PrincipalExtractor" instead and have the userAccess/tenant as principal https://www.baeldung.com/spring-security-oauth-principal-authorities-extractor
 		if (StringUtils.isNotBlank(request.getParameter(LOGIN_PARAM_TENANT_NAME))) {
-			Tenant tenant = ServletHelper.authenticateTenant(authentication.getName(), (String) authentication.getCredentials(), request.getParameter(LOGIN_PARAM_TENANT_NAME), dataSession, partitionCreationInterceptor);
+			Tenant tenant = ServletHelper.authenticateTenant(authentication.getName(), (String) authentication.getCredentials(), request.getParameter(LOGIN_PARAM_TENANT_NAME), dataSession, partitionTenantCreationInterceptor);
 			if (tenant != null) {
 				/**
 				 * Creating a new session after login

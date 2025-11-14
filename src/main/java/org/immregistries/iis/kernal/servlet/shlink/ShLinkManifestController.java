@@ -7,7 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Session;
-import org.immregistries.iis.kernal.fhir.interceptors.PartitionCreationInterceptor;
+import org.immregistries.iis.kernal.fhir.interceptors.PartitionTenantCreationInterceptor;
 import org.immregistries.iis.kernal.fhir.security.ServletHelper;
 import org.immregistries.iis.kernal.logic.shlink.ShLinkUtilService;
 import org.immregistries.iis.kernal.model.persisted.ShLinkManifest;
@@ -32,7 +32,7 @@ public class ShLinkManifestController {
 	@Autowired
 	ShLinkUtilService shLinkUtilService;
 	@Autowired
-	PartitionCreationInterceptor partitionCreationInterceptor;
+	PartitionTenantCreationInterceptor partitionTenantCreationInterceptor;
 
 	@GetMapping("/{id}")
 	public ShLinkManifest getManifest(HttpServletRequest req, HttpServletResponse resp, @PathVariable("id") String manifestId) {
@@ -54,7 +54,7 @@ public class ShLinkManifestController {
 			try (Session dataSession = ServletHelper.getDataSession()) {
 				Tenant tenant = null;
 				{
-					tenant = ServletHelper.authenticateTenantNoUsername(passcode, tenantName, dataSession, partitionCreationInterceptor);
+					tenant = ServletHelper.authenticateTenantNoUsername(passcode, tenantName, dataSession, partitionTenantCreationInterceptor);
 					if (tenant == null) {
 						throw new AuthenticationCredentialsNotFoundException("No tenant found or invalid passcode");
 					}

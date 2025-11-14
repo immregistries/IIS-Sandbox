@@ -2,7 +2,7 @@ package org.immregistries.iis.kernal.servlet.shlink;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.immregistries.iis.kernal.fhir.interceptors.PartitionCreationInterceptor;
+import org.immregistries.iis.kernal.fhir.interceptors.PartitionTenantCreationInterceptor;
 import org.immregistries.iis.kernal.logic.shlink.IisShLinkContentService;
 import org.immregistries.iis.kernal.logic.shlink.ShLinkUtilService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +20,7 @@ public class ShLinkContentController {
 	@Autowired
 	ShLinkUtilService shLinkUtilService;
 	@Autowired
-	PartitionCreationInterceptor partitionCreationInterceptor;
+	PartitionTenantCreationInterceptor partitionTenantCreationInterceptor;
 	@Autowired
 	IisShLinkContentService iisShLinkContentService;
 

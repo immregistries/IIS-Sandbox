@@ -35,7 +35,7 @@ import org.hl7.fhir.instance.model.api.IPrimitiveType;
 import org.hl7.fhir.r4.model.IdType;
 import org.hl7.fhir.r4.model.InstantType;
 import org.hl7.fhir.r4.model.Parameters;
-import org.immregistries.iis.kernal.fhir.interceptors.PartitionCreationInterceptor;
+import org.immregistries.iis.kernal.fhir.interceptors.PartitionTenantCreationInterceptor;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
@@ -53,7 +53,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 @Component
 @Primary
-public class NewCustomBulkDataExporter extends BulkDataExportProvider {
+public class IisBulkDataExporter extends BulkDataExportProvider {
 
 	private static final Logger ourLog = getLogger(BulkDataExportProvider.class);
 
@@ -76,12 +76,12 @@ public class NewCustomBulkDataExporter extends BulkDataExportProvider {
 	private IRequestPartitionHelperSvc myRequestPartitionHelperService;
 
 	@Autowired
-	private PartitionCreationInterceptor partitionCreationInterceptor;
+	private PartitionTenantCreationInterceptor partitionTenantCreationInterceptor;
 
 	/**
 	 * Constructor
 	 */
-	public NewCustomBulkDataExporter() {
+	public IisBulkDataExporter() {
 		super();
 	}
 
@@ -119,7 +119,7 @@ public class NewCustomBulkDataExporter extends BulkDataExportProvider {
 		// JPA export provider
 		BulkDataExportUtil.validatePreferAsyncHeader(theRequestDetails, ProviderConstants.OPERATION_EXPORT);
 
-		RequestPartitionId requestPartitionId = partitionCreationInterceptor.partitionIdentifyRead(theRequestDetails);
+		RequestPartitionId requestPartitionId = partitionTenantCreationInterceptor.partitionIdentifyRead(theRequestDetails);
 		BulkExportJobParameters bulkExportJobParameters = new BulkExportJobParametersBuilder()
 			.outputFormat(theOutputFormat)
 			.resourceTypes(theType)
@@ -179,7 +179,7 @@ public class NewCustomBulkDataExporter extends BulkDataExportProvider {
 		// verify the Group exists before starting the job
 		getBulkDataExportSupport().validateTargetsExists(theRequestDetails, "Group", List.of(theIdParam));
 
-		RequestPartitionId requestPartitionId = partitionCreationInterceptor.partitionIdentifyRead(theRequestDetails);
+		RequestPartitionId requestPartitionId = partitionTenantCreationInterceptor.partitionIdentifyRead(theRequestDetails);
 		final BulkExportJobParameters bulkExportJobParameters = new BulkExportJobParametersBuilder()
 			.outputFormat(theOutputFormat)
 			.resourceTypes(theType)
@@ -325,7 +325,7 @@ public class NewCustomBulkDataExporter extends BulkDataExportProvider {
 			? new StringDt(String.join(",", getBulkDataExportSupport().getPatientCompartmentResources()))
 			: theType;
 
-		RequestPartitionId requestPartitionId = partitionCreationInterceptor.partitionIdentifyRead(theRequestDetails);
+		RequestPartitionId requestPartitionId = partitionTenantCreationInterceptor.partitionIdentifyRead(theRequestDetails);
 		BulkExportJobParameters bulkExportJobParameters = new BulkExportJobParametersBuilder()
 			.outputFormat(theOutputFormat)
 			.resourceTypes(resourceTypes)

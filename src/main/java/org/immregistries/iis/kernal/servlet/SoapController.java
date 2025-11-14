@@ -3,7 +3,7 @@
  import jakarta.servlet.ServletException;
  import jakarta.servlet.http.HttpServletRequest;
  import jakarta.servlet.http.HttpServletResponse;
- import org.immregistries.iis.kernal.fhir.interceptors.PartitionCreationInterceptor;
+ import org.immregistries.iis.kernal.fhir.interceptors.PartitionTenantCreationInterceptor;
  import org.immregistries.iis.kernal.fhir.security.ServletHelper;
  import org.immregistries.iis.kernal.logic.BaseIISSOAPServer;
  import org.immregistries.iis.kernal.logic.messageHandling.V2IncomingMessageHandler;
@@ -26,7 +26,7 @@
 	 @Autowired
 	 private V2IncomingMessageHandler handler;
 	 @Autowired
-	 private PartitionCreationInterceptor partitionCreationInterceptor;
+	 private PartitionTenantCreationInterceptor partitionTenantCreationInterceptor;
 
 	@PostMapping
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp, @PathVariable(name = PATH_VARIABLE_TENANT_NAME, required = false) String tenantName)
@@ -35,7 +35,7 @@
 		String path = req.getPathInfo();
 		final String processorName =
 			path == null ? "" : (path.startsWith("/") ? path.substring(1) : path);
-		CDCWSDLServer server = new BaseIISSOAPServer(partitionCreationInterceptor, tenantName) {
+		CDCWSDLServer server = new BaseIISSOAPServer(partitionTenantCreationInterceptor, tenantName) {
 			@Override
 			public void process(SubmitSingleMessage ssm, PrintWriter out) throws Fault {
 				String message = ssm.getHl7Message();

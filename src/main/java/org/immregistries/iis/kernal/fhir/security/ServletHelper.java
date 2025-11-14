@@ -15,7 +15,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.immregistries.iis.kernal.HibernateConfig;
 import org.immregistries.iis.kernal.fhir.Application;
-import org.immregistries.iis.kernal.fhir.interceptors.PartitionCreationInterceptor;
+import org.immregistries.iis.kernal.fhir.interceptors.PartitionTenantCreationInterceptor;
 import org.immregistries.iis.kernal.model.persisted.Tenant;
 import org.immregistries.iis.kernal.model.persisted.UserAccess;
 import org.immregistries.iis.kernal.servlet.TenantController;
@@ -105,8 +105,7 @@ public final class ServletHelper {
 	}
 
 
-
-	public static Tenant authenticateTenantNoUsername(String password, String facilityName, Session dataSession, PartitionCreationInterceptor partitionCreationInterceptor) {
+	public static Tenant authenticateTenantNoUsername(String password, String facilityName, Session dataSession, PartitionTenantCreationInterceptor partitionTenantCreationInterceptor) {
 		Query query = dataSession.createQuery("from Tenant where organizationName = ?1", Tenant.class);
 		query.setParameter(1, facilityName);
 		Tenant tenant = (Tenant) query.getSingleResult();
@@ -117,23 +116,23 @@ public final class ServletHelper {
 		String username = tenantUserAccess.getAccessName();
 
 		UserAccess userAccess = authenticateUserAccessUsernamePassword(username, password, dataSession);
-		return authenticateTenant(userAccess, facilityName, dataSession, partitionCreationInterceptor);
+		return authenticateTenant(userAccess, facilityName, dataSession, partitionTenantCreationInterceptor);
 	}
 
-	public static Tenant authenticateTenant(String username, String password, String facilityName, Session dataSession, PartitionCreationInterceptor partitionCreationInterceptor) {
+	public static Tenant authenticateTenant(String username, String password, String facilityName, Session dataSession, PartitionTenantCreationInterceptor partitionTenantCreationInterceptor) {
 		UserAccess userAccess = authenticateUserAccessUsernamePassword(username,password,dataSession);
-		return authenticateTenant(userAccess, facilityName, dataSession, partitionCreationInterceptor);
+		return authenticateTenant(userAccess, facilityName, dataSession, partitionTenantCreationInterceptor);
 	}
 
-	public static Tenant authenticateTenant(OAuth2User oAuth2User, String facilityName, Session dataSession, PartitionCreationInterceptor partitionCreationInterceptor) {
+	public static Tenant authenticateTenant(OAuth2User oAuth2User, String facilityName, Session dataSession, PartitionTenantCreationInterceptor partitionTenantCreationInterceptor) {
 		/**
 		 * First user authentication with OAUTH
 		 */
 		UserAccess userAccess = authenticateUserAccessOAuth(oAuth2User,dataSession);
-		return authenticateTenant(userAccess, facilityName, dataSession, partitionCreationInterceptor);
+		return authenticateTenant(userAccess, facilityName, dataSession, partitionTenantCreationInterceptor);
 	}
 
-	public static Tenant authenticateTenant(UserAccess userAccess, String facilityName, Session dataSession, PartitionCreationInterceptor partitionCreationInterceptor) {
+	public static Tenant authenticateTenant(UserAccess userAccess, String facilityName, Session dataSession, PartitionTenantCreationInterceptor partitionTenantCreationInterceptor) {
 		/**
 		 * Users starting with the prefix can create a user with the same name, any other use of prefix are rejected
 		 */
@@ -163,8 +162,8 @@ public final class ServletHelper {
 			}
 		} else {
 			tenant = registerTenant(facilityName, userAccess, dataSession);
-			if (partitionCreationInterceptor != null) {
-				partitionCreationInterceptor.getOrCreatePartitionId(tenant.getOrganizationName());
+			if (partitionTenantCreationInterceptor != null) {
+				partitionTenantCreationInterceptor.getOrCreatePartitionId(tenant.getOrganizationName());
 			}
 		}
 		return tenant;
