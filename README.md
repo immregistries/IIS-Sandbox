@@ -30,8 +30,9 @@ mvn clean package -Pdev && java -jar --add-opens java.base/java.lang=ALL-UNNAMED
 
 ## Dependencies not on maven repository
 
-- [Modded HAPIFHIR](https://github.com/cerbeor/hapi-fhir-Subscription-custom/tree/v6.8.3-SUB)
+- [Modded HAPIFHIR](https://github.com/cerbeor/hapi-fhir-Subscription-custom)
 - [vaccination_deduplication](https://github.com/usnistgov/vaccination_deduplication.git)
 - [MQE-validator](https://github.com/immregistries/mqe-validator)
 - [ForecastConnector](https://github.com/immregistries/VaccineForecastConnector)
 - [mismo-match](https://github.com/immregistries/mismo-match)
+- [IPS-to-CLVR](https://github.com/cerbeor/ips-to-clvr)
