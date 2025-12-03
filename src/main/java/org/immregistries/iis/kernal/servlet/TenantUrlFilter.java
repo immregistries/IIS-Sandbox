@@ -20,7 +20,8 @@ public class TenantUrlFilter extends OncePerRequestFilter {
 	private final AntPathMatcher antPathMatcher = new AntPathMatcher("/");
 
 	@Override
-	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+			throws ServletException, IOException {
 		String path = request.getServletPath();
 
 		if (!path.startsWith(TenantController.TENANT_BASE_PATH + "/")) {
@@ -35,7 +36,8 @@ public class TenantUrlFilter extends OncePerRequestFilter {
 		if (antPathMatcher.match(PATIENT_MANIFEST_FULL_PATH, path)) {
 			filterChain.doFilter(request, response);
 			return;
-		} else if (antPathMatcher.match(TenantController.TENANT_PATH + WellKnownKeyController.WELL_KNOWN_PATH_SUFFIX, path)) {
+		} else if (antPathMatcher.match(TenantController.TENANT_PATH + WellKnownKeyController.WELL_KNOWN_PATH_SUFFIX,
+				path)) {
 			filterChain.doFilter(request, response);
 			return;
 		}

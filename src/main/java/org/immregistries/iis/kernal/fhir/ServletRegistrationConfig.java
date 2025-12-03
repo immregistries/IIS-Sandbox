@@ -8,7 +8,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * Registers  Servlets and Controllers for UI and inherited IIS Sandbox V2 functionalities
+ * Registers Servlets and Controllers for UI and inherited IIS Sandbox V2
+ * functionalities
  */
 @Configuration
 public class ServletRegistrationConfig {
@@ -28,6 +29,22 @@ public class ServletRegistrationConfig {
 		registration.addUrlPatterns("/tenant/*");
 		registration.setName("tenantUrlFilter");
 		registration.setOrder(1);
+		return registration;
+	}
+
+	@Bean(name = "tenantRequestLoggingFilter")
+	public org.immregistries.iis.kernal.rest.TenantRequestLoggingFilter tenantRequestLoggingFilter() {
+		return new org.immregistries.iis.kernal.rest.TenantRequestLoggingFilter();
+	}
+
+	@Bean
+	public FilterRegistrationBean tenantRequestLoggingFilterRegistrationBean(
+			org.immregistries.iis.kernal.rest.TenantRequestLoggingFilter tenantRequestLoggingFilter) {
+		FilterRegistrationBean registration = new FilterRegistrationBean();
+		registration.setFilter(tenantRequestLoggingFilter);
+		registration.addUrlPatterns("/rest/tenant/*");
+		registration.setName("tenantRequestLoggingFilter");
+		registration.setOrder(2);
 		return registration;
 	}
 

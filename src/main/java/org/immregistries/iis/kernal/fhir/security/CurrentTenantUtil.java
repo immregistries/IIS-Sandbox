@@ -19,8 +19,11 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import java.io.IOException;
 
 import static org.immregistries.iis.kernal.servlet.TenantUrlFilter.TENANT_NAME_URL;
+import static org.immregistries.iis.kernal.rest.TenantRequestLoggingFilter.TENANT_ID_URL;
 
 public class CurrentTenantUtil {
+
+    public static final String TENANT_ID_URL = "TENANT_ID_URL";
 
     public static final String SESSION_REQUEST_TENANT = "tenant";
 
@@ -47,9 +50,13 @@ public class CurrentTenantUtil {
         final Tenant tenant;
         Tenant requestTenant = (Tenant) request.getAttribute(SESSION_REQUEST_TENANT);
         String urlTenantName = (String) request.getAttribute(TENANT_NAME_URL);
-        if (StringUtils.isBlank(urlTenantName)) {
-            tenant = requestTenant;
-        } else {
+        int urlTenantId = (int) request.getAttribute(TENANT_ID_URL);
+
+        if (urlTenantId > 0) {
+            try (Session dataSession = HibernateConfig.getDataSession()) {
+                tenant = TenantUtil.getTenantByIdAuthenticated(urlTenantId, dataSession);
+            }
+        } else if (StringUtils.isNotBlank(urlTenantName)) {
             if (requestTenant != null && StringUtils.equals(requestTenant.getOrganizationName(), urlTenantName)) {
                 tenant = requestTenant;
             } else if (existingDataSession != null) {
@@ -58,6 +65,8 @@ public class CurrentTenantUtil {
                 try (Session dataSession = HibernateConfig.getDataSession()) {
                     tenant = getTenant(urlTenantName, request, dataSession);
                 }
+        } else {
+            tenant = requestTenant;
         }
         return tenant;
     }

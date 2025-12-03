@@ -27,12 +27,6 @@ public class PatientRestController extends BaseTenantTiedRest {
             @PathVariable String patientId,
             HttpServletRequest req) {
         try (Session dataSession = HibernateConfig.getDataSession()) {
-            Tenant tenant = TenantUtil.getTenantByIdAuthenticated(tenantId, dataSession);
-            if (tenant == null) {
-                return null;
-            }
-            CurrentTenantUtil.getTenant(tenant.getOrganizationName(), req, dataSession);
-
             return fhirRequester.readAsPatientMaster(patientId);
         }
     }
