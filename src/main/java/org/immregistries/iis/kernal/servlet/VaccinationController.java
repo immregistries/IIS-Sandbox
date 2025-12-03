@@ -14,7 +14,9 @@ import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
-import org.immregistries.iis.kernal.fhir.security.ServletHelper;
+
+import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
+import org.immregistries.iis.kernal.fhir.security.TenantUtil;
 import org.immregistries.iis.kernal.logic.CodeMapManager;
 import org.immregistries.iis.kernal.mapping.interfaces.ImmunizationMapper;
 import org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester;
@@ -69,7 +71,7 @@ public class VaccinationController {
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp
 //		, @PathVariable(name = TenantController.PATH_VARIABLE_TENANT_NAME, required = false) String tenantName dealt with in filter
 	) throws ServletException, IOException {
-		Tenant tenant = ServletHelper.getTenantRedirectIfNone(req, resp);
+		Tenant tenant = CurrentTenantUtil.getTenantRedirectIfNone(req, resp);
 		IGenericClient fhirClient = repositoryClientFactory.newGenericClient(req);
 
 		resp.setContentType("text/html");
@@ -304,7 +306,7 @@ public class VaccinationController {
 				out.println("    <td>");
 				String link = "vaccination?" + VaccinationController.PARAM_VACCINATION_REPORTED_ID + "="
 					+ vaccination.getVaccinationId();
-				out.println("      <a href=\"" + ServletHelper.tenantifyPathWithContextPath(tenant, link) + "\">");
+				out.println("      <a href=\"" + TenantUtil.tenantifyPathWithContextPath(tenant, link) + "\">");
 				if (!StringUtils.isEmpty(vaccination.getVaccineCvxCode())) {
 					Code cvxCode = codeMap.getCodeForCodeset(CodesetType.VACCINATION_CVX_CODE,
 						vaccination.getVaccineCvxCode());

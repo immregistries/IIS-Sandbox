@@ -13,7 +13,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.r5.model.Immunization;
 import org.hl7.fhir.r5.model.Patient;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR5Condition;
-import org.immregistries.iis.kernal.fhir.security.ServletHelper;
+
+import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.mapping.forR5.LocationMapperR5;
 import org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester;
 import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
@@ -79,7 +80,7 @@ public class CovidController {
 		throws ServletException, IOException {
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
-		Tenant tenant = ServletHelper.getTenantRedirectIfNone(req, resp);
+		Tenant tenant = CurrentTenantUtil.getTenantRedirectIfNone(req, resp);
 		IGenericClient fhirClient = repositoryClientFactory.newGenericClient(req);
 
 

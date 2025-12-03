@@ -21,10 +21,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import static org.immregistries.iis.kernal.fhir.security.ServletHelper.SESSION_REQUEST_TENANT;
-import static org.immregistries.iis.kernal.fhir.security.ServletHelper.SESSION_USER_ACCESS;
+import org.immregistries.iis.kernal.HibernateConfig;
 import static org.immregistries.iis.kernal.servlet.LoginController.LOGIN_PARAM_TENANT_NAME;
-
 
 @Component
 public class UsernamePasswordAuthenticationProvider implements AuthenticationProvider {
@@ -42,24 +40,30 @@ public class UsernamePasswordAuthenticationProvider implements AuthenticationPro
 	private PartitionTenantCreationInterceptor partitionTenantCreationInterceptor;
 
 	public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
-		Session dataSession = ServletHelper.getDataSession();
+		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
+				.getRequest();
+		Session dataSession = HibernateConfig.getDataSession();
 
-		// TODO maybe customize  "PrincipalExtractor" instead and have the userAccess/tenant as principal https://www.baeldung.com/spring-security-oauth-principal-authorities-extractor
+		// TODO maybe customize "PrincipalExtractor" instead and have the
+		// userAccess/tenant as principal
+		// https://www.baeldung.com/spring-security-oauth-principal-authorities-extractor
 		if (StringUtils.isNotBlank(request.getParameter(LOGIN_PARAM_TENANT_NAME))) {
-			Tenant tenant = ServletHelper.authenticateTenant(authentication.getName(), (String) authentication.getCredentials(), request.getParameter(LOGIN_PARAM_TENANT_NAME), dataSession, partitionTenantCreationInterceptor);
+			Tenant tenant = TenantUtil.authenticateTenant(authentication.getName(),
+					(String) authentication.getCredentials(), request.getParameter(LOGIN_PARAM_TENANT_NAME),
+					dataSession, partitionTenantCreationInterceptor);
 			if (tenant != null) {
 				/**
 				 * Creating a new session after login
 				 */
-				request.getSession(true).setAttribute(SESSION_REQUEST_TENANT, tenant);
+				request.getSession(true).setAttribute(CurrentTenantUtil.SESSION_REQUEST_TENANT, tenant);
 				return tenant.getUserAccess();
 			} else {
 				return null;
 			}
-		} else  {
-			UserAccess userAccess = ServletHelper.authenticateUserAccessUsernamePassword(authentication.getName(), (String) authentication.getCredentials(), dataSession);
-			request.getSession(true).setAttribute(SESSION_USER_ACCESS, userAccess);
+		} else {
+			UserAccess userAccess = UserAccessUtil.authenticateUserAccessUsernamePassword(authentication.getName(),
+					(String) authentication.getCredentials(), dataSession);
+			request.getSession(true).setAttribute(UserAccessUtil.SESSION_USER_ACCESS, userAccess);
 			return userAccess;
 		}
 	}

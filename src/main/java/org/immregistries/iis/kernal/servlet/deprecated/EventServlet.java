@@ -19,7 +19,7 @@ public class EventServlet extends PopController {
 //      String password = req.getParameter(PARAM_PASSWORD);
 //      String facilityId = req.getParameter(PARAM_TENANT_NAME);
 //      HttpSession session = req.getSession(true);
-//      Tenant tenant = ServletHelper.getTenant();
+//      Tenant tenant = CurrentTenantUtil.getTenant();
 //      String ack = "";
 //      Session dataSession = getDataSession();
 //      try {
@@ -76,7 +76,7 @@ public class EventServlet extends PopController {
 //        out.println("    <div class=\"w3-container w3-half w3-margin-top\">");
 //        out.println("    <div class=\"w3-container w3-card-4\">");
 //        out.println("      <h3>Authentication</h3>");
-//        UserAccess userAccess = ServletHelper.getUserAccess();
+//        UserAccess userAccess = UserAccessUtil.getUserAccess();
 //        if (userAccess == null) {
 //          out.println("      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_USERID
 //              + "\" value=\"" + userId + "\"/>");

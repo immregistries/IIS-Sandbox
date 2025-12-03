@@ -5,7 +5,9 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.hl7.fhir.r5.model.*;
-import org.immregistries.iis.kernal.fhir.security.ServletHelper;
+
+import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
+import org.immregistries.iis.kernal.fhir.security.UserAccessUtil;
 import org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester;
 import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
 import org.immregistries.iis.kernal.model.persisted.UserAccess;
@@ -23,13 +25,13 @@ import java.io.PrintWriter;
 
 /**
  * Prototype of Servlet tool for group which would allow to
- * 	- generate accurate group for bulk and subscription
- * 	- provide option to add/remove a member
- * 	- link with a subscription
+ * - generate accurate group for bulk and subscription
+ * - provide option to add/remove a member
+ * - link with a subscription
  *
  */
 @RestController
-@RequestMapping({"/group", TenantController.TENANT_PATH + "/group"})
+@RequestMapping({ "/group", TenantController.TENANT_PATH + "/group" })
 public class GroupController {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	@Autowired
@@ -39,35 +41,38 @@ public class GroupController {
 	@Autowired
 	FhirContext fhirContext;
 
-
 	@PostMapping
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-		throws ServletException, IOException {
+			throws ServletException, IOException {
 		doGet(req, resp);
 
-		UserAccess userAccess = ServletHelper.getUserAccess();
+		UserAccess userAccess = UserAccessUtil.getUserAccess();
 		if (userAccess == null) {
 			throw new AuthenticationCredentialsNotFoundException("");
 		}
 		String orgString = req.getParameter("Organization");
-//		Reference orgReference = repositoryClientFactory.getFhirContext().newJsonParser().parseResource(Reference.class,orgString);
+		// Reference orgReference =
+		// repositoryClientFactory.getFhirContext().newJsonParser().parseResource(Reference.class,orgString);
 
 	}
 
 	@GetMapping
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-		throws ServletException, IOException {
+			throws ServletException, IOException {
 
-		UserAccess userAccess = ServletHelper.getUserAccess();
+		UserAccess userAccess = UserAccessUtil.getUserAccess();
 		if (userAccess == null) {
 			throw new AuthenticationCredentialsNotFoundException("");
 		}
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
-		HomeController.doHeader(out, "IIS Sandbox - Groups", ServletHelper.getTenant());
+		HomeController.doHeader(out, "IIS Sandbox - Groups", CurrentTenantUtil.getTenant());
 		Group group = new Group();
-		group.setManagingEntity(new Reference().setIdentifier(new Identifier().setType(new CodeableConcept(new Coding().setCode("Organization"))).setSystem("AIRA_TEST").setValue("test")));
-		group.setDescription("Generated Group in IIS sandbox, for Bulk data export use case and Synchronisation with subscription synchronisation");
+		group.setManagingEntity(new Reference()
+				.setIdentifier(new Identifier().setType(new CodeableConcept(new Coding().setCode("Organization")))
+						.setSystem("AIRA_TEST").setValue("test")));
+		group.setDescription(
+				"Generated Group in IIS sandbox, for Bulk data export use case and Synchronisation with subscription synchronisation");
 		out.println("<p>");
 		out.println(fhirContext.newJsonParser().setPrettyPrint(true).encodeResourceToString(group));
 		out.println("</p>");

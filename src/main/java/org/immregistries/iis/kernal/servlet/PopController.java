@@ -7,7 +7,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Session;
-import org.immregistries.iis.kernal.fhir.security.ServletHelper;
+
+import org.immregistries.iis.kernal.HibernateConfig;
+import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.logic.messageHandling.V2IncomingMessageHandler;
 import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
 import org.immregistries.iis.kernal.model.persisted.Tenant;
@@ -56,8 +58,8 @@ public class PopController {
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		Session dataSession = null;
 		try {
-			dataSession = ServletHelper.getDataSession();
-			Tenant tenant = ServletHelper.getTenant(req, dataSession);
+			dataSession = HibernateConfig.getDataSession();
+			Tenant tenant = CurrentTenantUtil.getTenant(req, dataSession);
 
 			String ack = "";
 			String[] messages;
@@ -123,7 +125,7 @@ public class PopController {
 	@GetMapping
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		resp.setContentType("text/html");
-		Tenant tenant = ServletHelper.getTenant(req, ServletHelper.getDataSession());
+		Tenant tenant = CurrentTenantUtil.getTenant(req, HibernateConfig.getDataSession());
 
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		try {

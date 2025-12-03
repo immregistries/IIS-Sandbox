@@ -4,7 +4,9 @@
  import jakarta.servlet.http.HttpServletRequest;
  import jakarta.servlet.http.HttpServletResponse;
  import org.immregistries.iis.kernal.fhir.interceptors.PartitionTenantCreationInterceptor;
- import org.immregistries.iis.kernal.fhir.security.ServletHelper;
+
+ import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
+ import org.immregistries.iis.kernal.fhir.security.TenantUtil;
  import org.immregistries.iis.kernal.logic.BaseIISSOAPServer;
  import org.immregistries.iis.kernal.logic.messageHandling.V2IncomingMessageHandler;
  import org.immregistries.iis.kernal.model.persisted.Tenant;
@@ -45,7 +47,7 @@
 					/*
 					 * Tenant is accessed through RequestContext, and was previously set through the authorize method of WSDL server
 					 */
-					Tenant tenant = ServletHelper.getTenant();
+					Tenant tenant = CurrentTenantUtil.getTenant();
 					if (tenant == null) {
 						throw new SecurityException("Username/password combination is unrecognized");
 					} else {
@@ -75,7 +77,7 @@
 
 			PrintWriter out = resp.getWriter();
 			try {
-				Tenant tenant = ServletHelper.getTenant();
+				Tenant tenant = CurrentTenantUtil.getTenant();
 				HomeController.doHeader(out, "IIS Sandbox", tenant);
 				out.println("<h2>CDC SOAP Endpoint</h2>");
 				out.println("<p>");
@@ -88,7 +90,7 @@
 				out.println("</p>");
 				out.println("<h2>Usage Instructions</h2>");
 				out.println("<h3>WSDL</h3>");
-				out.println("<p><a href=\"" + ServletHelper.tenantifyPathWithContextPath(tenant, "soap") + "\">See WSDL</a></p>");
+				out.println("<p><a href=\"" + TenantUtil.tenantifyPathWithContextPath(tenant, "soap") + "\">See WSDL</a></p>");
 				out.println("<h3>Authentication</h3>");
 				out.println(
 					"<p>Authentication credentials can be established by submitting a username and password to a facility "

@@ -4,7 +4,9 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import org.immregistries.iis.kernal.fhir.security.ServletHelper;
+
+import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
+import org.immregistries.iis.kernal.fhir.security.TenantUtil;
 import org.immregistries.iis.kernal.model.persisted.Tenant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
@@ -50,7 +52,7 @@ public class VXUDownloadFormController {
 
     resp.setContentType("text/html");
     PrintWriter out = new PrintWriter(resp.getOutputStream());
-	  Tenant tenant = ServletHelper.getTenant(req);
+	  Tenant tenant = CurrentTenantUtil.getTenant(req);
 	  if (tenant == null) {
 		  throw new AuthenticationCredentialsNotFoundException("");
 	  }
@@ -116,7 +118,7 @@ public class VXUDownloadFormController {
       if (generator.isFileReady()) {
         String link = "VXUDownload";
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-			out.println("<a href=\"" + ServletHelper.tenantifyPathWithContextPath(tenant, link) + "\" download=\"export"
+			out.println("<a href=\"" + TenantUtil.tenantifyPathWithContextPath(tenant, link) + "\" download=\"export"
             + sdf.format(generator.getDateEnd()) + ".vxu.txt\">Download</a>");
       }
       out.println("    </div>");

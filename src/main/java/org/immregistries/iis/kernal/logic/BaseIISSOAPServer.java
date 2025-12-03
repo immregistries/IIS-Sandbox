@@ -3,14 +3,16 @@ package org.immregistries.iis.kernal.logic;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Session;
+import org.immregistries.iis.kernal.HibernateConfig;
 import org.immregistries.iis.kernal.fhir.interceptors.PartitionTenantCreationInterceptor;
-import org.immregistries.iis.kernal.fhir.security.ServletHelper;
+
+import org.immregistries.iis.kernal.fhir.security.TenantUtil;
 import org.immregistries.iis.kernal.model.persisted.Tenant;
 import org.immregistries.smm.cdc.*;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import static org.immregistries.iis.kernal.fhir.security.ServletHelper.SESSION_REQUEST_TENANT;
+import static org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil.SESSION_REQUEST_TENANT;
 
 public abstract class BaseIISSOAPServer extends CDCWSDLServer {
 
@@ -33,15 +35,15 @@ public abstract class BaseIISSOAPServer extends CDCWSDLServer {
 		String userId = ssm.getUsername();
 		String password = ssm.getPassword();
 		String facilityId = ssm.getFacilityID();
-		try (Session dataSession = ServletHelper.getDataSession()) {
+		try (Session dataSession = HibernateConfig.getDataSession()) {
 			if ("NPE".equals(userId) && "NPE".equals(password)) {
 				throw new UnknownFault("Unknown Fault");
 			}
 			Tenant tenant;
 			if (StringUtils.isNotBlank(tenantName)) {
-				tenant = ServletHelper.authenticateTenant(userId, password, tenantName, dataSession, partitionTenantCreationInterceptor);
+				tenant = TenantUtil.authenticateTenant(userId, password, tenantName, dataSession, partitionTenantCreationInterceptor);
 			} else {
-				tenant = ServletHelper.authenticateTenant(userId, password, facilityId, dataSession, partitionTenantCreationInterceptor);
+				tenant = TenantUtil.authenticateTenant(userId, password, facilityId, dataSession, partitionTenantCreationInterceptor);
 			}
 			if (tenant == null) {
 				throw new SecurityFault("Username/password combination is unrecognized");

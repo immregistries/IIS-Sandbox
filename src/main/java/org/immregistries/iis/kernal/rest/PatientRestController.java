@@ -4,11 +4,11 @@ import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
 import jakarta.servlet.http.HttpServletRequest;
 import org.hibernate.Session;
 
-import org.immregistries.iis.kernal.fhir.security.ServletHelper;
-import org.immregistries.iis.kernal.mapping.internalClient.IFhirRequester;
+import org.immregistries.iis.kernal.HibernateConfig;
+import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
+import org.immregistries.iis.kernal.fhir.security.TenantUtil;
 import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.model.persisted.Tenant;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,23 +19,19 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/rest/tenant/{tenantId}/patientMaster")
-public class PatientRestController {
-
-    @Autowired
-    @SuppressWarnings("rawtypes")
-    private IFhirRequester fhirRequester;
+public class PatientRestController extends BaseTenantTiedRest {
 
     @GetMapping("/{patientId}")
     public PatientMaster getPatient(
             @PathVariable int tenantId,
             @PathVariable String patientId,
             HttpServletRequest req) {
-        try (Session dataSession = ServletHelper.getDataSession()) {
-            Tenant tenant = ServletHelper.getTenant(tenantId, dataSession);
+        try (Session dataSession = HibernateConfig.getDataSession()) {
+            Tenant tenant = TenantUtil.getTenantByIdAuthenticated(tenantId, dataSession);
             if (tenant == null) {
                 return null;
             }
-            ServletHelper.getTenant(tenant.getOrganizationName(), req, dataSession);
+            CurrentTenantUtil.getTenant(tenant.getOrganizationName(), req, dataSession);
 
             return fhirRequester.readAsPatientMaster(patientId);
         }
@@ -45,12 +41,12 @@ public class PatientRestController {
     public List<PatientMaster> getAllPatients(
             @PathVariable int tenantId,
             HttpServletRequest req) {
-        try (Session dataSession = ServletHelper.getDataSession()) {
-            Tenant tenant = ServletHelper.getTenant(tenantId, dataSession);
+        try (Session dataSession = HibernateConfig.getDataSession()) {
+            Tenant tenant = TenantUtil.getTenantByIdAuthenticated(tenantId, dataSession);
             if (tenant == null) {
                 return new ArrayList<>();
             }
-            ServletHelper.getTenant(tenant.getOrganizationName(), req, dataSession);
+            CurrentTenantUtil.getTenant(tenant.getOrganizationName(), req, dataSession);
 
             @SuppressWarnings("unchecked")
             List<PatientMaster> result = fhirRequester.searchPatientMasterGoldenList(new SearchParameterMap());

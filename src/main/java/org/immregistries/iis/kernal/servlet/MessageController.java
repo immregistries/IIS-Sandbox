@@ -5,7 +5,9 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.hibernate.Session;
-import org.immregistries.iis.kernal.fhir.security.ServletHelper;
+
+import org.immregistries.iis.kernal.HibernateConfig;
+import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.model.persisted.MessageReceived;
 import org.immregistries.iis.kernal.model.persisted.Tenant;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -50,10 +52,10 @@ public class MessageController {
 
     resp.setContentType("text/html");
     PrintWriter out = new PrintWriter(resp.getOutputStream());
-	  try (Session dataSession = ServletHelper.getDataSession()) {
+	  try (Session dataSession = HibernateConfig.getDataSession()) {
 		  String messageError = null;
 		  String messageConfirmation = null;
-		  HomeController.doHeader(out, "IIS Sandbox", ServletHelper.getTenant());
+		  HomeController.doHeader(out, "IIS Sandbox");
 		  if (messageError != null) {
 			  out.println("  <div class=\"w3-panel w3-red\">");
 			  out.println("    <p>" + messageError + "</p>");
@@ -65,7 +67,7 @@ public class MessageController {
 			  out.println("  </div>");
 		  }
 
-		  Tenant tenant = ServletHelper.getTenant();
+		  Tenant tenant = CurrentTenantUtil.getTenant();
 		  if (tenant != null) {
 			  out.println("    <div class=\"w3-container w3-half w3-margin-top\">");
 			  out.println("    <h2>Facility: " + tenant.getOrganizationName() + "</h2>");

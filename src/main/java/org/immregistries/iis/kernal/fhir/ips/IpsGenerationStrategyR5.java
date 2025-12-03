@@ -11,7 +11,8 @@ import org.hl7.fhir.instance.model.api.IBaseBundle;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.instance.model.api.IIdType;
 import org.hl7.fhir.r5.model.*;
-import org.immregistries.iis.kernal.fhir.security.ServletHelper;
+
+import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.mapping.forR5.OrganizationMapperR5;
 import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,7 +77,7 @@ public class IpsGenerationStrategyR5 extends DefaultJpaIpsGenerationStrategy imp
 
 	@Override
 	public IBaseResource createAuthor() {
-		Organization organization = organizationMapper.getFhirResource(ServletHelper.getTenant());
+		Organization organization = organizationMapper.getFhirResource(CurrentTenantUtil.getTenant());
 		return organization;
 	}
 

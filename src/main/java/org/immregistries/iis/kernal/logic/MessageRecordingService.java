@@ -2,7 +2,7 @@ package org.immregistries.iis.kernal.logic;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.immregistries.iis.kernal.fhir.security.ServletHelper;
+import org.immregistries.iis.kernal.HibernateConfig;
 import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.model.persisted.MessageReceived;
 import org.immregistries.iis.kernal.model.persisted.Tenant;
@@ -23,20 +23,23 @@ public class MessageRecordingService {
 	public MessageRecordingService() {
 	}
 
-	public void recordMessageReceived(String message, PatientMaster patient, String messageResponse, String categoryRequest, String categoryResponse, Tenant tenant) {
-		MessageReceived messageReceived = getMessageReceived(message, patient, messageResponse, categoryRequest, categoryResponse, tenant);
+	public void recordMessageReceived(String message, PatientMaster patient, String messageResponse,
+			String categoryRequest, String categoryResponse, Tenant tenant) {
+		MessageReceived messageReceived = getMessageReceived(message, patient, messageResponse, categoryRequest,
+				categoryResponse, tenant);
 		recordMessageReceived(messageReceived);
 	}
 
 	private void recordMessageReceived(MessageReceived messageReceived) {
-		try (Session dataSession = ServletHelper.getDataSession()) {
+		try (Session dataSession = HibernateConfig.getDataSession()) {
 			Transaction transaction = dataSession.beginTransaction();
 			dataSession.persist(messageReceived);
 			transaction.commit();
 		}
 	}
 
-	private static @NotNull MessageReceived getMessageReceived(String message, PatientMaster patient, String messageResponse, String categoryRequest, String categoryResponse, Tenant tenant) {
+	private static @NotNull MessageReceived getMessageReceived(String message, PatientMaster patient,
+			String messageResponse, String categoryRequest, String categoryResponse, Tenant tenant) {
 		MessageReceived messageReceived = new MessageReceived();
 		messageReceived.setTenant(tenant);
 		messageReceived.setMessageRequest(message);

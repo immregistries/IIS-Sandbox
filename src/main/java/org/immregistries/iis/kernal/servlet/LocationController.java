@@ -7,7 +7,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Session;
-import org.immregistries.iis.kernal.fhir.security.ServletHelper;
+
+import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.mapping.interfaces.LocationMapper;
 import org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester;
 import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
@@ -79,7 +80,7 @@ public class LocationController {
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
 		throws ServletException, IOException {
 
-		Tenant tenant = ServletHelper.getTenantRedirectIfNone(req, resp);
+		Tenant tenant = CurrentTenantUtil.getTenantRedirectIfNone(req, resp);
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 //    Session dataSession = PopServlet.getDataSession();
@@ -139,7 +140,7 @@ public class LocationController {
 			List<OrgLocation> orgLocationList = null;
 			orgLocationList = fhirRequests.searchOrgLocationList(new SearchParameterMap());
 
-			HomeController.doHeader(out, "IIS Sandbox", ServletHelper.getTenant());
+			HomeController.doHeader(out, "IIS Sandbox");
 
 			out.println("    <h2>Facility</h2>");
 			if (orgLocationSelected == null) {

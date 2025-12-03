@@ -10,7 +10,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Session;
 import org.hl7.fhir.r5.model.Immunization;
 import org.hl7.fhir.r5.model.Patient;
-import org.immregistries.iis.kernal.fhir.security.ServletHelper;
+
+import org.immregistries.iis.kernal.HibernateConfig;
 import org.immregistries.iis.kernal.logic.IExampleMessageWriter;
 import org.immregistries.iis.kernal.mapping.internalClient.FhirRequesterR5;
 import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
@@ -104,7 +105,7 @@ public class VXUDownloadGenerator extends Thread {
 
   public VXUDownloadGenerator(HttpServletRequest req, Tenant tenant) {
     runningMessage = "Initializing";
-	  this.dataSession = ServletHelper.getDataSession();
+	  this.dataSession = HibernateConfig.getDataSession();
 	 this.tenant = tenant;
     sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
     messageError = null;

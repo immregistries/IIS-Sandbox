@@ -3,7 +3,8 @@ package org.immregistries.iis.kernal.servlet;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.immregistries.iis.kernal.fhir.security.ServletHelper;
+
+import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
 import org.immregistries.mqe.hl7util.parser.HL7Reader;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -190,7 +191,7 @@ public class LabController {
           }
         }
       }
-		 HomeController.doHeader(out, "IIS Sandbox", ServletHelper.getTenant(req));
+		 HomeController.doHeader(out, "IIS Sandbox", CurrentTenantUtil.getTenant(req));
 
 
 

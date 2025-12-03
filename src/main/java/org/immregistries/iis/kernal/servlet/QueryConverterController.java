@@ -4,7 +4,8 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.hibernate.SessionFactory;
-import org.immregistries.iis.kernal.fhir.security.ServletHelper;
+
+import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
 import org.immregistries.smm.tester.manager.query.QueryConverter;
 import org.immregistries.smm.tester.manager.query.QueryType;
 import org.immregistries.smm.transform.ScenarioManager;
@@ -59,7 +60,7 @@ public class QueryConverterController {
         message = queryConverter.convert(message);
       }
       {
-			HomeController.doHeader(out, "IIS Sandbox", ServletHelper.getTenant());
+			HomeController.doHeader(out, "IIS Sandbox");
 			out.println("    <h2>Convert VXU to QBP</h2>");
         out.println("    <form action=\"queryConverter\" method=\"POST\">");
         if (queryConverter == null) {

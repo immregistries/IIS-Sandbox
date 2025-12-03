@@ -15,7 +15,7 @@ import org.hibernate.Transaction;
 import org.hl7.fhir.instance.model.api.IBaseBundle;
 import org.hl7.fhir.instance.model.api.IIdType;
 import org.immregistries.iis.kernal.fhir.Application;
-import org.immregistries.iis.kernal.fhir.security.ServletHelper;
+import org.immregistries.iis.kernal.HibernateConfig;
 import org.immregistries.iis.kernal.fhir.shl.ShLinkPayload;
 import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
 import org.immregistries.iis.kernal.model.PatientMaster;
@@ -45,7 +45,6 @@ import static org.immregistries.iis.kernal.servlet.shlink.ShLinkManifestControll
 
 @Service
 public class ShLinkUtilService {
-
 
 	private static final Logger logger = LoggerFactory.getLogger(ShLinkUtilService.class);
 
@@ -91,7 +90,6 @@ public class ShLinkUtilService {
 		return generateManifest(tenant, patientLocation);
 	}
 
-
 	public ShLinkManifest generateManifest(Tenant tenant, String fhirLocation) {
 		ShLinkManifest shLinkManifest = generateManifest(tenant);
 		ShLinkManifest.FileManifest fileManifest = generateFhirFileManifest();
@@ -104,9 +102,10 @@ public class ShLinkUtilService {
 		ShLinkManifest shLinkManifest = new ShLinkManifest();
 		shLinkManifest.setTenant(tenant);
 		shLinkManifest.setStatus("finalized");
-//		ShLinkManifest.FileManifest fileManifest = generateFhirFileManifest();
-//		shLinkManifest.addFiles(fileManifest);
-//		fileManifest.setLocation("/fhir/" + tenant.getOrganizationName() + "/Patient?identifier=test");
+		// ShLinkManifest.FileManifest fileManifest = generateFhirFileManifest();
+		// shLinkManifest.addFiles(fileManifest);
+		// fileManifest.setLocation("/fhir/" + tenant.getOrganizationName() +
+		// "/Patient?identifier=test");
 		return shLinkManifest;
 	}
 
@@ -121,7 +120,7 @@ public class ShLinkUtilService {
 		if (StringUtils.isBlank(shLinkManifest.getId())) {
 			shLinkManifest.setId(UUID.randomUUID().toString());
 		}
-		try (Session dataSession = ServletHelper.getDataSession()) {
+		try (Session dataSession = HibernateConfig.getDataSession()) {
 			Transaction transaction = dataSession.beginTransaction();
 			dataSession.persist(shLinkManifest);
 			transaction.commit();
@@ -131,7 +130,7 @@ public class ShLinkUtilService {
 
 	public ShLinkManifest readShLinkManifest(String manifestId) {
 		ShLinkManifest shLinkManifest;
-		try (Session dataSession = ServletHelper.getDataSession()) {
+		try (Session dataSession = HibernateConfig.getDataSession()) {
 			Query query = dataSession.createQuery("from ShLinkManifest where id = :id", ShLinkManifest.class);
 			query.setParameter("id", manifestId);
 			shLinkManifest = (ShLinkManifest) query.getSingleResult();
@@ -142,7 +141,7 @@ public class ShLinkUtilService {
 	public String qrCode(ShLinkPayload shLinkPayload) {
 		Gson gson = new Gson();
 		String payload = gson.toJson(shLinkPayload);
-//		String minified = payload.trim();
+		// String minified = payload.trim();
 		Base64URL base64URL = Base64URL.encode(payload);
 		return SHLINK_PREFIX + base64URL;
 	}
@@ -158,8 +157,9 @@ public class ShLinkUtilService {
 		}
 	}
 
-
-	public String generateShLinkUrlForShCards(List<IBaseBundle> bundleList, ShLinkPayload shLinkPayload, HttpServletRequest req, IisKey iisSigningKey, SecretKeySpec encryptionKey, UserAccess userAccess, Tenant tenant) throws IOException {
+	public String generateShLinkUrlForShCards(List<IBaseBundle> bundleList, ShLinkPayload shLinkPayload,
+			HttpServletRequest req, IisKey iisSigningKey, SecretKeySpec encryptionKey, UserAccess userAccess,
+			Tenant tenant) throws IOException {
 		String url;
 		UriComponentsBuilder builder = ServletUriComponentsBuilder.fromRequest(req);
 
@@ -174,11 +174,11 @@ public class ShLinkUtilService {
 		shLinkFilePayload.setVerifiableCredential(verifiableCredentials);
 
 		String encryptedContent = Jwts.builder()
-			.content(CompressionUtil
-				.minifyJson(shLinkFilePayload))
-			.header().add("cty", APPLICATION_SMART_HEALTH_CARD_CONTENT_TYPE)
-			.and()
-			.encryptWith(encryptionKey, Jwts.ENC.A256GCM).compact(); // Alg specified in Smart health card IG
+				.content(CompressionUtil
+						.minifyJson(shLinkFilePayload))
+				.header().add("cty", APPLICATION_SMART_HEALTH_CARD_CONTENT_TYPE)
+				.and()
+				.encryptWith(encryptionKey, Jwts.ENC.A256GCM).compact(); // Alg specified in Smart health card IG
 
 		/*
 		 * Direct file
@@ -189,10 +189,11 @@ public class ShLinkUtilService {
 			iisShLinkContent.setExp(shLinkPayload.getExp().orElse(10000000L));
 			iisShLinkContent.setContent(encryptedContent);
 			iisShLinkContentService.saveIisShLinkContent(iisShLinkContent);
-			builder.replacePath(Application.IIS_PATH_BASE + ShLinkContentController.SHLINK_CONTENT_PATH + "/{contentId}");
+			builder.replacePath(
+					Application.IIS_PATH_BASE + ShLinkContentController.SHLINK_CONTENT_PATH + "/{contentId}");
 			url = builder
-				.build(Map.of("contentId", iisShLinkContent.getId()))
-				.toURL().toString();
+					.build(Map.of("contentId", iisShLinkContent.getId()))
+					.toURL().toString();
 		} else {
 			/*
 			 * Manifest
@@ -210,8 +211,8 @@ public class ShLinkUtilService {
 
 			builder.replacePath(Application.IIS_PATH_BASE + SHLINKS_CONTROLLER_BASE_URL + "/{manifestId}");
 			url = builder
-				.build(Map.of("manifestId", shLinkManifest.getId()))
-				.toURL().toString();
+					.build(Map.of("manifestId", shLinkManifest.getId()))
+					.toURL().toString();
 		}
 		return url;
 	}
@@ -222,6 +223,5 @@ public class ShLinkUtilService {
 		secureRandom.nextBytes(randomBytes);
 		return new SecretKeySpec(randomBytes, "AES");
 	}
-
 
 }

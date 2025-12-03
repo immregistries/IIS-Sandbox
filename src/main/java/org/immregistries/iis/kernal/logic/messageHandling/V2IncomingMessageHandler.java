@@ -8,7 +8,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.instance.model.api.IIdType;
 import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.iis.kernal.SoftwareVersion;
-import org.immregistries.iis.kernal.fhir.security.ServletHelper;
+
+import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.logic.*;
 import org.immregistries.iis.kernal.logic.ack.*;
 import org.immregistries.iis.kernal.logic.logicInterceptors.ImmunizationProcessingInterceptor;
@@ -193,7 +194,7 @@ public abstract class V2IncomingMessageHandler extends IncomingMessageHandler<HL
 			sendersUniqueId = "MSH-10 NOT VALUED";
 		}
 		data.setReceivingApplication(receivingApp.toString());
-		data.setReceivingFacility(ServletHelper.getTenant().getOrganizationName());
+		data.setReceivingFacility(CurrentTenantUtil.getTenant().getOrganizationName());
 
 		data.setMessageControlId(sendersUniqueId);
 		data.setMessageDate(header.getMessageDate());

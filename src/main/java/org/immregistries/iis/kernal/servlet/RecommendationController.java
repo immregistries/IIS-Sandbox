@@ -10,7 +10,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.instance.model.api.IBaseBundle;
 import org.hl7.fhir.instance.model.api.IDomainResource;
-import org.immregistries.iis.kernal.fhir.security.ServletHelper;
+
+import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.logic.IImmunizationRecommendationService;
 import org.immregistries.iis.kernal.mapping.interfaces.PatientMapper;
 import org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester;
@@ -63,7 +64,7 @@ public class RecommendationController {
 //		, @PathVariable(name = TenantController.PATH_VARIABLE_TENANT_NAME, required = false) String tenantName dealt with in filter
 	)
 		throws ServletException, IOException {
-		Tenant tenant = ServletHelper.getTenantRedirectIfNone(req, resp);
+		Tenant tenant = CurrentTenantUtil.getTenantRedirectIfNone(req, resp);
 		IGenericClient fhirClient = repositoryClientFactory.newGenericClient(req);
 		IDomainResource patient = PatientServletUtil.fetchPatientFromParameter(req, fhirClient, fhirRequester);
 		PatientMaster patientMaster = patientMapper.localObject(patient);
@@ -103,7 +104,7 @@ public class RecommendationController {
 	 */
 	@PutMapping
 	protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		ServletHelper.getTenantRedirectIfNone(req, resp);
+		CurrentTenantUtil.getTenantRedirectIfNone(req, resp);
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		try {
 			IParser parser = repositoryClientFactory.getFhirContext()
@@ -143,7 +144,7 @@ public class RecommendationController {
 	 */
 	@GetMapping
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		Tenant tenant = ServletHelper.getTenantRedirectIfNone(req, resp);
+		Tenant tenant = CurrentTenantUtil.getTenantRedirectIfNone(req, resp);
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		HomeController.doHeader(out, "Recommendations", tenant);

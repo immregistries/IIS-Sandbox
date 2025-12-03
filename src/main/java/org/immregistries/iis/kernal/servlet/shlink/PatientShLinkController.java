@@ -9,8 +9,10 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Session;
 import org.hl7.fhir.instance.model.api.IBaseResource;
+import org.immregistries.iis.kernal.HibernateConfig;
 import org.immregistries.iis.kernal.fhir.interceptors.PartitionTenantCreationInterceptor;
-import org.immregistries.iis.kernal.fhir.security.ServletHelper;
+
+import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.fhir.shl.ShLinkPayload;
 import org.immregistries.iis.kernal.logic.shlink.ShLinkUtilService;
 import org.immregistries.iis.kernal.mapping.interfaces.PatientMapper;
@@ -56,8 +58,8 @@ public class PatientShLinkController {
 //		PrintWriter out = new PrintWriter(outputStream);
 		resp.setContentType("image/png"); // Set content type for PNG image
 
-		try (Session dataSession = ServletHelper.getDataSession()) {
-			Tenant tenant = ServletHelper.getTenantRedirectIfNone(req, resp, dataSession);
+		try (Session dataSession = HibernateConfig.getDataSession()) {
+			Tenant tenant = CurrentTenantUtil.getTenantRedirectIfNone(req, resp, dataSession);
 			IGenericClient fhirClient = repositoryClientFactory.newGenericClient(req);
 			IBaseResource patientSelected = fetchPatientFromParameter(req, fhirClient, fhirRequester);
 			if (patientSelected != null) {

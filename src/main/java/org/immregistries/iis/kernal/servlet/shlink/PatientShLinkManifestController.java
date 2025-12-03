@@ -8,8 +8,11 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Session;
 import org.hl7.fhir.instance.model.api.IBaseResource;
+import org.immregistries.iis.kernal.HibernateConfig;
 import org.immregistries.iis.kernal.fhir.interceptors.PartitionTenantCreationInterceptor;
-import org.immregistries.iis.kernal.fhir.security.ServletHelper;
+
+import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
+import org.immregistries.iis.kernal.fhir.security.TenantUtil;
 import org.immregistries.iis.kernal.logic.shlink.ShLinkUtilService;
 import org.immregistries.iis.kernal.mapping.interfaces.PatientMapper;
 import org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester;
@@ -59,10 +62,10 @@ public class PatientShLinkManifestController {
 																		@RequestBody ShLinkManifestRequestBody body) throws IOException, ServletException {
 		String passcode = body.getPasscode();
 		resp.setContentType("application/json");
-		try (Session dataSession = ServletHelper.getDataSession()) {
+		try (Session dataSession = HibernateConfig.getDataSession()) {
 			Tenant tenant = null;
 			if (StringUtils.isNotBlank(passcode)) {
-				tenant = ServletHelper.authenticateTenantNoUsername(passcode, tenantName, dataSession, partitionTenantCreationInterceptor);
+				tenant = TenantUtil.authenticateTenantNoUsername(passcode, tenantName, dataSession, partitionTenantCreationInterceptor);
 			}
 			if (tenant == null) {
 				throw new AuthenticationCredentialsNotFoundException("No tenant found or invalid passcode");
@@ -80,8 +83,8 @@ public class PatientShLinkManifestController {
 																	  @RequestParam(value = "embeddedLengthMax", required = false) String embeddedLengthMax
 	) throws IOException, ServletException {
 		resp.setContentType("application/json");
-		try (Session dataSession = ServletHelper.getDataSession()) {
-			Tenant tenant = ServletHelper.getTenantRedirectIfNone(req, resp, dataSession);
+		try (Session dataSession = HibernateConfig.getDataSession()) {
+			Tenant tenant = CurrentTenantUtil.getTenantRedirectIfNone(req, resp, dataSession);
 			return getShLinkManifest(req, id, tenant);
 		}
 	}

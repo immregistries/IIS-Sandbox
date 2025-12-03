@@ -11,9 +11,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.hibernate.Session;
 import org.hl7.fhir.r5.model.*;
+import org.immregistries.iis.kernal.HibernateConfig;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR5Condition;
 import org.immregistries.iis.kernal.fhir.interceptors.PartitionTenantCreationInterceptor;
-import org.immregistries.iis.kernal.fhir.security.ServletHelper;
+
+import org.immregistries.iis.kernal.fhir.security.TenantUtil;
+import org.immregistries.iis.kernal.fhir.security.UserAccessUtil;
 import org.immregistries.iis.kernal.model.persisted.Tenant;
 import org.immregistries.iis.kernal.model.persisted.UserAccess;
 import org.slf4j.Logger;
@@ -68,8 +71,8 @@ public class MacroEndpointControllerR5 {
 
 		Bundle facilityBundle = fhirContext.newJsonParser().parseResource(Bundle.class,req.getReader());
 		ServletRequestDetails requestDetails;
-		UserAccess userAccess = ServletHelper.getUserAccess();
-		Session dataSession = ServletHelper.getDataSession();
+		UserAccess userAccess = UserAccessUtil.getUserAccess();
+		Session dataSession = HibernateConfig.getDataSession();
 		Tenant tenant = null;
 		/**
 		 * one and only one organization must be specified in bundle
@@ -81,7 +84,7 @@ public class MacroEndpointControllerR5 {
 					if (tenant != null) {
 						throw new InvalidRequestException("More than one organization present");
 					}
-					tenant = ServletHelper.authenticateTenant(userAccess, ((Organization) entry.getResource()).getName(), dataSession, partitionTenantCreationInterceptor);
+					tenant = TenantUtil.authenticateTenant(userAccess, ((Organization) entry.getResource()).getName(), dataSession, partitionTenantCreationInterceptor);
 				}
 			}
 		} finally {

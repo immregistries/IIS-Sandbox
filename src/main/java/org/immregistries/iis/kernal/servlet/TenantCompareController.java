@@ -21,8 +21,12 @@ import org.hibernate.Session;
 import org.hl7.fhir.instance.model.api.IBaseParameters;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.BooleanType;
+import org.immregistries.iis.kernal.HibernateConfig;
 import org.immregistries.iis.kernal.fhir.CrossTenantDiffProvider;
-import org.immregistries.iis.kernal.fhir.security.ServletHelper;
+
+import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
+import org.immregistries.iis.kernal.fhir.security.TenantUtil;
+import org.immregistries.iis.kernal.fhir.security.UserAccessUtil;
 import org.immregistries.iis.kernal.model.persisted.Tenant;
 import org.immregistries.iis.kernal.model.persisted.UserAccess;
 import org.slf4j.Logger;
@@ -86,14 +90,14 @@ public class TenantCompareController {
 		logger.info("Testing Tenant comparison");
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
-		HomeController.doHeader(out, "Tenant Comparison", ServletHelper.getTenant(req));
-		try (Session dataSession = ServletHelper.getDataSession()) {
-			UserAccess userAccess = ServletHelper.getUserAccess();
+		HomeController.doHeader(out, "Tenant Comparison", CurrentTenantUtil.getTenant(req));
+		try (Session dataSession = HibernateConfig.getDataSession()) {
+			UserAccess userAccess = UserAccessUtil.getUserAccess();
 			if (userAccess == null) {
 				throw new AuthenticationCredentialsNotFoundException("");
 			}
 
-			List<Tenant> tenantList = Arrays.stream(tenantNames).distinct().map(tenantName -> ServletHelper.authenticateTenant(userAccess, tenantName, dataSession, null)).collect(Collectors.toList());
+			List<Tenant> tenantList = Arrays.stream(tenantNames).distinct().map(tenantName -> TenantUtil.authenticateTenant(userAccess, tenantName, dataSession, null)).collect(Collectors.toList());
 
 			List<SystemRequestDetails> systemRequestDetailsList = tenantList.stream().map(tenant -> {
 				SystemRequestDetails systemRequestDetails = new SystemRequestDetails();

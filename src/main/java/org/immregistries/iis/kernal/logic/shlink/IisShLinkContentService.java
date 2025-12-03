@@ -3,7 +3,8 @@ package org.immregistries.iis.kernal.logic.shlink;
 import jakarta.persistence.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.immregistries.iis.kernal.fhir.security.ServletHelper;
+
+import org.immregistries.iis.kernal.HibernateConfig;
 import org.immregistries.iis.kernal.model.persisted.IisShLinkContent;
 import org.immregistries.iis.kernal.model.persisted.UserAccess;
 import org.springframework.stereotype.Service;
@@ -12,7 +13,7 @@ import org.springframework.stereotype.Service;
 public class IisShLinkContentService {
 
 	public IisShLinkContent getContent(String contentId, UserAccess userAccess) {
-		try (Session dataSession = ServletHelper.getDataSession()) {
+		try (Session dataSession = HibernateConfig.getDataSession()) {
 			Query query = dataSession.createQuery(
 				"from IisShLinkContent where userAccess = :user and id = :id", IisShLinkContent.class);
 			query.setParameter("user", userAccess);
@@ -22,7 +23,7 @@ public class IisShLinkContentService {
 	}
 
 	public IisShLinkContent getContent(String contentId) {
-		try (Session dataSession = ServletHelper.getDataSession()) {
+		try (Session dataSession = HibernateConfig.getDataSession()) {
 			Query query = dataSession.createQuery(
 				"from IisShLinkContent where id = :id", IisShLinkContent.class);
 			query.setParameter("id", contentId);
@@ -31,7 +32,7 @@ public class IisShLinkContentService {
 	}
 
 	public void saveIisShLinkContent(IisShLinkContent iisShLinkContent) {
-		try (Session dataSession = ServletHelper.getDataSession()) {
+		try (Session dataSession = HibernateConfig.getDataSession()) {
 			Transaction transaction = dataSession.beginTransaction();
 			dataSession.persist(iisShLinkContent);
 			transaction.commit();

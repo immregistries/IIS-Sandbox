@@ -8,7 +8,8 @@ import jakarta.persistence.Query;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.immregistries.iis.kernal.fhir.security.ServletHelper;
+
+import org.immregistries.iis.kernal.HibernateConfig;
 import org.immregistries.iis.kernal.model.persisted.IisKey;
 import org.immregistries.iis.kernal.model.persisted.Tenant;
 import org.immregistries.iis.kernal.model.persisted.UserAccess;
@@ -32,7 +33,7 @@ public class KeyStoreService {
 	}
 
 	public IisKey getKey(String keyId, UserAccess userAccess) {
-		try (Session dataSession = ServletHelper.getDataSession()) {
+		try (Session dataSession = HibernateConfig.getDataSession()) {
 			Query query = dataSession.createQuery(
 				"from IisKey where userAccess = :user and keyId = :kid", IisKey.class);
 			query.setParameter("user", userAccess);
@@ -42,7 +43,7 @@ public class KeyStoreService {
 	}
 
 	public IisKey getAnyKey(UserAccess userAccess) {
-		try (Session dataSession = ServletHelper.getDataSession()) {
+		try (Session dataSession = HibernateConfig.getDataSession()) {
 			Query query = dataSession.createQuery(
 				"from IisKey where userAccess = :user", IisKey.class);
 			query.setParameter("user", userAccess);
@@ -61,7 +62,7 @@ public class KeyStoreService {
 	}
 
 	public List<IisKey> getKeys(UserAccess userAccess) {
-		try (Session dataSession = ServletHelper.getDataSession()) {
+		try (Session dataSession = HibernateConfig.getDataSession()) {
 			return getKeys(userAccess, dataSession);
 		}
 	}
@@ -82,7 +83,7 @@ public class KeyStoreService {
 	}
 
 	private void recordIisKey(IisKey iisKey) {
-		try (Session dataSession = ServletHelper.getDataSession()) {
+		try (Session dataSession = HibernateConfig.getDataSession()) {
 			recordIisKey(iisKey, dataSession);
 		}
 	}

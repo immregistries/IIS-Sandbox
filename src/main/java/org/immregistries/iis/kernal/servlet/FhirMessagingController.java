@@ -10,9 +10,11 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Session;
 import org.hl7.fhir.r4.model.Bundle;
+import org.immregistries.iis.kernal.HibernateConfig;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
 import org.immregistries.iis.kernal.fhir.interceptors.PartitionTenantCreationInterceptor;
-import org.immregistries.iis.kernal.fhir.security.ServletHelper;
+
+import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.logic.BaseIISSOAPServer;
 import org.immregistries.iis.kernal.logic.messageHandling.FhirMessagingHandler;
 import org.immregistries.iis.kernal.logic.messageHandling.V2IncomingMessageHandler;
@@ -31,7 +33,7 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import static org.immregistries.iis.kernal.fhir.security.ServletHelper.SESSION_REQUEST_TENANT;
+import static org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil.SESSION_REQUEST_TENANT;
 import static org.immregistries.iis.kernal.servlet.FhirMessagingController.FHIR_MESSAGING_BASE_PATH;
 import static org.immregistries.iis.kernal.servlet.PopController.PARAM_FACILITY_NAME;
 import static org.immregistries.iis.kernal.servlet.PopController.PARAM_MESSAGE;
@@ -62,8 +64,8 @@ public class FhirMessagingController {
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		Session dataSession = null;
 		try {
-			dataSession = ServletHelper.getDataSession();
-			Tenant tenant = ServletHelper.getTenant(req, dataSession);
+			dataSession = HibernateConfig.getDataSession();
+			Tenant tenant = CurrentTenantUtil.getTenant(req, dataSession);
 			String result = "";
 			String message = req.getParameter(PARAM_MESSAGE);
 			String facility_name = req.getParameter(PARAM_FACILITY_NAME);
@@ -118,7 +120,7 @@ public class FhirMessagingController {
 	@GetMapping
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		resp.setContentType("text/html");
-		Tenant tenant = ServletHelper.getTenant(req, ServletHelper.getDataSession());
+		Tenant tenant = CurrentTenantUtil.getTenant(req, HibernateConfig.getDataSession());
 
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		try {
@@ -168,7 +170,7 @@ public class FhirMessagingController {
 					/*
 					 * Tenant is accessed through RequestContext, and was previously set through the authorize method of WSDL server in BaseIISSOAPServer.java
 					 */
-					Tenant tenant = ServletHelper.getTenant();
+					Tenant tenant = CurrentTenantUtil.getTenant();
 					if (tenant == null) {
 						throw new SecurityException("Username/password combination is unrecognized");
 					} else {

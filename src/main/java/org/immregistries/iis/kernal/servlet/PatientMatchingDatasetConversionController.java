@@ -7,7 +7,8 @@ import ca.uhn.fhir.rest.api.server.IBundleProvider;
 import jakarta.servlet.http.HttpServletResponse;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r5.model.Bundle;
-import org.immregistries.iis.kernal.fhir.security.ServletHelper;
+
+import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.logic.PatientMismoConversionService;
 import org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester;
 import org.immregistries.mismo.match.model.Patient;
@@ -35,7 +36,7 @@ public class PatientMatchingDatasetConversionController {
 
 	@PostMapping("/init")
 	public String initBuilder() throws IOException {
-		String tenantId = ServletHelper.getTenant().getOrganizationName();
+		String tenantId = CurrentTenantUtil.getTenant().getOrganizationName();
 		tenantId.strip().replace("/","");
 		File csvOutputFile = new File("./target/"+tenantId+".csv");
 		csvOutputFile.createNewFile();
@@ -74,7 +75,7 @@ public class PatientMatchingDatasetConversionController {
 			}
 		}
 
-		String tenantId = ServletHelper.getTenant().getOrganizationName();
+		String tenantId = CurrentTenantUtil.getTenant().getOrganizationName();
 		tenantId.strip().replace("/","");
 		File csvOutputFile = new File("./target/"+tenantId+".csv");
 		FileWriter fileWriter = new FileWriter(csvOutputFile, true);

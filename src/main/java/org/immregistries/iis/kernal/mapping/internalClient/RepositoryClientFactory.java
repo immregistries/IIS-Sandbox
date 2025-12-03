@@ -15,7 +15,8 @@ import ca.uhn.fhir.rest.server.servlet.ServletRequestDetails;
 import ca.uhn.fhir.rest.server.util.ITestingUiClientFactory;
 import jakarta.servlet.http.HttpServletRequest;
 import org.immregistries.iis.kernal.fhir.Application;
-import org.immregistries.iis.kernal.fhir.security.ServletHelper;
+
+import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.model.persisted.Tenant;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -34,8 +35,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import static org.immregistries.iis.kernal.fhir.interceptors.IisAuthorizationInterceptor.CONNECTATHON_USER;
-import static org.immregistries.iis.kernal.fhir.security.ServletHelper.GITHUB_PREFIX;
-import static org.immregistries.iis.kernal.fhir.security.ServletHelper.SESSION_REQUEST_TENANT;
+import static org.immregistries.iis.kernal.fhir.security.UserAccessUtil.GITHUB_PREFIX;
+import static org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil.SESSION_REQUEST_TENANT;
 
 /**
  * Generates fhir client to interact with the jpa repository
@@ -123,7 +124,7 @@ public class RepositoryClientFactory extends ApacheRestfulClientFactory implemen
 	public IGenericClient newGenericClient(HttpServletRequest request) {
 		asynchInit();
 		if (request.getAttribute(FHIR_CLIENT) == null) {
-			Tenant tenant = ServletHelper.getTenant(request);
+			Tenant tenant = CurrentTenantUtil.getTenant(request);
 			if (tenant != null) {
 				request.setAttribute(FHIR_CLIENT, newGenericClient(tenant, request));
 			} else {

@@ -10,7 +10,8 @@ import org.hl7.fhir.r4.model.ImmunizationRecommendation;
 import org.hl7.fhir.r4.model.Parameters;
 import org.hl7.fhir.r4.model.Patient;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
-import org.immregistries.iis.kernal.fhir.security.ServletHelper;
+
+import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.logic.ImmunizationRecommendationServiceR4;
 import org.immregistries.iis.kernal.logic.messageHandling.IncomingQueryHandler;
 import org.immregistries.iis.kernal.mapping.forR4.ImmunizationMapperR4;
@@ -66,10 +67,10 @@ public class RecommendationForecastProviderR4 implements IRecommendationForecast
 		}
 		PatientMaster patientMaster = patientMapperR4.localObject(patient);
 		try {
-			out = immunizationRecommendationServiceR4.queryCds(ServletHelper.getTenant(), assessmentDate.getValue(), patientMaster, vaccinationMasterList);
+			out = immunizationRecommendationServiceR4.queryCds(CurrentTenantUtil.getTenant(), assessmentDate.getValue(), patientMaster, vaccinationMasterList);
 			logger.info("out {}", out.getParameters(EVALUATION).size());
 		} catch (Exception e) {
-			ImmunizationRecommendation immunizationRecommendation = immunizationRecommendationServiceR4.generate(ServletHelper.getTenant(), assessmentDate.getValue(), patientMaster);
+			ImmunizationRecommendation immunizationRecommendation = immunizationRecommendationServiceR4.generate(CurrentTenantUtil.getTenant(), assessmentDate.getValue(), patientMaster);
 			out.addParameter().setName(RECOMMENDATION).setResource(immunizationRecommendation);
 		}
 		return out;

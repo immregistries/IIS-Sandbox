@@ -5,7 +5,11 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.hibernate.Session;
-import org.immregistries.iis.kernal.fhir.security.ServletHelper;
+
+import org.immregistries.iis.kernal.HibernateConfig;
+import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
+import org.immregistries.iis.kernal.fhir.security.TenantUtil;
+import org.immregistries.iis.kernal.fhir.security.UserAccessUtil;
 import org.immregistries.iis.kernal.logic.KeyStoreService;
 import org.immregistries.iis.kernal.model.persisted.IisKey;
 import org.immregistries.iis.kernal.model.persisted.Tenant;
@@ -52,10 +56,10 @@ public class IisKeyController {
 	 * @throws IOException
 	 */
 	protected List<JWK> doGetWellKnown(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		UserAccess userAccess = ServletHelper.getUserAccess();
+		UserAccess userAccess = UserAccessUtil.getUserAccess();
 	resp.setContentType("application/json");
-		try (Session dataSession = ServletHelper.getDataSession()) {
-//			Tenant tenant = ServletHelper.getTenantRedirectIfNone(req, resp, dataSession);
+		try (Session dataSession = HibernateConfig.getDataSession()) {
+//			Tenant tenant = CurrentTenantUtil.getTenantRedirectIfNone(req, resp, dataSession);
 			List<IisKey> iisKeys = keyStoreService.getKeys(userAccess, dataSession);
 			return iisKeys.stream().map(iisKey -> iisKey.jwk().toPublicJWK()).collect(Collectors.toList());
 		}
@@ -63,12 +67,12 @@ public class IisKeyController {
 
 	@GetMapping
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		UserAccess userAccess = ServletHelper.getUserAccess();
+		UserAccess userAccess = UserAccessUtil.getUserAccess();
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
-		try (Session dataSession = ServletHelper.getDataSession()) {
-			Tenant tenant = ServletHelper.getTenantRedirectIfNone(req, resp, dataSession);
-			HomeController.doHeader(out, "IIS Sandbox Keystore", ServletHelper.getTenant());
+		try (Session dataSession = HibernateConfig.getDataSession()) {
+			Tenant tenant = CurrentTenantUtil.getTenantRedirectIfNone(req, resp, dataSession);
+			HomeController.doHeader(out, "IIS Sandbox Keystore", CurrentTenantUtil.getTenant());
 			out.println("    <div class=\"w3-container w3-half w3-margin-top\">");
 			out.println("    <h2>Facility: " + tenant.getOrganizationName() + "</h2>");
 			out.println("    <h3>Keys used for signing Smart Health Cards (generated for the user)</h3>");
@@ -89,7 +93,7 @@ public class IisKeyController {
 	}
 
 	protected static void printIisKeys(PrintWriter out, List<IisKey> iisKeys, Tenant tenant) {
-		out.println("<a href=\"" + ServletHelper.tenantifyPathWithContextPath(tenant, WellKnownKeyController.WELL_KNOWN_PATH_SUFFIX) + "\">well-known</a>");
+		out.println("<a href=\"" + TenantUtil.tenantifyPathWithContextPath(tenant, WellKnownKeyController.WELL_KNOWN_PATH_SUFFIX) + "\">well-known</a>");
 
 		if (iisKeys.isEmpty()) {
 			out.println("<em>No Key found</em>");

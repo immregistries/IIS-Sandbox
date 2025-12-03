@@ -3,6 +3,8 @@ package org.immregistries.iis.kernal.model.persisted;
 import org.immregistries.iis.kernal.model.AbstractMappedObject;
 import org.immregistries.iis.kernal.model.ProcessingFlavor;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.io.Serializable;
 import java.util.Set;
 
@@ -12,8 +14,10 @@ public class Tenant extends AbstractMappedObject implements Serializable {
    */
   private static final long serialVersionUID = 1L;
   private int orgId = 0;
+  @JsonIgnore
   private UserAccess userAccess = null;
   private String organizationName = "";
+  @JsonIgnore
   private Set<ProcessingFlavor> processingFlavorSet = null;
 
   public int getOrgId() {
@@ -53,19 +57,19 @@ public class Tenant extends AbstractMappedObject implements Serializable {
     return processingFlavorSet;
   }
 
-	public UserAccess getUserAccess() {
-		return userAccess;
-	}
+  public UserAccess getUserAccess() {
+    return userAccess;
+  }
 
-	public void setUserAccess(UserAccess userAccess) {
-		this.userAccess = userAccess;
-	}
+  public void setUserAccess(UserAccess userAccess) {
+    this.userAccess = userAccess;
+  }
 
-	@Override
-	public String toString() {
-		return "Tenant{" +
-			"orgId=" + orgId +
-			", organizationName='" + organizationName + '\'' +
-			'}';
-	}
+  @Override
+  public String toString() {
+    return "Tenant{" +
+        "orgId=" + orgId +
+        ", organizationName='" + organizationName + '\'' +
+        '}';
+  }
 }

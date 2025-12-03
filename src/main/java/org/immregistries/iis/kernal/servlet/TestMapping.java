@@ -7,7 +7,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.hibernate.Session;
 import org.hl7.fhir.r5.model.*;
 import org.immregistries.codebase.client.CodeMap;
-import org.immregistries.iis.kernal.fhir.security.ServletHelper;
+import org.immregistries.iis.kernal.HibernateConfig;
+import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
+import org.immregistries.iis.kernal.fhir.security.UserAccessUtil;
 import org.immregistries.iis.kernal.logic.CodeMapManager;
 import org.immregistries.iis.kernal.logic.ProcessingException;
 import org.immregistries.iis.kernal.logic.messageHandling.V2IncomingMessageHandler;
@@ -62,11 +64,11 @@ public class TestMapping extends HttpServlet {
 			String userId = "utest";
 			String password = "utest";
 			String facilityId = "utest";
-			Tenant tenant = ServletHelper.getTenant();
+			Tenant tenant = CurrentTenantUtil.getTenant();
 			String ack = "";
 			String[] messages;
 			StringBuilder ackBuilder = new StringBuilder();
-			Session dataSession = ServletHelper.getDataSession();
+			Session dataSession = HibernateConfig.getDataSession();
 			try {
 				if (tenant == null) {
 					resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -104,7 +106,7 @@ public class TestMapping extends HttpServlet {
 
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
-		UserAccess userAccess = ServletHelper.getUserAccess();
+		UserAccess userAccess = UserAccessUtil.getUserAccess();
 		try {
 			String message = req.getParameter(PARAM_MESSAGE);
 			if (message == null || message.equals("")) {
@@ -115,7 +117,7 @@ public class TestMapping extends HttpServlet {
 				message = testCaseMessage.getMessageText();
 			}
 			{
-				HomeController.doHeader(out, "IIS Sandbox", ServletHelper.getTenant());
+				HomeController.doHeader(out, "IIS Sandbox");
 				out.println("    <h2>Send Now to Test Mapping</h2>");
 				out.println("    <form action=\"utest\" method=\"POST\" target=\"_blank\">");
 				out.println("      <h3>VXU Message</h3>");

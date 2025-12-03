@@ -7,8 +7,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Session;
+import org.immregistries.iis.kernal.HibernateConfig;
 import org.immregistries.iis.kernal.fhir.interceptors.PartitionTenantCreationInterceptor;
-import org.immregistries.iis.kernal.fhir.security.ServletHelper;
+
+import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
+import org.immregistries.iis.kernal.fhir.security.TenantUtil;
 import org.immregistries.iis.kernal.logic.shlink.ShLinkUtilService;
 import org.immregistries.iis.kernal.model.persisted.ShLinkManifest;
 import org.immregistries.iis.kernal.model.persisted.Tenant;
@@ -51,10 +54,10 @@ public class ShLinkManifestController {
 	) throws IOException, ServletException {
 		resp.setContentType("application/json");
 		if (StringUtils.isNoneBlank(passcode, tenantName)) {
-			try (Session dataSession = ServletHelper.getDataSession()) {
+			try (Session dataSession = HibernateConfig.getDataSession()) {
 				Tenant tenant = null;
 				{
-					tenant = ServletHelper.authenticateTenantNoUsername(passcode, tenantName, dataSession, partitionTenantCreationInterceptor);
+					tenant = TenantUtil.authenticateTenantNoUsername(passcode, tenantName, dataSession, partitionTenantCreationInterceptor);
 					if (tenant == null) {
 						throw new AuthenticationCredentialsNotFoundException("No tenant found or invalid passcode");
 					}
@@ -84,7 +87,7 @@ public class ShLinkManifestController {
 	@GetMapping()
 	public List getManifestAll(HttpServletRequest req, HttpServletResponse resp) {
 		resp.setContentType("application/json");
-		try (Session dataSession = ServletHelper.getDataSession()) {
+		try (Session dataSession = HibernateConfig.getDataSession()) {
 			Query query = dataSession.createQuery("from ShLinkManifest", ShLinkManifest.class);
 			return query.getResultList();
 		} catch (Exception e) {
@@ -96,7 +99,7 @@ public class ShLinkManifestController {
 
 	@GetMapping("/$generate")
 	public ShLinkManifest genManifest(HttpServletRequest req, HttpServletResponse resp) {
-		ShLinkManifest shLinkManifest = shLinkUtilService.generateManifest(ServletHelper.getTenant(req));
+		ShLinkManifest shLinkManifest = shLinkUtilService.generateManifest(CurrentTenantUtil.getTenant(req));
 		return shLinkUtilService.saveManifest(shLinkManifest);
 	}
 

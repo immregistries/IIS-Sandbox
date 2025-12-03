@@ -7,9 +7,13 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.validation.constraints.NotBlank;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
+import org.immregistries.iis.kernal.HibernateConfig;
 import org.immregistries.iis.kernal.fhir.Application;
 import org.immregistries.iis.kernal.fhir.interceptors.PartitionTenantCreationInterceptor;
-import org.immregistries.iis.kernal.fhir.security.ServletHelper;
+
+import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
+import org.immregistries.iis.kernal.fhir.security.TenantUtil;
+import org.immregistries.iis.kernal.fhir.security.UserAccessUtil;
 import org.immregistries.iis.kernal.model.persisted.Tenant;
 import org.immregistries.iis.kernal.model.persisted.UserAccess;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,9 +54,9 @@ public class TenantController {
 	@PostMapping()
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp, @RequestParam(name = PARAM_TENANT_NAME) @NotBlank String tenantName)
 		throws ServletException, IOException {
-		UserAccess userAccess = ServletHelper.getUserAccess();
-		try (Session dataSession = ServletHelper.getDataSession()) {
-			ServletHelper.authenticateTenant(userAccess, tenantName, dataSession, partitionTenantCreationInterceptor);
+		UserAccess userAccess = UserAccessUtil.getUserAccess();
+		try (Session dataSession = HibernateConfig.getDataSession()) {
+			TenantUtil.authenticateTenant(userAccess, tenantName, dataSession, partitionTenantCreationInterceptor);
 			resp.sendRedirect(Application.IIS_PATH_BASE + TENANT_BASE_PATH + "/" + tenantName + TENANT_BASE_PATH);
 		}
 		doGet(req, resp);
@@ -77,9 +81,9 @@ public class TenantController {
 		String action = req.getParameter(PARAM_ACTION);
 		String tenantId = req.getParameter(PARAM_TENANT_ID);
 
-		try (Session dataSession = ServletHelper.getDataSession()) {
-			Tenant tenant = ServletHelper.getTenant(req, dataSession);
-			UserAccess userAccess = ServletHelper.getUserAccess();
+		try (Session dataSession = HibernateConfig.getDataSession()) {
+			Tenant tenant = CurrentTenantUtil.getTenant(req, dataSession);
+			UserAccess userAccess = UserAccessUtil.getUserAccess();
 			if (userAccess != null && session != null) {
 				Query<Tenant> query = dataSession.createQuery("from Tenant where userAccess=?1 order by organizationName", Tenant.class);
 				query.setParameter(1, userAccess);

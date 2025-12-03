@@ -31,8 +31,8 @@ public class FhirTestServlet extends HttpServlet {
 //      throws ServletException, IOException {
 //
 //    HttpSession session = req.getSession(true);
-////    UserAccess userAccess = ServletHelper.getUserAccess();
-//	  Tenant tenant = ServletHelper.getTenant();
+////    UserAccess userAccess = UserAccessUtil.getUserAccess();
+//	  Tenant tenant = CurrentTenantUtil.getTenant();
 //
 //
 //    resp.setContentType("text/html");

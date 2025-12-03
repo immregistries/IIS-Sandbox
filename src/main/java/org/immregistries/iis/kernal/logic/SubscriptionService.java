@@ -14,7 +14,8 @@ import org.hl7.fhir.instance.model.api.IBaseParameters;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.instance.model.api.IPrimitiveType;
 import org.hl7.fhir.r5.model.*;
-import org.immregistries.iis.kernal.fhir.security.ServletHelper;
+
+import org.immregistries.iis.kernal.fhir.security.TenantUtil;
 import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
 import org.immregistries.iis.kernal.model.persisted.Tenant;
 import org.slf4j.Logger;
@@ -77,7 +78,7 @@ private static SubscriptionStatus createSubscriptionStatus(Subscription subscrip
 //		return subscription;
 //	}
 	public String triggerWithResource(Subscription subscription, List<Pair<String, Bundle.HTTPVerb>> requests, Tenant tenant) {
-		RequestDetails requestDetails = ServletHelper.requestDetailsWithPartitionName(partitionLookupSvc);
+		RequestDetails requestDetails = TenantUtil.requestDetailsWithPartitionName(partitionLookupSvc);
 		List<IPrimitiveType<String>> urls = List.of(new StringType("Patient?name=ulysse"));
 		IBaseParameters iBaseParameters = subscriptionTriggeringProvider.triggerSubscription(requestDetails, subscription.getIdElement(), null, urls);
 		return fhirContext.newJsonParser().encodeResourceToString(iBaseParameters);
@@ -93,7 +94,7 @@ private static SubscriptionStatus createSubscriptionStatus(Subscription subscrip
 	 * @return
 	 */
 	public String triggerWithResourceFullManual(Subscription subscription, List<Pair<String, Bundle.HTTPVerb>> requests) {
-//			UserAccess userAccess = ServletHelper.getUserAccess();
+//			UserAccess userAccess = UserAccessUtil.getUserAccess();
 
 //			ResourceDeliveryMessage resourceDeliveryMessage = new ResourceDeliveryMessage();
 //			resourceDeliveryMessage.setSubscription(subscriptionCanonicalizer.canonicalize(subscription));

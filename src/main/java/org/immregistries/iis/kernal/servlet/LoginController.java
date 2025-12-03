@@ -4,7 +4,9 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.hibernate.Session;
-import org.immregistries.iis.kernal.fhir.security.ServletHelper;
+
+import org.immregistries.iis.kernal.HibernateConfig;
+import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.model.persisted.Tenant;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -40,10 +42,10 @@ public class LoginController {
 		throws ServletException, IOException {
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
-		Session dataSession = ServletHelper.getDataSession();
+		Session dataSession = HibernateConfig.getDataSession();
 		String locationHeader = req.getHeader("referer");
 		try {
-			HomeController.doHeader(out, "IIS Sandbox", ServletHelper.getTenant());
+			HomeController.doHeader(out, "IIS Sandbox");
 			Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
          // LOGIN FORM, inherited, could be made in a separate class and improved
 			if (!authentication.isAuthenticated() || authentication instanceof AnonymousAuthenticationToken) {

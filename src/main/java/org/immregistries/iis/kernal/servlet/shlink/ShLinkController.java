@@ -9,7 +9,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.instance.model.api.IBaseBundle;
 import org.hl7.fhir.r4.model.IdType;
 import org.immregistries.iis.kernal.fhir.ips.IpsGeneratorSvcIIS;
-import org.immregistries.iis.kernal.fhir.security.ServletHelper;
+
+import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
+import org.immregistries.iis.kernal.fhir.security.TenantUtil;
+import org.immregistries.iis.kernal.fhir.security.UserAccessUtil;
 import org.immregistries.iis.kernal.fhir.shl.ShLinkPayload;
 import org.immregistries.iis.kernal.logic.KeyStoreService;
 import org.immregistries.iis.kernal.logic.shlink.ShLinkUtilService;
@@ -77,8 +80,8 @@ public class ShLinkController {
 								 @RequestParam(value = "image", required = false) boolean image
 	)
 		throws ServletException, IOException, NoSuchAlgorithmException {
-		Tenant tenant = ServletHelper.getTenantRedirectIfNone(req, resp);
-		UserAccess userAccess = ServletHelper.getUserAccess();
+		Tenant tenant = CurrentTenantUtil.getTenantRedirectIfNone(req, resp);
+		UserAccess userAccess = UserAccessUtil.getUserAccess();
 		OutputStream outputStream = resp.getOutputStream();
 		PrintWriter out = new PrintWriter(outputStream);
 		/*
@@ -97,7 +100,7 @@ public class ShLinkController {
 		/*
 		 * Getting the bundle for the payload content
 		 */
-		IBaseBundle ipsToBeEncoded = ipsGeneratorSvcIIS.generateIps(ServletHelper.requestDetailsWithPartitionName(partitionLookupSvc), new IdType(patientId), "");
+		IBaseBundle ipsToBeEncoded = ipsGeneratorSvcIIS.generateIps(TenantUtil.requestDetailsWithPartitionName(partitionLookupSvc), new IdType(patientId), "");
 		/*
 		 * Convert the bundle to a shcard file
 		 */
@@ -153,8 +156,8 @@ public class ShLinkController {
 								@RequestParam(value = PARAM_FLAG, required = false) String flag,
 								@RequestParam(value = PARAM_EXP, required = false) String exp)
 		throws ServletException, IOException {
-		Tenant tenant = ServletHelper.getTenantRedirectIfNone(req, resp);
-		UserAccess userAccess = ServletHelper.getUserAccess();
+		Tenant tenant = CurrentTenantUtil.getTenantRedirectIfNone(req, resp);
+		UserAccess userAccess = UserAccessUtil.getUserAccess();
 
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());

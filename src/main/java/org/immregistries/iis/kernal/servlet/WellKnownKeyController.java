@@ -4,7 +4,9 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.hibernate.Session;
-import org.immregistries.iis.kernal.fhir.security.ServletHelper;
+
+import org.immregistries.iis.kernal.HibernateConfig;
+import org.immregistries.iis.kernal.fhir.security.UserAccessUtil;
 import org.immregistries.iis.kernal.logic.KeyStoreService;
 import org.immregistries.iis.kernal.model.persisted.IisKey;
 import org.immregistries.iis.kernal.model.persisted.Tenant;
@@ -37,10 +39,10 @@ public class WellKnownKeyController {
 
 	@GetMapping()
 	protected Set<?> doGetWellKnown(HttpServletRequest req, HttpServletResponse resp, @PathVariable(name = TenantController.PATH_VARIABLE_TENANT_NAME, required = false) String tenantName) throws ServletException, IOException {
-		UserAccess userAccess = ServletHelper.getUserAccess();
+		UserAccess userAccess = UserAccessUtil.getUserAccess();
 		resp.setContentType("application/json");
-		try (Session dataSession = ServletHelper.getDataSession()) {
-//			Tenant tenant = ServletHelper.getTenantRedirectIfNone(req, resp, dataSession);
+		try (Session dataSession = HibernateConfig.getDataSession()) {
+//			Tenant tenant = CurrentTenantUtil.getTenantRedirectIfNone(req, resp, dataSession);
 			List<IisKey> iisKeys = keyStoreService.getKeys(userAccess, dataSession);
 			return iisKeys.stream().map(iisKey -> iisKey.jwk().toPublicJWK().toJSONObject()).collect(Collectors.toSet());
 		}

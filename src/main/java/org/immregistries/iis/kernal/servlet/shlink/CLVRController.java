@@ -38,13 +38,13 @@ public class CLVRController {
 //		@PathVariable("patientId") String patientId,
 //		@RequestParam(value = "pdf", required = false) boolean pdf
 //	) throws IOException, ServletException, DataFormatException, SignatureException, NoSuchAlgorithmException, InvalidKeyException, NoSuchProviderException, WriterException, COSEException {
-//		Tenant tenant = ServletHelper.getTenantRedirectIfNone(req, resp);
-//		UserAccess userAccess = ServletHelper.getUserAccess();
+//		Tenant tenant = CurrentTenantUtil.getTenantRedirectIfNone(req, resp);
+//		UserAccess userAccess = UserAccessUtil.getUserAccess();
 //		OutputStream outputStream = resp.getOutputStream();
 //
 //		IisKey iisSigningKey = keyStoreService.getIisSigningKeyOrCreate("", userAccess, tenant);
 //
-//		IBaseBundle ipsToBeEncoded = ipsGeneratorSvcIIS.generateIps(ServletHelper.requestDetailsWithPartitionName(partitionLookupSvc), new IdType(patientId), "");
+//		IBaseBundle ipsToBeEncoded = ipsGeneratorSvcIIS.generateIps(TenantUtil.requestDetailsWithPartitionName(partitionLookupSvc), new IdType(patientId), "");
 //		CLVRPayload clvrPayload = fhirConversionUtil.toCLVRPayloadFromBundle((Bundle) ipsToBeEncoded);
 //
 //		String qrCode = clvrService.encodeCLVRtoQrCode(clvrPayload, iisSigningKey.keyPair());
