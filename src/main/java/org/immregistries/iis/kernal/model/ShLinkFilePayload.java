@@ -5,10 +5,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 /**
  * A Java class representing the payload structure for a Smart Health Link File.
  * This class is designed to be serialized from and deserialized to JSON.
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ShLinkFilePayload {
 
 	@JsonProperty("type")
@@ -24,7 +27,8 @@ public class ShLinkFilePayload {
 	}
 
 	/**
-	 * Constructs a new ShLinkFilePayload with the given type and verifiable credential.
+	 * Constructs a new ShLinkFilePayload with the given type and verifiable
+	 * credential.
 	 *
 	 * @param type                 The list of types.
 	 * @param verifiableCredential The list of verifiable credentials.
@@ -55,8 +59,8 @@ public class ShLinkFilePayload {
 	@Override
 	public String toString() {
 		return "SmartHealthLinkFilePayload{" +
-			"type=" + type +
-			", verifiableCredential=" + verifiableCredential +
-			'}';
+				"type=" + type +
+				", verifiableCredential=" + verifiableCredential +
+				'}';
 	}
 }

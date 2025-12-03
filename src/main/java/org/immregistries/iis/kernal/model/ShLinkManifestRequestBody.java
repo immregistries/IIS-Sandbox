@@ -4,20 +4,24 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 /**
  * Represents the JSON structure for ShLinkManifestRequestBody.
  * This class is ready for JSON serialization using Jackson.
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-	"recipient",
-	"passcode",
-	"embeddedLengthMax"
+		"recipient",
+		"passcode",
+		"embeddedLengthMax"
 })
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ShLinkManifestRequestBody {
 
 	/**
-	 * A string describing the recipient (e.g., the name of an organization or person)
+	 * A string describing the recipient (e.g., the name of an organization or
+	 * person)
 	 * suitable for display to the Receiving User. This field is mandatory.
 	 */
 	@JsonProperty(value = "recipient", required = true)

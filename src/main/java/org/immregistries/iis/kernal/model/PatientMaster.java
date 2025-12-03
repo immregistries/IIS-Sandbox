@@ -7,8 +7,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 /**
- * Internal Standard agnostic representation of a patient's information, this class should only be used when dealing with Golden Record except for Display,
+ * Internal Standard agnostic representation of a patient's information, this
+ * class should only be used when dealing with Golden Record except for Display,
  * When dealing with a report use PatientReported
  */
 public class PatientMaster extends AbstractMappedObject implements Serializable, TenantTiedObject {
@@ -43,7 +46,6 @@ public class PatientMaster extends AbstractMappedObject implements Serializable,
 
 	private String managingOrganizationId;
 	private String generalPractitionerId;
-
 
 	public String getManagingOrganizationId() {
 		return managingOrganizationId;
@@ -217,6 +219,7 @@ public class PatientMaster extends AbstractMappedObject implements Serializable,
 		this.modelNames.add(modelName);
 	}
 
+	@JsonIgnore
 	public ModelName getPatientNameFirst() {
 		if (modelNames.isEmpty()) {
 			return null;
@@ -224,24 +227,34 @@ public class PatientMaster extends AbstractMappedObject implements Serializable,
 		return modelNames.get(0);
 	}
 
+	@JsonIgnore
 	public ModelName getLegalName() {
-		return modelNames.stream().filter(patientName -> "L".equals(patientName.getNameType())).findFirst().orElse(null);
+		return modelNames.stream().filter(patientName -> "L".equals(patientName.getNameType())).findFirst()
+				.orElse(null);
 	}
 
+	@JsonIgnore
 	public ModelName getLegalNameOrFirst() {
-		return modelNames.stream().filter(patientName -> "L".equals(patientName.getNameType())).findFirst().orElse(this.getPatientNameFirst());
+		return modelNames.stream().filter(patientName -> "L".equals(patientName.getNameType())).findFirst()
+				.orElse(this.getPatientNameFirst());
 	}
 
+	@JsonIgnore
 	public String getNameLast() {
-		return this.getLegalNameOrFirst().getNameLast();
+		ModelName mn = this.getLegalNameOrFirst();
+		return mn != null ? mn.getNameLast() : null;
 	}
 
+	@JsonIgnore
 	public String getNameFirst() {
-		return this.getLegalNameOrFirst().getNameFirst();
+		ModelName mn = this.getLegalNameOrFirst();
+		return mn != null ? mn.getNameFirst() : null;
 	}
 
+	@JsonIgnore
 	public String getNameMiddle() {
-		return this.getLegalNameOrFirst().getNameMiddle();
+		ModelName mn = this.getLegalNameOrFirst();
+		return mn != null ? mn.getNameMiddle() : null;
 	}
 
 	public List<PatientGuardian> getPatientGuardians() {
@@ -274,6 +287,7 @@ public class PatientMaster extends AbstractMappedObject implements Serializable,
 		this.races.add(race);
 	}
 
+	@JsonIgnore
 	public String getFirstRace() {
 		if (races.isEmpty()) {
 			return null;
@@ -296,6 +310,7 @@ public class PatientMaster extends AbstractMappedObject implements Serializable,
 		this.phones.add(phone);
 	}
 
+	@JsonIgnore
 	public ModelPhone getFirstPhone() {
 		if (phones.isEmpty()) {
 			return null;
@@ -318,6 +333,7 @@ public class PatientMaster extends AbstractMappedObject implements Serializable,
 		this.addresses.add(phone);
 	}
 
+	@JsonIgnore
 	public ModelAddress getFirstAddress() {
 		if (addresses.isEmpty()) {
 			return null;
@@ -340,6 +356,7 @@ public class PatientMaster extends AbstractMappedObject implements Serializable,
 		this.businessIdentifiers.add(businessIdentifier);
 	}
 
+	@JsonIgnore
 	public BusinessIdentifier getFirstBusinessIdentifier() {
 		if (businessIdentifiers.isEmpty()) {
 			return null;
@@ -347,24 +364,25 @@ public class PatientMaster extends AbstractMappedObject implements Serializable,
 		return this.businessIdentifiers.get(0);
 	}
 
+	@JsonIgnore
 	public BusinessIdentifier getMainBusinessIdentifier() {
 		BusinessIdentifier identifier = null;
 		if (businessIdentifiers.isEmpty()) {
 			return new BusinessIdentifier();
 		}
 		identifier = this.businessIdentifiers.stream()
-			.filter(businessIdentifier -> BusinessIdentifier.MRN_TYPE_VALUE.equals(businessIdentifier.getType()))
+				.filter(businessIdentifier -> BusinessIdentifier.MRN_TYPE_VALUE.equals(businessIdentifier.getType()))
 				.findFirst()
 				.orElse(null);
 		if (identifier == null) {
 			identifier = this.businessIdentifiers.stream()
-				.filter(businessIdentifier -> "PT".equals(businessIdentifier.getType()))
+					.filter(businessIdentifier -> "PT".equals(businessIdentifier.getType()))
 					.findFirst()
 					.orElse(null);
 		}
 		if (identifier == null) {
 			identifier = this.businessIdentifiers.stream()
-				.filter(businessIdentifier -> "PI".equals(businessIdentifier.getType()))
+					.filter(businessIdentifier -> "PI".equals(businessIdentifier.getType()))
 					.findFirst()
 					.orElse(null);
 		}
@@ -378,11 +396,11 @@ public class PatientMaster extends AbstractMappedObject implements Serializable,
 	public String toString() {
 		return "PatientMaster{" +
 				"patientId='" + patientId + '\'' +
-//			", tenant=" + tenant +
-			", businessIdentifiers=" + businessIdentifiers +
-//			", reportedDate=" + reportedDate +
+				// ", tenant=" + tenant +
+				", businessIdentifiers=" + businessIdentifiers +
+				// ", reportedDate=" + reportedDate +
 				", updatedDate=" + updatedDate +
-			", patientNames=" + modelNames +
+				", patientNames=" + modelNames +
 				", motherMaidenName='" + motherMaidenName + '\'' +
 				", birthDate=" + birthDate +
 				", sex='" + sex + '\'' +
@@ -402,8 +420,8 @@ public class PatientMaster extends AbstractMappedObject implements Serializable,
 				", registryStatusIndicator='" + registryStatusIndicator + '\'' +
 				", registryStatusIndicatorDate=" + registryStatusIndicatorDate +
 				", patientGuardians=" + patientGuardians +
-			", managingOrganizationId='" + managingOrganizationId + '\'' +
-			", generalPractitionerId='" + generalPractitionerId + '\'' +
+				", managingOrganizationId='" + managingOrganizationId + '\'' +
+				", generalPractitionerId='" + generalPractitionerId + '\'' +
 				'}';
 	}
 

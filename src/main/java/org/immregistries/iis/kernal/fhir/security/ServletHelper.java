@@ -38,7 +38,8 @@ import static org.immregistries.iis.kernal.servlet.TenantUrlFilter.TENANT_NAME_U
 
 public final class ServletHelper {
 	// TODO Complete
-	public static final List<String> FORBIDDEN_NAMES = List.of("pop", "iis", "home", "patient", "vaccination", "fhir", "tenant", "facility", "tenant");
+	public static final List<String> FORBIDDEN_NAMES = List.of("pop", "iis", "home", "patient", "vaccination", "fhir",
+			"tenant", "facility", "tenant");
 	private static final Logger logger = LoggerFactory.getLogger(ServletHelper.class);
 	public static final String GITHUB_PREFIX = "github-";
 	public static final String SESSION_REQUEST_TENANT = "tenant";
@@ -54,20 +55,19 @@ public final class ServletHelper {
 	 */
 	public static Session getDataSession() {
 		if (factory == null) {
-//			factory = HibernateConfig.configuration().buildSessionFactory();
+			// factory = HibernateConfig.configuration().buildSessionFactory();
 			factory = HibernateConfig.sessionFactory();
 		}
 		return factory.openSession();
 	}
 
-
 	/**
 	 * Adds tenant prefix to urlSuffix if tenant is not null
 	 * Used for links in the UI with href
 	 *
-	 * @param tenant tenant
+	 * @param tenant    tenant
 	 * @param urlSuffix
-	 * @return  {tenantBasePath}/{tenantName}/ + urlSuffix
+	 * @return {tenantBasePath}/{tenantName}/ + urlSuffix
 	 */
 	public static String tenantifyPathWithContextPath(Tenant tenant, String urlSuffix) {
 		if (tenant == null || tenant.getOrgId() < 0) {
@@ -104,8 +104,8 @@ public final class ServletHelper {
 		return tenantifyPathSuffix("*", urlSuffix);
 	}
 
-
-	public static Tenant authenticateTenantNoUsername(String password, String facilityName, Session dataSession, PartitionTenantCreationInterceptor partitionTenantCreationInterceptor) {
+	public static Tenant authenticateTenantNoUsername(String password, String facilityName, Session dataSession,
+			PartitionTenantCreationInterceptor partitionTenantCreationInterceptor) {
 		Query query = dataSession.createQuery("from Tenant where organizationName = ?1", Tenant.class);
 		query.setParameter(1, facilityName);
 		Tenant tenant = (Tenant) query.getSingleResult();
@@ -119,22 +119,26 @@ public final class ServletHelper {
 		return authenticateTenant(userAccess, facilityName, dataSession, partitionTenantCreationInterceptor);
 	}
 
-	public static Tenant authenticateTenant(String username, String password, String facilityName, Session dataSession, PartitionTenantCreationInterceptor partitionTenantCreationInterceptor) {
-		UserAccess userAccess = authenticateUserAccessUsernamePassword(username,password,dataSession);
+	public static Tenant authenticateTenant(String username, String password, String facilityName, Session dataSession,
+			PartitionTenantCreationInterceptor partitionTenantCreationInterceptor) {
+		UserAccess userAccess = authenticateUserAccessUsernamePassword(username, password, dataSession);
 		return authenticateTenant(userAccess, facilityName, dataSession, partitionTenantCreationInterceptor);
 	}
 
-	public static Tenant authenticateTenant(OAuth2User oAuth2User, String facilityName, Session dataSession, PartitionTenantCreationInterceptor partitionTenantCreationInterceptor) {
+	public static Tenant authenticateTenant(OAuth2User oAuth2User, String facilityName, Session dataSession,
+			PartitionTenantCreationInterceptor partitionTenantCreationInterceptor) {
 		/**
 		 * First user authentication with OAUTH
 		 */
-		UserAccess userAccess = authenticateUserAccessOAuth(oAuth2User,dataSession);
+		UserAccess userAccess = authenticateUserAccessOAuth(oAuth2User, dataSession);
 		return authenticateTenant(userAccess, facilityName, dataSession, partitionTenantCreationInterceptor);
 	}
 
-	public static Tenant authenticateTenant(UserAccess userAccess, String facilityName, Session dataSession, PartitionTenantCreationInterceptor partitionTenantCreationInterceptor) {
+	public static Tenant authenticateTenant(UserAccess userAccess, String facilityName, Session dataSession,
+			PartitionTenantCreationInterceptor partitionTenantCreationInterceptor) {
 		/**
-		 * Users starting with the prefix can create a user with the same name, any other use of prefix are rejected
+		 * Users starting with the prefix can create a user with the same name, any
+		 * other use of prefix are rejected
 		 */
 		if (StringUtils.isBlank(facilityName)) {
 			throw new AuthenticationException();
@@ -169,9 +173,8 @@ public final class ServletHelper {
 		return tenant;
 	}
 
-
-
-	public static UserAccess authenticateUserAccessUsernamePassword(String username, String password, Session dataSession) {
+	public static UserAccess authenticateUserAccessUsernamePassword(String username, String password,
+			Session dataSession) {
 		if (username.startsWith(GITHUB_PREFIX) || StringUtils.isBlank(password)) {
 			throw new AuthenticationException();
 		}
@@ -180,14 +183,15 @@ public final class ServletHelper {
 		}
 		UserAccess userAccess = null;
 
-		List<UserAccess> userAccessList = queryUserAccessWithUsername(username,dataSession);
+		List<UserAccess> userAccessList = queryUserAccessWithUsername(username, dataSession);
 		if (userAccessList.size() == 0) {
 			/**
 			 * Registration
 			 */
 			userAccess = registerUserAccessWithUsernamePassword(username, password, dataSession);
 		} else if (userAccessList.size() == 1) {
-//      if (BCrypt.checkpw(password, userAccessList.get(0).getAccessKey())) { TODO after auth checks fix in fhir
+			// if (BCrypt.checkpw(password, userAccessList.get(0).getAccessKey())) { TODO
+			// after auth checks fix in fhir
 			if (password.equals(userAccessList.get(0).getAccessKey())) {
 				userAccess = userAccessList.get(0);
 			} else {
@@ -204,12 +208,12 @@ public final class ServletHelper {
 		String username = GITHUB_PREFIX + oAuth2User.getAttribute("login");
 		UserAccess userAccess = null;
 
-		List<UserAccess> userAccessList = queryUserAccessWithUsername(username,dataSession);
+		List<UserAccess> userAccessList = queryUserAccessWithUsername(username, dataSession);
 		if (userAccessList.size() == 0) {
 			/**
 			 * Registration
 			 */
-			userAccess = registerUserAccessGithub(username,dataSession);
+			userAccess = registerUserAccessGithub(username, dataSession);
 		} else if (userAccessList.size() == 1) {
 			if (StringUtils.isNotBlank(userAccessList.get(0).getAccessKey())) {
 				throw new AuthenticationException("OAuth login failure");
@@ -246,13 +250,16 @@ public final class ServletHelper {
 
 		return userAccess;
 	}
-	private static UserAccess registerUserAccessWithUsernamePassword(String username, String password, Session dataSession) {
+
+	private static UserAccess registerUserAccessWithUsernamePassword(String username, String password,
+			Session dataSession) {
 		if (username.startsWith(GITHUB_PREFIX)) {
 			throw new AuthenticationException();
 		}
 		UserAccess userAccess = new UserAccess();
 		userAccess.setAccessName(username);
-//      userAccess.setAccessKey(BCrypt.hashpw(password, BCrypt.gensalt(5))); TODO after auth checks fix in fhir
+		// userAccess.setAccessKey(BCrypt.hashpw(password, BCrypt.gensalt(5))); TODO
+		// after auth checks fix in fhir
 		userAccess.setAccessKey(password);
 		Transaction transaction = dataSession.beginTransaction();
 		try {
@@ -276,8 +283,6 @@ public final class ServletHelper {
 		return tenant;
 	}
 
-
-
 	/**
 	 * asynchroneously provides and registers UserAccess Object from SecurityContext
 	 *
@@ -288,8 +293,10 @@ public final class ServletHelper {
 		if (authentication instanceof UserAccess) {
 			return (UserAccess) authentication;
 		}
-		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
-		Tenant tenant = getTenant(request); // TODO test if commenting breaks anything, might be useless, or only used for subscription/ bulk
+		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
+				.getRequest();
+		Tenant tenant = getTenant(request); // TODO test if commenting breaks anything, might be useless, or only used
+											// for subscription/ bulk
 		if (tenant != null) {
 			return tenant.getUserAccess();
 		}
@@ -316,9 +323,9 @@ public final class ServletHelper {
 			}
 			tenant = authenticateTenant(userAccess, pathVariable, dataSession, null);
 		}
-//		if (tenant == null) {
-//			throw new AuthenticationCredentialsNotFoundException("");
-//		}
+		// if (tenant == null) {
+		// throw new AuthenticationCredentialsNotFoundException("");
+		// }
 		request.setAttribute(SESSION_REQUEST_TENANT, tenant);
 		return tenant;
 	}
@@ -334,9 +341,10 @@ public final class ServletHelper {
 				tenant = requestTenant;
 			} else if (existingDataSession != null) {
 				tenant = getTenant(urlTenantName, request, existingDataSession);
-			} else try (Session dataSession = getDataSession()) {
-				tenant = getTenant(urlTenantName, request, dataSession);
-			}
+			} else
+				try (Session dataSession = getDataSession()) {
+					tenant = getTenant(urlTenantName, request, dataSession);
+				}
 		}
 		return tenant;
 	}
@@ -345,11 +353,13 @@ public final class ServletHelper {
 		return getTenant(request, null);
 	}
 
-	public static @NotNull Tenant getTenantRedirectIfNone(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+	public static @NotNull Tenant getTenantRedirectIfNone(HttpServletRequest req, HttpServletResponse resp)
+			throws IOException {
 		return getTenantRedirectIfNone(req, resp, null);
 	}
 
-	public static @NotNull Tenant getTenantRedirectIfNone(HttpServletRequest req, HttpServletResponse resp, Session existingDataSession) throws IOException {
+	public static @NotNull Tenant getTenantRedirectIfNone(HttpServletRequest req, HttpServletResponse resp,
+			Session existingDataSession) throws IOException {
 		Tenant tenant = getTenant(req, existingDataSession);
 		if (tenant == null) {
 			if (ServletHelper.getUserAccess() != null) {
@@ -361,21 +371,28 @@ public final class ServletHelper {
 	}
 
 	public static Tenant getTenant() {
-		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
+				.getRequest();
 		return getTenant(request);
 	}
 
 	public static RequestDetails requestDetailsWithPartitionName(IPartitionLookupSvc partitionLookupSvc) {
-		PartitionEntity partitionEntity = partitionLookupSvc.getPartitionByName(ServletHelper.getTenant().getOrganizationName());
+		PartitionEntity partitionEntity = partitionLookupSvc
+				.getPartitionByName(ServletHelper.getTenant().getOrganizationName());
 		if (partitionEntity == null) {
-//			return SystemRequestDetails.forAllPartitions();
+			// return SystemRequestDetails.forAllPartitions();
 			throw new RuntimeException("No partition found");
 		}
-		RequestDetails requestDetails = SystemRequestDetails.forRequestPartitionId(partitionEntity.toRequestPartitionId());
+		RequestDetails requestDetails = SystemRequestDetails
+				.forRequestPartitionId(partitionEntity.toRequestPartitionId());
 		requestDetails.setTenantId(ServletHelper.getTenant().getOrganizationName());
 		return requestDetails;
 	}
 
-
+	public static Tenant getTenant(int tenantId, Session dataSession) {
+		Query query = dataSession.createQuery("from Tenant where orgId = :tenantId", Tenant.class);
+		query.setParameter("tenantId", tenantId);
+		return (Tenant) query.getSingleResult();
+	}
 
 }
