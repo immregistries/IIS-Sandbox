@@ -16,6 +16,7 @@ import org.immregistries.iis.kernal.fhir.security.TenantUtil;
 import org.immregistries.iis.kernal.fhir.security.UserAccessUtil;
 import org.immregistries.iis.kernal.model.persisted.Tenant;
 import org.immregistries.iis.kernal.model.persisted.UserAccess;
+import org.immregistries.iis.kernal.rest.TenantRestController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,7 +28,8 @@ import java.util.List;
  * Tenant management UI page
  */
 @RestController()
-@RequestMapping({TenantController.TENANT_BASE_PATH, TenantController.TENANT_PATH, TenantController.TENANT_PATH + TenantController.TENANT_BASE_PATH})
+@RequestMapping({ TenantController.TENANT_BASE_PATH, TenantController.TENANT_PATH,
+		TenantController.TENANT_PATH + TenantController.TENANT_BASE_PATH })
 public class TenantController {
 	public static final String TENANT_BASE_PATH = "/tenant";
 	public static final String PATH_VARIABLE_TENANT_NAME = "tenantName";
@@ -42,6 +44,9 @@ public class TenantController {
 	@Autowired
 	PartitionTenantCreationInterceptor partitionTenantCreationInterceptor;
 
+	@Autowired
+	TenantRestController tenantRestController;
+
 	/**
 	 * Adds a new tenant from form
 	 *
@@ -52,8 +57,9 @@ public class TenantController {
 	 * @throws IOException      outputStream exception
 	 */
 	@PostMapping()
-	protected void doPost(HttpServletRequest req, HttpServletResponse resp, @RequestParam(name = PARAM_TENANT_NAME) @NotBlank String tenantName)
-		throws ServletException, IOException {
+	protected void doPost(HttpServletRequest req, HttpServletResponse resp,
+			@RequestParam(name = PARAM_TENANT_NAME) @NotBlank String tenantName)
+			throws ServletException, IOException {
 		UserAccess userAccess = UserAccessUtil.getUserAccess();
 		try (Session dataSession = HibernateConfig.getDataSession()) {
 			TenantUtil.authenticateTenant(userAccess, tenantName, dataSession, partitionTenantCreationInterceptor);
@@ -67,14 +73,14 @@ public class TenantController {
 	 * Allows tenant switching
 	 * TODO switch to controller based URI Variable paradigm ?
 	 *
-	 * @param req request
+	 * @param req  request
 	 * @param resp response
 	 * @throws ServletException servlet exception
-	 * @throws IOException outputStream exception
+	 * @throws IOException      outputStream exception
 	 */
 	@GetMapping()
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-		throws ServletException, IOException {
+			throws ServletException, IOException {
 		HttpSession session = req.getSession(false);
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
@@ -85,13 +91,11 @@ public class TenantController {
 			Tenant tenant = CurrentTenantUtil.getTenant(req, dataSession);
 			UserAccess userAccess = UserAccessUtil.getUserAccess();
 			if (userAccess != null && session != null) {
-				Query<Tenant> query = dataSession.createQuery("from Tenant where userAccess=?1 order by organizationName", Tenant.class);
-				query.setParameter(1, userAccess);
-				List<Tenant> tenantList = query.list();
+				List<Tenant> tenantList = tenantRestController.getTenants(req);
 				for (Tenant tenantMember : tenantList) {
 					if (ACTION_SWITCH.equals(action) && String.valueOf(tenantMember.getOrgId()).equals(tenantId)) {
 						tenant = tenantMember;
-//						session.setAttribute(SESSION_TENANT, tenant);
+						// session.setAttribute(SESSION_TENANT, tenant);
 					}
 				}
 				/*
@@ -110,27 +114,34 @@ public class TenantController {
 					if (tenantMember.equals(tenant)) {
 						out.println("<li>" + tenantMember.getOrganizationName() + " (selected)</li>");
 					} else {
-						String link = Application.IIS_PATH_BASE + TenantController.TENANT_BASE_PATH + "/" + tenantMember.getOrganizationName() + TenantController.TENANT_BASE_PATH;
+						String link = Application.IIS_PATH_BASE + TenantController.TENANT_BASE_PATH + "/"
+								+ tenantMember.getOrganizationName() + TenantController.TENANT_BASE_PATH;
 						out.println("<li><a href=\"" + link + "\">" + tenantMember.getOrganizationName() + "</a></li>");
 					}
 				}
 				out.println("	  </ul>");
 				out.println("</div>");
 
-
 				out.println("<div class=\"w3-container w3-half w3-margin-top\">");
 				out.println("    <h3>Add Tenant</h3>");
-				out.println("    <form method=\"POST\" action=\"tenant\" class=\"w3-container w3-card-4\">"); // TODO forbid space in input
+				out.println("    <form method=\"POST\" action=\"tenant\" class=\"w3-container w3-card-4\">"); // TODO
+																												// forbid
+																												// space
+																												// in
+																												// input
 				out.println("      <label>Tenant Name</label>");
-				out.println("      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_TENANT_NAME + "\" value=\"\"/>");
-				out.println("		<input class=\"w3-button w3-section w3-teal w3-ripple\" type=\"submit\" value=\"Create\"/> ");
+				out.println("      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_TENANT_NAME
+						+ "\" value=\"\"/>");
+				out.println(
+						"		<input class=\"w3-button w3-section w3-teal w3-ripple\" type=\"submit\" value=\"Create\"/> ");
 				out.println("    </form>");
 				out.println("</div>");
 
 				out.println("<div class=\"w3-container w3-margin-top\">");
 				out.println("	<div class=\"w3-panel w3-yellow\"><p class=\"w3-left-align\">" +
-					"Tenants are separated testing environments, One Tenant &#8792; One IIS equivalent, Different Facilities can be registered as information sources to the Tenants" +
-					"</p></div>"); // TODO better explanation
+						"Tenants are separated testing environments, One Tenant &#8792; One IIS equivalent, Different Facilities can be registered as information sources to the Tenants"
+						+
+						"</p></div>"); // TODO better explanation
 
 				HomeController.printFlavors(out, true);
 				out.println("</div>");

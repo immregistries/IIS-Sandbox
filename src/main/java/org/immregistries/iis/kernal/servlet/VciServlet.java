@@ -11,7 +11,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.hibernate.SessionFactory;
 
-import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,7 +22,7 @@ import java.util.*;
 
 @SuppressWarnings("serial")
 @RestController
-@RequestMapping({"/vciDemo", TenantController.TENANT_PATH + "/vciDemo"})
+@RequestMapping({ "/vciDemo", TenantController.TENANT_PATH + "/vciDemo" })
 public class VciServlet {
 
   public static final Map<String, String> GENDER_MAP;
@@ -38,32 +37,30 @@ public class VciServlet {
 
   public static final String PARAM_MESSAGE = "MESSAGEDATA";
   public static final String CONVERSION_STEP = "conversionStep";
-  public static final String EXAMPLE_RSP =
-      "MSH|^~\\&||IIS Sandbox v0.4.1|||20210327104950-0600||RSP^K11^RSP_K11|16168637904173|P|2.5.1|||NE|NE|||||Z32^CDCPHINVS\r\n"
-          + "MSA|AA|1616863788100.1\r\n"
-          + "QAK|1616863788100.1|OK|Z34^Request a Complete Immunization History^CDCPHINVS\r\n"
-          + "QPD|Z34^Request Immunization History^CDCPHINVS|1616863788100.1|O26S1^^^AIRA-TEST^MR|WestmorelandAIRA^AbigaleAIRA^Hemangi^^^^L|GalvestonAIRA^AlumitAIRA^^^^^M|20170317|F|1049 Daterland Ave^^Coloma^MI^49039^USA^P|^PRN^PH^^^269^5713805|||||\r\n"
-          + "PID|1||CVM7PU8NTVR6^^^IIS^SR~O26S1^^^AIRA-TEST^MR||WestmorelandAIRA^AbigaleAIRA^Hemangi^^^^L|GalvestonAIRA^^^^^^M|20170317|F|||1049 Daterland Ave^^Coloma^MI^49039^USA^P||^PRN^PH^^^269^5713805||||||||||||\r\n"
-          + "NK1|1|HoggAIRA^AlumitAIRA^^^^^L|MTH^Mother^HL70063\r\n"
-          + "ORC|RE|11533^IIS|O26S1.3^AART Primary\r\n"
-          + "RXA|0|1|20210327||03^MMR^CVX|0.5|mL^milliliters^UCUM||00^New immunization record^NIP001||||||U1747GW||MSD^Merck and Co., Inc.^MVX|||CP|A\r\n"
-          + "RXR|C38299^Subcutaneous^NCIT|LA^Left Upper Arm^HL70163\r\n"
-          + "OBX|1|CE|30956-7^Vaccine type^LN|1|06^06^CVX||||||F\r\n"
-          + "OBX|2|CE|59781-5^Dose validity^LN|1|Y^Y^99107||||||F\r\n"
-          + "OBX|3|CE|30956-7^Vaccine type^LN|2|05^05^CVX||||||F\r\n"
-          + "OBX|4|CE|59781-5^Dose validity^LN|2|Y^Y^99107||||||F\r\n"
-          + "OBX|5|CE|30956-7^Vaccine type^LN|3|07^07^CVX||||||F\r\n"
-          + "OBX|6|CE|59781-5^Dose validity^LN|3|Y^Y^99107||||||F\r\n"
-          + "OBX|7|CE|64994-7^Vaccine funding program eligibility category^LN|4|V05^VFC eligible - Federally Qualified Health Center Patient (under-insured)^HL70064||||||F|||20210327|||VXC40^Eligibility captured at the immunization level^CDCPHINVS\r\n"
-          + "OBX|8|CE|30956-7^Vaccine Type^LN|4|03^MMR^CVX||||||F||||||\r\n"
-          + "OBX|9|TS|29768-9^Date vaccine information statement published^LN|4|20120420||||||F||||||\r\n"
-          + "OBX|10|TS|29769-7^Date vaccine information statement presented^LN|4|20210327||||||F||||||\r\n"
-          + "ORC|RE||9999^IIS\r\n";
+  public static final String EXAMPLE_RSP = "MSH|^~\\&||IIS Sandbox v0.4.1|||20210327104950-0600||RSP^K11^RSP_K11|16168637904173|P|2.5.1|||NE|NE|||||Z32^CDCPHINVS\r\n"
+      + "MSA|AA|1616863788100.1\r\n"
+      + "QAK|1616863788100.1|OK|Z34^Request a Complete Immunization History^CDCPHINVS\r\n"
+      + "QPD|Z34^Request Immunization History^CDCPHINVS|1616863788100.1|O26S1^^^AIRA-TEST^MR|WestmorelandAIRA^AbigaleAIRA^Hemangi^^^^L|GalvestonAIRA^AlumitAIRA^^^^^M|20170317|F|1049 Daterland Ave^^Coloma^MI^49039^USA^P|^PRN^PH^^^269^5713805|||||\r\n"
+      + "PID|1||CVM7PU8NTVR6^^^IIS^SR~O26S1^^^AIRA-TEST^MR||WestmorelandAIRA^AbigaleAIRA^Hemangi^^^^L|GalvestonAIRA^^^^^^M|20170317|F|||1049 Daterland Ave^^Coloma^MI^49039^USA^P||^PRN^PH^^^269^5713805||||||||||||\r\n"
+      + "NK1|1|HoggAIRA^AlumitAIRA^^^^^L|MTH^Mother^HL70063\r\n"
+      + "ORC|RE|11533^IIS|O26S1.3^AART Primary\r\n"
+      + "RXA|0|1|20210327||03^MMR^CVX|0.5|mL^milliliters^UCUM||00^New immunization record^NIP001||||||U1747GW||MSD^Merck and Co., Inc.^MVX|||CP|A\r\n"
+      + "RXR|C38299^Subcutaneous^NCIT|LA^Left Upper Arm^HL70163\r\n"
+      + "OBX|1|CE|30956-7^Vaccine type^LN|1|06^06^CVX||||||F\r\n"
+      + "OBX|2|CE|59781-5^Dose validity^LN|1|Y^Y^99107||||||F\r\n"
+      + "OBX|3|CE|30956-7^Vaccine type^LN|2|05^05^CVX||||||F\r\n"
+      + "OBX|4|CE|59781-5^Dose validity^LN|2|Y^Y^99107||||||F\r\n"
+      + "OBX|5|CE|30956-7^Vaccine type^LN|3|07^07^CVX||||||F\r\n"
+      + "OBX|6|CE|59781-5^Dose validity^LN|3|Y^Y^99107||||||F\r\n"
+      + "OBX|7|CE|64994-7^Vaccine funding program eligibility category^LN|4|V05^VFC eligible - Federally Qualified Health Center Patient (under-insured)^HL70064||||||F|||20210327|||VXC40^Eligibility captured at the immunization level^CDCPHINVS\r\n"
+      + "OBX|8|CE|30956-7^Vaccine Type^LN|4|03^MMR^CVX||||||F||||||\r\n"
+      + "OBX|9|TS|29768-9^Date vaccine information statement published^LN|4|20120420||||||F||||||\r\n"
+      + "OBX|10|TS|29769-7^Date vaccine information statement presented^LN|4|20210327||||||F||||||\r\n"
+      + "ORC|RE||9999^IIS\r\n";
 
   private final Map<String, Object> fhirImm = new HashMap<>();
   private final Map<String, Object> fhirPatient = new HashMap<>();
   private static SessionFactory factory;
-
 
   @PostMapping
   protected void doPost(HttpServletRequest req, HttpServletResponse resp)
@@ -74,7 +71,6 @@ public class VciServlet {
   @GetMapping
   protected void doGet(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
-
 
     resp.setContentType("text/html");
     PrintWriter out = new PrintWriter(resp.getOutputStream());
@@ -136,8 +132,8 @@ public class VciServlet {
         ObjectMapper mapper = new ObjectMapper();
 
         Map<String, Object> verifiableCredential = new HashMap<>();
-		  verifiableCredential.put("iss", "https://sabbia.westus2.cloudapp.azure.com/issuer");
-			verifiableCredential.put("nbf", System.currentTimeMillis() / 1000L);
+        verifiableCredential.put("iss", "https://sabbia.westus2.cloudapp.azure.com/issuer");
+        verifiableCredential.put("nbf", System.currentTimeMillis() / 1000L);
 
         Map<String, Object> vcObj = new HashMap<>();
         vcObj.put("@context", Arrays.asList("https://www.w3.org/2018/credentials/v1"));
@@ -171,7 +167,7 @@ public class VciServlet {
         message = mapper.writeValueAsString(verifiableCredential);
       }
       HomeController.doHeader(out, "IIS Sandbox");
-		 out.println("    <h2>VCI Demonstration</h2>");
+      out.println("    <h2>VCI Demonstration</h2>");
       out.println("    <form action=\"vciDemo\" method=\"POST\">");
       if (conversionStep == null) {
         out.println("      <h3>Response (RSP) Message</h3>");

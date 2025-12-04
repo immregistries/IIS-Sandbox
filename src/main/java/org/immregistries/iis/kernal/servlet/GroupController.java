@@ -7,17 +7,15 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.hl7.fhir.r5.model.*;
 
 import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
-import org.immregistries.iis.kernal.fhir.security.UserAccessUtil;
-import org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester;
-import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
-import org.immregistries.iis.kernal.model.persisted.UserAccess;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.immregistries.iis.kernal.rest.GroupRestController;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
@@ -34,23 +32,17 @@ import java.io.PrintWriter;
 @RequestMapping({ "/group", TenantController.TENANT_PATH + "/group" })
 public class GroupController {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
-	@Autowired
-	RepositoryClientFactory repositoryClientFactory;
-	@Autowired
-	AbstractFhirRequester fhirRequester;
+
 	@Autowired
 	FhirContext fhirContext;
+	@Autowired
+	GroupRestController groupRestController;
 
 	@PostMapping
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
 		doGet(req, resp);
 
-		UserAccess userAccess = UserAccessUtil.getUserAccess();
-		if (userAccess == null) {
-			throw new AuthenticationCredentialsNotFoundException("");
-		}
-		String orgString = req.getParameter("Organization");
 		// Reference orgReference =
 		// repositoryClientFactory.getFhirContext().newJsonParser().parseResource(Reference.class,orgString);
 
@@ -60,19 +52,10 @@ public class GroupController {
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
 
-		UserAccess userAccess = UserAccessUtil.getUserAccess();
-		if (userAccess == null) {
-			throw new AuthenticationCredentialsNotFoundException("");
-		}
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		HomeController.doHeader(out, "IIS Sandbox - Groups", CurrentTenantUtil.getTenant());
-		Group group = new Group();
-		group.setManagingEntity(new Reference()
-				.setIdentifier(new Identifier().setType(new CodeableConcept(new Coding().setCode("Organization")))
-						.setSystem("AIRA_TEST").setValue("test")));
-		group.setDescription(
-				"Generated Group in IIS sandbox, for Bulk data export use case and Synchronisation with subscription synchronisation");
+		Group group = groupRestController.getGroup(req);
 		out.println("<p>");
 		out.println(fhirContext.newJsonParser().setPrettyPrint(true).encodeResourceToString(group));
 		out.println("</p>");

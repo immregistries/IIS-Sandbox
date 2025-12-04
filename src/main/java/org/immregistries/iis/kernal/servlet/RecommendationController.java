@@ -21,35 +21,36 @@ import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.model.persisted.Tenant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.immregistries.iis.kernal.rest.RecommendationRestController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Date;
 
 import static org.immregistries.iis.kernal.servlet.PatientController.PARAM_PATIENT_REPORTED_ID;
 import static org.immregistries.iis.kernal.servlet.RecommendationController.RECOMMENDATION_BASE_PATH;
 
 @RestController
-@RequestMapping({RECOMMENDATION_BASE_PATH, TenantController.TENANT_PATH + RECOMMENDATION_BASE_PATH})
+@RequestMapping({ RECOMMENDATION_BASE_PATH, TenantController.TENANT_PATH + RECOMMENDATION_BASE_PATH })
 public class RecommendationController {
 	public static final String RECOMMENDATION_BASE_PATH = "/recommendation";
 	public static final String PARAM_RECOMMENDATION_ID = "recommendationId";
 	public static final String PARAM_RECOMMENDATION_IDENTIFIER = "recommendationIdentifier";
 	public static final String PARAM_RECOMMENDATION_RESOURCE = "recommendationResource";
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
-	@Autowired
-	private IImmunizationRecommendationService immunizationRecommendationService;
+
 	@Autowired
 	private RepositoryClientFactory repositoryClientFactory;
 	@Autowired
 	private AbstractFhirRequester fhirRequester;
+
 	@Autowired
 	private FhirContext fhirContext;
 	@Autowired
 	private PatientMapper patientMapper;
-
+	@Autowired
+	private RecommendationRestController recommendationRestController;
 
 	/**
 	 * Used to add a random generated component to recommendation
@@ -61,38 +62,12 @@ public class RecommendationController {
 	 */
 	@PostMapping
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp
-//		, @PathVariable(name = TenantController.PATH_VARIABLE_TENANT_NAME, required = false) String tenantName dealt with in filter
+	// , @PathVariable(name = TenantController.PATH_VARIABLE_TENANT_NAME, required =
+	// false) String tenantName dealt with in filter
 	)
-		throws ServletException, IOException {
+			throws ServletException, IOException {
 		Tenant tenant = CurrentTenantUtil.getTenantRedirectIfNone(req, resp);
-		IGenericClient fhirClient = repositoryClientFactory.newGenericClient(req);
-		IDomainResource patient = PatientServletUtil.fetchPatientFromParameter(req, fhirClient, fhirRequester);
-		PatientMaster patientMaster = patientMapper.localObject(patient);
-
-		if (patient != null) {
-
-			IBaseBundle baseBundle = fhirClient.search().forResource("ImmunizationRecommendation")
-				.where(org.hl7.fhir.r5.model.ImmunizationRecommendation.PATIENT.hasId(new org.hl7.fhir.r5.model.IdType(patient.getId()).getIdPart())).execute();
-			if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R5)) {
-				org.hl7.fhir.r5.model.Bundle recommendationBundle = (org.hl7.fhir.r5.model.Bundle) baseBundle;
-				if (recommendationBundle.hasEntry()) {
-					org.hl7.fhir.r5.model.ImmunizationRecommendation recommendation = (org.hl7.fhir.r5.model.ImmunizationRecommendation) recommendationBundle.getEntryFirstRep().getResource();
-					recommendation = (org.hl7.fhir.r5.model.ImmunizationRecommendation) immunizationRecommendationService.addRandomGeneratedRecommendation(recommendation);
-					fhirClient.update().resource(recommendation).withId(recommendation.getId()).execute();
-				} else {
-					fhirClient.create().resource(immunizationRecommendationService.generate(tenant, new Date(), patientMaster)).execute();
-				}
-			} else if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R4)) {
-				org.hl7.fhir.r4.model.Bundle recommendationBundle = (org.hl7.fhir.r4.model.Bundle) baseBundle;
-				if (recommendationBundle.hasEntry()) {
-					org.hl7.fhir.r4.model.ImmunizationRecommendation recommendation = (org.hl7.fhir.r4.model.ImmunizationRecommendation) recommendationBundle.getEntryFirstRep().getResource();
-					recommendation = (org.hl7.fhir.r4.model.ImmunizationRecommendation) immunizationRecommendationService.addRandomGeneratedRecommendation(recommendation);
-					fhirClient.update().resource(recommendation).withId(recommendation.getId()).execute();
-				} else {
-					fhirClient.create().resource(immunizationRecommendationService.generate(tenant, new Date(), patientMaster)).execute();
-				}
-			}
-		}
+		recommendationRestController.addRandomRecommendation(tenant.getOrgId(), req);
 		doGet(req, resp);
 	}
 
@@ -107,22 +82,11 @@ public class RecommendationController {
 		CurrentTenantUtil.getTenantRedirectIfNone(req, resp);
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		try {
-			IParser parser = repositoryClientFactory.getFhirContext()
-				.newJsonParser().setPrettyPrint(true).setSummaryMode(false).setSuppressNarratives(true);
-			if (req.getParameter(PARAM_RECOMMENDATION_RESOURCE) != null) {
-				IGenericClient fhirClient = repositoryClientFactory.newGenericClient(req);
 
-				if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R5)) {
-					org.hl7.fhir.r5.model.ImmunizationRecommendation newRecommendation = parser.parseResource(org.hl7.fhir.r5.model.ImmunizationRecommendation.class, req.getParameter(PARAM_RECOMMENDATION_RESOURCE));
-					org.hl7.fhir.r5.model.ImmunizationRecommendation old = (org.hl7.fhir.r5.model.ImmunizationRecommendation) getRecommendation(req, fhirClient);
-					newRecommendation.setId(old.getIdElement().getIdPart());
-					fhirClient.update().resource(newRecommendation).execute();
-				} else if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R4)) {
-					org.hl7.fhir.r4.model.ImmunizationRecommendation newRecommendation = parser.parseResource(org.hl7.fhir.r4.model.ImmunizationRecommendation.class, req.getParameter(PARAM_RECOMMENDATION_RESOURCE));
-					org.hl7.fhir.r4.model.ImmunizationRecommendation old = (org.hl7.fhir.r4.model.ImmunizationRecommendation) getRecommendation(req, fhirClient);
-					newRecommendation.setId(old.getIdElement().getIdPart());
-					fhirClient.update().resource(newRecommendation).execute();
-				}
+			if (req.getParameter(PARAM_RECOMMENDATION_RESOURCE) != null) {
+				Tenant tenant = CurrentTenantUtil.getTenantRedirectIfNone(req, resp);
+				recommendationRestController.updateRecommendation(tenant.getOrgId(),
+						req.getParameter(PARAM_RECOMMENDATION_RESOURCE), req);
 			}
 		} catch (Exception exception) {
 			exception.printStackTrace(out);
@@ -157,10 +121,14 @@ public class RecommendationController {
 			if (recommendationResource != null) {
 				if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R5)) {
 					patientResource = (IDomainResource) fhirClient.read().resource("Patient")
-						.withId(((org.hl7.fhir.r5.model.ImmunizationRecommendation) recommendationResource).getPatient().getReference()).execute();
+							.withId(((org.hl7.fhir.r5.model.ImmunizationRecommendation) recommendationResource)
+									.getPatient().getReference())
+							.execute();
 				} else if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R4)) {
 					patientResource = (IDomainResource) fhirClient.read().resource("Patient")
-						.withId(((org.hl7.fhir.r4.model.ImmunizationRecommendation) recommendationResource).getPatient().getReference()).execute();
+							.withId(((org.hl7.fhir.r4.model.ImmunizationRecommendation) recommendationResource)
+									.getPatient().getReference())
+							.execute();
 				}
 			} else {
 				patientResource = PatientServletUtil.fetchPatientFromParameter(req, fhirClient, fhirRequester);
@@ -175,41 +143,52 @@ public class RecommendationController {
 			}
 
 			if (patientResource != null) {
-				out.println("<h2>Immunization recommendations of " + patientMaster.getLegalNameOrFirst().asSingleString() + "</h2>");
+				out.println("<h2>Immunization recommendations of "
+						+ patientMaster.getLegalNameOrFirst().asSingleString() + "</h2>");
 				if (recommendationResource == null) {
 					IBaseBundle baseBundle = fhirClient.search()
-						.forResource("ImmunizationRecommendation")
-						.where(org.hl7.fhir.r5.model.ImmunizationRecommendation.PATIENT
-							.hasChainedProperty(org.hl7.fhir.r5.model.Patient.IDENTIFIER.exactly()
-								.systemAndCode(identifier.getSystem(), identifier.getValue()))).execute();
+							.forResource("ImmunizationRecommendation")
+							.where(org.hl7.fhir.r5.model.ImmunizationRecommendation.PATIENT
+									.hasChainedProperty(org.hl7.fhir.r5.model.Patient.IDENTIFIER.exactly()
+											.systemAndCode(identifier.getSystem(), identifier.getValue())))
+							.execute();
 					if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R5)) {
 						org.hl7.fhir.r5.model.Bundle recommendationBundle = (org.hl7.fhir.r5.model.Bundle) baseBundle;
 						if (recommendationBundle.hasEntry()) {
-							recommendationResource = (IDomainResource) recommendationBundle.getEntryFirstRep().getResource();
+							recommendationResource = (IDomainResource) recommendationBundle.getEntryFirstRep()
+									.getResource();
 						}
 					} else if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R4)) {
 						org.hl7.fhir.r4.model.Bundle recommendationBundle = (org.hl7.fhir.r4.model.Bundle) baseBundle;
 						if (recommendationBundle.hasEntry()) {
-							recommendationResource = (IDomainResource) recommendationBundle.getEntryFirstRep().getResource();
+							recommendationResource = (IDomainResource) recommendationBundle.getEntryFirstRep()
+									.getResource();
 						}
 					}
 				}
 				printRecommendation(out, recommendationResource, patientResource);
-				if (recommendationResource != null && fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R5)) {
-					org.hl7.fhir.r5.model.Bundle subcriptionBundle = fhirClient.search().forResource(org.hl7.fhir.r5.model.Subscription.class).returnBundle(org.hl7.fhir.r5.model.Bundle.class).execute();
+				if (recommendationResource != null
+						&& fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R5)) {
+					org.hl7.fhir.r5.model.Bundle subcriptionBundle = fhirClient.search()
+							.forResource(org.hl7.fhir.r5.model.Subscription.class)
+							.returnBundle(org.hl7.fhir.r5.model.Bundle.class).execute();
 					IParser parser = repositoryClientFactory.getFhirContext()
-						.newJsonParser().setPrettyPrint(true).setSummaryMode(false).setSuppressNarratives(true);
+							.newJsonParser().setPrettyPrint(true).setSummaryMode(false).setSuppressNarratives(true);
 
 					out.println("<div class=\"w3-container\">");
 					out.println("<h3>Manually edit</h3>");
 					out.println("<form action=\"recommendation\" method=\"POST\">");
 					out.println("  <input type=\"hidden\" name=\"_method\" value=\"put\" />");
-					out.println("	<input type=\"hidden\" name=\"" + PARAM_PATIENT_REPORTED_ID + "\" value=\"" + new org.hl7.fhir.r5.model.IdType(patientResource.getId()).getIdPart() + "\"/>");
-					out.println("	<input type=\"hidden\" name=\"" + PARAM_RECOMMENDATION_ID + "\" value=\"" + new org.hl7.fhir.r5.model.IdType(recommendationResource.getId()).getIdPart() + "\"/>");
-					out.println("	<textarea class=\"w3-input w3-border\" name=\"" + PARAM_RECOMMENDATION_RESOURCE + "\" rows=\"11\" cols=\"160\">" +
-						parser.encodeResourceToString(recommendationResource) +
-						"</textarea>");
-					out.println("	<input class=\"w3-button w3-section w3-teal w3-ripple\" type=\"submit\" name=\"submit\" value=\"Edit resource\"/>");
+					out.println("	<input type=\"hidden\" name=\"" + PARAM_PATIENT_REPORTED_ID + "\" value=\""
+							+ new org.hl7.fhir.r5.model.IdType(patientResource.getId()).getIdPart() + "\"/>");
+					out.println("	<input type=\"hidden\" name=\"" + PARAM_RECOMMENDATION_ID + "\" value=\""
+							+ new org.hl7.fhir.r5.model.IdType(recommendationResource.getId()).getIdPart() + "\"/>");
+					out.println("	<textarea class=\"w3-input w3-border\" name=\"" + PARAM_RECOMMENDATION_RESOURCE
+							+ "\" rows=\"11\" cols=\"160\">" +
+							parser.encodeResourceToString(recommendationResource) +
+							"</textarea>");
+					out.println(
+							"	<input class=\"w3-button w3-section w3-teal w3-ripple\" type=\"submit\" name=\"submit\" value=\"Edit resource\"/>");
 					out.println("</form>");
 					out.println("</div>");
 
@@ -217,7 +196,8 @@ public class RecommendationController {
 					 * Temporary change to send through subscription
 					 */
 					org.hl7.fhir.r5.model.ImmunizationRecommendation immunizationRecommendation = (org.hl7.fhir.r5.model.ImmunizationRecommendation) recommendationResource;
-					immunizationRecommendation.setPatient(new org.hl7.fhir.r5.model.Reference().setIdentifier(identifier.toR5()));
+					immunizationRecommendation
+							.setPatient(new org.hl7.fhir.r5.model.Reference().setIdentifier(identifier.toR5()));
 					PatientServletUtil.printSubscriptions(out, parser, subcriptionBundle, immunizationRecommendation);
 				}
 			}
@@ -239,19 +219,28 @@ public class RecommendationController {
 	protected IDomainResource getRecommendation(HttpServletRequest req, IGenericClient fhirClient) {
 		IDomainResource recommendation = null;
 		if (req.getParameter(PARAM_RECOMMENDATION_ID) != null) {
-			recommendation = (IDomainResource) fhirClient.read().resource("ImmunizationRecommendation").withId(req.getParameter(PARAM_RECOMMENDATION_ID)).execute();
+			recommendation = (IDomainResource) fhirClient.read().resource("ImmunizationRecommendation")
+					.withId(req.getParameter(PARAM_RECOMMENDATION_ID)).execute();
 		} else if (req.getParameter(PARAM_RECOMMENDATION_IDENTIFIER) != null) {
 			if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R5)) {
-				org.hl7.fhir.r5.model.Bundle recommendationBundle = fhirClient.search().forResource("ImmunizationRecommendation").where(
-					org.hl7.fhir.r5.model.Patient.IDENTIFIER.exactly().identifier(req.getParameter(PARAM_RECOMMENDATION_IDENTIFIER))).returnBundle(org.hl7.fhir.r5.model.Bundle.class).execute();
+				org.hl7.fhir.r5.model.Bundle recommendationBundle = fhirClient
+						.search().forResource("ImmunizationRecommendation").where(
+								org.hl7.fhir.r5.model.Patient.IDENTIFIER.exactly()
+										.identifier(req.getParameter(PARAM_RECOMMENDATION_IDENTIFIER)))
+						.returnBundle(org.hl7.fhir.r5.model.Bundle.class).execute();
 				if (recommendationBundle.hasEntry()) {
-					recommendation = (org.hl7.fhir.r5.model.ImmunizationRecommendation) recommendationBundle.getEntryFirstRep().getResource();
+					recommendation = (org.hl7.fhir.r5.model.ImmunizationRecommendation) recommendationBundle
+							.getEntryFirstRep().getResource();
 				}
 			} else if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R4)) {
-				org.hl7.fhir.r4.model.Bundle recommendationBundle = fhirClient.search().forResource("ImmunizationRecommendation").where(
-					org.hl7.fhir.r4.model.Patient.IDENTIFIER.exactly().identifier(req.getParameter(PARAM_RECOMMENDATION_IDENTIFIER))).returnBundle(org.hl7.fhir.r4.model.Bundle.class).execute();
+				org.hl7.fhir.r4.model.Bundle recommendationBundle = fhirClient
+						.search().forResource("ImmunizationRecommendation").where(
+								org.hl7.fhir.r4.model.Patient.IDENTIFIER.exactly()
+										.identifier(req.getParameter(PARAM_RECOMMENDATION_IDENTIFIER)))
+						.returnBundle(org.hl7.fhir.r4.model.Bundle.class).execute();
 				if (recommendationBundle.hasEntry()) {
-					recommendation = (org.hl7.fhir.r4.model.ImmunizationRecommendation) recommendationBundle.getEntryFirstRep().getResource();
+					recommendation = (org.hl7.fhir.r4.model.ImmunizationRecommendation) recommendationBundle
+							.getEntryFirstRep().getResource();
 				}
 			}
 		}
@@ -262,7 +251,8 @@ public class RecommendationController {
 		printRecommendation(out, recommendation, patient, fhirContext);
 	}
 
-	public static void printRecommendation(PrintWriter out, IDomainResource recommendation, IDomainResource patient, FhirContext fhirContext) {
+	public static void printRecommendation(PrintWriter out, IDomainResource recommendation, IDomainResource patient,
+			FhirContext fhirContext) {
 		out.println("<div class=\"w3-container\">");
 		out.println("<h4>Recommendations</h4>");
 		if (recommendation != null) {
@@ -278,8 +268,10 @@ public class RecommendationController {
 		} else {
 			out.println("<div class=\"w3-panel w3-yellow\"><p>No Recommendation Found</p></div>");
 			out.println("<form action=\"recommendation\" method=\"POST\">");
-			out.println("	<input type=\"hidden\" name=\"" + PARAM_PATIENT_REPORTED_ID + "\" value=\"" + new org.hl7.fhir.r5.model.IdType(patient.getId()).getIdPart() + "\"/>");
-			out.println("	<input class=\"w3-button w3-section w3-teal w3-ripple\" type=\"submit\" name=\"submit\" value=\"Generate new recommendation\"/>");
+			out.println("	<input type=\"hidden\" name=\"" + PARAM_PATIENT_REPORTED_ID + "\" value=\""
+					+ new org.hl7.fhir.r5.model.IdType(patient.getId()).getIdPart() + "\"/>");
+			out.println(
+					"	<input class=\"w3-button w3-section w3-teal w3-ripple\" type=\"submit\" name=\"submit\" value=\"Generate new recommendation\"/>");
 			out.println("</form>");
 		}
 		if (recommendation != null) {
@@ -294,46 +286,59 @@ public class RecommendationController {
 		out.println("</table>");
 
 		out.println("<form action=\"recommendation\" method=\"POST\">");
-		out.println("	<input type=\"hidden\" name=\"" + PARAM_PATIENT_REPORTED_ID + "\" value=\"" + new org.hl7.fhir.r5.model.IdType(patient.getId()).getIdPart() + "\"/>");
+		out.println("	<input type=\"hidden\" name=\"" + PARAM_PATIENT_REPORTED_ID + "\" value=\""
+				+ new org.hl7.fhir.r5.model.IdType(patient.getId()).getIdPart() + "\"/>");
 		if (recommendation != null) {
-			out.println("	<input type=\"hidden\" name=\"" + PARAM_RECOMMENDATION_ID + "\" value=\"" + new org.hl7.fhir.r5.model.IdType(recommendation.getId()).getIdPart() + "\"/>");
+			out.println("	<input type=\"hidden\" name=\"" + PARAM_RECOMMENDATION_ID + "\" value=\""
+					+ new org.hl7.fhir.r5.model.IdType(recommendation.getId()).getIdPart() + "\"/>");
 		}
-		out.println("	<input class=\"w3-button w3-section w3-teal w3-ripple\" type=\"submit\" name=\"submit\" value=\"Add recommendation component\"/>");
+		out.println(
+				"	<input class=\"w3-button w3-section w3-teal w3-ripple\" type=\"submit\" name=\"submit\" value=\"Add recommendation component\"/>");
 		out.println("</form>");
 		out.println("</div>");
 	}
 
-	public static void printRecommendationLineR5(PrintWriter out, org.hl7.fhir.r5.model.ImmunizationRecommendation recommendation) {
+	public static void printRecommendationLineR5(PrintWriter out,
+			org.hl7.fhir.r5.model.ImmunizationRecommendation recommendation) {
 		int count = 0;
-		for (org.hl7.fhir.r5.model.ImmunizationRecommendation.ImmunizationRecommendationRecommendationComponent component : recommendation.getRecommendation()) {
+		for (org.hl7.fhir.r5.model.ImmunizationRecommendation.ImmunizationRecommendationRecommendationComponent component : recommendation
+				.getRecommendation()) {
 			count++;
 			if (count > 100) {
 				break;
 			}
 			String link = "recommendation?" + PARAM_RECOMMENDATION_ID + "="
-				+ new org.hl7.fhir.r5.model.IdType(recommendation.getId()).getIdPart();
+					+ new org.hl7.fhir.r5.model.IdType(recommendation.getId()).getIdPart();
 			out.println("<tr>");
-			out.println("    <td><a href=\"" + link + "\">" + component.getVaccineCodeFirstRep().getCodingFirstRep().getCode() + "</a></td>");
-			out.println("    <td><a href=\"" + link + "\">" + component.getDateCriterionFirstRep().getValue() + "</a></td>");
-			out.println("    <td><a href=\"" + link + "\">" + component.getDateCriterionFirstRep().getCode().getCodingFirstRep().getDisplay() + "</a></td>");
+			out.println("    <td><a href=\"" + link + "\">"
+					+ component.getVaccineCodeFirstRep().getCodingFirstRep().getCode() + "</a></td>");
+			out.println("    <td><a href=\"" + link + "\">" + component.getDateCriterionFirstRep().getValue()
+					+ "</a></td>");
+			out.println("    <td><a href=\"" + link + "\">"
+					+ component.getDateCriterionFirstRep().getCode().getCodingFirstRep().getDisplay() + "</a></td>");
 			out.println("</tr>");
 		}
 	}
 
-	public static void printRecommendationLineR4(PrintWriter out, org.hl7.fhir.r4.model.ImmunizationRecommendation recommendation) {
+	public static void printRecommendationLineR4(PrintWriter out,
+			org.hl7.fhir.r4.model.ImmunizationRecommendation recommendation) {
 		int count = 0;
 
-		for (org.hl7.fhir.r4.model.ImmunizationRecommendation.ImmunizationRecommendationRecommendationComponent component : recommendation.getRecommendation()) {
+		for (org.hl7.fhir.r4.model.ImmunizationRecommendation.ImmunizationRecommendationRecommendationComponent component : recommendation
+				.getRecommendation()) {
 			count++;
 			if (count > 100) {
 				break;
 			}
 			String link = "recommendation?" + PARAM_RECOMMENDATION_ID + "="
-				+ new org.hl7.fhir.r4.model.IdType(recommendation.getId()).getIdPart();
+					+ new org.hl7.fhir.r4.model.IdType(recommendation.getId()).getIdPart();
 			out.println("<tr>");
-			out.println("    <td><a href=\"" + link + "\">" + component.getVaccineCodeFirstRep().getCodingFirstRep().getCode() + "</a></td>");
-			out.println("    <td><a href=\"" + link + "\">" + component.getDateCriterionFirstRep().getValue() + "</a></td>");
-			out.println("    <td><a href=\"" + link + "\">" + component.getDateCriterionFirstRep().getCode().getCodingFirstRep().getDisplay() + "</a></td>");
+			out.println("    <td><a href=\"" + link + "\">"
+					+ component.getVaccineCodeFirstRep().getCodingFirstRep().getCode() + "</a></td>");
+			out.println("    <td><a href=\"" + link + "\">" + component.getDateCriterionFirstRep().getValue()
+					+ "</a></td>");
+			out.println("    <td><a href=\"" + link + "\">"
+					+ component.getDateCriterionFirstRep().getCode().getCodingFirstRep().getDisplay() + "</a></td>");
 			out.println("</tr>");
 		}
 	}

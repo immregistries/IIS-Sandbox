@@ -5,11 +5,13 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.immregistries.vaccination_deduplication.Immunization;
 import org.immregistries.vaccination_deduplication.LinkedImmunization;
-import org.immregistries.vaccination_deduplication.VaccinationDeduplication;
+
 import org.immregistries.vaccination_deduplication.reference.ImmunizationSource;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.immregistries.iis.kernal.rest.VacDedupRestController;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
@@ -18,11 +20,17 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import org.immregistries.iis.kernal.model.persisted.Tenant;
+import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
 
 @RestController
-@RequestMapping({"/vacDedup", TenantController.TENANT_PATH + "/vacDedup"})
+@RequestMapping({ "/vacDedup", TenantController.TENANT_PATH + "/vacDedup" })
 public class VacDedupController {
   private static final long serialVersionUID = 1L;
+
+  @Autowired
+  private VacDedupRestController vacDedupRestController;
 
   public static final String PARAM_ACTION = "action";
   public static final String PARAM_CVX = "cvx";
@@ -62,6 +70,10 @@ public class VacDedupController {
       }
       if (action != null) {
         if (action.equals(ACTION_SUBMIT)) {
+          VacDedupRestController.VacDedupRequest request = new VacDedupRestController.VacDedupRequest();
+          request.setAlgorithm(algorithm);
+          ArrayList<VacDedupRestController.VacDedupRequest.ImmunizationItem> items = new ArrayList<>();
+
           int i = 0;
           while (req.getParameter(PARAM_CVX + i) != null) {
             if (req.getParameter(PARAM_DATE + i).equals("")
@@ -69,6 +81,7 @@ public class VacDedupController {
               i++;
               continue;
             }
+            // Add to list for display
             Date date = null;
             try {
               date = sdf.parse(req.getParameter(PARAM_DATE + i));
@@ -95,22 +108,26 @@ public class VacDedupController {
             immunization.setOrganisationID(org);
             immunization.setSource(immunizationSource);
             immunizationList.add(immunization);
+
+            // Add to request for REST controller
+            VacDedupRestController.VacDedupRequest.ImmunizationItem item = new VacDedupRestController.VacDedupRequest.ImmunizationItem();
+            item.setDate(req.getParameter(PARAM_DATE + i));
+            item.setCvx(cvx);
+            item.setMvx(mvx);
+            item.setLot(lot);
+            item.setOrg(org);
+            item.setSource(source);
+            items.add(item);
+
             i++;
           }
+          request.setImmunizations(items);
+
           if (immunizationList.size() > 1) {
-            VaccinationDeduplication vaccinationDeduplication = new VaccinationDeduplication();
-
-            if (algorithm.equals(ALGORITHM_DETERMINISTIC)) {
-              immunizationListResults =
-                  vaccinationDeduplication.deduplicateDeterministic(immunizationList);
-
-            } else if (algorithm.equals(ALGORITHM_WEIGHTED)) {
-              immunizationListResults =
-                  vaccinationDeduplication.deduplicateWeighted(immunizationList);
-            } else if (algorithm.equals(ALGORITHM_HYBRID)) {
-              immunizationListResults =
-                  vaccinationDeduplication.deduplicateHybrid(immunizationList);
-            }
+            // Call REST controller
+            Tenant tenant = CurrentTenantUtil.getTenant();
+            List<LinkedImmunization> results = vacDedupRestController.deduplicate(tenant.getOrgId(), request, req);
+            immunizationListResults = new ArrayList<>(results);
           }
         }
       }

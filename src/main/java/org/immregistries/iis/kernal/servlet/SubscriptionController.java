@@ -1,14 +1,13 @@
 package org.immregistries.iis.kernal.servlet;
 
 import ca.uhn.fhir.jpa.provider.SubscriptionTriggeringProvider;
-import ca.uhn.fhir.parser.IParser;
+
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.apache.commons.lang3.tuple.MutablePair;
-import org.apache.commons.lang3.tuple.Pair;
+
 import org.hl7.fhir.r5.model.Bundle;
 import org.hl7.fhir.r5.model.Subscription;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR5Condition;
@@ -23,13 +22,13 @@ import org.springframework.context.annotation.Conditional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.immregistries.iis.kernal.rest.SubscriptionRestController;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.List;
+
 import java.util.Map;
 
 /**
@@ -47,6 +46,8 @@ public class SubscriptionController {
 	SubscriptionService subscriptionService;
 	@Autowired
 	SubscriptionTriggeringProvider subscriptionTriggeringProvider;
+	@Autowired
+	SubscriptionRestController subscriptionRestController;
 
 	public static final String PARAM_ACTION = "action";
 	public static final String PARAM_MESSAGE = "message";
@@ -84,7 +85,6 @@ public class SubscriptionController {
 			throws ServletException, IOException {
 		// TODO action as manual trigger with content
 		Tenant tenant = CurrentTenantUtil.getTenantRedirectIfNone(req, resp);
-		IGenericClient localClient = repositoryClientFactory.newGenericClient(req);
 
 		String subscriptionId = req.getParameter(PARAM_SUBSCRIPTION_ID);
 
@@ -93,37 +93,20 @@ public class SubscriptionController {
 		HomeController.doHeader(out, "IIS Sandbox - SubscriptionsResult", tenant);
 
 		try {
-			Bundle searchBundle = localClient.search().forResource(Subscription.class)
-					.where(Subscription.IDENTIFIER.exactly().identifier(subscriptionId)).returnBundle(Bundle.class)
-					.execute();
-			// Subscription subscription =
-			// localClient.read().resource(Subscription.class).withId(subscriptionId).execute();
+			String[] messages = req.getParameterValues(PARAM_MESSAGE);
+			String[] httpVerbs = req.getParameterValues(PARAM_HTTP_VERB);
 
-			if (searchBundle.hasEntry()) {
-				String[] messages = req.getParameterValues(PARAM_MESSAGE);
-				String[] httpVerbs = req.getParameterValues(PARAM_HTTP_VERB);
-				if (messages.length == httpVerbs.length) {
-					IParser parser;
-					List<Pair<String, Bundle.HTTPVerb>> parsedResources = new ArrayList<>();
-					for (int i = 0; i < messages.length; i++) {
-						String message = messages[i];
-						if (!message.isBlank()) {
-							parsedResources.add(new MutablePair<>(message, Bundle.HTTPVerb.valueOf(httpVerbs[i])));
-						}
-					}
-
-					Subscription subscription = (Subscription) searchBundle.getEntryFirstRep().getResource();
-					String result = subscriptionService.triggerWithResourceFullManual(subscription, parsedResources);
-					// String result = subscriptionService.triggerWithResource(subscription,null,
-					// null);
-					out.println(result);
-				} else {
-					out.println("Incorrect parameters length");
-				}
-
-			} else {
-				out.println("NO SUBSCRIPTION FOUND FOR THIS IDENTIFIER");
+			SubscriptionRestController.TriggerRequest triggerRequest = new SubscriptionRestController.TriggerRequest();
+			triggerRequest.setSubscriptionId(subscriptionId);
+			if (messages != null) {
+				triggerRequest.setMessages(java.util.Arrays.asList(messages));
 			}
+			if (httpVerbs != null) {
+				triggerRequest.setHttpVerbs(java.util.Arrays.asList(httpVerbs));
+			}
+
+			String result = subscriptionRestController.triggerSubscription(tenant.getOrgId(), triggerRequest, req);
+			out.println(result);
 		} catch (Exception e) {
 			resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 			e.printStackTrace(out);

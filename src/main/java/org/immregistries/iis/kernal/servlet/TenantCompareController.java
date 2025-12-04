@@ -1,33 +1,18 @@
 package org.immregistries.iis.kernal.servlet;
 
-import ca.uhn.fhir.context.FhirContext;
-import ca.uhn.fhir.interceptor.model.RequestPartitionId;
-import ca.uhn.fhir.jpa.api.dao.DaoRegistry;
-import ca.uhn.fhir.jpa.api.dao.IFhirResourceDao;
-import ca.uhn.fhir.jpa.partition.IPartitionLookupSvc;
-import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
-import ca.uhn.fhir.rest.api.server.IBundleProvider;
-import ca.uhn.fhir.rest.api.server.SystemRequestDetails;
-import ca.uhn.fhir.rest.param.TokenParam;
-import ca.uhn.fhir.rest.param.TokenParamModifier;
-import ca.uhn.fhir.rest.server.RestfulServer;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.constraints.NotBlank;
+
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Session;
 import org.hl7.fhir.instance.model.api.IBaseParameters;
-import org.hl7.fhir.instance.model.api.IBaseResource;
-import org.hl7.fhir.r4.model.BooleanType;
 import org.immregistries.iis.kernal.HibernateConfig;
-import org.immregistries.iis.kernal.fhir.CrossTenantDiffProvider;
 
 import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
-import org.immregistries.iis.kernal.fhir.security.TenantUtil;
 import org.immregistries.iis.kernal.fhir.security.UserAccessUtil;
-import org.immregistries.iis.kernal.model.persisted.Tenant;
+import org.immregistries.iis.kernal.logic.TenantCompareService;
 import org.immregistries.iis.kernal.model.persisted.UserAccess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,19 +21,17 @@ import org.springframework.security.authentication.AuthenticationCredentialsNotF
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import ca.uhn.fhir.context.FhirContext;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
-
-import static org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester.GOLDEN_RECORD;
-import static org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester.GOLDEN_SYSTEM_TAG;
 
 @RestController
-@RequestMapping({"/tenantCompare", TenantController.TENANT_PATH + "/tenantCompare"})
+@RequestMapping({ "/tenantCompare", TenantController.TENANT_PATH + "/tenantCompare" })
 public class TenantCompareController {
 	public static final String INCLUDE_GOLDEN = "includeGolden";
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -56,20 +39,15 @@ public class TenantCompareController {
 	public static final String TENANT_IDS = "tenantIds";
 
 	@Autowired
-	private IPartitionLookupSvc partitionLookupSvc;
+	private TenantCompareService tenantCompareService;
 
 	@Autowired
-	private CrossTenantDiffProvider diffProvider;
-	@Autowired
-	private DaoRegistry daoRegistry;
-	@Autowired
 	private FhirContext fhirContext;
-	@Autowired
-	private RestfulServer restfulServer;
 
 	@PostMapping
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		doGet(req, resp);
+		String tenantIds = req.getParameter(TENANT_IDS);
+		doGet(req, resp, tenantIds);
 	}
 
 	/**
@@ -82,8 +60,9 @@ public class TenantCompareController {
 	 * @throws IOException
 	 */
 	@GetMapping
-	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		String[] tenantNames = req.getParameter(TENANT_IDS).split(",");
+	protected void doGet(HttpServletRequest req, HttpServletResponse resp,
+			@RequestParam(name = TENANT_IDS) @NotBlank String tenantIds) throws ServletException, IOException {
+		String[] tenantNames = tenantIds.split(",");
 
 		boolean includeGolden = StringUtils.equalsIgnoreCase("true", req.getParameter(INCLUDE_GOLDEN));
 
@@ -96,82 +75,17 @@ public class TenantCompareController {
 			if (userAccess == null) {
 				throw new AuthenticationCredentialsNotFoundException("");
 			}
-
-			List<Tenant> tenantList = Arrays.stream(tenantNames).distinct().map(tenantName -> TenantUtil.authenticateTenant(userAccess, tenantName, dataSession, null)).collect(Collectors.toList());
-
-			List<SystemRequestDetails> systemRequestDetailsList = tenantList.stream().map(tenant -> {
-				SystemRequestDetails systemRequestDetails = new SystemRequestDetails();
-				systemRequestDetails.setTenantId(tenant.getOrganizationName());
-				return systemRequestDetails;
-			}).collect(Collectors.toList());
-
-			IFhirResourceDao patientDao = daoRegistry.getResourceDao("Patient");
-			checkResourceType(systemRequestDetailsList, patientDao, out, includeGolden);
-			IFhirResourceDao immunizationDao = daoRegistry.getResourceDao("Immunization");
-			checkResourceType(systemRequestDetailsList, immunizationDao, out, includeGolden);
-			IFhirResourceDao observationDao = daoRegistry.getResourceDao("Observation");
-			checkResourceType(systemRequestDetailsList, observationDao, out, includeGolden);
-			IFhirResourceDao organizationDao = daoRegistry.getResourceDao("Organization");
-			checkResourceType(systemRequestDetailsList, organizationDao, out, includeGolden);
-
-			/*
-			 * Check references, match resources
-			 */
+			List<IBaseParameters> diffs = tenantCompareService.compareTenants(tenantNames, userAccess, dataSession,
+					includeGolden);
+			for (IBaseParameters diff : diffs) {
+				out.println(
+						"<pre>" + fhirContext.newJsonParser().setPrettyPrint(true).encodeResourceToString(diff)
+								+ "</pre>");
+			}
 		} finally {
 			out.flush();
 			out.close();
 		}
 	}
-
-	private void checkResourceType(List<SystemRequestDetails> systemRequestDetailsList, IFhirResourceDao resourceDao, PrintWriter out, Boolean includeGolden) {
-		SearchParameterMap searchParameterMap = new SearchParameterMap();
-		if (!includeGolden) {
-			searchParameterMap.add("_tag", new TokenParam(GOLDEN_SYSTEM_TAG, GOLDEN_RECORD).setModifier(TokenParamModifier.NOT));
-		}
-		List<IBundleProvider> bundleProviderStream = systemRequestDetailsList.stream().map(
-			requestDetails -> resourceDao.search(searchParameterMap, requestDetails)).collect(Collectors.toList());
-		String label = resourceDao.getResourceType().getName().toLowerCase();
-
-		int previousSize = -1;
-		/**
-		 * Counting found patients
-		 */
-		for (IBundleProvider iBundleProvider : bundleProviderStream) {
-			int bundleSize = iBundleProvider.size();
-			if (previousSize >= 0) {
-				if (bundleSize > previousSize) {
-					logger.info("Missing {}s in first tenant ,{} found instead of {}", label, previousSize, bundleSize);
-				} else if (bundleSize < previousSize) {
-					logger.info("Missing {}s in second tenant ,{} found instead of {}", label, previousSize, bundleSize);
-				}
-//					return ;
-			}
-			previousSize = bundleSize;
-		}
-
-		/*
-		 * Diff on each patient
-		 */
-		SystemRequestDetails diffRequestDetail = new SystemRequestDetails();
-		diffRequestDetail.setRequestPartitionId(RequestPartitionId.allPartitions());
-		logger.info("Testing {}s with $diff", label);
-
-		JsonObject jsonObject = new JsonObject();
-		JsonArray diffs = new JsonArray();
-		for (int i = 0; i < previousSize; i++) {
-			IBaseResource iBaseResource1 = bundleProviderStream.get(0).getAllResources().get(i);
-			IBaseResource iBaseResource2 = bundleProviderStream.get(1).getAllResources().get(i);
-
-			IBaseParameters diff = diffProvider.diff(iBaseResource1.getIdElement(), iBaseResource2.getIdElement(), new BooleanType(false), diffRequestDetail);
-//			patientsDiff.add(fhirContext.newJsonParser().setPrettyPrint(true).encodeResourceToString(diff));
-			out.println("<pre>" + fhirContext.newJsonParser().setPrettyPrint(true).encodeResourceToString(diff) + "</pre>");
-//				out.println("<pre>" + fhirContext.newJsonParser().setPrettyPrint(true).encodeResourceToString(diff) + "</pre>");
-
-//				logger.info("Diff Patient {}, {}", i, fhirContext.newJsonParser().setPrettyPrint(true).encodeResourceToString(diff));
-		}
-//		jsonObject.add("patientsDiff", patientsDiff);
-		return;
-	}
-
 
 }

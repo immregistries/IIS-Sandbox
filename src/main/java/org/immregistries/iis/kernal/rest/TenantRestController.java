@@ -1,5 +1,7 @@
 package org.immregistries.iis.kernal.rest;
 
+import java.util.List;
+
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.query.Query;
@@ -17,6 +19,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 @RestController
 @RequestMapping("/rest/tenant")
 public class TenantRestController {
@@ -27,9 +31,20 @@ public class TenantRestController {
     @GetMapping("/{tenantId}")
     public Tenant getTenant(@PathVariable int tenantId) {
         try (Session dataSession = HibernateConfig.getDataSession()) {
-            Query<Tenant> query = dataSession.createQuery("from Tenant where orgId = :tenantId", Tenant.class);
+            Query<Tenant> query = dataSession
+                    .createQuery("from Tenant where orgId = :tenantId and userAccess = :userAccess", Tenant.class);
             query.setParameter("tenantId", tenantId);
+            query.setParameter("userAccess", UserAccessUtil.getUserAccess());
             return query.uniqueResult();
+        }
+    }
+
+    @GetMapping
+    public List<Tenant> getTenants(HttpServletRequest req) {
+        try (Session dataSession = HibernateConfig.getDataSession()) {
+            Query<Tenant> query = dataSession.createQuery("from Tenant where userAccess = :userAccess", Tenant.class);
+            query.setParameter("userAccess", UserAccessUtil.getUserAccess());
+            return query.list();
         }
     }
 
