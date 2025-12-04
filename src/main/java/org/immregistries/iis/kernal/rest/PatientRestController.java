@@ -6,7 +6,6 @@ import org.hibernate.Session;
 
 import org.immregistries.iis.kernal.HibernateConfig;
 import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
-import org.immregistries.iis.kernal.fhir.security.TenantUtil;
 import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.model.persisted.Tenant;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,7 +22,6 @@ public class PatientRestController extends BaseTenantTiedRest {
 
     @GetMapping("/{patientId}")
     public PatientMaster getPatient(
-            @PathVariable int tenantId,
             @PathVariable String patientId,
             HttpServletRequest req) {
         try (Session dataSession = HibernateConfig.getDataSession()) {
@@ -33,14 +31,12 @@ public class PatientRestController extends BaseTenantTiedRest {
 
     @GetMapping("")
     public List<PatientMaster> getAllPatients(
-            @PathVariable int tenantId,
             HttpServletRequest req) {
         try (Session dataSession = HibernateConfig.getDataSession()) {
-            Tenant tenant = TenantUtil.getTenantByIdAuthenticated(tenantId, dataSession);
+            Tenant tenant = CurrentTenantUtil.getTenant(req, dataSession);
             if (tenant == null) {
                 return new ArrayList<>();
             }
-            CurrentTenantUtil.getTenant(tenant.getOrganizationName(), req, dataSession);
 
             @SuppressWarnings("unchecked")
             List<PatientMaster> result = fhirRequester.searchPatientMasterGoldenList(new SearchParameterMap());

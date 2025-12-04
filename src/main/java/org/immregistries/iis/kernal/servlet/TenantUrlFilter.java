@@ -4,6 +4,8 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
+import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.AntPathMatcher;
@@ -14,7 +16,6 @@ import java.io.IOException;
 import static org.immregistries.iis.kernal.servlet.shlink.PatientShLinkManifestController.PATIENT_MANIFEST_FULL_PATH;
 
 public class TenantUrlFilter extends OncePerRequestFilter {
-	public static final String TENANT_NAME_URL = "TENANT_NAME_URL";
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	private final AntPathMatcher antPathMatcher = new AntPathMatcher("/");
@@ -48,7 +49,7 @@ public class TenantUrlFilter extends OncePerRequestFilter {
 			return;
 		}
 		path = path.substring(0, indexOfNext);
-		request.setAttribute(TENANT_NAME_URL, path);
+		request.setAttribute(CurrentTenantUtil.TENANT_NAME_URL, path);
 		filterChain.doFilter(request, response);
 	}
 

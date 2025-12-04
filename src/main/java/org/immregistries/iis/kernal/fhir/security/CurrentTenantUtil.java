@@ -18,12 +18,10 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.io.IOException;
 
-import static org.immregistries.iis.kernal.servlet.TenantUrlFilter.TENANT_NAME_URL;
-import static org.immregistries.iis.kernal.rest.TenantRequestLoggingFilter.TENANT_ID_URL;
-
 public class CurrentTenantUtil {
 
     public static final String TENANT_ID_URL = "TENANT_ID_URL";
+    public static final String TENANT_NAME_URL = "TENANT_NAME_URL";
 
     public static final String SESSION_REQUEST_TENANT = "tenant";
 
