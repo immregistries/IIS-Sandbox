@@ -5,7 +5,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.hibernate.SessionFactory;
 
-import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
 import org.immregistries.smm.tester.manager.query.QueryConverter;
 import org.immregistries.smm.tester.manager.query.QueryType;
 import org.immregistries.smm.transform.ScenarioManager;
@@ -21,7 +20,7 @@ import java.io.PrintWriter;
 
 @SuppressWarnings("serial")
 @RestController
-@RequestMapping({"/queryConverter", TenantController.TENANT_PATH + "/queryConverter"})
+@RequestMapping({ "/queryConverter", TenantController.TENANT_PATH + "/queryConverter" })
 public class QueryConverterController {
 
   public static final String PARAM_MESSAGE = "MESSAGEDATA";
@@ -29,16 +28,15 @@ public class QueryConverterController {
 
   private static SessionFactory factory;
 
-	@PostMapping
+  @PostMapping
   protected void doPost(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
     doGet(req, resp);
   }
 
-	@GetMapping
+  @GetMapping
   protected void doGet(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
-
 
     resp.setContentType("text/html");
     PrintWriter out = new PrintWriter(resp.getOutputStream());
@@ -46,12 +44,11 @@ public class QueryConverterController {
       String message = req.getParameter(PARAM_MESSAGE);
       QueryConverter queryConverter = null;
       if (req.getParameter(QUERY_TYPE) != null) {
-        queryConverter =
-            QueryConverter.getQueryConverter(QueryType.getValue(req.getParameter(QUERY_TYPE)));
+        queryConverter = QueryConverter.getQueryConverter(QueryType.getValue(req.getParameter(QUERY_TYPE)));
       }
       if (message == null || message.equals("")) {
-        TestCaseMessage testCaseMessage =
-            ScenarioManager.createTestCaseMessage(ScenarioManager.SCENARIO_1_R_ADMIN_CHILD);
+        TestCaseMessage testCaseMessage = ScenarioManager
+            .createTestCaseMessage(ScenarioManager.SCENARIO_1_R_ADMIN_CHILD);
         Transformer transformer = new Transformer();
         transformer.transform(testCaseMessage);
         message = testCaseMessage.getMessageText();
@@ -60,8 +57,8 @@ public class QueryConverterController {
         message = queryConverter.convert(message);
       }
       {
-			HomeController.doHeader(out, "IIS Sandbox");
-			out.println("    <h2>Convert VXU to QBP</h2>");
+        HomeController.doHeader(out, "IIS Sandbox");
+        out.println("    <h2>Convert VXU to QBP</h2>");
         out.println("    <form action=\"queryConverter\" method=\"POST\">");
         if (queryConverter == null) {
           out.println("      <h3>Update (VXU) Message</h3>");
@@ -84,7 +81,7 @@ public class QueryConverterController {
         }
         out.println("    </div>");
         out.println("    </form>");
-			HomeController.doFooter(out);
+        HomeController.doFooter(out);
       }
     } catch (Exception e) {
       e.printStackTrace(System.err);

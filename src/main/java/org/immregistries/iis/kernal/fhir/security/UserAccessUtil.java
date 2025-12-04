@@ -122,6 +122,7 @@ public class UserAccessUtil {
 
     /**
      * asynchroneously provides and registers UserAccess Object from SecurityContext
+     * or HttpServletRequest for Code use in Subscription Context
      *
      * @return
      */

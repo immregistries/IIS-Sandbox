@@ -48,7 +48,11 @@ public class CurrentTenantUtil {
         final Tenant tenant;
         Tenant requestTenant = (Tenant) request.getAttribute(SESSION_REQUEST_TENANT);
         String urlTenantName = (String) request.getAttribute(TENANT_NAME_URL);
-        int urlTenantId = (int) request.getAttribute(TENANT_ID_URL);
+		 Object attribute = request.getAttribute(TENANT_ID_URL);
+		 int urlTenantId = 0;
+		 if (attribute != null) {
+			 urlTenantId = (int) attribute;
+		 }
 
         if (urlTenantId > 0) {
             try (Session dataSession = HibernateConfig.getDataSession()) {
