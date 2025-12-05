@@ -48,7 +48,8 @@ public class ServerSecurityConfig {
 						// API AUTHORIZATION AND AUTHENTICATION SEPARATED
 						.requestMatchers("/fhir/**", SoapController.SOAP_BASE_PATH,
 								FhirMessagingController.FHIR_MESSAGING_BASE_PATH + SoapController.SOAP_BASE_PATH,
-								"/.well-known/smart-configuration", "/registerClient", "/token")
+								"/.well-known/smart-configuration", "/registerClient", "/token",
+								"/rest/**")
 						.permitAll()
 						.anyRequest().authenticated())
 				.formLogin((form) -> form

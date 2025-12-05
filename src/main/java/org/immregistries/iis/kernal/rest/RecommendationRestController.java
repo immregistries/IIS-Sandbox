@@ -160,6 +160,7 @@ public class RecommendationRestController {
     }
 
     // Copied from RecommendationController for equivalence
+    @GetMapping()
     private IDomainResource getRecommendation(HttpServletRequest req, IGenericClient fhirClient) {
         IDomainResource recommendation = null;
         String recommendationId = req.getParameter("recommendationId");

@@ -5,6 +5,7 @@ import ca.uhn.fhir.rest.client.api.IGenericClient;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.tuple.MutablePair;
 import org.apache.commons.lang3.tuple.Pair;
+import org.hl7.fhir.instance.model.api.IBaseBundle;
 import org.hl7.fhir.r5.model.Bundle;
 import org.hl7.fhir.r5.model.Subscription;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR5Condition;
@@ -31,6 +32,18 @@ public class SubscriptionRestController {
     SubscriptionService subscriptionService;
     @Autowired
     SubscriptionTriggeringProvider subscriptionTriggeringProvider;
+
+    @GetMapping()
+    public IBaseBundle getAllSubscriptions(
+            HttpServletRequest req) {
+        IGenericClient fhirClient = repositoryClientFactory.newGenericClient(req);
+
+        // Implementation for GET request
+        org.hl7.fhir.r5.model.Bundle subcriptionBundle = fhirClient.search()
+                .forResource(org.hl7.fhir.r5.model.Subscription.class)
+                .returnBundle(org.hl7.fhir.r5.model.Bundle.class).execute();
+        return subcriptionBundle;
+    }
 
     @PostMapping("/trigger")
     public String triggerSubscription(

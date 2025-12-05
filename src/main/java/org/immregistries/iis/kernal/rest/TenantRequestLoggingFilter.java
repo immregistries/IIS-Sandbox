@@ -20,6 +20,7 @@ public class TenantRequestLoggingFilter extends OncePerRequestFilter {
 
     private static final Logger logger = LoggerFactory.getLogger(TenantRequestLoggingFilter.class);
     private static final String TENANT_PREFIX = "/rest/tenant/";
+    public static final String TENANT_REQUEST_ATTRIBUTE = "tenant";
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)

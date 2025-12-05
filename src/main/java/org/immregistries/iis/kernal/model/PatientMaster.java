@@ -47,6 +47,16 @@ public class PatientMaster extends AbstractMappedObject implements Serializable,
 	private String managingOrganizationId;
 	private String generalPractitionerId;
 
+	private boolean isMdmGolden = false;
+
+	public boolean isMdmGolden() {
+		return isMdmGolden;
+	}
+
+	public void setMdmGolden(boolean mdmGolden) {
+		isMdmGolden = mdmGolden;
+	}
+
 	public String getManagingOrganizationId() {
 		return managingOrganizationId;
 	}

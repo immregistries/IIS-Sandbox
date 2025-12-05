@@ -53,13 +53,13 @@ public class RepositoryClientFactory extends ApacheRestfulClientFactory implemen
 	Environment environment;
 
 	@Autowired
-	public RepositoryClientFactory(){
+	public RepositoryClientFactory() {
 		super();
 		setServerValidationMode(ServerValidationModeEnum.NEVER);
 	}
 
 	private void asynchInit() {
-		if (this.getFhirContext() == null ){
+		if (this.getFhirContext() == null) {
 			setFhirContext(fhirSystemDao.getContext());
 			loggingInterceptor = new LoggingInterceptor();
 			loggingInterceptor.setLogger(logger);
@@ -69,15 +69,7 @@ public class RepositoryClientFactory extends ApacheRestfulClientFactory implemen
 	public IGenericClient newGenericClient(Tenant tenant, HttpServletRequest httpServletRequest) {
 		asynchInit();
 		IGenericClient client;
-		UriComponentsBuilder uriComponentsBuilder = ServletUriComponentsBuilder.fromRequestUri(httpServletRequest);
-		URL serverBase;
-		try {
-			uriComponentsBuilder.replacePath(fhirServerBasePath(tenant));
-			uriComponentsBuilder.replaceQuery("");
-			serverBase = uriComponentsBuilder.build().toUri().toURL();
-		} catch (MalformedURLException e) {
-			throw new RuntimeException(e);
-		}
+		URL serverBase = extractServerBase(tenant, httpServletRequest);
 		client = newGenericClient(serverBase.toString());
 		IClientInterceptor authInterceptor;
 		if (tenant.getOrganizationName().equals(CONNECTATHON_USER) && tenant.getUserAccess().getAccessName() == null) {
@@ -94,12 +86,24 @@ public class RepositoryClientFactory extends ApacheRestfulClientFactory implemen
 
 			authInterceptor = new BearerTokenAuthInterceptor((String) authentication.getCredentials());
 		} else {
-			authInterceptor = new BasicAuthInterceptor(tenant.getUserAccess().getAccessName(), tenant.getUserAccess().getAccessKey());
+			authInterceptor = new BasicAuthInterceptor(tenant.getUserAccess().getAccessName(),
+					tenant.getUserAccess().getAccessKey());
 		}
 		client.registerInterceptor(authInterceptor);
-		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
-		request.setAttribute(FHIR_CLIENT, client);
 		return client;
+	}
+
+	private URL extractServerBase(Tenant tenant, HttpServletRequest httpServletRequest) {
+		UriComponentsBuilder uriComponentsBuilder = ServletUriComponentsBuilder.fromRequestUri(httpServletRequest);
+		URL serverBase;
+		try {
+			uriComponentsBuilder.replacePath(fhirServerBasePath(tenant));
+			uriComponentsBuilder.replaceQuery("");
+			serverBase = uriComponentsBuilder.build().toUri().toURL();
+		} catch (MalformedURLException e) {
+			throw new RuntimeException(e);
+		}
+		return serverBase;
 	}
 
 	public static @NotNull String fhirServerBasePath(Tenant tenant) {
@@ -134,12 +138,11 @@ public class RepositoryClientFactory extends ApacheRestfulClientFactory implemen
 		return (IGenericClient) request.getAttribute(FHIR_CLIENT);
 	}
 
-
 	public IGenericClient getFhirClient() {
-		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
+				.getRequest();
 		return newGenericClient(request);
 	}
-
 
 	/**
 	 * Used for manual subscription trigger

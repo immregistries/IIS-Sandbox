@@ -3,15 +3,10 @@ package org.immregistries.iis.kernal.servlet;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.immregistries.iis.kernal.fhir.interceptors.PartitionTenantCreationInterceptor;
-
 import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.fhir.security.TenantUtil;
-import org.immregistries.iis.kernal.logic.BaseIISSOAPServer;
-import org.immregistries.iis.kernal.logic.messageHandling.V2IncomingMessageHandler;
 import org.immregistries.iis.kernal.model.persisted.Tenant;
 import org.immregistries.smm.cdc.*;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -25,50 +20,6 @@ import static org.immregistries.iis.kernal.servlet.TenantController.PATH_VARIABL
 public class SoapController {
 
 	public static final String SOAP_BASE_PATH = "/soap";
-	@Autowired
-	private V2IncomingMessageHandler handler;
-	@Autowired
-	private PartitionTenantCreationInterceptor partitionTenantCreationInterceptor;
-
-	@PostMapping
-	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-			throws ServletException, IOException {
-		Tenant tenant = CurrentTenantUtil.getTenant();
-
-		String tenantName;
-		if (tenant == null) {
-			tenantName = null;
-		} else {
-			tenantName = tenant.getOrganizationName();
-		}
-		String path = req.getPathInfo();
-		final String processorName = path == null ? "" : (path.startsWith("/") ? path.substring(1) : path);
-		CDCWSDLServer server = new BaseIISSOAPServer(partitionTenantCreationInterceptor, tenantName) {
-			@Override
-			public void process(SubmitSingleMessage ssm, PrintWriter out) throws Fault {
-				String message = ssm.getHl7Message();
-
-				String ack = "";
-				try {
-					/*
-					 * Tenant is accessed through RequestContext, and was previously set through the
-					 * authorize method of WSDL server
-					 */
-					Tenant tenant = CurrentTenantUtil.getTenant();
-					if (tenant == null) {
-						throw new SecurityException("Username/password combination is unrecognized");
-					} else {
-						ack = handler.process(message, tenant, null);
-					}
-				} catch (Exception e) {
-					throw new UnknownFault("Unable to process request: " + e.getMessage(), e);
-				}
-				out.print(ack);
-			}
-		};
-		server.setProcessorName(processorName);
-		server.process(req, resp);
-	}
 
 	@GetMapping
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp,
