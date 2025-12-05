@@ -829,6 +829,7 @@
                     </ignoredDependencies>
                     -->
                     <ignoredResourcePatterns>
+                        <ignoredResourcePattern>.*\.pdf$</ignoredResourcePattern>
                         <ignoredResourcePattern>.*\.txt$</ignoredResourcePattern>
                         <ignoredResourcePattern>.*\.html$</ignoredResourcePattern>
                         <ignoredResourcePattern>config/img/favicon.ico</ignoredResourcePattern>
