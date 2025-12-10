@@ -1,75 +1,85 @@
 package org.immregistries.iis.kernal.model.persisted;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
 import org.immregistries.iis.kernal.model.AbstractMappedObject;
 import org.immregistries.iis.kernal.model.ProcessingFlavor;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.io.Serializable;
 import java.util.Set;
 
+
+@Entity
+@Table(schema = "tenants")
 public class Tenant extends AbstractMappedObject implements Serializable {
-  /**
-   * 
-   */
-  private static final long serialVersionUID = 1L;
-  private int orgId = 0;
-  @JsonIgnore
-  private UserAccess userAccess = null;
-  private String organizationName = "";
-  @JsonIgnore
-  private Set<ProcessingFlavor> processingFlavorSet = null;
 
-  public int getOrgId() {
-    return orgId;
-  }
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	private int orgId = 0;
 
-  public void setOrgId(int orgId) {
-    this.orgId = orgId;
-  }
+	@JsonIgnore
+	@ManyToOne
+	private UserAccess userAccess = null;
 
-  public String getOrganizationName() {
-    return organizationName;
-  }
+	@Column(unique = true, nullable = false)
+	private String organizationName = "";
 
-  public void setOrganizationName(String organizationName) {
-    this.organizationName = organizationName;
-  }
+	@JsonIgnore
+	@Transient
+	private Set<ProcessingFlavor> processingFlavorSet = null;
 
-  @Override
-  public int hashCode() {
-    return this.getOrgId();
-  }
+	public int getOrgId() {
+		return orgId;
+	}
 
-  @Override
-  public boolean equals(Object obj) {
-    if (obj instanceof Tenant) {
-      Tenant other = (Tenant) obj;
-      return other.getOrgId() == this.getOrgId();
-    }
-    return super.equals(obj);
-  }
+	public void setOrgId(int orgId) {
+		this.orgId = orgId;
+	}
 
-  public Set<ProcessingFlavor> getProcessingFlavorSet() {
-    if (processingFlavorSet == null) {
-      processingFlavorSet = ProcessingFlavor.getProcessingStyle(organizationName);
-    }
-    return processingFlavorSet;
-  }
+	public String getOrganizationName() {
+		return organizationName;
+	}
 
-  public UserAccess getUserAccess() {
-    return userAccess;
-  }
+	public void setOrganizationName(String organizationName) {
+		this.organizationName = organizationName;
+	}
 
-  public void setUserAccess(UserAccess userAccess) {
-    this.userAccess = userAccess;
-  }
 
-  @Override
-  public String toString() {
-    return "Tenant{" +
-        "orgId=" + orgId +
-        ", organizationName='" + organizationName + '\'' +
-        '}';
-  }
+	public Set<ProcessingFlavor> getProcessingFlavorSet() {
+		if (processingFlavorSet == null) {
+			processingFlavorSet = ProcessingFlavor.getProcessingStyle(organizationName);
+		}
+		return processingFlavorSet;
+	}
+
+	public UserAccess getUserAccess() {
+		return userAccess;
+	}
+
+	public void setUserAccess(UserAccess userAccess) {
+		this.userAccess = userAccess;
+	}
+
+
+	@Override
+	public int hashCode() {
+		return this.getOrgId();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof Tenant) {
+			Tenant other = (Tenant) obj;
+			return other.getOrgId() == this.getOrgId();
+		}
+		return super.equals(obj);
+	}
+
+	@Override
+	public String toString() {
+		return "Tenant{" +
+			"orgId=" + orgId +
+			", organizationName='" + organizationName + '\'' +
+			'}';
+	}
 }

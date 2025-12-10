@@ -1,5 +1,6 @@
 package org.immregistries.iis.kernal.model.persisted;
 
+import jakarta.persistence.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 
@@ -14,14 +15,19 @@ import java.util.Collection;
 /**
  * TODO Improve integration with spring security, especially grantedAuthority
  */
+@Entity
+@Table(schema = "users")
 public class UserAccess implements Serializable, Authentication {
 
-  private static final long serialVersionUID = 1L;
-
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
   private int userAccessId = 0;
-  private String accessName = "";
-  private String accessKey = "";
 
+	@Column(unique = true, nullable = false)
+  private String accessName = "";
+
+	@Column(nullable = false)
+  private String accessKey = "";
 
   public int getUserAccessId() {
     return userAccessId;
