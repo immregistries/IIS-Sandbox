@@ -18,86 +18,98 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.io.IOException;
 
+/**
+ * static class providing tools related to the Tenent selected using request context
+ */
 public class CurrentTenantUtil {
 
-    public static final String TENANT_ID_URL = "TENANT_ID_URL";
-    public static final String TENANT_NAME_URL = "TENANT_NAME_URL";
+	public static final String TENANT_ID_URL = "TENANT_ID_URL";
+	public static final String TENANT_NAME_URL = "TENANT_NAME_URL";
 
-    public static final String SESSION_REQUEST_TENANT = "tenant";
+	public static final String SESSION_REQUEST_TENANT = "tenant";
 
-    public static Tenant getTenant(String pathVariable, HttpServletRequest request, Session dataSession) {
-        Tenant tenant = null;
-        if (StringUtils.isBlank(pathVariable)) {
-            tenant = getTenant(request);
-        } else {
-            UserAccess userAccess = null;
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            if (authentication instanceof UserAccess) {
-                userAccess = (UserAccess) authentication;
-            }
-            tenant = TenantUtil.authenticateTenant(userAccess, pathVariable, dataSession, null);
-        }
-        // if (tenant == null) {
-        // throw new AuthenticationCredentialsNotFoundException("");
-        // }
-        request.setAttribute(SESSION_REQUEST_TENANT, tenant);
-        return tenant;
-    }
+	public static Tenant getTenant(String pathVariable, HttpServletRequest request, Session dataSession) {
+		Tenant tenant = null;
+		if (StringUtils.isBlank(pathVariable)) {
+			tenant = getTenant(request);
+		} else {
+			UserAccess userAccess = null;
+			Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+			if (authentication instanceof UserAccess) {
+				userAccess = (UserAccess) authentication;
+			}
+			tenant = TenantUtil.authenticateTenant(userAccess, pathVariable, dataSession, null);
+		}
+		// if (tenant == null) {
+		// throw new AuthenticationCredentialsNotFoundException("");
+		// }
+		request.setAttribute(SESSION_REQUEST_TENANT, tenant);
+		return tenant;
+	}
 
-    public static Tenant getTenant(HttpServletRequest request, Session existingDataSession) {
-        final Tenant tenant;
-        Tenant requestTenant = (Tenant) request.getAttribute(SESSION_REQUEST_TENANT);
-        String urlTenantName = (String) request.getAttribute(TENANT_NAME_URL);
-		 Object attribute = request.getAttribute(TENANT_ID_URL);
-		 int urlTenantId = 0;
-		 if (attribute != null) {
-			 urlTenantId = (int) attribute;
-		 }
+	public static Tenant getTenant(HttpServletRequest request, Session existingDataSession) {
+		final Tenant tenant;
+		/*
+		Extracting variables from the Request
+		 */
+		Tenant requestTenant = (Tenant) request.getAttribute(SESSION_REQUEST_TENANT);
+		String urlTenantName = (String) request.getAttribute(TENANT_NAME_URL);
+		Object tenantIdUrlAttribute = request.getAttribute(TENANT_ID_URL);
+		int urlTenantId = 0;
+		if (tenantIdUrlAttribute != null) {
+			urlTenantId = (int) tenantIdUrlAttribute;
+		}
 
-        if (urlTenantId > 0) {
-            try (Session dataSession = HibernateConfig.getDataSession()) {
-                tenant = TenantUtil.getTenantByIdAuthenticated(urlTenantId, dataSession);
-            }
-        } else if (StringUtils.isNotBlank(urlTenantName)) {
-            if (requestTenant != null && StringUtils.equals(requestTenant.getOrganizationName(), urlTenantName)) {
-                tenant = requestTenant;
-            } else if (existingDataSession != null) {
-                tenant = getTenant(urlTenantName, request, existingDataSession);
-            } else
-                try (Session dataSession = HibernateConfig.getDataSession()) {
-                    tenant = getTenant(urlTenantName, request, dataSession);
-                }
-        } else {
-            tenant = requestTenant;
-        }
-        return tenant;
-    }
+		/*
+		if Tenant Id specified
+		else check if name
+		else check if full tenant object
+		 */
+		if (urlTenantId > 0) {
+			if (existingDataSession != null) {
+				tenant = TenantUtil.getTenantByIdAuthenticated(urlTenantId, existingDataSession);
+			} else try (Session dataSession = HibernateConfig.getDataSession()) {
+				tenant = TenantUtil.getTenantByIdAuthenticated(urlTenantId, dataSession);
+			}
+		} else if (StringUtils.isNotBlank(urlTenantName)) {
+			if (requestTenant != null && StringUtils.equals(requestTenant.getOrganizationName(), urlTenantName)) {
+				tenant = requestTenant;
+			} else if (existingDataSession != null) {
+				tenant = getTenant(urlTenantName, request, existingDataSession);
+			} else try (Session dataSession = HibernateConfig.getDataSession()) {
+				tenant = getTenant(urlTenantName, request, dataSession);
+			}
+		} else {
+			tenant = requestTenant;
+		}
+		return tenant;
+	}
 
-    public static Tenant getTenant(HttpServletRequest request) {
-        return getTenant(request, null);
-    }
+	public static Tenant getTenant(HttpServletRequest request) {
+		return getTenant(request, null);
+	}
 
-    public static @NotNull Tenant getTenantRedirectIfNone(HttpServletRequest req, HttpServletResponse resp)
-            throws IOException {
-        return getTenantRedirectIfNone(req, resp, null);
-    }
+	public static @NotNull Tenant getTenantRedirectIfNone(HttpServletRequest req, HttpServletResponse resp)
+		throws IOException {
+		return getTenantRedirectIfNone(req, resp, null);
+	}
 
-    public static @NotNull Tenant getTenantRedirectIfNone(HttpServletRequest req, HttpServletResponse resp,
-            Session existingDataSession) throws IOException {
-        Tenant tenant = getTenant(req, existingDataSession);
-        if (tenant == null) {
-            if (UserAccessUtil.getUserAccess() != null) {
-                resp.sendRedirect(Application.IIS_PATH_BASE + TenantController.TENANT_BASE_PATH);
-            }
-            throw new AuthenticationCredentialsNotFoundException("");
-        }
-        return tenant;
-    }
+	public static @NotNull Tenant getTenantRedirectIfNone(HttpServletRequest req, HttpServletResponse resp,
+																			Session existingDataSession) throws IOException {
+		Tenant tenant = getTenant(req, existingDataSession);
+		if (tenant == null) {
+			if (UserAccessUtil.getUserAccess() != null) {
+				resp.sendRedirect(Application.IIS_PATH_BASE + TenantController.TENANT_BASE_PATH);
+			}
+			throw new AuthenticationCredentialsNotFoundException("");
+		}
+		return tenant;
+	}
 
-    public static Tenant getTenant() {
-        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
-                .getRequest();
-        return getTenant(request);
-    }
+	public static Tenant getTenant() {
+		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
+			.getRequest();
+		return getTenant(request);
+	}
 
 }

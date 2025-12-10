@@ -2,10 +2,7 @@ package org.immregistries.iis.kernal.servlet;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.context.FhirVersionEnum;
-
 import ca.uhn.fhir.parser.IParser;
-import ca.uhn.fhir.rest.client.api.IGenericClient;
-
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -79,7 +76,8 @@ public class PatientController {
 
 	@Autowired
 	private PatientRestController patientRestController;
-	@Autowired
+
+	@Autowired(required = false)
 	private SubscriptionRestController subscriptionRestController;
 
 	@PostMapping
@@ -103,8 +101,11 @@ public class PatientController {
 			Tenant tenant = CurrentTenantUtil.getTenantRedirectIfNone(req, resp, dataSession);
 			try {
 				HomeController.doHeader(out, "IIS Sandbox - Patients", tenant);
-				IBaseResource patientSelected = patientRestController
-						.getPatientFhir(req.getParameter(PARAM_PATIENT_REPORTED_ID), tenant, req);
+				String patientId = req.getParameter(PARAM_PATIENT_REPORTED_ID);
+				IBaseResource patientSelected = null;
+				if (StringUtils.isNotBlank(patientId)) {
+					patientSelected = patientRestController.getPatientFhir(patientId, tenant, req);
+				}
 
 				if (patientSelected == null) {
 					searchOrPrintAll(req, out, tenant);
