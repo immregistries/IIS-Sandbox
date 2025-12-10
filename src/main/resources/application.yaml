@@ -48,10 +48,6 @@ spring:
     max-active: 50
     hikari:
       maximum-pool-size: 10
-  hibernate:
-    hbm2ddl:
-      auto:
-        create
   datasource:
     #    url: '@SPRING_DATASOURCE_URL@'
     url: ${SPRING_DATASOURCE_URL}
@@ -92,6 +88,10 @@ spring:
   batch:
     job:
       enabled: false
+hibernate:
+  hbm2ddl:
+    auto:
+      create
 hapi:
   fhir:
     ### This is the FHIR version. Choose between, DSTU2, DSTU3, R4 or R5
