@@ -15,43 +15,43 @@ import java.util.Collection;
 /**
  * TODO Improve integration with spring security, especially grantedAuthority
  */
-@Entity
-@Table(schema = "users")
+@Entity(name = "UserAccess")
+@Table(schema = "UserAccess", name = "UserAccess")
 public class UserAccess implements Serializable, Authentication {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-  private int userAccessId = 0;
+	private int id = 0;
 
 	@Column(unique = true, nullable = false)
-  private String accessName = "";
+	private String accessName = "";
 
 	@Column(nullable = false)
-  private String accessKey = "";
+	private String accessKey = "";
 
-  public int getUserAccessId() {
-    return userAccessId;
-  }
+	public int getUserAccessId() {
+		return id;
+	}
 
-  public void setUserAccessId(int userAccessId) {
-    this.userAccessId = userAccessId;
-  }
+	public void setUserAccessId(int userAccessId) {
+		this.id = userAccessId;
+	}
 
-  public String getAccessName() {
-    return accessName;
-  }
+	public String getAccessName() {
+		return accessName;
+	}
 
-  public void setAccessName(String accessName) {
-    this.accessName = accessName;
-  }
+	public void setAccessName(String accessName) {
+		this.accessName = accessName;
+	}
 
-  public String getAccessKey() {
-    return accessKey;
-  }
+	public String getAccessKey() {
+		return accessKey;
+	}
 
-  public void setAccessKey(String accessKey) {
-    this.accessKey = accessKey;
-  }
+	public void setAccessKey(String accessKey) {
+		this.accessKey = accessKey;
+	}
 
 
 	@Override

@@ -14,6 +14,7 @@ server:
   servlet:
     contextPath: "/iis"
 iis:
+
   api:
     app:
       jwtSecret: ${ENV_IIS_JWT_SECRET}
@@ -40,6 +41,17 @@ spring:
     enabled: false
     check-location: false
     baselineOnMigrate: true
+  second-datasource:
+    jdbc-url: ${IIS_MYSQL_URL}
+    username: ${ENV_IIS_MYSQL_USER}
+    password: ${ENV_IIS_MYSQL_PASSWORD}
+    max-active: 50
+    hikari:
+      maximum-pool-size: 10
+  hibernate:
+    hbm2ddl:
+      auto:
+        create
   datasource:
     #    url: '@SPRING_DATASOURCE_URL@'
     url: ${SPRING_DATASOURCE_URL}

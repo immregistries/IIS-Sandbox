@@ -38,7 +38,7 @@ public class ServerSecurityConfig {
 				.requestCache(cache -> cache.requestCache(requestCache))
 				.authorizeHttpRequests((authorize) -> authorize
 						.requestMatchers(HttpMethod.GET, "/", HomeController.HOME_BASE_PATH,
-								PopController.POP_BASE_PATH, "/SubscriptionTopic/**", "/img/**")
+							PopController.POP_BASE_PATH, "/SubscriptionTopic/**", "/img/**", "/rest/**")
 						.permitAll()
 						.requestMatchers("/tenant/*/manifest/**", SHLINKS_CONTROLLER_BASE_URL + "/*",
 								TenantController.TENANT_PATH + WellKnownKeyController.WELL_KNOWN_PATH_SUFFIX,
