@@ -24,10 +24,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
-public class ShCardUtil {
+public class ShCardUtilService {
 
 	private final static String SIGNATURE_ALGORITHM_NAME = "HmacSha512";
 
@@ -56,6 +55,8 @@ public class ShCardUtil {
 
 	@Autowired
 	private FhirContext fhirContext;
+	@Autowired
+	private CompressionService compressionService;
 
 	public String qrCompact(IBaseBundle iBaseBundle, HttpServletRequest request, IisKey signingKey, UserAccess userAccess, Tenant tenant) throws IOException {
 		String resourceString = fhirContext.newJsonParser().setSummaryMode(true).encodeResourceToString(iBaseBundle);
@@ -85,7 +86,7 @@ public class ShCardUtil {
 			.add(VC, mapVc)
 			.build();
 
-		String claimsString = CompressionUtil.minifyJson(gson.toJson(claims));
+		String claimsString = compressionService.minifyJson(gson.toJson(claims));
 
 		JwtBuilder jwtBuilder = Jwts.builder()
 			.compressWith(Jwts.ZIP.DEF)
@@ -100,14 +101,14 @@ public class ShCardUtil {
 		return compact;
 	}
 
-	private static String getEncodedForQrCode(String compact) {
-		String encodedForQrCode = compact.
-			chars().map(value -> value - SMALLEST_B64_CHAR_CODE)
-			.boxed()
-			.map(integer -> String.valueOf(integer / 10) + integer % 10)
-			.collect(Collectors.joining());
-		return encodedForQrCode;
-	}
+//	private static String getEncodedForQrCode(String compact) {
+//		String encodedForQrCode = compact.
+//			chars().map(value -> value - SMALLEST_B64_CHAR_CODE)
+//			.boxed()
+//			.map(integer -> String.valueOf(integer / 10) + integer % 10)
+//			.collect(Collectors.joining());
+//		return encodedForQrCode;
+//	}
 
 
 }

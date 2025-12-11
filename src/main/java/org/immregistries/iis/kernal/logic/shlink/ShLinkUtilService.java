@@ -6,12 +6,9 @@ import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
 import com.nimbusds.jose.util.Base64URL;
 import io.jsonwebtoken.Jwts;
-import jakarta.persistence.Query;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.hl7.fhir.instance.model.api.IBaseBundle;
 import org.hl7.fhir.instance.model.api.IIdType;
 import org.immregistries.iis.kernal.fhir.Application;
@@ -19,14 +16,9 @@ import org.immregistries.iis.kernal.fhir.shl.ShLinkPayload;
 import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
 import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.model.ShLinkFilePayload;
-import org.immregistries.iis.kernal.persisted.model.IisKey;
-import org.immregistries.iis.kernal.persisted.model.IisShLinkContent;
-import org.immregistries.iis.kernal.persisted.model.ShLinkManifest;
-import org.immregistries.iis.kernal.persisted.model.Tenant;
-import org.immregistries.iis.kernal.persisted.model.UserAccess;
+import org.immregistries.iis.kernal.persisted.model.*;
 import org.immregistries.iis.kernal.persisted.repository.IisShlinkContentRepository;
 import org.immregistries.iis.kernal.persisted.repository.ShlinkManifestRepository;
-import org.immregistries.iis.kernal.persisted.util.HibernateConfig;
 import org.immregistries.iis.kernal.servlet.shlink.ShLinkContentController;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -46,7 +38,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import static org.immregistries.iis.kernal.logic.shlink.ShCardUtil.VERIFIABLE_CREDENTIAL_TYPE;
+import static org.immregistries.iis.kernal.logic.shlink.ShCardUtilService.VERIFIABLE_CREDENTIAL_TYPE;
 import static org.immregistries.iis.kernal.servlet.shlink.ShLinkManifestController.SHLINKS_CONTROLLER_BASE_URL;
 
 @Service
@@ -59,7 +51,7 @@ public class ShLinkUtilService {
 	@Autowired
 	private IisShlinkContentRepository iisShlinkContentRepository;
 	@Autowired
-	private ShCardUtil shCardUtil;
+	private ShCardUtilService shCardUtilService;
 
 	@Autowired
 	private ShlinkManifestRepository shlinkManifestRepository;
@@ -71,6 +63,8 @@ public class ShLinkUtilService {
 
 	@Autowired
 	FhirContext fhirContext;
+	@Autowired
+	CompressionService compressionService;
 
 	public String fullExamplePatientQrCode(Tenant tenant, PatientMaster patientMaster, String baseUrl) {
 
@@ -148,7 +142,7 @@ public class ShLinkUtilService {
 		int width = 300; // Desired QR code width
 		int height = 300; // Desired QR code height
 		try {
-			BitMatrix bitMatrix = CompressionUtil.qrCodeBitMatrix(data, width, height);
+			BitMatrix bitMatrix = compressionService.qrCodeBitMatrix(data, width, height);
 			MatrixToImageWriter.writeToStream(bitMatrix, "PNG", outputStream);
 		} catch (IOException e) {
 			throw new ServletException("Error generating QR code", e);
@@ -166,13 +160,13 @@ public class ShLinkUtilService {
 
 		List<String> verifiableCredentials = new ArrayList<>(bundleList.size());
 		for (IBaseBundle bundle : bundleList) {
-			String shCardCompact = shCardUtil.qrCompact(bundle, req, iisSigningKey, userAccess, tenant);
+			String shCardCompact = shCardUtilService.qrCompact(bundle, req, iisSigningKey, userAccess, tenant);
 			verifiableCredentials.add(shCardCompact);
 		}
 		shLinkFilePayload.setVerifiableCredential(verifiableCredentials);
 
 		String encryptedContent = Jwts.builder()
-				.content(CompressionUtil
+			.content(compressionService
 						.minifyJson(shLinkFilePayload))
 				.header().add("cty", APPLICATION_SMART_HEALTH_CARD_CONTENT_TYPE)
 				.and()

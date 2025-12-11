@@ -7,6 +7,7 @@ import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 import jakarta.servlet.ServletException;
+import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -14,8 +15,8 @@ import java.util.zip.DataFormatException;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
 
-public class CompressionUtil {
-
+@Service
+public class CompressionService {
 
 	/**
 	 * Applies raw RFC1951 INFLATE decompression to a byte array.
@@ -26,7 +27,7 @@ public class CompressionUtil {
 	 * @return The decompressed byte array.
 	 * @throws DataFormatException If the input data format is invalid.
 	 */
-	public static byte[] inflate(byte[] input, boolean nowrap) throws DataFormatException {
+	public byte[] inflate(byte[] input, boolean nowrap) throws DataFormatException {
 		// Create a new Inflater instance with the "nowrap" parameter set to true.
 		// This indicates that the input is a raw DEFLATE stream, not a zlib stream.
 		Inflater inflater = new Inflater(nowrap);
@@ -58,7 +59,7 @@ public class CompressionUtil {
 	 * @param nowrap
 	 * @return The compressed byte array.
 	 */
-	public static byte[] deflate(byte[] input, boolean nowrap) {
+	public byte[] deflate(byte[] input, boolean nowrap) {
 		// Create a new Deflater instance with the desired compression level.
 		// A level of 9 represents the best compression.
 		Deflater deflater = new Deflater(Deflater.BEST_COMPRESSION, nowrap); // The `true` parameter signifies "nowrap" for raw DEFLATE.
@@ -92,7 +93,7 @@ public class CompressionUtil {
 	 * @return A minified JSON string with no useless whitespace.
 	 * @throws IOException If the JSON string is invalid.
 	 */
-	public static String minifyJson(String jsonString) throws IOException {
+	public String minifyJson(String jsonString) throws IOException {
 		ObjectMapper objectMapper = new ObjectMapper();
 		JsonNode jsonNode = objectMapper.readTree(jsonString);
 		return objectMapper.writeValueAsString(jsonNode);
@@ -107,13 +108,13 @@ public class CompressionUtil {
 	 * @return A minified JSON string with no useless whitespace.
 	 * @throws IOException If the JSON string is invalid.
 	 */
-	public static String minifyJson(Object jsonObject) throws IOException {
+	public String minifyJson(Object jsonObject) throws IOException {
 		ObjectMapper objectMapper = new ObjectMapper();
 		JsonNode jsonNode = objectMapper.valueToTree(jsonObject);
 		return objectMapper.writeValueAsString(jsonNode);
 	}
 
-	public static BitMatrix qrCodeBitMatrix(String data, int width, int height) throws ServletException {
+	public BitMatrix qrCodeBitMatrix(String data, int width, int height) throws ServletException {
 		try {
 			QRCodeWriter qrCodeWriter = new QRCodeWriter();
 			return qrCodeWriter.encode(data, BarcodeFormat.QR_CODE, width, height);
