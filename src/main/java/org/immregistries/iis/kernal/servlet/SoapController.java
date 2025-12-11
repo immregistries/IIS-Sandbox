@@ -5,7 +5,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.fhir.security.TenantUtil;
-import org.immregistries.iis.kernal.model.persisted.Tenant;
+import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.immregistries.smm.cdc.*;
 import org.springframework.web.bind.annotation.*;
 

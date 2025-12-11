@@ -4,13 +4,12 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.hibernate.Session;
-
-import org.immregistries.iis.kernal.HibernateConfig;
 import org.immregistries.iis.kernal.fhir.security.UserAccessUtil;
 import org.immregistries.iis.kernal.logic.KeyStoreService;
-import org.immregistries.iis.kernal.model.persisted.IisKey;
-import org.immregistries.iis.kernal.model.persisted.Tenant;
-import org.immregistries.iis.kernal.model.persisted.UserAccess;
+import org.immregistries.iis.kernal.persisted.model.IisKey;
+import org.immregistries.iis.kernal.persisted.model.Tenant;
+import org.immregistries.iis.kernal.persisted.model.UserAccess;
+import org.immregistries.iis.kernal.persisted.util.HibernateConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,7 +28,7 @@ import java.util.stream.Collectors;
 import static org.immregistries.iis.kernal.servlet.WellKnownKeyController.WELL_KNOWN_PATH_SUFFIX;
 
 @RestController
-@RequestMapping({TenantController.TENANT_PATH + WELL_KNOWN_PATH_SUFFIX, WELL_KNOWN_PATH_SUFFIX})
+@RequestMapping({ TenantController.TENANT_PATH + WELL_KNOWN_PATH_SUFFIX, WELL_KNOWN_PATH_SUFFIX })
 public class WellKnownKeyController {
 
 	public static final String WELL_KNOWN_PATH_SUFFIX = "/.well-known/jwks.json";
@@ -38,17 +37,19 @@ public class WellKnownKeyController {
 	KeyStoreService keyStoreService;
 
 	@GetMapping()
-	protected Set<?> doGetWellKnown(HttpServletRequest req, HttpServletResponse resp, @PathVariable(name = TenantController.PATH_VARIABLE_TENANT_NAME, required = false) String tenantName) throws ServletException, IOException {
+	protected Set<?> doGetWellKnown(HttpServletRequest req, HttpServletResponse resp,
+			@PathVariable(name = TenantController.PATH_VARIABLE_TENANT_NAME, required = false) String tenantName)
+			throws ServletException, IOException {
 		UserAccess userAccess = UserAccessUtil.getUserAccess();
 		resp.setContentType("application/json");
 		try (Session dataSession = HibernateConfig.getDataSession()) {
-//			Tenant tenant = CurrentTenantUtil.getTenantRedirectIfNone(req, resp, dataSession);
+			// Tenant tenant = CurrentTenantUtil.getTenantRedirectIfNone(req, resp,
+			// dataSession);
 			List<IisKey> iisKeys = keyStoreService.getKeys(userAccess, dataSession);
-			return iisKeys.stream().map(iisKey -> iisKey.jwk().toPublicJWK().toJSONObject()).collect(Collectors.toSet());
+			return iisKeys.stream().map(iisKey -> iisKey.jwk().toPublicJWK().toJSONObject())
+					.collect(Collectors.toSet());
 		}
 	}
-
-
 
 	public static String getKeyIssuerUrl(HttpServletRequest request, Tenant tenant) {
 		UriComponentsBuilder uriComponentsBuilder = ServletUriComponentsBuilder.fromRequest(request);

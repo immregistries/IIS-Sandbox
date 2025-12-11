@@ -16,9 +16,9 @@ import org.immregistries.iis.kernal.fhir.security.TenantUtil;
 import org.immregistries.iis.kernal.fhir.security.UserAccessUtil;
 import org.immregistries.iis.kernal.logic.KeyStoreService;
 import org.immregistries.iis.kernal.logic.shlink.ShLinkUtilService;
-import org.immregistries.iis.kernal.model.persisted.IisKey;
-import org.immregistries.iis.kernal.model.persisted.Tenant;
-import org.immregistries.iis.kernal.model.persisted.UserAccess;
+import org.immregistries.iis.kernal.persisted.model.IisKey;
+import org.immregistries.iis.kernal.persisted.model.Tenant;
+import org.immregistries.iis.kernal.persisted.model.UserAccess;
 import org.immregistries.iis.kernal.servlet.TenantController;
 import org.immregitries.clvr.CLVRPdfService;
 import org.immregitries.clvr.CLVRService;
@@ -69,7 +69,9 @@ public class CLVRController {
 			HttpServletRequest req,
 			HttpServletResponse resp,
 			@PathVariable("patientId") String patientId,
-			@RequestParam(value = "pdf", required = false) boolean pdf) throws COSEException, IOException, SignatureException, NoSuchAlgorithmException, InvalidKeyException, NoSuchProviderException, ServletException, WriterException {
+			@RequestParam(value = "pdf", required = false) boolean pdf)
+			throws COSEException, IOException, SignatureException, NoSuchAlgorithmException, InvalidKeyException,
+			NoSuchProviderException, ServletException, WriterException {
 		Tenant tenant = CurrentTenantUtil.getTenantRedirectIfNone(req, resp);
 		UserAccess userAccess = UserAccessUtil.getUserAccess();
 		OutputStream outputStream = resp.getOutputStream();
@@ -80,7 +82,7 @@ public class CLVRController {
 				.generateIps(TenantUtil.requestDetailsWithPartitionName(partitionLookupSvc), new IdType(patientId), "");
 		CLVRPayload clvrPayload = fhirConversionUtil.toCLVRPayloadFromBundle(ipsToBeEncoded);
 
-		CLVRToken clvrToken = new CLVRToken(clvrPayload,"IIS");
+		CLVRToken clvrToken = new CLVRToken(clvrPayload, "IIS");
 		String qrCode = clvrService.encodeCLVRtoQrCode(clvrToken, iisSigningKey.keyPair());
 		logger.info("qrCode {}", qrCode);
 

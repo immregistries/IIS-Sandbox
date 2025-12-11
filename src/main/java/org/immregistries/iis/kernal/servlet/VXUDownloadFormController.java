@@ -7,7 +7,7 @@ import jakarta.servlet.http.HttpSession;
 
 import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.fhir.security.TenantUtil;
-import org.immregistries.iis.kernal.model.persisted.Tenant;
+import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
@@ -22,11 +22,11 @@ import java.text.SimpleDateFormat;
 
 @SuppressWarnings("serial")
 @RestController
-@RequestMapping({"/VXUDownloadForm", TenantController.TENANT_PATH + "/VXUDownloadForm"})
+@RequestMapping({ "/VXUDownloadForm", TenantController.TENANT_PATH + "/VXUDownloadForm" })
 public class VXUDownloadFormController {
 
-	@Autowired
-	AutowireCapableBeanFactory beanFactory;
+  @Autowired
+  AutowireCapableBeanFactory beanFactory;
 
   protected static final String CACHED_GENERATOR = "generator";
   protected static final String EXPORT_YYYY_MM_DD = "yyyy-MM-dd";
@@ -36,15 +36,13 @@ public class VXUDownloadFormController {
 
   public static final String PARAM_ACTION = "action";
 
-
-	@PostMapping
+  @PostMapping
   protected void doPost(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
     doGet(req, resp);
   }
 
-
-	@GetMapping
+  @GetMapping
   protected void doGet(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
 
@@ -52,24 +50,23 @@ public class VXUDownloadFormController {
 
     resp.setContentType("text/html");
     PrintWriter out = new PrintWriter(resp.getOutputStream());
-	  Tenant tenant = CurrentTenantUtil.getTenant(req);
-	  if (tenant == null) {
-		  throw new AuthenticationCredentialsNotFoundException("");
-	  }
+    Tenant tenant = CurrentTenantUtil.getTenant(req);
+    if (tenant == null) {
+      throw new AuthenticationCredentialsNotFoundException("");
+    }
 
     try {
       String action = req.getParameter(PARAM_ACTION);
       if (action == null) {
         action = ACTION_REFRESH;
       }
-      VXUDownloadGenerator generator =
-          (VXUDownloadGenerator) session.getAttribute(CACHED_GENERATOR);
+      VXUDownloadGenerator generator = (VXUDownloadGenerator) session.getAttribute(CACHED_GENERATOR);
       if (generator == null || action == null || action.equals(ACTION_GENERATE)) {
         generator = new VXUDownloadGenerator(req, tenant);
-		  beanFactory.autowireBean(generator);
+        beanFactory.autowireBean(generator);
         session.setAttribute(CACHED_GENERATOR, generator);
       }
-		 HomeController.doHeader(out, "IIS Sandbox", tenant);
+      HomeController.doHeader(out, "IIS Sandbox", tenant);
 
       if (action.equals(ACTION_GENERATE) && generator.canGenerate()) {
         generator.start();
@@ -118,7 +115,7 @@ public class VXUDownloadFormController {
       if (generator.isFileReady()) {
         String link = "VXUDownload";
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-			out.println("<a href=\"" + TenantUtil.tenantifyPathWithContextPath(tenant, link) + "\" download=\"export"
+        out.println("<a href=\"" + TenantUtil.tenantifyPathWithContextPath(tenant, link) + "\" download=\"export"
             + sdf.format(generator.getDateEnd()) + ".vxu.txt\">Download</a>");
       }
       out.println("    </div>");
@@ -127,7 +124,7 @@ public class VXUDownloadFormController {
       System.err.println("Unable to render page: " + e.getMessage());
       e.printStackTrace(System.err);
     }
-		HomeController.doFooter(out);
+    HomeController.doFooter(out);
     out.flush();
     out.close();
   }

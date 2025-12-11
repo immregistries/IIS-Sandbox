@@ -7,15 +7,15 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.validation.constraints.NotBlank;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
-import org.immregistries.iis.kernal.HibernateConfig;
 import org.immregistries.iis.kernal.fhir.Application;
 import org.immregistries.iis.kernal.fhir.interceptors.PartitionTenantCreationInterceptor;
 
 import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.fhir.security.TenantUtil;
 import org.immregistries.iis.kernal.fhir.security.UserAccessUtil;
-import org.immregistries.iis.kernal.model.persisted.Tenant;
-import org.immregistries.iis.kernal.model.persisted.UserAccess;
+import org.immregistries.iis.kernal.persisted.model.Tenant;
+import org.immregistries.iis.kernal.persisted.model.UserAccess;
+import org.immregistries.iis.kernal.persisted.util.HibernateConfig;
 import org.immregistries.iis.kernal.rest.TenantRestController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

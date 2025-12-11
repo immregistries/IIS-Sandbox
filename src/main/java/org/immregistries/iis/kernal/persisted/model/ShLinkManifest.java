@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal.model.persisted;
+package org.immregistries.iis.kernal.persisted.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -12,10 +12,10 @@ import java.util.List;
 public class ShLinkManifest {
 	@JsonIgnore
 	private Tenant tenant;
-	//	@JsonIgnore
+	// @JsonIgnore
 	private String id;
 	@JsonProperty(value = "status")
-	private String status; //"finalized"|"can-change"|"no-longer-valid"
+	private String status; // "finalized"|"can-change"|"no-longer-valid"
 	@JsonProperty(value = "files")
 	private List<FileManifest> files = new ArrayList<>();
 

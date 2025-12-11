@@ -5,7 +5,7 @@ import org.immregistries.iis.kernal.logic.ack.IisReportable;
 import org.immregistries.iis.kernal.logic.ack.IisReportableSeverity;
 import org.immregistries.iis.kernal.logic.ack.ReportableUtil;
 import org.immregistries.iis.kernal.model.ProcessingFlavor;
-import org.immregistries.iis.kernal.model.persisted.Tenant;
+import org.immregistries.iis.kernal.persisted.model.Tenant;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

@@ -10,7 +10,7 @@ import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
 import org.immregistries.iis.kernal.logic.ProcessingException;
 import org.immregistries.iis.kernal.model.BusinessIdentifier;
 import org.immregistries.iis.kernal.model.ProcessingFlavor;
-import org.immregistries.iis.kernal.model.persisted.Tenant;
+import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.immregistries.smm.tester.manager.HL7Reader;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.context.annotation.Conditional;

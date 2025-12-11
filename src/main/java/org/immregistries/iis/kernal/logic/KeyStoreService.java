@@ -8,11 +8,10 @@ import jakarta.persistence.Query;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-
-import org.immregistries.iis.kernal.HibernateConfig;
-import org.immregistries.iis.kernal.model.persisted.IisKey;
-import org.immregistries.iis.kernal.model.persisted.Tenant;
-import org.immregistries.iis.kernal.model.persisted.UserAccess;
+import org.immregistries.iis.kernal.persisted.model.IisKey;
+import org.immregistries.iis.kernal.persisted.model.Tenant;
+import org.immregistries.iis.kernal.persisted.model.UserAccess;
+import org.immregistries.iis.kernal.persisted.util.HibernateConfig;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

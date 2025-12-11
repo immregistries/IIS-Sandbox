@@ -13,7 +13,6 @@ import org.hl7.fhir.instance.model.api.IBaseBundle;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.instance.model.api.IDomainResource;
 import org.hl7.fhir.r5.model.Bundle;
-import org.immregistries.iis.kernal.HibernateConfig;
 import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.fhir.security.TenantUtil;
 import org.immregistries.iis.kernal.fhir.shl.ShLinkPayload;
@@ -25,12 +24,13 @@ import org.immregistries.iis.kernal.model.LoincIdentifier;
 import org.immregistries.iis.kernal.model.ObservationReported;
 import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.model.VaccinationMaster;
-import org.immregistries.iis.kernal.model.persisted.MessageReceived;
-import org.immregistries.iis.kernal.model.persisted.Tenant;
+import org.immregistries.iis.kernal.persisted.model.MessageReceived;
+import org.immregistries.iis.kernal.persisted.model.Tenant;
+import org.immregistries.iis.kernal.persisted.util.HibernateConfig;
 import org.immregistries.iis.kernal.rest.PatientRestController;
 import org.immregistries.iis.kernal.rest.SubscriptionRestController;
 import org.immregistries.iis.kernal.servlet.shlink.CLVRController;
-import org.immregistries.iis.kernal.servlet.shlink.PatientShLinkController;
+
 import org.immregistries.iis.kernal.servlet.shlink.ShLinkController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -145,8 +145,9 @@ public class PatientController {
 		printFhirShortcuts(out, patientSelected, patientMasterSelected, tenant);
 		out.println("</div>");
 
-		String manifestUrl = PatientShLinkController.getManifestUrl(req, patientSelected, tenant);
-		ShLinkPayload shLinkPayload = PatientShLinkController.getPatientShLinkPayload(manifestUrl);
+		ShLinkPayload shLinkPayload = patientRestController.getShLinkPayload(patientMasterSelected.getPatientId(),
+				tenant,
+				req);
 
 		out.println("<div class=\"w3-container\">");
 		out.println("<h4>Smart Health link</h4>");

@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal.model.persisted;
+package org.immregistries.iis.kernal.persisted.model;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

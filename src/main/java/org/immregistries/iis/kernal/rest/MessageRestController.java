@@ -3,11 +3,11 @@ package org.immregistries.iis.kernal.rest;
 import jakarta.persistence.Query;
 import jakarta.servlet.http.HttpServletRequest;
 import org.hibernate.Session;
-import org.immregistries.iis.kernal.HibernateConfig;
 import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.fhir.security.TenantUtil;
-import org.immregistries.iis.kernal.model.persisted.MessageReceived;
-import org.immregistries.iis.kernal.model.persisted.Tenant;
+import org.immregistries.iis.kernal.persisted.model.MessageReceived;
+import org.immregistries.iis.kernal.persisted.model.Tenant;
+import org.immregistries.iis.kernal.persisted.util.HibernateConfig;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

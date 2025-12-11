@@ -4,10 +4,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Session;
-import org.immregistries.iis.kernal.HibernateConfig;
 import org.immregistries.iis.kernal.fhir.Application;
-import org.immregistries.iis.kernal.model.persisted.Tenant;
-import org.immregistries.iis.kernal.model.persisted.UserAccess;
+import org.immregistries.iis.kernal.persisted.model.Tenant;
+import org.immregistries.iis.kernal.persisted.model.UserAccess;
+import org.immregistries.iis.kernal.persisted.util.HibernateConfig;
 import org.immregistries.iis.kernal.servlet.TenantController;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
@@ -19,7 +19,8 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import java.io.IOException;
 
 /**
- * static class providing tools related to the Tenent selected using request context
+ * static class providing tools related to the Tenent selected using request
+ * context
  */
 public class CurrentTenantUtil {
 
@@ -50,7 +51,7 @@ public class CurrentTenantUtil {
 	public static Tenant getTenant(HttpServletRequest request, Session existingDataSession) {
 		final Tenant tenant;
 		/*
-		Extracting variables from the Request
+		 * Extracting variables from the Request
 		 */
 		Tenant requestTenant = (Tenant) request.getAttribute(SESSION_REQUEST_TENANT);
 		String urlTenantName = (String) request.getAttribute(TENANT_NAME_URL);
@@ -61,24 +62,26 @@ public class CurrentTenantUtil {
 		}
 
 		/*
-		if Tenant Id specified
-		else check if name
-		else check if full tenant object
+		 * if Tenant Id specified
+		 * else check if name
+		 * else check if full tenant object
 		 */
 		if (urlTenantId > 0) {
 			if (existingDataSession != null) {
 				tenant = TenantUtil.getTenantByIdAuthenticated(urlTenantId, existingDataSession);
-			} else try (Session dataSession = HibernateConfig.getDataSession()) {
-				tenant = TenantUtil.getTenantByIdAuthenticated(urlTenantId, dataSession);
-			}
+			} else
+				try (Session dataSession = HibernateConfig.getDataSession()) {
+					tenant = TenantUtil.getTenantByIdAuthenticated(urlTenantId, dataSession);
+				}
 		} else if (StringUtils.isNotBlank(urlTenantName)) {
 			if (requestTenant != null && StringUtils.equals(requestTenant.getOrganizationName(), urlTenantName)) {
 				tenant = requestTenant;
 			} else if (existingDataSession != null) {
 				tenant = getTenant(urlTenantName, request, existingDataSession);
-			} else try (Session dataSession = HibernateConfig.getDataSession()) {
-				tenant = getTenant(urlTenantName, request, dataSession);
-			}
+			} else
+				try (Session dataSession = HibernateConfig.getDataSession()) {
+					tenant = getTenant(urlTenantName, request, dataSession);
+				}
 		} else {
 			tenant = requestTenant;
 		}
@@ -90,12 +93,12 @@ public class CurrentTenantUtil {
 	}
 
 	public static @NotNull Tenant getTenantRedirectIfNone(HttpServletRequest req, HttpServletResponse resp)
-		throws IOException {
+			throws IOException {
 		return getTenantRedirectIfNone(req, resp, null);
 	}
 
 	public static @NotNull Tenant getTenantRedirectIfNone(HttpServletRequest req, HttpServletResponse resp,
-																			Session existingDataSession) throws IOException {
+			Session existingDataSession) throws IOException {
 		Tenant tenant = getTenant(req, existingDataSession);
 		if (tenant == null) {
 			if (UserAccessUtil.getUserAccess() != null) {
@@ -108,7 +111,7 @@ public class CurrentTenantUtil {
 
 	public static Tenant getTenant() {
 		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
-			.getRequest();
+				.getRequest();
 		return getTenant(request);
 	}
 

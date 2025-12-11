@@ -5,10 +5,14 @@ import jakarta.persistence.TypedQuery;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.math3.stat.inference.TestUtils;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.immregistries.iis.kernal.model.persisted.Tenant;
-import org.immregistries.iis.kernal.model.persisted.UserAccess;
+import org.immregistries.iis.kernal.persisted.model.Tenant;
+import org.immregistries.iis.kernal.persisted.model.UserAccess;
+import org.immregistries.iis.kernal.persisted.repository.UserAccessRepository;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -17,7 +21,19 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.util.List;
 
-public class UserAccessUtil {
+public class UserAccessUtil implements ApplicationContextAware {
+
+    private static ApplicationContext ac;
+
+    @Override
+    public void setApplicationContext(ApplicationContext ac) {
+        UserAccessUtil.ac = ac;
+    }
+
+    public static UserAccessRepository getUserAccessRepository() {
+        return (UserAccessRepository) ac.getBean("userAccessRepository");
+
+    }
 
     public static final String GITHUB_PREFIX = "github-";
     public static final String SESSION_USER_ACCESS = "userAccess";

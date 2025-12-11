@@ -3,7 +3,7 @@ package org.immregistries.iis.kernal.rest;
 import jakarta.servlet.http.HttpServletRequest;
 import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.fhir.security.TenantUtil;
-import org.immregistries.iis.kernal.model.persisted.Tenant;
+import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.immregistries.vaccination_deduplication.Immunization;
 import org.immregistries.vaccination_deduplication.LinkedImmunization;
 import org.immregistries.vaccination_deduplication.VaccinationDeduplication;
@@ -30,7 +30,7 @@ public class VacDedupRestController {
             @RequestBody VacDedupRequest request,
             HttpServletRequest req) {
 
-        try (org.hibernate.Session dataSession = org.immregistries.iis.kernal.HibernateConfig.getDataSession()) {
+        try (org.hibernate.Session dataSession = org.immregistries.iis.kernal.persisted.util.HibernateConfig.getDataSession()) {
             Tenant tenant = TenantUtil.getTenantByIdAuthenticated(tenantId, dataSession);
             if (tenant == null) {
                 throw new RuntimeException("Access is not authorized");

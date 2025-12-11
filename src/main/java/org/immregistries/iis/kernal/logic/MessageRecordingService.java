@@ -1,9 +1,9 @@
 package org.immregistries.iis.kernal.logic;
 
 import org.immregistries.iis.kernal.model.PatientMaster;
-import org.immregistries.iis.kernal.model.persisted.MessageReceived;
-import org.immregistries.iis.kernal.model.persisted.MessageReceivedRepository;
-import org.immregistries.iis.kernal.model.persisted.Tenant;
+import org.immregistries.iis.kernal.persisted.model.MessageReceived;
+import org.immregistries.iis.kernal.persisted.model.MessageReceivedRepository;
+import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

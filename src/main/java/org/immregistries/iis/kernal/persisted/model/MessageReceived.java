@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal.model.persisted;
+package org.immregistries.iis.kernal.persisted.model;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -6,7 +6,7 @@ import java.util.Date;
 public class MessageReceived implements Serializable {
 
   private static final long serialVersionUID = 1L;
-  
+
   private int messageReceivedId = 0;
   private Tenant tenant = null;
   private String messageRequest = "";
@@ -72,11 +72,11 @@ public class MessageReceived implements Serializable {
     this.tenant = tenant;
   }
 
-	public String getPatientReportedId() {
-		return patientReportedId;
-	}
+  public String getPatientReportedId() {
+    return patientReportedId;
+  }
 
-	public void setPatientReportedId(String patientReportedId) {
-		this.patientReportedId = patientReportedId;
-	}
+  public void setPatientReportedId(String patientReportedId) {
+    this.patientReportedId = patientReportedId;
+  }
 }

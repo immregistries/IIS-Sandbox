@@ -18,7 +18,7 @@ import org.immregistries.iis.kernal.mapping.forR4.*;
 import org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester;
 import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
 import org.immregistries.iis.kernal.model.*;
-import org.immregistries.iis.kernal.model.persisted.Tenant;
+import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.immregistries.mqe.hl7util.model.CodedWithExceptions;
 import org.immregistries.mqe.hl7util.model.Hl7Location;
 import org.jetbrains.annotations.NotNull;
@@ -76,11 +76,12 @@ public class FhirMessagingHandler extends IncomingMessageHandler<Bundle, Object>
 	@Override
 	public String extractMessageType(Bundle bundle) {
 		return bundle.getEntry().stream()
-			.filter(bundleEntryComponent -> ResourceType.MessageHeader.equals(bundleEntryComponent.getResource().getResourceType()))
-			.findFirst()
-			.map(Bundle.BundleEntryComponent::getResource)
-			.map(resource -> resource.getMeta().getTagFirstRep().getCode())
-			.orElse(null);
+				.filter(bundleEntryComponent -> ResourceType.MessageHeader
+						.equals(bundleEntryComponent.getResource().getResourceType()))
+				.findFirst()
+				.map(Bundle.BundleEntryComponent::getResource)
+				.map(resource -> resource.getMeta().getTagFirstRep().getCode())
+				.orElse(null);
 	}
 
 	@Override
@@ -89,13 +90,19 @@ public class FhirMessagingHandler extends IncomingMessageHandler<Bundle, Object>
 	}
 
 	@Override
-	@Nullable IIdType readResponsibleOrganizationIIdType(Tenant tenant, Bundle bundle, String sendingFacilityName, Set<ProcessingFlavor> processingFlavorSet) throws ProcessingException {
+	@Nullable
+	IIdType readResponsibleOrganizationIIdType(Tenant tenant, Bundle bundle, String sendingFacilityName,
+			Set<ProcessingFlavor> processingFlavorSet) throws ProcessingException {
 		return null;
 	}
 
 	@Override
-	public PatientReported processPatient(Tenant tenant, Bundle bundle, List<IisReportable> iisReportableList, Set<ProcessingFlavor> processingFlavorSet, CodeMap codeMap, boolean strictDate, IIdType managingOrganizationId) throws ProcessingException {
-		Patient patient = ((Patient) bundle.getEntry().stream().filter((entry) -> entry.getResource().getResourceType().equals(ResourceType.Patient)).findFirst().map(Bundle.BundleEntryComponent::getResource).orElse(null));
+	public PatientReported processPatient(Tenant tenant, Bundle bundle, List<IisReportable> iisReportableList,
+			Set<ProcessingFlavor> processingFlavorSet, CodeMap codeMap, boolean strictDate,
+			IIdType managingOrganizationId) throws ProcessingException {
+		Patient patient = ((Patient) bundle.getEntry().stream()
+				.filter((entry) -> entry.getResource().getResourceType().equals(ResourceType.Patient)).findFirst()
+				.map(Bundle.BundleEntryComponent::getResource).orElse(null));
 		PatientReported patientReported = patientMapper.localObjectReported(patient);
 		patientReported.setPatientId(null);
 		patientReported.setTenant(tenant);
@@ -105,7 +112,8 @@ public class FhirMessagingHandler extends IncomingMessageHandler<Bundle, Object>
 			patientReported.setManagingOrganizationId("Organization/" + managingOrganizationId.getIdPart());
 		}
 
-		patientReported = patientProcessingInterceptor.processAndValidatePatient(patientReported, iisReportableList, processingFlavorSet);
+		patientReported = patientProcessingInterceptor.processAndValidatePatient(patientReported, iisReportableList,
+				processingFlavorSet);
 		IIncomingMessageHandler.verifyNoErrors(iisReportableList);
 		patientReported.setUpdatedDate(new Date());
 		patientReported = fhirRequester.savePatientReported(patientReported);
@@ -113,16 +121,19 @@ public class FhirMessagingHandler extends IncomingMessageHandler<Bundle, Object>
 	}
 
 	@Override
-	public List<VaccinationReported> processVaccinations(Bundle bundle, Tenant tenant, List<IisReportable> iisReportableList, PatientReported patientReported, Set<ProcessingFlavor> processingFlavorSet, boolean strictDate) throws ProcessingException {
+	public List<VaccinationReported> processVaccinations(Bundle bundle, Tenant tenant,
+			List<IisReportable> iisReportableList, PatientReported patientReported,
+			Set<ProcessingFlavor> processingFlavorSet, boolean strictDate) throws ProcessingException {
 		List<VaccinationReported> vaccinationReportedList = new ArrayList<>(bundle.getEntry().size());
 		for (Bundle.BundleEntryComponent entryComponent : bundle.getEntry()) {
-			if (entryComponent.hasResource() && ResourceType.Immunization.equals(entryComponent.getResource().getResourceType())) {
+			if (entryComponent.hasResource()
+					&& ResourceType.Immunization.equals(entryComponent.getResource().getResourceType())) {
 
 				Immunization immunization = (Immunization) entryComponent.getResource();
 
 				OrgLocation orgLocation = processLocation(bundle, tenant, immunization.getLocation());
 
-//				immunization.setId(null);
+				// immunization.setId(null);
 				immunization.setPatient(null);
 				immunization.setLocation(null);
 				VaccinationReported vaccinationReported = immunizationMapper.localObjectReported(immunization);
@@ -155,7 +166,8 @@ public class FhirMessagingHandler extends IncomingMessageHandler<Bundle, Object>
 						}
 					}
 				}
-				vaccinationReported = immunizationProcessingInterceptor.processAndValidateVaccinationReported(vaccinationReported, iisReportableList, processingFlavorSet, -1, -1, -1, null);
+				vaccinationReported = immunizationProcessingInterceptor.processAndValidateVaccinationReported(
+						vaccinationReported, iisReportableList, processingFlavorSet, -1, -1, -1, null);
 				vaccinationReported = fhirRequester.saveVaccinationReported(vaccinationReported);
 				vaccinationReportedList.add(vaccinationReported);
 			}
@@ -169,12 +181,14 @@ public class FhirMessagingHandler extends IncomingMessageHandler<Bundle, Object>
 	}
 
 	@Override
-	public String processQBP(Tenant tenant, Bundle bundle, String messageReceived, IIdType managingOrganizationId) throws Exception {
+	public String processQBP(Tenant tenant, Bundle bundle, String messageReceived, IIdType managingOrganizationId)
+			throws Exception {
 		throw new RuntimeException("Only VXU is supported for now");
 	}
 
 	@Override
-	public String buildResultWithoutValidation(Bundle bundle, List<IisReportable> iisReportableList, Set<ProcessingFlavor> processingFlavorSet) {
+	public String buildResultWithoutValidation(Bundle bundle, List<IisReportable> iisReportableList,
+			Set<ProcessingFlavor> processingFlavorSet) {
 		Bundle resultBundle = new Bundle();
 		/*
 		 * TODO MessageHeader
@@ -189,7 +203,8 @@ public class FhirMessagingHandler extends IncomingMessageHandler<Bundle, Object>
 		return fhirContext.newJsonParser().setPrettyPrint(true).encodeResourceToString(resultBundle);
 	}
 
-	private static OperationOutcome.@NotNull OperationOutcomeIssueComponent getIssueComponent(IisReportable reportable) {
+	private static OperationOutcome.@NotNull OperationOutcomeIssueComponent getIssueComponent(
+			IisReportable reportable) {
 		OperationOutcome.OperationOutcomeIssueComponent issueComponent = new OperationOutcome.OperationOutcomeIssueComponent();
 		switch (reportable.getSeverity()) {
 			case ERROR: {
@@ -212,23 +227,23 @@ public class FhirMessagingHandler extends IncomingMessageHandler<Bundle, Object>
 		issueComponent.setDetails(details);
 		CodedWithExceptions codedWithExceptions = reportable.getApplicationErrorCode();
 		details.addCoding(new Coding(codedWithExceptions.getNameOfCodingSystem(),
-			codedWithExceptions.getIdentifier(),
-			codedWithExceptions.getText()));
+				codedWithExceptions.getIdentifier(),
+				codedWithExceptions.getText()));
 		details.addCoding(new Coding("Source", reportable.getSource().name(), reportable.getSource().name()));
 		issueComponent.setLocation(
-			reportable
-				.getHl7LocationList().
-				stream()
-				.filter(Objects::nonNull)
-				.map(Hl7Location::toString)
-				.map(StringType::new)
-				.collect(Collectors.toList()));
+				reportable
+						.getHl7LocationList().stream()
+						.filter(Objects::nonNull)
+						.map(Hl7Location::toString)
+						.map(StringType::new)
+						.collect(Collectors.toList()));
 		issueComponent.setDiagnostics(reportable.getDiagnosticMessage());
 		return issueComponent;
 	}
 
 	@Override
-	public String buildResultWithValidation(Bundle bundle, Object o, List<IisReportable> iisReportableList, Set<ProcessingFlavor> processingFlavorSet) {
+	public String buildResultWithValidation(Bundle bundle, Object o, List<IisReportable> iisReportableList,
+			Set<ProcessingFlavor> processingFlavorSet) {
 		return buildResultWithoutValidation(bundle, iisReportableList, processingFlavorSet);
 	}
 
@@ -239,38 +254,41 @@ public class FhirMessagingHandler extends IncomingMessageHandler<Bundle, Object>
 
 	public OrgLocation processLocation(Bundle bundle, Tenant tenant, Reference reference) {
 		return bundle.getEntry().stream()
-			.filter(bundleEntryComponent -> reference.getReference().equals(bundleEntryComponent.getFullUrl()) || reference.getReference().equals(bundleEntryComponent.getResource().getId()))
-			.findFirst()
-			.map(Bundle.BundleEntryComponent::getResource)
-			.map(resource -> locationMapper.localObject((Location) resource))
-			.map(orgLocation -> {
-				orgLocation.setTenant(tenant);
-				return orgLocation;
-			})
-			.map(orgLocation -> fhirRequester.saveOrgLocation(orgLocation))
-			.orElse(null);
+				.filter(bundleEntryComponent -> reference.getReference().equals(bundleEntryComponent.getFullUrl())
+						|| reference.getReference().equals(bundleEntryComponent.getResource().getId()))
+				.findFirst()
+				.map(Bundle.BundleEntryComponent::getResource)
+				.map(resource -> locationMapper.localObject((Location) resource))
+				.map(orgLocation -> {
+					orgLocation.setTenant(tenant);
+					return orgLocation;
+				})
+				.map(orgLocation -> fhirRequester.saveOrgLocation(orgLocation))
+				.orElse(null);
 	}
 
 	public ModelPerson processPersonPractitioner(Bundle bundle, Tenant tenant, Reference reference) {
 		if (reference.getReferenceElement().getResourceType().equals("Practitioner")) {
 			return bundle.getEntry().stream()
-				.filter(bundleEntryComponent -> reference.getReference().equals(bundleEntryComponent.getFullUrl()) || reference.getReference().equals(bundleEntryComponent.getResource().getId()))
-				.findFirst()
-				.map(Bundle.BundleEntryComponent::getResource)
-				.map(resource -> practitionerMapper.localObject((Practitioner) resource))
-				.map(modelPerson -> {
-					modelPerson.setTenant(tenant);
-					return modelPerson;
-				})
-				.map(modelPerson -> fhirRequester.savePractitioner(modelPerson))
-				.orElse(null);
+					.filter(bundleEntryComponent -> reference.getReference().equals(bundleEntryComponent.getFullUrl())
+							|| reference.getReference().equals(bundleEntryComponent.getResource().getId()))
+					.findFirst()
+					.map(Bundle.BundleEntryComponent::getResource)
+					.map(resource -> practitionerMapper.localObject((Practitioner) resource))
+					.map(modelPerson -> {
+						modelPerson.setTenant(tenant);
+						return modelPerson;
+					})
+					.map(modelPerson -> fhirRequester.savePractitioner(modelPerson))
+					.orElse(null);
 		} else if (reference.getReferenceElement().getResourceType().equals("PractitionerRole")) {
 			Optional<Reference> practitionerReference = bundle.getEntry().stream()
-				.filter(bundleEntryComponent -> reference.getReference().equals(bundleEntryComponent.getFullUrl()) || reference.getReference().equals(bundleEntryComponent.getResource().getId()))
-				.findFirst()
-				.map(Bundle.BundleEntryComponent::getResource)
-				.map(resource -> (PractitionerRole) resource)
-				.map(PractitionerRole::getPractitioner);
+					.filter(bundleEntryComponent -> reference.getReference().equals(bundleEntryComponent.getFullUrl())
+							|| reference.getReference().equals(bundleEntryComponent.getResource().getId()))
+					.findFirst()
+					.map(Bundle.BundleEntryComponent::getResource)
+					.map(resource -> (PractitionerRole) resource)
+					.map(PractitionerRole::getPractitioner);
 			if (practitionerReference.isPresent()) {
 				return processPersonPractitioner(bundle, tenant, practitionerReference.get());
 			} else {

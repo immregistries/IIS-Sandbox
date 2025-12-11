@@ -1,5 +1,4 @@
-package org.immregistries.iis.kernal.model.persisted;
-
+package org.immregistries.iis.kernal.persisted;
 
 import jakarta.persistence.EntityManagerFactory;
 import org.hibernate.SessionFactory;
@@ -21,14 +20,10 @@ import javax.sql.DataSource;
 import java.util.HashMap;
 
 @Configuration
-//@PropertySource({"application.properties"})
-@EntityScan("org.immregistries.iis.kernal.model.persisted")
-@EnableJpaRepositories(
-	basePackages = "org.immregistries.iis.kernal.model.persisted",
-	entityManagerFactoryRef = "iisLocalEntityManager",
-	transactionManagerRef = "iisLocalTransactionManager"
-)
-public class ProperDatabaseConfiguration {
+// @PropertySource({"application.properties"})
+@EntityScan("org.immregistries.iis.kernal.persisted.model")
+@EnableJpaRepositories(basePackages = "org.immregistries.iis.kernal.persisted.model", entityManagerFactoryRef = "iisLocalEntityManager", transactionManagerRef = "iisLocalTransactionManager")
+public class SecondDatabaseConfiguration {
 	@Autowired
 	private Environment env;
 
@@ -45,37 +40,37 @@ public class ProperDatabaseConfiguration {
 	}
 
 	@Bean
-	public LocalContainerEntityManagerFactoryBean iisLocalEntityManager(@Qualifier("iisLocalDataSource") DataSource dataSource) {
-		LocalContainerEntityManagerFactoryBean em
-			= new LocalContainerEntityManagerFactoryBean();
+	public LocalContainerEntityManagerFactoryBean iisLocalEntityManager(
+			@Qualifier("iisLocalDataSource") DataSource dataSource) {
+		LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
 		em.setDataSource(dataSource);
 		em.setPackagesToScan(
-			new String[]{"org.immregistries.iis.kernal.model.persisted"});
+				new String[] { "org.immregistries.iis.kernal.model.persisted" });
 
-		HibernateJpaVendorAdapter vendorAdapter
-			= new HibernateJpaVendorAdapter();
+		HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
 		em.setJpaVendorAdapter(vendorAdapter);
 		HashMap<String, Object> properties = new HashMap<>();
 		properties.put("hibernate.hbm2ddl.auto",
-			env.getProperty("hibernate.hbm2ddl.auto"));
+				env.getProperty("hibernate.hbm2ddl.auto"));
 		properties.put("hibernate.dialect",
-			env.getProperty("hibernate.dialect"));
+				env.getProperty("hibernate.dialect"));
 		em.setJpaPropertyMap(properties);
 
 		return em;
 	}
 
 	@Bean
-	public PlatformTransactionManager iisLocalTransactionManager(@Qualifier("iisLocalEntityManager") LocalContainerEntityManagerFactoryBean entityManagerFactory) {
-		JpaTransactionManager transactionManager
-			= new JpaTransactionManager();
+	public PlatformTransactionManager iisLocalTransactionManager(
+			@Qualifier("iisLocalEntityManager") LocalContainerEntityManagerFactoryBean entityManagerFactory) {
+		JpaTransactionManager transactionManager = new JpaTransactionManager();
 		transactionManager.setEntityManagerFactory(
-			entityManagerFactory.getObject());
+				entityManagerFactory.getObject());
 		return transactionManager;
 	}
 
 	@Bean
-	public SessionFactory sessionFactory(@Qualifier("iisLocalEntityManager") EntityManagerFactory entityManagerFactory) {
+	public SessionFactory sessionFactory(
+			@Qualifier("iisLocalEntityManager") EntityManagerFactory entityManagerFactory) {
 		// The LCEFBean produces an EntityManagerFactory.
 		// If the provider is Hibernate, this object is also a SessionFactory.
 
@@ -83,11 +78,11 @@ public class ProperDatabaseConfiguration {
 			throw new IllegalStateException("The JPA EntityManagerFactory is not a Hibernate SessionFactory!");
 		}
 
-		// This is the cleanest and most reliable way to get the native Hibernate object.
+		// This is the cleanest and most reliable way to get the native Hibernate
+		// object.
 		SessionFactory unwrap = entityManagerFactory.unwrap(SessionFactory.class);
 		sessionFactory = unwrap;
 		return unwrap;
 	}
-
 
 }

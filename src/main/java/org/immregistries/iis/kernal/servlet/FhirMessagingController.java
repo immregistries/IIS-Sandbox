@@ -10,7 +10,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Session;
 import org.hl7.fhir.r4.model.Bundle;
-import org.immregistries.iis.kernal.HibernateConfig;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
 import org.immregistries.iis.kernal.fhir.interceptors.PartitionTenantCreationInterceptor;
 
@@ -18,7 +17,8 @@ import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.logic.BaseIISSOAPServer;
 import org.immregistries.iis.kernal.logic.messageHandling.FhirMessagingHandler;
 import org.immregistries.iis.kernal.logic.messageHandling.V2IncomingMessageHandler;
-import org.immregistries.iis.kernal.model.persisted.Tenant;
+import org.immregistries.iis.kernal.persisted.model.Tenant;
+import org.immregistries.iis.kernal.persisted.util.HibernateConfig;
 import org.immregistries.smm.cdc.CDCWSDLServer;
 import org.immregistries.smm.cdc.Fault;
 import org.immregistries.smm.cdc.SubmitSingleMessage;
@@ -39,9 +39,8 @@ import static org.immregistries.iis.kernal.servlet.PopController.PARAM_FACILITY_
 import static org.immregistries.iis.kernal.servlet.PopController.PARAM_MESSAGE;
 import static org.immregistries.iis.kernal.servlet.TenantController.PATH_VARIABLE_TENANT_NAME;
 
-
 @RestController()
-@RequestMapping({FHIR_MESSAGING_BASE_PATH, TenantController.TENANT_PATH + FHIR_MESSAGING_BASE_PATH})
+@RequestMapping({ FHIR_MESSAGING_BASE_PATH, TenantController.TENANT_PATH + FHIR_MESSAGING_BASE_PATH })
 @Conditional(OnR4Condition.class)
 public class FhirMessagingController {
 	public static final String FHIR_MESSAGING_PATH_KEY = "fhirMessaging";
@@ -59,8 +58,8 @@ public class FhirMessagingController {
 
 	@PostMapping
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-		throws ServletException, IOException {
-//		resp.setContentType("text/html");
+			throws ServletException, IOException {
+		// resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		Session dataSession = null;
 		try {
@@ -104,16 +103,21 @@ public class FhirMessagingController {
 		String fhirResult;
 		fhirResult = fhirMessagingHandler.process(message, tenant, facility_name);
 		/*
-		 * Temporary solution of extracting the original V2 message from Document reference
-		 * TODO integrate or create a converter of FHIR messaging back to V2 message when available
+		 * Temporary solution of extracting the original V2 message from Document
+		 * reference
+		 * TODO integrate or create a converter of FHIR messaging back to V2 message
+		 * when available
 		 */
-//		Bundle bundle = (Bundle) parser.parseResource(message);
-//		DocumentReference documentReference = (DocumentReference) bundle.getEntryFirstRep().getResource();
-//		StringType v2Message = (StringType) documentReference.getContent().get(0).getExtensionByUrl(ORIGINAL_TEXT_EXTENSION_URL).getValue();
-//		String v2Result = incomingMessageHandler.process(v2Message.getValueNotNull(), tenant, facility_name);
-//		MessageParser messageParser = new MessageParser();
-//		Bundle resultBundle = messageParser.convert(v2Result);
-//		fhirResult = parser.encodeResourceToString(resultBundle);
+		// Bundle bundle = (Bundle) parser.parseResource(message);
+		// DocumentReference documentReference = (DocumentReference)
+		// bundle.getEntryFirstRep().getResource();
+		// StringType v2Message = (StringType)
+		// documentReference.getContent().get(0).getExtensionByUrl(ORIGINAL_TEXT_EXTENSION_URL).getValue();
+		// String v2Result = incomingMessageHandler.process(v2Message.getValueNotNull(),
+		// tenant, facility_name);
+		// MessageParser messageParser = new MessageParser();
+		// Bundle resultBundle = messageParser.convert(v2Result);
+		// fhirResult = parser.encodeResourceToString(resultBundle);
 		return fhirResult;
 	}
 
@@ -130,8 +134,8 @@ public class FhirMessagingController {
 				organizationName = "";
 			}
 			if (StringUtils.isBlank(message)) {
-				TestCaseMessage testCaseMessage =
-					ScenarioManager.createTestCaseMessage(ScenarioManager.SCENARIO_1_R_ADMIN_CHILD);
+				TestCaseMessage testCaseMessage = ScenarioManager
+						.createTestCaseMessage(ScenarioManager.SCENARIO_1_R_ADMIN_CHILD);
 				Transformer transformer = new Transformer();
 				transformer.transform(testCaseMessage);
 				MessageParser messageParser = new MessageParser();
@@ -152,12 +156,12 @@ public class FhirMessagingController {
 	}
 
 	@PostMapping(SoapController.SOAP_BASE_PATH)
-	protected void doPost(HttpServletRequest req, HttpServletResponse resp, @PathVariable(name = PATH_VARIABLE_TENANT_NAME, required = false) String tenantName)
-		throws ServletException, IOException {
+	protected void doPost(HttpServletRequest req, HttpServletResponse resp,
+			@PathVariable(name = PATH_VARIABLE_TENANT_NAME, required = false) String tenantName)
+			throws ServletException, IOException {
 
 		String path = req.getPathInfo();
-		final String processorName =
-			path == null ? "" : (path.startsWith("/") ? path.substring(1) : path);
+		final String processorName = path == null ? "" : (path.startsWith("/") ? path.substring(1) : path);
 		CDCWSDLServer server = new BaseIISSOAPServer(partitionTenantCreationInterceptor, tenantName) {
 			@Override
 			public void process(SubmitSingleMessage ssm, PrintWriter out) throws Fault {
@@ -168,7 +172,8 @@ public class FhirMessagingController {
 				String ack = "";
 				try {
 					/*
-					 * Tenant is accessed through RequestContext, and was previously set through the authorize method of WSDL server in BaseIISSOAPServer.java
+					 * Tenant is accessed through RequestContext, and was previously set through the
+					 * authorize method of WSDL server in BaseIISSOAPServer.java
 					 */
 					Tenant tenant = CurrentTenantUtil.getTenant();
 					if (tenant == null) {

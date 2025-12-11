@@ -13,7 +13,7 @@ import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.fhir.security.TenantUtil;
 import org.immregistries.iis.kernal.logic.SubscriptionService;
 import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
-import org.immregistries.iis.kernal.model.persisted.Tenant;
+import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.web.bind.annotation.*;
@@ -62,7 +62,7 @@ public class SubscriptionRestController {
         // other params.
         // We will accept a DTO.
 
-        try (org.hibernate.Session dataSession = org.immregistries.iis.kernal.HibernateConfig.getDataSession()) {
+        try (org.hibernate.Session dataSession = org.immregistries.iis.kernal.persisted.util.HibernateConfig.getDataSession()) {
             Tenant tenant = TenantUtil.getTenantByIdAuthenticated(tenantId, dataSession);
             if (tenant == null) {
                 throw new RuntimeException("Access is not authorized");

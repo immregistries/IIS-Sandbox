@@ -1,8 +1,8 @@
 package org.immregistries.iis.kernal.model;
 
-import org.immregistries.iis.kernal.model.persisted.Tenant;
-
 import java.io.Serializable;
+
+import org.immregistries.iis.kernal.persisted.model.Tenant;
 
 public class OrgLocation extends AbstractMappedObject implements Serializable, TenantTiedObject {
 	

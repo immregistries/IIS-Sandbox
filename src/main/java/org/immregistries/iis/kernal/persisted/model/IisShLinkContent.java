@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal.model.persisted;
+package org.immregistries.iis.kernal.persisted.model;
 
 /**
  * Persisting generated key for smart health links and cards

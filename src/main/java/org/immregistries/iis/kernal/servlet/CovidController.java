@@ -22,7 +22,7 @@ import org.immregistries.iis.kernal.model.OrgLocation;
 import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.model.PatientReported;
 import org.immregistries.iis.kernal.model.VaccinationReported;
-import org.immregistries.iis.kernal.model.persisted.Tenant;
+import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -70,19 +70,18 @@ public class CovidController {
 
 	@PostMapping
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-		throws ServletException, IOException {
+			throws ServletException, IOException {
 		doGet(req, resp);
 	}
 
 	@SuppressWarnings("unchecked")
 	@GetMapping
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-		throws ServletException, IOException {
+			throws ServletException, IOException {
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		Tenant tenant = CurrentTenantUtil.getTenantRedirectIfNone(req, resp);
 		IGenericClient fhirClient = repositoryClientFactory.newGenericClient(req);
-
 
 		try {
 			SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
@@ -91,7 +90,6 @@ public class CovidController {
 			String dateStartString = req.getParameter(PARAM_DATE_START);
 			String dateEndString = req.getParameter(PARAM_DATE_END);
 			HomeController.doHeader(out, "IIS Sandbox", tenant);
-
 
 			Date dateStart = null;
 			Date dateEnd = null;
@@ -122,8 +120,8 @@ public class CovidController {
 			if (StringUtils.isEmpty(cvxCodes)) {
 				cvxCodes = COVID_CVX_CODES;
 			}
-			boolean includePhi =
-				req.getParameter(PARAM_CVX_CODES) == null || req.getParameter(PARAM_INCLUDE_PHI) != null;
+			boolean includePhi = req.getParameter(PARAM_CVX_CODES) == null
+					|| req.getParameter(PARAM_INCLUDE_PHI) != null;
 
 			if (messageError != null) {
 				out.println("  <div class=\"w3-panel w3-red\">");
@@ -135,20 +133,20 @@ public class CovidController {
 			out.println("    <form method=\"POST\" action=\"covid\" class=\"w3-container w3-card-4\">");
 			out.println("          <label>Start Date</label>");
 			out.println("          <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_DATE_START
-				+ "\" value=\"" + dateStartString + "\"/>");
+					+ "\" value=\"" + dateStartString + "\"/>");
 			out.println("          <label>End Date</label>");
 			out.println("          <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_DATE_END
-				+ "\" value=\"" + dateEndString + "\"/>");
+					+ "\" value=\"" + dateEndString + "\"/>");
 			out.println("          <label>End Date</label>");
 			out.println("          <label>CVX Codes to Include</label>");
 			out.println("          <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_CVX_CODES
-				+ "\" value=\"" + cvxCodes + "\"/>");
+					+ "\" value=\"" + cvxCodes + "\"/>");
 			out.println("          <label>Include PHI</label>");
 			out.println("          <input class=\"w3-input\" type=\"checkbox\" name=\""
-				+ PARAM_INCLUDE_PHI + "\" value=\"Y\"" + (includePhi ? " checked" : "") + "/>");
+					+ PARAM_INCLUDE_PHI + "\" value=\"Y\"" + (includePhi ? " checked" : "") + "/>");
 			out.println(
-				"          <input class=\"w3-button w3-section w3-teal w3-ripple\" type=\"submit\" name=\""
-					+ PARAM_ACTION + "\" value=\"" + ACTION_GENERATE + "\"/>");
+					"          <input class=\"w3-button w3-section w3-teal w3-ripple\" type=\"submit\" name=\""
+							+ PARAM_ACTION + "\" value=\"" + ACTION_GENERATE + "\"/>");
 			out.println("    </form>");
 			if (action != null) {
 				if (action.equals(ACTION_GENERATE) && dateStart != null && dateEnd != null) {
@@ -164,20 +162,26 @@ public class CovidController {
 					}
 					List<VaccinationReported> vaccinationReportedList;
 					out.print(
-						"<textarea cols=\"80\" rows=\"30\" style=\"white-space: nowrap;  overflow: auto;\">");
+							"<textarea cols=\"80\" rows=\"30\" style=\"white-space: nowrap;  overflow: auto;\">");
 					{
 						vaccinationReportedList = fhirRequester.searchVaccinationReportedList(
-							new SearchParameterMap(Immunization.SP_PATIENT, new ReferenceParam().setChain(Patient.SP_ORGANIZATION).setValue(String.valueOf(tenant.getOrgId()))));// TODO TEST
-//						Immunization.DATE.after().day(dateStart),
-//					 Immunization.DATE.before().day(dateEnd),
-//							Immunization.PATIENT.hasChainedProperty(Patient.ORGANIZATION.hasId(String.valueOf(tenant.getOrgId()))));
+								new SearchParameterMap(Immunization.SP_PATIENT,
+										new ReferenceParam().setChain(Patient.SP_ORGANIZATION)
+												.setValue(String.valueOf(tenant.getOrgId()))));// TODO TEST
+						// Immunization.DATE.after().day(dateStart),
+						// Immunization.DATE.before().day(dateEnd),
+						// Immunization.PATIENT.hasChainedProperty(Patient.ORGANIZATION.hasId(String.valueOf(tenant.getOrgId()))));
 						Date finalDateStart = dateStart;
 						Date finalDateEnd = dateEnd;
-						vaccinationReportedList = vaccinationReportedList.stream().filter(vaccinationReported -> vaccinationReported.getReportedDate().after(finalDateStart) && vaccinationReported.getReportedDate().before(finalDateEnd)).collect(Collectors.toList());
-//            TODO verify claim for reportedDate search criteria
-//            Query query = dataSession.createQuery(
-//                "from VaccinationReported where reportedDate >= :dateStart and reportedDate <= :dateEnd "
-//                    + "and patientReported.orgReported = :orgReported");
+						vaccinationReportedList = vaccinationReportedList.stream()
+								.filter(vaccinationReported -> vaccinationReported.getReportedDate().after(
+										finalDateStart) && vaccinationReported.getReportedDate().before(finalDateEnd))
+								.collect(Collectors.toList());
+						// TODO verify claim for reportedDate search criteria
+						// Query query = dataSession.createQuery(
+						// "from VaccinationReported where reportedDate >= :dateStart and reportedDate
+						// <= :dateEnd "
+						// + "and patientReported.orgReported = :orgReported");
 					}
 
 					printHeaderLine(out);
@@ -257,18 +261,25 @@ public class CovidController {
 	private int getDoseNumber(IGenericClient fhirClient, VaccinationReported vaccinationReported) {
 		int doseNumber = 0;
 		if (vaccinationReported.getCompletionStatus().equals("CP")) {
-//		 Query query = dataSession
-//          .createQuery("from VaccinationReported where administeredDate < :administeredDate "
-//              + "and patientReported = :patientReported and completionStatus = 'CP'");
-//      query.setParameter("administeredDate", vaccinationReported.getAdministeredDate());
-//      query.setParameter("patientReported", vaccinationReported.getPatientReported());
+			// Query query = dataSession
+			// .createQuery("from VaccinationReported where administeredDate <
+			// :administeredDate "
+			// + "and patientReported = :patientReported and completionStatus = 'CP'");
+			// query.setParameter("administeredDate",
+			// vaccinationReported.getAdministeredDate());
+			// query.setParameter("patientReported",
+			// vaccinationReported.getPatientReported());
 			List<VaccinationReported> list = fhirRequester.searchVaccinationReportedList(
-				new SearchParameterMap(Immunization.SP_DATE, new DateParam().setPrefix(ParamPrefixEnum.ENDS_BEFORE).setValue(vaccinationReported.getAdministeredDate()))
-					.add(Immunization.SP_PATIENT, new ReferenceParam(vaccinationReported.getPatientReportedId()))
-					.add(Immunization.SP_STATUS, new TokenParam().setValue(Immunization.ImmunizationStatusCodes.COMPLETED.toCode()))
-//				Immunization.DATE.before().day(vaccinationReported.getAdministeredDate()),
-//				Immunization.PATIENT.hasId(vaccinationReported.getPatientReportedId()),
-//				Immunization.STATUS.exactly().identifier(Immunization.ImmunizationStatusCodes.COMPLETED.toCode())
+					new SearchParameterMap(Immunization.SP_DATE,
+							new DateParam().setPrefix(ParamPrefixEnum.ENDS_BEFORE)
+									.setValue(vaccinationReported.getAdministeredDate()))
+							.add(Immunization.SP_PATIENT,
+									new ReferenceParam(vaccinationReported.getPatientReportedId()))
+							.add(Immunization.SP_STATUS,
+									new TokenParam().setValue(Immunization.ImmunizationStatusCodes.COMPLETED.toCode()))
+			// Immunization.DATE.before().day(vaccinationReported.getAdministeredDate()),
+			// Immunization.PATIENT.hasId(vaccinationReported.getPatientReportedId()),
+			// Immunization.STATUS.exactly().identifier(Immunization.ImmunizationStatusCodes.COMPLETED.toCode())
 			);
 			doseNumber = list.size() + 1;
 		}
@@ -276,11 +287,10 @@ public class CovidController {
 	}
 
 	private void printLine(PrintWriter out, VaccinationReported vaccinationReported,
-								  boolean includePhi, int doseNumber) {
+			boolean includePhi, int doseNumber) {
 
 		PatientReported patientReported = vaccinationReported.getPatientReported();
 		PatientMaster patient = patientReported.getPatientMaster();
-
 
 		// 1: Vaccination event ID
 		printField(vaccinationReported.getVaccinationMaster().getVaccinationId(), out);
@@ -295,29 +305,29 @@ public class CovidController {
 		printField("", out);
 		// 4: Recipient ID
 		printField(patient.getPatientId(), out);
-		// 5:  Recipient name: first
+		// 5: Recipient name: first
 		printField(patientReported.getNameFirst(), includePhi, out);
-		// 6:  Recipient name: middle
+		// 6: Recipient name: middle
 		printField(patientReported.getNameMiddle(), includePhi, out);
-		// 7:  Recipient name: last
+		// 7: Recipient name: last
 		printField(patientReported.getNameLast(), includePhi, out);
-		// 8:  Recipient date of birth
+		// 8: Recipient date of birth
 		printField(patientReported.getBirthDate(), out);
-		// 9:  Recipient sex
+		// 9: Recipient sex
 		printField(patientReported.getSex(), out);
-		// 10:  Recipient address: street
-        printField(patientReported.getFirstAddress().getAddressLine1(), includePhi, out);
+		// 10: Recipient address: street
+		printField(patientReported.getFirstAddress().getAddressLine1(), includePhi, out);
 		// 11: Recipient address: street 2
-        printField(patientReported.getFirstAddress().getAddressLine2(), includePhi, out);
-		// 12:  Recipient address: city
-        printField(patientReported.getFirstAddress().getAddressCity(), includePhi, out);
-		// 13:  Recipient address:  county
-        printField(patientReported.getFirstAddress().getAddressCountyParish(), out);
-		// 14:  Recipient address: state
-        printField(patientReported.getFirstAddress().getAddressState(), out);
-		// 15:  Recipient address: zip code
-        printField(patientReported.getFirstAddress().getAddressZip(), out);
-		// 16:  Recipient race 1
+		printField(patientReported.getFirstAddress().getAddressLine2(), includePhi, out);
+		// 12: Recipient address: city
+		printField(patientReported.getFirstAddress().getAddressCity(), includePhi, out);
+		// 13: Recipient address: county
+		printField(patientReported.getFirstAddress().getAddressCountyParish(), out);
+		// 14: Recipient address: state
+		printField(patientReported.getFirstAddress().getAddressState(), out);
+		// 15: Recipient address: zip code
+		printField(patientReported.getFirstAddress().getAddressZip(), out);
+		// 16: Recipient race 1
 		if (patient.getRaces().isEmpty() || StringUtils.isEmpty(patientReported.getRaces().get(0))) {
 			printField("UNK", out);
 		} else {
@@ -327,46 +337,46 @@ public class CovidController {
 		}
 
 		boolean administeredVaccination = StringUtils.isEmpty(vaccinationReported.getCompletionStatus())
-			|| vaccinationReported.getCompletionStatus().equals("CP");
+				|| vaccinationReported.getCompletionStatus().equals("CP");
 		if (administeredVaccination) {
-			// 24:  CVX
+			// 24: CVX
 			printField(vaccinationReported.getVaccineCvxCode(), out);
 			// 25: NDC
 			printField(vaccinationReported.getVaccineNdcCode(), out);
-			// 26:  MVX
+			// 26: MVX
 			printField(vaccinationReported.getVaccineMvxCode(), out);
-			// 27:  Lot number
+			// 27: Lot number
 			printField(vaccinationReported.getLotnumber(), out);
-			// 28:  Vaccine expiration date
+			// 28: Vaccine expiration date
 			printField(vaccinationReported.getExpirationDate(), out);
-			// 29:  Vaccine administering site
+			// 29: Vaccine administering site
 			printField(vaccinationReported.getBodySite(), out);
-			// 30:  Vaccine route of administration
+			// 30: Vaccine route of administration
 			printField(vaccinationReported.getBodyRoute(), out);
 			if (administeredVaccination) {
 				if (doseNumber > 0) {
-					// 31:  Dose number
+					// 31: Dose number
 					printField(doseNumber, out);
-					// 32:  Vaccination series complete
+					// 32: Vaccination series complete
 					if (doseNumber >= 2) {
 						printField("Yes", out);
 					} else {
 						printField("No", out);
 					}
 				} else {
-					// 31:  Dose number
+					// 31: Dose number
 					printField("UNK", out);
-					// 32:  Vaccination series complete
+					// 32: Vaccination series complete
 					printField("UNK", out);
 				}
 			} else {
-				//    31   Dose number
+				// 31 Dose number
 				printField("", out);
-				//    32   Vaccination series complete
+				// 32 Vaccination series complete
 				printField("", out);
 			}
 		} else {
-			// 24:  CVX
+			// 24: CVX
 			if (vaccinationReported.getCompletionStatus().equals("RE")) {
 				printField(vaccinationReported.getVaccineCvxCode(), out);
 			} else {
@@ -374,19 +384,19 @@ public class CovidController {
 			}
 			// 25: NDC
 			printField("", out);
-			// 26:  MVX
+			// 26: MVX
 			printField("", out);
-			// 27:  Lot number
+			// 27: Lot number
 			printField("", out);
-			// 28:  Vaccine expiration date
+			// 28: Vaccine expiration date
 			printField("", out);
-			// 29:  Vaccine administering site
+			// 29: Vaccine administering site
 			printField("", out);
-			// 30:  Vaccine route of administration
+			// 30: Vaccine route of administration
 			printField("", out);
-			// 31:  Dose number
+			// 31: Dose number
 			printField("", out);
-			// 32:  Vaccination series complete
+			// 32: Vaccination series complete
 			printField("", out);
 		}
 
@@ -397,47 +407,47 @@ public class CovidController {
 		if (orgLocation == null) {
 			// 33: Responsible organization
 			printField("", out);
-			// 34:  Administered at location
+			// 34: Administered at location
 			printField("", out);
 			// 35: VTrckS provider PIN
 			printField("", out);
-			// 36:  Administered at location: type
+			// 36: Administered at location: type
 			printField("", out);
-			// 37:  Administration address: street
+			// 37: Administration address: street
 			printField("", out);
-			// 38:  Administration address: street 2
+			// 38: Administration address: street 2
 			printField("", out);
-			// 39:  Administration address: city
+			// 39: Administration address: city
 			printField("", out);
-			// 40:  Administration address: county
+			// 40: Administration address: county
 			printField("", out);
-			// 41:  Administration address: state
+			// 41: Administration address: state
 			printField("", out);
-			// 42:  Administration address: zip code
+			// 42: Administration address: zip code
 			printField("", out);
 		} else {
 			// 33: Responsible organization
 			printField(orgLocation.getOrgFacilityCode(), out);
-			// 34:  Administered at location
+			// 34: Administered at location
 			printField(orgLocation.getOrgFacilityName(), out);
 			// 35: VTrckS provider PIN
 			printField(orgLocation.getVfcProviderPin(), out);
-			// 36:  Administered at location: type
+			// 36: Administered at location: type
 			printField(orgLocation.getLocationType(), out);
-			// 37:  Administration address: street
+			// 37: Administration address: street
 			printField(orgLocation.getAddressLine1(), out);
-			// 38:  Administration address: street 2
+			// 38: Administration address: street 2
 			printField(orgLocation.getAddressLine2(), out);
-			// 39:  Administration address: city
+			// 39: Administration address: city
 			printField(orgLocation.getAddressCity(), out);
-			// 40:  Administration address: county
+			// 40: Administration address: county
 			printField(orgLocation.getAddressCountyParish(), out);
-			// 41:  Administration address: state
+			// 41: Administration address: state
 			printField(orgLocation.getAddressState(), out);
-			// 42:  Administration address: zip code
+			// 42: Administration address: zip code
 			printField(orgLocation.getAddressZip(), out);
 		}
-		// 43:  Vaccination refusal
+		// 43: Vaccination refusal
 		if (administeredVaccination) {
 			printField("No", out);
 		} else {
@@ -447,10 +457,10 @@ public class CovidController {
 				printField("No", out);
 			}
 		}
-		// 44:  Comorbidity status
+		// 44: Comorbidity status
 		printField("UNK", out);
 
-		// 45:  Serology results
+		// 45: Serology results
 		printField("UNK", out);
 		out.println();
 	}

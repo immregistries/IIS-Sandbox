@@ -1,11 +1,11 @@
 package org.immregistries.iis.kernal.model;
 
-import org.immregistries.iis.kernal.model.persisted.Tenant;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import org.immregistries.iis.kernal.persisted.model.Tenant;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 

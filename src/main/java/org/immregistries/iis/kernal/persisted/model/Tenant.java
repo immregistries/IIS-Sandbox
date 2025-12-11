@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal.model.persisted;
+package org.immregistries.iis.kernal.persisted.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -7,7 +7,6 @@ import org.immregistries.iis.kernal.model.ProcessingFlavor;
 
 import java.io.Serializable;
 import java.util.Set;
-
 
 @Entity
 @Table(schema = "tenants")
@@ -44,7 +43,6 @@ public class Tenant extends AbstractMappedObject implements Serializable {
 		this.organizationName = organizationName;
 	}
 
-
 	public Set<ProcessingFlavor> getProcessingFlavorSet() {
 		if (processingFlavorSet == null) {
 			processingFlavorSet = ProcessingFlavor.getProcessingStyle(organizationName);
@@ -59,7 +57,6 @@ public class Tenant extends AbstractMappedObject implements Serializable {
 	public void setUserAccess(UserAccess userAccess) {
 		this.userAccess = userAccess;
 	}
-
 
 	@Override
 	public int hashCode() {
@@ -78,8 +75,8 @@ public class Tenant extends AbstractMappedObject implements Serializable {
 	@Override
 	public String toString() {
 		return "Tenant{" +
-			"orgId=" + orgId +
-			", organizationName='" + organizationName + '\'' +
-			'}';
+				"orgId=" + orgId +
+				", organizationName='" + organizationName + '\'' +
+				'}';
 	}
 }

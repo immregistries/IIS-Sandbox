@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal.model.persisted;
+package org.immregistries.iis.kernal.persisted.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.nimbusds.jose.JOSEException;
@@ -82,7 +82,6 @@ public class IisKey {
 	public PublicKey publicKey() {
 		return keyPair().getPublic();
 	}
-
 
 	public String getKeyId() {
 		return keyId;

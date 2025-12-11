@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal.model.persisted;
+package org.immregistries.iis.kernal.persisted.model;
 
 import jakarta.persistence.*;
 import org.springframework.security.core.Authentication;
@@ -52,7 +52,6 @@ public class UserAccess implements Serializable, Authentication {
 	public void setAccessKey(String accessKey) {
 		this.accessKey = accessKey;
 	}
-
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {

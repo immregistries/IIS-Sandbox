@@ -21,8 +21,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import org.immregistries.iis.kernal.model.persisted.Tenant;
+
 import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
+import org.immregistries.iis.kernal.persisted.model.Tenant;
 
 @RestController
 @RequestMapping({ "/vacDedup", TenantController.TENANT_PATH + "/vacDedup" })

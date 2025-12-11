@@ -17,7 +17,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.immregistries.iis.kernal.fhir.Application;
 
 import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
-import org.immregistries.iis.kernal.model.persisted.Tenant;
+import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

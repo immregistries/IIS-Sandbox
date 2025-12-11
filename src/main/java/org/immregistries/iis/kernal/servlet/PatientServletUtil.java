@@ -15,8 +15,8 @@ import org.immregistries.iis.kernal.model.LoincIdentifier;
 import org.immregistries.iis.kernal.model.ObservationReported;
 import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.model.SnomedValue;
-import org.immregistries.iis.kernal.model.persisted.MessageReceived;
-import org.immregistries.iis.kernal.model.persisted.Tenant;
+import org.immregistries.iis.kernal.persisted.model.MessageReceived;
+import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintWriter;

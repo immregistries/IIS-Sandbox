@@ -1,7 +1,7 @@
 package org.immregistries.iis.kernal.mapping.interfaces;
 
 import org.hl7.fhir.instance.model.api.IBaseResource;
-import org.immregistries.iis.kernal.model.persisted.Tenant;
+import org.immregistries.iis.kernal.persisted.model.Tenant;
 
 public interface OrganizationMapper<Organization extends IBaseResource> {
 	public Organization getFhirResource(Tenant tenant);

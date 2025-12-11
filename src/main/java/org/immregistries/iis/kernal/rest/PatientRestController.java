@@ -10,7 +10,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.hibernate.Session;
 import org.hl7.fhir.instance.model.api.IBaseBundle;
 import org.hl7.fhir.instance.model.api.IBaseResource;
-import org.immregistries.iis.kernal.HibernateConfig;
 import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.mapping.interfaces.PatientMapper;
 import org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester;
@@ -18,8 +17,11 @@ import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFacto
 import org.immregistries.iis.kernal.model.ObservationReported;
 import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.model.VaccinationMaster;
-import org.immregistries.iis.kernal.model.persisted.Tenant;
+import org.immregistries.iis.kernal.persisted.model.Tenant;
+import org.immregistries.iis.kernal.persisted.util.HibernateConfig;
 import org.immregistries.iis.kernal.servlet.RecommendationController;
+import org.immregistries.iis.kernal.fhir.shl.ShLinkPayload;
+import org.immregistries.iis.kernal.servlet.shlink.PatientShLinkController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -146,6 +148,16 @@ public class PatientRestController extends BaseTenantTiedRest {
                 new SearchParameterMap("family", new ca.uhn.fhir.rest.param.StringParam(family))
                         .add("name", new ca.uhn.fhir.rest.param.StringParam(name))
                         .add("identifier", new ca.uhn.fhir.rest.param.TokenParam().setValue(identifier)));
+    }
+
+    @GetMapping("/{patientId}/shLinkPayload")
+    public ShLinkPayload getShLinkPayload(
+            @PathVariable String patientId,
+            @RequestAttribute(TenantRequestLoggingFilter.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
+            HttpServletRequest req) {
+        IBaseResource patientSelected = getPatientFhir(patientId, tenant, req);
+        String manifestUrl = PatientShLinkController.getManifestUrl(req, patientSelected, tenant);
+        return PatientShLinkController.getPatientShLinkPayload(manifestUrl);
     }
 
 }
