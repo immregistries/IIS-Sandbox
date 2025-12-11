@@ -12,6 +12,7 @@ import org.immregistries.iis.kernal.fhir.security.UserAccessUtil;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.immregistries.iis.kernal.persisted.model.UserAccess;
 import org.immregistries.iis.kernal.rest.TenantRestController;
+import org.immregistries.iis.kernal.servlet.util.UiUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -93,7 +94,7 @@ public class TenantController {
 			/*
 			 * print starts after potential tenant switch
 			 */
-			HomeController.doHeader(out, "IIS Sandbox - Home", tenant);
+			UiUtil.doHeader(out, "IIS Sandbox - Home", tenant);
 
 			out.println("	<h1>Create or select Tenant to proceed</h1>");
 
@@ -135,10 +136,10 @@ public class TenantController {
 					+
 					"</p></div>"); // TODO better explanation
 
-			HomeController.printFlavors(out, true);
+			UiUtil.printFlavors(out, true);
 			out.println("</div>");
 
-			HomeController.doFooter(out);
+			UiUtil.doFooter(out);
 		}
 		out.flush();
 		out.close();

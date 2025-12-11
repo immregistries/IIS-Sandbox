@@ -7,6 +7,8 @@ import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.persisted.model.MessageReceived;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.immregistries.iis.kernal.rest.MessageRestController;
+import org.immregistries.iis.kernal.servlet.util.PatientServletUtil;
+import org.immregistries.iis.kernal.servlet.util.UiUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -53,7 +55,7 @@ public class MessageController {
 		try {
 			String messageError = null;
 			String messageConfirmation = null;
-			HomeController.doHeader(out, "IIS Sandbox");
+			UiUtil.doHeader(out, "IIS Sandbox");
 			if (messageError != null) {
 				out.println("  <div class=\"w3-panel w3-red\">");
 				out.println("    <p>" + messageError + "</p>");
@@ -101,7 +103,7 @@ public class MessageController {
 			System.err.println("Unable to render page: " + e.getMessage());
 			e.printStackTrace(System.err);
 		}
-		HomeController.doFooter(out);
+		UiUtil.doFooter(out);
 		out.flush();
 		out.close();
 	}

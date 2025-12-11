@@ -16,6 +16,7 @@ import org.immregistries.iis.kernal.logic.BaseIISSOAPServer;
 import org.immregistries.iis.kernal.logic.messageHandling.FhirMessagingHandler;
 import org.immregistries.iis.kernal.logic.messageHandling.V2IncomingMessageHandler;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
+import org.immregistries.iis.kernal.servlet.util.UiUtil;
 import org.immregistries.smm.cdc.CDCWSDLServer;
 import org.immregistries.smm.cdc.Fault;
 import org.immregistries.smm.cdc.SubmitSingleMessage;
@@ -135,10 +136,10 @@ public class FhirMessagingController {
 				message = fhirContext.newJsonParser().setPrettyPrint(true).encodeResourceToString(bundle);
 			}
 
-			HomeController.doHeader(out, "IIS Sandbox - FHIR Messaging", tenant);
+			UiUtil.doHeader(out, "IIS Sandbox - FHIR Messaging", tenant);
 			out.println("<h2>Experimental FHIR Messaging Endpoint</h2>");
 			PopController.printForm(out, "FHIR Bundle", message, organizationName, FHIR_MESSAGING_PATH_KEY);
-			HomeController.doFooter(out);
+			UiUtil.doFooter(out);
 
 		} catch (Exception e) {
 			e.printStackTrace(System.err);

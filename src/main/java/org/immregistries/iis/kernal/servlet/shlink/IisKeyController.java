@@ -10,10 +10,10 @@ import org.immregistries.iis.kernal.logic.KeyStoreService;
 import org.immregistries.iis.kernal.persisted.model.IisKey;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.immregistries.iis.kernal.persisted.model.UserAccess;
-import org.immregistries.iis.kernal.servlet.HomeController;
 import org.immregistries.iis.kernal.servlet.TenantController;
-import org.immregistries.iis.kernal.servlet.UrlTenantUtil;
 import org.immregistries.iis.kernal.servlet.WellKnownKeyController;
+import org.immregistries.iis.kernal.servlet.util.UiUtil;
+import org.immregistries.iis.kernal.servlet.util.UrlTenantUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -68,7 +68,7 @@ public class IisKeyController {
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		try {
 			Tenant tenant = CurrentTenantUtil.getTenantRedirectIfNone(req, resp);
-			HomeController.doHeader(out, "IIS Sandbox Keystore", CurrentTenantUtil.getTenant());
+			UiUtil.doHeader(out, "IIS Sandbox Keystore", CurrentTenantUtil.getTenant());
 			out.println("    <div class=\"w3-container w3-half w3-margin-top\">");
 			out.println("    <h2>Facility: " + tenant.getOrganizationName() + "</h2>");
 			out.println("    <h3>Keys used for signing Smart Health Cards (generated for the user)</h3>");
@@ -82,7 +82,7 @@ public class IisKeyController {
 			System.err.println("Unable to render page: " + e.getMessage());
 			e.printStackTrace(System.err);
 		}
-		HomeController.doFooter(out);
+		UiUtil.doFooter(out);
 		out.flush();
 		out.close();
 

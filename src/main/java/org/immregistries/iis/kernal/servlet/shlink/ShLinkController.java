@@ -18,8 +18,8 @@ import org.immregistries.iis.kernal.logic.shlink.ShLinkUtilService;
 import org.immregistries.iis.kernal.persisted.model.IisKey;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.immregistries.iis.kernal.persisted.model.UserAccess;
-import org.immregistries.iis.kernal.servlet.HomeController;
 import org.immregistries.iis.kernal.servlet.TenantController;
+import org.immregistries.iis.kernal.servlet.util.UiUtil;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -112,13 +112,13 @@ public class ShLinkController {
 			shLinkUtilService.printQrCodeAsImage(outputStream, qrCode);
 		} else {
 			resp.setContentType("text/html");
-			HomeController.doHeader(out, "Smart Health Link Result", tenant);
+			UiUtil.doHeader(out, "Smart Health Link Result", tenant);
 			out.println("<h3>Smart health link</h3>");
 			out.println("<textarea name=\"shlink\" readonly style=\"width: 100%; height: 5em;\" >");
 			out.print(qrCode);
 			out.println("</textarea>");
 			IisKeyController.printIisKey(out, iisSigningKey);
-			HomeController.doFooter(out);
+			UiUtil.doFooter(out);
 		}
 		out.flush();
 		out.close();
@@ -160,7 +160,7 @@ public class ShLinkController {
 
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
-		HomeController.doHeader(out, "Smart Health Link Form", tenant);
+		UiUtil.doHeader(out, "Smart Health Link Form", tenant);
 
 		out.println("    <div class=\"w3-container w3-margin-top\">");
 		out.println("    <h3>Generate ShLink</h3>");
@@ -205,7 +205,7 @@ public class ShLinkController {
 		IisKeyController.printIisKeys(out, iisKeys, tenant);
 		out.println("    </div>");
 
-		HomeController.doFooter(out);
+		UiUtil.doFooter(out);
 		out.flush();
 		out.close();
 

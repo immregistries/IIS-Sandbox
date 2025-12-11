@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal.servlet;
+package org.immregistries.iis.kernal.servlet.util;
 
 import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
 import ca.uhn.fhir.parser.IParser;

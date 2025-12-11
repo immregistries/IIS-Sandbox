@@ -13,7 +13,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.r5.model.Immunization;
 import org.hl7.fhir.r5.model.Patient;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR5Condition;
-
 import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.mapping.forR5.LocationMapperR5;
 import org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester;
@@ -23,6 +22,7 @@ import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.model.PatientReported;
 import org.immregistries.iis.kernal.model.VaccinationReported;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
+import org.immregistries.iis.kernal.servlet.util.UiUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -89,7 +89,7 @@ public class CovidController {
 			String messageError = null;
 			String dateStartString = req.getParameter(PARAM_DATE_START);
 			String dateEndString = req.getParameter(PARAM_DATE_END);
-			HomeController.doHeader(out, "IIS Sandbox", tenant);
+			UiUtil.doHeader(out, "IIS Sandbox", tenant);
 
 			Date dateStart = null;
 			Date dateEnd = null;
@@ -204,7 +204,7 @@ public class CovidController {
 			System.err.println("Unable to render page: " + e.getMessage());
 			e.printStackTrace(System.err);
 		}
-		HomeController.doFooter(out);
+		UiUtil.doFooter(out);
 		out.flush();
 		out.close();
 	}

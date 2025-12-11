@@ -3,8 +3,8 @@ package org.immregistries.iis.kernal.servlet;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
 import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
+import org.immregistries.iis.kernal.servlet.util.UiUtil;
 import org.immregistries.mqe.hl7util.parser.HL7Reader;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -191,7 +191,7 @@ public class LabController {
           }
         }
       }
-		 HomeController.doHeader(out, "IIS Sandbox", CurrentTenantUtil.getTenant(req));
+      UiUtil.doHeader(out, "IIS Sandbox", CurrentTenantUtil.getTenant(req));
 
 
 
@@ -224,7 +224,7 @@ public class LabController {
       System.err.println("Unable to render page: " + e.getMessage());
       e.printStackTrace(System.err);
     }
-		HomeController.doFooter(out);
+      UiUtil.doFooter(out);
     out.flush();
     out.close();
   }

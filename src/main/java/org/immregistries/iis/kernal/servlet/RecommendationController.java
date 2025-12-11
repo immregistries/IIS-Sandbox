@@ -18,6 +18,8 @@ import org.immregistries.iis.kernal.model.BusinessIdentifier;
 import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.immregistries.iis.kernal.rest.RecommendationRestController;
+import org.immregistries.iis.kernal.servlet.util.PatientServletUtil;
+import org.immregistries.iis.kernal.servlet.util.UiUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -109,7 +111,7 @@ public class RecommendationController {
 		Tenant tenant = CurrentTenantUtil.getTenantRedirectIfNone(req, resp);
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
-		HomeController.doHeader(out, "Recommendations", tenant);
+		UiUtil.doHeader(out, "Recommendations", tenant);
 
 		try {
 			IGenericClient fhirClient = repositoryClientFactory.newGenericClient(req);
@@ -202,7 +204,7 @@ public class RecommendationController {
 		} catch (Exception e) {
 			e.printStackTrace(System.err);
 		}
-		HomeController.doFooter(out);
+		UiUtil.doFooter(out);
 		out.flush();
 		out.close();
 	}

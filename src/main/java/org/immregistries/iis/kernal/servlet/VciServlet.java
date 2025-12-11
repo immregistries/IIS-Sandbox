@@ -10,7 +10,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.hibernate.SessionFactory;
-
+import org.immregistries.iis.kernal.servlet.util.UiUtil;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -166,7 +166,7 @@ public class VciServlet {
 
         message = mapper.writeValueAsString(verifiableCredential);
       }
-      HomeController.doHeader(out, "IIS Sandbox");
+      UiUtil.doHeader(out, "IIS Sandbox");
       out.println("    <h2>VCI Demonstration</h2>");
       out.println("    <form action=\"vciDemo\" method=\"POST\">");
       if (conversionStep == null) {
@@ -215,7 +215,7 @@ public class VciServlet {
 
       out.println("    </div>");
       out.println("    </form>");
-      HomeController.doFooter(out);
+      UiUtil.doFooter(out);
     } catch (Exception e) {
       e.printStackTrace(System.err);
     }

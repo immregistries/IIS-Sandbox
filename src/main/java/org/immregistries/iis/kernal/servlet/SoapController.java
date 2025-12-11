@@ -5,6 +5,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
+import org.immregistries.iis.kernal.servlet.util.UiUtil;
+import org.immregistries.iis.kernal.servlet.util.UrlTenantUtil;
 import org.immregistries.smm.cdc.CDCWSDLServer;
 import org.immregistries.smm.cdc.ProcessorFactory;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -40,7 +42,7 @@ public class SoapController {
 			PrintWriter out = resp.getWriter();
 			try {
 				Tenant tenant = CurrentTenantUtil.getTenant();
-				HomeController.doHeader(out, "IIS Sandbox", tenant);
+				UiUtil.doHeader(out, "IIS Sandbox", tenant);
 				out.println("<h2>CDC SOAP Endpoint</h2>");
 				out.println("<p>");
 				out.println("This demonstration system supports the use of the ");
@@ -86,7 +88,7 @@ public class SoapController {
 			} finally {
 				out.close();
 			}
-			HomeController.doFooter(out);
+			UiUtil.doFooter(out);
 		}
 	}
 

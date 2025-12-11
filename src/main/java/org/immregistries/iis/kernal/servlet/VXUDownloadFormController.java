@@ -6,6 +6,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
+import org.immregistries.iis.kernal.servlet.util.UiUtil;
+import org.immregistries.iis.kernal.servlet.util.UrlTenantUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
@@ -64,7 +66,7 @@ public class VXUDownloadFormController {
         beanFactory.autowireBean(generator);
         session.setAttribute(CACHED_GENERATOR, generator);
       }
-      HomeController.doHeader(out, "IIS Sandbox", tenant);
+      UiUtil.doHeader(out, "IIS Sandbox", tenant);
 
       if (action.equals(ACTION_GENERATE) && generator.canGenerate()) {
         generator.start();
@@ -122,7 +124,7 @@ public class VXUDownloadFormController {
       System.err.println("Unable to render page: " + e.getMessage());
       e.printStackTrace(System.err);
     }
-    HomeController.doFooter(out);
+    UiUtil.doFooter(out);
     out.flush();
     out.close();
   }

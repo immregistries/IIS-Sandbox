@@ -7,16 +7,14 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
-import org.hibernate.Session;
 import org.hl7.fhir.r4.model.Bundle;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
-
 import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.mapping.interfaces.ImmunizationMapper;
 import org.immregistries.iis.kernal.mapping.internalClient.IFhirRequester;
 import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
-import org.immregistries.iis.kernal.persisted.util.HibernateConfig;
+import org.immregistries.iis.kernal.servlet.util.UiUtil;
 import org.immregistries.smm.transform.ScenarioManager;
 import org.immregistries.smm.transform.TestCaseMessage;
 import org.immregistries.smm.transform.Transformer;
@@ -66,7 +64,7 @@ public class V2ToFhirController {
 				resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 				out.println("Access is not authorized. FacilityId, userid and/or password are not recognized. ");
 			} else {
-				HomeController.doHeader(out, "IIS Sandbox - V2ToFhir Result", tenant);
+				UiUtil.doHeader(out, "IIS Sandbox - V2ToFhir Result", tenant);
 				MessageParser parser = new MessageParser();
 				try {
 					Bundle bundle = parser.convert(message);
@@ -115,10 +113,10 @@ public class V2ToFhirController {
 				message = testCaseMessage.getMessageText();
 			}
 
-			HomeController.doHeader(out, "IIS Sandbox - v2ToFhir", tenant);
+			UiUtil.doHeader(out, "IIS Sandbox - v2ToFhir", tenant);
 			out.println("<h2>Convert to FHIR</h2>");
 			PopController.printForm(out, "V2 Message", message, organizationName, V2_TO_FHIR_PATH_KEY);
-			HomeController.doFooter(out);
+			UiUtil.doFooter(out);
 		} catch (Exception e) {
 			e.printStackTrace(System.err);
 		}

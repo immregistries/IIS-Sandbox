@@ -21,6 +21,9 @@ import org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester
 import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
 import org.immregistries.iis.kernal.model.*;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
+import org.immregistries.iis.kernal.servlet.util.PatientServletUtil;
+import org.immregistries.iis.kernal.servlet.util.UiUtil;
+import org.immregistries.iis.kernal.servlet.util.UrlTenantUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -105,7 +108,7 @@ public class VaccinationController {
 				}
 			}
 
-			HomeController.doHeader(out, "IIS Sandbox - Vaccinations", tenant);
+			UiUtil.doHeader(out, "IIS Sandbox - Vaccinations", tenant);
 			SimpleDateFormat sdfDate = new SimpleDateFormat("MM/dd/yyyy");
 
 			out.println("<h2>Vaccination Record: " + cvxPrint + " " + sdfDate.format(vaccination.getAdministeredDate())
@@ -201,7 +204,7 @@ public class VaccinationController {
 					}
 					out.println("<h4>Related Vaccination Records</h4>");
 					printVaccinationList(out, relatedVaccinations, tenant);
-					HomeController.printGoldenRecordExplanation(out, immunizationResource);
+					UiUtil.printGoldenRecordExplanation(out, immunizationResource);
 				}
 
 				out.println("  </div>");
@@ -255,7 +258,7 @@ public class VaccinationController {
 		} catch (Exception e) {
 			e.printStackTrace(System.err);
 		}
-		HomeController.doFooter(out);
+		UiUtil.doFooter(out);
 		out.flush();
 		out.close();
 	}

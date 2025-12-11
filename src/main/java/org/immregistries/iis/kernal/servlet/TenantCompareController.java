@@ -11,6 +11,7 @@ import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.fhir.security.UserAccessUtil;
 import org.immregistries.iis.kernal.logic.TenantCompareService;
 import org.immregistries.iis.kernal.persisted.model.UserAccess;
+import org.immregistries.iis.kernal.servlet.util.UiUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,7 +61,7 @@ public class TenantCompareController {
 		logger.info("Testing Tenant comparison");
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
-		HomeController.doHeader(out, "Tenant Comparison", CurrentTenantUtil.getTenant(req));
+		UiUtil.doHeader(out, "Tenant Comparison", CurrentTenantUtil.getTenant(req));
 		try {
 			UserAccess userAccess = UserAccessUtil.get().getUserAccess();
 			if (userAccess == null) {

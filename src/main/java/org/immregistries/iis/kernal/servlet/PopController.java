@@ -7,14 +7,14 @@ import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Session;
 import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
-import org.immregistries.iis.kernal.persisted.util.HibernateConfig;
+import org.immregistries.iis.kernal.rest.PopRestController;
+import org.immregistries.iis.kernal.servlet.util.UiUtil;
 import org.immregistries.smm.transform.ScenarioManager;
 import org.immregistries.smm.transform.TestCaseMessage;
 import org.immregistries.smm.transform.Transformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.immregistries.iis.kernal.rest.PopRestController;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -59,7 +59,7 @@ public class PopController {
 				resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 				out.println("Access is not authorized. FacilityId, userid and/or password are not recognized. ");
 			} else {
-				HomeController.doHeader(out, "IIS Sandbox - PopResult", tenant);
+				UiUtil.doHeader(out, "IIS Sandbox - PopResult", tenant);
 
 				PopRestController.PopRequest popRequest = new PopRestController.PopRequest();
 				popRequest.setMessage(message);
@@ -105,10 +105,10 @@ public class PopController {
 			}
 
 			{
-				HomeController.doHeader(out, "IIS Sandbox - Pop", tenant);
+				UiUtil.doHeader(out, "IIS Sandbox - Pop", tenant);
 				out.println("    <h2>Send Now</h2>");
 				printForm(out, "VXU Message", message, organizationName, POP_PATH_KEY);
-				HomeController.doFooter(out);
+				UiUtil.doFooter(out);
 			}
 		} catch (Exception e) {
 			e.printStackTrace(System.err);

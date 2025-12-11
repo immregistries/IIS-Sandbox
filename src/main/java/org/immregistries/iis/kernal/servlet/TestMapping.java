@@ -15,6 +15,7 @@ import org.immregistries.iis.kernal.mapping.interfaces.*;
 import org.immregistries.iis.kernal.model.ProcessingFlavor;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.immregistries.iis.kernal.persisted.model.UserAccess;
+import org.immregistries.iis.kernal.servlet.util.UiUtil;
 import org.immregistries.smm.tester.manager.HL7Reader;
 import org.immregistries.smm.transform.ScenarioManager;
 import org.immregistries.smm.transform.TestCaseMessage;
@@ -108,7 +109,7 @@ public class TestMapping extends HttpServlet {
 				message = testCaseMessage.getMessageText();
 			}
 			{
-				HomeController.doHeader(out, "IIS Sandbox");
+				UiUtil.doHeader(out, "IIS Sandbox");
 				out.println("    <h2>Send Now to Test Mapping</h2>");
 				out.println("    <form action=\"utest\" method=\"POST\" target=\"_blank\">");
 				out.println("      <h3>VXU Message</h3>");
@@ -124,7 +125,7 @@ public class TestMapping extends HttpServlet {
 				out.println("    </div>");
 				out.println("    </div>");
 				out.println("    </form>");
-				HomeController.doFooter(out);
+				UiUtil.doFooter(out);
 			}
 		} catch (Exception e) {
 			e.printStackTrace(System.err);

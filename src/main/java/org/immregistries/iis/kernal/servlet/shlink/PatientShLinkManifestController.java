@@ -27,8 +27,8 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 
 import static org.immregistries.iis.kernal.servlet.PatientController.PATIENT_BASE_PATH;
-import static org.immregistries.iis.kernal.servlet.PatientServletUtil.fetchPatientFromParameters;
 import static org.immregistries.iis.kernal.servlet.shlink.PatientShLinkManifestController.PATIENT_MANIFEST_FULL_PATH;
+import static org.immregistries.iis.kernal.servlet.util.PatientServletUtil.fetchPatientFromParameters;
 
 @RestController
 @RequestMapping({ PATIENT_MANIFEST_FULL_PATH })

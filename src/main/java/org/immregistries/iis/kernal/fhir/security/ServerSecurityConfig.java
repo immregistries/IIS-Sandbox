@@ -1,6 +1,7 @@
 package org.immregistries.iis.kernal.fhir.security;
 
 import org.immregistries.iis.kernal.servlet.*;
+import org.immregistries.iis.kernal.servlet.util.UrlTenantUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;

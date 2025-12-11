@@ -3,7 +3,7 @@ package org.immregistries.iis.kernal.servlet;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
+import org.immregistries.iis.kernal.servlet.util.UiUtil;
 import org.immregistries.smm.tester.TestCovidReporting;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -61,7 +61,7 @@ public class CovidGenerateController {
         includeMissed = req.getParameter(PARAM_INCLUDE_MISSED) != null;
         includeSerology = req.getParameter(PARAM_INCLUDE_SEROLOGY) != null;
       }
-		 HomeController.doHeader(out, "IIS Sandbox");
+      UiUtil.doHeader(out, "IIS Sandbox");
 
 
 
@@ -132,7 +132,7 @@ public class CovidGenerateController {
       System.err.println("Unable to render page: " + e.getMessage());
       e.printStackTrace(System.err);
     }
-		HomeController.doFooter(out);
+      UiUtil.doFooter(out);
     out.flush();
     out.close();
   }

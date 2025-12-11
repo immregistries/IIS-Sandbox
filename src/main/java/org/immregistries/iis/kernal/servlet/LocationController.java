@@ -7,7 +7,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Session;
-
 import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.mapping.interfaces.LocationMapper;
 import org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester;
@@ -15,6 +14,7 @@ import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFacto
 import org.immregistries.iis.kernal.model.*;
 import org.immregistries.iis.kernal.persisted.model.MessageReceived;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
+import org.immregistries.iis.kernal.servlet.util.UiUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -140,7 +140,7 @@ public class LocationController {
 			List<OrgLocation> orgLocationList = null;
 			orgLocationList = fhirRequests.searchOrgLocationList(new SearchParameterMap());
 
-			HomeController.doHeader(out, "IIS Sandbox");
+			UiUtil.doHeader(out, "IIS Sandbox");
 
 			out.println("    <h2>Facility</h2>");
 			if (orgLocationSelected == null) {
@@ -244,7 +244,7 @@ public class LocationController {
 		} catch (Exception e) {
 			e.printStackTrace(System.err);
 		}
-		HomeController.doFooter(out);
+		UiUtil.doFooter(out);
 		out.flush();
 		out.close();
 	}

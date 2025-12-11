@@ -13,7 +13,7 @@ import org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester
 import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
 import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
-import org.immregistries.iis.kernal.servlet.PatientServletUtil;
+import org.immregistries.iis.kernal.servlet.util.PatientServletUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

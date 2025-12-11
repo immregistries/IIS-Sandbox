@@ -28,6 +28,8 @@ import org.immregistries.iis.kernal.rest.PatientRestController;
 import org.immregistries.iis.kernal.rest.SubscriptionRestController;
 import org.immregistries.iis.kernal.servlet.shlink.CLVRController;
 import org.immregistries.iis.kernal.servlet.shlink.ShLinkController;
+import org.immregistries.iis.kernal.servlet.util.UiUtil;
+import org.immregistries.iis.kernal.servlet.util.UrlTenantUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +44,7 @@ import java.util.List;
 import java.util.Set;
 
 import static org.immregistries.iis.kernal.servlet.PatientController.PATIENT_BASE_PATH;
-import static org.immregistries.iis.kernal.servlet.PatientServletUtil.*;
+import static org.immregistries.iis.kernal.servlet.util.PatientServletUtil.*;
 
 @RestController
 @RequestMapping({ PATIENT_BASE_PATH, TenantController.TENANT_PATH + PATIENT_BASE_PATH })
@@ -98,7 +100,7 @@ public class PatientController {
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		Tenant tenant = CurrentTenantUtil.getTenantRedirectIfNone(req, resp);
 		try {
-			HomeController.doHeader(out, "IIS Sandbox - Patients", tenant);
+			UiUtil.doHeader(out, "IIS Sandbox - Patients", tenant);
 			String patientId = req.getParameter(PARAM_PATIENT_REPORTED_ID);
 			IBaseResource patientSelected = null;
 			if (StringUtils.isNotBlank(patientId)) {
@@ -113,7 +115,7 @@ public class PatientController {
 		} catch (Exception e) {
 			e.printStackTrace(System.err);
 		}
-		HomeController.doFooter(out);
+		UiUtil.doFooter(out);
 		out.flush();
 		out.close();
 	}
@@ -254,7 +256,7 @@ public class PatientController {
 				.getPatientRelatedPatients(patientMasterSelected.getPatientId(), tenant, isGolden, req);
 		out.println("<h4>Related Patient records</h4>");
 		printPatientList(out, relatedPatients, false);
-		HomeController.printGoldenRecordExplanation(out, isGolden);
+		UiUtil.printGoldenRecordExplanation(out, isGolden);
 	}
 
 	private void printPatientVaccinations(PrintWriter out, PatientMaster patientMasterSelected, boolean isGolden,

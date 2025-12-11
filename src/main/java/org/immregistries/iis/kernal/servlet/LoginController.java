@@ -3,11 +3,9 @@ package org.immregistries.iis.kernal.servlet;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.hibernate.Session;
-import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.immregistries.iis.kernal.persisted.repository.TenantRepository;
-import org.immregistries.iis.kernal.persisted.util.HibernateConfig;
+import org.immregistries.iis.kernal.servlet.util.UiUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -48,7 +46,7 @@ public class LoginController {
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		String locationHeader = req.getHeader("referer");
 		try {
-			HomeController.doHeader(out, "IIS Sandbox");
+			UiUtil.doHeader(out, "IIS Sandbox");
 			Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 			// LOGIN FORM, inherited, could be made in a separate class and improved
 			if (!authentication.isAuthenticated() || authentication instanceof AnonymousAuthenticationToken) {
@@ -95,7 +93,7 @@ public class LoginController {
 			System.err.println("Unable to render page: " + e.getMessage());
 			e.printStackTrace(System.err);
 		}
-		HomeController.doFooter(out);
+		UiUtil.doFooter(out);
 		out.flush();
 		out.close();
 	}

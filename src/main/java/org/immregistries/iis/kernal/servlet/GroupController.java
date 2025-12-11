@@ -4,18 +4,18 @@ import ca.uhn.fhir.context.FhirContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.hl7.fhir.r5.model.*;
-
+import org.hl7.fhir.r5.model.Group;
+import org.hl7.fhir.r5.model.Identifier;
+import org.hl7.fhir.r5.model.Parameters;
 import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
-
+import org.immregistries.iis.kernal.rest.GroupRestController;
+import org.immregistries.iis.kernal.servlet.util.UiUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.immregistries.iis.kernal.rest.GroupRestController;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
@@ -54,7 +54,7 @@ public class GroupController {
 
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
-		HomeController.doHeader(out, "IIS Sandbox - Groups", CurrentTenantUtil.getTenant());
+		UiUtil.doHeader(out, "IIS Sandbox - Groups", CurrentTenantUtil.getTenant());
 		Group group = groupRestController.getGroup(req);
 		out.println("<p>");
 		out.println(fhirContext.newJsonParser().setPrettyPrint(true).encodeResourceToString(group));
@@ -63,7 +63,7 @@ public class GroupController {
 		out.println("<p>");
 		out.println(fhirContext.newJsonParser().setPrettyPrint(true).encodeResourceToString(parameters));
 		out.println("</p>");
-		HomeController.doFooter(out);
+		UiUtil.doFooter(out);
 		out.flush();
 		out.close();
 	}
