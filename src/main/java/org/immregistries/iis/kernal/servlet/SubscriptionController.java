@@ -1,34 +1,30 @@
 package org.immregistries.iis.kernal.servlet;
 
 import ca.uhn.fhir.jpa.provider.SubscriptionTriggeringProvider;
-
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
 import org.hl7.fhir.r5.model.Bundle;
 import org.hl7.fhir.r5.model.Subscription;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR5Condition;
-
 import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.fhir.security.TenantUtil;
 import org.immregistries.iis.kernal.logic.SubscriptionService;
 import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
+import org.immregistries.iis.kernal.rest.SubscriptionRestController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.immregistries.iis.kernal.rest.SubscriptionRestController;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
-
 import java.util.Map;
 
 /**
@@ -105,7 +101,7 @@ public class SubscriptionController {
 				triggerRequest.setHttpVerbs(java.util.Arrays.asList(httpVerbs));
 			}
 
-			String result = subscriptionRestController.triggerSubscription(tenant.getOrgId(), triggerRequest, req);
+			String result = subscriptionRestController.triggerSubscription(tenant, triggerRequest, req);
 			out.println(result);
 		} catch (Exception e) {
 			resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);

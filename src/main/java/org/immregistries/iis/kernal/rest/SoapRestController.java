@@ -45,7 +45,7 @@ public class SoapRestController {
         }
         String path = req.getPathInfo();
         final String processorName = path == null ? "" : (path.startsWith("/") ? path.substring(1) : path);
-        CDCWSDLServer server = new BaseIISSOAPServer(partitionTenantCreationInterceptor, tenantName) {
+		 CDCWSDLServer server = new BaseIISSOAPServer(tenantName) {
             @Override
             public void process(SubmitSingleMessage ssm, PrintWriter out) throws Fault {
                 String message = ssm.getHl7Message();

@@ -51,7 +51,7 @@ public class UserAccessUtil implements ApplicationContextAware {
         }
         UserAccess userAccess = null;
 
-        List<UserAccess> userAccessList = getUserAccessRepository().findByAccessName(username);
+		 List<UserAccess> userAccessList = getUserAccessRepository().findAllByAccessName(username);
         if (userAccessList.size() == 0) {
             /**
              * Registration
@@ -76,7 +76,7 @@ public class UserAccessUtil implements ApplicationContextAware {
         String username = GITHUB_PREFIX + oAuth2User.getAttribute("login");
         UserAccess userAccess = null;
 
-        List<UserAccess> userAccessList = getUserAccessRepository().findByAccessName(username);
+		 List<UserAccess> userAccessList = getUserAccessRepository().findAllByAccessName(username);
         if (userAccessList.size() == 0) {
             /**
              * Registration
