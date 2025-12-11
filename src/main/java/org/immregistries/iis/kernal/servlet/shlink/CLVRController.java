@@ -79,7 +79,7 @@ public class CLVRController {
 		IisKey iisSigningKey = keyStoreService.getIisSigningKeyOrCreate("", userAccess, tenant);
 
 		IBaseBundle ipsToBeEncoded = ipsGeneratorSvcIIS
-				.generateIps(TenantUtil.requestDetailsWithPartitionName(partitionLookupSvc), new IdType(patientId), "");
+				.generateIps(TenantUtil.requestDetailsWithPartitionName(), new IdType(patientId), "");
 		CLVRPayload clvrPayload = fhirConversionUtil.toCLVRPayloadFromBundle(ipsToBeEncoded);
 
 		CLVRToken clvrToken = new CLVRToken(clvrPayload, "IIS");

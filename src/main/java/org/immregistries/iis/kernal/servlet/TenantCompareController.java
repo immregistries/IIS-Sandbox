@@ -69,12 +69,12 @@ public class TenantCompareController {
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		HomeController.doHeader(out, "Tenant Comparison", CurrentTenantUtil.getTenant(req));
-		try (Session dataSession = HibernateConfig.getDataSession()) {
+		try {
 			UserAccess userAccess = UserAccessUtil.getUserAccess();
 			if (userAccess == null) {
 				throw new AuthenticationCredentialsNotFoundException("");
 			}
-			List<IBaseParameters> diffs = tenantCompareService.compareTenants(tenantNames, userAccess, dataSession,
+			List<IBaseParameters> diffs = tenantCompareService.compareTenants(tenantNames, userAccess,
 					includeGolden);
 			for (IBaseParameters diff : diffs) {
 				out.println(

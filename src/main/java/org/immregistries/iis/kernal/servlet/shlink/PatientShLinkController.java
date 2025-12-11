@@ -1,6 +1,5 @@
 package org.immregistries.iis.kernal.servlet.shlink;
 
-
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import jakarta.servlet.ServletException;
@@ -34,7 +33,7 @@ import static org.immregistries.iis.kernal.servlet.PatientServletUtil.fetchPatie
 import static org.immregistries.iis.kernal.servlet.shlink.PatientShLinkManifestController.MANIFEST_PATH_SUFFIX;
 
 @RestController
-@RequestMapping({PATIENT_BASE_PATH, TenantController.TENANT_PATH + PATIENT_BASE_PATH})
+@RequestMapping({ PATIENT_BASE_PATH, TenantController.TENANT_PATH + PATIENT_BASE_PATH })
 public class PatientShLinkController {
 
 	public static final String SHLINK_QR_CODE_PATH_SUFFIX = "/qr";
@@ -52,20 +51,19 @@ public class PatientShLinkController {
 	@Autowired
 	private PartitionTenantCreationInterceptor partitionTenantCreationInterceptor;
 
-	@GetMapping({SHLINK_QR_CODE_PATH_SUFFIX})
-	protected void doGetShLinkQrCode(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
+	@GetMapping({ SHLINK_QR_CODE_PATH_SUFFIX })
+	protected void doGetShLinkQrCode(HttpServletRequest req, HttpServletResponse resp)
+			throws IOException, ServletException {
 		OutputStream outputStream = resp.getOutputStream();
-//		PrintWriter out = new PrintWriter(outputStream);
+		// PrintWriter out = new PrintWriter(outputStream);
 		resp.setContentType("image/png"); // Set content type for PNG image
 
-		try (Session dataSession = HibernateConfig.getDataSession()) {
-			Tenant tenant = CurrentTenantUtil.getTenantRedirectIfNone(req, resp, dataSession);
-			IGenericClient fhirClient = repositoryClientFactory.newGenericClient(req);
-			IBaseResource patientSelected = fetchPatientFromParameter(req, fhirClient, fhirRequester);
-			if (patientSelected != null) {
-				String qrCode = getQrCode(req, patientSelected, tenant);
-				shLinkUtilService.printQrCodeAsImage(outputStream, qrCode);
-			}
+		Tenant tenant = CurrentTenantUtil.getTenantRedirectIfNone(req, resp);
+		IGenericClient fhirClient = repositoryClientFactory.newGenericClient(req);
+		IBaseResource patientSelected = fetchPatientFromParameter(req, fhirClient, fhirRequester);
+		if (patientSelected != null) {
+			String qrCode = getQrCode(req, patientSelected, tenant);
+			shLinkUtilService.printQrCodeAsImage(outputStream, qrCode);
 		}
 		outputStream.flush();
 		outputStream.close();
@@ -94,8 +92,8 @@ public class PatientShLinkController {
 	}
 
 	public static @NotNull String getManifestUrl(String baseUrl, IBaseResource patientSelected, Tenant tenant) {
-		return baseUrl + TenantController.TENANT_BASE_PATH + "/" + tenant.getOrganizationName() + MANIFEST_PATH_SUFFIX + "/patient/" + patientSelected.getIdElement().getIdPart();
+		return baseUrl + TenantController.TENANT_BASE_PATH + "/" + tenant.getOrganizationName() + MANIFEST_PATH_SUFFIX
+				+ "/patient/" + patientSelected.getIdElement().getIdPart();
 	}
-
 
 }

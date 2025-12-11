@@ -24,7 +24,7 @@ public class V2ToFhirRestController {
     @PostMapping
     public ResponseEntity<String> convertV2ToFhir(@RequestBody String message,
             @RequestParam(name = "facilityName", required = false) String facilityName) {
-        try (Session dataSession = HibernateConfig.getDataSession()) {
+        try {
             // In a real REST API, authentication should be handled by a filter or security
             // config.
             // For now, we assume the user is authenticated or we might need to pass
@@ -36,7 +36,7 @@ public class V2ToFhirRestController {
             // Given the context of "translate this method", I will try to preserve the
             // logic but adapt it.
             // But wait, the original code used
-            // `CurrentTenantUtil.getTenantByIdAuthenticated(req, dataSession)`.
+            // `CurrentTenantUtil.getTenantByIdAuthenticated(req)`.
             // This suggests it relies on the session or request attributes.
             // For a pure REST API, we usually don't rely on HttpSession.
             // However, `BaseTenantTiedRest` suggests we might be in a context where we can

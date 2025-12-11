@@ -27,7 +27,6 @@ import java.util.List;
 
 import static org.hl7.fhir.r5.model.Bundle.HTTPVerb.DELETE;
 
-
 @Service
 public class SubscriptionService {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -42,66 +41,78 @@ public class SubscriptionService {
 	SubscriptionTriggeringProvider subscriptionTriggeringProvider;
 	@Autowired
 	IPartitionLookupSvc partitionLookupSvc;
-//	@Autowired
-//	SubscriptionDeliveringRestHookSubscriber subscriptionDeliveringRestHookSubscriber;
-//	@Autowired
-//	SubscriptionCanonicalizer subscriptionCanonicalizer;
+	// @Autowired
+	// SubscriptionDeliveringRestHookSubscriber
+	// subscriptionDeliveringRestHookSubscriber;
+	// @Autowired
+	// SubscriptionCanonicalizer subscriptionCanonicalizer;
 
-//	public Subscription searchRelatedSubscription(Immunization baseResource, RequestDetails requestDetails) {
-//		UserAccess userAccess = (UserAccess) requestDetails.getAttribute("userAccess");
-//		/**
-//		 * define materialization of subscription on immunization with
-//		 * 	- TAG ?
-//		 * 	- Identifier System ?
-//		 * 	- $match operations ?
-//		 */
-//		Bundle bundle = repositoryClientFactory.newGenericClient(userAccess).search().forResource(Subscription.class)
-//			.where(Subscription.STATUS.exactly().code(Enumerations.SubscriptionStatusCodes.ACTIVE.toCode()))
-////			.and(Subscription.IDENTIFIER.hasSystemWithAnyCode(baseResource.getIdentifier()))  TODO change
-////			.and(Subscription.)  TODO change
-//			.returnBundle(Bundle.class).execute();
-//		Subscription subscription = (Subscription) bundle.getEntryFirstRep().getResource();
-private static SubscriptionStatus createSubscriptionStatus(Subscription subscription) {
-	SubscriptionStatus status = new SubscriptionStatus()
-		.setType(SubscriptionStatus.SubscriptionNotificationType.EVENTNOTIFICATION)
-		.setStatus(subscription.getStatus())
-//				.setSubscription(subscription.getIdentifierFirstRep().getAssigner())
-		.setSubscription(new Reference().setIdentifier(subscription.getIdentifierFirstRep()))
-//				.set
-//				.setEventsInNotification(1)
-//				.setEventsSinceSubscriptionStart(1)
-		.setTopic(subscription.getTopic());
-	return status;
-}
+	// public Subscription searchRelatedSubscription(Immunization baseResource,
+	// RequestDetails requestDetails) {
+	// UserAccess userAccess = (UserAccess)
+	// requestDetails.getAttribute("userAccess");
+	// /**
+	// * define materialization of subscription on immunization with
+	// * - TAG ?
+	// * - Identifier System ?
+	// * - $match operations ?
+	// */
+	// Bundle bundle =
+	// repositoryClientFactory.newGenericClient(userAccess).search().forResource(Subscription.class)
+	// .where(Subscription.STATUS.exactly().code(Enumerations.SubscriptionStatusCodes.ACTIVE.toCode()))
+	//// .and(Subscription.IDENTIFIER.hasSystemWithAnyCode(baseResource.getIdentifier()))
+	// TODO change
+	//// .and(Subscription.) TODO change
+	// .returnBundle(Bundle.class).execute();
+	// Subscription subscription = (Subscription)
+	// bundle.getEntryFirstRep().getResource();
+	private static SubscriptionStatus createSubscriptionStatus(Subscription subscription) {
+		SubscriptionStatus status = new SubscriptionStatus()
+				.setType(SubscriptionStatus.SubscriptionNotificationType.EVENTNOTIFICATION)
+				.setStatus(subscription.getStatus())
+				// .setSubscription(subscription.getIdentifierFirstRep().getAssigner())
+				.setSubscription(new Reference().setIdentifier(subscription.getIdentifierFirstRep()))
+				// .set
+				// .setEventsInNotification(1)
+				// .setEventsSinceSubscriptionStart(1)
+				.setTopic(subscription.getTopic());
+		return status;
+	}
 
-	/// /		subscription.gets
-//		return subscription;
-//	}
-	public String triggerWithResource(Subscription subscription, List<Pair<String, Bundle.HTTPVerb>> requests, Tenant tenant) {
-		RequestDetails requestDetails = TenantUtil.requestDetailsWithPartitionName(partitionLookupSvc);
+	/// / subscription.gets
+	// return subscription;
+	// }
+	public String triggerWithResource(Subscription subscription, List<Pair<String, Bundle.HTTPVerb>> requests,
+			Tenant tenant) {
+		RequestDetails requestDetails = TenantUtil.requestDetailsWithPartitionName();
 		List<IPrimitiveType<String>> urls = List.of(new StringType("Patient?name=ulysse"));
-		IBaseParameters iBaseParameters = subscriptionTriggeringProvider.triggerSubscription(requestDetails, subscription.getIdElement(), null, urls);
+		IBaseParameters iBaseParameters = subscriptionTriggeringProvider.triggerSubscription(requestDetails,
+				subscription.getIdElement(), null, urls);
 		return fhirContext.newJsonParser().encodeResourceToString(iBaseParameters);
 	}
 
 	/**
 	 * Testing method
-	 * Triggers subscription with completely custom bundle, generating Subscription Notification
+	 * Triggers subscription with completely custom bundle, generating Subscription
+	 * Notification
 	 * TODO Test with different use cases
 	 *
 	 * @param subscription
 	 * @param requests
 	 * @return
 	 */
-	public String triggerWithResourceFullManual(Subscription subscription, List<Pair<String, Bundle.HTTPVerb>> requests) {
-//			UserAccess userAccess = UserAccessUtil.getUserAccess();
+	public String triggerWithResourceFullManual(Subscription subscription,
+			List<Pair<String, Bundle.HTTPVerb>> requests) {
+		// UserAccess userAccess = UserAccessUtil.getUserAccess();
 
-//			ResourceDeliveryMessage resourceDeliveryMessage = new ResourceDeliveryMessage();
-//			resourceDeliveryMessage.setSubscription(subscriptionCanonicalizer.canonicalize(subscription));
-//			resourceDeliveryMessage.setPartitionId(RequestPartitionId.fromPartitionName(""+userAccess.getAccessName()));
-//			resourceDeliveryMessage.setOperationType(BaseResourceMessage.OperationTypeEnum.UPDATE);
-//			resourceDeliveryMessage.setPayload(fhirSystemDao.getContext(), resource, EncodingEnum.JSON);
-//			subscriptionDeliveringRestHookSubscriber.handleMessage(resourceDeliveryMessage);
+		// ResourceDeliveryMessage resourceDeliveryMessage = new
+		// ResourceDeliveryMessage();
+		// resourceDeliveryMessage.setSubscription(subscriptionCanonicalizer.canonicalize(subscription));
+		// resourceDeliveryMessage.setPartitionId(RequestPartitionId.fromPartitionName(""+userAccess.getAccessName()));
+		// resourceDeliveryMessage.setOperationType(BaseResourceMessage.OperationTypeEnum.UPDATE);
+		// resourceDeliveryMessage.setPayload(fhirSystemDao.getContext(), resource,
+		// EncodingEnum.JSON);
+		// subscriptionDeliveringRestHookSubscriber.handleMessage(resourceDeliveryMessage);
 
 		IGenericClient endpointClient = repositoryClientFactory.newGenericClient(subscription.getEndpoint());
 		/**
@@ -109,7 +120,8 @@ private static SubscriptionStatus createSubscriptionStatus(Subscription subscrip
 		 */
 		AdditionalRequestHeadersInterceptor additionalRequestHeadersInterceptor = new AdditionalRequestHeadersInterceptor();
 		for (Subscription.SubscriptionParameterComponent parameterComponent : subscription.getParameter()) {
-			additionalRequestHeadersInterceptor.addHeaderValue(parameterComponent.getName(), parameterComponent.getValue());
+			additionalRequestHeadersInterceptor.addHeaderValue(parameterComponent.getName(),
+					parameterComponent.getValue());
 		}
 		endpointClient.registerInterceptor(additionalRequestHeadersInterceptor);
 		Bundle notificationBundle = new Bundle(Bundle.BundleType.SUBSCRIPTIONNOTIFICATION);
@@ -124,8 +136,8 @@ private static SubscriptionStatus createSubscriptionStatus(Subscription subscrip
 				case POST: {
 					Resource resource = (Resource) parseResource(pair.getKey());
 					notificationBundle.addEntry()
-						.setResource(resource)
-						.setRequest(new Bundle.BundleEntryRequestComponent(pair.getValue(), resource.getId()));
+							.setResource(resource)
+							.setRequest(new Bundle.BundleEntryRequestComponent(pair.getValue(), resource.getId()));
 					break;
 				}
 				case DELETE: {
@@ -145,33 +157,34 @@ private static SubscriptionStatus createSubscriptionStatus(Subscription subscrip
 					}
 
 					Bundle.BundleEntryComponent entry = notificationBundle.addEntry()
-						.setRequest(new Bundle.BundleEntryRequestComponent(DELETE, url));
+							.setRequest(new Bundle.BundleEntryRequestComponent(DELETE, url));
 					break;
 				}
 			}
 		}
 
-
 		MethodOutcome outcome = endpointClient.create().resource(notificationBundle).execute();
 		if (outcome.getResource() != null) {
-//				out.println(parser.encodeResourceToString(outcome.getResource()));
+			// out.println(parser.encodeResourceToString(outcome.getResource()));
 		}
 		if (outcome.getOperationOutcome() != null) {
-//				out.println(parser.encodeResourceToString(outcome.getOperationOutcome()));
+			// out.println(parser.encodeResourceToString(outcome.getOperationOutcome()));
 		}
 		if (outcome.getId() != null) {
-//				out.println(outcome.getId());
+			// out.println(outcome.getId());
 		}
 
-//				MethodOutcome methodOutcome = localClient.create().resource(parsedResource).execute();
-//				List<IPrimitiveType<String>> ids = new ArrayList<>();
-//				ids.add(methodOutcome.getId());
-//				List<IPrimitiveType<String>> urls = new ArrayList<>();
-//				urls.add(new StringType("OperationOutcome?"));
-//				subscriptionTriggeringProvider.triggerSubscription(new IdType(subscription.getId()),ids,urls);
+		// MethodOutcome methodOutcome =
+		// localClient.create().resource(parsedResource).execute();
+		// List<IPrimitiveType<String>> ids = new ArrayList<>();
+		// ids.add(methodOutcome.getId());
+		// List<IPrimitiveType<String>> urls = new ArrayList<>();
+		// urls.add(new StringType("OperationOutcome?"));
+		// subscriptionTriggeringProvider.triggerSubscription(new
+		// IdType(subscription.getId()),ids,urls);
 
-
-		return "Success : \n\n" + fhirContext.newJsonParser().setPrettyPrint(true).encodeResourceToString(notificationBundle);
+		return "Success : \n\n"
+				+ fhirContext.newJsonParser().setPrettyPrint(true).encodeResourceToString(notificationBundle);
 	}
 
 	private IBaseResource parseResource(String message) {

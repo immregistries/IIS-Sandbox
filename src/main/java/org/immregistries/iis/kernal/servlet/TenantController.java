@@ -42,9 +42,6 @@ public class TenantController {
 	public static final String PARAM_TENANT_ID = "tenantId";
 
 	@Autowired
-	PartitionTenantCreationInterceptor partitionTenantCreationInterceptor;
-
-	@Autowired
 	TenantRestController tenantRestController;
 
 	/**
@@ -61,10 +58,8 @@ public class TenantController {
 			@RequestParam(name = PARAM_TENANT_NAME) @NotBlank String tenantName)
 			throws ServletException, IOException {
 		UserAccess userAccess = UserAccessUtil.getUserAccess();
-		try (Session dataSession = HibernateConfig.getDataSession()) {
-			TenantUtil.authenticateTenant(userAccess, tenantName, dataSession, partitionTenantCreationInterceptor);
-			resp.sendRedirect(Application.IIS_PATH_BASE + TENANT_BASE_PATH + "/" + tenantName + TENANT_BASE_PATH);
-		}
+		TenantUtil.authenticateTenant(userAccess, tenantName);
+		resp.sendRedirect(Application.IIS_PATH_BASE + TENANT_BASE_PATH + "/" + tenantName + TENANT_BASE_PATH);
 		doGet(req, resp);
 	}
 
@@ -87,67 +82,65 @@ public class TenantController {
 		String action = req.getParameter(PARAM_ACTION);
 		String tenantId = req.getParameter(PARAM_TENANT_ID);
 
-		try (Session dataSession = HibernateConfig.getDataSession()) {
-			Tenant tenant = CurrentTenantUtil.getTenantFromName(req, dataSession);
-			UserAccess userAccess = UserAccessUtil.getUserAccess();
-			if (userAccess != null && session != null) {
-				List<Tenant> tenantList = tenantRestController.getTenants(req);
-				for (Tenant tenantMember : tenantList) {
-					if (ACTION_SWITCH.equals(action) && String.valueOf(tenantMember.getOrgId()).equals(tenantId)) {
-						tenant = tenantMember;
-						// session.setAttribute(SESSION_TENANT, tenant);
-					}
+		Tenant tenant = CurrentTenantUtil.getTenant(req);
+		UserAccess userAccess = UserAccessUtil.getUserAccess();
+		if (userAccess != null && session != null) {
+			List<Tenant> tenantList = tenantRestController.getTenants(req);
+			for (Tenant tenantMember : tenantList) {
+				if (ACTION_SWITCH.equals(action) && String.valueOf(tenantMember.getOrgId()).equals(tenantId)) {
+					tenant = tenantMember;
+					// session.setAttribute(SESSION_TENANT, tenant);
 				}
-				/*
-				 * print starts after potential tenant switch
-				 */
-				HomeController.doHeader(out, "IIS Sandbox - Home", tenant);
-
-				out.println("	<h1>Create or select Tenant to proceed</h1>");
-
-				out.println("<div class=\"w3-container w3-half w3-margin-top\">");
-
-				out.println("	<h2>Tenant List</h2>");
-
-				out.println("<ul class=\"w3-ul w3-hoverable\">");
-				for (Tenant tenantMember : tenantList) {
-					if (tenantMember.equals(tenant)) {
-						out.println("<li>" + tenantMember.getOrganizationName() + " (selected)</li>");
-					} else {
-						String link = Application.IIS_PATH_BASE + TenantController.TENANT_BASE_PATH + "/"
-								+ tenantMember.getOrganizationName() + TenantController.TENANT_BASE_PATH;
-						out.println("<li><a href=\"" + link + "\">" + tenantMember.getOrganizationName() + "</a></li>");
-					}
-				}
-				out.println("	  </ul>");
-				out.println("</div>");
-
-				out.println("<div class=\"w3-container w3-half w3-margin-top\">");
-				out.println("    <h3>Add Tenant</h3>");
-				out.println("    <form method=\"POST\" action=\"tenant\" class=\"w3-container w3-card-4\">"); // TODO
-																												// forbid
-																												// space
-																												// in
-																												// input
-				out.println("      <label>Tenant Name</label>");
-				out.println("      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_TENANT_NAME
-						+ "\" value=\"\"/>");
-				out.println(
-						"		<input class=\"w3-button w3-section w3-teal w3-ripple\" type=\"submit\" value=\"Create\"/> ");
-				out.println("    </form>");
-				out.println("</div>");
-
-				out.println("<div class=\"w3-container w3-margin-top\">");
-				out.println("	<div class=\"w3-panel w3-yellow\"><p class=\"w3-left-align\">" +
-						"Tenants are separated testing environments, One Tenant &#8792; One IIS equivalent, Different Facilities can be registered as information sources to the Tenants"
-						+
-						"</p></div>"); // TODO better explanation
-
-				HomeController.printFlavors(out, true);
-				out.println("</div>");
-
-				HomeController.doFooter(out);
 			}
+			/*
+			 * print starts after potential tenant switch
+			 */
+			HomeController.doHeader(out, "IIS Sandbox - Home", tenant);
+
+			out.println("	<h1>Create or select Tenant to proceed</h1>");
+
+			out.println("<div class=\"w3-container w3-half w3-margin-top\">");
+
+			out.println("	<h2>Tenant List</h2>");
+
+			out.println("<ul class=\"w3-ul w3-hoverable\">");
+			for (Tenant tenantMember : tenantList) {
+				if (tenantMember.equals(tenant)) {
+					out.println("<li>" + tenantMember.getOrganizationName() + " (selected)</li>");
+				} else {
+					String link = Application.IIS_PATH_BASE + TenantController.TENANT_BASE_PATH + "/"
+							+ tenantMember.getOrganizationName() + TenantController.TENANT_BASE_PATH;
+					out.println("<li><a href=\"" + link + "\">" + tenantMember.getOrganizationName() + "</a></li>");
+				}
+			}
+			out.println("	  </ul>");
+			out.println("</div>");
+
+			out.println("<div class=\"w3-container w3-half w3-margin-top\">");
+			out.println("    <h3>Add Tenant</h3>");
+			out.println("    <form method=\"POST\" action=\"tenant\" class=\"w3-container w3-card-4\">"); // TODO
+																											// forbid
+																											// space
+																											// in
+																											// input
+			out.println("      <label>Tenant Name</label>");
+			out.println("      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_TENANT_NAME
+					+ "\" value=\"\"/>");
+			out.println(
+					"		<input class=\"w3-button w3-section w3-teal w3-ripple\" type=\"submit\" value=\"Create\"/> ");
+			out.println("    </form>");
+			out.println("</div>");
+
+			out.println("<div class=\"w3-container w3-margin-top\">");
+			out.println("	<div class=\"w3-panel w3-yellow\"><p class=\"w3-left-align\">" +
+					"Tenants are separated testing environments, One Tenant &#8792; One IIS equivalent, Different Facilities can be registered as information sources to the Tenants"
+					+
+					"</p></div>"); // TODO better explanation
+
+			HomeController.printFlavors(out, true);
+			out.println("</div>");
+
+			HomeController.doFooter(out);
 		}
 		out.flush();
 		out.close();

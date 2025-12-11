@@ -25,6 +25,7 @@ import org.immregistries.iis.kernal.model.ObservationReported;
 import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.model.VaccinationMaster;
 import org.immregistries.iis.kernal.persisted.model.MessageReceived;
+import org.immregistries.iis.kernal.persisted.model.MessageReceivedRepository;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.immregistries.iis.kernal.persisted.util.HibernateConfig;
 import org.immregistries.iis.kernal.rest.PatientRestController;
@@ -80,6 +81,9 @@ public class PatientController {
 	@Autowired(required = false)
 	private SubscriptionRestController subscriptionRestController;
 
+	@Autowired
+	private MessageReceivedRepository messageReceivedRepository;
+
 	@PostMapping
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp
 	// , @PathVariable(name = TenantController.PATH_VARIABLE_TENANT_NAME, required =
@@ -97,24 +101,22 @@ public class PatientController {
 			throws ServletException, IOException {
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
-		try (Session dataSession = HibernateConfig.getDataSession()) {
-			Tenant tenant = CurrentTenantUtil.getTenantRedirectIfNone(req, resp, dataSession);
-			try {
-				HomeController.doHeader(out, "IIS Sandbox - Patients", tenant);
-				String patientId = req.getParameter(PARAM_PATIENT_REPORTED_ID);
-				IBaseResource patientSelected = null;
-				if (StringUtils.isNotBlank(patientId)) {
-					patientSelected = patientRestController.getPatientFhir(patientId, tenant, req);
-				}
-
-				if (patientSelected == null) {
-					searchOrPrintAll(req, out, tenant);
-				} else {
-					singlePatientInformationPrintAll(out, patientSelected, tenant, dataSession, req);
-				}
-			} catch (Exception e) {
-				e.printStackTrace(System.err);
+		Tenant tenant = CurrentTenantUtil.getTenantRedirectIfNone(req, resp);
+		try {
+			HomeController.doHeader(out, "IIS Sandbox - Patients", tenant);
+			String patientId = req.getParameter(PARAM_PATIENT_REPORTED_ID);
+			IBaseResource patientSelected = null;
+			if (StringUtils.isNotBlank(patientId)) {
+				patientSelected = patientRestController.getPatientFhir(patientId, tenant, req);
 			}
+
+			if (patientSelected == null) {
+				searchOrPrintAll(req, out, tenant);
+			} else {
+				singlePatientInformationPrintAll(out, patientSelected, tenant, req);
+			}
+		} catch (Exception e) {
+			e.printStackTrace(System.err);
 		}
 		HomeController.doFooter(out);
 		out.flush();
@@ -122,7 +124,7 @@ public class PatientController {
 	}
 
 	private void singlePatientInformationPrintAll(PrintWriter out, IBaseResource patientSelected,
-			Tenant tenant, Session dataSession, HttpServletRequest req) {
+			Tenant tenant, HttpServletRequest req) {
 		PatientMaster patientMasterSelected = patientMapper.localObject(patientSelected);
 		boolean isGolden = AbstractFhirRequester.isGoldenRecord(patientSelected);
 
@@ -168,11 +170,8 @@ public class PatientController {
 
 		out.println("<div class=\"w3-container\">");
 		out.println("<h4>Messages Received</h4>");
-		Query<MessageReceived> query = dataSession.createQuery(
-				"from MessageReceived where patientReportedId = :patientReportedId order by reportedDate asc",
-				MessageReceived.class);
-		query.setParameter("patientReportedId", patientMasterSelected.getPatientId());
-		List<MessageReceived> messageReceivedList = query.list();
+		List<MessageReceived> messageReceivedList = messageReceivedRepository
+				.findByPatientReportedId(patientMasterSelected.getPatientId());
 		if (messageReceivedList.isEmpty()) {
 			out.println("<div class=\"w3-panel w3-yellow\"><p>No Messages Received</p></div>");
 		} else {

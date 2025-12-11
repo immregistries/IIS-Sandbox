@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 import static org.immregistries.iis.kernal.servlet.shlink.IisKeyController.IIS_KEY_BASE_PATH;
 
 @RestController
-@RequestMapping({IIS_KEY_BASE_PATH, TenantController.TENANT_PATH + IIS_KEY_BASE_PATH})
+@RequestMapping({ IIS_KEY_BASE_PATH, TenantController.TENANT_PATH + IIS_KEY_BASE_PATH })
 public class IisKeyController {
 	public static final String IIS_KEY_BASE_PATH = "/iisKey";
 
@@ -39,12 +39,12 @@ public class IisKeyController {
 
 	@PostMapping
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-		throws ServletException, IOException {
+			throws ServletException, IOException {
 		doGet(req, resp);
 	}
 
-//	@GetMapping("/.well-known/jwks.json")
-@GetMapping("/.well-known/jwks.json")
+	// @GetMapping("/.well-known/jwks.json")
+	@GetMapping("/.well-known/jwks.json")
 	/**
 	 * TODO link properly
 	 *
@@ -54,14 +54,13 @@ public class IisKeyController {
 	 * @throws ServletException
 	 * @throws IOException
 	 */
-	protected List<JWK> doGetWellKnown(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+	protected List<JWK> doGetWellKnown(HttpServletRequest req, HttpServletResponse resp)
+			throws ServletException, IOException {
 		UserAccess userAccess = UserAccessUtil.getUserAccess();
-	resp.setContentType("application/json");
-		try (Session dataSession = HibernateConfig.getDataSession()) {
-//			Tenant tenant = CurrentTenantUtil.getTenantRedirectIfNone(req, resp, dataSession);
-			List<IisKey> iisKeys = keyStoreService.getKeys(userAccess, dataSession);
-			return iisKeys.stream().map(iisKey -> iisKey.jwk().toPublicJWK()).collect(Collectors.toList());
-		}
+		resp.setContentType("application/json");
+		// Tenant tenant = CurrentTenantUtil.getTenantRedirectIfNone(req, resp);
+		List<IisKey> iisKeys = keyStoreService.getKeys(userAccess);
+		return iisKeys.stream().map(iisKey -> iisKey.jwk().toPublicJWK()).collect(Collectors.toList());
 	}
 
 	@GetMapping
@@ -69,8 +68,8 @@ public class IisKeyController {
 		UserAccess userAccess = UserAccessUtil.getUserAccess();
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
-		try (Session dataSession = HibernateConfig.getDataSession()) {
-			Tenant tenant = CurrentTenantUtil.getTenantRedirectIfNone(req, resp, dataSession);
+		try {
+			Tenant tenant = CurrentTenantUtil.getTenantRedirectIfNone(req, resp);
 			HomeController.doHeader(out, "IIS Sandbox Keystore", CurrentTenantUtil.getTenant());
 			out.println("    <div class=\"w3-container w3-half w3-margin-top\">");
 			out.println("    <h2>Facility: " + tenant.getOrganizationName() + "</h2>");
@@ -92,7 +91,9 @@ public class IisKeyController {
 	}
 
 	protected static void printIisKeys(PrintWriter out, List<IisKey> iisKeys, Tenant tenant) {
-		out.println("<a href=\"" + TenantUtil.tenantifyPathWithContextPath(tenant, WellKnownKeyController.WELL_KNOWN_PATH_SUFFIX) + "\">well-known</a>");
+		out.println("<a href=\""
+				+ TenantUtil.tenantifyPathWithContextPath(tenant, WellKnownKeyController.WELL_KNOWN_PATH_SUFFIX)
+				+ "\">well-known</a>");
 
 		if (iisKeys.isEmpty()) {
 			out.println("<em>No Key found</em>");
@@ -108,7 +109,7 @@ public class IisKeyController {
 	public static void printIisKey(PrintWriter out, IisKey iisKey) {
 		out.println("<h4>Key id : " + iisKey.getKeyId() + "</h4>");
 		out.println("<textarea textarea name=\"shlink\" readonly style=\"width: 100%; height: 3em;\" >" +
-			iisKey.jwk().toPublicJWK().toJSONString() + "</textarea>");
+				iisKey.jwk().toPublicJWK().toJSONString() + "</textarea>");
 	}
 
 }

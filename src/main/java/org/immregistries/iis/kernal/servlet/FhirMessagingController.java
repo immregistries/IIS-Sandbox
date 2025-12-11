@@ -61,10 +61,8 @@ public class FhirMessagingController {
 			throws ServletException, IOException {
 		// resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
-		Session dataSession = null;
 		try {
-			dataSession = HibernateConfig.getDataSession();
-			Tenant tenant = CurrentTenantUtil.getTenantFromName(req, dataSession);
+			Tenant tenant = CurrentTenantUtil.getTenant(req);
 			String result = "";
 			String message = req.getParameter(PARAM_MESSAGE);
 			String facility_name = req.getParameter(PARAM_FACILITY_NAME);
@@ -84,9 +82,6 @@ public class FhirMessagingController {
 			e.printStackTrace(out);
 			e.printStackTrace(System.err);
 		} finally {
-			if (dataSession != null) {
-				dataSession.close();
-			}
 			out.flush();
 			out.close();
 		}
@@ -124,7 +119,7 @@ public class FhirMessagingController {
 	@GetMapping
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		resp.setContentType("text/html");
-		Tenant tenant = CurrentTenantUtil.getTenantFromName(req, HibernateConfig.getDataSession());
+		Tenant tenant = CurrentTenantUtil.getTenant(req);
 
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		try {
@@ -162,7 +157,7 @@ public class FhirMessagingController {
 
 		String path = req.getPathInfo();
 		final String processorName = path == null ? "" : (path.startsWith("/") ? path.substring(1) : path);
-		CDCWSDLServer server = new BaseIISSOAPServer(partitionTenantCreationInterceptor, tenantName) {
+		CDCWSDLServer server = new BaseIISSOAPServer(tenantName) {
 			@Override
 			public void process(SubmitSingleMessage ssm, PrintWriter out) throws Fault {
 

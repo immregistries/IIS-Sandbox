@@ -28,24 +28,14 @@ public class TenantRestController {
 
     @GetMapping("/{tenantId}")
     public Tenant getTenant(@PathVariable int tenantId) {
-        try (Session dataSession = HibernateConfig.getDataSession()) {
-            Query<Tenant> query = dataSession
-                    .createQuery("from Tenant where orgId = :tenantId and userAccess = :userAccess", Tenant.class);
-            query.setParameter("tenantId", tenantId);
-            query.setParameter("userAccess", UserAccessUtil.getUserAccess());
-            return query.uniqueResult();
-        }
+        UserAccess userAccess = UserAccessUtil.getUserAccess();
+        return tenantRepository.findByIdAndUserAccessId(tenantId, userAccess.getUserAccessId())
+                .orElseThrow(() -> new RuntimeException("Tenant not found"));
     }
 
     @GetMapping
     public List<Tenant> getTenants(HttpServletRequest req) {
         return tenantRepository.findByUserAccessId(UserAccessUtil.getUserAccess().getUserAccessId());
-        // try (Session dataSession = HibernateConfig.getDataSession()) {
-        // Query<Tenant> query = dataSession.createQuery("from Tenant where userAccess =
-        // :userAccess", Tenant.class);
-        // query.setParameter("userAccess", UserAccessUtil.getUserAccess());
-        // return query.list();
-        // }
     }
 
     @PostMapping
@@ -54,15 +44,11 @@ public class TenantRestController {
         if (tenant.getUserAccess() != null && !tenant.getUserAccess().equals(currentUser)) {
             throw new IllegalArgumentException("Tenant UserAccess must be null or match the current user");
         }
-        try (Session dataSession = HibernateConfig.getDataSession()) {
-            TenantUtil.authenticateTenant(currentUser, tenant.getOrganizationName(), dataSession,
-                    partitionTenantCreationInterceptor);
-            tenant.setUserAccess(currentUser);
-            Transaction transaction = dataSession.beginTransaction();
-            dataSession.persist(tenant);
-            transaction.commit();
-            return tenant;
-        }
+        // TODO prevent duplicate tenant creation
+        TenantUtil.authenticateTenant(currentUser, tenant.getOrganizationName());
+        tenant.setUserAccess(currentUser);
+        tenant = tenantRepository.save(tenant);
+        return tenant;
     }
 
 }

@@ -29,18 +29,17 @@ import java.util.stream.Collectors;
 
 public class VXUDownloadGenerator extends Thread {
 
-	@Autowired
-	FhirRequesterR5 fhirRequests;
-	@Autowired
-	IExampleMessageWriter exampleMessageWriter;
-	@Autowired
-	RepositoryClientFactory repositoryClientFactory;
+  @Autowired
+  FhirRequesterR5 fhirRequests;
+  @Autowired
+  IExampleMessageWriter exampleMessageWriter;
+  @Autowired
+  RepositoryClientFactory repositoryClientFactory;
 
   public static final String PARAM_DATE_START = "dateStart";
   public static final String PARAM_DATE_END = "dateEnd";
   public static final String PARAM_CVX_CODES = "cvxCodes";
   public static final String PARAM_INCLUDE_PHI = "includePhi";
-
 
   private String messageError;
 
@@ -99,13 +98,12 @@ public class VXUDownloadGenerator extends Thread {
   private String runningMessage = "Not Started";
   private Session dataSession;
   private Tenant tenant;
-	private HttpServletRequest req;
+  private HttpServletRequest req;
   private File file;
 
   public VXUDownloadGenerator(HttpServletRequest req, Tenant tenant) {
     runningMessage = "Initializing";
-	  this.dataSession = HibernateConfig.getDataSession();
-	 this.tenant = tenant;
+    this.tenant = tenant;
     sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
     messageError = null;
     dateStartString = req.getParameter(PARAM_DATE_START);
@@ -139,10 +137,9 @@ public class VXUDownloadGenerator extends Thread {
     if (StringUtils.isEmpty(cvxCodes)) {
       cvxCodes = CovidController.COVID_CVX_CODES;
     }
-    includePhi =
-        req.getParameter(PARAM_CVX_CODES) == null || req.getParameter(PARAM_INCLUDE_PHI) != null;
+    includePhi = req.getParameter(PARAM_CVX_CODES) == null || req.getParameter(PARAM_INCLUDE_PHI) != null;
     runningMessage = "Initialized " + sdf.format(new Date());
-	  this.req = req;
+    this.req = req;
 
   }
 
@@ -173,29 +170,34 @@ public class VXUDownloadGenerator extends Thread {
       }
     }
     runningMessage = "Looking for vaccinations";
-	  IGenericClient fhirClient = repositoryClientFactory.newGenericClient(tenant, req);
+    IGenericClient fhirClient = repositoryClientFactory.newGenericClient(tenant, req);
 
-	  List<VaccinationReported> vaccinationReportedList = fhirRequests.searchVaccinationReportedList(
-		  new SearchParameterMap(Immunization.SP_DATE, new DateParam().setPrefix(ParamPrefixEnum.STARTS_AFTER).setValue(dateStart))
-			  .add(Immunization.SP_DATE, new DateParam().setPrefix(ParamPrefixEnum.ENDS_BEFORE).setValue(dateEnd))
-			  .add(Immunization.SP_PATIENT, new ReferenceParam().setChain(Patient.SP_ORGANIZATION).setValue(String.valueOf(tenant.getOrgId()))
-			  ));
-//      Immunization.DATE.after().day(dateStart),
-//		  Immunization.DATE.before().day(dateEnd),
-//		  Immunization.PATIENT.hasChainedProperty(Patient.ORGANIZATION.hasId(String.valueOf(tenant.getOrgId())))); // TODO test
-	  Date finalDateStart = dateStart;
-	  Date finalDateEnd = dateEnd;
-	  vaccinationReportedList = vaccinationReportedList.stream().filter(
-		  vaccinationReported -> vaccinationReported.getReportedDate().after(finalDateStart) && vaccinationReported.getReportedDate().before(finalDateEnd)).collect(Collectors.toList());
-//    {
-//      Query query = dataSession.createQuery(
-//          "from VaccinationReported where reportedDate >= :dateStart and reportedDate <= :dateEnd "
-//              + "and patientReported.orgReported = :orgReported");
-//      query.setParameter("dateStart", dateStart);
-//      query.setParameter("dateEnd", dateEnd);
-//      query.setParameter("orgReported", tenant);
-//      vaccinationReportedList = query.list();
-//    }
+    List<VaccinationReported> vaccinationReportedList = fhirRequests.searchVaccinationReportedList(
+        new SearchParameterMap(Immunization.SP_DATE,
+            new DateParam().setPrefix(ParamPrefixEnum.STARTS_AFTER).setValue(dateStart))
+            .add(Immunization.SP_DATE, new DateParam().setPrefix(ParamPrefixEnum.ENDS_BEFORE).setValue(dateEnd))
+            .add(Immunization.SP_PATIENT,
+                new ReferenceParam().setChain(Patient.SP_ORGANIZATION).setValue(String.valueOf(tenant.getOrgId()))));
+    // Immunization.DATE.after().day(dateStart),
+    // Immunization.DATE.before().day(dateEnd),
+    // Immunization.PATIENT.hasChainedProperty(Patient.ORGANIZATION.hasId(String.valueOf(tenant.getOrgId()))));
+    // // TODO test
+    Date finalDateStart = dateStart;
+    Date finalDateEnd = dateEnd;
+    vaccinationReportedList = vaccinationReportedList.stream().filter(
+        vaccinationReported -> vaccinationReported.getReportedDate().after(finalDateStart)
+            && vaccinationReported.getReportedDate().before(finalDateEnd))
+        .collect(Collectors.toList());
+    // {
+    // Query query = dataSession.createQuery(
+    // "from VaccinationReported where reportedDate >= :dateStart and reportedDate
+    // <= :dateEnd "
+    // + "and patientReported.orgReported = :orgReported");
+    // query.setParameter("dateStart", dateStart);
+    // query.setParameter("dateEnd", dateEnd);
+    // query.setParameter("orgReported", tenant);
+    // vaccinationReportedList = query.list();
+    // }
 
     Random random = new Random();
     String filename = "temp/VXUDownload-";

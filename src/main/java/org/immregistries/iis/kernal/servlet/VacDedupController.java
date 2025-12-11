@@ -127,7 +127,7 @@ public class VacDedupController {
           if (immunizationList.size() > 1) {
             // Call REST controller
             Tenant tenant = CurrentTenantUtil.getTenant();
-            List<LinkedImmunization> results = vacDedupRestController.deduplicate(tenant.getOrgId(), request, req);
+            List<LinkedImmunization> results = vacDedupRestController.deduplicate(tenant, request, req);
             immunizationListResults = new ArrayList<>(results);
           }
         }

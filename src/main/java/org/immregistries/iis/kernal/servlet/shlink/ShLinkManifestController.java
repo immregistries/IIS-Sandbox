@@ -1,6 +1,5 @@
 package org.immregistries.iis.kernal.servlet.shlink;
 
-
 import jakarta.persistence.Query;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,6 +13,7 @@ import org.immregistries.iis.kernal.fhir.security.TenantUtil;
 import org.immregistries.iis.kernal.logic.shlink.ShLinkUtilService;
 import org.immregistries.iis.kernal.persisted.model.ShLinkManifest;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
+import org.immregistries.iis.kernal.persisted.repository.ShlinkManifestRepository;
 import org.immregistries.iis.kernal.persisted.util.HibernateConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,31 +36,31 @@ public class ShLinkManifestController {
 	ShLinkUtilService shLinkUtilService;
 	@Autowired
 	PartitionTenantCreationInterceptor partitionTenantCreationInterceptor;
+	@Autowired
+	private ShlinkManifestRepository shlinkManifestRepository;
 
 	@GetMapping("/{id}")
-	public ShLinkManifest getManifest(HttpServletRequest req, HttpServletResponse resp, @PathVariable("id") String manifestId) {
+	public ShLinkManifest getManifest(HttpServletRequest req, HttpServletResponse resp,
+			@PathVariable("id") String manifestId) {
 		resp.setContentType("application/json");
 		return shLinkUtilService.readShLinkManifest(manifestId);
 	}
 
-
 	@PostMapping("/{id}")
 	protected ShLinkManifest readShLinkManifest(HttpServletRequest req, HttpServletResponse resp,
-															  @PathVariable("id") String manifestId,
-															  @PathVariable(value = "tenantName", required = false) String tenantName,
-															  @RequestParam(value = "recipient", required = false) String recipient,
-															  @RequestParam(value = "passcode", required = false) String passcode,
-															  @RequestParam(value = "embeddedLengthMax", required = false) String embeddedLengthMax
-	) throws IOException, ServletException {
+			@PathVariable("id") String manifestId,
+			@PathVariable(value = "tenantName", required = false) String tenantName,
+			@RequestParam(value = "recipient", required = false) String recipient,
+			@RequestParam(value = "passcode", required = false) String passcode,
+			@RequestParam(value = "embeddedLengthMax", required = false) String embeddedLengthMax)
+			throws IOException, ServletException {
 		resp.setContentType("application/json");
 		if (StringUtils.isNoneBlank(passcode, tenantName)) {
-			try (Session dataSession = HibernateConfig.getDataSession()) {
-				Tenant tenant = null;
-				{
-					tenant = TenantUtil.authenticateTenantNoUsername(passcode, tenantName, dataSession, partitionTenantCreationInterceptor);
-					if (tenant == null) {
-						throw new AuthenticationCredentialsNotFoundException("No tenant found or invalid passcode");
-					}
+			Tenant tenant = null;
+			{
+				tenant = TenantUtil.authenticateTenantNoUsername(passcode, tenantName);
+				if (tenant == null) {
+					throw new AuthenticationCredentialsNotFoundException("No tenant found or invalid passcode");
 				}
 			}
 		}
@@ -68,33 +68,28 @@ public class ShLinkManifestController {
 		return shLinkManifest;
 	}
 
-//	@GetMapping("/{id}/qr")
-//	public void printQr(HttpServletRequest req, HttpServletResponse resp, @PathVariable("id") String manifestId) throws IOException, ServletException {
-//		ShLinkManifest shLinkManifest = shlUtilService.readShLinkManifest(manifestId);
-//		ShLinkPayload fullExamplePatientQrCode
+	// @GetMapping("/{id}/qr")
+	// public void printQr(HttpServletRequest req, HttpServletResponse resp,
+	// @PathVariable("id") String manifestId) throws IOException, ServletException {
+	// ShLinkManifest shLinkManifest =
+	// shlUtilService.readShLinkManifest(manifestId);
+	// ShLinkPayload fullExamplePatientQrCode
 
-	/// /		UriComponentsBuilder builder = ServletUriComponentsBuilder.fromRequestUri(req);
-	/// /		builder.replacePath()
-//		String url = req.getContextPath().split("/qr")[0];
-//		resp.setContentType("image/png"); // Set content type for PNG image
-//		OutputStream out = resp.getOutputStream();
-//		shlUtilService.printQrCodeAsImage(out, url);
-//		out.flush();
-//		out.close();
-//	}
-
+	/// / UriComponentsBuilder builder =
+	/// ServletUriComponentsBuilder.fromRequestUri(req);
+	/// / builder.replacePath()
+	// String url = req.getContextPath().split("/qr")[0];
+	// resp.setContentType("image/png"); // Set content type for PNG image
+	// OutputStream out = resp.getOutputStream();
+	// shlUtilService.printQrCodeAsImage(out, url);
+	// out.flush();
+	// out.close();
+	// }
 
 	@GetMapping()
 	public List getManifestAll(HttpServletRequest req, HttpServletResponse resp) {
 		resp.setContentType("application/json");
-		try (Session dataSession = HibernateConfig.getDataSession()) {
-			Query query = dataSession.createQuery("from ShLinkManifest", ShLinkManifest.class);
-			return query.getResultList();
-		} catch (Exception e) {
-			System.err.println("Unable to render page: " + e.getMessage());
-			e.printStackTrace(System.err);
-		}
-		return List.of();
+		return shlinkManifestRepository.findAll();
 	}
 
 	@GetMapping("/$generate")

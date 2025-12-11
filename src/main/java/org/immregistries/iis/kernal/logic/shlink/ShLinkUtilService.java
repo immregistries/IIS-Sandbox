@@ -25,6 +25,7 @@ import org.immregistries.iis.kernal.persisted.model.ShLinkManifest;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.immregistries.iis.kernal.persisted.model.UserAccess;
 import org.immregistries.iis.kernal.persisted.repository.IisShlinkContentRepository;
+import org.immregistries.iis.kernal.persisted.repository.ShlinkManifestRepository;
 import org.immregistries.iis.kernal.persisted.util.HibernateConfig;
 import org.immregistries.iis.kernal.servlet.shlink.ShLinkContentController;
 import org.jetbrains.annotations.NotNull;
@@ -59,6 +60,9 @@ public class ShLinkUtilService {
 	private IisShlinkContentRepository iisShlinkContentRepository;
 	@Autowired
 	private ShCardUtil shCardUtil;
+
+	@Autowired
+	private ShlinkManifestRepository shlinkManifestRepository;
 
 	public static final String APPLICATION_SMART_HEALTH_CARD_CONTENT_TYPE = "application/smart-health-card";
 	public static final String APPLICATION_FHIR_JSON_CONTENT_TYPE = "application/fhir+json";
@@ -125,22 +129,11 @@ public class ShLinkUtilService {
 		if (StringUtils.isBlank(shLinkManifest.getId())) {
 			shLinkManifest.setId(UUID.randomUUID().toString());
 		}
-		try (Session dataSession = HibernateConfig.getDataSession()) {
-			Transaction transaction = dataSession.beginTransaction();
-			dataSession.persist(shLinkManifest);
-			transaction.commit();
-		}
-		return shLinkManifest;
+		return shlinkManifestRepository.save(shLinkManifest);
 	}
 
 	public ShLinkManifest readShLinkManifest(String manifestId) {
-		ShLinkManifest shLinkManifest;
-		try (Session dataSession = HibernateConfig.getDataSession()) {
-			Query query = dataSession.createQuery("from ShLinkManifest where id = :id", ShLinkManifest.class);
-			query.setParameter("id", manifestId);
-			shLinkManifest = (ShLinkManifest) query.getSingleResult();
-		}
-		return shLinkManifest;
+		return shlinkManifestRepository.findById(manifestId).orElse(null);
 	}
 
 	public String qrCode(ShLinkPayload shLinkPayload) {

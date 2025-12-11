@@ -46,10 +46,10 @@ public class TenantCompareService {
     private FhirContext fhirContext;
 
     @SuppressWarnings("rawtypes")
-    public List<IBaseParameters> compareTenants(String[] tenantNames, UserAccess userAccess, Session dataSession,
+    public List<IBaseParameters> compareTenants(String[] tenantNames, UserAccess userAccess,
             boolean includeGolden) {
         List<Tenant> tenantList = Arrays.stream(tenantNames).distinct()
-                .map(tenantName -> TenantUtil.authenticateTenant(userAccess, tenantName, dataSession, null))
+                .map(tenantName -> TenantUtil.authenticateTenant(userAccess, tenantName))
                 .collect(Collectors.toList());
 
         List<SystemRequestDetails> systemRequestDetailsList = tenantList.stream().map(tenant -> {

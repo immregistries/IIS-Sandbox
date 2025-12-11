@@ -37,11 +37,9 @@ public class TenantRequestLoggingFilter extends OncePerRequestFilter {
             }
             try {
                 int tenantIdInt = Integer.parseInt(tenantId);
-                try (Session dataSession = HibernateConfig.getDataSession()) {
-                    Tenant tenant = TenantUtil.getTenantByIdAuthenticated(tenantIdInt, dataSession);
-                    logger.info("Request for tenant {}: {}", tenant.getOrganizationName(), path);
-                    request.setAttribute(CurrentTenantUtil.TENANT_ID_URL, tenantId);
-                }
+                Tenant tenant = TenantUtil.getTenantByIdAuthenticated(tenantIdInt);
+                logger.info("Request for tenant {}: {}", tenant.getOrganizationName(), path);
+                request.setAttribute(CurrentTenantUtil.TENANT_ID_URL, tenantId);
             } catch (NumberFormatException e) {
                 logger.warn("Invalid tenant ID format in URL: {}", tenantId);
             } catch (Exception e) {

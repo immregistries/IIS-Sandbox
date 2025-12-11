@@ -55,7 +55,7 @@ public class TestMapping extends HttpServlet {
 
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-		throws ServletException, IOException {
+			throws ServletException, IOException {
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		try {
@@ -67,22 +67,20 @@ public class TestMapping extends HttpServlet {
 			String ack = "";
 			String[] messages;
 			StringBuilder ackBuilder = new StringBuilder();
-			try {
-				if (tenant == null) {
-					resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-					out.println(
+			if (tenant == null) {
+				resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+				out.println(
 						"Access is not authorized. Facilityid, userid and/or password are not recognized. ");
-				} else {
-					messages = message.split( "MSH\\|\\^~\\\\&\\|");
-					for (String msh: messages) {
-						if(!msh.isBlank()){
-							testPatientMapping(tenant,msh);
-							ackBuilder.append(handler.process("MSH|^~\\&|" + msh, tenant, null));
-							ackBuilder.append("\r\n");
-						}
+			} else {
+				messages = message.split("MSH\\|\\^~\\\\&\\|");
+				for (String msh : messages) {
+					if (!msh.isBlank()) {
+						testPatientMapping(tenant, msh);
+						ackBuilder.append(handler.process("MSH|^~\\&|" + msh, tenant, null));
+						ackBuilder.append("\r\n");
 					}
-					ack = ackBuilder.toString();
 				}
+				ack = ackBuilder.toString();
 			}
 			resp.setContentType("text/plain");
 			out.print(ack);

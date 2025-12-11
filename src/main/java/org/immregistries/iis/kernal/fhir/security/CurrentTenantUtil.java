@@ -1,9 +1,17 @@
 package org.immregistries.iis.kernal.fhir.security;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.constraints.NotNull;
+
+import java.io.IOException;
+
 import org.apache.commons.lang3.StringUtils;
+import org.immregistries.iis.kernal.fhir.Application;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.immregistries.iis.kernal.persisted.model.UserAccess;
+import org.immregistries.iis.kernal.servlet.TenantController;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -70,22 +78,22 @@ public class CurrentTenantUtil {
 			if (authentication instanceof UserAccess) {
 				userAccess = (UserAccess) authentication;
 			}
-			tenant = TenantUtil.authenticateTenant(userAccess, pathVariable, null);
+			tenant = TenantUtil.authenticateTenant(userAccess, pathVariable);
 		}
 		return tenant;
 	}
 
-	// public static @NotNull Tenant getTenantRedirectIfNone(HttpServletRequest req,
-	// HttpServletResponse resp) throws IOException {
-	// Tenant tenant = getTenant(req);
-	// if (tenant == null) {
-	// if (UserAccessUtil.getUserAccess() != null) {
-	// resp.sendRedirect(Application.IIS_PATH_BASE +
-	// TenantController.TENANT_BASE_PATH);
-	// }
-	// throw new AuthenticationCredentialsNotFoundException("");
-	// }
-	// return tenant;
-	// }
+	public static @NotNull Tenant getTenantRedirectIfNone(HttpServletRequest req,
+			HttpServletResponse resp) throws IOException {
+		Tenant tenant = getTenant(req);
+		if (tenant == null) {
+			if (UserAccessUtil.getUserAccess() != null) {
+				resp.sendRedirect(Application.IIS_PATH_BASE +
+						TenantController.TENANT_BASE_PATH);
+			}
+			throw new AuthenticationCredentialsNotFoundException("");
+		}
+		return tenant;
+	}
 
 }

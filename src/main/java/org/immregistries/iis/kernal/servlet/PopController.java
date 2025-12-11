@@ -49,8 +49,7 @@ public class PopController {
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		Session dataSession = null;
 		try {
-			dataSession = HibernateConfig.getDataSession();
-			Tenant tenant = CurrentTenantUtil.getTenantFromName(req, dataSession);
+			Tenant tenant = CurrentTenantUtil.getTenant(req);
 
 			String ack = "";
 
@@ -88,7 +87,7 @@ public class PopController {
 	@GetMapping
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		resp.setContentType("text/html");
-		Tenant tenant = CurrentTenantUtil.getTenantFromName(req, HibernateConfig.getDataSession());
+		Tenant tenant = CurrentTenantUtil.getTenant(req);
 
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		try {

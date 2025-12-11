@@ -33,57 +33,55 @@ public class PopRestController {
             // @PathVariable int tenantId,
             @RequestBody PopRequest popRequest,
             HttpServletRequest req) {
-        try (Session dataSession = HibernateConfig.getDataSession()) {
-            Tenant tenant = CurrentTenantUtil.getTenantFromName(req, dataSession);
-            if (tenant == null) {
-                throw new RuntimeException("Access is not authorized");
-            }
-            String message = popRequest.getMessage();
-            String facilityName = popRequest.getFacilityName();
-
-            if (message == null) {
-                return "";
-            }
-
-            String[] messages = message.split(PopController.MSH_HEADER_REGEX);
-            if (messages.length > 2) {
-                req.setAttribute("groupPatientIds", new ArrayList<String>());
-            }
-
-            StringBuilder ackBuilder = new StringBuilder();
-            for (String msh : messages) {
-                if (!msh.isBlank()) {
-                    String ack = handler.process(PopController.MSH_HEADER + msh, tenant, facilityName);
-                    ackBuilder.append(ack);
-                }
-            }
-
-            /**
-             * Saving a group if multiple patients were sent
-             */
-            @SuppressWarnings("unchecked")
-            ArrayList<String> groupPatientIds = (ArrayList<String>) req.getAttribute("groupPatientIds");
-            if (groupPatientIds != null) {
-                if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R5)) {
-                    org.hl7.fhir.r5.model.Group group = new org.hl7.fhir.r5.model.Group();
-                    for (String id : groupPatientIds) {
-                        group.addMember()
-                                .setEntity(new org.hl7.fhir.r5.model.Reference().setReference("Patient/" + id));
-                    }
-                    group.setDescription("Generated from Hl2v2 VXU Query on  time " + new Date());
-                    repositoryClientFactory.newGenericClient(req).create().resource(group).execute();
-                } else {
-                    org.hl7.fhir.r4.model.Group group = new org.hl7.fhir.r4.model.Group();
-                    for (String id : groupPatientIds) {
-                        group.addMember()
-                                .setEntity(new org.hl7.fhir.r4.model.Reference().setReference("Patient/" + id));
-                    }
-                    repositoryClientFactory.newGenericClient(req).create().resource(group).execute();
-                }
-            }
-
-            return ackBuilder.toString();
+        Tenant tenant = CurrentTenantUtil.getTenant(req);
+        if (tenant == null) {
+            throw new RuntimeException("Access is not authorized");
         }
+        String message = popRequest.getMessage();
+        String facilityName = popRequest.getFacilityName();
+
+        if (message == null) {
+            return "";
+        }
+
+        String[] messages = message.split(PopController.MSH_HEADER_REGEX);
+        if (messages.length > 2) {
+            req.setAttribute("groupPatientIds", new ArrayList<String>());
+        }
+
+        StringBuilder ackBuilder = new StringBuilder();
+        for (String msh : messages) {
+            if (!msh.isBlank()) {
+                String ack = handler.process(PopController.MSH_HEADER + msh, tenant, facilityName);
+                ackBuilder.append(ack);
+            }
+        }
+
+        /**
+         * Saving a group if multiple patients were sent
+         */
+        @SuppressWarnings("unchecked")
+        ArrayList<String> groupPatientIds = (ArrayList<String>) req.getAttribute("groupPatientIds");
+        if (groupPatientIds != null) {
+            if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R5)) {
+                org.hl7.fhir.r5.model.Group group = new org.hl7.fhir.r5.model.Group();
+                for (String id : groupPatientIds) {
+                    group.addMember()
+                            .setEntity(new org.hl7.fhir.r5.model.Reference().setReference("Patient/" + id));
+                }
+                group.setDescription("Generated from Hl2v2 VXU Query on  time " + new Date());
+                repositoryClientFactory.newGenericClient(req).create().resource(group).execute();
+            } else {
+                org.hl7.fhir.r4.model.Group group = new org.hl7.fhir.r4.model.Group();
+                for (String id : groupPatientIds) {
+                    group.addMember()
+                            .setEntity(new org.hl7.fhir.r4.model.Reference().setReference("Patient/" + id));
+                }
+                repositoryClientFactory.newGenericClient(req).create().resource(group).execute();
+            }
+        }
+
+        return ackBuilder.toString();
     }
 
     public static class PopRequest {

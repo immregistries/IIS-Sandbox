@@ -38,7 +38,8 @@ import java.util.List;
 import static org.immregistries.iis.kernal.servlet.LocationController.PARAM_ACTION;
 
 @RestController
-@RequestMapping({ShLinkController.SHLINK_CONTROLLER_BASE_PATH, TenantController.TENANT_PATH + ShLinkController.SHLINK_CONTROLLER_BASE_PATH})
+@RequestMapping({ ShLinkController.SHLINK_CONTROLLER_BASE_PATH,
+		TenantController.TENANT_PATH + ShLinkController.SHLINK_CONTROLLER_BASE_PATH })
 public class ShLinkController {
 
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -53,7 +54,6 @@ public class ShLinkController {
 	private static final String PARAM_EXP = "exp";
 
 	public static final String ACTION_SAVE = "Generate";
-
 
 	@Autowired
 	IpsGeneratorSvcIIS ipsGeneratorSvcIIS;
@@ -72,14 +72,13 @@ public class ShLinkController {
 
 	@PostMapping()
 	protected void shLinkIPS(HttpServletRequest req, HttpServletResponse resp,
-									 @RequestParam(value = PARAM_KEY_ID, required = false) String keyId,
-									 @RequestParam(value = PARAM_SECRET_KEY, required = false) String secretKey,
-								 @RequestParam(PARAM_PATIENT_ID) String patientId,
-								 @RequestParam(PARAM_FLAG) String flag,
-								 @RequestParam(PARAM_EXP) String exp,
-								 @RequestParam(value = "image", required = false) boolean image
-	)
-		throws ServletException, IOException, NoSuchAlgorithmException {
+			@RequestParam(value = PARAM_KEY_ID, required = false) String keyId,
+			@RequestParam(value = PARAM_SECRET_KEY, required = false) String secretKey,
+			@RequestParam(PARAM_PATIENT_ID) String patientId,
+			@RequestParam(PARAM_FLAG) String flag,
+			@RequestParam(PARAM_EXP) String exp,
+			@RequestParam(value = "image", required = false) boolean image)
+			throws ServletException, IOException, NoSuchAlgorithmException {
 		Tenant tenant = CurrentTenantUtil.getTenantRedirectIfNone(req, resp);
 		UserAccess userAccess = UserAccessUtil.getUserAccess();
 		OutputStream outputStream = resp.getOutputStream();
@@ -100,11 +99,13 @@ public class ShLinkController {
 		/*
 		 * Getting the bundle for the payload content
 		 */
-		IBaseBundle ipsToBeEncoded = ipsGeneratorSvcIIS.generateIps(TenantUtil.requestDetailsWithPartitionName(partitionLookupSvc), new IdType(patientId), "");
+		IBaseBundle ipsToBeEncoded = ipsGeneratorSvcIIS.generateIps(TenantUtil.requestDetailsWithPartitionName(),
+				new IdType(patientId), "");
 		/*
 		 * Convert the bundle to a shcard file
 		 */
-		String url = shLinkUtilService.generateShLinkUrlForShCards(List.of(ipsToBeEncoded), shLinkPayload, req, iisSigningKey, encryptionKeySpec, userAccess, tenant);
+		String url = shLinkUtilService.generateShLinkUrlForShCards(List.of(ipsToBeEncoded), shLinkPayload, req,
+				iisSigningKey, encryptionKeySpec, userAccess, tenant);
 		shLinkPayload.setUrl(url);
 		String qrCode = shLinkUtilService.qrCode(shLinkPayload);
 		if (image) {
@@ -148,14 +149,13 @@ public class ShLinkController {
 		return iisSigningKey;
 	}
 
-
 	@GetMapping()
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp,
-								@RequestParam(value = PARAM_KEY_ID, required = false) String keyId,
-								@RequestParam(value = PARAM_PATIENT_ID, required = false) String patientId,
-								@RequestParam(value = PARAM_FLAG, required = false) String flag,
-								@RequestParam(value = PARAM_EXP, required = false) String exp)
-		throws ServletException, IOException {
+			@RequestParam(value = PARAM_KEY_ID, required = false) String keyId,
+			@RequestParam(value = PARAM_PATIENT_ID, required = false) String patientId,
+			@RequestParam(value = PARAM_FLAG, required = false) String flag,
+			@RequestParam(value = PARAM_EXP, required = false) String exp)
+			throws ServletException, IOException {
 		Tenant tenant = CurrentTenantUtil.getTenantRedirectIfNone(req, resp);
 		UserAccess userAccess = UserAccessUtil.getUserAccess();
 
@@ -166,30 +166,32 @@ public class ShLinkController {
 		out.println("    <div class=\"w3-container w3-margin-top\">");
 		out.println("    <h3>Generate ShLink</h3>");
 		out.println(
-			"    <form method=\"POST\" action=\"" +
-				"shlink" +
-				"\" target=\"_blank\"  class=\"w3-container w3-card-4\">");
+				"    <form method=\"POST\" action=\"" +
+						"shlink" +
+						"\" target=\"_blank\"  class=\"w3-container w3-card-4\">");
 		out.println("      <label>Patient ID</label>");
 		out.println(
-			"      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_PATIENT_ID
-				+ "\" value=\"" + StringUtils.defaultIfBlank(patientId, "Patient/")
-				+ "\"/>");
+				"      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_PATIENT_ID
+						+ "\" value=\"" + StringUtils.defaultIfBlank(patientId, "Patient/")
+						+ "\"/>");
 		out.println("      <label>Flag</label>");
 		out.println(
-			"      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_FLAG
-				+ "\" value=\"" + StringUtils.defaultIfBlank(flag, "")
-				+ "\"/>"); // TODO add options
-//		out.println("      <label>Encryption Key for documents (generated if null)</label>");
-//		out.println("      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_SECRET_KEY
-//			+ "\" value=\"" + StringUtils.defaultIfBlank(keyId, "")
-//			+ "\"/>");
+				"      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_FLAG
+						+ "\" value=\"" + StringUtils.defaultIfBlank(flag, "")
+						+ "\"/>"); // TODO add options
+		// out.println(" <label>Encryption Key for documents (generated if
+		// null)</label>");
+		// out.println(" <input class=\"w3-input\" type=\"text\" name=\"" +
+		// PARAM_SECRET_KEY
+		// + "\" value=\"" + StringUtils.defaultIfBlank(keyId, "")
+		// + "\"/>");
 		out.println("      <label>Expiration (s)</label>");
 		out.println("      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_EXP
-			+ "\" value=\"" + StringUtils.defaultIfBlank(exp, "10000000") + "\"/>");
+				+ "\" value=\"" + StringUtils.defaultIfBlank(exp, "10000000") + "\"/>");
 
 		out.println(
-			"          <input class=\"w3-button w3-section w3-teal w3-ripple\" type=\"submit\" name=\""
-				+ PARAM_ACTION + "\" value=\"" + ACTION_SAVE + "\"/>");
+				"          <input class=\"w3-button w3-section w3-teal w3-ripple\" type=\"submit\" name=\""
+						+ PARAM_ACTION + "\" value=\"" + ACTION_SAVE + "\"/>");
 		out.println("    </form>");
 		out.println("    </div>");
 
@@ -207,7 +209,6 @@ public class ShLinkController {
 		HomeController.doFooter(out);
 		out.flush();
 		out.close();
-
 
 	}
 }

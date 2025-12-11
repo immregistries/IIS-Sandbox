@@ -70,7 +70,6 @@ public class IisAuthorizationInterceptor extends AuthorizationInterceptor {
 		 */
 		HttpServletRequest request = ((ServletRequestDetails) theRequestDetails).getServletRequest();
 		HttpSession httpSession = request.getSession(false);
-		Session dataSession = HibernateConfig.getDataSession();
 		String authHeader = theRequestDetails.getHeader("Authorization");
 		Tenant tenant = null;
 		try {
@@ -106,8 +105,7 @@ public class IisAuthorizationInterceptor extends AuthorizationInterceptor {
 					 */
 					if (userAccess != null) {
 						tenant = TenantUtil.authenticateTenant(userAccess,
-								PartitionTenantCreationInterceptor.extractPartitionName(theRequestDetails),
-								null);
+								PartitionTenantCreationInterceptor.extractPartitionName(theRequestDetails));
 					}
 				}
 			}
@@ -120,8 +118,6 @@ public class IisAuthorizationInterceptor extends AuthorizationInterceptor {
 			return new RuleBuilder()
 					.denyAll(authenticationException.getMessage())
 					.build();
-		} finally {
-			dataSession.close();
 		}
 
 		if (tenant.getOrganizationName() != null) {
@@ -154,7 +150,7 @@ public class IisAuthorizationInterceptor extends AuthorizationInterceptor {
 			String base64 = authHeader.substring("Basic ".length());
 			String base64decoded = new String(Base64.decodeBase64(base64));
 			String[] parts = base64decoded.split(":");
-			return TenantUtil.authenticateTenant(parts[0], parts[1], tenantName, null);
+			return TenantUtil.authenticateTenant(parts[0], parts[1], tenantName);
 		} else { // TODO token ?
 			return null;
 		}

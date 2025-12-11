@@ -107,10 +107,9 @@ public class TenantUtil implements ApplicationContextAware {
         return tenantifyPathSuffix("*", urlSuffix);
     }
 
-    public static Tenant authenticateTenantNoUsername(String password, String facilityName, Session dataSession) {
-        TypedQuery<Tenant> query = dataSession.createQuery("from Tenant where organizationName = ?1", Tenant.class);
-        query.setParameter(1, facilityName);
-        Tenant tenant = (Tenant) query.getSingleResult();
+    public static Tenant authenticateTenantNoUsername(String password, String facilityName) {
+        Tenant tenant = getTenantRepository().findByOrganizationName(facilityName).orElse(null);
+
         if (tenant == null) {
             throw new RuntimeException("Invalid tenantName");
         }

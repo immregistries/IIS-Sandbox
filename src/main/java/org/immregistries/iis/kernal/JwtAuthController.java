@@ -98,13 +98,12 @@ public class JwtAuthController {
 		// Session dataSession = null;
 		// UserAccess userAccess = null;
 		// try {
-		// dataSession = PopServlet.getDataSession();
 		// if (authHeader != null && authHeader.startsWith("Basic ")) {
 		// String base64 = authHeader.substring("Basic ".length());
 		// String base64decoded = new String(Base64.decodeBase64(base64));
 		// String[] parts = base64decoded.split(":");
 		// userAccess = ServletHelper.authenticateUserAccessUsernamePassword(parts[0],
-		// parts[1], dataSession);
+		// parts[1]);
 		// }
 		// } finally {
 		// dataSession.close();

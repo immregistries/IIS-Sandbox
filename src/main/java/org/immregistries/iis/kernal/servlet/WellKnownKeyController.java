@@ -42,13 +42,11 @@ public class WellKnownKeyController {
 			throws ServletException, IOException {
 		UserAccess userAccess = UserAccessUtil.getUserAccess();
 		resp.setContentType("application/json");
-		try (Session dataSession = HibernateConfig.getDataSession()) {
-			// Tenant tenant = CurrentTenantUtil.getTenantRedirectIfNone(req, resp,
-			// dataSession);
-			List<IisKey> iisKeys = keyStoreService.getKeys(userAccess, dataSession);
-			return iisKeys.stream().map(iisKey -> iisKey.jwk().toPublicJWK().toJSONObject())
-					.collect(Collectors.toSet());
-		}
+		// Tenant tenant = CurrentTenantUtil.getTenantRedirectIfNone(req, resp,
+		// dataSession);
+		List<IisKey> iisKeys = keyStoreService.getKeys(userAccess);
+		return iisKeys.stream().map(iisKey -> iisKey.jwk().toPublicJWK().toJSONObject())
+				.collect(Collectors.toSet());
 	}
 
 	public static String getKeyIssuerUrl(HttpServletRequest request, Tenant tenant) {

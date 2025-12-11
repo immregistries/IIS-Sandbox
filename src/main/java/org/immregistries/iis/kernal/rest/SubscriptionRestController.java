@@ -18,6 +18,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.web.bind.annotation.*;
 
+import static org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil.SESSION_REQUEST_TENANT;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,7 +49,7 @@ public class SubscriptionRestController {
 
     @PostMapping("/trigger")
     public String triggerSubscription(
-            @PathVariable int tenantId,
+            @RequestAttribute(name = SESSION_REQUEST_TENANT) Tenant tenant,
             @RequestBody TriggerRequest triggerRequest,
             HttpServletRequest req) {
 
@@ -61,42 +63,33 @@ public class SubscriptionRestController {
         // However, the original code uses `req.getParameter(PARAM_SUBSCRIPTION_ID)` and
         // other params.
         // We will accept a DTO.
+        IGenericClient localClient = repositoryClientFactory.newGenericClient(req);
+        String subscriptionId = triggerRequest.getSubscriptionId();
 
-        try (org.hibernate.Session dataSession = org.immregistries.iis.kernal.persisted.util.HibernateConfig.getDataSession()) {
-            Tenant tenant = TenantUtil.getTenantByIdAuthenticated(tenantId, dataSession);
-            if (tenant == null) {
-                throw new RuntimeException("Access is not authorized");
-            }
-            CurrentTenantUtil.getTenant(tenant.getOrganizationName(), req, dataSession);
+        Bundle searchBundle = localClient.search().forResource(Subscription.class)
+                .where(Subscription.IDENTIFIER.exactly().identifier(subscriptionId)).returnBundle(Bundle.class)
+                .execute();
 
-            IGenericClient localClient = repositoryClientFactory.newGenericClient(req);
-            String subscriptionId = triggerRequest.getSubscriptionId();
+        if (searchBundle.hasEntry()) {
+            List<String> messages = triggerRequest.getMessages();
+            List<String> httpVerbs = triggerRequest.getHttpVerbs();
 
-            Bundle searchBundle = localClient.search().forResource(Subscription.class)
-                    .where(Subscription.IDENTIFIER.exactly().identifier(subscriptionId)).returnBundle(Bundle.class)
-                    .execute();
-
-            if (searchBundle.hasEntry()) {
-                List<String> messages = triggerRequest.getMessages();
-                List<String> httpVerbs = triggerRequest.getHttpVerbs();
-
-                if (messages != null && httpVerbs != null && messages.size() == httpVerbs.size()) {
-                    List<Pair<String, Bundle.HTTPVerb>> parsedResources = new ArrayList<>();
-                    for (int i = 0; i < messages.size(); i++) {
-                        String message = messages.get(i);
-                        if (message != null && !message.isBlank()) {
-                            parsedResources.add(new MutablePair<>(message, Bundle.HTTPVerb.valueOf(httpVerbs.get(i))));
-                        }
+            if (messages != null && httpVerbs != null && messages.size() == httpVerbs.size()) {
+                List<Pair<String, Bundle.HTTPVerb>> parsedResources = new ArrayList<>();
+                for (int i = 0; i < messages.size(); i++) {
+                    String message = messages.get(i);
+                    if (message != null && !message.isBlank()) {
+                        parsedResources.add(new MutablePair<>(message, Bundle.HTTPVerb.valueOf(httpVerbs.get(i))));
                     }
-
-                    Subscription subscription = (Subscription) searchBundle.getEntryFirstRep().getResource();
-                    return subscriptionService.triggerWithResourceFullManual(subscription, parsedResources);
-                } else {
-                    return "Incorrect parameters length";
                 }
+
+                Subscription subscription = (Subscription) searchBundle.getEntryFirstRep().getResource();
+                return subscriptionService.triggerWithResourceFullManual(subscription, parsedResources);
             } else {
-                return "NO SUBSCRIPTION FOUND FOR THIS IDENTIFIER";
+                return "Incorrect parameters length";
             }
+        } else {
+            return "NO SUBSCRIPTION FOUND FOR THIS IDENTIFIER";
         }
     }
 

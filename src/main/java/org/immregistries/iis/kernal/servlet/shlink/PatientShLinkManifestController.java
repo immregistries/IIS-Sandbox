@@ -34,13 +34,12 @@ import static org.immregistries.iis.kernal.servlet.PatientServletUtil.fetchPatie
 import static org.immregistries.iis.kernal.servlet.shlink.PatientShLinkManifestController.PATIENT_MANIFEST_FULL_PATH;
 
 @RestController
-@RequestMapping({PATIENT_MANIFEST_FULL_PATH})
+@RequestMapping({ PATIENT_MANIFEST_FULL_PATH })
 public class PatientShLinkManifestController {
 
 	public static final String MANIFEST_PATH_SUFFIX = "/manifest";
 	public static final String PATIENT_MANIFEST_FULL_PATH = TenantController.TENANT_PATH + MANIFEST_PATH_SUFFIX;
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
-
 
 	@Autowired
 	private ShLinkUtilService shLinkUtilService;
@@ -55,38 +54,34 @@ public class PatientShLinkManifestController {
 	@Autowired
 	private PartitionTenantCreationInterceptor partitionTenantCreationInterceptor;
 
-	@PostMapping({PATIENT_BASE_PATH, PATIENT_BASE_PATH + "/{id}"})
+	@PostMapping({ PATIENT_BASE_PATH, PATIENT_BASE_PATH + "/{id}" })
 	protected ShLinkManifest postPatientShLinkManifest(HttpServletRequest req, HttpServletResponse resp,
-																	  @PathVariable("id") String id,
-																		@PathVariable("tenantName") String tenantName,
-																		@RequestBody ShLinkManifestRequestBody body) throws IOException, ServletException {
+			@PathVariable("id") String id,
+			@PathVariable("tenantName") String tenantName,
+			@RequestBody ShLinkManifestRequestBody body) throws IOException, ServletException {
 		String passcode = body.getPasscode();
 		resp.setContentType("application/json");
-		try (Session dataSession = HibernateConfig.getDataSession()) {
-			Tenant tenant = null;
-			if (StringUtils.isNotBlank(passcode)) {
-				tenant = TenantUtil.authenticateTenantNoUsername(passcode, tenantName, dataSession, partitionTenantCreationInterceptor);
-			}
-			if (tenant == null) {
-				throw new AuthenticationCredentialsNotFoundException("No tenant found or invalid passcode");
-			}
-			return getShLinkManifest(req, id, tenant);
+		Tenant tenant = null;
+		if (StringUtils.isNotBlank(passcode)) {
+			tenant = TenantUtil.authenticateTenantNoUsername(passcode, tenantName);
 		}
+		if (tenant == null) {
+			throw new AuthenticationCredentialsNotFoundException("No tenant found or invalid passcode");
+		}
+		return getShLinkManifest(req, id, tenant);
 	}
 
-	@GetMapping({PATIENT_BASE_PATH, PATIENT_BASE_PATH + "/{id}"})
+	@GetMapping({ PATIENT_BASE_PATH, PATIENT_BASE_PATH + "/{id}" })
 	protected ShLinkManifest getPatientShLinkManifest(HttpServletRequest req, HttpServletResponse resp,
-																	  @PathVariable("id") String id,
-																	  @PathVariable("tenantName") String tenantName,
-																	  @RequestParam(value = "recipient", required = false) String recipient,
-																	  @RequestParam(value = "passcode", required = false) String passcode,
-																	  @RequestParam(value = "embeddedLengthMax", required = false) String embeddedLengthMax
-	) throws IOException, ServletException {
+			@PathVariable("id") String id,
+			@PathVariable("tenantName") String tenantName,
+			@RequestParam(value = "recipient", required = false) String recipient,
+			@RequestParam(value = "passcode", required = false) String passcode,
+			@RequestParam(value = "embeddedLengthMax", required = false) String embeddedLengthMax)
+			throws IOException, ServletException {
 		resp.setContentType("application/json");
-		try (Session dataSession = HibernateConfig.getDataSession()) {
-			Tenant tenant = CurrentTenantUtil.getTenantRedirectIfNone(req, resp, dataSession);
-			return getShLinkManifest(req, id, tenant);
-		}
+		Tenant tenant = CurrentTenantUtil.getTenantRedirectIfNone(req, resp);
+		return getShLinkManifest(req, id, tenant);
 	}
 
 	private ShLinkManifest getShLinkManifest(HttpServletRequest req, String id, Tenant tenant) {

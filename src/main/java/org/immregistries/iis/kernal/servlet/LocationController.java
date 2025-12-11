@@ -34,7 +34,8 @@ import java.util.Set;
 
 @SuppressWarnings("serial")
 @RestController
-@RequestMapping({LocationController.LOCATION_BASE_PATH, TenantController.TENANT_PATH + LocationController.LOCATION_BASE_PATH})
+@RequestMapping({ LocationController.LOCATION_BASE_PATH,
+		TenantController.TENANT_PATH + LocationController.LOCATION_BASE_PATH })
 public class LocationController {
 	public static final String LOCATION_BASE_PATH = "/location";
 
@@ -63,32 +64,31 @@ public class LocationController {
 	public static void printMessageReceived(PrintWriter out, MessageReceived messageReceived) {
 		SimpleDateFormat sdfTime = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
 		out.println("     <h3>" + messageReceived.getCategoryRequest() + " - "
-			+ messageReceived.getCategoryResponse() + " "
-			+ sdfTime.format(messageReceived.getReportedDate()) + "</h3>");
+				+ messageReceived.getCategoryResponse() + " "
+				+ sdfTime.format(messageReceived.getReportedDate()) + "</h3>");
 		out.println("     <pre>" + messageReceived.getMessageRequest() + "</pre>");
 		out.println("     <pre>" + messageReceived.getMessageResponse() + "</pre>");
 	}
 
 	@PostMapping
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-		throws ServletException, IOException {
+			throws ServletException, IOException {
 		doGet(req, resp);
 	}
 
 	@SuppressWarnings("unchecked")
 	@GetMapping
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-		throws ServletException, IOException {
+			throws ServletException, IOException {
 
 		Tenant tenant = CurrentTenantUtil.getTenantRedirectIfNone(req, resp);
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
-//    Session dataSession = PopServlet.getDataSession();
 		try {
 			OrgLocation orgLocationSelected = null;
 			if (req.getParameter(PARAM_ORG_LOCATION_ID) != null) {
-//			orgLocationSelected = fhirRequests.searchOrgLocation(fhirClient,
-//				Location.IDENTIFIER.exactly().identifier(req.getParameter(PARAM_ORG_LOCATION_ID)));
+				// orgLocationSelected = fhirRequests.searchOrgLocation(fhirClient,
+				// Location.IDENTIFIER.exactly().identifier(req.getParameter(PARAM_ORG_LOCATION_ID)));
 				orgLocationSelected = fhirRequests.readAsOrgLocation(req.getParameter(PARAM_ORG_LOCATION_ID));
 			}
 
@@ -101,14 +101,14 @@ public class LocationController {
 						orgLocationSelected.setOrgFacilityCode(orgFacilityCode);
 						orgLocationSelected.setTenant(tenant);
 						orgLocationSelected = fhirRequests.saveOrgLocation(orgLocationSelected);
-//				Location location = LocationMapper.fhirLocation(orgLocationSelected);
-//				 try {
-//					 MethodOutcome outcome = fhirClient.update().resource(location).conditional()
-//						 .where(Location.IDENTIFIER.exactly().identifier(location.getIdentifierFirstRep().getValue()))
-//						 .execute();
-//				 } catch (ResourceNotFoundException e ){
-//					 MethodOutcome outcome = fhirClient.create().resource(location).execute();
-//				 }
+						// Location location = LocationMapper.fhirLocation(orgLocationSelected);
+						// try {
+						// MethodOutcome outcome = fhirClient.update().resource(location).conditional()
+						// .where(Location.IDENTIFIER.exactly().identifier(location.getIdentifierFirstRep().getValue()))
+						// .execute();
+						// } catch (ResourceNotFoundException e ){
+						// MethodOutcome outcome = fhirClient.create().resource(location).execute();
+						// }
 					}
 				} else if (action.equals(ACTION_SAVE)) {
 					orgLocationSelected.setOrgFacilityCode(req.getParameter(PARAM_ORG_FACILITY_CODE));
@@ -126,14 +126,14 @@ public class LocationController {
 
 					UriComponentsBuilder uriComponentsBuilder = ServletUriComponentsBuilder.fromRequestUri(req);
 					resp.sendRedirect(uriComponentsBuilder.build().toUri().toURL().toString());
-//			  Location location = LocationMapper.fhirLocation(orgLocationSelected);
-//			  try {
-//				  MethodOutcome outcome = fhirClient.update().resource(location).conditional()
-//					  .where(Location.IDENTIFIER.exactly().identifier(location.getIdentifierFirstRep().getValue()))
-//					  .execute();
-//			  } catch (ResourceNotFoundException e ){
-//				  MethodOutcome outcome = fhirClient.create().resource(location).execute();
-//			  }
+					// Location location = LocationMapper.fhirLocation(orgLocationSelected);
+					// try {
+					// MethodOutcome outcome = fhirClient.update().resource(location).conditional()
+					// .where(Location.IDENTIFIER.exactly().identifier(location.getIdentifierFirstRep().getValue()))
+					// .execute();
+					// } catch (ResourceNotFoundException e ){
+					// MethodOutcome outcome = fhirClient.create().resource(location).execute();
+					// }
 				}
 			}
 
@@ -150,7 +150,7 @@ public class LocationController {
 						out.println("<div class=\"w3-panel w3-yellow\"><p>No Locations Found</p></div>");
 					} else {
 						out.println(
-							"<table class=\"w3-table w3-bordered w3-striped w3-border test w3-hoverable\">");
+								"<table class=\"w3-table w3-bordered w3-striped w3-border test w3-hoverable\">");
 						out.println("  <tr class=\"w3-green\">");
 						out.println("    <th>Code</th>");
 						out.println("    <th>Name</th>");
@@ -158,15 +158,14 @@ public class LocationController {
 						out.println("  </tr>");
 						out.println("  <tbody>");
 						for (OrgLocation orgLocation : orgLocationList) {
-							String link =
-								"location?" + PARAM_ORG_LOCATION_ID + "=" + orgLocation.getOrgLocationId();
+							String link = "location?" + PARAM_ORG_LOCATION_ID + "=" + orgLocation.getOrgLocationId();
 							out.println("  <tr>");
 							out.println("    <td><a href=\"" + link + "\">" + orgLocation.getOrgFacilityCode()
-								+ "</a></td>");
+									+ "</a></td>");
 							out.println("    <td><a href=\"" + link + "\">" + orgLocation.getOrgFacilityName()
-								+ "</a></td>");
+									+ "</a></td>");
 							out.println("    <td><a href=\"" + link + "\">" + orgLocation.getLocationType()
-								+ "</a></td>");
+									+ "</a></td>");
 							out.println("  </tr>");
 						}
 						out.println("  </tbody>");
@@ -179,65 +178,64 @@ public class LocationController {
 				out.println("    <div class=\"w3-container w3-half w3-margin-top\">");
 				out.println("    <h3>Add Location</h3>");
 				out.println(
-					"    <form method=\"POST\" action=\"location\" class=\"w3-container w3-card-4\">");
+						"    <form method=\"POST\" action=\"location\" class=\"w3-container w3-card-4\">");
 				out.println("      <label>Facility Code</label>");
 				out.println("      <input class=\"w3-input\" type=\"text\" name=\""
-					+ PARAM_ORG_FACILITY_CODE + "\" value=\"\"/>");
+						+ PARAM_ORG_FACILITY_CODE + "\" value=\"\"/>");
 				out.println(
-					"          <input class=\"w3-button w3-section w3-teal w3-ripple\" type=\"submit\" name=\""
-						+ PARAM_ACTION + "\" value=\"" + ACTION_ADD + "\"/>");
+						"          <input class=\"w3-button w3-section w3-teal w3-ripple\" type=\"submit\" name=\""
+								+ PARAM_ACTION + "\" value=\"" + ACTION_ADD + "\"/>");
 				out.println("    </form>");
 				out.println("    </div>");
 
 				out.println("  <div class=\"w3-container\">");
 
-
 			} else {
 				out.println("    <div class=\"w3-container w3-half w3-margin-top\">");
 				out.println("    <h3>Add Location</h3>");
 				out.println(
-					"    <form method=\"POST\" action=\"location\" class=\"w3-container w3-card-4\">");
+						"    <form method=\"POST\" action=\"location\" class=\"w3-container w3-card-4\">");
 				out.println("      <label>Facility Code</label>");
 				out.println(
-					"      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_ORG_FACILITY_CODE
-						+ "\" value=\"" + orgLocationSelected.getOrgFacilityCode() + "\"/>");
+						"      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_ORG_FACILITY_CODE
+								+ "\" value=\"" + orgLocationSelected.getOrgFacilityCode() + "\"/>");
 				out.println("      <label>Facility Name</label>");
 				out.println(
-					"      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_ORG_FACILITY_NAME
-						+ "\" value=\"" + orgLocationSelected.getOrgFacilityName() + "\"/>");
+						"      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_ORG_FACILITY_NAME
+								+ "\" value=\"" + orgLocationSelected.getOrgFacilityName() + "\"/>");
 				out.println("      <label>Location Type</label>");
 				out.println("      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_LOCATION_TYPE
-					+ "\" value=\"" + orgLocationSelected.getLocationType() + "\"/>");
+						+ "\" value=\"" + orgLocationSelected.getLocationType() + "\"/>");
 				out.println("      <label>Address Line 1</label>");
 				out.println("      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_ADDRESS_LINE1
-					+ "\" value=\"" + orgLocationSelected.getAddressLine1() + "\"/>");
+						+ "\" value=\"" + orgLocationSelected.getAddressLine1() + "\"/>");
 				out.println("      <label>Address Line 2</label>");
 				out.println("      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_ADDRESS_LINE2
-					+ "\" value=\"" + orgLocationSelected.getAddressLine2() + "\"/>");
+						+ "\" value=\"" + orgLocationSelected.getAddressLine2() + "\"/>");
 				out.println("      <label>Address City</label>");
 				out.println("      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_ADDRESS_CITY
-					+ "\" value=\"" + orgLocationSelected.getAddressCity() + "\"/>");
+						+ "\" value=\"" + orgLocationSelected.getAddressCity() + "\"/>");
 				out.println("      <label>Address State</label>");
 				out.println("      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_ADDRESS_STATE
-					+ "\" value=\"" + orgLocationSelected.getAddressState() + "\"/>");
+						+ "\" value=\"" + orgLocationSelected.getAddressState() + "\"/>");
 				out.println("      <label>Address Zip</label>");
 				out.println("      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_ADDRESS_ZIP
-					+ "\" value=\"" + orgLocationSelected.getAddressZip() + "\"/>");
+						+ "\" value=\"" + orgLocationSelected.getAddressZip() + "\"/>");
 				out.println("      <label>Address Country</label>");
 				out.println("      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_ADDRESS_COUNTRY
-					+ "\" value=\"" + orgLocationSelected.getAddressCountry() + "\"/>");
+						+ "\" value=\"" + orgLocationSelected.getAddressCountry() + "\"/>");
 				out.println("      <label>Address County/Parish</label>");
 				out.println(
-					"      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_ADDRESS_COUNTY_PARISH
-						+ "\" value=\"" + orgLocationSelected.getAddressCountyParish() + "\"/>");
+						"      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_ADDRESS_COUNTY_PARISH
+								+ "\" value=\"" + orgLocationSelected.getAddressCountyParish() + "\"/>");
 				out.println("      <label>VFC Provider PIN</label>");
 				out.println("      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_VFC_PROVIDER_PIN
-					+ "\" value=\"" + orgLocationSelected.getVfcProviderPin() + "\"/>");
+						+ "\" value=\"" + orgLocationSelected.getVfcProviderPin() + "\"/>");
 				out.println("          <input type=\"hidden\" name=\"" + PARAM_ORG_LOCATION_ID
-					+ "\" value=\"" + orgLocationSelected.getOrgLocationId() + "\"/>");
+						+ "\" value=\"" + orgLocationSelected.getOrgLocationId() + "\"/>");
 				out.println(
-					"          <input class=\"w3-button w3-section w3-teal w3-ripple\" type=\"submit\" name=\""
-						+ PARAM_ACTION + "\" value=\"" + ACTION_SAVE + "\"/>");
+						"          <input class=\"w3-button w3-section w3-teal w3-ripple\" type=\"submit\" name=\""
+								+ PARAM_ACTION + "\" value=\"" + ACTION_SAVE + "\"/>");
 				out.println("    </form>");
 				out.println("    </div>");
 
@@ -252,7 +250,7 @@ public class LocationController {
 	}
 
 	public void printObservations(PrintWriter out,
-											List<ObservationReported> observationReportedList) {
+			List<ObservationReported> observationReportedList) {
 		SimpleDateFormat sdfDate = new SimpleDateFormat("MM/dd/yyyy");
 		out.println("<table class=\"w3-table w3-bordered w3-striped w3-border test w3-hoverable\">");
 		out.println("  <tr class=\"w3-green\">");
@@ -285,11 +283,11 @@ public class LocationController {
 							table = "Snomed";
 						}
 						out.println("      " + observationReported.getIdentifierLabel() + " (" + table + " "
-							+ code + ")");
+								+ code + ")");
 					}
 				}
 				if (observationReported.getIdentifierTable().equals("LN")
-					|| observationReported.getIdentifierTable().equals("99TPG")) {
+						|| observationReported.getIdentifierTable().equals("99TPG")) {
 					LoincIdentifier loincIdentifier = null;
 					for (LoincIdentifier oi : LoincIdentifier.values()) {
 						if (oi.getIdentifierCode().equalsIgnoreCase(code)) {
@@ -302,14 +300,13 @@ public class LocationController {
 					} else {
 						out.println("&#10004;");
 						if (!loincIdentifier.getIdentifierLabel()
-							.equalsIgnoreCase(observationReported.getIdentifierLabel())) {
+								.equalsIgnoreCase(observationReported.getIdentifierLabel())) {
 							out.println("Matches: " + loincIdentifier.getIdentifierLabel());
 						}
 					}
 				}
 			}
 			out.println("    </td>");
-
 
 			out.println("    <td>");
 			if (valueType.equals("DT")) {
@@ -326,7 +323,7 @@ public class LocationController {
 					try {
 						valueDate = sdf.parse(value);
 					} catch (ParseException pe) {
-						//ignore
+						// ignore
 					}
 				}
 				if (valueDate == null) {
@@ -336,7 +333,7 @@ public class LocationController {
 				}
 			} else if (valueType.equals("SN")) {
 				out.println("      " + observationReported.getValueLabel() + " "
-					+ observationReported.getValueTable() + " " + observationReported.getValueCode());
+						+ observationReported.getValueTable() + " " + observationReported.getValueCode());
 			} else {
 				String code = observationReported.getValueCode();
 				if (observationReported.getValueLabel().equals("")) {
@@ -354,12 +351,12 @@ public class LocationController {
 							table = "Snomed";
 						}
 						out.println(
-							"      " + observationReported.getValueLabel() + " (" + table + " " + code + ")");
+								"      " + observationReported.getValueLabel() + " (" + table + " " + code + ")");
 					}
 				}
 				if (observationReported.getValueTable().equals("SCT")
-					|| observationReported.getValueTable().equals("CDCPHINVS")
-					|| observationReported.getValueTable().equals("99TPG")) {
+						|| observationReported.getValueTable().equals("CDCPHINVS")
+						|| observationReported.getValueTable().equals("99TPG")) {
 					SnomedValue snomedValue = null;
 					for (SnomedValue sv : SnomedValue.values()) {
 						if (sv.getIdentifierCode().equalsIgnoreCase(code)) {
@@ -372,7 +369,7 @@ public class LocationController {
 					} else {
 						out.println("&#10004;");
 						if (!snomedValue.getIdentifierLabel()
-							.equalsIgnoreCase(observationReported.getValueLabel())) {
+								.equalsIgnoreCase(observationReported.getValueLabel())) {
 							out.println("Matches: " + snomedValue.getIdentifierLabel());
 						}
 					}
@@ -384,7 +381,7 @@ public class LocationController {
 				out.println("    <td></td>");
 			} else {
 				out.println(
-					"    <td>" + sdfDate.format(observationReported.getObservationDate()) + "</td>");
+						"    <td>" + sdfDate.format(observationReported.getObservationDate()) + "</td>");
 			}
 			out.println("  </tr>");
 		}
@@ -404,14 +401,14 @@ public class LocationController {
 		out.println("  <tr>");
 		out.println("    <th class=\"w3-green\">Patient Name</th>");
 		out.println("    <td>" + patientReportedSelected.getNameLast() + ", "
-			+ patientReportedSelected.getNameFirst() + " "
-			+ patientReportedSelected.getNameMiddle() + "</td>");
+				+ patientReportedSelected.getNameFirst() + " "
+				+ patientReportedSelected.getNameMiddle() + "</td>");
 		out.println("  </tr>");
 		{
 			out.println("  <tr>");
 			out.println("    <th class=\"w3-green\">Birth Date</th>");
 			out.println(
-				"    <td>" + sdfDate.format(patientReportedSelected.getBirthDate()) + "</td>");
+					"    <td>" + sdfDate.format(patientReportedSelected.getBirthDate()) + "</td>");
 			out.println("  </tr>");
 		}
 		out.println("  </tbody>");
@@ -421,15 +418,15 @@ public class LocationController {
 
 	@SuppressWarnings("unchecked")
 	public List<ObservationReported> getObservationList(Session dataSession,
-																		 PatientReported patientReportedSelected) {
+			PatientReported patientReportedSelected) {
 		List<ObservationReported> observationReportedList;
 		{
 			Query query = dataSession.createQuery(
-				"from ObservationReported where patientReported = :patientReported and vaccinationReported is null");
+					"from ObservationReported where patientReported = :patientReported and vaccinationReported is null");
 			query.setParameter("patientReported", patientReportedSelected);
 			observationReportedList = query.getResultList();
 			Set<String> suppressSet = LoincIdentifier.getSuppressIdentifierCodeSet();
-			for (Iterator<ObservationReported> it = observationReportedList.iterator(); it.hasNext(); ) {
+			for (Iterator<ObservationReported> it = observationReportedList.iterator(); it.hasNext();) {
 				ObservationReported observationReported = it.next();
 				if (suppressSet.contains(observationReported.getIdentifierCode())) {
 					it.remove();

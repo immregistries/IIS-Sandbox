@@ -67,7 +67,7 @@ public class RecommendationController {
 	)
 			throws ServletException, IOException {
 		Tenant tenant = CurrentTenantUtil.getTenantRedirectIfNone(req, resp);
-		recommendationRestController.addRandomRecommendation(tenant.getOrgId(), req);
+		recommendationRestController.addRandomRecommendation(tenant, req);
 		doGet(req, resp);
 	}
 

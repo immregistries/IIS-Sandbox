@@ -3,11 +3,9 @@ package org.immregistries.iis.kernal.servlet;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.hibernate.Session;
 import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.persisted.model.MessageReceived;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
-import org.immregistries.iis.kernal.persisted.util.HibernateConfig;
 import org.immregistries.iis.kernal.rest.MessageRestController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -52,7 +50,7 @@ public class MessageController {
 
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
-		try (Session dataSession = HibernateConfig.getDataSession()) {
+		try {
 			String messageError = null;
 			String messageConfirmation = null;
 			HomeController.doHeader(out, "IIS Sandbox");
@@ -87,7 +85,7 @@ public class MessageController {
 				out.println("    </div>");
 
 				out.println("    <div class=\"w3-container\">");
-				List<MessageReceived> messageReceivedList = messageRestController.getMessages(tenant.getOrgId(), search,
+				List<MessageReceived> messageReceivedList = messageRestController.getMessages(tenant, search,
 						req);
 
 				if (messageReceivedList.size() == 0) {

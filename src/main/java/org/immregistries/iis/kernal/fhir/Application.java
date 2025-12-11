@@ -33,26 +33,26 @@ import org.springframework.web.context.request.RequestContextListener;
 import java.io.IOException;
 
 @ServletComponentScan(basePackageClasses = {
-	RestfulServer.class}, basePackages = {
-	"org.immregistries.iis.kernal.servlet"
-//	,"org.immregistries.iis.kernal.repository"
-})
-@SpringBootApplication(exclude = {ElasticsearchRestClientAutoConfiguration.class, ThymeleafAutoConfiguration.class})
+		RestfulServer.class }, basePackages = {
+				"org.immregistries.iis.kernal.servlet"
+		// ,"org.immregistries.iis.kernal.repository"
+		})
+@SpringBootApplication(exclude = { ElasticsearchRestClientAutoConfiguration.class, ThymeleafAutoConfiguration.class })
 @Import({
-	SubscriptionSubmitterConfig.class,
-	SubscriptionProcessorConfig.class,
-	SubscriptionChannelConfig.class,
-	WebsocketDispatcherConfig.class,
-	MdmConfig.class,
-	JpaBatch2Config.class,
-	Batch2JobsConfig.class,
-	ServletRegistrationConfig.class,
-	ServerConfig.class,
-	ServerSecurityConfig.class,
+		SubscriptionSubmitterConfig.class,
+		SubscriptionProcessorConfig.class,
+		SubscriptionChannelConfig.class,
+		WebsocketDispatcherConfig.class,
+		MdmConfig.class,
+		JpaBatch2Config.class,
+		Batch2JobsConfig.class,
+		ServletRegistrationConfig.class,
+		ServerConfig.class,
+		ServerSecurityConfig.class,
 })
 @ComponentScan(basePackages = {
-	"ca.uhn.fhir.jpa.starter",
-	"org.immregistries.iis.kernal"
+		"ca.uhn.fhir.jpa.starter",
+		"org.immregistries.iis.kernal"
 })
 public class Application extends SpringBootServletInitializer {
 
@@ -68,13 +68,13 @@ public class Application extends SpringBootServletInitializer {
 		CodeMapManager.getCodeMap(); // Initializes codemaps
 		SpringApplication.run(Application.class, args);
 
-		//Server is now accessible at eg. http://localhost:8080/fhir/metadata
-		//UI is now accessible at http://localhost:8080/
+		// Server is now accessible at eg. http://localhost:8080/fhir/metadata
+		// UI is now accessible at http://localhost:8080/
 	}
 
 	@Override
 	protected SpringApplicationBuilder configure(
-		SpringApplicationBuilder builder) {
+			SpringApplicationBuilder builder) {
 		return builder.sources(Application.class);
 	}
 
@@ -91,7 +91,8 @@ public class Application extends SpringBootServletInitializer {
 	}
 
 	/**
-	 * Required to get access to httpRequest and session statically through spring, important to use the fhir client inside the servlets
+	 * Required to get access to httpRequest and session statically through spring,
+	 * important to use the fhir client inside the servlets
 	 *
 	 * @return
 	 */
