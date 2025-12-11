@@ -33,6 +33,7 @@ public class TenantUtil implements ApplicationContextAware {
 
     private static TenantRepository tenantRepository;
     private static IPartitionLookupSvc partitionLookupSvc;
+    private static PartitionTenantCreationInterceptor partitionTenantCreationInterceptor;
 
     @Override
     public void setApplicationContext(ApplicationContext ac) {
@@ -44,6 +45,13 @@ public class TenantUtil implements ApplicationContextAware {
             partitionLookupSvc = ac.getBean(IPartitionLookupSvc.class);
         }
         return partitionLookupSvc;
+    }
+
+    public static PartitionTenantCreationInterceptor getPartitionTenantCreationInterceptor() {
+        if (partitionTenantCreationInterceptor == null) {
+            partitionTenantCreationInterceptor = ac.getBean(PartitionTenantCreationInterceptor.class);
+        }
+        return partitionTenantCreationInterceptor;
     }
 
     public static TenantRepository getTenantRepository() {
@@ -99,8 +107,7 @@ public class TenantUtil implements ApplicationContextAware {
         return tenantifyPathSuffix("*", urlSuffix);
     }
 
-    public static Tenant authenticateTenantNoUsername(String password, String facilityName, Session dataSession,
-            PartitionTenantCreationInterceptor partitionTenantCreationInterceptor) {
+    public static Tenant authenticateTenantNoUsername(String password, String facilityName, Session dataSession) {
         TypedQuery<Tenant> query = dataSession.createQuery("from Tenant where organizationName = ?1", Tenant.class);
         query.setParameter(1, facilityName);
         Tenant tenant = (Tenant) query.getSingleResult();
@@ -111,26 +118,23 @@ public class TenantUtil implements ApplicationContextAware {
         String username = tenantUserAccess.getAccessName();
 
         UserAccess userAccess = UserAccessUtil.authenticateUserAccessUsernamePassword(username, password);
-        return authenticateTenant(userAccess, facilityName, partitionTenantCreationInterceptor);
+        return authenticateTenant(userAccess, facilityName);
     }
 
-    public static Tenant authenticateTenant(String username, String password, String facilityName,
-            PartitionTenantCreationInterceptor partitionTenantCreationInterceptor) {
+    public static Tenant authenticateTenant(String username, String password, String facilityName) {
         UserAccess userAccess = UserAccessUtil.authenticateUserAccessUsernamePassword(username, password);
-        return authenticateTenant(userAccess, facilityName, partitionTenantCreationInterceptor);
+        return authenticateTenant(userAccess, facilityName);
     }
 
-    public static Tenant authenticateTenant(OAuth2User oAuth2User, String facilityName,
-            PartitionTenantCreationInterceptor partitionTenantCreationInterceptor) {
+    public static Tenant authenticateTenant(OAuth2User oAuth2User, String facilityName) {
         /**
          * First user authentication with OAUTH
          */
         UserAccess userAccess = UserAccessUtil.authenticateUserAccessOAuth(oAuth2User);
-        return authenticateTenant(userAccess, facilityName, partitionTenantCreationInterceptor);
+        return authenticateTenant(userAccess, facilityName);
     }
 
-    public static Tenant authenticateTenant(UserAccess userAccess, String facilityName,
-            PartitionTenantCreationInterceptor partitionTenantCreationInterceptor) {
+    public static Tenant authenticateTenant(UserAccess userAccess, String facilityName) {
         /**
          * Users starting with the prefix can create a user with the same name, any
          * other use of prefix are rejected
@@ -152,8 +156,8 @@ public class TenantUtil implements ApplicationContextAware {
         Optional<Tenant> optional = getTenantRepository().findByOrganizationName(facilityName);
         if (optional.isEmpty()) {
             tenant = registerTenant(facilityName, userAccess);
-            if (partitionTenantCreationInterceptor != null) {
-                partitionTenantCreationInterceptor.getOrCreatePartitionId(tenant.getOrganizationName());
+            if (getPartitionTenantCreationInterceptor() != null) {
+                getPartitionTenantCreationInterceptor().getOrCreatePartitionId(tenant.getOrganizationName());
             }
         } else {
             /*

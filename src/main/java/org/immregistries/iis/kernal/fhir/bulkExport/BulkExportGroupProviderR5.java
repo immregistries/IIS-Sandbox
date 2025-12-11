@@ -160,103 +160,99 @@ public class BulkExportGroupProviderR5 extends GroupResourceProvider implements 
 			@Sort SortSpec theSortSpec,
 
 			ServletRequestDetails theRequestDetails) throws IOException {
-		try (Session dataSession = HibernateConfig.getDataSession()) {
-			HttpServletRequest theServletRequest = theRequestDetails.getServletRequest();
-			logger.info("Parameters {}", (Object) theRequestDetails.getParameters().get("_elements"));
+		HttpServletRequest theServletRequest = theRequestDetails.getServletRequest();
+		logger.info("Parameters {}", (Object) theRequestDetails.getParameters().get("_elements"));
 
-			if (theOutputFormat == null) {
+		if (theOutputFormat == null) {
 
-			}
-			BulkExportResponseJson bulkResponseDocument = new BulkExportResponseJson();
-
-			String serverBase = StringUtils.removeEnd(theRequestDetails.getServerBaseForRequest(), "/");
-			Map<String, Bundle> bundleMap = new HashMap<>();
-			Group group = read(theServletRequest, theId, theRequestDetails);
-
-			Bundle errorsBundle = new Bundle();
-			for (Group.GroupMemberComponent member : group.getMember()) {
-				if (member.getEntity().getReference().split("/")[0].equals("Patient")) {
-					// Bundle memberBundle = new Bundle();
-					// TODO add normal filter for type filter
-					try {
-						IBundleProvider bundleProvider = patientProvider.patientInstanceEverything(theServletRequest,
-								new IdType(member.getEntity().getReference()), theCount, theOffset, theLastUpdated,
-								theContent, theNarrative, theFilter, theTypes, new BooleanType(true), theSortSpec,
-								theRequestDetails);
-						for (IBaseResource resource : bundleProvider.getAllResources()) {
-							bundleMap.putIfAbsent(resource.fhirType(), new Bundle());
-							bundleMap.get(resource.fhirType()).addEntry().setResource((Resource) resource);
-						}
-					} catch (Exception e) {
-						/**
-						 * Caught Exceptions are exported in a ndJson Binary file
-						 */
-						e.printStackTrace();
-						OperationOutcome operationOutcome = new OperationOutcome();
-						operationOutcome.addIssue()
-								.setDetails(new CodeableConcept(new Coding().setDisplay(e.getMessage())));
-						errorsBundle.addEntry().setResource(operationOutcome); // TODO Add informations
-					}
-				}
-			}
-
-			IParser parser = fhirResourceGroupDao.getContext().newNDJsonParser();
-			RequestDetails detailsCopy = new SystemRequestDetails();
-			detailsCopy.setTenantId(PartitionTenantCreationInterceptor.extractPartitionName(theRequestDetails));
-			for (Map.Entry<String, Bundle> entry : bundleMap.entrySet()) {
-				Binary binary = new Binary();
-				binary.setContentType("Bulk");
-				binary.setContent(parser.encodeResourceToString(entry.getValue()).getBytes(StandardCharsets.UTF_8));
-				DaoMethodOutcome outcome = binaryDao.create(binary, detailsCopy);
-				IIdType newIId;
-				String nextUrl;
-				if (outcome.getResource() != null) {
-					newIId = outcome.getResource().getIdElement();
-					nextUrl = serverBase + "/" + newIId.toUnqualifiedVersionless().getValue();
-				} else if (outcome.getId() != null) {
-					newIId = outcome.getId();
-					nextUrl = serverBase + "/" + newIId.toUnqualifiedVersionless().getValue();
-				} else {
-					nextUrl = "ERROR";
-				}
-				bulkResponseDocument.addOutput()
-						.setType(entry.getKey())
-						.setUrl(nextUrl);
-			}
-
-			if (!errorsBundle.getEntry().isEmpty()) { // If exceptions were caught
-				Binary binary = new Binary();
-				binary.setContentType("Bulk-Error");
-				binary.setContent(parser.encodeResourceToString(errorsBundle).getBytes(StandardCharsets.UTF_8));
-				DaoMethodOutcome outcome = binaryDao.create(binary, detailsCopy);
-
-				IIdType newIId;
-				String nextUrl;
-				if (outcome.getResource() != null) {
-					newIId = outcome.getResource().getIdElement();
-					nextUrl = serverBase + "/" + newIId.toUnqualifiedVersionless().getValue();
-				} else if (outcome.getId() != null) {
-					newIId = outcome.getId();
-					nextUrl = serverBase + "/" + newIId.toUnqualifiedVersionless().getValue();
-				} else {
-					nextUrl = "ERROR";
-				}
-				BulkExportResponseJson.Output errorOutput = new BulkExportResponseJson.Output();
-				errorOutput.setType("OperationOutcome");
-				errorOutput.setUrl(nextUrl);
-				bulkResponseDocument.getError().add(errorOutput);
-			}
-
-			bulkResponseDocument.setTransactionTime(new Date(System.currentTimeMillis()));
-			bulkResponseDocument.setRequiresAccessToken(true);
-			bulkResponseDocument.setRequest(theRequestDetails.getCompleteUrl());
-
-			HttpServletResponse response = theRequestDetails.getServletResponse();
-			JsonUtil.serialize(bulkResponseDocument, response.getWriter());
-			response.getWriter().close();
-		} catch (Exception e) {
-			throw e;
 		}
+		BulkExportResponseJson bulkResponseDocument = new BulkExportResponseJson();
+
+		String serverBase = StringUtils.removeEnd(theRequestDetails.getServerBaseForRequest(), "/");
+		Map<String, Bundle> bundleMap = new HashMap<>();
+		Group group = read(theServletRequest, theId, theRequestDetails);
+
+		Bundle errorsBundle = new Bundle();
+		for (Group.GroupMemberComponent member : group.getMember()) {
+			if (member.getEntity().getReference().split("/")[0].equals("Patient")) {
+				// Bundle memberBundle = new Bundle();
+				// TODO add normal filter for type filter
+				try {
+					IBundleProvider bundleProvider = patientProvider.patientInstanceEverything(theServletRequest,
+							new IdType(member.getEntity().getReference()), theCount, theOffset, theLastUpdated,
+							theContent, theNarrative, theFilter, theTypes, new BooleanType(true), theSortSpec,
+							theRequestDetails);
+					for (IBaseResource resource : bundleProvider.getAllResources()) {
+						bundleMap.putIfAbsent(resource.fhirType(), new Bundle());
+						bundleMap.get(resource.fhirType()).addEntry().setResource((Resource) resource);
+					}
+				} catch (Exception e) {
+					/**
+					 * Caught Exceptions are exported in a ndJson Binary file
+					 */
+					e.printStackTrace();
+					OperationOutcome operationOutcome = new OperationOutcome();
+					operationOutcome.addIssue()
+							.setDetails(new CodeableConcept(new Coding().setDisplay(e.getMessage())));
+					errorsBundle.addEntry().setResource(operationOutcome); // TODO Add informations
+				}
+			}
+		}
+
+		IParser parser = fhirResourceGroupDao.getContext().newNDJsonParser();
+		RequestDetails detailsCopy = new SystemRequestDetails();
+		detailsCopy.setTenantId(PartitionTenantCreationInterceptor.extractPartitionName(theRequestDetails));
+		for (Map.Entry<String, Bundle> entry : bundleMap.entrySet()) {
+			Binary binary = new Binary();
+			binary.setContentType("Bulk");
+			binary.setContent(parser.encodeResourceToString(entry.getValue()).getBytes(StandardCharsets.UTF_8));
+			DaoMethodOutcome outcome = binaryDao.create(binary, detailsCopy);
+			IIdType newIId;
+			String nextUrl;
+			if (outcome.getResource() != null) {
+				newIId = outcome.getResource().getIdElement();
+				nextUrl = serverBase + "/" + newIId.toUnqualifiedVersionless().getValue();
+			} else if (outcome.getId() != null) {
+				newIId = outcome.getId();
+				nextUrl = serverBase + "/" + newIId.toUnqualifiedVersionless().getValue();
+			} else {
+				nextUrl = "ERROR";
+			}
+			bulkResponseDocument.addOutput()
+					.setType(entry.getKey())
+					.setUrl(nextUrl);
+		}
+
+		if (!errorsBundle.getEntry().isEmpty()) { // If exceptions were caught
+			Binary binary = new Binary();
+			binary.setContentType("Bulk-Error");
+			binary.setContent(parser.encodeResourceToString(errorsBundle).getBytes(StandardCharsets.UTF_8));
+			DaoMethodOutcome outcome = binaryDao.create(binary, detailsCopy);
+
+			IIdType newIId;
+			String nextUrl;
+			if (outcome.getResource() != null) {
+				newIId = outcome.getResource().getIdElement();
+				nextUrl = serverBase + "/" + newIId.toUnqualifiedVersionless().getValue();
+			} else if (outcome.getId() != null) {
+				newIId = outcome.getId();
+				nextUrl = serverBase + "/" + newIId.toUnqualifiedVersionless().getValue();
+			} else {
+				nextUrl = "ERROR";
+			}
+			BulkExportResponseJson.Output errorOutput = new BulkExportResponseJson.Output();
+			errorOutput.setType("OperationOutcome");
+			errorOutput.setUrl(nextUrl);
+			bulkResponseDocument.getError().add(errorOutput);
+		}
+
+		bulkResponseDocument.setTransactionTime(new Date(System.currentTimeMillis()));
+		bulkResponseDocument.setRequiresAccessToken(true);
+		bulkResponseDocument.setRequest(theRequestDetails.getCompleteUrl());
+
+		HttpServletResponse response = theRequestDetails.getServletResponse();
+		JsonUtil.serialize(bulkResponseDocument, response.getWriter());
+		response.getWriter().close();
 	}
 
 	/**

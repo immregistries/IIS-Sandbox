@@ -13,20 +13,21 @@ import jakarta.servlet.http.HttpSession;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.auth.AuthenticationException;
 import org.hibernate.Session;
-import org.hibernate.query.Query;
 import org.immregistries.iis.kernal.JwtUtils;
 import org.immregistries.iis.kernal.fhir.security.TenantUtil;
 import org.immregistries.iis.kernal.fhir.security.UserAccessUtil;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.immregistries.iis.kernal.persisted.model.UserAccess;
+import org.immregistries.iis.kernal.persisted.repository.TenantRepository;
+import org.immregistries.iis.kernal.persisted.repository.UserAccessRepository;
 import org.immregistries.iis.kernal.persisted.util.HibernateConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 
 import static org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil.SESSION_REQUEST_TENANT;
 import static org.immregistries.iis.kernal.fhir.security.UserAccessUtil.SESSION_USER_ACCESS;
@@ -49,6 +50,10 @@ public class IisAuthorizationInterceptor extends AuthorizationInterceptor {
 
 	@Autowired
 	private JwtUtils jwtUtils;
+	@Autowired
+	private UserAccessRepository userAccessRepository;
+	@Autowired
+	private TenantRepository tenantRepository;
 
 	/**
 	 * Authenticates request with Session cookie, Basic Auth (Token bearer currently
@@ -71,9 +76,9 @@ public class IisAuthorizationInterceptor extends AuthorizationInterceptor {
 		try {
 			if (PartitionTenantCreationInterceptor.extractPartitionName(theRequestDetails).equals(CONNECTATHON_USER)) {
 				if (theRequestDetails.getTenantId().endsWith("Unsafe")) {
-					return connectathonUserAuthorized(theRequestDetails, dataSession).build();
+					return connectathonUserAuthorized(theRequestDetails).build();
 				}
-				List<IAuthRule> rules = connectathonSpecialUser(theRequestDetails, authHeader, dataSession);
+				List<IAuthRule> rules = connectathonSpecialUser(theRequestDetails, authHeader);
 				if (rules != null) {
 					return rules;
 				}
@@ -86,7 +91,7 @@ public class IisAuthorizationInterceptor extends AuthorizationInterceptor {
 				 * Basic auth
 				 */
 				tenant = tryAuthHeaderBasic(authHeader,
-						PartitionTenantCreationInterceptor.extractPartitionName(theRequestDetails), dataSession);
+						PartitionTenantCreationInterceptor.extractPartitionName(theRequestDetails));
 				/*
 				 * Token bearer TODO
 				 */
@@ -101,7 +106,7 @@ public class IisAuthorizationInterceptor extends AuthorizationInterceptor {
 					 */
 					if (userAccess != null) {
 						tenant = TenantUtil.authenticateTenant(userAccess,
-								PartitionTenantCreationInterceptor.extractPartitionName(theRequestDetails), dataSession,
+								PartitionTenantCreationInterceptor.extractPartitionName(theRequestDetails),
 								null);
 					}
 				}
@@ -144,12 +149,12 @@ public class IisAuthorizationInterceptor extends AuthorizationInterceptor {
 	 * @param dataSession Database Session
 	 * @return tenant object if authenticated, null if not recognized
 	 */
-	public Tenant tryAuthHeaderBasic(String authHeader, String tenantName, Session dataSession) {
+	public Tenant tryAuthHeaderBasic(String authHeader, String tenantName) {
 		if (authHeader != null && authHeader.startsWith("Basic ")) {
 			String base64 = authHeader.substring("Basic ".length());
 			String base64decoded = new String(Base64.decodeBase64(base64));
 			String[] parts = base64decoded.split(":");
-			return TenantUtil.authenticateTenant(parts[0], parts[1], tenantName, dataSession, null);
+			return TenantUtil.authenticateTenant(parts[0], parts[1], tenantName, null);
 		} else { // TODO token ?
 			return null;
 		}
@@ -160,20 +165,17 @@ public class IisAuthorizationInterceptor extends AuthorizationInterceptor {
 	 * 
 	 * @param theRequestDetails request details
 	 * @param authHeader        HTTP authorization header
-	 * @param dataSession       Database session
 	 * @return Connectathon Authorization rules
 	 */
-	private List<IAuthRule> connectathonSpecialUser(RequestDetails theRequestDetails, String authHeader,
-			Session dataSession) {
+	private List<IAuthRule> connectathonSpecialUser(RequestDetails theRequestDetails, String authHeader) {
 		/*
 		 * If connecting as Connectathon with TOKEN : give only specific rights
 		 * Else : treat as usual
 		 */
-		UserAccess userAccess = null;
 		if (authHeader != null && authHeader.startsWith(BEARER_PREFIX)) {
 			String token = authHeader.split(BEARER_PREFIX)[1];
 			if (jwtUtils.validateJwtToken(token) && jwtUtils.getUserNameFromJwtToken(token).equals(CONNECTATHON_USER)) {
-				return connectathonUserAuthorized(theRequestDetails, dataSession).build();
+				return connectathonUserAuthorized(theRequestDetails).build();
 			}
 		}
 		return null;
@@ -186,20 +188,15 @@ public class IisAuthorizationInterceptor extends AuthorizationInterceptor {
 	 * @param dataSession       Database session
 	 * @return Connectathon Authorization rules
 	 */
-	private IAuthRuleFinished connectathonUserAuthorized(RequestDetails theRequestDetails, Session dataSession) {
+	private IAuthRuleFinished connectathonUserAuthorized(RequestDetails theRequestDetails) {
 		String tenantId = theRequestDetails.getTenantId();
 		UserAccess userAccess;
-		String queryString = "from UserAccess where accessName = ?1";
-		Query query = dataSession.createQuery(queryString);
-		query.setParameter(1, CONNECTATHON_USER);
-		Iterator userAccessIterator = query.getResultStream().iterator(); // TODO TODO test
-		if (userAccessIterator.hasNext()) {
-			userAccess = (UserAccess) userAccessIterator.next();
-			Query queryTenant = dataSession.createQuery("from Tenant where organizationName = ?1");
-			queryTenant.setParameter(1, CONNECTATHON_USER);
-			Iterator tenantIterator = queryTenant.getResultStream().iterator(); // TODO TODO verify
-			if (tenantIterator.hasNext()) {
-				Tenant tenant = (Tenant) tenantIterator.next();
+		Optional<UserAccess> userAccessOptional = userAccessRepository.findByAccessName(CONNECTATHON_USER);
+		if (userAccessOptional.isPresent()) {
+			userAccess = userAccessOptional.get();
+			Optional<Tenant> tenantOptional = tenantRepository.findByOrganizationName(CONNECTATHON_USER);
+			if (tenantOptional.isPresent()) {
+				Tenant tenant = tenantOptional.get();
 				theRequestDetails.setAttribute(SESSION_USER_ACCESS, userAccess);
 				theRequestDetails.setAttribute(SESSION_REQUEST_TENANT, tenant);
 				return new RuleBuilder()

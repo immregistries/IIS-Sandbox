@@ -50,9 +50,8 @@ public class TestMapping extends HttpServlet {
 	ObservationMapper<Observation> observationMapper;
 	@Autowired
 	PersonMapper<Person> personMapper;
-//	@Autowired
-//	RelatedPersonMapper<RelatedPerson> relatedPersonMapper;
-
+	// @Autowired
+	// RelatedPersonMapper<RelatedPerson> relatedPersonMapper;
 
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
@@ -68,7 +67,6 @@ public class TestMapping extends HttpServlet {
 			String ack = "";
 			String[] messages;
 			StringBuilder ackBuilder = new StringBuilder();
-			Session dataSession = HibernateConfig.getDataSession();
 			try {
 				if (tenant == null) {
 					resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -85,8 +83,6 @@ public class TestMapping extends HttpServlet {
 					}
 					ack = ackBuilder.toString();
 				}
-			} finally {
-				dataSession.close();
 			}
 			resp.setContentType("text/plain");
 			out.print(ack);
@@ -101,8 +97,7 @@ public class TestMapping extends HttpServlet {
 
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-		throws ServletException, IOException {
-
+			throws ServletException, IOException {
 
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
@@ -110,8 +105,8 @@ public class TestMapping extends HttpServlet {
 		try {
 			String message = req.getParameter(PARAM_MESSAGE);
 			if (message == null || message.equals("")) {
-				TestCaseMessage testCaseMessage =
-					ScenarioManager.createTestCaseMessage(ScenarioManager.SCENARIO_1_R_ADMIN_CHILD); // TODO TEST EVERY SCENARIO
+				TestCaseMessage testCaseMessage = ScenarioManager
+						.createTestCaseMessage(ScenarioManager.SCENARIO_1_R_ADMIN_CHILD); // TODO TEST EVERY SCENARIO
 				Transformer transformer = new Transformer();
 				transformer.transform(testCaseMessage);
 				message = testCaseMessage.getMessageText();
@@ -122,12 +117,12 @@ public class TestMapping extends HttpServlet {
 				out.println("    <form action=\"utest\" method=\"POST\" target=\"_blank\">");
 				out.println("      <h3>VXU Message</h3>");
 				out.println("      <textarea class=\"w3-input\" name=\"" + PARAM_MESSAGE
-					+ "\" rows=\"15\" cols=\"160\">" + message + "</textarea></td>");
+						+ "\" rows=\"15\" cols=\"160\">" + message + "</textarea></td>");
 				out.println("    <div class=\"w3-container w3-half w3-margin-top\">");
 
 				out.println("    <div class=\"w3-container w3-card-4\">");
 				out.println(
-					"      <input class=\"w3-button w3-section w3-teal w3-ripple\" type=\"submit\" name=\"submit\" value=\"Submit\"/>");
+						"      <input class=\"w3-button w3-section w3-teal w3-ripple\" type=\"submit\" name=\"submit\" value=\"Submit\"/>");
 				out.println("    <span class=\"w3-yellow\">Test Data Only</span>");
 
 				out.println("    </div>");
@@ -142,7 +137,7 @@ public class TestMapping extends HttpServlet {
 		out.close();
 	}
 
-	void  testPatientMapping(Tenant tenant, String message) throws ProcessingException {
+	void testPatientMapping(Tenant tenant, String message) throws ProcessingException {
 		List<ProcessingException> processingExceptionList = new ArrayList<>();
 		HL7Reader hl7Reader = new HL7Reader(message);
 		Set<ProcessingFlavor> processingFlavorSet = tenant.getProcessingFlavorSet();

@@ -36,21 +36,17 @@ public class UsernamePasswordAuthenticationProvider implements AuthenticationPro
 	private OAuth2AuthorizedClientRepository authorizedClientRepository;
 	@Autowired
 	private ClientRegistrationRepository clientRegistrationRepository;
-	@Autowired
-	private PartitionTenantCreationInterceptor partitionTenantCreationInterceptor;
 
 	public Authentication authenticate(Authentication authentication) throws AuthenticationException {
 		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
 				.getRequest();
-		Session dataSession = HibernateConfig.getDataSession();
 
 		// TODO maybe customize "PrincipalExtractor" instead and have the
 		// userAccess/tenant as principal
 		// https://www.baeldung.com/spring-security-oauth-principal-authorities-extractor
 		if (StringUtils.isNotBlank(request.getParameter(LOGIN_PARAM_TENANT_NAME))) {
 			Tenant tenant = TenantUtil.authenticateTenant(authentication.getName(),
-					(String) authentication.getCredentials(), request.getParameter(LOGIN_PARAM_TENANT_NAME),
-					dataSession, partitionTenantCreationInterceptor);
+					(String) authentication.getCredentials(), request.getParameter(LOGIN_PARAM_TENANT_NAME));
 			if (tenant != null) {
 				/**
 				 * Creating a new session after login
@@ -62,7 +58,7 @@ public class UsernamePasswordAuthenticationProvider implements AuthenticationPro
 			}
 		} else {
 			UserAccess userAccess = UserAccessUtil.authenticateUserAccessUsernamePassword(authentication.getName(),
-					(String) authentication.getCredentials(), dataSession);
+					(String) authentication.getCredentials());
 			request.getSession(true).setAttribute(UserAccessUtil.SESSION_USER_ACCESS, userAccess);
 			return userAccess;
 		}

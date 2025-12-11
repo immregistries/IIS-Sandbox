@@ -228,25 +228,17 @@ public class JwtAuthController {
 			}
 		}
 		jwtStore.put((String) signedJWT.getJWTClaimsSet().getClaim("jti"), client_assertion);
-		Session dataSession = null;
-		try {
-			dataSession = HibernateConfig.getDataSession();
-			UserAccess userAccess = UserAccessUtil.authenticateUserAccessUsernamePassword(CONNECTATHON_USER,
-					"SundaysR0ck!", dataSession);
-			Map<String, String> result = new HashMap<>(5);
-			result.put("access_token", jwtUtils.generateJwtToken(userAccess));
-			result.put("token_type", "bearer");
-			result.put("expires_in", "300");
-			result.put("scope", scope);
-			Gson gson = new Gson();
-			String gsonData = gson.toJson(result, new TypeToken<HashMap>() {
-			}.getType());
-			return gsonData;
-		} finally {
-			if (dataSession != null) {
-				dataSession.close();
-			}
-		}
+		UserAccess userAccess = UserAccessUtil.authenticateUserAccessUsernamePassword(CONNECTATHON_USER,
+				"SundaysR0ck!");
+		Map<String, String> result = new HashMap<>(5);
+		result.put("access_token", jwtUtils.generateJwtToken(userAccess));
+		result.put("token_type", "bearer");
+		result.put("expires_in", "300");
+		result.put("scope", scope);
+		Gson gson = new Gson();
+		String gsonData = gson.toJson(result, new TypeToken<HashMap>() {
+		}.getType());
+		return gsonData;
 	}
 
 }

@@ -47,18 +47,12 @@ public class IisOAuthSuccessHandler implements AuthenticationSuccessHandler {
 		Tenant tenant = null;
 		if (authentication instanceof OAuth2AuthenticationToken) {
 			HttpSession session = request.getSession(true);
-			Session dataSession = HibernateConfig.getDataSession();
 			try {
 				OAuth2AuthenticationToken oAuth2AuthenticationToken = (OAuth2AuthenticationToken) authentication;
 				tenant = TenantUtil.authenticateTenant(
 						oAuth2AuthenticationToken.getPrincipal(),
-						UserAccessUtil.GITHUB_PREFIX + oAuth2AuthenticationToken.getPrincipal().getAttribute("login"),
-						dataSession,
-						partitionTenantCreationInterceptor);
-				dataSession.close();
+						UserAccessUtil.GITHUB_PREFIX + oAuth2AuthenticationToken.getPrincipal().getAttribute("login"));
 				session.setAttribute(CurrentTenantUtil.SESSION_REQUEST_TENANT, tenant);
-			} finally {
-				dataSession.close();
 			}
 
 			// session.setAttribute(SESSION_ORGACCESS, tenant.userAccess);

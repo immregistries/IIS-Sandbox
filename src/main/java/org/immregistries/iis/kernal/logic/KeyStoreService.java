@@ -4,14 +4,12 @@ import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.Curve;
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.gen.ECKeyGenerator;
-import jakarta.persistence.Query;
 import org.apache.commons.lang3.StringUtils;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.immregistries.iis.kernal.persisted.model.IisKey;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.immregistries.iis.kernal.persisted.model.UserAccess;
-import org.immregistries.iis.kernal.persisted.util.HibernateConfig;
+import org.immregistries.iis.kernal.persisted.repository.IisKeyRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,50 +18,30 @@ import java.util.UUID;
 @Service
 public class KeyStoreService {
 
+	@Autowired
+	public IisKeyRepository iisKeyRepository;
+
 	public JWK generateEc() {
 		try {
 			// Generate a P-256 EC key pair with a random key ID
 			return new ECKeyGenerator(Curve.P_256)
-				.keyID(UUID.randomUUID().toString())
-				.generate();
+					.keyID(UUID.randomUUID().toString())
+					.generate();
 		} catch (JOSEException exception) {
 			throw new RuntimeException(exception);
 		}
 	}
 
 	public IisKey getKey(String keyId, UserAccess userAccess) {
-		try (Session dataSession = HibernateConfig.getDataSession()) {
-			Query query = dataSession.createQuery(
-				"from IisKey where userAccess = :user and keyId = :kid", IisKey.class);
-			query.setParameter("user", userAccess);
-			query.setParameter("kid", keyId);
-			return (IisKey) query.getSingleResult();
-		}
+		return iisKeyRepository.findByUserAccessAndKeyId(userAccess, keyId).orElse(null);
 	}
 
 	public IisKey getAnyKey(UserAccess userAccess) {
-		try (Session dataSession = HibernateConfig.getDataSession()) {
-			Query query = dataSession.createQuery(
-				"from IisKey where userAccess = :user", IisKey.class);
-			query.setParameter("user", userAccess);
-			if (query.getResultList().size() == 0) {
-				return null;
-			}
-			return (IisKey) query.getSingleResult();
-		}
-	}
-
-	public List<IisKey> getKeys(UserAccess userAccess, Session dataSession) {
-		Query query = dataSession.createQuery(
-			"from IisKey where userAccess = :user", IisKey.class);
-		query.setParameter("user", userAccess);
-		return query.getResultList();
+		return iisKeyRepository.findByUserAccess(userAccess).get(0);
 	}
 
 	public List<IisKey> getKeys(UserAccess userAccess) {
-		try (Session dataSession = HibernateConfig.getDataSession()) {
-			return getKeys(userAccess, dataSession);
-		}
+		return iisKeyRepository.findByUserAccess(userAccess);
 	}
 
 	public IisKey saveKey(JWK keyString, Tenant tenant, UserAccess userAccess) {
@@ -71,20 +49,7 @@ public class KeyStoreService {
 		iisKey.setKeyId(keyString.getKeyID());
 		iisKey.setKeyString(keyString.toJSONString());
 		iisKey.setUserAccess(userAccess);
-		recordIisKey(iisKey);
-		return iisKey;
-	}
-
-	private void recordIisKey(IisKey iisKey, Session dataSession) {
-		Transaction transaction = dataSession.beginTransaction();
-		dataSession.persist(iisKey);
-		transaction.commit();
-	}
-
-	private void recordIisKey(IisKey iisKey) {
-		try (Session dataSession = HibernateConfig.getDataSession()) {
-			recordIisKey(iisKey, dataSession);
-		}
+		return iisKeyRepository.save(iisKey);
 	}
 
 	public IisKey getIisSigningKeyOrCreate(String keyId, UserAccess userAccess, Tenant tenant) {

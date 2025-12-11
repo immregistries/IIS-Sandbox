@@ -2,9 +2,8 @@ package org.immregistries.iis.kernal.servlet.shlink;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.immregistries.iis.kernal.fhir.interceptors.PartitionTenantCreationInterceptor;
-import org.immregistries.iis.kernal.logic.shlink.IisShLinkContentService;
 import org.immregistries.iis.kernal.logic.shlink.ShLinkUtilService;
+import org.immregistries.iis.kernal.persisted.repository.IisShlinkContentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,14 +19,13 @@ public class ShLinkContentController {
 	@Autowired
 	ShLinkUtilService shLinkUtilService;
 	@Autowired
-	PartitionTenantCreationInterceptor partitionTenantCreationInterceptor;
-	@Autowired
-	IisShLinkContentService iisShLinkContentService;
-
+	IisShlinkContentRepository iisShlinkContentRepository;
 
 	@GetMapping("/{id}")
-	public String getContent(HttpServletRequest req, HttpServletResponse resp, @PathVariable("id") String contentId, @RequestParam(value = "recipient", required = false) String recipient) {
+	public String getContent(HttpServletRequest req, HttpServletResponse resp, @PathVariable("id") String contentId,
+			@RequestParam(value = "recipient", required = false) String recipient) {
 		resp.setContentType("text/plain");
-		return iisShLinkContentService.getContent(contentId).getContent();
+		return iisShlinkContentRepository.findById(Integer.parseInt(contentId))
+				.map(iisShLinkContent -> iisShLinkContent.getContent()).orElse(null);
 	}
 }

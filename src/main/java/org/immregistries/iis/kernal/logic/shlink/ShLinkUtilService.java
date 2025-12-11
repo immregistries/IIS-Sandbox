@@ -24,6 +24,7 @@ import org.immregistries.iis.kernal.persisted.model.IisShLinkContent;
 import org.immregistries.iis.kernal.persisted.model.ShLinkManifest;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.immregistries.iis.kernal.persisted.model.UserAccess;
+import org.immregistries.iis.kernal.persisted.repository.IisShlinkContentRepository;
 import org.immregistries.iis.kernal.persisted.util.HibernateConfig;
 import org.immregistries.iis.kernal.servlet.shlink.ShLinkContentController;
 import org.jetbrains.annotations.NotNull;
@@ -55,7 +56,7 @@ public class ShLinkUtilService {
 	@Autowired
 	private RepositoryClientFactory repositoryClientFactory;
 	@Autowired
-	private IisShLinkContentService iisShLinkContentService;
+	private IisShlinkContentRepository iisShlinkContentRepository;
 	@Autowired
 	private ShCardUtil shCardUtil;
 
@@ -192,7 +193,7 @@ public class ShLinkUtilService {
 			iisShLinkContent.setUserAccess(userAccess);
 			iisShLinkContent.setExp(shLinkPayload.getExp().orElse(10000000L));
 			iisShLinkContent.setContent(encryptedContent);
-			iisShLinkContentService.saveIisShLinkContent(iisShLinkContent);
+			iisShlinkContentRepository.save(iisShLinkContent);
 			builder.replacePath(
 					Application.IIS_PATH_BASE + ShLinkContentController.SHLINK_CONTENT_PATH + "/{contentId}");
 			url = builder
