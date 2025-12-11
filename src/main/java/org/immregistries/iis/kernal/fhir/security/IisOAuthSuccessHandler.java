@@ -1,16 +1,12 @@
 package org.immregistries.iis.kernal.fhir.security;
 
-import org.hibernate.Session;
-
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-
 import org.immregistries.iis.kernal.fhir.Application;
 import org.immregistries.iis.kernal.fhir.interceptors.PartitionTenantCreationInterceptor;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
-import org.immregistries.iis.kernal.persisted.util.HibernateConfig;
 import org.immregistries.iis.kernal.servlet.HomeController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,6 +24,9 @@ public class IisOAuthSuccessHandler implements AuthenticationSuccessHandler {
 
 	@Autowired
 	PartitionTenantCreationInterceptor partitionTenantCreationInterceptor;
+
+	@Autowired
+	TenantUtil tenantUtil;
 
 	// @Override
 	// public void onAuthenticationSuccess(HttpServletRequest request,
@@ -48,7 +47,7 @@ public class IisOAuthSuccessHandler implements AuthenticationSuccessHandler {
 		if (authentication instanceof OAuth2AuthenticationToken) {
 			HttpSession session = request.getSession(true);
 			OAuth2AuthenticationToken oAuth2AuthenticationToken = (OAuth2AuthenticationToken) authentication;
-			tenant = TenantUtil.authenticateTenant(
+			tenant = tenantUtil.authenticateTenant(
 					oAuth2AuthenticationToken.getPrincipal(),
 					UserAccessUtil.GITHUB_PREFIX + oAuth2AuthenticationToken.getPrincipal().getAttribute("login"));
 			session.setAttribute(CurrentTenantUtil.SESSION_REQUEST_TENANT, tenant);

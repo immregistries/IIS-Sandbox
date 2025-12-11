@@ -27,7 +27,6 @@ import ca.uhn.fhir.util.JsonUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
-import org.hibernate.Session;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.instance.model.api.IIdType;
 import org.hl7.fhir.instance.model.api.IPrimitiveType;
@@ -35,7 +34,6 @@ import org.hl7.fhir.r4.model.*;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
 import org.immregistries.iis.kernal.fhir.interceptors.IdentifierSolverInterceptorR4;
 import org.immregistries.iis.kernal.fhir.interceptors.PartitionTenantCreationInterceptor;
-import org.immregistries.iis.kernal.persisted.util.HibernateConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -271,7 +269,7 @@ public class BulkExportGroupProviderR4 extends GroupResourceProvider implements 
 		if (memberId != null) {
 			logger.info("PATIENT ADD identifier {}", memberId.getValue());
 			// String patientId =
-			// identifierSolverInterceptor.solvePatientIdentifier(TenantUtil.requestDetailsWithPartitionName(),
+			// identifierSolverInterceptor.solvePatientIdentifier(TenantUtil.get().requestDetailsWithPartitionName(),
 			// memberId);
 			IBundleProvider iBundleProvider = patientIFhirResourceDao.search(
 					new SearchParameterMap("identifier", new TokenParam(memberId.getValue())), theRequestDetails);

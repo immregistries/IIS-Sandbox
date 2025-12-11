@@ -10,18 +10,16 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.instance.model.api.IBaseBundle;
 import org.hl7.fhir.instance.model.api.IDomainResource;
-
 import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
-import org.immregistries.iis.kernal.logic.IImmunizationRecommendationService;
 import org.immregistries.iis.kernal.mapping.interfaces.PatientMapper;
 import org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester;
 import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
 import org.immregistries.iis.kernal.model.BusinessIdentifier;
 import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
+import org.immregistries.iis.kernal.rest.RecommendationRestController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.immregistries.iis.kernal.rest.RecommendationRestController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -85,7 +83,7 @@ public class RecommendationController {
 
 			if (req.getParameter(PARAM_RECOMMENDATION_RESOURCE) != null) {
 				Tenant tenant = CurrentTenantUtil.getTenantRedirectIfNone(req, resp);
-				recommendationRestController.updateRecommendation(tenant.getOrgId(),
+				recommendationRestController.updateRecommendation(tenant,
 						req.getParameter(PARAM_RECOMMENDATION_RESOURCE), req);
 			}
 		} catch (Exception exception) {

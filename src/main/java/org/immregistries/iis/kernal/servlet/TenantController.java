@@ -5,17 +5,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.constraints.NotBlank;
-import org.hibernate.Session;
-import org.hibernate.query.Query;
 import org.immregistries.iis.kernal.fhir.Application;
-import org.immregistries.iis.kernal.fhir.interceptors.PartitionTenantCreationInterceptor;
-
 import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.fhir.security.TenantUtil;
 import org.immregistries.iis.kernal.fhir.security.UserAccessUtil;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.immregistries.iis.kernal.persisted.model.UserAccess;
-import org.immregistries.iis.kernal.persisted.util.HibernateConfig;
 import org.immregistries.iis.kernal.rest.TenantRestController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -43,6 +38,9 @@ public class TenantController {
 
 	@Autowired
 	TenantRestController tenantRestController;
+	@Autowired
+	TenantUtil tenantUtil;
+
 
 	/**
 	 * Adds a new tenant from form
@@ -57,8 +55,8 @@ public class TenantController {
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp,
 			@RequestParam(name = PARAM_TENANT_NAME) @NotBlank String tenantName)
 			throws ServletException, IOException {
-		UserAccess userAccess = UserAccessUtil.getUserAccess();
-		TenantUtil.authenticateTenant(userAccess, tenantName);
+		UserAccess userAccess = UserAccessUtil.get().getUserAccess();
+		tenantUtil.authenticateTenant(userAccess, tenantName);
 		resp.sendRedirect(Application.IIS_PATH_BASE + TENANT_BASE_PATH + "/" + tenantName + TENANT_BASE_PATH);
 		doGet(req, resp);
 	}
@@ -83,7 +81,7 @@ public class TenantController {
 		String tenantId = req.getParameter(PARAM_TENANT_ID);
 
 		Tenant tenant = CurrentTenantUtil.getTenant(req);
-		UserAccess userAccess = UserAccessUtil.getUserAccess();
+		UserAccess userAccess = UserAccessUtil.get().getUserAccess();
 		if (userAccess != null && session != null) {
 			List<Tenant> tenantList = tenantRestController.getTenants(req);
 			for (Tenant tenantMember : tenantList) {

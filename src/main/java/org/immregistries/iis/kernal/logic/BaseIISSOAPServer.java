@@ -2,7 +2,6 @@ package org.immregistries.iis.kernal.logic;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
-
 import org.immregistries.iis.kernal.fhir.security.TenantUtil;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.immregistries.smm.cdc.*;
@@ -14,9 +13,11 @@ import static org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil.SESSI
 public abstract class BaseIISSOAPServer extends CDCWSDLServer {
 
 	private String tenantName;
+	private TenantUtil tenantUtil;
 
-	protected BaseIISSOAPServer(String tenantNameParameter) {
+	protected BaseIISSOAPServer(String tenantNameParameter, TenantUtil tenantUtil) {
 		this.tenantName = tenantNameParameter;
+		this.tenantUtil = tenantUtil;
 	}
 
 	@Override
@@ -34,9 +35,9 @@ public abstract class BaseIISSOAPServer extends CDCWSDLServer {
 		}
 		Tenant tenant;
 		if (StringUtils.isNotBlank(tenantName)) {
-			tenant = TenantUtil.authenticateTenant(userId, password, tenantName);
+			tenant = tenantUtil.authenticateTenant(userId, password, tenantName);
 		} else {
-			tenant = TenantUtil.authenticateTenant(userId, password, facilityId);
+			tenant = tenantUtil.authenticateTenant(userId, password, facilityId);
 		}
 		if (tenant == null) {
 			throw new SecurityFault("Username/password combination is unrecognized");

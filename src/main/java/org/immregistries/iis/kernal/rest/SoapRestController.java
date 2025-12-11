@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.immregistries.iis.kernal.fhir.interceptors.PartitionTenantCreationInterceptor;
 import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
+import org.immregistries.iis.kernal.fhir.security.TenantUtil;
 import org.immregistries.iis.kernal.logic.BaseIISSOAPServer;
 import org.immregistries.iis.kernal.logic.messageHandling.V2IncomingMessageHandler;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
@@ -31,6 +32,9 @@ public class SoapRestController {
     @Autowired
     private PartitionTenantCreationInterceptor partitionTenantCreationInterceptor;
 
+	@Autowired
+	TenantUtil tenantUtil;
+
     @PostMapping
     protected void doPost(HttpServletRequest req, HttpServletResponse resp,
             @PathVariable(required = false) String tenantId)
@@ -45,7 +49,7 @@ public class SoapRestController {
         }
         String path = req.getPathInfo();
         final String processorName = path == null ? "" : (path.startsWith("/") ? path.substring(1) : path);
-		 CDCWSDLServer server = new BaseIISSOAPServer(tenantName) {
+		 CDCWSDLServer server = new BaseIISSOAPServer(tenantName, tenantUtil) {
             @Override
             public void process(SubmitSingleMessage ssm, PrintWriter out) throws Fault {
                 String message = ssm.getHl7Message();

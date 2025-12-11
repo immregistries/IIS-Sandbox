@@ -21,27 +21,29 @@ public class TenantRestController {
 
     @Autowired
     TenantRepository tenantRepository;
+	@Autowired
+	TenantUtil tenantUtil;
 
     @GetMapping("/{tenantId}")
     public Tenant getTenant(@PathVariable int tenantId) {
-        UserAccess userAccess = UserAccessUtil.getUserAccess();
+		 UserAccess userAccess = UserAccessUtil.get().getUserAccess();
 		 return tenantRepository.findByOrgIdAndUserAccessId(tenantId, userAccess.getUserAccessId())
                 .orElseThrow(() -> new RuntimeException("Tenant not found"));
     }
 
     @GetMapping
     public List<Tenant> getTenants(HttpServletRequest req) {
-        return tenantRepository.findByUserAccessId(UserAccessUtil.getUserAccess().getUserAccessId());
+		 return tenantRepository.findByUserAccessId(UserAccessUtil.get().getUserAccess().getUserAccessId());
     }
 
     @PostMapping
     public Tenant createTenant(@RequestBody Tenant tenant) {
-        UserAccess currentUser = UserAccessUtil.getUserAccess();
+		 UserAccess currentUser = UserAccessUtil.get().getUserAccess();
         if (tenant.getUserAccess() != null && !tenant.getUserAccess().equals(currentUser)) {
             throw new IllegalArgumentException("Tenant UserAccess must be null or match the current user");
         }
         // TODO prevent duplicate tenant creation
-        TenantUtil.authenticateTenant(currentUser, tenant.getOrganizationName());
+		 tenantUtil.authenticateTenant(currentUser, tenant.getOrganizationName());
         tenant.setUserAccess(currentUser);
         tenant = tenantRepository.save(tenant);
         return tenant;

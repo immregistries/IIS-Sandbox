@@ -5,23 +5,21 @@ import ca.uhn.fhir.context.FhirVersionEnum;
 import ca.uhn.fhir.parser.IParser;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import jakarta.servlet.http.HttpServletRequest;
-import org.hibernate.Session;
 import org.hl7.fhir.instance.model.api.IBaseBundle;
 import org.hl7.fhir.instance.model.api.IDomainResource;
-import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
-import org.immregistries.iis.kernal.fhir.security.TenantUtil;
 import org.immregistries.iis.kernal.logic.IImmunizationRecommendationService;
 import org.immregistries.iis.kernal.mapping.interfaces.PatientMapper;
 import org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester;
 import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
 import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
-import org.immregistries.iis.kernal.persisted.util.HibernateConfig;
 import org.immregistries.iis.kernal.servlet.PatientServletUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
+
+import static org.immregistries.iis.kernal.rest.TenantRequestLoggingFilter.TENANT_REQUEST_ATTRIBUTE;
 
 @RestController
 @RequestMapping("/rest/tenant/{tenantId}/recommendation")
@@ -40,7 +38,7 @@ public class RecommendationRestController {
 
     @PostMapping("/random")
     public void addRandomRecommendation(
-            @RequestAttribute(name = TenantRequestLoggingFilter.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
+		 @RequestAttribute(name = TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
             HttpServletRequest req) {
 
         IGenericClient fhirClient = repositoryClientFactory.newGenericClient(req);
@@ -85,14 +83,9 @@ public class RecommendationRestController {
 
     @PutMapping
     public void updateRecommendation(
-            @PathVariable int tenantId,
+		 @RequestAttribute(TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
             @RequestBody String recommendationResource,
             HttpServletRequest req) {
-        Tenant tenant = TenantUtil.getTenantByIdAuthenticated(tenantId);
-        if (tenant == null) {
-            throw new RuntimeException("Access is not authorized");
-        }
-        CurrentTenantUtil.getTenantFromName(tenant.getOrganizationName());
 
         IParser parser = repositoryClientFactory.getFhirContext()
                 .newJsonParser().setPrettyPrint(true).setSummaryMode(false).setSuppressNarratives(true);

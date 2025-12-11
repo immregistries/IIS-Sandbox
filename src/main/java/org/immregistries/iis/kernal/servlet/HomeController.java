@@ -117,7 +117,7 @@ public class HomeController {
 	public static void doFooter(PrintWriter out) {
 		out.println("  </div>");
 		SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
-		UserAccess userAccess = UserAccessUtil.getUserAccess();
+		UserAccess userAccess = UserAccessUtil.get().getUserAccess();
 		if (userAccess != null) {
 			out.println("  <div class=\"w3-container\">");
 			out.println("    <p><a href=\"" + IIS_PATH_BASE + "/logout\">Logout</a></p>");

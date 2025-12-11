@@ -3,13 +3,11 @@ package org.immregistries.iis.kernal.servlet;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.hibernate.Session;
 import org.immregistries.iis.kernal.fhir.security.UserAccessUtil;
 import org.immregistries.iis.kernal.logic.KeyStoreService;
 import org.immregistries.iis.kernal.persisted.model.IisKey;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.immregistries.iis.kernal.persisted.model.UserAccess;
-import org.immregistries.iis.kernal.persisted.util.HibernateConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -40,7 +38,7 @@ public class WellKnownKeyController {
 	protected Set<?> doGetWellKnown(HttpServletRequest req, HttpServletResponse resp,
 			@PathVariable(name = TenantController.PATH_VARIABLE_TENANT_NAME, required = false) String tenantName)
 			throws ServletException, IOException {
-		UserAccess userAccess = UserAccessUtil.getUserAccess();
+		UserAccess userAccess = UserAccessUtil.get().getUserAccess();
 		resp.setContentType("application/json");
 		// Tenant tenant = CurrentTenantUtil.getTenantRedirectIfNone(req, resp,
 		// dataSession);

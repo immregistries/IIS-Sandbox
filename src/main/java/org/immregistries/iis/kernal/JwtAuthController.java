@@ -15,11 +15,9 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
-import org.hibernate.Session;
 import org.immregistries.iis.kernal.fhir.Application;
 import org.immregistries.iis.kernal.fhir.security.UserAccessUtil;
 import org.immregistries.iis.kernal.persisted.model.UserAccess;
-import org.immregistries.iis.kernal.persisted.util.HibernateConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -227,7 +225,7 @@ public class JwtAuthController {
 			}
 		}
 		jwtStore.put((String) signedJWT.getJWTClaimsSet().getClaim("jti"), client_assertion);
-		UserAccess userAccess = UserAccessUtil.authenticateUserAccessUsernamePassword(CONNECTATHON_USER,
+		UserAccess userAccess = UserAccessUtil.get().authenticateUserAccessUsernamePassword(CONNECTATHON_USER,
 				"SundaysR0ck!");
 		Map<String, String> result = new HashMap<>(5);
 		result.put("access_token", jwtUtils.generateJwtToken(userAccess));

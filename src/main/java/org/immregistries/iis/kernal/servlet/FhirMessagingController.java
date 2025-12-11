@@ -8,17 +8,14 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
-import org.hibernate.Session;
 import org.hl7.fhir.r4.model.Bundle;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
-import org.immregistries.iis.kernal.fhir.interceptors.PartitionTenantCreationInterceptor;
-
 import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
+import org.immregistries.iis.kernal.fhir.security.TenantUtil;
 import org.immregistries.iis.kernal.logic.BaseIISSOAPServer;
 import org.immregistries.iis.kernal.logic.messageHandling.FhirMessagingHandler;
 import org.immregistries.iis.kernal.logic.messageHandling.V2IncomingMessageHandler;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
-import org.immregistries.iis.kernal.persisted.util.HibernateConfig;
 import org.immregistries.smm.cdc.CDCWSDLServer;
 import org.immregistries.smm.cdc.Fault;
 import org.immregistries.smm.cdc.SubmitSingleMessage;
@@ -54,7 +51,7 @@ public class FhirMessagingController {
 	FhirContext fhirContext;
 
 	@Autowired
-	private PartitionTenantCreationInterceptor partitionTenantCreationInterceptor;
+	TenantUtil tenantUtil;
 
 	@PostMapping
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
@@ -157,7 +154,7 @@ public class FhirMessagingController {
 
 		String path = req.getPathInfo();
 		final String processorName = path == null ? "" : (path.startsWith("/") ? path.substring(1) : path);
-		CDCWSDLServer server = new BaseIISSOAPServer(tenantName) {
+		CDCWSDLServer server = new BaseIISSOAPServer(tenantName, tenantUtil) {
 			@Override
 			public void process(SubmitSingleMessage ssm, PrintWriter out) throws Fault {
 

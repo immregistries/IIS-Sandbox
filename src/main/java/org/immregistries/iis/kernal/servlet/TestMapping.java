@@ -4,7 +4,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.hibernate.Session;
 import org.hl7.fhir.r5.model.*;
 import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
@@ -16,7 +15,6 @@ import org.immregistries.iis.kernal.mapping.interfaces.*;
 import org.immregistries.iis.kernal.model.ProcessingFlavor;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.immregistries.iis.kernal.persisted.model.UserAccess;
-import org.immregistries.iis.kernal.persisted.util.HibernateConfig;
 import org.immregistries.smm.tester.manager.HL7Reader;
 import org.immregistries.smm.transform.ScenarioManager;
 import org.immregistries.smm.transform.TestCaseMessage;
@@ -99,7 +97,7 @@ public class TestMapping extends HttpServlet {
 
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
-		UserAccess userAccess = UserAccessUtil.getUserAccess();
+		UserAccess userAccess = UserAccessUtil.get().getUserAccess();
 		try {
 			String message = req.getParameter(PARAM_MESSAGE);
 			if (message == null || message.equals("")) {

@@ -12,7 +12,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.auth.AuthenticationException;
-import org.hibernate.Session;
 import org.immregistries.iis.kernal.JwtUtils;
 import org.immregistries.iis.kernal.fhir.security.TenantUtil;
 import org.immregistries.iis.kernal.fhir.security.UserAccessUtil;
@@ -20,7 +19,6 @@ import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.immregistries.iis.kernal.persisted.model.UserAccess;
 import org.immregistries.iis.kernal.persisted.repository.TenantRepository;
 import org.immregistries.iis.kernal.persisted.repository.UserAccessRepository;
-import org.immregistries.iis.kernal.persisted.util.HibernateConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,6 +52,8 @@ public class IisAuthorizationInterceptor extends AuthorizationInterceptor {
 	private UserAccessRepository userAccessRepository;
 	@Autowired
 	private TenantRepository tenantRepository;
+	@Autowired
+	TenantUtil tenantUtil;
 
 	/**
 	 * Authenticates request with Session cookie, Basic Auth (Token bearer currently
@@ -99,12 +99,12 @@ public class IisAuthorizationInterceptor extends AuthorizationInterceptor {
 				 * Cookie SESSIONID
 				 */
 				if (httpSession != null) {
-					UserAccess userAccess = UserAccessUtil.getUserAccess();
+					UserAccess userAccess = UserAccessUtil.get().getUserAccess();
 					/*
 					 * if user authenticated, Tenant/Facility is then selected
 					 */
 					if (userAccess != null) {
-						tenant = TenantUtil.authenticateTenant(userAccess,
+						tenant = tenantUtil.authenticateTenant(userAccess,
 								PartitionTenantCreationInterceptor.extractPartitionName(theRequestDetails));
 					}
 				}
@@ -150,7 +150,7 @@ public class IisAuthorizationInterceptor extends AuthorizationInterceptor {
 			String base64 = authHeader.substring("Basic ".length());
 			String base64decoded = new String(Base64.decodeBase64(base64));
 			String[] parts = base64decoded.split(":");
-			return TenantUtil.authenticateTenant(parts[0], parts[1], tenantName);
+			return tenantUtil.authenticateTenant(parts[0], parts[1], tenantName);
 		} else { // TODO token ?
 			return null;
 		}

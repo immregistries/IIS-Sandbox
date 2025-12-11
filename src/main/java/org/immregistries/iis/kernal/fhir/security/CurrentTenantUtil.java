@@ -3,9 +3,6 @@ package org.immregistries.iis.kernal.fhir.security;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.NotNull;
-
-import java.io.IOException;
-
 import org.apache.commons.lang3.StringUtils;
 import org.immregistries.iis.kernal.fhir.Application;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
@@ -16,6 +13,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+
+import java.io.IOException;
 
 /**
  * static class providing tools related to the Tenent selected using request
@@ -58,8 +57,9 @@ public class CurrentTenantUtil {
 			 * else check if name
 			 */
 			if (urlTenantId > 0) {
-				tenant = TenantUtil.getTenantByIdAuthenticated(urlTenantId);
-				request.setAttribute(SESSION_REQUEST_TENANT, tenant);
+//				tenant = tenantUtil.getTenantByIdAuthenticated(urlTenantId);
+//				request.setAttribute(SESSION_REQUEST_TENANT, tenant);
+				tenant = null; //TODO change
 			} else if (StringUtils.isNotBlank(urlTenantName)) {
 				tenant = getTenantFromName(urlTenantName);
 				request.setAttribute(SESSION_REQUEST_TENANT, tenant);
@@ -78,7 +78,7 @@ public class CurrentTenantUtil {
 			if (authentication instanceof UserAccess) {
 				userAccess = (UserAccess) authentication;
 			}
-			tenant = TenantUtil.authenticateTenant(userAccess, pathVariable);
+			tenant = TenantUtil.get().authenticateTenant(userAccess, pathVariable);
 		}
 		return tenant;
 	}
@@ -87,7 +87,7 @@ public class CurrentTenantUtil {
 			HttpServletResponse resp) throws IOException {
 		Tenant tenant = getTenant(req);
 		if (tenant == null) {
-			if (UserAccessUtil.getUserAccess() != null) {
+			if (UserAccessUtil.get().getUserAccess() != null) {
 				resp.sendRedirect(Application.IIS_PATH_BASE +
 						TenantController.TENANT_BASE_PATH);
 			}

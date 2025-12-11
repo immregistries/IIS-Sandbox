@@ -52,7 +52,7 @@ public class SyntheaController {
 //					result = jsonRecord;
 //					recordCount++;
 //					Bundle bundle = fhirContext.newJsonParser().parseResource(Bundle.class,jsonRecord);
-//					RequestDetails requestDetails = TenantUtil.requestDetailsWithPartitionName();
+//					RequestDetails requestDetails = TenantUtil.get().requestDetailsWithPartitionName();
 //					for (Bundle.BundleEntryComponent entry: bundle.getEntry()) {
 //						if (entry.getResource() instanceof Patient) {
 //							patientIFhirResourceDao.create((Patient) entry.getResource(), requestDetails);
@@ -61,7 +61,7 @@ public class SyntheaController {
 //							immunizationIFhirResourceDao.create((Immunization) entry.getResource(), requestDetails);
 //						}
 //					}
-//					bundleIFhirResourceDao.create(fhirContext.newJsonParser().parseResource(Bundle.class,jsonRecord), TenantUtil.requestDetailsWithPartitionName());
+//					bundleIFhirResourceDao.create(fhirContext.newJsonParser().parseResource(Bundle.class,jsonRecord), TenantUtil.get().requestDetailsWithPartitionName());
 //
 //				} catch (InterruptedException ex) {
 //					break;

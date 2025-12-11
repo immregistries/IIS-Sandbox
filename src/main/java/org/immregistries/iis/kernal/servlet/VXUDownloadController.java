@@ -4,7 +4,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-
 import org.immregistries.iis.kernal.fhir.security.UserAccessUtil;
 import org.immregistries.iis.kernal.persisted.model.UserAccess;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
@@ -34,7 +33,7 @@ public class VXUDownloadController extends VXUDownloadFormController {
 
     resp.setContentType("text/plain");
     PrintWriter out = new PrintWriter(resp.getOutputStream());
-    UserAccess userAccess = UserAccessUtil.getUserAccess();
+		UserAccess userAccess = UserAccessUtil.get().getUserAccess();
    if (userAccess == null) {
 //      RequestDispatcher dispatcher = req.getRequestDispatcher("home");
 //      dispatcher.forward(req, resp);

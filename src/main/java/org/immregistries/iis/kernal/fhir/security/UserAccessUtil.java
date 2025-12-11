@@ -7,17 +7,19 @@ import org.apache.commons.lang3.StringUtils;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.immregistries.iis.kernal.persisted.model.UserAccess;
 import org.immregistries.iis.kernal.persisted.repository.UserAccessRepository;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.util.Optional;
 
-public class UserAccessUtil implements ApplicationContextAware {
+@Service
+public class UserAccessUtil implements InitializingBean {
 
     public static final String GITHUB_PREFIX = "github-";
     public static final String SESSION_USER_ACCESS = "userAccess";
@@ -26,23 +28,22 @@ public class UserAccessUtil implements ApplicationContextAware {
     /**
      * Singleton to access the application context for the repositories
      */
-    private static ApplicationContext ac;
+	 private static UserAccessUtil instance;
 
-    private static UserAccessRepository userAccessRepository;
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		instance = this;
+	}
 
-    @Override
-    public void setApplicationContext(ApplicationContext ac) {
-        UserAccessUtil.ac = ac;
-    }
+	public static UserAccessUtil get() {
+		return instance;
+	}
 
-    public static UserAccessRepository getUserAccessRepository() {
-        if (userAccessRepository == null) {
-            userAccessRepository = ac.getBean(UserAccessRepository.class);
-        }
-        return userAccessRepository;
-    }
+	@Autowired
+	private UserAccessRepository userAccessRepository;
 
-    public static UserAccess authenticateUserAccessUsernamePassword(String username, String password) {
+
+	public UserAccess authenticateUserAccessUsernamePassword(String username, String password) {
         if (username.startsWith(GITHUB_PREFIX) || StringUtils.isBlank(password)) {
             throw new AuthenticationException();
         }
@@ -51,7 +52,7 @@ public class UserAccessUtil implements ApplicationContextAware {
         }
 		 UserAccess userAccess = null;
 
-		 Optional<UserAccess> optionalUserAccess = getUserAccessRepository().findByAccessName(getUserAccess().getAccessName());
+		Optional<UserAccess> optionalUserAccess = userAccessRepository.findByAccessName(username);
 		 if (optionalUserAccess.isEmpty()) {
 			 userAccess = registerUserAccessWithUsernamePassword(username, password);
 		 } else {
@@ -67,11 +68,11 @@ public class UserAccessUtil implements ApplicationContextAware {
         return userAccess;
     }
 
-    public static UserAccess authenticateUserAccessOAuth(OAuth2User oAuth2User) {
+	public UserAccess authenticateUserAccessOAuth(OAuth2User oAuth2User) {
         String username = GITHUB_PREFIX + oAuth2User.getAttribute("login");
         UserAccess userAccess = null;
 
-		 Optional<UserAccess> optionalUserAccess = getUserAccessRepository().findByAccessName(getUserAccess().getAccessName());
+		Optional<UserAccess> optionalUserAccess = userAccessRepository.findByAccessName(getUserAccess().getAccessName());
 		 if (optionalUserAccess.isEmpty()) {
             /**
              * Registration
@@ -87,17 +88,17 @@ public class UserAccessUtil implements ApplicationContextAware {
         return userAccess;
     }
 
-    private static UserAccess registerUserAccessGithub(String username) {
+	private UserAccess registerUserAccessGithub(String username) {
         if (!username.startsWith(GITHUB_PREFIX)) {
             throw new AuthenticationException();
         }
         UserAccess userAccess = new UserAccess();
         userAccess.setAccessName(username);
         userAccess.setAccessKey("");
-        return getUserAccessRepository().save(userAccess);
+		return userAccessRepository.save(userAccess);
     }
 
-    private static UserAccess registerUserAccessWithUsernamePassword(String username, String password) {
+	private UserAccess registerUserAccessWithUsernamePassword(String username, String password) {
         if (username.startsWith(GITHUB_PREFIX)) {
             throw new AuthenticationException();
         }
@@ -106,7 +107,7 @@ public class UserAccessUtil implements ApplicationContextAware {
         // userAccess.setAccessKey(BCrypt.hashpw(password, BCrypt.gensalt(5))); TODO
         // after auth checks fix in fhir
         userAccess.setAccessKey(password);
-        return getUserAccessRepository().save(userAccess);
+		return userAccessRepository.save(userAccess);
     }
 
     /**
@@ -115,7 +116,7 @@ public class UserAccessUtil implements ApplicationContextAware {
      *
      * @return
      */
-    public static UserAccess getUserAccess() {
+	 public UserAccess getUserAccess() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication instanceof UserAccess) {
             return (UserAccess) authentication;

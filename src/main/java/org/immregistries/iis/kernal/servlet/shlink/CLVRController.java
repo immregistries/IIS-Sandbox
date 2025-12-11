@@ -8,7 +8,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.hl7.fhir.instance.model.api.IBaseBundle;
-import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.IdType;
 import org.immregistries.iis.kernal.fhir.ips.IpsGeneratorSvcIIS;
 import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
@@ -73,13 +72,13 @@ public class CLVRController {
 			throws COSEException, IOException, SignatureException, NoSuchAlgorithmException, InvalidKeyException,
 			NoSuchProviderException, ServletException, WriterException {
 		Tenant tenant = CurrentTenantUtil.getTenantRedirectIfNone(req, resp);
-		UserAccess userAccess = UserAccessUtil.getUserAccess();
+		UserAccess userAccess = UserAccessUtil.get().getUserAccess();
 		OutputStream outputStream = resp.getOutputStream();
 
 		IisKey iisSigningKey = keyStoreService.getIisSigningKeyOrCreate("", userAccess, tenant);
 
 		IBaseBundle ipsToBeEncoded = ipsGeneratorSvcIIS
-				.generateIps(TenantUtil.requestDetailsWithPartitionName(), new IdType(patientId), "");
+			.generateIps(TenantUtil.get().requestDetailsWithPartitionName(), new IdType(patientId), "");
 		CLVRPayload clvrPayload = fhirConversionUtil.toCLVRPayloadFromBundle(ipsToBeEncoded);
 
 		CLVRToken clvrToken = new CLVRToken(clvrPayload, "IIS");

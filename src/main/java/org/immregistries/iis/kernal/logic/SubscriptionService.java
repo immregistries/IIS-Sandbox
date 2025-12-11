@@ -14,7 +14,6 @@ import org.hl7.fhir.instance.model.api.IBaseParameters;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.instance.model.api.IPrimitiveType;
 import org.hl7.fhir.r5.model.*;
-
 import org.immregistries.iis.kernal.fhir.security.TenantUtil;
 import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
@@ -84,7 +83,7 @@ public class SubscriptionService {
 	// }
 	public String triggerWithResource(Subscription subscription, List<Pair<String, Bundle.HTTPVerb>> requests,
 			Tenant tenant) {
-		RequestDetails requestDetails = TenantUtil.requestDetailsWithPartitionName();
+		RequestDetails requestDetails = TenantUtil.get().requestDetailsWithPartitionName();
 		List<IPrimitiveType<String>> urls = List.of(new StringType("Patient?name=ulysse"));
 		IBaseParameters iBaseParameters = subscriptionTriggeringProvider.triggerSubscription(requestDetails,
 				subscription.getIdElement(), null, urls);

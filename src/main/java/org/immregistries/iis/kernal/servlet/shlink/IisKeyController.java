@@ -4,7 +4,6 @@ import com.nimbusds.jose.jwk.JWK;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.hibernate.Session;
 import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.fhir.security.TenantUtil;
 import org.immregistries.iis.kernal.fhir.security.UserAccessUtil;
@@ -12,7 +11,6 @@ import org.immregistries.iis.kernal.logic.KeyStoreService;
 import org.immregistries.iis.kernal.persisted.model.IisKey;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.immregistries.iis.kernal.persisted.model.UserAccess;
-import org.immregistries.iis.kernal.persisted.util.HibernateConfig;
 import org.immregistries.iis.kernal.servlet.HomeController;
 import org.immregistries.iis.kernal.servlet.TenantController;
 import org.immregistries.iis.kernal.servlet.WellKnownKeyController;
@@ -56,7 +54,7 @@ public class IisKeyController {
 	 */
 	protected List<JWK> doGetWellKnown(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
-		UserAccess userAccess = UserAccessUtil.getUserAccess();
+		UserAccess userAccess = UserAccessUtil.get().getUserAccess();
 		resp.setContentType("application/json");
 		// Tenant tenant = CurrentTenantUtil.getTenantRedirectIfNone(req, resp);
 		List<IisKey> iisKeys = keyStoreService.getKeys(userAccess);
@@ -65,7 +63,7 @@ public class IisKeyController {
 
 	@GetMapping
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		UserAccess userAccess = UserAccessUtil.getUserAccess();
+		UserAccess userAccess = UserAccessUtil.get().getUserAccess();
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		try {

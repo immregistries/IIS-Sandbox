@@ -16,8 +16,6 @@ import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.IdType;
-
-import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.fhir.security.TenantUtil;
 import org.immregistries.iis.kernal.mapping.interfaces.*;
 import org.immregistries.iis.kernal.model.PatientMaster;
@@ -135,7 +133,7 @@ public abstract class AbstractFhirRequester<Patient extends IBaseResource, Immun
 		}
 		DaoMethodOutcome outcome;
 		if (createOnly) {
-			return dao.create(resource, TenantUtil.requestDetailsWithPartitionName());
+			return dao.create(resource, TenantUtil.get().requestDetailsWithPartitionName());
 		} else
 			try {
 				// IUpdateTyped updateTyped =
@@ -149,12 +147,12 @@ public abstract class AbstractFhirRequester<Patient extends IBaseResource, Immun
 				// updateWithQueryTyped = updateWithQueryTyped.and(where[i]);
 				// }
 				// return updateWithQueryTyped.execute();
-				return dao.update(resource, params, TenantUtil.requestDetailsWithPartitionName());
+				return dao.update(resource, params, TenantUtil.get().requestDetailsWithPartitionName());
 			} catch (InvalidRequestException invalidRequestException) {
-				return dao.create(resource, TenantUtil.requestDetailsWithPartitionName());
+				return dao.create(resource, TenantUtil.get().requestDetailsWithPartitionName());
 			}
 		// catch (JdbcBatchUpdateException jdbcBatchUpdateException) {
-		// return dao.create(resource, TenantUtil.requestDetailsWithPartitionName());
+		// return dao.create(resource, TenantUtil.get().requestDetailsWithPartitionName());
 		// }
 	}
 
@@ -166,7 +164,7 @@ public abstract class AbstractFhirRequester<Patient extends IBaseResource, Immun
 	 */
 	public IBaseResource read(Class<? extends IBaseResource> aClass, String id) {
 		IFhirResourceDao dao = daoRegistry.getResourceDao(aClass);
-		return dao.read(new IdType(id), TenantUtil.requestDetailsWithPartitionName());
+		return dao.read(new IdType(id), TenantUtil.get().requestDetailsWithPartitionName());
 	}
 
 	/**
@@ -218,7 +216,7 @@ public abstract class AbstractFhirRequester<Patient extends IBaseResource, Immun
 				new TokenParam(GOLDEN_SYSTEM_TAG, GOLDEN_RECORD).setModifier(TokenParamModifier.NOT));
 		return search(aClass, searchParameterMap);
 		// return dao.search(searchParameterMap,
-		// TenantUtil.requestDetailsWithPartitionName());
+		// TenantUtil.get().requestDetailsWithPartitionName());
 		// IGenericClient fhirClient = repositoryClientFactory.getFhirClient();
 		// try {
 		// IQuery<IBaseBundle> query = fhirClient.search().forResource(aClass);
@@ -244,7 +242,7 @@ public abstract class AbstractFhirRequester<Patient extends IBaseResource, Immun
 	 */
 	IBundleProvider search(Class<? extends IBaseResource> aClass, SearchParameterMap searchParameterMap) {
 		return daoRegistry.getResourceDao(aClass).search(searchParameterMap,
-				TenantUtil.requestDetailsWithPartitionName());
+			TenantUtil.get().requestDetailsWithPartitionName());
 		// IGenericClient fhirClient = repositoryClientFactory.getFhirClient();
 		// try {
 		// IQuery<IBaseBundle> query = fhirClient.search().forResource(aClass);

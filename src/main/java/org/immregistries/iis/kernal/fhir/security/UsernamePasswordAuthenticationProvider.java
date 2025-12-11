@@ -2,11 +2,8 @@ package org.immregistries.iis.kernal.fhir.security;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
-import org.hibernate.Session;
-import org.immregistries.iis.kernal.fhir.interceptors.PartitionTenantCreationInterceptor;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.immregistries.iis.kernal.persisted.model.UserAccess;
-import org.immregistries.iis.kernal.persisted.util.HibernateConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +33,8 @@ public class UsernamePasswordAuthenticationProvider implements AuthenticationPro
 	private OAuth2AuthorizedClientRepository authorizedClientRepository;
 	@Autowired
 	private ClientRegistrationRepository clientRegistrationRepository;
+	@Autowired
+	TenantUtil tenantUtil;
 
 	public Authentication authenticate(Authentication authentication) throws AuthenticationException {
 		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
@@ -45,7 +44,7 @@ public class UsernamePasswordAuthenticationProvider implements AuthenticationPro
 		// userAccess/tenant as principal
 		// https://www.baeldung.com/spring-security-oauth-principal-authorities-extractor
 		if (StringUtils.isNotBlank(request.getParameter(LOGIN_PARAM_TENANT_NAME))) {
-			Tenant tenant = TenantUtil.authenticateTenant(authentication.getName(),
+			Tenant tenant = tenantUtil.authenticateTenant(authentication.getName(),
 					(String) authentication.getCredentials(), request.getParameter(LOGIN_PARAM_TENANT_NAME));
 			if (tenant != null) {
 				/**
@@ -57,7 +56,7 @@ public class UsernamePasswordAuthenticationProvider implements AuthenticationPro
 				return null;
 			}
 		} else {
-			UserAccess userAccess = UserAccessUtil.authenticateUserAccessUsernamePassword(authentication.getName(),
+			UserAccess userAccess = UserAccessUtil.get().authenticateUserAccessUsernamePassword(authentication.getName(),
 					(String) authentication.getCredentials());
 			request.getSession(true).setAttribute(UserAccessUtil.SESSION_USER_ACCESS, userAccess);
 			return userAccess;

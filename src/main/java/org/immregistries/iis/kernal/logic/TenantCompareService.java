@@ -9,7 +9,6 @@ import ca.uhn.fhir.rest.api.server.IBundleProvider;
 import ca.uhn.fhir.rest.api.server.SystemRequestDetails;
 import ca.uhn.fhir.rest.param.TokenParam;
 import ca.uhn.fhir.rest.param.TokenParamModifier;
-import org.hibernate.Session;
 import org.hl7.fhir.instance.model.api.IBaseParameters;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.BooleanType;
@@ -22,7 +21,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -44,12 +42,15 @@ public class TenantCompareService {
     private DaoRegistry daoRegistry;
     @Autowired
     private FhirContext fhirContext;
+	@Autowired
+	TenantUtil tenantUtil;
 
-    @SuppressWarnings("rawtypes")
+
+	@SuppressWarnings("rawtypes")
     public List<IBaseParameters> compareTenants(String[] tenantNames, UserAccess userAccess,
             boolean includeGolden) {
         List<Tenant> tenantList = Arrays.stream(tenantNames).distinct()
-                .map(tenantName -> TenantUtil.authenticateTenant(userAccess, tenantName))
+			  .map(tenantName -> tenantUtil.authenticateTenant(userAccess, tenantName))
                 .collect(Collectors.toList());
 
         List<SystemRequestDetails> systemRequestDetailsList = tenantList.stream().map(tenant -> {

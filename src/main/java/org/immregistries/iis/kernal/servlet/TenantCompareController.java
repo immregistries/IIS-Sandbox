@@ -1,29 +1,21 @@
 package org.immregistries.iis.kernal.servlet;
 
+import ca.uhn.fhir.context.FhirContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.NotBlank;
-
 import org.apache.commons.lang3.StringUtils;
-import org.hibernate.Session;
 import org.hl7.fhir.instance.model.api.IBaseParameters;
 import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.fhir.security.UserAccessUtil;
 import org.immregistries.iis.kernal.logic.TenantCompareService;
 import org.immregistries.iis.kernal.persisted.model.UserAccess;
-import org.immregistries.iis.kernal.persisted.util.HibernateConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
-import ca.uhn.fhir.context.FhirContext;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -70,7 +62,7 @@ public class TenantCompareController {
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		HomeController.doHeader(out, "Tenant Comparison", CurrentTenantUtil.getTenant(req));
 		try {
-			UserAccess userAccess = UserAccessUtil.getUserAccess();
+			UserAccess userAccess = UserAccessUtil.get().getUserAccess();
 			if (userAccess == null) {
 				throw new AuthenticationCredentialsNotFoundException("");
 			}

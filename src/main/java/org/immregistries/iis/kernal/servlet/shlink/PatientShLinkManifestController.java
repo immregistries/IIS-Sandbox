@@ -6,10 +6,8 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
-import org.hibernate.Session;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.immregistries.iis.kernal.fhir.interceptors.PartitionTenantCreationInterceptor;
-
 import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.fhir.security.TenantUtil;
 import org.immregistries.iis.kernal.logic.shlink.ShLinkUtilService;
@@ -19,7 +17,6 @@ import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFacto
 import org.immregistries.iis.kernal.model.ShLinkManifestRequestBody;
 import org.immregistries.iis.kernal.persisted.model.ShLinkManifest;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
-import org.immregistries.iis.kernal.persisted.util.HibernateConfig;
 import org.immregistries.iis.kernal.servlet.TenantController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,6 +50,9 @@ public class PatientShLinkManifestController {
 	private PatientMapper patientMapper;
 	@Autowired
 	private PartitionTenantCreationInterceptor partitionTenantCreationInterceptor;
+	@Autowired
+	private TenantUtil tenantUtil;
+
 
 	@PostMapping({ PATIENT_BASE_PATH, PATIENT_BASE_PATH + "/{id}" })
 	protected ShLinkManifest postPatientShLinkManifest(HttpServletRequest req, HttpServletResponse resp,
@@ -63,7 +63,7 @@ public class PatientShLinkManifestController {
 		resp.setContentType("application/json");
 		Tenant tenant = null;
 		if (StringUtils.isNotBlank(passcode)) {
-			tenant = TenantUtil.authenticateTenantNoUsername(passcode, tenantName);
+			tenant = tenantUtil.authenticateTenantNoUsername(passcode, tenantName);
 		}
 		if (tenant == null) {
 			throw new AuthenticationCredentialsNotFoundException("No tenant found or invalid passcode");
