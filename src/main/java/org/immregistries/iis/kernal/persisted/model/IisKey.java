@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.KeyType;
+import jakarta.persistence.*;
 import org.apache.commons.lang3.StringUtils;
 
 import java.security.KeyPair;
@@ -13,10 +14,19 @@ import java.text.ParseException;
 /**
  * Persisting generated key for smart health links and cards
  */
+@Entity
+@Table
 public class IisKey {
 
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	@Column(name = "id")
 	private int id;
+
 	private String keyId;
+	@JsonIgnore
+	@ManyToOne
 	private UserAccess userAccess;
 	private String keyString;
 

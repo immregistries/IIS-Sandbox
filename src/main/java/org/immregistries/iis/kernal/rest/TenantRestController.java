@@ -1,16 +1,12 @@
 package org.immregistries.iis.kernal.rest;
 
 import jakarta.servlet.http.HttpServletRequest;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
-import org.hibernate.query.Query;
 import org.immregistries.iis.kernal.fhir.interceptors.PartitionTenantCreationInterceptor;
 import org.immregistries.iis.kernal.fhir.security.TenantUtil;
 import org.immregistries.iis.kernal.fhir.security.UserAccessUtil;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.immregistries.iis.kernal.persisted.model.UserAccess;
 import org.immregistries.iis.kernal.persisted.repository.TenantRepository;
-import org.immregistries.iis.kernal.persisted.util.HibernateConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,7 +25,7 @@ public class TenantRestController {
     @GetMapping("/{tenantId}")
     public Tenant getTenant(@PathVariable int tenantId) {
         UserAccess userAccess = UserAccessUtil.getUserAccess();
-        return tenantRepository.findByIdAndUserAccessId(tenantId, userAccess.getUserAccessId())
+		 return tenantRepository.findByOrgIdAndUserAccessId(tenantId, userAccess.getUserAccessId())
                 .orElseThrow(() -> new RuntimeException("Tenant not found"));
     }
 

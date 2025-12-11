@@ -5,9 +5,7 @@ import ca.uhn.fhir.jpa.partition.IPartitionLookupSvc;
 import ca.uhn.fhir.rest.api.server.RequestDetails;
 import ca.uhn.fhir.rest.api.server.SystemRequestDetails;
 import ca.uhn.fhir.rest.server.exceptions.AuthenticationException;
-import jakarta.persistence.TypedQuery;
 import org.apache.commons.lang3.StringUtils;
-import org.hibernate.Session;
 import org.immregistries.iis.kernal.fhir.Application;
 import org.immregistries.iis.kernal.fhir.interceptors.PartitionTenantCreationInterceptor;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
@@ -15,6 +13,7 @@ import org.immregistries.iis.kernal.persisted.model.UserAccess;
 import org.immregistries.iis.kernal.persisted.repository.TenantRepository;
 import org.immregistries.iis.kernal.servlet.TenantController;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -36,12 +35,16 @@ public class TenantUtil implements ApplicationContextAware {
     private static PartitionTenantCreationInterceptor partitionTenantCreationInterceptor;
 
     @Override
+	 @Autowired
     public void setApplicationContext(ApplicationContext ac) {
         TenantUtil.ac = ac;
     }
 
     public static IPartitionLookupSvc getPartitionLookupSvc() {
         if (partitionLookupSvc == null) {
+			  if (ac == null) {
+
+			  }
             partitionLookupSvc = ac.getBean(IPartitionLookupSvc.class);
         }
         return partitionLookupSvc;
@@ -194,7 +197,7 @@ public class TenantUtil implements ApplicationContextAware {
 
     public static Tenant getTenantByIdAuthenticated(int tenantId) {
         UserAccess userAccess = UserAccessUtil.getUserAccess();
-        Tenant tenant = getTenantRepository().findByIdAndUserAccessId(tenantId, userAccess.getUserAccessId())
+		 Tenant tenant = getTenantRepository().findByOrgIdAndUserAccessId(tenantId, userAccess.getUserAccessId())
                 .orElse(null);
         return tenant;
     }

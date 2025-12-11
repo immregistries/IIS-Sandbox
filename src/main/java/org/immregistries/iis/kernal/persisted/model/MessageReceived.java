@@ -1,15 +1,27 @@
 package org.immregistries.iis.kernal.persisted.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
+
 import java.io.Serializable;
 import java.util.Date;
 
+@Entity
+@Table
 public class MessageReceived implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
   private int messageReceivedId = 0;
+
+	@JsonIgnore
+	@ManyToOne
   private Tenant tenant = null;
+	@Column(columnDefinition = "TEXT")
   private String messageRequest = "";
+	@Column(columnDefinition = "TEXT")
   private String messageResponse = "";
   private String patientReportedId = null;
   private Date reportedDate = null;

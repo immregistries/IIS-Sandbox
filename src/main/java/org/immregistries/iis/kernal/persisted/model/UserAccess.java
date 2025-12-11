@@ -1,5 +1,6 @@
 package org.immregistries.iis.kernal.persisted.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -15,8 +16,8 @@ import java.util.Collection;
 /**
  * TODO Improve integration with spring security, especially grantedAuthority
  */
-@Entity(name = "UserAccess")
-@Table(schema = "UserAccess", name = "UserAccess")
+@Entity
+@Table
 public class UserAccess implements Serializable, Authentication {
 
 	@Id
@@ -27,6 +28,7 @@ public class UserAccess implements Serializable, Authentication {
 	private String accessName = "";
 
 	@Column(nullable = false)
+	@JsonIgnore
 	private String accessKey = "";
 
 	public int getUserAccessId() {

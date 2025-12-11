@@ -22,7 +22,7 @@ import java.util.HashMap;
 @Configuration
 // @PropertySource({"application.properties"})
 @EntityScan("org.immregistries.iis.kernal.persisted.model")
-@EnableJpaRepositories(basePackages = "org.immregistries.iis.kernal.persisted.model", entityManagerFactoryRef = "iisLocalEntityManager", transactionManagerRef = "iisLocalTransactionManager")
+@EnableJpaRepositories(basePackages = "org.immregistries.iis.kernal.persisted.repository", entityManagerFactoryRef = "iisLocalEntityManager", transactionManagerRef = "iisLocalTransactionManager")
 public class SecondDatabaseConfiguration {
 	@Autowired
 	private Environment env;
@@ -45,7 +45,7 @@ public class SecondDatabaseConfiguration {
 		LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
 		em.setDataSource(dataSource);
 		em.setPackagesToScan(
-				new String[] { "org.immregistries.iis.kernal.model.persisted" });
+			new String[]{"org.immregistries.iis.kernal.persisted.model", "org.immregistries.iis.kernal.persisted.repository"});
 
 		HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
 		em.setJpaVendorAdapter(vendorAdapter);

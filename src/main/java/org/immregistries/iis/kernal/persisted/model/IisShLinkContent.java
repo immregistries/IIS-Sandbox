@@ -1,12 +1,19 @@
 package org.immregistries.iis.kernal.persisted.model;
 
+import jakarta.persistence.*;
+
 /**
  * Persisting generated key for smart health links and cards
  */
+@Entity
+@Table
 public class IisShLinkContent {
 
+	@Id
 	private int id;
+	@ManyToOne
 	private UserAccess userAccess;
+	@Column(columnDefinition = "TEXT")
 	private String content;
 	private Long exp;
 

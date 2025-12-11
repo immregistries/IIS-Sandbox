@@ -9,11 +9,12 @@ import java.io.Serializable;
 import java.util.Set;
 
 @Entity
-@Table(schema = "tenants")
+@Table
 public class Tenant extends AbstractMappedObject implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
+	@Column(name = "id")
 	private int orgId = 0;
 
 	@JsonIgnore

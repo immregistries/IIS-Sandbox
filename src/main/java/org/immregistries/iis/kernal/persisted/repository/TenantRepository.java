@@ -9,7 +9,7 @@ import java.util.Optional;
 public interface TenantRepository extends JpaRepository<Tenant, Integer> {
 	List<Tenant> findByUserAccessId(Integer i);
 
-	Optional<Tenant> findByIdAndUserAccessId(Integer i, Integer userAccessId);
+	Optional<Tenant> findByOrgIdAndUserAccessId(Integer orgId, Integer userAccessId);
 
 	Optional<Tenant> findByOrganizationNameAndUserAccessId(String organizationName, Integer userAccessId);
 
