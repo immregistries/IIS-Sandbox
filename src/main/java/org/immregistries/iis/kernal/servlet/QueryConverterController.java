@@ -3,7 +3,6 @@ package org.immregistries.iis.kernal.servlet;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.hibernate.SessionFactory;
 import org.immregistries.iis.kernal.servlet.util.UiUtil;
 import org.immregistries.smm.tester.manager.query.QueryConverter;
 import org.immregistries.smm.tester.manager.query.QueryType;
@@ -25,8 +24,6 @@ public class QueryConverterController {
 
   public static final String PARAM_MESSAGE = "MESSAGEDATA";
   public static final String QUERY_TYPE = "queryType";
-
-  private static SessionFactory factory;
 
   @PostMapping
   protected void doPost(HttpServletRequest req, HttpServletResponse resp)

@@ -17,6 +17,7 @@ import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFacto
 import org.immregistries.iis.kernal.model.BusinessIdentifier;
 import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
+import org.immregistries.iis.kernal.rest.PatientRestController;
 import org.immregistries.iis.kernal.rest.RecommendationRestController;
 import org.immregistries.iis.kernal.servlet.util.PatientServletUtil;
 import org.immregistries.iis.kernal.servlet.util.UiUtil;
@@ -51,6 +52,8 @@ public class RecommendationController {
 	private PatientMapper patientMapper;
 	@Autowired
 	private RecommendationRestController recommendationRestController;
+	@Autowired
+	private PatientRestController patientRestController;
 
 	/**
 	 * Used to add a random generated component to recommendation
