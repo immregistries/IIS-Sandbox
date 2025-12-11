@@ -12,7 +12,6 @@ import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.instance.model.api.IDomainResource;
 import org.hl7.fhir.r5.model.Bundle;
 import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
-import org.immregistries.iis.kernal.fhir.security.TenantUtil;
 import org.immregistries.iis.kernal.fhir.shl.ShLinkPayload;
 import org.immregistries.iis.kernal.logic.shlink.ShLinkUtilService;
 import org.immregistries.iis.kernal.mapping.interfaces.PatientMapper;
@@ -184,7 +183,7 @@ public class PatientController {
 			ShLinkPayload shLinkPayload) {
 		out.println("<div class=\"w3-container\">");
 		out.println("<img src=\""
-				+ TenantUtil.tenantifyPathWithContextPath(tenant,
+			+ UrlTenantUtil.tenantifyPathWithContextPath(tenant,
 						"/patient/qr?id=" + patientMasterSelected.getPatientId())
 				+ "\"  alt=\"shlink\" width=\"200\">");
 		out.println("<div><a href= \"" + shLinkPayload.getUrl() + "\">Manifest URL</a></div>");
@@ -196,13 +195,13 @@ public class PatientController {
 		out.println("</div>");
 		out.println("</div>");
 		out.println("<div><a href= \"" +
-				TenantUtil.tenantifyPathWithContextPath(tenant,
+			UrlTenantUtil.tenantifyPathWithContextPath(tenant,
 						ShLinkController.SHLINK_CONTROLLER_BASE_PATH + "?" + ShLinkController.PARAM_PATIENT_ID + "="
 								+ patientMasterSelected.getPatientId())
 				+
 				"\">Generate a new Smart Health Link with IPS</a></div>");
 		out.println("<div><a href= \"" +
-				TenantUtil.tenantifyPathWithContextPath(tenant,
+			UrlTenantUtil.tenantifyPathWithContextPath(tenant,
 						CLVRController.CLVR_PATH_SUFFIX + "/" + patientMasterSelected.getPatientId())
 				+
 				"?pdf=true\">Generate a EVC with IPS</a></div>");

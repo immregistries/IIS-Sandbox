@@ -5,7 +5,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
-import org.immregistries.iis.kernal.fhir.security.TenantUtil;
 import org.immregistries.iis.kernal.fhir.security.UserAccessUtil;
 import org.immregistries.iis.kernal.logic.KeyStoreService;
 import org.immregistries.iis.kernal.persisted.model.IisKey;
@@ -13,6 +12,7 @@ import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.immregistries.iis.kernal.persisted.model.UserAccess;
 import org.immregistries.iis.kernal.servlet.HomeController;
 import org.immregistries.iis.kernal.servlet.TenantController;
+import org.immregistries.iis.kernal.servlet.UrlTenantUtil;
 import org.immregistries.iis.kernal.servlet.WellKnownKeyController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -90,7 +90,7 @@ public class IisKeyController {
 
 	protected static void printIisKeys(PrintWriter out, List<IisKey> iisKeys, Tenant tenant) {
 		out.println("<a href=\""
-				+ TenantUtil.tenantifyPathWithContextPath(tenant, WellKnownKeyController.WELL_KNOWN_PATH_SUFFIX)
+			+ UrlTenantUtil.tenantifyPathWithContextPath(tenant, WellKnownKeyController.WELL_KNOWN_PATH_SUFFIX)
 				+ "\">well-known</a>");
 
 		if (iisKeys.isEmpty()) {

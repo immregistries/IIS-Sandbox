@@ -10,7 +10,6 @@ import org.hl7.fhir.r5.model.Bundle;
 import org.hl7.fhir.r5.model.Subscription;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR5Condition;
 import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
-import org.immregistries.iis.kernal.fhir.security.TenantUtil;
 import org.immregistries.iis.kernal.logic.SubscriptionService;
 import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
@@ -264,7 +263,7 @@ public class SubscriptionController {
 					}
 					String baseLink = "subscription?" + PARAM_SUBSCRIPTION_ID + "="
 							+ subscription.getIdentifierFirstRep().getValue(); // TODO or id
-					String linkWithTenantBase = TenantUtil.tenantifyPathWithContextPath(tenant, baseLink); // TODO or id
+					String linkWithTenantBase = UrlTenantUtil.tenantifyPathWithContextPath(tenant, baseLink); // TODO or id
 					out.println("  <tr>");
 					out.println("    <td><a href=\"" + linkWithTenantBase + "\">"
 							+ subscription.getName() + "</a></td>");

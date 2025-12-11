@@ -4,10 +4,13 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
-import org.immregistries.iis.kernal.fhir.security.TenantUtil;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
-import org.immregistries.smm.cdc.*;
-import org.springframework.web.bind.annotation.*;
+import org.immregistries.smm.cdc.CDCWSDLServer;
+import org.immregistries.smm.cdc.ProcessorFactory;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -49,7 +52,7 @@ public class SoapController {
 				out.println("</p>");
 				out.println("<h2>Usage Instructions</h2>");
 				out.println("<h3>WSDL</h3>");
-				out.println("<p><a href=\"" + TenantUtil.tenantifyPathWithContextPath(tenant, "soap")
+				out.println("<p><a href=\"" + UrlTenantUtil.tenantifyPathWithContextPath(tenant, "soap")
 						+ "\">See WSDL</a></p>");
 				out.println("<h3>Authentication</h3>");
 				out.println(

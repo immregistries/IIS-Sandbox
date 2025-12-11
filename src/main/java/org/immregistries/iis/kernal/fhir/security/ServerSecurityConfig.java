@@ -123,7 +123,7 @@ public class ServerSecurityConfig {
 	}
 
 	private void addTenantifiedRequestMatcher(List<RequestMatcher> matchers, String pathSuffix) {
-		String tenantified = TenantUtil.securityConfigUrl(pathSuffix);
+		String tenantified = UrlTenantUtil.securityConfigUrl(pathSuffix);
 		matchers.add(new AntPathRequestMatcher(pathSuffix));
 		matchers.add(new AntPathRequestMatcher(tenantified));
 	}

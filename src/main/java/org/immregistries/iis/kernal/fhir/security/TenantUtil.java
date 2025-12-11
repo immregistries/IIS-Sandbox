@@ -6,13 +6,10 @@ import ca.uhn.fhir.rest.api.server.RequestDetails;
 import ca.uhn.fhir.rest.api.server.SystemRequestDetails;
 import ca.uhn.fhir.rest.server.exceptions.AuthenticationException;
 import org.apache.commons.lang3.StringUtils;
-import org.immregistries.iis.kernal.fhir.Application;
 import org.immregistries.iis.kernal.fhir.interceptors.PartitionTenantCreationInterceptor;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.immregistries.iis.kernal.persisted.model.UserAccess;
 import org.immregistries.iis.kernal.persisted.repository.TenantRepository;
-import org.immregistries.iis.kernal.servlet.TenantController;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -26,171 +23,118 @@ import java.util.Optional;
 @Service
 public class TenantUtil implements InitializingBean {
 
+	public static final List<String> FORBIDDEN_NAMES = List.of("pop", "iis", "home", "patient", "vaccination", "fhir",
+		"tenant", "facility", "tenant");
 	/**
 	 * Needs to be statically accessible in Tenant Context
 	 */
 	private static TenantUtil instance;
+	@Autowired
+	private TenantRepository tenantRepository;
+	@Autowired
+	private PartitionTenantCreationInterceptor partitionTenantCreationInterceptor;
+	@Autowired
+	private IPartitionLookupSvc partitionLookupSvc;
+
+	public static TenantUtil get() {
+		return instance;
+	}
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		instance = this;
 	}
 
-	public static TenantUtil get() {
-		return instance;
-	}
-
-	 @Autowired
-	 private TenantRepository tenantRepository;
-	@Autowired
-	private PartitionTenantCreationInterceptor partitionTenantCreationInterceptor;
-	@Autowired
-	private IPartitionLookupSvc partitionLookupSvc;
-
-
-//    public static TenantRepository getTenantRepository() {
-//        if (tenantRepository == null) {
-//            tenantRepository = ac.getBean(TenantRepository.class);
-//        }
-//        return tenantRepository;
-//    }
-
-    public static final List<String> FORBIDDEN_NAMES = List.of("pop", "iis", "home", "patient", "vaccination", "fhir",
-            "tenant", "facility", "tenant");
-
-    /**
-     * Adds tenant prefix to urlSuffix if tenant is not null
-     * Used for links in the UI with href
-     *
-     * @param tenant    tenant
-     * @param urlSuffix
-     * @return {tenantBasePath}/{tenantName}/ + urlSuffix
-     */
-    public static String tenantifyPathWithContextPath(Tenant tenant, String urlSuffix) {
-        if (tenant == null || tenant.getOrgId() < 0) {
-            return urlSuffix;
-        }
-        String organizationName = tenant.getOrganizationName();
-        return Application.IIS_PATH_BASE + tenantifyPathSuffix(organizationName, urlSuffix);
-    }
-
-    /**
-     * Standardized converting url Suffix with tenant Name and variable,
-     * Automatically adds / character if needed
-     *
-     * can also be used for security config with * as tenantName
-     *
-     * @param tenantName organisation name
-     * @param urlSuffix
-     * @return {tenantBasePath}/{tenantName}/ + urlSuffix
-     */
-    public static @NotNull String tenantifyPathSuffix(String tenantName, String urlSuffix) {
-        if (!StringUtils.startsWith(urlSuffix, "/")) {
-            urlSuffix = "/" + urlSuffix;
-        }
-        return TenantController.TENANT_BASE_PATH + "/" + tenantName + urlSuffix;
-    }
-
-    /**
-     * Deals with tenantName path variable for Authorization config
-     *
-     * @param urlSuffix
-     * @return
-     */
-    public static @NotNull String securityConfigUrl(String urlSuffix) {
-        return tenantifyPathSuffix("*", urlSuffix);
-	 }
-
 	public Tenant authenticateTenantNoUsername(String password, String facilityName) {
 		Tenant tenant = tenantRepository.findByOrganizationName(facilityName).orElse(null);
 
-        if (tenant == null) {
-            throw new RuntimeException("Invalid tenantName");
-        }
-        UserAccess tenantUserAccess = tenant.getUserAccess();
-        String username = tenantUserAccess.getAccessName();
+		if (tenant == null) {
+			throw new RuntimeException("Invalid tenantName");
+		}
+		UserAccess tenantUserAccess = tenant.getUserAccess();
+		String username = tenantUserAccess.getAccessName();
 
 		UserAccess userAccess = UserAccessUtil.get().authenticateUserAccessUsernamePassword(username, password);
-        return authenticateTenant(userAccess, facilityName);
+		return authenticateTenant(userAccess, facilityName);
 	}
 
 	public Tenant authenticateTenant(String username, String password, String facilityName) {
 		UserAccess userAccess = UserAccessUtil.get().authenticateUserAccessUsernamePassword(username, password);
-        return authenticateTenant(userAccess, facilityName);
+		return authenticateTenant(userAccess, facilityName);
 	}
 
 	public Tenant authenticateTenant(OAuth2User oAuth2User, String facilityName) {
-        /**
-         * First user authentication with OAUTH
-			*/
+		/**
+		 * First user authentication with OAUTH
+		 */
 		UserAccess userAccess = UserAccessUtil.get().authenticateUserAccessOAuth(oAuth2User);
-        return authenticateTenant(userAccess, facilityName);
+		return authenticateTenant(userAccess, facilityName);
 	}
 
 	public Tenant authenticateTenant(UserAccess userAccess, String facilityName) {
-        /**
-         * Users starting with the prefix can create a user with the same name, any
-         * other use of prefix are rejected
-         */
-        if (StringUtils.isBlank(facilityName)) {
-            throw new AuthenticationException();
-        }
-        facilityName = URLEncoder.encode(facilityName, StandardCharsets.UTF_8);
-        if (facilityName.startsWith(UserAccessUtil.GITHUB_PREFIX)) { // TODO rethink
-            if (!userAccess.getAccessName().startsWith(UserAccessUtil.GITHUB_PREFIX)) {
-                throw new AuthenticationException();
-            } else if (!facilityName.equals(userAccess.getAccessName())) {
-                throw new AuthenticationException();
-            }
-        }
+		/**
+		 * Users starting with the prefix can create a user with the same name, any
+		 * other use of prefix are rejected
+		 */
+		if (StringUtils.isBlank(facilityName)) {
+			throw new AuthenticationException();
+		}
+		facilityName = URLEncoder.encode(facilityName, StandardCharsets.UTF_8);
+		if (facilityName.startsWith(UserAccessUtil.GITHUB_PREFIX)) { // TODO rethink
+			if (!userAccess.getAccessName().startsWith(UserAccessUtil.GITHUB_PREFIX)) {
+				throw new AuthenticationException();
+			} else if (!facilityName.equals(userAccess.getAccessName())) {
+				throw new AuthenticationException();
+			}
+		}
 
-        Tenant tenant = null;
+		Tenant tenant = null;
 
 		Optional<Tenant> optional = tenantRepository.findByOrganizationName(facilityName);
-        if (optional.isEmpty()) {
-            tenant = registerTenant(facilityName, userAccess);
-			  if (partitionTenantCreationInterceptor != null) {
-				  partitionTenantCreationInterceptor.getOrCreatePartitionId(tenant.getOrganizationName());
-            }
-        } else {
-            /*
-             * Important step verifying authorisation
-             */
-            if (optional.get().getUserAccess().getUserAccessId() == userAccess.getUserAccessId()) {
-                tenant = optional.get();
-            }
-        }
-        return tenant;
+		if (optional.isEmpty()) {
+			tenant = registerTenant(facilityName, userAccess);
+			if (partitionTenantCreationInterceptor != null) {
+				partitionTenantCreationInterceptor.getOrCreatePartitionId(tenant.getOrganizationName());
+			}
+		} else {
+			/*
+			 * Important step verifying authorisation
+			 */
+			if (optional.get().getUserAccess().getUserAccessId() == userAccess.getUserAccessId()) {
+				tenant = optional.get();
+			}
+		}
+		return tenant;
 	}
 
 	public Tenant registerTenant(String facilityName, UserAccess userAccess) {
-        Tenant tenant = new Tenant();
-        if (FORBIDDEN_NAMES.contains(facilityName)) {
-            throw new RuntimeException("Tenant name: " + facilityName + " is forbidden");
-        }
-        tenant.setOrganizationName(facilityName);
-        tenant.setUserAccess(userAccess);
+		Tenant tenant = new Tenant();
+		if (FORBIDDEN_NAMES.contains(facilityName)) {
+			throw new RuntimeException("Tenant name: " + facilityName + " is forbidden");
+		}
+		tenant.setOrganizationName(facilityName);
+		tenant.setUserAccess(userAccess);
 		return tenantRepository.save(tenant);
 	}
 
 	public RequestDetails requestDetailsWithPartitionName() {
 		PartitionEntity partitionEntity = partitionLookupSvc
-                .getPartitionByName(CurrentTenantUtil.getTenant().getOrganizationName());
-        if (partitionEntity == null) {
-            // return SystemRequestDetails.forAllPartitions();
-            throw new RuntimeException("No partition found");
-        }
-        RequestDetails requestDetails = SystemRequestDetails
-                .forRequestPartitionId(partitionEntity.toRequestPartitionId());
-        requestDetails.setTenantId(CurrentTenantUtil.getTenant().getOrganizationName());
-        return requestDetails;
+			.getPartitionByName(CurrentTenantUtil.getTenant().getOrganizationName());
+		if (partitionEntity == null) {
+			// return SystemRequestDetails.forAllPartitions();
+			throw new RuntimeException("No partition found");
+		}
+		RequestDetails requestDetails = SystemRequestDetails
+			.forRequestPartitionId(partitionEntity.toRequestPartitionId());
+		requestDetails.setTenantId(CurrentTenantUtil.getTenant().getOrganizationName());
+		return requestDetails;
 	}
 
 	public Tenant getTenantByIdAuthenticated(int tenantId) {
 		UserAccess userAccess = UserAccessUtil.get().getUserAccess();
 		Tenant tenant = tenantRepository.findByOrgIdAndUserAccessId(tenantId, userAccess.getUserAccessId())
-                .orElse(null);
-        return tenant;
-    }
+			.orElse(null);
+		return tenant;
+	}
 
 }
