@@ -8,20 +8,50 @@ import ca.uhn.fhir.rest.server.exceptions.AuthenticationException;
 import jakarta.persistence.TypedQuery;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.immregistries.iis.kernal.fhir.Application;
 import org.immregistries.iis.kernal.fhir.interceptors.PartitionTenantCreationInterceptor;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.immregistries.iis.kernal.persisted.model.UserAccess;
+import org.immregistries.iis.kernal.persisted.repository.TenantRepository;
 import org.immregistries.iis.kernal.servlet.TenantController;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Optional;
 
-public class TenantUtil {
+public class TenantUtil implements ApplicationContextAware {
+
+    /**
+     * Singleton to access the application context for the repositories
+     */
+    private static ApplicationContext ac;
+
+    private static TenantRepository tenantRepository;
+    private static IPartitionLookupSvc partitionLookupSvc;
+
+    @Override
+    public void setApplicationContext(ApplicationContext ac) {
+        TenantUtil.ac = ac;
+    }
+
+    public static IPartitionLookupSvc getPartitionLookupSvc() {
+        if (partitionLookupSvc == null) {
+            partitionLookupSvc = ac.getBean(IPartitionLookupSvc.class);
+        }
+        return partitionLookupSvc;
+    }
+
+    public static TenantRepository getTenantRepository() {
+        if (tenantRepository == null) {
+            tenantRepository = ac.getBean(TenantRepository.class);
+        }
+        return tenantRepository;
+    }
 
     public static final List<String> FORBIDDEN_NAMES = List.of("pop", "iis", "home", "patient", "vaccination", "fhir",
             "tenant", "facility", "tenant");
@@ -80,26 +110,26 @@ public class TenantUtil {
         UserAccess tenantUserAccess = tenant.getUserAccess();
         String username = tenantUserAccess.getAccessName();
 
-        UserAccess userAccess = UserAccessUtil.authenticateUserAccessUsernamePassword(username, password, dataSession);
-        return authenticateTenant(userAccess, facilityName, dataSession, partitionTenantCreationInterceptor);
+        UserAccess userAccess = UserAccessUtil.authenticateUserAccessUsernamePassword(username, password);
+        return authenticateTenant(userAccess, facilityName, partitionTenantCreationInterceptor);
     }
 
-    public static Tenant authenticateTenant(String username, String password, String facilityName, Session dataSession,
+    public static Tenant authenticateTenant(String username, String password, String facilityName,
             PartitionTenantCreationInterceptor partitionTenantCreationInterceptor) {
-        UserAccess userAccess = UserAccessUtil.authenticateUserAccessUsernamePassword(username, password, dataSession);
-        return authenticateTenant(userAccess, facilityName, dataSession, partitionTenantCreationInterceptor);
+        UserAccess userAccess = UserAccessUtil.authenticateUserAccessUsernamePassword(username, password);
+        return authenticateTenant(userAccess, facilityName, partitionTenantCreationInterceptor);
     }
 
-    public static Tenant authenticateTenant(OAuth2User oAuth2User, String facilityName, Session dataSession,
+    public static Tenant authenticateTenant(OAuth2User oAuth2User, String facilityName,
             PartitionTenantCreationInterceptor partitionTenantCreationInterceptor) {
         /**
          * First user authentication with OAUTH
          */
-        UserAccess userAccess = UserAccessUtil.authenticateUserAccessOAuth(oAuth2User, dataSession);
-        return authenticateTenant(userAccess, facilityName, dataSession, partitionTenantCreationInterceptor);
+        UserAccess userAccess = UserAccessUtil.authenticateUserAccessOAuth(oAuth2User);
+        return authenticateTenant(userAccess, facilityName, partitionTenantCreationInterceptor);
     }
 
-    public static Tenant authenticateTenant(UserAccess userAccess, String facilityName, Session dataSession,
+    public static Tenant authenticateTenant(UserAccess userAccess, String facilityName,
             PartitionTenantCreationInterceptor partitionTenantCreationInterceptor) {
         /**
          * Users starting with the prefix can create a user with the same name, any
@@ -118,41 +148,36 @@ public class TenantUtil {
         }
 
         Tenant tenant = null;
-        TypedQuery<Tenant> query = dataSession.createQuery("from Tenant where organizationName = ?1", Tenant.class);
-        query.setParameter(1, facilityName);
 
-        List<Tenant> tenantList = query.getResultList();
-        if (tenantList.size() > 0) {
-            /**
-             * Important step verifying authorisation
-             */
-            if (tenantList.get(0).getUserAccess().getUserAccessId() == userAccess.getUserAccessId()) {
-                tenant = tenantList.get(0);
-            }
-        } else {
-            tenant = registerTenant(facilityName, userAccess, dataSession);
+        Optional<Tenant> optional = getTenantRepository().findByOrganizationName(facilityName);
+        if (optional.isEmpty()) {
+            tenant = registerTenant(facilityName, userAccess);
             if (partitionTenantCreationInterceptor != null) {
                 partitionTenantCreationInterceptor.getOrCreatePartitionId(tenant.getOrganizationName());
+            }
+        } else {
+            /*
+             * Important step verifying authorisation
+             */
+            if (optional.get().getUserAccess().getUserAccessId() == userAccess.getUserAccessId()) {
+                tenant = optional.get();
             }
         }
         return tenant;
     }
 
-    public static Tenant registerTenant(String facilityName, UserAccess userAccess, Session dataSession) {
+    public static Tenant registerTenant(String facilityName, UserAccess userAccess) {
         Tenant tenant = new Tenant();
         if (FORBIDDEN_NAMES.contains(facilityName)) {
             throw new RuntimeException("Tenant name: " + facilityName + " is forbidden");
         }
         tenant.setOrganizationName(facilityName);
         tenant.setUserAccess(userAccess);
-        Transaction transaction = dataSession.beginTransaction();
-        dataSession.persist(tenant);
-        transaction.commit();
-        return tenant;
+        return getTenantRepository().save(tenant);
     }
 
-    public static RequestDetails requestDetailsWithPartitionName(IPartitionLookupSvc partitionLookupSvc) {
-        PartitionEntity partitionEntity = partitionLookupSvc
+    public static RequestDetails requestDetailsWithPartitionName() {
+        PartitionEntity partitionEntity = getPartitionLookupSvc()
                 .getPartitionByName(CurrentTenantUtil.getTenant().getOrganizationName());
         if (partitionEntity == null) {
             // return SystemRequestDetails.forAllPartitions();
@@ -164,13 +189,11 @@ public class TenantUtil {
         return requestDetails;
     }
 
-    public static Tenant getTenantByIdAuthenticated(int tenantId, Session dataSession) {
+    public static Tenant getTenantByIdAuthenticated(int tenantId) {
         UserAccess userAccess = UserAccessUtil.getUserAccess();
-        TypedQuery<Tenant> query = dataSession
-                .createQuery("from Tenant where orgId = :tenantId and userAccess = :userAccess", Tenant.class);
-        query.setParameter("tenantId", tenantId);
-        query.setParameter("userAccess", userAccess);
-        return (Tenant) query.getSingleResult();
+        Tenant tenant = getTenantRepository().findByIdAndUserAccessId(tenantId, userAccess.getUserAccessId())
+                .orElse(null);
+        return tenant;
     }
 
 }

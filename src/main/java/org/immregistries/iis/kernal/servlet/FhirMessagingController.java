@@ -64,7 +64,7 @@ public class FhirMessagingController {
 		Session dataSession = null;
 		try {
 			dataSession = HibernateConfig.getDataSession();
-			Tenant tenant = CurrentTenantUtil.getTenant(req, dataSession);
+			Tenant tenant = CurrentTenantUtil.getTenantFromName(req, dataSession);
 			String result = "";
 			String message = req.getParameter(PARAM_MESSAGE);
 			String facility_name = req.getParameter(PARAM_FACILITY_NAME);
@@ -124,7 +124,7 @@ public class FhirMessagingController {
 	@GetMapping
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		resp.setContentType("text/html");
-		Tenant tenant = CurrentTenantUtil.getTenant(req, HibernateConfig.getDataSession());
+		Tenant tenant = CurrentTenantUtil.getTenantFromName(req, HibernateConfig.getDataSession());
 
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		try {

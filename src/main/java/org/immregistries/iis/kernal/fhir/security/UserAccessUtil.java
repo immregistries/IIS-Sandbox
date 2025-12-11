@@ -1,13 +1,9 @@
 package org.immregistries.iis.kernal.fhir.security;
 
 import ca.uhn.fhir.rest.server.exceptions.AuthenticationException;
-import jakarta.persistence.TypedQuery;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.math3.stat.inference.TestUtils;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.immregistries.iis.kernal.persisted.model.UserAccess;
 import org.immregistries.iis.kernal.persisted.repository.UserAccessRepository;
@@ -23,7 +19,16 @@ import java.util.List;
 
 public class UserAccessUtil implements ApplicationContextAware {
 
+    public static final String GITHUB_PREFIX = "github-";
+    public static final String SESSION_USER_ACCESS = "userAccess";
+    private static String BAD_PASSWORD = "badpassword";
+
+    /**
+     * Singleton to access the application context for the repositories
+     */
     private static ApplicationContext ac;
+
+    private static UserAccessRepository userAccessRepository;
 
     @Override
     public void setApplicationContext(ApplicationContext ac) {
@@ -31,16 +36,13 @@ public class UserAccessUtil implements ApplicationContextAware {
     }
 
     public static UserAccessRepository getUserAccessRepository() {
-        return (UserAccessRepository) ac.getBean("userAccessRepository");
-
+        if (userAccessRepository == null) {
+            userAccessRepository = ac.getBean(UserAccessRepository.class);
+        }
+        return userAccessRepository;
     }
 
-    public static final String GITHUB_PREFIX = "github-";
-    public static final String SESSION_USER_ACCESS = "userAccess";
-    private static String BAD_PASSWORD = "badpassword";
-
-    public static UserAccess authenticateUserAccessUsernamePassword(String username, String password,
-            Session dataSession) {
+    public static UserAccess authenticateUserAccessUsernamePassword(String username, String password) {
         if (username.startsWith(GITHUB_PREFIX) || StringUtils.isBlank(password)) {
             throw new AuthenticationException();
         }
@@ -49,12 +51,12 @@ public class UserAccessUtil implements ApplicationContextAware {
         }
         UserAccess userAccess = null;
 
-        List<UserAccess> userAccessList = queryUserAccessWithUsername(username, dataSession);
+        List<UserAccess> userAccessList = getUserAccessRepository().findByAccessName(username);
         if (userAccessList.size() == 0) {
             /**
              * Registration
              */
-            userAccess = registerUserAccessWithUsernamePassword(username, password, dataSession);
+            userAccess = registerUserAccessWithUsernamePassword(username, password);
         } else if (userAccessList.size() == 1) {
             // if (BCrypt.checkpw(password, userAccessList.get(0).getAccessKey())) { TODO
             // after auth checks fix in fhir
@@ -70,16 +72,16 @@ public class UserAccessUtil implements ApplicationContextAware {
         return userAccess;
     }
 
-    public static UserAccess authenticateUserAccessOAuth(OAuth2User oAuth2User, Session dataSession) {
+    public static UserAccess authenticateUserAccessOAuth(OAuth2User oAuth2User) {
         String username = GITHUB_PREFIX + oAuth2User.getAttribute("login");
         UserAccess userAccess = null;
 
-        List<UserAccess> userAccessList = queryUserAccessWithUsername(username, dataSession);
+        List<UserAccess> userAccessList = getUserAccessRepository().findByAccessName(username);
         if (userAccessList.size() == 0) {
             /**
              * Registration
              */
-            userAccess = registerUserAccessGithub(username, dataSession);
+            userAccess = registerUserAccessGithub(username);
         } else if (userAccessList.size() == 1) {
             if (StringUtils.isNotBlank(userAccessList.get(0).getAccessKey())) {
                 throw new AuthenticationException("OAuth login failure");
@@ -92,33 +94,17 @@ public class UserAccessUtil implements ApplicationContextAware {
         return userAccess;
     }
 
-    private static List<UserAccess> queryUserAccessWithUsername(String username, Session dataSession) {
-        String queryString = "from UserAccess where accessName = ?1";
-        TypedQuery<UserAccess> query = dataSession.createQuery(queryString, UserAccess.class);
-        query.setParameter(1, username);
-
-        return query.getResultList();
-    }
-
-    private static UserAccess registerUserAccessGithub(String username, Session dataSession) {
+    private static UserAccess registerUserAccessGithub(String username) {
         if (!username.startsWith(GITHUB_PREFIX)) {
             throw new AuthenticationException();
         }
         UserAccess userAccess = new UserAccess();
         userAccess.setAccessName(username);
         userAccess.setAccessKey("");
-        Transaction transaction = dataSession.beginTransaction();
-        try {
-            userAccess.setUserAccessId((Integer) dataSession.save(userAccess));
-        } finally {
-            transaction.commit();
-        }
-
-        return userAccess;
+        return getUserAccessRepository().save(userAccess);
     }
 
-    private static UserAccess registerUserAccessWithUsernamePassword(String username, String password,
-            Session dataSession) {
+    private static UserAccess registerUserAccessWithUsernamePassword(String username, String password) {
         if (username.startsWith(GITHUB_PREFIX)) {
             throw new AuthenticationException();
         }
@@ -127,13 +113,7 @@ public class UserAccessUtil implements ApplicationContextAware {
         // userAccess.setAccessKey(BCrypt.hashpw(password, BCrypt.gensalt(5))); TODO
         // after auth checks fix in fhir
         userAccess.setAccessKey(password);
-        Transaction transaction = dataSession.beginTransaction();
-        try {
-            userAccess.setUserAccessId((Integer) dataSession.save(userAccess));
-        } finally {
-            transaction.commit();
-        }
-        return userAccess;
+        return getUserAccessRepository().save(userAccess);
     }
 
     /**

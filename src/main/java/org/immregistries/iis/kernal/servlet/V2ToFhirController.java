@@ -34,9 +34,8 @@ import static org.immregistries.iis.kernal.servlet.PopController.PARAM_FACILITY_
 import static org.immregistries.iis.kernal.servlet.PopController.PARAM_MESSAGE;
 import static org.immregistries.iis.kernal.servlet.V2ToFhirController.V2_TO_FHIR_BASE_PATH;
 
-
 @RestController()
-@RequestMapping({V2_TO_FHIR_BASE_PATH, TenantController.TENANT_PATH + V2_TO_FHIR_BASE_PATH})
+@RequestMapping({ V2_TO_FHIR_BASE_PATH, TenantController.TENANT_PATH + V2_TO_FHIR_BASE_PATH })
 @Conditional(OnR4Condition.class)
 public class V2ToFhirController {
 	public static final String V2_TO_FHIR_PATH_KEY = "v2ToFhir";
@@ -48,20 +47,20 @@ public class V2ToFhirController {
 	ImmunizationMapper immunizationMapper;
 	@Autowired
 	IFhirRequester fhirRequester;
-	//	@Autowired
-//	V2ToFhirMessageHandler v2ToFhirMessageHandler;
+	// @Autowired
+	// V2ToFhirMessageHandler v2ToFhirMessageHandler;
 	@Autowired
 	FhirContext fhirContext;
 
 	@PostMapping
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-		throws ServletException, IOException {
+			throws ServletException, IOException {
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		Session dataSession = null;
 		try {
 			dataSession = HibernateConfig.getDataSession();
-			Tenant tenant = CurrentTenantUtil.getTenant(req, dataSession);
+			Tenant tenant = CurrentTenantUtil.getTenantFromName(req, dataSession);
 			String result = "";
 			String message = req.getParameter(PARAM_MESSAGE);
 			String facility_name = req.getParameter(PARAM_FACILITY_NAME);
@@ -75,13 +74,15 @@ public class V2ToFhirController {
 					Bundle bundle = parser.convert(message);
 
 					result = fhirContext.newJsonParser().setPrettyPrint(true).encodeResourceToString(bundle);
-//			MethodOutcome result = repositoryClientFactory.getFhirClient().create().resource(bundle).execute();
-//			return  fhirContext.newJsonParser().encodeResourceToString(result.getResource());
+					// MethodOutcome result =
+					// repositoryClientFactory.getFhirClient().create().resource(bundle).execute();
+					// return
+					// fhirContext.newJsonParser().encodeResourceToString(result.getResource());
 				} catch (HL7Exception e) {
 					throw new RuntimeException(e);
 				}
 			}
-//      resp.setContentType("text/plain");
+			// resp.setContentType("text/plain");
 			out.println("<textarea name=\"result\" readonly style=\"width: 100%; height: 90%;\" >");
 			out.print(result);
 			out.println("</textarea>");
@@ -102,7 +103,7 @@ public class V2ToFhirController {
 	@GetMapping
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		resp.setContentType("text/html");
-		Tenant tenant = CurrentTenantUtil.getTenant(req, HibernateConfig.getDataSession());
+		Tenant tenant = CurrentTenantUtil.getTenantFromName(req, HibernateConfig.getDataSession());
 
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		try {
@@ -112,8 +113,8 @@ public class V2ToFhirController {
 				organizationName = "";
 			}
 			if (StringUtils.isBlank(message)) {
-				TestCaseMessage testCaseMessage =
-					ScenarioManager.createTestCaseMessage(ScenarioManager.SCENARIO_1_R_ADMIN_CHILD);
+				TestCaseMessage testCaseMessage = ScenarioManager
+						.createTestCaseMessage(ScenarioManager.SCENARIO_1_R_ADMIN_CHILD);
 				Transformer transformer = new Transformer();
 				transformer.transform(testCaseMessage);
 				message = testCaseMessage.getMessageText();

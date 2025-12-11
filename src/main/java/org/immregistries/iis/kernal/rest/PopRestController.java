@@ -34,7 +34,7 @@ public class PopRestController {
             @RequestBody PopRequest popRequest,
             HttpServletRequest req) {
         try (Session dataSession = HibernateConfig.getDataSession()) {
-            Tenant tenant = CurrentTenantUtil.getTenant(req, dataSession);
+            Tenant tenant = CurrentTenantUtil.getTenantFromName(req, dataSession);
             if (tenant == null) {
                 throw new RuntimeException("Access is not authorized");
             }

@@ -88,7 +88,7 @@ public class TenantController {
 		String tenantId = req.getParameter(PARAM_TENANT_ID);
 
 		try (Session dataSession = HibernateConfig.getDataSession()) {
-			Tenant tenant = CurrentTenantUtil.getTenant(req, dataSession);
+			Tenant tenant = CurrentTenantUtil.getTenantFromName(req, dataSession);
 			UserAccess userAccess = UserAccessUtil.getUserAccess();
 			if (userAccess != null && session != null) {
 				List<Tenant> tenantList = tenantRestController.getTenants(req);
