@@ -15,7 +15,7 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import java.util.List;
+import java.util.Optional;
 
 public class UserAccessUtil implements ApplicationContextAware {
 
@@ -49,24 +49,19 @@ public class UserAccessUtil implements ApplicationContextAware {
         if (BAD_PASSWORD.equals(password)) {
             return null;
         }
-        UserAccess userAccess = null;
+		 UserAccess userAccess = null;
 
-		 List<UserAccess> userAccessList = getUserAccessRepository().findAllByAccessName(username);
-        if (userAccessList.size() == 0) {
-            /**
-             * Registration
-             */
-            userAccess = registerUserAccessWithUsernamePassword(username, password);
-        } else if (userAccessList.size() == 1) {
+		 Optional<UserAccess> optionalUserAccess = getUserAccessRepository().findByAccessName(getUserAccess().getAccessName());
+		 if (optionalUserAccess.isEmpty()) {
+			 userAccess = registerUserAccessWithUsernamePassword(username, password);
+		 } else {
             // if (BCrypt.checkpw(password, userAccessList.get(0).getAccessKey())) { TODO
             // after auth checks fix in fhir
-            if (password.equals(userAccessList.get(0).getAccessKey())) {
-                userAccess = userAccessList.get(0);
+			 if (password.equals(optionalUserAccess.get().getAccessKey())) { // TODO Change
+				 userAccess = optionalUserAccess.get();
             } else {
                 throw new AuthenticationException("password for user : " + username);
             }
-        } else {
-            throw new AuthenticationException("password for user : " + username);
         }
         SecurityContextHolder.getContext().setAuthentication(userAccess);
         return userAccess;
@@ -76,19 +71,17 @@ public class UserAccessUtil implements ApplicationContextAware {
         String username = GITHUB_PREFIX + oAuth2User.getAttribute("login");
         UserAccess userAccess = null;
 
-		 List<UserAccess> userAccessList = getUserAccessRepository().findAllByAccessName(username);
-        if (userAccessList.size() == 0) {
+		 Optional<UserAccess> optionalUserAccess = getUserAccessRepository().findByAccessName(getUserAccess().getAccessName());
+		 if (optionalUserAccess.isEmpty()) {
             /**
              * Registration
              */
             userAccess = registerUserAccessGithub(username);
-        } else if (userAccessList.size() == 1) {
-            if (StringUtils.isNotBlank(userAccessList.get(0).getAccessKey())) {
+		 } else {
+			 if (StringUtils.isNotBlank(optionalUserAccess.get().getAccessKey())) {
                 throw new AuthenticationException("OAuth login failure");
             }
-            userAccess = userAccessList.get(0);
-        } else {
-            throw new AuthenticationException("OAuth login failure");
+			 userAccess = optionalUserAccess.get();
         }
         SecurityContextHolder.getContext().setAuthentication(userAccess);
         return userAccess;
