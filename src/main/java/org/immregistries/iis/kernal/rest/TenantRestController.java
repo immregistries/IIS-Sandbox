@@ -23,10 +23,12 @@ public class TenantRestController {
     TenantRepository tenantRepository;
 	@Autowired
 	TenantUtil tenantUtil;
+	@Autowired
+	UserAccessUtil userAccessUtil;
 
     @GetMapping("/{tenantId}")
-    public Tenant getTenant(@PathVariable int tenantId) {
-		 UserAccess userAccess = UserAccessUtil.get().getUserAccess();
+    public Tenant getTenant(@PathVariable("tenantId") int tenantId) {
+		 UserAccess userAccess = userAccessUtil.getUserAccess();
 		 return tenantRepository.findByOrgIdAndUserAccessId(tenantId, userAccess.getUserAccessId())
                 .orElseThrow(() -> new RuntimeException("Tenant not found"));
     }

@@ -37,7 +37,7 @@ public class PatientRestController extends BaseTenantTiedRest {
 
     @GetMapping("/{patientId}")
     public PatientMaster getPatient(
-            @PathVariable String patientId,
+            @PathVariable("patientId") String patientId,
             @RequestAttribute(TenantRequestLoggingFilter.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
             HttpServletRequest req) {
         return fhirRequester.readAsPatientMaster(patientId);
@@ -45,7 +45,7 @@ public class PatientRestController extends BaseTenantTiedRest {
 
     @GetMapping("/{patientId}/fhir")
     public IBaseResource getPatientFhir(
-            @PathVariable String patientId,
+            @PathVariable("patientId") String patientId,
             @RequestAttribute(TenantRequestLoggingFilter.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
             HttpServletRequest req) {
         IGenericClient fhirClient = repositoryClientFactory.newGenericClient(tenant, req);
@@ -63,7 +63,7 @@ public class PatientRestController extends BaseTenantTiedRest {
 
     @GetMapping("/{patientId}/recommendation")
     public IBaseBundle getPatientRecommendation(
-            @PathVariable String patientId,
+            @PathVariable("patientId") String patientId,
             @RequestAttribute(TenantRequestLoggingFilter.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
             HttpServletRequest req) {
         IGenericClient fhirClient = repositoryClientFactory.newGenericClient(tenant, req);
@@ -76,7 +76,7 @@ public class PatientRestController extends BaseTenantTiedRest {
     @SuppressWarnings("unchecked")
     @GetMapping("/{patientId}/vaccination")
     public List<VaccinationMaster> getPatientVaccination(
-            @PathVariable String patientId,
+            @PathVariable("patientId") String patientId,
             @RequestAttribute(TenantRequestLoggingFilter.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
             @RequestParam(name = MDM_EXPAND_REST_PARAM, defaultValue = "false") boolean isGolden,
             HttpServletRequest req) {
@@ -89,7 +89,7 @@ public class PatientRestController extends BaseTenantTiedRest {
     @SuppressWarnings("unchecked")
     @GetMapping("/{patientId}/observations")
     public List<ObservationReported> getPatientObservation(
-            @PathVariable String patientId,
+            @PathVariable("patientId") String patientId,
             @RequestAttribute(TenantRequestLoggingFilter.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
             @RequestParam(name = MDM_EXPAND_REST_PARAM, defaultValue = "false") boolean isGolden,
             HttpServletRequest req) {
@@ -102,7 +102,7 @@ public class PatientRestController extends BaseTenantTiedRest {
     @SuppressWarnings("unchecked")
     @GetMapping("/{patientId}/related")
     public List<PatientMaster> getPatientRelatedPatients(
-            @PathVariable String patientId,
+            @PathVariable("patientId") String patientId,
             @RequestAttribute(TenantRequestLoggingFilter.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
             @RequestParam(name = MDM_EXPAND_REST_PARAM, defaultValue = "false") boolean isGolden,
             HttpServletRequest req) {
@@ -138,7 +138,7 @@ public class PatientRestController extends BaseTenantTiedRest {
 
     @GetMapping("/{patientId}/shLinkPayload")
     public ShLinkPayload getShLinkPayload(
-            @PathVariable String patientId,
+            @PathVariable("patientId") String patientId,
             @RequestAttribute(TenantRequestLoggingFilter.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
             HttpServletRequest req) {
         IBaseResource patientSelected = getPatientFhir(patientId, tenant, req);

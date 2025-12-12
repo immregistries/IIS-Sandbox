@@ -37,7 +37,7 @@ public class KeyStoreService {
 	}
 
 	public IisKey getAnyKey(UserAccess userAccess) {
-		return iisKeyRepository.findByUserAccess(userAccess).get(0);
+		return iisKeyRepository.findByUserAccess(userAccess).stream().findAny().orElse(null);
 	}
 
 	public List<IisKey> getKeys(UserAccess userAccess) {

@@ -8,8 +8,6 @@ import ca.uhn.fhir.jpa.subscription.match.config.SubscriptionProcessorConfig;
 import ca.uhn.fhir.jpa.subscription.match.config.WebsocketDispatcherConfig;
 import ca.uhn.fhir.jpa.subscription.submit.config.SubscriptionSubmitterConfig;
 import ca.uhn.fhir.rest.server.RestfulServer;
-import com.syadem.nuva.NUVA;
-import com.syadem.nuva.SupportedLocale;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnEitherVersion;
 import org.immregistries.iis.kernal.fhir.mdm.MdmConfig;
 import org.immregistries.iis.kernal.fhir.security.ServerSecurityConfig;
@@ -30,8 +28,6 @@ import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Import;
 import org.springframework.web.context.request.RequestContextListener;
 
-import java.io.IOException;
-
 @ServletComponentScan(basePackageClasses = {
 		RestfulServer.class }, basePackages = {
 				"org.immregistries.iis.kernal.servlet"
@@ -46,7 +42,7 @@ import java.io.IOException;
 		MdmConfig.class,
 		JpaBatch2Config.class,
 		Batch2JobsConfig.class,
-		ServletRegistrationConfig.class,
+		FilterRegistrationConfig.class,
 		ServerConfig.class,
 		ServerSecurityConfig.class,
 })

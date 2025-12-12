@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Configuration;
  * functionalities
  */
 @Configuration
-public class ServletRegistrationConfig {
+public class FilterRegistrationConfig {
 	@Autowired
 	AutowireCapableBeanFactory beanFactory;
 
@@ -44,7 +44,7 @@ public class ServletRegistrationConfig {
 		registration.setFilter(tenantRequestLoggingFilter);
 		registration.addUrlPatterns("/rest/tenant/*");
 		registration.setName("tenantRequestLoggingFilter");
-		registration.setOrder(2);
+		registration.setOrder(1);
 		return registration;
 	}
 

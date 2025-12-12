@@ -28,7 +28,7 @@ public class VaccinationRestController extends BaseTenantTiedRest {
     @GetMapping("/{vaccinationId}")
     public VaccinationMaster getVaccination(
             @RequestAttribute(name = SESSION_REQUEST_TENANT) Tenant tenant,
-            @PathVariable String vaccinationId,
+            @PathVariable("vaccinationId") String vaccinationId,
             HttpServletRequest req) {
         // TODO make FHIr Requester tenant aware
         return fhirRequester.readAsVaccinationMaster(vaccinationId);
