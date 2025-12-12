@@ -16,7 +16,7 @@ import java.io.IOException;
 
 public class TenantRequestLoggingFilter extends OncePerRequestFilter {
 
-	public static final String TENANT_REQUEST_ATTRIBUTE = "tenant";
+	public static final String TENANT_REQUEST_ATTRIBUTE = CurrentTenantUtil.SESSION_REQUEST_TENANT;
 	private static final Logger logger = LoggerFactory.getLogger(TenantRequestLoggingFilter.class);
 	private static final String TENANT_PREFIX = "/rest/tenant/";
 	@Autowired

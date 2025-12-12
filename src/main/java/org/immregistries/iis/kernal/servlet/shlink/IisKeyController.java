@@ -10,6 +10,7 @@ import org.immregistries.iis.kernal.logic.KeyStoreService;
 import org.immregistries.iis.kernal.persisted.model.IisKey;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.immregistries.iis.kernal.persisted.model.UserAccess;
+import org.immregistries.iis.kernal.rest.shlink.IisKeyRestController;
 import org.immregistries.iis.kernal.servlet.TenantController;
 import org.immregistries.iis.kernal.servlet.WellKnownKeyController;
 import org.immregistries.iis.kernal.servlet.util.UiUtil;
@@ -23,7 +24,6 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.immregistries.iis.kernal.servlet.shlink.IisKeyController.IIS_KEY_BASE_PATH;
 
@@ -34,6 +34,9 @@ public class IisKeyController {
 
 	@Autowired
 	KeyStoreService keyStoreService;
+
+	@Autowired
+	IisKeyRestController iisKeyRestController;
 
 	@PostMapping
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
@@ -54,11 +57,8 @@ public class IisKeyController {
 	 */
 	protected List<JWK> doGetWellKnown(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
-		UserAccess userAccess = UserAccessUtil.get().getUserAccess();
 		resp.setContentType("application/json");
-		// Tenant tenant = CurrentTenantUtil.getTenantRedirectIfNone(req, resp);
-		List<IisKey> iisKeys = keyStoreService.getKeys(userAccess);
-		return iisKeys.stream().map(iisKey -> iisKey.jwk().toPublicJWK()).collect(Collectors.toList());
+		return iisKeyRestController.doGetWellKnown(req, resp);
 	}
 
 	@GetMapping
@@ -90,7 +90,7 @@ public class IisKeyController {
 
 	protected static void printIisKeys(PrintWriter out, List<IisKey> iisKeys, Tenant tenant) {
 		out.println("<a href=\""
-			+ UrlTenantUtil.tenantifyPathWithContextPath(tenant, WellKnownKeyController.WELL_KNOWN_PATH_SUFFIX)
+				+ UrlTenantUtil.tenantifyPathWithContextPath(tenant, WellKnownKeyController.WELL_KNOWN_PATH_SUFFIX)
 				+ "\">well-known</a>");
 
 		if (iisKeys.isEmpty()) {

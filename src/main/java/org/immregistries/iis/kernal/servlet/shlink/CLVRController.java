@@ -18,6 +18,7 @@ import org.immregistries.iis.kernal.logic.shlink.ShLinkUtilService;
 import org.immregistries.iis.kernal.persisted.model.IisKey;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.immregistries.iis.kernal.persisted.model.UserAccess;
+import org.immregistries.iis.kernal.rest.shlink.CLVRRestController;
 import org.immregistries.iis.kernal.servlet.TenantController;
 import org.immregitries.clvr.CLVRPdfService;
 import org.immregitries.clvr.CLVRService;
@@ -27,10 +28,12 @@ import org.immregitries.clvr.model.CLVRToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.URISyntaxException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
@@ -43,25 +46,13 @@ public class CLVRController {
 	Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	@Autowired
-	KeyStoreService keyStoreService;
-
-	@Autowired
 	ShLinkUtilService shLinkUtilService;
 
 	@Autowired
-	CLVRService clvrService;
-
-	@Autowired
-	IpsGeneratorSvcIIS ipsGeneratorSvcIIS;
-
-	@Autowired
-	IPartitionLookupSvc partitionLookupSvc;
-
-	@Autowired
-	FhirConversionUtil fhirConversionUtil;
-
-	@Autowired
 	CLVRPdfService clvrPdfService;
+
+	@Autowired
+	CLVRRestController clvrRestController;
 
 	@GetMapping("/{patientId}")
 	protected void doGetPatientCLVR(
@@ -69,28 +60,26 @@ public class CLVRController {
 			HttpServletResponse resp,
 			@PathVariable("patientId") String patientId,
 			@RequestParam(value = "pdf", required = false) boolean pdf)
-			throws COSEException, IOException, SignatureException, NoSuchAlgorithmException, InvalidKeyException,
-			NoSuchProviderException, ServletException, WriterException {
+		throws COSEException, IOException, SignatureException, NoSuchAlgorithmException, InvalidKeyException,
+		NoSuchProviderException, ServletException, WriterException, URISyntaxException {
 		Tenant tenant = CurrentTenantUtil.getTenantRedirectIfNone(req, resp);
 		UserAccess userAccess = UserAccessUtil.get().getUserAccess();
 		OutputStream outputStream = resp.getOutputStream();
 
-		IisKey iisSigningKey = keyStoreService.getIisSigningKeyOrCreate("", userAccess, tenant);
-
-		IBaseBundle ipsToBeEncoded = ipsGeneratorSvcIIS
-			.generateIps(TenantUtil.get().requestDetailsWithPartitionName(), new IdType(patientId), "");
-		CLVRPayload clvrPayload = fhirConversionUtil.toCLVRPayloadFromBundle(ipsToBeEncoded);
-
-		CLVRToken clvrToken = new CLVRToken(clvrPayload, "IIS");
-		String qrCode = clvrService.encodeCLVRtoQrCode(clvrToken, iisSigningKey.keyPair());
-		logger.info("qrCode {}", qrCode);
+		String qrCode = clvrRestController.getPatientClvrQrCode(patientId,tenant);
+			;logger.info("qrCode {}", qrCode);
 
 		if (!pdf) {
 			resp.setContentType("image/png"); // Set content type for PNG image
 			shLinkUtilService.printQrCodeAsImage(outputStream, qrCode);
 		} else {
-			PDDocument pdDocument = clvrPdfService.createPdf(clvrToken, qrCode.getBytes(), "IIS SANDBOX");
-			printPdf(req, resp, pdDocument, "testCLVR");
+
+			ResponseEntity<byte[]> responseEntity = clvrRestController.getPatientClvrPdf(patientId,tenant);
+			resp.setContentType("application/pdf");
+			resp.setHeader("Content-Disposition", "attachment; filename=" + "testPdf");
+			resp.getOutputStream().write(responseEntity.getBody());
+			resp.getOutputStream().flush();
+			resp.getOutputStream().close();
 		}
 	}
 

@@ -6,6 +6,7 @@ import ca.uhn.fhir.rest.api.server.RequestDetails;
 import ca.uhn.fhir.rest.api.server.SystemRequestDetails;
 import ca.uhn.fhir.rest.server.exceptions.AuthenticationException;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.immregistries.iis.kernal.fhir.interceptors.PartitionTenantCreationInterceptor;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.immregistries.iis.kernal.persisted.model.UserAccess;
@@ -24,7 +25,7 @@ import java.util.Optional;
 public class TenantUtil implements InitializingBean {
 
 	public static final List<String> FORBIDDEN_NAMES = List.of("pop", "iis", "home", "patient", "vaccination", "fhir",
-		"tenant", "facility", "tenant");
+			"tenant", "facility", "tenant");
 	/**
 	 * Needs to be statically accessible in Tenant Context
 	 */
@@ -109,8 +110,8 @@ public class TenantUtil implements InitializingBean {
 
 	public Tenant registerTenant(String facilityName, UserAccess userAccess) {
 		Tenant tenant = new Tenant();
-		if (FORBIDDEN_NAMES.contains(facilityName)) {
-			throw new RuntimeException("Tenant name: " + facilityName + " is forbidden");
+		if (FORBIDDEN_NAMES.contains(facilityName) || NumberUtils.isCreatable(facilityName)) {
+			throw new AuthenticationException("Tenant name: " + facilityName + " is forbidden");
 		}
 		tenant.setOrganizationName(facilityName);
 		tenant.setUserAccess(userAccess);
@@ -119,13 +120,13 @@ public class TenantUtil implements InitializingBean {
 
 	public RequestDetails requestDetailsWithPartitionName() {
 		PartitionEntity partitionEntity = partitionLookupSvc
-			.getPartitionByName(CurrentTenantUtil.getTenant().getOrganizationName());
+				.getPartitionByName(CurrentTenantUtil.getTenant().getOrganizationName());
 		if (partitionEntity == null) {
 			// return SystemRequestDetails.forAllPartitions();
 			throw new RuntimeException("No partition found");
 		}
 		RequestDetails requestDetails = SystemRequestDetails
-			.forRequestPartitionId(partitionEntity.toRequestPartitionId());
+				.forRequestPartitionId(partitionEntity.toRequestPartitionId());
 		requestDetails.setTenantId(CurrentTenantUtil.getTenant().getOrganizationName());
 		return requestDetails;
 	}
@@ -133,7 +134,7 @@ public class TenantUtil implements InitializingBean {
 	public Tenant getTenantByIdAuthenticated(int tenantId) {
 		UserAccess userAccess = UserAccessUtil.get().getUserAccess();
 		Tenant tenant = tenantRepository.findByOrgIdAndUserAccessId(tenantId, userAccess.getUserAccessId())
-			.orElse(null);
+				.orElse(null);
 		return tenant;
 	}
 
