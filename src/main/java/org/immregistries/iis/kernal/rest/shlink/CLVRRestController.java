@@ -71,10 +71,10 @@ public class CLVRRestController {
 
     @Autowired
     CLVRPdfService clvrPdfService;
-	 @Autowired
-	CompressionService compressionService;
+    @Autowired
+    CompressionService compressionService;
 
-    @GetMapping(value = "/qr", produces = "text/plain")
+    @GetMapping(value = "/qr", produces = MediaType.TEXT_PLAIN_VALUE)
     public String getPatientClvrQrCode(
             @PathVariable("patientId") String patientId,
             @RequestAttribute(CurrentTenantUtil.SESSION_REQUEST_TENANT) Tenant tenant)
@@ -89,21 +89,26 @@ public class CLVRRestController {
         return qrCode;
     }
 
-    @GetMapping(value = "/qr/png", produces = "image/png")
-    public BufferedImage getPatientClvrQrCodePng(
+    @GetMapping(value = "/qr/png", produces = MediaType.IMAGE_PNG_VALUE)
+    public ResponseEntity<byte[]> getPatientClvrPng(
             @PathVariable("patientId") String patientId,
             @RequestAttribute(CurrentTenantUtil.SESSION_REQUEST_TENANT) Tenant tenant)
-		 throws COSEException, IOException, SignatureException, NoSuchAlgorithmException, InvalidKeyException,
-		 NoSuchProviderException, ServletException {
+            throws COSEException, IOException, SignatureException, NoSuchAlgorithmException, InvalidKeyException,
+            NoSuchProviderException, ServletException {
         UserAccess userAccess = UserAccessUtil.get().getUserAccess();
         IisKey iisSigningKey = keyStoreService.getIisSigningKeyOrCreate("", userAccess, tenant);
         CLVRToken clvrToken = getIpsClvrToken(patientId);
         String qrCode = clvrService.encodeCLVRtoQrCode(clvrToken, iisSigningKey.keyPair());
 
-        return bufferedImage(qrCode);
+
+		 ByteArrayOutputStream byteArrayOutputStreamPNG = getByteArrayOutputStreamPNG(qrCode);
+		 return ResponseEntity.ok(byteArrayOutputStreamPNG.toByteArray());
+//		 HttpHeaders headers = new HttpHeaders();
+//		 headers.setContentDispositionFormData("attachment", "qr.png");
+//		 return new ResponseEntity<>(byteArrayOutputStreamPNG, headers, HttpStatus.OK);
     }
 
-    @GetMapping(value = "/qr/pdf", produces = "application/pdf")
+    @GetMapping(value = "/qr/pdf", produces = MediaType.APPLICATION_PDF_VALUE)
     public ResponseEntity<byte[]> getPatientClvrPdf(
             @PathVariable("patientId") String patientId,
             @RequestAttribute(CurrentTenantUtil.SESSION_REQUEST_TENANT) Tenant tenant)
@@ -131,26 +136,35 @@ public class CLVRRestController {
     protected ResponseEntity<byte[]> pdfResponseEntity(
             PDDocument pdDocument,
             String name) throws IOException {
-		 ByteArrayOutputStream byteArrayOutputStream = getByteArrayOutputStream(pdDocument);
+        ByteArrayOutputStream byteArrayOutputStream = getByteArrayOutputStream(pdDocument);
 
-		 HttpHeaders headers = new HttpHeaders();
-//        headers.setContentType(MediaType.APPLICATION_PDF);
+        HttpHeaders headers = new HttpHeaders();
+        // headers.setContentType(MediaType.APPLICATION_PDF);
         headers.setContentDispositionFormData("attachment", name + ".pdf");
         return new ResponseEntity<>(byteArrayOutputStream.toByteArray(), headers, HttpStatus.OK);
     }
 
-	private static @NotNull ByteArrayOutputStream getByteArrayOutputStream(PDDocument pdDocument) throws IOException {
-		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-		pdDocument.save(byteArrayOutputStream);
-		pdDocument.close();
-		return byteArrayOutputStream;
-	}
+    private static @NotNull ByteArrayOutputStream getByteArrayOutputStream(PDDocument pdDocument) throws IOException {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        pdDocument.save(byteArrayOutputStream);
+        pdDocument.close();
+        return byteArrayOutputStream;
+    }
 
-	public BufferedImage bufferedImage(String data) throws ServletException {
-		int width = 300; // Desired QR code width
-		int height = 300; // Desired QR code height
-		BitMatrix bitMatrix = compressionService.qrCodeBitMatrix(data, width, height);
-		return MatrixToImageWriter.toBufferedImage(bitMatrix);
-	}
+    private @NotNull ByteArrayOutputStream getByteArrayOutputStreamPNG(String data) throws IOException, ServletException {
+		 int width = 300; // Desired QR code width
+		 int height = 300; // Desired QR code height
+		 BitMatrix bitMatrix = compressionService.qrCodeBitMatrix(data, width, height);
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+		  MatrixToImageWriter.writeToStream(bitMatrix, "PNG", byteArrayOutputStream);
+        return byteArrayOutputStream;
+    }
+
+    public BufferedImage bufferedImage(String data) throws ServletException {
+        int width = 300; // Desired QR code width
+        int height = 300; // Desired QR code height
+        BitMatrix bitMatrix = compressionService.qrCodeBitMatrix(data, width, height);
+        return MatrixToImageWriter.toBufferedImage(bitMatrix);
+    }
 
 }

@@ -15,6 +15,8 @@ import org.immregistries.iis.kernal.mapping.interfaces.PatientMapper;
 import org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester;
 import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
+import org.immregistries.iis.kernal.rest.PatientRestController;
+import org.immregistries.iis.kernal.rest.shlink.PatientShLinkRestController;
 import org.immregistries.iis.kernal.servlet.TenantController;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,13 +42,11 @@ public class PatientShLinkController {
 	@Autowired
 	private RepositoryClientFactory repositoryClientFactory;
 	@Autowired
+	private PatientRestController patientRestController;
+	@Autowired
+	private PatientShLinkRestController patientShLinkRestController;
+	@Autowired
 	private AbstractFhirRequester fhirRequester;
-	@Autowired
-	private FhirContext fhirContext;
-	@Autowired
-	private PatientMapper patientMapper;
-	@Autowired
-	private PartitionTenantCreationInterceptor partitionTenantCreationInterceptor;
 
 	@GetMapping({ SHLINK_QR_CODE_PATH_SUFFIX })
 	protected void doGetShLinkQrCode(HttpServletRequest req, HttpServletResponse resp)
@@ -57,6 +57,7 @@ public class PatientShLinkController {
 
 		Tenant tenant = CurrentTenantUtil.getTenantRedirectIfNone(req, resp);
 		IGenericClient fhirClient = repositoryClientFactory.newGenericClient(req);
+		// patientShLinkRestController.doGetPatientShLinkQrCode(req, resp);
 		IBaseResource patientSelected = fetchPatientFromParameter(req, fhirClient, fhirRequester);
 		if (patientSelected != null) {
 			String qrCode = getQrCode(req, patientSelected, tenant);

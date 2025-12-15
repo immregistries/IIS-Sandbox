@@ -4,6 +4,7 @@ import ca.uhn.fhir.jpa.partition.IPartitionLookupSvc;
 import com.authlete.cose.COSEException;
 import com.google.zxing.WriterException;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -49,9 +50,6 @@ public class CLVRController {
 	ShLinkUtilService shLinkUtilService;
 
 	@Autowired
-	CLVRPdfService clvrPdfService;
-
-	@Autowired
 	CLVRRestController clvrRestController;
 
 	@GetMapping("/{patientId}")
@@ -60,26 +58,32 @@ public class CLVRController {
 			HttpServletResponse resp,
 			@PathVariable("patientId") String patientId,
 			@RequestParam(value = "pdf", required = false) boolean pdf)
-		throws COSEException, IOException, SignatureException, NoSuchAlgorithmException, InvalidKeyException,
-		NoSuchProviderException, ServletException, WriterException, URISyntaxException {
+			throws COSEException, IOException, SignatureException, NoSuchAlgorithmException, InvalidKeyException,
+			NoSuchProviderException, ServletException, WriterException, URISyntaxException {
 		Tenant tenant = CurrentTenantUtil.getTenantRedirectIfNone(req, resp);
 		UserAccess userAccess = UserAccessUtil.get().getUserAccess();
-		OutputStream outputStream = resp.getOutputStream();
+		ServletOutputStream outputStream = resp.getOutputStream();
 
-		String qrCode = clvrRestController.getPatientClvrQrCode(patientId,tenant);
-			;logger.info("qrCode {}", qrCode);
+//		String qrCode = clvrRestController.getPatientClvrQrCode(patientId, tenant);
+//		logger.info("qrCode {}", qrCode);
 
 		if (!pdf) {
 			resp.setContentType("image/png"); // Set content type for PNG image
+			ResponseEntity<byte[]> responseEntity = clvrRestController.getPatientClvrPng(patientId, tenant);
+			outputStream.write(responseEntity.getBody());
+			outputStream.flush();
+			outputStream.close();
+
+			String qrCode = clvrRestController.getPatientClvrQrCode(patientId, tenant);
 			shLinkUtilService.printQrCodeAsImage(outputStream, qrCode);
 		} else {
 
-			ResponseEntity<byte[]> responseEntity = clvrRestController.getPatientClvrPdf(patientId,tenant);
+			ResponseEntity<byte[]> responseEntity = clvrRestController.getPatientClvrPdf(patientId, tenant);
 			resp.setContentType("application/pdf");
 			resp.setHeader("Content-Disposition", "attachment; filename=" + "testPdf");
-			resp.getOutputStream().write(responseEntity.getBody());
-			resp.getOutputStream().flush();
-			resp.getOutputStream().close();
+			outputStream.write(responseEntity.getBody());
+			outputStream.flush();
+			outputStream.close();
 		}
 	}
 

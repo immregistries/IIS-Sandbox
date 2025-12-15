@@ -18,6 +18,7 @@ import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -38,22 +39,18 @@ public class PatientShLinkRestController {
     private ShLinkUtilService shLinkUtilService;
     @Autowired
     private RepositoryClientFactory repositoryClientFactory;
-    @Autowired
-    private AbstractFhirRequester fhirRequester;
-    @Autowired
-    private FhirContext fhirContext;
-    @Autowired
-    private PatientMapper patientMapper;
 
     @GetMapping({ SHLINK_QR_CODE_PATH_SUFFIX })
-    protected void doGetShLinkQrCode(HttpServletRequest req, HttpServletResponse resp,
-            @RequestAttribute(CurrentTenantUtil.SESSION_REQUEST_TENANT) Tenant tenant)
+    public void doGetShLinkQrCode(HttpServletRequest req, HttpServletResponse resp,
+            @RequestAttribute(CurrentTenantUtil.SESSION_REQUEST_TENANT) Tenant tenant,
+            @PathVariable("patientId") String patientId)
             throws IOException, ServletException {
         OutputStream outputStream = resp.getOutputStream();
         resp.setContentType("image/png"); // Set content type for PNG image
 
-        IGenericClient fhirClient = repositoryClientFactory.newGenericClient(req);
-        IBaseResource patientSelected = fetchPatientFromParameter(req, fhirClient, fhirRequester);
+        IGenericClient client = repositoryClientFactory.newGenericClient(tenant, req);
+
+        IBaseResource patientSelected = client.read().resource("Patient").withId(patientId).execute();
         if (patientSelected != null) {
             String qrCode = getQrCode(req, patientSelected, tenant);
             shLinkUtilService.printQrCodeAsImage(outputStream, qrCode);
@@ -62,7 +59,7 @@ public class PatientShLinkRestController {
         outputStream.close();
     }
 
-    private String getQrCode(HttpServletRequest req, IBaseResource patientSelected, Tenant tenant) {
+    public String getQrCode(HttpServletRequest req, IBaseResource patientSelected, Tenant tenant) {
         String manifestUrl = getManifestUrl(req, patientSelected, tenant);
         ShLinkPayload shLinkPayload = getPatientShLinkPayload(manifestUrl);
 
