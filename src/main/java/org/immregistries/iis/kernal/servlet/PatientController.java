@@ -57,7 +57,7 @@ public class PatientController {
 	public static final String PARAM_PATIENT_NAME_LAST = "patientNameLast";
 	public static final String PARAM_PATIENT_NAME_FIRST = "patientNameFirst";
 	public static final String PARAM_PATIENT_REPORTED_EXTERNAL_LINK = "identifier";
-	public static final String PARAM_PATIENT_REPORTED_ID = "id";
+	public static final String PARAM_PATIENT_REPORTED_ID = "patientId";
 
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 

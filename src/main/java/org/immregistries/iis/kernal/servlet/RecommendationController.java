@@ -12,7 +12,6 @@ import org.hl7.fhir.instance.model.api.IBaseBundle;
 import org.hl7.fhir.instance.model.api.IDomainResource;
 import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.mapping.interfaces.PatientMapper;
-import org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester;
 import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
 import org.immregistries.iis.kernal.model.BusinessIdentifier;
 import org.immregistries.iis.kernal.model.PatientMaster;
@@ -43,8 +42,6 @@ public class RecommendationController {
 
 	@Autowired
 	private RepositoryClientFactory repositoryClientFactory;
-	@Autowired
-	private AbstractFhirRequester fhirRequester;
 
 	@Autowired
 	private FhirContext fhirContext;
@@ -134,7 +131,8 @@ public class RecommendationController {
 							.execute();
 				}
 			} else {
-				patientResource = PatientServletUtil.fetchPatientFromParameter(req, fhirClient, fhirRequester);
+				String patientId = req.getParameter(PARAM_PATIENT_REPORTED_ID);
+				patientResource = (IDomainResource) patientRestController.getPatientFhir(patientId, tenant, req);
 			}
 			if (patientResource == null) {
 				out.println("No patient or recommendation found with request parameters.");
