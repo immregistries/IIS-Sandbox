@@ -116,20 +116,16 @@ public class RecommendationController {
 		try {
 			IGenericClient fhirClient = repositoryClientFactory.newGenericClient(req);
 
-			IDomainResource recommendationResource = getRecommendation(req, fhirClient);
+			IDomainResource recommendationResource = recommendationRestController.getRecommendation(
+					req.getParameter(PARAM_RECOMMENDATION_ID), req.getParameter(PARAM_RECOMMENDATION_IDENTIFIER),
+					tenant, req);
 			IDomainResource patientResource = null;
 			if (recommendationResource != null) {
-				if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R5)) {
-					patientResource = (IDomainResource) fhirClient.read().resource("Patient")
-							.withId(((org.hl7.fhir.r5.model.ImmunizationRecommendation) recommendationResource)
-									.getPatient().getReference())
-							.execute();
-				} else if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R4)) {
-					patientResource = (IDomainResource) fhirClient.read().resource("Patient")
-							.withId(((org.hl7.fhir.r4.model.ImmunizationRecommendation) recommendationResource)
-									.getPatient().getReference())
-							.execute();
-				}
+				String patientReference = getPatientIdFromRecommendation(recommendationResource,
+						fhirClient.getFhirContext());
+				patientResource = (IDomainResource) fhirClient.read().resource("Patient")
+						.withId(patientReference)
+						.execute();
 			} else {
 				String patientId = req.getParameter(PARAM_PATIENT_REPORTED_ID);
 				patientResource = (IDomainResource) patientRestController.getPatientFhir(patientId, tenant, req);
@@ -147,26 +143,25 @@ public class RecommendationController {
 				out.println("<h2>Immunization recommendations of "
 						+ patientMaster.getLegalNameOrFirst().asSingleString() + "</h2>");
 				if (recommendationResource == null) {
-					IBaseBundle baseBundle = fhirClient.search()
-							.forResource("ImmunizationRecommendation")
-							.where(org.hl7.fhir.r5.model.ImmunizationRecommendation.PATIENT
-									.hasChainedProperty(org.hl7.fhir.r5.model.Patient.IDENTIFIER.exactly()
-											.systemAndCode(identifier.getSystem(), identifier.getValue())))
-							.execute();
-					if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R5)) {
+					IBaseBundle baseBundle = patientRestController
+							.getPatientRecommendation(patientResource.getIdElement().getIdPart(), tenant, req);
+					if (fhirContext.getVersion().equals(FhirVersionEnum.R5)) {
 						org.hl7.fhir.r5.model.Bundle recommendationBundle = (org.hl7.fhir.r5.model.Bundle) baseBundle;
-						if (recommendationBundle.hasEntry()) {
-							recommendationResource = (IDomainResource) recommendationBundle.getEntryFirstRep()
+						if (recommendationBundle.getEntry().size() > 0) {
+							recommendationResource = (IDomainResource) recommendationBundle
+									.getEntryFirstRep()
 									.getResource();
 						}
-					} else if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R4)) {
+					} else if (fhirContext.getVersion().equals(FhirVersionEnum.R4)) {
 						org.hl7.fhir.r4.model.Bundle recommendationBundle = (org.hl7.fhir.r4.model.Bundle) baseBundle;
-						if (recommendationBundle.hasEntry()) {
-							recommendationResource = (IDomainResource) recommendationBundle.getEntryFirstRep()
+						if (recommendationBundle.getEntry().size() > 0) {
+							recommendationResource = (IDomainResource) recommendationBundle
+									.getEntryFirstRep()
 									.getResource();
 						}
 					}
 				}
+
 				printRecommendation(out, recommendationResource, patientResource);
 				if (recommendationResource != null
 						&& fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R5)) {
@@ -210,42 +205,16 @@ public class RecommendationController {
 		out.close();
 	}
 
-	/**
-	 * Helping method to get Recommendation from server
-	 *
-	 * @param req        request
-	 * @param fhirClient Fhir client
-	 * @return ImmunizationRecommendation
-	 */
-	protected IDomainResource getRecommendation(HttpServletRequest req, IGenericClient fhirClient) {
-		IDomainResource recommendation = null;
-		if (req.getParameter(PARAM_RECOMMENDATION_ID) != null) {
-			recommendation = (IDomainResource) fhirClient.read().resource("ImmunizationRecommendation")
-					.withId(req.getParameter(PARAM_RECOMMENDATION_ID)).execute();
-		} else if (req.getParameter(PARAM_RECOMMENDATION_IDENTIFIER) != null) {
-			if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R5)) {
-				org.hl7.fhir.r5.model.Bundle recommendationBundle = fhirClient
-						.search().forResource("ImmunizationRecommendation").where(
-								org.hl7.fhir.r5.model.Patient.IDENTIFIER.exactly()
-										.identifier(req.getParameter(PARAM_RECOMMENDATION_IDENTIFIER)))
-						.returnBundle(org.hl7.fhir.r5.model.Bundle.class).execute();
-				if (recommendationBundle.hasEntry()) {
-					recommendation = (org.hl7.fhir.r5.model.ImmunizationRecommendation) recommendationBundle
-							.getEntryFirstRep().getResource();
-				}
-			} else if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R4)) {
-				org.hl7.fhir.r4.model.Bundle recommendationBundle = fhirClient
-						.search().forResource("ImmunizationRecommendation").where(
-								org.hl7.fhir.r4.model.Patient.IDENTIFIER.exactly()
-										.identifier(req.getParameter(PARAM_RECOMMENDATION_IDENTIFIER)))
-						.returnBundle(org.hl7.fhir.r4.model.Bundle.class).execute();
-				if (recommendationBundle.hasEntry()) {
-					recommendation = (org.hl7.fhir.r4.model.ImmunizationRecommendation) recommendationBundle
-							.getEntryFirstRep().getResource();
-				}
-			}
+	private String getPatientIdFromRecommendation(IDomainResource recommendationResource, FhirContext fhirContext) {
+		String patientReference = "";
+		if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R5)) {
+			patientReference = ((org.hl7.fhir.r5.model.ImmunizationRecommendation) recommendationResource)
+					.getPatient().getReference();
+		} else if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R4)) {
+			patientReference = ((org.hl7.fhir.r4.model.ImmunizationRecommendation) recommendationResource)
+					.getPatient().getReference();
 		}
-		return recommendation;
+		return patientReference;
 	}
 
 	public void printRecommendation(PrintWriter out, IDomainResource recommendation, IDomainResource patient) {

@@ -38,7 +38,7 @@ public class RecommendationRestController {
 
     @PostMapping("/random")
     public void addRandomRecommendation(
-		 @RequestAttribute(name = TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
+            @RequestAttribute(name = TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
             HttpServletRequest req) {
 
         IGenericClient fhirClient = repositoryClientFactory.newGenericClient(req);
@@ -83,7 +83,7 @@ public class RecommendationRestController {
 
     @PutMapping
     public void updateRecommendation(
-		 @RequestAttribute(TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
+            @RequestAttribute(TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
             @RequestBody String recommendationResource,
             HttpServletRequest req) {
 
@@ -127,7 +127,8 @@ public class RecommendationRestController {
             // If I simplify, I might break the exact behavior.
             // Let's try to support the query params for lookup if provided.
 
-            IDomainResource old = getRecommendation(req, fhirClient);
+            IDomainResource old = getRecommendation(req.getParameter("recommendationId"),
+                    req.getParameter("recommendationIdentifier"), tenant, req);
             if (old != null) {
                 newRecommendation.setId(old.getIdElement().getIdPart());
             }
@@ -135,7 +136,8 @@ public class RecommendationRestController {
         } else if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R4)) {
             org.hl7.fhir.r4.model.ImmunizationRecommendation newRecommendation = parser
                     .parseResource(org.hl7.fhir.r4.model.ImmunizationRecommendation.class, recommendationResource);
-            IDomainResource old = getRecommendation(req, fhirClient);
+            IDomainResource old = getRecommendation(req.getParameter("recommendationId"),
+                    req.getParameter("recommendationIdentifier"), tenant, req);
             if (old != null) {
                 newRecommendation.setId(old.getIdElement().getIdPart());
             }
@@ -143,13 +145,15 @@ public class RecommendationRestController {
         }
     }
 
-    // Copied from RecommendationController for equivalence
     @GetMapping()
-    private IDomainResource getRecommendation(HttpServletRequest req, IGenericClient fhirClient) {
+    public IDomainResource getRecommendation(
+            @RequestParam(name = "recommendationId", required = false) String recommendationId,
+            @RequestParam(name = "recommendationIdentifier", required = false) String recommendationIdentifier,
+            @RequestAttribute(TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
+            HttpServletRequest req) {
         IDomainResource recommendation = null;
-        String recommendationId = req.getParameter("recommendationId");
-        String recommendationIdentifier = req.getParameter("recommendationIdentifier");
 
+        IGenericClient fhirClient = repositoryClientFactory.newGenericClient(tenant, req);
         if (recommendationId != null) {
             recommendation = (IDomainResource) fhirClient.read().resource("ImmunizationRecommendation")
                     .withId(recommendationId).execute();
