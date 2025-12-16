@@ -4,7 +4,7 @@ import ca.uhn.fhir.rest.server.RestfulServer;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.immregistries.iis.kernal.servlet.TenantController;
+import org.immregistries.iis.kernal.controllers.servlet.TenantController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 

@@ -19,7 +19,7 @@ import org.immregistries.iis.kernal.model.ShLinkFilePayload;
 import org.immregistries.iis.kernal.persisted.model.*;
 import org.immregistries.iis.kernal.persisted.repository.IisShlinkContentRepository;
 import org.immregistries.iis.kernal.persisted.repository.ShlinkManifestRepository;
-import org.immregistries.iis.kernal.servlet.shlink.ShLinkContentController;
+import org.immregistries.iis.kernal.controllers.servlet.shlink.ShLinkContentController;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +39,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import static org.immregistries.iis.kernal.logic.shlink.ShCardUtilService.VERIFIABLE_CREDENTIAL_TYPE;
-import static org.immregistries.iis.kernal.servlet.shlink.ShLinkManifestController.SHLINKS_CONTROLLER_BASE_URL;
+import static org.immregistries.iis.kernal.controllers.servlet.shlink.ShLinkManifestController.SHLINKS_CONTROLLER_BASE_URL;
 
 @Service
 public class ShLinkUtilService {

@@ -1,7 +1,7 @@
 package org.immregistries.iis.kernal.fhir.security;
 
-import org.immregistries.iis.kernal.servlet.*;
-import org.immregistries.iis.kernal.servlet.util.UrlTenantUtil;
+import org.immregistries.iis.kernal.controllers.servlet.*;
+import org.immregistries.iis.kernal.controllers.servlet.util.UrlTenantUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
@@ -16,10 +16,10 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 
 import java.util.List;
 
-import static org.immregistries.iis.kernal.servlet.LoginController.LOGIN_PARAM_PASSWORD;
-import static org.immregistries.iis.kernal.servlet.LoginController.LOGIN_PARAM_USERID;
-import static org.immregistries.iis.kernal.servlet.shlink.ShLinkContentController.SHLINK_FILES;
-import static org.immregistries.iis.kernal.servlet.shlink.ShLinkManifestController.SHLINKS_CONTROLLER_BASE_URL;
+import static org.immregistries.iis.kernal.controllers.servlet.LoginController.LOGIN_PARAM_PASSWORD;
+import static org.immregistries.iis.kernal.controllers.servlet.LoginController.LOGIN_PARAM_USERID;
+import static org.immregistries.iis.kernal.controllers.servlet.shlink.ShLinkContentController.SHLINK_FILES;
+import static org.immregistries.iis.kernal.controllers.servlet.shlink.ShLinkManifestController.SHLINKS_CONTROLLER_BASE_URL;
 
 @Configuration
 public class ServerSecurityConfig {
@@ -47,8 +47,8 @@ public class ServerSecurityConfig {
 						.permitAll() // ShLinks
 						.requestMatchers(LOGIN_FORM_PATH, "/oauth2/**", LOGIN_PATH).permitAll()
 						// API AUTHORIZATION AND AUTHENTICATION SEPARATED
-						.requestMatchers("/fhir/**", SoapController.SOAP_BASE_PATH,
-								FhirMessagingController.FHIR_MESSAGING_BASE_PATH + SoapController.SOAP_BASE_PATH,
+						.requestMatchers("/fhir/**", SoapDescriptionController.SOAP_BASE_PATH,
+								FhirMessagingController.FHIR_MESSAGING_BASE_PATH + SoapDescriptionController.SOAP_BASE_PATH,
 								"/.well-known/smart-configuration", "/registerClient", "/token",
 								"/rest/**")
 						.permitAll()

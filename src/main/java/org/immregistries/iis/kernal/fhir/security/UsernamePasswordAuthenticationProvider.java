@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import static org.immregistries.iis.kernal.servlet.LoginController.LOGIN_PARAM_TENANT_NAME;
+import static org.immregistries.iis.kernal.controllers.servlet.LoginController.LOGIN_PARAM_TENANT_NAME;
 
 @Component
 public class UsernamePasswordAuthenticationProvider implements AuthenticationProvider {

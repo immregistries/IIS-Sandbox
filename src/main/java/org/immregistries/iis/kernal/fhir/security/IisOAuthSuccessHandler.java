@@ -7,7 +7,7 @@ import jakarta.servlet.http.HttpSession;
 import org.immregistries.iis.kernal.fhir.Application;
 import org.immregistries.iis.kernal.fhir.interceptors.PartitionTenantCreationInterceptor;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
-import org.immregistries.iis.kernal.servlet.HomeController;
+import org.immregistries.iis.kernal.controllers.servlet.HomeController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

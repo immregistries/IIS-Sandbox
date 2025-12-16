@@ -7,7 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.immregistries.iis.kernal.fhir.Application;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.immregistries.iis.kernal.persisted.model.UserAccess;
-import org.immregistries.iis.kernal.servlet.TenantController;
+import org.immregistries.iis.kernal.controllers.servlet.TenantController;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;

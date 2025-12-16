@@ -1,6 +1,7 @@
 package org.immregistries.iis.kernal.fhir;
 
-import org.immregistries.iis.kernal.servlet.TenantUrlFilter;
+import org.immregistries.iis.kernal.controllers.rest.TenantRequestLoggingFilter;
+import org.immregistries.iis.kernal.controllers.servlet.TenantUrlFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -33,13 +34,13 @@ public class FilterRegistrationConfig {
 	}
 
 	@Bean(name = "tenantRequestLoggingFilter")
-	public org.immregistries.iis.kernal.rest.TenantRequestLoggingFilter tenantRequestLoggingFilter() {
-		return new org.immregistries.iis.kernal.rest.TenantRequestLoggingFilter();
+	public TenantRequestLoggingFilter tenantRequestLoggingFilter() {
+		return new TenantRequestLoggingFilter();
 	}
 
 	@Bean
 	public FilterRegistrationBean tenantRequestLoggingFilterRegistrationBean(
-			org.immregistries.iis.kernal.rest.TenantRequestLoggingFilter tenantRequestLoggingFilter) {
+			TenantRequestLoggingFilter tenantRequestLoggingFilter) {
 		FilterRegistrationBean registration = new FilterRegistrationBean();
 		registration.setFilter(tenantRequestLoggingFilter);
 		registration.addUrlPatterns("/rest/tenant/*");

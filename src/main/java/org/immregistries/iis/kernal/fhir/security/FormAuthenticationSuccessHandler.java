@@ -5,8 +5,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.immregistries.iis.kernal.fhir.Application;
-import org.immregistries.iis.kernal.servlet.HomeController;
-import org.immregistries.iis.kernal.servlet.PopController;
+import org.immregistries.iis.kernal.controllers.servlet.HomeController;
+import org.immregistries.iis.kernal.controllers.servlet.PopController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
@@ -22,8 +22,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.io.IOException;
 import java.net.MalformedURLException;
 
-import static org.immregistries.iis.kernal.servlet.LoginController.LOGIN_PARAM_TENANT_NAME;
-import static org.immregistries.iis.kernal.servlet.TenantController.TENANT_BASE_PATH;
+import static org.immregistries.iis.kernal.controllers.servlet.LoginController.LOGIN_PARAM_TENANT_NAME;
+import static org.immregistries.iis.kernal.controllers.servlet.TenantController.TENANT_BASE_PATH;
 
 public class FormAuthenticationSuccessHandler extends SavedRequestAwareAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
 	private Logger logger = LoggerFactory.getLogger(this.getClass());

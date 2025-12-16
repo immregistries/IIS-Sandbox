@@ -12,7 +12,7 @@ import org.immregistries.iis.kernal.logic.KeyStoreService;
 import org.immregistries.iis.kernal.persisted.model.IisKey;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.immregistries.iis.kernal.persisted.model.UserAccess;
-import org.immregistries.iis.kernal.servlet.WellKnownKeyController;
+import org.immregistries.iis.kernal.controllers.servlet.WellKnownKeyController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
