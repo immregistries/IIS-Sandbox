@@ -60,11 +60,7 @@ public class PopController {
 				out.println("Access is not authorized. FacilityId, userid and/or password are not recognized. ");
 			} else {
 				UiUtil.doHeader(out, "IIS Sandbox - PopResult", tenant);
-
-				PopRestController.PopRequest popRequest = new PopRestController.PopRequest();
-				popRequest.setMessage(message);
-				popRequest.setFacilityName(facility_name);
-				ack = popRestController.postPop(popRequest, req);
+				ack = popRestController.postPop(message,facility_name,tenant, req);
 			}
 			// resp.setContentType("text/plain");
 			out.println("<textarea name=\"ack\" readonly style=\"width: 100%; height: 90%;\" >");

@@ -3,6 +3,7 @@ package org.immregistries.iis.kernal.controllers.rest;
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.context.FhirVersionEnum;
 import jakarta.servlet.http.HttpServletRequest;
+import org.immregistries.iis.kernal.controllers.filters.TenantRequestLoggingFilter;
 import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.logic.messageHandling.V2IncomingMessageHandler;
 import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
@@ -13,6 +14,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.Date;
+
+import static org.immregistries.iis.kernal.controllers.servlet.PopController.PARAM_FACILITY_NAME;
 
 @RestController
 @RequestMapping("/rest/tenant/{tenantId}/pop")
@@ -27,16 +30,10 @@ public class PopRestController {
 
     @PostMapping
     public String postPop(
-            // @PathVariable int tenantId,
-            @RequestBody PopRequest popRequest,
-            HttpServletRequest req) {
-        Tenant tenant = CurrentTenantUtil.getTenant(req);
-        if (tenant == null) {
-            throw new RuntimeException("Access is not authorized");
-        }
-        String message = popRequest.getMessage();
-        String facilityName = popRequest.getFacilityName();
-
+            @RequestBody String message,
+				@RequestParam(value = PARAM_FACILITY_NAME, required = false) String facilityName,
+				@RequestAttribute(TenantRequestLoggingFilter.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
+				HttpServletRequest req) {
         if (message == null) {
             return "";
         }
@@ -79,26 +76,5 @@ public class PopRestController {
         }
 
         return ackBuilder.toString();
-    }
-
-    public static class PopRequest {
-        private String message;
-        private String facilityName;
-
-        public String getMessage() {
-            return message;
-        }
-
-        public void setMessage(String message) {
-            this.message = message;
-        }
-
-        public String getFacilityName() {
-            return facilityName;
-        }
-
-        public void setFacilityName(String facilityName) {
-            this.facilityName = facilityName;
-        }
     }
 }
