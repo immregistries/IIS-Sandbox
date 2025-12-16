@@ -32,6 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URISyntaxException;
@@ -74,8 +75,8 @@ public class CLVRController {
 			outputStream.flush();
 			outputStream.close();
 
-			String qrCode = clvrRestController.getPatientClvrQrCode(patientId, tenant);
-			shLinkUtilService.printQrCodeAsImage(outputStream, qrCode);
+//			String qrCode = clvrRestController.getPatientClvrQrCode(patientId, tenant);
+//			shLinkUtilService.printQrCodeAsImage(outputStream, qrCode);
 		} else {
 
 			ResponseEntity<byte[]> responseEntity = clvrRestController.getPatientClvrPdf(patientId, tenant);

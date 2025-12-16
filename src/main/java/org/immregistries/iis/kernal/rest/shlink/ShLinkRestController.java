@@ -1,7 +1,5 @@
 package org.immregistries.iis.kernal.rest.shlink;
 
-import ca.uhn.fhir.context.FhirContext;
-import ca.uhn.fhir.jpa.partition.IPartitionLookupSvc;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -22,9 +20,11 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
 import javax.crypto.spec.SecretKeySpec;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
@@ -54,14 +54,8 @@ public class ShLinkRestController {
 	@Autowired
 	KeyStoreService keyStoreService;
 
-	@Autowired
-	IPartitionLookupSvc partitionLookupSvc;
-
-	@Autowired
-	FhirContext fhirContext;
-
 	@PostMapping()
-	protected void shLinkIPS(HttpServletRequest req, HttpServletResponse resp,
+	public ResponseEntity<byte[]> shLinkIPS(HttpServletRequest req, HttpServletResponse resp,
 			@RequestParam(value = PARAM_KEY_ID, required = false) String keyId,
 			@RequestParam(value = PARAM_SECRET_KEY, required = false) String secretKey,
 			@RequestParam(PARAM_PATIENT_ID) String patientId,
@@ -71,7 +65,7 @@ public class ShLinkRestController {
 			@RequestAttribute(CurrentTenantUtil.SESSION_REQUEST_TENANT) Tenant tenant)
 			throws ServletException, IOException, NoSuchAlgorithmException {
 		UserAccess userAccess = UserAccessUtil.get().getUserAccess();
-		OutputStream outputStream = resp.getOutputStream();
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream(20000);
 
 		/*
 		 * Choosing or generating the keys based on the parameters
@@ -85,17 +79,6 @@ public class ShLinkRestController {
 		shLinkPayload.setLabel("Generated for ShLink testing with IPS of Synthetic Patient");
 		shLinkPayload.setFlag(flag);
 		shLinkPayload.setKey(new String(Base64.getUrlEncoder().encode(encryptionKeySpec.getEncoded())));
-		// Fixed potential NPE on Long.getLong which expects property name, not value
-		// string parsing
-		// Original code had Long.getLong(exp), which might have been checking system
-		// properties?
-		// Or if it was meant to parse: Long.parseLong(exp). I assume parse.
-		// But let's check original... yes `Long.getLong(exp)` implies it's looking for
-		// a system property named by contents of `exp`?
-		// That seems like a bug or specific intent in original code.
-		// Wait, typical use is Long.parseLong. Long.getLong is for System properties.
-		// If the user passes "123", Long.getLong("123") checks for property "123".
-		// I will assume it should be parsed.
 		try {
 			shLinkPayload.setExp(Long.parseLong(exp));
 		} catch (NumberFormatException e) {
@@ -113,16 +96,16 @@ public class ShLinkRestController {
 				iisSigningKey, encryptionKeySpec, userAccess, tenant);
 		shLinkPayload.setUrl(url);
 		String qrCode = shLinkUtilService.qrCode(shLinkPayload);
+		HttpHeaders headers = new HttpHeaders();
 		if (image) {
-			resp.setContentType("image/png"); // Set content type for PNG image
+			headers.setContentType(MediaType.IMAGE_PNG);
 			shLinkUtilService.printQrCodeAsImage(outputStream, qrCode);
 		} else {
 			// Returning the QR code text directly for REST if not image
-			resp.setContentType("text/plain");
-			PrintWriter out = new PrintWriter(outputStream);
-			out.print(qrCode);
-			out.flush();
+			headers.setContentType(MediaType.TEXT_PLAIN);
 		}
+		return new ResponseEntity<>(outputStream.toByteArray(),headers, HttpStatus.OK);
+
 	}
 
 	private @NotNull SecretKeySpec getSecretEncryptionKey(String secretKey) throws NoSuchAlgorithmException {
