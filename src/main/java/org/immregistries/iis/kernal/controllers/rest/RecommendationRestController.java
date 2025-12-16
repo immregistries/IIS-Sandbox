@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
 
-import static org.immregistries.iis.kernal.controllers.rest.TenantRequestLoggingFilter.TENANT_REQUEST_ATTRIBUTE;
+import static org.immregistries.iis.kernal.controllers.filters.TenantRequestLoggingFilter.TENANT_REQUEST_ATTRIBUTE;
 
 @RestController
 @RequestMapping("/rest/tenant/{tenantId}/recommendation")

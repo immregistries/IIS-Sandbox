@@ -1,7 +1,7 @@
 package org.immregistries.iis.kernal.fhir;
 
-import org.immregistries.iis.kernal.controllers.rest.TenantRequestLoggingFilter;
-import org.immregistries.iis.kernal.controllers.servlet.TenantUrlFilter;
+import org.immregistries.iis.kernal.controllers.filters.TenantRequestLoggingFilter;
+import org.immregistries.iis.kernal.controllers.filters.TenantUrlFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;

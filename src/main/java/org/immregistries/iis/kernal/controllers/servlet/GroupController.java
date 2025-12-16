@@ -59,7 +59,7 @@ public class GroupController {
 		out.println("<p>");
 		out.println(fhirContext.newJsonParser().setPrettyPrint(true).encodeResourceToString(group));
 		out.println("</p>");
-		Parameters parameters = new Parameters().addParameter("test", new Identifier().setValue("iii"));
+		Parameters parameters = new Parameters().addParameter("test", new Identifier().setValue("identifierTest"));
 		out.println("<p>");
 		out.println(fhirContext.newJsonParser().setPrettyPrint(true).encodeResourceToString(parameters));
 		out.println("</p>");
