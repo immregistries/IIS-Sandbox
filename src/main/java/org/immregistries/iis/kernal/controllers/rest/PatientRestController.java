@@ -7,7 +7,8 @@ import ca.uhn.fhir.rest.param.ReferenceParam;
 import jakarta.servlet.http.HttpServletRequest;
 import org.hl7.fhir.instance.model.api.IBaseBundle;
 import org.hl7.fhir.instance.model.api.IBaseResource;
-import org.immregistries.iis.kernal.controllers.filters.TenantRequestLoggingFilter;
+import org.immregistries.iis.kernal.controllers.filters.RestTenantUrlFilter;
+import org.immregistries.iis.kernal.controllers.rest.shlink.PatientShLinkRestController;
 import org.immregistries.iis.kernal.fhir.shl.ShLinkPayload;
 import org.immregistries.iis.kernal.mapping.interfaces.PatientMapper;
 import org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester;
@@ -16,7 +17,6 @@ import org.immregistries.iis.kernal.model.ObservationReported;
 import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.model.VaccinationMaster;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
-import org.immregistries.iis.kernal.controllers.servlet.shlink.PatientShLinkController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -39,7 +39,7 @@ public class PatientRestController extends BaseTenantTiedRest {
     @GetMapping("/{patientId}")
     public PatientMaster getPatient(
             @PathVariable("patientId") String patientId,
-            @RequestAttribute(TenantRequestLoggingFilter.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
+            @RequestAttribute(RestTenantUrlFilter.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
             HttpServletRequest req) {
         return fhirRequester.readAsPatientMaster(patientId);
     }
@@ -47,7 +47,7 @@ public class PatientRestController extends BaseTenantTiedRest {
     @GetMapping("/{patientId}/fhir")
     public IBaseResource getPatientFhir(
             @PathVariable("patientId") String patientId,
-            @RequestAttribute(TenantRequestLoggingFilter.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
+            @RequestAttribute(RestTenantUrlFilter.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
             HttpServletRequest req) {
         IGenericClient fhirClient = repositoryClientFactory.newGenericClient(tenant, req);
         return fhirClient.read().resource("Patient").withId(patientId).execute();
@@ -55,7 +55,7 @@ public class PatientRestController extends BaseTenantTiedRest {
 
     @GetMapping("")
     public List<PatientMaster> getAllPatients(
-            @RequestAttribute(TenantRequestLoggingFilter.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
+            @RequestAttribute(RestTenantUrlFilter.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
             HttpServletRequest req) {
         @SuppressWarnings("unchecked")
         List<PatientMaster> result = fhirRequester.searchPatientMasterGoldenList(new SearchParameterMap());
@@ -65,7 +65,7 @@ public class PatientRestController extends BaseTenantTiedRest {
     @GetMapping("/{patientId}/recommendation")
     public IBaseBundle getPatientRecommendation(
             @PathVariable("patientId") String patientId,
-            @RequestAttribute(TenantRequestLoggingFilter.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
+            @RequestAttribute(RestTenantUrlFilter.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
             HttpServletRequest req) {
         IGenericClient fhirClient = repositoryClientFactory.newGenericClient(tenant, req);
         return fhirClient.search()
@@ -78,7 +78,7 @@ public class PatientRestController extends BaseTenantTiedRest {
     @GetMapping("/{patientId}/vaccination")
     public List<VaccinationMaster> getPatientVaccination(
             @PathVariable("patientId") String patientId,
-            @RequestAttribute(TenantRequestLoggingFilter.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
+            @RequestAttribute(RestTenantUrlFilter.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
             @RequestParam(name = MDM_EXPAND_REST_PARAM, defaultValue = "false") boolean isGolden,
             HttpServletRequest req) {
         ReferenceParam referenceParam = new ReferenceParam().setValue(patientId);
@@ -91,7 +91,7 @@ public class PatientRestController extends BaseTenantTiedRest {
     @GetMapping("/{patientId}/observations")
     public List<ObservationReported> getPatientObservation(
             @PathVariable("patientId") String patientId,
-            @RequestAttribute(TenantRequestLoggingFilter.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
+            @RequestAttribute(RestTenantUrlFilter.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
             @RequestParam(name = MDM_EXPAND_REST_PARAM, defaultValue = "false") boolean isGolden,
             HttpServletRequest req) {
         ReferenceParam referenceParam = new ReferenceParam().setValue(patientId);
@@ -104,7 +104,7 @@ public class PatientRestController extends BaseTenantTiedRest {
     @GetMapping("/{patientId}/related")
     public List<PatientMaster> getPatientRelatedPatients(
             @PathVariable("patientId") String patientId,
-            @RequestAttribute(TenantRequestLoggingFilter.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
+            @RequestAttribute(RestTenantUrlFilter.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
             @RequestParam(name = MDM_EXPAND_REST_PARAM, defaultValue = "false") boolean isGolden,
             HttpServletRequest req) {
         ReferenceParam referenceParam = new ReferenceParam().setValue(patientId);
@@ -129,7 +129,7 @@ public class PatientRestController extends BaseTenantTiedRest {
             @RequestParam(required = false) String family,
             @RequestParam(required = false) String name,
             @RequestParam(required = false) String identifier,
-            @RequestAttribute(TenantRequestLoggingFilter.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
+            @RequestAttribute(RestTenantUrlFilter.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
             HttpServletRequest req) {
         return fhirRequester.searchPatientMasterGoldenList(
                 new SearchParameterMap("family", new ca.uhn.fhir.rest.param.StringParam(family))
@@ -140,11 +140,11 @@ public class PatientRestController extends BaseTenantTiedRest {
     @GetMapping("/{patientId}/shLinkPayload")
     public ShLinkPayload getShLinkPayload(
             @PathVariable("patientId") String patientId,
-            @RequestAttribute(TenantRequestLoggingFilter.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
+            @RequestAttribute(RestTenantUrlFilter.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
             HttpServletRequest req) {
         IBaseResource patientSelected = getPatientFhir(patientId, tenant, req);
-        String manifestUrl = PatientShLinkController.getManifestUrl(req, patientSelected, tenant);
-        return PatientShLinkController.getPatientShLinkPayload(manifestUrl);
+        String manifestUrl = PatientShLinkRestController.getManifestUrl(req, patientSelected, tenant);
+        return PatientShLinkRestController.getPatientShLinkPayload(manifestUrl);
     }
 
 }

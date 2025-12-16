@@ -55,7 +55,7 @@ public class GroupController {
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		UiUtil.doHeader(out, "IIS Sandbox - Groups", CurrentTenantUtil.getTenant());
-		Group group = groupRestController.getGroup(req);
+		Group group = groupRestController.generateGroup(req);
 		out.println("<p>");
 		out.println(fhirContext.newJsonParser().setPrettyPrint(true).encodeResourceToString(group));
 		out.println("</p>");

@@ -1,7 +1,7 @@
-package org.immregistries.iis.kernal.fhir;
+package org.immregistries.iis.kernal.controllers.filters;
 
-import org.immregistries.iis.kernal.controllers.filters.TenantRequestLoggingFilter;
-import org.immregistries.iis.kernal.controllers.filters.TenantUrlFilter;
+import org.immregistries.iis.kernal.controllers.rest.RestUrlUtil;
+import org.immregistries.iis.kernal.controllers.servlet.TenantController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -14,6 +14,8 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 public class FilterRegistrationConfig {
+	private static final String REST_TENANT_URL_FILTER = "restTenantUrlFilter";
+
 	@Autowired
 	AutowireCapableBeanFactory beanFactory;
 
@@ -27,24 +29,24 @@ public class FilterRegistrationConfig {
 	public FilterRegistrationBean tenantUrlFilterRegistrationBean(TenantUrlFilter tenantUrlFilter) {
 		FilterRegistrationBean registration = new FilterRegistrationBean();
 		registration.setFilter(tenantUrlFilter);
-		registration.addUrlPatterns("/tenant/*");
+		registration.addUrlPatterns(TenantController.TENANT_BASE_PATH + "/*");
 		registration.setName("tenantUrlFilter");
 		registration.setOrder(1);
 		return registration;
 	}
 
-	@Bean(name = "tenantRequestLoggingFilter")
-	public TenantRequestLoggingFilter tenantRequestLoggingFilter() {
-		return new TenantRequestLoggingFilter();
+	@Bean(name = REST_TENANT_URL_FILTER)
+	public RestTenantUrlFilter restTenantUrlFilter() {
+		return new RestTenantUrlFilter();
 	}
 
 	@Bean
-	public FilterRegistrationBean tenantRequestLoggingFilterRegistrationBean(
-			TenantRequestLoggingFilter tenantRequestLoggingFilter) {
+	public FilterRegistrationBean restTenantUrlFilterRegistrationBean(
+		RestTenantUrlFilter restTenantUrlFilter) {
 		FilterRegistrationBean registration = new FilterRegistrationBean();
-		registration.setFilter(tenantRequestLoggingFilter);
-		registration.addUrlPatterns("/rest/tenant/*");
-		registration.setName("tenantRequestLoggingFilter");
+		registration.setFilter(restTenantUrlFilter);
+		registration.addUrlPatterns(RestUrlUtil.REST + TenantController.TENANT_BASE_PATH + "/*");
+		registration.setName(REST_TENANT_URL_FILTER);
 		registration.setOrder(1);
 		return registration;
 	}

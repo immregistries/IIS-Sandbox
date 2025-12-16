@@ -1,13 +1,10 @@
 package org.immregistries.iis.kernal.controllers.rest.shlink;
 
-import ca.uhn.fhir.jpa.partition.IPartitionLookupSvc;
 import com.authlete.cose.COSEException;
 import com.google.zxing.WriterException;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.hl7.fhir.instance.model.api.IBaseBundle;
 import org.hl7.fhir.r4.model.IdType;
@@ -17,7 +14,6 @@ import org.immregistries.iis.kernal.fhir.security.TenantUtil;
 import org.immregistries.iis.kernal.fhir.security.UserAccessUtil;
 import org.immregistries.iis.kernal.logic.KeyStoreService;
 import org.immregistries.iis.kernal.logic.shlink.CompressionService;
-import org.immregistries.iis.kernal.logic.shlink.ShLinkUtilService;
 import org.immregistries.iis.kernal.persisted.model.IisKey;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.immregistries.iis.kernal.persisted.model.UserAccess;
@@ -55,22 +51,17 @@ public class CLVRRestController {
     KeyStoreService keyStoreService;
 
     @Autowired
-    ShLinkUtilService shLinkUtilService;
-
-    @Autowired
     CLVRService clvrService;
 
     @Autowired
     IpsGeneratorSvcIIS ipsGeneratorSvcIIS;
 
     @Autowired
-    IPartitionLookupSvc partitionLookupSvc;
-
-    @Autowired
     FhirConversionUtil fhirConversionUtil;
 
     @Autowired
     CLVRPdfService clvrPdfService;
+
     @Autowired
     CompressionService compressionService;
 
@@ -101,14 +92,14 @@ public class CLVRRestController {
         String qrCode = clvrService.encodeCLVRtoQrCode(clvrToken, iisSigningKey.keyPair());
 
 
-		 ByteArrayOutputStream byteArrayOutputStreamPNG = getByteArrayOutputStreamPNG(qrCode);
+		 ByteArrayOutputStream byteArrayOutputStreamPNG = compressionService.getQrCodeByteArrayOutputStreamPNG(qrCode);
 		 return ResponseEntity.ok(byteArrayOutputStreamPNG.toByteArray());
 //		 HttpHeaders headers = new HttpHeaders();
 //		 headers.setContentDispositionFormData("attachment", "qr.png");
 //		 return new ResponseEntity<>(byteArrayOutputStreamPNG, headers, HttpStatus.OK);
     }
 
-    @GetMapping(value = "/qr/pdf", produces = MediaType.APPLICATION_PDF_VALUE)
+    @GetMapping(value = "/pdf", produces = MediaType.APPLICATION_PDF_VALUE)
     public ResponseEntity<byte[]> getPatientClvrPdf(
             @PathVariable("patientId") String patientId,
             @RequestAttribute(CurrentTenantUtil.SESSION_REQUEST_TENANT) Tenant tenant)
@@ -148,15 +139,6 @@ public class CLVRRestController {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         pdDocument.save(byteArrayOutputStream);
         pdDocument.close();
-        return byteArrayOutputStream;
-    }
-
-    private @NotNull ByteArrayOutputStream getByteArrayOutputStreamPNG(String data) throws IOException, ServletException {
-		 int width = 300; // Desired QR code width
-		 int height = 300; // Desired QR code height
-		 BitMatrix bitMatrix = compressionService.qrCodeBitMatrix(data, width, height);
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-		  MatrixToImageWriter.writeToStream(bitMatrix, "PNG", byteArrayOutputStream);
         return byteArrayOutputStream;
     }
 

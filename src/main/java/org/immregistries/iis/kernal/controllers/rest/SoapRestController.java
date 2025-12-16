@@ -3,7 +3,7 @@ package org.immregistries.iis.kernal.controllers.rest;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.immregistries.iis.kernal.controllers.filters.TenantRequestLoggingFilter;
+import org.immregistries.iis.kernal.controllers.filters.RestTenantUrlFilter;
 import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.fhir.security.TenantUtil;
 import org.immregistries.iis.kernal.logic.BaseIISSOAPServer;
@@ -33,7 +33,7 @@ public class SoapRestController {
 
 	@PostMapping
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp,
-								 @RequestAttribute(value = TenantRequestLoggingFilter.TENANT_REQUEST_ATTRIBUTE, required = false) Tenant tenant)
+								 @RequestAttribute(value = RestTenantUrlFilter.TENANT_REQUEST_ATTRIBUTE, required = false) Tenant tenant)
 		throws ServletException, IOException {
 
 		String tenantName;

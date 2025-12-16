@@ -31,8 +31,6 @@ import static org.immregistries.iis.kernal.controllers.servlet.shlink.IisKeyCont
 public class IisKeyController {
 	public static final String IIS_KEY_BASE_PATH = "/iisKey";
 
-	@Autowired
-	KeyStoreService keyStoreService;
 
 	@Autowired
 	IisKeyRestController iisKeyRestController;
@@ -45,7 +43,6 @@ public class IisKeyController {
 
 	@GetMapping
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		UserAccess userAccess = UserAccessUtil.get().getUserAccess();
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		try {
@@ -57,7 +54,7 @@ public class IisKeyController {
 			out.println("    </div>");
 
 			out.println("    <div class=\"w3-container\">");
-			List<IisKey> iisKeys = keyStoreService.getKeys(userAccess);
+			List<IisKey> iisKeys = iisKeyRestController.getKeys();
 			printIisKeys(out, iisKeys, tenant);
 			out.println("    </div>");
 		} catch (Exception e) {

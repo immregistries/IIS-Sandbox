@@ -15,7 +15,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
-import static org.immregistries.iis.kernal.controllers.servlet.shlink.PatientShLinkManifestController.PATIENT_MANIFEST_FULL_PATH;
 
 public class TenantUrlFilter extends OncePerRequestFilter {
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -32,14 +31,7 @@ public class TenantUrlFilter extends OncePerRequestFilter {
 			return;
 		}
 
-		/*
-		 * For Smart health links manifest retrieval, authentication is dealt with later
-		 * or well known key
-		 */
-		if (antPathMatcher.match(PATIENT_MANIFEST_FULL_PATH, path)) {
-			filterChain.doFilter(request, response);
-			return;
-		} else if (antPathMatcher.match(TenantController.TENANT_PATH + WellKnownKeyController.WELL_KNOWN_PATH_SUFFIX,
+		if (antPathMatcher.match(TenantController.TENANT_PATH + WellKnownKeyController.WELL_KNOWN_PATH_SUFFIX,
 				path)) {
 			filterChain.doFilter(request, response);
 			return;

@@ -62,7 +62,7 @@ public class ShLinkManifestRestController {
             // should work and return the same tenant (or null/fail).
             Tenant authenticatedTenant = null;
             {
-                authenticatedTenant = tenantUtil.authenticateTenantNoUsername(passcode, tenant.getOrganizationName());
+                authenticatedTenant = tenantUtil.authenticateTenantNoUsername(tenant.getOrganizationName(), passcode);
                 if (authenticatedTenant == null) {
                     throw new AuthenticationCredentialsNotFoundException("Invalid passcode");
                 }

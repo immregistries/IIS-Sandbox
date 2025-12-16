@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class GroupRestController {
 
     @GetMapping("/$generate")
-    public Group getGroup(HttpServletRequest req) {
+    public Group generateGroup(HttpServletRequest req) {
 
         Group group = new Group();
         group.setManagingEntity(new Reference()

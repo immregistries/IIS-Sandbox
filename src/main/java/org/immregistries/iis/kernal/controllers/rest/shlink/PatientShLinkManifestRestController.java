@@ -7,6 +7,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.instance.model.api.IBaseResource;
+import org.immregistries.iis.kernal.controllers.rest.RestUrlUtil;
+import org.immregistries.iis.kernal.controllers.servlet.TenantController;
 import org.immregistries.iis.kernal.fhir.interceptors.PartitionTenantCreationInterceptor;
 import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.fhir.security.TenantUtil;
@@ -32,6 +34,8 @@ import static org.immregistries.iis.kernal.controllers.servlet.util.PatientServl
 public class PatientShLinkManifestRestController {
 
     public static final String MANIFEST_PATH_SUFFIX = "/manifest";
+	public static final String MANIFEST_FULL_PATH = RestUrlUtil.REST_TENANT_PATH + MANIFEST_PATH_SUFFIX;
+
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
@@ -45,19 +49,17 @@ public class PatientShLinkManifestRestController {
     @Autowired
     private PatientMapper patientMapper;
     @Autowired
-    private PartitionTenantCreationInterceptor partitionTenantCreationInterceptor;
-    @Autowired
     private TenantUtil tenantUtil;
 
     @PostMapping({ "/patient", "/patient/{id}" })
     protected ShLinkManifest postPatientShLinkManifest(HttpServletRequest req, HttpServletResponse resp,
             @PathVariable(value = "id", required = false) String id,
-            @PathVariable("tenantName") String tenantName,
+            @PathVariable("tenantId") String tenantId,
             @RequestAttribute(CurrentTenantUtil.SESSION_REQUEST_TENANT) Tenant tenant,
             @RequestBody ShLinkManifestRequestBody body) throws IOException, ServletException {
         String passcode = body.getPasscode();
         if (StringUtils.isNotBlank(passcode)) {
-            tenant = tenantUtil.authenticateTenantNoUsername(passcode, tenantName);
+            tenant = tenantUtil.authenticateTenantNoUsername(tenantId, passcode);
         }
         if (tenant == null) {
             throw new AuthenticationCredentialsNotFoundException("No tenant found or invalid passcode");

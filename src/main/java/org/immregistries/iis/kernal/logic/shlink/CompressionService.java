@@ -4,9 +4,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.WriterException;
+import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 import jakarta.servlet.ServletException;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
@@ -122,4 +124,15 @@ public class CompressionService {
 			throw new ServletException("Error generating QR code Bit Matrix", e);
 		}
 	}
+
+
+	public @NotNull ByteArrayOutputStream getQrCodeByteArrayOutputStreamPNG(String data) throws IOException, ServletException {
+		int width = 300; // Desired QR code width
+		int height = 300; // Desired QR code height
+		BitMatrix bitMatrix = qrCodeBitMatrix(data, width, height);
+		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+		MatrixToImageWriter.writeToStream(bitMatrix, "PNG", byteArrayOutputStream);
+		return byteArrayOutputStream;
+	}
+
 }

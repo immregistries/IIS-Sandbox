@@ -53,7 +53,7 @@ public class ShLinkManifestController {
 		if (StringUtils.isNoneBlank(passcode, tenantName)) {
 			Tenant tenant = null;
 			{
-				tenant = tenantUtil.authenticateTenantNoUsername(passcode, tenantName);
+				tenant = tenantUtil.authenticateTenantNoUsername(tenantName, passcode);
 				if (tenant == null) {
 					throw new AuthenticationCredentialsNotFoundException("No tenant found or invalid passcode");
 				}

@@ -17,12 +17,14 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
+import static org.immregistries.iis.kernal.controllers.rest.shlink.PatientShLinkManifestRestController.MANIFEST_FULL_PATH;
+
 @Service
 @WebFilter
-public class TenantRequestLoggingFilter extends OncePerRequestFilter {
+public class RestTenantUrlFilter extends OncePerRequestFilter {
 
 	public static final String TENANT_REQUEST_ATTRIBUTE = CurrentTenantUtil.SESSION_REQUEST_TENANT;
-	private static final Logger logger = LoggerFactory.getLogger(TenantRequestLoggingFilter.class);
+	private static final Logger logger = LoggerFactory.getLogger(RestTenantUrlFilter.class);
 	private static final String TENANT_PREFIX = Application.IIS_PATH_BASE + "/rest/tenant/";
 	@Autowired
 	TenantUtil tenantUtil;
@@ -31,9 +33,14 @@ public class TenantRequestLoggingFilter extends OncePerRequestFilter {
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 		throws ServletException, IOException {
 		String path = request.getRequestURI();
-		logger.info("Called");
+		/*
+		 * For Smart health links manifest retrieval, authentication is dealt with later
+		 * or well known key
+		 */
+		if (path.startsWith(MANIFEST_FULL_PATH)) {
+			filterChain.doFilter(request, response);
+		}
 		if (path.startsWith(TENANT_PREFIX)) {
-			logger.info("YES ?");
 			String remainingPath = path.substring(TENANT_PREFIX.length());
 			int slashIndex = remainingPath.indexOf('/');
 			String tenantId;
@@ -45,7 +52,6 @@ public class TenantRequestLoggingFilter extends OncePerRequestFilter {
 			try {
 				int tenantIdInt = Integer.parseInt(tenantId);
 				Tenant tenant = tenantUtil.getTenantByIdAuthenticated(tenantIdInt);
-				logger.info("Request for tenant {}: {}", tenant.getOrganizationName(), path);
 				request.setAttribute(CurrentTenantUtil.TENANT_ID_URL, tenantId);
 				request.setAttribute(TENANT_REQUEST_ATTRIBUTE, tenant);
 			} catch (NumberFormatException e) {

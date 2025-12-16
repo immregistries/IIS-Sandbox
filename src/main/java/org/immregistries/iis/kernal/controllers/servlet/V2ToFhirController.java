@@ -40,14 +40,6 @@ public class V2ToFhirController {
 	public static final String V2_TO_FHIR_BASE_PATH = "/" + V2_TO_FHIR_PATH_KEY;
 
 	@Autowired
-	RepositoryClientFactory repositoryClientFactory;
-	@Autowired
-	ImmunizationMapper immunizationMapper;
-	@Autowired
-	IFhirRequester fhirRequester;
-	// @Autowired
-	// V2ToFhirMessageHandler v2ToFhirMessageHandler;
-	@Autowired
 	FhirContext fhirContext;
 
 	@PostMapping

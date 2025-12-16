@@ -63,12 +63,6 @@ public class ShLinkController {
 	@Autowired
 	KeyStoreService keyStoreService;
 
-	@Autowired
-	IPartitionLookupSvc partitionLookupSvc;
-
-	@Autowired
-	FhirContext fhirContext;
-
 	@PostMapping()
 	protected void shLinkIPS(HttpServletRequest req, HttpServletResponse resp,
 			@RequestParam(value = PARAM_KEY_ID, required = false) String keyId,

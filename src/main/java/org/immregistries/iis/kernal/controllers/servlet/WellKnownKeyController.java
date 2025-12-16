@@ -1,5 +1,6 @@
 package org.immregistries.iis.kernal.controllers.servlet;
 
+import com.nimbusds.jose.jwk.JWK;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -35,16 +36,11 @@ public class WellKnownKeyController {
 	KeyStoreService keyStoreService;
 
 	@GetMapping()
-	protected Set<?> doGetWellKnown(HttpServletRequest req, HttpServletResponse resp,
-			@PathVariable(name = TenantController.PATH_VARIABLE_TENANT_NAME, required = false) String tenantName)
-			throws ServletException, IOException {
+	public List<JWK> doGetWellKnown(HttpServletRequest req, HttpServletResponse resp)
+		throws ServletException, IOException {
 		UserAccess userAccess = UserAccessUtil.get().getUserAccess();
-		resp.setContentType("application/json");
-		// Tenant tenant = CurrentTenantUtil.getTenantRedirectIfNone(req, resp,
-		// dataSession);
 		List<IisKey> iisKeys = keyStoreService.getKeys(userAccess);
-		return iisKeys.stream().map(iisKey -> iisKey.jwk().toPublicJWK().toJSONObject())
-				.collect(Collectors.toSet());
+		return iisKeys.stream().map(iisKey -> iisKey.jwk().toPublicJWK()).collect(Collectors.toList());
 	}
 
 	public static String getKeyIssuerUrl(HttpServletRequest request, Tenant tenant) {

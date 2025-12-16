@@ -46,7 +46,19 @@ public class TenantUtil implements InitializingBean {
 		instance = this;
 	}
 
-	public Tenant authenticateTenantNoUsername(String password, String facilityName) {
+	public Tenant authenticateTenantNoUsername(int tenantId, String password) {
+		Tenant tenant = tenantRepository.findById(tenantId).orElse(null);
+		if (tenant == null) {
+			throw new RuntimeException("Invalid tenantId");
+		}
+		UserAccess tenantUserAccess = tenant.getUserAccess();
+		String username = tenantUserAccess.getAccessName();
+
+		UserAccess userAccess = UserAccessUtil.get().authenticateUserAccessUsernamePassword(username, password);
+		return authenticateTenant(userAccess, tenantId);
+	}
+
+	public Tenant authenticateTenantNoUsername(String facilityName, String password) {
 		Tenant tenant = tenantRepository.findByOrganizationName(facilityName).orElse(null);
 
 		if (tenant == null) {
@@ -104,6 +116,16 @@ public class TenantUtil implements InitializingBean {
 			if (optional.get().getUserAccess().getUserAccessId() == userAccess.getUserAccessId()) {
 				tenant = optional.get();
 			}
+		}
+		return tenant;
+	}
+
+
+	public Tenant authenticateTenant(UserAccess userAccess, int tenantId) {
+		Tenant tenant = null;
+		Optional<Tenant> optional = tenantRepository.findById(tenantId);
+		if (optional.get().getUserAccess().getUserAccessId() == userAccess.getUserAccessId()) {
+			tenant = optional.get();
 		}
 		return tenant;
 	}
