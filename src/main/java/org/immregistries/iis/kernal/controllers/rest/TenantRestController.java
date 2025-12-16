@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import static org.immregistries.iis.kernal.controllers.servlet.TenantController.PARAM_TENANT_ID;
+
 @RestController
 @RequestMapping("/rest/tenant")
 public class TenantRestController {
@@ -27,7 +29,7 @@ public class TenantRestController {
 	UserAccessUtil userAccessUtil;
 
     @GetMapping("/{tenantId}")
-    public Tenant getTenant(@PathVariable("tenantId") int tenantId) {
+    public Tenant getTenant(@PathVariable(PARAM_TENANT_ID) int tenantId) {
 		 UserAccess userAccess = userAccessUtil.getUserAccess();
 		 return tenantRepository.findByOrgIdAndUserAccessId(tenantId, userAccess.getUserAccessId())
                 .orElseThrow(() -> new RuntimeException("Tenant not found"));

@@ -16,10 +16,10 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 
 import java.util.List;
 
+import static org.immregistries.iis.kernal.controllers.rest.shlink.ShLinkManifestRestController.SHLINKS_CONTROLLER_REST_BASE_URL;
 import static org.immregistries.iis.kernal.controllers.servlet.LoginController.LOGIN_PARAM_PASSWORD;
 import static org.immregistries.iis.kernal.controllers.servlet.LoginController.LOGIN_PARAM_USERID;
 import static org.immregistries.iis.kernal.controllers.servlet.shlink.ShLinkContentController.SHLINK_FILES;
-import static org.immregistries.iis.kernal.controllers.servlet.shlink.ShLinkManifestController.SHLINKS_CONTROLLER_BASE_URL;
 
 @Configuration
 public class ServerSecurityConfig {
@@ -41,7 +41,7 @@ public class ServerSecurityConfig {
 						.requestMatchers(HttpMethod.GET, "/", HomeController.HOME_BASE_PATH,
 							PopController.POP_BASE_PATH, "/SubscriptionTopic/**", "/img/**", "/rest/**")
 						.permitAll()
-						.requestMatchers("/tenant/*/manifest/**", SHLINKS_CONTROLLER_BASE_URL + "/*",
+						.requestMatchers("/tenant/*/manifest/**", SHLINKS_CONTROLLER_REST_BASE_URL + "/*",
 								TenantController.TENANT_PATH + WellKnownKeyController.WELL_KNOWN_PATH_SUFFIX,
 								SHLINK_FILES + "/*")
 						.permitAll() // ShLinks

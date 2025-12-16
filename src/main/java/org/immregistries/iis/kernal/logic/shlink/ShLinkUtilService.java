@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.instance.model.api.IBaseBundle;
 import org.hl7.fhir.instance.model.api.IIdType;
+import org.immregistries.iis.kernal.controllers.rest.RestUrlUtil;
 import org.immregistries.iis.kernal.fhir.Application;
 import org.immregistries.iis.kernal.fhir.shl.ShLinkPayload;
 import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
@@ -38,8 +39,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import static org.immregistries.iis.kernal.controllers.rest.shlink.ShLinkManifestRestController.SHLINKS_CONTROLLER_REST_BASE_URL;
 import static org.immregistries.iis.kernal.logic.shlink.ShCardUtilService.VERIFIABLE_CREDENTIAL_TYPE;
-import static org.immregistries.iis.kernal.controllers.servlet.shlink.ShLinkManifestController.SHLINKS_CONTROLLER_BASE_URL;
 
 @Service
 public class ShLinkUtilService {
@@ -201,7 +202,8 @@ public class ShLinkUtilService {
 
 			saveManifest(shLinkManifest);
 
-			builder.replacePath(Application.IIS_PATH_BASE + SHLINKS_CONTROLLER_BASE_URL + "/{manifestId}");
+
+			builder.replacePath(Application.IIS_PATH_BASE + SHLINKS_CONTROLLER_REST_BASE_URL + "/{manifestId}");
 			url = builder
 					.build(Map.of("manifestId", shLinkManifest.getId()))
 					.toURL().toString();
