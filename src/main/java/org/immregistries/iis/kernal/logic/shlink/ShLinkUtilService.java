@@ -12,6 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.instance.model.api.IBaseBundle;
 import org.hl7.fhir.instance.model.api.IIdType;
 import org.immregistries.iis.kernal.controllers.rest.RestUrlUtil;
+import org.immregistries.iis.kernal.controllers.rest.shlink.ShLinkContentRestController;
 import org.immregistries.iis.kernal.fhir.Application;
 import org.immregistries.iis.kernal.fhir.shl.ShLinkPayload;
 import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
@@ -183,7 +184,7 @@ public class ShLinkUtilService {
 			iisShLinkContent.setContent(encryptedContent);
 			iisShlinkContentRepository.save(iisShLinkContent);
 			builder.replacePath(
-					Application.IIS_PATH_BASE + ShLinkContentController.SHLINK_CONTENT_PATH + "/{contentId}");
+					Application.IIS_PATH_BASE  + ShLinkContentRestController.SHLINK_CONTENT_PATH + "/{contentId}");
 			url = builder
 					.build(Map.of("contentId", iisShLinkContent.getId()))
 					.toURL().toString();

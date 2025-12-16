@@ -12,6 +12,7 @@ import org.immregistries.iis.kernal.fhir.security.TenantUtil;
 import org.immregistries.iis.kernal.fhir.security.UserAccessUtil;
 import org.immregistries.iis.kernal.fhir.shl.ShLinkPayload;
 import org.immregistries.iis.kernal.logic.KeyStoreService;
+import org.immregistries.iis.kernal.logic.shlink.CompressionService;
 import org.immregistries.iis.kernal.logic.shlink.ShLinkUtilService;
 import org.immregistries.iis.kernal.persisted.model.IisKey;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
@@ -54,18 +55,19 @@ public class ShLinkRestController {
 	@Autowired
 	KeyStoreService keyStoreService;
 
+	@Autowired
+	CompressionService compressionService;
+
 	@PostMapping()
-	public ResponseEntity<byte[]> shLinkIPS(HttpServletRequest req,
+	public String shLinkIPSQrCode(HttpServletRequest req,
 			@RequestParam(value = PARAM_KEY_ID, required = false) String keyId,
 			@RequestParam(value = PARAM_SECRET_KEY, required = false) String secretKey,
 			@RequestParam(PARAM_PATIENT_ID) String patientId,
 			@RequestParam(PARAM_FLAG) String flag,
 			@RequestParam(value = PARAM_EXP, required = false, defaultValue = "10000000") String exp,
-			@RequestParam(value = "image", required = false) boolean image,
 			@RequestAttribute(CurrentTenantUtil.SESSION_REQUEST_TENANT) Tenant tenant)
 			throws ServletException, IOException, NoSuchAlgorithmException {
 		UserAccess userAccess = UserAccessUtil.get().getUserAccess();
-		ByteArrayOutputStream outputStream = new ByteArrayOutputStream(20000);
 
 		/*
 		 * Choosing or generating the keys based on the parameters
@@ -88,22 +90,29 @@ public class ShLinkRestController {
 		 * Getting the bundle for the payload content
 		 */
 		IBaseBundle ipsToBeEncoded = ipsGeneratorSvcIIS.generateIps(TenantUtil.get().requestDetailsWithPartitionName(),
-				new IdType(patientId), "");
+			new IdType(patientId), "");
 		/*
 		 * Convert the bundle to a shcard file
 		 */
 		String url = shLinkUtilService.generateShLinkUrlForShCards(List.of(ipsToBeEncoded), shLinkPayload, req,
-				iisSigningKey, encryptionKeySpec, userAccess, tenant);
+			iisSigningKey, encryptionKeySpec, userAccess, tenant);
 		shLinkPayload.setUrl(url);
 		String qrCode = shLinkUtilService.qrCode(shLinkPayload);
+		return qrCode;
+	}
+	@PostMapping(value = "/png")
+	public ResponseEntity<byte[]> shLinkIPSPng(HttpServletRequest req,
+			@RequestParam(value = PARAM_KEY_ID, required = false) String keyId,
+			@RequestParam(value = PARAM_SECRET_KEY, required = false) String secretKey,
+			@RequestParam(PARAM_PATIENT_ID) String patientId,
+			@RequestParam(PARAM_FLAG) String flag,
+			@RequestParam(value = PARAM_EXP, required = false, defaultValue = "10000000") String exp,
+			@RequestAttribute(CurrentTenantUtil.SESSION_REQUEST_TENANT) Tenant tenant)
+			throws ServletException, IOException, NoSuchAlgorithmException {
+		String qrCode = shLinkIPSQrCode(req,keyId,secretKey,patientId,flag,exp,tenant);
 		HttpHeaders headers = new HttpHeaders();
-		if (image) {
-			headers.setContentType(MediaType.IMAGE_PNG);
-			shLinkUtilService.printQrCodeAsImage(outputStream, qrCode);
-		} else {
-			// Returning the QR code text directly for REST if not image
-			headers.setContentType(MediaType.TEXT_PLAIN);
-		}
+		headers.setContentType(MediaType.IMAGE_PNG);
+		ByteArrayOutputStream outputStream = compressionService.getQrCodeByteArrayOutputStreamPNG(qrCode);
 		return new ResponseEntity<>(outputStream.toByteArray(), headers, HttpStatus.OK);
 
 	}

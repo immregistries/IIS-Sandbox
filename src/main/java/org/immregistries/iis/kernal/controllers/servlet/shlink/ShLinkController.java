@@ -1,13 +1,12 @@
 package org.immregistries.iis.kernal.controllers.servlet.shlink;
 
-import ca.uhn.fhir.context.FhirContext;
-import ca.uhn.fhir.jpa.partition.IPartitionLookupSvc;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.instance.model.api.IBaseBundle;
 import org.hl7.fhir.r4.model.IdType;
+import org.immregistries.iis.kernal.controllers.rest.shlink.ShLinkRestController;
 import org.immregistries.iis.kernal.fhir.ips.IpsGeneratorSvcIIS;
 import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.fhir.security.TenantUtil;
@@ -54,14 +53,15 @@ public class ShLinkController {
 
 	public static final String ACTION_SAVE = "Generate";
 
-	@Autowired
-	IpsGeneratorSvcIIS ipsGeneratorSvcIIS;
 
 	@Autowired
 	ShLinkUtilService shLinkUtilService;
 
 	@Autowired
 	KeyStoreService keyStoreService;
+
+	@Autowired
+	ShLinkRestController shLinkRestController;
 
 	@PostMapping()
 	protected void shLinkIPS(HttpServletRequest req, HttpServletResponse resp,
@@ -73,36 +73,19 @@ public class ShLinkController {
 			@RequestParam(value = "image", required = false) boolean image)
 			throws ServletException, IOException, NoSuchAlgorithmException {
 		Tenant tenant = CurrentTenantUtil.getTenantRedirectIfNone(req, resp);
+
 		UserAccess userAccess = UserAccessUtil.get().getUserAccess();
 		OutputStream outputStream = resp.getOutputStream();
 		PrintWriter out = new PrintWriter(outputStream);
 		/*
 		 * Choosing or generating the keys based on the parameters
 		 */
-		SecretKeySpec encryptionKeySpec = getSecretEncryptionKey(secretKey);
 		IisKey iisSigningKey = keyStoreService.getIisSigningKeyOrCreate(keyId, userAccess, tenant);
-		/*
-		 * Payload skeleton
-		 */
-		ShLinkPayload shLinkPayload = new ShLinkPayload();
-		shLinkPayload.setLabel("Generated for ShLink testing with IPS of Synthetic Patient");
-		shLinkPayload.setFlag(flag);
-		shLinkPayload.setKey(new String(Base64.getUrlEncoder().encode(encryptionKeySpec.getEncoded())));
-		shLinkPayload.setExp(Long.getLong(exp));
-		/*
-		 * Getting the bundle for the payload content
-		 */
-		IBaseBundle ipsToBeEncoded = ipsGeneratorSvcIIS.generateIps(TenantUtil.get().requestDetailsWithPartitionName(),
-				new IdType(patientId), "");
-		/*
-		 * Convert the bundle to a shcard file
-		 */
-		String url = shLinkUtilService.generateShLinkUrlForShCards(List.of(ipsToBeEncoded), shLinkPayload, req,
-				iisSigningKey, encryptionKeySpec, userAccess, tenant);
-		shLinkPayload.setUrl(url);
-		String qrCode = shLinkUtilService.qrCode(shLinkPayload);
+
+		String qrCode = shLinkRestController.shLinkIPSQrCode(req, iisSigningKey.getKeyId(), secretKey,patientId,flag,exp,tenant);
 		if (image) {
 			resp.setContentType("image/png"); // Set content type for PNG image
+
 			shLinkUtilService.printQrCodeAsImage(outputStream, qrCode);
 		} else {
 			resp.setContentType("text/html");
@@ -117,29 +100,6 @@ public class ShLinkController {
 		out.flush();
 		out.close();
 
-	}
-
-	private @NotNull SecretKeySpec getSecretEncryptionKey(String secretKey) throws NoSuchAlgorithmException {
-		SecretKeySpec encryptionKeySpec;
-		if (StringUtils.isNotBlank(secretKey)) {
-			encryptionKeySpec = new SecretKeySpec(Base64.getDecoder().decode(secretKey), 0, secretKey.length(), "AES");
-		} else {
-			encryptionKeySpec = shLinkUtilService.generateSecretKey();
-		}
-		return encryptionKeySpec;
-	}
-
-	private IisKey getIisSigningKey(String keyId, UserAccess userAccess, Tenant tenant) {
-		IisKey iisSigningKey;
-		if (StringUtils.isNotBlank(keyId)) {
-			iisSigningKey = keyStoreService.getKey(keyId, userAccess);
-		} else {
-			iisSigningKey = keyStoreService.getAnyKey(userAccess);
-		}
-		if (iisSigningKey == null) {
-			iisSigningKey = keyStoreService.saveKey(keyStoreService.generateEc(), tenant, userAccess);
-		}
-		return iisSigningKey;
 	}
 
 	@GetMapping()

@@ -16,10 +16,11 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 
 import java.util.List;
 
+import static org.immregistries.iis.kernal.controllers.rest.shlink.ShLinkContentRestController.SHLINK_CONTENT_PATH;
 import static org.immregistries.iis.kernal.controllers.rest.shlink.ShLinkManifestRestController.SHLINKS_CONTROLLER_REST_BASE_URL;
 import static org.immregistries.iis.kernal.controllers.servlet.LoginController.LOGIN_PARAM_PASSWORD;
 import static org.immregistries.iis.kernal.controllers.servlet.LoginController.LOGIN_PARAM_USERID;
-import static org.immregistries.iis.kernal.controllers.servlet.shlink.ShLinkContentController.SHLINK_FILES;
+import static org.immregistries.iis.kernal.controllers.rest.shlink.ShLinkContentRestController.SHLINK_FILES;
 
 @Configuration
 public class ServerSecurityConfig {
@@ -43,7 +44,7 @@ public class ServerSecurityConfig {
 						.permitAll()
 						.requestMatchers("/tenant/*/manifest/**", SHLINKS_CONTROLLER_REST_BASE_URL + "/*",
 								TenantController.TENANT_PATH + WellKnownKeyController.WELL_KNOWN_PATH_SUFFIX,
-								SHLINK_FILES + "/*")
+								SHLINK_CONTENT_PATH + "/*")
 						.permitAll() // ShLinks
 						.requestMatchers(LOGIN_FORM_PATH, "/oauth2/**", LOGIN_PATH).permitAll()
 						// API AUTHORIZATION AND AUTHENTICATION SEPARATED

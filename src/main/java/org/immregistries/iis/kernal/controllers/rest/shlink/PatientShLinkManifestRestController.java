@@ -35,7 +35,7 @@ import static org.immregistries.iis.kernal.controllers.servlet.util.PatientServl
 public class PatientShLinkManifestRestController {
 
     public static final String MANIFEST_PATH_SUFFIX = "/manifest";
-	public static final String MANIFEST_FULL_PATH = RestUrlUtil.REST_TENANT_PATH + MANIFEST_PATH_SUFFIX;
+	 public static final String MANIFEST_FULL_PATH = RestUrlUtil.REST_TENANT_PATH + MANIFEST_PATH_SUFFIX;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
