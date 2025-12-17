@@ -3,6 +3,7 @@ package org.immregistries.iis.kernal.controllers.servlet;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.immregistries.iis.kernal.controllers.rest.TenantRestController;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.immregistries.iis.kernal.persisted.repository.TenantRepository;
 import org.immregistries.iis.kernal.controllers.servlet.util.UiUtil;
@@ -21,6 +22,7 @@ import java.io.PrintWriter;
 @RestController
 @RequestMapping("/loginForm")
 public class LoginController {
+
 
 	@Autowired
 	TenantRepository tenantRepository;
@@ -51,17 +53,17 @@ public class LoginController {
 			// LOGIN FORM, inherited, could be made in a separate class and improved
 			if (!authentication.isAuthenticated() || authentication instanceof AnonymousAuthenticationToken) {
 				String userId = req.getParameter(LOGIN_PARAM_USERID);
-				String tenantId = req.getParameter(LOGIN_PARAM_TENANT_NAME);
+				String tenantName = req.getParameter(LOGIN_PARAM_TENANT_NAME);
 				if (userId == null) {
 					userId = "";
 				}
-				if (tenantId == null) {
-					tenantId = "";
+				if (tenantName == null) {
+					tenantName = "";
 				}
 				if (req.getParameter(PARAM_ORG_ID) != null) {
 					Tenant tenant = tenantRepository.findById(Integer.parseInt(req.getParameter(PARAM_ORG_ID)))
 							.orElse(null);
-					tenantId = tenant.getOrganizationName();
+					tenantName = tenant.getOrganizationName();
 				}
 				out.println("<div class=\"w3-container w3-card-4\">");
 				out.println("	<h2>Login</h2>");
@@ -76,7 +78,7 @@ public class LoginController {
 						+ "\" value=\"\"/>");
 				out.println("		<label>Password</label>");
 				out.println("		<input class=\"w3-input\" type=\"text\" name=\"" + LOGIN_PARAM_TENANT_NAME
-						+ "\" value=\"" + tenantId + "\"/>");
+						+ "\" value=\"" + tenantName + "\"/>");
 				out.println("		<label>Tenant Name (optional)</label>");
 				out.println("		<br/>");
 				out.println("		<input class=\"w3-button w3-section w3-teal w3-ripple\" type=\"submit\" name=\""

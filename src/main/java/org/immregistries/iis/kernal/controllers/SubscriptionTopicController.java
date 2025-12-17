@@ -1,10 +1,11 @@
-package org.immregistries.iis.kernal.controllers.rest;
+package org.immregistries.iis.kernal.controllers;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.jpa.searchparam.extractor.ISearchParamExtractor;
 import ca.uhn.fhir.rest.server.util.ISearchParamRegistry;
 import jakarta.servlet.ServletException;
 import org.hl7.fhir.r5.model.*;
+import org.immregistries.iis.kernal.controllers.rest.RestUrlUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

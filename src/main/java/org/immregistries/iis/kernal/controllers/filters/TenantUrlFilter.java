@@ -6,7 +6,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.immregistries.iis.kernal.controllers.servlet.TenantController;
-import org.immregistries.iis.kernal.controllers.servlet.WellKnownKeyController;
+import org.immregistries.iis.kernal.controllers.WellKnownKeyController;
 import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
