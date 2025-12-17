@@ -19,8 +19,8 @@ import java.util.List;
 
 import static org.immregistries.iis.kernal.controllers.rest.shlink.ShLinkContentRestController.SHLINK_CONTENT_PATH;
 import static org.immregistries.iis.kernal.controllers.rest.shlink.ShLinkManifestRestController.SHLINKS_CONTROLLER_REST_BASE_URL;
-import static org.immregistries.iis.kernal.controllers.servlet.LoginController.LOGIN_PARAM_PASSWORD;
-import static org.immregistries.iis.kernal.controllers.servlet.LoginController.LOGIN_PARAM_USERID;
+import static org.immregistries.iis.kernal.controllers.servlet.LoginFormController.LOGIN_PARAM_PASSWORD;
+import static org.immregistries.iis.kernal.controllers.servlet.LoginFormController.LOGIN_PARAM_USERID;
 
 @Configuration
 public class ServerSecurityConfig {

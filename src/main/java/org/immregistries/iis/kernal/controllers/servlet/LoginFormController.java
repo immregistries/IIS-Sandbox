@@ -3,14 +3,13 @@ package org.immregistries.iis.kernal.controllers.servlet;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.immregistries.iis.kernal.controllers.rest.AuthenticationRestController;
 import org.immregistries.iis.kernal.controllers.rest.TenantRestController;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
-import org.immregistries.iis.kernal.persisted.repository.TenantRepository;
 import org.immregistries.iis.kernal.controllers.servlet.util.UiUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,11 +20,13 @@ import java.io.PrintWriter;
 
 @RestController
 @RequestMapping("/loginForm")
-public class LoginController {
+public class LoginFormController {
 
 
 	@Autowired
-	TenantRepository tenantRepository;
+	AuthenticationRestController authenticationRestController;
+	@Autowired
+	TenantRestController tenantRestController;
 
 	public static final String LOGIN_PARAM_USERID = "USERID";
 	public static final String LOGIN_PARAM_PASSWORD = "PASSWORD";
@@ -49,7 +50,7 @@ public class LoginController {
 		String locationHeader = req.getHeader("referer");
 		try {
 			UiUtil.doHeader(out, "IIS Sandbox");
-			Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+			Authentication authentication = authenticationRestController.getAuthentication();
 			// LOGIN FORM, inherited, could be made in a separate class and improved
 			if (!authentication.isAuthenticated() || authentication instanceof AnonymousAuthenticationToken) {
 				String userId = req.getParameter(LOGIN_PARAM_USERID);
@@ -61,8 +62,7 @@ public class LoginController {
 					tenantName = "";
 				}
 				if (req.getParameter(PARAM_ORG_ID) != null) {
-					Tenant tenant = tenantRepository.findById(Integer.parseInt(req.getParameter(PARAM_ORG_ID)))
-							.orElse(null);
+					Tenant tenant = tenantRestController.getTenant(Integer.parseInt(req.getParameter(PARAM_ORG_ID)));
 					tenantName = tenant.getOrganizationName();
 				}
 				out.println("<div class=\"w3-container w3-card-4\">");

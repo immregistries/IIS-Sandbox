@@ -22,7 +22,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.io.IOException;
 import java.net.MalformedURLException;
 
-import static org.immregistries.iis.kernal.controllers.servlet.LoginController.LOGIN_PARAM_TENANT_NAME;
+import static org.immregistries.iis.kernal.controllers.servlet.LoginFormController.LOGIN_PARAM_TENANT_NAME;
 import static org.immregistries.iis.kernal.controllers.servlet.TenantController.TENANT_BASE_PATH;
 
 public class FormAuthenticationSuccessHandler extends SavedRequestAwareAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
