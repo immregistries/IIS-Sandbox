@@ -4,11 +4,15 @@ import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.context.FhirVersionEnum;
 import jakarta.servlet.http.HttpServletRequest;
 import org.immregistries.iis.kernal.controllers.filters.RestTenantUrlFilter;
+import org.immregistries.iis.kernal.controllers.servlet.PopController;
 import org.immregistries.iis.kernal.logic.messageHandling.V2IncomingMessageHandler;
 import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
-import org.immregistries.iis.kernal.controllers.servlet.PopController;
+import org.immregistries.smm.transform.ScenarioManager;
+import org.immregistries.smm.transform.TestCaseMessage;
+import org.immregistries.smm.transform.Transformer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -26,6 +30,15 @@ public class PopRestController {
     private RepositoryClientFactory repositoryClientFactory;
     @Autowired
     private V2IncomingMessageHandler handler;
+
+    @GetMapping(value = "/sample", produces = MediaType.TEXT_PLAIN_VALUE)
+    public String getSampleMessage() {
+        TestCaseMessage testCaseMessage = ScenarioManager
+                .createTestCaseMessage(ScenarioManager.SCENARIO_1_R_ADMIN_CHILD);
+        Transformer transformer = new Transformer();
+        transformer.transform(testCaseMessage);
+        return testCaseMessage.getMessageText();
+    }
 
     @PostMapping
     public String postPop(

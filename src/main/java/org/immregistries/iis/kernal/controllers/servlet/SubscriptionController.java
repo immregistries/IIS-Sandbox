@@ -1,6 +1,5 @@
 package org.immregistries.iis.kernal.controllers.servlet;
 
-import ca.uhn.fhir.jpa.provider.SubscriptionTriggeringProvider;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletInputStream;
@@ -8,14 +7,13 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.hl7.fhir.r5.model.Bundle;
 import org.hl7.fhir.r5.model.Subscription;
-import org.immregistries.iis.kernal.fhir.common.annotations.OnR5Condition;
-import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
-import org.immregistries.iis.kernal.logic.SubscriptionService;
-import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
-import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.immregistries.iis.kernal.controllers.rest.SubscriptionRestController;
 import org.immregistries.iis.kernal.controllers.servlet.util.UiUtil;
 import org.immregistries.iis.kernal.controllers.servlet.util.UrlTenantUtil;
+import org.immregistries.iis.kernal.fhir.common.annotations.OnR5Condition;
+import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
+import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
+import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -39,10 +37,6 @@ public class SubscriptionController {
 	public static final String SUBSCRIPTION_BASE_PATH = "/subscription";
 	@Autowired
 	RepositoryClientFactory repositoryClientFactory;
-	@Autowired
-	SubscriptionService subscriptionService;
-	@Autowired
-	SubscriptionTriggeringProvider subscriptionTriggeringProvider;
 	@Autowired
 	SubscriptionRestController subscriptionRestController;
 

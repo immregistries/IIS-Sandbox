@@ -2,23 +2,17 @@ package org.immregistries.iis.kernal.controllers.servlet;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.hl7v2.HL7Exception;
-import gov.cdc.izgw.v2tofhir.converter.MessageParser;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.r4.model.Bundle;
+import org.immregistries.iis.kernal.controllers.rest.PopRestController;
 import org.immregistries.iis.kernal.controllers.rest.V2ToFhirRestController;
+import org.immregistries.iis.kernal.controllers.servlet.util.UiUtil;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
 import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
-import org.immregistries.iis.kernal.mapping.interfaces.ImmunizationMapper;
-import org.immregistries.iis.kernal.mapping.internalClient.IFhirRequester;
-import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
-import org.immregistries.iis.kernal.controllers.servlet.util.UiUtil;
-import org.immregistries.smm.transform.ScenarioManager;
-import org.immregistries.smm.transform.TestCaseMessage;
-import org.immregistries.smm.transform.Transformer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -44,6 +38,8 @@ public class V2ToFhirController {
 	FhirContext fhirContext;
 	@Autowired
 	V2ToFhirRestController v2ToFhirRestController;
+	@Autowired
+	PopRestController popRestController;
 
 	@PostMapping
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
@@ -94,11 +90,7 @@ public class V2ToFhirController {
 				organizationName = "";
 			}
 			if (StringUtils.isBlank(message)) {
-				TestCaseMessage testCaseMessage = ScenarioManager
-						.createTestCaseMessage(ScenarioManager.SCENARIO_1_R_ADMIN_CHILD);
-				Transformer transformer = new Transformer();
-				transformer.transform(testCaseMessage);
-				message = testCaseMessage.getMessageText();
+				popRestController.getSampleMessage();
 			}
 
 			UiUtil.doHeader(out, "IIS Sandbox - v2ToFhir", tenant);

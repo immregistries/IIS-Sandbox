@@ -4,14 +4,10 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
-import org.hibernate.Session;
-import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
-import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.immregistries.iis.kernal.controllers.rest.PopRestController;
 import org.immregistries.iis.kernal.controllers.servlet.util.UiUtil;
-import org.immregistries.smm.transform.ScenarioManager;
-import org.immregistries.smm.transform.TestCaseMessage;
-import org.immregistries.smm.transform.Transformer;
+import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
+import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -89,11 +85,7 @@ public class PopController {
 				organizationName = "";
 			}
 			if (StringUtils.isBlank(message)) {
-				TestCaseMessage testCaseMessage = ScenarioManager
-						.createTestCaseMessage(ScenarioManager.SCENARIO_1_R_ADMIN_CHILD);
-				Transformer transformer = new Transformer();
-				transformer.transform(testCaseMessage);
-				message = testCaseMessage.getMessageText();
+				popRestController.getSampleMessage();
 			}
 
 			{

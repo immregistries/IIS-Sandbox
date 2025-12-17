@@ -4,16 +4,14 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
+import org.immregistries.iis.kernal.controllers.rest.shlink.IisKeyRestController;
 import org.immregistries.iis.kernal.controllers.rest.shlink.ShLinkRestController;
+import org.immregistries.iis.kernal.controllers.servlet.TenantController;
+import org.immregistries.iis.kernal.controllers.servlet.util.UiUtil;
 import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
-import org.immregistries.iis.kernal.fhir.security.UserAccessUtil;
-import org.immregistries.iis.kernal.logic.KeyStoreService;
 import org.immregistries.iis.kernal.logic.shlink.ShLinkUtilService;
 import org.immregistries.iis.kernal.persisted.model.IisKey;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
-import org.immregistries.iis.kernal.persisted.model.UserAccess;
-import org.immregistries.iis.kernal.controllers.servlet.TenantController;
-import org.immregistries.iis.kernal.controllers.servlet.util.UiUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,7 +48,7 @@ public class ShLinkController {
 	ShLinkUtilService shLinkUtilService;
 
 	@Autowired
-	KeyStoreService keyStoreService;
+	IisKeyRestController iisKeyRestController;
 
 	@Autowired
 	ShLinkRestController shLinkRestController;
@@ -66,13 +64,12 @@ public class ShLinkController {
 			throws ServletException, IOException, NoSuchAlgorithmException {
 		Tenant tenant = CurrentTenantUtil.getTenantRedirectIfNone(req, resp);
 
-		UserAccess userAccess = UserAccessUtil.get().getUserAccess();
 		OutputStream outputStream = resp.getOutputStream();
 		PrintWriter out = new PrintWriter(outputStream);
 		/*
 		 * Choosing or generating the keys based on the parameters
 		 */
-		IisKey iisSigningKey = keyStoreService.getIisSigningKeyOrCreate(keyId, userAccess, tenant);
+		IisKey iisSigningKey = iisKeyRestController.getOrCreateKey(tenant, keyId);
 
 		String qrCode = shLinkRestController.shLinkIPSQrCode(req, iisSigningKey.getKeyId(), secretKey,patientId,flag,exp,tenant);
 		if (image) {
@@ -102,7 +99,6 @@ public class ShLinkController {
 			@RequestParam(value = PARAM_EXP, required = false) String exp)
 			throws ServletException, IOException {
 		Tenant tenant = CurrentTenantUtil.getTenantRedirectIfNone(req, resp);
-		UserAccess userAccess = UserAccessUtil.get().getUserAccess();
 
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
@@ -147,7 +143,7 @@ public class ShLinkController {
 
 		out.println("    <div class=\"w3-container\">");
 
-		List<IisKey> iisKeys = keyStoreService.getKeys(userAccess);
+		List<IisKey> iisKeys = iisKeyRestController.getKeys();
 		IisKeyController.printIisKeys(out, iisKeys, tenant);
 		out.println("    </div>");
 
