@@ -2,7 +2,6 @@ package org.immregistries.iis.kernal.controllers.rest.shlink;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.instance.model.api.IBaseBundle;
 import org.hl7.fhir.r4.model.IdType;
@@ -27,8 +26,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintWriter;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 import java.util.List;
