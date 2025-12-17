@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.r4.model.Bundle;
+import org.immregistries.iis.kernal.controllers.rest.V2ToFhirRestController;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
 import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.mapping.interfaces.ImmunizationMapper;
@@ -41,6 +42,8 @@ public class V2ToFhirController {
 
 	@Autowired
 	FhirContext fhirContext;
+	@Autowired
+	V2ToFhirRestController v2ToFhirRestController;
 
 	@PostMapping
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
@@ -57,20 +60,13 @@ public class V2ToFhirController {
 				out.println("Access is not authorized. FacilityId, userid and/or password are not recognized. ");
 			} else {
 				UiUtil.doHeader(out, "IIS Sandbox - V2ToFhir Result", tenant);
-				MessageParser parser = new MessageParser();
 				try {
-					Bundle bundle = parser.convert(message);
-
+					Bundle bundle = v2ToFhirRestController.convertV2ToFhir(message,facility_name);
 					result = fhirContext.newJsonParser().setPrettyPrint(true).encodeResourceToString(bundle);
-					// MethodOutcome result =
-					// repositoryClientFactory.getFhirClient().create().resource(bundle).execute();
-					// return
-					// fhirContext.newJsonParser().encodeResourceToString(result.getResource());
 				} catch (HL7Exception e) {
 					throw new RuntimeException(e);
 				}
 			}
-			// resp.setContentType("text/plain");
 			out.println("<textarea name=\"result\" readonly style=\"width: 100%; height: 90%;\" >");
 			out.print(result);
 			out.println("</textarea>");
