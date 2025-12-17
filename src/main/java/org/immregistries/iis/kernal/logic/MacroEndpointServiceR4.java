@@ -1,38 +1,25 @@
-package org.immregistries.iis.kernal.controllers.servlet;
+package org.immregistries.iis.kernal.logic;
 
 import ca.uhn.fhir.context.FhirContext;
-import ca.uhn.fhir.context.RuntimeResourceDefinition;
 import ca.uhn.fhir.jpa.api.dao.IFhirResourceDao;
 import ca.uhn.fhir.jpa.api.model.DaoMethodOutcome;
 import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
 import ca.uhn.fhir.rest.server.servlet.ServletRequestDetails;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import org.hl7.fhir.r4.model.*;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
-import org.immregistries.iis.kernal.fhir.interceptors.PartitionTenantCreationInterceptor;
 import org.immregistries.iis.kernal.fhir.security.TenantUtil;
-import org.immregistries.iis.kernal.fhir.security.UserAccessUtil;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.immregistries.iis.kernal.persisted.model.UserAccess;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-
-@RestController()
-@RequestMapping("/$create")
+@Service
 @Conditional(OnR4Condition.class)
-public class MacroEndpointControllerR4 {
-	private final Logger logger = LoggerFactory.getLogger(this.getClass());
+public class MacroEndpointServiceR4 {
+
 	@Autowired
 	FhirContext fhirContext;
 	@Autowired
@@ -46,34 +33,9 @@ public class MacroEndpointControllerR4 {
 	@Autowired
 	TenantUtil tenantUtil;
 
-	@Autowired
-	PartitionTenantCreationInterceptor partitionTenantCreationInterceptor;
-
-	// @GetMapping("/StructureDefinition")
-	// public ResponseEntity<String> getStructureDefinition() {
-	// fhirContext.
-	// StructureDefinition structureDefinition =
-	// ClasspathUtil.loadResource(fhirContext,StructureDefinition.class,
-	// "org/hl7/fhir/r4/model/patient.json");
-	// return ResponseEntity.ok().body(structureDefinition.getUrl());
-	// }
-	@GetMapping("/StructureDefinition")
-	public ResponseEntity<String> getStructureDefinition2() {
-		RuntimeResourceDefinition runtimeResourceDefinition = fhirContext.getResourceDefinition("Patient");
-		logger.info("profile test{}", runtimeResourceDefinition.getResourceProfile("localhost:8080/fhir/b"));
-		logger.info("profile test{}", runtimeResourceDefinition);
-
-		return ResponseEntity.ok()
-				.body(fhirContext.newJsonParser().encodeResourceToString(runtimeResourceDefinition.toProfile("test")));
-	}
-
-	@PostMapping
-	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-			throws ServletException, IOException {
-
-		Bundle facilityBundle = fhirContext.newJsonParser().parseResource(Bundle.class, req.getReader());
+	public @NotNull Tenant generateTenantAndContent(String bundleString, UserAccess userAccess) {
+		Bundle facilityBundle = fhirContext.newJsonParser().parseResource(Bundle.class, bundleString);
 		ServletRequestDetails requestDetails;
-		UserAccess userAccess = UserAccessUtil.get().getUserAccess();
 		Tenant tenant = null;
 		/**
 		 * one and only one organization must be specified in bundle
@@ -94,15 +56,11 @@ public class MacroEndpointControllerR4 {
 			requestDetails = new ServletRequestDetails();
 			requestDetails.setTenantId(tenant.getOrganizationName());
 			fillFacility(requestDetails, facilityBundle);
+			return tenant;
 		}
 	}
 
-	@GetMapping
-	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		doPost(req, resp);
-	}
-
-	public ResponseEntity fillFacility(ServletRequestDetails requestDetails, Bundle bundle) {
+	private void fillFacility(ServletRequestDetails requestDetails, Bundle bundle) {
 		for (Bundle.BundleEntryComponent entry : bundle.getEntry()) {
 			if (entry.getResource() instanceof Practitioner) {
 				Practitioner practitioner = (Practitioner) entry.getResource();
@@ -136,10 +94,9 @@ public class MacroEndpointControllerR4 {
 		for (Bundle.BundleEntryComponent entry : bundle.getEntry()) {
 			if (entry.getResource() instanceof ImmunizationRecommendation) {
 				ImmunizationRecommendation immunizationRecommendation = (ImmunizationRecommendation) entry
-						.getResource();
+					.getResource();
 				immunizationRecommendationDao.create(immunizationRecommendation, requestDetails);
 			}
 		}
-		return ResponseEntity.ok().build();
 	}
 }

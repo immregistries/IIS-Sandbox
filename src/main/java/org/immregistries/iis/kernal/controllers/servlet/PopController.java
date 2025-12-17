@@ -47,7 +47,6 @@ public class PopController {
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
-		Session dataSession = null;
 		try {
 			Tenant tenant = CurrentTenantUtil.getTenant(req);
 
@@ -72,9 +71,6 @@ public class PopController {
 			e.printStackTrace(out);
 			e.printStackTrace(System.err);
 		} finally {
-			if (dataSession != null) {
-				dataSession.close();
-			}
 			out.flush();
 			out.close();
 		}

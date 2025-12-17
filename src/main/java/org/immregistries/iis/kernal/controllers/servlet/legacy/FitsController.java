@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal.controllers.servlet;
+package org.immregistries.iis.kernal.controllers.servlet.legacy;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
+import org.immregistries.iis.kernal.controllers.servlet.TenantController;
 import org.immregistries.iis.kernal.logic.CodeMapManager;
 import org.immregistries.iis.kernal.logic.FitsExamples;
 import org.immregistries.vfa.connect.IISConnector;

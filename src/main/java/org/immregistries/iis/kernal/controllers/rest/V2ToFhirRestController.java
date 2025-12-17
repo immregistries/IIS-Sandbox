@@ -14,16 +14,20 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
 
+import static org.immregistries.iis.kernal.controllers.rest.V2ToFhirRestController.V2_TO_FHIR_PATH;
+
 @RestController
-@RequestMapping("/rest/v2tofhir")
+@RequestMapping({RestUrlUtil.REST + V2_TO_FHIR_PATH, RestUrlUtil.REST_TENANT_PATH + V2_TO_FHIR_PATH})
 @Conditional(OnR4Condition.class)
 public class V2ToFhirRestController {
+	public static final String V2_TO_FHIR_PATH = "/v2ToFhir";
+	public static final String FACILITY_NAME = "facilityName";
 
-	 @Autowired
+	@Autowired
 	 private MessageParser messageParser;
 
     @PostMapping
-    public Bundle convertV2ToFhir(@RequestBody String message, @RequestParam(name = "facilityName", required = false) String facilityName) throws HL7Exception {
+    public Bundle convertV2ToFhir(@RequestBody String message, @RequestParam(name = FACILITY_NAME, required = false) String facilityName) throws HL7Exception {
 		 return messageParser.convert(message);
     }
 }

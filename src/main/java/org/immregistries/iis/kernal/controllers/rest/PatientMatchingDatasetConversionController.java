@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal.controllers.servlet;
+package org.immregistries.iis.kernal.controllers.rest;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.context.FhirVersionEnum;
