@@ -1,7 +1,6 @@
 package org.immregistries.iis.kernal.controllers.servlet.legacy;
 
 import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
-import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.param.DateParam;
 import ca.uhn.fhir.rest.param.ParamPrefixEnum;
 import ca.uhn.fhir.rest.param.ReferenceParam;
@@ -26,6 +25,9 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Broken and deprecated, TODO modernize
+ */
 public class VXUDownloadGenerator extends Thread {
 
   @Autowired
@@ -169,7 +171,6 @@ public class VXUDownloadGenerator extends Thread {
       }
     }
     runningMessage = "Looking for vaccinations";
-    IGenericClient fhirClient = repositoryClientFactory.newGenericClient(tenant, req);
 
     List<VaccinationReported> vaccinationReportedList = fhirRequests.searchVaccinationReportedList(
         new SearchParameterMap(Immunization.SP_DATE,
