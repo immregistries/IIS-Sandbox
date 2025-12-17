@@ -1,12 +1,9 @@
-package org.immregistries.iis.kernal.controllers.servlet;
+package org.immregistries.iis.kernal.controllers.rest;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.jpa.searchparam.extractor.ISearchParamExtractor;
-import ca.uhn.fhir.parser.IParser;
 import ca.uhn.fhir.rest.server.util.ISearchParamRegistry;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import org.hl7.fhir.r5.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +16,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.io.IOException;
 
 @RestController
-@RequestMapping("/SubscriptionTopic")
+@RequestMapping({"/SubscriptionTopic", RestUrlUtil.REST + "/SubscriptionTopic"})
 public class SubscriptionTopicController {
 	public static final String DATA_QUALITY_ISSUES_TOPIC_NAME = "/data-quality-issues";
 	public static final String PATIENT_TOPIC_NAME = "/Patient";
@@ -34,32 +31,24 @@ public class SubscriptionTopicController {
 	ISearchParamExtractor iSearchParamExtractor;
 
 	@GetMapping
-	protected void doGetDefault(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		IParser parser = fhirContext.newJsonParser().setPrettyPrint(true);
-		SubscriptionTopic topic = getDataQualityIssuesSubscriptionTopic();
-		resp.getOutputStream().print(parser.encodeResourceToString(topic));
+	protected SubscriptionTopic doGetDefault() throws ServletException, IOException {
+		return getDataQualityIssuesSubscriptionTopic();
 	}
 
 	@GetMapping(PATIENT_TOPIC_NAME)
-	protected void doGetPatientTest(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		IParser parser = fhirContext.newJsonParser().setPrettyPrint(true);
-		SubscriptionTopic topic = getPatientSubscriptionTopic();
-		resp.getOutputStream().print(parser.encodeResourceToString(topic));
+	protected SubscriptionTopic doGetPatientTest() throws ServletException, IOException {
+		return getPatientSubscriptionTopic();
 	}
 
 	@GetMapping(GROUP_TOPIC_NAME)
-	protected void doGetGroup(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		IParser parser = fhirContext.newJsonParser().setPrettyPrint(true);
-		SubscriptionTopic topic = getGroupSubscriptionTopic();
-		resp.getOutputStream().print(parser.encodeResourceToString(topic));
+	protected SubscriptionTopic doGetGroup() throws ServletException, IOException {
+		return getGroupSubscriptionTopic();
 	}
 
 
 	@GetMapping(DATA_QUALITY_ISSUES_TOPIC_NAME)
-	protected void doGetDataQualityIssues(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		IParser parser = fhirContext.newJsonParser().setPrettyPrint(true);
-		SubscriptionTopic topic = getDataQualityIssuesSubscriptionTopic();
-		resp.getOutputStream().print(parser.encodeResourceToString(topic));
+	protected SubscriptionTopic doGetDataQualityIssues() throws ServletException, IOException {
+		return getDataQualityIssuesSubscriptionTopic();
 	}
 
 	public static SubscriptionTopic getDataQualityIssuesSubscriptionTopic() {

@@ -18,6 +18,7 @@ public class RestUrlUtil {
 		return Application.IIS_PATH_BASE + tenantifyPathSuffix(tenant.getOrgId(), urlSuffix);
 	}
 
+
 	/**
 	 * Standardized converting url Suffix with tenant Name and variable,
 	 * Automatically adds / character if needed
