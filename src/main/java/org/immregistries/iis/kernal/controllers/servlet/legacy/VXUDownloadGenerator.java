@@ -10,11 +10,9 @@ import org.hibernate.Session;
 import org.hl7.fhir.r5.model.Immunization;
 import org.hl7.fhir.r5.model.Patient;
 import org.immregistries.iis.kernal.logic.IExampleMessageWriter;
-import org.immregistries.iis.kernal.mapping.internalClient.FhirRequesterR5;
-import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
+import org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester;
 import org.immregistries.iis.kernal.model.VaccinationReported;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -30,12 +28,8 @@ import java.util.stream.Collectors;
  */
 public class VXUDownloadGenerator extends Thread {
 
-  @Autowired
-  FhirRequesterR5 fhirRequests;
-  @Autowired
+	AbstractFhirRequester fhirRequests;
   IExampleMessageWriter exampleMessageWriter;
-  @Autowired
-  RepositoryClientFactory repositoryClientFactory;
 
   public static final String PARAM_DATE_START = "dateStart";
   public static final String PARAM_DATE_END = "dateEnd";
@@ -102,7 +96,9 @@ public class VXUDownloadGenerator extends Thread {
   private HttpServletRequest req;
   private File file;
 
-  public VXUDownloadGenerator(HttpServletRequest req, Tenant tenant) {
+	public VXUDownloadGenerator(HttpServletRequest req, Tenant tenant, AbstractFhirRequester fhirRequester, IExampleMessageWriter exampleMessageWriter) {
+		this.fhirRequests = fhirRequester;
+		this.exampleMessageWriter = exampleMessageWriter;
     runningMessage = "Initializing";
     this.tenant = tenant;
     sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");

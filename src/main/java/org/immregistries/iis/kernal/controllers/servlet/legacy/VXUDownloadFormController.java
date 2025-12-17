@@ -8,9 +8,10 @@ import org.immregistries.iis.kernal.controllers.servlet.TenantController;
 import org.immregistries.iis.kernal.controllers.servlet.util.UiUtil;
 import org.immregistries.iis.kernal.controllers.servlet.util.UrlTenantUtil;
 import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
+import org.immregistries.iis.kernal.logic.IExampleMessageWriter;
+import org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,8 +30,10 @@ import java.text.SimpleDateFormat;
 @RequestMapping({ "/VXUDownloadForm", TenantController.TENANT_PATH + "/VXUDownloadForm" })
 public class VXUDownloadFormController {
 
-  @Autowired
-  AutowireCapableBeanFactory beanFactory;
+	@Autowired
+	AbstractFhirRequester fhirRequests;
+	@Autowired
+	IExampleMessageWriter exampleMessageWriter;
 
   protected static final String CACHED_GENERATOR = "generator";
   protected static final String EXPORT_YYYY_MM_DD = "yyyy-MM-dd";
@@ -66,8 +69,7 @@ public class VXUDownloadFormController {
       }
       VXUDownloadGenerator generator = (VXUDownloadGenerator) session.getAttribute(CACHED_GENERATOR);
       if (generator == null || action == null || action.equals(ACTION_GENERATE)) {
-        generator = new VXUDownloadGenerator(req, tenant);
-        beanFactory.autowireBean(generator);
+			generator = new VXUDownloadGenerator(req, tenant, fhirRequests, exampleMessageWriter);
         session.setAttribute(CACHED_GENERATOR, generator);
       }
       UiUtil.doHeader(out, "IIS Sandbox", tenant);
