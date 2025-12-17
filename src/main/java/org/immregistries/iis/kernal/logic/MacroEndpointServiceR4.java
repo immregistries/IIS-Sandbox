@@ -13,12 +13,11 @@ import org.immregistries.iis.kernal.persisted.model.UserAccess;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 @Service
 @Conditional(OnR4Condition.class)
-public class MacroEndpointServiceR4 {
+public class MacroEndpointServiceR4 implements MacroEndpointService {
 
 	@Autowired
 	FhirContext fhirContext;

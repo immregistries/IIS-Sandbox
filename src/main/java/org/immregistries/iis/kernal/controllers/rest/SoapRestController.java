@@ -23,7 +23,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 @RestController
-@RequestMapping({"/rest/soap", "/rest/tenant/{tenantId}/soap"})
+@RequestMapping({"/rest/soap", "/rest/tenant/{tenantId}/soap", "/tenant/{tenantName}/soap"})
 public class SoapRestController {
 
 	@Autowired
