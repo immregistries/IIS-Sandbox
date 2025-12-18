@@ -17,7 +17,7 @@ public class MessageRestController {
     @Autowired
     MessageReceivedRepository messageReceivedRepository;
 
-	@GetMapping
+	@GetMapping("/{patientId}")
 	public List<MessageReceived> getPatientMessages(
 		@RequestAttribute(name = SESSION_REQUEST_TENANT) Tenant tenant,
 		@PathVariable("patientId") String patientId) {

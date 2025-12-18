@@ -9,7 +9,16 @@ import org.immregistries.iis.kernal.model.PatientReported;
  *
  * @param <Patient> FHIR Resource type
  */
-public interface PatientMapper<Patient extends IBaseResource> extends IisFhirMapperMasterReported<PatientMaster, PatientReported, Patient> {
+public interface PatientMapper<Patient extends IBaseResource>
+		extends IisFhirMapperMasterReported<PatientMaster, PatientReported, Patient> {
+
+	default String fhirType() {
+		return "Patient";
+	}
+
+	default Class<PatientMaster> localMasterType() {
+		return PatientMaster.class;
+	}
 
 	String MRN_SYSTEM = "AIRA-TEST";
 
@@ -26,7 +35,6 @@ public interface PatientMapper<Patient extends IBaseResource> extends IisFhirMap
 	String ETHNICITY_SYSTEM = "urn:oid:2.16.840.1.113883.6.238";
 	String ETHNICITY_SYSTEM_OMB = "http://hl7.org/fhir/us/core/ValueSet/omb-ethnicity-category";
 	String ETHNICITY_SYSTEM_DETAILED = "http://hl7.org/fhir/us/core/ValueSet/detailed-ethnicity";
-
 
 	String RACE_EXTENSION = "http://hl7.org/fhir/us/core/StructureDefinition/us-core-race";
 	String RACE_EXTENSION_DETAILED = "detailed";
@@ -53,7 +61,8 @@ public interface PatientMapper<Patient extends IBaseResource> extends IisFhirMap
 	String RELATIONSHIP_SYSTEM = "";
 
 	/**
-	 * Translates from FHIR to reconstruct reported patient, fetching master patient for referencing
+	 * Translates from FHIR to reconstruct reported patient, fetching master patient
+	 * for referencing
 	 *
 	 * @param patient FHIR patient resource
 	 * @return Mapped internal model Patient as reported patient, with
@@ -62,6 +71,7 @@ public interface PatientMapper<Patient extends IBaseResource> extends IisFhirMap
 
 	/**
 	 * Translates from FHIR to reconstruct reported patient object
+	 * 
 	 * @param patient FHIR patient Resource
 	 * @return Mapped internal model Patient as reported patient
 	 */
@@ -76,6 +86,7 @@ public interface PatientMapper<Patient extends IBaseResource> extends IisFhirMap
 
 	/**
 	 * Converts local model patient information to FHIR Resource
+	 * 
 	 * @param patientMaster any local patient record
 	 * @return
 	 */

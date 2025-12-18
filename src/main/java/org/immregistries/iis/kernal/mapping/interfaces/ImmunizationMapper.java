@@ -4,12 +4,21 @@ import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.immregistries.iis.kernal.model.VaccinationMaster;
 import org.immregistries.iis.kernal.model.VaccinationReported;
 
-public interface ImmunizationMapper<Immunization extends IBaseResource> extends IisFhirMapperMasterReported<VaccinationMaster, VaccinationReported, Immunization> {
+public interface ImmunizationMapper<Immunization extends IBaseResource>
+		extends IisFhirMapperMasterReported<VaccinationMaster, VaccinationReported, Immunization> {
+	default String fhirType() {
+		return "Immunization";
+	}
+
+	default Class<VaccinationMaster> localMasterType() {
+		return VaccinationMaster.class;
+	}
+
 	String CVX_SYSTEM = "http://hl7.org/fhir/sid/cvx";
 	String MVX_SYSTEM = "http://terminology.hl7.org/CodeSystem/MVX";
 	String NDC_SYSTEM = "NDC";
-	String INFORMATION_SOURCE = "NIP001"; //TODO get system from actual message
-	String INFORMATION_SOURCE_EXTENSION = "informationSource"; //TODO get system from actual message
+	String INFORMATION_SOURCE = "NIP001"; // TODO get system from actual message
+	String INFORMATION_SOURCE_EXTENSION = "informationSource"; // TODO get system from actual message
 	String PERFORMER_FUNCTION_SYSTEM = "http://terminology.hl7.org/CodeSystem/v2-0443";
 	String ENTERING_VALUE = "EP";
 	String ENTERING_DISPLAY = "Entering Provider";
@@ -28,7 +37,6 @@ public interface ImmunizationMapper<Immunization extends IBaseResource> extends 
 	String COMPLETION_STATUS_EXTENSION = "completionStatus";
 	String COMPLETION_STATUS_SYSTEM = "0322";
 
-
 	VaccinationReported localObjectReportedWithMaster(Immunization immunization);
 
 	VaccinationReported localObjectReported(Immunization immunization);
@@ -36,7 +44,8 @@ public interface ImmunizationMapper<Immunization extends IBaseResource> extends 
 	VaccinationMaster localObject(Immunization immunization);
 
 	/**
-	 * This method create the immunization resource based on the vaccinationReported information
+	 * This method create the immunization resource based on the vaccinationReported
+	 * information
 	 *
 	 * @param vaccinationMaster the vaccination local object
 	 * @return the Immunization resource
