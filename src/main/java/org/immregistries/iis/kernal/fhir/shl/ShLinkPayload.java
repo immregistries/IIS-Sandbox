@@ -3,13 +3,14 @@ package org.immregistries.iis.kernal.fhir.shl;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.io.Serializable;
 import java.util.Optional;
 import java.util.Set;
 
 /**
  * Represents a SMART Health Link, which provides a link to a user's health information.
  */
-public class ShLinkPayload {
+public class ShLinkPayload implements Serializable {
 
 	/**
 	 * The URL for this SMART Health Link.

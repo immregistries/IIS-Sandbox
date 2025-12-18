@@ -1,6 +1,5 @@
 package org.immregistries.iis.kernal.controllers.rest;
 
-import jakarta.servlet.http.HttpServletRequest;
 import org.immregistries.iis.kernal.persisted.model.MessageReceived;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.immregistries.iis.kernal.persisted.repository.MessageReceivedRepository;
@@ -18,11 +17,17 @@ public class MessageRestController {
     @Autowired
     MessageReceivedRepository messageReceivedRepository;
 
+	@GetMapping
+	public List<MessageReceived> getPatientMessages(
+		@RequestAttribute(name = SESSION_REQUEST_TENANT) Tenant tenant,
+		@PathVariable("patientId") String patientId) {
+		return messageReceivedRepository.findByTenantAndPatientReportedId(tenant, patientId);
+	}
+
     @GetMapping
     public List<MessageReceived> getMessages(
             @RequestAttribute(name = SESSION_REQUEST_TENANT) Tenant tenant,
-            @RequestParam(required = false) String search,
-            HttpServletRequest req) {
+				@RequestParam(required = false) String search) {
 
         List<MessageReceived> messageReceivedList = messageReceivedRepository
                 .findByTenantOrderByReportedDateDesc(tenant);

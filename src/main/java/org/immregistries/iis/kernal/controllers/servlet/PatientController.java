@@ -11,7 +11,13 @@ import org.hl7.fhir.instance.model.api.IBaseBundle;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.instance.model.api.IDomainResource;
 import org.hl7.fhir.r5.model.Bundle;
+import org.immregistries.iis.kernal.controllers.rest.MessageRestController;
+import org.immregistries.iis.kernal.controllers.rest.PatientRestController;
 import org.immregistries.iis.kernal.controllers.rest.RestUrlUtil;
+import org.immregistries.iis.kernal.controllers.rest.SubscriptionRestController;
+import org.immregistries.iis.kernal.controllers.servlet.shlink.ShLinkController;
+import org.immregistries.iis.kernal.controllers.servlet.util.UiUtil;
+import org.immregistries.iis.kernal.controllers.servlet.util.UrlTenantUtil;
 import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.fhir.shl.ShLinkPayload;
 import org.immregistries.iis.kernal.logic.shlink.ShLinkUtilService;
@@ -24,12 +30,6 @@ import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.model.VaccinationMaster;
 import org.immregistries.iis.kernal.persisted.model.MessageReceived;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
-import org.immregistries.iis.kernal.persisted.repository.MessageReceivedRepository;
-import org.immregistries.iis.kernal.controllers.rest.PatientRestController;
-import org.immregistries.iis.kernal.controllers.rest.SubscriptionRestController;
-import org.immregistries.iis.kernal.controllers.servlet.shlink.ShLinkController;
-import org.immregistries.iis.kernal.controllers.servlet.util.UiUtil;
-import org.immregistries.iis.kernal.controllers.servlet.util.UrlTenantUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,7 +79,7 @@ public class PatientController {
 	private SubscriptionRestController subscriptionRestController;
 
 	@Autowired
-	private MessageReceivedRepository messageReceivedRepository;
+	private MessageRestController messageRestController;
 
 	@PostMapping
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp
@@ -167,8 +167,7 @@ public class PatientController {
 
 		out.println("<div class=\"w3-container\">");
 		out.println("<h4>Messages Received</h4>");
-		List<MessageReceived> messageReceivedList = messageReceivedRepository
-			.findByPatientReportedId(patientMasterSelected.getPatientId());
+		List<MessageReceived> messageReceivedList = messageRestController.getPatientMessages(tenant, patientMasterSelected.getPatientId());
 		if (messageReceivedList.isEmpty()) {
 			out.println("<div class=\"w3-panel w3-yellow\"><p>No Messages Received</p></div>");
 		} else {

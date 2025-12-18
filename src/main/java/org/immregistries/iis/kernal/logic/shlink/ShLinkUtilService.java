@@ -1,7 +1,8 @@
 package org.immregistries.iis.kernal.logic.shlink;
 
 import ca.uhn.fhir.context.FhirContext;
-import com.google.gson.Gson;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
 import com.nimbusds.jose.util.Base64URL;
@@ -65,6 +66,8 @@ public class ShLinkUtilService {
 	FhirContext fhirContext;
 	@Autowired
 	CompressionService compressionService;
+
+	ObjectMapper objectMapper = new ObjectMapper();
 
 	public String fullExamplePatientQrCode(Tenant tenant, PatientMaster patientMaster, String baseUrl) {
 
@@ -131,9 +134,12 @@ public class ShLinkUtilService {
 	}
 
 	public String qrCode(ShLinkPayload shLinkPayload) {
-		Gson gson = new Gson();
-		String payload = gson.toJson(shLinkPayload);
-		// String minified = payload.trim();
+		String payload = "";
+		try {
+			payload = objectMapper.writeValueAsString(shLinkPayload);
+		} catch (JsonProcessingException e) {
+			throw new RuntimeException(e);
+		}
 		Base64URL base64URL = Base64URL.encode(payload);
 		return SHLINK_PREFIX + base64URL;
 	}

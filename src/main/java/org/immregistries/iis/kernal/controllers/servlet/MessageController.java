@@ -3,12 +3,12 @@ package org.immregistries.iis.kernal.controllers.servlet;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
-import org.immregistries.iis.kernal.persisted.model.MessageReceived;
-import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.immregistries.iis.kernal.controllers.rest.MessageRestController;
 import org.immregistries.iis.kernal.controllers.servlet.util.PatientServletUtil;
 import org.immregistries.iis.kernal.controllers.servlet.util.UiUtil;
+import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
+import org.immregistries.iis.kernal.persisted.model.MessageReceived;
+import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -87,8 +87,7 @@ public class MessageController {
 				out.println("    </div>");
 
 				out.println("    <div class=\"w3-container\">");
-				List<MessageReceived> messageReceivedList = messageRestController.getMessages(tenant, search,
-						req);
+				List<MessageReceived> messageReceivedList = messageRestController.getMessages(tenant, search);
 
 				if (messageReceivedList.size() == 0) {
 					out.println("     <em>None Received</em>");

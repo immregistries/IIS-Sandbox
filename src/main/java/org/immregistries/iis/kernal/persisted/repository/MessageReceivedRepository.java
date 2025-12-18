@@ -10,4 +10,6 @@ public interface MessageReceivedRepository extends JpaRepository<MessageReceived
     List<MessageReceived> findByTenantOrderByReportedDateDesc(Tenant tenant);
 
     List<MessageReceived> findByPatientReportedId(String patientId);
+
+    List<MessageReceived> findByTenantAndPatientReportedId(Tenant tenant, String patientId);
 }
