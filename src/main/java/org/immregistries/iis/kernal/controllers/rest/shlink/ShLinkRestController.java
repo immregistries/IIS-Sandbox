@@ -109,7 +109,7 @@ public class ShLinkRestController {
 		String qrCode = shLinkIPSQrCode(req,keyId,secretKey,patientId,flag,exp,tenant);
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.IMAGE_PNG);
-		ByteArrayOutputStream outputStream = compressionService.getQrCodeByteArrayOutputStreamPNG(qrCode);
+		ByteArrayOutputStream outputStream = compressionService.toQrCodeStreamPNG(qrCode);
 		return new ResponseEntity<>(outputStream.toByteArray(), headers, HttpStatus.OK);
 
 	}

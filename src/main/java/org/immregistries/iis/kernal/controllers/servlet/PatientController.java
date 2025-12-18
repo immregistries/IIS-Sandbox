@@ -3,6 +3,7 @@ package org.immregistries.iis.kernal.controllers.servlet;
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.context.FhirVersionEnum;
 import ca.uhn.fhir.parser.IParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -16,6 +17,7 @@ import org.immregistries.iis.kernal.controllers.rest.PatientRestController;
 import org.immregistries.iis.kernal.controllers.rest.RestUrlUtil;
 import org.immregistries.iis.kernal.controllers.rest.SubscriptionRestController;
 import org.immregistries.iis.kernal.controllers.servlet.shlink.ShLinkController;
+import org.immregistries.iis.kernal.controllers.servlet.util.UiQrCodeUtil;
 import org.immregistries.iis.kernal.controllers.servlet.util.UiUtil;
 import org.immregistries.iis.kernal.controllers.servlet.util.UrlTenantUtil;
 import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
@@ -70,9 +72,6 @@ public class PatientController {
 	private PatientMapper patientMapper;
 
 	@Autowired
-	private ShLinkUtilService shLinkUtilService;
-
-	@Autowired
 	private PatientRestController patientRestController;
 
 	@Autowired(required = false)
@@ -121,7 +120,7 @@ public class PatientController {
 	}
 
 	private void singlePatientInformationPrintAll(PrintWriter out, IBaseResource patientSelected,
-																 Tenant tenant, HttpServletRequest req) {
+																 Tenant tenant, HttpServletRequest req) throws JsonProcessingException {
 		PatientMaster patientMasterSelected = patientMapper.localObject(patientSelected);
 		boolean isGolden = AbstractFhirRequester.isGoldenRecord(patientSelected);
 
@@ -181,7 +180,7 @@ public class PatientController {
 	}
 
 	private void printQrCodeAndDetails(PrintWriter out, Tenant tenant, PatientMaster patientMasterSelected,
-												  ShLinkPayload shLinkPayload) {
+												  ShLinkPayload shLinkPayload) throws JsonProcessingException {
 		out.println("<div class=\"w3-container\">");
 		out.println("<img src=\""
 			+ UrlTenantUtil.tenantifyPathWithContextPath(tenant,
@@ -190,7 +189,7 @@ public class PatientController {
 		out.println("<div><a href= \"" + shLinkPayload.getUrl() + "\">Manifest URL</a></div>");
 		out.println("<h5>Qr Code Text Value</h5>");
 		out.println("<textarea id =\"qrCode\" cols=\"30\" rows=\"2\" style=\"white-space: nowrap;  overflow: auto;\">");
-		String qrCode = shLinkUtilService.qrCode(shLinkPayload);
+		String qrCode = UiQrCodeUtil.qrCodeBase64(shLinkPayload);
 		out.print(qrCode);
 		out.println("</textarea>");
 		out.println("</div>");
@@ -199,8 +198,7 @@ public class PatientController {
 			UrlTenantUtil.tenantifyPathWithContextPath(tenant,
 				ShLinkController.SHLINK_CONTROLLER_BASE_PATH + "?" + ShLinkController.PARAM_PATIENT_ID + "="
 					+ patientMasterSelected.getPatientId())
-			+
-			"\">Generate a new Smart Health Link with IPS</a></div>");
+			+ "\">Generate a new Smart Health Link with IPS</a></div>");
 		out.println("<div><a href= \"" +
 			RestUrlUtil.tenantifyPathWithContextPath(tenant, "/patient/" + patientMasterSelected.getPatientId() + "/clvr/pdf")
 			+

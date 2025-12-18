@@ -126,7 +126,7 @@ public class CompressionService {
 	}
 
 
-	public @NotNull ByteArrayOutputStream getQrCodeByteArrayOutputStreamPNG(String data) throws IOException, ServletException {
+	public @NotNull ByteArrayOutputStream toQrCodeStreamPNG(String data) throws IOException, ServletException {
 		int width = 300; // Desired QR code width
 		int height = 300; // Desired QR code height
 		BitMatrix bitMatrix = qrCodeBitMatrix(data, width, height);

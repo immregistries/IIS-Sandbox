@@ -1,5 +1,6 @@
 package org.immregistries.iis.kernal.controllers.servlet.shlink;
 
+import com.google.zxing.WriterException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -7,9 +8,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.immregistries.iis.kernal.controllers.rest.shlink.IisKeyRestController;
 import org.immregistries.iis.kernal.controllers.rest.shlink.ShLinkRestController;
 import org.immregistries.iis.kernal.controllers.servlet.TenantController;
+import org.immregistries.iis.kernal.controllers.servlet.util.UiQrCodeUtil;
 import org.immregistries.iis.kernal.controllers.servlet.util.UiUtil;
 import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
-import org.immregistries.iis.kernal.logic.shlink.ShLinkUtilService;
 import org.immregistries.iis.kernal.persisted.model.IisKey;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.slf4j.Logger;
@@ -43,10 +44,6 @@ public class ShLinkController {
 
 	public static final String ACTION_SAVE = "Generate";
 
-
-	@Autowired
-	ShLinkUtilService shLinkUtilService;
-
 	@Autowired
 	IisKeyRestController iisKeyRestController;
 
@@ -61,7 +58,7 @@ public class ShLinkController {
 			@RequestParam(PARAM_FLAG) String flag,
 			@RequestParam(PARAM_EXP) String exp,
 			@RequestParam(value = "image", required = false) boolean image)
-			throws ServletException, IOException, NoSuchAlgorithmException {
+		throws ServletException, IOException, NoSuchAlgorithmException, WriterException {
 		Tenant tenant = CurrentTenantUtil.getTenantRedirectIfNone(req, resp);
 
 		OutputStream outputStream = resp.getOutputStream();
@@ -74,8 +71,7 @@ public class ShLinkController {
 		String qrCode = shLinkRestController.shLinkIPSQrCode(req, iisSigningKey.getKeyId(), secretKey,patientId,flag,exp,tenant);
 		if (image) {
 			resp.setContentType("image/png"); // Set content type for PNG image
-
-			shLinkUtilService.printQrCodeAsImage(outputStream, qrCode);
+			UiQrCodeUtil.printQrCodeAsImage(outputStream,qrCode);
 		} else {
 			resp.setContentType("text/html");
 			UiUtil.doHeader(out, "Smart Health Link Result", tenant);

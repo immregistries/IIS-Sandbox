@@ -52,7 +52,7 @@ public class PatientShLinkRestController {
 			throw new RuntimeException("Patient not found");
 		}
 		String qrCode = getQrCode(req, patientSelected, tenant);
-		ByteArrayOutputStream byteArrayOutputStreamPNG = compressionService.getQrCodeByteArrayOutputStreamPNG(qrCode);
+		ByteArrayOutputStream byteArrayOutputStreamPNG = compressionService.toQrCodeStreamPNG(qrCode);
 		return ResponseEntity.ok(byteArrayOutputStreamPNG.toByteArray());
 
 	}

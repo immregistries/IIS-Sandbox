@@ -35,7 +35,6 @@ import org.springframework.web.bind.annotation.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.net.URISyntaxException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -92,7 +91,7 @@ public class CLVRRestController {
         String qrCode = clvrService.encodeCLVRtoQrCode(clvrToken, iisSigningKey.keyPair());
 
 
-		 ByteArrayOutputStream byteArrayOutputStreamPNG = compressionService.getQrCodeByteArrayOutputStreamPNG(qrCode);
+		 ByteArrayOutputStream byteArrayOutputStreamPNG = compressionService.toQrCodeStreamPNG(qrCode);
 		 return ResponseEntity.ok(byteArrayOutputStreamPNG.toByteArray());
 //		 HttpHeaders headers = new HttpHeaders();
 //		 headers.setContentDispositionFormData("attachment", "qr.png");
