@@ -55,9 +55,6 @@ public class IncomingQueryHandler {
 	@Autowired
 	MessageRecordingService messageRecordingService;
 
-	@Autowired
-	FhirContext fhirContext;
-
 	public String processQBP(Tenant tenant, HL7Reader reader, String messageReceived, IIdType managingOrganizationId) throws Exception {
 		Set<ProcessingFlavor> processingFlavorSet = tenant.getProcessingFlavorSet();
 		MqeMessageServiceResponse mqeMessageServiceResponse = validationService.getMqeMessageService().processMessage(messageReceived);
@@ -368,7 +365,7 @@ public class IncomingQueryHandler {
 					}
 
 
-					List<ObservationMaster> observationVaccinationList = fhirSearchRequester.searchObservationReportedList(
+					List<ObservationReported> observationVaccinationList = fhirSearchRequester.searchObservationReportedList(
 						new SearchParameterMap("part-of", new ReferenceParam().setMdmExpand(true).setValue("Immunization/" + vaccination.getVaccinationId())));
 
 					for (ObservationMaster observationMaster : observationVaccinationList) {
@@ -382,7 +379,7 @@ public class IncomingQueryHandler {
 					}
 				}
 
-				List<ObservationMaster> observationReportedPatientList = fhirSearchRequester.searchObservationReportedList(
+				List<ObservationReported> observationReportedPatientList = fhirSearchRequester.searchObservationReportedList(
 					new SearchParameterMap("subject", new ReferenceParam().setMdmExpand(true).setValue("Patient/" + patientMaster.getPatientId()))
 						.add("part-of", new ReferenceParam().setMissing(true))
 				);

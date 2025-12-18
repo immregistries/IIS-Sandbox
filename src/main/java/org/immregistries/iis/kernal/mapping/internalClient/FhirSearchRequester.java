@@ -14,6 +14,7 @@ import org.immregistries.iis.kernal.mapping.AllMappingService;
 import org.immregistries.iis.kernal.mapping.interfaces.*;
 import org.immregistries.iis.kernal.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +22,7 @@ import java.util.stream.Collectors;
 
 import static org.immregistries.iis.kernal.mapping.interfaces.ImmunizationMapper.IMMUNIZATION;
 
+@Service
 public class FhirSearchRequester {
 
 	@Autowired
@@ -240,12 +242,6 @@ public class FhirSearchRequester {
 	public List<PatientReported> searchPatientReportedFromGoldenIdWithMdmLinks(String patientMasterId) {
 		return fhirReadRequester.readMdmlinksReportedIds(patientMasterId)
 			.map(fhirReadRequester::readAsPatientReported)
-			.collect(Collectors.toList());
-	}
-
-	public List<PatientMaster> searchPatientMasterFromGoldenIdWithMdmLinks(String patientMasterId) {
-		return fhirReadRequester.readMdmlinksReportedIds(patientMasterId)
-			.map(fhirReadRequester::readAsPatientMaster)
 			.collect(Collectors.toList());
 	}
 

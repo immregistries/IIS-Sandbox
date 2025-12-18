@@ -11,6 +11,7 @@ import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.logic.IExampleMessageWriter;
 import org.immregistries.iis.kernal.logic.VXUDownloadGenerator;
 import org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester;
+import org.immregistries.iis.kernal.mapping.internalClient.FhirSearchRequester;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
@@ -32,7 +33,7 @@ import java.text.SimpleDateFormat;
 public class VXUDownloadFormController {
 
 	@Autowired
-	AbstractFhirRequester fhirRequests;
+	FhirSearchRequester fhirSearchRequester;
 	@Autowired
 	IExampleMessageWriter exampleMessageWriter;
 

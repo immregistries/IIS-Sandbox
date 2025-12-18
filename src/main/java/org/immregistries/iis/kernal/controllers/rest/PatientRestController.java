@@ -11,9 +11,6 @@ import org.immregistries.iis.kernal.controllers.filters.RestTenantUrlFilter;
 import org.immregistries.iis.kernal.controllers.rest.shlink.PatientShLinkRestController;
 import org.immregistries.iis.kernal.fhir.shl.ShLinkPayload;
 import org.immregistries.iis.kernal.mapping.interfaces.PatientMapper;
-import org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester;
-import org.immregistries.iis.kernal.mapping.internalClient.FhirReadRequester;
-import org.immregistries.iis.kernal.mapping.internalClient.FhirSearchRequester;
 import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
 import org.immregistries.iis.kernal.model.ObservationReported;
 import org.immregistries.iis.kernal.model.PatientMaster;
@@ -28,7 +25,7 @@ import java.util.List;
 @RequestMapping("/rest/tenant/{tenantId}/patientMaster")
 public class PatientRestController extends BaseTenantTiedRest {
 
-    private static final String MDM_EXPAND_REST_PARAM = "isGolden";
+    public static final String MDM_EXPAND_REST_PARAM = "isGolden";
     @Autowired
     private RepositoryClientFactory repositoryClientFactory;
 
@@ -40,8 +37,7 @@ public class PatientRestController extends BaseTenantTiedRest {
     @GetMapping("/{patientId}")
     public PatientMaster getPatient(
             @PathVariable("patientId") String patientId,
-            @RequestAttribute(RestTenantUrlFilter.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
-            HttpServletRequest req) {
+            @RequestAttribute(RestTenantUrlFilter.TENANT_REQUEST_ATTRIBUTE) Tenant tenant) {
         return fhirReadRequester.readAsPatientMaster(patientId);
     }
 
@@ -103,28 +99,25 @@ public class PatientRestController extends BaseTenantTiedRest {
 
     @SuppressWarnings("unchecked")
     @GetMapping("/{patientId}/related")
-    public List<PatientMaster> getPatientRelatedPatients(
+    public List<? extends  PatientMaster> getPatientRelatedPatients(
             @PathVariable("patientId") String patientId,
             @RequestAttribute(RestTenantUrlFilter.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
             @RequestParam(name = MDM_EXPAND_REST_PARAM, defaultValue = "false") boolean isGolden,
             HttpServletRequest req) {
         ReferenceParam referenceParam = new ReferenceParam().setValue(patientId);
         referenceParam.setMdmExpand(isGolden);
-        List<PatientMaster> relatedPatients = List.of();
         if (isGolden) {
-			  /**
-				* TODO change name
-				*/
-			  relatedPatients = fhirSearchRequester
-                    .searchPatientMasterFromGoldenIdWithMdmLinks(patientId);
+			  return fhirSearchRequester
+                    .searchPatientReportedFromGoldenIdWithMdmLinks(patientId);
         } else {
             PatientMaster goldenRecord = fhirReadRequester
                     .readPatientMasterWithMdmLink(patientId);
             if (goldenRecord != null) {
-                relatedPatients = List.of(goldenRecord);
-            }
+					return List.of(goldenRecord);
+            } else {
+					return List.of();
+				}
         }
-        return relatedPatients;
     }
 
     @SuppressWarnings("unchecked")

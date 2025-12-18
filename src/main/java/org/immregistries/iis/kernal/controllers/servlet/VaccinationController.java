@@ -14,6 +14,8 @@ import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
+import org.immregistries.iis.kernal.controllers.rest.PatientRestController;
+import org.immregistries.iis.kernal.controllers.rest.VaccinationRestController;
 import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.logic.CodeMapManager;
 import org.immregistries.iis.kernal.mapping.interfaces.ImmunizationMapper;
@@ -56,13 +58,14 @@ public class VaccinationController {
 	@Autowired
 	RepositoryClientFactory repositoryClientFactory;
 	@Autowired
-	FhirSearchRequester fhirSearchRequester;
-	@Autowired
-	FhirReadRequester fhirReadRequester;
-	@Autowired
 	ImmunizationMapper immunizationMapper;
 	@Autowired
 	FhirContext fhirContext;
+
+	@Autowired
+	VaccinationRestController vaccinationRestController;
+	@Autowired
+	PatientRestController patientRestController;
 
 	@PostMapping
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp
@@ -117,8 +120,7 @@ public class VaccinationController {
 
 			out.println("<h2>Vaccination Record: " + cvxPrint + " " + sdfDate.format(vaccination.getAdministeredDate())
 					+ "</h2>");
-			PatientReported patientReportedSelected = fhirReadRequester
-					.readAsPatientReported(vaccination.getPatientReportedId());
+			PatientReported patientReportedSelected = (PatientReported) patientRestController.getPatient(vaccination.getPatientReportedId(), tenant)
 			{
 				out.println("<h4>Patient information</h4>");
 				PatientServletUtil.printPatient(out, patientReportedSelected);
@@ -195,17 +197,7 @@ public class VaccinationController {
 				}
 
 				{
-					List<VaccinationMaster> relatedVaccinations = List.of();
-					if (AbstractFhirRequester.isGoldenRecord(immunizationResource)) {
-						relatedVaccinations = fhirSearchRequester
-								.searchVaccinationMasterFromGoldenIdWithMdmLinks(vaccination.getVaccinationId());
-					} else {
-						VaccinationMaster goldenRecord = fhirReadRequester
-								.readVaccinationMasterWithMdmLink(vaccination.getVaccinationId());
-						if (goldenRecord != null) {
-							relatedVaccinations = List.of(goldenRecord);
-						}
-					}
+					List<? extends VaccinationMaster> relatedVaccinations = vaccinationRestController.getPatientRelatedPatients(vaccination.getVaccinationId(), tenant, AbstractFhirRequester.isGoldenRecord(immunizationResource));
 					out.println("<h4>Related Vaccination Records</h4>");
 					printVaccinationList(out, relatedVaccinations, tenant);
 					UiUtil.printGoldenRecordExplanation(out, immunizationResource);
