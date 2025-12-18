@@ -6,7 +6,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.instance.model.api.IBaseResource;
-import org.immregistries.iis.kernal.controllers.rest.PatientRestController;
 import org.immregistries.iis.kernal.controllers.rest.RestUrlUtil;
 import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.fhir.shl.ShLinkPayload;
@@ -60,11 +59,11 @@ public class PatientShLinkRestController {
 
 	public String getQrCode(HttpServletRequest req, IBaseResource patientSelected, Tenant tenant) {
 		String manifestUrl = getManifestUrl(req, patientSelected, tenant);
-		ShLinkPayload shLinkPayload = getPatientShLinkPayload(manifestUrl);
+		ShLinkPayload shLinkPayload = generatePatientShLinkPayload(manifestUrl);
 		return shLinkUtilService.qrCode(shLinkPayload);
 	}
 
-	public static @NotNull ShLinkPayload getPatientShLinkPayload(String manifestUrl) {
+	public static @NotNull ShLinkPayload generatePatientShLinkPayload(String manifestUrl) {
 		ShLinkPayload shLinkPayload = new ShLinkPayload();
 		shLinkPayload.setUrl(manifestUrl);
 		shLinkPayload.setLabel("Generated for testing");

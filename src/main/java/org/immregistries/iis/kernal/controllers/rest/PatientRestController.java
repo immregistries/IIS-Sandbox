@@ -144,7 +144,7 @@ public class PatientRestController extends BaseTenantTiedRest {
             HttpServletRequest req) {
         IBaseResource patientSelected = getPatientFhir(patientId, tenant, req);
         String manifestUrl = PatientShLinkRestController.getManifestUrl(req, patientSelected, tenant);
-        return PatientShLinkRestController.getPatientShLinkPayload(manifestUrl);
+        return PatientShLinkRestController.generatePatientShLinkPayload(manifestUrl);
     }
 
 }
