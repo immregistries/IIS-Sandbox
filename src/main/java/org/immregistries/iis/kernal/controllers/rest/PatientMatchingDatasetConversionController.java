@@ -11,6 +11,7 @@ import org.hl7.fhir.r5.model.Bundle;
 import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.logic.PatientMismoConversionService;
 import org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester;
+import org.immregistries.iis.kernal.mapping.internalClient.FhirSearchRequester;
 import org.immregistries.mismo.match.model.Patient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -30,7 +31,7 @@ public class PatientMatchingDatasetConversionController {
 	@Autowired
 	FhirContext fhirContext;
 	@Autowired
-	AbstractFhirRequester fhirRequester;
+	FhirSearchRequester fhirSearchRequester;
 	@Autowired
 	PatientMismoConversionService patientMismoConversionService;
 
@@ -92,7 +93,7 @@ public class PatientMatchingDatasetConversionController {
 	public void getFromFacility(HttpServletResponse resp) throws IOException {
 		List<Patient> list = new ArrayList<>(20);
 		if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R5)) {
-			IBundleProvider bundleProvider = fhirRequester.searchRegularRecord(org.hl7.fhir.r5.model.Patient.class, new SearchParameterMap());
+			IBundleProvider bundleProvider = fhirSearchRequester.searchRegularRecord(org.hl7.fhir.r5.model.Patient.class, new SearchParameterMap());
 			for (IBaseResource iBaseResource : bundleProvider.getAllResources()) {
 				if (iBaseResource instanceof org.hl7.fhir.r5.model.Patient) {
 					Patient patient = patientMismoConversionService.convertFromR5IncludingLink((org.hl7.fhir.r5.model.Patient) iBaseResource);
@@ -100,7 +101,7 @@ public class PatientMatchingDatasetConversionController {
 				}
 			}
 		} else if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R4)) {
-			IBundleProvider bundleProvider = fhirRequester.searchRegularRecord(org.hl7.fhir.r4.model.Patient.class, new SearchParameterMap());
+			IBundleProvider bundleProvider = fhirSearchRequester.searchRegularRecord(org.hl7.fhir.r4.model.Patient.class, new SearchParameterMap());
 			for (IBaseResource iBaseResource : bundleProvider.getAllResources()) {
 				if (iBaseResource instanceof org.hl7.fhir.r4.model.Patient) {
 					Patient patient = patientMismoConversionService.convertFromR4IncludingLink((org.hl7.fhir.r4.model.Patient) iBaseResource);

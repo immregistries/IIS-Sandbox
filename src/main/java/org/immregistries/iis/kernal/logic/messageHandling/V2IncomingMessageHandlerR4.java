@@ -33,7 +33,7 @@ public class V2IncomingMessageHandlerR4 extends V2IncomingMessageHandler {
 		}
 		Organization responsibleOrganization = null;
 		if (StringUtils.isNotBlank(sendingFacilityName) && !sendingFacilityName.equals("null")) {
-			responsibleOrganization = (Organization) fhirRequester.searchOrganization(new SearchParameterMap(Organization.SP_NAME, new StringParam(sendingFacilityName)));
+			responsibleOrganization = (Organization) fhirSearchRequester.searchOrganizationR4(new SearchParameterMap(Organization.SP_NAME, new StringParam(sendingFacilityName)));
 //					Organization.NAME.matches().value(sendingFacilityName));
 			if (responsibleOrganization == null) {
 				responsibleOrganization = (Organization) fhirRequester.saveOrganization(new Organization().setName(sendingFacilityName));
@@ -61,9 +61,9 @@ public class V2IncomingMessageHandlerR4 extends V2IncomingMessageHandler {
 		TokenParam tokenParam = businessIdentifier.asTokenParam();
 		Organization sendingOrganization = null;
 		if (tokenParam != null) {
-			sendingOrganization = (Organization) fhirRequester.searchOrganization(new SearchParameterMap(Organization.SP_IDENTIFIER, tokenParam));
+			sendingOrganization = (Organization) fhirSearchRequester.searchOrganizationR4(new SearchParameterMap(Organization.SP_IDENTIFIER, tokenParam));
 		} else if (organizationName != null) {
-			sendingOrganization = (Organization) fhirRequester.searchOrganization(new SearchParameterMap(Organization.SP_NAME, new StringParam(organizationName)));
+			sendingOrganization = (Organization) fhirSearchRequester.searchOrganizationR4(new SearchParameterMap(Organization.SP_NAME, new StringParam(organizationName)));
 		}
 		if (sendingOrganization == null && (StringUtils.isNotBlank(organizationName) || tokenParam != null)) {
 			sendingOrganization = new Organization()
@@ -85,7 +85,7 @@ public class V2IncomingMessageHandlerR4 extends V2IncomingMessageHandler {
 			managingIdentifier = reader.getValue(22, 3);
 		}
 		if (managingIdentifier != null) {
-			managingOrganization = (Organization) fhirRequester.searchOrganization(new SearchParameterMap(Organization.SP_IDENTIFIER, new TokenParam().setSystem(reader.getValue(22, 7)).setValue(managingIdentifier)));
+			managingOrganization = (Organization) fhirSearchRequester.searchOrganizationR4(new SearchParameterMap(Organization.SP_IDENTIFIER, new TokenParam().setSystem(reader.getValue(22, 7)).setValue(managingIdentifier)));
 //				Organization.IDENTIFIER.exactly()
 //				.systemAndIdentifier(reader.getValue(22, 7), managingIdentifier));
 			if (managingOrganization == null) {

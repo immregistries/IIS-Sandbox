@@ -1,6 +1,7 @@
 package org.immregistries.iis.kernal.mapping.internalClient;
 
 import ca.uhn.fhir.context.FhirContext;
+import ca.uhn.fhir.jpa.api.dao.DaoRegistry;
 import ca.uhn.fhir.jpa.api.dao.IFhirResourceDao;
 import ca.uhn.fhir.jpa.api.model.DaoMethodOutcome;
 import ca.uhn.fhir.rest.api.MethodOutcome;
@@ -30,7 +31,6 @@ public abstract class AbstractFhirRequester<Patient extends IBaseResource, Immun
 	public static final String GOLDEN_RECORD = "GOLDEN_RECORD";
 	private static final String GOLDEN_CRITERION_PART = GOLDEN_SYSTEM_TAG + "|" + GOLDEN_RECORD;
 	private static final String NOT_GOLDEN_CRITERION = "_tag:not=" + GOLDEN_CRITERION_PART;
-	final FhirSearchRequester<Patient, Immunization, Location, Practitioner, Observation, Person, Organization, RelatedPerson> fhirSearchRequester = new FhirSearchRequester<Patient, Immunization, Location, Practitioner, Observation, Person, Organization, RelatedPerson>(this);
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	@Autowired
@@ -52,8 +52,8 @@ public abstract class AbstractFhirRequester<Patient extends IBaseResource, Immun
 	RepositoryClientFactory repositoryClientFactory;
 	@Autowired
 	FhirContext fhirContext;
-	// @Autowired
-	// RestfulServer fhirServer;
+	@Autowired
+	DaoRegistry daoRegistry;
 
 
 	/**
@@ -66,7 +66,7 @@ public abstract class AbstractFhirRequester<Patient extends IBaseResource, Immun
 	 * @return methodOutcome
 	 */
 	protected MethodOutcome save(boolean createOnly, IBaseResource resource, ICriterion... where) {
-		IFhirResourceDao dao = fhirSearchRequester.daoRegistry.getResourceDao(resource);
+		IFhirResourceDao dao = daoRegistry.getResourceDao(resource);
 		String params = FhirRequesterUtil.stringCriterionList(fhirContext, where);
 		if (StringUtils.isNotBlank(params)) {
 			// If not empty add &

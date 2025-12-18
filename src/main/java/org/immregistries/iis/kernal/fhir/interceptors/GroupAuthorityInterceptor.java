@@ -13,6 +13,7 @@ import org.hl7.fhir.r5.model.Group;
 import org.hl7.fhir.r5.model.Organization;
 import org.hl7.fhir.r5.model.Reference;
 import org.immregistries.iis.kernal.mapping.internalClient.FhirRequesterR5;
+import org.immregistries.iis.kernal.mapping.internalClient.FhirSearchRequester;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +33,7 @@ import static ca.uhn.fhir.interceptor.api.Pointcut.SERVER_PROCESSING_COMPLETED_N
 //@Conditional(OnR5Condition.class)
 //@Service
 public class GroupAuthorityInterceptor {
+
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	private static final int DEFAULT_MAP_SIZE = 20;
@@ -42,7 +44,7 @@ public class GroupAuthorityInterceptor {
 	private Map<String, Map<String,String>> organizationAuthorityTree = new HashMap<>(DEFAULT_MAP_SIZE);
 
 	@Autowired
-	private FhirRequesterR5 fhirRequesterR5;
+	private FhirSearchRequester fhirSearchRequester;
 	@Autowired
 	private IFhirResourceDao<Organization> organizationDao;
 
@@ -88,7 +90,7 @@ public class GroupAuthorityInterceptor {
 		if (reference.hasIdentifier()) {
 			SearchParameterMap searchParameterMap = new SearchParameterMap("identifier",
 				new TokenParam(IdentifierUtil.identifierDtFromIdentifier(reference.getIdentifier())));
-			organization = fhirRequesterR5.searchOrganization(searchParameterMap);
+			organization = fhirSearchRequester.searchOrganizationR5(searchParameterMap);
 		} else {
 			organization = organizationDao.read(reference.getReferenceElement(),requestDetails);
 		}

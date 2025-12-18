@@ -70,7 +70,7 @@ public class VXUDownloadFormController {
       }
       VXUDownloadGenerator generator = (VXUDownloadGenerator) session.getAttribute(CACHED_GENERATOR);
       if (generator == null || action == null || action.equals(ACTION_GENERATE)) {
-			generator = new VXUDownloadGenerator(req, tenant, fhirRequests, exampleMessageWriter);
+			generator = new VXUDownloadGenerator(req, tenant, fhirSearchRequester, exampleMessageWriter);
         session.setAttribute(CACHED_GENERATOR, generator);
       }
       UiUtil.doHeader(out, "IIS Sandbox", tenant);

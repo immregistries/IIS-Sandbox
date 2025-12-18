@@ -10,6 +10,8 @@ import org.hibernate.Session;
 import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.mapping.interfaces.LocationMapper;
 import org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester;
+import org.immregistries.iis.kernal.mapping.internalClient.FhirReadRequester;
+import org.immregistries.iis.kernal.mapping.internalClient.FhirSearchRequester;
 import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
 import org.immregistries.iis.kernal.model.*;
 import org.immregistries.iis.kernal.persisted.model.MessageReceived;
@@ -55,11 +57,11 @@ public class LocationController {
 	public static final String PARAM_ADDRESS_COUNTY_PARISH = "addressCountyParish";
 	public static final String PARAM_VFC_PROVIDER_PIN = "vfcProviderPin";
 	@Autowired
-	RepositoryClientFactory repositoryClientFactory;
-	@Autowired
 	AbstractFhirRequester fhirRequester;
 	@Autowired
-	LocationMapper locationMapper;
+	FhirReadRequester fhirReadRequester;
+	@Autowired
+	FhirSearchRequester fhirSearchRequester;
 
 	public static void printMessageReceived(PrintWriter out, MessageReceived messageReceived) {
 		SimpleDateFormat sdfTime = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
@@ -87,9 +89,9 @@ public class LocationController {
 		try {
 			OrgLocation orgLocationSelected = null;
 			if (req.getParameter(PARAM_ORG_LOCATION_ID) != null) {
-				// orgLocationSelected = fhirRequests.searchOrgLocation(fhirClient,
+				// orgLocationSelected = fhirSearchRequester.searchOrgLocation(fhirClient,
 				// Location.IDENTIFIER.exactly().identifier(req.getParameter(PARAM_ORG_LOCATION_ID)));
-				orgLocationSelected = fhirRequester.readAsOrgLocation(req.getParameter(PARAM_ORG_LOCATION_ID));
+				orgLocationSelected = fhirReadRequester.readAsOrgLocation(req.getParameter(PARAM_ORG_LOCATION_ID));
 			}
 
 			String action = req.getParameter(PARAM_ACTION);
@@ -138,7 +140,7 @@ public class LocationController {
 			}
 
 			List<OrgLocation> orgLocationList = null;
-			orgLocationList = fhirRequester.searchOrgLocationList(new SearchParameterMap());
+			orgLocationList = fhirSearchRequester.searchOrgLocationList(new SearchParameterMap());
 
 			UiUtil.doHeader(out, "IIS Sandbox");
 

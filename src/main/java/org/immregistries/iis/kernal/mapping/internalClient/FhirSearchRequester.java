@@ -3,15 +3,15 @@ package org.immregistries.iis.kernal.mapping.internalClient;
 import ca.uhn.fhir.jpa.api.dao.DaoRegistry;
 import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
 import ca.uhn.fhir.rest.api.server.IBundleProvider;
+import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.param.TokenParam;
 import ca.uhn.fhir.rest.param.TokenParamModifier;
 import org.hl7.fhir.instance.model.api.IBaseResource;
+import org.hl7.fhir.r4.model.Bundle;
+import org.hl7.fhir.r4.model.Parameters;
 import org.immregistries.iis.kernal.fhir.security.TenantUtil;
 import org.immregistries.iis.kernal.mapping.AllMappingService;
-import org.immregistries.iis.kernal.mapping.interfaces.ImmunizationMapper;
-import org.immregistries.iis.kernal.mapping.interfaces.LocationMapper;
-import org.immregistries.iis.kernal.mapping.interfaces.ObservationMapper;
-import org.immregistries.iis.kernal.mapping.interfaces.PatientMapper;
+import org.immregistries.iis.kernal.mapping.interfaces.*;
 import org.immregistries.iis.kernal.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -19,7 +19,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static org.immregistries.iis.kernal.mapping.interfaces.ImmunizationMapper.IMMUNIZATION;
+
 public class FhirSearchRequester {
+
+	@Autowired
+	RepositoryClientFactory repositoryClientFactory;
 	@Autowired
 	DaoRegistry daoRegistry;
 	@Autowired
@@ -27,6 +32,9 @@ public class FhirSearchRequester {
 
 	@Autowired
 	TenantUtil tenantUtil;
+
+	@Autowired
+	FhirReadRequester fhirReadRequester;
 
 	public AbstractMappedObject searchMappedObjectMaster(String resourceType, SearchParameterMap searchParameterMap) {
 		AbstractMappedObject mappedObject = null;
@@ -77,6 +85,10 @@ public class FhirSearchRequester {
 
 	public VaccinationReported searchVaccinationReported(SearchParameterMap searchParameterMap) {
 		return (VaccinationReported) searchMappedObjectReportedWithMaster(ImmunizationMapper.IMMUNIZATION, searchParameterMap);
+	}
+
+	public VaccinationMaster searchVaccinationMaster(SearchParameterMap searchParameterMap) {
+		return (VaccinationMaster) searchMappedObjectMaster(ImmunizationMapper.IMMUNIZATION, searchParameterMap);
 	}
 
 	public ObservationReported searchObservationReported(SearchParameterMap searchParameterMap) {
@@ -224,4 +236,70 @@ public class FhirSearchRequester {
 		}
 		return patientList;
 	}
+
+	public List<PatientReported> searchPatientReportedFromGoldenIdWithMdmLinks(String patientMasterId) {
+		return fhirReadRequester.readMdmlinksReportedIds(patientMasterId)
+			.map(fhirReadRequester::readAsPatientReported)
+			.collect(Collectors.toList());
+	}
+
+	public List<PatientMaster> searchPatientMasterFromGoldenIdWithMdmLinks(String patientMasterId) {
+		return fhirReadRequester.readMdmlinksReportedIds(patientMasterId)
+			.map(fhirReadRequester::readAsPatientMaster)
+			.collect(Collectors.toList());
+	}
+
+	public List<VaccinationReported> searchVaccinationReportedFromGoldenIdWithMdmLinks(String vaccinationMasterId) {
+		return fhirReadRequester.readMdmlinksReportedIds(vaccinationMasterId)
+			.map(fhirReadRequester::readAsVaccinationReported)
+			.collect(Collectors.toList());
+	}
+
+	public List<VaccinationMaster> searchVaccinationMasterFromGoldenIdWithMdmLinks(String vaccinationMasterId) {
+		return fhirReadRequester.readMdmlinksReportedIds(vaccinationMasterId)
+			.map(fhirReadRequester::readAsVaccinationMaster)
+			.collect(Collectors.toList());
+	}
+
+	public ModelPerson searchPractitioner(SearchParameterMap searchParameterMap) {
+		return (ModelPerson) searchMappedObjectMaster(PractitionerMapper.PRACTITIONER, searchParameterMap);
+	}
+
+	public List<VaccinationMaster> searchVaccinationListOperationEverything(String patientId) {
+		IGenericClient client = repositoryClientFactory.getFhirClient();
+		Parameters in = new Parameters()
+			.addParameter("_mdm", "true")
+			.addParameter("_type", "Immunization");
+		Bundle bundle = client.operation()
+			.onInstance("Patient/" + patientId)
+			.named("$everything")
+			.withParameters(in)
+			.prettyPrint()
+			.useHttpGet()
+			.returnResourceType(Bundle.class).execute();
+		List<VaccinationMaster> vaccinationList = new ArrayList<>();
+		for (Bundle.BundleEntryComponent entry : bundle.getEntry()) {
+			if (entry.getResource().fhirType().equals(IMMUNIZATION)) {
+				if (AbstractFhirRequester.isGoldenRecord(entry.getResource())) {
+					VaccinationMaster vaccinationMaster = (VaccinationMaster) allMappingService
+						.localObject(entry.getResource());
+					if (vaccinationMaster != null) {
+						vaccinationList.add(vaccinationMaster);
+					}
+				}
+			}
+		}
+		return vaccinationList;
+	}
+
+	public org.hl7.fhir.r5.model.Organization searchOrganizationR5(SearchParameterMap searchParameterMap) {
+		IBundleProvider bundleProvider = search("Organization", searchParameterMap);
+		return (org.hl7.fhir.r5.model.Organization) bundleProvider.getAllResources().stream().findFirst().orElse(null);
+	}
+	public org.hl7.fhir.r4.model.Organization searchOrganizationR4(SearchParameterMap searchParameterMap) {
+		IBundleProvider bundleProvider = search("Organization", searchParameterMap);
+		return (org.hl7.fhir.r4.model.Organization) bundleProvider.getAllResources().stream().findFirst().orElse(null);
+	}
+
+
 }

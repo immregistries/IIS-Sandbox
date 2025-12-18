@@ -9,6 +9,7 @@ import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
 import org.immregistries.iis.kernal.logic.CodeMapManager;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
 import org.immregistries.iis.kernal.mapping.interfaces.PatientMapper;
+import org.immregistries.iis.kernal.mapping.internalClient.FhirReadRequester;
 import org.immregistries.iis.kernal.mapping.internalClient.FhirRequesterR4;
 import org.immregistries.iis.kernal.model.*;
 import org.slf4j.Logger;
@@ -34,12 +35,12 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	@Autowired
-	private FhirRequesterR4 fhirRequests;
+	private FhirReadRequester fhirReadRequester;
 
 	public PatientReported localObjectReportedWithMaster(Patient p) {
 		PatientReported patientReported = localObjectReported(p);
 		if (!p.getId().isBlank() && p.getMeta().getTag(GOLDEN_SYSTEM_TAG, GOLDEN_RECORD) == null) {
-			patientReported.setPatientMaster(fhirRequests.readPatientMasterWithMdmLink(p.getId()));
+			patientReported.setPatientMaster(fhirReadRequester.readPatientMasterWithMdmLink(p.getId()));
 		}
 		return patientReported;
 	}

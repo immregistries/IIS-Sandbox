@@ -127,7 +127,7 @@ public class VxuToBundleExperiment {
 			managingIdentifier = reader.getValue(22, 3);
 		}
 		if (managingIdentifier != null) {
-//			managingOrganization = (Organization) fhirRequester.searchOrganization(Organization.IDENTIFIER.exactly()
+//			managingOrganization = (Organization) fhirSearchRequester.searchOrganization(Organization.IDENTIFIER.exactly()
 //				.systemAndIdentifier(reader.getValue(22,7), managingIdentifier));
 			if (managingOrganization == null) {
 				managingOrganization = new Organization();

@@ -26,7 +26,7 @@ public class VaccinationRestController extends BaseTenantTiedRest {
             @PathVariable("vaccinationId") String vaccinationId,
             HttpServletRequest req) {
         // TODO make FHIr Requester tenant aware
-        return fhirRequester.readAsVaccinationMaster(vaccinationId);
+        return fhirReadRequester.readAsVaccinationMaster(vaccinationId);
     }
 
     @GetMapping("")
@@ -41,7 +41,7 @@ public class VaccinationRestController extends BaseTenantTiedRest {
         }
 
         @SuppressWarnings("unchecked")
-        List<VaccinationMaster> result = fhirRequester.searchVaccinationMasterGoldenList(parameters);
+        List<VaccinationMaster> result = fhirSearchRequester.searchVaccinationMasterGoldenList(parameters);
         return result;
     }
 

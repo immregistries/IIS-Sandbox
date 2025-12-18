@@ -18,6 +18,8 @@ import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.logic.CodeMapManager;
 import org.immregistries.iis.kernal.mapping.interfaces.ImmunizationMapper;
 import org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester;
+import org.immregistries.iis.kernal.mapping.internalClient.FhirReadRequester;
+import org.immregistries.iis.kernal.mapping.internalClient.FhirSearchRequester;
 import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
 import org.immregistries.iis.kernal.model.*;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
@@ -54,7 +56,9 @@ public class VaccinationController {
 	@Autowired
 	RepositoryClientFactory repositoryClientFactory;
 	@Autowired
-	AbstractFhirRequester fhirRequester;
+	FhirSearchRequester fhirSearchRequester;
+	@Autowired
+	FhirReadRequester fhirReadRequester;
 	@Autowired
 	ImmunizationMapper immunizationMapper;
 	@Autowired
@@ -113,7 +117,7 @@ public class VaccinationController {
 
 			out.println("<h2>Vaccination Record: " + cvxPrint + " " + sdfDate.format(vaccination.getAdministeredDate())
 					+ "</h2>");
-			PatientReported patientReportedSelected = fhirRequester
+			PatientReported patientReportedSelected = fhirReadRequester
 					.readAsPatientReported(vaccination.getPatientReportedId());
 			{
 				out.println("<h4>Patient information</h4>");
@@ -193,10 +197,10 @@ public class VaccinationController {
 				{
 					List<VaccinationMaster> relatedVaccinations = List.of();
 					if (AbstractFhirRequester.isGoldenRecord(immunizationResource)) {
-						relatedVaccinations = fhirRequester
-								.searchVaccinationReportedFromGoldenIdWithMdmLinks(vaccination.getVaccinationId());
+						relatedVaccinations = fhirSearchRequester
+								.searchVaccinationMasterFromGoldenIdWithMdmLinks(vaccination.getVaccinationId());
 					} else {
-						VaccinationMaster goldenRecord = fhirRequester
+						VaccinationMaster goldenRecord = fhirReadRequester
 								.readVaccinationMasterWithMdmLink(vaccination.getVaccinationId());
 						if (goldenRecord != null) {
 							relatedVaccinations = List.of(goldenRecord);
@@ -267,7 +271,7 @@ public class VaccinationController {
 	public List<ObservationReported> getObservationList(VaccinationMaster vaccination) {
 		List<ObservationReported> observationReportedList;
 		{
-			observationReportedList = fhirRequester.searchObservationReportedList(
+			observationReportedList = fhirSearchRequester.searchObservationReportedList(
 					new SearchParameterMap("patient", new ReferenceParam(vaccination.getPatientReportedId())));
 			// Observation.PATIENT.hasId(vaccination.getPatientReportedId()));
 			Set<String> suppressSet = LoincIdentifier.getSuppressIdentifierCodeSet();

@@ -11,6 +11,7 @@ import org.hl7.fhir.r5.model.Immunization;
 import org.hl7.fhir.r5.model.Patient;
 import org.immregistries.iis.kernal.controllers.servlet.legacy.CovidController;
 import org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester;
+import org.immregistries.iis.kernal.mapping.internalClient.FhirSearchRequester;
 import org.immregistries.iis.kernal.model.VaccinationReported;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
 
@@ -28,8 +29,8 @@ import java.util.stream.Collectors;
  */
 public class VXUDownloadGenerator extends Thread {
 
-	AbstractFhirRequester fhirRequests;
-  IExampleMessageWriter exampleMessageWriter;
+	private FhirSearchRequester fhirSearchRequester;
+  private IExampleMessageWriter exampleMessageWriter;
 
   public static final String PARAM_DATE_START = "dateStart";
   public static final String PARAM_DATE_END = "dateEnd";
@@ -96,8 +97,8 @@ public class VXUDownloadGenerator extends Thread {
   private HttpServletRequest req;
   private File file;
 
-	public VXUDownloadGenerator(HttpServletRequest req, Tenant tenant, AbstractFhirRequester fhirRequester, IExampleMessageWriter exampleMessageWriter) {
-		this.fhirRequests = fhirRequester;
+	public VXUDownloadGenerator(HttpServletRequest req, Tenant tenant, FhirSearchRequester fhirSearchRequester, IExampleMessageWriter exampleMessageWriter) {
+		this.fhirSearchRequester = fhirSearchRequester;
 		this.exampleMessageWriter = exampleMessageWriter;
     runningMessage = "Initializing";
     this.tenant = tenant;
@@ -168,7 +169,7 @@ public class VXUDownloadGenerator extends Thread {
     }
     runningMessage = "Looking for vaccinations";
 
-    List<VaccinationReported> vaccinationReportedList = fhirRequests.searchVaccinationReportedList(
+    List<VaccinationReported> vaccinationReportedList = fhirSearchRequester.searchVaccinationReportedList(
         new SearchParameterMap(Immunization.SP_DATE,
             new DateParam().setPrefix(ParamPrefixEnum.STARTS_AFTER).setValue(dateStart))
             .add(Immunization.SP_DATE, new DateParam().setPrefix(ParamPrefixEnum.ENDS_BEFORE).setValue(dateEnd))

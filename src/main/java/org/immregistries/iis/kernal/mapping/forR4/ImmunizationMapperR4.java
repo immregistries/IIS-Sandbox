@@ -10,11 +10,10 @@ import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
 import org.immregistries.iis.kernal.logic.CodeMapManager;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
 import org.immregistries.iis.kernal.mapping.interfaces.ImmunizationMapper;
+import org.immregistries.iis.kernal.mapping.internalClient.FhirReadRequester;
 import org.immregistries.iis.kernal.mapping.internalClient.FhirRequesterR4;
-import org.immregistries.iis.kernal.model.BusinessIdentifier;
-import org.immregistries.iis.kernal.model.ModelPerson;
-import org.immregistries.iis.kernal.model.VaccinationMaster;
-import org.immregistries.iis.kernal.model.VaccinationReported;
+import org.immregistries.iis.kernal.mapping.internalClient.FhirSearchRequester;
+import org.immregistries.iis.kernal.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,10 +29,15 @@ public class ImmunizationMapperR4 implements ImmunizationMapper<Immunization> {
 
 	@Autowired
 	private FhirRequesterR4 fhirRequests;
+	@Autowired
+	private FhirReadRequester fhirReadRequester;
+	@Autowired
+	private FhirSearchRequester fhirSearchRequester;
+	
 
 	public VaccinationReported localObjectReportedWithMaster(Immunization i) {
 		VaccinationReported vaccinationReported = this.localObjectReported(i);
-		VaccinationMaster vaccinationMaster = fhirRequests.searchVaccinationMaster(
+		VaccinationMaster vaccinationMaster = fhirSearchRequester.searchVaccinationMaster(
 			new SearchParameterMap(Immunization.SP_IDENTIFIER, new TokenParam().setValue(vaccinationReported.getFillerBusinessIdentifier().getValue()))
 //			Immunization.IDENTIFIER.exactly().systemAndIdentifier(
 //				vaccinationReported.getExternalLinkSystem(),
@@ -84,7 +88,8 @@ public class ImmunizationMapperR4 implements ImmunizationMapper<Immunization> {
 		 * Patient
 		 */
 		if (i.getPatient() != null && StringUtils.isNotBlank(i.getPatient().getReference())) {
-			vr.setPatientReported(fhirRequests.readAsPatientReported(i.getPatient().getReference()));
+			String id = i.getPatient().getReference();
+			vr.setPatientReported(fhirRequests.fhirReadSuper.readAsPatientReported(id));
 		}
 		/*
 		 * Reported Date
@@ -225,7 +230,8 @@ public class ImmunizationMapperR4 implements ImmunizationMapper<Immunization> {
 		 * Location
 		 */
 		if (i.getLocation() != null && StringUtils.isNotBlank(i.getLocation().getReference())) {
-			vr.setOrgLocation(fhirRequests.readAsOrgLocation(i.getLocation().getReference()));
+			String id = i.getLocation().getReference();
+			vr.setOrgLocation(fhirRequests.fhirReadSuper.readAsOrgLocation(id));
 		}
 		/*
 		 * Performers
@@ -234,15 +240,18 @@ public class ImmunizationMapperR4 implements ImmunizationMapper<Immunization> {
 			if (performer.getActor() != null && StringUtils.isNotBlank(performer.getActor().getReference()) && performer.getActor().getReferenceElement().getResourceType().equals("Practitioner")) {
 				switch (performer.getFunction().getCodingFirstRep().getCode()) {
 					case ADMINISTERING_VALUE: {
-						vr.setAdministeringProvider(fhirRequests.readPractitionerAsPerson(performer.getActor().getReference()));
+						String id = performer.getActor().getReference();
+						vr.setAdministeringProvider(fhirRequests.fhirReadSuper.readPractitionerAsPerson(id));
 						break;
 					}
 					case ORDERING_VALUE: {
-						vr.setOrderingProvider(fhirRequests.readPractitionerAsPerson(performer.getActor().getReference()));
+						String id = performer.getActor().getReference();
+						vr.setOrderingProvider(fhirRequests.fhirReadSuper.readPractitionerAsPerson(id));
 						break;
 					}
 					case ENTERING_VALUE: {
-						vr.setEnteredBy(fhirRequests.readPractitionerAsPerson(performer.getActor().getReference()));
+						String id = performer.getActor().getReference();
+						vr.setEnteredBy(fhirRequests.fhirReadSuper.readPractitionerAsPerson(id));
 						break;
 					}
 				}

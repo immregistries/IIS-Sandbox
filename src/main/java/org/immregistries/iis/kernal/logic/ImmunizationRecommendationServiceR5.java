@@ -10,7 +10,10 @@ import org.immregistries.iis.kernal.logic.messageHandling.IncomingQueryHandler;
 import org.immregistries.iis.kernal.mapping.forR5.ImmunizationEvaluationMapperR5;
 import org.immregistries.iis.kernal.mapping.forR5.ImmunizationRecommendationMapperR5;
 import org.immregistries.iis.kernal.mapping.forR5.PatientMapperR5;
+import org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester;
+import org.immregistries.iis.kernal.mapping.internalClient.FhirReadRequester;
 import org.immregistries.iis.kernal.mapping.internalClient.FhirRequesterR5;
+import org.immregistries.iis.kernal.mapping.internalClient.FhirSearchRequester;
 import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.model.VaccinationMaster;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
@@ -32,7 +35,11 @@ public class ImmunizationRecommendationServiceR5 implements IImmunizationRecomme
 	@Autowired
 	private IncomingQueryHandler incomingQueryHandler;
 	@Autowired
-	private FhirRequesterR5 fhirRequesterR5;
+	AbstractFhirRequester fhirRequester;
+	@Autowired
+	FhirSearchRequester fhirSearchRequester;
+	@Autowired
+	FhirReadRequester fhirReadRequester;
 	@Autowired
 	private ImmunizationRecommendationMapperR5 immunizationRecommendationMapperR5;
 	@Autowired
@@ -83,7 +90,7 @@ public class ImmunizationRecommendationServiceR5 implements IImmunizationRecomme
 
 
 	public ImmunizationRecommendation queryCds(Tenant tenant, Date date, PatientMaster patientMaster) {
-		List<VaccinationMaster> vaccinationMasterList = fhirRequesterR5.searchVaccinationMasterGoldenList(
+		List<VaccinationMaster> vaccinationMasterList = fhirSearchRequester.searchVaccinationMasterGoldenList(
 			new SearchParameterMap("patient", new ReferenceParam("Patient/" + patientMaster.getPatientId()).setMdmExpand(true))
 		);
 		return (ImmunizationRecommendation) queryCds(tenant, date, patientMaster, vaccinationMasterList).getParameter(RECOMMENDATION).getResource();

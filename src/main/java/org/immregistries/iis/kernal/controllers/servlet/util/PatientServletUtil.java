@@ -11,6 +11,7 @@ import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.instance.model.api.IDomainResource;
 import org.hl7.fhir.r5.model.Patient;
 import org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester;
+import org.immregistries.iis.kernal.mapping.internalClient.FhirSearchRequester;
 import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
 import org.immregistries.iis.kernal.model.LoincIdentifier;
 import org.immregistries.iis.kernal.model.ObservationReported;
@@ -297,14 +298,14 @@ public final class PatientServletUtil {
 	}
 
 	public static IDomainResource fetchPatientFromParameter(HttpServletRequest req, IGenericClient fhirClient,
-			AbstractFhirRequester fhirRequester) {
+			FhirSearchRequester fhirSearchRequester) {
 		String idParam = req.getParameter(PARAM_PATIENT_REPORTED_ID);
 		String identifierParam = req.getParameter(PARAM_PATIENT_REPORTED_EXTERNAL_LINK);
-		return fetchPatientFromParameters(idParam, identifierParam, fhirClient, fhirRequester);
+		return fetchPatientFromParameters(idParam, identifierParam, fhirClient, fhirSearchRequester);
 	}
 
 	public static @Nullable IDomainResource fetchPatientFromParameters(String idParam, String identifierParam,
-			IGenericClient fhirClient, AbstractFhirRequester fhirRequester) {
+																							 IGenericClient fhirClient, FhirSearchRequester fhirSearchRequester) {
 		IDomainResource patient = null;
 		if (idParam != null) {
 			patient = (IDomainResource) fhirClient.read().resource("Patient").withId(idParam).execute();
@@ -312,7 +313,7 @@ public final class PatientServletUtil {
 			if (identifierParam != null) {
 				SearchParameterMap searchParameterMap = new SearchParameterMap(Patient.SP_IDENTIFIER,
 						new TokenParam().setValue(identifierParam));
-				IBundleProvider bundleProvider = fhirRequester.fhirSearchRequesterSuper.searchGoldenRecord(Patient.class, searchParameterMap);
+				IBundleProvider bundleProvider = fhirSearchRequester.searchGoldenRecord(Patient.class, searchParameterMap);
 				if (!bundleProvider.isEmpty()) {
 					patient = (IDomainResource) bundleProvider.getAllResources().get(0);
 				}

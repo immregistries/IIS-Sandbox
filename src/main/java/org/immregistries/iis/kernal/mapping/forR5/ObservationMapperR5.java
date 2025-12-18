@@ -34,7 +34,7 @@ public class ObservationMapperR5 implements ObservationMapper<Observation> {
 	public ObservationReported localObjectReportedWithMaster(Observation observation) {
 		ObservationReported observationReported = localObjectReported(observation);
 //		observationReported.setObservationMaster(
-//			fhirRequests.searchObservationMaster(
+//			fhirSearchRequester.searchObservationMaster(
 //				new SearchParameterMap(Observation.SP_IDENTIFIER, new TokenParam().setSystem(observationReported.getIdentifierTable()).setValue(observationReported.getIdentifierCode())) // TODO remove
 ////				Observation.IDENTIFIER.exactly().systemAndIdentifier(observationReported.getIdentifierTable(),observationReported.getIdentifierCode())
 //			));

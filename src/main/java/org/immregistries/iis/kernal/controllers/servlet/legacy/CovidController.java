@@ -16,6 +16,8 @@ import org.immregistries.iis.kernal.fhir.common.annotations.OnR5Condition;
 import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.mapping.forR5.LocationMapperR5;
 import org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester;
+import org.immregistries.iis.kernal.mapping.internalClient.FhirReadRequester;
+import org.immregistries.iis.kernal.mapping.internalClient.FhirSearchRequester;
 import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
 import org.immregistries.iis.kernal.model.OrgLocation;
 import org.immregistries.iis.kernal.model.PatientMaster;
@@ -64,7 +66,11 @@ public class CovidController {
 	@Autowired
 	RepositoryClientFactory repositoryClientFactory;
 	@Autowired
-	AbstractFhirRequester fhirRequester;
+	private AbstractFhirRequester fhirRequester;
+	@Autowired
+	private FhirSearchRequester fhirSearchRequester;
+	@Autowired
+	private FhirReadRequester fhirReadRequester;
 	@Autowired
 	LocationMapperR5 locationMapper;
 
@@ -164,7 +170,7 @@ public class CovidController {
 					out.print(
 							"<textarea cols=\"80\" rows=\"30\" style=\"white-space: nowrap;  overflow: auto;\">");
 					{
-						vaccinationReportedList = fhirRequester.searchVaccinationReportedList(
+						vaccinationReportedList = fhirSearchRequester.searchVaccinationReportedList(
 								new SearchParameterMap(Immunization.SP_PATIENT,
 										new ReferenceParam().setChain(Patient.SP_ORGANIZATION)
 												.setValue(String.valueOf(tenant.getOrgId()))));// TODO TEST
@@ -269,7 +275,7 @@ public class CovidController {
 			// vaccinationReported.getAdministeredDate());
 			// query.setParameter("patientReported",
 			// vaccinationReported.getPatientReported());
-			List<VaccinationReported> list = fhirRequester.searchVaccinationReportedList(
+			List<VaccinationReported> list = fhirSearchRequester.searchVaccinationReportedList(
 					new SearchParameterMap(Immunization.SP_DATE,
 							new DateParam().setPrefix(ParamPrefixEnum.ENDS_BEFORE)
 									.setValue(vaccinationReported.getAdministeredDate()))
@@ -402,7 +408,7 @@ public class CovidController {
 
 		OrgLocation orgLocation = vaccinationReported.getOrgLocation();
 		if (orgLocation == null) {
-			orgLocation = fhirRequester.readAsOrgLocation(vaccinationReported.getOrgLocationId());
+			orgLocation = fhirReadRequester.readAsOrgLocation(vaccinationReported.getOrgLocationId());
 		}
 		if (orgLocation == null) {
 			// 33: Responsible organization

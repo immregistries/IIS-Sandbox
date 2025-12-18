@@ -10,6 +10,8 @@ import org.hl7.fhir.instance.model.api.IDomainResource;
 import org.immregistries.iis.kernal.logic.IImmunizationRecommendationService;
 import org.immregistries.iis.kernal.mapping.interfaces.PatientMapper;
 import org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester;
+import org.immregistries.iis.kernal.mapping.internalClient.FhirReadRequester;
+import org.immregistries.iis.kernal.mapping.internalClient.FhirSearchRequester;
 import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
 import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
@@ -29,8 +31,8 @@ public class RecommendationRestController {
     private IImmunizationRecommendationService immunizationRecommendationService;
     @Autowired
     private RepositoryClientFactory repositoryClientFactory;
-    @Autowired
-    private AbstractFhirRequester fhirRequester;
+	@Autowired
+	FhirSearchRequester fhirSearchRequester;
     @Autowired
     private FhirContext fhirContext;
     @Autowired
@@ -42,7 +44,7 @@ public class RecommendationRestController {
             HttpServletRequest req) {
 
         IGenericClient fhirClient = repositoryClientFactory.newGenericClient(req);
-        IDomainResource patient = PatientServletUtil.fetchPatientFromParameter(req, fhirClient, fhirRequester);
+        IDomainResource patient = PatientServletUtil.fetchPatientFromParameter(req, fhirClient, fhirSearchRequester);
         PatientMaster patientMaster = patientMapper.localObject(patient);
 
         if (patient != null) {

@@ -12,6 +12,8 @@ import org.immregistries.iis.kernal.controllers.rest.shlink.PatientShLinkRestCon
 import org.immregistries.iis.kernal.fhir.shl.ShLinkPayload;
 import org.immregistries.iis.kernal.mapping.interfaces.PatientMapper;
 import org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester;
+import org.immregistries.iis.kernal.mapping.internalClient.FhirReadRequester;
+import org.immregistries.iis.kernal.mapping.internalClient.FhirSearchRequester;
 import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
 import org.immregistries.iis.kernal.model.ObservationReported;
 import org.immregistries.iis.kernal.model.PatientMaster;
@@ -29,8 +31,7 @@ public class PatientRestController extends BaseTenantTiedRest {
     private static final String MDM_EXPAND_REST_PARAM = "isGolden";
     @Autowired
     private RepositoryClientFactory repositoryClientFactory;
-    @Autowired
-    private AbstractFhirRequester fhirRequester;
+
     @Autowired
     private FhirContext fhirContext;
     @Autowired
@@ -41,7 +42,7 @@ public class PatientRestController extends BaseTenantTiedRest {
             @PathVariable("patientId") String patientId,
             @RequestAttribute(RestTenantUrlFilter.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
             HttpServletRequest req) {
-        return fhirRequester.readAsPatientMaster(patientId);
+        return fhirReadRequester.readAsPatientMaster(patientId);
     }
 
     @GetMapping("/{patientId}/fhir")
@@ -58,7 +59,7 @@ public class PatientRestController extends BaseTenantTiedRest {
             @RequestAttribute(RestTenantUrlFilter.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
             HttpServletRequest req) {
         @SuppressWarnings("unchecked")
-        List<PatientMaster> result = fhirRequester.searchPatientMasterGoldenList(new SearchParameterMap());
+        List<PatientMaster> result = fhirSearchRequester.searchPatientMasterGoldenList(new SearchParameterMap());
         return result;
     }
 
@@ -83,7 +84,7 @@ public class PatientRestController extends BaseTenantTiedRest {
             HttpServletRequest req) {
         ReferenceParam referenceParam = new ReferenceParam().setValue(patientId);
         referenceParam.setMdmExpand(isGolden);
-        return fhirRequester.searchVaccinationMasterGoldenList(
+        return fhirSearchRequester.searchVaccinationMasterGoldenList(
                 new SearchParameterMap().add("patient", referenceParam));
     }
 
@@ -96,7 +97,7 @@ public class PatientRestController extends BaseTenantTiedRest {
             HttpServletRequest req) {
         ReferenceParam referenceParam = new ReferenceParam().setValue(patientId);
         referenceParam.setMdmExpand(isGolden);
-        return fhirRequester.searchObservationReportedList(
+        return fhirSearchRequester.searchObservationReportedList(
                 new SearchParameterMap("subject", referenceParam));
     }
 
@@ -111,10 +112,13 @@ public class PatientRestController extends BaseTenantTiedRest {
         referenceParam.setMdmExpand(isGolden);
         List<PatientMaster> relatedPatients = List.of();
         if (isGolden) {
-            relatedPatients = fhirRequester
-                    .searchPatientReportedFromGoldenIdWithMdmLinks(patientId);
+			  /**
+				* TODO change name
+				*/
+			  relatedPatients = fhirSearchRequester
+                    .searchPatientMasterFromGoldenIdWithMdmLinks(patientId);
         } else {
-            PatientMaster goldenRecord = fhirRequester
+            PatientMaster goldenRecord = fhirReadRequester
                     .readPatientMasterWithMdmLink(patientId);
             if (goldenRecord != null) {
                 relatedPatients = List.of(goldenRecord);
@@ -131,7 +135,7 @@ public class PatientRestController extends BaseTenantTiedRest {
             @RequestParam(required = false) String identifier,
             @RequestAttribute(RestTenantUrlFilter.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
             HttpServletRequest req) {
-        return fhirRequester.searchPatientMasterGoldenList(
+        return fhirSearchRequester.searchPatientMasterGoldenList(
                 new SearchParameterMap("family", new ca.uhn.fhir.rest.param.StringParam(family))
                         .add("name", new ca.uhn.fhir.rest.param.StringParam(name))
                         .add("identifier", new ca.uhn.fhir.rest.param.TokenParam().setValue(identifier)));

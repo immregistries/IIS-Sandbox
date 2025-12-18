@@ -218,7 +218,7 @@ public class PatientMismoConversionService {
 			Patient link = new Patient();
 			link.setValue("identifier", linkedWith.getValue());
 			mismo.setLinkWith(link);
-//			IBundleProvider bundleProvider = fhirRequester.searchRegularRecord(org.hl7.fhir.r4.model.Patient.class, new SearchParameterMap("identifier", new TokenParam().setSystem(LINK_ID).setValue(linkedWith.getValue())));
+//			IBundleProvider bundleProvider = fhirSearchRequester.searchRegularRecord(org.hl7.fhir.r4.model.Patient.class, new SearchParameterMap("identifier", new TokenParam().setSystem(LINK_ID).setValue(linkedWith.getValue())));
 //			if (!bundleProvider.isEmpty()) {
 //				mismo.setLinkWith(convertFromR4((org.hl7.fhir.r4.model.Patient) bundleProvider.getAllResources().get(0)));
 //			}
@@ -233,7 +233,7 @@ public class PatientMismoConversionService {
 			Patient link = new Patient();
 			link.setValue("identifier", linkedWith.getValue());
 			mismo.setLinkWith(link);
-//			IBundleProvider bundleProvider = fhirRequester.searchRegularRecord(org.hl7.fhir.r5.model.Patient.class, new SearchParameterMap("identifier", new TokenParam().setSystem(LINK_ID).setValue(linkedWith.getValue())));
+//			IBundleProvider bundleProvider = fhirSearchRequester.searchRegularRecord(org.hl7.fhir.r5.model.Patient.class, new SearchParameterMap("identifier", new TokenParam().setSystem(LINK_ID).setValue(linkedWith.getValue())));
 //			if (!bundleProvider.isEmpty()) {
 //				mismo.setLinkWith(convertFromR5((org.hl7.fhir.r5.model.Patient) bundleProvider.getAllResources().get(0)));
 //			}

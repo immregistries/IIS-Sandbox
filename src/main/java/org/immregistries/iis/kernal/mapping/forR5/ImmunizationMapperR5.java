@@ -10,7 +10,8 @@ import org.immregistries.iis.kernal.fhir.common.annotations.OnR5Condition;
 import org.immregistries.iis.kernal.logic.CodeMapManager;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
 import org.immregistries.iis.kernal.mapping.interfaces.ImmunizationMapper;
-import org.immregistries.iis.kernal.mapping.internalClient.FhirRequesterR5;
+import org.immregistries.iis.kernal.mapping.internalClient.FhirReadRequester;
+import org.immregistries.iis.kernal.mapping.internalClient.FhirSearchRequester;
 import org.immregistries.iis.kernal.model.BusinessIdentifier;
 import org.immregistries.iis.kernal.model.ModelPerson;
 import org.immregistries.iis.kernal.model.VaccinationMaster;
@@ -30,11 +31,13 @@ public class ImmunizationMapperR5 implements ImmunizationMapper<Immunization> {
 	@Autowired
 	private LocationMapperR5 locationMapper;
 	@Autowired
-	private FhirRequesterR5 fhirRequests;
+	private FhirReadRequester fhirReadRequester;
+	@Autowired
+	private FhirSearchRequester fhirSearchRequester;
 
 	public VaccinationReported localObjectReportedWithMaster(Immunization i) {
 		VaccinationReported vaccinationReported = this.localObjectReported(i);
-		VaccinationMaster vaccinationMaster = fhirRequests.searchVaccinationMaster(
+		VaccinationMaster vaccinationMaster = fhirSearchRequester.searchVaccinationMaster(
 			new SearchParameterMap(Immunization.SP_IDENTIFIER, new TokenParam().setValue(vaccinationReported.getFillerBusinessIdentifier().getValue())));
 		if (vaccinationMaster!= null) {
 			vaccinationReported.setVaccinationMaster(vaccinationMaster);
@@ -81,7 +84,7 @@ public class ImmunizationMapperR5 implements ImmunizationMapper<Immunization> {
 		 * Patient
 		 */
 		if (i.getPatient() != null && StringUtils.isNotBlank(i.getPatient().getReference())) {
-			vr.setPatientReported(fhirRequests.readAsPatientReported(i.getPatient().getReference()));
+			vr.setPatientReported(fhirReadRequester.readAsPatientReported(i.getPatient().getReference()));
 		}
 		/*
 		 * Reported Date
@@ -214,7 +217,7 @@ public class ImmunizationMapperR5 implements ImmunizationMapper<Immunization> {
 		 * Location
 		 */
 		if (i.getLocation() != null && StringUtils.isNotBlank(i.getLocation().getReference())) {
-			vr.setOrgLocation(fhirRequests.readAsOrgLocation(i.getLocation().getReference()));
+			vr.setOrgLocation(fhirReadRequester.readAsOrgLocation(i.getLocation().getReference()));
 		}
 		/*
 		 * Information Source
@@ -227,21 +230,21 @@ public class ImmunizationMapperR5 implements ImmunizationMapper<Immunization> {
 		 * TODO choose where to get entering Practitioner between information source and Performer
 		 */
 		if (i.hasInformationSource() && i.getInformationSource().getReference() != null && StringUtils.isNotBlank(i.getInformationSource().getReference().getReference())) {
-			vr.setEnteredBy(fhirRequests.readPractitionerAsPerson(i.getInformationSource().getReference().getReference()));
+			vr.setEnteredBy(fhirReadRequester.readPractitionerAsPerson(i.getInformationSource().getReference().getReference()));
 		}
 		for (Immunization.ImmunizationPerformerComponent performer : i.getPerformer()) {
 			if (performer.getActor() != null && StringUtils.isNotBlank(performer.getActor().getReference())) {
 				switch (performer.getFunction().getCode(PERFORMER_FUNCTION_SYSTEM)) {
 					case ADMINISTERING_VALUE: {
-						vr.setAdministeringProvider(fhirRequests.readPractitionerAsPerson(performer.getActor().getReference()));
+						vr.setAdministeringProvider(fhirReadRequester.readPractitionerAsPerson(performer.getActor().getReference()));
 						break;
 					}
 					case ORDERING_VALUE: {
-						vr.setOrderingProvider(fhirRequests.readPractitionerAsPerson(performer.getActor().getReference()));
+						vr.setOrderingProvider(fhirReadRequester.readPractitionerAsPerson(performer.getActor().getReference()));
 						break;
 					}
 					case ENTERING_VALUE: {
-						vr.setEnteredBy(fhirRequests.readPractitionerAsPerson(performer.getActor().getReference()));
+						vr.setEnteredBy(fhirReadRequester.readPractitionerAsPerson(performer.getActor().getReference()));
 						break;
 					}
 				}

@@ -20,6 +20,8 @@ import org.immregistries.iis.kernal.mapping.interfaces.LocationMapper;
 import org.immregistries.iis.kernal.mapping.interfaces.ObservationMapper;
 import org.immregistries.iis.kernal.mapping.interfaces.PatientMapper;
 import org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester;
+import org.immregistries.iis.kernal.mapping.internalClient.FhirReadRequester;
+import org.immregistries.iis.kernal.mapping.internalClient.FhirSearchRequester;
 import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
 import org.immregistries.iis.kernal.model.*;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
@@ -51,19 +53,11 @@ public abstract class V2IncomingMessageHandler extends IncomingMessageHandler<HL
 	@Autowired
 	ValidationService validationService;
 	@Autowired
-	RepositoryClientFactory repositoryClientFactory;
-	@Autowired
 	AbstractFhirRequester fhirRequester;
 	@Autowired
+	FhirSearchRequester fhirSearchRequester;
+	@Autowired
 	AbstractHl7MessageWriter hl7MessageWriter;
-	@Autowired
-	PatientMapper patientMapper;
-	@Autowired
-	ImmunizationMapper immunizationMapper;
-	@Autowired
-	ObservationMapper observationMapper;
-	@Autowired
-	LocationMapper locationMapper;
 	@Autowired
 	PatientProcessingInterceptor patientProcessingInterceptor; // TODO decide how/where to implement the execution of interceptors, currently using DAO so some interceptors are skipped by the v2 process and need to be manually triggered
 	@Autowired
@@ -295,7 +289,7 @@ public abstract class V2IncomingMessageHandler extends IncomingMessageHandler<HL
 
 	public PatientReported processPatient(Tenant tenant, HL7Reader reader, List<IisReportable> iisReportableList, Set<ProcessingFlavor> processingFlavorSet, CodeMap codeMap, boolean strictDate, IIdType managingOrganizationId) throws ProcessingException {
 //		PatientReported patientReported = null; // TODO figure out process of merging information in golden record
-//			fhirRequester.searchPatientReported(new SearchParameterMap("identifier", new TokenParam().setValue(patientReportedExternalLink)));
+//			fhirSearchRequester.searchPatientReported(new SearchParameterMap("identifier", new TokenParam().setValue(patientReportedExternalLink)));
 //		if (patientReported == null) {
 		PatientReported patientReported;
 		patientReported = new PatientReported();
@@ -501,7 +495,7 @@ public abstract class V2IncomingMessageHandler extends IncomingMessageHandler<HL
 
 //			TokenParam fillerIdentifierParam = fillerIdentifier.asTokenParam();
 //			if (fillerIdentifierParam != null) {
-//				vaccinationReported = fhirRequester.searchVaccinationReported(new SearchParameterMap("identifier", fillerIdentifierParam));
+//				vaccinationReported = fhirSearchRequester.searchVaccinationReported(new SearchParameterMap("identifier", fillerIdentifierParam));
 //			}
 
 			/*
@@ -649,7 +643,7 @@ public abstract class V2IncomingMessageHandler extends IncomingMessageHandler<HL
 		OrgLocation orgLocation = null;
 		String administeredAtLocation = reader.getValue(fieldNum, 4);
 		if (StringUtils.isNotEmpty(administeredAtLocation)) {
-			orgLocation = fhirRequester.searchOrgLocation(new SearchParameterMap("identifier", new TokenParam().setValue(administeredAtLocation)));
+			orgLocation = fhirSearchRequester.searchOrgLocation(new SearchParameterMap("identifier", new TokenParam().setValue(administeredAtLocation)));
 
 			if (orgLocation == null) {
 				if (processingFlavorSet.contains(ProcessingFlavor.PEAR)) {
@@ -676,7 +670,7 @@ public abstract class V2IncomingMessageHandler extends IncomingMessageHandler<HL
 		ModelPerson modelPerson = null;
 		String administeringProvider = reader.getValue(fieldNum);
 		if (StringUtils.isNotEmpty(administeringProvider)) {
-			modelPerson = fhirRequester.searchPractitioner(new SearchParameterMap("identifier", new TokenParam().setValue(administeringProvider)));
+			modelPerson = fhirSearchRequester.searchPractitioner(new SearchParameterMap("identifier", new TokenParam().setValue(administeringProvider)));
 //								Practitioner.IDENTIFIER.exactly().code(administeringProvider));
 			if (modelPerson == null) {
 				modelPerson = new ModelPerson();
@@ -700,10 +694,10 @@ public abstract class V2IncomingMessageHandler extends IncomingMessageHandler<HL
 	public ObservationReported readObservations(HL7Reader reader, List<IisReportable> iisReportableList, PatientReported patientReported, boolean strictDate, int obxCount, VaccinationReported vaccinationReported, VaccinationMaster vaccination) {
 		ObservationReported observationReported;
 		if (vaccination == null) {
-			observationReported = fhirRequester.searchObservationReported(new SearchParameterMap("part-of", new ReferenceParam().setMissing(true))
+			observationReported = fhirSearchRequester.searchObservationReported(new SearchParameterMap("part-of", new ReferenceParam().setMissing(true))
 				.add("subject", new ReferenceParam(patientReported.getPatientId())));
 		} else {
-			observationReported = fhirRequester.searchObservationReported(new SearchParameterMap("part-of", new ReferenceParam(vaccination.getVaccinationId())).add("subject", new ReferenceParam(patientReported.getPatientId())));
+			observationReported = fhirSearchRequester.searchObservationReported(new SearchParameterMap("part-of", new ReferenceParam(vaccination.getVaccinationId())).add("subject", new ReferenceParam(patientReported.getPatientId())));
 		}
 		if (observationReported == null) {
 			observationReported = new ObservationReported();

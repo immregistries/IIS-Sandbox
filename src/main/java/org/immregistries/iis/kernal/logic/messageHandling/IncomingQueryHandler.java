@@ -16,6 +16,8 @@ import org.immregistries.iis.kernal.logic.ack.ReportableUtil;
 import org.immregistries.iis.kernal.mapping.interfaces.ImmunizationMapper;
 import org.immregistries.iis.kernal.mapping.interfaces.ObservationMapper;
 import org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester;
+import org.immregistries.iis.kernal.mapping.internalClient.FhirReadRequester;
+import org.immregistries.iis.kernal.mapping.internalClient.FhirSearchRequester;
 import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
 import org.immregistries.iis.kernal.model.*;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
@@ -41,17 +43,13 @@ public class IncomingQueryHandler {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	@Autowired
-	private AbstractFhirRequester fhirRequester;
+	AbstractFhirRequester fhirRequester;
 	@Autowired
-	private AbstractHl7MessageWriter hl7MessageWriter;
+	FhirSearchRequester fhirSearchRequester;
 	@Autowired
-	private ValidationService validationService;
+	AbstractHl7MessageWriter hl7MessageWriter;
 	@Autowired
-	private RepositoryClientFactory repositoryClientFactory;
-	@Autowired
-	private ObservationMapper observationMapper;
-	@Autowired
-	private ImmunizationMapper immunizationMapper;
+	ValidationService validationService;
 
 
 	@Autowired
@@ -83,7 +81,7 @@ public class IncomingQueryHandler {
 				businessIdentifier.setValue(mrn);
 				businessIdentifier.setType(BusinessIdentifier.MRN_TYPE_VALUE);
 				patientMasterForMatchQuery.addBusinessIdentifier(businessIdentifier);
-//				patientReported = fhirRequester.searchPatientReported(
+//				patientReported = fhirSearchRequester.searchPatientReported(
 //					Patient.IDENTIFIER.exactly().systemAndCode(MRN_SYSTEM, mrn)
 //				);
 			}
@@ -278,7 +276,7 @@ public class IncomingQueryHandler {
 					hl7MessageWriter.printQueryNK1(patientMaster, sb, codeMap);
 				}
 
-				List<VaccinationMaster> vaccinationMasterList = fhirRequester.searchVaccinationMasterGoldenList(
+				List<VaccinationMaster> vaccinationMasterList = fhirSearchRequester.searchVaccinationMasterGoldenList(
 					new SearchParameterMap("patient", new ReferenceParam().setMdmExpand(true).setValue("Patient/" + patientMaster.getPatientId())));
 				vaccinationMasterList.sort(Comparator.comparing(VaccinationMaster::getAdministeredDate));
 
@@ -370,7 +368,7 @@ public class IncomingQueryHandler {
 					}
 
 
-					List<ObservationMaster> observationVaccinationList = fhirRequester.searchObservationReportedList(
+					List<ObservationMaster> observationVaccinationList = fhirSearchRequester.searchObservationReportedList(
 						new SearchParameterMap("part-of", new ReferenceParam().setMdmExpand(true).setValue("Immunization/" + vaccination.getVaccinationId())));
 
 					for (ObservationMaster observationMaster : observationVaccinationList) {
@@ -384,7 +382,7 @@ public class IncomingQueryHandler {
 					}
 				}
 
-				List<ObservationMaster> observationReportedPatientList = fhirRequester.searchObservationReportedList(
+				List<ObservationMaster> observationReportedPatientList = fhirSearchRequester.searchObservationReportedList(
 					new SearchParameterMap("subject", new ReferenceParam().setMdmExpand(true).setValue("Patient/" + patientMaster.getPatientId()))
 						.add("part-of", new ReferenceParam().setMissing(true))
 				);
