@@ -5,8 +5,10 @@ import org.immregistries.iis.kernal.model.OrgLocation;
 
 public interface LocationMapper<Location extends IBaseResource> extends IisFhirMapperMaster<OrgLocation, Location> {
 	default String fhirType() {
-		return "Location";
+		return LOCATION;
 	}
+
+	public static final String LOCATION = "Location";
 
 	default Class<OrgLocation> localMasterType() {
 		return OrgLocation.class;

@@ -6,8 +6,10 @@ import org.immregistries.iis.kernal.persisted.model.Tenant;
 public interface OrganizationMapper<Organization extends IBaseResource>
 		extends IisFhirMapperMaster<Tenant, Organization> {
 	default String fhirType() {
-		return "Organization";
+		return ORGANIZATION;
 	}
+
+	public static final String ORGANIZATION = "Organization";
 
 	default Class<Tenant> localMasterType() {
 		return Tenant.class;

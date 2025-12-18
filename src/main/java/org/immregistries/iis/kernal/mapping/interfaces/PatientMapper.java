@@ -13,8 +13,10 @@ public interface PatientMapper<Patient extends IBaseResource>
 		extends IisFhirMapperMasterReported<PatientMaster, PatientReported, Patient> {
 
 	default String fhirType() {
-		return "Patient";
+		return PATIENT;
 	}
+
+	public static final String PATIENT = "Patient";
 
 	default Class<PatientMaster> localMasterType() {
 		return PatientMaster.class;

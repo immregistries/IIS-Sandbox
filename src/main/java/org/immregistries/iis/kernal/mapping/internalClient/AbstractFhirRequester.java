@@ -4,12 +4,10 @@ import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.jpa.api.dao.DaoRegistry;
 import ca.uhn.fhir.jpa.api.dao.IFhirResourceDao;
 import ca.uhn.fhir.jpa.api.model.DaoMethodOutcome;
-import ca.uhn.fhir.jpa.partition.IPartitionLookupSvc;
 import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.api.server.IBundleProvider;
 import ca.uhn.fhir.rest.gclient.ICriterion;
-import ca.uhn.fhir.rest.gclient.ICriterionInternal;
 import ca.uhn.fhir.rest.param.TokenParam;
 import ca.uhn.fhir.rest.param.TokenParamModifier;
 import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
@@ -17,15 +15,24 @@ import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.IdType;
 import org.immregistries.iis.kernal.fhir.security.TenantUtil;
+import org.immregistries.iis.kernal.mapping.AllMappingService;
 import org.immregistries.iis.kernal.mapping.interfaces.*;
+import org.immregistries.iis.kernal.model.AbstractMappedObject;
+import org.immregistries.iis.kernal.model.ObservationMaster;
+import org.immregistries.iis.kernal.model.ObservationReported;
+import org.immregistries.iis.kernal.model.OrgLocation;
 import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.model.PatientReported;
+import org.immregistries.iis.kernal.model.VaccinationMaster;
+import org.immregistries.iis.kernal.model.VaccinationReported;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @SuppressWarnings("rawtypes")
 public abstract class AbstractFhirRequester<Patient extends IBaseResource, Immunization extends IBaseResource, Location extends IBaseResource, Practitioner extends IBaseResource, Observation extends IBaseResource, Person extends IBaseResource, Organization extends IBaseResource, RelatedPerson extends IBaseResource>
@@ -49,10 +56,11 @@ public abstract class AbstractFhirRequester<Patient extends IBaseResource, Immun
 	PractitionerMapper<Practitioner> practitionerMapper;
 	@Autowired
 	ObservationMapper<Observation> observationMapper;
+	@Autowired
+	AllMappingService allMappingService;
 
-
-	// @Autowired
-	// RelatedPersonMapper<RelatedPerson> relatedPersonMapper;
+	@Autowired
+	TenantUtil tenantUtil;
 
 	@Autowired
 	RepositoryClientFactory repositoryClientFactory;
@@ -63,56 +71,88 @@ public abstract class AbstractFhirRequester<Patient extends IBaseResource, Immun
 	// @Autowired
 	// RestfulServer fhirServer;
 
-	@Autowired
-	IPartitionLookupSvc partitionLookupSvc;
-
-	/**
-	 * Converts HAPI ICriterion Object to HTTP URI parameter substring
-	 *
-	 * @param iCriterion HAPIFHIR criterion
-	 * @return HTTP parameter String equivalent
-	 */
-	private String stringCriterion(ICriterion iCriterion) {
-		ICriterionInternal iCriterionInternal = (ICriterionInternal) iCriterion;
-		return iCriterionInternal.getParameterName() + "=" + iCriterionInternal.getParameterValue(fhirContext);
+	public AbstractMappedObject searchMappedObjectMaster(String resourceType, SearchParameterMap searchParameterMap) {
+		AbstractMappedObject mappedObject = null;
+		IBundleProvider bundleProvider = searchGoldenRecord(resourceType, searchParameterMap);
+		if (!bundleProvider.isEmpty()) {
+			mappedObject = allMappingService.localObject(bundleProvider.getResources(0, 1).get(0));
+		}
+		return mappedObject;
 	}
 
-	/**
-	 * Converts list HAPI ICriterion to a complete HTTP URI parameter suffix
-	 * 
-	 * @param criteria HAPIFHIR criteria list
-	 * @return Complete HTTP URI suffix
-	 */
-	private String stringCriterionList(ICriterion... criteria) {
-		int size = criteria.length;
-		StringBuilder params = new StringBuilder();
-		if (size > 0) {
-			params = new StringBuilder(stringCriterion(criteria[0]));
-			int i = 1;
-			while (i < size) {
-				params.append("&").append(stringCriterion(criteria[i]));
-				i++;
+	public AbstractMappedObject searchMappedObjectReportedWithMaster(String resourceType,
+			SearchParameterMap searchParameterMap) {
+		AbstractMappedObject mappedObject = null;
+		IBundleProvider bundleProvider = searchRegularRecord(resourceType, searchParameterMap);
+		if (!bundleProvider.isEmpty()) {
+			mappedObject = allMappingService.localObjectReportedWithMaster(bundleProvider.getResources(0, 1).get(0));
+		}
+		return mappedObject;
+	}
+
+	public List<AbstractMappedObject> searchMappedObjectReportedList(String resourceType,
+			SearchParameterMap searchParameterMap) {
+		IBundleProvider bundleProvider = searchRegularRecord(resourceType, searchParameterMap);
+		return bundleProvider.getAllResources().stream().map(allMappingService::localObjectReportedWithMaster)
+				.collect(Collectors.toList());
+	}
+
+	public List<VaccinationMaster> searchVaccinationMasterGoldenList(SearchParameterMap searchParameterMap) {
+		List<VaccinationMaster> vaccinationMasterList = new ArrayList<>();
+		IBundleProvider bundleProvider = searchGoldenRecord(ImmunizationMapper.IMMUNIZATION, searchParameterMap);
+		if (!bundleProvider.isEmpty()) {
+			for (IBaseResource resource : bundleProvider.getAllResources()) {
+				vaccinationMasterList.add((VaccinationMaster) allMappingService.localObject(resource));
 			}
 		}
-		return params.toString();
+		return vaccinationMasterList;
 	}
 
-	// private SearchParameterMap searchParameterCriterionList(ICriterion...
-	// criteria) {
-	// SearchParameterMap map = new SearchParameterMap();
-	// int size = criteria.length;
-	// int i = 0;
-	// while (i < size) {
-	// ICriterionInternal iCriterionInternal = (ICriterionInternal) criteria[i];
-	// if (criteria[i] instanceof TokenCriterion) {
-	//
-	// }
-	// map.add(iCriterionInternal.getParameterName(),
-	// new StringParam(iCriterionInternal.getParameterValue(fhirContext)));
-	// i++;
-	// }
-	// return map;
-	// }
+	public List<VaccinationReported> searchVaccinationReportedList(SearchParameterMap searchParameterMap) {
+		List<VaccinationReported> vaccinationReportedList = new ArrayList<>();
+		IBundleProvider bundleProvider = searchRegularRecord(ImmunizationMapper.IMMUNIZATION, searchParameterMap);
+		for (IBaseResource resource : bundleProvider.getAllResources()) {
+			vaccinationReportedList
+					.add((VaccinationReported) allMappingService.localObjectReportedWithMaster(resource));
+		}
+		return vaccinationReportedList;
+	}
+
+	public VaccinationReported searchVaccinationReported(SearchParameterMap searchParameterMap) {
+		return (VaccinationReported) searchMappedObjectReportedWithMaster("Immunization", searchParameterMap);
+	}
+
+	public ObservationReported searchObservationReported(SearchParameterMap searchParameterMap) {
+		return (ObservationReported) searchMappedObjectReportedWithMaster(ObservationMapper.OBSERVATION,
+				searchParameterMap);
+	}
+
+	public ObservationMaster searchObservationMaster(SearchParameterMap searchParameterMap) {
+		return (ObservationMaster) searchMappedObjectMaster(ObservationMapper.OBSERVATION, searchParameterMap);
+	}
+
+	public List<ObservationReported> searchObservationReportedList(SearchParameterMap searchParameterMap) {
+		List<ObservationReported> observationReportedList = new ArrayList<>();
+		IBundleProvider bundleProvider = search(ObservationMapper.OBSERVATION, searchParameterMap);
+		for (IBaseResource resource : bundleProvider.getAllResources()) {
+			observationReportedList
+					.add((ObservationReported) allMappingService.localObjectReportedWithMaster(resource));
+		}
+		return observationReportedList;
+	}
+
+	public OrgLocation searchOrgLocation(SearchParameterMap searchParameterMap) {
+		return (OrgLocation) searchMappedObjectMaster(LocationMapper.LOCATION, searchParameterMap);
+	}
+
+	public List<OrgLocation> searchOrgLocationList(SearchParameterMap searchParameterMap) {
+		List<OrgLocation> locationList = new ArrayList<>();
+		IBundleProvider bundleProvider = search(LocationMapper.LOCATION, searchParameterMap);
+		for (IBaseResource resource : bundleProvider.getAllResources()) {
+			locationList.add((OrgLocation) allMappingService.localObject(resource));
+		}
+		return locationList;
+	}
 
 	/**
 	 * Helping method for saving, executes conditional update and create on HAPI
@@ -125,7 +165,7 @@ public abstract class AbstractFhirRequester<Patient extends IBaseResource, Immun
 	 */
 	protected MethodOutcome save(boolean createOnly, IBaseResource resource, ICriterion... where) {
 		IFhirResourceDao dao = daoRegistry.getResourceDao(resource);
-		String params = stringCriterionList(where);
+		String params = FhirRequesterUtil.stringCriterionList(fhirContext, where);
 		if (StringUtils.isNotBlank(params)) {
 			// If not empty add &
 			params += "&";
@@ -152,19 +192,22 @@ public abstract class AbstractFhirRequester<Patient extends IBaseResource, Immun
 				return dao.create(resource, TenantUtil.get().requestDetailsWithPartitionName());
 			}
 		// catch (JdbcBatchUpdateException jdbcBatchUpdateException) {
-		// return dao.create(resource, TenantUtil.get().requestDetailsWithPartitionName());
+		// return dao.create(resource,
+		// TenantUtil.get().requestDetailsWithPartitionName());
 		// }
 	}
 
+	@Autowired
+	FhirReadRequester fhirReadRequester;
+
 	/**
 	 *
-	 * @param aClass FHIR Resource Class
-	 * @param id     resource id
+	 * @param fhirType FHIR Resource Class
+	 * @param id       resource id
 	 * @return resource found
 	 */
-	public IBaseResource read(Class<? extends IBaseResource> aClass, String id) {
-		IFhirResourceDao dao = daoRegistry.getResourceDao(aClass);
-		return dao.read(new IdType(id), TenantUtil.get().requestDetailsWithPartitionName());
+	public IBaseResource read(String fhirType, String id) {
+		return fhirReadRequester.read(fhirType, id);
 	}
 
 	/**
@@ -181,23 +224,22 @@ public abstract class AbstractFhirRequester<Patient extends IBaseResource, Immun
 		}
 		searchParameterMap.add("_tag", new TokenParam(GOLDEN_SYSTEM_TAG, GOLDEN_RECORD));
 		return search(aClass, searchParameterMap);
-		// IGenericClient fhirClient = repositoryClientFactory.getFhirClient();
-		// try {
-		// IQuery<IBaseBundle> query = fhirClient.search().forResource(aClass);
-		// int size = where.length;
-		// if (size > 0) {
-		// query = query.where(where[0]);
-		// }
-		// query = query.withTag(GOLDEN_SYSTEM_TAG, GOLDEN_RECORD);
-		// int i = 1;
-		// while (i < size) {
-		// query = query.and(where[i]);
-		// i++;
-		// }
-		// return query.execute();
-		// } catch (ResourceNotFoundException e) {
-		// return null;
-		// }
+	}
+
+	/**
+	 * Search only golden record by adding extra parameter
+	 * 
+	 * @param fhirType           FHIR Resource Class
+	 * @param searchParameterMap search parameters
+	 * @return Bundle of search result with only Golden/Master records
+	 */
+	public IBundleProvider searchGoldenRecord(String fhirType,
+			SearchParameterMap searchParameterMap) {
+		if (searchParameterMap == null) {
+			searchParameterMap = new SearchParameterMap();
+		}
+		searchParameterMap.add("_tag", new TokenParam(GOLDEN_SYSTEM_TAG, GOLDEN_RECORD));
+		return search(fhirType, searchParameterMap);
 	}
 
 	/**
@@ -215,22 +257,23 @@ public abstract class AbstractFhirRequester<Patient extends IBaseResource, Immun
 		searchParameterMap.add("_tag",
 				new TokenParam(GOLDEN_SYSTEM_TAG, GOLDEN_RECORD).setModifier(TokenParamModifier.NOT));
 		return search(aClass, searchParameterMap);
-		// return dao.search(searchParameterMap,
-		// TenantUtil.get().requestDetailsWithPartitionName());
-		// IGenericClient fhirClient = repositoryClientFactory.getFhirClient();
-		// try {
-		// IQuery<IBaseBundle> query = fhirClient.search().forResource(aClass);
-		// int size = where.length;
-		//// query = query.where(NOT_GOLDEN_CRITERION);
-		// int i = 0;
-		// while (i < size) {
-		// query = query.and(where[i]);
-		// i++;
-		// }
-		// return query.execute();
-		// } catch (ResourceNotFoundException e) {
-		// return null;
-		// }
+	}
+
+	/**
+	 * Search only regular record by adding extra parameter excluding golden record
+	 * 
+	 * @param fhirType             FHIR Resource Class
+	 * @param searchParameterMap Search parameters
+	 * @return Bundle of search result excluding Golden/Master records
+	 */
+	public IBundleProvider searchRegularRecord(String fhirType,
+			SearchParameterMap searchParameterMap) {
+		if (searchParameterMap == null) {
+			searchParameterMap = new SearchParameterMap();
+		}
+		searchParameterMap.add("_tag",
+				new TokenParam(GOLDEN_SYSTEM_TAG, GOLDEN_RECORD).setModifier(TokenParamModifier.NOT));
+		return search(fhirType, searchParameterMap);
 	}
 
 	/**
@@ -242,23 +285,19 @@ public abstract class AbstractFhirRequester<Patient extends IBaseResource, Immun
 	 */
 	IBundleProvider search(Class<? extends IBaseResource> aClass, SearchParameterMap searchParameterMap) {
 		return daoRegistry.getResourceDao(aClass).search(searchParameterMap,
-			TenantUtil.get().requestDetailsWithPartitionName());
-		// IGenericClient fhirClient = repositoryClientFactory.getFhirClient();
-		// try {
-		// IQuery<IBaseBundle> query = fhirClient.search().forResource(aClass);
-		// int size = where.length;
-		// if (size > 0) {
-		// query = query.where(where[0]);
-		// }
-		// int i = 1;
-		// while (i < size) {
-		// query = query.and(where[i]);
-		// i++;
-		// }
-		// return query.execute();
-		// } catch (ResourceNotFoundException e) {
-		// return null;
-		// }
+				tenantUtil.requestDetailsWithPartitionName());
+	}
+
+	/**
+	 * Search Operation
+	 *
+	 * @param fhirType           FHIR Resource name
+	 * @param searchParameterMap Search parameters
+	 * @return Bundle of search result
+	 */
+	IBundleProvider search(String fhirType, SearchParameterMap searchParameterMap) {
+		return daoRegistry.getResourceDao(fhirType).search(searchParameterMap,
+				tenantUtil.requestDetailsWithPartitionName());
 	}
 
 	/**

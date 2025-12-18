@@ -11,6 +11,8 @@ public interface ObservationMapper<Observation extends IBaseResource>
 		return "Observation";
 	}
 
+	public static final String OBSERVATION = "Observation";
+
 	default Class<ObservationMaster> localMasterType() {
 		return ObservationMaster.class;
 	}
