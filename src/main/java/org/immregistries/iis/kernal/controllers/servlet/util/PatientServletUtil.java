@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.instance.model.api.IDomainResource;
+import org.hl7.fhir.r5.model.Patient;
 import org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester;
 import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
 import org.immregistries.iis.kernal.model.LoincIdentifier;
@@ -309,9 +310,9 @@ public final class PatientServletUtil {
 			patient = (IDomainResource) fhirClient.read().resource("Patient").withId(idParam).execute();
 		} else {
 			if (identifierParam != null) {
-				IBundleProvider bundleProvider = fhirRequester.searchGoldenRecord(org.hl7.fhir.r5.model.Patient.class,
-						new SearchParameterMap(org.hl7.fhir.r5.model.Patient.SP_IDENTIFIER,
-								new TokenParam().setValue(identifierParam)));
+				SearchParameterMap searchParameterMap = new SearchParameterMap(Patient.SP_IDENTIFIER,
+						new TokenParam().setValue(identifierParam));
+				IBundleProvider bundleProvider = fhirRequester.fhirSearchRequesterSuper.searchGoldenRecord(Patient.class, searchParameterMap);
 				if (!bundleProvider.isEmpty()) {
 					patient = (IDomainResource) bundleProvider.getAllResources().get(0);
 				}

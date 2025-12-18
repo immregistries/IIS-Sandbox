@@ -40,7 +40,7 @@ public class FhirRequesterR5 extends AbstractFhirRequester<Patient, Immunization
 
 	public PatientMaster searchPatientMaster(SearchParameterMap searchParameterMap) {
 		PatientMaster patientMaster = null;
-		IBundleProvider bundleProvider = searchGoldenRecord(Patient.class, searchParameterMap);
+		IBundleProvider bundleProvider = fhirSearchRequester.searchGoldenRecord(Patient.class, searchParameterMap);
 		if (!bundleProvider.isEmpty()) {
 			patientMaster = patientMapper.localObject((Patient) bundleProvider.getResources(0, 1).get(0));
 		}
@@ -49,7 +49,7 @@ public class FhirRequesterR5 extends AbstractFhirRequester<Patient, Immunization
 
 	public PatientReported searchPatientReported(SearchParameterMap searchParameterMap) {
 		PatientReported patientReported = null;
-		IBundleProvider bundleProvider = searchRegularRecord(Patient.class, searchParameterMap);
+		IBundleProvider bundleProvider = fhirSearchRequester.searchRegularRecord(Patient.class, searchParameterMap);
 		if (!bundleProvider.isEmpty()) {
 			patientReported = patientMapper.localObjectReportedWithMaster((Patient) bundleProvider.getResources(0, 1).get(0));
 		}
@@ -58,7 +58,7 @@ public class FhirRequesterR5 extends AbstractFhirRequester<Patient, Immunization
 
 	public List<PatientReported> searchPatientReportedList(SearchParameterMap searchParameterMap) {
 		List<PatientReported> patientReportedList = new ArrayList<>();
-		IBundleProvider bundleProvider = searchRegularRecord(Patient.class, searchParameterMap);
+		IBundleProvider bundleProvider = fhirSearchRequester.searchRegularRecord(Patient.class, searchParameterMap);
 		if (!bundleProvider.isEmpty()) {
 			for (IBaseResource resource : bundleProvider.getAllResources()) {
 				patientReportedList.add(patientMapper.localObjectReportedWithMaster((Patient) resource));
@@ -69,7 +69,7 @@ public class FhirRequesterR5 extends AbstractFhirRequester<Patient, Immunization
 
 	public List<PatientMaster> searchPatientMasterGoldenList(SearchParameterMap searchParameterMap) {
 		List<PatientMaster> patientList = new ArrayList<>();
-		IBundleProvider bundleProvider = searchGoldenRecord(Patient.class, searchParameterMap);
+		IBundleProvider bundleProvider = fhirSearchRequester.searchGoldenRecord(Patient.class, searchParameterMap);
 		if (!bundleProvider.isEmpty()) {
 			for (IBaseResource resource : bundleProvider.getAllResources()) {
 				patientList.add(patientMapper.localObject((Patient) resource));
@@ -80,7 +80,7 @@ public class FhirRequesterR5 extends AbstractFhirRequester<Patient, Immunization
 
 	public VaccinationMaster searchVaccinationMaster(SearchParameterMap searchParameterMap) {
 		VaccinationMaster vaccinationMaster = null;
-		IBundleProvider bundleProvider = searchGoldenRecord(Immunization.class, searchParameterMap);
+		IBundleProvider bundleProvider = fhirSearchRequester.searchGoldenRecord(Immunization.class, searchParameterMap);
 		if (!bundleProvider.isEmpty()) {
 			vaccinationMaster = immunizationMapper.localObject((Immunization) bundleProvider.getResources(0, 1).get(0));
 		}
@@ -89,7 +89,7 @@ public class FhirRequesterR5 extends AbstractFhirRequester<Patient, Immunization
 
 	public VaccinationReported searchVaccinationReported(SearchParameterMap searchParameterMap) {
 		VaccinationReported vaccinationReported = null;
-		IBundleProvider bundleProvider = searchRegularRecord(Immunization.class, searchParameterMap);
+		IBundleProvider bundleProvider = fhirSearchRequester.searchRegularRecord(Immunization.class, searchParameterMap);
 		if (!bundleProvider.isEmpty()) {
 			vaccinationReported = immunizationMapper.localObjectReportedWithMaster((Immunization) bundleProvider.getResources(0, 1).get(0));
 		}
@@ -98,7 +98,7 @@ public class FhirRequesterR5 extends AbstractFhirRequester<Patient, Immunization
 
 	public List<VaccinationMaster> searchVaccinationMasterGoldenList(SearchParameterMap searchParameterMap) {
 		List<VaccinationMaster> vaccinationMasterList = new ArrayList<>();
-		IBundleProvider bundleProvider = searchGoldenRecord(Immunization.class, searchParameterMap);
+		IBundleProvider bundleProvider = fhirSearchRequester.searchGoldenRecord(Immunization.class, searchParameterMap);
 		if (!bundleProvider.isEmpty()) {
 			for (IBaseResource resource : bundleProvider.getAllResources()) {
 				vaccinationMasterList.add(immunizationMapper.localObject((Immunization) resource));
@@ -109,7 +109,7 @@ public class FhirRequesterR5 extends AbstractFhirRequester<Patient, Immunization
 
 	public Organization searchOrganization(SearchParameterMap searchParameterMap) {
 		Organization organization = null;
-		IBundleProvider bundleProvider = search(Organization.class, searchParameterMap);
+		IBundleProvider bundleProvider = fhirSearchRequester.search(Organization.class, searchParameterMap);
 		if (!bundleProvider.isEmpty()) {
 			organization = (Organization) bundleProvider.getResources(0, 1).get(0);
 		}
@@ -118,7 +118,7 @@ public class FhirRequesterR5 extends AbstractFhirRequester<Patient, Immunization
 
 	public List<VaccinationReported> searchVaccinationReportedList(SearchParameterMap searchParameterMap) {
 		List<VaccinationReported> vaccinationReportedList = new ArrayList<>();
-		IBundleProvider bundleProvider = searchRegularRecord(Immunization.class, searchParameterMap);
+		IBundleProvider bundleProvider = fhirSearchRequester.searchRegularRecord(Immunization.class, searchParameterMap);
 		for (IBaseResource resource : bundleProvider.getAllResources()) {
 			vaccinationReportedList.add(immunizationMapper.localObjectReportedWithMaster((Immunization) resource));
 		}
@@ -154,7 +154,7 @@ public class FhirRequesterR5 extends AbstractFhirRequester<Patient, Immunization
 	public ObservationReported searchObservationReported(SearchParameterMap searchParameterMap) {
 		IGenericClient fhirClient = repositoryClientFactory.getFhirClient();
 		ObservationReported observationReported = null;
-		IBundleProvider bundleProvider = searchRegularRecord(Observation.class, searchParameterMap);
+		IBundleProvider bundleProvider = fhirSearchRequester.searchRegularRecord(Observation.class, searchParameterMap);
 		if (!bundleProvider.isEmpty()) {
 			observationReported = observationMapper.localObjectReportedWithMaster((Observation) bundleProvider.getResources(0, 1).get(0));
 		}
@@ -163,7 +163,7 @@ public class FhirRequesterR5 extends AbstractFhirRequester<Patient, Immunization
 
 	public ObservationMaster searchObservationMaster(SearchParameterMap searchParameterMap) {
 		ObservationMaster observationMaster = null;
-		IBundleProvider bundleProvider = searchGoldenRecord(Observation.class, searchParameterMap);
+		IBundleProvider bundleProvider = fhirSearchRequester.searchGoldenRecord(Observation.class, searchParameterMap);
 		if (!bundleProvider.isEmpty()) {
 			observationMaster = observationMapper.localObject((Observation) bundleProvider.getResources(0, 1).get(0));
 		}
@@ -183,7 +183,7 @@ public class FhirRequesterR5 extends AbstractFhirRequester<Patient, Immunization
 	public List<ObservationReported> searchObservationReportedList(SearchParameterMap searchParameterMap) {
 		IGenericClient fhirClient = repositoryClientFactory.getFhirClient();
 		List<ObservationReported> observationReportedList = new ArrayList<>();
-		IBundleProvider bundleProvider = search(Observation.class, searchParameterMap);
+		IBundleProvider bundleProvider = fhirSearchRequester.search(Observation.class, searchParameterMap);
 		for (IBaseResource resource : bundleProvider.getAllResources()) {
 			observationReportedList.add(observationMapper.localObjectReportedWithMaster((Observation) resource));
 		}
@@ -192,7 +192,7 @@ public class FhirRequesterR5 extends AbstractFhirRequester<Patient, Immunization
 
 	public OrgLocation searchOrgLocation(SearchParameterMap searchParameterMap) {
 		OrgLocation orgLocation = null;
-		IBundleProvider bundleProvider = search(Observation.class, searchParameterMap);
+		IBundleProvider bundleProvider = fhirSearchRequester.search(Observation.class, searchParameterMap);
 		if (!bundleProvider.isEmpty()) {
 			orgLocation = locationMapper.localObject((Location) bundleProvider.getResources(0, 1).get(0));
 		}
@@ -201,7 +201,7 @@ public class FhirRequesterR5 extends AbstractFhirRequester<Patient, Immunization
 
 	public List<OrgLocation> searchOrgLocationList(SearchParameterMap searchParameterMap) {
 		List<OrgLocation> locationList = new ArrayList<>();
-		IBundleProvider bundleProvider = search(Location.class, searchParameterMap);
+		IBundleProvider bundleProvider = fhirSearchRequester.search(Location.class, searchParameterMap);
 		for (IBaseResource resource : bundleProvider.getAllResources()) {
 			locationList.add(locationMapper.localObject((Location) resource));
 		}
@@ -219,7 +219,7 @@ public class FhirRequesterR5 extends AbstractFhirRequester<Patient, Immunization
 
 	public ModelPerson searchPractitioner(SearchParameterMap searchParameterMap) {
 		ModelPerson modelPerson = null;
-		IBundleProvider bundleProvider = search(Practitioner.class, searchParameterMap);
+		IBundleProvider bundleProvider = fhirSearchRequester.search(Practitioner.class, searchParameterMap);
 		if (!bundleProvider.isEmpty()) {
 			modelPerson = practitionerMapper.localObject((Practitioner) bundleProvider.getResources(0, 1).get(0));
 		}
@@ -228,7 +228,7 @@ public class FhirRequesterR5 extends AbstractFhirRequester<Patient, Immunization
 
 	public RelatedPerson searchRelatedPerson(SearchParameterMap searchParameterMap) {
 		RelatedPerson relatedPerson = null;
-		IBundleProvider bundleProvider = search(RelatedPerson.class, searchParameterMap);
+		IBundleProvider bundleProvider = fhirSearchRequester.search(RelatedPerson.class, searchParameterMap);
 		if (!bundleProvider.isEmpty()) {
 			relatedPerson = (RelatedPerson) bundleProvider.getResources(0, 1).get(0);
 		}

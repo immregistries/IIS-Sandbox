@@ -6,13 +6,13 @@ import ca.uhn.fhir.rest.api.server.IBundleProvider;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.gclient.ICriterion;
 import org.apache.commons.lang3.StringUtils;
-import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.*;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
 import org.immregistries.iis.kernal.mapping.interfaces.*;
 import org.immregistries.iis.kernal.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Component;
 
@@ -42,32 +42,12 @@ public class FhirRequesterR4 extends
 		AbstractFhirRequester<Patient, Immunization, Location, Practitioner, Observation, Person, Organization, RelatedPerson> {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
+	@Autowired
+	FhirSearchRequester fhirSearchRequester;
 
-	public List<PatientReported> searchPatientReportedList(SearchParameterMap searchParameterMap) {
-		List<PatientReported> patientReportedList = new ArrayList<>();
-		IBundleProvider bundleProvider = searchRegularRecord(PatientMapper.PATIENT, searchParameterMap);
-		if (!bundleProvider.isEmpty()) {
-			for (IBaseResource resource : bundleProvider.getAllResources()) {
-				patientReportedList
-						.add((PatientReported) allMappingService.localObjectReportedWithMaster((Patient) resource));
-			}
-		}
-		return patientReportedList;
-	}
-
-	public List<PatientMaster> searchPatientMasterGoldenList(SearchParameterMap searchParameterMap) {
-		List<PatientMaster> patientList = new ArrayList<>();
-		IBundleProvider bundleProvider = searchGoldenRecord(PatientMapper.Patient, searchParameterMap);
-		if (!bundleProvider.isEmpty()) {
-			for (IBaseResource resource : bundleProvider.getAllResources()) {
-				patientList.add((PatientMaster) allMappingService.localObject(resource));
-			}
-		}
-		return patientList;
-	}
 
 	public Organization searchOrganization(SearchParameterMap searchParameterMap) {
-		IBundleProvider bundleProvider = search("Organization", searchParameterMap);
+		IBundleProvider bundleProvider = fhirSearchRequester.search("Organization", searchParameterMap);
 		return (Organization) bundleProvider.getAllResources().stream().findFirst().orElse(null);
 	}
 
@@ -122,12 +102,12 @@ public class FhirRequesterR4 extends
 	// }
 
 	public ModelPerson searchPractitioner(SearchParameterMap searchParameterMap) {
-		return (ModelPerson) searchMappedObjectMaster(PractitionerMapper.PRACTITIONER, searchParameterMap);
+		return (ModelPerson) fhirSearchRequester.searchMappedObjectMaster(PractitionerMapper.PRACTITIONER, searchParameterMap);
 	}
 
 	public RelatedPerson searchRelatedPerson(SearchParameterMap searchParameterMap) {
 		RelatedPerson relatedPerson = null;
-		IBundleProvider bundleProvider = search(RelatedPerson.class, searchParameterMap);
+		IBundleProvider bundleProvider = fhirSearchRequester.search(RelatedPerson.class, searchParameterMap);
 		if (!bundleProvider.isEmpty()) {
 			relatedPerson = (RelatedPerson) bundleProvider.getResources(0, 1).get(0);
 		}
