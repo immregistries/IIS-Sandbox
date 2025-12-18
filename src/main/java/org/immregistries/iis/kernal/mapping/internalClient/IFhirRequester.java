@@ -9,6 +9,7 @@ import java.util.List;
 
 /**
  * Helping service to execute Queries alongside fhir mapping
+ * 
  * @param <Patient>
  * @param <Immunization>
  * @param <Location>
@@ -18,15 +19,7 @@ import java.util.List;
  * @param <Organization>
  * @param <RelatedPerson>
  */
-public interface IFhirRequester<
-	Patient extends IBaseResource,
-	Immunization extends IBaseResource,
-	Location extends IBaseResource,
-	Practitioner extends IBaseResource,
-	Observation extends IBaseResource,
-	Person extends IBaseResource,
-	Organization extends IBaseResource,
-	RelatedPerson extends IBaseResource> {
+public interface IFhirRequester<Patient extends IBaseResource, Immunization extends IBaseResource, Location extends IBaseResource, Practitioner extends IBaseResource, Observation extends IBaseResource, Person extends IBaseResource, Organization extends IBaseResource, RelatedPerson extends IBaseResource> {
 
 	PatientMaster searchPatientMaster(SearchParameterMap searchParameterMap);
 
@@ -44,7 +37,8 @@ public interface IFhirRequester<
 
 	List<VaccinationMaster> searchVaccinationMasterGoldenList(SearchParameterMap searchParameterMap);
 
-//	List<VaccinationMaster> searchVaccinationListOperationEverything(String patientId);
+	// List<VaccinationMaster> searchVaccinationListOperationEverything(String
+	// patientId);
 
 	ObservationReported searchObservationReported(SearchParameterMap searchParameterMap);
 
@@ -56,13 +50,14 @@ public interface IFhirRequester<
 
 	List<ObservationReported> searchObservationReportedList(SearchParameterMap searchParameterMap);
 
-//	List<ObservationMaster> searchObservationMasterList(SearchParameterMap searchParameterMap);
+	// List<ObservationMaster> searchObservationMasterList(SearchParameterMap
+	// searchParameterMap);
 
 	OrgLocation searchOrgLocation(SearchParameterMap searchParameterMap);
 
 	List<OrgLocation> searchOrgLocationList(SearchParameterMap searchParameterMap);
 
-	ModelPerson searchPerson(SearchParameterMap searchParameterMap);
+	// ModelPerson searchPerson(SearchParameterMap searchParameterMap);
 
 	ModelPerson searchPractitioner(SearchParameterMap searchParameterMap);
 
@@ -101,6 +96,5 @@ public interface IFhirRequester<
 	List<VaccinationReported> searchVaccinationReportedFromGoldenIdWithMdmLinks(String vaccinationMasterId);
 
 	VaccinationMaster readVaccinationMasterWithMdmLink(String vaccinationReportedId);
-
 
 }

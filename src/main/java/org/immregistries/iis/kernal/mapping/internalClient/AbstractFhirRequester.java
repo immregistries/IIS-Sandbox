@@ -49,8 +49,8 @@ public abstract class AbstractFhirRequester<Patient extends IBaseResource, Immun
 	PractitionerMapper<Practitioner> practitionerMapper;
 	@Autowired
 	ObservationMapper<Observation> observationMapper;
-	@Autowired
-	PersonMapper<Person> personMapper;
+
+
 	// @Autowired
 	// RelatedPersonMapper<RelatedPerson> relatedPersonMapper;
 

@@ -208,14 +208,14 @@ public class FhirRequesterR5 extends AbstractFhirRequester<Patient, Immunization
 		return locationList;
 	}
 
-	public ModelPerson searchPerson(SearchParameterMap searchParameterMap) {
-		ModelPerson modelPerson = null;
-		IBundleProvider bundleProvider = search(Person.class, searchParameterMap);
-		if (!bundleProvider.isEmpty()) {
-			modelPerson = personMapper.localObject((Person) bundleProvider.getResources(0, 1).get(0));
-		}
-		return modelPerson;
-	}
+//	public ModelPerson searchPerson(SearchParameterMap searchParameterMap) {
+//		ModelPerson modelPerson = null;
+//		IBundleProvider bundleProvider = search(Person.class, searchParameterMap);
+//		if (!bundleProvider.isEmpty()) {
+//			modelPerson = personMapper.localObject((Person) bundleProvider.getResources(0, 1).get(0));
+//		}
+//		return modelPerson;
+//	}
 
 	public ModelPerson searchPractitioner(SearchParameterMap searchParameterMap) {
 		ModelPerson modelPerson = null;

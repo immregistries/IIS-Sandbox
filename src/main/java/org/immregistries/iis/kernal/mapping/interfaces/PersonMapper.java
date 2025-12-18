@@ -3,7 +3,13 @@ package org.immregistries.iis.kernal.mapping.interfaces;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.immregistries.iis.kernal.model.ModelPerson;
 
-public interface PersonMapper<Person extends IBaseResource> extends IisFhirMapperMaster<ModelPerson, Person> {
+/**
+ * Retired and deprecated
+ * @param <Person>
+ */
+public interface PersonMapper<Person extends IBaseResource>
+//	extends IisFhirMapperMaster<ModelPerson, Person>
+{
 	default String fhirType() {
 		return "Person";
 	}
