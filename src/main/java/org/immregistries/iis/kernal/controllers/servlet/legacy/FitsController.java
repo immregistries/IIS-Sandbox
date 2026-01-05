@@ -9,7 +9,6 @@ import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.controllers.rest.CodeMapRestController;
 import org.immregistries.iis.kernal.controllers.rest.FitsExampleRestController;
 import org.immregistries.iis.kernal.controllers.servlet.TenantController;
-import org.immregistries.iis.kernal.logic.FitsExamples;
 import org.immregistries.vfa.connect.IISConnector;
 import org.immregistries.vfa.connect.IISConnector.ParseDebugLine;
 import org.immregistries.vfa.connect.model.*;
