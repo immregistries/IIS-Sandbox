@@ -6,11 +6,10 @@ import org.hl7.fhir.r4.model.*;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
-import org.immregistries.iis.kernal.logic.CodeMapManager;
+import org.immregistries.iis.kernal.logic.CodeMapManagerService;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
 import org.immregistries.iis.kernal.mapping.interfaces.PatientMapper;
 import org.immregistries.iis.kernal.mapping.internalClient.FhirReadRequester;
-import org.immregistries.iis.kernal.mapping.internalClient.FhirRequesterR4;
 import org.immregistries.iis.kernal.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,6 +35,8 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 
 	@Autowired
 	private FhirReadRequester fhirReadRequester;
+	@Autowired
+	CodeMapManagerService codeMapManagerService;
 
 	public PatientReported localObjectReportedWithMaster(Patient p) {
 		PatientReported patientReported = localObjectReported(p);
@@ -353,7 +354,7 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 			for (String value : pm.getRaces()) {
 				if (StringUtils.isNotBlank(value)) {
 					Coding coding = new Coding().setCode(value).setSystem(RACE_SYSTEM);
-					Code code = CodeMapManager.getCodeMap().getCodeForCodeset(CodesetType.PATIENT_RACE, value);
+					Code code = codeMapManagerService.getCodeMap().getCodeForCodeset(CodesetType.PATIENT_RACE, value);
 					/*
 					 * Added to OMB extension if code recognised
 					 * TODO make sure this is using the right codeset
@@ -376,7 +377,7 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 			Extension ethnicityExtension = p.addExtension().setUrl(ETHNICITY_EXTENSION);
 			if (StringUtils.isNotBlank(pm.getEthnicity())) {
 				Coding coding = new Coding().setCode(pm.getEthnicity()).setSystem(ETHNICITY_SYSTEM);
-				Code code = CodeMapManager.getCodeMap().getCodeForCodeset(CodesetType.PATIENT_ETHNICITY, pm.getEthnicity());
+				Code code = codeMapManagerService.getCodeMap().getCodeForCodeset(CodesetType.PATIENT_ETHNICITY, pm.getEthnicity());
 				/*
 				 * Added to OMB extension if code recognised
 				 */
@@ -480,7 +481,7 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 			contact.setName(patientGuardian.getName().toR4());
 			if (StringUtils.isNotBlank(patientGuardian.getGuardianRelationship())) {
 				Coding coding = new Coding().setSystem(RELATIONSHIP_SYSTEM).setCode(patientGuardian.getGuardianRelationship());
-				Code code = CodeMapManager.getCodeMap().getCodeForCodeset(CodesetType.PERSON_RELATIONSHIP, patientGuardian.getGuardianRelationship());
+				Code code = codeMapManagerService.getCodeMap().getCodeForCodeset(CodesetType.PERSON_RELATIONSHIP, patientGuardian.getGuardianRelationship());
 				if (code != null) {
 					coding.setDisplay(code.getLabel());
 					contact.addRelationship()

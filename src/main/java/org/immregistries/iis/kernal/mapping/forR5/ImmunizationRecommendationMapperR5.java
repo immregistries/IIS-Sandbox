@@ -9,12 +9,13 @@ import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR5Condition;
-import org.immregistries.iis.kernal.logic.CodeMapManager;
+import org.immregistries.iis.kernal.logic.CodeMapManagerService;
 import org.immregistries.iis.kernal.logic.VaccinationRecommendationDateCode;
 import org.immregistries.iis.kernal.logic.VaccinePlanStatus;
 import org.immregistries.iis.kernal.mapping.interfaces.IRecommendationMapper;
 import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.vfa.connect.model.ForecastActual;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +28,9 @@ import static org.immregistries.iis.kernal.mapping.interfaces.ImmunizationMapper
 @Conditional(OnR5Condition.class)
 public class ImmunizationRecommendationMapperR5 implements IRecommendationMapper {
 
+	@Autowired
+	private CodeMapManagerService codeMapManagerService;
+
 	public ImmunizationRecommendation toFhir(List<ForecastActual> forecastActualList, Date date, PatientMaster patientMaster) {
 		ImmunizationRecommendation immunizationRecommendation = toFhir(forecastActualList, date);
 		immunizationRecommendation.setPatient(new Reference().setIdentifier(patientMaster.getMainBusinessIdentifier().toR5()));
@@ -37,7 +41,7 @@ public class ImmunizationRecommendationMapperR5 implements IRecommendationMapper
 		if (forecastActualList == null) {
 			return null;
 		}
-		CodeMap codeMap = CodeMapManager.getCodeMap();
+		CodeMap codeMap = codeMapManagerService.getCodeMap();
 		ImmunizationRecommendation immunizationRecommendation = new ImmunizationRecommendation();
 		immunizationRecommendation.setDate(date);
 		for (ForecastActual forecastActual : forecastActualList) {

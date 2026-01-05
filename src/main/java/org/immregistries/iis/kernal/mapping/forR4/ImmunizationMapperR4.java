@@ -7,7 +7,7 @@ import org.hl7.fhir.r4.model.*;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
-import org.immregistries.iis.kernal.logic.CodeMapManager;
+import org.immregistries.iis.kernal.logic.CodeMapManagerService;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
 import org.immregistries.iis.kernal.mapping.interfaces.ImmunizationMapper;
 import org.immregistries.iis.kernal.mapping.internalClient.FhirReadRequester;
@@ -33,6 +33,8 @@ public class ImmunizationMapperR4 implements ImmunizationMapper<Immunization> {
 	private FhirReadRequester fhirReadRequester;
 	@Autowired
 	private FhirSearchRequester fhirSearchRequester;
+	@Autowired
+	private CodeMapManagerService codeMapManagerService;
 	
 
 	public VaccinationReported localObjectReportedWithMaster(Immunization i) {
@@ -358,7 +360,7 @@ public class ImmunizationMapperR4 implements ImmunizationMapper<Immunization> {
 		 */
 		if (vr.getRefusalReasonCode() != null) {
 			Coding coding = new Coding().setSystem(REFUSAL_REASON_CODE).setCode(vr.getRefusalReasonCode());
-			Code code = CodeMapManager.getCodeMap().getCodeForCodeset(CodesetType.VACCINATION_REFUSAL, vr.getRefusalReasonCode());
+			Code code = codeMapManagerService.getCodeMap().getCodeForCodeset(CodesetType.VACCINATION_REFUSAL, vr.getRefusalReasonCode());
 			if (code != null) {
 				coding.setDisplay(code.getLabel());
 			}
@@ -370,7 +372,7 @@ public class ImmunizationMapperR4 implements ImmunizationMapper<Immunization> {
 		 */
 		if (vr.getBodySite() != null) {
 			Coding coding = new Coding().setSystem(BODY_PART_SITE_SYSTEM).setCode(vr.getBodySite());
-			Code code = CodeMapManager.getCodeMap().getCodeForCodeset(CodesetType.BODY_SITE, vr.getBodySite());
+			Code code = codeMapManagerService.getCodeMap().getCodeForCodeset(CodesetType.BODY_SITE, vr.getBodySite());
 			if (code != null) {
 				coding.setDisplay(code.getLabel());
 			}
@@ -381,7 +383,7 @@ public class ImmunizationMapperR4 implements ImmunizationMapper<Immunization> {
 		 */
 		if (vr.getBodyRoute() != null) {
 			Coding coding = new Coding().setSystem(BODY_ROUTE_SYSTEM).setCode(vr.getBodyRoute());
-			Code code = CodeMapManager.getCodeMap().getCodeForCodeset(CodesetType.BODY_ROUTE, vr.getBodyRoute());
+			Code code = codeMapManagerService.getCodeMap().getCodeForCodeset(CodesetType.BODY_ROUTE, vr.getBodyRoute());
 			if (code != null) {
 				coding.setDisplay(code.getLabel());
 			}
@@ -392,7 +394,7 @@ public class ImmunizationMapperR4 implements ImmunizationMapper<Immunization> {
 		 */
 		if (StringUtils.isNotBlank(vr.getFundingSource())) {
 			Coding coding = new Coding().setSystem(FUNDING_SOURCE_SYSTEM).setCode(vr.getFundingSource());
-			Code code = CodeMapManager.getCodeMap().getCodeForCodeset(CodesetType.VACCINATION_FUNDING_SOURCE, vr.getFundingSource());
+			Code code = codeMapManagerService.getCodeMap().getCodeForCodeset(CodesetType.VACCINATION_FUNDING_SOURCE, vr.getFundingSource());
 			if (code != null) {
 				coding.setDisplay(code.getLabel());
 			}
@@ -403,7 +405,7 @@ public class ImmunizationMapperR4 implements ImmunizationMapper<Immunization> {
 		 */
 		if (StringUtils.isNotBlank(vr.getFundingEligibility())) {
 			Coding coding = new Coding().setSystem(FUNDING_ELIGIBILITY).setCode(vr.getFundingEligibility());
-			Code code = CodeMapManager.getCodeMap().getCodeForCodeset(CodesetType.FINANCIAL_STATUS_CODE, vr.getFundingEligibility());
+			Code code = codeMapManagerService.getCodeMap().getCodeForCodeset(CodesetType.FINANCIAL_STATUS_CODE, vr.getFundingEligibility());
 			if (code != null) {
 				coding.setDisplay(code.getLabel());
 			}
@@ -420,7 +422,7 @@ public class ImmunizationMapperR4 implements ImmunizationMapper<Immunization> {
 		 */
 		if (vr.getInformationSource() != null) {
 			Coding coding = new Coding().setSystem(INFORMATION_SOURCE).setCode(vr.getInformationSource());
-			Code code = CodeMapManager.getCodeMap().getCodeForCodeset(CodesetType.VACCINATION_INFORMATION_SOURCE, vr.getInformationSource());
+			Code code = codeMapManagerService.getCodeMap().getCodeForCodeset(CodesetType.VACCINATION_INFORMATION_SOURCE, vr.getInformationSource());
 			if (code != null) {
 				coding.setDisplay(code.getLabel());
 			}

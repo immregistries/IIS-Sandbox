@@ -5,7 +5,7 @@ import org.hl7.fhir.exceptions.FHIRException;
 import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
-import org.immregistries.iis.kernal.logic.CodeMapManager;
+import org.immregistries.iis.kernal.logic.CodeMapManagerService;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
 
 import java.util.Objects;
@@ -36,6 +36,10 @@ public class ModelPhone extends AbstractDiffable<ModelPhone> {
 	}
 
 
+	/**
+	 * TODO move those methods
+	 * @return
+	 */
 	public org.hl7.fhir.r4.model.ContactPoint toR4() {
 		org.hl7.fhir.r4.model.ContactPoint contactPoint = new org.hl7.fhir.r4.model.ContactPoint();
 		contactPoint.setSystem(org.hl7.fhir.r4.model.ContactPoint.ContactPointSystem.PHONE)
@@ -45,7 +49,7 @@ public class ModelPhone extends AbstractDiffable<ModelPhone> {
 			try {
 				contactPoint.setUse(org.hl7.fhir.r4.model.ContactPoint.ContactPointUse.fromCode(use));
 			} catch (FHIRException ignored) {
-				CodeMap codeMap = CodeMapManager.getCodeMap();
+				CodeMap codeMap = CodeMapManagerService.get().getCodeMap();
 				Code useCode = codeMap.getCodeForCodeset(CodesetType.TELECOMMUNICATION_USE, use);
 				if (useCode != null) {
 					contactPoint.addExtension(USE_EXTENSION_URL, new org.hl7.fhir.r4.model.Coding().setSystem(PHONE_USE_V2_SYSTEM).setCode(use));
@@ -83,7 +87,7 @@ public class ModelPhone extends AbstractDiffable<ModelPhone> {
 			try {
 				contactPoint.setUse(org.hl7.fhir.r5.model.ContactPoint.ContactPointUse.fromCode(use));
 			} catch (FHIRException ignored) {
-				CodeMap codeMap = CodeMapManager.getCodeMap();
+				CodeMap codeMap = CodeMapManagerService.get().getCodeMap();
 				Code useCode = codeMap.getCodeForCodeset(CodesetType.TELECOMMUNICATION_USE, use);
 				if (useCode != null) {
 					contactPoint.addExtension(USE_EXTENSION_URL, new org.hl7.fhir.r5.model.Coding().setSystem(PHONE_USE_V2_SYSTEM).setCode(use));

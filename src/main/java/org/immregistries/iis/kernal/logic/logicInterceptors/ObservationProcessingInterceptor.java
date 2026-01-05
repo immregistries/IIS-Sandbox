@@ -9,7 +9,7 @@ import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
-import org.immregistries.iis.kernal.logic.CodeMapManager;
+import org.immregistries.iis.kernal.logic.CodeMapManagerService;
 import org.immregistries.iis.kernal.logic.ProcessingException;
 import org.immregistries.iis.kernal.logic.ack.IisReportable;
 import org.immregistries.iis.kernal.logic.ack.IisReportableSeverity;
@@ -37,6 +37,8 @@ public class ObservationProcessingInterceptor extends AbstractLogicInterceptor {
 	public static final String PATIENT_BIRTH_DATE = "patientBirthDate";
 	@Autowired
 	private ObservationMapper observationMapper;
+	@Autowired
+	private CodeMapManagerService codeMapManagerService;
 
 	@Hook(value = SERVER_INCOMING_REQUEST_PRE_HANDLED, order = 2001)
 	public void handle(RequestDetails requestDetails) throws InvalidRequestException, ProcessingException {
@@ -68,7 +70,7 @@ public class ObservationProcessingInterceptor extends AbstractLogicInterceptor {
 		testMapping(observationMapper, observationReported);
 		if ("30945-0".equals(observationReported.getIdentifierCode())) // contraindication!
 		{
-			CodeMap codeMap = CodeMapManager.getCodeMap();
+			CodeMap codeMap = codeMapManagerService.getCodeMap();
 			Code contraCode = codeMap.getCodeForCodeset(CodesetType.CONTRAINDICATION_OR_PRECAUTION, observationReported.getValueCode());
 			if (contraCode == null) {
 				ProcessingException pe = new ProcessingException("Unrecognized contraindication or precaution", "OBX", obxCount, 5, IisReportableSeverity.WARN);

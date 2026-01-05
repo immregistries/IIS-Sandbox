@@ -11,7 +11,7 @@ import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
-import org.immregistries.iis.kernal.logic.CodeMapManager;
+import org.immregistries.iis.kernal.logic.CodeMapManagerService;
 import org.immregistries.iis.kernal.logic.ProcessingException;
 import org.immregistries.iis.kernal.logic.ack.IisReportable;
 import org.immregistries.iis.kernal.logic.ack.IisReportableSeverity;
@@ -39,6 +39,8 @@ public class ImmunizationProcessingInterceptor extends AbstractLogicInterceptor 
 	@Autowired
 	private ImmunizationMapper immunizationMapper;
 	@Autowired
+	private CodeMapManagerService codeMapManagerService;
+	@Autowired
 	private FhirContext fhirContext;
 	private Random random = new Random();
 
@@ -64,7 +66,7 @@ public class ImmunizationProcessingInterceptor extends AbstractLogicInterceptor 
 
 	public VaccinationReported processAndValidateVaccinationReported(VaccinationReported vaccinationReported, List<IisReportable> iisReportableList, Set<ProcessingFlavor> processingFlavorSet, int fundingSourceObxCount, int fundingEligibilityObxCount, int rxaCount, String vaccineCptCode) throws ProcessingException {
 		testMapping(immunizationMapper, vaccinationReported);
-		CodeMap codeMap = CodeMapManager.getCodeMap();
+		CodeMap codeMap = codeMapManagerService.getCodeMap();
 
 		Date administrationDate = vaccinationReported.getAdministeredDate();
 		if (administrationDate.after(new Date()) && !processingFlavorSet.contains(ProcessingFlavor.MANDARINE)) {
@@ -111,8 +113,8 @@ public class ImmunizationProcessingInterceptor extends AbstractLogicInterceptor 
 		return vaccinationReported;
 	}
 
-	private static VaccinationReported processNdcAndCvx(VaccinationReported vaccinationReported, List<IisReportable> iisReportableList, Set<ProcessingFlavor> processingFlavorSet, int rxaCount, String vaccineCptCode) throws ProcessingException {
-		CodeMap codeMap = CodeMapManager.getCodeMap();
+	private VaccinationReported processNdcAndCvx(VaccinationReported vaccinationReported, List<IisReportable> iisReportableList, Set<ProcessingFlavor> processingFlavorSet, int rxaCount, String vaccineCptCode) throws ProcessingException {
+		CodeMap codeMap = codeMapManagerService.getCodeMap();
 		String vaccineNdcCode = vaccinationReported.getVaccineNdcCode();
 		String vaccineCvxCode = vaccinationReported.getVaccineCvxCode();
 		{

@@ -1,11 +1,11 @@
 package org.immregistries.iis.kernal.controllers.rest;
 
-import jakarta.servlet.http.HttpServletRequest;
 import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.controllers.filters.RestTenantUrlFilter;
-import org.immregistries.iis.kernal.logic.CodeMapManager;
+import org.immregistries.iis.kernal.logic.CodeMapManagerService;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
@@ -16,11 +16,13 @@ public class CodeMapRestController {
 
 	public static final String CODEMAPS_PATH_KEY = "codemaps";
 	public static final String CODEMAPS_PATH_SUFFIX = "/" + CODEMAPS_PATH_KEY;
+	@Autowired
+	CodeMapManagerService codeMapManagerService;
 
 	@GetMapping
     public CodeMap getCodeMaps(
             @RequestAttribute(RestTenantUrlFilter.TENANT_REQUEST_ATTRIBUTE) Tenant tenant) {
-        return CodeMapManager.getCodeMap();
+        return codeMapManagerService.getCodeMap();
     }
 
     @GetMapping("/search")
@@ -28,6 +30,6 @@ public class CodeMapRestController {
             @RequestParam(name = "tableName") String tableName,
             @RequestAttribute(RestTenantUrlFilter.TENANT_REQUEST_ATTRIBUTE) Tenant tenant) {
         CodesetType codesetType = CodesetType.valueOf(tableName);
-        return CodeMapManager.getCodeMap().getCodesForTable(codesetType);
+        return codeMapManagerService.getCodeMap().getCodesForTable(codesetType);
     }
 }

@@ -9,7 +9,7 @@ import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
-import org.immregistries.iis.kernal.logic.CodeMapManager;
+import org.immregistries.iis.kernal.logic.CodeMapManagerService;
 import org.immregistries.iis.kernal.mapping.interfaces.IImmunizationEvaluationMapper;
 import org.immregistries.iis.kernal.model.VaccinationMaster;
 import org.immregistries.vfa.connect.model.EvaluationActual;
@@ -29,9 +29,11 @@ public class ImmunizationEvaluationMapperR4 implements IImmunizationEvaluationMa
 
 	@Autowired
 	private ImmunizationMapperR4 immunizationMapperR4;
+	@Autowired
+	private CodeMapManagerService codeMapManagerService;
 
 	public ImmunizationEvaluation toFhir(VaccinationMaster vaccinationMaster, Date date) {
-		CodeMap codeMap = CodeMapManager.getCodeMap();
+		CodeMap codeMap = codeMapManagerService.getCodeMap();
 		ImmunizationEvaluation immunizationEvaluation = new ImmunizationEvaluation();
 		if (vaccinationMaster.getPatientReported() != null) {
 			immunizationEvaluation.setPatient(new Reference().setIdentifier(vaccinationMaster.getPatientReported().getMainBusinessIdentifier().toR4()));

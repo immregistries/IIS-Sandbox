@@ -12,7 +12,6 @@ import org.immregistries.iis.kernal.controllers.filters.FilterRegistrationConfig
 import org.immregistries.iis.kernal.fhir.common.annotations.OnEitherVersion;
 import org.immregistries.iis.kernal.fhir.mdm.MdmConfig;
 import org.immregistries.iis.kernal.fhir.security.ServerSecurityConfig;
-import org.immregistries.iis.kernal.logic.CodeMapManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.boot.SpringApplication;
@@ -62,7 +61,6 @@ public class Application extends SpringBootServletInitializer {
 	AutowireCapableBeanFactory beanFactory;
 
 	public static void main(String[] args) {
-		CodeMapManager.getCodeMap(); // Initializes codemaps
 		SpringApplication.run(Application.class, args);
 
 		// Server is now accessible at eg. http://localhost:8080/fhir/metadata

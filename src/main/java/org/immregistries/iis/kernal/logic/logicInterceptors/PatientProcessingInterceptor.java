@@ -12,7 +12,7 @@ import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodeStatusValue;
 import org.immregistries.codebase.client.reference.CodesetType;
-import org.immregistries.iis.kernal.logic.CodeMapManager;
+import org.immregistries.iis.kernal.logic.CodeMapManagerService;
 import org.immregistries.iis.kernal.logic.ProcessingException;
 import org.immregistries.iis.kernal.logic.ValidValues;
 import org.immregistries.iis.kernal.logic.ack.IisReportable;
@@ -43,6 +43,8 @@ public class PatientProcessingInterceptor extends AbstractLogicInterceptor {
 	private PatientMapper patientMapper;
 	@Autowired
 	private FhirContext fhirContext;
+	@Autowired
+	private CodeMapManagerService codeMapManagerService;
 
 	@Hook(value = SERVER_INCOMING_REQUEST_PRE_HANDLED, order = 2000)
 	public void handle(RequestDetails requestDetails) throws InvalidRequestException, ProcessingException {
@@ -239,8 +241,8 @@ public class PatientProcessingInterceptor extends AbstractLogicInterceptor {
 		}
 	}
 
-	public static void agnosticValidation(PatientReported patientReported, List<IisReportable> iisReportableList, Set<ProcessingFlavor> processingFlavorSet) throws ProcessingException {
-		CodeMap codeMap = CodeMapManager.getCodeMap();
+	public void agnosticValidation(PatientReported patientReported, List<IisReportable> iisReportableList, Set<ProcessingFlavor> processingFlavorSet) throws ProcessingException {
+		CodeMap codeMap = codeMapManagerService.getCodeMap();
 		{
 			String patientSex = patientReported.getSex();
 			if (!ValidValues.verifyValidValue(patientSex, ValidValues.SEX)) {

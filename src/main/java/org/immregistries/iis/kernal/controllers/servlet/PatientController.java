@@ -12,17 +12,13 @@ import org.hl7.fhir.instance.model.api.IBaseBundle;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.instance.model.api.IDomainResource;
 import org.hl7.fhir.r5.model.Bundle;
-import org.immregistries.iis.kernal.controllers.rest.MessageRestController;
-import org.immregistries.iis.kernal.controllers.rest.PatientRestController;
-import org.immregistries.iis.kernal.controllers.rest.RestUrlUtil;
-import org.immregistries.iis.kernal.controllers.rest.SubscriptionRestController;
+import org.immregistries.iis.kernal.controllers.rest.*;
 import org.immregistries.iis.kernal.controllers.servlet.shlink.ShLinkController;
 import org.immregistries.iis.kernal.controllers.servlet.util.UiQrCodeUtil;
 import org.immregistries.iis.kernal.controllers.servlet.util.UiUtil;
 import org.immregistries.iis.kernal.controllers.servlet.util.UrlTenantUtil;
 import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.fhir.shl.ShLinkPayload;
-import org.immregistries.iis.kernal.logic.shlink.ShLinkUtilService;
 import org.immregistries.iis.kernal.mapping.interfaces.PatientMapper;
 import org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester;
 import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
@@ -79,6 +75,8 @@ public class PatientController {
 
 	@Autowired
 	private MessageRestController messageRestController;
+	@Autowired
+	CodeMapRestController codeMapRestController;
 
 	@PostMapping
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp
@@ -260,7 +258,7 @@ public class PatientController {
 		List<VaccinationMaster> vaccinationList = patientRestController
 			.getPatientVaccination(patientMasterSelected.getPatientId(), tenant, isGolden, req);
 		out.println("<h4>Vaccinations</h4>");
-		VaccinationController.printVaccinationList(out, vaccinationList, null); // TODO test and change
+		VaccinationController.printVaccinationList(out, vaccinationList, null, codeMapRestController.getCodeMaps(tenant)); // TODO test and change
 	}
 
 	private void printPatientObservations(PrintWriter out, PatientMaster patientMasterSelected, boolean isGolden,

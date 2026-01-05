@@ -28,6 +28,8 @@ public abstract class IncomingMessageHandler<ParsedSource, ValidationResult> imp
 	ValidationService validationService;
 	@Autowired
 	MessageRecordingService messageRecordingService;
+	@Autowired
+	private CodeMapManagerService codeMapManagerService;
 
 	@Override
 	public String process(String message, Tenant tenant, String sendingFacilityName) {
@@ -87,7 +89,7 @@ public abstract class IncomingMessageHandler<ParsedSource, ValidationResult> imp
 		ValidationResult validationResult = validation(message, iisReportableList);
 
 		try {
-			CodeMap codeMap = CodeMapManager.getCodeMap();
+			CodeMap codeMap = codeMapManagerService.getCodeMap();
 			boolean strictDate = !processingFlavorSet.contains(ProcessingFlavor.CANTALOUPE);
 			PatientReported patientReported = processPatient(tenant, parsedSource, iisReportableList, processingFlavorSet, codeMap, strictDate, managingOrganizationId);
 

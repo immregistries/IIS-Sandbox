@@ -15,14 +15,8 @@ import org.immregistries.iis.kernal.logic.ack.*;
 import org.immregistries.iis.kernal.logic.logicInterceptors.ImmunizationProcessingInterceptor;
 import org.immregistries.iis.kernal.logic.logicInterceptors.ObservationProcessingInterceptor;
 import org.immregistries.iis.kernal.logic.logicInterceptors.PatientProcessingInterceptor;
-import org.immregistries.iis.kernal.mapping.interfaces.ImmunizationMapper;
-import org.immregistries.iis.kernal.mapping.interfaces.LocationMapper;
-import org.immregistries.iis.kernal.mapping.interfaces.ObservationMapper;
-import org.immregistries.iis.kernal.mapping.interfaces.PatientMapper;
 import org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester;
-import org.immregistries.iis.kernal.mapping.internalClient.FhirReadRequester;
 import org.immregistries.iis.kernal.mapping.internalClient.FhirSearchRequester;
-import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
 import org.immregistries.iis.kernal.model.*;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.immregistries.mqe.validator.MqeMessageServiceResponse;
@@ -69,6 +63,8 @@ public abstract class V2IncomingMessageHandler extends IncomingMessageHandler<HL
 
 	@Autowired
 	MessageRecordingService messageRecordingService;
+	@Autowired
+	private CodeMapManagerService codeMapManagerService;
 
 
 	public V2IncomingMessageHandler() {
@@ -254,7 +250,7 @@ public abstract class V2IncomingMessageHandler extends IncomingMessageHandler<HL
 		List<IisReportable> iisReportableList = new ArrayList<>();
 		Set<ProcessingFlavor> processingFlavorSet = tenant.getProcessingFlavorSet();
 		try {
-			CodeMap codeMap = CodeMapManager.getCodeMap();
+			CodeMap codeMap = codeMapManagerService.getCodeMap();
 
 			boolean strictDate = !processingFlavorSet.contains(ProcessingFlavor.CANTALOUPE);
 			PatientReported patientReported = processPatient(tenant, reader, iisReportableList, processingFlavorSet, codeMap, strictDate, managingOrganizationId);

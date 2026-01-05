@@ -14,10 +14,10 @@ import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
+import org.immregistries.iis.kernal.controllers.rest.CodeMapRestController;
 import org.immregistries.iis.kernal.controllers.rest.PatientRestController;
 import org.immregistries.iis.kernal.controllers.rest.VaccinationRestController;
 import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
-import org.immregistries.iis.kernal.logic.CodeMapManager;
 import org.immregistries.iis.kernal.mapping.interfaces.ImmunizationMapper;
 import org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester;
 import org.immregistries.iis.kernal.mapping.internalClient.FhirSearchRequester;
@@ -67,6 +67,9 @@ public class VaccinationController {
 	PatientRestController patientRestController;
 	@Autowired
 	FhirSearchRequester fhirSearchRequester;
+	@Autowired
+	CodeMapRestController codeMapRestController;
+	
 
 	@PostMapping
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp
@@ -104,7 +107,7 @@ public class VaccinationController {
 			String action = req.getParameter(PARAM_ACTION);
 			if (action != null) {
 			}
-			CodeMap codeMap = CodeMapManager.getCodeMap();
+			CodeMap codeMap = codeMapRestController.getCodeMaps(tenant);
 			String cvxPrint = "Unknown CVX";
 			if (!StringUtils.isEmpty(vaccination.getVaccineCvxCode())) {
 				Code cvxCode = codeMap.getCodeForCodeset(CodesetType.VACCINATION_CVX_CODE,
@@ -200,7 +203,7 @@ public class VaccinationController {
 				{
 					List< ? extends VaccinationMaster> relatedVaccinations = vaccinationRestController.getRelatedVaccinations(vaccination.getVaccinationId(), tenant, AbstractFhirRequester.isGoldenRecord(immunizationResource));
 					out.println("<h4>Related Vaccination Records</h4>");
-					printVaccinationList(out, relatedVaccinations, tenant);
+					printVaccinationList(out, relatedVaccinations, tenant, codeMap);
 					UiUtil.printGoldenRecordExplanation(out, immunizationResource);
 				}
 
@@ -287,13 +290,12 @@ public class VaccinationController {
 		return immunization;
 	}
 
-	public static void printVaccinationList(PrintWriter out, List<? extends VaccinationMaster> vaccinationList, Tenant tenant) {
+	public static void printVaccinationList(PrintWriter out, List<? extends VaccinationMaster> vaccinationList, Tenant tenant, CodeMap codeMap) {
 		SimpleDateFormat sdfDate = new SimpleDateFormat("MM/dd/yyyy");
 
 		if (vaccinationList.isEmpty()) {
 			out.println("<div class=\"w3-panel w3-yellow\"><p>No Vaccinations</p></div>");
 		} else {
-			CodeMap codeMap = CodeMapManager.getCodeMap();
 			out.println(
 					"<table class=\"w3-table w3-bordered w3-striped w3-border test w3-hoverable\">");
 			out.println("  <tr class=\"w3-green\">");

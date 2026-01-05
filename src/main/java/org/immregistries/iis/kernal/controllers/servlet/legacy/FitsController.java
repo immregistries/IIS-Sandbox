@@ -6,13 +6,14 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
+import org.immregistries.iis.kernal.controllers.rest.CodeMapRestController;
 import org.immregistries.iis.kernal.controllers.servlet.TenantController;
-import org.immregistries.iis.kernal.logic.CodeMapManager;
 import org.immregistries.iis.kernal.logic.FitsExamples;
 import org.immregistries.vfa.connect.IISConnector;
 import org.immregistries.vfa.connect.IISConnector.ParseDebugLine;
 import org.immregistries.vfa.connect.model.*;
 import org.immregistries.vfa.connect.util.ForecastResultPrinter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,6 +35,8 @@ public class FitsController {
 	public static final String MESSAGE_NAME = "messageName";
 	public static final String EXAMPLE_NAME = "exampleName";
 
+	@Autowired
+	private CodeMapRestController codeMapRestController;
 
 	@GetMapping
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -159,7 +162,7 @@ public class FitsController {
 				out.println("  <th>Count</th>");
 				out.println("  <th>Vaccine Group</th>");
 				out.println("</tr>");
-				CodeMap codeMap = CodeMapManager.getCodeMap();
+				CodeMap codeMap = codeMapRestController.getCodeMaps(null);
 				for (String familyMappingName : familyMappingNameList) {
 					if (familyMapping.get(familyMappingName).size() > 0) {
 						boolean first = true;

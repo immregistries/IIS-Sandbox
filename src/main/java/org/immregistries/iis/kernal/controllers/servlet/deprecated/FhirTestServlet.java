@@ -42,7 +42,7 @@ public class FhirTestServlet extends HttpServlet {
     // try {
     //
     // try {
-    // CodeMap codeMap = CodeMapManager.getCodeMap();
+    // CodeMap codeMap = codeMapService.getCodeMap();
     // FhirContext ctx = fhirSystemDao.getContext();
     // String format = req.getParameter(PARAM_FORMAT);
     // if (format == null) {

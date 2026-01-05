@@ -1,6 +1,5 @@
 package org.immregistries.iis.kernal.logic.messageHandling;
 
-import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
 import ca.uhn.fhir.rest.param.ReferenceParam;
 import org.apache.commons.lang3.StringUtils;
@@ -13,12 +12,8 @@ import org.immregistries.iis.kernal.logic.ack.IisHL7Util;
 import org.immregistries.iis.kernal.logic.ack.IisReportable;
 import org.immregistries.iis.kernal.logic.ack.IisReportableSeverity;
 import org.immregistries.iis.kernal.logic.ack.ReportableUtil;
-import org.immregistries.iis.kernal.mapping.interfaces.ImmunizationMapper;
-import org.immregistries.iis.kernal.mapping.interfaces.ObservationMapper;
 import org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester;
-import org.immregistries.iis.kernal.mapping.internalClient.FhirReadRequester;
 import org.immregistries.iis.kernal.mapping.internalClient.FhirSearchRequester;
-import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
 import org.immregistries.iis.kernal.model.*;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.immregistries.mqe.validator.MqeMessageServiceResponse;
@@ -50,6 +45,8 @@ public class IncomingQueryHandler {
 	AbstractHl7MessageWriter hl7MessageWriter;
 	@Autowired
 	ValidationService validationService;
+	@Autowired
+	private CodeMapManagerService codeMapManagerService;
 
 
 	@Autowired
@@ -155,7 +152,7 @@ public class IncomingQueryHandler {
 
 		StringBuilder sb = new StringBuilder();
 		String profileIdSubmitted = reader.getValue(21);
-		CodeMap codeMap = CodeMapManager.getCodeMap();
+		CodeMap codeMap = codeMapManagerService.getCodeMap();
 		String categoryResponse = NO_MATCH;
 		String profileId = RSP_Z33_NO_MATCH;
 		boolean sendBackForecast = true;
@@ -543,7 +540,7 @@ public class IncomingQueryHandler {
 	}
 
 	private void printRXR(VaccinationMaster vaccination, StringBuilder sb) {
-		CodeMap codeMap = CodeMapManager.getCodeMap();
+		CodeMap codeMap = codeMapManagerService.getCodeMap();
 		sb.append("RXR");
 		// RXR-1
 		sb.append("|");
@@ -556,7 +553,7 @@ public class IncomingQueryHandler {
 
 	private void printRXA(VaccinationMaster vaccination, StringBuilder sb, int obxSetId, Set<ProcessingFlavor> processingFlavorSet, Code cvxCode) {
 		SimpleDateFormat sdf = IIncomingMessageHandler.generateV2SDF();
-		CodeMap codeMap = CodeMapManager.getCodeMap();
+		CodeMap codeMap = codeMapManagerService.getCodeMap();
 
 		sb.append("RXA");
 		// RXA-1
@@ -665,7 +662,7 @@ public class IncomingQueryHandler {
 	}
 
 	public List<ForecastActual> doForecast(PatientMaster patient, List<VaccinationMaster> vaccinationMasterList, Tenant tenant, Date date) {
-		CodeMap codeMap = CodeMapManager.getCodeMap();
+		CodeMap codeMap = codeMapManagerService.getCodeMap();
 		List<ForecastActual> forecastActualList = null;
 		Set<ProcessingFlavor> processingFlavorSet = tenant.getProcessingFlavorSet();
 		try {

@@ -4,7 +4,7 @@ import org.hl7.fhir.r5.model.ImmunizationEvaluation;
 import org.hl7.fhir.r5.model.Reference;
 import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR5Condition;
-import org.immregistries.iis.kernal.logic.CodeMapManager;
+import org.immregistries.iis.kernal.logic.CodeMapManagerService;
 import org.immregistries.iis.kernal.mapping.interfaces.IImmunizationEvaluationMapper;
 import org.immregistries.iis.kernal.model.VaccinationMaster;
 import org.immregistries.vfa.connect.model.EvaluationActual;
@@ -23,9 +23,11 @@ public class ImmunizationEvaluationMapperR5 implements IImmunizationEvaluationMa
 
 	@Autowired
 	private ImmunizationMapperR5 immunizationMapperR5;
+	@Autowired
+	private CodeMapManagerService codeMapManagerService;
 
 	public ImmunizationEvaluation toFhir(VaccinationMaster vaccinationMaster, Date date) {
-		CodeMap codeMap = CodeMapManager.getCodeMap();
+		CodeMap codeMap = codeMapManagerService.getCodeMap();
 		ImmunizationEvaluation immunizationEvaluation = new ImmunizationEvaluation();
 		if (vaccinationMaster.getPatientReported() != null) {
 			immunizationEvaluation.setPatient(new Reference().setIdentifier(vaccinationMaster.getPatientReported().getMainBusinessIdentifier().toR5()));
