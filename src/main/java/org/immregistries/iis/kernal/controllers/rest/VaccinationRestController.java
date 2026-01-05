@@ -4,7 +4,6 @@ import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
 import ca.uhn.fhir.rest.param.ReferenceParam;
 import jakarta.servlet.http.HttpServletRequest;
 import org.immregistries.iis.kernal.controllers.filters.RestTenantUrlFilter;
-import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.model.VaccinationMaster;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -49,15 +48,14 @@ public class VaccinationRestController extends BaseTenantTiedRest {
     }
 
 	@GetMapping("/{vaccinationId}/related")
-	public List<? extends VaccinationMaster> getPatientRelatedPatients(
+	public List<? extends VaccinationMaster> getRelatedVaccinations(
 		@PathVariable("vaccinationId") String vaccinationId,
 		@RequestAttribute(RestTenantUrlFilter.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
 		@RequestParam(name = MDM_EXPAND_REST_PARAM, defaultValue = "false") boolean isGolden) {
 		ReferenceParam referenceParam = new ReferenceParam().setValue(vaccinationId);
 		referenceParam.setMdmExpand(isGolden);
 		if (isGolden) {
-			return fhirSearchRequester
-				.searchVaccinationReportedFromGoldenIdWithMdmLinks(vaccinationId);
+			return fhirSearchRequester.searchVaccinationReportedFromGoldenIdWithMdmLinks(vaccinationId);
 		} else {
 			VaccinationMaster goldenRecord = fhirReadRequester
 				.readVaccinationMasterWithMdmLink(vaccinationId);

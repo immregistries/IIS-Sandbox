@@ -3,7 +3,6 @@ package org.immregistries.iis.kernal.mapping.internalClient;
 import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.api.server.IBundleProvider;
-import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.gclient.ICriterion;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.r4.model.*;
@@ -21,7 +20,6 @@ import java.util.Date;
 import java.util.List;
 
 import static org.immregistries.iis.kernal.logic.IIncomingMessageHandler.MINIMAL_MATCHING_SCORE;
-import static org.immregistries.iis.kernal.mapping.interfaces.ImmunizationMapper.IMMUNIZATION;
 
 /**
  * DO NOT EDIT THE CONTENT OF THIS FILE
@@ -43,12 +41,10 @@ public class FhirRequesterR4 extends
 	@Autowired
 	FhirSearchRequester fhirSearchRequester;
 
-
 	public Organization searchOrganization(SearchParameterMap searchParameterMap) {
 		IBundleProvider bundleProvider = fhirSearchRequester.search("Organization", searchParameterMap);
 		return (Organization) bundleProvider.getAllResources().stream().findFirst().orElse(null);
 	}
-
 
 	public RelatedPerson searchRelatedPerson(SearchParameterMap searchParameterMap) {
 		RelatedPerson relatedPerson = null;
@@ -201,6 +197,5 @@ public class FhirRequesterR4 extends
 		}
 		return singleMatch;
 	}
-
 
 }

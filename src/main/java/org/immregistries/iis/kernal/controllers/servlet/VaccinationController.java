@@ -20,7 +20,6 @@ import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.logic.CodeMapManager;
 import org.immregistries.iis.kernal.mapping.interfaces.ImmunizationMapper;
 import org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester;
-import org.immregistries.iis.kernal.mapping.internalClient.FhirReadRequester;
 import org.immregistries.iis.kernal.mapping.internalClient.FhirSearchRequester;
 import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
 import org.immregistries.iis.kernal.model.*;
@@ -66,6 +65,8 @@ public class VaccinationController {
 	VaccinationRestController vaccinationRestController;
 	@Autowired
 	PatientRestController patientRestController;
+	@Autowired
+	FhirSearchRequester fhirSearchRequester;
 
 	@PostMapping
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp
@@ -120,7 +121,7 @@ public class VaccinationController {
 
 			out.println("<h2>Vaccination Record: " + cvxPrint + " " + sdfDate.format(vaccination.getAdministeredDate())
 					+ "</h2>");
-			PatientReported patientReportedSelected = (PatientReported) patientRestController.getPatient(vaccination.getPatientReportedId(), tenant)
+			PatientReported patientReportedSelected = (PatientReported) patientRestController.getPatient(vaccination.getPatientReportedId(), tenant);
 			{
 				out.println("<h4>Patient information</h4>");
 				PatientServletUtil.printPatient(out, patientReportedSelected);
@@ -197,7 +198,7 @@ public class VaccinationController {
 				}
 
 				{
-					List<? extends VaccinationMaster> relatedVaccinations = vaccinationRestController.getPatientRelatedPatients(vaccination.getVaccinationId(), tenant, AbstractFhirRequester.isGoldenRecord(immunizationResource));
+					List< ? extends VaccinationMaster> relatedVaccinations = vaccinationRestController.getRelatedVaccinations(vaccination.getVaccinationId(), tenant, AbstractFhirRequester.isGoldenRecord(immunizationResource));
 					out.println("<h4>Related Vaccination Records</h4>");
 					printVaccinationList(out, relatedVaccinations, tenant);
 					UiUtil.printGoldenRecordExplanation(out, immunizationResource);
@@ -286,7 +287,7 @@ public class VaccinationController {
 		return immunization;
 	}
 
-	public static void printVaccinationList(PrintWriter out, List<VaccinationMaster> vaccinationList, Tenant tenant) {
+	public static void printVaccinationList(PrintWriter out, List<? extends VaccinationMaster> vaccinationList, Tenant tenant) {
 		SimpleDateFormat sdfDate = new SimpleDateFormat("MM/dd/yyyy");
 
 		if (vaccinationList.isEmpty()) {
