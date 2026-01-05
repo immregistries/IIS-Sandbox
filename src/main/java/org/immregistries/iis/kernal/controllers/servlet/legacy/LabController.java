@@ -3,7 +3,7 @@ package org.immregistries.iis.kernal.controllers.servlet.legacy;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
+import org.immregistries.iis.kernal.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.controllers.servlet.TenantController;
 import org.immregistries.iis.kernal.controllers.servlet.util.UiUtil;
 import org.immregistries.mqe.hl7util.parser.HL7Reader;

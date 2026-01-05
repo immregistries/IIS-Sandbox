@@ -7,7 +7,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.hl7.fhir.r5.model.Group;
 import org.hl7.fhir.r5.model.Identifier;
 import org.hl7.fhir.r5.model.Parameters;
-import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
+import org.immregistries.iis.kernal.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.controllers.rest.GroupRestController;
 import org.immregistries.iis.kernal.controllers.servlet.util.UiUtil;
 import org.slf4j.Logger;

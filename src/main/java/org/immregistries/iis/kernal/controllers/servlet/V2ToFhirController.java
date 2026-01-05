@@ -11,7 +11,7 @@ import org.immregistries.iis.kernal.controllers.rest.PopRestController;
 import org.immregistries.iis.kernal.controllers.rest.V2ToFhirRestController;
 import org.immregistries.iis.kernal.controllers.servlet.util.UiUtil;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
-import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
+import org.immregistries.iis.kernal.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;

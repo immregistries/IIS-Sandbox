@@ -10,8 +10,8 @@ import jakarta.validation.constraints.NotNull;
 import org.apache.commons.lang3.StringUtils;
 import org.immregistries.iis.kernal.controllers.servlet.SoapDescriptionController;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
-import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
-import org.immregistries.iis.kernal.fhir.security.TenantUtil;
+import org.immregistries.iis.kernal.security.CurrentTenantUtil;
+import org.immregistries.iis.kernal.security.TenantUtil;
 import org.immregistries.iis.kernal.logic.BaseIISSOAPServer;
 import org.immregistries.iis.kernal.logic.messageHandling.FhirMessagingHandler;
 import org.immregistries.iis.kernal.logic.messageHandling.V2IncomingMessageHandler;
@@ -31,7 +31,7 @@ import java.io.PrintWriter;
 import static org.immregistries.iis.kernal.controllers.servlet.PopController.PARAM_FACILITY_NAME;
 import static org.immregistries.iis.kernal.controllers.servlet.PopController.PARAM_MESSAGE;
 import static org.immregistries.iis.kernal.controllers.servlet.TenantController.PATH_VARIABLE_TENANT_NAME;
-import static org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil.SESSION_REQUEST_TENANT;
+import static org.immregistries.iis.kernal.security.CurrentTenantUtil.SESSION_REQUEST_TENANT;
 
 @RestController
 @RequestMapping({"/rest/fhirMessaging", "/rest/tenant/{tenantId}/fhirMessaging", "/tenant/{tenantName}/fhirMessaging"})

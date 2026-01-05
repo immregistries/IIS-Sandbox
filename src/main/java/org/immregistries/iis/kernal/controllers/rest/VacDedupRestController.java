@@ -8,7 +8,7 @@ import org.immregistries.vaccination_deduplication.VaccinationDeduplication;
 import org.immregistries.vaccination_deduplication.reference.ImmunizationSource;
 import org.springframework.web.bind.annotation.*;
 
-import static org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil.SESSION_REQUEST_TENANT;
+import static org.immregistries.iis.kernal.security.CurrentTenantUtil.SESSION_REQUEST_TENANT;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal.fhir.security;
+package org.immregistries.iis.kernal.security;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

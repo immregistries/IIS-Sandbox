@@ -3,7 +3,7 @@ package org.immregistries.iis.kernal.controllers;
 import com.nimbusds.jose.jwk.JWK;
 import jakarta.servlet.http.HttpServletRequest;
 import org.immregistries.iis.kernal.controllers.servlet.TenantController;
-import org.immregistries.iis.kernal.fhir.security.UserAccessUtil;
+import org.immregistries.iis.kernal.security.UserAccessUtil;
 import org.immregistries.iis.kernal.logic.KeyStoreService;
 import org.immregistries.iis.kernal.persisted.model.IisKey;
 import org.immregistries.iis.kernal.persisted.model.Tenant;

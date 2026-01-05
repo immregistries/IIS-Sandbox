@@ -1,12 +1,10 @@
 package org.immregistries.iis.kernal.controllers.rest.shlink;
 
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.immregistries.iis.kernal.controllers.rest.RestUrlUtil;
-import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
-import org.immregistries.iis.kernal.fhir.security.TenantUtil;
+import org.immregistries.iis.kernal.security.CurrentTenantUtil;
+import org.immregistries.iis.kernal.security.TenantUtil;
 import org.immregistries.iis.kernal.logic.shlink.ShLinkUtilService;
 import org.immregistries.iis.kernal.persisted.model.ShLinkManifest;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
@@ -17,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 import java.util.List;
 
 import static org.immregistries.iis.kernal.controllers.servlet.TenantController.PARAM_TENANT_ID;

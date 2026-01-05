@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal;
+package org.immregistries.iis.kernal.security;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.MacAlgorithm;

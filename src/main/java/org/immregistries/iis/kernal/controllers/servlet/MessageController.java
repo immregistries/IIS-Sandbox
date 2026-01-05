@@ -6,7 +6,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.immregistries.iis.kernal.controllers.rest.MessageRestController;
 import org.immregistries.iis.kernal.controllers.servlet.util.PatientServletUtil;
 import org.immregistries.iis.kernal.controllers.servlet.util.UiUtil;
-import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
+import org.immregistries.iis.kernal.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.persisted.model.MessageReceived;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.springframework.beans.factory.annotation.Autowired;

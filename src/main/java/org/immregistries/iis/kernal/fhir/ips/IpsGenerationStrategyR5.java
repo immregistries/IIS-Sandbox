@@ -12,7 +12,7 @@ import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.instance.model.api.IIdType;
 import org.hl7.fhir.r5.model.*;
 
-import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
+import org.immregistries.iis.kernal.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.mapping.forR5.OrganizationMapperR5;
 import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
 import org.springframework.beans.factory.annotation.Autowired;

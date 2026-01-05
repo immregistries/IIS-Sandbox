@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal.fhir.security;
+package org.immregistries.iis.kernal.security;
 
 import ca.uhn.fhir.jpa.entity.PartitionEntity;
 import ca.uhn.fhir.jpa.partition.IPartitionLookupSvc;

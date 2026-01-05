@@ -1,7 +1,7 @@
 package org.immregistries.iis.kernal.controllers.rest.shlink;
 
 import org.immregistries.iis.kernal.controllers.filters.RestTenantUrlFilter;
-import org.immregistries.iis.kernal.fhir.security.UserAccessUtil;
+import org.immregistries.iis.kernal.security.UserAccessUtil;
 import org.immregistries.iis.kernal.logic.KeyStoreService;
 import org.immregistries.iis.kernal.persisted.model.IisKey;
 import org.immregistries.iis.kernal.persisted.model.Tenant;

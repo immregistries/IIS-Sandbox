@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal.fhir.security;
+package org.immregistries.iis.kernal.security;
 
 import org.immregistries.iis.kernal.controllers.WellKnownKeyController;
 import org.immregistries.iis.kernal.controllers.servlet.*;

@@ -16,7 +16,7 @@ import ca.uhn.fhir.rest.server.util.ITestingUiClientFactory;
 import jakarta.servlet.http.HttpServletRequest;
 import org.immregistries.iis.kernal.fhir.Application;
 
-import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
+import org.immregistries.iis.kernal.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -35,8 +35,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import static org.immregistries.iis.kernal.fhir.interceptors.IisAuthorizationInterceptor.CONNECTATHON_USER;
-import static org.immregistries.iis.kernal.fhir.security.UserAccessUtil.GITHUB_PREFIX;
-import static org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil.SESSION_REQUEST_TENANT;
+import static org.immregistries.iis.kernal.security.UserAccessUtil.GITHUB_PREFIX;
+import static org.immregistries.iis.kernal.security.CurrentTenantUtil.SESSION_REQUEST_TENANT;
 
 /**
  * Generates fhir client to interact with the jpa repository

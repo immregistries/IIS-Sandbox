@@ -1,11 +1,10 @@
-package org.immregistries.iis.kernal.fhir.security;
+package org.immregistries.iis.kernal.security;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.immregistries.iis.kernal.fhir.Application;
-import org.immregistries.iis.kernal.fhir.interceptors.PartitionTenantCreationInterceptor;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.immregistries.iis.kernal.controllers.servlet.HomeController;
 import org.slf4j.Logger;
@@ -21,9 +20,6 @@ import java.io.IOException;
 @Component
 public class IisOAuthSuccessHandler implements AuthenticationSuccessHandler {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
-
-	@Autowired
-	PartitionTenantCreationInterceptor partitionTenantCreationInterceptor;
 
 	@Autowired
 	TenantUtil tenantUtil;

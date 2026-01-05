@@ -6,7 +6,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.immregistries.iis.kernal.controllers.rest.PopRestController;
 import org.immregistries.iis.kernal.controllers.servlet.util.UiUtil;
-import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
+import org.immregistries.iis.kernal.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

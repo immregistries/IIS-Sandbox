@@ -2,11 +2,8 @@ package org.immregistries.iis.kernal.controllers.rest;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.context.RuntimeResourceDefinition;
-import ca.uhn.fhir.jpa.api.dao.IFhirResourceDao;
 import jakarta.servlet.ServletException;
-import org.hl7.fhir.r4.model.*;
-import org.immregistries.iis.kernal.fhir.security.TenantUtil;
-import org.immregistries.iis.kernal.fhir.security.UserAccessUtil;
+import org.immregistries.iis.kernal.security.UserAccessUtil;
 import org.immregistries.iis.kernal.logic.MacroEndpointService;
 import org.immregistries.iis.kernal.persisted.model.UserAccess;
 import org.slf4j.Logger;

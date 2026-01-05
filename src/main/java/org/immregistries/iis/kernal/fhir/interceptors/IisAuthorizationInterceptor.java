@@ -12,9 +12,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.auth.AuthenticationException;
-import org.immregistries.iis.kernal.JwtUtils;
-import org.immregistries.iis.kernal.fhir.security.TenantUtil;
-import org.immregistries.iis.kernal.fhir.security.UserAccessUtil;
+import org.immregistries.iis.kernal.security.JwtUtils;
+import org.immregistries.iis.kernal.security.TenantUtil;
+import org.immregistries.iis.kernal.security.UserAccessUtil;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.immregistries.iis.kernal.persisted.model.UserAccess;
 import org.immregistries.iis.kernal.persisted.repository.TenantRepository;
@@ -27,8 +27,8 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Optional;
 
-import static org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil.SESSION_REQUEST_TENANT;
-import static org.immregistries.iis.kernal.fhir.security.UserAccessUtil.SESSION_USER_ACCESS;
+import static org.immregistries.iis.kernal.security.CurrentTenantUtil.SESSION_REQUEST_TENANT;
+import static org.immregistries.iis.kernal.security.UserAccessUtil.SESSION_USER_ACCESS;
 
 /**
  * Interceptor dealing with Authorization of FHIR Requests, allowing several

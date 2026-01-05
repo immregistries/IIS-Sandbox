@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal;
+package org.immregistries.iis.kernal.controllers;
 
 import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
 import com.google.gson.Gson;
@@ -16,7 +16,8 @@ import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import org.immregistries.iis.kernal.fhir.Application;
-import org.immregistries.iis.kernal.fhir.security.UserAccessUtil;
+import org.immregistries.iis.kernal.security.JwtUtils;
+import org.immregistries.iis.kernal.security.UserAccessUtil;
 import org.immregistries.iis.kernal.persisted.model.UserAccess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,7 +42,7 @@ import static org.immregistries.iis.kernal.fhir.interceptors.IisAuthorizationInt
  * TODO proper key store
  */
 @RestController()
-public class JwtAuthController {
+public class JwtSmartAuthController {
 	@Autowired
 	JwtUtils jwtUtils;
 	private final Map<String, PublicKey> keystore;
@@ -50,7 +51,7 @@ public class JwtAuthController {
 
 	private final static String CLIENT_ASSERTION_TYPE = "urn:ietf:params:oauth:client-assertion-type:jwt-bearer";
 
-	public JwtAuthController() {
+	public JwtSmartAuthController() {
 		this.keystore = new HashMap<>(10);
 		this.jwtStore = new HashMap<>(10);
 	}

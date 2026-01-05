@@ -7,7 +7,7 @@ import jakarta.servlet.http.HttpSession;
 import org.immregistries.iis.kernal.controllers.servlet.TenantController;
 import org.immregistries.iis.kernal.controllers.servlet.util.UiUtil;
 import org.immregistries.iis.kernal.controllers.servlet.util.UrlTenantUtil;
-import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
+import org.immregistries.iis.kernal.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.logic.IExampleMessageWriter;
 import org.immregistries.iis.kernal.logic.VXUDownloadGenerator;
 import org.immregistries.iis.kernal.mapping.internalClient.FhirSearchRequester;
