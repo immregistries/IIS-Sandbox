@@ -7,6 +7,7 @@ import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.controllers.rest.CodeMapRestController;
+import org.immregistries.iis.kernal.controllers.rest.FitsExampleRestController;
 import org.immregistries.iis.kernal.controllers.servlet.TenantController;
 import org.immregistries.iis.kernal.logic.FitsExamples;
 import org.immregistries.vfa.connect.IISConnector;
@@ -28,7 +29,7 @@ import java.util.*;
 
 @SuppressWarnings("serial")
 @RestController
-@RequestMapping({"/fits", TenantController.TENANT_PATH + "/fits"})
+@RequestMapping({ "/fits", TenantController.TENANT_PATH + "/fits" })
 public class FitsController {
 
 	public static final String RSP_MESSAGE = "rsp";
@@ -37,10 +38,12 @@ public class FitsController {
 
 	@Autowired
 	private CodeMapRestController codeMapRestController;
+	@Autowired
+	private FitsExampleRestController fitsExampleRestController;
 
 	@GetMapping
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-		throws ServletException, IOException {
+			throws ServletException, IOException {
 
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
@@ -54,7 +57,7 @@ public class FitsController {
 		}
 		if (req.getParameter(EXAMPLE_NAME) != null) {
 			messageName = req.getParameter(EXAMPLE_NAME);
-			rsp = FitsExamples.exampleMap.get(messageName);
+			rsp = fitsExampleRestController.getExampleByName(messageName);
 		}
 		messageName = messageName.replaceAll("\\s", "_");
 		try {
@@ -66,9 +69,9 @@ public class FitsController {
 			out.println("    <h1>FITS HL7 Read Inspector</h1>");
 			out.println("    <form method=\"POST\" action=\"fits\">");
 			out.println("    <textarea name=\"" + RSP_MESSAGE + "\"\" cols=\"80\" rows=\"30\">" + rsp
-				+ "</textarea><br/>");
+					+ "</textarea><br/>");
 			out.println("    JUnit Name (no spaces): <input type=\"text\" name=\"" + MESSAGE_NAME
-				+ "\"\" size=\"25\" value=\"" + messageName + "\"/><br/>");
+					+ "\"\" size=\"25\" value=\"" + messageName + "\"/><br/>");
 			out.println("      <input type=\"submit\" name=\"sumbit\" value=\"Submit\"/>");
 			out.println("    </form>");
 			if (rsp.length() > 4) {
@@ -115,11 +118,11 @@ public class FitsController {
 					}
 					out.println("<tr>");
 					out.println("  <td style=\"background-color: " + color + ";\">"
-						+ parseDebugLine.getLineStatus() + "</td>");
+							+ parseDebugLine.getLineStatus() + "</td>");
 					out.println("  <td style=\"background-color: " + color + ";\">"
-						+ parseDebugLine.getLine() + "</td>");
+							+ parseDebugLine.getLine() + "</td>");
 					out.println("  <td style=\"background-color: " + color + ";\">"
-						+ parseDebugLine.getLineStatusReason() + "</td>");
+							+ parseDebugLine.getLineStatusReason() + "</td>");
 					out.println("</tr>");
 				}
 				out.println("</table>");
@@ -180,23 +183,23 @@ public class FitsController {
 							}
 							if (first) {
 								out.println("  <td style=\"background-color: " + color + ";\" rowspan=\""
-									+ familyMapping.get(familyMappingName).size() + "\">" + familyMappingName
-									+ "</td>");
+										+ familyMapping.get(familyMappingName).size() + "\">" + familyMappingName
+										+ "</td>");
 								Code code = codeMap.getCodeForCodeset(CodesetType.VACCINATION_CVX_CODE,
-									familyMappingName);
+										familyMappingName);
 								if (code == null) {
 									out.println("  <td style=\"background-color: " + color + ";\" rowspan=\""
-										+ familyMapping.get(familyMappingName).size() + "\">-</td>");
+											+ familyMapping.get(familyMappingName).size() + "\">-</td>");
 								} else {
 									out.println("  <td style=\"background-color: " + color + ";\" rowspan=\""
-										+ familyMapping.get(familyMappingName).size() + "\">" + code.getLabel()
-										+ "</td>");
+											+ familyMapping.get(familyMappingName).size() + "\">" + code.getLabel()
+											+ "</td>");
 								}
 								out.println("  <td style=\"background-color: " + color + ";\" rowspan=\""
-									+ familyMapping.get(familyMappingName).size() + "\">" + count + "</td>");
+										+ familyMapping.get(familyMappingName).size() + "\">" + count + "</td>");
 							}
 							out.println("  <td style=\"background-color: " + color + ";\">"
-								+ vaccineGroup.getLabel() + "</td>");
+									+ vaccineGroup.getLabel() + "</td>");
 							out.println("</tr>");
 							first = false;
 						}
@@ -231,7 +234,7 @@ public class FitsController {
 					}
 					out.println("<tr>");
 					out.println("  <td style=\"background-color: " + color + ";\">"
-						+ vaccineGroup.getLabel() + "</td>");
+							+ vaccineGroup.getLabel() + "</td>");
 					out.println("  <td style=\"background-color: " + color + ";\">" + count + "</td>");
 					out.println("</tr>");
 				}
@@ -261,9 +264,9 @@ public class FitsController {
 							out.println("  <td style=\"background-color: " + color + ";\">OBX-5.1</td>");
 							out.println("  <td style=\"background-color: " + color + ";\">Y</td>");
 							out.println(
-								"  <td style=\"background-color: " + color + ";\">" + adminStatus + "</td>");
+									"  <td style=\"background-color: " + color + ";\">" + adminStatus + "</td>");
 							out.println("  <td style=\"background-color: " + color + ";\">" + admin.getLabel()
-								+ "</td>");
+									+ "</td>");
 							out.println("</tr>");
 						}
 					}
@@ -280,9 +283,9 @@ public class FitsController {
 							out.println("  <td style=\"background-color: " + color + ";\">OBX-5.2</td>");
 							out.println("  <td style=\"background-color: " + color + ";\">N</td>");
 							out.println("  <td style=\"background-color: " + color + ";\">" + adminStatusLabel
-								+ "</td>");
+									+ "</td>");
 							out.println("  <td style=\"background-color: " + color + ";\">" + admin.getLabel()
-								+ "</td>");
+									+ "</td>");
 							out.println("</tr>");
 						}
 					}
@@ -293,12 +296,12 @@ public class FitsController {
 				printCode(out, rsp, messageName, forecastActualList, testCase);
 			}
 			out.println("    <h2>Example RSPs</h2>");
-			List<String> exampleNameList = new ArrayList<String>(FitsExamples.exampleMap.keySet());
+			List<String> exampleNameList = new ArrayList<String>(fitsExampleRestController.getAllExamples().keySet());
 			Collections.sort(exampleNameList);
 			out.println("<ul>");
 			for (String exampleName : exampleNameList) {
 				out.println("<li><a href=\"fits?" + EXAMPLE_NAME + "=" + exampleName + "\">" + exampleName
-					+ "</a></li>");
+						+ "</a></li>");
 			}
 			out.println("<ul>");
 
@@ -312,7 +315,7 @@ public class FitsController {
 	}
 
 	public void printCode(PrintWriter out, String rsp, String messageName,
-								 List<ForecastActual> forecastActualList, TestCase testCase) throws IOException {
+			List<ForecastActual> forecastActualList, TestCase testCase) throws IOException {
 		out.println("<h3>JUnit test for " + messageName + "</h3>");
 		out.println("<pre>");
 		out.println("exampleMap.put(\"" + messageName + "\", RSP_" + messageName.toUpperCase() + ");");
@@ -336,30 +339,30 @@ public class FitsController {
 		out.println("  @Test");
 		out.println("  public void testRSP_" + messageName + "() throws Exception {");
 		out.println(
-			"    List&lt;ForecastActual&gt; forecastActualList = new ArrayList&lt;ForecastActual&gt;();");
+				"    List&lt;ForecastActual&gt; forecastActualList = new ArrayList&lt;ForecastActual&gt;();");
 		out.println(
-			"    TestCase testCase = run(forecastActualList, RSP_" + messageName.toUpperCase() + ");");
+				"    TestCase testCase = run(forecastActualList, RSP_" + messageName.toUpperCase() + ");");
 		SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
 		out.println("    SimpleDateFormat sdf = new SimpleDateFormat(\"MM/dd/yyyy\");");
 		out.println("    assertEquals(\"Not all test events read\", "
-			+ testCase.getTestEventList().size() + ", testCase.getTestEventList().size()); ");
+				+ testCase.getTestEventList().size() + ", testCase.getTestEventList().size()); ");
 		{
 			int posA = 0;
 			for (TestEvent testEvent : testCase.getTestEventList()) {
 				if (testEvent.getEvaluationActualList() != null
-					&& testEvent.getEvaluationActualList().size() > 0) {
+						&& testEvent.getEvaluationActualList().size() > 0) {
 					out.println("    assertEquals(\"Wrong number of evaluations\", "
-						+ testEvent.getEvaluationActualList().size() + ", testCase.getTestEventList().get("
-						+ posA + ").getEvaluationActualList().size()); ");
+							+ testEvent.getEvaluationActualList().size() + ", testCase.getTestEventList().get("
+							+ posA + ").getEvaluationActualList().size()); ");
 					int posB = 0;
 					for (EvaluationActual evaluationActual : testEvent.getEvaluationActualList()) {
 						if (evaluationActual.getVaccineCvx() != null) {
 							out.println("    assertEquals(\"Wrong CVX found\", \""
-								+ evaluationActual.getVaccineCvx() + "\", testCase.getTestEventList().get(" + posA
-								+ ").getEvaluationActualList().get(" + posB + ").getVaccineCvx()); ");
+									+ evaluationActual.getVaccineCvx() + "\", testCase.getTestEventList().get(" + posA
+									+ ").getEvaluationActualList().get(" + posB + ").getVaccineCvx()); ");
 							out.println("    assertEquals(\"Wrong validity found\", \""
-								+ evaluationActual.getDoseValid() + "\", testCase.getTestEventList().get(" + posA
-								+ ").getEvaluationActualList().get(" + posB + ").getDoseValid()); ");
+									+ evaluationActual.getDoseValid() + "\", testCase.getTestEventList().get(" + posA
+									+ ").getEvaluationActualList().get(" + posB + ").getDoseValid()); ");
 						}
 						posB++;
 					}
@@ -368,46 +371,46 @@ public class FitsController {
 			}
 		}
 		out.println("    assertEquals(\"Not all forecasts read\", " + forecastActualList.size()
-			+ ",forecastActualList.size()); ");
+				+ ",forecastActualList.size()); ");
 
 		{
 			int posA = 0;
 			for (ForecastActual forecastActual : forecastActualList) {
 				out.println("    assertEquals(\"Forecast not found\", \""
-					+ forecastActual.getVaccineGroup().getLabel() + "\", forecastActualList.get(" + posA
-					+ ").getVaccineGroup().getLabel()); ");
+						+ forecastActual.getVaccineGroup().getLabel() + "\", forecastActualList.get(" + posA
+						+ ").getVaccineGroup().getLabel()); ");
 				out.println("    assertEquals(\"Wrong status found\", \"" + forecastActual.getAdminStatus()
-					+ "\", forecastActualList.get(" + posA + ").getAdminStatus()); ");
+						+ "\", forecastActualList.get(" + posA + ").getAdminStatus()); ");
 				if (forecastActual.getValidDate() == null) {
 					out.println("    assertNull(\"Valid date should be null\", forecastActualList.get(" + posA
-						+ ").getValidDate()); ");
+							+ ").getValidDate()); ");
 				} else {
 					out.println("    assertNotNull(\"Valid date should not be null\", forecastActualList.get("
-						+ posA + ").getValidDate()); ");
+							+ posA + ").getValidDate()); ");
 					out.println("    assertEquals(\"Wrong earliest date found\", \""
-						+ sdf.format(forecastActual.getValidDate()) + "\", sdf.format(forecastActualList.get("
-						+ posA + ").getValidDate())); ");
+							+ sdf.format(forecastActual.getValidDate()) + "\", sdf.format(forecastActualList.get("
+							+ posA + ").getValidDate())); ");
 				}
 				if (forecastActual.getDueDate() == null) {
 					out.println("    assertNull(\"Due date should be null\", forecastActualList.get(" + posA
-						+ ").getDueDate()); ");
+							+ ").getDueDate()); ");
 				} else {
 					out.println("    assertNotNull(\"Due date should not be null\", forecastActualList.get("
-						+ posA + ").getDueDate()); ");
+							+ posA + ").getDueDate()); ");
 					out.println("    assertEquals(\"Wrong due date found\", \""
-						+ sdf.format(forecastActual.getDueDate()) + "\", sdf.format(forecastActualList.get("
-						+ posA + ").getDueDate())); ");
+							+ sdf.format(forecastActual.getDueDate()) + "\", sdf.format(forecastActualList.get("
+							+ posA + ").getDueDate())); ");
 				}
 				if (forecastActual.getOverdueDate() == null) {
 					out.println("    assertNull(\"Overdue date should be null\", forecastActualList.get("
-						+ posA + ").getOverdueDate()); ");
+							+ posA + ").getOverdueDate()); ");
 				} else {
 					out.println(
-						"    assertNotNull(\"Overdue date should not be null\", forecastActualList.get("
-							+ posA + ").getOverdueDate()); ");
+							"    assertNotNull(\"Overdue date should not be null\", forecastActualList.get("
+									+ posA + ").getOverdueDate()); ");
 					out.println("    assertEquals(\"Wrong overdue date found\", \""
-						+ sdf.format(forecastActual.getOverdueDate())
-						+ "\", sdf.format(forecastActualList.get(" + posA + ").getOverdueDate())); ");
+							+ sdf.format(forecastActual.getOverdueDate())
+							+ "\", sdf.format(forecastActualList.get(" + posA + ").getOverdueDate())); ");
 				}
 				posA++;
 			}
@@ -419,9 +422,8 @@ public class FitsController {
 
 	@PostMapping
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-		throws ServletException, IOException {
+			throws ServletException, IOException {
 		doGet(req, resp);
 	}
-
 
 }
