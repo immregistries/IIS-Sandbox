@@ -248,7 +248,7 @@ public class PatientController {
 
 	private void printRelatedPatients(PrintWriter out, PatientMaster patientMasterSelected, boolean isGolden,
 												 Tenant tenant, HttpServletRequest req) {
-		List<PatientMaster> relatedPatients = patientRestController
+		List<? extends  PatientMaster> relatedPatients = patientRestController
 			.getPatientRelatedPatients(patientMasterSelected.getPatientId(), tenant, isGolden, req);
 		out.println("<h4>Related Patient records</h4>");
 		printPatientList(out, relatedPatients, false);

@@ -34,7 +34,7 @@ import static org.immregistries.iis.kernal.controllers.servlet.SubscriptionContr
 
 public final class PatientServletUtil {
 
-	public static void printPatientList(PrintWriter out, List<PatientMaster> patientMasterList, boolean showingRecent) {
+	public static void printPatientList(PrintWriter out, List<? extends PatientMaster> patientMasterList, boolean showingRecent) {
 		if (patientMasterList != null) {
 			if (patientMasterList.isEmpty()) {
 				out.println("<div class=\"w3-panel w3-yellow\"><p>No Records Found</p></div>");
