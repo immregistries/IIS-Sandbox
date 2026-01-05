@@ -11,8 +11,6 @@ import org.immregistries.iis.kernal.controllers.rest.V2ToFhirRestController;
 import org.immregistries.iis.kernal.controllers.servlet.util.UiUtil;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
 import org.immregistries.iis.kernal.fhir.security.CurrentTenantUtil;
-import org.immregistries.iis.kernal.fhir.security.TenantUtil;
-import org.immregistries.iis.kernal.logic.messageHandling.FhirMessagingHandler;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
@@ -35,17 +33,12 @@ public class FhirMessagingController {
 	public static final String FHIR_MESSAGING_BASE_PATH = "/" + FHIR_MESSAGING_PATH_KEY;
 	public static final String ORIGINAL_TEXT_EXTENSION_URL = "http://hl7.org/fhir/StructureDefinition/originalText";
 	@Autowired
-	FhirMessagingHandler fhirMessagingHandler;
-	@Autowired
 	FhirContext fhirContext;
 
-	@Autowired
-	TenantUtil tenantUtil;
 	@Autowired
 	PopRestController popRestController;
 	@Autowired
 	V2ToFhirRestController v2ToFhirRestController;
-
 
 	@GetMapping
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {

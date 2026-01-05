@@ -14,9 +14,10 @@ import org.immregistries.iis.kernal.fhir.shl.ShLinkPayload;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import static org.immregistries.iis.kernal.logic.shlink.ShLinkUtilService.SHLINK_PREFIX;
 
 public class UiQrCodeUtil {
+
+	public static final String SHLINK_PREFIX = "shlink:/";
 
 	private static final QRCodeWriter qrCodeWriter = new QRCodeWriter();
 	private static final ObjectMapper jsonMapper = new ObjectMapper();
