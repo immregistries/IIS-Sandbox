@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.io.Serializable;
-import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -73,24 +72,24 @@ public class ShLinkPayload implements Serializable {
 		this.url = url;
 	}
 
-	public Optional<String> getKey() {
-		return Optional.ofNullable(key);
+	public String getKey() {
+		return key;
 	}
 
 	public void setKey(String key) {
 		this.key = key;
 	}
 
-	public Optional<Long> getExp() {
-		return Optional.ofNullable(exp);
+	public Long getExp() {
+		return exp;
 	}
 
 	public void setExp(Long exp) {
 		this.exp = exp;
 	}
 
-	public Optional<String> getFlag() {
-		return Optional.ofNullable(flag);
+	public String getFlag() {
+		return flag;
 	}
 
 	public void setFlag(String flag) {
@@ -110,8 +109,8 @@ public class ShLinkPayload implements Serializable {
 		this.flag = flag;
 	}
 
-	public Optional<String> getLabel() {
-		return Optional.ofNullable(label);
+	public String getLabel() {
+		return label;
 	}
 
 	public void setLabel(String label) {
@@ -121,8 +120,8 @@ public class ShLinkPayload implements Serializable {
 		this.label = label;
 	}
 
-	public Optional<Integer> getV() {
-		return Optional.ofNullable(v);
+	public Integer getV() {
+		return v;
 	}
 
 	public void setV(Integer v) {

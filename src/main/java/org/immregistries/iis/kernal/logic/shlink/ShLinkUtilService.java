@@ -181,10 +181,14 @@ public class ShLinkUtilService {
 		/*
 		 * Direct file
 		 */
-		if (StringUtils.contains(shLinkPayload.getFlag().orElse(""), "U")) {
+		if (StringUtils.containsAny(shLinkPayload.getFlag(), "U")) {
 			IisShLinkContent iisShLinkContent = new IisShLinkContent();
 			iisShLinkContent.setUserAccess(userAccess);
-			iisShLinkContent.setExp(shLinkPayload.getExp().orElse(10000000L));
+			if (shLinkPayload.getExp() != null) {
+				iisShLinkContent.setExp(shLinkPayload.getExp());
+			} else {
+				iisShLinkContent.setExp(10000000L);
+			}
 			iisShLinkContent.setContent(encryptedContent);
 			iisShlinkContentRepository.save(iisShLinkContent);
 			builder.replacePath(
