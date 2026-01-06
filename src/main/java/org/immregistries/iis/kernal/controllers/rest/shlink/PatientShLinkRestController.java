@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.instance.model.api.IBaseResource;
+import org.immregistries.iis.kernal.Application;
 import org.immregistries.iis.kernal.controllers.rest.RestUrlUtil;
 import org.immregistries.iis.kernal.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.fhir.shl.ShLinkPayload;
@@ -73,7 +74,7 @@ public class PatientShLinkRestController {
 
 	public static @NotNull String getManifestUrl(HttpServletRequest req, IBaseResource patientSelected, Tenant tenant) {
 		// Adjusting Base URL for REST
-		String baseUrl = StringUtils.substringBefore(req.getRequestURL().toString(), "/rest/");
+		String baseUrl = StringUtils.substringBefore(req.getRequestURL().toString(), Application.IIS_PATH_BASE);
 		return getManifestUrl(baseUrl, patientSelected, tenant);
 	}
 
