@@ -22,6 +22,10 @@ public interface PatientMapper<Patient extends IBaseResource>
 		return PatientMaster.class;
 	}
 
+	default Class<PatientReported> localReportedType() {
+		return PatientReported.class;
+	}
+
 	String MRN_SYSTEM = "AIRA-TEST";
 
 	String MOTHER_MAIDEN_NAME = "http://hl7.org/fhir/StructureDefinition/patient-mothersMaidenName";

@@ -18,7 +18,6 @@ import org.immregistries.iis.kernal.Application;
 
 import org.immregistries.iis.kernal.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +44,7 @@ import static org.immregistries.iis.kernal.security.CurrentTenantUtil.SESSION_RE
 public class IisFhirClientFactory extends ApacheRestfulClientFactory implements ITestingUiClientFactory {
 	public static final String FHIR_CLIENT = "fhirClient";
 	@Autowired
-	IFhirSystemDao fhirSystemDao;
+	FhirContext fhirContext;
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	private LoggingInterceptor loggingInterceptor;
 
@@ -58,9 +57,9 @@ public class IisFhirClientFactory extends ApacheRestfulClientFactory implements 
 		setServerValidationMode(ServerValidationModeEnum.NEVER);
 	}
 
-	private void asynchInit() {
+	protected void asynchInit() {
 		if (this.getFhirContext() == null) {
-			setFhirContext(fhirSystemDao.getContext());
+			setFhirContext(fhirContext);
 			loggingInterceptor = new LoggingInterceptor();
 			loggingInterceptor.setLogger(logger);
 		}
@@ -93,59 +92,9 @@ public class IisFhirClientFactory extends ApacheRestfulClientFactory implements 
 		return client;
 	}
 
-	private URL extractServerBase(Tenant tenant, HttpServletRequest httpServletRequest) {
-		UriComponentsBuilder uriComponentsBuilder = ServletUriComponentsBuilder.fromRequestUri(httpServletRequest);
-		URL serverBase;
-		try {
-			uriComponentsBuilder.replacePath(fhirServerBasePath(tenant));
-			uriComponentsBuilder.replaceQuery("");
-			serverBase = uriComponentsBuilder.build().toUri().toURL();
-		} catch (MalformedURLException e) {
-			throw new RuntimeException(e);
-		}
-		return serverBase;
-	}
-
-	public static @NotNull String fhirServerBasePath(Tenant tenant) {
-		return Application.IIS_PATH_BASE + "/fhir/" + tenant.getOrganizationName();
-	}
 
 	/**
-	 * Used to get a fhir client within HAPIFHIR Interceptors
-	 *
-	 * @param theRequestDetails
-	 * @return
-	 */
-	public IGenericClient newGenericClient(ServletRequestDetails theRequestDetails) {
-		asynchInit();
-		Tenant tenant = (Tenant) theRequestDetails.getAttribute(SESSION_REQUEST_TENANT);
-		if (tenant == null) {
-			throw new AuthenticationException();
-		}
-		return newGenericClient(tenant, theRequestDetails.getServletRequest());
-	}
-
-	public IGenericClient newGenericClient(HttpServletRequest request) {
-		asynchInit();
-		if (request.getAttribute(FHIR_CLIENT) == null) {
-			Tenant tenant = CurrentTenantUtil.getTenant(request);
-			if (tenant != null) {
-				request.setAttribute(FHIR_CLIENT, newGenericClient(tenant, request));
-			} else {
-				request.setAttribute(FHIR_CLIENT, null);
-			}
-		}
-		return (IGenericClient) request.getAttribute(FHIR_CLIENT);
-	}
-
-	public IGenericClient getFhirClient() {
-		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
-				.getRequest();
-		return newGenericClient(request);
-	}
-
-	/**
-	 * Used for manual subscription trigger
+	 * Used only for manual subscription trigger
 	 *
 	 * @param theServerBase
 	 * @return
@@ -161,8 +110,63 @@ public class IisFhirClientFactory extends ApacheRestfulClientFactory implements 
 		return client;
 	}
 
+	/**
+	 * No client should be created trough this method
+	 * @param fhirContext
+	 * @param httpServletRequest
+	 * @param s
+	 * @return null
+	 */
 	@Override
 	public IGenericClient newClient(FhirContext fhirContext, HttpServletRequest httpServletRequest, String s) {
 		return null;
 	}
+
+	public IGenericClient getOrCreateFhirClientFromContext() {
+		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
+			.getRequest();
+		return getOrCreateGenericClient(request);
+	}
+
+	public IGenericClient getOrCreateGenericClient(HttpServletRequest request) {
+		asynchInit();
+		if (request.getAttribute(FHIR_CLIENT) == null) {
+			Tenant tenant = CurrentTenantUtil.getTenant(request);
+			if (tenant != null) {
+				request.setAttribute(FHIR_CLIENT, newGenericClient(tenant, request));
+			} else {
+				request.setAttribute(FHIR_CLIENT, null);
+			}
+		}
+		return (IGenericClient) request.getAttribute(FHIR_CLIENT);
+	}
+
+	/**
+	 * Used to get a fhir client within HAPIFHIR Interceptors
+	 *
+	 * @param theRequestDetails
+	 * @return
+	 */
+	public IGenericClient getOrCreateGenericClient(ServletRequestDetails theRequestDetails) {
+		asynchInit();
+		Tenant tenant = (Tenant) theRequestDetails.getAttribute(SESSION_REQUEST_TENANT);
+		if (tenant == null) {
+			throw new AuthenticationException();
+		}
+		return newGenericClient(tenant, theRequestDetails.getServletRequest());
+	}
+
+	private URL extractServerBase(Tenant tenant, HttpServletRequest httpServletRequest) {
+		UriComponentsBuilder uriComponentsBuilder = ServletUriComponentsBuilder.fromRequestUri(httpServletRequest);
+		URL serverBase;
+		try {
+			uriComponentsBuilder.replacePath(Application.fhirServerBasePath(tenant));
+			uriComponentsBuilder.replaceQuery("");
+			serverBase = uriComponentsBuilder.build().toUri().toURL();
+		} catch (MalformedURLException e) {
+			throw new RuntimeException(e);
+		}
+		return serverBase;
+	}
+
 }

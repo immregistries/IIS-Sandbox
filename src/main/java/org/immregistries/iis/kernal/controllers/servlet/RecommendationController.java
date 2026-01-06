@@ -117,7 +117,7 @@ public class RecommendationController {
 		UiUtil.doHeader(out, "Recommendations", tenant);
 
 		try {
-			IGenericClient fhirClient = iisFhirClientFactory.newGenericClient(req);
+			IGenericClient fhirClient = iisFhirClientFactory.getOrCreateGenericClient(req);
 
 			IDomainResource recommendationResource = recommendationRestController.getRecommendation(
 					req.getParameter(PARAM_RECOMMENDATION_ID), req.getParameter(PARAM_RECOMMENDATION_IDENTIFIER),

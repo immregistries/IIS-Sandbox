@@ -84,7 +84,7 @@ public class CovidController {
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		Tenant tenant = CurrentTenantUtil.getTenantRedirectIfNone(req, resp);
-		IGenericClient fhirClient = iisFhirClientFactory.newGenericClient(req);
+		IGenericClient fhirClient = iisFhirClientFactory.getOrCreateGenericClient(req);
 
 		try {
 			SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");

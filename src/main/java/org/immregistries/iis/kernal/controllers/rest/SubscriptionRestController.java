@@ -36,7 +36,7 @@ public class SubscriptionRestController {
     @GetMapping()
     public IBaseBundle getAllSubscriptions(
             HttpServletRequest req) {
-        IGenericClient fhirClient = iisFhirClientFactory.newGenericClient(req);
+        IGenericClient fhirClient = iisFhirClientFactory.getOrCreateGenericClient(req);
 
         // Implementation for GET request
         org.hl7.fhir.r5.model.Bundle subcriptionBundle = fhirClient.search()
@@ -61,7 +61,7 @@ public class SubscriptionRestController {
         // However, the original code uses `req.getParameter(PARAM_SUBSCRIPTION_ID)` and
         // other params.
         // We will accept a DTO.
-        IGenericClient localClient = iisFhirClientFactory.newGenericClient(req);
+        IGenericClient localClient = iisFhirClientFactory.getOrCreateGenericClient(req);
         String subscriptionId = triggerRequest.getSubscriptionId();
 
         Bundle searchBundle = localClient.search().forResource(Subscription.class)

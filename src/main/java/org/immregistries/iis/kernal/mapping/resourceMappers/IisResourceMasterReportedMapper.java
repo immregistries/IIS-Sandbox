@@ -5,6 +5,8 @@ import org.immregistries.iis.kernal.model.AbstractMappedObject;
 
 public interface IisResourceMasterReportedMapper<Master extends AbstractMappedObject, Reported extends Master, FhirResourceType extends IBaseResource> extends IisResourceMasterMapper<Master, FhirResourceType> {
 
+	Class<Reported> localReportedType();
+
 	Reported localObjectReportedWithMaster(FhirResourceType fhirResource);
 
 	Reported localObjectReported(FhirResourceType fhirResource);

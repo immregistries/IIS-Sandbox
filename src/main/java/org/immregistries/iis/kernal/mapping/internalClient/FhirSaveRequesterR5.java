@@ -144,7 +144,7 @@ public class FhirSaveRequesterR5 extends
 	public PatientMaster matchPatient(List<PatientReported> multipleMatches, PatientMaster patientMasterForMatchQuery,
 												 Date cutoff) {
 		PatientMaster singleMatch = null;
-		Bundle matches = iisFhirClientFactory.getFhirClient()
+		Bundle matches = iisFhirClientFactory.getOrCreateFhirClientFromContext()
 			.operation().onType(Patient.class)
 			.named("match")
 			.withParameter(Parameters.class, "resource", allMappingService.fhirResource(patientMasterForMatchQuery))

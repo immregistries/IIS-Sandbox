@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 public class Hl7MessageWriterR4 extends AbstractHl7MessageWriter {
 
 	public void printStoredObservations(StringBuilder sb, PatientMaster patientMaster, VaccinationMaster vaccination, int obsSubId, int obxSetId) {
-		IGenericClient fhirClient = iisFhirClientFactory.getFhirClient();
+		IGenericClient fhirClient = iisFhirClientFactory.getOrCreateFhirClientFromContext();
 		try {
 			Bundle bundle = fhirClient.search().forResource(Observation.class)
 				.where(Observation.PART_OF.hasId(patientMaster.getPatientId()))

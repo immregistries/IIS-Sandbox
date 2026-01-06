@@ -79,13 +79,17 @@ public class PopController {
 
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		try {
-			String message = req.getParameter(PARAM_MESSAGE);
-			String organizationName = req.getParameter(PARAM_FACILITY_NAME);
-			if (organizationName == null) {
-				organizationName = "";
+
+			String message;
+			if (req.getParameter(PARAM_MESSAGE) !=  null) {
+				message = req.getParameter(PARAM_MESSAGE);
+			} else {
+				 message = popRestController.getSampleMessage();
 			}
-			if (StringUtils.isBlank(message)) {
-				popRestController.getSampleMessage();
+
+			String organizationName = "";
+			if (req.getParameter(PARAM_FACILITY_NAME) != null) {
+				organizationName = req.getParameter(PARAM_FACILITY_NAME);
 			}
 
 			{

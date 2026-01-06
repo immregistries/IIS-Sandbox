@@ -14,6 +14,7 @@ import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
+import org.immregistries.iis.kernal.Application;
 import org.immregistries.iis.kernal.controllers.rest.CodeMapRestController;
 import org.immregistries.iis.kernal.controllers.rest.PatientRestController;
 import org.immregistries.iis.kernal.controllers.rest.VaccinationRestController;
@@ -86,7 +87,7 @@ public class VaccinationController {
 	// false) String tenantName dealt with in filter
 	) throws ServletException, IOException {
 		Tenant tenant = CurrentTenantUtil.getTenantRedirectIfNone(req, resp);
-		IGenericClient fhirClient = iisFhirClientFactory.newGenericClient(req);
+		IGenericClient fhirClient = iisFhirClientFactory.getOrCreateGenericClient(req);
 
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
@@ -231,7 +232,7 @@ public class VaccinationController {
 				{
 					out.println("<div class=\"w3-container\">");
 					out.println("<h4>FHIR Api Shortcuts</h4>");
-					String apiBaseUrl = IisFhirClientFactory.fhirServerBasePath(tenant);
+					String apiBaseUrl = Application.fhirServerBasePath(tenant);
 					{
 						String link = apiBaseUrl + "/Immunization?_id=" + vaccination.getVaccinationId();
 						out.println("<div>FHIR Immunization: <a href=\"" + link + "\">" + link + "</a></div>");

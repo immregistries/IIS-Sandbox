@@ -12,6 +12,7 @@ import org.hl7.fhir.instance.model.api.IBaseBundle;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.instance.model.api.IDomainResource;
 import org.hl7.fhir.r5.model.Bundle;
+import org.immregistries.iis.kernal.Application;
 import org.immregistries.iis.kernal.controllers.rest.*;
 import org.immregistries.iis.kernal.controllers.servlet.shlink.ShLinkController;
 import org.immregistries.iis.kernal.controllers.servlet.util.UiQrCodeUtil;
@@ -321,7 +322,7 @@ public class PatientController {
 		{
 			out.println("<div class=\"w3-container\">");
 			out.println("<h4>FHIR Api Shortcuts</h4>");
-			String apiBaseUrl = IisFhirClientFactory.fhirServerBasePath(tenant);
+			String apiBaseUrl = Application.fhirServerBasePath(tenant);
 			{
 				String link = apiBaseUrl + "/Patient";
 				out.println("<div>All FHIR Patient records: <a href=\"" + link + "\">" + link + "</a></div>");

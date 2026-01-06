@@ -76,14 +76,14 @@ public class PopRestController {
                             .setEntity(new org.hl7.fhir.r5.model.Reference().setReference("Patient/" + id));
                 }
                 group.setDescription("Generated from Hl2v2 VXU Query on  time " + new Date());
-                iisFhirClientFactory.newGenericClient(req).create().resource(group).execute();
+                iisFhirClientFactory.getOrCreateGenericClient(req).create().resource(group).execute();
             } else {
                 org.hl7.fhir.r4.model.Group group = new org.hl7.fhir.r4.model.Group();
                 for (String id : groupPatientIds) {
                     group.addMember()
                             .setEntity(new org.hl7.fhir.r4.model.Reference().setReference("Patient/" + id));
                 }
-                iisFhirClientFactory.newGenericClient(req).create().resource(group).execute();
+                iisFhirClientFactory.getOrCreateGenericClient(req).create().resource(group).execute();
             }
         }
 

@@ -16,6 +16,9 @@ public interface ObservationMapper<Observation extends IBaseResource>
 	default Class<ObservationMaster> localMasterType() {
 		return ObservationMaster.class;
 	}
+	default Class<ObservationReported> localReportedType() {
+		return ObservationReported.class;
+	}
 
 	String IDENTIFIER_CODE = "identifierCode";
 	String OBSERVATION_DATE = "observationDate";

@@ -41,7 +41,7 @@ public class RecommendationRestController {
             @RequestAttribute(name = TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
             HttpServletRequest req) {
 
-        IGenericClient fhirClient = iisFhirClientFactory.newGenericClient(req);
+        IGenericClient fhirClient = iisFhirClientFactory.getOrCreateGenericClient(req);
         IDomainResource patient = PatientServletUtil.fetchPatientFromParameter(req, fhirClient, fhirSearchRequester);
         PatientMaster patientMaster = patientMapper.localObject(patient);
 
@@ -90,7 +90,7 @@ public class RecommendationRestController {
         IParser parser = iisFhirClientFactory.getFhirContext()
                 .newJsonParser().setPrettyPrint(true).setSummaryMode(false).setSuppressNarratives(true);
 
-        IGenericClient fhirClient = iisFhirClientFactory.newGenericClient(req);
+        IGenericClient fhirClient = iisFhirClientFactory.getOrCreateGenericClient(req);
 
         if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R5)) {
             org.hl7.fhir.r5.model.ImmunizationRecommendation newRecommendation = parser

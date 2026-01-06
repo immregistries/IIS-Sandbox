@@ -50,8 +50,8 @@ public class AllMappingService {
     @SuppressWarnings("rawtypes")
     public IisResourceMasterMapper selectMapper(AbstractMappedObject internal) {
         Class inteClass = internal.getClass();
-        if (mapperMastersReported.stream().anyMatch(mapper -> mapper.localMasterType().equals(inteClass))) {
-            return mapperMastersReported.stream().filter(mapper -> mapper.localMasterType().equals(inteClass))
+        if (mapperMastersReported.stream().anyMatch(mapper -> mapper.localReportedType().equals(inteClass))) {
+            return mapperMastersReported.stream().filter(mapper -> mapper.localReportedType().equals(inteClass))
                     .findFirst().orElseThrow(() -> new RuntimeException("Mapper not found for " + inteClass.getName()));
         }
         return mapperMasters.stream().filter(mapper -> mapper.localMasterType().equals(inteClass)).findFirst()

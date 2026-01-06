@@ -73,7 +73,7 @@ public class FhirReadRequester {
 	}
 
 	public Optional<String> readGoldenResourceId(String reportId) {
-		Parameters out = iisFhirClientFactory.getFhirClient().operation().onServer().named("$mdm-query-links")
+		Parameters out = iisFhirClientFactory.getOrCreateFhirClientFromContext().operation().onServer().named("$mdm-query-links")
 			.withParameters(new Parameters().addParameter("resourceId", reportId)).execute();
 		List<Parameters.ParametersParameterComponent> part = out.getParameter().stream()
 			.filter(parametersParameterComponent -> parametersParameterComponent.getName().equals("link"))
@@ -100,7 +100,7 @@ public class FhirReadRequester {
 
 
 	public Stream<String> readMdmlinksReportedIds(String masterId) {
-		Parameters out = iisFhirClientFactory.getFhirClient().operation().onServer().named("$mdm-query-links")
+		Parameters out = iisFhirClientFactory.getOrCreateFhirClientFromContext().operation().onServer().named("$mdm-query-links")
 			.withParameters(new Parameters().addParameter("goldenResourceId", masterId)).execute();
 		Stream<Parameters.ParametersParameterComponent> links = out.getParameter().stream()
 			.filter(parametersParameterComponent -> parametersParameterComponent.getName().equals("link"));

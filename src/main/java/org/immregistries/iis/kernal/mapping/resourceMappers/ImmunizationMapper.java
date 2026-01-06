@@ -15,6 +15,9 @@ public interface ImmunizationMapper<Immunization extends IBaseResource>
 	default Class<VaccinationMaster> localMasterType() {
 		return VaccinationMaster.class;
 	}
+	default Class<VaccinationReported> localReportedType() {
+		return VaccinationReported.class;
+	}
 
 	String CVX_SYSTEM = "http://hl7.org/fhir/sid/cvx";
 	String MVX_SYSTEM = "http://terminology.hl7.org/CodeSystem/MVX";

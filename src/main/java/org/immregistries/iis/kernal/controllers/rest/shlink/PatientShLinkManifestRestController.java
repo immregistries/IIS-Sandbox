@@ -77,7 +77,7 @@ public class PatientShLinkManifestRestController {
 	}
 
 	private ShLinkManifest getShLinkManifest(HttpServletRequest req, String id, Tenant tenant) {
-		IGenericClient fhirClient = iisFhirClientFactory.newGenericClient(req);
+		IGenericClient fhirClient = iisFhirClientFactory.getOrCreateGenericClient(req);
 		IBaseResource patientSelected = fetchPatientFromParameters(id, "", fhirClient, fhirSearchRequester);
 		return shLinkUtilService.generateExamplePatientManifest(tenant, patientSelected.getIdElement());
 	}

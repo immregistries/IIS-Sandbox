@@ -267,7 +267,7 @@ public class FhirSearchRequester {
 	}
 
 	public List<VaccinationMaster> searchVaccinationListOperationEverything(String patientId) {
-		IGenericClient client = iisFhirClientFactory.getFhirClient();
+		IGenericClient client = iisFhirClientFactory.getOrCreateFhirClientFromContext();
 		Parameters in = new Parameters()
 			.addParameter("_mdm", "true")
 			.addParameter("_type", "Immunization");
@@ -314,7 +314,7 @@ public class FhirSearchRequester {
 	public PatientMaster matchPatient(List<PatientReported> multipleMatches, PatientMaster patientMasterForMatchQuery,
 												 Date cutoff) {
 		PatientMaster singleMatch = null;
-		Bundle matches = iisFhirClientFactory.getFhirClient()
+		Bundle matches = iisFhirClientFactory.getOrCreateFhirClientFromContext()
 			.operation().onType(Patient.class)
 			.named("match")
 			.withParameter(Parameters.class, "resource", allMappingService.fhirResource(patientMasterForMatchQuery))

@@ -114,7 +114,7 @@ public class SubscriptionController {
 			throws ServletException, IOException {
 		Tenant tenant = CurrentTenantUtil.getTenantRedirectIfNone(req, resp);
 		resp.setContentType("text/html");
-		IGenericClient fhirClient = iisFhirClientFactory.newGenericClient(req);
+		IGenericClient fhirClient = iisFhirClientFactory.getOrCreateGenericClient(req);
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 
 		String subscriptionId = req.getParameter(PARAM_SUBSCRIPTION_ID);
