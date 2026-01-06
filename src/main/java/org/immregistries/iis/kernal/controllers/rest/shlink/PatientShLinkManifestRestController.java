@@ -29,7 +29,7 @@ import static org.immregistries.iis.kernal.controllers.servlet.TenantController.
 import static org.immregistries.iis.kernal.controllers.servlet.util.PatientServletUtil.fetchPatientFromParameters;
 
 @RestController
-@RequestMapping("rest/tenant/{tenantId}/manifest")
+@RequestMapping(RestUrlUtil.REST_TENANT_PATH + "/manifest")
 public class PatientShLinkManifestRestController {
 
 	public static final String MANIFEST_PATH_SUFFIX = "/manifest";
@@ -50,12 +50,12 @@ public class PatientShLinkManifestRestController {
 	@Autowired
 	private TenantUtil tenantUtil;
 
-	@PostMapping({"/patient", "/patient/{id}"})
+	@PostMapping({ "/patient", "/patient/{id}" })
 	protected ShLinkManifest postPatientShLinkManifest(HttpServletRequest req, HttpServletResponse resp,
-																		@PathVariable(value = "id", required = false) String id,
-																		@PathVariable(PARAM_TENANT_ID) String tenantId,
-																		@RequestAttribute(CurrentTenantUtil.SESSION_REQUEST_TENANT) Tenant tenant,
-																		@RequestBody ShLinkManifestRequestBody body) throws IOException, ServletException {
+			@PathVariable(value = "id", required = false) String id,
+			@PathVariable(PARAM_TENANT_ID) String tenantId,
+			@RequestAttribute(CurrentTenantUtil.SESSION_REQUEST_TENANT) Tenant tenant,
+			@RequestBody ShLinkManifestRequestBody body) throws IOException, ServletException {
 		String passcode = body.getPasscode();
 		if (StringUtils.isNotBlank(passcode)) {
 			tenant = tenantUtil.authenticateTenantNoUsername(tenantId, passcode);
@@ -66,13 +66,13 @@ public class PatientShLinkManifestRestController {
 		return getShLinkManifest(req, id, tenant);
 	}
 
-	@GetMapping({"/patient", "/patient/{id}"})
+	@GetMapping({ "/patient", "/patient/{id}" })
 	protected ShLinkManifest getPatientShLinkManifest(HttpServletRequest req, HttpServletResponse resp,
-																	  @PathVariable(value = "id", required = false) String id,
-																	  @RequestAttribute(CurrentTenantUtil.SESSION_REQUEST_TENANT) Tenant tenant,
-																	  @RequestParam(value = "recipient", required = false) String recipient,
-																	  @RequestParam(value = "passcode", required = false) String passcode,
-																	  @RequestParam(value = "embeddedLengthMax", required = false) String embeddedLengthMax) {
+			@PathVariable(value = "id", required = false) String id,
+			@RequestAttribute(CurrentTenantUtil.SESSION_REQUEST_TENANT) Tenant tenant,
+			@RequestParam(value = "recipient", required = false) String recipient,
+			@RequestParam(value = "passcode", required = false) String passcode,
+			@RequestParam(value = "embeddedLengthMax", required = false) String embeddedLengthMax) {
 		return getShLinkManifest(req, id, tenant);
 	}
 

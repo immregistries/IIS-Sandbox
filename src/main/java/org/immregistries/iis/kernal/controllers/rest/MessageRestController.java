@@ -11,23 +11,23 @@ import java.util.List;
 import static org.immregistries.iis.kernal.security.CurrentTenantUtil.SESSION_REQUEST_TENANT;
 
 @RestController
-@RequestMapping("/rest/tenant/{tenantId}/message")
+@RequestMapping(RestUrlUtil.REST_TENANT_PATH + "/message")
 public class MessageRestController {
 
     @Autowired
     MessageReceivedRepository messageReceivedRepository;
 
-	@GetMapping("/{patientId}")
-	public List<MessageReceived> getPatientMessages(
-		@RequestAttribute(name = SESSION_REQUEST_TENANT) Tenant tenant,
-		@PathVariable("patientId") String patientId) {
-		return messageReceivedRepository.findByTenantAndPatientReportedId(tenant, patientId);
-	}
+    @GetMapping("/{patientId}")
+    public List<MessageReceived> getPatientMessages(
+            @RequestAttribute(name = SESSION_REQUEST_TENANT) Tenant tenant,
+            @PathVariable("patientId") String patientId) {
+        return messageReceivedRepository.findByTenantAndPatientReportedId(tenant, patientId);
+    }
 
     @GetMapping
     public List<MessageReceived> getMessages(
             @RequestAttribute(name = SESSION_REQUEST_TENANT) Tenant tenant,
-				@RequestParam(required = false) String search) {
+            @RequestParam(required = false) String search) {
 
         List<MessageReceived> messageReceivedList = messageReceivedRepository
                 .findByTenantOrderByReportedDateDesc(tenant);

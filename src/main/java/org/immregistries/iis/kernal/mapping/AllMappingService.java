@@ -16,7 +16,6 @@ public class AllMappingService {
     @SuppressWarnings("rawtypes")
     @Autowired
     private List<IisResourceMasterReportedMapper> mapperMastersReported;
-
     @SuppressWarnings("rawtypes")
     @Autowired
     private List<IisResourceMasterMapper> mapperMasters;
@@ -24,28 +23,28 @@ public class AllMappingService {
     @SuppressWarnings("unchecked")
     public IBaseResource fhirResource(AbstractMappedObject internal) {
         @SuppressWarnings("rawtypes")
-		  IisResourceMasterMapper mapper = selectMapper(internal);
+        IisResourceMasterMapper mapper = selectMapper(internal);
         return mapper.fhirResource(internal);
     }
 
     @SuppressWarnings("unchecked")
     public AbstractMappedObject localObject(IBaseResource resource) {
         @SuppressWarnings("rawtypes")
-		  IisResourceMasterMapper mapper = selectMapper(resource);
+        IisResourceMasterMapper mapper = selectMapper(resource);
         return mapper.localObject(resource);
     }
 
     @SuppressWarnings("unchecked")
     public AbstractMappedObject localObjectReportedWithMaster(IBaseResource resource) {
         @SuppressWarnings("rawtypes")
-		  IisResourceMasterReportedMapper mapper = selectMapperReported(resource);
+        IisResourceMasterReportedMapper mapper = selectMapperReported(resource);
         return mapper.localObjectReportedWithMaster(resource);
     }
 
     @SuppressWarnings("unchecked")
     public AbstractMappedObject localObjectReported(IBaseResource resource) {
         @SuppressWarnings("rawtypes")
-		  IisResourceMasterReportedMapper mapper = selectMapperReported(resource);
+        IisResourceMasterReportedMapper mapper = selectMapperReported(resource);
         return mapper.localObjectReported(resource);
     }
 

@@ -23,7 +23,7 @@ import static org.immregistries.iis.kernal.controllers.servlet.TenantController.
 @RequestMapping(ShLinkManifestRestController.SHLINKS_CONTROLLER_REST_BASE_URL)
 public class ShLinkManifestRestController {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
-	public final static String SHLINKS_CONTROLLER_REST_BASE_URL = RestUrlUtil.REST +  "/link";
+	public final static String SHLINKS_CONTROLLER_REST_BASE_URL = RestUrlUtil.REST_PATH +  "/link";
 
 
 	@Autowired

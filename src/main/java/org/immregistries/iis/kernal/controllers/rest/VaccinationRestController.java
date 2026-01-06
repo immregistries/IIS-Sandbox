@@ -19,7 +19,7 @@ import static org.immregistries.iis.kernal.security.CurrentTenantUtil.SESSION_RE
 import java.util.List;
 
 @RestController
-@RequestMapping("/rest/tenant/{tenantId}/VaccinationMaster")
+@RequestMapping(RestUrlUtil.REST_TENANT_PATH + "/Vaccination")
 public class VaccinationRestController extends BaseTenantTiedRest {
 
     @GetMapping("/{vaccinationId}")
@@ -47,24 +47,24 @@ public class VaccinationRestController extends BaseTenantTiedRest {
         return result;
     }
 
-	@GetMapping("/{vaccinationId}/related")
-	public List<? extends VaccinationMaster> getRelatedVaccinations(
-		@PathVariable("vaccinationId") String vaccinationId,
-		@RequestAttribute(RestTenantUrlFilter.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
-		@RequestParam(name = MDM_EXPAND_REST_PARAM, defaultValue = "false") boolean isGolden) {
-		ReferenceParam referenceParam = new ReferenceParam().setValue(vaccinationId);
-		referenceParam.setMdmExpand(isGolden);
-		if (isGolden) {
-			return fhirSearchRequester.searchVaccinationReportedFromGoldenIdWithMdmLinks(vaccinationId);
-		} else {
-			VaccinationMaster goldenRecord = fhirReadRequester
-				.readVaccinationMasterWithMdmLink(vaccinationId);
-			if (goldenRecord != null) {
-				return List.of(goldenRecord);
-			} else {
-				return List.of();
-			}
-		}
-	}
+    @GetMapping("/{vaccinationId}/related")
+    public List<? extends VaccinationMaster> getRelatedVaccinations(
+            @PathVariable("vaccinationId") String vaccinationId,
+            @RequestAttribute(RestTenantUrlFilter.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
+            @RequestParam(name = MDM_EXPAND_REST_PARAM, defaultValue = "false") boolean isGolden) {
+        ReferenceParam referenceParam = new ReferenceParam().setValue(vaccinationId);
+        referenceParam.setMdmExpand(isGolden);
+        if (isGolden) {
+            return fhirSearchRequester.searchVaccinationReportedFromGoldenIdWithMdmLinks(vaccinationId);
+        } else {
+            VaccinationMaster goldenRecord = fhirReadRequester
+                    .readVaccinationMasterWithMdmLink(vaccinationId);
+            if (goldenRecord != null) {
+                return List.of(goldenRecord);
+            } else {
+                return List.of();
+            }
+        }
+    }
 
 }

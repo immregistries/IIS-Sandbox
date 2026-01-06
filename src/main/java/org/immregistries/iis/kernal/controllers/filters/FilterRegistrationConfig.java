@@ -45,7 +45,7 @@ public class FilterRegistrationConfig {
 		RestTenantUrlFilter restTenantUrlFilter) {
 		FilterRegistrationBean registration = new FilterRegistrationBean();
 		registration.setFilter(restTenantUrlFilter);
-		registration.addUrlPatterns(RestUrlUtil.REST + TenantController.TENANT_BASE_PATH + "/*");
+		registration.addUrlPatterns(RestUrlUtil.REST_PATH + TenantController.TENANT_BASE_PATH + "/*");
 		registration.setName(REST_TENANT_URL_FILTER);
 		registration.setOrder(1);
 		return registration;

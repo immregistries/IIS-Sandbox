@@ -22,15 +22,15 @@ import java.util.Date;
 import static org.immregistries.iis.kernal.controllers.filters.RestTenantUrlFilter.TENANT_REQUEST_ATTRIBUTE;
 
 @RestController
-@RequestMapping("/rest/tenant/{tenantId}/recommendation")
+@RequestMapping(RestUrlUtil.REST_TENANT_PATH + "/recommendation")
 public class RecommendationRestController {
 
     @Autowired
     private IImmunizationRecommendationService immunizationRecommendationService;
     @Autowired
     private IisFhirClientFactory iisFhirClientFactory;
-	@Autowired
-	FhirSearchRequester fhirSearchRequester;
+    @Autowired
+    FhirSearchRequester fhirSearchRequester;
     @Autowired
     private FhirContext fhirContext;
     @Autowired

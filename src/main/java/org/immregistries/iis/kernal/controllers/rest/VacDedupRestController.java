@@ -17,7 +17,7 @@ import java.util.Date;
 import java.util.List;
 
 @RestController
-@RequestMapping("/rest/tenant/{tenantId}/vacDedup")
+@RequestMapping(RestUrlUtil.REST_TENANT_PATH + "/vacDedup")
 public class VacDedupRestController {
 
     public static final String ALGORITHM_DETERMINISTIC = "Deterministic";

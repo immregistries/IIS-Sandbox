@@ -23,7 +23,7 @@ import java.util.List;
 
 @Conditional(OnR5Condition.class)
 @RestController
-@RequestMapping("/rest/tenant/{tenantId}/subscription")
+@RequestMapping(RestUrlUtil.REST_TENANT_PATH + "/subscription")
 public class SubscriptionRestController {
 
     @Autowired

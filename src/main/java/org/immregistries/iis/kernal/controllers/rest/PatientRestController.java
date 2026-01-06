@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/rest/tenant/{tenantId}/patientMaster")
+@RequestMapping(RestUrlUtil.REST_TENANT_PATH + "/patient")
 public class PatientRestController extends BaseTenantTiedRest {
 
     public static final String MDM_EXPAND_REST_PARAM = "isGolden";
@@ -99,7 +99,7 @@ public class PatientRestController extends BaseTenantTiedRest {
 
     @SuppressWarnings("unchecked")
     @GetMapping("/{patientId}/related")
-    public List<? extends  PatientMaster> getPatientRelatedPatients(
+    public List<? extends PatientMaster> getPatientRelatedPatients(
             @PathVariable("patientId") String patientId,
             @RequestAttribute(RestTenantUrlFilter.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
             @RequestParam(name = MDM_EXPAND_REST_PARAM, defaultValue = "false") boolean isGolden,
@@ -107,16 +107,16 @@ public class PatientRestController extends BaseTenantTiedRest {
         ReferenceParam referenceParam = new ReferenceParam().setValue(patientId);
         referenceParam.setMdmExpand(isGolden);
         if (isGolden) {
-			  return fhirSearchRequester
+            return fhirSearchRequester
                     .searchPatientReportedFromGoldenIdWithMdmLinks(patientId);
         } else {
             PatientMaster goldenRecord = fhirReadRequester
                     .readPatientMasterWithMdmLink(patientId);
             if (goldenRecord != null) {
-					return List.of(goldenRecord);
+                return List.of(goldenRecord);
             } else {
-					return List.of();
-				}
+                return List.of();
+            }
         }
     }
 

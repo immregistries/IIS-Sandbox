@@ -15,7 +15,7 @@ import java.util.List;
 import static org.immregistries.iis.kernal.controllers.servlet.TenantController.PARAM_TENANT_ID;
 
 @RestController
-@RequestMapping("/rest/tenant")
+@RequestMapping(RestUrlUtil.REST_PATH + "/tenant")
 public class TenantRestController {
 
     @Autowired
@@ -23,31 +23,31 @@ public class TenantRestController {
 
     @Autowired
     TenantRepository tenantRepository;
-	@Autowired
-	TenantUtil tenantUtil;
-	@Autowired
-	UserAccessUtil userAccessUtil;
+    @Autowired
+    TenantUtil tenantUtil;
+    @Autowired
+    UserAccessUtil userAccessUtil;
 
     @GetMapping("/{tenantId}")
     public Tenant getTenant(@PathVariable(PARAM_TENANT_ID) int tenantId) {
-		 UserAccess userAccess = userAccessUtil.getUserAccess();
-		 return tenantRepository.findByOrgIdAndUserAccessId(tenantId, userAccess.getUserAccessId())
+        UserAccess userAccess = userAccessUtil.getUserAccess();
+        return tenantRepository.findByOrgIdAndUserAccessId(tenantId, userAccess.getUserAccessId())
                 .orElseThrow(() -> new RuntimeException("Tenant not found"));
     }
 
     @GetMapping
     public List<Tenant> getTenants(HttpServletRequest req) {
-		 return tenantRepository.findByUserAccessId(UserAccessUtil.get().getUserAccess().getUserAccessId());
+        return tenantRepository.findByUserAccessId(UserAccessUtil.get().getUserAccess().getUserAccessId());
     }
 
     @PostMapping
     public Tenant createTenant(@RequestBody Tenant tenant) {
-		 UserAccess currentUser = UserAccessUtil.get().getUserAccess();
+        UserAccess currentUser = UserAccessUtil.get().getUserAccess();
         if (tenant.getUserAccess() != null && !tenant.getUserAccess().equals(currentUser)) {
             throw new IllegalArgumentException("Tenant UserAccess must be null or match the current user");
         }
         // TODO prevent duplicate tenant creation
-		 tenantUtil.authenticateTenant(currentUser, tenant.getOrganizationName());
+        tenantUtil.authenticateTenant(currentUser, tenant.getOrganizationName());
         tenant.setUserAccess(currentUser);
         tenant = tenantRepository.save(tenant);
         return tenant;

@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Collection;
 
 @RestController
-@RequestMapping({RestUrlUtil.REST_TENANT_PATH + CodeMapRestController.CODEMAPS_PATH_SUFFIX, RestUrlUtil.REST + CodeMapRestController.CODEMAPS_PATH_SUFFIX})
+@RequestMapping({RestUrlUtil.REST_TENANT_PATH + CodeMapRestController.CODEMAPS_PATH_SUFFIX, RestUrlUtil.REST_PATH + CodeMapRestController.CODEMAPS_PATH_SUFFIX})
 public class CodeMapRestController {
 
 	public static final String CODEMAPS_PATH_KEY = "codemaps";

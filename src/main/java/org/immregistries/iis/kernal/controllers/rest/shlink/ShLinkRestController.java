@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
+import org.immregistries.iis.kernal.controllers.rest.RestUrlUtil;
 
 import javax.crypto.spec.SecretKeySpec;
 import java.io.ByteArrayOutputStream;
@@ -31,7 +32,7 @@ import java.util.Base64;
 import java.util.List;
 
 @RestController
-@RequestMapping({ "rest/shlink", "rest/tenant/{tenantName}/shlink" })
+@RequestMapping({ RestUrlUtil.REST_KEY + "/shlink", RestUrlUtil.REST_KEY + "/tenant/{tenantName}/shlink" })
 public class ShLinkRestController {
 
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -87,16 +88,17 @@ public class ShLinkRestController {
 		 * Getting the bundle for the payload content
 		 */
 		IBaseBundle ipsToBeEncoded = ipsGeneratorSvcIIS.generateIps(TenantUtil.get().requestDetailsWithPartitionName(),
-			new IdType(patientId), "");
+				new IdType(patientId), "");
 		/*
 		 * Convert the bundle to a shcard file
 		 */
 		String url = shLinkUtilService.generateShLinkUrlForShCards(List.of(ipsToBeEncoded), shLinkPayload, req,
-			iisSigningKey, encryptionKeySpec, userAccess, tenant);
+				iisSigningKey, encryptionKeySpec, userAccess, tenant);
 		shLinkPayload.setUrl(url);
 		String qrCode = shLinkUtilService.qrCode(shLinkPayload);
 		return qrCode;
 	}
+
 	@PostMapping(value = "/png")
 	public ResponseEntity<byte[]> shLinkIPSPng(HttpServletRequest req,
 			@RequestParam(value = PARAM_KEY_ID, required = false) String keyId,
@@ -106,7 +108,7 @@ public class ShLinkRestController {
 			@RequestParam(value = PARAM_EXP, required = false, defaultValue = "10000000") String exp,
 			@RequestAttribute(CurrentTenantUtil.SESSION_REQUEST_TENANT) Tenant tenant)
 			throws ServletException, IOException, NoSuchAlgorithmException {
-		String qrCode = shLinkIPSQrCode(req,keyId,secretKey,patientId,flag,exp,tenant);
+		String qrCode = shLinkIPSQrCode(req, keyId, secretKey, patientId, flag, exp, tenant);
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.IMAGE_PNG);
 		ByteArrayOutputStream outputStream = compressionService.toQrCodeStreamPNG(qrCode);

@@ -21,7 +21,7 @@ import java.util.Date;
 import static org.immregistries.iis.kernal.controllers.servlet.PopController.PARAM_FACILITY_NAME;
 
 @RestController
-@RequestMapping("/rest/tenant/{tenantId}/pop")
+@RequestMapping(RestUrlUtil.REST_TENANT_PATH + "/pop")
 public class PopRestController {
 
     @Autowired
@@ -43,9 +43,9 @@ public class PopRestController {
     @PostMapping
     public String postPop(
             @RequestBody String message,
-				@RequestParam(value = PARAM_FACILITY_NAME, required = false) String facilityName,
-				@RequestAttribute(RestTenantUrlFilter.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
-				HttpServletRequest req) {
+            @RequestParam(value = PARAM_FACILITY_NAME, required = false) String facilityName,
+            @RequestAttribute(RestTenantUrlFilter.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
+            HttpServletRequest req) {
         if (message == null) {
             return "";
         }

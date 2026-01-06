@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.immregistries.iis.kernal.controllers.rest.RestUrlUtil;
 
 import java.io.IOException;
 
@@ -25,13 +26,13 @@ public class RestTenantUrlFilter extends OncePerRequestFilter {
 
 	public static final String TENANT_REQUEST_ATTRIBUTE = CurrentTenantUtil.SESSION_REQUEST_TENANT;
 	private static final Logger logger = LoggerFactory.getLogger(RestTenantUrlFilter.class);
-	private static final String TENANT_PREFIX = Application.IIS_PATH_BASE + "/rest/tenant/";
+	private static final String TENANT_PREFIX = Application.IIS_PATH_BASE + RestUrlUtil.REST_PATH + "/tenant/";
 	@Autowired
 	TenantUtil tenantUtil;
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-		throws ServletException, IOException {
+			throws ServletException, IOException {
 		String path = request.getRequestURI();
 		/*
 		 * For Smart health links manifest retrieval, authentication is dealt with later

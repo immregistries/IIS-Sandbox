@@ -31,6 +31,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.immregistries.iis.kernal.controllers.rest.RestUrlUtil;
 
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
@@ -42,7 +43,7 @@ import java.security.NoSuchProviderException;
 import java.security.SignatureException;
 
 @RestController
-@RequestMapping("rest/tenant/{tenantId}/patient/{patientId}/clvr")
+@RequestMapping(RestUrlUtil.REST_TENANT_PATH + "/patient/{patientId}/clvr")
 public class CLVRRestController {
     Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -90,12 +91,12 @@ public class CLVRRestController {
         CLVRToken clvrToken = getIpsClvrToken(patientId);
         String qrCode = clvrService.encodeCLVRtoQrCode(clvrToken, iisSigningKey.keyPair());
 
-
-		 ByteArrayOutputStream byteArrayOutputStreamPNG = compressionService.toQrCodeStreamPNG(qrCode);
-		 return ResponseEntity.ok(byteArrayOutputStreamPNG.toByteArray());
-//		 HttpHeaders headers = new HttpHeaders();
-//		 headers.setContentDispositionFormData("attachment", "qr.png");
-//		 return new ResponseEntity<>(byteArrayOutputStreamPNG, headers, HttpStatus.OK);
+        ByteArrayOutputStream byteArrayOutputStreamPNG = compressionService.toQrCodeStreamPNG(qrCode);
+        return ResponseEntity.ok(byteArrayOutputStreamPNG.toByteArray());
+        // HttpHeaders headers = new HttpHeaders();
+        // headers.setContentDispositionFormData("attachment", "qr.png");
+        // return new ResponseEntity<>(byteArrayOutputStreamPNG, headers,
+        // HttpStatus.OK);
     }
 
     @GetMapping(value = "/pdf", produces = MediaType.APPLICATION_PDF_VALUE)

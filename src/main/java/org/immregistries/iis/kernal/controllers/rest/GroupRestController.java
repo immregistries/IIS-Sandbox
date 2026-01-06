@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/rest/tenant/{tenantId}/group")
+@RequestMapping(RestUrlUtil.REST_TENANT_PATH + "/group")
 public class GroupRestController {
 
     @GetMapping("/$generate")

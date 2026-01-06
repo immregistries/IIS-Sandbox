@@ -17,7 +17,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.io.IOException;
 
 @RestController
-@RequestMapping({"/SubscriptionTopic", RestUrlUtil.REST + "/SubscriptionTopic"})
+@RequestMapping({"/SubscriptionTopic", RestUrlUtil.REST_PATH + "/SubscriptionTopic"})
 public class SubscriptionTopicController {
 	public static final String DATA_QUALITY_ISSUES_TOPIC_NAME = "/data-quality-issues";
 	public static final String PATIENT_TOPIC_NAME = "/Patient";

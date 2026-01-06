@@ -34,7 +34,8 @@ import static org.immregistries.iis.kernal.controllers.servlet.TenantController.
 import static org.immregistries.iis.kernal.security.CurrentTenantUtil.SESSION_REQUEST_TENANT;
 
 @RestController
-@RequestMapping({"/rest/fhirMessaging", "/rest/tenant/{tenantId}/fhirMessaging", "/tenant/{tenantName}/fhirMessaging"})
+@RequestMapping({ RestUrlUtil.REST_PATH + "/fhirMessaging", RestUrlUtil.REST_TENANT_PATH + "/fhirMessaging",
+		"/tenant/{tenantName}/fhirMessaging" })
 @Conditional(OnR4Condition.class)
 public class FhirMessagingRestController {
 
@@ -48,12 +49,11 @@ public class FhirMessagingRestController {
 	@Autowired
 	private V2IncomingMessageHandler handler;
 
-
 	@PostMapping(produces = MediaType.TEXT_PLAIN_VALUE)
 	protected String doPost(@RequestParam(PARAM_MESSAGE) String message,
-									@RequestParam(PARAM_FACILITY_NAME) String facilityName,
-									@RequestAttribute(SESSION_REQUEST_TENANT) @NotNull Tenant tenant)
-		throws ServletException, IOException, HL7Exception {
+			@RequestParam(PARAM_FACILITY_NAME) String facilityName,
+			@RequestAttribute(SESSION_REQUEST_TENANT) @NotNull Tenant tenant)
+			throws ServletException, IOException, HL7Exception {
 		// resp.setContentType("text/html");
 		if (StringUtils.isBlank(message)) {
 			throw new RuntimeException("Blank message not accepted");
@@ -90,11 +90,10 @@ public class FhirMessagingRestController {
 		return fhirResult;
 	}
 
-
 	@PostMapping(SoapDescriptionController.SOAP_BASE_PATH)
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp,
-								 @PathVariable(name = PATH_VARIABLE_TENANT_NAME, required = false) String tenantName)
-		throws ServletException, IOException {
+			@PathVariable(name = PATH_VARIABLE_TENANT_NAME, required = false) String tenantName)
+			throws ServletException, IOException {
 
 		String path = req.getPathInfo();
 		final String processorName = path == null ? "" : (path.startsWith("/") ? path.substring(1) : path);

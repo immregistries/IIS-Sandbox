@@ -23,7 +23,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 @RestController
-@RequestMapping({"/rest/soap", "/rest/tenant/{tenantId}/soap", "/tenant/{tenantName}/soap"})
+@RequestMapping({ RestUrlUtil.REST_PATH + "/soap", RestUrlUtil.REST_TENANT_PATH + "/soap",
+		"/tenant/{tenantName}/soap" })
 public class SoapRestController {
 
 	@Autowired
@@ -33,8 +34,8 @@ public class SoapRestController {
 
 	@PostMapping
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp,
-								 @RequestAttribute(value = RestTenantUrlFilter.TENANT_REQUEST_ATTRIBUTE, required = false) Tenant tenant)
-		throws ServletException, IOException {
+			@RequestAttribute(value = RestTenantUrlFilter.TENANT_REQUEST_ATTRIBUTE, required = false) Tenant tenant)
+			throws ServletException, IOException {
 
 		String tenantName;
 		if (tenant == null) {

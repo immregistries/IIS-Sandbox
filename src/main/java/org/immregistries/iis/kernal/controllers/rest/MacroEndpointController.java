@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 
 @RestController()
-@RequestMapping({RestUrlUtil.REST + "/$create", "/$create"})
+@RequestMapping({RestUrlUtil.REST_PATH + "/$create", "/$create"})
 public class MacroEndpointController {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	@Autowired

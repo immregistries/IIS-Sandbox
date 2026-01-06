@@ -1,9 +1,6 @@
 package org.immregistries.iis.kernal.controllers.rest.shlink;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import org.immregistries.iis.kernal.controllers.rest.RestUrlUtil;
-import org.immregistries.iis.kernal.logic.shlink.ShLinkUtilService;
 import org.immregistries.iis.kernal.persisted.repository.IisShlinkContentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -16,7 +13,7 @@ import static org.immregistries.iis.kernal.controllers.rest.shlink.ShLinkContent
 @RequestMapping(SHLINK_CONTENT_PATH)
 public class ShLinkContentRestController {
 	public static final String SHLINK_FILES = "shlink/files";
-	public static final String SHLINK_CONTENT_PATH = RestUrlUtil.REST + "/" + SHLINK_FILES;
+	public static final String SHLINK_CONTENT_PATH = RestUrlUtil.REST_PATH + "/" + SHLINK_FILES;
 
     @Autowired
     IisShlinkContentRepository iisShlinkContentRepository;

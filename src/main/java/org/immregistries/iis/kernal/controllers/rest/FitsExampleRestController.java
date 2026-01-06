@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("rest/fits/example")
+@RequestMapping(RestUrlUtil.REST_KEY + "/fits/example")
 public class FitsExampleRestController {
 
     @GetMapping("all")

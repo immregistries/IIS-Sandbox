@@ -8,8 +8,9 @@ import org.jetbrains.annotations.NotNull;
 
 public class RestUrlUtil {
 
-	public static final String REST = "/rest";
-	public static final String REST_TENANT_PATH = REST + TenantController.TENANT_BASE_PATH + "/{tenantId}";
+	public static final String REST_KEY = "rest";
+	public static final String REST_PATH = "/" + REST_KEY;
+	public static final String REST_TENANT_PATH = REST_PATH + TenantController.TENANT_BASE_PATH + "/{tenantId}";
 
 	public static String tenantifyPathWithContextPath(Tenant tenant, String urlSuffix) {
 		if (tenant == null || tenant.getOrgId() < 0) {

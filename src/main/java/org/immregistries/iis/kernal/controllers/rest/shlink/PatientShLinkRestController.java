@@ -26,9 +26,8 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-
 @RestController
-@RequestMapping({"rest/patient", "rest/tenant/{tenantName}/patient"})
+@RequestMapping({ RestUrlUtil.REST_KEY + "/patient", RestUrlUtil.REST_KEY + "/tenant/{tenantName}/patient" })
 public class PatientShLinkRestController {
 
 	public static final String SHLINK_QR_CODE_PATH_SUFFIX = "/qr";
@@ -40,12 +39,11 @@ public class PatientShLinkRestController {
 	@Autowired
 	private CompressionService compressionService;
 
-
-	@GetMapping(value = {SHLINK_QR_CODE_PATH_SUFFIX}, produces = MediaType.IMAGE_PNG_VALUE)
+	@GetMapping(value = { SHLINK_QR_CODE_PATH_SUFFIX }, produces = MediaType.IMAGE_PNG_VALUE)
 	public ResponseEntity<byte[]> doGetShLinkQrCode(HttpServletRequest req, HttpServletResponse resp,
-																	@RequestAttribute(CurrentTenantUtil.SESSION_REQUEST_TENANT) Tenant tenant,
-																	@PathVariable("patientId") String patientId)
-		throws IOException, ServletException {
+			@RequestAttribute(CurrentTenantUtil.SESSION_REQUEST_TENANT) Tenant tenant,
+			@PathVariable("patientId") String patientId)
+			throws IOException, ServletException {
 		IGenericClient client = iisFhirClientFactory.newGenericClient(tenant, req);
 		IBaseResource patientSelected = client.read().resource("Patient").withId(patientId).execute();
 		if (patientSelected == null) {
@@ -80,8 +78,9 @@ public class PatientShLinkRestController {
 	}
 
 	public static @NotNull String getManifestUrl(String baseUrl, IBaseResource patientSelected, Tenant tenant) {
-		return baseUrl + RestUrlUtil.tenantifyPathWithContextPath(tenant, PatientShLinkManifestRestController.MANIFEST_PATH_SUFFIX
-			+ "/patient/" + patientSelected.getIdElement().getIdPart());
+		return baseUrl + RestUrlUtil.tenantifyPathWithContextPath(tenant,
+				PatientShLinkManifestRestController.MANIFEST_PATH_SUFFIX
+						+ "/patient/" + patientSelected.getIdElement().getIdPart());
 	}
 
 }

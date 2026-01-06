@@ -19,7 +19,7 @@ import static org.immregistries.iis.kernal.controllers.rest.TenantCompareControl
 
 @RestController
 @RequestMapping({
-		RestUrlUtil.REST + TENANT_COMPARE_BASE_PATH })
+		RestUrlUtil.REST_PATH + TENANT_COMPARE_BASE_PATH })
 public class TenantCompareController {
 	public static final String TENANT_COMPARE_BASE_PATH = "/tenantCompare";
 

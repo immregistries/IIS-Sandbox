@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(RestUrlUtil.REST + "/authentication")
+@RequestMapping(RestUrlUtil.REST_PATH + "/authentication")
 public class AuthenticationRestController {
 
     /**
