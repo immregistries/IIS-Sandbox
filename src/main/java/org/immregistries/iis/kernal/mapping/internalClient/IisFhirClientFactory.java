@@ -1,7 +1,6 @@
 package org.immregistries.iis.kernal.mapping.internalClient;
 
 import ca.uhn.fhir.context.FhirContext;
-import ca.uhn.fhir.jpa.api.dao.IFhirSystemDao;
 import ca.uhn.fhir.rest.client.apache.ApacheRestfulClientFactory;
 import ca.uhn.fhir.rest.client.api.IClientInterceptor;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
@@ -12,7 +11,6 @@ import ca.uhn.fhir.rest.client.interceptor.BearerTokenAuthInterceptor;
 import ca.uhn.fhir.rest.client.interceptor.LoggingInterceptor;
 import ca.uhn.fhir.rest.server.exceptions.AuthenticationException;
 import ca.uhn.fhir.rest.server.servlet.ServletRequestDetails;
-import ca.uhn.fhir.rest.server.util.ITestingUiClientFactory;
 import jakarta.servlet.http.HttpServletRequest;
 import org.immregistries.iis.kernal.Application;
 
@@ -41,15 +39,16 @@ import static org.immregistries.iis.kernal.security.CurrentTenantUtil.SESSION_RE
  * Generates fhir client to interact with the jpa repository
  */
 @Component
-public class IisFhirClientFactory extends ApacheRestfulClientFactory implements ITestingUiClientFactory {
-	public static final String FHIR_CLIENT = "fhirClient";
-	@Autowired
-	FhirContext fhirContext;
-	private final Logger logger = LoggerFactory.getLogger(this.getClass());
-	private LoggingInterceptor loggingInterceptor;
+public class IisFhirClientFactory extends ApacheRestfulClientFactory {
+	public static final String FHIR_CLIENT_REQUEST_ATTRIBUTE = "fhirClient";
 
 	@Autowired
-	Environment environment;
+	public void setFhirContext(FhirContext fhirContext) {
+		super.setFhirContext(fhirContext);
+	}
+
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
+	private LoggingInterceptor loggingInterceptor;
 
 	@Autowired
 	public IisFhirClientFactory() {
@@ -58,8 +57,8 @@ public class IisFhirClientFactory extends ApacheRestfulClientFactory implements 
 	}
 
 	protected void asynchInit() {
-		if (this.getFhirContext() == null) {
-			setFhirContext(fhirContext);
+		if (loggingInterceptor == null) {
+//			super.setFhirContext(fhirContext);
 			loggingInterceptor = new LoggingInterceptor();
 			loggingInterceptor.setLogger(logger);
 		}
@@ -94,7 +93,7 @@ public class IisFhirClientFactory extends ApacheRestfulClientFactory implements 
 
 
 	/**
-	 * Used only for manual subscription trigger
+	 * Used for manual subscription trigger
 	 *
 	 * @param theServerBase
 	 * @return
@@ -110,18 +109,6 @@ public class IisFhirClientFactory extends ApacheRestfulClientFactory implements 
 		return client;
 	}
 
-	/**
-	 * No client should be created trough this method
-	 * @param fhirContext
-	 * @param httpServletRequest
-	 * @param s
-	 * @return null
-	 */
-	@Override
-	public IGenericClient newClient(FhirContext fhirContext, HttpServletRequest httpServletRequest, String s) {
-		return null;
-	}
-
 	public IGenericClient getOrCreateFhirClientFromContext() {
 		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
 			.getRequest();
@@ -130,15 +117,15 @@ public class IisFhirClientFactory extends ApacheRestfulClientFactory implements 
 
 	public IGenericClient getOrCreateGenericClient(HttpServletRequest request) {
 		asynchInit();
-		if (request.getAttribute(FHIR_CLIENT) == null) {
+		if (request.getAttribute(FHIR_CLIENT_REQUEST_ATTRIBUTE) == null) {
 			Tenant tenant = CurrentTenantUtil.getTenant(request);
 			if (tenant != null) {
-				request.setAttribute(FHIR_CLIENT, newGenericClient(tenant, request));
+				request.setAttribute(FHIR_CLIENT_REQUEST_ATTRIBUTE, newGenericClient(tenant, request));
 			} else {
-				request.setAttribute(FHIR_CLIENT, null);
+				request.setAttribute(FHIR_CLIENT_REQUEST_ATTRIBUTE, null);
 			}
 		}
-		return (IGenericClient) request.getAttribute(FHIR_CLIENT);
+		return (IGenericClient) request.getAttribute(FHIR_CLIENT_REQUEST_ATTRIBUTE);
 	}
 
 	/**
