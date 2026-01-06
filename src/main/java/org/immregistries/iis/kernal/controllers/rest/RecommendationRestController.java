@@ -10,7 +10,7 @@ import org.hl7.fhir.instance.model.api.IDomainResource;
 import org.immregistries.iis.kernal.logic.IImmunizationRecommendationService;
 import org.immregistries.iis.kernal.mapping.resourceMappers.PatientMapper;
 import org.immregistries.iis.kernal.mapping.internalClient.FhirSearchRequester;
-import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
+import org.immregistries.iis.kernal.mapping.internalClient.IisFhirClientFactory;
 import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.immregistries.iis.kernal.controllers.servlet.util.PatientServletUtil;
@@ -28,7 +28,7 @@ public class RecommendationRestController {
     @Autowired
     private IImmunizationRecommendationService immunizationRecommendationService;
     @Autowired
-    private RepositoryClientFactory repositoryClientFactory;
+    private IisFhirClientFactory iisFhirClientFactory;
 	@Autowired
 	FhirSearchRequester fhirSearchRequester;
     @Autowired
@@ -41,7 +41,7 @@ public class RecommendationRestController {
             @RequestAttribute(name = TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
             HttpServletRequest req) {
 
-        IGenericClient fhirClient = repositoryClientFactory.newGenericClient(req);
+        IGenericClient fhirClient = iisFhirClientFactory.newGenericClient(req);
         IDomainResource patient = PatientServletUtil.fetchPatientFromParameter(req, fhirClient, fhirSearchRequester);
         PatientMaster patientMaster = patientMapper.localObject(patient);
 
@@ -87,10 +87,10 @@ public class RecommendationRestController {
             @RequestBody String recommendationResource,
             HttpServletRequest req) {
 
-        IParser parser = repositoryClientFactory.getFhirContext()
+        IParser parser = iisFhirClientFactory.getFhirContext()
                 .newJsonParser().setPrettyPrint(true).setSummaryMode(false).setSuppressNarratives(true);
 
-        IGenericClient fhirClient = repositoryClientFactory.newGenericClient(req);
+        IGenericClient fhirClient = iisFhirClientFactory.newGenericClient(req);
 
         if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R5)) {
             org.hl7.fhir.r5.model.ImmunizationRecommendation newRecommendation = parser
@@ -153,7 +153,7 @@ public class RecommendationRestController {
             HttpServletRequest req) {
         IDomainResource recommendation = null;
 
-        IGenericClient fhirClient = repositoryClientFactory.newGenericClient(tenant, req);
+        IGenericClient fhirClient = iisFhirClientFactory.newGenericClient(tenant, req);
         if (recommendationId != null) {
             recommendation = (IDomainResource) fhirClient.read().resource("ImmunizationRecommendation")
                     .withId(recommendationId).execute();

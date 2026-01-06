@@ -14,7 +14,7 @@ import org.hl7.fhir.r4.model.*;
 
 import org.immregistries.iis.kernal.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.mapping.resourceMappers.forR4.OrganizationMapperR4;
-import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
+import org.immregistries.iis.kernal.mapping.internalClient.IisFhirClientFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
@@ -28,7 +28,7 @@ public class IpsGenerationStrategyR4 extends DefaultJpaIpsGenerationStrategy imp
 	@Autowired
 	BaseJpaResourceProviderPatient<Patient> baseJpaResourceProviderPatient;
 	@Autowired
-	RepositoryClientFactory repositoryClientFactory;
+	IisFhirClientFactory iisFhirClientFactory;
 
 	/**
 	 * Constructor
@@ -84,7 +84,7 @@ public class IpsGenerationStrategyR4 extends DefaultJpaIpsGenerationStrategy imp
 		Parameters inParams = new Parameters();
 		inParams.addParameter("_mdm", true);
 		inParams.addParameter("type", StringUtils.join(theSection.getResourceTypes(), ","));
-		Bundle bundle = repositoryClientFactory.getFhirClient().operation().onServer().named(JpaConstants.OPERATION_EVERYTHING).withParameters(inParams)
+		Bundle bundle = iisFhirClientFactory.getFhirClient().operation().onServer().named(JpaConstants.OPERATION_EVERYTHING).withParameters(inParams)
 			.returnResourceType(Bundle.class).execute();
 		return bundle;
 	}
@@ -100,7 +100,7 @@ public class IpsGenerationStrategyR4 extends DefaultJpaIpsGenerationStrategy imp
 	public String mdmLinksParameterIds(IIdType theOriginalSubjectId, Section theSection) {
 		Parameters inParams = new Parameters();
 		inParams.addParameter("resourceId", theOriginalSubjectId.getValue());
-		Bundle bundle = repositoryClientFactory.getFhirClient().operation().onServer().named("$mdm-query-links").withParameters(inParams)
+		Bundle bundle = iisFhirClientFactory.getFhirClient().operation().onServer().named("$mdm-query-links").withParameters(inParams)
 			.returnResourceType(Bundle.class).execute();
 		return bundle.getEntry().stream().map(bundleEntryComponent -> bundleEntryComponent.getResource().getId()).collect(Collectors.joining(","));
 	}

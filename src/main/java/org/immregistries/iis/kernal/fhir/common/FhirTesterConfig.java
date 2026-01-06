@@ -2,7 +2,7 @@ package org.immregistries.iis.kernal.fhir.common;
 
 import ca.uhn.fhir.jpa.partition.IPartitionLookupSvc;
 import ca.uhn.fhir.jpa.partition.PartitionManagementProvider;
-import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
+import org.immregistries.iis.kernal.mapping.internalClient.IisFhirClientFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 //@formatter:off
@@ -19,7 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class FhirTesterConfig {
 
 	@Autowired
-	RepositoryClientFactory repositoryClientFactory;
+	IisFhirClientFactory iisFhirClientFactory;
 	@Autowired
 	IPartitionLookupSvc partitionLookupSvc;
 	@Autowired

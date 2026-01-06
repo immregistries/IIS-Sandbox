@@ -13,7 +13,7 @@ import org.immregistries.iis.kernal.security.TenantUtil;
 import org.immregistries.iis.kernal.logic.shlink.ShLinkUtilService;
 import org.immregistries.iis.kernal.mapping.resourceMappers.PatientMapper;
 import org.immregistries.iis.kernal.mapping.internalClient.FhirSearchRequester;
-import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
+import org.immregistries.iis.kernal.mapping.internalClient.IisFhirClientFactory;
 import org.immregistries.iis.kernal.model.ShLinkManifestRequestBody;
 import org.immregistries.iis.kernal.persisted.model.ShLinkManifest;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
@@ -40,7 +40,7 @@ public class PatientShLinkManifestRestController {
 	@Autowired
 	private ShLinkUtilService shLinkUtilService;
 	@Autowired
-	private RepositoryClientFactory repositoryClientFactory;
+	private IisFhirClientFactory iisFhirClientFactory;
 	@Autowired
 	FhirSearchRequester fhirSearchRequester;
 	@Autowired
@@ -77,7 +77,7 @@ public class PatientShLinkManifestRestController {
 	}
 
 	private ShLinkManifest getShLinkManifest(HttpServletRequest req, String id, Tenant tenant) {
-		IGenericClient fhirClient = repositoryClientFactory.newGenericClient(req);
+		IGenericClient fhirClient = iisFhirClientFactory.newGenericClient(req);
 		IBaseResource patientSelected = fetchPatientFromParameters(id, "", fhirClient, fhirSearchRequester);
 		return shLinkUtilService.generateExamplePatientManifest(tenant, patientSelected.getIdElement());
 	}

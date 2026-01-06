@@ -12,7 +12,7 @@ import org.hl7.fhir.instance.model.api.IBaseBundle;
 import org.hl7.fhir.instance.model.api.IDomainResource;
 import org.immregistries.iis.kernal.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.mapping.resourceMappers.PatientMapper;
-import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
+import org.immregistries.iis.kernal.mapping.internalClient.IisFhirClientFactory;
 import org.immregistries.iis.kernal.model.BusinessIdentifier;
 import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
@@ -42,7 +42,7 @@ public class RecommendationController {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	@Autowired
-	private RepositoryClientFactory repositoryClientFactory;
+	private IisFhirClientFactory iisFhirClientFactory;
 
 	@Autowired
 	private FhirContext fhirContext;
@@ -117,7 +117,7 @@ public class RecommendationController {
 		UiUtil.doHeader(out, "Recommendations", tenant);
 
 		try {
-			IGenericClient fhirClient = repositoryClientFactory.newGenericClient(req);
+			IGenericClient fhirClient = iisFhirClientFactory.newGenericClient(req);
 
 			IDomainResource recommendationResource = recommendationRestController.getRecommendation(
 					req.getParameter(PARAM_RECOMMENDATION_ID), req.getParameter(PARAM_RECOMMENDATION_IDENTIFIER),
@@ -171,7 +171,7 @@ public class RecommendationController {
 					org.hl7.fhir.r5.model.Bundle subcriptionBundle = fhirClient.search()
 							.forResource(org.hl7.fhir.r5.model.Subscription.class)
 							.returnBundle(org.hl7.fhir.r5.model.Bundle.class).execute();
-					IParser parser = repositoryClientFactory.getFhirContext()
+					IParser parser = iisFhirClientFactory.getFhirContext()
 							.newJsonParser().setPrettyPrint(true).setSummaryMode(false).setSuppressNarratives(true);
 
 					out.println("<div class=\"w3-container\">");

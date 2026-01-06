@@ -11,7 +11,7 @@ import org.immregistries.iis.kernal.controllers.filters.RestTenantUrlFilter;
 import org.immregistries.iis.kernal.controllers.rest.shlink.PatientShLinkRestController;
 import org.immregistries.iis.kernal.fhir.shl.ShLinkPayload;
 import org.immregistries.iis.kernal.mapping.resourceMappers.PatientMapper;
-import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
+import org.immregistries.iis.kernal.mapping.internalClient.IisFhirClientFactory;
 import org.immregistries.iis.kernal.model.ObservationReported;
 import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.model.VaccinationMaster;
@@ -27,7 +27,7 @@ public class PatientRestController extends BaseTenantTiedRest {
 
     public static final String MDM_EXPAND_REST_PARAM = "isGolden";
     @Autowired
-    private RepositoryClientFactory repositoryClientFactory;
+    private IisFhirClientFactory iisFhirClientFactory;
 
     @Autowired
     private FhirContext fhirContext;
@@ -46,7 +46,7 @@ public class PatientRestController extends BaseTenantTiedRest {
             @PathVariable("patientId") String patientId,
             @RequestAttribute(RestTenantUrlFilter.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
             HttpServletRequest req) {
-        IGenericClient fhirClient = repositoryClientFactory.newGenericClient(tenant, req);
+        IGenericClient fhirClient = iisFhirClientFactory.newGenericClient(tenant, req);
         return fhirClient.read().resource("Patient").withId(patientId).execute();
     }
 
@@ -64,7 +64,7 @@ public class PatientRestController extends BaseTenantTiedRest {
             @PathVariable("patientId") String patientId,
             @RequestAttribute(RestTenantUrlFilter.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
             HttpServletRequest req) {
-        IGenericClient fhirClient = repositoryClientFactory.newGenericClient(tenant, req);
+        IGenericClient fhirClient = iisFhirClientFactory.newGenericClient(tenant, req);
         return fhirClient.search()
                 .forResource("ImmunizationRecommendation")
                 .where(new ca.uhn.fhir.rest.gclient.ReferenceClientParam("patient").hasId(patientId))

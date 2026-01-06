@@ -7,7 +7,7 @@ import org.immregistries.codebase.client.reference.CodeStatusValue;
 import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.SoftwareVersion;
 import org.immregistries.iis.kernal.mapping.resourceMappers.ObservationMapper;
-import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
+import org.immregistries.iis.kernal.mapping.internalClient.IisFhirClientFactory;
 import org.immregistries.iis.kernal.model.*;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.immregistries.smm.tester.manager.HL7Reader;
@@ -25,7 +25,7 @@ public abstract class AbstractHl7MessageWriter implements IExampleMessageWriter 
 	private static Integer increment = 1;
 
 	@Autowired
-	RepositoryClientFactory repositoryClientFactory;
+	IisFhirClientFactory iisFhirClientFactory;
 	@Autowired
 	ObservationMapper observationMapper;
 	@Autowired

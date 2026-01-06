@@ -21,7 +21,7 @@ import org.immregistries.iis.kernal.mapping.internalClient.FhirRequesterUtil;
 import org.immregistries.iis.kernal.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.mapping.resourceMappers.ImmunizationMapper;
 import org.immregistries.iis.kernal.mapping.internalClient.FhirSearchRequester;
-import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
+import org.immregistries.iis.kernal.mapping.internalClient.IisFhirClientFactory;
 import org.immregistries.iis.kernal.model.*;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.immregistries.iis.kernal.controllers.servlet.util.PatientServletUtil;
@@ -55,7 +55,7 @@ public class VaccinationController {
 	public static final String PARAM_RESOURCE = "resource";
 	public static final String PARAM_VACCINATION_REPORTED_ID = "vaccinationReportedId";
 	@Autowired
-	RepositoryClientFactory repositoryClientFactory;
+	IisFhirClientFactory iisFhirClientFactory;
 	@Autowired
 	ImmunizationMapper immunizationMapper;
 	@Autowired
@@ -86,7 +86,7 @@ public class VaccinationController {
 	// false) String tenantName dealt with in filter
 	) throws ServletException, IOException {
 		Tenant tenant = CurrentTenantUtil.getTenantRedirectIfNone(req, resp);
-		IGenericClient fhirClient = repositoryClientFactory.newGenericClient(req);
+		IGenericClient fhirClient = iisFhirClientFactory.newGenericClient(req);
 
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
@@ -223,7 +223,7 @@ public class VaccinationController {
 					immunization.getPatient().setIdentifier(new org.hl7.fhir.r5.model.Identifier()
 							.setValue(patientMaster.getMainBusinessIdentifier().getValue())
 							.setSystem(patientMaster1.getMainBusinessIdentifier().getSystem()));
-					IParser parser = repositoryClientFactory.getFhirContext().newJsonParser().setPrettyPrint(true);
+					IParser parser = iisFhirClientFactory.getFhirContext().newJsonParser().setPrettyPrint(true);
 
 					PatientServletUtil.printSubscriptions(out, parser, bundle, immunization);
 				}
@@ -231,7 +231,7 @@ public class VaccinationController {
 				{
 					out.println("<div class=\"w3-container\">");
 					out.println("<h4>FHIR Api Shortcuts</h4>");
-					String apiBaseUrl = RepositoryClientFactory.fhirServerBasePath(tenant);
+					String apiBaseUrl = IisFhirClientFactory.fhirServerBasePath(tenant);
 					{
 						String link = apiBaseUrl + "/Immunization?_id=" + vaccination.getVaccinationId();
 						out.println("<div>FHIR Immunization: <a href=\"" + link + "\">" + link + "</a></div>");

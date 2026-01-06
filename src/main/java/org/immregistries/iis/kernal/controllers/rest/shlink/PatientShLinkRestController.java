@@ -11,7 +11,7 @@ import org.immregistries.iis.kernal.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.fhir.shl.ShLinkPayload;
 import org.immregistries.iis.kernal.logic.shlink.CompressionService;
 import org.immregistries.iis.kernal.logic.shlink.ShLinkUtilService;
-import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
+import org.immregistries.iis.kernal.mapping.internalClient.IisFhirClientFactory;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +36,7 @@ public class PatientShLinkRestController {
 	@Autowired
 	private ShLinkUtilService shLinkUtilService;
 	@Autowired
-	private RepositoryClientFactory repositoryClientFactory;
+	private IisFhirClientFactory iisFhirClientFactory;
 	@Autowired
 	private CompressionService compressionService;
 
@@ -46,7 +46,7 @@ public class PatientShLinkRestController {
 																	@RequestAttribute(CurrentTenantUtil.SESSION_REQUEST_TENANT) Tenant tenant,
 																	@PathVariable("patientId") String patientId)
 		throws IOException, ServletException {
-		IGenericClient client = repositoryClientFactory.newGenericClient(tenant, req);
+		IGenericClient client = iisFhirClientFactory.newGenericClient(tenant, req);
 		IBaseResource patientSelected = client.read().resource("Patient").withId(patientId).execute();
 		if (patientSelected == null) {
 			throw new RuntimeException("Patient not found");

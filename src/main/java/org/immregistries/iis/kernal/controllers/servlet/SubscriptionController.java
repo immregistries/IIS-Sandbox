@@ -12,7 +12,7 @@ import org.immregistries.iis.kernal.controllers.servlet.util.UiUtil;
 import org.immregistries.iis.kernal.controllers.servlet.util.UrlTenantUtil;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR5Condition;
 import org.immregistries.iis.kernal.security.CurrentTenantUtil;
-import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
+import org.immregistries.iis.kernal.mapping.internalClient.IisFhirClientFactory;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
@@ -36,7 +36,7 @@ import java.util.Map;
 public class SubscriptionController {
 	public static final String SUBSCRIPTION_BASE_PATH = "/subscription";
 	@Autowired
-	RepositoryClientFactory repositoryClientFactory;
+	IisFhirClientFactory iisFhirClientFactory;
 	@Autowired
 	SubscriptionRestController subscriptionRestController;
 
@@ -114,7 +114,7 @@ public class SubscriptionController {
 			throws ServletException, IOException {
 		Tenant tenant = CurrentTenantUtil.getTenantRedirectIfNone(req, resp);
 		resp.setContentType("text/html");
-		IGenericClient fhirClient = repositoryClientFactory.newGenericClient(req);
+		IGenericClient fhirClient = iisFhirClientFactory.newGenericClient(req);
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 
 		String subscriptionId = req.getParameter(PARAM_SUBSCRIPTION_ID);

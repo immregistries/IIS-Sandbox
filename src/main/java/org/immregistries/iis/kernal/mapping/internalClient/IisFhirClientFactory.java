@@ -42,7 +42,7 @@ import static org.immregistries.iis.kernal.security.CurrentTenantUtil.SESSION_RE
  * Generates fhir client to interact with the jpa repository
  */
 @Component
-public class RepositoryClientFactory extends ApacheRestfulClientFactory implements ITestingUiClientFactory {
+public class IisFhirClientFactory extends ApacheRestfulClientFactory implements ITestingUiClientFactory {
 	public static final String FHIR_CLIENT = "fhirClient";
 	@Autowired
 	IFhirSystemDao fhirSystemDao;
@@ -53,7 +53,7 @@ public class RepositoryClientFactory extends ApacheRestfulClientFactory implemen
 	Environment environment;
 
 	@Autowired
-	public RepositoryClientFactory() {
+	public IisFhirClientFactory() {
 		super();
 		setServerValidationMode(ServerValidationModeEnum.NEVER);
 	}

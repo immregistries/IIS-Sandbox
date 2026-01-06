@@ -15,7 +15,7 @@ import org.immregistries.iis.kernal.logic.logicInterceptors.ImmunizationProcessi
 import org.immregistries.iis.kernal.logic.logicInterceptors.ObservationProcessingInterceptor;
 import org.immregistries.iis.kernal.logic.logicInterceptors.PatientProcessingInterceptor;
 import org.immregistries.iis.kernal.mapping.internalClient.FhirSaveRequester;
-import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
+import org.immregistries.iis.kernal.mapping.internalClient.IisFhirClientFactory;
 import org.immregistries.iis.kernal.mapping.resourceMappers.forR4.*;
 import org.immregistries.iis.kernal.model.*;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
@@ -40,7 +40,7 @@ public class FhirMessagingHandler extends IncomingMessageHandler<Bundle, Object>
 	private FhirSaveRequester fhirSaveRequester;
 
 	@Autowired
-	private RepositoryClientFactory repositoryClientFactory;
+	private IisFhirClientFactory iisFhirClientFactory;
 	@Autowired
 	private AbstractHl7MessageWriter hl7MessageWriter;
 	@Autowired

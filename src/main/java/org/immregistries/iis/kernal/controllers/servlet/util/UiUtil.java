@@ -7,7 +7,7 @@ import org.immregistries.iis.kernal.mapping.internalClient.FhirRequesterUtil;
 import org.immregistries.iis.kernal.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.security.ServerSecurityConfig;
 import org.immregistries.iis.kernal.security.UserAccessUtil;
-import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
+import org.immregistries.iis.kernal.mapping.internalClient.IisFhirClientFactory;
 import org.immregistries.iis.kernal.model.ProcessingFlavor;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.immregistries.iis.kernal.persisted.model.UserAccess;
@@ -74,7 +74,7 @@ public class UiUtil {
 			if (tenant != null) {
 				out.println("<a class='w3-bar-item w3-button w3-right w3-green' href=\"" + link + "\">Tenant : "
 					+ tenant.getOrganizationName() + " </a>");
-				out.println("<a href=\"" + RepositoryClientFactory.fhirServerBasePath(tenant)
+				out.println("<a href=\"" + IisFhirClientFactory.fhirServerBasePath(tenant)
 					+ "/metadata\" class=\"w3-bar-item w3-button w3-right \">Tenant Fhir Server Base</a>");
 			} else {
 				out.println("<a class='w3-bar-item w3-button w3-right w3-green' href=\"" + link

@@ -6,7 +6,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.immregistries.iis.kernal.controllers.filters.RestTenantUrlFilter;
 import org.immregistries.iis.kernal.controllers.servlet.PopController;
 import org.immregistries.iis.kernal.logic.messageHandling.V2IncomingMessageHandler;
-import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
+import org.immregistries.iis.kernal.mapping.internalClient.IisFhirClientFactory;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.immregistries.smm.transform.ScenarioManager;
 import org.immregistries.smm.transform.TestCaseMessage;
@@ -27,7 +27,7 @@ public class PopRestController {
     @Autowired
     private FhirContext fhirContext;
     @Autowired
-    private RepositoryClientFactory repositoryClientFactory;
+    private IisFhirClientFactory iisFhirClientFactory;
     @Autowired
     private V2IncomingMessageHandler handler;
 
@@ -76,14 +76,14 @@ public class PopRestController {
                             .setEntity(new org.hl7.fhir.r5.model.Reference().setReference("Patient/" + id));
                 }
                 group.setDescription("Generated from Hl2v2 VXU Query on  time " + new Date());
-                repositoryClientFactory.newGenericClient(req).create().resource(group).execute();
+                iisFhirClientFactory.newGenericClient(req).create().resource(group).execute();
             } else {
                 org.hl7.fhir.r4.model.Group group = new org.hl7.fhir.r4.model.Group();
                 for (String id : groupPatientIds) {
                     group.addMember()
                             .setEntity(new org.hl7.fhir.r4.model.Reference().setReference("Patient/" + id));
                 }
-                repositoryClientFactory.newGenericClient(req).create().resource(group).execute();
+                iisFhirClientFactory.newGenericClient(req).create().resource(group).execute();
             }
         }
 

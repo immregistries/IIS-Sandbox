@@ -21,7 +21,7 @@ import org.immregistries.iis.kernal.mapping.internalClient.FhirRequesterUtil;
 import org.immregistries.iis.kernal.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.fhir.shl.ShLinkPayload;
 import org.immregistries.iis.kernal.mapping.resourceMappers.PatientMapper;
-import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
+import org.immregistries.iis.kernal.mapping.internalClient.IisFhirClientFactory;
 import org.immregistries.iis.kernal.model.LoincIdentifier;
 import org.immregistries.iis.kernal.model.ObservationReported;
 import org.immregistries.iis.kernal.model.PatientMaster;
@@ -60,7 +60,7 @@ public class PatientController {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	@Autowired
-	private RepositoryClientFactory repositoryClientFactory;
+	private IisFhirClientFactory iisFhirClientFactory;
 
 	@Autowired
 	private FhirContext fhirContext;
@@ -206,7 +206,7 @@ public class PatientController {
 	private void printPatientRecommendationsAndSubscriptions(PrintWriter out, IBaseResource patientSelected,
 																				PatientMaster patientMasterSelected, HttpServletRequest req,
 																				Tenant tenant) {
-		IParser parser = repositoryClientFactory.getFhirContext()
+		IParser parser = iisFhirClientFactory.getFhirContext()
 			.newJsonParser().setPrettyPrint(true).setSuppressNarratives(true);
 		IBaseBundle recommendationBaseBundle = patientRestController
 			.getPatientRecommendation(patientMasterSelected.getPatientId(), tenant, req);
@@ -321,7 +321,7 @@ public class PatientController {
 		{
 			out.println("<div class=\"w3-container\">");
 			out.println("<h4>FHIR Api Shortcuts</h4>");
-			String apiBaseUrl = RepositoryClientFactory.fhirServerBasePath(tenant);
+			String apiBaseUrl = IisFhirClientFactory.fhirServerBasePath(tenant);
 			{
 				String link = apiBaseUrl + "/Patient";
 				out.println("<div>All FHIR Patient records: <a href=\"" + link + "\">" + link + "</a></div>");

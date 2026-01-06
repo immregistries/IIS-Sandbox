@@ -12,6 +12,5 @@ public interface IFieldMapper<LocalType, R4, R5> {
 	LocalType fromR5(R5 r5);
 
 	LocalType fromR4(R4 r4);
-
-
+	
 }

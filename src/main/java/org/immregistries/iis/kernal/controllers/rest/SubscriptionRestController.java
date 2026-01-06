@@ -10,7 +10,7 @@ import org.hl7.fhir.r5.model.Bundle;
 import org.hl7.fhir.r5.model.Subscription;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR5Condition;
 import org.immregistries.iis.kernal.logic.SubscriptionService;
-import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
+import org.immregistries.iis.kernal.mapping.internalClient.IisFhirClientFactory;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
@@ -27,7 +27,7 @@ import java.util.List;
 public class SubscriptionRestController {
 
     @Autowired
-    RepositoryClientFactory repositoryClientFactory;
+    IisFhirClientFactory iisFhirClientFactory;
     @Autowired
     SubscriptionService subscriptionService;
     @Autowired
@@ -36,7 +36,7 @@ public class SubscriptionRestController {
     @GetMapping()
     public IBaseBundle getAllSubscriptions(
             HttpServletRequest req) {
-        IGenericClient fhirClient = repositoryClientFactory.newGenericClient(req);
+        IGenericClient fhirClient = iisFhirClientFactory.newGenericClient(req);
 
         // Implementation for GET request
         org.hl7.fhir.r5.model.Bundle subcriptionBundle = fhirClient.search()
@@ -61,7 +61,7 @@ public class SubscriptionRestController {
         // However, the original code uses `req.getParameter(PARAM_SUBSCRIPTION_ID)` and
         // other params.
         // We will accept a DTO.
-        IGenericClient localClient = repositoryClientFactory.newGenericClient(req);
+        IGenericClient localClient = iisFhirClientFactory.newGenericClient(req);
         String subscriptionId = triggerRequest.getSubscriptionId();
 
         Bundle searchBundle = localClient.search().forResource(Subscription.class)

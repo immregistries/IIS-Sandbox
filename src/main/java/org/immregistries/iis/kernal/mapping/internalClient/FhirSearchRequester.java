@@ -31,7 +31,7 @@ import static org.immregistries.iis.kernal.mapping.resourceMappers.ImmunizationM
 public class FhirSearchRequester {
 
 	@Autowired
-	RepositoryClientFactory repositoryClientFactory;
+	IisFhirClientFactory iisFhirClientFactory;
 	@Autowired
 	DaoRegistry daoRegistry;
 	@Autowired
@@ -267,7 +267,7 @@ public class FhirSearchRequester {
 	}
 
 	public List<VaccinationMaster> searchVaccinationListOperationEverything(String patientId) {
-		IGenericClient client = repositoryClientFactory.getFhirClient();
+		IGenericClient client = iisFhirClientFactory.getFhirClient();
 		Parameters in = new Parameters()
 			.addParameter("_mdm", "true")
 			.addParameter("_type", "Immunization");
@@ -314,7 +314,7 @@ public class FhirSearchRequester {
 	public PatientMaster matchPatient(List<PatientReported> multipleMatches, PatientMaster patientMasterForMatchQuery,
 												 Date cutoff) {
 		PatientMaster singleMatch = null;
-		Bundle matches = repositoryClientFactory.getFhirClient()
+		Bundle matches = iisFhirClientFactory.getFhirClient()
 			.operation().onType(Patient.class)
 			.named("match")
 			.withParameter(Parameters.class, "resource", allMappingService.fhirResource(patientMasterForMatchQuery))
