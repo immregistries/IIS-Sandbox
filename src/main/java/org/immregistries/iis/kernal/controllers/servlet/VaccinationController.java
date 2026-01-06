@@ -18,7 +18,7 @@ import org.immregistries.iis.kernal.controllers.rest.CodeMapRestController;
 import org.immregistries.iis.kernal.controllers.rest.PatientRestController;
 import org.immregistries.iis.kernal.controllers.rest.VaccinationRestController;
 import org.immregistries.iis.kernal.security.CurrentTenantUtil;
-import org.immregistries.iis.kernal.mapping.interfaces.ImmunizationMapper;
+import org.immregistries.iis.kernal.mapping.resourceMappers.ImmunizationMapper;
 import org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester;
 import org.immregistries.iis.kernal.mapping.internalClient.FhirSearchRequester;
 import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;

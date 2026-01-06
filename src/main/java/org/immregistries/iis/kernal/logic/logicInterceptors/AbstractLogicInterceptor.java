@@ -7,7 +7,7 @@ import org.apache.commons.lang3.builder.DiffResult;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.immregistries.iis.kernal.logic.ack.IisReportable;
 import org.immregistries.iis.kernal.logic.ack.IisReportableSeverity;
-import org.immregistries.iis.kernal.mapping.interfaces.IisFhirMapperMasterReported;
+import org.immregistries.iis.kernal.mapping.resourceMappers.IisFhirMapperMasterReported;
 import org.immregistries.iis.kernal.model.AbstractMappedObject;
 import org.immregistries.iis.kernal.model.TenantTiedObject;
 import org.immregistries.mqe.hl7util.model.CodedWithExceptions;

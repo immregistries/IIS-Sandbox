@@ -14,9 +14,9 @@ import org.immregistries.iis.kernal.logic.ack.IisReportable;
 import org.immregistries.iis.kernal.logic.logicInterceptors.ImmunizationProcessingInterceptor;
 import org.immregistries.iis.kernal.logic.logicInterceptors.ObservationProcessingInterceptor;
 import org.immregistries.iis.kernal.logic.logicInterceptors.PatientProcessingInterceptor;
-import org.immregistries.iis.kernal.mapping.forR4.*;
 import org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester;
 import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
+import org.immregistries.iis.kernal.mapping.resourceMappers.forR4.*;
 import org.immregistries.iis.kernal.model.*;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.immregistries.mqe.hl7util.model.CodedWithExceptions;
@@ -30,7 +30,7 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.immregistries.iis.kernal.mapping.interfaces.ImmunizationMapper.*;
+import static org.immregistries.iis.kernal.mapping.resourceMappers.ImmunizationMapper.*;
 
 @Service
 @Conditional(OnR4Condition.class)

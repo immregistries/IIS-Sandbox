@@ -3,7 +3,8 @@ package org.immregistries.iis.kernal.mapping;
 import java.util.Set;
 
 import org.hl7.fhir.instance.model.api.IBaseResource;
-import org.immregistries.iis.kernal.mapping.interfaces.*;
+import org.immregistries.iis.kernal.mapping.resourceMappers.IisFhirMapperMaster;
+import org.immregistries.iis.kernal.mapping.resourceMappers.IisFhirMapperMasterReported;
 import org.immregistries.iis.kernal.model.AbstractMappedObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

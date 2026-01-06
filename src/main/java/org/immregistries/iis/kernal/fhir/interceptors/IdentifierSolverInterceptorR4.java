@@ -19,7 +19,7 @@ import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Service;
 
 import static ca.uhn.fhir.interceptor.api.Pointcut.SERVER_INCOMING_REQUEST_PRE_HANDLED;
-import static org.immregistries.iis.kernal.mapping.interfaces.PatientMapper.MRN_SYSTEM;
+import static org.immregistries.iis.kernal.mapping.resourceMappers.PatientMapper.MRN_SYSTEM;
 import static org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester.GOLDEN_RECORD;
 import static org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester.GOLDEN_SYSTEM_TAG;
 

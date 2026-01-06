@@ -6,7 +6,7 @@ import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodeStatusValue;
 import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.SoftwareVersion;
-import org.immregistries.iis.kernal.mapping.interfaces.ObservationMapper;
+import org.immregistries.iis.kernal.mapping.resourceMappers.ObservationMapper;
 import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
 import org.immregistries.iis.kernal.model.*;
 import org.immregistries.iis.kernal.persisted.model.Tenant;

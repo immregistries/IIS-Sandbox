@@ -11,7 +11,7 @@ import org.immregistries.iis.kernal.controllers.rest.RestUrlUtil;
 import org.immregistries.iis.kernal.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.security.TenantUtil;
 import org.immregistries.iis.kernal.logic.shlink.ShLinkUtilService;
-import org.immregistries.iis.kernal.mapping.interfaces.PatientMapper;
+import org.immregistries.iis.kernal.mapping.resourceMappers.PatientMapper;
 import org.immregistries.iis.kernal.mapping.internalClient.FhirSearchRequester;
 import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
 import org.immregistries.iis.kernal.model.ShLinkManifestRequestBody;

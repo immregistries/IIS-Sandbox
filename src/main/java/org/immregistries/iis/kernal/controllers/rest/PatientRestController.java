@@ -10,7 +10,7 @@ import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.immregistries.iis.kernal.controllers.filters.RestTenantUrlFilter;
 import org.immregistries.iis.kernal.controllers.rest.shlink.PatientShLinkRestController;
 import org.immregistries.iis.kernal.fhir.shl.ShLinkPayload;
-import org.immregistries.iis.kernal.mapping.interfaces.PatientMapper;
+import org.immregistries.iis.kernal.mapping.resourceMappers.PatientMapper;
 import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
 import org.immregistries.iis.kernal.model.ObservationReported;
 import org.immregistries.iis.kernal.model.PatientMaster;

@@ -11,7 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.instance.model.api.IBaseBundle;
 import org.hl7.fhir.instance.model.api.IDomainResource;
 import org.immregistries.iis.kernal.security.CurrentTenantUtil;
-import org.immregistries.iis.kernal.mapping.interfaces.PatientMapper;
+import org.immregistries.iis.kernal.mapping.resourceMappers.PatientMapper;
 import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
 import org.immregistries.iis.kernal.model.BusinessIdentifier;
 import org.immregistries.iis.kernal.model.PatientMaster;
@@ -20,6 +20,7 @@ import org.immregistries.iis.kernal.controllers.rest.PatientRestController;
 import org.immregistries.iis.kernal.controllers.rest.RecommendationRestController;
 import org.immregistries.iis.kernal.controllers.servlet.util.PatientServletUtil;
 import org.immregistries.iis.kernal.controllers.servlet.util.UiUtil;
+import org.immregistries.iis.kernal.mapping.fieldsMappers.BusinessIdentifierMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -193,7 +194,8 @@ public class RecommendationController {
 					 */
 					org.hl7.fhir.r5.model.ImmunizationRecommendation immunizationRecommendation = (org.hl7.fhir.r5.model.ImmunizationRecommendation) recommendationResource;
 					immunizationRecommendation
-							.setPatient(new org.hl7.fhir.r5.model.Reference().setIdentifier(identifier.toR5()));
+							.setPatient(new org.hl7.fhir.r5.model.Reference()
+									.setIdentifier(BusinessIdentifierMapper.toR5(identifier)));
 					PatientServletUtil.printSubscriptions(out, parser, subcriptionBundle, immunizationRecommendation);
 				}
 			}

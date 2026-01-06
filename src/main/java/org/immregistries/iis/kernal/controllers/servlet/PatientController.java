@@ -19,7 +19,7 @@ import org.immregistries.iis.kernal.controllers.servlet.util.UiUtil;
 import org.immregistries.iis.kernal.controllers.servlet.util.UrlTenantUtil;
 import org.immregistries.iis.kernal.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.fhir.shl.ShLinkPayload;
-import org.immregistries.iis.kernal.mapping.interfaces.PatientMapper;
+import org.immregistries.iis.kernal.mapping.resourceMappers.PatientMapper;
 import org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester;
 import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
 import org.immregistries.iis.kernal.model.LoincIdentifier;
