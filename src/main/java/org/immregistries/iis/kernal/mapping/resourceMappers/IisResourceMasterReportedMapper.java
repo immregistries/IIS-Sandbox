@@ -3,7 +3,7 @@ package org.immregistries.iis.kernal.mapping.resourceMappers;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.immregistries.iis.kernal.model.AbstractMappedObject;
 
-public interface IisFhirMapperMasterReported<Master extends AbstractMappedObject, Reported extends Master, FhirResourceType extends IBaseResource> extends IisFhirMapperMaster<Master, FhirResourceType> {
+public interface IisResourceMasterReportedMapper<Master extends AbstractMappedObject, Reported extends Master, FhirResourceType extends IBaseResource> extends IisResourceMasterMapper<Master, FhirResourceType> {
 
 	Reported localObjectReportedWithMaster(FhirResourceType fhirResource);
 

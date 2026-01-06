@@ -1,13 +1,13 @@
 package org.immregistries.iis.kernal.mapping.fieldsMappers;
 
-import com.sun.tools.xjc.generator.bean.field.FieldRenderer;
+import org.hl7.fhir.r4.model.Address;
 import org.springframework.stereotype.Service;
 
 import org.apache.commons.lang3.StringUtils;
 import org.immregistries.iis.kernal.model.ModelAddress;
 
 @Service
-public class ModelAddressMapper implements FieldMapper<ModelAddress, org.hl7.fhir.r4.model.Address, org.hl7.fhir.r5.model.Address> {
+public class ModelAddressMapper implements IFieldMapper<ModelAddress, Address, org.hl7.fhir.r5.model.Address> {
 
 	@Override
 	public Class<ModelAddress> localType() {

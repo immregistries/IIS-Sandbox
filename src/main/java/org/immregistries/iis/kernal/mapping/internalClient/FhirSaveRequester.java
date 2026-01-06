@@ -22,7 +22,7 @@ import java.util.Date;
 import java.util.List;
 
 @SuppressWarnings("rawtypes")
-public abstract class AbstractFhirRequester<Patient extends IBaseResource, Immunization extends IBaseResource, Location extends IBaseResource, Practitioner extends IBaseResource, Observation extends IBaseResource, Person extends IBaseResource, Organization extends IBaseResource, RelatedPerson extends IBaseResource>
+public abstract class FhirSaveRequester<Patient extends IBaseResource, Immunization extends IBaseResource, Location extends IBaseResource, Practitioner extends IBaseResource, Observation extends IBaseResource, Person extends IBaseResource, Organization extends IBaseResource, RelatedPerson extends IBaseResource>
 		implements
 		IFhirRequester<Patient, Immunization, Location, Practitioner, Observation, Person, Organization, RelatedPerson> {
 	// public static final String GOLDEN_SYSTEM_IDENTIFIER =
@@ -45,8 +45,6 @@ public abstract class AbstractFhirRequester<Patient extends IBaseResource, Immun
 	ObservationMapper<Observation> observationMapper;
 	@Autowired
 	AllMappingService allMappingService;
-
-
 
 	@Autowired
 	RepositoryClientFactory repositoryClientFactory;
@@ -99,43 +97,7 @@ public abstract class AbstractFhirRequester<Patient extends IBaseResource, Immun
 		// }
 	}
 
-	@Autowired
-	FhirReadRequester fhirReadRequester;
-
-	/**
-	 *
-	 * @param fhirType FHIR Resource Class
-	 * @param id       resource id
-	 * @return resource found
-	 */
-	public IBaseResource read(String fhirType, String id) {
-		return fhirReadRequester.read(fhirType, id);
-	}
 
 
-	/**
-	 * Fills multiple matched list and return Single Match
-	 * Used for RSP
-	 *
-	 * @param multipleMatches            List to add multiple matches in
-	 * @param patientMasterForMatchQuery patient Information to match
-	 * @param cutoff                     cutoff date to ignore old records
-	 * @return Single match result
-	 */
-	public abstract PatientMaster matchPatient(List<PatientReported> multipleMatches,
-			PatientMaster patientMasterForMatchQuery, Date cutoff);
-
-	/**
-	 * Checks Meta and Tags
-	 * 
-	 * @param iBaseResource FHIR resource
-	 * @return if resource is golden record
-	 */
-	public static boolean isGoldenRecord(IBaseResource iBaseResource) {
-		if (iBaseResource != null && iBaseResource.getMeta() != null && !iBaseResource.getMeta().isEmpty()) {
-			return iBaseResource.getMeta().getTag(GOLDEN_SYSTEM_TAG, GOLDEN_RECORD) != null;
-		}
-		return false;
-	}
 
 }

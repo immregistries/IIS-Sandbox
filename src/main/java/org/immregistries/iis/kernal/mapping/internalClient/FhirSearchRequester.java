@@ -8,7 +8,9 @@ import ca.uhn.fhir.rest.param.TokenParam;
 import ca.uhn.fhir.rest.param.TokenParamModifier;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.Bundle;
+import org.hl7.fhir.r4.model.DecimalType;
 import org.hl7.fhir.r4.model.Parameters;
+import org.hl7.fhir.r4.model.Patient;
 import org.immregistries.iis.kernal.mapping.resourceMappers.*;
 import org.immregistries.iis.kernal.security.TenantUtil;
 import org.immregistries.iis.kernal.mapping.AllMappingService;
@@ -16,10 +18,13 @@ import org.immregistries.iis.kernal.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static org.immregistries.iis.kernal.logic.IIncomingMessageHandler.MINIMAL_MATCHING_SCORE;
 import static org.immregistries.iis.kernal.mapping.resourceMappers.ImmunizationMapper.IMMUNIZATION;
 
 @Service
@@ -137,7 +142,7 @@ public class FhirSearchRequester {
 		if (searchParameterMap == null) {
 			searchParameterMap = new SearchParameterMap();
 		}
-		searchParameterMap.add("_tag", new TokenParam(AbstractFhirRequester.GOLDEN_SYSTEM_TAG, AbstractFhirRequester.GOLDEN_RECORD));
+		searchParameterMap.add("_tag", new TokenParam(FhirSaveRequester.GOLDEN_SYSTEM_TAG, FhirSaveRequester.GOLDEN_RECORD));
 		return search(aClass, searchParameterMap);
 	}
 
@@ -153,7 +158,7 @@ public class FhirSearchRequester {
 		if (searchParameterMap == null) {
 			searchParameterMap = new SearchParameterMap();
 		}
-		searchParameterMap.add("_tag", new TokenParam(AbstractFhirRequester.GOLDEN_SYSTEM_TAG, AbstractFhirRequester.GOLDEN_RECORD));
+		searchParameterMap.add("_tag", new TokenParam(FhirSaveRequester.GOLDEN_SYSTEM_TAG, FhirSaveRequester.GOLDEN_RECORD));
 		return search(fhirType, searchParameterMap);
 	}
 
@@ -170,7 +175,7 @@ public class FhirSearchRequester {
 			searchParameterMap = new SearchParameterMap();
 		}
 		searchParameterMap.add("_tag",
-			new TokenParam(AbstractFhirRequester.GOLDEN_SYSTEM_TAG, AbstractFhirRequester.GOLDEN_RECORD).setModifier(TokenParamModifier.NOT));
+			new TokenParam(FhirSaveRequester.GOLDEN_SYSTEM_TAG, FhirSaveRequester.GOLDEN_RECORD).setModifier(TokenParamModifier.NOT));
 		return search(aClass, searchParameterMap);
 	}
 
@@ -187,7 +192,7 @@ public class FhirSearchRequester {
 			searchParameterMap = new SearchParameterMap();
 		}
 		searchParameterMap.add("_tag",
-			new TokenParam(AbstractFhirRequester.GOLDEN_SYSTEM_TAG, AbstractFhirRequester.GOLDEN_RECORD).setModifier(TokenParamModifier.NOT));
+			new TokenParam(FhirSaveRequester.GOLDEN_SYSTEM_TAG, FhirSaveRequester.GOLDEN_RECORD).setModifier(TokenParamModifier.NOT));
 		return search(fhirType, searchParameterMap);
 	}
 
@@ -276,7 +281,7 @@ public class FhirSearchRequester {
 		List<VaccinationMaster> vaccinationList = new ArrayList<>();
 		for (Bundle.BundleEntryComponent entry : bundle.getEntry()) {
 			if (entry.getResource().fhirType().equals(IMMUNIZATION)) {
-				if (AbstractFhirRequester.isGoldenRecord(entry.getResource())) {
+				if (FhirRequesterUtil.isGoldenRecord(entry.getResource())) {
 					VaccinationMaster vaccinationMaster = (VaccinationMaster) allMappingService
 						.localObject(entry.getResource());
 					if (vaccinationMaster != null) {
@@ -295,6 +300,65 @@ public class FhirSearchRequester {
 	public org.hl7.fhir.r4.model.Organization searchOrganizationR4(SearchParameterMap searchParameterMap) {
 		IBundleProvider bundleProvider = search("Organization", searchParameterMap);
 		return (org.hl7.fhir.r4.model.Organization) bundleProvider.getAllResources().stream().findFirst().orElse(null);
+	}
+
+	/**
+	 * Fills multiple matched list and return Single Match
+	 * Used for RSP
+	 *
+	 * @param multipleMatches            List to add multiple matches in
+	 * @param patientMasterForMatchQuery patient Information to match
+	 * @param cutoff                     cutoff date to ignore old records
+	 * @return Single match result
+	 */
+	public PatientMaster matchPatient(List<PatientReported> multipleMatches, PatientMaster patientMasterForMatchQuery,
+												 Date cutoff) {
+		PatientMaster singleMatch = null;
+		Bundle matches = repositoryClientFactory.getFhirClient()
+			.operation().onType(Patient.class)
+			.named("match")
+			.withParameter(Parameters.class, "resource", allMappingService.fhirResource(patientMasterForMatchQuery))
+			.returnResourceType(Bundle.class).execute();
+		BigDecimal singleMatchScore = new BigDecimal(-1);
+		for (Bundle.BundleEntryComponent entry : matches.getEntry()) {
+			if (entry.getResource() instanceof Patient) {
+				Patient patient = (Patient) entry.getResource();
+				PatientMaster patientMaster = (PatientMaster) allMappingService.localObject(patient);
+				/*
+				 * Filter for flavours previously configured SNAIL
+				 */
+				if (cutoff != null && cutoff.before(patientMaster.getReportedDate())) {
+					break;
+				}
+
+				// /**
+				// * Filtering only Golden records
+				// * TODO ask Nathan to assert workflow
+				// */
+				// if (entry.getResource().getMeta().getTag(GOLDEN_SYSTEM_TAG, GOLDEN_RECORD) ==
+				// null) {
+				// break;
+				// }
+				// if (entry.getSearch().hasScore() &&
+				// entry.getSearch().getScoreElement().compareTo(new
+				// DecimalType(MINIMAL_MATCHING_SCORE))) {
+				// singleMatch = patientMaster;
+				// }
+				if (FhirRequesterUtil.isGoldenRecord(entry.getResource())) {
+					if (singleMatch == null) {
+						if (!entry.getSearch().hasScore()) {
+							singleMatch = patientMaster;
+						} else if (entry.getSearch().getScoreElement().compareTo(new DecimalType(
+							Math.max(MINIMAL_MATCHING_SCORE, singleMatchScore.toBigInteger().intValue()))) >= 0) {
+							singleMatch = patientMaster;
+							singleMatchScore = entry.getSearch().getScore();
+						}
+					}
+				}
+				multipleMatches.add((PatientReported) allMappingService.localObjectReported(entry.getResource()));
+			}
+		}
+		return singleMatch;
 	}
 
 

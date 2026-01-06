@@ -1,9 +1,7 @@
 package org.immregistries.iis.kernal.mapping.fieldsMappers;
 
 
-import org.immregistries.iis.kernal.model.BusinessIdentifier;
-
-public interface FieldMapper<LocalType, R4, R5> {
+public interface IFieldMapper<LocalType, R4, R5> {
 
 	Class<LocalType> localType();
 

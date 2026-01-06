@@ -8,7 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Session;
 import org.immregistries.iis.kernal.security.CurrentTenantUtil;
-import org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester;
+import org.immregistries.iis.kernal.mapping.internalClient.FhirSaveRequester;
 import org.immregistries.iis.kernal.mapping.internalClient.FhirReadRequester;
 import org.immregistries.iis.kernal.mapping.internalClient.FhirSearchRequester;
 import org.immregistries.iis.kernal.model.*;
@@ -55,7 +55,7 @@ public class LocationController {
 	public static final String PARAM_ADDRESS_COUNTY_PARISH = "addressCountyParish";
 	public static final String PARAM_VFC_PROVIDER_PIN = "vfcProviderPin";
 	@Autowired
-	AbstractFhirRequester fhirRequester;
+	FhirSaveRequester fhirSaveRequester;
 	@Autowired
 	FhirReadRequester fhirReadRequester;
 	@Autowired
@@ -100,7 +100,7 @@ public class LocationController {
 						orgLocationSelected = new OrgLocation();
 						orgLocationSelected.setOrgFacilityCode(orgFacilityCode);
 						orgLocationSelected.setTenant(tenant);
-						orgLocationSelected = fhirRequester.saveOrgLocation(orgLocationSelected);
+						orgLocationSelected = fhirSaveRequester.saveOrgLocation(orgLocationSelected);
 						// Location location = LocationMapper.fhirLocation(orgLocationSelected);
 						// try {
 						// MethodOutcome outcome = fhirClient.update().resource(location).conditional()
@@ -122,7 +122,7 @@ public class LocationController {
 					orgLocationSelected.setAddressCountry(req.getParameter(PARAM_ADDRESS_COUNTRY));
 					orgLocationSelected.setAddressCountyParish(req.getParameter(PARAM_ADDRESS_COUNTY_PARISH));
 					orgLocationSelected.setVfcProviderPin(req.getParameter(PARAM_VFC_PROVIDER_PIN));
-					orgLocationSelected = fhirRequester.saveOrgLocation(orgLocationSelected);
+					orgLocationSelected = fhirSaveRequester.saveOrgLocation(orgLocationSelected);
 
 					UriComponentsBuilder uriComponentsBuilder = ServletUriComponentsBuilder.fromRequestUri(req);
 					resp.sendRedirect(uriComponentsBuilder.build().toUri().toURL().toString());

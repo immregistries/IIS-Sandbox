@@ -5,8 +5,8 @@ import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.api.server.IBundleProvider;
 import ca.uhn.fhir.rest.gclient.ICriterion;
 import org.apache.commons.lang3.StringUtils;
-import org.hl7.fhir.r4.model.*;
-import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
+import org.hl7.fhir.r5.model.*;
+import org.immregistries.iis.kernal.fhir.common.annotations.OnR5Condition;
 import org.immregistries.iis.kernal.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,19 +21,10 @@ import java.util.List;
 
 import static org.immregistries.iis.kernal.logic.IIncomingMessageHandler.MINIMAL_MATCHING_SCORE;
 
-/**
- * DO NOT EDIT THE CONTENT OF THIS FILE
- *
- * This is a literal copy of FhirRequesterR4 except for the name and imported
- * FHIR Model package
- *
- * Please paste any new content from R4 version here to preserve similarity in
- * behavior.
- */
 @Component
-@Conditional(OnR4Condition.class)
-public class FhirRequesterR4 extends
-		AbstractFhirRequester<Patient, Immunization, Location, Practitioner, Observation, Person, Organization, RelatedPerson> {
+@Conditional(OnR5Condition.class)
+public class FhirSaveRequesterR5 extends
+        FhirSaveRequester<Patient, Immunization, Location, Practitioner, Observation, Person, Organization, RelatedPerson> {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	@Autowired
 	public FhirReadRequester fhirReadSuper;
@@ -41,10 +32,12 @@ public class FhirRequesterR4 extends
 	@Autowired
 	FhirSearchRequester fhirSearchRequester;
 
+
 	public Organization searchOrganization(SearchParameterMap searchParameterMap) {
 		IBundleProvider bundleProvider = fhirSearchRequester.search("Organization", searchParameterMap);
 		return (Organization) bundleProvider.getAllResources().stream().findFirst().orElse(null);
 	}
+
 
 	public RelatedPerson searchRelatedPerson(SearchParameterMap searchParameterMap) {
 		RelatedPerson relatedPerson = null;
@@ -60,8 +53,8 @@ public class FhirRequesterR4 extends
 		boolean createOnly = false;
 		List<ICriterion> criteria = new ArrayList<>(2);
 		criteria.add(Patient.IDENTIFIER.exactly().systemAndIdentifier(
-				patientReported.getMainBusinessIdentifier().getSystem(),
-				patientReported.getMainBusinessIdentifier().getValue()));
+			patientReported.getMainBusinessIdentifier().getSystem(),
+			patientReported.getMainBusinessIdentifier().getValue()));
 		if (StringUtils.isNotBlank(patientReported.getManagingOrganizationId())) {
 			criteria.add(Patient.ORGANIZATION.hasAnyOfIds(patientReported.getManagingOrganizationId()));
 		} else {
@@ -82,7 +75,7 @@ public class FhirRequesterR4 extends
 	public ModelPerson savePractitioner(ModelPerson modelPerson) {
 		Practitioner practitioner = practitionerMapper.fhirResource(modelPerson);
 		MethodOutcome outcome = save(false, practitioner,
-				Patient.IDENTIFIER.exactly().identifier(modelPerson.getPersonExternalLink()));
+			Patient.IDENTIFIER.exactly().identifier(modelPerson.getPersonExternalLink()));
 		if (outcome.getCreated() != null && outcome.getCreated()) {
 			modelPerson.setPersonId(outcome.getId().getIdPart());
 		} else if (!outcome.getResource().isEmpty()) {
@@ -106,8 +99,8 @@ public class FhirRequesterR4 extends
 		Immunization immunization = (Immunization) allMappingService.fhirResource(vaccinationReported);
 		// TODO change conditional create to update ?
 		MethodOutcome outcome = save(false, immunization
-		// , Immunization.IDENTIFIER.exactly()
-		// .identifier(vaccinationReported.getExternalLink())
+			// , Immunization.IDENTIFIER.exactly()
+			// .identifier(vaccinationReported.getExternalLink())
 		);
 		if (outcome.getCreated() != null && outcome.getCreated()) {
 			vaccinationReported.setVaccinationId(outcome.getId().getIdPart());
@@ -120,7 +113,7 @@ public class FhirRequesterR4 extends
 	public OrgLocation saveOrgLocation(OrgLocation orgLocation) {
 		Location location = locationMapper.fhirResource(orgLocation);
 		MethodOutcome outcome = save(false, location,
-				Location.IDENTIFIER.exactly().identifier(location.getIdentifierFirstRep().getValue()));
+			Location.IDENTIFIER.exactly().identifier(location.getIdentifierFirstRep().getValue()));
 		if (outcome.getCreated() != null && outcome.getCreated()) {
 			orgLocation.setOrgLocationId(outcome.getId().getIdPart());
 		} else if (!outcome.getResource().isEmpty()) {
@@ -133,7 +126,7 @@ public class FhirRequesterR4 extends
 		MethodOutcome outcome = null;
 		if (organization.getIdentifierFirstRep().getValue() != null) {
 			outcome = save(false, organization,
-					Organization.IDENTIFIER.exactly().identifier(organization.getIdentifierFirstRep().getValue()));
+				Organization.IDENTIFIER.exactly().identifier(organization.getIdentifierFirstRep().getValue()));
 		} else {
 			outcome = save(false, organization);
 		}
@@ -149,13 +142,13 @@ public class FhirRequesterR4 extends
 	}
 
 	public PatientMaster matchPatient(List<PatientReported> multipleMatches, PatientMaster patientMasterForMatchQuery,
-			Date cutoff) {
+												 Date cutoff) {
 		PatientMaster singleMatch = null;
 		Bundle matches = repositoryClientFactory.getFhirClient()
-				.operation().onType(Patient.class)
-				.named("match")
-				.withParameter(Parameters.class, "resource", allMappingService.fhirResource(patientMasterForMatchQuery))
-				.returnResourceType(Bundle.class).execute();
+			.operation().onType(Patient.class)
+			.named("match")
+			.withParameter(Parameters.class, "resource", allMappingService.fhirResource(patientMasterForMatchQuery))
+			.returnResourceType(Bundle.class).execute();
 		BigDecimal singleMatchScore = new BigDecimal(-1);
 		for (Bundle.BundleEntryComponent entry : matches.getEntry()) {
 			if (entry.getResource() instanceof Patient) {
@@ -181,12 +174,12 @@ public class FhirRequesterR4 extends
 				// DecimalType(MINIMAL_MATCHING_SCORE))) {
 				// singleMatch = patientMaster;
 				// }
-				if (isGoldenRecord(entry.getResource())) {
+				if (FhirRequesterUtil.isGoldenRecord(entry.getResource())) {
 					if (singleMatch == null) {
 						if (!entry.getSearch().hasScore()) {
 							singleMatch = patientMaster;
 						} else if (entry.getSearch().getScoreElement().compareTo(new DecimalType(
-								Math.max(MINIMAL_MATCHING_SCORE, singleMatchScore.toBigInteger().intValue()))) >= 0) {
+							Math.max(MINIMAL_MATCHING_SCORE, singleMatchScore.toBigInteger().intValue()))) >= 0) {
 							singleMatch = patientMaster;
 							singleMatchScore = entry.getSearch().getScore();
 						}
@@ -197,5 +190,6 @@ public class FhirRequesterR4 extends
 		}
 		return singleMatch;
 	}
+
 
 }

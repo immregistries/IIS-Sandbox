@@ -3,7 +3,7 @@ package org.immregistries.iis.kernal.mapping.resourceMappers;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.immregistries.iis.kernal.model.OrgLocation;
 
-public interface LocationMapper<Location extends IBaseResource> extends IisFhirMapperMaster<OrgLocation, Location> {
+public interface LocationMapper<Location extends IBaseResource> extends IisResourceMasterMapper<OrgLocation, Location> {
 	default String fhirType() {
 		return LOCATION;
 	}

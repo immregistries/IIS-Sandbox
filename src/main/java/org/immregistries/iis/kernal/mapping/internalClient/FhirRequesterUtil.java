@@ -3,6 +3,10 @@ package org.immregistries.iis.kernal.mapping.internalClient;
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.rest.gclient.ICriterion;
 import ca.uhn.fhir.rest.gclient.ICriterionInternal;
+import org.hl7.fhir.instance.model.api.IBaseResource;
+
+import static org.immregistries.iis.kernal.mapping.internalClient.FhirSaveRequester.GOLDEN_RECORD;
+import static org.immregistries.iis.kernal.mapping.internalClient.FhirSaveRequester.GOLDEN_SYSTEM_TAG;
 
 public class FhirRequesterUtil {
 
@@ -38,4 +42,18 @@ public class FhirRequesterUtil {
 		}
 		return params.toString();
 	}
+
+	/**
+	 * Checks Meta and Tags
+	 *
+	 * @param iBaseResource FHIR resource
+	 * @return if resource is golden record
+	 */
+	public static boolean isGoldenRecord(IBaseResource iBaseResource) {
+		if (iBaseResource != null && iBaseResource.getMeta() != null && !iBaseResource.getMeta().isEmpty()) {
+			return iBaseResource.getMeta().getTag(GOLDEN_SYSTEM_TAG, GOLDEN_RECORD) != null;
+		}
+		return false;
+	}
+
 }

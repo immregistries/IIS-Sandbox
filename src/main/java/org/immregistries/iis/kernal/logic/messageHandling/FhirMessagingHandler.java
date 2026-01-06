@@ -14,7 +14,7 @@ import org.immregistries.iis.kernal.logic.ack.IisReportable;
 import org.immregistries.iis.kernal.logic.logicInterceptors.ImmunizationProcessingInterceptor;
 import org.immregistries.iis.kernal.logic.logicInterceptors.ObservationProcessingInterceptor;
 import org.immregistries.iis.kernal.logic.logicInterceptors.PatientProcessingInterceptor;
-import org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester;
+import org.immregistries.iis.kernal.mapping.internalClient.FhirSaveRequester;
 import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
 import org.immregistries.iis.kernal.mapping.resourceMappers.forR4.*;
 import org.immregistries.iis.kernal.model.*;
@@ -37,7 +37,7 @@ import static org.immregistries.iis.kernal.mapping.resourceMappers.ImmunizationM
 public class FhirMessagingHandler extends IncomingMessageHandler<Bundle, Object> {
 
 	@Autowired
-	private AbstractFhirRequester fhirRequester;
+	private FhirSaveRequester fhirSaveRequester;
 
 	@Autowired
 	private RepositoryClientFactory repositoryClientFactory;
@@ -116,7 +116,7 @@ public class FhirMessagingHandler extends IncomingMessageHandler<Bundle, Object>
 				processingFlavorSet);
 		IIncomingMessageHandler.verifyNoErrors(iisReportableList);
 		patientReported.setUpdatedDate(new Date());
-		patientReported = fhirRequester.savePatientReported(patientReported);
+		patientReported = fhirSaveRequester.savePatientReported(patientReported);
 		return patientReported;
 	}
 
@@ -168,7 +168,7 @@ public class FhirMessagingHandler extends IncomingMessageHandler<Bundle, Object>
 				}
 				vaccinationReported = immunizationProcessingInterceptor.processAndValidateVaccinationReported(
 						vaccinationReported, iisReportableList, processingFlavorSet, -1, -1, -1, null);
-				vaccinationReported = fhirRequester.saveVaccinationReported(vaccinationReported);
+				vaccinationReported = fhirSaveRequester.saveVaccinationReported(vaccinationReported);
 				vaccinationReportedList.add(vaccinationReported);
 			}
 		}
@@ -263,7 +263,7 @@ public class FhirMessagingHandler extends IncomingMessageHandler<Bundle, Object>
 					orgLocation.setTenant(tenant);
 					return orgLocation;
 				})
-				.map(orgLocation -> fhirRequester.saveOrgLocation(orgLocation))
+				.map(orgLocation -> fhirSaveRequester.saveOrgLocation(orgLocation))
 				.orElse(null);
 	}
 
@@ -279,7 +279,7 @@ public class FhirMessagingHandler extends IncomingMessageHandler<Bundle, Object>
 						modelPerson.setTenant(tenant);
 						return modelPerson;
 					})
-					.map(modelPerson -> fhirRequester.savePractitioner(modelPerson))
+					.map(modelPerson -> fhirSaveRequester.savePractitioner(modelPerson))
 					.orElse(null);
 		} else if (reference.getReferenceElement().getResourceType().equals("PractitionerRole")) {
 			Optional<Reference> practitionerReference = bundle.getEntry().stream()

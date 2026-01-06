@@ -1,5 +1,6 @@
 package org.immregistries.iis.kernal.mapping.fieldsMappers;
 
+import org.hl7.fhir.r4.model.ContactPoint;
 import org.springframework.stereotype.Service;
 
 import org.apache.commons.lang3.StringUtils;
@@ -12,7 +13,7 @@ import org.immregistries.iis.kernal.mapping.MappingHelper;
 import org.immregistries.iis.kernal.model.ModelPhone;
 
 @Service
-public class ModelPhoneMapper implements  FieldMapper<ModelPhone, org.hl7.fhir.r4.model.ContactPoint, org.hl7.fhir.r5.model.ContactPoint>{
+public class ModelPhoneMapper implements IFieldMapper<ModelPhone, ContactPoint, org.hl7.fhir.r5.model.ContactPoint> {
     public static final String PHONE_USE_V2_SYSTEM = "http://terminology.hl7.org/ValueSet/v2-0201";
     public static final String USE_EXTENSION_URL = "use";
 

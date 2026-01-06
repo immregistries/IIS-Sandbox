@@ -8,7 +8,7 @@ import org.immregistries.iis.kernal.logic.IIncomingMessageHandler;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
 import org.immregistries.iis.kernal.mapping.resourceMappers.ImmunizationMapper;
 import org.immregistries.iis.kernal.mapping.resourceMappers.ObservationMapper;
-import org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester;
+import org.immregistries.iis.kernal.mapping.internalClient.FhirSaveRequester;
 import org.immregistries.iis.kernal.mapping.fieldsMappers.BusinessIdentifierMapper;
 import org.immregistries.iis.kernal.model.BusinessIdentifier;
 import org.immregistries.iis.kernal.model.ObservationMaster;
@@ -29,8 +29,6 @@ import static org.immregistries.iis.kernal.mapping.resourceMappers.ImmunizationM
 @Service
 @Conditional(OnR4Condition.class)
 public class ObservationMapperR4 implements ObservationMapper<Observation> {
-	@Autowired
-	private AbstractFhirRequester fhirRequests;
 	@Autowired
 	private BusinessIdentifierMapper businessIdentifierMapper;
 

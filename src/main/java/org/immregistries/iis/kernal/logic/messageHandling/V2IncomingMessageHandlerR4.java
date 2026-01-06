@@ -43,7 +43,7 @@ public class V2IncomingMessageHandlerR4 extends V2IncomingMessageHandler {
 					new SearchParameterMap(Organization.SP_NAME, new StringParam(sendingFacilityName)));
 			// Organization.NAME.matches().value(sendingFacilityName));
 			if (responsibleOrganization == null) {
-				responsibleOrganization = (Organization) fhirRequester
+				responsibleOrganization = (Organization) fhirSaveRequester
 						.saveOrganization(new Organization().setName(sendingFacilityName));
 			}
 		}
@@ -82,7 +82,7 @@ public class V2IncomingMessageHandlerR4 extends V2IncomingMessageHandler {
 			if (tokenParam != null) {
 				sendingOrganization.addIdentifier(businessIdentifierMapper.toR4(businessIdentifier));
 			}
-			sendingOrganization = (Organization) fhirRequester.saveOrganization(sendingOrganization);
+			sendingOrganization = (Organization) fhirSaveRequester.saveOrganization(sendingOrganization);
 		}
 		return sendingOrganization;
 	}
@@ -108,7 +108,7 @@ public class V2IncomingMessageHandlerR4 extends V2IncomingMessageHandler {
 			}
 		}
 		if (managingOrganization != null) {
-			managingOrganization = (Organization) fhirRequester.saveOrganization(managingOrganization);
+			managingOrganization = (Organization) fhirSaveRequester.saveOrganization(managingOrganization);
 		}
 		return managingOrganization;
 	}

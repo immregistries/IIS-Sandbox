@@ -1,16 +1,16 @@
 package org.immregistries.iis.kernal.mapping.fieldsMappers;
 
+import org.hl7.fhir.r4.model.HumanName;
 import org.springframework.stereotype.Service;
 
 import org.immregistries.iis.kernal.mapping.MappingHelper;
 import org.immregistries.iis.kernal.model.ModelName;
-import org.immregistries.iis.kernal.model.VaccinationMaster;
 
 import static org.immregistries.iis.kernal.mapping.resourceMappers.PatientMapper.V_2_NAME_TYPE;
 import static org.immregistries.iis.kernal.mapping.resourceMappers.PatientMapper.V_2_NAME_TYPE_SYSTEM;
 
 @Service
-public class ModelNameMapper implements FieldMapper<ModelName, org.hl7.fhir.r4.model.HumanName, org.hl7.fhir.r5.model.HumanName> {
+public class ModelNameMapper implements IFieldMapper<ModelName, HumanName, org.hl7.fhir.r5.model.HumanName> {
 
 	@Override
 	public Class<ModelName> localType() {

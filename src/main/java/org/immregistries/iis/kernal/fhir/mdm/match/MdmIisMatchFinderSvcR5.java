@@ -28,8 +28,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import static org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester.GOLDEN_RECORD;
-import static org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester.GOLDEN_SYSTEM_TAG;
+import static org.immregistries.iis.kernal.mapping.internalClient.FhirSaveRequester.GOLDEN_RECORD;
+import static org.immregistries.iis.kernal.mapping.internalClient.FhirSaveRequester.GOLDEN_SYSTEM_TAG;
 
 public class MdmIisMatchFinderSvcR5 extends AbstractMdmIisMatchFinderSvc<Immunization> implements IMdmMatchFinderSvc, IMdmIisMatchFinderSvc {
 	private static final Logger ourLog = Logs.getMdmTroubleshootingLog();

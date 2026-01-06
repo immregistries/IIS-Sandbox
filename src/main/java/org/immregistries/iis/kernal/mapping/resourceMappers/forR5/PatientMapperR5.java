@@ -29,8 +29,8 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import static org.immregistries.iis.kernal.mapping.resourceMappers.ImmunizationMapper.RECORDED;
-import static org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester.GOLDEN_RECORD;
-import static org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester.GOLDEN_SYSTEM_TAG;
+import static org.immregistries.iis.kernal.mapping.internalClient.FhirSaveRequester.GOLDEN_RECORD;
+import static org.immregistries.iis.kernal.mapping.internalClient.FhirSaveRequester.GOLDEN_SYSTEM_TAG;
 
 @Service
 @Conditional(OnR5Condition.class)

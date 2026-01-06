@@ -17,10 +17,10 @@ import org.immregistries.iis.kernal.controllers.servlet.shlink.ShLinkController;
 import org.immregistries.iis.kernal.controllers.servlet.util.UiQrCodeUtil;
 import org.immregistries.iis.kernal.controllers.servlet.util.UiUtil;
 import org.immregistries.iis.kernal.controllers.servlet.util.UrlTenantUtil;
+import org.immregistries.iis.kernal.mapping.internalClient.FhirRequesterUtil;
 import org.immregistries.iis.kernal.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.fhir.shl.ShLinkPayload;
 import org.immregistries.iis.kernal.mapping.resourceMappers.PatientMapper;
-import org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester;
 import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
 import org.immregistries.iis.kernal.model.LoincIdentifier;
 import org.immregistries.iis.kernal.model.ObservationReported;
@@ -120,7 +120,7 @@ public class PatientController {
 	private void singlePatientInformationPrintAll(PrintWriter out, IBaseResource patientSelected,
 																 Tenant tenant, HttpServletRequest req) throws JsonProcessingException {
 		PatientMaster patientMasterSelected = patientMapper.localObject(patientSelected);
-		boolean isGolden = AbstractFhirRequester.isGoldenRecord(patientSelected);
+		boolean isGolden = FhirRequesterUtil.isGoldenRecord(patientSelected);
 
 		out.println("<h2>Patient : " + patientMasterSelected.getNameFirst() + " "
 			+ patientMasterSelected.getNameMiddle() + " " + patientMasterSelected.getNameLast() + "</h2>");

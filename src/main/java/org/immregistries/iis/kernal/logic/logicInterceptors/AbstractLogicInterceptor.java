@@ -7,7 +7,7 @@ import org.apache.commons.lang3.builder.DiffResult;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.immregistries.iis.kernal.logic.ack.IisReportable;
 import org.immregistries.iis.kernal.logic.ack.IisReportableSeverity;
-import org.immregistries.iis.kernal.mapping.resourceMappers.IisFhirMapperMasterReported;
+import org.immregistries.iis.kernal.mapping.resourceMappers.IisResourceMasterReportedMapper;
 import org.immregistries.iis.kernal.model.AbstractMappedObject;
 import org.immregistries.iis.kernal.model.TenantTiedObject;
 import org.immregistries.mqe.hl7util.model.CodedWithExceptions;
@@ -43,7 +43,7 @@ public abstract class AbstractLogicInterceptor {
 		return iisReportable;
 	}
 
-	public boolean testMapping(IisFhirMapperMasterReported<AbstractMappedObject, AbstractMappedObject, IBaseResource> mapper, AbstractMappedObject abstractMappedObject) {
+	public boolean testMapping(IisResourceMasterReportedMapper<AbstractMappedObject, AbstractMappedObject, IBaseResource> mapper, AbstractMappedObject abstractMappedObject) {
 		IBaseResource resource = mapper.fhirResource(abstractMappedObject);
 		AbstractMappedObject abstractMappedObject1 = mapper.localObjectReported(resource);
 		if (abstractMappedObject1 == null) {
@@ -64,7 +64,7 @@ public abstract class AbstractLogicInterceptor {
 		return res;
 	}
 
-	public boolean testMappingFhir(IisFhirMapperMasterReported<AbstractMappedObject, AbstractMappedObject, IBaseResource> mapper, IBaseResource resource, IParser parser) {
+	public boolean testMappingFhir(IisResourceMasterReportedMapper<AbstractMappedObject, AbstractMappedObject, IBaseResource> mapper, IBaseResource resource, IParser parser) {
 		AbstractMappedObject abstractMappedObject1 = mapper.localObjectReported(resource);
 		IBaseResource resource1 = mapper.fhirResource(abstractMappedObject1);
 		String s1 = parser.encodeResourceToString(resource);

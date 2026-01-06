@@ -12,7 +12,7 @@ import org.immregistries.iis.kernal.mapping.MappingHelper;
 import org.immregistries.iis.kernal.mapping.fieldsMappers.BusinessIdentifierMapper;
 import org.immregistries.iis.kernal.mapping.resourceMappers.ImmunizationMapper;
 import org.immregistries.iis.kernal.mapping.internalClient.FhirReadRequester;
-import org.immregistries.iis.kernal.mapping.internalClient.FhirRequesterR4;
+import org.immregistries.iis.kernal.mapping.internalClient.FhirSaveRequesterR4;
 import org.immregistries.iis.kernal.mapping.internalClient.FhirSearchRequester;
 import org.immregistries.iis.kernal.model.*;
 import org.slf4j.Logger;
@@ -29,7 +29,7 @@ public class ImmunizationMapperR4 implements ImmunizationMapper<Immunization> {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	@Autowired
-	private FhirRequesterR4 fhirRequests;
+	private FhirSaveRequesterR4 fhirRequests;
 	@Autowired
 	private FhirReadRequester fhirReadRequester;
 	@Autowired

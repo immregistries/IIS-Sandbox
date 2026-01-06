@@ -10,7 +10,7 @@ import org.immregistries.iis.kernal.model.PatientReported;
  * @param <Patient> FHIR Resource type
  */
 public interface PatientMapper<Patient extends IBaseResource>
-		extends IisFhirMapperMasterReported<PatientMaster, PatientReported, Patient> {
+		extends IisResourceMasterReportedMapper<PatientMaster, PatientReported, Patient> {
 
 	default String fhirType() {
 		return PATIENT;

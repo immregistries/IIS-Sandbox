@@ -5,7 +5,7 @@ import org.immregistries.iis.kernal.model.VaccinationMaster;
 import org.immregistries.iis.kernal.model.VaccinationReported;
 
 public interface ImmunizationMapper<Immunization extends IBaseResource>
-		extends IisFhirMapperMasterReported<VaccinationMaster, VaccinationReported, Immunization> {
+		extends IisResourceMasterReportedMapper<VaccinationMaster, VaccinationReported, Immunization> {
 	default String fhirType() {
 		return IMMUNIZATION;
 	}

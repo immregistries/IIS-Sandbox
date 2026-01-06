@@ -4,7 +4,7 @@ import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
 
 public interface OrganizationMapper<Organization extends IBaseResource>
-		extends IisFhirMapperMaster<Tenant, Organization> {
+		extends IisResourceMasterMapper<Tenant, Organization> {
 	default String fhirType() {
 		return ORGANIZATION;
 	}

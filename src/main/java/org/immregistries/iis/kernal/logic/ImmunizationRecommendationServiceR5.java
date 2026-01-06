@@ -11,7 +11,7 @@ import org.immregistries.iis.kernal.mapping.fieldsMappers.BusinessIdentifierMapp
 import org.immregistries.iis.kernal.mapping.resourceMappers.forR5.ImmunizationEvaluationMapperR5;
 import org.immregistries.iis.kernal.mapping.resourceMappers.forR5.ImmunizationRecommendationMapperR5;
 import org.immregistries.iis.kernal.mapping.resourceMappers.forR5.PatientMapperR5;
-import org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester;
+import org.immregistries.iis.kernal.mapping.internalClient.FhirSaveRequester;
 import org.immregistries.iis.kernal.mapping.internalClient.FhirReadRequester;
 import org.immregistries.iis.kernal.mapping.internalClient.FhirSearchRequester;
 import org.immregistries.iis.kernal.model.PatientMaster;
@@ -36,11 +36,7 @@ public class ImmunizationRecommendationServiceR5
 	@Autowired
 	private IncomingQueryHandler incomingQueryHandler;
 	@Autowired
-	AbstractFhirRequester fhirRequester;
-	@Autowired
 	FhirSearchRequester fhirSearchRequester;
-	@Autowired
-	FhirReadRequester fhirReadRequester;
 	@Autowired
 	private ImmunizationRecommendationMapperR5 immunizationRecommendationMapperR5;
 	@Autowired

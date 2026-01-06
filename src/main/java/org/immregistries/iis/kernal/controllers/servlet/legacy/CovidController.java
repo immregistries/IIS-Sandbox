@@ -15,7 +15,7 @@ import org.hl7.fhir.r5.model.Patient;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR5Condition;
 import org.immregistries.iis.kernal.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.mapping.resourceMappers.forR5.LocationMapperR5;
-import org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester;
+import org.immregistries.iis.kernal.mapping.internalClient.FhirSaveRequester;
 import org.immregistries.iis.kernal.mapping.internalClient.FhirReadRequester;
 import org.immregistries.iis.kernal.mapping.internalClient.FhirSearchRequester;
 import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
@@ -65,8 +65,6 @@ public class CovidController {
 
 	@Autowired
 	RepositoryClientFactory repositoryClientFactory;
-	@Autowired
-	private AbstractFhirRequester fhirRequester;
 	@Autowired
 	private FhirSearchRequester fhirSearchRequester;
 	@Autowired

@@ -20,8 +20,7 @@ import java.util.List;
  * @param <RelatedPerson>
  */
 public interface IFhirRequester<Patient extends IBaseResource, Immunization extends IBaseResource, Location extends IBaseResource, Practitioner extends IBaseResource, Observation extends IBaseResource, Person extends IBaseResource, Organization extends IBaseResource, RelatedPerson extends IBaseResource> {
-	
-	Organization searchOrganization(SearchParameterMap searchParameterMap);
+
 
 	PatientReported savePatientReported(PatientReported patientReported);
 

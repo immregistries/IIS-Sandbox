@@ -42,7 +42,7 @@ public class FhirReadRequester {
 
 	public PatientMaster readAsPatientMaster(String id) {
 		Patient patient = (Patient) read(PatientMapper.PATIENT, id);
-		if (AbstractFhirRequester.isGoldenRecord(patient)) {
+		if (FhirRequesterUtil.isGoldenRecord(patient)) {
 			return (PatientMaster) allMappingService.localObject(patient);
 		}
 		return null;
@@ -66,7 +66,7 @@ public class FhirReadRequester {
 
 	public VaccinationMaster readAsVaccinationMaster(String id) {
 		Immunization immunization = (Immunization) read(ImmunizationMapper.IMMUNIZATION, id);
-		if (AbstractFhirRequester.isGoldenRecord(immunization)) {
+		if (FhirRequesterUtil.isGoldenRecord(immunization)) {
 			return (VaccinationMaster) allMappingService.localObject(immunization);
 		}
 		return null;

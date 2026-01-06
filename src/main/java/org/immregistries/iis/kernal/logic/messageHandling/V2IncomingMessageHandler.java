@@ -15,7 +15,7 @@ import org.immregistries.iis.kernal.logic.ack.*;
 import org.immregistries.iis.kernal.logic.logicInterceptors.ImmunizationProcessingInterceptor;
 import org.immregistries.iis.kernal.logic.logicInterceptors.ObservationProcessingInterceptor;
 import org.immregistries.iis.kernal.logic.logicInterceptors.PatientProcessingInterceptor;
-import org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester;
+import org.immregistries.iis.kernal.mapping.internalClient.FhirSaveRequester;
 import org.immregistries.iis.kernal.mapping.internalClient.FhirSearchRequester;
 import org.immregistries.iis.kernal.model.*;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
@@ -47,7 +47,7 @@ public abstract class V2IncomingMessageHandler extends IncomingMessageHandler<HL
 	@Autowired
 	ValidationService validationService;
 	@Autowired
-	AbstractFhirRequester fhirRequester;
+	FhirSaveRequester fhirSaveRequester;
 	@Autowired
 	FhirSearchRequester fhirSearchRequester;
 	@Autowired
@@ -64,7 +64,7 @@ public abstract class V2IncomingMessageHandler extends IncomingMessageHandler<HL
 	@Autowired
 	MessageRecordingService messageRecordingService;
 	@Autowired
-	private CodeMapManagerService codeMapManagerService;
+	CodeMapManagerService codeMapManagerService;
 
 
 	public V2IncomingMessageHandler() {
@@ -217,7 +217,7 @@ public abstract class V2IncomingMessageHandler extends IncomingMessageHandler<HL
 			if (StringUtils.isBlank(subId) || !StringUtils.equals(previousSubId, subId)) {
 				if (currentMainObservation != null) {
 					observationProcessingInterceptor.processAndValidateObservationReported(currentMainObservation, iisReportableList, processingFlavorSet, obxCount, patientReported.getBirthDate());
-					fhirRequester.saveObservationReported(currentMainObservation);
+					fhirSaveRequester.saveObservationReported(currentMainObservation);
 					currentMainObservation = null;
 				}
 			}
@@ -240,7 +240,7 @@ public abstract class V2IncomingMessageHandler extends IncomingMessageHandler<HL
 		}
 		if (currentMainObservation != null) {
 			observationProcessingInterceptor.processAndValidateObservationReported(currentMainObservation, iisReportableList, processingFlavorSet, obxCount, patientReported.getBirthDate());
-			fhirRequester.saveObservationReported(currentMainObservation);
+			fhirSaveRequester.saveObservationReported(currentMainObservation);
 		}
 		return obxCount;
 	}
@@ -317,7 +317,7 @@ public abstract class V2IncomingMessageHandler extends IncomingMessageHandler<HL
 		IIncomingMessageHandler.verifyNoErrors(iisReportableList);
 
 		patientReported.setUpdatedDate(new Date());
-		patientReported = fhirRequester.savePatientReported(patientReported);
+		patientReported = fhirSaveRequester.savePatientReported(patientReported);
 //		patientReported = fhirRequester.saveRelatedPerson(patientReported);
 		iisReportableList.add(ReportableUtil.fromProcessingException(new ProcessingException("Patient record saved", PID, 0, 0, IisReportableSeverity.INFO)));
 
@@ -620,7 +620,7 @@ public abstract class V2IncomingMessageHandler extends IncomingMessageHandler<HL
 
 			IIncomingMessageHandler.verifyNoErrors(iisReportableList);
 			immunizationProcessingInterceptor.processAndValidateVaccinationReported(vaccinationReported, iisReportableList, processingFlavorSet, fundingSourceObxCount, fundingEligibilityObxCount, rxaCount, vaccineCptCode);
-			vaccinationReported = fhirRequester.saveVaccinationReported(vaccinationReported);
+			vaccinationReported = fhirSaveRequester.saveVaccinationReported(vaccinationReported);
 			vaccinationReportedList.add(vaccinationReported);
 			reader.gotoSegmentPosition(segmentPosition);
 			obxCount = readAndCreateObservations(reader, iisReportableList, processingFlavorSet, patientReported, strictDate, obxCount, vaccinationReported, vaccinationReported.getVaccinationMaster());
@@ -656,7 +656,7 @@ public abstract class V2IncomingMessageHandler extends IncomingMessageHandler<HL
 				orgLocation.setAddressState(reader.getValue(fieldNum, 12));
 				orgLocation.setAddressZip(reader.getValue(fieldNum, 13));
 				orgLocation.setAddressCountry(reader.getValue(fieldNum, 14));
-				orgLocation = fhirRequester.saveOrgLocation(orgLocation);
+				orgLocation = fhirSaveRequester.saveOrgLocation(orgLocation);
 			}
 		}
 		return orgLocation;
@@ -680,7 +680,7 @@ public abstract class V2IncomingMessageHandler extends IncomingMessageHandler<HL
 				modelPerson.setIdentifierTypeCode(reader.getValue(fieldNum, 13));
 				modelPerson.setProfessionalSuffix(reader.getValue(fieldNum, 21));
 //					  Person  p = PersonMapper.getFhirPerson(modelPerson);
-				modelPerson = fhirRequester.savePractitioner(modelPerson);
+				modelPerson = fhirSaveRequester.savePractitioner(modelPerson);
 			}
 		}
 		return modelPerson;

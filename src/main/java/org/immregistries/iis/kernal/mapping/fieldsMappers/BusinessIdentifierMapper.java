@@ -1,5 +1,6 @@
 package org.immregistries.iis.kernal.mapping.fieldsMappers;
 
+import org.hl7.fhir.r4.model.Identifier;
 import org.springframework.stereotype.Service;
 
 import org.apache.commons.lang3.StringUtils;
@@ -8,7 +9,7 @@ import org.immregistries.iis.kernal.model.BusinessIdentifier;
 import ca.uhn.fhir.rest.param.TokenParam;
 
 @Service
-public class BusinessIdentifierMapper implements FieldMapper<BusinessIdentifier, org.hl7.fhir.r4.model.Identifier, org.hl7.fhir.r5.model.Identifier> {
+public class BusinessIdentifierMapper implements IFieldMapper<BusinessIdentifier, Identifier, org.hl7.fhir.r5.model.Identifier> {
     public static final String IDENTIFIER_TYPE_SYSTEM = "http://terminology.hl7.org/CodeSystem/v2-0203";
 
 	@Override

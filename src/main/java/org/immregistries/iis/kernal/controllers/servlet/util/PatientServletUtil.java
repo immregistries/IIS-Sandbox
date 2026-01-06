@@ -10,7 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.instance.model.api.IDomainResource;
 import org.hl7.fhir.r5.model.Patient;
-import org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester;
+import org.immregistries.iis.kernal.mapping.internalClient.FhirRequesterUtil;
 import org.immregistries.iis.kernal.mapping.internalClient.FhirSearchRequester;
 import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
 import org.immregistries.iis.kernal.model.LoincIdentifier;
@@ -357,7 +357,7 @@ public final class PatientServletUtil {
 		}
 		{
 			String link;
-			if (AbstractFhirRequester.isGoldenRecord(patientSelected)) {
+			if (FhirRequesterUtil.isGoldenRecord(patientSelected)) {
 				link = apiBaseUrl + "/$mdm-query-links?goldenResourceId=" + patientMasterSelected.getPatientId();
 			} else {
 				link = apiBaseUrl + "/$mdm-query-links?resourceId=" + patientMasterSelected.getPatientId();

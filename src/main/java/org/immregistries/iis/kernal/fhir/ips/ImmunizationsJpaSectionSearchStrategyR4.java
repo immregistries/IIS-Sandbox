@@ -9,8 +9,8 @@ import ca.uhn.fhir.rest.param.ReferenceParam;
 import jakarta.annotation.Nonnull;
 import org.hl7.fhir.r4.model.Immunization;
 
-import static org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester.GOLDEN_RECORD;
-import static org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester.GOLDEN_SYSTEM_TAG;
+import static org.immregistries.iis.kernal.mapping.internalClient.FhirSaveRequester.GOLDEN_RECORD;
+import static org.immregistries.iis.kernal.mapping.internalClient.FhirSaveRequester.GOLDEN_SYSTEM_TAG;
 
 /**
  * Retains only golden record

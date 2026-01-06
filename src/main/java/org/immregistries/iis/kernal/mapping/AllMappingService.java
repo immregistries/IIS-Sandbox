@@ -3,8 +3,8 @@ package org.immregistries.iis.kernal.mapping;
 import java.util.Set;
 
 import org.hl7.fhir.instance.model.api.IBaseResource;
-import org.immregistries.iis.kernal.mapping.resourceMappers.IisFhirMapperMaster;
-import org.immregistries.iis.kernal.mapping.resourceMappers.IisFhirMapperMasterReported;
+import org.immregistries.iis.kernal.mapping.resourceMappers.IisResourceMasterMapper;
+import org.immregistries.iis.kernal.mapping.resourceMappers.IisResourceMasterReportedMapper;
 import org.immregistries.iis.kernal.model.AbstractMappedObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,41 +14,41 @@ public class AllMappingService {
 
     @SuppressWarnings("rawtypes")
     @Autowired
-    private Set<IisFhirMapperMasterReported> mapperMastersReported;
+    private Set<IisResourceMasterReportedMapper> mapperMastersReported;
     @SuppressWarnings("rawtypes")
     @Autowired
-    private Set<IisFhirMapperMaster> mapperMasters;
+    private Set<IisResourceMasterMapper> mapperMasters;
 
     @SuppressWarnings("unchecked")
     public IBaseResource fhirResource(AbstractMappedObject internal) {
         @SuppressWarnings("rawtypes")
-        IisFhirMapperMaster mapper = selectMapper(internal);
+		  IisResourceMasterMapper mapper = selectMapper(internal);
         return mapper.fhirResource(internal);
     }
 
     @SuppressWarnings("unchecked")
     public AbstractMappedObject localObject(IBaseResource resource) {
         @SuppressWarnings("rawtypes")
-        IisFhirMapperMaster mapper = selectMapper(resource);
+		  IisResourceMasterMapper mapper = selectMapper(resource);
         return mapper.localObject(resource);
     }
 
     @SuppressWarnings("unchecked")
     public AbstractMappedObject localObjectReportedWithMaster(IBaseResource resource) {
         @SuppressWarnings("rawtypes")
-        IisFhirMapperMasterReported mapper = selectMapperReported(resource);
+		  IisResourceMasterReportedMapper mapper = selectMapperReported(resource);
         return mapper.localObjectReportedWithMaster(resource);
     }
 
     @SuppressWarnings("unchecked")
     public AbstractMappedObject localObjectReported(IBaseResource resource) {
         @SuppressWarnings("rawtypes")
-        IisFhirMapperMasterReported mapper = selectMapperReported(resource);
+		  IisResourceMasterReportedMapper mapper = selectMapperReported(resource);
         return mapper.localObjectReported(resource);
     }
 
     @SuppressWarnings("rawtypes")
-    public IisFhirMapperMaster selectMapper(AbstractMappedObject internal) {
+    public IisResourceMasterMapper selectMapper(AbstractMappedObject internal) {
         Class inteClass = internal.getClass();
         if (mapperMastersReported.stream().anyMatch(mapper -> mapper.localMasterType().equals(inteClass))) {
             return mapperMastersReported.stream().filter(mapper -> mapper.localMasterType().equals(inteClass))
@@ -59,7 +59,7 @@ public class AllMappingService {
     }
 
     @SuppressWarnings("rawtypes")
-    public IisFhirMapperMaster selectMapper(IBaseResource resource) {
+    public IisResourceMasterMapper selectMapper(IBaseResource resource) {
         String fhirType = resource.fhirType();
         return mapperMasters.stream().filter(mapper -> mapper.fhirType().equals(fhirType))
                 .findFirst()
@@ -67,7 +67,7 @@ public class AllMappingService {
     }
 
     @SuppressWarnings("rawtypes")
-    public IisFhirMapperMasterReported selectMapperReported(IBaseResource resource) {
+    public IisResourceMasterReportedMapper selectMapperReported(IBaseResource resource) {
         String fhirType = resource.fhirType();
         return mapperMastersReported.stream().filter(mapper -> mapper.fhirType().equals(fhirType))
                 .findFirst()

@@ -12,7 +12,7 @@ import org.immregistries.iis.kernal.logic.ack.IisHL7Util;
 import org.immregistries.iis.kernal.logic.ack.IisReportable;
 import org.immregistries.iis.kernal.logic.ack.IisReportableSeverity;
 import org.immregistries.iis.kernal.logic.ack.ReportableUtil;
-import org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester;
+import org.immregistries.iis.kernal.mapping.internalClient.FhirSaveRequester;
 import org.immregistries.iis.kernal.mapping.internalClient.FhirSearchRequester;
 import org.immregistries.iis.kernal.model.*;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
@@ -37,8 +37,6 @@ import static org.immregistries.iis.kernal.logic.IIncomingMessageHandler.*;
 public class IncomingQueryHandler {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-	@Autowired
-	AbstractFhirRequester fhirRequester;
 	@Autowired
 	FhirSearchRequester fhirSearchRequester;
 	@Autowired
@@ -131,7 +129,7 @@ public class IncomingQueryHandler {
 			cutoff = calendar.getTime();
 		}
 		List<PatientReported> multipleMatches = new ArrayList<>();
-		PatientMaster singleMatch = fhirRequester.matchPatient(multipleMatches, patientMasterForMatchQuery, cutoff);
+		PatientMaster singleMatch = fhirSearchRequester.matchPatient(multipleMatches, patientMasterForMatchQuery, cutoff);
 		if (singleMatch == null) {
 			throw new ProcessingException("Patient not found", "PID", 1, 1); // TODO position
 		}

@@ -3,10 +3,10 @@ package org.immregistries.iis.kernal.controllers.servlet.util;
 import com.google.common.collect.ImmutableMap;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.immregistries.iis.kernal.SoftwareVersion;
+import org.immregistries.iis.kernal.mapping.internalClient.FhirRequesterUtil;
 import org.immregistries.iis.kernal.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.security.ServerSecurityConfig;
 import org.immregistries.iis.kernal.security.UserAccessUtil;
-import org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester;
 import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
 import org.immregistries.iis.kernal.model.ProcessingFlavor;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
@@ -141,7 +141,7 @@ public class UiUtil {
 	}
 
 	public static void printGoldenRecordExplanation(PrintWriter out, IBaseResource iBaseResource) {
-		printGoldenRecordExplanation(out, AbstractFhirRequester.isGoldenRecord(iBaseResource));
+		printGoldenRecordExplanation(out, FhirRequesterUtil.isGoldenRecord(iBaseResource));
 	}
 
 	public static void printGoldenRecordExplanation(PrintWriter out, boolean isGolden) {

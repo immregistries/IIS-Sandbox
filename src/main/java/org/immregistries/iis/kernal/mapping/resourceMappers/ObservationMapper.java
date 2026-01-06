@@ -5,7 +5,7 @@ import org.immregistries.iis.kernal.model.ObservationMaster;
 import org.immregistries.iis.kernal.model.ObservationReported;
 
 public interface ObservationMapper<Observation extends IBaseResource>
-		extends IisFhirMapperMasterReported<ObservationMaster, ObservationReported, Observation> {
+		extends IisResourceMasterReportedMapper<ObservationMaster, ObservationReported, Observation> {
 
 	default String fhirType() {
 		return "Observation";
