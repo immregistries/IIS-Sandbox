@@ -30,12 +30,14 @@ import static org.immregistries.iis.kernal.mapping.resourceMappers.ImmunizationM
 public class ImmunizationRecommendationMapperR4 implements IRecommendationMapper {
 	@Autowired
 	CodeMapManagerService codeMapManagerService;
+	@Autowired
+	private BusinessIdentifierMapper businessIdentifierMapper;
 
 	public ImmunizationRecommendation toFhir(List<ForecastActual> forecastActualList, Date date,
 			PatientMaster patientMaster) {
 		ImmunizationRecommendation immunizationRecommendation = toFhir(forecastActualList, date);
 		immunizationRecommendation.setPatient(new Reference()
-				.setIdentifier(BusinessIdentifierMapper.toR4(patientMaster.getMainBusinessIdentifier())));
+				.setIdentifier(businessIdentifierMapper.toR4(patientMaster.getMainBusinessIdentifier())));
 		return immunizationRecommendation;
 	}
 

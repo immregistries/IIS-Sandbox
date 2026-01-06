@@ -3,7 +3,6 @@ package org.immregistries.iis.kernal.mapping.resourceMappers.forR5;
 import org.hl7.fhir.r5.model.ImmunizationEvaluation;
 import org.hl7.fhir.r5.model.Reference;
 import org.immregistries.iis.kernal.mapping.fieldsMappers.BusinessIdentifierMapper;
-import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR5Condition;
 import org.immregistries.iis.kernal.logic.CodeMapManagerService;
 import org.immregistries.iis.kernal.mapping.resourceMappers.IImmunizationEvaluationMapper;
@@ -24,14 +23,15 @@ public class ImmunizationEvaluationMapperR5 implements IImmunizationEvaluationMa
 
 	@Autowired
 	private ImmunizationMapperR5 immunizationMapperR5;
+
 	@Autowired
-	private CodeMapManagerService codeMapManagerService;
+	private BusinessIdentifierMapper businessIdentifierMapper;
 
 	public ImmunizationEvaluation toFhir(VaccinationMaster vaccinationMaster, Date date) {
 		ImmunizationEvaluation immunizationEvaluation = new ImmunizationEvaluation();
 		if (vaccinationMaster.getPatientReported() != null) {
 			immunizationEvaluation.setPatient(new Reference().setIdentifier(
-					BusinessIdentifierMapper.toR5(vaccinationMaster.getPatientReported().getMainBusinessIdentifier())));
+					businessIdentifierMapper.toR5(vaccinationMaster.getPatientReported().getMainBusinessIdentifier())));
 		}
 		immunizationEvaluation
 				.setImmunizationEvent(new Reference("Immunization/" + vaccinationMaster.getVaccinationId()));

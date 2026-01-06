@@ -41,6 +41,14 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 	FhirReadRequester fhirReadRequester;
 	@Autowired
 	private CodeMapManagerService codeMapManagerService;
+	@Autowired
+	private ModelAddressMapper modelAddressMapper;
+	@Autowired
+	private ModelNameMapper modelNameMapper;
+	@Autowired
+	private ModelPhoneMapper modelPhoneMapper;
+	@Autowired
+	private BusinessIdentifierMapper businessIdentifierMapper;
 
 	public PatientReported localObjectReportedWithMaster(Patient p) {
 		PatientReported patientReported = localObjectReported(p);
@@ -91,7 +99,7 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 		 * Identifiers
 		 */
 		for (Identifier identifier : patient.getIdentifier()) {
-			localPatient.addBusinessIdentifier(BusinessIdentifierMapper.fromR5(identifier));
+			localPatient.addBusinessIdentifier(businessIdentifierMapper.fromR5(identifier));
 		}
 		/*
 		 * Birth Date
@@ -110,7 +118,7 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 		List<ModelName> modelNames = new ArrayList<>(patient.getName().size());
 		localPatient.setPatientNames(modelNames);
 		for (HumanName name : patient.getName()) {
-			modelNames.add(ModelNameMapper.fromR5(name));
+			modelNames.add(modelNameMapper.fromR5(name));
 		}
 		/*
 		 * Mother Maiden name
@@ -183,7 +191,7 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 		for (ContactPoint telecom : patient.getTelecom()) {
 			if (null != telecom.getSystem()) {
 				if (telecom.getSystem().equals(ContactPointSystem.PHONE)) {
-					localPatient.addPhone(ModelPhoneMapper.fromR5(telecom));
+					localPatient.addPhone(modelPhoneMapper.fromR5(telecom));
 				} else if (telecom.getSystem().equals(ContactPointSystem.EMAIL)) {
 					localPatient.setEmail(StringUtils.defaultString(telecom.getValue(), ""));
 				}
@@ -208,7 +216,7 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 		 * Addresses
 		 */
 		for (Address address : patient.getAddress()) {
-			localPatient.addAddress(ModelAddressMapper.fromR5(address));
+			localPatient.addAddress(modelAddressMapper.fromR5(address));
 		}
 		/*
 		 * Multiple birth
@@ -278,7 +286,7 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 		 */
 		for (Patient.ContactComponent contactComponent : patient.getContact()) {
 			PatientGuardian patientGuardian = new PatientGuardian();
-			patientGuardian.setName(ModelNameMapper.fromR5(contactComponent.getName()));
+			patientGuardian.setName(modelNameMapper.fromR5(contactComponent.getName()));
 			patientGuardian
 					.setGuardianRelationship(contactComponent.getRelationshipFirstRep().getCodingFirstRep().getCode());
 			localPatient.addPatientGuardian(patientGuardian);
@@ -311,7 +319,7 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 		 * Business Identifiers
 		 */
 		for (BusinessIdentifier businessIdentifier : pm.getBusinessIdentifiers()) {
-			p.addIdentifier(BusinessIdentifierMapper.toR5(businessIdentifier));
+			p.addIdentifier(businessIdentifierMapper.toR5(businessIdentifier));
 		}
 		/*
 		 * Managing Organization
@@ -327,7 +335,7 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 		 * Names
 		 */
 		for (ModelName modelName : pm.getPatientNames()) {
-			p.addName(ModelNameMapper.toR5(modelName));
+			p.addName(modelNameMapper.toR5(modelName));
 		}
 		/*
 		 * Mother Maiden Name
@@ -402,7 +410,7 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 		 * Phone
 		 */
 		for (ModelPhone patientPhone : pm.getPhones()) {
-			p.addTelecom(ModelPhoneMapper.toR5(patientPhone));
+			p.addTelecom(modelPhoneMapper.toR5(patientPhone));
 		}
 		/*
 		 * Email
@@ -424,7 +432,7 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 		 * Addresses
 		 */
 		for (ModelAddress modelAddress : pm.getAddresses()) {
-			p.addAddress(ModelAddressMapper.toR5(modelAddress));
+			p.addAddress(modelAddressMapper.toR5(modelAddress));
 		}
 		/*
 		 * Birth Order
@@ -487,7 +495,7 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 		 */
 		for (PatientGuardian patientGuardian : pm.getPatientGuardians()) {
 			Patient.ContactComponent contact = p.addContact();
-			contact.setName(ModelNameMapper.toR5(patientGuardian.getName()));
+			contact.setName(modelNameMapper.toR5(patientGuardian.getName()));
 			if (StringUtils.isNotBlank(patientGuardian.getGuardianRelationship())) {
 				Coding coding = new Coding().setSystem(RELATIONSHIP_SYSTEM)
 						.setCode(patientGuardian.getGuardianRelationship());

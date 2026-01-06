@@ -31,12 +31,14 @@ public class ImmunizationRecommendationMapperR5 implements IRecommendationMapper
 
 	@Autowired
 	private CodeMapManagerService codeMapManagerService;
+	@Autowired
+	private BusinessIdentifierMapper businessIdentifierMapper;
 
 	public ImmunizationRecommendation toFhir(List<ForecastActual> forecastActualList, Date date,
 			PatientMaster patientMaster) {
 		ImmunizationRecommendation immunizationRecommendation = toFhir(forecastActualList, date);
 		immunizationRecommendation.setPatient(new Reference()
-				.setIdentifier(BusinessIdentifierMapper.toR5(patientMaster.getMainBusinessIdentifier())));
+				.setIdentifier(businessIdentifierMapper.toR5(patientMaster.getMainBusinessIdentifier())));
 		return immunizationRecommendation;
 	}
 

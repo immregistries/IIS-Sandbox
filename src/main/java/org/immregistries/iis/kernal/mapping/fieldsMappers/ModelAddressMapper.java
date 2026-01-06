@@ -1,11 +1,20 @@
 package org.immregistries.iis.kernal.mapping.fieldsMappers;
 
+import com.sun.tools.xjc.generator.bean.field.FieldRenderer;
+import org.springframework.stereotype.Service;
+
 import org.apache.commons.lang3.StringUtils;
 import org.immregistries.iis.kernal.model.ModelAddress;
 
-public class ModelAddressMapper {
+@Service
+public class ModelAddressMapper implements FieldMapper<ModelAddress, org.hl7.fhir.r4.model.Address, org.hl7.fhir.r5.model.Address> {
 
-    public static org.hl7.fhir.r4.model.Address toR4(ModelAddress modelAddress) {
+	@Override
+	public Class<ModelAddress> localType() {
+		return ModelAddress.class;
+	}
+
+	public org.hl7.fhir.r4.model.Address toR4(ModelAddress modelAddress) {
         return new org.hl7.fhir.r4.model.Address().addLine(modelAddress.getAddressLine1())
                 .addLine(modelAddress.getAddressLine2())
                 .setCity(modelAddress.getAddressCity())
@@ -15,7 +24,8 @@ public class ModelAddressMapper {
                 .setPostalCode(modelAddress.getAddressZip());
     }
 
-    public static org.hl7.fhir.r5.model.Address toR5(ModelAddress modelAddress) {
+
+	public org.hl7.fhir.r5.model.Address toR5(ModelAddress modelAddress) {
         return new org.hl7.fhir.r5.model.Address().addLine(modelAddress.getAddressLine1())
                 .addLine(modelAddress.getAddressLine2())
                 .setCity(modelAddress.getAddressCity())
@@ -25,7 +35,7 @@ public class ModelAddressMapper {
                 .setPostalCode(modelAddress.getAddressZip());
     }
 
-    public static ModelAddress fromR4(org.hl7.fhir.r4.model.Address address) {
+    public ModelAddress fromR4(org.hl7.fhir.r4.model.Address address) {
         ModelAddress modelAddress = new ModelAddress();
         if (!address.getLine().isEmpty()) {
             modelAddress.setAddressLine1(address.getLine().get(0).getValueNotNull());
@@ -41,7 +51,7 @@ public class ModelAddressMapper {
         return modelAddress;
     }
 
-    public static ModelAddress fromR5(org.hl7.fhir.r5.model.Address address) {
+    public ModelAddress fromR5(org.hl7.fhir.r5.model.Address address) {
         ModelAddress modelAddress = new ModelAddress();
         if (!address.getLine().isEmpty()) {
             modelAddress.setAddressLine1(address.getLine().get(0).getValueNotNull());

@@ -52,6 +52,8 @@ public class RecommendationController {
 	private RecommendationRestController recommendationRestController;
 	@Autowired
 	private PatientRestController patientRestController;
+	@Autowired
+	private BusinessIdentifierMapper businessIdentifierMapper;
 
 	/**
 	 * Used to add a random generated component to recommendation
@@ -195,7 +197,7 @@ public class RecommendationController {
 					org.hl7.fhir.r5.model.ImmunizationRecommendation immunizationRecommendation = (org.hl7.fhir.r5.model.ImmunizationRecommendation) recommendationResource;
 					immunizationRecommendation
 							.setPatient(new org.hl7.fhir.r5.model.Reference()
-									.setIdentifier(BusinessIdentifierMapper.toR5(identifier)));
+									.setIdentifier(businessIdentifierMapper.toR5(identifier)));
 					PatientServletUtil.printSubscriptions(out, parser, subcriptionBundle, immunizationRecommendation);
 				}
 			}

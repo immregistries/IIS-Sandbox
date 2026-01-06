@@ -27,6 +27,8 @@ import java.util.Set;
 public class V2IncomingMessageHandlerR5 extends V2IncomingMessageHandler {
 	@Autowired
 	FhirSearchRequester fhirSearchRequester;
+	@Autowired
+	private BusinessIdentifierMapper businessIdentifierMapper;
 
 	public @Nullable IIdType readResponsibleOrganizationIIdType(Tenant tenant, HL7Reader reader,
 			String sendingFacilityName, Set<ProcessingFlavor> processingFlavorSet) throws ProcessingException {
@@ -67,7 +69,7 @@ public class V2IncomingMessageHandlerR5 extends V2IncomingMessageHandler {
 		businessIdentifier.setValue(reader.getValue(4, 2));
 		// businessIdentifier.setType(reader.getValue(4, 3)); TODO support TYPE in TOKEN
 		// PARAM
-		TokenParam tokenParam = BusinessIdentifierMapper.asTokenParam(businessIdentifier);
+		TokenParam tokenParam = businessIdentifierMapper.asTokenParam(businessIdentifier);
 		Organization sendingOrganization = null;
 		if (tokenParam != null) {
 			sendingOrganization = (Organization) fhirSearchRequester
@@ -80,7 +82,7 @@ public class V2IncomingMessageHandlerR5 extends V2IncomingMessageHandler {
 			sendingOrganization = new Organization()
 					.setName(organizationName);
 			if (tokenParam != null) {
-				sendingOrganization.addIdentifier(BusinessIdentifierMapper.toR5(businessIdentifier));
+				sendingOrganization.addIdentifier(businessIdentifierMapper.toR5(businessIdentifier));
 			}
 			sendingOrganization = (Organization) fhirRequester.saveOrganization(sendingOrganization);
 		}

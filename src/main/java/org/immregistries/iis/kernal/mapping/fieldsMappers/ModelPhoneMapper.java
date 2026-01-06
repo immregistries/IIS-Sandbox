@@ -1,5 +1,7 @@
 package org.immregistries.iis.kernal.mapping.fieldsMappers;
 
+import org.springframework.stereotype.Service;
+
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.exceptions.FHIRException;
 import org.immregistries.codebase.client.CodeMap;
@@ -9,11 +11,17 @@ import org.immregistries.iis.kernal.logic.CodeMapManagerService;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
 import org.immregistries.iis.kernal.model.ModelPhone;
 
-public class ModelPhoneMapper {
+@Service
+public class ModelPhoneMapper implements  FieldMapper<ModelPhone, org.hl7.fhir.r4.model.ContactPoint, org.hl7.fhir.r5.model.ContactPoint>{
     public static final String PHONE_USE_V2_SYSTEM = "http://terminology.hl7.org/ValueSet/v2-0201";
     public static final String USE_EXTENSION_URL = "use";
 
-    public static org.hl7.fhir.r4.model.ContactPoint toR4(ModelPhone modelPhone) {
+	@Override
+	public Class<ModelPhone> localType() {
+		return ModelPhone.class;
+	}
+
+    public org.hl7.fhir.r4.model.ContactPoint toR4(ModelPhone modelPhone) {
         org.hl7.fhir.r4.model.ContactPoint contactPoint = new org.hl7.fhir.r4.model.ContactPoint();
         contactPoint.setSystem(org.hl7.fhir.r4.model.ContactPoint.ContactPointSystem.PHONE)
                 .setValue(modelPhone.getNumber());
@@ -52,7 +60,9 @@ public class ModelPhoneMapper {
         return contactPoint;
     }
 
-    public static org.hl7.fhir.r5.model.ContactPoint toR5(ModelPhone modelPhone) {
+
+
+	public org.hl7.fhir.r5.model.ContactPoint toR5(ModelPhone modelPhone) {
         org.hl7.fhir.r5.model.ContactPoint contactPoint = new org.hl7.fhir.r5.model.ContactPoint();
         contactPoint.setSystem(org.hl7.fhir.r5.model.ContactPoint.ContactPointSystem.PHONE)
                 .setValue(modelPhone.getNumber());
@@ -91,7 +101,7 @@ public class ModelPhoneMapper {
         return contactPoint;
     }
 
-    public static ModelPhone fromR4(org.hl7.fhir.r4.model.ContactPoint contactPoint) {
+    public ModelPhone fromR4(org.hl7.fhir.r4.model.ContactPoint contactPoint) {
         if (!contactPoint.getSystem().equals(org.hl7.fhir.r4.model.ContactPoint.ContactPointSystem.PHONE)) {
             return null;
         } else {
@@ -114,7 +124,7 @@ public class ModelPhoneMapper {
         }
     }
 
-    public static ModelPhone fromR5(org.hl7.fhir.r5.model.ContactPoint contactPoint) {
+    public ModelPhone fromR5(org.hl7.fhir.r5.model.ContactPoint contactPoint) {
         if (!contactPoint.getSystem().equals(org.hl7.fhir.r5.model.ContactPoint.ContactPointSystem.PHONE)) {
             return null;
         } else {
@@ -137,7 +147,7 @@ public class ModelPhoneMapper {
         }
     }
 
-    public static ModelPhone fromFhir(org.hl7.fhir.instance.model.api.ICompositeType contactPoint) {
+    public ModelPhone fromFhir(org.hl7.fhir.instance.model.api.ICompositeType contactPoint) {
         if (contactPoint instanceof org.hl7.fhir.r5.model.ContactPoint) {
             return fromR5((org.hl7.fhir.r5.model.ContactPoint) contactPoint);
         } else if (contactPoint instanceof org.hl7.fhir.r4.model.ContactPoint) {

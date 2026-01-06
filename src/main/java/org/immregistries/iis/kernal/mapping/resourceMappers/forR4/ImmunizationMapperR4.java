@@ -36,6 +36,8 @@ public class ImmunizationMapperR4 implements ImmunizationMapper<Immunization> {
 	private FhirSearchRequester fhirSearchRequester;
 	@Autowired
 	private CodeMapManagerService codeMapManagerService;
+	@Autowired
+	private BusinessIdentifierMapper businessIdentifierMapper;
 
 	public VaccinationReported localObjectReportedWithMaster(Immunization i) {
 		VaccinationReported vaccinationReported = this.localObjectReported(i);
@@ -85,7 +87,7 @@ public class ImmunizationMapperR4 implements ImmunizationMapper<Immunization> {
 		 * Business identifier
 		 */
 		for (Identifier identifier : i.getIdentifier()) {
-			vr.addBusinessIdentifier(BusinessIdentifierMapper.fromR4(identifier));
+			vr.addBusinessIdentifier(businessIdentifierMapper.fromR4(identifier));
 		}
 		/*
 		 * Patient
@@ -280,7 +282,7 @@ public class ImmunizationMapperR4 implements ImmunizationMapper<Immunization> {
 		 * Identifiers
 		 */
 		for (BusinessIdentifier businessIdentifier : vr.getBusinessIdentifiers()) {
-			i.addIdentifier(BusinessIdentifierMapper.toR4(businessIdentifier));
+			i.addIdentifier(businessIdentifierMapper.toR4(businessIdentifier));
 		}
 		/*
 		 * Patient

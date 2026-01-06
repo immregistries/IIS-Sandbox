@@ -19,10 +19,14 @@ import org.springframework.stereotype.Service;
 
 import java.util.Set;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 @Service
 @Conditional(OnR4Condition.class)
 @SuppressWarnings({ "unchecked" })
 public class V2IncomingMessageHandlerR4 extends V2IncomingMessageHandler {
+	@Autowired
+	private BusinessIdentifierMapper businessIdentifierMapper;
 
 	public @Nullable IIdType readResponsibleOrganizationIIdType(Tenant tenant, HL7Reader reader,
 			String sendingFacilityName, Set<ProcessingFlavor> processingFlavorSet) throws ProcessingException {
@@ -63,7 +67,7 @@ public class V2IncomingMessageHandlerR4 extends V2IncomingMessageHandler {
 		businessIdentifier.setValue(reader.getValue(4, 2));
 		// businessIdentifier.setType(reader.getValue(4, 3)); TODO support TYPE in TOKEN
 		// PARAM
-		TokenParam tokenParam = BusinessIdentifierMapper.asTokenParam(businessIdentifier);
+		TokenParam tokenParam = businessIdentifierMapper.asTokenParam(businessIdentifier);
 		Organization sendingOrganization = null;
 		if (tokenParam != null) {
 			sendingOrganization = (Organization) fhirSearchRequester
@@ -76,7 +80,7 @@ public class V2IncomingMessageHandlerR4 extends V2IncomingMessageHandler {
 			sendingOrganization = new Organization()
 					.setName(organizationName);
 			if (tokenParam != null) {
-				sendingOrganization.addIdentifier(BusinessIdentifierMapper.toR4(businessIdentifier));
+				sendingOrganization.addIdentifier(businessIdentifierMapper.toR4(businessIdentifier));
 			}
 			sendingOrganization = (Organization) fhirRequester.saveOrganization(sendingOrganization);
 		}

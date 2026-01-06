@@ -32,13 +32,15 @@ public class ImmunizationEvaluationMapperR4 implements IImmunizationEvaluationMa
 	private ImmunizationMapperR4 immunizationMapperR4;
 	@Autowired
 	private CodeMapManagerService codeMapManagerService;
+	@Autowired
+	private BusinessIdentifierMapper businessIdentifierMapper;
 
 	public ImmunizationEvaluation toFhir(VaccinationMaster vaccinationMaster, Date date) {
 		CodeMap codeMap = codeMapManagerService.getCodeMap();
 		ImmunizationEvaluation immunizationEvaluation = new ImmunizationEvaluation();
 		if (vaccinationMaster.getPatientReported() != null) {
 			immunizationEvaluation.setPatient(new Reference().setIdentifier(
-					BusinessIdentifierMapper.toR4(vaccinationMaster.getPatientReported().getMainBusinessIdentifier())));
+					businessIdentifierMapper.toR4(vaccinationMaster.getPatientReported().getMainBusinessIdentifier())));
 		}
 		immunizationEvaluation
 				.setImmunizationEvent(new Reference("Immunization/" + vaccinationMaster.getVaccinationId()));

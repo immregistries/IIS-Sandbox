@@ -43,6 +43,8 @@ public class ImmunizationRecommendationServiceR4
 	private PatientMapperR4 patientMapperR4;
 	@Autowired
 	private CodeMapManagerService codeMapManagerService;
+	@Autowired
+	private BusinessIdentifierMapper businessIdentifierMapper;
 
 	@Override
 	public ImmunizationRecommendation generate(Tenant tenant, Date date) {
@@ -66,7 +68,7 @@ public class ImmunizationRecommendationServiceR4
 	public ImmunizationRecommendation generate(Tenant tenant, Date date, PatientMaster patientReported) {
 		ImmunizationRecommendation recommendation = this.generate(tenant, date);
 		recommendation.setPatient(new Reference()
-				.setIdentifier(BusinessIdentifierMapper.toR4(patientReported.getMainBusinessIdentifier())));
+				.setIdentifier(businessIdentifierMapper.toR4(patientReported.getMainBusinessIdentifier())));
 		return recommendation;
 	}
 

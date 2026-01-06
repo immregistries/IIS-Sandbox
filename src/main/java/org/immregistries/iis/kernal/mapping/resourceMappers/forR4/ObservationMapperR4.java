@@ -31,6 +31,8 @@ import static org.immregistries.iis.kernal.mapping.resourceMappers.ImmunizationM
 public class ObservationMapperR4 implements ObservationMapper<Observation> {
 	@Autowired
 	private AbstractFhirRequester fhirRequests;
+	@Autowired
+	private BusinessIdentifierMapper businessIdentifierMapper;
 
 	public ObservationReported localObjectReportedWithMaster(Observation observation) {
 		ObservationReported observationReported = localObjectReported(observation);
@@ -191,7 +193,7 @@ public class ObservationMapperR4 implements ObservationMapper<Observation> {
 		 * OBX-21
 		 */
 		for (BusinessIdentifier businessIdentifier : om.getBusinessIdentifiers()) {
-			o.addIdentifier(BusinessIdentifierMapper.toR4(businessIdentifier));
+			o.addIdentifier(businessIdentifierMapper.toR4(businessIdentifier));
 		}
 		/*
 		 * Components , other OBX with same subId
@@ -337,7 +339,7 @@ public class ObservationMapperR4 implements ObservationMapper<Observation> {
 		 * Identifiers
 		 */
 		for (Identifier identifier : o.getIdentifier()) {
-			observationReported.addBusinessIdentifier(BusinessIdentifierMapper.fromR4(identifier));
+			observationReported.addBusinessIdentifier(businessIdentifierMapper.fromR4(identifier));
 		}
 		/*
 		 * Components
