@@ -1,5 +1,6 @@
 package org.immregistries.iis.kernal.mapping;
 
+import java.util.List;
 import java.util.Set;
 
 import org.hl7.fhir.instance.model.api.IBaseResource;
@@ -14,10 +15,11 @@ public class AllMappingService {
 
     @SuppressWarnings("rawtypes")
     @Autowired
-    private Set<IisResourceMasterReportedMapper> mapperMastersReported;
+    private List<IisResourceMasterReportedMapper> mapperMastersReported;
+
     @SuppressWarnings("rawtypes")
     @Autowired
-    private Set<IisResourceMasterMapper> mapperMasters;
+    private List<IisResourceMasterMapper> mapperMasters;
 
     @SuppressWarnings("unchecked")
     public IBaseResource fhirResource(AbstractMappedObject internal) {
