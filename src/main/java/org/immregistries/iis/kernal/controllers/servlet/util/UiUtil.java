@@ -24,7 +24,7 @@ import java.text.SimpleDateFormat;
 import java.util.Map;
 import java.util.UUID;
 
-import static org.immregistries.iis.kernal.fhir.Application.IIS_PATH_BASE;
+import static org.immregistries.iis.kernal.Application.IIS_PATH_BASE;
 
 public class UiUtil {
 	private final static ImmutableMap<String, String> HEADER_MAP = ImmutableMap.of(PopController.POP_PATH_KEY,

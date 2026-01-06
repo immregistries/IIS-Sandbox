@@ -5,7 +5,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.constraints.NotBlank;
-import org.immregistries.iis.kernal.fhir.Application;
+import org.immregistries.iis.kernal.Application;
 import org.immregistries.iis.kernal.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.security.TenantUtil;
 import org.immregistries.iis.kernal.security.UserAccessUtil;

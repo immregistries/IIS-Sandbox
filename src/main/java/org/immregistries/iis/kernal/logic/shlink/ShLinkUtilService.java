@@ -13,7 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.instance.model.api.IBaseBundle;
 import org.hl7.fhir.instance.model.api.IIdType;
 import org.immregistries.iis.kernal.controllers.rest.shlink.ShLinkContentRestController;
-import org.immregistries.iis.kernal.fhir.Application;
+import org.immregistries.iis.kernal.Application;
 import org.immregistries.iis.kernal.fhir.shl.ShLinkPayload;
 import org.immregistries.iis.kernal.mapping.internalClient.RepositoryClientFactory;
 import org.immregistries.iis.kernal.model.PatientMaster;

@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import static org.immregistries.iis.kernal.fhir.Application.IIS_PATH_BASE;
+import static org.immregistries.iis.kernal.Application.IIS_PATH_BASE;
 import static org.immregistries.iis.kernal.controllers.servlet.HomeController.HOME_BASE_PATH;
 
 /**

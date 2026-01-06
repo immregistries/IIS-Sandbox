@@ -15,7 +15,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
-import org.immregistries.iis.kernal.fhir.Application;
+import org.immregistries.iis.kernal.Application;
 import org.immregistries.iis.kernal.security.JwtUtils;
 import org.immregistries.iis.kernal.security.UserAccessUtil;
 import org.immregistries.iis.kernal.persisted.model.UserAccess;

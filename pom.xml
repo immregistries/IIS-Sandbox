@@ -675,7 +675,7 @@
                             <goal>repackage</goal>
                         </goals>
                         <configuration>
-                            <mainClass>org.immregistries.iis.kernal.fhir.Application</mainClass>
+                            <mainClass>org.immregistries.iis.kernal.Application</mainClass>
                         </configuration>
                     </execution>
                 </executions>
@@ -696,7 +696,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>org.immregistries.iis.kernal.fhir.Application</mainClass>
+                            <mainClass>org.immregistries.iis.kernal.Application</mainClass>
                             <addDefaultImplementationEntries>
                                 true
                             </addDefaultImplementationEntries>

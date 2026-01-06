@@ -1,7 +1,5 @@
 package org.immregistries.iis.kernal.model;
 
-import org.apache.commons.lang3.StringUtils;
-
 import java.util.Objects;
 
 public class ModelAddress extends AbstractDiffable<ModelAddress> {
@@ -69,80 +67,33 @@ public class ModelAddress extends AbstractDiffable<ModelAddress> {
 		this.addressCountyParish = addressCountyParish;
 	}
 
-	public org.hl7.fhir.r4.model.Address toR4() {
-		return new org.hl7.fhir.r4.model.Address().addLine(getAddressLine1())
-			.addLine(getAddressLine2())
-			.setCity(getAddressCity())
-			.setCountry(getAddressCountry())
-			.setState(getAddressState())
-			.setDistrict(getAddressCountyParish())
-			.setPostalCode(getAddressZip());
-	}
-
-	public org.hl7.fhir.r5.model.Address toR5() {
-		return new org.hl7.fhir.r5.model.Address().addLine(getAddressLine1())
-			.addLine(getAddressLine2())
-			.setCity(getAddressCity())
-			.setCountry(getAddressCountry())
-			.setState(getAddressState())
-			.setDistrict(getAddressCountyParish())
-			.setPostalCode(getAddressZip());
-	}
-
-	public static ModelAddress fromR4(org.hl7.fhir.r4.model.Address address) {
-		ModelAddress modelAddress = new ModelAddress();
-		if (!address.getLine().isEmpty()) {
-			modelAddress.setAddressLine1(address.getLine().get(0).getValueNotNull());
-		}
-		if (address.getLine().size() > 1) {
-			modelAddress.setAddressLine2(address.getLine().get(1).getValueNotNull());
-		}
-		modelAddress.setAddressCity(StringUtils.defaultString(address.getCity()));
-		modelAddress.setAddressState(StringUtils.defaultString(address.getState()));
-		modelAddress.setAddressZip(StringUtils.defaultString(address.getPostalCode()));
-		modelAddress.setAddressCountry(StringUtils.defaultString(address.getCountry()));
-		modelAddress.setAddressCountyParish(StringUtils.defaultString(address.getDistrict()));
-		return modelAddress;
-	}
-
-	public static ModelAddress fromR5(org.hl7.fhir.r5.model.Address address) {
-		ModelAddress modelAddress = new ModelAddress();
-		if (!address.getLine().isEmpty()) {
-			modelAddress.setAddressLine1(address.getLine().get(0).getValueNotNull());
-		}
-		if (address.getLine().size() > 1) {
-			modelAddress.setAddressLine2(address.getLine().get(1).getValueNotNull());
-		}
-		modelAddress.setAddressCity(StringUtils.defaultString(address.getCity()));
-		modelAddress.setAddressState(StringUtils.defaultString(address.getState()));
-		modelAddress.setAddressZip(StringUtils.defaultString(address.getPostalCode()));
-		modelAddress.setAddressCountry(StringUtils.defaultString(address.getCountry()));
-		modelAddress.setAddressCountyParish(StringUtils.defaultString(address.getDistrict()));
-		return modelAddress;
-	}
-
 	@Override
 	public String toString() {
 		return "PatientAddress{" +
-			"addressLine1='" + addressLine1 + '\'' +
-			", addressLine2='" + addressLine2 + '\'' +
-			", addressCity='" + addressCity + '\'' +
-			", addressState='" + addressState + '\'' +
-			", addressZip='" + addressZip + '\'' +
-			", addressCountry='" + addressCountry + '\'' +
-			", addressCountyParish='" + addressCountyParish + '\'' +
-			'}';
+				"addressLine1='" + addressLine1 + '\'' +
+				", addressLine2='" + addressLine2 + '\'' +
+				", addressCity='" + addressCity + '\'' +
+				", addressState='" + addressState + '\'' +
+				", addressZip='" + addressZip + '\'' +
+				", addressCountry='" + addressCountry + '\'' +
+				", addressCountyParish='" + addressCountyParish + '\'' +
+				'}';
 	}
 
 	@Override
 	public boolean equals(Object o) {
-		if (o == null || getClass() != o.getClass()) return false;
+		if (o == null || getClass() != o.getClass())
+			return false;
 		ModelAddress that = (ModelAddress) o;
-		return Objects.equals(addressLine1, that.addressLine1) && Objects.equals(addressLine2, that.addressLine2) && Objects.equals(addressCity, that.addressCity) && Objects.equals(addressState, that.addressState) && Objects.equals(addressZip, that.addressZip) && Objects.equals(addressCountry, that.addressCountry) && Objects.equals(addressCountyParish, that.addressCountyParish);
+		return Objects.equals(addressLine1, that.addressLine1) && Objects.equals(addressLine2, that.addressLine2)
+				&& Objects.equals(addressCity, that.addressCity) && Objects.equals(addressState, that.addressState)
+				&& Objects.equals(addressZip, that.addressZip) && Objects.equals(addressCountry, that.addressCountry)
+				&& Objects.equals(addressCountyParish, that.addressCountyParish);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(addressLine1, addressLine2, addressCity, addressState, addressZip, addressCountry, addressCountyParish);
+		return Objects.hash(addressLine1, addressLine2, addressCity, addressState, addressZip, addressCountry,
+				addressCountyParish);
 	}
 }

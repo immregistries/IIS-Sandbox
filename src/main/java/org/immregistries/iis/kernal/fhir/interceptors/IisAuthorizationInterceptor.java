@@ -142,7 +142,6 @@ public class IisAuthorizationInterceptor extends AuthorizationInterceptor {
 	 *
 	 * @param authHeader  HTTP Auth header
 	 * @param tenantName  tenant name
-	 * @param dataSession Database Session
 	 * @return tenant object if authenticated, null if not recognized
 	 */
 	public Tenant tryAuthHeaderBasic(String authHeader, String tenantName) {
@@ -181,7 +180,6 @@ public class IisAuthorizationInterceptor extends AuthorizationInterceptor {
 	 * Custom authorization rules for Connectathon specific needs
 	 * 
 	 * @param theRequestDetails request details
-	 * @param dataSession       Database session
 	 * @return Connectathon Authorization rules
 	 */
 	private IAuthRuleFinished connectathonUserAuthorized(RequestDetails theRequestDetails) {

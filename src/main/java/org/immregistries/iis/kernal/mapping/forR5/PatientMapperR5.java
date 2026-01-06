@@ -1,6 +1,5 @@
 package org.immregistries.iis.kernal.mapping.forR5;
 
-
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.r5.model.*;
 import org.hl7.fhir.r5.model.ContactPoint.ContactPointSystem;
@@ -10,6 +9,9 @@ import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR5Condition;
 import org.immregistries.iis.kernal.logic.CodeMapManagerService;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
+import org.immregistries.iis.kernal.mapping.fieldsMappers.ModelAddressMapper;
+import org.immregistries.iis.kernal.mapping.fieldsMappers.ModelNameMapper;
+import org.immregistries.iis.kernal.mapping.fieldsMappers.ModelPhoneMapper;
 import org.immregistries.iis.kernal.mapping.interfaces.PatientMapper;
 import org.immregistries.iis.kernal.mapping.internalClient.FhirReadRequester;
 import org.immregistries.iis.kernal.model.*;
@@ -28,7 +30,6 @@ import java.util.stream.Stream;
 import static org.immregistries.iis.kernal.mapping.interfaces.ImmunizationMapper.RECORDED;
 import static org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester.GOLDEN_RECORD;
 import static org.immregistries.iis.kernal.mapping.internalClient.AbstractFhirRequester.GOLDEN_SYSTEM_TAG;
-
 
 @Service
 @Conditional(OnR5Condition.class)
@@ -50,20 +51,20 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 
 	public PatientMaster localObject(Patient patient) {
 		PatientMaster patientMaster = new PatientMaster();
-//		if (FhirRequester.isGoldenRecord(patient)) {
-//			logger.info("Mapping refused for report as patient is golden");
-//			return null;
-//		}
+		// if (FhirRequester.isGoldenRecord(patient)) {
+		// logger.info("Mapping refused for report as patient is golden");
+		// return null;
+		// }
 		fillFromFhirResource(patientMaster, patient);
 		return patientMaster;
 	}
 
 	public PatientReported localObjectReported(Patient patient) {
 		PatientReported patientReported = new PatientReported();
-//		if (!FhirRequester.isGoldenRecord(patient)) {
-//			logger.info("Mapping refused for golden as Patient is reported");
-//			return null;
-//		}
+		// if (!FhirRequester.isGoldenRecord(patient)) {
+		// logger.info("Mapping refused for golden as Patient is reported");
+		// return null;
+		// }
 		fillFromFhirResource(patientReported, patient);
 		return patientReported;
 	}
@@ -99,7 +100,8 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 		 * Managing organization
 		 */
 		if (patient.hasManagingOrganization() && patient.getManagingOrganization().hasReference()) {
-			localPatient.setManagingOrganizationId(StringUtils.defaultString(patient.getManagingOrganization().getReference()));
+			localPatient.setManagingOrganizationId(
+					StringUtils.defaultString(patient.getManagingOrganization().getReference()));
 		}
 		/*
 		 * Names
@@ -107,7 +109,7 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 		List<ModelName> modelNames = new ArrayList<>(patient.getName().size());
 		localPatient.setPatientNames(modelNames);
 		for (HumanName name : patient.getName()) {
-			modelNames.add(ModelName.fromR5(name));
+			modelNames.add(ModelNameMapper.fromR5(name));
 		}
 		/*
 		 * Mother Maiden name
@@ -148,8 +150,10 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 		 */
 		Extension raceExtension = patient.getExtensionByUrl(RACE_EXTENSION);
 		if (raceExtension != null) {
-			Stream<Extension> raceExtensionStream = Stream.concat(raceExtension.getExtensionsByUrl(RACE_EXTENSION_OMB).stream(), raceExtension.getExtensionsByUrl(RACE_EXTENSION_DETAILED).stream());
-			for (Iterator<Extension> it = raceExtensionStream.iterator(); it.hasNext(); ) {
+			Stream<Extension> raceExtensionStream = Stream.concat(
+					raceExtension.getExtensionsByUrl(RACE_EXTENSION_OMB).stream(),
+					raceExtension.getExtensionsByUrl(RACE_EXTENSION_DETAILED).stream());
+			for (Iterator<Extension> it = raceExtensionStream.iterator(); it.hasNext();) {
 				Extension ext = it.next();
 				Coding coding = MappingHelper.extensionGetCoding(ext);
 				if (coding != null && !localPatient.getRaces().contains(coding.getCode())) {
@@ -178,7 +182,7 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 		for (ContactPoint telecom : patient.getTelecom()) {
 			if (null != telecom.getSystem()) {
 				if (telecom.getSystem().equals(ContactPointSystem.PHONE)) {
-					localPatient.addPhone(ModelPhone.fromR5(telecom));
+					localPatient.addPhone(ModelPhoneMapper.fromR5(telecom));
 				} else if (telecom.getSystem().equals(ContactPointSystem.EMAIL)) {
 					localPatient.setEmail(StringUtils.defaultString(telecom.getValue(), ""));
 				}
@@ -203,7 +207,7 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 		 * Addresses
 		 */
 		for (Address address : patient.getAddress()) {
-			localPatient.addAddress(ModelAddress.fromR5(address));
+			localPatient.addAddress(ModelAddressMapper.fromR5(address));
 		}
 		/*
 		 * Multiple birth
@@ -269,19 +273,21 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 		}
 
 		/*
-		Patient Contact / Guardian
+		 * Patient Contact / Guardian
 		 */
 		for (Patient.ContactComponent contactComponent : patient.getContact()) {
 			PatientGuardian patientGuardian = new PatientGuardian();
-			patientGuardian.setName(ModelName.fromR5(contactComponent.getName()));
-			patientGuardian.setGuardianRelationship(contactComponent.getRelationshipFirstRep().getCodingFirstRep().getCode());
+			patientGuardian.setName(ModelNameMapper.fromR5(contactComponent.getName()));
+			patientGuardian
+					.setGuardianRelationship(contactComponent.getRelationshipFirstRep().getCodingFirstRep().getCode());
 			localPatient.addPatientGuardian(patientGuardian);
 		}
 		/*
 		 * GeneralPractitioner
 		 */
 		if (!patient.getGeneralPractitioner().isEmpty() && patient.getGeneralPractitionerFirstRep().hasReference()) {
-			localPatient.setGeneralPractitionerId("Practitioner/" + patient.getGeneralPractitionerFirstRep().getReferenceElement().getIdPart());
+			localPatient.setGeneralPractitionerId(
+					"Practitioner/" + patient.getGeneralPractitionerFirstRep().getReferenceElement().getIdPart());
 		}
 	}
 
@@ -297,8 +303,8 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 		 */
 		if (pm.getReportedDate() != null) {
 			p.addExtension()
-				.setUrl(RECORDED)
-				.setValue(new DateType(pm.getReportedDate()));
+					.setUrl(RECORDED)
+					.setValue(new DateType(pm.getReportedDate()));
 		}
 		/*
 		 * Business Identifiers
@@ -320,7 +326,7 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 		 * Names
 		 */
 		for (ModelName modelName : pm.getPatientNames()) {
-			p.addName(modelName.toR5());
+			p.addName(ModelNameMapper.toR5(modelName));
 		}
 		/*
 		 * Mother Maiden Name
@@ -377,7 +383,8 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 			Extension ethnicityExtension = p.addExtension().setUrl(ETHNICITY_EXTENSION);
 			if (StringUtils.isNotBlank(pm.getEthnicity())) {
 				Coding coding = new Coding().setCode(pm.getEthnicity()).setSystem(ETHNICITY_SYSTEM);
-				Code code = codeMapManagerService.getCodeMap().getCodeForCodeset(CodesetType.PATIENT_ETHNICITY, pm.getEthnicity());
+				Code code = codeMapManagerService.getCodeMap().getCodeForCodeset(CodesetType.PATIENT_ETHNICITY,
+						pm.getEthnicity());
 				/*
 				 * Added to OMB extension if code recognised
 				 */
@@ -394,7 +401,7 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 		 * Phone
 		 */
 		for (ModelPhone patientPhone : pm.getPhones()) {
-			p.addTelecom(patientPhone.toR5());
+			p.addTelecom(ModelPhoneMapper.toR5(patientPhone));
 		}
 		/*
 		 * Email
@@ -416,7 +423,7 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 		 * Addresses
 		 */
 		for (ModelAddress modelAddress : pm.getAddresses()) {
-			p.addAddress(modelAddress.toR5());
+			p.addAddress(ModelAddressMapper.toR5(modelAddress));
 		}
 		/*
 		 * Birth Order
@@ -431,7 +438,8 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 
 		/*
 		 * Publicity
-		 * Rule used for indicators: null value means no added extension, blank value means adding extension but no value/coding
+		 * Rule used for indicators: null value means no added extension, blank value
+		 * means adding extension but no value/coding
 		 */
 		if (pm.getPublicityIndicator() != null) {
 			Extension publicity = p.addExtension();
@@ -465,7 +473,8 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 			Extension registryStatus = p.addExtension();
 			registryStatus.setUrl(REGISTRY_STATUS_EXTENSION);
 			if (StringUtils.isNotBlank(pm.getRegistryStatusIndicator())) {
-				Coding registryValue = new Coding().setSystem(REGISTRY_STATUS_INDICATOR).setCode(pm.getRegistryStatusIndicator());
+				Coding registryValue = new Coding().setSystem(REGISTRY_STATUS_INDICATOR)
+						.setCode(pm.getRegistryStatusIndicator());
 				registryStatus.setValue(registryValue);
 				if (pm.getRegistryStatusIndicatorDate() != null) {
 					registryValue.setVersion(MappingHelper.FHIR_SDF.format(pm.getRegistryStatusIndicatorDate()));
@@ -477,18 +486,20 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 		 */
 		for (PatientGuardian patientGuardian : pm.getPatientGuardians()) {
 			Patient.ContactComponent contact = p.addContact();
-			contact.setName(patientGuardian.getName().toR5());
+			contact.setName(ModelNameMapper.toR5(patientGuardian.getName()));
 			if (StringUtils.isNotBlank(patientGuardian.getGuardianRelationship())) {
-				Coding coding = new Coding().setSystem(RELATIONSHIP_SYSTEM).setCode(patientGuardian.getGuardianRelationship());
-				Code code = codeMapManagerService.getCodeMap().getCodeForCodeset(CodesetType.PERSON_RELATIONSHIP, patientGuardian.getGuardianRelationship());
+				Coding coding = new Coding().setSystem(RELATIONSHIP_SYSTEM)
+						.setCode(patientGuardian.getGuardianRelationship());
+				Code code = codeMapManagerService.getCodeMap().getCodeForCodeset(CodesetType.PERSON_RELATIONSHIP,
+						patientGuardian.getGuardianRelationship());
 				if (code != null) {
 					coding.setDisplay(code.getLabel());
 					contact.addRelationship()
-						.setText(patientGuardian.getGuardianRelationship())
-						.addCoding(coding);
+							.setText(patientGuardian.getGuardianRelationship())
+							.addCoding(coding);
 				} else {
 					contact.addRelationship()
-						.setText(patientGuardian.getGuardianRelationship());
+							.setText(patientGuardian.getGuardianRelationship());
 				}
 			}
 		}
@@ -500,6 +511,5 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 		}
 		return p;
 	}
-
 
 }

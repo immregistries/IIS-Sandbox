@@ -1,5 +1,4 @@
-
-package org.immregistries.iis.kernal.fhir;
+package org.immregistries.iis.kernal;
 
 import ca.uhn.fhir.batch2.jobs.config.Batch2JobsConfig;
 import ca.uhn.fhir.jpa.batch2.JpaBatch2Config;
@@ -9,6 +8,7 @@ import ca.uhn.fhir.jpa.subscription.match.config.WebsocketDispatcherConfig;
 import ca.uhn.fhir.jpa.subscription.submit.config.SubscriptionSubmitterConfig;
 import ca.uhn.fhir.rest.server.RestfulServer;
 import org.immregistries.iis.kernal.controllers.filters.FilterRegistrationConfig;
+import org.immregistries.iis.kernal.fhir.ServerConfig;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnEitherVersion;
 import org.immregistries.iis.kernal.fhir.mdm.MdmConfig;
 import org.immregistries.iis.kernal.security.ServerSecurityConfig;
@@ -28,11 +28,7 @@ import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Import;
 import org.springframework.web.context.request.RequestContextListener;
 
-@ServletComponentScan(basePackageClasses = {
-		RestfulServer.class }, basePackages = {
-				"org.immregistries.iis.kernal.servlet"
-		// ,"org.immregistries.iis.kernal.repository"
-		})
+
 @SpringBootApplication(exclude = { ElasticsearchRestClientAutoConfiguration.class, ThymeleafAutoConfiguration.class })
 @Import({
 		SubscriptionSubmitterConfig.class,
@@ -45,6 +41,11 @@ import org.springframework.web.context.request.RequestContextListener;
 		FilterRegistrationConfig.class,
 		ServerConfig.class,
 		ServerSecurityConfig.class,
+})
+@ServletComponentScan(basePackageClasses = {
+	RestfulServer.class }, basePackages = {
+	"org.immregistries.iis.kernal.servlet"
+	// ,"org.immregistries.iis.kernal.repository"
 })
 @ComponentScan(basePackages = {
 		"ca.uhn.fhir.jpa.starter",
@@ -62,7 +63,6 @@ public class Application extends SpringBootServletInitializer {
 
 	public static void main(String[] args) {
 		SpringApplication.run(Application.class, args);
-
 		// Server is now accessible at eg. http://localhost:8080/fhir/metadata
 		// UI is now accessible at http://localhost:8080/
 	}
