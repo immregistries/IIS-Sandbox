@@ -25,8 +25,7 @@ public class ShLinkManifest {
 	private String status; // "finalized"|"can-change"|"no-longer-valid"
 
 	@JsonProperty(value = "files")
-	@Embedded()
-//	@OneToMany(cascade = CascadeType.ALL)
+	@ElementCollection
 	private List<FileManifest> files = new ArrayList<>();
 
 	public String getStatus() {
