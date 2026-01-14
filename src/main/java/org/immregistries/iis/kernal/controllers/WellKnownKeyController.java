@@ -41,7 +41,7 @@ public class WellKnownKeyController {
 	public static String getKeyIssuerUrl(HttpServletRequest request, Tenant tenant) {
 		UriComponentsBuilder uriComponentsBuilder = ServletUriComponentsBuilder.fromRequest(request);
 		uriComponentsBuilder.replacePath(TenantController.TENANT_PATH);
-		uriComponentsBuilder.build(Map.of(TenantController.PATH_VARIABLE_TENANT_NAME, tenant.getOrganizationName()));
+		uriComponentsBuilder.build(Map.of(TenantController.TENANT_NAME, tenant.getOrganizationName()));
 		String issuerUrl = null;
 		try {
 			issuerUrl = uriComponentsBuilder.build().toUri().toURL().toString();

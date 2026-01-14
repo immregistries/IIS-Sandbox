@@ -17,14 +17,16 @@ import java.util.Date;
 import java.util.List;
 
 @RestController
-@RequestMapping(RestUrlUtil.REST_TENANT_PATH + "/vacDedup")
+@RequestMapping(RestUrlUtil.REST_TENANT_PATH + VacDedupRestController.VAC_DEDUP_PATH)
 public class VacDedupRestController {
+
+	public static final String VAC_DEDUP_PATH = "/vacDedup";
 
     public static final String ALGORITHM_DETERMINISTIC = "Deterministic";
     public static final String ALGORITHM_WEIGHTED = "Weighted";
     public static final String ALGORITHM_HYBRID = "Hybrid";
 
-    @PostMapping
+	@PostMapping
     public List<LinkedImmunization> deduplicate(
             @RequestAttribute(name = SESSION_REQUEST_TENANT) Tenant tenant,
             @RequestBody VacDedupRequest request,

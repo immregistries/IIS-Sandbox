@@ -15,8 +15,9 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 
 @RestController()
-@RequestMapping({RestUrlUtil.REST_PATH + "/$create", "/$create"})
+@RequestMapping({RestUrlUtil.REST_PATH + MacroEndpointController.$_CREATE_PATH_KEY, "/$create"})
 public class MacroEndpointController {
+	public static final String $_CREATE_PATH_KEY = "/$create";
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	@Autowired
 	FhirContext fhirContext;

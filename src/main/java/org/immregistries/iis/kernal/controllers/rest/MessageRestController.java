@@ -11,16 +11,18 @@ import java.util.List;
 import static org.immregistries.iis.kernal.security.CurrentTenantUtil.SESSION_REQUEST_TENANT;
 
 @RestController
-@RequestMapping(RestUrlUtil.REST_TENANT_PATH + "/message")
+@RequestMapping(RestUrlUtil.REST_TENANT_PATH + MessageRestController.MESSAGE_PATH_KEY)
 public class MessageRestController {
 
-    @Autowired
+	public static final String MESSAGE_PATH_KEY = "/message";
+
+	@Autowired
     MessageReceivedRepository messageReceivedRepository;
 
-    @GetMapping("/{patientId}")
+    @GetMapping(RestUrlUtil.PATIENT_ID_PLACEHOLDER)
     public List<MessageReceived> getPatientMessages(
             @RequestAttribute(name = SESSION_REQUEST_TENANT) Tenant tenant,
-            @PathVariable("patientId") String patientId) {
+            @PathVariable(RestUrlUtil.PATIENT_ID) String patientId) {
         return messageReceivedRepository.findByTenantAndPatientReportedId(tenant, patientId);
     }
 

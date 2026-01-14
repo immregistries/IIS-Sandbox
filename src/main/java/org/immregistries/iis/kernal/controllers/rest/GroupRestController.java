@@ -7,10 +7,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(RestUrlUtil.REST_TENANT_PATH + "/group")
+@RequestMapping(RestUrlUtil.REST_TENANT_PATH + GroupRestController.GROUP_PATH_KEY)
 public class GroupRestController {
 
-    @GetMapping("/$generate")
+	public static final String GROUP_PATH_KEY = "/group";
+
+	@GetMapping("/$generate")
     public Group generateGroup(HttpServletRequest req) {
 
         Group group = new Group();

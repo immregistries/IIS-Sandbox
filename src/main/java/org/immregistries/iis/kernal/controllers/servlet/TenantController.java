@@ -28,8 +28,9 @@ import java.util.List;
 		TenantController.TENANT_PATH + TenantController.TENANT_BASE_PATH })
 public class TenantController {
 	public static final String TENANT_BASE_PATH = "/tenant";
-	public static final String PATH_VARIABLE_TENANT_NAME = "tenantName";
-	public static final String TENANT_PATH = TENANT_BASE_PATH + "/{" + PATH_VARIABLE_TENANT_NAME + "}";
+	public static final String TENANT_NAME = "tenantName";
+	public static final String TENANT_NAME_PLACEHOLDER = "/{" + TENANT_NAME + "}";
+	public static final String TENANT_PATH = TENANT_BASE_PATH + TENANT_NAME_PLACEHOLDER;
 
 	public static final String PARAM_ACTION = "action";
 

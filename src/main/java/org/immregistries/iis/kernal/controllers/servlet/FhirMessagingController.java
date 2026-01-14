@@ -61,7 +61,7 @@ public class FhirMessagingController {
 
 			UiUtil.doHeader(out, "IIS Sandbox - FHIR Messaging", tenant);
 			out.println("<h2>Experimental FHIR Messaging Endpoint</h2>");
-			PopController.printForm(out, "FHIR Bundle", message, organizationName, RestUrlUtil.REST_KEY + "/" + FHIR_MESSAGING_PATH_KEY);
+			PopController.printForm(out, "FHIR Bundle", message, organizationName, RestUrlUtil.REST + "/" + FHIR_MESSAGING_PATH_KEY);
 			UiUtil.doFooter(out);
 
 		} catch (Exception e) {

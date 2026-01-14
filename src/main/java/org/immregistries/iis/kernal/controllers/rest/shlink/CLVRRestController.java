@@ -43,7 +43,7 @@ import java.security.NoSuchProviderException;
 import java.security.SignatureException;
 
 @RestController
-@RequestMapping(RestUrlUtil.REST_TENANT_PATH + "/patient/{patientId}/clvr")
+@RequestMapping(RestUrlUtil.REST_PATIENT_PATH + "/clvr")
 public class CLVRRestController {
     Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -67,7 +67,7 @@ public class CLVRRestController {
 
     @GetMapping(value = "/qr", produces = MediaType.TEXT_PLAIN_VALUE)
     public String getPatientClvrQrCode(
-            @PathVariable("patientId") String patientId,
+            @PathVariable(RestUrlUtil.PATIENT_ID) String patientId,
             @RequestAttribute(CurrentTenantUtil.SESSION_REQUEST_TENANT) Tenant tenant)
             throws COSEException, SignatureException, NoSuchAlgorithmException, InvalidKeyException,
             NoSuchProviderException, IOException {
@@ -82,7 +82,7 @@ public class CLVRRestController {
 
     @GetMapping(value = "/qr/png", produces = MediaType.IMAGE_PNG_VALUE)
     public ResponseEntity<byte[]> getPatientClvrPng(
-            @PathVariable("patientId") String patientId,
+            @PathVariable(RestUrlUtil.PATIENT_ID) String patientId,
             @RequestAttribute(CurrentTenantUtil.SESSION_REQUEST_TENANT) Tenant tenant)
             throws COSEException, IOException, SignatureException, NoSuchAlgorithmException, InvalidKeyException,
             NoSuchProviderException, ServletException {
@@ -101,7 +101,7 @@ public class CLVRRestController {
 
     @GetMapping(value = "/pdf", produces = MediaType.APPLICATION_PDF_VALUE)
     public ResponseEntity<byte[]> getPatientClvrPdf(
-            @PathVariable("patientId") String patientId,
+            @PathVariable(RestUrlUtil.PATIENT_ID) String patientId,
             @RequestAttribute(CurrentTenantUtil.SESSION_REQUEST_TENANT) Tenant tenant)
             throws COSEException, IOException, SignatureException, NoSuchAlgorithmException, InvalidKeyException,
             NoSuchProviderException, WriterException, URISyntaxException {

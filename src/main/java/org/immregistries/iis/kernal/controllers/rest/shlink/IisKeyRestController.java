@@ -16,22 +16,26 @@ import java.util.List;
 @RequestMapping()
 public class IisKeyRestController {
 
+	public static final String IIS_KEYS = "/iisKeys";
+	public static final String KEY_ID = "keyId";
+
+	public static final String KEY_ID_PLACEHOLDER = "/{" + KEY_ID + "}";
 	@Autowired
 	KeyStoreService keyStoreService;
 	@Autowired
 	UserAccessUtil userAccessUtil;
 
-	@GetMapping(RestUrlUtil.REST_PATH + "/iisKeys")
+	@GetMapping(RestUrlUtil.REST_PATH + IIS_KEYS)
 	public List<IisKey> getKeys() {
 		UserAccess userAccess = userAccessUtil.getUserAccess();
 		return keyStoreService.getKeys(userAccess);
 	}
 
-	@GetMapping({ RestUrlUtil.REST_PATH + "/iisKeys/{id}/$getOrCreate",
-			RestUrlUtil.REST_TENANT_PATH + "/iisKeys/{id}/$getOrCreate" })
+	@GetMapping({ RestUrlUtil.REST_PATH + IIS_KEYS + KEY_ID_PLACEHOLDER + "/$getOrCreate",
+			RestUrlUtil.REST_TENANT_PATH + IIS_KEYS + KEY_ID_PLACEHOLDER + "/$getOrCreate"})
 	public IisKey getOrCreateKey(
 			@RequestAttribute(value = RestTenantUrlFilter.TENANT_REQUEST_ATTRIBUTE, required = false) Tenant tenant,
-			@PathVariable("id") String keyId) {
+			@PathVariable(KEY_ID) String keyId) {
 		UserAccess userAccess = userAccessUtil.getUserAccess();
 		return keyStoreService.getIisSigningKeyOrCreate(keyId, userAccess, tenant);
 	}

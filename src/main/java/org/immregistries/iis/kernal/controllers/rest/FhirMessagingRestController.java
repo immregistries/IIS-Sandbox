@@ -28,17 +28,19 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 import java.io.PrintWriter;
 
+import static org.immregistries.iis.kernal.controllers.rest.FhirMessagingRestController.FHIR_MESSAGING_KEY_PATH;
 import static org.immregistries.iis.kernal.controllers.servlet.PopController.PARAM_FACILITY_NAME;
 import static org.immregistries.iis.kernal.controllers.servlet.PopController.PARAM_MESSAGE;
-import static org.immregistries.iis.kernal.controllers.servlet.TenantController.PATH_VARIABLE_TENANT_NAME;
+import static org.immregistries.iis.kernal.controllers.servlet.TenantController.TENANT_NAME;
 import static org.immregistries.iis.kernal.security.CurrentTenantUtil.SESSION_REQUEST_TENANT;
 
 @RestController
-@RequestMapping({ RestUrlUtil.REST_PATH + "/fhirMessaging", RestUrlUtil.REST_TENANT_PATH + "/fhirMessaging",
+@RequestMapping({ RestUrlUtil.REST_PATH + FHIR_MESSAGING_KEY_PATH, RestUrlUtil.REST_TENANT_PATH + FHIR_MESSAGING_KEY_PATH,
 		"/tenant/{tenantName}/fhirMessaging" })
 @Conditional(OnR4Condition.class)
 public class FhirMessagingRestController {
 
+	public static final String FHIR_MESSAGING_KEY_PATH = "/fhirMessaging";
 	@Autowired
 	FhirContext fhirContext;
 	@Autowired
@@ -92,7 +94,7 @@ public class FhirMessagingRestController {
 
 	@PostMapping(SoapDescriptionController.SOAP_BASE_PATH)
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp,
-			@PathVariable(name = PATH_VARIABLE_TENANT_NAME, required = false) String tenantName)
+			@PathVariable(name = TENANT_NAME, required = false) String tenantName)
 			throws ServletException, IOException {
 
 		String path = req.getPathInfo();

@@ -14,6 +14,7 @@ import org.hl7.fhir.instance.model.api.IDomainResource;
 import org.hl7.fhir.r5.model.Bundle;
 import org.immregistries.iis.kernal.Application;
 import org.immregistries.iis.kernal.controllers.rest.*;
+import org.immregistries.iis.kernal.controllers.rest.shlink.PatientShLinkRestController;
 import org.immregistries.iis.kernal.controllers.servlet.shlink.ShLinkController;
 import org.immregistries.iis.kernal.controllers.servlet.util.UiQrCodeUtil;
 import org.immregistries.iis.kernal.controllers.servlet.util.UiUtil;
@@ -181,11 +182,9 @@ public class PatientController {
 	private void printQrCodeAndDetails(PrintWriter out, Tenant tenant, PatientMaster patientMasterSelected,
 												  ShLinkPayload shLinkPayload) throws JsonProcessingException {
 		out.println("<div class=\"w3-container\">");
-		out.println("<img src=\""
-			+ UrlTenantUtil.tenantifyPathWithContextPath(tenant,
-			"/patient/qr?id=" + patientMasterSelected.getPatientId())
+		out.println("<img src=\"" + RestUrlUtil.patientifyPathWithContextPath(tenant.getOrgId(), patientMasterSelected.getPatientId(), PatientShLinkRestController.SHLINK_QR_CODE_PATH_SUFFIX)
 			+ "\"  alt=\"shlink\" width=\"200\">");
-		out.println("<div><a href= \"" + shLinkPayload.getUrl() + "\">Manifest URL</a></div>");
+		out.print("<div><a href= \"" + shLinkPayload.getUrl() + "\">Manifest URL</a></div>");
 		out.println("<h5>Qr Code Text Value</h5>");
 		out.println("<textarea id =\"qrCode\" cols=\"30\" rows=\"2\" style=\"white-space: nowrap;  overflow: auto;\">");
 		String qrCode = UiQrCodeUtil.qrCodeBase64(shLinkPayload);

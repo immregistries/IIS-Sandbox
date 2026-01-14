@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.immregistries.iis.kernal.Application;
+import org.immregistries.iis.kernal.controllers.rest.PatientRestController;
 import org.immregistries.iis.kernal.controllers.rest.RestUrlUtil;
 import org.immregistries.iis.kernal.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.fhir.shl.ShLinkPayload;
@@ -28,7 +29,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 @RestController
-@RequestMapping({ RestUrlUtil.REST_KEY + "/patient", RestUrlUtil.REST_KEY + "/tenant/{tenantName}/patient" })
+@RequestMapping({RestUrlUtil.REST + PatientRestController.PATIENT_BASE_PATH + PatientShLinkRestController.SHLINK_QR_CODE_PATH_SUFFIX, RestUrlUtil.REST_TENANT_PATH + PatientRestController.PATIENT_BASE_PATH + PatientShLinkRestController.SHLINK_QR_CODE_PATH_SUFFIX})
 public class PatientShLinkRestController {
 
 	public static final String SHLINK_QR_CODE_PATH_SUFFIX = "/qr";
@@ -40,11 +41,11 @@ public class PatientShLinkRestController {
 	@Autowired
 	private CompressionService compressionService;
 
-	@GetMapping(value = { SHLINK_QR_CODE_PATH_SUFFIX }, produces = MediaType.IMAGE_PNG_VALUE)
+	@GetMapping( produces = MediaType.IMAGE_PNG_VALUE)
 	public ResponseEntity<byte[]> doGetShLinkQrCode(HttpServletRequest req, HttpServletResponse resp,
-			@RequestAttribute(CurrentTenantUtil.SESSION_REQUEST_TENANT) Tenant tenant,
-			@PathVariable("patientId") String patientId)
-			throws IOException, ServletException {
+																	@RequestAttribute(CurrentTenantUtil.SESSION_REQUEST_TENANT) Tenant tenant,
+																	@PathVariable(PatientRestController.PATIENT_ID) String patientId)
+		throws IOException, ServletException {
 		IGenericClient client = iisFhirClientFactory.newGenericClient(tenant, req);
 		IBaseResource patientSelected = client.read().resource("Patient").withId(patientId).execute();
 		if (patientSelected == null) {
@@ -80,8 +81,8 @@ public class PatientShLinkRestController {
 
 	public static @NotNull String getManifestUrl(String baseUrl, IBaseResource patientSelected, Tenant tenant) {
 		return baseUrl + RestUrlUtil.tenantifyPathWithContextPath(tenant,
-				PatientShLinkManifestRestController.MANIFEST_PATH_SUFFIX
-						+ "/patient/" + patientSelected.getIdElement().getIdPart());
+			PatientShLinkManifestRestController.MANIFEST_PATH_SUFFIX
+				+ "/patient/" + patientSelected.getIdElement().getIdPart());
 	}
 
 }

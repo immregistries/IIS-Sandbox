@@ -19,19 +19,23 @@ import static org.immregistries.iis.kernal.security.CurrentTenantUtil.SESSION_RE
 import java.util.List;
 
 @RestController
-@RequestMapping(RestUrlUtil.REST_TENANT_PATH + "/Vaccination")
+@RequestMapping(RestUrlUtil.REST_TENANT_PATH + VaccinationRestController.VACCINATION)
 public class VaccinationRestController extends BaseTenantTiedRest {
 
-    @GetMapping("/{vaccinationId}")
+	public static final String VACCINATION = "/vaccination";
+	public static final String VACCINATION_ID = "vaccinationId";
+	public static final String VACCINATION_ID_PLACEHOLDER = "/{" + VACCINATION_ID + "}";
+
+	@GetMapping(VACCINATION_ID_PLACEHOLDER)
     public VaccinationMaster getVaccination(
             @RequestAttribute(name = SESSION_REQUEST_TENANT) Tenant tenant,
-            @PathVariable("vaccinationId") String vaccinationId,
+            @PathVariable(VACCINATION_ID) String vaccinationId,
             HttpServletRequest req) {
         // TODO make FHIr Requester tenant aware
         return fhirReadRequester.readAsVaccinationMaster(vaccinationId);
     }
 
-    @GetMapping("")
+    @GetMapping()
     public List<VaccinationMaster> getVaccinations(
             @RequestAttribute(name = SESSION_REQUEST_TENANT) Tenant tenant,
             @RequestParam(required = false) String patientId,
@@ -47,9 +51,9 @@ public class VaccinationRestController extends BaseTenantTiedRest {
         return result;
     }
 
-    @GetMapping("/{vaccinationId}/related")
+    @GetMapping(VACCINATION_ID_PLACEHOLDER + "/related")
     public List<? extends VaccinationMaster> getRelatedVaccinations(
-            @PathVariable("vaccinationId") String vaccinationId,
+            @PathVariable(VACCINATION_ID) String vaccinationId,
             @RequestAttribute(RestTenantUrlFilter.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
             @RequestParam(name = MDM_EXPAND_REST_PARAM, defaultValue = "false") boolean isGolden) {
         ReferenceParam referenceParam = new ReferenceParam().setValue(vaccinationId);

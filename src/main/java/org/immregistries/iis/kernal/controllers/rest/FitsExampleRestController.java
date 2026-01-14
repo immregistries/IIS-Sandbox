@@ -8,15 +8,17 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(RestUrlUtil.REST_KEY + "/fits/example")
+@RequestMapping(RestUrlUtil.REST + FitsExampleRestController.FITS_EXAMPLE_PATH)
 public class FitsExampleRestController {
 
-    @GetMapping("all")
+	public static final String FITS_EXAMPLE_PATH = "/fits/example";
+
+	@GetMapping("all")
     public Map<String, String> getAllExamples() {
         return FitsExamples.exampleMap;
     }
 
-    @GetMapping
+    @GetMapping()
     public String getExampleByName(@RequestParam("name") String name) {
         return FitsExamples.exampleMap.get(name);
     }

@@ -7,10 +7,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(RestUrlUtil.REST_PATH + "/authentication")
+@RequestMapping(RestUrlUtil.REST_PATH + AuthenticationRestController.AUTHENTICATION_KEY_PATH)
 public class AuthenticationRestController {
 
-    /**
+	public static final String AUTHENTICATION_KEY_PATH = "/authentication";
+
+	/**
      * Get the current authentication state.
      * 
      * @return The current Authentication object.

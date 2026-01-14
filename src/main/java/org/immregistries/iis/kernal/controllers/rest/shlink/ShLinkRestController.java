@@ -32,7 +32,7 @@ import java.util.Base64;
 import java.util.List;
 
 @RestController
-@RequestMapping({ RestUrlUtil.REST_KEY + "/shlink", RestUrlUtil.REST_KEY + "/tenant/{tenantName}/shlink" })
+@RequestMapping({ RestUrlUtil.REST + "/shlink", RestUrlUtil.REST + "/tenant/{tenantName}/shlink" })
 public class ShLinkRestController {
 
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());

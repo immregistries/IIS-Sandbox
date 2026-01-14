@@ -15,11 +15,8 @@ import java.util.List;
 import static org.immregistries.iis.kernal.controllers.servlet.TenantController.PARAM_TENANT_ID;
 
 @RestController
-@RequestMapping(RestUrlUtil.REST_PATH + "/tenant")
+@RequestMapping(RestUrlUtil.REST_PATH + RestUrlUtil.TENANT_PATH)
 public class TenantRestController {
-
-    @Autowired
-    private PartitionTenantCreationInterceptor partitionTenantCreationInterceptor;
 
     @Autowired
     TenantRepository tenantRepository;
@@ -28,7 +25,7 @@ public class TenantRestController {
     @Autowired
     UserAccessUtil userAccessUtil;
 
-    @GetMapping("/{tenantId}")
+    @GetMapping(RestUrlUtil.TENANT_ID_PLACEHOLDER)
     public Tenant getTenant(@PathVariable(PARAM_TENANT_ID) int tenantId) {
         UserAccess userAccess = userAccessUtil.getUserAccess();
         return tenantRepository.findByOrgIdAndUserAccessId(tenantId, userAccess.getUserAccessId())

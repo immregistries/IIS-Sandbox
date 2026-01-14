@@ -22,6 +22,11 @@ import static org.immregistries.iis.kernal.controllers.servlet.TenantController.
 @RestController
 @RequestMapping(ShLinkManifestRestController.SHLINKS_CONTROLLER_REST_BASE_URL)
 public class ShLinkManifestRestController {
+	public static final String MANIFEST_ID = "manifestId";
+	public static final String MANIFEST_ID_PLACEHOLDER = "/{" + MANIFEST_ID + "}";
+	public static final String RECIPIENT_PARAM = "recipient";
+	public static final String PASSCODE_PARAM = "passcode";
+	public static final String EMBEDDED_LENGTH_MAX_PARAM = "embeddedLengthMax";
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	public final static String SHLINKS_CONTROLLER_REST_BASE_URL = RestUrlUtil.REST_PATH +  "/link";
 
@@ -33,18 +38,18 @@ public class ShLinkManifestRestController {
 	@Autowired
 	TenantUtil tenantUtil;
 
-	@GetMapping("/{manifestId}")
-	public ShLinkManifest getManifest(@PathVariable("manifestId") String manifestId) {
+	@GetMapping(MANIFEST_ID_PLACEHOLDER)
+	public ShLinkManifest getManifest(@PathVariable(MANIFEST_ID) String manifestId) {
 		return shLinkUtilService.readShLinkManifest(manifestId);
 	}
 
-	@PostMapping("/{manifestId}")
+	@PostMapping(MANIFEST_ID_PLACEHOLDER)
 	protected ShLinkManifest readShLinkManifest(
-		@PathVariable("manifestId") String manifestId,
+		@PathVariable(MANIFEST_ID) String manifestId,
 		@PathVariable(PARAM_TENANT_ID) int tenantId,
-		@RequestParam(value = "recipient", required = false) String recipient,
-		@RequestParam(value = "passcode", required = false) String passcode,
-		@RequestParam(value = "embeddedLengthMax", required = false) String embeddedLengthMax) {
+		@RequestParam(value = RECIPIENT_PARAM, required = false) String recipient,
+		@RequestParam(value = PASSCODE_PARAM, required = false) String passcode,
+		@RequestParam(value = EMBEDDED_LENGTH_MAX_PARAM, required = false) String embeddedLengthMax) {
 		Tenant tenant = null;
 		if (StringUtils.isNoneBlank(passcode)) {
 			tenant = tenantUtil.authenticateTenantNoUsername(tenantId, passcode);

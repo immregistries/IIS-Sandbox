@@ -21,72 +21,73 @@ import java.util.Date;
 import static org.immregistries.iis.kernal.controllers.servlet.PopController.PARAM_FACILITY_NAME;
 
 @RestController
-@RequestMapping(RestUrlUtil.REST_TENANT_PATH + "/pop")
+@RequestMapping(RestUrlUtil.REST_TENANT_PATH + PopRestController.POP)
 public class PopRestController {
 
-    @Autowired
-    private FhirContext fhirContext;
-    @Autowired
-    private IisFhirClientFactory iisFhirClientFactory;
-    @Autowired
-    private V2IncomingMessageHandler handler;
+	public static final String POP = "/pop";
+	@Autowired
+	private FhirContext fhirContext;
+	@Autowired
+	private IisFhirClientFactory iisFhirClientFactory;
+	@Autowired
+	private V2IncomingMessageHandler handler;
 
-    @GetMapping(value = "/sample", produces = MediaType.TEXT_PLAIN_VALUE)
-    public String getSampleMessage() {
-        TestCaseMessage testCaseMessage = ScenarioManager
-                .createTestCaseMessage(ScenarioManager.SCENARIO_1_R_ADMIN_CHILD);
-        Transformer transformer = new Transformer();
-        transformer.transform(testCaseMessage);
-        return testCaseMessage.getMessageText();
-    }
+	@GetMapping(value = "/sample", produces = MediaType.TEXT_PLAIN_VALUE)
+	public String getSampleMessage() {
+		TestCaseMessage testCaseMessage = ScenarioManager
+			.createTestCaseMessage(ScenarioManager.SCENARIO_1_R_ADMIN_CHILD);
+		Transformer transformer = new Transformer();
+		transformer.transform(testCaseMessage);
+		return testCaseMessage.getMessageText();
+	}
 
-    @PostMapping
-    public String postPop(
-            @RequestBody String message,
-            @RequestParam(value = PARAM_FACILITY_NAME, required = false) String facilityName,
-            @RequestAttribute(RestTenantUrlFilter.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
-            HttpServletRequest req) {
-        if (message == null) {
-            return "";
-        }
+	@PostMapping
+	public String postPop(
+		@RequestBody String message,
+		@RequestParam(value = PARAM_FACILITY_NAME, required = false) String facilityName,
+		@RequestAttribute(RestTenantUrlFilter.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
+		HttpServletRequest req) {
+		if (message == null) {
+			return "";
+		}
 
-        String[] messages = message.split(PopController.MSH_HEADER_REGEX);
-        if (messages.length > 2) {
-            req.setAttribute("groupPatientIds", new ArrayList<String>());
-        }
+		String[] messages = message.split(PopController.MSH_HEADER_REGEX);
+		if (messages.length > 2) {
+			req.setAttribute("groupPatientIds", new ArrayList<String>());
+		}
 
-        StringBuilder ackBuilder = new StringBuilder();
-        for (String msh : messages) {
-            if (!msh.isBlank()) {
-                String ack = handler.process(PopController.MSH_HEADER + msh, tenant, facilityName);
-                ackBuilder.append(ack);
-            }
-        }
+		StringBuilder ackBuilder = new StringBuilder();
+		for (String msh : messages) {
+			if (!msh.isBlank()) {
+				String ack = handler.process(PopController.MSH_HEADER + msh, tenant, facilityName);
+				ackBuilder.append(ack);
+			}
+		}
 
-        /**
-         * Saving a group if multiple patients were sent
-         */
-        @SuppressWarnings("unchecked")
-        ArrayList<String> groupPatientIds = (ArrayList<String>) req.getAttribute("groupPatientIds");
-        if (groupPatientIds != null) {
-            if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R5)) {
-                org.hl7.fhir.r5.model.Group group = new org.hl7.fhir.r5.model.Group();
-                for (String id : groupPatientIds) {
-                    group.addMember()
-                            .setEntity(new org.hl7.fhir.r5.model.Reference().setReference("Patient/" + id));
-                }
-                group.setDescription("Generated from Hl2v2 VXU Query on  time " + new Date());
-                iisFhirClientFactory.getOrCreateGenericClient(req).create().resource(group).execute();
-            } else {
-                org.hl7.fhir.r4.model.Group group = new org.hl7.fhir.r4.model.Group();
-                for (String id : groupPatientIds) {
-                    group.addMember()
-                            .setEntity(new org.hl7.fhir.r4.model.Reference().setReference("Patient/" + id));
-                }
-                iisFhirClientFactory.getOrCreateGenericClient(req).create().resource(group).execute();
-            }
-        }
+		/**
+		 * Saving a group if multiple patients were sent
+		 */
+		@SuppressWarnings("unchecked")
+		ArrayList<String> groupPatientIds = (ArrayList<String>) req.getAttribute("groupPatientIds");
+		if (groupPatientIds != null) {
+			if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R5)) {
+				org.hl7.fhir.r5.model.Group group = new org.hl7.fhir.r5.model.Group();
+				for (String id : groupPatientIds) {
+					group.addMember()
+						.setEntity(new org.hl7.fhir.r5.model.Reference().setReference("Patient/" + id));
+				}
+				group.setDescription("Generated from Hl2v2 VXU Query on  time " + new Date());
+				iisFhirClientFactory.getOrCreateGenericClient(req).create().resource(group).execute();
+			} else {
+				org.hl7.fhir.r4.model.Group group = new org.hl7.fhir.r4.model.Group();
+				for (String id : groupPatientIds) {
+					group.addMember()
+						.setEntity(new org.hl7.fhir.r4.model.Reference().setReference("Patient/" + id));
+				}
+				iisFhirClientFactory.getOrCreateGenericClient(req).create().resource(group).execute();
+			}
+		}
 
-        return ackBuilder.toString();
-    }
+		return ackBuilder.toString();
+	}
 }

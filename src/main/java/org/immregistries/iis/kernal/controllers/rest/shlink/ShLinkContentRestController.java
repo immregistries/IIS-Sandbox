@@ -14,12 +14,14 @@ import static org.immregistries.iis.kernal.controllers.rest.shlink.ShLinkContent
 public class ShLinkContentRestController {
 	public static final String SHLINK_FILES = "shlink/files";
 	public static final String SHLINK_CONTENT_PATH = RestUrlUtil.REST_PATH + "/" + SHLINK_FILES;
+	public static final String CONTENT_ID = "contentId";
+	public static final String CONTENT_ID_PLACEHOLDER = "/{" + CONTENT_ID + "}";
 
-    @Autowired
+	@Autowired
     IisShlinkContentRepository iisShlinkContentRepository;
 
-    @GetMapping(value = "/{id}", produces = MediaType.TEXT_PLAIN_VALUE)
-    public String getContent(@PathVariable("id") String contentId,
+    @GetMapping(value = CONTENT_ID_PLACEHOLDER, produces = MediaType.TEXT_PLAIN_VALUE)
+    public String getContent(@PathVariable(CONTENT_ID) String contentId,
             @RequestParam(value = "recipient", required = false) String recipient) {
         return iisShlinkContentRepository.findById(Integer.parseInt(contentId))
                 .map(iisShLinkContent -> iisShLinkContent.getContent()).orElse(null);
