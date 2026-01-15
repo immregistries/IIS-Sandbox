@@ -15,12 +15,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Component;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
-import static org.immregistries.iis.kernal.logic.IIncomingMessageHandler.MINIMAL_MATCHING_SCORE;
 
 @Component
 @Conditional(OnR5Condition.class)
@@ -141,56 +138,5 @@ public class FhirSaveRequesterR5 extends
 			return null;
 		}
 	}
-
-	public PatientMaster matchPatient(List<PatientReported> multipleMatches, PatientMaster patientMasterForMatchQuery,
-												 Date cutoff) {
-		PatientMaster singleMatch = null;
-		Bundle matches = iisFhirClientFactory.getOrCreateFhirClientFromContext()
-			.operation().onType(Patient.class)
-			.named("match")
-			.withParameter(Parameters.class, "resource", allMappingService.fhirResource(patientMasterForMatchQuery))
-			.returnResourceType(Bundle.class).execute();
-		BigDecimal singleMatchScore = new BigDecimal(-1);
-		for (Bundle.BundleEntryComponent entry : matches.getEntry()) {
-			if (entry.getResource() instanceof Patient) {
-				Patient patient = (Patient) entry.getResource();
-				PatientMaster patientMaster = (PatientMaster) allMappingService.localObject(patient);
-				/*
-				 * Filter for flavours previously configured SNAIL
-				 */
-				if (cutoff != null && cutoff.before(patientMaster.getReportedDate())) {
-					break;
-				}
-
-				// /**
-				// * Filtering only Golden records
-				// * TODO ask Nathan to assert workflow
-				// */
-				// if (entry.getResource().getMeta().getTag(GOLDEN_SYSTEM_TAG, GOLDEN_RECORD) ==
-				// null) {
-				// break;
-				// }
-				// if (entry.getSearch().hasScore() &&
-				// entry.getSearch().getScoreElement().compareTo(new
-				// DecimalType(MINIMAL_MATCHING_SCORE))) {
-				// singleMatch = patientMaster;
-				// }
-				if (FhirRequesterUtil.isGoldenRecord(entry.getResource())) {
-					if (singleMatch == null) {
-						if (!entry.getSearch().hasScore()) {
-							singleMatch = patientMaster;
-						} else if (entry.getSearch().getScoreElement().compareTo(new DecimalType(
-							Math.max(MINIMAL_MATCHING_SCORE, singleMatchScore.toBigInteger().intValue()))) >= 0) {
-							singleMatch = patientMaster;
-							singleMatchScore = entry.getSearch().getScore();
-						}
-					}
-				}
-				multipleMatches.add((PatientReported) allMappingService.localObjectReported(entry.getResource()));
-			}
-		}
-		return singleMatch;
-	}
-
 
 }

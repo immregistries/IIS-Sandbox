@@ -15,7 +15,6 @@ import java.util.Random;
 import java.util.Set;
 
 public interface IIncomingMessageHandler<SourceType> {
-	double MINIMAL_MATCHING_SCORE = 0.75;
 	int NAME_SIZE_LIMIT = 15;
 
 	String RXA = "RXA";

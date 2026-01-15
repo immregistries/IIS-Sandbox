@@ -9,9 +9,7 @@ import ca.uhn.fhir.rest.param.TokenParamModifier;
 import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.Bundle;
-import org.hl7.fhir.r4.model.DecimalType;
 import org.hl7.fhir.r4.model.Parameters;
-import org.hl7.fhir.r4.model.Patient;
 import org.immregistries.iis.kernal.mapping.AllMappingService;
 import org.immregistries.iis.kernal.mapping.resourceMappers.*;
 import org.immregistries.iis.kernal.model.*;
@@ -19,13 +17,10 @@ import org.immregistries.iis.kernal.security.TenantUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.immregistries.iis.kernal.logic.IIncomingMessageHandler.MINIMAL_MATCHING_SCORE;
 import static org.immregistries.iis.kernal.mapping.resourceMappers.ImmunizationMapper.IMMUNIZATION;
 
 @Service
@@ -37,6 +32,8 @@ public class FhirSearchRequester {
 	DaoRegistry daoRegistry;
 	@Autowired
 	AllMappingService allMappingService;
+	@Autowired
+	PatientMapper patientMapper;
 
 	@Autowired
 	TenantUtil tenantUtil;
@@ -302,65 +299,5 @@ public class FhirSearchRequester {
 		IBundleProvider bundleProvider = search("Organization", searchParameterMap);
 		return (org.hl7.fhir.r4.model.Organization) bundleProvider.getAllResources().stream().findFirst().orElse(null);
 	}
-
-	/**
-	 * Fills multiple matched list and return Single Match
-	 * Used for RSP
-	 *
-	 * @param multipleMatches            List to add multiple matches in
-	 * @param patientForMatchQuery patient Information to match
-	 * @param cutoff                     cutoff date to ignore old records
-	 * @return Single match result
-	 */
-	public PatientMaster matchPatient(List<PatientReported> multipleMatches, IisPatient patientForMatchQuery,
-												 Date cutoff) {
-		PatientMaster singleMatch = null;
-		Bundle matches = iisFhirClientFactory.getOrCreateFhirClientFromContext()
-			.operation().onType(Patient.class)
-			.named("match")
-			.withParameter(Parameters.class, "resource", allMappingService.fhirResource(patientForMatchQuery))
-			.returnResourceType(Bundle.class).execute();
-		BigDecimal singleMatchScore = new BigDecimal(-1);
-		for (Bundle.BundleEntryComponent entry : matches.getEntry()) {
-			if (entry.getResource() instanceof Patient) {
-				Patient patient = (Patient) entry.getResource();
-				PatientMaster patientMaster = (PatientMaster) allMappingService.localObject(patient);
-				/*
-				 * Filter for flavours previously configured SNAIL
-				 */
-				if (cutoff != null && cutoff.before(patientMaster.getReportedDate())) {
-					break;
-				}
-
-				// /**
-				// * Filtering only Golden records
-				// * TODO ask Nathan to assert workflow
-				// */
-				// if (entry.getResource().getMeta().getTag(GOLDEN_SYSTEM_TAG, GOLDEN_RECORD) ==
-				// null) {
-				// break;
-				// }
-				// if (entry.getSearch().hasScore() &&
-				// entry.getSearch().getScoreElement().compareTo(new
-				// DecimalType(MINIMAL_MATCHING_SCORE))) {
-				// singleMatch = patientMaster;
-				// }
-				if (FhirRequesterUtil.isGoldenRecord(entry.getResource())) {
-					if (singleMatch == null) {
-						if (!entry.getSearch().hasScore()) {
-							singleMatch = patientMaster;
-						} else if (entry.getSearch().getScoreElement().compareTo(new DecimalType(
-							Math.max(MINIMAL_MATCHING_SCORE, singleMatchScore.toBigInteger().intValue()))) >= 0) {
-							singleMatch = patientMaster;
-							singleMatchScore = entry.getSearch().getScore();
-						}
-					}
-				}
-				multipleMatches.add((PatientReported) allMappingService.localObjectReported(entry.getResource()));
-			}
-		}
-		return singleMatch;
-	}
-
 
 }
