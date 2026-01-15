@@ -71,6 +71,13 @@ public class AllMappingService {
         return mapper.localObjectReported(resource);
     }
 
+	@SuppressWarnings("unchecked")
+	public IisMappedToFhirResource localObjectMaster(IAnyResource resource) {
+		@SuppressWarnings("rawtypes")
+		IisResourceMasterReportedMapper mapper = selectMapperReported(resource);
+		return mapper.localObjectMaster(resource);
+	}
+
     @SuppressWarnings("rawtypes")
 	 public IisResourceMasterMapper selectMapper(IisMappedToFhirResource internal) {
 		 Class inteClass = internal.getClass();

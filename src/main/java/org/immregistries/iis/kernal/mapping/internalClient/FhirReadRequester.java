@@ -49,7 +49,7 @@ public class FhirReadRequester {
 	public PatientMaster readAsPatientMaster(String id) {
 		Patient patient = (Patient) read(PatientMapper.PATIENT, id);
 		if (FhirRequesterUtil.isGoldenRecord(patient)) {
-			return (PatientMaster) allMappingService.localObject(patient);
+			return (PatientMaster) allMappingService.localObjectMaster(patient);
 		}
 		return null;
 	}
