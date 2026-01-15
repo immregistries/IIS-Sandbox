@@ -118,35 +118,35 @@ public class PatientController {
 
 	private void singlePatientInformationPrintAll(PrintWriter out, IBaseResource patientSelected,
 																 Tenant tenant, HttpServletRequest req) throws JsonProcessingException {
-		PatientMaster patientMasterSelected = patientMapper.localObject(patientSelected);
+		IisPatient iisPatient = patientMapper.localObject(patientSelected);
 		boolean isGolden = FhirRequesterUtil.isGoldenRecord(patientSelected);
 
-		out.println("<h2>Patient : " + patientMasterSelected.getNameFirst() + " "
-			+ patientMasterSelected.getNameMiddle() + " " + patientMasterSelected.getNameLast() + "</h2>");
+		out.println("<h2>Patient : " + iisPatient.getNameFirst() + " "
+			+ iisPatient.getNameMiddle() + " " + iisPatient.getNameLast() + "</h2>");
 
-		printPatient(out, patientMasterSelected);
+		printPatient(out, iisPatient);
 
 		out.println("  <div class=\"w3-container\">");
 
-		printPatientVaccinations(out, patientMasterSelected, isGolden, tenant, req);
-		printPatientObservations(out, patientMasterSelected, isGolden, tenant, req);
-		printRelatedPatients(out, patientMasterSelected, isGolden, tenant, req);
+		printPatientVaccinations(out, iisPatient, isGolden, tenant, req);
+		printPatientObservations(out, iisPatient, isGolden, tenant, req);
+		printRelatedPatients(out, iisPatient, isGolden, tenant, req);
 
 		out.println("  </div>");
 
-		printPatientRecommendationsAndSubscriptions(out, patientSelected, patientMasterSelected, req, tenant);
+		printPatientRecommendationsAndSubscriptions(out, patientSelected, iisPatient, req, tenant);
 
 		out.println("<div class=\"w3-container\">");
-		printFhirShortcuts(out, patientSelected, patientMasterSelected, tenant);
+		printFhirShortcuts(out, patientSelected, iisPatient, tenant);
 		out.println("</div>");
 
-		ShLinkPayload shLinkPayload = patientRestController.getShLinkPayload(patientMasterSelected.getPatientId(),
+		ShLinkPayload shLinkPayload = patientRestController.getShLinkPayload(iisPatient.getPatientId(),
 			tenant,
 			req);
 
 		out.println("<div class=\"w3-container\">");
 		out.println("<h4>Smart Health link</h4>");
-		printQrCodeAndDetails(out, tenant, patientMasterSelected, shLinkPayload);
+		printQrCodeAndDetails(out, tenant, iisPatient, shLinkPayload);
 
 		// out.println("<button onclick=\"copyHtmlToClipboard()\">Copy HTML</button>");
 		// out.println("<script>");
@@ -163,7 +163,7 @@ public class PatientController {
 
 		out.println("<div class=\"w3-container\">");
 		out.println("<h4>Messages Received</h4>");
-		List<MessageReceived> messageReceivedList = messageRestController.getPatientMessages(tenant, patientMasterSelected.getPatientId());
+		List<MessageReceived> messageReceivedList = messageRestController.getPatientMessages(tenant, iisPatient.getPatientId());
 		if (messageReceivedList.isEmpty()) {
 			out.println("<div class=\"w3-panel w3-yellow\"><p>No Messages Received</p></div>");
 		} else {
@@ -176,10 +176,10 @@ public class PatientController {
 		out.println("</div>");
 	}
 
-	private void printQrCodeAndDetails(PrintWriter out, Tenant tenant, PatientMaster patientMasterSelected,
+	private void printQrCodeAndDetails(PrintWriter out, Tenant tenant, IisPatient iisPatient,
 												  ShLinkPayload shLinkPayload) throws JsonProcessingException {
 		out.println("<div class=\"w3-container\">");
-		out.println("<img src=\"" + RestUrlUtil.patientifyPathWithContextPath(tenant.getOrgId(), patientMasterSelected.getPatientId(), PatientShLinkRestController.SHLINK_QR_CODE_PATH_SUFFIX)
+		out.println("<img src=\"" + RestUrlUtil.patientifyPathWithContextPath(tenant.getOrgId(), iisPatient.getPatientId(), PatientShLinkRestController.SHLINK_QR_CODE_PATH_SUFFIX)
 			+ "\"  alt=\"shlink\" width=\"200\">");
 		out.print("<div><a href= \"" + shLinkPayload.getUrl() + "\">Manifest URL</a></div>");
 		out.println("<h5>Qr Code Text Value</h5>");
@@ -192,21 +192,21 @@ public class PatientController {
 		out.println("<div><a href= \"" +
 			UrlTenantUtil.tenantifyPathWithContextPath(tenant,
 				ShLinkController.SHLINK_CONTROLLER_BASE_PATH + "?" + ShLinkController.PARAM_PATIENT_ID + "="
-					+ patientMasterSelected.getPatientId())
+					+ iisPatient.getPatientId())
 			+ "\">Generate a new Smart Health Link with IPS</a></div>");
 		out.println("<div><a href= \"" +
-			RestUrlUtil.tenantifyPathWithContextPath(tenant, "/patient/" + patientMasterSelected.getPatientId() + "/clvr/pdf")
+			RestUrlUtil.tenantifyPathWithContextPath(tenant, "/patient/" + iisPatient.getPatientId() + "/clvr/pdf")
 			+
 			"\">Generate a EVC with IPS</a></div>");
 	}
 
 	private void printPatientRecommendationsAndSubscriptions(PrintWriter out, IBaseResource patientSelected,
-																				PatientMaster patientMasterSelected, HttpServletRequest req,
+																				IisPatient iisPatient, HttpServletRequest req,
 																				Tenant tenant) {
 		IParser parser = iisFhirClientFactory.getFhirContext()
 			.newJsonParser().setPrettyPrint(true).setSuppressNarratives(true);
 		IBaseBundle recommendationBaseBundle = patientRestController
-			.getPatientRecommendation(patientMasterSelected.getPatientId(), tenant, req);
+			.getPatientRecommendation(iisPatient.getPatientId(), tenant, req);
 
 		if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R4)) {
 			org.hl7.fhir.r4.model.Bundle recommendationBundle = (org.hl7.fhir.r4.model.Bundle) recommendationBaseBundle;
@@ -241,27 +241,27 @@ public class PatientController {
 		}
 	}
 
-	private void printRelatedPatients(PrintWriter out, PatientMaster patientMasterSelected, boolean isGolden,
+	private void printRelatedPatients(PrintWriter out, IisPatient iisPatient, boolean isGolden,
 												 Tenant tenant, HttpServletRequest req) {
 		List<? extends IisPatient> relatedPatients = patientRestController
-			.getPatientRelatedPatients(patientMasterSelected.getPatientId(), tenant, isGolden, req);
+			.getPatientRelatedPatients(iisPatient.getPatientId(), tenant, isGolden, req);
 		out.println("<h4>Related Patient records</h4>");
 		printPatientList(out, relatedPatients, false);
 		UiUtil.printGoldenRecordExplanation(out, isGolden);
 	}
 
-	private void printPatientVaccinations(PrintWriter out, PatientMaster patientMasterSelected, boolean isGolden,
+	private void printPatientVaccinations(PrintWriter out, IisPatient iisPatient, boolean isGolden,
 													  Tenant tenant, HttpServletRequest req) {
 		List<VaccinationMaster> vaccinationList = patientRestController
-			.getPatientVaccination(patientMasterSelected.getPatientId(), tenant, isGolden, req);
+			.getPatientVaccination(iisPatient.getPatientId(), tenant, isGolden, req);
 		out.println("<h4>Vaccinations</h4>");
 		VaccinationController.printVaccinationList(out, vaccinationList, null, codeMapRestController.getCodeMaps(tenant)); // TODO test and change
 	}
 
-	private void printPatientObservations(PrintWriter out, PatientMaster patientMasterSelected, boolean isGolden,
+	private void printPatientObservations(PrintWriter out, IisPatient iisPatient, boolean isGolden,
 													  Tenant tenant, HttpServletRequest req) {
 		List<ObservationReported> observationReportedList = patientRestController
-			.getPatientObservation(patientMasterSelected.getPatientId(), tenant, isGolden, req);
+			.getPatientObservation(iisPatient.getPatientId(), tenant, isGolden, req);
 		Set<String> suppressSet = LoincIdentifier.getSuppressIdentifierCodeSet();
 		observationReportedList
 			.removeIf(observationReported -> suppressSet.contains(observationReported.getIdentifierCode()));

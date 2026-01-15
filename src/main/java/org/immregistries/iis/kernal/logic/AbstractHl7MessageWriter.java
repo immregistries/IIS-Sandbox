@@ -109,7 +109,7 @@ public abstract class AbstractHl7MessageWriter implements IExampleMessageWriter 
 	}
 
 	public void printQueryPID(IisPatient patientReported, Set<ProcessingFlavor> processingFlavorSet,
-			StringBuilder sb, PatientMaster patient, SimpleDateFormat sdf, int pidCount) {
+									  StringBuilder sb, PatientMaster patientMaster, SimpleDateFormat sdf, int pidCount) {
 		// PID
 		sb.append("PID");
 		// PID-1
@@ -117,7 +117,7 @@ public abstract class AbstractHl7MessageWriter implements IExampleMessageWriter 
 		// PID-2
 		sb.append("|");
 		// PID-3
-		sb.append("|").append(patient.getMainBusinessIdentifier().getValue()).append("^^^IIS^SR");
+		sb.append("|").append(patientMaster.getMainBusinessIdentifier().getValue()).append("^^^IIS^SR");
 		if (patientReported != null) {
 			sb.append("~").append(patientReported.getMainBusinessIdentifier().getValue()).append("^^^")
 					.append(patientReported.getMainBusinessIdentifier().getSystem()).append("^")
@@ -126,14 +126,14 @@ public abstract class AbstractHl7MessageWriter implements IExampleMessageWriter 
 		// PID-4
 		sb.append("|");
 		// PID-5
-		String firstName = patient.getNameFirst();
-		String middleName = patient.getNameMiddle();
-		String lastName = patient.getNameLast();
+		String firstName = patientMaster.getNameFirst();
+		String middleName = patientMaster.getNameMiddle();
+		String lastName = patientMaster.getNameLast();
 		String motherMaiden = null;
 		if (patientReported != null) {
 			motherMaiden = patientReported.getMotherMaidenName();
 		}
-		String dateOfBirth = sdf.format(patient.getBirthDate());
+		String dateOfBirth = sdf.format(patientMaster.getBirthDate());
 
 		// If "PHI" flavor, strip AIRA from names 10% of the time
 		if (processingFlavorSet.contains(ProcessingFlavor.PHI)) {
@@ -513,10 +513,10 @@ public abstract class AbstractHl7MessageWriter implements IExampleMessageWriter 
 		return "";
 	}
 
-	public void printQueryNK1(IisPatient patientMaster, StringBuilder sb, CodeMap codeMap) {
-		if (patientMaster != null) {
-			for (int i = 0; i < patientMaster.getPatientGuardians().size(); i++) {
-				PatientGuardian patientGuardian = patientMaster.getPatientGuardians().get(i);
+	public void printQueryNK1(IisPatient iisPatient, StringBuilder sb, CodeMap codeMap) {
+		if (iisPatient != null) {
+			for (int i = 0; i < iisPatient.getPatientGuardians().size(); i++) {
+				PatientGuardian patientGuardian = iisPatient.getPatientGuardians().get(i);
 				if (StringUtils.isNotBlank(patientGuardian.getGuardianRelationship())
 						&& StringUtils.isNotBlank(patientGuardian.getName().getNameLast())
 						&& StringUtils.isNotBlank(patientGuardian.getName().getNameFirst())) {

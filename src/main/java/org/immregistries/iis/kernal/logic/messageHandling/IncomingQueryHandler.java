@@ -53,7 +53,7 @@ public class IncomingQueryHandler {
 		Set<ProcessingFlavor> processingFlavorSet = tenant.getProcessingFlavorSet();
 		MqeMessageServiceResponse mqeMessageServiceResponse = validationService.getMqeMessageService().processMessage(messageReceived);
 		List<IisReportable> reportables = validationService.nistValidation(messageReceived, mqeMessageServiceResponse.getMessageObjects().getMessageHeader().getMessageProfile());
-		PatientMaster patientMasterForMatchQuery = new PatientMaster();
+		IisPatient patientForMatchQuery = new IisPatient();
 		if (reader.advanceToSegment("QPD")) {
 			String mrn = "";
 			String mrnType = "";
@@ -71,7 +71,7 @@ public class IncomingQueryHandler {
 				BusinessIdentifier businessIdentifier = new BusinessIdentifier();
 				businessIdentifier.setValue(mrn);
 				businessIdentifier.setType(BusinessIdentifier.MRN_TYPE_VALUE);
-				patientMasterForMatchQuery.addBusinessIdentifier(businessIdentifier);
+				patientForMatchQuery.addBusinessIdentifier(businessIdentifier);
 //				patientReported = fhirSearchRequester.searchPatientReported(
 //					Patient.IDENTIFIER.exactly().systemAndCode(MRN_SYSTEM, mrn)
 //				);
@@ -102,8 +102,8 @@ public class IncomingQueryHandler {
 				reportables.add(ReportableUtil.fromProcessingException(new ProcessingException(problem, "QPD", 1, fieldPosition)));
 			} else {
 				ModelName modelName = new ModelName(patientNameLast, patientNameFirst, patientNameMiddle, "");
-				patientMasterForMatchQuery.addPatientName(modelName);
-				patientMasterForMatchQuery.setBirthDate(patientBirthDate);
+				patientForMatchQuery.addPatientName(modelName);
+				patientForMatchQuery.setBirthDate(patientBirthDate);
 			}
 		} else {
 			reportables.add(ReportableUtil.fromProcessingException(new ProcessingException("QPD segment not found", null, 0, 0)));
@@ -128,7 +128,7 @@ public class IncomingQueryHandler {
 			cutoff = calendar.getTime();
 		}
 		List<PatientReported> multipleMatches = new ArrayList<>();
-		PatientMaster singleMatch = fhirSearchRequester.matchPatient(multipleMatches, patientMasterForMatchQuery, cutoff);
+		PatientMaster singleMatch = fhirSearchRequester.matchPatient(multipleMatches, patientForMatchQuery, cutoff);
 		if (singleMatch == null) {
 			throw new ProcessingException("Patient not found", "PID", 1, 1); // TODO position
 		}
@@ -260,9 +260,9 @@ public class IncomingQueryHandler {
 				/**
 				 * CONFUSING naming p but no better solution right now but to deal with single match
 				 */
-				PatientMaster patient = patientMaster;
+				IisPatient matchedPatient = patientMaster;
 				SimpleDateFormat sdf = IIncomingMessageHandler.generateV2SDF();
-				hl7MessageWriter.printQueryPID(patientMaster, processingFlavorSet, sb, patient, sdf, 1);
+				hl7MessageWriter.printQueryPID(matchedPatient, processingFlavorSet, sb, patientMaster, sdf, 1);
 				if (profileId.equals(RSP_Z32_MATCH)) {
 					hl7MessageWriter.printQueryNK1(patientMaster, sb, codeMap);
 				}
@@ -658,7 +658,7 @@ public class IncomingQueryHandler {
 		sb.append("\r");
 	}
 
-	public List<ForecastActual> doForecast(PatientMaster patient, List<VaccinationMaster> vaccinationMasterList, Tenant tenant, Date date) {
+	public List<ForecastActual> doForecast(IisPatient patient, List<VaccinationMaster> vaccinationMasterList, Tenant tenant, Date date) {
 		CodeMap codeMap = codeMapManagerService.getCodeMap();
 		List<ForecastActual> forecastActualList = null;
 		Set<ProcessingFlavor> processingFlavorSet = tenant.getProcessingFlavorSet();

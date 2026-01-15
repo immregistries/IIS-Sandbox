@@ -307,17 +307,17 @@ public class FhirSearchRequester {
 	 * Used for RSP
 	 *
 	 * @param multipleMatches            List to add multiple matches in
-	 * @param patientMasterForMatchQuery patient Information to match
+	 * @param patientForMatchQuery patient Information to match
 	 * @param cutoff                     cutoff date to ignore old records
 	 * @return Single match result
 	 */
-	public PatientMaster matchPatient(List<PatientReported> multipleMatches, PatientMaster patientMasterForMatchQuery,
+	public PatientMaster matchPatient(List<PatientReported> multipleMatches, IisPatient patientForMatchQuery,
 												 Date cutoff) {
 		PatientMaster singleMatch = null;
 		Bundle matches = iisFhirClientFactory.getOrCreateFhirClientFromContext()
 			.operation().onType(Patient.class)
 			.named("match")
-			.withParameter(Parameters.class, "resource", allMappingService.fhirResource(patientMasterForMatchQuery))
+			.withParameter(Parameters.class, "resource", allMappingService.fhirResource(patientForMatchQuery))
 			.returnResourceType(Bundle.class).execute();
 		BigDecimal singleMatchScore = new BigDecimal(-1);
 		for (Bundle.BundleEntryComponent entry : matches.getEntry()) {
