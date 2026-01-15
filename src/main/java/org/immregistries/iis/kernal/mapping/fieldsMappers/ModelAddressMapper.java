@@ -23,6 +23,11 @@ public class ModelAddressMapper implements IFieldMapper<ModelAddress, Address, o
 		return org.hl7.fhir.r4.model.Address.class;
 	}
 
+	@Override
+	public String fhirType() {
+		return "Address";
+	}
+
 	public org.hl7.fhir.r4.model.Address toR4(ModelAddress modelAddress) {
         return new org.hl7.fhir.r4.model.Address().addLine(modelAddress.getAddressLine1())
                 .addLine(modelAddress.getAddressLine2())

@@ -31,6 +31,11 @@ public class ModelPhoneMapper implements IFieldMapper<ModelPhone, ContactPoint, 
 		return org.hl7.fhir.r4.model.ContactPoint.class;
 	}
 
+	@Override
+	public String fhirType() {
+		return "ContactPoint";
+	}
+
     public org.hl7.fhir.r4.model.ContactPoint toR4(ModelPhone modelPhone) {
         org.hl7.fhir.r4.model.ContactPoint contactPoint = new org.hl7.fhir.r4.model.ContactPoint();
         contactPoint.setSystem(org.hl7.fhir.r4.model.ContactPoint.ContactPointSystem.PHONE)

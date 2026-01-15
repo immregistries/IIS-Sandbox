@@ -1,8 +1,10 @@
 package org.immregistries.iis.kernal.controllers.rest;
 
 
-import org.hl7.fhir.instance.model.api.IBaseResource;
+import org.hl7.fhir.instance.model.api.IAnyResource;
+import org.hl7.fhir.instance.model.api.IBaseDatatype;
 import org.immregistries.iis.kernal.mapping.AllMappingService;
+import org.immregistries.iis.kernal.model.IisMappedToFhir;
 import org.immregistries.iis.kernal.model.IisMappedToFhirResource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -11,16 +13,31 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(RestUrlUtil.REST_PATH + "/mapping")
+@RequestMapping(RestUrlUtil.REST_PATH + FhirMappingRestController.MAPPING_KEY_PATH)
 public class FhirMappingRestController {
 
+	public static final String MAPPING_KEY_PATH = "/mapping";
 	@Autowired
 	AllMappingService mappingService;
 
-	@PostMapping("/toFhir")
-	public IBaseResource toFhir(
+	@PostMapping("/resource")
+	public IAnyResource toFhir(
 		@RequestBody IisMappedToFhirResource iisDiffableObject
 	) {
 		return mappingService.fhirResource(iisDiffableObject);
+	}
+
+	@PostMapping("/field/r4")
+	public IBaseDatatype fieldR4(
+		@RequestBody IisMappedToFhir iisMappedToFhir
+	) {
+		return mappingService.selectFieldMapper(iisMappedToFhir).toR4(iisMappedToFhir);
+	}
+
+	@PostMapping("/field/r5")
+	public IBaseDatatype fieldR5(
+		@RequestBody IisMappedToFhir iisMappedToFhir
+	) {
+		return mappingService.selectFieldMapper(iisMappedToFhir).toR5(iisMappedToFhir);
 	}
 }

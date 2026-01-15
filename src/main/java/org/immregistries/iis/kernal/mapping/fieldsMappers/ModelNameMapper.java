@@ -26,6 +26,11 @@ public class ModelNameMapper implements IFieldMapper<ModelName, HumanName, org.h
 		return org.hl7.fhir.r4.model.HumanName.class;
 	}
 
+	@Override
+	public String fhirType() {
+		return "HumanName";
+	}
+
 	public org.hl7.fhir.r4.model.HumanName toR4(ModelName modelName) {
 		org.hl7.fhir.r4.model.HumanName name = new org.hl7.fhir.r4.model.HumanName()
 				.setFamily(modelName.getNameLast())

@@ -25,6 +25,11 @@ public class BusinessIdentifierMapper implements IFieldMapper<BusinessIdentifier
 		return org.hl7.fhir.r4.model.Identifier.class;
 	}
 
+	@Override
+	public String fhirType() {
+		return "Identifier";
+	}
+
     public org.hl7.fhir.r5.model.Identifier toR5(BusinessIdentifier businessIdentifier) {
         org.hl7.fhir.r5.model.Identifier identifier = new org.hl7.fhir.r5.model.Identifier()
                 .setValue(businessIdentifier.getValue())

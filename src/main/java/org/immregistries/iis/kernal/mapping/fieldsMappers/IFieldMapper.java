@@ -12,6 +12,8 @@ public interface IFieldMapper<LocalType extends IisMappedToFhir, R4 extends IBas
 
 	Class<R4> r4Type();
 
+	String fhirType();
+
 	R5 toR5(LocalType localField);
 
 	R4 toR4(LocalType localField);
