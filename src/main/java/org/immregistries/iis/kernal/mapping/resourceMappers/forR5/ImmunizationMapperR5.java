@@ -13,10 +13,7 @@ import org.immregistries.iis.kernal.mapping.fieldsMappers.BusinessIdentifierMapp
 import org.immregistries.iis.kernal.mapping.internalClient.FhirReadRequester;
 import org.immregistries.iis.kernal.mapping.internalClient.FhirSearchRequester;
 import org.immregistries.iis.kernal.mapping.resourceMappers.ImmunizationMapper;
-import org.immregistries.iis.kernal.model.BusinessIdentifier;
-import org.immregistries.iis.kernal.model.ModelPerson;
-import org.immregistries.iis.kernal.model.VaccinationMaster;
-import org.immregistries.iis.kernal.model.VaccinationReported;
+import org.immregistries.iis.kernal.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,7 +68,7 @@ public class ImmunizationMapperR5 implements ImmunizationMapper<Immunization> {
 		return vaccinationMaster;
 	}
 
-	public void fillFromFhirResource(VaccinationMaster vr, Immunization i) {
+	public void fillFromFhirResource(IisVaccination vr, Immunization i) {
 		/*
 		 * Id
 		 */

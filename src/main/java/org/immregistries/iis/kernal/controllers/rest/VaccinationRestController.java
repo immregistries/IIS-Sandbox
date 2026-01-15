@@ -4,19 +4,15 @@ import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
 import ca.uhn.fhir.rest.param.ReferenceParam;
 import jakarta.servlet.http.HttpServletRequest;
 import org.immregistries.iis.kernal.controllers.filters.RestTenantUrlFilter;
+import org.immregistries.iis.kernal.model.IisVaccination;
 import org.immregistries.iis.kernal.model.VaccinationMaster;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 import static org.immregistries.iis.kernal.controllers.rest.PatientRestController.MDM_EXPAND_REST_PARAM;
 import static org.immregistries.iis.kernal.security.CurrentTenantUtil.SESSION_REQUEST_TENANT;
-
-import java.util.List;
 
 @RestController
 @RequestMapping(RestUrlUtil.REST_TENANT_PATH + VaccinationRestController.VACCINATION)
@@ -52,7 +48,7 @@ public class VaccinationRestController extends BaseTenantTiedRest {
     }
 
     @GetMapping(VACCINATION_ID_PLACEHOLDER + "/related")
-    public List<? extends VaccinationMaster> getRelatedVaccinations(
+	 public List<? extends IisVaccination> getRelatedVaccinations(
             @PathVariable(VACCINATION_ID) String vaccinationId,
             @RequestAttribute(RestTenantUrlFilter.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
             @RequestParam(name = MDM_EXPAND_REST_PARAM, defaultValue = "false") boolean isGolden) {

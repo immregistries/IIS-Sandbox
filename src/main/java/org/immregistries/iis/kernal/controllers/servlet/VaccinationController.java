@@ -18,16 +18,16 @@ import org.immregistries.iis.kernal.Application;
 import org.immregistries.iis.kernal.controllers.rest.CodeMapRestController;
 import org.immregistries.iis.kernal.controllers.rest.PatientRestController;
 import org.immregistries.iis.kernal.controllers.rest.VaccinationRestController;
-import org.immregistries.iis.kernal.mapping.internalClient.FhirRequesterUtil;
-import org.immregistries.iis.kernal.security.CurrentTenantUtil;
-import org.immregistries.iis.kernal.mapping.resourceMappers.ImmunizationMapper;
-import org.immregistries.iis.kernal.mapping.internalClient.FhirSearchRequester;
-import org.immregistries.iis.kernal.mapping.internalClient.IisFhirClientFactory;
-import org.immregistries.iis.kernal.model.*;
-import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.immregistries.iis.kernal.controllers.servlet.util.PatientServletUtil;
 import org.immregistries.iis.kernal.controllers.servlet.util.UiUtil;
 import org.immregistries.iis.kernal.controllers.servlet.util.UrlTenantUtil;
+import org.immregistries.iis.kernal.mapping.internalClient.FhirRequesterUtil;
+import org.immregistries.iis.kernal.mapping.internalClient.FhirSearchRequester;
+import org.immregistries.iis.kernal.mapping.internalClient.IisFhirClientFactory;
+import org.immregistries.iis.kernal.mapping.resourceMappers.ImmunizationMapper;
+import org.immregistries.iis.kernal.model.*;
+import org.immregistries.iis.kernal.persisted.model.Tenant;
+import org.immregistries.iis.kernal.security.CurrentTenantUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -97,7 +97,7 @@ public class VaccinationController {
 				out.println("<h2>Failed to find Vaccination with id : "
 						+ req.getParameter(PARAM_VACCINATION_REPORTED_ID) + "</h2>");
 			}
-			VaccinationMaster vaccination;
+			IisVaccination vaccination;
 
 			if (FhirRequesterUtil.isGoldenRecord(immunizationResource)) {
 				vaccination = immunizationMapper.localObject(immunizationResource);
@@ -202,7 +202,7 @@ public class VaccinationController {
 				}
 
 				{
-					List< ? extends VaccinationMaster> relatedVaccinations = vaccinationRestController.getRelatedVaccinations(vaccination.getVaccinationId(), tenant, FhirRequesterUtil.isGoldenRecord(immunizationResource));
+					List<? extends IisVaccination> relatedVaccinations = vaccinationRestController.getRelatedVaccinations(vaccination.getVaccinationId(), tenant, FhirRequesterUtil.isGoldenRecord(immunizationResource));
 					out.println("<h4>Related Vaccination Records</h4>");
 					printVaccinationList(out, relatedVaccinations, tenant, codeMap);
 					UiUtil.printGoldenRecordExplanation(out, immunizationResource);
@@ -265,7 +265,7 @@ public class VaccinationController {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<ObservationReported> getObservationList(VaccinationMaster vaccination) {
+	public List<ObservationReported> getObservationList(IisVaccination vaccination) {
 		List<ObservationReported> observationReportedList;
 		{
 			observationReportedList = fhirSearchRequester.searchObservationReportedList(
@@ -291,7 +291,7 @@ public class VaccinationController {
 		return immunization;
 	}
 
-	public static void printVaccinationList(PrintWriter out, List<? extends VaccinationMaster> vaccinationList, Tenant tenant, CodeMap codeMap) {
+	public static void printVaccinationList(PrintWriter out, List<? extends IisVaccination> vaccinationList, Tenant tenant, CodeMap codeMap) {
 		SimpleDateFormat sdfDate = new SimpleDateFormat("MM/dd/yyyy");
 
 		if (vaccinationList.isEmpty()) {
@@ -309,7 +309,7 @@ public class VaccinationController {
 			out.println("    <th>Action</th>");
 			out.println("  </tr>");
 			out.println("  <tbody>");
-			for (VaccinationMaster vaccination : vaccinationList) {
+			for (IisVaccination vaccination : vaccinationList) {
 				out.println("  <tr>");
 				out.println("    <td>");
 				String link = "vaccination?" + VaccinationController.PARAM_VACCINATION_REPORTED_ID + "="
