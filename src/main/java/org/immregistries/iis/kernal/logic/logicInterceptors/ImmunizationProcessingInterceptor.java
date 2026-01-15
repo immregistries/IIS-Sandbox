@@ -35,7 +35,7 @@ import static ca.uhn.fhir.interceptor.api.Pointcut.SERVER_INCOMING_REQUEST_PRE_H
 
 @Interceptor
 @Service
-public class ImmunizationProcessingInterceptor extends AbstractLogicInterceptor {
+public class ImmunizationProcessingInterceptor extends IisLogicInterceptor {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	@Autowired

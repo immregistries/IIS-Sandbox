@@ -12,7 +12,7 @@ import org.apache.commons.lang3.builder.DiffResult;
 import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.hl7.fhir.r4.model.ResourceType;
 import org.immregistries.iis.kernal.logic.PatientMismoConversionService;
-import org.immregistries.iis.kernal.logic.logicInterceptors.AbstractLogicInterceptor;
+import org.immregistries.iis.kernal.logic.logicInterceptors.IisLogicInterceptor;
 import org.immregistries.iis.kernal.logic.logicInterceptors.PatientProcessingInterceptor;
 import org.immregistries.iis.kernal.mapping.resourceMappers.PatientMapper;
 import org.immregistries.iis.kernal.model.ProcessingFlavor;
@@ -101,7 +101,7 @@ public abstract class AbstractMdmIisMatchFinderSvc<Immunization extends IAnyReso
 			if (theResourceType.equals(ResourceType.Patient.name())) {
 				for (MatchedTarget matchedTarget : matches) {
 					DiffResult diff = patientMapper.localObject(theResource).diff(patientMapper.localObject(matchedTarget.getTarget()));
-					AbstractLogicInterceptor.printDiff(ourLog, diff);
+					IisLogicInterceptor.printDiff(ourLog, diff);
 				}
 			}
 			return matches;

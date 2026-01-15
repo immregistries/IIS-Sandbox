@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class AbstractLogicInterceptor {
+public abstract class IisLogicInterceptor {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	public static final String IIS_REPORTABLE_LIST = "iisReportableList";
