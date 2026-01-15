@@ -10,13 +10,13 @@ import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.client.interceptor.AdditionalRequestHeadersInterceptor;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.hl7.fhir.instance.model.api.IBaseParameters;
-import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.instance.model.api.IPrimitiveType;
 import org.hl7.fhir.r5.model.*;
-import org.immregistries.iis.kernal.security.TenantUtil;
 import org.immregistries.iis.kernal.mapping.internalClient.IisFhirClientFactory;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
+import org.immregistries.iis.kernal.security.TenantUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -186,11 +186,11 @@ public class SubscriptionService {
 				+ fhirContext.newJsonParser().setPrettyPrint(true).encodeResourceToString(notificationBundle);
 	}
 
-	private IBaseResource parseResource(String message) {
+	private IAnyResource parseResource(String message) {
 		if (message.startsWith("<")) {
-			return fhirContext.newXmlParser().parseResource(message);
+			return (IAnyResource) fhirContext.newXmlParser().parseResource(message);
 		} else {
-			return fhirContext.newJsonParser().parseResource(message);
+			return (IAnyResource) fhirContext.newJsonParser().parseResource(message);
 		}
 	}
 }

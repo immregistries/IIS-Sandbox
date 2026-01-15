@@ -1,11 +1,7 @@
 package org.immregistries.iis.kernal.mapping.internalClient;
 
-import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
-import ca.uhn.fhir.rest.api.server.IBundleProvider;
-import org.hl7.fhir.instance.model.api.IBaseResource;
+import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.immregistries.iis.kernal.model.*;
-
-import java.util.List;
 
 /**
  * Helping service to execute Queries alongside fhir mapping
@@ -19,7 +15,7 @@ import java.util.List;
  * @param <Organization>
  * @param <RelatedPerson>
  */
-public interface IFhirRequester<Patient extends IBaseResource, Immunization extends IBaseResource, Location extends IBaseResource, Practitioner extends IBaseResource, Observation extends IBaseResource, Person extends IBaseResource, Organization extends IBaseResource, RelatedPerson extends IBaseResource> {
+public interface IFhirRequester<Patient extends IAnyResource, Immunization extends IAnyResource, Location extends IAnyResource, Practitioner extends IAnyResource, Observation extends IAnyResource, Person extends IAnyResource, Organization extends IAnyResource, RelatedPerson extends IAnyResource> {
 
 
 	PatientReported savePatientReported(PatientReported patientReported);

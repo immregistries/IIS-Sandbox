@@ -4,7 +4,7 @@ import ca.uhn.fhir.parser.IParser;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
-import org.hl7.fhir.instance.model.api.IBaseResource;
+import org.hl7.fhir.instance.model.api.IAnyResource;
 
 import java.io.IOException;
 
@@ -15,7 +15,7 @@ import java.io.IOException;
  *
  * @param <resource>
  */
-public class CustomFhirJacksonSerializer<resource extends IBaseResource> extends JsonSerializer<resource> {
+public class CustomFhirJacksonSerializer<resource extends IAnyResource> extends JsonSerializer<resource> {
 
 	private final IParser parser;
 

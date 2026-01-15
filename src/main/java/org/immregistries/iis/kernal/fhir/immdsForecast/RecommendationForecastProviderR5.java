@@ -9,14 +9,13 @@ import org.hl7.fhir.r5.model.ImmunizationRecommendation;
 import org.hl7.fhir.r5.model.Parameters;
 import org.hl7.fhir.r5.model.Patient;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR5Condition;
-
-import org.immregistries.iis.kernal.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.logic.ImmunizationRecommendationServiceR5;
 import org.immregistries.iis.kernal.logic.messageHandling.IncomingQueryHandler;
 import org.immregistries.iis.kernal.mapping.resourceMappers.forR5.ImmunizationMapperR5;
 import org.immregistries.iis.kernal.mapping.resourceMappers.forR5.PatientMapperR5;
-import org.immregistries.iis.kernal.model.PatientMaster;
-import org.immregistries.iis.kernal.model.VaccinationMaster;
+import org.immregistries.iis.kernal.model.IisPatient;
+import org.immregistries.iis.kernal.model.IisVaccination;
+import org.immregistries.iis.kernal.security.CurrentTenantUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,11 +56,11 @@ public class RecommendationForecastProviderR5 implements IRecommendationForecast
 		List<Immunization> immunization
 	) {
 		Parameters out = new Parameters();
-		List<VaccinationMaster> vaccinationMasterList = List.of();
+		List<? extends IisVaccination> vaccinationMasterList = List.of();
 		if (immunization != null) {
 			vaccinationMasterList = immunization.stream().map(immunization1 -> immunizationMapperR5.localObject(immunization1)).collect(Collectors.toList());
 		}
-		PatientMaster patientMaster = patientMapperR5.localObject(patient);
+		IisPatient patientMaster = patientMapperR5.localObject(patient);
 		try {
 			out = immunizationRecommendationServiceR5.queryCds(CurrentTenantUtil.getTenant(), assessmentDate.getValue(), patientMaster, vaccinationMasterList);
 		} catch (Exception e) {

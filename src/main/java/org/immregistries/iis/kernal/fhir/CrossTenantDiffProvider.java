@@ -45,8 +45,8 @@ public class CrossTenantDiffProvider {
 		}
 
 		IFhirResourceDao<?> dao = myDaoRegistry.getResourceDao(theFromVersion.getResourceType());
-		IBaseResource sourceResource = dao.read(theFromVersion, theRequestDetails);
-		IBaseResource targetResource = dao.read(theToVersion, theRequestDetails);
+		IAnyResource sourceResource = (IAnyResource) dao.read(theFromVersion, theRequestDetails);
+		IAnyResource targetResource = (IAnyResource) dao.read(theToVersion, theRequestDetails);
 
 		try {
 			IDomainResource sourceDomain = (IDomainResource) sourceResource;

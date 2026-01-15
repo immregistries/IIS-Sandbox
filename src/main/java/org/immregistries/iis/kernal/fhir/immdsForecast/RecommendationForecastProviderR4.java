@@ -64,7 +64,7 @@ public class RecommendationForecastProviderR4 implements IRecommendationForecast
 		} else {
 			vaccinationMasterList = List.of();
 		}
-		PatientMaster patientMaster = patientMapperR4.localObject(patient);
+		PatientMaster patientMaster = patientMapperR4.localObjectMaster(patient);
 		try {
 			out = immunizationRecommendationServiceR4.queryCds(CurrentTenantUtil.getTenant(), assessmentDate.getValue(), patientMaster, vaccinationMasterList);
 			logger.info("out {}", out.getParameters(EVALUATION).size());

@@ -1,7 +1,7 @@
 package org.immregistries.iis.kernal.mapping;
 
+import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.hl7.fhir.instance.model.api.IBaseDatatype;
-import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.immregistries.iis.kernal.mapping.fieldsMappers.IFieldMapper;
 import org.immregistries.iis.kernal.mapping.resourceMappers.IisResourceMasterMapper;
 import org.immregistries.iis.kernal.mapping.resourceMappers.IisResourceMasterReportedMapper;
@@ -30,21 +30,21 @@ public class AllMappingService {
 	private List<IFieldMapper> fieldMappers;
 
     @SuppressWarnings("unchecked")
-	 public IBaseResource fhirResource(IisMappedToFhirResource internal) {
+	 public IAnyResource fhirResource(IisMappedToFhirResource internal) {
         @SuppressWarnings("rawtypes")
         IisResourceMasterMapper mapper = selectMapper(internal);
         return mapper.fhirResource(internal);
     }
 
 //    @SuppressWarnings("unchecked")
-//	 public IBaseResource fhir(IisDiffableObject internal) {
+//	 public IAnyResource fhir(IisDiffableObject internal) {
 //        @SuppressWarnings("rawtypes")
 //        IisResourceMasterMapper mapper = selectMapper();
 //        return mapper.fhirResource(internal);
 //    }
 
     @SuppressWarnings("unchecked")
-	 public IisMappedToFhirResource localObject(IBaseResource resource) {
+	 public IisMappedToFhirResource localObject(IAnyResource resource) {
 		 @SuppressWarnings("rawtypes")
 		 IisResourceMasterMapper mapper = selectMapper(resource);
 		 return mapper.localObject(resource);
@@ -58,14 +58,14 @@ public class AllMappingService {
     }
 
     @SuppressWarnings("unchecked")
-	 public IisMappedToFhirResource localObjectReportedWithMaster(IBaseResource resource) {
+	 public IisMappedToFhirResource localObjectReportedWithMaster(IAnyResource resource) {
         @SuppressWarnings("rawtypes")
         IisResourceMasterReportedMapper mapper = selectMapperReported(resource);
         return mapper.localObjectReportedWithMaster(resource);
     }
 
     @SuppressWarnings("unchecked")
-	 public IisMappedToFhirResource localObjectReported(IBaseResource resource) {
+	 public IisMappedToFhirResource localObjectReported(IAnyResource resource) {
         @SuppressWarnings("rawtypes")
         IisResourceMasterReportedMapper mapper = selectMapperReported(resource);
         return mapper.localObjectReported(resource);
@@ -83,7 +83,7 @@ public class AllMappingService {
     }
 
 	@SuppressWarnings("rawtypes")
-    public IisResourceMasterMapper selectMapper(IBaseResource resource) {
+	public IisResourceMasterMapper selectMapper(IAnyResource resource) {
         String fhirType = resource.fhirType();
 		return masterMappersFiltered(fhirType)
                 .findFirst()
@@ -99,7 +99,7 @@ public class AllMappingService {
 	}
 
 	@SuppressWarnings("rawtypes")
-    public IisResourceMasterReportedMapper selectMapperReported(IBaseResource resource) {
+	public IisResourceMasterReportedMapper selectMapperReported(IAnyResource resource) {
         String fhirType = resource.fhirType();
 		return masterReportedMappersFiltered(fhirType)
                 .findFirst()

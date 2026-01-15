@@ -8,8 +8,8 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
+import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.hl7.fhir.instance.model.api.IBaseBundle;
-import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.instance.model.api.IDomainResource;
 import org.hl7.fhir.r5.model.Bundle;
 import org.immregistries.iis.kernal.Application;
@@ -98,7 +98,7 @@ public class PatientController {
 		try {
 			UiUtil.doHeader(out, "IIS Sandbox - Patients", tenant);
 			String patientId = req.getParameter(PARAM_PATIENT_REPORTED_ID);
-			IBaseResource patientSelected = null;
+			IAnyResource patientSelected = null;
 			if (StringUtils.isNotBlank(patientId)) {
 				patientSelected = patientRestController.getPatientFhir(patientId, tenant, req);
 			}
@@ -116,7 +116,7 @@ public class PatientController {
 		out.close();
 	}
 
-	private void singlePatientInformationPrintAll(PrintWriter out, IBaseResource patientSelected,
+	private void singlePatientInformationPrintAll(PrintWriter out, IAnyResource patientSelected,
 																 Tenant tenant, HttpServletRequest req) throws JsonProcessingException {
 		IisPatient iisPatient = patientMapper.localObject(patientSelected);
 		boolean isGolden = FhirRequesterUtil.isGoldenRecord(patientSelected);
@@ -200,7 +200,7 @@ public class PatientController {
 			"\">Generate a EVC with IPS</a></div>");
 	}
 
-	private void printPatientRecommendationsAndSubscriptions(PrintWriter out, IBaseResource patientSelected,
+	private void printPatientRecommendationsAndSubscriptions(PrintWriter out, IAnyResource patientSelected,
 																				IisPatient iisPatient, HttpServletRequest req,
 																				Tenant tenant) {
 		IParser parser = iisFhirClientFactory.getFhirContext()

@@ -32,7 +32,7 @@ import ca.uhn.fhir.subscription.SubscriptionConstants;
 import ca.uhn.fhir.util.HapiExtensions;
 import ca.uhn.fhir.util.SubscriptionUtil;
 import com.google.common.annotations.VisibleForTesting;
-import org.hl7.fhir.instance.model.api.IBaseResource;
+import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.hl7.fhir.r4.model.Extension;
 import org.hl7.fhir.r4.model.StringType;
 import org.hl7.fhir.r4.model.Subscription;
@@ -81,15 +81,15 @@ public class IisSubscriptionValidatingInterceptor extends SubscriptionValidating
 
 	@Hook(value = Pointcut.STORAGE_PRESTORAGE_RESOURCE_CREATED, order = ORDER_SUBSCRIPTION_VALIDATING)
 	public void resourcePreCreate(
-		IBaseResource theResource, RequestDetails theRequestDetails, RequestPartitionId theRequestPartitionId) {
+		IAnyResource theResource, RequestDetails theRequestDetails, RequestPartitionId theRequestPartitionId) {
 		validateSubmittedSubscription(
 			theResource, theRequestDetails, theRequestPartitionId, Pointcut.STORAGE_PRESTORAGE_RESOURCE_CREATED);
 	}
 
 	@Hook(value = Pointcut.STORAGE_PRESTORAGE_RESOURCE_UPDATED, order = ORDER_SUBSCRIPTION_VALIDATING)
 	public void resourceUpdated(
-		IBaseResource theOldResource,
-		IBaseResource theResource,
+		IAnyResource theOldResource,
+		IAnyResource theResource,
 		RequestDetails theRequestDetails,
 		RequestPartitionId theRequestPartitionId) {
 		validateSubmittedSubscription(
@@ -103,7 +103,7 @@ public class IisSubscriptionValidatingInterceptor extends SubscriptionValidating
 
 	@VisibleForTesting
 	void validateSubmittedSubscription(
-		IBaseResource theSubscription,
+		IAnyResource theSubscription,
 		RequestDetails theRequestDetails,
 		RequestPartitionId theRequestPartitionId,
 		Pointcut thePointcut) {
@@ -180,7 +180,7 @@ public class IisSubscriptionValidatingInterceptor extends SubscriptionValidating
 		}
 	}
 
-	private void validateCriteria(IBaseResource theSubscription, CanonicalSubscription theCanonicalSubscription) {
+	private void validateCriteria(IAnyResource theSubscription, CanonicalSubscription theCanonicalSubscription) {
 		if (theCanonicalSubscription.isTopicSubscription()) {
 			if (myFhirContext.getVersion().getVersion() == FhirVersionEnum.R4) {
 				validateR4BackportSubscription((Subscription) theSubscription);
@@ -193,7 +193,7 @@ public class IisSubscriptionValidatingInterceptor extends SubscriptionValidating
 	}
 
 	private void validateR5PlusTopicSubscription(CanonicalSubscription theCanonicalSubscription) {
-		Optional<IBaseResource> oTopic = findSubscriptionTopicByUrl(theCanonicalSubscription.getTopic());
+		Optional<IAnyResource> oTopic = findSubscriptionTopicByUrl(theCanonicalSubscription.getTopic());
 		if (!oTopic.isPresent()) {
 			throw new UnprocessableEntityException(
 				Msg.code(2322) + "No SubscriptionTopic exists with topic: " + theCanonicalSubscription.getTopic());
@@ -227,7 +227,7 @@ public class IisSubscriptionValidatingInterceptor extends SubscriptionValidating
 	}
 
 	protected void validatePermissions(
-		IBaseResource theSubscription,
+		IAnyResource theSubscription,
 		RequestDetails theRequestDetails,
 		RequestPartitionId theRequestPartitionId,
 		Pointcut thePointcut) {
@@ -257,7 +257,7 @@ public class IisSubscriptionValidatingInterceptor extends SubscriptionValidating
 		}
 	}
 
-	private RequestPartitionId determinePartition(RequestDetails theRequestDetails, IBaseResource theResource) {
+	private RequestPartitionId determinePartition(RequestDetails theRequestDetails, IAnyResource theResource) {
 		switch (theRequestDetails.getRestOperationType()) {
 			case CREATE:
 				return myRequestPartitionHelperSvc.determineCreatePartitionForRequest(
@@ -274,14 +274,14 @@ public class IisSubscriptionValidatingInterceptor extends SubscriptionValidating
 		mySubscriptionQueryValidator.validateCriteria(theQuery, theFieldName);
 	}
 
-	private Optional<IBaseResource> findSubscriptionTopicByUrl(String theCriteria) {
+	private Optional<IAnyResource> findSubscriptionTopicByUrl(String theCriteria) {
 		myDaoRegistry.getResourceDao("SubscriptionTopic");
 		SearchParameterMap map = SearchParameterMap.newSynchronous();
 		map.add(SubscriptionTopic.SP_URL, new UriParam(theCriteria));
 		IFhirResourceDao subscriptionTopicDao = myDaoRegistry.getResourceDao("SubscriptionTopic");
 		SystemRequestDetails systemRequestDetails = SystemRequestDetails.forAllPartitions();
 		IBundleProvider search = subscriptionTopicDao.search(map, systemRequestDetails);
-		return search.getResources(0, 1).stream().findFirst();
+		return search.getResources(0, 1).stream().map(IAnyResource.class::cast).findFirst();
 	}
 
 	public void validateMessageSubscriptionEndpoint(String theEndpointUrl) {

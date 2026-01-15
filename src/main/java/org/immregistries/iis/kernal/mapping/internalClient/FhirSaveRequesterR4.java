@@ -5,6 +5,7 @@ import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.api.server.IBundleProvider;
 import ca.uhn.fhir.rest.gclient.ICriterion;
 import org.apache.commons.lang3.StringUtils;
+import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.hl7.fhir.r4.model.*;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
 import org.immregistries.iis.kernal.model.*;
@@ -66,7 +67,7 @@ public class FhirSaveRequesterR4 extends
 		MethodOutcome outcome = save(createOnly, patient, criteria.toArray(new ICriterion[0]));
 		if (!outcome.getResource().isEmpty()) {
 			patientReported.setPatientId(outcome.getResource().getIdElement().getIdPart());
-			return (PatientReported) allMappingService.localObjectReportedWithMaster(outcome.getResource());
+			return (PatientReported) allMappingService.localObjectReportedWithMaster((IAnyResource) outcome.getResource());
 		} else if (outcome.getCreated() != null && outcome.getCreated()) {
 			patientReported.setPatientId(outcome.getId().getIdPart());
 			return fhirReadSuper.readAsPatientReported(outcome.getId().getIdPart());

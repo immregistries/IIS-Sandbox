@@ -8,16 +8,16 @@ import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.gclient.ICriterion;
 import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
 import org.apache.commons.lang3.StringUtils;
-import org.hl7.fhir.instance.model.api.IBaseResource;
+import org.hl7.fhir.instance.model.api.IAnyResource;
+import org.immregistries.iis.kernal.mapping.AllMappingService;
 import org.immregistries.iis.kernal.mapping.resourceMappers.*;
 import org.immregistries.iis.kernal.security.TenantUtil;
-import org.immregistries.iis.kernal.mapping.AllMappingService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @SuppressWarnings("rawtypes")
-public abstract class FhirSaveRequester<Patient extends IBaseResource, Immunization extends IBaseResource, Location extends IBaseResource, Practitioner extends IBaseResource, Observation extends IBaseResource, Person extends IBaseResource, Organization extends IBaseResource, RelatedPerson extends IBaseResource>
+public abstract class FhirSaveRequester<Patient extends IAnyResource, Immunization extends IAnyResource, Location extends IAnyResource, Practitioner extends IAnyResource, Observation extends IAnyResource, Person extends IAnyResource, Organization extends IAnyResource, RelatedPerson extends IAnyResource>
 		implements
 		IFhirRequester<Patient, Immunization, Location, Practitioner, Observation, Person, Organization, RelatedPerson> {
 	// public static final String GOLDEN_SYSTEM_IDENTIFIER =
@@ -58,7 +58,7 @@ public abstract class FhirSaveRequester<Patient extends IBaseResource, Immunizat
 	 * @param where      HAPIFHIR Criteria list
 	 * @return methodOutcome
 	 */
-	protected MethodOutcome save(boolean createOnly, IBaseResource resource, ICriterion... where) {
+	protected MethodOutcome save(boolean createOnly, IAnyResource resource, ICriterion... where) {
 		IFhirResourceDao dao = daoRegistry.getResourceDao(resource);
 		String params = FhirRequesterUtil.stringCriterionList(fhirContext, where);
 		if (StringUtils.isNotBlank(params)) {

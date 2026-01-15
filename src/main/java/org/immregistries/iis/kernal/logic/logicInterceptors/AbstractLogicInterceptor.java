@@ -4,7 +4,7 @@ import ca.uhn.fhir.parser.IParser;
 import ca.uhn.fhir.rest.api.server.RequestDetails;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.DiffResult;
-import org.hl7.fhir.instance.model.api.IBaseResource;
+import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.immregistries.iis.kernal.logic.ack.IisReportable;
 import org.immregistries.iis.kernal.logic.ack.IisReportableSeverity;
 import org.immregistries.iis.kernal.mapping.resourceMappers.IisResourceMasterReportedMapper;
@@ -43,8 +43,8 @@ public abstract class AbstractLogicInterceptor {
 		return iisReportable;
 	}
 
-	public boolean testMapping(IisResourceMasterReportedMapper<IisMappedToFhirResource, IisMappedToFhirResource, IisMappedToFhirResource, IBaseResource> mapper, IisMappedToFhirResource iisMappedToResourceObject) {
-		IBaseResource resource = mapper.fhirResource(iisMappedToResourceObject);
+	public boolean testMapping(IisResourceMasterReportedMapper<IisMappedToFhirResource, IisMappedToFhirResource, IisMappedToFhirResource, IAnyResource> mapper, IisMappedToFhirResource iisMappedToResourceObject) {
+		IAnyResource resource = mapper.fhirResource(iisMappedToResourceObject);
 		IisMappedToFhirResource iisMappedToResourceObject1 = mapper.localObjectReported(resource);
 		if (iisMappedToResourceObject1 == null) {
 			iisMappedToResourceObject1 = mapper.localObject(resource);
@@ -64,9 +64,9 @@ public abstract class AbstractLogicInterceptor {
 		return res;
 	}
 
-	public boolean testMappingFhir(IisResourceMasterReportedMapper<IisMappedToFhirResource, IisMappedToFhirResource, IisMappedToFhirResource, IBaseResource> mapper, IBaseResource resource, IParser parser) {
+	public boolean testMappingFhir(IisResourceMasterReportedMapper<IisMappedToFhirResource, IisMappedToFhirResource, IisMappedToFhirResource, IAnyResource> mapper, IAnyResource resource, IParser parser) {
 		IisMappedToFhirResource iisMappedToResourceObject1 = mapper.localObjectReported(resource);
-		IBaseResource resource1 = mapper.fhirResource(iisMappedToResourceObject1);
+		IAnyResource resource1 = mapper.fhirResource(iisMappedToResourceObject1);
 		String s1 = parser.encodeResourceToString(resource);
 		String s2 = parser.encodeResourceToString(resource1);
 		boolean res = s1.equals(s2);

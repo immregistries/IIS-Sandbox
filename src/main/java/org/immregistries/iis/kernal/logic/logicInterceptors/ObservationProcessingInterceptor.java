@@ -5,7 +5,7 @@ import ca.uhn.fhir.interceptor.api.Interceptor;
 import ca.uhn.fhir.rest.api.RestOperationTypeEnum;
 import ca.uhn.fhir.rest.api.server.RequestDetails;
 import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
-import org.hl7.fhir.instance.model.api.IBaseResource;
+import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
@@ -55,10 +55,10 @@ public class ObservationProcessingInterceptor extends AbstractLogicInterceptor {
 		if (requestDetails.getAttribute(PATIENT_BIRTH_DATE) != null) { // If in a v2 context
 			patientBirthDate = (Date) requestDetails.getAttribute(PATIENT_BIRTH_DATE);
 		}
-		IBaseResource result = requestDetails.getResource();
+		IAnyResource result = (IAnyResource) requestDetails.getResource();
 		if (requestDetails.getRestOperationType().equals(RestOperationTypeEnum.CREATE) || requestDetails.getRestOperationType().equals(RestOperationTypeEnum.CREATE)) {
 			if (requestDetails.getResource() instanceof org.hl7.fhir.r4.model.Observation || requestDetails.getResource() instanceof org.hl7.fhir.r5.model.Observation) {
-				ObservationReported observationReported = processAndValidateObservationReported(observationMapper.localObjectReported(requestDetails.getResource()), iisReportableList, processingFlavorSet, obxCount, patientBirthDate);
+				ObservationReported observationReported = processAndValidateObservationReported(observationMapper.localObjectReported(result), iisReportableList, processingFlavorSet, obxCount, patientBirthDate);
 				result = observationMapper.fhirResource(observationReported);
 			}
 		}

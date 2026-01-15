@@ -1,10 +1,10 @@
 package org.immregistries.iis.kernal.mapping.resourceMappers;
 
-import org.hl7.fhir.instance.model.api.IBaseResource;
+import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.immregistries.iis.kernal.model.ObservationMaster;
 import org.immregistries.iis.kernal.model.ObservationReported;
 
-public interface ObservationMapper<Observation extends IBaseResource>
+public interface ObservationMapper<Observation extends IAnyResource>
 	extends IisResourceMasterReportedMapper<ObservationMaster, ObservationReported, ObservationMaster, Observation> {
 
 	default String fhirType() {

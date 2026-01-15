@@ -1,7 +1,5 @@
 package org.immregistries.iis.kernal.mapping.resourceMappers.forR5;
 
-import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
-import ca.uhn.fhir.rest.param.TokenParam;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.r5.model.*;
 import org.immregistries.codebase.client.generated.Code;
@@ -13,7 +11,9 @@ import org.immregistries.iis.kernal.mapping.fieldsMappers.BusinessIdentifierMapp
 import org.immregistries.iis.kernal.mapping.internalClient.FhirReadRequester;
 import org.immregistries.iis.kernal.mapping.internalClient.FhirSearchRequester;
 import org.immregistries.iis.kernal.mapping.resourceMappers.ImmunizationMapper;
-import org.immregistries.iis.kernal.model.*;
+import org.immregistries.iis.kernal.model.BusinessIdentifier;
+import org.immregistries.iis.kernal.model.IisVaccination;
+import org.immregistries.iis.kernal.model.ModelPerson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +24,7 @@ import java.math.BigDecimal;
 
 @Service
 @Conditional(OnR5Condition.class)
-public class ImmunizationMapperR5 implements ImmunizationMapper<Immunization> {
+public class ImmunizationMapperR5 extends ImmunizationMapper<Immunization> {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	@Autowired
 	private LocationMapperR5 locationMapper;
@@ -36,37 +36,6 @@ public class ImmunizationMapperR5 implements ImmunizationMapper<Immunization> {
 	private CodeMapManagerService codeMapManagerService;
 	@Autowired
 	private BusinessIdentifierMapper businessIdentifierMapper;
-
-	public VaccinationReported localObjectReportedWithMaster(Immunization i) {
-		VaccinationReported vaccinationReported = this.localObjectReported(i);
-		VaccinationMaster vaccinationMaster = fhirSearchRequester.searchVaccinationMaster(
-				new SearchParameterMap(Immunization.SP_IDENTIFIER,
-						new TokenParam().setValue(vaccinationReported.getFillerBusinessIdentifier().getValue())));
-		if (vaccinationMaster != null) {
-			vaccinationReported.setMasterRecord(vaccinationMaster);
-		}
-		return vaccinationReported;
-	}
-
-	public VaccinationReported localObjectReported(Immunization i) {
-		VaccinationReported vaccinationReported = new VaccinationReported();
-		// if (FhirRequester.isGoldenRecord(i)) {
-		// logger.info("Mapping refused for report as patient is golden");
-		// return null;
-		// }
-		fillFromFhirResource(vaccinationReported, i);
-		return vaccinationReported;
-	}
-
-	public VaccinationMaster localObject(Immunization i) {
-		VaccinationMaster vaccinationMaster = new VaccinationMaster();
-		// if (!FhirRequester.isGoldenRecord(i)) {
-		// logger.info("Mapping refused for golden as patient is report");
-		// return null;
-		// }
-		fillFromFhirResource(vaccinationMaster, i);
-		return vaccinationMaster;
-	}
 
 	public void fillFromFhirResource(IisVaccination vr, Immunization i) {
 		/*

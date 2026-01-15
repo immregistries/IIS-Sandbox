@@ -5,7 +5,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
-import org.hl7.fhir.instance.model.api.IBaseResource;
+import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.immregistries.iis.kernal.Application;
 import org.immregistries.iis.kernal.controllers.rest.RestUrlUtil;
 import org.immregistries.iis.kernal.fhir.shl.ShLinkPayload;
@@ -42,7 +42,7 @@ public class PatientShLinkRestController {
 																	@PathVariable(RestUrlUtil.PATIENT_ID) String patientId)
 		throws IOException, ServletException {
 		IGenericClient client = iisFhirClientFactory.newGenericClient(tenant, req);
-		IBaseResource patientSelected = client.read().resource("Patient").withId(patientId).execute();
+		IAnyResource patientSelected = (IAnyResource) client.read().resource("Patient").withId(patientId).execute();
 		if (patientSelected == null) {
 			throw new RuntimeException("Patient not found");
 		}
@@ -52,7 +52,7 @@ public class PatientShLinkRestController {
 
 	}
 
-	public String getQrCode(HttpServletRequest req, IBaseResource patientSelected, Tenant tenant) {
+	public String getQrCode(HttpServletRequest req, IAnyResource patientSelected, Tenant tenant) {
 		String manifestUrl = getManifestUrl(req, patientSelected, tenant);
 		ShLinkPayload shLinkPayload = generatePatientShLinkPayload(manifestUrl);
 		return shLinkUtilService.qrCode(shLinkPayload);
@@ -68,13 +68,13 @@ public class PatientShLinkRestController {
 		return shLinkPayload;
 	}
 
-	public static @NotNull String getManifestUrl(HttpServletRequest req, IBaseResource patientSelected, Tenant tenant) {
+	public static @NotNull String getManifestUrl(HttpServletRequest req, IAnyResource patientSelected, Tenant tenant) {
 		// Adjusting Base URL for REST
 		String baseUrl = StringUtils.substringBefore(req.getRequestURL().toString(), Application.IIS_PATH_BASE);
 		return getManifestUrl(baseUrl, patientSelected, tenant);
 	}
 
-	public static @NotNull String getManifestUrl(String baseUrl, IBaseResource patientSelected, Tenant tenant) {
+	public static @NotNull String getManifestUrl(String baseUrl, IAnyResource patientSelected, Tenant tenant) {
 		return baseUrl + RestUrlUtil.tenantifyPathWithContextPath(tenant,
 			PatientShLinkManifestRestController.MANIFEST_PATH_SUFFIX
 				+ "/patient/" + patientSelected.getIdElement().getIdPart());

@@ -9,13 +9,13 @@ import ca.uhn.fhir.rest.api.server.IBundleProvider;
 import ca.uhn.fhir.rest.api.server.SystemRequestDetails;
 import ca.uhn.fhir.rest.param.TokenParam;
 import ca.uhn.fhir.rest.param.TokenParamModifier;
+import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.hl7.fhir.instance.model.api.IBaseParameters;
-import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.BooleanType;
 import org.immregistries.iis.kernal.fhir.CrossTenantDiffProvider;
-import org.immregistries.iis.kernal.security.TenantUtil;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.immregistries.iis.kernal.persisted.model.UserAccess;
+import org.immregistries.iis.kernal.security.TenantUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -103,8 +103,8 @@ public class TenantCompareService {
 		logger.info("Testing {}s with $diff", label);
 
 		for (int i = 0; i < previousSize; i++) {
-			IBaseResource iBaseResource1 = bundleProviderStream.get(0).getAllResources().get(i);
-			IBaseResource iBaseResource2 = bundleProviderStream.get(1).getAllResources().get(i);
+			IAnyResource iBaseResource1 = (IAnyResource) bundleProviderStream.get(0).getAllResources().get(i);
+			IAnyResource iBaseResource2 = (IAnyResource) bundleProviderStream.get(1).getAllResources().get(i);
 
 			IBaseParameters diff = diffProvider.diff(iBaseResource1.getIdElement(), iBaseResource2.getIdElement(),
 				new BooleanType(false), diffRequestDetail);

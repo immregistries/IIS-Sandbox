@@ -46,7 +46,7 @@ public class CrossTenantFhirPatch extends FhirPatch {
 		myIgnorePaths.add(new EncodeContextPath(theIgnorePath));
 	}
 
-	public IBaseParameters diff(@Nullable IBaseResource theOldValue, @Nonnull IBaseResource theNewValue) {
+	public IBaseParameters diff(@Nullable IAnyResource theOldValue, @Nonnull IAnyResource theNewValue) {
 		IBaseParameters retVal = ParametersUtil.newInstance(myContext);
 		String newValueTypeName = myContext.getResourceDefinition(theNewValue).getName();
 

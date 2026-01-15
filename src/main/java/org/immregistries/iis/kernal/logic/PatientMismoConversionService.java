@@ -1,8 +1,8 @@
 package org.immregistries.iis.kernal.logic;
 
 import ca.uhn.fhir.util.ExtensionUtil;
+import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.hl7.fhir.instance.model.api.IBaseExtension;
-import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r5.model.ContactPoint;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
 import org.immregistries.mismo.match.StringUtils;
@@ -110,7 +110,7 @@ public class PatientMismoConversionService {
 	}
 
 
-	public Patient convertFromFhir(IBaseResource patient) {
+	public Patient convertFromFhir(IAnyResource patient) {
 		if (patient instanceof org.hl7.fhir.r4.model.Patient) {
 			return convertFromR4((org.hl7.fhir.r4.model.Patient) patient);
 		} else if (patient instanceof org.hl7.fhir.r5.model.Patient) {

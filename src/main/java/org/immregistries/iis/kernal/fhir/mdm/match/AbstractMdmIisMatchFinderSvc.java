@@ -10,7 +10,6 @@ import ca.uhn.fhir.mdm.rules.svc.MdmResourceMatcherSvc;
 import jakarta.annotation.Nonnull;
 import org.apache.commons.lang3.builder.DiffResult;
 import org.hl7.fhir.instance.model.api.IAnyResource;
-import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.ResourceType;
 import org.immregistries.iis.kernal.logic.PatientMismoConversionService;
 import org.immregistries.iis.kernal.logic.logicInterceptors.AbstractLogicInterceptor;
@@ -35,7 +34,7 @@ import static ca.uhn.fhir.jpa.mdm.svc.candidate.CandidateSearcher.idOrType;
 /**
  * Custom, based on MdmMatchFinderSvcImpl from Hapi-fhir v6.2.4, to allow for Immunization matching with external library
  */
-public abstract class AbstractMdmIisMatchFinderSvc<Immunization extends IBaseResource> extends MdmMatchFinderSvcImpl implements IMdmMatchFinderSvc, IMdmIisMatchFinderSvc {
+public abstract class AbstractMdmIisMatchFinderSvc<Immunization extends IAnyResource> extends MdmMatchFinderSvcImpl implements IMdmMatchFinderSvc, IMdmIisMatchFinderSvc {
 	private static final Logger ourLog = Logs.getMdmTroubleshootingLog();
 
 	@Autowired

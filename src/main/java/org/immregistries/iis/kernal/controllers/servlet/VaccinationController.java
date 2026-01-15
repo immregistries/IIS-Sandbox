@@ -10,7 +10,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
-import org.hl7.fhir.instance.model.api.IBaseResource;
+import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
@@ -92,7 +92,7 @@ public class VaccinationController {
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		try {
-			IBaseResource immunizationResource = getImmunizationFromParameter(req, fhirClient);
+			IAnyResource immunizationResource = getImmunizationFromParameter(req, fhirClient);
 			if (immunizationResource == null) {
 				out.println("<h2>Failed to find Vaccination with id : "
 						+ req.getParameter(PARAM_VACCINATION_REPORTED_ID) + "</h2>");
@@ -281,10 +281,10 @@ public class VaccinationController {
 		return observationReportedList;
 	}
 
-	protected IBaseResource getImmunizationFromParameter(HttpServletRequest req, IGenericClient fhirClient) {
-		IBaseResource immunization = null;
+	protected IAnyResource getImmunizationFromParameter(HttpServletRequest req, IGenericClient fhirClient) {
+		IAnyResource immunization = null;
 		if (req.getParameter(PARAM_VACCINATION_REPORTED_ID) != null) {
-			immunization = fhirClient.read().resource("Immunization")
+			immunization = (IAnyResource) fhirClient.read().resource("Immunization")
 					.withId(req.getParameter(PARAM_VACCINATION_REPORTED_ID)).execute();
 		}
 		return immunization;

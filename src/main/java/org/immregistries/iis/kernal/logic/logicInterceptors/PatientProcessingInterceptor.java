@@ -7,7 +7,7 @@ import ca.uhn.fhir.rest.api.RestOperationTypeEnum;
 import ca.uhn.fhir.rest.api.server.RequestDetails;
 import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
 import org.apache.commons.lang3.StringUtils;
-import org.hl7.fhir.instance.model.api.IBaseResource;
+import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodeStatusValue;
@@ -53,11 +53,11 @@ public class PatientProcessingInterceptor extends AbstractLogicInterceptor {
 		if (requestDetails.getResource() == null || requestDetails.getRestOperationType() == null) {
 			return;
 		}
-		IBaseResource result = requestDetails.getResource();
+		IAnyResource result = (IAnyResource) requestDetails.getResource();
 		if (requestDetails.getRestOperationType().equals(RestOperationTypeEnum.UPDATE) || requestDetails.getRestOperationType().equals(RestOperationTypeEnum.CREATE)) {
-			if (requestDetails.getResource() instanceof org.hl7.fhir.r4.model.Patient || requestDetails.getResource() instanceof org.hl7.fhir.r5.model.Patient) {
-				testMappingFhir(patientMapper, requestDetails.getResource(), fhirContext.newJsonParser());
-				PatientReported patientReported = processAndValidatePatient(patientMapper.localObjectReported(requestDetails.getResource()), iisReportableList, processingFlavorSet);
+			if (requestDetails.getResource() instanceof org.hl7.fhir.r4.model.Patient || result instanceof org.hl7.fhir.r5.model.Patient) {
+				testMappingFhir(patientMapper, result, fhirContext.newJsonParser());
+				PatientReported patientReported = processAndValidatePatient(patientMapper.localObjectReported((IAnyResource) requestDetails.getResource()), iisReportableList, processingFlavorSet);
 				result = patientMapper.fhirResource(patientReported);
 			}
 		}

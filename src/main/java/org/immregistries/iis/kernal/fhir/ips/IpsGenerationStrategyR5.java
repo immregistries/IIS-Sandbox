@@ -7,14 +7,13 @@ import ca.uhn.fhir.jpa.ips.jpa.JpaSectionSearchStrategyCollection;
 import ca.uhn.fhir.jpa.model.util.JpaConstants;
 import ca.uhn.fhir.jpa.provider.BaseJpaResourceProviderPatient;
 import org.apache.commons.lang3.StringUtils;
+import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.hl7.fhir.instance.model.api.IBaseBundle;
-import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.instance.model.api.IIdType;
 import org.hl7.fhir.r5.model.*;
-
-import org.immregistries.iis.kernal.security.CurrentTenantUtil;
-import org.immregistries.iis.kernal.mapping.resourceMappers.forR5.OrganizationMapperR5;
 import org.immregistries.iis.kernal.mapping.internalClient.IisFhirClientFactory;
+import org.immregistries.iis.kernal.mapping.resourceMappers.forR5.OrganizationMapperR5;
+import org.immregistries.iis.kernal.security.CurrentTenantUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
@@ -76,7 +75,7 @@ public class IpsGenerationStrategyR5 extends DefaultJpaIpsGenerationStrategy imp
 	}
 
 	@Override
-	public IBaseResource createAuthor() {
+	public IAnyResource createAuthor() {
 		Organization organization = organizationMapper.fhirResource(CurrentTenantUtil.getTenant());
 		return organization;
 	}
@@ -91,7 +90,7 @@ public class IpsGenerationStrategyR5 extends DefaultJpaIpsGenerationStrategy imp
 	}
 
 
-	public List<IBaseResource> extractResourcesFromBundle(IpsSectionContext theIpsSectionContext, IBaseBundle iBaseBundle) {
+	public List<IAnyResource> extractResourcesFromBundle(IpsSectionContext theIpsSectionContext, IBaseBundle iBaseBundle) {
 		Bundle bundle = (Bundle) iBaseBundle;
 		return bundle.getEntry().stream()
 			.filter((bundleEntryComponent -> bundleEntryComponent.hasResource() && theIpsSectionContext.getResourceType().equals(bundleEntryComponent.getResource().getResourceType().name())))

@@ -1,6 +1,6 @@
 package org.immregistries.iis.kernal.logic;
 
-import org.hl7.fhir.instance.model.api.IBaseResource;
+import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.hl7.fhir.instance.model.api.IDomainResource;
 import org.immregistries.iis.kernal.model.IisPatient;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
@@ -13,7 +13,7 @@ import java.util.Date;
  * @param <ImmunizationRecommendation> FHIR class
  * @param <Patient>                    FHIR class
  */
-public interface IImmunizationRecommendationService<ImmunizationRecommendation extends IBaseResource, Patient extends IDomainResource> {
+public interface IImmunizationRecommendationService<ImmunizationRecommendation extends IAnyResource, Patient extends IDomainResource> {
 
 	String IMMUNIZATION_RECOMMENDATION_DATE_CRITERION_SYSTEM = "http://hl7.org/fhir/ValueSet/immunization-recommendation-date-criterion";
 	String IMMUNIZATION_RECOMMENDATION_STATUS_SYSTEM = "http://hl7.org/fhir/ValueSet/immunization-recommendation-status";

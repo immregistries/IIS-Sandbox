@@ -2,6 +2,7 @@ package org.immregistries.iis.kernal.mapping.internalClient;
 
 import ca.uhn.fhir.jpa.api.dao.DaoRegistry;
 import ca.uhn.fhir.jpa.api.dao.IFhirResourceDao;
+import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.*;
 import org.immregistries.iis.kernal.mapping.AllMappingService;
@@ -54,7 +55,7 @@ public class FhirReadRequester {
 	}
 
 	public PatientReported readAsPatientReported(String id) {
-		return (PatientReported) allMappingService.localObjectReportedWithMaster(read(PatientMapper.PATIENT, id));
+		return (PatientReported) allMappingService.localObjectReportedWithMaster((IAnyResource) read(PatientMapper.PATIENT, id));
 	}
 
 	public ModelPerson readPractitionerAsPerson(String id) {

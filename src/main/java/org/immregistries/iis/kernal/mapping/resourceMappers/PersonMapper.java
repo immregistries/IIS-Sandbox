@@ -1,13 +1,13 @@
 package org.immregistries.iis.kernal.mapping.resourceMappers;
 
-import org.hl7.fhir.instance.model.api.IBaseResource;
+import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.immregistries.iis.kernal.model.ModelPerson;
 
 /**
  * Retired and deprecated
  * @param <Person>
  */
-public interface PersonMapper<Person extends IBaseResource>
+public interface PersonMapper<Person extends IAnyResource>
 //	extends IisFhirMapperMaster<ModelPerson, Person>
 {
 	default String fhirType() {

@@ -27,15 +27,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static org.immregistries.iis.kernal.mapping.internalClient.FhirSaveRequester.GOLDEN_RECORD;
-import static org.immregistries.iis.kernal.mapping.internalClient.FhirSaveRequester.GOLDEN_SYSTEM_TAG;
 import static org.immregistries.iis.kernal.mapping.resourceMappers.ImmunizationMapper.RECORDED;
 
 @Service
 @Conditional(OnR5Condition.class)
-public class PatientMapperR5 implements PatientMapper<Patient> {
+public class PatientMapperR5 extends PatientMapper<Patient> {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
-
 
 	@Autowired
 	private CodeMapManagerService codeMapManagerService;
@@ -47,14 +44,6 @@ public class PatientMapperR5 implements PatientMapper<Patient> {
 	private ModelPhoneMapper modelPhoneMapper;
 	@Autowired
 	private BusinessIdentifierMapper businessIdentifierMapper;
-
-	public PatientReported localObjectReportedWithMaster(Patient patient) {
-		PatientReported patientReported = localObjectReported(patient);
-		if (!patient.getId().isBlank() && patient.getMeta().getTag(GOLDEN_SYSTEM_TAG, GOLDEN_RECORD) == null) {
-			patientReported.setMasterRecord(fhirReadRequester.readPatientMasterWithMdmLink(patient.getId()));
-		}
-		return patientReported;
-	}
 
 	public void fillFromFhirResource(IisPatient localPatient, Patient patient) {
 		if (StringUtils.isNotBlank(patient.getId())) {

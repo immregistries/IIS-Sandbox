@@ -11,7 +11,6 @@ import org.immregistries.iis.kernal.mapping.fieldsMappers.BusinessIdentifierMapp
 import org.immregistries.iis.kernal.mapping.fieldsMappers.ModelAddressMapper;
 import org.immregistries.iis.kernal.mapping.fieldsMappers.ModelNameMapper;
 import org.immregistries.iis.kernal.mapping.fieldsMappers.ModelPhoneMapper;
-import org.immregistries.iis.kernal.mapping.internalClient.FhirReadRequester;
 import org.immregistries.iis.kernal.mapping.resourceMappers.PatientMapper;
 import org.immregistries.iis.kernal.model.*;
 import org.slf4j.Logger;
@@ -26,17 +25,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static org.immregistries.iis.kernal.mapping.internalClient.FhirSaveRequester.GOLDEN_RECORD;
-import static org.immregistries.iis.kernal.mapping.internalClient.FhirSaveRequester.GOLDEN_SYSTEM_TAG;
 import static org.immregistries.iis.kernal.mapping.resourceMappers.ImmunizationMapper.RECORDED;
 
 @Service
 @Conditional(OnR4Condition.class)
-public class PatientMapperR4 implements PatientMapper<Patient> {
+public class PatientMapperR4 extends PatientMapper<Patient> {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-	@Autowired
-	private FhirReadRequester fhirReadRequester;
 	@Autowired
 	CodeMapManagerService codeMapManagerService;
 	@Autowired
@@ -48,41 +43,7 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 	@Autowired
 	private BusinessIdentifierMapper businessIdentifierMapper;
 
-	public PatientReported localObjectReportedWithMaster(Patient patient) {
-		PatientReported patientReported = localObjectReported(patient);
-		if (!patient.getId().isBlank() && patient.getMeta().getTag(GOLDEN_SYSTEM_TAG, GOLDEN_RECORD) == null) {
-			patientReported.setMasterRecord(fhirReadRequester.readPatientMasterWithMdmLink(patient.getId()));
-		}
-		return patientReported;
-	}
-
-	public IisPatient localObject(Patient patient) {
-		IisPatient iisPatient = new IisPatient();
-		fillFromFhirResource(iisPatient, patient);
-		return iisPatient;
-	}
-
-	public PatientMaster localObjectMaster(Patient patient) {
-		PatientMaster patientMaster = new PatientMaster();
-		if (FhirReadRequester.isGoldenRecord(patient)) {
-			logger.info("Mapping refused for report as patient is golden");
-			return null;
-		}
-		fillFromFhirResource(patientMaster, patient);
-		return patientMaster;
-	}
-
-	public PatientReported localObjectReported(Patient patient) {
-		PatientReported patientReported = new PatientReported();
-		// if (!AbstractFhirRequester.isGoldenRecord(patient)) {
-		// logger.info("Mapping refused for golden as Patient is reported");
-		// return null;
-		// }
-		fillFromFhirResource(patientReported, patient);
-		return patientReported;
-	}
-
-	private void fillFromFhirResource(IisPatient localPatient, Patient patient) {
+	public void fillFromFhirResource(IisPatient localPatient, Patient patient) {
 		if (StringUtils.isNotBlank(patient.getId())) {
 			localPatient.setPatientId(new IdType(patient.getId()).getIdPart());
 		}

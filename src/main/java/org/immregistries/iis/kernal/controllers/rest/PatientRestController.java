@@ -5,8 +5,8 @@ import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.param.ReferenceParam;
 import jakarta.servlet.http.HttpServletRequest;
+import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.hl7.fhir.instance.model.api.IBaseBundle;
-import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.immregistries.iis.kernal.controllers.filters.RestTenantUrlFilter;
 import org.immregistries.iis.kernal.controllers.rest.shlink.PatientShLinkRestController;
 import org.immregistries.iis.kernal.fhir.shl.ShLinkPayload;
@@ -46,12 +46,12 @@ public class PatientRestController extends BaseTenantTiedRest {
 	}
 
 	@GetMapping(PATIENT_ID_PLACEHOLDER + "/fhir")
-	public IBaseResource getPatientFhir(
+	public IAnyResource getPatientFhir(
 		@PathVariable(PATIENT_ID) String patientId,
 		@RequestAttribute(RestTenantUrlFilter.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
 		HttpServletRequest req) {
 		IGenericClient fhirClient = iisFhirClientFactory.newGenericClient(tenant, req);
-		return fhirClient.read().resource("Patient").withId(patientId).execute();
+		return (IAnyResource) fhirClient.read().resource("Patient").withId(patientId).execute();
 	}
 
 	@GetMapping("")
@@ -143,7 +143,7 @@ public class PatientRestController extends BaseTenantTiedRest {
 		@PathVariable(PATIENT_ID) String patientId,
 		@RequestAttribute(RestTenantUrlFilter.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
 		HttpServletRequest req) {
-		IBaseResource patientSelected = getPatientFhir(patientId, tenant, req);
+		IAnyResource patientSelected = getPatientFhir(patientId, tenant, req);
 		String manifestUrl = PatientShLinkRestController.getManifestUrl(req, patientSelected, tenant);
 		return PatientShLinkRestController.generatePatientShLinkPayload(manifestUrl);
 	}

@@ -6,17 +6,17 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
-import org.hl7.fhir.instance.model.api.IBaseResource;
+import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.immregistries.iis.kernal.controllers.rest.RestUrlUtil;
-import org.immregistries.iis.kernal.security.CurrentTenantUtil;
-import org.immregistries.iis.kernal.security.TenantUtil;
 import org.immregistries.iis.kernal.logic.shlink.ShLinkUtilService;
-import org.immregistries.iis.kernal.mapping.resourceMappers.PatientMapper;
 import org.immregistries.iis.kernal.mapping.internalClient.FhirSearchRequester;
 import org.immregistries.iis.kernal.mapping.internalClient.IisFhirClientFactory;
+import org.immregistries.iis.kernal.mapping.resourceMappers.PatientMapper;
 import org.immregistries.iis.kernal.model.ShLinkManifestRequestBody;
 import org.immregistries.iis.kernal.persisted.model.ShLinkManifest;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
+import org.immregistries.iis.kernal.security.CurrentTenantUtil;
+import org.immregistries.iis.kernal.security.TenantUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,7 +78,7 @@ public class PatientShLinkManifestRestController {
 
 	private ShLinkManifest getShLinkManifest(HttpServletRequest req, String id, Tenant tenant) {
 		IGenericClient fhirClient = iisFhirClientFactory.getOrCreateGenericClient(req);
-		IBaseResource patientSelected = fetchPatientFromParameters(id, "", fhirClient, fhirSearchRequester);
+		IAnyResource patientSelected = fetchPatientFromParameters(id, "", fhirClient, fhirSearchRequester);
 		return shLinkUtilService.generateExamplePatientManifest(tenant, patientSelected.getIdElement());
 	}
 }

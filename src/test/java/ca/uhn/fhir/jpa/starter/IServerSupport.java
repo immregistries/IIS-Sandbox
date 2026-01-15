@@ -5,7 +5,7 @@ import ca.uhn.fhir.jpa.api.dao.DaoRegistry;
 import ca.uhn.fhir.jpa.api.dao.IFhirResourceDao;
 import com.google.common.base.Charsets;
 import org.apache.commons.io.IOUtils;
-import org.hl7.fhir.instance.model.api.IBaseResource;
+import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 
@@ -16,10 +16,10 @@ import java.io.InputStream;
 
 public interface  IServerSupport {
 
-  default IBaseResource loadResource(String theLocation, FhirContext theFhirContext, DaoRegistry theDaoRegistry) throws IOException {
+	default IAnyResource loadResource(String theLocation, FhirContext theFhirContext, DaoRegistry theDaoRegistry) throws IOException {
     String json = stringFromResource(theLocation);
-    IBaseResource resource = theFhirContext.newJsonParser().parseResource(json);
-    IFhirResourceDao<IBaseResource> dao = theDaoRegistry.getResourceDao(resource.getIdElement().getResourceType());
+		IAnyResource resource = theFhirContext.newJsonParser().parseResource(json);
+		IFhirResourceDao<IAnyResource> dao = theDaoRegistry.getResourceDao(resource.getIdElement().getResourceType());
     if (dao == null) {
       return null;
     } else {

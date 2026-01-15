@@ -13,7 +13,6 @@ import ca.uhn.fhir.mdm.util.MdmPartitionHelper;
 import jakarta.annotation.Nonnull;
 import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.hl7.fhir.instance.model.api.IBase;
-import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -74,7 +73,7 @@ public class MdmIisGoldenResourceHelper extends GoldenResourceHelper {
 	private <T extends IAnyResource> void addAllEid(
 		BaseRuntimeChildDefinition theGoldenResourceIdentifier,
 		IAnyResource theIncomingResource,
-		IBaseResource theNewGoldenResource) {
+		IAnyResource theNewGoldenResource) {
 
 
 		List<IBase> incomingResourceIdentifiers = theGoldenResourceIdentifier.getAccessor().getValues(theIncomingResource);

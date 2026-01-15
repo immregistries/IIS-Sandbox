@@ -1,20 +1,20 @@
 package org.immregistries.iis.kernal.controllers.servlet.util;
 
 import com.google.common.collect.ImmutableMap;
-import org.hl7.fhir.instance.model.api.IBaseResource;
+import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.immregistries.iis.kernal.Application;
 import org.immregistries.iis.kernal.SoftwareVersion;
-import org.immregistries.iis.kernal.mapping.internalClient.FhirRequesterUtil;
-import org.immregistries.iis.kernal.security.CurrentTenantUtil;
-import org.immregistries.iis.kernal.security.ServerSecurityConfig;
-import org.immregistries.iis.kernal.security.UserAccessUtil;
-import org.immregistries.iis.kernal.model.ProcessingFlavor;
-import org.immregistries.iis.kernal.persisted.model.Tenant;
-import org.immregistries.iis.kernal.persisted.model.UserAccess;
 import org.immregistries.iis.kernal.controllers.servlet.PatientController;
 import org.immregistries.iis.kernal.controllers.servlet.PopController;
 import org.immregistries.iis.kernal.controllers.servlet.TenantController;
 import org.immregistries.iis.kernal.controllers.servlet.shlink.ShLinkController;
+import org.immregistries.iis.kernal.mapping.internalClient.FhirRequesterUtil;
+import org.immregistries.iis.kernal.model.ProcessingFlavor;
+import org.immregistries.iis.kernal.persisted.model.Tenant;
+import org.immregistries.iis.kernal.persisted.model.UserAccess;
+import org.immregistries.iis.kernal.security.CurrentTenantUtil;
+import org.immregistries.iis.kernal.security.ServerSecurityConfig;
+import org.immregistries.iis.kernal.security.UserAccessUtil;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -140,7 +140,7 @@ public class UiUtil {
 		out.println("    </ul>");
 	}
 
-	public static void printGoldenRecordExplanation(PrintWriter out, IBaseResource iBaseResource) {
+	public static void printGoldenRecordExplanation(PrintWriter out, IAnyResource iBaseResource) {
 		printGoldenRecordExplanation(out, FhirRequesterUtil.isGoldenRecord(iBaseResource));
 	}
 

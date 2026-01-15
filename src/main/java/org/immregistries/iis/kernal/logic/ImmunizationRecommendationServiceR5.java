@@ -13,6 +13,7 @@ import org.immregistries.iis.kernal.mapping.resourceMappers.forR5.ImmunizationEv
 import org.immregistries.iis.kernal.mapping.resourceMappers.forR5.ImmunizationRecommendationMapperR5;
 import org.immregistries.iis.kernal.mapping.resourceMappers.forR5.PatientMapperR5;
 import org.immregistries.iis.kernal.model.IisPatient;
+import org.immregistries.iis.kernal.model.IisVaccination;
 import org.immregistries.iis.kernal.model.VaccinationMaster;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.immregistries.vfa.connect.model.ForecastActual;
@@ -108,9 +109,9 @@ public class ImmunizationRecommendationServiceR5
 	}
 
 	public Parameters queryCds(Tenant tenant, Date date, IisPatient iisPatient,
-			List<VaccinationMaster> vaccinationMasterList) {
+										List<? extends IisVaccination> iisVaccinationList) {
 		List<ForecastActual> forecastActualList = incomingQueryHandler.doForecast(iisPatient,
-				vaccinationMasterList, tenant, date);
+			iisVaccinationList, tenant, date);
 		ImmunizationRecommendation immunizationRecommendation = immunizationRecommendationMapperR5
 			.toFhir(forecastActualList, date, iisPatient);
 		immunizationRecommendation.addIdentifier(new Identifier().setValue(UUID.randomUUID().toString().split("-")[0]));
@@ -120,8 +121,8 @@ public class ImmunizationRecommendationServiceR5
 
 		Parameters parameters = new Parameters();
 		parameters.addParameter().setResource(immunizationRecommendation).setName(RECOMMENDATION);
-		for (VaccinationMaster vaccinationMaster : vaccinationMasterList) {
-			ImmunizationEvaluation immunizationEvaluation = immunizationEvaluationMapperR5.toFhir(vaccinationMaster,
+		for (IisVaccination iisVaccination : iisVaccinationList) {
+			ImmunizationEvaluation immunizationEvaluation = immunizationEvaluationMapperR5.toFhir(iisVaccination,
 					date);
 			if (immunizationEvaluation != null) {
 				parameters.addParameter().setResource(immunizationEvaluation).setName(EVALUATION);

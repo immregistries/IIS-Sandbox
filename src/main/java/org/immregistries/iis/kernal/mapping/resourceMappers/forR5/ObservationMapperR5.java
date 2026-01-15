@@ -6,10 +6,9 @@ import org.hl7.fhir.r5.model.*;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR5Condition;
 import org.immregistries.iis.kernal.logic.IIncomingMessageHandler;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
+import org.immregistries.iis.kernal.mapping.fieldsMappers.BusinessIdentifierMapper;
 import org.immregistries.iis.kernal.mapping.resourceMappers.ImmunizationMapper;
 import org.immregistries.iis.kernal.mapping.resourceMappers.ObservationMapper;
-import org.immregistries.iis.kernal.mapping.fieldsMappers.BusinessIdentifierMapper;
-import org.immregistries.iis.kernal.mapping.internalClient.FhirSaveRequester;
 import org.immregistries.iis.kernal.model.BusinessIdentifier;
 import org.immregistries.iis.kernal.model.ObservationMaster;
 import org.immregistries.iis.kernal.model.ObservationReported;
@@ -23,7 +22,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import static org.immregistries.iis.kernal.mapping.MappingHelper.*;
+import static org.immregistries.iis.kernal.mapping.MappingHelper.IMMUNIZATION;
+import static org.immregistries.iis.kernal.mapping.MappingHelper.PATIENT;
 import static org.immregistries.iis.kernal.mapping.resourceMappers.ImmunizationMapper.RECORDED;
 
 @Service
@@ -45,6 +45,10 @@ public class ObservationMapperR5 implements ObservationMapper<Observation> {
 	}
 
 	public ObservationMaster localObject(Observation o) {
+		return localObjectReported(o);
+	}
+
+	public ObservationMaster localObjectMaster(Observation o) {
 		return localObjectReported(o);
 	}
 
