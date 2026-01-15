@@ -112,7 +112,7 @@ public abstract class PatientMapper<Patient extends IAnyResource>
 	 */
 	public PatientMaster localObjectMaster(Patient patient) {
 		PatientMaster patientMaster = new PatientMaster();
-		if (FhirRequesterUtil.isGoldenRecord(patient)) {
+		if (FhirRequesterUtil.isNotGoldenRecord(patient)) {
 			return null;
 		}
 		fillFromFhirResource(patientMaster, patient);
@@ -127,7 +127,7 @@ public abstract class PatientMapper<Patient extends IAnyResource>
 	 */
 	public PatientReported localObjectReported(Patient patient) {
 		PatientReported patientReported = new PatientReported();
-		if (FhirRequesterUtil.isNotGoldenRecord(patient)) {
+		if (FhirRequesterUtil.isGoldenRecord(patient)) {
 			return null;
 		}
 		fillFromFhirResource(patientReported, patient);
