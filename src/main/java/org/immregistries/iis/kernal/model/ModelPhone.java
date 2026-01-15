@@ -2,7 +2,7 @@ package org.immregistries.iis.kernal.model;
 
 import java.util.Objects;
 
-public class ModelPhone extends AbstractDiffable<ModelPhone> {
+public class ModelPhone extends IisDiffableObject<ModelPhone> {
 	private String number = "";
 	private String use = "";
 

@@ -15,7 +15,6 @@ import ca.uhn.fhir.rest.param.TokenParamModifier;
 import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.r5.model.Immunization;
-import org.immregistries.iis.kernal.mapping.resourceMappers.forR5.ImmunizationMapperR5;
 import org.immregistries.iis.kernal.mapping.resourceMappers.ImmunizationMapper;
 import org.immregistries.vaccination_deduplication.computation_classes.Deterministic;
 import org.immregistries.vaccination_deduplication.reference.ComparisonResult;
@@ -122,8 +121,8 @@ public class MdmIisMatchFinderSvcR5 extends AbstractMdmIisMatchFinderSvc<Immuniz
 			i1.setSource(ImmunizationSource.SOURCE);
 		} else if (immunization.hasInformationSource()
 			&& immunization.getInformationSource().getConcept() != null
-			&& StringUtils.isNotBlank(immunization.getInformationSource().getConcept().getCode(ImmunizationMapperR5.INFORMATION_SOURCE))
-			&& immunization.getInformationSource().getConcept().getCode(ImmunizationMapperR5.INFORMATION_SOURCE).equals("00")) {
+			&& StringUtils.isNotBlank(immunization.getInformationSource().getConcept().getCode(ImmunizationMapper.INFORMATION_SOURCE))
+			&& immunization.getInformationSource().getConcept().getCode(ImmunizationMapper.INFORMATION_SOURCE).equals("00")) {
 			i1.setSource(ImmunizationSource.SOURCE);
 		} else {
 			i1.setSource(ImmunizationSource.HISTORICAL);

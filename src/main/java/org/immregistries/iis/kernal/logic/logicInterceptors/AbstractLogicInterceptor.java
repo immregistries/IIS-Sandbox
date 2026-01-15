@@ -8,8 +8,8 @@ import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.immregistries.iis.kernal.logic.ack.IisReportable;
 import org.immregistries.iis.kernal.logic.ack.IisReportableSeverity;
 import org.immregistries.iis.kernal.mapping.resourceMappers.IisResourceMasterReportedMapper;
-import org.immregistries.iis.kernal.model.AbstractMappedObject;
-import org.immregistries.iis.kernal.model.TenantTiedObject;
+import org.immregistries.iis.kernal.model.ITenantTiedObject;
+import org.immregistries.iis.kernal.model.IisMappedObject;
 import org.immregistries.mqe.hl7util.model.CodedWithExceptions;
 import org.immregistries.mqe.hl7util.model.Hl7Location;
 import org.jetbrains.annotations.NotNull;
@@ -43,20 +43,20 @@ public abstract class AbstractLogicInterceptor {
 		return iisReportable;
 	}
 
-	public boolean testMapping(IisResourceMasterReportedMapper<AbstractMappedObject, AbstractMappedObject, IBaseResource> mapper, AbstractMappedObject abstractMappedObject) {
-		IBaseResource resource = mapper.fhirResource(abstractMappedObject);
-		AbstractMappedObject abstractMappedObject1 = mapper.localObjectReported(resource);
-		if (abstractMappedObject1 == null) {
-			abstractMappedObject1 = mapper.localObject(resource);
+	public boolean testMapping(IisResourceMasterReportedMapper<IisMappedObject, IisMappedObject, IBaseResource> mapper, IisMappedObject iisMappedObject) {
+		IBaseResource resource = mapper.fhirResource(iisMappedObject);
+		IisMappedObject iisMappedObject1 = mapper.localObjectReported(resource);
+		if (iisMappedObject1 == null) {
+			iisMappedObject1 = mapper.localObject(resource);
 		}
-		boolean res = abstractMappedObject.toString().equals(abstractMappedObject1.toString());
+		boolean res = iisMappedObject.toString().equals(iisMappedObject1.toString());
 		if (!res) {
-			logger.info("Object Mapping check failed\n{}\n\n{}\n", abstractMappedObject, abstractMappedObject1);
+			logger.info("Object Mapping check failed\n{}\n\n{}\n", iisMappedObject, iisMappedObject1);
 		}
-		if (abstractMappedObject1 instanceof TenantTiedObject) {
-			((TenantTiedObject) abstractMappedObject1).setTenant(((TenantTiedObject) abstractMappedObject).getTenant());
+		if (iisMappedObject1 instanceof ITenantTiedObject) {
+			((ITenantTiedObject) iisMappedObject1).setTenant(((ITenantTiedObject) iisMappedObject).getTenant());
 		}
-		DiffResult<AbstractMappedObject> diffResult = abstractMappedObject.diff(abstractMappedObject1);
+		DiffResult<IisMappedObject> diffResult = iisMappedObject.diff(iisMappedObject1);
 		if (diffResult.getNumberOfDiffs() > 0) {
 			logger.info("Object Mapping check FAILED");
 			printDiff(logger, diffResult);
@@ -64,9 +64,9 @@ public abstract class AbstractLogicInterceptor {
 		return res;
 	}
 
-	public boolean testMappingFhir(IisResourceMasterReportedMapper<AbstractMappedObject, AbstractMappedObject, IBaseResource> mapper, IBaseResource resource, IParser parser) {
-		AbstractMappedObject abstractMappedObject1 = mapper.localObjectReported(resource);
-		IBaseResource resource1 = mapper.fhirResource(abstractMappedObject1);
+	public boolean testMappingFhir(IisResourceMasterReportedMapper<IisMappedObject, IisMappedObject, IBaseResource> mapper, IBaseResource resource, IParser parser) {
+		IisMappedObject iisMappedObject1 = mapper.localObjectReported(resource);
+		IBaseResource resource1 = mapper.fhirResource(iisMappedObject1);
 		String s1 = parser.encodeResourceToString(resource);
 		String s2 = parser.encodeResourceToString(resource1);
 		boolean res = s1.equals(s2);
@@ -76,7 +76,7 @@ public abstract class AbstractLogicInterceptor {
 		return res;
 	}
 
-	public static void printDiff(Logger logger, DiffResult<AbstractMappedObject> diffResult) {
+	public static void printDiff(Logger logger, DiffResult<IisMappedObject> diffResult) {
 //		logger.info("Object Mapping check DIFF: \n{}", JsonFormatter.prettyPrint(diffResult.toString(ToStringStyle.JSON_STYLE)));
 //		logger.info("Object Mapping check DIFF: {}", diffResult.toString(ToStringStyle.SHORT_PREFIX_STYLE));
 		diffResult.getDiffs().stream().forEach((dif) -> {

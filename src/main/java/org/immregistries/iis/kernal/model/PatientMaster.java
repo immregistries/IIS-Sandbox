@@ -1,20 +1,19 @@
 package org.immregistries.iis.kernal.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.immregistries.iis.kernal.persisted.model.Tenant;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
-import org.immregistries.iis.kernal.persisted.model.Tenant;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * Internal Standard agnostic representation of a patient's information, this
  * class should only be used when dealing with Golden Record except for Display,
  * When dealing with a report use PatientReported
  */
-public class PatientMaster extends AbstractMappedObject implements Serializable, TenantTiedObject {
+public class PatientMaster extends IisMappedObject implements Serializable, ITenantTiedObject {
 
 	private String patientId = "";
 	private Tenant tenant = null;

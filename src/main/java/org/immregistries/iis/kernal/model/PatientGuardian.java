@@ -2,7 +2,7 @@ package org.immregistries.iis.kernal.model;
 
 import java.util.Objects;
 
-public class PatientGuardian extends AbstractDiffable<PatientGuardian> {
+public class PatientGuardian extends IisDiffableObject<PatientGuardian> {
 	private ModelName name = new ModelName();
 	private String guardianRelationship = "";
 

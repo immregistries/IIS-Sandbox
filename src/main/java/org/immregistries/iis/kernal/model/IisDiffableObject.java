@@ -1,15 +1,14 @@
 package org.immregistries.iis.kernal.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.apache.commons.lang3.builder.DiffResult;
 import org.apache.commons.lang3.builder.Diffable;
 import org.apache.commons.lang3.builder.ReflectionDiffBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
 @JsonIgnoreProperties(ignoreUnknown = true)
-public abstract class AbstractDiffable<T> implements Diffable<T> {
+public abstract class IisDiffableObject<T> implements Diffable<T> {
 
 	@JsonIgnore()
 	public DiffResult diff(T obj) {

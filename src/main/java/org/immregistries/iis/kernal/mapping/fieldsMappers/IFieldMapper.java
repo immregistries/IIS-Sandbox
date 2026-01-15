@@ -1,9 +1,16 @@
 package org.immregistries.iis.kernal.mapping.fieldsMappers;
 
 
-public interface IFieldMapper<LocalType, R4, R5> {
+import org.hl7.fhir.instance.model.api.IBaseDatatype;
+import org.immregistries.iis.kernal.model.IisDiffableObject;
+
+public interface IFieldMapper<LocalType extends IisDiffableObject<LocalType>, R4 extends IBaseDatatype, R5 extends IBaseDatatype> {
 
 	Class<LocalType> localType();
+
+	Class<R5> r5Type();
+
+	Class<R4> r4Type();
 
 	R5 toR5(LocalType localField);
 
@@ -12,5 +19,23 @@ public interface IFieldMapper<LocalType, R4, R5> {
 	LocalType fromR5(R5 r5);
 
 	LocalType fromR4(R4 r4);
+
+	/**
+	 * TODO Fix bad practice if class cast
+	 *
+	 * @param datatype
+	 * @return
+	 */
+	default LocalType localObject(IBaseDatatype datatype) {
+		try {
+			return fromR4((R4) datatype);
+		} catch (ClassCastException classCastException) {
+			try {
+				return fromR5((R5) datatype);
+			} catch (ClassCastException classCastException2) {
+				throw new RuntimeException(classCastException2);
+			}
+		}
+	}
 	
 }

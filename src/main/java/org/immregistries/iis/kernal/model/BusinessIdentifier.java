@@ -1,11 +1,8 @@
 package org.immregistries.iis.kernal.model;
 
-import ca.uhn.fhir.rest.param.TokenParam;
-import org.apache.commons.lang3.StringUtils;
-
 import java.util.Objects;
 
-public class BusinessIdentifier extends AbstractDiffable<BusinessIdentifier> {
+public class BusinessIdentifier extends IisDiffableObject<BusinessIdentifier> {
 	public static final String MRN_TYPE_VALUE = "MR";
 	public static final String PT_TYPE_VALUE = "PT";
 	public static final String FILLER_TYPE_VALUE = "FILL";

@@ -1,5 +1,6 @@
 package org.immregistries.iis.kernal.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.immregistries.vfa.connect.model.TestEvent;
 
 import java.io.Serializable;
@@ -8,14 +9,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 /**
  * Internal Standard agnostic representation of a Vaccination record, this class
  * should only be used when dealing with Golden Record except for display,
  * When dealing with a report use VaccinationReported
  */
-public class VaccinationMaster extends AbstractMappedObject implements Serializable {
+public class VaccinationMaster extends IisMappedObject implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 

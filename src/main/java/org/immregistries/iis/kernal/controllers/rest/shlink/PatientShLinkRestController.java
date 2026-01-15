@@ -7,29 +7,24 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.immregistries.iis.kernal.Application;
-import org.immregistries.iis.kernal.controllers.rest.PatientRestController;
 import org.immregistries.iis.kernal.controllers.rest.RestUrlUtil;
-import org.immregistries.iis.kernal.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.fhir.shl.ShLinkPayload;
 import org.immregistries.iis.kernal.logic.shlink.CompressionService;
 import org.immregistries.iis.kernal.logic.shlink.ShLinkUtilService;
 import org.immregistries.iis.kernal.mapping.internalClient.IisFhirClientFactory;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
+import org.immregistries.iis.kernal.security.CurrentTenantUtil;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 @RestController
-@RequestMapping({RestUrlUtil.REST + PatientRestController.PATIENT_BASE_PATH + PatientShLinkRestController.SHLINK_QR_CODE_PATH_SUFFIX, RestUrlUtil.REST_TENANT_PATH + PatientRestController.PATIENT_BASE_PATH + PatientShLinkRestController.SHLINK_QR_CODE_PATH_SUFFIX})
+@RequestMapping({RestUrlUtil.REST + RestUrlUtil.PATIENT_BASE_PATH + PatientShLinkRestController.SHLINK_QR_CODE_PATH_SUFFIX, RestUrlUtil.REST_TENANT_PATH + RestUrlUtil.PATIENT_BASE_PATH + PatientShLinkRestController.SHLINK_QR_CODE_PATH_SUFFIX})
 public class PatientShLinkRestController {
 
 	public static final String SHLINK_QR_CODE_PATH_SUFFIX = "/qr";
@@ -44,7 +39,7 @@ public class PatientShLinkRestController {
 	@GetMapping( produces = MediaType.IMAGE_PNG_VALUE)
 	public ResponseEntity<byte[]> doGetShLinkQrCode(HttpServletRequest req, HttpServletResponse resp,
 																	@RequestAttribute(CurrentTenantUtil.SESSION_REQUEST_TENANT) Tenant tenant,
-																	@PathVariable(PatientRestController.PATIENT_ID) String patientId)
+																	@PathVariable(RestUrlUtil.PATIENT_ID) String patientId)
 		throws IOException, ServletException {
 		IGenericClient client = iisFhirClientFactory.newGenericClient(tenant, req);
 		IBaseResource patientSelected = client.read().resource("Patient").withId(patientId).execute();

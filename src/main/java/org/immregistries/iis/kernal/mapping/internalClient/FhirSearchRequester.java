@@ -11,10 +11,10 @@ import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.DecimalType;
 import org.hl7.fhir.r4.model.Parameters;
 import org.hl7.fhir.r4.model.Patient;
-import org.immregistries.iis.kernal.mapping.resourceMappers.*;
-import org.immregistries.iis.kernal.security.TenantUtil;
 import org.immregistries.iis.kernal.mapping.AllMappingService;
+import org.immregistries.iis.kernal.mapping.resourceMappers.*;
 import org.immregistries.iis.kernal.model.*;
+import org.immregistries.iis.kernal.security.TenantUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -43,8 +43,8 @@ public class FhirSearchRequester {
 	@Autowired
 	FhirReadRequester fhirReadRequester;
 
-	public AbstractMappedObject searchMappedObjectMaster(String resourceType, SearchParameterMap searchParameterMap) {
-		AbstractMappedObject mappedObject = null;
+	public IisMappedObject searchMappedObjectMaster(String resourceType, SearchParameterMap searchParameterMap) {
+		IisMappedObject mappedObject = null;
 		IBundleProvider bundleProvider = searchGoldenRecord(resourceType, searchParameterMap);
 		if (!bundleProvider.isEmpty()) {
 			mappedObject = allMappingService.localObject(bundleProvider.getResources(0, 1).get(0));
@@ -52,9 +52,9 @@ public class FhirSearchRequester {
 		return mappedObject;
 	}
 
-	public AbstractMappedObject searchMappedObjectReportedWithMaster(String resourceType,
-																						  SearchParameterMap searchParameterMap) {
-		AbstractMappedObject mappedObject = null;
+	public IisMappedObject searchMappedObjectReportedWithMaster(String resourceType,
+																					SearchParameterMap searchParameterMap) {
+		IisMappedObject mappedObject = null;
 		IBundleProvider bundleProvider = searchRegularRecord(resourceType, searchParameterMap);
 		if (!bundleProvider.isEmpty()) {
 			mappedObject = allMappingService.localObjectReportedWithMaster(bundleProvider.getResources(0, 1).get(0));
@@ -62,8 +62,8 @@ public class FhirSearchRequester {
 		return mappedObject;
 	}
 
-	public List<AbstractMappedObject> searchMappedObjectReportedList(String resourceType,
-																						  SearchParameterMap searchParameterMap) {
+	public List<IisMappedObject> searchMappedObjectReportedList(String resourceType,
+																					SearchParameterMap searchParameterMap) {
 		IBundleProvider bundleProvider = searchRegularRecord(resourceType, searchParameterMap);
 		return bundleProvider.getAllResources().stream().map(allMappingService::localObjectReportedWithMaster)
 			.collect(Collectors.toList());

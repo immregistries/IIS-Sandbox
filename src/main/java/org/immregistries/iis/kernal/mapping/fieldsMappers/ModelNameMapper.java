@@ -1,10 +1,9 @@
 package org.immregistries.iis.kernal.mapping.fieldsMappers;
 
 import org.hl7.fhir.r4.model.HumanName;
-import org.springframework.stereotype.Service;
-
 import org.immregistries.iis.kernal.mapping.MappingHelper;
 import org.immregistries.iis.kernal.model.ModelName;
+import org.springframework.stereotype.Service;
 
 import static org.immregistries.iis.kernal.mapping.resourceMappers.PatientMapper.V_2_NAME_TYPE;
 import static org.immregistries.iis.kernal.mapping.resourceMappers.PatientMapper.V_2_NAME_TYPE_SYSTEM;
@@ -15,6 +14,16 @@ public class ModelNameMapper implements IFieldMapper<ModelName, HumanName, org.h
 	@Override
 	public Class<ModelName> localType() {
 		return ModelName.class;
+	}
+
+	@Override
+	public Class<org.hl7.fhir.r5.model.HumanName> r5Type() {
+		return org.hl7.fhir.r5.model.HumanName.class;
+	}
+
+	@Override
+	public Class<org.hl7.fhir.r4.model.HumanName> r4Type() {
+		return org.hl7.fhir.r4.model.HumanName.class;
 	}
 
 	public org.hl7.fhir.r4.model.HumanName toR4(ModelName modelName) {

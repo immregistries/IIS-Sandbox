@@ -1,16 +1,15 @@
 package org.immregistries.iis.kernal.mapping.fieldsMappers;
 
-import org.hl7.fhir.r4.model.ContactPoint;
-import org.springframework.stereotype.Service;
-
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.exceptions.FHIRException;
+import org.hl7.fhir.r4.model.ContactPoint;
 import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.logic.CodeMapManagerService;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
 import org.immregistries.iis.kernal.model.ModelPhone;
+import org.springframework.stereotype.Service;
 
 @Service
 public class ModelPhoneMapper implements IFieldMapper<ModelPhone, ContactPoint, org.hl7.fhir.r5.model.ContactPoint> {
@@ -20,6 +19,16 @@ public class ModelPhoneMapper implements IFieldMapper<ModelPhone, ContactPoint, 
 	@Override
 	public Class<ModelPhone> localType() {
 		return ModelPhone.class;
+	}
+
+	@Override
+	public Class<org.hl7.fhir.r5.model.ContactPoint> r5Type() {
+		return org.hl7.fhir.r5.model.ContactPoint.class;
+	}
+
+	@Override
+	public Class<org.hl7.fhir.r4.model.ContactPoint> r4Type() {
+		return org.hl7.fhir.r4.model.ContactPoint.class;
 	}
 
     public org.hl7.fhir.r4.model.ContactPoint toR4(ModelPhone modelPhone) {

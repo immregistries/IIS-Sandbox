@@ -1,10 +1,9 @@
 package org.immregistries.iis.kernal.mapping.fieldsMappers;
 
-import org.hl7.fhir.r4.model.Address;
-import org.springframework.stereotype.Service;
-
 import org.apache.commons.lang3.StringUtils;
+import org.hl7.fhir.r4.model.Address;
 import org.immregistries.iis.kernal.model.ModelAddress;
+import org.springframework.stereotype.Service;
 
 @Service
 public class ModelAddressMapper implements IFieldMapper<ModelAddress, Address, org.hl7.fhir.r5.model.Address> {
@@ -12,6 +11,16 @@ public class ModelAddressMapper implements IFieldMapper<ModelAddress, Address, o
 	@Override
 	public Class<ModelAddress> localType() {
 		return ModelAddress.class;
+	}
+
+	@Override
+	public Class<org.hl7.fhir.r5.model.Address> r5Type() {
+		return org.hl7.fhir.r5.model.Address.class;
+	}
+
+	@Override
+	public Class<org.hl7.fhir.r4.model.Address> r4Type() {
+		return org.hl7.fhir.r4.model.Address.class;
 	}
 
 	public org.hl7.fhir.r4.model.Address toR4(ModelAddress modelAddress) {

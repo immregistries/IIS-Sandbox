@@ -1,12 +1,10 @@
 package org.immregistries.iis.kernal.mapping.fieldsMappers;
 
-import org.hl7.fhir.r4.model.Identifier;
-import org.springframework.stereotype.Service;
-
-import org.apache.commons.lang3.StringUtils;
-import org.immregistries.iis.kernal.model.BusinessIdentifier;
-
 import ca.uhn.fhir.rest.param.TokenParam;
+import org.apache.commons.lang3.StringUtils;
+import org.hl7.fhir.r4.model.Identifier;
+import org.immregistries.iis.kernal.model.BusinessIdentifier;
+import org.springframework.stereotype.Service;
 
 @Service
 public class BusinessIdentifierMapper implements IFieldMapper<BusinessIdentifier, Identifier, org.hl7.fhir.r5.model.Identifier> {
@@ -15,6 +13,16 @@ public class BusinessIdentifierMapper implements IFieldMapper<BusinessIdentifier
 	@Override
 	public Class<BusinessIdentifier> localType() {
 		return BusinessIdentifier.class;
+	}
+
+	@Override
+	public Class<org.hl7.fhir.r5.model.Identifier> r5Type() {
+		return org.hl7.fhir.r5.model.Identifier.class;
+	}
+
+	@Override
+	public Class<org.hl7.fhir.r4.model.Identifier> r4Type() {
+		return org.hl7.fhir.r4.model.Identifier.class;
 	}
 
     public org.hl7.fhir.r5.model.Identifier toR5(BusinessIdentifier businessIdentifier) {

@@ -1,10 +1,10 @@
 package org.immregistries.iis.kernal.model;
 
-import java.io.Serializable;
-
 import org.immregistries.iis.kernal.persisted.model.Tenant;
 
-public class OrgLocation extends AbstractMappedObject implements Serializable, TenantTiedObject {
+import java.io.Serializable;
+
+public class OrgLocation extends IisMappedObject implements Serializable, ITenantTiedObject {
 	
   private static final long serialVersionUID = 1L;
   

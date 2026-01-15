@@ -10,7 +10,7 @@ public interface ImmunizationMapper<Immunization extends IBaseResource>
 		return IMMUNIZATION;
 	}
 
-	public static final String IMMUNIZATION = "Immunization";
+	String IMMUNIZATION = "Immunization";
 
 	default Class<VaccinationMaster> localMasterType() {
 		return VaccinationMaster.class;

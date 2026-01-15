@@ -4,7 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.Objects;
 
-public class ModelName extends AbstractDiffable<ModelName> {
+public class ModelName extends IisDiffableObject<ModelName> {
 	private String nameLast = "";
 	private String nameFirst = "";
 	private String nameMiddle = "";
