@@ -8,7 +8,13 @@ import java.io.Serializable;
  * Record,
  * Used when dealing with a report
  */
-public class PatientReported extends PatientMaster implements Serializable, IReportedObject<PatientMaster> {
+public class PatientReported extends IisPatient implements Serializable, IReportedObject<PatientMaster> {
+
+	@Override
+	public boolean isMdmGolden() {
+		return false;
+	}
+
 	/**
 	 * Master Patient reference or Golden Record
 	 */

@@ -1,6 +1,6 @@
 package org.immregistries.iis.kernal.logic;
 
-import org.immregistries.iis.kernal.model.PatientMaster;
+import org.immregistries.iis.kernal.model.IisPatient;
 import org.immregistries.iis.kernal.persisted.model.MessageReceived;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.immregistries.iis.kernal.persisted.repository.MessageReceivedRepository;
@@ -22,14 +22,14 @@ public class MessageRecordingService {
 	@Autowired
 	MessageReceivedRepository messageReceivedRepository;
 
-	public MessageReceived recordMessageReceived(String message, PatientMaster patient, String messageResponse,
-			String categoryRequest, String categoryResponse, Tenant tenant) {
+	public MessageReceived recordMessageReceived(String message, IisPatient patient, String messageResponse,
+																String categoryRequest, String categoryResponse, Tenant tenant) {
 		MessageReceived messageReceived = getMessageReceived(message, patient, messageResponse, categoryRequest,
 				categoryResponse, tenant);
 		return messageReceivedRepository.save(messageReceived);
 	}
 
-	private static @NotNull MessageReceived getMessageReceived(String message, PatientMaster patient,
+	private static @NotNull MessageReceived getMessageReceived(String message, IisPatient patient,
 			String messageResponse, String categoryRequest, String categoryResponse, Tenant tenant) {
 		MessageReceived messageReceived = new MessageReceived();
 		messageReceived.setTenant(tenant);

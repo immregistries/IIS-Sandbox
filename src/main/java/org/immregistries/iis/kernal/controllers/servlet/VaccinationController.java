@@ -219,11 +219,10 @@ public class VaccinationController {
 					/*
 					 * Setting external identifier in reference
 					 */
-					PatientMaster patientMaster = vaccination.getPatientReported();
-					PatientMaster patientMaster1 = vaccination.getPatientReported();
+					IisPatient iisPatient = vaccination.getPatientReported();
 					immunization.getPatient().setIdentifier(new org.hl7.fhir.r5.model.Identifier()
-							.setValue(patientMaster.getMainBusinessIdentifier().getValue())
-							.setSystem(patientMaster1.getMainBusinessIdentifier().getSystem()));
+						.setValue(iisPatient.getMainBusinessIdentifier().getValue())
+						.setSystem(iisPatient.getMainBusinessIdentifier().getSystem()));
 					IParser parser = iisFhirClientFactory.getFhirContext().newJsonParser().setPrettyPrint(true);
 
 					PatientServletUtil.printSubscriptions(out, parser, bundle, immunization);

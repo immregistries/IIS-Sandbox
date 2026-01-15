@@ -10,8 +10,9 @@ import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.immregistries.iis.kernal.controllers.filters.RestTenantUrlFilter;
 import org.immregistries.iis.kernal.controllers.rest.shlink.PatientShLinkRestController;
 import org.immregistries.iis.kernal.fhir.shl.ShLinkPayload;
-import org.immregistries.iis.kernal.mapping.resourceMappers.PatientMapper;
 import org.immregistries.iis.kernal.mapping.internalClient.IisFhirClientFactory;
+import org.immregistries.iis.kernal.mapping.resourceMappers.PatientMapper;
+import org.immregistries.iis.kernal.model.IisPatient;
 import org.immregistries.iis.kernal.model.ObservationReported;
 import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.model.VaccinationMaster;
@@ -38,7 +39,7 @@ public class PatientRestController extends BaseTenantTiedRest {
 	private PatientMapper patientMapper;
 
 	@GetMapping(PATIENT_ID_PLACEHOLDER)
-	public PatientMaster getPatient(
+	public IisPatient getPatient(
 		@PathVariable(PATIENT_ID) String patientId,
 		@RequestAttribute(RestTenantUrlFilter.TENANT_REQUEST_ATTRIBUTE) Tenant tenant) {
 		return fhirReadRequester.readAsPatientMaster(patientId);
@@ -102,7 +103,7 @@ public class PatientRestController extends BaseTenantTiedRest {
 
 	@SuppressWarnings("unchecked")
 	@GetMapping(PATIENT_ID_PLACEHOLDER + "/related")
-	public List<? extends PatientMaster> getPatientRelatedPatients(
+	public List<? extends IisPatient> getPatientRelatedPatients(
 		@PathVariable(PATIENT_ID) String patientId,
 		@RequestAttribute(RestTenantUrlFilter.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
 		@RequestParam(name = MDM_EXPAND_REST_PARAM, defaultValue = "false") boolean isGolden,

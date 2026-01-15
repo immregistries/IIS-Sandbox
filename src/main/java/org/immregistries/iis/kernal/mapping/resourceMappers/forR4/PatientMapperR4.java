@@ -76,7 +76,7 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 		return patientReported;
 	}
 
-	private void fillFromFhirResource(PatientMaster localPatient, Patient patient) {
+	private void fillFromFhirResource(IisPatient localPatient, Patient patient) {
 		if (StringUtils.isNotBlank(patient.getId())) {
 			localPatient.setPatientId(new IdType(patient.getId()).getIdPart());
 		}

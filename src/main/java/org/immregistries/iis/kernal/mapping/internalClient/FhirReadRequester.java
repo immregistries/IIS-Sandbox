@@ -4,13 +4,13 @@ import ca.uhn.fhir.jpa.api.dao.DaoRegistry;
 import ca.uhn.fhir.jpa.api.dao.IFhirResourceDao;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.*;
-import org.immregistries.iis.kernal.security.TenantUtil;
 import org.immregistries.iis.kernal.mapping.AllMappingService;
 import org.immregistries.iis.kernal.mapping.resourceMappers.ImmunizationMapper;
 import org.immregistries.iis.kernal.mapping.resourceMappers.LocationMapper;
 import org.immregistries.iis.kernal.mapping.resourceMappers.PatientMapper;
 import org.immregistries.iis.kernal.mapping.resourceMappers.PractitionerMapper;
 import org.immregistries.iis.kernal.model.*;
+import org.immregistries.iis.kernal.security.TenantUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -40,6 +40,11 @@ public class FhirReadRequester {
 	}
 
 
+	public IisPatient readAsPatient(String id) {
+		Patient patient = (Patient) read(PatientMapper.PATIENT, id);
+		return (IisPatient) allMappingService.localObject(patient);
+	}
+
 	public PatientMaster readAsPatientMaster(String id) {
 		Patient patient = (Patient) read(PatientMapper.PATIENT, id);
 		if (FhirRequesterUtil.isGoldenRecord(patient)) {
@@ -62,6 +67,11 @@ public class FhirReadRequester {
 
 	public VaccinationReported readAsVaccinationReported(String id) {
 		return (VaccinationReported) allMappingService.localObjectReportedWithMaster((Immunization) read(ImmunizationMapper.IMMUNIZATION, id));
+	}
+
+	public IisVaccination readAsVaccination(String id) {
+		Immunization immunization = (Immunization) read(ImmunizationMapper.IMMUNIZATION, id);
+		return (IisVaccination) allMappingService.localObject(immunization);
 	}
 
 	public VaccinationMaster readAsVaccinationMaster(String id) {

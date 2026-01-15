@@ -7,4 +7,9 @@ package org.immregistries.iis.kernal.model;
  */
 public class PatientMaster extends IisPatient {
 
+
+	public boolean isMdmGolden() {
+		return true;
+	}
+
 }

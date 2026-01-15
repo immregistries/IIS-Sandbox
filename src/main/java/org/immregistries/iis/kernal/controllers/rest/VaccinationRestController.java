@@ -23,12 +23,11 @@ public class VaccinationRestController extends BaseTenantTiedRest {
 	public static final String VACCINATION_ID_PLACEHOLDER = "/{" + VACCINATION_ID + "}";
 
 	@GetMapping(VACCINATION_ID_PLACEHOLDER)
-    public VaccinationMaster getVaccination(
+	public IisVaccination getVaccination(
             @RequestAttribute(name = SESSION_REQUEST_TENANT) Tenant tenant,
             @PathVariable(VACCINATION_ID) String vaccinationId,
             HttpServletRequest req) {
-        // TODO make FHIr Requester tenant aware
-        return fhirReadRequester.readAsVaccinationMaster(vaccinationId);
+		return fhirReadRequester.readAsVaccination(vaccinationId);
     }
 
     @GetMapping()

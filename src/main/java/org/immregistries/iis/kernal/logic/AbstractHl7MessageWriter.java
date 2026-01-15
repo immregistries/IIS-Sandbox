@@ -108,7 +108,7 @@ public abstract class AbstractHl7MessageWriter implements IExampleMessageWriter 
 		sb.append(profileId).append("^CDCPHINVS\r");
 	}
 
-	public void printQueryPID(PatientMaster patientReported, Set<ProcessingFlavor> processingFlavorSet,
+	public void printQueryPID(IisPatient patientReported, Set<ProcessingFlavor> processingFlavorSet,
 			StringBuilder sb, PatientMaster patient, SimpleDateFormat sdf, int pidCount) {
 		// PID
 		sb.append("PID");
@@ -513,7 +513,7 @@ public abstract class AbstractHl7MessageWriter implements IExampleMessageWriter 
 		return "";
 	}
 
-	public void printQueryNK1(PatientMaster patientMaster, StringBuilder sb, CodeMap codeMap) {
+	public void printQueryNK1(IisPatient patientMaster, StringBuilder sb, CodeMap codeMap) {
 		if (patientMaster != null) {
 			for (int i = 0; i < patientMaster.getPatientGuardians().size(); i++) {
 				PatientGuardian patientGuardian = patientMaster.getPatientGuardians().get(i);

@@ -13,9 +13,9 @@ import org.hl7.fhir.r5.model.Patient;
 import org.immregistries.iis.kernal.Application;
 import org.immregistries.iis.kernal.mapping.internalClient.FhirRequesterUtil;
 import org.immregistries.iis.kernal.mapping.internalClient.FhirSearchRequester;
+import org.immregistries.iis.kernal.model.IisPatient;
 import org.immregistries.iis.kernal.model.LoincIdentifier;
 import org.immregistries.iis.kernal.model.ObservationReported;
-import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.model.SnomedValue;
 import org.immregistries.iis.kernal.persisted.model.MessageReceived;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
@@ -34,9 +34,9 @@ import static org.immregistries.iis.kernal.controllers.servlet.SubscriptionContr
 
 public final class PatientServletUtil {
 
-	public static void printPatientList(PrintWriter out, List<? extends PatientMaster> patientMasterList, boolean showingRecent) {
-		if (patientMasterList != null) {
-			if (patientMasterList.isEmpty()) {
+	public static void printPatientList(PrintWriter out, List<? extends IisPatient> patientList, boolean showingRecent) {
+		if (patientList != null) {
+			if (patientList.isEmpty()) {
 				out.println("<div class=\"w3-panel w3-yellow\"><p>No Records Found</p></div>");
 			} else {
 				if (showingRecent) {
@@ -52,7 +52,7 @@ public final class PatientServletUtil {
 				out.println("  <tbody>");
 				SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
 				int count = 0;
-				for (PatientMaster patient : patientMasterList) {
+				for (IisPatient patient : patientList) {
 					count++;
 					if (count > 100) {
 						break;
@@ -223,7 +223,7 @@ public final class PatientServletUtil {
 		}
 	}
 
-	public static void printPatient(PrintWriter out, PatientMaster patientSelected) {
+	public static void printPatient(PrintWriter out, IisPatient patientSelected) {
 		SimpleDateFormat sdfDate = new SimpleDateFormat("MM/dd/yyyy");
 		out.println("    <div class=\"w3-container w3-half w3-margin-top\">");
 		out.println("<table class=\"w3-table w3-bordered w3-striped w3-border test w3-hoverable\">");
@@ -332,35 +332,35 @@ public final class PatientServletUtil {
 	}
 
 	public static void printFhirShortcuts(PrintWriter out, IBaseResource patientSelected,
-			PatientMaster patientMasterSelected, Tenant tenant) {
+													  IisPatient iisPatient, Tenant tenant) {
 		out.println("<h4>FHIR Api Shortcuts</h4>");
 		String apiBaseUrl = Application.fhirServerBasePath(tenant);
 		{
-			String link = apiBaseUrl + "/Patient/" + patientMasterSelected.getPatientId();
+			String link = apiBaseUrl + "/Patient/" + iisPatient.getPatientId();
 			out.println("<div>FHIR Resource: <a href=\"" + link + "\">" + link + "</a></div>");
 		}
 		{
-			String link = apiBaseUrl + "/Patient/" + patientMasterSelected.getPatientId() + "/$everything?_mdm=true";
+			String link = apiBaseUrl + "/Patient/" + iisPatient.getPatientId() + "/$everything?_mdm=true";
 			out.println("<div>Everything related to this Patient: <a href=\"" + link + "\">" + link + "</a></div>");
 		}
 		{
-			String link = apiBaseUrl + "/Patient/" + patientMasterSelected.getPatientId() + "/$summary";
+			String link = apiBaseUrl + "/Patient/" + iisPatient.getPatientId() + "/$summary";
 			out.println("<div>International Patient Summary: <a href=\"" + link + "\">" + link + "</a></div>");
 		}
 		{
-			String link = apiBaseUrl + "/Immunization?patient:mdm=Patient/" + patientMasterSelected.getPatientId();
+			String link = apiBaseUrl + "/Immunization?patient:mdm=Patient/" + iisPatient.getPatientId();
 			out.println("<div>All Immunizations related<a href=\"" + link + "\">" + link + "</a></div>");
 		}
 		{
-			String link = apiBaseUrl + "/Observation?patient:mdm=Patient/" + patientMasterSelected.getPatientId();
+			String link = apiBaseUrl + "/Observation?patient:mdm=Patient/" + iisPatient.getPatientId();
 			out.println("<div>All Observations related<a href=\"" + link + "\">" + link + "</a></div>");
 		}
 		{
 			String link;
 			if (FhirRequesterUtil.isGoldenRecord(patientSelected)) {
-				link = apiBaseUrl + "/$mdm-query-links?goldenResourceId=" + patientMasterSelected.getPatientId();
+				link = apiBaseUrl + "/$mdm-query-links?goldenResourceId=" + iisPatient.getPatientId();
 			} else {
-				link = apiBaseUrl + "/$mdm-query-links?resourceId=" + patientMasterSelected.getPatientId();
+				link = apiBaseUrl + "/$mdm-query-links?resourceId=" + iisPatient.getPatientId();
 			}
 			out.println("<div>Related Patient Records: <a href=\"" + link + "\">" + link + "</a></div>");
 		}
