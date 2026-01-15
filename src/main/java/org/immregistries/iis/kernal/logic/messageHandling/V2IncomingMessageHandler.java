@@ -283,11 +283,7 @@ public abstract class V2IncomingMessageHandler extends IncomingMessageHandler<HL
 	}
 
 	public PatientReported processPatient(Tenant tenant, HL7Reader reader, List<IisReportable> iisReportableList, Set<ProcessingFlavor> processingFlavorSet, CodeMap codeMap, boolean strictDate, IIdType managingOrganizationId) throws ProcessingException {
-//		PatientReported patientReported = null; // TODO figure out process of merging information in golden record
-//			fhirSearchRequester.searchPatientReported(new SearchParameterMap("identifier", new TokenParam().setValue(patientReportedExternalLink)));
-//		if (patientReported == null) {
-		PatientReported patientReported;
-		patientReported = new PatientReported();
+		PatientReported patientReported = new PatientReported();
 		patientReported.setTenant(tenant);
 		patientReported.setReportedDate(new Date());
 		if (managingOrganizationId != null && managingOrganizationId.hasIdPart()) {

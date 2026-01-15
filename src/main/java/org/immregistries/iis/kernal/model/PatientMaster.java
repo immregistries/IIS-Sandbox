@@ -6,10 +6,4 @@ package org.immregistries.iis.kernal.model;
  * When dealing with a report use PatientReported
  */
 public class PatientMaster extends IisPatient {
-
-
-	public boolean isMdmGolden() {
-		return true;
-	}
-
 }

@@ -33,7 +33,7 @@ public class FhirSaveRequesterR4 extends
 	FhirSaveRequester<Patient, Immunization, Location, Practitioner, Observation, Person, Organization, RelatedPerson> {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	@Autowired
-	public FhirReadRequester fhirReadSuper;
+	public FhirReadRequester fhirReadRequester;
 
 	@Autowired
 	FhirSearchRequester fhirSearchRequester;
@@ -70,7 +70,7 @@ public class FhirSaveRequesterR4 extends
 			return (PatientReported) allMappingService.localObjectReportedWithMaster((IAnyResource) outcome.getResource());
 		} else if (outcome.getCreated() != null && outcome.getCreated()) {
 			patientReported.setPatientId(outcome.getId().getIdPart());
-			return fhirReadSuper.readAsPatientReported(outcome.getId().getIdPart());
+			return fhirReadRequester.readAsPatientReported(outcome.getId().getIdPart());
 		} else {
 			return patientReported;
 		}

@@ -10,14 +10,14 @@ public class VaccinationReported extends IisVaccination implements Serializable,
 	/**
 	 * Master Immunization reference or Golden Record
 	 */
-	private VaccinationMaster vaccinationMaster = null;
+	private VaccinationMaster masterRecord = null;
 
 	public VaccinationMaster getMasterRecord() {
-		return vaccinationMaster;
+		return masterRecord;
 	}
 
 	public void setMasterRecord(VaccinationMaster vaccination) {
-		this.vaccinationMaster = vaccination;
+		this.masterRecord = vaccination;
 	}
 
 }

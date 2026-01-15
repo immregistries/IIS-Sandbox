@@ -19,7 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 @SuppressWarnings("rawtypes")
 public abstract class FhirSaveRequester<Patient extends IAnyResource, Immunization extends IAnyResource, Location extends IAnyResource, Practitioner extends IAnyResource, Observation extends IAnyResource, Person extends IAnyResource, Organization extends IAnyResource, RelatedPerson extends IAnyResource>
 		implements
-		IFhirRequester<Patient, Immunization, Location, Practitioner, Observation, Person, Organization, RelatedPerson> {
+	IFhirSaveRequester<Patient, Immunization, Location, Practitioner, Observation, Person, Organization, RelatedPerson> {
 	// public static final String GOLDEN_SYSTEM_IDENTIFIER =
 	// "\"http://hapifhir.io/fhir/NamingSystem/mdm-golden-resource-enterprise-id\"";
 	public static final String GOLDEN_SYSTEM_TAG = "http://hapifhir.io/fhir/NamingSystem/mdm-record-status";

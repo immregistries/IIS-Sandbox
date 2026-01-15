@@ -33,6 +33,7 @@ import ca.uhn.fhir.util.HapiExtensions;
 import ca.uhn.fhir.util.SubscriptionUtil;
 import com.google.common.annotations.VisibleForTesting;
 import org.hl7.fhir.instance.model.api.IAnyResource;
+import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.Extension;
 import org.hl7.fhir.r4.model.StringType;
 import org.hl7.fhir.r4.model.Subscription;
@@ -81,15 +82,15 @@ public class IisSubscriptionValidatingInterceptor extends SubscriptionValidating
 
 	@Hook(value = Pointcut.STORAGE_PRESTORAGE_RESOURCE_CREATED, order = ORDER_SUBSCRIPTION_VALIDATING)
 	public void resourcePreCreate(
-		IAnyResource theResource, RequestDetails theRequestDetails, RequestPartitionId theRequestPartitionId) {
+		IBaseResource theResource, RequestDetails theRequestDetails, RequestPartitionId theRequestPartitionId) {
 		validateSubmittedSubscription(
 			theResource, theRequestDetails, theRequestPartitionId, Pointcut.STORAGE_PRESTORAGE_RESOURCE_CREATED);
 	}
 
 	@Hook(value = Pointcut.STORAGE_PRESTORAGE_RESOURCE_UPDATED, order = ORDER_SUBSCRIPTION_VALIDATING)
 	public void resourceUpdated(
-		IAnyResource theOldResource,
-		IAnyResource theResource,
+		IBaseResource theOldResource,
+		IBaseResource theResource,
 		RequestDetails theRequestDetails,
 		RequestPartitionId theRequestPartitionId) {
 		validateSubmittedSubscription(
@@ -103,7 +104,7 @@ public class IisSubscriptionValidatingInterceptor extends SubscriptionValidating
 
 	@VisibleForTesting
 	void validateSubmittedSubscription(
-		IAnyResource theSubscription,
+		IBaseResource theSubscription,
 		RequestDetails theRequestDetails,
 		RequestPartitionId theRequestPartitionId,
 		Pointcut thePointcut) {
@@ -180,7 +181,7 @@ public class IisSubscriptionValidatingInterceptor extends SubscriptionValidating
 		}
 	}
 
-	private void validateCriteria(IAnyResource theSubscription, CanonicalSubscription theCanonicalSubscription) {
+	private void validateCriteria(IBaseResource theSubscription, CanonicalSubscription theCanonicalSubscription) {
 		if (theCanonicalSubscription.isTopicSubscription()) {
 			if (myFhirContext.getVersion().getVersion() == FhirVersionEnum.R4) {
 				validateR4BackportSubscription((Subscription) theSubscription);

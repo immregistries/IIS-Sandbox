@@ -10,22 +10,17 @@ import java.io.Serializable;
  */
 public class PatientReported extends IisPatient implements Serializable, IReportedObject<PatientMaster> {
 
-	@Override
-	public boolean isMdmGolden() {
-		return false;
-	}
-
 	/**
 	 * Master Patient reference or Golden Record
 	 */
-	private PatientMaster patientMaster;
+	private PatientMaster masterRecord;
 
 	public PatientMaster getMasterRecord() {
-		return patientMaster;
+		return masterRecord;
 	}
 
 	public void setMasterRecord(PatientMaster patient) {
-		this.patientMaster = patient;
+		this.masterRecord = patient;
 	}
 
 }

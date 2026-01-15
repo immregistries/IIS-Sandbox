@@ -10,7 +10,7 @@ public abstract class IisMappedToFhirResource extends IisMappedToFhir {
 	public DiffResult diff(IisMappedToFhirResource obj) {
 		// No need for null check, as NullPointerException correct if obj is null
 		return ReflectionDiffBuilder.builder()
-			.setExcludeFieldNames("patientReported", "enteredBy")
+			.setExcludeFieldNames("patientReported", "enteredBy", "masterRecord", "patientReported")
 			.setDiffBuilder(DiffBuilder.builder()
 				.setLeft(this)
 				.setRight(obj)

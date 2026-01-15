@@ -15,7 +15,7 @@ import org.immregistries.iis.kernal.model.*;
  * @param <Organization>
  * @param <RelatedPerson>
  */
-public interface IFhirRequester<Patient extends IAnyResource, Immunization extends IAnyResource, Location extends IAnyResource, Practitioner extends IAnyResource, Observation extends IAnyResource, Person extends IAnyResource, Organization extends IAnyResource, RelatedPerson extends IAnyResource> {
+public interface IFhirSaveRequester<Patient extends IAnyResource, Immunization extends IAnyResource, Location extends IAnyResource, Practitioner extends IAnyResource, Observation extends IAnyResource, Person extends IAnyResource, Organization extends IAnyResource, RelatedPerson extends IAnyResource> {
 
 
 	PatientReported savePatientReported(PatientReported patientReported);
