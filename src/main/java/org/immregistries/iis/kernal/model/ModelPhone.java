@@ -2,7 +2,7 @@ package org.immregistries.iis.kernal.model;
 
 import java.util.Objects;
 
-public class ModelPhone extends IisDiffableObject<ModelPhone> {
+public class ModelPhone extends IisMappedToFhir {
 	private String number = "";
 	private String use = "";
 

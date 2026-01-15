@@ -12,7 +12,6 @@ import org.immregistries.iis.kernal.logic.ack.IisHL7Util;
 import org.immregistries.iis.kernal.logic.ack.IisReportable;
 import org.immregistries.iis.kernal.logic.ack.IisReportableSeverity;
 import org.immregistries.iis.kernal.logic.ack.ReportableUtil;
-import org.immregistries.iis.kernal.mapping.internalClient.FhirSaveRequester;
 import org.immregistries.iis.kernal.mapping.internalClient.FhirSearchRequester;
 import org.immregistries.iis.kernal.model.*;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
@@ -254,7 +253,7 @@ public class IncomingQueryHandler {
 				int count = 0;
 				for (PatientReported pr : patientReportedPossibleList) {
 					count++;
-					PatientMaster patient = pr.getPatientMaster();
+					PatientMaster patient = pr.getMasterRecord();
 					hl7MessageWriter.printQueryPID(pr, processingFlavorSet, sb, patient, sdf, count);
 				}
 			} else if (profileId.equals(RSP_Z32_MATCH) || profileId.equals(RSP_Z42_MATCH_WITH_FORECAST)) {

@@ -6,8 +6,8 @@ import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodeStatusValue;
 import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.SoftwareVersion;
-import org.immregistries.iis.kernal.mapping.resourceMappers.ObservationMapper;
 import org.immregistries.iis.kernal.mapping.internalClient.IisFhirClientFactory;
+import org.immregistries.iis.kernal.mapping.resourceMappers.ObservationMapper;
 import org.immregistries.iis.kernal.model.*;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.immregistries.smm.tester.manager.HL7Reader;
@@ -541,7 +541,7 @@ public abstract class AbstractHl7MessageWriter implements IExampleMessageWriter 
 		CodeMap codeMap = codeMapManagerService.getCodeMap();
 		Set<ProcessingFlavor> processingFlavorSet = tenant.getProcessingFlavorSet();
 		PatientReported patientReported = vaccinationReported.getPatientReported();
-		PatientMaster patientMaster = patientReported.getPatientMaster();
+		PatientMaster patientMaster = patientReported.getMasterRecord();
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
 		HL7Reader reader = new HL7Reader(
 				"MSH|^~\\&|||AIRA|IIS Sandbox|20120701082240-0500||VXU^V04^VXU_V04|NIST-IZ-001.00|P|2.5.1|||ER|AL|||||Z22^CDCPHINVS\r");
@@ -552,7 +552,7 @@ public abstract class AbstractHl7MessageWriter implements IExampleMessageWriter 
 		int obxSetId = 0;
 		int obsSubId = 0;
 		{
-			VaccinationMaster vaccination = vaccinationReported.getVaccinationMaster();
+			VaccinationMaster vaccination = vaccinationReported.getMasterRecord();
 			Code cvxCode = codeMap.getCodeForCodeset(CodesetType.VACCINATION_CVX_CODE,
 					vaccination.getVaccineCvxCode());
 			if (cvxCode != null) {

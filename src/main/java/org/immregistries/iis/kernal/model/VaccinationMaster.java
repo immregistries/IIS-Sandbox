@@ -14,7 +14,7 @@ import java.util.Objects;
  * should only be used when dealing with Golden Record except for display,
  * When dealing with a report use VaccinationReported
  */
-public class VaccinationMaster extends IisMappedObject implements Serializable {
+public class VaccinationMaster extends IisMappedToFhirResource implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 

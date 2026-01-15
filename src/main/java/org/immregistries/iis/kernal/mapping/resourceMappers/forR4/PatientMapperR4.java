@@ -7,12 +7,12 @@ import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
 import org.immregistries.iis.kernal.logic.CodeMapManagerService;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
+import org.immregistries.iis.kernal.mapping.fieldsMappers.BusinessIdentifierMapper;
 import org.immregistries.iis.kernal.mapping.fieldsMappers.ModelAddressMapper;
 import org.immregistries.iis.kernal.mapping.fieldsMappers.ModelNameMapper;
 import org.immregistries.iis.kernal.mapping.fieldsMappers.ModelPhoneMapper;
-import org.immregistries.iis.kernal.mapping.fieldsMappers.BusinessIdentifierMapper;
-import org.immregistries.iis.kernal.mapping.resourceMappers.PatientMapper;
 import org.immregistries.iis.kernal.mapping.internalClient.FhirReadRequester;
+import org.immregistries.iis.kernal.mapping.resourceMappers.PatientMapper;
 import org.immregistries.iis.kernal.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,9 +26,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static org.immregistries.iis.kernal.mapping.resourceMappers.ImmunizationMapper.RECORDED;
 import static org.immregistries.iis.kernal.mapping.internalClient.FhirSaveRequester.GOLDEN_RECORD;
 import static org.immregistries.iis.kernal.mapping.internalClient.FhirSaveRequester.GOLDEN_SYSTEM_TAG;
+import static org.immregistries.iis.kernal.mapping.resourceMappers.ImmunizationMapper.RECORDED;
 
 @Service
 @Conditional(OnR4Condition.class)
@@ -51,7 +51,7 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 	public PatientReported localObjectReportedWithMaster(Patient p) {
 		PatientReported patientReported = localObjectReported(p);
 		if (!p.getId().isBlank() && p.getMeta().getTag(GOLDEN_SYSTEM_TAG, GOLDEN_RECORD) == null) {
-			patientReported.setPatientMaster(fhirReadRequester.readPatientMasterWithMdmLink(p.getId()));
+			patientReported.setMasterRecord(fhirReadRequester.readPatientMasterWithMdmLink(p.getId()));
 		}
 		return patientReported;
 	}

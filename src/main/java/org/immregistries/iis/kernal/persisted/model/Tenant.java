@@ -2,7 +2,7 @@ package org.immregistries.iis.kernal.persisted.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import org.immregistries.iis.kernal.model.IisMappedObject;
+import org.immregistries.iis.kernal.model.IisMappedToFhirResource;
 import org.immregistries.iis.kernal.model.ProcessingFlavor;
 
 import java.io.Serializable;
@@ -10,7 +10,7 @@ import java.util.Set;
 
 @Entity
 @Table
-public class Tenant extends IisMappedObject implements Serializable {
+public class Tenant extends IisMappedToFhirResource implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)

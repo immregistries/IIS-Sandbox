@@ -8,17 +8,17 @@ import java.io.Serializable;
  * Record,
  * Used when dealing with a report
  */
-public class PatientReported extends PatientMaster implements Serializable {
+public class PatientReported extends PatientMaster implements Serializable, IReportedObject<PatientMaster> {
 	/**
 	 * Master Patient reference or Golden Record
 	 */
 	private PatientMaster patientMaster;
 
-	public PatientMaster getPatientMaster() {
+	public PatientMaster getMasterRecord() {
 		return patientMaster;
 	}
 
-	public void setPatientMaster(PatientMaster patient) {
+	public void setMasterRecord(PatientMaster patient) {
 		this.patientMaster = patient;
 	}
 

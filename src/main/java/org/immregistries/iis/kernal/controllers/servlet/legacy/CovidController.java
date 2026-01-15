@@ -12,18 +12,18 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.r5.model.Immunization;
 import org.hl7.fhir.r5.model.Patient;
+import org.immregistries.iis.kernal.controllers.servlet.util.UiUtil;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR5Condition;
-import org.immregistries.iis.kernal.security.CurrentTenantUtil;
-import org.immregistries.iis.kernal.mapping.resourceMappers.forR5.LocationMapperR5;
 import org.immregistries.iis.kernal.mapping.internalClient.FhirReadRequester;
 import org.immregistries.iis.kernal.mapping.internalClient.FhirSearchRequester;
 import org.immregistries.iis.kernal.mapping.internalClient.IisFhirClientFactory;
+import org.immregistries.iis.kernal.mapping.resourceMappers.forR5.LocationMapperR5;
 import org.immregistries.iis.kernal.model.OrgLocation;
 import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.model.PatientReported;
 import org.immregistries.iis.kernal.model.VaccinationReported;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
-import org.immregistries.iis.kernal.controllers.servlet.util.UiUtil;
+import org.immregistries.iis.kernal.security.CurrentTenantUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -293,10 +293,10 @@ public class CovidController {
 			boolean includePhi, int doseNumber) {
 
 		PatientReported patientReported = vaccinationReported.getPatientReported();
-		PatientMaster patient = patientReported.getPatientMaster();
+		PatientMaster patient = patientReported.getMasterRecord();
 
 		// 1: Vaccination event ID
-		printField(vaccinationReported.getVaccinationMaster().getVaccinationId(), out);
+		printField(vaccinationReported.getMasterRecord().getVaccinationId(), out);
 
 		// 2: Extract type
 		if (includePhi) {

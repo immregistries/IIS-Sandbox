@@ -4,7 +4,7 @@ import org.immregistries.iis.kernal.persisted.model.Tenant;
 
 import java.io.Serializable;
 
-public class OrgLocation extends IisMappedObject implements Serializable, ITenantTiedObject {
+public class OrgLocation extends IisMappedToFhirResource implements Serializable, ITenantTiedObject {
 	
   private static final long serialVersionUID = 1L;
   

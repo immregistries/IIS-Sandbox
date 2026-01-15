@@ -5,9 +5,9 @@ import org.apache.commons.lang3.builder.DiffResult;
 import org.apache.commons.lang3.builder.ReflectionDiffBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
-public abstract class IisMappedObject extends IisDiffableObject<IisMappedObject> {
+public abstract class IisMappedToFhirResource extends IisMappedToFhir {
 
-	public DiffResult diff(IisMappedObject obj) {
+	public DiffResult diff(IisMappedToFhirResource obj) {
 		// No need for null check, as NullPointerException correct if obj is null
 		return ReflectionDiffBuilder.builder()
 			.setExcludeFieldNames("patientReported", "enteredBy")

@@ -10,9 +10,9 @@ import org.immregistries.iis.kernal.fhir.common.annotations.OnR5Condition;
 import org.immregistries.iis.kernal.logic.CodeMapManagerService;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
 import org.immregistries.iis.kernal.mapping.fieldsMappers.BusinessIdentifierMapper;
-import org.immregistries.iis.kernal.mapping.resourceMappers.ImmunizationMapper;
 import org.immregistries.iis.kernal.mapping.internalClient.FhirReadRequester;
 import org.immregistries.iis.kernal.mapping.internalClient.FhirSearchRequester;
+import org.immregistries.iis.kernal.mapping.resourceMappers.ImmunizationMapper;
 import org.immregistries.iis.kernal.model.BusinessIdentifier;
 import org.immregistries.iis.kernal.model.ModelPerson;
 import org.immregistries.iis.kernal.model.VaccinationMaster;
@@ -46,7 +46,7 @@ public class ImmunizationMapperR5 implements ImmunizationMapper<Immunization> {
 				new SearchParameterMap(Immunization.SP_IDENTIFIER,
 						new TokenParam().setValue(vaccinationReported.getFillerBusinessIdentifier().getValue())));
 		if (vaccinationMaster != null) {
-			vaccinationReported.setVaccinationMaster(vaccinationMaster);
+			vaccinationReported.setMasterRecord(vaccinationMaster);
 		}
 		return vaccinationReported;
 	}

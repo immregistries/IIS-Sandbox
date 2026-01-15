@@ -2,9 +2,9 @@ package org.immregistries.iis.kernal.mapping.fieldsMappers;
 
 
 import org.hl7.fhir.instance.model.api.IBaseDatatype;
-import org.immregistries.iis.kernal.model.IisDiffableObject;
+import org.immregistries.iis.kernal.model.IisMappedToFhir;
 
-public interface IFieldMapper<LocalType extends IisDiffableObject<LocalType>, R4 extends IBaseDatatype, R5 extends IBaseDatatype> {
+public interface IFieldMapper<LocalType extends IisMappedToFhir, R4 extends IBaseDatatype, R5 extends IBaseDatatype> {
 
 	Class<LocalType> localType();
 

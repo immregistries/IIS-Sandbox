@@ -43,8 +43,8 @@ public class FhirSearchRequester {
 	@Autowired
 	FhirReadRequester fhirReadRequester;
 
-	public IisMappedObject searchMappedObjectMaster(String resourceType, SearchParameterMap searchParameterMap) {
-		IisMappedObject mappedObject = null;
+	public IisMappedToFhirResource searchMappedObjectMaster(String resourceType, SearchParameterMap searchParameterMap) {
+		IisMappedToFhirResource mappedObject = null;
 		IBundleProvider bundleProvider = searchGoldenRecord(resourceType, searchParameterMap);
 		if (!bundleProvider.isEmpty()) {
 			mappedObject = allMappingService.localObject(bundleProvider.getResources(0, 1).get(0));
@@ -52,9 +52,9 @@ public class FhirSearchRequester {
 		return mappedObject;
 	}
 
-	public IisMappedObject searchMappedObjectReportedWithMaster(String resourceType,
-																					SearchParameterMap searchParameterMap) {
-		IisMappedObject mappedObject = null;
+	public IisMappedToFhirResource searchMappedObjectReportedWithMaster(String resourceType,
+																							  SearchParameterMap searchParameterMap) {
+		IisMappedToFhirResource mappedObject = null;
 		IBundleProvider bundleProvider = searchRegularRecord(resourceType, searchParameterMap);
 		if (!bundleProvider.isEmpty()) {
 			mappedObject = allMappingService.localObjectReportedWithMaster(bundleProvider.getResources(0, 1).get(0));
@@ -62,8 +62,8 @@ public class FhirSearchRequester {
 		return mappedObject;
 	}
 
-	public List<IisMappedObject> searchMappedObjectReportedList(String resourceType,
-																					SearchParameterMap searchParameterMap) {
+	public List<IisMappedToFhirResource> searchMappedObjectReportedList(String resourceType,
+																							  SearchParameterMap searchParameterMap) {
 		IBundleProvider bundleProvider = searchRegularRecord(resourceType, searchParameterMap);
 		return bundleProvider.getAllResources().stream().map(allMappingService::localObjectReportedWithMaster)
 			.collect(Collectors.toList());

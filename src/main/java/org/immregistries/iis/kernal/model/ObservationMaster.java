@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class ObservationMaster extends IisMappedObject implements Serializable {
+public class ObservationMaster extends IisMappedToFhirResource implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	private String observationId = "";

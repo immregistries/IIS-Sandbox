@@ -2,7 +2,7 @@ package org.immregistries.iis.kernal.model;
 
 import java.util.Objects;
 
-public class ModelAddress extends IisDiffableObject<ModelAddress> {
+public class ModelAddress extends IisMappedToFhir {
 	private String addressLine1 = "";
 	private String addressLine2 = "";
 	private String addressCity = "";

@@ -6,12 +6,15 @@ import org.immregistries.iis.kernal.mapping.fieldsMappers.IFieldMapper;
 import org.immregistries.iis.kernal.mapping.resourceMappers.IisResourceMasterMapper;
 import org.immregistries.iis.kernal.mapping.resourceMappers.IisResourceMasterReportedMapper;
 import org.immregistries.iis.kernal.model.IisDiffableObject;
-import org.immregistries.iis.kernal.model.IisMappedObject;
+import org.immregistries.iis.kernal.model.IisMappedToFhirResource;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 @Service
 public class AllMappingService {
@@ -27,14 +30,21 @@ public class AllMappingService {
 	private List<IFieldMapper> fieldMappers;
 
     @SuppressWarnings("unchecked")
-	 public IBaseResource fhirResource(IisMappedObject internal) {
+	 public IBaseResource fhirResource(IisMappedToFhirResource internal) {
         @SuppressWarnings("rawtypes")
         IisResourceMasterMapper mapper = selectMapper(internal);
         return mapper.fhirResource(internal);
     }
 
+//    @SuppressWarnings("unchecked")
+//	 public IBaseResource fhir(IisDiffableObject internal) {
+//        @SuppressWarnings("rawtypes")
+//        IisResourceMasterMapper mapper = selectMapper();
+//        return mapper.fhirResource(internal);
+//    }
+
     @SuppressWarnings("unchecked")
-	 public IisMappedObject localObject(IBaseResource resource) {
+	 public IisMappedToFhirResource localObject(IBaseResource resource) {
 		 @SuppressWarnings("rawtypes")
 		 IisResourceMasterMapper mapper = selectMapper(resource);
 		 return mapper.localObject(resource);
@@ -48,51 +58,75 @@ public class AllMappingService {
     }
 
     @SuppressWarnings("unchecked")
-	 public IisMappedObject localObjectReportedWithMaster(IBaseResource resource) {
+	 public IisMappedToFhirResource localObjectReportedWithMaster(IBaseResource resource) {
         @SuppressWarnings("rawtypes")
         IisResourceMasterReportedMapper mapper = selectMapperReported(resource);
         return mapper.localObjectReportedWithMaster(resource);
     }
 
     @SuppressWarnings("unchecked")
-	 public IisMappedObject localObjectReported(IBaseResource resource) {
+	 public IisMappedToFhirResource localObjectReported(IBaseResource resource) {
         @SuppressWarnings("rawtypes")
         IisResourceMasterReportedMapper mapper = selectMapperReported(resource);
         return mapper.localObjectReported(resource);
     }
 
     @SuppressWarnings("rawtypes")
-	 public IisResourceMasterMapper selectMapper(IisMappedObject internal) {
+	 public IisResourceMasterMapper selectMapper(IisMappedToFhirResource internal) {
 		 Class inteClass = internal.getClass();
-		 Optional<IisResourceMasterReportedMapper> reportedMapper = mapperMastersReported.stream().filter(mapper -> mapper.localReportedType().equals(inteClass)).findFirst();
+		 Optional<IisResourceMasterReportedMapper> reportedMapper = masterReportedMappersFiltered(inteClass).findFirst();
 		 if (reportedMapper.isPresent()) {
 			 return reportedMapper.get();
         }
-		 Optional<IisResourceMasterMapper> masterMapper = mapperMasters.stream().filter(mapper -> mapper.localMasterType().equals(inteClass)).findFirst();
-		 return masterMapper.orElseThrow(() -> new RuntimeException("Mapper not found for " + inteClass.getName()));
+		 Optional<IisResourceMasterMapper> masterMapper = masterMappersFiltered(inteClass).findFirst();
+		 return masterMapper.orElseThrow(mapperNotFoundExceptionSupplier(inteClass.getName()));
     }
 
-    @SuppressWarnings("rawtypes")
+	@SuppressWarnings("rawtypes")
     public IisResourceMasterMapper selectMapper(IBaseResource resource) {
         String fhirType = resource.fhirType();
-        return mapperMasters.stream().filter(mapper -> mapper.fhirType().equals(fhirType))
+		return masterMappersFiltered(fhirType)
                 .findFirst()
-                .orElseThrow(() -> new RuntimeException("Mapper not found for " + fhirType));
+			.orElseThrow(mapperNotFoundExceptionSupplier(fhirType));
     }
 
 	@SuppressWarnings("rawtypes")
 	public IFieldMapper selectMapper(IBaseDatatype datatype) {
 		String fhirType = datatype.fhirType();
-		return fieldMappers.stream().filter(mapper -> mapper.r4Type().equals(fhirType) || mapper.r5Type().equals(fhirType))
+		return fieldMappersFiltered(fhirType)
 			.findFirst()
-			.orElseThrow(() -> new RuntimeException("Mapper not found for " + fhirType));
+			.orElseThrow(mapperNotFoundExceptionSupplier(fhirType));
 	}
 
-    @SuppressWarnings("rawtypes")
+	@SuppressWarnings("rawtypes")
     public IisResourceMasterReportedMapper selectMapperReported(IBaseResource resource) {
         String fhirType = resource.fhirType();
-        return mapperMastersReported.stream().filter(mapper -> mapper.fhirType().equals(fhirType))
+		return masterReportedMappersFiltered(fhirType)
                 .findFirst()
-                .orElseThrow(() -> new RuntimeException("Mapper not found for " + fhirType));
-    }
+			.orElseThrow(mapperNotFoundExceptionSupplier(fhirType));
+	}
+
+	private @NotNull Supplier<RuntimeException> mapperNotFoundExceptionSupplier(String fhirType) {
+		return () -> new RuntimeException("Mapper not found for " + fhirType);
+	}
+
+	private @NotNull Stream<IFieldMapper> fieldMappersFiltered(String fhirType) {
+		return fieldMappers.stream().filter(mapper -> mapper.r4Type().equals(fhirType) || mapper.r5Type().equals(fhirType));
+	}
+
+	private @NotNull Stream<IisResourceMasterReportedMapper> masterReportedMappersFiltered(String fhirType) {
+		return mapperMastersReported.stream().filter(mapper -> mapper.fhirType().equals(fhirType));
+	}
+
+	private @NotNull Stream<IisResourceMasterMapper> masterMappersFiltered(String fhirType) {
+		return mapperMasters.stream().filter(mapper -> mapper.fhirType().equals(fhirType));
+	}
+
+	private @NotNull Stream<IisResourceMasterReportedMapper> masterReportedMappersFiltered(Class inteClass) {
+		return mapperMastersReported.stream().filter(mapper -> mapper.localReportedType().equals(inteClass));
+	}
+
+	private @NotNull Stream<IisResourceMasterMapper> masterMappersFiltered(Class inteClass) {
+		return mapperMasters.stream().filter(mapper -> mapper.localMasterType().equals(inteClass));
+	}
 }
