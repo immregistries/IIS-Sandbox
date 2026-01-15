@@ -709,12 +709,10 @@ public class IncomingQueryHandler {
 				forecastActualList = connector.queryForForecast(testCase, softwareResult);
 //				logger.info("swr {}", softwareResult.getLogText());
 			} catch (IOException ioe) {
-				System.err.println("Unable to query for forecast");
-				ioe.printStackTrace();
+				logger.error("Unable to query for forecast", ioe);
 			}
 		} catch (Exception e) {
-			System.err.println("Unable to query for forecast");
-			e.printStackTrace(System.err);
+			logger.error("Unable to query for forecast", e);
 		}
 		return forecastActualList;
 	}
