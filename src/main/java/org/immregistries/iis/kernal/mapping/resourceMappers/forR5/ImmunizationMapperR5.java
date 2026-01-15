@@ -262,7 +262,7 @@ public class ImmunizationMapperR5 implements ImmunizationMapper<Immunization> {
 		}
 	}
 
-	public Immunization fhirResource(VaccinationMaster vr) {
+	public Immunization fhirResource(IisVaccination vr) {
 		Immunization i = new Immunization();
 		/*
 		 * Id

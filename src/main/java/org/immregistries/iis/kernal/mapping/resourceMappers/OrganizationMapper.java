@@ -11,7 +11,7 @@ public interface OrganizationMapper<Organization extends IBaseResource>
 
 	public static final String ORGANIZATION = "Organization";
 
-	default Class<Tenant> localMasterType() {
+	default Class<Tenant> localType() {
 		return Tenant.class;
 	}
 

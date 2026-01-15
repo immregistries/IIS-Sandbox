@@ -10,14 +10,13 @@ import org.hl7.fhir.r4.model.ImmunizationRecommendation;
 import org.hl7.fhir.r4.model.Parameters;
 import org.hl7.fhir.r4.model.Patient;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
-
-import org.immregistries.iis.kernal.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.logic.ImmunizationRecommendationServiceR4;
 import org.immregistries.iis.kernal.logic.messageHandling.IncomingQueryHandler;
 import org.immregistries.iis.kernal.mapping.resourceMappers.forR4.ImmunizationMapperR4;
 import org.immregistries.iis.kernal.mapping.resourceMappers.forR4.PatientMapperR4;
+import org.immregistries.iis.kernal.model.IisVaccination;
 import org.immregistries.iis.kernal.model.PatientMaster;
-import org.immregistries.iis.kernal.model.VaccinationMaster;
+import org.immregistries.iis.kernal.security.CurrentTenantUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,7 +58,7 @@ public class RecommendationForecastProviderR4 implements IRecommendationForecast
 		List<Immunization> immunization
 	) {
 		Parameters out = new Parameters();
-		List<VaccinationMaster> vaccinationMasterList;
+		List<IisVaccination> vaccinationMasterList;
 		if (immunization != null) {
 			vaccinationMasterList = immunization.stream().map(immunization1 -> immunizationMapperR4.localObject(immunization1)).collect(Collectors.toList());
 		} else {

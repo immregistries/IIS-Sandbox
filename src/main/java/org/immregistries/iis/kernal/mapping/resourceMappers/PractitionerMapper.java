@@ -9,7 +9,7 @@ public interface PractitionerMapper<Practitioner extends IBaseResource>
 		return PRACTITIONER;
 	}
 
-	default Class<ModelPerson> localMasterType() {
+	default Class<ModelPerson> localType() {
 		return ModelPerson.class;
 	}
 

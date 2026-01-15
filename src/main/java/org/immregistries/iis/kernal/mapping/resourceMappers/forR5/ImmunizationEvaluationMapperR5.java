@@ -2,11 +2,10 @@ package org.immregistries.iis.kernal.mapping.resourceMappers.forR5;
 
 import org.hl7.fhir.r5.model.ImmunizationEvaluation;
 import org.hl7.fhir.r5.model.Reference;
-import org.immregistries.iis.kernal.mapping.fieldsMappers.BusinessIdentifierMapper;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR5Condition;
-import org.immregistries.iis.kernal.logic.CodeMapManagerService;
+import org.immregistries.iis.kernal.mapping.fieldsMappers.BusinessIdentifierMapper;
 import org.immregistries.iis.kernal.mapping.resourceMappers.IImmunizationEvaluationMapper;
-import org.immregistries.iis.kernal.model.VaccinationMaster;
+import org.immregistries.iis.kernal.model.IisVaccination;
 import org.immregistries.vfa.connect.model.EvaluationActual;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
@@ -27,7 +26,7 @@ public class ImmunizationEvaluationMapperR5 implements IImmunizationEvaluationMa
 	@Autowired
 	private BusinessIdentifierMapper businessIdentifierMapper;
 
-	public ImmunizationEvaluation toFhir(VaccinationMaster vaccinationMaster, Date date) {
+	public ImmunizationEvaluation toFhir(IisVaccination vaccinationMaster, Date date) {
 		ImmunizationEvaluation immunizationEvaluation = new ImmunizationEvaluation();
 		if (vaccinationMaster.getPatientReported() != null) {
 			immunizationEvaluation.setPatient(new Reference().setIdentifier(

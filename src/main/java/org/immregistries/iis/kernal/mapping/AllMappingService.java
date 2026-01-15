@@ -123,10 +123,10 @@ public class AllMappingService {
 	}
 
 	private @NotNull Stream<IisResourceMasterReportedMapper> masterReportedMappersFiltered(Class inteClass) {
-		return mapperMastersReported.stream().filter(mapper -> mapper.localReportedType().equals(inteClass));
+		return mapperMastersReported.stream().filter(mapper -> mapper.localReportedType().equals(inteClass) || mapper.localMasterType().equals(inteClass));
 	}
 
 	private @NotNull Stream<IisResourceMasterMapper> masterMappersFiltered(Class inteClass) {
-		return mapperMasters.stream().filter(mapper -> mapper.localMasterType().equals(inteClass));
+		return mapperMasters.stream().filter(mapper -> mapper.localType().equals(inteClass));
 	}
 }

@@ -10,7 +10,7 @@ public interface LocationMapper<Location extends IBaseResource> extends IisResou
 
 	public static final String LOCATION = "Location";
 
-	default Class<OrgLocation> localMasterType() {
+	default Class<OrgLocation> localType() {
 		return OrgLocation.class;
 	}
 

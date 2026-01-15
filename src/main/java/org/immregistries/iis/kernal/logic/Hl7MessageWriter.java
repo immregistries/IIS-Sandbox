@@ -1,7 +1,6 @@
 package org.immregistries.iis.kernal.logic;
 
 import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
-import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.param.ReferenceParam;
 import org.apache.commons.lang3.StringUtils;
 import org.immregistries.codebase.client.CodeMap;
@@ -37,6 +36,10 @@ public class Hl7MessageWriter implements IExampleMessageWriter {
 	ObservationMapper observationMapper;
 	@Autowired
 	private CodeMapManagerService codeMapManagerService;
+
+
+	@Autowired
+	FhirSearchRequester fhirSearchRequester;
 
 	Random random = new Random();
 
@@ -721,12 +724,9 @@ public class Hl7MessageWriter implements IExampleMessageWriter {
 		return sb.toString();
 	}
 
-	@Autowired
-	FhirSearchRequester fhirSearchRequester;
 
 	void printStoredObservations(StringBuilder sb, IisPatient iisPatient, IisVaccination iisVaccination,
 										  int obsSubId, int obxSetId) {
-		IGenericClient fhirClient = iisFhirClientFactory.getOrCreateFhirClientFromContext();
 		SearchParameterMap searchParameterMap = new SearchParameterMap();
 		searchParameterMap.add("part-of", new ReferenceParam("Patient", "", iisPatient.getPatientId()));
 		searchParameterMap.add("part-of", new ReferenceParam("Immunization", "", iisVaccination.getVaccinationId()));

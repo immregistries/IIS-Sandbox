@@ -43,7 +43,7 @@ public abstract class AbstractLogicInterceptor {
 		return iisReportable;
 	}
 
-	public boolean testMapping(IisResourceMasterReportedMapper<IisMappedToFhirResource, IisMappedToFhirResource, IBaseResource> mapper, IisMappedToFhirResource iisMappedToResourceObject) {
+	public boolean testMapping(IisResourceMasterReportedMapper<IisMappedToFhirResource, IisMappedToFhirResource, IisMappedToFhirResource, IBaseResource> mapper, IisMappedToFhirResource iisMappedToResourceObject) {
 		IBaseResource resource = mapper.fhirResource(iisMappedToResourceObject);
 		IisMappedToFhirResource iisMappedToResourceObject1 = mapper.localObjectReported(resource);
 		if (iisMappedToResourceObject1 == null) {
@@ -64,7 +64,7 @@ public abstract class AbstractLogicInterceptor {
 		return res;
 	}
 
-	public boolean testMappingFhir(IisResourceMasterReportedMapper<IisMappedToFhirResource, IisMappedToFhirResource, IBaseResource> mapper, IBaseResource resource, IParser parser) {
+	public boolean testMappingFhir(IisResourceMasterReportedMapper<IisMappedToFhirResource, IisMappedToFhirResource, IisMappedToFhirResource, IBaseResource> mapper, IBaseResource resource, IParser parser) {
 		IisMappedToFhirResource iisMappedToResourceObject1 = mapper.localObjectReported(resource);
 		IBaseResource resource1 = mapper.fhirResource(iisMappedToResourceObject1);
 		String s1 = parser.encodeResourceToString(resource);

@@ -8,13 +8,11 @@ import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR5Condition;
 import org.immregistries.iis.kernal.logic.messageHandling.IncomingQueryHandler;
 import org.immregistries.iis.kernal.mapping.fieldsMappers.BusinessIdentifierMapper;
+import org.immregistries.iis.kernal.mapping.internalClient.FhirSearchRequester;
 import org.immregistries.iis.kernal.mapping.resourceMappers.forR5.ImmunizationEvaluationMapperR5;
 import org.immregistries.iis.kernal.mapping.resourceMappers.forR5.ImmunizationRecommendationMapperR5;
 import org.immregistries.iis.kernal.mapping.resourceMappers.forR5.PatientMapperR5;
-import org.immregistries.iis.kernal.mapping.internalClient.FhirSaveRequester;
-import org.immregistries.iis.kernal.mapping.internalClient.FhirReadRequester;
-import org.immregistries.iis.kernal.mapping.internalClient.FhirSearchRequester;
-import org.immregistries.iis.kernal.model.PatientMaster;
+import org.immregistries.iis.kernal.model.IisPatient;
 import org.immregistries.iis.kernal.model.VaccinationMaster;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.immregistries.vfa.connect.model.ForecastActual;
@@ -67,10 +65,10 @@ public class ImmunizationRecommendationServiceR5
 	}
 
 	@Override
-	public ImmunizationRecommendation generate(Tenant tenant, Date date, PatientMaster patientMaster) {
+	public ImmunizationRecommendation generate(Tenant tenant, Date date, IisPatient iisPatient) {
 		ImmunizationRecommendation recommendation = this.generate(tenant, date);
 		recommendation.setPatient(new Reference()
-				.setIdentifier(businessIdentifierMapper.toR5(patientMaster.getMainBusinessIdentifier())));
+			.setIdentifier(businessIdentifierMapper.toR5(iisPatient.getMainBusinessIdentifier())));
 		return recommendation;
 	}
 
@@ -101,20 +99,20 @@ public class ImmunizationRecommendationServiceR5
 		return recommendation;
 	}
 
-	public ImmunizationRecommendation queryCds(Tenant tenant, Date date, PatientMaster patientMaster) {
+	public ImmunizationRecommendation queryCds(Tenant tenant, Date date, IisPatient iisPatient) {
 		List<VaccinationMaster> vaccinationMasterList = fhirSearchRequester.searchVaccinationMasterGoldenList(
 				new SearchParameterMap("patient",
-						new ReferenceParam("Patient/" + patientMaster.getPatientId()).setMdmExpand(true)));
-		return (ImmunizationRecommendation) queryCds(tenant, date, patientMaster, vaccinationMasterList)
+					new ReferenceParam("Patient/" + iisPatient.getPatientId()).setMdmExpand(true)));
+		return (ImmunizationRecommendation) queryCds(tenant, date, iisPatient, vaccinationMasterList)
 				.getParameter(RECOMMENDATION).getResource();
 	}
 
-	public Parameters queryCds(Tenant tenant, Date date, PatientMaster patientpatientMaster,
+	public Parameters queryCds(Tenant tenant, Date date, IisPatient iisPatient,
 			List<VaccinationMaster> vaccinationMasterList) {
-		List<ForecastActual> forecastActualList = incomingQueryHandler.doForecast(patientpatientMaster,
+		List<ForecastActual> forecastActualList = incomingQueryHandler.doForecast(iisPatient,
 				vaccinationMasterList, tenant, date);
 		ImmunizationRecommendation immunizationRecommendation = immunizationRecommendationMapperR5
-				.toFhir(forecastActualList, date, patientpatientMaster);
+			.toFhir(forecastActualList, date, iisPatient);
 		immunizationRecommendation.addIdentifier(new Identifier().setValue(UUID.randomUUID().toString().split("-")[0]));
 		immunizationRecommendation.setAuthority(new Reference()
 				.setIdentifier(new Identifier().setSystem("IIS-Sandbox/tenantAndLonestar")

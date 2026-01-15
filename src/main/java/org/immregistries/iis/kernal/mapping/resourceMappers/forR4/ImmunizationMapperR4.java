@@ -64,14 +64,14 @@ public class ImmunizationMapperR4 implements ImmunizationMapper<Immunization> {
 		return vaccinationReported;
 	}
 
-	public VaccinationMaster localObject(Immunization i) {
-		VaccinationMaster vaccinationMaster = new VaccinationMaster();
+	public IisVaccination localObject(Immunization i) {
+		IisVaccination iisVaccination = new IisVaccination();
 		// if (!AbstractFhirRequester.isGoldenRecord(i)) {
 		// logger.info("Mapping refused for golden as Immunization is reported");
 		// return null;
 		// }
-		fillFromFhirResource(vaccinationMaster, i);
-		return vaccinationMaster;
+		fillFromFhirResource(iisVaccination, i);
+		return iisVaccination;
 	}
 
 	public void fillFromFhirResource(IisVaccination vr, Immunization i) {
@@ -268,7 +268,7 @@ public class ImmunizationMapperR4 implements ImmunizationMapper<Immunization> {
 		}
 	}
 
-	public Immunization fhirResource(VaccinationMaster vr) {
+	public Immunization fhirResource(IisVaccination vr) {
 		Immunization i = new Immunization();
 		/*
 		 * Id

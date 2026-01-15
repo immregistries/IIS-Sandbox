@@ -56,4 +56,8 @@ public class FhirRequesterUtil {
 		return false;
 	}
 
+	public static boolean isNotGoldenRecord(IBaseResource iBaseResource) {
+		return !isGoldenRecord(iBaseResource);
+	}
+
 }

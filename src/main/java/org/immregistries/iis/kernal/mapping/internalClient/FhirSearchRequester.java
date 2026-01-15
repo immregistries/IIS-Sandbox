@@ -74,7 +74,7 @@ public class FhirSearchRequester {
 		IBundleProvider bundleProvider = searchGoldenRecord(ImmunizationMapper.IMMUNIZATION, searchParameterMap);
 		if (!bundleProvider.isEmpty()) {
 			for (IBaseResource resource : bundleProvider.getAllResources()) {
-				vaccinationMasterList.add((VaccinationMaster) allMappingService.localObject(resource));
+				vaccinationMasterList.add((VaccinationMaster) allMappingService.localObjectM(resource));
 			}
 		}
 		return vaccinationMasterList;

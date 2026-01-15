@@ -85,7 +85,7 @@ public class FhirSaveRequesterR5 extends
 	}
 
 	public ObservationReported saveObservationReported(ObservationReported observationReported) {
-		Observation observation = observationMapper.fhirResource(observationReported);
+		Observation observation = (Observation) observationMapper.fhirResource(observationReported);
 		MethodOutcome outcome = save(false, observation);
 		if (outcome.getCreated() != null && outcome.getCreated()) {
 			observationReported.setObservationId(outcome.getId().getIdPart());

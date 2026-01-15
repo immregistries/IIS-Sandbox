@@ -5,13 +5,17 @@ import org.immregistries.iis.kernal.model.ObservationMaster;
 import org.immregistries.iis.kernal.model.ObservationReported;
 
 public interface ObservationMapper<Observation extends IBaseResource>
-		extends IisResourceMasterReportedMapper<ObservationMaster, ObservationReported, Observation> {
+	extends IisResourceMasterReportedMapper<ObservationMaster, ObservationReported, ObservationMaster, Observation> {
 
 	default String fhirType() {
 		return "Observation";
 	}
 
 	public static final String OBSERVATION = "Observation";
+
+	default Class<ObservationMaster> localType() {
+		return ObservationMaster.class;
+	}
 
 	default Class<ObservationMaster> localMasterType() {
 		return ObservationMaster.class;

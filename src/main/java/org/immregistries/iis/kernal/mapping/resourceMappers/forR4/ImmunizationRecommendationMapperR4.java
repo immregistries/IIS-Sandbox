@@ -14,7 +14,7 @@ import org.immregistries.iis.kernal.logic.VaccinationRecommendationDateCode;
 import org.immregistries.iis.kernal.logic.VaccinePlanStatus;
 import org.immregistries.iis.kernal.mapping.fieldsMappers.BusinessIdentifierMapper;
 import org.immregistries.iis.kernal.mapping.resourceMappers.IRecommendationMapper;
-import org.immregistries.iis.kernal.model.PatientMaster;
+import org.immregistries.iis.kernal.model.IisPatient;
 import org.immregistries.vfa.connect.model.ForecastActual;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
@@ -34,10 +34,10 @@ public class ImmunizationRecommendationMapperR4 implements IRecommendationMapper
 	private BusinessIdentifierMapper businessIdentifierMapper;
 
 	public ImmunizationRecommendation toFhir(List<ForecastActual> forecastActualList, Date date,
-			PatientMaster patientMaster) {
+														  IisPatient iisPatient) {
 		ImmunizationRecommendation immunizationRecommendation = toFhir(forecastActualList, date);
 		immunizationRecommendation.setPatient(new Reference()
-				.setIdentifier(businessIdentifierMapper.toR4(patientMaster.getMainBusinessIdentifier())));
+			.setIdentifier(businessIdentifierMapper.toR4(iisPatient.getMainBusinessIdentifier())));
 		return immunizationRecommendation;
 	}
 

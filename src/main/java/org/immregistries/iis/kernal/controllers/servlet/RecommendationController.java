@@ -10,17 +10,17 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.instance.model.api.IBaseBundle;
 import org.hl7.fhir.instance.model.api.IDomainResource;
-import org.immregistries.iis.kernal.security.CurrentTenantUtil;
-import org.immregistries.iis.kernal.mapping.resourceMappers.PatientMapper;
-import org.immregistries.iis.kernal.mapping.internalClient.IisFhirClientFactory;
-import org.immregistries.iis.kernal.model.BusinessIdentifier;
-import org.immregistries.iis.kernal.model.PatientMaster;
-import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.immregistries.iis.kernal.controllers.rest.PatientRestController;
 import org.immregistries.iis.kernal.controllers.rest.RecommendationRestController;
 import org.immregistries.iis.kernal.controllers.servlet.util.PatientServletUtil;
 import org.immregistries.iis.kernal.controllers.servlet.util.UiUtil;
 import org.immregistries.iis.kernal.mapping.fieldsMappers.BusinessIdentifierMapper;
+import org.immregistries.iis.kernal.mapping.internalClient.IisFhirClientFactory;
+import org.immregistries.iis.kernal.mapping.resourceMappers.PatientMapper;
+import org.immregistries.iis.kernal.model.BusinessIdentifier;
+import org.immregistries.iis.kernal.model.IisPatient;
+import org.immregistries.iis.kernal.persisted.model.Tenant;
+import org.immregistries.iis.kernal.security.CurrentTenantUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -136,7 +136,7 @@ public class RecommendationController {
 			if (patientResource == null) {
 				out.println("No patient or recommendation found with request parameters.");
 			}
-			PatientMaster patientMaster = patientMapper.localObject(patientResource);
+			IisPatient patientMaster = patientMapper.localObject(patientResource);
 			BusinessIdentifier identifier = patientMaster.getMainBusinessIdentifier();
 			if (StringUtils.isBlank(identifier.getValue())) {
 				identifier = patientMaster.getFirstBusinessIdentifier();

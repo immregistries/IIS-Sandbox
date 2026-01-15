@@ -7,13 +7,13 @@ import ca.uhn.fhir.rest.client.api.IGenericClient;
 import jakarta.servlet.http.HttpServletRequest;
 import org.hl7.fhir.instance.model.api.IBaseBundle;
 import org.hl7.fhir.instance.model.api.IDomainResource;
+import org.immregistries.iis.kernal.controllers.servlet.util.PatientServletUtil;
 import org.immregistries.iis.kernal.logic.IImmunizationRecommendationService;
-import org.immregistries.iis.kernal.mapping.resourceMappers.PatientMapper;
 import org.immregistries.iis.kernal.mapping.internalClient.FhirSearchRequester;
 import org.immregistries.iis.kernal.mapping.internalClient.IisFhirClientFactory;
-import org.immregistries.iis.kernal.model.PatientMaster;
+import org.immregistries.iis.kernal.mapping.resourceMappers.PatientMapper;
+import org.immregistries.iis.kernal.model.IisPatient;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
-import org.immregistries.iis.kernal.controllers.servlet.util.PatientServletUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -44,7 +44,7 @@ public class RecommendationRestController {
 
         IGenericClient fhirClient = iisFhirClientFactory.getOrCreateGenericClient(req);
         IDomainResource patient = PatientServletUtil.fetchPatientFromParameter(req, fhirClient, fhirSearchRequester);
-        PatientMaster patientMaster = patientMapper.localObject(patient);
+		 IisPatient patientMaster = patientMapper.localObject(patient);
 
         if (patient != null) {
             IBaseBundle baseBundle = fhirClient.search().forResource("ImmunizationRecommendation")

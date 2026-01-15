@@ -5,14 +5,14 @@ import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.ImmunizationEvaluation;
 import org.hl7.fhir.r4.model.Reference;
-import org.immregistries.iis.kernal.mapping.fieldsMappers.BusinessIdentifierMapper;
 import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
 import org.immregistries.iis.kernal.logic.CodeMapManagerService;
+import org.immregistries.iis.kernal.mapping.fieldsMappers.BusinessIdentifierMapper;
 import org.immregistries.iis.kernal.mapping.resourceMappers.IImmunizationEvaluationMapper;
-import org.immregistries.iis.kernal.model.VaccinationMaster;
+import org.immregistries.iis.kernal.model.IisVaccination;
 import org.immregistries.vfa.connect.model.EvaluationActual;
 import org.immregistries.vfa.connect.model.TestEvent;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,19 +35,19 @@ public class ImmunizationEvaluationMapperR4 implements IImmunizationEvaluationMa
 	@Autowired
 	private BusinessIdentifierMapper businessIdentifierMapper;
 
-	public ImmunizationEvaluation toFhir(VaccinationMaster vaccinationMaster, Date date) {
+	public ImmunizationEvaluation toFhir(IisVaccination iisVaccination, Date date) {
 		CodeMap codeMap = codeMapManagerService.getCodeMap();
 		ImmunizationEvaluation immunizationEvaluation = new ImmunizationEvaluation();
-		if (vaccinationMaster.getPatientReported() != null) {
+		if (iisVaccination.getPatientReported() != null) {
 			immunizationEvaluation.setPatient(new Reference().setIdentifier(
-					businessIdentifierMapper.toR4(vaccinationMaster.getPatientReported().getMainBusinessIdentifier())));
+				businessIdentifierMapper.toR4(iisVaccination.getPatientReported().getMainBusinessIdentifier())));
 		}
 		immunizationEvaluation
-				.setImmunizationEvent(new Reference("Immunization/" + vaccinationMaster.getVaccinationId()));
+			.setImmunizationEvent(new Reference("Immunization/" + iisVaccination.getVaccinationId()));
 
-		if (vaccinationMaster.getTestEvent() != null
-				&& vaccinationMaster.getTestEvent().getEvaluationActualList() != null) {
-			TestEvent testEvent = vaccinationMaster.getTestEvent();
+		if (iisVaccination.getTestEvent() != null
+			&& iisVaccination.getTestEvent().getEvaluationActualList() != null) {
+			TestEvent testEvent = iisVaccination.getTestEvent();
 			immunizationEvaluation.setStatus(ImmunizationEvaluation.ImmunizationEvaluationStatus.COMPLETED);
 			for (EvaluationActual evaluationActual : testEvent.getEvaluationActualList()) {
 				immunizationEvaluation.setSeries(evaluationActual.getSeriesUsedCode());

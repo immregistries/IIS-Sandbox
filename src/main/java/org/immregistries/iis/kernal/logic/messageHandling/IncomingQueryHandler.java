@@ -658,7 +658,7 @@ public class IncomingQueryHandler {
 		sb.append("\r");
 	}
 
-	public List<ForecastActual> doForecast(IisPatient patient, List<VaccinationMaster> vaccinationMasterList, Tenant tenant, Date date) {
+	public List<ForecastActual> doForecast(IisPatient patient, List<? extends IisVaccination> vaccinationMasterList, Tenant tenant, Date date) {
 		CodeMap codeMap = codeMapManagerService.getCodeMap();
 		List<ForecastActual> forecastActualList = null;
 		Set<ProcessingFlavor> processingFlavorSet = tenant.getProcessingFlavorSet();
@@ -672,7 +672,7 @@ public class IncomingQueryHandler {
 				testCase.setPatientSex("F");
 			}
 			List<TestEvent> testEventList = new ArrayList<>();
-			for (VaccinationMaster vaccination : vaccinationMasterList) {
+			for (IisVaccination vaccination : vaccinationMasterList) {
 				Code cvxCode = codeMap.getCodeForCodeset(CodesetType.VACCINATION_CVX_CODE, vaccination.getVaccineCvxCode());
 				if (cvxCode == null) {
 					continue;

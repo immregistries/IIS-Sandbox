@@ -14,12 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Component;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-
-import static org.immregistries.iis.kernal.logic.IIncomingMessageHandler.MINIMAL_MATCHING_SCORE;
 
 /**
  * DO NOT EDIT THE CONTENT OF THIS FILE
@@ -92,7 +88,7 @@ public class FhirSaveRequesterR4 extends
 	}
 
 	public ObservationReported saveObservationReported(ObservationReported observationReported) {
-		Observation observation = observationMapper.fhirResource(observationReported);
+		Observation observation = (Observation) observationMapper.fhirResource(observationReported);
 		MethodOutcome outcome = save(false, observation);
 		if (outcome.getCreated() != null && outcome.getCreated()) {
 			observationReported.setObservationId(outcome.getId().getIdPart());

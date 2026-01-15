@@ -1,17 +1,21 @@
 package org.immregistries.iis.kernal.mapping.resourceMappers;
 
 import org.hl7.fhir.instance.model.api.IBaseResource;
+import org.immregistries.iis.kernal.model.IisVaccination;
 import org.immregistries.iis.kernal.model.VaccinationMaster;
 import org.immregistries.iis.kernal.model.VaccinationReported;
 
 public interface ImmunizationMapper<Immunization extends IBaseResource>
-		extends IisResourceMasterReportedMapper<VaccinationMaster, VaccinationReported, Immunization> {
+	extends IisResourceMasterReportedMapper<VaccinationMaster, VaccinationReported, IisVaccination, Immunization> {
 	default String fhirType() {
 		return IMMUNIZATION;
 	}
 
 	String IMMUNIZATION = "Immunization";
 
+	default Class<IisVaccination> localType() {
+		return IisVaccination.class;
+	}
 	default Class<VaccinationMaster> localMasterType() {
 		return VaccinationMaster.class;
 	}
@@ -46,7 +50,7 @@ public interface ImmunizationMapper<Immunization extends IBaseResource>
 
 	VaccinationReported localObjectReported(Immunization immunization);
 
-	VaccinationMaster localObject(Immunization immunization);
+	IisVaccination localObject(Immunization immunization);
 
 	/**
 	 * This method create the immunization resource based on the vaccinationReported
@@ -55,5 +59,5 @@ public interface ImmunizationMapper<Immunization extends IBaseResource>
 	 * @param vaccinationMaster the vaccination local object
 	 * @return the Immunization resource
 	 */
-	Immunization fhirResource(VaccinationMaster vaccinationMaster);
+	Immunization fhirResource(IisVaccination vaccinationMaster);
 }

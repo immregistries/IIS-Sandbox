@@ -2,7 +2,7 @@ package org.immregistries.iis.kernal.logic;
 
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.instance.model.api.IDomainResource;
-import org.immregistries.iis.kernal.model.PatientMaster;
+import org.immregistries.iis.kernal.model.IisPatient;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
 
 import java.util.Date;
@@ -35,10 +35,10 @@ public interface IImmunizationRecommendationService<ImmunizationRecommendation e
 	 * @param patientMaster patient
 	 * @return ImmunizationRecommendation resource
 	 */
-	ImmunizationRecommendation generate(Tenant tenant, Date date, PatientMaster patientMaster);
+	ImmunizationRecommendation generate(Tenant tenant, Date date, IisPatient patientMaster);
 
 	ImmunizationRecommendation addRandomGeneratedRecommendation(ImmunizationRecommendation recommendation);
 
-	ImmunizationRecommendation queryCds(Tenant tenant, Date date, PatientMaster patientMaster);
+	ImmunizationRecommendation queryCds(Tenant tenant, Date date, IisPatient patientMaster);
 
 }

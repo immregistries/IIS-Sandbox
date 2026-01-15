@@ -48,20 +48,26 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 	@Autowired
 	private BusinessIdentifierMapper businessIdentifierMapper;
 
-	public PatientReported localObjectReportedWithMaster(Patient p) {
-		PatientReported patientReported = localObjectReported(p);
-		if (!p.getId().isBlank() && p.getMeta().getTag(GOLDEN_SYSTEM_TAG, GOLDEN_RECORD) == null) {
-			patientReported.setMasterRecord(fhirReadRequester.readPatientMasterWithMdmLink(p.getId()));
+	public PatientReported localObjectReportedWithMaster(Patient patient) {
+		PatientReported patientReported = localObjectReported(patient);
+		if (!patient.getId().isBlank() && patient.getMeta().getTag(GOLDEN_SYSTEM_TAG, GOLDEN_RECORD) == null) {
+			patientReported.setMasterRecord(fhirReadRequester.readPatientMasterWithMdmLink(patient.getId()));
 		}
 		return patientReported;
 	}
 
-	public PatientMaster localObject(Patient patient) {
+	public IisPatient localObject(Patient patient) {
+		IisPatient iisPatient = new IisPatient();
+		fillFromFhirResource(iisPatient, patient);
+		return iisPatient;
+	}
+
+	public PatientMaster localObjectMaster(Patient patient) {
 		PatientMaster patientMaster = new PatientMaster();
-		// if (AbstractFhirRequester.isGoldenRecord(patient)) {
-		// logger.info("Mapping refused for report as patient is golden");
-		// return null;
-		// }
+		if (FhirReadRequester.isGoldenRecord(patient)) {
+			logger.info("Mapping refused for report as patient is golden");
+			return null;
+		}
 		fillFromFhirResource(patientMaster, patient);
 		return patientMaster;
 	}
@@ -295,7 +301,7 @@ public class PatientMapperR4 implements PatientMapper<Patient> {
 		}
 	}
 
-	public Patient fhirResource(PatientMaster pm) {
+	public Patient fhirResource(IisPatient pm) {
 		Patient p = new Patient();
 		p.setId(pm.getPatientId());
 		/*

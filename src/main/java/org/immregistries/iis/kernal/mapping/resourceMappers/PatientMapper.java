@@ -1,6 +1,8 @@
 package org.immregistries.iis.kernal.mapping.resourceMappers;
 
-import org.hl7.fhir.instance.model.api.IBaseResource;
+import org.hl7.fhir.instance.model.api.IDomainResource;
+import org.immregistries.iis.kernal.mapping.internalClient.FhirRequesterUtil;
+import org.immregistries.iis.kernal.model.IisPatient;
 import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.model.PatientReported;
 
@@ -9,14 +11,18 @@ import org.immregistries.iis.kernal.model.PatientReported;
  *
  * @param <Patient> FHIR Resource type
  */
-public interface PatientMapper<Patient extends IBaseResource>
-		extends IisResourceMasterReportedMapper<PatientMaster, PatientReported, Patient> {
+public interface PatientMapper<Patient extends IDomainResource>
+	extends IisResourceMasterReportedMapper<PatientMaster, PatientReported, IisPatient, Patient> {
 
 	default String fhirType() {
 		return PATIENT;
 	}
 
 	public static final String PATIENT = "Patient";
+
+	default Class<IisPatient> localType() {
+		return IisPatient.class;
+	}
 
 	default Class<PatientMaster> localMasterType() {
 		return PatientMaster.class;
@@ -66,6 +72,9 @@ public interface PatientMapper<Patient extends IBaseResource>
 
 	String RELATIONSHIP_SYSTEM = "";
 
+//	@Autowired
+//	FhirReadRequester fhirReadRequester;
+
 	/**
 	 * Translates from FHIR to reconstruct reported patient, fetching master patient
 	 * for referencing
@@ -73,28 +82,66 @@ public interface PatientMapper<Patient extends IBaseResource>
 	 * @param patient FHIR patient resource
 	 * @return Mapped internal model Patient as reported patient, with
 	 */
-	PatientReported localObjectReportedWithMaster(Patient patient);
+//	default PatientReported localObjectReportedWithMaster(Patient patient) {
+//		PatientReported patientReported = localObjectReported(patient);
+//		if (!patient.getId().isBlank() && patient.getMeta().getTag(GOLDEN_SYSTEM_TAG, GOLDEN_RECORD) == null) {
+//			patientReported.setMasterRecord(fhirReadRequester.readPatientMasterWithMdmLink(patient.getId()));
+//		}
+//		return patientReported;
+//	}
 
-	/**
-	 * Translates from FHIR to reconstruct reported patient object
-	 * 
-	 * @param patient FHIR patient Resource
-	 * @return Mapped internal model Patient as reported patient
-	 */
-	PatientReported localObjectReported(Patient patient);
+	PatientReported localObjectReportedWithMaster(Patient patient);
 
 	/**
 	 *
 	 * @param patient FHIR patient Resource
 	 * @return Mapped internal model patient as master patient
 	 */
-	PatientMaster localObject(Patient patient);
+	default IisPatient localObject(Patient patient) {
+		IisPatient iisPatient = new IisPatient();
+		fillFromFhirResource(iisPatient, patient);
+		return iisPatient;
+	}
+
+	/**
+	 * Translates from FHIR to reconstruct master patient object
+	 *
+	 * @param patient FHIR patient Resource
+	 * @return Mapped internal model Patient as Master patient
+	 */
+	default PatientMaster localObjectMaster(Patient patient) {
+		PatientMaster patientMaster = new PatientMaster();
+		if (FhirRequesterUtil.isGoldenRecord(patient)) {
+			return null;
+		}
+		fillFromFhirResource(patientMaster, patient);
+		return patientMaster;
+	}
+
+	/**
+	 * Translates from FHIR to reconstruct reported patient object
+	 *
+	 * @param patient FHIR patient Resource
+	 * @return Mapped internal model Patient as reported patient
+	 */
+	default PatientReported localObjectReported(Patient patient) {
+		PatientReported patientReported = new PatientReported();
+		if (FhirRequesterUtil.isNotGoldenRecord(patient)) {
+			return null;
+		}
+		fillFromFhirResource(patientReported, patient);
+		return patientReported;
+	}
 
 	/**
 	 * Converts local model patient information to FHIR Resource
-	 * 
-	 * @param patientMaster any local patient record
+	 *
+	 * @param iisPatient any local patient record
 	 * @return
 	 */
-	Patient fhirResource(PatientMaster patientMaster);
+	Patient fhirResource(IisPatient iisPatient);
+
+
+	void fillFromFhirResource(IisPatient localPatient, Patient patient);
+
 }
