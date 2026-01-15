@@ -1,11 +1,15 @@
 package org.immregistries.iis.kernal.logic;
 
+import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
+import ca.uhn.fhir.rest.client.api.IGenericClient;
+import ca.uhn.fhir.rest.param.ReferenceParam;
 import org.apache.commons.lang3.StringUtils;
 import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodeStatusValue;
 import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.SoftwareVersion;
+import org.immregistries.iis.kernal.mapping.internalClient.FhirSearchRequester;
 import org.immregistries.iis.kernal.mapping.internalClient.IisFhirClientFactory;
 import org.immregistries.iis.kernal.mapping.resourceMappers.ObservationMapper;
 import org.immregistries.iis.kernal.model.*;
@@ -14,14 +18,17 @@ import org.immregistries.smm.tester.manager.HL7Reader;
 import org.immregistries.vfa.connect.model.EvaluationActual;
 import org.immregistries.vfa.connect.model.TestEvent;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
+@Service
 @SuppressWarnings({ "rawtypes" })
-public abstract class AbstractHl7MessageWriter implements IExampleMessageWriter {
+public class Hl7MessageWriter implements IExampleMessageWriter {
 	private static Integer increment = 1;
 
 	@Autowired
@@ -714,7 +721,23 @@ public abstract class AbstractHl7MessageWriter implements IExampleMessageWriter 
 		return sb.toString();
 	}
 
-	abstract void printStoredObservations(StringBuilder sb, PatientMaster patientMaster, VaccinationMaster vaccination,
-			int obsSubId, int obxSetId);
+	@Autowired
+	FhirSearchRequester fhirSearchRequester;
+
+	void printStoredObservations(StringBuilder sb, IisPatient iisPatient, IisVaccination iisVaccination,
+										  int obsSubId, int obxSetId) {
+		IGenericClient fhirClient = iisFhirClientFactory.getOrCreateFhirClientFromContext();
+		SearchParameterMap searchParameterMap = new SearchParameterMap();
+		searchParameterMap.add("part-of", new ReferenceParam("Patient", "", iisPatient.getPatientId()));
+		searchParameterMap.add("part-of", new ReferenceParam("Immunization", "", iisVaccination.getVaccinationId()));
+		List<ObservationReported> observationReportedList = fhirSearchRequester.searchObservationReportedList(searchParameterMap);
+		if (!observationReportedList.isEmpty()) {
+			obsSubId++;
+			for (ObservationReported observationReported : observationReportedList) {
+				obxSetId++;
+				printObx(sb, obxSetId, obsSubId, observationReported);
+			}
+		}
+	}
 
 }

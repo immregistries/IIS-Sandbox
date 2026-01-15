@@ -39,7 +39,7 @@ public class IncomingQueryHandler {
 	@Autowired
 	FhirSearchRequester fhirSearchRequester;
 	@Autowired
-	AbstractHl7MessageWriter hl7MessageWriter;
+	Hl7MessageWriter hl7MessageWriter;
 	@Autowired
 	ValidationService validationService;
 	@Autowired
@@ -536,7 +536,7 @@ public class IncomingQueryHandler {
 		return messageResponse;
 	}
 
-	private void printRXR(VaccinationMaster vaccination, StringBuilder sb) {
+	private void printRXR(IisVaccination vaccination, StringBuilder sb) {
 		CodeMap codeMap = codeMapManagerService.getCodeMap();
 		sb.append("RXR");
 		// RXR-1
@@ -548,7 +548,7 @@ public class IncomingQueryHandler {
 		sb.append("\r");
 	}
 
-	private void printRXA(VaccinationMaster vaccination, StringBuilder sb, int obxSetId, Set<ProcessingFlavor> processingFlavorSet, Code cvxCode) {
+	private void printRXA(IisVaccination vaccination, StringBuilder sb, int obxSetId, Set<ProcessingFlavor> processingFlavorSet, Code cvxCode) {
 		SimpleDateFormat sdf = IIncomingMessageHandler.generateV2SDF();
 		CodeMap codeMap = codeMapManagerService.getCodeMap();
 

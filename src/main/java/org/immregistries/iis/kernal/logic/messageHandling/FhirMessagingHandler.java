@@ -6,7 +6,7 @@ import org.hl7.fhir.r4.model.*;
 import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
 import org.immregistries.iis.kernal.fhir.interceptors.PartitionTenantCreationInterceptor;
-import org.immregistries.iis.kernal.logic.AbstractHl7MessageWriter;
+import org.immregistries.iis.kernal.logic.Hl7MessageWriter;
 import org.immregistries.iis.kernal.logic.IIncomingMessageHandler;
 import org.immregistries.iis.kernal.logic.MessageRecordingService;
 import org.immregistries.iis.kernal.logic.ProcessingException;
@@ -42,7 +42,7 @@ public class FhirMessagingHandler extends IncomingMessageHandler<Bundle, Object>
 	@Autowired
 	private IisFhirClientFactory iisFhirClientFactory;
 	@Autowired
-	private AbstractHl7MessageWriter hl7MessageWriter;
+	private Hl7MessageWriter hl7MessageWriter;
 	@Autowired
 	private PartitionTenantCreationInterceptor partitionTenantCreationInterceptor;
 	@Autowired

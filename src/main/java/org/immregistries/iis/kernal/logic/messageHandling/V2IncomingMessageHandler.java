@@ -50,7 +50,7 @@ public abstract class V2IncomingMessageHandler extends IncomingMessageHandler<HL
 	@Autowired
 	FhirSearchRequester fhirSearchRequester;
 	@Autowired
-	AbstractHl7MessageWriter hl7MessageWriter;
+	Hl7MessageWriter hl7MessageWriter;
 	@Autowired
 	PatientProcessingInterceptor patientProcessingInterceptor; // TODO decide how/where to implement the execution of interceptors, currently using DAO so some interceptors are skipped by the v2 process and need to be manually triggered
 	@Autowired
