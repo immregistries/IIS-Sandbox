@@ -4,7 +4,7 @@ import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
 
 public abstract class OrganizationMapper<Organization extends IAnyResource>
-		implements IisResourceMasterMapper<Tenant, Organization> {
+		implements IisResourceMapper<Tenant, Organization> {
 	public String fhirResourceName() {
 		return ORGANIZATION;
 	}

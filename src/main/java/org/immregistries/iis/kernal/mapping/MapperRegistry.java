@@ -1,9 +1,10 @@
 package org.immregistries.iis.kernal.mapping;
 
+import ca.uhn.fhir.context.FhirContext;
 import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.hl7.fhir.instance.model.api.IBaseDatatype;
 import org.immregistries.iis.kernal.mapping.fieldsMappers.IFieldMapper;
-import org.immregistries.iis.kernal.mapping.resourceMappers.IisResourceMasterMapper;
+import org.immregistries.iis.kernal.mapping.resourceMappers.IisResourceMapper;
 import org.immregistries.iis.kernal.mapping.resourceMappers.IisResourceMasterReportedMapper;
 import org.immregistries.iis.kernal.model.IisMappedToFhir;
 import org.immregistries.iis.kernal.model.IisMappedToFhirResource;
@@ -19,30 +20,34 @@ import java.util.stream.Stream;
 @Service
 public class MapperRegistry {
 
+	@Autowired
+	private FhirContext fhirContext;
+
+
 	@SuppressWarnings("rawtypes")
 	@Autowired
 	private List<IisResourceMasterReportedMapper> mapperMastersReported;
 	@SuppressWarnings("rawtypes")
 	@Autowired
-	private List<IisResourceMasterMapper> mapperMasters;
+	private List<IisResourceMapper> mapperMasters;
 	@SuppressWarnings("rawtypes")
 	@Autowired
 	private List<IFieldMapper> fieldMappers;
 
 
 	@SuppressWarnings("rawtypes")
-	public IisResourceMasterMapper selectMapper(IisMappedToFhirResource internal) {
+	public IisResourceMapper mapper(IisMappedToFhirResource internal) {
 		Class inteClass = internal.getClass();
 		Optional<IisResourceMasterReportedMapper> reportedMapper = masterReportedMappersFiltered(inteClass).findFirst();
 		if (reportedMapper.isPresent()) {
 			return reportedMapper.get();
 		}
-		Optional<IisResourceMasterMapper> masterMapper = masterMappersFiltered(inteClass).findFirst();
+		Optional<IisResourceMapper> masterMapper = masterMappersFiltered(inteClass).findFirst();
 		return masterMapper.orElseThrow(mapperNotFoundExceptionSupplier(inteClass.getName()));
 	}
 
 	@SuppressWarnings("rawtypes")
-	public IisResourceMasterMapper selectMapper(IAnyResource resource) {
+	public IisResourceMapper mapper(IAnyResource resource) {
 		String fhirType = resource.fhirType();
 		return masterMappersFiltered(fhirType)
 			.findFirst()
@@ -50,7 +55,7 @@ public class MapperRegistry {
 	}
 
 	@SuppressWarnings("rawtypes")
-	public IFieldMapper selectMapper(IBaseDatatype datatype) {
+	public IFieldMapper fieldMapper(IBaseDatatype datatype) {
 		String fhirType = datatype.fhirType();
 		return fieldMappersFiltered(fhirType)
 			.findFirst()
@@ -58,7 +63,7 @@ public class MapperRegistry {
 	}
 
 	@SuppressWarnings("rawtypes")
-	public IFieldMapper selectFieldMapper(IisMappedToFhir internal) {
+	public IFieldMapper fieldMapper(IisMappedToFhir internal) {
 		Class<? extends IisMappedToFhir> aClass = internal.getClass();
 		return fieldMappersFiltered(aClass)
 			.findFirst()
@@ -66,7 +71,7 @@ public class MapperRegistry {
 	}
 
 	@SuppressWarnings("rawtypes")
-	public IisResourceMasterReportedMapper selectMapperReported(IAnyResource resource) {
+	public IisResourceMasterReportedMapper mapperReported(IAnyResource resource) {
 		String fhirType = resource.fhirType();
 		return masterReportedMappersFiltered(fhirType)
 			.findFirst()
@@ -89,7 +94,7 @@ public class MapperRegistry {
 		return mapperMastersReported.stream().filter(mapper -> mapper.fhirResourceName().equals(fhirType));
 	}
 
-	private @NotNull Stream<IisResourceMasterMapper> masterMappersFiltered(String fhirType) {
+	private @NotNull Stream<IisResourceMapper> masterMappersFiltered(String fhirType) {
 		return mapperMasters.stream().filter(mapper -> mapper.fhirResourceName().equals(fhirType));
 	}
 
@@ -97,7 +102,7 @@ public class MapperRegistry {
 		return mapperMastersReported.stream().filter(mapper -> mapper.localReportedType().equals(inteClass) || mapper.localMasterType().equals(inteClass));
 	}
 
-	private @NotNull Stream<IisResourceMasterMapper> masterMappersFiltered(Class inteClass) {
+	private @NotNull Stream<IisResourceMapper> masterMappersFiltered(Class inteClass) {
 		return mapperMasters.stream().filter(mapper -> mapper.localType().equals(inteClass));
 	}
 

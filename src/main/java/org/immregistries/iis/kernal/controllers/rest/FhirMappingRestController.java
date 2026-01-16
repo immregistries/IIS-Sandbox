@@ -34,13 +34,13 @@ public class FhirMappingRestController {
 	public IBaseDatatype fieldR4(
 		@RequestBody IisMappedToFhir iisMappedToFhir
 	) {
-		return mapperRegistry.selectFieldMapper(iisMappedToFhir).toR4(iisMappedToFhir);
+		return mapperRegistry.fieldMapper(iisMappedToFhir).toR4(iisMappedToFhir);
 	}
 
 	@PostMapping("/field/r5")
 	public IBaseDatatype fieldR5(
 		@RequestBody IisMappedToFhir iisMappedToFhir
 	) {
-		return mapperRegistry.selectFieldMapper(iisMappedToFhir).toR5(iisMappedToFhir);
+		return mapperRegistry.fieldMapper(iisMappedToFhir).toR5(iisMappedToFhir);
 	}
 }

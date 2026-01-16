@@ -4,7 +4,7 @@ import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.immregistries.iis.kernal.model.IisRecommendation;
 
 public abstract class RecommendationMapper<ImmunizationRecommendation extends IAnyResource>
-		implements IisResourceMasterMapper<IisRecommendation, ImmunizationRecommendation> {
+		implements IisResourceMapper<IisRecommendation, ImmunizationRecommendation> {
 
 	public Class<IisRecommendation> localType() {
 		return IisRecommendation.class;

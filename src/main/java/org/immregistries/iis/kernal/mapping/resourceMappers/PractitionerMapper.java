@@ -4,7 +4,7 @@ import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.immregistries.iis.kernal.model.ModelPerson;
 
 public abstract class PractitionerMapper<Practitioner extends IAnyResource>
-		implements IisResourceMasterMapper<ModelPerson, Practitioner> {
+		implements IisResourceMapper<ModelPerson, Practitioner> {
 	public String fhirResourceName() {
 		return PRACTITIONER;
 	}

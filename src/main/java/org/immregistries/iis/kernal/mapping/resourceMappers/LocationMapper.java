@@ -4,7 +4,7 @@ import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.immregistries.iis.kernal.model.OrgLocation;
 
 public abstract class LocationMapper<Location extends IAnyResource>
-		implements IisResourceMasterMapper<OrgLocation, Location> {
+		implements IisResourceMapper<OrgLocation, Location> {
 	public String fhirResourceName() {
 		return LOCATION;
 	}

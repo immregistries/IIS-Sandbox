@@ -7,7 +7,7 @@ import org.immregistries.iis.kernal.model.IisVaccination;
 import java.util.Date;
 
 public abstract class ImmunizationEvaluationMapper<ImmunizationEvaluation extends IAnyResource>
-		implements IisResourceMasterMapper<IisEvaluation, ImmunizationEvaluation> {
+		implements IisResourceMapper<IisEvaluation, ImmunizationEvaluation> {
 
 	public Class<IisEvaluation> localType() {
 		return IisEvaluation.class;
