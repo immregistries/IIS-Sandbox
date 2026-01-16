@@ -118,7 +118,7 @@ public class AllMappingService {
 	}
 
 	@SuppressWarnings("rawtypes")
-	public IisResourceMasterReportedMapper selectMapperReported(IAnyResource resource) {
+	private IisResourceMasterReportedMapper selectMapperReported(IAnyResource resource) {
 		String fhirType = resource.fhirType();
 		return masterReportedMappersFiltered(fhirType)
 			.findFirst()
