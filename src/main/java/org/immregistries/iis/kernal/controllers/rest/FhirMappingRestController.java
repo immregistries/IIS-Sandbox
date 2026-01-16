@@ -20,36 +20,20 @@ public class FhirMappingRestController {
 
 	public static final String MAPPING_KEY_PATH = "/mapping";
 	@Autowired
-	MappingService mappingService;
-	@Autowired
-	MapperRegistry mapperRegistry;
+	private MappingService mappingService;
+
 
 	@PostMapping("/fhir")
 	public IElement toFhirAll(
 		@RequestBody IisMappedToFhir iisMappedToFhir
 	) {
-		return mapperRegistry.mapper(iisMappedToFhir).fhirObject(iisMappedToFhir);
+		return mappingService.fhirObject(iisMappedToFhir);
 	}
 
 	@PostMapping("/local")
 	public IisMappedToFhir toIisAll(
 		@RequestBody IElement iElement
 	) {
-		return mapperRegistry.mapper(iElement).localObject(iElement);
+		return mappingService.localObject(iElement);
 	}
-//
-//	@PostMapping("/resource")
-//	public IAnyResource toFhir(
-//		@RequestBody IisMappedToFhirResource iisDiffableObject
-//	) {
-//		return mappingService.fhirResource(iisDiffableObject);
-//	}
-//
-//	@PostMapping("/field")
-//	public IBaseDatatype field(
-//		@RequestBody IisMappedToFhir iisMappedToFhir
-//	) {
-//		return mapperRegistry.fieldMapper(iisMappedToFhir).fhirObject(iisMappedToFhir);
-//	}
-
 }

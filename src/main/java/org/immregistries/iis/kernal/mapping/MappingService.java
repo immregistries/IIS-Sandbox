@@ -13,6 +13,9 @@ import org.immregistries.iis.kernal.model.IisMappedToFhirResource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+/**
+ * TODO Simplify
+ */
 @Service
 public class MappingService {
 
@@ -24,6 +27,13 @@ public class MappingService {
 	public IAnyResource fhirResource(IisMappedToFhirResource internal) {
 		@SuppressWarnings("rawtypes")
 		IisResourceMapper mapper = mapperRegistry.resourceMapper(internal);
+		return mapper.fhirObject(internal);
+	}
+
+	@SuppressWarnings("unchecked")
+	public IElement fhirObject(IisMappedToFhir internal) {
+		@SuppressWarnings("rawtypes")
+		IisMapper mapper = mapperRegistry.mapper(internal);
 		return mapper.fhirObject(internal);
 	}
 
