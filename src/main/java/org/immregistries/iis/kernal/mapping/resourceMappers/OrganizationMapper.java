@@ -9,13 +9,13 @@ public interface OrganizationMapper<Organization extends IAnyResource>
 		return ORGANIZATION;
 	}
 
-	public static final String ORGANIZATION = "Organization";
+	String ORGANIZATION = "Organization";
 
 	default Class<Tenant> localType() {
 		return Tenant.class;
 	}
 
-	public Organization fhirResource(Tenant tenant);
+	Organization fhirResource(Tenant tenant);
 
-	public Tenant localObject(Organization organization);
+	Tenant localObject(Organization organization);
 }
