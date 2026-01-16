@@ -52,7 +52,7 @@ public class ObservationMapperR4 extends ObservationMapper<Observation> implemen
 		return localObjectReported(o);
 	}
 
-	public Observation fhirResource(ObservationMaster om) {
+	public Observation fhirObject(ObservationMaster om) {
 		Observation o = new Observation();
 		/*
 		 * Id
@@ -195,7 +195,7 @@ public class ObservationMapperR4 extends ObservationMapper<Observation> implemen
 		 * OBX-21
 		 */
 		for (BusinessIdentifier businessIdentifier : om.getBusinessIdentifiers()) {
-			o.addIdentifier(businessIdentifierMapper.toFhir(businessIdentifier));
+			o.addIdentifier(businessIdentifierMapper.fhirObject(businessIdentifier));
 		}
 		/*
 		 * Components , other OBX with same subId

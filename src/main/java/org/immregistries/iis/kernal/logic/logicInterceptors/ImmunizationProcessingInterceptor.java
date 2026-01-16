@@ -59,7 +59,7 @@ public class ImmunizationProcessingInterceptor extends IisLogicInterceptor {
 				testMappingFhir((IisResourceMasterReportedMapper<IisMappedToFhirResource, IisMappedToFhirResource, IisMappedToFhirResource, IAnyResource>) immunizationMapper, (IAnyResource) requestDetails.getResource(), fhirContext.newJsonParser());
 				VaccinationReported vaccinationReported = immunizationMapper.localObjectReported((IAnyResource) requestDetails.getResource());
 				vaccinationReported = processAndValidateVaccinationReported(vaccinationReported, iisReportableList, processingFlavorSet, -1, -1, -1, "");
-				result = immunizationMapper.fhirResource(vaccinationReported);
+				result = immunizationMapper.fhirObject(vaccinationReported);
 			}
 		}
 		requestDetails.setResource(result);

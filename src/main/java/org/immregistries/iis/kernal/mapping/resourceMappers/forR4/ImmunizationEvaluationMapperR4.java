@@ -41,7 +41,7 @@ public class ImmunizationEvaluationMapperR4 extends ImmunizationEvaluationMapper
 		return iisEvaluation;
 	}
 
-	public ImmunizationEvaluation fhirResource(IisEvaluation iisEvaluation) {
+	public ImmunizationEvaluation fhirObject(IisEvaluation iisEvaluation) {
 		IisVaccination iisVaccination = iisEvaluation.getIisVaccination();
 		Date date = iisEvaluation.getDate();
 		return toFhir(iisVaccination, date);
@@ -52,7 +52,7 @@ public class ImmunizationEvaluationMapperR4 extends ImmunizationEvaluationMapper
 		ImmunizationEvaluation immunizationEvaluation = new ImmunizationEvaluation();
 		if (iisVaccination.getPatientReported() != null) {
 			immunizationEvaluation.setPatient(new Reference().setIdentifier(
-				businessIdentifierMapper.toFhir(iisVaccination.getPatientReported().getMainBusinessIdentifier())));
+				businessIdentifierMapper.fhirObject(iisVaccination.getPatientReported().getMainBusinessIdentifier())));
 		}
 		immunizationEvaluation
 			.setImmunizationEvent(new Reference("Immunization/" + iisVaccination.getVaccinationId()));

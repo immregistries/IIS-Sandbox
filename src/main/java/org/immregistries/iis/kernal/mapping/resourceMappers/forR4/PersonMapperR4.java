@@ -31,7 +31,7 @@ public class PersonMapperR4 extends PersonMapper<Person> implements IR4Mapper<Mo
 		return modelPerson;
 	}
 
-	public Person fhirResource(ModelPerson modelPerson) {
+	public Person fhirObject(ModelPerson modelPerson) {
 		Person p = new Person();
 		p.setId(modelPerson.getPersonId());
 		p.addIdentifier(new Identifier().setSystem(MappingHelper.PERSON).setValue(modelPerson.getPersonExternalLink()));

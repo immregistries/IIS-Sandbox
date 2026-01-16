@@ -27,11 +27,11 @@ public class ImmunizationMapperR4 extends ImmunizationMapper<Immunization> imple
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	@Autowired
-	private FhirSaveRequesterR4 fhirRequests;
+	private FhirSaveRequesterR4 fhirSaveRequesterR4;
 	@Autowired
 	private CodeMapManagerService codeMapManagerService;
 	@Autowired
-	private BusinessIdentifierMapperR4 businessIdentifierMapper;
+	private BusinessIdentifierMapperR4 businessIdentifierMapperR4;
 
 	public void fillFromFhirResource(IisVaccination vr, Immunization i) {
 		/*
@@ -46,14 +46,14 @@ public class ImmunizationMapperR4 extends ImmunizationMapper<Immunization> imple
 		 * Business identifier
 		 */
 		for (Identifier identifier : i.getIdentifier()) {
-			vr.addBusinessIdentifier(businessIdentifierMapper.localObject(identifier));
+			vr.addBusinessIdentifier(businessIdentifierMapperR4.localObject(identifier));
 		}
 		/*
 		 * Patient
 		 */
 		if (i.getPatient() != null && StringUtils.isNotBlank(i.getPatient().getReference())) {
 			String id = i.getPatient().getReference();
-			vr.setPatientReported(fhirRequests.fhirReadRequester.readAsPatientReported(id));
+			vr.setPatientReported(fhirSaveRequesterR4.fhirReadRequester.readAsPatientReported(id));
 		}
 		/*
 		 * Reported Date
@@ -198,7 +198,7 @@ public class ImmunizationMapperR4 extends ImmunizationMapper<Immunization> imple
 		 */
 		if (i.getLocation() != null && StringUtils.isNotBlank(i.getLocation().getReference())) {
 			String id = i.getLocation().getReference();
-			vr.setOrgLocation(fhirRequests.fhirReadRequester.readAsOrgLocation(id));
+			vr.setOrgLocation(fhirSaveRequesterR4.fhirReadRequester.readAsOrgLocation(id));
 		}
 		/*
 		 * Performers
@@ -209,17 +209,17 @@ public class ImmunizationMapperR4 extends ImmunizationMapper<Immunization> imple
 				switch (performer.getFunction().getCodingFirstRep().getCode()) {
 					case ADMINISTERING_VALUE: {
 						String id = performer.getActor().getReference();
-						vr.setAdministeringProvider(fhirRequests.fhirReadRequester.readPractitionerAsPerson(id));
+						vr.setAdministeringProvider(fhirSaveRequesterR4.fhirReadRequester.readPractitionerAsPerson(id));
 						break;
 					}
 					case ORDERING_VALUE: {
 						String id = performer.getActor().getReference();
-						vr.setOrderingProvider(fhirRequests.fhirReadRequester.readPractitionerAsPerson(id));
+						vr.setOrderingProvider(fhirSaveRequesterR4.fhirReadRequester.readPractitionerAsPerson(id));
 						break;
 					}
 					case ENTERING_VALUE: {
 						String id = performer.getActor().getReference();
-						vr.setEnteredBy(fhirRequests.fhirReadRequester.readPractitionerAsPerson(id));
+						vr.setEnteredBy(fhirSaveRequesterR4.fhirReadRequester.readPractitionerAsPerson(id));
 						break;
 					}
 				}
@@ -227,7 +227,7 @@ public class ImmunizationMapperR4 extends ImmunizationMapper<Immunization> imple
 		}
 	}
 
-	public Immunization fhirResource(IisVaccination vr) {
+	public Immunization fhirObject(IisVaccination vr) {
 		Immunization i = new Immunization();
 		/*
 		 * Id
@@ -241,7 +241,7 @@ public class ImmunizationMapperR4 extends ImmunizationMapper<Immunization> imple
 		 * Identifiers
 		 */
 		for (BusinessIdentifier businessIdentifier : vr.getBusinessIdentifiers()) {
-			i.addIdentifier(businessIdentifierMapper.toFhir(businessIdentifier));
+			i.addIdentifier(businessIdentifierMapperR4.fhirObject(businessIdentifier));
 		}
 		/*
 		 * Patient

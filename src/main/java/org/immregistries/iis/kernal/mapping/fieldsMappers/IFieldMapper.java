@@ -2,18 +2,15 @@ package org.immregistries.iis.kernal.mapping.fieldsMappers;
 
 
 import org.hl7.fhir.instance.model.api.IBaseDatatype;
+import org.immregistries.iis.kernal.mapping.IisMapper;
 import org.immregistries.iis.kernal.model.IisMappedToFhir;
 
-public interface IFieldMapper<LocalType extends IisMappedToFhir, FhirType extends IBaseDatatype> {
-
-	Class<LocalType> localType();
+public interface IFieldMapper<LocalType extends IisMappedToFhir, FhirType extends IBaseDatatype> extends IisMapper<LocalType, FhirType> {
 
 	Class<FhirType> fhirType();
 
-	String fhirTypeName();
+	FhirType fhirObject(LocalType localField);
 
-	FhirType toFhir(LocalType localField);
-
-	LocalType localObject(FhirType r5);
+	LocalType localObject(FhirType fhirType);
 
 }

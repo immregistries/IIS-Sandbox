@@ -20,7 +20,7 @@ public class MessageRecordingService {
 	Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	@Autowired
-	MessageReceivedRepository messageReceivedRepository;
+	private MessageReceivedRepository messageReceivedRepository;
 
 	public MessageReceived recordMessageReceived(String message, IisPatient patient, String messageResponse,
 																String categoryRequest, String categoryResponse, Tenant tenant) {

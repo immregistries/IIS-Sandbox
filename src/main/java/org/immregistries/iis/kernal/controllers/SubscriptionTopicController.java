@@ -25,11 +25,11 @@ public class SubscriptionTopicController {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	@Autowired
-	FhirContext fhirContext;
+	private FhirContext fhirContext;
 	@Autowired
-	ISearchParamRegistry iSearchParamRegistry;
+	private ISearchParamRegistry iSearchParamRegistry;
 	@Autowired
-	ISearchParamExtractor iSearchParamExtractor;
+	private ISearchParamExtractor iSearchParamExtractor;
 
 	@GetMapping
 	protected SubscriptionTopic doGetDefault() throws ServletException, IOException {

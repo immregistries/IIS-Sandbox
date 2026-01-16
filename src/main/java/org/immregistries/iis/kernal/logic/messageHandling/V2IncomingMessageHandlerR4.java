@@ -80,7 +80,7 @@ public class V2IncomingMessageHandlerR4 extends V2IncomingMessageHandler {
 			sendingOrganization = new Organization()
 					.setName(organizationName);
 			if (tokenParam != null) {
-				sendingOrganization.addIdentifier(businessIdentifierMapper.toFhir(businessIdentifier));
+				sendingOrganization.addIdentifier(businessIdentifierMapper.fhirObject(businessIdentifier));
 			}
 			sendingOrganization = (Organization) fhirSaveRequester.saveOrganization(sendingOrganization);
 		}

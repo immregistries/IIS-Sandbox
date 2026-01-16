@@ -13,7 +13,7 @@ public abstract class ImmunizationEvaluationMapper<ImmunizationEvaluation extend
 		return IisEvaluation.class;
 	}
 
-	public String fhirResourceName() {
+	public String fhirTypeName() {
 		return IMMUNIZATION_EVALUATION;
 	}
 

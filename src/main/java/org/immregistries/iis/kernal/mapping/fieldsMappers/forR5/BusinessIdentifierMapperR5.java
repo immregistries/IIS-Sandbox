@@ -16,7 +16,7 @@ public class BusinessIdentifierMapperR5 extends BusinessIdentifierMapper<Identif
 		return org.hl7.fhir.r5.model.Identifier.class;
 	}
 
-	public org.hl7.fhir.r5.model.Identifier toFhir(BusinessIdentifier businessIdentifier) {
+	public org.hl7.fhir.r5.model.Identifier fhirObject(BusinessIdentifier businessIdentifier) {
 		org.hl7.fhir.r5.model.Identifier identifier = new org.hl7.fhir.r5.model.Identifier()
 			.setValue(businessIdentifier.getValue())
 			.setSystem(businessIdentifier.getSystem());

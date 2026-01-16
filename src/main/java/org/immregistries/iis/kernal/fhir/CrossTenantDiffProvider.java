@@ -29,7 +29,7 @@ public class CrossTenantDiffProvider {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	@Autowired
-	FhirContext myContext;
+	private FhirContext myContext;
 	@Autowired
 	private DaoRegistry myDaoRegistry;
 

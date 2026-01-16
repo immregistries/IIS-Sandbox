@@ -5,7 +5,7 @@ import org.immregistries.iis.kernal.persisted.model.Tenant;
 
 public abstract class OrganizationMapper<Organization extends IAnyResource>
 		implements IisResourceMapper<Tenant, Organization> {
-	public String fhirResourceName() {
+	public String fhirTypeName() {
 		return ORGANIZATION;
 	}
 
@@ -15,7 +15,7 @@ public abstract class OrganizationMapper<Organization extends IAnyResource>
 		return Tenant.class;
 	}
 
-	public abstract Organization fhirResource(Tenant tenant);
+	public abstract Organization fhirObject(Tenant tenant);
 
 	public abstract Tenant localObject(Organization organization);
 }

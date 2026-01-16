@@ -50,7 +50,7 @@ public class FhirSaveRequesterR5 extends
 	}
 
 	public ModelPerson savePractitioner(ModelPerson modelPerson) {
-		Practitioner practitioner = practitionerMapper.fhirResource(modelPerson);
+		Practitioner practitioner = practitionerMapper.fhirObject(modelPerson);
 		MethodOutcome outcome = save(false, practitioner,
 			Patient.IDENTIFIER.exactly().identifier(modelPerson.getPersonExternalLink()));
 		if (outcome.getCreated() != null && outcome.getCreated()) {
@@ -62,7 +62,7 @@ public class FhirSaveRequesterR5 extends
 	}
 
 	public ObservationReported saveObservationReported(ObservationReported observationReported) {
-		Observation observation = (Observation) observationMapper.fhirResource(observationReported);
+		Observation observation = (Observation) observationMapper.fhirObject(observationReported);
 		MethodOutcome outcome = save(false, observation);
 		if (outcome.getCreated() != null && outcome.getCreated()) {
 			observationReported.setObservationId(outcome.getId().getIdPart());
@@ -88,7 +88,7 @@ public class FhirSaveRequesterR5 extends
 	}
 
 	public OrgLocation saveOrgLocation(OrgLocation orgLocation) {
-		Location location = locationMapper.fhirResource(orgLocation);
+		Location location = locationMapper.fhirObject(orgLocation);
 		MethodOutcome outcome = save(false, location,
 			Location.IDENTIFIER.exactly().identifier(location.getIdentifierFirstRep().getValue()));
 		if (outcome.getCreated() != null && outcome.getCreated()) {

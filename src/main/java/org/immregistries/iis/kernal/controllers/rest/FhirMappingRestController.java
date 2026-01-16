@@ -34,7 +34,7 @@ public class FhirMappingRestController {
 	public IBaseDatatype fieldR4(
 		@RequestBody IisMappedToFhir iisMappedToFhir
 	) {
-		return mapperRegistry.fieldMapper(iisMappedToFhir).toFhir(iisMappedToFhir);
+		return mapperRegistry.fieldMapper(iisMappedToFhir).fhirObject(iisMappedToFhir);
 	}
 
 }

@@ -34,7 +34,7 @@ public class PractitionerMapperR4 extends PractitionerMapper<Practitioner> imple
 		return modelPerson;
 	}
 
-	public Practitioner fhirResource(ModelPerson modelPerson) {
+	public Practitioner fhirObject(ModelPerson modelPerson) {
 		Practitioner practitioner = new Practitioner();
 		try {
 			switch (new Reference(modelPerson.getIdentifierTypeCode()).getType()) {

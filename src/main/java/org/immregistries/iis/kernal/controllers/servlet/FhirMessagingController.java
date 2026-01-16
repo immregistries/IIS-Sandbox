@@ -34,12 +34,12 @@ public class FhirMessagingController {
 	public static final String FHIR_MESSAGING_BASE_PATH = "/" + FHIR_MESSAGING_PATH_KEY;
 	public static final String ORIGINAL_TEXT_EXTENSION_URL = "http://hl7.org/fhir/StructureDefinition/originalText";
 	@Autowired
-	FhirContext fhirContext;
+	private FhirContext fhirContext;
 
 	@Autowired
-	PopRestController popRestController;
+	private PopRestController popRestController;
 	@Autowired
-	V2ToFhirRestController v2ToFhirRestController;
+	private V2ToFhirRestController v2ToFhirRestController;
 
 	@GetMapping
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {

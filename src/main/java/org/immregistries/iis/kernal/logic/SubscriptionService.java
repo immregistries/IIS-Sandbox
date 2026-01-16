@@ -31,15 +31,11 @@ public class SubscriptionService {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	@Autowired
-	IFhirSystemDao fhirSystemDao;
+	private FhirContext fhirContext;
 	@Autowired
-	FhirContext fhirContext;
+	private IisFhirClientFactory iisFhirClientFactory;
 	@Autowired
-	IisFhirClientFactory iisFhirClientFactory;
-	@Autowired
-	SubscriptionTriggeringProvider subscriptionTriggeringProvider;
-	@Autowired
-	IPartitionLookupSvc partitionLookupSvc;
+	private SubscriptionTriggeringProvider subscriptionTriggeringProvider;
 	// @Autowired
 	// SubscriptionDeliveringRestHookSubscriber
 	// subscriptionDeliveringRestHookSubscriber;

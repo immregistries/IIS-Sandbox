@@ -11,7 +11,7 @@ import org.immregistries.iis.kernal.model.ModelPerson;
 public abstract class PersonMapper<Person extends IAnyResource>
 // extends IisFhirMapperMaster<ModelPerson, Person>
 {
-	public String fhirResourceName() {
+	public String fhirTypeName() {
 		return "Person";
 	}
 
@@ -23,5 +23,5 @@ public abstract class PersonMapper<Person extends IAnyResource>
 
 	public abstract ModelPerson localObject(Person person);
 
-	public abstract Person fhirResource(ModelPerson modelPerson);
+	public abstract Person fhirObject(ModelPerson modelPerson);
 }

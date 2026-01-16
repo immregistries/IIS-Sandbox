@@ -75,7 +75,7 @@ public class PatientController {
 	@Autowired
 	private MessageRestController messageRestController;
 	@Autowired
-	CodeMapRestController codeMapRestController;
+	private CodeMapRestController codeMapRestController;
 
 	@PostMapping
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp

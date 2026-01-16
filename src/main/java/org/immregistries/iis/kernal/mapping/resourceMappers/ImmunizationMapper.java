@@ -39,7 +39,7 @@ public abstract class ImmunizationMapper<Immunization extends IAnyResource>
 	@Autowired
 	private FhirSearchRequester fhirSearchRequester;
 
-	public String fhirResourceName() {
+	public String fhirTypeName() {
 		return IMMUNIZATION;
 	}
 
@@ -105,7 +105,7 @@ public abstract class ImmunizationMapper<Immunization extends IAnyResource>
 	 * @param vaccinationMaster the vaccination local object
 	 * @return the Immunization resource
 	 */
-	public abstract Immunization fhirResource(IisVaccination vaccinationMaster);
+	public abstract Immunization fhirObject(IisVaccination vaccinationMaster);
 
 	public abstract void fillFromFhirResource(IisVaccination localPatient, Immunization immunization);
 }

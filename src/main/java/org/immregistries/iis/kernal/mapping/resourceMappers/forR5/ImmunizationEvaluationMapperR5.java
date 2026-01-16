@@ -3,7 +3,6 @@ package org.immregistries.iis.kernal.mapping.resourceMappers.forR5;
 import org.hl7.fhir.r5.model.ImmunizationEvaluation;
 import org.hl7.fhir.r5.model.Reference;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR5Condition;
-import org.immregistries.iis.kernal.mapping.fieldsMappers.BusinessIdentifierMapper;
 import org.immregistries.iis.kernal.mapping.fieldsMappers.forR5.BusinessIdentifierMapperR5;
 import org.immregistries.iis.kernal.mapping.resourceMappers.ImmunizationEvaluationMapper;
 import org.immregistries.iis.kernal.model.IisEvaluation;
@@ -30,7 +29,7 @@ public class ImmunizationEvaluationMapperR5 extends ImmunizationEvaluationMapper
 		return iisEvaluation;
 	}
 
-	public ImmunizationEvaluation fhirResource(IisEvaluation iisEvaluation) {
+	public ImmunizationEvaluation fhirObject(IisEvaluation iisEvaluation) {
 		IisVaccination iisVaccination = iisEvaluation.getIisVaccination();
 		Date date = iisEvaluation.getDate();
 		return toFhir(iisVaccination, date);
@@ -40,7 +39,7 @@ public class ImmunizationEvaluationMapperR5 extends ImmunizationEvaluationMapper
 		ImmunizationEvaluation immunizationEvaluation = new ImmunizationEvaluation();
 		if (vaccinationMaster.getPatientReported() != null) {
 			immunizationEvaluation.setPatient(new Reference().setIdentifier(
-					businessIdentifierMapper.toFhir(vaccinationMaster.getPatientReported().getMainBusinessIdentifier())));
+					businessIdentifierMapper.fhirObject(vaccinationMaster.getPatientReported().getMainBusinessIdentifier())));
 		}
 		immunizationEvaluation
 				.setImmunizationEvent(new Reference("Immunization/" + vaccinationMaster.getVaccinationId()));

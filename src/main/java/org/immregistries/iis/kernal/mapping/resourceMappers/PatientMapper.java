@@ -16,7 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public abstract class PatientMapper<Patient extends IAnyResource>
 	implements IisResourceMasterReportedMapper<PatientMaster, PatientReported, IisPatient, Patient> {
 
-	public String fhirResourceName() {
+	public String fhirTypeName() {
 		return PATIENT;
 	}
 
@@ -140,7 +140,7 @@ public abstract class PatientMapper<Patient extends IAnyResource>
 	 * @param iisPatient any local patient record
 	 * @return
 	 */
-	abstract public Patient fhirResource(IisPatient iisPatient);
+	abstract public Patient fhirObject(IisPatient iisPatient);
 
 
 	public abstract void fillFromFhirResource(IisPatient localPatient, Patient patient);

@@ -30,7 +30,7 @@ public class PersonMapperR5 extends PersonMapper<Person> implements IR5Mapper<Mo
 		return modelPerson;
 	}
 
-	public Person fhirResource(ModelPerson modelPerson) {
+	public Person fhirObject(ModelPerson modelPerson) {
 		org.hl7.fhir.r5.model.Person p = new org.hl7.fhir.r5.model.Person();
 		p.setId(modelPerson.getPersonId());
 		p.addIdentifier(MappingHelper.getFhirIdentifierR5(MappingHelper.PERSON, modelPerson.getPersonExternalLink()));

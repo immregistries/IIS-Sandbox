@@ -6,7 +6,6 @@ import org.hl7.fhir.r5.model.*;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR5Condition;
 import org.immregistries.iis.kernal.logic.IIncomingMessageHandler;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
-import org.immregistries.iis.kernal.mapping.fieldsMappers.BusinessIdentifierMapper;
 import org.immregistries.iis.kernal.mapping.fieldsMappers.forR5.BusinessIdentifierMapperR5;
 import org.immregistries.iis.kernal.mapping.resourceMappers.ImmunizationMapper;
 import org.immregistries.iis.kernal.mapping.resourceMappers.ObservationMapper;
@@ -53,7 +52,7 @@ public class ObservationMapperR5 extends ObservationMapper<Observation> implemen
 		return localObjectReported(o);
 	}
 
-	public Observation fhirResource(ObservationMaster om) {
+	public Observation fhirObject(ObservationMaster om) {
 		Observation o = new Observation();
 		/*
 		 * Id
@@ -196,7 +195,7 @@ public class ObservationMapperR5 extends ObservationMapper<Observation> implemen
 		 * OBX-21
 		 */
 		for (BusinessIdentifier businessIdentifier : om.getBusinessIdentifiers()) {
-			o.addIdentifier(businessIdentifierMapper.toFhir(businessIdentifier));
+			o.addIdentifier(businessIdentifierMapper.fhirObject(businessIdentifier));
 		}
 		/*
 		 * Components , other OBX with same subId

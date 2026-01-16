@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 public class OrganizationMapperR4 extends OrganizationMapper<Organization> implements IR4Mapper<Tenant, Organization> {
 //	TODO
 
-	public Organization fhirResource(Tenant tenant) {
+	public Organization fhirObject(Tenant tenant) {
 		Organization o = new Organization();
 		o.addIdentifier(MappingHelper.getFhirIdentifierR4("Tenant", Integer.toString(tenant.getOrgId())));
 		o.setName(tenant.getOrganizationName());

@@ -44,7 +44,7 @@ import static org.immregistries.iis.kernal.fhir.interceptors.IisAuthorizationInt
 @RestController()
 public class JwtSmartAuthController {
 	@Autowired
-	JwtUtils jwtUtils;
+	private JwtUtils jwtUtils;
 	private final Map<String, PublicKey> keystore;
 	private final Map<String, String> jwtStore;
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());

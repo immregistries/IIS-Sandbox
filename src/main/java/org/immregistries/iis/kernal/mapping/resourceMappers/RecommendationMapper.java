@@ -10,7 +10,7 @@ public abstract class RecommendationMapper<ImmunizationRecommendation extends IA
 		return IisRecommendation.class;
 	}
 
-	public String fhirResourceName() {
+	public String fhirTypeName() {
 		return IMMUNIZATION_RECOMMENDATION;
 	}
 

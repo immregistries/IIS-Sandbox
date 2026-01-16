@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 @Conditional(OnR5Condition.class)
 public class LocationMapperR5 extends LocationMapper<Location> implements IR5Mapper<OrgLocation, Location> {
 
-	public Location fhirResource(OrgLocation ol) {
+	public Location fhirObject(OrgLocation ol) {
 
 		if (ol != null) {
 			Location location = new Location();

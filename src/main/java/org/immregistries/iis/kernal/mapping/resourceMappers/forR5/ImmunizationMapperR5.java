@@ -7,10 +7,8 @@ import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR5Condition;
 import org.immregistries.iis.kernal.logic.CodeMapManagerService;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
-import org.immregistries.iis.kernal.mapping.fieldsMappers.BusinessIdentifierMapper;
 import org.immregistries.iis.kernal.mapping.fieldsMappers.forR5.BusinessIdentifierMapperR5;
 import org.immregistries.iis.kernal.mapping.internalClient.FhirReadRequester;
-import org.immregistries.iis.kernal.mapping.internalClient.FhirSearchRequester;
 import org.immregistries.iis.kernal.mapping.resourceMappers.ImmunizationMapper;
 import org.immregistries.iis.kernal.model.BusinessIdentifier;
 import org.immregistries.iis.kernal.model.IisVaccination;
@@ -230,7 +228,7 @@ public class ImmunizationMapperR5 extends ImmunizationMapper<Immunization> imple
 		}
 	}
 
-	public Immunization fhirResource(IisVaccination vr) {
+	public Immunization fhirObject(IisVaccination vr) {
 		Immunization i = new Immunization();
 		/*
 		 * Id
@@ -244,7 +242,7 @@ public class ImmunizationMapperR5 extends ImmunizationMapper<Immunization> imple
 		 * Identifiers
 		 */
 		for (BusinessIdentifier businessIdentifier : vr.getBusinessIdentifiers()) {
-			i.addIdentifier(businessIdentifierMapper.toFhir(businessIdentifier));
+			i.addIdentifier(businessIdentifierMapper.fhirObject(businessIdentifier));
 		}
 		/*
 		 * Patient
@@ -393,7 +391,7 @@ public class ImmunizationMapperR5 extends ImmunizationMapper<Immunization> imple
 		/*
 		 * Location
 		 */
-		Location location = locationMapper.fhirResource(vr.getOrgLocation()); // Should have been saved in
+		Location location = locationMapper.fhirObject(vr.getOrgLocation()); // Should have been saved in
 																				// Event/MessageHandler
 		if (location != null) {
 			i.setLocation(new Reference(MappingHelper.LOCATION + "/" + location.getId()));

@@ -23,7 +23,7 @@ public class ModelPhoneMapperR5 extends ModelPhoneMapper<ContactPoint> {
 		return ContactPoint.class;
 	}
 
-	public org.hl7.fhir.r5.model.ContactPoint toFhir(ModelPhone modelPhone) {
+	public org.hl7.fhir.r5.model.ContactPoint fhirObject(ModelPhone modelPhone) {
 		org.hl7.fhir.r5.model.ContactPoint contactPoint = new org.hl7.fhir.r5.model.ContactPoint();
 		contactPoint.setSystem(org.hl7.fhir.r5.model.ContactPoint.ContactPointSystem.PHONE)
 			.setValue(modelPhone.getNumber());

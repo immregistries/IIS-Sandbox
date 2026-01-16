@@ -198,7 +198,7 @@ public class RecommendationController {
 					org.hl7.fhir.r5.model.ImmunizationRecommendation immunizationRecommendation = (org.hl7.fhir.r5.model.ImmunizationRecommendation) recommendationResource;
 					immunizationRecommendation
 							.setPatient(new org.hl7.fhir.r5.model.Reference()
-									.setIdentifier((Identifier) businessIdentifierMapper.toFhir(identifier)));
+									.setIdentifier((Identifier) businessIdentifierMapper.fhirObject(identifier)));
 					PatientServletUtil.printSubscriptions(out, parser, subcriptionBundle, immunizationRecommendation);
 				}
 			}

@@ -7,12 +7,10 @@ import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR5Condition;
 import org.immregistries.iis.kernal.logic.messageHandling.IncomingQueryHandler;
-import org.immregistries.iis.kernal.mapping.fieldsMappers.BusinessIdentifierMapper;
 import org.immregistries.iis.kernal.mapping.fieldsMappers.forR5.BusinessIdentifierMapperR5;
 import org.immregistries.iis.kernal.mapping.internalClient.FhirSearchRequester;
 import org.immregistries.iis.kernal.mapping.resourceMappers.forR5.ImmunizationEvaluationMapperR5;
 import org.immregistries.iis.kernal.mapping.resourceMappers.forR5.ImmunizationRecommendationMapperR5;
-import org.immregistries.iis.kernal.mapping.resourceMappers.forR5.PatientMapperR5;
 import org.immregistries.iis.kernal.model.*;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.immregistries.vfa.connect.model.ForecastActual;
@@ -66,7 +64,7 @@ public class ImmunizationRecommendationServiceR5
 	public ImmunizationRecommendation generate(Tenant tenant, Date date, IisPatient iisPatient) {
 		ImmunizationRecommendation recommendation = this.generate(tenant, date);
 		recommendation.setPatient(new Reference()
-			.setIdentifier(businessIdentifierMapper.toFhir(iisPatient.getMainBusinessIdentifier())));
+			.setIdentifier(businessIdentifierMapper.fhirObject(iisPatient.getMainBusinessIdentifier())));
 		return recommendation;
 	}
 
@@ -114,7 +112,7 @@ public class ImmunizationRecommendationServiceR5
 		List<ForecastActual> forecastActualList = incomingQueryHandler.doForecast(iisPatient,
 			iisVaccinationList, tenant, date);
 		IisRecommendation iisRecommendation = new IisRecommendation(iisPatient, forecastActualList, date);
-		ImmunizationRecommendation immunizationRecommendation = immunizationRecommendationMapperR5.fhirResource(iisRecommendation);
+		ImmunizationRecommendation immunizationRecommendation = immunizationRecommendationMapperR5.fhirObject(iisRecommendation);
 		immunizationRecommendation.addIdentifier(new Identifier().setValue(UUID.randomUUID().toString().split("-")[0]));
 		immunizationRecommendation.setAuthority(new Reference()
 				.setIdentifier(new Identifier().setSystem("IIS-Sandbox/tenantAndLonestar")
@@ -124,7 +122,7 @@ public class ImmunizationRecommendationServiceR5
 		parameters.addParameter().setResource(immunizationRecommendation).setName(RECOMMENDATION);
 		for (IisVaccination iisVaccination : iisVaccinationList) {
 			IisEvaluation iisEvaluation = new IisEvaluation(iisVaccination, date);
-			ImmunizationEvaluation immunizationEvaluation = immunizationEvaluationMapperR5.fhirResource(iisEvaluation);
+			ImmunizationEvaluation immunizationEvaluation = immunizationEvaluationMapperR5.fhirObject(iisEvaluation);
 			if (immunizationEvaluation != null) {
 				parameters.addParameter().setResource(immunizationEvaluation).setName(EVALUATION);
 			}

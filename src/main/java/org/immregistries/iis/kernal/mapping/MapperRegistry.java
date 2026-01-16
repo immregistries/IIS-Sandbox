@@ -1,7 +1,7 @@
 package org.immregistries.iis.kernal.mapping;
 
-import ca.uhn.fhir.context.FhirContext;
 import org.hl7.fhir.instance.model.api.IAnyResource;
+import org.hl7.fhir.instance.model.api.IBase;
 import org.hl7.fhir.instance.model.api.IBaseDatatype;
 import org.immregistries.iis.kernal.mapping.fieldsMappers.IFieldMapper;
 import org.immregistries.iis.kernal.mapping.resourceMappers.IisResourceMapper;
@@ -20,10 +20,6 @@ import java.util.stream.Stream;
 @Service
 public class MapperRegistry {
 
-	@Autowired
-	private FhirContext fhirContext;
-
-
 	@SuppressWarnings("rawtypes")
 	@Autowired
 	private List<IisResourceMasterReportedMapper> mapperMastersReported;
@@ -33,6 +29,10 @@ public class MapperRegistry {
 	@SuppressWarnings("rawtypes")
 	@Autowired
 	private List<IFieldMapper> fieldMappers;
+
+	@SuppressWarnings("rawtypes")
+	@Autowired
+	private List<IisMapper> allMappers;
 
 
 	@SuppressWarnings("rawtypes")
@@ -50,6 +50,14 @@ public class MapperRegistry {
 	public IisResourceMapper mapper(IAnyResource resource) {
 		String fhirType = resource.fhirType();
 		return masterMappersFiltered(fhirType)
+			.findFirst()
+			.orElseThrow(mapperNotFoundExceptionSupplier(fhirType));
+	}
+
+	@SuppressWarnings("rawtypes")
+	public IisMapper mapper(IBase iBase) {
+		String fhirType = iBase.fhirType();
+		return allMappersFiltered(fhirType)
 			.findFirst()
 			.orElseThrow(mapperNotFoundExceptionSupplier(fhirType));
 	}
@@ -91,11 +99,15 @@ public class MapperRegistry {
 	}
 
 	private @NotNull Stream<IisResourceMasterReportedMapper> masterReportedMappersFiltered(String fhirType) {
-		return mapperMastersReported.stream().filter(mapper -> mapper.fhirResourceName().equals(fhirType));
+		return mapperMastersReported.stream().filter(mapper -> mapper.fhirTypeName().equals(fhirType));
 	}
 
 	private @NotNull Stream<IisResourceMapper> masterMappersFiltered(String fhirType) {
-		return mapperMasters.stream().filter(mapper -> mapper.fhirResourceName().equals(fhirType));
+		return mapperMasters.stream().filter(mapper -> mapper.fhirTypeName().equals(fhirType));
+	}
+
+	private @NotNull Stream<IisMapper> allMappersFiltered(String fhirType) {
+		return allMappers.stream().filter(mapper -> mapper.fhirTypeName().equals(fhirType));
 	}
 
 	private @NotNull Stream<IisResourceMasterReportedMapper> masterReportedMappersFiltered(Class inteClass) {

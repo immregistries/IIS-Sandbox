@@ -20,7 +20,7 @@ public class ModelNameMapperR5 extends ModelNameMapper<HumanName> {
 		return HumanName.class;
 	}
 	
-	public HumanName toFhir(ModelName modelName) {
+	public HumanName fhirObject(ModelName modelName) {
 		HumanName name = new HumanName()
 				.setFamily(modelName.getNameLast())
 				.addGiven(modelName.getNameFirst())

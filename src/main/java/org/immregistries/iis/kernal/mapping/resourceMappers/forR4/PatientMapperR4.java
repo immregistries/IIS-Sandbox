@@ -262,7 +262,7 @@ public class PatientMapperR4 extends PatientMapper<Patient> implements IR4Mapper
 		}
 	}
 
-	public Patient fhirResource(IisPatient pm) {
+	public Patient fhirObject(IisPatient pm) {
 		Patient p = new Patient();
 		p.setId(pm.getPatientId());
 		/*
@@ -281,7 +281,7 @@ public class PatientMapperR4 extends PatientMapper<Patient> implements IR4Mapper
 		 * Business Identifiers
 		 */
 		for (BusinessIdentifier businessIdentifier : pm.getBusinessIdentifiers()) {
-			p.addIdentifier(businessIdentifierMapper.toFhir(businessIdentifier));
+			p.addIdentifier(businessIdentifierMapper.fhirObject(businessIdentifier));
 		}
 		/*
 		 * Managing Organization
@@ -297,7 +297,7 @@ public class PatientMapperR4 extends PatientMapper<Patient> implements IR4Mapper
 		 * Names
 		 */
 		for (ModelName modelName : pm.getPatientNames()) {
-			p.addName(modelNameMapper.toFhir(modelName));
+			p.addName(modelNameMapper.fhirObject(modelName));
 		}
 		/*
 		 * Mother Maiden Name
@@ -376,7 +376,7 @@ public class PatientMapperR4 extends PatientMapper<Patient> implements IR4Mapper
 		 * Phone
 		 */
 		for (ModelPhone patientPhone : pm.getPhones()) {
-			p.addTelecom(modelPhoneMapper.toFhir(patientPhone));
+			p.addTelecom(modelPhoneMapper.fhirObject(patientPhone));
 		}
 		/*
 		 * Email
@@ -400,7 +400,7 @@ public class PatientMapperR4 extends PatientMapper<Patient> implements IR4Mapper
 		 * Addresses
 		 */
 		for (ModelAddress modelAddress : pm.getAddresses()) {
-			p.addAddress(modelAddressMapper.toFhir(modelAddress));
+			p.addAddress(modelAddressMapper.fhirObject(modelAddress));
 		}
 		/*
 		 * Birth Order
@@ -462,7 +462,7 @@ public class PatientMapperR4 extends PatientMapper<Patient> implements IR4Mapper
 		 */
 		for (PatientGuardian patientGuardian : pm.getPatientGuardians()) {
 			Patient.ContactComponent contact = p.addContact();
-			contact.setName(modelNameMapper.toFhir(patientGuardian.getName()));
+			contact.setName(modelNameMapper.fhirObject(patientGuardian.getName()));
 			if (StringUtils.isNotBlank(patientGuardian.getGuardianRelationship())) {
 				Coding coding = new Coding().setSystem(RELATIONSHIP_SYSTEM)
 						.setCode(patientGuardian.getGuardianRelationship());

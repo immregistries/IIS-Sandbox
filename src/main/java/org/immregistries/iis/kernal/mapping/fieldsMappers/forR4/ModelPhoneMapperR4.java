@@ -24,7 +24,7 @@ public class ModelPhoneMapperR4 extends ModelPhoneMapper<ContactPoint> {
 		return ContactPoint.class;
 	}
 
-    public ContactPoint toFhir(ModelPhone modelPhone) {
+    public ContactPoint fhirObject(ModelPhone modelPhone) {
         ContactPoint contactPoint = new ContactPoint();
         contactPoint.setSystem(ContactPoint.ContactPointSystem.PHONE)
                 .setValue(modelPhone.getNumber());

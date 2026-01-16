@@ -19,7 +19,7 @@ public class ModelAddressMapperR4 extends ModelAddressMapper<Address> {
 	}
 	
 
-	public Address toFhir(ModelAddress modelAddress) {
+	public Address fhirObject(ModelAddress modelAddress) {
         return new Address().addLine(modelAddress.getAddressLine1())
                 .addLine(modelAddress.getAddressLine2())
                 .setCity(modelAddress.getAddressCity())

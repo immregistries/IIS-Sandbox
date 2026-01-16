@@ -21,7 +21,7 @@ public class ModelNameMapperR4 extends ModelNameMapper<HumanName> {
 		return HumanName.class;
 	}
 
-	public org.hl7.fhir.r4.model.HumanName toFhir(ModelName modelName) {
+	public org.hl7.fhir.r4.model.HumanName fhirObject(ModelName modelName) {
 		org.hl7.fhir.r4.model.HumanName name = new org.hl7.fhir.r4.model.HumanName()
 				.setFamily(modelName.getNameLast())
 				.addGiven(modelName.getNameFirst())

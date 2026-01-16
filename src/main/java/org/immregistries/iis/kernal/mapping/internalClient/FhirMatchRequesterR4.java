@@ -32,7 +32,7 @@ public class FhirMatchRequesterR4 implements FhirMatchRequester {
 		Bundle matches = iisFhirClientFactory.getOrCreateFhirClientFromContext()
 			.operation().onType(Patient.class)
 			.named("match")
-			.withParameter(Parameters.class, "resource", patientMapper.fhirResource(patientForMatchQuery))
+			.withParameter(Parameters.class, "resource", patientMapper.fhirObject(patientForMatchQuery))
 			.returnResourceType(Bundle.class).execute();
 		BigDecimal singleMatchScore = new BigDecimal(-1);
 		for (Bundle.BundleEntryComponent entry : matches.getEntry()) {

@@ -59,7 +59,7 @@ public class ObservationProcessingInterceptor extends IisLogicInterceptor {
 		if (requestDetails.getRestOperationType().equals(RestOperationTypeEnum.CREATE) || requestDetails.getRestOperationType().equals(RestOperationTypeEnum.CREATE)) {
 			if (requestDetails.getResource() instanceof org.hl7.fhir.r4.model.Observation || requestDetails.getResource() instanceof org.hl7.fhir.r5.model.Observation) {
 				ObservationReported observationReported = processAndValidateObservationReported(observationMapper.localObjectReported(result), iisReportableList, processingFlavorSet, obxCount, patientBirthDate);
-				result = observationMapper.fhirResource(observationReported);
+				result = observationMapper.fhirObject(observationReported);
 			}
 		}
 		requestDetails.setResource(result);

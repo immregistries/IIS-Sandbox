@@ -39,9 +39,9 @@ public class TenantController {
 	public static final String PARAM_TENANT_ID = "tenantId";
 
 	@Autowired
-	TenantRestController tenantRestController;
+	private TenantRestController tenantRestController;
 	@Autowired
-	TenantUtil tenantUtil;
+	private TenantUtil tenantUtil;
 
 
 	/**

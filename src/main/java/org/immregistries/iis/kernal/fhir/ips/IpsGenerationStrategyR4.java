@@ -75,7 +75,7 @@ public class IpsGenerationStrategyR4 extends DefaultJpaIpsGenerationStrategy imp
 
 	@Override
 	public IAnyResource createAuthor() {
-		Organization organization = organizationMapper.fhirResource(CurrentTenantUtil.getTenant());
+		Organization organization = organizationMapper.fhirObject(CurrentTenantUtil.getTenant());
 		return organization;
 	}
 

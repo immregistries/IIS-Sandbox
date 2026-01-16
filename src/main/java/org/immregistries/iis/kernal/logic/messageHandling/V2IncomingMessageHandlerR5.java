@@ -13,7 +13,6 @@ import org.immregistries.iis.kernal.mapping.internalClient.FhirSearchRequester;
 import org.immregistries.iis.kernal.model.BusinessIdentifier;
 import org.immregistries.iis.kernal.model.ProcessingFlavor;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
-import org.immregistries.iis.kernal.mapping.fieldsMappers.BusinessIdentifierMapper;
 import org.immregistries.smm.tester.manager.HL7Reader;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,7 +82,7 @@ public class V2IncomingMessageHandlerR5 extends V2IncomingMessageHandler {
 			sendingOrganization = new Organization()
 					.setName(organizationName);
 			if (tokenParam != null) {
-				sendingOrganization.addIdentifier(businessIdentifierMapper.toFhir(businessIdentifier));
+				sendingOrganization.addIdentifier(businessIdentifierMapper.fhirObject(businessIdentifier));
 			}
 			sendingOrganization = (Organization) fhirSaveRequester.saveOrganization(sendingOrganization);
 		}

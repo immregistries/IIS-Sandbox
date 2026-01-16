@@ -27,11 +27,11 @@ import java.util.stream.Stream;
 @RequestMapping("/patientMatchingDatasetConversion")
 public class PatientMatchingDatasetConversionController {
 	@Autowired
-	FhirContext fhirContext;
+	private FhirContext fhirContext;
 	@Autowired
-	FhirSearchRequester fhirSearchRequester;
+	private FhirSearchRequester fhirSearchRequester;
 	@Autowired
-	PatientMismoConversionService patientMismoConversionService;
+	private PatientMismoConversionService patientMismoConversionService;
 
 	@PostMapping("/init")
 	public String initBuilder() throws IOException {

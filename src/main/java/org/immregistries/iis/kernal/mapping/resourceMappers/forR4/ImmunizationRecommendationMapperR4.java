@@ -39,7 +39,7 @@ public class ImmunizationRecommendationMapperR4 extends RecommendationMapper<Imm
 		return iisRecommendation;
 	}
 
-	public ImmunizationRecommendation fhirResource(IisRecommendation iisRecommendation) {
+	public ImmunizationRecommendation fhirObject(IisRecommendation iisRecommendation) {
 		ImmunizationRecommendation immunizationRecommendation = toFhir(iisRecommendation.getForecastActualList(),
 				iisRecommendation.getDate(), iisRecommendation.getIisPatient());
 		immunizationRecommendation.setId(iisRecommendation.getId());
@@ -52,7 +52,7 @@ public class ImmunizationRecommendationMapperR4 extends RecommendationMapper<Imm
 		ImmunizationRecommendation immunizationRecommendation = toFhir(forecastActualList, date);
 		if (iisPatient != null) {
 			immunizationRecommendation.setPatient(new Reference()
-					.setIdentifier(businessIdentifierMapper.toFhir(iisPatient.getMainBusinessIdentifier())));
+					.setIdentifier(businessIdentifierMapper.fhirObject(iisPatient.getMainBusinessIdentifier())));
 		}
 		return immunizationRecommendation;
 	}

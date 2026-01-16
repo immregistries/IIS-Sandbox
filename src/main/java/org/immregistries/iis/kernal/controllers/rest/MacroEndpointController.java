@@ -20,10 +20,10 @@ public class MacroEndpointController {
 	public static final String $_CREATE_PATH_KEY = "/$create";
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	@Autowired
-	FhirContext fhirContext;
+	private FhirContext fhirContext;
 
 	@Autowired
-	MacroEndpointService macroEndpointService;
+	private MacroEndpointService macroEndpointService;
 
 	// @GetMapping("/StructureDefinition")
 	// public ResponseEntity<String> getStructureDefinition() {

@@ -5,7 +5,7 @@ import org.immregistries.iis.kernal.model.OrgLocation;
 
 public abstract class LocationMapper<Location extends IAnyResource>
 		implements IisResourceMapper<OrgLocation, Location> {
-	public String fhirResourceName() {
+	public String fhirTypeName() {
 		return LOCATION;
 	}
 

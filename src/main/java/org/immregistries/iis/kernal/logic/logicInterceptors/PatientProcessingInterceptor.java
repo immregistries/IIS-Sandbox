@@ -58,7 +58,7 @@ public class PatientProcessingInterceptor extends IisLogicInterceptor {
 			if (requestDetails.getResource() instanceof org.hl7.fhir.r4.model.Patient || result instanceof org.hl7.fhir.r5.model.Patient) {
 				testMappingFhir(patientMapper, result, fhirContext.newJsonParser());
 				PatientReported patientReported = processAndValidatePatient(patientMapper.localObjectReported((IAnyResource) requestDetails.getResource()), iisReportableList, processingFlavorSet);
-				result = patientMapper.fhirResource(patientReported);
+				result = patientMapper.fhirObject(patientReported);
 			}
 		}
 		requestDetails.setResource(result);

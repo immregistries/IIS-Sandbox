@@ -21,7 +21,7 @@ public class MappingService {
 	public IAnyResource fhirResource(IisMappedToFhirResource internal) {
 		@SuppressWarnings("rawtypes")
 		IisResourceMapper mapper = mapperRegistry.mapper(internal);
-		return mapper.fhirResource(internal);
+		return mapper.fhirObject(internal);
 	}
 
 //    @SuppressWarnings("unchecked")
