@@ -1,6 +1,7 @@
 package org.immregistries.iis.kernal.controllers.rest;
 
 
+import ca.uhn.fhir.model.api.IElement;
 import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.hl7.fhir.instance.model.api.IBaseDatatype;
 import org.immregistries.iis.kernal.mapping.MappingService;
@@ -23,18 +24,32 @@ public class FhirMappingRestController {
 	@Autowired
 	MapperRegistry mapperRegistry;
 
-	@PostMapping("/resource")
-	public IAnyResource toFhir(
-		@RequestBody IisMappedToFhirResource iisDiffableObject
-	) {
-		return mappingService.fhirResource(iisDiffableObject);
-	}
-
-	@PostMapping("/field")
-	public IBaseDatatype fieldR4(
+	@PostMapping("/fhir")
+	public IElement toFhirAll(
 		@RequestBody IisMappedToFhir iisMappedToFhir
 	) {
-		return mapperRegistry.fieldMapper(iisMappedToFhir).fhirObject(iisMappedToFhir);
+		return mapperRegistry.mapper(iisMappedToFhir).fhirObject(iisMappedToFhir);
 	}
+
+	@PostMapping("/local")
+	public IisMappedToFhir toIisAll(
+		@RequestBody IElement iElement
+	) {
+		return mapperRegistry.mapper(iElement).localObject(iElement);
+	}
+//
+//	@PostMapping("/resource")
+//	public IAnyResource toFhir(
+//		@RequestBody IisMappedToFhirResource iisDiffableObject
+//	) {
+//		return mappingService.fhirResource(iisDiffableObject);
+//	}
+//
+//	@PostMapping("/field")
+//	public IBaseDatatype field(
+//		@RequestBody IisMappedToFhir iisMappedToFhir
+//	) {
+//		return mapperRegistry.fieldMapper(iisMappedToFhir).fhirObject(iisMappedToFhir);
+//	}
 
 }

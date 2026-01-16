@@ -37,28 +37,41 @@ public class MapperRegistry {
 
 
 	@SuppressWarnings("rawtypes")
-	public IisResourceMapper mapper(IisMappedToFhirResource internal) {
+	public IisMapper mapper(IisMappedToFhir internal) {
 		Class inteClass = internal.getClass();
 		Optional<IisResourceMasterReportedMapper> reportedMapper = masterReportedMappersFiltered(inteClass).findFirst();
 		if (reportedMapper.isPresent()) {
 			return reportedMapper.get();
 		}
-		Optional<IisResourceMapper> masterMapper = masterMappersFiltered(inteClass).findFirst();
-		return masterMapper.orElseThrow(mapperNotFoundExceptionSupplier(inteClass.getName()));
-	}
-
-	@SuppressWarnings("rawtypes")
-	public IisResourceMapper mapper(IAnyResource resource) {
-		String fhirType = resource.fhirType();
-		return masterMappersFiltered(fhirType)
+		return mappersFiltered(inteClass)
 			.findFirst()
-			.orElseThrow(mapperNotFoundExceptionSupplier(fhirType));
+			.orElseThrow(mapperNotFoundExceptionSupplier(inteClass.getName()));
 	}
 
 	@SuppressWarnings("rawtypes")
 	public IisMapper mapper(IBase iBase) {
 		String fhirType = iBase.fhirType();
 		return allMappersFiltered(fhirType)
+			.findFirst()
+			.orElseThrow(mapperNotFoundExceptionSupplier(fhirType));
+	}
+
+	@SuppressWarnings("rawtypes")
+	public IisResourceMapper resourceMapper(IisMappedToFhirResource internal) {
+		Class inteClass = internal.getClass();
+		Optional<IisResourceMasterReportedMapper> reportedMapper = masterReportedMappersFiltered(inteClass).findFirst();
+		if (reportedMapper.isPresent()) {
+			return reportedMapper.get();
+		}
+		return resourceMappersFiltered(inteClass)
+			.findFirst()
+			.orElseThrow(mapperNotFoundExceptionSupplier(inteClass.getName()));
+	}
+
+	@SuppressWarnings("rawtypes")
+	public IisResourceMapper resourceMapper(IAnyResource resource) {
+		String fhirType = resource.fhirType();
+		return resourceMappersFiltered(fhirType)
 			.findFirst()
 			.orElseThrow(mapperNotFoundExceptionSupplier(fhirType));
 	}
@@ -80,7 +93,7 @@ public class MapperRegistry {
 	}
 
 	@SuppressWarnings("rawtypes")
-	public IisResourceMasterReportedMapper mapperReported(IAnyResource resource) {
+	public IisResourceMasterReportedMapper masterReportedMapper(IAnyResource resource) {
 		String fhirType = resource.fhirType();
 		return masterReportedMappersFiltered(fhirType)
 			.findFirst()
@@ -103,7 +116,7 @@ public class MapperRegistry {
 		return mapperMastersReported.stream().filter(mapper -> mapper.fhirTypeName().equals(fhirType));
 	}
 
-	private @NotNull Stream<IisResourceMapper> masterMappersFiltered(String fhirType) {
+	private @NotNull Stream<IisResourceMapper> resourceMappersFiltered(String fhirType) {
 		return mapperMasters.stream().filter(mapper -> mapper.fhirTypeName().equals(fhirType));
 	}
 
@@ -115,7 +128,11 @@ public class MapperRegistry {
 		return mapperMastersReported.stream().filter(mapper -> mapper.localReportedType().equals(inteClass) || mapper.localMasterType().equals(inteClass));
 	}
 
-	private @NotNull Stream<IisResourceMapper> masterMappersFiltered(Class inteClass) {
+	private @NotNull Stream<IisResourceMapper> resourceMappersFiltered(Class inteClass) {
+		return mapperMasters.stream().filter(mapper -> mapper.localType().equals(inteClass));
+	}
+
+	private @NotNull Stream<IisResourceMapper> mappersFiltered(Class inteClass) {
 		return mapperMasters.stream().filter(mapper -> mapper.localType().equals(inteClass));
 	}
 
