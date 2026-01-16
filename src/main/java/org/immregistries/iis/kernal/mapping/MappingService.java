@@ -39,7 +39,7 @@ public class MappingService {
 	}
 
 	@SuppressWarnings("unchecked")
-	public IisDiffableObject localObject(IBaseDatatype datatype) {
+	public IisDiffableObject localField(IBaseDatatype datatype) {
 		@SuppressWarnings("rawtypes")
 		IFieldMapper mapper = mapperRegistry.fieldMapper(datatype);
 		return mapper.localObject(datatype);

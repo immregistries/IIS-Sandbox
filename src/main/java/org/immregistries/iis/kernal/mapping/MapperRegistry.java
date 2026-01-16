@@ -87,7 +87,7 @@ public class MapperRegistry {
 	}
 
 	private @NotNull Stream<IFieldMapper> fieldMappersFiltered(String fhirType) {
-		return fieldMappers.stream().filter(mapper -> fhirType.equals(mapper.fhirType()));
+		return fieldMappers.stream().filter(mapper -> fhirType.equals(mapper.fhirTypeName()));
 	}
 
 	private @NotNull Stream<IisResourceMasterReportedMapper> masterReportedMappersFiltered(String fhirType) {

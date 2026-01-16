@@ -30,17 +30,11 @@ public class FhirMappingRestController {
 		return mappingService.fhirResource(iisDiffableObject);
 	}
 
-	@PostMapping("/field/r4")
+	@PostMapping("/field")
 	public IBaseDatatype fieldR4(
 		@RequestBody IisMappedToFhir iisMappedToFhir
 	) {
-		return mapperRegistry.fieldMapper(iisMappedToFhir).toR4(iisMappedToFhir);
+		return mapperRegistry.fieldMapper(iisMappedToFhir).toFhir(iisMappedToFhir);
 	}
 
-	@PostMapping("/field/r5")
-	public IBaseDatatype fieldR5(
-		@RequestBody IisMappedToFhir iisMappedToFhir
-	) {
-		return mapperRegistry.fieldMapper(iisMappedToFhir).toR5(iisMappedToFhir);
-	}
 }

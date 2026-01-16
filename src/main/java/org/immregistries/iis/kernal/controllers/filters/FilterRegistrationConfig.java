@@ -17,7 +17,7 @@ public class FilterRegistrationConfig {
 	private static final String REST_TENANT_URL_FILTER = "restTenantUrlFilter";
 
 	@Autowired
-	AutowireCapableBeanFactory beanFactory;
+	private AutowireCapableBeanFactory beanFactory;
 
 	@Bean(name = "tenantUrlFilter")
 	public TenantUrlFilter tenantUrlFilter() {

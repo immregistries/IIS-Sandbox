@@ -7,8 +7,7 @@ import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
 import org.immregistries.iis.kernal.logic.CodeMapManagerService;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
-import org.immregistries.iis.kernal.mapping.fieldsMappers.BusinessIdentifierMapper;
-import org.immregistries.iis.kernal.mapping.internalClient.FhirReadRequester;
+import org.immregistries.iis.kernal.mapping.fieldsMappers.forR4.BusinessIdentifierMapperR4;
 import org.immregistries.iis.kernal.mapping.internalClient.FhirSaveRequesterR4;
 import org.immregistries.iis.kernal.mapping.resourceMappers.ImmunizationMapper;
 import org.immregistries.iis.kernal.model.BusinessIdentifier;
@@ -30,11 +29,9 @@ public class ImmunizationMapperR4 extends ImmunizationMapper<Immunization> imple
 	@Autowired
 	private FhirSaveRequesterR4 fhirRequests;
 	@Autowired
-	private FhirReadRequester fhirReadRequester;
-	@Autowired
 	private CodeMapManagerService codeMapManagerService;
 	@Autowired
-	private BusinessIdentifierMapper businessIdentifierMapper;
+	private BusinessIdentifierMapperR4 businessIdentifierMapper;
 
 	public void fillFromFhirResource(IisVaccination vr, Immunization i) {
 		/*
@@ -49,7 +46,7 @@ public class ImmunizationMapperR4 extends ImmunizationMapper<Immunization> imple
 		 * Business identifier
 		 */
 		for (Identifier identifier : i.getIdentifier()) {
-			vr.addBusinessIdentifier(businessIdentifierMapper.fromR4(identifier));
+			vr.addBusinessIdentifier(businessIdentifierMapper.localObject(identifier));
 		}
 		/*
 		 * Patient
@@ -244,7 +241,7 @@ public class ImmunizationMapperR4 extends ImmunizationMapper<Immunization> imple
 		 * Identifiers
 		 */
 		for (BusinessIdentifier businessIdentifier : vr.getBusinessIdentifiers()) {
-			i.addIdentifier(businessIdentifierMapper.toR4(businessIdentifier));
+			i.addIdentifier(businessIdentifierMapper.toFhir(businessIdentifier));
 		}
 		/*
 		 * Patient

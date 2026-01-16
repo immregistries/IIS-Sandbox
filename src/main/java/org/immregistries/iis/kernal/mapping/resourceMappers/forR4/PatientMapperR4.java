@@ -7,10 +7,10 @@ import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
 import org.immregistries.iis.kernal.logic.CodeMapManagerService;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
-import org.immregistries.iis.kernal.mapping.fieldsMappers.BusinessIdentifierMapper;
-import org.immregistries.iis.kernal.mapping.fieldsMappers.ModelAddressMapper;
-import org.immregistries.iis.kernal.mapping.fieldsMappers.ModelNameMapper;
-import org.immregistries.iis.kernal.mapping.fieldsMappers.ModelPhoneMapper;
+import org.immregistries.iis.kernal.mapping.fieldsMappers.forR4.BusinessIdentifierMapperR4;
+import org.immregistries.iis.kernal.mapping.fieldsMappers.forR4.ModelAddressMapperR4;
+import org.immregistries.iis.kernal.mapping.fieldsMappers.forR4.ModelNameMapperR4;
+import org.immregistries.iis.kernal.mapping.fieldsMappers.forR4.ModelPhoneMapperR4;
 import org.immregistries.iis.kernal.mapping.resourceMappers.PatientMapper;
 import org.immregistries.iis.kernal.model.*;
 import org.slf4j.Logger;
@@ -33,15 +33,15 @@ public class PatientMapperR4 extends PatientMapper<Patient> implements IR4Mapper
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	@Autowired
-	CodeMapManagerService codeMapManagerService;
+	private CodeMapManagerService codeMapManagerService;
 	@Autowired
-	private ModelAddressMapper modelAddressMapper;
+	private ModelAddressMapperR4 modelAddressMapper;
 	@Autowired
-	private ModelNameMapper modelNameMapper;
+	private ModelNameMapperR4 modelNameMapper;
 	@Autowired
-	private ModelPhoneMapper modelPhoneMapper;
+	private ModelPhoneMapperR4 modelPhoneMapper;
 	@Autowired
-	private BusinessIdentifierMapper businessIdentifierMapper;
+	private BusinessIdentifierMapperR4 businessIdentifierMapper;
 
 	public void fillFromFhirResource(IisPatient localPatient, Patient patient) {
 		if (StringUtils.isNotBlank(patient.getId())) {
@@ -64,7 +64,7 @@ public class PatientMapperR4 extends PatientMapper<Patient> implements IR4Mapper
 		 * Identifiers
 		 */
 		for (Identifier identifier : patient.getIdentifier()) {
-			localPatient.addBusinessIdentifier(businessIdentifierMapper.fromR4(identifier));
+			localPatient.addBusinessIdentifier(businessIdentifierMapper.localObject(identifier));
 		}
 		/*
 		 * Birth Date
@@ -83,7 +83,7 @@ public class PatientMapperR4 extends PatientMapper<Patient> implements IR4Mapper
 		List<ModelName> modelNames = new ArrayList<>(patient.getName().size());
 		localPatient.setPatientNames(modelNames);
 		for (HumanName name : patient.getName()) {
-			modelNames.add(modelNameMapper.fromR4(name));
+			modelNames.add(modelNameMapper.localObject(name));
 		}
 		/*
 		 * Mother Maiden name
@@ -154,7 +154,7 @@ public class PatientMapperR4 extends PatientMapper<Patient> implements IR4Mapper
 		for (ContactPoint telecom : patient.getTelecom()) {
 			if (null != telecom.getSystem()) {
 				if (telecom.getSystem().equals(ContactPoint.ContactPointSystem.PHONE)) {
-					localPatient.addPhone(modelPhoneMapper.fromR4(telecom));
+					localPatient.addPhone(modelPhoneMapper.localObject(telecom));
 				} else if (telecom.getSystem().equals(ContactPoint.ContactPointSystem.EMAIL)) {
 					localPatient.setEmail(StringUtils.defaultString(telecom.getValue()));
 				}
@@ -179,7 +179,7 @@ public class PatientMapperR4 extends PatientMapper<Patient> implements IR4Mapper
 		 * Addresses
 		 */
 		for (Address address : patient.getAddress()) {
-			localPatient.addAddress(modelAddressMapper.fromR4(address));
+			localPatient.addAddress(modelAddressMapper.localObject(address));
 		}
 		/*
 		 * Multiple birth
@@ -248,7 +248,7 @@ public class PatientMapperR4 extends PatientMapper<Patient> implements IR4Mapper
 		 */
 		for (Patient.ContactComponent contactComponent : patient.getContact()) {
 			PatientGuardian patientGuardian = new PatientGuardian();
-			patientGuardian.setName(modelNameMapper.fromR4(contactComponent.getName()));
+			patientGuardian.setName(modelNameMapper.localObject(contactComponent.getName()));
 			patientGuardian
 					.setGuardianRelationship(contactComponent.getRelationshipFirstRep().getCodingFirstRep().getCode());
 			localPatient.addPatientGuardian(patientGuardian);
@@ -281,7 +281,7 @@ public class PatientMapperR4 extends PatientMapper<Patient> implements IR4Mapper
 		 * Business Identifiers
 		 */
 		for (BusinessIdentifier businessIdentifier : pm.getBusinessIdentifiers()) {
-			p.addIdentifier(businessIdentifierMapper.toR4(businessIdentifier));
+			p.addIdentifier(businessIdentifierMapper.toFhir(businessIdentifier));
 		}
 		/*
 		 * Managing Organization
@@ -297,7 +297,7 @@ public class PatientMapperR4 extends PatientMapper<Patient> implements IR4Mapper
 		 * Names
 		 */
 		for (ModelName modelName : pm.getPatientNames()) {
-			p.addName(modelNameMapper.toR4(modelName));
+			p.addName(modelNameMapper.toFhir(modelName));
 		}
 		/*
 		 * Mother Maiden Name
@@ -376,7 +376,7 @@ public class PatientMapperR4 extends PatientMapper<Patient> implements IR4Mapper
 		 * Phone
 		 */
 		for (ModelPhone patientPhone : pm.getPhones()) {
-			p.addTelecom(modelPhoneMapper.toR4(patientPhone));
+			p.addTelecom(modelPhoneMapper.toFhir(patientPhone));
 		}
 		/*
 		 * Email
@@ -400,7 +400,7 @@ public class PatientMapperR4 extends PatientMapper<Patient> implements IR4Mapper
 		 * Addresses
 		 */
 		for (ModelAddress modelAddress : pm.getAddresses()) {
-			p.addAddress(modelAddressMapper.toR4(modelAddress));
+			p.addAddress(modelAddressMapper.toFhir(modelAddress));
 		}
 		/*
 		 * Birth Order
@@ -462,7 +462,7 @@ public class PatientMapperR4 extends PatientMapper<Patient> implements IR4Mapper
 		 */
 		for (PatientGuardian patientGuardian : pm.getPatientGuardians()) {
 			Patient.ContactComponent contact = p.addContact();
-			contact.setName(modelNameMapper.toR4(patientGuardian.getName()));
+			contact.setName(modelNameMapper.toFhir(patientGuardian.getName()));
 			if (StringUtils.isNotBlank(patientGuardian.getGuardianRelationship())) {
 				Coding coding = new Coding().setSystem(RELATIONSHIP_SYSTEM)
 						.setCode(patientGuardian.getGuardianRelationship());

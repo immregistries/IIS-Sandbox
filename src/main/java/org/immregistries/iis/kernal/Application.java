@@ -66,7 +66,7 @@ public class Application extends SpringBootServletInitializer {
 
 
 	@Autowired
-	AutowireCapableBeanFactory beanFactory;
+	private AutowireCapableBeanFactory beanFactory;
 
 	public static void main(String[] args) {
 		SpringApplication.run(Application.class, args);

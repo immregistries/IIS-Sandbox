@@ -1,8 +1,15 @@
 package org.immregistries.iis.kernal.fhir.mdm;
 
 import ca.uhn.fhir.context.FhirContext;
+import ca.uhn.fhir.jpa.api.dao.DaoRegistry;
 import ca.uhn.fhir.jpa.mdm.config.MdmSubmitterConfig;
+import ca.uhn.fhir.jpa.model.config.SubscriptionSettings;
+import ca.uhn.fhir.jpa.partition.IRequestPartitionHelperSvc;
 import ca.uhn.fhir.jpa.searchparam.config.NicknameServiceConfig;
+import ca.uhn.fhir.jpa.subscription.match.matcher.matching.SubscriptionStrategyEvaluator;
+import ca.uhn.fhir.jpa.subscription.match.registry.SubscriptionCanonicalizer;
+import ca.uhn.fhir.jpa.subscription.submit.interceptor.validator.SubscriptionChannelTypeValidatorFactory;
+import ca.uhn.fhir.jpa.subscription.submit.interceptor.validator.SubscriptionQueryValidator;
 import ca.uhn.fhir.jpa.topic.SubscriptionTopicConfig;
 import ca.uhn.fhir.mdm.api.IMdmSettings;
 import ca.uhn.fhir.mdm.interceptor.MdmSearchExpandingInterceptor;
@@ -27,8 +34,6 @@ import java.nio.charset.StandardCharsets;
 @Conditional(MdmConfigCondition.class)
 @Import({MdmIisConsumerConfig.class, MdmSubmitterConfig.class, NicknameServiceConfig.class, SubscriptionTopicConfig.class})
 public class MdmConfig {
-	@Autowired
-	AutowireCapableBeanFactory autowireCapableBeanFactory;
 
 	@Primary
 	@Bean
@@ -61,9 +66,8 @@ public class MdmConfig {
 
 	@Primary
 	@Bean
-	IisSubscriptionValidatingInterceptor iisSubscriptionValidatingInterceptor() {
-		IisSubscriptionValidatingInterceptor iisSubscriptionValidatingInterceptor = new IisSubscriptionValidatingInterceptor();
-		autowireCapableBeanFactory.autowireBean(iisSubscriptionValidatingInterceptor);
+	IisSubscriptionValidatingInterceptor iisSubscriptionValidatingInterceptor(DaoRegistry myDaoRegistry, SubscriptionSettings mySubscriptionSettings, SubscriptionStrategyEvaluator mySubscriptionStrategyEvaluator, SubscriptionCanonicalizer mySubscriptionCanonicalizer, FhirContext myFhirContext, IRequestPartitionHelperSvc myRequestPartitionHelperSvc, SubscriptionQueryValidator mySubscriptionQueryValidator, SubscriptionChannelTypeValidatorFactory mySubscriptionChannelTypeValidatorFactory) {
+		IisSubscriptionValidatingInterceptor iisSubscriptionValidatingInterceptor = new IisSubscriptionValidatingInterceptor(myDaoRegistry,mySubscriptionSettings,mySubscriptionStrategyEvaluator,mySubscriptionCanonicalizer,myFhirContext,myRequestPartitionHelperSvc,mySubscriptionQueryValidator,mySubscriptionChannelTypeValidatorFactory);
 		return iisSubscriptionValidatingInterceptor;
 	}
 

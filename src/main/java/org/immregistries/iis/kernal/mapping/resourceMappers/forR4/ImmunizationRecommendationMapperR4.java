@@ -12,7 +12,7 @@ import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
 import org.immregistries.iis.kernal.logic.CodeMapManagerService;
 import org.immregistries.iis.kernal.logic.VaccinationRecommendationDateCode;
 import org.immregistries.iis.kernal.logic.VaccinePlanStatus;
-import org.immregistries.iis.kernal.mapping.fieldsMappers.BusinessIdentifierMapper;
+import org.immregistries.iis.kernal.mapping.fieldsMappers.forR4.BusinessIdentifierMapperR4;
 import org.immregistries.iis.kernal.mapping.resourceMappers.RecommendationMapper;
 import org.immregistries.iis.kernal.model.IisPatient;
 import org.immregistries.iis.kernal.model.IisRecommendation;
@@ -30,9 +30,9 @@ import static org.immregistries.iis.kernal.mapping.resourceMappers.ImmunizationM
 @Conditional(OnR4Condition.class)
 public class ImmunizationRecommendationMapperR4 extends RecommendationMapper<ImmunizationRecommendation> implements IR4Mapper<IisRecommendation, ImmunizationRecommendation>  {
 	@Autowired
-	CodeMapManagerService codeMapManagerService;
+	private CodeMapManagerService codeMapManagerService;
 	@Autowired
-	private BusinessIdentifierMapper businessIdentifierMapper;
+	private BusinessIdentifierMapperR4 businessIdentifierMapper;
 
 	public IisRecommendation localObject(ImmunizationRecommendation immunizationRecommendation) {
 		IisRecommendation iisRecommendation = new IisRecommendation();
@@ -52,7 +52,7 @@ public class ImmunizationRecommendationMapperR4 extends RecommendationMapper<Imm
 		ImmunizationRecommendation immunizationRecommendation = toFhir(forecastActualList, date);
 		if (iisPatient != null) {
 			immunizationRecommendation.setPatient(new Reference()
-					.setIdentifier(businessIdentifierMapper.toR4(iisPatient.getMainBusinessIdentifier())));
+					.setIdentifier(businessIdentifierMapper.toFhir(iisPatient.getMainBusinessIdentifier())));
 		}
 		return immunizationRecommendation;
 	}

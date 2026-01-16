@@ -8,8 +8,8 @@ import org.hl7.fhir.instance.model.api.IIdType;
 import org.hl7.fhir.r4.model.Organization;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
 import org.immregistries.iis.kernal.logic.ProcessingException;
+import org.immregistries.iis.kernal.mapping.fieldsMappers.forR4.BusinessIdentifierMapperR4;
 import org.immregistries.iis.kernal.model.BusinessIdentifier;
-import org.immregistries.iis.kernal.mapping.fieldsMappers.BusinessIdentifierMapper;
 import org.immregistries.iis.kernal.model.ProcessingFlavor;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.immregistries.smm.tester.manager.HL7Reader;
@@ -26,7 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 @SuppressWarnings({ "unchecked" })
 public class V2IncomingMessageHandlerR4 extends V2IncomingMessageHandler {
 	@Autowired
-	private BusinessIdentifierMapper businessIdentifierMapper;
+	private BusinessIdentifierMapperR4 businessIdentifierMapper;
 
 	public @Nullable IIdType readResponsibleOrganizationIIdType(Tenant tenant, HL7Reader reader,
 			String sendingFacilityName, Set<ProcessingFlavor> processingFlavorSet) throws ProcessingException {
@@ -80,7 +80,7 @@ public class V2IncomingMessageHandlerR4 extends V2IncomingMessageHandler {
 			sendingOrganization = new Organization()
 					.setName(organizationName);
 			if (tokenParam != null) {
-				sendingOrganization.addIdentifier(businessIdentifierMapper.toR4(businessIdentifier));
+				sendingOrganization.addIdentifier(businessIdentifierMapper.toFhir(businessIdentifier));
 			}
 			sendingOrganization = (Organization) fhirSaveRequester.saveOrganization(sendingOrganization);
 		}

@@ -7,6 +7,7 @@ import org.immregistries.iis.kernal.fhir.common.annotations.OnR5Condition;
 import org.immregistries.iis.kernal.logic.IIncomingMessageHandler;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
 import org.immregistries.iis.kernal.mapping.fieldsMappers.BusinessIdentifierMapper;
+import org.immregistries.iis.kernal.mapping.fieldsMappers.forR5.BusinessIdentifierMapperR5;
 import org.immregistries.iis.kernal.mapping.resourceMappers.ImmunizationMapper;
 import org.immregistries.iis.kernal.mapping.resourceMappers.ObservationMapper;
 import org.immregistries.iis.kernal.model.BusinessIdentifier;
@@ -30,7 +31,7 @@ import static org.immregistries.iis.kernal.mapping.resourceMappers.ImmunizationM
 @Conditional(OnR5Condition.class)
 public class ObservationMapperR5 extends ObservationMapper<Observation> implements IR5Mapper<ObservationMaster, Observation> {
 	@Autowired
-	private BusinessIdentifierMapper businessIdentifierMapper;
+	private BusinessIdentifierMapperR5 businessIdentifierMapper;
 
 	public ObservationReported localObjectReportedWithMaster(Observation observation) {
 		ObservationReported observationReported = localObjectReported(observation);
@@ -195,7 +196,7 @@ public class ObservationMapperR5 extends ObservationMapper<Observation> implemen
 		 * OBX-21
 		 */
 		for (BusinessIdentifier businessIdentifier : om.getBusinessIdentifiers()) {
-			o.addIdentifier(businessIdentifierMapper.toR5(businessIdentifier));
+			o.addIdentifier(businessIdentifierMapper.toFhir(businessIdentifier));
 		}
 		/*
 		 * Components , other OBX with same subId
@@ -340,7 +341,7 @@ public class ObservationMapperR5 extends ObservationMapper<Observation> implemen
 		 * Identifiers
 		 */
 		for (Identifier identifier : o.getIdentifier()) {
-			observationReported.addBusinessIdentifier(businessIdentifierMapper.fromR5(identifier));
+			observationReported.addBusinessIdentifier(businessIdentifierMapper.localObject(identifier));
 		}
 		/*
 		 * Components

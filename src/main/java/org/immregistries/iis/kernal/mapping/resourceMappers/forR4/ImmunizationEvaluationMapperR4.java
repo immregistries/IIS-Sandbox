@@ -10,7 +10,7 @@ import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
 import org.immregistries.iis.kernal.logic.CodeMapManagerService;
-import org.immregistries.iis.kernal.mapping.fieldsMappers.BusinessIdentifierMapper;
+import org.immregistries.iis.kernal.mapping.fieldsMappers.forR4.BusinessIdentifierMapperR4;
 import org.immregistries.iis.kernal.mapping.resourceMappers.ImmunizationEvaluationMapper;
 import org.immregistries.iis.kernal.model.IisEvaluation;
 import org.immregistries.iis.kernal.model.IisVaccination;
@@ -34,7 +34,7 @@ public class ImmunizationEvaluationMapperR4 extends ImmunizationEvaluationMapper
 	@Autowired
 	private CodeMapManagerService codeMapManagerService;
 	@Autowired
-	private BusinessIdentifierMapper businessIdentifierMapper;
+	private BusinessIdentifierMapperR4 businessIdentifierMapper;
 
 	public IisEvaluation localObject(ImmunizationEvaluation immunizationEvaluation) {
 		IisEvaluation iisEvaluation = new IisEvaluation();
@@ -52,7 +52,7 @@ public class ImmunizationEvaluationMapperR4 extends ImmunizationEvaluationMapper
 		ImmunizationEvaluation immunizationEvaluation = new ImmunizationEvaluation();
 		if (iisVaccination.getPatientReported() != null) {
 			immunizationEvaluation.setPatient(new Reference().setIdentifier(
-				businessIdentifierMapper.toR4(iisVaccination.getPatientReported().getMainBusinessIdentifier())));
+				businessIdentifierMapper.toFhir(iisVaccination.getPatientReported().getMainBusinessIdentifier())));
 		}
 		immunizationEvaluation
 			.setImmunizationEvent(new Reference("Immunization/" + iisVaccination.getVaccinationId()));

@@ -13,6 +13,10 @@ import org.immregistries.iis.kernal.mapping.fieldsMappers.BusinessIdentifierMapp
 import org.immregistries.iis.kernal.mapping.fieldsMappers.ModelAddressMapper;
 import org.immregistries.iis.kernal.mapping.fieldsMappers.ModelNameMapper;
 import org.immregistries.iis.kernal.mapping.fieldsMappers.ModelPhoneMapper;
+import org.immregistries.iis.kernal.mapping.fieldsMappers.forR5.BusinessIdentifierMapperR5;
+import org.immregistries.iis.kernal.mapping.fieldsMappers.forR5.ModelAddressMapperR5;
+import org.immregistries.iis.kernal.mapping.fieldsMappers.forR5.ModelNameMapperR5;
+import org.immregistries.iis.kernal.mapping.fieldsMappers.forR5.ModelPhoneMapperR5;
 import org.immregistries.iis.kernal.mapping.resourceMappers.PatientMapper;
 import org.immregistries.iis.kernal.model.*;
 import org.slf4j.Logger;
@@ -37,13 +41,13 @@ public class PatientMapperR5 extends PatientMapper<Patient> implements IR5Mapper
 	@Autowired
 	private CodeMapManagerService codeMapManagerService;
 	@Autowired
-	private ModelAddressMapper modelAddressMapper;
+	private ModelAddressMapperR5 modelAddressMapper;
 	@Autowired
-	private ModelNameMapper modelNameMapper;
+	private ModelNameMapperR5 modelNameMapper;
 	@Autowired
-	private ModelPhoneMapper modelPhoneMapper;
+	private ModelPhoneMapperR5 modelPhoneMapper;
 	@Autowired
-	private BusinessIdentifierMapper businessIdentifierMapper;
+	private BusinessIdentifierMapperR5 businessIdentifierMapper;
 
 	public void fillFromFhirResource(IisPatient localPatient, Patient patient) {
 		if (StringUtils.isNotBlank(patient.getId())) {
@@ -66,7 +70,7 @@ public class PatientMapperR5 extends PatientMapper<Patient> implements IR5Mapper
 		 * Identifiers
 		 */
 		for (Identifier identifier : patient.getIdentifier()) {
-			localPatient.addBusinessIdentifier(businessIdentifierMapper.fromR5(identifier));
+			localPatient.addBusinessIdentifier(businessIdentifierMapper.localObject(identifier));
 		}
 		/*
 		 * Birth Date
@@ -85,7 +89,7 @@ public class PatientMapperR5 extends PatientMapper<Patient> implements IR5Mapper
 		List<ModelName> modelNames = new ArrayList<>(patient.getName().size());
 		localPatient.setPatientNames(modelNames);
 		for (HumanName name : patient.getName()) {
-			modelNames.add(modelNameMapper.fromR5(name));
+			modelNames.add(modelNameMapper.localObject(name));
 		}
 		/*
 		 * Mother Maiden name
@@ -158,7 +162,7 @@ public class PatientMapperR5 extends PatientMapper<Patient> implements IR5Mapper
 		for (ContactPoint telecom : patient.getTelecom()) {
 			if (null != telecom.getSystem()) {
 				if (telecom.getSystem().equals(ContactPointSystem.PHONE)) {
-					localPatient.addPhone(modelPhoneMapper.fromR5(telecom));
+					localPatient.addPhone(modelPhoneMapper.localObject(telecom));
 				} else if (telecom.getSystem().equals(ContactPointSystem.EMAIL)) {
 					localPatient.setEmail(StringUtils.defaultString(telecom.getValue(), ""));
 				}
@@ -183,7 +187,7 @@ public class PatientMapperR5 extends PatientMapper<Patient> implements IR5Mapper
 		 * Addresses
 		 */
 		for (Address address : patient.getAddress()) {
-			localPatient.addAddress(modelAddressMapper.fromR5(address));
+			localPatient.addAddress(modelAddressMapper.localObject(address));
 		}
 		/*
 		 * Multiple birth
@@ -253,7 +257,7 @@ public class PatientMapperR5 extends PatientMapper<Patient> implements IR5Mapper
 		 */
 		for (Patient.ContactComponent contactComponent : patient.getContact()) {
 			PatientGuardian patientGuardian = new PatientGuardian();
-			patientGuardian.setName(modelNameMapper.fromR5(contactComponent.getName()));
+			patientGuardian.setName(modelNameMapper.localObject(contactComponent.getName()));
 			patientGuardian
 					.setGuardianRelationship(contactComponent.getRelationshipFirstRep().getCodingFirstRep().getCode());
 			localPatient.addPatientGuardian(patientGuardian);
@@ -286,7 +290,7 @@ public class PatientMapperR5 extends PatientMapper<Patient> implements IR5Mapper
 		 * Business Identifiers
 		 */
 		for (BusinessIdentifier businessIdentifier : pm.getBusinessIdentifiers()) {
-			p.addIdentifier(businessIdentifierMapper.toR5(businessIdentifier));
+			p.addIdentifier(businessIdentifierMapper.toFhir(businessIdentifier));
 		}
 		/*
 		 * Managing Organization
@@ -302,7 +306,7 @@ public class PatientMapperR5 extends PatientMapper<Patient> implements IR5Mapper
 		 * Names
 		 */
 		for (ModelName modelName : pm.getPatientNames()) {
-			p.addName(modelNameMapper.toR5(modelName));
+			p.addName(modelNameMapper.toFhir(modelName));
 		}
 		/*
 		 * Mother Maiden Name
@@ -377,7 +381,7 @@ public class PatientMapperR5 extends PatientMapper<Patient> implements IR5Mapper
 		 * Phone
 		 */
 		for (ModelPhone patientPhone : pm.getPhones()) {
-			p.addTelecom(modelPhoneMapper.toR5(patientPhone));
+			p.addTelecom(modelPhoneMapper.toFhir(patientPhone));
 		}
 		/*
 		 * Email
@@ -399,7 +403,7 @@ public class PatientMapperR5 extends PatientMapper<Patient> implements IR5Mapper
 		 * Addresses
 		 */
 		for (ModelAddress modelAddress : pm.getAddresses()) {
-			p.addAddress(modelAddressMapper.toR5(modelAddress));
+			p.addAddress(modelAddressMapper.toFhir(modelAddress));
 		}
 		/*
 		 * Birth Order
@@ -462,7 +466,7 @@ public class PatientMapperR5 extends PatientMapper<Patient> implements IR5Mapper
 		 */
 		for (PatientGuardian patientGuardian : pm.getPatientGuardians()) {
 			Patient.ContactComponent contact = p.addContact();
-			contact.setName(modelNameMapper.toR5(patientGuardian.getName()));
+			contact.setName(modelNameMapper.toFhir(patientGuardian.getName()));
 			if (StringUtils.isNotBlank(patientGuardian.getGuardianRelationship())) {
 				Coding coding = new Coding().setSystem(RELATIONSHIP_SYSTEM)
 						.setCode(patientGuardian.getGuardianRelationship());

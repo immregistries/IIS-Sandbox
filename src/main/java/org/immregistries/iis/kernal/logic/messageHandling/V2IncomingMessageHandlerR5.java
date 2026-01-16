@@ -8,6 +8,7 @@ import org.hl7.fhir.instance.model.api.IIdType;
 import org.hl7.fhir.r5.model.Organization;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR5Condition;
 import org.immregistries.iis.kernal.logic.ProcessingException;
+import org.immregistries.iis.kernal.mapping.fieldsMappers.forR5.BusinessIdentifierMapperR5;
 import org.immregistries.iis.kernal.mapping.internalClient.FhirSearchRequester;
 import org.immregistries.iis.kernal.model.BusinessIdentifier;
 import org.immregistries.iis.kernal.model.ProcessingFlavor;
@@ -28,7 +29,7 @@ public class V2IncomingMessageHandlerR5 extends V2IncomingMessageHandler {
 	@Autowired
 	FhirSearchRequester fhirSearchRequester;
 	@Autowired
-	private BusinessIdentifierMapper businessIdentifierMapper;
+	private BusinessIdentifierMapperR5 businessIdentifierMapper;
 
 	public @Nullable IIdType readResponsibleOrganizationIIdType(Tenant tenant, HL7Reader reader,
 			String sendingFacilityName, Set<ProcessingFlavor> processingFlavorSet) throws ProcessingException {
@@ -82,7 +83,7 @@ public class V2IncomingMessageHandlerR5 extends V2IncomingMessageHandler {
 			sendingOrganization = new Organization()
 					.setName(organizationName);
 			if (tokenParam != null) {
-				sendingOrganization.addIdentifier(businessIdentifierMapper.toR5(businessIdentifier));
+				sendingOrganization.addIdentifier(businessIdentifierMapper.toFhir(businessIdentifier));
 			}
 			sendingOrganization = (Organization) fhirSaveRequester.saveOrganization(sendingOrganization);
 		}

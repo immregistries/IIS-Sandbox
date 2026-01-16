@@ -6,7 +6,7 @@ import org.hl7.fhir.r4.model.*;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
 import org.immregistries.iis.kernal.logic.IIncomingMessageHandler;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
-import org.immregistries.iis.kernal.mapping.fieldsMappers.BusinessIdentifierMapper;
+import org.immregistries.iis.kernal.mapping.fieldsMappers.forR4.BusinessIdentifierMapperR4;
 import org.immregistries.iis.kernal.mapping.resourceMappers.ImmunizationMapper;
 import org.immregistries.iis.kernal.mapping.resourceMappers.ObservationMapper;
 import org.immregistries.iis.kernal.model.BusinessIdentifier;
@@ -30,7 +30,7 @@ import static org.immregistries.iis.kernal.mapping.resourceMappers.ImmunizationM
 @Conditional(OnR4Condition.class)
 public class ObservationMapperR4 extends ObservationMapper<Observation> implements IR4Mapper<ObservationMaster, Observation> {
 	@Autowired
-	private BusinessIdentifierMapper businessIdentifierMapper;
+	private BusinessIdentifierMapperR4 businessIdentifierMapper;
 
 	public ObservationReported localObjectReportedWithMaster(Observation observation) {
 		ObservationReported observationReported = localObjectReported(observation);
@@ -195,7 +195,7 @@ public class ObservationMapperR4 extends ObservationMapper<Observation> implemen
 		 * OBX-21
 		 */
 		for (BusinessIdentifier businessIdentifier : om.getBusinessIdentifiers()) {
-			o.addIdentifier(businessIdentifierMapper.toR4(businessIdentifier));
+			o.addIdentifier(businessIdentifierMapper.toFhir(businessIdentifier));
 		}
 		/*
 		 * Components , other OBX with same subId
@@ -341,7 +341,7 @@ public class ObservationMapperR4 extends ObservationMapper<Observation> implemen
 		 * Identifiers
 		 */
 		for (Identifier identifier : o.getIdentifier()) {
-			observationReported.addBusinessIdentifier(businessIdentifierMapper.fromR4(identifier));
+			observationReported.addBusinessIdentifier(businessIdentifierMapper.localObject(identifier));
 		}
 		/*
 		 * Components

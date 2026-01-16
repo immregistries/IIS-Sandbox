@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.instance.model.api.IBaseBundle;
 import org.hl7.fhir.instance.model.api.IDomainResource;
+import org.hl7.fhir.r5.model.Identifier;
 import org.immregistries.iis.kernal.controllers.rest.PatientRestController;
 import org.immregistries.iis.kernal.controllers.rest.RecommendationRestController;
 import org.immregistries.iis.kernal.controllers.servlet.util.PatientServletUtil;
@@ -197,7 +198,7 @@ public class RecommendationController {
 					org.hl7.fhir.r5.model.ImmunizationRecommendation immunizationRecommendation = (org.hl7.fhir.r5.model.ImmunizationRecommendation) recommendationResource;
 					immunizationRecommendation
 							.setPatient(new org.hl7.fhir.r5.model.Reference()
-									.setIdentifier(businessIdentifierMapper.toR5(identifier)));
+									.setIdentifier((Identifier) businessIdentifierMapper.toFhir(identifier)));
 					PatientServletUtil.printSubscriptions(out, parser, subcriptionBundle, immunizationRecommendation);
 				}
 			}

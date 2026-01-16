@@ -80,6 +80,17 @@ public class IisSubscriptionValidatingInterceptor extends SubscriptionValidating
 	@Autowired
 	private SubscriptionChannelTypeValidatorFactory mySubscriptionChannelTypeValidatorFactory;
 
+	public IisSubscriptionValidatingInterceptor(DaoRegistry myDaoRegistry, SubscriptionSettings mySubscriptionSettings, SubscriptionStrategyEvaluator mySubscriptionStrategyEvaluator, SubscriptionCanonicalizer mySubscriptionCanonicalizer, FhirContext myFhirContext, IRequestPartitionHelperSvc myRequestPartitionHelperSvc, SubscriptionQueryValidator mySubscriptionQueryValidator, SubscriptionChannelTypeValidatorFactory mySubscriptionChannelTypeValidatorFactory) {
+		this.myDaoRegistry = myDaoRegistry;
+		this.mySubscriptionSettings = mySubscriptionSettings;
+		this.mySubscriptionStrategyEvaluator = mySubscriptionStrategyEvaluator;
+		this.mySubscriptionCanonicalizer = mySubscriptionCanonicalizer;
+		this.myFhirContext = myFhirContext;
+		this.myRequestPartitionHelperSvc = myRequestPartitionHelperSvc;
+		this.mySubscriptionQueryValidator = mySubscriptionQueryValidator;
+		this.mySubscriptionChannelTypeValidatorFactory = mySubscriptionChannelTypeValidatorFactory;
+	}
+
 	@Hook(value = Pointcut.STORAGE_PRESTORAGE_RESOURCE_CREATED, order = ORDER_SUBSCRIPTION_VALIDATING)
 	public void resourcePreCreate(
 		IBaseResource theResource, RequestDetails theRequestDetails, RequestPartitionId theRequestPartitionId) {

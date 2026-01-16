@@ -24,9 +24,9 @@ public class LoginFormController {
 
 
 	@Autowired
-	AuthenticationRestController authenticationRestController;
+	private AuthenticationRestController authenticationRestController;
 	@Autowired
-	TenantRestController tenantRestController;
+	private TenantRestController tenantRestController;
 
 	public static final String LOGIN_PARAM_USERID = "USERID";
 	public static final String LOGIN_PARAM_PASSWORD = "PASSWORD";

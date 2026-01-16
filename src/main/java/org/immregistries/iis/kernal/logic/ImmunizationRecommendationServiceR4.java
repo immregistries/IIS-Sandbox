@@ -8,6 +8,7 @@ import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
 import org.immregistries.iis.kernal.logic.messageHandling.IncomingQueryHandler;
 import org.immregistries.iis.kernal.mapping.fieldsMappers.BusinessIdentifierMapper;
+import org.immregistries.iis.kernal.mapping.fieldsMappers.forR4.BusinessIdentifierMapperR4;
 import org.immregistries.iis.kernal.mapping.internalClient.FhirSearchRequester;
 import org.immregistries.iis.kernal.mapping.resourceMappers.forR4.ImmunizationEvaluationMapperR4;
 import org.immregistries.iis.kernal.mapping.resourceMappers.forR4.ImmunizationRecommendationMapperR4;
@@ -39,11 +40,9 @@ public class ImmunizationRecommendationServiceR4
 	@Autowired
 	private ImmunizationEvaluationMapperR4 immunizationEvaluationMapperR4;
 	@Autowired
-	private PatientMapperR4 patientMapperR4;
-	@Autowired
 	private CodeMapManagerService codeMapManagerService;
 	@Autowired
-	private BusinessIdentifierMapper businessIdentifierMapper;
+	private BusinessIdentifierMapperR4 businessIdentifierMapper;
 
 	@Override
 	public ImmunizationRecommendation generate(Tenant tenant, Date date) {
@@ -67,7 +66,7 @@ public class ImmunizationRecommendationServiceR4
 	public ImmunizationRecommendation generate(Tenant tenant, Date date, IisPatient patientReported) {
 		ImmunizationRecommendation recommendation = this.generate(tenant, date);
 		recommendation.setPatient(new Reference()
-				.setIdentifier(businessIdentifierMapper.toR4(patientReported.getMainBusinessIdentifier())));
+				.setIdentifier(businessIdentifierMapper.toFhir(patientReported.getMainBusinessIdentifier())));
 		return recommendation;
 	}
 

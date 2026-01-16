@@ -63,7 +63,7 @@ public abstract class V2IncomingMessageHandler extends IncomingMessageHandler<HL
 	@Autowired
 	MessageRecordingService messageRecordingService;
 	@Autowired
-	CodeMapManagerService codeMapManagerService;
+	private CodeMapManagerService codeMapManagerService;
 
 
 	public V2IncomingMessageHandler() {

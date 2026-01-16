@@ -17,7 +17,7 @@ public class CodeMapRestController {
 	public static final String CODEMAPS_PATH_KEY = "codemaps";
 	public static final String CODEMAPS_PATH_SUFFIX = "/" + CODEMAPS_PATH_KEY;
 	@Autowired
-	CodeMapManagerService codeMapManagerService;
+	private CodeMapManagerService codeMapManagerService;
 
 	@GetMapping
     public CodeMap getCodeMaps(
