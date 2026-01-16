@@ -1,17 +1,24 @@
 package org.immregistries.iis.kernal.model;
 
-import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.immregistries.vfa.connect.model.ForecastActual;
 
 import java.util.Date;
 import java.util.List;
 
 public class IisRecommendation extends IisMappedToFhirResource {
-	private Tenant tenant;
 	private String id;
 	private IisPatient iisPatient;
 	private List<ForecastActual> forecastActualList;
 	private Date date;
+
+	public IisRecommendation() {
+	}
+
+	public IisRecommendation(IisPatient iisPatient, List<ForecastActual> forecastActualList, Date date) {
+		this.iisPatient = iisPatient;
+		this.forecastActualList = forecastActualList;
+		this.date = date;
+	}
 
 	public String getId() {
 		return id;
@@ -43,13 +50,5 @@ public class IisRecommendation extends IisMappedToFhirResource {
 
 	public void setDate(Date date) {
 		this.date = date;
-	}
-
-	public Tenant getTenant() {
-		return tenant;
-	}
-
-	public void setTenant(Tenant tenant) {
-		this.tenant = tenant;
 	}
 }

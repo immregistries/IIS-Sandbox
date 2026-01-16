@@ -13,6 +13,7 @@ import org.immregistries.iis.kernal.mapping.resourceMappers.forR5.ImmunizationEv
 import org.immregistries.iis.kernal.mapping.resourceMappers.forR5.ImmunizationRecommendationMapperR5;
 import org.immregistries.iis.kernal.mapping.resourceMappers.forR5.PatientMapperR5;
 import org.immregistries.iis.kernal.model.IisPatient;
+import org.immregistries.iis.kernal.model.IisRecommendation;
 import org.immregistries.iis.kernal.model.IisVaccination;
 import org.immregistries.iis.kernal.model.VaccinationMaster;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
@@ -116,8 +117,8 @@ public class ImmunizationRecommendationServiceR5
 										List<? extends IisVaccination> iisVaccinationList) {
 		List<ForecastActual> forecastActualList = incomingQueryHandler.doForecast(iisPatient,
 			iisVaccinationList, tenant, date);
-		ImmunizationRecommendation immunizationRecommendation = immunizationRecommendationMapperR5
-			.toFhir(forecastActualList, date, iisPatient);
+		IisRecommendation iisRecommendation = new IisRecommendation(iisPatient, forecastActualList, date);
+		ImmunizationRecommendation immunizationRecommendation = immunizationRecommendationMapperR5.fhirResource(iisRecommendation);
 		immunizationRecommendation.addIdentifier(new Identifier().setValue(UUID.randomUUID().toString().split("-")[0]));
 		immunizationRecommendation.setAuthority(new Reference()
 				.setIdentifier(new Identifier().setSystem("IIS-Sandbox/tenantAndLonestar")
