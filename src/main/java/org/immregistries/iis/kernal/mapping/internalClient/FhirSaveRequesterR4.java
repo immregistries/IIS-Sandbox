@@ -34,7 +34,7 @@ public class FhirSaveRequesterR4 extends
 	public FhirReadRequester fhirReadRequester;
 
 	public PatientReported savePatientReported(PatientReported patientReported) {
-		Patient patient = (Patient) allMappingService.fhirResource(patientReported);
+		Patient patient = (Patient) mappingService.fhirResource(patientReported);
 		boolean createOnly = false;
 		List<ICriterion> criteria = new ArrayList<>(2);
 		criteria.add(Patient.IDENTIFIER.exactly().systemAndIdentifier(
@@ -48,7 +48,7 @@ public class FhirSaveRequesterR4 extends
 		MethodOutcome outcome = save(createOnly, patient, criteria.toArray(new ICriterion[0]));
 		if (!outcome.getResource().isEmpty()) {
 			patientReported.setPatientId(outcome.getResource().getIdElement().getIdPart());
-			return (PatientReported) allMappingService.localObjectReportedWithMaster((IAnyResource) outcome.getResource());
+			return (PatientReported) mappingService.localObjectReportedWithMaster((IAnyResource) outcome.getResource());
 		} else if (outcome.getCreated() != null && outcome.getCreated()) {
 			patientReported.setPatientId(outcome.getId().getIdPart());
 			return fhirReadRequester.readAsPatientReported(outcome.getId().getIdPart());
@@ -81,7 +81,7 @@ public class FhirSaveRequesterR4 extends
 	}
 
 	public VaccinationReported saveVaccinationReported(VaccinationReported vaccinationReported) {
-		Immunization immunization = (Immunization) allMappingService.fhirResource(vaccinationReported);
+		Immunization immunization = (Immunization) mappingService.fhirResource(vaccinationReported);
 		// TODO change conditional create to update ?
 		MethodOutcome outcome = save(false, immunization
 		// , Immunization.IDENTIFIER.exactly()

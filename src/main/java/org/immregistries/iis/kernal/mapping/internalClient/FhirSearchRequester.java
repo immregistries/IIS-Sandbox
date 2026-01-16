@@ -10,7 +10,7 @@ import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Parameters;
-import org.immregistries.iis.kernal.mapping.AllMappingService;
+import org.immregistries.iis.kernal.mapping.MappingService;
 import org.immregistries.iis.kernal.mapping.resourceMappers.*;
 import org.immregistries.iis.kernal.model.*;
 import org.immregistries.iis.kernal.security.TenantUtil;
@@ -31,7 +31,7 @@ public class FhirSearchRequester {
 	@Autowired
 	DaoRegistry daoRegistry;
 	@Autowired
-	AllMappingService allMappingService;
+	MappingService mappingService;
 	@Autowired
 	PatientMapper patientMapper;
 
@@ -45,7 +45,7 @@ public class FhirSearchRequester {
 		IisMappedToFhirResource mappedObject = null;
 		IBundleProvider bundleProvider = searchGoldenRecord(resourceType, searchParameterMap);
 		if (!bundleProvider.isEmpty()) {
-			mappedObject = allMappingService.localObject((IAnyResource) bundleProvider.getResources(0, 1).get(0));
+			mappedObject = mappingService.localObject((IAnyResource) bundleProvider.getResources(0, 1).get(0));
 		}
 		return mappedObject;
 	}
@@ -55,7 +55,7 @@ public class FhirSearchRequester {
 		IisMappedToFhirResource mappedObject = null;
 		IBundleProvider bundleProvider = searchRegularRecord(resourceType, searchParameterMap);
 		if (!bundleProvider.isEmpty()) {
-			mappedObject = allMappingService.localObjectReportedWithMaster((IAnyResource) bundleProvider.getResources(0, 1).get(0));
+			mappedObject = mappingService.localObjectReportedWithMaster((IAnyResource) bundleProvider.getResources(0, 1).get(0));
 		}
 		return mappedObject;
 	}
@@ -63,7 +63,7 @@ public class FhirSearchRequester {
 	public List<IisMappedToFhirResource> searchMappedObjectReportedList(String resourceType,
 																							  SearchParameterMap searchParameterMap) {
 		IBundleProvider bundleProvider = searchRegularRecord(resourceType, searchParameterMap);
-		return bundleProvider.getAllResources().stream().map(IAnyResource.class::cast).map(allMappingService::localObjectReportedWithMaster)
+		return bundleProvider.getAllResources().stream().map(IAnyResource.class::cast).map(mappingService::localObjectReportedWithMaster)
 			.collect(Collectors.toList());
 	}
 
@@ -72,7 +72,7 @@ public class FhirSearchRequester {
 		IBundleProvider bundleProvider = searchGoldenRecord(ImmunizationMapper.IMMUNIZATION, searchParameterMap);
 		if (!bundleProvider.isEmpty()) {
 			for (IBaseResource resource : bundleProvider.getAllResources()) {
-				vaccinationMasterList.add((VaccinationMaster) allMappingService.localObjectMaster((IAnyResource) resource));
+				vaccinationMasterList.add((VaccinationMaster) mappingService.localObjectMaster((IAnyResource) resource));
 			}
 		}
 		return vaccinationMasterList;
@@ -83,7 +83,7 @@ public class FhirSearchRequester {
 		IBundleProvider bundleProvider = searchRegularRecord(ImmunizationMapper.IMMUNIZATION, searchParameterMap);
 		for (IBaseResource resource : bundleProvider.getAllResources()) {
 			vaccinationReportedList
-				.add((VaccinationReported) allMappingService.localObjectReportedWithMaster((IAnyResource) resource));
+				.add((VaccinationReported) mappingService.localObjectReportedWithMaster((IAnyResource) resource));
 		}
 		return vaccinationReportedList;
 	}
@@ -110,7 +110,7 @@ public class FhirSearchRequester {
 		IBundleProvider bundleProvider = search(ObservationMapper.OBSERVATION, searchParameterMap);
 		for (IBaseResource resource : bundleProvider.getAllResources()) {
 			observationReportedList
-				.add((ObservationReported) allMappingService.localObjectReportedWithMaster((IAnyResource) resource));
+				.add((ObservationReported) mappingService.localObjectReportedWithMaster((IAnyResource) resource));
 		}
 		return observationReportedList;
 	}
@@ -123,7 +123,7 @@ public class FhirSearchRequester {
 		List<OrgLocation> locationList = new ArrayList<OrgLocation>();
 		IBundleProvider bundleProvider = search(LocationMapper.LOCATION, searchParameterMap);
 		for (IBaseResource resource : bundleProvider.getAllResources()) {
-			locationList.add((OrgLocation) allMappingService.localObject((IAnyResource) resource));
+			locationList.add((OrgLocation) mappingService.localObject((IAnyResource) resource));
 		}
 		return locationList;
 	}
@@ -226,7 +226,7 @@ public class FhirSearchRequester {
 		if (!bundleProvider.isEmpty()) {
 			for (IBaseResource resource : bundleProvider.getAllResources()) {
 				patientReportedList
-					.add((PatientReported) allMappingService.localObjectReportedWithMaster((org.hl7.fhir.r4.model.Patient) resource));
+					.add((PatientReported) mappingService.localObjectReportedWithMaster((org.hl7.fhir.r4.model.Patient) resource));
 			}
 		}
 		return patientReportedList;
@@ -237,7 +237,7 @@ public class FhirSearchRequester {
 		IBundleProvider bundleProvider = searchGoldenRecord(PatientMapper.PATIENT, searchParameterMap);
 		if (!bundleProvider.isEmpty()) {
 			for (IBaseResource resource : bundleProvider.getAllResources()) {
-				patientList.add((PatientMaster) allMappingService.localObject((IAnyResource) resource));
+				patientList.add((PatientMaster) mappingService.localObject((IAnyResource) resource));
 			}
 		}
 		return patientList;
@@ -281,7 +281,7 @@ public class FhirSearchRequester {
 		for (Bundle.BundleEntryComponent entry : bundle.getEntry()) {
 			if (entry.getResource().fhirType().equals(IMMUNIZATION)) {
 				if (FhirRequesterUtil.isGoldenRecord(entry.getResource())) {
-					VaccinationMaster vaccinationMaster = (VaccinationMaster) allMappingService
+					VaccinationMaster vaccinationMaster = (VaccinationMaster) mappingService
 						.localObject(entry.getResource());
 					if (vaccinationMaster != null) {
 						vaccinationList.add(vaccinationMaster);

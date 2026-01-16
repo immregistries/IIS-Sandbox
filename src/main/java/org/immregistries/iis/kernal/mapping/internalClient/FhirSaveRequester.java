@@ -9,7 +9,7 @@ import ca.uhn.fhir.rest.gclient.ICriterion;
 import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.instance.model.api.IAnyResource;
-import org.immregistries.iis.kernal.mapping.AllMappingService;
+import org.immregistries.iis.kernal.mapping.MappingService;
 import org.immregistries.iis.kernal.mapping.resourceMappers.*;
 import org.immregistries.iis.kernal.security.TenantUtil;
 import org.slf4j.Logger;
@@ -39,7 +39,7 @@ public abstract class FhirSaveRequester<Patient extends IAnyResource, Immunizati
 	@Autowired
 	ObservationMapper<Observation> observationMapper;
 	@Autowired
-	AllMappingService allMappingService;
+	MappingService mappingService;
 
 	@Autowired
 	IisFhirClientFactory iisFhirClientFactory;

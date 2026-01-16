@@ -5,7 +5,7 @@ import ca.uhn.fhir.jpa.api.dao.IFhirResourceDao;
 import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.*;
-import org.immregistries.iis.kernal.mapping.AllMappingService;
+import org.immregistries.iis.kernal.mapping.MappingService;
 import org.immregistries.iis.kernal.mapping.resourceMappers.ImmunizationMapper;
 import org.immregistries.iis.kernal.mapping.resourceMappers.LocationMapper;
 import org.immregistries.iis.kernal.mapping.resourceMappers.PatientMapper;
@@ -27,7 +27,7 @@ public class FhirReadRequester {
 	@Autowired
 	DaoRegistry daoRegistry;
 	@Autowired
-	AllMappingService allMappingService;
+    MappingService mappingService;
 
 	/**
 	 *
@@ -43,42 +43,42 @@ public class FhirReadRequester {
 
 	public IisPatient readAsPatient(String id) {
 		Patient patient = (Patient) read(PatientMapper.PATIENT, id);
-		return (IisPatient) allMappingService.localObject(patient);
+		return (IisPatient) mappingService.localObject(patient);
 	}
 
 	public PatientMaster readAsPatientMaster(String id) {
 		Patient patient = (Patient) read(PatientMapper.PATIENT, id);
 		if (FhirRequesterUtil.isGoldenRecord(patient)) {
-			return (PatientMaster) allMappingService.localObjectMaster(patient);
+			return (PatientMaster) mappingService.localObjectMaster(patient);
 		}
 		return null;
 	}
 
 	public PatientReported readAsPatientReported(String id) {
-		return (PatientReported) allMappingService.localObjectReportedWithMaster((IAnyResource) read(PatientMapper.PATIENT, id));
+		return (PatientReported) mappingService.localObjectReportedWithMaster((IAnyResource) read(PatientMapper.PATIENT, id));
 	}
 
 	public ModelPerson readPractitionerAsPerson(String id) {
-		return (ModelPerson) allMappingService.localObject((Practitioner) read(PractitionerMapper.PRACTITIONER, id));
+		return (ModelPerson) mappingService.localObject((Practitioner) read(PractitionerMapper.PRACTITIONER, id));
 	}
 
 	public OrgLocation readAsOrgLocation(String id) {
-		return (OrgLocation) allMappingService.localObject((Location) read(LocationMapper.LOCATION, id));
+		return (OrgLocation) mappingService.localObject((Location) read(LocationMapper.LOCATION, id));
 	}
 
 	public VaccinationReported readAsVaccinationReported(String id) {
-		return (VaccinationReported) allMappingService.localObjectReportedWithMaster((Immunization) read(ImmunizationMapper.IMMUNIZATION, id));
+		return (VaccinationReported) mappingService.localObjectReportedWithMaster((Immunization) read(ImmunizationMapper.IMMUNIZATION, id));
 	}
 
 	public IisVaccination readAsVaccination(String id) {
 		Immunization immunization = (Immunization) read(ImmunizationMapper.IMMUNIZATION, id);
-		return (IisVaccination) allMappingService.localObject(immunization);
+		return (IisVaccination) mappingService.localObject(immunization);
 	}
 
 	public VaccinationMaster readAsVaccinationMaster(String id) {
 		Immunization immunization = (Immunization) read(ImmunizationMapper.IMMUNIZATION, id);
 		if (FhirRequesterUtil.isGoldenRecord(immunization)) {
-			return (VaccinationMaster) allMappingService.localObject(immunization);
+			return (VaccinationMaster) mappingService.localObject(immunization);
 		}
 		return null;
 	}

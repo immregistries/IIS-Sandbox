@@ -3,7 +3,7 @@ package org.immregistries.iis.kernal.controllers.rest;
 
 import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.hl7.fhir.instance.model.api.IBaseDatatype;
-import org.immregistries.iis.kernal.mapping.AllMappingService;
+import org.immregistries.iis.kernal.mapping.MappingService;
 import org.immregistries.iis.kernal.mapping.MapperRegistry;
 import org.immregistries.iis.kernal.model.IisMappedToFhir;
 import org.immregistries.iis.kernal.model.IisMappedToFhirResource;
@@ -19,7 +19,7 @@ public class FhirMappingRestController {
 
 	public static final String MAPPING_KEY_PATH = "/mapping";
 	@Autowired
-	AllMappingService mappingService;
+	MappingService mappingService;
 	@Autowired
 	MapperRegistry mapperRegistry;
 
