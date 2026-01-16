@@ -4,7 +4,7 @@ import org.hl7.fhir.r5.model.ImmunizationEvaluation;
 import org.hl7.fhir.r5.model.Reference;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR5Condition;
 import org.immregistries.iis.kernal.mapping.fieldsMappers.BusinessIdentifierMapper;
-import org.immregistries.iis.kernal.mapping.resourceMappers.IImmunizationEvaluationMapper;
+import org.immregistries.iis.kernal.mapping.resourceMappers.ImmunizationEvaluationMapper;
 import org.immregistries.iis.kernal.model.IisEvaluation;
 import org.immregistries.iis.kernal.model.IisVaccination;
 import org.immregistries.vfa.connect.model.EvaluationActual;
@@ -19,7 +19,7 @@ import java.util.Date;
  */
 @Service
 @Conditional(OnR5Condition.class)
-public class ImmunizationEvaluationMapperR5 extends IImmunizationEvaluationMapper<ImmunizationEvaluation> implements IR5Mapper<IisEvaluation, ImmunizationEvaluation>{
+public class ImmunizationEvaluationMapperR5 extends ImmunizationEvaluationMapper<ImmunizationEvaluation> implements IR5Mapper<IisEvaluation, ImmunizationEvaluation>{
 
 	@Autowired
 	private ImmunizationMapperR5 immunizationMapperR5;

@@ -13,7 +13,7 @@ import org.immregistries.iis.kernal.logic.CodeMapManagerService;
 import org.immregistries.iis.kernal.logic.VaccinationRecommendationDateCode;
 import org.immregistries.iis.kernal.logic.VaccinePlanStatus;
 import org.immregistries.iis.kernal.mapping.fieldsMappers.BusinessIdentifierMapper;
-import org.immregistries.iis.kernal.mapping.resourceMappers.IRecommendationMapper;
+import org.immregistries.iis.kernal.mapping.resourceMappers.RecommendationMapper;
 import org.immregistries.iis.kernal.model.IisPatient;
 import org.immregistries.iis.kernal.model.IisRecommendation;
 import org.immregistries.vfa.connect.model.ForecastActual;
@@ -28,7 +28,7 @@ import static org.immregistries.iis.kernal.mapping.resourceMappers.ImmunizationM
 
 @Service
 @Conditional(OnR4Condition.class)
-public class ImmunizationRecommendationMapperR4 extends IRecommendationMapper<ImmunizationRecommendation> implements IR4Mapper<IisRecommendation, ImmunizationRecommendation>  {
+public class ImmunizationRecommendationMapperR4 extends RecommendationMapper<ImmunizationRecommendation> implements IR4Mapper<IisRecommendation, ImmunizationRecommendation>  {
 	@Autowired
 	CodeMapManagerService codeMapManagerService;
 	@Autowired

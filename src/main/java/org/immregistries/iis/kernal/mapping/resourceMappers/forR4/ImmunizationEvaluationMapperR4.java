@@ -11,7 +11,7 @@ import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
 import org.immregistries.iis.kernal.logic.CodeMapManagerService;
 import org.immregistries.iis.kernal.mapping.fieldsMappers.BusinessIdentifierMapper;
-import org.immregistries.iis.kernal.mapping.resourceMappers.IImmunizationEvaluationMapper;
+import org.immregistries.iis.kernal.mapping.resourceMappers.ImmunizationEvaluationMapper;
 import org.immregistries.iis.kernal.model.IisEvaluation;
 import org.immregistries.iis.kernal.model.IisVaccination;
 import org.immregistries.vfa.connect.model.EvaluationActual;
@@ -27,7 +27,7 @@ import java.util.Date;
  */
 @Service
 @Conditional(OnR4Condition.class)
-public class ImmunizationEvaluationMapperR4 implements IImmunizationEvaluationMapper<ImmunizationEvaluation>, IR4Mapper<IisEvaluation, ImmunizationEvaluation> {
+public class ImmunizationEvaluationMapperR4 extends ImmunizationEvaluationMapper<ImmunizationEvaluation> implements IR4Mapper<IisEvaluation, ImmunizationEvaluation> {
 
 	@Autowired
 	private ImmunizationMapperR4 immunizationMapperR4;
