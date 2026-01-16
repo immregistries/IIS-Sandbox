@@ -10,7 +10,7 @@ import org.hl7.fhir.r5.model.Bundle;
 import org.hl7.fhir.r5.model.Subscription;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR5Condition;
 import org.immregistries.iis.kernal.logic.SubscriptionService;
-import org.immregistries.iis.kernal.mapping.internalClient.IisFhirClientFactory;
+import org.immregistries.iis.kernal.mapping.IisFhirClientFactory;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;

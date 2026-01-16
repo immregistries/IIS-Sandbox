@@ -39,7 +39,7 @@ import com.google.common.base.Strings;
 import org.immregistries.iis.kernal.fhir.bulkExport.IBulkExportGroupProvider;
 import org.immregistries.iis.kernal.fhir.common.AppProperties;
 import org.immregistries.iis.kernal.fhir.common.StarterJpaConfig;
-import org.immregistries.iis.kernal.fhir.immdsForecast.IRecommendationForecastProvider;
+import org.immregistries.iis.kernal.fhir.immds.IRecommendationForecastProvider;
 import org.immregistries.iis.kernal.fhir.interceptors.*;
 import org.immregistries.iis.kernal.fhir.ips.IpsConfig;
 import org.immregistries.iis.kernal.logic.logicInterceptors.ImmunizationProcessingInterceptor;

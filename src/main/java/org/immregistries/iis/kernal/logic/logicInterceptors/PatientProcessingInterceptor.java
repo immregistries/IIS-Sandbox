@@ -18,7 +18,7 @@ import org.immregistries.iis.kernal.logic.ValidValues;
 import org.immregistries.iis.kernal.logic.ack.IisReportable;
 import org.immregistries.iis.kernal.logic.ack.IisReportableSeverity;
 import org.immregistries.iis.kernal.logic.ack.ReportableUtil;
-import org.immregistries.iis.kernal.mapping.resourceMappers.PatientMapper;
+import org.immregistries.iis.kernal.mapping.mappers.resources.PatientMapper;
 import org.immregistries.iis.kernal.model.*;
 import org.immregistries.mqe.hl7util.model.Hl7Location;
 import org.slf4j.Logger;

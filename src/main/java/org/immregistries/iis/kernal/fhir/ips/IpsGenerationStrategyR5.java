@@ -11,8 +11,8 @@ import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.hl7.fhir.instance.model.api.IBaseBundle;
 import org.hl7.fhir.instance.model.api.IIdType;
 import org.hl7.fhir.r5.model.*;
-import org.immregistries.iis.kernal.mapping.internalClient.IisFhirClientFactory;
-import org.immregistries.iis.kernal.mapping.resourceMappers.forR5.OrganizationMapperR5;
+import org.immregistries.iis.kernal.mapping.IisFhirClientFactory;
+import org.immregistries.iis.kernal.mapping.mappers.resources.r5.OrganizationMapperR5;
 import org.immregistries.iis.kernal.security.CurrentTenantUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 

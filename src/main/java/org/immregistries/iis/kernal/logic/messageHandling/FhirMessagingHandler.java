@@ -14,9 +14,9 @@ import org.immregistries.iis.kernal.logic.ack.IisReportable;
 import org.immregistries.iis.kernal.logic.logicInterceptors.ImmunizationProcessingInterceptor;
 import org.immregistries.iis.kernal.logic.logicInterceptors.ObservationProcessingInterceptor;
 import org.immregistries.iis.kernal.logic.logicInterceptors.PatientProcessingInterceptor;
-import org.immregistries.iis.kernal.mapping.internalClient.FhirSaveRequester;
-import org.immregistries.iis.kernal.mapping.internalClient.IisFhirClientFactory;
-import org.immregistries.iis.kernal.mapping.resourceMappers.forR4.*;
+import org.immregistries.iis.kernal.mapping.mappers.resources.r4.*;
+import org.immregistries.iis.kernal.mapping.requesters.FhirSaveRequester;
+import org.immregistries.iis.kernal.mapping.IisFhirClientFactory;
 import org.immregistries.iis.kernal.model.*;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.immregistries.mqe.hl7util.model.CodedWithExceptions;
@@ -30,7 +30,7 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.immregistries.iis.kernal.mapping.resourceMappers.ImmunizationMapper.*;
+import static org.immregistries.iis.kernal.mapping.mappers.resources.ImmunizationMapper.*;
 
 @Service
 @Conditional(OnR4Condition.class)
@@ -63,15 +63,15 @@ public class FhirMessagingHandler extends IncomingMessageHandler<Bundle, Object>
 	private V2IncomingMessageHandler v2IncomingMessageHandler;
 
 	@Autowired
-	PatientMapperR4 patientMapper;
+	private PatientMapperR4 patientMapper;
 	@Autowired
-	ImmunizationMapperR4 immunizationMapper;
+	private ImmunizationMapperR4 immunizationMapper;
 	@Autowired
-	PractitionerMapperR4 practitionerMapper;
+	private PractitionerMapperR4 practitionerMapper;
 	@Autowired
-	ObservationMapperR4 observationMapper;
+	private ObservationMapperR4 observationMapper;
 	@Autowired
-	LocationMapperR4 locationMapper;
+	private LocationMapperR4 locationMapper;
 
 	@Override
 	public String extractMessageType(Bundle bundle) {

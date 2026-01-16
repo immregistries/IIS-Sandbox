@@ -15,7 +15,7 @@ import org.hl7.fhir.instance.model.api.IIdType;
 import org.immregistries.iis.kernal.controllers.rest.shlink.ShLinkContentRestController;
 import org.immregistries.iis.kernal.Application;
 import org.immregistries.iis.kernal.fhir.shl.ShLinkPayload;
-import org.immregistries.iis.kernal.mapping.internalClient.IisFhirClientFactory;
+import org.immregistries.iis.kernal.mapping.IisFhirClientFactory;
 import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.model.ShLinkFilePayload;
 import org.immregistries.iis.kernal.persisted.model.*;

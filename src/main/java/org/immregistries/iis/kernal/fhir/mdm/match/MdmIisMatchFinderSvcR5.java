@@ -15,7 +15,7 @@ import ca.uhn.fhir.rest.param.TokenParamModifier;
 import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.r5.model.Immunization;
-import org.immregistries.iis.kernal.mapping.resourceMappers.ImmunizationMapper;
+import org.immregistries.iis.kernal.mapping.mappers.resources.ImmunizationMapper;
 import org.immregistries.vaccination_deduplication.computation_classes.Deterministic;
 import org.immregistries.vaccination_deduplication.reference.ComparisonResult;
 import org.immregistries.vaccination_deduplication.reference.ImmunizationSource;
@@ -27,8 +27,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import static org.immregistries.iis.kernal.mapping.internalClient.FhirSaveRequester.GOLDEN_RECORD;
-import static org.immregistries.iis.kernal.mapping.internalClient.FhirSaveRequester.GOLDEN_SYSTEM_TAG;
+import static org.immregistries.iis.kernal.mapping.requesters.FhirSaveRequester.GOLDEN_RECORD;
+import static org.immregistries.iis.kernal.mapping.requesters.FhirSaveRequester.GOLDEN_SYSTEM_TAG;
 
 public class MdmIisMatchFinderSvcR5 extends AbstractMdmIisMatchFinderSvc<Immunization> implements IMdmMatchFinderSvc, IMdmIisMatchFinderSvc {
 	private static final Logger ourLog = Logs.getMdmTroubleshootingLog();

@@ -8,7 +8,7 @@ import org.immregistries.iis.kernal.controllers.servlet.PatientController;
 import org.immregistries.iis.kernal.controllers.servlet.PopController;
 import org.immregistries.iis.kernal.controllers.servlet.TenantController;
 import org.immregistries.iis.kernal.controllers.servlet.shlink.ShLinkController;
-import org.immregistries.iis.kernal.mapping.internalClient.FhirRequesterUtil;
+import org.immregistries.iis.kernal.mapping.requesters.FhirRequesterUtil;
 import org.immregistries.iis.kernal.model.ProcessingFlavor;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.immregistries.iis.kernal.persisted.model.UserAccess;

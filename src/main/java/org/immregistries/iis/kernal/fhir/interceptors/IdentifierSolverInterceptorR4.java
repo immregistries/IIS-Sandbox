@@ -19,9 +19,9 @@ import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Service;
 
 import static ca.uhn.fhir.interceptor.api.Pointcut.SERVER_INCOMING_REQUEST_PRE_HANDLED;
-import static org.immregistries.iis.kernal.mapping.resourceMappers.PatientMapper.MRN_SYSTEM;
-import static org.immregistries.iis.kernal.mapping.internalClient.FhirSaveRequester.GOLDEN_RECORD;
-import static org.immregistries.iis.kernal.mapping.internalClient.FhirSaveRequester.GOLDEN_SYSTEM_TAG;
+import static org.immregistries.iis.kernal.mapping.mappers.resources.PatientMapper.MRN_SYSTEM;
+import static org.immregistries.iis.kernal.mapping.requesters.FhirSaveRequester.GOLDEN_RECORD;
+import static org.immregistries.iis.kernal.mapping.requesters.FhirSaveRequester.GOLDEN_SYSTEM_TAG;
 
 @Interceptor
 @Conditional(OnR4Condition.class)

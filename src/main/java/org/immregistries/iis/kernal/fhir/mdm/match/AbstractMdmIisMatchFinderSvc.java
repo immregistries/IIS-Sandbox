@@ -14,7 +14,7 @@ import org.hl7.fhir.r4.model.ResourceType;
 import org.immregistries.iis.kernal.logic.PatientMismoConversionService;
 import org.immregistries.iis.kernal.logic.logicInterceptors.IisLogicInterceptor;
 import org.immregistries.iis.kernal.logic.logicInterceptors.PatientProcessingInterceptor;
-import org.immregistries.iis.kernal.mapping.resourceMappers.PatientMapper;
+import org.immregistries.iis.kernal.mapping.mappers.resources.PatientMapper;
 import org.immregistries.iis.kernal.model.ProcessingFlavor;
 import org.immregistries.mismo.match.PatientMatchResult;
 import org.immregistries.mismo.match.PatientMatcher;

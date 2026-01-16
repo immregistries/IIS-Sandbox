@@ -14,7 +14,7 @@ import org.immregistries.iis.kernal.logic.ProcessingException;
 import org.immregistries.iis.kernal.logic.ack.IisReportable;
 import org.immregistries.iis.kernal.logic.ack.IisReportableSeverity;
 import org.immregistries.iis.kernal.logic.ack.ReportableUtil;
-import org.immregistries.iis.kernal.mapping.resourceMappers.ObservationMapper;
+import org.immregistries.iis.kernal.mapping.mappers.resources.ObservationMapper;
 import org.immregistries.iis.kernal.model.ObservationReported;
 import org.immregistries.iis.kernal.model.ProcessingFlavor;
 import org.slf4j.Logger;

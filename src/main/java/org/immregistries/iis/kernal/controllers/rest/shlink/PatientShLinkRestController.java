@@ -11,7 +11,7 @@ import org.immregistries.iis.kernal.controllers.rest.RestUrlUtil;
 import org.immregistries.iis.kernal.fhir.shl.ShLinkPayload;
 import org.immregistries.iis.kernal.logic.shlink.CompressionService;
 import org.immregistries.iis.kernal.logic.shlink.ShLinkUtilService;
-import org.immregistries.iis.kernal.mapping.internalClient.IisFhirClientFactory;
+import org.immregistries.iis.kernal.mapping.IisFhirClientFactory;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.immregistries.iis.kernal.security.CurrentTenantUtil;
 import org.jetbrains.annotations.NotNull;

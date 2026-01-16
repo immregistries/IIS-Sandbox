@@ -9,8 +9,8 @@ import org.immregistries.mismo.match.StringUtils;
 import org.immregistries.mismo.match.model.Patient;
 import org.springframework.stereotype.Service;
 
-import static org.immregistries.iis.kernal.mapping.resourceMappers.PatientMapper.LINK_ID;
-import static org.immregistries.iis.kernal.mapping.resourceMappers.PatientMapper.MOTHER_MAIDEN_NAME;
+import static org.immregistries.iis.kernal.mapping.mappers.resources.PatientMapper.LINK_ID;
+import static org.immregistries.iis.kernal.mapping.mappers.resources.PatientMapper.MOTHER_MAIDEN_NAME;
 
 @Service
 public class PatientMismoConversionService {

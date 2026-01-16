@@ -7,10 +7,10 @@ import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR5Condition;
 import org.immregistries.iis.kernal.logic.messageHandling.IncomingQueryHandler;
-import org.immregistries.iis.kernal.mapping.fieldsMappers.forR5.BusinessIdentifierMapperR5;
-import org.immregistries.iis.kernal.mapping.internalClient.FhirSearchRequester;
-import org.immregistries.iis.kernal.mapping.resourceMappers.forR5.ImmunizationEvaluationMapperR5;
-import org.immregistries.iis.kernal.mapping.resourceMappers.forR5.ImmunizationRecommendationMapperR5;
+import org.immregistries.iis.kernal.mapping.mappers.fields.r5.BusinessIdentifierMapperR5;
+import org.immregistries.iis.kernal.mapping.requesters.FhirSearchRequester;
+import org.immregistries.iis.kernal.mapping.mappers.resources.r5.ImmunizationEvaluationMapperR5;
+import org.immregistries.iis.kernal.mapping.mappers.resources.r5.ImmunizationRecommendationMapperR5;
 import org.immregistries.iis.kernal.model.*;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.immregistries.vfa.connect.model.ForecastActual;
@@ -20,9 +20,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 
-import static org.immregistries.iis.kernal.fhir.immdsForecast.IRecommendationForecastProvider.EVALUATION;
-import static org.immregistries.iis.kernal.fhir.immdsForecast.IRecommendationForecastProvider.RECOMMENDATION;
-import static org.immregistries.iis.kernal.mapping.resourceMappers.ImmunizationMapper.CVX_SYSTEM;
+import static org.immregistries.iis.kernal.fhir.immds.IRecommendationForecastProvider.EVALUATION;
+import static org.immregistries.iis.kernal.fhir.immds.IRecommendationForecastProvider.RECOMMENDATION;
+import static org.immregistries.iis.kernal.mapping.mappers.resources.ImmunizationMapper.CVX_SYSTEM;
 
 @Service
 @Conditional(OnR5Condition.class)

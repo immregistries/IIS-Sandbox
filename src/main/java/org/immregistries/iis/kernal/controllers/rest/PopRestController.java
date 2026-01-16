@@ -6,7 +6,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.immregistries.iis.kernal.controllers.filters.RestTenantUrlFilter;
 import org.immregistries.iis.kernal.controllers.servlet.PopController;
 import org.immregistries.iis.kernal.logic.messageHandling.V2IncomingMessageHandler;
-import org.immregistries.iis.kernal.mapping.internalClient.IisFhirClientFactory;
+import org.immregistries.iis.kernal.mapping.IisFhirClientFactory;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.immregistries.smm.transform.ScenarioManager;
 import org.immregistries.smm.transform.TestCaseMessage;

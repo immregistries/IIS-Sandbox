@@ -2,7 +2,7 @@ package org.immregistries.iis.kernal.fhir.common;
 
 import ca.uhn.fhir.jpa.partition.IPartitionLookupSvc;
 import ca.uhn.fhir.jpa.partition.PartitionManagementProvider;
-import org.immregistries.iis.kernal.mapping.internalClient.IisFhirClientFactory;
+import org.immregistries.iis.kernal.mapping.IisFhirClientFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 //@formatter:off
