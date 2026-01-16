@@ -28,7 +28,7 @@ import static org.immregistries.iis.kernal.mapping.resourceMappers.ImmunizationM
 
 @Service
 @Conditional(OnR4Condition.class)
-public class ImmunizationRecommendationMapperR4 implements IRecommendationMapper<ImmunizationRecommendation> {
+public class ImmunizationRecommendationMapperR4 implements IRecommendationMapper<ImmunizationRecommendation>, IR4Mapper<IisRecommendation, ImmunizationRecommendation> {
 	@Autowired
 	CodeMapManagerService codeMapManagerService;
 	@Autowired

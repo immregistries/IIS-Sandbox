@@ -24,7 +24,7 @@ import java.math.BigDecimal;
 
 @Service
 @Conditional(OnR5Condition.class)
-public class ImmunizationMapperR5 extends ImmunizationMapper<Immunization> {
+public class ImmunizationMapperR5 extends ImmunizationMapper<Immunization> implements IR5Mapper<IisVaccination, Immunization> {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	@Autowired
 	private LocationMapperR5 locationMapper;

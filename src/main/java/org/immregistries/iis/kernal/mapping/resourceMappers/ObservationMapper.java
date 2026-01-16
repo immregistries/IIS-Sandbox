@@ -11,7 +11,7 @@ public interface ObservationMapper<Observation extends IAnyResource>
 		return "Observation";
 	}
 
-	public static final String OBSERVATION = "Observation";
+	String OBSERVATION = "Observation";
 
 	default Class<ObservationMaster> localType() {
 		return ObservationMaster.class;

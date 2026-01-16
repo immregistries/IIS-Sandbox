@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Conditional(OnR4Condition.class)
-public class PersonMapperR4 implements PersonMapper<Person> {
+public class PersonMapperR4 implements PersonMapper<Person>, IR4Mapper<ModelPerson, Person> {
 
 	public ModelPerson localObject(Person p) {
 		ModelPerson modelPerson = new ModelPerson();

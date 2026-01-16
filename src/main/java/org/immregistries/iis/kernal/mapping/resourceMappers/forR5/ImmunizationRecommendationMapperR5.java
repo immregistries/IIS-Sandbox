@@ -28,7 +28,7 @@ import static org.immregistries.iis.kernal.mapping.resourceMappers.ImmunizationM
 
 @Service
 @Conditional(OnR5Condition.class)
-public class ImmunizationRecommendationMapperR5 implements IRecommendationMapper<ImmunizationRecommendation> {
+public class ImmunizationRecommendationMapperR5 implements IRecommendationMapper<ImmunizationRecommendation>, IR5Mapper<IisRecommendation, ImmunizationRecommendation> {
 
 	@Autowired
 	private CodeMapManagerService codeMapManagerService;

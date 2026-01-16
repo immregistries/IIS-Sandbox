@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Conditional(OnR5Condition.class)
-public class LocationMapperR5 implements LocationMapper<Location> {
+public class LocationMapperR5 implements LocationMapper<Location>, IR5Mapper<OrgLocation, Location> {
 
 	public Location fhirResource(OrgLocation ol) {
 

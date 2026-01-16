@@ -8,13 +8,11 @@ public interface LocationMapper<Location extends IAnyResource> extends IisResour
 		return LOCATION;
 	}
 
-	public static final String LOCATION = "Location";
+	String LOCATION = "Location";
 
 	default Class<OrgLocation> localType() {
 		return OrgLocation.class;
 	}
 
-	public String VFC_PROVIDER_PIN = "VFC_PROVIDER_PIN";
-	// public Location fhirResource(OrgLocation ol);
-	// public OrgLocation localObject(Location l);
+	String VFC_PROVIDER_PIN = "VFC_PROVIDER_PIN";
 }

@@ -31,7 +31,7 @@ import static org.immregistries.iis.kernal.mapping.resourceMappers.ImmunizationM
 
 @Service
 @Conditional(OnR5Condition.class)
-public class PatientMapperR5 extends PatientMapper<Patient> {
+public class PatientMapperR5 extends PatientMapper<Patient> implements IR5Mapper<IisPatient, Patient> {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	@Autowired
