@@ -1,8 +1,6 @@
 package org.immregistries.iis.kernal.mapping.internalClient;
 
-import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
 import ca.uhn.fhir.rest.api.MethodOutcome;
-import ca.uhn.fhir.rest.api.server.IBundleProvider;
 import ca.uhn.fhir.rest.gclient.ICriterion;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.instance.model.api.IAnyResource;
@@ -34,23 +32,6 @@ public class FhirSaveRequesterR4 extends
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	@Autowired
 	public FhirReadRequester fhirReadRequester;
-
-	@Autowired
-	FhirSearchRequester fhirSearchRequester;
-
-	public Organization searchOrganization(SearchParameterMap searchParameterMap) {
-		IBundleProvider bundleProvider = fhirSearchRequester.search("Organization", searchParameterMap);
-		return (Organization) bundleProvider.getAllResources().stream().findFirst().orElse(null);
-	}
-
-	public RelatedPerson searchRelatedPerson(SearchParameterMap searchParameterMap) {
-		RelatedPerson relatedPerson = null;
-		IBundleProvider bundleProvider = fhirSearchRequester.search(RelatedPerson.class, searchParameterMap);
-		if (!bundleProvider.isEmpty()) {
-			relatedPerson = (RelatedPerson) bundleProvider.getResources(0, 1).get(0);
-		}
-		return relatedPerson;
-	}
 
 	public PatientReported savePatientReported(PatientReported patientReported) {
 		Patient patient = (Patient) allMappingService.fhirResource(patientReported);

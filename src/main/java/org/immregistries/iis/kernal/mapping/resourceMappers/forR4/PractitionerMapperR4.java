@@ -12,7 +12,8 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Conditional(OnR4Condition.class)
-public class PractitionerMapperR4 extends PractitionerMapper<Practitioner> {
+public class PractitionerMapperR4 extends PractitionerMapper<Practitioner> implements IR4Mapper<ModelPerson, Practitioner> {
+
 
 	public ModelPerson localObject(Practitioner practitioner) {
 		ModelPerson modelPerson = new ModelPerson();
@@ -58,6 +59,7 @@ public class PractitionerMapperR4 extends PractitionerMapper<Practitioner> {
 			practitioner.addIdentifier(new Identifier().setSystem(modelPerson.getIdentifierTypeCode())
 					.setValue(modelPerson.getPersonExternalLink()));
 		}
+
 
 		HumanName name = practitioner.addName();
 		name.setFamily(modelPerson.getNameLast());

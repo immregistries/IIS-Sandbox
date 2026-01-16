@@ -219,6 +219,7 @@ public class FhirSearchRequester {
 	}
 
 
+
 	public List<PatientReported> searchPatientReportedList(SearchParameterMap searchParameterMap) {
 		List<PatientReported> patientReportedList = new ArrayList<>();
 		IBundleProvider bundleProvider = searchRegularRecord(PatientMapper.PATIENT, searchParameterMap);
@@ -292,12 +293,20 @@ public class FhirSearchRequester {
 	}
 
 	public org.hl7.fhir.r5.model.Organization searchOrganizationR5(SearchParameterMap searchParameterMap) {
-		IBundleProvider bundleProvider = search("Organization", searchParameterMap);
+		IBundleProvider bundleProvider = search(OrganizationMapper.ORGANIZATION, searchParameterMap);
 		return (org.hl7.fhir.r5.model.Organization) bundleProvider.getAllResources().stream().findFirst().orElse(null);
 	}
 	public org.hl7.fhir.r4.model.Organization searchOrganizationR4(SearchParameterMap searchParameterMap) {
-		IBundleProvider bundleProvider = search("Organization", searchParameterMap);
+		IBundleProvider bundleProvider = search(OrganizationMapper.ORGANIZATION, searchParameterMap);
 		return (org.hl7.fhir.r4.model.Organization) bundleProvider.getAllResources().stream().findFirst().orElse(null);
 	}
+	//	public RelatedPerson searchRelatedPerson(SearchParameterMap searchParameterMap) {
+//		RelatedPerson relatedPerson = null;
+//		IBundleProvider bundleProvider = fhirSearchRequester.search(RelatedPerson.class, searchParameterMap);
+//		if (!bundleProvider.isEmpty()) {
+//			relatedPerson = (RelatedPerson) bundleProvider.getResources(0, 1).get(0);
+//		}
+//		return relatedPerson;
+//	}
 
 }

@@ -27,7 +27,7 @@ import java.util.Date;
  */
 @Service
 @Conditional(OnR4Condition.class)
-public class ImmunizationEvaluationMapperR4 extends IImmunizationEvaluationMapper<ImmunizationEvaluation> {
+public class ImmunizationEvaluationMapperR4 implements IImmunizationEvaluationMapper<ImmunizationEvaluation>, IR4Mapper<IisEvaluation, ImmunizationEvaluation> {
 
 	@Autowired
 	private ImmunizationMapperR4 immunizationMapperR4;
@@ -52,13 +52,13 @@ public class ImmunizationEvaluationMapperR4 extends IImmunizationEvaluationMappe
 		ImmunizationEvaluation immunizationEvaluation = new ImmunizationEvaluation();
 		if (iisVaccination.getPatientReported() != null) {
 			immunizationEvaluation.setPatient(new Reference().setIdentifier(
-					businessIdentifierMapper.toR4(iisVaccination.getPatientReported().getMainBusinessIdentifier())));
+				businessIdentifierMapper.toR4(iisVaccination.getPatientReported().getMainBusinessIdentifier())));
 		}
 		immunizationEvaluation
-				.setImmunizationEvent(new Reference("Immunization/" + iisVaccination.getVaccinationId()));
+			.setImmunizationEvent(new Reference("Immunization/" + iisVaccination.getVaccinationId()));
 
 		if (iisVaccination.getTestEvent() != null
-				&& iisVaccination.getTestEvent().getEvaluationActualList() != null) {
+			&& iisVaccination.getTestEvent().getEvaluationActualList() != null) {
 			TestEvent testEvent = iisVaccination.getTestEvent();
 			immunizationEvaluation.setStatus(ImmunizationEvaluation.ImmunizationEvaluationStatus.COMPLETED);
 			for (EvaluationActual evaluationActual : testEvent.getEvaluationActualList()) {

@@ -12,7 +12,8 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Conditional(OnR5Condition.class)
-public class PractitionerMapperR5 extends PractitionerMapper<Practitioner> {
+public class PractitionerMapperR5 extends PractitionerMapper<Practitioner> implements IR5Mapper<ModelPerson, Practitioner> {
+
 
 	public ModelPerson localObject(Practitioner practitioner) {
 		ModelPerson modelPerson = new ModelPerson();

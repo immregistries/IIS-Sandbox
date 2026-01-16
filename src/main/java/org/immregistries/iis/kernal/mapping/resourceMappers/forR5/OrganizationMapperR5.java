@@ -10,8 +10,8 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Conditional(OnR5Condition.class)
-public class OrganizationMapperR5 extends OrganizationMapper<Organization> {
-	// TODO
+public class OrganizationMapperR5 extends OrganizationMapper<Organization> implements IR5Mapper<Tenant, Organization> {
+//	TODO
 
 	public Organization fhirResource(Tenant tenant) {
 		Organization o = new Organization();

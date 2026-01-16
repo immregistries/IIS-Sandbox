@@ -12,7 +12,7 @@ public abstract class ObservationMapper<Observation extends IAnyResource>
 		return "Observation";
 	}
 
-	public static final String OBSERVATION = "Observation";
+	String OBSERVATION = "Observation";
 
 	public Class<ObservationMaster> localType() {
 		return ObservationMaster.class;
