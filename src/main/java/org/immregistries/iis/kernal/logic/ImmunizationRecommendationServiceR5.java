@@ -12,10 +12,7 @@ import org.immregistries.iis.kernal.mapping.internalClient.FhirSearchRequester;
 import org.immregistries.iis.kernal.mapping.resourceMappers.forR5.ImmunizationEvaluationMapperR5;
 import org.immregistries.iis.kernal.mapping.resourceMappers.forR5.ImmunizationRecommendationMapperR5;
 import org.immregistries.iis.kernal.mapping.resourceMappers.forR5.PatientMapperR5;
-import org.immregistries.iis.kernal.model.IisPatient;
-import org.immregistries.iis.kernal.model.IisRecommendation;
-import org.immregistries.iis.kernal.model.IisVaccination;
-import org.immregistries.iis.kernal.model.VaccinationMaster;
+import org.immregistries.iis.kernal.model.*;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.immregistries.vfa.connect.model.ForecastActual;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -127,8 +124,8 @@ public class ImmunizationRecommendationServiceR5
 		Parameters parameters = new Parameters();
 		parameters.addParameter().setResource(immunizationRecommendation).setName(RECOMMENDATION);
 		for (IisVaccination iisVaccination : iisVaccinationList) {
-			ImmunizationEvaluation immunizationEvaluation = immunizationEvaluationMapperR5.toFhir(iisVaccination,
-					date);
+			IisEvaluation iisEvaluation = new IisEvaluation(iisVaccination, date);
+			ImmunizationEvaluation immunizationEvaluation = immunizationEvaluationMapperR5.fhirResource(iisEvaluation);
 			if (immunizationEvaluation != null) {
 				parameters.addParameter().setResource(immunizationEvaluation).setName(EVALUATION);
 			}

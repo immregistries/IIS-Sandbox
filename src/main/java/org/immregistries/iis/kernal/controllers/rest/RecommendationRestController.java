@@ -31,7 +31,7 @@ public class RecommendationRestController {
     @Autowired
     private IisFhirClientFactory iisFhirClientFactory;
     @Autowired
-    FhirSearchRequester fhirSearchRequester;
+	 private FhirSearchRequester fhirSearchRequester;
     @Autowired
     private FhirContext fhirContext;
     @Autowired

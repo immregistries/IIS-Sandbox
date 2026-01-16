@@ -5,6 +5,7 @@ import org.hl7.fhir.r5.model.Reference;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR5Condition;
 import org.immregistries.iis.kernal.mapping.fieldsMappers.BusinessIdentifierMapper;
 import org.immregistries.iis.kernal.mapping.resourceMappers.IImmunizationEvaluationMapper;
+import org.immregistries.iis.kernal.model.IisEvaluation;
 import org.immregistries.iis.kernal.model.IisVaccination;
 import org.immregistries.vfa.connect.model.EvaluationActual;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,18 @@ public class ImmunizationEvaluationMapperR5 implements IImmunizationEvaluationMa
 
 	@Autowired
 	private BusinessIdentifierMapper businessIdentifierMapper;
+
+	public IisEvaluation localObject(ImmunizationEvaluation immunizationEvaluation) {
+		IisEvaluation iisEvaluation = new IisEvaluation();
+		return iisEvaluation;
+	}
+
+	public ImmunizationEvaluation fhirResource(IisEvaluation iisEvaluation) {
+		IisVaccination iisVaccination = iisEvaluation.getIisVaccination();
+		Date date = iisEvaluation.getDate();
+		return toFhir(iisVaccination, date);
+	}
+
 
 	public ImmunizationEvaluation toFhir(IisVaccination vaccinationMaster, Date date) {
 		ImmunizationEvaluation immunizationEvaluation = new ImmunizationEvaluation();

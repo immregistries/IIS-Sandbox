@@ -12,6 +12,7 @@ import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
 import org.immregistries.iis.kernal.logic.CodeMapManagerService;
 import org.immregistries.iis.kernal.mapping.fieldsMappers.BusinessIdentifierMapper;
 import org.immregistries.iis.kernal.mapping.resourceMappers.IImmunizationEvaluationMapper;
+import org.immregistries.iis.kernal.model.IisEvaluation;
 import org.immregistries.iis.kernal.model.IisVaccination;
 import org.immregistries.vfa.connect.model.EvaluationActual;
 import org.immregistries.vfa.connect.model.TestEvent;
@@ -34,6 +35,17 @@ public class ImmunizationEvaluationMapperR4 implements IImmunizationEvaluationMa
 	private CodeMapManagerService codeMapManagerService;
 	@Autowired
 	private BusinessIdentifierMapper businessIdentifierMapper;
+
+	public IisEvaluation localObject(ImmunizationEvaluation immunizationEvaluation) {
+		IisEvaluation iisEvaluation = new IisEvaluation();
+		return iisEvaluation;
+	}
+
+	public ImmunizationEvaluation fhirResource(IisEvaluation iisEvaluation) {
+		IisVaccination iisVaccination = iisEvaluation.getIisVaccination();
+		Date date = iisEvaluation.getDate();
+		return toFhir(iisVaccination, date);
+	}
 
 	public ImmunizationEvaluation toFhir(IisVaccination iisVaccination, Date date) {
 		CodeMap codeMap = codeMapManagerService.getCodeMap();
