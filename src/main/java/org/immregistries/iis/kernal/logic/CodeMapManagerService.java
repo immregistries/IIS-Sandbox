@@ -8,6 +8,9 @@ import org.springframework.stereotype.Service;
 import java.io.InputStream;
 
 @Service
+/**
+ * Grants access to CodeMaps extracted from XML file, usually Compiled.xml
+ */
 public class CodeMapManagerService implements InitializingBean {
 	private static CodeMapManagerService instance;
 

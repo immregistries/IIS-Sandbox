@@ -66,7 +66,6 @@ public class ShLinkRestController {
 			@RequestAttribute(CurrentTenantUtil.SESSION_REQUEST_TENANT) Tenant tenant)
 			throws ServletException, IOException, NoSuchAlgorithmException {
 		UserAccess userAccess = UserAccessUtil.get().getUserAccess();
-
 		/*
 		 * Choosing or generating the keys based on the parameters
 		 */

@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.immregistries.iis.kernal.controllers.rest.RestUrlUtil;
+import org.immregistries.iis.kernal.logic.shlink.ShLinkManifestGenerator;
 import org.immregistries.iis.kernal.logic.shlink.ShLinkUtilService;
 import org.immregistries.iis.kernal.mapping.requesters.FhirSearchRequester;
 import org.immregistries.iis.kernal.mapping.IisFhirClientFactory;
@@ -39,6 +40,8 @@ public class PatientShLinkManifestRestController {
 
 	@Autowired
 	private ShLinkUtilService shLinkUtilService;
+	@Autowired
+	private ShLinkManifestGenerator shLinkManifestGenerator;
 	@Autowired
 	private IisFhirClientFactory iisFhirClientFactory;
 	@Autowired
@@ -79,6 +82,6 @@ public class PatientShLinkManifestRestController {
 	private ShLinkManifest getShLinkManifest(HttpServletRequest req, String id, Tenant tenant) {
 		IGenericClient fhirClient = iisFhirClientFactory.getOrCreateGenericClient(req);
 		IAnyResource patientSelected = fetchPatientFromParameters(id, "", fhirClient, fhirSearchRequester);
-		return shLinkUtilService.generateExamplePatientManifest(tenant, patientSelected.getIdElement());
+		return shLinkManifestGenerator.generateExamplePatientManifest(tenant, patientSelected.getIdElement());
 	}
 }
