@@ -15,6 +15,7 @@ import org.immregistries.iis.kernal.logic.VaccinePlanStatus;
 import org.immregistries.iis.kernal.mapping.fieldsMappers.BusinessIdentifierMapper;
 import org.immregistries.iis.kernal.mapping.resourceMappers.IRecommendationMapper;
 import org.immregistries.iis.kernal.model.IisPatient;
+import org.immregistries.iis.kernal.model.IisRecommendation;
 import org.immregistries.vfa.connect.model.ForecastActual;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
@@ -27,17 +28,30 @@ import static org.immregistries.iis.kernal.mapping.resourceMappers.ImmunizationM
 
 @Service
 @Conditional(OnR4Condition.class)
-public class ImmunizationRecommendationMapperR4 implements IRecommendationMapper {
+public class ImmunizationRecommendationMapperR4 implements IRecommendationMapper<ImmunizationRecommendation> {
 	@Autowired
 	CodeMapManagerService codeMapManagerService;
 	@Autowired
 	private BusinessIdentifierMapper businessIdentifierMapper;
 
+	public IisRecommendation localObject(ImmunizationRecommendation immunizationRecommendation) {
+		IisRecommendation iisRecommendation = new IisRecommendation();
+		return iisRecommendation;
+	}
+
+	public ImmunizationRecommendation fhirResource(IisRecommendation iisRecommendation) {
+		ImmunizationRecommendation immunizationRecommendation = toFhir(iisRecommendation.getForecastActualList(), iisRecommendation.getDate(), iisRecommendation.getIisPatient());
+		immunizationRecommendation.setId(iisRecommendation.getId());
+		return immunizationRecommendation;
+	}
 	public ImmunizationRecommendation toFhir(List<ForecastActual> forecastActualList, Date date,
 														  IisPatient iisPatient) {
+
 		ImmunizationRecommendation immunizationRecommendation = toFhir(forecastActualList, date);
-		immunizationRecommendation.setPatient(new Reference()
-			.setIdentifier(businessIdentifierMapper.toR4(iisPatient.getMainBusinessIdentifier())));
+		if (iisPatient != null) {
+			immunizationRecommendation.setPatient(new Reference()
+				.setIdentifier(businessIdentifierMapper.toR4(iisPatient.getMainBusinessIdentifier())));
+		}
 		return immunizationRecommendation;
 	}
 
