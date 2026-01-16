@@ -19,7 +19,7 @@ import java.util.Date;
  */
 @Service
 @Conditional(OnR5Condition.class)
-public class ImmunizationEvaluationMapperR5 implements IImmunizationEvaluationMapper<ImmunizationEvaluation> {
+public class ImmunizationEvaluationMapperR5 extends IImmunizationEvaluationMapper<ImmunizationEvaluation> {
 
 	@Autowired
 	private ImmunizationMapperR5 immunizationMapperR5;
@@ -37,7 +37,6 @@ public class ImmunizationEvaluationMapperR5 implements IImmunizationEvaluationMa
 		Date date = iisEvaluation.getDate();
 		return toFhir(iisVaccination, date);
 	}
-
 
 	public ImmunizationEvaluation toFhir(IisVaccination vaccinationMaster, Date date) {
 		ImmunizationEvaluation immunizationEvaluation = new ImmunizationEvaluation();

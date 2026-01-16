@@ -1,6 +1,5 @@
 package org.immregistries.iis.kernal.mapping.resourceMappers.forR4;
 
-
 import org.hl7.fhir.r4.model.HumanName;
 import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.Practitioner;
@@ -13,13 +12,12 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Conditional(OnR4Condition.class)
-public class PractitionerMapperR4 implements PractitionerMapper<Practitioner> {
-
+public class PractitionerMapperR4 extends PractitionerMapper<Practitioner> {
 
 	public ModelPerson localObject(Practitioner practitioner) {
-	  ModelPerson modelPerson = new ModelPerson();
+		ModelPerson modelPerson = new ModelPerson();
 		modelPerson.setPersonId(practitioner.getIdElement().getIdPart());
-	  modelPerson.setPersonExternalLink(practitioner.getIdentifierFirstRep().getValue());
+		modelPerson.setPersonExternalLink(practitioner.getIdentifierFirstRep().getValue());
 		if (practitioner.getNameFirstRep().getGiven().size() > 0) {
 			modelPerson.setNameFirst(practitioner.getNameFirstRep().getGiven().get(0).getValue());
 		}
@@ -32,8 +30,8 @@ public class PractitionerMapperR4 implements PractitionerMapper<Practitioner> {
 			modelPerson.setAssigningAuthority(practitioner.getIdentifierFirstRep().getAssigner().getReference());
 		}
 
-	  return modelPerson;
-  }
+		return modelPerson;
+	}
 
 	public Practitioner fhirResource(ModelPerson modelPerson) {
 		Practitioner practitioner = new Practitioner();
@@ -41,22 +39,25 @@ public class PractitionerMapperR4 implements PractitionerMapper<Practitioner> {
 			switch (new Reference(modelPerson.getIdentifierTypeCode()).getType()) {
 				case "Organization": {
 					practitioner.addIdentifier(
-						new Identifier().setSystem(PRACTITIONER).setValue(modelPerson.getPersonExternalLink())
-							.setAssigner(new Reference(modelPerson.getAssigningAuthority())));
+							new Identifier().setSystem(PRACTITIONER).setValue(modelPerson.getPersonExternalLink())
+									.setAssigner(new Reference(modelPerson.getAssigningAuthority())));
 					break;
 				}
-				case "System" : {
-					practitioner.addIdentifier(new Identifier().setSystem(modelPerson.getIdentifierTypeCode()).setValue(modelPerson.getPersonExternalLink()));
+				case "System": {
+					practitioner.addIdentifier(new Identifier().setSystem(modelPerson.getIdentifierTypeCode())
+							.setValue(modelPerson.getPersonExternalLink()));
 					break;
-				} default: {
-					practitioner.addIdentifier(new Identifier().setSystem(PRACTITIONER).setValue(modelPerson.getPersonExternalLink()));
+				}
+				default: {
+					practitioner.addIdentifier(
+							new Identifier().setSystem(PRACTITIONER).setValue(modelPerson.getPersonExternalLink()));
 					break;
 				}
 			}
 		} catch (NullPointerException e) { // If typecode is not reference
-			practitioner.addIdentifier(new Identifier().setSystem(modelPerson.getIdentifierTypeCode()).setValue(modelPerson.getPersonExternalLink()));
+			practitioner.addIdentifier(new Identifier().setSystem(modelPerson.getIdentifierTypeCode())
+					.setValue(modelPerson.getPersonExternalLink()));
 		}
-
 
 		HumanName name = practitioner.addName();
 		name.setFamily(modelPerson.getNameLast());
@@ -97,11 +98,10 @@ public class PractitionerMapperR4 implements PractitionerMapper<Practitioner> {
 				break;
 			}
 		}
-		if ( modelPerson.getProfessionalSuffix() != null) {
+		if (modelPerson.getProfessionalSuffix() != null) {
 			name.addSuffix(modelPerson.getProfessionalSuffix());
 		}
 		return practitioner;
 	}
 
 }
-

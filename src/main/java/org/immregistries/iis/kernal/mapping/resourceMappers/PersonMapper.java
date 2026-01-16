@@ -5,22 +5,23 @@ import org.immregistries.iis.kernal.model.ModelPerson;
 
 /**
  * Retired and deprecated
+ * 
  * @param <Person>
  */
-public interface PersonMapper<Person extends IAnyResource>
-//	extends IisFhirMapperMaster<ModelPerson, Person>
+public abstract class PersonMapper<Person extends IAnyResource>
+// extends IisFhirMapperMaster<ModelPerson, Person>
 {
-	default String fhirType() {
+	public String fhirType() {
 		return "Person";
 	}
 
-	default Class<ModelPerson> localMasterType() {
+	public Class<ModelPerson> localMasterType() {
 		return ModelPerson.class;
 	}
 
-	String ORGANIZATION_ASSIGNING_AUTHORITY = "AssigningAuthority";
+	public static final String ORGANIZATION_ASSIGNING_AUTHORITY = "AssigningAuthority";
 
-	ModelPerson localObject(Person person);
+	public abstract ModelPerson localObject(Person person);
 
-	Person fhirResource(ModelPerson modelPerson);
+	public abstract Person fhirResource(ModelPerson modelPerson);
 }

@@ -10,20 +10,21 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Conditional(OnR4Condition.class)
-public class OrganizationMapperR4 implements OrganizationMapper<Organization> {
-//	TODO
+public class OrganizationMapperR4 extends OrganizationMapper<Organization> {
+	// TODO
 
 	public Organization fhirResource(Tenant tenant) {
 		Organization o = new Organization();
 		o.addIdentifier(MappingHelper.getFhirIdentifierR4("Tenant", Integer.toString(tenant.getOrgId())));
 		o.setName(tenant.getOrganizationName());
-		return  o;
+		return o;
 	}
 
 	public Tenant localObject(Organization organization) {
 		Tenant tenant = new Tenant();
 		tenant.setOrganizationName(organization.getName());
-		tenant.setOrgId(Integer.parseInt(MappingHelper.filterIdentifierR4(organization.getIdentifier(),"Tenant").getValue()));
+		tenant.setOrgId(
+				Integer.parseInt(MappingHelper.filterIdentifierR4(organization.getIdentifier(), "Tenant").getValue()));
 		return tenant;
 	}
 }

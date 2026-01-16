@@ -28,7 +28,7 @@ import static org.immregistries.iis.kernal.mapping.resourceMappers.ImmunizationM
 
 @Service
 @Conditional(OnR5Condition.class)
-public class ImmunizationRecommendationMapperR5 implements IRecommendationMapper<ImmunizationRecommendation> {
+public class ImmunizationRecommendationMapperR5 extends IRecommendationMapper<ImmunizationRecommendation> {
 
 	@Autowired
 	private CodeMapManagerService codeMapManagerService;
@@ -36,7 +36,8 @@ public class ImmunizationRecommendationMapperR5 implements IRecommendationMapper
 	private BusinessIdentifierMapper businessIdentifierMapper;
 
 	public ImmunizationRecommendation fhirResource(IisRecommendation iisRecommendation) {
-		ImmunizationRecommendation immunizationRecommendation = toFhir(iisRecommendation.getForecastActualList(), iisRecommendation.getDate(), iisRecommendation.getIisPatient());
+		ImmunizationRecommendation immunizationRecommendation = toFhir(iisRecommendation.getForecastActualList(),
+				iisRecommendation.getDate(), iisRecommendation.getIisPatient());
 		immunizationRecommendation.setId(iisRecommendation.getId());
 		return immunizationRecommendation;
 	}
@@ -48,10 +49,10 @@ public class ImmunizationRecommendationMapperR5 implements IRecommendationMapper
 	}
 
 	public ImmunizationRecommendation toFhir(List<ForecastActual> forecastActualList, Date date,
-														  IisPatient iisPatient) {
+			IisPatient iisPatient) {
 		ImmunizationRecommendation immunizationRecommendation = toFhir(forecastActualList, date);
 		immunizationRecommendation.setPatient(new Reference()
-			.setIdentifier(businessIdentifierMapper.toR5(iisPatient.getMainBusinessIdentifier())));
+				.setIdentifier(businessIdentifierMapper.toR5(iisPatient.getMainBusinessIdentifier())));
 		return immunizationRecommendation;
 	}
 

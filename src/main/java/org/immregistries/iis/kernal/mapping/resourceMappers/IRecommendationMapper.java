@@ -3,17 +3,17 @@ package org.immregistries.iis.kernal.mapping.resourceMappers;
 import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.immregistries.iis.kernal.model.IisRecommendation;
 
-public interface IRecommendationMapper<ImmunizationRecommendation extends IAnyResource> extends IisResourceMasterMapper<IisRecommendation, ImmunizationRecommendation> {
+public abstract class IRecommendationMapper<ImmunizationRecommendation extends IAnyResource>
+		implements IisResourceMasterMapper<IisRecommendation, ImmunizationRecommendation> {
 
-	default Class<IisRecommendation> localType() {
+	public Class<IisRecommendation> localType() {
 		return IisRecommendation.class;
 	}
 
-	default String fhirType() {
+	public String fhirType() {
 		return IMMUNIZATION_RECOMMENDATION;
 	}
 
-	String IMMUNIZATION_RECOMMENDATION = "ImmunizationRecommendation";
-
+	public static final String IMMUNIZATION_RECOMMENDATION = "ImmunizationRecommendation";
 
 }

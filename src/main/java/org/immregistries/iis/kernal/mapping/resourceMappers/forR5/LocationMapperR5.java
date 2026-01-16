@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Conditional(OnR5Condition.class)
-public class LocationMapperR5 implements LocationMapper<Location> {
+public class LocationMapperR5 extends LocationMapper<Location> {
 
 	public Location fhirResource(OrgLocation ol) {
 
@@ -33,7 +33,7 @@ public class LocationMapperR5 implements LocationMapper<Location> {
 			address.setState(ol.getAddressState());
 			address.setPostalCode(ol.getAddressZip());
 			address.setCountry(ol.getAddressCountry());
-			return  location;
+			return location;
 		}
 		return null;
 	}
@@ -59,16 +59,16 @@ public class LocationMapperR5 implements LocationMapper<Location> {
 			if (l.getAddress().getLine().size() > 1) {
 				orgLocation.setAddressLine2(l.getAddress().getLine().get(1).getValueNotNull());
 			}
-			if (l.getAddress().getCity() != null){
+			if (l.getAddress().getCity() != null) {
 				orgLocation.setAddressCity(l.getAddress().getCity());
 			}
-			if (l.getAddress().getState() != null){
+			if (l.getAddress().getState() != null) {
 				orgLocation.setAddressState(l.getAddress().getState());
 			}
-			if (l.getAddress().getPostalCode() != null){
+			if (l.getAddress().getPostalCode() != null) {
 				orgLocation.setAddressZip(l.getAddress().getPostalCode());
 			}
-			if (l.getAddress().getCountry() != null){
+			if (l.getAddress().getCountry() != null) {
 				orgLocation.setAddressCountry(l.getAddress().getCountry());
 			}
 		}

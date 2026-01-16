@@ -6,18 +6,19 @@ import org.immregistries.iis.kernal.model.IisVaccination;
 
 import java.util.Date;
 
-public interface IImmunizationEvaluationMapper<ImmunizationEvaluation extends IAnyResource> extends IisResourceMasterMapper<IisEvaluation, ImmunizationEvaluation> {
+public abstract class IImmunizationEvaluationMapper<ImmunizationEvaluation extends IAnyResource>
+		implements IisResourceMasterMapper<IisEvaluation, ImmunizationEvaluation> {
 
-	default Class<IisEvaluation> localType() {
+	public Class<IisEvaluation> localType() {
 		return IisEvaluation.class;
 	}
 
-	default String fhirType() {
+	public String fhirType() {
 		return IMMUNIZATION_EVALUATION;
 	}
 
-	String IMMUNIZATION_EVALUATION = "ImmunizationEvaluation";
+	public static final String IMMUNIZATION_EVALUATION = "ImmunizationEvaluation";
 
-	ImmunizationEvaluation toFhir(IisVaccination iisVaccination, Date date);
+	public abstract ImmunizationEvaluation toFhir(IisVaccination iisVaccination, Date date);
 
 }
