@@ -36,7 +36,7 @@ import ca.uhn.fhir.rest.server.util.ISearchParamRegistry;
 import ca.uhn.fhir.validation.IValidatorModule;
 import ca.uhn.fhir.validation.ResultSeverityEnum;
 import com.google.common.base.Strings;
-import org.immregistries.iis.kernal.fhir.bulkExport.IBulkExportGroupProvider;
+import org.immregistries.iis.kernal.fhir.bulk.IBulkExportGroupProvider;
 import org.immregistries.iis.kernal.fhir.common.AppProperties;
 import org.immregistries.iis.kernal.fhir.common.StarterJpaConfig;
 import org.immregistries.iis.kernal.fhir.immds.IRecommendationForecastProvider;

@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal.fhir.bulkExport;
+package org.immregistries.iis.kernal.fhir.bulk;
 
 import ca.uhn.fhir.batch2.api.IJobCoordinator;
 import ca.uhn.fhir.batch2.api.JobOperationResultJson;

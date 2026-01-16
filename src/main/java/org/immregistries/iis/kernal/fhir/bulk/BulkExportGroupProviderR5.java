@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal.fhir.bulkExport;
+package org.immregistries.iis.kernal.fhir.bulk;
 
 import ca.uhn.fhir.jpa.api.dao.IFhirResourceDao;
 import ca.uhn.fhir.jpa.api.model.DaoMethodOutcome;
