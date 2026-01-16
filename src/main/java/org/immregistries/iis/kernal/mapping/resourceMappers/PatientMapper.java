@@ -16,7 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public abstract class PatientMapper<Patient extends IAnyResource>
 	implements IisResourceMasterReportedMapper<PatientMaster, PatientReported, IisPatient, Patient> {
 
-	public String fhirType() {
+	public String fhirResourceName() {
 		return PATIENT;
 	}
 

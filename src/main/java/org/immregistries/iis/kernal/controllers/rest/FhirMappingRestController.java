@@ -4,6 +4,7 @@ package org.immregistries.iis.kernal.controllers.rest;
 import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.hl7.fhir.instance.model.api.IBaseDatatype;
 import org.immregistries.iis.kernal.mapping.AllMappingService;
+import org.immregistries.iis.kernal.mapping.MapperRegistry;
 import org.immregistries.iis.kernal.model.IisMappedToFhir;
 import org.immregistries.iis.kernal.model.IisMappedToFhirResource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,8 @@ public class FhirMappingRestController {
 	public static final String MAPPING_KEY_PATH = "/mapping";
 	@Autowired
 	AllMappingService mappingService;
+	@Autowired
+	MapperRegistry mapperRegistry;
 
 	@PostMapping("/resource")
 	public IAnyResource toFhir(
@@ -31,13 +34,13 @@ public class FhirMappingRestController {
 	public IBaseDatatype fieldR4(
 		@RequestBody IisMappedToFhir iisMappedToFhir
 	) {
-		return mappingService.selectFieldMapper(iisMappedToFhir).toR4(iisMappedToFhir);
+		return mapperRegistry.selectFieldMapper(iisMappedToFhir).toR4(iisMappedToFhir);
 	}
 
 	@PostMapping("/field/r5")
 	public IBaseDatatype fieldR5(
 		@RequestBody IisMappedToFhir iisMappedToFhir
 	) {
-		return mappingService.selectFieldMapper(iisMappedToFhir).toR5(iisMappedToFhir);
+		return mapperRegistry.selectFieldMapper(iisMappedToFhir).toR5(iisMappedToFhir);
 	}
 }

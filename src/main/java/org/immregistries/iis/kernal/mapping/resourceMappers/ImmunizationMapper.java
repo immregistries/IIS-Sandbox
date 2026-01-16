@@ -39,7 +39,7 @@ public abstract class ImmunizationMapper<Immunization extends IAnyResource>
 	@Autowired
 	private FhirSearchRequester fhirSearchRequester;
 
-	public String fhirType() {
+	public String fhirResourceName() {
 		return IMMUNIZATION;
 	}
 

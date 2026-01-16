@@ -5,7 +5,7 @@ import org.immregistries.iis.kernal.model.ModelPerson;
 
 public abstract class PractitionerMapper<Practitioner extends IAnyResource>
 		implements IisResourceMasterMapper<ModelPerson, Practitioner> {
-	public String fhirType() {
+	public String fhirResourceName() {
 		return PRACTITIONER;
 	}
 

@@ -5,7 +5,7 @@ import org.immregistries.iis.kernal.model.IisMappedToFhirResource;
 
 public interface IisResourceMasterMapper<LocalResource extends IisMappedToFhirResource, FhirResourceType extends IAnyResource> {
 
-	String fhirType();
+	String fhirResourceName();
 
 	Class<LocalResource> localType();
 

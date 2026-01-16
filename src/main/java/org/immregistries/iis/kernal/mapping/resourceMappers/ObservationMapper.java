@@ -8,7 +8,7 @@ public abstract class ObservationMapper<Observation extends IAnyResource>
 		implements
 		IisResourceMasterReportedMapper<ObservationMaster, ObservationReported, ObservationMaster, Observation> {
 
-	public String fhirType() {
+	public String fhirResourceName() {
 		return "Observation";
 	}
 
