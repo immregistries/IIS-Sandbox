@@ -8,8 +8,10 @@ import java.util.List;
 public class IisRecommendation extends IisMappedToFhirResource {
 	private String id;
 	private IisPatient iisPatient;
+	private List<BusinessIdentifier> businessIdentifierList;
 	private List<ForecastActual> forecastActualList;
 	private Date date;
+	private BusinessIdentifier authority;
 
 	public IisRecommendation() {
 	}
@@ -50,5 +52,21 @@ public class IisRecommendation extends IisMappedToFhirResource {
 
 	public void setDate(Date date) {
 		this.date = date;
+	}
+
+	public List<BusinessIdentifier> getBusinessIdentifierList() {
+		return businessIdentifierList;
+	}
+
+	public void setBusinessIdentifierList(List<BusinessIdentifier> businessIdentifierList) {
+		this.businessIdentifierList = businessIdentifierList;
+	}
+
+	public BusinessIdentifier getAuthority() {
+		return authority;
+	}
+
+	public void setAuthority(BusinessIdentifier authority) {
+		this.authority = authority;
 	}
 }

@@ -17,6 +17,7 @@ import org.immregistries.iis.kernal.mapping.mappers.resources.RecommendationMapp
 import org.immregistries.iis.kernal.model.IisPatient;
 import org.immregistries.iis.kernal.model.IisRecommendation;
 import org.immregistries.vfa.connect.model.ForecastActual;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Service;
@@ -28,7 +29,7 @@ import static org.immregistries.iis.kernal.mapping.mappers.resources.Immunizatio
 
 @Service
 @Conditional(OnR4Condition.class)
-public class ImmunizationRecommendationMapperR4 extends RecommendationMapper<ImmunizationRecommendation> implements IR4Mapper<IisRecommendation, ImmunizationRecommendation>  {
+public class ImmunizationRecommendationMapperR4 extends RecommendationMapper<ImmunizationRecommendation, ImmunizationRecommendation.ImmunizationRecommendationRecommendationComponent> implements IR4Mapper<IisRecommendation, ImmunizationRecommendation> {
 	@Autowired
 	private CodeMapManagerService codeMapManagerService;
 	@Autowired
@@ -46,8 +47,7 @@ public class ImmunizationRecommendationMapperR4 extends RecommendationMapper<Imm
 		return immunizationRecommendation;
 	}
 
-	public ImmunizationRecommendation toFhir(List<ForecastActual> forecastActualList, Date date,
-			IisPatient iisPatient) {
+	public ImmunizationRecommendation toFhir(List<ForecastActual> forecastActualList, Date date, IisPatient iisPatient) {
 
 		ImmunizationRecommendation immunizationRecommendation = toFhir(forecastActualList, date);
 		if (iisPatient != null) {
@@ -65,97 +65,106 @@ public class ImmunizationRecommendationMapperR4 extends RecommendationMapper<Imm
 		ImmunizationRecommendation immunizationRecommendation = new ImmunizationRecommendation();
 		immunizationRecommendation.setDate(date);
 		for (ForecastActual forecastActual : forecastActualList) {
-			ImmunizationRecommendation.ImmunizationRecommendationRecommendationComponent component = immunizationRecommendation
-					.addRecommendation();
-			/*
-			 * CVX
-			 */
-			String cvx = forecastActual.getVaccineCvx();
-			if (StringUtils.isBlank(cvx)) {
-				cvx = forecastActual.getVaccineGroup().getVaccineCvx();
-			}
-			Code cvxCode = codeMap.getCodeForCodeset(CodesetType.VACCINATION_CVX_CODE, cvx);
-			if (cvxCode != null) {
-				component.addVaccineCode(
-						new CodeableConcept(new Coding(CVX_SYSTEM, cvxCode.getValue(), cvxCode.getLabel())));
-			} else {
-				component.addVaccineCode(new CodeableConcept(new Coding(CVX_SYSTEM, cvx, "")));
-			}
-			/*
-			 * Vaccine Group
-			 */
-			Code vaccineGroup = codeMap.getCodeForCodeset(CodesetType.VACCINE_GROUP,
-					forecastActual.getVaccineGroup().getVaccineCvx());
-			if (vaccineGroup != null) {
-				component.setTargetDisease(
-						new CodeableConcept(new Coding("", vaccineGroup.getValue(), vaccineGroup.getLabel())));
-			}
-			// component.setContraindicatedVaccineCode();
-			/*
-			 * ForecastStatus
-			 */
-			component.setForecastStatus(
-					new CodeableConcept().addCoding(VaccinePlanStatus.fromForecastActual(forecastActual).toR4()));
-			/*
-			 * ForecastReason
-			 */
-			// component.addForecastReason()
-
-			/*
-			 * Dates
-			 */
-			if (forecastActual.getValidDate() != null) {
-				component
-						.addDateCriterion()
-						.setValue(forecastActual.getValidDate())
-						.setCode(new CodeableConcept().addCoding(VaccinationRecommendationDateCode.EARLIEST.toR4()));
-			}
-			if (forecastActual.getDueDate() != null) {
-				component
-						.addDateCriterion()
-						.setValue(forecastActual.getDueDate())
-						.setCode(new CodeableConcept().addCoding(VaccinationRecommendationDateCode.DUE.toR4()));
-			}
-			if (forecastActual.getOverdueDate() != null) {
-				component
-						.addDateCriterion()
-						.setValue(forecastActual.getOverdueDate())
-						.setCode(new CodeableConcept().addCoding(VaccinationRecommendationDateCode.OVERDUE.toR4()));
-			}
-			if (forecastActual.getFinishedDate() != null) {
-				component
-						.addDateCriterion()
-						.setValue(forecastActual.getFinishedDate())
-						.setCode(new CodeableConcept().addCoding(VaccinationRecommendationDateCode.LATEST.toR4()));
-			}
-
-			/*
-			 * Description
-			 */
-			component.setDescription(forecastActual.getExplanationHtml());
-			/*
-			 * Series
-			 */
-			component.setSeries(forecastActual.getScheduleName());
-			/*
-			 * Dose Number
-			 */
-			// component.setDoseNumber();
-			/*
-			 * Series Doses
-			 */
-			// component.setSeriesDoses();
-			/*
-			 * SupportingImmunization
-			 */
-			// component.setSupportingImmunization()
-			/*
-			 * SupportingPatientInformation(
-			 */
-			// component.setSupportingPatientInformation();
-
+			ImmunizationRecommendation.ImmunizationRecommendationRecommendationComponent component = getRecommendationComponent(forecastActual, codeMap);
+			immunizationRecommendation.addRecommendation(component);
 		}
 		return immunizationRecommendation;
+	}
+
+	public ImmunizationRecommendation.@NotNull ImmunizationRecommendationRecommendationComponent recommendationComponent(ForecastActual forecastActual) {
+		CodeMap codeMap = codeMapManagerService.getCodeMap();
+		return getRecommendationComponent(forecastActual, codeMap);
+	}
+
+	public ImmunizationRecommendation.@NotNull ImmunizationRecommendationRecommendationComponent getRecommendationComponent(ForecastActual forecastActual, CodeMap codeMap) {
+		ImmunizationRecommendation.ImmunizationRecommendationRecommendationComponent component = new ImmunizationRecommendation.ImmunizationRecommendationRecommendationComponent();
+		/*
+		 * CVX
+		 */
+		String cvx = forecastActual.getVaccineCvx();
+		if (StringUtils.isBlank(cvx)) {
+			cvx = forecastActual.getVaccineGroup().getVaccineCvx();
+		}
+		Code cvxCode = codeMap.getCodeForCodeset(CodesetType.VACCINATION_CVX_CODE, cvx);
+		if (cvxCode != null) {
+			component.addVaccineCode(
+				new CodeableConcept(new Coding(CVX_SYSTEM, cvxCode.getValue(), cvxCode.getLabel())));
+		} else {
+			component.addVaccineCode(new CodeableConcept(new Coding(CVX_SYSTEM, cvx, "")));
+		}
+		/*
+		 * Vaccine Group
+		 */
+		Code vaccineGroup = codeMap.getCodeForCodeset(CodesetType.VACCINE_GROUP,
+			forecastActual.getVaccineGroup().getVaccineCvx());
+		if (vaccineGroup != null) {
+			component.setTargetDisease(
+				new CodeableConcept(new Coding("", vaccineGroup.getValue(), vaccineGroup.getLabel())));
+		}
+		// component.setContraindicatedVaccineCode();
+		/*
+		 * ForecastStatus
+		 */
+		component.setForecastStatus(
+			new CodeableConcept().addCoding(VaccinePlanStatus.fromForecastActual(forecastActual).toR4()));
+		/*
+		 * ForecastReason
+		 */
+		// component.addForecastReason()
+
+		/*
+		 * Dates
+		 */
+		if (forecastActual.getValidDate() != null) {
+			component
+				.addDateCriterion()
+				.setValue(forecastActual.getValidDate())
+				.setCode(new CodeableConcept().addCoding(VaccinationRecommendationDateCode.EARLIEST.toR4()));
+		}
+		if (forecastActual.getDueDate() != null) {
+			component
+				.addDateCriterion()
+				.setValue(forecastActual.getDueDate())
+				.setCode(new CodeableConcept().addCoding(VaccinationRecommendationDateCode.DUE.toR4()));
+		}
+		if (forecastActual.getOverdueDate() != null) {
+			component
+				.addDateCriterion()
+				.setValue(forecastActual.getOverdueDate())
+				.setCode(new CodeableConcept().addCoding(VaccinationRecommendationDateCode.OVERDUE.toR4()));
+		}
+		if (forecastActual.getFinishedDate() != null) {
+			component
+				.addDateCriterion()
+				.setValue(forecastActual.getFinishedDate())
+				.setCode(new CodeableConcept().addCoding(VaccinationRecommendationDateCode.LATEST.toR4()));
+		}
+
+		/*
+		 * Description
+		 */
+		component.setDescription(forecastActual.getExplanationHtml());
+		/*
+		 * Series
+		 */
+		component.setSeries(forecastActual.getScheduleName());
+		/*
+		 * Dose Number
+		 */
+		// component.setDoseNumber();
+		/*
+		 * Series Doses
+		 */
+		// component.setSeriesDoses();
+		/*
+		 * SupportingImmunization
+		 */
+		// component.setSupportingImmunization()
+		/*
+		 * SupportingPatientInformation(
+		 */
+		// component.setSupportingPatientInformation();
+		return component;
 	}
 
 }
