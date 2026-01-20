@@ -7,7 +7,7 @@ import org.immregistries.iis.kernal.logic.*;
 import org.immregistries.iis.kernal.logic.validation.ProcessingException;
 import org.immregistries.iis.kernal.logic.validation.ValidationService;
 import org.immregistries.iis.kernal.model.ack.IisReportable;
-import org.immregistries.iis.kernal.logic.v2.ack.ReportableUtil;
+import org.immregistries.iis.kernal.logic.v2.ack.IisReportableUtilService;
 import org.immregistries.iis.kernal.model.PatientReported;
 import org.immregistries.iis.kernal.model.ProcessingFlavor;
 import org.immregistries.iis.kernal.model.VaccinationReported;
@@ -33,7 +33,7 @@ public abstract class IncomingMessageHandler<ParsedSource, ValidationResult> imp
 	@Autowired
 	private CodeMapManagerService codeMapManagerService;
 	@Autowired
-	ReportableUtil reportableUtil;
+	IisReportableUtilService iisReportableUtilService;
 
 	@Override
 	public String process(String message, Tenant tenant, String sendingFacilityName) {
@@ -61,7 +61,7 @@ public abstract class IncomingMessageHandler<ParsedSource, ValidationResult> imp
 					break;
 				default:
 					ProcessingException pe = new ProcessingException("Unsupported message", "", 0, 0);
-					List<IisReportable> iisReportableList = List.of(reportableUtil.fromProcessingException(pe));
+					List<IisReportable> iisReportableList = List.of(iisReportableUtilService.fromProcessingException(pe));
 					responseMessage = buildResultWithoutValidation(parsedSource, iisReportableList, processingFlavorSet);
 					messageRecordingService.recordMessageReceived(message, null, responseMessage, "Unknown", "NAck", tenant);
 					break;
@@ -70,7 +70,7 @@ public abstract class IncomingMessageHandler<ParsedSource, ValidationResult> imp
 		} catch (Exception e) {
 			e.printStackTrace(System.err);
 			List<IisReportable> iisReportableList = new ArrayList<>();
-			iisReportableList.add(reportableUtil.fromProcessingException(new ProcessingException("Internal error prevented processing: " + e.getMessage(), null, 0, 0)));
+			iisReportableList.add(iisReportableUtilService.fromProcessingException(new ProcessingException("Internal error prevented processing: " + e.getMessage(), null, 0, 0)));
 			responseMessage = buildResultWithoutValidation(parsedSource, iisReportableList, processingFlavorSet);
 		}
 		return responseMessage;
@@ -102,7 +102,7 @@ public abstract class IncomingMessageHandler<ParsedSource, ValidationResult> imp
 			messageRecordingService.recordMessageReceived(message, patientReported, ack, "Update", "Ack", tenant);
 			return ack;
 		} catch (ProcessingException e) {
-			IisReportable exceptionReportable = reportableUtil.fromProcessingException(e);
+			IisReportable exceptionReportable = iisReportableUtilService.fromProcessingException(e);
 			if (!iisReportableList.contains(exceptionReportable)) {
 				iisReportableList.add(exceptionReportable);
 			}

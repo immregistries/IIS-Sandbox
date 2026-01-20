@@ -67,11 +67,11 @@ public abstract class V2IncomingMessageHandler extends IncomingMessageHandler<HL
 	@Autowired
 	private CodeMapManagerService codeMapManagerService;
 	@Autowired
-	IisHL7Util iisHL7Util;
+	IisHL7UtilService iisHL7UtilService;
 	@Autowired
 	IisAckBuilder ackBuilder;
 	@Autowired
-	ReportableUtil reportableUtil;
+	IisReportableUtilService iisReportableUtilService;
 	@Autowired
 	V2DateParseService v2DateParseService;
 
@@ -118,7 +118,7 @@ public abstract class V2IncomingMessageHandler extends IncomingMessageHandler<HL
 
 		sb.append("MSA|").append(overallStatus).append("|").append(sendersUniqueId).append("\r");
 		for (IisReportable reportable : iisReportableList) {
-			sb.append(iisHL7Util.makeERRSegment(reportable, false));
+			sb.append(iisHL7UtilService.makeERRSegment(reportable, false));
 		}
 		return sb.toString();
 	}
@@ -277,7 +277,7 @@ public abstract class V2IncomingMessageHandler extends IncomingMessageHandler<HL
 			messageRecordingService.recordMessageReceived(message, patientReported, ack, "Update", "Ack", tenant);
 			return ack;
 		} catch (ProcessingException e) {
-			IisReportable exceptionReportable = reportableUtil.fromProcessingException(e);
+			IisReportable exceptionReportable = iisReportableUtilService.fromProcessingException(e);
 			if (!iisReportableList.contains(exceptionReportable)) {
 				iisReportableList.add(exceptionReportable);
 			}
@@ -323,7 +323,7 @@ public abstract class V2IncomingMessageHandler extends IncomingMessageHandler<HL
 		patientReported.setUpdatedDate(new Date());
 		patientReported = fhirSaveRequester.savePatientReported(patientReported);
 //		patientReported = fhirRequester.saveRelatedPerson(patientReported);
-		iisReportableList.add(reportableUtil.fromProcessingException(new ProcessingException("Patient record saved", PID, 0, 0, IisReportableSeverity.INFO)));
+		iisReportableList.add(iisReportableUtilService.fromProcessingException(new ProcessingException("Patient record saved", PID, 0, 0, IisReportableSeverity.INFO)));
 
 		/*
 		 * checking if request is gathering patients  Ids to create a group, TODO cleaner solution

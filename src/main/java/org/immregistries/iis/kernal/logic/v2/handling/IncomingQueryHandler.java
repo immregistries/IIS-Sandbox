@@ -8,7 +8,7 @@ import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.logic.*;
-import org.immregistries.iis.kernal.logic.v2.ack.IisHL7Util;
+import org.immregistries.iis.kernal.logic.v2.ack.IisHL7UtilService;
 import org.immregistries.iis.kernal.logic.v2.ack.V2DateParseService;
 import org.immregistries.iis.kernal.logic.recommendations.VaccinationRecommendationDateCode;
 import org.immregistries.iis.kernal.logic.recommendations.VaccinePlanStatus;
@@ -17,7 +17,7 @@ import org.immregistries.iis.kernal.logic.validation.ValidationService;
 import org.immregistries.iis.kernal.logic.v2.writing.Hl7MessageWriter;
 import org.immregistries.iis.kernal.model.ack.IisReportable;
 import org.immregistries.iis.kernal.model.ack.IisReportableSeverity;
-import org.immregistries.iis.kernal.logic.v2.ack.ReportableUtil;
+import org.immregistries.iis.kernal.logic.v2.ack.IisReportableUtilService;
 import org.immregistries.iis.kernal.mapping.requesters.FhirMatchRequester;
 import org.immregistries.iis.kernal.mapping.requesters.FhirSearchRequester;
 import org.immregistries.iis.kernal.model.*;
@@ -54,11 +54,11 @@ public class IncomingQueryHandler {
 	@Autowired
 	private CodeMapManagerService codeMapManagerService;
 	@Autowired
-	IisHL7Util iisHL7Util;
+	IisHL7UtilService iisHL7UtilService;
 	@Autowired
 	MessageRecordingService messageRecordingService;
 	@Autowired
-	ReportableUtil reportableUtil;
+	IisReportableUtilService iisReportableUtilService;
 	@Autowired
 	V2DateParseService v2DateParseService;
 
@@ -112,14 +112,14 @@ public class IncomingQueryHandler {
 				fieldPosition = 6;
 			}
 			if (StringUtils.isNotBlank(problem)) {
-				reportables.add(reportableUtil.fromProcessingException(new ProcessingException(problem, "QPD", 1, fieldPosition)));
+				reportables.add(iisReportableUtilService.fromProcessingException(new ProcessingException(problem, "QPD", 1, fieldPosition)));
 			} else {
 				ModelName modelName = new ModelName(patientNameLast, patientNameFirst, patientNameMiddle, "");
 				patientForMatchQuery.addPatientName(modelName);
 				patientForMatchQuery.setBirthDate(patientBirthDate);
 			}
 		} else {
-			reportables.add(reportableUtil.fromProcessingException(new ProcessingException("QPD segment not found", null, 0, 0)));
+			reportables.add(iisReportableUtilService.fromProcessingException(new ProcessingException("QPD segment not found", null, 0, 0)));
 		}
 
 		Date cutoff = null;
@@ -154,7 +154,7 @@ public class IncomingQueryHandler {
 		MqeMessageServiceResponse mqeMessageServiceResponse = validationService.getMqeMessageService().processMessage(messageReceived);
 		boolean sendInformations = true;
 		if (processingFlavorSet.contains(ProcessingFlavor.STARFRUIT) && (StringUtils.defaultString(patientMaster.getNameFirst()).startsWith("S") || StringUtils.defaultString(patientMaster.getNameFirst()).startsWith("A"))) {
-			iisReportables.add(reportableUtil.fromProcessingException(new ProcessingException("Immunization History cannot be shared because of patient's consent status", "PID", 0, 0, IisReportableSeverity.NOTICE)));
+			iisReportables.add(iisReportableUtilService.fromProcessingException(new ProcessingException("Immunization History cannot be shared because of patient's consent status", "PID", 0, 0, IisReportableSeverity.NOTICE)));
 			sendInformations = false;
 		}
 		reader.resetPostion();
@@ -227,7 +227,7 @@ public class IncomingQueryHandler {
 					categoryResponse = MATCH;
 				}
 			} else {
-				iisReportables.add(reportableUtil.fromProcessingException(new ProcessingException("Unrecognized profile id '" + profileIdSubmitted + "'", "MSH", 1, 21)));
+				iisReportables.add(iisReportableUtilService.fromProcessingException(new ProcessingException("Unrecognized profile id '" + profileIdSubmitted + "'", "MSH", 1, 21)));
 			}
 			// TODO remove notices ?
 			hl7MessageWriter.createMSH(RSP_K_11_RSP_K_11, profileId, reader, sb, processingFlavorSet);
@@ -236,7 +236,7 @@ public class IncomingQueryHandler {
 		{
 			String sendersUniqueId = reader.getValue(10);
 			String processingId = mqeMessageServiceResponse.getMessageObjects().getMessageHeader().getProcessingStatus();
-			iisHL7Util.makeMsaAndErr(sb, sendersUniqueId, processingId, profileId, iisReportables, processingFlavorSet);
+			iisHL7UtilService.makeMsaAndErr(sb, sendersUniqueId, processingId, profileId, iisReportables, processingFlavorSet);
 		}
 
 		if (sendInformations) {

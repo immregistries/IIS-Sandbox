@@ -23,7 +23,7 @@ import static org.immregistries.iis.kernal.logic.v2.ack.IisAckBuilder.PROCESSING
 import static org.immregistries.mqe.vxu.parse.HL7ParsingUtil.escapeHL7Chars;
 
 @Service
-public class IisHL7Util {
+public class IisHL7UtilService {
 
 	public static final String MESSAGE_TYPE_VXU = "VXU";
 	public static final String MESSAGE_TYPE_QBP = "QBP";

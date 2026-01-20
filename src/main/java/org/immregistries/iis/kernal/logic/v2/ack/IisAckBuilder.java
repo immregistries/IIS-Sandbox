@@ -19,7 +19,7 @@ public class IisAckBuilder {
 	public static final String PROCESSING_ID_DEBUG = "D";
 
 	@Autowired
-	IisHL7Util iisHL7Util;
+	IisHL7UtilService iisHL7UtilService;
 
 
 	public String buildAckFrom(IisAckData ackDataIn, Set<ProcessingFlavor> processingFlavorSet) {
@@ -37,7 +37,7 @@ public class IisAckBuilder {
 		String profileExtension = ackDataIn.getProfileExtension();
 		List<IisReportable> reportables = ackDataIn.getReportables();
 
-		iisHL7Util.makeMsaAndErr(ack, controlId, processingId, profileExtension, reportables, processingFlavorSet);
+		iisHL7UtilService.makeMsaAndErr(ack, controlId, processingId, profileExtension, reportables, processingFlavorSet);
 		return ack.toString();
 	}
 

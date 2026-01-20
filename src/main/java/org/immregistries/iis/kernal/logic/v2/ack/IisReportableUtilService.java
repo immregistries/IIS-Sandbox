@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class ReportableUtil {
+public class IisReportableUtilService {
 
 	public IisReportable fromProcessingException(ProcessingException processingException) {
 		IisReportable iisReportable = new IisReportable();

@@ -14,7 +14,7 @@ import java.util.List;
 @Service
 public class V2DateParseService {
 	@Autowired
-	ReportableUtil reportableUtil;
+	IisReportableUtilService iisReportableUtilService;
 
 	public Date parseDateWarn(String dateString, String errorMessage, String segmentId, int segmentRepeat, int fieldPosition, boolean strict, List<IisReportable> iisReportableList) {
 		try {
@@ -22,7 +22,7 @@ public class V2DateParseService {
 		} catch (ParseException e) {
 			if (errorMessage != null) {
 				ProcessingException pe = new ProcessingException(errorMessage + ": " + e.getMessage(), segmentId, segmentRepeat, fieldPosition, IisReportableSeverity.WARN);
-				iisReportableList.add(reportableUtil.fromProcessingException(pe));
+				iisReportableList.add(iisReportableUtilService.fromProcessingException(pe));
 			}
 		}
 		return null;
