@@ -78,10 +78,6 @@ public class ImmunizationRecommendationServiceR5 implements IImmunizationRecomme
 				.getParameter(RECOMMENDATION).getResource();
 	}
 
-//	public Parameters queryCds(Tenant tenant, IisRecommendation iisRecommendation) {
-//		return queryCds(tenant,iisRecommendation.getDate(), iisRecommendation.getIisPatient(), )
-//	}
-
 	public Parameters queryCds(Tenant tenant, Date date, IisPatient iisPatient,
 										List<? extends IisVaccination> iisVaccinationList) {
 		List<ForecastActual> forecastActualList = incomingQueryHandler.doForecast(iisPatient,
