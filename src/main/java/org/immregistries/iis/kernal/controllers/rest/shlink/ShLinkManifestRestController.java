@@ -4,14 +4,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.immregistries.iis.kernal.controllers.rest.RestUrlUtil;
 import org.immregistries.iis.kernal.logic.shlink.ShLinkManifestGenerator;
-import org.immregistries.iis.kernal.logic.shlink.ShlinkManifestService;
+import org.immregistries.iis.kernal.logic.shlink.ShLinkManifestService;
 import org.immregistries.iis.kernal.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.security.TenantUtil;
-import org.immregistries.iis.kernal.logic.shlink.ShLinkUtilService;
 import org.immregistries.iis.kernal.persisted.model.ShLinkManifest;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
-import org.immregistries.iis.kernal.persisted.repository.ShlinkManifestRepository;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +33,7 @@ public class ShLinkManifestRestController {
 	@Autowired
 	private ShLinkManifestGenerator shLinkManifestGenerator;
 	@Autowired
-	private ShlinkManifestService shlinkManifestService;
+	private ShLinkManifestService shlinkManifestService;
 	@Autowired
 	private TenantUtil tenantUtil;
 

@@ -53,7 +53,7 @@ public class ShLinkUtilService {
 	@Autowired
 	private CompressionService compressionService;
 	@Autowired
-	private ShlinkManifestService shlinkManifestService;
+	private ShLinkManifestService shlinkManifestService;
 	@Autowired
 	private IpsGeneratorSvcIIS ipsGeneratorSvcIIS;
 	@Autowired
