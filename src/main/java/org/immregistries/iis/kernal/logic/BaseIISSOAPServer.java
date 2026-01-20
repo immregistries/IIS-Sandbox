@@ -2,7 +2,7 @@ package org.immregistries.iis.kernal.logic;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
-import org.immregistries.iis.kernal.security.TenantUtil;
+import org.immregistries.iis.kernal.security.TenantAuthService;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.immregistries.smm.cdc.*;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -13,11 +13,11 @@ import static org.immregistries.iis.kernal.security.CurrentTenantUtil.SESSION_RE
 public abstract class BaseIISSOAPServer extends CDCWSDLServer {
 
 	private String tenantName;
-	private TenantUtil tenantUtil;
+	private TenantAuthService tenantAuthService;
 
-	protected BaseIISSOAPServer(String tenantNameParameter, TenantUtil tenantUtil) {
+	protected BaseIISSOAPServer(String tenantNameParameter, TenantAuthService tenantAuthService) {
 		this.tenantName = tenantNameParameter;
-		this.tenantUtil = tenantUtil;
+		this.tenantAuthService = tenantAuthService;
 	}
 
 	@Override
@@ -35,9 +35,9 @@ public abstract class BaseIISSOAPServer extends CDCWSDLServer {
 		}
 		Tenant tenant;
 		if (StringUtils.isNotBlank(tenantName)) {
-			tenant = tenantUtil.authenticateTenant(userId, password, tenantName);
+			tenant = tenantAuthService.authenticateTenant(userId, password, tenantName);
 		} else {
-			tenant = tenantUtil.authenticateTenant(userId, password, facilityId);
+			tenant = tenantAuthService.authenticateTenant(userId, password, facilityId);
 		}
 		if (tenant == null) {
 			throw new SecurityFault("Username/password combination is unrecognized");

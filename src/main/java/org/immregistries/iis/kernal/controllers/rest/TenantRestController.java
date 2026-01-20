@@ -1,8 +1,7 @@
 package org.immregistries.iis.kernal.controllers.rest;
 
 import jakarta.servlet.http.HttpServletRequest;
-import org.immregistries.iis.kernal.fhir.interceptors.PartitionTenantCreationInterceptor;
-import org.immregistries.iis.kernal.security.TenantUtil;
+import org.immregistries.iis.kernal.security.TenantAuthService;
 import org.immregistries.iis.kernal.security.UserAccessUtil;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.immregistries.iis.kernal.persisted.model.UserAccess;
@@ -21,7 +20,7 @@ public class TenantRestController {
     @Autowired
     TenantRepository tenantRepository;
     @Autowired
-    TenantUtil tenantUtil;
+	 TenantAuthService tenantAuthService;
     @Autowired
     UserAccessUtil userAccessUtil;
 
@@ -44,7 +43,7 @@ public class TenantRestController {
             throw new IllegalArgumentException("Tenant UserAccess must be null or match the current user");
         }
         // TODO prevent duplicate tenant creation
-        tenantUtil.authenticateTenant(currentUser, tenant.getOrganizationName());
+        tenantAuthService.authenticateTenant(currentUser, tenant.getOrganizationName());
         tenant.setUserAccess(currentUser);
         tenant = tenantRepository.save(tenant);
         return tenant;

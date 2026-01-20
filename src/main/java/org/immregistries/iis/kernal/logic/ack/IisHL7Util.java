@@ -2,11 +2,14 @@ package org.immregistries.iis.kernal.logic.ack;
 
 import org.apache.commons.lang3.StringUtils;
 import org.immregistries.iis.kernal.model.ProcessingFlavor;
+import org.immregistries.iis.kernal.model.ack.IisReportable;
+import org.immregistries.iis.kernal.model.ack.IisReportableSeverity;
 import org.immregistries.mqe.hl7util.ReportableSource;
 import org.immregistries.mqe.hl7util.builder.AckERRCode;
 import org.immregistries.mqe.hl7util.builder.AckResult;
 import org.immregistries.mqe.hl7util.model.CodedWithExceptions;
 import org.immregistries.mqe.hl7util.model.Hl7Location;
+import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -19,6 +22,7 @@ import static org.immregistries.iis.kernal.logic.IIncomingMessageHandler.ADVANCE
 import static org.immregistries.iis.kernal.logic.ack.IisAckBuilder.PROCESSING_ID_DEBUG;
 import static org.immregistries.mqe.vxu.parse.HL7ParsingUtil.escapeHL7Chars;
 
+@Service
 public class IisHL7Util {
 
 	public static final String MESSAGE_TYPE_VXU = "VXU";
@@ -51,14 +55,14 @@ public class IisHL7Util {
 
 	private static int ackCount = 1;
 
-	public static synchronized int getNextAckCount() {
+	public synchronized int getNextAckCount() {
 		if (ackCount == Integer.MAX_VALUE) {
 			ackCount = 1;
 		}
 		return ackCount++;
 	}
 
-	public static boolean setupSeparators(String messageText, char[] separators) {
+	public boolean setupSeparators(String messageText, char[] separators) {
 		if (messageText.startsWith("MSH") && messageText.length() > 10) {
 			separators[BAR] = messageText.charAt(BAR + 3);
 			separators[CAR] = messageText.charAt(CAR + 3);
@@ -72,7 +76,7 @@ public class IisHL7Util {
 		}
 	}
 
-	public static void setDefault(char[] separators) {
+	public void setDefault(char[] separators) {
 		separators[BAR] = '|';
 		separators[CAR] = '^';
 		separators[TIL] = '~';
@@ -80,7 +84,7 @@ public class IisHL7Util {
 		separators[AMP] = '&';
 	}
 
-	public static boolean checkSeparatorsAreValid(char[] separators) {
+	public boolean checkSeparatorsAreValid(char[] separators) {
 		boolean unique = true;
 		// Make sure separators are unique for each other
 		for (int i = 0; i < separators.length; i++) {
@@ -94,7 +98,7 @@ public class IisHL7Util {
 		return unique;
 	}
 
-	public static String makeAckMessage(String ackType, String severityLevel, String message,
+	public String makeAckMessage(String ackType, String severityLevel, String message,
 													IisAckData ackData, IisReportable reportable) {
 		StringBuilder ack = new StringBuilder();
 
@@ -144,7 +148,7 @@ public class IisHL7Util {
 
 	}
 
-	public static void appendErrorCode(StringBuilder ack, CodedWithExceptions cwe) {
+	public void appendErrorCode(StringBuilder ack, CodedWithExceptions cwe) {
 		if (cwe != null) {
 			AckERRCode code = AckERRCode.getFromString(cwe.getIdentifier());
 			if (code == null) {
@@ -156,7 +160,7 @@ public class IisHL7Util {
 		printCodedWithExceptions(ack, cwe);
 	}
 
-	public static String makeERRSegment(IisReportable reportable, boolean debug) {
+	public String makeERRSegment(IisReportable reportable, boolean debug) {
 		StringBuilder err = new StringBuilder();
 		CodedWithExceptions hl7ErrorCode = reportable.getHl7ErrorCode();
 
@@ -169,7 +173,7 @@ public class IisHL7Util {
 			hl7ErrorCode = new CodedWithExceptions();
 			hl7ErrorCode.setIdentifier("0");
 		}
-		IisHL7Util.appendErrorCode(err, reportable.getHl7ErrorCode());
+		appendErrorCode(err, reportable.getHl7ErrorCode());
 		err.append("|");
 		// 4 Severity
 		IisReportableSeverity level = reportable.getSeverity();
@@ -195,7 +199,7 @@ public class IisHL7Util {
 		return err.toString();
 	}
 
-	public static void appendAppErrorCode(StringBuilder ack, IisReportable reportable) {
+	public void appendAppErrorCode(StringBuilder ack, IisReportable reportable) {
 		if (reportable != null) {
 			CodedWithExceptions cwe = reportable.getApplicationErrorCode();
 			if (cwe != null) {
@@ -237,7 +241,7 @@ public class IisHL7Util {
 
 	}
 
-	private static void printCodedWithExceptions(StringBuilder ack, CodedWithExceptions cwe) {
+	private void printCodedWithExceptions(StringBuilder ack, CodedWithExceptions cwe) {
 		if (cwe != null) {
 			if (StringUtils.isNotBlank(cwe.getIdentifier())) {
 				ack.append(cwe.getIdentifier());
@@ -259,7 +263,7 @@ public class IisHL7Util {
 		}
 	}
 
-	private static String printErr2(IisReportable reportable) {
+	private String printErr2(IisReportable reportable) {
 		StringBuilder ack = new StringBuilder();
 		boolean repeating = false;
 		if (reportable.getHl7LocationList() != null) {
@@ -301,7 +305,7 @@ public class IisHL7Util {
 		return ack.toString();
 	}
 
-	public static String makeERRSegment(String severity, String textMessage, IisReportable reportable) {
+	public String makeERRSegment(String severity, String textMessage, IisReportable reportable) {
 		StringBuilder ack = new StringBuilder();
 		ack.append("ERR||");
 		// 2 Error Location
@@ -309,7 +313,7 @@ public class IisHL7Util {
 			? reportable.getHl7LocationList().get(0) : "");
 		ack.append("|");
 		// 3 HL7 Error Code
-		IisHL7Util.appendErrorCode(ack, reportable.getHl7ErrorCode());
+		appendErrorCode(ack, reportable.getHl7ErrorCode());
 		ack.append("|");
 		// 4 Severity
 		ack.append(severity);
@@ -327,39 +331,39 @@ public class IisHL7Util {
 		return ack.toString();
 	}
 
-	public static void makeMsaAndErr(StringBuilder sb, String controlId, String processingId, String profileExtension, List<IisReportable> reportables, Set<ProcessingFlavor> processingFlavorSet) {
+	public void makeMsaAndErr(StringBuilder sb, String controlId, String processingId, String profileExtension, List<IisReportable> reportables, Set<ProcessingFlavor> processingFlavorSet) {
 		String ackCode = getAckCode(profileExtension, reportables, processingFlavorSet);
 		sb.append("MSA|").append(ackCode).append("|").append(controlId).append("|\r");
 		for (IisReportable r : reportables) {
 			if (r.getSeverity() == IisReportableSeverity.ERROR) {
-				sb.append(IisHL7Util.makeERRSegment(r, PROCESSING_ID_DEBUG.equals(processingId)));
+				sb.append(makeERRSegment(r, PROCESSING_ID_DEBUG.equals(processingId)));
 			}
 		}
 		for (IisReportable r : reportables) {
 			if (r.getSeverity() == IisReportableSeverity.WARN) {
-				sb.append(IisHL7Util.makeERRSegment(r, PROCESSING_ID_DEBUG.equals(processingId)));
+				sb.append(makeERRSegment(r, PROCESSING_ID_DEBUG.equals(processingId)));
 			}
 		}
 		for (IisReportable r : reportables) {
 			if (r.getSeverity() == IisReportableSeverity.INFO) {
-				sb.append(IisHL7Util.makeERRSegment(r, PROCESSING_ID_DEBUG.equals(processingId)));
+				sb.append(makeERRSegment(r, PROCESSING_ID_DEBUG.equals(processingId)));
 			}
 		}
 		for (IisReportable r : reportables) {
 			if (r.getSeverity() == IisReportableSeverity.NOTICE) {
-				sb.append(IisHL7Util.makeERRSegment(r, PROCESSING_ID_DEBUG.equals(processingId)));
+				sb.append(makeERRSegment(r, PROCESSING_ID_DEBUG.equals(processingId)));
 			}
 		}
 		if (PROCESSING_ID_DEBUG.equals(processingId)) {
 			for (IisReportable r : reportables) {
 				if (r.getSeverity() == IisReportableSeverity.ACCEPT) {
-					sb.append(IisHL7Util.makeERRSegment(r, true));
+					sb.append(makeERRSegment(r, true));
 				}
 			}
 		}
 	}
 
-	private static boolean hasErrorSeverityType(List<IisReportable> reportables, String severityCode) {
+	private boolean hasErrorSeverityType(List<IisReportable> reportables, String severityCode) {
 		for (IisReportable reportable : reportables) {
 			if (reportable.getSeverity().getCode().equals(severityCode)) {
 				return true;
@@ -368,7 +372,7 @@ public class IisHL7Util {
 		return false;
 	}
 
-	private static String getAckCode(String profileExtension, List<IisReportable> reportables, Set<ProcessingFlavor> processingFlavorSet) {
+	private String getAckCode(String profileExtension, List<IisReportable> reportables, Set<ProcessingFlavor> processingFlavorSet) {
 		String ackCode;
 		String hl7ErrorCode;
 		if (processingFlavorSet.contains(ProcessingFlavor.NOTICE)) {

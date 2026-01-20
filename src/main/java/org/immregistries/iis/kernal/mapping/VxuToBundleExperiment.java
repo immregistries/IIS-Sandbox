@@ -2,7 +2,7 @@ package org.immregistries.iis.kernal.mapping;
 
 import org.hl7.fhir.r5.model.*;
 import org.immregistries.iis.kernal.logic.ProcessingException;
-import org.immregistries.iis.kernal.logic.ack.IisReportableSeverity;
+import org.immregistries.iis.kernal.model.ack.IisReportableSeverity;
 import org.immregistries.iis.kernal.model.ProcessingFlavor;
 import org.immregistries.smm.tester.manager.HL7Reader;
 

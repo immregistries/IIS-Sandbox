@@ -5,6 +5,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.hl7.fhir.r4.model.*;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
 import org.immregistries.iis.kernal.logic.IIncomingMessageHandler;
+import org.immregistries.iis.kernal.logic.ack.V2DateParseService;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
 import org.immregistries.iis.kernal.mapping.mappers.fields.r4.BusinessIdentifierMapperR4;
 import org.immregistries.iis.kernal.mapping.mappers.resources.ImmunizationMapper;
@@ -31,6 +32,8 @@ import static org.immregistries.iis.kernal.mapping.mappers.resources.Immunizatio
 public class ObservationMapperR4 extends ObservationMapper<Observation> implements IR4Mapper<ObservationMaster, Observation> {
 	@Autowired
 	private BusinessIdentifierMapperR4 businessIdentifierMapper;
+	@Autowired
+	V2DateParseService v2DateParseService;
 
 	public ObservationReported localObjectReportedWithMaster(Observation observation) {
 		ObservationReported observationReported = localObjectReported(observation);
@@ -207,7 +210,7 @@ public class ObservationMapperR4 extends ObservationMapper<Observation> implemen
 		return o;
 	}
 
-	private static Observation.ObservationComponentComponent fhirObservationComponent(ObservationMaster component) {
+	private Observation.ObservationComponentComponent fhirObservationComponent(ObservationMaster component) {
 		Observation.ObservationComponentComponent observationComponent = new Observation.ObservationComponentComponent();
 		/*
 		 * OBX-2 extension Value type
@@ -319,7 +322,7 @@ public class ObservationMapperR4 extends ObservationMapper<Observation> implemen
 			observationReported.setUnitsTable(quantity.getSystem());
 			observationReported.setUnitsLabel(quantity.getUnit());
 		} else if (o.hasValueDateTimeType()) {
-			SimpleDateFormat simpleDateFormat = IIncomingMessageHandler.generateV2SDF();
+			SimpleDateFormat simpleDateFormat = v2DateParseService.generateSimpleDateFormat();
 			observationReported.setValueCode(simpleDateFormat.format(o.getValueDateTimeType().getValue()));
 		}
 		/*
@@ -358,7 +361,7 @@ public class ObservationMapperR4 extends ObservationMapper<Observation> implemen
 		return observationReported;
 	}
 
-	private static @NotNull ObservationMaster fromFhirComponent(
+	private @NotNull ObservationMaster fromFhirComponent(
 			Observation.ObservationComponentComponent observationComponent) {
 		ObservationMaster component = new ObservationMaster();
 		/*
@@ -396,7 +399,7 @@ public class ObservationMapperR4 extends ObservationMapper<Observation> implemen
 			component.setUnitsTable(quantity.getSystem());
 			component.setUnitsLabel(quantity.getUnit());
 		} else if (observationComponent.hasValueDateTimeType()) {
-			SimpleDateFormat simpleDateFormat = IIncomingMessageHandler.generateV2SDF();
+			SimpleDateFormat simpleDateFormat = v2DateParseService.generateSimpleDateFormat();
 			component.setValueCode(simpleDateFormat.format(observationComponent.getValueDateTimeType().getValue()));
 		}
 		/*
@@ -409,7 +412,7 @@ public class ObservationMapperR4 extends ObservationMapper<Observation> implemen
 		return component;
 	}
 
-	private static @NotNull Range valueRange(ObservationMaster om) {
+	private @NotNull Range valueRange(ObservationMaster om) {
 		Range range = new Range();
 		Quantity low = valueQuantity(om.getValueCode(), om);
 		if (low.getValue() != null) {
@@ -422,8 +425,8 @@ public class ObservationMapperR4 extends ObservationMapper<Observation> implemen
 		return range;
 	}
 
-	private static @NotNull DateTimeType valueDateTimeType(ObservationMaster om) {
-		SimpleDateFormat simpleDateFormat = IIncomingMessageHandler.generateV2SDF();
+	private  @NotNull DateTimeType valueDateTimeType(ObservationMaster om) {
+		SimpleDateFormat simpleDateFormat = v2DateParseService.generateSimpleDateFormat();
 		DateTimeType dateTimeType = new DateTimeType();
 		try {
 			dateTimeType.setValue(simpleDateFormat.parse(om.getValueCode()));
@@ -432,8 +435,8 @@ public class ObservationMapperR4 extends ObservationMapper<Observation> implemen
 		return dateTimeType;
 	}
 
-	private static @NotNull Period valuePeriod(ObservationMaster om) {
-		SimpleDateFormat simpleDateFormat = IIncomingMessageHandler.generateV2SDF();
+	private @NotNull Period valuePeriod(ObservationMaster om) {
+		SimpleDateFormat simpleDateFormat = v2DateParseService.generateSimpleDateFormat();
 		Period period = new Period();
 		try {
 			Date start = simpleDateFormat.parse(om.getValueCode());
@@ -448,7 +451,7 @@ public class ObservationMapperR4 extends ObservationMapper<Observation> implemen
 		return period;
 	}
 
-	private static CodeableConcept valueCodeableConcept(ObservationMaster om) {
+	private CodeableConcept valueCodeableConcept(ObservationMaster om) {
 		Coding valueCoding = new Coding();
 		valueCoding.setCode(om.getValueCode());
 		valueCoding.setDisplay(om.getValueLabel());
@@ -456,7 +459,7 @@ public class ObservationMapperR4 extends ObservationMapper<Observation> implemen
 		return new CodeableConcept().addCoding(valueCoding);
 	}
 
-	private static Quantity valueQuantity(String value, ObservationMaster om) {
+	private Quantity valueQuantity(String value, ObservationMaster om) {
 		Quantity quantity = new Quantity();
 		if (NumberUtils.isCreatable(value)) {
 			quantity.setValue(NumberUtils.createDouble(value));
@@ -472,7 +475,7 @@ public class ObservationMapperR4 extends ObservationMapper<Observation> implemen
 		return quantity;
 	}
 
-	private static @Nullable Type getObservationReportedValue(ObservationMaster om) {
+	private @Nullable Type getObservationReportedValue(ObservationMaster om) {
 		Type value = null;
 		switch (om.getValueType()) {
 			case "NM": {
@@ -540,7 +543,7 @@ public class ObservationMapperR4 extends ObservationMapper<Observation> implemen
 		return value;
 	}
 
-	private static CodeableConcept getValueCodeCodeableConcept(ObservationMaster om) {
+	private CodeableConcept getValueCodeCodeableConcept(ObservationMaster om) {
 		boolean codeNonNull = false;
 		Coding observationCodeCoding = new Coding();
 		if (om.getIdentifierCode() != null) {

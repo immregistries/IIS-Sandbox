@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal.logic.ack;
+package org.immregistries.iis.kernal.model.ack;
 
 import org.immregistries.mqe.hl7util.Reportable;
 import org.immregistries.mqe.hl7util.ReportableSource;

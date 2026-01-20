@@ -2,21 +2,12 @@ package org.immregistries.iis.kernal.controllers.rest.shlink;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
-import org.apache.commons.lang3.StringUtils;
-import org.hl7.fhir.instance.model.api.IBaseBundle;
-import org.hl7.fhir.r4.model.IdType;
-import org.immregistries.iis.kernal.fhir.ips.IpsGeneratorSvcIIS;
 import org.immregistries.iis.kernal.security.CurrentTenantUtil;
-import org.immregistries.iis.kernal.security.TenantUtil;
 import org.immregistries.iis.kernal.security.UserAccessUtil;
-import org.immregistries.iis.kernal.fhir.shl.ShLinkPayload;
-import org.immregistries.iis.kernal.logic.KeyStoreService;
 import org.immregistries.iis.kernal.logic.shlink.CompressionService;
 import org.immregistries.iis.kernal.logic.shlink.ShLinkUtilService;
-import org.immregistries.iis.kernal.persisted.model.IisKey;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.immregistries.iis.kernal.persisted.model.UserAccess;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,13 +15,9 @@ import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.immregistries.iis.kernal.controllers.rest.RestUrlUtil;
 
-import javax.crypto.spec.SecretKeySpec;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.net.URL;
 import java.security.NoSuchAlgorithmException;
-import java.util.Base64;
-import java.util.List;
 
 @RestController
 @RequestMapping({ RestUrlUtil.REST + "/shlink", RestUrlUtil.REST + "/tenant/{tenantName}/shlink" })

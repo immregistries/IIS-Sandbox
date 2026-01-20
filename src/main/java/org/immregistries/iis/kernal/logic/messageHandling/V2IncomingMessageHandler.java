@@ -16,6 +16,8 @@ import org.immregistries.iis.kernal.logic.logicInterceptors.PatientProcessingInt
 import org.immregistries.iis.kernal.mapping.requesters.FhirSaveRequester;
 import org.immregistries.iis.kernal.mapping.requesters.FhirSearchRequester;
 import org.immregistries.iis.kernal.model.*;
+import org.immregistries.iis.kernal.model.ack.IisReportable;
+import org.immregistries.iis.kernal.model.ack.IisReportableSeverity;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.immregistries.iis.kernal.security.CurrentTenantUtil;
 import org.immregistries.mqe.validator.MqeMessageServiceResponse;
@@ -64,6 +66,14 @@ public abstract class V2IncomingMessageHandler extends IncomingMessageHandler<HL
 	MessageRecordingService messageRecordingService;
 	@Autowired
 	private CodeMapManagerService codeMapManagerService;
+	@Autowired
+	IisHL7Util iisHL7Util;
+	@Autowired
+	IisAckBuilder ackBuilder;
+	@Autowired
+	ReportableUtil reportableUtil;
+	@Autowired
+	V2DateParseService v2DateParseService;
 
 
 	public V2IncomingMessageHandler() {
@@ -108,13 +118,12 @@ public abstract class V2IncomingMessageHandler extends IncomingMessageHandler<HL
 
 		sb.append("MSA|").append(overallStatus).append("|").append(sendersUniqueId).append("\r");
 		for (IisReportable reportable : iisReportableList) {
-			sb.append(IisHL7Util.makeERRSegment(reportable, false));
+			sb.append(iisHL7Util.makeERRSegment(reportable, false));
 		}
 		return sb.toString();
 	}
 
 	public String buildResultWithValidation(HL7Reader reader, MqeMessageServiceResponse mqeMessageServiceResponse, List<IisReportable> iisReportableList, Set<ProcessingFlavor> processingFlavorSet) {
-		IisAckBuilder ackBuilder = IisAckBuilder.INSTANCE;
 		IisAckData data = new IisAckData();
 		MqeMessageHeader header = mqeMessageServiceResponse.getMessageObjects().getMessageHeader();
 		String profileId = header.getMessageProfile();
@@ -268,7 +277,7 @@ public abstract class V2IncomingMessageHandler extends IncomingMessageHandler<HL
 			messageRecordingService.recordMessageReceived(message, patientReported, ack, "Update", "Ack", tenant);
 			return ack;
 		} catch (ProcessingException e) {
-			IisReportable exceptionReportable = ReportableUtil.fromProcessingException(e);
+			IisReportable exceptionReportable = reportableUtil.fromProcessingException(e);
 			if (!iisReportableList.contains(exceptionReportable)) {
 				iisReportableList.add(exceptionReportable);
 			}
@@ -314,7 +323,7 @@ public abstract class V2IncomingMessageHandler extends IncomingMessageHandler<HL
 		patientReported.setUpdatedDate(new Date());
 		patientReported = fhirSaveRequester.savePatientReported(patientReported);
 //		patientReported = fhirRequester.saveRelatedPerson(patientReported);
-		iisReportableList.add(ReportableUtil.fromProcessingException(new ProcessingException("Patient record saved", PID, 0, 0, IisReportableSeverity.INFO)));
+		iisReportableList.add(reportableUtil.fromProcessingException(new ProcessingException("Patient record saved", PID, 0, 0, IisReportableSeverity.INFO)));
 
 		/*
 		 * checking if request is gathering patients  Ids to create a group, TODO cleaner solution
@@ -365,7 +374,7 @@ public abstract class V2IncomingMessageHandler extends IncomingMessageHandler<HL
 		patientReported.setPatientNames(names);
 
 		Date patientBirthDate;
-		patientBirthDate = IIncomingMessageHandler.parseDateError(reader.getValue(7), "Bad format for date of birth", PID, 1, 7, strictDate);
+		patientBirthDate = v2DateParseService.parseDateError(reader.getValue(7), "Bad format for date of birth", PID, 1, 7, strictDate);
 		patientReported.setMotherMaidenName(reader.getValue(6));
 		patientReported.setBirthDate(patientBirthDate);
 		patientReported.setSex(reader.getValue(8));
@@ -416,7 +425,7 @@ public abstract class V2IncomingMessageHandler extends IncomingMessageHandler<HL
 		patientReported.setEthnicity(reader.getValue(22));
 		patientReported.setBirthFlag(reader.getValue(24));
 		patientReported.setBirthOrder(reader.getValue(25));
-		patientReported.setDeathDate(IIncomingMessageHandler.parseDateWarn(reader.getValue(29), "Invalid patient death date", PID, 1, 29, strictDate, iisReportableList));
+		patientReported.setDeathDate(v2DateParseService.parseDateWarn(reader.getValue(29), "Invalid patient death date", PID, 1, 29, strictDate, iisReportableList));
 		patientReported.setDeathFlag(reader.getValue(30));
 	}
 
@@ -427,10 +436,10 @@ public abstract class V2IncomingMessageHandler extends IncomingMessageHandler<HL
 		}
 		patientReported.setPublicityIndicator(reader.getValue(11));
 		patientReported.setProtectionIndicator(reader.getValue(12));
-		patientReported.setProtectionIndicatorDate(IIncomingMessageHandler.parseDateWarn(reader.getValue(13), "Invalid protection indicator date", PD_1, 1, 13, strictDate, iisReportableList));
+		patientReported.setProtectionIndicatorDate(v2DateParseService.parseDateWarn(reader.getValue(13), "Invalid protection indicator date", PD_1, 1, 13, strictDate, iisReportableList));
 		patientReported.setRegistryStatusIndicator(reader.getValue(16));
-		patientReported.setRegistryStatusIndicatorDate(IIncomingMessageHandler.parseDateWarn(reader.getValue(17), "Invalid registry status indicator date", PD_1, 1, 17, strictDate, iisReportableList));
-		patientReported.setPublicityIndicatorDate(IIncomingMessageHandler.parseDateWarn(reader.getValue(18), "Invalid publicity indicator date", PD_1, 1, 18, strictDate, iisReportableList));
+		patientReported.setRegistryStatusIndicatorDate(v2DateParseService.parseDateWarn(reader.getValue(17), "Invalid registry status indicator date", PD_1, 1, 17, strictDate, iisReportableList));
+		patientReported.setPublicityIndicatorDate(v2DateParseService.parseDateWarn(reader.getValue(18), "Invalid publicity indicator date", PD_1, 1, 18, strictDate, iisReportableList));
 	}
 
 	public List<VaccinationReported> processVaccinations(HL7Reader reader, Tenant tenant, List<IisReportable> iisReportableList, PatientReported patientReported, Set<ProcessingFlavor> processingFlavorSet, boolean strictDate) throws ProcessingException {
@@ -479,7 +488,7 @@ public abstract class V2IncomingMessageHandler extends IncomingMessageHandler<HL
 			if (fillerIdentifier == null) {
 				throw new ProcessingException("Vaccination order id was not found, unable to process", ORC, orcCount, 3);
 			}
-			administrationDate = IIncomingMessageHandler.parseDateError(reader.getValue(3, 1), "Could not read administered date in RXA-5", "RXA", rxaCount, 3, strictDate);
+			administrationDate = v2DateParseService.parseDateError(reader.getValue(3, 1), "Could not read administered date in RXA-5", "RXA", rxaCount, 3, strictDate);
 //			if (administrationDate.after(new Date())) {
 //				throw new ProcessingException("Vaccination is indicated as occurring in the future, unable to accept future vaccination events", "RXA", rxaCount, 3);
 //			}
@@ -565,7 +574,7 @@ public abstract class V2IncomingMessageHandler extends IncomingMessageHandler<HL
 			vaccinationReported.setAdministeredAmount(reader.getValue(6));
 			vaccinationReported.setInformationSource(reader.getValue(9));
 			vaccinationReported.setLotnumber(reader.getValue(15));
-			vaccinationReported.setExpirationDate(IIncomingMessageHandler.parseDateWarn(reader.getValue(16), "Invalid vaccination expiration date", "RXA", rxaCount, 16, strictDate, iisReportableList));
+			vaccinationReported.setExpirationDate(v2DateParseService.parseDateWarn(reader.getValue(16), "Invalid vaccination expiration date", "RXA", rxaCount, 16, strictDate, iisReportableList));
 			vaccinationReported.setVaccineMvxCode(reader.getValue(17));
 			vaccinationReported.setRefusalReasonCode(reader.getValue(18));
 			vaccinationReported.setCompletionStatus(reader.getValue(20));
@@ -711,7 +720,7 @@ public abstract class V2IncomingMessageHandler extends IncomingMessageHandler<HL
 		observationReported.setUnitsLabel(reader.getValue(6, 2));
 		observationReported.setUnitsTable(reader.getValue(6, 3));
 		observationReported.setResultStatus(reader.getValue(11));
-		observationReported.setObservationDate(IIncomingMessageHandler.parseDateWarn(reader.getValue(14), "Unparsable date/time of observation", OBX, obxCount, 14, strictDate, iisReportableList));
+		observationReported.setObservationDate(v2DateParseService.parseDateWarn(reader.getValue(14), "Unparsable date/time of observation", OBX, obxCount, 14, strictDate, iisReportableList));
 		observationReported.setMethodCode(reader.getValue(17, 1));
 		observationReported.setMethodLabel(reader.getValue(17, 2));
 		observationReported.setMethodTable(reader.getValue(17, 3));

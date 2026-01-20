@@ -22,14 +22,18 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class TenantUtil implements InitializingBean {
+/**
+ * Manages Tenant Authorization and Authentication
+ *
+ */
+public class TenantAuthService implements InitializingBean {
 
 	public static final List<String> FORBIDDEN_NAMES = List.of("pop", "iis", "home", "patient", "vaccination", "fhir",
 			"tenant", "facility", "tenant");
 	/**
 	 * Needs to be statically accessible in Tenant Context
 	 */
-	private static TenantUtil instance;
+	private static TenantAuthService instance;
 	@Autowired
 	private TenantRepository tenantRepository;
 	@Autowired
@@ -37,7 +41,7 @@ public class TenantUtil implements InitializingBean {
 	@Autowired
 	private IPartitionLookupSvc partitionLookupSvc;
 
-	public static TenantUtil get() {
+	public static TenantAuthService get() {
 		return instance;
 	}
 
@@ -130,7 +134,7 @@ public class TenantUtil implements InitializingBean {
 		return tenant;
 	}
 
-	public Tenant registerTenant(String facilityName, UserAccess userAccess) {
+	private Tenant registerTenant(String facilityName, UserAccess userAccess) {
 		Tenant tenant = new Tenant();
 		if (FORBIDDEN_NAMES.contains(facilityName) || NumberUtils.isCreatable(facilityName)) {
 			throw new AuthenticationException("Tenant name: " + facilityName + " is forbidden");

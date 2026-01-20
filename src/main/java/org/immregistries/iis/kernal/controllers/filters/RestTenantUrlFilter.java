@@ -7,7 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.immregistries.iis.kernal.Application;
 import org.immregistries.iis.kernal.security.CurrentTenantUtil;
-import org.immregistries.iis.kernal.security.TenantUtil;
+import org.immregistries.iis.kernal.security.TenantAuthService;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +28,7 @@ public class RestTenantUrlFilter extends OncePerRequestFilter {
 	private static final Logger logger = LoggerFactory.getLogger(RestTenantUrlFilter.class);
 	private static final String TENANT_PREFIX = Application.IIS_PATH_BASE + RestUrlUtil.REST_PATH + "/tenant/";
 	@Autowired
-	TenantUtil tenantUtil;
+	TenantAuthService tenantAuthService;
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -52,7 +52,7 @@ public class RestTenantUrlFilter extends OncePerRequestFilter {
 			}
 			try {
 				int tenantIdInt = Integer.parseInt(tenantId);
-				Tenant tenant = tenantUtil.getTenantByIdAuthenticated(tenantIdInt);
+				Tenant tenant = tenantAuthService.getTenantByIdAuthenticated(tenantIdInt);
 				request.setAttribute(CurrentTenantUtil.TENANT_ID_URL, tenantId);
 				request.setAttribute(TENANT_REQUEST_ATTRIBUTE, tenant);
 			} catch (NumberFormatException e) {

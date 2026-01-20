@@ -13,7 +13,7 @@ import jakarta.servlet.http.HttpSession;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.auth.AuthenticationException;
 import org.immregistries.iis.kernal.security.JwtUtils;
-import org.immregistries.iis.kernal.security.TenantUtil;
+import org.immregistries.iis.kernal.security.TenantAuthService;
 import org.immregistries.iis.kernal.security.UserAccessUtil;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.immregistries.iis.kernal.persisted.model.UserAccess;
@@ -53,7 +53,7 @@ public class IisAuthorizationInterceptor extends AuthorizationInterceptor {
 	@Autowired
 	private TenantRepository tenantRepository;
 	@Autowired
-	TenantUtil tenantUtil;
+	TenantAuthService tenantAuthService;
 
 	/**
 	 * Authenticates request with Session cookie, Basic Auth (Token bearer currently
@@ -104,7 +104,7 @@ public class IisAuthorizationInterceptor extends AuthorizationInterceptor {
 					 * if user authenticated, Tenant/Facility is then selected
 					 */
 					if (userAccess != null) {
-						tenant = tenantUtil.authenticateTenant(userAccess,
+						tenant = tenantAuthService.authenticateTenant(userAccess,
 								PartitionTenantCreationInterceptor.extractPartitionName(theRequestDetails));
 					}
 				}
@@ -149,7 +149,7 @@ public class IisAuthorizationInterceptor extends AuthorizationInterceptor {
 			String base64 = authHeader.substring("Basic ".length());
 			String base64decoded = new String(Base64.decodeBase64(base64));
 			String[] parts = base64decoded.split(":");
-			return tenantUtil.authenticateTenant(parts[0], parts[1], tenantName);
+			return tenantAuthService.authenticateTenant(parts[0], parts[1], tenantName);
 		} else { // TODO token ?
 			return null;
 		}

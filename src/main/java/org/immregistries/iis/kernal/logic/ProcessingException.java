@@ -1,7 +1,7 @@
 package org.immregistries.iis.kernal.logic;
 
-import org.immregistries.iis.kernal.logic.ack.IisReportable;
-import org.immregistries.iis.kernal.logic.ack.IisReportableSeverity;
+import org.immregistries.iis.kernal.model.ack.IisReportable;
+import org.immregistries.iis.kernal.model.ack.IisReportableSeverity;
 import org.immregistries.mqe.hl7util.model.CodedWithExceptions;
 import org.immregistries.mqe.hl7util.model.Hl7Location;
 

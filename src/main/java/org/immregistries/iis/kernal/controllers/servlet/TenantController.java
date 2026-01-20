@@ -7,7 +7,7 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.validation.constraints.NotBlank;
 import org.immregistries.iis.kernal.Application;
 import org.immregistries.iis.kernal.security.CurrentTenantUtil;
-import org.immregistries.iis.kernal.security.TenantUtil;
+import org.immregistries.iis.kernal.security.TenantAuthService;
 import org.immregistries.iis.kernal.security.UserAccessUtil;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.immregistries.iis.kernal.persisted.model.UserAccess;
@@ -41,7 +41,7 @@ public class TenantController {
 	@Autowired
 	private TenantRestController tenantRestController;
 	@Autowired
-	private TenantUtil tenantUtil;
+	private TenantAuthService tenantAuthService;
 
 
 	/**
@@ -58,7 +58,7 @@ public class TenantController {
 			@RequestParam(name = PARAM_TENANT_NAME) @NotBlank String tenantName)
 			throws ServletException, IOException {
 		UserAccess userAccess = UserAccessUtil.get().getUserAccess();
-		tenantUtil.authenticateTenant(userAccess, tenantName);
+		tenantAuthService.authenticateTenant(userAccess, tenantName);
 		resp.sendRedirect(Application.IIS_PATH_BASE + TENANT_BASE_PATH + "/" + tenantName + TENANT_BASE_PATH);
 		doGet(req, resp);
 	}

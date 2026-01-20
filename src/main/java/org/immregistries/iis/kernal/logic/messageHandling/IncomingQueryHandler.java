@@ -9,8 +9,9 @@ import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.logic.*;
 import org.immregistries.iis.kernal.logic.ack.IisHL7Util;
-import org.immregistries.iis.kernal.logic.ack.IisReportable;
-import org.immregistries.iis.kernal.logic.ack.IisReportableSeverity;
+import org.immregistries.iis.kernal.logic.ack.V2DateParseService;
+import org.immregistries.iis.kernal.model.ack.IisReportable;
+import org.immregistries.iis.kernal.model.ack.IisReportableSeverity;
 import org.immregistries.iis.kernal.logic.ack.ReportableUtil;
 import org.immregistries.iis.kernal.mapping.requesters.FhirMatchRequester;
 import org.immregistries.iis.kernal.mapping.requesters.FhirSearchRequester;
@@ -47,10 +48,14 @@ public class IncomingQueryHandler {
 	ValidationService validationService;
 	@Autowired
 	private CodeMapManagerService codeMapManagerService;
-
-
+	@Autowired
+	IisHL7Util iisHL7Util;
 	@Autowired
 	MessageRecordingService messageRecordingService;
+	@Autowired
+	ReportableUtil reportableUtil;
+	@Autowired
+	V2DateParseService v2DateParseService;
 
 	public String processQBP(Tenant tenant, HL7Reader reader, String messageReceived, IIdType managingOrganizationId) throws Exception {
 		Set<ProcessingFlavor> processingFlavorSet = tenant.getProcessingFlavorSet();
@@ -88,7 +93,7 @@ public class IncomingQueryHandler {
 			}
 			boolean strictDate = false;
 
-			Date patientBirthDate = IIncomingMessageHandler.parseDateWarn(reader.getValue(6), "Invalid patient birth date", "QPD", 1, 6, strictDate, reportables);
+			Date patientBirthDate = v2DateParseService.parseDateWarn(reader.getValue(6), "Invalid patient birth date", "QPD", 1, 6, strictDate, reportables);
 			String patientSex = reader.getValue(7);
 
 			if (StringUtils.isBlank(patientNameLast)) {
@@ -102,14 +107,14 @@ public class IncomingQueryHandler {
 				fieldPosition = 6;
 			}
 			if (StringUtils.isNotBlank(problem)) {
-				reportables.add(ReportableUtil.fromProcessingException(new ProcessingException(problem, "QPD", 1, fieldPosition)));
+				reportables.add(reportableUtil.fromProcessingException(new ProcessingException(problem, "QPD", 1, fieldPosition)));
 			} else {
 				ModelName modelName = new ModelName(patientNameLast, patientNameFirst, patientNameMiddle, "");
 				patientForMatchQuery.addPatientName(modelName);
 				patientForMatchQuery.setBirthDate(patientBirthDate);
 			}
 		} else {
-			reportables.add(ReportableUtil.fromProcessingException(new ProcessingException("QPD segment not found", null, 0, 0)));
+			reportables.add(reportableUtil.fromProcessingException(new ProcessingException("QPD segment not found", null, 0, 0)));
 		}
 
 		Date cutoff = null;
@@ -144,7 +149,7 @@ public class IncomingQueryHandler {
 		MqeMessageServiceResponse mqeMessageServiceResponse = validationService.getMqeMessageService().processMessage(messageReceived);
 		boolean sendInformations = true;
 		if (processingFlavorSet.contains(ProcessingFlavor.STARFRUIT) && (StringUtils.defaultString(patientMaster.getNameFirst()).startsWith("S") || StringUtils.defaultString(patientMaster.getNameFirst()).startsWith("A"))) {
-			iisReportables.add(ReportableUtil.fromProcessingException(new ProcessingException("Immunization History cannot be shared because of patient's consent status", "PID", 0, 0, IisReportableSeverity.NOTICE)));
+			iisReportables.add(reportableUtil.fromProcessingException(new ProcessingException("Immunization History cannot be shared because of patient's consent status", "PID", 0, 0, IisReportableSeverity.NOTICE)));
 			sendInformations = false;
 		}
 		reader.resetPostion();
@@ -217,7 +222,7 @@ public class IncomingQueryHandler {
 					categoryResponse = MATCH;
 				}
 			} else {
-				iisReportables.add(ReportableUtil.fromProcessingException(new ProcessingException("Unrecognized profile id '" + profileIdSubmitted + "'", "MSH", 1, 21)));
+				iisReportables.add(reportableUtil.fromProcessingException(new ProcessingException("Unrecognized profile id '" + profileIdSubmitted + "'", "MSH", 1, 21)));
 			}
 			// TODO remove notices ?
 			hl7MessageWriter.createMSH(RSP_K_11_RSP_K_11, profileId, reader, sb, processingFlavorSet);
@@ -226,7 +231,7 @@ public class IncomingQueryHandler {
 		{
 			String sendersUniqueId = reader.getValue(10);
 			String processingId = mqeMessageServiceResponse.getMessageObjects().getMessageHeader().getProcessingStatus();
-			IisHL7Util.makeMsaAndErr(sb, sendersUniqueId, processingId, profileId, iisReportables, processingFlavorSet);
+			iisHL7Util.makeMsaAndErr(sb, sendersUniqueId, processingId, profileId, iisReportables, processingFlavorSet);
 		}
 
 		if (sendInformations) {
@@ -252,7 +257,7 @@ public class IncomingQueryHandler {
 				sb.append("QPD|");
 			}
 			if (profileId.equals(RSP_Z31_MULTIPLE_MATCH)) {
-				SimpleDateFormat sdf = IIncomingMessageHandler.generateV2SDF();
+				SimpleDateFormat sdf = v2DateParseService.generateSimpleDateFormat();
 				int count = 0;
 				for (PatientReported pr : patientReportedPossibleList) {
 					count++;
@@ -264,7 +269,7 @@ public class IncomingQueryHandler {
 				 * CONFUSING naming p but no better solution right now but to deal with single match
 				 */
 				IisPatient matchedPatient = patientMaster;
-				SimpleDateFormat sdf = IIncomingMessageHandler.generateV2SDF();
+				SimpleDateFormat sdf = v2DateParseService.generateSimpleDateFormat();
 				hl7MessageWriter.printQueryPID(matchedPatient, processingFlavorSet, sb, patientMaster, sdf, 1);
 				if (profileId.equals(RSP_Z32_MATCH)) {
 					hl7MessageWriter.printQueryNK1(patientMaster, sb, codeMap);
@@ -552,7 +557,7 @@ public class IncomingQueryHandler {
 	}
 
 	private void printRXA(IisVaccination vaccination, StringBuilder sb, int obxSetId, Set<ProcessingFlavor> processingFlavorSet, Code cvxCode) {
-		SimpleDateFormat sdf = IIncomingMessageHandler.generateV2SDF();
+		SimpleDateFormat sdf = v2DateParseService.generateSimpleDateFormat();
 		CodeMap codeMap = codeMapManagerService.getCodeMap();
 
 		sb.append("RXA");

@@ -1,8 +1,8 @@
 package org.immregistries.iis.kernal.logic;
 
 import org.apache.commons.lang3.StringUtils;
-import org.immregistries.iis.kernal.logic.ack.IisReportable;
-import org.immregistries.iis.kernal.logic.ack.IisReportableSeverity;
+import org.immregistries.iis.kernal.model.ack.IisReportable;
+import org.immregistries.iis.kernal.model.ack.IisReportableSeverity;
 import org.immregistries.iis.kernal.logic.ack.ReportableUtil;
 import org.immregistries.iis.kernal.model.ProcessingFlavor;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
@@ -67,55 +67,6 @@ public interface IIncomingMessageHandler<SourceType> {
 	String process(String message, Tenant tenant, String facilityName);
 
 	String buildResultWithoutValidation(SourceType sourceType, List<IisReportable> iisReportableList, Set<ProcessingFlavor> processingFlavorSet);
-
-	static SimpleDateFormat generateV2SDF() {
-		return new SimpleDateFormat("yyyyMMdd");
-	}
-
-	static Date parseDateWarn(String dateString, String errorMessage, String segmentId, int segmentRepeat, int fieldPosition, boolean strict, List<IisReportable> iisReportableList) {
-		try {
-			return parseDateInternal(dateString, strict);
-		} catch (ParseException e) {
-			if (errorMessage != null) {
-				ProcessingException pe = new ProcessingException(errorMessage + ": " + e.getMessage(), segmentId, segmentRepeat, fieldPosition, IisReportableSeverity.WARN);
-				iisReportableList.add(ReportableUtil.fromProcessingException(pe));
-			}
-		}
-		return null;
-	}
-
-	static Date parseDateInternal(String dateString, boolean strict) throws ParseException {
-		if (StringUtils.isBlank(dateString)) {
-			return null;
-		}
-		Date date;
-		if (dateString.length() > 8) {
-			dateString = dateString.substring(0, 8);
-		}
-		SimpleDateFormat simpleDateFormat = generateV2SDF();
-		simpleDateFormat.setLenient(!strict);
-		date = simpleDateFormat.parse(dateString);
-		return date;
-	}
-
-	static Date parseDateError(String dateString, String errorMessage, String segmentId, int segmentRepeat, int fieldPosition, boolean strict) throws ProcessingException {
-		try {
-			Date date = IIncomingMessageHandler.parseDateInternal(dateString, strict);
-			if (date == null) {
-				if (errorMessage != null) {
-					throw new ProcessingException(errorMessage + ": No date was specified", segmentId, segmentRepeat, fieldPosition);
-				}
-			}
-			return date;
-		} catch (ParseException e) {
-			if (errorMessage != null) {
-				throw new ProcessingException(errorMessage + ": " + e.getMessage(), segmentId, segmentRepeat, fieldPosition);
-			}
-		}
-		return null;
-	}
-
-
 
 	static void verifyNoErrors(List<IisReportable> iisReportableList) throws ProcessingException {
 		for (IisReportable reportable : iisReportableList) {

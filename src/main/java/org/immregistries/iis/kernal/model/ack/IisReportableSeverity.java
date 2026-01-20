@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal.logic.ack;
+package org.immregistries.iis.kernal.model.ack;
 
 
 public enum IisReportableSeverity {

@@ -15,7 +15,7 @@ import org.hl7.fhir.r4.model.BooleanType;
 import org.immregistries.iis.kernal.fhir.CrossTenantDiffProvider;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.immregistries.iis.kernal.persisted.model.UserAccess;
-import org.immregistries.iis.kernal.security.TenantUtil;
+import org.immregistries.iis.kernal.security.TenantAuthService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +36,7 @@ public class TenantCompareService {
 
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	@Autowired
-	TenantUtil tenantUtil;
+	TenantAuthService tenantAuthService;
 	@Autowired
 	private CrossTenantDiffProvider diffProvider;
 	@Autowired
@@ -48,7 +48,7 @@ public class TenantCompareService {
 	public List<IBaseParameters> compareTenants(String[] tenantNames, UserAccess userAccess,
 															  boolean includeGolden) {
 		List<Tenant> tenantList = Arrays.stream(tenantNames).distinct()
-			.map(tenantName -> tenantUtil.authenticateTenant(userAccess, tenantName))
+			.map(tenantName -> tenantAuthService.authenticateTenant(userAccess, tenantName))
 			.collect(Collectors.toList());
 
 		List<SystemRequestDetails> systemRequestDetailsList = tenantList.stream().map(tenant -> {

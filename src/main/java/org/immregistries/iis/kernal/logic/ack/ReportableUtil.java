@@ -1,15 +1,18 @@
 package org.immregistries.iis.kernal.logic.ack;
 
 import org.immregistries.iis.kernal.logic.ProcessingException;
+import org.immregistries.iis.kernal.model.ack.IisReportable;
 import org.immregistries.mqe.hl7util.ReportableSource;
 import org.immregistries.mqe.hl7util.model.CodedWithExceptions;
 import org.immregistries.mqe.hl7util.model.Hl7Location;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-public final class ReportableUtil {
+@Service
+public class ReportableUtil {
 
-	public static IisReportable fromProcessingException(ProcessingException processingException) {
+	public IisReportable fromProcessingException(ProcessingException processingException) {
 		IisReportable iisReportable = new IisReportable();
 
 		Hl7Location location = new Hl7Location();
@@ -41,7 +44,7 @@ public final class ReportableUtil {
 	 * @param segmentid
 	 * @return
 	 */
-	public static Hl7Location readErrorLocation(String path, String segmentid) {
+	public Hl7Location readErrorLocation(String path, String segmentid) {
 		Hl7Location errorLocation = new Hl7Location();
 		errorLocation.setSegmentId(segmentid);
 		int firstDotPos = path.indexOf("-");
@@ -113,7 +116,7 @@ public final class ReportableUtil {
 		return errorLocation;
 	}
 
-	private static int parseBracketInt(String s) {
+	private int parseBracketInt(String s) {
 		if (s.startsWith("[") && s.endsWith("]")) {
 			try {
 				return Integer.parseInt(s.substring(1, s.length() - 1).trim());

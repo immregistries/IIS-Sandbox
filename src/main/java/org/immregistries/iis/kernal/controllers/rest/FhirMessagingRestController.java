@@ -11,7 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.immregistries.iis.kernal.controllers.servlet.SoapDescriptionController;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
 import org.immregistries.iis.kernal.security.CurrentTenantUtil;
-import org.immregistries.iis.kernal.security.TenantUtil;
+import org.immregistries.iis.kernal.security.TenantAuthService;
 import org.immregistries.iis.kernal.logic.BaseIISSOAPServer;
 import org.immregistries.iis.kernal.logic.messageHandling.FhirMessagingHandler;
 import org.immregistries.iis.kernal.logic.messageHandling.V2IncomingMessageHandler;
@@ -47,7 +47,7 @@ public class FhirMessagingRestController {
 	FhirMessagingHandler fhirMessagingHandler;
 
 	@Autowired
-	private TenantUtil tenantUtil;
+	private TenantAuthService tenantAuthService;
 	@Autowired
 	private V2IncomingMessageHandler handler;
 
@@ -99,7 +99,7 @@ public class FhirMessagingRestController {
 
 		String path = req.getPathInfo();
 		final String processorName = path == null ? "" : (path.startsWith("/") ? path.substring(1) : path);
-		CDCWSDLServer server = new BaseIISSOAPServer(tenantName, tenantUtil) {
+		CDCWSDLServer server = new BaseIISSOAPServer(tenantName, tenantAuthService) {
 			@Override
 			public void process(SubmitSingleMessage ssm, PrintWriter out) throws Fault {
 

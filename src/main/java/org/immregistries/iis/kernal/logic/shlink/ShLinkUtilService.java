@@ -15,7 +15,7 @@ import org.immregistries.iis.kernal.logic.SecretKeyUtilService;
 import org.immregistries.iis.kernal.model.ShLinkFilePayload;
 import org.immregistries.iis.kernal.persisted.model.*;
 import org.immregistries.iis.kernal.persisted.repository.IisShlinkContentRepository;
-import org.immregistries.iis.kernal.security.TenantUtil;
+import org.immregistries.iis.kernal.security.TenantAuthService;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,7 +82,7 @@ public class ShLinkUtilService {
 		/*
 		 * Getting the bundle for the payload content
 		 */
-		IBaseBundle ipsToBeEncoded = ipsGeneratorSvcIIS.generateIps(TenantUtil.get().requestDetailsWithPartitionName(),
+		IBaseBundle ipsToBeEncoded = ipsGeneratorSvcIIS.generateIps(TenantAuthService.get().requestDetailsWithPartitionName(),
 			new IdType(patientId), "");
 		/*
 		 * Convert the bundle to a shcard file

@@ -14,7 +14,7 @@ import org.hl7.fhir.instance.model.api.IPrimitiveType;
 import org.hl7.fhir.r5.model.*;
 import org.immregistries.iis.kernal.mapping.IisFhirClientFactory;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
-import org.immregistries.iis.kernal.security.TenantUtil;
+import org.immregistries.iis.kernal.security.TenantAuthService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -77,7 +77,7 @@ public class SubscriptionService {
 	// }
 	public String triggerWithResource(Subscription subscription, List<Pair<String, Bundle.HTTPVerb>> requests,
 			Tenant tenant) {
-		RequestDetails requestDetails = TenantUtil.get().requestDetailsWithPartitionName();
+		RequestDetails requestDetails = TenantAuthService.get().requestDetailsWithPartitionName();
 		List<IPrimitiveType<String>> urls = List.of(new StringType("Patient?name=ulysse"));
 		IBaseParameters iBaseParameters = subscriptionTriggeringProvider.triggerSubscription(requestDetails,
 				subscription.getIdElement(), null, urls);

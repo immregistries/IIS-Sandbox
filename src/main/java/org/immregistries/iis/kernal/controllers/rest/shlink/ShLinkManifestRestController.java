@@ -6,7 +6,7 @@ import org.immregistries.iis.kernal.controllers.rest.RestUrlUtil;
 import org.immregistries.iis.kernal.logic.shlink.ShLinkManifestGenerator;
 import org.immregistries.iis.kernal.logic.shlink.ShLinkManifestService;
 import org.immregistries.iis.kernal.security.CurrentTenantUtil;
-import org.immregistries.iis.kernal.security.TenantUtil;
+import org.immregistries.iis.kernal.security.TenantAuthService;
 import org.immregistries.iis.kernal.persisted.model.ShLinkManifest;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.slf4j.Logger;
@@ -35,7 +35,7 @@ public class ShLinkManifestRestController {
 	@Autowired
 	private ShLinkManifestService shlinkManifestService;
 	@Autowired
-	private TenantUtil tenantUtil;
+	private TenantAuthService tenantAuthService;
 
 	@GetMapping(MANIFEST_ID_PLACEHOLDER)
 	public ShLinkManifest getManifest(@PathVariable(MANIFEST_ID) String manifestId) {
@@ -51,7 +51,7 @@ public class ShLinkManifestRestController {
 		@RequestParam(value = EMBEDDED_LENGTH_MAX_PARAM, required = false) String embeddedLengthMax) {
 		Tenant tenant = null;
 		if (StringUtils.isNoneBlank(passcode)) {
-			tenant = tenantUtil.authenticateTenantNoUsername(tenantId, passcode);
+			tenant = tenantAuthService.authenticateTenantNoUsername(tenantId, passcode);
 		}
 		if (tenant == null) {
 			throw new AuthenticationCredentialsNotFoundException("Invalid passcode");

@@ -10,7 +10,7 @@ import org.hl7.fhir.instance.model.api.IBaseBundle;
 import org.hl7.fhir.r4.model.IdType;
 import org.immregistries.iis.kernal.fhir.ips.IpsGeneratorSvcIIS;
 import org.immregistries.iis.kernal.security.CurrentTenantUtil;
-import org.immregistries.iis.kernal.security.TenantUtil;
+import org.immregistries.iis.kernal.security.TenantAuthService;
 import org.immregistries.iis.kernal.security.UserAccessUtil;
 import org.immregistries.iis.kernal.logic.KeyStoreService;
 import org.immregistries.iis.kernal.logic.shlink.CompressionService;
@@ -116,7 +116,7 @@ public class CLVRRestController {
 
     private @NotNull CLVRToken getIpsClvrToken(String patientId) {
         IBaseBundle ipsToBeEncoded = ipsGeneratorSvcIIS
-                .generateIps(TenantUtil.get().requestDetailsWithPartitionName(), new IdType(patientId), "");
+                .generateIps(TenantAuthService.get().requestDetailsWithPartitionName(), new IdType(patientId), "");
         @SuppressWarnings("unchecked")
         CLVRPayload clvrPayload = fhirConversionUtil.toCLVRPayloadFromBundle(ipsToBeEncoded);
 

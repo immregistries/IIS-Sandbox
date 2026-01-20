@@ -22,7 +22,7 @@ public class IisOAuthSuccessHandler implements AuthenticationSuccessHandler {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	@Autowired
-	TenantUtil tenantUtil;
+	TenantAuthService tenantAuthService;
 
 	// @Override
 	// public void onAuthenticationSuccess(HttpServletRequest request,
@@ -43,7 +43,7 @@ public class IisOAuthSuccessHandler implements AuthenticationSuccessHandler {
 		if (authentication instanceof OAuth2AuthenticationToken) {
 			HttpSession session = request.getSession(true);
 			OAuth2AuthenticationToken oAuth2AuthenticationToken = (OAuth2AuthenticationToken) authentication;
-			tenant = tenantUtil.authenticateTenant(
+			tenant = tenantAuthService.authenticateTenant(
 					oAuth2AuthenticationToken.getPrincipal(),
 					UserAccessUtil.GITHUB_PREFIX + oAuth2AuthenticationToken.getPrincipal().getAttribute("login"));
 			session.setAttribute(CurrentTenantUtil.SESSION_REQUEST_TENANT, tenant);

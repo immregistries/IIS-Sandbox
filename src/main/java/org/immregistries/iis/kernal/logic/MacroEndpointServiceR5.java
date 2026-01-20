@@ -7,7 +7,7 @@ import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
 import ca.uhn.fhir.rest.server.servlet.ServletRequestDetails;
 import org.hl7.fhir.r5.model.*;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR5Condition;
-import org.immregistries.iis.kernal.security.TenantUtil;
+import org.immregistries.iis.kernal.security.TenantAuthService;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.immregistries.iis.kernal.persisted.model.UserAccess;
 import org.jetbrains.annotations.NotNull;
@@ -29,7 +29,7 @@ public class MacroEndpointServiceR5 implements MacroEndpointService{
 	@Autowired
 	IFhirResourceDao<Practitioner> practitionerDao;
 	@Autowired
-	TenantUtil tenantUtil;
+	TenantAuthService tenantAuthService;
 
 	public @NotNull Tenant generateTenantAndContent(String bundleString, UserAccess userAccess) {
 		Bundle facilityBundle = fhirContext.newJsonParser().parseResource(Bundle.class, bundleString);
@@ -44,7 +44,7 @@ public class MacroEndpointServiceR5 implements MacroEndpointService{
 				if (tenant != null) {
 					throw new InvalidRequestException("More than one organization present");
 				}
-				tenant = tenantUtil.authenticateTenant(userAccess, ((Organization) entry.getResource()).getName());
+				tenant = tenantAuthService.authenticateTenant(userAccess, ((Organization) entry.getResource()).getName());
 			}
 		}
 

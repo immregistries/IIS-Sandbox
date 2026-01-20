@@ -1,5 +1,6 @@
 package org.immregistries.iis.kernal.logic.ack;
 
+import org.immregistries.iis.kernal.model.ack.IisReportable;
 import org.immregistries.mqe.hl7util.builder.AckResult;
 
 import java.util.ArrayList;

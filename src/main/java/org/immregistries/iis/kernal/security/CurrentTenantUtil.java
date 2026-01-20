@@ -78,7 +78,7 @@ public class CurrentTenantUtil {
 			if (authentication instanceof UserAccess) {
 				userAccess = (UserAccess) authentication;
 			}
-			tenant = TenantUtil.get().authenticateTenant(userAccess, pathVariable);
+			tenant = TenantAuthService.get().authenticateTenant(userAccess, pathVariable);
 		}
 		return tenant;
 	}

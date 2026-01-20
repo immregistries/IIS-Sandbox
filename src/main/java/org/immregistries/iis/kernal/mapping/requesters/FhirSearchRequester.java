@@ -14,7 +14,7 @@ import org.immregistries.iis.kernal.mapping.IisFhirClientFactory;
 import org.immregistries.iis.kernal.mapping.MappingService;
 import org.immregistries.iis.kernal.mapping.mappers.resources.*;
 import org.immregistries.iis.kernal.model.*;
-import org.immregistries.iis.kernal.security.TenantUtil;
+import org.immregistries.iis.kernal.security.TenantAuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -37,7 +37,7 @@ public class FhirSearchRequester {
 	PatientMapper patientMapper;
 
 	@Autowired
-	TenantUtil tenantUtil;
+	TenantAuthService tenantAuthService;
 
 	@Autowired
 	FhirReadRequester fhirReadRequester;
@@ -204,7 +204,7 @@ public class FhirSearchRequester {
 	 */
 	IBundleProvider search(Class<? extends IBaseResource> aClass, SearchParameterMap searchParameterMap) {
 		return daoRegistry.getResourceDao(aClass).search(searchParameterMap,
-			tenantUtil.requestDetailsWithPartitionName());
+			tenantAuthService.requestDetailsWithPartitionName());
 	}
 
 	/**
@@ -216,7 +216,7 @@ public class FhirSearchRequester {
 	 */
 	IBundleProvider search(String fhirType, SearchParameterMap searchParameterMap) {
 		return daoRegistry.getResourceDao(fhirType).search(searchParameterMap,
-			tenantUtil.requestDetailsWithPartitionName());
+			tenantAuthService.requestDetailsWithPartitionName());
 	}
 
 

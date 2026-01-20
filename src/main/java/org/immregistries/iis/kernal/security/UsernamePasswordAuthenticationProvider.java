@@ -34,7 +34,7 @@ public class UsernamePasswordAuthenticationProvider implements AuthenticationPro
 	@Autowired
 	private ClientRegistrationRepository clientRegistrationRepository;
 	@Autowired
-	TenantUtil tenantUtil;
+	TenantAuthService tenantAuthService;
 
 	public Authentication authenticate(Authentication authentication) throws AuthenticationException {
 		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
@@ -44,7 +44,7 @@ public class UsernamePasswordAuthenticationProvider implements AuthenticationPro
 		// userAccess/tenant as principal
 		// https://www.baeldung.com/spring-security-oauth-principal-authorities-extractor
 		if (StringUtils.isNotBlank(request.getParameter(LOGIN_PARAM_TENANT_NAME))) {
-			Tenant tenant = tenantUtil.authenticateTenant(authentication.getName(),
+			Tenant tenant = tenantAuthService.authenticateTenant(authentication.getName(),
 					(String) authentication.getCredentials(), request.getParameter(LOGIN_PARAM_TENANT_NAME));
 			if (tenant != null) {
 				/**

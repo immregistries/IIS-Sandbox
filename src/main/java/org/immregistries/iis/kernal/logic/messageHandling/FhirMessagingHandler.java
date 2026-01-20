@@ -10,7 +10,7 @@ import org.immregistries.iis.kernal.logic.Hl7MessageWriter;
 import org.immregistries.iis.kernal.logic.IIncomingMessageHandler;
 import org.immregistries.iis.kernal.logic.MessageRecordingService;
 import org.immregistries.iis.kernal.logic.ProcessingException;
-import org.immregistries.iis.kernal.logic.ack.IisReportable;
+import org.immregistries.iis.kernal.model.ack.IisReportable;
 import org.immregistries.iis.kernal.logic.logicInterceptors.ImmunizationProcessingInterceptor;
 import org.immregistries.iis.kernal.logic.logicInterceptors.ObservationProcessingInterceptor;
 import org.immregistries.iis.kernal.logic.logicInterceptors.PatientProcessingInterceptor;

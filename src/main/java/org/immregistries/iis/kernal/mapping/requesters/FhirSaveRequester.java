@@ -10,9 +10,7 @@ import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.immregistries.iis.kernal.mapping.IisFhirClientFactory;
-import org.immregistries.iis.kernal.mapping.MappingService;
-import org.immregistries.iis.kernal.mapping.mappers.resources.*;
-import org.immregistries.iis.kernal.security.TenantUtil;
+import org.immregistries.iis.kernal.security.TenantAuthService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,7 +54,7 @@ public abstract class FhirSaveRequester<Patient extends IAnyResource, Immunizati
 		}
 		DaoMethodOutcome outcome;
 		if (createOnly) {
-			return dao.create(resource, TenantUtil.get().requestDetailsWithPartitionName());
+			return dao.create(resource, TenantAuthService.get().requestDetailsWithPartitionName());
 		} else
 			try {
 				// IUpdateTyped updateTyped =
@@ -70,9 +68,9 @@ public abstract class FhirSaveRequester<Patient extends IAnyResource, Immunizati
 				// updateWithQueryTyped = updateWithQueryTyped.and(where[i]);
 				// }
 				// return updateWithQueryTyped.execute();
-				return dao.update(resource, params, TenantUtil.get().requestDetailsWithPartitionName());
+				return dao.update(resource, params, TenantAuthService.get().requestDetailsWithPartitionName());
 			} catch (InvalidRequestException invalidRequestException) {
-				return dao.create(resource, TenantUtil.get().requestDetailsWithPartitionName());
+				return dao.create(resource, TenantAuthService.get().requestDetailsWithPartitionName());
 			}
 		// catch (JdbcBatchUpdateException jdbcBatchUpdateException) {
 		// return dao.create(resource,
