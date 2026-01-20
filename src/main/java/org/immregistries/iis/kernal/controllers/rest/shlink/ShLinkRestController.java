@@ -27,6 +27,7 @@ import org.immregistries.iis.kernal.controllers.rest.RestUrlUtil;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.net.URL;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 import java.util.List;
@@ -44,14 +45,10 @@ public class ShLinkRestController {
 	public static final String PARAM_FLAG = "flag";
 	private static final String PARAM_EXP = "exp";
 
-	@Autowired
-	IpsGeneratorSvcIIS ipsGeneratorSvcIIS;
 
 	@Autowired
 	ShLinkUtilService shLinkUtilService;
 
-	@Autowired
-	KeyStoreService keyStoreService;
 
 	@Autowired
 	CompressionService compressionService;
@@ -64,39 +61,12 @@ public class ShLinkRestController {
 			@RequestParam(PARAM_FLAG) String flag,
 			@RequestParam(value = PARAM_EXP, required = false, defaultValue = "10000000") String exp,
 			@RequestAttribute(CurrentTenantUtil.SESSION_REQUEST_TENANT) Tenant tenant)
-			throws ServletException, IOException, NoSuchAlgorithmException {
+			throws IOException, NoSuchAlgorithmException {
 		UserAccess userAccess = UserAccessUtil.get().getUserAccess();
-		/*
-		 * Choosing or generating the keys based on the parameters
-		 */
-		SecretKeySpec encryptionKeySpec = getSecretEncryptionKey(secretKey);
-		IisKey iisSigningKey = keyStoreService.getIisSigningKeyOrCreate(keyId, userAccess, tenant);
-		/*
-		 * Payload skeleton
-		 */
-		ShLinkPayload shLinkPayload = new ShLinkPayload();
-		shLinkPayload.setLabel("Generated for ShLink testing with IPS of Synthetic Patient");
-		shLinkPayload.setFlag(flag);
-		shLinkPayload.setKey(new String(Base64.getUrlEncoder().encode(encryptionKeySpec.getEncoded())));
-		try {
-			shLinkPayload.setExp(Long.parseLong(exp));
-		} catch (NumberFormatException e) {
-			shLinkPayload.setExp(10000000L); // default
-		}
-		/*
-		 * Getting the bundle for the payload content
-		 */
-		IBaseBundle ipsToBeEncoded = ipsGeneratorSvcIIS.generateIps(TenantUtil.get().requestDetailsWithPartitionName(),
-				new IdType(patientId), "");
-		/*
-		 * Convert the bundle to a shcard file
-		 */
-		String url = shLinkUtilService.generateShLinkUrlForShCards(List.of(ipsToBeEncoded), shLinkPayload, req,
-				iisSigningKey, encryptionKeySpec, userAccess, tenant);
-		shLinkPayload.setUrl(url);
-		String qrCode = shLinkUtilService.qrCode(shLinkPayload);
+		String qrCode = shLinkUtilService.generateShLink(req, keyId, secretKey, patientId, flag, exp, tenant, userAccess);
 		return qrCode;
 	}
+
 
 	@PostMapping(value = "/png")
 	public ResponseEntity<byte[]> shLinkIPSPng(HttpServletRequest req,
@@ -115,15 +85,7 @@ public class ShLinkRestController {
 
 	}
 
-	private @NotNull SecretKeySpec getSecretEncryptionKey(String secretKey) throws NoSuchAlgorithmException {
-		SecretKeySpec encryptionKeySpec;
-		if (StringUtils.isNotBlank(secretKey)) {
-			encryptionKeySpec = new SecretKeySpec(Base64.getDecoder().decode(secretKey), 0, secretKey.length(), "AES");
-		} else {
-			encryptionKeySpec = shLinkUtilService.generateSecretKey();
-		}
-		return encryptionKeySpec;
-	}
+
 
 	// Skipping doGet as it was purely HTML UI form.
 }

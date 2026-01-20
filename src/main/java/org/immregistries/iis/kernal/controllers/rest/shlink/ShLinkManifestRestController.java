@@ -25,20 +25,20 @@ import static org.immregistries.iis.kernal.controllers.servlet.TenantController.
 @RestController
 @RequestMapping(ShLinkManifestRestController.SHLINKS_CONTROLLER_REST_BASE_URL)
 public class ShLinkManifestRestController {
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	public static final String MANIFEST_ID = "manifestId";
 	public static final String MANIFEST_ID_PLACEHOLDER = "/{" + MANIFEST_ID + "}";
 	public static final String RECIPIENT_PARAM = "recipient";
 	public static final String PASSCODE_PARAM = "passcode";
 	public static final String EMBEDDED_LENGTH_MAX_PARAM = "embeddedLengthMax";
-	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	public final static String SHLINKS_CONTROLLER_REST_BASE_URL = RestUrlUtil.REST_PATH +  "/link";
 
 	@Autowired
-	ShLinkManifestGenerator shLinkManifestGenerator;
+	private ShLinkManifestGenerator shLinkManifestGenerator;
 	@Autowired
 	private ShlinkManifestService shlinkManifestService;
 	@Autowired
-	TenantUtil tenantUtil;
+	private TenantUtil tenantUtil;
 
 	@GetMapping(MANIFEST_ID_PLACEHOLDER)
 	public ShLinkManifest getManifest(@PathVariable(MANIFEST_ID) String manifestId) {

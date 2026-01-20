@@ -8,11 +8,10 @@ import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import jakarta.servlet.http.HttpServletRequest;
 import org.hl7.fhir.instance.model.api.IBaseBundle;
-import org.immregistries.iis.kernal.logic.KeyStoreService;
 import org.immregistries.iis.kernal.persisted.model.IisKey;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
-import org.immregistries.iis.kernal.persisted.model.UserAccess;
 import org.immregistries.iis.kernal.controllers.WellKnownKeyController;
+import org.immregistries.iis.kernal.persisted.model.UserAccess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,19 +50,21 @@ public class ShCardUtilService {
 	private Gson gson = new Gson();
 
 	@Autowired
-	KeyStoreService keyStoreService;
-
-	@Autowired
 	private FhirContext fhirContext;
 	@Autowired
 	private CompressionService compressionService;
 
-	public String qrCompact(IBaseBundle iBaseBundle, HttpServletRequest request, IisKey signingKey, UserAccess userAccess, Tenant tenant) throws IOException {
-		String resourceString = fhirContext.newJsonParser().setSummaryMode(true).encodeResourceToString(iBaseBundle);
-		return qrCompact(resourceString, request, signingKey, userAccess, tenant);
+	public String qrCompact(IBaseBundle iBaseBundle, HttpServletRequest request, IisKey signingKey, Tenant tenant) throws IOException {
+		String shcardIssuerUrl = WellKnownKeyController.getKeyIssuerUrl(request, tenant);
+		return qrCompact(iBaseBundle, shcardIssuerUrl, signingKey);
 	}
 
-	public String qrCompact(String resourceString, HttpServletRequest request, IisKey iisKey, UserAccess userAccess, Tenant tenant) throws IOException {
+	public String qrCompact(IBaseBundle iBaseBundle, String issuerUrl, IisKey signingKey) throws IOException {
+		String resourceString = fhirContext.newJsonParser().setSummaryMode(true).encodeResourceToString(iBaseBundle);
+		return qrCompact(resourceString, issuerUrl, signingKey);
+	}
+
+	public String qrCompact(String resourceString, String issuerUrl, IisKey iisKey) throws IOException {
 		KeyPair signingKeyPair = iisKey.keyPair();
 
 		Map<String, Object> mapVc = new HashMap<>(2);
@@ -78,7 +79,6 @@ public class ShCardUtilService {
 		credentialSubject.put(FHIR_BUNDLE, JsonParser.parseString(resourceString).getAsJsonObject());
 		mapVc.put(CREDENTIAL_SUBJECT, credentialSubject);
 
-		String issuerUrl = WellKnownKeyController.getKeyIssuerUrl(request, tenant);
 		Claims claims = Jwts.claims()
 			.notBefore(new Date())
 			.issuer(issuerUrl)
@@ -100,15 +100,5 @@ public class ShCardUtilService {
 //		logger.info("parsed {}", Jwts.parser().verifyWith(signingKeyPair.getPublic()).build().parse(compact));
 		return compact;
 	}
-
-//	private static String getEncodedForQrCode(String compact) {
-//		String encodedForQrCode = compact.
-//			chars().map(value -> value - SMALLEST_B64_CHAR_CODE)
-//			.boxed()
-//			.map(integer -> String.valueOf(integer / 10) + integer % 10)
-//			.collect(Collectors.joining());
-//		return encodedForQrCode;
-//	}
-
 
 }
