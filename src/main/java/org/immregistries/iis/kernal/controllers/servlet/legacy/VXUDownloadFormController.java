@@ -8,7 +8,7 @@ import org.immregistries.iis.kernal.controllers.servlet.TenantController;
 import org.immregistries.iis.kernal.controllers.servlet.util.UiUtil;
 import org.immregistries.iis.kernal.controllers.servlet.util.UrlTenantUtil;
 import org.immregistries.iis.kernal.security.CurrentTenantUtil;
-import org.immregistries.iis.kernal.logic.IExampleMessageWriter;
+import org.immregistries.iis.kernal.logic.v2.writing.IExampleMessageWriter;
 import org.immregistries.iis.kernal.logic.VXUDownloadGenerator;
 import org.immregistries.iis.kernal.mapping.requesters.FhirSearchRequester;
 import org.immregistries.iis.kernal.persisted.model.Tenant;

@@ -4,7 +4,7 @@ import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.context.RuntimeResourceDefinition;
 import jakarta.servlet.ServletException;
 import org.immregistries.iis.kernal.security.UserAccessUtil;
-import org.immregistries.iis.kernal.logic.MacroEndpointService;
+import org.immregistries.iis.kernal.logic.macro.MacroEndpointService;
 import org.immregistries.iis.kernal.persisted.model.UserAccess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

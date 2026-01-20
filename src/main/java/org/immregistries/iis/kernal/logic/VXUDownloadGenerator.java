@@ -10,6 +10,7 @@ import org.hibernate.Session;
 import org.hl7.fhir.r5.model.Immunization;
 import org.hl7.fhir.r5.model.Patient;
 import org.immregistries.iis.kernal.controllers.servlet.legacy.CovidController;
+import org.immregistries.iis.kernal.logic.v2.writing.IExampleMessageWriter;
 import org.immregistries.iis.kernal.mapping.requesters.FhirSearchRequester;
 import org.immregistries.iis.kernal.model.VaccinationReported;
 import org.immregistries.iis.kernal.persisted.model.Tenant;

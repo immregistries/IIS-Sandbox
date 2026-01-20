@@ -12,9 +12,9 @@ import org.immregistries.iis.kernal.controllers.servlet.SoapDescriptionControlle
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
 import org.immregistries.iis.kernal.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.security.TenantAuthService;
-import org.immregistries.iis.kernal.logic.BaseIISSOAPServer;
-import org.immregistries.iis.kernal.logic.messageHandling.FhirMessagingHandler;
-import org.immregistries.iis.kernal.logic.messageHandling.V2IncomingMessageHandler;
+import org.immregistries.iis.kernal.logic.v2.BaseIISSOAPServer;
+import org.immregistries.iis.kernal.logic.v2.handling.FhirMessagingHandler;
+import org.immregistries.iis.kernal.logic.v2.handling.V2IncomingMessageHandler;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.immregistries.smm.cdc.CDCWSDLServer;
 import org.immregistries.smm.cdc.Fault;

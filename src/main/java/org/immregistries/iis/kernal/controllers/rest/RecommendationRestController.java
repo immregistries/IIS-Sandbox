@@ -8,7 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.hl7.fhir.instance.model.api.IBaseBundle;
 import org.hl7.fhir.instance.model.api.IDomainResource;
 import org.immregistries.iis.kernal.controllers.servlet.util.PatientServletUtil;
-import org.immregistries.iis.kernal.logic.IImmunizationRecommendationService;
+import org.immregistries.iis.kernal.logic.recommendations.IImmunizationRecommendationService;
 import org.immregistries.iis.kernal.mapping.requesters.FhirSearchRequester;
 import org.immregistries.iis.kernal.mapping.IisFhirClientFactory;
 import org.immregistries.iis.kernal.mapping.mappers.resources.PatientMapper;
