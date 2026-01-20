@@ -1,5 +1,7 @@
 package org.immregistries.iis.kernal.logic.recommendations;
 
+import ca.uhn.fhir.rest.api.MethodOutcome;
+import ca.uhn.fhir.rest.client.api.IGenericClient;
 import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.hl7.fhir.instance.model.api.IDomainResource;
 import org.immregistries.iis.kernal.model.IisPatient;
@@ -37,8 +39,16 @@ public interface IImmunizationRecommendationService<ImmunizationRecommendation e
 	 */
 	ImmunizationRecommendation generate(Tenant tenant, Date date, IisPatient patientMaster);
 
+	ImmunizationRecommendation addRandomGeneratedRecommendation(IGenericClient fhirClient, IAnyResource patient);
+
 	ImmunizationRecommendation addRandomGeneratedRecommendation(ImmunizationRecommendation recommendation);
 
 	ImmunizationRecommendation queryCds(Tenant tenant, Date date, IisPatient patientMaster);
+
+	MethodOutcome updateRecommendation(IGenericClient fhirClient, IAnyResource recommendation);
+
+	ImmunizationRecommendation readRecommendation(String recommendationId, String recommendationIdentifier, IGenericClient fhirClient);
+
+	ImmunizationRecommendation getPatientRecommendation(IGenericClient fhirClient, IAnyResource patient);
 
 }

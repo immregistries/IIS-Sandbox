@@ -8,6 +8,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
+import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.hl7.fhir.instance.model.api.IBaseBundle;
 import org.hl7.fhir.instance.model.api.IDomainResource;
 import org.hl7.fhir.r5.model.Identifier;
@@ -15,8 +16,8 @@ import org.immregistries.iis.kernal.controllers.rest.PatientRestController;
 import org.immregistries.iis.kernal.controllers.rest.RecommendationRestController;
 import org.immregistries.iis.kernal.controllers.servlet.util.PatientServletUtil;
 import org.immregistries.iis.kernal.controllers.servlet.util.UiUtil;
-import org.immregistries.iis.kernal.mapping.mappers.fields.BusinessIdentifierMapper;
 import org.immregistries.iis.kernal.mapping.IisFhirClientFactory;
+import org.immregistries.iis.kernal.mapping.mappers.fields.BusinessIdentifierMapper;
 import org.immregistries.iis.kernal.mapping.mappers.resources.PatientMapper;
 import org.immregistries.iis.kernal.model.BusinessIdentifier;
 import org.immregistries.iis.kernal.model.IisPatient;
@@ -90,7 +91,7 @@ public class RecommendationController {
 			if (req.getParameter(PARAM_RECOMMENDATION_RESOURCE) != null) {
 				Tenant tenant = CurrentTenantUtil.getTenantRedirectIfNone(req, resp);
 				recommendationRestController.updateRecommendation(tenant,
-						req.getParameter(PARAM_RECOMMENDATION_RESOURCE), req);
+					req.getParameter(PARAM_RECOMMENDATION_RESOURCE), req.getParameter(RecommendationRestController.RECOMMENDATION_ID), req.getParameter(RecommendationRestController.RECOMMENDATION_IDENTIFIER), req);
 			}
 		} catch (Exception exception) {
 			exception.printStackTrace(out);
@@ -120,7 +121,7 @@ public class RecommendationController {
 		try {
 			IGenericClient fhirClient = iisFhirClientFactory.getOrCreateGenericClient(req);
 
-			IDomainResource recommendationResource = recommendationRestController.getRecommendation(
+			IAnyResource recommendationResource = recommendationRestController.getRecommendation(
 					req.getParameter(PARAM_RECOMMENDATION_ID), req.getParameter(PARAM_RECOMMENDATION_IDENTIFIER),
 					tenant, req);
 			IDomainResource patientResource = null;
@@ -148,7 +149,7 @@ public class RecommendationController {
 						+ patientMaster.getLegalNameOrFirst().asSingleString() + "</h2>");
 				if (recommendationResource == null) {
 					IBaseBundle baseBundle = patientRestController
-							.getPatientRecommendation(patientResource.getIdElement().getIdPart(), tenant, req);
+						.getPatientRecommendationBundle(patientResource.getIdElement().getIdPart(), tenant, req);
 					if (fhirContext.getVersion().equals(FhirVersionEnum.R5)) {
 						org.hl7.fhir.r5.model.Bundle recommendationBundle = (org.hl7.fhir.r5.model.Bundle) baseBundle;
 						if (recommendationBundle.getEntry().size() > 0) {
@@ -210,7 +211,7 @@ public class RecommendationController {
 		out.close();
 	}
 
-	private String getPatientIdFromRecommendation(IDomainResource recommendationResource, FhirContext fhirContext) {
+	private String getPatientIdFromRecommendation(IAnyResource recommendationResource, FhirContext fhirContext) {
 		String patientReference = "";
 		if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R5)) {
 			patientReference = ((org.hl7.fhir.r5.model.ImmunizationRecommendation) recommendationResource)
@@ -222,11 +223,11 @@ public class RecommendationController {
 		return patientReference;
 	}
 
-	public void printRecommendation(PrintWriter out, IDomainResource recommendation, IDomainResource patient) {
+	public void printRecommendation(PrintWriter out, IAnyResource recommendation, IDomainResource patient) {
 		printRecommendation(out, recommendation, patient, fhirContext);
 	}
 
-	public static void printRecommendation(PrintWriter out, IDomainResource recommendation, IDomainResource patient,
+	public static void printRecommendation(PrintWriter out, IAnyResource recommendation, IDomainResource patient,
 			FhirContext fhirContext) {
 		out.println("<div class=\"w3-container\">");
 		out.println("<h4>Recommendations</h4>");

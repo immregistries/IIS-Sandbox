@@ -20,9 +20,9 @@ import org.immregistries.iis.kernal.controllers.servlet.util.UiQrCodeUtil;
 import org.immregistries.iis.kernal.controllers.servlet.util.UiUtil;
 import org.immregistries.iis.kernal.controllers.servlet.util.UrlTenantUtil;
 import org.immregistries.iis.kernal.fhir.shl.ShLinkPayload;
-import org.immregistries.iis.kernal.mapping.requesters.FhirRequesterUtil;
 import org.immregistries.iis.kernal.mapping.IisFhirClientFactory;
 import org.immregistries.iis.kernal.mapping.mappers.resources.PatientMapper;
+import org.immregistries.iis.kernal.mapping.requesters.FhirRequesterUtil;
 import org.immregistries.iis.kernal.model.*;
 import org.immregistries.iis.kernal.persisted.model.MessageReceived;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
@@ -206,7 +206,7 @@ public class PatientController {
 		IParser parser = iisFhirClientFactory.getFhirContext()
 			.newJsonParser().setPrettyPrint(true).setSuppressNarratives(true);
 		IBaseBundle recommendationBaseBundle = patientRestController
-			.getPatientRecommendation(iisPatient.getPatientId(), tenant, req);
+				.getPatientRecommendationBundle(iisPatient.getPatientId(), tenant, req);
 
 		if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R4)) {
 			org.hl7.fhir.r4.model.Bundle recommendationBundle = (org.hl7.fhir.r4.model.Bundle) recommendationBaseBundle;

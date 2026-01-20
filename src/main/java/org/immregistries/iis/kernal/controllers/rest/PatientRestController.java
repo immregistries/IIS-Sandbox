@@ -59,7 +59,7 @@ public class PatientRestController extends BaseTenantTiedRest {
 	}
 
 	@GetMapping(PATIENT_ID_PLACEHOLDER + "/recommendation")
-	public IBaseBundle getPatientRecommendation(
+	public IBaseBundle getPatientRecommendationBundle(
 		@PathVariable(PATIENT_ID) String patientId,
 		@RequestAttribute(RestTenantUrlFilter.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
 		HttpServletRequest req) {
