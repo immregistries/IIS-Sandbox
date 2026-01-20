@@ -14,7 +14,6 @@ import org.immregistries.iis.kernal.logic.recommendations.VaccinationRecommendat
 import org.immregistries.iis.kernal.logic.recommendations.VaccinePlanStatus;
 import org.immregistries.iis.kernal.mapping.mappers.fields.r5.BusinessIdentifierMapperR5;
 import org.immregistries.iis.kernal.mapping.mappers.resources.RecommendationMapper;
-import org.immregistries.iis.kernal.model.IisPatient;
 import org.immregistries.iis.kernal.model.IisRecommendation;
 import org.immregistries.vfa.connect.model.ForecastActual;
 import org.jetbrains.annotations.NotNull;
@@ -24,6 +23,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.immregistries.iis.kernal.mapping.mappers.resources.ImmunizationMapper.CVX_SYSTEM;
 
@@ -36,23 +36,20 @@ public class ImmunizationRecommendationMapperR5 extends RecommendationMapper<Imm
 	@Autowired
 	private BusinessIdentifierMapperR5 businessIdentifierMapper;
 
-	public ImmunizationRecommendation fhirObject(IisRecommendation iisRecommendation) {
-		ImmunizationRecommendation immunizationRecommendation = toFhir(iisRecommendation.getForecastActualList(),
-				iisRecommendation.getDate(), iisRecommendation.getIisPatient());
-		immunizationRecommendation.setId(iisRecommendation.getId());
-		return immunizationRecommendation;
-	}
-
 	public IisRecommendation localObject(ImmunizationRecommendation immunizationRecommendation) {
 		IisRecommendation iisRecommendation = new IisRecommendation();
-
 		return iisRecommendation;
 	}
 
-	public ImmunizationRecommendation toFhir(List<ForecastActual> forecastActualList, Date date, IisPatient iisPatient) {
-		ImmunizationRecommendation immunizationRecommendation = toFhir(forecastActualList, date);
-		immunizationRecommendation.setPatient(new Reference()
-				.setIdentifier(businessIdentifierMapper.fhirObject(iisPatient.getMainBusinessIdentifier())));
+	public ImmunizationRecommendation fhirObject(IisRecommendation iisRecommendation) {
+		ImmunizationRecommendation immunizationRecommendation = toFhir(iisRecommendation.getForecastActualList(), iisRecommendation.getDate());
+		if (iisRecommendation.getIisPatient() != null) {
+			immunizationRecommendation.setPatient(new Reference()
+				.setIdentifier(businessIdentifierMapper.fhirObject(iisRecommendation.getIisPatient().getMainBusinessIdentifier())));
+		}
+		immunizationRecommendation.setId(iisRecommendation.getId());
+		immunizationRecommendation.setAuthority(new Reference().setIdentifier(businessIdentifierMapper.fhirObject(iisRecommendation.getAuthority())));
+		immunizationRecommendation.setIdentifier(iisRecommendation.getBusinessIdentifierList().stream().map(businessIdentifier -> businessIdentifierMapper.fhirObject(businessIdentifier)).collect(Collectors.toList()));
 		return immunizationRecommendation;
 	}
 
@@ -64,7 +61,7 @@ public class ImmunizationRecommendationMapperR5 extends RecommendationMapper<Imm
 		ImmunizationRecommendation immunizationRecommendation = new ImmunizationRecommendation();
 		immunizationRecommendation.setDate(date);
 		for (ForecastActual forecastActual : forecastActualList) {
-			ImmunizationRecommendation.ImmunizationRecommendationRecommendationComponent component = getRecommendationComponent(forecastActual, codeMap);
+			ImmunizationRecommendation.ImmunizationRecommendationRecommendationComponent component = recommendationComponent(forecastActual, codeMap);
 			immunizationRecommendation.addRecommendation(component);
 		}
 		return immunizationRecommendation;
@@ -72,11 +69,13 @@ public class ImmunizationRecommendationMapperR5 extends RecommendationMapper<Imm
 
 	public ImmunizationRecommendation.@NotNull ImmunizationRecommendationRecommendationComponent recommendationComponent(ForecastActual forecastActual) {
 		CodeMap codeMap = codeMapManagerService.getCodeMap();
-		return getRecommendationComponent(forecastActual, codeMap);
+		return recommendationComponent(forecastActual, codeMap);
 	}
 
-	public ImmunizationRecommendation.@NotNull ImmunizationRecommendationRecommendationComponent getRecommendationComponent(ForecastActual forecastActual, CodeMap codeMap) {
+	public ImmunizationRecommendation.@NotNull ImmunizationRecommendationRecommendationComponent recommendationComponent(ForecastActual forecastActual, CodeMap codeMap) {
 		ImmunizationRecommendation.ImmunizationRecommendationRecommendationComponent component = new ImmunizationRecommendation.ImmunizationRecommendationRecommendationComponent();
+		component.setSeries(forecastActual.getScheduleName());
+		component.setDescription(forecastActual.getExplanationHtml());
 		/*
 		 * CVX
 		 */

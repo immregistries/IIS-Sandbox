@@ -6,6 +6,7 @@ public enum VaccinationRecommendationDateCode implements IisEnum {
 	LATEST("59777-3", "Latest date to give immunization"),
 	OVERDUE("59778-1", "Date when overdue for immunization");
 
+	public static final String URL = "http://hl7.org/fhir/ValueSet/immunization-recommendation-date-criterion";
 	private final String code;
 	private final String label;
 
@@ -24,7 +25,7 @@ public enum VaccinationRecommendationDateCode implements IisEnum {
 	}
 
 	public String getSystem() {
-		return "http://hl7.org/fhir/ValueSet/immunization-recommendation-date-criterion";
+		return URL;
 	}
 
 	public org.hl7.fhir.r4.model.Coding toR4() {

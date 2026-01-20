@@ -17,9 +17,6 @@ import java.util.Date;
  */
 public interface IImmunizationRecommendationService<ImmunizationRecommendation extends IAnyResource, Patient extends IDomainResource> {
 
-	String IMMUNIZATION_RECOMMENDATION_DATE_CRITERION_SYSTEM = "http://hl7.org/fhir/ValueSet/immunization-recommendation-date-criterion";
-	String IMMUNIZATION_RECOMMENDATION_STATUS_SYSTEM = "http://hl7.org/fhir/ValueSet/immunization-recommendation-status";
-
 	/**
 	 * Generate a random Immunization Recommendation on specific date
 	 *

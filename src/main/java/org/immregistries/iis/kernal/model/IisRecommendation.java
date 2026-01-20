@@ -1,7 +1,9 @@
 package org.immregistries.iis.kernal.model;
 
+import org.immregistries.iis.kernal.logic.recommendations.VaccinePlanStatus;
 import org.immregistries.vfa.connect.model.ForecastActual;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -9,9 +11,11 @@ public class IisRecommendation extends IisMappedToFhirResource {
 	private String id;
 	private IisPatient iisPatient;
 	private List<BusinessIdentifier> businessIdentifierList;
-	private List<ForecastActual> forecastActualList;
+	private List<ForecastActual> forecastActualList = new ArrayList<>(1);
 	private Date date;
 	private BusinessIdentifier authority;
+	private String description;
+	private VaccinePlanStatus vaccinePlanStatus;
 
 	public IisRecommendation() {
 	}
@@ -68,5 +72,21 @@ public class IisRecommendation extends IisMappedToFhirResource {
 
 	public void setAuthority(BusinessIdentifier authority) {
 		this.authority = authority;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public VaccinePlanStatus getVaccinePlanStatus() {
+		return vaccinePlanStatus;
+	}
+
+	public void setVaccinePlanStatus(VaccinePlanStatus vaccinePlanStatus) {
+		this.vaccinePlanStatus = vaccinePlanStatus;
 	}
 }
