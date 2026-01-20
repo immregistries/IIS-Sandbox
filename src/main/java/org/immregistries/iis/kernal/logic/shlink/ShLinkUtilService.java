@@ -90,7 +90,7 @@ public class ShLinkUtilService {
 		URL url = generateShLinkForShCards(List.of(ipsToBeEncoded), shLinkPayload, req,
 			iisSigningKey, encryptionKeySpec, userAccess, tenant);
 		shLinkPayload.setUrl(url.toString());
-		return ShLinkPayloadUtil.toQrCode(shLinkPayload);
+		return ShLinkPayloadUtil.toBase64QrCode(shLinkPayload);
 	}
 
 

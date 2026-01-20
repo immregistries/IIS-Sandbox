@@ -1,6 +1,5 @@
 package org.immregistries.iis.kernal.controllers.rest;
 
-import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.param.ReferenceParam;
@@ -8,10 +7,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.hl7.fhir.instance.model.api.IBaseBundle;
 import org.immregistries.iis.kernal.controllers.filters.RestTenantUrlFilter;
-import org.immregistries.iis.kernal.controllers.rest.shlink.PatientShLinkRestController;
 import org.immregistries.iis.kernal.fhir.shl.ShLinkPayload;
+import org.immregistries.iis.kernal.logic.shlink.PatientShLinkService;
 import org.immregistries.iis.kernal.mapping.IisFhirClientFactory;
-import org.immregistries.iis.kernal.mapping.mappers.resources.PatientMapper;
 import org.immregistries.iis.kernal.model.IisPatient;
 import org.immregistries.iis.kernal.model.ObservationReported;
 import org.immregistries.iis.kernal.model.PatientMaster;
@@ -32,11 +30,8 @@ public class PatientRestController extends BaseTenantTiedRest {
 
 	@Autowired
 	private IisFhirClientFactory iisFhirClientFactory;
-
 	@Autowired
-	private FhirContext fhirContext;
-	@Autowired
-	private PatientMapper patientMapper;
+	private PatientShLinkService patientShlinkService;
 
 	@GetMapping(PATIENT_ID_PLACEHOLDER)
 	public IisPatient getPatient(
@@ -144,8 +139,8 @@ public class PatientRestController extends BaseTenantTiedRest {
 		@RequestAttribute(RestTenantUrlFilter.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
 		HttpServletRequest req) {
 		IAnyResource patientSelected = getPatientFhir(patientId, tenant, req);
-		String manifestUrl = PatientShLinkRestController.getManifestUrl(req, patientSelected, tenant);
-		return PatientShLinkRestController.generatePatientShLinkPayload(manifestUrl);
+		String manifestUrl = patientShlinkService.getManifestUrl(req, patientSelected, tenant);
+		return patientShlinkService.generatePatientShLinkPayload(manifestUrl);
 	}
 
 }

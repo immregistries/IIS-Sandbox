@@ -10,7 +10,7 @@ public class ShLinkPayloadUtil {
 	public static final String SHLINK_PREFIX = "shlink:/";
 	private static final ObjectMapper objectMapper = new ObjectMapper();
 
-	public static String toQrCode(ShLinkPayload shLinkPayload) {
+	public static String toBase64QrCode(ShLinkPayload shLinkPayload) {
 		String payload = "";
 		try {
 			payload = objectMapper.writeValueAsString(shLinkPayload);
