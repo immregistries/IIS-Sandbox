@@ -17,10 +17,10 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import java.io.IOException;
 
 /**
- * static class providing tools related to the Tenent selected using request
+ * static class providing tools related to the Tenant selected using request
  * context
  */
-public class CurrentTenantUtil {
+public final class CurrentTenantUtil {
 
 	public static final String TENANT_ID_URL = "TENANT_ID_URL";
 	public static final String TENANT_NAME_URL = "TENANT_NAME_URL";
