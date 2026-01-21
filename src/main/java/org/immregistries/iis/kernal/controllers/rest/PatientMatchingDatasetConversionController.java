@@ -56,7 +56,7 @@ public class PatientMatchingDatasetConversionController {
 			for (Bundle.BundleEntryComponent entry : bundle.getEntry()) {
 				if (entry.getResource() instanceof org.hl7.fhir.r5.model.Patient) {
 					org.hl7.fhir.r5.model.Patient fhirPatient = (org.hl7.fhir.r5.model.Patient) entry.getResource();
-					Patient patient = patientMismoConversionService.convertFromR5IncludingLink(fhirPatient);
+					Patient patient = patientMismoConversionService.convertIncludingLink(fhirPatient);
 					patientList.add(patient);
 					break;
 				}
@@ -66,7 +66,7 @@ public class PatientMatchingDatasetConversionController {
 			for (org.hl7.fhir.r4.model.Bundle.BundleEntryComponent entry : bundle.getEntry()) {
 				if (entry.getResource() instanceof org.hl7.fhir.r4.model.Patient) {
 					org.hl7.fhir.r4.model.Patient fhirPatient = (org.hl7.fhir.r4.model.Patient) entry.getResource();
-					Patient patient = patientMismoConversionService.convertFromR4IncludingLink(fhirPatient);
+					Patient patient = patientMismoConversionService.convertIncludingLink(fhirPatient);
 					patientList.add(patient);
 				}
 			}
@@ -92,7 +92,7 @@ public class PatientMatchingDatasetConversionController {
 			IBundleProvider bundleProvider = fhirSearchRequester.searchRegularRecord(org.hl7.fhir.r5.model.Patient.class, new SearchParameterMap());
 			for (IBaseResource iBaseResource : bundleProvider.getAllResources()) {
 				if (iBaseResource instanceof org.hl7.fhir.r5.model.Patient) {
-					Patient patient = patientMismoConversionService.convertFromR5IncludingLink((org.hl7.fhir.r5.model.Patient) iBaseResource);
+					Patient patient = patientMismoConversionService.convertIncludingLink((org.hl7.fhir.r5.model.Patient) iBaseResource);
 					list.add(patient);
 				}
 			}
@@ -100,7 +100,7 @@ public class PatientMatchingDatasetConversionController {
 			IBundleProvider bundleProvider = fhirSearchRequester.searchRegularRecord(org.hl7.fhir.r4.model.Patient.class, new SearchParameterMap());
 			for (IBaseResource iBaseResource : bundleProvider.getAllResources()) {
 				if (iBaseResource instanceof org.hl7.fhir.r4.model.Patient) {
-					Patient patient = patientMismoConversionService.convertFromR4IncludingLink((org.hl7.fhir.r4.model.Patient) iBaseResource);
+					Patient patient = patientMismoConversionService.convertIncludingLink((org.hl7.fhir.r4.model.Patient) iBaseResource);
 					list.add(patient);
 				}
 			}

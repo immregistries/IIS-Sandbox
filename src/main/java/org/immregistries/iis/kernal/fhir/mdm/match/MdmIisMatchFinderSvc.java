@@ -13,7 +13,6 @@ import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.hl7.fhir.r4.model.ResourceType;
 import org.immregistries.iis.kernal.logic.match.PatientMismoConversionService;
 import org.immregistries.iis.kernal.logic.validation.IisLogicInterceptor;
-import org.immregistries.iis.kernal.logic.validation.PatientProcessingInterceptor;
 import org.immregistries.iis.kernal.mapping.mappers.resources.PatientMapper;
 import org.immregistries.iis.kernal.model.ProcessingFlavor;
 import org.immregistries.mismo.match.PatientMatchResult;
@@ -38,15 +37,13 @@ public abstract class MdmIisMatchFinderSvc<Immunization extends IAnyResource> ex
 	private static final Logger ourLog = Logs.getMdmTroubleshootingLog();
 
 	@Autowired
-	MdmCandidateSearchSvc myMdmCandidateSearchSvc;
+	private MdmCandidateSearchSvc myMdmCandidateSearchSvc;
 	@Autowired
-	MdmResourceMatcherSvc myMdmResourceMatcherSvc;
+	private MdmResourceMatcherSvc myMdmResourceMatcherSvc;
 	@Autowired
 	private PatientMismoConversionService patientMismoConversionService;
 	@Autowired
-	PatientProcessingInterceptor patientProcessingInterceptor;
-	@Autowired
-	PatientMapper patientMapper;
+	private PatientMapper patientMapper;
 
 	private final PatientMatcher patientMismoMatcher;
 
@@ -74,11 +71,11 @@ public abstract class MdmIisMatchFinderSvc<Immunization extends IAnyResource> ex
 			 * Flavor check activating patient Matching with Mismo match
 			 */
 			Collection<IAnyResource> targetCandidates = myMdmCandidateSearchSvc.findCandidates(theResourceType, theResource, theRequestPartitionId);
-			Patient mismoPatient = patientMismoConversionService.convertFromFhir(theResource);
+			Patient mismoPatient = patientMismoConversionService.convert(theResource);
 
 			List<MatchedTarget> matches = targetCandidates.stream()
 				.map((candidate) -> {
-					Patient mismoPatientCandidate = patientMismoConversionService.convertFromFhir(candidate);
+					Patient mismoPatientCandidate = patientMismoConversionService.convert(candidate);
 					PatientMatchResult mismoMatchResult = patientMismoMatcher.match(mismoPatient, mismoPatientCandidate);
 					return new MatchedTarget(candidate, IMdmIisMatchFinderSvc.mismoResultToMdmMatchOutcome(mismoMatchResult));
 				}).collect(Collectors.toList());
