@@ -8,6 +8,7 @@ import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.hl7.fhir.instance.model.api.IDomainResource;
 import org.immregistries.iis.kernal.controllers.servlet.util.PatientServletUtil;
 import org.immregistries.iis.kernal.logic.recommendations.IImmunizationRecommendationService;
+import org.immregistries.iis.kernal.logic.recommendations.IisRecommendationGenerator;
 import org.immregistries.iis.kernal.mapping.IisFhirClientFactory;
 import org.immregistries.iis.kernal.mapping.mappers.resources.PatientMapper;
 import org.immregistries.iis.kernal.mapping.requesters.FhirSearchRequester;
@@ -37,6 +38,8 @@ public class RecommendationRestController {
     private FhirContext fhirContext;
     @Autowired
     private PatientMapper patientMapper;
+	 @Autowired
+	 private IisRecommendationGenerator iisRecommendationGenerator;
 
     @PostMapping("/random")
     public void addRandomRecommendation(
@@ -50,11 +53,11 @@ public class RecommendationRestController {
         if (patient != null) {
 			  IAnyResource recommendation = immunizationRecommendationService.getPatientRecommendation(fhirClient, patient);
 			  if (recommendation != null) {
-				  recommendation = immunizationRecommendationService.addRandomGeneratedRecommendation(recommendation);
+				  recommendation = iisRecommendationGenerator.addRandomGeneratedRecommendation(recommendation);
 				  immunizationRecommendationService.updateRecommendation(fhirClient, recommendation);
 			  } else {
 				  fhirClient.create()
-					  .resource(immunizationRecommendationService.generate(tenant, new Date(), patientMaster))
+					  .resource(iisRecommendationGenerator.generateFhirRecommendation(tenant, new Date(), patientMaster))
 					  .execute();
 			  }
         }

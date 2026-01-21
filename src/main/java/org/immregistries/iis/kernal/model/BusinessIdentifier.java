@@ -18,6 +18,15 @@ public class BusinessIdentifier extends IisMappedToFhir {
 	public BusinessIdentifier() {
 	}
 
+	public BusinessIdentifier(String value) {
+		this.value = value;
+	}
+
+	public BusinessIdentifier(String system, String value) {
+		this.system = system;
+		this.value = value;
+	}
+
 	public String getSystem() {
 		return system;
 	}

@@ -10,7 +10,7 @@ import java.util.List;
 public class IisRecommendation extends IisMappedToFhirResource {
 	private String id;
 	private IisPatient iisPatient;
-	private List<BusinessIdentifier> businessIdentifierList;
+	private List<BusinessIdentifier> businessIdentifierList = new ArrayList<>(1);
 	private List<ForecastActual> forecastActualList = new ArrayList<>(1);
 	private Date date;
 	private BusinessIdentifier authority;

@@ -10,12 +10,12 @@ import org.hl7.fhir.r4.model.ImmunizationRecommendation;
 import org.hl7.fhir.r4.model.Parameters;
 import org.hl7.fhir.r4.model.Patient;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
-import org.immregistries.iis.kernal.logic.recommendations.ImmunizationRecommendationServiceR4;
-import org.immregistries.iis.kernal.logic.v2.handling.IncomingQueryHandler;
+import org.immregistries.iis.kernal.logic.recommendations.CdsQueryServiceR4;
+import org.immregistries.iis.kernal.logic.recommendations.IisRecommendationGenerator;
 import org.immregistries.iis.kernal.mapping.mappers.resources.r4.ImmunizationMapperR4;
 import org.immregistries.iis.kernal.mapping.mappers.resources.r4.PatientMapperR4;
+import org.immregistries.iis.kernal.model.IisPatient;
 import org.immregistries.iis.kernal.model.IisVaccination;
-import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.security.CurrentTenantUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,15 +32,14 @@ import java.util.stream.Collectors;
 public class RecommendationForecastProviderR4 implements IRecommendationForecastProvider<Parameters, Patient, Immunization> {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-
 	@Autowired
-	IncomingQueryHandler incomingQueryHandler;
+	private PatientMapperR4 patientMapperR4;
 	@Autowired
-	PatientMapperR4 patientMapperR4;
+	private ImmunizationMapperR4 immunizationMapperR4;
 	@Autowired
-	ImmunizationMapperR4 immunizationMapperR4;
+	private IisRecommendationGenerator iisRecommendationGenerator;
 	@Autowired
-	private ImmunizationRecommendationServiceR4 immunizationRecommendationServiceR4;
+	private CdsQueryServiceR4 cdsQueryService;
 
 	@Operation(name = $_IMMDS_FORECAST,
 		idempotent = true,
@@ -58,18 +57,18 @@ public class RecommendationForecastProviderR4 implements IRecommendationForecast
 		List<Immunization> immunization
 	) {
 		Parameters out = new Parameters();
-		List<IisVaccination> vaccinationMasterList;
+		List<? extends IisVaccination> iisVaccinationList;
 		if (immunization != null) {
-			vaccinationMasterList = immunization.stream().map(immunization1 -> immunizationMapperR4.localObject(immunization1)).collect(Collectors.toList());
+			iisVaccinationList = immunization.stream().map(immunization1 -> immunizationMapperR4.localObject(immunization1)).collect(Collectors.toList());
 		} else {
-			vaccinationMasterList = List.of();
+			iisVaccinationList = List.of();
 		}
-		PatientMaster patientMaster = patientMapperR4.localObjectMaster(patient);
+		IisPatient iisPatient = patientMapperR4.localObject(patient);
 		try {
-			out = immunizationRecommendationServiceR4.queryCds(CurrentTenantUtil.getTenant(), assessmentDate.getValue(), patientMaster, vaccinationMasterList);
+			out = cdsQueryService.queryCds(CurrentTenantUtil.getTenant(), assessmentDate.getValue(), iisPatient, iisVaccinationList);
 			logger.info("out {}", out.getParameters(EVALUATION).size());
 		} catch (Exception e) {
-			ImmunizationRecommendation immunizationRecommendation = immunizationRecommendationServiceR4.generate(CurrentTenantUtil.getTenant(), assessmentDate.getValue(), patientMaster);
+			ImmunizationRecommendation immunizationRecommendation = (ImmunizationRecommendation) iisRecommendationGenerator.generateFhirRecommendation(CurrentTenantUtil.getTenant(), assessmentDate.getValue(), iisPatient);
 			out.addParameter().setName(RECOMMENDATION).setResource(immunizationRecommendation);
 		}
 		return out;
