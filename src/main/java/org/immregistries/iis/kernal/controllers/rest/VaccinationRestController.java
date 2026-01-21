@@ -4,9 +4,13 @@ import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
 import ca.uhn.fhir.rest.param.ReferenceParam;
 import jakarta.servlet.http.HttpServletRequest;
 import org.immregistries.iis.kernal.controllers.filters.RestTenantUrlFilter;
+import org.immregistries.iis.kernal.mapping.requesters.FhirReadRequester;
+import org.immregistries.iis.kernal.mapping.requesters.FhirSearchRequester;
+import org.immregistries.iis.kernal.mapping.requesters.IFhirSaveRequester;
 import org.immregistries.iis.kernal.model.IisVaccination;
 import org.immregistries.iis.kernal.model.VaccinationMaster;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,6 +21,14 @@ import static org.immregistries.iis.kernal.security.CurrentTenantUtil.SESSION_RE
 @RestController
 @RequestMapping(RestUrlUtil.REST_TENANT_PATH + VaccinationRestController.VACCINATION)
 public class VaccinationRestController extends BaseTenantTiedRest {
+
+	@Autowired
+	@SuppressWarnings("rawtypes")
+	private IFhirSaveRequester fhirRequester;
+	@Autowired
+	private FhirReadRequester fhirReadRequester;
+	@Autowired
+	private FhirSearchRequester fhirSearchRequester;
 
 	public static final String VACCINATION = "/vaccination";
 	public static final String VACCINATION_ID = "vaccinationId";
@@ -40,7 +52,6 @@ public class VaccinationRestController extends BaseTenantTiedRest {
         if (patientId != null && !patientId.isEmpty()) {
             parameters.add("patient", new ReferenceParam(patientId));
         }
-
         @SuppressWarnings("unchecked")
         List<VaccinationMaster> result = fhirSearchRequester.searchVaccinationMasterGoldenList(parameters);
         return result;

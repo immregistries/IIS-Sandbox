@@ -20,8 +20,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @RestController
 @RequestMapping("/patientMatchingDatasetConversion")
@@ -36,7 +34,7 @@ public class PatientMatchingDatasetConversionController {
 	@PostMapping("/init")
 	public String initBuilder() throws IOException {
 		String tenantId = CurrentTenantUtil.getTenant().getOrganizationName();
-		tenantId.strip().replace("/","");
+		tenantId = tenantId.strip().replace("/", "");
 		File csvOutputFile = new File("./target/"+tenantId+".csv");
 		csvOutputFile.createNewFile();
 		FileWriter fileWriter = new FileWriter(csvOutputFile, false);
@@ -75,7 +73,7 @@ public class PatientMatchingDatasetConversionController {
 		}
 
 		String tenantId = CurrentTenantUtil.getTenant().getOrganizationName();
-		tenantId.strip().replace("/","");
+		tenantId = tenantId.strip().replace("/", "");
 		File csvOutputFile = new File("./target/"+tenantId+".csv");
 		FileWriter fileWriter = new FileWriter(csvOutputFile, true);
 		try (PrintWriter pw = new PrintWriter(fileWriter)) {
@@ -171,8 +169,7 @@ public class PatientMatchingDatasetConversionController {
 		if (patient.getLinkWith() != null) {
 			line[line.length-1] = patient.getLinkWith().getValue("identifier");
 		}
-		return Stream.of(line)
-//			.map(this::escapeSpecialCharacters)
-			.collect(Collectors.joining(","));
+		//			.map(this::escapeSpecialCharacters)
+		return String.join(",", line);
 	}
 }

@@ -16,15 +16,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.web.bind.annotation.*;
 
-import static org.immregistries.iis.kernal.security.CurrentTenantUtil.SESSION_REQUEST_TENANT;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.immregistries.iis.kernal.security.CurrentTenantUtil.SESSION_REQUEST_TENANT;
 
 @Conditional(OnR5Condition.class)
 @RestController
 @RequestMapping(RestUrlUtil.REST_TENANT_PATH + "/subscription")
-public class SubscriptionRestController {
+public class SubscriptionRestControllerR5 {
 
     @Autowired
     IisFhirClientFactory iisFhirClientFactory;
@@ -39,10 +39,9 @@ public class SubscriptionRestController {
         IGenericClient fhirClient = iisFhirClientFactory.getOrCreateGenericClient(req);
 
         // Implementation for GET request
-        org.hl7.fhir.r5.model.Bundle subcriptionBundle = fhirClient.search()
-                .forResource(org.hl7.fhir.r5.model.Subscription.class)
-                .returnBundle(org.hl7.fhir.r5.model.Bundle.class).execute();
-        return subcriptionBundle;
+		 return fhirClient.search()
+			 .forResource(Subscription.class)
+			 .returnBundle(Bundle.class).execute();
     }
 
     @PostMapping("/trigger")

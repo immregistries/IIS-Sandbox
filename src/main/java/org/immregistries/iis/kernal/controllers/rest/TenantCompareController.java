@@ -1,18 +1,16 @@
 package org.immregistries.iis.kernal.controllers.rest;
 
-import jakarta.servlet.ServletException;
 import jakarta.validation.constraints.NotBlank;
 import org.hl7.fhir.instance.model.api.IBaseParameters;
-import org.immregistries.iis.kernal.security.UserAccessUtil;
 import org.immregistries.iis.kernal.logic.TenantCompareService;
 import org.immregistries.iis.kernal.persisted.model.UserAccess;
+import org.immregistries.iis.kernal.security.UserAccessUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 import java.util.List;
 
 import static org.immregistries.iis.kernal.controllers.rest.TenantCompareController.TENANT_COMPARE_BASE_PATH;
@@ -41,10 +39,8 @@ public class TenantCompareController {
 	 * Currently adapted only for origins loaded in the right order,
 	 * TODO add cross resource checks with ids and matching
 	 *
-	 * @param req
-	 * @param resp
-	 * @throws ServletException
-	 * @throws IOException
+	 * @param tenantIds ids of tenants to be compared
+	 * @param includeGolden option of use of MDM Golden/Master Records
 	 */
 	@GetMapping()
 	protected List<IBaseParameters> tenantCompareGet(
@@ -56,9 +52,8 @@ public class TenantCompareController {
 		if (userAccess == null) {
 			throw new AuthenticationCredentialsNotFoundException("");
 		}
-		List<IBaseParameters> diffs = tenantCompareService.compareTenants(tenantNames, userAccess,
+		return tenantCompareService.compareTenants(tenantNames, userAccess,
 				includeGolden);
-		return diffs;
 	}
 
 }

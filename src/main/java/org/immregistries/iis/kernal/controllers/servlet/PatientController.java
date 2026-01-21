@@ -70,7 +70,7 @@ public class PatientController {
 	private PatientRestController patientRestController;
 
 	@Autowired(required = false)
-	private SubscriptionRestController subscriptionRestController;
+	private SubscriptionRestControllerR5 subscriptionRestController;
 
 	@Autowired
 	private MessageRestController messageRestController;

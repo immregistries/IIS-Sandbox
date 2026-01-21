@@ -7,13 +7,13 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.hl7.fhir.r5.model.Bundle;
 import org.hl7.fhir.r5.model.Subscription;
-import org.immregistries.iis.kernal.controllers.rest.SubscriptionRestController;
+import org.immregistries.iis.kernal.controllers.rest.SubscriptionRestControllerR5;
 import org.immregistries.iis.kernal.controllers.servlet.util.UiUtil;
 import org.immregistries.iis.kernal.controllers.servlet.util.UrlTenantUtil;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR5Condition;
-import org.immregistries.iis.kernal.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.mapping.IisFhirClientFactory;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
+import org.immregistries.iis.kernal.security.CurrentTenantUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,7 +38,7 @@ public class SubscriptionController {
 	@Autowired
 	IisFhirClientFactory iisFhirClientFactory;
 	@Autowired
-	SubscriptionRestController subscriptionRestController;
+	SubscriptionRestControllerR5 subscriptionRestController;
 
 	public static final String PARAM_ACTION = "action";
 	public static final String PARAM_MESSAGE = "message";
@@ -87,7 +87,7 @@ public class SubscriptionController {
 			String[] messages = req.getParameterValues(PARAM_MESSAGE);
 			String[] httpVerbs = req.getParameterValues(PARAM_HTTP_VERB);
 
-			SubscriptionRestController.TriggerRequest triggerRequest = new SubscriptionRestController.TriggerRequest();
+			SubscriptionRestControllerR5.TriggerRequest triggerRequest = new SubscriptionRestControllerR5.TriggerRequest();
 			triggerRequest.setSubscriptionId(subscriptionId);
 			if (messages != null) {
 				triggerRequest.setMessages(java.util.Arrays.asList(messages));

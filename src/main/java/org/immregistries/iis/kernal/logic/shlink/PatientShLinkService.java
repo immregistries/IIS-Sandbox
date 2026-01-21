@@ -20,7 +20,7 @@ public class PatientShLinkService {
 		return ShLinkPayloadUtil.toBase64QrCode(shLinkPayload);
 	}
 
-	public static @NotNull ShLinkPayload generatePatientShLinkPayload(String manifestUrl) {
+	public @NotNull ShLinkPayload generatePatientShLinkPayload(String manifestUrl) {
 		ShLinkPayload shLinkPayload = new ShLinkPayload();
 		shLinkPayload.setUrl(manifestUrl);
 		shLinkPayload.setLabel("Generated for testing");

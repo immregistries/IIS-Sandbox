@@ -1,6 +1,6 @@
 package org.immregistries.iis.kernal.controllers.rest;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.immregistries.iis.kernal.Application;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.jetbrains.annotations.NotNull;
@@ -32,7 +32,7 @@ public class RestUrlUtil {
 	}
 
 	public static String patientifyPathWithContextPath(Integer tenantId, String patientId, String urlSuffix) {
-		if (!StringUtils.startsWith(urlSuffix, "/")) {
+		if (!Strings.CS.startsWith(urlSuffix, "/")) {
 			urlSuffix = "/" + urlSuffix;
 		}
 		return  REST_PATH + TENANT_PATH + "/" + tenantId  + PATIENT_PATH + "/" + patientId + urlSuffix;
@@ -50,19 +50,9 @@ public class RestUrlUtil {
 	 * @return {tenantBasePath}/{tenantName}/ + urlSuffix
 	 */
 	public static @NotNull String tenantifyPathSuffix(int tenantId, String urlSuffix) {
-		if (!StringUtils.startsWith(urlSuffix, "/")) {
+		if (!Strings.CS.startsWith(urlSuffix, "/")) {
 			urlSuffix = "/" + urlSuffix;
 		}
 		return REST_PATH + TENANT_PATH + "/" + tenantId + urlSuffix;
 	}
-
-//	/**
-//	 * Deals with tenantName path variable for Authorization config
-//	 *
-//	 * @param urlSuffix
-//	 * @return
-//	 */
-//	public static @NotNull String securityConfigUrl(String urlSuffix) {
-//		return tenantifyPathSuffix("*", urlSuffix);
-//	}
 }

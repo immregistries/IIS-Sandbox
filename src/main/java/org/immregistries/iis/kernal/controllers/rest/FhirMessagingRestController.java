@@ -10,12 +10,12 @@ import jakarta.validation.constraints.NotNull;
 import org.apache.commons.lang3.StringUtils;
 import org.immregistries.iis.kernal.controllers.servlet.SoapDescriptionController;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
-import org.immregistries.iis.kernal.security.CurrentTenantUtil;
-import org.immregistries.iis.kernal.security.TenantAuthService;
 import org.immregistries.iis.kernal.logic.v2.BaseIISSOAPServer;
 import org.immregistries.iis.kernal.logic.v2.handling.FhirMessagingHandler;
 import org.immregistries.iis.kernal.logic.v2.handling.V2IncomingMessageHandler;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
+import org.immregistries.iis.kernal.security.CurrentTenantUtil;
+import org.immregistries.iis.kernal.security.TenantAuthService;
 import org.immregistries.smm.cdc.CDCWSDLServer;
 import org.immregistries.smm.cdc.Fault;
 import org.immregistries.smm.cdc.SubmitSingleMessage;
@@ -42,9 +42,9 @@ public class FhirMessagingRestController {
 
 	public static final String FHIR_MESSAGING_KEY_PATH = "/fhirMessaging";
 	@Autowired
-	FhirContext fhirContext;
+	private FhirContext fhirContext;
 	@Autowired
-	FhirMessagingHandler fhirMessagingHandler;
+	private FhirMessagingHandler fhirMessagingHandler;
 
 	@Autowired
 	private TenantAuthService tenantAuthService;
@@ -106,7 +106,7 @@ public class FhirMessagingRestController {
 				String message = ssm.getHl7Message();
 				String facilityId = ssm.getFacilityID();
 
-				String ack = "";
+				String ack;
 				try {
 					/*
 					 * Tenant is accessed through RequestContext, and was previously set through the

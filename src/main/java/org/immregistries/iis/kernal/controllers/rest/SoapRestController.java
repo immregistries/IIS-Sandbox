@@ -4,11 +4,11 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.immregistries.iis.kernal.controllers.filters.RestTenantUrlFilter;
-import org.immregistries.iis.kernal.security.CurrentTenantUtil;
-import org.immregistries.iis.kernal.security.TenantAuthService;
 import org.immregistries.iis.kernal.logic.v2.BaseIISSOAPServer;
 import org.immregistries.iis.kernal.logic.v2.handling.V2IncomingMessageHandler;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
+import org.immregistries.iis.kernal.security.CurrentTenantUtil;
+import org.immregistries.iis.kernal.security.TenantAuthService;
 import org.immregistries.smm.cdc.CDCWSDLServer;
 import org.immregistries.smm.cdc.Fault;
 import org.immregistries.smm.cdc.SubmitSingleMessage;
@@ -50,7 +50,7 @@ public class SoapRestController {
 			public void process(SubmitSingleMessage ssm, PrintWriter out) throws Fault {
 				String message = ssm.getHl7Message();
 
-				String ack = "";
+				String ack;
 				try {
 					/*
 					 * Tenant is accessed through RequestContext, and was previously set through the

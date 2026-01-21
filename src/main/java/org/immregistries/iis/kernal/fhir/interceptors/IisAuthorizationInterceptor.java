@@ -11,14 +11,15 @@ import jakarta.interceptor.Interceptor;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang3.Strings;
 import org.apache.http.auth.AuthenticationException;
-import org.immregistries.iis.kernal.security.JwtUtils;
-import org.immregistries.iis.kernal.security.TenantAuthService;
-import org.immregistries.iis.kernal.security.UserAccessUtil;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.immregistries.iis.kernal.persisted.model.UserAccess;
 import org.immregistries.iis.kernal.persisted.repository.TenantRepository;
 import org.immregistries.iis.kernal.persisted.repository.UserAccessRepository;
+import org.immregistries.iis.kernal.security.JwtUtils;
+import org.immregistries.iis.kernal.security.TenantAuthService;
+import org.immregistries.iis.kernal.security.UserAccessUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -145,7 +146,7 @@ public class IisAuthorizationInterceptor extends AuthorizationInterceptor {
 	 * @return tenant object if authenticated, null if not recognized
 	 */
 	public Tenant tryAuthHeaderBasic(String authHeader, String tenantName) {
-		if (authHeader != null && authHeader.startsWith("Basic ")) {
+		if (Strings.CS.startsWith(authHeader, "Basic ")) {
 			String base64 = authHeader.substring("Basic ".length());
 			String base64decoded = new String(Base64.decodeBase64(base64));
 			String[] parts = base64decoded.split(":");

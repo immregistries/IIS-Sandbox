@@ -10,6 +10,9 @@ import org.immregistries.iis.kernal.controllers.filters.RestTenantUrlFilter;
 import org.immregistries.iis.kernal.fhir.shl.ShLinkPayload;
 import org.immregistries.iis.kernal.logic.shlink.PatientShLinkService;
 import org.immregistries.iis.kernal.mapping.IisFhirClientFactory;
+import org.immregistries.iis.kernal.mapping.requesters.FhirReadRequester;
+import org.immregistries.iis.kernal.mapping.requesters.FhirSaveRequester;
+import org.immregistries.iis.kernal.mapping.requesters.FhirSearchRequester;
 import org.immregistries.iis.kernal.model.IisPatient;
 import org.immregistries.iis.kernal.model.ObservationReported;
 import org.immregistries.iis.kernal.model.PatientMaster;
@@ -25,6 +28,14 @@ import static org.immregistries.iis.kernal.controllers.rest.RestUrlUtil.*;
 @RestController
 @RequestMapping(RestUrlUtil.REST_TENANT_PATH + PATIENT_PATH)
 public class PatientRestController extends BaseTenantTiedRest {
+
+	@Autowired
+	@SuppressWarnings("rawtypes")
+	private FhirSaveRequester fhirRequester;
+	@Autowired
+	private FhirReadRequester fhirReadRequester;
+	@Autowired
+	private FhirSearchRequester fhirSearchRequester;
 
 	public static final String MDM_EXPAND_REST_PARAM = "isGolden";
 
@@ -53,9 +64,7 @@ public class PatientRestController extends BaseTenantTiedRest {
 	public List<PatientMaster> getAllPatients(
 		@RequestAttribute(RestTenantUrlFilter.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
 		HttpServletRequest req) {
-		@SuppressWarnings("unchecked")
-		List<PatientMaster> result = fhirSearchRequester.searchPatientMasterGoldenList(new SearchParameterMap());
-		return result;
+		return fhirSearchRequester.searchPatientMasterGoldenList(new SearchParameterMap());
 	}
 
 	@GetMapping(PATIENT_ID_PLACEHOLDER + "/recommendation")
@@ -70,7 +79,6 @@ public class PatientRestController extends BaseTenantTiedRest {
 			.execute();
 	}
 
-	@SuppressWarnings("unchecked")
 	@GetMapping(PATIENT_ID_PLACEHOLDER + "/vaccination")
 	public List<VaccinationMaster> getPatientVaccination(
 		@PathVariable(PATIENT_ID) String patientId,
@@ -83,7 +91,6 @@ public class PatientRestController extends BaseTenantTiedRest {
 			new SearchParameterMap().add("patient", referenceParam));
 	}
 
-	@SuppressWarnings("unchecked")
 	@GetMapping(PATIENT_ID_PLACEHOLDER + "/observations")
 	public List<ObservationReported> getPatientObservation(
 		@PathVariable(PATIENT_ID) String patientId,
@@ -96,7 +103,6 @@ public class PatientRestController extends BaseTenantTiedRest {
 			new SearchParameterMap("subject", referenceParam));
 	}
 
-	@SuppressWarnings("unchecked")
 	@GetMapping(PATIENT_ID_PLACEHOLDER + "/related")
 	public List<? extends IisPatient> getPatientRelatedPatients(
 		@PathVariable(PATIENT_ID) String patientId,
@@ -119,7 +125,6 @@ public class PatientRestController extends BaseTenantTiedRest {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	@GetMapping("/search")
 	public List<PatientMaster> basicSearch(
 		@RequestParam(required = false) String family,

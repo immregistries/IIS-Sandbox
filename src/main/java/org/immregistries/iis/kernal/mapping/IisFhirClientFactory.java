@@ -16,6 +16,7 @@ import org.immregistries.iis.kernal.Application;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.immregistries.iis.kernal.persisted.model.UserAccess;
 import org.immregistries.iis.kernal.security.CurrentTenantUtil;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,9 +77,17 @@ public class IisFhirClientFactory extends ApacheRestfulClientFactory {
 		IGenericClient client;
 		URL serverBase = extractServerBase(tenant, httpServletRequest);
 		client = newGenericClient(serverBase.toString());
+		IClientInterceptor authInterceptor = getClientAuthInterceptor(tenant);
+		client.registerInterceptor(authInterceptor);
+		return client;
+	}
+
+	private @NotNull IClientInterceptor getClientAuthInterceptor(Tenant tenant) {
 		IClientInterceptor authInterceptor;
 		UserAccess userAccess = tenant.getUserAccess();
-		if (tenant.getOrganizationName().equals(CONNECTATHON_USER) && userAccess.getAccessName() == null) {
+		String accessName = userAccess.getAccessName();
+		String accessKey = userAccess.getAccessKey();
+		if (tenant.getOrganizationName().equals(CONNECTATHON_USER) && accessName == null) {
 			/**
 			 * SPECIFIC Connection User for Connectathon
 			 * specific auth when logged in with token,
@@ -86,15 +95,14 @@ public class IisFhirClientFactory extends ApacheRestfulClientFactory {
 			 *
 			 * see SessionAuthorizationInterceptor
 			 */
-			authInterceptor = new BearerTokenAuthInterceptor(userAccess.getAccessKey());
-		} else if (userAccess.getAccessName().startsWith(GITHUB_PREFIX)) {
+			authInterceptor = new BearerTokenAuthInterceptor(accessKey);
+		} else if (accessName.startsWith(GITHUB_PREFIX)) {
 			Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 			authInterceptor = new BearerTokenAuthInterceptor((String) authentication.getCredentials());
 		} else {
-			authInterceptor = new BasicAuthInterceptor(userAccess.getAccessName(), userAccess.getAccessKey());
+			authInterceptor = new BasicAuthInterceptor(accessName, accessKey);
 		}
-		client.registerInterceptor(authInterceptor);
-		return client;
+		return authInterceptor;
 	}
 
 

@@ -3,9 +3,10 @@ package org.immregistries.iis.kernal.controllers.rest;
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.context.RuntimeResourceDefinition;
 import jakarta.servlet.ServletException;
-import org.immregistries.iis.kernal.security.UserAccessUtil;
 import org.immregistries.iis.kernal.logic.macro.MacroEndpointService;
+import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.immregistries.iis.kernal.persisted.model.UserAccess;
+import org.immregistries.iis.kernal.security.UserAccessUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,14 +45,14 @@ public class MacroEndpointController {
 	}
 
 	@PostMapping
-	protected ResponseEntity doPost(@RequestBody String bundleString)
+	protected ResponseEntity<Tenant> doPost(@RequestBody String bundleString)
 			throws ServletException, IOException {
 		UserAccess userAccess = UserAccessUtil.get().getUserAccess();
 		return ResponseEntity.ok().body(macroEndpointService.generateTenantAndContent(bundleString, userAccess));
 	}
 
 	@GetMapping
-	protected ResponseEntity doGet(@RequestBody String bundleString) throws ServletException, IOException {
+	protected ResponseEntity<Tenant> doGet(@RequestBody String bundleString) throws ServletException, IOException {
 		return doPost(bundleString);
 	}
 
