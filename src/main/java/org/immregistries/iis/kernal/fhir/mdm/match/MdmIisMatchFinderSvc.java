@@ -34,7 +34,7 @@ import static ca.uhn.fhir.jpa.mdm.svc.candidate.CandidateSearcher.idOrType;
 /**
  * Custom, based on MdmMatchFinderSvcImpl from Hapi-fhir v6.2.4, to allow for Immunization matching with external library
  */
-public abstract class AbstractMdmIisMatchFinderSvc<Immunization extends IAnyResource> extends MdmMatchFinderSvcImpl implements IMdmMatchFinderSvc, IMdmIisMatchFinderSvc {
+public abstract class MdmIisMatchFinderSvc<Immunization extends IAnyResource> extends MdmMatchFinderSvcImpl implements IMdmMatchFinderSvc, IMdmIisMatchFinderSvc {
 	private static final Logger ourLog = Logs.getMdmTroubleshootingLog();
 
 	@Autowired
@@ -50,7 +50,7 @@ public abstract class AbstractMdmIisMatchFinderSvc<Immunization extends IAnyReso
 
 	private final PatientMatcher patientMismoMatcher;
 
-	public AbstractMdmIisMatchFinderSvc() {
+	public MdmIisMatchFinderSvc() {
 		super();
 		InputStream is = this.getClass().getResourceAsStream("/Mismo-Configuration.yml");
 		if (is == null) {
