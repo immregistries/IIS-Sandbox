@@ -8,16 +8,15 @@ import ca.uhn.fhir.mdm.api.MatchedTarget;
 import ca.uhn.fhir.mdm.log.Logs;
 import ca.uhn.fhir.mdm.rules.svc.MdmResourceMatcherSvc;
 import jakarta.annotation.Nonnull;
-import org.apache.commons.lang3.builder.DiffResult;
 import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.hl7.fhir.r4.model.ResourceType;
 import org.immregistries.iis.kernal.logic.match.PatientMismoConversionService;
-import org.immregistries.iis.kernal.logic.validation.IisLogicInterceptor;
 import org.immregistries.iis.kernal.mapping.mappers.resources.PatientMapper;
 import org.immregistries.iis.kernal.model.ProcessingFlavor;
 import org.immregistries.mismo.match.PatientMatchResult;
 import org.immregistries.mismo.match.PatientMatcher;
 import org.immregistries.mismo.match.model.Patient;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -61,48 +60,48 @@ public abstract class MdmIisMatchFinderSvc<Immunization extends IAnyResource> ex
 	@Transactional
 	public List<MatchedTarget> getMatchedTargets(String theResourceType, IAnyResource theResource, RequestPartitionId theRequestPartitionId) {
 		Set<ProcessingFlavor> processingFlavorSet = ProcessingFlavor.getProcessingStyle(theRequestPartitionId.getFirstPartitionNameOrNull());
+		List<MatchedTarget> matches;
+
 		if (theResourceType.equals(ResourceType.Immunization.name())) {
-			List<MatchedTarget> matches = matchImmunization((Immunization) theResource, theRequestPartitionId);
-			ourLog.info("Found {} matched targets for {}.", matches.size(), idOrType(theResource, theResourceType));
-			ourLog.trace("Found {} matched targets for {}.", matches.size(), idOrType(theResource, theResourceType));
-			return matches;
+			matches = matchImmunization((Immunization) theResource, theRequestPartitionId);
 		} else if (theResourceType.equals(ResourceType.Patient.name()) && processingFlavorSet.contains(ProcessingFlavor.MISMO)) {
 			/*
 			 * Flavor check activating patient Matching with Mismo match
 			 */
-			Collection<IAnyResource> targetCandidates = myMdmCandidateSearchSvc.findCandidates(theResourceType, theResource, theRequestPartitionId);
-			Patient mismoPatient = patientMismoConversionService.convert(theResource);
-
-			List<MatchedTarget> matches = targetCandidates.stream()
-				.map((candidate) -> {
-					Patient mismoPatientCandidate = patientMismoConversionService.convert(candidate);
-					PatientMatchResult mismoMatchResult = patientMismoMatcher.match(mismoPatient, mismoPatientCandidate);
-					return new MatchedTarget(candidate, IMdmIisMatchFinderSvc.mismoResultToMdmMatchOutcome(mismoMatchResult));
-				}).collect(Collectors.toList());
-
-			ourLog.info("Found {} matched targets for {} with mismo.", matches.size(), idOrType(theResource, theResourceType));
-			ourLog.trace("Found {} matched targets for {}.", matches.size(), idOrType(theResource, theResourceType));
-			return matches;
+			matches = matchMismoPatient(theResource, theRequestPartitionId);
+			ourLog.info("Found {} matched targets for {} using mismo", matches.size(), idOrType(theResource, theResourceType));
 		} else {
 			/*
 			 * Original code for all cases
 			 */
 			Collection<IAnyResource> targetCandidates = myMdmCandidateSearchSvc.findCandidates(theResourceType, theResource, theRequestPartitionId);
-
-			List<MatchedTarget> matches = targetCandidates.stream()
+			matches = targetCandidates.stream()
 				.map(candidate -> new MatchedTarget(candidate, myMdmResourceMatcherSvc.getMatchResult(theResource, candidate)))
 				.collect(Collectors.toList());
-
-			ourLog.trace("Found {} matched targets for {}.", matches.size(), idOrType(theResource, theResourceType));
-			ourLog.info("Found {} matched targets for {}.", matches.size(), idOrType(theResource, theResourceType));
-			if (theResourceType.equals(ResourceType.Patient.name())) {
-				for (MatchedTarget matchedTarget : matches) {
-					DiffResult diff = patientMapper.localObject(theResource).diff(patientMapper.localObject(matchedTarget.getTarget()));
-					IisLogicInterceptor.printDiff(ourLog, diff);
-				}
-			}
-			return matches;
+//			if (theResourceType.equals(ResourceType.Patient.name())) {
+//				for (MatchedTarget matchedTarget : matches) {
+//					DiffResult diff = patientMapper.localObject(theResource).diff(patientMapper.localObject(matchedTarget.getTarget()));
+//					IisLogicInterceptor.printDiff(ourLog, diff);
+//				}
+//			}
 		}
+		ourLog.info("Found {} matched targets for {}.", matches.size(), idOrType(theResource, theResourceType));
+		ourLog.trace("Found {} matched targets for {}.", matches.size(), idOrType(theResource, theResourceType));
+		return matches;
+
+	}
+
+	private @NotNull List<MatchedTarget> matchMismoPatient(IAnyResource theResource, RequestPartitionId theRequestPartitionId) {
+		Collection<IAnyResource> targetCandidates = myMdmCandidateSearchSvc.findCandidates(ResourceType.Patient.name(), theResource, theRequestPartitionId);
+		Patient mismoPatient = patientMismoConversionService.convert(theResource);
+
+		List<MatchedTarget> matches = targetCandidates.stream()
+			.map((candidate) -> {
+				Patient mismoPatientCandidate = patientMismoConversionService.convert(candidate);
+				PatientMatchResult mismoMatchResult = patientMismoMatcher.match(mismoPatient, mismoPatientCandidate);
+				return new MatchedTarget(candidate, IMdmIisMatchFinderSvc.mismoResultToMdmMatchOutcome(mismoMatchResult));
+			}).collect(Collectors.toList());
+		return matches;
 	}
 
 	abstract List<MatchedTarget> matchImmunization(Immunization immunization, RequestPartitionId theRequestPartitionId);

@@ -13,6 +13,7 @@ import ca.uhn.fhir.rest.param.ReferenceParam;
 import ca.uhn.fhir.rest.param.TokenParam;
 import ca.uhn.fhir.rest.param.TokenParamModifier;
 import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
+import org.hl7.fhir.instance.model.api.IBaseReference;
 import org.hl7.fhir.r4.model.Immunization;
 import org.immregistries.iis.kernal.logic.match.VaccinationDedupConversionServiceR4;
 import org.immregistries.vaccination_deduplication.computation_classes.Deterministic;
@@ -43,7 +44,8 @@ public class MdmIisMatchFinderSvcR4 extends MdmIisMatchFinderSvc<Immunization> i
 	}
 
 	public List<MatchedTarget> matchImmunization(Immunization immunization, RequestPartitionId theRequestPartitionId) {
-		if (immunization.getPatient() == null) {
+		IBaseReference patient = immunization.getPatient();
+		if (patient == null) {
 			throw new InvalidRequestException("No patient specified");
 		}
 		Deterministic comparer = new Deterministic();
@@ -65,9 +67,9 @@ public class MdmIisMatchFinderSvcR4 extends MdmIisMatchFinderSvc<Immunization> i
 		 * or with identifier
 		 */
 		String patientParameterValue = null;
-		if (immunization.getPatient().getReference() != null) {
-			patientParameterValue = immunization.getPatient().getReference();
-		} else if (immunization.getPatient().getIdentifier() != null) {
+		if (patient.getReference() != null) {
+			patientParameterValue = patient.getReference();
+		} else if (patient.getIdentifier() != null) {
 			SystemRequestDetails patientRequestDetails = new SystemRequestDetails();
 			patientRequestDetails.setRequestPartitionId(theRequestPartitionId);
 			SearchParameterMap patientSearchParameter = new SearchParameterMap()
@@ -75,8 +77,8 @@ public class MdmIisMatchFinderSvcR4 extends MdmIisMatchFinderSvc<Immunization> i
 					.setSystem(GOLDEN_SYSTEM_TAG)
 					.setValue(GOLDEN_RECORD))
 				.add("identifier", new TokenParam()
-					.setSystem(immunization.getPatient().getIdentifier().getSystem())
-					.setValue(immunization.getPatient().getIdentifier().getValue()));
+					.setSystem(patient.getIdentifier().getSystem())
+					.setValue(patient.getIdentifier().getValue()));
 			patientParameterValue = String.join(",", patientDao.search(patientSearchParameter, patientRequestDetails).getAllResourceIds());
 		} else {
 			throw new InvalidRequestException("No patient specified");
