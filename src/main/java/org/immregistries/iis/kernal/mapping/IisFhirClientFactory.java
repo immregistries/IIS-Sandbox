@@ -13,9 +13,9 @@ import ca.uhn.fhir.rest.server.exceptions.AuthenticationException;
 import ca.uhn.fhir.rest.server.servlet.ServletRequestDetails;
 import jakarta.servlet.http.HttpServletRequest;
 import org.immregistries.iis.kernal.Application;
-
-import org.immregistries.iis.kernal.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
+import org.immregistries.iis.kernal.persisted.model.UserAccess;
+import org.immregistries.iis.kernal.security.CurrentTenantUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,8 +31,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import static org.immregistries.iis.kernal.fhir.interceptors.IisAuthorizationInterceptor.CONNECTATHON_USER;
-import static org.immregistries.iis.kernal.security.UserAccessUtil.GITHUB_PREFIX;
 import static org.immregistries.iis.kernal.security.CurrentTenantUtil.SESSION_REQUEST_TENANT;
+import static org.immregistries.iis.kernal.security.UserAccessUtil.GITHUB_PREFIX;
 
 /**
  * Generates fhir client to interact with the jpa repository
@@ -40,6 +40,8 @@ import static org.immregistries.iis.kernal.security.CurrentTenantUtil.SESSION_RE
 @Component
 public class IisFhirClientFactory extends ApacheRestfulClientFactory {
 	public static final String FHIR_CLIENT_REQUEST_ATTRIBUTE = "fhirClient";
+	public static final String CACHE_CONTROL = "Cache-Control";
+	public static final String NO_CACHE = "no-cache";
 
 	@Autowired
 	public void setFhirContext(FhirContext fhirContext) {
@@ -49,27 +51,34 @@ public class IisFhirClientFactory extends ApacheRestfulClientFactory {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	private LoggingInterceptor loggingInterceptor;
 
+	private LoggingInterceptor getLoggingInterceptor() {
+		if (loggingInterceptor == null) {
+			loggingInterceptor = new LoggingInterceptor();
+			loggingInterceptor.setLogger(logger);
+		}
+		return loggingInterceptor;
+	}
+
 	@Autowired
 	public IisFhirClientFactory() {
 		super();
 		setServerValidationMode(ServerValidationModeEnum.NEVER);
 	}
 
-	protected void asynchInit() {
-		if (loggingInterceptor == null) {
-//			super.setFhirContext(fhirContext);
-			loggingInterceptor = new LoggingInterceptor();
-			loggingInterceptor.setLogger(logger);
-		}
-	}
 
+	/**
+	 *
+	 * @param tenant             Tenant for Authorization
+	 * @param httpServletRequest HttpServletRequest to extract Server base url from
+	 * @return client
+	 */
 	public IGenericClient newGenericClient(Tenant tenant, HttpServletRequest httpServletRequest) {
-		asynchInit();
 		IGenericClient client;
 		URL serverBase = extractServerBase(tenant, httpServletRequest);
 		client = newGenericClient(serverBase.toString());
 		IClientInterceptor authInterceptor;
-		if (tenant.getOrganizationName().equals(CONNECTATHON_USER) && tenant.getUserAccess().getAccessName() == null) {
+		UserAccess userAccess = tenant.getUserAccess();
+		if (tenant.getOrganizationName().equals(CONNECTATHON_USER) && userAccess.getAccessName() == null) {
 			/**
 			 * SPECIFIC Connection User for Connectathon
 			 * specific auth when logged in with token,
@@ -77,14 +86,12 @@ public class IisFhirClientFactory extends ApacheRestfulClientFactory {
 			 *
 			 * see SessionAuthorizationInterceptor
 			 */
-			authInterceptor = new BearerTokenAuthInterceptor(tenant.getUserAccess().getAccessKey());
-		} else if (tenant.getUserAccess().getAccessName().startsWith(GITHUB_PREFIX)) {
+			authInterceptor = new BearerTokenAuthInterceptor(userAccess.getAccessKey());
+		} else if (userAccess.getAccessName().startsWith(GITHUB_PREFIX)) {
 			Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
 			authInterceptor = new BearerTokenAuthInterceptor((String) authentication.getCredentials());
 		} else {
-			authInterceptor = new BasicAuthInterceptor(tenant.getUserAccess().getAccessName(),
-					tenant.getUserAccess().getAccessKey());
+			authInterceptor = new BasicAuthInterceptor(userAccess.getAccessName(), userAccess.getAccessKey());
 		}
 		client.registerInterceptor(authInterceptor);
 		return client;
@@ -95,15 +102,14 @@ public class IisFhirClientFactory extends ApacheRestfulClientFactory {
 	 * Used for manual subscription trigger
 	 *
 	 * @param theServerBase
-	 * @return
+	 * @return unauthorized client
 	 */
 	@Override
 	public synchronized IGenericClient newGenericClient(String theServerBase) {
-		asynchInit();
 		IGenericClient client = super.newGenericClient(theServerBase);
-		client.registerInterceptor(loggingInterceptor);
+		client.registerInterceptor(getLoggingInterceptor());
 		AdditionalRequestHeadersInterceptor interceptor = new AdditionalRequestHeadersInterceptor();
-		interceptor.addHeaderValue("Cache-Control", "no-cache");
+		interceptor.addHeaderValue(CACHE_CONTROL, NO_CACHE);
 		client.registerInterceptor(interceptor);
 		return client;
 	}
@@ -115,7 +121,6 @@ public class IisFhirClientFactory extends ApacheRestfulClientFactory {
 	}
 
 	public IGenericClient getOrCreateGenericClient(HttpServletRequest request) {
-		asynchInit();
 		if (request.getAttribute(FHIR_CLIENT_REQUEST_ATTRIBUTE) == null) {
 			Tenant tenant = CurrentTenantUtil.getTenant(request);
 			if (tenant != null) {
@@ -134,7 +139,6 @@ public class IisFhirClientFactory extends ApacheRestfulClientFactory {
 	 * @return
 	 */
 	public IGenericClient getOrCreateGenericClient(ServletRequestDetails theRequestDetails) {
-		asynchInit();
 		Tenant tenant = (Tenant) theRequestDetails.getAttribute(SESSION_REQUEST_TENANT);
 		if (tenant == null) {
 			throw new AuthenticationException();
