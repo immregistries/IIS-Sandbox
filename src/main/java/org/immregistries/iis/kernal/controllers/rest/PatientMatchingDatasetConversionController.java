@@ -7,7 +7,7 @@ import ca.uhn.fhir.rest.api.server.IBundleProvider;
 import jakarta.servlet.http.HttpServletResponse;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r5.model.Bundle;
-import org.immregistries.iis.kernal.logic.PatientMismoConversionService;
+import org.immregistries.iis.kernal.logic.match.PatientMismoConversionService;
 import org.immregistries.iis.kernal.mapping.requesters.FhirSearchRequester;
 import org.immregistries.iis.kernal.security.CurrentTenantUtil;
 import org.immregistries.mismo.match.model.Patient;

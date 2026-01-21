@@ -1,17 +1,12 @@
 package org.immregistries.iis.kernal.controllers.rest;
 
 import jakarta.servlet.http.HttpServletRequest;
+import org.immregistries.iis.kernal.logic.match.VaccinationDedupService;
 import org.immregistries.iis.kernal.persisted.model.Tenant;
-import org.immregistries.vaccination_deduplication.Immunization;
 import org.immregistries.vaccination_deduplication.LinkedImmunization;
-import org.immregistries.vaccination_deduplication.VaccinationDeduplication;
-import org.immregistries.vaccination_deduplication.reference.ImmunizationSource;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import static org.immregistries.iis.kernal.security.CurrentTenantUtil.SESSION_REQUEST_TENANT;
@@ -22,77 +17,17 @@ public class VacDedupRestController {
 
 	public static final String VAC_DEDUP_PATH = "/vacDedup";
 
-	public static final String ALGORITHM_DETERMINISTIC = "Deterministic";
-	public static final String ALGORITHM_WEIGHTED = "Weighted";
-	public static final String ALGORITHM_HYBRID = "Hybrid";
+
+	@Autowired
+	private VaccinationDedupService vaccinationDedupService;
 
 	@PostMapping
 	public List<LinkedImmunization> deduplicate(
 		@RequestAttribute(name = SESSION_REQUEST_TENANT) Tenant tenant,
-		@RequestBody VacDedupRequest request,
+		@RequestBody VacDedupRequest vacDedupRequest,
 		HttpServletRequest req) {
 
-		if (tenant == null) {
-			throw new RuntimeException("Access is not authorized");
-		}
-
-		LinkedImmunization immunizationList = new LinkedImmunization();
-		SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
-
-		if (request.getImmunizations() != null) {
-			for (VacDedupRequest.ImmunizationItem item : request.getImmunizations()) {
-				Date date = null;
-				try {
-					if (item.getDate() != null && !item.getDate().isEmpty()) {
-						date = sdf.parse(item.getDate());
-					}
-				} catch (ParseException pe) {
-					// Ignore or handle error
-				}
-
-				if (date != null && item.getCvx() != null && !item.getCvx().isEmpty()) {
-					Immunization immunization = new Immunization();
-					immunization.setCVX(item.getCvx());
-					immunization.setDate(date);
-					immunization.setMVX(item.getMvx());
-					immunization.setLotNumber(item.getLot());
-					immunization.setOrganisationID(item.getOrg());
-
-					ImmunizationSource source = ImmunizationSource.HISTORICAL;
-					if (item.getSource() != null && !item.getSource().isEmpty()) {
-						try {
-							source = ImmunizationSource.valueOf(item.getSource());
-						} catch (IllegalArgumentException e) {
-							// default to HISTORICAL
-						}
-					}
-					immunization.setSource(source);
-					immunizationList.add(immunization);
-				}
-			}
-		}
-
-		ArrayList<LinkedImmunization> immunizationListResults = new ArrayList<>();
-		if (immunizationList.size() > 1) {
-			VaccinationDeduplication vaccinationDeduplication = new VaccinationDeduplication();
-			String algorithm = request.getAlgorithm();
-			if (algorithm == null) {
-				algorithm = ALGORITHM_DETERMINISTIC;
-			}
-
-			switch (algorithm) {
-				case ALGORITHM_DETERMINISTIC:
-					immunizationListResults = vaccinationDeduplication.deduplicateDeterministic(immunizationList);
-					break;
-				case ALGORITHM_WEIGHTED:
-					immunizationListResults = vaccinationDeduplication.deduplicateWeighted(immunizationList);
-					break;
-				case ALGORITHM_HYBRID:
-					immunizationListResults = vaccinationDeduplication.deduplicateHybrid(immunizationList);
-					break;
-			}
-		}
-		return immunizationListResults;
+		return vaccinationDedupService.getLinkedImmunizations(vacDedupRequest);
 	}
 
 	public static class VacDedupRequest {

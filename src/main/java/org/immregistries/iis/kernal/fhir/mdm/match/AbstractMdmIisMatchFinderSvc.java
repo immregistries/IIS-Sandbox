@@ -11,7 +11,7 @@ import jakarta.annotation.Nonnull;
 import org.apache.commons.lang3.builder.DiffResult;
 import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.hl7.fhir.r4.model.ResourceType;
-import org.immregistries.iis.kernal.logic.PatientMismoConversionService;
+import org.immregistries.iis.kernal.logic.match.PatientMismoConversionService;
 import org.immregistries.iis.kernal.logic.validation.IisLogicInterceptor;
 import org.immregistries.iis.kernal.logic.validation.PatientProcessingInterceptor;
 import org.immregistries.iis.kernal.mapping.mappers.resources.PatientMapper;
