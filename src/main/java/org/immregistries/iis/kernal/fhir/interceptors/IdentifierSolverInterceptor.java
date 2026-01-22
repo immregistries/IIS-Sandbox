@@ -108,7 +108,6 @@ public abstract class IdentifierSolverInterceptor<Patient extends IDomainResourc
 	public String solvePatientIdentifier(RequestDetails requestDetails, BusinessIdentifier identifier) {
 		RequestPartitionId thePartitionId = RequestPartitionId.fromPartitionName(PartitionTenantCreationInterceptor.extractPartitionName(requestDetails));
 		return solvePatientIdentifier(thePartitionId, identifier);
-
 	}
 
 	/**

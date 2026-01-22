@@ -1,6 +1,5 @@
 package org.immregistries.iis.kernal.fhir.interceptors;
 
-import ca.uhn.fhir.jpa.api.dao.IFhirResourceDao;
 import ca.uhn.fhir.rest.api.server.RequestDetails;
 import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
 import jakarta.interceptor.Interceptor;
@@ -8,7 +7,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.r4.model.*;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
 import org.immregistries.iis.kernal.mapping.mappers.fields.BusinessIdentifierMapper;
-import org.immregistries.iis.kernal.mapping.mappers.fields.ModelReferenceMapper;
 import org.immregistries.iis.kernal.mapping.mappers.resources.ImmunizationMapper;
 import org.immregistries.iis.kernal.model.BusinessIdentifier;
 import org.immregistries.iis.kernal.model.ModelReference;
@@ -27,11 +25,7 @@ public class IdentifierSolverInterceptorR4 extends IdentifierSolverInterceptor<P
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	@Autowired
-	private IFhirResourceDao<Patient> patientDao;
-	@Autowired
 	private BusinessIdentifierMapper<Identifier> businessIdentifierMapper;
-	@Autowired
-	private ModelReferenceMapper<Reference> modelReferenceMapper;
 	@Autowired
 	private ImmunizationMapper<Immunization> immunizationMapper;
 
