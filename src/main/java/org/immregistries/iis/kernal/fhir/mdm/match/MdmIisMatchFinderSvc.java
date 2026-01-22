@@ -24,7 +24,7 @@ import org.immregistries.iis.kernal.logic.match.PatientMismoConversionService;
 import org.immregistries.iis.kernal.logic.match.VaccinationDedupConversionService;
 import org.immregistries.iis.kernal.mapping.mappers.resources.ImmunizationMapper;
 import org.immregistries.iis.kernal.mapping.mappers.resources.PatientMapper;
-import org.immregistries.iis.kernal.model.IisReference;
+import org.immregistries.iis.kernal.model.ModelReference;
 import org.immregistries.iis.kernal.model.ProcessingFlavor;
 import org.immregistries.mismo.match.PatientMatchResult;
 import org.immregistries.mismo.match.PatientMatcher;
@@ -140,7 +140,7 @@ public class MdmIisMatchFinderSvc<FhirImmunization extends IAnyResource, FhirPat
 	}
 
 	public List<MatchedTarget> matchImmunization(FhirImmunization immunization, RequestPartitionId theRequestPartitionId) {
-		IisReference patient = immunizationMapper.extractPatientReference(immunization);
+		ModelReference patient = immunizationMapper.extractPatientReference(immunization);
 		if (patient == null) {
 			throw new InvalidRequestException("No patient specified");
 		}

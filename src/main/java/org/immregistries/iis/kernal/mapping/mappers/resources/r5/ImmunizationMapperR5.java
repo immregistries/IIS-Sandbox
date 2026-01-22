@@ -8,13 +8,13 @@ import org.immregistries.iis.kernal.fhir.common.annotations.OnR5Condition;
 import org.immregistries.iis.kernal.logic.CodeMapManagerService;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
 import org.immregistries.iis.kernal.mapping.mappers.fields.r5.BusinessIdentifierMapperR5;
-import org.immregistries.iis.kernal.mapping.mappers.fields.r5.IisReferenceMapperR5;
+import org.immregistries.iis.kernal.mapping.mappers.fields.r5.ModelReferenceMapperR5;
 import org.immregistries.iis.kernal.mapping.mappers.resources.ImmunizationMapper;
 import org.immregistries.iis.kernal.mapping.requesters.FhirReadRequester;
 import org.immregistries.iis.kernal.model.BusinessIdentifier;
-import org.immregistries.iis.kernal.model.IisReference;
 import org.immregistries.iis.kernal.model.IisVaccination;
 import org.immregistries.iis.kernal.model.ModelPerson;
+import org.immregistries.iis.kernal.model.ModelReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +36,7 @@ public class ImmunizationMapperR5 extends ImmunizationMapper<Immunization> imple
 	@Autowired
 	private BusinessIdentifierMapperR5 businessIdentifierMapper;
 	@Autowired
-	private IisReferenceMapperR5 iisReferenceMapperR5;
+	private ModelReferenceMapperR5 modelReferenceMapperR5;
 
 	public void fillFromFhirResource(IisVaccination vr, Immunization i) {
 		/*
@@ -450,8 +450,8 @@ public class ImmunizationMapperR5 extends ImmunizationMapper<Immunization> imple
 	}
 
 	@Override
-	public IisReference extractPatientReference(Immunization immunization) {
-		return iisReferenceMapperR5.localObject(immunization.getPatient());
+	public ModelReference extractPatientReference(Immunization immunization) {
+		return modelReferenceMapperR5.localObject(immunization.getPatient());
 	}
 
 	private Immunization.ImmunizationPerformerComponent performer(ModelPerson person, String functionCode,

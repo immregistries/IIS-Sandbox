@@ -5,8 +5,8 @@ import ca.uhn.fhir.rest.param.TokenParam;
 import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.immregistries.iis.kernal.mapping.requesters.FhirRequesterUtil;
 import org.immregistries.iis.kernal.mapping.requesters.FhirSearchRequester;
-import org.immregistries.iis.kernal.model.IisReference;
 import org.immregistries.iis.kernal.model.IisVaccination;
+import org.immregistries.iis.kernal.model.ModelReference;
 import org.immregistries.iis.kernal.model.VaccinationMaster;
 import org.immregistries.iis.kernal.model.VaccinationReported;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -108,7 +108,7 @@ public abstract class ImmunizationMapper<Immunization extends IAnyResource>
 	 */
 	public abstract Immunization fhirObject(IisVaccination vaccinationMaster);
 
-	public abstract IisReference extractPatientReference(Immunization immunization);
+	public abstract ModelReference extractPatientReference(Immunization immunization);
 
 	public abstract void fillFromFhirResource(IisVaccination localPatient, Immunization immunization);
 }

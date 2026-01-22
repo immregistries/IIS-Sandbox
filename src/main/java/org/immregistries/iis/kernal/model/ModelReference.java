@@ -1,6 +1,6 @@
 package org.immregistries.iis.kernal.model;
 
-public class IisReference extends IisMappedToFhir {
+public class ModelReference extends IisMappedToFhir {
 	private String reference = "";
 	private BusinessIdentifier identifier;
 
