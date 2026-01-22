@@ -4,7 +4,7 @@ import org.hl7.fhir.r4.model.Organization;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
 import org.immregistries.iis.kernal.mapping.mappers.resources.OrganizationMapper;
-import org.immregistries.iis.kernal.persisted.model.Tenant;
+import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Service;
 

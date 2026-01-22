@@ -12,7 +12,7 @@ import org.immregistries.iis.kernal.controllers.servlet.util.UiUtil;
 import org.immregistries.iis.kernal.controllers.servlet.util.UrlTenantUtil;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR5Condition;
 import org.immregistries.iis.kernal.mapping.IisFhirClientFactory;
-import org.immregistries.iis.kernal.persisted.model.Tenant;
+import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.immregistries.iis.kernal.security.CurrentTenantUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;

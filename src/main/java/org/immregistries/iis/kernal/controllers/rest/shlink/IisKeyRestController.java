@@ -2,11 +2,11 @@ package org.immregistries.iis.kernal.controllers.rest.shlink;
 
 import org.immregistries.iis.kernal.controllers.filters.RestTenantUrlFilter;
 import org.immregistries.iis.kernal.controllers.rest.RestUrlUtil;
-import org.immregistries.iis.kernal.security.UserAccessUtil;
 import org.immregistries.iis.kernal.logic.KeyStoreService;
-import org.immregistries.iis.kernal.persisted.model.IisKey;
-import org.immregistries.iis.kernal.persisted.model.Tenant;
-import org.immregistries.iis.kernal.persisted.model.UserAccess;
+import org.immregistries.iis.kernal.persisted.entities.IisKey;
+import org.immregistries.iis.kernal.persisted.entities.Tenant;
+import org.immregistries.iis.kernal.persisted.entities.UserAccess;
+import org.immregistries.iis.kernal.security.UserAccessUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

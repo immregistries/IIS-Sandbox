@@ -3,7 +3,7 @@ package org.immregistries.iis.kernal.controllers.rest;
 import jakarta.validation.constraints.NotBlank;
 import org.hl7.fhir.instance.model.api.IBaseParameters;
 import org.immregistries.iis.kernal.logic.TenantCompareService;
-import org.immregistries.iis.kernal.persisted.model.UserAccess;
+import org.immregistries.iis.kernal.persisted.entities.UserAccess;
 import org.immregistries.iis.kernal.security.UserAccessUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

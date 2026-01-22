@@ -6,7 +6,7 @@ import org.immregistries.iis.kernal.model.BusinessIdentifier;
 import org.immregistries.iis.kernal.model.IisPatient;
 import org.immregistries.iis.kernal.model.IisRecommendation;
 import org.immregistries.iis.kernal.model.IisVaccination;
-import org.immregistries.iis.kernal.persisted.model.Tenant;
+import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.immregistries.vfa.connect.model.ForecastActual;
 import org.jetbrains.annotations.NotNull;
 

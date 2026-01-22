@@ -6,7 +6,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.immregistries.iis.kernal.controllers.filters.RestTenantUrlFilter;
 import org.immregistries.iis.kernal.logic.v2.BaseIISSOAPServer;
 import org.immregistries.iis.kernal.logic.v2.handling.V2IncomingMessageHandler;
-import org.immregistries.iis.kernal.persisted.model.Tenant;
+import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.immregistries.iis.kernal.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.security.TenantAuthService;
 import org.immregistries.smm.cdc.CDCWSDLServer;

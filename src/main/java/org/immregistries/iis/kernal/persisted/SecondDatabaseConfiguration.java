@@ -21,9 +21,15 @@ import java.util.HashMap;
 
 @Configuration
 // @PropertySource({"application.properties"})
-@EntityScan("org.immregistries.iis.kernal.persisted.model")
-@EnableJpaRepositories(basePackages = "org.immregistries.iis.kernal.persisted.repository", entityManagerFactoryRef = "iisLocalEntityManager", transactionManagerRef = "iisLocalTransactionManager")
+@EntityScan(SecondDatabaseConfiguration.ENTITIES_PACKAGE)
+@EnableJpaRepositories(basePackages = SecondDatabaseConfiguration.REPOSITORIES_PACKAGE, entityManagerFactoryRef = SecondDatabaseConfiguration.IIS_LOCAL_ENTITY_MANAGER, transactionManagerRef = SecondDatabaseConfiguration.IIS_LOCAL_TRANSACTION_MANAGER)
 public class SecondDatabaseConfiguration {
+	public static final String ENTITIES_PACKAGE = "org.immregistries.iis.kernal.persisted.entities";
+	public static final String REPOSITORIES_PACKAGE = "org.immregistries.iis.kernal.persisted.repository";
+	public static final String IIS_LOCAL_ENTITY_MANAGER = "iisLocalEntityManager";
+	public static final String IIS_LOCAL_TRANSACTION_MANAGER = "iisLocalTransactionManager";
+	public static final String IIS_LOCAL_DATA_SOURCE = "iisLocalDataSource";
+	public static final String SPRING_SECOND_DATASOURCE = "spring.second-datasource";
 	@Autowired
 	private Environment env;
 
@@ -34,34 +40,30 @@ public class SecondDatabaseConfiguration {
 	private static SessionFactory sessionFactory = null;
 
 	@Bean
-	@ConfigurationProperties(prefix = "spring.second-datasource")
+	@ConfigurationProperties(prefix = SPRING_SECOND_DATASOURCE)
 	public DataSource iisLocalDataSource() {
 		return DataSourceBuilder.create().build();
 	}
 
 	@Bean
 	public LocalContainerEntityManagerFactoryBean iisLocalEntityManager(
-			@Qualifier("iisLocalDataSource") DataSource dataSource) {
+		@Qualifier(IIS_LOCAL_DATA_SOURCE) DataSource dataSource) {
 		LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
 		em.setDataSource(dataSource);
-		em.setPackagesToScan(
-			new String[]{"org.immregistries.iis.kernal.persisted.model", "org.immregistries.iis.kernal.persisted.repository"});
+		em.setPackagesToScan(ENTITIES_PACKAGE, REPOSITORIES_PACKAGE);
 
 		HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
 		em.setJpaVendorAdapter(vendorAdapter);
 		HashMap<String, Object> properties = new HashMap<>();
-		properties.put("hibernate.hbm2ddl.auto",
-				env.getProperty("hibernate.hbm2ddl.auto"));
-		properties.put("hibernate.dialect",
-				env.getProperty("hibernate.dialect"));
+		properties.put("hibernate.hbm2ddl.auto", env.getProperty("hibernate.hbm2ddl.auto"));
+		properties.put("hibernate.dialect", env.getProperty("hibernate.dialect"));
 		em.setJpaPropertyMap(properties);
-
 		return em;
 	}
 
 	@Bean
 	public PlatformTransactionManager iisLocalTransactionManager(
-			@Qualifier("iisLocalEntityManager") LocalContainerEntityManagerFactoryBean entityManagerFactory) {
+		@Qualifier(IIS_LOCAL_ENTITY_MANAGER) LocalContainerEntityManagerFactoryBean entityManagerFactory) {
 		JpaTransactionManager transactionManager = new JpaTransactionManager();
 		transactionManager.setEntityManagerFactory(
 				entityManagerFactory.getObject());
@@ -70,7 +72,7 @@ public class SecondDatabaseConfiguration {
 
 	@Bean
 	public SessionFactory sessionFactory(
-			@Qualifier("iisLocalEntityManager") EntityManagerFactory entityManagerFactory) {
+		@Qualifier(IIS_LOCAL_ENTITY_MANAGER) EntityManagerFactory entityManagerFactory) {
 		// The LCEFBean produces an EntityManagerFactory.
 		// If the provider is Hibernate, this object is also a SessionFactory.
 

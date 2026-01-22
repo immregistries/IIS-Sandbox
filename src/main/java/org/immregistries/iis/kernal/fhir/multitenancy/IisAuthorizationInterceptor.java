@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal.fhir.interceptors;
+package org.immregistries.iis.kernal.fhir.multitenancy;
 
 import ca.uhn.fhir.i18n.Msg;
 import ca.uhn.fhir.rest.api.server.RequestDetails;
@@ -13,8 +13,8 @@ import jakarta.servlet.http.HttpSession;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.Strings;
 import org.apache.http.auth.AuthenticationException;
-import org.immregistries.iis.kernal.persisted.model.Tenant;
-import org.immregistries.iis.kernal.persisted.model.UserAccess;
+import org.immregistries.iis.kernal.persisted.entities.Tenant;
+import org.immregistries.iis.kernal.persisted.entities.UserAccess;
 import org.immregistries.iis.kernal.persisted.repository.TenantRepository;
 import org.immregistries.iis.kernal.persisted.repository.UserAccessRepository;
 import org.immregistries.iis.kernal.security.JwtUtils;

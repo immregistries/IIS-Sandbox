@@ -10,9 +10,9 @@ import org.immregistries.iis.kernal.controllers.rest.shlink.ShLinkRestController
 import org.immregistries.iis.kernal.controllers.servlet.TenantController;
 import org.immregistries.iis.kernal.controllers.servlet.util.UiQrCodeUtil;
 import org.immregistries.iis.kernal.controllers.servlet.util.UiUtil;
+import org.immregistries.iis.kernal.persisted.entities.IisKey;
+import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.immregistries.iis.kernal.security.CurrentTenantUtil;
-import org.immregistries.iis.kernal.persisted.model.IisKey;
-import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,7 +1,7 @@
 package org.immregistries.iis.kernal.persisted.repository;
 
-import org.immregistries.iis.kernal.persisted.model.MessageReceived;
-import org.immregistries.iis.kernal.persisted.model.Tenant;
+import org.immregistries.iis.kernal.persisted.entities.MessageReceived;
+import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

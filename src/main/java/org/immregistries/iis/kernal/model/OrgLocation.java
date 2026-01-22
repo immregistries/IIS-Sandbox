@@ -1,6 +1,6 @@
 package org.immregistries.iis.kernal.model;
 
-import org.immregistries.iis.kernal.persisted.model.Tenant;
+import org.immregistries.iis.kernal.persisted.entities.Tenant;
 
 import java.io.Serializable;
 

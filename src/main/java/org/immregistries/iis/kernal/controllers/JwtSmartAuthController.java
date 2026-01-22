@@ -16,9 +16,9 @@ import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import org.immregistries.iis.kernal.Application;
+import org.immregistries.iis.kernal.persisted.entities.UserAccess;
 import org.immregistries.iis.kernal.security.JwtUtils;
 import org.immregistries.iis.kernal.security.UserAccessUtil;
-import org.immregistries.iis.kernal.persisted.model.UserAccess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +35,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import static org.immregistries.iis.kernal.fhir.interceptors.IisAuthorizationInterceptor.CONNECTATHON_USER;
+import static org.immregistries.iis.kernal.fhir.multitenancy.IisAuthorizationInterceptor.CONNECTATHON_USER;
 
 /**
  * Used for SMART AUTH, and testing around keystores

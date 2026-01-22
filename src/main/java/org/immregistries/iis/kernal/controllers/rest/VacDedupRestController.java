@@ -2,7 +2,7 @@ package org.immregistries.iis.kernal.controllers.rest;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.immregistries.iis.kernal.logic.match.VaccinationDedupService;
-import org.immregistries.iis.kernal.persisted.model.Tenant;
+import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.immregistries.vaccination_deduplication.LinkedImmunization;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

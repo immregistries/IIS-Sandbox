@@ -6,13 +6,13 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.constraints.NotBlank;
 import org.immregistries.iis.kernal.Application;
+import org.immregistries.iis.kernal.controllers.rest.TenantRestController;
+import org.immregistries.iis.kernal.controllers.servlet.util.UiUtil;
+import org.immregistries.iis.kernal.persisted.entities.Tenant;
+import org.immregistries.iis.kernal.persisted.entities.UserAccess;
 import org.immregistries.iis.kernal.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.security.TenantAuthService;
 import org.immregistries.iis.kernal.security.UserAccessUtil;
-import org.immregistries.iis.kernal.persisted.model.Tenant;
-import org.immregistries.iis.kernal.persisted.model.UserAccess;
-import org.immregistries.iis.kernal.controllers.rest.TenantRestController;
-import org.immregistries.iis.kernal.controllers.servlet.util.UiUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

@@ -1,7 +1,7 @@
 package org.immregistries.iis.kernal.persisted.repository;
 
-import org.immregistries.iis.kernal.persisted.model.IisKey;
-import org.immregistries.iis.kernal.persisted.model.UserAccess;
+import org.immregistries.iis.kernal.persisted.entities.IisKey;
+import org.immregistries.iis.kernal.persisted.entities.UserAccess;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

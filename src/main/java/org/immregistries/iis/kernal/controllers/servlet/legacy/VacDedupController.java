@@ -3,16 +3,17 @@ package org.immregistries.iis.kernal.controllers.servlet.legacy;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.immregistries.iis.kernal.controllers.rest.VacDedupRestController;
 import org.immregistries.iis.kernal.controllers.servlet.TenantController;
+import org.immregistries.iis.kernal.persisted.entities.Tenant;
+import org.immregistries.iis.kernal.security.CurrentTenantUtil;
 import org.immregistries.vaccination_deduplication.Immunization;
 import org.immregistries.vaccination_deduplication.LinkedImmunization;
-
 import org.immregistries.vaccination_deduplication.reference.ImmunizationSource;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.immregistries.iis.kernal.controllers.rest.VacDedupRestController;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
@@ -22,9 +23,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
-import org.immregistries.iis.kernal.security.CurrentTenantUtil;
-import org.immregistries.iis.kernal.persisted.model.Tenant;
 
 @RestController
 @RequestMapping({ "/vacDedup", TenantController.TENANT_PATH + "/vacDedup" })

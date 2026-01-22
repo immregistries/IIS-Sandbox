@@ -6,15 +6,15 @@ import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.immregistries.iis.kernal.Application;
+import org.immregistries.iis.kernal.controllers.rest.RestUrlUtil;
+import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.immregistries.iis.kernal.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.security.TenantAuthService;
-import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.filter.OncePerRequestFilter;
-import org.immregistries.iis.kernal.controllers.rest.RestUrlUtil;
 
 import java.io.IOException;
 

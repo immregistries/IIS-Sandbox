@@ -9,7 +9,7 @@ import org.immregistries.iis.kernal.controllers.rest.RestUrlUtil;
 import org.immregistries.iis.kernal.logic.shlink.CompressionService;
 import org.immregistries.iis.kernal.logic.shlink.PatientShLinkService;
 import org.immregistries.iis.kernal.mapping.IisFhirClientFactory;
-import org.immregistries.iis.kernal.persisted.model.Tenant;
+import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.immregistries.iis.kernal.security.CurrentTenantUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;

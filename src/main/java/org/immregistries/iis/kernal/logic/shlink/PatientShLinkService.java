@@ -7,7 +7,7 @@ import org.immregistries.iis.kernal.Application;
 import org.immregistries.iis.kernal.controllers.rest.RestUrlUtil;
 import org.immregistries.iis.kernal.controllers.rest.shlink.PatientShLinkManifestRestController;
 import org.immregistries.iis.kernal.fhir.shl.ShLinkPayload;
-import org.immregistries.iis.kernal.persisted.model.Tenant;
+import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 

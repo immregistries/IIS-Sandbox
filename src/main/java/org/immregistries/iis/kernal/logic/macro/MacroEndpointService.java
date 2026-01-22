@@ -1,7 +1,7 @@
 package org.immregistries.iis.kernal.logic.macro;
 
-import org.immregistries.iis.kernal.persisted.model.Tenant;
-import org.immregistries.iis.kernal.persisted.model.UserAccess;
+import org.immregistries.iis.kernal.persisted.entities.Tenant;
+import org.immregistries.iis.kernal.persisted.entities.UserAccess;
 import org.jetbrains.annotations.NotNull;
 
 public interface MacroEndpointService {

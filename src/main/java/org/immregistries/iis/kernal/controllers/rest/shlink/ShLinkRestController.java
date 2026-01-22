@@ -2,18 +2,21 @@ package org.immregistries.iis.kernal.controllers.rest.shlink;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
-import org.immregistries.iis.kernal.security.CurrentTenantUtil;
-import org.immregistries.iis.kernal.security.UserAccessUtil;
+import org.immregistries.iis.kernal.controllers.rest.RestUrlUtil;
 import org.immregistries.iis.kernal.logic.shlink.CompressionService;
 import org.immregistries.iis.kernal.logic.shlink.ShLinkUtilService;
-import org.immregistries.iis.kernal.persisted.model.Tenant;
-import org.immregistries.iis.kernal.persisted.model.UserAccess;
+import org.immregistries.iis.kernal.persisted.entities.Tenant;
+import org.immregistries.iis.kernal.persisted.entities.UserAccess;
+import org.immregistries.iis.kernal.security.CurrentTenantUtil;
+import org.immregistries.iis.kernal.security.UserAccessUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.*;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.immregistries.iis.kernal.controllers.rest.RestUrlUtil;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

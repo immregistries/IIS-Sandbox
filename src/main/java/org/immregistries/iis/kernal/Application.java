@@ -11,7 +11,7 @@ import org.immregistries.iis.kernal.controllers.filters.FilterRegistrationConfig
 import org.immregistries.iis.kernal.fhir.ServerConfig;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnEitherVersion;
 import org.immregistries.iis.kernal.fhir.mdm.MdmConfig;
-import org.immregistries.iis.kernal.persisted.model.Tenant;
+import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.immregistries.iis.kernal.security.ServerSecurityConfig;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;

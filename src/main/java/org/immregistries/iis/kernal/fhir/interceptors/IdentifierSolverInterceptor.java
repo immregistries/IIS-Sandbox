@@ -17,6 +17,7 @@ import org.apache.commons.lang3.Strings;
 import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.hl7.fhir.instance.model.api.IDomainResource;
 import org.hl7.fhir.r4.model.ResourceType;
+import org.immregistries.iis.kernal.fhir.multitenancy.PartitionTenantCreationInterceptor;
 import org.immregistries.iis.kernal.mapping.mappers.resources.ImmunizationMapper;
 import org.immregistries.iis.kernal.model.BusinessIdentifier;
 import org.slf4j.Logger;

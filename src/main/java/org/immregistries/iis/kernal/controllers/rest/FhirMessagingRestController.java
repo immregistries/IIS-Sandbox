@@ -13,7 +13,7 @@ import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
 import org.immregistries.iis.kernal.logic.v2.BaseIISSOAPServer;
 import org.immregistries.iis.kernal.logic.v2.handling.FhirMessagingHandler;
 import org.immregistries.iis.kernal.logic.v2.handling.V2IncomingMessageHandler;
-import org.immregistries.iis.kernal.persisted.model.Tenant;
+import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.immregistries.iis.kernal.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.security.TenantAuthService;
 import org.immregistries.smm.cdc.CDCWSDLServer;

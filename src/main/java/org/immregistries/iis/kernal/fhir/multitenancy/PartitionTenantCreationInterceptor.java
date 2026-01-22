@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal.fhir.interceptors;
+package org.immregistries.iis.kernal.fhir.multitenancy;
 
 import ca.uhn.fhir.i18n.Msg;
 import ca.uhn.fhir.interceptor.api.Hook;
@@ -19,8 +19,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import static org.immregistries.iis.kernal.fhir.interceptors.IisAuthorizationInterceptor.CONNECTATHON_USER;
-import static org.immregistries.iis.kernal.fhir.interceptors.IisAuthorizationInterceptor.DEFAULT_USER;
+import static org.immregistries.iis.kernal.fhir.multitenancy.IisAuthorizationInterceptor.CONNECTATHON_USER;
+import static org.immregistries.iis.kernal.fhir.multitenancy.IisAuthorizationInterceptor.DEFAULT_USER;
 
 /**
  * Intercepts requests, checks if partition aimed at exists, otherwise creates new partition

@@ -2,7 +2,7 @@ package org.immregistries.iis.kernal.controllers.rest;
 
 import org.apache.commons.lang3.Strings;
 import org.immregistries.iis.kernal.Application;
-import org.immregistries.iis.kernal.persisted.model.Tenant;
+import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.jetbrains.annotations.NotNull;
 
 public class RestUrlUtil {

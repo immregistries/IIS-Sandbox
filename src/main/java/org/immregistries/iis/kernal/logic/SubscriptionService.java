@@ -13,7 +13,7 @@ import org.hl7.fhir.instance.model.api.IBaseParameters;
 import org.hl7.fhir.instance.model.api.IPrimitiveType;
 import org.hl7.fhir.r5.model.*;
 import org.immregistries.iis.kernal.mapping.IisFhirClientFactory;
-import org.immregistries.iis.kernal.persisted.model.Tenant;
+import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.immregistries.iis.kernal.security.TenantAuthService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

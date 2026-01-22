@@ -2,8 +2,8 @@ package org.immregistries.iis.kernal.logic.v2;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
+import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.immregistries.iis.kernal.security.TenantAuthService;
-import org.immregistries.iis.kernal.persisted.model.Tenant;
 import org.immregistries.smm.cdc.*;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;

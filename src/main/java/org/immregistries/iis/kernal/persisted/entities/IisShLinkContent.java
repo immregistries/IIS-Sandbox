@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal.persisted.model;
+package org.immregistries.iis.kernal.persisted.entities;
 
 import jakarta.persistence.*;
 

@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal.persisted.model;
+package org.immregistries.iis.kernal.persisted.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
