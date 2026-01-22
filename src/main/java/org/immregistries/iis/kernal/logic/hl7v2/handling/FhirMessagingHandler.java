@@ -92,6 +92,12 @@ public class FhirMessagingHandler extends IncomingMessageHandler<Bundle, Object>
 	}
 
 	@Override
+	public IIdType readResponsibleOrganizationIIdType(Tenant tenant, Bundle bundle, String sendingFacilityName) throws ProcessingException {
+		return null;
+		//TODO
+	}
+
+	@Override
 	public PatientReported processPatient(Tenant tenant, Bundle bundle, List<IisReportable> iisReportableList,
 			Set<ProcessingFlavor> processingFlavorSet, CodeMap codeMap, boolean strictDate,
 			IIdType managingOrganizationId) throws ProcessingException {

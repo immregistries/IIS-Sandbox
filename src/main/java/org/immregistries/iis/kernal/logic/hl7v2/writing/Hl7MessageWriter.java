@@ -9,8 +9,6 @@ import org.immregistries.codebase.client.reference.CodeStatusValue;
 import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.SoftwareVersion;
 import org.immregistries.iis.kernal.logic.CodeMapManagerService;
-import org.immregistries.iis.kernal.mapping.IisFhirClientFactory;
-import org.immregistries.iis.kernal.mapping.mappers.resources.ObservationMapper;
 import org.immregistries.iis.kernal.mapping.requesters.FhirSearchRequester;
 import org.immregistries.iis.kernal.model.*;
 import org.immregistries.iis.kernal.model.enums.ProcessingFlavor;
@@ -33,17 +31,11 @@ public class Hl7MessageWriter implements IExampleMessageWriter {
 	private static Integer increment = 1;
 
 	@Autowired
-	IisFhirClientFactory iisFhirClientFactory;
-	@Autowired
-	ObservationMapper observationMapper;
-	@Autowired
 	private CodeMapManagerService codeMapManagerService;
-
-
 	@Autowired
-	FhirSearchRequester fhirSearchRequester;
+	private FhirSearchRequester fhirSearchRequester;
 
-	Random random = new Random();
+	private Random random = new Random();
 
 	private static int nextIncrement() {
 		synchronized (increment) {

@@ -25,7 +25,7 @@ import static org.immregistries.iis.kernal.fhir.immds.IRecommendationForecastPro
 
 @Service
 @Conditional(OnR5Condition.class)
-public class CdsQueryServiceR5 implements  CdsQueryService<ImmunizationRecommendation, Parameters> {
+public class CdsQueryServiceR5 extends CdsQueryService<ImmunizationRecommendation, Parameters> {
 
 	@Autowired
 	private ImmunizationRecommendationMapperR5 immunizationRecommendationMapperR5;
@@ -48,7 +48,7 @@ public class CdsQueryServiceR5 implements  CdsQueryService<ImmunizationRecommend
 
 	public Parameters queryCds(Tenant tenant, Date date, IisPatient iisPatient,
 																	 List<? extends IisVaccination> iisVaccinationList) {
-		List<ForecastActual> forecastActualList = incomingQueryHandler.doForecast(iisPatient,
+		List<ForecastActual> forecastActualList = doForecast(iisPatient,
 			iisVaccinationList, tenant, date);
 		IisRecommendation iisRecommendation = lonestarIisRecommendation(tenant, date, iisPatient, forecastActualList);
 

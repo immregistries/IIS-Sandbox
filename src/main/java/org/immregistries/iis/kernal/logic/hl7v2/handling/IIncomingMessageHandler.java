@@ -72,7 +72,6 @@ public interface IIncomingMessageHandler<SourceType> {
 		}
 	}
 
-
 	static boolean hasErrors(List<IisReportable> reportables) {
 		for (IisReportable reportable : reportables) {
 			if (reportable.getSeverity().equals(IisReportableSeverity.ERROR)) {

@@ -28,9 +28,8 @@ import static org.immregistries.iis.kernal.controllers.servlet.shlink.IisKeyCont
 public class IisKeyController {
 	public static final String IIS_KEY_BASE_PATH = "/iisKey";
 
-
 	@Autowired
-	IisKeyRestController iisKeyRestController;
+	private IisKeyRestController iisKeyRestController;
 
 	@PostMapping
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)

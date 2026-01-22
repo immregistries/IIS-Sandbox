@@ -29,6 +29,7 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -42,9 +43,9 @@ import java.util.stream.Collectors;
  * Processes the Incoming Hl7v2 Messages, parsing into local objects and saving into database through FHIR Requester
  */
 @SuppressWarnings({"rawtypes", "unchecked"})
+@Service
 public class V2IncomingMessageHandler extends IncomingMessageHandler<HL7Reader, MqeMessageServiceResponse> {
-
-	protected final Logger logger = LoggerFactory.getLogger(V2IncomingMessageHandler.class);
+	protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	@Autowired
 	private ValidationService validationService;
@@ -54,15 +55,9 @@ public class V2IncomingMessageHandler extends IncomingMessageHandler<HL7Reader, 
 	private FhirSearchRequester fhirSearchRequester;
 	@Autowired
 	private Hl7MessageWriter hl7MessageWriter;
-	@Autowired
-	private PatientProcessingInterceptor patientProcessingInterceptor; // TODO decide how/where to implement the execution of interceptors, currently using DAO so some interceptors are skipped by the v2 process and need to be manually triggered
-	@Autowired
-	private ObservationProcessingInterceptor observationProcessingInterceptor;
-	@Autowired
-	private ImmunizationProcessingInterceptor immunizationProcessingInterceptor;
+
 	@Autowired
 	private IncomingQueryHandler incomingQueryHandler;
-
 	@Autowired
 	private MessageRecordingService messageRecordingService;
 	@Autowired
@@ -75,6 +70,15 @@ public class V2IncomingMessageHandler extends IncomingMessageHandler<HL7Reader, 
 	private IisReportableUtilService iisReportableUtilService;
 	@Autowired
 	private V2DateParseService v2DateParseService;
+	@Autowired
+	private V2OrganizationService v2OrganizationService;
+
+	@Autowired
+	private PatientProcessingInterceptor patientProcessingInterceptor; // TODO decide how/where to implement the execution of interceptors, currently using DAO so some interceptors are skipped by the v2 process and need to be manually triggered
+	@Autowired
+	private ObservationProcessingInterceptor observationProcessingInterceptor;
+	@Autowired
+	private ImmunizationProcessingInterceptor immunizationProcessingInterceptor;
 
 
 	public V2IncomingMessageHandler() {
@@ -761,5 +765,10 @@ public class V2IncomingMessageHandler extends IncomingMessageHandler<HL7Reader, 
 
 	public HL7Reader parseSource(String message) {
 		return new HL7Reader(message);
+	}
+
+	@Override
+	public IIdType readResponsibleOrganizationIIdType(Tenant tenant, HL7Reader hl7Reader, String sendingFacilityName) throws ProcessingException {
+		return v2OrganizationService.readResponsibleOrganizationIIdType(tenant, hl7Reader, sendingFacilityName);
 	}
 }

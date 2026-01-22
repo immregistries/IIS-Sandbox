@@ -6,7 +6,6 @@ import org.hl7.fhir.r4.model.ImmunizationEvaluation;
 import org.hl7.fhir.r4.model.ImmunizationRecommendation;
 import org.hl7.fhir.r4.model.Parameters;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
-import org.immregistries.iis.kernal.logic.hl7v2.handling.IncomingQueryHandler;
 import org.immregistries.iis.kernal.mapping.mappers.resources.r4.ImmunizationEvaluationMapperR4;
 import org.immregistries.iis.kernal.mapping.mappers.resources.r4.ImmunizationRecommendationMapperR4;
 import org.immregistries.iis.kernal.mapping.requesters.FhirSearchRequester;
@@ -25,15 +24,12 @@ import static org.immregistries.iis.kernal.fhir.immds.IRecommendationForecastPro
 
 @Service
 @Conditional(OnR4Condition.class)
-public class CdsQueryServiceR4 implements  CdsQueryService<ImmunizationRecommendation, Parameters> {
+public class CdsQueryServiceR4 extends CdsQueryService<ImmunizationRecommendation, Parameters> {
 
 	@Autowired
 	private ImmunizationRecommendationMapperR4 immunizationRecommendationMapperR4;
 	@Autowired
 	private ImmunizationEvaluationMapperR4 immunizationEvaluationMapperR4;
-
-	@Autowired
-	private IncomingQueryHandler incomingQueryHandler;
 	@Autowired
 	private FhirSearchRequester fhirSearchRequester;
 
@@ -47,7 +43,7 @@ public class CdsQueryServiceR4 implements  CdsQueryService<ImmunizationRecommend
 
 	public Parameters queryCds(Tenant tenant, Date date, IisPatient iisPatient,
 																	 List<? extends IisVaccination> iisVaccinationList) {
-		List<ForecastActual> forecastActualList = incomingQueryHandler.doForecast(iisPatient,
+		List<ForecastActual> forecastActualList = doForecast(iisPatient,
 			iisVaccinationList, tenant, date);
 		IisRecommendation iisRecommendation = lonestarIisRecommendation(tenant, date, iisPatient, forecastActualList);
 

@@ -6,14 +6,11 @@ import org.immregistries.iis.kernal.logic.validation.ProcessingException;
 import org.immregistries.iis.kernal.mapping.mappers.fields.r4.BusinessIdentifierMapperR4;
 import org.immregistries.iis.kernal.mapping.requesters.FhirSaveRequester;
 import org.immregistries.iis.kernal.mapping.requesters.FhirSearchRequester;
-import org.immregistries.iis.kernal.model.enums.ProcessingFlavor;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.Set;
-
-public abstract class V2MessageOrganizationService<FhirOrganization extends IAnyResource, ParsedSource> {
+public abstract class V2OrganizationService<FhirOrganization extends IAnyResource, ParsedSource> {
 	public static final String ORGANIZATION_SP_NAME = org.hl7.fhir.r4.model.Organization.SP_NAME;
 	public static final String ORGANIZATION_SP_IDENTIFIER = org.hl7.fhir.r4.model.Organization.SP_IDENTIFIER;
 
@@ -24,7 +21,7 @@ public abstract class V2MessageOrganizationService<FhirOrganization extends IAny
 	@Autowired
 	private BusinessIdentifierMapperR4 businessIdentifierMapper;
 
-	abstract @Nullable IIdType readResponsibleOrganizationIIdType(Tenant tenant, ParsedSource parsedSource, String sendingFacilityName, Set<ProcessingFlavor> processingFlavorSet) throws ProcessingException;
+	abstract @Nullable IIdType readResponsibleOrganizationIIdType(Tenant tenant, ParsedSource parsedSource, String sendingFacilityName) throws ProcessingException;
 
 	abstract FhirOrganization processSendingOrganization(ParsedSource parsedSource);
 

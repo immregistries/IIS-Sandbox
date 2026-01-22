@@ -5,11 +5,11 @@ import ca.uhn.fhir.rest.param.StringParam;
 import ca.uhn.fhir.rest.param.TokenParam;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.instance.model.api.IIdType;
-import org.hl7.fhir.r5.model.Organization;
-import org.immregistries.iis.kernal.fhir.common.annotations.OnR5Condition;
+import org.hl7.fhir.r4.model.Organization;
+import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
 import org.immregistries.iis.kernal.logic.validation.ProcessingException;
-import org.immregistries.iis.kernal.mapping.mappers.fields.r5.BusinessIdentifierMapperR5;
-import org.immregistries.iis.kernal.mapping.requesters.FhirSaveRequesterR5;
+import org.immregistries.iis.kernal.mapping.mappers.fields.r4.BusinessIdentifierMapperR4;
+import org.immregistries.iis.kernal.mapping.requesters.FhirSaveRequesterR4;
 import org.immregistries.iis.kernal.mapping.requesters.FhirSearchRequester;
 import org.immregistries.iis.kernal.model.BusinessIdentifier;
 import org.immregistries.iis.kernal.model.enums.ProcessingFlavor;
@@ -23,20 +23,21 @@ import org.springframework.stereotype.Service;
 import java.util.Set;
 
 @Service
-@Conditional(OnR5Condition.class)
-public class V2MessageOrganizationServiceR5 extends V2MessageOrganizationService<Organization, HL7Reader> {
+@Conditional(OnR4Condition.class)
+public class V2OrganizationServiceR4 extends V2OrganizationService<Organization, HL7Reader> {
 
 	@Autowired
-	private FhirSaveRequesterR5 fhirSaveRequester;
+	private FhirSaveRequesterR4 fhirSaveRequester;
 	@Autowired
 	private FhirSearchRequester fhirSearchRequester;
 	@Autowired
-	private BusinessIdentifierMapperR5 businessIdentifierMapper;
+	private BusinessIdentifierMapperR4 businessIdentifierMapper;
 
 	public @Nullable IIdType readResponsibleOrganizationIIdType(Tenant tenant,
 																					HL7Reader reader,
-																					String sendingFacilityName,
-																					Set<ProcessingFlavor> processingFlavorSet) throws ProcessingException {
+																					String sendingFacilityName
+	) throws ProcessingException {
+		Set<ProcessingFlavor> processingFlavorSet = tenant.getProcessingFlavorSet();
 		String facilityId = reader.getValue(4);
 
 		if (processingFlavorSet.contains(ProcessingFlavor.SOURSOP)) {
@@ -46,7 +47,7 @@ public class V2MessageOrganizationServiceR5 extends V2MessageOrganizationService
 		}
 		Organization responsibleOrganization = null;
 		if (StringUtils.isNotBlank(sendingFacilityName) && !sendingFacilityName.equals("null")) {
-			responsibleOrganization = (Organization) fhirSearchRequester.searchOrganizationR5(
+			responsibleOrganization = (Organization) fhirSearchRequester.searchOrganizationR4(
 				new SearchParameterMap(ORGANIZATION_SP_NAME, new StringParam(sendingFacilityName)));
 			// Organization.NAME.matches().value(sendingFacilityName));
 			if (responsibleOrganization == null) {
@@ -77,9 +78,9 @@ public class V2MessageOrganizationServiceR5 extends V2MessageOrganizationService
 		Organization sendingOrganization = null;
 		if (tokenParam != null) {
 			sendingOrganization = (Organization) fhirSearchRequester
-				.searchOrganizationR5(new SearchParameterMap(Organization.SP_IDENTIFIER, tokenParam));
+				.searchOrganizationR4(new SearchParameterMap(Organization.SP_IDENTIFIER, tokenParam));
 		} else if (organizationName != null) {
-			sendingOrganization = (Organization) fhirSearchRequester.searchOrganizationR5(
+			sendingOrganization = (Organization) fhirSearchRequester.searchOrganizationR4(
 				new SearchParameterMap(ORGANIZATION_SP_NAME, new StringParam(organizationName)));
 		}
 		if (sendingOrganization == null && (StringUtils.isNotBlank(organizationName) || tokenParam != null)) {
@@ -103,7 +104,7 @@ public class V2MessageOrganizationServiceR5 extends V2MessageOrganizationService
 		}
 		if (managingIdentifier != null) {
 			managingOrganization = (Organization) fhirSearchRequester
-				.searchOrganizationR5(new SearchParameterMap(Organization.SP_IDENTIFIER,
+				.searchOrganizationR4(new SearchParameterMap(Organization.SP_IDENTIFIER,
 					new TokenParam().setSystem(reader.getValue(22, 7)).setValue(managingIdentifier)));
 			// Organization.IDENTIFIER.exactly()
 			// .systemAndIdentifier(reader.getValue(22, 7), managingIdentifier));

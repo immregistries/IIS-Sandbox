@@ -22,8 +22,8 @@ import java.util.List;
 import java.util.Set;
 
 public abstract class IncomingMessageHandler<ParsedSource, ValidationResult> implements IIncomingMessageHandler<ParsedSource> {
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-	Logger logger = LoggerFactory.getLogger(this.getClass());
 	@Autowired
 	private PartitionTenantCreationInterceptor partitionTenantCreationInterceptor;
 	@Autowired
@@ -34,8 +34,6 @@ public abstract class IncomingMessageHandler<ParsedSource, ValidationResult> imp
 	private CodeMapManagerService codeMapManagerService;
 	@Autowired
 	private IisReportableUtilService iisReportableUtilService;
-	@Autowired
-	private V2MessageOrganizationService v2MessageOrganizationService;
 
 	@Override
 	public String process(String message, Tenant tenant, String sendingFacilityName) {
@@ -50,7 +48,7 @@ public abstract class IncomingMessageHandler<ParsedSource, ValidationResult> imp
 		Set<ProcessingFlavor> processingFlavorSet = null;
 		try {
 			processingFlavorSet = tenant.getProcessingFlavorSet();
-			IIdType organizationIdType = v2MessageOrganizationService.readResponsibleOrganizationIIdType(tenant, parsedSource, sendingFacilityName, processingFlavorSet);
+			IIdType organizationIdType = readResponsibleOrganizationIIdType(tenant, parsedSource, sendingFacilityName);
 			switch (messageType) {
 				case "VXU":
 					responseMessage = processVXU(tenant, parsedSource, message, organizationIdType);
@@ -82,8 +80,6 @@ public abstract class IncomingMessageHandler<ParsedSource, ValidationResult> imp
 
 	public abstract ParsedSource parseSource(String message);
 
-
-	//	public abstract String processVXU(Tenant tenant, SourceType sourceType, String message, IIdType managingOrganizationId) throws Exception;
 	public String processVXU(Tenant tenant, ParsedSource parsedSource, String message, IIdType managingOrganizationId) throws Exception {
 		List<IisReportable> iisReportableList = new ArrayList<>();
 		Set<ProcessingFlavor> processingFlavorSet = tenant.getProcessingFlavorSet();
@@ -113,6 +109,7 @@ public abstract class IncomingMessageHandler<ParsedSource, ValidationResult> imp
 		}
 	}
 
+	public abstract IIdType readResponsibleOrganizationIIdType(Tenant tenant, ParsedSource parsedSource, String sendingFacilityName) throws ProcessingException;
 
 	public abstract PatientReported processPatient(Tenant tenant, ParsedSource parsedSource, List<IisReportable> iisReportableList, Set<ProcessingFlavor> processingFlavorSet, CodeMap codeMap, boolean strictDate, IIdType managingOrganizationId) throws ProcessingException;
 
@@ -121,7 +118,6 @@ public abstract class IncomingMessageHandler<ParsedSource, ValidationResult> imp
 	public abstract String processORU(Tenant tenant, ParsedSource parsedSource, String message, IIdType managingOrganizationId);
 
 	public abstract String processQBP(Tenant tenant, ParsedSource parsedSource, String messageReceived, IIdType managingOrganizationId) throws Exception;
-
 
 	public abstract String buildResultWithoutValidation(ParsedSource parsedSource, List<IisReportable> iisReportableList, Set<ProcessingFlavor> processingFlavorSet);
 

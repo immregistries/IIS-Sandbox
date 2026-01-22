@@ -13,6 +13,7 @@ import org.immregistries.iis.kernal.logic.hl7v2.ack.IisHL7UtilService;
 import org.immregistries.iis.kernal.logic.hl7v2.ack.IisReportableUtilService;
 import org.immregistries.iis.kernal.logic.hl7v2.ack.V2DateParseService;
 import org.immregistries.iis.kernal.logic.hl7v2.writing.Hl7MessageWriter;
+import org.immregistries.iis.kernal.logic.recommendations.CdsQueryService;
 import org.immregistries.iis.kernal.logic.recommendations.VaccinationRecommendationDateCode;
 import org.immregistries.iis.kernal.logic.recommendations.VaccinePlanStatus;
 import org.immregistries.iis.kernal.logic.validation.ProcessingException;
@@ -26,15 +27,15 @@ import org.immregistries.iis.kernal.model.enums.ProcessingFlavor;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.immregistries.mqe.validator.MqeMessageServiceResponse;
 import org.immregistries.smm.tester.manager.HL7Reader;
-import org.immregistries.vfa.connect.ConnectFactory;
-import org.immregistries.vfa.connect.ConnectorInterface;
-import org.immregistries.vfa.connect.model.*;
+import org.immregistries.vfa.connect.model.Admin;
+import org.immregistries.vfa.connect.model.EvaluationActual;
+import org.immregistries.vfa.connect.model.ForecastActual;
+import org.immregistries.vfa.connect.model.TestEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -46,23 +47,25 @@ public class IncomingQueryHandler {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	@Autowired
-	FhirSearchRequester fhirSearchRequester;
+	private FhirSearchRequester fhirSearchRequester;
 	@Autowired
-	FhirMatchRequester fhirMatchRequester;
+	private FhirMatchRequester fhirMatchRequester;
 	@Autowired
-	Hl7MessageWriter hl7MessageWriter;
+	private Hl7MessageWriter hl7MessageWriter;
 	@Autowired
-	ValidationService validationService;
+	private ValidationService validationService;
 	@Autowired
 	private CodeMapManagerService codeMapManagerService;
 	@Autowired
-	IisHL7UtilService iisHL7UtilService;
+	private IisHL7UtilService iisHL7UtilService;
 	@Autowired
-	MessageRecordingService messageRecordingService;
+	private MessageRecordingService messageRecordingService;
 	@Autowired
-	IisReportableUtilService iisReportableUtilService;
+	private IisReportableUtilService iisReportableUtilService;
 	@Autowired
-	V2DateParseService v2DateParseService;
+	private V2DateParseService v2DateParseService;
+	@Autowired
+	private CdsQueryService cdsQueryService;
 
 	public String processQBP(Tenant tenant, HL7Reader reader, String messageReceived, IIdType managingOrganizationId) throws Exception {
 		Set<ProcessingFlavor> processingFlavorSet = tenant.getProcessingFlavorSet();
@@ -300,7 +303,7 @@ public class IncomingQueryHandler {
 				}
 				List<ForecastActual> forecastActualList = null;
 				if (sendBackForecast) {
-					forecastActualList = doForecast(patientMaster, vaccinationMasterList, tenant, new Date());
+					forecastActualList = cdsQueryService.doForecast(patientMaster, vaccinationMasterList, tenant, new Date());
 				}
 
 				int obxSetId = 0;
@@ -673,60 +676,5 @@ public class IncomingQueryHandler {
 		sb.append("\r");
 	}
 
-	public List<ForecastActual> doForecast(IisPatient patient, List<? extends IisVaccination> vaccinationMasterList, Tenant tenant, Date date) {
-		CodeMap codeMap = codeMapManagerService.getCodeMap();
-		List<ForecastActual> forecastActualList = null;
-		Set<ProcessingFlavor> processingFlavorSet = tenant.getProcessingFlavorSet();
-		try {
-			TestCase testCase = new TestCase();
-			testCase.setEvalDate(date);
-			if (patient != null) {
-				testCase.setPatientSex(patient.getSex());
-				testCase.setPatientDob(patient.getBirthDate());
-			} else {
-				testCase.setPatientSex("F");
-			}
-			List<TestEvent> testEventList = new ArrayList<>();
-			for (IisVaccination vaccination : vaccinationMasterList) {
-				Code cvxCode = codeMap.getCodeForCodeset(CodesetType.VACCINATION_CVX_CODE, vaccination.getVaccineCvxCode());
-				if (cvxCode == null) {
-					continue;
-				}
-				if ("D".equals(vaccination.getActionCode())) {
-					continue;
-				}
-				int cvx;
-				try {
-					cvx = Integer.parseInt(vaccination.getVaccineCvxCode());
-					TestEvent testEvent = new TestEvent(cvx, vaccination.getAdministeredDate());
-					testEventList.add(testEvent);
-					vaccination.setTestEvent(testEvent);
-				} catch (NumberFormatException ignored) {
-				}
-			}
-			testCase.setTestEventList(testEventList);
-			Software software = new Software();
-			software.setServiceUrl("https://sabbia.westus2.cloudapp.azure.com/lonestar/forecast");
-			software.setService(org.immregistries.vfa.connect.model.Service.LSVF);
-			if (processingFlavorSet.contains(ProcessingFlavor.ICE)) {
-				software.setServiceUrl("https://sabbia.westus2.cloudapp.azure.com/opencds-decision-support-service/evaluate");
-				software.setService(org.immregistries.vfa.connect.model.Service.ICE);
-			}
-
-			ConnectorInterface connector = ConnectFactory.createConnecter(software, VaccineGroup.getForecastItemList());
-			connector.setLogText(false);
-			try {
-
-				SoftwareResult softwareResult = new SoftwareResult();
-				forecastActualList = connector.queryForForecast(testCase, softwareResult);
-//				logger.info("swr {}", softwareResult.getLogText());
-			} catch (IOException ioe) {
-				logger.error("Unable to query for forecast", ioe);
-			}
-		} catch (Exception e) {
-			logger.error("Unable to query for forecast", e);
-		}
-		return forecastActualList;
-	}
 
 }
