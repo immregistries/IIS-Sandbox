@@ -12,7 +12,7 @@ import org.immregistries.iis.kernal.fhir.ips.IpsGeneratorSvcIIS;
 import org.immregistries.iis.kernal.fhir.shl.ShLinkPayload;
 import org.immregistries.iis.kernal.logic.KeyStoreService;
 import org.immregistries.iis.kernal.logic.SecretKeyUtilService;
-import org.immregistries.iis.kernal.model.ShLinkFilePayload;
+import org.immregistries.iis.kernal.model.shlink.ShLinkFilePayload;
 import org.immregistries.iis.kernal.persisted.entities.*;
 import org.immregistries.iis.kernal.persisted.repository.IisShlinkContentRepository;
 import org.immregistries.iis.kernal.security.TenantAuthService;

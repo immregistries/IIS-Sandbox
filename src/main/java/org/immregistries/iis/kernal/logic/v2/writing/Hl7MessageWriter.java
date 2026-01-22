@@ -13,6 +13,7 @@ import org.immregistries.iis.kernal.mapping.IisFhirClientFactory;
 import org.immregistries.iis.kernal.mapping.mappers.resources.ObservationMapper;
 import org.immregistries.iis.kernal.mapping.requesters.FhirSearchRequester;
 import org.immregistries.iis.kernal.model.*;
+import org.immregistries.iis.kernal.model.enums.ProcessingFlavor;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.immregistries.smm.tester.manager.HL7Reader;
 import org.immregistries.vfa.connect.model.EvaluationActual;

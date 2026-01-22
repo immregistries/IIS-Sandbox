@@ -1,10 +1,9 @@
-package org.immregistries.iis.kernal.model;
+package org.immregistries.iis.kernal.model.shlink;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 /**
  * Represents the JSON structure for ShLinkManifestRequestBody.

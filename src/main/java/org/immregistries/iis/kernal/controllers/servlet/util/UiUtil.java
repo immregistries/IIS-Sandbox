@@ -9,7 +9,7 @@ import org.immregistries.iis.kernal.controllers.servlet.PopController;
 import org.immregistries.iis.kernal.controllers.servlet.TenantController;
 import org.immregistries.iis.kernal.controllers.servlet.shlink.ShLinkController;
 import org.immregistries.iis.kernal.mapping.requesters.FhirRequesterUtil;
-import org.immregistries.iis.kernal.model.ProcessingFlavor;
+import org.immregistries.iis.kernal.model.enums.ProcessingFlavor;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.immregistries.iis.kernal.persisted.entities.UserAccess;
 import org.immregistries.iis.kernal.security.CurrentTenantUtil;

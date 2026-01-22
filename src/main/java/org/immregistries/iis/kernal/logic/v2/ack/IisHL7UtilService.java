@@ -1,9 +1,9 @@
 package org.immregistries.iis.kernal.logic.v2.ack;
 
 import org.apache.commons.lang3.StringUtils;
-import org.immregistries.iis.kernal.model.ProcessingFlavor;
 import org.immregistries.iis.kernal.model.ack.IisReportable;
 import org.immregistries.iis.kernal.model.ack.IisReportableSeverity;
+import org.immregistries.iis.kernal.model.enums.ProcessingFlavor;
 import org.immregistries.mqe.hl7util.ReportableSource;
 import org.immregistries.mqe.hl7util.builder.AckERRCode;
 import org.immregistries.mqe.hl7util.builder.AckResult;
@@ -18,8 +18,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.immregistries.iis.kernal.logic.v2.handling.IIncomingMessageHandler.ADVANCED_ACK;
 import static org.immregistries.iis.kernal.logic.v2.ack.IisAckBuilder.PROCESSING_ID_DEBUG;
+import static org.immregistries.iis.kernal.logic.v2.handling.IIncomingMessageHandler.ADVANCED_ACK;
 import static org.immregistries.mqe.vxu.parse.HL7ParsingUtil.escapeHL7Chars;
 
 @Service

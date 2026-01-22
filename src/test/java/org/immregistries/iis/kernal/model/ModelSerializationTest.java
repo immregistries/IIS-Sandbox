@@ -1,8 +1,11 @@
 package org.immregistries.iis.kernal.model;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.immregistries.iis.kernal.model.shlink.ShLinkFilePayload;
+import org.immregistries.iis.kernal.model.shlink.ShLinkManifestRequestBody;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class ModelSerializationTest {
 

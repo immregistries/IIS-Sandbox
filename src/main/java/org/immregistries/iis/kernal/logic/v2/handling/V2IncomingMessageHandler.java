@@ -18,6 +18,7 @@ import org.immregistries.iis.kernal.mapping.requesters.FhirSearchRequester;
 import org.immregistries.iis.kernal.model.*;
 import org.immregistries.iis.kernal.model.ack.IisReportable;
 import org.immregistries.iis.kernal.model.ack.IisReportableSeverity;
+import org.immregistries.iis.kernal.model.enums.ProcessingFlavor;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.immregistries.iis.kernal.security.CurrentTenantUtil;
 import org.immregistries.mqe.validator.MqeMessageServiceResponse;

@@ -13,7 +13,7 @@ import org.immregistries.iis.kernal.logic.shlink.ShLinkUtilService;
 import org.immregistries.iis.kernal.mapping.IisFhirClientFactory;
 import org.immregistries.iis.kernal.mapping.mappers.resources.PatientMapper;
 import org.immregistries.iis.kernal.mapping.requesters.FhirSearchRequester;
-import org.immregistries.iis.kernal.model.ShLinkManifestRequestBody;
+import org.immregistries.iis.kernal.model.shlink.ShLinkManifestRequestBody;
 import org.immregistries.iis.kernal.persisted.entities.ShLinkManifest;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.immregistries.iis.kernal.security.CurrentTenantUtil;

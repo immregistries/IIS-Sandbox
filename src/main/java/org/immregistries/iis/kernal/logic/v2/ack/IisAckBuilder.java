@@ -1,8 +1,8 @@
 package org.immregistries.iis.kernal.logic.v2.ack;
 
 import org.apache.commons.lang3.StringUtils;
-import org.immregistries.iis.kernal.model.ProcessingFlavor;
 import org.immregistries.iis.kernal.model.ack.IisReportable;
+import org.immregistries.iis.kernal.model.enums.ProcessingFlavor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

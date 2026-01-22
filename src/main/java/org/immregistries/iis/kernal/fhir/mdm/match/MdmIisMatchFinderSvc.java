@@ -25,7 +25,7 @@ import org.immregistries.iis.kernal.logic.match.VaccinationDedupConversionServic
 import org.immregistries.iis.kernal.mapping.mappers.resources.ImmunizationMapper;
 import org.immregistries.iis.kernal.mapping.mappers.resources.PatientMapper;
 import org.immregistries.iis.kernal.model.ModelReference;
-import org.immregistries.iis.kernal.model.ProcessingFlavor;
+import org.immregistries.iis.kernal.model.enums.ProcessingFlavor;
 import org.immregistries.mismo.match.PatientMatchResult;
 import org.immregistries.mismo.match.PatientMatcher;
 import org.immregistries.mismo.match.model.Patient;

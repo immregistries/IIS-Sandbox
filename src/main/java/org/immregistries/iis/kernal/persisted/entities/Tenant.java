@@ -3,7 +3,7 @@ package org.immregistries.iis.kernal.persisted.entities;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import org.immregistries.iis.kernal.model.IisMappedToFhirResource;
-import org.immregistries.iis.kernal.model.ProcessingFlavor;
+import org.immregistries.iis.kernal.model.enums.ProcessingFlavor;
 
 import java.io.Serializable;
 import java.util.Set;

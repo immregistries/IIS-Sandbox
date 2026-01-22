@@ -1,11 +1,10 @@
-package org.immregistries.iis.kernal.model;
+package org.immregistries.iis.kernal.model.shlink;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 /**
  * A Java class representing the payload structure for a Smart Health Link File.

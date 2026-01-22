@@ -1,9 +1,9 @@
 package org.immregistries.iis.kernal.logic.v2.handling;
 
 import org.immregistries.iis.kernal.logic.validation.ProcessingException;
-import org.immregistries.iis.kernal.model.ProcessingFlavor;
 import org.immregistries.iis.kernal.model.ack.IisReportable;
 import org.immregistries.iis.kernal.model.ack.IisReportableSeverity;
+import org.immregistries.iis.kernal.model.enums.ProcessingFlavor;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
 
 import java.util.List;
