@@ -25,7 +25,7 @@ import static ca.uhn.fhir.interceptor.api.Pointcut.SERVER_INCOMING_REQUEST_PRE_H
 import static ca.uhn.fhir.interceptor.api.Pointcut.SERVER_PROCESSING_COMPLETED_NORMALLY;
 
 /**
- * In progress
+ * In progress / Inactive
  * Aims at allowing Groups access by Facilities ruling over the managing facility
  */
 @Interceptor

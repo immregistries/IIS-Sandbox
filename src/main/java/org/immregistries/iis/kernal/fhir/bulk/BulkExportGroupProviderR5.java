@@ -53,7 +53,7 @@ public class BulkExportGroupProviderR5 extends GroupResourceProvider implements 
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	@Autowired
-	BaseJpaResourceProviderPatient<Patient> patientProvider;
+	private BaseJpaResourceProviderPatient<Patient> patientProvider;
 	@Autowired
 	private IFhirResourceDao<Group> fhirResourceGroupDao;
 	@Autowired
