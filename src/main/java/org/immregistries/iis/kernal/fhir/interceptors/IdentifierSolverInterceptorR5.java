@@ -10,6 +10,7 @@ import org.immregistries.iis.kernal.fhir.common.annotations.OnR5Condition;
 import org.immregistries.iis.kernal.mapping.mappers.fields.BusinessIdentifierMapper;
 import org.immregistries.iis.kernal.mapping.mappers.fields.ModelReferenceMapper;
 import org.immregistries.iis.kernal.mapping.mappers.resources.ImmunizationMapper;
+import org.immregistries.iis.kernal.model.BusinessIdentifier;
 import org.immregistries.iis.kernal.model.ModelReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,29 +28,26 @@ public class IdentifierSolverInterceptorR5 extends IdentifierSolverInterceptor<P
 
 	@Autowired
 	private IFhirResourceDao<Patient> patientDao;
-
-	@Autowired
-	private ImmunizationMapper<Immunization> immunizationMapper;
 	@Autowired
 	private BusinessIdentifierMapper<Identifier> businessIdentifierMapper;
 	@Autowired
 	private ModelReferenceMapper<Reference> modelReferenceMapper;
-
+	@Autowired
+	private ImmunizationMapper<Immunization> immunizationMapper;
 
 	@Override
 	public void handleImmunization(RequestDetails requestDetails, Immunization immunization) {
-		if (immunization == null
-			|| immunization.getPatient().getIdentifier() == null
-			|| immunization.getPatient().getIdentifier().getValue() == null
-			|| immunization.getPatient().getIdentifier().getSystem() == null
-		) {
+		if (immunization == null) {
+			return;
+		}
+		ModelReference patientReference = immunizationMapper.extractPatientReference(immunization);
+		BusinessIdentifier identifier = patientReference.getIdentifier();
+		if (identifier == null || identifier.getValue() == null || identifier.getSystem() == null) {
 			return;
 		}
 		/*
-		 * Linking record to golden
+		 * Look for golden record
 		 */
-		ModelReference modelReference = immunizationMapper.extractPatientReference(immunization);
-		Identifier identifier = immunization.getPatient().getIdentifier();
 		String id = solvePatientIdentifier(requestDetails, identifier);
 
 		if (id != null) {
@@ -72,7 +70,7 @@ public class IdentifierSolverInterceptorR5 extends IdentifierSolverInterceptor<P
 			return;
 		}
 		/*
-		 * Linking record to golden
+		 * Look for golden record
 		 */
 		Identifier identifier = observation.getSubject().getIdentifier();
 		if (identifier == null || identifier.getValue() == null || identifier.getSystem() == null) {

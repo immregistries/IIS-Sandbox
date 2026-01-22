@@ -45,7 +45,7 @@ public class IdentifierSolverInterceptorR4 extends IdentifierSolverInterceptor<P
 			return;
 		}
 		/*
-		 * Linking record to golden
+		 * Look for golden record
 		 */
 		String id = solvePatientIdentifier(requestDetails, identifier);
 		if (id != null) {
@@ -64,17 +64,16 @@ public class IdentifierSolverInterceptorR4 extends IdentifierSolverInterceptor<P
 
 	@Override
 	public void handleObservation(RequestDetails requestDetails, Observation observation) {
-		if (observation == null
-			|| observation.getSubject().getIdentifier() == null
-			|| observation.getSubject().getIdentifier().getValue() == null
-			|| observation.getSubject().getIdentifier().getSystem() == null
-		) {
+		if (observation == null) {
+			return;
+		}
+		Identifier identifier = observation.getSubject().getIdentifier();
+		if (identifier == null || identifier.getValue() == null || identifier.getSystem() == null) {
 			return;
 		}
 		/*
-		 * Linking record to golden
+		 * Look for golden record
 		 */
-		Identifier identifier = observation.getSubject().getIdentifier();
 		String id = solvePatientIdentifier(requestDetails, identifier);
 
 		if (id != null) {
