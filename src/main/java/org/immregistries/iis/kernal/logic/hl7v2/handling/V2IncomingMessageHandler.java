@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal.logic.v2.handling;
+package org.immregistries.iis.kernal.logic.hl7v2.handling;
 
 import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
 import ca.uhn.fhir.rest.param.ReferenceParam;
@@ -10,8 +10,8 @@ import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.iis.kernal.SoftwareVersion;
 import org.immregistries.iis.kernal.logic.CodeMapManagerService;
 import org.immregistries.iis.kernal.logic.MessageRecordingService;
-import org.immregistries.iis.kernal.logic.v2.ack.*;
-import org.immregistries.iis.kernal.logic.v2.writing.Hl7MessageWriter;
+import org.immregistries.iis.kernal.logic.hl7v2.ack.*;
+import org.immregistries.iis.kernal.logic.hl7v2.writing.Hl7MessageWriter;
 import org.immregistries.iis.kernal.logic.validation.*;
 import org.immregistries.iis.kernal.mapping.requesters.FhirSaveRequester;
 import org.immregistries.iis.kernal.mapping.requesters.FhirSearchRequester;

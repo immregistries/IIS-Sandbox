@@ -1,20 +1,20 @@
-package org.immregistries.iis.kernal.logic.v2.writing;
+package org.immregistries.iis.kernal.logic.hl7v2.writing;
 
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
-import org.hl7.fhir.r4.model.Bundle;
-import org.hl7.fhir.r4.model.Observation;
+import org.hl7.fhir.r5.model.Bundle;
+import org.hl7.fhir.r5.model.Observation;
 import org.immregistries.iis.kernal.model.IisPatient;
 import org.immregistries.iis.kernal.model.IisVaccination;
 import org.immregistries.iis.kernal.model.ObservationReported;
 
 //@Service
-//@Conditional(OnR4Condition.class)
+//@Conditional(OnR5Condition.class)
 @SuppressWarnings({"unchecked"})
 /**
  * Retired
  */
-public class Hl7MessageWriterR4 extends Hl7MessageWriter {
+public class Hl7MessageWriterR5 extends Hl7MessageWriter {
 
 	public void printStoredObservations(StringBuilder sb, IisPatient iisPatient, IisVaccination iisVaccination, int obsSubId, int obxSetId) {
 		IGenericClient fhirClient = iisFhirClientFactory.getOrCreateFhirClientFromContext();

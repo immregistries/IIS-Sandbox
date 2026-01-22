@@ -6,7 +6,7 @@ import org.hl7.fhir.r4.model.ImmunizationEvaluation;
 import org.hl7.fhir.r4.model.ImmunizationRecommendation;
 import org.hl7.fhir.r4.model.Parameters;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
-import org.immregistries.iis.kernal.logic.v2.handling.IncomingQueryHandler;
+import org.immregistries.iis.kernal.logic.hl7v2.handling.IncomingQueryHandler;
 import org.immregistries.iis.kernal.mapping.mappers.resources.r4.ImmunizationEvaluationMapperR4;
 import org.immregistries.iis.kernal.mapping.mappers.resources.r4.ImmunizationRecommendationMapperR4;
 import org.immregistries.iis.kernal.mapping.requesters.FhirSearchRequester;

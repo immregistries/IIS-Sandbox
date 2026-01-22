@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal.logic.v2.ack;
+package org.immregistries.iis.kernal.logic.hl7v2.ack;
 
 import org.apache.commons.lang3.StringUtils;
 import org.immregistries.iis.kernal.model.ack.IisReportable;

@@ -13,7 +13,7 @@ import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodeStatusValue;
 import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.logic.CodeMapManagerService;
-import org.immregistries.iis.kernal.logic.v2.ack.IisReportableUtilService;
+import org.immregistries.iis.kernal.logic.hl7v2.ack.IisReportableUtilService;
 import org.immregistries.iis.kernal.mapping.mappers.resources.PatientMapper;
 import org.immregistries.iis.kernal.model.ModelName;
 import org.immregistries.iis.kernal.model.ModelPhone;
@@ -35,7 +35,7 @@ import java.util.List;
 import java.util.Set;
 
 import static ca.uhn.fhir.interceptor.api.Pointcut.SERVER_INCOMING_REQUEST_PRE_HANDLED;
-import static org.immregistries.iis.kernal.logic.v2.handling.IIncomingMessageHandler.NAME_SIZE_LIMIT;
+import static org.immregistries.iis.kernal.logic.hl7v2.handling.IIncomingMessageHandler.NAME_SIZE_LIMIT;
 
 @Interceptor
 @Service

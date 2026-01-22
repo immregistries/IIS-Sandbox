@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal.logic.v2.handling;
+package org.immregistries.iis.kernal.logic.hl7v2.handling;
 
 import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
 import ca.uhn.fhir.rest.param.ReferenceParam;
@@ -9,12 +9,12 @@ import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.logic.CodeMapManagerService;
 import org.immregistries.iis.kernal.logic.MessageRecordingService;
+import org.immregistries.iis.kernal.logic.hl7v2.ack.IisHL7UtilService;
+import org.immregistries.iis.kernal.logic.hl7v2.ack.IisReportableUtilService;
+import org.immregistries.iis.kernal.logic.hl7v2.ack.V2DateParseService;
+import org.immregistries.iis.kernal.logic.hl7v2.writing.Hl7MessageWriter;
 import org.immregistries.iis.kernal.logic.recommendations.VaccinationRecommendationDateCode;
 import org.immregistries.iis.kernal.logic.recommendations.VaccinePlanStatus;
-import org.immregistries.iis.kernal.logic.v2.ack.IisHL7UtilService;
-import org.immregistries.iis.kernal.logic.v2.ack.IisReportableUtilService;
-import org.immregistries.iis.kernal.logic.v2.ack.V2DateParseService;
-import org.immregistries.iis.kernal.logic.v2.writing.Hl7MessageWriter;
 import org.immregistries.iis.kernal.logic.validation.ProcessingException;
 import org.immregistries.iis.kernal.logic.validation.ValidationService;
 import org.immregistries.iis.kernal.mapping.requesters.FhirMatchRequester;
@@ -38,7 +38,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-import static org.immregistries.iis.kernal.logic.v2.handling.IIncomingMessageHandler.*;
+import static org.immregistries.iis.kernal.logic.hl7v2.handling.IIncomingMessageHandler.*;
 
 @Service
 @SuppressWarnings({"rawtypes", "unchecked"})

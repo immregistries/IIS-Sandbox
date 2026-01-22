@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal.logic.v2.handling;
+package org.immregistries.iis.kernal.logic.hl7v2.handling;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.hl7v2.HL7Exception;

@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal.logic.v2.handling;
+package org.immregistries.iis.kernal.logic.hl7v2.handling;
 
 import org.immregistries.iis.kernal.logic.validation.ProcessingException;
 import org.immregistries.iis.kernal.model.ack.IisReportable;

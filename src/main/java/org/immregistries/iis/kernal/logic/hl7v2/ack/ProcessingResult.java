@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal.logic.v2.ack;
+package org.immregistries.iis.kernal.logic.hl7v2.ack;
 
 public enum ProcessingResult {
 //

@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal.logic.v2;
+package org.immregistries.iis.kernal.logic.hl7v2;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;

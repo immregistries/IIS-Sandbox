@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal.logic.v2.writing;
+package org.immregistries.iis.kernal.logic.hl7v2.writing;
 
 import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
 import ca.uhn.fhir.rest.param.ReferenceParam;

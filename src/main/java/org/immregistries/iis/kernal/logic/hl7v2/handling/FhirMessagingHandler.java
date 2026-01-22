@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal.logic.v2.handling;
+package org.immregistries.iis.kernal.logic.hl7v2.handling;
 
 import ca.uhn.fhir.context.FhirContext;
 import org.hl7.fhir.instance.model.api.IIdType;
@@ -7,7 +7,7 @@ import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
 import org.immregistries.iis.kernal.fhir.multitenancy.PartitionTenantCreationInterceptor;
 import org.immregistries.iis.kernal.logic.MessageRecordingService;
-import org.immregistries.iis.kernal.logic.v2.writing.Hl7MessageWriter;
+import org.immregistries.iis.kernal.logic.hl7v2.writing.Hl7MessageWriter;
 import org.immregistries.iis.kernal.logic.validation.ImmunizationProcessingInterceptor;
 import org.immregistries.iis.kernal.logic.validation.ObservationProcessingInterceptor;
 import org.immregistries.iis.kernal.logic.validation.PatientProcessingInterceptor;
