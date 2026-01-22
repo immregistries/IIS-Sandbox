@@ -42,39 +42,39 @@ import java.util.stream.Collectors;
  * Processes the Incoming Hl7v2 Messages, parsing into local objects and saving into database through FHIR Requester
  */
 @SuppressWarnings({"rawtypes", "unchecked"})
-public abstract class V2IncomingMessageHandler extends IncomingMessageHandler<HL7Reader, MqeMessageServiceResponse> {
+public class V2IncomingMessageHandler extends IncomingMessageHandler<HL7Reader, MqeMessageServiceResponse> {
 
 	protected final Logger logger = LoggerFactory.getLogger(V2IncomingMessageHandler.class);
 
 	@Autowired
-	ValidationService validationService;
+	private ValidationService validationService;
 	@Autowired
-	FhirSaveRequester fhirSaveRequester;
+	private FhirSaveRequester fhirSaveRequester;
 	@Autowired
-	FhirSearchRequester fhirSearchRequester;
+	private FhirSearchRequester fhirSearchRequester;
 	@Autowired
-	Hl7MessageWriter hl7MessageWriter;
+	private Hl7MessageWriter hl7MessageWriter;
 	@Autowired
-	PatientProcessingInterceptor patientProcessingInterceptor; // TODO decide how/where to implement the execution of interceptors, currently using DAO so some interceptors are skipped by the v2 process and need to be manually triggered
+	private PatientProcessingInterceptor patientProcessingInterceptor; // TODO decide how/where to implement the execution of interceptors, currently using DAO so some interceptors are skipped by the v2 process and need to be manually triggered
 	@Autowired
-	ObservationProcessingInterceptor observationProcessingInterceptor;
+	private ObservationProcessingInterceptor observationProcessingInterceptor;
 	@Autowired
-	ImmunizationProcessingInterceptor immunizationProcessingInterceptor;
+	private ImmunizationProcessingInterceptor immunizationProcessingInterceptor;
 	@Autowired
-	IncomingQueryHandler incomingQueryHandler;
+	private IncomingQueryHandler incomingQueryHandler;
 
 	@Autowired
-	MessageRecordingService messageRecordingService;
+	private MessageRecordingService messageRecordingService;
 	@Autowired
 	private CodeMapManagerService codeMapManagerService;
 	@Autowired
-	IisHL7UtilService iisHL7UtilService;
+	private IisHL7UtilService iisHL7UtilService;
 	@Autowired
-	IisAckBuilder ackBuilder;
+	private IisAckBuilder ackBuilder;
 	@Autowired
-	IisReportableUtilService iisReportableUtilService;
+	private IisReportableUtilService iisReportableUtilService;
 	@Autowired
-	V2DateParseService v2DateParseService;
+	private V2DateParseService v2DateParseService;
 
 
 	public V2IncomingMessageHandler() {

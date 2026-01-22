@@ -5,10 +5,11 @@ import ca.uhn.fhir.rest.param.StringParam;
 import ca.uhn.fhir.rest.param.TokenParam;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.instance.model.api.IIdType;
-import org.hl7.fhir.r5.model.Organization;
-import org.immregistries.iis.kernal.fhir.common.annotations.OnR5Condition;
+import org.hl7.fhir.r4.model.Organization;
+import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
 import org.immregistries.iis.kernal.logic.validation.ProcessingException;
-import org.immregistries.iis.kernal.mapping.mappers.fields.r5.BusinessIdentifierMapperR5;
+import org.immregistries.iis.kernal.mapping.mappers.fields.r4.BusinessIdentifierMapperR4;
+import org.immregistries.iis.kernal.mapping.requesters.FhirSaveRequesterR4;
 import org.immregistries.iis.kernal.mapping.requesters.FhirSearchRequester;
 import org.immregistries.iis.kernal.model.BusinessIdentifier;
 import org.immregistries.iis.kernal.model.enums.ProcessingFlavor;
@@ -22,16 +23,20 @@ import org.springframework.stereotype.Service;
 import java.util.Set;
 
 @Service
-@Conditional(OnR5Condition.class)
-@SuppressWarnings({ "unchecked" })
-public class V2IncomingMessageHandlerR5 extends V2IncomingMessageHandler {
+@Conditional(OnR4Condition.class)
+public class V2MessageOrganizationServiceR4 extends V2MessageOrganizationService<Organization, HL7Reader> {
+
+	@Autowired
+	private FhirSaveRequesterR4 fhirSaveRequester;
 	@Autowired
 	private FhirSearchRequester fhirSearchRequester;
 	@Autowired
-	private BusinessIdentifierMapperR5 businessIdentifierMapper;
+	private BusinessIdentifierMapperR4 businessIdentifierMapper;
 
-	public @Nullable IIdType readResponsibleOrganizationIIdType(Tenant tenant, HL7Reader reader,
-			String sendingFacilityName, Set<ProcessingFlavor> processingFlavorSet) throws ProcessingException {
+	public @Nullable IIdType readResponsibleOrganizationIIdType(Tenant tenant,
+																					HL7Reader reader,
+																					String sendingFacilityName,
+																					Set<ProcessingFlavor> processingFlavorSet) throws ProcessingException {
 		String facilityId = reader.getValue(4);
 
 		if (processingFlavorSet.contains(ProcessingFlavor.SOURSOP)) {
@@ -41,12 +46,11 @@ public class V2IncomingMessageHandlerR5 extends V2IncomingMessageHandler {
 		}
 		Organization responsibleOrganization = null;
 		if (StringUtils.isNotBlank(sendingFacilityName) && !sendingFacilityName.equals("null")) {
-			responsibleOrganization = (Organization) fhirSearchRequester.searchOrganizationR5(
-					new SearchParameterMap(Organization.SP_NAME, new StringParam(sendingFacilityName)));
+			responsibleOrganization = (Organization) fhirSearchRequester.searchOrganizationR4(
+				new SearchParameterMap(ORGANIZATION_SP_NAME, new StringParam(sendingFacilityName)));
 			// Organization.NAME.matches().value(sendingFacilityName));
 			if (responsibleOrganization == null) {
-				responsibleOrganization = (Organization) fhirSaveRequester
-						.saveOrganization(new Organization().setName(sendingFacilityName));
+				responsibleOrganization = (Organization) fhirSaveRequester.saveOrganization(new Organization().setName(sendingFacilityName));
 			}
 		}
 
@@ -63,7 +67,7 @@ public class V2IncomingMessageHandlerR5 extends V2IncomingMessageHandler {
 		return organizationIdType;
 	}
 
-	private Organization processSendingOrganization(HL7Reader reader) {
+	public Organization processSendingOrganization(HL7Reader reader) {
 		String organizationName = reader.getValue(4, 1);
 		BusinessIdentifier businessIdentifier = new BusinessIdentifier();
 		businessIdentifier.setValue(reader.getValue(4, 2));
@@ -73,14 +77,14 @@ public class V2IncomingMessageHandlerR5 extends V2IncomingMessageHandler {
 		Organization sendingOrganization = null;
 		if (tokenParam != null) {
 			sendingOrganization = (Organization) fhirSearchRequester
-					.searchOrganizationR5(new SearchParameterMap(Organization.SP_IDENTIFIER, tokenParam));
+				.searchOrganizationR4(new SearchParameterMap(Organization.SP_IDENTIFIER, tokenParam));
 		} else if (organizationName != null) {
-			sendingOrganization = (Organization) fhirSearchRequester.searchOrganizationR5(
-					new SearchParameterMap(Organization.SP_NAME, new StringParam(organizationName)));
+			sendingOrganization = (Organization) fhirSearchRequester.searchOrganizationR4(
+				new SearchParameterMap(ORGANIZATION_SP_NAME, new StringParam(organizationName)));
 		}
 		if (sendingOrganization == null && (StringUtils.isNotBlank(organizationName) || tokenParam != null)) {
 			sendingOrganization = new Organization()
-					.setName(organizationName);
+				.setName(organizationName);
 			if (tokenParam != null) {
 				sendingOrganization.addIdentifier(businessIdentifierMapper.fhirObject(businessIdentifier));
 			}
@@ -99,8 +103,8 @@ public class V2IncomingMessageHandlerR5 extends V2IncomingMessageHandler {
 		}
 		if (managingIdentifier != null) {
 			managingOrganization = (Organization) fhirSearchRequester
-					.searchOrganizationR5(new SearchParameterMap(Organization.SP_IDENTIFIER,
-							new TokenParam().setSystem(reader.getValue(22, 7)).setValue(managingIdentifier)));
+				.searchOrganizationR4(new SearchParameterMap(Organization.SP_IDENTIFIER,
+					new TokenParam().setSystem(reader.getValue(22, 7)).setValue(managingIdentifier)));
 			// Organization.IDENTIFIER.exactly()
 			// .systemAndIdentifier(reader.getValue(22, 7), managingIdentifier));
 			if (managingOrganization == null) {

@@ -25,7 +25,6 @@ import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.immregistries.mqe.hl7util.model.CodedWithExceptions;
 import org.immregistries.mqe.hl7util.model.Hl7Location;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Service;
@@ -90,13 +89,6 @@ public class FhirMessagingHandler extends IncomingMessageHandler<Bundle, Object>
 	@Override
 	public Bundle parseSource(String message) {
 		return fhirContext.newJsonParser().parseResource(Bundle.class, message);
-	}
-
-	@Override
-	@Nullable
-	IIdType readResponsibleOrganizationIIdType(Tenant tenant, Bundle bundle, String sendingFacilityName,
-			Set<ProcessingFlavor> processingFlavorSet) throws ProcessingException {
-		return null;
 	}
 
 	@Override

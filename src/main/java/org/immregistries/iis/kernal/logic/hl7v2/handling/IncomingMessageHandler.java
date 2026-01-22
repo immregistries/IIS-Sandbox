@@ -13,7 +13,6 @@ import org.immregistries.iis.kernal.model.VaccinationReported;
 import org.immregistries.iis.kernal.model.ack.IisReportable;
 import org.immregistries.iis.kernal.model.enums.ProcessingFlavor;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
-import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,15 +25,17 @@ public abstract class IncomingMessageHandler<ParsedSource, ValidationResult> imp
 
 	Logger logger = LoggerFactory.getLogger(this.getClass());
 	@Autowired
-	PartitionTenantCreationInterceptor partitionTenantCreationInterceptor;
+	private PartitionTenantCreationInterceptor partitionTenantCreationInterceptor;
 	@Autowired
-	ValidationService validationService;
+	private ValidationService validationService;
 	@Autowired
-	MessageRecordingService messageRecordingService;
+	private MessageRecordingService messageRecordingService;
 	@Autowired
 	private CodeMapManagerService codeMapManagerService;
 	@Autowired
-	IisReportableUtilService iisReportableUtilService;
+	private IisReportableUtilService iisReportableUtilService;
+	@Autowired
+	private V2MessageOrganizationService v2MessageOrganizationService;
 
 	@Override
 	public String process(String message, Tenant tenant, String sendingFacilityName) {
@@ -49,7 +50,7 @@ public abstract class IncomingMessageHandler<ParsedSource, ValidationResult> imp
 		Set<ProcessingFlavor> processingFlavorSet = null;
 		try {
 			processingFlavorSet = tenant.getProcessingFlavorSet();
-			IIdType organizationIdType = readResponsibleOrganizationIIdType(tenant, parsedSource, sendingFacilityName, processingFlavorSet);
+			IIdType organizationIdType = v2MessageOrganizationService.readResponsibleOrganizationIIdType(tenant, parsedSource, sendingFacilityName, processingFlavorSet);
 			switch (messageType) {
 				case "VXU":
 					responseMessage = processVXU(tenant, parsedSource, message, organizationIdType);
@@ -81,7 +82,6 @@ public abstract class IncomingMessageHandler<ParsedSource, ValidationResult> imp
 
 	public abstract ParsedSource parseSource(String message);
 
-	abstract @Nullable IIdType readResponsibleOrganizationIIdType(Tenant tenant, ParsedSource parsedSource, String sendingFacilityName, Set<ProcessingFlavor> processingFlavorSet) throws ProcessingException;
 
 	//	public abstract String processVXU(Tenant tenant, SourceType sourceType, String message, IIdType managingOrganizationId) throws Exception;
 	public String processVXU(Tenant tenant, ParsedSource parsedSource, String message, IIdType managingOrganizationId) throws Exception {
