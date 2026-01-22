@@ -15,14 +15,14 @@ public class MdmIisConsumerConfig extends MdmConsumerConfig {
 
 	@Bean
 	@Conditional(OnR5Condition.class)
-	IMdmMatchFinderSvc mdmMatchFinderSvc() {
-		return new MdmIisMatchFinderSvcR5();
+	IMdmMatchFinderSvc mdmMatchFinderSvcR5() {
+		return new MdmIisMatchFinderSvc<org.hl7.fhir.r5.model.Immunization, org.hl7.fhir.r5.model.Patient>();
 	}
 
 	@Bean
 	@Conditional(OnR4Condition.class)
-	IMdmMatchFinderSvc mdmMatchFinderSvcR4() {
-		return new MdmIisMatchFinderSvcR4();
+	IMdmMatchFinderSvc mdmMatchFinderSvc() {
+		return new MdmIisMatchFinderSvc<org.hl7.fhir.r4.model.Immunization, org.hl7.fhir.r4.model.Patient>();
 	}
 
 }

@@ -8,9 +8,11 @@ import org.immregistries.iis.kernal.fhir.common.annotations.OnR5Condition;
 import org.immregistries.iis.kernal.logic.CodeMapManagerService;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
 import org.immregistries.iis.kernal.mapping.mappers.fields.r5.BusinessIdentifierMapperR5;
-import org.immregistries.iis.kernal.mapping.requesters.FhirReadRequester;
+import org.immregistries.iis.kernal.mapping.mappers.fields.r5.IisReferenceMapperR5;
 import org.immregistries.iis.kernal.mapping.mappers.resources.ImmunizationMapper;
+import org.immregistries.iis.kernal.mapping.requesters.FhirReadRequester;
 import org.immregistries.iis.kernal.model.BusinessIdentifier;
+import org.immregistries.iis.kernal.model.IisReference;
 import org.immregistries.iis.kernal.model.IisVaccination;
 import org.immregistries.iis.kernal.model.ModelPerson;
 import org.slf4j.Logger;
@@ -33,6 +35,8 @@ public class ImmunizationMapperR5 extends ImmunizationMapper<Immunization> imple
 	private CodeMapManagerService codeMapManagerService;
 	@Autowired
 	private BusinessIdentifierMapperR5 businessIdentifierMapper;
+	@Autowired
+	private IisReferenceMapperR5 iisReferenceMapperR5;
 
 	public void fillFromFhirResource(IisVaccination vr, Immunization i) {
 		/*
@@ -443,6 +447,11 @@ public class ImmunizationMapperR5 extends ImmunizationMapper<Immunization> imple
 			i.addPerformer(performer(vr.getAdministeringProvider(), ADMINISTERING_VALUE, ADMINISTERING_DISPLAY));
 		}
 		return i;
+	}
+
+	@Override
+	public IisReference extractPatientReference(Immunization immunization) {
+		return iisReferenceMapperR5.localObject(immunization.getPatient());
 	}
 
 	private Immunization.ImmunizationPerformerComponent performer(ModelPerson person, String functionCode,

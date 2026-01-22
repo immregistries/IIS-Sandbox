@@ -13,7 +13,6 @@ public abstract class BusinessIdentifierMapper<Identifier extends IBaseDatatype>
 		return BusinessIdentifier.class;
 	}
 
-
 	@Override
 	public String fhirTypeName() {
 		return "Identifier";
