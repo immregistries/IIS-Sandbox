@@ -4,10 +4,6 @@ import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.hl7.fhir.instance.model.api.IDomainResource;
-import org.immregistries.iis.kernal.model.IisPatient;
-import org.immregistries.iis.kernal.persisted.model.Tenant;
-
-import java.util.Date;
 
 /**
  * Implements Immunization Recommendation functionalities
@@ -17,10 +13,10 @@ import java.util.Date;
  */
 public interface IImmunizationRecommendationService<ImmunizationRecommendation extends IAnyResource, Patient extends IDomainResource> {
 
-	MethodOutcome updateRecommendation(IGenericClient fhirClient, IAnyResource recommendation);
+	MethodOutcome updateRecommendation(IGenericClient fhirClient, ImmunizationRecommendation recommendation);
 
 	ImmunizationRecommendation readRecommendation(String recommendationId, String recommendationIdentifier, IGenericClient fhirClient);
 
-	ImmunizationRecommendation getPatientRecommendation(IGenericClient fhirClient, IAnyResource patient);
+	ImmunizationRecommendation getPatientRecommendation(IGenericClient fhirClient, Patient patient);
 
 }

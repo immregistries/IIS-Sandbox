@@ -12,8 +12,8 @@ import org.hl7.fhir.r4.model.Patient;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
 import org.immregistries.iis.kernal.logic.recommendations.CdsQueryServiceR4;
 import org.immregistries.iis.kernal.logic.recommendations.IisRecommendationGenerator;
-import org.immregistries.iis.kernal.mapping.mappers.resources.r4.ImmunizationMapperR4;
-import org.immregistries.iis.kernal.mapping.mappers.resources.r4.PatientMapperR4;
+import org.immregistries.iis.kernal.mapping.mappers.resources.ImmunizationMapper;
+import org.immregistries.iis.kernal.mapping.mappers.resources.PatientMapper;
 import org.immregistries.iis.kernal.model.IisPatient;
 import org.immregistries.iis.kernal.model.IisVaccination;
 import org.immregistries.iis.kernal.security.CurrentTenantUtil;
@@ -33,9 +33,9 @@ public class RecommendationForecastProviderR4 implements IRecommendationForecast
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	@Autowired
-	private PatientMapperR4 patientMapperR4;
+	private PatientMapper<Patient> patientMapper;
 	@Autowired
-	private ImmunizationMapperR4 immunizationMapperR4;
+	private ImmunizationMapper<Immunization> immunizationMapper;
 	@Autowired
 	private IisRecommendationGenerator iisRecommendationGenerator;
 	@Autowired
@@ -59,11 +59,11 @@ public class RecommendationForecastProviderR4 implements IRecommendationForecast
 		Parameters out = new Parameters();
 		List<? extends IisVaccination> iisVaccinationList;
 		if (immunization != null) {
-			iisVaccinationList = immunization.stream().map(immunization1 -> immunizationMapperR4.localObject(immunization1)).collect(Collectors.toList());
+			iisVaccinationList = immunization.stream().map(immunization1 -> immunizationMapper.localObject(immunization1)).collect(Collectors.toList());
 		} else {
 			iisVaccinationList = List.of();
 		}
-		IisPatient iisPatient = patientMapperR4.localObject(patient);
+		IisPatient iisPatient = patientMapper.localObject(patient);
 		try {
 			out = cdsQueryService.queryCds(CurrentTenantUtil.getTenant(), assessmentDate.getValue(), iisPatient, iisVaccinationList);
 			logger.info("out {}", out.getParameters(EVALUATION).size());

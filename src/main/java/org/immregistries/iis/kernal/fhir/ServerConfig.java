@@ -119,7 +119,7 @@ public class ServerConfig {
 												  Optional<DiffProvider> diffProvider,
 												  PartitionTenantCreationInterceptor partitionTenantCreationInterceptor,
 												  Optional<IBulkExportGroupProvider> bulkQueryGroupProvider,
-												  Optional<IIdentifierSolverInterceptor> identifierSolverInterceptor,
+												  Optional<IdentifierSolverInterceptor> identifierSolverInterceptor,
 												  Optional<GroupAuthorityInterceptor> groupAuthorityInterceptor,
 												  Optional<IRecommendationForecastProvider> recommendationForecastProvider,
 												  IisAuthorizationInterceptor iisAuthorizationInterceptor,

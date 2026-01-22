@@ -6,13 +6,12 @@ import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.immregistries.iis.kernal.mapping.requesters.FhirRequesterUtil;
 import org.immregistries.iis.kernal.mapping.requesters.FhirSearchRequester;
 import org.immregistries.iis.kernal.model.IisVaccination;
-import org.immregistries.iis.kernal.model.ModelReference;
 import org.immregistries.iis.kernal.model.VaccinationMaster;
 import org.immregistries.iis.kernal.model.VaccinationReported;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public abstract class ImmunizationMapper<Immunization extends IAnyResource>
-	implements IisResourceMasterReportedMapper<VaccinationMaster, VaccinationReported, IisVaccination, Immunization> {
+	implements IisResourceMasterReportedMapper<VaccinationMaster, VaccinationReported, IisVaccination, Immunization>, IPatientReferenceExtractor<Immunization> {
 
 	public static final String CVX_SYSTEM = "http://hl7.org/fhir/sid/cvx";
 	public static final String MVX_SYSTEM = "http://terminology.hl7.org/CodeSystem/MVX";
@@ -107,8 +106,6 @@ public abstract class ImmunizationMapper<Immunization extends IAnyResource>
 	 * @return the Immunization resource
 	 */
 	public abstract Immunization fhirObject(IisVaccination vaccinationMaster);
-
-	public abstract ModelReference extractPatientReference(Immunization immunization);
 
 	public abstract void fillFromFhirResource(IisVaccination localPatient, Immunization immunization);
 }

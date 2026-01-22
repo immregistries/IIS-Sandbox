@@ -1,17 +1,15 @@
 package org.immregistries.iis.kernal.mapping.mappers.resources.r4;
 
 import org.apache.commons.lang3.StringUtils;
-import org.hl7.fhir.r4.model.CodeableConcept;
-import org.hl7.fhir.r4.model.Coding;
-import org.hl7.fhir.r4.model.ImmunizationEvaluation;
-import org.hl7.fhir.r4.model.Reference;
+import org.hl7.fhir.r4.model.*;
 import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
 import org.immregistries.iis.kernal.logic.CodeMapManagerService;
-import org.immregistries.iis.kernal.mapping.mappers.fields.r4.BusinessIdentifierMapperR4;
+import org.immregistries.iis.kernal.mapping.mappers.fields.BusinessIdentifierMapper;
 import org.immregistries.iis.kernal.mapping.mappers.resources.ImmunizationEvaluationMapper;
+import org.immregistries.iis.kernal.mapping.mappers.resources.ImmunizationMapper;
 import org.immregistries.iis.kernal.model.IisEvaluation;
 import org.immregistries.iis.kernal.model.IisVaccination;
 import org.immregistries.vfa.connect.model.EvaluationActual;
@@ -30,11 +28,12 @@ import java.util.Date;
 public class ImmunizationEvaluationMapperR4 extends ImmunizationEvaluationMapper<ImmunizationEvaluation> implements IR4Mapper<IisEvaluation, ImmunizationEvaluation> {
 
 	@Autowired
-	private ImmunizationMapperR4 immunizationMapperR4;
+	private ImmunizationMapper<Immunization> immunizationMapper;
+	@Autowired
+	private BusinessIdentifierMapper<Identifier> businessIdentifierMapper;
 	@Autowired
 	private CodeMapManagerService codeMapManagerService;
-	@Autowired
-	private BusinessIdentifierMapperR4 businessIdentifierMapper;
+
 
 	public IisEvaluation localObject(ImmunizationEvaluation immunizationEvaluation) {
 		IisEvaluation iisEvaluation = new IisEvaluation();

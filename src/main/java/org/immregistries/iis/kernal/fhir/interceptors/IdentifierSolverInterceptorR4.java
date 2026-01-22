@@ -1,71 +1,55 @@
 package org.immregistries.iis.kernal.fhir.interceptors;
 
-import ca.uhn.fhir.interceptor.api.Hook;
 import ca.uhn.fhir.jpa.api.dao.IFhirResourceDao;
-import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
-import ca.uhn.fhir.rest.api.RestOperationTypeEnum;
-import ca.uhn.fhir.rest.api.server.IBundleProvider;
 import ca.uhn.fhir.rest.api.server.RequestDetails;
-import ca.uhn.fhir.rest.param.TokenParam;
 import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
 import jakarta.interceptor.Interceptor;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.r4.model.*;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
+import org.immregistries.iis.kernal.mapping.mappers.fields.BusinessIdentifierMapper;
+import org.immregistries.iis.kernal.mapping.mappers.fields.ModelReferenceMapper;
+import org.immregistries.iis.kernal.mapping.mappers.resources.ImmunizationMapper;
+import org.immregistries.iis.kernal.model.BusinessIdentifier;
+import org.immregistries.iis.kernal.model.ModelReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Service;
 
-import static ca.uhn.fhir.interceptor.api.Pointcut.SERVER_INCOMING_REQUEST_PRE_HANDLED;
 import static org.immregistries.iis.kernal.mapping.mappers.resources.PatientMapper.MRN_SYSTEM;
-import static org.immregistries.iis.kernal.mapping.requesters.FhirSaveRequester.GOLDEN_RECORD;
-import static org.immregistries.iis.kernal.mapping.requesters.FhirSaveRequester.GOLDEN_SYSTEM_TAG;
 
 @Interceptor
 @Conditional(OnR4Condition.class)
 @Service
-public class IdentifierSolverInterceptorR4 implements IIdentifierSolverInterceptor<Identifier, Immunization, Group, Observation> {
+public class IdentifierSolverInterceptorR4 extends IdentifierSolverInterceptor<Patient, Immunization, Group, Observation> {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	@Autowired
 	private IFhirResourceDao<Patient> patientDao;
+	@Autowired
+	private BusinessIdentifierMapper<Identifier> businessIdentifierMapper;
+	@Autowired
+	private ModelReferenceMapper<Reference> modelReferenceMapper;
+	@Autowired
+	private ImmunizationMapper<Immunization> immunizationMapper;
 
-	@Override
-	@Hook(SERVER_INCOMING_REQUEST_PRE_HANDLED)
-	public void handle(RequestDetails requestDetails) throws InvalidRequestException {
-		if (requestDetails.getResource() == null || requestDetails.getRestOperationType() == null) {
+	public void handleImmunization(RequestDetails requestDetails, Immunization immunization) {
+		if (immunization == null) {
 			return;
 		}
-		if (requestDetails.getRestOperationType().equals(RestOperationTypeEnum.UPDATE) || requestDetails.getRestOperationType().equals(RestOperationTypeEnum.CREATE)) {
-			if (requestDetails.getResource() instanceof Immunization) {
-				handleImmunization(requestDetails, (Immunization) requestDetails.getResource());
-			} else if (requestDetails.getResource() instanceof Group) {
-				handleGroup(requestDetails, (Group) requestDetails.getResource());
-			} else if (requestDetails.getResource() instanceof Observation) {
-				handleObservation(requestDetails, (Observation) requestDetails.getResource());
-			}
-		}
-	}
-
-	@Override
-	public void handleImmunization(RequestDetails requestDetails, Immunization immunization) {
-		if (immunization == null
-			|| immunization.getPatient().getIdentifier() == null
-			|| immunization.getPatient().getIdentifier().getValue() == null
-			|| immunization.getPatient().getIdentifier().getSystem() == null
-		) {
+		ModelReference patientReference = immunizationMapper.extractPatientReference(immunization);
+		BusinessIdentifier identifier = patientReference.getIdentifier();
+		if (identifier == null || identifier.getValue() == null || identifier.getSystem() == null) {
 			return;
 		}
 		/*
 		 * Linking record to golden
 		 */
-		Identifier identifier = immunization.getPatient().getIdentifier();
 		String id = solvePatientIdentifier(requestDetails, identifier);
-
 		if (id != null) {
-			logger.info("Identifier reference solved {}|{} to {}", identifier.getSystem(), identifier.getValue(), id);
+			logger.info("Identifier reference solved {}|{} to {} for Immunization", identifier.getSystem(), identifier.getValue(), id);
 			immunization.setPatient(new Reference("Patient/" + new IdType(id).getIdPart()));
 			requestDetails.setResource(immunization);
 		} else {
@@ -94,7 +78,7 @@ public class IdentifierSolverInterceptorR4 implements IIdentifierSolverIntercept
 		String id = solvePatientIdentifier(requestDetails, identifier);
 
 		if (id != null) {
-			logger.info("Identifier reference solved {}|{} to {}", identifier.getSystem(), identifier.getValue(), id);
+			logger.info("Identifier reference solved {}|{} to {} for Observation", identifier.getSystem(), identifier.getValue(), id);
 			observation.setSubject(new Reference("Patient/" + new IdType(id).getIdPart()));
 			requestDetails.setResource(observation);
 		} else {
@@ -120,62 +104,11 @@ public class IdentifierSolverInterceptorR4 implements IIdentifierSolverIntercept
 				logger.info("Identifier reference solved {}|{} to {} for Group", identifier.getSystem(), identifier.getValue(), id);
 				memberComponent.setEntity(new Reference("Patient/" + new IdType(id).getIdPart()).setIdentifier(identifier));
 			}
-//			else {
-//				// TODO set flavor
-//				if (identifier.getSystem().equals(MRN_SYSTEM)) {
-//					throw new InvalidRequestException("There is no matching patient for MRN " + identifier.getValue());
-//				} else {
-//					throw new InvalidRequestException("There is no matching patient for " + identifier.getSystem() + " " + identifier.getValue());
-//				}
-//			}
 		}
 		requestDetails.setResource(group);
 	}
 
-
-	@Override
 	public String solvePatientIdentifier(RequestDetails requestDetails, Identifier identifier) {
-		String id = null;
-		/*
-		 * searching for matching patient golden record first
-		 */
-		SearchParameterMap goldenSearchParameterMap = new SearchParameterMap()
-			.add("_tag", new TokenParam()
-				.setSystem(GOLDEN_SYSTEM_TAG)
-				.setValue(GOLDEN_RECORD));
-		if (StringUtils.isNotBlank(identifier.getSystem())) {
-			goldenSearchParameterMap.add(Patient.SP_IDENTIFIER, new TokenParam()
-				.setSystem(identifier.getSystem())
-				.setValue(identifier.getValue()));
-		} else {
-			goldenSearchParameterMap.add(Patient.SP_IDENTIFIER, new TokenParam()
-				.setValue(identifier.getValue()));
-		}
-
-		// TODO get golden record, or merge and add identifiers to golden record
-		IBundleProvider goldenBundleProvider = patientDao.search(goldenSearchParameterMap, requestDetails);
-		if (!goldenBundleProvider.isEmpty()) {
-			id = goldenBundleProvider.getAllResourceIds().get(0);
-		} else {
-			/*
-			 * If no golden record matched, regular records are checked
-			 */
-			// TODO set flavor
-			SearchParameterMap searchParameterMap = new SearchParameterMap();
-			if (StringUtils.isNotBlank(identifier.getSystem())) {
-				searchParameterMap.add(Patient.SP_IDENTIFIER, new TokenParam()
-					.setSystem(identifier.getSystem())
-					.setValue(identifier.getValue()));
-			} else {
-				searchParameterMap.add(Patient.SP_IDENTIFIER, new TokenParam()
-					.setValue(identifier.getValue()));
-			}
-
-			IBundleProvider bundleProvider = patientDao.search(searchParameterMap, requestDetails);
-			if (!bundleProvider.isEmpty()) {
-				id = bundleProvider.getAllResourceIds().get(0);
-			}
-		}
-		return id;
+		return solvePatientIdentifier(requestDetails, businessIdentifierMapper.localObject(identifier));
 	}
 }

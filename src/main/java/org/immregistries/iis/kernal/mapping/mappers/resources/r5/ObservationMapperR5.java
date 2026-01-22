@@ -7,6 +7,7 @@ import org.immregistries.iis.kernal.fhir.common.annotations.OnR5Condition;
 import org.immregistries.iis.kernal.logic.v2.ack.V2DateParseService;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
 import org.immregistries.iis.kernal.mapping.mappers.fields.r5.BusinessIdentifierMapperR5;
+import org.immregistries.iis.kernal.mapping.mappers.fields.r5.ModelReferenceMapperR5;
 import org.immregistries.iis.kernal.mapping.mappers.resources.ImmunizationMapper;
 import org.immregistries.iis.kernal.mapping.mappers.resources.ObservationMapper;
 import org.immregistries.iis.kernal.model.BusinessIdentifier;
@@ -32,7 +33,9 @@ public class ObservationMapperR5 extends ObservationMapper<Observation> implemen
 	@Autowired
 	private BusinessIdentifierMapperR5 businessIdentifierMapper;
 	@Autowired
-	V2DateParseService v2DateParseService;
+	private V2DateParseService v2DateParseService;
+	@Autowired
+	private ModelReferenceMapperR5 modelReferenceMapperR5;
 
 	public ObservationReported localObjectReportedWithMaster(Observation observation) {
 		ObservationReported observationReported = localObjectReported(observation);
@@ -563,4 +566,8 @@ public class ObservationMapperR5 extends ObservationMapper<Observation> implemen
 		return codeableConcept;
 	}
 
+//	@Override
+//	public ModelReference extractPatientReference(Observation observation) {
+//		return modelReferenceMapperR5.localObject(observation.getSubject());
+//	}
 }
