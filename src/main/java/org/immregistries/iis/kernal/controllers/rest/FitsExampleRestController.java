@@ -1,11 +1,12 @@
 package org.immregistries.iis.kernal.controllers.rest;
 
-import java.util.Map;
-import org.immregistries.iis.kernal.logic.FitsExamples;
+import org.immregistries.iis.kernal.logic.v2.FitsExamples;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping(RestUrlUtil.REST + FitsExampleRestController.FITS_EXAMPLE_PATH)

@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal.logic;
+package org.immregistries.iis.kernal.logic.v2;
 
 import java.util.HashMap;
 import java.util.Map;

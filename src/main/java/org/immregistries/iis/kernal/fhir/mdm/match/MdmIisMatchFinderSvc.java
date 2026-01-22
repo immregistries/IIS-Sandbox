@@ -52,7 +52,7 @@ import static org.immregistries.iis.kernal.mapping.requesters.FhirSaveRequester.
  * Generics FhirImmunization Immunization
  * Generics FhirPatient Patient
  */
-public class MdmIisMatchFinderSvc<FhirImmunization extends IAnyResource, FhirPatient extends IAnyResource> extends MdmMatchFinderSvcImpl implements IMdmMatchFinderSvc, IMdmIisMatchFinderSvc {
+public class MdmIisMatchFinderSvc<FhirImmunization extends IAnyResource, FhirPatient extends IAnyResource> extends MdmMatchFinderSvcImpl implements IMdmMatchFinderSvc {
 	private static final Logger ourLog = Logs.getMdmTroubleshootingLog();
 
 	@Autowired
@@ -134,7 +134,7 @@ public class MdmIisMatchFinderSvc<FhirImmunization extends IAnyResource, FhirPat
 			.map((candidate) -> {
 				Patient mismoPatientCandidate = patientMismoConversionService.convert((FhirPatient) candidate);
 				PatientMatchResult mismoMatchResult = patientMismoMatcher.match(mismoPatient, mismoPatientCandidate);
-				return new MatchedTarget(candidate, IMdmIisMatchFinderSvc.mismoResultToMdmMatchOutcome(mismoMatchResult));
+				return new MatchedTarget(candidate, patientMismoConversionService.mismoResultToMdmMatchOutcome(mismoMatchResult));
 			}).collect(Collectors.toList());
 		return matches;
 	}

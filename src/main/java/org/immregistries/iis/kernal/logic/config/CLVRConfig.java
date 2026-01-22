@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal.logic.shlink;
+package org.immregistries.iis.kernal.logic.config;
 
 import com.syadem.nuva.NUVA;
 import com.syadem.nuva.SupportedLocale;
@@ -6,7 +6,6 @@ import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR5Condition;
 import org.immregitries.clvr.*;
 import org.immregitries.clvr.impl.*;
-import org.immregitries.clvr.mapping.FhirConversionUtil;
 import org.immregitries.clvr.mapping.FhirConversionUtilR4;
 import org.immregitries.clvr.mapping.FhirConversionUtilR5;
 import org.springframework.context.annotation.Bean;

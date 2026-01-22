@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal.logic;
+package org.immregistries.iis.kernal.logic.config;
 
 import gov.cdc.izgw.v2tofhir.converter.MessageParser;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
