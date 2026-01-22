@@ -79,7 +79,7 @@ public class FhirReadRequester {
 	public VaccinationMaster readAsVaccinationMaster(String id) {
 		Immunization immunization = (Immunization) read(ImmunizationMapper.IMMUNIZATION, id);
 		if (FhirRequesterUtil.isGoldenRecord(immunization)) {
-			return (VaccinationMaster) mappingService.localObject(immunization);
+			return (VaccinationMaster) mappingService.localObjectMaster(immunization);
 		}
 		return null;
 	}

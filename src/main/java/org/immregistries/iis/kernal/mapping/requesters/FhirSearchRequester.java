@@ -238,7 +238,7 @@ public class FhirSearchRequester {
 		IBundleProvider bundleProvider = searchGoldenRecord(PatientMapper.PATIENT, searchParameterMap);
 		if (!bundleProvider.isEmpty()) {
 			for (IBaseResource resource : bundleProvider.getAllResources()) {
-				patientList.add((PatientMaster) mappingService.localObject((IAnyResource) resource));
+				patientList.add((PatientMaster) mappingService.localObjectMaster((IAnyResource) resource));
 			}
 		}
 		return patientList;
