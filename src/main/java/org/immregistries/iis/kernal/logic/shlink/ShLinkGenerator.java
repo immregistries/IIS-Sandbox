@@ -35,12 +35,12 @@ import java.util.List;
 import java.util.Map;
 
 import static org.immregistries.iis.kernal.controllers.rest.shlink.ShLinkManifestRestController.SHLINKS_CONTROLLER_REST_BASE_URL;
-import static org.immregistries.iis.kernal.logic.shlink.ShCardUtilService.VERIFIABLE_CREDENTIAL_TYPE;
+import static org.immregistries.iis.kernal.logic.shlink.ShCardGenerator.VERIFIABLE_CREDENTIAL_TYPE;
 
 @Service
-public class ShLinkUtilService {
+public class ShLinkGenerator {
 
-	private static final Logger logger = LoggerFactory.getLogger(ShLinkUtilService.class);
+	private static final Logger logger = LoggerFactory.getLogger(ShLinkGenerator.class);
 	public static final String CONTENT_ID = "contentId";
 	public static final String APPLICATION_SMART_HEALTH_CARD_CONTENT_TYPE = "application/smart-health-card";
 	public static final String APPLICATION_FHIR_JSON_CONTENT_TYPE = "application/fhir+json";
@@ -49,7 +49,7 @@ public class ShLinkUtilService {
 	@Autowired
 	private IisShlinkContentRepository iisShlinkContentRepository;
 	@Autowired
-	private ShCardUtilService shCardUtilService;
+	private ShCardGenerator shCardGenerator;
 	@Autowired
 	private CompressionService compressionService;
 	@Autowired
@@ -107,7 +107,7 @@ public class ShLinkUtilService {
 		String shcardIssuerUrl = WellKnownKeyController.getKeyIssuerUrl(req, tenant);
 		List<String> verifiableCredentials = new ArrayList<>(bundleList.size());
 		for (IBaseBundle bundle : bundleList) {
-			String shCardCompact = shCardUtilService.qrCompact(bundle, shcardIssuerUrl, iisSigningKey);
+			String shCardCompact = shCardGenerator.shCardCompact(bundle, shcardIssuerUrl, iisSigningKey);
 			verifiableCredentials.add(shCardCompact);
 		}
 		shLinkFilePayload.setVerifiableCredential(verifiableCredentials);

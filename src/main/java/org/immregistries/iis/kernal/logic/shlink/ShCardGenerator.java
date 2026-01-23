@@ -24,10 +24,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Service
-public class ShCardUtilService {
+public class ShCardGenerator {
 
 	private final static String SIGNATURE_ALGORITHM_NAME = "HmacSha512";
-
 
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -53,17 +52,17 @@ public class ShCardUtilService {
 	@Autowired
 	private CompressionService compressionService;
 
-	public String qrCompact(IBaseBundle iBaseBundle, HttpServletRequest request, IisKey signingKey, Tenant tenant) throws IOException {
+	public String shCardCompact(IBaseBundle iBaseBundle, HttpServletRequest request, IisKey signingKey, Tenant tenant) throws IOException {
 		String shcardIssuerUrl = WellKnownKeyController.getKeyIssuerUrl(request, tenant);
-		return qrCompact(iBaseBundle, shcardIssuerUrl, signingKey);
+		return shCardCompact(iBaseBundle, shcardIssuerUrl, signingKey);
 	}
 
-	public String qrCompact(IBaseBundle iBaseBundle, String issuerUrl, IisKey signingKey) throws IOException {
+	public String shCardCompact(IBaseBundle iBaseBundle, String issuerUrl, IisKey signingKey) throws IOException {
 		String resourceString = fhirContext.newJsonParser().setSummaryMode(true).encodeResourceToString(iBaseBundle);
-		return qrCompact(resourceString, issuerUrl, signingKey);
+		return shCardCompact(resourceString, issuerUrl, signingKey);
 	}
 
-	public String qrCompact(String resourceString, String issuerUrl, IisKey iisKey) throws IOException {
+	public String shCardCompact(String resourceString, String issuerUrl, IisKey iisKey) throws IOException {
 		KeyPair signingKeyPair = iisKey.keyPair();
 
 		Map<String, Object> mapVc = new HashMap<>(2);

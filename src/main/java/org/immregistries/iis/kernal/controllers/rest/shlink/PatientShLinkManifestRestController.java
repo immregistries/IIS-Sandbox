@@ -8,8 +8,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.immregistries.iis.kernal.controllers.rest.RestUrlUtil;
+import org.immregistries.iis.kernal.logic.shlink.ShLinkGenerator;
 import org.immregistries.iis.kernal.logic.shlink.ShLinkManifestGenerator;
-import org.immregistries.iis.kernal.logic.shlink.ShLinkUtilService;
 import org.immregistries.iis.kernal.mapping.IisFhirClientFactory;
 import org.immregistries.iis.kernal.mapping.mappers.resources.PatientMapper;
 import org.immregistries.iis.kernal.mapping.requesters.FhirSearchRequester;
@@ -39,7 +39,7 @@ public class PatientShLinkManifestRestController {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	@Autowired
-	private ShLinkUtilService shLinkUtilService;
+	private ShLinkGenerator shLinkGenerator;
 	@Autowired
 	private ShLinkManifestGenerator shLinkManifestGenerator;
 	@Autowired

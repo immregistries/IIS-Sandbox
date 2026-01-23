@@ -4,7 +4,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.immregistries.iis.kernal.controllers.rest.RestUrlUtil;
 import org.immregistries.iis.kernal.logic.shlink.CompressionService;
-import org.immregistries.iis.kernal.logic.shlink.ShLinkUtilService;
+import org.immregistries.iis.kernal.logic.shlink.ShLinkGenerator;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.immregistries.iis.kernal.persisted.entities.UserAccess;
 import org.immregistries.iis.kernal.security.CurrentTenantUtil;
@@ -37,7 +37,7 @@ public class ShLinkRestController {
 
 
 	@Autowired
-	ShLinkUtilService shLinkUtilService;
+	ShLinkGenerator shLinkGenerator;
 
 
 	@Autowired
@@ -53,7 +53,7 @@ public class ShLinkRestController {
 			@RequestAttribute(CurrentTenantUtil.SESSION_REQUEST_TENANT) Tenant tenant)
 			throws IOException, NoSuchAlgorithmException {
 		UserAccess userAccess = UserAccessUtil.get().getUserAccess();
-		String qrCode = shLinkUtilService.generateShLink(req, keyId, secretKey, patientId, flag, exp, tenant, userAccess);
+		String qrCode = shLinkGenerator.generateShLink(req, keyId, secretKey, patientId, flag, exp, tenant, userAccess);
 		return qrCode;
 	}
 

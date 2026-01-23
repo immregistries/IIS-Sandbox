@@ -14,7 +14,6 @@ server:
   servlet:
     contextPath: "/iis"
 iis:
-
   api:
     app:
       jwtSecret: ${ENV_IIS_JWT_SECRET}
@@ -62,16 +61,14 @@ spring:
 
   jpa:
     properties:
-      hibernate.dialect: ca.uhn.fhir.jpa.model.dialect.HapiFhirH2Dialect
       hibernate.format_sql: false
       hibernate.show_sql: false
       #Hibernate dialect is automatically detected except Postgres and H2.
       #If using H2, then supply the value of ca.uhn.fhir.jpa.model.dialect.HapiFhirH2Dialect
       #If using postgres, then supply the value of ca.uhn.fhir.jpa.model.dialect.HapiFhirPostgres94Dialect
-
-#      hibernate.dialect: '@jpa.properties.hibernate.dialect@'
-#      hibernate.dialect: ca.uhn.fhir.jpa.model.dialect.HapiFhirH2Dialect
-#      hibernate.dialect: ca.uhn.fhir.jpa.model.dialect.HapiFhirPostgres94Dialect
+      #      hibernate.dialect: '@jpa.properties.hibernate.dialect@'
+      hibernate.dialect: ca.uhn.fhir.jpa.model.dialect.HapiFhirH2Dialect
+      #      hibernate.dialect: ca.uhn.fhir.jpa.model.dialect.HapiFhirPostgres94Dialect
   #      hibernate.hbm2ddl.auto: update
   #      hibernate.jdbc.batch_size: 20
   #      hibernate.cache.use_query_cache: false
@@ -241,7 +238,6 @@ hapi:
 #  username: SomeUsername
 
 ## Prod profile only properties to set up with postgresql
-
 ## Dev profile only properties to set up with H2
 ---
 spring:
