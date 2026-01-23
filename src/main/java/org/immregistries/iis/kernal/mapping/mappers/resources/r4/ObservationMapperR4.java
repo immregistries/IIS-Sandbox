@@ -54,6 +54,11 @@ public class ObservationMapperR4 extends ObservationMapper<Observation> implemen
 		return localObjectReported(o);
 	}
 
+	@Override
+	public Class<Observation> fhirType() {
+		return Observation.class;
+	}
+
 	public Observation fhirObject(ObservationMaster om) {
 		Observation o = new Observation();
 		/*

@@ -41,6 +41,11 @@ public class ImmunizationRecommendationMapperR5 extends RecommendationMapper<Imm
 		return iisRecommendation;
 	}
 
+	@Override
+	public Class<ImmunizationRecommendation> fhirType() {
+		return ImmunizationRecommendation.class;
+	}
+
 	public ImmunizationRecommendation fhirObject(IisRecommendation iisRecommendation) {
 		ImmunizationRecommendation immunizationRecommendation = toFhir(iisRecommendation.getForecastActualList(), iisRecommendation.getDate());
 		if (iisRecommendation.getIisPatient() != null) {

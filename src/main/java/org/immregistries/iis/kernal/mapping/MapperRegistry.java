@@ -27,32 +27,26 @@ public class MapperRegistry {
 	private List<IisResourceMasterReportedMapper> mapperMastersReported;
 	@SuppressWarnings("rawtypes")
 	@Autowired
-	private List<IisResourceMapper> mapperMasters;
+	private List<IisResourceMapper> resourceMappers;
 	@SuppressWarnings("rawtypes")
 	@Autowired
 	private List<IFieldMapper> fieldMappers;
-
 	@SuppressWarnings("rawtypes")
 	@Autowired
 	private List<IisMapper> allMappers;
 
-
 	@SuppressWarnings("rawtypes")
 	public IisMapper mapper(IisMappedToFhir internal) {
 		Class<? extends IisMappedToFhir> inteClass = internal.getClass();
-		Optional<IisResourceMasterReportedMapper> reportedMapper = masterReportedMappersFiltered(inteClass).findFirst();
-		if (reportedMapper.isPresent()) {
-			return reportedMapper.get();
-		}
-		return mappersFiltered(inteClass)
+		return allMappersFiltered(inteClass)
 			.findFirst()
 			.orElseThrow(mapperNotFoundExceptionSupplier(inteClass.getName()));
 	}
 
 	@SuppressWarnings("rawtypes")
 	public IisMapper mapper(IBase iBase) {
-		String fhirType = iBase.fhirType();
-		return allMappersFiltered(fhirType)
+		Class<? extends IBase> fhirType = iBase.getClass();
+		return allMappersFilteredFhir(fhirType)
 			.findFirst()
 			.orElseThrow(mapperNotFoundExceptionSupplier(fhirType));
 	}
@@ -71,16 +65,16 @@ public class MapperRegistry {
 
 	@SuppressWarnings("rawtypes")
 	public IisResourceMapper resourceMapper(IAnyResource resource) {
-		String fhirType = resource.fhirType();
-		return resourceMappersFiltered(fhirType)
+		Class<? extends IAnyResource> fhirType = resource.getClass();
+		return resourceMappersFilteredFhir(fhirType)
 			.findFirst()
 			.orElseThrow(mapperNotFoundExceptionSupplier(fhirType));
 	}
 
 	@SuppressWarnings("rawtypes")
 	public IFieldMapper fieldMapper(IBaseDatatype datatype) {
-		String fhirType = datatype.fhirType();
-		return fieldMappersFiltered(fhirType)
+		Class<? extends IBaseDatatype> fhirType = datatype.getClass();
+		return fieldMappersFilteredFhir(fhirType)
 			.findFirst()
 			.orElseThrow(mapperNotFoundExceptionSupplier(fhirType));
 	}
@@ -95,34 +89,34 @@ public class MapperRegistry {
 
 	@SuppressWarnings("rawtypes")
 	public IisResourceMasterReportedMapper masterReportedMapper(IAnyResource resource) {
-		String fhirType = resource.fhirType();
-		return masterReportedMappersFiltered(fhirType)
+		Class<? extends IAnyResource> fhirType = resource.getClass();
+		return masterReportedMappersFilteredFhir(fhirType)
 			.findFirst()
 			.orElseThrow(mapperNotFoundExceptionSupplier(fhirType));
-	}
-
-	private @NotNull Supplier<RuntimeException> mapperNotFoundExceptionSupplier(String fhirType) {
-		return () -> new RuntimeException("Mapper not found for " + fhirType);
 	}
 
 	private @NotNull Stream<IFieldMapper> fieldMappersFiltered(Class<? extends IisMappedToFhirField> inteClass) {
 		return fieldMappers.stream().filter(mapper -> mapper.localType().equals(inteClass));
 	}
 
-	private @NotNull Stream<IFieldMapper> fieldMappersFiltered(String fhirType) {
-		return fieldMappers.stream().filter(mapper -> fhirType.equals(mapper.fhirTypeName()));
+	private @NotNull Stream<IFieldMapper> fieldMappersFilteredFhir(Class<? extends IBaseDatatype> fhirType) {
+		return fieldMappers.stream().filter(mapper -> fhirType.equals(mapper.fhirType()));
 	}
 
-	private @NotNull Stream<IisResourceMasterReportedMapper> masterReportedMappersFiltered(String fhirType) {
-		return mapperMastersReported.stream().filter(mapper -> mapper.fhirTypeName().equals(fhirType));
+	private @NotNull Stream<IisResourceMasterReportedMapper> masterReportedMappersFilteredFhir(Class<? extends IAnyResource> fhirType) {
+		return mapperMastersReported.stream().filter(mapper -> mapper.fhirType().equals(fhirType));
 	}
 
-	private @NotNull Stream<IisResourceMapper> resourceMappersFiltered(String fhirType) {
-		return mapperMasters.stream().filter(mapper -> mapper.fhirTypeName().equals(fhirType));
+	private @NotNull Stream<IisResourceMapper> resourceMappersFilteredFhir(Class<? extends IAnyResource> fhirType) {
+		return resourceMappers.stream().filter(mapper -> mapper.fhirType().equals(fhirType));
 	}
 
-	private @NotNull Stream<IisMapper> allMappersFiltered(String fhirType) {
-		return allMappers.stream().filter(mapper -> mapper.fhirTypeName().equals(fhirType));
+	private @NotNull Stream<IisMapper> allMappersFilteredFhir(Class<? extends IBase> fhirType) {
+		return allMappers.stream().filter(mapper -> mapper.fhirType().equals(fhirType));
+	}
+
+	private @NotNull Stream<IisMapper> allMappersFiltered(Class<? extends IisMappedToFhir> inteClass) {
+		return allMappers.stream().filter(mapper -> mapper.localType().equals(inteClass));
 	}
 
 	private @NotNull Stream<IisResourceMasterReportedMapper> masterReportedMappersFiltered(Class<? extends IisMappedToFhir> inteClass) {
@@ -130,11 +124,35 @@ public class MapperRegistry {
 	}
 
 	private @NotNull Stream<IisResourceMapper> resourceMappersFiltered(Class<? extends IisMappedToFhir> inteClass) {
-		return mapperMasters.stream().filter(mapper -> mapper.localType().equals(inteClass));
+		return resourceMappers.stream().filter(mapper -> mapper.localType().equals(inteClass));
 	}
 
 	private @NotNull Stream<IisResourceMapper> mappersFiltered(Class<? extends IisMappedToFhir> inteClass) {
-		return mapperMasters.stream().filter(mapper -> mapper.localType().equals(inteClass));
+		return resourceMappers.stream().filter(mapper -> mapper.localType().equals(inteClass));
 	}
+
+	private @NotNull Supplier<RuntimeException> mapperNotFoundExceptionSupplier(String fhirTypeName) {
+		return () -> new RuntimeException("Mapper not found for " + fhirTypeName);
+	}
+
+	private @NotNull Supplier<RuntimeException> mapperNotFoundExceptionSupplier(Class<? extends IBase> fhirType) {
+		return () -> new RuntimeException("Mapper not found for " + fhirType);
+	}
+
+//	private @NotNull Stream<IFieldMapper> fieldMappersFiltered(String fhirTypeName) {
+//		return fieldMappers.stream().filter(mapper -> fhirTypeName.equals(mapper.fhirTypeName()));
+//	}
+//
+//	private @NotNull Stream<IisResourceMasterReportedMapper> masterReportedMappersFiltered(String fhirTypeName) {
+//		return mapperMastersReported.stream().filter(mapper -> mapper.fhirTypeName().equals(fhirTypeName));
+//	}
+//
+//	private @NotNull Stream<IisResourceMapper> resourceMappersFiltered(String fhirTypeName) {
+//		return resourceMappers.stream().filter(mapper -> mapper.fhirTypeName().equals(fhirTypeName));
+//	}
+//
+//	private @NotNull Stream<IisMapper> allMappersFiltered(String fhirTypeName) {
+//		return allMappers.stream().filter(mapper -> mapper.fhirTypeName().equals(fhirTypeName));
+//	}
 
 }

@@ -14,6 +14,11 @@ import org.springframework.stereotype.Service;
 @Conditional(OnR4Condition.class)
 public class PersonMapperR4 extends PersonMapper<Person> implements IR4Mapper<ModelPerson, Person> {
 
+	@Override
+	public Class<Person> fhirType() {
+		return Person.class;
+	}
+
 	public ModelPerson localObject(Person p) {
 		ModelPerson modelPerson = new ModelPerson();
 		modelPerson.setPersonId(p.getId());

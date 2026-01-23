@@ -29,6 +29,11 @@ public class ImmunizationEvaluationMapperR5 extends ImmunizationEvaluationMapper
 		return iisEvaluation;
 	}
 
+	@Override
+	public Class<ImmunizationEvaluation> fhirType() {
+		return ImmunizationEvaluation.class;
+	}
+
 	public ImmunizationEvaluation fhirObject(IisEvaluation iisEvaluation) {
 		IisVaccination iisVaccination = iisEvaluation.getIisVaccination();
 		Date date = iisEvaluation.getDate();

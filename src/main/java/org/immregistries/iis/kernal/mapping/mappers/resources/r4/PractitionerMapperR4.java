@@ -34,6 +34,11 @@ public class PractitionerMapperR4 extends PractitionerMapper<Practitioner> imple
 		return modelPerson;
 	}
 
+	@Override
+	public Class<Practitioner> fhirType() {
+		return Practitioner.class;
+	}
+
 	public Practitioner fhirObject(ModelPerson modelPerson) {
 		Practitioner practitioner = new Practitioner();
 		try {

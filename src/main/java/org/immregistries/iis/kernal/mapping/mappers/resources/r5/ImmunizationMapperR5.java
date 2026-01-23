@@ -232,6 +232,11 @@ public class ImmunizationMapperR5 extends ImmunizationMapper<Immunization> imple
 		}
 	}
 
+	@Override
+	public Class<Immunization> fhirType() {
+		return Immunization.class;
+	}
+
 	public Immunization fhirObject(IisVaccination vr) {
 		Immunization i = new Immunization();
 		/*

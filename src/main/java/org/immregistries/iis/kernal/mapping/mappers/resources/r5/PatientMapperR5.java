@@ -267,6 +267,11 @@ public class PatientMapperR5 extends PatientMapper<Patient> implements IR5Mapper
 		}
 	}
 
+	@Override
+	public Class<Patient> fhirType() {
+		return Patient.class;
+	}
+
 	public Patient fhirObject(IisPatient pm) {
 		Patient p = new Patient();
 		p.setId(pm.getPatientId());

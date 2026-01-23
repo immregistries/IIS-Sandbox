@@ -11,6 +11,11 @@ import org.springframework.stereotype.Service;
 @Conditional(OnR5Condition.class)
 public class LocationMapperR5 extends LocationMapper<Location> implements IR5Mapper<OrgLocation, Location> {
 
+	@Override
+	public Class<Location> fhirType() {
+		return Location.class;
+	}
+
 	public Location fhirObject(OrgLocation ol) {
 
 		if (ol != null) {

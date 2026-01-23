@@ -262,6 +262,11 @@ public class PatientMapperR4 extends PatientMapper<Patient> implements IR4Mapper
 		}
 	}
 
+	@Override
+	public Class<Patient> fhirType() {
+		return Patient.class;
+	}
+
 	public Patient fhirObject(IisPatient pm) {
 		Patient p = new Patient();
 		p.setId(pm.getPatientId());
