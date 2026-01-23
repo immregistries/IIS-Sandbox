@@ -19,7 +19,7 @@ import java.util.Date;
  */
 @Service
 @Conditional(OnR5Condition.class)
-public class ImmunizationEvaluationMapperR5 extends ImmunizationEvaluationMapper<ImmunizationEvaluation> implements IR5Mapper<IisEvaluation, ImmunizationEvaluation>{
+public class ImmunizationEvaluationMapperR5 extends ImmunizationEvaluationMapper<ImmunizationEvaluation> implements IR5ResourceMapper<IisEvaluation, ImmunizationEvaluation> {
 
 	@Autowired
 	private BusinessIdentifierMapperR5 businessIdentifierMapper;

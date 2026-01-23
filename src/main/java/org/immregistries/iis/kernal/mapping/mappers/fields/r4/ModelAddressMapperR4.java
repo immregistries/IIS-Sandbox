@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Conditional(OnR4Condition.class)
-public class ModelAddressMapperR4 extends ModelAddressMapper<Address> {
+public class ModelAddressMapperR4 extends ModelAddressMapper<Address> implements IR4FieldMapper<ModelAddress, Address> {
 	
 
 	@Override

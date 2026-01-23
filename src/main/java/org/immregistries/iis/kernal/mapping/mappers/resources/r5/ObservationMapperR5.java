@@ -29,7 +29,7 @@ import static org.immregistries.iis.kernal.mapping.mappers.resources.Immunizatio
 
 @Service
 @Conditional(OnR5Condition.class)
-public class ObservationMapperR5 extends ObservationMapper<Observation> implements IR5Mapper<ObservationMaster, Observation> {
+public class ObservationMapperR5 extends ObservationMapper<Observation> implements IR5ResourceMapper<ObservationMaster, Observation> {
 	@Autowired
 	private BusinessIdentifierMapperR5 businessIdentifierMapper;
 	@Autowired

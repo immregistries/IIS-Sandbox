@@ -29,7 +29,7 @@ import static org.immregistries.iis.kernal.mapping.mappers.resources.Immunizatio
 
 @Service
 @Conditional(OnR4Condition.class)
-public class PatientMapperR4 extends PatientMapper<Patient> implements IR4Mapper<IisPatient, Patient> {
+public class PatientMapperR4 extends PatientMapper<Patient> implements IR4ResourceMapper<IisPatient, Patient> {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	@Autowired

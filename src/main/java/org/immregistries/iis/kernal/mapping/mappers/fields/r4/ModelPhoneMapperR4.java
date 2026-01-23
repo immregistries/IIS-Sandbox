@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Conditional(OnR4Condition.class)
-public class ModelPhoneMapperR4 extends ModelPhoneMapper<ContactPoint> {
+public class ModelPhoneMapperR4 extends ModelPhoneMapper<ContactPoint> implements IR4FieldMapper<ModelPhone, ContactPoint> {
 
 	@Override
 	public Class<ContactPoint> fhirType() {

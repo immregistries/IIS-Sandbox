@@ -3,6 +3,7 @@ package org.immregistries.iis.kernal.mapping.mappers.fields.r5;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.r5.model.Address;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR5Condition;
+import org.immregistries.iis.kernal.mapping.mappers.IR5Mapper;
 import org.immregistries.iis.kernal.mapping.mappers.fields.ModelAddressMapper;
 import org.immregistries.iis.kernal.model.ModelAddress;
 import org.springframework.context.annotation.Conditional;
@@ -10,7 +11,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Conditional(OnR5Condition.class)
-public class ModelAddressMapperR5 extends ModelAddressMapper<Address> {
+public class ModelAddressMapperR5 extends ModelAddressMapper<Address> implements IR5Mapper<ModelAddress, Address> {
 
 
 	@Override

@@ -2,6 +2,7 @@ package org.immregistries.iis.kernal.mapping.mappers.fields.r5;
 
 import org.hl7.fhir.r5.model.Identifier;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR5Condition;
+import org.immregistries.iis.kernal.mapping.mappers.IR5Mapper;
 import org.immregistries.iis.kernal.mapping.mappers.fields.BusinessIdentifierMapper;
 import org.immregistries.iis.kernal.model.BusinessIdentifier;
 import org.springframework.context.annotation.Conditional;
@@ -9,7 +10,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Conditional(OnR5Condition.class)
-public class BusinessIdentifierMapperR5 extends BusinessIdentifierMapper<Identifier> {
+public class BusinessIdentifierMapperR5 extends BusinessIdentifierMapper<Identifier> implements IR5Mapper<BusinessIdentifier, Identifier> {
 
 	@Override
 	public Class<Identifier> fhirType() {

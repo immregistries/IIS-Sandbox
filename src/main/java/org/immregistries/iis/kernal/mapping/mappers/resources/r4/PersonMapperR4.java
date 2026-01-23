@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Conditional(OnR4Condition.class)
-public class PersonMapperR4 extends PersonMapper<Person> implements IR4Mapper<ModelPerson, Person> {
+public class PersonMapperR4 extends PersonMapper<Person> implements IR4ResourceMapper<ModelPerson, Person> {
 
 	@Override
 	public Class<Person> fhirType() {

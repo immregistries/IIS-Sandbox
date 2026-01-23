@@ -2,6 +2,7 @@ package org.immregistries.iis.kernal.mapping.mappers.fields.r5;
 
 import org.hl7.fhir.r5.model.Reference;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR5Condition;
+import org.immregistries.iis.kernal.mapping.mappers.IR5Mapper;
 import org.immregistries.iis.kernal.mapping.mappers.fields.ModelReferenceMapper;
 import org.immregistries.iis.kernal.model.ModelReference;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +11,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Conditional(OnR5Condition.class)
-public class ModelReferenceMapperR5 extends ModelReferenceMapper<Reference> {
+public class ModelReferenceMapperR5 extends ModelReferenceMapper<Reference> implements IR5Mapper<ModelReference, Reference> {
 
 	@Autowired
 	private BusinessIdentifierMapperR5 businessIdentifierMapperR5;

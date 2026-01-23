@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Conditional(OnR4Condition.class)
-public class ModelReferenceMapperR4 extends ModelReferenceMapper<Reference> {
+public class ModelReferenceMapperR4 extends ModelReferenceMapper<Reference> implements IR4FieldMapper<ModelReference, Reference> {
 
 	@Autowired
 	private BusinessIdentifierMapperR4 businessIdentifierMapperR4;

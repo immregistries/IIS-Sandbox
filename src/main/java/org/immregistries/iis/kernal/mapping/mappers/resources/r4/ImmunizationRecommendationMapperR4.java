@@ -29,7 +29,7 @@ import static org.immregistries.iis.kernal.mapping.mappers.resources.Immunizatio
 
 @Service
 @Conditional(OnR4Condition.class)
-public class ImmunizationRecommendationMapperR4 extends RecommendationMapper<ImmunizationRecommendation, ImmunizationRecommendation.ImmunizationRecommendationRecommendationComponent> implements IR4Mapper<IisRecommendation, ImmunizationRecommendation> {
+public class ImmunizationRecommendationMapperR4 extends RecommendationMapper<ImmunizationRecommendation, ImmunizationRecommendation.ImmunizationRecommendationRecommendationComponent> implements IR4ResourceMapper<IisRecommendation, ImmunizationRecommendation> {
 	@Autowired
 	private CodeMapManagerService codeMapManagerService;
 	@Autowired

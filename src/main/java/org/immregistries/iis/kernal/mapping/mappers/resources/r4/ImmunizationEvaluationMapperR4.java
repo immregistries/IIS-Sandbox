@@ -25,7 +25,7 @@ import java.util.Date;
  */
 @Service
 @Conditional(OnR4Condition.class)
-public class ImmunizationEvaluationMapperR4 extends ImmunizationEvaluationMapper<ImmunizationEvaluation> implements IR4Mapper<IisEvaluation, ImmunizationEvaluation> {
+public class ImmunizationEvaluationMapperR4 extends ImmunizationEvaluationMapper<ImmunizationEvaluation> implements IR4ResourceMapper<IisEvaluation, ImmunizationEvaluation> {
 
 	@Autowired
 	private ImmunizationMapper<Immunization> immunizationMapper;

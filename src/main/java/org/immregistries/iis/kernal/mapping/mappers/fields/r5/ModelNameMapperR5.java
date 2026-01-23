@@ -13,7 +13,7 @@ import static org.immregistries.iis.kernal.mapping.mappers.resources.PatientMapp
 
 @Service
 @Conditional(OnR5Condition.class)
-public class ModelNameMapperR5 extends ModelNameMapper<HumanName> {
+public class ModelNameMapperR5 extends ModelNameMapper<HumanName> implements IR5FieldMapper<ModelName, HumanName> {
 	
 	@Override
 	public Class<HumanName> fhirType() {

@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Conditional(OnR4Condition.class)
-public class BusinessIdentifierMapperR4 extends BusinessIdentifierMapper<Identifier> {
+public class BusinessIdentifierMapperR4 extends BusinessIdentifierMapper<Identifier> implements IR4FieldMapper<BusinessIdentifier, Identifier> {
 
 	@Override
 	public Class<Identifier> fhirType() {

@@ -28,7 +28,7 @@ import static org.immregistries.iis.kernal.mapping.mappers.resources.Immunizatio
 
 @Service
 @Conditional(OnR4Condition.class)
-public class ObservationMapperR4 extends ObservationMapper<Observation> implements IR4Mapper<ObservationMaster, Observation> {
+public class ObservationMapperR4 extends ObservationMapper<Observation> implements IR4ResourceMapper<ObservationMaster, Observation> {
 	@Autowired
 	private BusinessIdentifierMapperR4 businessIdentifierMapper;
 	@Autowired

@@ -29,7 +29,7 @@ import static org.immregistries.iis.kernal.mapping.mappers.resources.Immunizatio
 
 @Service
 @Conditional(OnR5Condition.class)
-public class ImmunizationRecommendationMapperR5 extends RecommendationMapper<ImmunizationRecommendation, ImmunizationRecommendation.ImmunizationRecommendationRecommendationComponent> implements IR5Mapper<IisRecommendation, ImmunizationRecommendation> {
+public class ImmunizationRecommendationMapperR5 extends RecommendationMapper<ImmunizationRecommendation, ImmunizationRecommendation.ImmunizationRecommendationRecommendationComponent> implements IR5ResourceMapper<IisRecommendation, ImmunizationRecommendation> {
 
 	@Autowired
 	private CodeMapManagerService codeMapManagerService;
