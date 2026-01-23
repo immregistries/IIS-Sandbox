@@ -3,11 +3,12 @@ package org.immregistries.iis.kernal.mapping;
 import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.hl7.fhir.instance.model.api.IBase;
 import org.hl7.fhir.instance.model.api.IBaseDatatype;
-import org.immregistries.iis.kernal.mapping.mappers.fields.IFieldMapper;
 import org.immregistries.iis.kernal.mapping.mappers.IisMapper;
+import org.immregistries.iis.kernal.mapping.mappers.fields.IFieldMapper;
 import org.immregistries.iis.kernal.mapping.mappers.resources.IisResourceMapper;
 import org.immregistries.iis.kernal.mapping.mappers.resources.IisResourceMasterReportedMapper;
 import org.immregistries.iis.kernal.model.IisMappedToFhir;
+import org.immregistries.iis.kernal.model.IisMappedToFhirField;
 import org.immregistries.iis.kernal.model.IisMappedToFhirResource;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +39,7 @@ public class MapperRegistry {
 
 	@SuppressWarnings("rawtypes")
 	public IisMapper mapper(IisMappedToFhir internal) {
-		Class inteClass = internal.getClass();
+		Class<? extends IisMappedToFhir> inteClass = internal.getClass();
 		Optional<IisResourceMasterReportedMapper> reportedMapper = masterReportedMappersFiltered(inteClass).findFirst();
 		if (reportedMapper.isPresent()) {
 			return reportedMapper.get();
@@ -58,7 +59,7 @@ public class MapperRegistry {
 
 	@SuppressWarnings("rawtypes")
 	public IisResourceMapper resourceMapper(IisMappedToFhirResource internal) {
-		Class inteClass = internal.getClass();
+		Class<? extends IisMappedToFhirResource> inteClass = internal.getClass();
 		Optional<IisResourceMasterReportedMapper> reportedMapper = masterReportedMappersFiltered(inteClass).findFirst();
 		if (reportedMapper.isPresent()) {
 			return reportedMapper.get();
@@ -85,8 +86,8 @@ public class MapperRegistry {
 	}
 
 	@SuppressWarnings("rawtypes")
-	public IFieldMapper fieldMapper(IisMappedToFhir internal) {
-		Class<? extends IisMappedToFhir> aClass = internal.getClass();
+	public IFieldMapper fieldMapper(IisMappedToFhirField internal) {
+		Class<? extends IisMappedToFhirField> aClass = internal.getClass();
 		return fieldMappersFiltered(aClass)
 			.findFirst()
 			.orElseThrow(mapperNotFoundExceptionSupplier(aClass.getName()));
@@ -104,7 +105,7 @@ public class MapperRegistry {
 		return () -> new RuntimeException("Mapper not found for " + fhirType);
 	}
 
-	private @NotNull Stream<IFieldMapper> fieldMappersFiltered(Class inteClass) {
+	private @NotNull Stream<IFieldMapper> fieldMappersFiltered(Class<? extends IisMappedToFhirField> inteClass) {
 		return fieldMappers.stream().filter(mapper -> mapper.localType().equals(inteClass));
 	}
 
@@ -124,15 +125,15 @@ public class MapperRegistry {
 		return allMappers.stream().filter(mapper -> mapper.fhirTypeName().equals(fhirType));
 	}
 
-	private @NotNull Stream<IisResourceMasterReportedMapper> masterReportedMappersFiltered(Class inteClass) {
+	private @NotNull Stream<IisResourceMasterReportedMapper> masterReportedMappersFiltered(Class<? extends IisMappedToFhir> inteClass) {
 		return mapperMastersReported.stream().filter(mapper -> mapper.localReportedType().equals(inteClass) || mapper.localMasterType().equals(inteClass));
 	}
 
-	private @NotNull Stream<IisResourceMapper> resourceMappersFiltered(Class inteClass) {
+	private @NotNull Stream<IisResourceMapper> resourceMappersFiltered(Class<? extends IisMappedToFhir> inteClass) {
 		return mapperMasters.stream().filter(mapper -> mapper.localType().equals(inteClass));
 	}
 
-	private @NotNull Stream<IisResourceMapper> mappersFiltered(Class inteClass) {
+	private @NotNull Stream<IisResourceMapper> mappersFiltered(Class<? extends IisMappedToFhir> inteClass) {
 		return mapperMasters.stream().filter(mapper -> mapper.localType().equals(inteClass));
 	}
 

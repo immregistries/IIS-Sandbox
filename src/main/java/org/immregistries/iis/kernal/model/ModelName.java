@@ -4,7 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.Objects;
 
-public class ModelName extends IisMappedToFhir {
+public class ModelName extends IisMappedToFhirField {
 	private String nameLast = "";
 	private String nameFirst = "";
 	private String nameMiddle = "";

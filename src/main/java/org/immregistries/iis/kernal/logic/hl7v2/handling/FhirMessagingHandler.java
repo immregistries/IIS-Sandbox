@@ -5,14 +5,10 @@ import org.hl7.fhir.instance.model.api.IIdType;
 import org.hl7.fhir.r4.model.*;
 import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
-import org.immregistries.iis.kernal.fhir.multitenancy.PartitionTenantCreationInterceptor;
-import org.immregistries.iis.kernal.logic.MessageRecordingService;
-import org.immregistries.iis.kernal.logic.hl7v2.writing.Hl7MessageWriter;
 import org.immregistries.iis.kernal.logic.validation.ImmunizationProcessingInterceptor;
 import org.immregistries.iis.kernal.logic.validation.ObservationProcessingInterceptor;
 import org.immregistries.iis.kernal.logic.validation.PatientProcessingInterceptor;
 import org.immregistries.iis.kernal.logic.validation.ProcessingException;
-import org.immregistries.iis.kernal.mapping.IisFhirClientFactory;
 import org.immregistries.iis.kernal.mapping.mappers.resources.r4.*;
 import org.immregistries.iis.kernal.mapping.requesters.FhirSaveRequester;
 import org.immregistries.iis.kernal.model.ModelPerson;
@@ -39,30 +35,9 @@ import static org.immregistries.iis.kernal.mapping.mappers.resources.Immunizatio
 public class FhirMessagingHandler extends IncomingMessageHandler<Bundle, Object> {
 
 	@Autowired
-	private FhirSaveRequester fhirSaveRequester;
-
-	@Autowired
-	private IisFhirClientFactory iisFhirClientFactory;
-	@Autowired
-	private Hl7MessageWriter hl7MessageWriter;
-	@Autowired
-	private PartitionTenantCreationInterceptor partitionTenantCreationInterceptor;
-	@Autowired
-	private PatientProcessingInterceptor patientProcessingInterceptor;
-	@Autowired
-	private ObservationProcessingInterceptor observationProcessingInterceptor;
-	@Autowired
-	private ImmunizationProcessingInterceptor immunizationProcessingInterceptor;
-	@Autowired
-	private IncomingQueryHandler incomingQueryHandler;
-
-	@Autowired
-	private MessageRecordingService messageRecordingService;
-	@Autowired
 	private FhirContext fhirContext;
-
 	@Autowired
-	private V2IncomingMessageHandler v2IncomingMessageHandler;
+	private FhirSaveRequester fhirSaveRequester;
 
 	@Autowired
 	private PatientMapperR4 patientMapper;
@@ -74,6 +49,13 @@ public class FhirMessagingHandler extends IncomingMessageHandler<Bundle, Object>
 	private ObservationMapperR4 observationMapper;
 	@Autowired
 	private LocationMapperR4 locationMapper;
+
+	@Autowired
+	private PatientProcessingInterceptor patientProcessingInterceptor;
+	@Autowired
+	private ObservationProcessingInterceptor observationProcessingInterceptor;
+	@Autowired
+	private ImmunizationProcessingInterceptor immunizationProcessingInterceptor;
 
 	@Override
 	public String extractMessageType(Bundle bundle) {
@@ -94,7 +76,7 @@ public class FhirMessagingHandler extends IncomingMessageHandler<Bundle, Object>
 	@Override
 	public IIdType readResponsibleOrganizationIIdType(Tenant tenant, Bundle bundle, String sendingFacilityName) throws ProcessingException {
 		return null;
-		//TODO
+		//TODO ? or ignore
 	}
 
 	@Override

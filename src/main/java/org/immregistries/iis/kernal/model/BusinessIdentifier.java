@@ -2,7 +2,7 @@ package org.immregistries.iis.kernal.model;
 
 import java.util.Objects;
 
-public class BusinessIdentifier extends IisMappedToFhir {
+public class BusinessIdentifier extends IisMappedToFhirField {
 	public static final String MRN_TYPE_VALUE = "MR";
 	public static final String PT_TYPE_VALUE = "PT";
 	public static final String FILLER_TYPE_VALUE = "FILL";
