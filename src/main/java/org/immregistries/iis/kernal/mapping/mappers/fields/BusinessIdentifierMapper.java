@@ -7,6 +7,7 @@ import org.immregistries.iis.kernal.model.BusinessIdentifier;
 
 public abstract class BusinessIdentifierMapper<Identifier extends IBaseDatatype> implements IFieldMapper<BusinessIdentifier, Identifier> {
     public static final String IDENTIFIER_TYPE_SYSTEM = "http://terminology.hl7.org/CodeSystem/v2-0203";
+	public static final String IDENTIFIER_FHIR_TYPE_NAME = "Identifier";
 
 	@Override
 	public Class<BusinessIdentifier> localType() {
@@ -15,7 +16,7 @@ public abstract class BusinessIdentifierMapper<Identifier extends IBaseDatatype>
 
 	@Override
 	public String fhirTypeName() {
-		return "Identifier";
+		return IDENTIFIER_FHIR_TYPE_NAME;
 	}
 
 	/**

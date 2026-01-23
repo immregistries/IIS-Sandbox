@@ -6,10 +6,10 @@ import org.immregistries.iis.kernal.persisted.entities.Tenant;
 public abstract class OrganizationMapper<Organization extends IAnyResource>
 		implements IisResourceMapper<Tenant, Organization> {
 	public String fhirTypeName() {
-		return ORGANIZATION;
+		return ORGANIZATION_FHIR_TYPE_NAME;
 	}
 
-	public static final String ORGANIZATION = "Organization";
+	public static final String ORGANIZATION_FHIR_TYPE_NAME = "Organization";
 
 	public Class<Tenant> localType() {
 		return Tenant.class;

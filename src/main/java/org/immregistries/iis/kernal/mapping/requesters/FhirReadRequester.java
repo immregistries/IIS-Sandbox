@@ -43,12 +43,12 @@ public class FhirReadRequester {
 
 
 	public IisPatient readAsPatient(String id) {
-		Patient patient = (Patient) read(PatientMapper.PATIENT, id);
+		Patient patient = (Patient) read(PatientMapper.PATIENT_FHIR_TYPE_NAME, id);
 		return (IisPatient) mappingService.localObject(patient);
 	}
 
 	public PatientMaster readAsPatientMaster(String id) {
-		Patient patient = (Patient) read(PatientMapper.PATIENT, id);
+		Patient patient = (Patient) read(PatientMapper.PATIENT_FHIR_TYPE_NAME, id);
 		if (FhirRequesterUtil.isGoldenRecord(patient)) {
 			return (PatientMaster) mappingService.localObjectMaster(patient);
 		}
@@ -56,28 +56,28 @@ public class FhirReadRequester {
 	}
 
 	public PatientReported readAsPatientReported(String id) {
-		return (PatientReported) mappingService.localObjectReportedWithMaster((IAnyResource) read(PatientMapper.PATIENT, id));
+		return (PatientReported) mappingService.localObjectReportedWithMaster((IAnyResource) read(PatientMapper.PATIENT_FHIR_TYPE_NAME, id));
 	}
 
 	public ModelPerson readPractitionerAsPerson(String id) {
-		return (ModelPerson) mappingService.localObject((Practitioner) read(PractitionerMapper.PRACTITIONER, id));
+		return (ModelPerson) mappingService.localObject((Practitioner) read(PractitionerMapper.PRACTITIONER_FHIR_TYPE_NAME, id));
 	}
 
 	public OrgLocation readAsOrgLocation(String id) {
-		return (OrgLocation) mappingService.localObject((Location) read(LocationMapper.LOCATION, id));
+		return (OrgLocation) mappingService.localObject((Location) read(LocationMapper.LOCATION_FHIR_TYPE_NAME, id));
 	}
 
 	public VaccinationReported readAsVaccinationReported(String id) {
-		return (VaccinationReported) mappingService.localObjectReportedWithMaster((Immunization) read(ImmunizationMapper.IMMUNIZATION, id));
+		return (VaccinationReported) mappingService.localObjectReportedWithMaster((Immunization) read(ImmunizationMapper.IMMUNIZATION_FHIR_TYPE_NAME, id));
 	}
 
 	public IisVaccination readAsVaccination(String id) {
-		Immunization immunization = (Immunization) read(ImmunizationMapper.IMMUNIZATION, id);
+		Immunization immunization = (Immunization) read(ImmunizationMapper.IMMUNIZATION_FHIR_TYPE_NAME, id);
 		return (IisVaccination) mappingService.localObject(immunization);
 	}
 
 	public VaccinationMaster readAsVaccinationMaster(String id) {
-		Immunization immunization = (Immunization) read(ImmunizationMapper.IMMUNIZATION, id);
+		Immunization immunization = (Immunization) read(ImmunizationMapper.IMMUNIZATION_FHIR_TYPE_NAME, id);
 		if (FhirRequesterUtil.isGoldenRecord(immunization)) {
 			return (VaccinationMaster) mappingService.localObjectMaster(immunization);
 		}

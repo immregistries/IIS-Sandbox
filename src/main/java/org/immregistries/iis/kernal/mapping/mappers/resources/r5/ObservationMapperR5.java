@@ -90,7 +90,7 @@ public class ObservationMapperR5 extends ObservationMapper<Observation> implemen
 		 * Has member Observation TODO choose hasmember direction or change field
 		 */
 		if (StringUtils.isNotBlank(om.getPartOfObservationId())) {
-			o.addHasMember(new Reference().setReference(OBSERVATION + "/" + om.getObservationId()));
+			o.addHasMember(new Reference().setReference(OBSERVATION_FHIR_TYPE_NAME + "/" + om.getObservationId()));
 		}
 		/*
 		 * Patient/Subject
@@ -284,7 +284,7 @@ public class ObservationMapperR5 extends ObservationMapper<Observation> implemen
 		 * Observation member
 		 */
 		Reference observationReference = o.getHasMember().stream()
-				.filter(ref -> ref.getReference().startsWith(OBSERVATION + "/")).findFirst().orElse(null);
+			.filter(ref -> ref.getReference().startsWith(OBSERVATION_FHIR_TYPE_NAME + "/")).findFirst().orElse(null);
 		if (observationReference != null) {
 			observationReported.setPartOfObservationId(observationReference.getReferenceElement().getIdPart());
 		}

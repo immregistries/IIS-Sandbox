@@ -4,6 +4,11 @@ import ca.uhn.fhir.model.api.IElement;
 import org.immregistries.iis.kernal.model.IisMappedToFhir;
 
 public interface IisMapper<LocalType extends IisMappedToFhir, FhirElement extends IElement> {
+	/**
+	 * Deprecated use
+	 *
+	 * @return fhirType()
+	 */
 	String fhirTypeName();
 
 	Class<FhirElement> fhirType();

@@ -32,18 +32,18 @@ public abstract class ImmunizationMapper<Immunization extends IAnyResource>
 	public static final String FUNDING_ELIGIBILITY = "http://hl7.org/fhir/ValueSet/immunization-program-eligibility";
 	public static final String RECORDED = "recorded";
 	public static final String ACTION_CODE_EXTENSION = "actionCode";
-	public static final String ACTION_CODE_SYSTEM = "0206";
+	public static final String ACTION_CODE_TABLE = "0206";
 	public static final String COMPLETION_STATUS_EXTENSION = "completionStatus";
-	public static final String COMPLETION_STATUS_SYSTEM = "0322";
+	public static final String COMPLETION_STATUS_TABLE = "0322";
 
 	@Autowired
 	private FhirSearchRequester fhirSearchRequester;
 
 	public String fhirTypeName() {
-		return IMMUNIZATION;
+		return IMMUNIZATION_FHIR_TYPE_NAME;
 	}
 
-	public static final String IMMUNIZATION = "Immunization";
+	public static final String IMMUNIZATION_FHIR_TYPE_NAME = "Immunization";
 
 	public Class<IisVaccination> localType() {
 		return IisVaccination.class;

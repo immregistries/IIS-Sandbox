@@ -32,6 +32,10 @@ public class MapperRegistry {
 	@Autowired
 	private List<IFieldMapper> fieldMappers;
 	@SuppressWarnings("rawtypes")
+	/**
+	 * TODO
+	 * remove FieldMappers in case of other mapper using same Fhir Type (ie ContactPoint can be Phone or something else) ?
+	 */
 	@Autowired
 	private List<IisMapper> allMappers;
 

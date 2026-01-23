@@ -13,10 +13,10 @@ public abstract class RecommendationMapper<ImmunizationRecommendation extends IA
 	}
 
 	public String fhirTypeName() {
-		return IMMUNIZATION_RECOMMENDATION;
+		return IMMUNIZATION_RECOMMENDATION_FHIR_TYPE_NAME;
 	}
 
-	public static final String IMMUNIZATION_RECOMMENDATION = "ImmunizationRecommendation";
+	public static final String IMMUNIZATION_RECOMMENDATION_FHIR_TYPE_NAME = "ImmunizationRecommendation";
 
 	public abstract Component recommendationComponent(ForecastActual forecastActual);
 

@@ -17,10 +17,10 @@ public abstract class PatientMapper<Patient extends IAnyResource>
 	implements IisResourceMasterReportedMapper<PatientMaster, PatientReported, IisPatient, Patient> {
 
 	public String fhirTypeName() {
-		return PATIENT;
+		return PATIENT_FHIR_TYPE_NAME;
 	}
 
-	public static final String PATIENT = "Patient";
+	public static final String PATIENT_FHIR_TYPE_NAME = "Patient";
 
 	public Class<IisPatient> localType() {
 		return IisPatient.class;

@@ -308,7 +308,7 @@ public class ImmunizationMapperR5 extends ImmunizationMapper<Immunization> imple
 		 */
 		if (vr.getActionCode() != null) {
 			i.addExtension().setUrl(ACTION_CODE_EXTENSION)
-					.setValue(new Coding().setCode(vr.getActionCode()).setSystem(ACTION_CODE_SYSTEM));
+				.setValue(new Coding().setCode(vr.getActionCode()).setSystem(ACTION_CODE_TABLE));
 			if (vr.getActionCode().equals("D")) {
 				i.setStatus(Immunization.ImmunizationStatusCodes.ENTEREDINERROR);
 			} else {
@@ -335,7 +335,7 @@ public class ImmunizationMapperR5 extends ImmunizationMapper<Immunization> imple
 			Extension completionStatusExtension = i.addExtension().setUrl(COMPLETION_STATUS_EXTENSION);
 			if (StringUtils.isNotBlank(vr.getCompletionStatus())) {
 				completionStatusExtension
-						.setValue(new Coding().setCode(vr.getCompletionStatus()).setSystem(COMPLETION_STATUS_SYSTEM));
+					.setValue(new Coding().setCode(vr.getCompletionStatus()).setSystem(COMPLETION_STATUS_TABLE));
 			}
 		}
 		/*

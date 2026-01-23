@@ -6,10 +6,10 @@ import org.immregistries.iis.kernal.model.OrgLocation;
 public abstract class LocationMapper<Location extends IAnyResource>
 		implements IisResourceMapper<OrgLocation, Location> {
 	public String fhirTypeName() {
-		return LOCATION;
+		return LOCATION_FHIR_TYPE_NAME;
 	}
 
-	public static final String LOCATION = "Location";
+	public static final String LOCATION_FHIR_TYPE_NAME = "Location";
 
 	public Class<OrgLocation> localType() {
 		return OrgLocation.class;

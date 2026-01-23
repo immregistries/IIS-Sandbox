@@ -14,10 +14,10 @@ public abstract class ImmunizationEvaluationMapper<ImmunizationEvaluation extend
 	}
 
 	public String fhirTypeName() {
-		return IMMUNIZATION_EVALUATION;
+		return IMMUNIZATION_EVALUATION_FHIR_TYPE_NAME;
 	}
 
-	public static final String IMMUNIZATION_EVALUATION = "ImmunizationEvaluation";
+	public static final String IMMUNIZATION_EVALUATION_FHIR_TYPE_NAME = "ImmunizationEvaluation";
 
 	public abstract ImmunizationEvaluation toFhir(IisVaccination iisVaccination, Date date);
 

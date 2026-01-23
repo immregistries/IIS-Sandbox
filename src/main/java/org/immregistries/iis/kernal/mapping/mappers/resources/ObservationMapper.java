@@ -9,10 +9,10 @@ public abstract class ObservationMapper<Observation extends IAnyResource>
 		IisResourceMasterReportedMapper<ObservationMaster, ObservationReported, ObservationMaster, Observation> {
 
 	public String fhirTypeName() {
-		return "Observation";
+		return OBSERVATION_FHIR_TYPE_NAME;
 	}
 
-	public static final String OBSERVATION = "Observation";
+	public static final String OBSERVATION_FHIR_TYPE_NAME = "Observation";
 
 	public Class<ObservationMaster> localType() {
 		return ObservationMaster.class;

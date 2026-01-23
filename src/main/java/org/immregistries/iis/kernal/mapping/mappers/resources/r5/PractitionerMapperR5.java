@@ -45,7 +45,7 @@ public class PractitionerMapperR5 extends PractitionerMapper<Practitioner> imple
 			switch (new Reference(modelPerson.getIdentifierTypeCode()).getType()) {
 				case "Organization": {
 					practitioner.addIdentifier(
-							MappingHelper.getFhirIdentifierR5(PRACTITIONER, modelPerson.getPersonExternalLink())
+						MappingHelper.getFhirIdentifierR5(PRACTITIONER_FHIR_TYPE_NAME, modelPerson.getPersonExternalLink())
 									.setAssigner(new Reference(modelPerson.getAssigningAuthority())));
 					break;
 				}
@@ -56,7 +56,7 @@ public class PractitionerMapperR5 extends PractitionerMapper<Practitioner> imple
 				}
 				default: {
 					practitioner.addIdentifier(
-							MappingHelper.getFhirIdentifierR5(PRACTITIONER, modelPerson.getPersonExternalLink()));
+						MappingHelper.getFhirIdentifierR5(PRACTITIONER_FHIR_TYPE_NAME, modelPerson.getPersonExternalLink()));
 					break;
 				}
 			}
