@@ -3,7 +3,7 @@ package org.immregistries.iis.kernal.controllers.rest;
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.context.FhirVersionEnum;
 import jakarta.servlet.http.HttpServletRequest;
-import org.immregistries.iis.kernal.controllers.filters.RestTenantUrlFilter;
+import org.immregistries.iis.kernal.controllers.rest.filters.RestTenantUrlFilter;
 import org.immregistries.iis.kernal.controllers.servlet.PopController;
 import org.immregistries.iis.kernal.logic.hl7v2.handling.V2IncomingMessageHandler;
 import org.immregistries.iis.kernal.mapping.IisFhirClientFactory;

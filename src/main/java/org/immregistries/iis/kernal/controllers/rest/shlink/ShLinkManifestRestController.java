@@ -1,8 +1,9 @@
 package org.immregistries.iis.kernal.controllers.rest.shlink;
 
+import org.immregistries.iis.kernal.controllers.rest.util.RestConstants;
+
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
-import org.immregistries.iis.kernal.controllers.rest.RestUrlUtil;
 import org.immregistries.iis.kernal.logic.shlink.ShLinkManifestGenerator;
 import org.immregistries.iis.kernal.logic.shlink.ShLinkManifestService;
 import org.immregistries.iis.kernal.persisted.entities.ShLinkManifest;
@@ -17,18 +18,11 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import static org.immregistries.iis.kernal.controllers.servlet.TenantController.PARAM_TENANT_ID;
-
 @RestController
 @RequestMapping(ShLinkManifestRestController.SHLINKS_CONTROLLER_REST_BASE_URL)
 public class ShLinkManifestRestController {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
-	public static final String MANIFEST_ID = "manifestId";
-	public static final String MANIFEST_ID_PLACEHOLDER = "/{" + MANIFEST_ID + "}";
-	public static final String RECIPIENT_PARAM = "recipient";
-	public static final String PASSCODE_PARAM = "passcode";
-	public static final String EMBEDDED_LENGTH_MAX_PARAM = "embeddedLengthMax";
-	public final static String SHLINKS_CONTROLLER_REST_BASE_URL = RestUrlUtil.REST_PATH +  "/link";
+	public final static String SHLINKS_CONTROLLER_REST_BASE_URL = RestConstants.Path.REST_PATH + "/link";
 
 	@Autowired
 	private ShLinkManifestGenerator shLinkManifestGenerator;
@@ -37,18 +31,18 @@ public class ShLinkManifestRestController {
 	@Autowired
 	private TenantAuthService tenantAuthService;
 
-	@GetMapping(MANIFEST_ID_PLACEHOLDER)
-	public ShLinkManifest getManifest(@PathVariable(MANIFEST_ID) String manifestId) {
+	@GetMapping(RestConstants.Path.MANIFEST_ID_PLACEHOLDER)
+	public ShLinkManifest getManifest(@PathVariable(RestConstants.Path.Variables.MANIFEST_ID) String manifestId) {
 		return shlinkManifestService.readManifest(manifestId);
 	}
 
-	@PostMapping(MANIFEST_ID_PLACEHOLDER)
+	@PostMapping(RestConstants.Path.MANIFEST_ID_PLACEHOLDER)
 	protected ShLinkManifest readShLinkManifest(
-		@PathVariable(MANIFEST_ID) String manifestId,
-		@PathVariable(PARAM_TENANT_ID) int tenantId,
-		@RequestParam(value = RECIPIENT_PARAM, required = false) String recipient,
-		@RequestParam(value = PASSCODE_PARAM, required = false) String passcode,
-		@RequestParam(value = EMBEDDED_LENGTH_MAX_PARAM, required = false) String embeddedLengthMax) {
+			@PathVariable(RestConstants.Path.Variables.MANIFEST_ID) String manifestId,
+			@PathVariable(RestConstants.Path.Variables.TENANT_ID) int tenantId,
+			@RequestParam(value = RestConstants.Param.RECIPIENT, required = false) String recipient,
+			@RequestParam(value = RestConstants.Param.PASSCODE, required = false) String passcode,
+			@RequestParam(value = RestConstants.Param.EMBEDDED_LENGTH_MAX, required = false) String embeddedLengthMax) {
 		Tenant tenant = null;
 		if (StringUtils.isNoneBlank(passcode)) {
 			tenant = tenantAuthService.authenticateTenantNoUsername(tenantId, passcode);
@@ -63,7 +57,6 @@ public class ShLinkManifestRestController {
 	public List<ShLinkManifest> getManifestAll() {
 		return shlinkManifestService.getAllManifests();
 	}
-
 
 	@GetMapping("/$generate")
 	public ShLinkManifest genManifest(HttpServletRequest req) {

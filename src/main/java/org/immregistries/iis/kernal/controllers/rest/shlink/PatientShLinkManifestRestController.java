@@ -1,5 +1,7 @@
 package org.immregistries.iis.kernal.controllers.rest.shlink;
 
+import org.immregistries.iis.kernal.controllers.rest.util.RestConstants;
+
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import jakarta.servlet.ServletException;
@@ -7,7 +9,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.instance.model.api.IAnyResource;
-import org.immregistries.iis.kernal.controllers.rest.RestUrlUtil;
 import org.immregistries.iis.kernal.logic.shlink.ShLinkGenerator;
 import org.immregistries.iis.kernal.logic.shlink.ShLinkManifestGenerator;
 import org.immregistries.iis.kernal.mapping.IisFhirClientFactory;
@@ -30,11 +31,8 @@ import static org.immregistries.iis.kernal.controllers.servlet.TenantController.
 import static org.immregistries.iis.kernal.controllers.servlet.util.PatientServletUtil.fetchPatientFromParameters;
 
 @RestController
-@RequestMapping(RestUrlUtil.REST_TENANT_PATH + "/manifest")
+@RequestMapping(RestConstants.Path.MANIFEST_FULL_PATH)
 public class PatientShLinkManifestRestController {
-
-	public static final String MANIFEST_PATH_SUFFIX = "/manifest";
-	public static final String MANIFEST_FULL_PATH = RestUrlUtil.REST_TENANT_PATH + MANIFEST_PATH_SUFFIX;
 
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 

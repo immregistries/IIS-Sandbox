@@ -1,8 +1,9 @@
 package org.immregistries.iis.kernal.controllers.rest.shlink;
 
+import org.immregistries.iis.kernal.controllers.rest.util.RestConstants;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
-import org.immregistries.iis.kernal.controllers.rest.RestUrlUtil;
 import org.immregistries.iis.kernal.logic.shlink.CompressionService;
 import org.immregistries.iis.kernal.logic.shlink.ShLinkGenerator;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
@@ -23,32 +24,26 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 
 @RestController
-@RequestMapping({ RestUrlUtil.REST + "/shlink", RestUrlUtil.REST + "/tenant/{tenantName}/shlink" })
+@RequestMapping({ RestConstants.Path.REST + "/shlink", RestConstants.Path.REST + "/tenant/{tenantName}/shlink" })
 public class ShLinkRestController {
 
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	// Keeping constants that might be useful
-	public static final String PARAM_SECRET_KEY = "secretKey";
-	public static final String PARAM_KEY_ID = "keyId";
-	public static final String PARAM_PATIENT_ID = "patientId";
-	public static final String PARAM_FLAG = "flag";
 	private static final String PARAM_EXP = "exp";
-
 
 	@Autowired
 	ShLinkGenerator shLinkGenerator;
-
 
 	@Autowired
 	CompressionService compressionService;
 
 	@PostMapping()
 	public String shLinkIPSQrCode(HttpServletRequest req,
-			@RequestParam(value = PARAM_KEY_ID, required = false) String keyId,
-			@RequestParam(value = PARAM_SECRET_KEY, required = false) String secretKey,
-			@RequestParam(PARAM_PATIENT_ID) String patientId,
-			@RequestParam(PARAM_FLAG) String flag,
+			@RequestParam(value = RestConstants.Param.KEY_ID, required = false) String keyId,
+			@RequestParam(value = RestConstants.Param.SECRET_KEY, required = false) String secretKey,
+			@RequestParam(RestConstants.Param.PATIENT_ID) String patientId,
+			@RequestParam(RestConstants.Param.FLAG) String flag,
 			@RequestParam(value = PARAM_EXP, required = false, defaultValue = "10000000") String exp,
 			@RequestAttribute(CurrentTenantUtil.SESSION_REQUEST_TENANT) Tenant tenant)
 			throws IOException, NoSuchAlgorithmException {
@@ -57,13 +52,12 @@ public class ShLinkRestController {
 		return qrCode;
 	}
 
-
 	@PostMapping(value = "/png")
 	public ResponseEntity<byte[]> shLinkIPSPng(HttpServletRequest req,
-			@RequestParam(value = PARAM_KEY_ID, required = false) String keyId,
-			@RequestParam(value = PARAM_SECRET_KEY, required = false) String secretKey,
-			@RequestParam(PARAM_PATIENT_ID) String patientId,
-			@RequestParam(PARAM_FLAG) String flag,
+			@RequestParam(value = RestConstants.Param.KEY_ID, required = false) String keyId,
+			@RequestParam(value = RestConstants.Param.SECRET_KEY, required = false) String secretKey,
+			@RequestParam(RestConstants.Param.PATIENT_ID) String patientId,
+			@RequestParam(RestConstants.Param.FLAG) String flag,
 			@RequestParam(value = PARAM_EXP, required = false, defaultValue = "10000000") String exp,
 			@RequestAttribute(CurrentTenantUtil.SESSION_REQUEST_TENANT) Tenant tenant)
 			throws ServletException, IOException, NoSuchAlgorithmException {
@@ -74,8 +68,6 @@ public class ShLinkRestController {
 		return new ResponseEntity<>(outputStream.toByteArray(), headers, HttpStatus.OK);
 
 	}
-
-
 
 	// Skipping doGet as it was purely HTML UI form.
 }

@@ -1,8 +1,10 @@
 package org.immregistries.iis.kernal.controllers.rest;
 
+import org.immregistries.iis.kernal.controllers.rest.util.RestConstants;
+
 import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.reference.CodesetType;
-import org.immregistries.iis.kernal.controllers.filters.RestTenantUrlFilter;
+import org.immregistries.iis.kernal.controllers.rest.filters.RestTenantUrlFilter;
 import org.immregistries.iis.kernal.logic.CodeMapManagerService;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,15 +13,14 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Collection;
 
 @RestController
-@RequestMapping({RestUrlUtil.REST_TENANT_PATH + CodeMapRestController.CODEMAPS_PATH_SUFFIX, RestUrlUtil.REST_PATH + CodeMapRestController.CODEMAPS_PATH_SUFFIX})
+@RequestMapping({ RestUrlUtil.REST_TENANT_PATH + RestConstants.Path.CODEMAPS_PATH_SUFFIX,
+        RestUrlUtil.REST_PATH + RestConstants.Path.CODEMAPS_PATH_SUFFIX })
 public class CodeMapRestController {
 
-	public static final String CODEMAPS_PATH_KEY = "codemaps";
-	public static final String CODEMAPS_PATH_SUFFIX = "/" + CODEMAPS_PATH_KEY;
-	@Autowired
-	private CodeMapManagerService codeMapManagerService;
+    @Autowired
+    private CodeMapManagerService codeMapManagerService;
 
-	@GetMapping
+    @GetMapping
     public CodeMap getCodeMaps(
             @RequestAttribute(RestTenantUrlFilter.TENANT_REQUEST_ATTRIBUTE) Tenant tenant) {
         return codeMapManagerService.getCodeMap();

@@ -1,5 +1,7 @@
 package org.immregistries.iis.kernal.controllers.rest;
 
+import org.immregistries.iis.kernal.controllers.rest.util.RestConstants;
+
 import jakarta.validation.constraints.NotBlank;
 import org.hl7.fhir.instance.model.api.IBaseParameters;
 import org.immregistries.iis.kernal.logic.TenantCompareService;
@@ -13,25 +15,19 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import static org.immregistries.iis.kernal.controllers.rest.TenantCompareController.TENANT_COMPARE_BASE_PATH;
-
 @RestController
 @RequestMapping({
-		RestUrlUtil.REST_PATH + TENANT_COMPARE_BASE_PATH })
+		RestConstants.Path.REST_PATH + RestConstants.Path.TENANT_COMPARE_BASE_PATH })
 public class TenantCompareController {
-	public static final String TENANT_COMPARE_BASE_PATH = "/tenantCompare";
-
-	public static final String INCLUDE_GOLDEN = "includeGolden";
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
-
-	public static final String TENANT_IDS = "tenantIds";
 
 	@Autowired
 	private TenantCompareService tenantCompareService;
 
 	@PostMapping
-	protected List<IBaseParameters> tenantComparePost(@RequestParam(name = TENANT_IDS) @NotBlank String tenantIds,
-			@RequestParam(name = INCLUDE_GOLDEN, required = false) boolean includeGolden) {
+	protected List<IBaseParameters> tenantComparePost(
+			@RequestParam(name = RestConstants.Param.TENANT_IDS) @NotBlank String tenantIds,
+			@RequestParam(name = RestConstants.Param.INCLUDE_GOLDEN, required = false) boolean includeGolden) {
 		return tenantCompareGet(tenantIds, includeGolden);
 	}
 
@@ -39,13 +35,13 @@ public class TenantCompareController {
 	 * Currently adapted only for origins loaded in the right order,
 	 * TODO add cross resource checks with ids and matching
 	 *
-	 * @param tenantIds ids of tenants to be compared
+	 * @param tenantIds     ids of tenants to be compared
 	 * @param includeGolden option of use of MDM Golden/Master Records
 	 */
 	@GetMapping()
 	protected List<IBaseParameters> tenantCompareGet(
-			@RequestParam(name = TENANT_IDS) @NotBlank String tenantIds,
-			@RequestParam(name = INCLUDE_GOLDEN, required = false) boolean includeGolden) {
+			@RequestParam(name = RestConstants.Param.TENANT_IDS) @NotBlank String tenantIds,
+			@RequestParam(name = RestConstants.Param.INCLUDE_GOLDEN, required = false) boolean includeGolden) {
 		String[] tenantNames = tenantIds.split(",");
 		logger.info("Testing Tenant comparison for ids {} with golden={}", tenantNames, includeGolden);
 		UserAccess userAccess = UserAccessUtil.get().getUserAccess();

@@ -1,5 +1,7 @@
 package org.immregistries.iis.kernal.controllers.rest;
 
+import org.immregistries.iis.kernal.controllers.rest.util.RestConstants;
+
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.context.RuntimeResourceDefinition;
 import jakarta.servlet.ServletException;
@@ -16,9 +18,8 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 
 @RestController()
-@RequestMapping({RestUrlUtil.REST_PATH + MacroEndpointController.$_CREATE_PATH_KEY, "/$create"})
+@RequestMapping({ RestUrlUtil.REST_PATH + RestConstants.Path.$_CREATE_PATH_KEY, "/$create" })
 public class MacroEndpointController {
-	public static final String $_CREATE_PATH_KEY = "/$create";
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	@Autowired
 	private FhirContext fhirContext;
@@ -55,6 +56,5 @@ public class MacroEndpointController {
 	protected ResponseEntity<Tenant> doGet(@RequestBody String bundleString) throws ServletException, IOException {
 		return doPost(bundleString);
 	}
-
 
 }

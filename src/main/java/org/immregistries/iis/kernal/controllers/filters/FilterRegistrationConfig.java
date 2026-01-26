@@ -1,6 +1,7 @@
 package org.immregistries.iis.kernal.controllers.filters;
 
 import org.immregistries.iis.kernal.controllers.rest.RestUrlUtil;
+import org.immregistries.iis.kernal.controllers.rest.filters.RestTenantUrlFilter;
 import org.immregistries.iis.kernal.controllers.servlet.TenantController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;

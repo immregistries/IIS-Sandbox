@@ -5,7 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.immregistries.iis.kernal.Application;
 import org.immregistries.iis.kernal.controllers.rest.RestUrlUtil;
-import org.immregistries.iis.kernal.controllers.rest.shlink.PatientShLinkManifestRestController;
+import org.immregistries.iis.kernal.controllers.rest.util.RestConstants;
 import org.immregistries.iis.kernal.fhir.shl.ShLinkPayload;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.jetbrains.annotations.NotNull;
@@ -38,8 +38,8 @@ public class PatientShLinkService {
 
 	public @NotNull String getManifestUrl(String baseUrl, IAnyResource patientSelected, Tenant tenant) {
 		return baseUrl + RestUrlUtil.tenantifyPathWithContextPath(tenant,
-			PatientShLinkManifestRestController.MANIFEST_PATH_SUFFIX
-				+ "/patient/" + patientSelected.getIdElement().getIdPart());
+				RestConstants.Path.MANIFEST_PATH_SUFFIX
+						+ "/patient/" + patientSelected.getIdElement().getIdPart());
 	}
 
 }

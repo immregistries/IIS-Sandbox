@@ -1,5 +1,7 @@
 package org.immregistries.iis.kernal.controllers.rest;
 
+import org.immregistries.iis.kernal.controllers.rest.util.RestConstants;
+
 import org.immregistries.iis.kernal.persisted.entities.MessageReceived;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.immregistries.iis.kernal.persisted.repository.MessageReceivedRepository;
@@ -11,12 +13,10 @@ import java.util.List;
 import static org.immregistries.iis.kernal.security.CurrentTenantUtil.SESSION_REQUEST_TENANT;
 
 @RestController
-@RequestMapping(RestUrlUtil.REST_TENANT_PATH + MessageRestController.MESSAGE_PATH_KEY)
+@RequestMapping(RestUrlUtil.REST_TENANT_PATH + RestConstants.Path.MESSAGE_PATH_KEY)
 public class MessageRestController {
 
-	public static final String MESSAGE_PATH_KEY = "/message";
-
-	@Autowired
+    @Autowired
     MessageReceivedRepository messageReceivedRepository;
 
     @GetMapping(RestUrlUtil.PATIENT_ID_PLACEHOLDER)

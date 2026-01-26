@@ -1,5 +1,7 @@
 package org.immregistries.iis.kernal.controllers.rest;
 
+import org.immregistries.iis.kernal.controllers.rest.util.RestConstants;
+
 import jakarta.servlet.http.HttpServletRequest;
 import org.immregistries.iis.kernal.logic.match.VaccinationDedupService;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
@@ -12,20 +14,17 @@ import java.util.List;
 import static org.immregistries.iis.kernal.security.CurrentTenantUtil.SESSION_REQUEST_TENANT;
 
 @RestController
-@RequestMapping(RestUrlUtil.REST_TENANT_PATH + VacDedupRestController.VAC_DEDUP_PATH)
+@RequestMapping(RestUrlUtil.REST_TENANT_PATH + RestConstants.Path.VAC_DEDUP_PATH)
 public class VacDedupRestController {
-
-	public static final String VAC_DEDUP_PATH = "/vacDedup";
-
 
 	@Autowired
 	private VaccinationDedupService vaccinationDedupService;
 
 	@PostMapping
 	public List<LinkedImmunization> deduplicate(
-		@RequestAttribute(name = SESSION_REQUEST_TENANT) Tenant tenant,
-		@RequestBody VacDedupRequest vacDedupRequest,
-		HttpServletRequest req) {
+			@RequestAttribute(name = SESSION_REQUEST_TENANT) Tenant tenant,
+			@RequestBody VacDedupRequest vacDedupRequest,
+			HttpServletRequest req) {
 
 		return vaccinationDedupService.getLinkedImmunizations(vacDedupRequest);
 	}

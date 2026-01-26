@@ -1,6 +1,6 @@
 package org.immregistries.iis.kernal.controllers.rest.shlink;
 
-import org.immregistries.iis.kernal.controllers.filters.RestTenantUrlFilter;
+import org.immregistries.iis.kernal.controllers.rest.filters.RestTenantUrlFilter;
 import org.immregistries.iis.kernal.controllers.rest.RestUrlUtil;
 import org.immregistries.iis.kernal.logic.KeyStoreService;
 import org.immregistries.iis.kernal.persisted.entities.IisKey;

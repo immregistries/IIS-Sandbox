@@ -14,7 +14,7 @@ import org.hl7.fhir.instance.model.api.IDomainResource;
 import org.hl7.fhir.r5.model.Bundle;
 import org.immregistries.iis.kernal.Application;
 import org.immregistries.iis.kernal.controllers.rest.*;
-import org.immregistries.iis.kernal.controllers.rest.shlink.PatientShLinkRestController;
+import org.immregistries.iis.kernal.controllers.rest.util.RestConstants;
 import org.immregistries.iis.kernal.controllers.servlet.shlink.ShLinkController;
 import org.immregistries.iis.kernal.controllers.servlet.util.UiQrCodeUtil;
 import org.immregistries.iis.kernal.controllers.servlet.util.UiUtil;
@@ -48,7 +48,7 @@ import static org.immregistries.iis.kernal.controllers.servlet.PatientController
 import static org.immregistries.iis.kernal.controllers.servlet.util.PatientServletUtil.*;
 
 @RestController
-@RequestMapping({PATIENT_BASE_PATH, TenantController.TENANT_PATH + PATIENT_BASE_PATH})
+@RequestMapping({ PATIENT_BASE_PATH, TenantController.TENANT_PATH + PATIENT_BASE_PATH })
 public class PatientController {
 	public static final String PATIENT_PATH_KEY = "patient";
 	public static final String PATIENT_BASE_PATH = "/" + PATIENT_PATH_KEY;
@@ -83,19 +83,19 @@ public class PatientController {
 
 	@PostMapping
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp
-								 // , @PathVariable(name = TenantController.PATH_VARIABLE_TENANT_NAME, required =
-								 // false) String tenantName
+	// , @PathVariable(name = TenantController.PATH_VARIABLE_TENANT_NAME, required =
+	// false) String tenantName
 	)
-		throws ServletException, IOException {
+			throws ServletException, IOException {
 		doGet(req, resp);
 	}
 
 	@GetMapping
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp
-								// , @PathVariable(name = TenantController.PATH_VARIABLE_TENANT_NAME, required =
-								// false) String tenantName
+	// , @PathVariable(name = TenantController.PATH_VARIABLE_TENANT_NAME, required =
+	// false) String tenantName
 	)
-		throws ServletException, IOException {
+			throws ServletException, IOException {
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		Tenant tenant = CurrentTenantUtil.getTenantRedirectIfNone(req, resp);
@@ -121,12 +121,12 @@ public class PatientController {
 	}
 
 	private void singlePatientInformationPrintAll(PrintWriter out, IAnyResource patientSelected,
-																 Tenant tenant, HttpServletRequest req) throws JsonProcessingException {
+			Tenant tenant, HttpServletRequest req) throws JsonProcessingException {
 		IisPatient iisPatient = patientMapper.localObject(patientSelected);
 		boolean isGolden = FhirRequesterUtil.isGoldenRecord(patientSelected);
 
 		out.println("<h2>Patient : " + iisPatient.getNameFirst() + " "
-			+ iisPatient.getNameMiddle() + " " + iisPatient.getNameLast() + "</h2>");
+				+ iisPatient.getNameMiddle() + " " + iisPatient.getNameLast() + "</h2>");
 
 		printPatient(out, iisPatient);
 
@@ -145,8 +145,8 @@ public class PatientController {
 		out.println("</div>");
 
 		ShLinkPayload shLinkPayload = patientRestController.getShLinkPayload(iisPatient.getPatientId(),
-			tenant,
-			req);
+				tenant,
+				req);
 
 		out.println("<div class=\"w3-container\">");
 		out.println("<h4>Smart Health link</h4>");
@@ -167,7 +167,8 @@ public class PatientController {
 
 		out.println("<div class=\"w3-container\">");
 		out.println("<h4>Messages Received</h4>");
-		List<MessageReceived> messageReceivedList = messageRestController.getPatientMessages(tenant, iisPatient.getPatientId());
+		List<MessageReceived> messageReceivedList = messageRestController.getPatientMessages(tenant,
+				iisPatient.getPatientId());
 		if (messageReceivedList.isEmpty()) {
 			out.println("<div class=\"w3-panel w3-yellow\"><p>No Messages Received</p></div>");
 		} else {
@@ -181,10 +182,12 @@ public class PatientController {
 	}
 
 	private void printQrCodeAndDetails(PrintWriter out, Tenant tenant, IisPatient iisPatient,
-												  ShLinkPayload shLinkPayload) throws JsonProcessingException {
+			ShLinkPayload shLinkPayload) throws JsonProcessingException {
 		out.println("<div class=\"w3-container\">");
-		out.println("<img src=\"" + RestUrlUtil.patientifyPathWithContextPath(tenant.getOrgId(), iisPatient.getPatientId(), PatientShLinkRestController.SHLINK_QR_CODE_PATH_SUFFIX)
-			+ "\"  alt=\"shlink\" width=\"200\">");
+		out.println("<img src=\""
+				+ RestUrlUtil.patientifyPathWithContextPath(tenant.getOrgId(), iisPatient.getPatientId(),
+						RestConstants.Path.SHLINK_QR_CODE_PATH_SUFFIX)
+				+ "\"  alt=\"shlink\" width=\"200\">");
 		out.print("<div><a href= \"" + shLinkPayload.getUrl() + "\">Manifest URL</a></div>");
 		out.println("<h5>Qr Code Text Value</h5>");
 		out.println("<textarea id =\"qrCode\" cols=\"30\" rows=\"2\" style=\"white-space: nowrap;  overflow: auto;\">");
@@ -194,21 +197,21 @@ public class PatientController {
 		out.println("</div>");
 		out.println("</div>");
 		out.println("<div><a href= \"" +
-			UrlTenantUtil.tenantifyPathWithContextPath(tenant,
-				ShLinkController.SHLINK_CONTROLLER_BASE_PATH + "?" + ShLinkController.PARAM_PATIENT_ID + "="
-					+ iisPatient.getPatientId())
-			+ "\">Generate a new Smart Health Link with IPS</a></div>");
+				UrlTenantUtil.tenantifyPathWithContextPath(tenant,
+						ShLinkController.SHLINK_CONTROLLER_BASE_PATH + "?" + ShLinkController.PARAM_PATIENT_ID + "="
+								+ iisPatient.getPatientId())
+				+ "\">Generate a new Smart Health Link with IPS</a></div>");
 		out.println("<div><a href= \"" +
-			RestUrlUtil.tenantifyPathWithContextPath(tenant, "/patient/" + iisPatient.getPatientId() + "/clvr/pdf")
-			+
-			"\">Generate a EVC with IPS</a></div>");
+				RestUrlUtil.tenantifyPathWithContextPath(tenant, "/patient/" + iisPatient.getPatientId() + "/clvr/pdf")
+				+
+				"\">Generate a EVC with IPS</a></div>");
 	}
 
 	private void printPatientRecommendationsAndSubscriptions(PrintWriter out, IAnyResource patientSelected,
-																				IisPatient iisPatient, HttpServletRequest req,
-																				Tenant tenant) {
+			IisPatient iisPatient, HttpServletRequest req,
+			Tenant tenant) {
 		IParser parser = iisFhirClientFactory.getFhirContext()
-			.newJsonParser().setPrettyPrint(true).setSuppressNarratives(true);
+				.newJsonParser().setPrettyPrint(true).setSuppressNarratives(true);
 		IBaseBundle recommendationBaseBundle = patientRestController
 				.getPatientRecommendationBundle(iisPatient.getPatientId(), tenant, req);
 
@@ -216,13 +219,13 @@ public class PatientController {
 			org.hl7.fhir.r4.model.Bundle recommendationBundle = (org.hl7.fhir.r4.model.Bundle) recommendationBaseBundle;
 			if (recommendationBundle.hasEntry()) {
 				RecommendationController
-					.printRecommendation(out,
-						(org.hl7.fhir.r4.model.ImmunizationRecommendation) recommendationBundle
-							.getEntryFirstRep().getResource(),
-						(org.hl7.fhir.r4.model.Patient) patientSelected, fhirContext);
+						.printRecommendation(out,
+								(org.hl7.fhir.r4.model.ImmunizationRecommendation) recommendationBundle
+										.getEntryFirstRep().getResource(),
+								(org.hl7.fhir.r4.model.Patient) patientSelected, fhirContext);
 			} else {
 				RecommendationController.printRecommendation(out, null, (org.hl7.fhir.r4.model.Patient) patientSelected,
-					fhirContext);
+						fhirContext);
 			}
 			// org.hl7.fhir.r4.model.Bundle subcriptionBundle =
 			// fhirClient.search().forResource(org.hl7.fhir.r4.model.Subscription.class).returnBundle(org.hl7.fhir.r4.model.Bundle.class).execute();
@@ -234,41 +237,42 @@ public class PatientController {
 			org.hl7.fhir.r5.model.Bundle recommendationBundle = (org.hl7.fhir.r5.model.Bundle) recommendationBaseBundle;
 			if (recommendationBundle.hasEntry()) {
 				RecommendationController.printRecommendation(out,
-					(IDomainResource) recommendationBundle.getEntryFirstRep().getResource(),
-					(IDomainResource) patientSelected, fhirContext);
+						(IDomainResource) recommendationBundle.getEntryFirstRep().getResource(),
+						(IDomainResource) patientSelected, fhirContext);
 			} else {
 				RecommendationController.printRecommendation(out, null, (IDomainResource) patientSelected, fhirContext);
 			}
 			org.hl7.fhir.r5.model.Bundle subcriptionBundle = (Bundle) subscriptionRestController
-				.getAllSubscriptions(req);
+					.getAllSubscriptions(req);
 			printSubscriptions(out, parser, subcriptionBundle, (org.hl7.fhir.r5.model.Resource) patientSelected);
 		}
 	}
 
 	private void printRelatedPatients(PrintWriter out, IisPatient iisPatient, boolean isGolden,
-												 Tenant tenant, HttpServletRequest req) {
+			Tenant tenant, HttpServletRequest req) {
 		List<? extends IisPatient> relatedPatients = patientRestController
-			.getPatientRelatedPatients(iisPatient.getPatientId(), tenant, isGolden, req);
+				.getPatientRelatedPatients(iisPatient.getPatientId(), tenant, isGolden, req);
 		out.println("<h4>Related Patient records</h4>");
 		printPatientList(out, relatedPatients, false);
 		UiUtil.printGoldenRecordExplanation(out, isGolden);
 	}
 
 	private void printPatientVaccinations(PrintWriter out, IisPatient iisPatient, boolean isGolden,
-													  Tenant tenant, HttpServletRequest req) {
+			Tenant tenant, HttpServletRequest req) {
 		List<VaccinationMaster> vaccinationList = patientRestController
-			.getPatientVaccination(iisPatient.getPatientId(), tenant, isGolden, req);
+				.getPatientVaccination(iisPatient.getPatientId(), tenant, isGolden, req);
 		out.println("<h4>Vaccinations</h4>");
-		VaccinationController.printVaccinationList(out, vaccinationList, null, codeMapRestController.getCodeMaps(tenant)); // TODO test and change
+		VaccinationController.printVaccinationList(out, vaccinationList, null,
+				codeMapRestController.getCodeMaps(tenant)); // TODO test and change
 	}
 
 	private void printPatientObservations(PrintWriter out, IisPatient iisPatient, boolean isGolden,
-													  Tenant tenant, HttpServletRequest req) {
+			Tenant tenant, HttpServletRequest req) {
 		List<ObservationReported> observationReportedList = patientRestController
-			.getPatientObservation(iisPatient.getPatientId(), tenant, isGolden, req);
+				.getPatientObservation(iisPatient.getPatientId(), tenant, isGolden, req);
 		Set<String> suppressSet = LoincIdentifier.getSuppressIdentifierCodeSet();
 		observationReportedList
-			.removeIf(observationReported -> suppressSet.contains(observationReported.getIdentifierCode()));
+				.removeIf(observationReported -> suppressSet.contains(observationReported.getIdentifierCode()));
 
 		out.println("<h4>Patient Observations</h4>");
 		printObservationList(out, observationReportedList);
@@ -286,7 +290,7 @@ public class PatientController {
 		if (action != null) {
 			if (action.equals(ACTION_SEARCH)) {
 				patientMasterList = patientRestController.basicSearch(patientNameLast, patientNameFirst, externalLink,
-					tenant, req);
+						tenant, req);
 			}
 		}
 		List<PatientMaster> patientMasterList1 = patientMasterList;
@@ -295,16 +299,16 @@ public class PatientController {
 		out.println("    <h3>Search Patient Registry</h3>");
 		out.println("    <form method=\"GET\" action=\"patient\" class=\"w3-container w3-card-4\">");
 		out.println("      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_PATIENT_NAME_LAST + "\" value=\""
-			+ patientNameLast + "\"/>");
+				+ patientNameLast + "\"/>");
 		out.println("      <label>Last Name</label>");
 		out.println("      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_PATIENT_NAME_FIRST + "\" value=\""
-			+ patientNameFirst + "\"/>");
+				+ patientNameFirst + "\"/>");
 		out.println("      <label>First Name</label>");
 		out.println("      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_PATIENT_REPORTED_EXTERNAL_LINK
-			+ "\" value=\"" + externalLink + "\"/>");
+				+ "\" value=\"" + externalLink + "\"/>");
 		out.println("      <label>Medical Record Number</label><br/>");
 		out.println("      <input class=\"w3-button w3-section w3-teal w3-ripple\" type=\"submit\" name=\""
-			+ PARAM_ACTION + "\" value=\"" + ACTION_SEARCH + "\"/>");
+				+ PARAM_ACTION + "\" value=\"" + ACTION_SEARCH + "\"/>");
 		out.println("    </form>");
 		out.println("</div>");
 
@@ -330,7 +334,7 @@ public class PatientController {
 			{
 				String link = apiBaseUrl + "/Patient" + "?_tag=GOLDEN_RECORD";
 				out.println("<div>Patient golden records (records referenced by duplicates): <a href=\"" + link + "\">"
-					+ link + "</a></div>");
+						+ link + "</a></div>");
 			}
 			out.println("</div>");
 		}

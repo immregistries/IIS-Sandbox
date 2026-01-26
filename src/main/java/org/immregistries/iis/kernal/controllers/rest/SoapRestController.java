@@ -3,7 +3,7 @@ package org.immregistries.iis.kernal.controllers.rest;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.immregistries.iis.kernal.controllers.filters.RestTenantUrlFilter;
+import org.immregistries.iis.kernal.controllers.rest.filters.RestTenantUrlFilter;
 import org.immregistries.iis.kernal.logic.hl7v2.BaseIISSOAPServer;
 import org.immregistries.iis.kernal.logic.hl7v2.handling.V2IncomingMessageHandler;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;

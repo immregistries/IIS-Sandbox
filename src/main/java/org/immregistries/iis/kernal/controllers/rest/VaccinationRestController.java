@@ -3,7 +3,7 @@ package org.immregistries.iis.kernal.controllers.rest;
 import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
 import ca.uhn.fhir.rest.param.ReferenceParam;
 import jakarta.servlet.http.HttpServletRequest;
-import org.immregistries.iis.kernal.controllers.filters.RestTenantUrlFilter;
+import org.immregistries.iis.kernal.controllers.rest.filters.RestTenantUrlFilter;
 import org.immregistries.iis.kernal.mapping.requesters.FhirReadRequester;
 import org.immregistries.iis.kernal.mapping.requesters.FhirSearchRequester;
 import org.immregistries.iis.kernal.mapping.requesters.IFhirSaveRequester;
@@ -15,31 +15,31 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import static org.immregistries.iis.kernal.controllers.rest.PatientRestController.MDM_EXPAND_REST_PARAM;
+import org.immregistries.iis.kernal.controllers.rest.util.RestConstants;
 import static org.immregistries.iis.kernal.security.CurrentTenantUtil.SESSION_REQUEST_TENANT;
 
 @RestController
 @RequestMapping(RestUrlUtil.REST_TENANT_PATH + VaccinationRestController.VACCINATION)
 public class VaccinationRestController extends BaseTenantTiedRest {
 
-	@Autowired
-	@SuppressWarnings("rawtypes")
-	private IFhirSaveRequester fhirRequester;
-	@Autowired
-	private FhirReadRequester fhirReadRequester;
-	@Autowired
-	private FhirSearchRequester fhirSearchRequester;
+    @Autowired
+    @SuppressWarnings("rawtypes")
+    private IFhirSaveRequester fhirRequester;
+    @Autowired
+    private FhirReadRequester fhirReadRequester;
+    @Autowired
+    private FhirSearchRequester fhirSearchRequester;
 
-	public static final String VACCINATION = "/vaccination";
-	public static final String VACCINATION_ID = "vaccinationId";
-	public static final String VACCINATION_ID_PLACEHOLDER = "/{" + VACCINATION_ID + "}";
+    public static final String VACCINATION = "/vaccination";
+    public static final String VACCINATION_ID = "vaccinationId";
+    public static final String VACCINATION_ID_PLACEHOLDER = "/{" + VACCINATION_ID + "}";
 
-	@GetMapping(VACCINATION_ID_PLACEHOLDER)
-	public IisVaccination getVaccination(
+    @GetMapping(VACCINATION_ID_PLACEHOLDER)
+    public IisVaccination getVaccination(
             @RequestAttribute(name = SESSION_REQUEST_TENANT) Tenant tenant,
             @PathVariable(VACCINATION_ID) String vaccinationId,
             HttpServletRequest req) {
-		return fhirReadRequester.readAsVaccination(vaccinationId);
+        return fhirReadRequester.readAsVaccination(vaccinationId);
     }
 
     @GetMapping()
@@ -58,10 +58,10 @@ public class VaccinationRestController extends BaseTenantTiedRest {
     }
 
     @GetMapping(VACCINATION_ID_PLACEHOLDER + "/related")
-	 public List<? extends IisVaccination> getRelatedVaccinations(
+    public List<? extends IisVaccination> getRelatedVaccinations(
             @PathVariable(VACCINATION_ID) String vaccinationId,
             @RequestAttribute(RestTenantUrlFilter.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
-            @RequestParam(name = MDM_EXPAND_REST_PARAM, defaultValue = "false") boolean isGolden) {
+            @RequestParam(name = RestConstants.Param.MDM_EXPAND_REST_PARAM, defaultValue = "false") boolean isGolden) {
         ReferenceParam referenceParam = new ReferenceParam().setValue(vaccinationId);
         referenceParam.setMdmExpand(isGolden);
         if (isGolden) {
