@@ -42,7 +42,7 @@
         <maven>3.8.3</maven>
     </prerequisites>
 
-    <name>IIS Sandbox HAPI FHIR JPA</name>
+    <name>IIS Sandbox</name>
 
     <modules>
         <module>iis-core</module>
