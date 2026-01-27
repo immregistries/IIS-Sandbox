@@ -9,7 +9,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Session;
 import org.hl7.fhir.r5.model.Immunization;
 import org.hl7.fhir.r5.model.Patient;
-import org.immregistries.iis.kernal.controllers.servlet.legacy.CovidController;
 import org.immregistries.iis.kernal.logic.hl7v2.writing.IExampleMessageWriter;
 import org.immregistries.iis.kernal.mapping.requesters.FhirSearchRequester;
 import org.immregistries.iis.kernal.model.VaccinationReported;
@@ -29,13 +28,17 @@ import java.util.stream.Collectors;
  */
 public class VXUDownloadGenerator extends Thread {
 
+	public static final String COVID_CVX_CODES = "208,207,210,212,211,213";
+	public static final String ACTION_GENERATE = "Generate";
+	public static final String PARAM_ACTION = "action";
+	public static final String PARAM_DATE_START = "dateStart";
+	public static final String PARAM_DATE_END = "dateEnd";
+	public static final String PARAM_CVX_CODES = "cvxCodes";
+	public static final String PARAM_INCLUDE_PHI = "includePhi";
+	public static final String EXPORT_YYYY_MM_DD = "yyyy-MM-dd";
+
 	private FhirSearchRequester fhirSearchRequester;
   private IExampleMessageWriter exampleMessageWriter;
-
-  public static final String PARAM_DATE_START = "dateStart";
-  public static final String PARAM_DATE_END = "dateEnd";
-  public static final String PARAM_CVX_CODES = "cvxCodes";
-  public static final String PARAM_INCLUDE_PHI = "includePhi";
 
   private String messageError;
 
@@ -133,7 +136,7 @@ public class VXUDownloadGenerator extends Thread {
     }
     cvxCodes = req.getParameter(PARAM_CVX_CODES);
     if (StringUtils.isEmpty(cvxCodes)) {
-      cvxCodes = CovidController.COVID_CVX_CODES;
+      cvxCodes = COVID_CVX_CODES;
     }
     includePhi = req.getParameter(PARAM_CVX_CODES) == null || req.getParameter(PARAM_INCLUDE_PHI) != null;
     runningMessage = "Initialized " + sdf.format(new Date());

@@ -1,7 +1,6 @@
 package org.immregistries.iis.kernal.logic.match;
 
 import org.apache.commons.lang3.StringUtils;
-import org.immregistries.iis.kernal.controllers.rest.VacDedupRestController;
 import org.immregistries.vaccination_deduplication.Immunization;
 import org.immregistries.vaccination_deduplication.LinkedImmunization;
 import org.immregistries.vaccination_deduplication.VaccinationDeduplication;
@@ -22,12 +21,13 @@ public class VaccinationDedupService {
 	public static final String ALGORITHM_WEIGHTED = "Weighted";
 	public static final String ALGORITHM_HYBRID = "Hybrid";
 
-	public List<LinkedImmunization> getLinkedImmunizations(VacDedupRestController.VacDedupRequest vacDedupRequest) {
+	public List<LinkedImmunization> getLinkedImmunizations(VacDedupRequest vacDedupRequest) {
+
 		LinkedImmunization linkedImmunizationList = new LinkedImmunization();
 		SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
 
 		if (vacDedupRequest.getImmunizations() != null) {
-			for (VacDedupRestController.VacDedupRequest.ImmunizationItem item : vacDedupRequest.getImmunizations()) {
+			for (VacDedupRequest.ImmunizationItem item : vacDedupRequest.getImmunizations()) {
 				Date parsedDate = null;
 				if (StringUtils.isNotBlank(item.getDate())) {
 					try {
@@ -66,7 +66,7 @@ public class VaccinationDedupService {
 		return immunizationListResults;
 	}
 
-	public @NotNull Immunization toVacDedupImmunization(VacDedupRestController.VacDedupRequest.ImmunizationItem item, Date parsedDate) {
+	public @NotNull Immunization toVacDedupImmunization(VacDedupRequest.ImmunizationItem item, Date parsedDate) {
 		Immunization immunization = new Immunization();
 		immunization.setCVX(item.getCvx());
 		immunization.setDate(parsedDate);

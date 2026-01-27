@@ -8,7 +8,7 @@ import ca.uhn.fhir.rest.server.exceptions.ResourceGoneException;
 import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
 import jakarta.annotation.PostConstruct;
 import org.hl7.fhir.r5.model.SubscriptionTopic;
-import org.immregistries.iis.kernal.controllers.SubscriptionTopicController;
+import org.immregistries.iis.kernal.logic.SubscriptionTopicGenerator;
 
 public class SubscriptionTopicConfigurer {
 
@@ -25,9 +25,9 @@ public class SubscriptionTopicConfigurer {
 		if (mySubscriptionTopicDao == null) {
 			mySubscriptionTopicDao = myDaoRegistry.getResourceDao("SubscriptionTopic");
 		}
-		saveTopic(SubscriptionTopicController.getDataQualityIssuesSubscriptionTopic());
-		saveTopic(SubscriptionTopicController.getGroupSubscriptionTopic());
-		saveTopic(SubscriptionTopicController.getPatientSubscriptionTopic());
+		saveTopic(SubscriptionTopicGenerator.getDataQualityIssuesSubscriptionTopic());
+		saveTopic(SubscriptionTopicGenerator.getGroupSubscriptionTopic());
+		saveTopic(SubscriptionTopicGenerator.getPatientSubscriptionTopic());
 	}
 
 	private void saveTopic(SubscriptionTopic topic) {

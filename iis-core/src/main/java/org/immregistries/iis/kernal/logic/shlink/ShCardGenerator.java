@@ -6,11 +6,8 @@ import com.google.gson.JsonParser;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
-import jakarta.servlet.http.HttpServletRequest;
 import org.hl7.fhir.instance.model.api.IBaseBundle;
-import org.immregistries.iis.kernal.controllers.WellKnownKeyController;
 import org.immregistries.iis.kernal.persisted.entities.IisKey;
-import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,10 +49,10 @@ public class ShCardGenerator {
 	@Autowired
 	private CompressionService compressionService;
 
-	public String shCardCompact(IBaseBundle iBaseBundle, HttpServletRequest request, IisKey signingKey, Tenant tenant) throws IOException {
-		String shcardIssuerUrl = WellKnownKeyController.getKeyIssuerUrl(request, tenant);
-		return shCardCompact(iBaseBundle, shcardIssuerUrl, signingKey);
-	}
+//	public String shCardCompact(IBaseBundle iBaseBundle, HttpServletRequest request, IisKey signingKey, Tenant tenant) throws IOException {
+//		String shcardIssuerUrl = WellKnownKeyController.getKeyIssuerUrl(request, tenant);
+//		return shCardCompact(iBaseBundle, shcardIssuerUrl, signingKey);
+//	}
 
 	public String shCardCompact(IBaseBundle iBaseBundle, String issuerUrl, IisKey signingKey) throws IOException {
 		String resourceString = fhirContext.newJsonParser().setSummaryMode(true).encodeResourceToString(iBaseBundle);

@@ -28,7 +28,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Optional;
 
-import static org.immregistries.iis.kernal.security.CurrentTenantUtil.SESSION_REQUEST_TENANT;
+import static org.immregistries.iis.kernal.FunctionalConstants.SESSION_REQUEST_TENANT;
 import static org.immregistries.iis.kernal.security.UserAccessUtil.SESSION_USER_ACCESS;
 
 /**
@@ -54,7 +54,7 @@ public class IisAuthorizationInterceptor extends AuthorizationInterceptor {
 	@Autowired
 	private TenantRepository tenantRepository;
 	@Autowired
-	TenantAuthService tenantAuthService;
+	private TenantAuthService tenantAuthService;
 
 	/**
 	 * Authenticates request with Session cookie, Basic Auth (Token bearer currently

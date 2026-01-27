@@ -5,13 +5,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.instance.model.api.IBaseBundle;
 import org.hl7.fhir.r4.model.IdType;
-import org.immregistries.iis.kernal.Application;
-import org.immregistries.iis.kernal.controllers.WellKnownKeyController;
-import org.immregistries.iis.kernal.controllers.IisRestPath;
 import org.immregistries.iis.kernal.fhir.ips.IpsGeneratorSvcIIS;
 import org.immregistries.iis.kernal.fhir.shl.ShLinkPayload;
 import org.immregistries.iis.kernal.logic.KeyStoreService;
 import org.immregistries.iis.kernal.logic.SecretKeyUtilService;
+import org.immregistries.iis.kernal.logic.api.IWellKnownKeyApiService;
 import org.immregistries.iis.kernal.model.shlink.ShLinkFilePayload;
 import org.immregistries.iis.kernal.persisted.entities.*;
 import org.immregistries.iis.kernal.persisted.repository.IisShlinkContentRepository;
@@ -34,7 +32,6 @@ import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 
-import static org.immregistries.iis.kernal.controllers.rest.shlink.ShLinkManifestRestController.SHLINKS_CONTROLLER_REST_BASE_URL;
 import static org.immregistries.iis.kernal.logic.shlink.ShCardGenerator.VERIFIABLE_CREDENTIAL_TYPE;
 
 @Service
@@ -60,6 +57,10 @@ public class ShLinkGenerator {
 	private KeyStoreService keyStoreService;
 	@Autowired
 	private SecretKeyUtilService secretKeyUtilService;
+	@Autowired
+	private IWellKnownKeyApiService wellKnownKeyService;
+	@Autowired
+	private IShApiUrlService shApiUrlService;
 
 	public String generateShLink(HttpServletRequest req, String keyId, String secretKey, String patientId, String flag, String exp, Tenant tenant, UserAccess userAccess) throws NoSuchAlgorithmException, IOException {
 		/*
@@ -104,7 +105,7 @@ public class ShLinkGenerator {
 		ShLinkFilePayload shLinkFilePayload = new ShLinkFilePayload();
 		shLinkFilePayload.setType(List.of(VERIFIABLE_CREDENTIAL_TYPE, APPLICATION_SMART_HEALTH_CARD_CONTENT_TYPE));
 
-		String shcardIssuerUrl = WellKnownKeyController.getKeyIssuerUrl(req, tenant);
+		String shcardIssuerUrl = wellKnownKeyService.getKeyIssuerUrl(req, tenant);
 		List<String> verifiableCredentials = new ArrayList<>(bundleList.size());
 		for (IBaseBundle bundle : bundleList) {
 			String shCardCompact = shCardGenerator.shCardCompact(bundle, shcardIssuerUrl, iisSigningKey);
@@ -147,12 +148,13 @@ public class ShLinkGenerator {
 		shlinkManifestService.saveManifest(shLinkManifest);
 
 
-		uriBuilder.replacePath(Application.IIS_PATH_BASE + SHLINKS_CONTROLLER_REST_BASE_URL + "/{" + MANIFEST_ID + "}");
+		shApiUrlService.replaceUrlWithShCardPattern(uriBuilder);
 		shLinkUrl = uriBuilder
 				.build(Map.of(MANIFEST_ID, shLinkManifest.getId()))
 				.toURL();
 		return shLinkUrl;
 	}
+
 
 	private @NotNull URL directFileShCardUrl(ShLinkPayload shLinkPayload, UserAccess userAccess, String encryptedContent, UriComponentsBuilder uriBuilder) throws MalformedURLException {
 		URL shLinkUrl;
@@ -165,8 +167,7 @@ public class ShLinkGenerator {
 		}
 		iisShLinkContent.setContent(encryptedContent);
 		iisShlinkContentRepository.save(iisShLinkContent);
-		uriBuilder.replacePath(
-				Application.IIS_PATH_BASE  + IisRestPath.SHLINK_CONTENT_PATH + "/{" + CONTENT_ID + "}");
+		shApiUrlService.replaceUrlWithShLinkPattern(uriBuilder);
 		shLinkUrl = uriBuilder
 				.build(Map.of(CONTENT_ID, iisShLinkContent.getId()))
 				.toURL();

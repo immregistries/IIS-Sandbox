@@ -1,20 +1,14 @@
 package org.immregistries.iis.kernal.security;
 
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.validation.constraints.NotNull;
 import org.apache.commons.lang3.StringUtils;
-import org.immregistries.iis.kernal.Application;
-import org.immregistries.iis.kernal.controllers.servlet.TenantController;
+import org.immregistries.iis.kernal.FunctionalConstants;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.immregistries.iis.kernal.persisted.entities.UserAccess;
-import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
-
-import java.io.IOException;
 
 /**
  * static class providing tools related to the Tenant selected using request
@@ -22,10 +16,10 @@ import java.io.IOException;
  */
 public final class CurrentTenantUtil {
 
-	public static final String TENANT_ID_URL = "TENANT_ID_URL";
-	public static final String TENANT_NAME_URL = "TENANT_NAME_URL";
+	public static final String TENANT_ID_URL = FunctionalConstants.TENANT_ID_URL;
+	public static final String TENANT_NAME_URL = FunctionalConstants.TENANT_NAME_URL;
 
-	public static final String SESSION_REQUEST_TENANT = "tenant";
+	public static final String SESSION_REQUEST_TENANT = FunctionalConstants.SESSION_REQUEST_TENANT;
 
 	public static Tenant getTenant() {
 		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
@@ -79,19 +73,6 @@ public final class CurrentTenantUtil {
 				userAccess = (UserAccess) authentication;
 			}
 			tenant = TenantAuthService.get().authenticateTenant(userAccess, pathVariable);
-		}
-		return tenant;
-	}
-
-	public static @NotNull Tenant getTenantRedirectIfNone(HttpServletRequest req,
-			HttpServletResponse resp) throws IOException {
-		Tenant tenant = getTenant(req);
-		if (tenant == null) {
-			if (UserAccessUtil.get().getUserAccess() != null) {
-				resp.sendRedirect(Application.IIS_PATH_BASE +
-						TenantController.TENANT_BASE_PATH);
-			}
-			throw new AuthenticationCredentialsNotFoundException("");
 		}
 		return tenant;
 	}
