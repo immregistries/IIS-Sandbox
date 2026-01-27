@@ -3,6 +3,7 @@ package org.immregistries.iis.kernal.controllers.servlet.shlink;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.immregistries.iis.kernal.controllers.IisRestPath;
 import org.immregistries.iis.kernal.controllers.WellKnownKeyController;
 import org.immregistries.iis.kernal.controllers.rest.shlink.IisKeyRestController;
 import org.immregistries.iis.kernal.controllers.servlet.TenantController;
@@ -21,12 +22,9 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 
-import static org.immregistries.iis.kernal.controllers.servlet.shlink.IisKeyController.IIS_KEY_BASE_PATH;
-
 @RestController
-@RequestMapping({ IIS_KEY_BASE_PATH, TenantController.TENANT_PATH + IIS_KEY_BASE_PATH })
+@RequestMapping({IisRestPath.BasePath.IIS_KEYS_PATH, TenantController.TENANT_PATH + IisRestPath.BasePath.IIS_KEYS_PATH})
 public class IisKeyController {
-	public static final String IIS_KEY_BASE_PATH = "/iisKey";
 
 	@Autowired
 	private IisKeyRestController iisKeyRestController;

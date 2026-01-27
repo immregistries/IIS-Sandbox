@@ -17,8 +17,8 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 
 import java.util.List;
 
+import static org.immregistries.iis.kernal.controllers.IisRestPath.SHLINK_CONTENT_PATH;
 import static org.immregistries.iis.kernal.controllers.rest.shlink.ShLinkManifestRestController.SHLINKS_CONTROLLER_REST_BASE_URL;
-import static org.immregistries.iis.kernal.controllers.RestConstants.Path.SHLINK_CONTENT_PATH;
 import static org.immregistries.iis.kernal.controllers.servlet.LoginFormController.LOGIN_PARAM_PASSWORD;
 import static org.immregistries.iis.kernal.controllers.servlet.LoginFormController.LOGIN_PARAM_USERID;
 

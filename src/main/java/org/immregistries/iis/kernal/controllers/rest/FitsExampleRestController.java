@@ -1,6 +1,7 @@
 package org.immregistries.iis.kernal.controllers.rest;
 
-import org.immregistries.iis.kernal.controllers.RestConstants;
+import org.immregistries.iis.kernal.controllers.IisRestParam;
+import org.immregistries.iis.kernal.controllers.IisRestPath;
 
 import org.immregistries.iis.kernal.logic.hl7v2.FitsExamples;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,16 +12,17 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Map;
 
 @RestController
-@RequestMapping(RestConstants.Path.Key.REST_KEY + RestConstants.Path.FITS_EXAMPLE_PATH)
+@RequestMapping(IisRestPath.BasePath.REST_PATH + IisRestPath.FITS_EXAMPLE_PATH)
 public class FitsExampleRestController {
 
-    @GetMapping("all")
+
+	@GetMapping("all")
     public Map<String, String> getAllExamples() {
         return FitsExamples.exampleMap;
     }
 
     @GetMapping()
-    public String getExampleByName(@RequestParam("name") String name) {
+    public String getExampleByName(@RequestParam(IisRestParam.FITS_MAP_NAME) String name) {
         return FitsExamples.exampleMap.get(name);
     }
 }

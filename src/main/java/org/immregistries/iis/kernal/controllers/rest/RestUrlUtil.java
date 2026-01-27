@@ -2,7 +2,7 @@ package org.immregistries.iis.kernal.controllers.rest;
 
 import org.apache.commons.lang3.Strings;
 import org.immregistries.iis.kernal.Application;
-import org.immregistries.iis.kernal.controllers.RestConstants;
+import org.immregistries.iis.kernal.controllers.IisRestPath;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.jetbrains.annotations.NotNull;
 
@@ -19,7 +19,7 @@ public class RestUrlUtil {
 		if (!Strings.CS.startsWith(urlSuffix, "/")) {
 			urlSuffix = "/" + urlSuffix;
 		}
-		return RestConstants.Path.REST_PATH + RestConstants.Path.TENANT_PATH + "/" + tenantId + RestConstants.Path.PATIENT_PATH + "/" + patientId + urlSuffix;
+		return IisRestPath.BasePath.REST_PATH + IisRestPath.BasePath.TENANT_PATH + "/" + tenantId + IisRestPath.BasePath.PATIENT_PATH + "/" + patientId + urlSuffix;
 	}
 
 	/**
@@ -36,6 +36,6 @@ public class RestUrlUtil {
 		if (!Strings.CS.startsWith(urlSuffix, "/")) {
 			urlSuffix = "/" + urlSuffix;
 		}
-		return RestConstants.Path.REST_PATH + RestConstants.Path.TENANT_PATH + "/" + tenantId + urlSuffix;
+		return IisRestPath.BasePath.REST_PATH + IisRestPath.BasePath.TENANT_PATH + "/" + tenantId + urlSuffix;
 	}
 }

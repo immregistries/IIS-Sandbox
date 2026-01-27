@@ -7,7 +7,7 @@ import org.hl7.fhir.instance.model.api.IBaseBundle;
 import org.hl7.fhir.r4.model.IdType;
 import org.immregistries.iis.kernal.Application;
 import org.immregistries.iis.kernal.controllers.WellKnownKeyController;
-import org.immregistries.iis.kernal.controllers.RestConstants;
+import org.immregistries.iis.kernal.controllers.IisRestPath;
 import org.immregistries.iis.kernal.fhir.ips.IpsGeneratorSvcIIS;
 import org.immregistries.iis.kernal.fhir.shl.ShLinkPayload;
 import org.immregistries.iis.kernal.logic.KeyStoreService;
@@ -166,7 +166,7 @@ public class ShLinkGenerator {
 		iisShLinkContent.setContent(encryptedContent);
 		iisShlinkContentRepository.save(iisShLinkContent);
 		uriBuilder.replacePath(
-				Application.IIS_PATH_BASE  + RestConstants.Path.SHLINK_CONTENT_PATH + "/{" + CONTENT_ID + "}");
+				Application.IIS_PATH_BASE  + IisRestPath.SHLINK_CONTENT_PATH + "/{" + CONTENT_ID + "}");
 		shLinkUrl = uriBuilder
 				.build(Map.of(CONTENT_ID, iisShLinkContent.getId()))
 				.toURL();

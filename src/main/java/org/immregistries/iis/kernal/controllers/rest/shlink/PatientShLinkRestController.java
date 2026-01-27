@@ -1,6 +1,7 @@
 package org.immregistries.iis.kernal.controllers.rest.shlink;
 
-import org.immregistries.iis.kernal.controllers.RestConstants;
+import org.immregistries.iis.kernal.controllers.IisPathVariable;
+import org.immregistries.iis.kernal.controllers.IisRestPath;
 
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import jakarta.servlet.ServletException;
@@ -10,6 +11,7 @@ import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.immregistries.iis.kernal.logic.shlink.CompressionService;
 import org.immregistries.iis.kernal.logic.shlink.PatientShLinkService;
 import org.immregistries.iis.kernal.mapping.IisFhirClientFactory;
+import org.immregistries.iis.kernal.mapping.mappers.resources.PatientMapper;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.immregistries.iis.kernal.security.CurrentTenantUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +23,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 @RestController
-@RequestMapping({ RestConstants.Path.REST_PATIENT_PATH + RestConstants.Path.PATIENT_SH_LINK_PATH})
+@RequestMapping({ IisRestPath.REST_PATIENT_PATH + IisRestPath.BasePath.PATIENT_SH_LINK_PATH})
 public class PatientShLinkRestController {
 
 	@Autowired
@@ -34,10 +36,10 @@ public class PatientShLinkRestController {
 	@GetMapping(produces = MediaType.IMAGE_PNG_VALUE)
 	public ResponseEntity<byte[]> doGetShLinkQrCode(HttpServletRequest req, HttpServletResponse resp,
 			@RequestAttribute(CurrentTenantUtil.SESSION_REQUEST_TENANT) Tenant tenant,
-			@PathVariable(RestConstants.PathVariable.Key.PATIENT_ID) String patientId)
+			@PathVariable(IisPathVariable.Key.PATIENT_ID) String patientId)
 			throws IOException, ServletException {
 		IGenericClient client = iisFhirClientFactory.newGenericClient(tenant, req);
-		IAnyResource patientSelected = (IAnyResource) client.read().resource("Patient").withId(patientId).execute();
+		IAnyResource patientSelected = (IAnyResource) client.read().resource(PatientMapper.PATIENT_FHIR_TYPE_NAME).withId(patientId).execute();
 		if (patientSelected == null) {
 			throw new RuntimeException("Patient not found");
 		}

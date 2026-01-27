@@ -1,8 +1,8 @@
 package org.immregistries.iis.kernal.controllers.rest;
 
-import org.immregistries.iis.kernal.controllers.RestConstants;
+import org.immregistries.iis.kernal.controllers.IisRestParam;
+import org.immregistries.iis.kernal.controllers.IisRestPath;
 
-import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.parser.IParser;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import jakarta.servlet.http.HttpServletRequest;
@@ -24,7 +24,7 @@ import java.util.Date;
 import static org.immregistries.iis.kernal.controllers.rest.filters.RestTenantUrlFilter.TENANT_REQUEST_ATTRIBUTE;
 
 @RestController
-@RequestMapping(RestConstants.Path.REST_TENANT_PATH + RestConstants.Path.RECOMMENDATION_PATH)
+@RequestMapping(IisRestPath.REST_TENANT_PATH + IisRestPath.BasePath.RECOMMENDATION_PATH)
 public class RecommendationRestController {
 	@Autowired
 	private IImmunizationRecommendationService immunizationRecommendationService;
@@ -65,8 +65,8 @@ public class RecommendationRestController {
 	public void updateRecommendation(
 			@RequestAttribute(TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
 			@RequestBody String recommendationResource,
-			@RequestParam(name = RestConstants.Param.RECOMMENDATION_ID, required = false) String recommendationId,
-			@RequestParam(name = RestConstants.Param.RECOMMENDATION_IDENTIFIER, required = false) String recommendationIdentifier,
+			@RequestParam(name = IisRestParam.RECOMMENDATION_ID, required = false) String recommendationId,
+			@RequestParam(name = IisRestParam.RECOMMENDATION_IDENTIFIER, required = false) String recommendationIdentifier,
 			HttpServletRequest req) {
 		IParser parser = iisFhirClientFactory.getFhirContext()
 				.newJsonParser().setPrettyPrint(true).setSummaryMode(false).setSuppressNarratives(true);
@@ -81,8 +81,8 @@ public class RecommendationRestController {
 
 	@GetMapping()
 	public IAnyResource getRecommendation(
-			@RequestParam(name = RestConstants.Param.RECOMMENDATION_ID, required = false) String recommendationId,
-			@RequestParam(name = RestConstants.Param.RECOMMENDATION_IDENTIFIER, required = false) String recommendationIdentifier,
+			@RequestParam(name = IisRestParam.RECOMMENDATION_ID, required = false) String recommendationId,
+			@RequestParam(name = IisRestParam.RECOMMENDATION_IDENTIFIER, required = false) String recommendationIdentifier,
 			@RequestAttribute(TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
 			HttpServletRequest req) {
 		IGenericClient fhirClient = iisFhirClientFactory.newGenericClient(tenant, req);

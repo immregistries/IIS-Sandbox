@@ -8,7 +8,8 @@ import jakarta.servlet.ServletException;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.hl7.fhir.instance.model.api.IBaseBundle;
 import org.hl7.fhir.r4.model.IdType;
-import org.immregistries.iis.kernal.controllers.RestConstants;
+import org.immregistries.iis.kernal.controllers.IisPathVariable;
+import org.immregistries.iis.kernal.controllers.IisRestPath;
 import org.immregistries.iis.kernal.fhir.ips.IpsGeneratorSvcIIS;
 import org.immregistries.iis.kernal.logic.KeyStoreService;
 import org.immregistries.iis.kernal.logic.shlink.CompressionService;
@@ -43,31 +44,26 @@ import java.security.NoSuchProviderException;
 import java.security.SignatureException;
 
 @RestController
-@RequestMapping(RestConstants.Path.REST_PATIENT_PATH + "/clvr")
+@RequestMapping(IisRestPath.REST_PATIENT_PATH + IisRestPath.BasePath.CLVR_PATH)
 public class CLVRRestController {
     Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
-    KeyStoreService keyStoreService;
-
+    private KeyStoreService keyStoreService;
     @Autowired
-    CLVRService clvrService;
-
+    private CLVRService clvrService;
     @Autowired
-    IpsGeneratorSvcIIS ipsGeneratorSvcIIS;
-
+    private IpsGeneratorSvcIIS ipsGeneratorSvcIIS;
     @Autowired
-    FhirConversionUtil fhirConversionUtil;
-
+    private FhirConversionUtil fhirConversionUtil;
     @Autowired
-    CLVRPdfService clvrPdfService;
-
+    private CLVRPdfService clvrPdfService;
     @Autowired
-    CompressionService compressionService;
+    private CompressionService compressionService;
 
     @GetMapping(value = "/qr", produces = MediaType.TEXT_PLAIN_VALUE)
     public String getPatientClvrQrCode(
-            @PathVariable(RestConstants.PathVariable.Key.PATIENT_ID) String patientId,
+            @PathVariable(IisPathVariable.Key.PATIENT_ID) String patientId,
             @RequestAttribute(CurrentTenantUtil.SESSION_REQUEST_TENANT) Tenant tenant)
             throws COSEException, SignatureException, NoSuchAlgorithmException, InvalidKeyException,
             NoSuchProviderException, IOException {
@@ -82,7 +78,7 @@ public class CLVRRestController {
 
     @GetMapping(value = "/qr/png", produces = MediaType.IMAGE_PNG_VALUE)
     public ResponseEntity<byte[]> getPatientClvrPng(
-            @PathVariable(RestConstants.PathVariable.Key.PATIENT_ID) String patientId,
+            @PathVariable(IisPathVariable.Key.PATIENT_ID) String patientId,
             @RequestAttribute(CurrentTenantUtil.SESSION_REQUEST_TENANT) Tenant tenant)
             throws COSEException, IOException, SignatureException, NoSuchAlgorithmException, InvalidKeyException,
             NoSuchProviderException, ServletException {
@@ -101,7 +97,7 @@ public class CLVRRestController {
 
     @GetMapping(value = "/pdf", produces = MediaType.APPLICATION_PDF_VALUE)
     public ResponseEntity<byte[]> getPatientClvrPdf(
-            @PathVariable(RestConstants.PathVariable.Key.PATIENT_ID) String patientId,
+            @PathVariable(IisPathVariable.Key.PATIENT_ID) String patientId,
             @RequestAttribute(CurrentTenantUtil.SESSION_REQUEST_TENANT) Tenant tenant)
             throws COSEException, IOException, SignatureException, NoSuchAlgorithmException, InvalidKeyException,
             NoSuchProviderException, WriterException, URISyntaxException {

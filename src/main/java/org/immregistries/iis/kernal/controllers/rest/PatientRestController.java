@@ -1,6 +1,8 @@
 package org.immregistries.iis.kernal.controllers.rest;
 
-import org.immregistries.iis.kernal.controllers.RestConstants;
+import org.immregistries.iis.kernal.controllers.IisPathVariable;
+import org.immregistries.iis.kernal.controllers.IisRestParam;
+import org.immregistries.iis.kernal.controllers.IisRestPath;
 
 import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
@@ -12,8 +14,9 @@ import org.immregistries.iis.kernal.controllers.rest.filters.RestTenantUrlFilter
 import org.immregistries.iis.kernal.fhir.shl.ShLinkPayload;
 import org.immregistries.iis.kernal.logic.shlink.PatientShLinkService;
 import org.immregistries.iis.kernal.mapping.IisFhirClientFactory;
+import org.immregistries.iis.kernal.mapping.mappers.resources.PatientMapper;
+import org.immregistries.iis.kernal.mapping.mappers.resources.RecommendationMapper;
 import org.immregistries.iis.kernal.mapping.requesters.FhirReadRequester;
-import org.immregistries.iis.kernal.mapping.requesters.FhirSaveRequester;
 import org.immregistries.iis.kernal.mapping.requesters.FhirSearchRequester;
 import org.immregistries.iis.kernal.model.IisPatient;
 import org.immregistries.iis.kernal.model.ObservationReported;
@@ -25,36 +28,35 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import static org.immregistries.iis.kernal.controllers.RestConstants.Path.*;
+import static org.immregistries.iis.kernal.controllers.IisRestPath.BasePath.*;
 
 @RestController
-@RequestMapping(REST_TENANT_PATH + PATIENT_PATH)
+@RequestMapping(IisRestPath.REST_TENANT_PATH + IisRestPath.BasePath.PATIENT_PATH)
 public class PatientRestController extends BaseTenantTiedRest {
 
 	@Autowired
 	private FhirReadRequester fhirReadRequester;
 	@Autowired
 	private FhirSearchRequester fhirSearchRequester;
-
 	@Autowired
 	private IisFhirClientFactory iisFhirClientFactory;
 	@Autowired
 	private PatientShLinkService patientShlinkService;
 
-	@GetMapping(RestConstants.PathVariable.PlaceHolder.PATIENT_ID_PLACEHOLDER)
+	@GetMapping(IisPathVariable.PlaceHolder.PATIENT_ID_PLACEHOLDER)
 	public IisPatient getPatient(
-			@PathVariable(RestConstants.PathVariable.Key.PATIENT_ID) String patientId,
+			@PathVariable(IisPathVariable.Key.PATIENT_ID) String patientId,
 			@RequestAttribute(RestTenantUrlFilter.TENANT_REQUEST_ATTRIBUTE) Tenant tenant) {
 		return fhirReadRequester.readAsPatientMaster(patientId);
 	}
 
-	@GetMapping(RestConstants.PathVariable.PlaceHolder.PATIENT_ID_PLACEHOLDER + "/fhir")
+	@GetMapping(IisPathVariable.PlaceHolder.PATIENT_ID_PLACEHOLDER + IisRestPath.BasePath.FHIR_RESOURCE_PATH)
 	public IAnyResource getPatientFhir(
-			@PathVariable(RestConstants.PathVariable.Key.PATIENT_ID) String patientId,
+			@PathVariable(IisPathVariable.Key.PATIENT_ID) String patientId,
 			@RequestAttribute(RestTenantUrlFilter.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
 			HttpServletRequest req) {
 		IGenericClient fhirClient = iisFhirClientFactory.newGenericClient(tenant, req);
-		return (IAnyResource) fhirClient.read().resource("Patient").withId(patientId).execute();
+		return (IAnyResource) fhirClient.read().resource(PatientMapper.PATIENT_FHIR_TYPE_NAME).withId(patientId).execute();
 	}
 
 	@GetMapping("")
@@ -64,23 +66,23 @@ public class PatientRestController extends BaseTenantTiedRest {
 		return fhirSearchRequester.searchPatientMasterGoldenList(new SearchParameterMap());
 	}
 
-	@GetMapping(RestConstants.PathVariable.PlaceHolder.PATIENT_ID_PLACEHOLDER + "/recommendation")
+	@GetMapping(IisPathVariable.PlaceHolder.PATIENT_ID_PLACEHOLDER + IisRestPath.BasePath.RECOMMENDATION_PATH)
 	public IBaseBundle getPatientRecommendationBundle(
-			@PathVariable(RestConstants.PathVariable.Key.PATIENT_ID) String patientId,
+			@PathVariable(IisPathVariable.Key.PATIENT_ID) String patientId,
 			@RequestAttribute(RestTenantUrlFilter.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
 			HttpServletRequest req) {
 		IGenericClient fhirClient = iisFhirClientFactory.newGenericClient(tenant, req);
 		return fhirClient.search()
-				.forResource("ImmunizationRecommendation")
+				.forResource(RecommendationMapper.IMMUNIZATION_RECOMMENDATION_FHIR_TYPE_NAME)
 				.where(new ca.uhn.fhir.rest.gclient.ReferenceClientParam("patient").hasId(patientId))
 				.execute();
 	}
 
-	@GetMapping(RestConstants.PathVariable.PlaceHolder.PATIENT_ID_PLACEHOLDER + VACCINATION_PATH)
+	@GetMapping(IisPathVariable.PlaceHolder.PATIENT_ID_PLACEHOLDER + VACCINATION_PATH)
 	public List<VaccinationMaster> getPatientVaccination(
-			@PathVariable(RestConstants.PathVariable.Key.PATIENT_ID) String patientId,
+			@PathVariable(IisPathVariable.Key.PATIENT_ID) String patientId,
 			@RequestAttribute(RestTenantUrlFilter.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
-			@RequestParam(name = RestConstants.Param.MDM_EXPAND_REST_PARAM, defaultValue = "false") boolean isGolden,
+			@RequestParam(name = IisRestParam.MDM_EXPAND, defaultValue = "false") boolean isGolden,
 			HttpServletRequest req) {
 		ReferenceParam referenceParam = new ReferenceParam().setValue(patientId);
 		referenceParam.setMdmExpand(isGolden);
@@ -88,11 +90,11 @@ public class PatientRestController extends BaseTenantTiedRest {
 				new SearchParameterMap().add("patient", referenceParam));
 	}
 
-	@GetMapping(RestConstants.PathVariable.PlaceHolder.PATIENT_ID_PLACEHOLDER + "/observations")
+	@GetMapping(IisPathVariable.PlaceHolder.PATIENT_ID_PLACEHOLDER + IisRestPath.BasePath.OBSERVATIONS_PATH)
 	public List<ObservationReported> getPatientObservation(
-			@PathVariable(RestConstants.PathVariable.Key.PATIENT_ID) String patientId,
+			@PathVariable(IisPathVariable.Key.PATIENT_ID) String patientId,
 			@RequestAttribute(RestTenantUrlFilter.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
-			@RequestParam(name = RestConstants.Param.MDM_EXPAND_REST_PARAM, defaultValue = "false") boolean isGolden,
+			@RequestParam(name = IisRestParam.MDM_EXPAND, defaultValue = "false") boolean isGolden,
 			HttpServletRequest req) {
 		ReferenceParam referenceParam = new ReferenceParam().setValue(patientId);
 		referenceParam.setMdmExpand(isGolden);
@@ -100,11 +102,11 @@ public class PatientRestController extends BaseTenantTiedRest {
 				new SearchParameterMap("subject", referenceParam));
 	}
 
-	@GetMapping(RestConstants.PathVariable.PlaceHolder.PATIENT_ID_PLACEHOLDER + "/related")
+	@GetMapping(IisPathVariable.PlaceHolder.PATIENT_ID_PLACEHOLDER + IisRestPath.BasePath.RELATED_PATH)
 	public List<? extends IisPatient> getPatientRelatedPatients(
-			@PathVariable(RestConstants.PathVariable.Key.PATIENT_ID) String patientId,
+			@PathVariable(IisPathVariable.Key.PATIENT_ID) String patientId,
 			@RequestAttribute(RestTenantUrlFilter.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
-			@RequestParam(name = RestConstants.Param.MDM_EXPAND_REST_PARAM, defaultValue = "false") boolean isGolden,
+			@RequestParam(name = IisRestParam.MDM_EXPAND, defaultValue = "false") boolean isGolden,
 			HttpServletRequest req) {
 		ReferenceParam referenceParam = new ReferenceParam().setValue(patientId);
 		referenceParam.setMdmExpand(isGolden);
@@ -135,9 +137,9 @@ public class PatientRestController extends BaseTenantTiedRest {
 						.add("identifier", new ca.uhn.fhir.rest.param.TokenParam().setValue(identifier)));
 	}
 
-	@GetMapping(RestConstants.PathVariable.PlaceHolder.PATIENT_ID_PLACEHOLDER + "/shLinkPayload")
+	@GetMapping(IisPathVariable.PlaceHolder.PATIENT_ID_PLACEHOLDER + IisRestPath.BasePath.SH_LINK_PAYLOAD_PATH)
 	public ShLinkPayload getShLinkPayload(
-			@PathVariable(RestConstants.PathVariable.Key.PATIENT_ID) String patientId,
+			@PathVariable(IisPathVariable.Key.PATIENT_ID) String patientId,
 			@RequestAttribute(RestTenantUrlFilter.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
 			HttpServletRequest req) {
 		IAnyResource patientSelected = getPatientFhir(patientId, tenant, req);

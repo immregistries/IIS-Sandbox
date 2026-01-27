@@ -4,7 +4,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.immregistries.iis.kernal.controllers.rest.filters.RestTenantUrlFilter;
-import org.immregistries.iis.kernal.controllers.RestConstants;
+import org.immregistries.iis.kernal.controllers.IisRestPath;
 import org.immregistries.iis.kernal.logic.hl7v2.BaseIISSOAPServer;
 import org.immregistries.iis.kernal.logic.hl7v2.handling.V2IncomingMessageHandler;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
@@ -24,7 +24,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 @RestController
-@RequestMapping({ RestConstants.Path.REST_PATH + "/soap", RestConstants.Path.REST_TENANT_PATH + "/soap",
+@RequestMapping({ IisRestPath.BasePath.REST_PATH + "/soap", IisRestPath.REST_TENANT_PATH + "/soap",
 		"/tenant/{tenantName}/soap" })
 public class SoapRestController {
 

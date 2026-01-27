@@ -1,6 +1,7 @@
 package org.immregistries.iis.kernal.controllers.rest;
 
-import org.immregistries.iis.kernal.controllers.RestConstants;
+import org.immregistries.iis.kernal.controllers.IisRestParam;
+import org.immregistries.iis.kernal.controllers.IisRestPath;
 
 import jakarta.validation.constraints.NotBlank;
 import org.hl7.fhir.instance.model.api.IBaseParameters;
@@ -17,7 +18,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping({
-		RestConstants.Path.REST_PATH + RestConstants.Path.TENANT_COMPARE_BASE_PATH })
+		IisRestPath.BasePath.REST_PATH + IisRestPath.BasePath.TENANT_COMPARE_BASE_PATH })
 public class TenantCompareController {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -26,8 +27,8 @@ public class TenantCompareController {
 
 	@PostMapping
 	protected List<IBaseParameters> tenantComparePost(
-			@RequestParam(name = RestConstants.Param.TENANT_IDS) @NotBlank String tenantIds,
-			@RequestParam(name = RestConstants.Param.INCLUDE_GOLDEN, required = false) boolean includeGolden) {
+			@RequestParam(name = IisRestParam.TENANT_IDS) @NotBlank String tenantIds,
+			@RequestParam(name = IisRestParam.INCLUDE_GOLDEN, required = false) boolean includeGolden) {
 		return tenantCompareGet(tenantIds, includeGolden);
 	}
 
@@ -40,8 +41,8 @@ public class TenantCompareController {
 	 */
 	@GetMapping()
 	protected List<IBaseParameters> tenantCompareGet(
-			@RequestParam(name = RestConstants.Param.TENANT_IDS) @NotBlank String tenantIds,
-			@RequestParam(name = RestConstants.Param.INCLUDE_GOLDEN, required = false) boolean includeGolden) {
+			@RequestParam(name = IisRestParam.TENANT_IDS) @NotBlank String tenantIds,
+			@RequestParam(name = IisRestParam.INCLUDE_GOLDEN, required = false) boolean includeGolden) {
 		String[] tenantNames = tenantIds.split(",");
 		logger.info("Testing Tenant comparison for ids {} with golden={}", tenantNames, includeGolden);
 		UserAccess userAccess = UserAccessUtil.get().getUserAccess();

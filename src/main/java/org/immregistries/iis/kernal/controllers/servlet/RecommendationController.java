@@ -12,9 +12,9 @@ import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.hl7.fhir.instance.model.api.IBaseBundle;
 import org.hl7.fhir.instance.model.api.IDomainResource;
 import org.hl7.fhir.r5.model.Identifier;
+import org.immregistries.iis.kernal.controllers.IisRestParam;
 import org.immregistries.iis.kernal.controllers.rest.PatientRestController;
 import org.immregistries.iis.kernal.controllers.rest.RecommendationRestController;
-import org.immregistries.iis.kernal.controllers.RestConstants;
 import org.immregistries.iis.kernal.controllers.servlet.util.PatientServletUtil;
 import org.immregistries.iis.kernal.controllers.servlet.util.UiUtil;
 import org.immregistries.iis.kernal.mapping.IisFhirClientFactory;
@@ -92,7 +92,7 @@ public class RecommendationController {
 			if (req.getParameter(PARAM_RECOMMENDATION_RESOURCE) != null) {
 				Tenant tenant = CurrentTenantUtil.getTenantRedirectIfNone(req, resp);
 				recommendationRestController.updateRecommendation(tenant,
-					req.getParameter(PARAM_RECOMMENDATION_RESOURCE), req.getParameter(RestConstants.Param.RECOMMENDATION_ID), req.getParameter(RestConstants.Param.RECOMMENDATION_IDENTIFIER), req);
+					req.getParameter(PARAM_RECOMMENDATION_RESOURCE), req.getParameter(IisRestParam.RECOMMENDATION_ID), req.getParameter(IisRestParam.RECOMMENDATION_IDENTIFIER), req);
 			}
 		} catch (Exception exception) {
 			exception.printStackTrace(out);

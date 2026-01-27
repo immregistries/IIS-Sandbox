@@ -1,6 +1,6 @@
 package org.immregistries.iis.kernal.controllers.rest;
 
-import org.immregistries.iis.kernal.controllers.RestConstants;
+import org.immregistries.iis.kernal.controllers.IisRestPath;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.context.RuntimeResourceDefinition;
@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 
 @RestController()
-@RequestMapping({ RestConstants.Path.REST_PATH + RestConstants.Path.$_CREATE_PATH, "/$create" })
+@RequestMapping({ IisRestPath.BasePath.REST_PATH + IisRestPath.BasePath.$_CREATE_PATH, "/$create" })
 public class MacroEndpointController {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	@Autowired

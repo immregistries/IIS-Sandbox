@@ -1,6 +1,6 @@
 package org.immregistries.iis.kernal.controllers.rest;
 
-import org.immregistries.iis.kernal.controllers.RestConstants;
+import org.immregistries.iis.kernal.controllers.IisRestPath;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 
-@RequestMapping(RestConstants.Path.REST_PATH + RestConstants.Path.AUTHENTICATION_PATH)
+@RequestMapping(IisRestPath.BasePath.REST_PATH + IisRestPath.BasePath.AUTHENTICATION_PATH)
 public class AuthenticationRestController {
 
     /**

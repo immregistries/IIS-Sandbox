@@ -1,6 +1,6 @@
 package org.immregistries.iis.kernal.controllers.rest.shlink;
 
-import org.immregistries.iis.kernal.controllers.RestConstants;
+import org.immregistries.iis.kernal.controllers.IisRestPath;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
@@ -31,7 +31,7 @@ import static org.immregistries.iis.kernal.controllers.servlet.TenantController.
 import static org.immregistries.iis.kernal.controllers.servlet.util.PatientServletUtil.fetchPatientFromParameters;
 
 @RestController
-@RequestMapping(RestConstants.Path.MANIFEST_FULL_PATH)
+@RequestMapping(IisRestPath.MANIFEST_FULL_PATH)
 public class PatientShLinkManifestRestController {
 
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());

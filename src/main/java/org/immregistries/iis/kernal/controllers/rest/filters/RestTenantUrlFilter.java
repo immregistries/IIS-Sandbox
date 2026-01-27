@@ -17,7 +17,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
-import org.immregistries.iis.kernal.controllers.RestConstants;
+import org.immregistries.iis.kernal.controllers.IisRestPath;
 
 @Service
 @WebFilter
@@ -25,7 +25,7 @@ public class RestTenantUrlFilter extends OncePerRequestFilter {
 
 	public static final String TENANT_REQUEST_ATTRIBUTE = CurrentTenantUtil.SESSION_REQUEST_TENANT;
 	private static final Logger logger = LoggerFactory.getLogger(RestTenantUrlFilter.class);
-	private static final String TENANT_PREFIX = Application.IIS_PATH_BASE + RestConstants.Path.REST_PATH + "/tenant/";
+	private static final String TENANT_PREFIX = Application.IIS_PATH_BASE + IisRestPath.BasePath.REST_PATH + "/tenant/";
 
 	@Autowired
 	private TenantAuthService tenantAuthService;
@@ -38,7 +38,7 @@ public class RestTenantUrlFilter extends OncePerRequestFilter {
 		 * For Smart health links manifest retrieval, authentication is dealt with later
 		 * or well known key
 		 */
-		if (path.startsWith(RestConstants.Path.MANIFEST_FULL_PATH)) {
+		if (path.startsWith(IisRestPath.MANIFEST_FULL_PATH)) {
 			filterChain.doFilter(request, response);
 		}
 		if (path.startsWith(TENANT_PREFIX)) {

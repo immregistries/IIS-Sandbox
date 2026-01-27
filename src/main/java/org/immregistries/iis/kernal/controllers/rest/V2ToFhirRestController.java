@@ -1,6 +1,7 @@
 package org.immregistries.iis.kernal.controllers.rest;
 
-import org.immregistries.iis.kernal.controllers.RestConstants;
+import org.immregistries.iis.kernal.controllers.IisRestParam;
+import org.immregistries.iis.kernal.controllers.IisRestPath;
 
 import ca.uhn.hl7v2.HL7Exception;
 import gov.cdc.izgw.v2tofhir.converter.MessageParser;
@@ -10,11 +11,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.web.bind.annotation.*;
 
-import static org.immregistries.iis.kernal.controllers.RestConstants.Path.V2_TO_FHIR_PATH;
+import static org.immregistries.iis.kernal.controllers.IisRestPath.BasePath.V2_TO_FHIR_PATH;
 
 @RestController
-@RequestMapping({ RestConstants.Path.REST_PATH + V2_TO_FHIR_PATH,
-		RestConstants.Path.REST_TENANT_PATH + V2_TO_FHIR_PATH })
+@RequestMapping({ IisRestPath.BasePath.REST_PATH + V2_TO_FHIR_PATH,
+		IisRestPath.REST_TENANT_PATH + V2_TO_FHIR_PATH })
 @Conditional(OnR4Condition.class)
 public class V2ToFhirRestController {
 
@@ -23,7 +24,7 @@ public class V2ToFhirRestController {
 
 	@PostMapping
 	public Bundle convertV2ToFhir(@RequestBody String message,
-			@RequestParam(name = RestConstants.Param.FACILITY_NAME, required = false) String facilityName)
+			@RequestParam(name = IisRestParam.FACILITY_NAME, required = false) String facilityName)
 			throws HL7Exception {
 		return messageParser.convert(message);
 	}
