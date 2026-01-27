@@ -1,6 +1,6 @@
 package org.immregistries.iis.kernal.controllers.rest;
 
-import org.immregistries.iis.kernal.controllers.rest.util.RestConstants;
+import org.immregistries.iis.kernal.controllers.RestConstants;
 
 import ca.uhn.hl7v2.HL7Exception;
 import gov.cdc.izgw.v2tofhir.converter.MessageParser;
@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.web.bind.annotation.*;
 
-import static org.immregistries.iis.kernal.controllers.rest.util.RestConstants.Path.V2_TO_FHIR_PATH;
+import static org.immregistries.iis.kernal.controllers.RestConstants.Path.V2_TO_FHIR_PATH;
 
 @RestController
 @RequestMapping({ RestConstants.Path.REST_PATH + V2_TO_FHIR_PATH,

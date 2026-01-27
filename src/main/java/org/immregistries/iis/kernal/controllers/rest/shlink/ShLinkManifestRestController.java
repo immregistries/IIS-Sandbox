@@ -1,6 +1,6 @@
 package org.immregistries.iis.kernal.controllers.rest.shlink;
 
-import org.immregistries.iis.kernal.controllers.rest.util.RestConstants;
+import org.immregistries.iis.kernal.controllers.RestConstants;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
@@ -31,15 +31,15 @@ public class ShLinkManifestRestController {
 	@Autowired
 	private TenantAuthService tenantAuthService;
 
-	@GetMapping(RestConstants.Path.MANIFEST_ID_PLACEHOLDER)
-	public ShLinkManifest getManifest(@PathVariable(RestConstants.Path.Variables.MANIFEST_ID) String manifestId) {
+	@GetMapping(RestConstants.PathVariable.PlaceHolder.MANIFEST_ID_PLACEHOLDER)
+	public ShLinkManifest getManifest(@PathVariable(RestConstants.PathVariable.Key.MANIFEST_ID) String manifestId) {
 		return shlinkManifestService.readManifest(manifestId);
 	}
 
-	@PostMapping(RestConstants.Path.MANIFEST_ID_PLACEHOLDER)
+	@PostMapping(RestConstants.PathVariable.PlaceHolder.MANIFEST_ID_PLACEHOLDER)
 	protected ShLinkManifest readShLinkManifest(
-			@PathVariable(RestConstants.Path.Variables.MANIFEST_ID) String manifestId,
-			@PathVariable(RestConstants.Path.Variables.TENANT_ID) int tenantId,
+			@PathVariable(RestConstants.PathVariable.Key.MANIFEST_ID) String manifestId,
+			@PathVariable(RestConstants.PathVariable.Key.TENANT_ID) int tenantId,
 			@RequestParam(value = RestConstants.Param.RECIPIENT, required = false) String recipient,
 			@RequestParam(value = RestConstants.Param.PASSCODE, required = false) String passcode,
 			@RequestParam(value = RestConstants.Param.EMBEDDED_LENGTH_MAX, required = false) String embeddedLengthMax) {

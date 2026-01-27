@@ -1,6 +1,6 @@
 package org.immregistries.iis.kernal.controllers.rest;
 
-import org.immregistries.iis.kernal.controllers.rest.util.RestConstants;
+import org.immregistries.iis.kernal.controllers.RestConstants;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.immregistries.iis.kernal.logic.match.VaccinationDedupService;
@@ -14,7 +14,7 @@ import java.util.List;
 import static org.immregistries.iis.kernal.security.CurrentTenantUtil.SESSION_REQUEST_TENANT;
 
 @RestController
-@RequestMapping(RestUrlUtil.REST_TENANT_PATH + RestConstants.Path.VAC_DEDUP_PATH)
+@RequestMapping(RestConstants.Path.REST_TENANT_PATH + RestConstants.Path.VAC_DEDUP_PATH)
 public class VacDedupRestController {
 
 	@Autowired

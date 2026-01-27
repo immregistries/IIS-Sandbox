@@ -1,6 +1,6 @@
 package org.immregistries.iis.kernal.controllers.rest;
 
-import org.immregistries.iis.kernal.controllers.rest.util.RestConstants;
+import org.immregistries.iis.kernal.controllers.RestConstants;
 
 import ca.uhn.fhir.model.api.IElement;
 import org.immregistries.iis.kernal.mapping.MappingService;
@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(RestUrlUtil.REST_PATH + RestConstants.Path.MAPPING_KEY_PATH)
+@RequestMapping(RestConstants.Path.REST_PATH + RestConstants.Path.MAPPING_KEY_PATH)
 public class FhirMappingRestController {
 	@Autowired
 	private MappingService mappingService;

@@ -4,6 +4,7 @@ import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.context.FhirVersionEnum;
 import jakarta.servlet.http.HttpServletRequest;
 import org.immregistries.iis.kernal.controllers.rest.filters.RestTenantUrlFilter;
+import org.immregistries.iis.kernal.controllers.RestConstants;
 import org.immregistries.iis.kernal.controllers.servlet.PopController;
 import org.immregistries.iis.kernal.logic.hl7v2.handling.V2IncomingMessageHandler;
 import org.immregistries.iis.kernal.mapping.IisFhirClientFactory;
@@ -21,10 +22,9 @@ import java.util.Date;
 import static org.immregistries.iis.kernal.controllers.servlet.PopController.PARAM_FACILITY_NAME;
 
 @RestController
-@RequestMapping(RestUrlUtil.REST_TENANT_PATH + PopRestController.POP)
+@RequestMapping(RestConstants.Path.REST_TENANT_PATH +  RestConstants.Path.POP_PATH)
 public class PopRestController {
 
-	public static final String POP = "/pop";
 	@Autowired
 	private FhirContext fhirContext;
 	@Autowired

@@ -1,6 +1,6 @@
 package org.immregistries.iis.kernal.controllers.rest;
 
-import org.immregistries.iis.kernal.controllers.rest.util.RestConstants;
+import org.immregistries.iis.kernal.controllers.RestConstants;
 
 import org.immregistries.iis.kernal.persisted.entities.MessageReceived;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
@@ -13,16 +13,16 @@ import java.util.List;
 import static org.immregistries.iis.kernal.security.CurrentTenantUtil.SESSION_REQUEST_TENANT;
 
 @RestController
-@RequestMapping(RestUrlUtil.REST_TENANT_PATH + RestConstants.Path.MESSAGE_PATH_KEY)
+@RequestMapping(RestConstants.Path.REST_TENANT_PATH + RestConstants.Path.MESSAGE_PATH)
 public class MessageRestController {
 
     @Autowired
     MessageReceivedRepository messageReceivedRepository;
 
-    @GetMapping(RestUrlUtil.PATIENT_ID_PLACEHOLDER)
+    @GetMapping(RestConstants.PathVariable.PlaceHolder.PATIENT_ID_PLACEHOLDER)
     public List<MessageReceived> getPatientMessages(
             @RequestAttribute(name = SESSION_REQUEST_TENANT) Tenant tenant,
-            @PathVariable(RestUrlUtil.PATIENT_ID) String patientId) {
+            @PathVariable(RestConstants.PathVariable.Key.PATIENT_ID) String patientId) {
         return messageReceivedRepository.findByTenantAndPatientReportedId(tenant, patientId);
     }
 

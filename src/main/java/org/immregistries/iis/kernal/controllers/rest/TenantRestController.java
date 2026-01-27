@@ -1,6 +1,7 @@
 package org.immregistries.iis.kernal.controllers.rest;
 
 import jakarta.servlet.http.HttpServletRequest;
+import org.immregistries.iis.kernal.controllers.RestConstants;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.immregistries.iis.kernal.persisted.entities.UserAccess;
 import org.immregistries.iis.kernal.persisted.repository.TenantRepository;
@@ -14,7 +15,7 @@ import java.util.List;
 import static org.immregistries.iis.kernal.controllers.servlet.TenantController.PARAM_TENANT_ID;
 
 @RestController
-@RequestMapping(RestUrlUtil.REST_PATH + RestUrlUtil.TENANT_PATH)
+@RequestMapping(RestConstants.Path.REST_PATH + RestConstants.Path.TENANT_PATH)
 public class TenantRestController {
 
     @Autowired
@@ -24,7 +25,7 @@ public class TenantRestController {
     @Autowired
     UserAccessUtil userAccessUtil;
 
-    @GetMapping(RestUrlUtil.TENANT_ID_PLACEHOLDER)
+    @GetMapping(RestConstants.PathVariable.PlaceHolder.TENANT_ID_PLACEHOLDER)
     public Tenant getTenant(@PathVariable(PARAM_TENANT_ID) int tenantId) {
         UserAccess userAccess = userAccessUtil.getUserAccess();
         return tenantRepository.findByOrgIdAndUserAccessId(tenantId, userAccess.getUserAccessId())

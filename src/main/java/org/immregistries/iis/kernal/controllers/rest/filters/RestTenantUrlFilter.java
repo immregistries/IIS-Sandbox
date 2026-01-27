@@ -6,7 +6,6 @@ import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.immregistries.iis.kernal.Application;
-import org.immregistries.iis.kernal.controllers.rest.RestUrlUtil;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.immregistries.iis.kernal.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.security.TenantAuthService;
@@ -18,7 +17,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
-import org.immregistries.iis.kernal.controllers.rest.util.RestConstants;
+import org.immregistries.iis.kernal.controllers.RestConstants;
 
 @Service
 @WebFilter
@@ -26,7 +25,7 @@ public class RestTenantUrlFilter extends OncePerRequestFilter {
 
 	public static final String TENANT_REQUEST_ATTRIBUTE = CurrentTenantUtil.SESSION_REQUEST_TENANT;
 	private static final Logger logger = LoggerFactory.getLogger(RestTenantUrlFilter.class);
-	private static final String TENANT_PREFIX = Application.IIS_PATH_BASE + RestUrlUtil.REST_PATH + "/tenant/";
+	private static final String TENANT_PREFIX = Application.IIS_PATH_BASE + RestConstants.Path.REST_PATH + "/tenant/";
 
 	@Autowired
 	private TenantAuthService tenantAuthService;

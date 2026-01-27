@@ -1,6 +1,6 @@
 package org.immregistries.iis.kernal.controllers.rest.shlink;
 
-import org.immregistries.iis.kernal.controllers.rest.util.RestConstants;
+import org.immregistries.iis.kernal.controllers.RestConstants;
 
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import jakarta.servlet.ServletException;
@@ -21,9 +21,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 @RestController
-@RequestMapping({ RestConstants.Path.REST_PATIENT_PATH + RestConstants.Path.SHLINK_QR_CODE_PATH_SUFFIX,
-		RestConstants.Path.REST_TENANT_PATH + RestConstants.Path.PATIENT_BASE_PATH
-				+ RestConstants.Path.SHLINK_QR_CODE_PATH_SUFFIX })
+@RequestMapping({ RestConstants.Path.REST_PATIENT_PATH + RestConstants.Path.PATIENT_SH_LINK_PATH})
 public class PatientShLinkRestController {
 
 	@Autowired
@@ -36,7 +34,7 @@ public class PatientShLinkRestController {
 	@GetMapping(produces = MediaType.IMAGE_PNG_VALUE)
 	public ResponseEntity<byte[]> doGetShLinkQrCode(HttpServletRequest req, HttpServletResponse resp,
 			@RequestAttribute(CurrentTenantUtil.SESSION_REQUEST_TENANT) Tenant tenant,
-			@PathVariable(RestConstants.Path.Variables.PATIENT_ID) String patientId)
+			@PathVariable(RestConstants.PathVariable.Key.PATIENT_ID) String patientId)
 			throws IOException, ServletException {
 		IGenericClient client = iisFhirClientFactory.newGenericClient(tenant, req);
 		IAnyResource patientSelected = (IAnyResource) client.read().resource("Patient").withId(patientId).execute();

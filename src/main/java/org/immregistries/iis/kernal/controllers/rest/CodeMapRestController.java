@@ -1,6 +1,6 @@
 package org.immregistries.iis.kernal.controllers.rest;
 
-import org.immregistries.iis.kernal.controllers.rest.util.RestConstants;
+import org.immregistries.iis.kernal.controllers.RestConstants;
 
 import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.reference.CodesetType;
@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Collection;
 
 @RestController
-@RequestMapping({ RestUrlUtil.REST_TENANT_PATH + RestConstants.Path.CODEMAPS_PATH_SUFFIX,
-        RestUrlUtil.REST_PATH + RestConstants.Path.CODEMAPS_PATH_SUFFIX })
+@RequestMapping({ RestConstants.Path.REST_TENANT_PATH + RestConstants.Path.CODE_MAPS_PATH,
+        RestConstants.Path.REST_PATH + RestConstants.Path.CODE_MAPS_PATH})
 public class CodeMapRestController {
 
     @Autowired

@@ -1,6 +1,6 @@
 package org.immregistries.iis.kernal.controllers.rest;
 
-import org.immregistries.iis.kernal.controllers.rest.util.RestConstants;
+import org.immregistries.iis.kernal.controllers.RestConstants;
 
 import jakarta.validation.constraints.NotBlank;
 import org.hl7.fhir.instance.model.api.IBaseParameters;

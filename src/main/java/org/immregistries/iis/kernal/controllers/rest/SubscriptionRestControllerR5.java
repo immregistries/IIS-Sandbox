@@ -8,6 +8,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.hl7.fhir.instance.model.api.IBaseBundle;
 import org.hl7.fhir.r5.model.Bundle;
 import org.hl7.fhir.r5.model.Subscription;
+import org.immregistries.iis.kernal.controllers.RestConstants;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR5Condition;
 import org.immregistries.iis.kernal.logic.SubscriptionService;
 import org.immregistries.iis.kernal.mapping.IisFhirClientFactory;
@@ -23,7 +24,7 @@ import static org.immregistries.iis.kernal.security.CurrentTenantUtil.SESSION_RE
 
 @Conditional(OnR5Condition.class)
 @RestController
-@RequestMapping(RestUrlUtil.REST_TENANT_PATH + "/subscription")
+@RequestMapping(RestConstants.Path.REST_TENANT_PATH + "/subscription")
 public class SubscriptionRestControllerR5 {
 
     @Autowired

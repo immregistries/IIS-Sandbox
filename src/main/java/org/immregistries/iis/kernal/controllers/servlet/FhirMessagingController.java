@@ -7,8 +7,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.r4.model.Bundle;
 import org.immregistries.iis.kernal.controllers.rest.PopRestController;
-import org.immregistries.iis.kernal.controllers.rest.RestUrlUtil;
 import org.immregistries.iis.kernal.controllers.rest.V2ToFhirRestController;
+import org.immregistries.iis.kernal.controllers.RestConstants;
 import org.immregistries.iis.kernal.controllers.servlet.util.UiUtil;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
@@ -61,7 +61,7 @@ public class FhirMessagingController {
 
 			UiUtil.doHeader(out, "IIS Sandbox - FHIR Messaging", tenant);
 			out.println("<h2>Experimental FHIR Messaging Endpoint</h2>");
-			PopController.printForm(out, "FHIR Bundle", message, organizationName, RestUrlUtil.REST + "/" + FHIR_MESSAGING_PATH_KEY);
+			PopController.printForm(out, "FHIR Bundle", message, organizationName, RestConstants.Path.Key.REST_KEY + "/" + FHIR_MESSAGING_PATH_KEY);
 			UiUtil.doFooter(out);
 
 		} catch (Exception e) {

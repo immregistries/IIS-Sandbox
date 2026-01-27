@@ -1,6 +1,6 @@
 package org.immregistries.iis.kernal.controllers.rest;
 
-import org.immregistries.iis.kernal.controllers.rest.util.RestConstants;
+import org.immregistries.iis.kernal.controllers.RestConstants;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.hl7.fhir.r5.model.*;
@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(RestUrlUtil.REST_TENANT_PATH + RestConstants.Path.GROUP_PATH_KEY)
+@RequestMapping(RestConstants.Path.REST_TENANT_PATH + RestConstants.Path.GROUP_PATH)
 public class GroupRestController {
 
     @GetMapping("/$generate")

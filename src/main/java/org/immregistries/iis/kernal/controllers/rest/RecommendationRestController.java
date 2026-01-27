@@ -1,6 +1,6 @@
 package org.immregistries.iis.kernal.controllers.rest;
 
-import org.immregistries.iis.kernal.controllers.rest.util.RestConstants;
+import org.immregistries.iis.kernal.controllers.RestConstants;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.parser.IParser;
@@ -32,8 +32,6 @@ public class RecommendationRestController {
 	private IisFhirClientFactory iisFhirClientFactory;
 	@Autowired
 	private FhirSearchRequester fhirSearchRequester;
-	@Autowired
-	private FhirContext fhirContext;
 	@Autowired
 	private PatientMapper patientMapper;
 	@Autowired

@@ -5,7 +5,6 @@ import ca.uhn.fhir.jpa.searchparam.extractor.ISearchParamExtractor;
 import ca.uhn.fhir.rest.server.util.ISearchParamRegistry;
 import jakarta.servlet.ServletException;
 import org.hl7.fhir.r5.model.*;
-import org.immregistries.iis.kernal.controllers.rest.RestUrlUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +16,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.io.IOException;
 
 @RestController
-@RequestMapping({"/SubscriptionTopic", RestUrlUtil.REST_PATH + "/SubscriptionTopic"})
+@RequestMapping({"/SubscriptionTopic", RestConstants.Path.REST_PATH + "/SubscriptionTopic"})
 public class SubscriptionTopicController {
 	public static final String DATA_QUALITY_ISSUES_TOPIC_NAME = "/data-quality-issues";
 	public static final String PATIENT_TOPIC_NAME = "/Patient";

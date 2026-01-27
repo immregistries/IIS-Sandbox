@@ -1,7 +1,7 @@
 package org.immregistries.iis.kernal.controllers.filters;
 
-import org.immregistries.iis.kernal.controllers.rest.RestUrlUtil;
 import org.immregistries.iis.kernal.controllers.rest.filters.RestTenantUrlFilter;
+import org.immregistries.iis.kernal.controllers.RestConstants;
 import org.immregistries.iis.kernal.controllers.servlet.TenantController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
@@ -46,7 +46,7 @@ public class FilterRegistrationConfig {
 		RestTenantUrlFilter restTenantUrlFilter) {
 		FilterRegistrationBean registration = new FilterRegistrationBean();
 		registration.setFilter(restTenantUrlFilter);
-		registration.addUrlPatterns(RestUrlUtil.REST_PATH + TenantController.TENANT_BASE_PATH + "/*");
+		registration.addUrlPatterns(RestConstants.Path.REST_PATH + TenantController.TENANT_BASE_PATH + "/*");
 		registration.setName(REST_TENANT_URL_FILTER);
 		registration.setOrder(1);
 		return registration;

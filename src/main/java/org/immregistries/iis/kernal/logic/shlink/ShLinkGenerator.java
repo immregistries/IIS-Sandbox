@@ -7,7 +7,7 @@ import org.hl7.fhir.instance.model.api.IBaseBundle;
 import org.hl7.fhir.r4.model.IdType;
 import org.immregistries.iis.kernal.Application;
 import org.immregistries.iis.kernal.controllers.WellKnownKeyController;
-import org.immregistries.iis.kernal.controllers.rest.util.RestConstants;
+import org.immregistries.iis.kernal.controllers.RestConstants;
 import org.immregistries.iis.kernal.fhir.ips.IpsGeneratorSvcIIS;
 import org.immregistries.iis.kernal.fhir.shl.ShLinkPayload;
 import org.immregistries.iis.kernal.logic.KeyStoreService;

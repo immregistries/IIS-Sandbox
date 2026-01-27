@@ -1,6 +1,6 @@
 package org.immregistries.iis.kernal.controllers.rest.shlink;
 
-import org.immregistries.iis.kernal.controllers.rest.util.RestConstants;
+import org.immregistries.iis.kernal.controllers.RestConstants;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,14 +23,14 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 
+import static org.immregistries.iis.kernal.controllers.RestConstants.Param.PARAM_EXP;
+
 @RestController
-@RequestMapping({ RestConstants.Path.REST + "/shlink", RestConstants.Path.REST + "/tenant/{tenantName}/shlink" })
+@RequestMapping({ RestConstants.Path.Key.REST_KEY + "/shlink", RestConstants.Path.Key.REST_KEY + "/tenant/{tenantName}/shlink" })
 public class ShLinkRestController {
 
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-	// Keeping constants that might be useful
-	private static final String PARAM_EXP = "exp";
 
 	@Autowired
 	ShLinkGenerator shLinkGenerator;

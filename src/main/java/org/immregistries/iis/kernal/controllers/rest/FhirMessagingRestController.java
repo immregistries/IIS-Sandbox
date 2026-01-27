@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.NotNull;
 import org.apache.commons.lang3.StringUtils;
+import org.immregistries.iis.kernal.controllers.RestConstants;
 import org.immregistries.iis.kernal.controllers.servlet.SoapDescriptionController;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
 import org.immregistries.iis.kernal.logic.hl7v2.BaseIISSOAPServer;
@@ -28,15 +29,15 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import static org.immregistries.iis.kernal.controllers.rest.util.RestConstants.Path.FHIR_MESSAGING_KEY_PATH;
+import static org.immregistries.iis.kernal.controllers.RestConstants.Path.FHIR_MESSAGING_PATH;
 import static org.immregistries.iis.kernal.controllers.servlet.PopController.PARAM_FACILITY_NAME;
 import static org.immregistries.iis.kernal.controllers.servlet.PopController.PARAM_MESSAGE;
 import static org.immregistries.iis.kernal.controllers.servlet.TenantController.TENANT_NAME;
 import static org.immregistries.iis.kernal.security.CurrentTenantUtil.SESSION_REQUEST_TENANT;
 
 @RestController
-@RequestMapping({ RestUrlUtil.REST_PATH + FHIR_MESSAGING_KEY_PATH,
-		RestUrlUtil.REST_TENANT_PATH + FHIR_MESSAGING_KEY_PATH,
+@RequestMapping({ RestConstants.Path.REST_PATH + FHIR_MESSAGING_PATH,
+		RestConstants.Path.REST_TENANT_PATH + FHIR_MESSAGING_PATH,
 		"/tenant/{tenantName}/fhirMessaging" })
 @Conditional(OnR4Condition.class)
 public class FhirMessagingRestController {

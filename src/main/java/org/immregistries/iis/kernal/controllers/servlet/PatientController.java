@@ -14,7 +14,7 @@ import org.hl7.fhir.instance.model.api.IDomainResource;
 import org.hl7.fhir.r5.model.Bundle;
 import org.immregistries.iis.kernal.Application;
 import org.immregistries.iis.kernal.controllers.rest.*;
-import org.immregistries.iis.kernal.controllers.rest.util.RestConstants;
+import org.immregistries.iis.kernal.controllers.RestConstants;
 import org.immregistries.iis.kernal.controllers.servlet.shlink.ShLinkController;
 import org.immregistries.iis.kernal.controllers.servlet.util.UiQrCodeUtil;
 import org.immregistries.iis.kernal.controllers.servlet.util.UiUtil;
@@ -186,7 +186,7 @@ public class PatientController {
 		out.println("<div class=\"w3-container\">");
 		out.println("<img src=\""
 				+ RestUrlUtil.patientifyPathWithContextPath(tenant.getOrgId(), iisPatient.getPatientId(),
-						RestConstants.Path.SHLINK_QR_CODE_PATH_SUFFIX)
+						RestConstants.Path.PATIENT_SH_LINK_PATH)
 				+ "\"  alt=\"shlink\" width=\"200\">");
 		out.print("<div><a href= \"" + shLinkPayload.getUrl() + "\">Manifest URL</a></div>");
 		out.println("<h5>Qr Code Text Value</h5>");

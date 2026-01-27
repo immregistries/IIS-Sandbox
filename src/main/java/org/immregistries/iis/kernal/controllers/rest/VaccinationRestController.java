@@ -15,11 +15,11 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import org.immregistries.iis.kernal.controllers.rest.util.RestConstants;
+import org.immregistries.iis.kernal.controllers.RestConstants;
 import static org.immregistries.iis.kernal.security.CurrentTenantUtil.SESSION_REQUEST_TENANT;
 
 @RestController
-@RequestMapping(RestUrlUtil.REST_TENANT_PATH + VaccinationRestController.VACCINATION)
+@RequestMapping(RestConstants.Path.REST_TENANT_PATH + RestConstants.Path.VACCINATION_PATH)
 public class VaccinationRestController extends BaseTenantTiedRest {
 
     @Autowired
@@ -30,14 +30,10 @@ public class VaccinationRestController extends BaseTenantTiedRest {
     @Autowired
     private FhirSearchRequester fhirSearchRequester;
 
-    public static final String VACCINATION = "/vaccination";
-    public static final String VACCINATION_ID = "vaccinationId";
-    public static final String VACCINATION_ID_PLACEHOLDER = "/{" + VACCINATION_ID + "}";
-
-    @GetMapping(VACCINATION_ID_PLACEHOLDER)
+	@GetMapping(RestConstants.PathVariable.PlaceHolder.VACCINATION_ID_PLACEHOLDER)
     public IisVaccination getVaccination(
             @RequestAttribute(name = SESSION_REQUEST_TENANT) Tenant tenant,
-            @PathVariable(VACCINATION_ID) String vaccinationId,
+            @PathVariable(RestConstants.PathVariable.Key.VACCINATION_ID) String vaccinationId,
             HttpServletRequest req) {
         return fhirReadRequester.readAsVaccination(vaccinationId);
     }
@@ -57,9 +53,9 @@ public class VaccinationRestController extends BaseTenantTiedRest {
         return result;
     }
 
-    @GetMapping(VACCINATION_ID_PLACEHOLDER + "/related")
+    @GetMapping(RestConstants.PathVariable.PlaceHolder.VACCINATION_ID_PLACEHOLDER + "/related")
     public List<? extends IisVaccination> getRelatedVaccinations(
-            @PathVariable(VACCINATION_ID) String vaccinationId,
+            @PathVariable(RestConstants.PathVariable.Key.VACCINATION_ID) String vaccinationId,
             @RequestAttribute(RestTenantUrlFilter.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
             @RequestParam(name = RestConstants.Param.MDM_EXPAND_REST_PARAM, defaultValue = "false") boolean isGolden) {
         ReferenceParam referenceParam = new ReferenceParam().setValue(vaccinationId);
