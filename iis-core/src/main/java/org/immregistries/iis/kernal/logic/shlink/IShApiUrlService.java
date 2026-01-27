@@ -8,5 +8,4 @@ public interface IShApiUrlService {
 	void replaceUrlWithShCardPattern(UriComponentsBuilder uriBuilder);
 	void replaceUrlWithShLinkPattern(UriComponentsBuilder uriBuilder);
 
-
 }

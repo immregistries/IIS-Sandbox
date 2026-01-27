@@ -1,5 +1,6 @@
-package org.immregistries.iis.kernal;
+package org.immregistries.iis.kernal.service;
 
+import org.immregistries.iis.kernal.Application;
 import org.immregistries.iis.kernal.controllers.IisRestPath;
 import org.immregistries.iis.kernal.logic.shlink.IShApiUrlService;
 import org.springframework.stereotype.Service;

@@ -1,6 +1,6 @@
 package org.immregistries.iis.kernal.controllers.rest.shlink;
 
-import org.immregistries.iis.kernal.PatientShlinkApiService;
+import org.immregistries.iis.kernal.service.PatientShlinkApiManifestUrlService;
 import org.immregistries.iis.kernal.controllers.IisPathVariable;
 import org.immregistries.iis.kernal.controllers.IisRestPath;
 
@@ -9,8 +9,10 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.hl7.fhir.instance.model.api.IAnyResource;
+import org.immregistries.iis.kernal.fhir.shl.ShLinkPayload;
 import org.immregistries.iis.kernal.logic.shlink.CompressionService;
 import org.immregistries.iis.kernal.logic.shlink.PatientShLinkGenerator;
+import org.immregistries.iis.kernal.logic.shlink.ShLinkPayloadUtil;
 import org.immregistries.iis.kernal.mapping.IisFhirClientFactory;
 import org.immregistries.iis.kernal.mapping.mappers.resources.PatientMapper;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
@@ -32,9 +34,9 @@ public class PatientShLinkRestController {
 	@Autowired
 	private CompressionService compressionService;
 	@Autowired
-	private PatientShLinkGenerator patientShlinkGenerator;
+	private PatientShLinkGenerator patientShLinkGenerator;
 	@Autowired
-	private PatientShlinkApiService patientShlinkApiService;
+	private PatientShlinkApiManifestUrlService patientShlinkApiManifestUrlService;
 
 	@GetMapping(produces = MediaType.IMAGE_PNG_VALUE)
 	public ResponseEntity<byte[]> doGetShLinkQrCode(HttpServletRequest req, HttpServletResponse resp,
@@ -46,7 +48,9 @@ public class PatientShLinkRestController {
 		if (patientSelected == null) {
 			throw new RuntimeException("Patient not found");
 		}
-		String qrCode = patientShlinkApiService.getPatientShLinkQrCode(req, patientSelected, tenant);
+		String manifestUrl = patientShlinkApiManifestUrlService.getManifestUrl(req, patientSelected, tenant);
+		ShLinkPayload shLinkPayload = patientShLinkGenerator.generatePatientShLinkPayload(manifestUrl);
+		String qrCode = ShLinkPayloadUtil.toBase64QrCode(shLinkPayload);
 		ByteArrayOutputStream byteArrayOutputStreamPNG = compressionService.toQrCodeStreamPNG(qrCode);
 		return ResponseEntity.ok(byteArrayOutputStreamPNG.toByteArray());
 

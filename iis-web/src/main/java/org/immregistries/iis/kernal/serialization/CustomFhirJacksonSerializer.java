@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal.controllers;
+package org.immregistries.iis.kernal.serialization;
 
 import ca.uhn.fhir.parser.IParser;
 import com.fasterxml.jackson.core.JsonGenerator;

@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal.logic;
+package org.immregistries.iis.kernal.service;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.immregistries.iis.kernal.controllers.servlet.TenantController;

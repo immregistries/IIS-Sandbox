@@ -1,6 +1,6 @@
 package org.immregistries.iis.kernal.controllers.rest;
 
-import org.immregistries.iis.kernal.PatientShlinkApiService;
+import org.immregistries.iis.kernal.service.PatientShlinkApiManifestUrlService;
 import org.immregistries.iis.kernal.controllers.IisPathVariable;
 import org.immregistries.iis.kernal.controllers.IisRestParam;
 import org.immregistries.iis.kernal.controllers.IisRestPath;
@@ -44,7 +44,7 @@ public class PatientRestController extends BaseTenantTiedRest {
 	@Autowired
 	private PatientShLinkGenerator patientShlinkGenerator;
 	@Autowired
-	private PatientShlinkApiService patientShlinkApiService;
+	private PatientShlinkApiManifestUrlService patientShlinkApiManifestUrlService;
 
 	@GetMapping(IisPathVariable.PlaceHolder.PATIENT_ID_PLACEHOLDER)
 	public IisPatient getPatient(
@@ -146,7 +146,7 @@ public class PatientRestController extends BaseTenantTiedRest {
 			@RequestAttribute(RestTenantUrlFilter.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
 			HttpServletRequest req) {
 		IAnyResource patientSelected = getPatientFhir(patientId, tenant, req);
-		String manifestUrl = patientShlinkApiService.getManifestUrl(req, patientSelected, tenant);
+		String manifestUrl = patientShlinkApiManifestUrlService.getManifestUrl(req, patientSelected, tenant);
 		return patientShlinkGenerator.generatePatientShLinkPayload(manifestUrl);
 	}
 

@@ -9,7 +9,6 @@ import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
 import ca.uhn.fhir.mdm.api.IMdmMatchFinderSvc;
 import ca.uhn.fhir.mdm.api.MatchedTarget;
 import ca.uhn.fhir.mdm.api.MdmMatchOutcome;
-import ca.uhn.fhir.mdm.log.Logs;
 import ca.uhn.fhir.mdm.rules.svc.MdmResourceMatcherSvc;
 import ca.uhn.fhir.rest.api.server.IBundleProvider;
 import ca.uhn.fhir.rest.api.server.SystemRequestDetails;
@@ -33,6 +32,7 @@ import org.immregistries.vaccination_deduplication.computation_classes.Determini
 import org.immregistries.vaccination_deduplication.reference.ComparisonResult;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -53,7 +53,8 @@ import static org.immregistries.iis.kernal.mapping.requesters.FhirSaveRequester.
  * Generics FhirPatient Patient
  */
 public class MdmIisMatchFinderSvc<FhirImmunization extends IAnyResource, FhirPatient extends IAnyResource> extends MdmMatchFinderSvcImpl implements IMdmMatchFinderSvc {
-	private static final Logger ourLog = Logs.getMdmTroubleshootingLog();
+	private static final Logger ourLog = LoggerFactory.getLogger(MdmIisMatchFinderSvc.class);
+	public static final String MISMO_CONFIGURATION_YML = "/Mismo-Configuration.yml";
 
 	@Autowired
 	private MdmCandidateSearchSvc myMdmCandidateSearchSvc;
@@ -82,9 +83,11 @@ public class MdmIisMatchFinderSvc<FhirImmunization extends IAnyResource, FhirPat
 
 	public MdmIisMatchFinderSvc() {
 		super();
-		InputStream is = this.getClass().getResourceAsStream("/Mismo-Configuration.yml");
+		InputStream is = this.getClass().getResourceAsStream(MISMO_CONFIGURATION_YML);
 		if (is == null) {
 			ourLog.error("Unable to find Mismo-Configuration file");
+		} else {
+			ourLog.info("Found Mismo-Configuration file");
 		}
 		patientMismoMatcher = new PatientMatcher(is);
 	}

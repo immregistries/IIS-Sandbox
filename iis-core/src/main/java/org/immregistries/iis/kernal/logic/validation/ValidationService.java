@@ -39,7 +39,7 @@ public class ValidationService {
 		return mqeMessageService;
 	}
 	@Autowired
-	IisReportableUtilService iisReportableUtilService;
+	private IisReportableUtilService iisReportableUtilService;
 
 	/**
 	 * DYNAMIC VALUE SETS for validation
