@@ -3,7 +3,7 @@ package org.immregistries.iis.kernal.logic.shlink;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.util.Base64URL;
-import org.immregistries.iis.kernal.fhir.shl.ShLinkPayload;
+import org.immregistries.iis.kernal.model.shlink.ShLinkPayload;
 
 public class ShLinkPayloadUtil {
 

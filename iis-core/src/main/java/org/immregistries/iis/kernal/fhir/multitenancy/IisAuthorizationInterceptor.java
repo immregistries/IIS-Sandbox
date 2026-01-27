@@ -13,6 +13,7 @@ import jakarta.servlet.http.HttpSession;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.Strings;
 import org.apache.http.auth.AuthenticationException;
+import org.immregistries.iis.kernal.GlobalConstants;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.immregistries.iis.kernal.persisted.entities.UserAccess;
 import org.immregistries.iis.kernal.persisted.repository.TenantRepository;
@@ -28,7 +29,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Optional;
 
-import static org.immregistries.iis.kernal.FunctionalConstants.SESSION_REQUEST_TENANT;
+import static org.immregistries.iis.kernal.GlobalConstants.SESSION_REQUEST_TENANT;
 import static org.immregistries.iis.kernal.security.UserAccessUtil.SESSION_USER_ACCESS;
 
 /**
@@ -41,11 +42,7 @@ import static org.immregistries.iis.kernal.security.UserAccessUtil.SESSION_USER_
 public class IisAuthorizationInterceptor extends AuthorizationInterceptor {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-	public static final String CONNECTATHON_USER = "Connectathon";
-	// private static final String CONNECTATHON_AUTH =
-	// "78q3gb#QPGK!FmHKrgJjzkbpSCtiUtlchoClU1pC/UCdKxZ=PhRgtsL!4att8/6QKrUe1gS?p2ME!ixXP0Sg5lWnHP6t=U=6zeJXWnILR-BLc8HxVsfrLhp5/1q-DXuk?ljL?zwqJxB=we0SDKlT2j8WgNEkalit7Sf35F/R8W-QtrFbyO9IZPXJ1172OzvwfJBq-m9Z10DbSxIA?6f=3e!H7TLg/DwHByVlUSlZ6HWrytJkOFXljk9!z/BPrb9H";
-	public static final String DEFAULT_USER = "DEFAULT";
-	public static final String BEARER_PREFIX = "Bearer ";
+	private static final String BEARER_PREFIX = "Bearer ";
 
 	@Autowired
 	private JwtUtils jwtUtils;
@@ -74,7 +71,7 @@ public class IisAuthorizationInterceptor extends AuthorizationInterceptor {
 		String authHeader = theRequestDetails.getHeader("Authorization");
 		Tenant tenant = null;
 		try {
-			if (PartitionTenantCreationInterceptor.extractPartitionName(theRequestDetails).equals(CONNECTATHON_USER)) {
+			if (PartitionTenantCreationInterceptor.extractPartitionName(theRequestDetails).equals(GlobalConstants.CONNECTATHON_USER)) {
 				if (theRequestDetails.getTenantId().endsWith("Unsafe")) {
 					return connectathonUserAuthorized(theRequestDetails).build();
 				}
@@ -125,9 +122,9 @@ public class IisAuthorizationInterceptor extends AuthorizationInterceptor {
 			theRequestDetails.setAttribute(SESSION_REQUEST_TENANT, tenant);
 			return new RuleBuilder()
 					.allow().read()
-					.resourcesOfType("Subscription").withAnyId().forTenantIds(DEFAULT_USER)
+					.resourcesOfType("Subscription").withAnyId().forTenantIds(GlobalConstants.DEFAULT_USER)
 					.andThen().allow().read()
-					.resourcesOfType("SubscriptionTopic").withAnyId().forTenantIds(DEFAULT_USER)
+					.resourcesOfType("SubscriptionTopic").withAnyId().forTenantIds(GlobalConstants.DEFAULT_USER)
 					.andThen()
 					.allowAll("Logged in as " + tenant.getOrganizationName())
 					.forTenantIds(tenant.getOrganizationName())
@@ -170,7 +167,7 @@ public class IisAuthorizationInterceptor extends AuthorizationInterceptor {
 		 */
 		if (authHeader != null && authHeader.startsWith(BEARER_PREFIX)) {
 			String token = authHeader.split(BEARER_PREFIX)[1];
-			if (jwtUtils.validateJwtToken(token) && jwtUtils.getUserNameFromJwtToken(token).equals(CONNECTATHON_USER)) {
+			if (jwtUtils.validateJwtToken(token) && jwtUtils.getUserNameFromJwtToken(token).equals(GlobalConstants.CONNECTATHON_USER)) {
 				return connectathonUserAuthorized(theRequestDetails).build();
 			}
 		}
@@ -186,25 +183,25 @@ public class IisAuthorizationInterceptor extends AuthorizationInterceptor {
 	private IAuthRuleFinished connectathonUserAuthorized(RequestDetails theRequestDetails) {
 		String tenantId = theRequestDetails.getTenantId();
 		UserAccess userAccess;
-		Optional<UserAccess> userAccessOptional = userAccessRepository.findByAccessName(CONNECTATHON_USER);
+		Optional<UserAccess> userAccessOptional = userAccessRepository.findByAccessName(GlobalConstants.CONNECTATHON_USER);
 		if (userAccessOptional.isPresent()) {
 			userAccess = userAccessOptional.get();
-			Optional<Tenant> tenantOptional = tenantRepository.findByOrganizationName(CONNECTATHON_USER);
+			Optional<Tenant> tenantOptional = tenantRepository.findByOrganizationName(GlobalConstants.CONNECTATHON_USER);
 			if (tenantOptional.isPresent()) {
 				Tenant tenant = tenantOptional.get();
 				theRequestDetails.setAttribute(SESSION_USER_ACCESS, userAccess);
 				theRequestDetails.setAttribute(SESSION_REQUEST_TENANT, tenant);
 				return new RuleBuilder()
 						.allow().read()
-						.resourcesOfType("Subscription").withAnyId().forTenantIds(DEFAULT_USER)
+						.resourcesOfType("Subscription").withAnyId().forTenantIds(GlobalConstants.DEFAULT_USER)
 						.andThen().allow().read()
-						.resourcesOfType("SubscriptionTopic").withAnyId().forTenantIds(DEFAULT_USER)
+						.resourcesOfType("SubscriptionTopic").withAnyId().forTenantIds(GlobalConstants.DEFAULT_USER)
 						.andThen()
-						.allowAll("Logged in as " + CONNECTATHON_USER)
-						.forTenantIds(CONNECTATHON_USER, "ConnectathonUnsafe")
+						.allowAll("Logged in as " + GlobalConstants.CONNECTATHON_USER)
+						.forTenantIds(GlobalConstants.CONNECTATHON_USER, "ConnectathonUnsafe")
 						.andThen().allow().read()
 						.resourcesOfType("Binary").withAnyId()
-						.forTenantIds(CONNECTATHON_USER, "ConnectathonUnsafe", "DEFAULT", "default");
+						.forTenantIds(GlobalConstants.CONNECTATHON_USER, "ConnectathonUnsafe", "DEFAULT", "default");
 				// return new RuleBuilder()
 				// .allow().operation()
 				// .named(JpaConstants.OPERATION_EXPORT).atAnyLevel()

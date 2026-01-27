@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal.fhir.shl;
+package org.immregistries.iis.kernal.model.shlink;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;

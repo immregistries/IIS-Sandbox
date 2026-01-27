@@ -9,7 +9,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.hl7.fhir.instance.model.api.IAnyResource;
-import org.immregistries.iis.kernal.fhir.shl.ShLinkPayload;
+import org.immregistries.iis.kernal.model.shlink.ShLinkPayload;
 import org.immregistries.iis.kernal.logic.shlink.CompressionService;
 import org.immregistries.iis.kernal.logic.shlink.PatientShLinkGenerator;
 import org.immregistries.iis.kernal.logic.shlink.ShLinkPayloadUtil;

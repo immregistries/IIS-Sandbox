@@ -20,7 +20,7 @@ import org.immregistries.iis.kernal.controllers.servlet.util.RedirectUtil;
 import org.immregistries.iis.kernal.controllers.servlet.util.UiQrCodeUtil;
 import org.immregistries.iis.kernal.controllers.servlet.util.UiUtil;
 import org.immregistries.iis.kernal.controllers.servlet.util.UrlTenantUtil;
-import org.immregistries.iis.kernal.fhir.shl.ShLinkPayload;
+import org.immregistries.iis.kernal.model.shlink.ShLinkPayload;
 import org.immregistries.iis.kernal.mapping.IisFhirClientFactory;
 import org.immregistries.iis.kernal.mapping.mappers.resources.PatientMapper;
 import org.immregistries.iis.kernal.mapping.requesters.FhirRequesterUtil;

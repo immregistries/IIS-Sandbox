@@ -12,7 +12,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.hl7.fhir.instance.model.api.IBaseBundle;
 import org.immregistries.iis.kernal.controllers.rest.filters.RestTenantUrlFilter;
-import org.immregistries.iis.kernal.fhir.shl.ShLinkPayload;
+import org.immregistries.iis.kernal.model.shlink.ShLinkPayload;
 import org.immregistries.iis.kernal.logic.shlink.PatientShLinkGenerator;
 import org.immregistries.iis.kernal.mapping.IisFhirClientFactory;
 import org.immregistries.iis.kernal.mapping.mappers.resources.PatientMapper;

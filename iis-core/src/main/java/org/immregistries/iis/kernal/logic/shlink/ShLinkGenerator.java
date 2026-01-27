@@ -6,7 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.instance.model.api.IBaseBundle;
 import org.hl7.fhir.r4.model.IdType;
 import org.immregistries.iis.kernal.fhir.ips.IpsGeneratorSvcIIS;
-import org.immregistries.iis.kernal.fhir.shl.ShLinkPayload;
+import org.immregistries.iis.kernal.model.shlink.ShLinkPayload;
 import org.immregistries.iis.kernal.logic.KeyStoreService;
 import org.immregistries.iis.kernal.logic.SecretKeyUtilService;
 import org.immregistries.iis.kernal.logic.api.IWellKnownKeyApiService;

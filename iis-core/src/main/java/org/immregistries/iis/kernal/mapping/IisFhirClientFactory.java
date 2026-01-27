@@ -12,6 +12,7 @@ import ca.uhn.fhir.rest.client.interceptor.LoggingInterceptor;
 import ca.uhn.fhir.rest.server.exceptions.AuthenticationException;
 import ca.uhn.fhir.rest.server.servlet.ServletRequestDetails;
 import jakarta.servlet.http.HttpServletRequest;
+import org.immregistries.iis.kernal.GlobalConstants;
 import org.immregistries.iis.kernal.logic.api.IApiUrlService;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.immregistries.iis.kernal.persisted.entities.UserAccess;
@@ -31,8 +32,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import static org.immregistries.iis.kernal.fhir.multitenancy.IisAuthorizationInterceptor.CONNECTATHON_USER;
-import static org.immregistries.iis.kernal.FunctionalConstants.SESSION_REQUEST_TENANT;
+import static org.immregistries.iis.kernal.GlobalConstants.SESSION_REQUEST_TENANT;
 import static org.immregistries.iis.kernal.security.UserAccessUtil.GITHUB_PREFIX;
 
 /**
@@ -90,7 +90,7 @@ public class IisFhirClientFactory extends ApacheRestfulClientFactory {
 		UserAccess userAccess = tenant.getUserAccess();
 		String accessName = userAccess.getAccessName();
 		String accessKey = userAccess.getAccessKey();
-		if (tenant.getOrganizationName().equals(CONNECTATHON_USER) && accessName == null) {
+		if (tenant.getOrganizationName().equals(GlobalConstants.CONNECTATHON_USER) && accessName == null) {
 			/**
 			 * SPECIFIC Connection User for Connectathon
 			 * specific auth when logged in with token,

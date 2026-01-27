@@ -14,13 +14,11 @@ import ca.uhn.fhir.rest.server.interceptor.partition.RequestTenantPartitionInter
 import jakarta.annotation.Nonnull;
 import jakarta.interceptor.Interceptor;
 import org.apache.commons.lang3.StringUtils;
+import org.immregistries.iis.kernal.GlobalConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import static org.immregistries.iis.kernal.fhir.multitenancy.IisAuthorizationInterceptor.CONNECTATHON_USER;
-import static org.immregistries.iis.kernal.fhir.multitenancy.IisAuthorizationInterceptor.DEFAULT_USER;
 
 /**
  * Intercepts requests, checks if partition aimed at exists, otherwise creates new partition
@@ -64,10 +62,10 @@ public class PartitionTenantCreationInterceptor extends RequestTenantPartitionIn
 
 	public RequestPartitionId getOrCreatePartitionId(String partitionName) {
 		if (StringUtils.isBlank(partitionName)) { // ALL partitions and DEFAULT partition are set to be the same
-			partitionName = DEFAULT_USER;
+			partitionName = GlobalConstants.DEFAULT_USER;
 //			return RequestPartitionId.defaultPartition();
 		}
-		if (partitionName.equals("default") || partitionName.equals(DEFAULT_USER) ) {
+		if (partitionName.equals("default") || partitionName.equals(GlobalConstants.DEFAULT_USER) ) {
 			return RequestPartitionId.defaultPartition();
 		}
 		try {
@@ -84,7 +82,7 @@ public class PartitionTenantCreationInterceptor extends RequestTenantPartitionIn
 			throw new InvalidRequestException(Msg.code(343) + "No tenant ID was specified");
 		} else {
 			if (requestDetails.getTenantId().equals("ConnectathonUnsafe")) {
-				return CONNECTATHON_USER;
+				return GlobalConstants.CONNECTATHON_USER;
 			}
 //			String[] ids = tenantId.split(PARTITION_NAME_SEPARATOR);
 //			if (ids.length < 2){

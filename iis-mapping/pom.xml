@@ -23,5 +23,20 @@
             <artifactId>iis-fhir-annotations</artifactId>
             <version>${revision}</version>
         </dependency>
+        <dependency>
+            <groupId>org.immregistries.iis</groupId>
+            <artifactId>iis-core-model</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.immregistries.iis</groupId>
+            <artifactId>iis-core-model</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.immregistries.iis</groupId>
+            <artifactId>iis-constants</artifactId>
+            <version>${revision}</version>
+        </dependency>
     </dependencies>
 </project>

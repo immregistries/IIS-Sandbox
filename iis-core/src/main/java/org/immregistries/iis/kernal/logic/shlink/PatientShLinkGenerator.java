@@ -1,6 +1,6 @@
 package org.immregistries.iis.kernal.logic.shlink;
 
-import org.immregistries.iis.kernal.fhir.shl.ShLinkPayload;
+import org.immregistries.iis.kernal.model.shlink.ShLinkPayload;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 

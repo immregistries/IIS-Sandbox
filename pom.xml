@@ -50,6 +50,7 @@
         <module>iis-core-model</module>
         <module>iis-fhir-annotations</module>
         <module>iis-mapping</module>
+        <module>iis-constants</module>
     </modules>
 
     <dependencyManagement>

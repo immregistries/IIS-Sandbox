@@ -2,7 +2,7 @@ package org.immregistries.iis.kernal.security;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
-import org.immregistries.iis.kernal.FunctionalConstants;
+import org.immregistries.iis.kernal.GlobalConstants;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.immregistries.iis.kernal.persisted.entities.UserAccess;
 import org.springframework.security.core.Authentication;
@@ -16,10 +16,10 @@ import org.springframework.web.context.request.ServletRequestAttributes;
  */
 public final class CurrentTenantUtil {
 
-	public static final String TENANT_ID_URL = FunctionalConstants.TENANT_ID_URL;
-	public static final String TENANT_NAME_URL = FunctionalConstants.TENANT_NAME_URL;
+	public static final String TENANT_ID_URL = GlobalConstants.TENANT_ID_URL;
+	public static final String TENANT_NAME_URL = GlobalConstants.TENANT_NAME_URL;
 
-	public static final String SESSION_REQUEST_TENANT = FunctionalConstants.SESSION_REQUEST_TENANT;
+	public static final String SESSION_REQUEST_TENANT = GlobalConstants.SESSION_REQUEST_TENANT;
 
 	public static Tenant getTenant() {
 		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())

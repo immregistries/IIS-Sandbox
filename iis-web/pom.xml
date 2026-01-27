@@ -24,6 +24,11 @@
     <dependencies>
         <dependency>
             <groupId>org.immregistries.iis</groupId>
+            <artifactId>iis-constants</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.immregistries.iis</groupId>
             <artifactId>iis-core</artifactId>
             <version>${revision}</version>
         </dependency>

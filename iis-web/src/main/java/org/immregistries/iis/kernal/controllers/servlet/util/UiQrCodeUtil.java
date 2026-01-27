@@ -9,7 +9,7 @@ import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 import com.nimbusds.jose.util.Base64URL;
 import jakarta.servlet.ServletException;
-import org.immregistries.iis.kernal.fhir.shl.ShLinkPayload;
+import org.immregistries.iis.kernal.model.shlink.ShLinkPayload;
 
 import java.io.IOException;
 import java.io.OutputStream;

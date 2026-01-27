@@ -16,6 +16,7 @@ import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import org.immregistries.iis.kernal.Application;
+import org.immregistries.iis.kernal.GlobalConstants;
 import org.immregistries.iis.kernal.persisted.entities.UserAccess;
 import org.immregistries.iis.kernal.security.JwtUtils;
 import org.immregistries.iis.kernal.security.UserAccessUtil;
@@ -34,8 +35,6 @@ import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-
-import static org.immregistries.iis.kernal.fhir.multitenancy.IisAuthorizationInterceptor.CONNECTATHON_USER;
 
 /**
  * Used for SMART AUTH, and testing around keystores
@@ -226,7 +225,7 @@ public class JwtSmartAuthController {
 			}
 		}
 		jwtStore.put((String) signedJWT.getJWTClaimsSet().getClaim("jti"), client_assertion);
-		UserAccess userAccess = UserAccessUtil.get().authenticateUserAccessUsernamePassword(CONNECTATHON_USER,
+		UserAccess userAccess = UserAccessUtil.get().authenticateUserAccessUsernamePassword(GlobalConstants.CONNECTATHON_USER,
 				"SundaysR0ck!");
 		Map<String, String> result = new HashMap<>(5);
 		result.put("access_token", jwtUtils.generateJwtToken(userAccess));
