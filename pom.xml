@@ -54,7 +54,7 @@
         <dependencies>
             <dependency>
                 <groupId>org.immregistries.iis</groupId>
-                <artifactId>iis-core</artifactId>
+                <artifactId>iis-core-model</artifactId>
                 <version>${revision}</version>
             </dependency>
         </dependencies>

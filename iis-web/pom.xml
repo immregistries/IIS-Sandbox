@@ -25,6 +25,7 @@
         <dependency>
             <groupId>org.immregistries.iis</groupId>
             <artifactId>iis-core</artifactId>
+            <version>${revision}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>

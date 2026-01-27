@@ -1,6 +1,6 @@
 package org.immregistries.iis.kernal.controllers.rest.shlink;
 
-import org.immregistries.iis.kernal.service.PatientShlinkApiManifestUrlService;
+import org.immregistries.iis.kernal.logic.api.IPatientShlinkApiManifestUrlService;
 import org.immregistries.iis.kernal.controllers.IisPathVariable;
 import org.immregistries.iis.kernal.controllers.IisRestPath;
 
@@ -36,7 +36,7 @@ public class PatientShLinkRestController {
 	@Autowired
 	private PatientShLinkGenerator patientShLinkGenerator;
 	@Autowired
-	private PatientShlinkApiManifestUrlService patientShlinkApiManifestUrlService;
+	private IPatientShlinkApiManifestUrlService patientShlinkApiManifestUrlService;
 
 	@GetMapping(produces = MediaType.IMAGE_PNG_VALUE)
 	public ResponseEntity<byte[]> doGetShLinkQrCode(HttpServletRequest req, HttpServletResponse resp,
