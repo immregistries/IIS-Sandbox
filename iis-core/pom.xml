@@ -34,6 +34,12 @@
         </dependency>
 
         <dependency>
+            <groupId>org.immregistries.iis</groupId>
+            <artifactId>iis-fhir-annotations</artifactId>
+            <version>${revision}</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
             <version>3.18.0</version>

@@ -48,6 +48,8 @@
         <module>iis-core</module>
         <module>iis-web</module>
         <module>iis-core-model</module>
+        <module>iis-fhir-annotations</module>
+        <module>iis-mapping</module>
     </modules>
 
     <dependencyManagement>

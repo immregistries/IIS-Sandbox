@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 import static org.immregistries.iis.kernal.fhir.common.validation.IRepositoryValidationInterceptorFactory.ENABLE_REPOSITORY_VALIDATING_INTERCEPTOR;
 
 /**
- * This class can be customized to enable the {@link ca.uhn.fhir.jpa.interceptor.validation.RepositoryValidatingInterceptor}
+ * This class can be customized to enable the {@link RepositoryValidatingInterceptor}
  * on this server.
  * <p>
  * The <code>enable_repository_validating_interceptor</code> property must be enabled in <code>application.yaml</code>

@@ -186,3 +186,5 @@ Temporary Items
 /.flattened-pom.xml
 /iis-web/Compiled.xml
 /iis-core-model/.flattened-pom.xml
+/iis-web/data-h2/
+/iis-fhir-annotations/.flattened-pom.xml
