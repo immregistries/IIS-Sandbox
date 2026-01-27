@@ -1,6 +1,6 @@
 package org.immregistries.iis.kernal.model;
 
-import org.immregistries.iis.kernal.logic.recommendations.VaccinePlanStatus;
+import org.immregistries.iis.kernal.enums.VaccinePlanStatus;
 import org.immregistries.vfa.connect.model.ForecastActual;
 
 import java.util.ArrayList;

@@ -1,4 +1,5 @@
-package org.immregistries.iis.kernal.logic.recommendations;
+package org.immregistries.iis.kernal.enums;
+
 
 public enum RecommendationStatus implements IisEnum {
 

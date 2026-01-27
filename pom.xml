@@ -47,6 +47,7 @@
     <modules>
         <module>iis-core</module>
         <module>iis-web</module>
+        <module>iis-core-model</module>
     </modules>
 
     <dependencyManagement>

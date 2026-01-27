@@ -1,4 +1,5 @@
-package org.immregistries.iis.kernal.logic.recommendations;
+package org.immregistries.iis.kernal.enums;
+
 
 public enum VaccinationRecommendationDateCode implements IisEnum {
 	EARLIEST("30981-5", "Earliest date to give"),

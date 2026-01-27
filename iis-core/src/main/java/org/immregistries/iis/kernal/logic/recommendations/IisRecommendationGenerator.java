@@ -5,6 +5,8 @@ import ca.uhn.fhir.context.FhirVersionEnum;
 import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
+import org.immregistries.iis.kernal.enums.VaccinationRecommendationDateCode;
+import org.immregistries.iis.kernal.enums.VaccinePlanStatus;
 import org.immregistries.iis.kernal.logic.CodeMapManagerService;
 import org.immregistries.iis.kernal.mapping.mappers.resources.RecommendationMapper;
 import org.immregistries.iis.kernal.model.BusinessIdentifier;

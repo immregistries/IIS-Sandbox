@@ -19,7 +19,6 @@ import org.immregistries.iis.kernal.model.enums.LoincIdentifier;
 import org.immregistries.iis.kernal.model.enums.SnomedValue;
 import org.immregistries.iis.kernal.persisted.entities.MessageReceived;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
-import org.immregistries.iis.kernal.security.CurrentTenantUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;

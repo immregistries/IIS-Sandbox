@@ -1,7 +1,6 @@
 package org.immregistries.iis.kernal.controllers;
 
 import com.nimbusds.jose.jwk.JWK;
-import jakarta.servlet.http.HttpServletRequest;
 import org.immregistries.iis.kernal.controllers.servlet.TenantController;
 import org.immregistries.iis.kernal.logic.KeyStoreService;
 import org.immregistries.iis.kernal.persisted.entities.IisKey;
@@ -12,12 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import org.springframework.web.util.UriComponentsBuilder;
 
-import java.net.MalformedURLException;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import static org.immregistries.iis.kernal.controllers.WellKnownKeyController.WELL_KNOWN_PATH_SUFFIX;

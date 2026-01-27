@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal.logic.recommendations;
+package org.immregistries.iis.kernal.enums;
 
 import org.immregistries.vfa.connect.model.Admin;
 import org.immregistries.vfa.connect.model.ForecastActual;

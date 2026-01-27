@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal.logic.recommendations;
+package org.immregistries.iis.kernal.enums;
 
 public interface IisEnum {
 	String getCode();
