@@ -2,6 +2,8 @@ package org.immregistries.iis.kernal.logic;
 
 import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.CodeMapBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Service;
 
@@ -12,15 +14,16 @@ import java.io.InputStream;
  * Grants access to CodeMaps extracted from XML file, usually Compiled.xml
  */
 public class CodeMapManagerService implements InitializingBean {
-	private static CodeMapManagerService instance;
+	public static final String COMPILED_XML_PATH = "/Compiled.xml";
+	private Logger logger = LoggerFactory.getLogger(this.getClass());
 
-	public static CodeMapManagerService get() {
-		return instance;
-	}
-
+//	private static CodeMapManagerService instance;
+//	public static CodeMapManagerService get() {
+//		return instance;
+//	}
 	@Override
-	public void afterPropertiesSet() throws Exception {
-		instance = this;
+	public void afterPropertiesSet() {
+//		instance = this;
 	}
 
 	private final CodeMapBuilder builder = CodeMapBuilder.INSTANCE;
@@ -30,11 +33,10 @@ public class CodeMapManagerService implements InitializingBean {
 		return codeMap;
 	}
 
-
 	public CodeMapManagerService() {
-		InputStream is = this.getClass().getResourceAsStream("/Compiled.xml");
+		InputStream is = this.getClass().getResourceAsStream(COMPILED_XML_PATH);
 		if (is == null) {
-			System.err.println("Unable to find Compiled.xml!");
+			logger.error("Could not load compiled CodeMap Unable to find file from {}", COMPILED_XML_PATH);
 		}
 		codeMap = builder.getCodeMap(is);
 	}

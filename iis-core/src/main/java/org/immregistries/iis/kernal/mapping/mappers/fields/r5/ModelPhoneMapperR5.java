@@ -11,12 +11,15 @@ import org.immregistries.iis.kernal.logic.CodeMapManagerService;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
 import org.immregistries.iis.kernal.mapping.mappers.fields.ModelPhoneMapper;
 import org.immregistries.iis.kernal.model.ModelPhone;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Service;
 
 @Service
 @Conditional(OnR5Condition.class)
 public class ModelPhoneMapperR5 extends ModelPhoneMapper<ContactPoint> implements IR5FieldMapper<ModelPhone, ContactPoint> {
+	@Autowired
+	private CodeMapManagerService codeMapManagerService;
 
 	@Override
 	public Class<ContactPoint> fhirType() {
@@ -32,7 +35,7 @@ public class ModelPhoneMapperR5 extends ModelPhoneMapper<ContactPoint> implement
 			try {
 				contactPoint.setUse(org.hl7.fhir.r5.model.ContactPoint.ContactPointUse.fromCode(use));
 			} catch (FHIRException ignored) {
-				CodeMap codeMap = CodeMapManagerService.get().getCodeMap();
+				CodeMap codeMap = codeMapManagerService.getCodeMap();
 				Code useCode = codeMap.getCodeForCodeset(CodesetType.TELECOMMUNICATION_USE, use);
 				if (useCode != null) {
 					contactPoint.addExtension(USE_EXTENSION_URL,
