@@ -29,7 +29,7 @@
         </dependency>
         <dependency>
             <groupId>org.immregistries.iis</groupId>
-            <artifactId>iis-core</artifactId>
+            <artifactId>iis-logic</artifactId>
             <version>${revision}</version>
         </dependency>
         <dependency>

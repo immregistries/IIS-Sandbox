@@ -45,7 +45,7 @@
     <name>IIS Sandbox</name>
 
     <modules>
-        <module>iis-core</module>
+        <module>iis-logic</module>
         <module>iis-web</module>
         <module>iis-core-model</module>
         <module>iis-fhir-annotations</module>

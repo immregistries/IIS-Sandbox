@@ -9,9 +9,9 @@
         <version>${revision}</version>
     </parent>
 
-    <artifactId>iis-core</artifactId>
+    <artifactId>iis-logic</artifactId>
     <packaging>jar</packaging>
-    <name>IIS Sandbox Core</name>
+    <name>IIS Sandbox Logic</name>
 
     <repositories>
         <repository>
