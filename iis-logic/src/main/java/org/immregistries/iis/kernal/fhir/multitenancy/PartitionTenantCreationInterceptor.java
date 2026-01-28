@@ -14,6 +14,7 @@ import ca.uhn.fhir.rest.server.interceptor.partition.RequestTenantPartitionInter
 import jakarta.annotation.Nonnull;
 import jakarta.interceptor.Interceptor;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.immregistries.iis.kernal.GlobalConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,7 +66,7 @@ public class PartitionTenantCreationInterceptor extends RequestTenantPartitionIn
 			partitionName = GlobalConstants.DEFAULT_USER;
 //			return RequestPartitionId.defaultPartition();
 		}
-		if (partitionName.equals("default") || partitionName.equals(GlobalConstants.DEFAULT_USER) ) {
+		if (Strings.CI.equals(partitionName,GlobalConstants.DEFAULT_USER)) {
 			return RequestPartitionId.defaultPartition();
 		}
 		try {
