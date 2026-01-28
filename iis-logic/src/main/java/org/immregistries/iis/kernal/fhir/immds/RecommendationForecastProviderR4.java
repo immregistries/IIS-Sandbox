@@ -4,6 +4,7 @@ package org.immregistries.iis.kernal.fhir.immds;
 import ca.uhn.fhir.model.api.annotation.Description;
 import ca.uhn.fhir.rest.annotation.Operation;
 import ca.uhn.fhir.rest.annotation.OperationParam;
+import ca.uhn.fhir.rest.api.server.RequestDetails;
 import org.hl7.fhir.instance.model.api.IPrimitiveType;
 import org.hl7.fhir.r4.model.Immunization;
 import org.hl7.fhir.r4.model.ImmunizationRecommendation;
@@ -16,6 +17,7 @@ import org.immregistries.iis.kernal.mapping.mappers.resources.ImmunizationMapper
 import org.immregistries.iis.kernal.mapping.mappers.resources.PatientMapper;
 import org.immregistries.iis.kernal.model.IisPatient;
 import org.immregistries.iis.kernal.model.IisVaccination;
+import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.immregistries.iis.kernal.security.CurrentTenantUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,7 +56,8 @@ public class RecommendationForecastProviderR4 implements IRecommendationForecast
 		Patient patient,
 		@Description(shortDefinition = "Patient immunization history.")
 		@OperationParam(name = IMMUNIZATION)
-		List<Immunization> immunization
+		List<Immunization> immunization,
+		RequestDetails theRequestDetails
 	) {
 		Parameters out = new Parameters();
 		List<? extends IisVaccination> iisVaccinationList;
