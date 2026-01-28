@@ -4,8 +4,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.hl7.fhir.r4.model.*;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
-import org.immregistries.iis.kernal.logic.hl7v2.ack.V2DateParseService;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
+import org.immregistries.iis.kernal.mapping.V2SimpleDateFormatGenerator;
 import org.immregistries.iis.kernal.mapping.mappers.fields.r4.BusinessIdentifierMapperR4;
 import org.immregistries.iis.kernal.mapping.mappers.resources.ImmunizationMapper;
 import org.immregistries.iis.kernal.mapping.mappers.resources.ObservationMapper;
@@ -32,7 +32,7 @@ public class ObservationMapperR4 extends ObservationMapper<Observation> implemen
 	@Autowired
 	private BusinessIdentifierMapperR4 businessIdentifierMapper;
 	@Autowired
-	V2DateParseService v2DateParseService;
+	private V2SimpleDateFormatGenerator v2SimpleDateFormatGenerator;
 
 	public ObservationReported localObjectReportedWithMaster(Observation observation) {
 		ObservationReported observationReported = localObjectReported(observation);
@@ -326,7 +326,7 @@ public class ObservationMapperR4 extends ObservationMapper<Observation> implemen
 			observationReported.setUnitsTable(quantity.getSystem());
 			observationReported.setUnitsLabel(quantity.getUnit());
 		} else if (o.hasValueDateTimeType()) {
-			SimpleDateFormat simpleDateFormat = v2DateParseService.generateSimpleDateFormat();
+			SimpleDateFormat simpleDateFormat = v2SimpleDateFormatGenerator.generateSimpleDateFormat();
 			observationReported.setValueCode(simpleDateFormat.format(o.getValueDateTimeType().getValue()));
 		}
 		/*
@@ -403,7 +403,7 @@ public class ObservationMapperR4 extends ObservationMapper<Observation> implemen
 			component.setUnitsTable(quantity.getSystem());
 			component.setUnitsLabel(quantity.getUnit());
 		} else if (observationComponent.hasValueDateTimeType()) {
-			SimpleDateFormat simpleDateFormat = v2DateParseService.generateSimpleDateFormat();
+			SimpleDateFormat simpleDateFormat = v2SimpleDateFormatGenerator.generateSimpleDateFormat();
 			component.setValueCode(simpleDateFormat.format(observationComponent.getValueDateTimeType().getValue()));
 		}
 		/*
@@ -430,7 +430,7 @@ public class ObservationMapperR4 extends ObservationMapper<Observation> implemen
 	}
 
 	private  @NotNull DateTimeType valueDateTimeType(ObservationMaster om) {
-		SimpleDateFormat simpleDateFormat = v2DateParseService.generateSimpleDateFormat();
+		SimpleDateFormat simpleDateFormat = v2SimpleDateFormatGenerator.generateSimpleDateFormat();
 		DateTimeType dateTimeType = new DateTimeType();
 		try {
 			dateTimeType.setValue(simpleDateFormat.parse(om.getValueCode()));
@@ -440,7 +440,7 @@ public class ObservationMapperR4 extends ObservationMapper<Observation> implemen
 	}
 
 	private @NotNull Period valuePeriod(ObservationMaster om) {
-		SimpleDateFormat simpleDateFormat = v2DateParseService.generateSimpleDateFormat();
+		SimpleDateFormat simpleDateFormat = v2SimpleDateFormatGenerator.generateSimpleDateFormat();
 		Period period = new Period();
 		try {
 			Date start = simpleDateFormat.parse(om.getValueCode());

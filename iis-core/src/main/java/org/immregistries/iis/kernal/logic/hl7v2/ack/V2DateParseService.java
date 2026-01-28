@@ -2,6 +2,7 @@ package org.immregistries.iis.kernal.logic.hl7v2.ack;
 
 import org.apache.commons.lang3.StringUtils;
 import org.immregistries.iis.kernal.logic.validation.ProcessingException;
+import org.immregistries.iis.kernal.mapping.V2SimpleDateFormatGenerator;
 import org.immregistries.iis.kernal.model.ack.IisReportable;
 import org.immregistries.iis.kernal.model.ack.IisReportableSeverity;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,10 +12,13 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+
 @Service
 public class V2DateParseService {
 	@Autowired
-	IisReportableUtilService iisReportableUtilService;
+	private IisReportableUtilService iisReportableUtilService;
+	@Autowired
+	private V2SimpleDateFormatGenerator v2SimpleDateFormatGenerator;
 
 	public Date parseDateWarn(String dateString, String errorMessage, String segmentId, int segmentRepeat, int fieldPosition, boolean strict, List<IisReportable> iisReportableList) {
 		try {
@@ -60,7 +64,7 @@ public class V2DateParseService {
 	}
 
 	public SimpleDateFormat generateSimpleDateFormat() {
-		return new SimpleDateFormat("yyyyMMdd");
+		return v2SimpleDateFormatGenerator.generateSimpleDateFormat();
 	}
 
 }
