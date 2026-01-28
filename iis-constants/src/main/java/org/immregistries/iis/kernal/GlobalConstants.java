@@ -10,4 +10,7 @@ public final class GlobalConstants {
 	public static final String CONNECTATHON_USER = "Connectathon";
 	public static final String DEFAULT_USER = "DEFAULT";
 
+	public static final String FHIR_CLIENT_REQUEST_ATTRIBUTE = "fhirClient";
+
+
 }

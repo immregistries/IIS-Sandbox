@@ -40,9 +40,8 @@ import static org.immregistries.iis.kernal.security.UserAccessUtil.GITHUB_PREFIX
  */
 @Component
 public class IisFhirClientFactory extends ApacheRestfulClientFactory {
-	public static final String FHIR_CLIENT_REQUEST_ATTRIBUTE = "fhirClient";
-	public static final String CACHE_CONTROL = "Cache-Control";
-	public static final String NO_CACHE = "no-cache";
+	private static final String CACHE_CONTROL = "Cache-Control";
+	private static final String NO_CACHE = "no-cache";
 
 	@Autowired
 	public void setFhirContext(FhirContext fhirContext) {
@@ -132,15 +131,15 @@ public class IisFhirClientFactory extends ApacheRestfulClientFactory {
 	}
 
 	public IGenericClient getOrCreateGenericClient(HttpServletRequest request) {
-		if (request.getAttribute(FHIR_CLIENT_REQUEST_ATTRIBUTE) == null) {
+		if (request.getAttribute(GlobalConstants.FHIR_CLIENT_REQUEST_ATTRIBUTE) == null) {
 			Tenant tenant = CurrentTenantUtil.getTenant(request);
 			if (tenant != null) {
-				request.setAttribute(FHIR_CLIENT_REQUEST_ATTRIBUTE, newGenericClient(tenant, request));
+				request.setAttribute(GlobalConstants.FHIR_CLIENT_REQUEST_ATTRIBUTE, newGenericClient(tenant, request));
 			} else {
-				request.setAttribute(FHIR_CLIENT_REQUEST_ATTRIBUTE, null);
+				request.setAttribute(GlobalConstants.FHIR_CLIENT_REQUEST_ATTRIBUTE, null);
 			}
 		}
-		return (IGenericClient) request.getAttribute(FHIR_CLIENT_REQUEST_ATTRIBUTE);
+		return (IGenericClient) request.getAttribute(GlobalConstants.FHIR_CLIENT_REQUEST_ATTRIBUTE);
 	}
 
 	/**
