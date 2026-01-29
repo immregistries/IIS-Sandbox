@@ -181,13 +181,7 @@ Temporary Items
 /.vscode/
 /iis-core/Compiled.xml
 /iis-core/data-h2/
-/iis-core/.flattened-pom.xml
-/iis-web/.flattened-pom.xml
 /.flattened-pom.xml
 /iis-web/Compiled.xml
-/iis-core-model/.flattened-pom.xml
 /iis-web/data-h2/
-/iis-fhir-annotations/.flattened-pom.xml
-/iis-mapping/.flattened-pom.xml
-/iis-constants/.flattened-pom.xml
-/iis-logic/.flattened-pom.xml
+/**/.flattened-pom.xml
