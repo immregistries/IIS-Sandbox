@@ -40,7 +40,7 @@ public class FhirSearchRequester {
 	TenantAuthService tenantAuthService;
 
 	@Autowired
-	FhirReadRequester fhirReadRequester;
+    org.immregistries.iis.kernal.mapping.requesters.FhirReadRequester fhirReadRequester;
 
 	public IisMappedToFhirResource searchMappedObjectMaster(String resourceType, SearchParameterMap searchParameterMap) {
 		IisMappedToFhirResource mappedObject = null;

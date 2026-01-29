@@ -51,6 +51,7 @@
         <module>iis-fhir-annotations</module>
         <module>iis-mapping</module>
         <module>iis-constants</module>
+        <module>iis-core-commons</module>
     </modules>
 
     <dependencyManagement>

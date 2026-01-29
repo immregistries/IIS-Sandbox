@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal;
+package org.immregistries.iis.kernal.logic;
 
 import ca.uhn.fhir.interceptor.model.RequestPartitionId;
 import ca.uhn.fhir.jpa.entity.PartitionEntity;
@@ -7,6 +7,7 @@ import ca.uhn.fhir.rest.api.server.SystemRequestDetails;
 import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
+import org.immregistries.iis.kernal.GlobalConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,7 +22,7 @@ public class PartitionCreationService {
 			partitionName = GlobalConstants.DEFAULT_USER;
 //			return RequestPartitionId.defaultPartition();
 		}
-		if (Strings.CI.equals(partitionName,GlobalConstants.DEFAULT_USER)) {
+		if (Strings.CI.equals(partitionName, GlobalConstants.DEFAULT_USER)) {
 			return RequestPartitionId.defaultPartition();
 		}
 		try {

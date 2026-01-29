@@ -9,18 +9,17 @@
         <version>${revision}</version>
     </parent>
 
-    <artifactId>iis-mapping</artifactId>
+    <artifactId>iis-core-commons</artifactId>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
-
     <dependencies>
         <dependency>
             <groupId>org.immregistries.iis</groupId>
-            <artifactId>iis-fhir-annotations</artifactId>
+            <artifactId>iis-constants</artifactId>
             <version>${revision}</version>
         </dependency>
         <dependency>
@@ -28,15 +27,13 @@
             <artifactId>iis-core-model</artifactId>
             <version>${revision}</version>
         </dependency>
+
         <dependency>
-            <groupId>org.immregistries.iis</groupId>
-            <artifactId>iis-core-commons</artifactId>
-            <version>${revision}</version>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.18.0</version>
         </dependency>
-        <dependency>
-            <groupId>org.immregistries.iis</groupId>
-            <artifactId>iis-constants</artifactId>
-            <version>${revision}</version>
-        </dependency>
+
     </dependencies>
+
 </project>

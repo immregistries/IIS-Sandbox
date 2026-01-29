@@ -28,7 +28,7 @@ import java.math.BigDecimal;
 public class ImmunizationMapperR5 extends ImmunizationMapper<Immunization> implements IR5ResourceMapper<IisVaccination, Immunization> {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	@Autowired
-	private LocationMapperR5 locationMapper;
+	private org.immregistries.iis.kernal.mapping.mappers.resources.r5.LocationMapperR5 locationMapper;
 	@Autowired
 	private FhirReadRequester fhirReadRequester;
 	@Autowired

@@ -7,7 +7,7 @@ import ca.uhn.fhir.rest.api.server.SystemRequestDetails;
 import ca.uhn.fhir.rest.server.exceptions.AuthenticationException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
-import org.immregistries.iis.kernal.fhir.multitenancy.PartitionTenantCreationInterceptor;
+import org.immregistries.iis.kernal.logic.PartitionCreationService;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.immregistries.iis.kernal.persisted.entities.UserAccess;
 import org.immregistries.iis.kernal.persisted.repository.TenantRepository;
@@ -37,7 +37,7 @@ public class TenantAuthService implements InitializingBean {
 	@Autowired
 	private TenantRepository tenantRepository;
 	@Autowired
-	private PartitionTenantCreationInterceptor partitionTenantCreationInterceptor;
+	private PartitionCreationService partitionCreationService;
 	@Autowired
 	private IPartitionLookupSvc partitionLookupSvc;
 
@@ -110,8 +110,8 @@ public class TenantAuthService implements InitializingBean {
 		Optional<Tenant> optional = tenantRepository.findByOrganizationName(facilityName);
 		if (optional.isEmpty()) {
 			tenant = registerTenant(facilityName, userAccess);
-			if (partitionTenantCreationInterceptor != null) {
-				partitionTenantCreationInterceptor.getOrCreatePartitionId(tenant.getOrganizationName());
+			if (partitionCreationService != null) {
+				partitionCreationService.getOrCreatePartitionId(tenant.getOrganizationName());
 			}
 		} else {
 			/*

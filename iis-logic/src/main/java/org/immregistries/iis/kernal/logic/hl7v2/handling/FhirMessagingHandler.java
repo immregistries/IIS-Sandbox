@@ -9,6 +9,7 @@ import org.immregistries.iis.kernal.logic.validation.ImmunizationProcessingInter
 import org.immregistries.iis.kernal.logic.validation.ObservationProcessingInterceptor;
 import org.immregistries.iis.kernal.logic.validation.PatientProcessingInterceptor;
 import org.immregistries.iis.kernal.logic.validation.ProcessingException;
+import org.immregistries.iis.kernal.mapping.mappers.resources.ImmunizationMapper;
 import org.immregistries.iis.kernal.mapping.mappers.resources.r4.*;
 import org.immregistries.iis.kernal.mapping.requesters.FhirSaveRequester;
 import org.immregistries.iis.kernal.model.ModelPerson;
@@ -27,8 +28,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.Collectors;
-
-import static org.immregistries.iis.kernal.mapping.mappers.resources.ImmunizationMapper.*;
 
 @Service
 @Conditional(OnR4Condition.class)
@@ -134,15 +133,15 @@ public class FhirMessagingHandler extends IncomingMessageHandler<Bundle, Object>
 					}
 					for (Coding function : performer.getFunction().getCoding()) {
 						switch (function.getCode()) {
-							case ENTERING_VALUE: {
+							case ImmunizationMapper.ENTERING_VALUE: {
 								vaccinationReported.setEnteredBy(modelPerson);
 								break;
 							}
-							case ORDERING_VALUE: {
+							case ImmunizationMapper.ORDERING_VALUE: {
 								vaccinationReported.setOrderingProvider(modelPerson);
 								break;
 							}
-							case ADMINISTERING_VALUE: {
+							case ImmunizationMapper.ADMINISTERING_VALUE: {
 								vaccinationReported.setAdministeringProvider(modelPerson);
 								break;
 							}

@@ -39,6 +39,11 @@
         </dependency>
         <dependency>
             <groupId>org.immregistries.iis</groupId>
+            <artifactId>iis-core-commons</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.immregistries.iis</groupId>
             <artifactId>iis-mapping</artifactId>
             <version>${revision}</version>
         </dependency>

@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 public class ModelReferenceMapperR4 extends ModelReferenceMapper<Reference> implements IR4FieldMapper<ModelReference, Reference> {
 
 	@Autowired
-	private BusinessIdentifierMapperR4 businessIdentifierMapperR4;
+	private org.immregistries.iis.kernal.mapping.mappers.fields.r4.BusinessIdentifierMapperR4 businessIdentifierMapperR4;
 
 	@Override
 	public Class<Reference> fhirType() {
