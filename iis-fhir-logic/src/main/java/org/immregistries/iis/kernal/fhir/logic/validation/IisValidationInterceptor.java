@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal.flogic.validation;
+package org.immregistries.iis.kernal.fhir.logic.validation;
 
 import org.immregistries.iis.kernal.fhir.IisFhirInterceptor;
 

@@ -38,7 +38,7 @@ import com.google.common.base.Strings;
 import org.immregistries.iis.kernal.fhir.bulk.IBulkExportGroupProvider;
 import org.immregistries.iis.kernal.fhir.common.AppProperties;
 import org.immregistries.iis.kernal.fhir.common.StarterJpaConfig;
-import org.immregistries.iis.kernal.flogic.interceptors.IisLoggingInterceptor;
+import org.immregistries.iis.kernal.fhir.logic.interceptors.IisLoggingInterceptor;
 import org.immregistries.iis.kernal.fhir.ips.IpsConfig;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;

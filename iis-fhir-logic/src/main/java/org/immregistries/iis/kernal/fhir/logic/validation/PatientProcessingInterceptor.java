@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal.flogic.validation;
+package org.immregistries.iis.kernal.fhir.logic.validation;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.interceptor.api.Hook;
@@ -6,39 +6,22 @@ import ca.uhn.fhir.interceptor.api.Interceptor;
 import ca.uhn.fhir.rest.api.RestOperationTypeEnum;
 import ca.uhn.fhir.rest.api.server.RequestDetails;
 import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
-import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.instance.model.api.IAnyResource;
-import org.immregistries.codebase.client.CodeMap;
-import org.immregistries.codebase.client.generated.Code;
-import org.immregistries.codebase.client.reference.CodeStatusValue;
-import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.logic.validation.PatientValidator;
 import org.immregistries.iis.kernal.logic.validation.ProcessingException;
-import org.immregistries.iis.kernal.logic.validation.ValidValues;
-import org.immregistries.iis.kernal.services.CodeMapManagerService;
-import org.immregistries.iis.kernal.logic.hl7v2.ack.IisReportableUtilService;
 import org.immregistries.iis.kernal.mapping.mappers.resources.PatientMapper;
-import org.immregistries.iis.kernal.model.ModelName;
-import org.immregistries.iis.kernal.model.ModelPhone;
-import org.immregistries.iis.kernal.model.PatientGuardian;
 import org.immregistries.iis.kernal.model.PatientReported;
 import org.immregistries.iis.kernal.model.ack.IisReportable;
-import org.immregistries.iis.kernal.model.ack.IisReportableSeverity;
 import org.immregistries.iis.kernal.model.enums.ProcessingFlavor;
-import org.immregistries.mqe.hl7util.model.Hl7Location;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.text.Normalizer;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
 import static ca.uhn.fhir.interceptor.api.Pointcut.SERVER_INCOMING_REQUEST_PRE_HANDLED;
-import static org.immregistries.iis.kernal.logic.hl7v2.handling.IIncomingMessageHandler.NAME_SIZE_LIMIT;
 
 @Interceptor
 @Service

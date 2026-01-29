@@ -8,7 +8,7 @@ import ca.uhn.fhir.rest.server.exceptions.ResourceGoneException;
 import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
 import jakarta.annotation.PostConstruct;
 import org.hl7.fhir.r5.model.SubscriptionTopic;
-import org.immregistries.iis.kernal.flogic.SubscriptionTopicGenerator;
+import org.immregistries.iis.kernal.fhir.logic.SubscriptionTopicGenerator;
 
 public class SubscriptionTopicConfigurer {
 

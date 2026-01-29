@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal.flogic;
+package org.immregistries.iis.kernal.fhir.logic;
 
 import org.hl7.fhir.r5.model.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;

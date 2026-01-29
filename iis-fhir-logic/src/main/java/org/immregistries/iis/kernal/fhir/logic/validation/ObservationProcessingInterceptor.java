@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal.flogic.validation;
+package org.immregistries.iis.kernal.fhir.logic.validation;
 
 import ca.uhn.fhir.interceptor.api.Hook;
 import ca.uhn.fhir.interceptor.api.Interceptor;
@@ -6,17 +6,11 @@ import ca.uhn.fhir.rest.api.RestOperationTypeEnum;
 import ca.uhn.fhir.rest.api.server.RequestDetails;
 import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
 import org.hl7.fhir.instance.model.api.IAnyResource;
-import org.immregistries.codebase.client.CodeMap;
-import org.immregistries.codebase.client.generated.Code;
-import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.logic.validation.ObservationValidator;
 import org.immregistries.iis.kernal.logic.validation.ProcessingException;
-import org.immregistries.iis.kernal.services.CodeMapManagerService;
-import org.immregistries.iis.kernal.logic.hl7v2.ack.IisReportableUtilService;
 import org.immregistries.iis.kernal.mapping.mappers.resources.ObservationMapper;
 import org.immregistries.iis.kernal.model.ObservationReported;
 import org.immregistries.iis.kernal.model.ack.IisReportable;
-import org.immregistries.iis.kernal.model.ack.IisReportableSeverity;
 import org.immregistries.iis.kernal.model.enums.ProcessingFlavor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

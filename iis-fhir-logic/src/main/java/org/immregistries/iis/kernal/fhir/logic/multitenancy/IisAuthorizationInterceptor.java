@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal.flogic.multitenancy;
+package org.immregistries.iis.kernal.fhir.logic.multitenancy;
 
 import ca.uhn.fhir.i18n.Msg;
 import ca.uhn.fhir.rest.api.server.RequestDetails;

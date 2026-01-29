@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal.flogic;
+package org.immregistries.iis.kernal.fhir.logic;
 
 import ca.uhn.fhir.interceptor.model.RequestPartitionId;
 import ca.uhn.fhir.jpa.api.dao.DaoRegistry;

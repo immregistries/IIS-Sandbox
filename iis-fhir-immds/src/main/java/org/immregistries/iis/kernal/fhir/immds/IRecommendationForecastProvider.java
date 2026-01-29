@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal.immds;
+package org.immregistries.iis.kernal.fhir.immds;
 
 import org.hl7.fhir.instance.model.api.IBaseParameters;
 import org.hl7.fhir.instance.model.api.IDomainResource;

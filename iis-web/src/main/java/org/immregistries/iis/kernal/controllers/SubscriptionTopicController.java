@@ -5,7 +5,7 @@ import ca.uhn.fhir.jpa.searchparam.extractor.ISearchParamExtractor;
 import ca.uhn.fhir.rest.server.util.ISearchParamRegistry;
 import jakarta.servlet.ServletException;
 import org.hl7.fhir.r5.model.*;
-import org.immregistries.iis.kernal.flogic.SubscriptionTopicGenerator;
+import org.immregistries.iis.kernal.fhir.logic.SubscriptionTopicGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,8 +14,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
-
-import static org.immregistries.iis.kernal.flogic.SubscriptionTopicGenerator.*;
 
 @RestController
 @RequestMapping({"/SubscriptionTopic", IisRestPath.BasePath.REST_PATH + "/SubscriptionTopic"})
