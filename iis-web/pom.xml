@@ -24,12 +24,12 @@
     <dependencies>
         <dependency>
             <groupId>org.immregistries.iis</groupId>
-            <artifactId>iis-constants</artifactId>
+            <artifactId>iis-logic</artifactId>
             <version>${revision}</version>
         </dependency>
         <dependency>
             <groupId>org.immregistries.iis</groupId>
-            <artifactId>iis-logic</artifactId>
+            <artifactId>iis-fhir-server</artifactId>
             <version>${revision}</version>
         </dependency>
         <dependency>

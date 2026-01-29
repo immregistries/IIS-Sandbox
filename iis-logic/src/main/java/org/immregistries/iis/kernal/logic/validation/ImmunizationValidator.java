@@ -26,8 +26,6 @@ public class ImmunizationValidator extends IisValidator{
 	private ImmunizationMapper immunizationMapper;
 
 	@Autowired
-	private FhirContext fhirContext;
-	@Autowired
 	private IisReportableUtilService iisReportableUtilService;
 	@Autowired
 	private CodeMapManagerService codeMapManagerService;

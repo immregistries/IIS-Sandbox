@@ -39,6 +39,18 @@
         </dependency>
 
         <dependency>
+            <groupId>org.immregistries.iis</groupId>
+            <artifactId>iis-logic</artifactId>
+            <version>${revision}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.18.0</version>
+        </dependency>
+
+        <dependency>
             <groupId>jakarta.interceptor</groupId>
             <artifactId>jakarta.interceptor-api</artifactId>
             <scope>provided</scope>

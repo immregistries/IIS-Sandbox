@@ -1,14 +1,8 @@
 package org.immregistries.iis.kernal.logic.validation;
 
-import ca.uhn.fhir.interceptor.api.Hook;
-import ca.uhn.fhir.rest.api.RestOperationTypeEnum;
-import ca.uhn.fhir.rest.api.server.RequestDetails;
-import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
-import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
-import org.immregistries.iis.kernal.flogic.validation.IisLogicInterceptor;
 import org.immregistries.iis.kernal.logic.hl7v2.ack.IisReportableUtilService;
 import org.immregistries.iis.kernal.mapping.mappers.resources.ObservationMapper;
 import org.immregistries.iis.kernal.model.ObservationReported;

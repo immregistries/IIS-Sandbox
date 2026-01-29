@@ -5,7 +5,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.instance.model.api.IBaseBundle;
 import org.hl7.fhir.r4.model.IdType;
-import org.immregistries.iis.kernal.fhir.ips.IpsGeneratorSvcIIS;
+import org.immregistries.iis.fhir.ips.IpsGeneratorSvcIIS;
 import org.immregistries.iis.kernal.model.shlink.ShLinkPayload;
 import org.immregistries.iis.kernal.services.KeyStoreService;
 import org.immregistries.iis.kernal.services.SecretKeyUtilService;

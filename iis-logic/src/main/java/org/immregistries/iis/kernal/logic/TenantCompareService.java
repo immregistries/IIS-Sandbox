@@ -12,7 +12,6 @@ import ca.uhn.fhir.rest.param.TokenParamModifier;
 import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.hl7.fhir.instance.model.api.IBaseParameters;
 import org.hl7.fhir.r4.model.BooleanType;
-import org.immregistries.iis.kernal.fhir.CrossTenantDiffProvider;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.immregistries.iis.kernal.persisted.entities.UserAccess;
 import org.immregistries.iis.kernal.security.TenantAuthService;
@@ -38,11 +37,9 @@ public class TenantCompareService {
 	@Autowired
 	private TenantAuthService tenantAuthService;
 	@Autowired
-	private CrossTenantDiffProvider diffProvider;
+	private CrossTenantFhirDiffExecuter diffProvider;
 	@Autowired
 	private DaoRegistry daoRegistry;
-	@Autowired
-	private FhirContext fhirContext;
 
 	@SuppressWarnings("rawtypes")
 	public List<IBaseParameters> compareTenants(String[] tenantNames, UserAccess userAccess,
