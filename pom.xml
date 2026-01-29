@@ -45,18 +45,18 @@
     <name>IIS Sandbox</name>
 
     <modules>
-        <module>iis-logic</module>
-        <module>iis-web</module>
+        <module>iis-constants</module>
         <module>iis-core-model</module>
+        <module>iis-core-commons</module>
         <module>iis-fhir-annotations</module>
         <module>iis-mapping</module>
-        <module>iis-constants</module>
-        <module>iis-core-commons</module>
-        <module>iis-fhir-bulk-export</module>
-        <module>iis-fhir-server</module>
-        <module>iis-fhir-logic</module>
         <module>iis-logic-immds</module>
+        <module>iis-logic</module>
+        <module>iis-fhir-interceptors</module>
+        <module>iis-fhir-bulk-export</module>
         <module>iis-fhir-immds</module>
+        <module>iis-fhir-server</module>
+        <module>iis-web</module>
     </modules>
 
     <dependencyManagement>

@@ -7,9 +7,11 @@
         <groupId>org.immregistries.iis</groupId>
         <artifactId>iis-sandbox</artifactId>
         <version>${revision}</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>iis-fhir-server</artifactId>
+    <name>IIS Sandbox HAPIFHIR Server</name>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
@@ -26,7 +28,7 @@
 
         <dependency>
             <groupId>org.immregistries.iis</groupId>
-            <artifactId>iis-fhir-logic</artifactId>
+            <artifactId>iis-fhir-interceptors</artifactId>
             <version>${revision}</version>
         </dependency>
         <dependency>

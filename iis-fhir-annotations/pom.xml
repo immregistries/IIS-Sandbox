@@ -6,10 +6,12 @@
     <parent>
         <groupId>org.immregistries.iis</groupId>
         <artifactId>iis-sandbox</artifactId>
-        <version>0.6.3-SNAPSHOT-HAPI-UPGRADE-TEST</version>
+        <version>${revision}</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>iis-fhir-annotations</artifactId>
+    <name>IIS Sandbox FHIR Configuration Annotations</name>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>

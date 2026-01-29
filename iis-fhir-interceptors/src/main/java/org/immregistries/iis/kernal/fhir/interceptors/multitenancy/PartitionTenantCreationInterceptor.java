@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal.fhir.multitenancy;
+package org.immregistries.iis.kernal.fhir.interceptors.multitenancy;
 
 import ca.uhn.fhir.interceptor.api.Hook;
 import ca.uhn.fhir.interceptor.api.Pointcut;

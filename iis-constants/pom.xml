@@ -7,9 +7,11 @@
         <groupId>org.immregistries.iis</groupId>
         <artifactId>iis-sandbox</artifactId>
         <version>${revision}</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>iis-constants</artifactId>
+    <name>IIS Sandbox Constants</name>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
@@ -17,7 +19,4 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
-    <dependencies>
-
-    </dependencies>
 </project>

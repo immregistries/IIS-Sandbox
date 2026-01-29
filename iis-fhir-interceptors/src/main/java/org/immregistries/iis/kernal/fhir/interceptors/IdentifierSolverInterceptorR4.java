@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal.fhir.logic.interceptors;
+package org.immregistries.iis.kernal.fhir.interceptors;
 
 import ca.uhn.fhir.rest.api.server.RequestDetails;
 import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;

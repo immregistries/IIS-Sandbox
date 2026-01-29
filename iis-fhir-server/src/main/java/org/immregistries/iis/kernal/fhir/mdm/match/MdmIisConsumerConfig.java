@@ -7,7 +7,7 @@ import org.hl7.fhir.r5.model.Patient;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR5Condition;
 import org.immregistries.iis.kernal.fhir.mdm.MdmConfigCondition;
-import org.immregistries.iis.kernal.fhir.logic.MdmIisMatchFinderSvc;
+import org.immregistries.iis.kernal.fhir.mdm.MdmIisMatchFinderSvc;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;

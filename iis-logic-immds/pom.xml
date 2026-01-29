@@ -7,9 +7,11 @@
         <groupId>org.immregistries.iis</groupId>
         <artifactId>iis-sandbox</artifactId>
         <version>${revision}</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>iis-logic-immds</artifactId>
+    <name>IIS Sandbox ImmDs logic</name>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>

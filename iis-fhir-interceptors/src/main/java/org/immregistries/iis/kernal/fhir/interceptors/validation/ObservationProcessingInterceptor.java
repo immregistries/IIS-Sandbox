@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal.fhir.logic.validation;
+package org.immregistries.iis.kernal.fhir.interceptors.validation;
 
 import ca.uhn.fhir.interceptor.api.Hook;
 import ca.uhn.fhir.interceptor.api.Interceptor;

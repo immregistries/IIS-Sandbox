@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal.fhir.logic.interceptors;
+package org.immregistries.iis.kernal.fhir.interceptors;
 
 import ca.uhn.fhir.interceptor.api.Hook;
 import ca.uhn.fhir.jpa.api.dao.IFhirResourceDao;

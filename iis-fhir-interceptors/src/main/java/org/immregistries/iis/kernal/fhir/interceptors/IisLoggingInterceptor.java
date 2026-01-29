@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal.fhir.logic.interceptors;
+package org.immregistries.iis.kernal.fhir.interceptors;
 
 import ca.uhn.fhir.interceptor.api.Hook;
 import ca.uhn.fhir.interceptor.api.Interceptor;
@@ -10,7 +10,8 @@ import ca.uhn.fhir.rest.server.interceptor.LoggingInterceptor;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.immregistries.iis.kernal.fhir.multitenancy.PartitionTenantCreationInterceptor;
+import org.immregistries.iis.kernal.fhir.IisFhirInterceptor;
+import org.immregistries.iis.kernal.fhir.interceptors.multitenancy.PartitionTenantCreationInterceptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +23,7 @@ import java.io.IOException;
 @Primary
 @Interceptor
 @Component
-public class IisLoggingInterceptor extends LoggingInterceptor {
+public class IisLoggingInterceptor extends LoggingInterceptor implements IisFhirInterceptor {
 
 	@Autowired
 	PartitionTenantCreationInterceptor partitionTenantCreationInterceptor;
