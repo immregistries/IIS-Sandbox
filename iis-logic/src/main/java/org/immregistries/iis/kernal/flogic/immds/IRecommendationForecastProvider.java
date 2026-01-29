@@ -1,9 +1,10 @@
-package org.immregistries.iis.kernal.fhir.immds;
+package org.immregistries.iis.kernal.flogic.immds;
 
 import org.hl7.fhir.instance.model.api.IBaseParameters;
 import org.hl7.fhir.instance.model.api.IDomainResource;
+import org.immregistries.iis.kernal.fhir.IisFhirSimpleProvider;
 
-public interface IRecommendationForecastProvider<Parameters extends IBaseParameters, Patient extends IDomainResource, Immunization extends IDomainResource> {
+public interface IRecommendationForecastProvider<Parameters extends IBaseParameters, Patient extends IDomainResource, Immunization extends IDomainResource> extends IisFhirSimpleProvider {
 	String $_IMMDS_FORECAST = "$immds-forecast";
 	String ASSESSMENT_DATE = "assessmentDate";
 	String PATIENT = "patient";

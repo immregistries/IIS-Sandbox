@@ -2,9 +2,9 @@ package org.immregistries.iis.kernal.logic.hl7v2.handling;
 
 import org.hl7.fhir.instance.model.api.IIdType;
 import org.immregistries.codebase.client.CodeMap;
-import org.immregistries.iis.kernal.logic.PartitionCreationService;
-import org.immregistries.iis.kernal.logic.CodeMapManagerService;
-import org.immregistries.iis.kernal.logic.MessageRecordingService;
+import org.immregistries.iis.kernal.services.PartitionCreationService;
+import org.immregistries.iis.kernal.services.CodeMapManagerService;
+import org.immregistries.iis.kernal.services.MessageRecordingService;
 import org.immregistries.iis.kernal.logic.hl7v2.ack.IisReportableUtilService;
 import org.immregistries.iis.kernal.logic.validation.ProcessingException;
 import org.immregistries.iis.kernal.model.PatientReported;

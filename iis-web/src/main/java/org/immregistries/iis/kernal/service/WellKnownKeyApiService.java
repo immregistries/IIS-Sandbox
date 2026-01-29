@@ -2,7 +2,7 @@ package org.immregistries.iis.kernal.service;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.immregistries.iis.kernal.controllers.servlet.TenantController;
-import org.immregistries.iis.kernal.logic.api.IWellKnownKeyApiService;
+import org.immregistries.iis.kernal.services.api.IWellKnownKeyApiService;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;

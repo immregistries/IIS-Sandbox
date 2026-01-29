@@ -1,6 +1,6 @@
 package org.immregistries.iis.kernal.controllers.rest.shlink;
 
-import org.immregistries.iis.kernal.logic.api.IPatientShlinkApiManifestUrlService;
+import org.immregistries.iis.kernal.services.api.IPatientShlinkApiManifestUrlService;
 import org.immregistries.iis.kernal.controllers.IisPathVariable;
 import org.immregistries.iis.kernal.controllers.IisRestPath;
 

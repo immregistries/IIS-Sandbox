@@ -36,7 +36,7 @@ public class TenantCompareService {
 
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	@Autowired
-	TenantAuthService tenantAuthService;
+	private TenantAuthService tenantAuthService;
 	@Autowired
 	private CrossTenantDiffProvider diffProvider;
 	@Autowired

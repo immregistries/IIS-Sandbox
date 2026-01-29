@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal.logic;
+package org.immregistries.iis.kernal.services;
 
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.Curve;

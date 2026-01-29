@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal.logic.api;
+package org.immregistries.iis.kernal.services.api;
 
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.jetbrains.annotations.NotNull;

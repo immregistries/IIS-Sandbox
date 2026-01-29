@@ -6,7 +6,7 @@ import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
-import org.immregistries.iis.kernal.logic.CodeMapManagerService;
+import org.immregistries.iis.kernal.services.CodeMapManagerService;
 import org.immregistries.iis.kernal.mapping.mappers.fields.BusinessIdentifierMapper;
 import org.immregistries.iis.kernal.mapping.mappers.resources.ImmunizationEvaluationMapper;
 import org.immregistries.iis.kernal.mapping.mappers.resources.ImmunizationMapper;

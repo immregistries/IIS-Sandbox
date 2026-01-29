@@ -39,16 +39,8 @@ import com.google.common.base.Strings;
 import org.immregistries.iis.kernal.fhir.bulk.IBulkExportGroupProvider;
 import org.immregistries.iis.kernal.fhir.common.AppProperties;
 import org.immregistries.iis.kernal.fhir.common.StarterJpaConfig;
-import org.immregistries.iis.kernal.fhir.immds.IRecommendationForecastProvider;
-import org.immregistries.iis.kernal.fhir.interceptors.GroupAuthorityInterceptor;
-import org.immregistries.iis.kernal.fhir.interceptors.IdentifierSolverInterceptor;
-import org.immregistries.iis.kernal.fhir.interceptors.IisLoggingInterceptor;
+import org.immregistries.iis.kernal.flogic.interceptors.IisLoggingInterceptor;
 import org.immregistries.iis.kernal.fhir.ips.IpsConfig;
-import org.immregistries.iis.kernal.fhir.multitenancy.IisAuthorizationInterceptor;
-import org.immregistries.iis.kernal.fhir.multitenancy.PartitionTenantCreationInterceptor;
-import org.immregistries.iis.kernal.logic.validation.ImmunizationProcessingInterceptor;
-import org.immregistries.iis.kernal.logic.validation.ObservationProcessingInterceptor;
-import org.immregistries.iis.kernal.logic.validation.PatientProcessingInterceptor;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -105,15 +97,7 @@ public class ServerConfig {
 	 * @param appContext                        appContext
 	 * @param theIpsOperationProvider           IPS Provider
 	 * @param mdmProviderLoader                 mdmProviderLoader
-	 * @param partitionTenantCreationInterceptor      partitionCreationInterceptor
 	 * @param bulkQueryGroupProvider            bulkQueryGroupProvider
-	 * @param identifierSolverInterceptor       identifierSolverInterceptor
-	 * @param groupAuthorityInterceptor         groupAuthorityInterceptor
-	 * @param recommendationForecastProvider    IMMDS Forecast operations provider
-	 * @param iisAuthorizationInterceptor   sessionAuthorizationInterceptor
-	 * @param patientProcessingInterceptor      custom patientProcessingInterceptor
-	 * @param observationProcessingInterceptor  custom observationProcessingInterceptor
-	 * @param immunizationProcessingInterceptor custom immunizationProcessingInterceptor
 	 * @return Restful Server
 	 */
 	@Bean
@@ -121,15 +105,10 @@ public class ServerConfig {
 												  Optional<IpsOperationProvider> theIpsOperationProvider,
 												  Optional<MdmProviderLoader> mdmProviderLoader,
 												  Optional<DiffProvider> diffProvider,
-												  PartitionTenantCreationInterceptor partitionTenantCreationInterceptor,
 												  Optional<IBulkExportGroupProvider> bulkQueryGroupProvider,
-												  Optional<IdentifierSolverInterceptor> identifierSolverInterceptor,
-												  Optional<GroupAuthorityInterceptor> groupAuthorityInterceptor,
-												  Optional<IRecommendationForecastProvider> recommendationForecastProvider,
-												  IisAuthorizationInterceptor iisAuthorizationInterceptor,
-												  PatientProcessingInterceptor patientProcessingInterceptor,
-												  ObservationProcessingInterceptor observationProcessingInterceptor,
-												  ImmunizationProcessingInterceptor immunizationProcessingInterceptor) {
+												  List<IisFhirSimpleProvider> iisFhirSimpleProviders,
+												  List<IisFhirInterceptor> iisFhirInterceptors
+	) {
 		RestfulServer fhirServer = new RestfulServer(fhirSystemDao.getContext());
 		List<String> supportedResourceTypes = appProperties.getSupported_resource_types();
 
@@ -266,10 +245,7 @@ public class ServerConfig {
 			 * Customized
 			 */
 			fhirServer.registerProvider(bulkDataExportProvider);
-			if (bulkQueryGroupProvider.isPresent()) {
-				bulkQueryGroupProvider.get().setDao(daoRegistry.getResourceDao("Group"));
-				fhirServer.registerProvider(bulkQueryGroupProvider.get());
-			}
+			bulkQueryGroupProvider.ifPresent(fhirServer::registerProvider);
 		}
 
 		// Bulk Import
@@ -293,28 +269,26 @@ public class ServerConfig {
 			 * Registered custom interceptor for automatic partition generation
 			 * Rest is dealt with in PartitionModeConfigurer.class
 			 */
-			fhirServer.registerInterceptor(partitionTenantCreationInterceptor);
+			// Registered later as autowired into the list of IisInterceptor
+//			fhirServer.registerInterceptor(partitionTenantCreationInterceptor);
 			fhirServer.setTenantIdentificationStrategy(new UrlBaseTenantIdentificationStrategy());
 			fhirServer.registerProviders(partitionManagementProvider);
 		}
 		repositoryValidatingInterceptor.ifPresent(fhirServer::registerInterceptor);
 
 		//register the IPS Provider
+		fhirServer.registerProvider(iisFhirSimpleProviders);
 		theIpsOperationProvider.ifPresent(fhirServer::registerProvider);
-		recommendationForecastProvider.ifPresent(fhirServer::registerProvider);
 
 		/*
 		 * CUSTOM INTERCEPTORS HERE
 		 */
-		fhirServer.registerInterceptor(iisAuthorizationInterceptor);
-		identifierSolverInterceptor.ifPresent(fhirServer::registerInterceptor);
-		groupAuthorityInterceptor.ifPresent(fhirServer::registerInterceptor);
 		/*
 		 * Processing and validating interceptors, adding part of inherited V2 validation logic with Flavors.
 		 */
-		fhirServer.registerInterceptor(patientProcessingInterceptor);
-		fhirServer.registerInterceptor(immunizationProcessingInterceptor);
-		fhirServer.registerInterceptor(observationProcessingInterceptor);
+		for (IisFhirInterceptor iisFhirInterceptor : iisFhirInterceptors) {
+			fhirServer.registerInterceptor(iisFhirInterceptor);
+		}
 		return fhirServer;
 	}
 

@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal.logic;
+package org.immregistries.iis.kernal.services;
 
 import org.immregistries.iis.kernal.model.IisPatient;
 import org.immregistries.iis.kernal.persisted.entities.MessageReceived;

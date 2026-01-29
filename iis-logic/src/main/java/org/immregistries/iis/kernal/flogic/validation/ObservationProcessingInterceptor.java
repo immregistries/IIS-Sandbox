@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal.logic.validation;
+package org.immregistries.iis.kernal.flogic.validation;
 
 import ca.uhn.fhir.interceptor.api.Hook;
 import ca.uhn.fhir.interceptor.api.Interceptor;
@@ -9,7 +9,8 @@ import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
-import org.immregistries.iis.kernal.logic.CodeMapManagerService;
+import org.immregistries.iis.kernal.logic.validation.ProcessingException;
+import org.immregistries.iis.kernal.services.CodeMapManagerService;
 import org.immregistries.iis.kernal.logic.hl7v2.ack.IisReportableUtilService;
 import org.immregistries.iis.kernal.mapping.mappers.resources.ObservationMapper;
 import org.immregistries.iis.kernal.model.ObservationReported;

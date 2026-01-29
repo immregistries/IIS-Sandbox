@@ -2,9 +2,8 @@ package org.immregistries.iis.kernal.controllers;
 
 import com.nimbusds.jose.jwk.JWK;
 import org.immregistries.iis.kernal.controllers.servlet.TenantController;
-import org.immregistries.iis.kernal.logic.KeyStoreService;
+import org.immregistries.iis.kernal.services.KeyStoreService;
 import org.immregistries.iis.kernal.persisted.entities.IisKey;
-import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.immregistries.iis.kernal.persisted.entities.UserAccess;
 import org.immregistries.iis.kernal.security.UserAccessUtil;
 import org.springframework.beans.factory.annotation.Autowired;

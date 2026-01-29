@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal.fhir.multitenancy;
+package org.immregistries.iis.kernal.flogic.multitenancy;
 
 import ca.uhn.fhir.i18n.Msg;
 import ca.uhn.fhir.rest.api.server.RequestDetails;
@@ -14,6 +14,7 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.Strings;
 import org.apache.http.auth.AuthenticationException;
 import org.immregistries.iis.kernal.GlobalConstants;
+import org.immregistries.iis.kernal.fhir.IisFhirInterceptor;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.immregistries.iis.kernal.persisted.entities.UserAccess;
 import org.immregistries.iis.kernal.persisted.repository.TenantRepository;
@@ -39,7 +40,7 @@ import static org.immregistries.iis.kernal.security.UserAccessUtil.SESSION_USER_
  */
 @Component
 @Interceptor
-public class IisAuthorizationInterceptor extends AuthorizationInterceptor {
+public class IisAuthorizationInterceptor extends AuthorizationInterceptor implements IisFhirInterceptor {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	private static final String BEARER_PREFIX = "Bearer ";

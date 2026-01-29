@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal.logic.api;
+package org.immregistries.iis.kernal.services.api;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.hl7.fhir.instance.model.api.IAnyResource;

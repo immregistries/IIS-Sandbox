@@ -11,7 +11,7 @@ import org.hl7.fhir.r4.model.IdType;
 import org.immregistries.iis.kernal.controllers.IisPathVariable;
 import org.immregistries.iis.kernal.controllers.IisRestPath;
 import org.immregistries.iis.kernal.fhir.ips.IpsGeneratorSvcIIS;
-import org.immregistries.iis.kernal.logic.KeyStoreService;
+import org.immregistries.iis.kernal.services.KeyStoreService;
 import org.immregistries.iis.kernal.logic.shlink.CompressionService;
 import org.immregistries.iis.kernal.persisted.entities.IisKey;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;

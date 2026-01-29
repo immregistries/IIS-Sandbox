@@ -33,8 +33,6 @@ public class CdsQueryServiceR5 extends CdsQueryService<ImmunizationRecommendatio
 	private ImmunizationEvaluationMapperR5 immunizationEvaluationMapperR5;
 
 	@Autowired
-	private IncomingQueryHandler incomingQueryHandler;
-	@Autowired
 	private FhirSearchRequester fhirSearchRequester;
 
 	public ImmunizationRecommendation queryCds(Tenant tenant, Date date, IisPatient iisPatient) {

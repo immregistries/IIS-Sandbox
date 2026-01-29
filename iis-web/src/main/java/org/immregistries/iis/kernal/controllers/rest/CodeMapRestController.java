@@ -5,7 +5,7 @@ import org.immregistries.iis.kernal.controllers.IisRestPath;
 import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.controllers.rest.filters.RestTenantUrlFilter;
-import org.immregistries.iis.kernal.logic.CodeMapManagerService;
+import org.immregistries.iis.kernal.services.CodeMapManagerService;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

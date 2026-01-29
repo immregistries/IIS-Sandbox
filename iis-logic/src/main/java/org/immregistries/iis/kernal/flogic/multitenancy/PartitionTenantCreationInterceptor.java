@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal.fhir.multitenancy;
+package org.immregistries.iis.kernal.flogic.multitenancy;
 
 import ca.uhn.fhir.i18n.Msg;
 import ca.uhn.fhir.interceptor.api.Hook;
@@ -11,7 +11,8 @@ import jakarta.annotation.Nonnull;
 import jakarta.interceptor.Interceptor;
 import org.apache.commons.lang3.StringUtils;
 import org.immregistries.iis.kernal.GlobalConstants;
-import org.immregistries.iis.kernal.logic.PartitionCreationService;
+import org.immregistries.iis.kernal.fhir.IisFhirInterceptor;
+import org.immregistries.iis.kernal.services.PartitionCreationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,11 +24,11 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Interceptor
-public class PartitionTenantCreationInterceptor extends RequestTenantPartitionInterceptor {
+public class PartitionTenantCreationInterceptor extends RequestTenantPartitionInterceptor implements IisFhirInterceptor {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-@Autowired
-public PartitionCreationService partitionCreationService;
+	@Autowired
+	public PartitionCreationService partitionCreationService;
 
 	@Hook(value = Pointcut.SERVER_INCOMING_REQUEST_POST_PROCESSED)
 	public boolean partitionIdentifyPostProcessed(RequestDetails theRequestDetails) {
@@ -56,7 +57,6 @@ public PartitionCreationService partitionCreationService;
 		String partitionName = extractPartitionName(theRequestDetails);
 		return  partitionCreationService.getOrCreatePartitionId(partitionName);
 	}
-
 
 	public static String extractPartitionName(RequestDetails requestDetails) {
 		String tenantId = requestDetails.getTenantId();

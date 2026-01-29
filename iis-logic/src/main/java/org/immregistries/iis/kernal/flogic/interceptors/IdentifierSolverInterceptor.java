@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal.fhir.interceptors;
+package org.immregistries.iis.kernal.flogic.interceptors;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.interceptor.api.Hook;
@@ -17,7 +17,8 @@ import org.apache.commons.lang3.Strings;
 import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.hl7.fhir.instance.model.api.IDomainResource;
 import org.hl7.fhir.r4.model.ResourceType;
-import org.immregistries.iis.kernal.fhir.multitenancy.PartitionTenantCreationInterceptor;
+import org.immregistries.iis.kernal.fhir.IisFhirInterceptor;
+import org.immregistries.iis.kernal.flogic.multitenancy.PartitionTenantCreationInterceptor;
 import org.immregistries.iis.kernal.mapping.mappers.resources.ImmunizationMapper;
 import org.immregistries.iis.kernal.model.BusinessIdentifier;
 import org.slf4j.Logger;
@@ -35,7 +36,7 @@ import static org.immregistries.iis.kernal.mapping.requesters.FhirSaveRequester.
  * @param <Group>        FHIR Group class
  * @param <Observation>  FHIR Observation class
  */
-public abstract class IdentifierSolverInterceptor<Patient extends IDomainResource, Immunization extends IDomainResource, Group extends IDomainResource, Observation extends IDomainResource> {
+public abstract class IdentifierSolverInterceptor<Patient extends IDomainResource, Immunization extends IDomainResource, Group extends IDomainResource, Observation extends IDomainResource> implements IisFhirInterceptor {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	public static final String PATIENT_SP_IDENTIFIER = "identifier";
 	@Autowired

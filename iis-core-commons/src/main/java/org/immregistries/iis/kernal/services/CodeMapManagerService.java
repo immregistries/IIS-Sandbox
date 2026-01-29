@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal.logic;
+package org.immregistries.iis.kernal.services;
 
 import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.CodeMapBuilder;

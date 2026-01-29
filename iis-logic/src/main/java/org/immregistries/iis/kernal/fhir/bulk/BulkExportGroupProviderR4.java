@@ -32,8 +32,8 @@ import org.hl7.fhir.instance.model.api.IIdType;
 import org.hl7.fhir.instance.model.api.IPrimitiveType;
 import org.hl7.fhir.r4.model.*;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
-import org.immregistries.iis.kernal.fhir.interceptors.IdentifierSolverInterceptorR4;
-import org.immregistries.iis.kernal.fhir.multitenancy.PartitionTenantCreationInterceptor;
+import org.immregistries.iis.kernal.flogic.interceptors.IdentifierSolverInterceptorR4;
+import org.immregistries.iis.kernal.flogic.multitenancy.PartitionTenantCreationInterceptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,8 +54,7 @@ public class BulkExportGroupProviderR4 extends GroupResourceProvider implements 
 
 	@Autowired
 	private BaseJpaResourceProviderPatient<Patient> patientProvider;
-	@Autowired
-	private IFhirResourceDao<Group> fhirResourceGroupDao;
+
 	@Autowired
 	private IFhirResourceDao<Patient> patientIFhirResourceDao;
 	@Autowired
@@ -63,14 +62,17 @@ public class BulkExportGroupProviderR4 extends GroupResourceProvider implements 
 	@Autowired
 	private IFhirResourceDao<Binary> binaryDao;
 
-	public BulkExportGroupProviderR4() {
-		super();
-		setDao(fhirResourceGroupDao);
+	private IFhirResourceDao<Group> fhirResourceGroupDao;
+	@Autowired
+	public void setFhirResourceGroupDao(IFhirResourceDao<Group> fhirResourceGroupDao) {
+		super.setDao(fhirResourceGroupDao);
+		this.fhirResourceGroupDao = fhirResourceGroupDao;
 	}
 
-	public void setDao(IFhirResourceDao<Group> theDao) {
-		super.setDao(theDao);
+	public BulkExportGroupProviderR4() {
+		super();
 	}
+
 
 	/**
 	 * Group/123/$everything

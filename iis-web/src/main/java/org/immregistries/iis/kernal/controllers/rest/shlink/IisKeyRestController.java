@@ -3,7 +3,7 @@ package org.immregistries.iis.kernal.controllers.rest.shlink;
 import org.immregistries.iis.kernal.controllers.IisRestParam;
 import org.immregistries.iis.kernal.controllers.rest.filters.RestTenantUrlFilter;
 import org.immregistries.iis.kernal.controllers.IisRestPath;
-import org.immregistries.iis.kernal.logic.KeyStoreService;
+import org.immregistries.iis.kernal.services.KeyStoreService;
 import org.immregistries.iis.kernal.persisted.entities.IisKey;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.immregistries.iis.kernal.persisted.entities.UserAccess;

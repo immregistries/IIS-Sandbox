@@ -22,11 +22,9 @@ import java.util.List;
 import static org.immregistries.iis.kernal.FhirConstants.EVALUATION;
 import static org.immregistries.iis.kernal.FhirConstants.RECOMMENDATION;
 
-
 @Service
 @Conditional(OnR4Condition.class)
 public class CdsQueryServiceR4 extends CdsQueryService<ImmunizationRecommendation, Parameters> {
-
 
 	@Autowired
 	private ImmunizationRecommendationMapperR4 immunizationRecommendationMapperR4;

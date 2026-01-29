@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal.fhir.interceptors;
+package org.immregistries.iis.kernal.flogic.interceptors;
 
 import ca.uhn.fhir.interceptor.api.Hook;
 import ca.uhn.fhir.jpa.api.dao.IFhirResourceDao;
@@ -12,6 +12,7 @@ import jakarta.interceptor.Interceptor;
 import org.hl7.fhir.r5.model.Group;
 import org.hl7.fhir.r5.model.Organization;
 import org.hl7.fhir.r5.model.Reference;
+import org.immregistries.iis.kernal.fhir.IisFhirInterceptor;
 import org.immregistries.iis.kernal.mapping.requesters.FhirSearchRequester;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +32,7 @@ import static ca.uhn.fhir.interceptor.api.Pointcut.SERVER_PROCESSING_COMPLETED_N
 @Interceptor
 //@Conditional(OnR5Condition.class)
 //@Service
-public class GroupAuthorityInterceptor {
+public class GroupAuthorityInterceptor implements IisFhirInterceptor {
 
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 

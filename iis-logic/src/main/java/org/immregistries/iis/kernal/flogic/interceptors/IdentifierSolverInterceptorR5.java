@@ -1,11 +1,11 @@
-package org.immregistries.iis.kernal.fhir.interceptors;
+package org.immregistries.iis.kernal.flogic.interceptors;
 
 import ca.uhn.fhir.rest.api.server.RequestDetails;
 import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
 import jakarta.interceptor.Interceptor;
 import org.apache.commons.lang3.StringUtils;
-import org.hl7.fhir.r4.model.*;
-import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
+import org.hl7.fhir.r5.model.*;
+import org.immregistries.iis.kernal.fhir.common.annotations.OnR5Condition;
 import org.immregistries.iis.kernal.mapping.mappers.fields.BusinessIdentifierMapper;
 import org.immregistries.iis.kernal.mapping.mappers.resources.ImmunizationMapper;
 import org.immregistries.iis.kernal.model.BusinessIdentifier;
@@ -19,9 +19,9 @@ import org.springframework.stereotype.Service;
 import static org.immregistries.iis.kernal.mapping.mappers.resources.PatientMapper.MRN_SYSTEM;
 
 @Interceptor
-@Conditional(OnR4Condition.class)
+@Conditional(OnR5Condition.class)
 @Service
-public class IdentifierSolverInterceptorR4 extends IdentifierSolverInterceptor<Patient, Immunization, Group, Observation> {
+public class IdentifierSolverInterceptorR5 extends IdentifierSolverInterceptor<Patient, Immunization, Group, Observation> {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	@Autowired
@@ -29,6 +29,7 @@ public class IdentifierSolverInterceptorR4 extends IdentifierSolverInterceptor<P
 	@Autowired
 	private ImmunizationMapper<Immunization> immunizationMapper;
 
+	@Override
 	public void handleImmunization(RequestDetails requestDetails, Immunization immunization) {
 		if (immunization == null) {
 			return;
@@ -42,8 +43,9 @@ public class IdentifierSolverInterceptorR4 extends IdentifierSolverInterceptor<P
 		 * Look for golden record
 		 */
 		String id = solvePatientIdentifier(requestDetails, identifier);
+
 		if (id != null) {
-			logger.info("Identifier reference solved {}|{} to {} for Immunization", identifier.getSystem(), identifier.getValue(), id);
+			logger.info("Identifier reference solved {}|{} to {}", identifier.getSystem(), identifier.getValue(), id);
 			immunization.setPatient(new Reference("Patient/" + new IdType(id).getIdPart()));
 			requestDetails.setResource(immunization);
 		} else {
@@ -61,17 +63,17 @@ public class IdentifierSolverInterceptorR4 extends IdentifierSolverInterceptor<P
 		if (observation == null) {
 			return;
 		}
+		/*
+		 * Look for golden record
+		 */
 		Identifier identifier = observation.getSubject().getIdentifier();
 		if (identifier == null || identifier.getValue() == null || identifier.getSystem() == null) {
 			return;
 		}
-		/*
-		 * Look for golden record
-		 */
 		String id = solvePatientIdentifier(requestDetails, identifier);
 
 		if (id != null) {
-			logger.info("Identifier reference solved {}|{} to {} for Observation", identifier.getSystem(), identifier.getValue(), id);
+			logger.info("Identifier reference solved {}|{} to {}", identifier.getSystem(), identifier.getValue(), id);
 			observation.setSubject(new Reference("Patient/" + new IdType(id).getIdPart()));
 			requestDetails.setResource(observation);
 		} else {
@@ -100,6 +102,7 @@ public class IdentifierSolverInterceptorR4 extends IdentifierSolverInterceptor<P
 		}
 		requestDetails.setResource(group);
 	}
+
 
 	public String solvePatientIdentifier(RequestDetails requestDetails, Identifier identifier) {
 		return solvePatientIdentifier(requestDetails, businessIdentifierMapper.localObject(identifier));
