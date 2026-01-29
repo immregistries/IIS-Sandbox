@@ -133,6 +133,9 @@ public class ServerConfig {
 		/*
 		 * CUSTOM PROVIDERS HERE
 		 */
+		fhirServer.registerProviders(iisFhirSimpleProviders);
+		theIpsOperationProvider.ifPresent(fhirServer::registerProvider);
+
 		if (false) {
 //			resourceProviderFactory.removeSupplier();
 		}
@@ -264,21 +267,19 @@ public class ServerConfig {
 		fhirServer.registerProvider(reindexProvider);
 
 		// Partitioning
-		if (appProperties.getPartitioning() != null) {
-			/*
-			 * Registered custom interceptor for automatic partition generation
-			 * Rest is dealt with in PartitionModeConfigurer.class
-			 */
-			// Registered later as autowired into the list of IisInterceptor
-//			fhirServer.registerInterceptor(partitionTenantCreationInterceptor);
-			fhirServer.setTenantIdentificationStrategy(new UrlBaseTenantIdentificationStrategy());
-			fhirServer.registerProviders(partitionManagementProvider);
-		}
+//		if (appProperties.getPartitioning() != null) {
+//			/*
+//			 * Registered custom interceptor for automatic partition generation
+//			 * Rest is dealt with in PartitionModeConfigurer.class
+//			 */
+//			// Registered later as autowired into the list of IisInterceptor
+////			fhirServer.registerInterceptor(partitionTenantCreationInterceptor);
+//			fhirServer.setTenantIdentificationStrategy(new UrlBaseTenantIdentificationStrategy());
+//			fhirServer.registerProviders(partitionManagementProvider);
+//		}
 		repositoryValidatingInterceptor.ifPresent(fhirServer::registerInterceptor);
 
 		//register the IPS Provider
-		fhirServer.registerProvider(iisFhirSimpleProviders);
-		theIpsOperationProvider.ifPresent(fhirServer::registerProvider);
 
 		/*
 		 * CUSTOM INTERCEPTORS HERE

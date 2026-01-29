@@ -1,10 +1,12 @@
 package org.immregistries.iis.kernal.fhir.common;
 
 import ca.uhn.fhir.context.FhirContext;
+import ca.uhn.fhir.jpa.interceptor.PatientIdPartitionInterceptor;
 import ca.uhn.fhir.jpa.model.config.PartitionSettings;
 import ca.uhn.fhir.jpa.partition.PartitionManagementProvider;
 import ca.uhn.fhir.jpa.searchparam.extractor.ISearchParamExtractor;
 import ca.uhn.fhir.rest.server.RestfulServer;
+import ca.uhn.fhir.rest.server.tenant.UrlBaseTenantIdentificationStrategy;
 import jakarta.annotation.PostConstruct;
 import org.immregistries.iis.kernal.flogic.multitenancy.PartitionTenantCreationInterceptor;
 import org.slf4j.Logger;
@@ -40,15 +42,14 @@ public class PartitionModeConfigurer {
 		if (myAppProperties.getPartitioning() != null) {
 			if (myAppProperties.getPartitioning().getPatient_id_partitioning_mode() == Boolean.TRUE) {
 				ourLog.info("Partitioning mode enabled in: Patient ID partitioning mode");
-//				PatientIdPartitionInter ceptor patientIdInterceptor =
-//					new PatientIdPartitionInterceptor(myFhirContext, mySearchParamExtractor, myPartitionSettings);
-//				myRestfulServer.registerInterceptor(patientIdInterceptor);
-//				myPartitionSettings.setUnnamedPartitionMode(true);
+				PatientIdPartitionInterceptor patientIdInterceptor =
+					new PatientIdPartitionInterceptor(myFhirContext, mySearchParamExtractor, myPartitionSettings);
+				myRestfulServer.registerInterceptor(patientIdInterceptor);
+				myPartitionSettings.setUnnamedPartitionMode(true);
 			} else if (myAppProperties.getPartitioning().getRequest_tenant_partitioning_mode() == Boolean.TRUE) {
 				ourLog.info("Partitioning mode enabled in: Request tenant partitioning mode");
-				// DEALT WITH IN MAIN CONFIG
-//				myRestfulServer.registerInterceptor(partitionCreationInterceptor);
-//				myRestfulServer.setTenantIdentificationStrategy(new UrlBaseTenantIdentificationStrategy());
+				myRestfulServer.registerInterceptor(partitionTenantCreationInterceptor);
+				myRestfulServer.setTenantIdentificationStrategy(new UrlBaseTenantIdentificationStrategy());
 			}
 //
 //			myRestfulServer.registerProviders(myPartitionManagementProvider);

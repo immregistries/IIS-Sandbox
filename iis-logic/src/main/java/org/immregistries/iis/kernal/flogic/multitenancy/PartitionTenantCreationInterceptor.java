@@ -24,7 +24,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Interceptor
-public class PartitionTenantCreationInterceptor extends RequestTenantPartitionInterceptor implements IisFhirInterceptor {
+public class PartitionTenantCreationInterceptor extends RequestTenantPartitionInterceptor {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	@Autowired
