@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal.flogic.multitenancy;
+package org.immregistries.iis.kernal.fhir.multitenancy;
 
 import ca.uhn.fhir.interceptor.api.Hook;
 import ca.uhn.fhir.interceptor.api.Pointcut;
@@ -7,8 +7,8 @@ import ca.uhn.fhir.rest.api.server.RequestDetails;
 import ca.uhn.fhir.rest.server.interceptor.partition.RequestTenantPartitionInterceptor;
 import jakarta.annotation.Nonnull;
 import jakarta.interceptor.Interceptor;
-import org.immregistries.iis.kernal.services.PartitionNameExtractorService;
 import org.immregistries.iis.kernal.services.PartitionCreationService;
+import org.immregistries.iis.kernal.services.PartitionNameExtractorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

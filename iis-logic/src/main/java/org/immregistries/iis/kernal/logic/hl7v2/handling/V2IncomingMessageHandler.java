@@ -8,9 +8,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.instance.model.api.IIdType;
 import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.iis.kernal.SoftwareVersion;
-import org.immregistries.iis.kernal.flogic.validation.ImmunizationProcessingInterceptor;
-import org.immregistries.iis.kernal.flogic.validation.ObservationProcessingInterceptor;
-import org.immregistries.iis.kernal.flogic.validation.PatientProcessingInterceptor;
 import org.immregistries.iis.kernal.services.CodeMapManagerService;
 import org.immregistries.iis.kernal.services.MessageRecordingService;
 import org.immregistries.iis.kernal.logic.hl7v2.ack.*;
@@ -77,11 +74,11 @@ public class V2IncomingMessageHandler extends IncomingMessageHandler<HL7Reader, 
 	private V2OrganizationService v2OrganizationService;
 
 	@Autowired
-	private PatientProcessingInterceptor patientProcessingInterceptor; // TODO decide how/where to implement the execution of interceptors, currently using DAO so some interceptors are skipped by the v2 process and need to be manually triggered
+	private PatientValidator patientValidator; // TODO decide how/where to implement the execution of interceptors, currently using DAO so some interceptors are skipped by the v2 process and need to be manually triggered
 	@Autowired
-	private ObservationProcessingInterceptor observationProcessingInterceptor;
+	private ObservationValidator observationValidator;
 	@Autowired
-	private ImmunizationProcessingInterceptor immunizationProcessingInterceptor;
+	private ImmunizationValidator immunizationValidator;
 
 
 	public V2IncomingMessageHandler() {
@@ -232,7 +229,7 @@ public class V2IncomingMessageHandler extends IncomingMessageHandler<HL7Reader, 
 			 */
 			if (StringUtils.isBlank(subId) || !StringUtils.equals(previousSubId, subId)) {
 				if (currentMainObservation != null) {
-					observationProcessingInterceptor.processAndValidateObservationReported(currentMainObservation, iisReportableList, processingFlavorSet, obxCount, patientReported.getBirthDate());
+					observationValidator.processAndValidateObservationReported(currentMainObservation, iisReportableList, processingFlavorSet, obxCount, patientReported.getBirthDate());
 					fhirSaveRequester.saveObservationReported(currentMainObservation);
 					currentMainObservation = null;
 				}
@@ -255,7 +252,7 @@ public class V2IncomingMessageHandler extends IncomingMessageHandler<HL7Reader, 
 			previousSubId = subId;
 		}
 		if (currentMainObservation != null) {
-			observationProcessingInterceptor.processAndValidateObservationReported(currentMainObservation, iisReportableList, processingFlavorSet, obxCount, patientReported.getBirthDate());
+			observationValidator.processAndValidateObservationReported(currentMainObservation, iisReportableList, processingFlavorSet, obxCount, patientReported.getBirthDate());
 			fhirSaveRequester.saveObservationReported(currentMainObservation);
 		}
 		return obxCount;
@@ -325,7 +322,7 @@ public class V2IncomingMessageHandler extends IncomingMessageHandler<HL7Reader, 
 		}
 		reader.resetPostion();
 
-		patientProcessingInterceptor.processAndValidatePatient(patientReported, iisReportableList, processingFlavorSet);
+		patientValidator.processAndValidatePatient(patientReported, iisReportableList, processingFlavorSet);
 		IIncomingMessageHandler.verifyNoErrors(iisReportableList);
 
 		patientReported.setUpdatedDate(new Date());
@@ -631,7 +628,7 @@ public class V2IncomingMessageHandler extends IncomingMessageHandler<HL7Reader, 
 			}
 
 			IIncomingMessageHandler.verifyNoErrors(iisReportableList);
-			immunizationProcessingInterceptor.processAndValidateVaccinationReported(vaccinationReported, iisReportableList, processingFlavorSet, fundingSourceObxCount, fundingEligibilityObxCount, rxaCount, vaccineCptCode);
+			immunizationValidator.processAndValidateVaccinationReported(vaccinationReported, iisReportableList, processingFlavorSet, fundingSourceObxCount, fundingEligibilityObxCount, rxaCount, vaccineCptCode);
 			vaccinationReported = fhirSaveRequester.saveVaccinationReported(vaccinationReported);
 			vaccinationReportedList.add(vaccinationReported);
 			reader.gotoSegmentPosition(segmentPosition);

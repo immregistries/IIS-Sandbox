@@ -5,9 +5,9 @@ import org.hl7.fhir.instance.model.api.IIdType;
 import org.hl7.fhir.r4.model.*;
 import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
-import org.immregistries.iis.kernal.flogic.validation.ImmunizationProcessingInterceptor;
-import org.immregistries.iis.kernal.flogic.validation.ObservationProcessingInterceptor;
-import org.immregistries.iis.kernal.flogic.validation.PatientProcessingInterceptor;
+import org.immregistries.iis.kernal.logic.validation.ImmunizationValidator;
+import org.immregistries.iis.kernal.logic.validation.ObservationValidator;
+import org.immregistries.iis.kernal.logic.validation.PatientValidator;
 import org.immregistries.iis.kernal.logic.validation.ProcessingException;
 import org.immregistries.iis.kernal.mapping.mappers.resources.ImmunizationMapper;
 import org.immregistries.iis.kernal.mapping.mappers.resources.r4.*;
@@ -50,11 +50,11 @@ public class FhirMessagingHandler extends IncomingMessageHandler<Bundle, Object>
 	private LocationMapperR4 locationMapper;
 
 	@Autowired
-	private PatientProcessingInterceptor patientProcessingInterceptor;
+	private PatientValidator patientValidator;
 	@Autowired
-	private ObservationProcessingInterceptor observationProcessingInterceptor;
+	private ObservationValidator observationValidator;
 	@Autowired
-	private ImmunizationProcessingInterceptor immunizationProcessingInterceptor;
+	private ImmunizationValidator immunizationValidator;
 
 	@Override
 	public String extractMessageType(Bundle bundle) {
@@ -94,7 +94,7 @@ public class FhirMessagingHandler extends IncomingMessageHandler<Bundle, Object>
 			patientReported.setManagingOrganizationId("Organization/" + managingOrganizationId.getIdPart());
 		}
 
-		patientReported = patientProcessingInterceptor.processAndValidatePatient(patientReported, iisReportableList,
+		patientReported = patientValidator.processAndValidatePatient(patientReported, iisReportableList,
 				processingFlavorSet);
 		IIncomingMessageHandler.verifyNoErrors(iisReportableList);
 		patientReported.setUpdatedDate(new Date());
@@ -148,7 +148,7 @@ public class FhirMessagingHandler extends IncomingMessageHandler<Bundle, Object>
 						}
 					}
 				}
-				vaccinationReported = immunizationProcessingInterceptor.processAndValidateVaccinationReported(
+				vaccinationReported = immunizationValidator.processAndValidateVaccinationReported(
 						vaccinationReported, iisReportableList, processingFlavorSet, -1, -1, -1, null);
 				vaccinationReported = fhirSaveRequester.saveVaccinationReported(vaccinationReported);
 				vaccinationReportedList.add(vaccinationReported);

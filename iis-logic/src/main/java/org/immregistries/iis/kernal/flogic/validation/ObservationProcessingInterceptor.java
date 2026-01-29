@@ -9,6 +9,7 @@ import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
+import org.immregistries.iis.kernal.logic.validation.ObservationValidator;
 import org.immregistries.iis.kernal.logic.validation.ProcessingException;
 import org.immregistries.iis.kernal.services.CodeMapManagerService;
 import org.immregistries.iis.kernal.logic.hl7v2.ack.IisReportableUtilService;
@@ -38,9 +39,7 @@ public class ObservationProcessingInterceptor extends IisLogicInterceptor {
 	@Autowired
 	private ObservationMapper observationMapper;
 	@Autowired
-	private CodeMapManagerService codeMapManagerService;
-	@Autowired
-	private IisReportableUtilService iisReportableUtilService;
+	private ObservationValidator observationValidator;
 
 	@Hook(value = SERVER_INCOMING_REQUEST_PRE_HANDLED, order = 2001)
 	public void handle(RequestDetails requestDetails) throws InvalidRequestException, ProcessingException {
@@ -60,38 +59,12 @@ public class ObservationProcessingInterceptor extends IisLogicInterceptor {
 		IAnyResource result = (IAnyResource) requestDetails.getResource();
 		if (requestDetails.getRestOperationType().equals(RestOperationTypeEnum.CREATE) || requestDetails.getRestOperationType().equals(RestOperationTypeEnum.CREATE)) {
 			if (requestDetails.getResource() instanceof org.hl7.fhir.r4.model.Observation || requestDetails.getResource() instanceof org.hl7.fhir.r5.model.Observation) {
-				ObservationReported observationReported = processAndValidateObservationReported(observationMapper.localObjectReported(result), iisReportableList, processingFlavorSet, obxCount, patientBirthDate);
+				ObservationReported observationReported = observationValidator.processAndValidateObservationReported(observationMapper.localObjectReported(result), iisReportableList, processingFlavorSet, obxCount, patientBirthDate);
 				result = observationMapper.fhirObject(observationReported);
 			}
 		}
 		requestDetails.setResource(result);
 		requestDetails.setAttribute(IIS_REPORTABLE_LIST, iisReportableList);
-	}
-
-	public ObservationReported processAndValidateObservationReported(ObservationReported observationReported, List<IisReportable> iisReportableList, Set<ProcessingFlavor> processingFlavorSet, int obxCount, Date patientBirthDate) throws ProcessingException {
-		testMapping(observationMapper, observationReported);
-		if ("30945-0".equals(observationReported.getIdentifierCode())) // contraindication!
-		{
-			CodeMap codeMap = codeMapManagerService.getCodeMap();
-			Code contraCode = codeMap.getCodeForCodeset(CodesetType.CONTRAINDICATION_OR_PRECAUTION, observationReported.getValueCode());
-			if (contraCode == null) {
-				ProcessingException pe = new ProcessingException("Unrecognized contraindication or precaution", "OBX", obxCount, 5, IisReportableSeverity.WARN);
-				iisReportableList.add(iisReportableUtilService.fromProcessingException(pe));
-			}
-			if (observationReported.getObservationDate() != null) {
-				Date today = new Date();
-				if (observationReported.getObservationDate().after(today)) {
-					ProcessingException pe = new ProcessingException("Contraindication or precaution observed in the future", "OBX", obxCount, 5, IisReportableSeverity.WARN);
-					iisReportableList.add(iisReportableUtilService.fromProcessingException(pe));
-				}
-				if (patientBirthDate != null && observationReported.getObservationDate().before(patientBirthDate)) {
-					ProcessingException pe = new ProcessingException("Contraindication or precaution observed before patient was born", "OBX", obxCount, 14, IisReportableSeverity.WARN);
-					iisReportableList.add(iisReportableUtilService.fromProcessingException(pe));
-				} 
-			}
-		}
-		return observationReported;
-
 	}
 
 
