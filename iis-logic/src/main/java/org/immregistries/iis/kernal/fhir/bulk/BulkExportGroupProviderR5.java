@@ -32,8 +32,8 @@ import org.hl7.fhir.instance.model.api.IIdType;
 import org.hl7.fhir.instance.model.api.IPrimitiveType;
 import org.hl7.fhir.r5.model.*;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR5Condition;
-import org.immregistries.iis.kernal.flogic.interceptors.IdentifierSolverInterceptorR5;
-import org.immregistries.iis.kernal.flogic.multitenancy.PartitionTenantCreationInterceptor;
+import org.immregistries.iis.kernal.mapping.requesters.FhirIdentifierSolver;
+import org.immregistries.iis.kernal.services.PartitionNameExtractorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,11 +53,14 @@ public class BulkExportGroupProviderR5 extends GroupResourceProvider implements 
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	@Autowired
+	private FhirIdentifierSolver fhirIdentifierSolver;
+	@Autowired
+	private PartitionNameExtractorService partitionNameExtractorService;
+
+	@Autowired
 	private BaseJpaResourceProviderPatient<Patient> patientProvider;
 	@Autowired
 	private IFhirResourceDao<Binary> binaryDao;
-	@Autowired
-	private IdentifierSolverInterceptorR5 identifierSolverInterceptorR5;
 	@Autowired
 	private IFhirResourceDao<Patient> patientIFhirResourceDao;
 
@@ -200,7 +203,7 @@ public class BulkExportGroupProviderR5 extends GroupResourceProvider implements 
 
 		IParser parser = fhirResourceGroupDao.getContext().newNDJsonParser();
 		RequestDetails detailsCopy = new SystemRequestDetails();
-		detailsCopy.setTenantId(PartitionTenantCreationInterceptor.extractPartitionName(theRequestDetails));
+		detailsCopy.setTenantId(partitionNameExtractorService.extractPartitionName(theRequestDetails));
 		for (Map.Entry<String, Bundle> entry : bundleMap.entrySet()) {
 			Binary binary = new Binary();
 			binary.setContentType("Bulk");
@@ -374,7 +377,7 @@ public class BulkExportGroupProviderR5 extends GroupResourceProvider implements 
 							.findFirst()
 							.orElse(group.getMember().stream()
 									.filter((member) -> member.getEntity().getReference()
-											.equals(identifierSolverInterceptorR5
+											.equals(fhirIdentifierSolver
 													.solvePatientIdentifier(theRequestDetails, memberId)))
 									.findFirst().orElse(null)));
 

@@ -8,6 +8,7 @@ import org.hl7.fhir.r5.model.*;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR5Condition;
 import org.immregistries.iis.kernal.mapping.mappers.fields.BusinessIdentifierMapper;
 import org.immregistries.iis.kernal.mapping.mappers.resources.ImmunizationMapper;
+import org.immregistries.iis.kernal.mapping.requesters.FhirIdentifierSolver;
 import org.immregistries.iis.kernal.model.BusinessIdentifier;
 import org.immregistries.iis.kernal.model.ModelReference;
 import org.slf4j.Logger;
@@ -25,9 +26,10 @@ public class IdentifierSolverInterceptorR5 extends IdentifierSolverInterceptor<P
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	@Autowired
-	private BusinessIdentifierMapper<Identifier> businessIdentifierMapper;
-	@Autowired
 	private ImmunizationMapper<Immunization> immunizationMapper;
+
+	@Autowired
+	private FhirIdentifierSolver fhirIdentifierSolver;
 
 	@Override
 	public void handleImmunization(RequestDetails requestDetails, Immunization immunization) {
@@ -42,7 +44,7 @@ public class IdentifierSolverInterceptorR5 extends IdentifierSolverInterceptor<P
 		/*
 		 * Look for golden record
 		 */
-		String id = solvePatientIdentifier(requestDetails, identifier);
+		String id = fhirIdentifierSolver.solvePatientIdentifier(requestDetails, identifier);
 
 		if (id != null) {
 			logger.info("Identifier reference solved {}|{} to {}", identifier.getSystem(), identifier.getValue(), id);
@@ -70,7 +72,7 @@ public class IdentifierSolverInterceptorR5 extends IdentifierSolverInterceptor<P
 		if (identifier == null || identifier.getValue() == null || identifier.getSystem() == null) {
 			return;
 		}
-		String id = solvePatientIdentifier(requestDetails, identifier);
+		String id = fhirIdentifierSolver.solvePatientIdentifier(requestDetails, identifier);
 
 		if (id != null) {
 			logger.info("Identifier reference solved {}|{} to {}", identifier.getSystem(), identifier.getValue(), id);
@@ -94,7 +96,7 @@ public class IdentifierSolverInterceptorR5 extends IdentifierSolverInterceptor<P
 				break;
 			}
 			Identifier identifier = memberComponent.getEntity().getIdentifier();
-			String id = solvePatientIdentifier(requestDetails, identifier);
+			String id = fhirIdentifierSolver.solvePatientIdentifier(requestDetails, identifier);
 			if (StringUtils.isNotBlank(id)) {
 				logger.info("Identifier reference solved {}|{} to {} for Group", identifier.getSystem(), identifier.getValue(), id);
 				memberComponent.setEntity(new Reference("Patient/" + new IdType(id).getIdPart()).setIdentifier(identifier));
@@ -103,8 +105,4 @@ public class IdentifierSolverInterceptorR5 extends IdentifierSolverInterceptor<P
 		requestDetails.setResource(group);
 	}
 
-
-	public String solvePatientIdentifier(RequestDetails requestDetails, Identifier identifier) {
-		return solvePatientIdentifier(requestDetails, businessIdentifierMapper.localObject(identifier));
-	}
 }

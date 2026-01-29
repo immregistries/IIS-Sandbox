@@ -1,17 +1,13 @@
 package org.immregistries.iis.kernal.flogic.multitenancy;
 
-import ca.uhn.fhir.i18n.Msg;
 import ca.uhn.fhir.interceptor.api.Hook;
 import ca.uhn.fhir.interceptor.api.Pointcut;
 import ca.uhn.fhir.interceptor.model.RequestPartitionId;
 import ca.uhn.fhir.rest.api.server.RequestDetails;
-import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
 import ca.uhn.fhir.rest.server.interceptor.partition.RequestTenantPartitionInterceptor;
 import jakarta.annotation.Nonnull;
 import jakarta.interceptor.Interceptor;
-import org.apache.commons.lang3.StringUtils;
-import org.immregistries.iis.kernal.GlobalConstants;
-import org.immregistries.iis.kernal.fhir.IisFhirInterceptor;
+import org.immregistries.iis.kernal.services.PartitionNameExtractorService;
 import org.immregistries.iis.kernal.services.PartitionCreationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +23,8 @@ import org.springframework.stereotype.Component;
 public class PartitionTenantCreationInterceptor extends RequestTenantPartitionInterceptor {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
+	@Autowired
+	public PartitionNameExtractorService partitionNameExtractorService;
 	@Autowired
 	public PartitionCreationService partitionCreationService;
 
@@ -54,27 +52,9 @@ public class PartitionTenantCreationInterceptor extends RequestTenantPartitionIn
 	@Override
 	@Nonnull
 	protected RequestPartitionId extractPartitionIdFromRequest(RequestDetails theRequestDetails) {
-		String partitionName = extractPartitionName(theRequestDetails);
+		String partitionName = partitionNameExtractorService.extractPartitionName(theRequestDetails);
 		return  partitionCreationService.getOrCreatePartitionId(partitionName);
 	}
-
-	public static String extractPartitionName(RequestDetails requestDetails) {
-		String tenantId = requestDetails.getTenantId();
-		if (StringUtils.isBlank(tenantId)) {
-			throw new InvalidRequestException(Msg.code(343) + "No tenant ID was specified");
-		} else {
-			if (requestDetails.getTenantId().equals("ConnectathonUnsafe")) {
-				return GlobalConstants.CONNECTATHON_USER;
-			}
-//			String[] ids = tenantId.split(PARTITION_NAME_SEPARATOR);
-//			if (ids.length < 2){
-//				throw new InvalidRequestException(Msg.code(343) + "No facility ID has been specified, expected structure is fhir/{tenantId}-{facilityId}");
-//			}
-			return tenantId;
-		}
-	}
-
-
 
 
 }

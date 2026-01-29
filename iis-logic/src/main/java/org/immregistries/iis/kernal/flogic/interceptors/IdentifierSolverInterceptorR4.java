@@ -8,6 +8,7 @@ import org.hl7.fhir.r4.model.*;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
 import org.immregistries.iis.kernal.mapping.mappers.fields.BusinessIdentifierMapper;
 import org.immregistries.iis.kernal.mapping.mappers.resources.ImmunizationMapper;
+import org.immregistries.iis.kernal.mapping.requesters.FhirIdentifierSolver;
 import org.immregistries.iis.kernal.model.BusinessIdentifier;
 import org.immregistries.iis.kernal.model.ModelReference;
 import org.slf4j.Logger;
@@ -28,6 +29,8 @@ public class IdentifierSolverInterceptorR4 extends IdentifierSolverInterceptor<P
 	private BusinessIdentifierMapper<Identifier> businessIdentifierMapper;
 	@Autowired
 	private ImmunizationMapper<Immunization> immunizationMapper;
+	@Autowired
+	private FhirIdentifierSolver fhirIdentifierSolver;
 
 	public void handleImmunization(RequestDetails requestDetails, Immunization immunization) {
 		if (immunization == null) {
@@ -41,7 +44,7 @@ public class IdentifierSolverInterceptorR4 extends IdentifierSolverInterceptor<P
 		/*
 		 * Look for golden record
 		 */
-		String id = solvePatientIdentifier(requestDetails, identifier);
+		String id = fhirIdentifierSolver.solvePatientIdentifier(requestDetails, identifier);
 		if (id != null) {
 			logger.info("Identifier reference solved {}|{} to {} for Immunization", identifier.getSystem(), identifier.getValue(), id);
 			immunization.setPatient(new Reference("Patient/" + new IdType(id).getIdPart()));
@@ -102,6 +105,6 @@ public class IdentifierSolverInterceptorR4 extends IdentifierSolverInterceptor<P
 	}
 
 	public String solvePatientIdentifier(RequestDetails requestDetails, Identifier identifier) {
-		return solvePatientIdentifier(requestDetails, businessIdentifierMapper.localObject(identifier));
+		return fhirIdentifierSolver.solvePatientIdentifier(requestDetails, businessIdentifierMapper.localObject(identifier));
 	}
 }

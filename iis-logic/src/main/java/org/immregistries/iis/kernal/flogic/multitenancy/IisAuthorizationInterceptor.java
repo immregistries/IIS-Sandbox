@@ -22,6 +22,7 @@ import org.immregistries.iis.kernal.persisted.repository.UserAccessRepository;
 import org.immregistries.iis.kernal.security.JwtUtils;
 import org.immregistries.iis.kernal.security.TenantAuthService;
 import org.immregistries.iis.kernal.security.UserAccessUtil;
+import org.immregistries.iis.kernal.services.PartitionNameExtractorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,6 +55,9 @@ public class IisAuthorizationInterceptor extends AuthorizationInterceptor implem
 	@Autowired
 	private TenantAuthService tenantAuthService;
 
+	@Autowired
+	private PartitionNameExtractorService partitionNameExtractorService;
+
 	/**
 	 * Authenticates request with Session cookie, Basic Auth (Token bearer currently
 	 * only for specific usage ) and produces HAPI FHIR Authorization rules
@@ -72,7 +76,7 @@ public class IisAuthorizationInterceptor extends AuthorizationInterceptor implem
 		String authHeader = theRequestDetails.getHeader("Authorization");
 		Tenant tenant = null;
 		try {
-			if (PartitionTenantCreationInterceptor.extractPartitionName(theRequestDetails).equals(GlobalConstants.CONNECTATHON_USER)) {
+			if (partitionNameExtractorService.extractPartitionName(theRequestDetails).equals(GlobalConstants.CONNECTATHON_USER)) {
 				if (theRequestDetails.getTenantId().endsWith("Unsafe")) {
 					return connectathonUserAuthorized(theRequestDetails).build();
 				}
@@ -89,7 +93,7 @@ public class IisAuthorizationInterceptor extends AuthorizationInterceptor implem
 				 * Basic auth
 				 */
 				tenant = tryAuthHeaderBasic(authHeader,
-						PartitionTenantCreationInterceptor.extractPartitionName(theRequestDetails));
+					partitionNameExtractorService.extractPartitionName(theRequestDetails));
 				/*
 				 * Token bearer TODO
 				 */
@@ -104,7 +108,7 @@ public class IisAuthorizationInterceptor extends AuthorizationInterceptor implem
 					 */
 					if (userAccess != null) {
 						tenant = tenantAuthService.authenticateTenant(userAccess,
-								PartitionTenantCreationInterceptor.extractPartitionName(theRequestDetails));
+							partitionNameExtractorService.extractPartitionName(theRequestDetails));
 					}
 				}
 			}

@@ -41,16 +41,6 @@ public abstract class IdentifierSolverInterceptor<Patient extends IDomainResourc
 	public static final String PATIENT_SP_IDENTIFIER = "identifier";
 	@Autowired
 	private FhirContext fhirContext;
-	@Autowired
-	private ImmunizationMapper<Immunization> immunizationMapper;
-
-	private IFhirResourceDao<Patient> patientDao;
-
-
-	@Autowired
-	public void setDaoRegistry(DaoRegistry daoRegistry) {
-		this.patientDao = daoRegistry.getResourceDao(ResourceType.Patient.name());
-	}
 
 	/**
 	 * Resolves patient business identifier references to the actual references id if known
@@ -100,70 +90,6 @@ public abstract class IdentifierSolverInterceptor<Patient extends IDomainResourc
 	 */
 	abstract void handleGroup(RequestDetails requestDetails, Group group);
 
-	/**
-	 * Searches for PatientId matching Patient Identifier
-	 *
-	 * @param requestDetails RequestDetails to extract Partition Id from
-	 * @param identifier     identifier
-	 * @return Patient id or null
-	 */
-	public String solvePatientIdentifier(RequestDetails requestDetails, BusinessIdentifier identifier) {
-		RequestPartitionId thePartitionId = RequestPartitionId.fromPartitionName(PartitionTenantCreationInterceptor.extractPartitionName(requestDetails));
-		return solvePatientIdentifier(thePartitionId, identifier);
-	}
-
-	/**
-	 * Searches for PatientId matching Patient Identifier
-	 *
-	 * @param thePartitionId PartitionId used to search
-	 * @param identifier     identifier
-	 * @return Patient id or null
-	 */
-	public String solvePatientIdentifier(RequestPartitionId thePartitionId, BusinessIdentifier identifier) {
-		SystemRequestDetails systemRequestDetails = SystemRequestDetails.forRequestPartitionId(thePartitionId);
-		String id = null;
-		/*
-		 * searching for matching patient golden record first
-		 */
-		SearchParameterMap goldenSearchParameterMap = new SearchParameterMap()
-			.add("_tag", new TokenParam()
-				.setSystem(GOLDEN_SYSTEM_TAG)
-				.setValue(GOLDEN_RECORD));
-		if (StringUtils.isNotBlank(identifier.getSystem())) {
-			goldenSearchParameterMap.add(PATIENT_SP_IDENTIFIER, new TokenParam()
-				.setSystem(identifier.getSystem())
-				.setValue(identifier.getValue()));
-		} else {
-			goldenSearchParameterMap.add(PATIENT_SP_IDENTIFIER, new TokenParam()
-				.setValue(identifier.getValue()));
-		}
-
-		// TODO get golden record, or merge and add identifiers to golden record
-		IBundleProvider goldenBundleProvider = patientDao.search(goldenSearchParameterMap, systemRequestDetails);
-		if (!goldenBundleProvider.isEmpty()) {
-			id = goldenBundleProvider.getAllResourceIds().get(0);
-		} else {
-			/*
-			 * If no golden record matched, regular records are checked
-			 */
-			// TODO set flavor
-			SearchParameterMap searchParameterMap = new SearchParameterMap();
-			if (StringUtils.isNotBlank(identifier.getSystem())) {
-				searchParameterMap.add(PATIENT_SP_IDENTIFIER, new TokenParam()
-					.setSystem(identifier.getSystem())
-					.setValue(identifier.getValue()));
-			} else {
-				searchParameterMap.add(PATIENT_SP_IDENTIFIER, new TokenParam()
-					.setValue(identifier.getValue()));
-			}
-
-			IBundleProvider bundleProvider = patientDao.search(searchParameterMap, systemRequestDetails);
-			if (!bundleProvider.isEmpty()) {
-				id = bundleProvider.getAllResourceIds().get(0);
-			}
-		}
-		return id;
-	}
 
 
 }
