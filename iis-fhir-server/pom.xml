@@ -17,4 +17,12 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
+    <dependencies>
+        <dependency>
+            <groupId>org.immregistries.iis</groupId>
+            <artifactId>iis-logic</artifactId>
+            <version>0.6.3-SNAPSHOT-HAPI-UPGRADE-TEST</version>
+        </dependency>
+    </dependencies>
+
 </project>

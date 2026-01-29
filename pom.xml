@@ -54,6 +54,7 @@
         <module>iis-core-commons</module>
         <module>iis-fhir-bulk-export</module>
         <module>iis-fhir-server</module>
+        <module>iis-fhir-logic</module>
     </modules>
 
     <dependencyManagement>
