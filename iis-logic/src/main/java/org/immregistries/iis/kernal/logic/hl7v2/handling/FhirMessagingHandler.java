@@ -4,7 +4,7 @@ import ca.uhn.fhir.context.FhirContext;
 import org.hl7.fhir.instance.model.api.IIdType;
 import org.hl7.fhir.r4.model.*;
 import org.immregistries.codebase.client.CodeMap;
-import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
+import org.immregistries.iis.fhir.annotations.OnR4Condition;
 import org.immregistries.iis.kernal.logic.validation.ImmunizationValidator;
 import org.immregistries.iis.kernal.logic.validation.ObservationValidator;
 import org.immregistries.iis.kernal.logic.validation.PatientValidator;

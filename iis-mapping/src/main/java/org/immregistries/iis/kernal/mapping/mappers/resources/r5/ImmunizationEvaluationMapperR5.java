@@ -2,7 +2,7 @@ package org.immregistries.iis.kernal.mapping.mappers.resources.r5;
 
 import org.hl7.fhir.r5.model.ImmunizationEvaluation;
 import org.hl7.fhir.r5.model.Reference;
-import org.immregistries.iis.kernal.fhir.common.annotations.OnR5Condition;
+import org.immregistries.iis.fhir.annotations.OnR5Condition;
 import org.immregistries.iis.kernal.mapping.mappers.fields.r5.BusinessIdentifierMapperR5;
 import org.immregistries.iis.kernal.mapping.mappers.resources.ImmunizationEvaluationMapper;
 import org.immregistries.iis.kernal.model.IisEvaluation;

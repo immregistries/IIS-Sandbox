@@ -5,7 +5,7 @@ import ca.uhn.fhir.rest.param.ReferenceParam;
 import org.hl7.fhir.r5.model.ImmunizationEvaluation;
 import org.hl7.fhir.r5.model.ImmunizationRecommendation;
 import org.hl7.fhir.r5.model.Parameters;
-import org.immregistries.iis.kernal.fhir.common.annotations.OnR5Condition;
+import org.immregistries.iis.fhir.annotations.OnR5Condition;
 import org.immregistries.iis.kernal.mapping.mappers.resources.r5.ImmunizationEvaluationMapperR5;
 import org.immregistries.iis.kernal.mapping.mappers.resources.r5.ImmunizationRecommendationMapperR5;
 import org.immregistries.iis.kernal.mapping.requesters.FhirSearchRequester;

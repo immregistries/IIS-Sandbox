@@ -1,7 +1,7 @@
 package org.immregistries.iis.kernal.mapping.mappers.fields.r4;
 
 import org.hl7.fhir.r4.model.HumanName;
-import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
+import org.immregistries.iis.fhir.annotations.OnR4Condition;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
 import org.immregistries.iis.kernal.mapping.mappers.fields.ModelNameMapper;
 import org.immregistries.iis.kernal.model.ModelName;

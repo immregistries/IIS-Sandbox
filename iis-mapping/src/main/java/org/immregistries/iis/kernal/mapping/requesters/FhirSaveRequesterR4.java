@@ -5,7 +5,7 @@ import ca.uhn.fhir.rest.gclient.ICriterion;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.hl7.fhir.r4.model.*;
-import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
+import org.immregistries.iis.fhir.annotations.OnR4Condition;
 import org.immregistries.iis.kernal.mapping.MappingService;
 import org.immregistries.iis.kernal.mapping.mappers.resources.*;
 import org.immregistries.iis.kernal.model.*;

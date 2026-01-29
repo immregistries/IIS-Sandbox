@@ -1,7 +1,7 @@
 package org.immregistries.iis.kernal.mapping.mappers.resources.r4;
 
 import org.hl7.fhir.r4.model.RelatedPerson;
-import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
+import org.immregistries.iis.fhir.annotations.OnR4Condition;
 import org.immregistries.iis.kernal.mapping.mappers.resources.RelatedPersonMapper;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Service;

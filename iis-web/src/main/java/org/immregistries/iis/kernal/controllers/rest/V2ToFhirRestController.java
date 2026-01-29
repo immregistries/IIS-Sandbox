@@ -1,12 +1,11 @@
 package org.immregistries.iis.kernal.controllers.rest;
 
-import org.immregistries.iis.kernal.controllers.IisRestParam;
-import org.immregistries.iis.kernal.controllers.IisRestPath;
-
 import ca.uhn.hl7v2.HL7Exception;
 import gov.cdc.izgw.v2tofhir.converter.MessageParser;
 import org.hl7.fhir.r4.model.Bundle;
-import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
+import org.immregistries.iis.fhir.annotations.OnR4Condition;
+import org.immregistries.iis.kernal.controllers.IisRestParam;
+import org.immregistries.iis.kernal.controllers.IisRestPath;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.web.bind.annotation.*;

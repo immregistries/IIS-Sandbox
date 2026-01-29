@@ -2,7 +2,7 @@ package org.immregistries.iis.kernal.logic.match;
 
 import ca.uhn.fhir.interceptor.model.RequestPartitionId;
 import org.apache.commons.lang3.StringUtils;
-import org.immregistries.iis.kernal.fhir.common.annotations.OnR5Condition;
+import org.immregistries.iis.fhir.annotations.OnR5Condition;
 import org.immregistries.iis.kernal.mapping.mappers.resources.ImmunizationMapper;
 import org.immregistries.vaccination_deduplication.reference.ImmunizationSource;
 import org.springframework.context.annotation.Conditional;

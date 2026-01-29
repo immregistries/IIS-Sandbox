@@ -1,7 +1,7 @@
 package org.immregistries.iis.kernal.mapping.mappers.fields.r5;
 
 import org.hl7.fhir.r5.model.Identifier;
-import org.immregistries.iis.kernal.fhir.common.annotations.OnR5Condition;
+import org.immregistries.iis.fhir.annotations.OnR5Condition;
 import org.immregistries.iis.kernal.mapping.mappers.IR5Mapper;
 import org.immregistries.iis.kernal.mapping.mappers.fields.BusinessIdentifierMapper;
 import org.immregistries.iis.kernal.model.BusinessIdentifier;

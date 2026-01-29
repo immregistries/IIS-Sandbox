@@ -7,7 +7,7 @@ import org.hl7.fhir.r5.model.Bundle;
 import org.hl7.fhir.r5.model.IdType;
 import org.hl7.fhir.r5.model.ImmunizationRecommendation;
 import org.hl7.fhir.r5.model.Patient;
-import org.immregistries.iis.kernal.fhir.common.annotations.OnR5Condition;
+import org.immregistries.iis.fhir.annotations.OnR5Condition;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Service;

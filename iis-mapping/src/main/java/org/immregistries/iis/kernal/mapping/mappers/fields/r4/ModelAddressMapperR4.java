@@ -2,7 +2,7 @@ package org.immregistries.iis.kernal.mapping.mappers.fields.r4;
 
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.r4.model.Address;
-import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
+import org.immregistries.iis.fhir.annotations.OnR4Condition;
 import org.immregistries.iis.kernal.mapping.mappers.fields.ModelAddressMapper;
 import org.immregistries.iis.kernal.model.ModelAddress;
 import org.springframework.context.annotation.Conditional;

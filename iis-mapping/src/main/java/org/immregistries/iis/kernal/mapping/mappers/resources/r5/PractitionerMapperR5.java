@@ -3,7 +3,7 @@ package org.immregistries.iis.kernal.mapping.mappers.resources.r5;
 import org.hl7.fhir.r5.model.HumanName;
 import org.hl7.fhir.r5.model.Practitioner;
 import org.hl7.fhir.r5.model.Reference;
-import org.immregistries.iis.kernal.fhir.common.annotations.OnR5Condition;
+import org.immregistries.iis.fhir.annotations.OnR5Condition;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
 import org.immregistries.iis.kernal.mapping.mappers.resources.PractitionerMapper;
 import org.immregistries.iis.kernal.model.ModelPerson;
