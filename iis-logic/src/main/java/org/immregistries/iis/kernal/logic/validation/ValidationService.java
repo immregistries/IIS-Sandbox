@@ -2,13 +2,9 @@ package org.immregistries.iis.kernal.logic.validation;
 
 import gov.nist.validation.report.Entry;
 import gov.nist.validation.report.Report;
-import hl7.v2.profile.Profile;
-import hl7.v2.profile.XMLDeserializer;
 import hl7.v2.validation.SyncHL7Validator;
-import hl7.v2.validation.content.ConformanceContext;
-import hl7.v2.validation.content.DefaultConformanceContext;
-import hl7.v2.validation.vs.ValueSetLibrary;
-import hl7.v2.validation.vs.ValueSetLibraryImpl;
+import hl7.v2.validation.ValidationContext;
+import hl7.v2.validation.ValidationContextBuilder;
 import org.immregistries.iis.kernal.logic.hl7v2.ack.IisReportableUtilService;
 import org.immregistries.iis.kernal.model.ack.IisReportable;
 import org.immregistries.iis.kernal.model.ack.IisReportableSeverity;
@@ -75,10 +71,18 @@ public class ValidationService {
 		InputStream constraintsXML = Files.newInputStream(Path.of(constraintsPath));
 		InputStream vsLibraryXML = Files.newInputStream(Path.of(vsLibraryPath));
 
-		Profile profile = XMLDeserializer.deserialize(profileXML).get();
-		ValueSetLibrary valueSetLibrary = ValueSetLibraryImpl.apply(vsLibraryXML).get();
-		ConformanceContext conformanceContext = DefaultConformanceContext.apply(Collections.singletonList(constraintsXML)).get();
-		return new SyncHL7Validator(profile, valueSetLibrary, conformanceContext);
+		ValidationContext validationContext = new ValidationContextBuilder(profileXML)
+			.useValueSetLibrary(vsLibraryXML)
+			.useConformanceContext(Collections.singletonList(constraintsXML))
+			.useCoConstraintsContext(constraintsXML)
+			.getValidationContext();
+
+//		Profile profile = XMLDeserializer.deserialize(profileXML).get();
+//		ValueSetLibrary valueSetLibrary = ValueSetLibraryImpl.apply(vsLibraryXML).get();
+//		ConformanceContext conformanceContext = DefaultConformanceContext.apply(Collections.singletonList(constraintsXML)).get();
+//		return new SyncHL7Validator(profile, valueSetLibrary, conformanceContext);
+
+		return new SyncHL7Validator(validationContext);
 	}
 
 	public List<IisReportable> nistValidation(String message, String profileId) throws Exception {

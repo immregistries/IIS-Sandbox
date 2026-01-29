@@ -1,6 +1,6 @@
 package org.immregistries.iis.fhir.common.validation;
 
-import org.immregistries.iis.fhir.common.AppProperties;
+import org.immregistries.iis.fhir.AppProperties;
 import org.springframework.boot.context.properties.bind.Binder;
 import org.springframework.context.annotation.Condition;
 import org.springframework.context.annotation.ConditionContext;

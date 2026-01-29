@@ -14,6 +14,7 @@ import ca.uhn.fhir.rest.server.mail.MailConfig;
 import ca.uhn.fhir.rest.server.mail.MailSvc;
 import com.google.common.base.Strings;
 import org.hl7.fhir.r4.model.Bundle.BundleType;
+import org.immregistries.iis.fhir.AppProperties;
 import org.immregistries.iis.fhir.util.JpaHibernatePropertiesProvider;
 import org.springframework.boot.env.YamlPropertySourceLoader;
 import org.springframework.context.annotation.Bean;

@@ -8,6 +8,7 @@ import ca.uhn.fhir.jpa.searchparam.extractor.ISearchParamExtractor;
 import ca.uhn.fhir.rest.server.RestfulServer;
 import ca.uhn.fhir.rest.server.tenant.UrlBaseTenantIdentificationStrategy;
 import jakarta.annotation.PostConstruct;
+import org.immregistries.iis.fhir.AppProperties;
 import org.immregistries.iis.fhir.interceptors.multitenancy.PartitionTenantCreationInterceptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

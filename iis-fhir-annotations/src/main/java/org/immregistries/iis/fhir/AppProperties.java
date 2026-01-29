@@ -1,4 +1,4 @@
-package org.immregistries.iis.fhir.common;
+package org.immregistries.iis.fhir;
 
 import ca.uhn.fhir.context.FhirVersionEnum;
 import ca.uhn.fhir.jpa.api.config.JpaStorageSettings.ClientIdStrategyEnum;

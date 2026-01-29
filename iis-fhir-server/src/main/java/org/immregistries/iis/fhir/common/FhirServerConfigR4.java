@@ -7,6 +7,7 @@ import ca.uhn.fhir.context.support.ValidationSupportContext;
 import ca.uhn.fhir.jpa.config.r4.JpaR4Config;
 import org.hl7.fhir.common.hapi.validation.support.RemoteTerminologyServiceValidationSupport;
 import org.hl7.fhir.common.hapi.validation.support.ValidationSupportChain;
+import org.immregistries.iis.fhir.AppProperties;
 import org.immregistries.iis.fhir.ServerConfig;
 import org.immregistries.iis.fhir.annotations.OnR4Condition;
 import org.immregistries.iis.fhir.common.validation.OnRemoteTerminologyPresent;

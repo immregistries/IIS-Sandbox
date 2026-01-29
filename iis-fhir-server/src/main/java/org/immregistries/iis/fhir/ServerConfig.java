@@ -36,7 +36,6 @@ import ca.uhn.fhir.validation.IValidatorModule;
 import ca.uhn.fhir.validation.ResultSeverityEnum;
 import com.google.common.base.Strings;
 import org.immregistries.iis.fhir.bulk.IBulkExportGroupProvider;
-import org.immregistries.iis.fhir.common.AppProperties;
 import org.immregistries.iis.fhir.common.StarterJpaConfig;
 import org.immregistries.iis.fhir.ips.IpsConfig;
 import org.springframework.context.ApplicationContext;

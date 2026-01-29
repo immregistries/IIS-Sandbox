@@ -28,6 +28,7 @@ import ca.uhn.fhir.rest.server.interceptor.CorsInterceptor;
 import ca.uhn.fhir.rest.server.interceptor.LoggingInterceptor;
 import ca.uhn.fhir.rest.server.util.ISearchParamRegistry;
 import jakarta.persistence.EntityManagerFactory;
+import org.immregistries.iis.fhir.AppProperties;
 import org.immregistries.iis.fhir.annotations.OnCorsPresent;
 import org.immregistries.iis.fhir.annotations.OnImplementationGuidesPresent;
 import org.immregistries.iis.fhir.common.validation.IRepositoryValidationInterceptorFactory;

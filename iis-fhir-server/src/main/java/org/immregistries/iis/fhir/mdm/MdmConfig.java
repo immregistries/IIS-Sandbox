@@ -19,7 +19,7 @@ import ca.uhn.fhir.mdm.util.EIDHelper;
 import ca.uhn.fhir.mdm.util.GoldenResourceHelper;
 import ca.uhn.fhir.mdm.util.MdmPartitionHelper;
 import org.apache.commons.io.IOUtils;
-import org.immregistries.iis.fhir.common.AppProperties;
+import org.immregistries.iis.fhir.AppProperties;
 import org.immregistries.iis.fhir.mdm.match.MdmIisConsumerConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.*;

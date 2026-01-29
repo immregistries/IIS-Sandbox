@@ -1,6 +1,6 @@
 package org.immregistries.iis.fhir.common.web;
 
-import org.immregistries.iis.fhir.common.AppProperties;
+import org.immregistries.iis.fhir.AppProperties;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Configuration;
