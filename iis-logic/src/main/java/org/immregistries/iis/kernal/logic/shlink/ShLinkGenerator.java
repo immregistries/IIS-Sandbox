@@ -1,11 +1,11 @@
 package org.immregistries.iis.kernal.logic.shlink;
 
+import ca.uhn.fhir.jpa.ips.generator.IIpsGeneratorSvc;
 import io.jsonwebtoken.Jwts;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.instance.model.api.IBaseBundle;
 import org.hl7.fhir.r4.model.IdType;
-import org.immregistries.iis.fhir.ips.IpsGeneratorSvcIIS;
 import org.immregistries.iis.kernal.model.shlink.ShLinkPayload;
 import org.immregistries.iis.kernal.services.KeyStoreService;
 import org.immregistries.iis.kernal.services.SecretKeyUtilService;
@@ -52,7 +52,7 @@ public class ShLinkGenerator {
 	@Autowired
 	private ShLinkManifestService shlinkManifestService;
 	@Autowired
-	private IpsGeneratorSvcIIS ipsGeneratorSvcIIS;
+	private IIpsGeneratorSvc iIpsGeneratorSvc;
 	@Autowired
 	private KeyStoreService keyStoreService;
 	@Autowired
@@ -83,7 +83,7 @@ public class ShLinkGenerator {
 		/*
 		 * Getting the bundle for the payload content
 		 */
-		IBaseBundle ipsToBeEncoded = ipsGeneratorSvcIIS.generateIps(TenantAuthService.get().requestDetailsWithPartitionName(),
+		IBaseBundle ipsToBeEncoded = iIpsGeneratorSvc.generateIps(TenantAuthService.get().requestDetailsWithPartitionName(),
 			new IdType(patientId), "");
 		/*
 		 * Convert the bundle to a shcard file

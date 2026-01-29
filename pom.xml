@@ -55,9 +55,8 @@
         <module>iis-fhir-bulk-export</module>
         <module>iis-fhir-server</module>
         <module>iis-fhir-logic</module>
-        <module>iis-immds</module>
+        <module>iis-logic-immds</module>
         <module>iis-fhir-immds</module>
-        <module>iis-ips</module>
     </modules>
 
     <dependencyManagement>

@@ -1,4 +1,4 @@
-package org.immregistries.iis.fhir.ips;
+package org.immregistries.iis.kernal.fhir.ips;
 
 import ca.uhn.fhir.jpa.ips.api.IIpsGenerationStrategy;
 import ca.uhn.fhir.jpa.ips.api.IpsSectionContext;

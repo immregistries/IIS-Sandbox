@@ -6,8 +6,6 @@ import ca.uhn.fhir.jpa.ips.api.IIpsGenerationStrategy;
 import ca.uhn.fhir.jpa.ips.generator.IIpsGeneratorSvc;
 import ca.uhn.fhir.jpa.ips.generator.IpsGeneratorSvcImpl;
 import ca.uhn.fhir.jpa.ips.provider.IpsOperationProvider;
-import org.immregistries.iis.fhir.ips.ICustomIpsGenerationStrategy;
-import org.immregistries.iis.fhir.ips.IpsGeneratorSvcIIS;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR4Condition;
 import org.immregistries.iis.kernal.fhir.common.annotations.OnR5Condition;
 import org.springframework.context.annotation.Bean;

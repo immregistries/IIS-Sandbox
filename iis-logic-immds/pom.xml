@@ -9,7 +9,7 @@
         <version>${revision}</version>
     </parent>
 
-    <artifactId>iis-immds</artifactId>
+    <artifactId>iis-logic-immds</artifactId>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>

@@ -1,4 +1,4 @@
-package org.immregistries.iis.fhir.ips;
+package org.immregistries.iis.kernal.fhir.ips;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.jpa.api.dao.DaoRegistry;

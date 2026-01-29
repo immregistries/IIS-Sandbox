@@ -1,5 +1,6 @@
 package org.immregistries.iis.kernal.controllers.rest.shlink;
 
+import ca.uhn.fhir.jpa.ips.generator.IIpsGeneratorSvc;
 import com.authlete.cose.COSEException;
 import com.google.zxing.WriterException;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
@@ -8,7 +9,6 @@ import jakarta.servlet.ServletException;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.hl7.fhir.instance.model.api.IBaseBundle;
 import org.hl7.fhir.r4.model.IdType;
-import org.immregistries.iis.fhir.ips.IpsGeneratorSvcIIS;
 import org.immregistries.iis.kernal.controllers.IisPathVariable;
 import org.immregistries.iis.kernal.controllers.IisRestPath;
 import org.immregistries.iis.kernal.services.KeyStoreService;
@@ -53,7 +53,7 @@ public class CLVRRestController {
     @Autowired
     private CLVRService clvrService;
     @Autowired
-    private IpsGeneratorSvcIIS ipsGeneratorSvcIIS;
+    private IIpsGeneratorSvc ipsGeneratorSvc;
     @Autowired
     private FhirConversionUtil fhirConversionUtil;
     @Autowired
@@ -111,7 +111,7 @@ public class CLVRRestController {
     }
 
     private @NotNull CLVRToken getIpsClvrToken(String patientId) {
-        IBaseBundle ipsToBeEncoded = ipsGeneratorSvcIIS
+        IBaseBundle ipsToBeEncoded = ipsGeneratorSvc
                 .generateIps(TenantAuthService.get().requestDetailsWithPartitionName(), new IdType(patientId), "");
         @SuppressWarnings("unchecked")
         CLVRPayload clvrPayload = fhirConversionUtil.toCLVRPayloadFromBundle(ipsToBeEncoded);

@@ -45,7 +45,7 @@
         </dependency>
         <dependency>
             <groupId>org.immregistries.iis</groupId>
-            <artifactId>iis-immds</artifactId>
+            <artifactId>iis-logic-immds</artifactId>
             <version>${revision}</version>
         </dependency>
         <dependency>
