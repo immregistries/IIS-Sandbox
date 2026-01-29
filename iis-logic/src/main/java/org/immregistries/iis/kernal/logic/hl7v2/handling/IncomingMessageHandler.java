@@ -2,12 +2,12 @@ package org.immregistries.iis.kernal.logic.hl7v2.handling;
 
 import org.hl7.fhir.instance.model.api.IIdType;
 import org.immregistries.codebase.client.CodeMap;
+import org.immregistries.iis.kernal.PartitionCreationService;
 import org.immregistries.iis.kernal.fhir.multitenancy.PartitionTenantCreationInterceptor;
 import org.immregistries.iis.kernal.logic.CodeMapManagerService;
 import org.immregistries.iis.kernal.logic.MessageRecordingService;
 import org.immregistries.iis.kernal.logic.hl7v2.ack.IisReportableUtilService;
 import org.immregistries.iis.kernal.logic.validation.ProcessingException;
-import org.immregistries.iis.kernal.logic.validation.ValidationService;
 import org.immregistries.iis.kernal.model.PatientReported;
 import org.immregistries.iis.kernal.model.VaccinationReported;
 import org.immregistries.iis.kernal.model.ack.IisReportable;
@@ -25,9 +25,7 @@ public abstract class IncomingMessageHandler<ParsedSource, ValidationResult> imp
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	@Autowired
-	private PartitionTenantCreationInterceptor partitionTenantCreationInterceptor;
-	@Autowired
-	private ValidationService validationService;
+	private PartitionCreationService partitionCreationService;
 	@Autowired
 	private MessageRecordingService messageRecordingService;
 	@Autowired
@@ -40,7 +38,7 @@ public abstract class IncomingMessageHandler<ParsedSource, ValidationResult> imp
 		/*
 		 * Anticipating the partition creation, to prevent conflict when multiple FHIR Request try to create the same partition
 		 */
-		partitionTenantCreationInterceptor.getOrCreatePartitionId(tenant.getOrganizationName());
+		partitionCreationService.getOrCreatePartitionId(tenant.getOrganizationName());
 
 		ParsedSource parsedSource = parseSource(message);
 		String messageType = extractMessageType(parsedSource);

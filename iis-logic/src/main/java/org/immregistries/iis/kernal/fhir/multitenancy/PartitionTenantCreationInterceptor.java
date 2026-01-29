@@ -16,6 +16,7 @@ import jakarta.interceptor.Interceptor;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.immregistries.iis.kernal.GlobalConstants;
+import org.immregistries.iis.kernal.PartitionCreationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,8 +31,8 @@ import org.springframework.stereotype.Component;
 public class PartitionTenantCreationInterceptor extends RequestTenantPartitionInterceptor {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-	@Autowired
-	private IPartitionLookupSvc partitionLookupSvc;
+@Autowired
+public PartitionCreationService partitionCreationService;
 
 	@Hook(value = Pointcut.SERVER_INCOMING_REQUEST_POST_PROCESSED)
 	public boolean partitionIdentifyPostProcessed(RequestDetails theRequestDetails) {
@@ -58,24 +59,9 @@ public class PartitionTenantCreationInterceptor extends RequestTenantPartitionIn
 	@Nonnull
 	protected RequestPartitionId extractPartitionIdFromRequest(RequestDetails theRequestDetails) {
 		String partitionName = extractPartitionName(theRequestDetails);
-		return  getOrCreatePartitionId(partitionName);
+		return  partitionCreationService.getOrCreatePartitionId(partitionName);
 	}
 
-	public RequestPartitionId getOrCreatePartitionId(String partitionName) {
-		if (StringUtils.isBlank(partitionName)) { // ALL partitions and DEFAULT partition are set to be the same
-			partitionName = GlobalConstants.DEFAULT_USER;
-//			return RequestPartitionId.defaultPartition();
-		}
-		if (Strings.CI.equals(partitionName,GlobalConstants.DEFAULT_USER)) {
-			return RequestPartitionId.defaultPartition();
-		}
-		try {
-			PartitionEntity partitionEntity = partitionLookupSvc.getPartitionByName(partitionName);
-			return partitionEntity.toRequestPartitionId();
-		} catch (ResourceNotFoundException e) {
-			return createPartition(partitionName);
-		}
-	}
 
 	public static String extractPartitionName(RequestDetails requestDetails) {
 		String tenantId = requestDetails.getTenantId();
@@ -93,32 +79,7 @@ public class PartitionTenantCreationInterceptor extends RequestTenantPartitionIn
 		}
 	}
 
-	private RequestPartitionId createPartition(String tenantName) {
-		int idAttempt = partitionLookupSvc.generateRandomUnusedPartitionId();
-		PartitionEntity partitionEntity = partitionLookupSvc.createPartition(new PartitionEntity().setName(tenantName).setId(idAttempt), new SystemRequestDetails());
 
-		//Create subscription topics
-//		if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R5)) {
-//			if (mySubscriptionTopicDao == null) {
-//				mySubscriptionTopicDao = myDaoRegistry.getResourceDao("SubscriptionTopic");
-//			}
-//			RequestDetails requestDetails =  SystemRequestDetails.forRequestPartitionId(partitionEntity.toRequestPartitionId());
-//			SubscriptionTopic topic = SubscriptionTopicController.getDataQualityIssuesSubscriptionTopic();
-//			try {
-//				mySubscriptionTopicDao.read(topic.getIdElement(), requestDetails);
-//			} catch (ResourceNotFoundException | ResourceGoneException e) {
-//				mySubscriptionTopicDao.update(topic, requestDetails);
-//			}
-			//		SubscriptionTopic groupTopic = SubscriptionTopicController.getGroupSubscriptionTopic();
-	//		try {
-	//			mySubscriptionTopicDao.read(groupTopic.getIdElement(), requestDetails);
-	//		} catch (ResourceNotFoundException | ResourceGoneException e) {
-	//			mySubscriptionTopicDao.update(groupTopic, requestDetails);
-	//		}
-//		}
-
-		return partitionEntity.toRequestPartitionId();
-	}
 
 
 }
