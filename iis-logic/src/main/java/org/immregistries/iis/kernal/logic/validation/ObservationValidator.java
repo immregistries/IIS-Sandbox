@@ -3,12 +3,12 @@ package org.immregistries.iis.kernal.logic.validation;
 import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
+import org.immregistries.iis.kernal.enums.ProcessingFlavor;
 import org.immregistries.iis.kernal.logic.hl7v2.ack.IisReportableUtilService;
 import org.immregistries.iis.kernal.mapping.mappers.resources.ObservationMapper;
 import org.immregistries.iis.kernal.model.ObservationReported;
 import org.immregistries.iis.kernal.model.ack.IisReportable;
-import org.immregistries.iis.kernal.model.ack.IisReportableSeverity;
-import org.immregistries.iis.kernal.model.enums.ProcessingFlavor;
+import org.immregistries.iis.kernal.model.ack.IisReportableSeverityLevel;
 import org.immregistries.iis.kernal.services.CodeMapManagerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,17 +38,17 @@ public class ObservationValidator extends IisValidator {
 			CodeMap codeMap = codeMapManagerService.getCodeMap();
 			Code contraCode = codeMap.getCodeForCodeset(CodesetType.CONTRAINDICATION_OR_PRECAUTION, observationReported.getValueCode());
 			if (contraCode == null) {
-				ProcessingException pe = new ProcessingException("Unrecognized contraindication or precaution", "OBX", obxCount, 5, IisReportableSeverity.WARN);
+				ProcessingException pe = new ProcessingException("Unrecognized contraindication or precaution", "OBX", obxCount, 5, IisReportableSeverityLevel.WARN);
 				iisReportableList.add(iisReportableUtilService.fromProcessingException(pe));
 			}
 			if (observationReported.getObservationDate() != null) {
 				Date today = new Date();
 				if (observationReported.getObservationDate().after(today)) {
-					ProcessingException pe = new ProcessingException("Contraindication or precaution observed in the future", "OBX", obxCount, 5, IisReportableSeverity.WARN);
+					ProcessingException pe = new ProcessingException("Contraindication or precaution observed in the future", "OBX", obxCount, 5, IisReportableSeverityLevel.WARN);
 					iisReportableList.add(iisReportableUtilService.fromProcessingException(pe));
 				}
 				if (patientBirthDate != null && observationReported.getObservationDate().before(patientBirthDate)) {
-					ProcessingException pe = new ProcessingException("Contraindication or precaution observed before patient was born", "OBX", obxCount, 14, IisReportableSeverity.WARN);
+					ProcessingException pe = new ProcessingException("Contraindication or precaution observed before patient was born", "OBX", obxCount, 14, IisReportableSeverityLevel.WARN);
 					iisReportableList.add(iisReportableUtilService.fromProcessingException(pe));
 				}
 			}

@@ -1,19 +1,16 @@
 package org.immregistries.iis.kernal.controllers.rest;
 
-import org.immregistries.iis.kernal.service.PatientShlinkApiManifestUrlService;
-import org.immregistries.iis.kernal.controllers.IisPathVariable;
-import org.immregistries.iis.kernal.controllers.IisRestParam;
-import org.immregistries.iis.kernal.controllers.IisRestPath;
-
 import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.param.ReferenceParam;
 import jakarta.servlet.http.HttpServletRequest;
 import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.hl7.fhir.instance.model.api.IBaseBundle;
+import org.immregistries.iis.kernal.controllers.IisPathVariable;
+import org.immregistries.iis.kernal.controllers.IisRestParam;
+import org.immregistries.iis.kernal.controllers.IisRestPath;
 import org.immregistries.iis.kernal.controllers.rest.filters.RestTenantUrlFilter;
-import org.immregistries.iis.kernal.model.shlink.ShLinkPayload;
-import org.immregistries.iis.kernal.logic.shlink.PatientShLinkGenerator;
+import org.immregistries.iis.kernal.logic.shlink.generation.PatientShLinkGenerator;
 import org.immregistries.iis.kernal.mapping.IisFhirClientFactory;
 import org.immregistries.iis.kernal.mapping.mappers.resources.PatientMapper;
 import org.immregistries.iis.kernal.mapping.mappers.resources.RecommendationMapper;
@@ -23,13 +20,15 @@ import org.immregistries.iis.kernal.model.IisPatient;
 import org.immregistries.iis.kernal.model.ObservationReported;
 import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.model.VaccinationMaster;
+import org.immregistries.iis.kernal.model.shlink.ShLinkPayload;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
+import org.immregistries.iis.kernal.service.PatientShlinkApiManifestUrlService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import static org.immregistries.iis.kernal.controllers.IisRestPath.BasePath.*;
+import static org.immregistries.iis.kernal.controllers.IisRestPath.BasePath.VACCINATION_PATH;
 
 @RestController
 @RequestMapping(IisRestPath.REST_TENANT_PATH + IisRestPath.BasePath.PATIENT_PATH)

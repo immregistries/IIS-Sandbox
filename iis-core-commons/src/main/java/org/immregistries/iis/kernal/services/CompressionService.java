@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal.logic.shlink;
+package org.immregistries.iis.kernal.services;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;

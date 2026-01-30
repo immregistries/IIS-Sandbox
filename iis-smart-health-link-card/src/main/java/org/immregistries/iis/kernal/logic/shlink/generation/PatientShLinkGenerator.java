@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal.logic.shlink;
+package org.immregistries.iis.kernal.logic.shlink.generation;
 
 import org.immregistries.iis.kernal.model.shlink.ShLinkPayload;
 import org.jetbrains.annotations.NotNull;

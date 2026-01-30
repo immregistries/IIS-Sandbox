@@ -4,7 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.immregistries.iis.kernal.logic.validation.ProcessingException;
 import org.immregistries.iis.kernal.mapping.V2SimpleDateFormatGenerator;
 import org.immregistries.iis.kernal.model.ack.IisReportable;
-import org.immregistries.iis.kernal.model.ack.IisReportableSeverity;
+import org.immregistries.iis.kernal.model.ack.IisReportableSeverityLevel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,7 +25,7 @@ public class V2DateParseService {
 			return parseDateInternal(dateString, strict);
 		} catch (ParseException e) {
 			if (errorMessage != null) {
-				ProcessingException pe = new ProcessingException(errorMessage + ": " + e.getMessage(), segmentId, segmentRepeat, fieldPosition, IisReportableSeverity.WARN);
+				ProcessingException pe = new ProcessingException(errorMessage + ": " + e.getMessage(), segmentId, segmentRepeat, fieldPosition, IisReportableSeverityLevel.WARN);
 				iisReportableList.add(iisReportableUtilService.fromProcessingException(pe));
 			}
 		}

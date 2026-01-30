@@ -1,7 +1,7 @@
 package org.immregistries.iis.kernal.logic.validation;
 
 import org.immregistries.iis.kernal.model.ack.IisReportable;
-import org.immregistries.iis.kernal.model.ack.IisReportableSeverity;
+import org.immregistries.iis.kernal.model.ack.IisReportableSeverityLevel;
 import org.immregistries.mqe.hl7util.model.CodedWithExceptions;
 import org.immregistries.mqe.hl7util.model.Hl7Location;
 
@@ -11,7 +11,7 @@ public class ProcessingException extends Exception {
   private String segmentId = "";
   private int segmentRepeat = 0;
   private int fieldPosition = 0;
-	private IisReportableSeverity errorCode = IisReportableSeverity.ERROR;
+	private IisReportableSeverityLevel errorCode = IisReportableSeverityLevel.ERROR;
 	private CodedWithExceptions applicationErrorCode = new CodedWithExceptions();
 
 	public String getSegmentId() {
@@ -35,7 +35,7 @@ public class ProcessingException extends Exception {
   }
 
 	public ProcessingException(String message, String segmentId, int segmentRepeat,
-										int fieldPosition, IisReportableSeverity errorCode) {
+										int fieldPosition, IisReportableSeverityLevel errorCode) {
 		this(message, segmentId, segmentRepeat, fieldPosition);
 		this.errorCode = errorCode;
 	}
@@ -47,7 +47,7 @@ public class ProcessingException extends Exception {
 	}
 
 	public ProcessingException(String message, String segmentId, int segmentRepeat,
-										int fieldPosition, IisReportableSeverity errorCode, CodedWithExceptions applicationErrorCode) {
+										int fieldPosition, IisReportableSeverityLevel errorCode, CodedWithExceptions applicationErrorCode) {
 		this(message, segmentId, segmentRepeat, fieldPosition);
 		this.errorCode = errorCode;
 		this.applicationErrorCode = applicationErrorCode;
@@ -64,11 +64,11 @@ public class ProcessingException extends Exception {
 	}
 
 
-	public IisReportableSeverity getErrorCode() {
+	public IisReportableSeverityLevel getErrorCode() {
     return errorCode;
   }
 
-	public void setErrorCode(IisReportableSeverity errorCode) {
+	public void setErrorCode(IisReportableSeverityLevel errorCode) {
     this.errorCode = errorCode;
   }
 

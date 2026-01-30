@@ -57,6 +57,7 @@
         <module>iis-fhir-immds</module>
         <module>iis-fhir-server</module>
         <module>iis-web</module>
+        <module>iis-smart-health-link-card</module>
     </modules>
 
     <dependencyManagement>

@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal.model.enums;
+package org.immregistries.iis.kernal.enums;
 
 public enum SnomedValue {
                          HEPATITIS_B__FINDING_("271511000", "Hepatitis B (finding)"),

@@ -5,6 +5,7 @@ import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodeStatusValue;
 import org.immregistries.codebase.client.reference.CodesetType;
+import org.immregistries.iis.kernal.enums.ProcessingFlavor;
 import org.immregistries.iis.kernal.logic.hl7v2.ack.IisReportableUtilService;
 import org.immregistries.iis.kernal.mapping.mappers.resources.PatientMapper;
 import org.immregistries.iis.kernal.model.ModelName;
@@ -12,8 +13,7 @@ import org.immregistries.iis.kernal.model.ModelPhone;
 import org.immregistries.iis.kernal.model.PatientGuardian;
 import org.immregistries.iis.kernal.model.PatientReported;
 import org.immregistries.iis.kernal.model.ack.IisReportable;
-import org.immregistries.iis.kernal.model.ack.IisReportableSeverity;
-import org.immregistries.iis.kernal.model.enums.ProcessingFlavor;
+import org.immregistries.iis.kernal.model.ack.IisReportableSeverityLevel;
 import org.immregistries.iis.kernal.services.CodeMapManagerService;
 import org.immregistries.mqe.hl7util.model.Hl7Location;
 import org.slf4j.Logger;
@@ -79,7 +79,7 @@ public class PatientValidator extends IisValidator {
 		if (prn == null || !"PRN".equals(prn.getUse())) {
 			ProcessingException pe = new ProcessingException("Patient phone telecommunication type must be PRN ", "PID", 1, 13);
 			if (!processingFlavorSet.contains(ProcessingFlavor.QUINZE)) {
-				pe.setErrorCode(IisReportableSeverity.WARN);
+				pe.setErrorCode(IisReportableSeverityLevel.WARN);
 			}
 			iisReportableList.add(iisReportableUtilService.fromProcessingException(pe));
 		}
@@ -175,7 +175,7 @@ public class PatientValidator extends IisValidator {
 			}
 		}
 		if (legalName != null && processingFlavorSet.contains(ProcessingFlavor.MOONFRUIT) && (nameFirst.startsWith("S") || nameFirst.startsWith("A"))) {
-			throw new ProcessingException("Immunization History cannot be stored because of patient's consent status", "PID", 0, 0, IisReportableSeverity.WARN);
+			throw new ProcessingException("Immunization History cannot be stored because of patient's consent status", "PID", 0, 0, IisReportableSeverityLevel.WARN);
 		}
 	}
 
@@ -205,12 +205,12 @@ public class PatientValidator extends IisValidator {
 				}
 				if (invalidCharFound) {
 					ProcessingException pe = new ProcessingException("Patient phone number has unexpected character: " + invalidChar, "PID", 1, 13);
-					pe.setErrorCode(IisReportableSeverity.WARN);
+					pe.setErrorCode(IisReportableSeverityLevel.WARN);
 					iisReportableList.add(iisReportableUtilService.fromProcessingException(pe));
 				}
 				if (countNums != 10 || patientPhone.getNumber().startsWith("555") || patientPhone.getNumber().startsWith("0") || patientPhone.getNumber().startsWith("1")) {
 					ProcessingException pe = new ProcessingException("Patient phone number does not appear to be valid", "PID", 1, 13);
-					pe.setErrorCode(IisReportableSeverity.WARN);
+					pe.setErrorCode(IisReportableSeverityLevel.WARN);
 					iisReportableList.add(iisReportableUtilService.fromProcessingException(pe));
 				}
 			}
@@ -222,9 +222,9 @@ public class PatientValidator extends IisValidator {
 		{
 			String patientSex = patientReported.getSex();
 			if (!ValidValues.verifyValidValue(patientSex, ValidValues.SEX)) {
-				ProcessingException pe = new ProcessingException("Patient sex '" + patientSex + "' is not recognized", "PID", 1, 8, IisReportableSeverity.WARN);
+				ProcessingException pe = new ProcessingException("Patient sex '" + patientSex + "' is not recognized", "PID", 1, 8, IisReportableSeverityLevel.WARN);
 				if (processingFlavorSet.contains(ProcessingFlavor.ELDERBERRIES)) {
-					pe.setErrorCode(IisReportableSeverity.WARN);
+					pe.setErrorCode(IisReportableSeverityLevel.WARN);
 				}
 				iisReportableList.add(iisReportableUtilService.fromProcessingException(pe));
 			}
@@ -236,7 +236,7 @@ public class PatientValidator extends IisValidator {
 				if (!ValidValues.verifyValidValue(patientAddressCountry, ValidValues.COUNTRY_2DIGIT) && !ValidValues.verifyValidValue(patientAddressCountry, ValidValues.COUNTRY_3DIGIT)) {
 					ProcessingException pe = new ProcessingException("Patient address country '" + patientAddressCountry + "' is not recognized and cannot be accepted", "PID", 1, 11);
 					if (processingFlavorSet.contains(ProcessingFlavor.GUAVA)) {
-						pe.setErrorCode(IisReportableSeverity.WARN);
+						pe.setErrorCode(IisReportableSeverityLevel.WARN);
 					}
 					iisReportableList.add(iisReportableUtilService.fromProcessingException(pe));
 				}
@@ -247,7 +247,7 @@ public class PatientValidator extends IisValidator {
 					if (!ValidValues.verifyValidValue(patientAddressState, ValidValues.STATE)) {
 						ProcessingException pe = new ProcessingException("Patient address state '" + patientAddressState + "' is not recognized and cannot be accepted", "PID", 1, 11);
 						if (processingFlavorSet.contains(ProcessingFlavor.GUAVA)) {
-							pe.setErrorCode(IisReportableSeverity.WARN);
+							pe.setErrorCode(IisReportableSeverityLevel.WARN);
 						}
 						iisReportableList.add(iisReportableUtilService.fromProcessingException(pe));
 					}
@@ -261,7 +261,7 @@ public class PatientValidator extends IisValidator {
 				if (raceCode == null || CodeStatusValue.getBy(raceCode.getCodeStatus()) != CodeStatusValue.VALID) {
 					ProcessingException pe = new ProcessingException("Invalid race '" + race + "', message cannot be accepted", "PID", 1, 10);
 					if (!processingFlavorSet.contains(ProcessingFlavor.FIG)) {
-						pe.setErrorCode(IisReportableSeverity.WARN);
+						pe.setErrorCode(IisReportableSeverityLevel.WARN);
 					}
 					iisReportableList.add(iisReportableUtilService.fromProcessingException(pe));
 				}
@@ -276,7 +276,7 @@ public class PatientValidator extends IisValidator {
 				if (ethnicityCode == null || CodeStatusValue.getBy(ethnicityCode.getCodeStatus()) != CodeStatusValue.VALID) {
 					ProcessingException pe = new ProcessingException("Invalid ethnicity '" + ethnicity + "', message cannot be accepted", "PID", 1, 10);
 					if (!processingFlavorSet.contains(ProcessingFlavor.FIG)) {
-						pe.setErrorCode(IisReportableSeverity.WARN);
+						pe.setErrorCode(IisReportableSeverityLevel.WARN);
 					}
 					iisReportableList.add(iisReportableUtilService.fromProcessingException(pe));
 				}
@@ -298,26 +298,26 @@ public class PatientValidator extends IisValidator {
 					if (!birthOrder.equals("1") && !birthOrder.equals("")) {
 						ProcessingException pe = new ProcessingException("Birth order was specified as " + birthOrder + " but not indicated as multiple birth", "PID", 1, 25);
 						if (processingFlavorSet.contains(ProcessingFlavor.PLANTAIN)) {
-							pe.setErrorCode(IisReportableSeverity.WARN);
+							pe.setErrorCode(IisReportableSeverityLevel.WARN);
 						}
 						iisReportableList.add(iisReportableUtilService.fromProcessingException(pe));
 					}
 				} else if (birthFlag.equals("Y")) {
 					if (birthOrder.equals("")) {
 						ProcessingException pe = new ProcessingException("Multiple birth but birth order was not specified", "PID", 1, 24);
-						pe.setErrorCode(IisReportableSeverity.WARN);
+						pe.setErrorCode(IisReportableSeverityLevel.WARN);
 						iisReportableList.add(iisReportableUtilService.fromProcessingException(pe));
 					} else if (!ValidValues.verifyValidValue(birthOrder, ValidValues.BIRTH_ORDER)) {
 						ProcessingException pe = new ProcessingException("Birth order was specified as " + birthOrder + " but not an expected value, must be between 1 and 9", "PID", 1, 25);
 						if (processingFlavorSet.contains(ProcessingFlavor.PLANTAIN)) {
-							pe.setErrorCode(IisReportableSeverity.WARN);
+							pe.setErrorCode(IisReportableSeverityLevel.WARN);
 						}
 						iisReportableList.add(iisReportableUtilService.fromProcessingException(pe));
 					}
 				} else {
 					ProcessingException pe = new ProcessingException("Multiple birth indicator " + birthFlag + " is not recognized", "PID", 1, 24);
 					if (processingFlavorSet.contains(ProcessingFlavor.PLANTAIN)) {
-						pe.setErrorCode(IisReportableSeverity.WARN);
+						pe.setErrorCode(IisReportableSeverityLevel.WARN);
 					}
 					iisReportableList.add(iisReportableUtilService.fromProcessingException(pe));
 				}
@@ -327,22 +327,22 @@ public class PatientValidator extends IisValidator {
 		for (int i = 0; i < patientReported.getPatientGuardians().size(); i++) {
 			PatientGuardian patientGuardian = patientReported.getPatientGuardians().get(i);
 			if (StringUtils.isBlank(patientGuardian.getName().getNameLast())) {
-				ProcessingException pe = new ProcessingException("Next-of-kin last name is empty", "NK1", i, 2, IisReportableSeverity.WARN);
+				ProcessingException pe = new ProcessingException("Next-of-kin last name is empty", "NK1", i, 2, IisReportableSeverityLevel.WARN);
 				iisReportableList.add(iisReportableUtilService.fromProcessingException(pe));
 			}
 			if (StringUtils.isBlank(patientGuardian.getName().getNameFirst())) {
-				ProcessingException pe = new ProcessingException("Next-of-kin first name is empty", "NK1", i, 2, IisReportableSeverity.WARN);
+				ProcessingException pe = new ProcessingException("Next-of-kin first name is empty", "NK1", i, 2, IisReportableSeverityLevel.WARN);
 				iisReportableList.add(iisReportableUtilService.fromProcessingException(pe));
 			}
 
 			if (StringUtils.isBlank(patientGuardian.getGuardianRelationship())) {
-				ProcessingException pe = new ProcessingException("Next-of-kin relationship is empty", "NK1", i, 3, IisReportableSeverity.WARN);
+				ProcessingException pe = new ProcessingException("Next-of-kin relationship is empty", "NK1", i, 3, IisReportableSeverityLevel.WARN);
 				iisReportableList.add(iisReportableUtilService.fromProcessingException(pe));
 			}
 			if ("MTH".equals(patientGuardian.getGuardianRelationship()) || "FTH".equals(patientGuardian.getGuardianRelationship()) || "GRD".equals(patientGuardian.getGuardianRelationship())) {
 				break;
 			} else {
-				ProcessingException pe = new ProcessingException((StringUtils.isNotBlank(patientGuardian.getGuardianRelationship()) ? "Next-of-kin relationship not specified so is not recognized as guardian and will be ignored" : ("Next-of-kin relationship '" + patientGuardian.getGuardianRelationship() + "' is not a recognized guardian and will be ignored")), "NK1", i, 3, IisReportableSeverity.WARN);
+				ProcessingException pe = new ProcessingException((StringUtils.isNotBlank(patientGuardian.getGuardianRelationship()) ? "Next-of-kin relationship not specified so is not recognized as guardian and will be ignored" : ("Next-of-kin relationship '" + patientGuardian.getGuardianRelationship() + "' is not a recognized guardian and will be ignored")), "NK1", i, 3, IisReportableSeverityLevel.WARN);
 				iisReportableList.add(iisReportableUtilService.fromProcessingException(pe));
 			}
 		}

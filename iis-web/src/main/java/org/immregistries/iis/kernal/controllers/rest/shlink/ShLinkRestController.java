@@ -1,16 +1,15 @@
 package org.immregistries.iis.kernal.controllers.rest.shlink;
 
-import org.immregistries.iis.kernal.controllers.IisRestParam;
-import org.immregistries.iis.kernal.controllers.IisRestPath;
-
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
-import org.immregistries.iis.kernal.logic.shlink.CompressionService;
-import org.immregistries.iis.kernal.logic.shlink.ShLinkGenerator;
+import org.immregistries.iis.kernal.controllers.IisRestParam;
+import org.immregistries.iis.kernal.controllers.IisRestPath;
+import org.immregistries.iis.kernal.logic.shlink.generation.ShLinkGenerator;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.immregistries.iis.kernal.persisted.entities.UserAccess;
 import org.immregistries.iis.kernal.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.security.UserAccessUtil;
+import org.immregistries.iis.kernal.services.QrCodeEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +33,7 @@ public class ShLinkRestController {
 	@Autowired
 	private ShLinkGenerator shLinkGenerator;
 	@Autowired
-	private CompressionService compressionService;
+	private QrCodeEncoder qrCodeEncoder;
 
 	@PostMapping()
 	public String shLinkIPSQrCode(HttpServletRequest req,
@@ -62,7 +61,7 @@ public class ShLinkRestController {
 		String qrCode = shLinkIPSQrCode(req, keyId, secretKey, patientId, flag, exp, tenant);
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.IMAGE_PNG);
-		ByteArrayOutputStream outputStream = compressionService.toQrCodeStreamPNG(qrCode);
+		ByteArrayOutputStream outputStream = qrCodeEncoder.toQrCodeStreamPNG(qrCode);
 		return new ResponseEntity<>(outputStream.toByteArray(), headers, HttpStatus.OK);
 
 	}

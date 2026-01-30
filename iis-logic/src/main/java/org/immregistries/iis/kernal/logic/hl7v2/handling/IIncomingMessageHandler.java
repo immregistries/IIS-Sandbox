@@ -1,9 +1,9 @@
 package org.immregistries.iis.kernal.logic.hl7v2.handling;
 
+import org.immregistries.iis.kernal.enums.ProcessingFlavor;
 import org.immregistries.iis.kernal.logic.validation.ProcessingException;
 import org.immregistries.iis.kernal.model.ack.IisReportable;
-import org.immregistries.iis.kernal.model.ack.IisReportableSeverity;
-import org.immregistries.iis.kernal.model.enums.ProcessingFlavor;
+import org.immregistries.iis.kernal.model.ack.IisReportableSeverityLevel;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
 
 import java.util.List;
@@ -66,7 +66,7 @@ public interface IIncomingMessageHandler<SourceType> {
 
 	static void verifyNoErrors(List<IisReportable> iisReportableList) throws ProcessingException {
 		for (IisReportable reportable : iisReportableList) {
-			if (reportable.getSeverity().equals(IisReportableSeverity.ERROR)) {
+			if (reportable.getSeverity().equals(IisReportableSeverityLevel.ERROR)) {
 				throw ProcessingException.fromIisReportable(reportable);
 			}
 		}
@@ -74,7 +74,7 @@ public interface IIncomingMessageHandler<SourceType> {
 
 	static boolean hasErrors(List<IisReportable> reportables) {
 		for (IisReportable reportable : reportables) {
-			if (reportable.getSeverity().equals(IisReportableSeverity.ERROR)) {
+			if (reportable.getSeverity().equals(IisReportableSeverityLevel.ERROR)) {
 				return true;
 			}
 		}

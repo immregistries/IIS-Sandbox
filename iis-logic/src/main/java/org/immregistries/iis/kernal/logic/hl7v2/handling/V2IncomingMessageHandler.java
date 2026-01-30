@@ -8,8 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.instance.model.api.IIdType;
 import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.iis.kernal.SoftwareVersion;
-import org.immregistries.iis.kernal.services.CodeMapManagerService;
-import org.immregistries.iis.kernal.services.MessageRecordingService;
+import org.immregistries.iis.kernal.enums.ProcessingFlavor;
 import org.immregistries.iis.kernal.logic.hl7v2.ack.*;
 import org.immregistries.iis.kernal.logic.hl7v2.writing.Hl7MessageWriter;
 import org.immregistries.iis.kernal.logic.validation.*;
@@ -17,10 +16,11 @@ import org.immregistries.iis.kernal.mapping.requesters.FhirSaveRequester;
 import org.immregistries.iis.kernal.mapping.requesters.FhirSearchRequester;
 import org.immregistries.iis.kernal.model.*;
 import org.immregistries.iis.kernal.model.ack.IisReportable;
-import org.immregistries.iis.kernal.model.ack.IisReportableSeverity;
-import org.immregistries.iis.kernal.model.enums.ProcessingFlavor;
+import org.immregistries.iis.kernal.model.ack.IisReportableSeverityLevel;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.immregistries.iis.kernal.security.CurrentTenantUtil;
+import org.immregistries.iis.kernal.services.CodeMapManagerService;
+import org.immregistries.iis.kernal.services.MessageRecordingService;
 import org.immregistries.mqe.validator.MqeMessageServiceResponse;
 import org.immregistries.mqe.validator.engine.ValidationRuleResult;
 import org.immregistries.mqe.vxu.MqeMessageHeader;
@@ -159,7 +159,7 @@ public class V2IncomingMessageHandler extends IncomingMessageHandler<HL7Reader, 
 		}
 		// if processing flavor contains MEDLAR then all the non E errors have to removed from the processing list
 		if (processingFlavorSet != null && processingFlavorSet.contains(ProcessingFlavor.MEDLAR)) {
-			reportables = reportables.stream().filter(reportable -> !IisReportableSeverity.ERROR.equals(reportable.getSeverity())).collect(Collectors.toList());
+			reportables = reportables.stream().filter(reportable -> !IisReportableSeverityLevel.ERROR.equals(reportable.getSeverity())).collect(Collectors.toList());
 		}
 		data.setReportables(reportables);
 
@@ -328,7 +328,7 @@ public class V2IncomingMessageHandler extends IncomingMessageHandler<HL7Reader, 
 		patientReported.setUpdatedDate(new Date());
 		patientReported = fhirSaveRequester.savePatientReported(patientReported);
 //		patientReported = fhirRequester.saveRelatedPerson(patientReported);
-		iisReportableList.add(iisReportableUtilService.fromProcessingException(new ProcessingException("Patient record saved", PID, 0, 0, IisReportableSeverity.INFO)));
+		iisReportableList.add(iisReportableUtilService.fromProcessingException(new ProcessingException("Patient record saved", PID, 0, 0, IisReportableSeverityLevel.INFO)));
 
 		/*
 		 * checking if request is gathering patients  Ids to create a group, TODO cleaner solution

@@ -7,7 +7,7 @@ import hl7.v2.validation.ValidationContext;
 import hl7.v2.validation.ValidationContextBuilder;
 import org.immregistries.iis.kernal.logic.hl7v2.ack.IisReportableUtilService;
 import org.immregistries.iis.kernal.model.ack.IisReportable;
-import org.immregistries.iis.kernal.model.ack.IisReportableSeverity;
+import org.immregistries.iis.kernal.model.ack.IisReportableSeverityLevel;
 import org.immregistries.mqe.hl7util.ReportableSource;
 import org.immregistries.mqe.hl7util.SeverityLevel;
 import org.immregistries.mqe.hl7util.model.CodedWithExceptions;
@@ -115,7 +115,7 @@ public class ValidationService {
 				if (severityLevel != SeverityLevel.ACCEPT) {
 					IisReportable reportable = new IisReportable();
 					reportable.setSource(ReportableSource.NIST);
-					reportable.setSeverity(IisReportableSeverity.WARN);
+					reportable.setSeverity(IisReportableSeverityLevel.WARN);
 					reportableList.add(reportable);
 					reportable.setReportedMessage(assertion.getDescription());
 //					reportable.setSeverity(severityLevel);

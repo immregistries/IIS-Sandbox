@@ -1,22 +1,20 @@
 package org.immregistries.iis.kernal.controllers.rest.shlink;
 
-import org.immregistries.iis.kernal.services.api.IPatientShlinkApiManifestUrlService;
-import org.immregistries.iis.kernal.controllers.IisPathVariable;
-import org.immregistries.iis.kernal.controllers.IisRestPath;
-
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.hl7.fhir.instance.model.api.IAnyResource;
-import org.immregistries.iis.kernal.model.shlink.ShLinkPayload;
-import org.immregistries.iis.kernal.logic.shlink.CompressionService;
-import org.immregistries.iis.kernal.logic.shlink.PatientShLinkGenerator;
-import org.immregistries.iis.kernal.logic.shlink.ShLinkPayloadUtil;
+import org.immregistries.iis.kernal.controllers.IisPathVariable;
+import org.immregistries.iis.kernal.controllers.IisRestPath;
+import org.immregistries.iis.kernal.logic.shlink.generation.PatientShLinkGenerator;
 import org.immregistries.iis.kernal.mapping.IisFhirClientFactory;
 import org.immregistries.iis.kernal.mapping.mappers.resources.PatientMapper;
+import org.immregistries.iis.kernal.model.shlink.ShLinkPayload;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.immregistries.iis.kernal.security.CurrentTenantUtil;
+import org.immregistries.iis.kernal.services.QrCodeEncoder;
+import org.immregistries.iis.kernal.services.api.IPatientShlinkApiManifestUrlService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -32,7 +30,7 @@ public class PatientShLinkRestController {
 	@Autowired
 	private IisFhirClientFactory iisFhirClientFactory;
 	@Autowired
-	private CompressionService compressionService;
+	private QrCodeEncoder qrCodeEncoder;
 	@Autowired
 	private PatientShLinkGenerator patientShLinkGenerator;
 	@Autowired
@@ -50,8 +48,8 @@ public class PatientShLinkRestController {
 		}
 		String manifestUrl = patientShlinkApiManifestUrlService.getManifestUrl(req, patientSelected, tenant);
 		ShLinkPayload shLinkPayload = patientShLinkGenerator.generatePatientShLinkPayload(manifestUrl);
-		String qrCode = ShLinkPayloadUtil.toBase64QrCode(shLinkPayload);
-		ByteArrayOutputStream byteArrayOutputStreamPNG = compressionService.toQrCodeStreamPNG(qrCode);
+		String qrCode = qrCodeEncoder.toBase64QrCode(shLinkPayload);
+		ByteArrayOutputStream byteArrayOutputStreamPNG = qrCodeEncoder.toQrCodeStreamPNG(qrCode);
 		return ResponseEntity.ok(byteArrayOutputStreamPNG.toByteArray());
 
 	}

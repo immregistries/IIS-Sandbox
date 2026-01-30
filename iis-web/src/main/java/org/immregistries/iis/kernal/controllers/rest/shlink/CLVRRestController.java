@@ -11,14 +11,14 @@ import org.hl7.fhir.instance.model.api.IBaseBundle;
 import org.hl7.fhir.r4.model.IdType;
 import org.immregistries.iis.kernal.controllers.IisPathVariable;
 import org.immregistries.iis.kernal.controllers.IisRestPath;
-import org.immregistries.iis.kernal.services.KeyStoreService;
-import org.immregistries.iis.kernal.logic.shlink.CompressionService;
 import org.immregistries.iis.kernal.persisted.entities.IisKey;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.immregistries.iis.kernal.persisted.entities.UserAccess;
 import org.immregistries.iis.kernal.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.security.TenantAuthService;
 import org.immregistries.iis.kernal.security.UserAccessUtil;
+import org.immregistries.iis.kernal.services.KeyStoreService;
+import org.immregistries.iis.kernal.services.QrCodeEncoder;
 import org.immregitries.clvr.CLVRPdfService;
 import org.immregitries.clvr.CLVRService;
 import org.immregitries.clvr.mapping.FhirConversionUtil;
@@ -59,7 +59,7 @@ public class CLVRRestController {
     @Autowired
     private CLVRPdfService clvrPdfService;
     @Autowired
-    private CompressionService compressionService;
+    private QrCodeEncoder qrCodeEncoder;
 
     @GetMapping(value = "/qr", produces = MediaType.TEXT_PLAIN_VALUE)
     public String getPatientClvrQrCode(
@@ -87,7 +87,7 @@ public class CLVRRestController {
         CLVRToken clvrToken = getIpsClvrToken(patientId);
         String qrCode = clvrService.encodeCLVRtoQrCode(clvrToken, iisSigningKey.keyPair());
 
-        ByteArrayOutputStream byteArrayOutputStreamPNG = compressionService.toQrCodeStreamPNG(qrCode);
+        ByteArrayOutputStream byteArrayOutputStreamPNG = qrCodeEncoder.toQrCodeStreamPNG(qrCode);
         return ResponseEntity.ok(byteArrayOutputStreamPNG.toByteArray());
         // HttpHeaders headers = new HttpHeaders();
         // headers.setContentDispositionFormData("attachment", "qr.png");
@@ -141,7 +141,7 @@ public class CLVRRestController {
     public BufferedImage bufferedImage(String data) throws ServletException {
         int width = 300; // Desired QR code width
         int height = 300; // Desired QR code height
-        BitMatrix bitMatrix = compressionService.qrCodeBitMatrix(data, width, height);
+        BitMatrix bitMatrix = qrCodeEncoder.qrCodeBitMatrix(data, width, height);
         return MatrixToImageWriter.toBufferedImage(bitMatrix);
     }
 

@@ -1,9 +1,9 @@
 package org.immregistries.iis.kernal.logic.hl7v2.ack;
 
 import org.apache.commons.lang3.StringUtils;
+import org.immregistries.iis.kernal.enums.ProcessingFlavor;
 import org.immregistries.iis.kernal.model.ack.IisReportable;
-import org.immregistries.iis.kernal.model.ack.IisReportableSeverity;
-import org.immregistries.iis.kernal.model.enums.ProcessingFlavor;
+import org.immregistries.iis.kernal.model.ack.IisReportableSeverityLevel;
 import org.immregistries.mqe.hl7util.ReportableSource;
 import org.immregistries.mqe.hl7util.builder.AckERRCode;
 import org.immregistries.mqe.hl7util.builder.AckResult;
@@ -176,7 +176,7 @@ public class IisHL7UtilService {
 		appendErrorCode(err, reportable.getHl7ErrorCode());
 		err.append("|");
 		// 4 Severity
-		IisReportableSeverity level = reportable.getSeverity();
+		IisReportableSeverityLevel level = reportable.getSeverity();
 		err.append(level != null ? (level.getCode().equals("A") ? "I" : level.getCode()) : "E");
 
 		err.append("|");
@@ -335,28 +335,28 @@ public class IisHL7UtilService {
 		String ackCode = getAckCode(profileExtension, reportables, processingFlavorSet);
 		sb.append("MSA|").append(ackCode).append("|").append(controlId).append("|\r");
 		for (IisReportable r : reportables) {
-			if (r.getSeverity() == IisReportableSeverity.ERROR) {
+			if (r.getSeverity() == IisReportableSeverityLevel.ERROR) {
 				sb.append(makeERRSegment(r, PROCESSING_ID_DEBUG.equals(processingId)));
 			}
 		}
 		for (IisReportable r : reportables) {
-			if (r.getSeverity() == IisReportableSeverity.WARN) {
+			if (r.getSeverity() == IisReportableSeverityLevel.WARN) {
 				sb.append(makeERRSegment(r, PROCESSING_ID_DEBUG.equals(processingId)));
 			}
 		}
 		for (IisReportable r : reportables) {
-			if (r.getSeverity() == IisReportableSeverity.INFO) {
+			if (r.getSeverity() == IisReportableSeverityLevel.INFO) {
 				sb.append(makeERRSegment(r, PROCESSING_ID_DEBUG.equals(processingId)));
 			}
 		}
 		for (IisReportable r : reportables) {
-			if (r.getSeverity() == IisReportableSeverity.NOTICE) {
+			if (r.getSeverity() == IisReportableSeverityLevel.NOTICE) {
 				sb.append(makeERRSegment(r, PROCESSING_ID_DEBUG.equals(processingId)));
 			}
 		}
 		if (PROCESSING_ID_DEBUG.equals(processingId)) {
 			for (IisReportable r : reportables) {
-				if (r.getSeverity() == IisReportableSeverity.ACCEPT) {
+				if (r.getSeverity() == IisReportableSeverityLevel.ACCEPT) {
 					sb.append(makeERRSegment(r, true));
 				}
 			}
@@ -378,12 +378,12 @@ public class IisHL7UtilService {
 		if (processingFlavorSet.contains(ProcessingFlavor.NOTICE)) {
 			List<IisReportable> copy = new ArrayList<>(reportables.size());
 			for (IisReportable reportable : reportables) {
-				if (reportable.getSeverity() == IisReportableSeverity.ERROR) {
-					reportable.setSeverity(IisReportableSeverity.WARN);
-				} else if (reportable.getSeverity() == IisReportableSeverity.WARN) {
-					reportable.setSeverity(IisReportableSeverity.NOTICE);
-				} else if (reportable.getSeverity() == IisReportableSeverity.NOTICE) {
-					reportable.setSeverity(IisReportableSeverity.INFO);
+				if (reportable.getSeverity() == IisReportableSeverityLevel.ERROR) {
+					reportable.setSeverity(IisReportableSeverityLevel.WARN);
+				} else if (reportable.getSeverity() == IisReportableSeverityLevel.WARN) {
+					reportable.setSeverity(IisReportableSeverityLevel.NOTICE);
+				} else if (reportable.getSeverity() == IisReportableSeverityLevel.NOTICE) {
+					reportable.setSeverity(IisReportableSeverityLevel.INFO);
 				}
 				copy.add(reportable);
 			}
@@ -391,10 +391,10 @@ public class IisHL7UtilService {
 		}
 
 		if (ADVANCED_ACK.equals(profileExtension)) {  // If extended ACK profile
-			if (hasErrorSeverityType(reportables, IisReportableSeverity.ERROR.getCode())) {
+			if (hasErrorSeverityType(reportables, IisReportableSeverityLevel.ERROR.getCode())) {
 				ackCode = AckResult.APP_ERROR.getCode();
 				for (IisReportable r : reportables) {
-					if (r.getSeverity() == IisReportableSeverity.ERROR && r.getHl7ErrorCode() != null
+					if (r.getSeverity() == IisReportableSeverityLevel.ERROR && r.getHl7ErrorCode() != null
 						&& r.getHl7ErrorCode().getIdentifier() != null) {
 						hl7ErrorCode = r.getHl7ErrorCode().getIdentifier();
 						if (hl7ErrorCode != null && hl7ErrorCode.startsWith("2")) {
@@ -403,7 +403,7 @@ public class IisHL7UtilService {
 						}
 					}
 				}
-			} else if (hasErrorSeverityType(reportables, IisReportableSeverity.WARN.getCode())) {
+			} else if (hasErrorSeverityType(reportables, IisReportableSeverityLevel.WARN.getCode())) {
 				ackCode = "AW";
 			} else if (hasErrorSeverityType(reportables, "N")) {
 				ackCode = "AN";
@@ -412,15 +412,15 @@ public class IisHL7UtilService {
 			}
 		} else {
 			List<IisReportable> list = reportables.stream().peek(iisReportable -> {
-				if (iisReportable.getSeverity().equals(IisReportableSeverity.NOTICE)) {
-					iisReportable.setSeverity(IisReportableSeverity.INFO);
+				if (iisReportable.getSeverity().equals(IisReportableSeverityLevel.NOTICE)) {
+					iisReportable.setSeverity(IisReportableSeverityLevel.INFO);
 				}
 			}).collect(Collectors.toList());
 			reportables = list;
-			if (hasErrorSeverityType(reportables, IisReportableSeverity.ERROR.getCode()) || hasErrorSeverityType(reportables, IisReportableSeverity.WARN.getCode())) {
+			if (hasErrorSeverityType(reportables, IisReportableSeverityLevel.ERROR.getCode()) || hasErrorSeverityType(reportables, IisReportableSeverityLevel.WARN.getCode())) {
 				ackCode = AckResult.APP_ERROR.getCode();
 				for (IisReportable r : reportables) {
-					if ((r.getSeverity() == IisReportableSeverity.ERROR || r.getSeverity() == IisReportableSeverity.WARN) && r.getHl7ErrorCode() != null
+					if ((r.getSeverity() == IisReportableSeverityLevel.ERROR || r.getSeverity() == IisReportableSeverityLevel.WARN) && r.getHl7ErrorCode() != null
 						&& r.getHl7ErrorCode().getIdentifier() != null) {
 						hl7ErrorCode = r.getHl7ErrorCode().getIdentifier();
 						if (hl7ErrorCode != null && hl7ErrorCode.startsWith("2")) {

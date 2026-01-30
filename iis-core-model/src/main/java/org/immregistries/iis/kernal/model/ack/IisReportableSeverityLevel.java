@@ -1,7 +1,10 @@
 package org.immregistries.iis.kernal.model.ack;
 
 
-public enum IisReportableSeverity {
+/**
+ * Based on MQE Reportable severity
+ */
+public enum IisReportableSeverityLevel {
 
 	/**
 	 * Data needs to be fixed, and the message should be resubmitted.
@@ -30,15 +33,15 @@ public enum IisReportableSeverity {
 	private String severityLabel = "";
 	private String severityDescription = "";
 
-	private IisReportableSeverity(String actionCode, String actionLabel,
-											String actionDesc) {
+	private IisReportableSeverityLevel(String actionCode, String actionLabel,
+												  String actionDesc) {
 		this.severityCode = actionCode;
 		this.severityLabel = actionLabel;
 		this.severityDescription = actionDesc;
 	}
 
-	public static IisReportableSeverity findByCode(String code) {
-		for (IisReportableSeverity s : IisReportableSeverity.values()) {
+	public static IisReportableSeverityLevel findByCode(String code) {
+		for (IisReportableSeverityLevel s : IisReportableSeverityLevel.values()) {
 			if (s.getCode() == code) {
 				return s;
 			}
@@ -46,8 +49,8 @@ public enum IisReportableSeverity {
 		return null;
 	}
 
-	public static IisReportableSeverity findByLabel(String label) {
-		for (IisReportableSeverity s : IisReportableSeverity.values()) {
+	public static IisReportableSeverityLevel findByLabel(String label) {
+		for (IisReportableSeverityLevel s : IisReportableSeverityLevel.values()) {
 			if (s.getLabel().equalsIgnoreCase(label)) {
 				return s;
 			}

@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal.model.enums;
+package org.immregistries.iis.kernal.enums;
 
 import java.util.HashSet;
 import java.util.Set;

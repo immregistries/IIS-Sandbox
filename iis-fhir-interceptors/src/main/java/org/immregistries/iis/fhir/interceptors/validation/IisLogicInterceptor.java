@@ -9,7 +9,7 @@ import org.immregistries.iis.kernal.mapping.mappers.resources.IisResourceMasterR
 import org.immregistries.iis.kernal.model.ITenantTiedObject;
 import org.immregistries.iis.kernal.model.IisMappedToFhirResource;
 import org.immregistries.iis.kernal.model.ack.IisReportable;
-import org.immregistries.iis.kernal.model.ack.IisReportableSeverity;
+import org.immregistries.iis.kernal.model.ack.IisReportableSeverityLevel;
 import org.immregistries.mqe.hl7util.model.CodedWithExceptions;
 import org.immregistries.mqe.hl7util.model.Hl7Location;
 import org.jetbrains.annotations.NotNull;
@@ -39,7 +39,7 @@ public abstract class IisLogicInterceptor implements IisValidationInterceptor {
 		applicationErrorCode.setText(text);
 		iisReportable.setApplicationErrorCode(applicationErrorCode);
 		iisReportable.setHl7ErrorCode(applicationErrorCode);
-		iisReportable.setSeverity(IisReportableSeverity.WARN);
+		iisReportable.setSeverity(IisReportableSeverityLevel.WARN);
 		return iisReportable;
 	}
 

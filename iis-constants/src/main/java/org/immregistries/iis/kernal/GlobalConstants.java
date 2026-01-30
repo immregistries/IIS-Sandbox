@@ -12,5 +12,6 @@ public final class GlobalConstants {
 
 	public static final String FHIR_CLIENT_REQUEST_ATTRIBUTE = "fhirClient";
 
+	public static final String SHLINK_PREFIX = "shlink:/";
 
 }

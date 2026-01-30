@@ -7,7 +7,7 @@ import org.immregistries.iis.kernal.mapping.mappers.IisMapper;
 import org.immregistries.iis.kernal.mapping.mappers.fields.IFieldMapper;
 import org.immregistries.iis.kernal.mapping.mappers.resources.IisResourceMapper;
 import org.immregistries.iis.kernal.mapping.mappers.resources.IisResourceMasterReportedMapper;
-import org.immregistries.iis.kernal.model.IisDiffableObject;
+import org.immregistries.iis.kernal.model.IisDiffable;
 import org.immregistries.iis.kernal.model.IisMappedToFhir;
 import org.immregistries.iis.kernal.model.IisMappedToFhirResource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,7 +59,7 @@ public class MappingService {
 	}
 
 	@SuppressWarnings("unchecked")
-	public IisDiffableObject localField(IBaseDatatype datatype) {
+	public IisDiffable localField(IBaseDatatype datatype) {
 		@SuppressWarnings("rawtypes")
 		IFieldMapper mapper = mapperRegistry.fieldMapper(datatype);
 		return mapper.localObject(datatype);

@@ -8,7 +8,7 @@ import org.apache.commons.lang3.builder.ReflectionDiffBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public abstract class IisDiffableObject<T> implements Diffable<T> {
+public abstract class IisDiffable<T> implements Diffable<T> {
 
 	@JsonIgnore()
 	public DiffResult diff(T obj) {

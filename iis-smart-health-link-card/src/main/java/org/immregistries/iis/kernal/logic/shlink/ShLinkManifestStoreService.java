@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
-public class ShLinkManifestService {
+public class ShLinkManifestStoreService {
 
 	@Autowired
 	private ShlinkManifestRepository shlinkManifestRepository;

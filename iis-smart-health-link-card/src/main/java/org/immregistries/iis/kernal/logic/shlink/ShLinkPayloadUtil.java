@@ -3,14 +3,16 @@ package org.immregistries.iis.kernal.logic.shlink;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.util.Base64URL;
+import org.immregistries.iis.kernal.GlobalConstants;
 import org.immregistries.iis.kernal.model.shlink.ShLinkPayload;
+import org.springframework.stereotype.Service;
 
+@Service
 public class ShLinkPayloadUtil {
 
-	public static final String SHLINK_PREFIX = "shlink:/";
-	private static final ObjectMapper objectMapper = new ObjectMapper();
+	private final ObjectMapper objectMapper = new ObjectMapper();
 
-	public static String toBase64QrCode(ShLinkPayload shLinkPayload) {
+	public String toBase64QrCode(ShLinkPayload shLinkPayload) {
 		String payload = "";
 		try {
 			payload = objectMapper.writeValueAsString(shLinkPayload);
@@ -18,7 +20,7 @@ public class ShLinkPayloadUtil {
 			throw new RuntimeException(e);
 		}
 		Base64URL base64URL = Base64URL.encode(payload);
-		return SHLINK_PREFIX + base64URL;
+		return GlobalConstants.SHLINK_PREFIX + base64URL;
 	}
 
 

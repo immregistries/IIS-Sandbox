@@ -1,13 +1,12 @@
 package org.immregistries.iis.kernal.controllers.rest.shlink;
 
+import jakarta.servlet.http.HttpServletRequest;
+import org.apache.commons.lang3.StringUtils;
 import org.immregistries.iis.kernal.controllers.IisPathVariable;
 import org.immregistries.iis.kernal.controllers.IisRestParam;
 import org.immregistries.iis.kernal.controllers.IisRestPath;
-
-import jakarta.servlet.http.HttpServletRequest;
-import org.apache.commons.lang3.StringUtils;
 import org.immregistries.iis.kernal.logic.shlink.ShLinkManifestGenerator;
-import org.immregistries.iis.kernal.logic.shlink.ShLinkManifestService;
+import org.immregistries.iis.kernal.logic.shlink.ShLinkManifestStoreService;
 import org.immregistries.iis.kernal.persisted.entities.ShLinkManifest;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.immregistries.iis.kernal.security.CurrentTenantUtil;
@@ -29,13 +28,13 @@ public class ShLinkManifestRestController {
 	@Autowired
 	private ShLinkManifestGenerator shLinkManifestGenerator;
 	@Autowired
-	private ShLinkManifestService shlinkManifestService;
+	private ShLinkManifestStoreService shlinkManifestStoreService;
 	@Autowired
 	private TenantAuthService tenantAuthService;
 
 	@GetMapping(IisPathVariable.PlaceHolder.MANIFEST_ID_PLACEHOLDER)
 	public ShLinkManifest getManifest(@PathVariable(IisPathVariable.Key.MANIFEST_ID) String manifestId) {
-		return shlinkManifestService.readManifest(manifestId);
+		return shlinkManifestStoreService.readManifest(manifestId);
 	}
 
 	@PostMapping(IisPathVariable.PlaceHolder.MANIFEST_ID_PLACEHOLDER)
@@ -52,18 +51,18 @@ public class ShLinkManifestRestController {
 		if (tenant == null) {
 			throw new AuthenticationCredentialsNotFoundException("Invalid passcode");
 		}
-		return shlinkManifestService.readManifest(manifestId);
+		return shlinkManifestStoreService.readManifest(manifestId);
 	}
 
 	@GetMapping()
 	public List<ShLinkManifest> getManifestAll() {
-		return shlinkManifestService.getAllManifests();
+		return shlinkManifestStoreService.getAllManifests();
 	}
 
 	@GetMapping("/$generate")
 	public ShLinkManifest genManifest(HttpServletRequest req) {
 		ShLinkManifest shLinkManifest = shLinkManifestGenerator.generateManifest(CurrentTenantUtil.getTenant(req));
-		return shlinkManifestService.saveManifest(shLinkManifest);
+		return shlinkManifestStoreService.saveManifest(shLinkManifest);
 	}
 
 }

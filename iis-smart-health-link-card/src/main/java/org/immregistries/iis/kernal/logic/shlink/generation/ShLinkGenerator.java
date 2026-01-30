@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal.logic.shlink;
+package org.immregistries.iis.kernal.logic.shlink.generation;
 
 import ca.uhn.fhir.jpa.ips.generator.IIpsGeneratorSvc;
 import io.jsonwebtoken.Jwts;
@@ -6,14 +6,18 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.instance.model.api.IBaseBundle;
 import org.hl7.fhir.r4.model.IdType;
-import org.immregistries.iis.kernal.model.shlink.ShLinkPayload;
-import org.immregistries.iis.kernal.services.KeyStoreService;
-import org.immregistries.iis.kernal.services.SecretKeyUtilService;
-import org.immregistries.iis.kernal.services.api.IWellKnownKeyApiService;
+import org.immregistries.iis.kernal.logic.shlink.IShApiUrlService;
+import org.immregistries.iis.kernal.logic.shlink.ShLinkManifestStoreService;
 import org.immregistries.iis.kernal.model.shlink.ShLinkFilePayload;
+import org.immregistries.iis.kernal.model.shlink.ShLinkPayload;
 import org.immregistries.iis.kernal.persisted.entities.*;
 import org.immregistries.iis.kernal.persisted.repository.IisShlinkContentRepository;
 import org.immregistries.iis.kernal.security.TenantAuthService;
+import org.immregistries.iis.kernal.services.CompressionService;
+import org.immregistries.iis.kernal.services.KeyStoreService;
+import org.immregistries.iis.kernal.services.QrCodeEncoder;
+import org.immregistries.iis.kernal.services.SecretKeyUtilService;
+import org.immregistries.iis.kernal.services.api.IWellKnownKeyApiService;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +36,7 @@ import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 
-import static org.immregistries.iis.kernal.logic.shlink.ShCardGenerator.VERIFIABLE_CREDENTIAL_TYPE;
+import static org.immregistries.iis.kernal.logic.shlink.generation.ShCardGenerator.VERIFIABLE_CREDENTIAL_TYPE;
 
 @Service
 public class ShLinkGenerator {
@@ -50,7 +54,7 @@ public class ShLinkGenerator {
 	@Autowired
 	private CompressionService compressionService;
 	@Autowired
-	private ShLinkManifestService shlinkManifestService;
+	private ShLinkManifestStoreService shlinkManifestStoreService;
 	@Autowired
 	private IIpsGeneratorSvc iIpsGeneratorSvc;
 	@Autowired
@@ -61,6 +65,8 @@ public class ShLinkGenerator {
 	private IWellKnownKeyApiService wellKnownKeyService;
 	@Autowired
 	private IShApiUrlService shApiUrlService;
+	@Autowired
+	private QrCodeEncoder qrCodeEncoder;
 
 	public String generateShLink(HttpServletRequest req, String keyId, String secretKey, String patientId, String flag, String exp, Tenant tenant, UserAccess userAccess) throws NoSuchAlgorithmException, IOException {
 		/*
@@ -91,7 +97,7 @@ public class ShLinkGenerator {
 		URL url = generateShLinkForShCards(List.of(ipsToBeEncoded), shLinkPayload, req,
 			iisSigningKey, encryptionKeySpec, userAccess, tenant);
 		shLinkPayload.setUrl(url.toString());
-		return ShLinkPayloadUtil.toBase64QrCode(shLinkPayload);
+		return qrCodeEncoder.toBase64QrCode(shLinkPayload);
 	}
 
 
@@ -145,8 +151,7 @@ public class ShLinkGenerator {
 		fileManifest.setEmbedded(encryptedContent);
 		shLinkManifest.addFiles(fileManifest);
 
-		shlinkManifestService.saveManifest(shLinkManifest);
-
+		shlinkManifestStoreService.saveManifest(shLinkManifest);
 
 		shApiUrlService.replaceUrlWithShCardPattern(uriBuilder);
 		shLinkUrl = uriBuilder

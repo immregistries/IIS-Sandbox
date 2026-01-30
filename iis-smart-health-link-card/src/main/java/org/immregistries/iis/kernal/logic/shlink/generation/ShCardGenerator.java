@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal.logic.shlink;
+package org.immregistries.iis.kernal.logic.shlink.generation;
 
 import ca.uhn.fhir.context.FhirContext;
 import com.google.gson.Gson;
@@ -8,6 +8,7 @@ import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import org.hl7.fhir.instance.model.api.IBaseBundle;
 import org.immregistries.iis.kernal.persisted.entities.IisKey;
+import org.immregistries.iis.kernal.services.CompressionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

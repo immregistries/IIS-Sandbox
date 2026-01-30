@@ -2,14 +2,17 @@ package org.immregistries.iis.kernal.persisted.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import org.immregistries.iis.kernal.enums.ProcessingFlavor;
 import org.immregistries.iis.kernal.model.IisMappedToFhirResource;
-import org.immregistries.iis.kernal.model.enums.ProcessingFlavor;
 
 import java.io.Serializable;
 import java.util.Set;
 
 @Entity
 @Table
+/**
+ * Used for multitenancy, is implicitely linked to a HapiFHIR RequestPartitionId in the server
+ */
 public class Tenant extends IisMappedToFhirResource implements Serializable {
 
 	@Id

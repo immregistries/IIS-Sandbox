@@ -58,6 +58,11 @@
             <artifactId>iis-logic-immds</artifactId>
             <version>${revision}</version>
         </dependency>
+        <dependency>
+            <groupId>org.immregistries.iis</groupId>
+            <artifactId>iis-smart-health-link-card</artifactId>
+            <version>${revision}</version>
+        </dependency>
 
 <!--        <dependency>-->
 <!--            <groupId>org.immregistries.iis</groupId>-->

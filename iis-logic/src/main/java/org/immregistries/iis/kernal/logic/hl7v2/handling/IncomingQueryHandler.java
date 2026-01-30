@@ -7,24 +7,24 @@ import org.hl7.fhir.instance.model.api.IIdType;
 import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
-import org.immregistries.iis.kernal.services.CodeMapManagerService;
-import org.immregistries.iis.kernal.services.MessageRecordingService;
+import org.immregistries.iis.kernal.enums.ProcessingFlavor;
+import org.immregistries.iis.kernal.enums.VaccinationRecommendationDateCode;
+import org.immregistries.iis.kernal.enums.VaccinePlanStatus;
 import org.immregistries.iis.kernal.logic.hl7v2.ack.IisHL7UtilService;
 import org.immregistries.iis.kernal.logic.hl7v2.ack.IisReportableUtilService;
 import org.immregistries.iis.kernal.logic.hl7v2.ack.V2DateParseService;
 import org.immregistries.iis.kernal.logic.hl7v2.writing.Hl7MessageWriter;
 import org.immregistries.iis.kernal.logic.recommendations.CdsQueryService;
-import org.immregistries.iis.kernal.enums.VaccinationRecommendationDateCode;
-import org.immregistries.iis.kernal.enums.VaccinePlanStatus;
 import org.immregistries.iis.kernal.logic.validation.ProcessingException;
 import org.immregistries.iis.kernal.logic.validation.ValidationService;
 import org.immregistries.iis.kernal.mapping.requesters.FhirMatchRequester;
 import org.immregistries.iis.kernal.mapping.requesters.FhirSearchRequester;
 import org.immregistries.iis.kernal.model.*;
 import org.immregistries.iis.kernal.model.ack.IisReportable;
-import org.immregistries.iis.kernal.model.ack.IisReportableSeverity;
-import org.immregistries.iis.kernal.model.enums.ProcessingFlavor;
+import org.immregistries.iis.kernal.model.ack.IisReportableSeverityLevel;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
+import org.immregistries.iis.kernal.services.CodeMapManagerService;
+import org.immregistries.iis.kernal.services.MessageRecordingService;
 import org.immregistries.mqe.validator.MqeMessageServiceResponse;
 import org.immregistries.smm.tester.manager.HL7Reader;
 import org.immregistries.vfa.connect.model.Admin;
@@ -99,7 +99,7 @@ public class IncomingQueryHandler {
 			String patientNameMiddle = reader.getValue(4, 3);
 
 			if (processingFlavorSet.contains(ProcessingFlavor.MOONFRUIT) && (StringUtils.defaultString(patientNameFirst).startsWith("S") || StringUtils.defaultString(patientNameFirst).startsWith("A"))) {
-				throw new ProcessingException("Immunization History cannot be Accepted because of patient's consent status", "PID", 0, 0, IisReportableSeverity.WARN);
+				throw new ProcessingException("Immunization History cannot be Accepted because of patient's consent status", "PID", 0, 0, IisReportableSeverityLevel.WARN);
 			}
 			boolean strictDate = false;
 
@@ -159,7 +159,7 @@ public class IncomingQueryHandler {
 		MqeMessageServiceResponse mqeMessageServiceResponse = validationService.getMqeMessageService().processMessage(messageReceived);
 		boolean sendInformations = true;
 		if (processingFlavorSet.contains(ProcessingFlavor.STARFRUIT) && (StringUtils.defaultString(patientMaster.getNameFirst()).startsWith("S") || StringUtils.defaultString(patientMaster.getNameFirst()).startsWith("A"))) {
-			iisReportables.add(iisReportableUtilService.fromProcessingException(new ProcessingException("Immunization History cannot be shared because of patient's consent status", "PID", 0, 0, IisReportableSeverity.NOTICE)));
+			iisReportables.add(iisReportableUtilService.fromProcessingException(new ProcessingException("Immunization History cannot be shared because of patient's consent status", "PID", 0, 0, IisReportableSeverityLevel.NOTICE)));
 			sendInformations = false;
 		}
 		reader.resetPostion();

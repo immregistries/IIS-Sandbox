@@ -8,6 +8,9 @@ import org.immregistries.mqe.hl7util.model.Hl7Location;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Based on MQE Reportable, changed to include new Severity levels
+ */
 public class IisReportable {
 
 	private CodedWithExceptions applicationErrorCode = new CodedWithExceptions();
@@ -15,7 +18,7 @@ public class IisReportable {
 	private CodedWithExceptions hl7ErrorCode = new CodedWithExceptions();
 	private List<Hl7Location> hl7LocationList = new ArrayList();
 	private String reportedMessage = null;
-	private IisReportableSeverity severity = null;
+	private IisReportableSeverityLevel severity = null;
 	private ReportableSource source;
 
 	public IisReportable() {
@@ -26,7 +29,7 @@ public class IisReportable {
 		diagnosticMessage = reportable.getDiagnosticMessage();
 		hl7ErrorCode = reportable.getHl7ErrorCode();
 		reportedMessage = reportable.getReportedMessage();
-		severity = IisReportableSeverity.findByCode(reportable.getSeverity().getCode());
+		severity = IisReportableSeverityLevel.findByCode(reportable.getSeverity().getCode());
 		source = reportable.getSource();
 		hl7LocationList = List.copyOf(reportable.getHl7LocationList());
 	}
@@ -90,11 +93,11 @@ public class IisReportable {
 		this.reportedMessage = reportedMessage;
 	}
 
-	public IisReportableSeverity getSeverity() {
+	public IisReportableSeverityLevel getSeverity() {
 		return severity;
 	}
 
-	public void setSeverity(IisReportableSeverity severity) {
+	public void setSeverity(IisReportableSeverityLevel severity) {
 		this.severity = severity;
 	}
 
@@ -108,11 +111,11 @@ public class IisReportable {
 
 
 	public boolean isError() {
-		return IisReportableSeverity.ERROR.equals(this.severity);
+		return IisReportableSeverityLevel.ERROR.equals(this.severity);
 	}
 
 	public boolean isWarning() {
-		return IisReportableSeverity.WARN.equals(this.severity);
+		return IisReportableSeverityLevel.WARN.equals(this.severity);
 	}
 
 }

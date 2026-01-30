@@ -1,16 +1,15 @@
 package org.immregistries.iis.kernal.logic.validation;
 
-import ca.uhn.fhir.context.FhirContext;
 import org.apache.commons.lang3.StringUtils;
 import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
+import org.immregistries.iis.kernal.enums.ProcessingFlavor;
 import org.immregistries.iis.kernal.logic.hl7v2.ack.IisReportableUtilService;
 import org.immregistries.iis.kernal.mapping.mappers.resources.ImmunizationMapper;
 import org.immregistries.iis.kernal.model.VaccinationReported;
 import org.immregistries.iis.kernal.model.ack.IisReportable;
-import org.immregistries.iis.kernal.model.ack.IisReportableSeverity;
-import org.immregistries.iis.kernal.model.enums.ProcessingFlavor;
+import org.immregistries.iis.kernal.model.ack.IisReportableSeverityLevel;
 import org.immregistries.iis.kernal.services.CodeMapManagerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -48,14 +47,14 @@ public class ImmunizationValidator extends IisValidator{
 			Code refusalCode = codeMap.getCodeForCodeset(CodesetType.VACCINATION_REFUSAL, vaccinationReported.getRefusalReasonCode());
 			if (refusalCode == null) {
 				ProcessingException pe = new ProcessingException("Unrecognized refusal reason", "RXA", rxaCount, 18);
-				pe.setErrorCode(IisReportableSeverity.WARN);
+				pe.setErrorCode(IisReportableSeverityLevel.WARN);
 				iisReportableList.add(iisReportableUtilService.fromProcessingException(pe));
 			}
 		}
 
 
 		if (processingFlavorSet.contains(ProcessingFlavor.GRAPEFRUIT) && random.nextBoolean()) {
-			throw new ProcessingException("Vaccination randomly rejected, Patient Accepted", "RXR", 0, 0, IisReportableSeverity.NOTICE);
+			throw new ProcessingException("Vaccination randomly rejected, Patient Accepted", "RXR", 0, 0, IisReportableSeverityLevel.NOTICE);
 		}
 
 
@@ -63,7 +62,7 @@ public class ImmunizationValidator extends IisValidator{
 		if (!fundingEligibility.isEmpty()) {
 			Code fundingEligibilityCode = codeMap.getCodeForCodeset(CodesetType.FINANCIAL_STATUS_CODE, fundingEligibility);
 			if (fundingEligibilityCode == null) {
-				ProcessingException pe = new ProcessingException("Funding eligibility '" + fundingEligibility + "' was not recognized", "OBX", fundingEligibilityObxCount, 5, IisReportableSeverity.WARN);
+				ProcessingException pe = new ProcessingException("Funding eligibility '" + fundingEligibility + "' was not recognized", "OBX", fundingEligibilityObxCount, 5, IisReportableSeverityLevel.WARN);
 				iisReportableList.add(iisReportableUtilService.fromProcessingException(pe));
 				vaccinationReported.setFundingEligibility("");
 			}
@@ -73,7 +72,7 @@ public class ImmunizationValidator extends IisValidator{
 		if (!fundingSource.isEmpty()) {
 			Code fundingSourceCode = codeMap.getCodeForCodeset(CodesetType.VACCINATION_FUNDING_SOURCE, fundingSource);
 			if (fundingSourceCode == null) {
-				ProcessingException pe = new ProcessingException("Funding source '" + fundingSource + "' was not recognized", "OBX", fundingSourceObxCount, 5, IisReportableSeverity.WARN);
+				ProcessingException pe = new ProcessingException("Funding source '" + fundingSource + "' was not recognized", "OBX", fundingSourceObxCount, 5, IisReportableSeverityLevel.WARN);
 				iisReportableList.add(iisReportableUtilService.fromProcessingException(pe));
 				vaccinationReported.setFundingSource("");
 			}
@@ -93,14 +92,14 @@ public class ImmunizationValidator extends IisValidator{
 				}
 				Code cvxCode = codeMap.getRelatedCode(ndcCode, CodesetType.VACCINATION_CVX_CODE);
 				if (cvxCode == null) {
-					ProcessingException pe = new ProcessingException("Unrecognized NDC " + vaccineNdcCode, "RXA", rxaCount, 5, IisReportableSeverity.WARN);
+					ProcessingException pe = new ProcessingException("Unrecognized NDC " + vaccineNdcCode, "RXA", rxaCount, 5, IisReportableSeverityLevel.WARN);
 					iisReportableList.add(iisReportableUtilService.fromProcessingException(pe));
 				} else {
 					if (StringUtils.isBlank(vaccineCvxCode)) {
 						vaccineCvxCode = cvxCode.getValue();
 					} else if (!vaccineCvxCode.equals(cvxCode.getValue())) {
 						// NDC doesn't map to the CVX code that was submitted!
-						ProcessingException pe = new ProcessingException("NDC " + vaccineNdcCode + " maps to " + cvxCode.getValue() + " but CVX " + vaccineCvxCode + " was also reported, preferring CVX code", "RXA", rxaCount, 5, IisReportableSeverity.WARN);
+						ProcessingException pe = new ProcessingException("NDC " + vaccineNdcCode + " maps to " + cvxCode.getValue() + " but CVX " + vaccineCvxCode + " was also reported, preferring CVX code", "RXA", rxaCount, 5, IisReportableSeverityLevel.WARN);
 						iisReportableList.add(iisReportableUtilService.fromProcessingException(pe));
 					}
 				}
@@ -111,14 +110,14 @@ public class ImmunizationValidator extends IisValidator{
 			if (cptCode != null) {
 				Code cvxCode = codeMap.getRelatedCode(cptCode, CodesetType.VACCINATION_CVX_CODE);
 				if (cvxCode == null) {
-					ProcessingException pe = new ProcessingException("Unrecognized CPT " + cptCode, "RXA", rxaCount, 5, IisReportableSeverity.WARN);
+					ProcessingException pe = new ProcessingException("Unrecognized CPT " + cptCode, "RXA", rxaCount, 5, IisReportableSeverityLevel.WARN);
 					iisReportableList.add(iisReportableUtilService.fromProcessingException(pe));
 				} else {
 					if (StringUtils.isBlank(vaccineCvxCode)) {
 						vaccineCvxCode = cvxCode.getValue();
 					} else if (!vaccineCvxCode.equals(cvxCode.getValue())) {
 						// CPT doesn't map to the CVX code that was submitted!
-						ProcessingException pe = new ProcessingException("CPT " + vaccineCptCode + " maps to " + cvxCode.getValue() + " but CVX " + vaccineCvxCode + " was also reported, preferring CVX code", "RXA", rxaCount, 5, IisReportableSeverity.WARN);
+						ProcessingException pe = new ProcessingException("CPT " + vaccineCptCode + " maps to " + cvxCode.getValue() + " but CVX " + vaccineCvxCode + " was also reported, preferring CVX code", "RXA", rxaCount, 5, IisReportableSeverityLevel.WARN);
 						iisReportableList.add(iisReportableUtilService.fromProcessingException(pe));
 					}
 				}
