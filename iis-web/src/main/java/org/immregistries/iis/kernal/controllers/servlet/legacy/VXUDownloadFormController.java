@@ -31,10 +31,14 @@ import java.text.SimpleDateFormat;
 @RequestMapping({ "/VXUDownloadForm", TenantController.TENANT_PATH + "/VXUDownloadForm" })
 public class VXUDownloadFormController {
 
-	@Autowired
-	FhirSearchRequester fhirSearchRequester;
-	@Autowired
-	IExampleMessageWriter exampleMessageWriter;
+  @Autowired
+  FhirSearchRequester fhirSearchRequester;
+  @Autowired
+  IExampleMessageWriter exampleMessageWriter;
+  @Autowired
+  private UiUtil uiUtil;
+  @Autowired
+  private UrlTenantUtil urlTenantUtil;
 
   protected static final String CACHED_GENERATOR = "generator";
   protected static final String EXPORT_YYYY_MM_DD = "yyyy-MM-dd";
@@ -70,10 +74,10 @@ public class VXUDownloadFormController {
       }
       VXUDownloadGenerator generator = (VXUDownloadGenerator) session.getAttribute(CACHED_GENERATOR);
       if (generator == null || action == null || action.equals(ACTION_GENERATE)) {
-			generator = new VXUDownloadGenerator(req, tenant, fhirSearchRequester, exampleMessageWriter);
+        generator = new VXUDownloadGenerator(req, tenant, fhirSearchRequester, exampleMessageWriter);
         session.setAttribute(CACHED_GENERATOR, generator);
       }
-      UiUtil.doHeader(out, "IIS Sandbox", tenant);
+      uiUtil.doHeader(out, "IIS Sandbox", tenant);
 
       if (action.equals(ACTION_GENERATE) && generator.canGenerate()) {
         generator.start();
@@ -122,7 +126,7 @@ public class VXUDownloadFormController {
       if (generator.isFileReady()) {
         String link = "VXUDownload";
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-        out.println("<a href=\"" + UrlTenantUtil.tenantifyPathWithContextPath(tenant, link) + "\" download=\"export"
+        out.println("<a href=\"" + urlTenantUtil.tenantifyPathWithContextPath(tenant, link) + "\" download=\"export"
             + sdf.format(generator.getDateEnd()) + ".vxu.txt\">Download</a>");
       }
       out.println("    </div>");
@@ -131,7 +135,7 @@ public class VXUDownloadFormController {
       System.err.println("Unable to render page: " + e.getMessage());
       e.printStackTrace(System.err);
     }
-    UiUtil.doFooter(out);
+    uiUtil.doFooter(out);
     out.flush();
     out.close();
   }

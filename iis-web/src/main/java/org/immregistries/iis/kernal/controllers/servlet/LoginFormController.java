@@ -22,11 +22,12 @@ import java.io.PrintWriter;
 @RequestMapping("/loginForm")
 public class LoginFormController {
 
-
 	@Autowired
 	private AuthenticationRestController authenticationRestController;
 	@Autowired
 	private TenantRestController tenantRestController;
+	@Autowired
+	private UiUtil uiUtil;
 
 	public static final String LOGIN_PARAM_USERID = "USERID";
 	public static final String LOGIN_PARAM_PASSWORD = "PASSWORD";
@@ -49,7 +50,7 @@ public class LoginFormController {
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		String locationHeader = req.getHeader("referer");
 		try {
-			UiUtil.doHeader(out, "IIS Sandbox");
+			uiUtil.doHeader(out, "IIS Sandbox");
 			Authentication authentication = authenticationRestController.getAuthentication();
 			// LOGIN FORM, inherited, could be made in a separate class and improved
 			if (!authentication.isAuthenticated() || authentication instanceof AnonymousAuthenticationToken) {
@@ -95,7 +96,7 @@ public class LoginFormController {
 			System.err.println("Unable to render page: " + e.getMessage());
 			e.printStackTrace(System.err);
 		}
-		UiUtil.doFooter(out);
+		uiUtil.doFooter(out);
 		out.flush();
 		out.close();
 	}

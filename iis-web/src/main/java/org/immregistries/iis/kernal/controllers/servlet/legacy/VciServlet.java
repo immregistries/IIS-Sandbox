@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -25,6 +26,9 @@ import java.util.*;
 @RestController
 @RequestMapping({ "/vciDemo", TenantController.TENANT_PATH + "/vciDemo" })
 public class VciServlet {
+
+  @Autowired
+  private UiUtil uiUtil;
 
   public static final Map<String, String> GENDER_MAP;
 
@@ -167,7 +171,7 @@ public class VciServlet {
 
         message = mapper.writeValueAsString(verifiableCredential);
       }
-      UiUtil.doHeader(out, "IIS Sandbox");
+      uiUtil.doHeader(out, "IIS Sandbox");
       out.println("    <h2>VCI Demonstration</h2>");
       out.println("    <form action=\"vciDemo\" method=\"POST\">");
       if (conversionStep == null) {
@@ -216,7 +220,7 @@ public class VciServlet {
 
       out.println("    </div>");
       out.println("    </form>");
-      UiUtil.doFooter(out);
+      uiUtil.doFooter(out);
     } catch (Exception e) {
       e.printStackTrace(System.err);
     }

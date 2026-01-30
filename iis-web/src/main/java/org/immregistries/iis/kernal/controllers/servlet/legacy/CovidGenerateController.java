@@ -10,15 +10,18 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 
 @SuppressWarnings("serial")
 @RestController
-@RequestMapping({"/covidGenerate", TenantController.TENANT_PATH + "/covidGenerate"})
+@RequestMapping({ "/covidGenerate", TenantController.TENANT_PATH + "/covidGenerate" })
 public class CovidGenerateController {
 
+  @Autowired
+  private UiUtil uiUtil;
 
   public static final String ACTION_GENERATE = "Generate";
 
@@ -31,17 +34,15 @@ public class CovidGenerateController {
   public static final String PARAM_INCLUDE_MISSED = "includeMissed";
   public static final String PARAM_INCLUDE_SEROLOGY = "includeSerology";
 
-	@PostMapping
+  @PostMapping
   protected void doPost(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
     doGet(req, resp);
   }
 
-	@GetMapping
+  @GetMapping
   protected void doGet(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
-
-
 
     resp.setContentType("text/html");
     PrintWriter out = new PrintWriter(resp.getOutputStream());
@@ -62,9 +63,7 @@ public class CovidGenerateController {
         includeMissed = req.getParameter(PARAM_INCLUDE_MISSED) != null;
         includeSerology = req.getParameter(PARAM_INCLUDE_SEROLOGY) != null;
       }
-      UiUtil.doHeader(out, "IIS Sandbox");
-
-
+      uiUtil.doHeader(out, "IIS Sandbox");
 
       out.println("    <div class=\"w3-container w3-card-4\">");
       out.println("    <h2>Generate HL7 Messages with COVID-19 Vaccination Events</h2>");
@@ -133,7 +132,7 @@ public class CovidGenerateController {
       System.err.println("Unable to render page: " + e.getMessage());
       e.printStackTrace(System.err);
     }
-      UiUtil.doFooter(out);
+    uiUtil.doFooter(out);
     out.flush();
     out.close();
   }

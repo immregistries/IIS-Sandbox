@@ -5,6 +5,7 @@ import org.immregistries.iis.kernal.controllers.servlet.*;
 import org.immregistries.iis.kernal.controllers.servlet.util.UrlTenantUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -29,6 +30,9 @@ public class ServerSecurityConfig {
 	public static final String LOGOUT_PATH = "/logout";
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
+	@Autowired
+	private UrlTenantUtil urlTenantUtil;
+
 	/**
 	 * upgraded with AI, TODO verify
 	 */
@@ -40,7 +44,7 @@ public class ServerSecurityConfig {
 				.requestCache(cache -> cache.requestCache(requestCache))
 				.authorizeHttpRequests((authorize) -> authorize
 						.requestMatchers(HttpMethod.GET, "/", HomeController.HOME_BASE_PATH,
-							PopController.POP_BASE_PATH, "/SubscriptionTopic/**", "/img/**", "/rest/**")
+								PopController.POP_BASE_PATH, "/SubscriptionTopic/**", "/img/**", "/rest/**")
 						.permitAll()
 						.requestMatchers("/tenant/*/manifest/**", SHLINKS_CONTROLLER_REST_BASE_URL + "/*",
 								TenantController.TENANT_PATH + WellKnownKeyController.WELL_KNOWN_PATH_SUFFIX,
@@ -49,7 +53,8 @@ public class ServerSecurityConfig {
 						.requestMatchers(LOGIN_FORM_PATH, "/oauth2/**", LOGIN_PATH).permitAll()
 						// API AUTHORIZATION AND AUTHENTICATION SEPARATED
 						.requestMatchers("/fhir/**", SoapDescriptionController.SOAP_BASE_PATH,
-								FhirMessagingController.FHIR_MESSAGING_BASE_PATH + SoapDescriptionController.SOAP_BASE_PATH,
+								FhirMessagingController.FHIR_MESSAGING_BASE_PATH
+										+ SoapDescriptionController.SOAP_BASE_PATH,
 								"/.well-known/smart-configuration", "/registerClient", "/token",
 								"/rest/**")
 						.permitAll()
@@ -125,7 +130,7 @@ public class ServerSecurityConfig {
 	}
 
 	private void addTenantifiedRequestMatcher(List<RequestMatcher> matchers, String pathSuffix) {
-		String tenantified = UrlTenantUtil.securityConfigUrl(pathSuffix);
+		String tenantified = urlTenantUtil.securityConfigUrl(pathSuffix);
 		matchers.add(new AntPathRequestMatcher(pathSuffix));
 		matchers.add(new AntPathRequestMatcher(tenantified));
 	}

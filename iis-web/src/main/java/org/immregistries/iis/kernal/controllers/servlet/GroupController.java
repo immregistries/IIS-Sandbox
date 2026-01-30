@@ -37,6 +37,8 @@ public class GroupController {
 	FhirContext fhirContext;
 	@Autowired
 	GroupRestController groupRestController;
+	@Autowired
+	private UiUtil uiUtil;
 
 	@PostMapping
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
@@ -54,7 +56,7 @@ public class GroupController {
 
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
-		UiUtil.doHeader(out, "IIS Sandbox - Groups", CurrentTenantUtil.getTenant());
+		uiUtil.doHeader(out, "IIS Sandbox - Groups", CurrentTenantUtil.getTenant());
 		Group group = groupRestController.generateGroup(req);
 		out.println("<p>");
 		out.println(fhirContext.newJsonParser().setPrettyPrint(true).encodeResourceToString(group));
@@ -63,7 +65,7 @@ public class GroupController {
 		out.println("<p>");
 		out.println(fhirContext.newJsonParser().setPrettyPrint(true).encodeResourceToString(parameters));
 		out.println("</p>");
-		UiUtil.doFooter(out);
+		uiUtil.doFooter(out);
 		out.flush();
 		out.close();
 	}

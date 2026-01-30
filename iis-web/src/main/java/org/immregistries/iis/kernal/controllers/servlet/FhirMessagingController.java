@@ -27,7 +27,7 @@ import static org.immregistries.iis.kernal.controllers.servlet.PopController.PAR
 import static org.immregistries.iis.kernal.controllers.servlet.PopController.PARAM_MESSAGE;
 
 @RestController()
-@RequestMapping({FHIR_MESSAGING_BASE_PATH, TenantController.TENANT_PATH + FHIR_MESSAGING_BASE_PATH})
+@RequestMapping({ FHIR_MESSAGING_BASE_PATH, TenantController.TENANT_PATH + FHIR_MESSAGING_BASE_PATH })
 @Conditional(OnR4Condition.class)
 public class FhirMessagingController {
 	public static final String FHIR_MESSAGING_PATH_KEY = "fhirMessaging";
@@ -40,6 +40,8 @@ public class FhirMessagingController {
 	private PopRestController popRestController;
 	@Autowired
 	private V2ToFhirRestController v2ToFhirRestController;
+	@Autowired
+	private UiUtil uiUtil;
 
 	@GetMapping
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -59,10 +61,11 @@ public class FhirMessagingController {
 				message = fhirContext.newJsonParser().setPrettyPrint(true).encodeResourceToString(bundle);
 			}
 
-			UiUtil.doHeader(out, "IIS Sandbox - FHIR Messaging", tenant);
+			uiUtil.doHeader(out, "IIS Sandbox - FHIR Messaging", tenant);
 			out.println("<h2>Experimental FHIR Messaging Endpoint</h2>");
-			PopController.printForm(out, "FHIR Bundle", message, organizationName, IisRestPath.Key.REST_KEY + "/" + FHIR_MESSAGING_PATH_KEY);
-			UiUtil.doFooter(out);
+			PopController.printForm(out, "FHIR Bundle", message, organizationName,
+					IisRestPath.Key.REST_KEY + "/" + FHIR_MESSAGING_PATH_KEY);
+			uiUtil.doFooter(out);
 
 		} catch (Exception e) {
 			e.printStackTrace(System.err);
@@ -70,8 +73,5 @@ public class FhirMessagingController {
 		out.flush();
 		out.close();
 	}
-
-
-
 
 }

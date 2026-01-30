@@ -40,6 +40,10 @@ public class SubscriptionController {
 	IisFhirClientFactory iisFhirClientFactory;
 	@Autowired
 	SubscriptionRestControllerR5 subscriptionRestController;
+	@Autowired
+	private UiUtil uiUtil;
+	@Autowired
+	private UrlTenantUtil urlTenantUtil;
 
 	public static final String PARAM_ACTION = "action";
 	public static final String PARAM_MESSAGE = "message";
@@ -82,7 +86,7 @@ public class SubscriptionController {
 
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
-		UiUtil.doHeader(out, "IIS Sandbox - SubscriptionsResult", tenant);
+		uiUtil.doHeader(out, "IIS Sandbox - SubscriptionsResult", tenant);
 
 		try {
 			String[] messages = req.getParameterValues(PARAM_MESSAGE);
@@ -133,7 +137,7 @@ public class SubscriptionController {
 			PrintWriter out, IGenericClient fhirClient, String subscriptionId) {
 
 		try {
-			UiUtil.doHeader(out, "IIS Sandbox - Subscriptions", CurrentTenantUtil.getTenant());
+			uiUtil.doHeader(out, "IIS Sandbox - Subscriptions", CurrentTenantUtil.getTenant());
 			ServletInputStream servletInputStream = req.getInputStream();
 
 			String[] initialMessages = new String[] { OPERATION_SAMPLE };
@@ -197,7 +201,7 @@ public class SubscriptionController {
 			} else {
 				out.println("<div class=\"w3-panel w3-yellow\"><p>Not Found</p></div>");
 			}
-			UiUtil.doFooter(out);
+			uiUtil.doFooter(out);
 
 		} catch (Exception e) {
 			e.printStackTrace(System.err);
@@ -205,7 +209,7 @@ public class SubscriptionController {
 
 	}
 
-	public static void printSearchAndSelect(HttpServletRequest req, HttpServletResponse resp,
+	public void printSearchAndSelect(HttpServletRequest req, HttpServletResponse resp,
 			PrintWriter out, IGenericClient fhirClient, Tenant tenant) {
 
 		try {
@@ -225,7 +229,7 @@ public class SubscriptionController {
 				bundle = fhirClient.search().forResource(Subscription.class).returnBundle(Bundle.class).execute();
 			}
 
-			UiUtil.doHeader(out, "IIS Sandbox - Subscriptions", CurrentTenantUtil.getTenant());
+			uiUtil.doHeader(out, "IIS Sandbox - Subscriptions", CurrentTenantUtil.getTenant());
 
 			out.println("    <div class=\"w3-container w3-half w3-margin-top\">");
 			out.println("    <h3>Search Subscription</h3>");
@@ -260,7 +264,8 @@ public class SubscriptionController {
 					}
 					String baseLink = "subscription?" + PARAM_SUBSCRIPTION_ID + "="
 							+ subscription.getIdentifierFirstRep().getValue(); // TODO or id
-					String linkWithTenantBase = UrlTenantUtil.tenantifyPathWithContextPath(tenant, baseLink); // TODO or id
+					String linkWithTenantBase = urlTenantUtil.tenantifyPathWithContextPath(tenant, baseLink); // TODO or
+																												// id
 					out.println("  <tr>");
 					out.println("    <td><a href=\"" + linkWithTenantBase + "\">"
 							+ subscription.getName() + "</a></td>");
@@ -281,7 +286,7 @@ public class SubscriptionController {
 			} else {
 				out.println("<div class=\"w3-panel w3-yellow\"><p>No Records Found</p></div>");
 			}
-			UiUtil.doFooter(out);
+			uiUtil.doFooter(out);
 
 		} catch (Exception e) {
 			e.printStackTrace(System.err);

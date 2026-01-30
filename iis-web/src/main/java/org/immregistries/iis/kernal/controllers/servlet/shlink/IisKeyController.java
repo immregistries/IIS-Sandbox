@@ -24,11 +24,16 @@ import java.io.PrintWriter;
 import java.util.List;
 
 @RestController
-@RequestMapping({IisRestPath.BasePath.IIS_KEYS_PATH, TenantController.TENANT_PATH + IisRestPath.BasePath.IIS_KEYS_PATH})
+@RequestMapping({ IisRestPath.BasePath.IIS_KEYS_PATH,
+		TenantController.TENANT_PATH + IisRestPath.BasePath.IIS_KEYS_PATH })
 public class IisKeyController {
 
 	@Autowired
 	private IisKeyRestController iisKeyRestController;
+	@Autowired
+	private UiUtil uiUtil;
+	@Autowired
+	private UrlTenantUtil urlTenantUtil;
 
 	@PostMapping
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
@@ -42,7 +47,7 @@ public class IisKeyController {
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		try {
 			Tenant tenant = RedirectUtil.getTenantRedirectIfNone(req, resp);
-			UiUtil.doHeader(out, "IIS Sandbox Keystore", CurrentTenantUtil.getTenant());
+			uiUtil.doHeader(out, "IIS Sandbox Keystore", CurrentTenantUtil.getTenant());
 			out.println("    <div class=\"w3-container w3-half w3-margin-top\">");
 			out.println("    <h2>Facility: " + tenant.getOrganizationName() + "</h2>");
 			out.println("    <h3>Keys used for signing Smart Health Cards (generated for the user)</h3>");
@@ -56,15 +61,15 @@ public class IisKeyController {
 			System.err.println("Unable to render page: " + e.getMessage());
 			e.printStackTrace(System.err);
 		}
-		UiUtil.doFooter(out);
+		uiUtil.doFooter(out);
 		out.flush();
 		out.close();
 
 	}
 
-	protected static void printIisKeys(PrintWriter out, List<IisKey> iisKeys, Tenant tenant) {
+	protected void printIisKeys(PrintWriter out, List<IisKey> iisKeys, Tenant tenant) {
 		out.println("<a href=\""
-				+ UrlTenantUtil.tenantifyPathWithContextPath(tenant, WellKnownKeyController.WELL_KNOWN_PATH_SUFFIX)
+				+ urlTenantUtil.tenantifyPathWithContextPath(tenant, WellKnownKeyController.WELL_KNOWN_PATH_SUFFIX)
 				+ "\">well-known</a>");
 
 		if (iisKeys.isEmpty()) {
@@ -78,7 +83,7 @@ public class IisKeyController {
 		}
 	}
 
-	public static void printIisKey(PrintWriter out, IisKey iisKey) {
+	public void printIisKey(PrintWriter out, IisKey iisKey) {
 		out.println("<h4>Key id : " + iisKey.getKeyId() + "</h4>");
 		out.println("<textarea textarea name=\"shlink\" readonly style=\"width: 100%; height: 3em;\" >" +
 				iisKey.jwk().toPublicJWK().toJSONString() + "</textarea>");

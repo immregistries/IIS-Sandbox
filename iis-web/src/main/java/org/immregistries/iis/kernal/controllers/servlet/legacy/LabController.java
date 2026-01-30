@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -19,9 +20,11 @@ import java.util.Map;
 
 @SuppressWarnings("serial")
 @RestController
-@RequestMapping({"/lab", TenantController.TENANT_PATH + "/lab"})
+@RequestMapping({ "/lab", TenantController.TENANT_PATH + "/lab" })
 public class LabController {
 
+  @Autowired
+  private UiUtil uiUtil;
 
   public static final String ACTION_CONVERT = "Convert";
 
@@ -101,27 +104,24 @@ public class LabController {
 
   }
 
-  private static final String EXAMPLE_LAB_MESSAGE =
-      "MSH|^~\\&#|STARLIMS.AR.STAG^2.16.840.1.114222.4.3.3.2.5.2^ISO|AR.LittleRock.SPHL^2.16.840.1.114222.4.1.20083^ISO|US WHO Collab LabSys^2.16.840.1.114222.4.3.3.7^ISO|CDC-EPI Surv Branch^2.16.840.1.114222.4.1.10416^ISO|20190422132236-0500||ORU^R01^ORU_R01|1312-2|T|2.5.1|||NE|NE|USA||||PHLabReport-NoAck^ELR251R1_Rcvr_Prof^2.16.840.1.113883.9.11^ISO~PHLIP_ELSM_251^PHLIP_Profile_Flu^2.16.840.1.113883.9.179^ISO\r"
-          + "SFT|Software Vendor|v12|Software Name|Binary ID unknown||20181008\r"
-          + "PID|1||PID13295037^^^STARLIMS.AR.STAG&2.16.840.1.114222.4.3.3.2.5.2&ISO^PI||~^^^^^^S||19340726|F||2106-3^White^CDCREC^^^^^^White|^^^AR^72016^USA|||||||||||U^Unknown^HL70189^^^^^^Unknown\r"
-          + "ORC|RE|1905700000256-13^PHLIP-Test-EHR^2.16.840.1.113883.3.72.5.24^ISO|1905700000256-177^STARLIMS.AR.STAG^2.16.840.1.114222.4.3.3.2.5.2^ISO|||||||||1412941681^Smith^John^C^^DR^^^NPI&2.16.840.1.113883.4.6&ISO^L^^^NPI^^^^^^^^MD||^WPN^PH^^1^707^2643378|||||||Little Rock General Hospital Lab^D^^^^NPI&2.16.840.1.113883.4.6&ISO^NPI^^^1255402921|2217 Trancas^Suite 22^Little Rock^AR^72205^USA^M|^WPN^PH^^1^707^5549876\r"
-          + "OBR|1|1905700000256-13^PHLIP-Test-EHR^2.16.840.1.113883.3.72.5.24^ISO|1905700000256-177^STARLIMS.AR.STAG^2.16.840.1.114222.4.3.3.2.5.2^ISO|94309-2^SARS-CoV-2 RNA XXX NAA+probe-Imp^LN|||201902281257-0500|||||||||1412941681^Smith^John^C^^DR^^^NPI&2.16.840.1.113883.4.6&ISO^L^^^NPI^^^^^^^^MD|^WPN^PH^^1^707^2643378|||||20190402082143-0500|||F\r"
-          + "OBX|1|CWE|94309-2^SARS-CoV-2 RNA XXX NAA+probe-Imp^LN||260373001^Detected^SCT||||||F|||201902281257-0500|||||201904020721-0500||||Public Health Laboratory^D^^^^CLIA&2.16.840.1.113883.19.4.6&ISO^XX^^^05D0897628|3434 Industrial Loop^^Little Rock^AR^72205^USA^B\r"
-          + "NTE|1|L|94309-2 is a report code. It should be conditional in the panel = either this OR all the target codes MUST be used; both may be used also.\r"
-          + "SPM|1|^1905700000256-12&STARLIMS.AR.STAG&2.16.840.1.114222.4.3.3.2.5.2&ISO||258500001^Nasopharyngeal swab (specimen)^SCT|||||||||||||201902281257-0500|201903011118-0500";
+  private static final String EXAMPLE_LAB_MESSAGE = "MSH|^~\\&#|STARLIMS.AR.STAG^2.16.840.1.114222.4.3.3.2.5.2^ISO|AR.LittleRock.SPHL^2.16.840.1.114222.4.1.20083^ISO|US WHO Collab LabSys^2.16.840.1.114222.4.3.3.7^ISO|CDC-EPI Surv Branch^2.16.840.1.114222.4.1.10416^ISO|20190422132236-0500||ORU^R01^ORU_R01|1312-2|T|2.5.1|||NE|NE|USA||||PHLabReport-NoAck^ELR251R1_Rcvr_Prof^2.16.840.1.113883.9.11^ISO~PHLIP_ELSM_251^PHLIP_Profile_Flu^2.16.840.1.113883.9.179^ISO\r"
+      + "SFT|Software Vendor|v12|Software Name|Binary ID unknown||20181008\r"
+      + "PID|1||PID13295037^^^STARLIMS.AR.STAG&2.16.840.1.114222.4.3.3.2.5.2&ISO^PI||~^^^^^^S||19340726|F||2106-3^White^CDCREC^^^^^^White|^^^AR^72016^USA|||||||||||U^Unknown^HL70189^^^^^^Unknown\r"
+      + "ORC|RE|1905700000256-13^PHLIP-Test-EHR^2.16.840.1.113883.3.72.5.24^ISO|1905700000256-177^STARLIMS.AR.STAG^2.16.840.1.114222.4.3.3.2.5.2^ISO|||||||||1412941681^Smith^John^C^^DR^^^NPI&2.16.840.1.113883.4.6&ISO^L^^^NPI^^^^^^^^MD||^WPN^PH^^1^707^2643378|||||||Little Rock General Hospital Lab^D^^^^NPI&2.16.840.1.113883.4.6&ISO^NPI^^^1255402921|2217 Trancas^Suite 22^Little Rock^AR^72205^USA^M|^WPN^PH^^1^707^5549876\r"
+      + "OBR|1|1905700000256-13^PHLIP-Test-EHR^2.16.840.1.113883.3.72.5.24^ISO|1905700000256-177^STARLIMS.AR.STAG^2.16.840.1.114222.4.3.3.2.5.2^ISO|94309-2^SARS-CoV-2 RNA XXX NAA+probe-Imp^LN|||201902281257-0500|||||||||1412941681^Smith^John^C^^DR^^^NPI&2.16.840.1.113883.4.6&ISO^L^^^NPI^^^^^^^^MD|^WPN^PH^^1^707^2643378|||||20190402082143-0500|||F\r"
+      + "OBX|1|CWE|94309-2^SARS-CoV-2 RNA XXX NAA+probe-Imp^LN||260373001^Detected^SCT||||||F|||201902281257-0500|||||201904020721-0500||||Public Health Laboratory^D^^^^CLIA&2.16.840.1.113883.19.4.6&ISO^XX^^^05D0897628|3434 Industrial Loop^^Little Rock^AR^72205^USA^B\r"
+      + "NTE|1|L|94309-2 is a report code. It should be conditional in the panel = either this OR all the target codes MUST be used; both may be used also.\r"
+      + "SPM|1|^1905700000256-12&STARLIMS.AR.STAG&2.16.840.1.114222.4.3.3.2.5.2&ISO||258500001^Nasopharyngeal swab (specimen)^SCT|||||||||||||201902281257-0500|201903011118-0500";
 
-	@PostMapping
+  @PostMapping
   protected void doPost(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
     doGet(req, resp);
   }
 
-	@GetMapping
+  @GetMapping
   protected void doGet(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
-
-
 
     resp.setContentType("text/html");
     PrintWriter out = new PrintWriter(resp.getOutputStream());
@@ -167,7 +167,6 @@ public class LabController {
                 dateTimeOfMessage = dateTimeOfMessage.substring(0, 8);
               }
 
-
               if (reader.advanceToSegment("PID")) {
                 sb.append(reader.getOriginalSegment() + "\r");
               }
@@ -192,9 +191,7 @@ public class LabController {
           }
         }
       }
-      UiUtil.doHeader(out, "IIS Sandbox", CurrentTenantUtil.getTenant(req));
-
-
+      uiUtil.doHeader(out, "IIS Sandbox", CurrentTenantUtil.getTenant(req));
 
       if (messageError != null) {
         out.println("  <div class=\"w3-panel w3-red\">");
@@ -225,7 +222,7 @@ public class LabController {
       System.err.println("Unable to render page: " + e.getMessage());
       e.printStackTrace(System.err);
     }
-      UiUtil.doFooter(out);
+    uiUtil.doFooter(out);
     out.flush();
     out.close();
   }

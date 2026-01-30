@@ -57,6 +57,10 @@ public class RecommendationController {
 	private PatientRestController patientRestController;
 	@Autowired
 	private BusinessIdentifierMapper businessIdentifierMapper;
+	@Autowired
+	private UiUtil uiUtil;
+	@Autowired
+	private PatientServletUtil patientServletUtil;
 
 	/**
 	 * Used to add a random generated component to recommendation
@@ -92,7 +96,9 @@ public class RecommendationController {
 			if (req.getParameter(PARAM_RECOMMENDATION_RESOURCE) != null) {
 				Tenant tenant = RedirectUtil.getTenantRedirectIfNone(req, resp);
 				recommendationRestController.updateRecommendation(tenant,
-					req.getParameter(PARAM_RECOMMENDATION_RESOURCE), req.getParameter(IisRestParam.RECOMMENDATION_ID), req.getParameter(IisRestParam.RECOMMENDATION_IDENTIFIER), req);
+						req.getParameter(PARAM_RECOMMENDATION_RESOURCE),
+						req.getParameter(IisRestParam.RECOMMENDATION_ID),
+						req.getParameter(IisRestParam.RECOMMENDATION_IDENTIFIER), req);
 			}
 		} catch (Exception exception) {
 			exception.printStackTrace(out);
@@ -117,7 +123,7 @@ public class RecommendationController {
 		Tenant tenant = RedirectUtil.getTenantRedirectIfNone(req, resp);
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
-		UiUtil.doHeader(out, "Recommendations", tenant);
+		uiUtil.doHeader(out, "Recommendations", tenant);
 
 		try {
 			IGenericClient fhirClient = iisFhirClientFactory.getOrCreateGenericClient(req);
@@ -150,7 +156,7 @@ public class RecommendationController {
 						+ patientMaster.getLegalNameOrFirst().asSingleString() + "</h2>");
 				if (recommendationResource == null) {
 					IBaseBundle baseBundle = patientRestController
-						.getPatientRecommendationBundle(patientResource.getIdElement().getIdPart(), tenant, req);
+							.getPatientRecommendationBundle(patientResource.getIdElement().getIdPart(), tenant, req);
 					if (fhirContext.getVersion().equals(FhirVersionEnum.R5)) {
 						org.hl7.fhir.r5.model.Bundle recommendationBundle = (org.hl7.fhir.r5.model.Bundle) baseBundle;
 						if (recommendationBundle.getEntry().size() > 0) {
@@ -201,13 +207,13 @@ public class RecommendationController {
 					immunizationRecommendation
 							.setPatient(new org.hl7.fhir.r5.model.Reference()
 									.setIdentifier((Identifier) businessIdentifierMapper.fhirObject(identifier)));
-					PatientServletUtil.printSubscriptions(out, parser, subcriptionBundle, immunizationRecommendation);
+					patientServletUtil.printSubscriptions(out, parser, subcriptionBundle, immunizationRecommendation);
 				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace(System.err);
 		}
-		UiUtil.doFooter(out);
+		uiUtil.doFooter(out);
 		out.flush();
 		out.close();
 	}
@@ -228,7 +234,7 @@ public class RecommendationController {
 		printRecommendation(out, recommendation, patient, fhirContext);
 	}
 
-	public static void printRecommendation(PrintWriter out, IAnyResource recommendation, IDomainResource patient,
+	public void printRecommendation(PrintWriter out, IAnyResource recommendation, IDomainResource patient,
 			FhirContext fhirContext) {
 		out.println("<div class=\"w3-container\">");
 		out.println("<h4>Recommendations</h4>");
@@ -275,7 +281,7 @@ public class RecommendationController {
 		out.println("</div>");
 	}
 
-	public static void printRecommendationLineR5(PrintWriter out,
+	public void printRecommendationLineR5(PrintWriter out,
 			org.hl7.fhir.r5.model.ImmunizationRecommendation recommendation) {
 		int count = 0;
 		for (org.hl7.fhir.r5.model.ImmunizationRecommendation.ImmunizationRecommendationRecommendationComponent component : recommendation
@@ -297,7 +303,7 @@ public class RecommendationController {
 		}
 	}
 
-	public static void printRecommendationLineR4(PrintWriter out,
+	public void printRecommendationLineR4(PrintWriter out,
 			org.hl7.fhir.r4.model.ImmunizationRecommendation recommendation) {
 		int count = 0;
 

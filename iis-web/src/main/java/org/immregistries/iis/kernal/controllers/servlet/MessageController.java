@@ -29,6 +29,12 @@ public class MessageController {
 	@Autowired
 	private MessageRestController messageRestController;
 
+	@Autowired
+	private UiUtil uiUtil;
+
+	@Autowired
+	private PatientServletUtil patientServletUtil;
+
 	public static final String MESSAGE_PATH_KEY = "message";
 	public static final String MESSAGE_BASE_PATH = "/" + MESSAGE_PATH_KEY;
 
@@ -55,7 +61,7 @@ public class MessageController {
 		try {
 			String messageError = null;
 			String messageConfirmation = null;
-			UiUtil.doHeader(out, "IIS Sandbox");
+			uiUtil.doHeader(out, "IIS Sandbox");
 			if (messageError != null) {
 				out.println("  <div class=\"w3-panel w3-red\">");
 				out.println("    <p>" + messageError + "</p>");
@@ -93,7 +99,7 @@ public class MessageController {
 					out.println("     <em>None Received</em>");
 				} else {
 					for (MessageReceived messageReceived : messageReceivedList) {
-						PatientServletUtil.printMessageReceived(out, messageReceived);
+						patientServletUtil.printMessageReceived(out, messageReceived);
 					}
 				}
 				out.println("    </div>");
@@ -102,7 +108,7 @@ public class MessageController {
 			System.err.println("Unable to render page: " + e.getMessage());
 			e.printStackTrace(System.err);
 		}
-		UiUtil.doFooter(out);
+		uiUtil.doFooter(out);
 		out.flush();
 		out.close();
 	}

@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -22,6 +23,9 @@ import java.io.PrintWriter;
 @RestController
 @RequestMapping({ "/queryConverter", TenantController.TENANT_PATH + "/queryConverter" })
 public class QueryConverterController {
+
+  @Autowired
+  private UiUtil uiUtil;
 
   public static final String PARAM_MESSAGE = "MESSAGEDATA";
   public static final String QUERY_TYPE = "queryType";
@@ -55,7 +59,7 @@ public class QueryConverterController {
         message = queryConverter.convert(message);
       }
       {
-        UiUtil.doHeader(out, "IIS Sandbox");
+        uiUtil.doHeader(out, "IIS Sandbox");
         out.println("    <h2>Convert VXU to QBP</h2>");
         out.println("    <form action=\"queryConverter\" method=\"POST\">");
         if (queryConverter == null) {
@@ -79,7 +83,7 @@ public class QueryConverterController {
         }
         out.println("    </div>");
         out.println("    </form>");
-        UiUtil.doFooter(out);
+        uiUtil.doFooter(out);
       }
     } catch (Exception e) {
       e.printStackTrace(System.err);

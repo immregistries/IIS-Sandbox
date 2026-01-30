@@ -64,6 +64,8 @@ public class CovidController {
 	private FhirReadRequester fhirReadRequester;
 	@Autowired
 	LocationMapperR5 locationMapper;
+	@Autowired
+	private UiUtil uiUtil;
 
 	@PostMapping
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
@@ -86,7 +88,7 @@ public class CovidController {
 			String messageError = null;
 			String dateStartString = req.getParameter(PARAM_DATE_START);
 			String dateEndString = req.getParameter(PARAM_DATE_END);
-			UiUtil.doHeader(out, "IIS Sandbox", tenant);
+			uiUtil.doHeader(out, "IIS Sandbox", tenant);
 
 			Date dateStart = null;
 			Date dateEnd = null;
@@ -201,7 +203,7 @@ public class CovidController {
 			System.err.println("Unable to render page: " + e.getMessage());
 			e.printStackTrace(System.err);
 		}
-		UiUtil.doFooter(out);
+		uiUtil.doFooter(out);
 		out.flush();
 		out.close();
 	}

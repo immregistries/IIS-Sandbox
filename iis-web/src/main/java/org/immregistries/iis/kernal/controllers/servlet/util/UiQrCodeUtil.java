@@ -9,29 +9,30 @@ import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 import com.nimbusds.jose.util.Base64URL;
 import jakarta.servlet.ServletException;
+import org.immregistries.iis.kernal.GlobalConstants;
 import org.immregistries.iis.kernal.model.shlink.ShLinkPayload;
+import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.OutputStream;
 
-
+@Service
 public class UiQrCodeUtil {
 
-	public static final String SHLINK_PREFIX = "shlink:/";
+	private final QRCodeWriter qrCodeWriter = new QRCodeWriter();
+	private final ObjectMapper jsonMapper = new ObjectMapper();
 
-	private static final QRCodeWriter qrCodeWriter = new QRCodeWriter();
-	private static final ObjectMapper jsonMapper = new ObjectMapper();
-
-	public static void printQrCodeAsImage(OutputStream outputStream, String data) throws ServletException, IOException, WriterException {
+	public void printQrCodeAsImage(OutputStream outputStream, String data)
+			throws ServletException, IOException, WriterException {
 		int width = 300; // Desired QR code width
 		int height = 300; // Desired QR code height
 		BitMatrix bitMatrix = qrCodeWriter.encode(data, BarcodeFormat.QR_CODE, width, height);
 		MatrixToImageWriter.writeToStream(bitMatrix, "PNG", outputStream);
 	}
 
-	public static String qrCodeBase64(ShLinkPayload shLinkPayload) throws JsonProcessingException {
+	public String qrCodeBase64(ShLinkPayload shLinkPayload) throws JsonProcessingException {
 		String payload = jsonMapper.writeValueAsString(shLinkPayload);
 		Base64URL base64URL = Base64URL.encode(payload);
-		return SHLINK_PREFIX + base64URL;
+		return GlobalConstants.SHLINK_PREFIX + base64URL;
 	}
 }

@@ -74,7 +74,12 @@ public class VaccinationController {
 	FhirSearchRequester fhirSearchRequester;
 	@Autowired
 	CodeMapRestController codeMapRestController;
-	
+	@Autowired
+	private UiUtil uiUtil;
+	@Autowired
+	private UrlTenantUtil urlTenantUtil;
+	@Autowired
+	private PatientServletUtil patientServletUtil;
 
 	@PostMapping
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp
@@ -124,15 +129,16 @@ public class VaccinationController {
 				}
 			}
 
-			UiUtil.doHeader(out, "IIS Sandbox - Vaccinations", tenant);
+			uiUtil.doHeader(out, "IIS Sandbox - Vaccinations", tenant);
 			SimpleDateFormat sdfDate = new SimpleDateFormat("MM/dd/yyyy");
 
 			out.println("<h2>Vaccination Record: " + cvxPrint + " " + sdfDate.format(vaccination.getAdministeredDate())
 					+ "</h2>");
-			PatientReported patientReportedSelected = (PatientReported) patientRestController.getPatient(vaccination.getPatientReportedId(), tenant);
+			PatientReported patientReportedSelected = (PatientReported) patientRestController
+					.getPatient(vaccination.getPatientReportedId(), tenant);
 			{
 				out.println("<h4>Patient information</h4>");
-				PatientServletUtil.printPatient(out, patientReportedSelected);
+				patientServletUtil.printPatient(out, patientReportedSelected);
 
 				out.println("  <div class=\"w3-container\">");
 				out.println("<h4>Vaccination details</h4>");
@@ -202,14 +208,16 @@ public class VaccinationController {
 
 				if (!observationReportedList.isEmpty()) {
 					out.println("<h4>Observations</h4>");
-					PatientServletUtil.printObservationList(out, observationReportedList);
+					patientServletUtil.printObservationList(out, observationReportedList);
 				}
 
 				{
-					List<? extends IisVaccination> relatedVaccinations = vaccinationRestController.getRelatedVaccinations(vaccination.getVaccinationId(), tenant, FhirRequesterUtil.isGoldenRecord(immunizationResource));
+					List<? extends IisVaccination> relatedVaccinations = vaccinationRestController
+							.getRelatedVaccinations(vaccination.getVaccinationId(), tenant,
+									FhirRequesterUtil.isGoldenRecord(immunizationResource));
 					out.println("<h4>Related Vaccination Records</h4>");
 					printVaccinationList(out, relatedVaccinations, tenant, codeMap);
-					UiUtil.printGoldenRecordExplanation(out, immunizationResource);
+					uiUtil.printGoldenRecordExplanation(out, immunizationResource);
 				}
 
 				out.println("  </div>");
@@ -225,11 +233,11 @@ public class VaccinationController {
 					 */
 					IisPatient iisPatient = vaccination.getPatientReported();
 					immunization.getPatient().setIdentifier(new org.hl7.fhir.r5.model.Identifier()
-						.setValue(iisPatient.getMainBusinessIdentifier().getValue())
-						.setSystem(iisPatient.getMainBusinessIdentifier().getSystem()));
+							.setValue(iisPatient.getMainBusinessIdentifier().getValue())
+							.setSystem(iisPatient.getMainBusinessIdentifier().getSystem()));
 					IParser parser = iisFhirClientFactory.getFhirContext().newJsonParser().setPrettyPrint(true);
 
-					PatientServletUtil.printSubscriptions(out, parser, bundle, immunization);
+					patientServletUtil.printSubscriptions(out, parser, bundle, immunization);
 				}
 
 				{
@@ -262,7 +270,7 @@ public class VaccinationController {
 		} catch (Exception e) {
 			e.printStackTrace(System.err);
 		}
-		UiUtil.doFooter(out);
+		uiUtil.doFooter(out);
 		out.flush();
 		out.close();
 	}
@@ -294,7 +302,8 @@ public class VaccinationController {
 		return immunization;
 	}
 
-	public static void printVaccinationList(PrintWriter out, List<? extends IisVaccination> vaccinationList, Tenant tenant, CodeMap codeMap) {
+	public static void printVaccinationList(PrintWriter out, List<? extends IisVaccination> vaccinationList,
+			Tenant tenant, CodeMap codeMap) {
 		SimpleDateFormat sdfDate = new SimpleDateFormat("MM/dd/yyyy");
 
 		if (vaccinationList.isEmpty()) {
@@ -317,7 +326,7 @@ public class VaccinationController {
 				out.println("    <td>");
 				String link = "vaccination?" + VaccinationController.PARAM_VACCINATION_REPORTED_ID + "="
 						+ vaccination.getVaccinationId();
-				out.println("      <a href=\"" + UrlTenantUtil.tenantifyPathWithContextPath(tenant, link) + "\">");
+				out.println("      <a href=\"" + urlTenantUtil.tenantifyPathWithContextPath(tenant, link) + "\">");
 				if (!StringUtils.isEmpty(vaccination.getVaccineCvxCode())) {
 					Code cvxCode = codeMap.getCodeForCodeset(CodesetType.VACCINATION_CVX_CODE,
 							vaccination.getVaccineCvxCode());

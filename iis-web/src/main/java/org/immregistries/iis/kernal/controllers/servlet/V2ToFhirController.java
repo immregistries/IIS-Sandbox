@@ -40,6 +40,8 @@ public class V2ToFhirController {
 	V2ToFhirRestController v2ToFhirRestController;
 	@Autowired
 	PopRestController popRestController;
+	@Autowired
+	private UiUtil uiUtil;
 
 	@PostMapping
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
@@ -55,9 +57,9 @@ public class V2ToFhirController {
 				resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 				out.println("Access is not authorized. FacilityId, userid and/or password are not recognized. ");
 			} else {
-				UiUtil.doHeader(out, "IIS Sandbox - V2ToFhir Result", tenant);
+				uiUtil.doHeader(out, "IIS Sandbox - V2ToFhir Result", tenant);
 				try {
-					Bundle bundle = v2ToFhirRestController.convertV2ToFhir(message,facility_name);
+					Bundle bundle = v2ToFhirRestController.convertV2ToFhir(message, facility_name);
 					result = fhirContext.newJsonParser().setPrettyPrint(true).encodeResourceToString(bundle);
 				} catch (HL7Exception e) {
 					throw new RuntimeException(e);
@@ -93,10 +95,10 @@ public class V2ToFhirController {
 				popRestController.getSampleMessage();
 			}
 
-			UiUtil.doHeader(out, "IIS Sandbox - v2ToFhir", tenant);
+			uiUtil.doHeader(out, "IIS Sandbox - v2ToFhir", tenant);
 			out.println("<h2>Convert to FHIR</h2>");
 			PopController.printForm(out, "V2 Message", message, organizationName, V2_TO_FHIR_PATH_KEY);
-			UiUtil.doFooter(out);
+			uiUtil.doFooter(out);
 		} catch (Exception e) {
 			e.printStackTrace(System.err);
 		}

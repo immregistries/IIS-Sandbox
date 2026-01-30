@@ -64,6 +64,8 @@ public class LocationController {
 	FhirReadRequester fhirReadRequester;
 	@Autowired
 	FhirSearchRequester fhirSearchRequester;
+	@Autowired
+	private UiUtil uiUtil;
 
 	public static void printMessageReceived(PrintWriter out, MessageReceived messageReceived) {
 		SimpleDateFormat sdfTime = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
@@ -144,7 +146,7 @@ public class LocationController {
 			List<OrgLocation> orgLocationList = null;
 			orgLocationList = fhirSearchRequester.searchOrgLocationList(new SearchParameterMap());
 
-			UiUtil.doHeader(out, "IIS Sandbox");
+			uiUtil.doHeader(out, "IIS Sandbox");
 
 			out.println("    <h2>Facility</h2>");
 			if (orgLocationSelected == null) {
@@ -248,7 +250,7 @@ public class LocationController {
 		} catch (Exception e) {
 			e.printStackTrace(System.err);
 		}
-		UiUtil.doFooter(out);
+		uiUtil.doFooter(out);
 		out.flush();
 		out.close();
 	}

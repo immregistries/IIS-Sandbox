@@ -37,6 +37,8 @@ public class PopController {
 
 	@Autowired
 	private PopRestController popRestController;
+	@Autowired
+	private UiUtil uiUtil;
 
 	@PostMapping
 	// @Transactional
@@ -54,8 +56,8 @@ public class PopController {
 				resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 				out.println("Access is not authorized. FacilityId, userid and/or password are not recognized. ");
 			} else {
-				UiUtil.doHeader(out, "IIS Sandbox - PopResult", tenant);
-				ack = popRestController.postPop(message,facility_name,tenant, req);
+				uiUtil.doHeader(out, "IIS Sandbox - PopResult", tenant);
+				ack = popRestController.postPop(message, facility_name, tenant, req);
 			}
 			// resp.setContentType("text/plain");
 			out.println("<textarea name=\"ack\" readonly style=\"width: 100%; height: 90%;\" >");
@@ -81,10 +83,10 @@ public class PopController {
 		try {
 
 			String message;
-			if (req.getParameter(PARAM_MESSAGE) !=  null) {
+			if (req.getParameter(PARAM_MESSAGE) != null) {
 				message = req.getParameter(PARAM_MESSAGE);
 			} else {
-				 message = popRestController.getSampleMessage();
+				message = popRestController.getSampleMessage();
 			}
 
 			String organizationName = "";
@@ -93,10 +95,10 @@ public class PopController {
 			}
 
 			{
-				UiUtil.doHeader(out, "IIS Sandbox - Pop", tenant);
+				uiUtil.doHeader(out, "IIS Sandbox - Pop", tenant);
 				out.println("    <h2>Send Now</h2>");
 				printForm(out, "VXU Message", message, organizationName, POP_PATH_KEY);
-				UiUtil.doFooter(out);
+				uiUtil.doFooter(out);
 			}
 		} catch (Exception e) {
 			e.printStackTrace(System.err);

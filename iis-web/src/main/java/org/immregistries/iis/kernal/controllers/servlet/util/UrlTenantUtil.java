@@ -5,7 +5,9 @@ import org.immregistries.iis.kernal.Application;
 import org.immregistries.iis.kernal.controllers.servlet.TenantController;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.stereotype.Service;
 
+@Service
 public class UrlTenantUtil {
 	/**
 	 * Adds tenant prefix to urlSuffix if tenant is not null
@@ -15,7 +17,7 @@ public class UrlTenantUtil {
 	 * @param urlSuffix
 	 * @return {tenantBasePath}/{tenantName}/ + urlSuffix
 	 */
-	public static String tenantifyPathWithContextPath(Tenant tenant, String urlSuffix) {
+	public String tenantifyPathWithContextPath(Tenant tenant, String urlSuffix) {
 		if (tenant == null || tenant.getOrgId() < 0) {
 			return urlSuffix;
 		}
@@ -33,7 +35,7 @@ public class UrlTenantUtil {
 	 * @param urlSuffix
 	 * @return {tenantBasePath}/{tenantName}/ + urlSuffix
 	 */
-	public static @NotNull String tenantifyPathSuffix(String tenantName, String urlSuffix) {
+	public @NotNull String tenantifyPathSuffix(String tenantName, String urlSuffix) {
 		if (!StringUtils.startsWith(urlSuffix, "/")) {
 			urlSuffix = "/" + urlSuffix;
 		}
@@ -46,7 +48,7 @@ public class UrlTenantUtil {
 	 * @param urlSuffix
 	 * @return
 	 */
-	public static @NotNull String securityConfigUrl(String urlSuffix) {
+	public @NotNull String securityConfigUrl(String urlSuffix) {
 		return tenantifyPathSuffix("*", urlSuffix);
 	}
 }

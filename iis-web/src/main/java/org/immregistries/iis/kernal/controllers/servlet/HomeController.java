@@ -32,6 +32,10 @@ public class HomeController {
 
 	@Autowired
 	FhirContext fhirContext;
+	@Autowired
+	private UiUtil uiUtil;
+	@Autowired
+	private UrlTenantUtil urlTenantUtil;
 
 	@GetMapping
 	@PostMapping
@@ -46,7 +50,7 @@ public class HomeController {
 		}
 
 		try {
-			UiUtil.doHeader(out, "IIS Sandbox - Home", CurrentTenantUtil.getTenant());
+			uiUtil.doHeader(out, "IIS Sandbox - Home", CurrentTenantUtil.getTenant());
 			out.println("    <div class=\"w3-container w3-half w3-margin-top\">");
 			out.println(
 					"    <div class=\"w3-panel w3-yellow\"><p class=\"w3-left-align\">This system is for test purposes only. "
@@ -65,38 +69,38 @@ public class HomeController {
 			out.println("    <h2>Primary Functions Supported</h2>");
 			out.println("    <ul class=\"w3-ul w3-hoverable\">");
 			out.println("      <li><a href=\""
-				+ UrlTenantUtil.tenantifyPathWithContextPath(tenant, PopController.POP_PATH_KEY)
+					+ urlTenantUtil.tenantifyPathWithContextPath(tenant, PopController.POP_PATH_KEY)
 					+ "\">Send Now</a>: Send an HL7 message in now.</li>");
 			out.println("      <li><a href=\""
-				+ UrlTenantUtil.tenantifyPathWithContextPath(tenant, MessageController.MESSAGE_PATH_KEY)
+					+ urlTenantUtil.tenantifyPathWithContextPath(tenant, MessageController.MESSAGE_PATH_KEY)
 					+ "\">Messages</a>: Review recently submitted messages</li>");
 			out.println("      <li><a href=\""
-				+ UrlTenantUtil.tenantifyPathWithContextPath(tenant, PatientController.PATIENT_PATH_KEY)
+					+ urlTenantUtil.tenantifyPathWithContextPath(tenant, PatientController.PATIENT_PATH_KEY)
 					+ "\">Patients</a>: See data received by patient</li>");
-			out.println("      <li><a href=\"" + UrlTenantUtil.tenantifyPathWithContextPath(tenant, "location")
+			out.println("      <li><a href=\"" + urlTenantUtil.tenantifyPathWithContextPath(tenant, "location")
 					+ "\">Locations</a>: See administered-at-locations</li>");
-			out.println("      <li><a href=\"" + UrlTenantUtil.tenantifyPathWithContextPath(tenant, "recommendation")
+			out.println("      <li><a href=\"" + urlTenantUtil.tenantifyPathWithContextPath(tenant, "recommendation")
 					+ "\">Recommendations</a>: Generate Immunization Recommendations for Patients</li>");
 			if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R5)) {
-				out.println("      <li><a href=\"" + UrlTenantUtil.tenantifyPathWithContextPath(tenant, "subscription")
+				out.println("      <li><a href=\"" + urlTenantUtil.tenantifyPathWithContextPath(tenant, "subscription")
 						+ "\">Subscriptions</a>: Visualize and manually trigger FHIR subscriptions</li>");
 				out.println("      <li><a href=\""
-					+ UrlTenantUtil.tenantifyPathWithContextPath(tenant,
+						+ urlTenantUtil.tenantifyPathWithContextPath(tenant,
 								FhirMessagingController.FHIR_MESSAGING_PATH_KEY)
 						+ "\">Conversion messaging (Unavailable in R5 mode)</a>: Experimental endpoint for FHIR messaging with messages converted from HL7v2</li>");
 			} else if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R4)) {
 				out.println(
 						"      <li><a>Subscriptions</a>: (Unavailable in R4 mode) Visualize and manually trigger FHIR subscriptions</li>");
 				out.println("      <li><a href=\""
-					+ UrlTenantUtil.tenantifyPathWithContextPath(tenant, V2ToFhirController.V2_TO_FHIR_PATH_KEY)
+						+ urlTenantUtil.tenantifyPathWithContextPath(tenant, V2ToFhirController.V2_TO_FHIR_PATH_KEY)
 						+ "\">V2ToFhir</a>: V2 to Fhir conversion using v2ToFhir dependency</li>");
 				out.println("      <li><a href=\""
-					+ UrlTenantUtil.tenantifyPathWithContextPath(tenant,
+						+ urlTenantUtil.tenantifyPathWithContextPath(tenant,
 								FhirMessagingController.FHIR_MESSAGING_PATH_KEY)
 						+ "\">Conversion messaging </a>: Experimental endpoint for FHIR messaging with messages converted from HL7v2</li>");
 
 			}
-			out.println("      <li><a href=\"" + UrlTenantUtil.tenantifyPathWithContextPath(tenant, "soap")
+			out.println("      <li><a href=\"" + urlTenantUtil.tenantifyPathWithContextPath(tenant, "soap")
 					+ "\">CDC WSDL</a>: HL7 realtime interfacing using CDC WSDL</li>");
 			if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R5)) {
 				out.println(
@@ -139,30 +143,30 @@ public class HomeController {
 			out.println("    </ul>");
 			out.println("    <h3>Secondary Functions Supported</h3>");
 			out.println("    <ul class=\"w3-ul w3-hoverable\">");
-			out.println("      <li><a href=\"" + UrlTenantUtil.tenantifyPathWithContextPath(tenant, "lab")
+			out.println("      <li><a href=\"" + urlTenantUtil.tenantifyPathWithContextPath(tenant, "lab")
 					+ "\">Convert ORU to VXU</a>: Convert an ORU lab message to a VXU. </li>");
-			out.println("      <li><a href=\"" + UrlTenantUtil.tenantifyPathWithContextPath(tenant, "queryConverter")
+			out.println("      <li><a href=\"" + urlTenantUtil.tenantifyPathWithContextPath(tenant, "queryConverter")
 					+ "\">Convert VXU to QBP</a>: Convert an VXU immunization message into an immunization query. </li>");
 			if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R5)) {
-				out.println("      <li><a href=\"" + UrlTenantUtil.tenantifyPathWithContextPath(tenant, "covid")
+				out.println("      <li><a href=\"" + urlTenantUtil.tenantifyPathWithContextPath(tenant, "covid")
 						+ "\">COVID-19 Reporting</a>: Export data to demonstrate COVID-19 reporting </li>");
 			} else if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R4)) {
-				out.println("      <li><a href=\"" + UrlTenantUtil.tenantifyPathWithContextPath(tenant, "covid")
+				out.println("      <li><a href=\"" + urlTenantUtil.tenantifyPathWithContextPath(tenant, "covid")
 						+ "\">COVID-19 Reporting</a>:(Unavailable in R4 mode)  Export data to demonstrate COVID-19 reporting </li>");
 			}
-			out.println("      <li><a href=\"" + UrlTenantUtil.tenantifyPathWithContextPath(tenant, "VXUDownloadForm")
+			out.println("      <li><a href=\"" + urlTenantUtil.tenantifyPathWithContextPath(tenant, "VXUDownloadForm")
 					+ "\">COVID-19 Reporting (HL7)</a>: Download data in HL7 format demonstrate COVID-19 reporting </li>");
-			out.println("      <li><a href=\"" + UrlTenantUtil.tenantifyPathWithContextPath(tenant, "covidGenerate")
+			out.println("      <li><a href=\"" + urlTenantUtil.tenantifyPathWithContextPath(tenant, "covidGenerate")
 					+ "\">COVID-19 HL7 Generator</a>: Generate HL7 Messages</li>");
 			// out.println(" <li><a href=\"event\">Submit Event</a>: Submit a patient and
 			// vaccination event manually.</li>");
 			// out.println(" <li><a href=\"fhirTest\">FHIR Test Endpoint</a>: Create FHIR
 			// resources to test with IIS Sandbox.</li>");
-			out.println("      <li><a href=\"" + UrlTenantUtil.tenantifyPathWithContextPath(tenant, "vciDemo")
+			out.println("      <li><a href=\"" + urlTenantUtil.tenantifyPathWithContextPath(tenant, "vciDemo")
 					+ "\">VCI Demonstration</a>: Demonstration of RSP conversion steps for the Vaccine Credential Initiative</li>");
 			out.println("    </ul>");
 
-			UiUtil.printFlavors(out, false);
+			uiUtil.printFlavors(out, false);
 			out.println("  </div>");
 			out.println("  <img src=\"" + IIS_PATH_BASE
 					+ "/img/markus-spiske-dWaRJ3WBnGs-unsplash.jpg\" class=\"w3-round\" alt=\"Sandbox\" width=\"400\">");
@@ -182,7 +186,7 @@ public class HomeController {
 					+
 					"<title>unsplash-logo</title>" +
 					"<path d=\"M10 9V0h12v9H10zm12 5h10v18H0V14h10v9h12v-9z\"></path></svg></span><span style=\"display:inline-block;padding:2px 3px\">Markus Spiske</span></a>");
-			UiUtil.doFooter(out);
+			uiUtil.doFooter(out);
 		} catch (Exception e) {
 			e.printStackTrace(System.err);
 		}

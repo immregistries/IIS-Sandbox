@@ -32,9 +32,12 @@ import static org.immregistries.iis.kernal.controllers.servlet.PatientController
 import static org.immregistries.iis.kernal.controllers.servlet.SubscriptionController.PARAM_MESSAGE;
 import static org.immregistries.iis.kernal.controllers.servlet.SubscriptionController.PARAM_SUBSCRIPTION_ID;
 
-public final class PatientServletUtil {
+import org.springframework.stereotype.Service;
 
-	public static void printPatientList(PrintWriter out, List<? extends IisPatient> patientList, boolean showingRecent) {
+@Service
+public class PatientServletUtil {
+
+	public void printPatientList(PrintWriter out, List<? extends IisPatient> patientList, boolean showingRecent) {
 		if (patientList != null) {
 			if (patientList.isEmpty()) {
 				out.println("<div class=\"w3-panel w3-yellow\"><p>No Records Found</p></div>");
@@ -77,7 +80,7 @@ public final class PatientServletUtil {
 		}
 	}
 
-	public static void printObservationList(PrintWriter out, List<ObservationReported> observationReportedList) {
+	public void printObservationList(PrintWriter out, List<ObservationReported> observationReportedList) {
 		SimpleDateFormat sdfDate = new SimpleDateFormat("MM/dd/yyyy");
 		if (observationReportedList.isEmpty()) {
 			out.println("<div class=\"w3-panel w3-yellow\"><p>No Observations found</p></div>");
@@ -223,7 +226,7 @@ public final class PatientServletUtil {
 		}
 	}
 
-	public static void printPatient(PrintWriter out, IisPatient patientSelected) {
+	public void printPatient(PrintWriter out, IisPatient patientSelected) {
 		SimpleDateFormat sdfDate = new SimpleDateFormat("MM/dd/yyyy");
 		out.println("    <div class=\"w3-container w3-half w3-margin-top\">");
 		out.println("<table class=\"w3-table w3-bordered w3-striped w3-border test w3-hoverable\">");
@@ -250,7 +253,7 @@ public final class PatientServletUtil {
 		out.println("</div>");
 	}
 
-	public static void printSubscriptions(PrintWriter out, IParser parser, org.hl7.fhir.r5.model.Bundle bundle,
+	public void printSubscriptions(PrintWriter out, IParser parser, org.hl7.fhir.r5.model.Bundle bundle,
 			org.hl7.fhir.r5.model.Resource resource) {
 		String resourceString = parser.encodeResourceToString(resource);
 		// .replace("\"","\'")
@@ -297,15 +300,15 @@ public final class PatientServletUtil {
 		out.println("</div>");
 	}
 
-	public static IDomainResource fetchPatientFromParameter(HttpServletRequest req, IGenericClient fhirClient,
+	public IDomainResource fetchPatientFromParameter(HttpServletRequest req, IGenericClient fhirClient,
 			FhirSearchRequester fhirSearchRequester) {
 		String idParam = req.getParameter(PARAM_PATIENT_REPORTED_ID);
 		String identifierParam = req.getParameter(PARAM_PATIENT_REPORTED_EXTERNAL_LINK);
 		return fetchPatientFromParameters(idParam, identifierParam, fhirClient, fhirSearchRequester);
 	}
 
-	public static @Nullable IDomainResource fetchPatientFromParameters(String idParam, String identifierParam,
-																							 IGenericClient fhirClient, FhirSearchRequester fhirSearchRequester) {
+	public @Nullable IDomainResource fetchPatientFromParameters(String idParam, String identifierParam,
+			IGenericClient fhirClient, FhirSearchRequester fhirSearchRequester) {
 		IDomainResource patient = null;
 		if (idParam != null) {
 			patient = (IDomainResource) fhirClient.read().resource("Patient").withId(idParam).execute();
@@ -313,7 +316,8 @@ public final class PatientServletUtil {
 			if (identifierParam != null) {
 				SearchParameterMap searchParameterMap = new SearchParameterMap(Patient.SP_IDENTIFIER,
 						new TokenParam().setValue(identifierParam));
-				IBundleProvider bundleProvider = fhirSearchRequester.searchGoldenRecord(Patient.class, searchParameterMap);
+				IBundleProvider bundleProvider = fhirSearchRequester.searchGoldenRecord(Patient.class,
+						searchParameterMap);
 				if (!bundleProvider.isEmpty()) {
 					patient = (IDomainResource) bundleProvider.getAllResources().get(0);
 				}
@@ -322,7 +326,7 @@ public final class PatientServletUtil {
 		return patient;
 	}
 
-	public static void printMessageReceived(PrintWriter out, MessageReceived messageReceived) {
+	public void printMessageReceived(PrintWriter out, MessageReceived messageReceived) {
 		SimpleDateFormat sdfTime = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
 		out.println("     <h3>" + messageReceived.getCategoryRequest() + " - "
 				+ messageReceived.getCategoryResponse() + " "
@@ -331,8 +335,8 @@ public final class PatientServletUtil {
 		out.println("     <pre>" + messageReceived.getMessageResponse() + "</pre>");
 	}
 
-	public static void printFhirShortcuts(PrintWriter out, IBaseResource patientSelected,
-													  IisPatient iisPatient, Tenant tenant) {
+	public void printFhirShortcuts(PrintWriter out, IBaseResource patientSelected,
+			IisPatient iisPatient, Tenant tenant) {
 		out.println("<h4>FHIR Api Shortcuts</h4>");
 		String apiBaseUrl = Application.fhirServerBasePath(tenant);
 		{

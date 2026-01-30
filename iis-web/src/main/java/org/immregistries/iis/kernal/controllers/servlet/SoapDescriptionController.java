@@ -12,6 +12,7 @@ import org.immregistries.smm.cdc.ProcessorFactory;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -21,6 +22,11 @@ import static org.immregistries.iis.kernal.controllers.servlet.SoapDescriptionCo
 @RestController
 @RequestMapping({ SOAP_BASE_PATH, TenantController.TENANT_PATH + SOAP_BASE_PATH })
 public class SoapDescriptionController {
+
+	@Autowired
+	private UiUtil uiUtil;
+	@Autowired
+	private UrlTenantUtil urlTenantUtil;
 
 	public static final String SOAP_BASE_PATH = "/soap";
 
@@ -39,7 +45,7 @@ public class SoapDescriptionController {
 			PrintWriter out = resp.getWriter();
 			try {
 				Tenant tenant = CurrentTenantUtil.getTenant();
-				UiUtil.doHeader(out, "IIS Sandbox", tenant);
+				uiUtil.doHeader(out, "IIS Sandbox", tenant);
 				out.println("<h2>CDC SOAP Endpoint</h2>");
 				out.println("<p>");
 				out.println("This demonstration system supports the use of the ");
@@ -51,7 +57,7 @@ public class SoapDescriptionController {
 				out.println("</p>");
 				out.println("<h2>Usage Instructions</h2>");
 				out.println("<h3>WSDL</h3>");
-				out.println("<p><a href=\"" + UrlTenantUtil.tenantifyPathWithContextPath(tenant, "soap")
+				out.println("<p><a href=\"" + urlTenantUtil.tenantifyPathWithContextPath(tenant, "soap")
 						+ "\">See WSDL</a></p>");
 				out.println("<h3>Authentication</h3>");
 				out.println(
@@ -85,7 +91,7 @@ public class SoapDescriptionController {
 			} finally {
 				out.close();
 			}
-			UiUtil.doFooter(out);
+			uiUtil.doFooter(out);
 		}
 	}
 

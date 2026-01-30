@@ -42,7 +42,8 @@ public class TenantController {
 	private TenantRestController tenantRestController;
 	@Autowired
 	private TenantAuthService tenantAuthService;
-
+	@Autowired
+	private UiUtil uiUtil;
 
 	/**
 	 * Adds a new tenant from form
@@ -95,7 +96,7 @@ public class TenantController {
 			/*
 			 * print starts after potential tenant switch
 			 */
-			UiUtil.doHeader(out, "IIS Sandbox - Home", tenant);
+			uiUtil.doHeader(out, "IIS Sandbox - Home", tenant);
 
 			out.println("	<h1>Create or select Tenant to proceed</h1>");
 
@@ -137,10 +138,10 @@ public class TenantController {
 					+
 					"</p></div>"); // TODO better explanation
 
-			UiUtil.printFlavors(out, true);
+			uiUtil.printFlavors(out, true);
 			out.println("</div>");
 
-			UiUtil.doFooter(out);
+			uiUtil.doFooter(out);
 		}
 		out.flush();
 		out.close();

@@ -50,6 +50,13 @@ public class ShLinkController {
 	@Autowired
 	ShLinkRestController shLinkRestController;
 
+	@Autowired
+	private UiUtil uiUtil;
+	@Autowired
+	private UiQrCodeUtil uiQrCodeUtil;
+	@Autowired
+	private IisKeyController iisKeyController;
+
 	@PostMapping()
 	protected void shLinkIPS(HttpServletRequest req, HttpServletResponse resp,
 			@RequestParam(value = PARAM_KEY_ID, required = false) String keyId,
@@ -58,7 +65,7 @@ public class ShLinkController {
 			@RequestParam(PARAM_FLAG) String flag,
 			@RequestParam(PARAM_EXP) String exp,
 			@RequestParam(value = "image", required = false) boolean image)
-		throws ServletException, IOException, NoSuchAlgorithmException, WriterException {
+			throws ServletException, IOException, NoSuchAlgorithmException, WriterException {
 		Tenant tenant = RedirectUtil.getTenantRedirectIfNone(req, resp);
 
 		OutputStream outputStream = resp.getOutputStream();
@@ -68,19 +75,20 @@ public class ShLinkController {
 		 */
 		IisKey iisSigningKey = iisKeyRestController.getOrCreateKey(tenant, keyId);
 
-		String qrCode = shLinkRestController.shLinkIPSQrCode(req, iisSigningKey.getKeyId(), secretKey,patientId,flag,exp,tenant);
+		String qrCode = shLinkRestController.shLinkIPSQrCode(req, iisSigningKey.getKeyId(), secretKey, patientId, flag,
+				exp, tenant);
 		if (image) {
 			resp.setContentType("image/png"); // Set content type for PNG image
-			UiQrCodeUtil.printQrCodeAsImage(outputStream,qrCode);
+			uiQrCodeUtil.printQrCodeAsImage(outputStream, qrCode);
 		} else {
 			resp.setContentType("text/html");
-			UiUtil.doHeader(out, "Smart Health Link Result", tenant);
+			uiUtil.doHeader(out, "Smart Health Link Result", tenant);
 			out.println("<h3>Smart health link</h3>");
 			out.println("<textarea name=\"shlink\" readonly style=\"width: 100%; height: 5em;\" >");
 			out.print(qrCode);
 			out.println("</textarea>");
-			IisKeyController.printIisKey(out, iisSigningKey);
-			UiUtil.doFooter(out);
+			iisKeyController.printIisKey(out, iisSigningKey);
+			uiUtil.doFooter(out);
 		}
 		out.flush();
 		out.close();
@@ -98,7 +106,7 @@ public class ShLinkController {
 
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
-		UiUtil.doHeader(out, "Smart Health Link Form", tenant);
+		uiUtil.doHeader(out, "Smart Health Link Form", tenant);
 
 		out.println("    <div class=\"w3-container w3-margin-top\">");
 		out.println("    <h3>Generate ShLink</h3>");
@@ -140,10 +148,10 @@ public class ShLinkController {
 		out.println("    <div class=\"w3-container\">");
 
 		List<IisKey> iisKeys = iisKeyRestController.getKeys();
-		IisKeyController.printIisKeys(out, iisKeys, tenant);
+		iisKeyController.printIisKeys(out, iisKeys, tenant);
 		out.println("    </div>");
 
-		UiUtil.doFooter(out);
+		uiUtil.doFooter(out);
 		out.flush();
 		out.close();
 
