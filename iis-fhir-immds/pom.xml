@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.immregistries.iis</groupId>
         <artifactId>iis-sandbox</artifactId>
-        <version>${revision}</version>
+        <version>${iis.sandbox.revision}</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -23,37 +23,37 @@
         <dependency>
             <groupId>org.immregistries.iis</groupId>
             <artifactId>iis-constants</artifactId>
-            <version>${revision}</version>
+            <version>${iis.sandbox.revision}</version>
         </dependency>
         <dependency>
             <groupId>org.immregistries.iis</groupId>
             <artifactId>iis-core-model</artifactId>
-            <version>${revision}</version>
+            <version>${iis.sandbox.revision}</version>
         </dependency>
         <dependency>
             <groupId>org.immregistries.iis</groupId>
             <artifactId>iis-core-commons</artifactId>
-            <version>${revision}</version>
+            <version>${iis.sandbox.revision}</version>
         </dependency>
         <dependency>
             <groupId>org.immregistries.iis</groupId>
             <artifactId>iis-mapping</artifactId>
-            <version>${revision}</version>
+            <version>${iis.sandbox.revision}</version>
         </dependency>
         <dependency>
             <groupId>org.immregistries.iis</groupId>
             <artifactId>iis-fhir-annotations</artifactId>
-            <version>${revision}</version>
+            <version>${iis.sandbox.revision}</version>
         </dependency>
         <dependency>
             <groupId>org.immregistries.iis</groupId>
             <artifactId>iis-logic-immds</artifactId>
-            <version>${revision}</version>
+            <version>${iis.sandbox.revision}</version>
         </dependency>
         <dependency>
             <groupId>org.immregistries.iis</groupId>
             <artifactId>iis-fhir-interceptors</artifactId>
-            <version>${revision}</version>
+            <version>${iis.sandbox.revision}</version>
         </dependency>
 
     </dependencies>

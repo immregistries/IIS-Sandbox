@@ -14,7 +14,6 @@ import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
-import org.immregistries.iis.kernal.Application;
 import org.immregistries.iis.kernal.controllers.rest.CodeMapRestController;
 import org.immregistries.iis.kernal.controllers.rest.PatientRestController;
 import org.immregistries.iis.kernal.controllers.rest.VaccinationRestController;
@@ -32,6 +31,7 @@ import org.immregistries.iis.kernal.model.IisVaccination;
 import org.immregistries.iis.kernal.model.ObservationReported;
 import org.immregistries.iis.kernal.model.PatientReported;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
+import org.immregistries.iis.kernal.services.api.IDeployedApiUrlService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,6 +80,8 @@ public class VaccinationController {
 	private UrlTenantUtil urlTenantUtil;
 	@Autowired
 	private PatientServletUtil patientServletUtil;
+	@Autowired
+	private IDeployedApiUrlService deployedUrlService;
 
 	@PostMapping
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp
@@ -243,7 +245,7 @@ public class VaccinationController {
 				{
 					out.println("<div class=\"w3-container\">");
 					out.println("<h4>FHIR Api Shortcuts</h4>");
-					String apiBaseUrl = Application.fhirServerBasePath(tenant);
+					String apiBaseUrl = deployedUrlService.fhirServerBasePath(tenant);
 					{
 						String link = apiBaseUrl + "/Immunization?_id=" + vaccination.getVaccinationId();
 						out.println("<div>FHIR Immunization: <a href=\"" + link + "\">" + link + "</a></div>");

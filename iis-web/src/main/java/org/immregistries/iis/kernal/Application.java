@@ -4,13 +4,14 @@ import ca.uhn.fhir.batch2.jobs.config.Batch2JobsConfig;
 import ca.uhn.fhir.jpa.batch2.JpaBatch2Config;
 import ca.uhn.fhir.jpa.starter.ServerConfig;
 import ca.uhn.fhir.jpa.starter.annotations.OnEitherVersion;
-import ca.uhn.fhir.jpa.starter.mdm.MdmConfig;
 import ca.uhn.fhir.jpa.subscription.channel.config.SubscriptionChannelConfig;
 import ca.uhn.fhir.jpa.subscription.match.config.SubscriptionProcessorConfig;
 import ca.uhn.fhir.jpa.subscription.match.config.WebsocketDispatcherConfig;
 import ca.uhn.fhir.jpa.subscription.submit.config.SubscriptionSubmitterConfig;
 import ca.uhn.fhir.rest.server.RestfulServer;
 import org.immregistries.iis.kernal.controllers.filters.FilterRegistrationConfig;
+import org.immregistries.iis.kernal.logic.config.CLVRConfig;
+import org.immregistries.iis.kernal.logic.config.V2toFhirConfig;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.immregistries.iis.kernal.security.ServerSecurityConfig;
 import org.jetbrains.annotations.NotNull;
@@ -37,12 +38,13 @@ import org.springframework.web.context.request.RequestContextListener;
 		SubscriptionProcessorConfig.class,
 		SubscriptionChannelConfig.class,
 		WebsocketDispatcherConfig.class,
-		MdmConfig.class,
 		JpaBatch2Config.class,
 		Batch2JobsConfig.class,
 		FilterRegistrationConfig.class,
 		ServerConfig.class,
 		ServerSecurityConfig.class,
+	CLVRConfig.class,
+	V2toFhirConfig.class,
 })
 @ServletComponentScan(basePackageClasses = {
 	RestfulServer.class }, basePackages = {
@@ -60,9 +62,9 @@ public class Application extends SpringBootServletInitializer {
 	 * TODO get from Configuration
 	 */
 	public static final String IIS_PATH_BASE = "/iis";
-	public static final String FHIR_PATH_EXTENSION = "/fhir";
+	public static final String FHIR_SERVER_PATH_EXTENSION = "/fhir";
 	public static @NotNull String fhirServerBasePath(Tenant tenant) {
-		return Application.IIS_PATH_BASE + FHIR_PATH_EXTENSION + "/" + tenant.getOrganizationName();
+		return Application.IIS_PATH_BASE + FHIR_SERVER_PATH_EXTENSION + "/" + tenant.getOrganizationName();
 	}
 
 
@@ -87,7 +89,7 @@ public class Application extends SpringBootServletInitializer {
 		ServletRegistrationBean servletRegistrationBean = new ServletRegistrationBean();
 		beanFactory.autowireBean(restfulServer);
 		servletRegistrationBean.setServlet(restfulServer);
-		servletRegistrationBean.addUrlMappings(FHIR_PATH_EXTENSION + "/*");
+		servletRegistrationBean.addUrlMappings(FHIR_SERVER_PATH_EXTENSION + "/*");
 		servletRegistrationBean.setLoadOnStartup(1);
 		return servletRegistrationBean;
 	}

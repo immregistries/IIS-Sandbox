@@ -10,7 +10,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.instance.model.api.IDomainResource;
 import org.hl7.fhir.r5.model.Patient;
-import org.immregistries.iis.kernal.Application;
 import org.immregistries.iis.kernal.enums.LoincIdentifier;
 import org.immregistries.iis.kernal.enums.SnomedValue;
 import org.immregistries.iis.kernal.mapping.requesters.FhirRequesterUtil;
@@ -19,7 +18,10 @@ import org.immregistries.iis.kernal.model.IisPatient;
 import org.immregistries.iis.kernal.model.ObservationReported;
 import org.immregistries.iis.kernal.persisted.entities.MessageReceived;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
+import org.immregistries.iis.kernal.services.api.IDeployedApiUrlService;
 import org.jetbrains.annotations.Nullable;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.io.PrintWriter;
 import java.text.ParseException;
@@ -32,10 +34,11 @@ import static org.immregistries.iis.kernal.controllers.servlet.PatientController
 import static org.immregistries.iis.kernal.controllers.servlet.SubscriptionController.PARAM_MESSAGE;
 import static org.immregistries.iis.kernal.controllers.servlet.SubscriptionController.PARAM_SUBSCRIPTION_ID;
 
-import org.springframework.stereotype.Service;
-
 @Service
 public class PatientServletUtil {
+
+	@Autowired
+	private IDeployedApiUrlService deployedUrlService;
 
 	public void printPatientList(PrintWriter out, List<? extends IisPatient> patientList, boolean showingRecent) {
 		if (patientList != null) {
@@ -338,7 +341,7 @@ public class PatientServletUtil {
 	public void printFhirShortcuts(PrintWriter out, IBaseResource patientSelected,
 			IisPatient iisPatient, Tenant tenant) {
 		out.println("<h4>FHIR Api Shortcuts</h4>");
-		String apiBaseUrl = Application.fhirServerBasePath(tenant);
+		String apiBaseUrl = deployedUrlService.fhirServerBasePath(tenant);
 		{
 			String link = apiBaseUrl + "/Patient/" + iisPatient.getPatientId();
 			out.println("<div>FHIR Resource: <a href=\"" + link + "\">" + link + "</a></div>");

@@ -1,9 +1,7 @@
 package org.immregistries.iis.kernal.controllers.servlet.util;
 
 import com.google.common.collect.ImmutableMap;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.hl7.fhir.instance.model.api.IAnyResource;
-import org.immregistries.iis.kernal.Application;
 import org.immregistries.iis.kernal.SoftwareVersion;
 import org.immregistries.iis.kernal.controllers.servlet.PatientController;
 import org.immregistries.iis.kernal.controllers.servlet.PopController;
@@ -16,10 +14,12 @@ import org.immregistries.iis.kernal.persisted.entities.UserAccess;
 import org.immregistries.iis.kernal.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.security.ServerSecurityConfig;
 import org.immregistries.iis.kernal.security.UserAccessUtil;
+import org.immregistries.iis.kernal.services.api.IDeployedApiUrlService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
-import org.springframework.stereotype.Service;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
 
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
@@ -30,6 +30,10 @@ import static org.immregistries.iis.kernal.Application.IIS_PATH_BASE;
 
 @Service
 public class UiUtil {
+
+	@Autowired
+	private IDeployedApiUrlService deployedUrlService;
+
 	private final ImmutableMap<String, String> HEADER_MAP = ImmutableMap.of(PopController.POP_PATH_KEY,
 			"Send Now",
 			"message", "Messages",
@@ -80,7 +84,7 @@ public class UiUtil {
 			if (tenant != null) {
 				out.println("<a class='w3-bar-item w3-button w3-right w3-green' href=\"" + link + "\">Tenant : "
 						+ tenant.getOrganizationName() + " </a>");
-				out.println("<a href=\"" + Application.fhirServerBasePath(tenant)
+				out.println("<a href=\"" + deployedUrlService.fhirServerBasePath(tenant)
 						+ "/metadata\" class=\"w3-bar-item w3-button w3-right \">Tenant Fhir Server Base</a>");
 			} else {
 				out.println("<a class='w3-bar-item w3-button w3-right w3-green' href=\"" + link

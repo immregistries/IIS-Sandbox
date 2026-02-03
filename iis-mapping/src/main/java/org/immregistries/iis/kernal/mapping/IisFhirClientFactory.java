@@ -13,10 +13,10 @@ import ca.uhn.fhir.rest.server.exceptions.AuthenticationException;
 import ca.uhn.fhir.rest.server.servlet.ServletRequestDetails;
 import jakarta.servlet.http.HttpServletRequest;
 import org.immregistries.iis.kernal.GlobalConstants;
-import org.immregistries.iis.kernal.services.api.IApiUrlService;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.immregistries.iis.kernal.persisted.entities.UserAccess;
 import org.immregistries.iis.kernal.security.CurrentTenantUtil;
+import org.immregistries.iis.kernal.services.api.IDeployedApiUrlService;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,7 +49,7 @@ public class IisFhirClientFactory extends ApacheRestfulClientFactory {
 	}
 
 	@Autowired
-	private IApiUrlService apiUrlService;
+	private IDeployedApiUrlService apiUrlService;
 
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	private LoggingInterceptor loggingInterceptor;

@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.immregistries.iis</groupId>
         <artifactId>iis-sandbox</artifactId>
-        <version>${revision}</version>
+        <version>${iis.sandbox.revision}</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -23,7 +23,7 @@
         <dependency>
             <groupId>org.immregistries.iis</groupId>
             <artifactId>iis-constants</artifactId>
-            <version>${revision}</version>
+            <version>${iis.sandbox.revision}</version>
         </dependency>
 
         <dependency>
