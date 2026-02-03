@@ -1,10 +1,10 @@
 package org.immregistries.iis.kernal.mapping.requesters;
 
+import ca.uhn.fhir.jpa.starter.annotations.OnR4Condition;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.DecimalType;
 import org.hl7.fhir.r4.model.Parameters;
 import org.hl7.fhir.r4.model.Patient;
-import org.immregistries.iis.fhir.annotations.OnR4Condition;
 import org.immregistries.iis.kernal.mapping.IisFhirClientFactory;
 import org.immregistries.iis.kernal.mapping.mappers.resources.r4.PatientMapperR4;
 import org.immregistries.iis.kernal.model.IisPatient;

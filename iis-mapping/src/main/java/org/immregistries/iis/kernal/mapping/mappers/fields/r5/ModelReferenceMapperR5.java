@@ -1,7 +1,7 @@
 package org.immregistries.iis.kernal.mapping.mappers.fields.r5;
 
+import ca.uhn.fhir.jpa.starter.annotations.OnR5Condition;
 import org.hl7.fhir.r5.model.Reference;
-import org.immregistries.iis.fhir.annotations.OnR5Condition;
 import org.immregistries.iis.kernal.mapping.mappers.IR5Mapper;
 import org.immregistries.iis.kernal.mapping.mappers.fields.ModelReferenceMapper;
 import org.immregistries.iis.kernal.model.ModelReference;

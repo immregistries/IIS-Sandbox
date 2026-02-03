@@ -2,7 +2,7 @@ package org.immregistries.iis.fhir.immds;
 
 import org.hl7.fhir.instance.model.api.IBaseParameters;
 import org.hl7.fhir.instance.model.api.IDomainResource;
-import org.immregistries.iis.fhir.IisFhirSimpleProvider;
+import org.immregistries.iis.fhir.common.IisFhirSimpleProvider;
 
 public interface IRecommendationForecastProvider<Parameters extends IBaseParameters, Patient extends IDomainResource, Immunization extends IDomainResource> extends IisFhirSimpleProvider {
 	String $_IMMDS_FORECAST = "$immds-forecast";

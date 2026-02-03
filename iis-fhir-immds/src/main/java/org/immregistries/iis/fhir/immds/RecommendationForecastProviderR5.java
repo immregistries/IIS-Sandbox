@@ -1,5 +1,6 @@
 package org.immregistries.iis.fhir.immds;
 
+import ca.uhn.fhir.jpa.starter.annotations.OnR5Condition;
 import ca.uhn.fhir.model.api.annotation.Description;
 import ca.uhn.fhir.rest.annotation.Operation;
 import ca.uhn.fhir.rest.annotation.OperationParam;
@@ -8,7 +9,6 @@ import org.hl7.fhir.r5.model.Immunization;
 import org.hl7.fhir.r5.model.ImmunizationRecommendation;
 import org.hl7.fhir.r5.model.Parameters;
 import org.hl7.fhir.r5.model.Patient;
-import org.immregistries.iis.fhir.annotations.OnR5Condition;
 import org.immregistries.iis.kernal.logic.recommendations.CdsQueryServiceR5;
 import org.immregistries.iis.kernal.logic.recommendations.IisRecommendationGenerator;
 import org.immregistries.iis.kernal.mapping.mappers.resources.r5.ImmunizationMapperR5;

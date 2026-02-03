@@ -1,5 +1,6 @@
 package org.immregistries.iis.kernal.controllers.servlet;
 
+import ca.uhn.fhir.jpa.starter.annotations.OnR5Condition;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletInputStream;
@@ -7,7 +8,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.hl7.fhir.r5.model.Bundle;
 import org.hl7.fhir.r5.model.Subscription;
-import org.immregistries.iis.fhir.annotations.OnR5Condition;
 import org.immregistries.iis.kernal.controllers.rest.SubscriptionRestControllerR5;
 import org.immregistries.iis.kernal.controllers.servlet.util.RedirectUtil;
 import org.immregistries.iis.kernal.controllers.servlet.util.UiUtil;

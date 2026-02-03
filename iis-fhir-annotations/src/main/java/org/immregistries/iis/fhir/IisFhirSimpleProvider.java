@@ -1,4 +1,0 @@
-package org.immregistries.iis.fhir;
-
-public interface IisFhirSimpleProvider {
-}

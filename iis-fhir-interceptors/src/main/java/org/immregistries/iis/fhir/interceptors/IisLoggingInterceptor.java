@@ -10,7 +10,7 @@ import ca.uhn.fhir.rest.server.interceptor.LoggingInterceptor;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.immregistries.iis.fhir.IisFhirInterceptor;
+import org.immregistries.iis.fhir.common.IisFhirInterceptor;
 import org.immregistries.iis.fhir.interceptors.multitenancy.PartitionTenantCreationInterceptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

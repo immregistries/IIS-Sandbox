@@ -1,7 +1,7 @@
 package org.immregistries.iis.kernal.mapping.mappers.resources.r5;
 
+import ca.uhn.fhir.jpa.starter.annotations.OnR5Condition;
 import org.hl7.fhir.r5.model.*;
-import org.immregistries.iis.fhir.annotations.OnR5Condition;
 import org.immregistries.iis.kernal.mapping.mappers.resources.LocationMapper;
 import org.immregistries.iis.kernal.model.OrgLocation;
 import org.springframework.context.annotation.Conditional;

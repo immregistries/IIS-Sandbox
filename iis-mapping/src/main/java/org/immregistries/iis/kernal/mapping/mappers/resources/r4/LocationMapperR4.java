@@ -1,10 +1,10 @@
 package org.immregistries.iis.kernal.mapping.mappers.resources.r4;
 
+import ca.uhn.fhir.jpa.starter.annotations.OnR4Condition;
 import org.hl7.fhir.r4.model.Address;
 import org.hl7.fhir.r4.model.Extension;
 import org.hl7.fhir.r4.model.Location;
 import org.hl7.fhir.r4.model.StringType;
-import org.immregistries.iis.fhir.annotations.OnR4Condition;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
 import org.immregistries.iis.kernal.mapping.mappers.resources.LocationMapper;
 import org.immregistries.iis.kernal.model.OrgLocation;

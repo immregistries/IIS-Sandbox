@@ -13,7 +13,7 @@ import jakarta.servlet.http.HttpSession;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.Strings;
 import org.apache.http.auth.AuthenticationException;
-import org.immregistries.iis.fhir.IisFhirInterceptor;
+import org.immregistries.iis.fhir.common.IisFhirInterceptor;
 import org.immregistries.iis.kernal.GlobalConstants;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.immregistries.iis.kernal.persisted.entities.UserAccess;

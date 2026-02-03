@@ -9,7 +9,7 @@ import org.apache.commons.lang3.Strings;
 import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.hl7.fhir.instance.model.api.IDomainResource;
 import org.hl7.fhir.r4.model.ResourceType;
-import org.immregistries.iis.fhir.IisFhirInterceptor;
+import org.immregistries.iis.fhir.common.IisFhirInterceptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

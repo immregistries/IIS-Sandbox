@@ -1,7 +1,7 @@
 package org.immregistries.iis.kernal.mapping.mappers.resources.r5;
 
+import ca.uhn.fhir.jpa.starter.annotations.OnR5Condition;
 import org.hl7.fhir.r5.model.Organization;
-import org.immregistries.iis.fhir.annotations.OnR5Condition;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
 import org.immregistries.iis.kernal.mapping.mappers.resources.OrganizationMapper;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;

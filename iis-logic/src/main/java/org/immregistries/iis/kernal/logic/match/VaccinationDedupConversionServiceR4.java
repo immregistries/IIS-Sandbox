@@ -1,8 +1,8 @@
 package org.immregistries.iis.kernal.logic.match;
 
 import ca.uhn.fhir.interceptor.model.RequestPartitionId;
+import ca.uhn.fhir.jpa.starter.annotations.OnR4Condition;
 import org.hl7.fhir.r4.model.Coding;
-import org.immregistries.iis.fhir.annotations.OnR4Condition;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
 import org.immregistries.iis.kernal.mapping.mappers.resources.ImmunizationMapper;
 import org.immregistries.vaccination_deduplication.reference.ImmunizationSource;

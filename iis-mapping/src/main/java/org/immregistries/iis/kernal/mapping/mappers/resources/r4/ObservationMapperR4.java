@@ -1,9 +1,9 @@
 package org.immregistries.iis.kernal.mapping.mappers.resources.r4;
 
+import ca.uhn.fhir.jpa.starter.annotations.OnR4Condition;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.hl7.fhir.r4.model.*;
-import org.immregistries.iis.fhir.annotations.OnR4Condition;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
 import org.immregistries.iis.kernal.mapping.V2SimpleDateFormatGenerator;
 import org.immregistries.iis.kernal.mapping.mappers.fields.r4.BusinessIdentifierMapperR4;

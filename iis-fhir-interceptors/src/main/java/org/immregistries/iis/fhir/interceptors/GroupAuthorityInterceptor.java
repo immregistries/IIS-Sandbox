@@ -12,7 +12,7 @@ import jakarta.interceptor.Interceptor;
 import org.hl7.fhir.r5.model.Group;
 import org.hl7.fhir.r5.model.Organization;
 import org.hl7.fhir.r5.model.Reference;
-import org.immregistries.iis.fhir.IisFhirInterceptor;
+import org.immregistries.iis.fhir.common.IisFhirInterceptor;
 import org.immregistries.iis.kernal.mapping.requesters.FhirSearchRequester;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

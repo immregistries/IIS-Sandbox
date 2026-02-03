@@ -2,14 +2,14 @@ package org.immregistries.iis.kernal;
 
 import ca.uhn.fhir.batch2.jobs.config.Batch2JobsConfig;
 import ca.uhn.fhir.jpa.batch2.JpaBatch2Config;
+import ca.uhn.fhir.jpa.starter.ServerConfig;
+import ca.uhn.fhir.jpa.starter.annotations.OnEitherVersion;
+import ca.uhn.fhir.jpa.starter.mdm.MdmConfig;
 import ca.uhn.fhir.jpa.subscription.channel.config.SubscriptionChannelConfig;
 import ca.uhn.fhir.jpa.subscription.match.config.SubscriptionProcessorConfig;
 import ca.uhn.fhir.jpa.subscription.match.config.WebsocketDispatcherConfig;
 import ca.uhn.fhir.jpa.subscription.submit.config.SubscriptionSubmitterConfig;
 import ca.uhn.fhir.rest.server.RestfulServer;
-import org.immregistries.iis.fhir.ServerConfig;
-import org.immregistries.iis.fhir.annotations.OnEitherVersion;
-import org.immregistries.iis.fhir.mdm.MdmConfig;
 import org.immregistries.iis.kernal.controllers.filters.FilterRegistrationConfig;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.immregistries.iis.kernal.security.ServerSecurityConfig;
