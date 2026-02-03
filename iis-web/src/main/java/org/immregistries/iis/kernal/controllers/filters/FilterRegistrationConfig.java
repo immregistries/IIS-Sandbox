@@ -1,10 +1,8 @@
 package org.immregistries.iis.kernal.controllers.filters;
 
-import org.immregistries.iis.kernal.controllers.rest.filters.RestTenantUrlFilter;
 import org.immregistries.iis.kernal.controllers.IisRestPath;
+import org.immregistries.iis.kernal.controllers.rest.filters.RestTenantUrlFilter;
 import org.immregistries.iis.kernal.controllers.servlet.TenantController;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,9 +14,6 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class FilterRegistrationConfig {
 	private static final String REST_TENANT_URL_FILTER = "restTenantUrlFilter";
-
-	@Autowired
-	private AutowireCapableBeanFactory beanFactory;
 
 	@Bean(name = "tenantUrlFilter")
 	public TenantUrlFilter tenantUrlFilter() {

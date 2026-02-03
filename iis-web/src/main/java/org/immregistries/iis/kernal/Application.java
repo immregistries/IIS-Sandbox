@@ -1,12 +1,5 @@
 package org.immregistries.iis.kernal;
 
-import ca.uhn.fhir.batch2.jobs.config.Batch2JobsConfig;
-import ca.uhn.fhir.jpa.batch2.JpaBatch2Config;
-import ca.uhn.fhir.jpa.starter.ServerConfig;
-import ca.uhn.fhir.jpa.subscription.channel.config.SubscriptionChannelConfig;
-import ca.uhn.fhir.jpa.subscription.match.config.SubscriptionProcessorConfig;
-import ca.uhn.fhir.jpa.subscription.match.config.WebsocketDispatcherConfig;
-import ca.uhn.fhir.jpa.subscription.submit.config.SubscriptionSubmitterConfig;
 import ca.uhn.fhir.rest.server.RestfulServer;
 import org.immregistries.iis.kernal.controllers.filters.FilterRegistrationConfig;
 import org.immregistries.iis.kernal.logic.config.CLVRConfig;
@@ -29,18 +22,11 @@ import org.springframework.web.context.request.RequestContextListener;
 
 @SpringBootApplication(exclude = { ElasticsearchRestClientAutoConfiguration.class, ThymeleafAutoConfiguration.class })
 @Import({
-		SubscriptionSubmitterConfig.class,
-		SubscriptionProcessorConfig.class,
-		SubscriptionChannelConfig.class,
-		WebsocketDispatcherConfig.class,
-		JpaBatch2Config.class,
-		Batch2JobsConfig.class,
-		FilterRegistrationConfig.class,
-		ServerConfig.class,
-		ServerSecurityConfig.class,
+	HapiFhirServerRegistrationConfig.class,
+	FilterRegistrationConfig.class,
+	ServerSecurityConfig.class,
 	CLVRConfig.class,
 	V2toFhirConfig.class,
-	HapiFhirServerRegistrationConfig.class,
 })
 @ServletComponentScan(basePackageClasses = {
 	RestfulServer.class }, basePackages = {
@@ -53,8 +39,6 @@ import org.springframework.web.context.request.RequestContextListener;
 		"org.immregistries.iis.kernal"
 })
 public class Application extends SpringBootServletInitializer {
-
-
 
 	@Autowired
 	private AutowireCapableBeanFactory beanFactory;
