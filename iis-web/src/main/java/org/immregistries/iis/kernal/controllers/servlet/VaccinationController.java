@@ -18,7 +18,6 @@ import org.immregistries.iis.kernal.controllers.rest.CodeMapRestController;
 import org.immregistries.iis.kernal.controllers.rest.PatientRestController;
 import org.immregistries.iis.kernal.controllers.rest.VaccinationRestController;
 import org.immregistries.iis.kernal.controllers.servlet.util.PatientServletUtil;
-import org.immregistries.iis.kernal.controllers.servlet.util.RedirectUtil;
 import org.immregistries.iis.kernal.controllers.servlet.util.UiUtil;
 import org.immregistries.iis.kernal.controllers.servlet.util.UrlTenantUtil;
 import org.immregistries.iis.kernal.enums.LoincIdentifier;
@@ -97,7 +96,7 @@ public class VaccinationController {
 	// , @PathVariable(name = TenantController.PATH_VARIABLE_TENANT_NAME, required =
 	// false) String tenantName dealt with in filter
 	) throws ServletException, IOException {
-		Tenant tenant = RedirectUtil.getTenantRedirectIfNone(req, resp);
+		Tenant tenant = uiUtil.getTenantRedirectIfNone(req, resp);
 		IGenericClient fhirClient = iisFhirClientFactory.getOrCreateGenericClient(req);
 
 		resp.setContentType("text/html");

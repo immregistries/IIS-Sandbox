@@ -118,14 +118,14 @@ public class ServerSecurityConfig {
 	}
 
 	@Bean
-	FormAuthenticationSuccessHandler formAuthenticationSuccessHandler(HttpSecurity http, RequestCache requestCache) {
+	public FormAuthenticationSuccessHandler formAuthenticationSuccessHandler(HttpSecurity http, RequestCache requestCache) {
 		FormAuthenticationSuccessHandler formAuthenticationSuccessHandler = new FormAuthenticationSuccessHandler();
 		formAuthenticationSuccessHandler.setRequestCache(requestCache);
 		return formAuthenticationSuccessHandler;
 	}
 
 	@Bean
-	RequestCache requestCache(HttpSecurity http) {
+	public RequestCache requestCache(HttpSecurity http) {
 		return new HttpSessionRequestCache();
 	}
 

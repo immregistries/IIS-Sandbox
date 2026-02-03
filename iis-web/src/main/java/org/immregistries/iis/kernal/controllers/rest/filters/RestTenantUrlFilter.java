@@ -5,10 +5,11 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.immregistries.iis.kernal.Application;
+import org.immregistries.iis.kernal.controllers.IisRestPath;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.immregistries.iis.kernal.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.security.TenantAuthService;
+import org.immregistries.iis.kernal.services.api.IDeployedApiUrlService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,15 +18,19 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
-import org.immregistries.iis.kernal.controllers.IisRestPath;
-
 @Service
 @WebFilter
 public class RestTenantUrlFilter extends OncePerRequestFilter {
+	@Autowired
+	private IDeployedApiUrlService deployedApiUrlService;
+
 
 	public static final String TENANT_REQUEST_ATTRIBUTE = CurrentTenantUtil.SESSION_REQUEST_TENANT;
 	private static final Logger logger = LoggerFactory.getLogger(RestTenantUrlFilter.class);
-	private static final String TENANT_PREFIX = Application.IIS_PATH_BASE + IisRestPath.BasePath.REST_PATH + "/tenant/";
+
+	private String tenantPrefix() {
+		return deployedApiUrlService.getContextPath() + IisRestPath.BasePath.REST_PATH + "/tenant/";
+	}
 
 	@Autowired
 	private TenantAuthService tenantAuthService;
@@ -41,8 +46,8 @@ public class RestTenantUrlFilter extends OncePerRequestFilter {
 		if (path.startsWith(IisRestPath.MANIFEST_FULL_PATH)) {
 			filterChain.doFilter(request, response);
 		}
-		if (path.startsWith(TENANT_PREFIX)) {
-			String remainingPath = path.substring(TENANT_PREFIX.length());
+		if (path.startsWith(tenantPrefix())) {
+			String remainingPath = path.substring(tenantPrefix().length());
 			int slashIndex = remainingPath.indexOf('/');
 			String tenantId;
 			if (slashIndex > 0) {

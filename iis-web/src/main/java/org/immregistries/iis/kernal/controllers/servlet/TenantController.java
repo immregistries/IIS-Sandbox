@@ -5,7 +5,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.constraints.NotBlank;
-import org.immregistries.iis.kernal.Application;
 import org.immregistries.iis.kernal.controllers.rest.TenantRestController;
 import org.immregistries.iis.kernal.controllers.servlet.util.UiUtil;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
@@ -13,6 +12,7 @@ import org.immregistries.iis.kernal.persisted.entities.UserAccess;
 import org.immregistries.iis.kernal.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.security.TenantAuthService;
 import org.immregistries.iis.kernal.security.UserAccessUtil;
+import org.immregistries.iis.kernal.services.api.IDeployedApiUrlService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -44,6 +44,8 @@ public class TenantController {
 	private TenantAuthService tenantAuthService;
 	@Autowired
 	private UiUtil uiUtil;
+	@Autowired
+	private IDeployedApiUrlService deployedApiUrlService;
 
 	/**
 	 * Adds a new tenant from form
@@ -60,7 +62,7 @@ public class TenantController {
 			throws ServletException, IOException {
 		UserAccess userAccess = UserAccessUtil.get().getUserAccess();
 		tenantAuthService.authenticateTenant(userAccess, tenantName);
-		resp.sendRedirect(Application.IIS_PATH_BASE + TENANT_BASE_PATH + "/" + tenantName + TENANT_BASE_PATH);
+		resp.sendRedirect(deployedApiUrlService.getContextPath() + TENANT_BASE_PATH + "/" + tenantName + TENANT_BASE_PATH);
 		doGet(req, resp);
 	}
 
@@ -109,7 +111,7 @@ public class TenantController {
 				if (tenantMember.equals(tenant)) {
 					out.println("<li>" + tenantMember.getOrganizationName() + " (selected)</li>");
 				} else {
-					String link = Application.IIS_PATH_BASE + TenantController.TENANT_BASE_PATH + "/"
+					String link = deployedApiUrlService.getContextPath() + TenantController.TENANT_BASE_PATH + "/"
 							+ tenantMember.getOrganizationName() + TenantController.TENANT_BASE_PATH;
 					out.println("<li><a href=\"" + link + "\">" + tenantMember.getOrganizationName() + "</a></li>");
 				}

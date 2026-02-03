@@ -1,6 +1,9 @@
 package org.immregistries.iis.kernal.controllers.servlet.util;
 
 import com.google.common.collect.ImmutableMap;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.constraints.NotNull;
 import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.immregistries.iis.kernal.SoftwareVersion;
 import org.immregistries.iis.kernal.controllers.servlet.PatientController;
@@ -17,22 +20,20 @@ import org.immregistries.iis.kernal.security.UserAccessUtil;
 import org.immregistries.iis.kernal.services.api.IDeployedApiUrlService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.Map;
 import java.util.UUID;
 
-import static org.immregistries.iis.kernal.Application.IIS_PATH_BASE;
 
 @Service
 public class UiUtil {
-
-	@Autowired
-	private IDeployedApiUrlService deployedUrlService;
 
 	private final ImmutableMap<String, String> HEADER_MAP = ImmutableMap.of(PopController.POP_PATH_KEY,
 			"Send Now",
@@ -43,8 +44,12 @@ public class UiUtil {
 	// ,FhirMessagingController.FHIR_MESSAGING, "Conversion messaging"
 	);
 
+
+	@Autowired
+	private IDeployedApiUrlService deployedUrlService;
 	@Autowired
 	private UrlTenantUtil urlTenantUtil;
+
 
 	public void doHeader(PrintWriter out, String title) {
 		doHeader(out, title, CurrentTenantUtil.getTenant());
@@ -61,7 +66,7 @@ public class UiUtil {
 		out.println("<html>");
 		out.println("  <head>");
 		out.println("    <title>" + title + "</title>");
-		out.println("	  <link rel=\"icon\" type=\"image/x-icon\" href=\"" + IIS_PATH_BASE + "/img/favicon.ico\">");
+		out.println("	  <link rel=\"icon\" type=\"image/x-icon\" href=\"" + deployedUrlService.getContextPath() + "/img/favicon.ico\">");
 		out.println("    <link rel=\"stylesheet\" href=\"https://www.w3schools.com/w3css/4/w3.css\"/>");
 		out.println("  </head>");
 		out.println("  <body>");
@@ -78,7 +83,7 @@ public class UiUtil {
 		out.println("<a href=\"" + urlTenantUtil.tenantifyPathWithContextPath(tenant, "soap")
 				+ "\" class=\"w3-bar-item w3-button\">CDC WSDL</a>");
 		if (authentication.isAuthenticated() && !(authentication instanceof AnonymousAuthenticationToken)) {
-			out.println("<a class='w3-bar-item w3-button w3-right' href=\"" + IIS_PATH_BASE
+			out.println("<a class='w3-bar-item w3-button w3-right' href=\"" + deployedUrlService.getContextPath()
 					+ ServerSecurityConfig.LOGOUT_PATH + "\">Logout</a>");
 			String link = "tenant";
 			if (tenant != null) {
@@ -110,7 +115,7 @@ public class UiUtil {
 		UserAccess userAccess = UserAccessUtil.get().getUserAccess();
 		if (userAccess != null) {
 			out.println("  <div class=\"w3-container\">");
-			out.println("    <p><a href=\"" + IIS_PATH_BASE + "/logout\">Logout</a></p>");
+			out.println("    <p><a href=\"" + deployedUrlService.getContextPath() + "/logout\">Logout</a></p>");
 			out.println("  </div>");
 		}
 
@@ -137,7 +142,7 @@ public class UiUtil {
 			out.println("      <li>");
 			if (allowCreateShortcut) {
 				String randomSuffix = UUID.randomUUID().toString().substring(0, 8);
-				String link = IIS_PATH_BASE + TenantController.TENANT_BASE_PATH + "/" + processingFlavor.getKey() + "_"
+				String link = deployedUrlService.getContextPath() + TenantController.TENANT_BASE_PATH + "/" + processingFlavor.getKey() + "_"
 						+ randomSuffix + TenantController.TENANT_BASE_PATH;
 				out.print("<a href=\"" + link + "\">");
 				out.print(processingFlavor.getKey());
@@ -170,5 +175,18 @@ public class UiUtil {
 				+ "\"><p class=\"w3-left-align\">");
 		out.println(message);
 		out.println("</p></div>");
+	}
+
+	public @NotNull Tenant getTenantRedirectIfNone(HttpServletRequest req,
+																  HttpServletResponse resp) throws IOException {
+		Tenant tenant = CurrentTenantUtil.getTenant(req);
+		if (tenant == null) {
+			if (UserAccessUtil.get().getUserAccess() != null) {
+				resp.sendRedirect(deployedUrlService.getContextPath() +
+					TenantController.TENANT_BASE_PATH);
+			}
+			throw new AuthenticationCredentialsNotFoundException("");
+		}
+		return tenant;
 	}
 }

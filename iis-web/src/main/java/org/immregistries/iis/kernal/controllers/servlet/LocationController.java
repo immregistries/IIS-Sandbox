@@ -7,7 +7,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Session;
-import org.immregistries.iis.kernal.controllers.servlet.util.RedirectUtil;
 import org.immregistries.iis.kernal.controllers.servlet.util.UiUtil;
 import org.immregistries.iis.kernal.enums.LoincIdentifier;
 import org.immregistries.iis.kernal.enums.SnomedValue;
@@ -87,7 +86,7 @@ public class LocationController {
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
 
-		Tenant tenant = RedirectUtil.getTenantRedirectIfNone(req, resp);
+		Tenant tenant = uiUtil.getTenantRedirectIfNone(req, resp);
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		try {

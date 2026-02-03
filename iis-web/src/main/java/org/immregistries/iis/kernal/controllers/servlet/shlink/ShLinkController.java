@@ -8,7 +8,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.immregistries.iis.kernal.controllers.rest.shlink.IisKeyRestController;
 import org.immregistries.iis.kernal.controllers.rest.shlink.ShLinkRestController;
 import org.immregistries.iis.kernal.controllers.servlet.TenantController;
-import org.immregistries.iis.kernal.controllers.servlet.util.RedirectUtil;
 import org.immregistries.iis.kernal.controllers.servlet.util.UiQrCodeUtil;
 import org.immregistries.iis.kernal.controllers.servlet.util.UiUtil;
 import org.immregistries.iis.kernal.persisted.entities.IisKey;
@@ -66,7 +65,7 @@ public class ShLinkController {
 			@RequestParam(PARAM_EXP) String exp,
 			@RequestParam(value = "image", required = false) boolean image)
 			throws ServletException, IOException, NoSuchAlgorithmException, WriterException {
-		Tenant tenant = RedirectUtil.getTenantRedirectIfNone(req, resp);
+		Tenant tenant = uiUtil.getTenantRedirectIfNone(req, resp);
 
 		OutputStream outputStream = resp.getOutputStream();
 		PrintWriter out = new PrintWriter(outputStream);
@@ -102,7 +101,7 @@ public class ShLinkController {
 			@RequestParam(value = PARAM_FLAG, required = false) String flag,
 			@RequestParam(value = PARAM_EXP, required = false) String exp)
 			throws ServletException, IOException {
-		Tenant tenant = RedirectUtil.getTenantRedirectIfNone(req, resp);
+		Tenant tenant = uiUtil.getTenantRedirectIfNone(req, resp);
 
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());

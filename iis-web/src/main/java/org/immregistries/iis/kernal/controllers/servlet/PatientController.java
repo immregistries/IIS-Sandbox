@@ -15,7 +15,10 @@ import org.hl7.fhir.r5.model.Bundle;
 import org.immregistries.iis.kernal.controllers.IisRestPath;
 import org.immregistries.iis.kernal.controllers.rest.*;
 import org.immregistries.iis.kernal.controllers.servlet.shlink.ShLinkController;
-import org.immregistries.iis.kernal.controllers.servlet.util.*;
+import org.immregistries.iis.kernal.controllers.servlet.util.PatientServletUtil;
+import org.immregistries.iis.kernal.controllers.servlet.util.UiQrCodeUtil;
+import org.immregistries.iis.kernal.controllers.servlet.util.UiUtil;
+import org.immregistries.iis.kernal.controllers.servlet.util.UrlTenantUtil;
 import org.immregistries.iis.kernal.enums.LoincIdentifier;
 import org.immregistries.iis.kernal.mapping.IisFhirClientFactory;
 import org.immregistries.iis.kernal.mapping.mappers.resources.PatientMapper;
@@ -91,6 +94,8 @@ public class PatientController {
 	private UiQrCodeUtil uiQrCodeUtil;
 	@Autowired
 	private IDeployedApiUrlService deployedUrlService;
+	@Autowired
+	private RestUrlUtil restUrlUtil;
 
 	@PostMapping
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp
@@ -106,7 +111,7 @@ public class PatientController {
 			throws ServletException, IOException {
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
-		Tenant tenant = RedirectUtil.getTenantRedirectIfNone(req, resp);
+		Tenant tenant = uiUtil.getTenantRedirectIfNone(req, resp);
 		try {
 			uiUtil.doHeader(out, "IIS Sandbox - Patients", tenant);
 			String patientId = req.getParameter(PARAM_PATIENT_REPORTED_ID);
@@ -193,7 +198,7 @@ public class PatientController {
 			ShLinkPayload shLinkPayload) throws JsonProcessingException {
 		out.println("<div class=\"w3-container\">");
 		out.println("<img src=\""
-				+ RestUrlUtil.patientifyPathWithContextPath(tenant.getOrgId(), iisPatient.getPatientId(),
+			+ restUrlUtil.patientifyPathWithContextPath(tenant.getOrgId(), iisPatient.getPatientId(),
 						IisRestPath.BasePath.PATIENT_SH_LINK_PATH)
 				+ "\"  alt=\"shlink\" width=\"200\">");
 		out.print("<div><a href= \"" + shLinkPayload.getUrl() + "\">Manifest URL</a></div>");
@@ -210,7 +215,7 @@ public class PatientController {
 								+ iisPatient.getPatientId())
 				+ "\">Generate a new Smart Health Link with IPS</a></div>");
 		out.println("<div><a href= \"" +
-				RestUrlUtil.tenantifyPathWithContextPath(tenant, "/patient/" + iisPatient.getPatientId() + "/clvr/pdf")
+			restUrlUtil.tenantifyPathWithContextPath(tenant, "/patient/" + iisPatient.getPatientId() + "/clvr/pdf")
 				+
 				"\">Generate a EVC with IPS</a></div>");
 	}

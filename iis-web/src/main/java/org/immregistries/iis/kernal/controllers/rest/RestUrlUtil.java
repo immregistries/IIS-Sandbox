@@ -1,21 +1,27 @@
 package org.immregistries.iis.kernal.controllers.rest;
 
 import org.apache.commons.lang3.Strings;
-import org.immregistries.iis.kernal.Application;
 import org.immregistries.iis.kernal.controllers.IisRestPath;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
+import org.immregistries.iis.kernal.services.api.IDeployedApiUrlService;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+@Service
 public class RestUrlUtil {
 
-	public static String tenantifyPathWithContextPath(Tenant tenant, String urlSuffix) {
+	@Autowired
+	private IDeployedApiUrlService deployedApiUrlService;
+
+	public String tenantifyPathWithContextPath(Tenant tenant, String urlSuffix) {
 		if (tenant == null || tenant.getOrgId() < 0) {
 			return urlSuffix;
 		}
-		return Application.IIS_PATH_BASE + tenantifyPathSuffix(tenant.getOrgId(), urlSuffix);
+		return deployedApiUrlService.getContextPath() + tenantifyPathSuffix(tenant.getOrgId(), urlSuffix);
 	}
 
-	public static String patientifyPathWithContextPath(Integer tenantId, String patientId, String urlSuffix) {
+	public String patientifyPathWithContextPath(Integer tenantId, String patientId, String urlSuffix) {
 		if (!Strings.CS.startsWith(urlSuffix, "/")) {
 			urlSuffix = "/" + urlSuffix;
 		}
@@ -32,7 +38,7 @@ public class RestUrlUtil {
 	 * @param urlSuffix
 	 * @return {tenantBasePath}/{tenantName}/ + urlSuffix
 	 */
-	public static @NotNull String tenantifyPathSuffix(int tenantId, String urlSuffix) {
+	public @NotNull String tenantifyPathSuffix(int tenantId, String urlSuffix) {
 		if (!Strings.CS.startsWith(urlSuffix, "/")) {
 			urlSuffix = "/" + urlSuffix;
 		}

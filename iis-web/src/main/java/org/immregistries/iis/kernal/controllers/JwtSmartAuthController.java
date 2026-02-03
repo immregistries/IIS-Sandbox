@@ -15,11 +15,11 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
-import org.immregistries.iis.kernal.Application;
 import org.immregistries.iis.kernal.GlobalConstants;
 import org.immregistries.iis.kernal.persisted.entities.UserAccess;
 import org.immregistries.iis.kernal.security.JwtUtils;
 import org.immregistries.iis.kernal.security.UserAccessUtil;
+import org.immregistries.iis.kernal.services.api.IDeployedApiUrlService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +44,9 @@ import java.util.Optional;
 public class JwtSmartAuthController {
 	@Autowired
 	private JwtUtils jwtUtils;
+	@Autowired
+	private IDeployedApiUrlService deployedApiUrlService;
+
 	private final Map<String, PublicKey> keystore;
 	private final Map<String, String> jwtStore;
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -64,7 +67,7 @@ public class JwtSmartAuthController {
 	@GetMapping("/.well-known/smart-configuration")
 	public String wellKnownConfiguration() {
 		UriComponentsBuilder uriComponentsBuilder = ServletUriComponentsBuilder.fromCurrentRequestUri();
-		uriComponentsBuilder.replacePath(Application.IIS_PATH_BASE + "/token");
+		uriComponentsBuilder.replacePath(deployedApiUrlService.getContextPath() + "/token");
 		String token_endpoint;
 
 		try {

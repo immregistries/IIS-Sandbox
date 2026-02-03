@@ -1,12 +1,11 @@
 package org.immregistries.iis.kernal.security;
 
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import org.immregistries.iis.kernal.Application;
 import org.immregistries.iis.kernal.controllers.servlet.HomeController;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
+import org.immregistries.iis.kernal.services.api.IDeployedApiUrlService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,20 +21,13 @@ public class IisOAuthSuccessHandler implements AuthenticationSuccessHandler {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	@Autowired
-	TenantAuthService tenantAuthService;
-
-	// @Override
-	// public void onAuthenticationSuccess(HttpServletRequest request,
-	// HttpServletResponse response, FilterChain chain, Authentication
-	// authentication) throws IOException, ServletException {
-	// this.onAuthenticationSuccess(request, response, authentication);
-	//
-	// chain.doFilter(request, response);
-	// }
+	private TenantAuthService tenantAuthService;
+	@Autowired
+	private IDeployedApiUrlService deployedApiUrlService;
 
 	@Override
 	public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
-			Authentication authentication) throws IOException, ServletException {
+													Authentication authentication) throws IOException {
 		logger.info("Authentication success {}", authentication);
 		String queryString = "from UserAccess where accessName = ?1";
 		// UserAccess userAccess = null;
@@ -51,7 +43,7 @@ public class IisOAuthSuccessHandler implements AuthenticationSuccessHandler {
 			// TODO switch to userAccess when facilities creation implemented
 		}
 
-		String targetUrl = Application.IIS_PATH_BASE + HomeController.HOME_BASE_PATH;
+		String targetUrl = deployedApiUrlService.getContextPath() + HomeController.HOME_BASE_PATH;
 
 		if (response.isCommitted()) {
 			logger.debug(

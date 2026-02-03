@@ -16,7 +16,6 @@ import org.immregistries.iis.kernal.controllers.IisRestParam;
 import org.immregistries.iis.kernal.controllers.rest.PatientRestController;
 import org.immregistries.iis.kernal.controllers.rest.RecommendationRestController;
 import org.immregistries.iis.kernal.controllers.servlet.util.PatientServletUtil;
-import org.immregistries.iis.kernal.controllers.servlet.util.RedirectUtil;
 import org.immregistries.iis.kernal.controllers.servlet.util.UiUtil;
 import org.immregistries.iis.kernal.mapping.IisFhirClientFactory;
 import org.immregistries.iis.kernal.mapping.mappers.fields.BusinessIdentifierMapper;
@@ -76,7 +75,7 @@ public class RecommendationController {
 	// false) String tenantName dealt with in filter
 	)
 			throws ServletException, IOException {
-		Tenant tenant = RedirectUtil.getTenantRedirectIfNone(req, resp);
+		Tenant tenant = uiUtil.getTenantRedirectIfNone(req, resp);
 		recommendationRestController.addRandomRecommendation(tenant, req);
 		doGet(req, resp);
 	}
@@ -89,12 +88,12 @@ public class RecommendationController {
 	 */
 	@PutMapping
 	protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		RedirectUtil.getTenantRedirectIfNone(req, resp);
+		uiUtil.getTenantRedirectIfNone(req, resp);
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		try {
 
 			if (req.getParameter(PARAM_RECOMMENDATION_RESOURCE) != null) {
-				Tenant tenant = RedirectUtil.getTenantRedirectIfNone(req, resp);
+				Tenant tenant = uiUtil.getTenantRedirectIfNone(req, resp);
 				recommendationRestController.updateRecommendation(tenant,
 						req.getParameter(PARAM_RECOMMENDATION_RESOURCE),
 						req.getParameter(IisRestParam.RECOMMENDATION_ID),
@@ -120,7 +119,7 @@ public class RecommendationController {
 	 */
 	@GetMapping
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		Tenant tenant = RedirectUtil.getTenantRedirectIfNone(req, resp);
+		Tenant tenant = uiUtil.getTenantRedirectIfNone(req, resp);
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		uiUtil.doHeader(out, "Recommendations", tenant);

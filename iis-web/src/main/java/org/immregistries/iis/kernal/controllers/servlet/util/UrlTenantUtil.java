@@ -1,14 +1,17 @@
 package org.immregistries.iis.kernal.controllers.servlet.util;
 
 import org.apache.commons.lang3.StringUtils;
-import org.immregistries.iis.kernal.Application;
 import org.immregistries.iis.kernal.controllers.servlet.TenantController;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
+import org.immregistries.iis.kernal.services.api.IDeployedApiUrlService;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class UrlTenantUtil {
+	@Autowired
+	private IDeployedApiUrlService deployedApiUrlService;
 	/**
 	 * Adds tenant prefix to urlSuffix if tenant is not null
 	 * Used for links in the UI with href
@@ -22,7 +25,7 @@ public class UrlTenantUtil {
 			return urlSuffix;
 		}
 		String organizationName = tenant.getOrganizationName();
-		return Application.IIS_PATH_BASE + tenantifyPathSuffix(organizationName, urlSuffix);
+		return deployedApiUrlService.getContextPath() + tenantifyPathSuffix(organizationName, urlSuffix);
 	}
 
 	/**

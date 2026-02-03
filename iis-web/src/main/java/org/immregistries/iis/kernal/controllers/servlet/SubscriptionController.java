@@ -9,7 +9,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.hl7.fhir.r5.model.Bundle;
 import org.hl7.fhir.r5.model.Subscription;
 import org.immregistries.iis.kernal.controllers.rest.SubscriptionRestControllerR5;
-import org.immregistries.iis.kernal.controllers.servlet.util.RedirectUtil;
 import org.immregistries.iis.kernal.controllers.servlet.util.UiUtil;
 import org.immregistries.iis.kernal.controllers.servlet.util.UrlTenantUtil;
 import org.immregistries.iis.kernal.mapping.IisFhirClientFactory;
@@ -80,7 +79,7 @@ public class SubscriptionController {
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
 		// TODO action as manual trigger with content
-		Tenant tenant = RedirectUtil.getTenantRedirectIfNone(req, resp);
+		Tenant tenant = uiUtil.getTenantRedirectIfNone(req, resp);
 
 		String subscriptionId = req.getParameter(PARAM_SUBSCRIPTION_ID);
 
@@ -117,7 +116,7 @@ public class SubscriptionController {
 	@GetMapping
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
-		Tenant tenant = RedirectUtil.getTenantRedirectIfNone(req, resp);
+		Tenant tenant = uiUtil.getTenantRedirectIfNone(req, resp);
 		resp.setContentType("text/html");
 		IGenericClient fhirClient = iisFhirClientFactory.getOrCreateGenericClient(req);
 		PrintWriter out = new PrintWriter(resp.getOutputStream());

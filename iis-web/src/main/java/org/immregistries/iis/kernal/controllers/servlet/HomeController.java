@@ -9,6 +9,7 @@ import org.immregistries.iis.kernal.controllers.servlet.util.UiUtil;
 import org.immregistries.iis.kernal.controllers.servlet.util.UrlTenantUtil;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.immregistries.iis.kernal.security.CurrentTenantUtil;
+import org.immregistries.iis.kernal.services.api.IDeployedApiUrlService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,7 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import static org.immregistries.iis.kernal.Application.IIS_PATH_BASE;
 import static org.immregistries.iis.kernal.controllers.servlet.HomeController.HOME_BASE_PATH;
 
 /**
@@ -36,6 +36,8 @@ public class HomeController {
 	private UiUtil uiUtil;
 	@Autowired
 	private UrlTenantUtil urlTenantUtil;
+	@Autowired
+	private IDeployedApiUrlService deployedApiUrlService;
 
 	@GetMapping
 	@PostMapping
@@ -121,7 +123,7 @@ public class HomeController {
 			out.println(
 					"      <li><h4>Multitenancy:</h4> Tenants allow separate testing environments, using different Flavors and different partitions of FHIR Server,	"
 							+
-							"Base URLs are formatted as <a href='fhir'>" + IIS_PATH_BASE + "/fhir/" + tenantName
+						"Base URLs are formatted as <a href='fhir'>" + deployedApiUrlService.getContextPath() + "/fhir/" + tenantName
 							+ "</a></li>");
 			out.println("      <li><h4>Record's Matching:</h4>Matching resources using " +
 					"<a href='https://github.com/immregistries/mismo-match'>MISMO</a> for Patients (Activated with a Flavor), "
@@ -168,7 +170,7 @@ public class HomeController {
 
 			uiUtil.printFlavors(out, false);
 			out.println("  </div>");
-			out.println("  <img src=\"" + IIS_PATH_BASE
+			out.println("  <img src=\"" + deployedApiUrlService.getContextPath()
 					+ "/img/markus-spiske-dWaRJ3WBnGs-unsplash.jpg\" class=\"w3-round\" alt=\"Sandbox\" width=\"400\">");
 			out.println("<a " +
 					"style=\"background-color:black;color:white;text-decoration:none;padding:4px 6px;font-family:-apple-system, "

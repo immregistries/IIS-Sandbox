@@ -7,7 +7,6 @@ import org.immregistries.iis.kernal.controllers.IisRestPath;
 import org.immregistries.iis.kernal.controllers.WellKnownKeyController;
 import org.immregistries.iis.kernal.controllers.rest.shlink.IisKeyRestController;
 import org.immregistries.iis.kernal.controllers.servlet.TenantController;
-import org.immregistries.iis.kernal.controllers.servlet.util.RedirectUtil;
 import org.immregistries.iis.kernal.controllers.servlet.util.UiUtil;
 import org.immregistries.iis.kernal.controllers.servlet.util.UrlTenantUtil;
 import org.immregistries.iis.kernal.persisted.entities.IisKey;
@@ -46,7 +45,7 @@ public class IisKeyController {
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		try {
-			Tenant tenant = RedirectUtil.getTenantRedirectIfNone(req, resp);
+			Tenant tenant = uiUtil.getTenantRedirectIfNone(req, resp);
 			uiUtil.doHeader(out, "IIS Sandbox Keystore", CurrentTenantUtil.getTenant());
 			out.println("    <div class=\"w3-container w3-half w3-margin-top\">");
 			out.println("    <h2>Facility: " + tenant.getOrganizationName() + "</h2>");
