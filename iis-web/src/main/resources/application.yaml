@@ -12,11 +12,11 @@ management:
         include: "health,prometheus"
 server:
   servlet:
-    contextPath: ${ENV_CONTEXT_PATH:"/iis" }
+    contextPath: ${ENV_CONTEXT_PATH:"/iis"}
 iis:
   deployment:
     url:
-      host: "localhost:/8080"
+      host: "localhost:8080"
     admin:
       user: ${IIS_ADMIN_USER:"change-me"}
       password: ${IIS_ADMIN_PASSWORD:"change-me"}

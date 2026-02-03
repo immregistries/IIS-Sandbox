@@ -60,20 +60,20 @@ public class VaccinationController {
 	public static final String PARAM_RESOURCE = "resource";
 	public static final String PARAM_VACCINATION_REPORTED_ID = "vaccinationReportedId";
 	@Autowired
-	IisFhirClientFactory iisFhirClientFactory;
+	private IisFhirClientFactory iisFhirClientFactory;
 	@Autowired
-	ImmunizationMapper immunizationMapper;
+	private ImmunizationMapper immunizationMapper;
 	@Autowired
-	FhirContext fhirContext;
+	private FhirContext fhirContext;
 
 	@Autowired
-	VaccinationRestController vaccinationRestController;
+	private VaccinationRestController vaccinationRestController;
 	@Autowired
-	PatientRestController patientRestController;
+	private PatientRestController patientRestController;
 	@Autowired
-	FhirSearchRequester fhirSearchRequester;
+	private FhirSearchRequester fhirSearchRequester;
 	@Autowired
-	CodeMapRestController codeMapRestController;
+	private CodeMapRestController codeMapRestController;
 	@Autowired
 	private UiUtil uiUtil;
 	@Autowired
@@ -302,7 +302,7 @@ public class VaccinationController {
 		return immunization;
 	}
 
-	public static void printVaccinationList(PrintWriter out, List<? extends IisVaccination> vaccinationList,
+	public void printVaccinationList(PrintWriter out, List<? extends IisVaccination> vaccinationList,
 			Tenant tenant, CodeMap codeMap) {
 		SimpleDateFormat sdfDate = new SimpleDateFormat("MM/dd/yyyy");
 

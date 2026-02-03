@@ -16,11 +16,7 @@ import org.immregistries.iis.kernal.Application;
 import org.immregistries.iis.kernal.controllers.IisRestPath;
 import org.immregistries.iis.kernal.controllers.rest.*;
 import org.immregistries.iis.kernal.controllers.servlet.shlink.ShLinkController;
-import org.immregistries.iis.kernal.controllers.servlet.util.PatientServletUtil;
-import org.immregistries.iis.kernal.controllers.servlet.util.RedirectUtil;
-import org.immregistries.iis.kernal.controllers.servlet.util.UiQrCodeUtil;
-import org.immregistries.iis.kernal.controllers.servlet.util.UiUtil;
-import org.immregistries.iis.kernal.controllers.servlet.util.UrlTenantUtil;
+import org.immregistries.iis.kernal.controllers.servlet.util.*;
 import org.immregistries.iis.kernal.enums.LoincIdentifier;
 import org.immregistries.iis.kernal.mapping.IisFhirClientFactory;
 import org.immregistries.iis.kernal.mapping.mappers.resources.PatientMapper;
@@ -83,6 +79,9 @@ public class PatientController {
 	@Autowired
 	private RecommendationController recommendationController;
 	@Autowired
+	private VaccinationController vaccinationController;
+
+	@Autowired
 	private UiUtil uiUtil;
 	@Autowired
 	private UrlTenantUtil urlTenantUtil;
@@ -101,10 +100,7 @@ public class PatientController {
 	}
 
 	@GetMapping
-	protected void doGet(HttpServletRequest req, HttpServletResponse resp
-	// , @PathVariable(name = TenantController.PATH_VARIABLE_TENANT_NAME, required =
-	// false) String tenantName
-	)
+	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
@@ -271,8 +267,9 @@ public class PatientController {
 			Tenant tenant, HttpServletRequest req) {
 		List<VaccinationMaster> vaccinationList = patientRestController
 				.getPatientVaccination(iisPatient.getPatientId(), tenant, isGolden, req);
-		out.println("<h4>Vaccinations</h4>");
-		VaccinationController.printVaccinationList(out, vaccinationList, null,
+		out.println("<h4>Vaccinat" +
+			"ions</h4>");
+		vaccinationController.printVaccinationList(out, vaccinationList, null,
 				codeMapRestController.getCodeMaps(tenant)); // TODO test and change
 	}
 

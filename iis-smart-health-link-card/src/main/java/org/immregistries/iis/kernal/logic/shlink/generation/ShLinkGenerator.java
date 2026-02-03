@@ -67,6 +67,8 @@ public class ShLinkGenerator {
 	private IShApiUrlService shApiUrlService;
 	@Autowired
 	private QrCodeEncoder qrCodeEncoder;
+	@Autowired
+	private TenantAuthService tenantAuthService;
 
 	public String generateShLink(HttpServletRequest req, String keyId, String secretKey, String patientId, String flag, String exp, Tenant tenant, UserAccess userAccess) throws NoSuchAlgorithmException, IOException {
 		/*
@@ -89,7 +91,7 @@ public class ShLinkGenerator {
 		/*
 		 * Getting the bundle for the payload content
 		 */
-		IBaseBundle ipsToBeEncoded = iIpsGeneratorSvc.generateIps(TenantAuthService.get().requestDetailsWithPartitionName(),
+		IBaseBundle ipsToBeEncoded = iIpsGeneratorSvc.generateIps(tenantAuthService.requestDetailsWithPartitionName(),
 			new IdType(patientId), "");
 		/*
 		 * Convert the bundle to a shcard file

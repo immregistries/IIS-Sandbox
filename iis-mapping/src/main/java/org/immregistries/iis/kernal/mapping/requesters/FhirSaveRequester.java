@@ -33,6 +33,8 @@ public abstract class FhirSaveRequester<Patient extends IAnyResource, Immunizati
 	FhirContext fhirContext;
 	@Autowired
 	DaoRegistry daoRegistry;
+	@Autowired
+	TenantAuthService tenantAuthService;
 
 
 	/**
@@ -54,7 +56,7 @@ public abstract class FhirSaveRequester<Patient extends IAnyResource, Immunizati
 		}
 		DaoMethodOutcome outcome;
 		if (createOnly) {
-			return dao.create(resource, TenantAuthService.get().requestDetailsWithPartitionName());
+			return dao.create(resource, tenantAuthService.requestDetailsWithPartitionName());
 		} else
 			try {
 				// IUpdateTyped updateTyped =
@@ -68,9 +70,9 @@ public abstract class FhirSaveRequester<Patient extends IAnyResource, Immunizati
 				// updateWithQueryTyped = updateWithQueryTyped.and(where[i]);
 				// }
 				// return updateWithQueryTyped.execute();
-				return dao.update(resource, params, TenantAuthService.get().requestDetailsWithPartitionName());
+				return dao.update(resource, params, tenantAuthService.requestDetailsWithPartitionName());
 			} catch (InvalidRequestException invalidRequestException) {
-				return dao.create(resource, TenantAuthService.get().requestDetailsWithPartitionName());
+				return dao.create(resource, tenantAuthService.requestDetailsWithPartitionName());
 			}
 		// catch (JdbcBatchUpdateException jdbcBatchUpdateException) {
 		// return dao.create(resource,

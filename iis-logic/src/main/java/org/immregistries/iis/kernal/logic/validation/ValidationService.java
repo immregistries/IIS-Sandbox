@@ -2,9 +2,13 @@ package org.immregistries.iis.kernal.logic.validation;
 
 import gov.nist.validation.report.Entry;
 import gov.nist.validation.report.Report;
+import hl7.v2.profile.Profile;
+import hl7.v2.profile.XMLDeserializer;
 import hl7.v2.validation.SyncHL7Validator;
-import hl7.v2.validation.ValidationContext;
-import hl7.v2.validation.ValidationContextBuilder;
+import hl7.v2.validation.content.ConformanceContext;
+import hl7.v2.validation.content.DefaultConformanceContext;
+import hl7.v2.validation.vs.ValueSetLibrary;
+import hl7.v2.validation.vs.ValueSetLibraryImpl;
 import org.immregistries.iis.kernal.logic.hl7v2.ack.IisReportableUtilService;
 import org.immregistries.iis.kernal.model.ack.IisReportable;
 import org.immregistries.iis.kernal.model.ack.IisReportableSeverityLevel;
@@ -17,12 +21,11 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -47,42 +50,47 @@ public class ValidationService {
 	SyncHL7Validator syncHL7ValidatorQbpZ44;
 
 
-	public ValidationService() throws IOException {
+	public ValidationService(ResourceLoader resourceLoader) throws IOException {
 		mqeMessageService = MqeMessageService.INSTANCE;
 
 		syncHL7ValidatorVxuZ22 = getSyncHL7Validator(
-			"src/main/resources/export/VXU-Z22_Profile.xml",
-			"src/main/resources/export/VXU-Z22_Constraints.xml",
-			"src/main/resources/export/VXU-Z22_ValueSetLibrary.xml");
+			"export/VXU-Z22_Profile.xml",
+			"export/VXU-Z22_Constraints.xml",
+			"export/VXU-Z22_ValueSetLibrary.xml",
+			resourceLoader);
 		syncHL7ValidatorQbpZ34 = getSyncHL7Validator(
-			"src/main/resources/export/QBP-Z34_Profile.xml",
-			"src/main/resources/export/QBP-Z34_Constraints.xml",
-			"src/main/resources/export/QBP-Z34_ValueSetLibrary.xml"
-		);
+			"export/QBP-Z34_Profile.xml",
+			"export/QBP-Z34_Constraints.xml",
+			"export/QBP-Z34_ValueSetLibrary.xml",
+			resourceLoader);
 		syncHL7ValidatorQbpZ44 = getSyncHL7Validator(
-			"src/main/resources/export/QBP-Z44_Profile.xml",
-			"src/main/resources/export/QBP-Z44_Constraints.xml",
-			"src/main/resources/export/QBP-Z44_ValueSetLibrary.xml"
-		);
+			"export/QBP-Z44_Profile.xml",
+			"export/QBP-Z44_Constraints.xml",
+			"export/QBP-Z44_ValueSetLibrary.xml",
+			resourceLoader);
 	}
 
-	private static @NotNull SyncHL7Validator getSyncHL7Validator(String profilePath, String constraintsPath, String vsLibraryPath) throws IOException {
-		InputStream profileXML = Files.newInputStream(Path.of(profilePath));
-		InputStream constraintsXML = Files.newInputStream(Path.of(constraintsPath));
-		InputStream vsLibraryXML = Files.newInputStream(Path.of(vsLibraryPath));
+	private @NotNull SyncHL7Validator getSyncHL7Validator(String profilePath, String constraintsPath, String vsLibraryPath, ResourceLoader resourceLoader) throws IOException {
+		InputStream profileXML = resourceLoader.getClassLoader().getResourceAsStream(profilePath);
+		InputStream constraintsXML = resourceLoader.getClassLoader().getResourceAsStream(constraintsPath);
+		InputStream vsLibraryXML = resourceLoader.getClassLoader().getResourceAsStream(vsLibraryPath);
 
-		ValidationContext validationContext = new ValidationContextBuilder(profileXML)
-			.useValueSetLibrary(vsLibraryXML)
-			.useConformanceContext(Collections.singletonList(constraintsXML))
-			.useCoConstraintsContext(constraintsXML)
-			.getValidationContext();
+		return getSyncHL7Validator(profileXML, vsLibraryXML, constraintsXML);
+	}
 
-//		Profile profile = XMLDeserializer.deserialize(profileXML).get();
-//		ValueSetLibrary valueSetLibrary = ValueSetLibraryImpl.apply(vsLibraryXML).get();
-//		ConformanceContext conformanceContext = DefaultConformanceContext.apply(Collections.singletonList(constraintsXML)).get();
-//		return new SyncHL7Validator(profile, valueSetLibrary, conformanceContext);
+	private @NotNull SyncHL7Validator getSyncHL7Validator(InputStream profileXML, InputStream vsLibraryXML, InputStream constraintsXML) {
+		//		ValidationContext validationContext = new ValidationContextBuilder(profileXML)
+//			.useValueSetLibrary(vsLibraryXML)
+//			.useConformanceContext(Collections.singletonList(constraintsXML))
+//			.useCoConstraintsContext(constraintsXML)
+//			.getValidationContext();
 
-		return new SyncHL7Validator(validationContext);
+		Profile profile = XMLDeserializer.deserialize(profileXML).get();
+		ValueSetLibrary valueSetLibrary = ValueSetLibraryImpl.apply(vsLibraryXML).get();
+		ConformanceContext conformanceContext = DefaultConformanceContext.apply(Collections.singletonList(constraintsXML)).get();
+		return new SyncHL7Validator(profile, valueSetLibrary, conformanceContext);
+
+//		return new SyncHL7Validator(validationContext);
 	}
 
 	public List<IisReportable> nistValidation(String message, String profileId) throws Exception {

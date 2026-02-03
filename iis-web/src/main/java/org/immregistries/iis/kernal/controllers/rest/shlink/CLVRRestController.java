@@ -60,6 +60,10 @@ public class CLVRRestController {
     private CLVRPdfService clvrPdfService;
     @Autowired
     private QrCodeEncoder qrCodeEncoder;
+	@Autowired
+	private TenantAuthService tenantAuthService;
+	@Autowired
+	private UserAccessUtil userAccessUtil;
 
     @GetMapping(value = "/qr", produces = MediaType.TEXT_PLAIN_VALUE)
     public String getPatientClvrQrCode(
@@ -68,7 +72,7 @@ public class CLVRRestController {
             throws COSEException, SignatureException, NoSuchAlgorithmException, InvalidKeyException,
             NoSuchProviderException, IOException {
 
-        UserAccess userAccess = UserAccessUtil.get().getUserAccess();
+		 UserAccess userAccess = userAccessUtil.getUserAccess();
         IisKey iisSigningKey = keyStoreService.getIisSigningKeyOrCreate("", userAccess, tenant);
         CLVRToken clvrToken = getIpsClvrToken(patientId);
         String qrCode = clvrService.encodeCLVRtoQrCode(clvrToken, iisSigningKey.keyPair());
@@ -82,7 +86,7 @@ public class CLVRRestController {
             @RequestAttribute(CurrentTenantUtil.SESSION_REQUEST_TENANT) Tenant tenant)
             throws COSEException, IOException, SignatureException, NoSuchAlgorithmException, InvalidKeyException,
             NoSuchProviderException, ServletException {
-        UserAccess userAccess = UserAccessUtil.get().getUserAccess();
+		 UserAccess userAccess = userAccessUtil.getUserAccess();
         IisKey iisSigningKey = keyStoreService.getIisSigningKeyOrCreate("", userAccess, tenant);
         CLVRToken clvrToken = getIpsClvrToken(patientId);
         String qrCode = clvrService.encodeCLVRtoQrCode(clvrToken, iisSigningKey.keyPair());
@@ -102,7 +106,7 @@ public class CLVRRestController {
             throws COSEException, IOException, SignatureException, NoSuchAlgorithmException, InvalidKeyException,
             NoSuchProviderException, WriterException, URISyntaxException {
 
-        UserAccess userAccess = UserAccessUtil.get().getUserAccess();
+		 UserAccess userAccess = userAccessUtil.getUserAccess();
         IisKey iisSigningKey = keyStoreService.getIisSigningKeyOrCreate("", userAccess, tenant);
         CLVRToken clvrToken = getIpsClvrToken(patientId);
         String qrCode = clvrService.encodeCLVRtoQrCode(clvrToken, iisSigningKey.keyPair());
@@ -112,7 +116,7 @@ public class CLVRRestController {
 
     private @NotNull CLVRToken getIpsClvrToken(String patientId) {
         IBaseBundle ipsToBeEncoded = ipsGeneratorSvc
-                .generateIps(TenantAuthService.get().requestDetailsWithPartitionName(), new IdType(patientId), "");
+			  .generateIps(tenantAuthService.requestDetailsWithPartitionName(), new IdType(patientId), "");
         @SuppressWarnings("unchecked")
         CLVRPayload clvrPayload = fhirConversionUtil.toCLVRPayloadFromBundle(ipsToBeEncoded);
 

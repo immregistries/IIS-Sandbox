@@ -14,7 +14,6 @@ import org.immregistries.iis.kernal.model.shlink.ShLinkPayload;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.immregistries.iis.kernal.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.services.QrCodeEncoder;
-import org.immregistries.iis.kernal.services.api.IPatientShlinkApiManifestUrlService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -34,7 +33,7 @@ public class PatientShLinkRestController {
 	@Autowired
 	private PatientShLinkGenerator patientShLinkGenerator;
 	@Autowired
-	private IPatientShlinkApiManifestUrlService patientShlinkApiManifestUrlService;
+	private org.immregistries.iis.kernal.logic.shlink.IPatientManifestApiUrlService patientShlinkApiManifestUrlService;
 
 	@GetMapping(produces = MediaType.IMAGE_PNG_VALUE)
 	public ResponseEntity<byte[]> doGetShLinkQrCode(HttpServletRequest req, HttpServletResponse resp,

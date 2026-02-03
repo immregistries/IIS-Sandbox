@@ -24,11 +24,13 @@ import java.util.stream.Stream;
 public class FhirReadRequester {
 
 	@Autowired
-	IisFhirClientFactory iisFhirClientFactory;
+	private IisFhirClientFactory iisFhirClientFactory;
 	@Autowired
-	DaoRegistry daoRegistry;
+	private DaoRegistry daoRegistry;
 	@Autowired
-    MappingService mappingService;
+	private MappingService mappingService;
+	@Autowired
+	private TenantAuthService tenantAuthService;
 
 	/**
 	 *
@@ -38,7 +40,7 @@ public class FhirReadRequester {
 	 */
 	public IBaseResource read(String fhirType, String id) {
 		IFhirResourceDao dao = daoRegistry.getResourceDao(fhirType);
-		return dao.read(new IdType(id), TenantAuthService.get().requestDetailsWithPartitionName());
+		return dao.read(new IdType(id), tenantAuthService.requestDetailsWithPartitionName());
 	}
 
 

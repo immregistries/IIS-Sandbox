@@ -1,13 +1,12 @@
 package org.immregistries.iis.kernal.controllers.rest;
 
-import org.immregistries.iis.kernal.controllers.IisRestParam;
-import org.immregistries.iis.kernal.controllers.IisRestPath;
-
 import ca.uhn.fhir.parser.IParser;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import jakarta.servlet.http.HttpServletRequest;
 import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.hl7.fhir.instance.model.api.IDomainResource;
+import org.immregistries.iis.kernal.controllers.IisRestParam;
+import org.immregistries.iis.kernal.controllers.IisRestPath;
 import org.immregistries.iis.kernal.controllers.servlet.util.PatientServletUtil;
 import org.immregistries.iis.kernal.logic.recommendations.IImmunizationRecommendationService;
 import org.immregistries.iis.kernal.logic.recommendations.IisRecommendationGenerator;
@@ -36,6 +35,8 @@ public class RecommendationRestController {
 	private PatientMapper patientMapper;
 	@Autowired
 	private IisRecommendationGenerator iisRecommendationGenerator;
+	@Autowired
+	private PatientServletUtil patientServletUtil;
 
 	@PostMapping("/random")
 	public void addRandomRecommendation(
@@ -43,7 +44,7 @@ public class RecommendationRestController {
 			HttpServletRequest req) {
 
 		IGenericClient fhirClient = iisFhirClientFactory.getOrCreateGenericClient(req);
-		IDomainResource patient = PatientServletUtil.fetchPatientFromParameter(req, fhirClient, fhirSearchRequester);
+		IDomainResource patient = patientServletUtil.fetchPatientFromParameter(req, fhirClient, fhirSearchRequester);
 		IisPatient patientMaster = patientMapper.localObject(patient);
 
 		if (patient != null) {

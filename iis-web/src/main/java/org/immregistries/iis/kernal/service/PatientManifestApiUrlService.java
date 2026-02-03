@@ -6,14 +6,13 @@ import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.immregistries.iis.kernal.Application;
 import org.immregistries.iis.kernal.controllers.IisRestPath;
 import org.immregistries.iis.kernal.controllers.rest.RestUrlUtil;
-import org.immregistries.iis.kernal.services.api.IPatientShlinkApiManifestUrlService;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 
 @Service
-public class PatientShlinkApiManifestUrlService implements IPatientShlinkApiManifestUrlService {
+public class PatientManifestApiUrlService implements org.immregistries.iis.kernal.logic.shlink.IPatientManifestApiUrlService {
 
 	@Override
 	public @NotNull String getManifestUrl(HttpServletRequest req, IAnyResource patientSelected, Tenant tenant) {

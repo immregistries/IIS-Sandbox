@@ -22,7 +22,7 @@ import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.model.VaccinationMaster;
 import org.immregistries.iis.kernal.model.shlink.ShLinkPayload;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
-import org.immregistries.iis.kernal.service.PatientShlinkApiManifestUrlService;
+import org.immregistries.iis.kernal.service.PatientManifestApiUrlService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -43,7 +43,7 @@ public class PatientRestController extends BaseTenantTiedRest {
 	@Autowired
 	private PatientShLinkGenerator patientShlinkGenerator;
 	@Autowired
-	private PatientShlinkApiManifestUrlService patientShlinkApiManifestUrlService;
+	private PatientManifestApiUrlService patientShlinkApiManifestUrlService;
 
 	@GetMapping(IisPathVariable.PlaceHolder.PATIENT_ID_PLACEHOLDER)
 	public IisPatient getPatient(

@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.immregistries.iis.kernal.controllers.IisRestPath;
+import org.immregistries.iis.kernal.controllers.servlet.util.PatientServletUtil;
 import org.immregistries.iis.kernal.logic.shlink.ShLinkManifestGenerator;
 import org.immregistries.iis.kernal.logic.shlink.generation.ShLinkGenerator;
 import org.immregistries.iis.kernal.mapping.IisFhirClientFactory;
@@ -27,7 +28,6 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 
 import static org.immregistries.iis.kernal.controllers.servlet.TenantController.PARAM_TENANT_ID;
-import static org.immregistries.iis.kernal.controllers.servlet.util.PatientServletUtil.fetchPatientFromParameters;
 
 @RestController
 @RequestMapping(IisRestPath.MANIFEST_FULL_PATH)
@@ -42,13 +42,15 @@ public class PatientShLinkManifestRestController {
 	@Autowired
 	private IisFhirClientFactory iisFhirClientFactory;
 	@Autowired
-	FhirSearchRequester fhirSearchRequester;
+	private FhirSearchRequester fhirSearchRequester;
 	@Autowired
 	private FhirContext fhirContext;
 	@Autowired
 	private PatientMapper patientMapper;
 	@Autowired
 	private TenantAuthService tenantAuthService;
+	@Autowired
+	private PatientServletUtil patientServletUtil;
 
 	@PostMapping({ "/patient", "/patient/{id}" })
 	protected ShLinkManifest postPatientShLinkManifest(HttpServletRequest req, HttpServletResponse resp,
@@ -78,7 +80,7 @@ public class PatientShLinkManifestRestController {
 
 	private ShLinkManifest getShLinkManifest(HttpServletRequest req, String id, Tenant tenant) {
 		IGenericClient fhirClient = iisFhirClientFactory.getOrCreateGenericClient(req);
-		IAnyResource patientSelected = fetchPatientFromParameters(id, "", fhirClient, fhirSearchRequester);
+		IAnyResource patientSelected = patientServletUtil.fetchPatientFromParameters(id, "", fhirClient, fhirSearchRequester);
 		return shLinkManifestGenerator.generateExamplePatientManifest(tenant, patientSelected.getIdElement());
 	}
 }

@@ -34,7 +34,22 @@ import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
  */
 @Configuration
 @EnableTransactionManagement
+//@Import({
+//	AppProperties.class,
+//})
 public class FhirServerConfigCommon {
+
+//	@Bean
+//	@Conditional(OnR4Condition.class)
+//	public FhirContext fhirContextR4() {
+//		return FhirContext.forR4();
+//	}
+//
+//	@Bean
+//	@Conditional(OnR5Condition.class)
+//	public FhirContext fhirContextR5() {
+//		return FhirContext.forR5();
+//	}
 
 	private static final org.slf4j.Logger ourLog = org.slf4j.LoggerFactory.getLogger(FhirServerConfigCommon.class);
 

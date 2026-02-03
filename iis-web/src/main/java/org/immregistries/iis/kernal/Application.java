@@ -46,11 +46,12 @@ import org.springframework.web.context.request.RequestContextListener;
 })
 @ServletComponentScan(basePackageClasses = {
 	RestfulServer.class }, basePackages = {
-	"org.immregistries.iis.kernal.servlet"
+	"org.immregistries.iis.kernal.controllers"
 	// ,"org.immregistries.iis.kernal.repository"
 })
 @ComponentScan(basePackages = {
 		"ca.uhn.fhir.jpa.starter",
+	"org.immregistries.iis",
 		"org.immregistries.iis.kernal"
 })
 public class Application extends SpringBootServletInitializer {

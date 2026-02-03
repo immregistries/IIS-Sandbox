@@ -10,6 +10,8 @@ import org.hl7.fhir.instance.model.api.IIdType;
 import java.util.List;
 
 public interface ICustomIpsGenerationStrategy extends IIpsGenerationStrategy {
+	String $_MDM_QUERY_LINKS = "$mdm-query-links";
+
 
 	IBaseBundle everything(IIdType theOriginalSubjectId, Section theSection);
 

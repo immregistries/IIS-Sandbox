@@ -34,6 +34,8 @@ public class SubscriptionService {
 	private IisFhirClientFactory iisFhirClientFactory;
 	@Autowired
 	private SubscriptionTriggeringProvider subscriptionTriggeringProvider;
+	@Autowired
+	private TenantAuthService tenantAuthService;
 	// @Autowired
 	// SubscriptionDeliveringRestHookSubscriber
 	// subscriptionDeliveringRestHookSubscriber;
@@ -77,7 +79,7 @@ public class SubscriptionService {
 	// }
 	public String triggerWithResource(Subscription subscription, List<Pair<String, Bundle.HTTPVerb>> requests,
 			Tenant tenant) {
-		RequestDetails requestDetails = TenantAuthService.get().requestDetailsWithPartitionName();
+		RequestDetails requestDetails = tenantAuthService.requestDetailsWithPartitionName();
 		List<IPrimitiveType<String>> urls = List.of(new StringType("Patient?name=ulysse"));
 		IBaseParameters iBaseParameters = subscriptionTriggeringProvider.triggerSubscription(requestDetails,
 				subscription.getIdElement(), null, urls);

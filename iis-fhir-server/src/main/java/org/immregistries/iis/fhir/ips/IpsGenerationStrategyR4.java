@@ -99,7 +99,7 @@ public class IpsGenerationStrategyR4 extends DefaultJpaIpsGenerationStrategy imp
 	public String mdmLinksParameterIds(IIdType theOriginalSubjectId, Section theSection) {
 		Parameters inParams = new Parameters();
 		inParams.addParameter("resourceId", theOriginalSubjectId.getValue());
-		Bundle bundle = iisFhirClientFactory.getOrCreateFhirClientFromContext().operation().onServer().named("$mdm-query-links").withParameters(inParams)
+		Bundle bundle = iisFhirClientFactory.getOrCreateFhirClientFromContext().operation().onServer().named($_MDM_QUERY_LINKS).withParameters(inParams)
 			.returnResourceType(Bundle.class).execute();
 		return bundle.getEntry().stream().map(bundleEntryComponent -> bundleEntryComponent.getResource().getId()).collect(Collectors.joining(","));
 	}
