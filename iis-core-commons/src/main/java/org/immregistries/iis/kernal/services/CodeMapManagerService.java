@@ -5,6 +5,7 @@ import org.immregistries.codebase.client.CodeMapBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
@@ -33,8 +34,8 @@ public class CodeMapManagerService implements InitializingBean {
 		return codeMap;
 	}
 
-	public CodeMapManagerService() {
-		InputStream is = this.getClass().getResourceAsStream(COMPILED_XML_PATH);
+	public CodeMapManagerService(ResourceLoader resourceLoader) {
+		InputStream is = resourceLoader.getClassLoader().getResourceAsStream(COMPILED_XML_PATH);
 		if (is == null) {
 			logger.error("Could not load compiled CodeMap Unable to find file from {}", COMPILED_XML_PATH);
 		}
