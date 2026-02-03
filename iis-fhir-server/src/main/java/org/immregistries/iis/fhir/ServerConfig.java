@@ -38,6 +38,7 @@ import com.google.common.base.Strings;
 import org.immregistries.iis.fhir.bulk.IBulkExportGroupProvider;
 import org.immregistries.iis.fhir.common.StarterJpaConfig;
 import org.immregistries.iis.fhir.ips.IpsConfig;
+import org.immregistries.iis.fhir.mdm.MdmConfig;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -55,7 +56,8 @@ import java.util.Optional;
 	{
 		ThreadPoolFactoryConfig.class,
 		StarterJpaConfig.class,
-		IpsConfig.class
+		IpsConfig.class,
+		MdmConfig.class,
 	}
 )
 public class ServerConfig {

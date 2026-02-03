@@ -26,11 +26,16 @@ import java.util.*;
 
 public abstract class CdsQueryService<ImmunizationRecommendation extends IAnyResource, Parameters extends IBaseParameters> {
 	public static final String CDS_SERVER_BASE_URL = "https://sabbia.westus2.cloudapp.azure.com";
+//	public static final String CDS_SERVER_BASE_URL = "https://localhost:8089";
+
+
 	public static final String LONESTAR_PATH = "/lonestar/forecast";
 	public static final String EVALUATION_SERVICE_PATH = "/opencds-decision-support-service/evaluate";
 	protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 	@Autowired
 	private CodeMapManagerService codeMapManagerService;
+	@Autowired
+	private CdsConnectionProperties cdsConnectionProperties;
 
 	public abstract ImmunizationRecommendation queryCds(Tenant tenant, Date date, IisPatient iisPatient);
 
@@ -83,13 +88,18 @@ public abstract class CdsQueryService<ImmunizationRecommendation extends IAnyRes
 				}
 			}
 			testCase.setTestEventList(testEventList);
+			/*
+			 * TODO introduce more flexibility with more flavors
+			 */
 			Software software = new Software();
-			software.setServiceUrl(CDS_SERVER_BASE_URL + LONESTAR_PATH);
-			software.setService(org.immregistries.vfa.connect.model.Service.LSVF);
+			CdsConnectionProperties.CdsConnection cdsConnection;
 			if (processingFlavorSet.contains(ProcessingFlavor.ICE)) {
-				software.setServiceUrl(CDS_SERVER_BASE_URL + EVALUATION_SERVICE_PATH);
-				software.setService(org.immregistries.vfa.connect.model.Service.ICE);
+				cdsConnection = cdsConnectionProperties.getConnectionByService(Service.ICE);
+			} else {
+				cdsConnection = cdsConnectionProperties.getConnectionByService(Service.LSVF);
 			}
+			software.setServiceUrl(cdsConnection.getUrl());
+			software.setService(cdsConnection.getService());
 
 			ConnectorInterface connector = ConnectFactory.createConnecter(software, VaccineGroup.getForecastItemList());
 			connector.setLogText(false);

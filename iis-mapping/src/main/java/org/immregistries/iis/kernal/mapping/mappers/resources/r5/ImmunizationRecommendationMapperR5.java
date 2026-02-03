@@ -108,8 +108,11 @@ public class ImmunizationRecommendationMapperR5 extends RecommendationMapper<Imm
 		/*
 		 * ForecastStatus
 		 */
-		component.setForecastStatus(
-			new CodeableConcept().addCoding(VaccinePlanStatus.fromForecastActual(forecastActual).toR5()));
+		VaccinePlanStatus vaccinePlanStatus = VaccinePlanStatus.fromForecastActual(forecastActual);
+		if (vaccinePlanStatus != null) {
+			component.setForecastStatus(
+				new CodeableConcept().addCoding(vaccinePlanStatus.toR5()));
+		}
 		/*
 		 * ForecastReason
 		 */
