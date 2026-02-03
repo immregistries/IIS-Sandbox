@@ -25,17 +25,11 @@ import java.util.*;
 
 
 public abstract class CdsQueryService<ImmunizationRecommendation extends IAnyResource, Parameters extends IBaseParameters> {
-	public static final String CDS_SERVER_BASE_URL = "https://sabbia.westus2.cloudapp.azure.com";
-//	public static final String CDS_SERVER_BASE_URL = "https://localhost:8089";
-
-
-	public static final String LONESTAR_PATH = "/lonestar/forecast";
-	public static final String EVALUATION_SERVICE_PATH = "/opencds-decision-support-service/evaluate";
 	protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 	@Autowired
 	private CodeMapManagerService codeMapManagerService;
 	@Autowired
-	private CdsConnectionProperties cdsConnectionProperties;
+	private CdsConnectionPropertiesService cdsConnectionPropertiesService;
 
 	public abstract ImmunizationRecommendation queryCds(Tenant tenant, Date date, IisPatient iisPatient);
 
@@ -94,9 +88,9 @@ public abstract class CdsQueryService<ImmunizationRecommendation extends IAnyRes
 			Software software = new Software();
 			CdsConnectionProperties.CdsConnection cdsConnection;
 			if (processingFlavorSet.contains(ProcessingFlavor.ICE)) {
-				cdsConnection = cdsConnectionProperties.getConnectionByService(Service.ICE);
+				cdsConnection = cdsConnectionPropertiesService.getDefaultIceConnection();
 			} else {
-				cdsConnection = cdsConnectionProperties.getConnectionByService(Service.LSVF);
+				cdsConnection = cdsConnectionPropertiesService.getDefaultConnection();
 			}
 			software.setServiceUrl(cdsConnection.getUrl());
 			software.setService(cdsConnection.getService());

@@ -1,6 +1,5 @@
 package org.immregistries.iis.kernal.logic.recommendations;
 
-import org.apache.commons.lang3.Strings;
 import org.immregistries.vfa.connect.model.Service;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -14,6 +13,8 @@ import java.util.List;
 @EnableConfigurationProperties
 public class CdsConnectionProperties {
 
+	private String default_connection = "";
+	private String default_ice_connection = "";
 	private List<CdsConnection> connections = new ArrayList<>();
 
 	public List<CdsConnection> getConnections() {
@@ -24,37 +25,58 @@ public class CdsConnectionProperties {
 		this.connections = connections;
 	}
 
-	public CdsConnection getConnectionByName(String name) {
-		return connections.stream()
-			.filter(cdsConnection -> Strings.CI.equals(name, cdsConnection.getName()))
-			.findFirst()
-			.orElseThrow(() -> new RuntimeException("Cds Configuration not found for name " + name + " in application.yml"));
+	public String getDefault_connection() {
+		return default_connection;
 	}
 
-
-	public CdsConnection getConnectionByService(org.immregistries.vfa.connect.model.Service service) {
-		return connections.stream()
-			.filter(cdsConnection -> cdsConnection.getService().equals(service))
-			.findFirst()
-			.orElseThrow(() -> new RuntimeException("Cds Configuration not found for service " + service + " in application.yml"));
+	public void setDefault_connection(String default_connection) {
+		this.default_connection = default_connection;
 	}
 
+	public String getDefault_ice_connection() {
+		return default_ice_connection;
+	}
+
+	public void setDefault_ice_connection(String default_ice_connection) {
+		this.default_ice_connection = default_ice_connection;
+	}
 
 	public static class CdsConnection {
 		private String url = "";
 		private String name = "";
-		private org.immregistries.vfa.connect.model.Service service = Service.LSVF;
+		private Service service = Service.LSVF;
 
 		public String getUrl() {
 			return url;
+		}
+
+		public void setUrl(String url) {
+			this.url = url;
 		}
 
 		public String getName() {
 			return name;
 		}
 
+		public void setName(String name) {
+			this.name = name;
+		}
+
 		public Service getService() {
 			return service;
+		}
+
+		public void setService(Service service) {
+			this.service = service;
+		}
+
+		@Override
+		public String toString() {
+			return "CdsConnection{" +
+				"url='" + url + '\'' +
+				", name='" + name + '\'' +
+				", service=" + service +
+				'}';
 		}
 	}
 
