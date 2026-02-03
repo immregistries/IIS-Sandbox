@@ -1,9 +1,9 @@
 package org.immregistries.iis.kernal.logic.match;
 
+import ca.uhn.fhir.jpa.starter.annotations.OnR5Condition;
 import ca.uhn.fhir.util.ExtensionUtil;
 import org.hl7.fhir.instance.model.api.IBaseExtension;
 import org.hl7.fhir.r5.model.ContactPoint;
-import org.immregistries.iis.fhir.annotations.OnR5Condition;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
 import org.immregistries.mismo.match.StringUtils;
 import org.immregistries.mismo.match.model.Patient;

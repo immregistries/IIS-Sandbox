@@ -1,5 +1,6 @@
 package org.immregistries.iis.kernal.mapping.mappers.resources.r5;
 
+import ca.uhn.fhir.jpa.starter.annotations.OnR5Condition;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.r5.model.CodeableConcept;
 import org.hl7.fhir.r5.model.Coding;
@@ -8,7 +9,6 @@ import org.hl7.fhir.r5.model.Reference;
 import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
-import org.immregistries.iis.fhir.annotations.OnR5Condition;
 import org.immregistries.iis.kernal.enums.VaccinationRecommendationDateCode;
 import org.immregistries.iis.kernal.enums.VaccinePlanStatus;
 import org.immregistries.iis.kernal.mapping.mappers.fields.r5.BusinessIdentifierMapperR5;

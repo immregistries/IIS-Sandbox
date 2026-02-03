@@ -1,11 +1,11 @@
 package org.immregistries.iis.kernal.logic.recommendations;
 
 import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
+import ca.uhn.fhir.jpa.starter.annotations.OnR4Condition;
 import ca.uhn.fhir.rest.param.ReferenceParam;
 import org.hl7.fhir.r4.model.ImmunizationEvaluation;
 import org.hl7.fhir.r4.model.ImmunizationRecommendation;
 import org.hl7.fhir.r4.model.Parameters;
-import org.immregistries.iis.fhir.annotations.OnR4Condition;
 import org.immregistries.iis.kernal.mapping.mappers.resources.r4.ImmunizationEvaluationMapperR4;
 import org.immregistries.iis.kernal.mapping.mappers.resources.r4.ImmunizationRecommendationMapperR4;
 import org.immregistries.iis.kernal.mapping.requesters.FhirSearchRequester;

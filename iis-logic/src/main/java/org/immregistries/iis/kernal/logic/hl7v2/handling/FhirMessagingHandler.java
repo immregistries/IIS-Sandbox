@@ -1,10 +1,10 @@
 package org.immregistries.iis.kernal.logic.hl7v2.handling;
 
 import ca.uhn.fhir.context.FhirContext;
+import ca.uhn.fhir.jpa.starter.annotations.OnR4Condition;
 import org.hl7.fhir.instance.model.api.IIdType;
 import org.hl7.fhir.r4.model.*;
 import org.immregistries.codebase.client.CodeMap;
-import org.immregistries.iis.fhir.annotations.OnR4Condition;
 import org.immregistries.iis.kernal.enums.ProcessingFlavor;
 import org.immregistries.iis.kernal.logic.validation.ImmunizationValidator;
 import org.immregistries.iis.kernal.logic.validation.ObservationValidator;

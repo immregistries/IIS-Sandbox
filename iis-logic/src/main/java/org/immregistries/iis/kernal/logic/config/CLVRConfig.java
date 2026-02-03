@@ -1,9 +1,9 @@
 package org.immregistries.iis.kernal.logic.config;
 
+import ca.uhn.fhir.jpa.starter.annotations.OnR4Condition;
+import ca.uhn.fhir.jpa.starter.annotations.OnR5Condition;
 import com.syadem.nuva.NUVA;
 import com.syadem.nuva.SupportedLocale;
-import org.immregistries.iis.fhir.annotations.OnR4Condition;
-import org.immregistries.iis.fhir.annotations.OnR5Condition;
 import org.immregitries.clvr.*;
 import org.immregitries.clvr.impl.*;
 import org.immregitries.clvr.mapping.FhirConversionUtilR4;

@@ -1,8 +1,8 @@
 package org.immregistries.iis.kernal.mapping.mappers.resources.r5;
 
+import ca.uhn.fhir.jpa.starter.annotations.OnR5Condition;
 import org.hl7.fhir.r5.model.ImmunizationEvaluation;
 import org.hl7.fhir.r5.model.Reference;
-import org.immregistries.iis.fhir.annotations.OnR5Condition;
 import org.immregistries.iis.kernal.mapping.mappers.fields.r5.BusinessIdentifierMapperR5;
 import org.immregistries.iis.kernal.mapping.mappers.resources.ImmunizationEvaluationMapper;
 import org.immregistries.iis.kernal.model.IisEvaluation;

@@ -1,7 +1,7 @@
 package org.immregistries.iis.kernal.mapping.mappers.fields.r4;
 
+import ca.uhn.fhir.jpa.starter.annotations.OnR4Condition;
 import org.hl7.fhir.r4.model.Reference;
-import org.immregistries.iis.fhir.annotations.OnR4Condition;
 import org.immregistries.iis.kernal.mapping.mappers.fields.ModelReferenceMapper;
 import org.immregistries.iis.kernal.model.ModelReference;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,9 +1,9 @@
 package org.immregistries.iis.kernal.mapping.mappers.fields.r4;
 
+import ca.uhn.fhir.jpa.starter.annotations.OnR4Condition;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.Identifier;
-import org.immregistries.iis.fhir.annotations.OnR4Condition;
 import org.immregistries.iis.kernal.mapping.mappers.fields.BusinessIdentifierMapper;
 import org.immregistries.iis.kernal.model.BusinessIdentifier;
 import org.springframework.context.annotation.Conditional;

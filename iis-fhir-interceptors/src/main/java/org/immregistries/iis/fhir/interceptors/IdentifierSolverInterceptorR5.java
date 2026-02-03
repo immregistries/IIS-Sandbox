@@ -1,11 +1,11 @@
 package org.immregistries.iis.fhir.interceptors;
 
+import ca.uhn.fhir.jpa.starter.annotations.OnR5Condition;
 import ca.uhn.fhir.rest.api.server.RequestDetails;
 import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
 import jakarta.interceptor.Interceptor;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.r5.model.*;
-import org.immregistries.iis.fhir.annotations.OnR5Condition;
 import org.immregistries.iis.kernal.mapping.mappers.resources.ImmunizationMapper;
 import org.immregistries.iis.kernal.mapping.requesters.FhirIdentifierSolver;
 import org.immregistries.iis.kernal.model.BusinessIdentifier;

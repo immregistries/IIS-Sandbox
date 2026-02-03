@@ -1,9 +1,9 @@
 package org.immregistries.iis.kernal.mapping.mappers.resources.r4;
 
+import ca.uhn.fhir.jpa.starter.annotations.OnR4Condition;
 import org.hl7.fhir.r4.model.HumanName;
 import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.Person;
-import org.immregistries.iis.fhir.annotations.OnR4Condition;
 import org.immregistries.iis.kernal.mapping.MappingHelper;
 import org.immregistries.iis.kernal.mapping.mappers.resources.PersonMapper;
 import org.immregistries.iis.kernal.model.ModelPerson;
