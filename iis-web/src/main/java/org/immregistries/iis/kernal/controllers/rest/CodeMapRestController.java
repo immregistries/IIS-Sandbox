@@ -2,7 +2,7 @@ package org.immregistries.iis.kernal.controllers.rest;
 
 import org.immregistries.codebase.client.CodeMap;
 import org.immregistries.codebase.client.reference.CodesetType;
-import org.immregistries.iis.kernal.GlobalConstants;
+import org.immregistries.iis.kernal.IisRequestAttribute;
 import org.immregistries.iis.kernal.controllers.IisRestPath;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.immregistries.iis.kernal.services.CodeMapManagerService;
@@ -21,14 +21,14 @@ public class CodeMapRestController {
 
     @GetMapping
     public CodeMap getCodeMaps(
-            @RequestAttribute(GlobalConstants.TENANT_REQUEST_ATTRIBUTE) Tenant tenant) {
+            @RequestAttribute(IisRequestAttribute.TENANT_REQUEST_ATTRIBUTE) Tenant tenant) {
         return codeMapManagerService.getCodeMap();
     }
 
     @GetMapping("/search")
     public Collection<?> getCodesForTable(
             @RequestParam(name = "tableName") String tableName,
-            @RequestAttribute(GlobalConstants.TENANT_REQUEST_ATTRIBUTE) Tenant tenant) {
+            @RequestAttribute(IisRequestAttribute.TENANT_REQUEST_ATTRIBUTE) Tenant tenant) {
         CodesetType codesetType = CodesetType.valueOf(tableName);
         return codeMapManagerService.getCodeMap().getCodesForTable(codesetType);
     }

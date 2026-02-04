@@ -5,7 +5,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.immregistries.iis.kernal.GlobalConstants;
+import org.immregistries.iis.kernal.IisRequestAttribute;
 import org.immregistries.iis.kernal.controllers.IisRestPath;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.immregistries.iis.kernal.security.RequestTenantUtil;
@@ -65,7 +65,7 @@ public class RestTenantUrlFilter extends OncePerRequestFilter {
 			}
 			try {
 				Tenant tenant = tenantAuthService.authenticateTenant(userAccessUtil.getUserAccess(), tenantName);
-				request.setAttribute(GlobalConstants.TENANT_NAME_URL, tenantName);
+				request.setAttribute(IisRequestAttribute.TENANT_NAME_URL, tenantName);
 				requestTenantUtil.setTenantForRequest(tenant, request);
 			} catch (Exception e) {
 				logger.warn("Could not authenticate tenant for logging: {}", e.getMessage());

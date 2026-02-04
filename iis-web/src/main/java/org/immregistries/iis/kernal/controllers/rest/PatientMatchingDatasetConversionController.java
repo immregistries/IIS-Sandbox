@@ -7,7 +7,7 @@ import ca.uhn.fhir.rest.api.server.IBundleProvider;
 import jakarta.servlet.http.HttpServletResponse;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r5.model.Bundle;
-import org.immregistries.iis.kernal.GlobalConstants;
+import org.immregistries.iis.kernal.IisRequestAttribute;
 import org.immregistries.iis.kernal.controllers.IisRestPath;
 import org.immregistries.iis.kernal.logic.match.PatientMismoConversionService;
 import org.immregistries.iis.kernal.mapping.requesters.FhirSearchRequester;
@@ -37,7 +37,7 @@ public class PatientMatchingDatasetConversionController {
 	private RequestTenantUtil requestTenantUtil;
 
 	@PostMapping("/init")
-	public String initBuilder(@RequestAttribute(GlobalConstants.TENANT_REQUEST_ATTRIBUTE) Tenant tenant) throws IOException {
+	public String initBuilder(@RequestAttribute(IisRequestAttribute.TENANT_REQUEST_ATTRIBUTE) Tenant tenant) throws IOException {
 		String tenantId = tenant.getOrganizationName();
 		tenantId = tenantId.strip().replace("/", "");
 		File csvOutputFile = new File("./target/"+tenantId+".csv");
@@ -54,7 +54,7 @@ public class PatientMatchingDatasetConversionController {
 	}
 
 	@PostMapping("")
-	public String post(@RequestBody String stringBundle, @RequestAttribute(GlobalConstants.TENANT_REQUEST_ATTRIBUTE) Tenant tenant) throws IOException {
+	public String post(@RequestBody String stringBundle, @RequestAttribute(IisRequestAttribute.TENANT_REQUEST_ATTRIBUTE) Tenant tenant) throws IOException {
 		List<Patient> patientList = new ArrayList<>(20);
 		if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R5)) {
 			Bundle bundle = fhirContext.newJsonParser().parseResource(Bundle.class, stringBundle);

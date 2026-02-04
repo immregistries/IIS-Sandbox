@@ -9,7 +9,7 @@ import jakarta.servlet.ServletException;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.hl7.fhir.instance.model.api.IBaseBundle;
 import org.hl7.fhir.r4.model.IdType;
-import org.immregistries.iis.kernal.GlobalConstants;
+import org.immregistries.iis.kernal.IisRequestAttribute;
 import org.immregistries.iis.kernal.controllers.IisPathVariable;
 import org.immregistries.iis.kernal.controllers.IisRestPath;
 import org.immregistries.iis.kernal.persisted.entities.IisKey;
@@ -68,7 +68,7 @@ public class CLVRRestController {
     @GetMapping(value = "/qr", produces = MediaType.TEXT_PLAIN_VALUE)
     public String getPatientClvrQrCode(
             @PathVariable(IisPathVariable.Key.PATIENT_ID) String patientId,
-				@RequestAttribute(GlobalConstants.TENANT_REQUEST_ATTRIBUTE) Tenant tenant)
+				@RequestAttribute(IisRequestAttribute.TENANT_REQUEST_ATTRIBUTE) Tenant tenant)
             throws COSEException, SignatureException, NoSuchAlgorithmException, InvalidKeyException,
             NoSuchProviderException, IOException {
 
@@ -83,7 +83,7 @@ public class CLVRRestController {
     @GetMapping(value = "/qr/png", produces = MediaType.IMAGE_PNG_VALUE)
     public ResponseEntity<byte[]> getPatientClvrPng(
             @PathVariable(IisPathVariable.Key.PATIENT_ID) String patientId,
-				@RequestAttribute(GlobalConstants.TENANT_REQUEST_ATTRIBUTE) Tenant tenant)
+				@RequestAttribute(IisRequestAttribute.TENANT_REQUEST_ATTRIBUTE) Tenant tenant)
             throws COSEException, IOException, SignatureException, NoSuchAlgorithmException, InvalidKeyException,
             NoSuchProviderException, ServletException {
 		 UserAccess userAccess = userAccessUtil.getUserAccess();
@@ -102,7 +102,7 @@ public class CLVRRestController {
     @GetMapping(value = "/pdf", produces = MediaType.APPLICATION_PDF_VALUE)
     public ResponseEntity<byte[]> getPatientClvrPdf(
             @PathVariable(IisPathVariable.Key.PATIENT_ID) String patientId,
-				@RequestAttribute(GlobalConstants.TENANT_REQUEST_ATTRIBUTE) Tenant tenant)
+				@RequestAttribute(IisRequestAttribute.TENANT_REQUEST_ATTRIBUTE) Tenant tenant)
             throws COSEException, IOException, SignatureException, NoSuchAlgorithmException, InvalidKeyException,
             NoSuchProviderException, WriterException, URISyntaxException {
 

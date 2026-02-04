@@ -4,7 +4,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.immregistries.iis.kernal.GlobalConstants;
+import org.immregistries.iis.kernal.IisRequestAttribute;
 import org.immregistries.iis.kernal.controllers.WellKnownKeyController;
 import org.immregistries.iis.kernal.controllers.servlet.TenantController;
 import org.slf4j.Logger;
@@ -42,7 +42,7 @@ public class TenantUrlFilter extends OncePerRequestFilter {
 			return;
 		}
 		path = path.substring(0, indexOfNext);
-		request.setAttribute(GlobalConstants.TENANT_NAME_URL, path);
+		request.setAttribute(IisRequestAttribute.TENANT_NAME_URL, path);
 		filterChain.doFilter(request, response);
 	}
 

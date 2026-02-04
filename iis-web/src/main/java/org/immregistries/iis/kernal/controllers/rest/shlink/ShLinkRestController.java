@@ -2,7 +2,7 @@ package org.immregistries.iis.kernal.controllers.rest.shlink;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
-import org.immregistries.iis.kernal.GlobalConstants;
+import org.immregistries.iis.kernal.IisRequestAttribute;
 import org.immregistries.iis.kernal.controllers.IisRestParam;
 import org.immregistries.iis.kernal.controllers.IisRestPath;
 import org.immregistries.iis.kernal.logic.shlink.generation.ShLinkGenerator;
@@ -43,7 +43,7 @@ public class ShLinkRestController {
 			@RequestParam(IisRestParam.PATIENT_ID) String patientId,
 			@RequestParam(IisRestParam.ShLink.FLAG) String flag,
 			@RequestParam(value = IisRestParam.ShLink.EXP, required = false, defaultValue = "10000000") String exp,
-											@RequestAttribute(GlobalConstants.TENANT_REQUEST_ATTRIBUTE) Tenant tenant)
+											@RequestAttribute(IisRequestAttribute.TENANT_REQUEST_ATTRIBUTE) Tenant tenant)
 			throws IOException, NoSuchAlgorithmException {
 		UserAccess userAccess = UserAccessUtil.get().getUserAccess();
 		ServletUriComponentsBuilder uriBuilder = ServletUriComponentsBuilder.fromRequest(req);
@@ -58,7 +58,7 @@ public class ShLinkRestController {
 			@RequestParam(IisRestParam.PATIENT_ID) String patientId,
 			@RequestParam(IisRestParam.ShLink.FLAG) String flag,
 			@RequestParam(value = IisRestParam.ShLink.EXP, required = false, defaultValue = "10000000") String exp,
-															 @RequestAttribute(GlobalConstants.TENANT_REQUEST_ATTRIBUTE) Tenant tenant)
+															 @RequestAttribute(IisRequestAttribute.TENANT_REQUEST_ATTRIBUTE) Tenant tenant)
 			throws ServletException, IOException, NoSuchAlgorithmException {
 		String qrCode = shLinkIPSQrCode(req, keyId, secretKey, patientId, flag, exp, tenant);
 		HttpHeaders headers = new HttpHeaders();

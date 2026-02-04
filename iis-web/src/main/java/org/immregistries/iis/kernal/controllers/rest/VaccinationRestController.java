@@ -3,7 +3,7 @@ package org.immregistries.iis.kernal.controllers.rest;
 import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
 import ca.uhn.fhir.rest.param.ReferenceParam;
 import jakarta.servlet.http.HttpServletRequest;
-import org.immregistries.iis.kernal.GlobalConstants;
+import org.immregistries.iis.kernal.IisRequestAttribute;
 import org.immregistries.iis.kernal.controllers.IisPathVariable;
 import org.immregistries.iis.kernal.controllers.IisRestParam;
 import org.immregistries.iis.kernal.controllers.IisRestPath;
@@ -28,7 +28,7 @@ public class VaccinationRestController extends BaseTenantTiedRest {
 
 	 @GetMapping(IisPathVariable.PlaceHolder.VACCINATION_ID_PLACEHOLDER)
     public IisVaccination getVaccination(
-       @RequestAttribute(name = GlobalConstants.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
+       @RequestAttribute(name = IisRequestAttribute.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
             @PathVariable(IisPathVariable.Key.VACCINATION_ID) String vaccinationId,
             HttpServletRequest req) {
         return fhirReadRequester.readAsVaccination(vaccinationId);
@@ -36,7 +36,7 @@ public class VaccinationRestController extends BaseTenantTiedRest {
 
     @GetMapping()
     public List<VaccinationMaster> getVaccinations(
-       @RequestAttribute(name = GlobalConstants.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
+       @RequestAttribute(name = IisRequestAttribute.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
             @RequestParam(required = false) String patientId) {
         SearchParameterMap parameters = new SearchParameterMap();
         if (patientId != null && !patientId.isEmpty()) {
@@ -50,7 +50,7 @@ public class VaccinationRestController extends BaseTenantTiedRest {
     @GetMapping(IisPathVariable.PlaceHolder.VACCINATION_ID_PLACEHOLDER + IisRestPath.BasePath.RELATED_PATH)
     public List<? extends IisVaccination> getRelatedVaccinations(
             @PathVariable(IisPathVariable.Key.VACCINATION_ID) String vaccinationId,
-            @RequestAttribute(GlobalConstants.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
+            @RequestAttribute(IisRequestAttribute.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
             @RequestParam(name = IisRestParam.MDM_EXPAND, defaultValue = "false") boolean isGolden) {
         ReferenceParam referenceParam = new ReferenceParam().setValue(vaccinationId);
         referenceParam.setMdmExpand(isGolden);

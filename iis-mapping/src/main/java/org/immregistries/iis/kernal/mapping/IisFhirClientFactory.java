@@ -13,6 +13,7 @@ import ca.uhn.fhir.rest.server.exceptions.AuthenticationException;
 import ca.uhn.fhir.rest.server.servlet.ServletRequestDetails;
 import jakarta.servlet.http.HttpServletRequest;
 import org.immregistries.iis.kernal.GlobalConstants;
+import org.immregistries.iis.kernal.IisRequestAttribute;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.immregistries.iis.kernal.persisted.entities.UserAccess;
 import org.immregistries.iis.kernal.security.RequestTenantUtil;
@@ -132,15 +133,15 @@ public class IisFhirClientFactory extends ApacheRestfulClientFactory {
 	}
 
 	public IGenericClient getOrCreateGenericClient(HttpServletRequest request) {
-		if (request.getAttribute(GlobalConstants.FHIR_CLIENT_REQUEST_ATTRIBUTE) == null) {
+		if (request.getAttribute(IisRequestAttribute.FHIR_CLIENT_REQUEST_ATTRIBUTE) == null) {
 			Tenant tenant = requestTenantUtil.extractTenant(request);
 			if (tenant != null) {
-				request.setAttribute(GlobalConstants.FHIR_CLIENT_REQUEST_ATTRIBUTE, newGenericClient(tenant, request));
+				request.setAttribute(IisRequestAttribute.FHIR_CLIENT_REQUEST_ATTRIBUTE, newGenericClient(tenant, request));
 			} else {
-				request.setAttribute(GlobalConstants.FHIR_CLIENT_REQUEST_ATTRIBUTE, null);
+				request.setAttribute(IisRequestAttribute.FHIR_CLIENT_REQUEST_ATTRIBUTE, null);
 			}
 		}
-		return (IGenericClient) request.getAttribute(GlobalConstants.FHIR_CLIENT_REQUEST_ATTRIBUTE);
+		return (IGenericClient) request.getAttribute(IisRequestAttribute.FHIR_CLIENT_REQUEST_ATTRIBUTE);
 	}
 
 	/**

@@ -1,6 +1,6 @@
 package org.immregistries.iis.kernal.controllers.rest.shlink;
 
-import org.immregistries.iis.kernal.GlobalConstants;
+import org.immregistries.iis.kernal.IisRequestAttribute;
 import org.immregistries.iis.kernal.controllers.IisRestParam;
 import org.immregistries.iis.kernal.controllers.IisRestPath;
 import org.immregistries.iis.kernal.persisted.entities.IisKey;
@@ -36,7 +36,7 @@ public class IisKeyRestController {
 	@GetMapping({ REST_PATH + IIS_KEYS_KEY + KEY_ID_PLACEHOLDER + "/$getOrCreate",
 			IisRestPath.REST_TENANT_PATH + IIS_KEYS_KEY + KEY_ID_PLACEHOLDER + "/$getOrCreate"})
 	public IisKey getOrCreateKey(
-			@RequestAttribute(value = GlobalConstants.TENANT_REQUEST_ATTRIBUTE, required = false) Tenant tenant,
+			@RequestAttribute(value = IisRequestAttribute.TENANT_REQUEST_ATTRIBUTE, required = false) Tenant tenant,
 			@PathVariable(IisRestParam.KEY_ID) String keyId) {
 		UserAccess userAccess = userAccessUtil.getUserAccess();
 		return keyStoreService.getIisSigningKeyOrCreate(keyId, userAccess, tenant);

@@ -5,7 +5,7 @@ import ca.uhn.fhir.rest.client.api.IGenericClient;
 import jakarta.servlet.http.HttpServletRequest;
 import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.hl7.fhir.instance.model.api.IDomainResource;
-import org.immregistries.iis.kernal.GlobalConstants;
+import org.immregistries.iis.kernal.IisRequestAttribute;
 import org.immregistries.iis.kernal.controllers.IisRestParam;
 import org.immregistries.iis.kernal.controllers.IisRestPath;
 import org.immregistries.iis.kernal.controllers.servlet.util.PatientServletUtil;
@@ -39,7 +39,7 @@ public class RecommendationRestController {
 
 	@PostMapping("/random")
 	public void addRandomRecommendation(
-			@RequestAttribute(name = GlobalConstants.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
+			@RequestAttribute(name = IisRequestAttribute.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
 			HttpServletRequest req) {
 
 		IGenericClient fhirClient = iisFhirClientFactory.getOrCreateGenericClient(req);
@@ -63,7 +63,7 @@ public class RecommendationRestController {
 
 	@PutMapping
 	public void updateRecommendation(
-			@RequestAttribute(GlobalConstants.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
+			@RequestAttribute(IisRequestAttribute.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
 			@RequestBody String recommendationResource,
 			@RequestParam(name = IisRestParam.RECOMMENDATION_ID, required = false) String recommendationId,
 			@RequestParam(name = IisRestParam.RECOMMENDATION_IDENTIFIER, required = false) String recommendationIdentifier,
@@ -83,7 +83,7 @@ public class RecommendationRestController {
 	public IAnyResource getRecommendation(
 			@RequestParam(name = IisRestParam.RECOMMENDATION_ID, required = false) String recommendationId,
 			@RequestParam(name = IisRestParam.RECOMMENDATION_IDENTIFIER, required = false) String recommendationIdentifier,
-			@RequestAttribute(GlobalConstants.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
+			@RequestAttribute(IisRequestAttribute.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
 			HttpServletRequest req) {
 		IGenericClient fhirClient = iisFhirClientFactory.newGenericClient(tenant, req);
 		return immunizationRecommendationService.readRecommendation(recommendationId, recommendationIdentifier,

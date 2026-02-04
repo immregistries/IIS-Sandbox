@@ -1,6 +1,6 @@
 package org.immregistries.iis.kernal.controllers.rest;
 
-import org.immregistries.iis.kernal.GlobalConstants;
+import org.immregistries.iis.kernal.IisRequestAttribute;
 import org.immregistries.iis.kernal.controllers.IisPathVariable;
 import org.immregistries.iis.kernal.controllers.IisRestPath;
 import org.immregistries.iis.kernal.persisted.entities.MessageReceived;
@@ -20,14 +20,14 @@ public class MessageRestController {
 
     @GetMapping(IisPathVariable.PlaceHolder.PATIENT_ID_PLACEHOLDER)
     public List<MessageReceived> getPatientMessages(
-		 @RequestAttribute(name = GlobalConstants.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
+       @RequestAttribute(name = IisRequestAttribute.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
             @PathVariable(IisPathVariable.Key.PATIENT_ID) String patientId) {
         return messageReceivedRepository.findByTenantAndPatientReportedId(tenant, patientId);
     }
 
     @GetMapping
     public List<MessageReceived> getMessages(
-		 @RequestAttribute(name = GlobalConstants.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
+       @RequestAttribute(name = IisRequestAttribute.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
             @RequestParam(required = false) String search) {
 
         List<MessageReceived> messageReceivedList = messageReceivedRepository

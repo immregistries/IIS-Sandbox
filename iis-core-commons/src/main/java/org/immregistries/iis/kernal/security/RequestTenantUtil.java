@@ -7,7 +7,7 @@ import ca.uhn.fhir.rest.api.server.RequestDetails;
 import ca.uhn.fhir.rest.api.server.SystemRequestDetails;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
-import org.immregistries.iis.kernal.GlobalConstants;
+import org.immregistries.iis.kernal.IisRequestAttribute;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.immregistries.iis.kernal.persisted.entities.UserAccess;
 import org.jetbrains.annotations.NotNull;
@@ -36,7 +36,7 @@ public class RequestTenantUtil {
 	}
 
 	public Tenant extractTenant(RequestDetails theRequestDetails) {
-		Object attribute = theRequestDetails.getAttribute(GlobalConstants.TENANT_REQUEST_ATTRIBUTE);
+		Object attribute = theRequestDetails.getAttribute(IisRequestAttribute.TENANT_REQUEST_ATTRIBUTE);
 		if (attribute != null) {
 			return (Tenant) attribute;
 		} else {
@@ -58,12 +58,12 @@ public class RequestTenantUtil {
 		/*
 		 * If Tenant was already set as attribute return it
 		 */
-		Tenant requestTenant = (Tenant) request.getAttribute(GlobalConstants.TENANT_REQUEST_ATTRIBUTE);
+		Tenant requestTenant = (Tenant) request.getAttribute(IisRequestAttribute.TENANT_REQUEST_ATTRIBUTE);
 		if (requestTenant != null) {
 			tenant = requestTenant;
 		} else {
-			String urlTenantName = (String) request.getAttribute(GlobalConstants.TENANT_NAME_URL);
-			Object tenantIdUrlAttribute = request.getAttribute(GlobalConstants.TENANT_ID_URL);
+			String urlTenantName = (String) request.getAttribute(IisRequestAttribute.TENANT_NAME_URL);
+			Object tenantIdUrlAttribute = request.getAttribute(IisRequestAttribute.TENANT_ID_URL);
 			int urlTenantId = 0;
 			if (tenantIdUrlAttribute != null) {
 				urlTenantId = (int) tenantIdUrlAttribute;
@@ -102,7 +102,7 @@ public class RequestTenantUtil {
 
 
 	public void setTenantForRequestDetails(Tenant tenant, RequestDetails requestDetails) {
-		requestDetails.setAttribute(GlobalConstants.TENANT_REQUEST_ATTRIBUTE, tenant);
+		requestDetails.setAttribute(IisRequestAttribute.TENANT_REQUEST_ATTRIBUTE, tenant);
 		if (requestDetails instanceof SystemRequestDetails) {
 			SystemRequestDetails systemRequestDetails = (SystemRequestDetails) requestDetails;
 			PartitionEntity partitionByName = partitionLookupSvc.getPartitionByName(tenant.getOrganizationName());
@@ -116,7 +116,7 @@ public class RequestTenantUtil {
 	}
 
 	public Tenant setTenantForRequest(Tenant tenant, HttpServletRequest request) {
-		request.setAttribute(GlobalConstants.TENANT_REQUEST_ATTRIBUTE, tenant);
+		request.setAttribute(IisRequestAttribute.TENANT_REQUEST_ATTRIBUTE, tenant);
 		return tenant;
 	}
 
