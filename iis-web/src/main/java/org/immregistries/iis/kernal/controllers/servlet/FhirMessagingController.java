@@ -49,7 +49,7 @@ public class FhirMessagingController {
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		resp.setContentType("text/html");
 
-		Tenant tenant = requestTenantUtil.getTenant(req);
+		Tenant tenant = requestTenantUtil.extractTenant(req);
 
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		try {

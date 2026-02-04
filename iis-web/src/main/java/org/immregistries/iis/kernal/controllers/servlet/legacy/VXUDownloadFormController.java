@@ -64,7 +64,7 @@ public class VXUDownloadFormController {
 
     resp.setContentType("text/html");
     PrintWriter out = new PrintWriter(resp.getOutputStream());
-	  Tenant tenant = requestTenantUtil.getTenant(req);
+	  Tenant tenant = requestTenantUtil.extractTenant(req);
     if (tenant == null) {
       throw new AuthenticationCredentialsNotFoundException("");
     }

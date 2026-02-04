@@ -198,7 +198,7 @@ public class V2IncomingMessageHandler extends IncomingMessageHandler<HL7Reader, 
 			sendersUniqueId = "MSH-10 NOT VALUED";
 		}
 		data.setReceivingApplication(receivingApp.toString());
-		data.setReceivingFacility(requestTenantUtil.getTenantFromContextRequest().getOrganizationName());
+		data.setReceivingFacility(requestTenantUtil.extractTenantFromRequestContext().getOrganizationName());
 
 		data.setMessageControlId(sendersUniqueId);
 		data.setMessageDate(header.getMessageDate());

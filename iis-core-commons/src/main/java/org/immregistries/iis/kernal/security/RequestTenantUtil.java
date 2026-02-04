@@ -1,5 +1,6 @@
 package org.immregistries.iis.kernal.security;
 
+import ca.uhn.fhir.interceptor.model.RequestPartitionId;
 import ca.uhn.fhir.jpa.entity.PartitionEntity;
 import ca.uhn.fhir.jpa.partition.IPartitionLookupSvc;
 import ca.uhn.fhir.rest.api.server.RequestDetails;
@@ -28,13 +29,13 @@ public class RequestTenantUtil {
 	@Autowired
 	private TenantAuthService tenantAuthService;
 
-	public Tenant getTenantFromContextRequest() {
+	public Tenant extractTenantFromRequestContext() {
 		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
 				.getRequest();
-		return getTenant(request);
+		return extractTenant(request);
 	}
 
-	public Tenant getTenant(RequestDetails theRequestDetails) {
+	public Tenant extractTenant(RequestDetails theRequestDetails) {
 		Object attribute = theRequestDetails.getAttribute(GlobalConstants.SESSION_REQUEST_TENANT);
 		if (attribute != null) {
 			return (Tenant) attribute;
@@ -42,14 +43,14 @@ public class RequestTenantUtil {
 			String tenantName = theRequestDetails.getTenantId();
 			if (StringUtils.isNotBlank(tenantName)) {
 				Tenant tenant = getTenantFromName(tenantName);
-				setTenantForRequestDetails(theRequestDetails, tenant);
+				setTenantForRequestDetails(tenant, theRequestDetails);
 				return tenant;
 			}
 		}
 		return null;
 	}
 
-	public Tenant getTenant(HttpServletRequest request) {
+	public Tenant extractTenant(HttpServletRequest request) {
 		final Tenant tenant;
 		/*
 		 * Extracting variables from the Request
@@ -78,7 +79,7 @@ public class RequestTenantUtil {
 				tenant = null; //TODO change
 			} else if (StringUtils.isNotBlank(urlTenantName)) {
 				tenant = getTenantFromName(urlTenantName);
-				setTenantForRequest(request, tenant);
+				setTenantForRequest(tenant, request);
 			} else {
 				tenant = null;
 			}
@@ -100,18 +101,27 @@ public class RequestTenantUtil {
 	}
 
 
-	public Tenant setTenantForRequestDetails(RequestDetails requestDetails, Tenant tenant) {
+	public void setTenantForRequestDetails(Tenant tenant, RequestDetails requestDetails) {
 		requestDetails.setAttribute(GlobalConstants.SESSION_REQUEST_TENANT, tenant);
-		return tenant;
+		if (requestDetails instanceof SystemRequestDetails) {
+			SystemRequestDetails systemRequestDetails = (SystemRequestDetails) requestDetails;
+			PartitionEntity partitionByName = partitionLookupSvc.getPartitionByName(tenant.getOrganizationName());
+			RequestPartitionId requestPartitionId = partitionByName.toRequestPartitionId();
+			systemRequestDetails.setRequestPartitionId(requestPartitionId);
+		}
+//		else if (requestDetails instanceof ServletRequestDetails) {
+//			ServletRequestDetails servletRequestDetails = (ServletRequestDetails) requestDetails;
+//			servletRequestDetails.partion
+//		}
 	}
 
-	public static Tenant setTenantForRequest(HttpServletRequest request, Tenant tenant) {
+	public Tenant setTenantForRequest(Tenant tenant, HttpServletRequest request) {
 		request.setAttribute(GlobalConstants.SESSION_REQUEST_TENANT, tenant);
 		return tenant;
 	}
 
 	public SystemRequestDetails requestDetailsWithPartitionName() {
-		Tenant tenant = getTenantFromContextRequest();
+		Tenant tenant = extractTenantFromRequestContext();
 		return requestDetailsWithPartitionName(tenant);
 	}
 

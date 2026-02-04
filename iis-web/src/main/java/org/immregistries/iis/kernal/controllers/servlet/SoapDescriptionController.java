@@ -46,7 +46,7 @@ public class SoapDescriptionController {
 
 			PrintWriter out = resp.getWriter();
 			try {
-				Tenant tenant = requestTenantUtil.getTenantFromContextRequest();
+				Tenant tenant = requestTenantUtil.extractTenantFromRequestContext();
 				uiUtil.doHeader(out, "IIS Sandbox", tenant);
 				out.println("<h2>CDC SOAP Endpoint</h2>");
 				out.println("<p>");

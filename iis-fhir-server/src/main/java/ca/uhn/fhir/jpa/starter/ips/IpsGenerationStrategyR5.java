@@ -31,7 +31,7 @@ public class IpsGenerationStrategyR5 extends DefaultJpaIpsGenerationStrategy imp
 	private IisFhirClientFactory iisFhirClientFactory;
 	@Autowired
 	private RequestTenantUtil requestTenantUtil;
-	
+
 	/**
 	 * Constructor
 	 */
@@ -78,7 +78,7 @@ public class IpsGenerationStrategyR5 extends DefaultJpaIpsGenerationStrategy imp
 
 	@Override
 	public IAnyResource createAuthor() {
-		Organization organization = organizationMapper.fhirObject(requestTenantUtil.getTenantFromContextRequest());
+		Organization organization = organizationMapper.fhirObject(requestTenantUtil.extractTenantFromRequestContext());
 		return organization;
 	}
 

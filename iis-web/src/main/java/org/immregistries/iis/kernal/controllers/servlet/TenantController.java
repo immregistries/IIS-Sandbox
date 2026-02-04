@@ -88,7 +88,7 @@ public class TenantController {
 		String action = req.getParameter(PARAM_ACTION);
 		String tenantId = req.getParameter(PARAM_TENANT_ID);
 
-		Tenant tenant = requestTenantUtil.getTenant(req);
+		Tenant tenant = requestTenantUtil.extractTenant(req);
 		UserAccess userAccess = UserAccessUtil.get().getUserAccess();
 		if (userAccess != null && session != null) {
 			List<Tenant> tenantList = tenantRestController.getTenants(req);

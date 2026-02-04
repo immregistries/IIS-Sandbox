@@ -59,7 +59,7 @@ public class SoapRestController {
 					 * Tenant is accessed through RequestContext, and was previously set through the
 					 * authorize method of WSDL server
 					 */
-					Tenant tenant = requestTenantUtil.getTenantFromContextRequest();
+					Tenant tenant = requestTenantUtil.extractTenantFromRequestContext();
 					if (tenant == null) {
 						throw new SecurityException("Username/password combination is unrecognized");
 					} else {

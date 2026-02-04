@@ -45,7 +45,7 @@ public abstract class BaseIISSOAPServer extends CDCWSDLServer {
 		} else {
 			HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder
 					.currentRequestAttributes()).getRequest();
-			requestTenantUtil.setTenantForRequest(request, tenant);
+			requestTenantUtil.setTenantForRequest(tenant, request);
 		}
 	}
 }

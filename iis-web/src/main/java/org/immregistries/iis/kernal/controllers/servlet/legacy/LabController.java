@@ -193,7 +193,7 @@ public class LabController {
           }
         }
       }
-		 uiUtil.doHeader(out, "IIS Sandbox", requestTenantUtil.getTenant(req));
+		 uiUtil.doHeader(out, "IIS Sandbox", requestTenantUtil.extractTenant(req));
 
       if (messageError != null) {
         out.println("  <div class=\"w3-panel w3-red\">");

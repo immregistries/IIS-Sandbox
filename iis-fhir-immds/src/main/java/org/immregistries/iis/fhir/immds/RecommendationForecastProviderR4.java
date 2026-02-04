@@ -69,7 +69,7 @@ public class RecommendationForecastProviderR4 implements IRecommendationForecast
 			iisVaccinationList = List.of();
 		}
 		IisPatient iisPatient = patientMapper.localObject(patient);
-		Tenant tenant = requestTenantUtil.getTenant(theRequestDetails);
+		Tenant tenant = requestTenantUtil.extractTenant(theRequestDetails);
 
 		try {
 			out = cdsQueryService.queryCds(tenant, assessmentDate.getValue(), iisPatient, iisVaccinationList);

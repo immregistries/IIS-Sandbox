@@ -47,14 +47,14 @@ public class HomeController {
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 
-		Tenant tenant = requestTenantUtil.getTenant(req);
+		Tenant tenant = requestTenantUtil.extractTenant(req);
 		String tenantName = "{tenantName}";
 		if (tenant != null) {
 			tenantName = tenant.getOrganizationName();
 		}
 
 		try {
-			uiUtil.doHeader(out, "IIS Sandbox - Home", requestTenantUtil.getTenantFromContextRequest());
+			uiUtil.doHeader(out, "IIS Sandbox - Home", requestTenantUtil.extractTenantFromRequestContext());
 			out.println("    <div class=\"w3-container w3-half w3-margin-top\">");
 			out.println(
 					"    <div class=\"w3-panel w3-yellow\"><p class=\"w3-left-align\">This system is for test purposes only. "

@@ -20,6 +20,7 @@ import org.immregistries.iis.kernal.persisted.entities.UserAccess;
 import org.immregistries.iis.kernal.persisted.repository.TenantRepository;
 import org.immregistries.iis.kernal.persisted.repository.UserAccessRepository;
 import org.immregistries.iis.kernal.security.JwtUtils;
+import org.immregistries.iis.kernal.security.RequestTenantUtil;
 import org.immregistries.iis.kernal.security.TenantAuthService;
 import org.immregistries.iis.kernal.security.UserAccessUtil;
 import org.immregistries.iis.kernal.services.PartitionNameExtractorService;
@@ -54,6 +55,8 @@ public class IisAuthorizationInterceptor extends AuthorizationInterceptor implem
 	private TenantRepository tenantRepository;
 	@Autowired
 	private TenantAuthService tenantAuthService;
+	@Autowired
+	private RequestTenantUtil requestTenantUtil;
 
 	@Autowired
 	private PartitionNameExtractorService partitionNameExtractorService;
@@ -124,7 +127,7 @@ public class IisAuthorizationInterceptor extends AuthorizationInterceptor implem
 		}
 
 		if (tenant.getOrganizationName() != null) {
-			theRequestDetails.setAttribute(SESSION_REQUEST_TENANT, tenant);
+			requestTenantUtil.setTenantForRequestDetails(tenant, theRequestDetails);
 			return new RuleBuilder()
 					.allow().read()
 					.resourcesOfType("Subscription").withAnyId().forTenantIds(GlobalConstants.DEFAULT_USER)
@@ -195,7 +198,7 @@ public class IisAuthorizationInterceptor extends AuthorizationInterceptor implem
 			if (tenantOptional.isPresent()) {
 				Tenant tenant = tenantOptional.get();
 				theRequestDetails.setAttribute(SESSION_USER_ACCESS, userAccess);
-				theRequestDetails.setAttribute(SESSION_REQUEST_TENANT, tenant);
+				requestTenantUtil.setTenantForRequestDetails(tenant, theRequestDetails);
 				return new RuleBuilder()
 						.allow().read()
 						.resourcesOfType("Subscription").withAnyId().forTenantIds(GlobalConstants.DEFAULT_USER)

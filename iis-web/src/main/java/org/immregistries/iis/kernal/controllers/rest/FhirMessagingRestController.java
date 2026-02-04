@@ -114,11 +114,11 @@ public class FhirMessagingRestController {
 					 * Tenant is accessed through RequestContext, and was previously set through the
 					 * authorize method of WSDL server in BaseIISSOAPServer.java
 					 */
-					Tenant tenant = requestTenantUtil.getTenantFromContextRequest();
+					Tenant tenant = requestTenantUtil.extractTenantFromRequestContext();
 					if (tenant == null) {
 						throw new SecurityException("Username/password combination is unrecognized");
 					} else {
-						req.setAttribute(GlobalConstants.SESSION_REQUEST_TENANT, tenant);
+						requestTenantUtil.setTenantForRequest(tenant, req);
 						ack = processInput(message, tenant, facilityId);
 					}
 				} catch (Exception e) {

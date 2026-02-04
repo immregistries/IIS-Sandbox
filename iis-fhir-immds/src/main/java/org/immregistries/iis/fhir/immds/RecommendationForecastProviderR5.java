@@ -66,7 +66,7 @@ public class RecommendationForecastProviderR5 implements IRecommendationForecast
 			iisVaccinationList = immunization.stream().map(immunization1 -> immunizationMapperR5.localObject(immunization1)).collect(Collectors.toList());
 		}
 		IisPatient iisPatient = patientMapperR5.localObject(patient);
-		Tenant tenant = requestTenantUtil.getTenant(theRequestDetails);
+		Tenant tenant = requestTenantUtil.extractTenant(theRequestDetails);
 
 		try {
 			out = cdsQueryService.queryCds(tenant, assessmentDate.getValue(), iisPatient, iisVaccinationList);

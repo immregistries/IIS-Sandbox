@@ -48,7 +48,7 @@ public class PopController {
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		try {
-			Tenant tenant = requestTenantUtil.getTenant(req);
+			Tenant tenant = requestTenantUtil.extractTenant(req);
 
 			String ack = "";
 
@@ -79,7 +79,7 @@ public class PopController {
 	@GetMapping
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		resp.setContentType("text/html");
-		Tenant tenant = requestTenantUtil.getTenant(req);
+		Tenant tenant = requestTenantUtil.extractTenant(req);
 
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		try {

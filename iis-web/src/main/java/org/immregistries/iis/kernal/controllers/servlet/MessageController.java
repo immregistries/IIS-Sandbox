@@ -73,7 +73,7 @@ public class MessageController {
 				out.println("  </div>");
 			}
 
-			Tenant tenant = requestTenantUtil.getTenantFromContextRequest();
+			Tenant tenant = requestTenantUtil.extractTenantFromRequestContext();
 			if (tenant != null) {
 				out.println("    <div class=\"w3-container w3-half w3-margin-top\">");
 				out.println("    <h2>Facility: " + tenant.getOrganizationName() + "</h2>");

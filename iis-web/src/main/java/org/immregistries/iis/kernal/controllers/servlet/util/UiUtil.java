@@ -56,7 +56,7 @@ public class UiUtil {
 
 
 	public void doHeader(PrintWriter out, String title) {
-		doHeader(out, title, requestTenantUtil.getTenantFromContextRequest());
+		doHeader(out, title, requestTenantUtil.extractTenantFromRequestContext());
 	}
 
 	/**
@@ -183,7 +183,7 @@ public class UiUtil {
 
 	public @NotNull Tenant getTenantRedirectIfNone(HttpServletRequest req,
 																  HttpServletResponse resp) throws IOException {
-		Tenant tenant = requestTenantUtil.getTenant(req);
+		Tenant tenant = requestTenantUtil.extractTenant(req);
 		if (tenant == null) {
 			if (userAccessUtil.getUserAccess() != null) {
 				resp.sendRedirect(deployedUrlService.getContextPath() +

@@ -134,7 +134,7 @@ public class IisFhirClientFactory extends ApacheRestfulClientFactory {
 
 	public IGenericClient getOrCreateGenericClient(HttpServletRequest request) {
 		if (request.getAttribute(GlobalConstants.FHIR_CLIENT_REQUEST_ATTRIBUTE) == null) {
-			Tenant tenant = requestTenantUtil.getTenant(request);
+			Tenant tenant = requestTenantUtil.extractTenant(request);
 			if (tenant != null) {
 				request.setAttribute(GlobalConstants.FHIR_CLIENT_REQUEST_ATTRIBUTE, newGenericClient(tenant, request));
 			} else {
@@ -151,6 +151,7 @@ public class IisFhirClientFactory extends ApacheRestfulClientFactory {
 	 * @return
 	 */
 	public IGenericClient getOrCreateGenericClient(ServletRequestDetails theRequestDetails) {
+		Tenant tenant = requestTenantUtil.extractTenant(theRequestDetails);
 		Tenant tenant = (Tenant) theRequestDetails.getAttribute(SESSION_REQUEST_TENANT);
 		if (tenant == null) {
 			throw new AuthenticationException();
