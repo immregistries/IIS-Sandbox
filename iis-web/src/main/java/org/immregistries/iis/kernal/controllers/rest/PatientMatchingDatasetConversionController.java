@@ -9,7 +9,7 @@ import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r5.model.Bundle;
 import org.immregistries.iis.kernal.logic.match.PatientMismoConversionService;
 import org.immregistries.iis.kernal.mapping.requesters.FhirSearchRequester;
-import org.immregistries.iis.kernal.security.CurrentTenantUtil;
+import org.immregistries.iis.kernal.security.RequestTenantUtil;
 import org.immregistries.mismo.match.model.Patient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -33,7 +33,7 @@ public class PatientMatchingDatasetConversionController {
 
 	@PostMapping("/init")
 	public String initBuilder() throws IOException {
-		String tenantId = CurrentTenantUtil.getTenant().getOrganizationName();
+		String tenantId = RequestTenantUtil.getTenantFromContextRequest().getOrganizationName();
 		tenantId = tenantId.strip().replace("/", "");
 		File csvOutputFile = new File("./target/"+tenantId+".csv");
 		csvOutputFile.createNewFile();
@@ -72,7 +72,7 @@ public class PatientMatchingDatasetConversionController {
 			}
 		}
 
-		String tenantId = CurrentTenantUtil.getTenant().getOrganizationName();
+		String tenantId = RequestTenantUtil.getTenantFromContextRequest().getOrganizationName();
 		tenantId = tenantId.strip().replace("/", "");
 		File csvOutputFile = new File("./target/"+tenantId+".csv");
 		FileWriter fileWriter = new FileWriter(csvOutputFile, true);

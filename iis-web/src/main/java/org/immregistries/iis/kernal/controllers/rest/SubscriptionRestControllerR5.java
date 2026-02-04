@@ -9,6 +9,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.hl7.fhir.instance.model.api.IBaseBundle;
 import org.hl7.fhir.r5.model.Bundle;
 import org.hl7.fhir.r5.model.Subscription;
+import org.immregistries.iis.kernal.GlobalConstants;
 import org.immregistries.iis.kernal.controllers.IisRestPath;
 import org.immregistries.iis.kernal.logic.SubscriptionService;
 import org.immregistries.iis.kernal.mapping.IisFhirClientFactory;
@@ -19,8 +20,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.immregistries.iis.kernal.security.CurrentTenantUtil.SESSION_REQUEST_TENANT;
 
 @Conditional(OnR5Condition.class)
 @RestController
@@ -47,7 +46,7 @@ public class SubscriptionRestControllerR5 {
 
     @PostMapping("/trigger")
     public String triggerSubscription(
-            @RequestAttribute(name = SESSION_REQUEST_TENANT) Tenant tenant,
+		 @RequestAttribute(name = GlobalConstants.SESSION_REQUEST_TENANT) Tenant tenant,
             @RequestBody TriggerRequest triggerRequest,
             HttpServletRequest req) {
 

@@ -14,7 +14,7 @@ import org.immregistries.iis.kernal.enums.ProcessingFlavor;
 import org.immregistries.iis.kernal.mapping.requesters.FhirRequesterUtil;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.immregistries.iis.kernal.persisted.entities.UserAccess;
-import org.immregistries.iis.kernal.security.CurrentTenantUtil;
+import org.immregistries.iis.kernal.security.RequestTenantUtil;
 import org.immregistries.iis.kernal.security.ServerSecurityConfig;
 import org.immregistries.iis.kernal.security.UserAccessUtil;
 import org.immregistries.iis.kernal.services.api.IDeployedApiUrlService;
@@ -49,10 +49,14 @@ public class UiUtil {
 	private IDeployedApiUrlService deployedUrlService;
 	@Autowired
 	private UrlTenantUtil urlTenantUtil;
+	@Autowired
+	private UserAccessUtil userAccessUtil;
+	@Autowired
+	private RequestTenantUtil requestTenantUtil;
 
 
 	public void doHeader(PrintWriter out, String title) {
-		doHeader(out, title, CurrentTenantUtil.getTenant());
+		doHeader(out, title, RequestTenantUtil.getTenantFromContextRequest());
 	}
 
 	/**
@@ -112,7 +116,7 @@ public class UiUtil {
 	public void doFooter(PrintWriter out) {
 		out.println("  </div>");
 		SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
-		UserAccess userAccess = UserAccessUtil.get().getUserAccess();
+		UserAccess userAccess = userAccessUtil.getUserAccess();
 		if (userAccess != null) {
 			out.println("  <div class=\"w3-container\">");
 			out.println("    <p><a href=\"" + deployedUrlService.getContextPath() + "/logout\">Logout</a></p>");
@@ -179,9 +183,9 @@ public class UiUtil {
 
 	public @NotNull Tenant getTenantRedirectIfNone(HttpServletRequest req,
 																  HttpServletResponse resp) throws IOException {
-		Tenant tenant = CurrentTenantUtil.getTenant(req);
+		Tenant tenant = requestTenantUtil.getTenant(req);
 		if (tenant == null) {
-			if (UserAccessUtil.get().getUserAccess() != null) {
+			if (userAccessUtil.getUserAccess() != null) {
 				resp.sendRedirect(deployedUrlService.getContextPath() +
 					TenantController.TENANT_BASE_PATH);
 			}

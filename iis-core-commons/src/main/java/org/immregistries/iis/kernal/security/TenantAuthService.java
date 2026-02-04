@@ -7,11 +7,11 @@ import ca.uhn.fhir.rest.api.server.SystemRequestDetails;
 import ca.uhn.fhir.rest.server.exceptions.AuthenticationException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
-import org.immregistries.iis.kernal.services.PartitionCreationService;
-import org.immregistries.iis.kernal.services.PartitionNameExtractorService;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.immregistries.iis.kernal.persisted.entities.UserAccess;
 import org.immregistries.iis.kernal.persisted.repository.TenantRepository;
+import org.immregistries.iis.kernal.services.PartitionCreationService;
+import org.immregistries.iis.kernal.services.PartitionNameExtractorService;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -43,6 +43,8 @@ public class TenantAuthService implements InitializingBean {
 	private PartitionCreationService partitionCreationService;
 	@Autowired
 	private IPartitionLookupSvc partitionLookupSvc;
+	@Autowired
+	private UserAccessUtil userAccessUtil;
 
 	public static TenantAuthService get() {
 		return instance;
@@ -149,14 +151,14 @@ public class TenantAuthService implements InitializingBean {
 
 	public RequestDetails requestDetailsWithPartitionName() {
 		PartitionEntity partitionEntity = partitionLookupSvc
-				.getPartitionByName(CurrentTenantUtil.getTenant().getOrganizationName());
+			.getPartitionByName(RequestTenantUtil.getTenantFromContextRequest().getOrganizationName());
 		if (partitionEntity == null) {
 			// return SystemRequestDetails.forAllPartitions();
 			throw new RuntimeException("No partition found");
 		}
 		RequestDetails requestDetails = SystemRequestDetails
 				.forRequestPartitionId(partitionEntity.toRequestPartitionId());
-		requestDetails.setTenantId(CurrentTenantUtil.getTenant().getOrganizationName());
+		requestDetails.setTenantId(RequestTenantUtil.getTenantFromContextRequest().getOrganizationName());
 		return requestDetails;
 	}
 

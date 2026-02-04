@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.instance.model.api.IAnyResource;
+import org.immregistries.iis.kernal.GlobalConstants;
 import org.immregistries.iis.kernal.controllers.IisRestPath;
 import org.immregistries.iis.kernal.controllers.servlet.util.PatientServletUtil;
 import org.immregistries.iis.kernal.logic.shlink.ShLinkManifestGenerator;
@@ -17,7 +18,6 @@ import org.immregistries.iis.kernal.mapping.requesters.FhirSearchRequester;
 import org.immregistries.iis.kernal.model.shlink.ShLinkManifestRequestBody;
 import org.immregistries.iis.kernal.persisted.entities.ShLinkManifest;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
-import org.immregistries.iis.kernal.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.security.TenantAuthService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,7 +56,7 @@ public class PatientShLinkManifestRestController {
 	protected ShLinkManifest postPatientShLinkManifest(HttpServletRequest req, HttpServletResponse resp,
 			@PathVariable(value = "id", required = false) String id,
 			@PathVariable(PARAM_TENANT_ID) String tenantId,
-			@RequestAttribute(CurrentTenantUtil.SESSION_REQUEST_TENANT) Tenant tenant,
+																		@RequestAttribute(GlobalConstants.SESSION_REQUEST_TENANT) Tenant tenant,
 			@RequestBody ShLinkManifestRequestBody body) throws IOException, ServletException {
 		String passcode = body.getPasscode();
 		if (StringUtils.isNotBlank(passcode)) {
@@ -71,7 +71,7 @@ public class PatientShLinkManifestRestController {
 	@GetMapping({ "/patient", "/patient/{id}" })
 	protected ShLinkManifest getPatientShLinkManifest(HttpServletRequest req, HttpServletResponse resp,
 			@PathVariable(value = "id", required = false) String id,
-			@RequestAttribute(CurrentTenantUtil.SESSION_REQUEST_TENANT) Tenant tenant,
+																	  @RequestAttribute(GlobalConstants.SESSION_REQUEST_TENANT) Tenant tenant,
 			@RequestParam(value = "recipient", required = false) String recipient,
 			@RequestParam(value = "passcode", required = false) String passcode,
 			@RequestParam(value = "embeddedLengthMax", required = false) String embeddedLengthMax) {

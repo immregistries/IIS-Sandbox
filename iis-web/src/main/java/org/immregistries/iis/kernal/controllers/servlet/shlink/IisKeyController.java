@@ -11,7 +11,7 @@ import org.immregistries.iis.kernal.controllers.servlet.util.UiUtil;
 import org.immregistries.iis.kernal.controllers.servlet.util.UrlTenantUtil;
 import org.immregistries.iis.kernal.persisted.entities.IisKey;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
-import org.immregistries.iis.kernal.security.CurrentTenantUtil;
+import org.immregistries.iis.kernal.security.RequestTenantUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -46,7 +46,7 @@ public class IisKeyController {
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		try {
 			Tenant tenant = uiUtil.getTenantRedirectIfNone(req, resp);
-			uiUtil.doHeader(out, "IIS Sandbox Keystore", CurrentTenantUtil.getTenant());
+			uiUtil.doHeader(out, "IIS Sandbox Keystore", RequestTenantUtil.getTenantFromContextRequest());
 			out.println("    <div class=\"w3-container w3-half w3-margin-top\">");
 			out.println("    <h2>Facility: " + tenant.getOrganizationName() + "</h2>");
 			out.println("    <h3>Keys used for signing Smart Health Cards (generated for the user)</h3>");

@@ -1,8 +1,8 @@
 package org.immregistries.iis.kernal.controllers.rest;
 
+import org.immregistries.iis.kernal.GlobalConstants;
 import org.immregistries.iis.kernal.controllers.IisPathVariable;
 import org.immregistries.iis.kernal.controllers.IisRestPath;
-
 import org.immregistries.iis.kernal.persisted.entities.MessageReceived;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.immregistries.iis.kernal.persisted.repository.MessageReceivedRepository;
@@ -10,8 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
-import static org.immregistries.iis.kernal.security.CurrentTenantUtil.SESSION_REQUEST_TENANT;
 
 @RestController
 @RequestMapping(IisRestPath.REST_TENANT_PATH + IisRestPath.BasePath.MESSAGE_PATH)
@@ -22,14 +20,14 @@ public class MessageRestController {
 
     @GetMapping(IisPathVariable.PlaceHolder.PATIENT_ID_PLACEHOLDER)
     public List<MessageReceived> getPatientMessages(
-            @RequestAttribute(name = SESSION_REQUEST_TENANT) Tenant tenant,
+		 @RequestAttribute(name = GlobalConstants.SESSION_REQUEST_TENANT) Tenant tenant,
             @PathVariable(IisPathVariable.Key.PATIENT_ID) String patientId) {
         return messageReceivedRepository.findByTenantAndPatientReportedId(tenant, patientId);
     }
 
     @GetMapping
     public List<MessageReceived> getMessages(
-            @RequestAttribute(name = SESSION_REQUEST_TENANT) Tenant tenant,
+		 @RequestAttribute(name = GlobalConstants.SESSION_REQUEST_TENANT) Tenant tenant,
             @RequestParam(required = false) String search) {
 
         List<MessageReceived> messageReceivedList = messageReceivedRepository

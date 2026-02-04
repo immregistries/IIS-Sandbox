@@ -9,7 +9,7 @@ import org.immregistries.iis.kernal.controllers.rest.TenantRestController;
 import org.immregistries.iis.kernal.controllers.servlet.util.UiUtil;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.immregistries.iis.kernal.persisted.entities.UserAccess;
-import org.immregistries.iis.kernal.security.CurrentTenantUtil;
+import org.immregistries.iis.kernal.security.RequestTenantUtil;
 import org.immregistries.iis.kernal.security.TenantAuthService;
 import org.immregistries.iis.kernal.security.UserAccessUtil;
 import org.immregistries.iis.kernal.services.api.IDeployedApiUrlService;
@@ -60,8 +60,9 @@ public class TenantController {
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp,
 			@RequestParam(name = PARAM_TENANT_NAME) @NotBlank String tenantName)
 			throws ServletException, IOException {
-		UserAccess userAccess = UserAccessUtil.get().getUserAccess();
-		tenantAuthService.authenticateTenant(userAccess, tenantName);
+		Tenant tenant = new Tenant();
+		tenant.setOrganizationName(tenantName);
+		tenantRestController.createTenant(tenant);
 		resp.sendRedirect(deployedApiUrlService.getContextPath() + TENANT_BASE_PATH + "/" + tenantName + TENANT_BASE_PATH);
 		doGet(req, resp);
 	}
@@ -85,7 +86,7 @@ public class TenantController {
 		String action = req.getParameter(PARAM_ACTION);
 		String tenantId = req.getParameter(PARAM_TENANT_ID);
 
-		Tenant tenant = CurrentTenantUtil.getTenant(req);
+		Tenant tenant = RequestTenantUtil.getTenant(req);
 		UserAccess userAccess = UserAccessUtil.get().getUserAccess();
 		if (userAccess != null && session != null) {
 			List<Tenant> tenantList = tenantRestController.getTenants(req);

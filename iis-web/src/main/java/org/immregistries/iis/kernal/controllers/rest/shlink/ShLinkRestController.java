@@ -2,12 +2,12 @@ package org.immregistries.iis.kernal.controllers.rest.shlink;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
+import org.immregistries.iis.kernal.GlobalConstants;
 import org.immregistries.iis.kernal.controllers.IisRestParam;
 import org.immregistries.iis.kernal.controllers.IisRestPath;
 import org.immregistries.iis.kernal.logic.shlink.generation.ShLinkGenerator;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.immregistries.iis.kernal.persisted.entities.UserAccess;
-import org.immregistries.iis.kernal.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.security.UserAccessUtil;
 import org.immregistries.iis.kernal.services.QrCodeEncoder;
 import org.slf4j.Logger;
@@ -42,7 +42,7 @@ public class ShLinkRestController {
 			@RequestParam(IisRestParam.PATIENT_ID) String patientId,
 			@RequestParam(IisRestParam.ShLink.FLAG) String flag,
 			@RequestParam(value = IisRestParam.ShLink.EXP, required = false, defaultValue = "10000000") String exp,
-			@RequestAttribute(CurrentTenantUtil.SESSION_REQUEST_TENANT) Tenant tenant)
+											@RequestAttribute(GlobalConstants.SESSION_REQUEST_TENANT) Tenant tenant)
 			throws IOException, NoSuchAlgorithmException {
 		UserAccess userAccess = UserAccessUtil.get().getUserAccess();
 		String qrCode = shLinkGenerator.generateShLink(req, keyId, secretKey, patientId, flag, exp, tenant, userAccess);
@@ -56,7 +56,7 @@ public class ShLinkRestController {
 			@RequestParam(IisRestParam.PATIENT_ID) String patientId,
 			@RequestParam(IisRestParam.ShLink.FLAG) String flag,
 			@RequestParam(value = IisRestParam.ShLink.EXP, required = false, defaultValue = "10000000") String exp,
-			@RequestAttribute(CurrentTenantUtil.SESSION_REQUEST_TENANT) Tenant tenant)
+															 @RequestAttribute(GlobalConstants.SESSION_REQUEST_TENANT) Tenant tenant)
 			throws ServletException, IOException, NoSuchAlgorithmException {
 		String qrCode = shLinkIPSQrCode(req, keyId, secretKey, patientId, flag, exp, tenant);
 		HttpHeaders headers = new HttpHeaders();

@@ -1,8 +1,8 @@
 package org.immregistries.iis.kernal.controllers.rest;
 
-import org.immregistries.iis.kernal.controllers.IisRestPath;
-
 import jakarta.servlet.http.HttpServletRequest;
+import org.immregistries.iis.kernal.GlobalConstants;
+import org.immregistries.iis.kernal.controllers.IisRestPath;
 import org.immregistries.iis.kernal.logic.match.VacDedupRequest;
 import org.immregistries.iis.kernal.logic.match.VaccinationDedupService;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
@@ -11,8 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
-import static org.immregistries.iis.kernal.security.CurrentTenantUtil.SESSION_REQUEST_TENANT;
 
 @RestController
 @RequestMapping(IisRestPath.REST_TENANT_PATH + IisRestPath.BasePath.VAC_DEDUP_PATH)
@@ -23,7 +21,7 @@ public class VacDedupRestController {
 
 	@PostMapping
 	public List<LinkedImmunization> deduplicate(
-			@RequestAttribute(name = SESSION_REQUEST_TENANT) Tenant tenant,
+		@RequestAttribute(name = GlobalConstants.SESSION_REQUEST_TENANT) Tenant tenant,
 			@RequestBody VacDedupRequest vacDedupRequest,
 			HttpServletRequest req) {
 

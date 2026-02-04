@@ -41,6 +41,8 @@ public class UserAccessUtil implements InitializingBean {
 
 	@Autowired
 	private UserAccessRepository userAccessRepository;
+	@Autowired
+	private RequestTenantUtil requestTenantUtil;
 
 
 	public UserAccess authenticateUserAccessUsernamePassword(String username, String password) {
@@ -123,7 +125,7 @@ public class UserAccessUtil implements InitializingBean {
         }
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
                 .getRequest();
-        Tenant tenant = CurrentTenantUtil.getTenant(request); // TODO test if commenting breaks anything, might be
+		 Tenant tenant = requestTenantUtil.getTenant(request); // TODO test if commenting breaks anything, might be
                                                               // useless, or
         // only used
         // for subscription/ bulk

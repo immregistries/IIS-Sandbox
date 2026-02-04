@@ -9,13 +9,14 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.NotNull;
 import org.apache.commons.lang3.StringUtils;
+import org.immregistries.iis.kernal.GlobalConstants;
 import org.immregistries.iis.kernal.controllers.IisRestPath;
 import org.immregistries.iis.kernal.controllers.servlet.SoapDescriptionController;
 import org.immregistries.iis.kernal.logic.hl7v2.BaseIISSOAPServer;
 import org.immregistries.iis.kernal.logic.hl7v2.handling.FhirMessagingHandler;
 import org.immregistries.iis.kernal.logic.hl7v2.handling.V2IncomingMessageHandler;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
-import org.immregistries.iis.kernal.security.CurrentTenantUtil;
+import org.immregistries.iis.kernal.security.RequestTenantUtil;
 import org.immregistries.iis.kernal.security.TenantAuthService;
 import org.immregistries.smm.cdc.CDCWSDLServer;
 import org.immregistries.smm.cdc.Fault;
@@ -33,7 +34,6 @@ import static org.immregistries.iis.kernal.controllers.IisRestPath.BasePath.FHIR
 import static org.immregistries.iis.kernal.controllers.servlet.PopController.PARAM_FACILITY_NAME;
 import static org.immregistries.iis.kernal.controllers.servlet.PopController.PARAM_MESSAGE;
 import static org.immregistries.iis.kernal.controllers.servlet.TenantController.TENANT_NAME;
-import static org.immregistries.iis.kernal.security.CurrentTenantUtil.SESSION_REQUEST_TENANT;
 
 @RestController
 @RequestMapping({ IisRestPath.BasePath.REST_PATH + FHIR_MESSAGING_PATH,
@@ -45,6 +45,8 @@ public class FhirMessagingRestController {
 	private FhirContext fhirContext;
 	@Autowired
 	private FhirMessagingHandler fhirMessagingHandler;
+	@Autowired
+	private RequestTenantUtil requestTenantUtil;
 
 	@Autowired
 	private TenantAuthService tenantAuthService;
@@ -54,7 +56,7 @@ public class FhirMessagingRestController {
 	@PostMapping(produces = MediaType.TEXT_PLAIN_VALUE)
 	protected String doPost(@RequestParam(PARAM_MESSAGE) String message,
 			@RequestParam(PARAM_FACILITY_NAME) String facilityName,
-			@RequestAttribute(SESSION_REQUEST_TENANT) @NotNull Tenant tenant)
+									@RequestAttribute(GlobalConstants.SESSION_REQUEST_TENANT) @NotNull Tenant tenant)
 			throws ServletException, IOException, HL7Exception {
 		// resp.setContentType("text/html");
 		if (StringUtils.isBlank(message)) {
@@ -99,7 +101,7 @@ public class FhirMessagingRestController {
 
 		String path = req.getPathInfo();
 		final String processorName = path == null ? "" : (path.startsWith("/") ? path.substring(1) : path);
-		CDCWSDLServer server = new BaseIISSOAPServer(tenantName, tenantAuthService) {
+		CDCWSDLServer server = new BaseIISSOAPServer(tenantName, tenantAuthService, requestTenantUtil) {
 			@Override
 			public void process(SubmitSingleMessage ssm, PrintWriter out) throws Fault {
 
@@ -112,11 +114,11 @@ public class FhirMessagingRestController {
 					 * Tenant is accessed through RequestContext, and was previously set through the
 					 * authorize method of WSDL server in BaseIISSOAPServer.java
 					 */
-					Tenant tenant = CurrentTenantUtil.getTenant();
+					Tenant tenant = RequestTenantUtil.getTenantFromContextRequest();
 					if (tenant == null) {
 						throw new SecurityException("Username/password combination is unrecognized");
 					} else {
-						req.setAttribute(SESSION_REQUEST_TENANT, tenant);
+						req.setAttribute(GlobalConstants.SESSION_REQUEST_TENANT, tenant);
 						ack = processInput(message, tenant, facilityId);
 					}
 				} catch (Exception e) {

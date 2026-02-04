@@ -5,10 +5,11 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.immregistries.iis.kernal.GlobalConstants;
 import org.immregistries.iis.kernal.controllers.IisRestPath;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
-import org.immregistries.iis.kernal.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.security.TenantAuthService;
+import org.immregistries.iis.kernal.security.UserAccessUtil;
 import org.immregistries.iis.kernal.services.api.IDeployedApiUrlService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,8 +25,7 @@ public class RestTenantUrlFilter extends OncePerRequestFilter {
 	@Autowired
 	private IDeployedApiUrlService deployedApiUrlService;
 
-
-	public static final String TENANT_REQUEST_ATTRIBUTE = CurrentTenantUtil.SESSION_REQUEST_TENANT;
+	public static final String TENANT_REQUEST_ATTRIBUTE = GlobalConstants.SESSION_REQUEST_TENANT;
 	private static final Logger logger = LoggerFactory.getLogger(RestTenantUrlFilter.class);
 
 	private String tenantPrefix() {
@@ -34,6 +34,9 @@ public class RestTenantUrlFilter extends OncePerRequestFilter {
 
 	@Autowired
 	private TenantAuthService tenantAuthService;
+
+	@Autowired
+	private UserAccessUtil userAccessUtil;
 
 	@Override
 	public void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -47,21 +50,21 @@ public class RestTenantUrlFilter extends OncePerRequestFilter {
 			filterChain.doFilter(request, response);
 		}
 		if (path.startsWith(tenantPrefix())) {
+			/**
+			 * TODO optimize prefix length calculus
+			 */
 			String remainingPath = path.substring(tenantPrefix().length());
 			int slashIndex = remainingPath.indexOf('/');
-			String tenantId;
+			String tenantName;
 			if (slashIndex > 0) {
-				tenantId = remainingPath.substring(0, slashIndex);
+				tenantName = remainingPath.substring(0, slashIndex);
 			} else {
-				tenantId = remainingPath;
+				tenantName = remainingPath;
 			}
 			try {
-				int tenantIdInt = Integer.parseInt(tenantId);
-				Tenant tenant = tenantAuthService.getTenantByIdAuthenticated(tenantIdInt);
-				request.setAttribute(CurrentTenantUtil.TENANT_ID_URL, tenantId);
+				Tenant tenant = tenantAuthService.authenticateTenant(userAccessUtil.getUserAccess(), tenantName);
+				request.setAttribute(GlobalConstants.TENANT_NAME_URL, tenantName);
 				request.setAttribute(TENANT_REQUEST_ATTRIBUTE, tenant);
-			} catch (NumberFormatException e) {
-				logger.warn("Invalid tenant ID format in URL: {}", tenantId);
 			} catch (Exception e) {
 				logger.warn("Could not authenticate tenant for logging: {}", e.getMessage());
 			}

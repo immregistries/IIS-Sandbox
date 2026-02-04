@@ -3,12 +3,12 @@ package org.immregistries.iis.kernal.controllers.rest;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.immregistries.iis.kernal.controllers.rest.filters.RestTenantUrlFilter;
 import org.immregistries.iis.kernal.controllers.IisRestPath;
+import org.immregistries.iis.kernal.controllers.rest.filters.RestTenantUrlFilter;
 import org.immregistries.iis.kernal.logic.hl7v2.BaseIISSOAPServer;
 import org.immregistries.iis.kernal.logic.hl7v2.handling.V2IncomingMessageHandler;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
-import org.immregistries.iis.kernal.security.CurrentTenantUtil;
+import org.immregistries.iis.kernal.security.RequestTenantUtil;
 import org.immregistries.iis.kernal.security.TenantAuthService;
 import org.immregistries.smm.cdc.CDCWSDLServer;
 import org.immregistries.smm.cdc.Fault;
@@ -31,6 +31,8 @@ public class SoapRestController {
 	@Autowired
 	private TenantAuthService tenantAuthService;
 	@Autowired
+	private RequestTenantUtil requestTenantUtil;
+	@Autowired
 	private V2IncomingMessageHandler handler;
 
 	@PostMapping
@@ -46,7 +48,7 @@ public class SoapRestController {
 		}
 		String path = req.getPathInfo();
 		final String processorName = path == null ? "" : (path.startsWith("/") ? path.substring(1) : path);
-		CDCWSDLServer server = new BaseIISSOAPServer(tenantName, tenantAuthService) {
+		CDCWSDLServer server = new BaseIISSOAPServer(tenantName, tenantAuthService, requestTenantUtil) {
 			@Override
 			public void process(SubmitSingleMessage ssm, PrintWriter out) throws Fault {
 				String message = ssm.getHl7Message();
@@ -57,7 +59,7 @@ public class SoapRestController {
 					 * Tenant is accessed through RequestContext, and was previously set through the
 					 * authorize method of WSDL server
 					 */
-					Tenant tenant = CurrentTenantUtil.getTenant();
+					Tenant tenant = RequestTenantUtil.getTenantFromContextRequest();
 					if (tenant == null) {
 						throw new SecurityException("Username/password combination is unrecognized");
 					} else {

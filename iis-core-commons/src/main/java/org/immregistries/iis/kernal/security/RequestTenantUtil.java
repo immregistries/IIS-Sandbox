@@ -1,5 +1,6 @@
 package org.immregistries.iis.kernal.security;
 
+import ca.uhn.fhir.rest.api.server.RequestDetails;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.immregistries.iis.kernal.GlobalConstants;
@@ -7,6 +8,7 @@ import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.immregistries.iis.kernal.persisted.entities.UserAccess;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -14,17 +16,28 @@ import org.springframework.web.context.request.ServletRequestAttributes;
  * static class providing tools related to the Tenant selected using request
  * context
  */
-public final class CurrentTenantUtil {
+@Service
+public class RequestTenantUtil {
 
-	public static final String TENANT_ID_URL = GlobalConstants.TENANT_ID_URL;
-	public static final String TENANT_NAME_URL = GlobalConstants.TENANT_NAME_URL;
-
-	public static final String SESSION_REQUEST_TENANT = GlobalConstants.SESSION_REQUEST_TENANT;
-
-	public static Tenant getTenant() {
+	public static Tenant getTenantFromContextRequest() {
 		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
 				.getRequest();
 		return getTenant(request);
+	}
+
+	public Tenant getTenant(RequestDetails theRequestDetails) {
+		Object attribute = theRequestDetails.getAttribute(GlobalConstants.SESSION_REQUEST_TENANT);
+		if (attribute != null) {
+			return (Tenant) attribute;
+		} else {
+			String tenantName = theRequestDetails.getTenantId();
+			if (StringUtils.isNotBlank(tenantName)) {
+				Tenant tenant = getTenantFromName(tenantName);
+				setTenantForRequestDetails(theRequestDetails, tenant);
+				return tenant;
+			}
+		}
+		return null;
 	}
 
 	public static Tenant getTenant(HttpServletRequest request) {
@@ -35,12 +48,12 @@ public final class CurrentTenantUtil {
 		/*
 		 * If Tenant was already set as attribute return it
 		 */
-		Tenant requestTenant = (Tenant) request.getAttribute(SESSION_REQUEST_TENANT);
+		Tenant requestTenant = (Tenant) request.getAttribute(GlobalConstants.SESSION_REQUEST_TENANT);
 		if (requestTenant != null) {
 			tenant = requestTenant;
 		} else {
-			String urlTenantName = (String) request.getAttribute(TENANT_NAME_URL);
-			Object tenantIdUrlAttribute = request.getAttribute(TENANT_ID_URL);
+			String urlTenantName = (String) request.getAttribute(GlobalConstants.TENANT_NAME_URL);
+			Object tenantIdUrlAttribute = request.getAttribute(GlobalConstants.TENANT_ID_URL);
 			int urlTenantId = 0;
 			if (tenantIdUrlAttribute != null) {
 				urlTenantId = (int) tenantIdUrlAttribute;
@@ -56,7 +69,7 @@ public final class CurrentTenantUtil {
 				tenant = null; //TODO change
 			} else if (StringUtils.isNotBlank(urlTenantName)) {
 				tenant = getTenantFromName(urlTenantName);
-				request.setAttribute(SESSION_REQUEST_TENANT, tenant);
+				setTenantForRequest(request, tenant);
 			} else {
 				tenant = null;
 			}
@@ -64,7 +77,7 @@ public final class CurrentTenantUtil {
 		return tenant;
 	}
 
-	public static Tenant getTenantFromName(String pathVariable) {
+	private static Tenant getTenantFromName(String pathVariable) {
 		Tenant tenant = null;
 		if (StringUtils.isNotBlank(pathVariable)) {
 			UserAccess userAccess = null;
@@ -74,6 +87,17 @@ public final class CurrentTenantUtil {
 			}
 			tenant = TenantAuthService.get().authenticateTenant(userAccess, pathVariable);
 		}
+		return tenant;
+	}
+
+
+	public Tenant setTenantForRequestDetails(RequestDetails requestDetails, Tenant tenant) {
+		requestDetails.setAttribute(GlobalConstants.SESSION_REQUEST_TENANT, tenant);
+		return tenant;
+	}
+
+	public static Tenant setTenantForRequest(HttpServletRequest request, Tenant tenant) {
+		request.setAttribute(GlobalConstants.SESSION_REQUEST_TENANT, tenant);
 		return tenant;
 	}
 

@@ -9,7 +9,7 @@ public final class IisRestPath {
 
 	public static final String SHLINK_CONTENT_PATH = BasePath.REST_PATH + "/" + SHLINK_FILES;
 
-	public static final String REST_TENANT_PATH = BasePath.REST_PATH + BasePath.TENANT_PATH + IisPathVariable.PlaceHolder.TENANT_ID_PLACEHOLDER;
+	public static final String REST_TENANT_PATH = BasePath.REST_PATH + BasePath.TENANT_PATH + IisPathVariable.PlaceHolder.TENANT_NAME_PLACEHOLDER;
 	public static final String REST_PATIENT_PATH = REST_TENANT_PATH + BasePath.PATIENT_PATH + IisPathVariable.PlaceHolder.PATIENT_ID_PLACEHOLDER;
 	public static final String MANIFEST_FULL_PATH = REST_TENANT_PATH + BasePath.MANIFEST_PATH;
 

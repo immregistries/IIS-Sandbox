@@ -13,7 +13,7 @@ import org.hl7.fhir.instance.model.api.IIdType;
 import org.hl7.fhir.r5.model.*;
 import org.immregistries.iis.kernal.mapping.IisFhirClientFactory;
 import org.immregistries.iis.kernal.mapping.mappers.resources.r5.OrganizationMapperR5;
-import org.immregistries.iis.kernal.security.CurrentTenantUtil;
+import org.immregistries.iis.kernal.security.RequestTenantUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
@@ -76,7 +76,7 @@ public class IpsGenerationStrategyR5 extends DefaultJpaIpsGenerationStrategy imp
 
 	@Override
 	public IAnyResource createAuthor() {
-		Organization organization = organizationMapper.fhirObject(CurrentTenantUtil.getTenant());
+		Organization organization = organizationMapper.fhirObject(RequestTenantUtil.getTenantFromContextRequest());
 		return organization;
 	}
 

@@ -4,10 +4,9 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
-import org.immregistries.iis.kernal.controllers.servlet.TenantController;
+import org.immregistries.iis.kernal.GlobalConstants;
 import org.immregistries.iis.kernal.controllers.WellKnownKeyController;
-import org.immregistries.iis.kernal.security.CurrentTenantUtil;
+import org.immregistries.iis.kernal.controllers.servlet.TenantController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.AntPathMatcher;
@@ -43,7 +42,7 @@ public class TenantUrlFilter extends OncePerRequestFilter {
 			return;
 		}
 		path = path.substring(0, indexOfNext);
-		request.setAttribute(CurrentTenantUtil.TENANT_NAME_URL, path);
+		request.setAttribute(GlobalConstants.TENANT_NAME_URL, path);
 		filterChain.doFilter(request, response);
 	}
 

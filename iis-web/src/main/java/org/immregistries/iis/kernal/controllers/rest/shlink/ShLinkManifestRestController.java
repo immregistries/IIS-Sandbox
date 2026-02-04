@@ -9,7 +9,7 @@ import org.immregistries.iis.kernal.logic.shlink.ShLinkManifestGenerator;
 import org.immregistries.iis.kernal.logic.shlink.ShLinkManifestStoreService;
 import org.immregistries.iis.kernal.persisted.entities.ShLinkManifest;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
-import org.immregistries.iis.kernal.security.CurrentTenantUtil;
+import org.immregistries.iis.kernal.security.RequestTenantUtil;
 import org.immregistries.iis.kernal.security.TenantAuthService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +31,8 @@ public class ShLinkManifestRestController {
 	private ShLinkManifestStoreService shlinkManifestStoreService;
 	@Autowired
 	private TenantAuthService tenantAuthService;
+	@Autowired
+	private RequestTenantUtil requestTenantUtil;
 
 	@GetMapping(IisPathVariable.PlaceHolder.MANIFEST_ID_PLACEHOLDER)
 	public ShLinkManifest getManifest(@PathVariable(IisPathVariable.Key.MANIFEST_ID) String manifestId) {
@@ -40,13 +42,13 @@ public class ShLinkManifestRestController {
 	@PostMapping(IisPathVariable.PlaceHolder.MANIFEST_ID_PLACEHOLDER)
 	protected ShLinkManifest readShLinkManifest(
 			@PathVariable(IisPathVariable.Key.MANIFEST_ID) String manifestId,
-			@PathVariable(IisPathVariable.Key.TENANT_ID) int tenantId,
+			@PathVariable(IisPathVariable.Key.TENANT_NAME) String tenantName,
 			@RequestParam(value = IisRestParam.ShLink.RECIPIENT, required = false) String recipient,
 			@RequestParam(value = IisRestParam.ShLink.PASSCODE, required = false) String passcode,
 			@RequestParam(value = IisRestParam.ShLink.EMBEDDED_LENGTH_MAX, required = false) String embeddedLengthMax) {
 		Tenant tenant = null;
 		if (StringUtils.isNoneBlank(passcode)) {
-			tenant = tenantAuthService.authenticateTenantNoUsername(tenantId, passcode);
+			tenant = tenantAuthService.authenticateTenantNoUsername(tenantName, passcode);
 		}
 		if (tenant == null) {
 			throw new AuthenticationCredentialsNotFoundException("Invalid passcode");
@@ -61,7 +63,7 @@ public class ShLinkManifestRestController {
 
 	@GetMapping("/$generate")
 	public ShLinkManifest genManifest(HttpServletRequest req) {
-		ShLinkManifest shLinkManifest = shLinkManifestGenerator.generateManifest(CurrentTenantUtil.getTenant(req));
+		ShLinkManifest shLinkManifest = shLinkManifestGenerator.generateManifest(requestTenantUtil.getTenant(req));
 		return shlinkManifestStoreService.saveManifest(shLinkManifest);
 	}
 

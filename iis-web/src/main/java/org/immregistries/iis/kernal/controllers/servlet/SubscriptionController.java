@@ -13,7 +13,7 @@ import org.immregistries.iis.kernal.controllers.servlet.util.UiUtil;
 import org.immregistries.iis.kernal.controllers.servlet.util.UrlTenantUtil;
 import org.immregistries.iis.kernal.mapping.IisFhirClientFactory;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
-import org.immregistries.iis.kernal.security.CurrentTenantUtil;
+import org.immregistries.iis.kernal.security.RequestTenantUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -136,7 +136,7 @@ public class SubscriptionController {
 			PrintWriter out, IGenericClient fhirClient, String subscriptionId) {
 
 		try {
-			uiUtil.doHeader(out, "IIS Sandbox - Subscriptions", CurrentTenantUtil.getTenant());
+			uiUtil.doHeader(out, "IIS Sandbox - Subscriptions", RequestTenantUtil.getTenantFromContextRequest());
 			ServletInputStream servletInputStream = req.getInputStream();
 
 			String[] initialMessages = new String[] { OPERATION_SAMPLE };
@@ -228,7 +228,7 @@ public class SubscriptionController {
 				bundle = fhirClient.search().forResource(Subscription.class).returnBundle(Bundle.class).execute();
 			}
 
-			uiUtil.doHeader(out, "IIS Sandbox - Subscriptions", CurrentTenantUtil.getTenant());
+			uiUtil.doHeader(out, "IIS Sandbox - Subscriptions", RequestTenantUtil.getTenantFromContextRequest());
 
 			out.println("    <div class=\"w3-container w3-half w3-margin-top\">");
 			out.println("    <h3>Search Subscription</h3>");

@@ -8,7 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.immregistries.iis.kernal.controllers.servlet.util.UiUtil;
 import org.immregistries.iis.kernal.controllers.servlet.util.UrlTenantUtil;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
-import org.immregistries.iis.kernal.security.CurrentTenantUtil;
+import org.immregistries.iis.kernal.security.RequestTenantUtil;
 import org.immregistries.iis.kernal.services.api.IDeployedApiUrlService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -45,14 +45,14 @@ public class HomeController {
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 
-		Tenant tenant = CurrentTenantUtil.getTenant(req);
+		Tenant tenant = RequestTenantUtil.getTenant(req);
 		String tenantName = "{tenantName}";
 		if (tenant != null) {
 			tenantName = tenant.getOrganizationName();
 		}
 
 		try {
-			uiUtil.doHeader(out, "IIS Sandbox - Home", CurrentTenantUtil.getTenant());
+			uiUtil.doHeader(out, "IIS Sandbox - Home", RequestTenantUtil.getTenantFromContextRequest());
 			out.println("    <div class=\"w3-container w3-half w3-margin-top\">");
 			out.println(
 					"    <div class=\"w3-panel w3-yellow\"><p class=\"w3-left-align\">This system is for test purposes only. "

@@ -3,15 +3,15 @@ package org.immregistries.iis.kernal.controllers.servlet.legacy;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.immregistries.iis.kernal.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.controllers.servlet.TenantController;
 import org.immregistries.iis.kernal.controllers.servlet.util.UiUtil;
+import org.immregistries.iis.kernal.security.RequestTenantUtil;
 import org.immregistries.mqe.hl7util.parser.HL7Reader;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -191,7 +191,7 @@ public class LabController {
           }
         }
       }
-      uiUtil.doHeader(out, "IIS Sandbox", CurrentTenantUtil.getTenant(req));
+      uiUtil.doHeader(out, "IIS Sandbox", RequestTenantUtil.getTenant(req));
 
       if (messageError != null) {
         out.println("  <div class=\"w3-panel w3-red\">");

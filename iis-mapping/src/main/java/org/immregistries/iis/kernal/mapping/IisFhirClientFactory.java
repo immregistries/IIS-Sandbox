@@ -15,7 +15,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.immregistries.iis.kernal.GlobalConstants;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.immregistries.iis.kernal.persisted.entities.UserAccess;
-import org.immregistries.iis.kernal.security.CurrentTenantUtil;
+import org.immregistries.iis.kernal.security.RequestTenantUtil;
 import org.immregistries.iis.kernal.services.api.IDeployedApiUrlService;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -50,6 +50,8 @@ public class IisFhirClientFactory extends ApacheRestfulClientFactory {
 
 	@Autowired
 	private IDeployedApiUrlService apiUrlService;
+	@Autowired
+	private RequestTenantUtil requestTenantUtil;
 
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	private LoggingInterceptor loggingInterceptor;
@@ -132,7 +134,7 @@ public class IisFhirClientFactory extends ApacheRestfulClientFactory {
 
 	public IGenericClient getOrCreateGenericClient(HttpServletRequest request) {
 		if (request.getAttribute(GlobalConstants.FHIR_CLIENT_REQUEST_ATTRIBUTE) == null) {
-			Tenant tenant = CurrentTenantUtil.getTenant(request);
+			Tenant tenant = requestTenantUtil.getTenant(request);
 			if (tenant != null) {
 				request.setAttribute(GlobalConstants.FHIR_CLIENT_REQUEST_ATTRIBUTE, newGenericClient(tenant, request));
 			} else {

@@ -7,7 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.immregistries.iis.kernal.controllers.rest.PopRestController;
 import org.immregistries.iis.kernal.controllers.servlet.util.UiUtil;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
-import org.immregistries.iis.kernal.security.CurrentTenantUtil;
+import org.immregistries.iis.kernal.security.RequestTenantUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +46,7 @@ public class PopController {
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		try {
-			Tenant tenant = CurrentTenantUtil.getTenant(req);
+			Tenant tenant = RequestTenantUtil.getTenant(req);
 
 			String ack = "";
 
@@ -77,7 +77,7 @@ public class PopController {
 	@GetMapping
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		resp.setContentType("text/html");
-		Tenant tenant = CurrentTenantUtil.getTenant(req);
+		Tenant tenant = RequestTenantUtil.getTenant(req);
 
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		try {

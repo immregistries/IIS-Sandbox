@@ -8,7 +8,7 @@ import org.immregistries.iis.kernal.controllers.servlet.util.PatientServletUtil;
 import org.immregistries.iis.kernal.controllers.servlet.util.UiUtil;
 import org.immregistries.iis.kernal.persisted.entities.MessageReceived;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
-import org.immregistries.iis.kernal.security.CurrentTenantUtil;
+import org.immregistries.iis.kernal.security.RequestTenantUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -73,7 +73,7 @@ public class MessageController {
 				out.println("  </div>");
 			}
 
-			Tenant tenant = CurrentTenantUtil.getTenant();
+			Tenant tenant = RequestTenantUtil.getTenantFromContextRequest();
 			if (tenant != null) {
 				out.println("    <div class=\"w3-container w3-half w3-margin-top\">");
 				out.println("    <h2>Facility: " + tenant.getOrganizationName() + "</h2>");

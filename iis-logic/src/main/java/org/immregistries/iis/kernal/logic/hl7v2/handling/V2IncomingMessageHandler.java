@@ -18,7 +18,7 @@ import org.immregistries.iis.kernal.model.*;
 import org.immregistries.iis.kernal.model.ack.IisReportable;
 import org.immregistries.iis.kernal.model.ack.IisReportableSeverityLevel;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
-import org.immregistries.iis.kernal.security.CurrentTenantUtil;
+import org.immregistries.iis.kernal.security.RequestTenantUtil;
 import org.immregistries.iis.kernal.services.CodeMapManagerService;
 import org.immregistries.iis.kernal.services.MessageRecordingService;
 import org.immregistries.mqe.validator.MqeMessageServiceResponse;
@@ -197,7 +197,7 @@ public class V2IncomingMessageHandler extends IncomingMessageHandler<HL7Reader, 
 			sendersUniqueId = "MSH-10 NOT VALUED";
 		}
 		data.setReceivingApplication(receivingApp.toString());
-		data.setReceivingFacility(CurrentTenantUtil.getTenant().getOrganizationName());
+		data.setReceivingFacility(RequestTenantUtil.getTenantFromContextRequest().getOrganizationName());
 
 		data.setMessageControlId(sendersUniqueId);
 		data.setMessageDate(header.getMessageDate());

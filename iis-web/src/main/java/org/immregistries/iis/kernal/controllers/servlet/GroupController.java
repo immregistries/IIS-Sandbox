@@ -7,9 +7,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.hl7.fhir.r5.model.Group;
 import org.hl7.fhir.r5.model.Identifier;
 import org.hl7.fhir.r5.model.Parameters;
-import org.immregistries.iis.kernal.security.CurrentTenantUtil;
 import org.immregistries.iis.kernal.controllers.rest.GroupRestController;
 import org.immregistries.iis.kernal.controllers.servlet.util.UiUtil;
+import org.immregistries.iis.kernal.security.RequestTenantUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,7 +56,7 @@ public class GroupController {
 
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
-		uiUtil.doHeader(out, "IIS Sandbox - Groups", CurrentTenantUtil.getTenant());
+		uiUtil.doHeader(out, "IIS Sandbox - Groups", RequestTenantUtil.getTenantFromContextRequest());
 		Group group = groupRestController.generateGroup(req);
 		out.println("<p>");
 		out.println(fhirContext.newJsonParser().setPrettyPrint(true).encodeResourceToString(group));

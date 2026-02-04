@@ -3,6 +3,7 @@ package org.immregistries.iis.kernal.security;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import org.immregistries.iis.kernal.GlobalConstants;
 import org.immregistries.iis.kernal.controllers.servlet.HomeController;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.immregistries.iis.kernal.services.api.IDeployedApiUrlService;
@@ -38,7 +39,7 @@ public class IisOAuthSuccessHandler implements AuthenticationSuccessHandler {
 			tenant = tenantAuthService.authenticateTenant(
 					oAuth2AuthenticationToken.getPrincipal(),
 					UserAccessUtil.GITHUB_PREFIX + oAuth2AuthenticationToken.getPrincipal().getAttribute("login"));
-			session.setAttribute(CurrentTenantUtil.SESSION_REQUEST_TENANT, tenant);
+			session.setAttribute(GlobalConstants.SESSION_REQUEST_TENANT, tenant);
 			// session.setAttribute(SESSION_ORGACCESS, tenant.userAccess);
 			// TODO switch to userAccess when facilities creation implemented
 		}

@@ -3,21 +3,22 @@ package org.immregistries.iis.kernal.logic.hl7v2;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
+import org.immregistries.iis.kernal.security.RequestTenantUtil;
 import org.immregistries.iis.kernal.security.TenantAuthService;
 import org.immregistries.smm.cdc.*;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import static org.immregistries.iis.kernal.security.CurrentTenantUtil.SESSION_REQUEST_TENANT;
-
 public abstract class BaseIISSOAPServer extends CDCWSDLServer {
 
 	private String tenantName;
 	private TenantAuthService tenantAuthService;
+	private RequestTenantUtil requestTenantUtil;
 
-	protected BaseIISSOAPServer(String tenantNameParameter, TenantAuthService tenantAuthService) {
+	protected BaseIISSOAPServer(String tenantNameParameter, TenantAuthService tenantAuthService, RequestTenantUtil requestTenantUtil) {
 		this.tenantName = tenantNameParameter;
 		this.tenantAuthService = tenantAuthService;
+		this.requestTenantUtil = requestTenantUtil;
 	}
 
 	@Override
@@ -44,7 +45,7 @@ public abstract class BaseIISSOAPServer extends CDCWSDLServer {
 		} else {
 			HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder
 					.currentRequestAttributes()).getRequest();
-			request.setAttribute(SESSION_REQUEST_TENANT, tenant);
+			requestTenantUtil.setTenantForRequest(request, tenant);
 		}
 	}
 }

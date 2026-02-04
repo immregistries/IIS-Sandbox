@@ -20,11 +20,11 @@ import static org.immregistries.iis.kernal.controllers.servlet.TenantController.
 public class TenantRestController {
 
     @Autowired
-    TenantRepository tenantRepository;
+	 private TenantRepository tenantRepository;
     @Autowired
-	 TenantAuthService tenantAuthService;
+	 private TenantAuthService tenantAuthService;
     @Autowired
-    UserAccessUtil userAccessUtil;
+	 private UserAccessUtil userAccessUtil;
 
     @GetMapping(IisPathVariable.PlaceHolder.TENANT_ID_PLACEHOLDER)
     public Tenant getTenant(@PathVariable(PARAM_TENANT_ID) int tenantId) {
@@ -35,12 +35,12 @@ public class TenantRestController {
 
     @GetMapping
     public List<Tenant> getTenants(HttpServletRequest req) {
-        return tenantRepository.findByUserAccessId(UserAccessUtil.get().getUserAccess().getUserAccessId());
+		 return tenantRepository.findByUserAccessId(userAccessUtil.getUserAccess().getUserAccessId());
     }
 
     @PostMapping
     public Tenant createTenant(@RequestBody Tenant tenant) {
-        UserAccess currentUser = UserAccessUtil.get().getUserAccess();
+		 UserAccess currentUser = userAccessUtil.getUserAccess();
         if (tenant.getUserAccess() != null && !tenant.getUserAccess().equals(currentUser)) {
             throw new IllegalArgumentException("Tenant UserAccess must be null or match the current user");
         }

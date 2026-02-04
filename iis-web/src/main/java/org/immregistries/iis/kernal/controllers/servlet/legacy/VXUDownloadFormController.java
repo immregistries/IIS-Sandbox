@@ -11,7 +11,7 @@ import org.immregistries.iis.kernal.logic.VXUDownloadGenerator;
 import org.immregistries.iis.kernal.logic.hl7v2.writing.IExampleMessageWriter;
 import org.immregistries.iis.kernal.mapping.requesters.FhirSearchRequester;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
-import org.immregistries.iis.kernal.security.CurrentTenantUtil;
+import org.immregistries.iis.kernal.security.RequestTenantUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -39,6 +39,8 @@ public class VXUDownloadFormController {
   private UiUtil uiUtil;
   @Autowired
   private UrlTenantUtil urlTenantUtil;
+	@Autowired
+	private RequestTenantUtil requestTenantUtil;
 
   protected static final String CACHED_GENERATOR = "generator";
   protected static final String EXPORT_YYYY_MM_DD = "yyyy-MM-dd";
@@ -62,7 +64,7 @@ public class VXUDownloadFormController {
 
     resp.setContentType("text/html");
     PrintWriter out = new PrintWriter(resp.getOutputStream());
-    Tenant tenant = CurrentTenantUtil.getTenant(req);
+	  Tenant tenant = requestTenantUtil.getTenant(req);
     if (tenant == null) {
       throw new AuthenticationCredentialsNotFoundException("");
     }

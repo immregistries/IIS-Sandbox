@@ -2,6 +2,7 @@ package org.immregistries.iis.kernal.security;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
+import org.immregistries.iis.kernal.GlobalConstants;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.immregistries.iis.kernal.persisted.entities.UserAccess;
 import org.slf4j.Logger;
@@ -50,7 +51,7 @@ public class UsernamePasswordAuthenticationProvider implements AuthenticationPro
 				/**
 				 * Creating a new session after login
 				 */
-				request.getSession(true).setAttribute(CurrentTenantUtil.SESSION_REQUEST_TENANT, tenant);
+				request.getSession(true).setAttribute(GlobalConstants.SESSION_REQUEST_TENANT, tenant);
 				return tenant.getUserAccess();
 			} else {
 				return null;

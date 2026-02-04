@@ -7,7 +7,7 @@ import org.immregistries.iis.kernal.controllers.rest.VacDedupRestController;
 import org.immregistries.iis.kernal.controllers.servlet.TenantController;
 import org.immregistries.iis.kernal.logic.match.VacDedupRequest;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
-import org.immregistries.iis.kernal.security.CurrentTenantUtil;
+import org.immregistries.iis.kernal.security.RequestTenantUtil;
 import org.immregistries.vaccination_deduplication.Immunization;
 import org.immregistries.vaccination_deduplication.LinkedImmunization;
 import org.immregistries.vaccination_deduplication.reference.ImmunizationSource;
@@ -126,7 +126,7 @@ public class VacDedupController {
 
           if (immunizationList.size() > 1) {
             // Call REST controller
-            Tenant tenant = CurrentTenantUtil.getTenant();
+            Tenant tenant = RequestTenantUtil.getTenantFromContextRequest();
             List<LinkedImmunization> results = vacDedupRestController.deduplicate(tenant, request, req);
             immunizationListResults = new ArrayList<>(results);
           }
