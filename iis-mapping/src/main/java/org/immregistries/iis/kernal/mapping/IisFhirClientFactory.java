@@ -32,7 +32,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import static org.immregistries.iis.kernal.GlobalConstants.TENANT_REQUEST_ATTRIBUTE;
 import static org.immregistries.iis.kernal.security.UserAccessUtil.GITHUB_PREFIX;
 
 /**
@@ -152,7 +151,6 @@ public class IisFhirClientFactory extends ApacheRestfulClientFactory {
 	 */
 	public IGenericClient getOrCreateGenericClient(ServletRequestDetails theRequestDetails) {
 		Tenant tenant = requestTenantUtil.extractTenant(theRequestDetails);
-		Tenant tenant = (Tenant) theRequestDetails.getAttribute(TENANT_REQUEST_ATTRIBUTE);
 		if (tenant == null) {
 			throw new AuthenticationException();
 		}
