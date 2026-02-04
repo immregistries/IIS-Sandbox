@@ -2,7 +2,6 @@ package org.immregistries.iis.kernal.logic.shlink.generation;
 
 import ca.uhn.fhir.jpa.ips.generator.IIpsGeneratorSvc;
 import io.jsonwebtoken.Jwts;
-import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.instance.model.api.IBaseBundle;
 import org.hl7.fhir.r4.model.IdType;
@@ -70,7 +69,7 @@ public class ShLinkGenerator {
 	@Autowired
 	private RequestTenantUtil requestTenantUtil;
 
-	public String generateShLink(HttpServletRequest req, String keyId, String secretKey, String patientId, String flag, String exp, Tenant tenant, UserAccess userAccess) throws NoSuchAlgorithmException, IOException {
+	public String generateShLink(String keyId, String secretKey, String patientId, String flag, String exp, Tenant tenant, UserAccess userAccess, ServletUriComponentsBuilder uriBuilder) throws NoSuchAlgorithmException, IOException {
 		/*
 		 * Choosing or generating the keys based on the parameters
 		 */
@@ -91,13 +90,13 @@ public class ShLinkGenerator {
 		/*
 		 * Getting the bundle for the payload content
 		 */
-		IBaseBundle ipsToBeEncoded = iIpsGeneratorSvc.generateIps(requestTenantUtil.requestDetailsWithPartitionName(),
+		IBaseBundle ipsToBeEncoded = iIpsGeneratorSvc.generateIps(requestTenantUtil.requestDetailsWithPartitionName(tenant),
 			new IdType(patientId), "");
 		/*
 		 * Convert the bundle to a shcard file
 		 */
-		URL url = generateShLinkForShCards(List.of(ipsToBeEncoded), shLinkPayload, req,
-			iisSigningKey, encryptionKeySpec, userAccess, tenant);
+		URL url = generateShLinkForShCards(List.of(ipsToBeEncoded), shLinkPayload,
+			iisSigningKey, encryptionKeySpec, userAccess, tenant, uriBuilder);
 		shLinkPayload.setUrl(url.toString());
 		return qrCodeEncoder.toBase64QrCode(shLinkPayload);
 	}
@@ -105,15 +104,14 @@ public class ShLinkGenerator {
 
 
 	public URL generateShLinkForShCards(List<IBaseBundle> bundleList, ShLinkPayload shLinkPayload,
-													HttpServletRequest req, IisKey iisSigningKey, SecretKeySpec encryptionKey, UserAccess userAccess,
-													Tenant tenant) throws IOException {
+													IisKey iisSigningKey, SecretKeySpec encryptionKey, UserAccess userAccess,
+													Tenant tenant, UriComponentsBuilder uriBuilder) throws IOException {
 		URL shLinkUrl;
-		UriComponentsBuilder uriBuilder = ServletUriComponentsBuilder.fromRequest(req);
 
 		ShLinkFilePayload shLinkFilePayload = new ShLinkFilePayload();
 		shLinkFilePayload.setType(List.of(VERIFIABLE_CREDENTIAL_TYPE, APPLICATION_SMART_HEALTH_CARD_CONTENT_TYPE));
 
-		String shcardIssuerUrl = wellKnownKeyService.getKeyIssuerUrl(req, tenant);
+		String shcardIssuerUrl = wellKnownKeyService.generateKeyIssuerUrl(tenant, uriBuilder);
 		List<String> verifiableCredentials = new ArrayList<>(bundleList.size());
 		for (IBaseBundle bundle : bundleList) {
 			String shCardCompact = shCardGenerator.shCardCompact(bundle, shcardIssuerUrl, iisSigningKey);

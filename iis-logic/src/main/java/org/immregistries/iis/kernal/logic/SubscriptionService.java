@@ -79,7 +79,7 @@ public class SubscriptionService {
 	// }
 	public String triggerWithResource(Subscription subscription, List<Pair<String, Bundle.HTTPVerb>> requests,
 			Tenant tenant) {
-		RequestDetails requestDetails = requestTenantUtil.requestDetailsWithPartitionName();
+		RequestDetails requestDetails = requestTenantUtil.requestDetailsWithPartitionName(tenant);
 		List<IPrimitiveType<String>> urls = List.of(new StringType("Patient?name=ulysse"));
 		IBaseParameters iBaseParameters = subscriptionTriggeringProvider.triggerSubscription(requestDetails,
 				subscription.getIdElement(), null, urls);

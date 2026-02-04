@@ -84,7 +84,7 @@ public class V2ToFhirController {
 	@GetMapping
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		resp.setContentType("text/html");
-		Tenant tenant = RequestTenantUtil.getTenant(req);
+		Tenant tenant = requestTenantUtil.getTenant(req);
 
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		try {

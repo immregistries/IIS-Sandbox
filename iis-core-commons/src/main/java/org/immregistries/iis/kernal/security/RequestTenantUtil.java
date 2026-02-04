@@ -25,6 +25,8 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 public class RequestTenantUtil {
 	@Autowired
 	private IPartitionLookupSvc partitionLookupSvc;
+	@Autowired
+	private TenantAuthService tenantAuthService;
 
 	public Tenant getTenantFromContextRequest() {
 		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
@@ -92,7 +94,7 @@ public class RequestTenantUtil {
 			if (authentication instanceof UserAccess) {
 				userAccess = (UserAccess) authentication;
 			}
-			tenant = TenantAuthService.get().authenticateTenant(userAccess, pathVariable);
+			tenant = tenantAuthService.authenticateTenant(userAccess, pathVariable);
 		}
 		return tenant;
 	}
@@ -110,15 +112,15 @@ public class RequestTenantUtil {
 
 	public SystemRequestDetails requestDetailsWithPartitionName() {
 		Tenant tenant = getTenantFromContextRequest();
-		return getRequestDetails(tenant);
+		return requestDetailsWithPartitionName(tenant);
 	}
 
-	private @NotNull SystemRequestDetails getRequestDetails(Tenant tenant) {
+	public @NotNull SystemRequestDetails requestDetailsWithPartitionName(Tenant tenant) {
 		String organizationName = tenant.getOrganizationName();
-		return getRequestDetails(organizationName);
+		return requestDetailsWithPartitionName(organizationName);
 	}
 
-	private @NotNull SystemRequestDetails getRequestDetails(String organizationName) {
+	public @NotNull SystemRequestDetails requestDetailsWithPartitionName(String organizationName) {
 		PartitionEntity partitionEntity = partitionLookupSvc.getPartitionByName(organizationName);
 		if (partitionEntity == null) {
 			// return SystemRequestDetails.forAllPartitions();

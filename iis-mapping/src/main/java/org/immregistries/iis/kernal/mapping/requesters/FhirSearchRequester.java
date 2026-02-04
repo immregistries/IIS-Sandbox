@@ -35,10 +35,8 @@ public class FhirSearchRequester {
 	private MappingService mappingService;
 	@Autowired
 	private PatientMapper patientMapper;
-
 	@Autowired
 	private RequestTenantUtil requestTenantUtil;
-
 	@Autowired
 	private FhirReadRequester fhirReadRequester;
 

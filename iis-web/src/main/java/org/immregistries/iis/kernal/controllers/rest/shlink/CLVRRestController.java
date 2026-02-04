@@ -74,7 +74,7 @@ public class CLVRRestController {
 
 		 UserAccess userAccess = userAccessUtil.getUserAccess();
         IisKey iisSigningKey = keyStoreService.getIisSigningKeyOrCreate("", userAccess, tenant);
-        CLVRToken clvrToken = getIpsClvrToken(patientId);
+		 CLVRToken clvrToken = getIpsClvrToken(patientId, tenant);
         String qrCode = clvrService.encodeCLVRtoQrCode(clvrToken, iisSigningKey.keyPair());
         logger.info("qrCode {}", qrCode);
         return qrCode;
@@ -88,7 +88,7 @@ public class CLVRRestController {
             NoSuchProviderException, ServletException {
 		 UserAccess userAccess = userAccessUtil.getUserAccess();
         IisKey iisSigningKey = keyStoreService.getIisSigningKeyOrCreate("", userAccess, tenant);
-        CLVRToken clvrToken = getIpsClvrToken(patientId);
+		 CLVRToken clvrToken = getIpsClvrToken(patientId, tenant);
         String qrCode = clvrService.encodeCLVRtoQrCode(clvrToken, iisSigningKey.keyPair());
 
         ByteArrayOutputStream byteArrayOutputStreamPNG = qrCodeEncoder.toQrCodeStreamPNG(qrCode);
@@ -108,15 +108,15 @@ public class CLVRRestController {
 
 		 UserAccess userAccess = userAccessUtil.getUserAccess();
         IisKey iisSigningKey = keyStoreService.getIisSigningKeyOrCreate("", userAccess, tenant);
-        CLVRToken clvrToken = getIpsClvrToken(patientId);
+		 CLVRToken clvrToken = getIpsClvrToken(patientId, tenant);
         String qrCode = clvrService.encodeCLVRtoQrCode(clvrToken, iisSigningKey.keyPair());
         PDDocument pdDocument = clvrPdfService.createPdf(clvrToken, qrCode.getBytes(), "IIS SANDBOX");
         return pdfResponseEntity(pdDocument, "clvrDocument");
     }
 
-    private @NotNull CLVRToken getIpsClvrToken(String patientId) {
+	private @NotNull CLVRToken getIpsClvrToken(String patientId, Tenant tenant) {
         IBaseBundle ipsToBeEncoded = ipsGeneratorSvc
-			  .generateIps(requestTenantUtil.requestDetailsWithPartitionName(), new IdType(patientId), "");
+			  .generateIps(requestTenantUtil.requestDetailsWithPartitionName(tenant), new IdType(patientId), "");
         @SuppressWarnings("unchecked")
         CLVRPayload clvrPayload = fhirConversionUtil.toCLVRPayloadFromBundle(ipsToBeEncoded);
 

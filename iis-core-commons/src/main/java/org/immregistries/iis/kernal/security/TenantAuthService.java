@@ -28,10 +28,7 @@ public class TenantAuthService implements InitializingBean {
 
 	public static final List<String> FORBIDDEN_NAMES = List.of("pop", "iis", "home", "patient", "vaccination", "fhir",
 			"tenant", "facility", "tenant");
-	/**
-	 * Needs to be statically accessible in Tenant Context
-	 */
-	private static TenantAuthService instance;
+
 	@Autowired
 	private TenantRepository tenantRepository;
 	@Autowired
@@ -42,16 +39,14 @@ public class TenantAuthService implements InitializingBean {
 	private IPartitionLookupSvc partitionLookupSvc;
 	@Autowired
 	private UserAccessUtil userAccessUtil;
-	@Autowired
-	private RequestTenantUtil requestTenantUtil;
 
-	public static TenantAuthService get() {
-		return instance;
-	}
-
+	//	private static TenantAuthService instance;
+//	public static TenantAuthService get() {
+//		return instance;
+//	}
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		instance = this;
+//		instance = this;
 	}
 
 	public Tenant authenticateTenantNoUsername(int tenantId, String password) {
