@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.immregistries.iis.kernal.GlobalConstants;
 import org.immregistries.iis.kernal.controllers.IisRestPath;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
+import org.immregistries.iis.kernal.security.RequestTenantUtil;
 import org.immregistries.iis.kernal.security.TenantAuthService;
 import org.immregistries.iis.kernal.security.UserAccessUtil;
 import org.immregistries.iis.kernal.services.api.IDeployedApiUrlService;
@@ -33,6 +34,8 @@ public class RestTenantUrlFilter extends OncePerRequestFilter {
 
 	@Autowired
 	private TenantAuthService tenantAuthService;
+	@Autowired
+	private RequestTenantUtil requestTenantUtil;
 
 	@Autowired
 	private UserAccessUtil userAccessUtil;
@@ -63,7 +66,7 @@ public class RestTenantUrlFilter extends OncePerRequestFilter {
 			try {
 				Tenant tenant = tenantAuthService.authenticateTenant(userAccessUtil.getUserAccess(), tenantName);
 				request.setAttribute(GlobalConstants.TENANT_NAME_URL, tenantName);
-				request.setAttribute(GlobalConstants.TENANT_REQUEST_ATTRIBUTE, tenant);
+				requestTenantUtil.setTenantForRequest(tenant, request);
 			} catch (Exception e) {
 				logger.warn("Could not authenticate tenant for logging: {}", e.getMessage());
 			}
