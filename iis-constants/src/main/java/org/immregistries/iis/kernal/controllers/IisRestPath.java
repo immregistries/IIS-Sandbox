@@ -1,5 +1,6 @@
 package org.immregistries.iis.kernal.controllers;
 
+import org.immregistries.iis.kernal.controllers.IisRestPath.BasePath;
 
 public final class IisRestPath {
 
@@ -9,8 +10,10 @@ public final class IisRestPath {
 
 	public static final String SHLINK_CONTENT_PATH = BasePath.REST_PATH + "/" + SHLINK_FILES;
 
-	public static final String REST_TENANT_PATH = BasePath.REST_PATH + BasePath.TENANT_PATH + IisPathVariable.PlaceHolder.TENANT_NAME_PLACEHOLDER;
-	public static final String REST_PATIENT_PATH = REST_TENANT_PATH + BasePath.PATIENT_PATH + IisPathVariable.PlaceHolder.PATIENT_ID_PLACEHOLDER;
+	public static final String REST_TENANT_PATH = BasePath.REST_PATH + BasePath.TENANT_PATH
+			+ IisPathVariable.PlaceHolder.TENANT_NAME_PLACEHOLDER;
+	public static final String REST_PATIENT_PATH = REST_TENANT_PATH + BasePath.PATIENT_PATH
+			+ IisPathVariable.PlaceHolder.PATIENT_ID_PLACEHOLDER;
 	public static final String MANIFEST_FULL_PATH = REST_TENANT_PATH + BasePath.MANIFEST_PATH;
 
 	/**
@@ -43,6 +46,43 @@ public final class IisRestPath {
 		public static final String CLVR_KEY = "clvr";
 	}
 
+	public enum RestKey {
+		REST(Key.REST_KEY),
+		TENANT(Key.TENANT_KEY),
+		PATIENT(Key.PATIENT_KEY),
+		CODE_MAPS(Key.CODE_MAPS_KEY),
+		AUTHENTICATION(Key.AUTHENTICATION_KEY),
+		FHIR_MESSAGING(Key.FHIR_MESSAGING_KEY),
+		GROUP(Key.GROUP_KEY),
+		RECOMMENDATION(Key.RECOMMENDATION_KEY),
+		VAC_DEDUP(Key.VAC_DEDUP_KEY),
+		PATIENT_SH_LINK(Key.PATIENT_SH_LINK_KEY),
+		V2_TO_FHIR(Key.V2_TO_FHIR_KEY),
+		TENANT_COMPARE(Key.TENANT_COMPARE_KEY),
+		CREATE(Key.CREATE_KEY),
+		MAPPING(Key.MAPPING_KEY),
+		MESSAGE(Key.MESSAGE_KEY),
+		MANIFEST(Key.MANIFEST_KEY),
+		VACCINATION(Key.VACCINATION_KEY),
+		POP(Key.POP_KEY),
+		IIS_KEYS(Key.IIS_KEYS_KEY),
+		OBSERVATIONS(Key.OBSERVATIONS_KEY),
+		RELATED(Key.RELATED_KEY),
+		SH_LINK_PAYLOAD(Key.SH_LINK_PAYLOAD_KEY),
+		FHIR_RESOURCE(Key.FHIR_RESOURCE_KEY),
+		CLVR(Key.CLVR_KEY);
+
+		private final String key;
+
+		RestKey(String key) {
+			this.key = key;
+		}
+
+		public String getKey() {
+			return key;
+		}
+	}
+
 	/**
 	 * Single modular path
 	 */
@@ -67,8 +107,8 @@ public final class IisRestPath {
 		public static final String POP_PATH = "/" + Key.POP_KEY;
 		public static final String IIS_KEYS_PATH = "/" + Key.IIS_KEYS_KEY;
 		public static final String OBSERVATIONS_PATH = "/" + Key.OBSERVATIONS_KEY;
-		public static final String RELATED_PATH =  "/" + Key.RELATED_KEY;
-		public static final String SH_LINK_PAYLOAD_PATH =  "/" + Key.SH_LINK_PAYLOAD_KEY;
+		public static final String RELATED_PATH = "/" + Key.RELATED_KEY;
+		public static final String SH_LINK_PAYLOAD_PATH = "/" + Key.SH_LINK_PAYLOAD_KEY;
 		public static final String FHIR_RESOURCE_PATH = "/" + Key.FHIR_RESOURCE_KEY;
 		public static final String CLVR_PATH = "/" + Key.CLVR_KEY;
 	}
