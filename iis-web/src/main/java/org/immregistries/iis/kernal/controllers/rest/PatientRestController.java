@@ -6,10 +6,10 @@ import ca.uhn.fhir.rest.param.ReferenceParam;
 import jakarta.servlet.http.HttpServletRequest;
 import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.hl7.fhir.instance.model.api.IBaseBundle;
+import org.immregistries.iis.kernal.GlobalConstants;
 import org.immregistries.iis.kernal.controllers.IisPathVariable;
 import org.immregistries.iis.kernal.controllers.IisRestParam;
 import org.immregistries.iis.kernal.controllers.IisRestPath;
-import org.immregistries.iis.kernal.controllers.rest.filters.RestTenantUrlFilter;
 import org.immregistries.iis.kernal.logic.shlink.generation.PatientShLinkGenerator;
 import org.immregistries.iis.kernal.mapping.IisFhirClientFactory;
 import org.immregistries.iis.kernal.mapping.mappers.resources.PatientMapper;
@@ -48,14 +48,14 @@ public class PatientRestController extends BaseTenantTiedRest {
 	@GetMapping(IisPathVariable.PlaceHolder.PATIENT_ID_PLACEHOLDER)
 	public IisPatient getPatient(
 			@PathVariable(IisPathVariable.Key.PATIENT_ID) String patientId,
-			@RequestAttribute(RestTenantUrlFilter.TENANT_REQUEST_ATTRIBUTE) Tenant tenant) {
+			@RequestAttribute(GlobalConstants.TENANT_REQUEST_ATTRIBUTE) Tenant tenant) {
 		return fhirReadRequester.readAsPatientMaster(patientId);
 	}
 
 	@GetMapping(IisPathVariable.PlaceHolder.PATIENT_ID_PLACEHOLDER + IisRestPath.BasePath.FHIR_RESOURCE_PATH)
 	public IAnyResource getPatientFhir(
 			@PathVariable(IisPathVariable.Key.PATIENT_ID) String patientId,
-			@RequestAttribute(RestTenantUrlFilter.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
+			@RequestAttribute(GlobalConstants.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
 			HttpServletRequest req) {
 		IGenericClient fhirClient = iisFhirClientFactory.newGenericClient(tenant, req);
 		return (IAnyResource) fhirClient.read().resource(PatientMapper.PATIENT_FHIR_TYPE_NAME).withId(patientId).execute();
@@ -63,7 +63,7 @@ public class PatientRestController extends BaseTenantTiedRest {
 
 	@GetMapping("")
 	public List<PatientMaster> getAllPatients(
-			@RequestAttribute(RestTenantUrlFilter.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
+			@RequestAttribute(GlobalConstants.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
 			HttpServletRequest req) {
 		return fhirSearchRequester.searchPatientMasterGoldenList(new SearchParameterMap());
 	}
@@ -71,7 +71,7 @@ public class PatientRestController extends BaseTenantTiedRest {
 	@GetMapping(IisPathVariable.PlaceHolder.PATIENT_ID_PLACEHOLDER + IisRestPath.BasePath.RECOMMENDATION_PATH)
 	public IBaseBundle getPatientRecommendationBundle(
 			@PathVariable(IisPathVariable.Key.PATIENT_ID) String patientId,
-			@RequestAttribute(RestTenantUrlFilter.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
+			@RequestAttribute(GlobalConstants.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
 			HttpServletRequest req) {
 		IGenericClient fhirClient = iisFhirClientFactory.newGenericClient(tenant, req);
 		return fhirClient.search()
@@ -83,7 +83,7 @@ public class PatientRestController extends BaseTenantTiedRest {
 	@GetMapping(IisPathVariable.PlaceHolder.PATIENT_ID_PLACEHOLDER + VACCINATION_PATH)
 	public List<VaccinationMaster> getPatientVaccination(
 			@PathVariable(IisPathVariable.Key.PATIENT_ID) String patientId,
-			@RequestAttribute(RestTenantUrlFilter.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
+			@RequestAttribute(GlobalConstants.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
 			@RequestParam(name = IisRestParam.MDM_EXPAND, defaultValue = "false") boolean isGolden,
 			HttpServletRequest req) {
 		ReferenceParam referenceParam = new ReferenceParam().setValue(patientId);
@@ -95,7 +95,7 @@ public class PatientRestController extends BaseTenantTiedRest {
 	@GetMapping(IisPathVariable.PlaceHolder.PATIENT_ID_PLACEHOLDER + IisRestPath.BasePath.OBSERVATIONS_PATH)
 	public List<ObservationReported> getPatientObservation(
 			@PathVariable(IisPathVariable.Key.PATIENT_ID) String patientId,
-			@RequestAttribute(RestTenantUrlFilter.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
+			@RequestAttribute(GlobalConstants.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
 			@RequestParam(name = IisRestParam.MDM_EXPAND, defaultValue = "false") boolean isGolden,
 			HttpServletRequest req) {
 		ReferenceParam referenceParam = new ReferenceParam().setValue(patientId);
@@ -107,7 +107,7 @@ public class PatientRestController extends BaseTenantTiedRest {
 	@GetMapping(IisPathVariable.PlaceHolder.PATIENT_ID_PLACEHOLDER + IisRestPath.BasePath.RELATED_PATH)
 	public List<? extends IisPatient> getPatientRelatedPatients(
 			@PathVariable(IisPathVariable.Key.PATIENT_ID) String patientId,
-			@RequestAttribute(RestTenantUrlFilter.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
+			@RequestAttribute(GlobalConstants.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
 			@RequestParam(name = IisRestParam.MDM_EXPAND, defaultValue = "false") boolean isGolden,
 			HttpServletRequest req) {
 		ReferenceParam referenceParam = new ReferenceParam().setValue(patientId);
@@ -131,7 +131,7 @@ public class PatientRestController extends BaseTenantTiedRest {
 			@RequestParam(required = false) String family,
 			@RequestParam(required = false) String name,
 			@RequestParam(required = false) String identifier,
-			@RequestAttribute(RestTenantUrlFilter.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
+			@RequestAttribute(GlobalConstants.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
 			HttpServletRequest req) {
 		return fhirSearchRequester.searchPatientMasterGoldenList(
 				new SearchParameterMap("family", new ca.uhn.fhir.rest.param.StringParam(family))
@@ -142,7 +142,7 @@ public class PatientRestController extends BaseTenantTiedRest {
 	@GetMapping(IisPathVariable.PlaceHolder.PATIENT_ID_PLACEHOLDER + IisRestPath.BasePath.SH_LINK_PAYLOAD_PATH)
 	public ShLinkPayload getShLinkPayload(
 			@PathVariable(IisPathVariable.Key.PATIENT_ID) String patientId,
-			@RequestAttribute(RestTenantUrlFilter.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
+			@RequestAttribute(GlobalConstants.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
 			HttpServletRequest req) {
 		IAnyResource patientSelected = getPatientFhir(patientId, tenant, req);
 		String manifestUrl = patientShlinkApiManifestUrlService.getManifestUrl(req, patientSelected, tenant);

@@ -68,7 +68,7 @@ public class CLVRRestController {
     @GetMapping(value = "/qr", produces = MediaType.TEXT_PLAIN_VALUE)
     public String getPatientClvrQrCode(
             @PathVariable(IisPathVariable.Key.PATIENT_ID) String patientId,
-				@RequestAttribute(GlobalConstants.SESSION_REQUEST_TENANT) Tenant tenant)
+				@RequestAttribute(GlobalConstants.TENANT_REQUEST_ATTRIBUTE) Tenant tenant)
             throws COSEException, SignatureException, NoSuchAlgorithmException, InvalidKeyException,
             NoSuchProviderException, IOException {
 
@@ -83,7 +83,7 @@ public class CLVRRestController {
     @GetMapping(value = "/qr/png", produces = MediaType.IMAGE_PNG_VALUE)
     public ResponseEntity<byte[]> getPatientClvrPng(
             @PathVariable(IisPathVariable.Key.PATIENT_ID) String patientId,
-				@RequestAttribute(GlobalConstants.SESSION_REQUEST_TENANT) Tenant tenant)
+				@RequestAttribute(GlobalConstants.TENANT_REQUEST_ATTRIBUTE) Tenant tenant)
             throws COSEException, IOException, SignatureException, NoSuchAlgorithmException, InvalidKeyException,
             NoSuchProviderException, ServletException {
 		 UserAccess userAccess = userAccessUtil.getUserAccess();
@@ -102,7 +102,7 @@ public class CLVRRestController {
     @GetMapping(value = "/pdf", produces = MediaType.APPLICATION_PDF_VALUE)
     public ResponseEntity<byte[]> getPatientClvrPdf(
             @PathVariable(IisPathVariable.Key.PATIENT_ID) String patientId,
-				@RequestAttribute(GlobalConstants.SESSION_REQUEST_TENANT) Tenant tenant)
+				@RequestAttribute(GlobalConstants.TENANT_REQUEST_ATTRIBUTE) Tenant tenant)
             throws COSEException, IOException, SignatureException, NoSuchAlgorithmException, InvalidKeyException,
             NoSuchProviderException, WriterException, URISyntaxException {
 

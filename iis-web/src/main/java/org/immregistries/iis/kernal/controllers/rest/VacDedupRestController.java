@@ -21,7 +21,7 @@ public class VacDedupRestController {
 
 	@PostMapping
 	public List<LinkedImmunization> deduplicate(
-		@RequestAttribute(name = GlobalConstants.SESSION_REQUEST_TENANT) Tenant tenant,
+		@RequestAttribute(name = GlobalConstants.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
 			@RequestBody VacDedupRequest vacDedupRequest,
 			HttpServletRequest req) {
 

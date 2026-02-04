@@ -37,7 +37,7 @@ public class PatientShLinkRestController {
 
 	@GetMapping(produces = MediaType.IMAGE_PNG_VALUE)
 	public ResponseEntity<byte[]> doGetShLinkQrCode(HttpServletRequest req, HttpServletResponse resp,
-																	@RequestAttribute(GlobalConstants.SESSION_REQUEST_TENANT) Tenant tenant,
+																	@RequestAttribute(GlobalConstants.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
 			@PathVariable(IisPathVariable.Key.PATIENT_ID) String patientId)
 			throws IOException, ServletException {
 		IGenericClient client = iisFhirClientFactory.newGenericClient(tenant, req);

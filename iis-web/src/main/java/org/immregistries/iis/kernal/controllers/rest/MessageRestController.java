@@ -20,14 +20,14 @@ public class MessageRestController {
 
     @GetMapping(IisPathVariable.PlaceHolder.PATIENT_ID_PLACEHOLDER)
     public List<MessageReceived> getPatientMessages(
-		 @RequestAttribute(name = GlobalConstants.SESSION_REQUEST_TENANT) Tenant tenant,
+		 @RequestAttribute(name = GlobalConstants.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
             @PathVariable(IisPathVariable.Key.PATIENT_ID) String patientId) {
         return messageReceivedRepository.findByTenantAndPatientReportedId(tenant, patientId);
     }
 
     @GetMapping
     public List<MessageReceived> getMessages(
-		 @RequestAttribute(name = GlobalConstants.SESSION_REQUEST_TENANT) Tenant tenant,
+		 @RequestAttribute(name = GlobalConstants.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
             @RequestParam(required = false) String search) {
 
         List<MessageReceived> messageReceivedList = messageReceivedRepository

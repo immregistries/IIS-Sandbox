@@ -36,7 +36,7 @@ public class RequestTenantUtil {
 	}
 
 	public Tenant extractTenant(RequestDetails theRequestDetails) {
-		Object attribute = theRequestDetails.getAttribute(GlobalConstants.SESSION_REQUEST_TENANT);
+		Object attribute = theRequestDetails.getAttribute(GlobalConstants.TENANT_REQUEST_ATTRIBUTE);
 		if (attribute != null) {
 			return (Tenant) attribute;
 		} else {
@@ -58,7 +58,7 @@ public class RequestTenantUtil {
 		/*
 		 * If Tenant was already set as attribute return it
 		 */
-		Tenant requestTenant = (Tenant) request.getAttribute(GlobalConstants.SESSION_REQUEST_TENANT);
+		Tenant requestTenant = (Tenant) request.getAttribute(GlobalConstants.TENANT_REQUEST_ATTRIBUTE);
 		if (requestTenant != null) {
 			tenant = requestTenant;
 		} else {
@@ -102,7 +102,7 @@ public class RequestTenantUtil {
 
 
 	public void setTenantForRequestDetails(Tenant tenant, RequestDetails requestDetails) {
-		requestDetails.setAttribute(GlobalConstants.SESSION_REQUEST_TENANT, tenant);
+		requestDetails.setAttribute(GlobalConstants.TENANT_REQUEST_ATTRIBUTE, tenant);
 		if (requestDetails instanceof SystemRequestDetails) {
 			SystemRequestDetails systemRequestDetails = (SystemRequestDetails) requestDetails;
 			PartitionEntity partitionByName = partitionLookupSvc.getPartitionByName(tenant.getOrganizationName());
@@ -116,7 +116,7 @@ public class RequestTenantUtil {
 	}
 
 	public Tenant setTenantForRequest(Tenant tenant, HttpServletRequest request) {
-		request.setAttribute(GlobalConstants.SESSION_REQUEST_TENANT, tenant);
+		request.setAttribute(GlobalConstants.TENANT_REQUEST_ATTRIBUTE, tenant);
 		return tenant;
 	}
 

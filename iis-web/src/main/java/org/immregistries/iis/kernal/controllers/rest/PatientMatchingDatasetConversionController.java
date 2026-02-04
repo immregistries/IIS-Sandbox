@@ -37,7 +37,7 @@ public class PatientMatchingDatasetConversionController {
 	private RequestTenantUtil requestTenantUtil;
 
 	@PostMapping("/init")
-	public String initBuilder(@RequestAttribute(GlobalConstants.SESSION_REQUEST_TENANT) Tenant tenant) throws IOException {
+	public String initBuilder(@RequestAttribute(GlobalConstants.TENANT_REQUEST_ATTRIBUTE) Tenant tenant) throws IOException {
 		String tenantId = tenant.getOrganizationName();
 		tenantId = tenantId.strip().replace("/", "");
 		File csvOutputFile = new File("./target/"+tenantId+".csv");
@@ -54,7 +54,7 @@ public class PatientMatchingDatasetConversionController {
 	}
 
 	@PostMapping("")
-	public String post(@RequestBody String stringBundle, @RequestAttribute(GlobalConstants.SESSION_REQUEST_TENANT) Tenant tenant) throws IOException {
+	public String post(@RequestBody String stringBundle, @RequestAttribute(GlobalConstants.TENANT_REQUEST_ATTRIBUTE) Tenant tenant) throws IOException {
 		List<Patient> patientList = new ArrayList<>(20);
 		if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R5)) {
 			Bundle bundle = fhirContext.newJsonParser().parseResource(Bundle.class, stringBundle);

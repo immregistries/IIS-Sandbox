@@ -56,7 +56,7 @@ public class FhirMessagingRestController {
 	@PostMapping(produces = MediaType.TEXT_PLAIN_VALUE)
 	protected String doPost(@RequestParam(PARAM_MESSAGE) String message,
 			@RequestParam(PARAM_FACILITY_NAME) String facilityName,
-									@RequestAttribute(GlobalConstants.SESSION_REQUEST_TENANT) @NotNull Tenant tenant)
+									@RequestAttribute(GlobalConstants.TENANT_REQUEST_ATTRIBUTE) @NotNull Tenant tenant)
 			throws ServletException, IOException, HL7Exception {
 		// resp.setContentType("text/html");
 		if (StringUtils.isBlank(message)) {

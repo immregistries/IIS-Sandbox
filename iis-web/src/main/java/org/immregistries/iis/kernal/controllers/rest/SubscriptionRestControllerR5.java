@@ -46,7 +46,7 @@ public class SubscriptionRestControllerR5 {
 
     @PostMapping("/trigger")
     public String triggerSubscription(
-		 @RequestAttribute(name = GlobalConstants.SESSION_REQUEST_TENANT) Tenant tenant,
+       @RequestAttribute(name = GlobalConstants.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
             @RequestBody TriggerRequest triggerRequest,
             HttpServletRequest req) {
 

@@ -32,7 +32,6 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Optional;
 
-import static org.immregistries.iis.kernal.GlobalConstants.SESSION_REQUEST_TENANT;
 import static org.immregistries.iis.kernal.security.UserAccessUtil.SESSION_USER_ACCESS;
 
 /**

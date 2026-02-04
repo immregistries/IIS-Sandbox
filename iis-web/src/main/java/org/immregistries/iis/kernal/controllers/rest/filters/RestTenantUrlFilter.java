@@ -25,7 +25,6 @@ public class RestTenantUrlFilter extends OncePerRequestFilter {
 	@Autowired
 	private IDeployedApiUrlService deployedApiUrlService;
 
-	public static final String TENANT_REQUEST_ATTRIBUTE = GlobalConstants.SESSION_REQUEST_TENANT;
 	private static final Logger logger = LoggerFactory.getLogger(RestTenantUrlFilter.class);
 
 	private String tenantPrefix() {
@@ -64,7 +63,7 @@ public class RestTenantUrlFilter extends OncePerRequestFilter {
 			try {
 				Tenant tenant = tenantAuthService.authenticateTenant(userAccessUtil.getUserAccess(), tenantName);
 				request.setAttribute(GlobalConstants.TENANT_NAME_URL, tenantName);
-				request.setAttribute(TENANT_REQUEST_ATTRIBUTE, tenant);
+				request.setAttribute(GlobalConstants.TENANT_REQUEST_ATTRIBUTE, tenant);
 			} catch (Exception e) {
 				logger.warn("Could not authenticate tenant for logging: {}", e.getMessage());
 			}

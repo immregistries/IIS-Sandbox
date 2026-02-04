@@ -3,7 +3,7 @@ package org.immregistries.iis.kernal.controllers.rest;
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.context.FhirVersionEnum;
 import jakarta.servlet.http.HttpServletRequest;
-import org.immregistries.iis.kernal.controllers.rest.filters.RestTenantUrlFilter;
+import org.immregistries.iis.kernal.GlobalConstants;
 import org.immregistries.iis.kernal.controllers.IisRestPath;
 import org.immregistries.iis.kernal.controllers.servlet.PopController;
 import org.immregistries.iis.kernal.logic.hl7v2.handling.V2IncomingMessageHandler;
@@ -45,7 +45,7 @@ public class PopRestController {
 	public String postPop(
 		@RequestBody String message,
 		@RequestParam(value = PARAM_FACILITY_NAME, required = false) String facilityName,
-		@RequestAttribute(RestTenantUrlFilter.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
+		@RequestAttribute(GlobalConstants.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
 		HttpServletRequest req) {
 		if (message == null) {
 			return "";

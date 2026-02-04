@@ -39,7 +39,7 @@ public class IisOAuthSuccessHandler implements AuthenticationSuccessHandler {
 			tenant = tenantAuthService.authenticateTenant(
 					oAuth2AuthenticationToken.getPrincipal(),
 					UserAccessUtil.GITHUB_PREFIX + oAuth2AuthenticationToken.getPrincipal().getAttribute("login"));
-			session.setAttribute(GlobalConstants.SESSION_REQUEST_TENANT, tenant);
+			session.setAttribute(GlobalConstants.TENANT_REQUEST_ATTRIBUTE, tenant);
 			// session.setAttribute(SESSION_ORGACCESS, tenant.userAccess);
 			// TODO switch to userAccess when facilities creation implemented
 		}

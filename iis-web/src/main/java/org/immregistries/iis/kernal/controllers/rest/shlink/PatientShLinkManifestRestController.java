@@ -56,7 +56,7 @@ public class PatientShLinkManifestRestController {
 	protected ShLinkManifest postPatientShLinkManifest(HttpServletRequest req, HttpServletResponse resp,
 			@PathVariable(value = "id", required = false) String id,
 			@PathVariable(PARAM_TENANT_ID) String tenantId,
-																		@RequestAttribute(GlobalConstants.SESSION_REQUEST_TENANT) Tenant tenant,
+																		@RequestAttribute(GlobalConstants.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
 			@RequestBody ShLinkManifestRequestBody body) throws IOException, ServletException {
 		String passcode = body.getPasscode();
 		if (StringUtils.isNotBlank(passcode)) {
@@ -71,7 +71,7 @@ public class PatientShLinkManifestRestController {
 	@GetMapping({ "/patient", "/patient/{id}" })
 	protected ShLinkManifest getPatientShLinkManifest(HttpServletRequest req, HttpServletResponse resp,
 			@PathVariable(value = "id", required = false) String id,
-																	  @RequestAttribute(GlobalConstants.SESSION_REQUEST_TENANT) Tenant tenant,
+																	  @RequestAttribute(GlobalConstants.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
 			@RequestParam(value = "recipient", required = false) String recipient,
 			@RequestParam(value = "passcode", required = false) String passcode,
 			@RequestParam(value = "embeddedLengthMax", required = false) String embeddedLengthMax) {
