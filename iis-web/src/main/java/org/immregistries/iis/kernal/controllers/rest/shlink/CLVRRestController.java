@@ -15,7 +15,7 @@ import org.immregistries.iis.kernal.controllers.IisRestPath;
 import org.immregistries.iis.kernal.persisted.entities.IisKey;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.immregistries.iis.kernal.persisted.entities.UserAccess;
-import org.immregistries.iis.kernal.security.TenantAuthService;
+import org.immregistries.iis.kernal.security.RequestTenantUtil;
 import org.immregistries.iis.kernal.security.UserAccessUtil;
 import org.immregistries.iis.kernal.services.KeyStoreService;
 import org.immregistries.iis.kernal.services.QrCodeEncoder;
@@ -61,7 +61,7 @@ public class CLVRRestController {
     @Autowired
     private QrCodeEncoder qrCodeEncoder;
 	@Autowired
-	private TenantAuthService tenantAuthService;
+	private RequestTenantUtil requestTenantUtil;
 	@Autowired
 	private UserAccessUtil userAccessUtil;
 
@@ -116,7 +116,7 @@ public class CLVRRestController {
 
     private @NotNull CLVRToken getIpsClvrToken(String patientId) {
         IBaseBundle ipsToBeEncoded = ipsGeneratorSvc
-			  .generateIps(tenantAuthService.requestDetailsWithPartitionName(), new IdType(patientId), "");
+			  .generateIps(requestTenantUtil.requestDetailsWithPartitionName(), new IdType(patientId), "");
         @SuppressWarnings("unchecked")
         CLVRPayload clvrPayload = fhirConversionUtil.toCLVRPayloadFromBundle(ipsToBeEncoded);
 

@@ -1,9 +1,6 @@
 package org.immregistries.iis.kernal.security;
 
-import ca.uhn.fhir.jpa.entity.PartitionEntity;
 import ca.uhn.fhir.jpa.partition.IPartitionLookupSvc;
-import ca.uhn.fhir.rest.api.server.RequestDetails;
-import ca.uhn.fhir.rest.api.server.SystemRequestDetails;
 import ca.uhn.fhir.rest.server.exceptions.AuthenticationException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -45,6 +42,8 @@ public class TenantAuthService implements InitializingBean {
 	private IPartitionLookupSvc partitionLookupSvc;
 	@Autowired
 	private UserAccessUtil userAccessUtil;
+	@Autowired
+	private RequestTenantUtil requestTenantUtil;
 
 	public static TenantAuthService get() {
 		return instance;
@@ -147,19 +146,6 @@ public class TenantAuthService implements InitializingBean {
 		tenant.setOrganizationName(facilityName);
 		tenant.setUserAccess(userAccess);
 		return tenantRepository.save(tenant);
-	}
-
-	public RequestDetails requestDetailsWithPartitionName() {
-		PartitionEntity partitionEntity = partitionLookupSvc
-			.getPartitionByName(RequestTenantUtil.getTenantFromContextRequest().getOrganizationName());
-		if (partitionEntity == null) {
-			// return SystemRequestDetails.forAllPartitions();
-			throw new RuntimeException("No partition found");
-		}
-		RequestDetails requestDetails = SystemRequestDetails
-				.forRequestPartitionId(partitionEntity.toRequestPartitionId());
-		requestDetails.setTenantId(RequestTenantUtil.getTenantFromContextRequest().getOrganizationName());
-		return requestDetails;
 	}
 
 	public Tenant getTenantByIdAuthenticated(int tenantId) {

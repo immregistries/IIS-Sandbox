@@ -17,6 +17,7 @@ import org.immregistries.iis.kernal.mapping.mappers.resources.ImmunizationMapper
 import org.immregistries.iis.kernal.mapping.mappers.resources.PatientMapper;
 import org.immregistries.iis.kernal.model.IisPatient;
 import org.immregistries.iis.kernal.model.IisVaccination;
+import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.immregistries.iis.kernal.security.RequestTenantUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,6 +42,8 @@ public class RecommendationForecastProviderR4 implements IRecommendationForecast
 	private IisRecommendationGenerator iisRecommendationGenerator;
 	@Autowired
 	private CdsQueryServiceR4 cdsQueryService;
+	@Autowired
+	private RequestTenantUtil requestTenantUtil;
 
 	@Operation(name = $_IMMDS_FORECAST,
 		idempotent = true,
@@ -66,11 +69,13 @@ public class RecommendationForecastProviderR4 implements IRecommendationForecast
 			iisVaccinationList = List.of();
 		}
 		IisPatient iisPatient = patientMapper.localObject(patient);
+		Tenant tenant = requestTenantUtil.getTenant(theRequestDetails);
+
 		try {
-			out = cdsQueryService.queryCds(RequestTenantUtil.getTenantFromContextRequest(), assessmentDate.getValue(), iisPatient, iisVaccinationList);
+			out = cdsQueryService.queryCds(tenant, assessmentDate.getValue(), iisPatient, iisVaccinationList);
 			logger.info("out {}", out.getParameters(EVALUATION).size());
 		} catch (Exception e) {
-			ImmunizationRecommendation immunizationRecommendation = (ImmunizationRecommendation) iisRecommendationGenerator.generateFhirRecommendation(RequestTenantUtil.getTenantFromContextRequest(), assessmentDate.getValue(), iisPatient);
+			ImmunizationRecommendation immunizationRecommendation = (ImmunizationRecommendation) iisRecommendationGenerator.generateFhirRecommendation(tenant, assessmentDate.getValue(), iisPatient);
 			out.addParameter().setName(RECOMMENDATION).setResource(immunizationRecommendation);
 		}
 		return out;

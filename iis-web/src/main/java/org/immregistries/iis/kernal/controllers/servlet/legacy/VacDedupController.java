@@ -32,6 +32,8 @@ public class VacDedupController {
 
   @Autowired
   private VacDedupRestController vacDedupRestController;
+	@Autowired
+	private RequestTenantUtil requestTenantUtil;
 
   public static final String PARAM_ACTION = "action";
   public static final String PARAM_CVX = "cvx";
@@ -126,7 +128,7 @@ public class VacDedupController {
 
           if (immunizationList.size() > 1) {
             // Call REST controller
-            Tenant tenant = RequestTenantUtil.getTenantFromContextRequest();
+				 Tenant tenant = requestTenantUtil.getTenantFromContextRequest();
             List<LinkedImmunization> results = vacDedupRestController.deduplicate(tenant, request, req);
             immunizationListResults = new ArrayList<>(results);
           }

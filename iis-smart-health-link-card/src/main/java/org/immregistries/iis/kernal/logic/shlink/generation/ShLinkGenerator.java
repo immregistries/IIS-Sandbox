@@ -12,7 +12,7 @@ import org.immregistries.iis.kernal.model.shlink.ShLinkFilePayload;
 import org.immregistries.iis.kernal.model.shlink.ShLinkPayload;
 import org.immregistries.iis.kernal.persisted.entities.*;
 import org.immregistries.iis.kernal.persisted.repository.IisShlinkContentRepository;
-import org.immregistries.iis.kernal.security.TenantAuthService;
+import org.immregistries.iis.kernal.security.RequestTenantUtil;
 import org.immregistries.iis.kernal.services.CompressionService;
 import org.immregistries.iis.kernal.services.KeyStoreService;
 import org.immregistries.iis.kernal.services.QrCodeEncoder;
@@ -68,7 +68,7 @@ public class ShLinkGenerator {
 	@Autowired
 	private QrCodeEncoder qrCodeEncoder;
 	@Autowired
-	private TenantAuthService tenantAuthService;
+	private RequestTenantUtil requestTenantUtil;
 
 	public String generateShLink(HttpServletRequest req, String keyId, String secretKey, String patientId, String flag, String exp, Tenant tenant, UserAccess userAccess) throws NoSuchAlgorithmException, IOException {
 		/*
@@ -91,7 +91,7 @@ public class ShLinkGenerator {
 		/*
 		 * Getting the bundle for the payload content
 		 */
-		IBaseBundle ipsToBeEncoded = iIpsGeneratorSvc.generateIps(tenantAuthService.requestDetailsWithPartitionName(),
+		IBaseBundle ipsToBeEncoded = iIpsGeneratorSvc.generateIps(requestTenantUtil.requestDetailsWithPartitionName(),
 			new IdType(patientId), "");
 		/*
 		 * Convert the bundle to a shcard file

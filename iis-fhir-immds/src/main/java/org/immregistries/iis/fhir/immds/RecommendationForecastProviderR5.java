@@ -4,6 +4,7 @@ import ca.uhn.fhir.jpa.starter.annotations.OnR5Condition;
 import ca.uhn.fhir.model.api.annotation.Description;
 import ca.uhn.fhir.rest.annotation.Operation;
 import ca.uhn.fhir.rest.annotation.OperationParam;
+import ca.uhn.fhir.rest.api.server.RequestDetails;
 import org.hl7.fhir.instance.model.api.IPrimitiveType;
 import org.hl7.fhir.r5.model.Immunization;
 import org.hl7.fhir.r5.model.ImmunizationRecommendation;
@@ -15,6 +16,7 @@ import org.immregistries.iis.kernal.mapping.mappers.resources.r5.ImmunizationMap
 import org.immregistries.iis.kernal.mapping.mappers.resources.r5.PatientMapperR5;
 import org.immregistries.iis.kernal.model.IisPatient;
 import org.immregistries.iis.kernal.model.IisVaccination;
+import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.immregistries.iis.kernal.security.RequestTenantUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,6 +41,8 @@ public class RecommendationForecastProviderR5 implements IRecommendationForecast
 	private IisRecommendationGenerator iisRecommendationGenerator;
 	@Autowired
 	private CdsQueryServiceR5 cdsQueryService;
+	@Autowired
+	private RequestTenantUtil requestTenantUtil;
 
 	@Operation(name = $_IMMDS_FORECAST,
 		idempotent = true,
@@ -53,7 +57,8 @@ public class RecommendationForecastProviderR5 implements IRecommendationForecast
 		Patient patient,
 		@Description(shortDefinition = "Patient immunization history.")
 		@OperationParam(name = IMMUNIZATION)
-		List<Immunization> immunization
+		List<Immunization> immunization,
+		RequestDetails theRequestDetails
 	) {
 		Parameters out = new Parameters();
 		List<? extends IisVaccination> iisVaccinationList = List.of();
@@ -61,10 +66,12 @@ public class RecommendationForecastProviderR5 implements IRecommendationForecast
 			iisVaccinationList = immunization.stream().map(immunization1 -> immunizationMapperR5.localObject(immunization1)).collect(Collectors.toList());
 		}
 		IisPatient iisPatient = patientMapperR5.localObject(patient);
+		Tenant tenant = requestTenantUtil.getTenant(theRequestDetails);
+
 		try {
-			out = cdsQueryService.queryCds(RequestTenantUtil.getTenantFromContextRequest(), assessmentDate.getValue(), iisPatient, iisVaccinationList);
+			out = cdsQueryService.queryCds(tenant, assessmentDate.getValue(), iisPatient, iisVaccinationList);
 		} catch (Exception e) {
-			ImmunizationRecommendation immunizationRecommendation = (ImmunizationRecommendation) iisRecommendationGenerator.generateFhirRecommendation(RequestTenantUtil.getTenantFromContextRequest(), assessmentDate.getValue(), iisPatient);
+			ImmunizationRecommendation immunizationRecommendation = (ImmunizationRecommendation) iisRecommendationGenerator.generateFhirRecommendation(tenant, assessmentDate.getValue(), iisPatient);
 			out.addParameter().setName(RECOMMENDATION).setResource(immunizationRecommendation);
 		}
 		return out;

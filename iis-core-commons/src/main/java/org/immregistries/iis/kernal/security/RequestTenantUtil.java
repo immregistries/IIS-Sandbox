@@ -1,11 +1,16 @@
 package org.immregistries.iis.kernal.security;
 
+import ca.uhn.fhir.jpa.entity.PartitionEntity;
+import ca.uhn.fhir.jpa.partition.IPartitionLookupSvc;
 import ca.uhn.fhir.rest.api.server.RequestDetails;
+import ca.uhn.fhir.rest.api.server.SystemRequestDetails;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.immregistries.iis.kernal.GlobalConstants;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.immregistries.iis.kernal.persisted.entities.UserAccess;
+import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -18,8 +23,10 @@ import org.springframework.web.context.request.ServletRequestAttributes;
  */
 @Service
 public class RequestTenantUtil {
+	@Autowired
+	private IPartitionLookupSvc partitionLookupSvc;
 
-	public static Tenant getTenantFromContextRequest() {
+	public Tenant getTenantFromContextRequest() {
 		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
 				.getRequest();
 		return getTenant(request);
@@ -40,7 +47,7 @@ public class RequestTenantUtil {
 		return null;
 	}
 
-	public static Tenant getTenant(HttpServletRequest request) {
+	public Tenant getTenant(HttpServletRequest request) {
 		final Tenant tenant;
 		/*
 		 * Extracting variables from the Request
@@ -77,7 +84,7 @@ public class RequestTenantUtil {
 		return tenant;
 	}
 
-	private static Tenant getTenantFromName(String pathVariable) {
+	private Tenant getTenantFromName(String pathVariable) {
 		Tenant tenant = null;
 		if (StringUtils.isNotBlank(pathVariable)) {
 			UserAccess userAccess = null;
@@ -100,5 +107,27 @@ public class RequestTenantUtil {
 		request.setAttribute(GlobalConstants.SESSION_REQUEST_TENANT, tenant);
 		return tenant;
 	}
+
+	public SystemRequestDetails requestDetailsWithPartitionName() {
+		Tenant tenant = getTenantFromContextRequest();
+		return getRequestDetails(tenant);
+	}
+
+	private @NotNull SystemRequestDetails getRequestDetails(Tenant tenant) {
+		String organizationName = tenant.getOrganizationName();
+		return getRequestDetails(organizationName);
+	}
+
+	private @NotNull SystemRequestDetails getRequestDetails(String organizationName) {
+		PartitionEntity partitionEntity = partitionLookupSvc.getPartitionByName(organizationName);
+		if (partitionEntity == null) {
+			// return SystemRequestDetails.forAllPartitions();
+			throw new RuntimeException("No partition found");
+		}
+		SystemRequestDetails requestDetails = SystemRequestDetails.forRequestPartitionId(partitionEntity.toRequestPartitionId());
+		requestDetails.setTenantId(organizationName);
+		return requestDetails;
+	}
+
 
 }

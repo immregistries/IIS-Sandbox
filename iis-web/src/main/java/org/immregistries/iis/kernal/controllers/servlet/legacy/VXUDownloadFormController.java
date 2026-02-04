@@ -32,9 +32,9 @@ import java.text.SimpleDateFormat;
 public class VXUDownloadFormController {
 
   @Autowired
-  FhirSearchRequester fhirSearchRequester;
+  private FhirSearchRequester fhirSearchRequester;
   @Autowired
-  IExampleMessageWriter exampleMessageWriter;
+  private IExampleMessageWriter exampleMessageWriter;
   @Autowired
   private UiUtil uiUtil;
   @Autowired

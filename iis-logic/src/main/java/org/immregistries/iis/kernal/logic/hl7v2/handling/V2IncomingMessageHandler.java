@@ -79,7 +79,8 @@ public class V2IncomingMessageHandler extends IncomingMessageHandler<HL7Reader, 
 	private ObservationValidator observationValidator;
 	@Autowired
 	private ImmunizationValidator immunizationValidator;
-
+	@Autowired
+	private RequestTenantUtil requestTenantUtil;
 
 	public V2IncomingMessageHandler() {
 	}
@@ -197,7 +198,7 @@ public class V2IncomingMessageHandler extends IncomingMessageHandler<HL7Reader, 
 			sendersUniqueId = "MSH-10 NOT VALUED";
 		}
 		data.setReceivingApplication(receivingApp.toString());
-		data.setReceivingFacility(RequestTenantUtil.getTenantFromContextRequest().getOrganizationName());
+		data.setReceivingFacility(requestTenantUtil.getTenantFromContextRequest().getOrganizationName());
 
 		data.setMessageControlId(sendersUniqueId);
 		data.setMessageDate(header.getMessageDate());

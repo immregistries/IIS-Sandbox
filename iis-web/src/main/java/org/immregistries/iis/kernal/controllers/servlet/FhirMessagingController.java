@@ -12,7 +12,6 @@ import org.immregistries.iis.kernal.controllers.rest.PopRestController;
 import org.immregistries.iis.kernal.controllers.rest.V2ToFhirRestController;
 import org.immregistries.iis.kernal.controllers.servlet.util.UiUtil;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
-import org.immregistries.iis.kernal.security.RequestTenantUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -47,7 +46,7 @@ public class FhirMessagingController {
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		resp.setContentType("text/html");
 
-		Tenant tenant = RequestTenantUtil.getTenant(req);
+		Tenant tenant = requestTenantUtil.getTenant(req);
 
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		try {

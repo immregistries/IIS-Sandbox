@@ -28,12 +28,12 @@ public class MessageController {
 
 	@Autowired
 	private MessageRestController messageRestController;
-
 	@Autowired
 	private UiUtil uiUtil;
-
 	@Autowired
 	private PatientServletUtil patientServletUtil;
+	@Autowired
+	private RequestTenantUtil requestTenantUtil;
 
 	public static final String MESSAGE_PATH_KEY = "message";
 	public static final String MESSAGE_BASE_PATH = "/" + MESSAGE_PATH_KEY;
@@ -73,7 +73,7 @@ public class MessageController {
 				out.println("  </div>");
 			}
 
-			Tenant tenant = RequestTenantUtil.getTenantFromContextRequest();
+			Tenant tenant = requestTenantUtil.getTenantFromContextRequest();
 			if (tenant != null) {
 				out.println("    <div class=\"w3-container w3-half w3-margin-top\">");
 				out.println("    <h2>Facility: " + tenant.getOrganizationName() + "</h2>");

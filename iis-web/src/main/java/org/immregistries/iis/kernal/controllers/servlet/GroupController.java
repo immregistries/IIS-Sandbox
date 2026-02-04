@@ -34,11 +34,13 @@ public class GroupController {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	@Autowired
-	FhirContext fhirContext;
+	private FhirContext fhirContext;
 	@Autowired
-	GroupRestController groupRestController;
+	private GroupRestController groupRestController;
 	@Autowired
 	private UiUtil uiUtil;
+	@Autowired
+	private RequestTenantUtil requestTenantUtil;
 
 	@PostMapping
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
@@ -56,7 +58,7 @@ public class GroupController {
 
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
-		uiUtil.doHeader(out, "IIS Sandbox - Groups", RequestTenantUtil.getTenantFromContextRequest());
+		uiUtil.doHeader(out, "IIS Sandbox - Groups", requestTenantUtil.getTenantFromContextRequest());
 		Group group = groupRestController.generateGroup(req);
 		out.println("<p>");
 		out.println(fhirContext.newJsonParser().setPrettyPrint(true).encodeResourceToString(group));

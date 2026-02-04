@@ -14,7 +14,7 @@ import org.immregistries.iis.kernal.mapping.IisFhirClientFactory;
 import org.immregistries.iis.kernal.mapping.MappingService;
 import org.immregistries.iis.kernal.mapping.mappers.resources.*;
 import org.immregistries.iis.kernal.model.*;
-import org.immregistries.iis.kernal.security.TenantAuthService;
+import org.immregistries.iis.kernal.security.RequestTenantUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -28,19 +28,19 @@ import static org.immregistries.iis.kernal.mapping.mappers.resources.Immunizatio
 public class FhirSearchRequester {
 
 	@Autowired
-	IisFhirClientFactory iisFhirClientFactory;
+	private IisFhirClientFactory iisFhirClientFactory;
 	@Autowired
-	DaoRegistry daoRegistry;
+	private DaoRegistry daoRegistry;
 	@Autowired
-	MappingService mappingService;
+	private MappingService mappingService;
 	@Autowired
-	PatientMapper patientMapper;
+	private PatientMapper patientMapper;
 
 	@Autowired
-	TenantAuthService tenantAuthService;
+	private RequestTenantUtil requestTenantUtil;
 
 	@Autowired
-    org.immregistries.iis.kernal.mapping.requesters.FhirReadRequester fhirReadRequester;
+	private FhirReadRequester fhirReadRequester;
 
 	public IisMappedToFhirResource searchMappedObjectMaster(String resourceType, SearchParameterMap searchParameterMap) {
 		IisMappedToFhirResource mappedObject = null;
@@ -204,7 +204,7 @@ public class FhirSearchRequester {
 	 */
 	IBundleProvider search(Class<? extends IBaseResource> aClass, SearchParameterMap searchParameterMap) {
 		return daoRegistry.getResourceDao(aClass).search(searchParameterMap,
-			tenantAuthService.requestDetailsWithPartitionName());
+			requestTenantUtil.requestDetailsWithPartitionName());
 	}
 
 	/**
@@ -216,7 +216,7 @@ public class FhirSearchRequester {
 	 */
 	IBundleProvider search(String fhirType, SearchParameterMap searchParameterMap) {
 		return daoRegistry.getResourceDao(fhirType).search(searchParameterMap,
-			tenantAuthService.requestDetailsWithPartitionName());
+			requestTenantUtil.requestDetailsWithPartitionName());
 	}
 
 

@@ -24,12 +24,14 @@ import java.util.stream.Collectors;
 public class IpsGenerationStrategyR5 extends DefaultJpaIpsGenerationStrategy implements ICustomIpsGenerationStrategy {
 
 	@Autowired
-	OrganizationMapperR5 organizationMapper;
+	private OrganizationMapperR5 organizationMapper;
 	@Autowired
-	BaseJpaResourceProviderPatient<Patient> baseJpaResourceProviderPatient;
+	private BaseJpaResourceProviderPatient<Patient> baseJpaResourceProviderPatient;
 	@Autowired
-	IisFhirClientFactory iisFhirClientFactory;
-
+	private IisFhirClientFactory iisFhirClientFactory;
+	@Autowired
+	private RequestTenantUtil requestTenantUtil;
+	
 	/**
 	 * Constructor
 	 */
@@ -76,7 +78,7 @@ public class IpsGenerationStrategyR5 extends DefaultJpaIpsGenerationStrategy imp
 
 	@Override
 	public IAnyResource createAuthor() {
-		Organization organization = organizationMapper.fhirObject(RequestTenantUtil.getTenantFromContextRequest());
+		Organization organization = organizationMapper.fhirObject(requestTenantUtil.getTenantFromContextRequest());
 		return organization;
 	}
 

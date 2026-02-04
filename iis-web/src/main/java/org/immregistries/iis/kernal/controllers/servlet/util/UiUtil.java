@@ -56,7 +56,7 @@ public class UiUtil {
 
 
 	public void doHeader(PrintWriter out, String title) {
-		doHeader(out, title, RequestTenantUtil.getTenantFromContextRequest());
+		doHeader(out, title, requestTenantUtil.getTenantFromContextRequest());
 	}
 
 	/**

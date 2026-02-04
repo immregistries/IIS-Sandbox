@@ -46,6 +46,8 @@ public class TenantController {
 	private UiUtil uiUtil;
 	@Autowired
 	private IDeployedApiUrlService deployedApiUrlService;
+	@Autowired
+	private RequestTenantUtil requestTenantUtil;
 
 	/**
 	 * Adds a new tenant from form
@@ -86,7 +88,7 @@ public class TenantController {
 		String action = req.getParameter(PARAM_ACTION);
 		String tenantId = req.getParameter(PARAM_TENANT_ID);
 
-		Tenant tenant = RequestTenantUtil.getTenant(req);
+		Tenant tenant = requestTenantUtil.getTenant(req);
 		UserAccess userAccess = UserAccessUtil.get().getUserAccess();
 		if (userAccess != null && session != null) {
 			List<Tenant> tenantList = tenantRestController.getTenants(req);
