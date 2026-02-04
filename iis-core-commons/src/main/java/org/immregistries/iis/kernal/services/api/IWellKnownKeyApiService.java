@@ -1,10 +1,10 @@
 package org.immregistries.iis.kernal.services.api;
 
-import jakarta.servlet.http.HttpServletRequest;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
+import org.springframework.web.util.UriComponentsBuilder;
 
 public interface IWellKnownKeyApiService {
 
-	String getKeyIssuerUrl(HttpServletRequest request, Tenant tenant);
+	String generateKeyIssuerUrl(Tenant tenant, UriComponentsBuilder uriBuilder);
 
 }

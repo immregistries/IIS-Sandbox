@@ -10,7 +10,7 @@ import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.immregistries.iis.kernal.mapping.IisFhirClientFactory;
-import org.immregistries.iis.kernal.security.TenantAuthService;
+import org.immregistries.iis.kernal.security.RequestTenantUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,11 +30,11 @@ public abstract class FhirSaveRequester<Patient extends IAnyResource, Immunizati
 	@Autowired
 	private IisFhirClientFactory iisFhirClientFactory;
 	@Autowired
-	FhirContext fhirContext;
+	private FhirContext fhirContext;
 	@Autowired
-	DaoRegistry daoRegistry;
+	private DaoRegistry daoRegistry;
 	@Autowired
-	TenantAuthService tenantAuthService;
+	private RequestTenantUtil requestTenantUtil;
 
 
 	/**
@@ -56,7 +56,7 @@ public abstract class FhirSaveRequester<Patient extends IAnyResource, Immunizati
 		}
 		DaoMethodOutcome outcome;
 		if (createOnly) {
-			return dao.create(resource, tenantAuthService.requestDetailsWithPartitionName());
+			return dao.create(resource, requestTenantUtil.requestDetailsWithPartitionName());
 		} else
 			try {
 				// IUpdateTyped updateTyped =
@@ -70,9 +70,9 @@ public abstract class FhirSaveRequester<Patient extends IAnyResource, Immunizati
 				// updateWithQueryTyped = updateWithQueryTyped.and(where[i]);
 				// }
 				// return updateWithQueryTyped.execute();
-				return dao.update(resource, params, tenantAuthService.requestDetailsWithPartitionName());
+				return dao.update(resource, params, requestTenantUtil.requestDetailsWithPartitionName());
 			} catch (InvalidRequestException invalidRequestException) {
-				return dao.create(resource, tenantAuthService.requestDetailsWithPartitionName());
+				return dao.create(resource, requestTenantUtil.requestDetailsWithPartitionName());
 			}
 		// catch (JdbcBatchUpdateException jdbcBatchUpdateException) {
 		// return dao.create(resource,

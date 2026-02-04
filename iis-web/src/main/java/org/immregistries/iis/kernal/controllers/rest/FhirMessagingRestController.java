@@ -9,7 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.NotNull;
 import org.apache.commons.lang3.StringUtils;
-import org.immregistries.iis.kernal.GlobalConstants;
+import org.immregistries.iis.kernal.IisRequestAttribute;
 import org.immregistries.iis.kernal.controllers.IisRestPath;
 import org.immregistries.iis.kernal.controllers.servlet.SoapDescriptionController;
 import org.immregistries.iis.kernal.logic.hl7v2.BaseIISSOAPServer;
@@ -56,7 +56,7 @@ public class FhirMessagingRestController {
 	@PostMapping(produces = MediaType.TEXT_PLAIN_VALUE)
 	protected String doPost(@RequestParam(PARAM_MESSAGE) String message,
 			@RequestParam(PARAM_FACILITY_NAME) String facilityName,
-									@RequestAttribute(GlobalConstants.SESSION_REQUEST_TENANT) @NotNull Tenant tenant)
+									@RequestAttribute(IisRequestAttribute.TENANT_REQUEST_ATTRIBUTE) @NotNull Tenant tenant)
 			throws ServletException, IOException, HL7Exception {
 		// resp.setContentType("text/html");
 		if (StringUtils.isBlank(message)) {
@@ -114,11 +114,11 @@ public class FhirMessagingRestController {
 					 * Tenant is accessed through RequestContext, and was previously set through the
 					 * authorize method of WSDL server in BaseIISSOAPServer.java
 					 */
-					Tenant tenant = RequestTenantUtil.getTenantFromContextRequest();
+					Tenant tenant = requestTenantUtil.extractTenantFromRequestContext();
 					if (tenant == null) {
 						throw new SecurityException("Username/password combination is unrecognized");
 					} else {
-						req.setAttribute(GlobalConstants.SESSION_REQUEST_TENANT, tenant);
+						requestTenantUtil.setTenantForRequest(tenant, req);
 						ack = processInput(message, tenant, facilityId);
 					}
 				} catch (Exception e) {

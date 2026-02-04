@@ -2,7 +2,7 @@ package org.immregistries.iis.kernal.controllers.rest.shlink;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
-import org.immregistries.iis.kernal.GlobalConstants;
+import org.immregistries.iis.kernal.IisRequestAttribute;
 import org.immregistries.iis.kernal.controllers.IisRestParam;
 import org.immregistries.iis.kernal.controllers.IisRestPath;
 import org.immregistries.iis.kernal.logic.shlink.generation.ShLinkGenerator;
@@ -18,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -42,10 +43,11 @@ public class ShLinkRestController {
 			@RequestParam(IisRestParam.PATIENT_ID) String patientId,
 			@RequestParam(IisRestParam.ShLink.FLAG) String flag,
 			@RequestParam(value = IisRestParam.ShLink.EXP, required = false, defaultValue = "10000000") String exp,
-											@RequestAttribute(GlobalConstants.SESSION_REQUEST_TENANT) Tenant tenant)
+											@RequestAttribute(IisRequestAttribute.TENANT_REQUEST_ATTRIBUTE) Tenant tenant)
 			throws IOException, NoSuchAlgorithmException {
 		UserAccess userAccess = UserAccessUtil.get().getUserAccess();
-		String qrCode = shLinkGenerator.generateShLink(req, keyId, secretKey, patientId, flag, exp, tenant, userAccess);
+		ServletUriComponentsBuilder uriBuilder = ServletUriComponentsBuilder.fromRequest(req);
+		String qrCode = shLinkGenerator.generateShLink(keyId, secretKey, patientId, flag, exp, tenant, userAccess, uriBuilder);
 		return qrCode;
 	}
 
@@ -56,7 +58,7 @@ public class ShLinkRestController {
 			@RequestParam(IisRestParam.PATIENT_ID) String patientId,
 			@RequestParam(IisRestParam.ShLink.FLAG) String flag,
 			@RequestParam(value = IisRestParam.ShLink.EXP, required = false, defaultValue = "10000000") String exp,
-															 @RequestAttribute(GlobalConstants.SESSION_REQUEST_TENANT) Tenant tenant)
+															 @RequestAttribute(IisRequestAttribute.TENANT_REQUEST_ATTRIBUTE) Tenant tenant)
 			throws ServletException, IOException, NoSuchAlgorithmException {
 		String qrCode = shLinkIPSQrCode(req, keyId, secretKey, patientId, flag, exp, tenant);
 		HttpHeaders headers = new HttpHeaders();

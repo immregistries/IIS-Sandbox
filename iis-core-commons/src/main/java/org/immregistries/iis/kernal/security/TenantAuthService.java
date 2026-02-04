@@ -1,9 +1,6 @@
 package org.immregistries.iis.kernal.security;
 
-import ca.uhn.fhir.jpa.entity.PartitionEntity;
 import ca.uhn.fhir.jpa.partition.IPartitionLookupSvc;
-import ca.uhn.fhir.rest.api.server.RequestDetails;
-import ca.uhn.fhir.rest.api.server.SystemRequestDetails;
 import ca.uhn.fhir.rest.server.exceptions.AuthenticationException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -31,10 +28,7 @@ public class TenantAuthService implements InitializingBean {
 
 	public static final List<String> FORBIDDEN_NAMES = List.of("pop", "iis", "home", "patient", "vaccination", "fhir",
 			"tenant", "facility", "tenant");
-	/**
-	 * Needs to be statically accessible in Tenant Context
-	 */
-	private static TenantAuthService instance;
+
 	@Autowired
 	private TenantRepository tenantRepository;
 	@Autowired
@@ -46,13 +40,13 @@ public class TenantAuthService implements InitializingBean {
 	@Autowired
 	private UserAccessUtil userAccessUtil;
 
-	public static TenantAuthService get() {
-		return instance;
-	}
-
+	//	private static TenantAuthService instance;
+//	public static TenantAuthService get() {
+//		return instance;
+//	}
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		instance = this;
+//		instance = this;
 	}
 
 	public Tenant authenticateTenantNoUsername(int tenantId, String password) {
@@ -147,19 +141,6 @@ public class TenantAuthService implements InitializingBean {
 		tenant.setOrganizationName(facilityName);
 		tenant.setUserAccess(userAccess);
 		return tenantRepository.save(tenant);
-	}
-
-	public RequestDetails requestDetailsWithPartitionName() {
-		PartitionEntity partitionEntity = partitionLookupSvc
-			.getPartitionByName(RequestTenantUtil.getTenantFromContextRequest().getOrganizationName());
-		if (partitionEntity == null) {
-			// return SystemRequestDetails.forAllPartitions();
-			throw new RuntimeException("No partition found");
-		}
-		RequestDetails requestDetails = SystemRequestDetails
-				.forRequestPartitionId(partitionEntity.toRequestPartitionId());
-		requestDetails.setTenantId(RequestTenantUtil.getTenantFromContextRequest().getOrganizationName());
-		return requestDetails;
 	}
 
 	public Tenant getTenantByIdAuthenticated(int tenantId) {

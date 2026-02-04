@@ -63,7 +63,7 @@ public class ShLinkManifestRestController {
 
 	@GetMapping("/$generate")
 	public ShLinkManifest genManifest(HttpServletRequest req) {
-		ShLinkManifest shLinkManifest = shLinkManifestGenerator.generateManifest(requestTenantUtil.getTenant(req));
+		ShLinkManifest shLinkManifest = shLinkManifestGenerator.generateManifest(requestTenantUtil.extractTenant(req));
 		return shlinkManifestStoreService.saveManifest(shLinkManifest);
 	}
 

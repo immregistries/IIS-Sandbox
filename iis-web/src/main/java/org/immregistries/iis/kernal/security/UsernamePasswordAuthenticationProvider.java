@@ -51,7 +51,8 @@ public class UsernamePasswordAuthenticationProvider implements AuthenticationPro
 				/**
 				 * Creating a new session after login
 				 */
-				request.getSession(true).setAttribute(GlobalConstants.SESSION_REQUEST_TENANT, tenant);
+				request.getSession(true);
+//				request.getSession(true).setAttribute(GlobalConstants.SESSION_REQUEST_TENANT, tenant);
 				return tenant.getUserAccess();
 			} else {
 				return null;

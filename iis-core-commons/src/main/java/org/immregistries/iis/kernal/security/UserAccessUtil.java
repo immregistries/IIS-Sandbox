@@ -125,7 +125,7 @@ public class UserAccessUtil implements InitializingBean {
         }
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
                 .getRequest();
-		 Tenant tenant = requestTenantUtil.getTenant(request); // TODO test if commenting breaks anything, might be
+		 Tenant tenant = requestTenantUtil.extractTenant(request); // TODO test if commenting breaks anything, might be
                                                               // useless, or
         // only used
         // for subscription/ bulk

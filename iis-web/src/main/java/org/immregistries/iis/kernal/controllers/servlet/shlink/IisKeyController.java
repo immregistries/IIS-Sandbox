@@ -33,6 +33,8 @@ public class IisKeyController {
 	private UiUtil uiUtil;
 	@Autowired
 	private UrlTenantUtil urlTenantUtil;
+	@Autowired
+	private RequestTenantUtil requestTenantUtil;
 
 	@PostMapping
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
@@ -46,7 +48,7 @@ public class IisKeyController {
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		try {
 			Tenant tenant = uiUtil.getTenantRedirectIfNone(req, resp);
-			uiUtil.doHeader(out, "IIS Sandbox Keystore", RequestTenantUtil.getTenantFromContextRequest());
+			uiUtil.doHeader(out, "IIS Sandbox Keystore", requestTenantUtil.extractTenant(req));
 			out.println("    <div class=\"w3-container w3-half w3-margin-top\">");
 			out.println("    <h2>Facility: " + tenant.getOrganizationName() + "</h2>");
 			out.println("    <h3>Keys used for signing Smart Health Cards (generated for the user)</h3>");

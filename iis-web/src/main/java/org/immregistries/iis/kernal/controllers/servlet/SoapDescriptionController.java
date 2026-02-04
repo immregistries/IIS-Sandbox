@@ -27,6 +27,8 @@ public class SoapDescriptionController {
 	private UiUtil uiUtil;
 	@Autowired
 	private UrlTenantUtil urlTenantUtil;
+	@Autowired
+	private RequestTenantUtil requestTenantUtil;
 
 	public static final String SOAP_BASE_PATH = "/soap";
 
@@ -44,7 +46,7 @@ public class SoapDescriptionController {
 
 			PrintWriter out = resp.getWriter();
 			try {
-				Tenant tenant = RequestTenantUtil.getTenantFromContextRequest();
+				Tenant tenant = requestTenantUtil.extractTenantFromRequestContext();
 				uiUtil.doHeader(out, "IIS Sandbox", tenant);
 				out.println("<h2>CDC SOAP Endpoint</h2>");
 				out.println("<p>");

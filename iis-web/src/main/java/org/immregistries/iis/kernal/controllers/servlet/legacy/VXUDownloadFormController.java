@@ -32,9 +32,9 @@ import java.text.SimpleDateFormat;
 public class VXUDownloadFormController {
 
   @Autowired
-  FhirSearchRequester fhirSearchRequester;
+  private FhirSearchRequester fhirSearchRequester;
   @Autowired
-  IExampleMessageWriter exampleMessageWriter;
+  private IExampleMessageWriter exampleMessageWriter;
   @Autowired
   private UiUtil uiUtil;
   @Autowired
@@ -64,7 +64,7 @@ public class VXUDownloadFormController {
 
     resp.setContentType("text/html");
     PrintWriter out = new PrintWriter(resp.getOutputStream());
-	  Tenant tenant = requestTenantUtil.getTenant(req);
+	  Tenant tenant = requestTenantUtil.extractTenant(req);
     if (tenant == null) {
       throw new AuthenticationCredentialsNotFoundException("");
     }

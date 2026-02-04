@@ -35,13 +35,15 @@ public class V2ToFhirController {
 	public static final String V2_TO_FHIR_BASE_PATH = "/" + V2_TO_FHIR_PATH_KEY;
 
 	@Autowired
-	FhirContext fhirContext;
+	private FhirContext fhirContext;
 	@Autowired
-	V2ToFhirRestController v2ToFhirRestController;
+	private V2ToFhirRestController v2ToFhirRestController;
 	@Autowired
-	PopRestController popRestController;
+	private PopRestController popRestController;
 	@Autowired
 	private UiUtil uiUtil;
+	@Autowired
+	private RequestTenantUtil requestTenantUtil;
 
 	@PostMapping
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
@@ -49,7 +51,7 @@ public class V2ToFhirController {
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		try {
-			Tenant tenant = RequestTenantUtil.getTenant(req);
+			Tenant tenant = requestTenantUtil.extractTenant(req);
 			String result = "";
 			String message = req.getParameter(PARAM_MESSAGE);
 			String facility_name = req.getParameter(PARAM_FACILITY_NAME);
@@ -82,7 +84,7 @@ public class V2ToFhirController {
 	@GetMapping
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		resp.setContentType("text/html");
-		Tenant tenant = RequestTenantUtil.getTenant(req);
+		Tenant tenant = requestTenantUtil.extractTenant(req);
 
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		try {

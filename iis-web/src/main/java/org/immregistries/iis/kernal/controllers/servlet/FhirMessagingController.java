@@ -42,12 +42,14 @@ public class FhirMessagingController {
 	private V2ToFhirRestController v2ToFhirRestController;
 	@Autowired
 	private UiUtil uiUtil;
+	@Autowired
+	private RequestTenantUtil requestTenantUtil;
 
 	@GetMapping
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		resp.setContentType("text/html");
 
-		Tenant tenant = RequestTenantUtil.getTenant(req);
+		Tenant tenant = requestTenantUtil.extractTenant(req);
 
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		try {

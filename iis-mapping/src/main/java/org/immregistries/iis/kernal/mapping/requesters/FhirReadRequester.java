@@ -12,7 +12,7 @@ import org.immregistries.iis.kernal.mapping.mappers.resources.LocationMapper;
 import org.immregistries.iis.kernal.mapping.mappers.resources.PatientMapper;
 import org.immregistries.iis.kernal.mapping.mappers.resources.PractitionerMapper;
 import org.immregistries.iis.kernal.model.*;
-import org.immregistries.iis.kernal.security.TenantAuthService;
+import org.immregistries.iis.kernal.security.RequestTenantUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -30,7 +30,7 @@ public class FhirReadRequester {
 	@Autowired
 	private MappingService mappingService;
 	@Autowired
-	private TenantAuthService tenantAuthService;
+	private RequestTenantUtil requestTenantUtil;
 
 	/**
 	 *
@@ -40,7 +40,7 @@ public class FhirReadRequester {
 	 */
 	public IBaseResource read(String fhirType, String id) {
 		IFhirResourceDao dao = daoRegistry.getResourceDao(fhirType);
-		return dao.read(new IdType(id), tenantAuthService.requestDetailsWithPartitionName());
+		return dao.read(new IdType(id), requestTenantUtil.requestDetailsWithPartitionName());
 	}
 
 

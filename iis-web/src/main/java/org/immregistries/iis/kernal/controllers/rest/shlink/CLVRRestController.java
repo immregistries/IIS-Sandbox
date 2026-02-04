@@ -9,13 +9,13 @@ import jakarta.servlet.ServletException;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.hl7.fhir.instance.model.api.IBaseBundle;
 import org.hl7.fhir.r4.model.IdType;
-import org.immregistries.iis.kernal.GlobalConstants;
+import org.immregistries.iis.kernal.IisRequestAttribute;
 import org.immregistries.iis.kernal.controllers.IisPathVariable;
 import org.immregistries.iis.kernal.controllers.IisRestPath;
 import org.immregistries.iis.kernal.persisted.entities.IisKey;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.immregistries.iis.kernal.persisted.entities.UserAccess;
-import org.immregistries.iis.kernal.security.TenantAuthService;
+import org.immregistries.iis.kernal.security.RequestTenantUtil;
 import org.immregistries.iis.kernal.security.UserAccessUtil;
 import org.immregistries.iis.kernal.services.KeyStoreService;
 import org.immregistries.iis.kernal.services.QrCodeEncoder;
@@ -61,20 +61,20 @@ public class CLVRRestController {
     @Autowired
     private QrCodeEncoder qrCodeEncoder;
 	@Autowired
-	private TenantAuthService tenantAuthService;
+	private RequestTenantUtil requestTenantUtil;
 	@Autowired
 	private UserAccessUtil userAccessUtil;
 
     @GetMapping(value = "/qr", produces = MediaType.TEXT_PLAIN_VALUE)
     public String getPatientClvrQrCode(
             @PathVariable(IisPathVariable.Key.PATIENT_ID) String patientId,
-				@RequestAttribute(GlobalConstants.SESSION_REQUEST_TENANT) Tenant tenant)
+				@RequestAttribute(IisRequestAttribute.TENANT_REQUEST_ATTRIBUTE) Tenant tenant)
             throws COSEException, SignatureException, NoSuchAlgorithmException, InvalidKeyException,
             NoSuchProviderException, IOException {
 
 		 UserAccess userAccess = userAccessUtil.getUserAccess();
         IisKey iisSigningKey = keyStoreService.getIisSigningKeyOrCreate("", userAccess, tenant);
-        CLVRToken clvrToken = getIpsClvrToken(patientId);
+		 CLVRToken clvrToken = getIpsClvrToken(patientId, tenant);
         String qrCode = clvrService.encodeCLVRtoQrCode(clvrToken, iisSigningKey.keyPair());
         logger.info("qrCode {}", qrCode);
         return qrCode;
@@ -83,12 +83,12 @@ public class CLVRRestController {
     @GetMapping(value = "/qr/png", produces = MediaType.IMAGE_PNG_VALUE)
     public ResponseEntity<byte[]> getPatientClvrPng(
             @PathVariable(IisPathVariable.Key.PATIENT_ID) String patientId,
-				@RequestAttribute(GlobalConstants.SESSION_REQUEST_TENANT) Tenant tenant)
+				@RequestAttribute(IisRequestAttribute.TENANT_REQUEST_ATTRIBUTE) Tenant tenant)
             throws COSEException, IOException, SignatureException, NoSuchAlgorithmException, InvalidKeyException,
             NoSuchProviderException, ServletException {
 		 UserAccess userAccess = userAccessUtil.getUserAccess();
         IisKey iisSigningKey = keyStoreService.getIisSigningKeyOrCreate("", userAccess, tenant);
-        CLVRToken clvrToken = getIpsClvrToken(patientId);
+		 CLVRToken clvrToken = getIpsClvrToken(patientId, tenant);
         String qrCode = clvrService.encodeCLVRtoQrCode(clvrToken, iisSigningKey.keyPair());
 
         ByteArrayOutputStream byteArrayOutputStreamPNG = qrCodeEncoder.toQrCodeStreamPNG(qrCode);
@@ -102,21 +102,21 @@ public class CLVRRestController {
     @GetMapping(value = "/pdf", produces = MediaType.APPLICATION_PDF_VALUE)
     public ResponseEntity<byte[]> getPatientClvrPdf(
             @PathVariable(IisPathVariable.Key.PATIENT_ID) String patientId,
-				@RequestAttribute(GlobalConstants.SESSION_REQUEST_TENANT) Tenant tenant)
+				@RequestAttribute(IisRequestAttribute.TENANT_REQUEST_ATTRIBUTE) Tenant tenant)
             throws COSEException, IOException, SignatureException, NoSuchAlgorithmException, InvalidKeyException,
             NoSuchProviderException, WriterException, URISyntaxException {
 
 		 UserAccess userAccess = userAccessUtil.getUserAccess();
         IisKey iisSigningKey = keyStoreService.getIisSigningKeyOrCreate("", userAccess, tenant);
-        CLVRToken clvrToken = getIpsClvrToken(patientId);
+		 CLVRToken clvrToken = getIpsClvrToken(patientId, tenant);
         String qrCode = clvrService.encodeCLVRtoQrCode(clvrToken, iisSigningKey.keyPair());
         PDDocument pdDocument = clvrPdfService.createPdf(clvrToken, qrCode.getBytes(), "IIS SANDBOX");
         return pdfResponseEntity(pdDocument, "clvrDocument");
     }
 
-    private @NotNull CLVRToken getIpsClvrToken(String patientId) {
+	private @NotNull CLVRToken getIpsClvrToken(String patientId, Tenant tenant) {
         IBaseBundle ipsToBeEncoded = ipsGeneratorSvc
-			  .generateIps(tenantAuthService.requestDetailsWithPartitionName(), new IdType(patientId), "");
+			  .generateIps(requestTenantUtil.requestDetailsWithPartitionName(tenant), new IdType(patientId), "");
         @SuppressWarnings("unchecked")
         CLVRPayload clvrPayload = fhirConversionUtil.toCLVRPayloadFromBundle(ipsToBeEncoded);
 

@@ -25,6 +25,8 @@ public class LabController {
 
   @Autowired
   private UiUtil uiUtil;
+	@Autowired
+	private RequestTenantUtil requestTenantUtil;
 
   public static final String ACTION_CONVERT = "Convert";
 
@@ -191,7 +193,7 @@ public class LabController {
           }
         }
       }
-      uiUtil.doHeader(out, "IIS Sandbox", RequestTenantUtil.getTenant(req));
+		 uiUtil.doHeader(out, "IIS Sandbox", requestTenantUtil.extractTenant(req));
 
       if (messageError != null) {
         out.println("  <div class=\"w3-panel w3-red\">");

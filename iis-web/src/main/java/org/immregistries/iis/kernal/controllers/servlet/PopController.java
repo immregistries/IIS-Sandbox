@@ -39,6 +39,8 @@ public class PopController {
 	private PopRestController popRestController;
 	@Autowired
 	private UiUtil uiUtil;
+	@Autowired
+	private RequestTenantUtil requestTenantUtil;
 
 	@PostMapping
 	// @Transactional
@@ -46,7 +48,7 @@ public class PopController {
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		try {
-			Tenant tenant = RequestTenantUtil.getTenant(req);
+			Tenant tenant = requestTenantUtil.extractTenant(req);
 
 			String ack = "";
 
@@ -77,7 +79,7 @@ public class PopController {
 	@GetMapping
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		resp.setContentType("text/html");
-		Tenant tenant = RequestTenantUtil.getTenant(req);
+		Tenant tenant = requestTenantUtil.extractTenant(req);
 
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		try {

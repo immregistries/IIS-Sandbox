@@ -1,7 +1,7 @@
 package org.immregistries.iis.kernal.controllers.rest;
 
 import jakarta.servlet.http.HttpServletRequest;
-import org.immregistries.iis.kernal.GlobalConstants;
+import org.immregistries.iis.kernal.IisRequestAttribute;
 import org.immregistries.iis.kernal.controllers.IisRestPath;
 import org.immregistries.iis.kernal.logic.match.VacDedupRequest;
 import org.immregistries.iis.kernal.logic.match.VaccinationDedupService;
@@ -21,7 +21,7 @@ public class VacDedupRestController {
 
 	@PostMapping
 	public List<LinkedImmunization> deduplicate(
-		@RequestAttribute(name = GlobalConstants.SESSION_REQUEST_TENANT) Tenant tenant,
+		@RequestAttribute(name = IisRequestAttribute.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
 			@RequestBody VacDedupRequest vacDedupRequest,
 			HttpServletRequest req) {
 
