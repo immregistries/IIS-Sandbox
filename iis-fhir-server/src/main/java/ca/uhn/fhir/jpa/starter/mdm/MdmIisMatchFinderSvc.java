@@ -36,7 +36,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.InputStream;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -54,7 +53,6 @@ import static org.immregistries.iis.kernal.mapping.requesters.FhirSaveRequester.
  */
 public class MdmIisMatchFinderSvc<FhirImmunization extends IAnyResource, FhirPatient extends IAnyResource> extends MdmMatchFinderSvcImpl implements IMdmMatchFinderSvc {
 	private static final Logger ourLog = LoggerFactory.getLogger(MdmIisMatchFinderSvc.class);
-	public static final String MISMO_CONFIGURATION_YML = "/Mismo-Configuration.yml";
 
 	@Autowired
 	private MdmCandidateSearchSvc myMdmCandidateSearchSvc;
@@ -68,8 +66,8 @@ public class MdmIisMatchFinderSvc<FhirImmunization extends IAnyResource, FhirPat
 	private ImmunizationMapper<FhirImmunization> immunizationMapper;
 	@Autowired
 	private VaccinationDedupConversionService<FhirImmunization> vaccinationDedupConversionService;
-
-	private final PatientMatcher patientMismoMatcher;
+	@Autowired
+	private PatientMatcher patientMismoMatcher;
 
 	private IFhirResourceDao<FhirImmunization> immunizationDao;
 	private IFhirResourceDao<FhirPatient> patientDao;
@@ -83,13 +81,6 @@ public class MdmIisMatchFinderSvc<FhirImmunization extends IAnyResource, FhirPat
 
 	public MdmIisMatchFinderSvc() {
 		super();
-		InputStream is = this.getClass().getResourceAsStream(MISMO_CONFIGURATION_YML);
-		if (is == null) {
-			ourLog.error("Unable to find Mismo-Configuration file");
-		} else {
-			ourLog.info("Found Mismo-Configuration file");
-		}
-		patientMismoMatcher = new PatientMatcher(is);
 	}
 
 	@Override

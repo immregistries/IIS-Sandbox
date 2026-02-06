@@ -9,7 +9,6 @@ import org.immregistries.iis.kernal.persisted.entities.UserAccess;
 import org.immregistries.iis.kernal.persisted.repository.TenantRepository;
 import org.immregistries.iis.kernal.services.PartitionCreationService;
 import org.immregistries.iis.kernal.services.PartitionNameExtractorService;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
@@ -24,7 +23,7 @@ import java.util.Optional;
  * Manages Tenant Authorization and Authentication
  *
  */
-public class TenantAuthService implements InitializingBean {
+public class TenantAuthService {
 
 	public static final List<String> FORBIDDEN_NAMES = List.of("pop", "iis", "home", "patient", "vaccination", "fhir",
 			"tenant", "facility", "tenant");
@@ -39,15 +38,6 @@ public class TenantAuthService implements InitializingBean {
 	private IPartitionLookupSvc partitionLookupSvc;
 	@Autowired
 	private UserAccessUtil userAccessUtil;
-
-	//	private static TenantAuthService instance;
-//	public static TenantAuthService get() {
-//		return instance;
-//	}
-	@Override
-	public void afterPropertiesSet() throws Exception {
-//		instance = this;
-	}
 
 	public Tenant authenticateTenantNoUsername(int tenantId, String password) {
 		Tenant tenant = tenantRepository.findById(tenantId).orElse(null);

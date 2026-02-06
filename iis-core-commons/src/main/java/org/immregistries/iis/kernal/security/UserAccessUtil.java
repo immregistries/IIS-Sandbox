@@ -7,7 +7,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.immregistries.iis.kernal.persisted.entities.UserAccess;
 import org.immregistries.iis.kernal.persisted.repository.UserAccessRepository;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,25 +18,11 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import java.util.Optional;
 
 @Service
-public class UserAccessUtil implements InitializingBean {
+public class UserAccessUtil {
 
     public static final String GITHUB_PREFIX = "github-";
     public static final String SESSION_USER_ACCESS = "userAccess";
     private static String BAD_PASSWORD = "badpassword";
-
-    /**
-     * Singleton to access the application context for the repositories
-     */
-//	 private static UserAccessUtil instance;
-
-	@Override
-	public void afterPropertiesSet() throws Exception {
-//		instance = this;
-	}
-//
-//	public static UserAccessUtil get() {
-//		return instance;
-//	}
 
 	@Autowired
 	private UserAccessRepository userAccessRepository;

@@ -19,6 +19,5 @@ public interface FhirMatchRequester {
 	 * @param cutoff               cutoff date to ignore old records
 	 * @return Single match result
 	 */
-	PatientMaster matchPatient(List<PatientReported> multipleMatches, IisPatient patientForMatchQuery,
-										Date cutoff);
+	PatientMaster matchPatient(List<PatientReported> multipleMatches, IisPatient patientForMatchQuery, Date cutoff);
 }

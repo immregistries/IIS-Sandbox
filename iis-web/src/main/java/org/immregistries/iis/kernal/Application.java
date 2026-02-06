@@ -3,6 +3,7 @@ package org.immregistries.iis.kernal;
 import ca.uhn.fhir.rest.server.RestfulServer;
 import org.immregistries.iis.kernal.controllers.filters.FilterRegistrationConfig;
 import org.immregistries.iis.kernal.logic.config.CLVRConfig;
+import org.immregistries.iis.kernal.logic.config.MismoConfig;
 import org.immregistries.iis.kernal.logic.config.V2toFhirConfig;
 import org.immregistries.iis.kernal.security.ServerSecurityConfig;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,7 @@ import org.springframework.web.context.request.RequestContextListener;
 	ServerSecurityConfig.class,
 	CLVRConfig.class,
 	V2toFhirConfig.class,
+	MismoConfig.class,
 })
 @ServletComponentScan(basePackageClasses = {
 	RestfulServer.class }, basePackages = {
