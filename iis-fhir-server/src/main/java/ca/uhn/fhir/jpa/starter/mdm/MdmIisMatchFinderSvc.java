@@ -107,12 +107,6 @@ public class MdmIisMatchFinderSvc<FhirImmunization extends IAnyResource, FhirPat
 			matches = targetCandidates.stream()
 				.map(candidate -> new MatchedTarget(candidate, myMdmResourceMatcherSvc.getMatchResult(theResource, candidate)))
 				.collect(Collectors.toList());
-//			if (theResourceType.equals(ResourceType.Patient.name())) {
-//				for (MatchedTarget matchedTarget : matches) {
-//					DiffResult diff = patientMapper.localObject(theResource).diff(patientMapper.localObject(matchedTarget.getTarget()));
-//					IisLogicInterceptor.printDiff(ourLog, diff);
-//				}
-//			}
 		}
 		ourLog.info("Found {} matched targets for {}.", matches.size(), idOrType(theResource, theResourceType));
 		ourLog.trace("Found {} matched targets for {}.", matches.size(), idOrType(theResource, theResourceType));
