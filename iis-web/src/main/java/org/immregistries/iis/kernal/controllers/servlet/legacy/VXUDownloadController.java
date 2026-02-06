@@ -8,6 +8,7 @@ import org.immregistries.iis.kernal.controllers.servlet.TenantController;
 import org.immregistries.iis.kernal.logic.VXUDownloadGenerator;
 import org.immregistries.iis.kernal.persisted.entities.UserAccess;
 import org.immregistries.iis.kernal.security.UserAccessUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,6 +21,9 @@ import java.io.*;
 @RestController
 @RequestMapping({"/VXUDownload", TenantController.TENANT_PATH + "/VXUDownload"})
 public class VXUDownloadController extends VXUDownloadFormController {
+
+	@Autowired
+	private UserAccessUtil userAccessUtil;
 
 	@PostMapping
   protected void doPost(HttpServletRequest req, HttpServletResponse resp)
@@ -35,7 +39,7 @@ public class VXUDownloadController extends VXUDownloadFormController {
 
     resp.setContentType("text/plain");
     PrintWriter out = new PrintWriter(resp.getOutputStream());
-		UserAccess userAccess = UserAccessUtil.get().getUserAccess();
+		UserAccess userAccess = userAccessUtil.getUserAccess();
    if (userAccess == null) {
 //      RequestDispatcher dispatcher = req.getRequestDispatcher("home");
 //      dispatcher.forward(req, resp);

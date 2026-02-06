@@ -2,7 +2,6 @@ package org.immregistries.iis.kernal.security;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
-import org.immregistries.iis.kernal.GlobalConstants;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.immregistries.iis.kernal.persisted.entities.UserAccess;
 import org.slf4j.Logger;
@@ -27,7 +26,7 @@ public class UsernamePasswordAuthenticationProvider implements AuthenticationPro
 	private static String CLIENT_PROPERTY_KEY = "spring.security.oauth2.client.registration.";
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	@Autowired
-	Environment env;
+	private Environment env;
 	@Autowired
 	private OAuth2AuthorizedClientService authorizedClientService;
 	@Autowired
@@ -35,7 +34,9 @@ public class UsernamePasswordAuthenticationProvider implements AuthenticationPro
 	@Autowired
 	private ClientRegistrationRepository clientRegistrationRepository;
 	@Autowired
-	TenantAuthService tenantAuthService;
+	private TenantAuthService tenantAuthService;
+	@Autowired
+	private UserAccessUtil userAccessUtil;
 
 	public Authentication authenticate(Authentication authentication) throws AuthenticationException {
 		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
@@ -58,7 +59,7 @@ public class UsernamePasswordAuthenticationProvider implements AuthenticationPro
 				return null;
 			}
 		} else {
-			UserAccess userAccess = UserAccessUtil.get().authenticateUserAccessUsernamePassword(authentication.getName(),
+			UserAccess userAccess = userAccessUtil.authenticateUserAccessUsernamePassword(authentication.getName(),
 					(String) authentication.getCredentials());
 			request.getSession(true).setAttribute(UserAccessUtil.SESSION_USER_ACCESS, userAccess);
 			return userAccess;

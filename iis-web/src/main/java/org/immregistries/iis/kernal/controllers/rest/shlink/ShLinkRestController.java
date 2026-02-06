@@ -35,6 +35,8 @@ public class ShLinkRestController {
 	private ShLinkGenerator shLinkGenerator;
 	@Autowired
 	private QrCodeEncoder qrCodeEncoder;
+	@Autowired
+	private UserAccessUtil userAccessUtil;
 
 	@PostMapping()
 	public String shLinkIPSQrCode(HttpServletRequest req,
@@ -45,7 +47,7 @@ public class ShLinkRestController {
 			@RequestParam(value = IisRestParam.ShLink.EXP, required = false, defaultValue = "10000000") String exp,
 											@RequestAttribute(IisRequestAttribute.TENANT_REQUEST_ATTRIBUTE) Tenant tenant)
 			throws IOException, NoSuchAlgorithmException {
-		UserAccess userAccess = UserAccessUtil.get().getUserAccess();
+		UserAccess userAccess = userAccessUtil.getUserAccess();
 		ServletUriComponentsBuilder uriBuilder = ServletUriComponentsBuilder.fromRequest(req);
 		String qrCode = shLinkGenerator.generateShLink(keyId, secretKey, patientId, flag, exp, tenant, userAccess, uriBuilder);
 		return qrCode;

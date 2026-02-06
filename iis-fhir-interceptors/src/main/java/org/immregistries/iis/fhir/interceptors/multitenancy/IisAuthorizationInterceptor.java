@@ -59,6 +59,8 @@ public class IisAuthorizationInterceptor extends AuthorizationInterceptor implem
 
 	@Autowired
 	private PartitionNameExtractorService partitionNameExtractorService;
+	@Autowired
+	private UserAccessUtil userAccessUtil;
 
 	/**
 	 * Authenticates request with Session cookie, Basic Auth (Token bearer currently
@@ -104,7 +106,7 @@ public class IisAuthorizationInterceptor extends AuthorizationInterceptor implem
 				 * Cookie SESSIONID
 				 */
 				if (httpSession != null) {
-					UserAccess userAccess = UserAccessUtil.get().getUserAccess();
+					UserAccess userAccess = userAccessUtil.getUserAccess();
 					/*
 					 * if user authenticated, Tenant/Facility is then selected
 					 */

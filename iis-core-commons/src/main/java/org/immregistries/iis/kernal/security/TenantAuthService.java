@@ -57,7 +57,7 @@ public class TenantAuthService implements InitializingBean {
 		UserAccess tenantUserAccess = tenant.getUserAccess();
 		String username = tenantUserAccess.getAccessName();
 
-		UserAccess userAccess = UserAccessUtil.get().authenticateUserAccessUsernamePassword(username, password);
+		UserAccess userAccess = userAccessUtil.authenticateUserAccessUsernamePassword(username, password);
 		return authenticateTenant(userAccess, tenantId);
 	}
 
@@ -70,12 +70,12 @@ public class TenantAuthService implements InitializingBean {
 		UserAccess tenantUserAccess = tenant.getUserAccess();
 		String username = tenantUserAccess.getAccessName();
 
-		UserAccess userAccess = UserAccessUtil.get().authenticateUserAccessUsernamePassword(username, password);
+		UserAccess userAccess = userAccessUtil.authenticateUserAccessUsernamePassword(username, password);
 		return authenticateTenant(userAccess, facilityName);
 	}
 
 	public Tenant authenticateTenant(String username, String password, String facilityName) {
-		UserAccess userAccess = UserAccessUtil.get().authenticateUserAccessUsernamePassword(username, password);
+		UserAccess userAccess = userAccessUtil.authenticateUserAccessUsernamePassword(username, password);
 		return authenticateTenant(userAccess, facilityName);
 	}
 
@@ -83,7 +83,7 @@ public class TenantAuthService implements InitializingBean {
 		/**
 		 * First user authentication with OAUTH
 		 */
-		UserAccess userAccess = UserAccessUtil.get().authenticateUserAccessOAuth(oAuth2User);
+		UserAccess userAccess = userAccessUtil.authenticateUserAccessOAuth(oAuth2User);
 		return authenticateTenant(userAccess, facilityName);
 	}
 
@@ -144,7 +144,7 @@ public class TenantAuthService implements InitializingBean {
 	}
 
 	public Tenant getTenantByIdAuthenticated(int tenantId) {
-		UserAccess userAccess = UserAccessUtil.get().getUserAccess();
+		UserAccess userAccess = userAccessUtil.getUserAccess();
 		Tenant tenant = tenantRepository.findByOrgIdAndUserAccessId(tenantId, userAccess.getUserAccessId())
 				.orElse(null);
 		return tenant;

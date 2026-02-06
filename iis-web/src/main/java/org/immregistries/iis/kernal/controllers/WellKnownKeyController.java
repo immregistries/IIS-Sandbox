@@ -2,10 +2,10 @@ package org.immregistries.iis.kernal.controllers;
 
 import com.nimbusds.jose.jwk.JWK;
 import org.immregistries.iis.kernal.controllers.servlet.TenantController;
-import org.immregistries.iis.kernal.services.KeyStoreService;
 import org.immregistries.iis.kernal.persisted.entities.IisKey;
 import org.immregistries.iis.kernal.persisted.entities.UserAccess;
 import org.immregistries.iis.kernal.security.UserAccessUtil;
+import org.immregistries.iis.kernal.services.KeyStoreService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,11 +23,13 @@ public class WellKnownKeyController {
 	public static final String WELL_KNOWN_PATH_SUFFIX = "/.well-known/jwks.json";
 
 	@Autowired
-	KeyStoreService keyStoreService;
+	private KeyStoreService keyStoreService;
+	@Autowired
+	private UserAccessUtil userAccessUtil;
 
 	@GetMapping()
 	public List<JWK> doGetWellKnown() {
-		UserAccess userAccess = UserAccessUtil.get().getUserAccess();
+		UserAccess userAccess = userAccessUtil.getUserAccess();
 		List<IisKey> iisKeys = keyStoreService.getKeys(userAccess);
 		return iisKeys.stream().map(iisKey -> iisKey.jwk().toPublicJWK()).collect(Collectors.toList());
 	}

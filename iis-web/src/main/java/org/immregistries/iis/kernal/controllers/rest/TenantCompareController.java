@@ -1,10 +1,9 @@
 package org.immregistries.iis.kernal.controllers.rest;
 
-import org.immregistries.iis.kernal.controllers.IisRestParam;
-import org.immregistries.iis.kernal.controllers.IisRestPath;
-
 import jakarta.validation.constraints.NotBlank;
 import org.hl7.fhir.instance.model.api.IBaseParameters;
+import org.immregistries.iis.kernal.controllers.IisRestParam;
+import org.immregistries.iis.kernal.controllers.IisRestPath;
 import org.immregistries.iis.kernal.logic.TenantCompareService;
 import org.immregistries.iis.kernal.persisted.entities.UserAccess;
 import org.immregistries.iis.kernal.security.UserAccessUtil;
@@ -24,6 +23,8 @@ public class TenantCompareController {
 
 	@Autowired
 	private TenantCompareService tenantCompareService;
+	@Autowired
+	private UserAccessUtil userAccessUtil;
 
 	@PostMapping
 	protected List<IBaseParameters> tenantComparePost(
@@ -45,7 +46,7 @@ public class TenantCompareController {
 			@RequestParam(name = IisRestParam.INCLUDE_GOLDEN, required = false) boolean includeGolden) {
 		String[] tenantNames = tenantIds.split(",");
 		logger.info("Testing Tenant comparison for ids {} with golden={}", tenantNames, includeGolden);
-		UserAccess userAccess = UserAccessUtil.get().getUserAccess();
+		UserAccess userAccess = userAccessUtil.getUserAccess();
 		if (userAccess == null) {
 			throw new AuthenticationCredentialsNotFoundException("");
 		}

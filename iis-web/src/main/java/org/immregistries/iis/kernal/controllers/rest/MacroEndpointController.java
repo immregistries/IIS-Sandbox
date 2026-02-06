@@ -1,10 +1,9 @@
 package org.immregistries.iis.kernal.controllers.rest;
 
-import org.immregistries.iis.kernal.controllers.IisRestPath;
-
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.context.RuntimeResourceDefinition;
 import jakarta.servlet.ServletException;
+import org.immregistries.iis.kernal.controllers.IisRestPath;
 import org.immregistries.iis.kernal.logic.macro.MacroEndpointService;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.immregistries.iis.kernal.persisted.entities.UserAccess;
@@ -23,7 +22,8 @@ public class MacroEndpointController {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	@Autowired
 	private FhirContext fhirContext;
-
+	@Autowired
+	private UserAccessUtil userAccessUtil;
 	@Autowired
 	private MacroEndpointService macroEndpointService;
 
@@ -48,7 +48,7 @@ public class MacroEndpointController {
 	@PostMapping
 	protected ResponseEntity<Tenant> doPost(@RequestBody String bundleString)
 			throws ServletException, IOException {
-		UserAccess userAccess = UserAccessUtil.get().getUserAccess();
+		UserAccess userAccess = userAccessUtil.getUserAccess();
 		return ResponseEntity.ok().body(macroEndpointService.generateTenantAndContent(bundleString, userAccess));
 	}
 

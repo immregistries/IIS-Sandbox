@@ -29,14 +29,13 @@ public class RestTenantUrlFilter extends OncePerRequestFilter {
 	private static final Logger logger = LoggerFactory.getLogger(RestTenantUrlFilter.class);
 
 	private String tenantPrefix() {
-		return deployedApiUrlService.getContextPath() + IisRestPath.BasePath.REST_PATH + "/tenant/";
+		return deployedApiUrlService.getContextPath() + IisRestPath.BasePath.REST_PATH + IisRestPath.BasePath.TENANT_PATH + "/";
 	}
 
 	@Autowired
 	private TenantAuthService tenantAuthService;
 	@Autowired
 	private RequestTenantUtil requestTenantUtil;
-
 	@Autowired
 	private UserAccessUtil userAccessUtil;
 

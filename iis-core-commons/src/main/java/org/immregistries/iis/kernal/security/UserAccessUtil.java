@@ -28,16 +28,16 @@ public class UserAccessUtil implements InitializingBean {
     /**
      * Singleton to access the application context for the repositories
      */
-	 private static UserAccessUtil instance;
+//	 private static UserAccessUtil instance;
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		instance = this;
+//		instance = this;
 	}
-
-	public static UserAccessUtil get() {
-		return instance;
-	}
+//
+//	public static UserAccessUtil get() {
+//		return instance;
+//	}
 
 	@Autowired
 	private UserAccessRepository userAccessRepository;

@@ -46,6 +46,8 @@ public class JwtSmartAuthController {
 	private JwtUtils jwtUtils;
 	@Autowired
 	private IDeployedApiUrlService deployedApiUrlService;
+	@Autowired
+	private UserAccessUtil userAccessUtil;
 
 	private final Map<String, PublicKey> keystore;
 	private final Map<String, String> jwtStore;
@@ -228,7 +230,7 @@ public class JwtSmartAuthController {
 			}
 		}
 		jwtStore.put((String) signedJWT.getJWTClaimsSet().getClaim("jti"), client_assertion);
-		UserAccess userAccess = UserAccessUtil.get().authenticateUserAccessUsernamePassword(GlobalConstants.CONNECTATHON_USER,
+		UserAccess userAccess = userAccessUtil.authenticateUserAccessUsernamePassword(GlobalConstants.CONNECTATHON_USER,
 				"SundaysR0ck!");
 		Map<String, String> result = new HashMap<>(5);
 		result.put("access_token", jwtUtils.generateJwtToken(userAccess));
