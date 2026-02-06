@@ -173,11 +173,11 @@ public class MdmIisMatchFinderSvc<FhirImmunization extends IAnyResource, FhirPat
 		targetCandidates = immunizationDao.search(searchParameterMap, requestDetails);
 		return targetCandidates.getAllResources().stream()
 			.map((resource) -> (FhirImmunization) resource)
-			.map((immunization2) -> {
-				org.immregistries.vaccination_deduplication.Immunization i2 = vaccinationDedupConversionService.convert((FhirImmunization) immunization2, theRequestPartitionId);
+			.map((fhirImmunization) -> {
+				org.immregistries.vaccination_deduplication.Immunization i2 = vaccinationDedupConversionService.convert(fhirImmunization, theRequestPartitionId);
 				ComparisonResult comparison = comparer.compare(i1, i2);
 				if (comparison.equals(ComparisonResult.EQUAL)) {
-					return new MatchedTarget(immunization2, MdmMatchOutcome.EID_MATCH); // TODO verify if accurate to use this match outcome
+					return new MatchedTarget(fhirImmunization, MdmMatchOutcome.EID_MATCH); // TODO verify if accurate to use this match outcome
 				} else {
 					return null;
 				}
