@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.immregistries.iis</groupId>
         <artifactId>iis-sandbox</artifactId>
-        <version>${iis.sandbox.revision}</version>
+        <version>${revision}</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -23,27 +23,27 @@
         <dependency>
             <groupId>org.immregistries.iis</groupId>
             <artifactId>iis-constants</artifactId>
-            <version>${iis.sandbox.revision}</version>
+            <version>${revision}</version>
         </dependency>
         <dependency>
             <groupId>org.immregistries.iis</groupId>
             <artifactId>iis-core-model</artifactId>
-            <version>${iis.sandbox.revision}</version>
+            <version>${revision}</version>
         </dependency>
         <dependency>
             <groupId>org.immregistries.iis</groupId>
             <artifactId>iis-core-commons</artifactId>
-            <version>${iis.sandbox.revision}</version>
+            <version>${revision}</version>
         </dependency>
         <dependency>
             <groupId>org.immregistries.iis</groupId>
             <artifactId>iis-mapping</artifactId>
-            <version>${iis.sandbox.revision}</version>
+            <version>${revision}</version>
         </dependency>
         <dependency>
             <groupId>org.immregistries.iis</groupId>
             <artifactId>iis-fhir-annotations</artifactId>
-            <version>${iis.sandbox.revision}</version>
+            <version>${revision}</version>
         </dependency>
 
         <dependency>

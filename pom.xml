@@ -5,7 +5,7 @@
 
     <groupId>org.immregistries.iis</groupId>
     <artifactId>iis-sandbox</artifactId>
-    <version>${iis.sandbox.revision}</version>
+    <version>${revision}</version>
     <packaging>pom</packaging>
 
     <repositories>
@@ -31,7 +31,7 @@
     </parent>
 
     <properties>
-        <iis.sandbox.revision>1</iis.sandbox.revision>
+        <!--        <iis.sandbox.revision>1</iis.sandbox.revision>-->
         <revision>0.6.3-SNAPSHOT-HAPI-UPGRADE-TEST</revision>
         <!--        WARNING MUST BE THE SAME VALUE AS parent hapi-fhir version -->
         <hapi-fhir.version>8.0.0</hapi-fhir.version>
@@ -66,7 +66,7 @@
             <dependency>
                 <groupId>org.immregistries.iis</groupId>
                 <artifactId>iis-core-model</artifactId>
-                <version>${iis.sandbox.revision}</version>
+                <version>${revision}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
