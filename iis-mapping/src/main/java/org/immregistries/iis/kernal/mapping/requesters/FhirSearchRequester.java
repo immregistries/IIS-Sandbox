@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static org.immregistries.iis.kernal.GlobalConstants.TAG_SEARCH_PARAM;
 import static org.immregistries.iis.kernal.mapping.mappers.resources.ImmunizationMapper.IMMUNIZATION_FHIR_TYPE_NAME;
 
 @Service
@@ -139,7 +140,7 @@ public class FhirSearchRequester {
 		if (searchParameterMap == null) {
 			searchParameterMap = new SearchParameterMap();
 		}
-		searchParameterMap.add("_tag", new TokenParam(FhirSaveRequester.GOLDEN_SYSTEM_TAG, FhirSaveRequester.GOLDEN_RECORD));
+		searchParameterMap.add(TAG_SEARCH_PARAM, new TokenParam(FhirSaveRequester.GOLDEN_SYSTEM_TAG, FhirSaveRequester.GOLDEN_RECORD));
 		return search(aClass, searchParameterMap);
 	}
 
@@ -155,7 +156,7 @@ public class FhirSearchRequester {
 		if (searchParameterMap == null) {
 			searchParameterMap = new SearchParameterMap();
 		}
-		searchParameterMap.add("_tag", new TokenParam(FhirSaveRequester.GOLDEN_SYSTEM_TAG, FhirSaveRequester.GOLDEN_RECORD));
+		searchParameterMap.add(TAG_SEARCH_PARAM, new TokenParam(FhirSaveRequester.GOLDEN_SYSTEM_TAG, FhirSaveRequester.GOLDEN_RECORD));
 		return search(fhirType, searchParameterMap);
 	}
 
@@ -171,7 +172,7 @@ public class FhirSearchRequester {
 		if (searchParameterMap == null) {
 			searchParameterMap = new SearchParameterMap();
 		}
-		searchParameterMap.add("_tag",
+		searchParameterMap.add(TAG_SEARCH_PARAM,
 			new TokenParam(FhirSaveRequester.GOLDEN_SYSTEM_TAG, FhirSaveRequester.GOLDEN_RECORD).setModifier(TokenParamModifier.NOT));
 		return search(aClass, searchParameterMap);
 	}
@@ -188,7 +189,7 @@ public class FhirSearchRequester {
 		if (searchParameterMap == null) {
 			searchParameterMap = new SearchParameterMap();
 		}
-		searchParameterMap.add("_tag",
+		searchParameterMap.add(TAG_SEARCH_PARAM,
 			new TokenParam(FhirSaveRequester.GOLDEN_SYSTEM_TAG, FhirSaveRequester.GOLDEN_RECORD).setModifier(TokenParamModifier.NOT));
 		return search(fhirType, searchParameterMap);
 	}

@@ -1,6 +1,5 @@
 package org.immregistries.iis.kernal.logic;
 
-import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.interceptor.model.RequestPartitionId;
 import ca.uhn.fhir.jpa.api.dao.DaoRegistry;
 import ca.uhn.fhir.jpa.api.dao.IFhirResourceDao;
@@ -25,6 +24,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static org.immregistries.iis.kernal.GlobalConstants.TAG_SEARCH_PARAM;
 import static org.immregistries.iis.kernal.mapping.requesters.FhirSaveRequester.GOLDEN_RECORD;
 import static org.immregistries.iis.kernal.mapping.requesters.FhirSaveRequester.GOLDEN_SYSTEM_TAG;
 
@@ -67,7 +67,7 @@ public class TenantCompareService {
 											 List<IBaseParameters> diffs, Boolean includeGolden) {
 		SearchParameterMap searchParameterMap = new SearchParameterMap();
 		if (!includeGolden) {
-			searchParameterMap.add("_tag",
+			searchParameterMap.add(TAG_SEARCH_PARAM,
 				new TokenParam(GOLDEN_SYSTEM_TAG, GOLDEN_RECORD).setModifier(TokenParamModifier.NOT));
 		}
 		List<IBundleProvider> bundleProviderStream = systemRequestDetailsList.stream().map(

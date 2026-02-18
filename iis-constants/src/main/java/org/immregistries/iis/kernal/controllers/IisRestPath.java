@@ -1,7 +1,5 @@
 package org.immregistries.iis.kernal.controllers;
 
-import org.immregistries.iis.kernal.controllers.IisRestPath.BasePath;
-
 public final class IisRestPath {
 
 	public static final String FITS_EXAMPLE_PATH = "/fits/example";

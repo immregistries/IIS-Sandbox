@@ -18,6 +18,7 @@ import org.immregistries.iis.kernal.services.PartitionNameExtractorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import static org.immregistries.iis.kernal.GlobalConstants.TAG_SEARCH_PARAM;
 import static org.immregistries.iis.kernal.mapping.requesters.FhirSaveRequester.GOLDEN_RECORD;
 import static org.immregistries.iis.kernal.mapping.requesters.FhirSaveRequester.GOLDEN_SYSTEM_TAG;
 
@@ -69,7 +70,7 @@ public class FhirIdentifierSolver<Identifier extends IBaseDatatype, Patient exte
 		 * searching for matching patient golden record first
 		 */
 		SearchParameterMap goldenSearchParameterMap = new SearchParameterMap()
-			.add("_tag", new TokenParam()
+			.add(TAG_SEARCH_PARAM, new TokenParam()
 				.setSystem(GOLDEN_SYSTEM_TAG)
 				.setValue(GOLDEN_RECORD));
 		if (StringUtils.isNotBlank(identifier.getSystem())) {

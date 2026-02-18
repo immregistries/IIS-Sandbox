@@ -7,8 +7,8 @@ import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.immregistries.iis.kernal.persisted.entities.UserAccess;
 import org.immregistries.iis.kernal.persisted.repository.TenantRepository;
 import org.immregistries.iis.kernal.security.TenantAuthService;
-import org.immregistries.iis.kernal.security.UserAccessUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,30 +23,26 @@ public class TenantRestController {
 	 private TenantRepository tenantRepository;
     @Autowired
 	 private TenantAuthService tenantAuthService;
-    @Autowired
-	 private UserAccessUtil userAccessUtil;
 
     @GetMapping(IisPathVariable.PlaceHolder.TENANT_ID_PLACEHOLDER)
-    public Tenant getTenant(@PathVariable(PARAM_TENANT_ID) int tenantId) {
-        UserAccess userAccess = userAccessUtil.getUserAccess();
+	 public Tenant getTenant(@AuthenticationPrincipal UserAccess userAccess, @PathVariable(PARAM_TENANT_ID) int tenantId) {
         return tenantRepository.findByOrgIdAndUserAccessId(tenantId, userAccess.getUserAccessId())
                 .orElseThrow(() -> new RuntimeException("Tenant not found"));
     }
 
     @GetMapping
-    public List<Tenant> getTenants(HttpServletRequest req) {
-		 return tenantRepository.findByUserAccessId(userAccessUtil.getUserAccess().getUserAccessId());
+	 public List<Tenant> getTenants(@AuthenticationPrincipal UserAccess userAccess, HttpServletRequest req) {
+		 return tenantRepository.findByUserAccessId(userAccess.getUserAccessId());
     }
 
     @PostMapping
-    public Tenant createTenant(@RequestBody Tenant tenant) {
-		 UserAccess currentUser = userAccessUtil.getUserAccess();
-        if (tenant.getUserAccess() != null && !tenant.getUserAccess().equals(currentUser)) {
+	 public Tenant createTenant(@AuthenticationPrincipal UserAccess userAccess, @RequestBody Tenant tenant) {
+		 if (tenant.getUserAccess() != null && !tenant.getUserAccess().equals(userAccess)) {
             throw new IllegalArgumentException("Tenant UserAccess must be null or match the current user");
         }
         // TODO prevent duplicate tenant creation
-        tenantAuthService.authenticateTenant(currentUser, tenant.getOrganizationName());
-        tenant.setUserAccess(currentUser);
+		 tenantAuthService.authenticateTenant(userAccess, tenant.getOrganizationName());
+		 tenant.setUserAccess(userAccess);
         tenant = tenantRepository.save(tenant);
         return tenant;
     }

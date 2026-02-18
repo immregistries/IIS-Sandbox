@@ -12,9 +12,11 @@ import org.immregistries.iis.kernal.controllers.servlet.util.UiQrCodeUtil;
 import org.immregistries.iis.kernal.controllers.servlet.util.UiUtil;
 import org.immregistries.iis.kernal.persisted.entities.IisKey;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
+import org.immregistries.iis.kernal.persisted.entities.UserAccess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -57,7 +59,10 @@ public class ShLinkController {
 	private IisKeyController iisKeyController;
 
 	@PostMapping()
-	protected void shLinkIPS(HttpServletRequest req, HttpServletResponse resp,
+	protected void shLinkIPS(
+		@AuthenticationPrincipal UserAccess userAccess,
+		HttpServletRequest req,
+		HttpServletResponse resp,
 			@RequestParam(value = PARAM_KEY_ID, required = false) String keyId,
 			@RequestParam(value = PARAM_SECRET_KEY, required = false) String secretKey,
 			@RequestParam(PARAM_PATIENT_ID) String patientId,
@@ -72,9 +77,9 @@ public class ShLinkController {
 		/*
 		 * Choosing or generating the keys based on the parameters
 		 */
-		IisKey iisSigningKey = iisKeyRestController.getOrCreateKey(tenant, keyId);
+		IisKey iisSigningKey = iisKeyRestController.getOrCreateKey(userAccess, tenant, keyId);
 
-		String qrCode = shLinkRestController.shLinkIPSQrCode(req, iisSigningKey.getKeyId(), secretKey, patientId, flag,
+		String qrCode = shLinkRestController.shLinkIPSQrCode(userAccess, req, iisSigningKey.getKeyId(), secretKey, patientId, flag,
 				exp, tenant);
 		if (image) {
 			resp.setContentType("image/png"); // Set content type for PNG image
@@ -95,7 +100,9 @@ public class ShLinkController {
 	}
 
 	@GetMapping()
-	protected void doGet(HttpServletRequest req, HttpServletResponse resp,
+	protected void doGet(
+		@AuthenticationPrincipal UserAccess userAccess,
+		HttpServletRequest req, HttpServletResponse resp,
 			@RequestParam(value = PARAM_KEY_ID, required = false) String keyId,
 			@RequestParam(value = PARAM_PATIENT_ID, required = false) String patientId,
 			@RequestParam(value = PARAM_FLAG, required = false) String flag,
@@ -146,7 +153,7 @@ public class ShLinkController {
 
 		out.println("    <div class=\"w3-container\">");
 
-		List<IisKey> iisKeys = iisKeyRestController.getKeys();
+		List<IisKey> iisKeys = iisKeyRestController.getKeys(userAccess);
 		iisKeyController.printIisKeys(out, iisKeys, tenant);
 		out.println("    </div>");
 

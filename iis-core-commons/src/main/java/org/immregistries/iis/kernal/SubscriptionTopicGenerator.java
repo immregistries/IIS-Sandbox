@@ -3,6 +3,8 @@ package org.immregistries.iis.kernal;
 import org.hl7.fhir.r5.model.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import static org.immregistries.iis.kernal.GlobalConstants.TAG_SEARCH_PARAM;
+
 public final class SubscriptionTopicGenerator {
 	public static final String DATA_QUALITY_ISSUES_TOPIC_NAME = "/data-quality-issues";
 	public static final String PATIENT_TOPIC_NAME = "/Patient";
@@ -44,7 +46,7 @@ public final class SubscriptionTopicGenerator {
 		topic.addCanFilterBy(new SubscriptionTopic.SubscriptionTopicCanFilterByComponent()
 			.setDescription("test")
 			.setResource("OperationOutcome")
-			.setFilterParameter("_tag")
+			.setFilterParameter(TAG_SEARCH_PARAM)
 			.addModifier(Enumerations.SearchModifierCode.EXACT)
 		);
 		topic.addNotificationShape().setResource("OperationOutcome");

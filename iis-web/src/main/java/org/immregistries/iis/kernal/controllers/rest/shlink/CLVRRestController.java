@@ -16,7 +16,6 @@ import org.immregistries.iis.kernal.persisted.entities.IisKey;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.immregistries.iis.kernal.persisted.entities.UserAccess;
 import org.immregistries.iis.kernal.security.RequestTenantUtil;
-import org.immregistries.iis.kernal.security.UserAccessUtil;
 import org.immregistries.iis.kernal.services.KeyStoreService;
 import org.immregistries.iis.kernal.services.QrCodeEncoder;
 import org.immregitries.clvr.CLVRPdfService;
@@ -32,6 +31,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.awt.image.BufferedImage;
@@ -62,17 +62,14 @@ public class CLVRRestController {
     private QrCodeEncoder qrCodeEncoder;
 	@Autowired
 	private RequestTenantUtil requestTenantUtil;
-	@Autowired
-	private UserAccessUtil userAccessUtil;
 
     @GetMapping(value = "/qr", produces = MediaType.TEXT_PLAIN_VALUE)
     public String getPatientClvrQrCode(
+		 @AuthenticationPrincipal UserAccess userAccess,
             @PathVariable(IisPathVariable.Key.PATIENT_ID) String patientId,
 				@RequestAttribute(IisRequestAttribute.TENANT_REQUEST_ATTRIBUTE) Tenant tenant)
             throws COSEException, SignatureException, NoSuchAlgorithmException, InvalidKeyException,
             NoSuchProviderException, IOException {
-
-		 UserAccess userAccess = userAccessUtil.getUserAccess();
         IisKey iisSigningKey = keyStoreService.getIisSigningKeyOrCreate("", userAccess, tenant);
 		 CLVRToken clvrToken = getIpsClvrToken(patientId, tenant);
         String qrCode = clvrService.encodeCLVRtoQrCode(clvrToken, iisSigningKey.keyPair());
@@ -82,11 +79,11 @@ public class CLVRRestController {
 
     @GetMapping(value = "/qr/png", produces = MediaType.IMAGE_PNG_VALUE)
     public ResponseEntity<byte[]> getPatientClvrPng(
+		 @AuthenticationPrincipal UserAccess userAccess,
             @PathVariable(IisPathVariable.Key.PATIENT_ID) String patientId,
 				@RequestAttribute(IisRequestAttribute.TENANT_REQUEST_ATTRIBUTE) Tenant tenant)
             throws COSEException, IOException, SignatureException, NoSuchAlgorithmException, InvalidKeyException,
             NoSuchProviderException, ServletException {
-		 UserAccess userAccess = userAccessUtil.getUserAccess();
         IisKey iisSigningKey = keyStoreService.getIisSigningKeyOrCreate("", userAccess, tenant);
 		 CLVRToken clvrToken = getIpsClvrToken(patientId, tenant);
         String qrCode = clvrService.encodeCLVRtoQrCode(clvrToken, iisSigningKey.keyPair());
@@ -101,12 +98,12 @@ public class CLVRRestController {
 
     @GetMapping(value = "/pdf", produces = MediaType.APPLICATION_PDF_VALUE)
     public ResponseEntity<byte[]> getPatientClvrPdf(
+		 @AuthenticationPrincipal UserAccess userAccess,
             @PathVariable(IisPathVariable.Key.PATIENT_ID) String patientId,
 				@RequestAttribute(IisRequestAttribute.TENANT_REQUEST_ATTRIBUTE) Tenant tenant)
             throws COSEException, IOException, SignatureException, NoSuchAlgorithmException, InvalidKeyException,
             NoSuchProviderException, WriterException, URISyntaxException {
 
-		 UserAccess userAccess = userAccessUtil.getUserAccess();
         IisKey iisSigningKey = keyStoreService.getIisSigningKeyOrCreate("", userAccess, tenant);
 		 CLVRToken clvrToken = getIpsClvrToken(patientId, tenant);
         String qrCode = clvrService.encodeCLVRtoQrCode(clvrToken, iisSigningKey.keyPair());

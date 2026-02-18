@@ -11,8 +11,10 @@ import org.immregistries.iis.kernal.controllers.servlet.util.UiUtil;
 import org.immregistries.iis.kernal.controllers.servlet.util.UrlTenantUtil;
 import org.immregistries.iis.kernal.persisted.entities.IisKey;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
+import org.immregistries.iis.kernal.persisted.entities.UserAccess;
 import org.immregistries.iis.kernal.security.RequestTenantUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -37,13 +39,13 @@ public class IisKeyController {
 	private RequestTenantUtil requestTenantUtil;
 
 	@PostMapping
-	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+	protected void doPost(@AuthenticationPrincipal UserAccess userAccess, HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
-		doGet(req, resp);
+		doGet(userAccess, req, resp);
 	}
 
 	@GetMapping
-	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+	protected void doGet(@AuthenticationPrincipal UserAccess userAccess, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		try {
@@ -55,7 +57,7 @@ public class IisKeyController {
 			out.println("    </div>");
 
 			out.println("    <div class=\"w3-container\">");
-			List<IisKey> iisKeys = iisKeyRestController.getKeys();
+			List<IisKey> iisKeys = iisKeyRestController.getKeys(userAccess);
 			printIisKeys(out, iisKeys, tenant);
 			out.println("    </div>");
 		} catch (Exception e) {

@@ -6,11 +6,10 @@ import org.immregistries.iis.kernal.controllers.IisRestParam;
 import org.immregistries.iis.kernal.controllers.IisRestPath;
 import org.immregistries.iis.kernal.logic.TenantCompareService;
 import org.immregistries.iis.kernal.persisted.entities.UserAccess;
-import org.immregistries.iis.kernal.security.UserAccessUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,14 +22,13 @@ public class TenantCompareController {
 
 	@Autowired
 	private TenantCompareService tenantCompareService;
-	@Autowired
-	private UserAccessUtil userAccessUtil;
 
 	@PostMapping
 	protected List<IBaseParameters> tenantComparePost(
+		@AuthenticationPrincipal UserAccess userAccess,
 			@RequestParam(name = IisRestParam.TENANT_IDS) @NotBlank String tenantIds,
 			@RequestParam(name = IisRestParam.INCLUDE_GOLDEN, required = false) boolean includeGolden) {
-		return tenantCompareGet(tenantIds, includeGolden);
+		return tenantCompareGet(userAccess, tenantIds, includeGolden);
 	}
 
 	/**
@@ -42,14 +40,11 @@ public class TenantCompareController {
 	 */
 	@GetMapping()
 	protected List<IBaseParameters> tenantCompareGet(
+		@AuthenticationPrincipal UserAccess userAccess,
 			@RequestParam(name = IisRestParam.TENANT_IDS) @NotBlank String tenantIds,
 			@RequestParam(name = IisRestParam.INCLUDE_GOLDEN, required = false) boolean includeGolden) {
 		String[] tenantNames = tenantIds.split(",");
 		logger.info("Testing Tenant comparison for ids {} with golden={}", tenantNames, includeGolden);
-		UserAccess userAccess = userAccessUtil.getUserAccess();
-		if (userAccess == null) {
-			throw new AuthenticationCredentialsNotFoundException("");
-		}
 		return tenantCompareService.compareTenants(tenantNames, userAccess,
 				includeGolden);
 	}

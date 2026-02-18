@@ -63,7 +63,7 @@ public class LoginFormController {
 					tenantName = "";
 				}
 				if (req.getParameter(PARAM_ORG_ID) != null) {
-					Tenant tenant = tenantRestController.getTenant(Integer.parseInt(req.getParameter(PARAM_ORG_ID)));
+					Tenant tenant = tenantRestController.getTenant(null, Integer.parseInt(req.getParameter(PARAM_ORG_ID)));
 					tenantName = tenant.getOrganizationName();
 				}
 				out.println("<div class=\"w3-container w3-card-4\">");

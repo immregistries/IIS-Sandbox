@@ -19,6 +19,7 @@ import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
 import jakarta.annotation.Nonnull;
 import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.hl7.fhir.r4.model.ResourceType;
+import org.immregistries.iis.kernal.GlobalConstants;
 import org.immregistries.iis.kernal.enums.ProcessingFlavor;
 import org.immregistries.iis.kernal.logic.match.PatientMismoConversionService;
 import org.immregistries.iis.kernal.logic.match.VaccinationDedupConversionService;
@@ -114,6 +115,13 @@ public class MdmIisMatchFinderSvc<FhirImmunization extends IAnyResource, FhirPat
 
 	}
 
+	/**
+	 * Match Patient using mismo
+	 *
+	 * @param theResource           Fhir Patient resource
+	 * @param theRequestPartitionId Partition Id
+	 * @return
+	 */
 	private @NotNull List<MatchedTarget> matchMismoPatient(FhirPatient theResource, RequestPartitionId theRequestPartitionId) {
 		Collection<IAnyResource> targetCandidates = myMdmCandidateSearchSvc.findCandidates(ResourceType.Patient.name(), theResource, theRequestPartitionId);
 		Patient mismoPatient = patientMismoConversionService.convert(theResource);
@@ -127,13 +135,20 @@ public class MdmIisMatchFinderSvc<FhirImmunization extends IAnyResource, FhirPat
 		return matches;
 	}
 
-	public List<MatchedTarget> matchImmunization(FhirImmunization immunization, RequestPartitionId theRequestPartitionId) {
-		ModelReference patient = immunizationMapper.extractPatientReference(immunization);
+	/**
+	 * Match immunizationusing Fhir Search and Vaccination Deduplication
+	 *
+	 * @param theResource           Fhir Immunization Resource
+	 * @param theRequestPartitionId Partition Id
+	 * @return
+	 */
+	private List<MatchedTarget> matchImmunization(FhirImmunization theResource, RequestPartitionId theRequestPartitionId) {
+		ModelReference patient = immunizationMapper.extractPatientReference(theResource);
 		if (patient == null) {
 			throw new InvalidRequestException("No patient specified");
 		}
 		Deterministic comparer = new Deterministic();
-		org.immregistries.vaccination_deduplication.Immunization i1 = vaccinationDedupConversionService.convert(immunization, theRequestPartitionId);
+		org.immregistries.vaccination_deduplication.Immunization i1 = vaccinationDedupConversionService.convert(theResource, theRequestPartitionId);
 
 		SystemRequestDetails requestDetails = new SystemRequestDetails();
 		requestDetails.setRequestPartitionId(theRequestPartitionId);
@@ -142,7 +157,7 @@ public class MdmIisMatchFinderSvc<FhirImmunization extends IAnyResource, FhirPat
 		SearchParameterMap searchParameterMap = new SearchParameterMap()
 			.setLoadSynchronous(true)
 			.setLoadSynchronousUpTo(1000)
-			.add("_tag", new TokenParam()
+			.add(GlobalConstants.TAG_SEARCH_PARAM, new TokenParam()
 				.setSystem(GOLDEN_SYSTEM_TAG)
 				.setValue(GOLDEN_RECORD).setModifier(TokenParamModifier.NOT));
 
@@ -157,7 +172,7 @@ public class MdmIisMatchFinderSvc<FhirImmunization extends IAnyResource, FhirPat
 			SystemRequestDetails patientRequestDetails = new SystemRequestDetails();
 			patientRequestDetails.setRequestPartitionId(theRequestPartitionId);
 			SearchParameterMap patientSearchParameter = new SearchParameterMap()
-				.add("_tag", new TokenParam()
+				.add(GlobalConstants.TAG_SEARCH_PARAM, new TokenParam()
 					.setSystem(GOLDEN_SYSTEM_TAG)
 					.setValue(GOLDEN_RECORD))
 				.add("identifier", new TokenParam()

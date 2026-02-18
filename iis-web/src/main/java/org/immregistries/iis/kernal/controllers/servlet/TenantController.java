@@ -11,9 +11,9 @@ import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.immregistries.iis.kernal.persisted.entities.UserAccess;
 import org.immregistries.iis.kernal.security.RequestTenantUtil;
 import org.immregistries.iis.kernal.security.TenantAuthService;
-import org.immregistries.iis.kernal.security.UserAccessUtil;
 import org.immregistries.iis.kernal.services.api.IDeployedApiUrlService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -48,8 +48,6 @@ public class TenantController {
 	private IDeployedApiUrlService deployedApiUrlService;
 	@Autowired
 	private RequestTenantUtil requestTenantUtil;
-	@Autowired
-	private UserAccessUtil userAccessUtil;
 
 	/**
 	 * Adds a new tenant from form
@@ -61,14 +59,16 @@ public class TenantController {
 	 * @throws IOException      outputStream exception
 	 */
 	@PostMapping()
-	protected void doPost(HttpServletRequest req, HttpServletResponse resp,
+	protected void doPost(
+		@AuthenticationPrincipal UserAccess userAccess,
+		HttpServletRequest req, HttpServletResponse resp,
 			@RequestParam(name = PARAM_TENANT_NAME) @NotBlank String tenantName)
 			throws ServletException, IOException {
 		Tenant tenant = new Tenant();
 		tenant.setOrganizationName(tenantName);
-		tenantRestController.createTenant(tenant);
+		tenantRestController.createTenant(userAccess, tenant);
 		resp.sendRedirect(deployedApiUrlService.getContextPath() + TENANT_BASE_PATH + "/" + tenantName + TENANT_BASE_PATH);
-		doGet(req, resp);
+		doGet(userAccess, req, resp);
 	}
 
 	/**
@@ -82,7 +82,7 @@ public class TenantController {
 	 * @throws IOException      outputStream exception
 	 */
 	@GetMapping()
-	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+	protected void doGet(@AuthenticationPrincipal UserAccess userAccess, HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
 		HttpSession session = req.getSession(false);
 		resp.setContentType("text/html");
@@ -91,9 +91,8 @@ public class TenantController {
 		String tenantId = req.getParameter(PARAM_TENANT_ID);
 
 		Tenant tenant = requestTenantUtil.extractTenant(req);
-		UserAccess userAccess = userAccessUtil.getUserAccess();
 		if (userAccess != null && session != null) {
-			List<Tenant> tenantList = tenantRestController.getTenants(req);
+			List<Tenant> tenantList = tenantRestController.getTenants(userAccess, req);
 			for (Tenant tenantMember : tenantList) {
 				if (ACTION_SWITCH.equals(action) && String.valueOf(tenantMember.getOrgId()).equals(tenantId)) {
 					tenant = tenantMember;
