@@ -2,7 +2,6 @@ package org.immregistries.iis.kernal.controllers.servlet.legacy;
 
 import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
 import ca.uhn.fhir.jpa.starter.annotations.OnR5Condition;
-import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.param.DateParam;
 import ca.uhn.fhir.rest.param.ParamPrefixEnum;
 import ca.uhn.fhir.rest.param.ReferenceParam;
@@ -14,7 +13,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.r5.model.Immunization;
 import org.hl7.fhir.r5.model.Patient;
 import org.immregistries.iis.kernal.controllers.servlet.util.UiUtil;
-import org.immregistries.iis.kernal.mapping.IisFhirClientFactory;
 import org.immregistries.iis.kernal.mapping.mappers.resources.r5.LocationMapperR5;
 import org.immregistries.iis.kernal.mapping.requesters.FhirReadRequester;
 import org.immregistries.iis.kernal.mapping.requesters.FhirSearchRequester;
@@ -56,8 +54,6 @@ public class CovidController {
 	}
 
 	@Autowired
-	IisFhirClientFactory iisFhirClientFactory;
-	@Autowired
 	private FhirSearchRequester fhirSearchRequester;
 	@Autowired
 	private FhirReadRequester fhirReadRequester;
@@ -79,7 +75,6 @@ public class CovidController {
 		resp.setContentType("text/html");
 		PrintWriter out = new PrintWriter(resp.getOutputStream());
 		Tenant tenant = uiUtil.getTenantRedirectIfNone(req, resp);
-		IGenericClient fhirClient = iisFhirClientFactory.getOrCreateGenericClient(req);
 
 		try {
 			SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
@@ -189,7 +184,7 @@ public class CovidController {
 								// not reporting missed appointments anymore
 								continue;
 							}
-							int doseNumber = getDoseNumber(fhirClient, vaccinationReported);
+							int doseNumber = getDoseNumber(vaccinationReported);
 							printLine(out, vaccinationReported, includePhi, doseNumber);
 						}
 					}
@@ -256,7 +251,7 @@ public class CovidController {
 		out.println();
 	}
 
-	private int getDoseNumber(IGenericClient fhirClient, VaccinationReported vaccinationReported) {
+	private int getDoseNumber(VaccinationReported vaccinationReported) {
 		int doseNumber = 0;
 		if (vaccinationReported.getCompletionStatus().equals("CP")) {
 			// Query query = dataSession

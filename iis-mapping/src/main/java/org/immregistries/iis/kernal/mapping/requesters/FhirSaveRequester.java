@@ -9,7 +9,6 @@ import ca.uhn.fhir.rest.gclient.ICriterion;
 import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.instance.model.api.IAnyResource;
-import org.immregistries.iis.kernal.mapping.IisFhirClientFactory;
 import org.immregistries.iis.kernal.security.RequestTenantUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,8 +26,6 @@ public abstract class FhirSaveRequester<Patient extends IAnyResource, Immunizati
 	private static final String NOT_GOLDEN_CRITERION = "_tag:not=" + GOLDEN_CRITERION_PART;
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-	@Autowired
-	private IisFhirClientFactory iisFhirClientFactory;
 	@Autowired
 	private FhirContext fhirContext;
 	@Autowired

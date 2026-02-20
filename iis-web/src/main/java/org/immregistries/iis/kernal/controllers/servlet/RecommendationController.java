@@ -11,6 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.hl7.fhir.instance.model.api.IBaseBundle;
 import org.hl7.fhir.instance.model.api.IDomainResource;
+import org.hl7.fhir.instance.model.api.IIdType;
 import org.hl7.fhir.r5.model.Identifier;
 import org.immregistries.iis.kernal.controllers.IisRestParam;
 import org.immregistries.iis.kernal.controllers.rest.PatientRestController;
@@ -131,14 +132,24 @@ public class RecommendationController {
 					req.getParameter(PARAM_RECOMMENDATION_ID), req.getParameter(PARAM_RECOMMENDATION_IDENTIFIER),
 					tenant, req);
 			IDomainResource patientResource = null;
+
+			String patientId;
 			if (recommendationResource != null) {
-				String patientReference = getPatientIdFromRecommendation(recommendationResource,
-						fhirClient.getFhirContext());
-				patientResource = (IDomainResource) fhirClient.read().resource("Patient")
-						.withId(patientReference)
-						.execute();
+				IIdType patientReference = getPatientIdFromRecommendation(recommendationResource,
+					fhirContext);
+//				patientResource = (IDomainResource) fhirClient.read().resource(PatientMapper.PATIENT_FHIR_TYPE_NAME)
+//						.withId(patientReference)
+//						.execute();
+				if (patientReference != null) {
+					patientId = patientReference.getIdPart();
+				} else {
+					patientId = "";
+				}
 			} else {
-				String patientId = req.getParameter(PARAM_PATIENT_REPORTED_ID);
+				patientId = req.getParameter(PARAM_PATIENT_REPORTED_ID);
+			}
+
+			if (StringUtils.isNotBlank(patientId)) {
 				patientResource = (IDomainResource) patientRestController.getPatientFhir(patientId, tenant, req);
 			}
 			if (patientResource == null) {
@@ -179,8 +190,7 @@ public class RecommendationController {
 					org.hl7.fhir.r5.model.Bundle subcriptionBundle = fhirClient.search()
 							.forResource(org.hl7.fhir.r5.model.Subscription.class)
 							.returnBundle(org.hl7.fhir.r5.model.Bundle.class).execute();
-					IParser parser = iisFhirClientFactory.getFhirContext()
-							.newJsonParser().setPrettyPrint(true).setSummaryMode(false).setSuppressNarratives(true);
+					IParser parser = fhirContext.newJsonParser().setPrettyPrint(true).setSummaryMode(false).setSuppressNarratives(true);
 
 					out.println("<div class=\"w3-container\">");
 					out.println("<h3>Manually edit</h3>");
@@ -217,16 +227,16 @@ public class RecommendationController {
 		out.close();
 	}
 
-	private String getPatientIdFromRecommendation(IAnyResource recommendationResource, FhirContext fhirContext) {
-		String patientReference = "";
+	private IIdType getPatientIdFromRecommendation(IAnyResource recommendationResource, FhirContext fhirContext) {
+		IIdType patientReference;
 		if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R5)) {
 			patientReference = ((org.hl7.fhir.r5.model.ImmunizationRecommendation) recommendationResource)
-					.getPatient().getReference();
+				.getPatient().getReferenceElement();
 		} else if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R4)) {
 			patientReference = ((org.hl7.fhir.r4.model.ImmunizationRecommendation) recommendationResource)
-					.getPatient().getReference();
+				.getPatient().getReferenceElement();
 		}
-		return patientReference;
+		return null;
 	}
 
 	public void printRecommendation(PrintWriter out, IAnyResource recommendation, IDomainResource patient) {

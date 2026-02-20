@@ -25,11 +25,11 @@ public class MdmIisProvider extends MdmProviderDstu3Plus {
 
 
 	@Autowired
-	FhirContext myFhirContext;
+	private FhirContext myFhirContext;
 	@Autowired
-	ResourceProviderFactory myResourceProviderFactory;
+	private ResourceProviderFactory myResourceProviderFactory;
 	@Autowired
-	MdmControllerHelper myMdmControllerHelper;
+	private MdmControllerHelper myMdmControllerHelper;
 	@Autowired
 	private IMdmControllerSvc myMdmControllerSvc;
 	@Autowired
