@@ -6,7 +6,6 @@ import ca.uhn.fhir.rest.client.api.IClientInterceptor;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.client.api.ServerValidationModeEnum;
 import ca.uhn.fhir.rest.client.interceptor.AdditionalRequestHeadersInterceptor;
-import ca.uhn.fhir.rest.client.interceptor.BasicAuthInterceptor;
 import ca.uhn.fhir.rest.client.interceptor.BearerTokenAuthInterceptor;
 import ca.uhn.fhir.rest.client.interceptor.LoggingInterceptor;
 import ca.uhn.fhir.rest.server.exceptions.AuthenticationException;
@@ -16,6 +15,7 @@ import org.immregistries.iis.kernal.GlobalConstants;
 import org.immregistries.iis.kernal.IisRequestAttribute;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.immregistries.iis.kernal.persisted.entities.UserAccess;
+import org.immregistries.iis.kernal.security.FhirSecretService;
 import org.immregistries.iis.kernal.security.RequestTenantUtil;
 import org.immregistries.iis.kernal.services.api.IDeployedApiUrlService;
 import org.jetbrains.annotations.NotNull;
@@ -52,6 +52,8 @@ public class IisFhirClientFactory extends ApacheRestfulClientFactory {
 	private IDeployedApiUrlService apiUrlService;
 	@Autowired
 	private RequestTenantUtil requestTenantUtil;
+	@Autowired
+	private FhirSecretService fhirSecretService;
 
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	private LoggingInterceptor loggingInterceptor;
@@ -104,7 +106,11 @@ public class IisFhirClientFactory extends ApacheRestfulClientFactory {
 			Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 			authInterceptor = new BearerTokenAuthInterceptor((String) authentication.getCredentials());
 		} else {
-			authInterceptor = new BasicAuthInterceptor(accessName, accessKey);
+			authInterceptor = new BearerTokenAuthInterceptor(fhirSecretService.secretToken(userAccess));
+			/**
+			 * Can not use Basic auth within server to avoid storing clean passwords, made a temporary system of secret
+			 */
+//			authInterceptor = new BasicAuthInterceptor(accessName, accessKey);
 		}
 		return authInterceptor;
 	}

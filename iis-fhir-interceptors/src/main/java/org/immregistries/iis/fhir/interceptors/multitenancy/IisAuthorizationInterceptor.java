@@ -19,10 +19,7 @@ import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.immregistries.iis.kernal.persisted.entities.UserAccess;
 import org.immregistries.iis.kernal.persisted.repository.TenantRepository;
 import org.immregistries.iis.kernal.persisted.repository.UserAccessRepository;
-import org.immregistries.iis.kernal.security.JwtUtils;
-import org.immregistries.iis.kernal.security.RequestTenantUtil;
-import org.immregistries.iis.kernal.security.TenantAuthService;
-import org.immregistries.iis.kernal.security.UserAccessUtil;
+import org.immregistries.iis.kernal.security.*;
 import org.immregistries.iis.kernal.services.PartitionNameExtractorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,6 +53,8 @@ public class IisAuthorizationInterceptor extends AuthorizationInterceptor implem
 	private TenantAuthService tenantAuthService;
 	@Autowired
 	private RequestTenantUtil requestTenantUtil;
+	@Autowired
+	private FhirSecretService fhirSecretService;
 
 	@Autowired
 	private PartitionNameExtractorService partitionNameExtractorService;
@@ -80,7 +79,8 @@ public class IisAuthorizationInterceptor extends AuthorizationInterceptor implem
 		String authHeader = theRequestDetails.getHeader("Authorization");
 		Tenant tenant = null;
 		try {
-			if (partitionNameExtractorService.extractPartitionName(theRequestDetails).equals(GlobalConstants.CONNECTATHON_USER)) {
+			String tenantName = partitionNameExtractorService.extractPartitionName(theRequestDetails);
+			if (tenantName.equals(GlobalConstants.CONNECTATHON_USER)) {
 				if (theRequestDetails.getTenantId().endsWith("Unsafe")) {
 					return connectathonUserAuthorized(theRequestDetails).build();
 				}
@@ -96,11 +96,13 @@ public class IisAuthorizationInterceptor extends AuthorizationInterceptor implem
 				/*
 				 * Basic auth
 				 */
-				tenant = tryAuthHeaderBasic(authHeader,
-					partitionNameExtractorService.extractPartitionName(theRequestDetails));
+				tenant = tryAuthHeaderBasic(authHeader, tenantName);
 				/*
 				 * Token bearer TODO
 				 */
+				if (tenant == null) {
+					tenant = fhirSecretAuth(authHeader, tenantName);
+				}
 			} else {
 				/*
 				 * Cookie SESSIONID
@@ -112,7 +114,7 @@ public class IisAuthorizationInterceptor extends AuthorizationInterceptor implem
 					 */
 					if (userAccess != null) {
 						tenant = tenantAuthService.authenticateTenant(userAccess,
-							partitionNameExtractorService.extractPartitionName(theRequestDetails));
+							tenantName);
 					}
 				}
 			}
@@ -160,6 +162,21 @@ public class IisAuthorizationInterceptor extends AuthorizationInterceptor implem
 		} else { // TODO token ?
 			return null;
 		}
+	}
+
+	private Tenant fhirSecretAuth(String authHeader, String tenantName) {
+		if (Strings.CS.startsWith(authHeader, "Bearer ")) {
+			String base64 = authHeader.substring("Bearer  ".length());
+//			String base64decoded = new String(Base64.decodeBase64(base64));
+//			String[] parts = base64decoded.split(":");
+			Tenant tenant = tenantRepository.findByOrganizationName(tenantName).orElse(null);
+			if (tenant != null) {
+				if (fhirSecretService.checkToken(tenant.getUserAccess(), base64)) {
+					return tenant;
+				}
+			}
+		}
+		return null;
 	}
 
 	/**
