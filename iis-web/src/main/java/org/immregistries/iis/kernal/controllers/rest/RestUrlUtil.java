@@ -25,7 +25,7 @@ public class RestUrlUtil {
 		if (!Strings.CS.startsWith(urlSuffix, "/")) {
 			urlSuffix = "/" + urlSuffix;
 		}
-		return IisRestPath.BasePath.REST_PATH + IisRestPath.BasePath.TENANT_PATH + "/" + tenantName + IisRestPath.BasePath.PATIENT_PATH + "/" + patientId + urlSuffix;
+		return deployedApiUrlService.getContextPath() + IisRestPath.BasePath.REST_PATH + IisRestPath.BasePath.TENANT_PATH + "/" + tenantName + IisRestPath.BasePath.PATIENT_PATH + "/" + patientId + urlSuffix;
 	}
 
 	/**
