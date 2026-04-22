@@ -18,14 +18,14 @@ public class RestUrlUtil {
 		if (tenant == null || tenant.getOrgId() < 0) {
 			return urlSuffix;
 		}
-		return deployedApiUrlService.getContextPath() + tenantifyPathSuffix(tenant.getOrgId(), urlSuffix);
+		return deployedApiUrlService.getContextPath() + tenantifyPathSuffix(tenant.getOrganizationName(), urlSuffix);
 	}
 
 	public String patientifyPathWithContextPath(String tenantName, String patientId, String urlSuffix) {
 		if (!Strings.CS.startsWith(urlSuffix, "/")) {
 			urlSuffix = "/" + urlSuffix;
 		}
-		return deployedApiUrlService.getContextPath() + IisRestPath.BasePath.REST_PATH + IisRestPath.BasePath.TENANT_PATH + "/" + tenantName + IisRestPath.BasePath.PATIENT_PATH + "/" + patientId + urlSuffix;
+		return deployedApiUrlService.getContextPath() + tenantifyPathSuffix(tenantName, IisRestPath.BasePath.PATIENT_PATH + "/" + patientId + urlSuffix);
 	}
 
 	/**
@@ -34,14 +34,14 @@ public class RestUrlUtil {
 	 * <p>
 	 * can also be used for security config with * as tenantName
 	 *
-	 * @param tenantId  organisation Id
+	 * @param tenantName  organisation Id
 	 * @param urlSuffix
 	 * @return {tenantBasePath}/{tenantName}/ + urlSuffix
 	 */
-	public @NotNull String tenantifyPathSuffix(int tenantId, String urlSuffix) {
+	public @NotNull String tenantifyPathSuffix(String tenantName, String urlSuffix) {
 		if (!Strings.CS.startsWith(urlSuffix, "/")) {
 			urlSuffix = "/" + urlSuffix;
 		}
-		return IisRestPath.BasePath.REST_PATH + IisRestPath.BasePath.TENANT_PATH + "/" + tenantId + urlSuffix;
+		return IisRestPath.BasePath.REST_PATH + IisRestPath.BasePath.TENANT_PATH + "/" + tenantName + urlSuffix;
 	}
 }
