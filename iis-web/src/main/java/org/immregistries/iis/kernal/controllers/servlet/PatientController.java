@@ -198,7 +198,7 @@ public class PatientController {
 			ShLinkPayload shLinkPayload) throws JsonProcessingException {
 		out.println("<div class=\"w3-container\">");
 		out.println("<img src=\""
-			+ restUrlUtil.patientifyPathWithContextPath(tenant.getOrgId(), iisPatient.getPatientId(),
+			+ restUrlUtil.patientifyPathWithContextPath(tenant.getOrganizationName(), iisPatient.getPatientId(),
 						IisRestPath.BasePath.PATIENT_SH_LINK_PATH)
 				+ "\"  alt=\"shlink\" width=\"200\">");
 		out.print("<div><a href= \"" + shLinkPayload.getUrl() + "\">Manifest URL</a></div>");

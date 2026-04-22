@@ -21,14 +21,14 @@ public final class IisRestPath {
 		public static final String REST_KEY = "rest";
 		public static final String TENANT_KEY = "tenant";
 		public static final String PATIENT_KEY = "patient";
-		public static final String CODE_MAPS_KEY = "codeMaps";
+		public static final String CODE_MAPS_KEY = "code-maps";
 		public static final String AUTHENTICATION_KEY = "authentication";
-		public static final String FHIR_MESSAGING_KEY = "fhirMessaging";
+		public static final String FHIR_MESSAGING_KEY = "fhir-messaging";
 		public static final String GROUP_KEY = "group";
 		public static final String RECOMMENDATION_KEY = "recommendation";
 		public static final String VAC_DEDUP_KEY = "vacDedup";
-		public static final String PATIENT_SH_LINK_KEY = "patientShLink";
-		public static final String V2_TO_FHIR_KEY = "v2ToFhir";
+		public static final String PATIENT_SH_LINK_KEY = "patient-sh-link";
+		public static final String V2_TO_FHIR_KEY = "v2-to-fhir";
 		public static final String TENANT_COMPARE_KEY = "tenantCompare";
 		public static final String CREATE_KEY = "$create";
 		public static final String MAPPING_KEY = "mapping";
@@ -36,11 +36,11 @@ public final class IisRestPath {
 		public static final String MANIFEST_KEY = "manifest";
 		public static final String VACCINATION_KEY = "vaccination";
 		public static final String POP_KEY = "pop";
-		public static final String IIS_KEYS_KEY = "iisKeys";
+		public static final String IIS_KEYS_KEY = "iis-keys";
 		public static final String OBSERVATIONS_KEY = "observations";
 		public static final String RELATED_KEY = "related";
-		public static final String SH_LINK_PAYLOAD_KEY = "shLinkPayload";
-		public static final String FHIR_RESOURCE_KEY = "fhirResource";
+		public static final String SH_LINK_PAYLOAD_KEY = "sh-link-payload";
+		public static final String FHIR_RESOURCE_KEY = "fhir-resource";
 		public static final String CLVR_KEY = "clvr";
 	}
 

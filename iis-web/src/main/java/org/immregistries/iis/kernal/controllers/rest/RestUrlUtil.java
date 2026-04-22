@@ -21,11 +21,11 @@ public class RestUrlUtil {
 		return deployedApiUrlService.getContextPath() + tenantifyPathSuffix(tenant.getOrgId(), urlSuffix);
 	}
 
-	public String patientifyPathWithContextPath(Integer tenantId, String patientId, String urlSuffix) {
+	public String patientifyPathWithContextPath(String tenantName, String patientId, String urlSuffix) {
 		if (!Strings.CS.startsWith(urlSuffix, "/")) {
 			urlSuffix = "/" + urlSuffix;
 		}
-		return IisRestPath.BasePath.REST_PATH + IisRestPath.BasePath.TENANT_PATH + "/" + tenantId + IisRestPath.BasePath.PATIENT_PATH + "/" + patientId + urlSuffix;
+		return IisRestPath.BasePath.REST_PATH + IisRestPath.BasePath.TENANT_PATH + "/" + tenantName + IisRestPath.BasePath.PATIENT_PATH + "/" + patientId + urlSuffix;
 	}
 
 	/**

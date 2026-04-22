@@ -85,6 +85,7 @@ public class ShLinkController {
 			resp.setContentType("image/png"); // Set content type for PNG image
 			uiQrCodeUtil.printQrCodeAsImage(outputStream, qrCode);
 		} else {
+			String url = req.getRequestURL().toString() + "?" + req.getQueryString() + "&" + "image";
 			resp.setContentType("text/html");
 			uiUtil.doHeader(out, "Smart Health Link Result", tenant);
 			out.println("<h3>Smart health link</h3>");
@@ -117,15 +118,14 @@ public class ShLinkController {
 		out.println("    <div class=\"w3-container w3-margin-top\">");
 		out.println("    <h3>Generate ShLink</h3>");
 		out.println(
-				"    <form method=\"POST\" action=\"" +
-						"shlink" +
+			"    <form method=\"POST\" action=\"" + SHLINK_CONTROLLER_PATH_KEY +
 						"\" target=\"_blank\"  class=\"w3-container w3-card-4\">");
 		out.println("      <label>Patient ID</label>");
 		out.println(
 				"      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_PATIENT_ID
 						+ "\" value=\"" + StringUtils.defaultIfBlank(patientId, "Patient/")
 						+ "\"/>");
-		out.println("      <label>Flag</label>");
+		out.println("      <label>Flag (ex: UP)</label>");
 		out.println(
 				"      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_FLAG
 						+ "\" value=\"" + StringUtils.defaultIfBlank(flag, "")
@@ -155,6 +155,15 @@ public class ShLinkController {
 
 		List<IisKey> iisKeys = iisKeyRestController.getKeys(userAccess);
 		iisKeyController.printIisKeys(out, iisKeys, tenant);
+		out.println("    </div>");
+		out.println("    <div class=\"w3-container\">");
+		out.println("    <h3>Flag Explanation</h3>");
+		out.println("<ul>" +
+			"<li>L: Indicates the SMART Health Link is intended for long-term use and manifest content can evolve over time.</li> " +
+			"<li>P: Indicates the SMART Health Link requires a Passcode to resolve. (In IIS Sandbox)</li> " +
+			"<li>U: Indicates the SMART Health Links's `url` resolves to a single encrypted file accessible via `GET`, bypassing the manifest. SHALL NOT be used in combination with P.</li> " +
+			"</ul>");
+
 		out.println("    </div>");
 
 		uiUtil.doFooter(out);
