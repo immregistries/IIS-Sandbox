@@ -72,7 +72,7 @@ public class CLVRRestController {
             NoSuchProviderException, IOException {
         IisKey iisSigningKey = keyStoreService.getIisSigningKeyOrCreate("", userAccess, tenant);
 		 CLVRToken clvrToken = getIpsClvrToken(patientId, tenant);
-        String qrCode = clvrService.encodeCLVRtoQrCode(clvrToken, iisSigningKey.keyPair());
+		 String qrCode = clvrService.encodeCLVRtoQrCode(clvrToken, iisSigningKey.keyPair(), iisSigningKey.getKeyId());
         logger.info("qrCode {}", qrCode);
         return qrCode;
     }
@@ -86,7 +86,7 @@ public class CLVRRestController {
             NoSuchProviderException, ServletException {
         IisKey iisSigningKey = keyStoreService.getIisSigningKeyOrCreate("", userAccess, tenant);
 		 CLVRToken clvrToken = getIpsClvrToken(patientId, tenant);
-        String qrCode = clvrService.encodeCLVRtoQrCode(clvrToken, iisSigningKey.keyPair());
+		 String qrCode = clvrService.encodeCLVRtoQrCode(clvrToken, iisSigningKey.keyPair(), iisSigningKey.getKeyId());
 
         ByteArrayOutputStream byteArrayOutputStreamPNG = qrCodeEncoder.toQrCodeStreamPNG(qrCode);
         return ResponseEntity.ok(byteArrayOutputStreamPNG.toByteArray());
@@ -106,7 +106,7 @@ public class CLVRRestController {
 
         IisKey iisSigningKey = keyStoreService.getIisSigningKeyOrCreate("", userAccess, tenant);
 		 CLVRToken clvrToken = getIpsClvrToken(patientId, tenant);
-        String qrCode = clvrService.encodeCLVRtoQrCode(clvrToken, iisSigningKey.keyPair());
+		 String qrCode = clvrService.encodeCLVRtoQrCode(clvrToken, iisSigningKey.keyPair(), iisSigningKey.getKeyId());
         PDDocument pdDocument = clvrPdfService.createPdf(clvrToken, qrCode.getBytes(), "IIS SANDBOX");
         return pdfResponseEntity(pdDocument, "clvrDocument");
     }
