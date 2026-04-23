@@ -68,6 +68,22 @@ public class PatientShLinkManifestRestController {
 		return getShLinkManifest(req, id, tenant);
 	}
 
+	@PostMapping({"/patient/ips", "/patient/{id}/ips"})
+	protected ShLinkManifest postPatientIpsShLinkManifest(HttpServletRequest req, HttpServletResponse resp,
+																			@PathVariable(value = "id", required = false) String id,
+																			@PathVariable(PARAM_TENANT_ID) String tenantId,
+																			@RequestAttribute(IisRequestAttribute.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
+																			@RequestBody ShLinkManifestRequestBody body) throws IOException, ServletException {
+		String passcode = body.getPasscode();
+		if (StringUtils.isNotBlank(passcode)) {
+			tenant = tenantAuthService.authenticateTenantNoUsername(tenantId, passcode);
+		}
+		if (tenant == null) {
+			throw new AuthenticationCredentialsNotFoundException("No tenant found or invalid passcode");
+		}
+		return getShLinkManifestIps(req, id, tenant);
+	}
+
 	@GetMapping({ "/patient", "/patient/{id}" })
 	protected ShLinkManifest getPatientShLinkManifest(HttpServletRequest req, HttpServletResponse resp,
 			@PathVariable(value = "id", required = false) String id,
@@ -78,9 +94,25 @@ public class PatientShLinkManifestRestController {
 		return getShLinkManifest(req, id, tenant);
 	}
 
+	@GetMapping({"/patient/ips", "/patient/{id}/ips"})
+	protected ShLinkManifest getPatientIpsShLinkManifest(HttpServletRequest req, HttpServletResponse resp,
+																		  @PathVariable(value = "id", required = false) String id,
+																		  @RequestAttribute(IisRequestAttribute.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
+																		  @RequestParam(value = "recipient", required = false) String recipient,
+																		  @RequestParam(value = "passcode", required = false) String passcode,
+																		  @RequestParam(value = "embeddedLengthMax", required = false) String embeddedLengthMax) {
+		return getShLinkManifestIps(req, id, tenant);
+	}
+
 	private ShLinkManifest getShLinkManifest(HttpServletRequest req, String id, Tenant tenant) {
 		IGenericClient fhirClient = iisFhirClientFactory.getOrCreateGenericClient(req);
 		IAnyResource patientSelected = patientServletUtil.fetchPatientFromParameters(id, "", fhirClient, fhirSearchRequester);
 		return shLinkManifestGenerator.generateExamplePatientManifest(tenant, patientSelected.getIdElement());
+	}
+
+	private ShLinkManifest getShLinkManifestIps(HttpServletRequest req, String id, Tenant tenant) {
+		IGenericClient fhirClient = iisFhirClientFactory.getOrCreateGenericClient(req);
+		IAnyResource patientSelected = patientServletUtil.fetchPatientFromParameters(id, "", fhirClient, fhirSearchRequester);
+		return shLinkManifestGenerator.generateExamplePatientIpsManifest(tenant, patientSelected.getIdElement());
 	}
 }

@@ -149,4 +149,14 @@ public class PatientRestController extends BaseTenantTiedRest {
 		return patientShlinkGenerator.generatePatientShLinkPayload(manifestUrl);
 	}
 
+	@GetMapping(IisPathVariable.PlaceHolder.PATIENT_ID_PLACEHOLDER + IisRestPath.BasePath.SH_LINK_PAYLOAD_PATH + "/ips")
+	public ShLinkPayload getShLinkIpsPayload(
+		@PathVariable(IisPathVariable.Key.PATIENT_ID) String patientId,
+		@RequestAttribute(IisRequestAttribute.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
+		HttpServletRequest req) {
+		IAnyResource patientSelected = getPatientFhir(patientId, tenant, req);
+		String manifestUrl = patientShlinkApiManifestUrlService.getManifestUrl(req, patientSelected, tenant) + "/ips";
+		return patientShlinkGenerator.generatePatientShLinkPayload(manifestUrl);
+	}
+
 }

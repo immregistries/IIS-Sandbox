@@ -157,25 +157,32 @@ public class PatientController {
 		patientServletUtil.printFhirShortcuts(out, patientSelected, iisPatient, tenant);
 		out.println("</div>");
 
-		ShLinkPayload shLinkPayload = patientRestController.getShLinkPayload(iisPatient.getPatientId(),
+		ShLinkPayload patientShLinkPayload = patientRestController.getShLinkPayload(iisPatient.getPatientId(),
 				tenant,
 				req);
 
+		ShLinkPayload patientIpsShLinkPayload = patientRestController.getShLinkIpsPayload(iisPatient.getPatientId(),
+			tenant,
+			req);
+
 		out.println("<div class=\"w3-container\">");
 		out.println("<h4>Smart Health link</h4>");
-		printQrCodeAndDetails(out, tenant, iisPatient, shLinkPayload);
+		out.println("<div class=\"w3-row-padding\">");
+		printQrCodeAndDetails(out, tenant, iisPatient, patientShLinkPayload, "Patient Static Link", "Long term, statically defined Smart Health Link to the Patient Resource");
+		printQrCodeAndDetails(out, tenant, iisPatient, patientIpsShLinkPayload, "IPS Static Link", "Long term, statically defined Smart Health Link to the IPS");
+		out.println("</div>");
+		out.println("<a class=\"w3-button w3-section w3-teal w3-ripple\" href=\"" +
+			urlTenantUtil.tenantifyPathWithContextPath(tenant,
+				ShLinkController.SHLINK_CONTROLLER_BASE_PATH + "?" + ShLinkController.PARAM_PATIENT_ID + "="
+					+ iisPatient.getPatientId())
+			+ "\">Generate a new Smart Health Link with IPS</a>");
+		out.println("</div>");
 
-		// out.println("<button onclick=\"copyHtmlToClipboard()\">Copy HTML</button>");
-		// out.println("<script>");
-		// out.println("function copyHtmlToClipboard() {");
-		// out.println(" const content = ");
-		// out.println(" navigator.clipboard.writeText(content)");
-		// out.println(" .then(() => { console.log('HTML copied to clipboard'); })");
-		// out.println(" .catch(err => { console.error('Failed to copy HTML: ', err);
-		// });");
-		// out.println("}");
-		// out.println("</script>");
-
+		out.println("<div class=\"w3-container\">");
+		out.println("<h4>European Vaccine Certificate (EVC) - CLVR</h4>");
+		out.println("<a class=\"w3-button w3-section w3-teal w3-ripple\"  href= \"" +
+			restUrlUtil.tenantifyPathWithContextPath(tenant, "/patient/" + iisPatient.getPatientId() + "/clvr/pdf")
+			+ "\">Generate a EVC with IPS</a>");
 		out.println("</div>");
 
 		out.println("<div class=\"w3-container\">");
@@ -195,29 +202,30 @@ public class PatientController {
 	}
 
 	private void printQrCodeAndDetails(PrintWriter out, Tenant tenant, IisPatient iisPatient,
-			ShLinkPayload shLinkPayload) throws JsonProcessingException {
+												  ShLinkPayload shLinkPayload, String label, String description) throws JsonProcessingException {
+		String qrCode = uiQrCodeUtil.qrCodeBase64(shLinkPayload);
+		out.println("<div class=\"w3-col l4 m4 s12\">");
+		out.println("<div class=\"w3-card-4 w3-sand w3-center w3-hover-shadow\">");
+		out.println("<header class=\"w3-panel \">");
+		out.println("<h3>" + label + "</h3>");
+		out.println("</header>");
+
 		out.println("<div class=\"w3-container\">");
 		out.println("<img src=\""
 			+ restUrlUtil.patientifyPathWithContextPath(tenant.getOrganizationName(), iisPatient.getPatientId(),
 						IisRestPath.BasePath.PATIENT_SH_LINK_PATH)
-				+ "\"  alt=\"shlink\" width=\"200\">");
-		out.print("<div><a href= \"" + shLinkPayload.getUrl() + "\">Manifest URL</a></div>");
-		out.println("<h5>Qr Code Text Value</h5>");
+			+ "\"  alt=\"shlink\">");
+
 		out.println("<textarea id =\"qrCode\" cols=\"30\" rows=\"2\" style=\"white-space: nowrap;  overflow: auto;\">");
-		String qrCode = uiQrCodeUtil.qrCodeBase64(shLinkPayload);
 		out.print(qrCode);
 		out.println("</textarea>");
 		out.println("</div>");
+
+		out.println("<footer class=\"w3-container w3-center\">" +
+			"<p>" + description + " (<a href= \"" + shLinkPayload.getUrl() + "\">manifest</a>)" + "</p>" +
+			"</footer>");
 		out.println("</div>");
-		out.println("<div><a href= \"" +
-				urlTenantUtil.tenantifyPathWithContextPath(tenant,
-						ShLinkController.SHLINK_CONTROLLER_BASE_PATH + "?" + ShLinkController.PARAM_PATIENT_ID + "="
-								+ iisPatient.getPatientId())
-				+ "\">Generate a new Smart Health Link with IPS</a></div>");
-		out.println("<div><a href= \"" +
-			restUrlUtil.tenantifyPathWithContextPath(tenant, "/patient/" + iisPatient.getPatientId() + "/clvr/pdf")
-				+
-				"\">Generate a EVC with IPS</a></div>");
+		out.println("</div>");
 	}
 
 	private void printPatientRecommendationsAndSubscriptions(PrintWriter out, IAnyResource patientSelected,
