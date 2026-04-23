@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 
-import static org.immregistries.iis.kernal.controllers.servlet.TenantController.PARAM_TENANT_ID;
+import static org.immregistries.iis.kernal.controllers.servlet.TenantController.PARAM_TENANT_NAME;
 
 @RestController
 @RequestMapping(IisRestPath.MANIFEST_FULL_PATH)
@@ -55,12 +55,12 @@ public class PatientShLinkManifestRestController {
 	@PostMapping({ "/patient", "/patient/{id}" })
 	protected ShLinkManifest postPatientShLinkManifest(HttpServletRequest req, HttpServletResponse resp,
 			@PathVariable(value = "id", required = false) String id,
-			@PathVariable(PARAM_TENANT_ID) String tenantId,
+																		@PathVariable(PARAM_TENANT_NAME) String tenantName,
 																		@RequestAttribute(IisRequestAttribute.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
 			@RequestBody ShLinkManifestRequestBody body) throws IOException, ServletException {
 		String passcode = body.getPasscode();
 		if (StringUtils.isNotBlank(passcode)) {
-			tenant = tenantAuthService.authenticateTenantNoUsername(tenantId, passcode);
+			tenant = tenantAuthService.authenticateTenantNoUsername(tenantName, passcode);
 		}
 		if (tenant == null) {
 			throw new AuthenticationCredentialsNotFoundException("No tenant found or invalid passcode");
@@ -71,12 +71,12 @@ public class PatientShLinkManifestRestController {
 	@PostMapping({"/patient/ips", "/patient/{id}/ips"})
 	protected ShLinkManifest postPatientIpsShLinkManifest(HttpServletRequest req, HttpServletResponse resp,
 																			@PathVariable(value = "id", required = false) String id,
-																			@PathVariable(PARAM_TENANT_ID) String tenantId,
+																			@PathVariable(PARAM_TENANT_NAME) String tenantName,
 																			@RequestAttribute(IisRequestAttribute.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
 																			@RequestBody ShLinkManifestRequestBody body) throws IOException, ServletException {
 		String passcode = body.getPasscode();
 		if (StringUtils.isNotBlank(passcode)) {
-			tenant = tenantAuthService.authenticateTenantNoUsername(tenantId, passcode);
+			tenant = tenantAuthService.authenticateTenantNoUsername(tenantName, passcode);
 		}
 		if (tenant == null) {
 			throw new AuthenticationCredentialsNotFoundException("No tenant found or invalid passcode");
