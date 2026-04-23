@@ -25,7 +25,7 @@ public class ShLinkManifest {
 	private String status; // "finalized"|"can-change"|"no-longer-valid"
 
 	@JsonProperty(value = "files")
-	@ElementCollection
+	@ElementCollection(fetch = FetchType.EAGER)
 	private List<FileManifest> files = new ArrayList<>();
 
 	@JsonIgnore
