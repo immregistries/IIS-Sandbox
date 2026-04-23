@@ -59,7 +59,7 @@ public class PatientShLinkManifestRestController {
 	protected ShLinkManifest postPatientShLinkManifest(HttpServletRequest req, HttpServletResponse resp,
 			@PathVariable(value = "id", required = false) String id,
 																		@PathVariable(PARAM_TENANT_NAME) String tenantName,
-																		@RequestAttribute(IisRequestAttribute.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
+																		@RequestAttribute(value = IisRequestAttribute.TENANT_REQUEST_ATTRIBUTE, required = false) Tenant tenant,
 			@RequestBody ShLinkManifestRequestBody body) throws IOException, ServletException {
 		String passcode = body.getPasscode();
 		if (StringUtils.isNotBlank(passcode)) {
@@ -76,7 +76,7 @@ public class PatientShLinkManifestRestController {
 	protected ShLinkManifest postPatientIpsShLinkManifest(HttpServletRequest req, HttpServletResponse resp,
 																			@PathVariable(value = "id", required = false) String id,
 																			@PathVariable(PARAM_TENANT_NAME) String tenantName,
-																			@RequestAttribute(IisRequestAttribute.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
+																			@RequestAttribute(value = IisRequestAttribute.TENANT_REQUEST_ATTRIBUTE, required = false) Tenant tenant,
 																			@RequestBody ShLinkManifestRequestBody body) throws IOException, ServletException {
 		String passcode = body.getPasscode();
 		if (StringUtils.isNotBlank(passcode)) {

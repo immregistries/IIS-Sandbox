@@ -49,8 +49,9 @@ public class RestTenantUrlFilter extends OncePerRequestFilter {
 		 * or well known key
 		 */
 		AntPathMatcher matcher = new AntPathMatcher();
-		if (matcher.match(IisRestPath.MANIFEST_FULL_PATH + "/**", path)) {
-			filterChain.doFilter(request, response);
+		String manifestPattern = deployedApiUrlService.getContextPath() + IisRestPath.MANIFEST_FULL_PATH + "/**";
+		if (matcher.match(manifestPattern, path)) {
+//			filterChain.doFilter(request, response);
 		} else if (path.startsWith(tenantPrefix())) {
 			/**
 			 * TODO optimize prefix length calculus
