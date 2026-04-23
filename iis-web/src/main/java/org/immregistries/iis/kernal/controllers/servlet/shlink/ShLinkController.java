@@ -125,7 +125,7 @@ public class ShLinkController {
 				"      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_PATIENT_ID
 						+ "\" value=\"" + StringUtils.defaultIfBlank(patientId, "Patient/")
 						+ "\"/>");
-		out.println("      <label>Flag (ex: UP)</label>");
+		out.println("      <label>Flag (ex: LU)</label>");
 		out.println(
 				"      <input class=\"w3-input\" type=\"text\" name=\"" + PARAM_FLAG
 						+ "\" value=\"" + StringUtils.defaultIfBlank(flag, "")
@@ -160,7 +160,7 @@ public class ShLinkController {
 		out.println("    <h3>Flag Explanation</h3>");
 		out.println("<ul>" +
 			"<li>L: Indicates the SMART Health Link is intended for long-term use and manifest content can evolve over time.</li> " +
-			"<li>P: Indicates the SMART Health Link requires a Passcode to resolve. (In IIS Sandbox)</li> " +
+			"<li>P: Indicates the SMART Health Link requires a Passcode to resolve. (In IIS Sandbox -> request must be authenticated)</li> " +
 			"<li>U: Indicates the SMART Health Links's `url` resolves to a single encrypted file accessible via `GET`, bypassing the manifest. SHALL NOT be used in combination with P.</li> " +
 			"</ul>");
 
