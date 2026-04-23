@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -47,10 +48,10 @@ public class RestTenantUrlFilter extends OncePerRequestFilter {
 		 * For Smart health links manifest retrieval, authentication is dealt with later
 		 * or well known key
 		 */
-		if (path.startsWith(IisRestPath.MANIFEST_FULL_PATH)) {
+		AntPathMatcher matcher = new AntPathMatcher();
+		if (matcher.match(IisRestPath.MANIFEST_FULL_PATH + "/**", path)) {
 			filterChain.doFilter(request, response);
-		}
-		if (path.startsWith(tenantPrefix())) {
+		} else if (path.startsWith(tenantPrefix())) {
 			/**
 			 * TODO optimize prefix length calculus
 			 */

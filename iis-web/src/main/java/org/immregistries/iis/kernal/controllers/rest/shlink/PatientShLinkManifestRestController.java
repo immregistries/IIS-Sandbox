@@ -18,6 +18,7 @@ import org.immregistries.iis.kernal.mapping.requesters.FhirSearchRequester;
 import org.immregistries.iis.kernal.model.shlink.ShLinkManifestRequestBody;
 import org.immregistries.iis.kernal.persisted.entities.ShLinkManifest;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
+import org.immregistries.iis.kernal.security.RequestTenantUtil;
 import org.immregistries.iis.kernal.security.TenantAuthService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,6 +52,8 @@ public class PatientShLinkManifestRestController {
 	private TenantAuthService tenantAuthService;
 	@Autowired
 	private PatientServletUtil patientServletUtil;
+	@Autowired
+	private RequestTenantUtil requestTenantUtil;
 
 	@PostMapping({ "/patient", "/patient/{id}" })
 	protected ShLinkManifest postPatientShLinkManifest(HttpServletRequest req, HttpServletResponse resp,
@@ -61,6 +64,7 @@ public class PatientShLinkManifestRestController {
 		String passcode = body.getPasscode();
 		if (StringUtils.isNotBlank(passcode)) {
 			tenant = tenantAuthService.authenticateTenantNoUsername(tenantName, passcode);
+			requestTenantUtil.setTenantForRequest(tenant, req);
 		}
 		if (tenant == null) {
 			throw new AuthenticationCredentialsNotFoundException("No tenant found or invalid passcode");
@@ -77,6 +81,7 @@ public class PatientShLinkManifestRestController {
 		String passcode = body.getPasscode();
 		if (StringUtils.isNotBlank(passcode)) {
 			tenant = tenantAuthService.authenticateTenantNoUsername(tenantName, passcode);
+			requestTenantUtil.setTenantForRequest(tenant, req);
 		}
 		if (tenant == null) {
 			throw new AuthenticationCredentialsNotFoundException("No tenant found or invalid passcode");

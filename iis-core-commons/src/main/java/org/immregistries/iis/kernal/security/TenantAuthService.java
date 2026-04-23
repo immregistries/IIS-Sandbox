@@ -40,10 +40,9 @@ public class TenantAuthService {
 	private UserAccessUtil userAccessUtil;
 
 	public Tenant authenticateTenantNoUsername(int tenantId, String password) {
-		Tenant tenant = tenantRepository.findById(tenantId).orElse(null);
-		if (tenant == null) {
-			throw new RuntimeException("Invalid tenantId");
-		}
+		Tenant tenant = tenantRepository.findById(tenantId)
+			.orElseThrow(() -> new RuntimeException("Invalid tenant id"));
+
 		UserAccess tenantUserAccess = tenant.getUserAccess();
 		String username = tenantUserAccess.getAccessName();
 
@@ -52,11 +51,9 @@ public class TenantAuthService {
 	}
 
 	public Tenant authenticateTenantNoUsername(String facilityName, String password) {
-		Tenant tenant = tenantRepository.findByOrganizationName(facilityName).orElse(null);
+		Tenant tenant = tenantRepository.findByOrganizationName(facilityName)
+			.orElseThrow(() -> new RuntimeException("Invalid tenant name"));
 
-		if (tenant == null) {
-			throw new RuntimeException("Invalid tenantName");
-		}
 		UserAccess tenantUserAccess = tenant.getUserAccess();
 		String username = tenantUserAccess.getAccessName();
 
