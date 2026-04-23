@@ -28,6 +28,10 @@ public class ShLinkManifest {
 	@ElementCollection
 	private List<FileManifest> files = new ArrayList<>();
 
+	@JsonIgnore
+	private Boolean passwordProtected = false;
+
+
 	public String getStatus() {
 		return status;
 	}
@@ -65,6 +69,14 @@ public class ShLinkManifest {
 
 	public void setId(String id) {
 		this.id = id;
+	}
+
+	public Boolean getPasswordProtected() {
+		return passwordProtected;
+	}
+
+	public void setPasswordProtected(Boolean passwordProtected) {
+		this.passwordProtected = passwordProtected;
 	}
 
 	@JsonInclude(JsonInclude.Include.NON_EMPTY)

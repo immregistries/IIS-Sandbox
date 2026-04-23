@@ -132,12 +132,13 @@ public class ShLinkGenerator {
 		if (StringUtils.containsAny(shLinkPayload.getFlag(), "U")) {
 			shLinkUrl = directFileShCardUrl(shLinkPayload, userAccess, encryptedContent, uriBuilder);
 		} else {
-			shLinkUrl = manifestShCardUrl(tenant, encryptedContent, uriBuilder);
+			boolean passcodeProtected = StringUtils.containsAny(shLinkPayload.getFlag(), "P");
+			shLinkUrl = manifestShCardUrl(tenant, encryptedContent, uriBuilder, passcodeProtected);
 		}
 		return shLinkUrl;
 	}
 
-	private @NotNull URL manifestShCardUrl(Tenant tenant, String encryptedContent, UriComponentsBuilder uriBuilder) throws MalformedURLException {
+	private @NotNull URL manifestShCardUrl(Tenant tenant, String encryptedContent, UriComponentsBuilder uriBuilder, boolean passcodeProtected) throws MalformedURLException {
 		URL shLinkUrl;
 		/*
 		 * Manifest
@@ -145,6 +146,7 @@ public class ShLinkGenerator {
 		ShLinkManifest shLinkManifest = new ShLinkManifest();
 		shLinkManifest.setTenant(tenant);
 		shLinkManifest.setStatus("finalized");
+		shLinkManifest.setPasswordProtected(passcodeProtected);
 
 		ShLinkManifest.FileManifest fileManifest = new ShLinkManifest.FileManifest();
 		fileManifest.setContentType(APPLICATION_SMART_HEALTH_CARD_CONTENT_TYPE);

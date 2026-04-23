@@ -2,6 +2,8 @@ package org.immregistries.iis.kernal.controllers.rest.shlink;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
+import org.immregistries.iis.kernal.IisRequestAttribute;
 import org.immregistries.iis.kernal.controllers.IisPathVariable;
 import org.immregistries.iis.kernal.controllers.IisRestParam;
 import org.immregistries.iis.kernal.controllers.IisRestPath;
@@ -42,18 +44,22 @@ public class ShLinkManifestRestController {
 	@PostMapping(IisPathVariable.PlaceHolder.MANIFEST_ID_PLACEHOLDER)
 	protected ShLinkManifest readShLinkManifest(
 			@PathVariable(IisPathVariable.Key.MANIFEST_ID) String manifestId,
-			@PathVariable(IisPathVariable.Key.TENANT_NAME) String tenantName,
+			@RequestAttribute(value = IisRequestAttribute.TENANT_REQUEST_ATTRIBUTE, required = false) Tenant tenant,
 			@RequestParam(value = IisRestParam.ShLink.RECIPIENT, required = false) String recipient,
 			@RequestParam(value = IisRestParam.ShLink.PASSCODE, required = false) String passcode,
 			@RequestParam(value = IisRestParam.ShLink.EMBEDDED_LENGTH_MAX, required = false) String embeddedLengthMax) {
-		Tenant tenant = null;
-		if (StringUtils.isNoneBlank(passcode)) {
-			tenant = tenantAuthService.authenticateTenantNoUsername(tenantName, passcode);
+		ShLinkManifest shLinkManifest = shlinkManifestStoreService.readManifest(manifestId);
+		Tenant manifestTenant = shLinkManifest.getTenant();
+		String manifestTenantName = manifestTenant.getOrganizationName();
+		if (shLinkManifest.getPasswordProtected()) {
+			if (StringUtils.isNoneBlank(passcode)) {
+				tenant = tenantAuthService.authenticateTenantNoUsername(manifestTenantName, passcode);
+			}
+			if (tenant == null || !Strings.CS.equals(manifestTenantName, tenant.getOrganizationName())) {
+				throw new AuthenticationCredentialsNotFoundException("Invalid passcode");
+			}
 		}
-		if (tenant == null) {
-			throw new AuthenticationCredentialsNotFoundException("Invalid passcode");
-		}
-		return shlinkManifestStoreService.readManifest(manifestId);
+		return shLinkManifest;
 	}
 
 	@GetMapping()
