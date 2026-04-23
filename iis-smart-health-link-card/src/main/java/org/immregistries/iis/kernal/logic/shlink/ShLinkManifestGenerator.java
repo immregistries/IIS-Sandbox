@@ -43,10 +43,6 @@ public class ShLinkManifestGenerator {
 		ShLinkManifest shLinkManifest = new ShLinkManifest();
 		shLinkManifest.setTenant(tenant);
 		shLinkManifest.setStatus("finalized");
-		// ShLinkManifest.FileManifest fileManifest = generateFhirFileManifest();
-		// shLinkManifest.addFiles(fileManifest);
-		// fileManifest.setLocation("/fhir/" + tenant.getOrganizationName() +
-		// "/Patient?identifier=test");
 		return shLinkManifest;
 	}
 
