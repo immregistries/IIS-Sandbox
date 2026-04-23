@@ -27,7 +27,7 @@ public class ShLinkManifestGenerator {
 	}
 
 	public ShLinkManifest generateExamplePatientIpsManifest(Tenant tenant, IIdType iIdType) {
-		String patientLocation = "/fhir/" + tenant.getOrganizationName() + "/Patient/" + iIdType.getIdPart() + "/ips";
+		String patientLocation = "/fhir/" + tenant.getOrganizationName() + "/Patient/" + iIdType.getIdPart() + "/$summary";
 		return generateManifest(tenant, patientLocation);
 	}
 

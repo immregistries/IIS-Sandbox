@@ -216,7 +216,7 @@ public class PatientController {
 						IisRestPath.BasePath.PATIENT_SH_LINK_PATH)
 			+ "\"  alt=\"shlink\">");
 
-		out.println("<textarea id =\"qrCode\" cols=\"30\" rows=\"2\" style=\"white-space: nowrap;  overflow: auto;\">");
+		out.println("<textarea id =\"qrCode\" cols=\"30\" rows=\"1\" style=\"white-space: nowrap; overflow: auto;\">");
 		out.print(qrCode);
 		out.println("</textarea>");
 		out.println("</div>");
