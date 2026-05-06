@@ -39,6 +39,7 @@ public final class IisRestPath {
 		public static final String IIS_KEYS_KEY = "iis-keys";
 		public static final String OBSERVATIONS_KEY = "observations";
 		public static final String RELATED_KEY = "related";
+		public static final String SH_LINK_KEY = "shlink";
 		public static final String SH_LINK_PAYLOAD_KEY = "sh-link-payload";
 		public static final String FHIR_RESOURCE_KEY = "fhir-resource";
 		public static final String CLVR_KEY = "clvr";
@@ -68,7 +69,8 @@ public final class IisRestPath {
 		RELATED(Key.RELATED_KEY),
 		SH_LINK_PAYLOAD(Key.SH_LINK_PAYLOAD_KEY),
 		FHIR_RESOURCE(Key.FHIR_RESOURCE_KEY),
-		CLVR(Key.CLVR_KEY);
+		CLVR(Key.CLVR_KEY),
+		SH_LINK(Key.SH_LINK_KEY);
 
 		private final String key;
 
@@ -109,5 +111,6 @@ public final class IisRestPath {
 		public static final String SH_LINK_PAYLOAD_PATH = "/" + Key.SH_LINK_PAYLOAD_KEY;
 		public static final String FHIR_RESOURCE_PATH = "/" + Key.FHIR_RESOURCE_KEY;
 		public static final String CLVR_PATH = "/" + Key.CLVR_KEY;
+		public static final String SH_LINK_PATH = "/" + Key.SH_LINK_KEY;
 	}
 }

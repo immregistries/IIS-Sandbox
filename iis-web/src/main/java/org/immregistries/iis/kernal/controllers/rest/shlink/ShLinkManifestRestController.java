@@ -52,6 +52,14 @@ public class ShLinkManifestRestController {
 		Tenant manifestTenant = shLinkManifest.getTenant();
 		String manifestTenantName = manifestTenant.getOrganizationName();
 		if (shLinkManifest.getPasswordProtected()) {
+			if (StringUtils.isNoneBlank(shLinkManifest.getPasscode())) {
+				if (!Strings.CS.equals(shLinkManifest.getPasscode(), passcode)) {
+					throw new AuthenticationCredentialsNotFoundException("Invalid passcode");
+				}
+			}
+			/*
+			 * If no passcode was specified at shlink creation, using iis sandbox authorization
+			 */
 			if (StringUtils.isNoneBlank(passcode)) {
 				tenant = tenantAuthService.authenticateTenantNoUsername(manifestTenantName, passcode);
 			}

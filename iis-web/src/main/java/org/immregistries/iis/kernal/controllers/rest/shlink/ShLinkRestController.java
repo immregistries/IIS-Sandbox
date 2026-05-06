@@ -1,6 +1,5 @@
 package org.immregistries.iis.kernal.controllers.rest.shlink;
 
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.immregistries.iis.kernal.IisRequestAttribute;
 import org.immregistries.iis.kernal.controllers.IisRestParam;
@@ -12,24 +11,18 @@ import org.immregistries.iis.kernal.services.QrCodeEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 
 @RestController
-@RequestMapping({ IisRestPath.BasePath.REST_PATH + "/shlink",  IisRestPath.BasePath.REST_PATH + "/tenant/{tenantName}/shlink" })
+@RequestMapping({IisRestPath.BasePath.REST_PATH + IisRestPath.BasePath.SH_LINK_PATH, IisRestPath.REST_TENANT_PATH + IisRestPath.BasePath.SH_LINK_PATH})
 public class ShLinkRestController {
 
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
-
 
 	@Autowired
 	private ShLinkGenerator shLinkGenerator;
@@ -37,39 +30,19 @@ public class ShLinkRestController {
 	private QrCodeEncoder qrCodeEncoder;
 
 	@PostMapping()
-	public String shLinkIPSQrCode(
+	public String createShLinkIPSQrCode(
 		@AuthenticationPrincipal UserAccess userAccess,
 		HttpServletRequest req,
 			@RequestParam(value = IisRestParam.KEY_ID, required = false) String keyId,
 			@RequestParam(value = IisRestParam.ShLink.SECRET_KEY, required = false) String secretKey,
 			@RequestParam(IisRestParam.PATIENT_ID) String patientId,
 			@RequestParam(IisRestParam.ShLink.FLAG) String flag,
+		@RequestParam(IisRestParam.ShLink.PASSCODE) String passcode,
 			@RequestParam(value = IisRestParam.ShLink.EXP, required = false, defaultValue = "10000000") String exp,
 											@RequestAttribute(IisRequestAttribute.TENANT_REQUEST_ATTRIBUTE) Tenant tenant)
 			throws IOException, NoSuchAlgorithmException {
 		ServletUriComponentsBuilder uriBuilder = ServletUriComponentsBuilder.fromRequest(req);
-		String qrCode = shLinkGenerator.generateShLink(keyId, secretKey, patientId, flag, exp, tenant, userAccess, uriBuilder);
+		String qrCode = shLinkGenerator.generateShLink(keyId, secretKey, patientId, flag, exp, tenant, userAccess, uriBuilder, passcode);
 		return qrCode;
 	}
-
-	@PostMapping(value = "/png")
-	public ResponseEntity<byte[]> shLinkIPSPng(
-		@AuthenticationPrincipal UserAccess userAccess,
-		HttpServletRequest req,
-			@RequestParam(value = IisRestParam.KEY_ID, required = false) String keyId,
-			@RequestParam(value = IisRestParam.ShLink.SECRET_KEY, required = false) String secretKey,
-			@RequestParam(IisRestParam.PATIENT_ID) String patientId,
-			@RequestParam(IisRestParam.ShLink.FLAG) String flag,
-			@RequestParam(value = IisRestParam.ShLink.EXP, required = false, defaultValue = "10000000") String exp,
-															 @RequestAttribute(IisRequestAttribute.TENANT_REQUEST_ATTRIBUTE) Tenant tenant)
-			throws ServletException, IOException, NoSuchAlgorithmException {
-		String qrCode = shLinkIPSQrCode(userAccess, req, keyId, secretKey, patientId, flag, exp, tenant);
-		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.IMAGE_PNG);
-		ByteArrayOutputStream outputStream = qrCodeEncoder.toQrCodeStreamPNG(qrCode);
-		return new ResponseEntity<>(outputStream.toByteArray(), headers, HttpStatus.OK);
-
-	}
-
-	// Skipping doGet as it was purely HTML UI form.
 }

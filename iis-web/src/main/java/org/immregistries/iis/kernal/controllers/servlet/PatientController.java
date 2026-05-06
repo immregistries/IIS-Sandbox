@@ -204,28 +204,10 @@ public class PatientController {
 	private void printQrCodeAndDetails(PrintWriter out, Tenant tenant, IisPatient iisPatient,
 												  ShLinkPayload shLinkPayload, String label, String description) throws JsonProcessingException {
 		String qrCode = uiQrCodeUtil.qrCodeBase64(shLinkPayload);
-		out.println("<div class=\"w3-col l4 m4 s12\">");
-		out.println("<div class=\"w3-card-4 w3-sand w3-center w3-hover-shadow\">");
-		out.println("<header class=\"w3-panel \">");
-		out.println("<h3>" + label + "</h3>");
-		out.println("</header>");
-
-		out.println("<div class=\"w3-container\">");
-		out.println("<img src=\""
-			+ restUrlUtil.patientifyPathWithContextPath(tenant.getOrganizationName(), iisPatient.getPatientId(),
-						IisRestPath.BasePath.PATIENT_SH_LINK_PATH)
-			+ "\"  alt=\"shlink\">");
-
-		out.println("<textarea id =\"qrCode\" cols=\"30\" rows=\"1\" style=\"white-space: nowrap; overflow: auto;\">");
-		out.print(qrCode);
-		out.println("</textarea>");
-		out.println("</div>");
-
-		out.println("<footer class=\"w3-container w3-center\">" +
-			"<p>" + description + " (<a href= \"" + shLinkPayload.getUrl() + "\">manifest</a>)" + "</p>" +
-			"</footer>");
-		out.println("</div>");
-		out.println("</div>");
+		String imageUrl = restUrlUtil.patientifyPathWithContextPath(tenant.getOrganizationName(), iisPatient.getPatientId(),
+			IisRestPath.BasePath.PATIENT_SH_LINK_PATH);
+		String manifestUrl = shLinkPayload.getUrl();
+		uiQrCodeUtil.prettyPrintQrCodeCard(out, label, description, imageUrl, qrCode, manifestUrl);
 	}
 
 	private void printPatientRecommendationsAndSubscriptions(PrintWriter out, IAnyResource patientSelected,

@@ -31,6 +31,8 @@ public class ShLinkManifest {
 	@JsonIgnore
 	private Boolean passwordProtected = false;
 
+	@JsonIgnore
+	private String passcode = null;
 
 	public String getStatus() {
 		return status;
@@ -77,6 +79,14 @@ public class ShLinkManifest {
 
 	public void setPasswordProtected(Boolean passwordProtected) {
 		this.passwordProtected = passwordProtected;
+	}
+
+	public String getPasscode() {
+		return passcode;
+	}
+
+	public void setPasscode(String passcode) {
+		this.passcode = passcode;
 	}
 
 	@JsonInclude(JsonInclude.Include.NON_EMPTY)
