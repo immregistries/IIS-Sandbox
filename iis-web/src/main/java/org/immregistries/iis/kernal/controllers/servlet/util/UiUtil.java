@@ -40,7 +40,7 @@ public class UiUtil {
 			"message", "Messages",
 			PatientController.PATIENT_PATH_KEY, "Patients",
 			"location", "Locations",
-			ShLinkController.SHLINK_CONTROLLER_PATH_KEY, "ShLink"
+		ShLinkController.SHLINK_CONTROLLER_PATH_KEY, "Smart Health Link"
 	// ,FhirMessagingController.FHIR_MESSAGING, "Conversion messaging"
 	);
 

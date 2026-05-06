@@ -103,7 +103,7 @@ public class ShLinkController {
 			 */
 			out.println("<h3>Signing Key used</h3>");
 			out.println("<h4>Key id : " + iisSigningKey.getKeyId() + "</h4>");
-			out.println("<textarea textarea name=\"shlink\" readonly style=\"height: 3em;\" >" +
+			out.println("<textarea textarea name=\"sh-link\" readonly style=\"height: 3em;\" >" +
 				iisSigningKey.jwk().toPublicJWK().toJSONString() + "</textarea>");
 			if (flag.contains("P")) {
 				out.println("<h3>Passcode Protected - P flag activated</h3>");

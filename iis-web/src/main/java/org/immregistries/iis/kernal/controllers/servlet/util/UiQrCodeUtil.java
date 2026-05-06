@@ -53,7 +53,7 @@ public class UiQrCodeUtil {
 
 		out.println("<img src=\""
 			+ imageUrl
-			+ "\"  alt=\"shlink\">");
+			+ "\"  alt=\"sh-link\">");
 
 		out.println("<textarea id =\"qrCode\" cols=\"30\" rows=\"1\" style=\"white-space: nowrap; overflow: auto;\">");
 		out.print(qrCode);

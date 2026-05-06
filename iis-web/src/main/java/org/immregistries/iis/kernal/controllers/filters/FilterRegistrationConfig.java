@@ -3,6 +3,7 @@ package org.immregistries.iis.kernal.controllers.filters;
 import org.immregistries.iis.kernal.controllers.IisRestPath;
 import org.immregistries.iis.kernal.controllers.rest.filters.RestTenantUrlFilter;
 import org.immregistries.iis.kernal.controllers.servlet.TenantController;
+import org.immregistries.iis.kernal.services.api.IDeployedApiUrlService;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,8 +23,8 @@ public class FilterRegistrationConfig {
 	}
 
 	@Bean
-	public FilterRegistrationBean tenantUrlFilterRegistrationBean(TenantUrlFilter tenantUrlFilter) {
-		FilterRegistrationBean registration = new FilterRegistrationBean();
+	public FilterRegistrationBean<TenantUrlFilter> tenantUrlFilterRegistrationBean(TenantUrlFilter tenantUrlFilter) {
+		FilterRegistrationBean<TenantUrlFilter> registration = new FilterRegistrationBean<>();
 		registration.setFilter(tenantUrlFilter);
 		registration.addUrlPatterns(TenantController.TENANT_BASE_PATH + "/*");
 		registration.setName("tenantUrlFilter");
@@ -32,14 +33,13 @@ public class FilterRegistrationConfig {
 	}
 
 	@Bean(name = REST_TENANT_URL_FILTER)
-	public RestTenantUrlFilter restTenantUrlFilter() {
-		return new RestTenantUrlFilter();
+	public RestTenantUrlFilter restTenantUrlFilter(IDeployedApiUrlService deployedApiUrlService) {
+		return new RestTenantUrlFilter(deployedApiUrlService);
 	}
 
 	@Bean
-	public FilterRegistrationBean restTenantUrlFilterRegistrationBean(
-		RestTenantUrlFilter restTenantUrlFilter) {
-		FilterRegistrationBean registration = new FilterRegistrationBean();
+	public FilterRegistrationBean<RestTenantUrlFilter> restTenantUrlFilterRegistrationBean(RestTenantUrlFilter restTenantUrlFilter) {
+		FilterRegistrationBean<RestTenantUrlFilter> registration = new FilterRegistrationBean<>();
 		registration.setFilter(restTenantUrlFilter);
 		registration.addUrlPatterns(IisRestPath.BasePath.REST_PATH + TenantController.TENANT_BASE_PATH + "/*");
 		registration.setName(REST_TENANT_URL_FILTER);

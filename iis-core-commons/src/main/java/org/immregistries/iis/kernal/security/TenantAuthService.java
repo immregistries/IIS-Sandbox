@@ -2,8 +2,10 @@ package org.immregistries.iis.kernal.security;
 
 import ca.uhn.fhir.jpa.partition.IPartitionLookupSvc;
 import ca.uhn.fhir.rest.server.exceptions.AuthenticationException;
+import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.immregistries.iis.kernal.controllers.IisRestPath;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.immregistries.iis.kernal.persisted.entities.UserAccess;
 import org.immregistries.iis.kernal.persisted.repository.TenantRepository;
@@ -122,7 +124,7 @@ public class TenantAuthService {
 
 	private Tenant registerTenant(String facilityName, UserAccess userAccess) {
 		Tenant tenant = new Tenant();
-		if (FORBIDDEN_NAMES.contains(facilityName) || NumberUtils.isCreatable(facilityName)) {
+		if (EnumUtils.isValidEnum(IisRestPath.RestKey.class, facilityName) || FORBIDDEN_NAMES.contains(facilityName) || NumberUtils.isCreatable(facilityName)) {
 			throw new AuthenticationException("Tenant name: " + facilityName + " is forbidden");
 		}
 		tenant.setOrganizationName(facilityName);

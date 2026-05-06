@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class RestUrlUtil {
-
+	// TODO use AntPAth Matcher
 	@Autowired
 	private IDeployedApiUrlService deployedApiUrlService;
 

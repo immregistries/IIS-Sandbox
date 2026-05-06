@@ -22,16 +22,13 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import static org.immregistries.iis.kernal.controllers.servlet.FhirMessagingController.FHIR_MESSAGING_BASE_PATH;
 import static org.immregistries.iis.kernal.controllers.servlet.PopController.PARAM_FACILITY_NAME;
 import static org.immregistries.iis.kernal.controllers.servlet.PopController.PARAM_MESSAGE;
 
 @RestController()
-@RequestMapping({ FHIR_MESSAGING_BASE_PATH, TenantController.TENANT_PATH + FHIR_MESSAGING_BASE_PATH })
+@RequestMapping({IisRestPath.BasePath.FHIR_MESSAGING_PATH, TenantController.TENANT_PATH + IisRestPath.BasePath.FHIR_MESSAGING_PATH})
 @Conditional(OnR4Condition.class)
 public class FhirMessagingController {
-	public static final String FHIR_MESSAGING_PATH_KEY = "fhirMessaging";
-	public static final String FHIR_MESSAGING_BASE_PATH = "/" + FHIR_MESSAGING_PATH_KEY;
 	public static final String ORIGINAL_TEXT_EXTENSION_URL = "http://hl7.org/fhir/StructureDefinition/originalText";
 	@Autowired
 	private FhirContext fhirContext;

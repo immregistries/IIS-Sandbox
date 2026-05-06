@@ -24,14 +24,20 @@ import java.io.IOException;
 @Service
 @WebFilter
 public class RestTenantUrlFilter extends OncePerRequestFilter {
+
+	private final AntPathMatcher antPathMatcher = new AntPathMatcher();
+	private final String tenantPattern;
+	private final String manifestPattern;
 	@Autowired
-	private IDeployedApiUrlService deployedApiUrlService;
+	public RestTenantUrlFilter(IDeployedApiUrlService deployedApiUrlService) {
+		tenantPattern = deployedApiUrlService.getContextPath() + IisRestPath.BasePath.REST_PATH + IisRestPath.BasePath.TENANT_PATH + "/**";
+		manifestPattern = deployedApiUrlService.getContextPath() + IisRestPath.MANIFEST_FULL_PATH + "/**";
+	}
+
+
 
 	private static final Logger logger = LoggerFactory.getLogger(RestTenantUrlFilter.class);
 
-	private String tenantPrefix() {
-		return deployedApiUrlService.getContextPath() + IisRestPath.BasePath.REST_PATH + IisRestPath.BasePath.TENANT_PATH + "/";
-	}
 
 	@Autowired
 	private TenantAuthService tenantAuthService;
@@ -44,19 +50,8 @@ public class RestTenantUrlFilter extends OncePerRequestFilter {
 	public void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
 		String path = request.getRequestURI();
-		/*
-		 * For Smart health links manifest retrieval, authentication is dealt with later
-		 * or well known key
-		 */
-		AntPathMatcher matcher = new AntPathMatcher();
-		String manifestPattern = deployedApiUrlService.getContextPath() + IisRestPath.MANIFEST_FULL_PATH + "/**";
-		if (matcher.match(manifestPattern, path)) {
-//			filterChain.doFilter(request, response);
-		} else if (path.startsWith(tenantPrefix())) {
-			/**
-			 * TODO optimize prefix length calculus
-			 */
-			String remainingPath = path.substring(tenantPrefix().length());
+		if (antPathMatcher.match(tenantPattern, path)) {
+			String remainingPath = antPathMatcher.extractPathWithinPattern(tenantPattern, path);
 			int slashIndex = remainingPath.indexOf('/');
 			String tenantName;
 			if (slashIndex > 0) {
@@ -69,7 +64,15 @@ public class RestTenantUrlFilter extends OncePerRequestFilter {
 				request.setAttribute(IisRequestAttribute.TENANT_NAME_URL, tenantName);
 				requestTenantUtil.setTenantForRequest(tenant, request);
 			} catch (Exception e) {
-				logger.warn("Could not authenticate tenant for logging: {}", e.getMessage());
+				/*
+				 * For Smart health links manifest retrieval, authentication is dealt with later
+				 * or well known key
+				 */
+				if (antPathMatcher.match(manifestPattern, path)) {
+					filterChain.doFilter(request, response);
+				} else {
+					logger.warn("Could not authenticate tenant for logging: {}", e.getMessage());
+				}
 			}
 		}
 		filterChain.doFilter(request, response);

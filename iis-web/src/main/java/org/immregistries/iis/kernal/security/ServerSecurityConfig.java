@@ -1,7 +1,11 @@
 package org.immregistries.iis.kernal.security;
 
+import org.immregistries.iis.kernal.controllers.IisRestPath;
 import org.immregistries.iis.kernal.controllers.WellKnownKeyController;
-import org.immregistries.iis.kernal.controllers.servlet.*;
+import org.immregistries.iis.kernal.controllers.servlet.HomeController;
+import org.immregistries.iis.kernal.controllers.servlet.PopController;
+import org.immregistries.iis.kernal.controllers.servlet.SoapDescriptionController;
+import org.immregistries.iis.kernal.controllers.servlet.TenantController;
 import org.immregistries.iis.kernal.controllers.servlet.util.UrlTenantUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +23,7 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 import java.util.List;
 
 import static org.immregistries.iis.kernal.HapiFhirServerRegistrationConfig.FHIR_SERVER_PATH_EXTENSION;
-import static org.immregistries.iis.kernal.controllers.IisRestPath.SHLINK_CONTENT_PATH;
+import static org.immregistries.iis.kernal.controllers.IisRestPath.SH_LINK_CONTENT_PATH;
 import static org.immregistries.iis.kernal.controllers.rest.shlink.ShLinkManifestRestController.SHLINKS_CONTROLLER_REST_BASE_URL;
 import static org.immregistries.iis.kernal.controllers.servlet.LoginFormController.LOGIN_PARAM_PASSWORD;
 import static org.immregistries.iis.kernal.controllers.servlet.LoginFormController.LOGIN_PARAM_USERID;
@@ -45,20 +49,20 @@ public class ServerSecurityConfig {
 				.requestCache(cache -> cache.requestCache(requestCache))
 				.authorizeHttpRequests((authorize) -> authorize
 						.requestMatchers(HttpMethod.GET, "/", HomeController.HOME_BASE_PATH,
-								PopController.POP_BASE_PATH, "/SubscriptionTopic/**", "/img/**", "/rest/**")
+							PopController.POP_BASE_PATH, "/SubscriptionTopic/**", "/img/**")
 						.permitAll()
-					.requestMatchers("/tenant/*/manifest/**",
+					.requestMatchers(IisRestPath.MANIFEST_FULL_PATH + "/**",
 						SHLINKS_CONTROLLER_REST_BASE_URL + "/*",
 								TenantController.TENANT_PATH + WellKnownKeyController.WELL_KNOWN_PATH_SUFFIX,
-								SHLINK_CONTENT_PATH + "/*")
+						SH_LINK_CONTENT_PATH + "/*")
 						.permitAll() // ShLinks
 						.requestMatchers(LOGIN_FORM_PATH, "/oauth2/**", LOGIN_PATH).permitAll()
 						// API AUTHORIZATION AND AUTHENTICATION SEPARATED
 					.requestMatchers(FHIR_SERVER_PATH_EXTENSION + "/**",
 						SoapDescriptionController.SOAP_BASE_PATH,
-						FhirMessagingController.FHIR_MESSAGING_BASE_PATH + SoapDescriptionController.SOAP_BASE_PATH,
+						IisRestPath.BasePath.FHIR_MESSAGING_PATH + SoapDescriptionController.SOAP_BASE_PATH,
 								"/.well-known/smart-configuration", "/registerClient", "/token",
-								"/rest/**")
+						IisRestPath.BasePath.REST_PATH + "/**")
 						.permitAll()
 						.anyRequest().authenticated())
 				.formLogin((form) -> form

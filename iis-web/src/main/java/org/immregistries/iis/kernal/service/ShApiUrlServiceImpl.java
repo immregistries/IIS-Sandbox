@@ -21,7 +21,7 @@ public class ShApiUrlServiceImpl implements IShApiUrlService {
 
 
 	public void replaceUrlWithShLinkPattern(UriComponentsBuilder uriBuilder) {
-		uriBuilder.replacePath(deployedUrlService.getContextPath() + IisRestPath.SHLINK_CONTENT_PATH + IisPathVariable.PlaceHolder.CONTENT_ID_PLACEHOLDER);
+		uriBuilder.replacePath(deployedUrlService.getContextPath() + IisRestPath.SH_LINK_CONTENT_PATH + IisPathVariable.PlaceHolder.CONTENT_ID_PLACEHOLDER);
 	}
 
 }

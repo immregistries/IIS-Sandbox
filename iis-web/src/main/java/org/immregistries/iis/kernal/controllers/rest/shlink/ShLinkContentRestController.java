@@ -8,10 +8,10 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import static org.immregistries.iis.kernal.controllers.IisRestParam.ShLink.RECIPIENT;
-import static org.immregistries.iis.kernal.controllers.IisRestPath.SHLINK_CONTENT_PATH;
+import static org.immregistries.iis.kernal.controllers.IisRestPath.SH_LINK_CONTENT_PATH;
 
 @RestController
-@RequestMapping(SHLINK_CONTENT_PATH)
+@RequestMapping(SH_LINK_CONTENT_PATH)
 public class ShLinkContentRestController {
 
 	 @Autowired

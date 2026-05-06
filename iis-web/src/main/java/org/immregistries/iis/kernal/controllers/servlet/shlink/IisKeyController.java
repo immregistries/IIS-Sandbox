@@ -88,7 +88,7 @@ public class IisKeyController {
 
 	public void printIisKey(PrintWriter out, IisKey iisKey) {
 		out.println("<h4>Key id : " + iisKey.getKeyId() + "</h4>");
-		out.println("<textarea textarea name=\"shlink\" readonly style=\"width: 100%; height: 3em;\" >" +
+		out.println("<textarea textarea name=\"sh-link\" readonly style=\"width: 100%; height: 3em;\" >" +
 				iisKey.jwk().toPublicJWK().toJSONString() + "</textarea>");
 	}
 

@@ -31,7 +31,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 import static org.immregistries.iis.kernal.controllers.IisRestPath.BasePath.FHIR_MESSAGING_PATH;
-import static org.immregistries.iis.kernal.controllers.servlet.FhirMessagingController.FHIR_MESSAGING_BASE_PATH;
 import static org.immregistries.iis.kernal.controllers.servlet.PopController.PARAM_FACILITY_NAME;
 import static org.immregistries.iis.kernal.controllers.servlet.PopController.PARAM_MESSAGE;
 import static org.immregistries.iis.kernal.controllers.servlet.TenantController.TENANT_NAME;
@@ -39,7 +38,7 @@ import static org.immregistries.iis.kernal.controllers.servlet.TenantController.
 @RestController
 @RequestMapping({ IisRestPath.BasePath.REST_PATH + FHIR_MESSAGING_PATH,
 		IisRestPath.REST_TENANT_PATH + FHIR_MESSAGING_PATH,
-	"/tenant/{tenantName}" + FHIR_MESSAGING_BASE_PATH})
+	"/tenant/{tenantName}" + FHIR_MESSAGING_PATH})
 @Conditional(OnR4Condition.class)
 public class FhirMessagingRestController {
 	@Autowired

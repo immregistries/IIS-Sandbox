@@ -92,7 +92,7 @@ public class PatientShLinkManifestRestController {
 	@GetMapping({ "/patient", "/patient/{id}" })
 	protected ShLinkManifest getPatientShLinkManifest(HttpServletRequest req, HttpServletResponse resp,
 			@PathVariable(value = "id", required = false) String id,
-																	  @RequestAttribute(IisRequestAttribute.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
+			                                            @RequestAttribute(value = IisRequestAttribute.TENANT_REQUEST_ATTRIBUTE, required = false) Tenant tenant,
 			@RequestParam(value = "recipient", required = false) String recipient,
 			@RequestParam(value = "passcode", required = false) String passcode,
 			@RequestParam(value = "embeddedLengthMax", required = false) String embeddedLengthMax) {
@@ -102,7 +102,7 @@ public class PatientShLinkManifestRestController {
 	@GetMapping({"/patient/ips", "/patient/{id}/ips"})
 	protected ShLinkManifest getPatientIpsShLinkManifest(HttpServletRequest req, HttpServletResponse resp,
 																		  @PathVariable(value = "id", required = false) String id,
-																		  @RequestAttribute(IisRequestAttribute.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
+																		  @RequestAttribute(value = IisRequestAttribute.TENANT_REQUEST_ATTRIBUTE, required = false) Tenant tenant,
 																		  @RequestParam(value = "recipient", required = false) String recipient,
 																		  @RequestParam(value = "passcode", required = false) String passcode,
 																		  @RequestParam(value = "embeddedLengthMax", required = false) String embeddedLengthMax) {

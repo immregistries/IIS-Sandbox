@@ -2,17 +2,22 @@ package org.immregistries.iis.kernal.controllers;
 
 public final class IisRestPath {
 
+	/*
+	 * Patterns used many times throughout the webapp
+	 */
+//	Tenant based paths
+	public static final String REST_TENANT_PATH = BasePath.REST_PATH + BasePath.TENANT_PATH
+		+ IisPathVariable.PlaceHolder.TENANT_NAME_PLACEHOLDER;
+	//	Patient based path
+	public static final String REST_PATIENT_PATH = REST_TENANT_PATH + BasePath.PATIENT_PATH
+		+ IisPathVariable.PlaceHolder.PATIENT_ID_PLACEHOLDER;
+
+	public static final String MANIFEST_FULL_PATH = REST_TENANT_PATH + BasePath.MANIFEST_PATH;
+
 	public static final String FITS_EXAMPLE_PATH = "/fits/example";
 
-	public static final String SHLINK_FILES = "shlink/files";
+	public static final String SH_LINK_CONTENT_PATH = BasePath.REST_PATH + "/" + Key.SH_LINK_FILES_KEY;
 
-	public static final String SHLINK_CONTENT_PATH = BasePath.REST_PATH + "/" + SHLINK_FILES;
-
-	public static final String REST_TENANT_PATH = BasePath.REST_PATH + BasePath.TENANT_PATH
-			+ IisPathVariable.PlaceHolder.TENANT_NAME_PLACEHOLDER;
-	public static final String REST_PATIENT_PATH = REST_TENANT_PATH + BasePath.PATIENT_PATH
-			+ IisPathVariable.PlaceHolder.PATIENT_ID_PLACEHOLDER;
-	public static final String MANIFEST_FULL_PATH = REST_TENANT_PATH + BasePath.MANIFEST_PATH;
 
 	/**
 	 * pure keys
@@ -39,10 +44,12 @@ public final class IisRestPath {
 		public static final String IIS_KEYS_KEY = "iis-keys";
 		public static final String OBSERVATIONS_KEY = "observations";
 		public static final String RELATED_KEY = "related";
-		public static final String SH_LINK_KEY = "shlink";
+		public static final String SH_LINK_KEY = "sh-link";
 		public static final String SH_LINK_PAYLOAD_KEY = "sh-link-payload";
 		public static final String FHIR_RESOURCE_KEY = "fhir-resource";
 		public static final String CLVR_KEY = "clvr";
+		public static final String SH_LINK_FILES_KEY = "sh-link-files";
+
 	}
 
 	public enum RestKey {
@@ -70,7 +77,8 @@ public final class IisRestPath {
 		SH_LINK_PAYLOAD(Key.SH_LINK_PAYLOAD_KEY),
 		FHIR_RESOURCE(Key.FHIR_RESOURCE_KEY),
 		CLVR(Key.CLVR_KEY),
-		SH_LINK(Key.SH_LINK_KEY);
+		SH_LINK(Key.SH_LINK_KEY),
+		SH_LINK_FILES(Key.SH_LINK_FILES_KEY);
 
 		private final String key;
 
