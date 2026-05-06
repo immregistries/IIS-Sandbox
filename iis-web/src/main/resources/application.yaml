@@ -1,8 +1,5 @@
-#Adds the option to go to eg. http://localhost:8080/actuator/health for seeing the running configuration
-#see https://docs.spring.io/spring-boot/docs/current/reference/html/actuator.html#actuator.endpoints
-
 #Used for all profiles
-#Profiles for R5, R4, dev at the bottom
+#Profiles for dev at the bottom
 
 spring.config.import: optional:file:.env[.properties]
 management:
@@ -71,7 +68,6 @@ spring:
     hikari:
       maximum-pool-size: 10
   datasource:
-    #    url: '@SPRING_DATASOURCE_URL@'
     url: ${SPRING_DATASOURCE_URL}
     username: ${ENV_IIS_POSTGRES_USER}
     password: ${ENV_IIS_POSTGRES_PASSWORD}
@@ -115,8 +111,8 @@ hibernate:
 hapi:
   fhir:
     ### This is the FHIR version. Choose between, DSTU2, DSTU3, R4 or R5
-    #    HERE R5 selected by default, can be modified with environment variable FHIR_VERSION, OnCondition classes were modified for this override
-    fhir_version: '@FHIR_VERSION@'
+    #    HERE R4 selected by default, can be modified with environment variable FHIR_VERSION, OnCondition classes were modified for this override
+    fhir_version: ${FHIR_VERSION:R4}
 
     ### This enables the swagger-ui at /fhir/swagger-ui/index.html as well as the /fhir/api-docs (see https://hapifhir.io/hapi-fhir/docs/server_plain/openapi.html)
 #    openapi_enabled: true

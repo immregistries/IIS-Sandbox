@@ -1,4 +1,4 @@
 set -a;
-source ../.env.dev;
+source ../dev.env;
 set +a;
-mvn clean spring-boot:run -Pdev-r4,jetty -DaddResources=True -Dspring-boot.run.arguments="--server.port=8082 --server.servlet.context-path=/iis"
+mvn clean spring-boot:run -Pdev,jetty -DaddResources=True -Dspring-boot.run.arguments="--server.servlet.context-path=/iis"
