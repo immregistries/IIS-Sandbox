@@ -30,7 +30,8 @@ import static org.immregistries.iis.kernal.controllers.servlet.PopController.PAR
 @RequestMapping({ FHIR_MESSAGING_BASE_PATH, TenantController.TENANT_PATH + FHIR_MESSAGING_BASE_PATH })
 @Conditional(OnR4Condition.class)
 public class FhirMessagingController {
-	public static final String FHIR_MESSAGING_BASE_PATH = "/" + IisRestPath.Key.FHIR_MESSAGING_KEY;
+	public static final String FHIR_MESSAGING_PATH_KEY = "fhirMessaging";
+	public static final String FHIR_MESSAGING_BASE_PATH = "/" + FHIR_MESSAGING_PATH_KEY;
 	public static final String ORIGINAL_TEXT_EXTENSION_URL = "http://hl7.org/fhir/StructureDefinition/originalText";
 	@Autowired
 	private FhirContext fhirContext;

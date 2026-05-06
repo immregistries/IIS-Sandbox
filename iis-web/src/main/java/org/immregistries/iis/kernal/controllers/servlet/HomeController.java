@@ -5,7 +5,6 @@ import ca.uhn.fhir.context.FhirVersionEnum;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.immregistries.iis.kernal.controllers.IisRestPath;
 import org.immregistries.iis.kernal.controllers.servlet.util.UiUtil;
 import org.immregistries.iis.kernal.controllers.servlet.util.UrlTenantUtil;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
@@ -91,7 +90,7 @@ public class HomeController {
 						+ "\">Subscriptions</a>: Visualize and manually trigger FHIR subscriptions</li>");
 				out.println("      <li><a href=\""
 						+ urlTenantUtil.tenantifyPathWithContextPath(tenant,
-						IisRestPath.Key.FHIR_MESSAGING_KEY)
+					FhirMessagingController.FHIR_MESSAGING_PATH_KEY)
 						+ "\">Conversion messaging (Unavailable in R5 mode)</a>: Experimental endpoint for FHIR messaging with messages converted from HL7v2</li>");
 			} else if (fhirContext.getVersion().getVersion().equals(FhirVersionEnum.R4)) {
 				out.println(
@@ -101,7 +100,7 @@ public class HomeController {
 						+ "\">V2ToFhir</a>: V2 to Fhir conversion using v2ToFhir dependency</li>");
 				out.println("      <li><a href=\""
 						+ urlTenantUtil.tenantifyPathWithContextPath(tenant,
-						IisRestPath.Key.FHIR_MESSAGING_KEY)
+					FhirMessagingController.FHIR_MESSAGING_PATH_KEY)
 						+ "\">Conversion messaging </a>: Experimental endpoint for FHIR messaging with messages converted from HL7v2</li>");
 
 			}

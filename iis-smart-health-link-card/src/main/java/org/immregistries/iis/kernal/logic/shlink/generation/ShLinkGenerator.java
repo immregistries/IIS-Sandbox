@@ -78,15 +78,7 @@ public class ShLinkGenerator {
 		/*
 		 * Payload skeleton
 		 */
-		ShLinkPayload shLinkPayload = new ShLinkPayload();
-		shLinkPayload.setLabel("Generated for ShLink testing with IPS of Synthetic Patient");
-		shLinkPayload.setFlag(flag);
-		shLinkPayload.setKey(new String(Base64.getUrlEncoder().encode(encryptionKeySpec.getEncoded())));
-		try {
-			shLinkPayload.setExp(Long.parseLong(exp));
-		} catch (NumberFormatException e) {
-			shLinkPayload.setExp(10000000L); // default
-		}
+		ShLinkPayload shLinkPayload = createEmptyShlinkPayload(flag, exp, encryptionKeySpec);
 		/*
 		 * Getting the bundle for the payload content
 		 */
@@ -101,6 +93,26 @@ public class ShLinkGenerator {
 		return qrCodeEncoder.toBase64QrCode(shLinkPayload);
 	}
 
+	/**
+	 * Generate empty payload skeleton
+	 *
+	 * @param flag
+	 * @param exp
+	 * @param encryptionKeySpec
+	 * @return
+	 */
+	private static @NotNull ShLinkPayload createEmptyShlinkPayload(String flag, String exp, SecretKeySpec encryptionKeySpec) {
+		ShLinkPayload shLinkPayload = new ShLinkPayload();
+		shLinkPayload.setLabel("Generated for ShLink testing with IPS of Synthetic Patient");
+		shLinkPayload.setFlag(flag);
+		shLinkPayload.setKey(new String(Base64.getUrlEncoder().encode(encryptionKeySpec.getEncoded())));
+		try {
+			shLinkPayload.setExp(Long.parseLong(exp));
+		} catch (NumberFormatException e) {
+			shLinkPayload.setExp(10000000L); // default
+		}
+		return shLinkPayload;
+	}
 
 
 	public URL generateShLinkForShCards(List<IBaseBundle> bundleList, ShLinkPayload shLinkPayload,
@@ -133,12 +145,12 @@ public class ShLinkGenerator {
 			shLinkUrl = directFileShCardUrl(shLinkPayload, userAccess, encryptedContent, uriBuilder);
 		} else {
 			boolean passcodeProtected = StringUtils.containsAny(shLinkPayload.getFlag(), "P");
-			shLinkUrl = manifestShCardUrl(tenant, encryptedContent, uriBuilder, passcodeProtected);
+			shLinkUrl = createManifestWithShCard(tenant, encryptedContent, uriBuilder, passcodeProtected);
 		}
 		return shLinkUrl;
 	}
 
-	private @NotNull URL manifestShCardUrl(Tenant tenant, String encryptedContent, UriComponentsBuilder uriBuilder, boolean passcodeProtected) throws MalformedURLException {
+	private @NotNull URL createManifestWithShCard(Tenant tenant, String encryptedContent, UriComponentsBuilder uriBuilder, boolean passcodeProtected) throws MalformedURLException {
 		URL shLinkUrl;
 		/*
 		 * Manifest
@@ -180,24 +192,5 @@ public class ShLinkGenerator {
 				.toURL();
 		return shLinkUrl;
 	}
-
-
-
-//	public String fullExamplePatientQrCode(Tenant tenant, PatientMaster patientMaster, String baseUrl) {
-//
-//		ShLinkManifest shLinkManifest = shLinkManifestGenerator.generateExamplePatientManifest(tenant, patientMaster);
-//		shLinkManifest = shlinkManifestService.saveManifest(shLinkManifest);
-//		String manifestUrl = baseUrl + shLinkManifest.getId();
-//
-//		ShLinkPayload shLinkPayload = new ShLinkPayload();
-//		shLinkPayload.setUrl(manifestUrl);
-//		shLinkPayload.setLabel("Generated for testing");
-//		shLinkPayload.setKey(null);
-//		shLinkPayload.setFlag("LP");
-//		shLinkPayload.setExp(10000000L);
-//
-//		return qrCode(shLinkPayload);
-//
-//	}
 
 }

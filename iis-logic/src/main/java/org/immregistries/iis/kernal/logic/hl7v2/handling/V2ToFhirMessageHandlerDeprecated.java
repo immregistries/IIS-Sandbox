@@ -4,7 +4,6 @@ import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.hl7v2.HL7Exception;
 import gov.cdc.izgw.v2tofhir.converter.MessageParser;
 import org.hl7.fhir.r4.model.Bundle;
-import org.immregistries.iis.kernal.mapping.IisFhirClientFactory;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -12,8 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 //@Conditional(OnR4Condition.class)
 public class V2ToFhirMessageHandlerDeprecated {
 
-	@Autowired
-	IisFhirClientFactory iisFhirClientFactory;
 	@Autowired
 	FhirContext fhirContext;
 

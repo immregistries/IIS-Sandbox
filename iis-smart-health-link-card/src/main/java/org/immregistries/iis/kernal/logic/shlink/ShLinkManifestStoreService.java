@@ -11,6 +11,9 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
+/**
+ * Service to manipulate stored Smart Health Link Manifests
+ */
 public class ShLinkManifestStoreService {
 
 	@Autowired

@@ -18,6 +18,7 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 
 import java.util.List;
 
+import static org.immregistries.iis.kernal.HapiFhirServerRegistrationConfig.FHIR_SERVER_PATH_EXTENSION;
 import static org.immregistries.iis.kernal.controllers.IisRestPath.SHLINK_CONTENT_PATH;
 import static org.immregistries.iis.kernal.controllers.rest.shlink.ShLinkManifestRestController.SHLINKS_CONTROLLER_REST_BASE_URL;
 import static org.immregistries.iis.kernal.controllers.servlet.LoginFormController.LOGIN_PARAM_PASSWORD;
@@ -46,15 +47,16 @@ public class ServerSecurityConfig {
 						.requestMatchers(HttpMethod.GET, "/", HomeController.HOME_BASE_PATH,
 								PopController.POP_BASE_PATH, "/SubscriptionTopic/**", "/img/**", "/rest/**")
 						.permitAll()
-						.requestMatchers("/tenant/*/manifest/**", SHLINKS_CONTROLLER_REST_BASE_URL + "/*",
+					.requestMatchers("/tenant/*/manifest/**",
+						SHLINKS_CONTROLLER_REST_BASE_URL + "/*",
 								TenantController.TENANT_PATH + WellKnownKeyController.WELL_KNOWN_PATH_SUFFIX,
 								SHLINK_CONTENT_PATH + "/*")
 						.permitAll() // ShLinks
 						.requestMatchers(LOGIN_FORM_PATH, "/oauth2/**", LOGIN_PATH).permitAll()
 						// API AUTHORIZATION AND AUTHENTICATION SEPARATED
-						.requestMatchers("/fhir/**", SoapDescriptionController.SOAP_BASE_PATH,
-								FhirMessagingController.FHIR_MESSAGING_BASE_PATH
-										+ SoapDescriptionController.SOAP_BASE_PATH,
+					.requestMatchers(FHIR_SERVER_PATH_EXTENSION + "/**",
+						SoapDescriptionController.SOAP_BASE_PATH,
+						FhirMessagingController.FHIR_MESSAGING_BASE_PATH + SoapDescriptionController.SOAP_BASE_PATH,
 								"/.well-known/smart-configuration", "/registerClient", "/token",
 								"/rest/**")
 						.permitAll()
@@ -62,8 +64,8 @@ public class ServerSecurityConfig {
 				.formLogin((form) -> form
 						.usernameParameter(LOGIN_PARAM_USERID)
 						.passwordParameter(LOGIN_PARAM_PASSWORD)
-						.loginPage("/loginForm") // Page where redirected when unauthorised
-						.loginProcessingUrl("/login") // url for login request to be processed (hollow)
+						.loginPage(LOGIN_FORM_PATH) // Page where redirected when unauthorised
+						.loginProcessingUrl(LOGIN_PATH) // url for login request to be processed (hollow)
 						.successHandler(formAuthenticationSuccessHandler)
 				// .addObjectPostProcessor()
 				)
