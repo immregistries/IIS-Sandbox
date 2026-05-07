@@ -6,11 +6,13 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.immregistries.iis.kernal.controllers.IisRestPath;
+import org.immregistries.iis.kernal.controllers.rest.PatientRestController;
 import org.immregistries.iis.kernal.controllers.rest.shlink.IisKeyRestController;
 import org.immregistries.iis.kernal.controllers.rest.shlink.ShLinkRestController;
 import org.immregistries.iis.kernal.controllers.servlet.TenantController;
 import org.immregistries.iis.kernal.controllers.servlet.util.UiQrCodeUtil;
 import org.immregistries.iis.kernal.controllers.servlet.util.UiUtil;
+import org.immregistries.iis.kernal.model.IisPatient;
 import org.immregistries.iis.kernal.persisted.entities.IisKey;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.immregistries.iis.kernal.persisted.entities.UserAccess;
@@ -52,10 +54,11 @@ public class ShLinkController {
 	public static final String QR_CODE_PARAM = "qrCode";
 
 	@Autowired
-	IisKeyRestController iisKeyRestController;
-
+	private IisKeyRestController iisKeyRestController;
 	@Autowired
-	ShLinkRestController shLinkRestController;
+	private ShLinkRestController shLinkRestController;
+	@Autowired
+	private PatientRestController patientRestController;
 
 	@Autowired
 	private UiUtil uiUtil;
@@ -89,15 +92,18 @@ public class ShLinkController {
 		String qrCode = shLinkRestController.createShLinkIPSQrCode(userAccess, req, iisSigningKey.getKeyId(), secretKey, patientId, flag,
 			exp, passcode, tenant);
 
+
 		if (image) {
 			resp.setContentType("image/png"); // Set content type for PNG image
 			uiQrCodeUtil.printQrCodeAsImage(outputStream, qrCode);
 		} else {
+			IisPatient iisPatient = patientRestController.getPatient(patientId, tenant);
+			String description = "Newly generated Qr Code, with IPS of patient " + iisPatient.getLegalNameOrFirst().asSingleString();
 			String imageUrl = req.getRequestURL().toString() + QR_TO_IMAGE_BASE_PATH + "?" + QR_CODE_PARAM + "=" + qrCode;
 			resp.setContentType("text/html");
 			uiUtil.doHeader(out, "Smart Health Link Result", tenant);
 			out.println("<h2>Smart health link Generated</h2>");
-			uiQrCodeUtil.prettyPrintQrCodeCard(out, "Smart Health link", "Newly generated Qr Code", imageUrl, qrCode, "");
+			uiQrCodeUtil.prettyPrintQrCodeCard(out, "Smart Health link", description, imageUrl, qrCode, "");
 			/*
 			 * Useful instructions
 			 */

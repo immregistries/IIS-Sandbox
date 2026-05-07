@@ -42,6 +42,11 @@ import java.util.Optional;
  */
 @RestController()
 public class JwtSmartAuthController {
+	public static final String WELL_KNOWN_SMART_CONFIGURATION = "/.well-known/smart-configuration";
+	public static final String REGISTER_CLIENT = "/register-client";
+	public static final String TOKEN = "/token";
+	public static final String CONNECTATHON_TEMP_PASSWORD = "SundaysR0ck!";
+
 	@Autowired
 	private JwtUtils jwtUtils;
 	@Autowired
@@ -66,10 +71,10 @@ public class JwtSmartAuthController {
 	 *
 	 * @return Well known configuration
 	 */
-	@GetMapping("/.well-known/smart-configuration")
+	@GetMapping(WELL_KNOWN_SMART_CONFIGURATION)
 	public String wellKnownConfiguration() {
 		UriComponentsBuilder uriComponentsBuilder = ServletUriComponentsBuilder.fromCurrentRequestUri();
-		uriComponentsBuilder.replacePath(deployedApiUrlService.getContextPath() + "/token");
+		uriComponentsBuilder.replacePath(deployedApiUrlService.getContextPath() + TOKEN);
 		String token_endpoint;
 
 		try {
@@ -94,7 +99,7 @@ public class JwtSmartAuthController {
 	 * @param authHeader Optional authHeader
 	 * @return Confirmation or exception message
 	 */
-	@PostMapping("/registerClient")
+	@PostMapping(REGISTER_CLIENT)
 	public String register(@RequestBody String jwkString, @RequestHeader("Authorization") Optional<String> authHeader) { // TODO
 																															// TLS
 																															// config
@@ -151,7 +156,7 @@ public class JwtSmartAuthController {
 	/**
 	 * Only allowed for connectathon users
 	 */
-	@PostMapping("/token")
+	@PostMapping(TOKEN)
 	public String smartJwtAuth(@RequestParam Map<String, String> map) throws ParseException, JOSEException {
 		// String client_assertion_type = map.get("client_assertion_type");
 		// String client_assertion = map.get("client_assertion");
@@ -166,7 +171,7 @@ public class JwtSmartAuthController {
 	 * @throws ParseException Parsing exception
 	 * @throws JOSEException  Invalid Key exception
 	 */
-	@GetMapping("/token")
+	@GetMapping(TOKEN)
 	public String smartJwtAuthGet(@RequestParam Map<String, String> map) throws ParseException, JOSEException {
 		String client_assertion_type = map.get("client_assertion_type");
 		String client_assertion = map.get("client_assertion");
@@ -231,7 +236,7 @@ public class JwtSmartAuthController {
 		}
 		jwtStore.put((String) signedJWT.getJWTClaimsSet().getClaim("jti"), client_assertion);
 		UserAccess userAccess = userAccessUtil.authenticateUserAccessUsernamePassword(GlobalConstants.CONNECTATHON_USER,
-				"SundaysR0ck!");
+			CONNECTATHON_TEMP_PASSWORD);
 		Map<String, String> result = new HashMap<>(5);
 		result.put("access_token", jwtUtils.generateJwtToken(userAccess));
 		result.put("token_type", "bearer");

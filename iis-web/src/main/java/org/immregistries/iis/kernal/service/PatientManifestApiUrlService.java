@@ -29,7 +29,7 @@ public class PatientManifestApiUrlService implements org.immregistries.iis.kerna
 	@Override
 	public @NotNull String getManifestUrl(String baseUrl, IAnyResource patientSelected, Tenant tenant) {
 		return baseUrl + restUrlUtil.tenantifyPathWithContextPath(tenant,
-			IisRestPath.BasePath.MANIFEST_PATH
+			IisRestPath.BasePath.PATIENT_MANIFEST_PATH
 				+ "/patient/" + patientSelected.getIdElement().getIdPart());
 	}
 }

@@ -4,7 +4,7 @@ import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.jpa.searchparam.extractor.ISearchParamExtractor;
 import ca.uhn.fhir.rest.server.util.ISearchParamRegistry;
 import jakarta.servlet.ServletException;
-import org.hl7.fhir.r5.model.*;
+import org.hl7.fhir.r5.model.SubscriptionTopic;
 import org.immregistries.iis.kernal.SubscriptionTopicGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +18,7 @@ import java.io.IOException;
 import static org.immregistries.iis.kernal.SubscriptionTopicGenerator.*;
 
 @RestController
-@RequestMapping({"/SubscriptionTopic", IisRestPath.BasePath.REST_PATH + "/SubscriptionTopic"})
+@RequestMapping({IisRestPath.BasePath.SUBSCRIPTION_TOPIC_PATH, IisRestPath.BasePath.REST_PATH + IisRestPath.BasePath.SUBSCRIPTION_TOPIC_PATH})
 public class SubscriptionTopicController {
 
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());

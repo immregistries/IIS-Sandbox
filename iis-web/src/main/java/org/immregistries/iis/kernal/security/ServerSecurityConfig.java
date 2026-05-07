@@ -1,6 +1,7 @@
 package org.immregistries.iis.kernal.security;
 
 import org.immregistries.iis.kernal.controllers.IisRestPath;
+import org.immregistries.iis.kernal.controllers.JwtSmartAuthController;
 import org.immregistries.iis.kernal.controllers.WellKnownKeyController;
 import org.immregistries.iis.kernal.controllers.servlet.HomeController;
 import org.immregistries.iis.kernal.controllers.servlet.PopController;
@@ -14,6 +15,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
 import org.springframework.security.web.savedrequest.RequestCache;
@@ -23,8 +25,8 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 import java.util.List;
 
 import static org.immregistries.iis.kernal.HapiFhirServerRegistrationConfig.FHIR_SERVER_PATH_EXTENSION;
+import static org.immregistries.iis.kernal.controllers.IisRestPath.SH_LINKS_STORED_MANIFEST_FULL_PATH;
 import static org.immregistries.iis.kernal.controllers.IisRestPath.SH_LINK_CONTENT_PATH;
-import static org.immregistries.iis.kernal.controllers.rest.shlink.ShLinkManifestRestController.SHLINKS_CONTROLLER_REST_BASE_URL;
 import static org.immregistries.iis.kernal.controllers.servlet.LoginFormController.LOGIN_PARAM_PASSWORD;
 import static org.immregistries.iis.kernal.controllers.servlet.LoginFormController.LOGIN_PARAM_USERID;
 
@@ -45,81 +47,51 @@ public class ServerSecurityConfig {
 	public SecurityFilterChain filterChain(HttpSecurity http, IisOAuthSuccessHandler iisOAuthSuccessHandler,
 			FormAuthenticationSuccessHandler formAuthenticationSuccessHandler, RequestCache requestCache)
 			throws Exception {
-		http
-				.requestCache(cache -> cache.requestCache(requestCache))
-				.authorizeHttpRequests((authorize) -> authorize
-						.requestMatchers(HttpMethod.GET, "/", HomeController.HOME_BASE_PATH,
-							PopController.POP_BASE_PATH, "/SubscriptionTopic/**", "/img/**")
+		http.requestCache(cache -> cache.requestCache(requestCache));
+		http.authorizeHttpRequests((authorize) -> authorize
+			.requestMatchers(HttpMethod.GET,
+				"/",
+				HomeController.HOME_BASE_PATH,
+				PopController.POP_BASE_PATH,
+				IisRestPath.BasePath.SUBSCRIPTION_TOPIC_PATH + "/**",
+				"/img/**")
 						.permitAll()
-					.requestMatchers(IisRestPath.MANIFEST_FULL_PATH + "/**",
-						SHLINKS_CONTROLLER_REST_BASE_URL + "/*",
-								TenantController.TENANT_PATH + WellKnownKeyController.WELL_KNOWN_PATH_SUFFIX,
+			.requestMatchers(
+				IisRestPath.PATIENT_MANIFEST_FULL_PATH + "/**",
+				SH_LINKS_STORED_MANIFEST_FULL_PATH + "/*",
+				TenantController.TENANT_PATH + WellKnownKeyController.WELL_KNOWN_PATH_SUFFIX,
 						SH_LINK_CONTENT_PATH + "/*")
 						.permitAll() // ShLinks
-						.requestMatchers(LOGIN_FORM_PATH, "/oauth2/**", LOGIN_PATH).permitAll()
+			.requestMatchers(LOGIN_FORM_PATH, "/oauth2/**", LOGIN_PATH)
+			.permitAll()
 						// API AUTHORIZATION AND AUTHENTICATION SEPARATED
 					.requestMatchers(FHIR_SERVER_PATH_EXTENSION + "/**",
 						SoapDescriptionController.SOAP_BASE_PATH,
 						IisRestPath.BasePath.FHIR_MESSAGING_PATH + SoapDescriptionController.SOAP_BASE_PATH,
-								"/.well-known/smart-configuration", "/registerClient", "/token",
+						JwtSmartAuthController.WELL_KNOWN_SMART_CONFIGURATION,
+						JwtSmartAuthController.REGISTER_CLIENT,
+						JwtSmartAuthController.TOKEN,
 						IisRestPath.BasePath.REST_PATH + "/**")
 						.permitAll()
-						.anyRequest().authenticated())
-				.formLogin((form) -> form
+			.anyRequest().authenticated()
+		);
+
+		http.formLogin((form) -> form
 						.usernameParameter(LOGIN_PARAM_USERID)
 						.passwordParameter(LOGIN_PARAM_PASSWORD)
 						.loginPage(LOGIN_FORM_PATH) // Page where redirected when unauthorised
 						.loginProcessingUrl(LOGIN_PATH) // url for login request to be processed (hollow)
-						.successHandler(formAuthenticationSuccessHandler)
-				// .addObjectPostProcessor()
-				)
-
-				.oauth2Login((oauth2) -> oauth2
+			.successHandler(formAuthenticationSuccessHandler));
+		http.oauth2Login((oauth2) -> oauth2
 						.defaultSuccessUrl(HomeController.HOME_BASE_PATH)
-						.successHandler(iisOAuthSuccessHandler))
-				.logout((logout) -> logout
+			.successHandler(iisOAuthSuccessHandler));
+
+		http.logout((logout) -> logout
 						.logoutRequestMatcher(new AntPathRequestMatcher(LOGOUT_PATH)) // Use RequestMatcher
 						.logoutSuccessUrl(LOGIN_FORM_PATH)
 						.deleteCookies("JSESSIONID"));
 
-		// List<RequestMatcher> csrfIgnoringRequestMatchers = new ArrayList<>(30);
-		// addTenantifiedRequestMatcher(csrfIgnoringRequestMatchers,
-		// PATIENT_MANIFEST_FULL_PATH + "/**");
-		// addTenantifiedRequestMatcher(csrfIgnoringRequestMatchers, "/manifest/**");
-		// addTenantifiedRequestMatcher(csrfIgnoringRequestMatchers,
-		// PopController.POP_BASE_PATH);
-		// addTenantifiedRequestMatcher(csrfIgnoringRequestMatchers,
-		// V2ToFhirController.V2_TO_FHIR_BASE_PATH);
-		// addTenantifiedRequestMatcher(csrfIgnoringRequestMatchers,
-		// FhirMessagingController.FHIR_MESSAGING_BASE_PATH);
-		// addTenantifiedRequestMatcher(csrfIgnoringRequestMatchers,
-		// FhirMessagingController.FHIR_MESSAGING_BASE_PATH +
-		// SoapController.SOAP_BASE_PATH);
-		// addTenantifiedRequestMatcher(csrfIgnoringRequestMatchers,
-		// MessageController.MESSAGE_BASE_PATH);
-		// addTenantifiedRequestMatcher(csrfIgnoringRequestMatchers, "/fhir/**");
-		// addTenantifiedRequestMatcher(csrfIgnoringRequestMatchers, LOGIN_FORM_PATH);
-		// addTenantifiedRequestMatcher(csrfIgnoringRequestMatchers, LOGIN_PATH);
-		// addTenantifiedRequestMatcher(csrfIgnoringRequestMatchers, LOGOUT_PATH);
-		// addTenantifiedRequestMatcher(csrfIgnoringRequestMatchers,
-		// PatientController.PATIENT_BASE_PATH);
-		// addTenantifiedRequestMatcher(csrfIgnoringRequestMatchers,
-		// SubscriptionController.SUBSCRIPTION_BASE_PATH);
-		// addTenantifiedRequestMatcher(csrfIgnoringRequestMatchers,
-		// VaccinationController.VACCINATION_BASE_PATH);
-		// addTenantifiedRequestMatcher(csrfIgnoringRequestMatchers,
-		// TenantController.TENANT_PATH);
-		// addTenantifiedRequestMatcher(csrfIgnoringRequestMatchers,
-		// LocationController.LOCATION_BASE_PATH);
-		// addTenantifiedRequestMatcher(csrfIgnoringRequestMatchers,
-		// SoapController.SOAP_BASE_PATH);
-		// addTenantifiedRequestMatcher(csrfIgnoringRequestMatchers,
-		// ShLinkController.SHLINK_CONTROLLER_BASE_PATH + "/**");
-		http.csrf((csrf) -> csrf.disable()
-		// .ignoringRequestMatchers(csrfIgnoringRequestMatchers.toArray(new
-		// RequestMatcher[csrfIgnoringRequestMatchers.size()]))
-		);
-		// ... other configuration
+		http.csrf(AbstractHttpConfigurer::disable);
 		return http.build();
 	}
 

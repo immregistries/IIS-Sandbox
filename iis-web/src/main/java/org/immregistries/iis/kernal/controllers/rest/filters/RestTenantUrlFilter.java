@@ -31,7 +31,7 @@ public class RestTenantUrlFilter extends OncePerRequestFilter {
 	@Autowired
 	public RestTenantUrlFilter(IDeployedApiUrlService deployedApiUrlService) {
 		tenantPattern = deployedApiUrlService.getContextPath() + IisRestPath.BasePath.REST_PATH + IisRestPath.BasePath.TENANT_PATH + "/**";
-		manifestPattern = deployedApiUrlService.getContextPath() + IisRestPath.MANIFEST_FULL_PATH + "/**";
+		manifestPattern = deployedApiUrlService.getContextPath() + IisRestPath.PATIENT_MANIFEST_FULL_PATH + "/**";
 	}
 
 

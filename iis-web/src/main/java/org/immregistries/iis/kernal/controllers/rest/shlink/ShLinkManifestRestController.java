@@ -22,10 +22,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping(ShLinkManifestRestController.SHLINKS_CONTROLLER_REST_BASE_URL)
+@RequestMapping(IisRestPath.SH_LINKS_STORED_MANIFEST_FULL_PATH)
 public class ShLinkManifestRestController {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
-	public final static String SHLINKS_CONTROLLER_REST_BASE_URL = IisRestPath.BasePath.REST_PATH + "/link";
 
 	@Autowired
 	private ShLinkManifestGenerator shLinkManifestGenerator;

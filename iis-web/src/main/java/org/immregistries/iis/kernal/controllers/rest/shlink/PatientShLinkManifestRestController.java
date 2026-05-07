@@ -31,7 +31,7 @@ import java.io.IOException;
 import static org.immregistries.iis.kernal.controllers.servlet.TenantController.PARAM_TENANT_NAME;
 
 @RestController
-@RequestMapping(IisRestPath.MANIFEST_FULL_PATH)
+@RequestMapping(IisRestPath.PATIENT_MANIFEST_FULL_PATH)
 public class PatientShLinkManifestRestController {
 
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
