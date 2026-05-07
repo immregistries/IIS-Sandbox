@@ -67,16 +67,16 @@ public class ShLinkManifestRestController {
 				if (!Strings.CS.equals(shLinkManifest.getPasscode(), passcode)) {
 					throw new AuthenticationCredentialsNotFoundException("Invalid passcode");
 				}
-			}
-			/*
-			 * If no Manifest passcode was specified at shlink creation, using iis sandbox authorization
-			 */
-			if (StringUtils.isNotBlank(passcode)) {
+			} else if (StringUtils.isNotBlank(passcode)) {
+				/*
+				 * If no Manifest passcode was specified at shlink creation, using iis sandbox authorization
+				 */
 				tenant = tenantAuthService.authenticateTenantNoUsername(manifestTenantName, passcode);
+				if (tenant == null || !Strings.CS.equals(manifestTenantName, tenant.getOrganizationName())) {
+					throw new AuthenticationCredentialsNotFoundException("Invalid passcode");
+				}
 			}
-			if (tenant == null || !Strings.CS.equals(manifestTenantName, tenant.getOrganizationName())) {
-				throw new AuthenticationCredentialsNotFoundException("Invalid passcode");
-			}
+
 		}
 		return shLinkManifest;
 	}

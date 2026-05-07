@@ -67,8 +67,8 @@ public class RestTenantUrlFilter extends OncePerRequestFilter {
 				requestTenantUtil.setTenantForRequest(tenant, request);
 			} catch (Exception e) {
 				/*
-				 * For Smart health links manifest retrieval, authentication is dealt with later
-				 * or well known key
+				 * For Smart health links manifest retrieval, authentication is dealt with later with passcode parameter
+				 *
 				 */
 				if (antPathMatcher.match(patientManifestPattern, path) || antPathMatcher.match(storedManifestPattern, path)) {
 					filterChain.doFilter(request, response);
