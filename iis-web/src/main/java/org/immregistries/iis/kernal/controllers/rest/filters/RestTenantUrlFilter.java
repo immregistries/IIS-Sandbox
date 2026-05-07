@@ -27,11 +27,13 @@ public class RestTenantUrlFilter extends OncePerRequestFilter {
 
 	private final AntPathMatcher antPathMatcher = new AntPathMatcher();
 	private final String tenantPattern;
-	private final String manifestPattern;
+	private final String patientManifestPattern;
+	private final String storedManifestPattern;
 	@Autowired
 	public RestTenantUrlFilter(IDeployedApiUrlService deployedApiUrlService) {
 		tenantPattern = deployedApiUrlService.getContextPath() + IisRestPath.BasePath.REST_PATH + IisRestPath.BasePath.TENANT_PATH + "/**";
-		manifestPattern = deployedApiUrlService.getContextPath() + IisRestPath.PATIENT_MANIFEST_FULL_PATH + "/**";
+		patientManifestPattern = deployedApiUrlService.getContextPath() + IisRestPath.PATIENT_MANIFEST_FULL_PATH + "/**";
+		storedManifestPattern = deployedApiUrlService.getContextPath() + IisRestPath.SH_LINKS_STORED_MANIFEST_FULL_PATH + "/**";
 	}
 
 
@@ -68,7 +70,7 @@ public class RestTenantUrlFilter extends OncePerRequestFilter {
 				 * For Smart health links manifest retrieval, authentication is dealt with later
 				 * or well known key
 				 */
-				if (antPathMatcher.match(manifestPattern, path)) {
+				if (antPathMatcher.match(patientManifestPattern, path) || antPathMatcher.match(storedManifestPattern, path)) {
 					filterChain.doFilter(request, response);
 				} else {
 					logger.warn("Could not authenticate tenant for logging: {}", e.getMessage());
