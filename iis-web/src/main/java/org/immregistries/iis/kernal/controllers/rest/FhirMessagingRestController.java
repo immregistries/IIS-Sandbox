@@ -54,11 +54,13 @@ public class FhirMessagingRestController {
 	private V2IncomingMessageHandler handler;
 
 	@PostMapping(produces = MediaType.TEXT_PLAIN_VALUE)
-	protected String doPost(@RequestParam(PARAM_MESSAGE) String message,
+	protected String doPost(
+		@RequestBody String message,
+		@RequestParam(PARAM_MESSAGE) String messageParam, // TODO Test and change
 			@RequestParam(PARAM_FACILITY_NAME) String facilityName,
-									@RequestAttribute(IisRequestAttribute.TENANT_REQUEST_ATTRIBUTE) @NotNull Tenant tenant)
+		@RequestAttribute(IisRequestAttribute.TENANT_REQUEST_ATTRIBUTE) @NotNull Tenant tenant)
 			throws ServletException, IOException, HL7Exception {
-		// resp.setContentType("text/html");
+		message = StringUtils.firstNonBlank(message, messageParam);
 		if (StringUtils.isBlank(message)) {
 			throw new RuntimeException("Blank message not accepted");
 		}
