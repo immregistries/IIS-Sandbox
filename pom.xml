@@ -27,14 +27,14 @@
         <groupId>ca.uhn.hapi.fhir</groupId>
         <artifactId>hapi-fhir</artifactId>
 <!--        WARNING MUST BE THE SAME VALUE AS PROPERTY hapi-fhir.version -->
-        <version>8.0.0</version>
+        <version>8.0.0-IIS</version>
     </parent>
 
     <properties>
         <!--        <iis.sandbox.revision>1</iis.sandbox.revision>-->
         <revision>0.6.3-SNAPSHOT-HAPI-UPGRADE-TEST</revision>
         <!--        WARNING MUST BE THE SAME VALUE AS parent hapi-fhir version -->
-        <hapi-fhir.version>8.0.0</hapi-fhir.version>
+        <hapi-fhir.version>8.0.0-IIS</hapi-fhir.version>
         <java.version>17</java.version>
         <logback-classic.version>1.2.11</logback-classic.version>
     </properties>
