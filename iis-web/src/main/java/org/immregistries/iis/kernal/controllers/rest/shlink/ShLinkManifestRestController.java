@@ -5,8 +5,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.immregistries.iis.kernal.IisRequestAttribute;
 import org.immregistries.iis.kernal.controllers.IisPathVariable;
-import org.immregistries.iis.kernal.controllers.IisRestParam;
 import org.immregistries.iis.kernal.controllers.IisRestPath;
+import org.immregistries.iis.kernal.controllers.request.shlink.ShLinkManifestRequestDTO;
 import org.immregistries.iis.kernal.logic.shlink.ShLinkManifestGenerator;
 import org.immregistries.iis.kernal.logic.shlink.ShLinkManifestStoreService;
 import org.immregistries.iis.kernal.persisted.entities.ShLinkManifest;
@@ -20,7 +20,6 @@ import org.springframework.security.authentication.AuthenticationCredentialsNotF
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping(IisRestPath.SH_LINKS_STORED_MANIFEST_FULL_PATH)
@@ -58,10 +57,8 @@ public class ShLinkManifestRestController {
 	protected ShLinkManifest readShLinkManifest(
 			@PathVariable(IisPathVariable.Key.MANIFEST_ID) String manifestId,
 			@RequestAttribute(value = IisRequestAttribute.TENANT_REQUEST_ATTRIBUTE, required = false) Tenant tenant,
-			@RequestBody Map<String, String> payload) {
-		String recipient = payload.get(IisRestParam.ShLink.RECIPIENT);
-		String passcode = payload.get(IisRestParam.ShLink.PASSCODE);
-		String maxLen = payload.get(IisRestParam.ShLink.EMBEDDED_LENGTH_MAX);
+			@RequestBody ShLinkManifestRequestDTO payload) {
+		String passcode = payload.getPasscode();
 		ShLinkManifest shLinkManifest = shlinkManifestStoreService.readManifest(manifestId);
 		Tenant manifestTenant = shLinkManifest.getTenant();
 		String manifestTenantName = manifestTenant.getOrganizationName();

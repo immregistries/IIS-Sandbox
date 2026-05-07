@@ -1,4 +1,4 @@
-package org.immregistries.iis.kernal.model.shlink;
+package org.immregistries.iis.kernal.controllers.request.shlink;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -16,7 +16,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 		"embeddedLengthMax"
 })
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ShLinkManifestRequestBody {
+public class ShLinkManifestRequestDTO {
 
 	/**
 	 * A string describing the recipient (e.g., the name of an organization or
@@ -40,10 +40,10 @@ public class ShLinkManifestRequestBody {
 	@JsonProperty("embeddedLengthMax")
 	private Integer embeddedLengthMax;
 
-	public ShLinkManifestRequestBody() {
+	public ShLinkManifestRequestDTO() {
 	}
 
-	public ShLinkManifestRequestBody(String recipient, String passcode, Integer embeddedLengthMax) {
+	public ShLinkManifestRequestDTO(String recipient, String passcode, Integer embeddedLengthMax) {
 		this.recipient = recipient;
 		this.passcode = passcode;
 		this.embeddedLengthMax = embeddedLengthMax;

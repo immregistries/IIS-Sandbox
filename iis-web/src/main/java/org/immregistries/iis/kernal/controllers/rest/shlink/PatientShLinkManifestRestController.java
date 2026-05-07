@@ -9,13 +9,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.immregistries.iis.kernal.IisRequestAttribute;
 import org.immregistries.iis.kernal.controllers.IisRestPath;
+import org.immregistries.iis.kernal.controllers.request.shlink.ShLinkManifestRequestDTO;
 import org.immregistries.iis.kernal.controllers.servlet.util.PatientServletUtil;
 import org.immregistries.iis.kernal.logic.shlink.ShLinkManifestGenerator;
 import org.immregistries.iis.kernal.logic.shlink.generation.ShLinkGenerator;
 import org.immregistries.iis.kernal.mapping.IisFhirClientFactory;
 import org.immregistries.iis.kernal.mapping.mappers.resources.PatientMapper;
 import org.immregistries.iis.kernal.mapping.requesters.FhirSearchRequester;
-import org.immregistries.iis.kernal.model.shlink.ShLinkManifestRequestBody;
 import org.immregistries.iis.kernal.persisted.entities.ShLinkManifest;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.immregistries.iis.kernal.security.RequestTenantUtil;
@@ -60,7 +60,7 @@ public class PatientShLinkManifestRestController {
 			@PathVariable(value = "id", required = false) String id,
 																		@PathVariable(PARAM_TENANT_NAME) String tenantName,
 																		@RequestAttribute(value = IisRequestAttribute.TENANT_REQUEST_ATTRIBUTE, required = false) Tenant tenant,
-			@RequestBody ShLinkManifestRequestBody body) throws IOException, ServletException {
+																		@RequestBody ShLinkManifestRequestDTO body) throws IOException, ServletException {
 		String passcode = body.getPasscode();
 		if (StringUtils.isNotBlank(passcode)) {
 			tenant = tenantAuthService.authenticateTenantNoUsername(tenantName, passcode);
@@ -77,7 +77,7 @@ public class PatientShLinkManifestRestController {
 																			@PathVariable(value = "id", required = false) String id,
 																			@PathVariable(PARAM_TENANT_NAME) String tenantName,
 																			@RequestAttribute(value = IisRequestAttribute.TENANT_REQUEST_ATTRIBUTE, required = false) Tenant tenant,
-																			@RequestBody ShLinkManifestRequestBody body) throws IOException, ServletException {
+																			@RequestBody ShLinkManifestRequestDTO body) throws IOException, ServletException {
 		String passcode = body.getPasscode();
 		if (StringUtils.isNotBlank(passcode)) {
 			tenant = tenantAuthService.authenticateTenantNoUsername(tenantName, passcode);

@@ -2,7 +2,6 @@ package org.immregistries.iis.kernal.model;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.immregistries.iis.kernal.model.shlink.ShLinkFilePayload;
-import org.immregistries.iis.kernal.model.shlink.ShLinkManifestRequestBody;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -24,7 +23,7 @@ public class ModelSerializationTest {
         testClass(new ModelAddress());
         testClass(new BusinessIdentifier());
         testClass(new ShLinkFilePayload());
-        testClass(new ShLinkManifestRequestBody());
+//        testClass(new ShLinkManifestRequestBody());
         testClass(new VaccinationReported());
         testClass(new PatientReported());
         testClass(new ObservationReported());
