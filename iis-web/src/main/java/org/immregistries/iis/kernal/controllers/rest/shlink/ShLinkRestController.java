@@ -2,8 +2,8 @@ package org.immregistries.iis.kernal.controllers.rest.shlink;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.immregistries.iis.kernal.IisRequestAttribute;
-import org.immregistries.iis.kernal.controllers.IisRestParam;
 import org.immregistries.iis.kernal.controllers.IisRestPath;
+import org.immregistries.iis.kernal.controllers.request.shlink.ShLinkCreationRequestDTO;
 import org.immregistries.iis.kernal.logic.shlink.generation.ShLinkGenerator;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.immregistries.iis.kernal.persisted.entities.UserAccess;
@@ -12,7 +12,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.io.IOException;
@@ -33,14 +36,15 @@ public class ShLinkRestController {
 	public String createShLinkIPSQrCode(
 		@AuthenticationPrincipal UserAccess userAccess,
 		HttpServletRequest req,
-			@RequestParam(value = IisRestParam.KEY_ID, required = false) String keyId,
-			@RequestParam(value = IisRestParam.ShLink.SECRET_KEY, required = false) String secretKey,
-			@RequestParam(IisRestParam.PATIENT_ID) String patientId,
-			@RequestParam(IisRestParam.ShLink.FLAG) String flag,
-		@RequestParam(IisRestParam.ShLink.PASSCODE) String passcode,
-			@RequestParam(value = IisRestParam.ShLink.EXP, required = false, defaultValue = "10000000") String exp,
-											@RequestAttribute(IisRequestAttribute.TENANT_REQUEST_ATTRIBUTE) Tenant tenant)
+		ShLinkCreationRequestDTO dto,
+		@RequestAttribute(IisRequestAttribute.TENANT_REQUEST_ATTRIBUTE) Tenant tenant)
 			throws IOException, NoSuchAlgorithmException {
+		String keyId = dto.getKeyId();
+		String secretKey = dto.getSecretKey();
+		String patientId = dto.getPatientId();
+		String flag = dto.getFlag();
+		String passcode = dto.getPasscode();
+		String exp = dto.getExp();
 		ServletUriComponentsBuilder uriBuilder = ServletUriComponentsBuilder.fromRequest(req);
 		String qrCode = shLinkGenerator.generateShLink(keyId, secretKey, patientId, flag, exp, tenant, userAccess, uriBuilder, passcode);
 		return qrCode;

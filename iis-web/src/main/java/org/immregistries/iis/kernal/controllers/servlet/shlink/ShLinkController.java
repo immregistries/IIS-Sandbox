@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.immregistries.iis.kernal.controllers.IisRestPath;
+import org.immregistries.iis.kernal.controllers.request.shlink.ShLinkCreationRequestDTO;
 import org.immregistries.iis.kernal.controllers.rest.PatientRestController;
 import org.immregistries.iis.kernal.controllers.rest.shlink.IisKeyRestController;
 import org.immregistries.iis.kernal.controllers.rest.shlink.ShLinkRestController;
@@ -89,8 +90,15 @@ public class ShLinkController {
 		 */
 		IisKey iisSigningKey = iisKeyRestController.getOrCreateKey(userAccess, tenant, keyId);
 
-		String qrCode = shLinkRestController.createShLinkIPSQrCode(userAccess, req, iisSigningKey.getKeyId(), secretKey, patientId, flag,
-			exp, passcode, tenant);
+		ShLinkCreationRequestDTO dto = ShLinkCreationRequestDTO.builder()
+			.keyId(iisSigningKey.getKeyId()) // Extracting from the object as requested
+			.secretKey(secretKey)
+			.patientId(patientId)
+			.flag(flag)
+			.passcode(passcode)
+			.exp(exp)
+			.build();
+		String qrCode = shLinkRestController.createShLinkIPSQrCode(userAccess, req, dto, tenant);
 
 
 		if (image) {

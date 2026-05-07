@@ -24,6 +24,12 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.46</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
             <groupId>org.immregistries.iis</groupId>
             <artifactId>iis-constants</artifactId>
             <version>${revision}</version>
