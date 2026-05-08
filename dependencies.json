@@ -13,6 +13,12 @@
       "cmd": "mvn clean install -DskipTests"
     },
     {
+      "name": "Lonestar-Forecaster",
+      "repository": "https://github.com/cerbeor/LoneStarVaccineForecaster",
+      "sha1": "763f37edae76557d03f0f9a595cd499701296e02",
+      "cmd": "mvn clean install -Dgpg.skip"
+    },
+    {
       "name": "MQE-validator",
       "repository": "https://github.com/immregistries/mqe-validator",
       "sha1": "398e294b6240484a61f590689703b863256e55e2",
@@ -31,16 +37,16 @@
       "cmd": "mvn clean install"
     },
     {
-      "name": "IPS-to-CLVR",
-      "repository": "https://github.com/cerbeor/ips-to-clvr",
-      "sha1": "73b2a91008f9133f11499491f16b403e414c38a9",
-      "cmd": "mvn clean install"
-    },
-    {
       "name": "CBOR",
       "repository": "https://github.com/cerbeor/cbor",
       "sha1": "f1aa987c32061e79aabc78272b8e1299fc75f319",
       "cmd": "mvn clean install -Dgpg.skip"
+    },
+    {
+      "name": "IPS-to-CLVR",
+      "repository": "https://github.com/cerbeor/ips-to-clvr",
+      "sha1": "73b2a91008f9133f11499491f16b403e414c38a9",
+      "cmd": "mvn clean install"
     }
   ]
 }

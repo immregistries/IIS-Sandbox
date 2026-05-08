@@ -36,3 +36,4 @@ mvn clean package -Pdev && java -jar --add-opens java.base/java.lang=ALL-UNNAMED
 - [ForecastConnector](https://github.com/immregistries/VaccineForecastConnector)
 - [mismo-match](https://github.com/immregistries/mismo-match)
 - [IPS-to-CLVR](https://github.com/cerbeor/ips-to-clvr)
+- [Lonestar](https://github.com/immregistries/LoneStarVaccineForecaster)

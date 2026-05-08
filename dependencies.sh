@@ -76,11 +76,11 @@ for ((i=0; i<$COUNT; i++)); do
             echo "  X Error: Directory '$DIR_NAME' already exists and skip flag is OFF."
             exit 1
         fi
+    else
+        # --- CLONE (Only runs if directory did NOT exist) ---
+        echo "  - Cloning $REPO..."
+        git clone "$REPO" "$DIR_NAME"
     fi
-
-    # --- CLONE (Only runs if directory did NOT exist) ---
-    echo "  - Cloning $REPO..."
-    git clone "$REPO" "$DIR_NAME"
 
     # Enter directory
     cd "$DIR_NAME" || exit 1
