@@ -51,7 +51,7 @@
     {
       "name": "V2-To-FHIR",
       "repository": "https://github.com/IZGateway/v2tofhir",
-      "sha1": "e69158bd4a5aa44298dd789d410db2ab1892cebc",
+      "sha1": "694a08e20cd8365beaaafb1c8d574aad601dec92",
       "cmd": "mvn clean install"
     }
   ]
