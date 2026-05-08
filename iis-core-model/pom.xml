@@ -34,7 +34,7 @@
         <dependency>
             <groupId>org.immregitries.clvr</groupId>
             <artifactId>ips-to-clvr</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>1.0.2-SNAPSHOT</version>
         </dependency>
         <!--        QR code-->
         <!-- https://mvnrepository.com/artifact/io.github.ehn-digital-green-development/base45 -->
