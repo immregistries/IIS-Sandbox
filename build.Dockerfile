@@ -1,18 +1,19 @@
 # ==========================================
 # Stage 1: Build
 # ==========================================
-FROM maven:3.9.13-eclipse-temurin-17 AS builder
+FROM eclipse-temurin:17-jdk AS builder
 
 SHELL ["/bin/bash", "-c"]
 
 # Set the working directory
 WORKDIR /app
 
-# Install the remaining CLI tools
-RUN apt-get update && apt-get install -y \
-    git \
-    curl \
-    jq \
+# Install git, curl, jq, maven
+RUN apt-get update && apt-get install -y  \
+    git  \
+    curl  \
+    jq  \
+    maven \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy the source code into the container
@@ -29,6 +30,7 @@ FROM tomcat:9.0.117-jdk17-temurin-noble AS tomcat
 RUN rm -rf /usr/local/tomcat/webapps/*
 RUN rm -rf /usr/local/tomcat/webapps.dist
 
+# Default redirection to Homepage Url
 RUN mkdir /usr/local/tomcat/webapps/ROOT
 RUN echo '<% response.sendRedirect("/iis/home"); %>' > /usr/local/tomcat/webapps/ROOT/index.jsp
 
