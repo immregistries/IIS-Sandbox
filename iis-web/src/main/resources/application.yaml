@@ -1,5 +1,5 @@
 #Used for all profiles
-#Profiles for dev at the bottom
+#Profiles for prod or h2 at the bottom
 
 spring.config.import: optional:file:.env[.properties]
 management:
@@ -264,15 +264,7 @@ spring:
   jpa.properties.hibernate.dialect: ca.uhn.fhir.jpa.model.dialect.HapiFhirPostgres94Dialect
 ---
 spring:
-  config.activate.on-profile: dev
-  datasource:
-    username: sa
-    password: null
-    driverClassName: org.h2.Driver
-  jpa.properties.hibernate.dialect: ca.uhn.fhir.jpa.model.dialect.HapiFhirH2Dialect
----
-spring:
-  config.activate.on-profile: test
+  config.activate.on-profile: h2
   datasource:
     username: sa
     password: null

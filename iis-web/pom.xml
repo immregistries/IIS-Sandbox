@@ -335,8 +335,8 @@
         <profile>
             <id>dev</id>
             <properties>
-                <!--                Activates H2 database -->
-                <spring.profiles.active>dev</spring.profiles.active>
+                <!--                Activates H2 database by default -->
+                <spring.profiles.active>h2</spring.profiles.active>
                 <maven.test.skip>true</maven.test.skip>
             </properties>
         </profile>
