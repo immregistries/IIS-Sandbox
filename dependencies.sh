@@ -15,11 +15,12 @@ fi
 COMMAND=$1
 ROOT_DIR=$2
 SKIP_EXISTING=false
+FORCE_IF_EXISTING=false
 
 # Check Command
 if [[ "$COMMAND" != "clone" && "$COMMAND" != "build" ]]; then
     echo "Error: First argument must be 'clone' or 'build'."
-    echo "Usage: $0 [clone|build] [target_directory] [-s]"
+    echo "Usage: $0 [clone|build] [target_directory] [-s|-f]"
     exit 1
 fi
 
@@ -33,6 +34,10 @@ fi
 if [[ "$3" == "-s" || "$3" == "--skip-existing" ]]; then
     SKIP_EXISTING=true
 fi
+# Check Optional Flag 2
+if [[ "$3" == "-f" || "$3" == "--force-checkout" ]]; then
+    FORCE_IF_EXISTING=true
+fi
 
 # --- 3. PREPARE DIRECTORY ---
 # Resolve absolute path for the JSON file because we are about to change directories
@@ -41,7 +46,22 @@ ABS_JSON_PATH=$(realpath "$JSON_FILE")
 echo "Mode: $COMMAND"
 echo "Target: $ROOT_DIR"
 echo "Skip Existing: $SKIP_EXISTING"
+echo "Force checkout if Existing: $FORCE_IF_EXISTING"
 echo "-------------------------------------"
+
+# 2. Add verification if the flag was provided
+if [ "$FORCE_IF_EXISTING" = true ]; then
+    # Prompt user for yes/no confirmation
+    echo "You activated -f force flag"
+    read -p "Are you sure you want to force checkout and reinstallation in existing folder ? any changes will be lost [y/N]: " confirm
+
+    # Check response (case-insensitive)
+    if [[ ! "$confirm" =~ ^[Yy](es)?$ ]]; then
+        echo "Action cancelled."
+        exit 0
+    fi
+    echo "Proceeding with deletion..."
+fi
 
 # Create root dir if it doesn't exist
 if [ ! -d "$ROOT_DIR" ]; then
@@ -69,7 +89,9 @@ for ((i=0; i<$COUNT; i++)); do
 
     # --- EXISTENCE CHECK ---
     if [ -d "$DIR_NAME" ]; then
-        if [ "$SKIP_EXISTING" = true ]; then
+        if [ "$FORCE_IF_EXISTING" = true ]; then
+          echo "  ! Directory '$DIR_NAME' exists. Forcing checkout."
+        elif [ "$SKIP_EXISTING" = true ]; then
             echo "  ! Directory '$DIR_NAME' exists. Skipping."
             continue
         else
@@ -89,8 +111,17 @@ for ((i=0; i<$COUNT; i++)); do
     echo "  - Checking out $SHA1..."
     git checkout "$SHA1" > /dev/null 2>&1
     if [ $? -ne 0 ]; then
-        echo "  X Error: Failed to checkout commit $SHA1"
-        exit 1
+        if [ "$FORCE_IF_EXISTING" = true ]; then
+            echo "  Failed soft checkout, Forcing checkout."
+            git checkout -f "$SHA1" > /dev/null 2>&1
+            if [ $? -ne 0 ]; then
+                echo "  X Error: Failed to force checkout commit $SHA1"
+                exit 1
+            fi
+        else
+            echo "  X Error: Failed to checkout commit $SHA1"
+            exit 1
+        fi
     fi
 
     # --- BUILD (Only if command is build) ---
