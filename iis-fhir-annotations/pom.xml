@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.immregistries.iis</groupId>
+        <artifactId>iis-sandbox</artifactId>
+        <version>${revision}</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <artifactId>iis-fhir-annotations</artifactId>
+    <name>IIS Sandbox FHIR Configuration Annotations</name>
+
+    <properties>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.immregistries.iis</groupId>
+            <artifactId>iis-core-commons</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <!-- This dependency includes the JPA server itself, which is packaged separately from the rest of HAPI FHIR -->
+        <dependency>
+            <groupId>ca.uhn.hapi.fhir</groupId>
+            <artifactId>hapi-fhir-jpaserver-base</artifactId>
+            <version>${hapi-fhir.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-jcl</artifactId>
+                </exclusion>
+                <!--                <exclusion>-->
+                <!--                    <groupId>commons-logging</groupId>-->
+                <!--                    <artifactId>commons-logging</artifactId>-->
+                <!--                </exclusion>-->
+            </exclusions>
+        </dependency>
+    </dependencies>
+
+</project>

@@ -1,0 +1,41 @@
+package org.immregistries.iis.kernal.mapping.mappers.fields;
+
+import ca.uhn.fhir.rest.param.TokenParam;
+import org.apache.commons.lang3.StringUtils;
+import org.hl7.fhir.instance.model.api.IBaseDatatype;
+import org.immregistries.iis.kernal.model.BusinessIdentifier;
+
+public abstract class BusinessIdentifierMapper<Identifier extends IBaseDatatype> implements IFieldMapper<BusinessIdentifier, Identifier> {
+    public static final String IDENTIFIER_TYPE_SYSTEM = "http://terminology.hl7.org/CodeSystem/v2-0203";
+	public static final String IDENTIFIER_FHIR_TYPE_NAME = "Identifier";
+
+	@Override
+	public Class<BusinessIdentifier> localType() {
+		return BusinessIdentifier.class;
+	}
+
+	@Override
+	public String fhirTypeName() {
+		return IDENTIFIER_FHIR_TYPE_NAME;
+	}
+
+	/**
+     * Converts to token param with System and value
+     *
+     * @return tokenParam
+     */
+    public TokenParam asTokenParam(BusinessIdentifier businessIdentifier) {
+        TokenParam tokenParam = new TokenParam();
+        if (StringUtils.isNotBlank(businessIdentifier.getValue())) {
+            tokenParam.setValue(businessIdentifier.getValue());
+            if (StringUtils.isNotBlank(businessIdentifier.getSystem())) {
+                tokenParam.setSystem(businessIdentifier.getSystem());
+            }
+            // tokenParam.setModifier(TokenParamModifier.OF_TYPE).; TODO TYPE
+            return tokenParam;
+        }
+        return null;
+    }
+
+
+}

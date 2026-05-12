@@ -1,0 +1,77 @@
+package org.immregistries.iis.kernal.controllers.servlet;
+
+import ca.uhn.fhir.context.FhirContext;
+import ca.uhn.fhir.jpa.starter.annotations.OnR4Condition;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.apache.commons.lang3.StringUtils;
+import org.hl7.fhir.r4.model.Bundle;
+import org.immregistries.iis.kernal.controllers.IisRestPath;
+import org.immregistries.iis.kernal.controllers.rest.PopRestController;
+import org.immregistries.iis.kernal.controllers.rest.V2ToFhirRestController;
+import org.immregistries.iis.kernal.controllers.servlet.util.UiUtil;
+import org.immregistries.iis.kernal.persisted.entities.Tenant;
+import org.immregistries.iis.kernal.security.RequestTenantUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Conditional;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+
+import static org.immregistries.iis.kernal.controllers.servlet.PopController.PARAM_FACILITY_NAME;
+import static org.immregistries.iis.kernal.controllers.servlet.PopController.PARAM_MESSAGE;
+
+@RestController()
+@RequestMapping({IisRestPath.BasePath.FHIR_MESSAGING_PATH, TenantController.TENANT_PATH + IisRestPath.BasePath.FHIR_MESSAGING_PATH})
+@Conditional(OnR4Condition.class)
+public class FhirMessagingController {
+	public static final String ORIGINAL_TEXT_EXTENSION_URL = "http://hl7.org/fhir/StructureDefinition/originalText";
+	@Autowired
+	private FhirContext fhirContext;
+
+	@Autowired
+	private PopRestController popRestController;
+	@Autowired
+	private V2ToFhirRestController v2ToFhirRestController;
+	@Autowired
+	private UiUtil uiUtil;
+	@Autowired
+	private RequestTenantUtil requestTenantUtil;
+
+	@GetMapping
+	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		resp.setContentType("text/html");
+
+		Tenant tenant = requestTenantUtil.extractTenant(req);
+
+		PrintWriter out = new PrintWriter(resp.getOutputStream());
+		try {
+			String message = req.getParameter(PARAM_MESSAGE);
+			String organizationName = req.getParameter(PARAM_FACILITY_NAME);
+			if (organizationName == null) {
+				organizationName = "";
+			}
+			if (StringUtils.isBlank(message)) {
+				String sampleMessage = popRestController.getSampleMessage();
+				Bundle bundle = v2ToFhirRestController.convertV2ToFhir(sampleMessage, null);
+				message = fhirContext.newJsonParser().setPrettyPrint(true).encodeResourceToString(bundle);
+			}
+
+			uiUtil.doHeader(out, "IIS Sandbox - FHIR Messaging", tenant);
+			out.println("<h2>Experimental FHIR Messaging Endpoint</h2>");
+			PopController.printForm(out, "FHIR Bundle", message, organizationName,
+				IisRestPath.Key.REST_KEY + "/" + IisRestPath.Key.FHIR_MESSAGING_KEY);
+			uiUtil.doFooter(out);
+
+		} catch (Exception e) {
+			e.printStackTrace(System.err);
+		}
+		out.flush();
+		out.close();
+	}
+
+}

@@ -19,6 +19,7 @@ ENV spring.profiles.active=prod
 
 COPY --chown=1001:1001 catalina.properties /opt/bitnami/tomcat/conf/catalina.properties
 COPY --chown=1001:1001 server.xml /opt/bitnami/tomcat/conf/server.xml
-COPY --chown=1001:1001 target/iis.war /opt/bitnami/tomcat/webapps_default/iis.war
+COPY --chown=1001:1001 iis-web/target/iis.war /opt/bitnami/tomcat/webapps_default/iis.war
 
-ENV TOMCAT_PASSWORD="28y341834uf8u3bfppkaebiThisIsSomehtingThatShouldBeModified917628oeruoipi3u267yui9877tu398nmjq09o321"
+RUN apt-get update && apt-get install -y pwgen
+RUN echo "tomcat:$(pwgen -s 16 1)" > /opt/bitnami/tomcat/conf/tomcat-users.txt

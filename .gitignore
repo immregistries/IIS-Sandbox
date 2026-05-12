@@ -176,5 +176,12 @@ Temporary Items
 /src/test/ES256.key.pub
 /.env
 /.env.dev
-/Compiled.xml
+/iis-core/Compiled.xml
 /.env.test
+/.vscode/
+/iis-core/Compiled.xml
+/iis-core/data-h2/
+/.flattened-pom.xml
+/iis-web/Compiled.xml
+/iis-web/data-h2/
+/**/.flattened-pom.xml

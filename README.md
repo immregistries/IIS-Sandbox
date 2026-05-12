@@ -1,38 +1,52 @@
 # IIS Sandbox with Hapi Fhir Jpa Database
 Based on Hapi fhir Jpa starter and IIS Sandbox.
 
-JDK 17 needed.
+## Java version
 
+JDK 17
 
-In production mode HAPI FHIR requires a postgresql database
+## Dependencies
 
-- On address ``postgresql://localhost:5432/hapi_fhir_iis`` (this can be changed in application.yaml).
- - Generation script: ``/src/main/database/create-postgresql-for-hapi-fhir.sql``
+This project relies on dependencies not hosted on maven repository, the GitHub repositories for the dependencies are
+specified in `dependencies.json`
 
+This script allows the quick installation of the dependencies
 
-For the current authentication and message log system, a Mysql Database is required, creation script : ``/src/main/database/create-database.sql``.
+```bash
+mkdir ../temp-dependencies;
+./dependencies.sh build ../temp-dependencies
+```
+
+To force rebuild and checking out the git revision use ``-f`` flag
+
+```bash
+./dependencies.sh build ../temp-dependencies -f
+```
+
+## Environment Variables
+
+[example.env](example.env) Provides a working example and skeleton of Environment Variables to set up with H2 databases
+
+Use
+```cp example.env .env```
+then configure the variables
+
+## Compile and run
+
+Compile and run with embedded H2 database:
+
+```
+mvn clean install;
+set -a;
+source .env;   
+set +a;
+java -jar iis-web/target/iis.war;
+```
+
+### Build and run with Docker
 
 Complete details for deployment are readable in docker-compose.yml
 Run project with docker
 ```
-mvn clean package -Pdocker; docker-compose up;
+mvn clean install; docker-compose up;
 ```
-
-Compile only to run with postgres:
-```
-mvn clean package
-```
-
-Compile and run with embedded H2 database:
-```
-mvn clean package -Pdev && java -jar --add-opens java.base/java.lang=ALL-UNNAMED target/iis.war
-```
-
-## Dependencies not on maven repository
-
-- [Modded HAPIFHIR](https://github.com/cerbeor/hapi-fhir-Subscription-custom)
-- [vaccination_deduplication](https://github.com/usnistgov/vaccination_deduplication.git)
-- [MQE-validator](https://github.com/immregistries/mqe-validator)
-- [ForecastConnector](https://github.com/immregistries/VaccineForecastConnector)
-- [mismo-match](https://github.com/immregistries/mismo-match)
-- [IPS-to-CLVR](https://github.com/cerbeor/ips-to-clvr)

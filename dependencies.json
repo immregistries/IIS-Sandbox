@@ -1,0 +1,58 @@
+{
+  "dependencies": [
+    {
+      "name": "Modded HAPIFHIR",
+      "repository": "https://github.com/cerbeor/hapi-fhir-Subscription-custom",
+      "sha1": "e7b644c146105b09945da362da895581eec9d136",
+      "cmd": "mvn clean install -DskipTests"
+    },
+    {
+      "name": "vaccination_deduplication",
+      "repository": "https://github.com/usnistgov/vaccination_deduplication.git",
+      "sha1": "0133d784601ece9505a069e312b6ece5d05f824a",
+      "cmd": "mvn clean install -DskipTests"
+    },
+    {
+      "name": "Lonestar-Forecaster",
+      "repository": "https://github.com/cerbeor/LoneStarVaccineForecaster",
+      "sha1": "763f37edae76557d03f0f9a595cd499701296e02",
+      "cmd": "mvn clean install -Dgpg.skip"
+    },
+    {
+      "name": "MQE-validator",
+      "repository": "https://github.com/immregistries/mqe-validator",
+      "sha1": "398e294b6240484a61f590689703b863256e55e2",
+      "cmd": "mvn clean install -DskipTests"
+    },
+    {
+      "name": "ForecastConnector",
+      "repository": "https://github.com/immregistries/VaccineForecastConnector",
+      "sha1": "bf0f3ca9761d4f5f49dc32e8633f3fc019a9c0c5",
+      "cmd": "mvn clean install -DskipTests"
+    },
+    {
+      "name": "mismo-match",
+      "repository": "https://github.com/cerbeor/mismo-match",
+      "sha1": "2c4196a8885f7e8c41b233170f585b027d6ea2c4",
+      "cmd": "mvn clean install"
+    },
+    {
+      "name": "CBOR",
+      "repository": "https://github.com/cerbeor/cbor",
+      "sha1": "f1aa987c32061e79aabc78272b8e1299fc75f319",
+      "cmd": "mvn clean install -Dgpg.skip"
+    },
+    {
+      "name": "IPS-to-CLVR",
+      "repository": "https://github.com/cerbeor/ips-to-clvr",
+      "sha1": "73b2a91008f9133f11499491f16b403e414c38a9",
+      "cmd": "mvn clean install"
+    },
+    {
+      "name": "V2-To-FHIR",
+      "repository": "https://github.com/IZGateway/v2tofhir",
+      "sha1": "694a08e20cd8365beaaafb1c8d574aad601dec92",
+      "cmd": "mvn clean install"
+    }
+  ]
+}

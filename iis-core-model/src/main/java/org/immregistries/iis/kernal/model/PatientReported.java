@@ -1,0 +1,26 @@
+package org.immregistries.iis.kernal.model;
+
+import java.io.Serializable;
+
+/**
+ * Internal Standard agnostic representation of a patient's report or record,
+ * extending PatientMaster with Reference to the actual Master patient or Golden
+ * Record,
+ * Used when dealing with a report
+ */
+public class PatientReported extends IisPatient implements Serializable, IReportedObject<PatientMaster> {
+
+	/**
+	 * Master Patient reference or Golden Record
+	 */
+	private PatientMaster masterRecord;
+
+	public PatientMaster getMasterRecord() {
+		return masterRecord;
+	}
+
+	public void setMasterRecord(PatientMaster patient) {
+		this.masterRecord = patient;
+	}
+
+}

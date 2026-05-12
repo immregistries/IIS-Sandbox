@@ -1,0 +1,78 @@
+package ca.uhn.fhir.jpa.starter.ips;
+
+import ca.uhn.fhir.jpa.ips.api.Section;
+import ca.uhn.fhir.jpa.ips.jpa.DefaultJpaIpsGenerationStrategy;
+import ca.uhn.fhir.jpa.ips.jpa.JpaSectionSearchStrategyCollection;
+import ca.uhn.fhir.jpa.provider.BaseJpaResourceProviderPatient;
+import org.hl7.fhir.instance.model.api.IAnyResource;
+import org.hl7.fhir.r5.model.Immunization;
+import org.hl7.fhir.r5.model.Organization;
+import org.hl7.fhir.r5.model.Patient;
+import org.immregistries.iis.kernal.mapping.IisFhirClientFactory;
+import org.immregistries.iis.kernal.mapping.mappers.resources.r5.OrganizationMapperR5;
+import org.immregistries.iis.kernal.security.RequestTenantUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+
+
+public class IpsGenerationStrategyR5 extends DefaultJpaIpsGenerationStrategy implements ICustomIpsGenerationStrategy {
+
+	@Autowired
+	private OrganizationMapperR5 organizationMapper;
+	@Autowired
+	private BaseJpaResourceProviderPatient<Patient> baseJpaResourceProviderPatient;
+	@Autowired
+	private IisFhirClientFactory iisFhirClientFactory;
+	@Autowired
+	private RequestTenantUtil requestTenantUtil;
+
+	/**
+	 * Constructor
+	 */
+	public IpsGenerationStrategyR5() {
+		super();
+	}
+
+	@Override
+	protected void addJpaSectionImmunizations() {
+		Section section = Section.newBuilder()
+			.withTitle("History of Immunizations")
+			.withSectionSystem(SECTION_SYSTEM_LOINC)
+			.withSectionCode(SECTION_CODE_IMMUNIZATIONS)
+			.withSectionDisplay("History of Immunization Narrative")
+			.withResourceType(Immunization.class)
+			.withProfile(
+				"https://hl7.org/fhir/uv/ips/StructureDefinition-Composition-uv-ips-definitions.html#Composition.section:sectionImmunizations")
+			.build();
+
+		JpaSectionSearchStrategyCollection searchStrategyCollection = JpaSectionSearchStrategyCollection.newBuilder()
+			.addStrategy(Immunization.class, new ImmunizationsJpaSectionSearchStrategyR5())
+			.build();
+
+		addJpaSection(section, searchStrategyCollection);
+	}
+
+	@Override
+	protected void addSections() {
+		addJpaSectionAllergyIntolerance();
+		addJpaSectionMedicationSummary();
+		addJpaSectionProblemList();
+		addJpaSectionImmunizations();
+//		addJpaSectionProcedures();
+//		addJpaSectionMedicalDevices();
+//		addJpaSectionDiagnosticResults();
+//		addJpaSectionVitalSigns();
+//		addJpaSectionPregnancy();
+//		addJpaSectionSocialHistory();
+//		addJpaSectionIllnessHistory();
+//		addJpaSectionFunctionalStatus();
+//		addJpaSectionPlanOfCare();
+//		addJpaSectionAdvanceDirectives();
+	}
+
+	@Override
+	public IAnyResource createAuthor() {
+		Organization organization = organizationMapper.fhirObject(requestTenantUtil.extractTenantFromRequestContext());
+		return organization;
+	}
+
+}

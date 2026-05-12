@@ -1,0 +1,26 @@
+package org.immregistries.iis.kernal.mapping.mappers;
+
+import ca.uhn.fhir.context.FhirVersionEnum;
+import ca.uhn.fhir.model.api.IElement;
+import org.immregistries.iis.kernal.model.IisMappedToFhir;
+
+public interface IisMapper<LocalType extends IisMappedToFhir, FhirElement extends IElement> {
+
+	FhirVersionEnum fhirVersion();
+	/**
+	 * Deprecated use
+	 *
+	 * @return fhirType()
+	 */
+	String fhirTypeName();
+
+	Class<FhirElement> fhirType();
+
+	Class<LocalType> localType();
+
+	FhirElement fhirObject(LocalType localField);
+
+	LocalType localObject(FhirElement fhirElement);
+
+
+}

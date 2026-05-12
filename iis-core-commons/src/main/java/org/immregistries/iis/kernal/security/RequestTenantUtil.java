@@ -1,0 +1,145 @@
+package org.immregistries.iis.kernal.security;
+
+import ca.uhn.fhir.interceptor.model.RequestPartitionId;
+import ca.uhn.fhir.jpa.entity.PartitionEntity;
+import ca.uhn.fhir.jpa.partition.IPartitionLookupSvc;
+import ca.uhn.fhir.rest.api.server.RequestDetails;
+import ca.uhn.fhir.rest.api.server.SystemRequestDetails;
+import jakarta.servlet.http.HttpServletRequest;
+import org.apache.commons.lang3.StringUtils;
+import org.immregistries.iis.kernal.IisRequestAttribute;
+import org.immregistries.iis.kernal.persisted.entities.Tenant;
+import org.immregistries.iis.kernal.persisted.entities.UserAccess;
+import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+
+/**
+ * static class providing tools related to the Tenant selected using request
+ * context
+ */
+@Service
+public class RequestTenantUtil {
+	@Autowired
+	private IPartitionLookupSvc partitionLookupSvc;
+	@Autowired
+	private TenantAuthService tenantAuthService;
+
+	public Tenant extractTenantFromRequestContext() {
+		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
+				.getRequest();
+		return extractTenant(request);
+	}
+
+	public Tenant extractTenant(RequestDetails theRequestDetails) {
+		Object attribute = theRequestDetails.getAttribute(IisRequestAttribute.TENANT_REQUEST_ATTRIBUTE);
+		if (attribute != null) {
+			return (Tenant) attribute;
+		} else {
+			String tenantName = theRequestDetails.getTenantId();
+			if (StringUtils.isNotBlank(tenantName)) {
+				Tenant tenant = getTenantFromName(tenantName);
+				setTenantForRequestDetails(tenant, theRequestDetails);
+				return tenant;
+			}
+		}
+		return null;
+	}
+
+	public Tenant extractTenant(HttpServletRequest request) {
+		final Tenant tenant;
+		/*
+		 * Extracting variables from the Request
+		 */
+		/*
+		 * If Tenant was already set as attribute return it
+		 */
+		Tenant requestTenant = (Tenant) request.getAttribute(IisRequestAttribute.TENANT_REQUEST_ATTRIBUTE);
+		if (requestTenant != null) {
+			tenant = requestTenant;
+		} else {
+			String urlTenantName = (String) request.getAttribute(IisRequestAttribute.TENANT_NAME_URL);
+			Object tenantIdUrlAttribute = request.getAttribute(IisRequestAttribute.TENANT_ID_URL);
+			int urlTenantId = 0;
+			if (tenantIdUrlAttribute != null) {
+				urlTenantId = (int) tenantIdUrlAttribute;
+			}
+
+			/*
+			 * if Tenant Id specified
+			 * else check if name
+			 */
+			if (urlTenantId > 0) {
+//				tenant = tenantUtil.getTenantByIdAuthenticated(urlTenantId);
+//				request.setAttribute(SESSION_REQUEST_TENANT, tenant);
+				tenant = null; //TODO change
+			} else if (StringUtils.isNotBlank(urlTenantName)) {
+				tenant = getTenantFromName(urlTenantName);
+				setTenantForRequest(tenant, request);
+			} else {
+				tenant = null;
+			}
+		}
+		return tenant;
+	}
+
+	private Tenant getTenantFromName(String pathVariable) {
+		Tenant tenant = null;
+		if (StringUtils.isNotBlank(pathVariable)) {
+			UserAccess userAccess = null;
+			Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+			if (authentication instanceof UserAccess) {
+				userAccess = (UserAccess) authentication;
+			}
+			tenant = tenantAuthService.authenticateTenant(userAccess, pathVariable);
+		}
+		return tenant;
+	}
+
+
+	public void setTenantForRequestDetails(Tenant tenant, RequestDetails requestDetails) {
+		requestDetails.setAttribute(IisRequestAttribute.TENANT_REQUEST_ATTRIBUTE, tenant);
+		if (requestDetails instanceof SystemRequestDetails) {
+			SystemRequestDetails systemRequestDetails = (SystemRequestDetails) requestDetails;
+			PartitionEntity partitionByName = partitionLookupSvc.getPartitionByName(tenant.getOrganizationName());
+			RequestPartitionId requestPartitionId = partitionByName.toRequestPartitionId();
+			systemRequestDetails.setRequestPartitionId(requestPartitionId);
+		}
+//		else if (requestDetails instanceof ServletRequestDetails) {
+//			ServletRequestDetails servletRequestDetails = (ServletRequestDetails) requestDetails;
+//			servletRequestDetails.partion
+//		}
+	}
+
+	public Tenant setTenantForRequest(Tenant tenant, HttpServletRequest request) {
+		request.setAttribute(IisRequestAttribute.TENANT_REQUEST_ATTRIBUTE, tenant);
+		return tenant;
+	}
+
+	public SystemRequestDetails requestDetailsWithPartitionName() {
+		Tenant tenant = extractTenantFromRequestContext();
+		return requestDetailsWithPartitionName(tenant);
+	}
+
+	public @NotNull SystemRequestDetails requestDetailsWithPartitionName(Tenant tenant) {
+		String organizationName = tenant.getOrganizationName();
+		return requestDetailsWithPartitionName(organizationName);
+	}
+
+	public @NotNull SystemRequestDetails requestDetailsWithPartitionName(String organizationName) {
+		PartitionEntity partitionEntity = partitionLookupSvc.getPartitionByName(organizationName);
+		if (partitionEntity == null) {
+			// return SystemRequestDetails.forAllPartitions();
+			throw new RuntimeException("No partition found");
+		}
+		SystemRequestDetails requestDetails = SystemRequestDetails.forRequestPartitionId(partitionEntity.toRequestPartitionId());
+		requestDetails.setTenantId(organizationName);
+		return requestDetails;
+	}
+
+
+}

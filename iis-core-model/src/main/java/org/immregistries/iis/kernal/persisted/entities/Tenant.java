@@ -1,0 +1,86 @@
+package org.immregistries.iis.kernal.persisted.entities;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
+import org.immregistries.iis.kernal.enums.ProcessingFlavor;
+import org.immregistries.iis.kernal.model.IisMappedToFhirResource;
+
+import java.io.Serializable;
+import java.util.Set;
+
+@Entity
+@Table
+/**
+ * Used for multitenancy, is implicitely linked to a HapiFHIR RequestPartitionId in the server
+ */
+public class Tenant extends IisMappedToFhirResource implements Serializable {
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	@Column(name = "id")
+	private int orgId = 0;
+
+	@JsonIgnore
+	@ManyToOne
+	private UserAccess userAccess = null;
+
+	@Column(unique = true, nullable = false)
+	private String organizationName = "";
+
+	@JsonIgnore
+	@Transient
+	private Set<ProcessingFlavor> processingFlavorSet = null;
+
+	public int getOrgId() {
+		return orgId;
+	}
+
+	public void setOrgId(int orgId) {
+		this.orgId = orgId;
+	}
+
+	public String getOrganizationName() {
+		return organizationName;
+	}
+
+	public void setOrganizationName(String organizationName) {
+		this.organizationName = organizationName;
+	}
+
+	public Set<ProcessingFlavor> getProcessingFlavorSet() {
+		if (processingFlavorSet == null) {
+			processingFlavorSet = ProcessingFlavor.getProcessingStyle(organizationName);
+		}
+		return processingFlavorSet;
+	}
+
+	public UserAccess getUserAccess() {
+		return userAccess;
+	}
+
+	public void setUserAccess(UserAccess userAccess) {
+		this.userAccess = userAccess;
+	}
+
+	@Override
+	public int hashCode() {
+		return this.getOrgId();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof Tenant) {
+			Tenant other = (Tenant) obj;
+			return other.getOrgId() == this.getOrgId();
+		}
+		return super.equals(obj);
+	}
+
+	@Override
+	public String toString() {
+		return "Tenant{" +
+				"orgId=" + orgId +
+				", organizationName='" + organizationName + '\'' +
+				'}';
+	}
+}

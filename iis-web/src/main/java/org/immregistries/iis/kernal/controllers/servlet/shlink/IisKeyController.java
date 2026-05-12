@@ -1,0 +1,95 @@
+package org.immregistries.iis.kernal.controllers.servlet.shlink;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.immregistries.iis.kernal.controllers.IisRestPath;
+import org.immregistries.iis.kernal.controllers.WellKnownKeyController;
+import org.immregistries.iis.kernal.controllers.rest.shlink.IisKeyRestController;
+import org.immregistries.iis.kernal.controllers.servlet.TenantController;
+import org.immregistries.iis.kernal.controllers.servlet.util.UiUtil;
+import org.immregistries.iis.kernal.controllers.servlet.util.UrlTenantUtil;
+import org.immregistries.iis.kernal.persisted.entities.IisKey;
+import org.immregistries.iis.kernal.persisted.entities.Tenant;
+import org.immregistries.iis.kernal.persisted.entities.UserAccess;
+import org.immregistries.iis.kernal.security.RequestTenantUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.List;
+
+@RestController
+@RequestMapping({ IisRestPath.BasePath.IIS_KEYS_PATH,
+		TenantController.TENANT_PATH + IisRestPath.BasePath.IIS_KEYS_PATH })
+public class IisKeyController {
+
+	@Autowired
+	private IisKeyRestController iisKeyRestController;
+	@Autowired
+	private UiUtil uiUtil;
+	@Autowired
+	private UrlTenantUtil urlTenantUtil;
+	@Autowired
+	private RequestTenantUtil requestTenantUtil;
+
+	@PostMapping
+	protected void doPost(@AuthenticationPrincipal UserAccess userAccess, HttpServletRequest req, HttpServletResponse resp)
+			throws ServletException, IOException {
+		doGet(userAccess, req, resp);
+	}
+
+	@GetMapping
+	protected void doGet(@AuthenticationPrincipal UserAccess userAccess, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		resp.setContentType("text/html");
+		PrintWriter out = new PrintWriter(resp.getOutputStream());
+		try {
+			Tenant tenant = uiUtil.getTenantRedirectIfNone(req, resp);
+			uiUtil.doHeader(out, "IIS Sandbox Keystore", requestTenantUtil.extractTenant(req));
+			out.println("    <div class=\"w3-container w3-half w3-margin-top\">");
+			out.println("    <h2>Facility: " + tenant.getOrganizationName() + "</h2>");
+			out.println("    <h3>Keys used for signing Smart Health Cards (generated for the user)</h3>");
+			out.println("    </div>");
+
+			out.println("    <div class=\"w3-container\">");
+			List<IisKey> iisKeys = iisKeyRestController.getKeys(userAccess);
+			printIisKeys(out, iisKeys, tenant);
+			out.println("    </div>");
+		} catch (Exception e) {
+			System.err.println("Unable to render page: " + e.getMessage());
+			e.printStackTrace(System.err);
+		}
+		uiUtil.doFooter(out);
+		out.flush();
+		out.close();
+
+	}
+
+	protected void printIisKeys(PrintWriter out, List<IisKey> iisKeys, Tenant tenant) {
+		out.println("<a href=\""
+				+ urlTenantUtil.tenantifyPathWithContextPath(tenant, WellKnownKeyController.WELL_KNOWN_PATH_SUFFIX)
+				+ "\">well-known</a>");
+
+		if (iisKeys.isEmpty()) {
+			out.println("<em>No Key found</em>");
+		} else {
+			int count = 0;
+			for (IisKey iisKey : iisKeys) {
+				count++;
+				printIisKey(out, iisKey);
+			}
+		}
+	}
+
+	public void printIisKey(PrintWriter out, IisKey iisKey) {
+		out.println("<h4>Key id : " + iisKey.getKeyId() + "</h4>");
+		out.println("<textarea textarea name=\"sh-link\" readonly style=\"width: 100%; height: 3em;\" >" +
+				iisKey.jwk().toPublicJWK().toJSONString() + "</textarea>");
+	}
+
+}
