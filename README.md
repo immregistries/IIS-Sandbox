@@ -38,7 +38,7 @@ Compile and run with embedded H2 database:
 ```
 mvn clean install;
 set -a;
-source .env;   
+source .env;
 set +a;
 java -jar iis-web/target/iis.war;
 ```
