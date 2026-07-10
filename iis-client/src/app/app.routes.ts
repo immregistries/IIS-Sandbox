@@ -38,6 +38,10 @@ export const routes: Routes = [
             path: 'messages',
             loadChildren: () => import('./features/message/message.routes').then((m) => m.MESSAGE_ROUTES),
           },
+          {
+            path: 'pop',
+            loadChildren: () => import('./features/pop/pop.routes').then((m) => m.POP_ROUTES),
+          },
           {path: '', redirectTo: 'patients', pathMatch: 'full'},
         ],
       },
