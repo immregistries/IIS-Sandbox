@@ -46,7 +46,7 @@ import {LoadingSpinnerComponent} from '../../../../shared/components/loading-spi
     </div>
   `,
   styles: `
-    h1 { margin: 0 0 1rem; color: #1e293b; }
+    h1 { margin: 0 0 1rem; }
     .search-form {
       display: flex;
       gap: 1rem;

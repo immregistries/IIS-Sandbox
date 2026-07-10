@@ -104,7 +104,7 @@ import {DateFormatPipe} from '../../../../shared/pipes/date-format.pipe';
       justify-content: space-between;
       align-items: center;
       margin-bottom: 1.25rem;
-      h1 { margin: 0; color: #1e293b; }
+      h1 { margin: 0; }
     }
     .detail-grid {
       display: grid;
@@ -112,8 +112,8 @@ import {DateFormatPipe} from '../../../../shared/pipes/date-format.pipe';
       gap: 1.25rem;
     }
     .detail-item {
-      .label { display: block; font-size: 0.75rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.125rem; }
-      .value { font-size: 0.9rem; color: #1e293b; }
+      .label { display: block; font-size: 0.75rem; color: var(--p-text-muted-color); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.125rem; }
+      .value { font-size: 0.9rem; }
     }
     .mt-4 { margin-top: 1rem; }
   `,

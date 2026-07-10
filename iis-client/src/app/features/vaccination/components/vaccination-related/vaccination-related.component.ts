@@ -28,7 +28,7 @@ import {DateFormatPipe} from '../../../../shared/pipes/date-format.pipe';
         </tr>
       </ng-template>
       <ng-template #emptymessage>
-        <tr><td colspan="5" style="text-align: center; color: #64748b;">No related vaccinations.</td></tr>
+        <tr><td colspan="5" class="text-muted" style="text-align: center;">No related vaccinations.</td></tr>
       </ng-template>
     </p-table>
   `,

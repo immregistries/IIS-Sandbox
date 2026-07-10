@@ -76,7 +76,7 @@ import {AuthService} from '../../../core/services/auth.service';
       justify-content: center;
       align-items: center;
       min-height: 100vh;
-      background: #f1f5f9;
+      background: var(--p-surface-ground);
     }
     :host ::ng-deep .login-card {
       width: 400px;
@@ -84,8 +84,8 @@ import {AuthService} from '../../../core/services/auth.service';
     .login-header {
       text-align: center;
       padding: 1.5rem 1.5rem 0;
-      h2 { margin: 0 0 0.25rem; color: #1e293b; }
-      p { margin: 0; color: #64748b; font-size: 0.9rem; }
+      h2 { margin: 0 0 0.25rem; }
+      p { margin: 0; color: var(--p-text-muted-color); font-size: 0.9rem; }
     }
     .form-group {
       margin-bottom: 1rem;
@@ -94,11 +94,11 @@ import {AuthService} from '../../../core/services/auth.service';
         margin-bottom: 0.375rem;
         font-size: 0.875rem;
         font-weight: 500;
-        color: #374151;
+        color: var(--p-text-color);
       }
     }
-    .optional-label { font-weight: 400; color: #94a3b8; font-size: 0.8rem; }
-    .divider-text { font-size: 0.8rem; color: #94a3b8; }
+    .optional-label { font-weight: 400; color: var(--p-text-muted-color); font-size: 0.8rem; }
+    .divider-text { font-size: 0.8rem; color: var(--p-text-muted-color); }
     .github-link { text-decoration: none; }
     .w-full { width: 100%; }
     .mb-3 { margin-bottom: 0.75rem; }

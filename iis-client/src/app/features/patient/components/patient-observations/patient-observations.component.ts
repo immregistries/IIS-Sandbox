@@ -26,7 +26,7 @@ import {DateFormatPipe} from '../../../../shared/pipes/date-format.pipe';
         </tr>
       </ng-template>
       <ng-template #emptymessage>
-        <tr><td colspan="4" style="text-align: center; color: #64748b;">No observations.</td></tr>
+        <tr><td colspan="4" class="text-muted" style="text-align: center;">No observations.</td></tr>
       </ng-template>
     </p-table>
   `,

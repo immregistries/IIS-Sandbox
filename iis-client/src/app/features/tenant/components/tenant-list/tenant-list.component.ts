@@ -56,9 +56,9 @@ import {LoadingSpinnerComponent} from '../../../../shared/components/loading-spi
       justify-content: space-between;
       align-items: center;
       margin-bottom: 1rem;
-      h1 { margin: 0; color: #1e293b; }
+      h1 { margin: 0; }
     }
-    .text-center { text-align: center; color: #64748b; }
+    .text-center { text-align: center; color: var(--p-text-muted-color); }
   `,
 })
 export class TenantListComponent implements OnInit {

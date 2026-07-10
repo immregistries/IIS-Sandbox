@@ -3,6 +3,7 @@ import {Button} from 'primeng/button';
 import {Tag} from 'primeng/tag';
 import {AuthService} from '../../../core/services/auth.service';
 import {TenantContextService} from '../../../core/services/tenant-context.service';
+import {ThemeService} from '../../../core/services/theme.service';
 
 @Component({
   selector: 'app-topbar',
@@ -17,6 +18,13 @@ import {TenantContextService} from '../../../core/services/tenant-context.servic
         }
       </div>
       <div class="topbar-right">
+        <p-button
+          [icon]="themeService.darkMode() ? 'pi pi-sun' : 'pi pi-moon'"
+          [rounded]="true"
+          [text]="true"
+          severity="secondary"
+          (onClick)="themeService.toggleDarkMode()"
+        />
         <span class="username">{{ authService.username() }}</span>
         <p-button label="Logout" icon="pi pi-sign-out" severity="secondary" [text]="true" size="small" (onClick)="authService.logout()" />
       </div>
@@ -29,8 +37,8 @@ import {TenantContextService} from '../../../core/services/tenant-context.servic
       justify-content: space-between;
       padding: 0 1.25rem;
       height: 48px;
-      background: #fff;
-      border-bottom: 1px solid #e2e8f0;
+      background: var(--p-content-background);
+      border-bottom: 1px solid var(--p-content-border-color);
     }
     .topbar-left, .topbar-right {
       display: flex;
@@ -40,15 +48,16 @@ import {TenantContextService} from '../../../core/services/tenant-context.servic
     .tenant-badge {
       font-size: 0.85rem;
       font-weight: 500;
-      color: #475569;
+      color: var(--p-text-color);
     }
     .username {
       font-size: 0.85rem;
-      color: #64748b;
+      color: var(--p-text-muted-color);
     }
   `,
 })
 export class TopbarComponent {
   authService = inject(AuthService);
   tenantContext = inject(TenantContextService);
+  themeService = inject(ThemeService);
 }

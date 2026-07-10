@@ -46,7 +46,7 @@ import {DateFormatPipe} from '../../../../shared/pipes/date-format.pipe';
       </ng-template>
     </p-table>
   `,
-  styles: `.text-center { text-align: center; color: #64748b; }`,
+  styles: `.text-center { text-align: center; color: var(--p-text-muted-color); }`,
 })
 export class PatientListComponent {
   patients = input.required<PatientMaster[]>();

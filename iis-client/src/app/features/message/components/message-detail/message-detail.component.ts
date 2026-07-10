@@ -34,14 +34,14 @@ import {DateFormatPipe} from '../../../../shared/pipes/date-format.pipe';
       display: flex;
       gap: 1.5rem;
       font-size: 0.85rem;
-      color: #64748b;
+      color: var(--p-text-muted-color);
     }
     .hl7-content {
       font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
       font-size: 0.8rem;
       white-space: pre-wrap;
       word-break: break-all;
-      background: #f8fafc;
+      background: var(--p-content-background);
       padding: 0.75rem;
       border-radius: 4px;
       margin: 0;

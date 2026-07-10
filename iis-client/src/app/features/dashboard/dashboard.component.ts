@@ -65,7 +65,7 @@ import {TenantContextService} from '../../core/services/tenant-context.service';
   `,
   styles: `
     .dashboard { max-width: 960px; }
-    h1 { margin: 0 0 1rem; color: #1e293b; }
+    h1 { margin: 0 0 1rem; }
     .cards-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -77,12 +77,11 @@ import {TenantContextService} from '../../core/services/tenant-context.service';
       flex-direction: column;
       gap: 0.5rem;
       a {
-        color: #2563eb;
         text-decoration: none;
         &:hover { text-decoration: underline; }
       }
     }
-    .hint { color: #64748b; margin: 0; }
+    .hint { color: var(--p-text-muted-color); margin: 0; }
     .mb-4 { margin-bottom: 1rem; }
     .mt-4 { margin-top: 1rem; }
     .w-full { width: 100%; }

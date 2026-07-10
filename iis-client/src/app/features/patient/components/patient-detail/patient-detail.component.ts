@@ -138,7 +138,7 @@ import {DateFormatPipe} from '../../../../shared/pipes/date-format.pipe';
                   </tr>
                 </ng-template>
                 <ng-template #emptymessage>
-                  <tr><td colspan="6" style="text-align: center; color: #64748b;">No vaccinations recorded.</td></tr>
+                  <tr><td colspan="6" class="text-muted" style="text-align: center;">No vaccinations recorded.</td></tr>
                 </ng-template>
               </p-table>
             </p-tabpanel>
@@ -161,9 +161,9 @@ import {DateFormatPipe} from '../../../../shared/pipes/date-format.pipe';
       justify-content: space-between;
       align-items: flex-start;
       margin-bottom: 1.25rem;
-      h1 { margin: 0 0 0.25rem; color: #1e293b; }
+      h1 { margin: 0 0 0.25rem; }
     }
-    .patient-id { font-size: 0.85rem; color: #64748b; }
+    .patient-id { font-size: 0.85rem; color: var(--p-text-muted-color); }
     .demographics-grid { display: flex; flex-direction: column; gap: 1rem; }
     .info-grid {
       display: grid;
@@ -171,8 +171,8 @@ import {DateFormatPipe} from '../../../../shared/pipes/date-format.pipe';
       gap: 1rem;
     }
     .info-item {
-      .label { display: block; font-size: 0.75rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.125rem; }
-      .value { font-size: 0.9rem; color: #1e293b; }
+      .label { display: block; font-size: 0.75rem; color: var(--p-text-muted-color); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.125rem; }
+      .value { font-size: 0.9rem; }
     }
   `,
 })

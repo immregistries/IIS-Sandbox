@@ -74,7 +74,7 @@ import {TenantContextService} from '../../../core/services/tenant-context.servic
       text-decoration: none;
       transition: background 0.15s;
       &:hover { background: #334155; }
-      &.active { background: #2563eb; color: #fff; }
+      &.active { background: var(--p-primary-color); color: #fff; }
       i { font-size: 1rem; }
     }
     .nav-section {

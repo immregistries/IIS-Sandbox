@@ -49,7 +49,7 @@ import {DateFormatPipe} from '../../../../shared/pipes/date-format.pipe';
             </tr>
           </ng-template>
           <ng-template #emptymessage>
-            <tr><td colspan="5" style="text-align: center; color: #64748b;">No messages found.</td></tr>
+            <tr><td colspan="5" class="text-muted" style="text-align: center;">No messages found.</td></tr>
           </ng-template>
         </p-table>
       }
@@ -60,7 +60,7 @@ import {DateFormatPipe} from '../../../../shared/pipes/date-format.pipe';
     </div>
   `,
   styles: `
-    h1 { margin: 0 0 1rem; color: #1e293b; }
+    h1 { margin: 0 0 1rem; }
     .search-bar {
       display: flex;
       gap: 0.5rem;
