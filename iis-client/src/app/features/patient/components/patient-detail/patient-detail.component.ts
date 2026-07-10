@@ -1,8 +1,9 @@
-import {Component, inject, OnInit, signal} from '@angular/core';
+import {Component, inject, input, OnInit, signal} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {TabsModule} from 'primeng/tabs';
 import {Fieldset} from 'primeng/fieldset';
 import {Tag} from 'primeng/tag';
+import {Tooltip} from 'primeng/tooltip';
 import {Button} from 'primeng/button';
 import {TableModule} from 'primeng/table';
 import {IisPatient} from '../../models/patient.model';
@@ -24,6 +25,7 @@ import {DateFormatPipe} from '../../../../shared/pipes/date-format.pipe';
     TabsModule,
     Fieldset,
     Tag,
+    Tooltip,
     Button,
     TableModule,
     LoadingSpinnerComponent,
@@ -41,7 +43,26 @@ import {DateFormatPipe} from '../../../../shared/pipes/date-format.pipe';
         <div class="page-header">
           <div>
             <h1>{{ patient()!.patientNames?.[0]?.nameLast }}, {{ patient()!.patientNames?.[0]?.nameFirst }}</h1>
-            <span class="patient-id">ID: {{ patient()!.patientId }}</span>
+            <span class="patient-id">
+              ID: {{ patient()!.patientId }}
+              @if (asNonGolden()) {
+                <p-tag
+                  value="Reported Record"
+                  severity="info"
+                  [rounded]="true"
+                  pTooltip="Reported (Non-golden) record. As part of the Master Data Management (MDM), this record represents the information as it was first received, before a merging process, and is kept separated from the consolidated record for preserving history and later potential merging."
+                  tooltipPosition="bottom"
+                />
+              } @else {
+                <p-tag
+                  value="Golden Record"
+                  severity="warn"
+                  [rounded]="true"
+                  pTooltip="Consolidated (Golden) record. As part of the Master Data Management (MDM), this record was generated aggregating the information across records identified as potential duplicates."
+                  tooltipPosition="bottom"
+                />
+              }
+            </span>
           </div>
           <p-button label="Back" icon="pi pi-arrow-left" severity="secondary" [outlined]="true" (onClick)="goBack()" />
         </div>
@@ -154,7 +175,7 @@ import {DateFormatPipe} from '../../../../shared/pipes/date-format.pipe';
             </p-tabpanel>
 
             <p-tabpanel value="3">
-              <app-patient-related [patients]="relatedPatients()" (selected)="viewRelatedPatient($event)" />
+              <app-patient-related [patients]="relatedPatients()" [isGolden]="!asNonGolden()" (selected)="viewRelatedPatient($event)" />
             </p-tabpanel>
 
             <p-tabpanel value="4">
@@ -177,7 +198,13 @@ import {DateFormatPipe} from '../../../../shared/pipes/date-format.pipe';
       margin-bottom: 1.25rem;
       h1 { margin: 0 0 0.25rem; }
     }
-    .patient-id { font-size: 0.85rem; color: var(--p-text-muted-color); }
+    .patient-id {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.85rem;
+      color: var(--p-text-muted-color);
+    }
     .demographics-grid { display: flex; flex-direction: column; gap: 1rem; }
     .info-grid {
       display: grid;
@@ -196,6 +223,8 @@ export class PatientDetailComponent implements OnInit {
   private router = inject(Router);
   private tenantContext = inject(TenantContextService);
 
+  asNonGolden = input(false, {transform: (v: string | boolean) => v === true || v === 'true'});
+
   patient = signal<IisPatient | null>(null);
   vaccinations = signal<VaccinationMaster[]>([]);
   observations = signal<ObservationReported[]>([]);
@@ -208,6 +237,7 @@ export class PatientDetailComponent implements OnInit {
   }
 
   private loadPatient(patientId: string): void {
+    const isGolden = !this.asNonGolden();
     this.loading.set(true);
     this.patientApi.getPatient(patientId).subscribe({
       next: (patient) => {
@@ -216,9 +246,9 @@ export class PatientDetailComponent implements OnInit {
       },
       error: () => this.loading.set(false),
     });
-    this.patientApi.getPatientVaccinations(patientId).subscribe((v) => this.vaccinations.set(v));
-    this.patientApi.getPatientObservations(patientId).subscribe((o) => this.observations.set(o));
-    this.patientApi.getRelatedPatients(patientId).subscribe((r) => this.relatedPatients.set(r));
+    this.patientApi.getPatientVaccinations(patientId, isGolden).subscribe((v) => this.vaccinations.set(v));
+    this.patientApi.getPatientObservations(patientId, isGolden).subscribe((o) => this.observations.set(o));
+    this.patientApi.getRelatedPatients(patientId, isGolden).subscribe((r) => this.relatedPatients.set(r));
   }
 
   viewVaccination(vaccinationId: string): void {
@@ -226,7 +256,10 @@ export class PatientDetailComponent implements OnInit {
   }
 
   viewRelatedPatient(patient: IisPatient): void {
-    this.router.navigate(['/t', this.tenantContext.tenantName(), 'patients', patient.patientId]);
+    this.router.navigate(
+      ['/t', this.tenantContext.tenantName(), 'patients', patient.patientId],
+      {queryParams: {asNonGolden: !this.asNonGolden()}},
+    );
   }
 
   goBack(): void {

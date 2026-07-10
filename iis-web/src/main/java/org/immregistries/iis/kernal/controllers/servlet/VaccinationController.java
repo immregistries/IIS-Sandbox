@@ -136,7 +136,7 @@ public class VaccinationController {
 			out.println("<h2>Vaccination Record: " + cvxPrint + " " + sdfDate.format(vaccination.getAdministeredDate())
 					+ "</h2>");
 			PatientReported patientReportedSelected = (PatientReported) patientRestController
-					.getPatient(vaccination.getPatientReportedId(), tenant);
+				.getPatient(vaccination.getPatientReportedId(), tenant, true);
 			{
 				out.println("<h4>Patient information</h4>");
 				patientServletUtil.printPatient(out, patientReportedSelected);

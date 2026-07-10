@@ -51,5 +51,6 @@ import {DateFormatPipe} from '../../../../shared/pipes/date-format.pipe';
 export class PatientListComponent {
   patients = input.required<PatientMaster[]>();
   paginator = input(true);
+
   selected = output<PatientMaster>();
 }

@@ -48,8 +48,13 @@ public class PatientRestController extends BaseTenantTiedRest {
 	@GetMapping(IisPathVariable.PlaceHolder.PATIENT_ID_PLACEHOLDER)
 	public IisPatient getPatient(
 			@PathVariable(IisPathVariable.Key.PATIENT_ID) String patientId,
-			@RequestAttribute(IisRequestAttribute.TENANT_REQUEST_ATTRIBUTE) Tenant tenant) {
-		return fhirReadRequester.readAsPatientMaster(patientId);
+			@RequestAttribute(IisRequestAttribute.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
+			@RequestParam(name = "asNonGolden", defaultValue = "false") boolean asNonGolden) {
+		if (asNonGolden) {
+			return fhirReadRequester.readAsPatientReported(patientId);
+		} else {
+			return fhirReadRequester.readAsPatient(patientId);
+		}
 	}
 
 	@GetMapping(IisPathVariable.PlaceHolder.PATIENT_ID_PLACEHOLDER + IisRestPath.BasePath.FHIR_RESOURCE_PATH)
