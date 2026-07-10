@@ -13,6 +13,8 @@ import {TenantContextService} from '../../../../core/services/tenant-context.ser
 import {LoadingSpinnerComponent} from '../../../../shared/components/loading-spinner/loading-spinner.component';
 import {PatientObservationsComponent} from '../patient-observations/patient-observations.component';
 import {PatientRelatedComponent} from '../patient-related/patient-related.component';
+import {PatientHealthCardsComponent} from '../patient-health-cards/patient-health-cards.component';
+import {PatientFhirLinksComponent} from '../patient-fhir-links/patient-fhir-links.component';
 import {DateFormatPipe} from '../../../../shared/pipes/date-format.pipe';
 
 @Component({
@@ -27,6 +29,8 @@ import {DateFormatPipe} from '../../../../shared/pipes/date-format.pipe';
     LoadingSpinnerComponent,
     PatientObservationsComponent,
     PatientRelatedComponent,
+    PatientHealthCardsComponent,
+    PatientFhirLinksComponent,
     DateFormatPipe,
   ],
   template: `
@@ -48,6 +52,8 @@ import {DateFormatPipe} from '../../../../shared/pipes/date-format.pipe';
             <p-tab value="1">Vaccinations ({{ vaccinations().length }})</p-tab>
             <p-tab value="2">Observations ({{ observations().length }})</p-tab>
             <p-tab value="3">Related Patients ({{ relatedPatients().length }})</p-tab>
+            <p-tab value="4">Health Cards</p-tab>
+            <p-tab value="5">FHIR API</p-tab>
           </p-tablist>
           <p-tabpanels>
             <p-tabpanel value="0">
@@ -149,6 +155,14 @@ import {DateFormatPipe} from '../../../../shared/pipes/date-format.pipe';
 
             <p-tabpanel value="3">
               <app-patient-related [patients]="relatedPatients()" (selected)="viewRelatedPatient($event)" />
+            </p-tabpanel>
+
+            <p-tabpanel value="4">
+              <app-patient-health-cards [patientId]="patient()!.patientId" />
+            </p-tabpanel>
+
+            <p-tabpanel value="5">
+              <app-patient-fhir-links [patientId]="patient()!.patientId" />
             </p-tabpanel>
           </p-tabpanels>
         </p-tabs>

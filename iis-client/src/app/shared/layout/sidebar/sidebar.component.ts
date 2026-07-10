@@ -44,6 +44,12 @@ import {TenantContextService} from '../../../core/services/tenant-context.servic
               <span>Send Now</span>
             </a>
           </li>
+          <li>
+            <a [routerLink]="shLinkLink()" routerLinkActive="active" class="nav-link">
+              <i class="pi pi-link"></i>
+              <span>Smart Health Link</span>
+            </a>
+          </li>
         }
       </ul>
     </nav>
@@ -99,4 +105,5 @@ export class SidebarComponent {
   patientsLink = computed(() => `/t/${this.tenantContext.tenantName()}/patients`);
   messagesLink = computed(() => `/t/${this.tenantContext.tenantName()}/messages`);
   popLink = computed(() => `/t/${this.tenantContext.tenantName()}/pop`);
+  shLinkLink = computed(() => `/t/${this.tenantContext.tenantName()}/sh-link`);
 }

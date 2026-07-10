@@ -3,6 +3,7 @@ package org.immregistries.iis.kernal.controllers.rest;
 import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
 import ca.uhn.fhir.rest.param.ReferenceParam;
 import jakarta.servlet.http.HttpServletRequest;
+import org.apache.commons.lang3.StringUtils;
 import org.immregistries.iis.kernal.IisRequestAttribute;
 import org.immregistries.iis.kernal.controllers.IisPathVariable;
 import org.immregistries.iis.kernal.controllers.IisRestParam;
@@ -18,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping(IisRestPath.REST_TENANT_PATH + IisRestPath.BasePath.VACCINATION_PATH)
+@RequestMapping(IisRestPath.REST_TENANT_PATH)
 public class VaccinationRestController extends BaseTenantTiedRest {
 
     @Autowired
@@ -26,7 +27,7 @@ public class VaccinationRestController extends BaseTenantTiedRest {
     @Autowired
     private FhirSearchRequester fhirSearchRequester;
 
-	 @GetMapping(IisPathVariable.PlaceHolder.VACCINATION_ID_PLACEHOLDER)
+	@GetMapping(IisRestPath.BasePath.VACCINATION_PATH + IisPathVariable.PlaceHolder.VACCINATION_ID_PLACEHOLDER)
     public IisVaccination getVaccination(
        @RequestAttribute(name = IisRequestAttribute.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
             @PathVariable(IisPathVariable.Key.VACCINATION_ID) String vaccinationId,
@@ -34,11 +35,15 @@ public class VaccinationRestController extends BaseTenantTiedRest {
         return fhirReadRequester.readAsVaccination(vaccinationId);
     }
 
-    @GetMapping()
+	@GetMapping({IisRestPath.BasePath.VACCINATION_PATH
+//		 , IisRestPath.BasePath.PATIENT_PATH + IisPathVariable.PlaceHolder.PATIENT_ID_PLACEHOLDER + IisRestPath.BasePath.VACCINATION_PATH
+	})
     public List<VaccinationMaster> getVaccinations(
        @RequestAttribute(name = IisRequestAttribute.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
-       @RequestParam(name = "patientId", required = false) String patientId) {
+       @PathVariable(name = IisPathVariable.Key.PATIENT_ID, required = false) String patientIdPath,
+       @RequestParam(name = IisRestParam.PATIENT_ID, required = false) String patientIdParam) {
         SearchParameterMap parameters = new SearchParameterMap();
+		String patientId = StringUtils.defaultIfBlank(patientIdPath, patientIdParam);
         if (patientId != null && !patientId.isEmpty()) {
             parameters.add("patient", new ReferenceParam(patientId));
         }
@@ -47,7 +52,7 @@ public class VaccinationRestController extends BaseTenantTiedRest {
         return result;
     }
 
-    @GetMapping(IisPathVariable.PlaceHolder.VACCINATION_ID_PLACEHOLDER + IisRestPath.BasePath.RELATED_PATH)
+	@GetMapping(IisRestPath.BasePath.VACCINATION_PATH + IisPathVariable.PlaceHolder.VACCINATION_ID_PLACEHOLDER + IisRestPath.BasePath.RELATED_PATH)
     public List<? extends IisVaccination> getRelatedVaccinations(
             @PathVariable(IisPathVariable.Key.VACCINATION_ID) String vaccinationId,
             @RequestAttribute(IisRequestAttribute.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,

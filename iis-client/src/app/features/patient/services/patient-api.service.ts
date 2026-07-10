@@ -3,6 +3,7 @@ import {HttpClient, HttpParams} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {IisPatient, PatientMaster} from '../models/patient.model';
 import {ObservationReported} from '../models/observation.model';
+import {ShLinkPayload} from '../models/shlink.model';
 import {VaccinationMaster} from '../../vaccination/models/vaccination.model';
 import {TenantContextService} from '../../../core/services/tenant-context.service';
 import {environment} from '../../../../environments/environment';
@@ -36,19 +37,38 @@ export class PatientApiService {
     return this.http.get<IisPatient>(`${this.basePath}/${patientId}`);
   }
 
-  getPatientVaccinations(patientId: string): Observable<VaccinationMaster[]> {
-    return this.http.get<VaccinationMaster[]>(`${this.basePath}/${patientId}/vaccination`);
+  getPatientVaccinations(patientId: string, isGolden = true): Observable<VaccinationMaster[]> {
+    const params = new HttpParams().set('isGolden', isGolden);
+    return this.http.get<VaccinationMaster[]>(`${this.basePath}/${patientId}/vaccination`, {params});
   }
 
-  getPatientObservations(patientId: string): Observable<ObservationReported[]> {
-    return this.http.get<ObservationReported[]>(`${this.basePath}/${patientId}/observations`);
+  getPatientObservations(patientId: string, isGolden = true): Observable<ObservationReported[]> {
+    const params = new HttpParams().set('isGolden', isGolden);
+    return this.http.get<ObservationReported[]>(`${this.basePath}/${patientId}/observations`, {params});
   }
 
-  getRelatedPatients(patientId: string): Observable<IisPatient[]> {
-    return this.http.get<IisPatient[]>(`${this.basePath}/${patientId}/related`);
+  getRelatedPatients(patientId: string, isGolden = true): Observable<IisPatient[]> {
+    const params = new HttpParams().set('isGolden', isGolden);
+    return this.http.get<IisPatient[]>(`${this.basePath}/${patientId}/related`, {params});
   }
 
   getPatientRecommendations(patientId: string): Observable<unknown> {
     return this.http.get(`${this.basePath}/${patientId}/recommendation`);
+  }
+
+  getShLinkPayload(patientId: string): Observable<ShLinkPayload> {
+    return this.http.get<ShLinkPayload>(`${this.basePath}/${patientId}/sh-link-payload`);
+  }
+
+  getShLinkIpsPayload(patientId: string): Observable<ShLinkPayload> {
+    return this.http.get<ShLinkPayload>(`${this.basePath}/${patientId}/sh-link-payload/ips`);
+  }
+
+  getShLinkQrCodeUrl(patientId: string): string {
+    return `${this.basePath}/${patientId}/patient-sh-link`;
+  }
+
+  getClvrPdf(patientId: string): Observable<Blob> {
+    return this.http.get(`${this.basePath}/${patientId}/clvr/pdf`, {responseType: 'blob'});
   }
 }

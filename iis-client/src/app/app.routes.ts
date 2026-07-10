@@ -42,6 +42,10 @@ export const routes: Routes = [
             path: 'pop',
             loadChildren: () => import('./features/pop/pop.routes').then((m) => m.POP_ROUTES),
           },
+          {
+            path: 'sh-link',
+            loadChildren: () => import('./features/shlink/shlink.routes').then((m) => m.SHLINK_ROUTES),
+          },
           {path: '', redirectTo: 'patients', pathMatch: 'full'},
         ],
       },

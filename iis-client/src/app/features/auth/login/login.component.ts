@@ -78,9 +78,6 @@ import {AuthService} from '../../../core/services/auth.service';
       min-height: 100vh;
       background: var(--p-surface-ground);
     }
-    :host ::ng-deep .login-card {
-      width: 400px;
-    }
     .login-header {
       text-align: center;
       padding: 1.5rem 1.5rem 0;

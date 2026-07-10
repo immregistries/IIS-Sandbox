@@ -20,3 +20,11 @@ a {
 .text-muted {
   color: var(--p-text-muted-color);
 }
+
+.text-center-header .p-card-title {
+  text-align: center;
+}
+
+.login-card {
+  width: 400px;
+}
