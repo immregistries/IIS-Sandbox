@@ -37,7 +37,7 @@ public class VaccinationRestController extends BaseTenantTiedRest {
     @GetMapping()
     public List<VaccinationMaster> getVaccinations(
        @RequestAttribute(name = IisRequestAttribute.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
-            @RequestParam(required = false) String patientId) {
+       @RequestParam(name = "patientId", required = false) String patientId) {
         SearchParameterMap parameters = new SearchParameterMap();
         if (patientId != null && !patientId.isEmpty()) {
             parameters.add("patient", new ReferenceParam(patientId));

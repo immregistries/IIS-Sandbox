@@ -128,9 +128,9 @@ public class PatientRestController extends BaseTenantTiedRest {
 
 	@GetMapping("/search")
 	public List<PatientMaster> basicSearch(
-			@RequestParam(required = false) String family,
-			@RequestParam(required = false) String name,
-			@RequestParam(required = false) String identifier,
+		@RequestParam(name = "family", required = false) String family,
+		@RequestParam(name = "name", required = false) String name,
+		@RequestParam(name = "identifier", required = false) String identifier,
 			@RequestAttribute(IisRequestAttribute.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
 			HttpServletRequest req) {
 		return fhirSearchRequester.searchPatientMasterGoldenList(
