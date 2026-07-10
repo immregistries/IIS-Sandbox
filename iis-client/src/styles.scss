@@ -1,0 +1,14 @@
+@use 'primeicons/primeicons.css';
+
+:root {
+  --iis-primary: #2563eb;
+  --iis-surface: #f8fafc;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: var(--p-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
+  background-color: var(--iis-surface);
+}

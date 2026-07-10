@@ -10,6 +10,7 @@ import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -51,7 +52,7 @@ public class LoginFormController {
 		String locationHeader = req.getHeader("referer");
 		try {
 			uiUtil.doHeader(out, "IIS Sandbox");
-			Authentication authentication = authenticationRestController.getAuthentication();
+			Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 			// LOGIN FORM, inherited, could be made in a separate class and improved
 			if (!authentication.isAuthenticated() || authentication instanceof AnonymousAuthenticationToken) {
 				String userId = req.getParameter(LOGIN_PARAM_USERID);

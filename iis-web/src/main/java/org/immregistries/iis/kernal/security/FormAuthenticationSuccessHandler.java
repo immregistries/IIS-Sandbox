@@ -67,7 +67,18 @@ public class FormAuthenticationSuccessHandler extends SavedRequestAwareAuthentic
 		}
 
 		clearAuthenticationAttributes(request);
-		getRedirectStrategy().sendRedirect(request, response, builder.build().toUri().toURL().toString());
+		if (isAjaxRequest(request)) {
+			clearAuthenticationAttributes(request);
+			this.requestCache.removeRequest(request, response);
+			response.setStatus(HttpServletResponse.SC_OK);
+			return;
+		} else {
+			getRedirectStrategy().sendRedirect(request, response, builder.build().toUri().toURL().toString());
+		}
+	}
+
+	private boolean isAjaxRequest(HttpServletRequest request) {
+		return "XMLHttpRequest".equals(request.getHeader("X-Requested-With"));
 	}
 
 	private void filterForSuffix(UriComponentsBuilder builder, String pathSuffix, String tenantName, String newSuffix) throws MalformedURLException {

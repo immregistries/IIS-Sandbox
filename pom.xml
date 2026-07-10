@@ -57,6 +57,7 @@
         <module>iis-fhir-bulk-export</module>
         <module>iis-fhir-immds</module>
         <module>iis-fhir-server</module>
+        <module>iis-client</module>
         <module>iis-web</module>
         <module>iis-smart-health-link-card</module>
     </modules>

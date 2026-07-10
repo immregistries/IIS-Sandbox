@@ -1,0 +1,32 @@
+{
+  "/iis/rest": {
+    "target": "http://localhost:8082",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/iis/login": {
+    "target": "http://localhost:8082",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/iis/logout": {
+    "target": "http://localhost:8082",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/iis/loginForm": {
+    "target": "http://localhost:8082",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/iis/oauth2": {
+    "target": "http://localhost:8082",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/iis/fhir": {
+    "target": "http://localhost:8082",
+    "secure": false,
+    "changeOrigin": true
+  }
+}

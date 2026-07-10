@@ -185,3 +185,9 @@ Temporary Items
 /iis-web/Compiled.xml
 /iis-web/data-h2/
 /**/.flattened-pom.xml
+
+# Angular client
+/iis-client/node_modules/
+/iis-client/dist/
+/iis-client/.angular/
+/iis-client/node/

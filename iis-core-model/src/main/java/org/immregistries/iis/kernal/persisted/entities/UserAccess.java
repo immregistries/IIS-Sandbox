@@ -56,26 +56,31 @@ public class UserAccess implements Serializable, Authentication {
 	}
 
 	@Override
+	@JsonIgnore
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		return new ArrayList<>(0);
 	}
 
 	@Override
+	@JsonIgnore
 	public Object getCredentials() {
 		return accessKey;
 	}
 
 	@Override
+	@JsonIgnore
 	public Object getDetails() {
 		return this.getAccessName();
 	}
 
 	@Override
+	@JsonIgnore
 	public Object getPrincipal() {
 		return this;
 	}
 
 	@Override
+	@JsonIgnore
 	public boolean isAuthenticated() {
 		return true;
 	}

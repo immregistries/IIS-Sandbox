@@ -35,6 +35,7 @@ public class ServerSecurityConfig {
 	public static final String LOGIN_PATH = "/login";
 	public static final String LOGIN_FORM_PATH = "/loginForm";
 	public static final String LOGOUT_PATH = "/logout";
+	public static final String COOKIE_NAME = "JSESSIONID";
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	@Autowired
@@ -54,7 +55,8 @@ public class ServerSecurityConfig {
 				HomeController.HOME_BASE_PATH,
 				PopController.POP_BASE_PATH,
 				IisRestPath.BasePath.SUBSCRIPTION_TOPIC_PATH + "/**",
-				"/img/**")
+				"/img/**",
+				"/app", "/app/**")
 						.permitAll()
 			.requestMatchers(
 				IisRestPath.PATIENT_MANIFEST_FULL_PATH + "/**",
@@ -89,7 +91,7 @@ public class ServerSecurityConfig {
 		http.logout((logout) -> logout
 						.logoutRequestMatcher(new AntPathRequestMatcher(LOGOUT_PATH)) // Use RequestMatcher
 						.logoutSuccessUrl(LOGIN_FORM_PATH)
-						.deleteCookies("JSESSIONID"));
+			.deleteCookies(COOKIE_NAME));
 
 		http.csrf(AbstractHttpConfigurer::disable);
 		return http.build();
