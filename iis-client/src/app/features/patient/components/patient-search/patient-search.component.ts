@@ -1,104 +1,94 @@
-import {Component, inject, signal} from '@angular/core';
+import {Component, inject, OnInit, signal} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {FormsModule} from '@angular/forms';
+import {IconField} from 'primeng/iconfield';
+import {InputIcon} from 'primeng/inputicon';
 import {InputText} from 'primeng/inputtext';
 import {Button} from 'primeng/button';
-import {Card} from 'primeng/card';
+import {TableModule} from 'primeng/table';
 import {PatientMaster} from '../../models/patient.model';
 import {PatientApiService} from '../../services/patient-api.service';
-import {PatientListComponent} from '../patient-list/patient-list.component';
 import {LoadingSpinnerComponent} from '../../../../shared/components/loading-spinner/loading-spinner.component';
+import {DateFormatPipe} from '../../../../shared/pipes/date-format.pipe';
 
 @Component({
   selector: 'app-patient-search',
   standalone: true,
-  imports: [FormsModule, InputText, Button, Card, PatientListComponent, LoadingSpinnerComponent],
+  imports: [FormsModule, IconField, InputIcon, InputText, Button, TableModule, LoadingSpinnerComponent, DateFormatPipe],
   template: `
     <div class="patient-search">
       <h1>Patients</h1>
 
-      <p-card>
-        <div class="search-form">
-          <div class="search-field">
-            <label for="family">Last Name</label>
-            <input pInputText id="family" [(ngModel)]="family" placeholder="Search by last name" (keyup.enter)="onSearch()" />
-          </div>
-          <div class="search-field">
-            <label for="name">First Name</label>
-            <input pInputText id="name" [(ngModel)]="firstName" placeholder="Search by first name" (keyup.enter)="onSearch()" />
-          </div>
-          <div class="search-field">
-            <label for="identifier">Identifier</label>
-            <input pInputText id="identifier" [(ngModel)]="identifier" placeholder="Medical record #" (keyup.enter)="onSearch()" />
-          </div>
-          <div class="search-actions">
-            <p-button label="Search" icon="pi pi-search" (onClick)="onSearch()" [loading]="loading()" />
-            <p-button label="Show All" severity="secondary" [outlined]="true" (onClick)="loadAll()" [loading]="loading()" />
-          </div>
-        </div>
-      </p-card>
-
       @if (loading()) {
         <app-loading-spinner />
-      } @else if (patients().length > 0 || searched()) {
-        <app-patient-list [patients]="patients()" (selected)="onSelectPatient($event)" />
+      } @else {
+        <p-table
+          #dt
+          [value]="patients()"
+          [paginator]="true"
+          [rows]="10"
+          [rowHover]="true"
+          [globalFilterFields]="['patientId', 'patientNames.0.nameLast', 'patientNames.0.nameFirst', 'sex']"
+          styleClass="p-datatable-sm"
+        >
+          <ng-template #caption>
+            <div class="table-header">
+              <p-iconfield>
+                <p-inputicon styleClass="pi pi-search" />
+                <input pInputText type="text" placeholder="Search patients..." (input)="dt.filterGlobal($any($event.target).value, 'contains')" />
+              </p-iconfield>
+            </div>
+          </ng-template>
+          <ng-template #header>
+            <tr>
+              <th pSortableColumn="patientId">ID <p-sortIcon field="patientId" /></th>
+              <th pSortableColumn="patientNames.0.nameLast">Last Name <p-sortIcon field="patientNames.0.nameLast" /></th>
+              <th pSortableColumn="patientNames.0.nameFirst">First Name <p-sortIcon field="patientNames.0.nameFirst" /></th>
+              <th pSortableColumn="birthDate">DOB <p-sortIcon field="birthDate" /></th>
+              <th pSortableColumn="sex">Sex <p-sortIcon field="sex" /></th>
+              <th style="width: 80px"></th>
+            </tr>
+          </ng-template>
+          <ng-template #body let-patient>
+            <tr>
+              <td>{{ patient.patientId }}</td>
+              <td>{{ patient.patientNames?.[0]?.nameLast }}</td>
+              <td>{{ patient.patientNames?.[0]?.nameFirst }}</td>
+              <td>{{ patient.birthDate | iisDate }}</td>
+              <td>{{ patient.sex }}</td>
+              <td>
+                <p-button icon="pi pi-eye" [rounded]="true" [text]="true" size="small" (onClick)="onSelectPatient(patient)" />
+              </td>
+            </tr>
+          </ng-template>
+          <ng-template #emptymessage>
+            <tr>
+              <td colspan="6" class="text-center">No patients found.</td>
+            </tr>
+          </ng-template>
+        </p-table>
       }
     </div>
   `,
   styles: `
     h1 { margin: 0 0 1rem; }
-    .search-form {
+    .table-header {
       display: flex;
-      gap: 1rem;
-      align-items: flex-end;
-      flex-wrap: wrap;
+      justify-content: flex-end;
     }
-    .search-field {
-      flex: 1;
-      min-width: 160px;
-      label { display: block; margin-bottom: 0.375rem; font-size: 0.875rem; font-weight: 500; }
-      input { width: 100%; }
-    }
-    .search-actions {
-      display: flex;
-      gap: 0.5rem;
-      align-self: flex-end;
-    }
+    .text-center { text-align: center; color: var(--p-text-muted-color); }
   `,
 })
-export class PatientSearchComponent {
+export class PatientSearchComponent implements OnInit {
   private patientApi = inject(PatientApiService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
 
-  family = signal('');
-  firstName = signal('');
-  identifier = signal('');
   patients = signal<PatientMaster[]>([]);
   loading = signal(false);
-  searched = signal(false);
 
-  onSearch(): void {
+  ngOnInit(): void {
     this.loading.set(true);
-    this.searched.set(true);
-    this.patientApi
-      .searchPatients({
-        family: this.family() || undefined,
-        name: this.firstName() || undefined,
-        identifier: this.identifier() || undefined,
-      })
-      .subscribe({
-        next: (patients) => {
-          this.patients.set(patients);
-          this.loading.set(false);
-        },
-        error: () => this.loading.set(false),
-      });
-  }
-
-  loadAll(): void {
-    this.loading.set(true);
-    this.searched.set(true);
     this.patientApi.getPatients().subscribe({
       next: (patients) => {
         this.patients.set(patients);
