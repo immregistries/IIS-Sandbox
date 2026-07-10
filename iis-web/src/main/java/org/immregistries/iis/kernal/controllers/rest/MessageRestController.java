@@ -28,7 +28,7 @@ public class MessageRestController {
     @GetMapping
     public List<MessageReceived> getMessages(
        @RequestAttribute(name = IisRequestAttribute.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
-            @RequestParam(required = false) String search) {
+       @RequestParam(name = "search", required = false) String search) {
 
         List<MessageReceived> messageReceivedList = messageReceivedRepository
                 .findByTenantOrderByReportedDateDesc(tenant);

@@ -42,8 +42,8 @@ public class TenantRestController {
         }
         // TODO prevent duplicate tenant creation
 		 tenantAuthService.authenticateTenant(userAccess, tenant.getOrganizationName());
-		 tenant.setUserAccess(userAccess);
-        tenant = tenantRepository.save(tenant);
+//		 tenant.setUserAccess(userAccess);
+//        tenant = tenantRepository.save(tenant);
         return tenant;
     }
 
