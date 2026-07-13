@@ -1,5 +1,6 @@
 package org.immregistries.iis.kernal.persisted.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 /**
@@ -11,11 +12,23 @@ public class IisShLinkContent {
 
 	@Id
 	private int id;
-	@ManyToOne
-	private UserAccess userAccess;
+
 	@Column(columnDefinition = "TEXT")
 	private String content;
 	private Long exp;
+
+	@JsonIgnore
+	/**
+	 * For referencing when stored, to be accessible in the UI
+	 */
+	private String patientId;
+
+	@JsonIgnore
+	/**
+	 * For referencing when stored, to be accessible in the UI
+	 */
+	@ManyToOne
+	private Tenant tenant;
 
 	public int getId() {
 		return id;
@@ -23,14 +36,6 @@ public class IisShLinkContent {
 
 	public void setId(int id) {
 		this.id = id;
-	}
-
-	public UserAccess getUserAccess() {
-		return userAccess;
-	}
-
-	public void setUserAccess(UserAccess userAccess) {
-		this.userAccess = userAccess;
 	}
 
 	public String getContent() {
@@ -47,5 +52,21 @@ public class IisShLinkContent {
 
 	public void setExp(Long exp) {
 		this.exp = exp;
+	}
+
+	public String getPatientId() {
+		return patientId;
+	}
+
+	public void setPatientId(String patientId) {
+		this.patientId = patientId;
+	}
+
+	public Tenant getTenant() {
+		return tenant;
+	}
+
+	public void setTenant(Tenant tenant) {
+		this.tenant = tenant;
 	}
 }

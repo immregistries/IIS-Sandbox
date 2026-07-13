@@ -35,7 +35,7 @@ public class ShLinkManifestRestController {
 	@Autowired
 	private RequestTenantUtil requestTenantUtil;
 
-	@GetMapping(IisPathVariable.PlaceHolder.MANIFEST_ID_PLACEHOLDER)
+	@GetMapping(IisRestPath.SH_LINKS_STORED_MANIFEST_FULL_PATH + IisPathVariable.PlaceHolder.MANIFEST_ID_PLACEHOLDER)
 	public ShLinkManifest getManifest(@PathVariable(IisPathVariable.Key.MANIFEST_ID) String manifestId,
 	                                  @RequestAttribute(value = IisRequestAttribute.TENANT_REQUEST_ATTRIBUTE, required = false) Tenant tenant
 	) {
@@ -53,7 +53,7 @@ public class ShLinkManifestRestController {
 		return shLinkManifest;
 	}
 
-	@PostMapping(IisPathVariable.PlaceHolder.MANIFEST_ID_PLACEHOLDER)
+	@PostMapping(IisRestPath.SH_LINKS_STORED_MANIFEST_FULL_PATH + IisPathVariable.PlaceHolder.MANIFEST_ID_PLACEHOLDER)
 	protected ShLinkManifest readShLinkManifest(
 			@PathVariable(IisPathVariable.Key.MANIFEST_ID) String manifestId,
 			@RequestAttribute(value = IisRequestAttribute.TENANT_REQUEST_ATTRIBUTE, required = false) Tenant tenant,
@@ -81,9 +81,19 @@ public class ShLinkManifestRestController {
 		return shLinkManifest;
 	}
 
-	@GetMapping()
+	@GetMapping(IisRestPath.SH_LINKS_STORED_MANIFEST_FULL_PATH)
 	public List<ShLinkManifest> getManifestAll() {
 		return shlinkManifestStoreService.getAllManifests();
+	}
+
+	@GetMapping(IisRestPath.REST_PATIENT_PATH + IisRestPath.BasePath.STORED_MANIFEST_PATH)
+	public List<ShLinkManifest> getDynamicManifestsForPatient(@RequestAttribute(value = IisRequestAttribute.TENANT_REQUEST_ATTRIBUTE) Tenant tenant, @PathVariable(IisPathVariable.Key.PATIENT_ID) String patientId) {
+		return shlinkManifestStoreService.getAllPatientManifests(tenant, patientId);
+	}
+
+	@GetMapping(IisRestPath.REST_TENANT_PATH + IisRestPath.BasePath.STORED_MANIFEST_PATH)
+	public List<ShLinkManifest> getDynamicManifestsForTenant(@RequestAttribute(value = IisRequestAttribute.TENANT_REQUEST_ATTRIBUTE) Tenant tenant) {
+		return shlinkManifestStoreService.getAllTenantManifests(tenant);
 	}
 
 	@GetMapping("/$generate")

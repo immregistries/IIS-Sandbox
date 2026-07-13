@@ -17,6 +17,12 @@ public class ShLinkManifest {
 	@ManyToOne
 	private Tenant tenant;
 
+	@JsonIgnore
+	/**
+	 * For referencing when stored, to be accessible in the UI
+	 */
+	private String patientId;
+
 	@Id
 	@Column(name = "id")
 	private String id;
@@ -87,6 +93,14 @@ public class ShLinkManifest {
 
 	public void setPasscode(String passcode) {
 		this.passcode = passcode;
+	}
+
+	public String getPatientId() {
+		return patientId;
+	}
+
+	public void setPatientId(String patientId) {
+		this.patientId = patientId;
 	}
 
 	@JsonInclude(JsonInclude.Include.NON_EMPTY)

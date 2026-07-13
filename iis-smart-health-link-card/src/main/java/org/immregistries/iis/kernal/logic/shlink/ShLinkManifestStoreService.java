@@ -2,6 +2,7 @@ package org.immregistries.iis.kernal.logic.shlink;
 
 import org.apache.commons.lang3.StringUtils;
 import org.immregistries.iis.kernal.persisted.entities.ShLinkManifest;
+import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.immregistries.iis.kernal.persisted.repository.ShlinkManifestRepository;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +33,14 @@ public class ShLinkManifestStoreService {
 
 	public @NotNull List<ShLinkManifest> getAllManifests() {
 		return shlinkManifestRepository.findAll();
+	}
+
+	public @NotNull List<ShLinkManifest> getAllPatientManifests(Tenant tenant, String patientId) {
+		return shlinkManifestRepository.findByTenantAndPatientId(tenant, patientId);
+	}
+
+	public @NotNull List<ShLinkManifest> getAllTenantManifests(Tenant tenant) {
+		return shlinkManifestRepository.findByTenant(tenant);
 	}
 
 
