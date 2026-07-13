@@ -1,8 +1,9 @@
 import {inject, Injectable} from '@angular/core';
 import {HttpClient, HttpParams} from '@angular/common/http';
-import {Observable} from 'rxjs';
+import {map, Observable} from 'rxjs';
 import {IisPatient, PatientMaster} from '../models/patient.model';
 import {ObservationReported} from '../models/observation.model';
+import {MdmLink} from '../models/mdm-link.model';
 import {ShLinkPayload} from '../models/shlink.model';
 import {VaccinationMaster} from '../../vaccination/models/vaccination.model';
 import {TenantContextService} from '../../../core/services/tenant-context.service';
@@ -70,5 +71,28 @@ export class PatientApiService {
 
   getClvrPdf(patientId: string): Observable<Blob> {
     return this.http.get(`${this.basePath}/${patientId}/clvr/pdf`, {responseType: 'blob'});
+  }
+
+  getMdmLinks(goldenResourceId: string): Observable<MdmLink[]> {
+    const fhirBase = `${environment.apiBaseUrl}/fhir/${this.tenantContext.tenantName()}`;
+    return this.http.get<any>(`${fhirBase}/$mdm-query-links`, {
+      params: new HttpParams().set('goldenResourceId', goldenResourceId),
+    }).pipe(
+      map((params) => {
+        const links: MdmLink[] = [];
+        for (const param of params.parameter || []) {
+          if (param.name !== 'link') continue;
+          const parts = param.part || [];
+          const get = (name: string) => parts.find((p: any) => p.name === name);
+          links.push({
+            goldenResourceId: (get('goldenResourceId')?.valueString || '').replace('Patient/', ''),
+            sourceResourceId: (get('sourceResourceId')?.valueString || '').replace('Patient/', ''),
+            matchResult: get('matchResult')?.valueString || '',
+            score: get('score')?.valueDecimal,
+          });
+        }
+        return links;
+      }),
+    );
   }
 }

@@ -105,7 +105,7 @@ public class ShLinkController {
 			resp.setContentType("image/png"); // Set content type for PNG image
 			uiQrCodeUtil.printQrCodeAsImage(outputStream, qrCode);
 		} else {
-			IisPatient iisPatient = patientRestController.getPatient(patientId, tenant);
+			IisPatient iisPatient = patientRestController.getPatient(patientId, tenant, true);
 			String description = "Newly generated Qr Code, with IPS of patient " + iisPatient.getLegalNameOrFirst().asSingleString();
 			String imageUrl = req.getRequestURL().toString() + QR_TO_IMAGE_BASE_PATH + "?" + QR_CODE_PARAM + "=" + qrCode;
 			resp.setContentType("text/html");

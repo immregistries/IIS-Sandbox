@@ -41,16 +41,6 @@ public class IisPatient extends IisMappedToFhirResource implements Serializable,
 	private String managingOrganizationId;
 	private String generalPractitionerId;
 
-//	private boolean isMdmGolden = false;
-//
-//	public boolean isMdmGolden() {
-//		return isMdmGolden;
-//	}
-//
-//	public void setMdmGolden(boolean mdmGolden) {
-//		isMdmGolden = mdmGolden;
-//	}
-
 	public String getManagingOrganizationId() {
 		return managingOrganizationId;
 	}
@@ -436,4 +426,12 @@ public class IisPatient extends IisMappedToFhirResource implements Serializable,
 	public void setGeneralPractitionerId(String generalPractitionerId) {
 		this.generalPractitionerId = generalPractitionerId;
 	}
+
+//	/**
+//	 * DO NOT USE outside serialization
+//	 * @return
+//	 */
+//	public Boolean isMdmGolden() {
+//		return null;
+//	}
 }

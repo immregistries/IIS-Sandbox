@@ -28,3 +28,15 @@ a {
 .login-card {
   width: 400px;
 }
+
+.mdm-node-golden.p-organizationchart-node {
+  background: var(--p-tag-warn-background);
+  color: var(--p-tag-warn-color);
+  border-color: var(--p-tag-warn-background);
+}
+
+.mdm-node-reported.p-organizationchart-node {
+  background: var(--p-tag-info-background);
+  color: var(--p-tag-info-color);
+  border-color: var(--p-tag-info-background);
+}

@@ -1,20 +1,26 @@
-import {Component, inject} from '@angular/core';
+import {Component, computed, inject, OnInit, signal} from '@angular/core';
 import {Button} from 'primeng/button';
 import {Tag} from 'primeng/tag';
+import {Tooltip} from 'primeng/tooltip';
 import {AuthService} from '../../../core/services/auth.service';
 import {TenantContextService} from '../../../core/services/tenant-context.service';
 import {ThemeService} from '../../../core/services/theme.service';
+import {TenantApiService} from '../../../features/tenant/services/tenant-api.service';
+import {getActiveFlavors, ProcessingFlavor} from '../../../features/tenant/models/flavor.model';
 
 @Component({
   selector: 'app-topbar',
   standalone: true,
-  imports: [Button, Tag],
+  imports: [Button, Tag, Tooltip],
   template: `
     <header class="topbar">
       <div class="topbar-left">
         <p-tag value="FHIR R4" severity="info" />
         @if (tenantContext.hasTenant()) {
           <span class="tenant-badge">{{ tenantContext.tenantName() }}</span>
+          @for (flavor of activeFlavorsWithDesc(); track flavor.key) {
+            <p-tag [value]="flavor.key" severity="success" [rounded]="true" [pTooltip]="flavor.behaviorDescription" tooltipPosition="bottom" />
+          }
         }
       </div>
       <div class="topbar-right">
@@ -56,8 +62,24 @@ import {ThemeService} from '../../../core/services/theme.service';
     }
   `,
 })
-export class TopbarComponent {
+export class TopbarComponent implements OnInit {
   authService = inject(AuthService);
   tenantContext = inject(TenantContextService);
   themeService = inject(ThemeService);
+  private tenantApi = inject(TenantApiService);
+
+  private allFlavors = signal<ProcessingFlavor[]>([]);
+
+  activeFlavorsWithDesc = computed(() => {
+    const name = this.tenantContext.tenantName();
+    if (!name) return [];
+    const active = getActiveFlavors(name, this.allFlavors());
+    return this.allFlavors().filter((f) => active.has(f.key));
+  });
+
+  ngOnInit(): void {
+    this.tenantApi.getFlavors().subscribe({
+      next: (flavors) => this.allFlavors.set(flavors),
+    });
+  }
 }

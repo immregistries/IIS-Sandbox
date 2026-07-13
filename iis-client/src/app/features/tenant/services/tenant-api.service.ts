@@ -2,6 +2,7 @@ import {inject, Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {Tenant} from '../models/tenant.model';
+import {ProcessingFlavor} from '../models/flavor.model';
 import {environment} from '../../../../environments/environment';
 
 @Injectable({providedIn: 'root'})
@@ -19,5 +20,9 @@ export class TenantApiService {
 
   createTenant(tenant: Partial<Tenant>): Observable<Tenant> {
     return this.http.post<Tenant>(this.base, tenant);
+  }
+
+  getFlavors(): Observable<ProcessingFlavor[]> {
+    return this.http.get<ProcessingFlavor[]>(`${environment.apiBaseUrl}/rest/flavors`);
   }
 }

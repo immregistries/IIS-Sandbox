@@ -46,6 +46,10 @@ export const routes: Routes = [
             path: 'sh-link',
             loadChildren: () => import('./features/shlink/shlink.routes').then((m) => m.SHLINK_ROUTES),
           },
+          {
+            path: 'wsdl',
+            loadChildren: () => import('./features/wsdl/wsdl.routes').then((m) => m.WSDL_ROUTES),
+          },
           {path: '', redirectTo: 'patients', pathMatch: 'full'},
         ],
       },

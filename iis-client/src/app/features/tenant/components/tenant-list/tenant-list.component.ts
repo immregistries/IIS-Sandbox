@@ -1,8 +1,11 @@
 import {Component, inject, OnInit, signal, viewChild} from '@angular/core';
 import {Router} from '@angular/router';
 import {TableModule} from 'primeng/table';
+import {Tag} from 'primeng/tag';
+import {Tooltip} from 'primeng/tooltip';
 import {Button} from 'primeng/button';
 import {Tenant} from '../../models/tenant.model';
+import {getActiveFlavors, ProcessingFlavor} from '../../models/flavor.model';
 import {TenantApiService} from '../../services/tenant-api.service';
 import {TenantContextService} from '../../../../core/services/tenant-context.service';
 import {TenantCreateDialogComponent} from '../tenant-create-dialog/tenant-create-dialog.component';
@@ -11,11 +14,20 @@ import {LoadingSpinnerComponent} from '../../../../shared/components/loading-spi
 @Component({
   selector: 'app-tenant-list',
   standalone: true,
-  imports: [TableModule, Button, TenantCreateDialogComponent, LoadingSpinnerComponent],
+  imports: [TableModule, Tag, Tooltip, Button, TenantCreateDialogComponent, LoadingSpinnerComponent],
   template: `
     <div class="tenant-list-page">
       <div class="page-header">
-        <h1>Tenants</h1>
+        <h1>
+          Tenants
+          <p-tag
+            value="?"
+            [rounded]="true"
+            severity="info"
+            pTooltip="Tenants are separated testing environments. One Tenant ≘ One IIS equivalent. Different Facilities can be registered as information sources to the Tenants."
+            tooltipPosition="right"
+          />
+        </h1>
         <p-button label="Create Tenant" icon="pi pi-plus" (onClick)="createDialog().open()" />
       </div>
 
@@ -27,6 +39,7 @@ import {LoadingSpinnerComponent} from '../../../../shared/components/loading-spi
             <tr>
               <th>ID</th>
               <th>Name</th>
+              <th>Flavors</th>
               <th style="width: 120px">Actions</th>
             </tr>
           </ng-template>
@@ -35,19 +48,32 @@ import {LoadingSpinnerComponent} from '../../../../shared/components/loading-spi
               <td>{{ tenant.orgId }}</td>
               <td>{{ tenant.organizationName }}</td>
               <td>
+                <div class="flavor-tags">
+                  @for (key of getActiveFlavorKeys(tenant.organizationName); track key) {
+                    <p-tag
+                      [value]="key"
+                      severity="success"
+                      [rounded]="true"
+                      [pTooltip]="getFlavorDescription(key)"
+                      tooltipPosition="top"
+                    />
+                  }
+                </div>
+              </td>
+              <td>
                 <p-button label="Select" icon="pi pi-arrow-right" size="small" [text]="true" (onClick)="selectTenant(tenant)" />
               </td>
             </tr>
           </ng-template>
           <ng-template #emptymessage>
             <tr>
-              <td colspan="3" class="text-center">No tenants found. Create one to get started.</td>
+              <td colspan="4" class="text-center">No tenants found. Create one to get started.</td>
             </tr>
           </ng-template>
         </p-table>
       }
 
-      <app-tenant-create-dialog (created)="loadTenants()" />
+      <app-tenant-create-dialog [flavors]="flavors()" (created)="loadTenants()" />
     </div>
   `,
   styles: `
@@ -59,6 +85,11 @@ import {LoadingSpinnerComponent} from '../../../../shared/components/loading-spi
       h1 { margin: 0; }
     }
     .text-center { text-align: center; color: var(--p-text-muted-color); }
+    .flavor-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.25rem;
+    }
   `,
 })
 export class TenantListComponent implements OnInit {
@@ -69,10 +100,20 @@ export class TenantListComponent implements OnInit {
   createDialog = viewChild.required(TenantCreateDialogComponent);
 
   tenants = signal<Tenant[]>([]);
+  flavors = signal<ProcessingFlavor[]>([]);
   loading = signal(false);
+
+  private flavorMap = new Map<string, string>();
 
   ngOnInit(): void {
     this.loadTenants();
+    this.tenantApi.getFlavors().subscribe({
+      next: (flavors) => {
+        this.flavors.set(flavors);
+        this.flavorMap.clear();
+        for (const f of flavors) this.flavorMap.set(f.key, f.behaviorDescription);
+      },
+    });
   }
 
   loadTenants(): void {
@@ -84,6 +125,14 @@ export class TenantListComponent implements OnInit {
       },
       error: () => this.loading.set(false),
     });
+  }
+
+  getActiveFlavorKeys(tenantName: string): string[] {
+    return [...getActiveFlavors(tenantName, this.flavors())];
+  }
+
+  getFlavorDescription(key: string): string {
+    return this.flavorMap.get(key) || '';
   }
 
   selectTenant(tenant: Tenant): void {

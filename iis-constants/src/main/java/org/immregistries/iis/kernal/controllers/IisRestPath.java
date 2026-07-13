@@ -53,6 +53,7 @@ public final class IisRestPath {
 		public static final String SH_LINK_FILES_KEY = "sh-link-files";
 		public static final String STORED_MANIFEST_KEY = "stored-manifest";
 		public static final String SUBSCRIPTION_TOPIC_KEY = "SubscriptionTopic";
+		public static final String FLAVORS_KEY = "flavors";
 	}
 
 	public enum RestKey {
@@ -83,7 +84,8 @@ public final class IisRestPath {
 		SH_LINK(Key.SH_LINK_KEY),
 		STORED_MANIFEST(Key.STORED_MANIFEST_KEY),
 		SUBSCRIPTION_TOPIC(Key.SUBSCRIPTION_TOPIC_KEY),
-		SH_LINK_FILES(Key.SH_LINK_FILES_KEY);
+		SH_LINK_FILES(Key.SH_LINK_FILES_KEY),
+		FLAVORS(Key.FLAVORS_KEY);
 
 		private final String key;
 
@@ -127,6 +129,7 @@ public final class IisRestPath {
 		public static final String SH_LINK_PATH = "/" + Key.SH_LINK_KEY;
 		public static final String STORED_MANIFEST_PATH = "/" + Key.STORED_MANIFEST_KEY;
 		public static final String SUBSCRIPTION_TOPIC_PATH = "/" + Key.SUBSCRIPTION_TOPIC_KEY;
+		public static final String FLAVORS_PATH = "/" + Key.FLAVORS_KEY;
 
 	}
 }

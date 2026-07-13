@@ -50,6 +50,12 @@ import {TenantContextService} from '../../../core/services/tenant-context.servic
               <span>Smart Health Link</span>
             </a>
           </li>
+          <li>
+            <a [routerLink]="wsdlLink()" routerLinkActive="active" class="nav-link">
+              <i class="pi pi-code"></i>
+              <span>CDC WSDL</span>
+            </a>
+          </li>
         }
       </ul>
     </nav>
@@ -106,4 +112,5 @@ export class SidebarComponent {
   messagesLink = computed(() => `/t/${this.tenantContext.tenantName()}/messages`);
   popLink = computed(() => `/t/${this.tenantContext.tenantName()}/pop`);
   shLinkLink = computed(() => `/t/${this.tenantContext.tenantName()}/sh-link`);
+  wsdlLink = computed(() => `/t/${this.tenantContext.tenantName()}/wsdl`);
 }

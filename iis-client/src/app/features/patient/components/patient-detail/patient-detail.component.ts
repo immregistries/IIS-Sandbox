@@ -8,12 +8,14 @@ import {Button} from 'primeng/button';
 import {TableModule} from 'primeng/table';
 import {IisPatient} from '../../models/patient.model';
 import {ObservationReported} from '../../models/observation.model';
+import {MdmLink} from '../../models/mdm-link.model';
 import {VaccinationMaster} from '../../../vaccination/models/vaccination.model';
 import {PatientApiService} from '../../services/patient-api.service';
 import {TenantContextService} from '../../../../core/services/tenant-context.service';
 import {LoadingSpinnerComponent} from '../../../../shared/components/loading-spinner/loading-spinner.component';
 import {PatientObservationsComponent} from '../patient-observations/patient-observations.component';
 import {PatientRelatedComponent} from '../patient-related/patient-related.component';
+import {PatientMdmChartComponent} from '../patient-mdm-chart/patient-mdm-chart.component';
 import {PatientHealthCardsComponent} from '../patient-health-cards/patient-health-cards.component';
 import {PatientFhirLinksComponent} from '../patient-fhir-links/patient-fhir-links.component';
 import {DateFormatPipe} from '../../../../shared/pipes/date-format.pipe';
@@ -31,6 +33,7 @@ import {DateFormatPipe} from '../../../../shared/pipes/date-format.pipe';
     LoadingSpinnerComponent,
     PatientObservationsComponent,
     PatientRelatedComponent,
+    PatientMdmChartComponent,
     PatientHealthCardsComponent,
     PatientFhirLinksComponent,
     DateFormatPipe,
@@ -175,7 +178,17 @@ import {DateFormatPipe} from '../../../../shared/pipes/date-format.pipe';
             </p-tabpanel>
 
             <p-tabpanel value="3">
+
               <app-patient-related [patients]="relatedPatients()" [isGolden]="!asNonGolden()" (selected)="viewRelatedPatient($event)" />
+             @if (relatedPatients().length) {
+                <app-patient-mdm-chart
+                  [patient]="patient()!"
+                  [relatedPatients]="relatedPatients()"
+                  [mdmLinks]="mdmLinks()"
+                  [isGolden]="!asNonGolden()"
+                  (selected)="viewRelatedPatient($event)"
+                />
+              }
             </p-tabpanel>
 
             <p-tabpanel value="4">
@@ -229,6 +242,7 @@ export class PatientDetailComponent implements OnInit {
   vaccinations = signal<VaccinationMaster[]>([]);
   observations = signal<ObservationReported[]>([]);
   relatedPatients = signal<IisPatient[]>([]);
+  mdmLinks = signal<MdmLink[]>([]);
   loading = signal(true);
 
   ngOnInit(): void {
@@ -249,6 +263,9 @@ export class PatientDetailComponent implements OnInit {
     this.patientApi.getPatientVaccinations(patientId, isGolden).subscribe((v) => this.vaccinations.set(v));
     this.patientApi.getPatientObservations(patientId, isGolden).subscribe((o) => this.observations.set(o));
     this.patientApi.getRelatedPatients(patientId, isGolden).subscribe((r) => this.relatedPatients.set(r));
+    if (isGolden) {
+      this.patientApi.getMdmLinks(patientId).subscribe((links) => this.mdmLinks.set(links));
+    }
   }
 
   viewVaccination(vaccinationId: string): void {
