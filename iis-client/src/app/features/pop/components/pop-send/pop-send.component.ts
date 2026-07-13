@@ -24,6 +24,7 @@ import {PopApiService} from '../../services/pop-api.service';
 
       <p-card header="VXU Message">
         <div class="form-layout">
+          <p-button label="New Sample" icon="pi pi-file-plus" severity="secondary" [outlined]="true" size="small" (onClick)="onNewSample()" [loading]="loadingSample()" />
           <textarea
             pTextarea
             [(ngModel)]="messageData"
@@ -109,6 +110,7 @@ export class PopSendComponent implements OnInit {
   response = signal<string | null>(null);
   error = signal<string | null>(null);
   submitting = signal(false);
+  loadingSample = signal(false);
 
   private sampleMessage = '';
 
@@ -137,6 +139,18 @@ export class PopSendComponent implements OnInit {
         this.error.set(err.message || 'Failed to send message');
         this.submitting.set(false);
       },
+    });
+  }
+
+  onNewSample(): void {
+    this.loadingSample.set(true);
+    this.popApi.getSampleMessage().subscribe({
+      next: (sample) => {
+        this.sampleMessage = sample;
+        this.messageData.set(sample);
+        this.loadingSample.set(false);
+      },
+      error: () => this.loadingSample.set(false),
     });
   }
 
