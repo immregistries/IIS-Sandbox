@@ -44,9 +44,9 @@ public class RecommendationRestController {
 
 		IGenericClient fhirClient = iisFhirClientFactory.getOrCreateGenericClient(req);
 		IDomainResource patient = patientServletUtil.fetchPatientFromParameter(req, fhirClient, fhirSearchRequester);
-		IisPatient patientMaster = patientMapper.localObject(patient);
 
 		if (patient != null) {
+			IisPatient patientMaster = patientMapper.localObject(patient);
 			IAnyResource recommendation = immunizationRecommendationService.getPatientRecommendation(fhirClient,
 					patient);
 			if (recommendation != null) {

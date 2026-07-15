@@ -47,6 +47,16 @@ export const routes: Routes = [
             loadChildren: () => import('./features/shlink/shlink.routes').then((m) => m.SHLINK_ROUTES),
           },
           {
+            path: 'subscription',
+            loadChildren: () =>
+              import('./features/subscription/subscription.routes').then((m) => m.SUBSCRIPTION_ROUTES),
+          },
+          {
+            path: 'recommendation',
+            loadChildren: () =>
+              import('./features/recommendation/recommendation.routes').then((m) => m.RECOMMENDATION_ROUTES),
+          },
+          {
             path: 'fhir-messaging',
             loadChildren: () =>
               import('./features/fhir-messaging/fhir-messaging.routes').then((m) => m.FHIR_MESSAGING_ROUTES),

@@ -13,6 +13,7 @@ import org.immregistries.iis.kernal.enums.VaccinationRecommendationDateCode;
 import org.immregistries.iis.kernal.enums.VaccinePlanStatus;
 import org.immregistries.iis.kernal.mapping.mappers.fields.r5.BusinessIdentifierMapperR5;
 import org.immregistries.iis.kernal.mapping.mappers.resources.RecommendationMapper;
+import org.immregistries.iis.kernal.model.IisPatient;
 import org.immregistries.iis.kernal.model.IisRecommendation;
 import org.immregistries.iis.kernal.services.CodeMapManagerService;
 import org.immregistries.vfa.connect.model.ForecastActual;
@@ -48,9 +49,10 @@ public class ImmunizationRecommendationMapperR5 extends RecommendationMapper<Imm
 
 	public ImmunizationRecommendation fhirObject(IisRecommendation iisRecommendation) {
 		ImmunizationRecommendation immunizationRecommendation = toFhir(iisRecommendation.getForecastActualList(), iisRecommendation.getDate());
-		if (iisRecommendation.getIisPatient() != null) {
-			immunizationRecommendation.setPatient(new Reference()
-				.setIdentifier(businessIdentifierMapper.fhirObject(iisRecommendation.getIisPatient().getMainBusinessIdentifier())));
+		IisPatient iisPatient = iisRecommendation.getIisPatient();
+		if (iisPatient != null) {
+			immunizationRecommendation.setPatient(new Reference().setReference("Patient/" + iisPatient.getPatientId())
+				.setIdentifier(businessIdentifierMapper.fhirObject(iisPatient.getMainBusinessIdentifier())));
 		}
 		immunizationRecommendation.setId(iisRecommendation.getId());
 		immunizationRecommendation.setAuthority(new Reference().setIdentifier(businessIdentifierMapper.fhirObject(iisRecommendation.getAuthority())));

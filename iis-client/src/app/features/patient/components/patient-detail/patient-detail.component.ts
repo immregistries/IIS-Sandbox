@@ -18,6 +18,9 @@ import {PatientRelatedComponent} from '../patient-related/patient-related.compon
 import {PatientMdmChartComponent} from '../patient-mdm-chart/patient-mdm-chart.component';
 import {PatientHealthCardsComponent} from '../patient-health-cards/patient-health-cards.component';
 import {PatientFhirLinksComponent} from '../patient-fhir-links/patient-fhir-links.component';
+import {
+  PatientRecommendationsComponent
+} from '../../../recommendation/components/patient-recommendations/patient-recommendations.component';
 import {DateFormatPipe} from '../../../../shared/pipes/date-format.pipe';
 
 @Component({
@@ -36,6 +39,7 @@ import {DateFormatPipe} from '../../../../shared/pipes/date-format.pipe';
     PatientMdmChartComponent,
     PatientHealthCardsComponent,
     PatientFhirLinksComponent,
+    PatientRecommendationsComponent,
     DateFormatPipe,
   ],
   template: `
@@ -77,7 +81,8 @@ import {DateFormatPipe} from '../../../../shared/pipes/date-format.pipe';
             <p-tab value="2">Observations ({{ observations().length }})</p-tab>
             <p-tab value="3">Related Patients ({{ relatedPatients().length }})</p-tab>
             <p-tab value="4">Health Cards</p-tab>
-            <p-tab value="5">FHIR API</p-tab>
+            <p-tab value="5">Recommendations</p-tab>
+            <p-tab value="6">FHIR API</p-tab>
           </p-tablist>
           <p-tabpanels>
             <p-tabpanel value="0">
@@ -196,6 +201,10 @@ import {DateFormatPipe} from '../../../../shared/pipes/date-format.pipe';
             </p-tabpanel>
 
             <p-tabpanel value="5">
+              <app-patient-recommendations [patientId]="patient()!.patientId" />
+            </p-tabpanel>
+
+            <p-tabpanel value="6">
               <app-patient-fhir-links [patientId]="patient()!.patientId" />
             </p-tabpanel>
           </p-tabpanels>
