@@ -47,6 +47,16 @@ export const routes: Routes = [
             loadChildren: () => import('./features/shlink/shlink.routes').then((m) => m.SHLINK_ROUTES),
           },
           {
+            path: 'fhir-messaging',
+            loadChildren: () =>
+              import('./features/fhir-messaging/fhir-messaging.routes').then((m) => m.FHIR_MESSAGING_ROUTES),
+          },
+          {
+            path: 'v2-to-fhir',
+            loadChildren: () =>
+              import('./features/v2-to-fhir/v2-to-fhir.routes').then((m) => m.V2_TO_FHIR_ROUTES),
+          },
+          {
             path: 'wsdl',
             loadChildren: () => import('./features/wsdl/wsdl.routes').then((m) => m.WSDL_ROUTES),
           },

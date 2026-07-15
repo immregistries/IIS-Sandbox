@@ -40,3 +40,38 @@ a {
   color: var(--p-tag-info-color);
   border-color: var(--p-tag-info-background);
 }
+
+:root {
+  --ngx-json-font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+  --ngx-json-font-size: inherit;
+  --ngx-json-key: var(--p-primary-color);
+  --ngx-json-separator: var(--p-text-muted-color);
+  --ngx-json-value: var(--p-text-color);
+  --ngx-json-string: var(--p-green-500);
+  --ngx-json-number: var(--p-cyan-500);
+  --ngx-json-boolean: var(--p-purple-500);
+  --ngx-json-date: var(--p-teal-500);
+  --ngx-json-array: var(--p-text-muted-color);
+  --ngx-json-object: var(--p-text-muted-color);
+  --ngx-json-function: var(--p-text-muted-color);
+  --ngx-json-null: var(--p-red-400);
+  --ngx-json-null-bg: transparent;
+  --ngx-json-undefined: var(--p-text-muted-color);
+  --ngx-json-undefined-key: var(--p-text-muted-color);
+  --ngx-json-toggler: var(--p-text-muted-color);
+}
+
+.json-viewer-container {
+  font-size: 0.85rem;
+}
+
+.json-viewer-container .ngx-json-viewer {
+  overflow: visible !important;
+  width: max-content !important;
+  min-width: 100%;
+}
+
+.json-viewer-container .ngx-json-viewer .segment .segment-main {
+  word-wrap: normal !important;
+  white-space: nowrap !important;
+}

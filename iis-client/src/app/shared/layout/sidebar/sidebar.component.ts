@@ -45,6 +45,18 @@ import {TenantContextService} from '../../../core/services/tenant-context.servic
             </a>
           </li>
           <li>
+            <a [routerLink]="fhirMessagingLink()" routerLinkActive="active" class="nav-link">
+              <i class="pi pi-comment"></i>
+              <span>FHIR Messaging</span>
+            </a>
+          </li>
+          <li>
+            <a [routerLink]="v2ToFhirLink()" routerLinkActive="active" class="nav-link">
+              <i class="pi pi-arrows-h"></i>
+              <span>V2 to FHIR</span>
+            </a>
+          </li>
+          <li>
             <a [routerLink]="shLinkLink()" routerLinkActive="active" class="nav-link">
               <i class="pi pi-link"></i>
               <span>Smart Health Link</span>
@@ -111,6 +123,8 @@ export class SidebarComponent {
   patientsLink = computed(() => `/t/${this.tenantContext.tenantName()}/patients`);
   messagesLink = computed(() => `/t/${this.tenantContext.tenantName()}/messages`);
   popLink = computed(() => `/t/${this.tenantContext.tenantName()}/pop`);
+  fhirMessagingLink = computed(() => `/t/${this.tenantContext.tenantName()}/fhir-messaging`);
+  v2ToFhirLink = computed(() => `/t/${this.tenantContext.tenantName()}/v2-to-fhir`);
   shLinkLink = computed(() => `/t/${this.tenantContext.tenantName()}/sh-link`);
   wsdlLink = computed(() => `/t/${this.tenantContext.tenantName()}/wsdl`);
 }
