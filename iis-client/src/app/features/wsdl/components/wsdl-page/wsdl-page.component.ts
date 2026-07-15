@@ -57,9 +57,10 @@ import {environment} from '../../../../../environments/environment';
                 </ul>
               }
               <ng-template #footer>
-                <a [href]="endpoint.path + '?wsdl=true'" target="_blank">
-                  <p-button [label]="endpoint.path" icon="pi pi-external-link" severity="secondary" [outlined]="true" size="small" />
-                </a>
+                <div class="endpoint-link">
+                  <code class="endpoint-path">{{ endpoint.path }}</code>
+                  <p-button icon="pi pi-copy" [rounded]="true" [text]="true" size="small" (onClick)="copyToClipboard(endpoint.path)" />
+                </div>
               </ng-template>
             </p-card>
           }
@@ -80,12 +81,25 @@ import {environment} from '../../../../../environments/environment';
     }
     ul { padding-left: 1.25rem; }
     a { text-decoration: none; }
+    .endpoint-link {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+    .endpoint-path {
+      font-size: 0.8rem;
+      word-break: break-all;
+    }
   `,
 })
 export class WsdlPageComponent {
   private tenantContext = inject(TenantContextService);
 
   soapUrl = computed(() => `${environment.apiBaseUrl}/tenant/${this.tenantContext.tenantName()}/soap`);
+
+  copyToClipboard(path: string): void {
+    navigator.clipboard.writeText(`${environment.apiBaseUrl}/${path}`);
+  }
 
   endpoints = computed(() => {
     const base = 'wsdl-demo';

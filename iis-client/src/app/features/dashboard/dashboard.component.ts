@@ -8,12 +8,13 @@ import {Tag} from 'primeng/tag';
 import {Tooltip} from 'primeng/tooltip';
 import {TenantContextService} from '../../core/services/tenant-context.service';
 import {TenantApiService} from '../tenant/services/tenant-api.service';
+import {TenantSelectorComponent} from '../../shared/components/tenant-selector/tenant-selector.component';
 import {getActiveFlavors, ProcessingFlavor} from '../tenant/models/flavor.model';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [RouterLink, Card, Button, Message, Panel, Tag, Tooltip],
+  imports: [RouterLink, Card, Button, Message, Panel, Tag, Tooltip, TenantSelectorComponent],
   template: `
     <div class="dashboard">
       <h1>Dashboard</h1>
@@ -70,6 +71,11 @@ import {getActiveFlavors, ProcessingFlavor} from '../tenant/models/flavor.model'
                 <p-button label="Messages" icon="pi pi-envelope" [routerLink]="messagesLink()" severity="secondary" size="small" />
               </div>
             </ng-template>
+          </p-card>
+        } @else {
+          <p-card header="Select a Tenant">
+            <p>Select a tenant to access patient and messaging features.</p>
+            <app-tenant-selector />
           </p-card>
         }
       </div>

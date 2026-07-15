@@ -4,11 +4,15 @@ import {Router} from '@angular/router';
 import {map, Observable, of, tap} from 'rxjs';
 import {AuthInfo} from '../models/auth.model';
 import {environment} from '../../../environments/environment';
+import {TenantContextService} from './tenant-context.service';
+import {TenantApiService} from '../../features/tenant/services/tenant-api.service';
 
 @Injectable({providedIn: 'root'})
 export class AuthService {
   private http = inject(HttpClient);
   private router = inject(Router);
+  private tenantContext = inject(TenantContextService);
+  private tenantApi = inject(TenantApiService);
 
   private _auth = signal<AuthInfo | null>(null);
   private _loaded = signal(false);
@@ -94,10 +98,8 @@ export class AuthService {
       .subscribe({
         next: () => {
           this.checkAuth(() => {
-            console.info(this._auth())
-            console.info(this.isAuthenticated())
             if (this.isAuthenticated()) {
-              this.router.navigate(['/dashboard']);
+              this.resolveLoginTenant(tenantName);
             } else {
               this._error.set('Invalid credentials');
             }
@@ -110,6 +112,25 @@ export class AuthService {
       });
   }
 
+  private resolveLoginTenant(tenantName?: string): void {
+    if (!tenantName) {
+      this.router.navigate(['/dashboard']);
+      return;
+    }
+    this.tenantApi.getTenants().subscribe({
+      next: (tenants) => {
+        const match = tenants.find(t => t.organizationName === tenantName);
+        if (match) {
+          this.tenantContext.setTenant(match);
+          this.router.navigate(['/dashboard']);
+        } else {
+          this.router.navigate(['/dashboard']);
+        }
+      },
+      error: () => this.router.navigate(['/dashboard']),
+    });
+  }
+
   getGitHubLoginUrl(): string {
     return `${environment.apiBaseUrl}/oauth2/authorization/github`;
   }
@@ -120,10 +141,12 @@ export class AuthService {
       .subscribe({
         next: () => {
           this._auth.set(null);
+          this.tenantContext.clearTenant();
           this.router.navigate(['/login']);
         },
         error: () => {
           this._auth.set(null);
+          this.tenantContext.clearTenant();
           this.router.navigate(['/login']);
         },
       });
