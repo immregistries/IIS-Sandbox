@@ -38,4 +38,10 @@ public class ShLinkCreationRequestDTO {
 	@JsonSetter(nulls = Nulls.SKIP)
 	private String exp = "10000000";
 
+	@JsonProperty("label")
+	private String label;
+
+	@JsonProperty("description")
+	private String description;
+
 }

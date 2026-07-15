@@ -4,13 +4,14 @@ import {Button} from 'primeng/button';
 import {Dialog} from 'primeng/dialog';
 import {ShLinkPayload} from '../../models/shlink.model';
 import {PatientApiService} from '../../services/patient-api.service';
-import {QrCodeCardComponent} from '../qr-code-card/qr-code-card.component';
+import {QrCodeCardComponent} from '../../../../shared/components/qr-code-card/qr-code-card.component';
 import {ShLinkGenerateComponent} from '../../../shlink/components/shlink-generate/shlink-generate.component';
+import {ShLinkTableComponent} from '../../../shlink/components/shlink-table/shlink-table.component';
 
 @Component({
   selector: 'app-patient-health-cards',
   standalone: true,
-  imports: [Button, Dialog, QrCodeCardComponent, ShLinkGenerateComponent],
+  imports: [Button, Dialog, QrCodeCardComponent, ShLinkGenerateComponent, ShLinkTableComponent],
   template: `
     <div class="health-cards">
       <h3>Smart Health Link</h3>
@@ -18,25 +19,28 @@ import {ShLinkGenerateComponent} from '../../../shlink/components/shlink-generat
         @if (patientShLink()) {
           <app-qr-code-card
             header="Patient Static Link"
+            flag="L"
             description="Long term, statically defined Smart Health Link to the Patient Resource"
-            [pictureUrl]="qrCodeUrl()!"
             [codeUri]="shlinkUri(patientShLink()!)"
             [manifestUrl]="patientShLink()!.url"
           />
         }
         @if (ipsShLink()) {
           <app-qr-code-card
+            flag="L"
             header="IPS Static Link"
             description="Long term, statically defined Smart Health Link to the IPS"
-            [pictureUrl]="qrCodeUrl()!"
             [codeUri]="shlinkUri(ipsShLink()!)"
             [manifestUrl]="ipsShLink()!.url"
           />
         }
       </div>
 
+      <h3>Generated Links</h3>
+      <app-shlink-table [patientId]="patientId()" [showPatientColumn]="false" />
+
       <p-button label="Generate a new Smart Health Link" icon="pi pi-link" [outlined]="true" (onClick)="shlinkDialog().open(patientId())" />
-      <app-shlink-generate />
+      <app-shlink-generate (generated)="onGenerated()" />
 
       <h3>European Vaccine Certificate (EVC) - CLVR</h3>
       <p-button label="Generate EVC with IPS" icon="pi pi-file-pdf" [loading]="pdfLoading()" (onClick)="generatePdf()" />
@@ -72,10 +76,10 @@ export class PatientHealthCardsComponent implements OnInit {
 
   patientId = input.required<string>();
   shlinkDialog = viewChild.required(ShLinkGenerateComponent);
+  shlinkTable = viewChild.required(ShLinkTableComponent);
 
   patientShLink = signal<ShLinkPayload | null>(null);
   ipsShLink = signal<ShLinkPayload | null>(null);
-  qrCodeUrl = signal<string | null>(null);
   pdfDialogVisible = signal(false);
   pdfUrl = signal<SafeResourceUrl | null>(null);
   pdfLoading = signal(false);
@@ -84,13 +88,16 @@ export class PatientHealthCardsComponent implements OnInit {
 
   ngOnInit(): void {
     const id = this.patientId();
-    this.qrCodeUrl.set(this.patientApi.getShLinkQrCodeUrl(id));
     this.patientApi.getShLinkPayload(id).subscribe({
       next: (payload) => this.patientShLink.set(payload),
     });
     this.patientApi.getShLinkIpsPayload(id).subscribe({
       next: (payload) => this.ipsShLink.set(payload),
     });
+  }
+
+  onGenerated(): void {
+    this.shlinkTable().reload();
   }
 
   generatePdf(): void {

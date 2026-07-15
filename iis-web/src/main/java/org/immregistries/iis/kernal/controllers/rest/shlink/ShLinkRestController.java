@@ -2,27 +2,32 @@ package org.immregistries.iis.kernal.controllers.rest.shlink;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.immregistries.iis.kernal.IisRequestAttribute;
+import org.immregistries.iis.kernal.controllers.IisPathVariable;
 import org.immregistries.iis.kernal.controllers.IisRestPath;
 import org.immregistries.iis.kernal.controllers.request.shlink.ShLinkCreationRequestDTO;
 import org.immregistries.iis.kernal.logic.shlink.generation.ShLinkGenerator;
+import org.immregistries.iis.kernal.persisted.entities.ShLinkGenerated;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.immregistries.iis.kernal.persisted.entities.UserAccess;
+import org.immregistries.iis.kernal.persisted.repository.ShLinkGeneratedRepository;
 import org.immregistries.iis.kernal.services.QrCodeEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
+import java.util.List;
+
+import static org.immregistries.iis.kernal.controllers.IisRestPath.BasePath.SH_LINK_PATH;
+import static org.immregistries.iis.kernal.controllers.IisRestPath.REST_PATIENT_PATH;
 
 @RestController
-@RequestMapping({IisRestPath.BasePath.REST_PATH + IisRestPath.BasePath.SH_LINK_PATH, IisRestPath.REST_TENANT_PATH + IisRestPath.BasePath.SH_LINK_PATH})
+@RequestMapping()
 public class ShLinkRestController {
 
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -31,8 +36,10 @@ public class ShLinkRestController {
 	private ShLinkGenerator shLinkGenerator;
 	@Autowired
 	private QrCodeEncoder qrCodeEncoder;
+	@Autowired
+	private ShLinkGeneratedRepository shLinkGeneratedRepository;
 
-	@PostMapping()
+	@PostMapping({IisRestPath.BasePath.REST_PATH + SH_LINK_PATH, IisRestPath.REST_TENANT_PATH + SH_LINK_PATH})
 	public String createShLinkIPSQrCode(
 		@AuthenticationPrincipal UserAccess userAccess,
 		HttpServletRequest req,
@@ -46,7 +53,45 @@ public class ShLinkRestController {
 		String passcode = dto.getPasscode();
 		String exp = dto.getExp();
 		ServletUriComponentsBuilder uriBuilder = ServletUriComponentsBuilder.fromRequest(req);
-		String qrCode = shLinkGenerator.generateShLink(keyId, secretKey, patientId, flag, exp, tenant, userAccess, uriBuilder, passcode);
-		return qrCode;
+		String label = dto.getLabel();
+		String description = dto.getDescription();
+		ShLinkGenerated shLinkGenerated = shLinkGenerator.generateShLink(keyId, secretKey, patientId, flag, exp, tenant, userAccess, uriBuilder, passcode, label, description);
+		return shLinkGenerated.getEncodedQR();
+	}
+
+	@GetMapping({IisRestPath.REST_TENANT_PATH + SH_LINK_PATH})
+	public List<ShLinkGenerated> listShLinks(
+		@RequestAttribute(IisRequestAttribute.TENANT_REQUEST_ATTRIBUTE) Tenant tenant) {
+		return shLinkGeneratedRepository.findByTenant(tenant);
+	}
+
+	@GetMapping({REST_PATIENT_PATH + SH_LINK_PATH})
+	public List<ShLinkGenerated> listShLinksByPatientId(
+		@RequestAttribute(IisRequestAttribute.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
+		@PathVariable(IisPathVariable.Key.PATIENT_ID) String patientId) {
+		return shLinkGeneratedRepository.findByTenantAndPatientId(tenant, patientId);
+	}
+
+	@GetMapping({IisRestPath.REST_TENANT_PATH + SH_LINK_PATH + "/{shLinkId}"})
+	public ResponseEntity<ShLinkGenerated> getShLinkById(
+		@RequestAttribute(IisRequestAttribute.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
+		@PathVariable("shLinkId") String shLinkId) {
+		return shLinkGeneratedRepository.findById(shLinkId)
+			.filter(shLink -> shLink.getTenant().getOrgId() == tenant.getOrgId())
+			.map(ResponseEntity::ok)
+			.orElse(ResponseEntity.notFound().build());
+	}
+
+	@DeleteMapping({IisRestPath.REST_TENANT_PATH + SH_LINK_PATH + "/{shLinkId}"})
+	public ResponseEntity<Void> deleteShLink(
+		@RequestAttribute(IisRequestAttribute.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
+		@PathVariable("shLinkId") String shLinkId) {
+		return shLinkGeneratedRepository.findById(shLinkId)
+			.filter(shLink -> shLink.getTenant().getOrgId() == tenant.getOrgId())
+			.map(shLink -> {
+				shLinkGeneratedRepository.delete(shLink);
+				return ResponseEntity.ok().<Void>build();
+			})
+			.orElse(ResponseEntity.notFound().build());
 	}
 }

@@ -1,15 +1,38 @@
-import {Component, input} from '@angular/core';
+import {Component, computed, input} from '@angular/core';
+import {DatePipe} from '@angular/common';
 import {Card} from 'primeng/card';
 import {Button} from 'primeng/button';
+import {Tag} from 'primeng/tag';
+import {QRCodeComponent} from 'angularx-qrcode';
 
 @Component({
   selector: 'app-qr-code-card',
   standalone: true,
-  imports: [Card, Button],
+  imports: [Card, Button, Tag, DatePipe, QRCodeComponent],
   template: `
     <p-card [header]="header()" styleClass="text-center-header">
       <div class="card-body">
-        <img [src]="pictureUrl()" [alt]="header()" class="qr-code" />
+        <qrcode
+          [qrdata]="codeUri()"
+          [errorCorrectionLevel]="'M'"
+          [width]="250"
+          [elementType]="'img'"
+          class="qr-code">
+        </qrcode>
+        <div class="tags">
+          @if (passcodeProtected()) {
+            <p-tag value="Passcode protected" icon="pi pi-lock" severity="warn" />
+          }
+          @if (directFile()) {
+            <p-tag value="Direct File" icon="pi pi-file" severity="info" />
+          }
+          @if (longTerm()) {
+            <p-tag value="Long Term" icon="pi pi-clock" severity="success" />
+          }
+        </div>
+        @if (expirationDate()) {
+          <span class="expiration">Expires: {{ expirationDate() | date:'medium' }}</span>
+        }
         <div class="code-uri">
           <span class="label">
             SHLink URI
@@ -36,9 +59,19 @@ import {Button} from 'primeng/button';
       gap: 0.75rem;
     }
     .qr-code {
-      max-width: 200px;
-      height: auto;
-      border-radius: 4px;
+      display: block;
+      max-width: 250px;
+      margin: 0 auto;
+    }
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      justify-content: center;
+    }
+    .expiration {
+      font-size: 0.8rem;
+      color: var(--p-text-muted-color);
     }
     .code-uri {
       width: 100%;
@@ -70,11 +103,20 @@ import {Button} from 'primeng/button';
   `,
 })
 export class QrCodeCardComponent {
-  header = input('');
-  description = input('');
+  header = input<string | undefined>('');
+  description = input<string | undefined>('');
   codeUri = input('');
-  pictureUrl = input('');
-  manifestUrl = input('');
+  manifestUrl = input<string | undefined>('');
+  flag = input('');
+  exp = input<number | undefined>();
+
+  passcodeProtected = computed(() => this.flag().includes('P'));
+  directFile = computed(() => this.flag().includes('U'));
+  longTerm = computed(() => this.flag().includes('L'));
+  expirationDate = computed(() => {
+    const exp = this.exp();
+    return exp ? new Date(exp * 1000) : null;
+  });
 
   copyToClipboard(): void {
     navigator.clipboard.writeText(this.codeUri());

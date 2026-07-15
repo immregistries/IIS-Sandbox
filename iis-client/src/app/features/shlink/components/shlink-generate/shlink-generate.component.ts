@@ -8,6 +8,7 @@ import {Checkbox} from 'primeng/checkbox';
 import {RadioButton} from 'primeng/radiobutton';
 import {Select} from 'primeng/select';
 import {SelectButton} from 'primeng/selectbutton';
+import {Textarea} from 'primeng/textarea';
 import {Tooltip} from 'primeng/tooltip';
 import {ShLinkApiService} from '../../services/shlink-api.service';
 import {PatientApiService} from '../.././../../features/patient/services/patient-api.service';
@@ -15,9 +16,10 @@ import {PatientApiService} from '../.././../../features/patient/services/patient
 @Component({
   selector: 'app-shlink-generate',
   standalone: true,
-  imports: [FormsModule, InputText, Button, Dialog, Message, Checkbox, RadioButton, Select, SelectButton, Tooltip],
+  imports: [FormsModule, InputText, Button, Dialog, Message, Checkbox, RadioButton, Select, SelectButton, Textarea, Tooltip],
   template: `
-    <p-dialog header="Generate Smart Health Link" [(visible)]="visible" [modal]="true" [style]="{ width: '550px' }">
+    <p-dialog header="Generate Smart Health Link" [(visible)]="visible" [modal]="true" [style]="{ width: '850px' }">
+      <div class="dialog-layout">
       <div class="form-layout">
         <div class="form-group">
           <label for="patientId">Patient</label>
@@ -96,16 +98,42 @@ import {PatientApiService} from '../.././../../features/patient/services/patient
           </div>
         }
       </div>
+
+      <div class="display-side">
+        <h4>Display (optional)</h4>
+        <div class="form-group">
+          <label for="shlinkLabel">Label</label>
+          <input pInputText id="shlinkLabel" [(ngModel)]="label" placeholder="Short description (max 80 chars)" class="w-full" maxlength="80" />
+        </div>
+        <div class="form-group">
+          <label for="shlinkDesc">Description</label>
+          <textarea pTextarea id="shlinkDesc" [(ngModel)]="description" placeholder="Detailed description" class="w-full" [rows]="5"></textarea>
+        </div>
+      </div>
+      </div>
       <ng-template #footer>
         <p-button label="Generate" icon="pi pi-link" [loading]="loading()" (onClick)="onGenerate()" />
       </ng-template>
     </p-dialog>
   `,
   styles: `
+    .dialog-layout {
+      display: flex;
+      gap: 1.5rem;
+    }
     .form-layout {
+      flex: 1;
       display: flex;
       flex-direction: column;
       gap: 0.75rem;
+      min-width: 300px;
+    }
+    .display-side {
+      flex: 0 0 250px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      h4 { margin: 0; }
     }
     .form-group {
       label {
@@ -167,6 +195,8 @@ export class ShLinkGenerateComponent {
   patientId = signal('');
   exp = signal('10000000');
   passcode = signal('');
+  label = signal('');
+  description = signal('');
 
   flagMode = signal<'selector' | 'manual'>('selector');
   flagManual = signal('');
@@ -205,6 +235,8 @@ export class ShLinkGenerateComponent {
     this.accessFlag.set('none');
     this.exp.set('10000000');
     this.passcode.set('');
+    this.label.set('');
+    this.description.set('');
     this.error.set(null);
     this.qrCodeResult.set(null);
     this.visible.set(true);
@@ -237,6 +269,8 @@ export class ShLinkGenerateComponent {
       flag: flag || undefined,
       exp: this.exp() || undefined,
       passcode: this.hasPasscode() ? this.passcode() || undefined : undefined,
+      label: this.label() || undefined,
+      description: this.description() || undefined,
     }).subscribe({
       next: (qrCode) => {
         this.qrCodeResult.set(qrCode);

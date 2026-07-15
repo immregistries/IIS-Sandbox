@@ -1,23 +1,40 @@
 import {Component, viewChild} from '@angular/core';
 import {Button} from 'primeng/button';
 import {ShLinkGenerateComponent} from '../shlink-generate/shlink-generate.component';
+import {ShLinkTableComponent} from '../shlink-table/shlink-table.component';
 
 @Component({
   selector: 'app-shlink-page',
   standalone: true,
-  imports: [Button, ShLinkGenerateComponent],
+  imports: [Button, ShLinkGenerateComponent, ShLinkTableComponent],
   template: `
     <div class="shlink-page">
-      <h1>Smart Health Link</h1>
-      <p-button label="Generate Smart Health Link" icon="pi pi-link" (onClick)="generateDialog().open()" />
-      <app-shlink-generate />
+      <div class="page-header">
+        <h1>Smart Health Links</h1>
+        <p-button label="Generate" icon="pi pi-plus" (onClick)="generateDialog().open()" />
+      </div>
+
+      <app-shlink-table />
+
+      <app-shlink-generate (generated)="onGenerated()" />
     </div>
   `,
   styles: `
     .shlink-page { max-width: 960px; }
-    h1 { margin: 0 0 1rem; }
+    .page-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+      h1 { margin: 0; }
+    }
   `,
 })
 export class ShLinkPageComponent {
   generateDialog = viewChild.required(ShLinkGenerateComponent);
+  shlinkTable = viewChild.required(ShLinkTableComponent);
+
+  onGenerated(): void {
+    this.shlinkTable().reload();
+  }
 }

@@ -11,6 +11,7 @@ import jakarta.persistence.*;
 public class IisShLinkContent {
 
 	@Id
+	@GeneratedValue
 	private int id;
 
 	@Column(columnDefinition = "TEXT")

@@ -9,6 +9,20 @@ export interface ShLinkGenerateRequest {
   flag?: string;
   exp?: string;
   passcode?: string;
+  label?: string;
+  description?: string;
+}
+
+export interface ShLinkGenerated {
+  id: number;
+  url: string;
+  patientId: string;
+  createdAt: string;
+  flag: string;
+  exp: number;
+  encodedQR: string;
+  label: string;
+  description: string;
 }
 
 @Injectable({providedIn: 'root'})
@@ -25,7 +39,27 @@ export class ShLinkApiService {
       .set('patientId', request.patientId)
       .set('flag', request.flag || '')
       .set('exp', request.exp || '10000000')
-      .set('passcode', request.passcode || '');
+        .set('passcode', request.passcode || '')
+        .set('label', request.label || '')
+        .set('description', request.description || '');
     return this.http.post(this.basePath, null, {params, responseType: 'text'});
+  }
+
+  getAll(): Observable<ShLinkGenerated[]> {
+    return this.http.get<ShLinkGenerated[]>(this.basePath);
+  }
+
+  getByPatientId(patientId: string): Observable<ShLinkGenerated[]> {
+    return this.http.get<ShLinkGenerated[]>(
+        `${environment.apiBaseUrl}/rest/tenant/${this.tenantContext.tenantName()}/patient/${patientId}/sh-link`
+    );
+  }
+
+  getById(id: number): Observable<ShLinkGenerated> {
+    return this.http.get<ShLinkGenerated>(`${this.basePath}/${id}`);
+  }
+
+  delete(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.basePath}/${id}`);
   }
 }

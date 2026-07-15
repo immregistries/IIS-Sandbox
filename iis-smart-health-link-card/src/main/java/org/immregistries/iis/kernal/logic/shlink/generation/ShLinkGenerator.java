@@ -11,6 +11,7 @@ import org.immregistries.iis.kernal.model.shlink.ShLinkFilePayload;
 import org.immregistries.iis.kernal.model.shlink.ShLinkPayload;
 import org.immregistries.iis.kernal.persisted.entities.*;
 import org.immregistries.iis.kernal.persisted.repository.IisShlinkContentRepository;
+import org.immregistries.iis.kernal.persisted.repository.ShLinkGeneratedRepository;
 import org.immregistries.iis.kernal.security.RequestTenantUtil;
 import org.immregistries.iis.kernal.services.CompressionService;
 import org.immregistries.iis.kernal.services.KeyStoreService;
@@ -30,10 +31,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.immregistries.iis.kernal.logic.shlink.generation.ShCardGenerator.VERIFIABLE_CREDENTIAL_TYPE;
 
@@ -68,8 +66,10 @@ public class ShLinkGenerator {
 	private QrCodeEncoder qrCodeEncoder;
 	@Autowired
 	private RequestTenantUtil requestTenantUtil;
+	@Autowired
+	private ShLinkGeneratedRepository shLinkGeneratedRepository;
 
-	public String generateShLink(String keyId, String secretKey, String patientId, String flag, String exp, Tenant tenant, UserAccess userAccess, ServletUriComponentsBuilder uriBuilder, String passcode) throws NoSuchAlgorithmException, IOException {
+	public ShLinkGenerated generateShLink(String keyId, String secretKey, String patientId, String flag, String exp, Tenant tenant, UserAccess userAccess, ServletUriComponentsBuilder uriBuilder, String passcode, String label, String description) throws NoSuchAlgorithmException, IOException {
 		/*
 		 * Choosing or generating the keys based on the parameters
 		 */
@@ -90,7 +90,22 @@ public class ShLinkGenerator {
 		URL url = generateShLinkForShCards(List.of(ipsToBeEncoded), shLinkPayload,
 			iisSigningKey, encryptionKeySpec, tenant, patientId, uriBuilder, passcode);
 		shLinkPayload.setUrl(url.toString());
-		return qrCodeEncoder.toBase64QrCode(shLinkPayload);
+
+		String base64QrCode = qrCodeEncoder.toBase64QrCode(shLinkPayload);
+
+
+		ShLinkGenerated shLinkGenerated = new ShLinkGenerated();
+		shLinkGenerated.setId(UUID.randomUUID().toString());
+		shLinkGenerated.setTenant(tenant);
+		shLinkGenerated.setPatientId(patientId);
+		shLinkGenerated.setExp(Long.valueOf(exp));
+		shLinkGenerated.setFlag(flag);
+		shLinkGenerated.setCreatedAt(new Date());
+		shLinkGenerated.setUrl(shLinkPayload.getUrl());
+		shLinkGenerated.setEncodedQR(base64QrCode);
+		shLinkGenerated.setLabel(label);
+		shLinkGenerated.setDescription(description);
+		return shLinkGeneratedRepository.save(shLinkGenerated);
 	}
 
 	/**
