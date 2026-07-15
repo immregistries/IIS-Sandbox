@@ -63,15 +63,6 @@ a {
 
 .json-viewer-container {
   font-size: 0.85rem;
-}
-
-.json-viewer-container .ngx-json-viewer {
-  overflow: visible !important;
-  width: max-content !important;
-  min-width: 100%;
-}
-
-.json-viewer-container .ngx-json-viewer .segment .segment-main {
-  word-wrap: normal !important;
-  white-space: nowrap !important;
+  max-height: calc(80vh - 100px);
+  overflow-y: auto;
 }
