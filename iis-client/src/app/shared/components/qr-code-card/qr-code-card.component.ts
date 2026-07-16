@@ -109,13 +109,17 @@ export class QrCodeCardComponent {
   manifestUrl = input<string | undefined>('');
   flag = input('');
   exp = input<number | undefined>();
+  createdAt = input<string | undefined>();
 
   passcodeProtected = computed(() => this.flag().includes('P'));
   directFile = computed(() => this.flag().includes('U'));
   longTerm = computed(() => this.flag().includes('L'));
   expirationDate = computed(() => {
     const exp = this.exp();
-    return exp ? new Date(exp * 1000) : null;
+    const createdAt = this.createdAt();
+    if (!exp || !createdAt) return null;
+    const createdMs = new Date(createdAt).getTime();
+    return new Date(createdMs + exp * 1000);
   });
 
   copyToClipboard(): void {

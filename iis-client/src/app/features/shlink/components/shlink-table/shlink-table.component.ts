@@ -69,6 +69,7 @@ import {QrCodeCardComponent} from '../../../../shared/components/qr-code-card/qr
             [header]="selectedLink()?.label"
             [manifestUrl]="selectedLink()?.url"
             [exp]="selectedLink()?.exp"
+            [createdAt]="selectedLink()?.createdAt"
           ></app-qr-code-card>
         </div>
       }
