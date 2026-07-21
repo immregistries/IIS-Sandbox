@@ -56,8 +56,8 @@ public class FhirMessagingRestController {
 	@PostMapping(produces = MediaType.TEXT_PLAIN_VALUE)
 	protected String doPost(
 		@RequestBody String message,
-		@RequestParam(PARAM_MESSAGE) String messageParam, // TODO Test and change
-			@RequestParam(PARAM_FACILITY_NAME) String facilityName,
+		@RequestParam(value = PARAM_MESSAGE, required = false) String messageParam, // TODO Test and change
+			@RequestParam(value = PARAM_FACILITY_NAME, required = false, defaultValue = "") String facilityName,
 		@RequestAttribute(IisRequestAttribute.TENANT_REQUEST_ATTRIBUTE) @NotNull Tenant tenant)
 			throws ServletException, IOException, HL7Exception {
 		message = StringUtils.firstNonBlank(message, messageParam);
