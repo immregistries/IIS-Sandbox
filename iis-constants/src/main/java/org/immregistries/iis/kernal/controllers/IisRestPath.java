@@ -54,6 +54,12 @@ public final class IisRestPath {
 		public static final String STORED_MANIFEST_KEY = "stored-manifest";
 		public static final String SUBSCRIPTION_TOPIC_KEY = "SubscriptionTopic";
 		public static final String FLAVORS_KEY = "flavors";
+		public static final String QUERY_CONVERTER_KEY = "query-converter";
+		public static final String COVID_GENERATE_KEY = "covid-generate";
+		public static final String LAB_CONVERTER_KEY = "lab-converter";
+		public static final String VCI_DEMO_KEY = "vci-demo";
+		public static final String VXU_DOWNLOAD_KEY = "vxu-download";
+		public static final String COVID_EXPORT_KEY = "covid-export";
 	}
 
 	public enum RestKey {
@@ -85,7 +91,13 @@ public final class IisRestPath {
 		STORED_MANIFEST(Key.STORED_MANIFEST_KEY),
 		SUBSCRIPTION_TOPIC(Key.SUBSCRIPTION_TOPIC_KEY),
 		SH_LINK_FILES(Key.SH_LINK_FILES_KEY),
-		FLAVORS(Key.FLAVORS_KEY);
+		FLAVORS(Key.FLAVORS_KEY),
+		QUERY_CONVERTER(Key.QUERY_CONVERTER_KEY),
+		COVID_GENERATE(Key.COVID_GENERATE_KEY),
+		LAB_CONVERTER(Key.LAB_CONVERTER_KEY),
+		VCI_DEMO(Key.VCI_DEMO_KEY),
+		VXU_DOWNLOAD(Key.VXU_DOWNLOAD_KEY),
+		COVID_EXPORT(Key.COVID_EXPORT_KEY);
 
 		private final String key;
 
@@ -130,6 +142,11 @@ public final class IisRestPath {
 		public static final String STORED_MANIFEST_PATH = "/" + Key.STORED_MANIFEST_KEY;
 		public static final String SUBSCRIPTION_TOPIC_PATH = "/" + Key.SUBSCRIPTION_TOPIC_KEY;
 		public static final String FLAVORS_PATH = "/" + Key.FLAVORS_KEY;
-
+		public static final String QUERY_CONVERTER_PATH = "/" + Key.QUERY_CONVERTER_KEY;
+		public static final String COVID_GENERATE_PATH = "/" + Key.COVID_GENERATE_KEY;
+		public static final String LAB_CONVERTER_PATH = "/" + Key.LAB_CONVERTER_KEY;
+		public static final String VCI_DEMO_PATH = "/" + Key.VCI_DEMO_KEY;
+		public static final String VXU_DOWNLOAD_PATH = "/" + Key.VXU_DOWNLOAD_KEY;
+		public static final String COVID_EXPORT_PATH = "/" + Key.COVID_EXPORT_KEY;
 	}
 }

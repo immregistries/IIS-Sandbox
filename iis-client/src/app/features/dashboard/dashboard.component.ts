@@ -90,6 +90,21 @@ import {getActiveFlavors, ProcessingFlavor} from '../tenant/models/flavor.model'
           }
         </div>
       </p-panel>
+
+      @if (tenantContext.hasTenant()) {
+        <p-panel header="Legacy Tools" styleClass="mt-4" [toggleable]="true" [collapsed]="true">
+          <div class="function-list">
+            <a [routerLink]="queryConverterLink()">Query Converter — Convert VXU to QBP query messages</a>
+            <a [routerLink]="covidGenerateLink()">COVID Generate — Generate synthetic COVID-19 HL7 messages</a>
+            <a [routerLink]="labConverterLink()">Lab Converter — Convert ORU lab messages to VXU</a>
+            <a [routerLink]="vciDemoLink()">VCI Demo — RSP to Verifiable Credential conversion</a>
+            <a [routerLink]="vacDedupLink()">Vac Dedup — Vaccination deduplication demo</a>
+            <a [routerLink]="fitsLink()">FITS Inspector — Parse and inspect RSP messages</a>
+            <a [routerLink]="vxuDownloadLink()">VXU Download — Download COVID VXU for CDC reporting</a>
+            <a [routerLink]="covidExportLink()">COVID Export — Export COVID flat-file for CDC</a>
+          </div>
+        </p-panel>
+      }
     </div>
   `,
   styles: `
@@ -136,6 +151,15 @@ export class DashboardComponent implements OnInit {
 
   patientsLink = computed(() => `/t/${this.tenantContext.tenantName()}/patients`);
   messagesLink = computed(() => `/t/${this.tenantContext.tenantName()}/messages`);
+
+  queryConverterLink = computed(() => `/t/${this.tenantContext.tenantName()}/legacy/query-converter`);
+  covidGenerateLink = computed(() => `/t/${this.tenantContext.tenantName()}/legacy/covid-generate`);
+  labConverterLink = computed(() => `/t/${this.tenantContext.tenantName()}/legacy/lab-converter`);
+  vciDemoLink = computed(() => `/t/${this.tenantContext.tenantName()}/legacy/vci-demo`);
+  vacDedupLink = computed(() => `/t/${this.tenantContext.tenantName()}/legacy/vac-dedup`);
+  fitsLink = computed(() => `/t/${this.tenantContext.tenantName()}/legacy/fits`);
+  vxuDownloadLink = computed(() => `/t/${this.tenantContext.tenantName()}/legacy/vxu-download`);
+  covidExportLink = computed(() => `/t/${this.tenantContext.tenantName()}/legacy/covid-export`);
 
   activeFlavorsWithDesc = computed(() => {
     const name = this.tenantContext.tenantName();

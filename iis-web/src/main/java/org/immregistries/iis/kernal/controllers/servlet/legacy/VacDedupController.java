@@ -63,7 +63,7 @@ public class VacDedupController {
     PrintWriter out = new PrintWriter(resp.getOutputStream());
     SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
     LinkedImmunization immunizationList = new LinkedImmunization();
-    ArrayList<LinkedImmunization> immunizationListResults = null;
+	  List<VacDedupRestController.LinkedImmunizationResult> immunizationListResults = null;
     try {
       String action = req.getParameter(PARAM_ACTION);
       String actionStatus = null;
@@ -129,7 +129,7 @@ public class VacDedupController {
           if (immunizationList.size() > 1) {
             // Call REST controller
 				 Tenant tenant = requestTenantUtil.extractTenantFromRequestContext();
-            List<LinkedImmunization> results = vacDedupRestController.deduplicate(tenant, request, req);
+				 List<VacDedupRestController.LinkedImmunizationResult> results = vacDedupRestController.deduplicate(tenant, request, req);
             immunizationListResults = new ArrayList<>(results);
           }
         }
@@ -201,7 +201,7 @@ public class VacDedupController {
         if (immunizationListResults != null) {
           out.println("    <h2>" + algorithm + " Results</h2>");
           int i = 0;
-          for (LinkedImmunization li : immunizationListResults) {
+			  for (VacDedupRestController.LinkedImmunizationResult li : immunizationListResults) {
             i++;
             out.println("    <h3>Immunization Set " + i + " " + li.getType() + "</h3>");
             out.println("      <table border=\"1\" cellpadding=\"3\" cellspacing=\"0\">");
@@ -213,7 +213,7 @@ public class VacDedupController {
             out.println("          <th>Org</th>");
             out.println("          <th>Source</th>");
             out.println("        </tr>");
-            for (Immunization imm : li) {
+				  for (Immunization imm : li.getImmunizations()) {
               out.println("        <tr>");
               out.println("          <td>" + sdf.format(imm.getDate()) + "</td>");
               out.println("          <td>" + imm.getCVX() + "</td>");

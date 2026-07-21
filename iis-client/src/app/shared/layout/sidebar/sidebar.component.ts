@@ -80,6 +80,55 @@ import {TenantContextService} from '../../../core/services/tenant-context.servic
               <span>CDC WSDL</span>
             </a>
           </li>
+          <li class="nav-section">Legacy Tools</li>
+          <li>
+            <a [routerLink]="queryConverterLink()" routerLinkActive="active" class="nav-link">
+              <i class="pi pi-sort-alt"></i>
+              <span>Query Converter</span>
+            </a>
+          </li>
+          <li>
+            <a [routerLink]="covidGenerateLink()" routerLinkActive="active" class="nav-link">
+              <i class="pi pi-bolt"></i>
+              <span>COVID Generate</span>
+            </a>
+          </li>
+          <li>
+            <a [routerLink]="labConverterLink()" routerLinkActive="active" class="nav-link">
+              <i class="pi pi-wrench"></i>
+              <span>Lab Converter</span>
+            </a>
+          </li>
+          <li>
+            <a [routerLink]="vciDemoLink()" routerLinkActive="active" class="nav-link">
+              <i class="pi pi-shield"></i>
+              <span>VCI Demo</span>
+            </a>
+          </li>
+          <li>
+            <a [routerLink]="vacDedupLink()" routerLinkActive="active" class="nav-link">
+              <i class="pi pi-clone"></i>
+              <span>Vac Dedup</span>
+            </a>
+          </li>
+          <li>
+            <a [routerLink]="fitsLink()" routerLinkActive="active" class="nav-link">
+              <i class="pi pi-search"></i>
+              <span>FITS Inspector</span>
+            </a>
+          </li>
+          <li>
+            <a [routerLink]="vxuDownloadLink()" routerLinkActive="active" class="nav-link">
+              <i class="pi pi-download"></i>
+              <span>VXU Download</span>
+            </a>
+          </li>
+          <li>
+            <a [routerLink]="covidExportLink()" routerLinkActive="active" class="nav-link">
+              <i class="pi pi-file-export"></i>
+              <span>COVID Export</span>
+            </a>
+          </li>
         }
       </ul>
     </nav>
@@ -141,4 +190,13 @@ export class SidebarComponent {
   subscriptionLink = computed(() => `/t/${this.tenantContext.tenantName()}/subscription`);
   shLinkLink = computed(() => `/t/${this.tenantContext.tenantName()}/sh-link`);
   wsdlLink = computed(() => `/t/${this.tenantContext.tenantName()}/wsdl`);
+
+  queryConverterLink = computed(() => `/t/${this.tenantContext.tenantName()}/legacy/query-converter`);
+  covidGenerateLink = computed(() => `/t/${this.tenantContext.tenantName()}/legacy/covid-generate`);
+  labConverterLink = computed(() => `/t/${this.tenantContext.tenantName()}/legacy/lab-converter`);
+  vciDemoLink = computed(() => `/t/${this.tenantContext.tenantName()}/legacy/vci-demo`);
+  vacDedupLink = computed(() => `/t/${this.tenantContext.tenantName()}/legacy/vac-dedup`);
+  fitsLink = computed(() => `/t/${this.tenantContext.tenantName()}/legacy/fits`);
+  vxuDownloadLink = computed(() => `/t/${this.tenantContext.tenantName()}/legacy/vxu-download`);
+  covidExportLink = computed(() => `/t/${this.tenantContext.tenantName()}/legacy/covid-export`);
 }

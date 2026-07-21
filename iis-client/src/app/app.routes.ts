@@ -70,6 +70,11 @@ export const routes: Routes = [
             path: 'wsdl',
             loadChildren: () => import('./features/wsdl/wsdl.routes').then((m) => m.WSDL_ROUTES),
           },
+          {
+            path: 'legacy',
+            loadChildren: () =>
+              import('./features/legacy/legacy.routes').then((m) => m.LEGACY_ROUTES),
+          },
           {path: '', redirectTo: 'patients', pathMatch: 'full'},
         ],
       },
