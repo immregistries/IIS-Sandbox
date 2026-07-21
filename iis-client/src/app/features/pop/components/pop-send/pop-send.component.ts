@@ -2,15 +2,15 @@ import {Component, inject, OnInit, signal} from '@angular/core';
 import {FormsModule} from '@angular/forms';
 import {InputText} from 'primeng/inputtext';
 import {Button} from 'primeng/button';
-import {Textarea} from 'primeng/textarea';
 import {Card} from 'primeng/card';
 import {Message} from 'primeng/message';
 import {PopApiService} from '../../services/pop-api.service';
+import {InputEditorComponent} from '../../../../shared/components/input-editor/input-editor.component';
 
 @Component({
   selector: 'app-pop-send',
   standalone: true,
-  imports: [FormsModule, InputText, Button, Textarea, Card, Message],
+  imports: [FormsModule, InputText, Button, Card, Message, InputEditorComponent],
   template: `
     <div class="pop-send">
       <h1>Send Now</h1>
@@ -25,13 +25,7 @@ import {PopApiService} from '../../services/pop-api.service';
       <p-card header="VXU Message">
         <div class="form-layout">
           <p-button label="New Sample" icon="pi pi-file-plus" severity="secondary" [outlined]="true" size="small" (onClick)="onNewSample()" [loading]="loadingSample()" />
-          <textarea
-            pTextarea
-            [(ngModel)]="messageData"
-            [rows]="15"
-            class="message-input"
-            placeholder="Paste HL7 VXU message here..."
-          ></textarea>
+          <app-input-editor [(content)]="messageData" placeholder="Paste HL7 VXU message here..." height="360px" />
 
           <div class="options-bar">
             <div class="facility-field">
@@ -48,13 +42,7 @@ import {PopApiService} from '../../services/pop-api.service';
 
       @if (response()) {
         <p-card header="ACK Response" styleClass="mt-4">
-          <textarea
-            pTextarea
-            [ngModel]="response()"
-            [rows]="12"
-            class="message-input"
-            readonly
-          ></textarea>
+          <app-input-editor [content]="response() ?? ''" [readonly]="true" height="288px" />
         </p-card>
       }
 
@@ -71,12 +59,7 @@ import {PopApiService} from '../../services/pop-api.service';
       flex-direction: column;
       gap: 1rem;
     }
-    .message-input {
-      width: 100%;
-      font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
-      font-size: 0.8rem;
-    }
-    .options-bar {
+.options-bar {
       display: flex;
       align-items: flex-end;
       gap: 1rem;

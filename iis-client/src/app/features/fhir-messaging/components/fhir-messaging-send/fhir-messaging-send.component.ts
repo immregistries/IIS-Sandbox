@@ -2,17 +2,17 @@ import {Component, inject, signal, viewChild} from '@angular/core';
 import {FormsModule} from '@angular/forms';
 import {InputText} from 'primeng/inputtext';
 import {Button} from 'primeng/button';
-import {Textarea} from 'primeng/textarea';
 import {Card} from 'primeng/card';
 import {Message} from 'primeng/message';
 import {Tooltip} from 'primeng/tooltip';
 import {FhirMessagingApiService} from '../../services/fhir-messaging-api.service';
 import {JsonViewerDialogComponent} from '../../../../shared/components/json-viewer-dialog/json-viewer-dialog.component';
+import {InputEditorComponent} from '../../../../shared/components/input-editor/input-editor.component';
 
 @Component({
   selector: 'app-fhir-messaging-send',
   standalone: true,
-  imports: [FormsModule, InputText, Button, Textarea, Card, Message, Tooltip, JsonViewerDialogComponent],
+  imports: [FormsModule, InputText, Button, Card, Message, Tooltip, JsonViewerDialogComponent, InputEditorComponent],
   template: `
     <div class="fhir-messaging">
       <h1>FHIR Messaging</h1>
@@ -30,13 +30,7 @@ import {JsonViewerDialogComponent} from '../../../../shared/components/json-view
             <p-button icon="pi pi-copy" [rounded]="true" [text]="true" size="small" pTooltip="Copy" (onClick)="copyToClipboard(messageData())" />
             <p-button icon="pi pi-eye" [rounded]="true" [text]="true" size="small" pTooltip="View JSON" (onClick)="jsonViewer().open(messageData())" />
           </div>
-          <textarea
-            pTextarea
-            [(ngModel)]="messageData"
-            [rows]="15"
-            class="message-input"
-            placeholder="Paste a FHIR R4 Bundle (JSON) here..."
-          ></textarea>
+          <app-input-editor [(content)]="messageData" language="json" placeholder="Paste a FHIR R4 Bundle (JSON) here..." height="360px" />
 
           <div class="options-bar">
             <div class="facility-field">
@@ -57,13 +51,7 @@ import {JsonViewerDialogComponent} from '../../../../shared/components/json-view
             <p-button icon="pi pi-copy" [rounded]="true" [text]="true" size="small" pTooltip="Copy" (onClick)="copyToClipboard(response()!)" />
             <p-button icon="pi pi-eye" [rounded]="true" [text]="true" size="small" pTooltip="View JSON" (onClick)="jsonViewer().open(response()!)" />
           </div>
-          <textarea
-            pTextarea
-            [ngModel]="response()"
-            [rows]="12"
-            class="message-input"
-            readonly
-          ></textarea>
+          <app-input-editor [content]="response() ?? ''" [readonly]="true" language="json" height="288px" />
         </p-card>
       }
 
@@ -88,12 +76,7 @@ import {JsonViewerDialogComponent} from '../../../../shared/components/json-view
       gap: 0.25rem;
       margin-bottom: -0.5rem;
     }
-    .message-input {
-      width: 100%;
-      font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
-      font-size: 0.8rem;
-    }
-    .options-bar {
+.options-bar {
       display: flex;
       align-items: flex-end;
       gap: 1rem;
