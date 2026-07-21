@@ -85,6 +85,9 @@ public class FhirMessagingHandler extends IncomingMessageHandler<Bundle, Object>
 		Patient patient = ((Patient) bundle.getEntry().stream()
 				.filter((entry) -> entry.getResource().getResourceType().equals(ResourceType.Patient)).findFirst()
 				.map(Bundle.BundleEntryComponent::getResource).orElse(null));
+		if (patient == null) {
+			return null;
+		}
 		PatientReported patientReported = patientMapper.localObjectReported(patient);
 		patientReported.setPatientId(null);
 		patientReported.setTenant(tenant);
