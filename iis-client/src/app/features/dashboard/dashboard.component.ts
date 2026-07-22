@@ -92,7 +92,7 @@ import {getActiveFlavors, ProcessingFlavor} from '../tenant/models/flavor.model'
       </p-panel>
 
       @if (tenantContext.hasTenant()) {
-        <p-panel header="Legacy Tools" styleClass="mt-4" [toggleable]="true" [collapsed]="true">
+        <p-panel header="Legacy Tools" styleClass="mt-4" [toggleable]="true" [collapsed]="false">
           <div class="function-list">
             <a [routerLink]="queryConverterLink()">Query Converter — Convert VXU to QBP query messages</a>
             <a [routerLink]="covidGenerateLink()">COVID Generate — Generate synthetic COVID-19 HL7 messages</a>
