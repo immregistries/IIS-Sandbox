@@ -237,7 +237,7 @@ public class PatientMapperR4 extends PatientMapper<Patient> implements IR4Resour
 			if (StringUtils.isNotBlank(value.getVersion())) {
 				try {
 					localPatient.setRegistryStatusIndicatorDate(MappingHelper.FHIR_SDF.parse(value.getVersion()));
-				} catch (ParseException ignored) {
+				} catch (ParseException | NumberFormatException ignored) {
 				}
 			}
 		} else {

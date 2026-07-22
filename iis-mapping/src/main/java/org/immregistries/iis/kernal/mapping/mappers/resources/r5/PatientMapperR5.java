@@ -209,7 +209,7 @@ public class PatientMapperR5 extends PatientMapper<Patient> implements IR5Resour
 			if (StringUtils.isNotBlank(value.getVersion())) {
 				try {
 					localPatient.setPublicityIndicatorDate(MappingHelper.FHIR_SDF.parse(value.getVersion()));
-				} catch (ParseException ignored) {
+				} catch (ParseException | NumberFormatException ignored) {
 				}
 			}
 		} else {
