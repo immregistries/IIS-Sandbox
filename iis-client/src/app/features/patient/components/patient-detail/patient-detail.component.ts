@@ -110,7 +110,7 @@ import {Card} from "primeng/card";
                     </div>
                     <div class="info-item">
                       <span class="label">Race</span>
-                      <span class="value">{{ patient()!.races?.join(', ') || '-' }}</span>
+                      <span class="value">{{ patient()!.races.join(', ') || '-' }}</span>
                     </div>
                     <div class="info-item">
                       <span class="label">Mother Maiden Name</span>
@@ -123,7 +123,7 @@ import {Card} from "primeng/card";
                   </div>
                 </p-fieldset>
 
-                @if (patient()!.addresses?.length) {
+                @if (patient()!.addresses.length) {
                   <p-fieldset legend="Address">
                     @for (addr of patient()!.addresses; track $index) {
                       <div class="info-grid">
@@ -140,7 +140,7 @@ import {Card} from "primeng/card";
                   </p-fieldset>
                 }
 
-                @if (patient()!.businessIdentifiers?.length) {
+                @if (patient()!.businessIdentifiers.length) {
                   <p-fieldset legend="Identifiers">
                     <p-table [value]="patient()!.businessIdentifiers" styleClass="p-datatable-sm">
                       <ng-template #header>

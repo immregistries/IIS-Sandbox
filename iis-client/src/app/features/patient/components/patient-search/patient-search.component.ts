@@ -15,7 +15,7 @@ import {PatientHistoryDialogComponent} from '../patient-history-dialog/patient-h
 @Component({
   selector: 'app-patient-search',
   standalone: true,
-  imports: [FormsModule, IconField, InputIcon, InputText, Button, TableModule, LoadingSpinnerComponent, DateFormatPipe, PatientHistoryDialogComponent],
+  imports: [FormsModule, IconField, InputIcon, InputText, Button, TableModule, LoadingSpinnerComponent, DateFormatPipe],
   template: `
     <div class="patient-search">
       <h1>Patients</h1>
