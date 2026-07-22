@@ -13,6 +13,18 @@ export interface ImmunizationRecord {
   source: 'SOURCE' | 'HISTORICAL';
 }
 
+export enum LinkedImmunizationType {
+  SURE = 'SURE',
+  UNSURE = 'UNSURE',
+  DIFFERENT = 'DIFFERENT',
+  INPUT = 'INPUT'
+}
+
+export interface LinkedImmunizationResult {
+  type: 'SURE' | 'UNSURE' | 'DIFFERENT' | 'INPUT';
+  immunizations: ImmunizationResult [];
+}
+
 export interface ImmunizationResult {
   date: string;
   cvx: string;
@@ -39,7 +51,7 @@ export class VacDedupApiService {
     return `${environment.apiBaseUrl}/rest/tenant/${this.tenantContext.tenantName()}/vacDedup`;
   }
 
-  deduplicate(request: VacDedupRequest): Observable<ImmunizationResult[][]> {
-    return this.http.post<ImmunizationResult[][]>(this.basePath, request);
+  deduplicate(request: VacDedupRequest): Observable<LinkedImmunizationResult[]> {
+    return this.http.post<LinkedImmunizationResult[]>(this.basePath, request);
   }
 }

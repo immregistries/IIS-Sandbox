@@ -8,7 +8,7 @@ import {InputText} from 'primeng/inputtext';
 import {SelectButton} from 'primeng/selectbutton';
 import {TableModule} from 'primeng/table';
 import {Tag} from 'primeng/tag';
-import {ImmunizationRecord, ImmunizationResult, VacDedupApiService,} from '../../services/vac-dedup-api.service';
+import {ImmunizationRecord, LinkedImmunizationResult, VacDedupApiService,} from '../../services/vac-dedup-api.service';
 
 function emptyRecord(): ImmunizationRecord {
   return {date: '', cvx: '', mvx: '', lot: '', org: '', source: 'SOURCE'};
@@ -93,9 +93,9 @@ function emptyRecord(): ImmunizationRecord {
             <div class="result-group">
               <div class="group-header">
                 <span>Group {{ $index + 1 }}</span>
-                <p-tag [value]="group.length === 1 ? 'UNIQUE' : 'DUPLICATE'" [severity]="group.length === 1 ? 'success' : 'warn'" />
+                <p-tag [value]="group.type" [severity]="group.type === 'SURE' ? 'success' : 'warn'" />
               </div>
-              <p-table [value]="group" [tableStyle]="{'min-width': '40rem'}">
+              <p-table [value]="group.immunizations" [tableStyle]="{'min-width': '40rem'}">
                 <ng-template #header>
                   <tr>
                     <th>Date</th>
@@ -155,7 +155,7 @@ export class VacDedupComponent {
 
   records = signal<ImmunizationRecord[]>([emptyRecord(), emptyRecord(), emptyRecord(), emptyRecord()]);
   algorithm = signal<'DETERMINISTIC' | 'WEIGHTED' | 'HYBRID'>('DETERMINISTIC');
-  results = signal<ImmunizationResult[][] | null>(null);
+  results = signal<LinkedImmunizationResult[] | null>(null);
   error = signal<string | null>(null);
   submitting = signal(false);
 
