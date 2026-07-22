@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping(IisRestPath.SH_LINKS_STORED_MANIFEST_FULL_PATH)
+@RequestMapping()
 public class ShLinkManifestRestController {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
