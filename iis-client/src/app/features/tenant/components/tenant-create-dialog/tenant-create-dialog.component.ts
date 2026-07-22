@@ -28,7 +28,10 @@ import {TenantApiService} from '../../services/tenant-api.service';
                 tooltipPosition="right"
               />
             </label>
-            <input pInputText id="tenantName" [(ngModel)]="tenantName" placeholder="Enter tenant name" class="w-full" />
+            <div class="name-input-row">
+              <input pInputText id="tenantName" [(ngModel)]="tenantName" placeholder="Enter tenant name" class="w-full" />
+              <p-button icon="pi pi-sparkles" [rounded]="true" [text]="true" severity="secondary" pTooltip="Generate random name" (onClick)="generateRandomName()" />
+            </div>
           </div>
         </div>
         @if (flavors().length) {
@@ -89,6 +92,7 @@ import {TenantApiService} from '../../services/tenant-api.service';
       font-weight: 500;
       font-size: 0.875rem;
     }
+    .name-input-row { display: flex; align-items: center; gap: 0.25rem; }
     .w-full { width: 100%; }
   `,
 })
@@ -103,6 +107,21 @@ export class TenantCreateDialogComponent {
   created = output<void>();
 
   activeFlavors = computed(() => getActiveFlavors(this.tenantName(), this.flavors()));
+
+  private readonly adjectives = ['Sunny', 'Green', 'Blue', 'Silver', 'Golden', 'Bright', 'Clear', 'Swift', 'Grand', 'Noble'];
+  private readonly nouns = ['Valley', 'Ridge', 'Creek', 'Harbor', 'Meadow', 'Summit', 'Grove', 'Lake', 'Pines', 'Vista'];
+
+  generateRandomName(): void {
+    const flavorKeys = new Set(this.flavors().map((f) => f.key.toLowerCase()));
+    let name: string;
+    do {
+      const adj = this.adjectives[Math.floor(Math.random() * this.adjectives.length)];
+      const noun = this.nouns[Math.floor(Math.random() * this.nouns.length)];
+      const num = Math.floor(Math.random() * 900) + 100;
+      name = `${adj}${noun}${num}`;
+    } while (name.split(/[\s_]+/).some((seg) => flavorKeys.has(seg.toLowerCase())));
+    this.tenantName.set(name);
+  }
 
   open(): void {
     this.tenantName.set('');

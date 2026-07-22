@@ -27,6 +27,8 @@ function emptyRecord(): ImmunizationRecord {
       </p-message>
 
       <p-card header="Immunization Records">
+            <p-button label="Load Sample" icon="pi pi-file-plus" severity="secondary" [outlined]="true" size="small" (onClick)="fillSample()" />
+
         <div class="form-layout">
           <p-table [value]="records()" [tableStyle]="{'min-width': '50rem'}">
             <ng-template #header>
@@ -66,7 +68,6 @@ function emptyRecord(): ImmunizationRecord {
 
           <div class="table-actions">
             <p-button label="Add Row" icon="pi pi-plus" severity="secondary" [outlined]="true" size="small" (onClick)="addRecord()" />
-            <p-button label="Fill Sample" icon="pi pi-sparkles" severity="secondary" [outlined]="true" size="small" (onClick)="fillSample()" />
           </div>
 
           <div class="field">

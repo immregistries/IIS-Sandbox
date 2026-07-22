@@ -22,6 +22,7 @@ import {
   PatientRecommendationsComponent
 } from '../../../recommendation/components/patient-recommendations/patient-recommendations.component';
 import {DateFormatPipe} from '../../../../shared/pipes/date-format.pipe';
+import {PatientHistoryDialogComponent} from '../patient-history-dialog/patient-history-dialog.component';
 
 @Component({
   selector: 'app-patient-detail',
@@ -41,6 +42,7 @@ import {DateFormatPipe} from '../../../../shared/pipes/date-format.pipe';
     PatientFhirLinksComponent,
     PatientRecommendationsComponent,
     DateFormatPipe,
+    PatientHistoryDialogComponent,
   ],
   template: `
     @if (loading()) {
@@ -71,7 +73,10 @@ import {DateFormatPipe} from '../../../../shared/pipes/date-format.pipe';
               }
             </span>
           </div>
-          <p-button label="Back" icon="pi pi-arrow-left" severity="secondary" [outlined]="true" (onClick)="goBack()" />
+          <div class="header-actions">
+            <p-button label="History" icon="pi pi-clock" severity="secondary" [outlined]="true" (onClick)="historyDialog.open(patient()!.patientId)" />
+            <p-button label="Back" icon="pi pi-arrow-left" severity="secondary" [outlined]="true" (onClick)="goBack()" />
+          </div>
         </div>
 
         <p-tabs value="0">
@@ -210,6 +215,7 @@ import {DateFormatPipe} from '../../../../shared/pipes/date-format.pipe';
           </p-tabpanels>
         </p-tabs>
       </div>
+      <app-patient-history-dialog #historyDialog />
     }
   `,
   styles: `
@@ -220,6 +226,7 @@ import {DateFormatPipe} from '../../../../shared/pipes/date-format.pipe';
       margin-bottom: 1.25rem;
       h1 { margin: 0 0 0.25rem; }
     }
+    .header-actions { display: flex; gap: 0.5rem; }
     .patient-id {
       display: flex;
       align-items: center;

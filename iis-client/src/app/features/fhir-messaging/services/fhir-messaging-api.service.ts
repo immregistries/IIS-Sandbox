@@ -13,6 +13,10 @@ export class FhirMessagingApiService {
     return `${environment.apiBaseUrl}/rest/tenant/${this.tenantContext.tenantName()}/fhir-messaging`;
   }
 
+  getSample(): Observable<string> {
+    return this.http.get(`${this.basePath}/sample`, {responseType: 'text'});
+  }
+
   sendMessage(message: string, facilityName?: string): Observable<string> {
     let params = new HttpParams();
     if (facilityName) params = params.set('facilityName', facilityName);

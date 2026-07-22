@@ -2,10 +2,10 @@ package org.immregistries.iis.kernal.controllers.rest;
 
 import ca.uhn.fhir.jpa.starter.annotations.OnR4Condition;
 import ca.uhn.hl7v2.HL7Exception;
-import gov.cdc.izgw.v2tofhir.converter.MessageParser;
 import org.hl7.fhir.r4.model.Bundle;
 import org.immregistries.iis.kernal.controllers.IisRestParam;
 import org.immregistries.iis.kernal.controllers.IisRestPath;
+import org.immregistries.iis.kernal.logic.V2ToFhirService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.web.bind.annotation.*;
@@ -19,12 +19,12 @@ import static org.immregistries.iis.kernal.controllers.IisRestPath.BasePath.V2_T
 public class V2ToFhirRestController {
 
 	@Autowired
-	private MessageParser messageParser;
+	private V2ToFhirService v2ToFhirService;
 
 	@PostMapping
 	public Bundle convertV2ToFhir(@RequestBody String message,
 			@RequestParam(name = IisRestParam.FACILITY_NAME, required = false) String facilityName)
 			throws HL7Exception {
-		return messageParser.convert(message);
+		return v2ToFhirService.v2ToFhirBundle(message);
 	}
 }

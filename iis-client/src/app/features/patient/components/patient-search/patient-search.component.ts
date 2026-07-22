@@ -10,11 +10,12 @@ import {PatientMaster} from '../../models/patient.model';
 import {PatientApiService} from '../../services/patient-api.service';
 import {LoadingSpinnerComponent} from '../../../../shared/components/loading-spinner/loading-spinner.component';
 import {DateFormatPipe} from '../../../../shared/pipes/date-format.pipe';
+import {PatientHistoryDialogComponent} from '../patient-history-dialog/patient-history-dialog.component';
 
 @Component({
   selector: 'app-patient-search',
   standalone: true,
-  imports: [FormsModule, IconField, InputIcon, InputText, Button, TableModule, LoadingSpinnerComponent, DateFormatPipe],
+  imports: [FormsModule, IconField, InputIcon, InputText, Button, TableModule, LoadingSpinnerComponent, DateFormatPipe, PatientHistoryDialogComponent],
   template: `
     <div class="patient-search">
       <h1>Patients</h1>
@@ -57,6 +58,7 @@ import {DateFormatPipe} from '../../../../shared/pipes/date-format.pipe';
               <td>{{ patient.birthDate | iisDate }}</td>
               <td>{{ patient.sex }}</td>
               <td>
+                <p-button icon="pi pi-clock" [rounded]="true" [text]="true" size="small" (onClick)="historyDialog.open(patient.patientId)" />
                 <p-button icon="pi pi-eye" [rounded]="true" [text]="true" size="small" (onClick)="onSelectPatient(patient)" />
               </td>
             </tr>
@@ -68,6 +70,7 @@ import {DateFormatPipe} from '../../../../shared/pipes/date-format.pipe';
           </ng-template>
         </p-table>
       }
+      <app-patient-history-dialog #historyDialog />
     </div>
   `,
   styles: `

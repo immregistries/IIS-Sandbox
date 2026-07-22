@@ -133,6 +133,7 @@ import {getActiveFlavors, ProcessingFlavor} from '../tenant/models/flavor.model'
       flex-direction: column;
       gap: 0.5rem;
       a {
+        color: var(--p-primary-color);
         text-decoration: none;
         &:hover { text-decoration: underline; }
       }

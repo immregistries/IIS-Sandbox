@@ -27,6 +27,8 @@ import {InputEditorComponent} from '../../../../shared/components/input-editor/i
       <p-card header="FHIR Bundle Message">
         <div class="form-layout">
           <div class="textarea-toolbar">
+            <p-button label="Load Sample" icon="pi pi-file-plus" severity="secondary" [outlined]="true" size="small" (onClick)="onLoadSample()" [loading]="loadingSample()" />
+            <span class="spacer"></span>
             <p-button icon="pi pi-copy" [rounded]="true" [text]="true" size="small" pTooltip="Copy" (onClick)="copyToClipboard(messageData())" />
             <p-button icon="pi pi-eye" [rounded]="true" [text]="true" size="small" pTooltip="View JSON" (onClick)="jsonViewer().open(messageData())" />
           </div>
@@ -48,6 +50,8 @@ import {InputEditorComponent} from '../../../../shared/components/input-editor/i
       @if (response()) {
         <p-card header="Response" styleClass="mt-4">
           <div class="textarea-toolbar">
+            <span class="spacer"></span>
+
             <p-button icon="pi pi-copy" [rounded]="true" [text]="true" size="small" pTooltip="Copy" (onClick)="copyToClipboard(response()!)" />
             <p-button icon="pi pi-eye" [rounded]="true" [text]="true" size="small" pTooltip="View JSON" (onClick)="jsonViewer().open(response()!)" />
           </div>
@@ -72,10 +76,11 @@ import {InputEditorComponent} from '../../../../shared/components/input-editor/i
     }
     .textarea-toolbar {
       display: flex;
-      justify-content: flex-end;
+      align-items: center;
       gap: 0.25rem;
       margin-bottom: -0.5rem;
     }
+    .spacer { flex: 1; }
 .options-bar {
       display: flex;
       align-items: flex-end;
@@ -112,6 +117,18 @@ export class FhirMessagingSendComponent {
   response = signal<string | null>(null);
   error = signal<string | null>(null);
   submitting = signal(false);
+  loadingSample = signal(false);
+
+  onLoadSample(): void {
+    this.loadingSample.set(true);
+    this.fhirMessagingApi.getSample().subscribe({
+      next: (sample) => {
+        this.messageData.set(sample);
+        this.loadingSample.set(false);
+      },
+      error: () => this.loadingSample.set(false),
+    });
+  }
 
   onSubmit(): void {
     if (!this.messageData()) return;

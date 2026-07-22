@@ -9,9 +9,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.NotNull;
 import org.apache.commons.lang3.StringUtils;
+import org.hl7.fhir.r4.model.Bundle;
 import org.immregistries.iis.kernal.IisRequestAttribute;
 import org.immregistries.iis.kernal.controllers.IisRestPath;
 import org.immregistries.iis.kernal.controllers.servlet.SoapDescriptionController;
+import org.immregistries.iis.kernal.logic.V2ToFhirService;
 import org.immregistries.iis.kernal.logic.hl7v2.BaseIISSOAPServer;
 import org.immregistries.iis.kernal.logic.hl7v2.handling.FhirMessagingHandler;
 import org.immregistries.iis.kernal.logic.hl7v2.handling.V2IncomingMessageHandler;
@@ -22,6 +24,9 @@ import org.immregistries.smm.cdc.CDCWSDLServer;
 import org.immregistries.smm.cdc.Fault;
 import org.immregistries.smm.cdc.SubmitSingleMessage;
 import org.immregistries.smm.cdc.UnknownFault;
+import org.immregistries.smm.transform.ScenarioManager;
+import org.immregistries.smm.transform.TestCaseMessage;
+import org.immregistries.smm.transform.Transformer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.http.MediaType;
@@ -52,6 +57,23 @@ public class FhirMessagingRestController {
 	private TenantAuthService tenantAuthService;
 	@Autowired
 	private V2IncomingMessageHandler handler;
+
+	@Autowired
+	private V2ToFhirService v2ToFhirService;
+	;
+
+	@GetMapping("/sample")
+	protected String getSample(@RequestAttribute(IisRequestAttribute.TENANT_REQUEST_ATTRIBUTE) @NotNull Tenant tenant)
+		throws HL7Exception {
+		TestCaseMessage testCaseMessage = ScenarioManager
+			.createTestCaseMessage(ScenarioManager.SCENARIO_1_R_ADMIN_CHILD);
+		Transformer transformer = new Transformer();
+		transformer.transform(testCaseMessage);
+		String sampleMessage = testCaseMessage.getMessageText();
+		Bundle bundle = v2ToFhirService.v2ToFhirBundle(sampleMessage);
+		String message = fhirContext.newJsonParser().setPrettyPrint(true).encodeResourceToString(bundle);
+		return message;
+	}
 
 	@PostMapping(produces = MediaType.TEXT_PLAIN_VALUE)
 	protected String doPost(
