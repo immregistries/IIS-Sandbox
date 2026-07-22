@@ -10,6 +10,7 @@ import {TenantContextService} from '../../core/services/tenant-context.service';
 import {TenantApiService} from '../tenant/services/tenant-api.service';
 import {TenantSelectorComponent} from '../../shared/components/tenant-selector/tenant-selector.component';
 import {getActiveFlavors, ProcessingFlavor} from '../tenant/models/flavor.model';
+import {MessageService} from 'primeng/api';
 
 @Component({
   selector: 'app-dashboard',
@@ -105,7 +106,9 @@ import {getActiveFlavors, ProcessingFlavor} from '../tenant/models/flavor.model'
           </div>
         </p-panel>
       }
-    </div>
+
+    <p-button label="Message display test" (onClick)="showTestMessage()" class="p-mt-2"></p-button>
+</div>
   `,
   styles: `
     .dashboard { max-width: 960px; }
@@ -145,6 +148,8 @@ import {getActiveFlavors, ProcessingFlavor} from '../tenant/models/flavor.model'
   `,
 })
 export class DashboardComponent implements OnInit {
+  private msgSrv = inject(MessageService);
+
   tenantContext = inject(TenantContextService);
   private tenantApi = inject(TenantApiService);
 
@@ -172,6 +177,17 @@ export class DashboardComponent implements OnInit {
   ngOnInit(): void {
     this.tenantApi.getFlavors().subscribe({
       next: (flavors) => this.allFlavors.set(flavors),
+    });
+  }
+
+  // Test helper – triggers a simple info toast
+  showTestMessage(): void {
+    this.msgSrv.add({
+      severity: 'info',
+      summary: 'Test Message',
+      detail: 'This is a test toast from DashboardComponent.',
+      sticky: false,
+      life: 5000,
     });
   }
 }

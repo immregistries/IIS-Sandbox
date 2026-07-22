@@ -9,6 +9,9 @@ import Aura from '@primeng/themes/aura';
 import {routes} from './app.routes';
 import {baseUrlInterceptor} from './core/interceptors/base-url.interceptor';
 import {authInterceptor} from './core/interceptors/auth.interceptor';
+import {errorInterceptor} from './core/interceptors/error.interceptor';
+import {MessageService} from 'primeng/api';
+import {DialogService} from 'primeng/dynamicdialog';
 
 const IISPreset = definePreset(Aura, {
   semantic: {
@@ -33,8 +36,10 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({eventCoalescing: true}),
     provideRouter(routes, withComponentInputBinding()),
-    provideHttpClient(withInterceptors([baseUrlInterceptor, authInterceptor])),
+    provideHttpClient(withInterceptors([baseUrlInterceptor, authInterceptor, errorInterceptor])),
     provideAnimationsAsync(),
+      MessageService,
+      DialogService,
     providePrimeNG({
       theme: {
         preset: IISPreset,
