@@ -36,6 +36,7 @@ import {QRCodeComponent} from 'angularx-qrcode';
         <div class="code-uri">
           <span class="label">
             SHLink URI
+            <span class="spacer"> </span>
             <p-button icon="pi pi-copy" [rounded]="true" [text]="true" size="small" (onClick)="copyToClipboard()" />
           </span>
           <code class="code-value">{{ codeUri() }}</code>
@@ -45,7 +46,9 @@ import {QRCodeComponent} from 'angularx-qrcode';
         <span class="card-description">
           {{ description() }}
           @if (manifestUrl()) {
-            (<a [href]="manifestUrl()" target="_blank">manifest</a>)
+            <a [href]="manifestUrl()" target="_blank">
+              <p-button [label]="directFile() ? 'File' : 'Manifest'" icon="pi pi-external-link" severity="secondary" [outlined]="true" />
+            </a>
           }
         </span>
       </ng-template>
@@ -100,6 +103,7 @@ import {QRCodeComponent} from 'angularx-qrcode';
       font-size: 0.8rem;
       color: var(--p-text-muted-color);
     }
+    .spacer { flex: 1; }
   `,
 })
 export class QrCodeCardComponent {
@@ -121,6 +125,7 @@ export class QrCodeCardComponent {
     const createdMs = new Date(createdAt).getTime();
     return new Date(createdMs + exp * 1000);
   });
+
 
   copyToClipboard(): void {
     navigator.clipboard.writeText(this.codeUri());
