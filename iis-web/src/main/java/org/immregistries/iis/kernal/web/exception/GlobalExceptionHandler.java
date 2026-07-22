@@ -12,9 +12,6 @@
 
 package org.immregistries.iis.kernal.web.exception;
 
-import java.time.Instant;
-import java.util.UUID;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -22,6 +19,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
+
+import java.time.Instant;
+import java.util.UUID;
 
 /**
  * Global exception handler for REST controllers.
@@ -45,7 +45,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleException(Exception ex, WebRequest request) {
         // Log the full stack trace for diagnostics.
-		 System.out.println("OHOHOHO");
         logger.error("Unhandled exception in REST controller", ex);
 
         // Generate a correlation identifier to tie logs and the HTTP response together.
