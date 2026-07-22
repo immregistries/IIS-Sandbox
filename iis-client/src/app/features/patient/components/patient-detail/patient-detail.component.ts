@@ -23,6 +23,7 @@ import {
 } from '../../../recommendation/components/patient-recommendations/patient-recommendations.component';
 import {DateFormatPipe} from '../../../../shared/pipes/date-format.pipe';
 import {PatientHistoryDialogComponent} from '../patient-history-dialog/patient-history-dialog.component';
+import {Card} from "primeng/card";
 
 @Component({
   selector: 'app-patient-detail',
@@ -43,6 +44,7 @@ import {PatientHistoryDialogComponent} from '../patient-history-dialog/patient-h
     PatientRecommendationsComponent,
     DateFormatPipe,
     PatientHistoryDialogComponent,
+    Card
   ],
   template: `
     @if (loading()) {
@@ -191,6 +193,7 @@ import {PatientHistoryDialogComponent} from '../patient-history-dialog/patient-h
 
               <app-patient-related [patients]="relatedPatients()" [isGolden]="!asNonGolden()" (selected)="viewRelatedPatient($event)" />
              @if (relatedPatients().length) {
+              <p-card>
                 <app-patient-mdm-chart
                   [patient]="patient()!"
                   [relatedPatients]="relatedPatients()"
@@ -198,6 +201,9 @@ import {PatientHistoryDialogComponent} from '../patient-history-dialog/patient-h
                   [isGolden]="!asNonGolden()"
                   (selected)="viewRelatedPatient($event)"
                 />
+              </p-card>
+
+
               }
             </p-tabpanel>
 

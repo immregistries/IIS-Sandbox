@@ -25,7 +25,7 @@ import {TenantContextService} from '../../../core/services/tenant-context.servic
           </a>
         </li>
         @if (tenantContext.hasTenant()) {
-          <li class="nav-section">{{ tenantContext.tenantName() }}</li>
+          <li class="nav-section">Tenant: {{ tenantContext.tenantName() }}</li>
           <li>
             <a [routerLink]="patientsLink()" routerLinkActive="active" class="nav-link">
               <i class="pi pi-users"></i>
@@ -41,18 +41,12 @@ import {TenantContextService} from '../../../core/services/tenant-context.servic
           <li>
             <a [routerLink]="popLink()" routerLinkActive="active" class="nav-link">
               <i class="pi pi-send"></i>
-              <span>Send Now</span>
-            </a>
-          </li>
-          <li>
-            <a [routerLink]="recommendationLink()" routerLinkActive="active" class="nav-link">
-              <i class="pi pi-list-check"></i>
-              <span>Recommendations</span>
+              <span>Hl7V2 Messaging</span>
             </a>
           </li>
           <li>
             <a [routerLink]="fhirMessagingLink()" routerLinkActive="active" class="nav-link">
-              <i class="pi pi-comment"></i>
+              <i class="pi pi-send"></i>
               <span>FHIR Messaging</span>
             </a>
           </li>

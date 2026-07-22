@@ -58,7 +58,6 @@ import {PatientHistoryDialogComponent} from '../patient-history-dialog/patient-h
               <td>{{ patient.birthDate | iisDate }}</td>
               <td>{{ patient.sex }}</td>
               <td>
-                <p-button icon="pi pi-clock" [rounded]="true" [text]="true" size="small" (onClick)="historyDialog.open(patient.patientId)" />
                 <p-button icon="pi pi-eye" [rounded]="true" [text]="true" size="small" (onClick)="onSelectPatient(patient)" />
               </td>
             </tr>
@@ -70,7 +69,6 @@ import {PatientHistoryDialogComponent} from '../patient-history-dialog/patient-h
           </ng-template>
         </p-table>
       }
-      <app-patient-history-dialog #historyDialog />
     </div>
   `,
   styles: `
