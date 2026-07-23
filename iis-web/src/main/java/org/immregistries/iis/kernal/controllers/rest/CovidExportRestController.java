@@ -2,19 +2,19 @@ package org.immregistries.iis.kernal.controllers.rest;
 
 import ca.uhn.fhir.jpa.searchparam.SearchParameterMap;
 import ca.uhn.fhir.jpa.starter.annotations.OnR5Condition;
-import ca.uhn.fhir.rest.param.DateParam;
-import ca.uhn.fhir.rest.param.ParamPrefixEnum;
 import ca.uhn.fhir.rest.param.ReferenceParam;
-import ca.uhn.fhir.rest.param.TokenParam;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.r5.model.Immunization;
 import org.hl7.fhir.r5.model.Patient;
 import org.immregistries.iis.kernal.IisRequestAttribute;
 import org.immregistries.iis.kernal.controllers.IisRestPath;
 import org.immregistries.iis.kernal.mapping.mappers.resources.r5.LocationMapperR5;
-import org.immregistries.iis.kernal.mapping.requesters.FhirReadRequester;
 import org.immregistries.iis.kernal.mapping.requesters.FhirSearchRequester;
-import org.immregistries.iis.kernal.model.*;
+import org.immregistries.iis.kernal.mapping.requesters.IFhirReadRequester;
+import org.immregistries.iis.kernal.model.OrgLocation;
+import org.immregistries.iis.kernal.model.PatientMaster;
+import org.immregistries.iis.kernal.model.PatientReported;
+import org.immregistries.iis.kernal.model.VaccinationReported;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
@@ -22,7 +22,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.immregistries.iis.kernal.controllers.IisRestPath.BasePath.COVID_EXPORT_PATH;
@@ -37,7 +40,7 @@ public class CovidExportRestController {
 	@Autowired
 	private FhirSearchRequester fhirSearchRequester;
 	@Autowired
-	private FhirReadRequester fhirReadRequester;
+	private IFhirReadRequester fhirReadRequester;
 	@Autowired
 	private LocationMapperR5 locationMapper;
 

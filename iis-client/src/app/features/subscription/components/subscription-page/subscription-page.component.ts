@@ -143,7 +143,7 @@ const OPERATION_SAMPLE = `{
           </div>
           <div class="form-field">
             <label>Topic URL</label>
-            <input pInputText [(ngModel)]="createTopic" />
+            <p-select [(ngModel)]="createTopic" [options]="topicOptions" placeholder="Select a topic" appendTo="body"></p-select>
           </div>
           <div class="form-field">
             <label>Content Type</label>
@@ -267,6 +267,10 @@ export class SubscriptionPageComponent implements OnInit {
   createTopic = '';
   createContentType = 'application/fhir+json';
   creating = signal(false);
+
+  topicOptions = [
+    "/Patient", "/Group", "/data-quality-issues"
+  ]
 
   ngOnInit(): void {
     this.loadSubscriptions();

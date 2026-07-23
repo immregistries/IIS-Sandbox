@@ -9,7 +9,7 @@ import org.immregistries.iis.kernal.mapping.MappingHelper;
 import org.immregistries.iis.kernal.mapping.mappers.fields.r5.BusinessIdentifierMapperR5;
 import org.immregistries.iis.kernal.mapping.mappers.fields.r5.ModelReferenceMapperR5;
 import org.immregistries.iis.kernal.mapping.mappers.resources.ImmunizationMapper;
-import org.immregistries.iis.kernal.mapping.requesters.FhirReadRequester;
+import org.immregistries.iis.kernal.mapping.requesters.IFhirReadRequester;
 import org.immregistries.iis.kernal.model.BusinessIdentifier;
 import org.immregistries.iis.kernal.model.IisVaccination;
 import org.immregistries.iis.kernal.model.ModelPerson;
@@ -30,7 +30,7 @@ public class ImmunizationMapperR5 extends ImmunizationMapper<Immunization> imple
 	@Autowired
 	private org.immregistries.iis.kernal.mapping.mappers.resources.r5.LocationMapperR5 locationMapper;
 	@Autowired
-	private FhirReadRequester fhirReadRequester;
+	private IFhirReadRequester fhirReadRequester;
 	@Autowired
 	private CodeMapManagerService codeMapManagerService;
 	@Autowired

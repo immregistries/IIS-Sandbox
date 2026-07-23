@@ -32,7 +32,7 @@ public class FhirSearchRequester {
 	@Autowired
 	private RequestTenantUtil requestTenantUtil;
 	@Autowired
-	private FhirReadRequester fhirReadRequester;
+	private IFhirReadRequester fhirReadRequester;
 
 	public IisMappedToFhirResource searchMappedObjectMaster(String resourceType, SearchParameterMap searchParameterMap) {
 		IisMappedToFhirResource mappedObject = null;

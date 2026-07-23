@@ -1,8 +1,8 @@
 package org.immregistries.iis.kernal.mapping.mappers.resources;
 
 import org.hl7.fhir.instance.model.api.IAnyResource;
-import org.immregistries.iis.kernal.mapping.requesters.FhirReadRequester;
 import org.immregistries.iis.kernal.mapping.requesters.FhirRequesterUtil;
+import org.immregistries.iis.kernal.mapping.requesters.IFhirReadRequester;
 import org.immregistries.iis.kernal.model.IisPatient;
 import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.model.PatientReported;
@@ -75,7 +75,7 @@ public abstract class PatientMapper<Patient extends IAnyResource>
 	public static final String RELATIONSHIP_SYSTEM = "";
 
 	@Autowired
-	FhirReadRequester fhirReadRequester;
+	IFhirReadRequester fhirReadRequester;
 
 	/**
 	 * Translates from FHIR to reconstruct reported patient, fetching master patient

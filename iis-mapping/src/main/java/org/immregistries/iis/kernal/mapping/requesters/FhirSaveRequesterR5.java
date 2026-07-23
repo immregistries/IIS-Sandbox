@@ -25,7 +25,7 @@ public class FhirSaveRequesterR5 extends
         FhirSaveRequester<Patient, Immunization, Location, Practitioner, Observation, Person, Organization, RelatedPerson> {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	@Autowired
-	public org.immregistries.iis.kernal.mapping.requesters.FhirReadRequester fhirReadRequester;
+	public IFhirReadRequester fhirReadRequester;
 
 	@Autowired
 	private PatientMapper<Patient> patientMapper;

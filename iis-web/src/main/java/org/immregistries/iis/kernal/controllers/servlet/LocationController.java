@@ -10,9 +10,9 @@ import org.hibernate.Session;
 import org.immregistries.iis.kernal.controllers.servlet.util.UiUtil;
 import org.immregistries.iis.kernal.enums.LoincIdentifier;
 import org.immregistries.iis.kernal.enums.SnomedValue;
-import org.immregistries.iis.kernal.mapping.requesters.FhirReadRequester;
 import org.immregistries.iis.kernal.mapping.requesters.FhirSaveRequester;
 import org.immregistries.iis.kernal.mapping.requesters.FhirSearchRequester;
+import org.immregistries.iis.kernal.mapping.requesters.IFhirReadRequester;
 import org.immregistries.iis.kernal.model.ObservationReported;
 import org.immregistries.iis.kernal.model.OrgLocation;
 import org.immregistries.iis.kernal.model.PatientReported;
@@ -60,7 +60,7 @@ public class LocationController {
 	@Autowired
 	FhirSaveRequester fhirSaveRequester;
 	@Autowired
-	FhirReadRequester fhirReadRequester;
+	IFhirReadRequester fhirReadRequester;
 	@Autowired
 	FhirSearchRequester fhirSearchRequester;
 	@Autowired

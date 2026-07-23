@@ -14,8 +14,8 @@ import org.immregistries.iis.kernal.logic.shlink.generation.PatientShLinkGenerat
 import org.immregistries.iis.kernal.mapping.IisFhirClientFactory;
 import org.immregistries.iis.kernal.mapping.mappers.resources.PatientMapper;
 import org.immregistries.iis.kernal.mapping.mappers.resources.RecommendationMapper;
-import org.immregistries.iis.kernal.mapping.requesters.FhirReadRequester;
 import org.immregistries.iis.kernal.mapping.requesters.FhirSearchRequester;
+import org.immregistries.iis.kernal.mapping.requesters.IFhirReadRequester;
 import org.immregistries.iis.kernal.model.IisPatient;
 import org.immregistries.iis.kernal.model.ObservationReported;
 import org.immregistries.iis.kernal.model.PatientMaster;
@@ -35,7 +35,7 @@ import static org.immregistries.iis.kernal.controllers.IisRestPath.BasePath.VACC
 public class PatientRestController extends BaseTenantTiedRest {
 
 	@Autowired
-	private FhirReadRequester fhirReadRequester;
+	private IFhirReadRequester fhirReadRequester;
 	@Autowired
 	private FhirSearchRequester fhirSearchRequester;
 	@Autowired

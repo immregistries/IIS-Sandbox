@@ -9,10 +9,13 @@ import org.springframework.stereotype.Service;
 @Service
 public class V2ToFhirService {
 
-	@Autowired
+	@Autowired(required = false)
 	private MessageParser messageParser;
 
 	public Bundle v2ToFhirBundle(String hl7Message) throws HL7Exception {
+		if (messageParser == null) {
+			return null;
+		}
 		return messageParser.convert(hl7Message);
 	}
 }

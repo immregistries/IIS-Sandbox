@@ -14,8 +14,8 @@ import org.hl7.fhir.r5.model.Immunization;
 import org.hl7.fhir.r5.model.Patient;
 import org.immregistries.iis.kernal.controllers.servlet.util.UiUtil;
 import org.immregistries.iis.kernal.mapping.mappers.resources.r5.LocationMapperR5;
-import org.immregistries.iis.kernal.mapping.requesters.FhirReadRequester;
 import org.immregistries.iis.kernal.mapping.requesters.FhirSearchRequester;
+import org.immregistries.iis.kernal.mapping.requesters.IFhirReadRequester;
 import org.immregistries.iis.kernal.model.OrgLocation;
 import org.immregistries.iis.kernal.model.PatientMaster;
 import org.immregistries.iis.kernal.model.PatientReported;
@@ -56,7 +56,7 @@ public class CovidController {
 	@Autowired
 	private FhirSearchRequester fhirSearchRequester;
 	@Autowired
-	private FhirReadRequester fhirReadRequester;
+	private IFhirReadRequester fhirReadRequester;
 	@Autowired
 	LocationMapperR5 locationMapper;
 	@Autowired

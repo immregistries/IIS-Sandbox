@@ -8,8 +8,8 @@ import org.immregistries.iis.kernal.IisRequestAttribute;
 import org.immregistries.iis.kernal.controllers.IisPathVariable;
 import org.immregistries.iis.kernal.controllers.IisRestParam;
 import org.immregistries.iis.kernal.controllers.IisRestPath;
-import org.immregistries.iis.kernal.mapping.requesters.FhirReadRequester;
 import org.immregistries.iis.kernal.mapping.requesters.FhirSearchRequester;
+import org.immregistries.iis.kernal.mapping.requesters.IFhirReadRequester;
 import org.immregistries.iis.kernal.model.IisVaccination;
 import org.immregistries.iis.kernal.model.VaccinationMaster;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
@@ -23,7 +23,7 @@ import java.util.List;
 public class VaccinationRestController extends BaseTenantTiedRest {
 
     @Autowired
-    private FhirReadRequester fhirReadRequester;
+	 private IFhirReadRequester fhirReadRequester;
     @Autowired
     private FhirSearchRequester fhirSearchRequester;
 
