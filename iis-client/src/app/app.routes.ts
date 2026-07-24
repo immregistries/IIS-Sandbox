@@ -52,6 +52,11 @@ export const routes: Routes = [
               import('./features/subscription/subscription.routes').then((m) => m.SUBSCRIPTION_ROUTES),
           },
           {
+            path: 'clvr',
+            loadChildren: () =>
+              import('./features/clvr/clvr.routes').then((m) => m.CLVR_ROUTES),
+          },
+          {
             path: 'recommendation',
             loadChildren: () =>
               import('./features/recommendation/recommendation.routes').then((m) => m.RECOMMENDATION_ROUTES),

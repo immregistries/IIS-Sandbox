@@ -3,9 +3,6 @@ package org.immregistries.iis.kernal.controllers.rest.shlink;
 import ca.uhn.fhir.jpa.ips.generator.IIpsGeneratorSvc;
 import com.authlete.cose.COSEException;
 import com.google.zxing.WriterException;
-import com.google.zxing.client.j2se.MatrixToImageWriter;
-import com.google.zxing.common.BitMatrix;
-import jakarta.servlet.ServletException;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.hl7.fhir.instance.model.api.IBaseBundle;
 import org.hl7.fhir.r4.model.IdType;
@@ -34,7 +31,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -73,27 +69,7 @@ public class CLVRRestController {
         IisKey iisSigningKey = keyStoreService.getIisSigningKeyOrCreate("", userAccess, tenant);
 		 CLVRToken clvrToken = getIpsClvrToken(patientId, tenant);
 		 String qrCode = clvrService.encodeCLVRtoQrCode(clvrToken, iisSigningKey.keyPair(), iisSigningKey.getKeyId());
-        logger.info("qrCode {}", qrCode);
         return qrCode;
-    }
-
-    @GetMapping(value = "/qr/png", produces = MediaType.IMAGE_PNG_VALUE)
-    public ResponseEntity<byte[]> getPatientClvrPng(
-		 @AuthenticationPrincipal UserAccess userAccess,
-            @PathVariable(IisPathVariable.Key.PATIENT_ID) String patientId,
-				@RequestAttribute(IisRequestAttribute.TENANT_REQUEST_ATTRIBUTE) Tenant tenant)
-            throws COSEException, IOException, SignatureException, NoSuchAlgorithmException, InvalidKeyException,
-            NoSuchProviderException, ServletException {
-        IisKey iisSigningKey = keyStoreService.getIisSigningKeyOrCreate("", userAccess, tenant);
-		 CLVRToken clvrToken = getIpsClvrToken(patientId, tenant);
-		 String qrCode = clvrService.encodeCLVRtoQrCode(clvrToken, iisSigningKey.keyPair(), iisSigningKey.getKeyId());
-
-        ByteArrayOutputStream byteArrayOutputStreamPNG = qrCodeEncoder.toQrCodeStreamPNG(qrCode);
-        return ResponseEntity.ok(byteArrayOutputStreamPNG.toByteArray());
-        // HttpHeaders headers = new HttpHeaders();
-        // headers.setContentDispositionFormData("attachment", "qr.png");
-        // return new ResponseEntity<>(byteArrayOutputStreamPNG, headers,
-        // HttpStatus.OK);
     }
 
     @GetMapping(value = "/pdf", produces = MediaType.APPLICATION_PDF_VALUE)
@@ -139,11 +115,5 @@ public class CLVRRestController {
         return byteArrayOutputStream;
     }
 
-    public BufferedImage bufferedImage(String data) throws ServletException {
-        int width = 300; // Desired QR code width
-        int height = 300; // Desired QR code height
-        BitMatrix bitMatrix = qrCodeEncoder.qrCodeBitMatrix(data, width, height);
-        return MatrixToImageWriter.toBufferedImage(bitMatrix);
-    }
 
 }
