@@ -1,6 +1,6 @@
 import {InputEditorComponent} from './../../../shared/components/input-editor/input-editor.component';
 import {Component, inject, Input, signal} from '@angular/core';
-import {CommonModule} from '@angular/common';
+import {CommonModule, JsonPipe} from '@angular/common';
 import {FormsModule} from '@angular/forms';
 
 // PrimeNG 19 Modules
@@ -39,7 +39,7 @@ import {
     ProgressSpinnerModule,
     InputEditorComponent,
   ],
-  providers: [MessageService, ClvrTestApiService],
+  providers: [MessageService, ClvrTestApiService, JsonPipe],
   template: `
   <p-toast></p-toast>
 
@@ -299,9 +299,10 @@ import {
 export class ClvrTestComponent {
   private clvrTestService = inject(ClvrTestApiService);
   private messageService = inject(MessageService);
+  private jsonPipe = inject(JsonPipe);
 
   /** Patient ID parameter passed to the component */
-  @Input() patientId: string = '12345';
+  @Input() patientId: string = '';
 
   // --- State Variables ---
   jwk = signal<string>('');
@@ -334,9 +335,9 @@ export class ClvrTestComponent {
 
   loadExampleKey(): void {
     this.loadingKey.set(true);
-    this.clvrTestService.getExampleKey(this.patientId).subscribe({
+    this.clvrTestService.getExampleKey().subscribe({
       next: (res) => {
-        this.jwk.set(res.jwk);
+        this.jwk.set(this.jsonPipe.transform(res));
         this.keyStatus.set({type: 'info', text: 'Example key loaded into text area'});
         this.loadingKey.set(false);
       },
@@ -350,10 +351,10 @@ export class ClvrTestComponent {
       return;
     }
     this.loadingKey.set(true);
-    this.clvrTestService.loadKey(this.patientId, this.jwk()).subscribe({
-      next: (res) => {
-        this.kid.set(res.kid);
-        this.keyStatus.set({type: 'success', text: `Key stored and ready (KID: ${res.kid})`});
+    this.clvrTestService.loadKey(this.jwk()).subscribe({
+      next: (res: string) => {
+        this.kid.set(res);
+        this.keyStatus.set({type: 'success', text: `Key stored and ready (KID: ${res})`});
         this.loadingKey.set(false);
       },
       error: (err) => this.handleError(err, this.keyStatus, 'Key pair could not be loaded', this.loadingKey)
@@ -388,9 +389,10 @@ export class ClvrTestComponent {
       fhirBundle: this.fhirBundle()
     };
 
-    this.clvrTestService.convertFhir(this.patientId, request).subscribe({
+    this.clvrTestService.convertFhir(request).subscribe({
       next: (res) => {
-        const prettyToken = JSON.stringify(res.clvrToken, null, 2);
+        const prettyToken = JSON.stringify(res, null, 2);
+        // this.clvrTokenJson.set(prettyToken);
         this.clvrTokenJson.set(prettyToken);
         this.fhirStatus.set({type: 'success', text: 'Parsed and Converted FHIR Bundle'});
         this.loadingFhir.set(false);
@@ -411,12 +413,14 @@ export class ClvrTestComponent {
     this.loadingClvr.set(true);
     const request: SignCompressRequest = {
       clvrTokenJson: this.clvrTokenJson(),
-      jwk: this.jwk()
+      kid: this.kid()
     };
+    console.info(this.clvrTokenJson(), request)
 
-    this.clvrTestService.signAndCompress(this.patientId, request).subscribe({
+
+    this.clvrTestService.signAndCompress(request).subscribe({
       next: (res) => {
-        this.qrCodeString.set(res.qrCodeString);
+        this.qrCodeString.set(res);
         this.clvrStatus.set({type: 'success', text: 'Generated Health QR Code'});
         this.loadingClvr.set(false);
       },
@@ -436,12 +440,12 @@ export class ClvrTestComponent {
     this.loadingQr.set(true);
     const request: ParseQrRequest = {
       qrCodeString: this.qrCodeString(),
-      jwk: this.jwk()
+      kid: this.kid()
     };
 
-    this.clvrTestService.parseQr(this.patientId, request).subscribe({
+    this.clvrTestService.parseQr(request).subscribe({
       next: (res) => {
-        this.clvrTokenJson.set(res.clvrTokenPretty);
+        this.clvrTokenJson.set(res);
         this.qrStatus.set({type: 'success', text: 'Parsed and Converted CLVR Token from QR'});
         this.loadingQr.set(false);
       },
@@ -457,16 +461,20 @@ export class ClvrTestComponent {
     this.loadingQr.set(true);
     const request: ParseQrRequest = {
       qrCodeString: this.qrCodeString(),
-      jwk: this.jwk()
+      kid: this.kid()
     };
 
-    this.clvrTestService.checkSignature(this.patientId, request).subscribe({
+    this.clvrTestService.checkSignature(request).subscribe({
       next: (res) => {
-        if (res.valid) {
-          this.qrStatus.set({type: 'success', text: res.message});
-          this.messageService.add({severity: 'success', summary: 'Signature Valid', detail: res.message});
+        if (res) {
+          this.qrStatus.set({type: 'success', text: "Signature validated by provided key"});
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Signature Valid',
+            detail: "Signature validated by provided key"
+          });
         } else {
-          this.qrStatus.set({type: 'error', text: res.message});
+          this.qrStatus.set({type: 'error', text: "Signature invalid"});
         }
         this.loadingQr.set(false);
       },
@@ -480,15 +488,7 @@ export class ClvrTestComponent {
       return;
     }
     this.loadingQr.set(true);
-    this.clvrTestService.generateQrImage(this.patientId, this.qrCodeString()).subscribe({
-      next: (blob) => {
-        this.qrImageUrl.set(URL.createObjectURL(blob));
-        this.showQrModal.set(true);
-        this.qrStatus.set({type: 'success', text: 'QR Code rendered'});
-        this.loadingQr.set(false);
-      },
-      error: (err) => this.handleError(err, this.qrStatus, 'Failed to render QR image', this.loadingQr)
-    });
+
   }
 
   showPdfModalView(): void {
@@ -501,16 +501,6 @@ export class ClvrTestComponent {
       clvrTokenJson: this.clvrTokenJson(),
       qrCodeString: this.qrCodeString()
     };
-
-    this.clvrTestService.renderPdfImage(this.patientId, request).subscribe({
-      next: (blob) => {
-        this.pdfImageUrl.set(URL.createObjectURL(blob));
-        this.showPdfModal.set(true);
-        this.qrStatus.set({type: 'success', text: 'PDF rendered successfully'});
-        this.loadingQr.set(false);
-      },
-      error: (err) => this.handleError(err, this.qrStatus, 'Failed to render PDF preview', this.loadingQr)
-    });
   }
 
   exportPdfFile(): void {
@@ -524,7 +514,7 @@ export class ClvrTestComponent {
       qrCodeString: this.qrCodeString()
     };
 
-    this.clvrTestService.exportPdf(this.patientId, request).subscribe({
+    this.clvrTestService.exportPdf(request).subscribe({
       next: (blob) => {
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');

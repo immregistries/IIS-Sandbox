@@ -2,20 +2,24 @@ package org.immregistries.iis.kernal.controllers.rest.shlink;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.jpa.ips.generator.IIpsGeneratorSvc;
-import com.google.zxing.BarcodeFormat;
-import com.google.zxing.MultiFormatWriter;
-import com.google.zxing.client.j2se.MatrixToImageWriter;
-import com.google.zxing.common.BitMatrix;
+import com.authlete.cose.COSEException;
+import com.google.zxing.WriterException;
+import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.ECKey;
 import com.nimbusds.jose.jwk.JWK;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.rendering.ImageType;
-import org.apache.pdfbox.rendering.PDFRenderer;
+import org.hl7.fhir.instance.model.api.IBaseBundle;
 import org.hl7.fhir.r4.model.Bundle;
+import org.hl7.fhir.r4.model.IdType;
 import org.immregistries.iis.kernal.IisRequestAttribute;
+import org.immregistries.iis.kernal.controllers.IisPathVariable;
 import org.immregistries.iis.kernal.controllers.IisRestPath;
+import org.immregistries.iis.kernal.persisted.entities.IisKey;
 import org.immregistries.iis.kernal.persisted.entities.Tenant;
+import org.immregistries.iis.kernal.persisted.entities.UserAccess;
 import org.immregistries.iis.kernal.security.RequestTenantUtil;
+import org.immregistries.iis.kernal.services.KeyStoreService;
 import org.immregitries.clvr.*;
 import org.immregitries.clvr.mapping.FhirConversionUtil;
 import org.immregitries.clvr.model.CLVRPayload;
@@ -25,19 +29,19 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
-import java.security.KeyPair;
-import java.security.PublicKey;
-import java.util.Collections;
+import java.io.IOException;
+import java.security.*;
+import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.zip.DataFormatException;
 
 @RestController
-@RequestMapping(IisRestPath.REST_PATIENT_PATH + IisRestPath.BasePath.CLVR_PATH + "/test")
+@RequestMapping(IisRestPath.REST_TENANT_PATH + IisRestPath.BasePath.CLVR_PATH + "/test")
 public class CLVRTestRestController {
 
 	public static final String IPS_SAMPLE_R4_IIS = "{\n" +
@@ -489,6 +493,7 @@ public class CLVRTestRestController {
 	private final FhirContext fhirContext;
 	private final IIpsGeneratorSvc ipsGeneratorSvc;
 	private final RequestTenantUtil requestTenantUtil;
+	private final KeyStoreService keyStoreService;
 
 	@Autowired
 	public CLVRTestRestController(
@@ -501,7 +506,8 @@ public class CLVRTestRestController {
 		CLVRPdfService clvrPdfService,
 		FhirContext fhirContext,
 		IIpsGeneratorSvc ipsGeneratorSvc,
-		RequestTenantUtil requestTenantUtil) {
+		RequestTenantUtil requestTenantUtil,
+		KeyStoreService keyStoreService) {
 		this.nuvaService = nuvaService;
 		this.clvrService = clvrService;
 		this.signingService = signingService;
@@ -512,190 +518,111 @@ public class CLVRTestRestController {
 		this.fhirContext = fhirContext;
 		this.ipsGeneratorSvc = ipsGeneratorSvc;
 		this.requestTenantUtil = requestTenantUtil;
+		this.keyStoreService = keyStoreService;
 	}
 
 	// --- 1. Key Operations ---
 
 	@GetMapping("/example-key")
-	public ResponseEntity<Map<String, String>> getExampleKey() {
-		return ResponseEntity.ok(Collections.singletonMap("jwk", EXAMPLE_JWK));
+	public String getExampleKey() {
+		return EXAMPLE_JWK;
 	}
 
 	@PostMapping("/load-key")
-	public ResponseEntity<Map<String, String>> loadKeyPair(@RequestBody Map<String, String> request) {
-		try {
-			String jwkString = request.get("jwk");
-			JWK jwk = JWK.parse(jwkString);
-			String kid = jwk.getKeyID();
-			return ResponseEntity.ok(Map.of(
-				"message", "Key stored and ready to use",
-				"kid", kid != null ? kid : ""
-			));
-		} catch (Exception ex) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-				.body(Map.of("error", "Key pair could not be loaded: " + ex.getMessage()));
-		}
+	public String loadKeyPair(@RequestBody String requestBody, @RequestAttribute(IisRequestAttribute.TENANT_REQUEST_ATTRIBUTE) Tenant tenant, @AuthenticationPrincipal UserAccess userAccess) throws ParseException {
+		JWK jwk = JWK.parse(requestBody);
+		IisKey iisKey = this.keyStoreService.saveKey(jwk, tenant, userAccess);
+		return iisKey.getKeyId();
 	}
 
 	// --- 2. Bundle & Token Operations ---
 
 	@GetMapping("/example-fhir")
-	public ResponseEntity<Map<String, String>> getExampleFhir(
-		@RequestAttribute(IisRequestAttribute.TENANT_REQUEST_ATTRIBUTE) Tenant tenant
-//		@PathVariable(IisPathVariable.Key.PATIENT_ID) String patientId
+	public Map<String, String> getExampleFhir(
+		@RequestAttribute(IisRequestAttribute.TENANT_REQUEST_ATTRIBUTE) Tenant tenant,
+		@RequestParam(value = IisPathVariable.Key.PATIENT_ID, required = false) String patientId
 	) {
-//		IBaseBundle iBaseBundle = ipsGeneratorSvc.generateIps(
-//			requestTenantUtil.requestDetailsWithPartitionName(tenant),
-//			new IdType(patientId),
-//			""
-//		);
-//		String bundleString = fhirContext.newJsonParser().encodeResourceToString(iBaseBundle);
-		return ResponseEntity.ok(Map.of(
+		String bundleString;
+		if (StringUtils.isNotBlank(patientId)) {
+			IBaseBundle iBaseBundle = ipsGeneratorSvc.generateIps(
+				requestTenantUtil.requestDetailsWithPartitionName(tenant),
+				new IdType(patientId),
+				""
+			);
+			bundleString = fhirContext.newJsonParser().encodeResourceToString(iBaseBundle);
+		} else {
+			bundleString = IPS_SAMPLE_R4_IIS;
+		}
+
+		return Map.of(
 			"issuer", "SYA",
-			"fhirBundle", IPS_SAMPLE_R4_IIS
-		));
+			"fhirBundle", bundleString
+		);
 	}
 
 	@PostMapping("/convert-fhir")
-	public ResponseEntity<Map<String, Object>> convertFhirBundle(@RequestBody ConvertFhirRequest request) {
-		try {
-			if (request.getFhirBundle() == null || request.getFhirBundle().isBlank()) {
-				throw new IllegalArgumentException("FHIR Bundle cannot be empty!");
-			}
-			Bundle fhirBundle = fhirContext.newJsonParser()
-				.setPrettyPrint(true)
-				.parseResource(Bundle.class, request.getFhirBundle().trim());
-
-			CLVRPayload clvrPayloadFromBundle = fhirConversionUtil.toCLVRPayloadFromBundle(fhirBundle);
-			CLVRToken clvrToken = new CLVRToken(clvrPayloadFromBundle, request.getIssuer().trim());
-
-			return ResponseEntity.ok(Map.of("clvrToken", clvrToken));
-		} catch (Exception ex) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-				.body(Map.of("error", "Failed to convert FHIR bundle: " + ex.getMessage()));
+	public Map<Integer, Object> convertFhirBundle(@RequestBody ConvertFhirRequest request) {
+		if (request.getFhirBundle() == null || request.getFhirBundle().isBlank()) {
+			throw new IllegalArgumentException("FHIR Bundle cannot be empty!");
 		}
+		Bundle fhirBundle = fhirContext.newJsonParser()
+			.setPrettyPrint(true)
+			.parseResource(Bundle.class, request.getFhirBundle().trim());
+
+		CLVRPayload clvrPayloadFromBundle = fhirConversionUtil.toCLVRPayloadFromBundle(fhirBundle);
+		CLVRToken clvrToken = new CLVRToken(clvrPayloadFromBundle, request.getIssuer().trim());
+
+		return clvrToken.toCBORMap();
 	}
 
 	@PostMapping("/sign-and-compress")
-	public ResponseEntity<Map<String, String>> signAndCompress(@RequestBody SignCompressRequest request) {
-		try {
-			CLVRToken clvrToken = CLVRToken.fromString(request.getClvrTokenJson().trim());
-			JWK jwk = JWK.parse(request.getJwk().trim());
-			KeyPair keyPair = jwk.toECKey().toKeyPair();
-			String kid = jwk.getKeyID();
-
-			String qrCodeString = clvrService.encodeCLVRtoQrCode(clvrToken, keyPair, kid);
-			return ResponseEntity.ok(Map.of("qrCodeString", qrCodeString));
-		} catch (Exception ex) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-				.body(Map.of("error", "Failed to sign and compress token: " + ex.getMessage()));
-		}
+	public String signAndCompress(@RequestBody SignCompressRequest request, @AuthenticationPrincipal UserAccess userAccess) throws IOException, JOSEException, COSEException, SignatureException, NoSuchAlgorithmException, InvalidKeyException, NoSuchProviderException, ParseException {
+		CLVRToken clvrToken = CLVRToken.fromString(request.getClvrTokenJson().trim());
+		IisKey iisKey = keyStoreService.getKey(request.getKid(), userAccess);
+		JWK jwk = iisKey.jwk();
+		KeyPair keyPair = jwk.toECKey().toKeyPair();
+		return clvrService.encodeCLVRtoQrCode(clvrToken, keyPair, request.getKid());
 	}
 
 	// --- 3. QR & Signature Operations ---
 
 	@PostMapping("/parse-qr")
-	public ResponseEntity<Map<String, Object>> parseQrToToken(@RequestBody ParseQrRequest request) {
-		try {
-			JWK jwk = JWK.parse(request.getJwk().trim());
-			ECKey ecKey = jwk.toECKey();
+	public Map<Integer, Object> parseQrToToken(@RequestBody ParseQrRequest request, @AuthenticationPrincipal UserAccess userAccess) throws ParseException, JOSEException, COSEException, DataFormatException, IOException {
+		IisKey iisKey = keyStoreService.getKey(request.getKid(), userAccess);
+		JWK jwk = iisKey.jwk();
+		ECKey ecKey = jwk.toECKey();
 
-			Map<String, PublicKey> publicKeyMap = new HashMap<>();
-			publicKeyMap.put(jwk.getKeyID(), ecKey.toPublicKey());
+		Map<String, PublicKey> publicKeyMap = new HashMap<>();
+		publicKeyMap.put(jwk.getKeyID(), ecKey.toPublicKey());
 
-			CLVRToken clvrToken = clvrService.decodeFullQrCode(request.getQrCodeString().trim().getBytes(), publicKeyMap);
-			return ResponseEntity.ok(Map.of("clvrTokenPretty", clvrToken.toPrettyString()));
-		} catch (Exception ex) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-				.body(Map.of("error", "Failed to parse QR code: " + ex.getMessage()));
-		}
+		CLVRToken clvrToken = clvrService.decodeFullQrCode(request.getQrCodeString().trim().getBytes(), publicKeyMap);
+		return clvrToken.toCBORMap();
 	}
 
 	@PostMapping("/check-signature")
-	public ResponseEntity<Map<String, Object>> checkSignature(@RequestBody ParseQrRequest request) {
-		try {
-			JWK jwk = JWK.parse(request.getJwk().trim());
-			ECKey ecKey = jwk.toECKey();
+	public boolean checkSignature(@RequestBody ParseQrRequest request, @AuthenticationPrincipal UserAccess userAccess) throws COSEException, DataFormatException, IOException, ParseException, JOSEException {
+		IisKey iisKey = keyStoreService.getKey(request.getKid(), userAccess);
+		JWK jwk = iisKey.jwk();
+		ECKey ecKey = jwk.toECKey();
 
-			Map<String, PublicKey> publicKeyMap = new HashMap<>();
-			publicKeyMap.put(jwk.getKeyID(), ecKey.toPublicKey());
+		Map<String, PublicKey> publicKeyMap = new HashMap<>();
+		publicKeyMap.put(jwk.getKeyID(), ecKey.toPublicKey());
 
-			clvrService.decodeFullQrCode(request.getQrCodeString().trim().getBytes(), publicKeyMap);
-			return ResponseEntity.ok(Map.of(
-				"valid", true,
-				"message", "Signature validated by provided key"
-			));
-		} catch (Exception ex) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of(
-				"valid", false,
-				"message", "Verification failed: " + ex.getMessage()
-			));
-		}
-	}
-
-	// --- 4. Render & PDF Outputs ---
-
-	@PostMapping(value = "/generate-qr-image", produces = MediaType.IMAGE_PNG_VALUE)
-	public ResponseEntity<?> generateQrImage(@RequestBody Map<String, String> request) {
-		try {
-			String qrText = request.get("qrCodeString");
-			if (qrText == null || qrText.isBlank()) {
-				return ResponseEntity.badRequest().body(Map.of("error", "qrCodeString is required"));
-			}
-			BitMatrix matrix = new MultiFormatWriter().encode(qrText.trim(), BarcodeFormat.QR_CODE, 300, 300);
-			BufferedImage image = MatrixToImageWriter.toBufferedImage(matrix);
-
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			ImageIO.write(image, "png", baos);
-
-			return ResponseEntity.ok()
-				.contentType(MediaType.IMAGE_PNG)
-				.body(baos.toByteArray());
-		} catch (Exception ex) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-				.body(Map.of("error", "Failed to generate QR image: " + ex.getMessage()));
-		}
-	}
-
-	@PostMapping(value = "/render-pdf-image", produces = {MediaType.IMAGE_PNG_VALUE, MediaType.APPLICATION_JSON_VALUE})
-	public ResponseEntity<?> renderPdfImage(@RequestBody PdfRequest request) {
-		try {
-			CLVRToken clvrToken = CLVRToken.fromString(request.getClvrTokenJson().trim());
-			try (PDDocument pdDocument = clvrPdfService.createPdf(clvrToken, request.getQrCodeString().trim().getBytes(), "REST-API")) {
-				PDFRenderer pdfRenderer = new PDFRenderer(pdDocument);
-				BufferedImage image = pdfRenderer.renderImageWithDPI(0, 75, ImageType.RGB);
-
-				ByteArrayOutputStream baos = new ByteArrayOutputStream();
-				ImageIO.write(image, "png", baos);
-
-				return ResponseEntity.ok()
-					.contentType(MediaType.IMAGE_PNG)
-					.body(baos.toByteArray());
-			}
-		} catch (Exception ex) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-				.body(Map.of("error", "Failed to render PDF image: " + ex.getMessage()));
-		}
+		clvrService.decodeFullQrCode(request.getQrCodeString().trim().getBytes(), publicKeyMap);
+		return true;
 	}
 
 	@PostMapping(value = "/export-pdf", produces = {MediaType.APPLICATION_PDF_VALUE, MediaType.APPLICATION_JSON_VALUE})
-	public ResponseEntity<?> exportPdf(@RequestBody PdfRequest request) {
-		try {
-			CLVRToken clvrToken = CLVRToken.fromString(request.getClvrTokenJson().trim());
-			try (PDDocument pdDocument = clvrPdfService.createPdf(clvrToken, request.getQrCodeString().trim().getBytes(), "REST-API")) {
-				ByteArrayOutputStream baos = new ByteArrayOutputStream();
-				pdDocument.save(baos);
+	public ResponseEntity<byte[]> exportPdf(@RequestBody PdfRequest request) throws IOException, WriterException {
+		CLVRToken clvrToken = CLVRToken.fromString(request.getClvrTokenJson().trim());
+		PDDocument pdDocument = clvrPdfService.createPdf(clvrToken, request.getQrCodeString().trim().getBytes(), "REST-API");
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		pdDocument.save(baos);
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_PDF);
+		headers.setContentDispositionFormData("attachment", "ips-to-clvr-export.pdf");
 
-				HttpHeaders headers = new HttpHeaders();
-				headers.setContentType(MediaType.APPLICATION_PDF);
-				headers.setContentDispositionFormData("attachment", "ips-to-clvr-export.pdf");
-
-				return new ResponseEntity<>(baos.toByteArray(), headers, HttpStatus.OK);
-			}
-		} catch (Exception ex) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-				.body(Map.of("error", "Failed to export PDF: " + ex.getMessage()));
-		}
+		return new ResponseEntity<>(baos.toByteArray(), headers, HttpStatus.OK);
 	}
 
 	// --- DTO Helper Classes ---
@@ -723,7 +650,7 @@ public class CLVRTestRestController {
 
 	public static class SignCompressRequest {
 		private String clvrTokenJson;
-		private String jwk;
+		private String kid;
 
 		public String getClvrTokenJson() {
 			return clvrTokenJson;
@@ -733,18 +660,18 @@ public class CLVRTestRestController {
 			this.clvrTokenJson = clvrTokenJson;
 		}
 
-		public String getJwk() {
-			return jwk;
+		public String getKid() {
+			return kid;
 		}
 
-		public void setJwk(String jwk) {
-			this.jwk = jwk;
+		public void setKid(String kid) {
+			this.kid = kid;
 		}
 	}
 
 	public static class ParseQrRequest {
 		private String qrCodeString;
-		private String jwk;
+		private String kid;
 
 		public String getQrCodeString() {
 			return qrCodeString;
@@ -754,12 +681,12 @@ public class CLVRTestRestController {
 			this.qrCodeString = qrCodeString;
 		}
 
-		public String getJwk() {
-			return jwk;
+		public String getKid() {
+			return kid;
 		}
 
-		public void setJwk(String jwk) {
-			this.jwk = jwk;
+		public void setKid(String kid) {
+			this.kid = kid;
 		}
 	}
 
