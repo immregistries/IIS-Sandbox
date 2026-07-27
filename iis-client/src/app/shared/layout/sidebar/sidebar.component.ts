@@ -1,3 +1,4 @@
+import { ClvrName } from './../../../features/clvr/models/clvr.model';
 import {Component, computed, inject} from '@angular/core';
 import {RouterLink, RouterLinkActive} from '@angular/router';
 import {TenantContextService} from '../../../core/services/tenant-context.service';
@@ -12,6 +13,7 @@ import {TenantContextService} from '../../../core/services/tenant-context.servic
         <span class="sidebar-title">IIS Sandbox</span>
       </div>
       <ul class="sidebar-nav">
+        @if (!tenantContext.hasTenant()) {
         <li>
           <a routerLink="/dashboard" routerLinkActive="active" class="nav-link">
             <i class="pi pi-home"></i>
@@ -24,7 +26,21 @@ import {TenantContextService} from '../../../core/services/tenant-context.servic
             <span>Tenants</span>
           </a>
         </li>
-        @if (tenantContext.hasTenant()) {
+        }
+        @else {
+          <li>
+            <a [routerLink]="dashboard()" routerLinkActive="active" class="nav-link">
+              <i class="pi pi-home"></i>
+              <span>Dashboard</span>
+            </a>
+          </li>
+
+          <li>
+            <a [routerLink]="tenants()" routerLinkActive="active" class="nav-link">
+              <i class="pi pi-building"></i>
+              <span>Tenants</span>
+            </a>
+          </li>
           <li class="nav-section">Tenant: {{ tenantContext.tenantName() }}</li>
           <li>
             <a [routerLink]="patientsLink()" routerLinkActive="active" class="nav-link">
@@ -72,6 +88,12 @@ import {TenantContextService} from '../../../core/services/tenant-context.servic
             <a [routerLink]="wsdlLink()" routerLinkActive="active" class="nav-link">
               <i class="pi pi-code"></i>
               <span>CDC WSDL</span>
+            </a>
+          </li>
+          <li>
+            <a [routerLink]="clvr()" routerLinkActive="active" class="nav-link">
+              <i class="pi pi-code"></i>
+              <span>CLVR Test client</span>
             </a>
           </li>
           <li class="nav-section">Legacy Tools</li>
@@ -175,6 +197,8 @@ import {TenantContextService} from '../../../core/services/tenant-context.servic
 export class SidebarComponent {
   tenantContext = inject(TenantContextService);
 
+  dashboard = computed(() => `/t/${this.tenantContext.tenantName()}/dashboard`)
+  tenants = computed(() => `/t/${this.tenantContext.tenantName()}/tenants`)
   patientsLink = computed(() => `/t/${this.tenantContext.tenantName()}/patients`);
   messagesLink = computed(() => `/t/${this.tenantContext.tenantName()}/messages`);
   popLink = computed(() => `/t/${this.tenantContext.tenantName()}/pop`);
@@ -184,6 +208,7 @@ export class SidebarComponent {
   subscriptionLink = computed(() => `/t/${this.tenantContext.tenantName()}/subscription`);
   shLinkLink = computed(() => `/t/${this.tenantContext.tenantName()}/sh-link`);
   wsdlLink = computed(() => `/t/${this.tenantContext.tenantName()}/wsdl`);
+  clvr = computed(() => `/t/${this.tenantContext.tenantName()}/clvr`);
 
   queryConverterLink = computed(() => `/t/${this.tenantContext.tenantName()}/legacy/query-converter`);
   covidGenerateLink = computed(() => `/t/${this.tenantContext.tenantName()}/legacy/covid-generate`);

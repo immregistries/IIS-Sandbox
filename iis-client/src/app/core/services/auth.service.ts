@@ -121,8 +121,8 @@ export class AuthService {
       next: (tenants) => {
         const match = tenants.find(t => t.organizationName === tenantName);
         if (match) {
-          this.tenantContext.setTenant(match);
-          this.router.navigate(['/dashboard']);
+          // this.tenantContext.setTenant(match);
+          this.router.navigate([`/t/${tenantName}/dashboard`]);
         } else {
           this.router.navigate(['/dashboard']);
         }

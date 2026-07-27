@@ -26,6 +26,14 @@ export const routes: Routes = [
         canActivate: [tenantGuard],
         children: [
           {
+            path: 'dashboard',
+            loadChildren: () => import('./features/dashboard/dashboard.routes').then((m) => m.DASHBOARD_ROUTES),
+          },
+          {
+            path: 'tenants',
+            loadChildren: () => import('./features/tenant/tenant.routes').then((m) => m.TENANT_ROUTES),
+          },
+          {
             path: 'patients',
             loadChildren: () => import('./features/patient/patient.routes').then((m) => m.PATIENT_ROUTES),
           },
