@@ -40,9 +40,9 @@ const OPERATION_SAMPLE = `{
     <div class="subscription-page">
       <div class="page-header">
         <h1>Subscriptions</h1>
-        @if (!notAvailable()) {
-          <p-button label="Create Subscription" icon="pi pi-plus" (onClick)="openCreateDialog()" />
-        }
+        <!-- @if (!notAvailable()) { -->
+          <!-- <p-button label="Create Subscription" icon="pi pi-plus" (onClick)="openCreateDialog()" /> -->
+        <!-- } -->
       </div>
 
       @if (notAvailable()) {

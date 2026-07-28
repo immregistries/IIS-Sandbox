@@ -54,10 +54,12 @@ import {TenantContextService} from '../../../core/services/tenant-context.servic
               <span>Messages</span>
             </a>
           </li>
+          <li class="nav-section">Entry Points</li>
+
           <li>
             <a [routerLink]="popLink()" routerLinkActive="active" class="nav-link">
               <i class="pi pi-send"></i>
-              <span>Hl7V2 Messaging</span>
+              <span>Hl7v2 Messaging</span>
             </a>
           </li>
           <li>
@@ -66,6 +68,15 @@ import {TenantContextService} from '../../../core/services/tenant-context.servic
               <span>FHIR Messaging</span>
             </a>
           </li>
+          <li>
+            <a [routerLink]="wsdlLink()" routerLinkActive="active" class="nav-link">
+              <i class="pi pi-code"></i>
+              <span>CDC WSDL</span>
+            </a>
+          </li>
+
+          <li class="nav-section">Features</li>
+
           <li>
             <a [routerLink]="v2ToFhirLink()" routerLinkActive="active" class="nav-link">
               <i class="pi pi-arrows-h"></i>
@@ -78,22 +89,23 @@ import {TenantContextService} from '../../../core/services/tenant-context.servic
               <span>Smart Health Link</span>
             </a>
           </li>
+
+          <li>
+            <a [routerLink]="clvr()" routerLinkActive="active" class="nav-link">
+              <i class="pi pi-link"></i>
+              <span>CLVR Test client</span>
+            </a>
+          </li>
+          <li>
+            <a [routerLink]="vacDedupLink()" routerLinkActive="active" class="nav-link">
+              <i class="pi pi-clone"></i>
+              <span>Vac Dedup</span>
+            </a>
+          </li>
           <li>
             <a [routerLink]="subscriptionLink()" routerLinkActive="active" class="nav-link">
               <i class="pi pi-bell"></i>
               <span>Subscriptions</span>
-            </a>
-          </li>
-          <li>
-            <a [routerLink]="wsdlLink()" routerLinkActive="active" class="nav-link">
-              <i class="pi pi-code"></i>
-              <span>CDC WSDL</span>
-            </a>
-          </li>
-          <li>
-            <a [routerLink]="clvr()" routerLinkActive="active" class="nav-link">
-              <i class="pi pi-code"></i>
-              <span>CLVR Test client</span>
             </a>
           </li>
           <li class="nav-section">Legacy Tools</li>
@@ -115,18 +127,13 @@ import {TenantContextService} from '../../../core/services/tenant-context.servic
               <span>Lab Converter</span>
             </a>
           </li>
-          <li>
+          <!-- <li>
             <a [routerLink]="vciDemoLink()" routerLinkActive="active" class="nav-link">
               <i class="pi pi-shield"></i>
               <span>VCI Demo</span>
             </a>
-          </li>
-          <li>
-            <a [routerLink]="vacDedupLink()" routerLinkActive="active" class="nav-link">
-              <i class="pi pi-clone"></i>
-              <span>Vac Dedup</span>
-            </a>
-          </li>
+          </li> -->
+
           <li>
             <a [routerLink]="fitsLink()" routerLinkActive="active" class="nav-link">
               <i class="pi pi-search"></i>

@@ -31,7 +31,7 @@ import {MessageService} from 'primeng/api';
         <p-card header="FHIR Server">
           <p>Running FHIR R4 with HAPI FHIR JPA</p>
           <ng-template #footer>
-            <a href="/iis/fhir/metadata" target="_blank">
+            <a [href]="fhirMetadataLink()" target="_blank">
               <p-button label="FHIR Metadata" icon="pi pi-external-link" severity="secondary" [outlined]="true" size="small" />
             </a>
           </ng-template>
@@ -155,6 +155,7 @@ export class DashboardComponent implements OnInit {
 
   private allFlavors = signal<ProcessingFlavor[]>([]);
 
+  fhirMetadataLink = computed(() => `/iis/fhir/${this.tenantContext.tenantName()}/metadata`);
   patientsLink = computed(() => `/t/${this.tenantContext.tenantName()}/patients`);
   messagesLink = computed(() => `/t/${this.tenantContext.tenantName()}/messages`);
 
