@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -45,7 +46,8 @@ public class KeyStoreService {
 	}
 
 	public IisKey saveKey(JWK keyString, Tenant tenant, UserAccess userAccess) {
-		IisKey iisKey = new IisKey();
+		Optional<IisKey> old = iisKeyRepository.findByUserAccessAndKeyId(userAccess, keyString.getKeyID());
+		IisKey iisKey = old.orElse(new IisKey());
 		iisKey.setKeyId(keyString.getKeyID());
 		iisKey.setKeyString(keyString.toJSONString());
 		iisKey.setUserAccess(userAccess);

@@ -22,6 +22,7 @@ import {
   PdfRequest,
   SignCompressRequest
 } from '../services/clvr-test-api.service';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-clvr-test',
@@ -171,34 +172,15 @@ import {
                 (onClick)="checkSignature()"
                 class="w-full">
               </p-button>
+
+              <p-button label="Open PDF" icon="pi pi-file-pdf" [loading]="loadingQr()" (onClick)="exportPdfFile()" />
+
+            <p-dialog header="European Vaccine Certificate" [(visible)]="pdfDialogVisible" [modal]="true" [style]="{ width: '800px', height: '85vh' }">
+              @if (pdfUrl()) {
+                <iframe [src]="pdfUrl()!" class="pdf-viewer"></iframe>
+              }
+            </p-dialog>
             </div>
-          </div>
-
-          <div class="flex flex-wrap gap-2">
-            <p-button
-              label="Show QR"
-              icon="pi pi-qrcode"
-              [loading]="loadingQr()"
-              (onClick)="showQrCodeModal()"
-              class="flex-1">
-            </p-button>
-
-            <p-button
-              label="Show PDF"
-              icon="pi pi-eye"
-              [loading]="loadingQr()"
-              (onClick)="showPdfModalView()"
-              class="flex-1">
-            </p-button>
-
-            <p-button
-              label="Export PDF"
-              icon="pi pi-download"
-              severity="help"
-              [loading]="loadingQr()"
-              (onClick)="exportPdfFile()"
-              class="flex-1">
-            </p-button>
           </div>
 
           <p-message
@@ -289,17 +271,26 @@ import {
       gap: 0.5rem;
     }
 
-  :host ::ng-deep .p-card-content {
+  :host ::ng-deep .p-card-content { // TODO remove ng-deep
     display: flex;
     flex-direction: column;
     flex-grow: 1;
-  }`
+  }
+
+  .pdf-viewer {
+    width: 100%;
+    height: calc(85vh - 130px);
+    border: none;
+  }
+  `
 
 })
 export class ClvrTestComponent {
   private clvrTestService = inject(ClvrTestApiService);
   private messageService = inject(MessageService);
   private jsonPipe = inject(JsonPipe);
+  private sanitizer = inject(DomSanitizer);
+
 
   /** Patient ID parameter passed to the component */
   @Input() patientId: string = '';
@@ -332,6 +323,9 @@ export class ClvrTestComponent {
   // =========================================================================
   // Panel 1: Key Operations
   // =========================================================================
+
+  pdfDialogVisible = signal(false);
+  pdfUrl = signal<SafeResourceUrl | null>(null);
 
   loadExampleKey(): void {
     this.loadingKey.set(true);
@@ -391,8 +385,7 @@ export class ClvrTestComponent {
 
     this.clvrTestService.convertFhir(request).subscribe({
       next: (res) => {
-        const prettyToken = JSON.stringify(res, null, 2);
-        // this.clvrTokenJson.set(prettyToken);
+        const prettyToken = JSON.stringify(res, null, 2).replace(/"(-?\d+)":/g, '$1:');
         this.clvrTokenJson.set(prettyToken);
         this.fhirStatus.set({type: 'success', text: 'Parsed and Converted FHIR Bundle'});
         this.loadingFhir.set(false);
@@ -445,7 +438,8 @@ export class ClvrTestComponent {
 
     this.clvrTestService.parseQr(request).subscribe({
       next: (res) => {
-        this.clvrTokenJson.set(res);
+        const prettyToken = JSON.stringify(res, null, 2).replace(/"(-?\d+)":/g, '$1:');
+        this.clvrTokenJson.set(prettyToken);
         this.qrStatus.set({type: 'success', text: 'Parsed and Converted CLVR Token from QR'});
         this.loadingQr.set(false);
       },
@@ -491,7 +485,9 @@ export class ClvrTestComponent {
 
   }
 
-  showPdfModalView(): void {
+  private pdfBlob: Blob | null = null;
+
+  exportPdfFile(): void {
     if (!this.clvrTokenJson().trim() || !this.qrCodeString().trim()) {
       this.qrStatus.set({type: 'error', text: 'Both CLVR Token and QR String are required for PDF!'});
       return;
@@ -501,31 +497,15 @@ export class ClvrTestComponent {
       clvrTokenJson: this.clvrTokenJson(),
       qrCodeString: this.qrCodeString()
     };
-  }
-
-  exportPdfFile(): void {
-    if (!this.clvrTokenJson().trim() || !this.qrCodeString().trim()) {
-      this.qrStatus.set({type: 'error', text: 'Both CLVR Token and QR String are required for PDF export!'});
-      return;
-    }
-    this.loadingQr.set(true);
-    const request: PdfRequest = {
-      clvrTokenJson: this.clvrTokenJson(),
-      qrCodeString: this.qrCodeString()
-    };
-
     this.clvrTestService.exportPdf(request).subscribe({
       next: (blob) => {
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'ips-to-clvr-export.pdf';
-        a.click();
-        window.URL.revokeObjectURL(url);
-        this.qrStatus.set({type: 'success', text: 'Exported PDF document'});
+        this.pdfBlob = blob;
+        const objectUrl = URL.createObjectURL(blob);
+        this.pdfUrl.set(this.sanitizer.bypassSecurityTrustResourceUrl(objectUrl));
         this.loadingQr.set(false);
+        this.pdfDialogVisible.set(true);
       },
-      error: (err) => this.handleError(err, this.qrStatus, 'PDF export failed', this.loadingQr)
+      error: () => this.loadingQr.set(false),
     });
   }
 

@@ -3,6 +3,7 @@ import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {TenantContextService} from '../../../core/services/tenant-context.service';
 import {environment} from '../../../../environments/environment';
+import { ClvrTokenWire } from '../models/clvr.model';
 
 // ==========================================
 // API Request & Response Interfaces
@@ -63,16 +64,16 @@ export class ClvrTestApiService {
     return this.http.get<ExampleFhirResponse>(`${this.getBasePath()}/example-fhir`, {params: patientId ? {patientId: patientId} : {}});
   }
 
-  convertFhir(request: ConvertFhirRequest): Observable<string> {
-    const headers = new HttpHeaders({'Accept': 'text/plain'});
-    return this.http.post(`${this.getBasePath()}/convert-fhir`, request, {
-      headers: headers,
-      responseType: 'text'
-    });
+  convertFhir(request: ConvertFhirRequest): Observable<ClvrTokenWire> {
+    return this.http.post<ClvrTokenWire>(`${this.getBasePath()}/convert-fhir`, request);
   }
 
   signAndCompress(request: SignCompressRequest): Observable<string> {
-    return this.http.post<string>(`${this.getBasePath()}/sign-and-compress`, request);
+    const headers = new HttpHeaders({'Accept': 'text/plain'});
+    return this.http.post(`${this.getBasePath()}/sign-and-compress`, request, {
+      headers: headers,
+      responseType: 'text'
+    });
   }
 
   parseQr(request: ParseQrRequest): Observable<string> {
