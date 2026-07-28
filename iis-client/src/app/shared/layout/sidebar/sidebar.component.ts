@@ -1,4 +1,3 @@
-import { ClvrName } from './../../../features/clvr/models/clvr.model';
 import {Component, computed, inject} from '@angular/core';
 import {RouterLink, RouterLinkActive} from '@angular/router';
 import {TenantContextService} from '../../../core/services/tenant-context.service';
@@ -72,6 +71,12 @@ import {TenantContextService} from '../../../core/services/tenant-context.servic
             <a [routerLink]="wsdlLink()" routerLinkActive="active" class="nav-link">
               <i class="pi pi-code"></i>
               <span>CDC WSDL</span>
+            </a>
+          </li>
+          <li>
+            <a [routerLink]="fhirRestTestClient()" routerLinkActive="active" class="nav-link">
+              <i class="pi pi-code"></i>
+              <span>FHIR Rest</span>
             </a>
           </li>
 
@@ -216,6 +221,7 @@ export class SidebarComponent {
   shLinkLink = computed(() => `/t/${this.tenantContext.tenantName()}/sh-link`);
   wsdlLink = computed(() => `/t/${this.tenantContext.tenantName()}/wsdl`);
   clvr = computed(() => `/t/${this.tenantContext.tenantName()}/clvr`);
+  fhirRestTestClient = computed(() => `/t/${this.tenantContext.tenantName()}/fhir-rest-test-client`);
 
   queryConverterLink = computed(() => `/t/${this.tenantContext.tenantName()}/legacy/query-converter`);
   covidGenerateLink = computed(() => `/t/${this.tenantContext.tenantName()}/legacy/covid-generate`);

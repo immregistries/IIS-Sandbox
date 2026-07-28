@@ -88,6 +88,10 @@ export const routes: Routes = [
             loadChildren: () =>
               import('./features/legacy/legacy.routes').then((m) => m.LEGACY_ROUTES),
           },
+          {
+            path: 'fhir-rest-test-client',
+            loadChildren: () => import('./features/fhir-rest-test-client/fhir-rest-test-client.routes').then(m => m.FHIR_REST_TEST_CLIENT_ROUTES),
+          },
           {path: '', redirectTo: 'patients', pathMatch: 'full'},
         ],
       },
