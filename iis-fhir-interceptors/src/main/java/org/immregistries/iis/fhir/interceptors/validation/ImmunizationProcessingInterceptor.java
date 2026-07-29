@@ -11,6 +11,7 @@ import org.immregistries.iis.kernal.enums.ProcessingFlavor;
 import org.immregistries.iis.kernal.logic.validation.ImmunizationValidator;
 import org.immregistries.iis.kernal.logic.validation.ProcessingException;
 import org.immregistries.iis.kernal.mapping.mappers.resources.ImmunizationMapper;
+import org.immregistries.iis.kernal.mapping.requesters.FhirRequesterUtil;
 import org.immregistries.iis.kernal.model.VaccinationReported;
 import org.immregistries.iis.kernal.model.ack.IisReportable;
 import org.slf4j.Logger;
@@ -42,19 +43,27 @@ public class ImmunizationProcessingInterceptor extends IisLogicInterceptor {
 		if (requestDetails.getResource() == null || requestDetails.getRestOperationType() == null) {
 			return;
 		}
-		IAnyResource result = (IAnyResource) requestDetails.getResource();
+		IAnyResource resource = (IAnyResource) requestDetails.getResource();
+		if (requestDetails.getRestOperationType().equals(RestOperationTypeEnum.CREATE)
+			&& isASupportedImmunization(resource)
+			&& FhirRequesterUtil.isGoldenRecord(resource)) {
+			throw new InvalidRequestException("IIS rule: Created resource should not bear GOLDEN_RECORD Tag");
+		}
 		if (requestDetails.getRestOperationType().equals(RestOperationTypeEnum.UPDATE) || requestDetails.getRestOperationType().equals(RestOperationTypeEnum.CREATE)) {
-			if (requestDetails.getResource() instanceof org.hl7.fhir.r4.model.Immunization || requestDetails.getResource() instanceof org.hl7.fhir.r5.model.Immunization) {
+			if (isASupportedImmunization(resource)) {
 //				testMappingFhir((IisResourceMasterReportedMapper<IisMappedToFhirResource, IisMappedToFhirResource, IisMappedToFhirResource, IAnyResource>) immunizationMapper, (IAnyResource) requestDetails.getResource(), fhirContext.newJsonParser());
 				VaccinationReported vaccinationReported = immunizationMapper.localObjectReported((IAnyResource) requestDetails.getResource());
 				vaccinationReported = immunizationValidator.processAndValidateVaccinationReported(vaccinationReported, iisReportableList, processingFlavorSet, -1, -1, -1, "");
-				result = immunizationMapper.fhirObject(vaccinationReported);
+				resource = immunizationMapper.fhirObject(vaccinationReported);
 			}
 		}
-		requestDetails.setResource(result);
+		requestDetails.setResource(resource);
 		requestDetails.setAttribute(IIS_REPORTABLE_LIST, iisReportableList);
 	}
 
+	private static boolean isASupportedImmunization(IAnyResource resource) {
+		return resource instanceof org.hl7.fhir.r4.model.Immunization || resource instanceof org.hl7.fhir.r5.model.Immunization;
+	}
 
 
 }

@@ -11,6 +11,7 @@ import org.immregistries.iis.kernal.enums.ProcessingFlavor;
 import org.immregistries.iis.kernal.logic.validation.PatientValidator;
 import org.immregistries.iis.kernal.logic.validation.ProcessingException;
 import org.immregistries.iis.kernal.mapping.mappers.resources.PatientMapper;
+import org.immregistries.iis.kernal.mapping.requesters.FhirRequesterUtil;
 import org.immregistries.iis.kernal.model.PatientReported;
 import org.immregistries.iis.kernal.model.ack.IisReportable;
 import org.slf4j.Logger;
@@ -35,15 +36,20 @@ public class PatientProcessingInterceptor extends IisLogicInterceptor {
 	private PatientValidator patientValidator;
 
 	@Hook(value = SERVER_INCOMING_REQUEST_PRE_HANDLED, order = 2000)
-	public void handle(RequestDetails requestDetails) throws InvalidRequestException, ProcessingException { //TODO add rule to clean tags and meta on operations
+	public void handle(RequestDetails requestDetails) throws InvalidRequestException, ProcessingException {
 		Set<ProcessingFlavor> processingFlavorSet = ProcessingFlavor.getProcessingStyle(requestDetails.getTenantId());
 		List<IisReportable> iisReportableList = iisReportableList(requestDetails);
 		if (requestDetails.getResource() == null || requestDetails.getRestOperationType() == null) {
 			return;
 		}
 		IAnyResource resource = (IAnyResource) requestDetails.getResource();
+		if (requestDetails.getRestOperationType().equals(RestOperationTypeEnum.CREATE)
+			&& isASupportedPatient(resource)
+			&& FhirRequesterUtil.isGoldenRecord(resource)) {
+			throw new InvalidRequestException("IIS rule: Created resource should not bear GOLDEN_RECORD Tag");
+		}
 		if (requestDetails.getRestOperationType().equals(RestOperationTypeEnum.UPDATE) || requestDetails.getRestOperationType().equals(RestOperationTypeEnum.CREATE)) {
-			if (resource instanceof org.hl7.fhir.r4.model.Patient || resource instanceof org.hl7.fhir.r5.model.Patient) {
+			if (isASupportedPatient(resource)) {
 //				testMappingFhir(patientMapper, resource, fhirContext.newJsonParser());
 				PatientReported patientReported = patientValidator.processAndValidatePatient(patientMapper.localObjectReported(resource), iisReportableList, processingFlavorSet);
 				resource = patientMapper.fhirObject(patientReported);
@@ -53,7 +59,9 @@ public class PatientProcessingInterceptor extends IisLogicInterceptor {
 		requestDetails.setAttribute(IIS_REPORTABLE_LIST, iisReportableList);
 	}
 
-
+	private static boolean isASupportedPatient(IAnyResource resource) {
+		return resource instanceof org.hl7.fhir.r4.model.Patient || resource instanceof org.hl7.fhir.r5.model.Patient;
+	}
 
 
 }
