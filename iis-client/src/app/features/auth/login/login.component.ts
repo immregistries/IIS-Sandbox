@@ -27,6 +27,8 @@ import {AuthService} from '../../../core/services/auth.service';
             <p-message severity="error" [text]="authService.error()!" styleClass="mb-3 w-full" />
           }
 
+          <p-message severity="warn" text="Registration is automatic on first login"  />
+
           <div class="form-group">
             <label for="userId">Username</label>
             <input pInputText id="userId" [(ngModel)]="userId" name="userId" placeholder="Enter username" class="w-full" />

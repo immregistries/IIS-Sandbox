@@ -1,4 +1,4 @@
-import {Component, computed, inject, OnInit, signal} from '@angular/core';
+import {Component, computed, inject, OnInit, signal, viewChild} from '@angular/core';
 import {RouterLink} from '@angular/router';
 import {Card} from 'primeng/card';
 import {Button} from 'primeng/button';
@@ -11,11 +11,12 @@ import {TenantApiService} from '../tenant/services/tenant-api.service';
 import {TenantSelectorComponent} from '../../shared/components/tenant-selector/tenant-selector.component';
 import {getActiveFlavors, ProcessingFlavor} from '../tenant/models/flavor.model';
 import {MessageService} from 'primeng/api';
+import {TenantCreateDialogComponent} from '../tenant/components/tenant-create-dialog/tenant-create-dialog.component';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [RouterLink, Card, Button, Message, Panel, Tag, Tooltip, TenantSelectorComponent],
+  imports: [RouterLink, Card, Button, Message, Panel, Tag, Tooltip, TenantSelectorComponent, TenantCreateDialogComponent],
   template: `
     <div class="dashboard">
       <h1>Dashboard</h1>
@@ -76,7 +77,11 @@ import {MessageService} from 'primeng/api';
         } @else {
           <p-card header="Select a Tenant">
             <p>Select a tenant to access patient and messaging features.</p>
-            <app-tenant-selector />
+            @if (userHasTenant) {
+              <app-tenant-selector />
+            } @else {
+              <p-button label="Create Tenant" icon="pi pi-plus" (onClick)="createDialog().open()" />
+            }
           </p-card>
         }
       </div>
@@ -109,6 +114,8 @@ import {MessageService} from 'primeng/api';
 
     <p-button label="Message display test" (onClick)="showTestMessage()" class="p-mt-2"></p-button>
 </div>
+      <app-tenant-create-dialog [flavors]="allFlavors()" (created)="loadTenants()" />
+
   `,
   styles: `
     .dashboard { max-width: 960px; }
@@ -153,7 +160,8 @@ export class DashboardComponent implements OnInit {
   tenantContext = inject(TenantContextService);
   private tenantApi = inject(TenantApiService);
 
-  private allFlavors = signal<ProcessingFlavor[]>([]);
+  allFlavors = signal<ProcessingFlavor[]>([]);
+  createDialog = viewChild.required(TenantCreateDialogComponent);
 
   fhirMetadataLink = computed(() => `/iis/fhir/${this.tenantContext.tenantName()}/metadata`);
   patientsLink = computed(() => `/t/${this.tenantContext.tenantName()}/patients`);
@@ -175,10 +183,13 @@ export class DashboardComponent implements OnInit {
     return this.allFlavors().filter((f) => active.has(f.key));
   });
 
+  userHasTenant: boolean = false
+
   ngOnInit(): void {
     this.tenantApi.getFlavors().subscribe({
       next: (flavors) => this.allFlavors.set(flavors),
     });
+    this.loadTenants()
   }
 
   // Test helper – triggers a simple info toast
@@ -191,4 +202,13 @@ export class DashboardComponent implements OnInit {
       life: 5000,
     });
   }
+
+  loadTenants() {
+    if (!this.tenantContext.hasTenant()) {
+      this.tenantApi.getTenants().subscribe({
+        next: (tenants) => this.userHasTenant = tenants && tenants.length > 0
+      });
+    }
+  }
+
 }

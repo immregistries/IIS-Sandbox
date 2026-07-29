@@ -16,7 +16,7 @@ import {TenantContextService} from '../../../core/services/tenant-context.servic
       [ngModel]="tenantContext.currentTenant()"
       (ngModelChange)="onSelect($event)"
       optionLabel="organizationName"
-      placeholder="Select tenant"
+      placeholder="Select Tenant"
       [style]="{ minWidth: '180px' }"
       size="small"
     />
@@ -35,6 +35,5 @@ export class TenantSelectorComponent implements OnInit {
 
   onSelect(tenant: Tenant): void {
     this.tenantContext.setTenant(tenant);
-    this.router.navigate(['/t', tenant.organizationName, 'patients']);
   }
 }
