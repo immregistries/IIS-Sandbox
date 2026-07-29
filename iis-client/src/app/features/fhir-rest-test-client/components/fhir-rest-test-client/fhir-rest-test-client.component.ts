@@ -1,4 +1,4 @@
-import {Component, inject, signal, viewChild} from '@angular/core';
+import {Component, computed, inject, OnInit, signal, viewChild} from '@angular/core';
 import {FormsModule} from '@angular/forms';
 import {Select} from 'primeng/select';
 import {InputText} from 'primeng/inputtext';
@@ -9,6 +9,8 @@ import {Tooltip} from 'primeng/tooltip';
 import {JsonViewerDialogComponent} from '../../../../shared/components/json-viewer-dialog/json-viewer-dialog.component';
 import {InputEditorComponent} from '../../../../shared/components/input-editor/input-editor.component';
 import {FhirRestTestClientService} from '../../services/fhir-rest-test-client.service';
+import { TenantContextService } from '../../../../core/services/tenant-context.service';
+import { map, tap } from 'rxjs';
 
 /**
  * Component providing a UI to perform basic FHIR REST CRUD operations.
@@ -30,7 +32,10 @@ import {FhirRestTestClientService} from '../../services/fhir-rest-test-client.se
   ],
   template: `
     <div class="fhir-rest-test-client">
-      <h1>FHIR REST Test Client</h1>
+      <a [href]="fhirMetadataLink()" target="_blank">
+        <p-button label="FHIR Server Metadata" icon="pi pi-external-link" severity="secondary" [outlined]="true" size="small" />
+      </a>
+      <h1>FHIR REST Test Client (BETA)</h1>
 
       <p-message severity="warn" styleClass="mb-4 w-full">
         <ng-template #messageicon>
@@ -49,6 +54,8 @@ import {FhirRestTestClientService} from '../../services/fhir-rest-test-client.se
                 [options]="operationOptions"
                 [(ngModel)]="operation"
                 optionLabel="label"
+                [filter]="true"
+                filterBy="value"
                 optionValue="value"
                 placeholder="Select operation"
                 styleClass="w-full"
@@ -60,8 +67,10 @@ import {FhirRestTestClientService} from '../../services/fhir-rest-test-client.se
                 id="resourceSelect"
                 [options]="resourceOptions"
                 [(ngModel)]="resourceType"
-                optionLabel="label"
+                optionLabel="value"
                 optionValue="value"
+                [filter]="true"
+                filterBy="value"
                 placeholder="Select resource"
                 styleClass="w-full"
               ></p-select>
@@ -119,8 +128,11 @@ import {FhirRestTestClientService} from '../../services/fhir-rest-test-client.se
     .spacer { flex: 1; }
   `,
 })
-export class FhirRestTestClientComponent {
+export class FhirRestTestClientComponent implements OnInit{
   private service = inject(FhirRestTestClientService);
+  private tenantContext = inject(TenantContextService);
+
+  fhirMetadataLink = computed(() => `/iis/fhir/${this.tenantContext.tenantName()}/metadata`);
 
   jsonViewer = viewChild.required(JsonViewerDialogComponent);
 
@@ -143,9 +155,9 @@ export class FhirRestTestClientComponent {
   ];
 
   resourceOptions = [
-    {label: 'Patient', value: 'Patient'},
-    {label: 'Observation', value: 'Observation'},
-    {label: 'Encounter', value: 'Encounter'},
+    {value: 'Patient'},
+    {value: 'Observation'},
+    {value: 'Immunization'},
   ];
 
   // Helpers to decide which UI parts to show
@@ -175,6 +187,17 @@ export class FhirRestTestClientComponent {
         this.loading.set(false);
       },
     });
+  }
+
+  ngOnInit(): void {
+    this.loadMetadata()
+  }
+
+  loadMetadata() {
+    this.service.metadata()
+    .pipe(
+      tap((metadata) => this.resourceOptions = metadata.rest[0].resource.map((r: any) => ({ value: r.type}))),
+    ).subscribe()
   }
 
   onReset() {

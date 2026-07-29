@@ -36,6 +36,12 @@ export class FhirRestTestClientService {
     return this.http.get(`${this.basePath}/${resource}`, {params: params, headers: headers});
   }
 
+  metadata(): Observable<any> {
+    const headers = new HttpHeaders({"Content-Type": `application/fhir+json;charset=UTF-8`});
+    return this.http.get(`${this.basePath}/metadata`, { headers: headers});
+  }
+
+
   execute(
     operation: 'create' | 'read' | 'update' | 'delete' | 'search',
     resource: string,
