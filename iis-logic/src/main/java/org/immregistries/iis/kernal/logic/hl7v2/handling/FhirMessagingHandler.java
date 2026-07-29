@@ -239,8 +239,10 @@ public class FhirMessagingHandler extends IncomingMessageHandler<Bundle, Object>
 
 	public OrgLocation processLocation(Bundle bundle, Tenant tenant, Reference reference) {
 		return bundle.getEntry().stream()
-				.filter(bundleEntryComponent -> reference.getReference().equals(bundleEntryComponent.getFullUrl())
-						|| reference.getReference().equals(bundleEntryComponent.getResource().getId()))
+			.filter(bundleEntryComponent ->
+				reference.getReference() != null
+					&& (reference.getReference().equals(bundleEntryComponent.getFullUrl())
+					|| reference.getReference().equals(bundleEntryComponent.getResource().getId())))
 				.findFirst()
 				.map(Bundle.BundleEntryComponent::getResource)
 				.map(resource -> locationMapper.localObject((Location) resource))
@@ -255,8 +257,10 @@ public class FhirMessagingHandler extends IncomingMessageHandler<Bundle, Object>
 	public ModelPerson processPersonPractitioner(Bundle bundle, Tenant tenant, Reference reference) {
 		if (reference.getReferenceElement().getResourceType().equals("Practitioner")) {
 			return bundle.getEntry().stream()
-					.filter(bundleEntryComponent -> reference.getReference().equals(bundleEntryComponent.getFullUrl())
-							|| reference.getReference().equals(bundleEntryComponent.getResource().getId()))
+				.filter(bundleEntryComponent ->
+					reference.getReference() != null
+						&& (reference.getReference().equals(bundleEntryComponent.getFullUrl())
+						|| reference.getReference().equals(bundleEntryComponent.getResource().getId())))
 					.findFirst()
 					.map(Bundle.BundleEntryComponent::getResource)
 					.map(resource -> practitionerMapper.localObject((Practitioner) resource))
@@ -268,8 +272,10 @@ public class FhirMessagingHandler extends IncomingMessageHandler<Bundle, Object>
 					.orElse(null);
 		} else if (reference.getReferenceElement().getResourceType().equals("PractitionerRole")) {
 			Optional<Reference> practitionerReference = bundle.getEntry().stream()
-					.filter(bundleEntryComponent -> reference.getReference().equals(bundleEntryComponent.getFullUrl())
-							|| reference.getReference().equals(bundleEntryComponent.getResource().getId()))
+				.filter(bundleEntryComponent ->
+					reference.getReference() != null
+						&& (reference.getReference().equals(bundleEntryComponent.getFullUrl())
+						|| reference.getReference().equals(bundleEntryComponent.getResource().getId())))
 					.findFirst()
 					.map(Bundle.BundleEntryComponent::getResource)
 					.map(resource -> (PractitionerRole) resource)
