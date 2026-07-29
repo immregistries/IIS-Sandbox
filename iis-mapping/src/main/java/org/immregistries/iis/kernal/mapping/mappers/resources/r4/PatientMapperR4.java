@@ -268,6 +268,9 @@ public class PatientMapperR4 extends PatientMapper<Patient> implements IR4Resour
 	}
 
 	public Patient fhirObject(IisPatient pm) {
+		if (pm == null) {
+			return null;
+		}
 		Patient p = new Patient();
 		p.setId(pm.getPatientId());
 		/*

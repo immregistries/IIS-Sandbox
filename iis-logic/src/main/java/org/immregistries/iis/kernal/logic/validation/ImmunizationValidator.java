@@ -7,7 +7,7 @@ import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.enums.ProcessingFlavor;
 import org.immregistries.iis.kernal.logic.hl7v2.ack.IisReportableUtilService;
 import org.immregistries.iis.kernal.mapping.mappers.resources.ImmunizationMapper;
-import org.immregistries.iis.kernal.model.VaccinationReported;
+import org.immregistries.iis.kernal.model.IisVaccination;
 import org.immregistries.iis.kernal.model.ack.IisReportable;
 import org.immregistries.iis.kernal.model.ack.IisReportableSeverityLevel;
 import org.immregistries.iis.kernal.services.CodeMapManagerService;
@@ -31,8 +31,8 @@ public class ImmunizationValidator extends IisValidator{
 
 	private Random random = new Random();
 
-	public VaccinationReported processAndValidateVaccinationReported(VaccinationReported vaccinationReported, List<IisReportable> iisReportableList, Set<ProcessingFlavor> processingFlavorSet, int fundingSourceObxCount, int fundingEligibilityObxCount, int rxaCount, String vaccineCptCode) throws ProcessingException {
-		testMapping(immunizationMapper, vaccinationReported);
+	public <T extends IisVaccination> T processAndValidateVaccinationReported(T vaccinationReported, List<IisReportable> iisReportableList, Set<ProcessingFlavor> processingFlavorSet, int fundingSourceObxCount, int fundingEligibilityObxCount, int rxaCount, String vaccineCptCode) throws ProcessingException {
+//		testMapping(immunizationMapper, vaccinationReported);
 		CodeMap codeMap = codeMapManagerService.getCodeMap();
 
 		Date administrationDate = vaccinationReported.getAdministeredDate();
@@ -41,7 +41,7 @@ public class ImmunizationValidator extends IisValidator{
 		}
 
 
-		vaccinationReported = processNdcAndCvx(vaccinationReported, iisReportableList, processingFlavorSet, rxaCount, vaccineCptCode);
+		vaccinationReported = processNdcAndCvx(vaccinationReported, iisReportableList, processingFlavorSet, rxaCount, vaccineCptCode, codeMap);
 
 		if (StringUtils.isNotBlank(vaccinationReported.getRefusalReasonCode())) {
 			Code refusalCode = codeMap.getCodeForCodeset(CodesetType.VACCINATION_REFUSAL, vaccinationReported.getRefusalReasonCode());
@@ -80,8 +80,7 @@ public class ImmunizationValidator extends IisValidator{
 		return vaccinationReported;
 	}
 
-	private VaccinationReported processNdcAndCvx(VaccinationReported vaccinationReported, List<IisReportable> iisReportableList, Set<ProcessingFlavor> processingFlavorSet, int rxaCount, String vaccineCptCode) throws ProcessingException {
-		CodeMap codeMap = codeMapManagerService.getCodeMap();
+	private <T extends IisVaccination> T processNdcAndCvx(T vaccinationReported, List<IisReportable> iisReportableList, Set<ProcessingFlavor> processingFlavorSet, int rxaCount, String vaccineCptCode, CodeMap codeMap) throws ProcessingException {
 		String vaccineNdcCode = vaccinationReported.getVaccineNdcCode();
 		String vaccineCvxCode = vaccinationReported.getVaccineCvxCode();
 		{

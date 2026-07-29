@@ -8,10 +8,10 @@ import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.iis.kernal.enums.ProcessingFlavor;
 import org.immregistries.iis.kernal.logic.hl7v2.ack.IisReportableUtilService;
 import org.immregistries.iis.kernal.mapping.mappers.resources.PatientMapper;
+import org.immregistries.iis.kernal.model.IisPatient;
 import org.immregistries.iis.kernal.model.ModelName;
 import org.immregistries.iis.kernal.model.ModelPhone;
 import org.immregistries.iis.kernal.model.PatientGuardian;
-import org.immregistries.iis.kernal.model.PatientReported;
 import org.immregistries.iis.kernal.model.ack.IisReportable;
 import org.immregistries.iis.kernal.model.ack.IisReportableSeverityLevel;
 import org.immregistries.iis.kernal.services.CodeMapManagerService;
@@ -41,8 +41,8 @@ public class PatientValidator extends IisValidator {
 	IisReportableUtilService iisReportableUtilService;
 
 
-	public PatientReported processAndValidatePatient(PatientReported patientReported, List<IisReportable> iisReportableList, Set<ProcessingFlavor> processingFlavorSet) throws ProcessingException {
-		testMapping(patientMapper, patientReported);
+	public <T extends IisPatient> T processAndValidatePatient(T patientReported, List<IisReportable> iisReportableList, Set<ProcessingFlavor> processingFlavorSet) throws ProcessingException {
+//		testMapping(patientMapper, patientReported);
 
 		if (patientReported.getBirthDate() != null && patientReported.getBirthDate().after(new Date())) {
 			throw new ProcessingException("Patient is indicated as being born in the future, unable to record patients who are not yet born", "PID", 1, 7);
@@ -217,7 +217,7 @@ public class PatientValidator extends IisValidator {
 		}
 	}
 
-	public void agnosticValidation(PatientReported patientReported, List<IisReportable> iisReportableList, Set<ProcessingFlavor> processingFlavorSet) throws ProcessingException {
+	public void agnosticValidation(IisPatient patientReported, List<IisReportable> iisReportableList, Set<ProcessingFlavor> processingFlavorSet) throws ProcessingException {
 		CodeMap codeMap = codeMapManagerService.getCodeMap();
 		{
 			String patientSex = patientReported.getSex();

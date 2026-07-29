@@ -35,21 +35,21 @@ public class PatientProcessingInterceptor extends IisLogicInterceptor {
 	private PatientValidator patientValidator;
 
 	@Hook(value = SERVER_INCOMING_REQUEST_PRE_HANDLED, order = 2000)
-	public void handle(RequestDetails requestDetails) throws InvalidRequestException, ProcessingException {
+	public void handle(RequestDetails requestDetails) throws InvalidRequestException, ProcessingException { //TODO add rule to clean tags and meta on operations
 		Set<ProcessingFlavor> processingFlavorSet = ProcessingFlavor.getProcessingStyle(requestDetails.getTenantId());
 		List<IisReportable> iisReportableList = iisReportableList(requestDetails);
 		if (requestDetails.getResource() == null || requestDetails.getRestOperationType() == null) {
 			return;
 		}
-		IAnyResource result = (IAnyResource) requestDetails.getResource();
+		IAnyResource resource = (IAnyResource) requestDetails.getResource();
 		if (requestDetails.getRestOperationType().equals(RestOperationTypeEnum.UPDATE) || requestDetails.getRestOperationType().equals(RestOperationTypeEnum.CREATE)) {
-			if (requestDetails.getResource() instanceof org.hl7.fhir.r4.model.Patient || result instanceof org.hl7.fhir.r5.model.Patient) {
-				testMappingFhir(patientMapper, result, fhirContext.newJsonParser());
-				PatientReported patientReported = patientValidator.processAndValidatePatient(patientMapper.localObjectReported((IAnyResource) requestDetails.getResource()), iisReportableList, processingFlavorSet);
-				result = patientMapper.fhirObject(patientReported);
+			if (resource instanceof org.hl7.fhir.r4.model.Patient || resource instanceof org.hl7.fhir.r5.model.Patient) {
+//				testMappingFhir(patientMapper, resource, fhirContext.newJsonParser());
+				PatientReported patientReported = patientValidator.processAndValidatePatient(patientMapper.localObjectReported(resource), iisReportableList, processingFlavorSet);
+				resource = patientMapper.fhirObject(patientReported);
 			}
 		}
-		requestDetails.setResource(result);
+		requestDetails.setResource(resource);
 		requestDetails.setAttribute(IIS_REPORTABLE_LIST, iisReportableList);
 	}
 

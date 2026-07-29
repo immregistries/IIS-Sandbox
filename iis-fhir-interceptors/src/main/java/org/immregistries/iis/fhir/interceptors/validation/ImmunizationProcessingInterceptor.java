@@ -10,9 +10,7 @@ import org.hl7.fhir.instance.model.api.IAnyResource;
 import org.immregistries.iis.kernal.enums.ProcessingFlavor;
 import org.immregistries.iis.kernal.logic.validation.ImmunizationValidator;
 import org.immregistries.iis.kernal.logic.validation.ProcessingException;
-import org.immregistries.iis.kernal.mapping.mappers.resources.IisResourceMasterReportedMapper;
 import org.immregistries.iis.kernal.mapping.mappers.resources.ImmunizationMapper;
-import org.immregistries.iis.kernal.model.IisMappedToFhirResource;
 import org.immregistries.iis.kernal.model.VaccinationReported;
 import org.immregistries.iis.kernal.model.ack.IisReportable;
 import org.slf4j.Logger;
@@ -47,7 +45,7 @@ public class ImmunizationProcessingInterceptor extends IisLogicInterceptor {
 		IAnyResource result = (IAnyResource) requestDetails.getResource();
 		if (requestDetails.getRestOperationType().equals(RestOperationTypeEnum.UPDATE) || requestDetails.getRestOperationType().equals(RestOperationTypeEnum.CREATE)) {
 			if (requestDetails.getResource() instanceof org.hl7.fhir.r4.model.Immunization || requestDetails.getResource() instanceof org.hl7.fhir.r5.model.Immunization) {
-				testMappingFhir((IisResourceMasterReportedMapper<IisMappedToFhirResource, IisMappedToFhirResource, IisMappedToFhirResource, IAnyResource>) immunizationMapper, (IAnyResource) requestDetails.getResource(), fhirContext.newJsonParser());
+//				testMappingFhir((IisResourceMasterReportedMapper<IisMappedToFhirResource, IisMappedToFhirResource, IisMappedToFhirResource, IAnyResource>) immunizationMapper, (IAnyResource) requestDetails.getResource(), fhirContext.newJsonParser());
 				VaccinationReported vaccinationReported = immunizationMapper.localObjectReported((IAnyResource) requestDetails.getResource());
 				vaccinationReported = immunizationValidator.processAndValidateVaccinationReported(vaccinationReported, iisReportableList, processingFlavorSet, -1, -1, -1, "");
 				result = immunizationMapper.fhirObject(vaccinationReported);
