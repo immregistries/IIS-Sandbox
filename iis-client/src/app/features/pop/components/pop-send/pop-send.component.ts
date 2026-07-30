@@ -119,7 +119,7 @@ export class PopSendComponent implements OnInit {
         this.submitting.set(false);
       },
       error: (err) => {
-        this.error.set(err.message || 'Failed to send message');
+        this.error.set((err.error? JSON.parse(err.error).message : err.message) || 'Failed to send message');
         this.submitting.set(false);
       },
     });
