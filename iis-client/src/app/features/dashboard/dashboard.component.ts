@@ -105,7 +105,7 @@ import { Fieldset } from 'primeng/fieldset';
             <a [routerLink]="queryConverterLink()">Query Converter — Convert VXU to QBP query messages</a>
             <a [routerLink]="covidGenerateLink()">COVID Generate — Generate synthetic COVID-19 HL7 messages</a>
             <a [routerLink]="labConverterLink()">Lab Converter — Convert ORU lab messages to VXU</a>
-            <a [routerLink]="vciDemoLink()">VCI Demo — RSP to Verifiable Credential conversion</a>
+            <!-- <a [routerLink]="vciDemoLink()">VCI Demo — RSP to Verifiable Credential conversion</a> -->
             <a [routerLink]="vacDedupLink()">Vac Dedup — Vaccination deduplication demo</a>
             <a [routerLink]="fitsLink()">FITS Inspector — Parse and inspect RSP messages</a>
             <a [routerLink]="vxuDownloadLink()">VXU Download — Download COVID VXU for CDC reporting</a>
