@@ -129,7 +129,7 @@ function emptyRecord(): ImmunizationRecord {
     </div>
   `,
   styles: `
-    .vac-dedup { max-width: 960px; }
+    .vac-dedup { }
     h1 { margin: 0 0 1rem; }
     .form-layout { display: flex; flex-direction: column; gap: 1rem; }
     .table-input { width: 100%; }

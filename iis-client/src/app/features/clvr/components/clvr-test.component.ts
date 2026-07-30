@@ -42,7 +42,6 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
   ],
   providers: [MessageService, ClvrTestApiService, JsonPipe],
   template: `
-  <p-toast></p-toast>
 
 <div class="clvr-container">
   <div class="header-banner p-3 mb-4 text-center surface-card border-round shadow-1">
@@ -227,7 +226,6 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
   styles: `
   .clvr-container {
     padding: 1rem;
-    background-color: var(--surface-ground, #f8f9fa);
     min-height: 100vh;
   }
 

@@ -137,6 +137,6 @@ export class TenantListComponent implements OnInit {
 
   selectTenant(tenant: Tenant): void {
     this.tenantContext.setTenant(tenant);
-    this.router.navigate(['/t', tenant.organizationName, 'patients']);
+    this.router.navigate(['/t', tenant.organizationName, 'dashboard']);
   }
 }
