@@ -18,7 +18,7 @@ public interface  IServerSupport {
 
 	default IAnyResource loadResource(String theLocation, FhirContext theFhirContext, DaoRegistry theDaoRegistry) throws IOException {
     String json = stringFromResource(theLocation);
-		IAnyResource resource = theFhirContext.newJsonParser().parseResource(json);
+		IAnyResource resource = (IAnyResource) theFhirContext.newJsonParser().parseResource(json);
 		IFhirResourceDao<IAnyResource> dao = theDaoRegistry.getResourceDao(resource.getIdElement().getResourceType());
     if (dao == null) {
       return null;

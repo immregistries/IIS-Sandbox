@@ -1,57 +1,25 @@
 services:
-  hapi-fhir-postgresql:
-    image: postgres:13-alpine
-    container_name: hapi-fhir-postgres-jojo
-    restart: unless-stopped
-    environment:
-      #      Postgres DB name should be changed when trying to switch between FHIR version
-      POSTGRES_DB: ${ENV_IIS_POSTGRES_DB}
-      POSTGRES_USER: ${ENV_IIS_POSTGRES_USER}
-      POSTGRES_PASSWORD: ${ENV_IIS_POSTGRES_PASSWORD}
-    healthcheck:
-      test: pg_isready -d $$POSTGRES_DB -U $$POSTGRES_USER
-      interval: 8s
-      timeout: 10s
-      retries: 10
-      start_period: 5s
-  iis-sandbox-mysql:
-    image: mysql:latest
-    container_name: iis-sandbox-mysql-polnareff
-    command:
-      --lower_case_table_names=1
-    restart: unless-stopped
-    healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:3306/iis_alongside_jpa" ]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-      start_period: 5s
-    environment:
-      MYSQL_USER: ${ENV_IIS_MYSQL_USER}
-      MYSQL_PASSWORD: ${ENV_IIS_MYSQL_PASSWORD}
-      MYSQL_ROOT_PASSWORD: ${ENV_IIS_MYSQL_ROOT_PASSWORD}
-    volumes:
-      - ./database/create-mysql-database.sql:/docker-entrypoint-initdb.d/1.sql
   iis-sandbox:
-    build: .
-    image: iis-sandbox:dev
+    #    build: .
+    image: clemhen/iis-sandbox:latest
     container_name: iis-sandbox-iggy
     env_file: .env
     environment:
       FHIR_VERSION: R4
-      IIS_MYSQL_URL: "jdbc:mysql://iis-sandbox-mysql:3306/iis_alongside_jpa"
-      SPRING_DATASOURCE_URL: "jdbc:postgresql://hapi-fhir-postgresql:5432/hapi_fhir_iis"
-    #      ENV_IIS_MYSQL_USER: iis_web
-    #      ENV_IIS_MYSQL_PASSWORD: SharkBaitHooHaHa
+      # 1. Activate your target H2 profile explicitly
+      SPRING_PROFILES_ACTIVE: "h2"
+
+      # 2. Bind your file storage parameters to the newly permissioned system path
+      IIS_MYSQL_URL: "jdbc:h2:file:/var/data-h2/usersTenants"
+      SPRING_DATASOURCE_URL: "jdbc:h2:file:/var/data-h2/r4"
+
+      # 3. Explicitly declare the driver parameters so the environment maps perfectly
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: "org.h2.Driver"
     restart: unless-stopped
     ports:
-      - "8081:8080"
-    depends_on:
-      hapi-fhir-postgresql:
-        condition: service_healthy
-      iis-sandbox-mysql:
-        condition: service_healthy
+      - "8089:8080"
+    volumes:
+      - iis_h2_storage:/var/data-h2
 
 volumes:
-  hapi-fhir-postgres:
-  sandbox-mysql:
+  iis_h2_storage:

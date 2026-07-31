@@ -1,25 +1,18 @@
-########### bitnami tomcat version is suitable for debugging and comes with a shell
-########### it can be built using eg. `docker build --target tomcat .`
-FROM bitnami/tomcat:9.0 AS tomcat
+FROM eclipse-temurin:17-jre
 
-RUN rm -rf /opt/bitnami/tomcat/webapps/ROOT && \
-    rm -rf /opt/bitnami/tomcat/webapps_default/ROOT
+# Create the user first so the system registers the name
+RUN useradd -m springboot
 
+# Create the data directory and give ownership directly to the named user
+RUN mkdir -p /var/data-h2 && chown -R springboot:springboot /var/data-h2
 
-RUN mkdir /opt/bitnami/tomcat/webapps_default/ROOT
-RUN echo '<% response.sendRedirect("/iis/home"); %>' > /opt/bitnami/tomcat/webapps_default/ROOT/index.jsp
+USER springboot
+WORKDIR /app
 
-USER root
-RUN mkdir ~/data-h2 && chown -R 1001:1001 ~/data-h2
-RUN mkdir -p /target && chown -R 1001:1001 target
-USER 1001
-# Used to deactivate dev profile, even if prod profile no longer exists
-ENV spring.profiles.active=prod
-#ENV spring.jpa.properties.hibernate.dialect=ca.uhn.fhir.jpa.model.dialect.HapiFhirPostgres94Dialect
+# Copy your built application WAR file
+COPY ./iis-web/target/iis.jar /app/iis.jar
 
-COPY --chown=1001:1001 catalina.properties /opt/bitnami/tomcat/conf/catalina.properties
-COPY --chown=1001:1001 server.xml /opt/bitnami/tomcat/conf/server.xml
-COPY --chown=1001:1001 iis-web/target/iis.war /opt/bitnami/tomcat/webapps_default/iis.war
+EXPOSE 8080
 
-RUN apt-get update && apt-get install -y pwgen
-RUN echo "tomcat:$(pwgen -s 16 1)" > /opt/bitnami/tomcat/conf/tomcat-users.txt
+# Run the jar file
+ENTRYPOINT ["java", "-jar", "iis.jar"]

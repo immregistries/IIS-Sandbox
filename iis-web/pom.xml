@@ -11,7 +11,6 @@
     </parent>
 
     <artifactId>iis-web</artifactId>
-    <packaging>war</packaging>
 
     <name>IIS Sandbox Web</name>
 
@@ -163,40 +162,9 @@
                 </configuration>
             </plugin>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-war-plugin</artifactId>
-                <configuration>
-                    <archive>
-                        <manifest>
-                            <mainClass>org.immregistries.iis.kernal.Application</mainClass>
-                            <addDefaultImplementationEntries>
-                                true
-                            </addDefaultImplementationEntries>
-                        </manifest>
-                    </archive>
-                </configuration>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
-            <!-- The configuration here tells the WAR plugin to include the FHIR Tester overlay. You can omit it if you are not using that feature. -->
-            <!--            <plugin>-->
-            <!--                <groupId>org.apache.maven.plugins</groupId>-->
-            <!--                <artifactId>maven-war-plugin</artifactId>-->
-            <!--                <configuration>-->
-            <!--                    <archive>-->
-            <!--                        <manifestEntries>-->
-            <!--                            <Build-Time>${maven.build.timestamp}</Build-Time>-->
-            <!--                        </manifestEntries>-->
-            <!--                    </archive>-->
-            <!--                    <attachClasses>true</attachClasses>-->
-            <!--                    <overlays>-->
-            <!--                        <overlay>-->
-            <!--                            <groupId>ca.uhn.hapi.fhir</groupId>-->
-            <!--                            <artifactId>hapi-fhir-testpage-overlay</artifactId>-->
-            <!--                        </overlay>-->
-            <!--                    </overlays>-->
-            <!--                    <failOnMissingWebXml>false</failOnMissingWebXml>-->
-            <!--                </configuration>-->
-            <!--            </plugin>-->
-
             <!-- This is to run the integration tests -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -334,6 +302,7 @@
                 <activeByDefault>true</activeByDefault>
             </activation>
             <properties>
+                <!--                <spring.profiles.active>h2</spring.profiles.active>-->
                 <maven.test.skip>true</maven.test.skip>
             </properties>
         </profile>
@@ -345,6 +314,44 @@
                 <maven.test.skip>true</maven.test.skip>
             </properties>
         </profile>
+        <profile>
+            <id>generate-war</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-war-plugin</artifactId>
+                        <version>3.4.0</version>
+                        <configuration>
+                            <archive>
+                                <manifest>
+                                    <mainClass>org.immregistries.iis.kernal.Application</mainClass>
+                                    <addDefaultImplementationEntries>
+                                        true
+                                    </addDefaultImplementationEntries>
+                                </manifest>
+                            </archive>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>make-war</id>
+                                <!-- Binds the war execution to the package phase -->
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>war</goal>
+                                </goals>
+                                <configuration>
+                                    <!-- Optional: point to your web.xml if needed -->
+                                    <!-- <webXml>src/main/webapp/WEB-INF/web.xml</webXml> -->
+                                    <failOnMissingWebXml>false</failOnMissingWebXml>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
         <profile>
             <id>jetty</id>
             <dependencies>

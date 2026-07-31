@@ -26,7 +26,7 @@ import static org.immregistries.iis.kernal.controllers.servlet.HomeController.HO
  * UI Homepage
  */
 @RestController
-@RequestMapping({ HOME_BASE_PATH, "/", TenantController.TENANT_PATH + HOME_BASE_PATH })
+@RequestMapping({HOME_BASE_PATH, TenantController.TENANT_PATH + HOME_BASE_PATH})
 public class HomeController {
 
 	public static final String HOME_BASE_PATH = "/home";
