@@ -36,11 +36,19 @@ then configure the variables
 Compile and run with embedded H2 database:
 
 ```
-mvn clean install;
+mvn clean install ;
 set -a;
 source .env;
 set +a;
-java -jar iis-web/target/iis.war;
+java -jar iis-web/target/iis.jar;
+```
+
+## Compile and get WAR archive
+
+Compile and obetain a war file:
+
+```
+mvn clean package -Pgenerate-war
 ```
 
 ### Build and run with Docker

@@ -1,6 +1,6 @@
 services:
   iis-sandbox:
-    #    build: .
+    build: .
     image: clemhen/iis-sandbox:latest
     container_name: iis-sandbox-iggy
     env_file: .env
