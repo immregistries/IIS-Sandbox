@@ -41,7 +41,6 @@ import {InputEditorComponent} from '../../../../shared/components/input-editor/i
             </div>
             <div class="actions">
               <p-button label="Submit" icon="pi pi-send" (onClick)="onSubmit()" [loading]="submitting()" />
-              <p-button label="Reset" icon="pi pi-refresh" severity="secondary" [outlined]="true" (onClick)="onReset()" />
             </div>
           </div>
         </div>
@@ -49,13 +48,17 @@ import {InputEditorComponent} from '../../../../shared/components/input-editor/i
 
       @if (response()) {
         <p-card header="Response" styleClass="mt-4">
+        <div class="form-layout">
           <div class="textarea-toolbar">
+              <p-button label="Reset" icon="pi pi-refresh" severity="secondary" [outlined]="true" (onClick)="onReset()" />
+
             <span class="spacer"></span>
 
             <p-button icon="pi pi-copy" [rounded]="true" [text]="true" size="small" pTooltip="Copy" (onClick)="copyToClipboard(response()!)" />
             <p-button icon="pi pi-eye" [rounded]="true" [text]="true" size="small" pTooltip="View JSON" (onClick)="jsonViewer().open(response()!)" />
           </div>
           <app-input-editor [content]="response() ?? ''" [readonly]="true" language="json" height="288px" />
+        </div>
         </p-card>
       }
 
@@ -150,8 +153,6 @@ export class FhirMessagingSendComponent {
   }
 
   onReset(): void {
-    this.messageData.set('');
-    this.facilityName.set('');
     this.response.set(null);
     this.error.set(null);
   }

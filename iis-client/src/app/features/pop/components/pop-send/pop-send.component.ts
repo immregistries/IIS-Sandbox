@@ -24,7 +24,11 @@ import {InputEditorComponent} from '../../../../shared/components/input-editor/i
 
       <p-card header="VXU Message">
         <div class="form-layout">
-          <p-button label="New Sample" icon="pi pi-file-plus" severity="secondary" [outlined]="true" size="small" (onClick)="onNewSample()" [loading]="loadingSample()" />
+          <div class="textarea-toolbar">
+            <p-button label="New Sample" icon="pi pi-file-plus" severity="secondary" [outlined]="true" size="small" (onClick)="onNewSample()" [loading]="loadingSample()" />
+            <span class="spacer"></span>
+            <p-button icon="pi pi-copy" [rounded]="true" [text]="true" size="small" pTooltip="Copy" (onClick)="copyToClipboard(messageData())" />
+          </div>
           <app-input-editor [(content)]="messageData" placeholder="Paste HL7 VXU message here..." height="360px" />
 
           <div class="options-bar">
@@ -34,7 +38,6 @@ import {InputEditorComponent} from '../../../../shared/components/input-editor/i
             </div>
             <div class="actions">
               <p-button label="Submit" icon="pi pi-send" (onClick)="onSubmit()" [loading]="submitting()" />
-              <p-button label="Reset" icon="pi pi-refresh" severity="secondary" [outlined]="true" (onClick)="onReset()" />
             </div>
           </div>
         </div>
@@ -42,7 +45,14 @@ import {InputEditorComponent} from '../../../../shared/components/input-editor/i
 
       @if (response()) {
         <p-card header="ACK Response" styleClass="mt-4">
+          <div class="form-layout">
+          <div class="textarea-toolbar">
+              <p-button label="Reset" icon="pi pi-refresh" severity="secondary" [outlined]="true" (onClick)="onReset()" />
+            <span class="spacer"></span>
+            <p-button icon="pi pi-copy" [rounded]="true" [text]="true" size="small" pTooltip="Copy" (onClick)="copyToClipboard(response()!)" />
+          </div>
           <app-input-editor [content]="response() ?? ''" [readonly]="true" height="288px" />
+          </div>
         </p-card>
       }
 
@@ -83,6 +93,13 @@ import {InputEditorComponent} from '../../../../shared/components/input-editor/i
     .mb-4 { margin-bottom: 1rem; }
     .mt-4 { margin-top: 1rem; }
     .w-full { width: 100%; }
+    .spacer { flex: 1; }
+    .textarea-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      margin-bottom: -0.5rem;
+    }
   `,
 })
 export class PopSendComponent implements OnInit {
@@ -142,5 +159,9 @@ export class PopSendComponent implements OnInit {
     this.facilityName.set('');
     this.response.set(null);
     this.error.set(null);
+  }
+
+  copyToClipboard(text: string): void {
+    navigator.clipboard.writeText(text);
   }
 }

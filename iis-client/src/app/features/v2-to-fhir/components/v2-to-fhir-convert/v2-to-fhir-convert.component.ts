@@ -41,7 +41,6 @@ import {InputEditorComponent} from '../../../../shared/components/input-editor/i
             </div>
             <div class="actions">
               <p-button label="Convert" icon="pi pi-arrows-h" (onClick)="onConvert()" [loading]="converting()" />
-              <p-button label="Reset" icon="pi pi-refresh" severity="secondary" [outlined]="true" (onClick)="onReset()" />
             </div>
           </div>
         </div>
@@ -49,12 +48,15 @@ import {InputEditorComponent} from '../../../../shared/components/input-editor/i
 
       @if (response()) {
         <p-card header="FHIR Bundle" styleClass="mt-4">
-          <div class="textarea-toolbar">
-            <span class="toolbar-spacer"></span>
-            <p-button icon="pi pi-copy" [rounded]="true" [text]="true" size="small" pTooltip="Copy" (onClick)="copyToClipboard(response()!)" />
-            <p-button icon="pi pi-eye" [rounded]="true" [text]="true" size="small" pTooltip="View JSON" (onClick)="jsonViewer().open(response()!)" />
+          <div class="form-layout">
+            <div class="textarea-toolbar">
+              <p-button label="Reset" icon="pi pi-refresh" severity="secondary" [outlined]="true" (onClick)="onReset()" />
+              <span class="toolbar-spacer"></span>
+              <p-button icon="pi pi-copy" [rounded]="true" [text]="true" size="small" pTooltip="Copy" (onClick)="copyToClipboard(response()!)" />
+              <p-button icon="pi pi-eye" [rounded]="true" [text]="true" size="small" pTooltip="View JSON" (onClick)="jsonViewer().open(response()!)" />
+            </div>
+            <app-input-editor [content]="response() ?? ''" [readonly]="true" language="json" height="288px" />
           </div>
-          <app-input-editor [content]="response() ?? ''" [readonly]="true" language="json" height="288px" />
         </p-card>
       }
 
