@@ -32,7 +32,7 @@
 
     <properties>
         <!--        <iis.sandbox.revision>1</iis.sandbox.revision>-->
-        <revision>0.6.3-SNAPSHOT-HAPI-UPGRADE-TEST</revision>
+        <revision>0.7.0-SNAPSHOT</revision>
         <!--        WARNING MUST BE THE SAME VALUE AS parent hapi-fhir version -->
         <hapi-fhir.version>8.0.0-IIS</hapi-fhir.version>
         <java.version>17</java.version>
