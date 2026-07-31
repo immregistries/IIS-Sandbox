@@ -10,6 +10,7 @@ import org.immregistries.iis.kernal.persisted.repository.UserAccessRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -43,9 +44,10 @@ public class UserAccessUtil {
 		 if (optionalUserAccess.isEmpty()) {
 			 userAccess = registerUserAccessWithUsernamePassword(username, password);
 		 } else {
-            // if (BCrypt.checkpw(password, userAccessList.get(0).getAccessKey())) { TODO
-            // after auth checks fix in fhir
-			 if (password.equals(optionalUserAccess.get().getAccessKey())) { // TODO Change
+
+			 if (BCrypt.checkpw(password, optionalUserAccess.get().getAccessKey())) {
+				 userAccess = optionalUserAccess.get();
+			 } else if (password.equals(optionalUserAccess.get().getAccessKey())) { // TODO Change, useful now for internal api call
 				 userAccess = optionalUserAccess.get();
             } else {
                 throw new AuthenticationException("password for user : " + username);
@@ -91,9 +93,8 @@ public class UserAccessUtil {
         }
         UserAccess userAccess = new UserAccess();
         userAccess.setAccessName(username);
-        // userAccess.setAccessKey(BCrypt.hashpw(password, BCrypt.gensalt(5))); TODO
+		userAccess.setAccessKey(BCrypt.hashpw(password, BCrypt.gensalt(5)));
         // after auth checks fix in fhir
-        userAccess.setAccessKey(password);
 		return userAccessRepository.save(userAccess);
     }
 
