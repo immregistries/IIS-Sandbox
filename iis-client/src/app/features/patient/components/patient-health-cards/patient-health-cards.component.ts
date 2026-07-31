@@ -36,10 +36,14 @@ import {ShLinkTableComponent} from '../../../shlink/components/shlink-table/shli
         }
       </div>
 
-      <h3>Generated Links</h3>
+      <div class="table-header">
+        <h3>Generated Links</h3>
+      <p-button label="Generate New Smart Health Link" icon="pi pi-link" [outlined]="true" (onClick)="shlinkDialog().open(patientId())" />
+
+      </div>
+
       <app-shlink-table [patientId]="patientId()" [showPatientColumn]="false" />
 
-      <p-button label="Generate a new Smart Health Link" icon="pi pi-link" [outlined]="true" (onClick)="shlinkDialog().open(patientId())" />
       <app-shlink-generate (generated)="onGenerated()" />
 
       <h3>European Vaccine Certificate (EVC) - CLVR</h3>
@@ -67,6 +71,13 @@ import {ShLinkTableComponent} from '../../../shlink/components/shlink-table/shli
       width: 100%;
       height: calc(85vh - 130px);
       border: none;
+    }
+    .table-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+      h3 { margin: 0; }
     }
   `,
 })
