@@ -13,9 +13,11 @@
     <artifactId>iis-web</artifactId>
 
     <name>IIS Sandbox Web</name>
-
+    <packaging>${packaging.type}</packaging>
 
     <properties>
+        <!-- Default fallback is standard JAR -->
+        <packaging.type>jar</packaging.type>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -316,6 +318,20 @@
         </profile>
         <profile>
             <id>generate-war</id>
+            <properties>
+                <packaging.type>war</packaging.type>
+            </properties>
+
+            <dependencies>
+                <!-- This scopes the embedded tomcat out of the final WAR production -->
+                <dependency>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-tomcat</artifactId>
+                    <version>${spring_boot_version}</version>
+                    <scope>provided</scope>
+                </dependency>
+            </dependencies>
+
             <build>
                 <plugins>
                     <plugin>
@@ -323,30 +339,15 @@
                         <artifactId>maven-war-plugin</artifactId>
                         <version>3.4.0</version>
                         <configuration>
-                            <archive>
-                                <manifest>
-                                    <mainClass>org.immregistries.iis.kernal.Application</mainClass>
-                                    <addDefaultImplementationEntries>
-                                        true
-                                    </addDefaultImplementationEntries>
-                                </manifest>
-                            </archive>
+                            <failOnMissingWebXml>false</failOnMissingWebXml>
                         </configuration>
-                        <executions>
-                            <execution>
-                                <id>make-war</id>
-                                <!-- Binds the war execution to the package phase -->
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>war</goal>
-                                </goals>
-                                <configuration>
-                                    <!-- Optional: point to your web.xml if needed -->
-                                    <!-- <webXml>src/main/webapp/WEB-INF/web.xml</webXml> -->
-                                    <failOnMissingWebXml>false</failOnMissingWebXml>
-                                </configuration>
-                            </execution>
-                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-maven-plugin</artifactId>
+                        <configuration>
+                            <mainClass>org.immregistries.iis.kernal.Application</mainClass>
+                        </configuration>
                     </plugin>
                 </plugins>
             </build>

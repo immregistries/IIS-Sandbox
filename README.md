@@ -45,7 +45,7 @@ java -jar iis-web/target/iis.jar;
 
 ## Compile and get WAR archive
 
-Compile and obetain a war file:
+Compile and obtain a war file:
 
 ```
 mvn clean package -Pgenerate-war
