@@ -9,8 +9,8 @@ import {Tooltip} from 'primeng/tooltip';
 import {JsonViewerDialogComponent} from '../../../../shared/components/json-viewer-dialog/json-viewer-dialog.component';
 import {InputEditorComponent} from '../../../../shared/components/input-editor/input-editor.component';
 import {FhirRestTestClientService} from '../../services/fhir-rest-test-client.service';
-import { TenantContextService } from '../../../../core/services/tenant-context.service';
-import { map, tap } from 'rxjs';
+import {TenantContextService} from '../../../../core/services/tenant-context.service';
+import {tap} from 'rxjs';
 
 /**
  * Component providing a UI to perform basic FHIR REST CRUD operations.
@@ -100,7 +100,7 @@ import { map, tap } from 'rxjs';
 
       @if (response()) {
         <p-card header="Response" styleClass="mt-4">
-          <div class="textarea-toolbar">
+          <div class="options-bar">
             <span class="spacer"></span>
             <p-button icon="pi pi-copy" [rounded]="true" [text]="true" size="small" pTooltip="Copy" (onClick)="copyToClipboard(response()!)" />
             <p-button icon="pi pi-eye" [rounded]="true" [text]="true" size="small" pTooltip="View JSON" (onClick)="jsonViewer().open(response()!)" />
