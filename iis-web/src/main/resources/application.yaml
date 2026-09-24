@@ -15,8 +15,14 @@ iis:
     url:
       host: "localhost:8080"
     admin:
-      user: ${IIS_ADMIN_USER:"change-me"}
-      password: ${IIS_ADMIN_PASSWORD:"change-me"}
+      # Blank by default on purpose: AdminBootstrap refuses to seed an account
+      # unless both a name and a real password are supplied.
+      user: ${IIS_ADMIN_USER:}
+      password: ${IIS_ADMIN_PASSWORD:}
+      create-if-not-exists: ${IIS_CREATE_ADMIN_IF_NOT_EXISTS:false}
+    # When false, logging in with an unknown username is rejected instead of
+    # silently creating the account.
+    allow-self-registration: ${IIS_ALLOW_SELF_REGISTRATION:true}
   api:
     app:
       jwtSecret: ${ENV_IIS_JWT_SECRET}
@@ -106,8 +112,9 @@ spring:
       enabled: false
 hibernate:
   hbm2ddl:
-    auto:
-      create
+    # Applies to the IIS second datasource (users, tenants). 'update' rather than
+    # 'create' so accounts survive a restart; all schema additions are additive.
+    auto: ${HIBERNATE_HBM2DDL_AUTO:update}
 hapi:
   fhir:
     ### This is the FHIR version. Choose between, DSTU2, DSTU3, R4 or R5

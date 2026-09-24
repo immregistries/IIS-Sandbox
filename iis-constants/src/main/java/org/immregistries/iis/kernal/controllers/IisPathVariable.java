@@ -12,6 +12,7 @@ public class IisPathVariable {
 		public static final String MANIFEST_ID = "manifestId";
 		public static final String VACCINATION_ID = "vaccinationId";
 		public static final String KEY_ID = "keyId";
+		public static final String USER_ID = "userId";
 	}
 
 	/**
@@ -25,5 +26,6 @@ public class IisPathVariable {
 		public static final String MANIFEST_ID_PLACEHOLDER = "/{" + Key.MANIFEST_ID + "}";
 		public static final String VACCINATION_ID_PLACEHOLDER = "/{" + Key.VACCINATION_ID + "}";
 		public static final String KEY_ID_PLACEHOLDER = "/{" + Key.KEY_ID + "}";
+		public static final String USER_ID_PLACEHOLDER = "/{" + Key.USER_ID + "}";
 	}
 }

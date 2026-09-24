@@ -19,6 +19,11 @@ public final class IisRestPath {
 	public static final String SH_LINK_CONTENT_PATH = BasePath.REST_PATH + "/" + Key.SH_LINK_FILES_KEY;
 	public final static String SH_LINKS_STORED_MANIFEST_FULL_PATH = BasePath.REST_PATH + BasePath.STORED_MANIFEST_PATH;
 
+	//	User management paths
+	public static final String REST_USER_PATH = BasePath.REST_PATH + BasePath.USER_PATH;
+	public static final String REST_ADMIN_PATH = BasePath.REST_PATH + BasePath.ADMIN_PATH;
+	public static final String REST_ADMIN_USERS_PATH = REST_ADMIN_PATH + BasePath.USERS_PATH;
+
 
 
 	/**
@@ -60,6 +65,14 @@ public final class IisRestPath {
 		public static final String VCI_DEMO_KEY = "vci-demo";
 		public static final String VXU_DOWNLOAD_KEY = "vxu-download";
 		public static final String COVID_EXPORT_KEY = "covid-export";
+		public static final String USER_KEY = "user";
+		public static final String USERS_KEY = "users";
+		public static final String ADMIN_KEY = "admin";
+		public static final String ME_KEY = "me";
+		public static final String PASSWORD_KEY = "password";
+		public static final String EMAIL_KEY = "email";
+		public static final String ENABLED_KEY = "enabled";
+		public static final String ROLES_KEY = "roles";
 	}
 
 	public enum RestKey {
@@ -148,5 +161,13 @@ public final class IisRestPath {
 		public static final String VCI_DEMO_PATH = "/" + Key.VCI_DEMO_KEY;
 		public static final String VXU_DOWNLOAD_PATH = "/" + Key.VXU_DOWNLOAD_KEY;
 		public static final String COVID_EXPORT_PATH = "/" + Key.COVID_EXPORT_KEY;
+		public static final String USER_PATH = "/" + Key.USER_KEY;
+		public static final String USERS_PATH = "/" + Key.USERS_KEY;
+		public static final String ADMIN_PATH = "/" + Key.ADMIN_KEY;
+		public static final String ME_PATH = "/" + Key.ME_KEY;
+		public static final String PASSWORD_PATH = "/" + Key.PASSWORD_KEY;
+		public static final String EMAIL_PATH = "/" + Key.EMAIL_KEY;
+		public static final String ENABLED_PATH = "/" + Key.ENABLED_KEY;
+		public static final String ROLES_PATH = "/" + Key.ROLES_KEY;
 	}
 }

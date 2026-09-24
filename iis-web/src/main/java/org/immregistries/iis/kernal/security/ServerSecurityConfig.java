@@ -8,15 +8,18 @@ import org.immregistries.iis.kernal.controllers.servlet.PopController;
 import org.immregistries.iis.kernal.controllers.servlet.SoapDescriptionController;
 import org.immregistries.iis.kernal.controllers.servlet.TenantController;
 import org.immregistries.iis.kernal.controllers.servlet.util.UrlTenantUtil;
+import org.immregistries.iis.kernal.enums.UserRole;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
 import org.springframework.security.web.savedrequest.RequestCache;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
@@ -66,6 +69,12 @@ public class ServerSecurityConfig {
 						.permitAll() // ShLinks
 			.requestMatchers(LOGIN_FORM_PATH, "/oauth2/**", LOGIN_PATH)
 			.permitAll()
+			// User management. MUST stay ahead of the blanket REST_PATH permitAll below:
+			// the authorization manager returns on the first matching pattern.
+			.requestMatchers(IisRestPath.REST_ADMIN_PATH + "/**")
+			.hasRole(UserRole.ADMIN.name())
+			.requestMatchers(IisRestPath.REST_USER_PATH + "/**")
+			.authenticated()
 						// API AUTHORIZATION AND AUTHENTICATION SEPARATED
 					.requestMatchers(FHIR_SERVER_PATH_EXTENSION + "/**",
 						SoapDescriptionController.SOAP_BASE_PATH,
@@ -92,6 +101,16 @@ public class ServerSecurityConfig {
 						.logoutRequestMatcher(new AntPathRequestMatcher(LOGOUT_PATH)) // Use RequestMatcher
 						.logoutSuccessUrl(LOGIN_FORM_PATH)
 			.deleteCookies(COOKIE_NAME));
+
+		/*
+		 * formLogin installs LoginUrlAuthenticationEntryPoint globally, which would answer an
+		 * unauthenticated API call with a 302 to the login page. Everything else under
+		 * /rest/** is permitAll and never reaches an entry point, so this only affects the
+		 * user management endpoints.
+		 */
+		http.exceptionHandling(exceptionHandling -> exceptionHandling.defaultAuthenticationEntryPointFor(
+			new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED),
+			new AntPathRequestMatcher(IisRestPath.BasePath.REST_PATH + "/**")));
 
 		http.csrf(AbstractHttpConfigurer::disable);
 		return http.build();

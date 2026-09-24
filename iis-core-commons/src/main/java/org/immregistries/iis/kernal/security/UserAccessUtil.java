@@ -8,6 +8,7 @@ import org.immregistries.iis.kernal.persisted.entities.Tenant;
 import org.immregistries.iis.kernal.persisted.entities.UserAccess;
 import org.immregistries.iis.kernal.persisted.repository.UserAccessRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCrypt;
@@ -25,11 +26,31 @@ public class UserAccessUtil {
     public static final String SESSION_USER_ACCESS = "userAccess";
     private static String BAD_PASSWORD = "badpassword";
 
+	/**
+	 * Cost factor for new password hashes. Kept at the historical value so existing hashes
+	 * and newly written ones are produced the same way; bcrypt encodes the cost per hash,
+	 * so raising this later is a non-breaking change.
+	 */
+	private static final int BCRYPT_COST = 5;
+
 	@Autowired
 	private UserAccessRepository userAccessRepository;
 	@Autowired
 	private RequestTenantUtil requestTenantUtil;
 
+	/**
+	 * When false, logging in with an unknown username is rejected instead of silently
+	 * creating the account. Defaults to true to preserve the sandbox behaviour.
+	 */
+	@Value("${iis.deployment.allow-self-registration:true}")
+	private boolean allowSelfRegistration;
+
+	/**
+	 * Single place where a password becomes a stored accessKey.
+	 */
+	public static String hashPassword(String rawPassword) {
+		return BCrypt.hashpw(rawPassword, BCrypt.gensalt(BCRYPT_COST));
+	}
 
 	public UserAccess authenticateUserAccessUsernamePassword(String username, String password) {
         if (username.startsWith(GITHUB_PREFIX) || StringUtils.isBlank(password)) {
@@ -51,8 +72,9 @@ public class UserAccessUtil {
 				 userAccess = optionalUserAccess.get();
             } else {
                 throw new AuthenticationException("password for user : " + username);
-            }
-        }
+			 }
+		 }
+		assertEnabled(userAccess);
         SecurityContextHolder.getContext().setAuthentication(userAccess);
         return userAccess;
     }
@@ -72,10 +94,24 @@ public class UserAccessUtil {
                 throw new AuthenticationException("OAuth login failure");
             }
 			 userAccess = optionalUserAccess.get();
-        }
+		 }
+		assertEnabled(userAccess);
         SecurityContextHolder.getContext().setAuthentication(userAccess);
         return userAccess;
-    }
+	}
+
+	/**
+	 * Rejects an account an administrator has switched off.
+	 * <p>
+	 * Uses HAPI's AuthenticationException rather than Spring's DisabledException on purpose:
+	 * this runs on the FHIR Basic-auth path too, where RestfulServer maps HAPI's exception to
+	 * a clean 401 and would turn anything else into a 500.
+	 */
+	private void assertEnabled(UserAccess userAccess) {
+		if (userAccess != null && !userAccess.isEnabled()) {
+			throw new AuthenticationException("user disabled : " + userAccess.getAccessName());
+		}
+	}
 
 	private UserAccess registerUserAccessGithub(String username) {
         if (!username.startsWith(GITHUB_PREFIX)) {
@@ -83,17 +119,22 @@ public class UserAccessUtil {
         }
         UserAccess userAccess = new UserAccess();
         userAccess.setAccessName(username);
-        userAccess.setAccessKey("");
+		userAccess.setAccessKey("");
+		userAccess.setEnabled(true);
 		return userAccessRepository.save(userAccess);
     }
 
 	private UserAccess registerUserAccessWithUsernamePassword(String username, String password) {
         if (username.startsWith(GITHUB_PREFIX)) {
             throw new AuthenticationException();
-        }
+		  }
+		if (!allowSelfRegistration) {
+			throw new AuthenticationException("unknown user : " + username);
+		}
         UserAccess userAccess = new UserAccess();
         userAccess.setAccessName(username);
-		userAccess.setAccessKey(BCrypt.hashpw(password, BCrypt.gensalt(5)));
+		userAccess.setAccessKey(hashPassword(password));
+		userAccess.setEnabled(true);
         // after auth checks fix in fhir
 		return userAccessRepository.save(userAccess);
     }

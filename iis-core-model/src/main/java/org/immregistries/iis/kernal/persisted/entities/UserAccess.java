@@ -2,23 +2,44 @@ package org.immregistries.iis.kernal.persisted.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import org.immregistries.iis.kernal.enums.UserRole;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Created by Eric on 12/20/17.
  */
 
 /**
- * TODO Improve integration with spring security, especially grantedAuthority
+ * This entity doubles as the Spring Security {@link Authentication} object: it is placed
+ * directly in the SecurityContext and in the HttpSession by UserAccessUtil, and is therefore
+ * read back <em>detached</em> on every subsequent request.
+ * <p>
+ * Two consequences drive the annotations below:
+ * <ul>
+ *   <li>{@link #roles} must be EAGER. {@link #getAuthorities()} is called from inside
+ *   Spring's AuthorizationFilter, long after the loading transaction closed; a lazy
+ *   collection would throw LazyInitializationException there.</li>
+ *   <li>Every field must be {@code @JsonIgnore}d. AuthenticationRestController passes the
+ *   principal into AuthInfo as a plain Object, so Jackson serializes this entity's runtime
+ *   type on the publicly readable /rest/authentication endpoint.</li>
+ * </ul>
+ * New fields are nullable so that a database created from the pre-existing schema keeps
+ * working: a NULL {@link #enabled} means enabled, and an empty {@link #roles} means
+ * {@link UserRole#USER}.
  */
 @Entity
 @Table
 public class UserAccess implements Serializable, Authentication {
+
+	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -30,6 +51,26 @@ public class UserAccess implements Serializable, Authentication {
 	@Column(nullable = false)
 	@JsonIgnore
 	private String accessKey = "";
+
+	@JsonIgnore
+	private String email;
+
+	/**
+	 * Wrapper type on purpose: rows predating this column read back as NULL, which means
+	 * enabled. See {@link #isEnabled()}.
+	 */
+	@JsonIgnore
+	private Boolean enabled;
+
+	/**
+	 * EAGER is mandatory, see the class javadoc.
+	 */
+	@ElementCollection(fetch = FetchType.EAGER)
+	@CollectionTable(name = "UserAccess_roles", joinColumns = @JoinColumn(name = "userAccess_id"))
+	@Column(name = "role", nullable = false, length = 32)
+	@Enumerated(EnumType.STRING)
+	@JsonIgnore
+	private Set<UserRole> roles = new HashSet<>();
 
 	public int getUserAccessId() {
 		return id;
@@ -55,10 +96,59 @@ public class UserAccess implements Serializable, Authentication {
 		this.accessKey = accessKey;
 	}
 
+	@JsonIgnore
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	/**
+	 * @return false only when explicitly disabled; NULL (legacy rows) counts as enabled.
+	 */
+	@Transient
+	@JsonIgnore
+	public boolean isEnabled() {
+		return !Boolean.FALSE.equals(enabled);
+	}
+
+	public void setEnabled(Boolean enabled) {
+		this.enabled = enabled;
+	}
+
+	@JsonIgnore
+	public Set<UserRole> getRoles() {
+		return roles;
+	}
+
+	public void setRoles(Set<UserRole> roles) {
+		this.roles = roles == null ? new HashSet<>() : roles;
+	}
+
+	@Transient
+	@JsonIgnore
+	public boolean hasRole(UserRole role) {
+		return roles != null && roles.contains(role);
+	}
+
+	/**
+	 * Users with no role recorded — which is every user predating the roles table — are
+	 * treated as {@link UserRole#USER}.
+	 */
+	@Transient
+	@JsonIgnore
+	public Set<UserRole> getEffectiveRoles() {
+		return roles == null || roles.isEmpty() ? Set.of(UserRole.USER) : Set.copyOf(roles);
+	}
+
 	@Override
 	@JsonIgnore
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-		return new ArrayList<>(0);
+		return getEffectiveRoles().stream()
+			.map(role -> (GrantedAuthority) new SimpleGrantedAuthority(role.getAuthority()))
+			.collect(Collectors.toList());
 	}
 
 	@Override
@@ -79,6 +169,13 @@ public class UserAccess implements Serializable, Authentication {
 		return this;
 	}
 
+	/**
+	 * Deliberately always true. Returning the enabled flag here would make
+	 * ExceptionTranslationFilter treat the caller as anonymous, clearing their session and
+	 * redirecting to the login page instead of returning 401/403. Disabled accounts are
+	 * rejected at authentication time in UserAccessUtil and re-checked against the database
+	 * in UserAccessManagementService.
+	 */
 	@Override
 	@JsonIgnore
 	public boolean isAuthenticated() {
@@ -93,5 +190,36 @@ public class UserAccess implements Serializable, Authentication {
 	@Override
 	public String getName() {
 		return this.accessName;
+	}
+
+	@Override
+	public int hashCode() {
+		return this.getUserAccessId();
+	}
+
+	/**
+	 * instanceof rather than getClass() so that a Hibernate proxy of a @ManyToOne
+	 * userAccess still compares equal to the loaded entity.
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (!(obj instanceof UserAccess)) {
+			return false;
+		}
+		return ((UserAccess) obj).getUserAccessId() == this.getUserAccessId();
+	}
+
+	/**
+	 * Never include accessKey or email: IisOAuthSuccessHandler logs the whole Authentication.
+	 */
+	@Override
+	public String toString() {
+		return "UserAccess{" +
+			"id=" + id +
+			", accessName='" + accessName + '\'' +
+				'}';
 	}
 }
