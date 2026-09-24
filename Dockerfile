@@ -9,7 +9,7 @@ RUN mkdir -p /var/data-h2 && chown -R springboot:springboot /var/data-h2
 USER springboot
 WORKDIR /app
 
-# Copy your built application WAR file
+# Copy your built application JAR file
 COPY ./iis-web/target/iis.jar /app/iis.jar
 
 EXPOSE 8080
