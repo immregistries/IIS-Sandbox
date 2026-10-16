@@ -31,6 +31,14 @@ export class AuthService {
     const name = this._auth()?.name;
     return name === 'anonymousUser' ? '' : (name ?? '');
   });
+  /**
+   * Authorities arrive ROLE_ prefixed, which is the Spring Security convention the
+   * UserRole enum keeps in sync. Used only to decide what to render: the real check is
+   * the /rest/admin/** matcher on the server, which answers 403 regardless.
+   */
+  readonly isAdmin = computed(
+    () => this.isAuthenticated() && (this._auth()?.authorities ?? []).some((a) => a.authority === 'ROLE_ADMIN'),
+  );
 
   ensureLoaded(): Observable<void> {
     if (this._loaded()) {

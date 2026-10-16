@@ -1,4 +1,5 @@
 import {Routes} from '@angular/router';
+import {adminGuard} from './core/guards/admin.guard';
 import {authGuard} from './core/guards/auth.guard';
 import {tenantGuard} from './core/guards/tenant.guard';
 import {MainLayoutComponent} from './shared/layout/main-layout/main-layout.component';
@@ -20,6 +21,15 @@ export const routes: Routes = [
       {
         path: 'tenants',
         loadChildren: () => import('./features/tenant/tenant.routes').then((m) => m.TENANT_ROUTES),
+      },
+      {
+        path: 'account',
+        loadChildren: () => import('./features/user/user.routes').then((m) => m.USER_ROUTES),
+      },
+      {
+        path: 'admin/users',
+        canActivate: [adminGuard],
+        loadChildren: () => import('./features/user/admin-user.routes').then((m) => m.ADMIN_USER_ROUTES),
       },
       {
         path: 't/:tenantName',

@@ -12,8 +12,8 @@ import {TenantSelectorComponent} from '../../shared/components/tenant-selector/t
 import {getActiveFlavors, ProcessingFlavor} from '../tenant/models/flavor.model';
 import {MessageService} from 'primeng/api';
 import {TenantCreateDialogComponent} from '../tenant/components/tenant-create-dialog/tenant-create-dialog.component';
-import { Divider } from 'primeng/divider';
-import { Fieldset } from 'primeng/fieldset';
+import {Divider} from 'primeng/divider';
+import {Fieldset} from 'primeng/fieldset';
 
 @Component({
   selector: 'app-dashboard',
@@ -118,7 +118,7 @@ import { Fieldset } from 'primeng/fieldset';
         This sandbox uses HAPIFHIR JPA Server framework as an end layer to store records, using an experimental mapping layer to use inherited Hl7v2 based functionalities, current version of HAPIFHIR is a <a href="https://github.com/cerbeor/hapi-fhir-Subscription-custom">modded</a> 6.8.3
         </p-fieldset>
         <p-fieldset legend="Multitenancy">
-        Tenants allow separate testing environments, using different Flavors and different partitions of FHIR Server,	Base URLs are formatted as <a href="fhirMetadataLink()"  target="_blank">/iis/fhir/tenantName</a>
+        Tenants allow separate testing environments, using different Flavors and different partitions of FHIR Server,	Base URLs are formatted as <a href="fhirMetadataLink()"  target="_blank">/iis/fhir/{tenantName}</a>
         </p-fieldset>
         <p-fieldset legend="Record's Matching:">
         Matching resources using <a href="https://github.com/immregistries/mismo-match"  target="_blank">MISMO</a> for Patients (Activated with a Flavor), <a href="https://github.com/usnistgov/vaccination_deduplication"  target="_blank">vaccination_deduplication</a> for Immunizations

@@ -1,5 +1,6 @@
 import {Component, computed, inject} from '@angular/core';
 import {RouterLink, RouterLinkActive} from '@angular/router';
+import {AuthService} from '../../../core/services/auth.service';
 import {TenantContextService} from '../../../core/services/tenant-context.service';
 
 @Component({
@@ -158,6 +159,22 @@ import {TenantContextService} from '../../../core/services/tenant-context.servic
             </a>
           </li>
         }
+
+        <li class="nav-section">Account</li>
+        <li>
+          <a routerLink="/account" routerLinkActive="active" class="nav-link">
+            <i class="pi pi-user"></i>
+            <span>My Account</span>
+          </a>
+        </li>
+        @if (authService.isAdmin()) {
+          <li>
+            <a routerLink="/admin/users" routerLinkActive="active" class="nav-link">
+              <i class="pi pi-users"></i>
+              <span>User Administration</span>
+            </a>
+          </li>
+        }
       </ul>
     </nav>
   `,
@@ -208,6 +225,7 @@ import {TenantContextService} from '../../../core/services/tenant-context.servic
 })
 export class SidebarComponent {
   tenantContext = inject(TenantContextService);
+  authService = inject(AuthService);
 
   dashboard = computed(() => `/t/${this.tenantContext.tenantName()}/dashboard`)
   tenants = computed(() => `/t/${this.tenantContext.tenantName()}/tenants`)

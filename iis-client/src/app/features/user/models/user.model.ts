@@ -52,3 +52,6 @@ export interface UserManagementError {
 
 /** Minimum accepted by the server, see UserAccessManagementService.MIN_PASSWORD_LENGTH. */
 export const MIN_PASSWORD_LENGTH = 8;
+
+/** Every assignable role, in the order the UserRole enum declares them. */
+export const ALL_USER_ROLES: readonly UserRole[] = ['USER', 'ADMIN'];
