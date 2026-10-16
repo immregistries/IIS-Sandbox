@@ -2,7 +2,9 @@ package org.immregistries.iis.kernal.controllers.rest;
 
 import ca.uhn.fhir.rest.server.exceptions.AuthenticationException;
 import org.immregistries.iis.kernal.security.UserNotFoundException;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -16,6 +18,7 @@ import java.util.Map;
  * error mapping for every existing REST controller in the app.
  */
 @RestControllerAdvice(assignableTypes = {UserSelfRestController.class, AdminUserRestController.class})
+@Order(1) // Runs first
 public class UserManagementExceptionAdvice {
 
 	@ExceptionHandler(UserNotFoundException.class)
@@ -36,8 +39,13 @@ public class UserManagementExceptionAdvice {
 		return body(HttpStatus.BAD_REQUEST, e.getMessage());
 	}
 
+	/**
+	 * The content type is set explicitly for the same reason the controllers pin
+	 * {@code produces}: without it a request carrying no Accept header negotiates to XML.
+	 */
 	private ResponseEntity<Map<String, String>> body(HttpStatus status, String message) {
-		return ResponseEntity.status(status).body(Map.of("error", status.getReasonPhrase(), "message",
-			message == null ? "" : message));
+		return ResponseEntity.status(status)
+			.contentType(MediaType.APPLICATION_JSON)
+			.body(Map.of("error", status.getReasonPhrase(), "message", message == null ? "" : message));
 	}
 }

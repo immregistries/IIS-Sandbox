@@ -62,6 +62,9 @@ class UserManagementRestIT {
 
 	/**
 	 * @return the JSESSIONID cookie, or null when the credentials were rejected.
+	 * <p>
+	 * The status code is what decides: the servlet container hands out a JSESSIONID on a
+	 * rejected login too, so the presence of the cookie says nothing about the outcome.
 	 */
 	private String login(String username, String password) {
 		HttpHeaders headers = new HttpHeaders();
@@ -74,6 +77,9 @@ class UserManagementRestIT {
 
 		ResponseEntity<String> response =
 			restTemplate.exchange(url("/login"), HttpMethod.POST, new HttpEntity<>(form, headers), String.class);
+		if (!response.getStatusCode().is2xxSuccessful()) {
+			return null;
+		}
 		List<String> cookies = response.getHeaders().get(HttpHeaders.SET_COOKIE);
 		if (cookies == null) {
 			return null;

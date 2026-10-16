@@ -14,7 +14,11 @@ import java.io.InputStream;
  * Grants access to CodeMaps extracted from XML file, usually Compiled.xml
  */
 public class CodeMapManagerService {
-	public static final String COMPILED_XML_PATH = "/Compiled.xml";
+	/**
+	 * No leading slash: ClassLoader.getResourceAsStream treats every name as absolute and
+	 * returns null for one, unlike Class.getResourceAsStream.
+	 */
+	public static final String COMPILED_XML_PATH = "Compiled.xml";
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	private final CodeMap codeMap;
@@ -28,6 +32,7 @@ public class CodeMapManagerService {
 		InputStream is = resourceLoader.getClassLoader().getResourceAsStream(COMPILED_XML_PATH);
 		if (is == null) {
 			logger.error("Could not load compiled CodeMap Unable to find file from {}", COMPILED_XML_PATH);
+			throw new IllegalStateException(COMPILED_XML_PATH + " is not on the classpath");
 		}
 		codeMap = builder.getCodeMap(is);
 	}

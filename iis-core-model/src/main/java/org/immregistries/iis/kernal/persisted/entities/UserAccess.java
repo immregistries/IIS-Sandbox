@@ -2,6 +2,8 @@ package org.immregistries.iis.kernal.persisted.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import org.immregistries.iis.kernal.enums.UserRole;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -64,11 +66,18 @@ public class UserAccess implements Serializable, Authentication {
 
 	/**
 	 * EAGER is mandatory, see the class javadoc.
+	 * <p>
+	 * The explicit VARCHAR type code is mandatory too. HAPI's dialects override
+	 * {@code getEnumTypeDeclaration} to return null (true of HapiFhirH2Dialect and
+	 * HapiFhirMySQLDialect alike), and Hibernate 6 writes that null straight into the
+	 * generated DDL as the column type, producing {@code role null not null}. Naming the
+	 * JDBC type keeps schema generation off that path on every dialect.
 	 */
 	@ElementCollection(fetch = FetchType.EAGER)
 	@CollectionTable(name = "UserAccess_roles", joinColumns = @JoinColumn(name = "userAccess_id"))
 	@Column(name = "role", nullable = false, length = 32)
 	@Enumerated(EnumType.STRING)
+	@JdbcTypeCode(SqlTypes.VARCHAR)
 	@JsonIgnore
 	private Set<UserRole> roles = new HashSet<>();
 

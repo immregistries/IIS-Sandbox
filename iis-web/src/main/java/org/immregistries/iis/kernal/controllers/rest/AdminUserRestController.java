@@ -5,6 +5,7 @@ import org.immregistries.iis.kernal.controllers.IisRestPath;
 import org.immregistries.iis.kernal.security.UserAccessManagementService;
 import org.immregistries.iis.kernal.security.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,7 +18,11 @@ import java.util.List;
  * requires ROLE_ADMIN and is registered ahead of the blanket {@code /rest/**} permitAll.
  */
 @RestController
-@RequestMapping(IisRestPath.REST_ADMIN_USERS_PATH)
+/*
+ * produces is pinned: a HAPI XML converter sits on the classpath, so a request that sends
+ * no Accept header negotiates to application/xml rather than JSON.
+ */
+@RequestMapping(value = IisRestPath.REST_ADMIN_USERS_PATH, produces = MediaType.APPLICATION_JSON_VALUE)
 public class AdminUserRestController {
 
 	@Autowired

@@ -10,6 +10,7 @@ import org.immregistries.iis.kernal.security.dto.ChangePasswordRequest;
 import org.immregistries.iis.kernal.security.dto.UpdateEmailRequest;
 import org.immregistries.iis.kernal.security.dto.UserProfileDto;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -22,7 +23,11 @@ import org.springframework.web.bind.annotation.*;
  * registered ahead of the blanket {@code /rest/**} permitAll.
  */
 @RestController
-@RequestMapping(IisRestPath.REST_USER_PATH + IisRestPath.BasePath.ME_PATH)
+/*
+ * produces is pinned, see AdminUserRestController.
+ */
+@RequestMapping(value = IisRestPath.REST_USER_PATH + IisRestPath.BasePath.ME_PATH,
+	produces = MediaType.APPLICATION_JSON_VALUE)
 public class UserSelfRestController {
 
 	@Autowired
