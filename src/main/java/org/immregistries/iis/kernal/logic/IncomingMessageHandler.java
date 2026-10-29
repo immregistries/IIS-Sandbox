@@ -2131,7 +2131,11 @@ public class IncomingMessageHandler {
     try {
       TestCase testCase = new TestCase();
       testCase.setEvalDate(new Date());
-      testCase.setPatientSex(patientReported == null ? "F" : patientReported.getPatientSex());
+      String patientSex = patientReported == null ? "F" : patientReported.getPatientSex();
+      if (!ValidValues.verifyValidValue(patientSex, ValidValues.SEX)) {
+        patientSex = "U";
+      }
+      testCase.setPatientSex(patientSex);
       testCase.setPatientDob(patient.getPatientBirthDate());
       List<TestEvent> testEventList = new ArrayList<>();
       for (VaccinationMaster vaccination : vaccinationMasterList) {
@@ -2156,11 +2160,11 @@ public class IncomingMessageHandler {
       }
       testCase.setTestEventList(testEventList);
       Software software = new Software();
-      software.setServiceUrl("https://sabbia.westus2.cloudapp.azure.com/lonestar/forecast");
+      software.setServiceUrl("https://informatics.immregistries.org/lonestar/forecast");
       software.setService(Service.LSVF);
       if (processingFlavorSet.contains(ProcessingFlavor.ICE)) {
         software.setServiceUrl(
-            "https://sabbia.westus2.cloudapp.azure.com//opencds-decision-support-service/evaluate");
+            "https://informatics.immregistries.org/opencds-decision-support-service/evaluate");
         software.setService(Service.ICE);
       }
 
