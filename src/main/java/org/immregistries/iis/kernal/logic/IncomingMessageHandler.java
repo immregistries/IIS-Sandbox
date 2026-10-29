@@ -36,6 +36,9 @@ import org.immregistries.iis.kernal.model.Person;
 import org.immregistries.iis.kernal.model.ProcessingFlavor;
 import org.immregistries.iis.kernal.model.VaccinationMaster;
 import org.immregistries.iis.kernal.model.VaccinationReported;
+import org.immregistries.iis.kernal.logic.rb.ContextualCondition;
+import org.immregistries.iis.kernal.logic.rb.ContextualConditionParser;
+import org.immregistries.iis.kernal.logic.rb.RiskBasedForecast;
 import org.immregistries.smm.tester.manager.HL7Reader;
 import org.immregistries.vfa.connect.ConnectFactory;
 import org.immregistries.vfa.connect.ConnectorInterface;
@@ -60,6 +63,7 @@ public class IncomingMessageHandler {
 
   private static final String QBP_Z34 = "Z34";
   private static final String QBP_Z44 = "Z44";
+  private static final String QBP_Z45 = "Z45";
   private static final String RSP_Z42_MATCH_WITH_FORECAST = "Z42";
   private static final String RSP_Z32_MATCH = "Z32";
   private static final String RSP_Z31_MULTIPLE_MATCH = "Z31";
@@ -1223,6 +1227,14 @@ public class IncomingMessageHandler {
     Set<ProcessingFlavor> processingFlavorSet = orgAccess.getOrg().getProcessingFlavorSet();
     StringBuilder sb = new StringBuilder();
     String profileIdSubmitted = reader.getValue(21);
+    // Z45 (risk-based) carries contextual conditions in OBX segments after the QPD
+    boolean riskBased = profileIdSubmitted.equals(QBP_Z45);
+    List<ContextualCondition> contextualConditions = new ArrayList<ContextualCondition>();
+    if (riskBased) {
+      contextualConditions = ContextualConditionParser.parse(reader);
+      reader.resetPostion();
+      reader.advanceToSegment("MSH");
+    }
     CodeMap codeMap = CodeMapManager.getCodeMap();
     String categoryResponse = "No Match";
     String profileId = RSP_Z33_NO_MATCH;
@@ -1267,7 +1279,7 @@ public class IncomingMessageHandler {
               profileId = RSP_Z31_MULTIPLE_MATCH;
               categoryResponse = "Possible Match";
             }
-          } else if (profileIdSubmitted.equals("Z44")) {
+          } else if (profileIdSubmitted.equals("Z44") || riskBased) {
             queryResponse = QUERY_NOT_FOUND;
             profileId = RSP_Z33_NO_MATCH;
             categoryResponse = "No Match";
@@ -1278,6 +1290,11 @@ public class IncomingMessageHandler {
         }
       } else if (profileIdSubmitted.equals(QBP_Z34)) {
         profileId = RSP_Z32_MATCH;
+        categoryResponse = "Match";
+      } else if (riskBased) {
+        // scripted risk-based forecast replaces the forecaster call
+        sendBackForecast = false;
+        profileId = RSP_Z42_MATCH_WITH_FORECAST;
         categoryResponse = "Match";
       } else if (profileIdSubmitted.equals(QBP_Z44)) {
         if (processingFlavorSet.contains(ProcessingFlavor.ORANGE)) {
@@ -1304,6 +1321,11 @@ public class IncomingMessageHandler {
       if (processingExceptionList.size() > 0) {
         printERRSegment(processingExceptionList.get(processingExceptionList.size() - 1), sb);
       }
+      if (riskBased) {
+        // one warning per contextual condition that is not recognized, query is not rejected
+        sb.append(RiskBasedForecast
+            .writeErrors(RiskBasedForecast.findUnknown(contextualConditions)));
+      }
     }
     String profileName = "Request a Complete Immunization History";
     if (profileIdSubmitted.equals("")) {
@@ -1313,6 +1335,8 @@ public class IncomingMessageHandler {
       profileName = "Request a Complete Immunization History";
     } else if (profileIdSubmitted.equals("Z44")) {
       profileName = "Request Evaluated Immunization History and Forecast Query";
+    } else if (riskBased) {
+      profileName = "Request Evaluated Immunization History and Risk-Based Forecast";
     }
     {
       sb.append("QAK|" + queryId);
@@ -1554,6 +1578,16 @@ public class IncomingMessageHandler {
             obxSetId++;
             printObx(sb, obxSetId, obsSubId, observation);
           }
+        }
+      }
+
+      if (riskBased) {
+        Date today = new Date();
+        String scripted = RiskBasedForecast.writeForecast(
+            RiskBasedForecast.build(contextualConditions, today), today, obxSetId, obsSubId);
+        if (scripted.length() > 0) {
+          printORC(orgAccess, sb, null, null, false);
+          sb.append(scripted);
         }
       }
 
