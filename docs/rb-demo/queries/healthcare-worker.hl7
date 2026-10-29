@@ -1,0 +1,4 @@
+MSH|^~\&|RBDEMO|RBDEMO-CLINIC|IIS|IIS|20261029120000-0500||QBP^Q11^QBP_Q11|1793303695093.1|P|2.5.1|||ER|AL|||||Z45^CDCPHINVS|||
+QPD|Z45^Request Evaluated Immunization History and Risk-Based Forecast^CDCPHINVS|1793303695093.1|MP1003^^^RBDEMO^MR|DemoHcw^Harold^^^^^L|DemoMom^Mother^^^^^M|19880215|M|123 Demo St^^Madison^WI^53703^USA^P|^PRN^PH^^^608^5551234|||||
+OBX|1|ID|055^Healthcare personnel^99CDS|1|Y||||||F
+RCP|I|1^RD&Records&HL70126

@@ -1,0 +1,33 @@
+--- REQUEST ---
+MSH|^~\&|RBDEMO|RBDEMO-CLINIC|IIS|IIS|20261029120000-0500||QBP^Q11^QBP_Q11|1793303695361.1|P|2.5.1|||ER|AL|||||Z45^CDCPHINVS|||
+QPD|Z45^Request Evaluated Immunization History and Risk-Based Forecast^CDCPHINVS|1793303695361.1|MP1004^^^RBDEMO^MR|DemoUnk^Una^^^^^L|DemoMom^Mother^^^^^M|19900707|F|123 Demo St^^Madison^WI^53703^USA^P|^PRN^PH^^^608^5551234|||||
+OBX|1|ID|055^Healthcare personnel^99CDS|1|Y||||||F
+OBX|2|ID|999^Unrecognized condition^99CDS|2|Y||||||F
+RCP|I|1^RD&Records&HL70126
+
+--- RESPONSE ---
+MSH|^~\&|IIS|IIS Sandbox v0.5.8|RBDEMO|RBDEMO-CLINIC|20261029025455-0500||RSP^K11^RSP_K11|17933036954129|P|2.5.1|||NE|NE|||||Z42^CDCPHINVS
+MSA|AA|1793303695361.1
+ERR||OBX^2^3|103^Table value not found^HL70357|W||||Contextual condition code '999' is not recognized, it was ignored|
+QAK|1793303695361.1|OK|Z45^Request Evaluated Immunization History and Risk-Based Forecast^CDCPHINVS
+QPD|Z45^Request Evaluated Immunization History and Risk-Based Forecast^CDCPHINVS|1793303695361.1|MP1004^^^RBDEMO^MR|DemoUnk^Una^^^^^L|DemoMom^Mother^^^^^M|19900707|F|123 Demo St^^Madison^WI^53703^USA^P|^PRN^PH^^^608^5551234|||||
+PID|1||AEPBYBJTA9X8^^^IIS^SR~MP1004^^^RBDEMO^MR||DemoUnk^Una^^^^^L|DemoMom^^^^^^M|19900707|F|||123 Demo St^^Madison^WI^53703^USA^P||^PRN^PH^^^608^5551234||||||||||||
+ORC|RE|3^IIS|MP1004.1^RBDEMO
+RXA|0|1|20100101||03^MMR^CVX|0.5|mL^milliliters^UCUM||00^New immunization record^NIP001||||||LOT1||MSD^Merck and Co., Inc.^MVX|||CP|A
+RXR|C28161^Intramuscular^NCIT|LA^Left Upper Arm^HL70163
+ORC|RE||9999^IIS
+RXA|0|1|20261029||998^No Vaccination Administered^CVX|999||||||||||||||NA
+OBX|1|CE|30956-7^Vaccine type^LN|1|45^HepB^CVX||||||F
+OBX|2|CE|59783-1^Status in series^LN|1|LA13422-3^On schedule^LN||||||F
+OBX|3|CE|59779-9^Schedule used^LN|1|VXC16^ACIP^CDCPHINVS||||||F
+OBX|4|CE|99999-9^Vaccine Recommendation Category^LN|1|H^High-Risk^99VRC||||||F
+OBX|5|CE|30982-3^Reason for Recommendation^LN|1|055^Healthcare personnel^99CDS||||||F
+OBX|6|CE|30956-7^Vaccine type^LN|2|88^Influenza^CVX||||||F
+OBX|7|CE|59783-1^Status in series^LN|2|LA13422-3^On schedule^LN||||||F
+OBX|8|DT|30981-5^Earliest date^LN|2|20261029||||||F
+OBX|9|DT|30980-7^Recommended date^LN|2|20261029||||||F
+OBX|10|DT|59778-1^Latest date^LN|2|20270127||||||F
+OBX|11|CE|59779-9^Schedule used^LN|2|VXC16^ACIP^CDCPHINVS||||||F
+OBX|12|CE|99999-9^Vaccine Recommendation Category^LN|2|R^Routine^99VRC||||||F
+OBX|13|CE|30982-3^Reason for Recommendation^LN|2|055^Healthcare personnel^99CDS||||||F
+

@@ -1,0 +1,20 @@
+--- REQUEST ---
+MSH|^~\&|RBDEMO|RBDEMO-CLINIC|IIS|IIS|20261029120000-0500||QBP^Q11^QBP_Q11|1793303694825.1|P|2.5.1|||ER|AL|||||Z45^CDCPHINVS|||
+QPD|Z45^Request Evaluated Immunization History and Risk-Based Forecast^CDCPHINVS|1793303694825.1|MP1002^^^RBDEMO^MR|DemoRsv^Baby^^^^^L|DemoMom^Mother^^^^^M|20260915|M|123 Demo St^^Madison^WI^53703^USA^P|^PRN^PH^^^608^5551234|||||
+OBX|1|ID|278^Birth mother received RSV vaccine during pregnancy^99CDS|1|Y||||||F
+RCP|I|1^RD&Records&HL70126
+
+--- RESPONSE ---
+MSH|^~\&|IIS|IIS Sandbox v0.5.8|RBDEMO|RBDEMO-CLINIC|20261029025454-0500||RSP^K11^RSP_K11|17933036948785|P|2.5.1|||NE|NE|||||Z42^CDCPHINVS
+MSA|AA|1793303694825.1
+QAK|1793303694825.1|OK|Z45^Request Evaluated Immunization History and Risk-Based Forecast^CDCPHINVS
+QPD|Z45^Request Evaluated Immunization History and Risk-Based Forecast^CDCPHINVS|1793303694825.1|MP1002^^^RBDEMO^MR|DemoRsv^Baby^^^^^L|DemoMom^Mother^^^^^M|20260915|M|123 Demo St^^Madison^WI^53703^USA^P|^PRN^PH^^^608^5551234|||||
+PID|1||2H7CLDJVNKG3^^^IIS^SR~MP1002^^^RBDEMO^MR||DemoRsv^Baby^^^^^L|DemoMom^^^^^^M|20260915|M|||123 Demo St^^Madison^WI^53703^USA^P||^PRN^PH^^^608^5551234||||||||||||
+ORC|RE||9999^IIS
+RXA|0|1|20261029||998^No Vaccination Administered^CVX|999||||||||||||||NA
+OBX|1|CE|30956-7^Vaccine type^LN|1|306^RSV-mAb (nirsevimab) - not needed^CVX||||||F
+OBX|2|CE|59783-1^Status in series^LN|1|LA27183-5^Immune^LN||||||F
+OBX|3|CE|59779-9^Schedule used^LN|1|VXC16^ACIP^CDCPHINVS||||||F
+OBX|4|CE|99999-9^Vaccine Recommendation Category^LN|1|R^Routine^99VRC||||||F
+OBX|5|CE|30982-3^Reason for Recommendation^LN|1|278^Birth mother received RSV vaccine during pregnancy^99CDS||||||F
+
