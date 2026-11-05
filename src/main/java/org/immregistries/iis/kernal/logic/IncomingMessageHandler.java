@@ -2461,7 +2461,7 @@ public class IncomingMessageHandler {
 
     String sendingDateString;
     {
-      SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddhhmmssZ");
+      SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddHHmmssZ");
       sendingDateString = simpleDateFormat.format(new Date());
     }
     String uniqueId;
