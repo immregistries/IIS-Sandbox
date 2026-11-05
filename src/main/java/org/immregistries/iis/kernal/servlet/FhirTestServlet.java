@@ -355,7 +355,7 @@ public class FhirTestServlet extends HttpServlet {
   }
 
   private Date getDateSafe(String value) throws ParseException {
-    SimpleDateFormat sdf = new SimpleDateFormat("YYYYMMDD");
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
     Date date = null;
     try {
       date = sdf.parse(value);
