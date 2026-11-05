@@ -14,6 +14,7 @@ import {MessageService} from 'primeng/api';
 import {TenantCreateDialogComponent} from '../tenant/components/tenant-create-dialog/tenant-create-dialog.component';
 import {Divider} from 'primeng/divider';
 import {Fieldset} from 'primeng/fieldset';
+import {REST_ENDPOINT_GROUPS} from './models/rest-endpoint.model';
 
 @Component({
   selector: 'app-dashboard',
@@ -113,12 +114,48 @@ import {Fieldset} from 'primeng/fieldset';
           </div>
         </p-panel>
       }
+      <p-panel header="Restful endpoints" styleClass="mt-4" [toggleable]="true" [collapsed]="true">
+        <p class="hint endpoints-intro">
+          Paths are relative to the application context, so a full URL reads
+          <code>/iis/rest/...</code>. Segments in braces are path variables. Unless a note says
+          otherwise, these answer JSON.
+        </p>
+        @for (group of restEndpointGroups; track group.name) {
+          <p-fieldset [legend]="group.name" [toggleable]="true" [collapsed]="true">
+            <div class="endpoint-list">
+              @for (endpoint of group.endpoints; track endpoint.path) {
+                <div class="endpoint">
+                  <code class="endpoint-path">{{ endpoint.path }}</code>
+                  <p class="endpoint-description">{{ endpoint.description }}</p>
+                  @if (endpoint.note) {
+                    <p class="endpoint-note">{{ endpoint.note }}</p>
+                  }
+                  @if (endpoint.operations) {
+                    <ul class="operation-list">
+                      @for (operation of endpoint.operations; track operation.method + (operation.suffix ?? '')) {
+                        <li>
+                          <p-tag [value]="operation.method" [severity]="methodSeverity(operation.method)" />
+                          @if (operation.suffix) {
+                            <code class="operation-suffix">{{ operation.suffix }}</code>
+                          }
+                          <span class="operation-description">{{ operation.description }}</span>
+                        </li>
+                      }
+                    </ul>
+                  }
+                </div>
+              }
+            </div>
+          </p-fieldset>
+        }
+      </p-panel>
+
       <p-panel header="Concepts" styleClass="mt-4" [toggleable]="true" [collapsed]="false">
         <p-fieldset legend="HAPIFHIR Server Backend">
         This sandbox uses HAPIFHIR JPA Server framework as an end layer to store records, using an experimental mapping layer to use inherited Hl7v2 based functionalities, current version of HAPIFHIR is a <a href="https://github.com/cerbeor/hapi-fhir-Subscription-custom">modded</a> 6.8.3
         </p-fieldset>
         <p-fieldset legend="Multitenancy">
-        Tenants allow separate testing environments, using different Flavors and different partitions of FHIR Server,	Base URLs are formatted as <a href="fhirMetadataLink()"  target="_blank">/iis/fhir/{tenantName}</a>
+        Tenants allow separate testing environments, using different Flavors and different partitions of FHIR Server,	Base URLs are formatted as <a href="fhirMetadataLink()"  target="_blank">/iis/fhir/&#123;tenantName&#125;</a>
         </p-fieldset>
         <p-fieldset legend="Record's Matching:">
         Matching resources using <a href="https://github.com/immregistries/mismo-match"  target="_blank">MISMO</a> for Patients (Activated with a Flavor), <a href="https://github.com/usnistgov/vaccination_deduplication"  target="_blank">vaccination_deduplication</a> for Immunizations
@@ -177,6 +214,52 @@ import {Fieldset} from 'primeng/fieldset';
       }
     }
     .hint { color: var(--p-text-muted-color); margin: 0; }
+    .endpoints-intro {
+      margin-bottom: 0.75rem;
+      font-size: 0.875rem;
+      code { font-size: 0.8125rem; }
+    }
+    .endpoint-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .endpoint-path {
+      font-size: 0.8125rem;
+      font-weight: 600;
+      word-break: break-all;
+    }
+    .endpoint-description {
+      margin: 0.25rem 0 0;
+      font-size: 0.875rem;
+    }
+    .endpoint-note {
+      margin: 0.25rem 0 0;
+      font-size: 0.8125rem;
+      color: var(--p-text-muted-color);
+      font-style: italic;
+    }
+    .operation-list {
+      list-style: none;
+      margin: 0.5rem 0 0;
+      padding: 0 0 0 0.5rem;
+      border-left: 2px solid var(--p-content-border-color);
+      display: flex;
+      flex-direction: column;
+      gap: 0.375rem;
+      li {
+        display: flex;
+        align-items: baseline;
+        flex-wrap: wrap;
+        gap: 0.375rem;
+        font-size: 0.875rem;
+      }
+    }
+    .operation-suffix {
+      font-size: 0.8125rem;
+      word-break: break-all;
+    }
+    .operation-description { color: var(--p-text-muted-color); }
     .mb-4 { margin-bottom: 1rem; }
     .mt-4 { margin-top: 1rem; }
     .w-full { width: 100%; }
@@ -184,6 +267,8 @@ import {Fieldset} from 'primeng/fieldset';
 })
 export class DashboardComponent implements OnInit {
   private msgSrv = inject(MessageService);
+
+  protected readonly restEndpointGroups = REST_ENDPOINT_GROUPS;
 
   tenantContext = inject(TenantContextService);
   private tenantApi = inject(TenantApiService);
@@ -210,6 +295,20 @@ export class DashboardComponent implements OnInit {
     const active = getActiveFlavors(name, this.allFlavors());
     return this.allFlavors().filter((f) => active.has(f.key));
   });
+
+  /** Reads at a glance: green creates, blue reads, amber replaces, red removes. */
+  methodSeverity(method: string): 'success' | 'info' | 'warn' | 'danger' {
+    switch (method) {
+      case 'POST':
+        return 'success';
+      case 'PUT':
+        return 'warn';
+      case 'DELETE':
+        return 'danger';
+      default:
+        return 'info';
+    }
+  }
 
   userHasTenant: boolean = false
 
